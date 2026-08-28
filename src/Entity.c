@@ -1,3 +1,7 @@
+/* 25 queued. DELIBERATELY UNWORKED in round 2026-08-29-a: five runners were
+ * staffed elsewhere, not because this unit is hard. Pairs well with a later
+ * Entity_b carve.
+ */
 #include "common.h"
 
 INCLUDE_ASM("asm/nonmatchings/Entity", New_Entity);

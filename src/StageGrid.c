@@ -1,3 +1,8 @@
+/* 2 queued (GetStageChunkFromMood / GetMoodFromStageChunk).
+ * DELIBERATELY UNWORKED in round 2026-08-29-a: a 2-function queue is too thin
+ * to be worth a runner's provisioning cost. Both need the STAGE_CHUNK_MOODS
+ * data slot understood first; that is head or warm-session work.
+ */
 #include "common.h"
 #include "StageGrid.h"
 

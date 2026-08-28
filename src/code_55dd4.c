@@ -1,3 +1,6 @@
+/* 34 queued. DELIBERATELY UNWORKED in round 2026-08-29-a: five runners
+ * were staffed elsewhere, not because this unit is hard. Next round's first pick.
+ */
 #include "common.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", New_class_65650);
