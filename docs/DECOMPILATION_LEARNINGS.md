@@ -62,15 +62,52 @@ thing to test, not a rule to apply:
 - Comma expressions and assignment-in-condition, which 2.x schedules
   differently from the separated form.
 
+## The class framework (SETTLED — the game is plain C)
+
+**Proven 2026-08-28, full evidence and reproducer in
+docs/research/class-framework.md.** The game is plain C with a HAND-ROLLED
+class framework. It is not C++: nothing in the binary was built by a C++ front
+end.
+
+The trap this nearly walked into: the suggestive symbol names (`New_DreamSys`,
+`DreamSys__DreamSys`, `BasicClass__*`) are all **FirecatFG's hypotheses**,
+inherited with the symbol file. Reading them as evidence for C++ is circular —
+they look like C++ because someone who suspected C++ chose them. Every finding
+below is from the bytes.
+
+- **Constructors are called THROUGH the method table** (slot `+0x008`), and so
+  are base-class constructors. No C++ compiler can do that: the object has no
+  vtable pointer until the constructor stores one, which is why the language
+  forbids virtual constructors. This alone settles it.
+- **Table entries are 4 bytes.** Compiling C++ with this repo's own
+  `tools/gcc263/cc1plus` emits **8-byte** entries — `{short delta; short index;
+  void *pfn}` with an entry-count header. The game's tables are flat pointers.
+- **Tables contain null slots mid-table.** g++ fills an unimplemented virtual
+  with `__pure_virtual`, never zero, and never leaves a hole.
+- **The vptr is at object offset 0**; g++ 2.6.3 places it after the base's data
+  members.
+- **A scan of the whole executable finds ZERO 8-byte-stride vtables** against
+  **128 flat pointer tables**. Nothing here is compiler-generated C++.
+
+Practical consequences:
+
+- The pipeline is correct as-is. `cc1`, not `cc1plus`; units stay `.c`.
+- Methods are ordinary C functions with an explicit `this` first parameter.
+- Method tables are DATA — a `static` struct-of-function-pointers initializer,
+  decompiled like any other data slot.
+- `lw $v0, 0x0($reg)` then `lw $v0, <off>($v0)` then `jalr` is a method call.
+  Resolve `<off>` with `tools/classtable.py <table> [--vs <base>]`; the `--vs`
+  diff is the subclass's behaviour in one screen.
+- **60 classes, ~1425 method slots.** This is the game's backbone, not a corner.
+
 ## Open questions
 
-- **Is `class_39e08` C++?** The `New_*` / `Class__method` symbol naming across
-  `class_16334`, `class_39e08` and the `New_DreamSys` / `DreamSys__DreamSys`
-  pair strongly suggests C++ with a `this` pointer in `$a0`. The Psy-Q SDK
-  shipped `cc1plus`, so it is available. This matters a lot for how those 415
-  functions get written, and it is answerable: check whether the constructors
-  return `$a0` unchanged and whether vtables appear in the data segments.
-  Nobody has looked yet.
+- **What is the class-table header word at `+0x000`?** Not a pointer, and it
+  varies per class (`0x1F34`, `0x34`, `0x1130`, `0x00011144`, `0x0E03`…). Some
+  values look like packed fields — the low byte is often `0x03`, `0x44`, `0x64`.
+  A class id, a flags word, or an instance size. Answerable by cross-referencing
+  the values against what the framework's own code at `class_16334` /
+  `code_179d8` does with them; nobody has looked.
 - **What are the four dead-looking data slots** at `0x57070`, `0x76DC8`,
   `0x79528` and the `sbss` runs? They assemble and link fine as plain data, so
   nothing is blocked, but their owners are unidentified.

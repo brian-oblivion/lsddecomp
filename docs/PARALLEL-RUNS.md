@@ -226,11 +226,21 @@ often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
      Any count above 1 is conclusive. splat under-splits when a function is
      reached only through a function-pointer table, because it derives symbols
      from `jal`/`j` references and there are none — so expect this wherever
-     table dispatch is common. **This game is full of C++-style vtable dispatch**
-     (`class_16334`, `class_39e08`, the `New_*`/`*__*` symbol naming), so treat
-     it as likely here, not exotic. A cheap corroborator: a prologue/epilogue
-     frame-size mismatch. Another: an m2c seed for a 400-instruction symbol that
-     comes back with a 9-line body — m2c stops at the first `jr $ra`.
+     table dispatch is common.
+
+     **In this game that is the NORMAL case, not an exotic one.** It is plain C
+     built on a hand-rolled class framework (proven —
+     docs/research/class-framework.md), with **60 classes and ~1425 method slots
+     dispatched through tables in the data**. Every one of those slots is an
+     entry point splat has no `jal` to. A cheap corroborator: a
+     prologue/epilogue frame-size mismatch. Another: an m2c seed for a
+     400-instruction symbol that comes back with a 9-line body — m2c stops at
+     the first `jr $ra`.
+
+     `tools/classtable.py --scan` lists every table, and the addresses inside
+     them are exactly the entry points splat may have missed — so they double
+     as carve boundaries. Cross-check a candidate band against it before
+     splitting.
    - *Exit side.* A "function" with no epilogue and no callers that falls
      through into the next one is a mis-carve — fold it, do not split it. Scan
      for non-`.L` labels (alt-entries) and `jr $reg` dispatchers.

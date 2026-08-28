@@ -53,7 +53,9 @@ Run `python3 tools/progress.py` for live numbers; the figures below go stale.
 
 The biggest carved-but-unworked blocks, for the next carve (Gate 2 in
 docs/PARALLEL-RUNS.md): `class_39e08` (415 functions), `code_179d8` (274),
-`code_2c054` (181), `Entity` (142).
+`code_2c054` (181), `Entity` (142). Expect splat to have under-split these:
+~1425 methods are reached only through class tables, so splat has no `jal` to
+their entry points. `tools/classtable.py --scan` lists those addresses.
 
 ## Key technical facts (derived from the binary)
 
@@ -81,6 +83,16 @@ docs/PARALLEL-RUNS.md): `class_39e08` (415 functions), `code_179d8` (274),
   `-fno-builtin`, which is a cc1-only flag; that asymmetry is why the Makefile
   has separate `CPP_FLAGS` and `CC_FLAGS`.
 - **`char` is unsigned** (`-funsigned-char`). A signed byte load is `s8`.
+- **It is plain C with a HAND-ROLLED class framework — not C++.** Proven, with
+  a reproducer, in `docs/research/class-framework.md`: constructors are called
+  *through* the method table (impossible for a C++ compiler), entries are 4
+  bytes where GCC 2.6.3's own C++ emits 8, and a scan of the whole executable
+  finds **zero** compiler-generated vtables against **128** flat pointer tables.
+  Do not reach for `cc1plus`. Methods are ordinary C functions with an explicit
+  `this` first parameter, the table pointer sits at object offset 0, and the
+  tables are data. Resolve a slot with `tools/classtable.py`, never by counting.
+  **The suggestive symbol names are FirecatFG's hypotheses, not evidence** —
+  they look like C++ because someone who suspected C++ chose them.
 
 ## The decompilation loop
 
@@ -200,6 +212,8 @@ toolchain change.
 make extract                       # regenerate asm/ from the executable
 python3 tools/progress.py          # where the project is
 python3 tools/funcdiff.py <func>   # per-function score
+python3 tools/classtable.py --scan # the 60 class method tables
+python3 tools/classtable.py <t> --vs <base>   # what a subclass overrides
 tools/setup-worktree.sh <name>     # provision a parallel runner
 ```
 

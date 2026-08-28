@@ -6,6 +6,67 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-08-28 — round 1: the C++ question, settled
+
+**No code changed. One structural fact established, and it was the one gating
+the largest block in the project.**
+
+`class_39e08` is 415 functions and round 0 flagged "is this C++?" as the top
+open question, on the grounds that writing them the wrong way is expensive to
+discover late. Settled now, before any of it was staffed.
+
+**Answer: plain C with a hand-rolled class framework.** No C++, no `cc1plus`,
+no pipeline change. Full evidence and reproducer in
+`docs/research/class-framework.md`.
+
+**The trap, worth remembering because it nearly worked.** The evidence FOR C++
+was entirely the symbol names — `New_DreamSys`, `DreamSys__DreamSys`,
+`Get_vtable_DreamSys`, `BasicClass__*`. Every one of those is FirecatFG's
+hypothesis, inherited with the symbol file, and there has never been a symbol
+leak for this game. The names look like C++ because someone who suspected C++
+chose them; treating them as evidence would have been circular. **Inherited
+naming is a hypothesis, not data.**
+
+**What settled it, from the bytes:**
+
+- Constructors are called *through* the method table (slot `+0x008`), and so are
+  base-class constructors. No C++ compiler can do that — the object has no
+  vtable pointer until the constructor stores it, which is why the language has
+  no virtual constructors.
+- Compiling C++ through this repo's own `tools/gcc263/cc1plus` emits **8-byte**
+  vtable entries `{delta, index, pfn}` with a count header, calls constructors
+  **directly by name**, emits no null check after `__builtin_new`, and puts the
+  vptr **after** the base's data members. The game does the opposite on all
+  four counts, with 4-byte flat entries and the vptr at offset 0.
+- The tables have **null slots mid-table**; g++ uses `__pure_virtual`, never 0.
+- Whole-binary falsification scan: **0 compiler-generated 8-byte-stride vtables
+  against 128 flat pointer tables.** Nothing here came from a C++ front end.
+
+**New tool: `tools/classtable.py`.** 60 classes and ~1425 method slots means a
+`lw $v0,0x0($reg)` / `lw $v0,<off>($v0)` / `jalr` call has its target in the
+DATA, invisible in the disassembly. The tool resolves a slot to a name, and
+`--vs` diffs a derived table against its base — which is the subclass's
+behaviour in one screen. DreamSys inherits 48 slots from `D_800878D4`, adds 90,
+overrides 8. Counting slots by hand is how you silently name the wrong
+function.
+
+**Carve consequence, and it is significant.** splat derives symbols from
+`jal`/`j` references, and a method reached only through a table has none. With
+~1425 such entry points, **under-splitting is the expected case in this game**,
+not an exotic one. `tools/classtable.py --scan` lists every table, and the
+addresses inside them are exactly what splat may have missed — so they double as
+carve boundaries. Gate 2 in PARALLEL-RUNS.md now says so.
+
+**Next move.** Unchanged otherwise: carve `code_4cd08` (17) and `code_1677c`
+(15) as the first small units, and cross-check any `class_39e08` band against
+`classtable.py --scan` before splitting it.
+
+**Still open:** what the class-table header word at `+0x000` means. Not a
+pointer, varies per class, some values look like packed fields. See
+DECOMPILATION_LEARNINGS.
+
+---
+
 ## 2026-08-28 — round 0: repo bootstrap
 
 **State at end: 6 matched / 1356 game functions. Build verifies.**

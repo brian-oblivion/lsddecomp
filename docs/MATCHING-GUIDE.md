@@ -121,7 +121,7 @@ cannot express "large body, deep reconstruction, low cold-runner yield".
 
 | segment | functions | note |
 | --- | --- | --- |
-| `class_39e08` | 415 | Biggest single block. `New_*`/`*__*` naming suggests C++-style dispatch — expect splat under-splits (see PARALLEL-RUNS Gate 2). |
+| `class_39e08` | 415 | Biggest single block. Almost certainly the class framework's implementation plus a large hierarchy. **Expect splat under-splits**: a method reached only through a table has no `jal` to it, so splat cannot see its entry point (PARALLEL-RUNS Gate 2). |
 | `code_179d8` | 274 | |
 | `code_2c054` | 181 | |
 | `Entity` | 142 | |
@@ -136,6 +136,39 @@ cannot express "large body, deep reconstruction, low cold-runner yield".
 The `psyq_*` segments (724 functions) are Sony SDK code. They are excluded from
 the game-code denominator and should be left until the game's own code is done —
 matching them proves nothing about this game.
+
+## Writing a class method
+
+The game is plain C with a hand-rolled class framework — **proven, see
+docs/research/class-framework.md**; do not reach for C++. What that means at
+the keyboard:
+
+- A method is an ordinary C function whose first parameter is the object:
+  `void DreamSys_TimerTick(DreamSys *self, s32 delta)`. `$a0` is `this`.
+- **Every object's method table pointer lives at offset 0.** This shape:
+
+  ```
+  lw    $v0, 0x0($s1)      ; obj->methods
+  lw    $v0, 0x80($v0)     ; the slot
+  jalr  $v0
+  ```
+
+  is a method call whose target is **in the data, not the instruction stream**.
+  You cannot read it off the disassembly. Resolve it:
+
+  ```sh
+  .venv/bin/python3 tools/classtable.py DREAMSYS_METHODS
+  .venv/bin/python3 tools/classtable.py DREAMSYS_METHODS --vs 0x800878D4
+  ```
+
+  Do not count slots by hand — an off-by-one silently names the wrong function,
+  and the resulting C looks entirely reasonable.
+- **`--vs` is the one to reach for first on an unfamiliar class.** A derived
+  table is a copy of its base's with slots replaced, so the diff tells you what
+  the subclass actually does. DreamSys inherits 48 slots, adds 90, overrides 8.
+- Allocation sites look like: allocator call with a literal size, null check,
+  then the constructor fetched from slot `+0x008` and called indirectly. That
+  is a `New_X` function, and it is ordinary C.
 
 ## Permuter
 
