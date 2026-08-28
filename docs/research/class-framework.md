@@ -151,20 +151,30 @@ flat 4-byte function-pointer tables (>=8 slots):    128
 
 ## Carve implication
 
-splat derives symbols from `jal`/`j` references. **A method reached only through
-a table has no such reference**, so splat cannot see its entry point and will
-under-split — gluing several real functions into one symbol. With 1425 slots
-dispatched this way, treat that as the expected case in this game, not an
-exotic one. The check, per function, before assigning it:
+splat derives symbols from `jal`/`j` references, and a method reached only
+through a table has none — so the obvious prediction is that splat cannot see
+those entry points and will under-split, gluing several real functions into one
+symbol.
+
+**That prediction was tested and is FALSE for this game.** spimdisasm also
+scans DATA for pointers into `.text` and creates a symbol for each. Of the
+**894** distinct function addresses referenced by class tables, **894 have a
+glabel**; the only three without one are already matched as C, so splat
+generates no `.s` for them. A corpus-wide prologue census over every uncarved
+segment returns **zero** functions with more than one `addiu $sp, $sp, -`.
+
+The per-function check is still worth knowing, because it costs nothing:
 
 ```sh
 grep -c 'addiu *\$sp, *\$sp, *-' asm/nonmatchings/<unit>/<func>.s
 ```
 
 A function allocates its frame exactly once, so any count above 1 is
-conclusive. `tools/classtable.py --scan` lists every table, and the addresses
-in them are exactly the entry points splat may have missed — which makes them
-useful as carve boundaries.
+conclusive. But do not budget time for hunting; treat a hit as surprising.
+
+`tools/classtable.py --scan` remains useful for carve boundaries — the table
+addresses are real function entry points, so they are known-safe places to
+split a segment.
 
 ## Reproducer
 

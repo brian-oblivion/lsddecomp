@@ -6,6 +6,63 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-08-28 — round 2: Gate 2 carve, 2 units -> 8
+
+**244 fresh across 8 units (was 120 across 2). 1100 uncarved. Build green.**
+
+Carved so a head agent can staff up to eight runners; one unit has exactly one
+owner, so two units capped the previous state at two runners regardless of how
+much queue they held.
+
+New units: `code_55dd4` (34), `code_171e0` (26), `Entity` (25, the first slice
+of a 142-function block, split at `func_8005DE18`), `code_4cd08` (17),
+`code_1677c` (14), `class_16334` (8).
+
+**A confident claim from round 1 was WRONG, and only running the check found
+it.** Round 1 reasoned that ~1425 table-dispatched methods have no `jal` to
+them, so splat must be under-splitting, and wrote that into Gate 2 as the
+expected case. Measured: of **894** distinct function addresses referenced by
+class tables, **894 already have a glabel** — spimdisasm scans data for
+pointers into `.text` and makes a symbol from each. A corpus-wide prologue
+census over every uncarved segment returns **zero** functions with more than
+one `addiu $sp, $sp, -`. Gate 2 and class-framework.md are corrected. The
+reasoning was sound and the conclusion was still false; nothing but the check
+would have separated them.
+
+**Three carve failures, all routine, all now in Gate 2:**
+
+- **Orphaned jump tables.** Carving a segment to `c` leaves its switch tables
+  in a standalone rodata segment that cannot see the `.L` labels, which are
+  local to the unit's function `.s` files. `code_4cd08` needed `0x206C`
+  attached — a slot the inherited yaml labelled `# greyman`, so the inherited
+  rodata comments do not reliably say who owns a slot.
+- **A segment whose tail is DATA.** `code_55dd4`'s text ends at `0x57028`;
+  after it are some ints and a character-classification table that the `asm`
+  segment had been emitting inline. Declared `data`, not `rodata` — the
+  `section_order` puts `.rodata` first and would have relocated those bytes to
+  the top of the image.
+- **Reverting a carve leaves `src/<unit>.c` behind.** splat does not delete it,
+  so every function is then defined twice. Delete it in the same step.
+
+**And a lesson about the carve helper itself.** The first attempt batched five
+segments through a shell function whose regex was `$`-anchored, so it silently
+skipped `code_4cd08` (trailing `# DreamAux` comment) while **printing OK**, and
+its "reverting" branch printed the word without reverting. Carve ONE segment at
+a time and verify each; the cycle is about two seconds.
+
+**Found while carving: 34 PSX BIOS call stubs** — `jr $t2` with the vector in
+`$t2` (`0xA0`/`0xB0`/`0xC0`) and the call number in `$t1`. 13 are in
+`class_39e08` (`0xB0`/`0x33` is BIOS `malloc`), the other 21 in `psyq_*`. These
+cannot be written in C at all and will need an `hasm` segment or a literal
+`.word` disposition. **Decide that at carve time**, not when a runner has
+already spent its attempt budget on one.
+
+**Next move.** Runners. The queue supports 4-8. `class_16334` (8) is the
+natural cold start; `DreamSys` (118) needs a named address range rather than
+the whole unit.
+
+---
+
 ## 2026-08-28 — round 1: the C++ question, settled
 
 **No code changed. One structural fact established, and it was the one gating

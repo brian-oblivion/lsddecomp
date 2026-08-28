@@ -228,19 +228,24 @@ often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
      from `jal`/`j` references and there are none — so expect this wherever
      table dispatch is common.
 
-     **In this game that is the NORMAL case, not an exotic one.** It is plain C
-     built on a hand-rolled class framework (proven —
-     docs/research/class-framework.md), with **60 classes and ~1425 method slots
-     dispatched through tables in the data**. Every one of those slots is an
-     entry point splat has no `jal` to. A cheap corroborator: a
-     prologue/epilogue frame-size mismatch. Another: an m2c seed for a
-     400-instruction symbol that comes back with a 9-line body — m2c stops at
-     the first `jr $ra`.
+     **MEASURED ON THIS GAME, AND IT DOES NOT HAPPEN — do not go hunting for
+     it.** The reasoning above predicted it would: the game dispatches ~1425
+     methods through tables in the data (docs/research/class-framework.md), and
+     none of those entry points has a `jal`. The prediction was wrong, because
+     spimdisasm also scans DATA for pointers into `.text` and makes a symbol
+     from each one. The check: of the **894** distinct function addresses
+     referenced by class tables, **894 have a glabel** — the only three without
+     one are already matched as C, so no `.s` is generated for them. A
+     corpus-wide `addiu $sp, $sp, -` census over every uncarved segment
+     (`class_39e08` included) returns **zero** functions with more than one
+     prologue.
 
-     `tools/classtable.py --scan` lists every table, and the addresses inside
-     them are exactly the entry points splat may have missed — so they double
-     as carve boundaries. Cross-check a candidate band against it before
-     splitting.
+     Re-run both if you doubt it; they are seconds. But budget nothing for
+     under-split hunting here, and treat a hit as genuinely surprising rather
+     than as the expected case. **This paragraph is the correction of a
+     confident, unverified claim written two commits earlier** — the sister
+     project's under-split problem is real, it just does not transfer, and
+     nothing but running the check would have told us.
    - *Exit side.* A "function" with no epilogue and no callers that falls
      through into the next one is a mis-carve — fold it, do not split it. Scan
      for non-`.L` labels (alt-entries) and `jr $reg` dispatchers.
@@ -265,7 +270,31 @@ often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
 3. Split the segment in the splat yaml, `make extract`, create the new
    `src/<unit>.c`.
 4. **`./build-and-verify.sh` MUST stay green — a correct carve changes zero
-   bytes.** Red build → revert the carve and escalate; never force it.
+   bytes.** Red build → fix or revert; never force it. **Carve ONE segment at a
+   time and verify each**, rather than a batch: the whole cycle is about two
+   seconds here, and a batch that goes red tells you nothing about which
+   segment did it.
+
+   Three failures are routine, all seen in the first carve round, and all of
+   them are a red LINK rather than anything subtler:
+
+   - **`undefined reference to '.LXXXXXXXX'`** — the unit's switch jump tables
+     live in a rodata slot that is still a standalone segment. Those words
+     point at labels *local to the unit's function `.s` files*, which a
+     separate rodata object cannot see. Attach the slot:
+     `- [0xNNNN, .rodata, <unit>]`. `code_4cd08` needed `0x206C` — a slot the
+     inherited yaml had labelled `# greyman`, so **do not trust the inherited
+     rodata comments to say who owns a slot**.
+   - **`undefined reference to 'D_XXXXXXXX'`** — the segment's tail is DATA,
+     not code, and an `asm` segment was emitting it inline. Find where the text
+     really ends and declare the rest: `code_55dd4`'s text stops at `0x57028`
+     and the remainder is a few ints plus a character-classification table.
+     Declare it **`data`, not `rodata`** — `section_order` puts `.rodata` first,
+     so a `rodata` declaration relocates those bytes to the top of the image.
+   - **Every function defined twice, after you REVERT a carve.** splat does not
+     delete `src/<unit>.c` when a segment goes back to `asm`, so the stale unit
+     keeps its `INCLUDE_ASM`s while the monolithic `.s` returns. **Reverting a
+     carve means deleting the generated `.c` in the same step.**
 5. Commit the carve on main as its own commit, THEN provision worktrees, so
    runners inherit it and never touch the yaml.
 

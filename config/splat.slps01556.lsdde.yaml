@@ -84,7 +84,11 @@ segments:
       # dot form plus `migrate_rodata_to_functions` puts each table in the same
       # .s as the switch that uses it, where the label is in scope.
       - [0x1F88, .rodata, DreamSys]
-      - [0x206C, rodata]  # greyman
+      # Jump tables for code_4cd08's switches -- its words point at
+      # `.L8005....` labels inside that unit's functions, so it must be
+      # attached (the yaml's inherited `# greyman` guess was wrong about
+      # which unit owns it).
+      - [0x206C, .rodata, code_4cd08]
 
       # ---- text -----------------------------------------------------------
       # `psyq_*` blocks are Sony SDK library code compiled into the executable.
@@ -102,10 +106,10 @@ segments:
       - [0xD294, asm, code_d294]
       - [0xF770, asm, psyq_GsLinkObject4]
       - [0x15D04, asm, psyq_15d04]
-      - [0x16334, asm, class_16334]
+      - [0x16334, c, class_16334]
       - [0x166ac, asm, psyq_PadInit]
-      - [0x1677c, asm, code_1677c]
-      - [0x171e0, asm, code_171e0]
+      - [0x1677c, c, code_1677c]
+      - [0x171e0, c, code_171e0]
       - [0x179d8, asm, code_179d8]
       - [0x272c8, asm, psyq_SpuSetMute]
       - [0x2c054, asm, code_2c054]
@@ -119,10 +123,14 @@ segments:
       - [0x39cb4, c, StageGrid]
       - [0x39e08, asm, class_39e08]
       - [0x48F74, c, DreamSys]
-      - [0x4CD08, asm, code_4cd08]   # DreamAux
-      - [0x4D7DC, asm, Entity]
-      - [0x55DD4, asm, code_55dd4]
-
+      - [0x4CD08, c, code_4cd08]   # DreamAux
+      # Entity is 142 functions -- too big for one runner queue, and only
+      # one runner may own a unit. Carved in slices; the remainder stays
+      # `asm` until someone needs it. 0x4E618 is a real function boundary
+      # (func_8005DE18), checked against the glabel list.
+      - [0x4D7DC, c, Entity]
+      - [0x4E618, asm, Entity_b]
+      - [0x55DD4, c, code_55dd4]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
       # carved C units. splat's dot-prefixed form (`.data, DreamSys`) means
@@ -132,6 +140,14 @@ segments:
       # data is decompiled the same way code is, one slot at a time. When you
       # do write a slot's arrays into its unit, flip that line back to the
       # dot form in the same commit -- leaving both would define it twice.
+      # code_55dd4's text ENDS at 0x57028; what follows is its own data --
+      # a few small ints and a character-classification table. While the
+      # segment was `asm` splat emitted that inline, so nothing noticed.
+      # Carving it to C orphaned the bytes and the link failed on
+      # D_80066828. Declared `data` rather than `rodata` deliberately:
+      # section_order puts .rodata FIRST, which would have relocated these
+      # bytes to the top of the image.
+      - [0x57028, data]
       - [0x57070, data]
       - [0x769D4, data]               # StageGrid's data slot
       - [0x76DC8, data]              # class_39e08

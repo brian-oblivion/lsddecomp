@@ -44,18 +44,21 @@ Run `python3 tools/progress.py` for live numbers; the figures below go stale.
 - **2080 functions** in the executable: **1356 game code**, **724 Psy-Q SDK
   library**. The library split is derived from the splat config, not
   hardcoded — any subsegment named `psyq_*` counts as library everywhere.
-- **6 matched.** Three of those splat generated itself (bodies that are just
+- **12 matched.** Nine of those splat generated itself (bodies that are just
   `jr $ra; nop`); three are real, in `src/StageGrid.c`.
-- **120 queued** across two carved units (`DreamSys`, `StageGrid`), **1230
-  uncarved** still inside monolithic `asm` segments.
+- **244 queued** across **eight carved units**, **1100 uncarved** still inside
+  monolithic `asm` segments. Eight units means up to eight parallel runners —
+  a unit has exactly one owner.
 - The build verifies. A clean `./build-and-verify.sh` takes under a second,
   which is what makes many parallel runners cheap here.
 
-The biggest carved-but-unworked blocks, for the next carve (Gate 2 in
+The biggest uncarved blocks, for the next carve (Gate 2 in
 docs/PARALLEL-RUNS.md): `class_39e08` (415 functions), `code_179d8` (274),
-`code_2c054` (181), `Entity` (142). Expect splat to have under-split these:
-~1425 methods are reached only through class tables, so splat has no `jal` to
-their entry points. `tools/classtable.py --scan` lists those addresses.
+`code_2c054` (181), `Entity_b` (117). Do NOT budget time for under-split
+hunting — it was predicted here, measured, and does not happen (894 of 894
+table-dispatched entry points already have symbols). Do budget for the two
+carve failures that ARE routine: an orphaned rodata jump-table slot, and a
+segment whose tail is data. Both are documented in Gate 2.
 
 ## Key technical facts (derived from the binary)
 

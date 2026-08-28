@@ -112,26 +112,27 @@ cannot express "large body, deep reconstruction, low cold-runner yield".
 
 | unit | queued | state |
 | --- | --- | --- |
-| `StageGrid` | 2 | 3 matched. Remainder is `GetStageChunkFromMood` / `GetMoodFromStageChunk` — both need the `STAGE_CHUNK_MOODS` / `STAGE_GRID_DIMENSIONS` data slots understood, and m2c already produces a clean body for the second. Good warm start. |
-| `DreamSys` | 118 | Untouched. The game's core state machine — dream timer, day advance, mood graph, flashbacks. Symbol names are descriptive (see `config/symbols.slps01556.lsdde.txt`) and `include/DreamSys.h` already carries a struct guess. The largest carved queue; split it across runners by address range. |
+| `DreamSys` | 118 | Untouched. The game's core state machine — dream timer, day advance, mood graph, flashbacks. Descriptive symbol names and a struct guess in `include/DreamSys.h`. Too big for one runner to finish; assign a named address range. |
+| `code_55dd4` | 34 | Untouched, carved 2026-08-28. Its tail was data (see the yaml at `0x57028`). |
+| `code_171e0` | 26 | Untouched, carved 2026-08-28. Clean segment, no boundary surprises. |
+| `Entity` | 25 | Untouched, carved 2026-08-28 — the first 25 of a 142-function block, split at `func_8005DE18`. The remainder is `Entity_b`, still `asm`. |
+| `code_4cd08` | 17 | Untouched, carved 2026-08-28. lsddecomp called this "DreamAux". Owns the `0x206C` rodata slot (jump tables). |
+| `code_1677c` | 14 | Untouched, carved 2026-08-28. |
+| `class_16334` | 8 | Untouched, carved 2026-08-28. Smallest unit — a good first assignment for a cold runner. |
+| `StageGrid` | 2 | 3 matched. Remainder is `GetStageChunkFromMood` / `GetMoodFromStageChunk`; both need the `STAGE_CHUNK_MOODS` / `STAGE_GRID_DIMENSIONS` data slots understood, and m2c already produces a clean body for the second. Good warm start, but a thin queue. |
 
 ## Uncarved ground
 
-1230 functions still sit inside monolithic `asm` segments. Largest first:
+1100 functions still sit inside monolithic `asm` segments. Largest first:
 
 | segment | functions | note |
 | --- | --- | --- |
-| `class_39e08` | 415 | Biggest single block. Almost certainly the class framework's implementation plus a large hierarchy. **Expect splat under-splits**: a method reached only through a table has no `jal` to it, so splat cannot see its entry point (PARALLEL-RUNS Gate 2). |
-| `code_179d8` | 274 | |
+| `class_39e08` | 415 | Biggest single block; the class framework plus a large hierarchy. **Contains 13 PSX BIOS call stubs** (`jr $t2` with the vector in `$t2` and the call number in `$t1` — `0xB0`/`0x33` is BIOS `malloc`). Those are NOT expressible in C and will need an `hasm` segment or a literal-`.word` disposition; decide that at carve time, not when a runner hits one. Also holds 19 `jr $reg` dispatchers. |
+| `code_179d8` | 274 | Owns the `0xFD8` rodata slot — 179 text pointers, so it will need attaching when carved. |
 | `code_2c054` | 181 | |
-| `Entity` | 142 | |
-| `code_8220` | 56 | |
+| `Entity_b` | 117 | The remainder of Entity after the 2026-08-28 slice. Carve the next ~25 the same way. |
+| `code_8220` | 56 | Owns the `0xA8C` rodata slot. |
 | `code_d294` | 55 | |
-| `code_55dd4` | 36 | |
-| `code_171e0` | 27 | |
-| `code_4cd08` | 17 | "DreamAux" per lsddecomp's notes. Small — a good first carve. |
-| `code_1677c` | 15 | Small; another good first carve. |
-| `class_16334` | 10 | Smallest. |
 
 The `psyq_*` segments (724 functions) are Sony SDK code. They are excluded from
 the game-code denominator and should be left until the game's own code is done —
