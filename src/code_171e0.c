@@ -22,7 +22,9 @@ void func_80026C88(UnkFlagsObj_171e0 *this) {
     this->unknown_value_0x24 |= 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C9C);
+void *func_80026C9C(void) {
+    return D_8006D430;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CAC);
 

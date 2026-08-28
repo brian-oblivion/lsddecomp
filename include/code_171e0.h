@@ -20,4 +20,13 @@ typedef struct UnkFlagsObj_171e0 {
     s32 unknown_value_0x24;
 } UnkFlagsObj_171e0;
 
+/* Method table (header 0x00000003) for a second class. Several of this
+ * unit's own functions are its slots: func_800269F0 (slot 0, offset +0x004),
+ * func_80026A50 (slot 1 / +0x008, i.e. its constructor by the same
+ * convention), func_80026AB4 (slot 2 / +0x00C), plus func_80026B08,
+ * func_80026C20, func_80026C80 and func_80026C88 further down the table.
+ * func_80026C9C returns its address the same way func_800269E0 returns
+ * D_8006D3C8's. */
+extern s32 D_8006D430[];
+
 #endif
