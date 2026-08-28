@@ -31,15 +31,23 @@ ctx.c.m2c
 # ---------------------------------------------------------------------------
 # TOOLCHAIN. Fetched or built by tools/setup.sh, never committed.
 # ---------------------------------------------------------------------------
-.venv/
-tools/binutils/
-tools/splat/
-tools/asm-differ/
-tools/m2c/
-tools/maspsx/
-tools/decomp-permuter/
-tools/gcc263/
-permuter-work/
+# NO TRAILING SLASHES ON THESE. A trailing slash makes a pattern match only a
+# DIRECTORY. In the main checkout these are real directories, so `tools/gcc263/`
+# ignored them fine -- but tools/setup-worktree.sh gives every worktree SYMLINKS
+# to them, and a symlink is not a directory, so all seven showed up as untracked
+# in every runner worktree. That silently disables the honesty check in
+# docs/PARALLEL-RUNS.md 3b: `git status --porcelain` can never be empty, so the
+# head cannot distinguish a runner that committed its work from one that did
+# not. The slashless form matches both spellings.
+.venv
+tools/binutils
+tools/splat
+tools/asm-differ
+tools/m2c
+tools/maspsx
+tools/decomp-permuter
+tools/gcc263
+permuter-work
 
 __pycache__/
 *.pyc
