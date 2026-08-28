@@ -23,7 +23,22 @@ INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C8AC);
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C930);
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C9A4);
+/* True when `entry`'s side/parity byte (offset 0x2) disagrees with
+ * `coordParity`'s own parity. `entry` is a candidate spawn/link record from
+ * one of this unit's stage tables (see func_8005C8AC); its layout beyond this
+ * one byte is not yet known here, so it is addressed by byte offset rather
+ * than through a named struct. A parity byte of 0 means "no side constraint",
+ * hence the early `true`. */
+bool func_8005C9A4(s32 coordParity, s8 *entry)
+{
+    bool result = true;
+
+    if (entry[2] != 0) {
+        coordParity = coordParity % 2 + 1;
+        result = entry[2] != coordParity;
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C9DC);
 
