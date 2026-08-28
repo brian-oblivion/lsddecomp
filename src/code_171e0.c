@@ -1,6 +1,9 @@
 #include "common.h"
+#include "code_171e0.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800269E0);
+void *func_800269E0(void) {
+    return D_8006D3C8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800269F0);
 
