@@ -74,6 +74,9 @@ cat <<DONE
 Worktree ready: $dest  (branch: $branch)
 Start a runner session there with the prompt in docs/PARALLEL-RUNS.md.
 
-Tear down only after the four preconditions in PARALLEL-RUNS.md §4b:
-  git worktree remove $dest && git branch -d $branch
+Tear down only after the four preconditions in PARALLEL-RUNS.md 4b.
+--force is REQUIRED, not optional: asm/, build/ and lsdde.ld are generated and
+untracked, and plain \`git worktree remove\` refuses while they exist. Check the
+preconditions yourself; the flag suppresses the only automatic guard.
+  git worktree remove --force $dest && git branch -d $branch
 DONE

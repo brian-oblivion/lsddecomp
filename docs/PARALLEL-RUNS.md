@@ -29,7 +29,16 @@ handing it over**. That last step is not ceremony: a runner in a worktree that
 does not verify produces scores that mean nothing, and it has no way to notice.
 
 Teardown, after the four preconditions in §4b:
-`git worktree remove ../lsddecomp2-wt-<name> && git branch -d runner/<name>`
+
+```sh
+git worktree remove --force ../lsddecomp2-wt-<name> && git branch -d runner/<name>
+```
+
+**`--force` is required here, not a shortcut.** `asm/`, `build/` and `lsdde.ld`
+are generated and untracked, so plain `git worktree remove` always refuses.
+That means the "are you sure?" backstop never fires for us and the four
+preconditions below are the *only* thing standing between a finished round and
+a lost one. Check them by hand, every time.
 
 ## Collision rules (what makes parallelism safe)
 
@@ -131,7 +140,10 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 4. **Merge** sequentially, in main: `git merge --no-ff runner/<name>` →
    `./build-and-verify.sh` → next. Disjoint units make conflicts rare.
 
-4b. **Teardown has four preconditions.** Before `git worktree remove`:
+4b. **Teardown has four preconditions.** Check all four before
+   `git worktree remove --force` — which, because generated files always make
+   plain `remove` refuse, is the command you will actually type, with its
+   safety net already disabled:
    - Every function the runner touched has a `docs/match-reports/` FILE.
    - Every runner has REPORTED, not merely gone quiet.
    - `git log --oneline main..runner/<name>` is EMPTY for every branch.

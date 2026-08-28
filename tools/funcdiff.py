@@ -16,6 +16,7 @@ offset directly: `/* 39CD8 800494D8 E8FFBD27 */`, i.e. FILEOFS VRAM WORD. For
 this executable file offset = vram - 0x80010000 + 0x800.
 """
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -24,17 +25,58 @@ import srcpath
 ROOT = Path(__file__).resolve().parent.parent
 RETAIL = ROOT / "disk/SLPS_015.56"
 BUILT = ROOT / "build/SLPS_015.56"
+ELF = ROOT / "build/lsdde.elf"
+NM = ROOT / "tools/binutils/bin/mipsel-linux-gnu-nm"
+
+VRAM_BASE = 0x80010000
+FILE_BASE = 0x800
 
 # /* FILEOFS VRAM WORD */
 INSN_RE = re.compile(r"/\* ([0-9A-Fa-f]+) [0-9A-Fa-f]{8} [0-9A-Fa-f]{8} \*/")
 
 
+def range_from_elf(name):
+    """(start, end) file offsets from the linked ELF's symbol table, or None.
+
+    THE ONLY SOURCE THAT WORKS FOR AN ALREADY-MATCHED FUNCTION. Once a function
+    is real C its `asm/nonmatchings/` file stops being generated, so the two
+    disassembly sources below cannot see it at all -- and funcdiff would answer
+    "not found" for precisely the functions someone is trying to RE-verify.
+    That matters: the head agent's protocol spot-checks every claimed match
+    after a merge, and a tool that cannot score a match is useless for it.
+
+    Size is the gap to the next symbol, which is how the linker lays functions
+    out. It over-reads when the next symbol is not a function, so this is the
+    fallback rather than the primary source.
+    """
+    if not (NM.exists() and ELF.exists()):
+        return None
+    out = subprocess.run([str(NM), "-n", str(ELF)],
+                         capture_output=True, text=True).stdout
+    syms = []
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) == 3 and parts[1] in ("T", "t"):
+            syms.append((int(parts[0], 16), parts[2]))
+    for i, (addr, sym) in enumerate(syms):
+        if sym != name:
+            continue
+        nxt = next((a for a, _ in syms[i + 1:] if a > addr), None)
+        if nxt is None:
+            return None
+        return (addr - VRAM_BASE + FILE_BASE, nxt - VRAM_BASE + FILE_BASE)
+    return None
+
+
 def find_range(name):
     """(start, end) file offsets for `name`, or None.
 
-    Looks in asm/nonmatchings/**/<name>.s first (one function per file), then
-    falls back to scanning the monolithic `asm/*.s` segments, where a function
-    is delimited by `glabel <name>` ... `endlabel <name>`.
+    Three sources, in descending order of precision:
+      1. asm/nonmatchings/**/<name>.s -- one function per file, exact.
+      2. the monolithic `asm/*.s` segments, where a function is delimited by
+         `glabel <name>` ... `endlabel <name>`.
+      3. the linked ELF's symbol table, which is the only one that still knows
+         about a function after it has been MATCHED.
     """
     for p in srcpath.nm_find(name):
         offs = [int(x, 16) for x in INSN_RE.findall(p.read_text())]
@@ -50,7 +92,8 @@ def find_range(name):
         offs = [int(x, 16) for x in INSN_RE.findall(m.group(1))]
         if offs:
             return min(offs), max(offs) + 4
-    return None
+
+    return range_from_elf(name)
 
 
 def staleness_check():
@@ -136,8 +179,11 @@ def main():
 
     rng = find_range(name)
     if not rng:
-        sys.exit(f"function {name} not found in asm/ — is it spelled right, "
-                 f"and has `make extract` run?")
+        sys.exit(f"function {name} not found in asm/ or in build/lsdde.elf.\n"
+                 f"  Is it spelled right? Has `make extract` run? Has "
+                 f"./build-and-verify.sh run at least once\n"
+                 f"  (the ELF is the only source that knows about an "
+                 f"already-matched function)?")
     start, end = rng
 
     if not RETAIL.exists():
