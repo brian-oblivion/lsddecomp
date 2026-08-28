@@ -9,7 +9,19 @@ INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025C30);
 
 INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025C84);
 
-INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025CC4);
+u32 func_80025CC4(Pad *self) {
+    u32 newMask;
+    u32 oldMask;
+    u32 changed;
+
+    newMask = func_80025EFC(self->port);
+    oldMask = self->heldMask;
+    self->heldMask = newMask;
+    changed = newMask ^ oldMask;
+    self->releasedMask = changed & oldMask;
+    self->pressedMask = changed & newMask;
+    return newMask;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025D10);
 
