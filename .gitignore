@@ -1,0 +1,47 @@
+# ---------------------------------------------------------------------------
+# BRING YOUR OWN DISC. The game executable and any disc image stay out of git.
+# ---------------------------------------------------------------------------
+disk/*
+!disk/.gitignore
+!disk/README.md
+*.bin
+*.cue
+*.iso
+*.img
+LSD - Dream Emulator*/
+
+# ---------------------------------------------------------------------------
+# GENERATED. splat rewrites all of this on every `make extract`; committing it
+# would turn regenerated disassembly into merge conflicts and let stale files
+# accumulate invisibly (southpark-decomp round 79 found 1604 stale against 992
+# live). If a segment ever holds assembly that was NEVER compiled from C, give
+# it splat's `hasm` type, commit it, and add a negation here -- an `hasm` file
+# is authored source, splat only writes it when missing, and annotating it is
+# the whole point of the category.
+# ---------------------------------------------------------------------------
+asm/
+build/
+expected/
+*.ld
+config/undefined_funcs_auto.*.txt
+config/undefined_syms_auto.*.txt
+ctx.c
+ctx.c.m2c
+
+# ---------------------------------------------------------------------------
+# TOOLCHAIN. Fetched or built by tools/setup.sh, never committed.
+# ---------------------------------------------------------------------------
+.venv/
+tools/binutils/
+tools/splat/
+tools/asm-differ/
+tools/m2c/
+tools/maspsx/
+tools/decomp-permuter/
+tools/gcc263/
+permuter-work/
+
+__pycache__/
+*.pyc
+.vscode/
+scratchpad/

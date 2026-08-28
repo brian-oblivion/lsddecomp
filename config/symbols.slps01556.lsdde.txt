@@ -1,0 +1,165 @@
+// Symbol names for LSD: Dream Emulator (SLPS-01556).
+//
+// PROVENANCE, and it matters when you read a name here. Every name in this
+// file was either hand-written by FirecatFG's lsddecomp
+// (github.com/FirecatFG/lsddecomp) or inferred by ghidra_psx_ldr. There has
+// never been a symbol leak for this game, so NOTHING here is the developers'
+// own naming -- it is a well-reasoned guess, and some of it will be wrong.
+// Treat a name as a hypothesis that the disassembly can overturn, exactly as
+// you would treat a struct layout.
+//
+// The four names dropped when this file was merged (new_GameManager,
+// GameManager__GameManager, new_DreamEntity, CalcNavigationScore) were an
+// EARLIER round of guessing at the same four addresses, superseded upstream by
+// New_DreamSys / DreamSys__DreamSys / New_Entity. Keeping both spellings made
+// splat refuse to load the file at all.
+//
+// Renaming a symbol here requires `make extract` afterwards, and the rename
+// must land BEFORE anything references the old name.
+
+_ExpAllocArea = 0x80011A58;
+bcopy = 0x80012778;
+GsGetLs = 0x80013498;
+VectorNormal = 0x80017610;
+BMemPMgrInit = 0x80017A20;
+BasicClass__func_17eb0 = 0x80017EB0;
+BasicClass__BasicClass = 0x80017EF8;
+BasicClass__func_17f2c = 0x80017F2C;
+BasicClass__func_17f98 = 0x80017F98;
+BasicClass__func_17ff0 = 0x80017FF0;
+BasicClass__func_18040 = 0x80018040;
+BasicClass__func_180bc = 0x800180BC;
+BasicClass__func_180fc = 0x800180FC;
+BasicClass__func_1811c = 0x8001811C;
+BasicClass__func_1813c = 0x8001813C;
+BasicClass__func_1816c = 0x8001816C;
+BasicClass__func_182cc = 0x800182CC;
+BasicClass__func_18350 = 0x80018350;
+BasicClass__func_18358 = 0x80018358;
+RCpolyF3A = 0x8001A56C;
+RCpolyF4A = 0x8001A8DC;
+RCpolyG3A = 0x8001AD5C;
+RCpolyG4A = 0x8001B16C;
+RCpolyFT3A = 0x8001B6BC;
+RCpolyFT4A = 0x8001BABC;
+GsLinkObject4 = 0x8001EF70;
+ratan2 = 0x8001F0C8;
+new_class_6bea0 = 0x8001F250;
+GsMapModelingData = 0x80020548;
+SquareRoot0 = 0x800205C0;
+SquareRoot12 = 0x80020644;
+new_class_6c078 = 0x800206E0;
+ResetGraph = 0x80020C74;
+new_class_6d3c8 = 0x80025F7C;
+strcat = 0x80027130;
+new_class_6d4e8 = 0x800271D8;
+strcpy = 0x80028B78;
+strstr = 0x80028BBC;
+CdStatus = 0x80028C34;
+new_class_6d940 = 0x8002C12C;
+SetRCnt = 0x80032B18;
+SsUtGetVabHdr = 0x8003317C;
+memset = 0x8004117C;
+rand = 0x80049480;
+srand = 0x800494A8;
+GetStageGridDimensionsTable = 0x800494BC;
+GetStageGridDimensions = 0x800494D8;
+GetStageChunkFromMood = 0x8004950C;
+GetMoodFromStageChunk = 0x800495B8;
+New_DreamSys = 0x80058774;
+DreamSys__DreamSys = 0x800587F0;
+DreamSys__func_588ec = 0x800588EC;
+DreamSys__func_58968 = 0x80058968;
+DreamSys__TimerTick = 0x80058D94;
+DreamSys__WallLink = 0x80058FAC;
+DreamSys__GetSetDreamTimeLimit = 0x80059328;
+DreamSys__InitNewGame = 0x8005A258;
+DreamSys__GetSetScreenShake = 0x8005A2D0;
+DreamSys__AdvanceDay = 0x8005A304;
+DreamSys__StartDay = 0x8005A368;
+DreamSys__EndDay = 0x8005A41C;
+DreamSys__GetCinematic = 0x8005A4E8;
+DreamSys__InitSpawnLoc = 0x8005A508;
+DreamSys__DynamicLink = 0x8005A580;
+DreamSys__StaticWallLink = 0x8005A5D8;
+DreamSys__LoadNextFlashback = 0x8005A63C;
+ExecuteLink = 0x8005A928;
+DreamSys__ProcessChunkChange = 0x8005AFDC;
+DreamSys__InstanceEffectsOnJournal = 0x8005B03C;
+DreamSys__GetPreviousDayMood = 0x8005B1F4;
+DreamSys__InitMoodContibutors = 0x8005B2F4;
+DreamSys__LogChunkMood = 0x8005B3A4;
+DreamSys__LogInstanceMood = 0x8005B3F0;
+DreamSys__UpdateDreamChart = 0x8005B420;
+DreamSys__GetDreamColor = 0x8005B4E0;
+CalcDreamColor = 0x8005B518;
+DreamSys__ClearMoodGraph = 0x8005B5A4;
+DreamSys__LogMood = 0x8005B5B8;
+DreamSys__GetMoodAverage = 0x8005B5F0;
+CalcMoodAxis = 0x8005B66C;
+DreamSys__CalcUnlockScore = 0x8005B6E0;
+DreamSys__AddFlashback = 0x8005B74C;
+DreamSys__FlashbackSaving = 0x8005B81C;
+DreamSys__ResetFlashbackList = 0x8005B8FC;
+Get_vtable_DreamSys = 0x8005BA40;
+InitNavChallengesArray = 0x8005BA50;
+CalcNavigationScore = 0x8005BA7C;
+GetRandomSpawnFromStage = 0x8005BB30;
+TestForStaticLink = 0x8005BCB4;
+Test4TunnelLinks = 0x8005BCF8;
+Test4InstantTeleporters = 0x8005BF74;
+Test4StaircaseNodes = 0x8005BFDC;
+GetStaticSpawn = 0x8005C150;
+GenerateInitialSpawn = 0x8005C28C;
+IsDaySpecial = 0x8005C438;
+SetTeleportsEnabled = 0x8005C6D8;
+New_Entity = 0x8005CFDC;
+Entity__Entity = 0x8005D068;
+Entity__GetMoodEffect = 0x8005D944;
+Entity__GetUnlockEffect = 0x8005D95C;
+Entity__GetLinkStage = 0x8005D994;
+Entity__GetEventVideo = 0x8005D9D0;
+Get_vtable_Entity = 0x8005E150;
+New_class_65650 = 0x800655D4;
+class_65650__Constructor = 0x80065650;
+STAGE_GRID_DIMENSIONS = 0x800861D4;
+STG00_CHUNK_MOODS = 0x80086244;
+STG01_CHUNK_MOODS = 0x80086250;
+STG02_CHUNK_MOODS = 0x8008625C;
+STG03_CHUNK_MOODS = 0x800862A4;
+STG04_CHUNK_MOODS = 0x800864A4;
+STG05_CHUNK_MOODS = 0x800864E0;
+STG06_CHUNK_MOODS = 0x8008651C;
+STG07_CHUNK_MOODS = 0x80086528;
+STG08_CHUNK_MOODS = 0x80086534;
+STG09_CHUNK_MOODS = 0x8008653C;
+STG10_CHUNK_MOODS = 0x80086540;
+STG11_CHUNK_MOODS = 0x80086548;
+STG12_CHUNK_MOODS = 0x80086560;
+STG13_CHUNK_MOODS = 0x80086588;
+STAGE_CHUNK_MOODS = 0x80086590;
+DREAMSYS_METHODS = 0x80087BDC;
+STAGE_TIME_LIMITS = 0x80087F14;
+SPAWN_POS_ADJUST = 0x80087F30;
+STG00_SPAWNPOINTS = 0x80088010;
+STAGE_SPAWNPOINTS = 0x800885B8;
+LEN_STAGE_SPAWNPOINTS = 0x800885F0;
+STG00_PERMALINK_SPAWNS = 0x80088600;
+STAGE_PERMALINK_SPAWNS = 0x80088664;
+STG00_PERMALINK_TRIGGERS = 0x8008869C;
+STG02_PERMALINK_TRIGGERS = 0x800886B0;
+STG03_PERMALINK_TRIGGERS = 0x800886BC;
+STG04_PERMALINK_TRIGGERS = 0x800886C4;
+STG05_PERMALINK_TRIGGERS = 0x800886DC;
+STG06_PERMALINK_TRIGGERS = 0x800886E8;
+STG09_PERMALINK_TRIGGERS = 0x800886F0;
+STG10_PERMALINK_TRIGGERS = 0x800886F8;
+STG11_PERMALINK_TRIGGERS = 0x80088700;
+STG12_PERMALINK_TRIGGERS = 0x80088708;
+STAGE_PERMALINK_TRIGGERS = 0x80088710;
+LEN_STAGE_PERMALINK_TRIGGERS = 0x80088748;
+SPECIAL_DAYS = 0x80088CCC;
+SPECIAL_COLORS = 0x80088D20;
+Small__rand = 0x8008AC68;
+gpNavChallengesComplete = 0x8008ACB4;
+gpDinamicLinkPenalty = 0x8008ACB8;

@@ -1,0 +1,48 @@
+# Python tooling for the .venv. Installed by tools/setup.sh.
+#
+#   python3 -m venv .venv
+#   .venv/bin/pip install -r tools/requirements.txt
+#
+# KEEP VERSIONS PINNED. A worktree symlinks this venv and a fresh clone
+# rebuilds it; an unpinned dependency is how two checkouts of the same commit
+# start disagreeing about what the binary contains.
+
+# splat: binary splitter/disassembler (make extract). The PyPI name is
+# splat64 even though the module is `splat` and it handles psx fine.
+#
+# THIS SET WAS RESOLVED BY HAND AND THE PINS ARE LOAD-BEARING. splat64
+# declares none of the four below as install_requires, so pip installs it
+# happily and `import splat` then dies at module load on whichever one is
+# missing -- spimdisasm first, then n64img (imported by the n64 image
+# segtypes, which load unconditionally even for a psx target). Newer splat64
+# (0.50.0) wants a spimdisasm that is not on PyPI at all. If you bump any of
+# these, re-run `make extract` AND `./build-and-verify.sh`; an import that
+# succeeds proves nothing about whether the split still reproduces.
+splat64==0.41.1
+spimdisasm==1.42.4
+rabbitizer==1.16.2
+n64img==0.3.3
+pygfxd==1.0.5
+crunch64==0.6.2
+
+# asm-differ (tools/asm-differ/diff.py). Not optional: diff.py hard-exits with
+# "Missing prerequisite python module watchdog" if absent.
+colorama==0.4.6
+watchdog==6.0.0
+Levenshtein==0.27.4
+cxxfilt==0.3.0
+
+# m2c (tools/m2c/m2c.py) parses the context file with pycparser.
+pycparser==2.22
+
+# decomp-permuter reads settings.toml.
+toml==0.10.2
+
+# Transitive; pinned so a fresh clone resolves identically.
+intervaltree==3.1.0
+pylibyaml==0.1.0
+PyYAML==6.0.3
+pypng==0.20220715.0
+RapidFuzz==3.14.5
+sortedcontainers==2.4.0
+tqdm==4.67.1

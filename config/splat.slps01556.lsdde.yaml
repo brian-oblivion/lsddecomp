@@ -1,0 +1,148 @@
+# LSD: Dream Emulator (PSX, 1998, Asmik Ace / OutSide Directors Company)
+# Japanese retail release, SLPS-01556.
+#
+# THE SEGMENTATION BELOW IS INHERITED FROM FirecatFG's lsddecomp
+# (github.com/FirecatFG/lsddecomp) -- see CREDITS.md. It is a set of empirical
+# facts about this executable (where the psyq library blocks start, where the
+# rodata slots sit, where the game's own code begins), not authored source, and
+# it is the single biggest head start this project has.
+#
+# ADDRESSING. This is a plain PS-X EXE: a 0x800-byte header followed by one
+# contiguous image loaded at 0x80010000. So
+#
+#     file offset = vram - 0x80010000 + 0x800
+#
+# and the whole file is 0x7B800 bytes. There is no compression, no overlay and
+# no bank switching -- every byte of code in the game is in this one file.
+name: LSD Dream Emulator
+sha1: 76322eeade5ebb22dca57fdeac7d68c30f06308d
+options:
+  basename: lsdde
+  platform: psx
+  compiler: GCC
+
+  base_path: ..
+  target_path: disk/SLPS_015.56
+  asm_path:    asm/
+  asset_path:  assets/
+  src_path:    src/
+  symbol_addrs_path: config/symbols.slps01556.lsdde.txt
+  undefined_funcs_auto_path:   config/undefined_funcs_auto.slps01556.lsdde.txt
+  undefined_syms_auto_path:    config/undefined_syms_auto.slps01556.lsdde.txt
+  ld_script_path: lsdde.ld
+
+  find_file_boundaries: False
+  pair_rodata_to_text: False
+  migrate_rodata_to_functions: True
+  gp_value: 0x8008A808
+
+  o_as_suffix: False
+  use_legacy_include_asm: False
+
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+
+  section_order: [".rodata", ".text", ".data", ".sdata", ".sbss", ".bss"]
+
+  subalign: 2
+
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+
+segments:
+  - name: header
+    type: header
+    start: 0x0
+
+  - name: main
+    type: code
+    start: 0x800
+    vram: 0x80010000
+    align: 4
+    subsegments:
+      # ---- rodata slots, paired by hand to the text blocks below ----------
+      - [0x800, rodata]   # psyq_2258
+      - [0xA8C, rodata]   # code_8220
+      - [0xABC, rodata]   # psyq_GsLinkObject4
+      - [0xF28, rodata]   # psyq_15d04
+      - [0xFA4, rodata]   # code_1677c
+      - [0xFD8, rodata]   # code_179d8
+      - [0x1764, rodata]
+      - [0x1890, rodata]
+      - [0x19DC, rodata]
+      - [0x1A90, rodata]
+      - [0x1C0C, rodata]
+      - [0x1E28, rodata]
+      - [0x1EF4, rodata]
+      # JUMP TABLES, and the one rodata slot that MUST stay attached to its
+      # unit. Its words are pointers to `.L8005....` labels INSIDE DreamSys's
+      # functions -- labels that are local to each function's .s file -- so a
+      # standalone rodata object cannot resolve them and the link dies. The
+      # dot form plus `migrate_rodata_to_functions` puts each table in the same
+      # .s as the switch that uses it, where the label is in scope.
+      - [0x1F88, .rodata, DreamSys]
+      - [0x206C, rodata]  # greyman
+
+      # ---- text -----------------------------------------------------------
+      # `psyq_*` blocks are Sony SDK library code compiled into the executable.
+      # They are NOT game code: keep them out of the progress denominator
+      # (tools/progress.py LIBRARY_RANGES) and off the runner queues until the
+      # game's own code is done.
+      - [0x20DC, asm, main]
+      - [0x2258, asm, psyq_2258]
+      - [0x8220, asm, code_8220]
+      - [0xAD64, asm, psyq_rcpolyf3]
+      - [0xB0D4, asm, psyq_rcpolyf4]
+      - [0xB554, asm, psyq_rcpolyg3]
+      - [0xC2B4, asm, psyq_rcpolyft3]
+      - [0xC7D4, asm, psyq_rcpolygt3]
+      - [0xD294, asm, code_d294]
+      - [0xF770, asm, psyq_GsLinkObject4]
+      - [0x15D04, asm, psyq_15d04]
+      - [0x16334, asm, class_16334]
+      - [0x166ac, asm, psyq_PadInit]
+      - [0x1677c, asm, code_1677c]
+      - [0x171e0, asm, code_171e0]
+      - [0x179d8, asm, code_179d8]
+      - [0x272c8, asm, psyq_SpuSetMute]
+      - [0x2c054, asm, code_2c054]
+      - [0x3197c, asm, psyq_memset]
+      - [0x39c80, asm, psyq_rand]
+
+      # ---- carved C units --------------------------------------------------
+      # These are the units runners work in. Everything else is still a
+      # monolithic `asm` segment awaiting a carve (docs/PARALLEL-RUNS.md
+      # Gate 2).
+      - [0x39cb4, c, StageGrid]
+      - [0x39e08, asm, class_39e08]
+      - [0x48F74, c, DreamSys]
+      - [0x4CD08, asm, code_4cd08]   # DreamAux
+      - [0x4D7DC, asm, Entity]
+      - [0x55DD4, asm, code_55dd4]
+
+      # ---- data ------------------------------------------------------------
+      # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
+      # carved C units. splat's dot-prefixed form (`.data, DreamSys`) means
+      # "this data is DEFINED IN src/DreamSys.c", so it emits nothing and the
+      # link fails on every symbol in the slot until someone writes the arrays
+      # out as C. That is the right end state and the wrong starting state:
+      # data is decompiled the same way code is, one slot at a time. When you
+      # do write a slot's arrays into its unit, flip that line back to the
+      # dot form in the same commit -- leaving both would define it twice.
+      - [0x57070, data]
+      - [0x769D4, data]               # StageGrid's data slot
+      - [0x76DC8, data]              # class_39e08
+      - [0x783dc, data]               # DreamSys's data slot
+      - [0x79528, data]
+      - [0x7b008, sdata]
+      - [0x7b3c0, sdata]              # DreamSys's sdata slot
+      - [0x7b3f8, sdata]
+      - [0x7b420, sbss]
+      - [0x7B468, sbss]              # psyq_rand
+      - [0x7B46C, sbss]
+      - [0x7b4b4, sbss]               # DreamSys's sbss slot
+      - [0x7b4cc, sbss]
+  - [0x7B800]
