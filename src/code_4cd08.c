@@ -13,7 +13,26 @@ void SetTeleportsEnabled(s32 triggerType)
     func_8005BF68(triggerType == 0xB || triggerType == 3);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C714);
+void func_8005C714(s32 triggerType)
+{
+    if (triggerType == 0x4E) {
+        goto call;
+    }
+    if (triggerType < 0x4F) {
+        if (triggerType == 0xB) {
+            goto call;
+        }
+        if (triggerType == 0x38) {
+            goto call;
+        }
+        return;
+    }
+    if (triggerType != 0x5D) {
+        return;
+    }
+call:
+    func_8005BF68(1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C76C);
 
