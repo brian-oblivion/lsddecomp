@@ -18,7 +18,9 @@ INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C20);
 void func_80026C80(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C88);
+void func_80026C88(UnkFlagsObj_171e0 *this) {
+    this->unknown_value_0x24 |= 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C9C);
 

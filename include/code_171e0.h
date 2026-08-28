@@ -12,4 +12,12 @@
  * convention. */
 extern s32 D_8006D3C8[];
 
+/* Some class instance (a slot of D_8006D430's table, going by
+ * classtable.py) with at least one flag word at offset 0x24, OR'd with 1 by
+ * func_80026C88. Layout before that offset is unknown. */
+typedef struct UnkFlagsObj_171e0 {
+    u8 pad0[0x24];
+    s32 unknown_value_0x24;
+} UnkFlagsObj_171e0;
+
 #endif
