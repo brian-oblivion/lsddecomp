@@ -7,7 +7,13 @@ INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025BA0);
 
 INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025C30);
 
-INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025C84);
+void func_80025C84(Pad *self, s32 port) {
+    self->port = (port != 0);
+    self->heldMask = 0;
+    self->releasedMask = 0;
+    self->pressedMask = 0;
+    self->methods->loadButtonTable();
+}
 
 u32 func_80025CC4(Pad *self) {
     u32 newMask;
