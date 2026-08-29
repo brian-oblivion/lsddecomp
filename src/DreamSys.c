@@ -68,8 +68,13 @@ void func_8005938C(DreamSys *this, s32 value)
 {
 	this->unk_0x64 = value;
 }
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059394);
-
+void func_80059394(DreamSys *this)
+{
+	if (this->unk_0x70 == 0) {
+		this->unk_0x74 = 0;
+		this->unk_0x124 = ((u32)this->dreamTimer % (u32)this->unk_0x120) == 0;
+	}
+}
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800593D8);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005942C);
