@@ -1,6 +1,9 @@
 #include "common.h"
+#include "code_171e0.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800269E0);
+void *func_800269E0(void) {
+    return D_8006D3C8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800269F0);
 
@@ -15,9 +18,13 @@ INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C20);
 void func_80026C80(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C88);
+void func_80026C88(UnkFlagsObj_171e0 *this) {
+    this->unknown_value_0x24 |= 1;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C9C);
+void *func_80026C9C(void) {
+    return D_8006D430;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CAC);
 
