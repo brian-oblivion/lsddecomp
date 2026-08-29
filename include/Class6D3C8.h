@@ -5,18 +5,45 @@
 
 /*
  * The class allocated by new_class_6d3c8 / constructed by func_80025FDC.
- * Method table is D_8006D3C8 (25 slots, see tools/classtable.py 0x8006D3C8
- * --vs 0x8006B58C): it derives from BasicClass (D_8006B58C, 14 slots),
- * overriding the constructor (+0x008) and destructor (+0x00C), and adding
- * ten slots of its own starting at +0x040. No FirecatFG name survives for
+ * Method table is D_8006D3C8 (25 slots). No FirecatFG name survives for
  * this class (only new_class_6d3c8 itself is named in the symbol file), so
  * fields are named by offset until real names are known.
+ *
+ * Inheritance, resolved with tools/classtable.py (never by counting):
+ * BasicClass (D_8006B58C, 14 slots) -> an intermediate class at D_8006E4F0
+ * (19 slots: overrides BasicClass's ctor/dtor at +0x008/+0x00C, adds four
+ * slots at +0x040..+0x04C) -> this class (D_8006D3C8, 25 slots: keeps the
+ * intermediate class's dtor override and its +0x048/+0x04C slots verbatim,
+ * overrides +0x008 (own ctor, func_80025FDC), +0x040 and +0x044, and adds
+ * six more of its own from +0x050). Confirmed by `classtable.py 0x8006D3C8
+ * --vs 0x8006E4F0` sharing +0x00C/+0x048/+0x04C exactly where the earlier
+ * `--vs 0x8006B58C` comparison did not, and by func_80025FDC itself calling
+ * the intermediate class's ctor slot (via func_8003B20C -> &D_8006E4F0)
+ * before installing its own vtable — the base-constructor-through-slot+8
+ * shape from docs/research/class-framework.md.
  *
  * Only the slots this unit's functions actually call through are given
  * concrete field types; the rest stay opaque `void *` so the struct keeps
  * the right size/offsets without requiring every method to be typed up
  * front.
  */
+
+/* The intermediate base class at D_8006E4F0. Same policy: only slots this
+ * unit actually dispatches through (+0x044, from func_80026108) are typed. */
+typedef struct MiddleClassMethods {
+    s32 header;                                             /* +0x000 */
+    void *unk04;                                             /* +0x004 */
+    void *ctor;                                               /* +0x008 func_8003AF8C */
+    void *unk0C;                                               /* +0x00C func_8003B024 (dtor override, shared with Class6D3C8) */
+    void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
+    void *unk3C;                                                /* +0x03C null slot */
+    void *unk40;                                                 /* +0x040 func_8003B02C */
+    s32 (*slot44)(void *self, void *a1, void *a2, s32 a3);         /* +0x044 func_8003B044 */
+    void *unk48;                                                    /* +0x048 func_8003B108, shared with Class6D3C8 */
+    void *unk4C;                                                     /* +0x04C func_8003B110, shared with Class6D3C8 */
+} MiddleClassMethods;
+
+extern MiddleClassMethods *func_8003B20C(void);
 
 typedef struct Class6D3C8 Class6D3C8;
 
@@ -38,7 +65,7 @@ typedef struct Class6D3C8Methods {
     void *unk38;                                            /* +0x038 BasicClass__func_18358 */
     void *unk3C;                                            /* +0x03C null slot */
     void (*slot40)(void);                                   /* +0x040 func_800260A4 */
-    void *slot44;                                           /* +0x044 func_80026108 */
+    void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 func_80026108 */
     void *unk48;                                            /* +0x048 func_8003B108 */
     void *unk4C;                                            /* +0x04C func_8003B110 */
     void *slot50;                                           /* +0x050 func_80026170 */
@@ -53,7 +80,9 @@ typedef struct Class6D3C8Methods {
  * offsets below are only the ones observed so far in func_80025FDC. */
 struct Class6D3C8 {
     Class6D3C8Methods *methods;    /* +0x00 */
-    u8 unk04[0x1C];                 /* +0x04 .. +0x1F, not yet decoded */
+    u8 unk04[0x14];                 /* +0x04 .. +0x17, not yet decoded */
+    s32 unk18;                       /* +0x18 guards func_80026108's fallback to the base class */
+    u8 unk1C_[4];                     /* +0x1C .. +0x1F, not yet decoded */
     void *arg;                      /* +0x20 the constructor's `arg` parameter */
     s32 unk24;                      /* +0x24 */
     void *dreamSys;                 /* +0x28 result of New_DreamSys() */

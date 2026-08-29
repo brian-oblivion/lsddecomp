@@ -13,13 +13,23 @@ void func_800260A4(void) {
     func_80048CFC(*(s32 *)0x1F800000 % 365, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026108);
+/* Defers to the base class's own implementation of this slot when this
+ * object hasn't been given an override (unk18 == 0). */
+void func_80026108(Class6D3C8 *self, void *a1, void *a2) {
+    if (self->unk18 == 0) {
+        func_8003B20C()->slot44(self, a1, a2, 0);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026170);
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026254);
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026328);
+extern s32 func_8004A070(s32 a0);
+
+s32 func_80026328(void) {
+    return func_8004A070(0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026348);
 
