@@ -104,22 +104,32 @@ into one of these. This list is short because this project is young — add to i
   instruction sequence with a zero check. If your division differs structurally
   from retail's, check whether retail divided at all — a shift may be the
   source form.
+- **A `lui`+`lw` pair where retail has a single `lw ..($gp)`.** This is the
+  gp-relative blocker, and **no source-level reshaping will move it** — the
+  addressing mode comes from the toolchain's `-G` value. Check for it before
+  spending attempts: `grep -l 'gp_rel' asm/nonmatchings/<unit>/*.s`. A hit
+  means STOP and file the report; see `docs/research/gp-relative-blocker.md`.
+  Nine functions across two units burned attempts on this in one round.
 
 ## Unit state
 
 Keep this current: the head reads it in Gate 1, and a number in `progress.py`
 cannot express "large body, deep reconstruction, low cold-runner yield".
 
-| unit | queued | state |
-| --- | --- | --- |
-| `DreamSys` | 118 | Untouched. The game's core state machine — dream timer, day advance, mood graph, flashbacks. Descriptive symbol names and a struct guess in `include/DreamSys.h`. Too big for one runner to finish; assign a named address range. |
-| `code_55dd4` | 34 | Untouched, carved 2026-08-28. Its tail was data (see the yaml at `0x57028`). |
-| `code_171e0` | 26 | Untouched, carved 2026-08-28. Clean segment, no boundary surprises. |
-| `Entity` | 25 | Untouched, carved 2026-08-28 — the first 25 of a 142-function block, split at `func_8005DE18`. The remainder is `Entity_b`, still `asm`. |
-| `code_4cd08` | 17 | Untouched, carved 2026-08-28. lsddecomp called this "DreamAux". Owns the `0x206C` rodata slot (jump tables). |
-| `code_1677c` | 14 | Untouched, carved 2026-08-28. |
-| `class_16334` | 8 | Untouched, carved 2026-08-28. Smallest unit — a good first assignment for a cold runner. |
-| `StageGrid` | 2 | 3 matched. Remainder is `GetStageChunkFromMood` / `GetMoodFromStageChunk`; both need the `STAGE_CHUNK_MOODS` / `STAGE_GRID_DIMENSIONS` data slots understood, and m2c already produces a clean body for the second. Good warm start, but a thin queue. |
+State after round 2026-08-29-a (5 runners, all killed mid-round by an
+account-wide session limit; their work was salvaged by the head per
+docs/PARALLEL-RUNS.md 4c).
+
+| unit | queued | fresh | state |
+| --- | --- | --- | --- |
+| `DreamSys` | 105 | 104 | **16 matched.** Round 2026-08-29-a took the accessor range `0x80059310`–`0x800595A8`: 13 matched, and `func_8005942C` preserved as a mid-attempt snapshot (19/56 with heavy outside drift — *not* a near-miss; needs the globals near `0x80087EE8` named first). `include/DreamSys.h` now carries real field offsets and callback slots. The remaining 104 are untouched; still too big for one runner, so keep assigning named ranges. |
+| `code_55dd4` | 34 | 0 | **DELIBERATELY UNWORKED** — banked for scheduling, not difficulty. First pick next round. Carved 2026-08-28; its tail was data (see the yaml at `0x57028`). |
+| `Entity` | 25 | 0 | **DELIBERATELY UNWORKED** — banked for scheduling. Carved 2026-08-28, the first 25 of a 142-function block split at `func_8005DE18`; remainder is `Entity_b`, still `asm`. |
+| `code_171e0` | 22 | 14 | **5 matched, 8 stalled.** All 8 stalls are the gp-relative blocker (`docs/research/gp-relative-blocker.md`) — a real toolchain escalation, verified by the head, not a runner misclassification. Do not staff those 8 again until the operator rules on `-G`. The other 14 are ordinary fresh ground. |
+| `code_4cd08` | 14 | 14 | **3 matched, 0 stalls.** The cleanest unit of the round — the runner matched everything it attempted. lsddecomp called this "DreamAux". Owns the `0x206C` rodata slot (jump tables). |
+| `code_1677c` | 11 | 10 | **4 matched, 1 stalled.** The stall is `new_class_6d3c8`, a single delay-slot residue in the `New_X` allocator shape that ~60 classes share — the best first permuter target in the project. |
+| `class_16334` | 4 | 3 | **6 matched, 1 stalled.** The stall (`func_80025C30`) is the gp-relative blocker again, found independently of `code_171e0`'s. |
+| `StageGrid` | 2 | 0 | **DELIBERATELY UNWORKED** — a 2-function queue is too thin to be worth a runner's provisioning cost. 3 matched. Remainder is `GetStageChunkFromMood` / `GetMoodFromStageChunk`; both need the `STAGE_CHUNK_MOODS` / `STAGE_GRID_DIMENSIONS` data slots understood. Head or warm-session work. |
 
 ## Uncarved ground
 
@@ -175,6 +185,13 @@ the keyboard:
 
 Not yet set up on this project. When a near-miss is worth it,
 `tools/decomp-permuter` is cloned and `tools/permuter_settings.toml` points at
-the Psy-Q compiler. A permuter zero is a LEAD: translate it to idiomatic C and
+the Psy-Q compiler.
+
+**The first target is chosen: `new_class_6d3c8`.** It is the `New_X` allocator
+shape (malloc → null check → constructor through slot `+0x008` → return the
+allocation), it stalls on one delay-slot residue that manual reshaping and a
+`__asm__("")` barrier both failed to close, and roughly 60 classes share the
+shape. One source form that closes it plausibly unblocks every `New_X` in the
+game, which is a far better return than permuting an isolated near-miss. A permuter zero is a LEAD: translate it to idiomatic C and
 re-verify with funcdiff. If only undefined-behaviour or duplicate-arm forms
 reach zero, mark the class permuter-exhausted in the report and move on.
