@@ -29,6 +29,34 @@ with fifty unverified claims teaches sessions to skim it.
   missing. Do not hand-edit them expecting the edit to survive; if you need a
   different `INCLUDE_ASM` expansion, that is a splat option, not a file edit.
 
+### BLOCKED: no C function can reach a small-data global (2026-08-29)
+
+**Full evidence and reproducer: `docs/research/gp-relative-blocker.md`. This is
+an open operator escalation; do not attempt a toolchain change yourself.**
+
+Retail reaches globals in the `.sdata` region gp-relatively, in one
+instruction (`lw $v0, 0x40($gp)`). The pinned pipeline emits the
+two-instruction absolute `lui`/`lw` form instead, and the extra instruction
+shifts every later function in the same unit.
+
+The measured discriminator: gp-relative addressing needs a non-zero `-G` at
+**both** cc1 and `as`. Either alone still gives the absolute form. The project
+pins `-G0` at both and passes maspsx no `-G` at all, though maspsx's README
+says a `$gp` project must be passed one.
+
+**Before spending attempts on any function, check whether it touches a
+small-data global:**
+
+```sh
+grep -l 'gp_rel' asm/nonmatchings/<unit>/*.s
+```
+
+A hit means the function is blocked by this, not by anything you can write.
+Nine functions across two unrelated units were confirmed blocked in round
+2026-08-29-a. It went unnoticed for 20 matches because every function matched
+before that round happens to touch no global at all — a fact worth
+remembering, because it is exactly why "the build is green" did not catch it.
+
 ## Build hygiene (proven, the hard way)
 
 - **A header edit rebuilds everything, on purpose.** The Makefile makes every
@@ -43,6 +71,20 @@ with fifty unverified claims teaches sessions to skim it.
   the slot until someone writes the arrays out as C. Slots start as plain
   `data`/`rodata` segments and flip to the dot form in the same commit that
   writes their C.
+- **Splicing a salvaged body into another checkout's file drops its
+  `#include`s, and the resulting parse error reads as a match.** Recovering
+  runner/echo's 14 bodies, the head spliced each into main's `src/DreamSys.c`,
+  which lacked the `#include "DreamSys.h"` echo had added. Every `DreamSys *`
+  became `parse error before '*'`, the compile failed, the previous build
+  stayed in place — and all 14 funcdiff reads came back full matches from that
+  stale build. They were plausible, self-consistent, and entirely fictional.
+  funcdiff's STALE BUILD guard is what caught it. **When splicing a body from
+  another tree, take its file preamble too, and confirm the base file builds
+  GREEN on its own before scoring anything against it.**
+- **`build exit=` is not advice you get to weigh against a good-looking
+  number.** In the incident above the exit status was printed next to every
+  one of the 14 scores and was `2` every time. Printing it is not the control;
+  refusing to read the number unless it is `0` is the control.
 - **One exception: a rodata slot holding JUMP TABLES must stay attached to its
   unit.** Its words point at `.L8005....` labels *inside* the unit's functions,
   which are local to each function's `.s` file, so a standalone rodata object
@@ -52,9 +94,41 @@ with fifty unverified claims teaches sessions to skim it.
 
 ## Source-shape idioms
 
-To be filled in as functions get matched. Candidates to watch for, from other
-GCC 2.x projects — **none of these is confirmed here yet**, so treat each as a
-thing to test, not a rule to apply:
+### Confirmed on this game (each backed by a byte-exact match)
+
+- **`x % N` for a compile-time-constant `N`: just write `%`.** Retail's
+  `mult`/`mfhi`/`sra`-`subu` sign-fix followed by a `sll`+`addu` chain that
+  rebuilds `N * quotient` and subtracts it is GCC 2.6.3's ordinary expansion.
+  Reconstructing that sequence by hand is wrong; the plain operator reproduces
+  it. (`func_800260A4`)
+- **"Default value, then conditionally overwritten by an `if` with no `else`"
+  is a real shape, and the alternatives are not equivalent.** 2.6.3 slides the
+  default assignment into the guarding branch's delay slot for free. The
+  `if/else` and `||` forms cost an extra instruction or change the comparison
+  codegen. Reach for this when the residue is "one extra instruction" or "a
+  `beq` where retail has `xor`+`sltu`". (`func_8005C9A4`)
+- **When a branch seems to vanish where two sibling blocks share an identical
+  tail call, write the literal jump graph with `goto`.** 2.6.3's
+  cross-jump/tail-merge can merge two blocks whose *guards* differ, dropping a
+  comparison. Do not reach for `||` or nested `if/else` first.
+  (`func_8005C714`, second instance in the same unit)
+- **A whole-struct assignment, not an indexed `for`, for a block copy.** Where
+  retail's first loop batches 4 words per iteration cycling four temp
+  registers (`v0,v1,a0,a1`), that is 2.6.3's inlined block-move for a struct
+  assignment. A per-word loop cannot produce it and silently shifts every
+  later function. (`func_80025E1C`)
+- **`lui`/`addiu` to a symbol with no surrounding `lw`/`sw` returns
+  `&symbol`**, not a value read from it. Check the callers before guessing a
+  dereferencing signature. (`func_800269E0`)
+- **Calling into a function that is still `INCLUDE_ASM` in another unit is
+  fine.** Add a local `extern` prototype at the call site, typed from the
+  registers loaded before the `jal` and from whether the caller consumes
+  `$v0`. It need not be authoritative — only the call site's own bytes depend
+  on it. (`SetTeleportsEnabled`)
+
+### Still unconfirmed here
+
+Candidates from other GCC 2.x projects — treat each as a thing to test:
 
 - Guarded `do { } while` where the source looks like it wants `while`.
 - Member loads hoisted into a local at the top of a loop.
@@ -99,6 +173,22 @@ Practical consequences:
   Resolve `<off>` with `tools/classtable.py <table> [--vs <base>]`; the `--vs`
   diff is the subclass's behaviour in one screen.
 - **60 classes, ~1425 method slots.** This is the game's backbone, not a corner.
+- **A patchy `--vs` diff may mean you picked the wrong ancestor, not that
+  there is no inheritance.** If a derived table's *high* slots line up
+  byte-for-byte with some other candidate table's high slots, re-run `--vs`
+  against that one; the longer identical run is the real parent. This is how
+  `code_1677c`'s class was found to descend from `D_8006E4F0`, an intermediate
+  between `BasicClass` and itself, rather than directly from `BasicClass`.
+  (`func_80026108`)
+- **`New_X` allocator wrappers are a recurring shape with a known residue.**
+  malloc → null check → constructor through the class's own slot `+0x008` →
+  return the allocation regardless of the constructor's return. The first one
+  attempted (`new_class_6d3c8`) stalled on a single delay-slot residue that no
+  `if`/`goto`/temp-variable reshaping and no `__asm__("")` barrier closed.
+  Since roughly 60 classes share this shape, this is the highest-value single
+  target for the first permuter round: one source shape that closes it
+  plausibly unblocks every `New_X` in the game. Do not re-derive the same 20+
+  manual attempts per class in the meantime.
 
 ## Open questions
 
@@ -110,7 +200,13 @@ Practical consequences:
   `code_179d8` does with them; nobody has looked.
 - **What are the four dead-looking data slots** at `0x57070`, `0x76DC8`,
   `0x79528` and the `sbss` runs? They assemble and link fine as plain data, so
-  nothing is blocked, but their owners are unidentified.
+  nothing is blocked, but their owners are unidentified. **Partly answered for
+  `0x57070` (2026-08-29):** it holds at least `D_8006D370`, one class's method
+  table, and probably `BASICCLASS_METHODS` (`D_8006B58C`) next to it. Before
+  calling any of these slots unidentified, cross-reference all 60 addresses
+  from `classtable.py --scan` against the segment ranges — the "dead" slots may
+  simply be the method tables, already understood, seen from the data side.
+  Nobody has run that cross-reference yet; it is cheap.
 - **How much of the 724 `psyq_*` functions is really SDK?** The blocks were
   identified by lsddecomp and inherited wholesale. The boundary between
   `psyq_memset` (260 functions) and game code at `0x39c80` in particular is a
