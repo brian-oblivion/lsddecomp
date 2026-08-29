@@ -73,6 +73,13 @@ every time. **Printing `build exit=` is not the control; refusing to read the
 number unless it is 0 is the control.** Corrected pass: 13 genuine matches, 1
 snapshot. Both the trap and the rule are now in DECOMPILATION_LEARNINGS.
 
+It bit a second time, in a nastier form, during the `-G` experiment. **A flag
+change rebuilds nothing** — objects depend on every source and header but not
+on the Makefile — so `-G8` reported a clean green that was simply the previous
+`-G0` build. Nothing failed, nothing was newer than anything, and funcdiff's
+mtime guard cannot see this one either. From scratch the same flags were
+19148 bytes wrong. `rm -rf build` before trusting any flag experiment.
+
 ### A provisioning defect that had disabled an honesty check
 
 The toolchain gitignore patterns ended in `/`, matching directories only —
@@ -91,16 +98,30 @@ UNWORKED so their 61 functions report as `banked` rather than inflating
 
 ### Next move
 
-**Operator decision first, then runners.** The `-G` question gates an unknown
-but probably large share of the remaining queue, and it is answerable in under
-a second: set `-G8` at cc1, `as` and maspsx together and run
-`./build-and-verify.sh`. If the image still verifies, the pin was wrong and a
-whole class of functions unblocks at once. If it goes red, the 39 matched
-functions say exactly which assumption broke. That is not the head's call to
-make.
+**Runners. The `-G` question was settled the same day and the answer is no.**
 
-Runners are still worthwhile without it — 145 fresh remain and `code_4cd08`
-matched everything it attempted — but route them around `gp_rel` functions.
+An earlier draft of this entry called `-G` a gate on "an unknown but probably
+large share of the queue" and put it ahead of runners. Both halves were wrong,
+and the measurements are worth keeping:
+
+- **Scale.** Functions touching a small-data global: 37 of 217 in the carved
+  queue (17%), 99 of 1098 uncarved (9%) — **~136 of 1315 remaining, about
+  10%.** Not most of the project. But heavily concentrated: `code_171e0` 63%,
+  `code_4cd08` 57%, `class_16334` 50%, against 0% for `code_55dd4`, `Entity`,
+  `code_1677c` and `StageGrid`. So it barely gates the project and badly gates
+  three specific units.
+- **Sequencing.** With ~160 functions of zero-exposure ground available, the
+  two decisions were never serial. Staffing runners never needed to wait.
+- **The answer.** Tested with operator authorisation and rejected: a clean
+  `-G8` rebuild differs from retail by 19148 bytes across 3203 runs, and `-G4`
+  gives byte-identical damage. The diagnosis was right (at `-G8` the blocked
+  function compiles to retail's exact `sw a0,0(gp)`), but a global flip costs
+  far more than the 136 functions it buys. `docs/research/gp-relative-blocker.md`
+  has the rejected experiment and what remains unexplored.
+
+So: runners, on the zero-exposure units, routed around `gp_rel` by the grep now
+in MATCHING-GUIDE. 145 fresh remain and `code_4cd08` matched everything it
+attempted.
 When the permuter is set up, the first target is `new_class_6d3c8`: the `New_X`
 allocator shape recurs across ~60 classes, so one closing source form unblocks
 all of them.
