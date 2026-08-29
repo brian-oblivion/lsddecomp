@@ -28,7 +28,12 @@ void *func_80026C9C(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CAC);
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CE8);
+Vec3_171e0 *func_80026CE8(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+    return this;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CFC);
 

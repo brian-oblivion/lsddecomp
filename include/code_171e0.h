@@ -29,4 +29,13 @@ typedef struct UnkFlagsObj_171e0 {
  * D_8006D3C8's. */
 extern s32 D_8006D430[];
 
+/* A 3-word vector-like object, written wholesale by func_80026CE8. Only the
+ * first three words are touched; nothing here says whether a further field
+ * follows. */
+typedef struct Vec3_171e0 {
+    s32 x;
+    s32 y;
+    s32 z;
+} Vec3_171e0;
+
 #endif
