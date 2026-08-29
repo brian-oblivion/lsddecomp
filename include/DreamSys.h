@@ -3,13 +3,17 @@
 
 #include "common.h"
 
-/* .sbss values */
-s8 (*gpNavChallengesComplete)[30];
-s32 *gpDinamicLinkPenalty;
-s32 D_8008ACBC;
-s32 D_8008ACC0;
-s32 D_8008ACC4;
-s32 D_8008ACC8;
+/* .sbss values. The 7B4B4 sbss segment that actually holds these is still
+   plain `data` (un-flipped to dot-form), so it already provides these
+   symbols; declaring them `extern` here lets this header be #included
+   without a multiple-definition link error. Whoever flips that segment to
+   `.data, DreamSys` should drop `extern` here in the same commit. */
+extern s8 (*gpNavChallengesComplete)[30];
+extern s32 *gpDinamicLinkPenalty;
+extern s32 D_8008ACBC;
+extern s32 D_8008ACC0;
+extern s32 D_8008ACC4;
+extern s32 D_8008ACC8;
 
 typedef struct CinematicCall{
 	s16 bank;
@@ -58,16 +62,62 @@ typedef struct {
 
 typedef struct DreamSys {
 	struct vtable_DreamSys *vt;
-	s8 unknown_values_0x4[32];
+	s8 unknown_values_0x4[8];
+
+	/* Gate observed by func_8001E600 and func_8005942C: when nonzero,
+	   unk_0x14 is treated as valid and its "+0x38" vector is used;
+	   otherwise a zero vector is used instead. Meaning of the pointed-to
+	   struct is unidentified. */
+	s32 unk_0xC;
+	s8 unknown_values_0x10[4];
+
+	/* Pointer to an unidentified struct; a 3-word vector lives at +0x38
+	   of what this points to (read by func_8001E600 / func_8005942C,
+	   guarded by unk_0xC above). */
+	void *unk_0x14;
+	s8 unknown_values_0x18[12];
 
 	s32 dreamTimer;
 	s8 unknown_values_0x28[28];
 
 	s32 unknwon_int_0x44;
-	s8 unknown_values_0x48[32];
+	s8 unknown_values_0x48[16];
+
+	/* Set by func_8005937C(this, value); no other observed use. */
+	s32 unk_0x58;
+	/* Set by func_80059384(this, value); read as a pointer by
+	   func_8005942C (this->unk_0x5C + 0x14 and + 0x20 are passed to
+	   func_8005950C), so it points to a pair of two-word (x,y) points. */
+	void *unk_0x5C;
+	s8 unknown_values_0x60[4];
+	/* Set by func_8005938C(this, value); no other observed use. */
+	s32 unk_0x64;
 
 	bool isFlashbackSession;
-	s8 unknown_values_0x6c[200];
+	s8 unknown_values_0x6c[4];
+
+	/* Gate flag: func_80059310 sets it to 1; func_8005931C reads it back;
+	   func_80059394 skips its whole body while this is nonzero. */
+	s32 unk_0x70;
+	/* Cleared to 0, then set to (dreamTimer % unk_0x120 == 0) by
+	   func_80059394. */
+	s32 unk_0x74;
+	/* Cleared to 0 by func_80059598; no other observed use. */
+	s32 unk_0x78;
+	/* Cleared to 0 by func_80059590; no other observed use. */
+	s32 unk_0x7C;
+	/* Called with (this) by func_800593D8, if non-NULL. */
+	void (*callback_0x80)(struct DreamSys *this);
+	s8 unknown_values_0x84[20];
+	/* Called with (this) by func_800593D8, if non-NULL. */
+	void (*callback_0x98)(struct DreamSys *this);
+	s8 unknown_values_0x9c[132];
+
+	/* Divisor for func_80059394's (dreamTimer % unk_0x120) check. */
+	s32 unk_0x120;
+	/* Result of func_80059394's (dreamTimer % unk_0x120 == 0) check. */
+	s32 unk_0x124;
+	s8 unknown_values_0x128[12];
 
 	s32 dreamTimeLimit;
 	s8 unknown_values_0x138[12];
@@ -120,9 +170,27 @@ struct vtable_DreamSys{
 	void *TimerTick;
 	u32 unknown_functions_0x9c[17];
 	void *LinkWall;
-	u32 unknown_functions_0xe4[8];
+	u32 unknown_functions_0xe4[6];
+	void (*func_80059310)(DreamSys *this);
+	s32 (*func_8005931C)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);
-	u32 unknown_functions_0x104[36];
+	s32 (*func_80059360)(DreamSys *this);
+	void (*func_8005937C)(DreamSys *this, s32 value);
+	void (*func_80059384)(DreamSys *this, void *value);
+	void (*func_8005938C)(DreamSys *this, s32 value);
+	void (*func_80059394)(DreamSys *this);
+	void (*func_800593D8)(DreamSys *this);
+	s32 (*func_8005942C)(DreamSys *this, void *out, s32 day, s32 *arg3);
+	void (*func_80059590)(DreamSys *this);
+	void (*func_80059598)(DreamSys *this);
+	s32 (*func_800595A0)(DreamSys *this);
+	void (*func_800595A8)(DreamSys *this, bool arg1);
+	u32 unknown_functions_0x134[1];
+	/* Called by func_800595A8(this, TRUE) as this->vt->func_8005966C(this, 0). */
+	void (*func_8005966C)(DreamSys *this, s32 arg1);
+	/* Called unconditionally by func_800595A8 as this->vt->func_800596E8(this, 0). */
+	void (*func_800596E8)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x140[22];
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	void *func_8005A2E4;
