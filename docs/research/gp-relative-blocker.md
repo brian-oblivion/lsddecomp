@@ -1,6 +1,8 @@
 # The gp-relative addressing blocker
 
-**Status: OPERATOR ESCALATION. Not acted on. No toolchain change has been made.**
+**Status: ESCALATED, TESTED 2026-08-29 WITH OPERATOR AUTHORISATION, REJECTED.
+The pin remains `-G0` and the tree is unchanged. See "The experiment was run"
+below before proposing any `-G` change — the obvious test gives a false green.**
 
 Found independently by two runners in two unrelated units during round
 2026-08-29-a, and adjudicated by the head. This is the first stall class on
@@ -101,13 +103,71 @@ This likely gates a large fraction of the remaining 1300+ game functions.
 - Whether the `.sdata`/`.sbss` segments in the splat yaml would need
   restructuring to suit.
 
-## Recommended next step (operator's call, not the head's)
+## THE EXPERIMENT WAS RUN (2026-08-29, operator-authorised)
 
-Try `-G8` at cc1, `as` and maspsx together on a branch, and run
-`./build-and-verify.sh`. The whole-image SHA1 answers it in under a second: if
-the image still verifies, the pin was simply wrong and a large class of
-functions unblocks at once. If it goes red, the currently-matched functions
-tell you exactly which assumption broke.
+Result: **a global non-zero `-G` is not the answer. The pin stays at `-G0`.**
 
-Per CLAUDE.md rule 5 and docs/PARALLEL-RUNS.md, the head does not perform
-toolchain changes. This document is the evidence, not the fix.
+### First, a trap that invalidates the obvious test
+
+An earlier version of this document recommended "set `-G8` and run
+`./build-and-verify.sh`; if the image still verifies, the pin was wrong."
+**That test gives a FALSE GREEN and must not be used.**
+
+The Makefile makes every object depend on every source and header, but **not
+on the Makefile itself**. Changing `CC_FLAGS` therefore rebuilds nothing: the
+build stays green because it is still the *previous* build, compiled with the
+old flags. The first run of this experiment reported a clean green at `-G8`
+and it was entirely fictional.
+
+**Any flag experiment must `rm -rf build` first.** There is no incremental
+path that is safe, because the flags are invisible to the dependency graph.
+
+### What is confirmed
+
+The diagnosis is right. At `-G8`, the simplest blocked function compiles to
+exactly retail's shape — verified at the object level, not inferred:
+
+```
+built at -G8:   af840000   sw   a0,0(gp)        # 3 words, 12 bytes
+retail:         4C0084AF   sw   $a0, %gp_rel(D_8008A854)($gp)
+```
+
+`D_8008A854` links at `0x8008a854` and `_gp` at `0x8008a808`, a displacement
+of `0x4C`, which is retail's encoding. So the small-data mechanism does work,
+and `-G0` really is what blocks it.
+
+### What kills it
+
+A **clean** rebuild at `-G8` does not reproduce retail:
+
+- **19148 bytes differ (3.785% of the image), across 3203 runs**, spanning
+  almost the entire executable (`0x80011848` to `0x8008A804`).
+- `-G4` produces **byte-for-byte identical damage** — the same 19148 bytes.
+
+That last point is the informative one. If the breakage came from symbols
+crossing the small-data size threshold, `-G4` and `-G8` would differ, because
+they admit different symbols. They do not differ at all. So the damage is not
+about *which* symbols become small — it is something structural that any
+non-zero `-G` switches on, and it costs far more than the ~136 functions it
+would unblock.
+
+### Where that leaves it
+
+The nine known-blocked functions stay blocked, and the `grep -l 'gp_rel'`
+routing rule in DECOMPILATION_LEARNINGS stands — it is still correct that
+these cannot be reached by reshaping C.
+
+What is now ruled out: flipping `-G` globally. What is not yet explored, in
+rough order of promise:
+
+1. **Find what the non-zero `-G` structurally changes.** Diff the assembler
+   output of one unchanged unit at `-G0` and `-G8` and look at what moved.
+   Identical damage at `-G4`/`-G8` makes this a single mechanism, so it should
+   be findable, and it may be separable from the size threshold.
+2. **maspsx's `--use-comm-section` / `--use-comm-for-lcomm`**, which change
+   where common and `.lcomm` symbols land. Untested here.
+3. Whether the `.sdata` segments in the splat yaml need declaring differently
+   so a non-zero `-G` does not relocate them.
+
+Per CLAUDE.md rule 5 the head does not choose among these unprompted; this
+section is the evidence for whoever does.

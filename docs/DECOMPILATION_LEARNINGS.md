@@ -44,6 +44,14 @@ The measured discriminator: gp-relative addressing needs a non-zero `-G` at
 pins `-G0` at both and passes maspsx no `-G` at all, though maspsx's README
 says a `$gp` project must be passed one.
 
+**Flipping `-G` globally was tried on 2026-08-29 with operator authorisation
+and REJECTED.** It does produce retail's exact instruction shape for a blocked
+function — the diagnosis is right — but a clean rebuild at `-G8` differs from
+retail by 19148 bytes across 3203 runs, and `-G4` gives byte-identical damage,
+which rules out the size threshold as the cause. The pin stays at `-G0`. Do
+not re-propose a global `-G` change without reading
+`docs/research/gp-relative-blocker.md` first.
+
 **Before spending attempts on any function, check whether it touches a
 small-data global:**
 
@@ -81,6 +89,15 @@ remembering, because it is exactly why "the build is green" did not catch it.
   funcdiff's STALE BUILD guard is what caught it. **When splicing a body from
   another tree, take its file preamble too, and confirm the base file builds
   GREEN on its own before scoring anything against it.**
+- **A FLAG change rebuilds NOTHING, so every flag experiment starts out
+  falsely green.** Every object depends on every source and header — but not
+  on the Makefile. Edit `CC_FLAGS`/`AS_FLAGS`/`MASPSX_FLAGS` and
+  `./build-and-verify.sh` reports OK, because it is still the previous build
+  compiled with the old flags. This is nastier than the ordinary stale-build
+  trap: there is no failed compile anywhere, nothing is newer than anything,
+  and funcdiff's mtime guard cannot see it either. **`rm -rf build` before
+  timing or trusting any flag experiment.** A `-G8` trial reported a clean
+  green this way and the real answer, from scratch, was 19148 differing bytes.
 - **`build exit=` is not advice you get to weigh against a good-looking
   number.** In the incident above the exit status was printed next to every
   one of the 14 scores and was `2` every time. Printing it is not the control;
