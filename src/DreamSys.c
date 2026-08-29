@@ -75,8 +75,13 @@ void func_80059394(DreamSys *this)
 		this->unk_0x124 = ((u32)this->dreamTimer % (u32)this->unk_0x120) == 0;
 	}
 }
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800593D8);
-
+void func_800593D8(DreamSys *this)
+{
+	if (this->callback_0x80 != NULL)
+		this->callback_0x80(this);
+	if (this->callback_0x98 != NULL)
+		this->callback_0x98(this);
+}
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005942C);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005950C);
