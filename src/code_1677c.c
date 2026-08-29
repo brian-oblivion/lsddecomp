@@ -1,10 +1,17 @@
 #include "common.h"
+#include "Class6D3C8.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", new_class_6d3c8);
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80025FDC);
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_800260A4);
+extern void func_80048CFC(s32 day, s32 unused);
+
+/* Advances the day cursor: reads the running tick count kept in scratchpad
+ * (0x1F800000, the PS-X data-cache-as-RAM region) and reduces it mod 365. */
+void func_800260A4(void) {
+    func_80048CFC(*(s32 *)0x1F800000 % 365, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026108);
 
