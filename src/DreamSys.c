@@ -1,4 +1,5 @@
 #include "common.h"
+#include "DreamSys.h"
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", New_DreamSys);
 
@@ -31,8 +32,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059148);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800591B4);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059310);
-
+void func_80059310(DreamSys *this)
+{
+	this->unk_0x70 = 1;
+}
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005931C);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetSetDreamTimeLimit);
