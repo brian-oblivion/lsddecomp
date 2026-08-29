@@ -6,6 +6,107 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-08-29 — round 3: 5 runners, 27 matches, and a real toolchain blocker
+
+**12 -> 39 matched (2.88% of game code). 217 queued: 145 fresh, 11 stalled, 61
+banked. Build green throughout.**
+
+Five runners on `class_16334` (8), `code_1677c` (14), `code_4cd08` (17),
+`code_171e0` (26) and a named `DreamSys` range (`0x80059310`-`0x800595A8`, 15
+accessors). Gate 2 was already done, so this was Gate 1 triage and
+provisioning only.
+
+**All five runners were killed mid-round by one account-wide session limit.**
+Not one reached its own stop rule. Of the 27 matches this round, 11 were
+committed by runners and **16 were recovered by the head** under
+PARALLEL-RUNS 4c — including runner/echo's entire output, which was 13 byte-
+exact bodies and not a single commit. Without the salvage path that work would
+have been silently lost at teardown, and the round would have read as 11
+matches with four units looking barren.
+
+Worth stating plainly for the next head: **4c is not a rare-contingency
+procedure.** One infrastructure event took every runner simultaneously, and
+the recovery was most of the round's value.
+
+### The finding: no C function on this project can reach a small-data global
+
+`docs/research/gp-relative-blocker.md`. **Open operator escalation; no
+toolchain change made.**
+
+Retail reads `.sdata` globals gp-relatively in one instruction. The pinned
+pipeline emits the two-instruction absolute `lui`/`lw` form, and the extra
+instruction shifts every later function in the unit.
+
+runner/delta filed 8 stalls in `code_171e0` all classed TOOLCHAIN. Eight
+identical classifications from one runner is exactly the shape that is usually
+a runner rationalising, so the head adjudicated rather than accepting — and
+this time the runner was right. Reproduced in isolation per CLAUDE.md, with
+one correction: the runner blamed cc1, but gp-relative addressing needs a
+non-zero `-G` at **both** cc1 and `as`; either alone still gives the absolute
+form. The project pins `-G0` at both and passes maspsx no `-G`, while maspsx's
+README says a `$gp` project must be passed one.
+
+The head then found the same root cause in **runner/alpha's** unfinished
+`func_80025C30` in `class_16334` — a different unit, a different runner,
+neither able to see the other's evidence. alpha died before classifying it, so
+that connection existed nowhere until consolidation.
+
+**Why 20 matches never caught it:** every function matched before this round
+touches no small-data global at all. Zero `(gp)` references across every
+genuinely-C matched body. The `-G0` pin had simply never been exercised.
+
+Scope is at least 9 functions and plausibly a large fraction of the remaining
+1300+. `grep -l 'gp_rel' asm/nonmatchings/<unit>/*.s` now identifies a blocked
+function before anyone spends attempts on it.
+
+### The head walked into trap #1 and the guard caught it
+
+Rescoring runner/echo's 14 salvaged bodies, the head spliced each into main's
+`src/DreamSys.c`, which lacked the `#include "DreamSys.h"` echo had added.
+Every `DreamSys *` became a parse error, the compile failed, the previous
+build stayed in place, and funcdiff returned **14 full matches from the stale
+build** — plausible, self-consistent, entirely fictional. funcdiff's STALE
+BUILD guard is what caught it.
+
+The exit status was printed next to every one of those 14 scores and was `2`
+every time. **Printing `build exit=` is not the control; refusing to read the
+number unless it is 0 is the control.** Corrected pass: 13 genuine matches, 1
+snapshot. Both the trap and the rule are now in DECOMPILATION_LEARNINGS.
+
+### A provisioning defect that had disabled an honesty check
+
+The toolchain gitignore patterns ended in `/`, matching directories only —
+but `setup-worktree.sh` installs *symlinks*. All seven showed as untracked in
+every worktree from the moment it was created, putting a permanent floor of
+seven lines under `git status --porcelain`. That is the one mechanical check
+PARALLEL-RUNS 3b uses to tell a runner that committed its work from one that
+did not, and it could never fire. Fixed before spawning; all five worktrees
+read clean, which is what made the 4c salvage survey trustworthy.
+
+### Also banked
+
+`code_55dd4` (34), `Entity` (25) and `StageGrid` (2) were marked DELIBERATELY
+UNWORKED so their 61 functions report as `banked` rather than inflating
+`fresh`. They are unworked for scheduling reasons, not difficulty.
+
+### Next move
+
+**Operator decision first, then runners.** The `-G` question gates an unknown
+but probably large share of the remaining queue, and it is answerable in under
+a second: set `-G8` at cc1, `as` and maspsx together and run
+`./build-and-verify.sh`. If the image still verifies, the pin was wrong and a
+whole class of functions unblocks at once. If it goes red, the 39 matched
+functions say exactly which assumption broke. That is not the head's call to
+make.
+
+Runners are still worthwhile without it — 145 fresh remain and `code_4cd08`
+matched everything it attempted — but route them around `gp_rel` functions.
+When the permuter is set up, the first target is `new_class_6d3c8`: the `New_X`
+allocator shape recurs across ~60 classes, so one closing source form unblocks
+all of them.
+
+---
+
 ## 2026-08-28 — round 2: Gate 2 carve, 2 units -> 8
 
 **244 fresh across 8 units (was 120 across 2). 1100 uncarved. Build green.**
