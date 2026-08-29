@@ -52,8 +52,10 @@ s32 DreamSys__GetSetDreamTimeLimit(DreamSys *this, s32 value)
 		result = (u32)result / 15;
 	return result;
 }
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059360);
-
+s32 func_80059360(DreamSys *this)
+{
+	return (u32)this->dreamTimer / 15;
+}
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005937C);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059384);
