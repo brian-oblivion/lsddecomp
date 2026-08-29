@@ -86,8 +86,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005942C);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005950C);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059590);
-
+void func_80059590(DreamSys *this)
+{
+	this->unk_0x7C = 0;
+}
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059598);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800595A0);
