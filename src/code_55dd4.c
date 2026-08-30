@@ -93,7 +93,10 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065FD8);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800660BC);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_8006613C);
+s32 func_8006613C(Class65650 *self)
+{
+    return self->unk8C = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066148);
 
