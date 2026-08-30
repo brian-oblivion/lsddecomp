@@ -31,7 +31,31 @@ void *func_80026AB4(UnkFlagsObj_171e0 *this) {
     return this->methods->slot5C(this);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026B08);
+void func_80026B08(UnkFlagsObj_171e0 *this, s32 arg1) {
+    s32 savedUnk0C;
+    s32 size;
+    void *newRes;
+
+    if (this->unk10 != NULL) {
+        return;
+    }
+    savedUnk0C = this->unk0C;
+    this->unk0C = 0;
+    this->methods->slot44(this, arg1, 1, 0);
+    size = this->methods->slot4C(this, 0, 2);
+    newRes = func_80017B34(size);
+    if (newRes != NULL) {
+        this->methods->slot4C(this, 0, 0);
+        this->methods->slot54(this, newRes, size);
+        this->methods->slot48(this);
+        this->unk10 = newRes;
+        this->unk14 = size;
+        this->unk0C = savedUnk0C;
+    } else {
+        func_80017CFC(NULL);
+        this->methods->slot48(this);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C20);
 
