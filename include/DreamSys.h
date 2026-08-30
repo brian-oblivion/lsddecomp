@@ -160,7 +160,10 @@ typedef struct DreamSys {
 	   a *different* trio of vtable slots. Called with (this) by
 	   func_800593D8, if non-NULL. */
 	void (*callback_0x98)(struct DreamSys *this);
-	s8 unknown_values_0x9c[4];
+	/* "Mode" field read/written by func_800596E8(this, arg1): when ==2 on
+	   entry, this->vt->func_8005A134(this, 0) fires first; then it is set
+	   unconditionally to arg1 (round 2026-08-30). */
+	s32 unk_0x9C;
 	/* (this->unk_0xA0 ^ 1) < 1u, i.e. (unk_0xA0 == 1), written by
 	   func_800598E8; also toggled/incremented by func_80059A1C and forced
 	   to 1 by func_80059B50 (round 2026-08-30). */
@@ -179,7 +182,7 @@ typedef struct DreamSys {
 	/* Struct initialized in-place by func_8002CC34 (still INCLUDE_ASM, in
 	   the uncarved code_179d8) via func_800596E8's arg1==2 case; internal
 	   layout unknown beyond that entry point (round 2026-08-30). */
-	s8 unknown_values_0xCC[0x54];
+	s8 unk_0xCC[0x54];
 
 	/* Divisor for func_80059394's (dreamTimer % unk_0x120) check. */
 	s32 unk_0x120;
