@@ -2,6 +2,7 @@
 #define CLASS_6D3C8_H
 
 #include "common.h"
+#include "DreamSys.h"
 
 /*
  * The class allocated by new_class_6d3c8 / constructed by func_80025FDC.
@@ -33,7 +34,7 @@
 typedef struct MiddleClassMethods {
     s32 header;                                             /* +0x000 */
     void *unk04;                                             /* +0x004 */
-    void *ctor;                                               /* +0x008 func_8003AF8C */
+    void (*ctor)(void *self, s32 a1);                         /* +0x008 func_8003AF8C */
     void *unk0C;                                               /* +0x00C func_8003B024 (dtor override, shared with Class6D3C8) */
     void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
     void *unk3C;                                                /* +0x03C null slot */
@@ -45,12 +46,25 @@ typedef struct MiddleClassMethods {
 
 extern MiddleClassMethods *func_8003B20C(void);
 
+/* The constructor argument block for Class6D3C8 (func_80025FDC). Observed
+ * from its one call site (asm/main.s, D_80066828: {0x13, 0, 1, 1, 1, 1}) --
+ * only offsets +0x00 and +0x14 are actually read by func_80025FDC, so the
+ * rest stays opaque padding until another caller needs it. */
+typedef struct Class6D3C8CtorArgs {
+    s32 unk00;                 /* +0x00, passed as the base ctor's own arg */
+    s32 unk04;                 /* +0x04, forwarded as a plain word arg by func_80026698 */
+    void *unk08;                  /* +0x08, gates func_80026348's whole body */
+    void *unk0C;                    /* +0x0C, gates func_80026170's whole body */
+    void *unk10;                       /* +0x10, gates func_80026410's whole body */
+    s32 unk14;                          /* +0x14, passed into the DreamSys call */
+} Class6D3C8CtorArgs;
+
 typedef struct Class6D3C8 Class6D3C8;
 
 typedef struct Class6D3C8Methods {
     s32 header;                                            /* +0x000 */
     void *unk04;                                            /* +0x004 BasicClass__func_17eb0 */
-    Class6D3C8 *(*ctor)(Class6D3C8 *self, void *arg);       /* +0x008 func_80025FDC */
+    void (*ctor)(Class6D3C8 *self, Class6D3C8CtorArgs *arg); /* +0x008 func_80025FDC */
     void *unk0C;                                            /* +0x00C func_8003B024 (dtor override) */
     void *unk10;                                            /* +0x010 BasicClass__func_17f98 */
     void *unk14;                                            /* +0x014 BasicClass__func_17ff0 */
@@ -64,15 +78,15 @@ typedef struct Class6D3C8Methods {
     void *unk34;                                            /* +0x034 BasicClass__func_18350 */
     void *unk38;                                            /* +0x038 BasicClass__func_18358 */
     void *unk3C;                                            /* +0x03C null slot */
-    void (*slot40)(void);                                   /* +0x040 func_800260A4 */
+    void (*slot40)(Class6D3C8 *self);                       /* +0x040 func_800260A4 (ignores self) */
     void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 func_80026108 */
     void *unk48;                                            /* +0x048 func_8003B108 */
     void *unk4C;                                            /* +0x04C func_8003B110 */
-    void *slot50;                                           /* +0x050 func_80026170 */
-    void *slot54;                                           /* +0x054 func_80026348 */
-    void *slot58;                                           /* +0x058 func_80026410 */
+    void (*slot50)(Class6D3C8 *self);                       /* +0x050 func_80026170 */
+    void (*slot54)(Class6D3C8 *self);                       /* +0x054 func_80026348 */
+    s32 (*slot58)(Class6D3C8 *self);                        /* +0x058 func_80026410 */
     void (*slot5C)(void);                                   /* +0x05C func_80026690 */
-    void *slot60;                                           /* +0x060 func_80026698 */
+    void (*slot60)(Class6D3C8 *self);                       /* +0x060 func_80026698 */
     void *slot64;                                           /* +0x064 func_80026900 */
 } Class6D3C8Methods;
 
@@ -82,12 +96,180 @@ struct Class6D3C8 {
     Class6D3C8Methods *methods;    /* +0x00 */
     u8 unk04[0x14];                 /* +0x04 .. +0x17, not yet decoded */
     s32 unk18;                       /* +0x18 guards func_80026108's fallback to the base class */
-    u8 unk1C_[4];                     /* +0x1C .. +0x1F, not yet decoded */
-    void *arg;                      /* +0x20 the constructor's `arg` parameter */
+    s32 unk1C;                        /* +0x1C, forwarded as a plain word arg by func_80026170/func_80026254 */
+    Class6D3C8CtorArgs *arg;        /* +0x20 the constructor's `arg` parameter */
     s32 unk24;                      /* +0x24 */
-    void *dreamSys;                 /* +0x28 result of New_DreamSys() */
+    DreamSys *dreamSys;              /* +0x28 result of New_DreamSys() */
 };
 
 extern Class6D3C8Methods D_8006D3C8;
+
+/* Cross-unit accessor, matched C in src/code_171e0.c (not this unit). No
+ * header currently declares it there, so it's declared here at the one
+ * call site that needs it (func_80025FDC). Returns &D_8006D3C8. */
+extern void *func_800269E0(void);
+
+/* Model-file-load request block used by func_80025FDC: {type; path}. Only
+ * one call site is known so far (func_80025FDC, loading "ETC\DREAME5.TMD"
+ * via D_800107A4), so field names are provisional. */
+typedef struct LoadModelRequest {
+    s32 type;
+    const char *path;
+    s32 unk08;
+    s32 unk0C;
+} LoadModelRequest;
+
+extern const char D_800107A4[];       /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
+
+extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so far */
+extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
+extern void *func_80043840(void *arg); /* code_1677c's own alloc+ctor shape, uncarved (psyq_memset.s); not this unit's to write */
+
+/* A "New_X"-shaped task object allocated by func_8003B854 (uncarved,
+ * asm/code_2c054.s) -- 0xDC bytes, constructed through func_8003BE84's
+ * slot +0x008. Only the two slots func_80026170 dispatches through are
+ * typed; everything else about this class is unknown. */
+typedef struct StreamTaskMethods {
+    s32 header;                                                    /* +0x000 */
+    void (*slot4)(void *self);                                      /* +0x004 */
+    u8 pad08[0x044 - 0x008];                                          /* +0x008 .. +0x043 */
+    /* +0x044: called with (self, a fixed word from the caller's own
+     * object, a second word whose meaning varies by call site -- a
+     * filename string in func_80026170, a plain derived count in
+     * func_80026348, func_800493E4's return value in func_8002658C --
+     * a type/format code, and a literal 1 spilled onto the stack as a
+     * 5th argument -- confirmed a real 5th argument, not a scheduling
+     * artifact, because MIPS o32 only spills to the stack once a0-a3 are
+     * all otherwise assigned; a <=4-arg call would never need the
+     * sp+0x10 store. */
+    void (*slot44)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag);
+    u8 pad48[0x06C - 0x048];                                          /* +0x048 .. +0x06B */
+    void (*slot6C)(void *self, s32 a1);                                 /* +0x06C */
+    u8 pad70[0x12C - 0x070];                                              /* +0x070 .. +0x12B */
+    void (*slot12C)(void *self, s32 a1);                                    /* +0x12C */
+} StreamTaskMethods;
+
+typedef struct StreamTask {
+    StreamTaskMethods *methods;
+} StreamTask;
+
+extern StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3);
+
+extern s32 func_80026F34(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
+                                                       the last value its internal dispatch loop got --
+                                                       func_80026170/func_80026348 discard it, but
+                                                       func_8002677C keeps it */
+extern const char *func_800490F4(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &D_800113DC */
+extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index] */
+extern s32 func_8004913C(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides func_80048CFC's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
+
+extern const char D_800107B4[]; /* "ETC\ASMKLOGO.TIM" */
+extern const char D_800107C8[]; /* "ETC\OSDLOGO.TIM" */
+
+/* Forward declaration: func_80026254 (this unit, defined later in ROM
+ * order) is called by func_80026170, which comes first in the file. */
+void func_80026254(Class6D3C8 *self, const char *path);
+
+/* A second "New_X"-shaped task object, allocated by func_8003BE94
+ * (uncarved, asm/code_2c054.s) -- 0xA4 bytes, constructed through
+ * func_8003DFBC's slot +0x008. Different class from StreamTaskMethods
+ * above (different allocator, different slot signatures at the same
+ * offsets), used by func_80026254 to register a named resource with a
+ * completion callback. */
+typedef struct LoaderTaskMethods {
+    s32 header;                                              /* +0x000 */
+    void (*slot4)(void *self);                                 /* +0x004 */
+    u8 pad08[0x044 - 0x008];                                     /* +0x008 .. +0x043 */
+    void (*slot44)(void *self, s32 a1, s32 a2);                    /* +0x044 */
+    u8 pad48[0x06C - 0x048];                                         /* +0x048 .. +0x06B */
+    void (*slot6C)(void *self, s32 a1);                                /* +0x06C */
+    u8 pad70[0x098 - 0x070];                                             /* +0x070 .. +0x097 */
+    void (*slot98)(void *self, s32 (*callback)(void), void *ctx);         /* +0x098 */
+    u8 pad9C[0x0D4 - 0x09C];                                                /* +0x09C .. +0x0D3 */
+    void (*slotD4)(void *self, const char *path, s32 a2);                    /* +0x0D4 */
+} LoaderTaskMethods;
+
+typedef struct LoaderTask {
+    LoaderTaskMethods *methods;
+} LoaderTask;
+
+extern LoaderTask *func_8003BE94(s32 a0, s32 a1, s32 a2);
+
+/* Forward declaration: func_80026328 (this unit, defined right after
+ * func_80026254 in ROM order) is used by func_80026254 as a completion
+ * callback. Already matched: s32 func_80026328(void) { return
+ * func_8004A070(0); } */
+s32 func_80026328(void);
+
+/* A third small class, constructed directly by a caller-supplied function
+ * pointer (func_80026518's own a0) rather than through a New_X-style
+ * allocator -- confirmed by func_80026518's shape: `jalr` straight on the
+ * incoming a0 with the object argument in a0, no allocation call at all.
+ * Shares slot +0x004/+0x044 offsets and signatures with LoaderTaskMethods,
+ * consistent with the class-framework's shared low base-class slots, but
+ * kept as its own type since nothing ties the two classes together. */
+typedef struct PollTaskMethods {
+    s32 header;                                   /* +0x000 */
+    void (*slot4)(void *self);                      /* +0x004 */
+    u8 pad08[0x044 - 0x008];                          /* +0x008 .. +0x043 */
+    s32 (*slot44)(void *self, s32 a1, s32 a2);          /* +0x044 */
+} PollTaskMethods;
+
+typedef struct PollTask {
+    PollTaskMethods *methods;
+} PollTask;
+
+typedef PollTask *(*PollTaskCtor)(void *arg);
+
+/* This unit's own function, defined later in ROM order (forward declared
+ * for func_80026410, which comes first). Constructs a PollTask via the
+ * caller-supplied `ctor`, dispatches slot44(task, extra, 0) and slot4(task)
+ * on it, and returns slot44's result. */
+s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra);
+
+/* This unit's own function, defined later in ROM order (forward declared
+ * for func_80026410, which comes first). */
+void func_8002658C(Class6D3C8 *self);
+
+/* PollTask constructors, uncarved (not this unit's to write). Called
+ * directly (not through any vtable) as func_80026518's `ctor` argument. */
+extern PollTask *func_80057F68(void *dreamSys);
+extern PollTask *func_8004D518(void *dreamSys);
+
+extern s32 func_800493E4(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
+extern s32 func_800491FC(s32 *out, s32 unused); /* psyq_memset.s: same "write to *out, return a
+    separate value" shape as func_800490F4/func_8004913C/func_800493E4 */
+extern s32 func_80049334(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
+    {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
+    to *out (-1 if unresolved); the packing must zero-extend both halves before combining
+    (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
+    back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
+    func_8002677C. */
+
+/* A fourth small class, allocated by func_80049608 (uncarved,
+ * asm/class_39e08.s, New_X shape, 0x50 bytes). slot4 here is called with
+ * ONLY self (no extra args) and its return is used as a small status
+ * code -- a different signature from every other class's slot4 in this
+ * unit, confirming these per-class slot tables are independent even
+ * where offsets coincide. */
+typedef struct StatusObjMethods {
+    s32 header;                              /* +0x000 */
+    void (*slot4)(void *self);                  /* +0x004 */
+    u8 pad08[0x044 - 0x008];                     /* +0x008 .. +0x043 */
+    s32 (*slot44)(void *self);                    /* +0x044: return value matters -- confirmed by the
+                                                       call site, which keeps THIS return (not slot4's,
+                                                       captured via slot4's own jalr delay slot the same
+                                                       way func_80026518 keeps its own slot44 result). */
+} StatusObjMethods;
+
+typedef struct StatusObj {
+    StatusObjMethods *methods;
+} StatusObj;
+
+extern StatusObj *func_80049608(s32 a0, void *dreamSys, s32 a2);
+
+/* This unit's own function, defined later in ROM order (forward declared
+ * for func_80026698, which comes first). */
+void func_8002677C(Class6D3C8 *self);
 
 #endif
