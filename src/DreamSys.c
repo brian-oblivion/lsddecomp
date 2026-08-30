@@ -104,19 +104,78 @@ void func_800595A8(DreamSys *this, bool arg1)
 	if (arg1)
 		this->vt->func_8005966C(this, 0);
 }
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059610);
+void func_80059610(DreamSys *this, s32 arg1, s32 arg2)
+{
+	this->vt->func_800596E8(this, arg1);
+	this->vt->func_8005966C(this, arg2);
+}
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005966C);
+void func_8005966C(DreamSys *this, s32 arg1)
+{
+	struct vtable_DreamSys *vt = this->vt;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800596E8);
+	this->unk_0x84 = arg1;
+	switch (arg1) {
+	case 0:
+		this->callback_0x80 = NULL;
+		break;
+	case 1:
+		this->callback_0x80 = vt->func_800597C0;
+		break;
+	case 2:
+		this->callback_0x80 = vt->func_80059A48;
+		break;
+	case 3:
+		this->callback_0x80 = vt->func_80059A50;
+		break;
+	}
+}
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800597C0);
+extern void func_8002CC34(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
+
+void func_800596E8(DreamSys *this, s32 arg1)
+{
+	struct vtable_DreamSys *vt = this->vt;
+
+	if (this->unk_0x9C == 2)
+		vt->func_8005A134(this, 0);
+	this->unk_0x9C = arg1;
+	switch (arg1) {
+	case 0:
+		this->callback_0x98 = NULL;
+		break;
+	case 1:
+		this->callback_0x98 = (void (*)(DreamSys *))vt->func_80059A58;
+		break;
+	case 2:
+		this->callback_0x98 = vt->func_8005A0B0;
+		this->unk_0xC4 = 1;
+		this->unk_0xC8 = 1;
+		func_8002CC34(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->func_8005A1F4);
+		break;
+	}
+}
+
+void func_800597C0(DreamSys *this)
+{
+	this->vt->func_80059814(this);
+	this->vt->func_800598E8(this);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059814);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800598E8);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059A1C);
+void func_80059A1C(DreamSys *this)
+{
+	this->unk_0xA8 = 0;
+	if (this->unk_0xA0 != 0) {
+		if (this->unk_0xA0 & 1)
+			this->unk_0xA0 = this->unk_0xA0 + 1;
+		else
+			this->unk_0xA0 = this->unk_0xA0 - 1;
+	}
+}
 
 void func_80059A48(void) {
 }
@@ -124,13 +183,37 @@ void func_80059A48(void) {
 void func_80059A50(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059A58);
+s32 func_80059A58(DreamSys *this)
+{
+	if (this->unk_0x6c == 0) {
+		this->vt->func_8005A050(this);
+		return this->vt->func_80059AEC(this);
+	} else if (this->unk_0x6c != 2) {
+		return this->vt->func_80059B50(this);
+	} else {
+		return this->vt->func_80059BD4(this);
+	}
+}
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059AEC);
+s32 func_80059AEC(DreamSys *this)
+{
+	if (this->unk_0x70 != 0)
+		return this->unk_0x70;
+	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
+}
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059B50);
+s32 func_80059B50(DreamSys *this)
+{
+	this->unk_0xA0 = 1;
+	if (this->unk_0x70 != 0)
+		return this->vt->func_80059BE0(this, 0);
+	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
+}
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059BD4);
+s32 func_80059BD4(DreamSys *this)
+{
+	return this->unk_0xA0 = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059BE0);
 
