@@ -40,6 +40,8 @@ typedef struct D800878D4Methods {
     void (*slot10)(void *self, void *arg);             /* +0x010 func_800570B4 */
     void *unk14;                                        /* +0x014 func_80057130 */
     void *unk18;                                         /* +0x018 func_800571A8 */
+    u8 pad1C[0x34];                                       /* +0x01C .. +0x04C, not yet needed */
+    void (*slot50)(Class65650 *self);                       /* +0x050 -- called by func_800659D0 */
 } D800878D4Methods;
 
 extern D800878D4Methods *func_80057C84(void);
@@ -112,13 +114,19 @@ typedef struct Class65650Methods {
     void *slot120;                                                               /* +0x120 ditto */
     u8 pad124[0x14];                                                             /* +0x124 .. +0x134, this unit's own slots, not dispatched through here */
     void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
+    u8 pad13C[0x04];                                                                /* +0x13C func_80066748, this unit's own, not dispatched through here */
+    void (*slot140)(Class65650 *self);                                               /* +0x140 func_800667B0 -- called by func_800659D0 */
 } Class65650Methods;
 
 /* Object size is 0x98 (from the allocator call in New_class_65650). Field
  * offsets below are only the ones observed so far in this unit's functions. */
 struct Class65650 {
     Class65650Methods *methods;   /* +0x00 */
-    u8 unk04[0x54];                 /* +0x04 .. +0x57, BasicClass/intermediate-class instance fields, not this unit's to name */
+    u8 pad04[0x08];                  /* +0x04 .. +0x0B, BasicClass/intermediate-class instance fields, not this unit's to name */
+    s32 unk0C;                       /* +0x0C guard flag gating func_800659D0's whole body (slot140/slot14/base-slot50 cleanup); parallels DreamSys's own unk_0xC gate field in the SAME shared base class, though not proven equivalent */
+    u8 pad10[0x40];                   /* +0x10 .. +0x4F, not this unit's to name */
+    Class65650 *unk50;                 /* +0x50 companion-object pointer, unlinked via slot14 in func_800659D0 when set -- a second link slot distinct from unk94's */
+    u8 pad54[0x04];                     /* +0x54 .. +0x57, not this unit's to name */
 
     UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; read by func_800661D4, which calls arg2->methods->slot80(arg2, forwardedArg, 0x6E, 0x6E) when non-NULL */
     Unk5CObj *unk5C;                /* +0x5C lazily-populated sub-object; guarded by unk60, set up by func_80065C5C, torn down by func_80065CEC */

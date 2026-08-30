@@ -58,7 +58,16 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065830);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065918);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800659D0);
+void func_800659D0(Class65650 *self)
+{
+    if (self->unk0C != 0) {
+        self->methods->slot140(self);
+        if (self->unk50 != NULL) {
+            self->methods->slot14(self, self->unk50);
+        }
+        func_80057C84()->slot50(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
 
