@@ -183,7 +183,17 @@ void func_80059A48(void) {
 void func_80059A50(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059A58);
+s32 func_80059A58(DreamSys *this)
+{
+	if (this->unk_0x6c == 0) {
+		this->vt->func_8005A050(this);
+		return this->vt->func_80059AEC(this);
+	} else if (this->unk_0x6c != 2) {
+		return this->vt->func_80059B50(this);
+	} else {
+		return this->vt->func_80059BD4(this);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059AEC);
 
