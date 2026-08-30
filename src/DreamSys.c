@@ -110,7 +110,26 @@ void func_80059610(DreamSys *this, s32 arg1, s32 arg2)
 	this->vt->func_8005966C(this, arg2);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005966C);
+void func_8005966C(DreamSys *this, s32 arg1)
+{
+	struct vtable_DreamSys *vt = this->vt;
+
+	this->unk_0x84 = arg1;
+	switch (arg1) {
+	case 0:
+		this->callback_0x80 = NULL;
+		break;
+	case 1:
+		this->callback_0x80 = vt->func_800597C0;
+		break;
+	case 2:
+		this->callback_0x80 = vt->func_80059A48;
+		break;
+	case 3:
+		this->callback_0x80 = vt->func_80059A50;
+		break;
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800596E8);
 
