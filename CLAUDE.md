@@ -44,11 +44,28 @@ Run `python3 tools/progress.py` for live numbers; the figures below go stale.
 - **2080 functions** in the executable: **1356 game code**, **724 Psy-Q SDK
   library**. The library split is derived from the splat config, not
   hardcoded — any subsegment named `psyq_*` counts as library everywhere.
-- **12 matched.** Nine of those splat generated itself (bodies that are just
-  `jr $ra; nop`); three are real, in `src/StageGrid.c`.
-- **244 queued** across **eight carved units**, **1100 uncarved** still inside
-  monolithic `asm` segments. Eight units means up to eight parallel runners —
-  a unit has exactly one owner.
+- **98 matched** (7.23% of game code), as of round 2026-08-30-a. Nine of those
+  splat generated itself (bodies that are just `jr $ra; nop`); the rest are real.
+- **158 queued** across **eight carved units**, **1100 uncarved** still inside
+  monolithic `asm` segments. A unit has exactly one owner, so eight units is the
+  ceiling on parallel runners — but only **three units have fresh ground left**
+  (`DreamSys`, `Entity`, `code_55dd4`), so the current state supports three
+  runners, not eight. Carve before provisioning more.
+- **TWO toolchain blockers are open, and together they account for 66 of the
+  158 queued.** Both are escalated with reproducers and corpus censuses, both
+  are the operator's call, and neither is something to experiment with:
+  `docs/research/gp-relative-blocker.md` (the `-G` experiment was run with
+  authorisation and REJECTED) and `docs/research/addiu-at-blocker.md` (not
+  tested; the obvious version bump is not the remedy). Screen any candidate
+  function before spending attempts on it:
+
+  ```sh
+  grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
+  grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+  ```
+
+  A hit in either means the function is blocked. `progress.py`'s `fresh` column
+  cannot see this, which is why every blocked function carries a stub report.
 - The build verifies. A clean `./build-and-verify.sh` takes under a second,
   which is what makes many parallel runners cheap here.
 
