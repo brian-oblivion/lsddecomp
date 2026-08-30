@@ -66,4 +66,53 @@ typedef struct DreamAuxLoadReq {
 extern DreamAuxLoadReq *func_80026CE8(DreamAuxLoadReq *this, s32 flag, const char *name, s32 mode);
 extern void *func_8004468C(DreamAuxLoadReq *req);
 
+/* A trigger/spawn record walked by func_8005CAB4 and func_8005CBC8. Only
+ * three fields and the overall stride (0x38 -- func_8005CAB4 recurses on
+ * `record + 1`, i.e. the next record in what is evidently an array) are
+ * established:
+ *  - offset 0x1: a selector func_8005CBC8 switches on (its own param, not
+ *    yet named the same as `kind` below -- may or may not be the same
+ *    logical field; not proven either way).
+ *  - offset 0x2 (`parity`): compared against a caller-supplied coordinate
+ *    parity by func_8005C9A4's `entry` parameter -- same struct, most
+ *    likely, given the shared 8-byte-ish record shape in this unit, but
+ *    that function takes a raw `s8 *` and was matched without this type.
+ *  - offset 0x3 (`kind`): read by func_8005CAB4 for func_8005C714 and
+ *    func_8005CDF8's first argument, and compared against the literal `2`
+ *    to decide whether to recurse into the next record.
+ *  - offset 0x4..0x7 (`entries`): up to 4 signed bytes, terminated early by
+ *    a `-1` sentinel, each tried against func_8005CDF8.
+ * Everything else is undiscovered padding. */
+typedef struct TriggerRecord {
+    u8 unk0;
+    u8 unk1;
+    s8 parity;
+    u8 kind;
+    s8 entries[4];
+    u8 unk8[0x30];
+} TriggerRecord;
+
+/* The `a3` object func_8005CAB4 receives: method table at offset 0 (see
+ * CLAUDE.md's "every object's method table pointer lives at offset 0"),
+ * slot 0x88 (index 0x22 as a pointer array) called with (self, parity). Not
+ * resolved against tools/classtable.py -- the concrete class is unknown
+ * from this function alone. */
+typedef struct TriggerWorld {
+    void **vtable;
+} TriggerWorld;
+
+typedef void *(*TriggerWorldFn)(TriggerWorld *self, s8 parity);
+
+extern bool func_8005CBC8(s32 value, TriggerRecord *record);
+/* `out` is a 4-word (0x10-byte) caller stack scratch buffer, reused across
+ * every call in func_8005CAB4's loop. Its LAST word is pre-populated by the
+ * caller with the return value of the TriggerWorld vtable-0x88 call before
+ * the loop starts (`scratch[3] = (s32)callResult;` in func_8005CAB4) --
+ * confirmed load-bearing: the match was 19/69 without it, 69/69 with it, no
+ * other change. func_8005CDF8 is still INCLUDE_ASM (gp-relative-blocked,
+ * see docs/research/gp-relative-blocker.md), so its own use of that word is
+ * not derived here. */
+extern bool func_8005CDF8(u8 kind, void *out, void *ctx, u8 entry);
+extern void func_8005C714(s32 triggerType);
+
 #endif

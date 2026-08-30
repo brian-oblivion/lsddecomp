@@ -126,7 +126,46 @@ bool func_8005C9A4(s32 coordParity, s8 *entry)
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C9DC);
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CAB4);
+bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world)
+{
+    s8 *p;
+    s8 *end;
+    void *callResult;
+    s32 scratch[4];
+
+    if (!func_8005CBC8(value, record)) {
+        goto fail;
+    }
+
+    func_8005C714(record->kind);
+
+    p = record->entries;
+    end = record->entries + 4;
+    callResult = ((TriggerWorldFn)world->vtable[0x22])(world, record->parity);
+    scratch[3] = (s32)callResult;
+
+    if (callResult == NULL) {
+        goto skip;
+    }
+
+    while (p < end) {
+        if (*p == -1) {
+            break;
+        }
+        if (func_8005CDF8(record->kind, scratch, ctx, (u8)*p)) {
+            return true;
+        }
+        p++;
+    }
+
+skip:
+    if (record->kind == 2) {
+        return func_8005CAB4(value, ctx, record + 1, world);
+    }
+
+fail:
+    return false;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CBC8);
 
