@@ -39,7 +39,27 @@ void func_80026108(Class6D3C8 *self, void *a1, void *a2) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026170);
+/* Optional stream-load block, gated by self->arg->unk0C: registers a
+ * "loader" task for "ETC\ASMKLOGO.TIM" (func_80026254), then a separate
+ * "stream" task for whatever type code func_800490F4 hands back
+ * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
+void func_80026170(Class6D3C8 *self) {
+    const char *streamName;
+    s32 typeCode;
+    s32 typeLookup;
+    StreamTask *task;
+
+    if (self->arg->unk0C != 0) {
+        func_80026F34(0, 0, 0);
+        func_80026254(self, D_800107B4);
+        task = func_8003B854(0, 0, 0, 0);
+        streamName = func_800490F4(&typeCode);
+        typeLookup = func_800493C8(typeCode);
+        task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
+        task->methods->slot4(task);
+        func_80026254(self, D_800107C8);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026254);
 

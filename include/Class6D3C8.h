@@ -52,8 +52,11 @@ extern MiddleClassMethods *func_8003B20C(void);
  * rest stays opaque padding until another caller needs it. */
 typedef struct Class6D3C8CtorArgs {
     s32 unk00;                 /* +0x00, passed as the base ctor's own arg */
-    u8 unk04[0x10];             /* +0x04 .. +0x13, not yet decoded */
-    s32 unk14;                   /* +0x14, passed into the DreamSys call */
+    u8 unk04[8];                /* +0x04 .. +0x0B, not yet decoded */
+    void *unk0C;                  /* +0x0C, gates func_80026170's whole body (and,
+                                      going by its shape, likely func_80026348's too) */
+    u8 unk10[4];                    /* +0x10 .. +0x13, not yet decoded */
+    s32 unk14;                        /* +0x14, passed into the DreamSys call */
 } Class6D3C8CtorArgs;
 
 typedef struct Class6D3C8 Class6D3C8;
@@ -79,7 +82,7 @@ typedef struct Class6D3C8Methods {
     void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 func_80026108 */
     void *unk48;                                            /* +0x048 func_8003B108 */
     void *unk4C;                                            /* +0x04C func_8003B110 */
-    void *slot50;                                           /* +0x050 func_80026170 */
+    void (*slot50)(Class6D3C8 *self);                       /* +0x050 func_80026170 */
     void *slot54;                                           /* +0x054 func_80026348 */
     void *slot58;                                           /* +0x058 func_80026410 */
     void (*slot5C)(void);                                   /* +0x05C func_80026690 */
@@ -93,7 +96,7 @@ struct Class6D3C8 {
     Class6D3C8Methods *methods;    /* +0x00 */
     u8 unk04[0x14];                 /* +0x04 .. +0x17, not yet decoded */
     s32 unk18;                       /* +0x18 guards func_80026108's fallback to the base class */
-    u8 unk1C_[4];                     /* +0x1C .. +0x1F, not yet decoded */
+    s32 unk1C;                        /* +0x1C, forwarded as a plain word arg by func_80026170/func_80026254 */
     Class6D3C8CtorArgs *arg;        /* +0x20 the constructor's `arg` parameter */
     s32 unk24;                      /* +0x24 */
     DreamSys *dreamSys;              /* +0x28 result of New_DreamSys() */
@@ -121,5 +124,40 @@ extern const char D_800107A4[];       /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.
 extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so far */
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
 extern void *func_80043840(void *arg); /* code_1677c's own alloc+ctor shape, uncarved (psyq_memset.s); not this unit's to write */
+
+/* A "New_X"-shaped task object allocated by func_8003B854 (uncarved,
+ * asm/code_2c054.s) -- 0xDC bytes, constructed through func_8003BE84's
+ * slot +0x008. Only the two slots func_80026170 dispatches through are
+ * typed; everything else about this class is unknown. */
+typedef struct StreamTaskMethods {
+    s32 header;                                                    /* +0x000 */
+    void (*slot4)(void *self);                                      /* +0x004 */
+    u8 pad08[0x044 - 0x008];                                          /* +0x008 .. +0x043 */
+    /* +0x044: called with (self, a fixed word from the caller's own
+     * object, a filename string, a type/format code looked up via
+     * func_800493C8, and a literal 1 spilled onto the stack as a 5th
+     * argument -- confirmed a real 5th argument, not a scheduling
+     * artifact, because MIPS o32 only spills to the stack once a0-a3 are
+     * all otherwise assigned; a <=4-arg call would never need the
+     * sp+0x10 store. */
+    void (*slot44)(void *self, s32 a1, const char *path, s32 typeLookup, s32 flag);
+} StreamTaskMethods;
+
+typedef struct StreamTask {
+    StreamTaskMethods *methods;
+} StreamTask;
+
+extern StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3);
+
+extern void func_80026F34(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there */
+extern const char *func_800490F4(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &D_800113DC */
+extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index]; return unused at this call site */
+
+extern const char D_800107B4[]; /* "ETC\ASMKLOGO.TIM" */
+extern const char D_800107C8[]; /* "ETC\OSDLOGO.TIM" */
+
+/* Forward declaration: func_80026254 (this unit, defined later in ROM
+ * order) is called by func_80026170, which comes first in the file. */
+void func_80026254(Class6D3C8 *self, const char *path);
 
 #endif
