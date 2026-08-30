@@ -5,7 +5,13 @@ void *func_800269E0(void) {
     return D_8006D3C8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800269F0);
+void *func_800269F0(UnkFlagsObj_171e0 *this) {
+    this->unk20 = 0;
+    this->methods->dtor(this);
+    func_80018390()->dtor(this);
+    func_80017CFC(this);
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026A50);
 
