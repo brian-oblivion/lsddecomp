@@ -167,6 +167,90 @@ fail:
     return false;
 }
 
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_8005CBC8.md. Best reached:
+ * every instruction matches retail except ONE, in the sel<0 preamble (the
+ * function is 4 bytes / one word short). Every reshaping tried compiles
+ * this identically; see the report for the full list attempted.
+ */
+bool func_8005CBC8(s32 value, TriggerRecord *record)
+{
+    s8 sel = record->sel;
+    s32 idx;
+
+    if (sel == 1) {
+        goto success;
+    }
+
+    if (sel < 0) {
+        if (record->unk0 != 0) {
+            return false;
+        }
+        idx = -sel;
+        goto have_idx;
+    }
+    idx = sel;
+
+have_idx:
+
+    switch (idx - 2) {
+    case 0:
+    case 1:
+    case 2:
+        if (!func_8005CDA8(value, idx - 1)) {
+            return false;
+        }
+        break;
+    case 3:
+        if (value % 3 != 0) {
+            return false;
+        }
+        break;
+    case 4:
+        if (value % 3 == 0) {
+            return false;
+        }
+        break;
+    case 5:
+        if (!func_8005630C()) {
+            return false;
+        }
+        break;
+    case 6:
+        if (value % 3 != 1) {
+            return false;
+        }
+        break;
+    case 7:
+        if (value % 3 != 2) {
+            return false;
+        }
+        break;
+    case 18:
+        if ((value & 1) != 0) {
+            return false;
+        }
+        break;
+    case 19:
+        if ((value & 1) == 0) {
+            return false;
+        }
+        break;
+    default:
+        if (idx >= 10) {
+            if (!func_8005CD58(idx)) {
+                return false;
+            }
+        }
+        break;
+    }
+
+success:
+    record->unk0 = 1;
+    return true;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CBC8);
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CD58);

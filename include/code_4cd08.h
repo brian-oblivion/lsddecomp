@@ -84,8 +84,8 @@ extern void *func_8004468C(DreamAuxLoadReq *req);
  *    a `-1` sentinel, each tried against func_8005CDF8.
  * Everything else is undiscovered padding. */
 typedef struct TriggerRecord {
-    u8 unk0;
-    u8 unk1;
+    s8 unk0;
+    s8 sel;
     s8 parity;
     u8 kind;
     s8 entries[4];
@@ -114,5 +114,8 @@ extern bool func_8005CBC8(s32 value, TriggerRecord *record);
  * not derived here. */
 extern bool func_8005CDF8(u8 kind, void *out, void *ctx, u8 entry);
 extern void func_8005C714(s32 triggerType);
+extern bool func_8005630C(void);
+extern bool func_8005CD58(s32 idx);
+extern bool func_8005CDA8(s32 a0, s32 a1);
 
 #endif
