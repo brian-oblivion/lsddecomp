@@ -5,6 +5,7 @@
  * exposed to the gp-relative blocker (docs/research/gp-relative-blocker.md).
  */
 #include "common.h"
+#include "Entity.h"
 
 INCLUDE_ASM("asm/nonmatchings/Entity", New_Entity);
 
@@ -26,7 +27,10 @@ INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D560);
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D658);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D6D4);
+void func_8005D6D4(Entity *this) {
+    func_8002CD08(this->unk58, this->unk9C);
+    this->unkFC++;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D714);
 
