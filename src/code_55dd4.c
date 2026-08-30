@@ -3,8 +3,24 @@
  * exposed to the gp-relative blocker (docs/research/gp-relative-blocker.md).
  */
 #include "common.h"
+#include "code_55dd4.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", New_class_65650);
+void *New_class_65650(void *arg1, void *arg2)
+{
+    Class65650 *self;
+    Class65650Methods *vt;
+
+    self = (Class65650 *)func_80017B34(0x98);
+    if (self == NULL) {
+        return NULL;
+    }
+    vt = func_80066818();
+    if (vt->ctor(self, arg1, arg2) != NULL) {
+        return self;
+    }
+    func_80017CFC(self);
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", class_65650__Constructor);
 
