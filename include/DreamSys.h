@@ -15,6 +15,25 @@ extern s32 D_8008ACC0;
 extern s32 D_8008ACC4;
 extern s32 D_8008ACC8;
 
+/* Delta/threshold table pairs consumed by func_80059814 (D_80087E50 /
+   D_80087E5C, indexed by DreamSys::unk_0x88) and func_800598E8 (D_80087E68 /
+   D_80087E74, indexed by DreamSys::unk_0x90). Index 0 is unused/zero in both
+   pairs; indices 1 and 2 are the negative/positive delta and its matching
+   threshold. Still raw `nonmatching` data (round 2026-08-30). */
+extern s32 D_80087E50[3];
+extern s32 D_80087E5C[3];
+extern s32 D_80087E68[3];
+extern s32 D_80087E74[3];
+
+/* {value, flag} pair array; func_800598E8 always writes index 0's value and
+   passes &D_80087E84[-1] (== &D_80087E80, a distinct label immediately
+   before it) to func_8001CEB4. Still raw `nonmatching` data. */
+typedef struct D_80087E84Entry {
+	s16 value;
+	s16 flag;
+} D_80087E84Entry;
+extern D_80087E84Entry D_80087E84[8];
+
 typedef struct CinematicCall{
 	s16 bank;
 	s16 entry;
@@ -60,6 +79,15 @@ typedef struct {
 	s32 day;
 } FlashbackEntry;
 
+/* Struct pointed to by DreamSys::unk_0x5C. +0x14 / +0x20 are a pair of
+   two-word (x,y) points per func_8005942C (still INCLUDE_ASM elsewhere in
+   this unit; not confirmed by this round). +0x24 (the second point's y) is
+   confirmed: func_80059814 (round 2026-08-30) nudges it. */
+typedef struct DreamSysUnk5C {
+	s8 unknown_values_0x0[0x24];
+	s32 unk_0x24;
+} DreamSysUnk5C;
+
 typedef struct DreamSys {
 	struct vtable_DreamSys *vt;
 	s8 unknown_values_0x4[8];
@@ -88,13 +116,15 @@ typedef struct DreamSys {
 	/* Set by func_80059384(this, value); read as a pointer by
 	   func_8005942C (this->unk_0x5C + 0x14 and + 0x20 are passed to
 	   func_8005950C), so it points to a pair of two-word (x,y) points. */
-	void *unk_0x5C;
+	DreamSysUnk5C *unk_0x5C;
 	s8 unknown_values_0x60[4];
 	/* Set by func_8005938C(this, value); no other observed use. */
 	s32 unk_0x64;
 
 	bool isFlashbackSession;
-	s8 unknown_values_0x6c[4];
+	/* Read by func_80059A58; compared against 0 / 1, else-branch otherwise.
+	   Meaning unidentified beyond that (round 2026-08-30). */
+	s32 unk_0x6c;
 
 	/* Gate flag: func_80059310 sets it to 1; func_8005931C reads it back;
 	   func_80059394 skips its whole body while this is nonzero. */
@@ -106,12 +136,50 @@ typedef struct DreamSys {
 	s32 unk_0x78;
 	/* Cleared to 0 by func_80059590; no other observed use. */
 	s32 unk_0x7C;
-	/* Called with (this) by func_800593D8, if non-NULL. */
+	/* Set by func_8005966C(this, arg1): NULL when arg1==0, otherwise one of
+	   three vtable-slot function pointers selected by arg1 (1/2/3). Called
+	   with (this) by func_800593D8, if non-NULL. */
 	void (*callback_0x80)(struct DreamSys *this);
-	s8 unknown_values_0x84[20];
-	/* Called with (this) by func_800593D8, if non-NULL. */
+	/* Set unconditionally to arg1 by func_8005966C(this, arg1); no other
+	   observed use (round 2026-08-30). */
+	s32 unk_0x84;
+	/* Index into the (D_80087E50, D_80087E5C) delta/threshold table pair,
+	   consumed and reset to 0 by func_80059814 (round 2026-08-30). */
+	s32 unk_0x88;
+	/* Running accumulator nudged by unk_0x88's table entry, or decayed by
+	   600/call towards 0 when unk_0x88 is 0; also propagated into
+	   unk_0x5C->unk_0x24. Set by func_80059814 (round 2026-08-30). */
+	s32 unk_0x8C;
+	/* Index into the (D_80087E68, D_80087E74) delta/threshold table pair,
+	   consumed and reset to 0 by func_800598E8 (round 2026-08-30). */
+	s32 unk_0x90;
+	/* Running delta accumulator paired with unk_0x90; see func_800598E8
+	   (round 2026-08-30). */
+	s32 unk_0x94;
+	/* Set by func_8005966C(this, arg1) exactly like callback_0x80, but from
+	   a *different* trio of vtable slots. Called with (this) by
+	   func_800593D8, if non-NULL. */
 	void (*callback_0x98)(struct DreamSys *this);
-	s8 unknown_values_0x9c[132];
+	s8 unknown_values_0x9c[4];
+	/* (this->unk_0xA0 ^ 1) < 1u, i.e. (unk_0xA0 == 1), written by
+	   func_800598E8; also toggled/incremented by func_80059A1C and forced
+	   to 1 by func_80059B50 (round 2026-08-30). */
+	s32 unk_0xA0;
+	s8 unknown_values_0xA4[4];
+	/* (unk_0xA0 == 1) as computed by func_800598E8; cleared by
+	   func_80059A1C when unk_0xA0 is 0 (round 2026-08-30). */
+	s32 unk_0xA8;
+	s8 unknown_values_0xAC[24];
+	/* Set to 1 by func_800596E8's arg1==2 case, alongside unk_0xC8 and
+	   callback_0x98 (round 2026-08-30). */
+	s32 unk_0xC4;
+	/* Set to 1 by func_800596E8's arg1==2 case, alongside unk_0xC4
+	   (round 2026-08-30). */
+	s32 unk_0xC8;
+	/* Struct initialized in-place by func_8002CC34 (still INCLUDE_ASM, in
+	   the uncarved code_179d8) via func_800596E8's arg1==2 case; internal
+	   layout unknown beyond that entry point (round 2026-08-30). */
+	s8 unknown_values_0xCC[0x54];
 
 	/* Divisor for func_80059394's (dreamTimer % unk_0x120) check. */
 	s32 unk_0x120;
@@ -164,7 +232,10 @@ struct vtable_DreamSys{
 	void *Constructor;
 	u32 unknown_functions_0xc[13];
 	void *func_800588EC;
-	u32 unknown_functions_0x44[2];
+	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
+	   if any, unused (round 2026-08-30). */
+	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);
+	u32 unknown_functions_0x48[1];
 	void *func_58968;
 	u32 unknown_functions_0x50[18];
 	void *TimerTick;
@@ -185,12 +256,53 @@ struct vtable_DreamSys{
 	void (*func_80059598)(DreamSys *this);
 	s32 (*func_800595A0)(DreamSys *this);
 	void (*func_800595A8)(DreamSys *this, bool arg1);
-	u32 unknown_functions_0x134[1];
+	/* Chains func_800596E8(this, arg1) then func_8005966C(this, arg2)
+	   (round 2026-08-30). */
+	void (*func_80059610)(DreamSys *this, s32 arg1, s32 arg2);
 	/* Called by func_800595A8(this, TRUE) as this->vt->func_8005966C(this, 0). */
 	void (*func_8005966C)(DreamSys *this, s32 arg1);
 	/* Called unconditionally by func_800595A8 as this->vt->func_800596E8(this, 0). */
 	void (*func_800596E8)(DreamSys *this, s32 arg1);
-	u32 unknown_functions_0x140[22];
+	/* Calls func_80059814(this) then func_800598E8(this) (round 2026-08-30). */
+	void (*func_800597C0)(DreamSys *this);
+	void (*func_80059814)(DreamSys *this);
+	void (*func_800598E8)(DreamSys *this);
+	/* No-op stub (`{ }`); one of func_8005966C's callback_0x80 choices. */
+	void (*func_80059A48)(DreamSys *this);
+	/* No-op stub (`{ }`); one of func_8005966C's callback_0x80 choices. */
+	void (*func_80059A50)(DreamSys *this);
+	/* Dispatches on unk_0x6C to func_8005A050+func_80059AEC, func_80059BD4,
+	   or func_80059B50, and returns whichever's result (round 2026-08-30). */
+	s32 (*func_80059A58)(DreamSys *this);
+	/* Returns unk_0x70 unchanged if nonzero; otherwise calls func_80059BE0
+	   and func_80059E98 in sequence and returns the latter's result
+	   (round 2026-08-30). */
+	s32 (*func_80059AEC)(DreamSys *this);
+	/* Forces unk_0xA0 to 1; then either calls func_80059BE0(this, 0) and
+	   returns its result, or chains func_80059BE0(this, 1) into
+	   func_80059E98 and returns THAT result (round 2026-08-30). */
+	s32 (*func_80059B50)(DreamSys *this);
+	/* Sets unk_0xA0 to 1 and returns 1 (round 2026-08-30). */
+	s32 (*func_80059BD4)(DreamSys *this);
+	/* Referenced by func_80059AEC/func_80059B50; still INCLUDE_ASM outside
+	   this runner's range. Return value is threaded into func_80059E98. */
+	s32 (*func_80059BE0)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x168[2];
+	/* Referenced by func_80059AEC/func_80059B50; still INCLUDE_ASM. */
+	s32 (*func_80059E98)(DreamSys *this, s32 arg1);
+	/* Referenced by func_80059A58; still INCLUDE_ASM. Called with (this)
+	   only, return value discarded. */
+	void (*func_8005A050)(DreamSys *this);
+	/* Referenced by func_800596E8's arg1==2 case; stored into
+	   callback_0x98, never called directly by this runner's functions. */
+	void (*func_8005A0B0)(DreamSys *this);
+	/* Referenced by func_800596E8's entry guard (this->unk_0x9C==2); called
+	   as (this, 0). */
+	void (*func_8005A134)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x180[5];
+	/* Referenced by func_800596E8's arg1==2 case: its raw address (never
+	   called there) is forwarded as func_8002CC34's 5th argument. */
+	void *func_8005A1F4;
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	void *func_8005A2E4;
