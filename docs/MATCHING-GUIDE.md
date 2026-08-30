@@ -111,25 +111,58 @@ into one of these. This list is short because this project is young — add to i
   means STOP and file the report; see `docs/research/gp-relative-blocker.md`.
   Nine functions across two units burned attempts on this in one round.
 
+- **Branch TARGETS disagree, not just delay slots.** This one is a
+  discriminator, not a residue, and it outranks everything else in this list.
+  A differing delay slot is a scheduler choice; a differing branch *target* is a
+  different control-flow graph, and a different CFG always comes from the
+  source. **Line up the branch targets before classifying anything as a
+  scheduling stall, a delay-slot choice or a toolchain lead.** In round
+  2026-08-30-a this turned a confidently-filed "unreachable compiler-internal"
+  stall at 16/42 into 41/42 with a one-line source change, and a second runner
+  credited it with closing a function outright (10/69 -> 69/69).
+- **One instruction short, everything after it shifted.** Suspect the
+  `addiu_at` blocker before suspecting your C. Check with
+  `grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s`;
+  a hit means STOP and file the stub (docs/research/addiu-at-blocker.md).
+- **Prologue callee-save stores in the wrong ORDER**, same registers and same
+  offsets. Not reachable from C — six declaration-order permutations produce
+  one identical score. A bare `__asm__("")` as the function's first statement is
+  the lever and is the permitted form; prove it by removing it and confirming
+  register allocation is unchanged. It does NOT generalise to other residues:
+  three runners tried it elsewhere and worsened them.
+- **A redundant `move` retail emits and you do not**, same register, same
+  value, branch targets agreeing. This is the genuine one-instruction class, now
+  with three confirmed instances (`new_class_6d3c8` 23/24, `strcat` 41/42,
+  plus a third found this round). It resists `goto`/`return` spelling, temp
+  placement, barriers and `volatile`. It is the project's best-posed permuter
+  target — do not spend a fresh attempt budget re-deriving it.
+
 ## Unit state
 
 Keep this current: the head reads it in Gate 1, and a number in `progress.py`
 cannot express "large body, deep reconstruction, low cold-runner yield".
 
-State after round 2026-08-29-a (5 runners, all killed mid-round by an
-account-wide session limit; their work was salvaged by the head per
-docs/PARALLEL-RUNS.md 4c).
+State after round 2026-08-30-a (5 runners, all five reached their own stop
+rule; bravo and delta each took a second assignment after finishing early).
+
+**39 -> 98 matched.** The `fresh` column below is now honest: 37 blocked
+functions that `progress.py` had been counting as runner-workable were
+stub-reported during consolidation, so `fresh` fell from a nominal 143 to a real
+92. Do not undo those stubs to make the number look better.
+
+**Only three units have fresh ground left, and one runner per unit is the rule**
+— so this state supports three runners, not five. See the carve note below.
 
 | unit | queued | fresh | state |
 | --- | --- | --- | --- |
-| `DreamSys` | 105 | 104 | **16 matched.** Round 2026-08-29-a took the accessor range `0x80059310`–`0x800595A8`: 13 matched, and `func_8005942C` preserved as a mid-attempt snapshot (19/56 with heavy outside drift — *not* a near-miss; needs the globals near `0x80087EE8` named first). `include/DreamSys.h` now carries real field offsets and callback slots. The remaining 104 are untouched; still too big for one runner, so keep assigning named ranges. |
-| `code_55dd4` | 34 | 0 | **DELIBERATELY UNWORKED** — banked for scheduling, not difficulty. First pick next round. Carved 2026-08-28; its tail was data (see the yaml at `0x57028`). |
-| `Entity` | 25 | 0 | **DELIBERATELY UNWORKED** — banked for scheduling. Carved 2026-08-28, the first 25 of a 142-function block split at `func_8005DE18`; remainder is `Entity_b`, still `asm`. |
-| `code_171e0` | 22 | 14 | **5 matched, 8 stalled.** All 8 stalls are the gp-relative blocker (`docs/research/gp-relative-blocker.md`) — a real toolchain escalation, verified by the head, not a runner misclassification. Do not staff those 8 again until the operator rules on `-G`. The other 14 are ordinary fresh ground. |
-| `code_4cd08` | 14 | 14 | **3 matched, 0 stalls.** The cleanest unit of the round — the runner matched everything it attempted. lsddecomp called this "DreamAux". Owns the `0x206C` rodata slot (jump tables). |
-| `code_1677c` | 11 | 10 | **4 matched, 1 stalled.** The stall is `new_class_6d3c8`, a single delay-slot residue in the `New_X` allocator shape that ~60 classes share — the best first permuter target in the project. |
-| `class_16334` | 4 | 3 | **6 matched, 1 stalled.** The stall (`func_80025C30`) is the gp-relative blocker again, found independently of `code_171e0`'s. |
-| `StageGrid` | 2 | 0 | **DELIBERATELY UNWORKED** — a 2-function queue is too thin to be worth a runner's provisioning cost. 3 matched. Remainder is `GetStageChunkFromMood` / `GetMoodFromStageChunk`; both need the `STAGE_CHUNK_MOODS` / `STAGE_GRID_DIMENSIONS` data slots understood. Head or warm-session work. |
+| `DreamSys` | 96 | 72 | **25 matched.** Round 2026-08-30-a took `0x80059610`-`0x80059BD4`: 9 matched, 2 blocked. Still far too big for one runner — keep assigning named address ranges. 21 of its queue are toolchain-blocked and stubbed. `include/DreamSys.h` has grown a `{s16 value; s16 flag}` array at `D_80087E80`/`D_80087E84` and notes on `func_8002CC34` in the uncarved `code_179d8`. |
+| `Entity` | 20 | 11 | **5 matched.** Unbanked and worked this round. 9 blocked (3 `addiu_at`, 6 mixed) and stubbed. `include/Entity.h` exists now. The remaining 11 are ordinary fresh ground. Pairs with an `Entity_b` carve. |
+| `code_55dd4` | 11 | 9 | **25 matched — the round's best unit by a distance**, across two passes by the same runner. 2 stalls, both prologue/register-allocation residues with byte-identical loop bodies. `func_80066340` (258 words) is deliberately untouched: an order of magnitude larger than anything else left, and it wants a dedicated assignment, not a tail-pass. |
+| `code_4cd08` | 10 | 0 | **7 matched, 10 blocked.** Every remaining function is toolchain-blocked and stubbed. Do not staff until a blocker is resolved. |
+| `code_171e0` | 15 | 0 | **12 matched, 15 blocked/stalled.** 14 gp-relative blocked, plus `strcat` at 41/42 (one redundant `move`, permuter target). No workable ground. |
+| `code_1677c` | 2 | 0 | **13 matched.** Both remainders are stalls: `new_class_6d3c8` (23/24) and `func_80026698` (53/57), both permuter targets with bodies preserved. |
+| `class_16334` | 2 | 0 | **8 matched.** Fully decompiled except its two gp-relative-blocked functions. |
+| `StageGrid` | 2 | 0 | **3 matched.** Its two remainders are `addiu_at`-blocked — **this corrects the previous entry**, which said they needed the `STAGE_CHUNK_MOODS`/`STAGE_GRID_DIMENSIONS` data slots understood and suggested head work. Understanding the data would not have helped; both index those tables through the fully-resolved `$at` form. |
 
 ## Uncarved ground
 

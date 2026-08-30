@@ -6,6 +6,119 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-08-30 — round 4: 5 runners, 59 matches, and a second toolchain blocker
+
+**39 -> 98 matched (7.23% of game code). 158 queued: 92 fresh, 66 stalled, 0
+banked. Build green throughout, verified after every merge.**
+
+Gate 2 was already done, so this was Gate 1 triage and provisioning only. Five
+runners on `DreamSys` (a named range), `code_55dd4`, `code_1677c`, `code_171e0`
+and `code_4cd08`. All five reached their own stop rule; none died to
+infrastructure, unlike round 3.
+
+### The pre-screen, and why `fresh` lies
+
+`progress.py` reported 145 fresh at round start. The true assignable number was
+lower, because `fresh` cannot see a toolchain blocker. Screening every queued
+function for `%gp_rel` before assigning changed three of the five assignments:
+`code_171e0` had 8 of 14 blocked and `code_4cd08` 8 of 14, so both runners got
+explicit function lists rather than "the unit". `class_16334` turned out to have
+only 2 workable functions, not the 8 the operator's brief assumed, so it was
+dropped as a runner unit and worked by the head instead; `code_55dd4` (34 fresh,
+zero exposure) took its place.
+
+**Consolidation stub-reported the remaining 37 blocked functions**, which is
+what Gate 1 asks for and what nobody had done. `fresh` fell from a nominal 143
+to a real 92. The next head reads a truthful number.
+
+### Second toolchain blocker: `addiu_at`
+
+Found independently by two runners in two unrelated units, reproduced from
+scratch by the head, and written up in `docs/research/addiu-at-blocker.md`.
+
+Retail resolves a runtime-indexed global fully into `$at` before loading
+(4 instructions); the pinned `--aspsx-version=2.34` folds `%lo` into the load
+(3 instructions). cc1 has no opinion — it emits one generic pseudo-op — so the
+choice is maspsx's `addiu_at` flag. Census over the whole disassembly, counting
+indexed accesses only: retail uses the unfolded form **502 times across 39
+files and the folded form 0 times.** No counterexample exists in the executable.
+
+**Both runners proposed repinning to 2.29; the head corrected that.** Below 2.30
+four flags flip together — `addiu_at` plus three nop-insertion rules that reach
+constructs inside the 98 functions that already match — and maspsx exposes no
+per-flag override. Same shape as the rejected `-G` experiment: correct
+diagnosis, remedy that costs more than it buys. Not tested. Operator's call.
+
+A useful control: `Entity__GetMoodEffect` matched 6/6 against the same table
+because it only forms `&arr[i]` and never loads through it. Address-only table
+arithmetic is safe.
+
+### Adjudication earned its keep
+
+The head's job of checking stall *classifications* rather than scores paid off
+twice, in opposite directions:
+
+- **`strcat` was misclassified.** Filed at 16/42 as an unreachable
+  compiler-internal delay-slot choice. The report was honest and reproducible —
+  splicing the preserved body back in gave exactly 16/42 — but the runner's own
+  diff showed the two guard branches had different *targets*. A differing target
+  is a differing CFG, which always comes from the source. The post-increment
+  scan idiom took it to 41/42. The one instruction still left over really is the
+  named class.
+- **`addiu_at` was NOT a misclassification**, and checking it properly is what
+  produced the census and the corrected remedy.
+
+That discriminator — check branch targets before calling anything a scheduler
+choice — went out as a mid-round broadcast and a second runner credited it with
+closing a function outright, 10/69 -> 69/69.
+
+### Broadcasts, including the one that was wrong
+
+Three broadcasts went to all five runners, each asking explicitly for the
+negative answer.
+
+The first was **overstated**: it presented `goto fail` vs `return NULL` as a
+general lever for early exits returning a different value. Three runners bounded
+it within the round — it does not apply when the allocator also tests the
+constructor's return, nor when the normal path contains a loop, and one
+superficially similar residue wanted the plain early return. The correction was
+rebroadcast with credit. Ship levers hedged; the retraction cost five messages.
+
+### Runner-to-unit outcomes
+
+| runner | unit(s) | matched | stalled |
+| --- | --- | --- | --- |
+| bravo | `code_55dd4` (two passes) | 23 | 2 |
+| charlie | `code_1677c` | 9 | 1 (+ a directed negative on `new_class_6d3c8`) |
+| alpha | `DreamSys` range | 9 | 2 (both `addiu_at`) |
+| delta | `code_171e0`, then `Entity` | 12 | 4 |
+| echo | `code_4cd08` | 4 | 2 |
+| head | `class_16334` | 2 | — |
+
+Two runners finished early and were sent back into their own units rather than
+left idle, per PARALLEL-RUNS 3c. `delta` had to change units because
+`code_171e0` had no clean ground left after its first pass; `Entity` was
+unbanked for it. Both second assignments were productive — bravo's was the
+round's single best result at 14 matches.
+
+### Permuter targets, now well-posed
+
+The "redundant delay-slot value duplication" class has **three confirmed
+instances**, each isolated to one instruction with branch targets agreeing:
+`new_class_6d3c8` (23/24), `strcat` (41/42), and one more found this round. All
+three resist `goto`/`return` spelling, temp placement, barriers and `volatile`.
+Bodies are preserved in the reports. This is the strongest permuter candidate
+the project has had.
+
+### Next round
+
+Only three units have fresh ground (`DreamSys` 72, `Entity` 11, `code_55dd4` 9),
+and one runner per unit is the rule, so **the current state supports three
+runners, not five.** Carve first if five are wanted. See Gate 2's candidate list;
+`Entity_b` (117) pairs naturally with the `Entity` work now in flight.
+
+---
+
 ## 2026-08-29 — round 3: 5 runners, 27 matches, and a real toolchain blocker
 
 **12 -> 39 matched (2.88% of game code). 217 queued: 145 fresh, 11 stalled, 61

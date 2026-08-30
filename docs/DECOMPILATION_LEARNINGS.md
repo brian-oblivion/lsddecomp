@@ -65,6 +65,42 @@ Nine functions across two unrelated units were confirmed blocked in round
 before that round happens to touch no global at all — a fact worth
 remembering, because it is exactly why "the build is green" did not catch it.
 
+### BLOCKED: no C function can load through a runtime-indexed global (2026-08-30)
+
+**Full evidence, reproducer and census: `docs/research/addiu-at-blocker.md`.
+Open operator escalation; do not attempt a toolchain change yourself.**
+
+Retail resolves a `sym[reg]` address fully into `$at` before loading from it
+(`lui` / `addiu %lo` / `addu` / `lb 0x0($at)`, four instructions). The pinned
+pipeline folds `%lo` into the load's own displacement instead (three
+instructions), and the missing instruction shifts every later function in the
+unit -- which is why the affected functions score like 8/53, not "one word off".
+
+cc1 has no opinion here: it emits a single `lbu $2,SYM($4)` pseudo-op. The
+choice is maspsx's `addiu_at` flag, off at the pinned `--aspsx-version=2.34`
+and on below 2.30.
+
+Census over the whole disassembly, counting indexed accesses only: retail uses
+the unfolded form **502 times across 39 files and the folded form 0 times**.
+There is no counterexample in the executable.
+
+**The remedy is not a version bump.** Below 2.30 four flags flip together --
+`addiu_at` plus three nop-insertion rules (`nop_at_expansion`, `nop_mflo_mfhi`,
+`nop_lw_lw`) that affect constructs inside the 84 functions that already match.
+maspsx exposes no per-flag override. Same shape as the rejected `-G`
+experiment.
+
+Routing rule, effective immediately:
+
+```sh
+grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+```
+
+A hit means blocked: file a stub report citing the research doc and move on.
+**Address-only table arithmetic is safe** -- `Entity__GetMoodEffect` matched
+6/6 against the same table because it only forms `&arr[i]` and never loads
+through it. Only the load is exposed.
+
 ## Build hygiene (proven, the hard way)
 
 - **A header edit rebuilds everything, on purpose.** The Makefile makes every
@@ -143,11 +179,69 @@ remembering, because it is exactly why "the build is green" did not catch it.
   `$v0`. It need not be authoritative — only the call site's own bytes depend
   on it. (`SetTeleportsEnabled`)
 
+- **An early exit returning a DIFFERENT value from the main path: try `goto`
+  and `return` both, they are not interchangeable.** With `return OTHER;` GCC
+  places the exit block after the main path, leaves the branch delay slot as
+  `nop`, and needs a `j` to reach the shared epilogue -- one extra word. With
+  `goto fail; ... fail: return OTHER;` the exit value is stolen into the delay
+  slot and the branch retargets to the epilogue. (`func_80025B34`)
+  **This lever is narrower than it first looked, and three runners bounded it
+  in one round.** It does NOT apply when the allocator also tests the
+  constructor's return (`New_class_65650` matched 31/31 with plain
+  `if`/`return`); it does NOT apply when the normal path contains a loop
+  (`func_80026410` needed the whole body wrapped in the positive condition
+  instead); and a superficially similar residue can want the plain early
+  return (`func_80059AEC`). Read the asm; do not apply it by reflex.
+- **`while (*p) { p++; }` and `while (*p++) { } p--;` are different code.** The
+  post-increment idiom increments unconditionally and backs up at the merge, so
+  its guard branch targets the `addiu rN,rN,-1` fixup; the pre-test idiom skips
+  it. When retail's guard branch jumps TO a decrement, the source used
+  post-increment. Worth 25 words on one function. (`strcat`, 16/42 -> 41/42)
+- **A guarded `do { } while` where the source looks like it wants `while`** --
+  promoted out of "unconfirmed" below. (`func_8005CAB4`, 10/69 -> 69/69)
+- **Let GCC hoist its own loop invariants.** Naming an array directly in the
+  loop condition (`for (p--; p >= events; p--)`) and hand-hoisting a `base`
+  local are not equivalent: the hand-hoisted form is live at the guard, so GCC
+  allocates the callee-saved register immediately and compares against it,
+  losing retail's temp/compare/copy-in-the-delay-slot preheader. Worth 23
+  words. (`func_80025D10`, 38/65 -> 61/65)
+- **Prologue callee-save store ORDER is not reachable from C.** Six
+  declaration-order permutations produced one identical score; statement order
+  and guard spelling did not touch it either. A bare `__asm__("")` as the
+  function's FIRST statement is the lever, and it is the permitted form -- but
+  verify rather than assert: remove it, rebuild, and confirm the register
+  ALLOCATION is unchanged. That is exactly the test CLAUDE.md rule 6 states.
+  (`func_80025D10`, 61/65 -> 65/65). It did NOT generalise: two runners tried
+  it on unrelated residues and worsened them, and on `func_8005C76C` explicit
+  assignment *statements* in the desired order worked instead.
+- **There are at least three `New_X` allocator sub-shapes.** (1) ignores the
+  constructor's return, one early exit -- needs `goto` (`func_80025B34`);
+  (2) returns the allocation unconditionally, no early exit -- open stall
+  (`new_class_6d3c8`); (3) tests BOTH the allocation and the constructor's
+  return, freeing on constructor failure -- plain `if`/`return`
+  (`New_class_65650`). Identify which from the asm before choosing a spelling.
+- **A call through a vtable slot needs no forward `extern` prototype** -- only
+  the struct field's type has to be right. This differs from the direct
+  `jal`-by-name case above. (`New_class_65650`)
+- **`return self->field = N;`** reproduces retail's single-`ori`-reused-for-
+  store-and-return shape for "set a literal, return the same literal" setters.
+- **For a `switch`, GCC 2.6.3 lays out case bodies in TEXTUAL source order but
+  picks its own comparison order** (binary-search pivot). Do not transcribe the
+  observed comparison order as the case order. (`func_8005966C`,
+  `func_800596E8`)
+- **A delay slot after a `jalr` captures the PRECEDING call's return value, not
+  the upcoming call's argument.** A real misread, easy to commit with two
+  adjacent calls. (`func_80026170`, `func_8002677C`)
+- **Solve a magic-multiply divisor arithmetically rather than guessing it.**
+  Given the multiplier and shift, solve `constant * N == 2^(32+shift) +
+  remainder` across candidate divisors; close constants at different shifts
+  render guessing unreliable. One function's assumed "divide by 9" was actually
+  15. (`func_8002658C`)
+
 ### Still unconfirmed here
 
 Candidates from other GCC 2.x projects — treat each as a thing to test:
 
-- Guarded `do { } while` where the source looks like it wants `while`.
 - Member loads hoisted into a local at the top of a loop.
 - A struct pointer to a global block, rather than several separate globals.
 - Comma expressions and assignment-in-condition, which 2.x schedules
