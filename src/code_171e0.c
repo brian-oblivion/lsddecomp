@@ -131,6 +131,14 @@ INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270AC);
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270B8);
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270C4);
+char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
+    dest[0] = '\0';
+    if (arg2 != NULL) {
+        strcat(dest, arg2);
+    }
+    strcat(dest, arg1);
+    strcat(dest, arg3);
+    return dest;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", strcat);
