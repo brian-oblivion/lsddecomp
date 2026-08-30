@@ -40,7 +40,51 @@ u32 func_80025CC4(Pad *self) {
     return newMask;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025D10);
+void func_80025D10(Pad *self) {
+    s32 events[16];
+    void (*onButtonEvent)(Pad *self, s32 event);
+    u32 held;
+    u32 released;
+    u32 pressed;
+    s32 *p;
+    s32 code;
+    s32 i;
+
+    /* Bare scheduling barrier. Without it the four prologue register stores
+     * come out in the order s0, ra, s2, s1 instead of retail's ra, s2, s1, s0
+     * -- same registers, same stack offsets, order only, so this is the
+     * permitted form under the project rule and not a register pin. Ten source
+     * shapes were tried first; see docs/match-reports/func_80025D10.md. */
+    __asm__("");
+    held = self->heldMask;
+    released = self->releasedMask;
+    pressed = self->pressedMask;
+    p = events;
+    if (held == 0 && released == 0 && pressed == 0) {
+        return;
+    }
+
+    for (i = 0; i < 16; i++) {
+        u32 mask = D_8008B388[i];
+
+        code = -1;
+        if (released & mask) {
+            code = 0x22;
+        } else if (pressed & mask) {
+            code = 0x12;
+        } else if (held & mask) {
+            code = 0x02;
+        }
+        if (code >= 0) {
+            *p++ = code + i;
+        }
+    }
+
+    onButtonEvent = self->methods->onButtonEvent;
+    for (p--; p >= events; p--) {
+        onButtonEvent(self, *p);
+    }
+}
 
 void func_80025E14(void) {
 }
