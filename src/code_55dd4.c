@@ -120,7 +120,10 @@ s32 func_800662A8(Class65650 *self)
     return self->unk90 = 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662B4);
+void func_800662B4(Class65650 *self)
+{
+    self->unk90 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
 
