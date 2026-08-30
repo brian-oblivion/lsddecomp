@@ -48,7 +48,11 @@ INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetLinkStage);
 
 INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetEventVideo);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D9F4);
+void func_8005D9F4(Entity *this) {
+    this->methods->slot60(this, 1);
+    this->unkF0 = 1;
+    this->unk24 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DA3C);
 
