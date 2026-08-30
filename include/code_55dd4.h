@@ -66,6 +66,17 @@ typedef struct Unk68Obj {
     Unk68Methods *methods;
 } Unk68Obj;
 
+/* Whatever class each self->unk70[i] (below) points at: unidentified,
+ * only its vtable slot +0x060 is needed so far, by func_80065A5C. */
+typedef struct Unk70ElemMethods {
+    u8 pad00[0x60];                          /* +0x000 .. +0x05C, unknown */
+    void (*slot60)(void *self, void *arg);    /* +0x060 */
+} Unk70ElemMethods;
+
+typedef struct Unk70ElemObj {
+    Unk70ElemMethods *methods;
+} Unk70ElemObj;
+
 /* Whatever class self->unk5C (below) points at: unidentified, only its
  * vtable slot +0x004 is needed so far, by func_80065CEC (a "release,
  * returns the new value to store back" idiom -- typically NULL). */
@@ -113,7 +124,7 @@ struct Class65650 {
     s32 unk64;                     /* +0x64 plain s32 field; set verbatim by func_80065BF4(self, value) */
     Unk68Obj *unk68;                /* +0x68 zeroed in the constructor; consumed by func_80066150, which calls unk68->methods->slot88(unk68, 6) when self->unk64 == 1 and unk68 is set */
     s32 unk6C;                     /* +0x6C count, paired with the unk70/unk74 arrays */
-    void *unk70;                   /* +0x70 array of item pointers, allocated by func_80065E1C */
+    Unk70ElemObj **unk70;           /* +0x70 array of item pointers, allocated by func_80065E1C; each element's own slot +0x060 is invoked (element, arg) by func_80065A5C */
     u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by func_80065E1C; linearly searched by func_80065D64 */
     void *unk78;                    /* +0x78 callback pointer; func_800660BC copies one of slot118/11C/120's VALUE (never calls it) here based on a small dispatch value */
     u8 pad7C[0x10];                 /* +0x7C .. +0x8B, not yet decoded */
