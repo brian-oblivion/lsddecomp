@@ -96,7 +96,18 @@ void func_80065C2C(Class65650 *self)
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065C5C);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065CEC);
+void func_80065CEC(Class65650 *self)
+{
+    Unk5CObj *result;
+
+    self->methods->slot_teardown70(self);
+    if (self->unk60 != 0) {
+        result = self->unk5C->methods->slot4(self->unk5C);
+    } else {
+        result = NULL;
+    }
+    self->unk5C = result;
+}
 
 s32 func_80065D64(Class65650 *self, s32 value)
 {

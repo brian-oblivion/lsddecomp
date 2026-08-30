@@ -66,6 +66,18 @@ typedef struct Unk68Obj {
     Unk68Methods *methods;
 } Unk68Obj;
 
+/* Whatever class self->unk5C (below) points at: unidentified, only its
+ * vtable slot +0x004 is needed so far, by func_80065CEC (a "release,
+ * returns the new value to store back" idiom -- typically NULL). */
+typedef struct Unk5CObj Unk5CObj;
+typedef struct Unk5CMethods {
+    u8 pad00[0x04];                          /* +0x000, unknown */
+    Unk5CObj *(*slot4)(Unk5CObj *self);       /* +0x004 */
+} Unk5CMethods;
+struct Unk5CObj {
+    Unk5CMethods *methods;
+};
+
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
     void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__func_17eb0, inherited -- used by func_80065B80 when its `val` == 4 */
@@ -80,7 +92,8 @@ typedef struct Class65650Methods {
     u8 padC8[0x2C];                                                        /* +0x0C8 .. +0x0F0, inherited/not yet needed */
     s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 func_80065BFC */
     void (*slot_teardown5C)(Class65650 *self);                              /* +0x0F8 func_80065C2C */
-    u8 padFC[0x0C];                                                          /* +0x0FC .. +0x104, this unit's own slots (func_80065D64/DBC/DEC), not dispatched through here */
+    u8 padFC[0x08];                                                          /* +0x0FC .. +0x100, this unit's own slots (func_80065D64/DBC), not dispatched through here */
+    void (*slot_teardown70)(Class65650 *self);                                /* +0x104 func_80065DEC -- called by func_80065CEC */
     void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by func_80065B80 when its `val` == 2 */
 } Class65650Methods;
 
@@ -91,7 +104,7 @@ struct Class65650 {
     u8 unk04[0x54];                 /* +0x04 .. +0x57, BasicClass/intermediate-class instance fields, not this unit's to name */
 
     UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; read by func_800661D4, which calls arg2->methods->slot80(arg2, forwardedArg, 0x6E, 0x6E) when non-NULL */
-    void *unk5C;                   /* +0x5C lazily-populated sub-object; guarded by unk60, set up by func_80065C5C, torn down by func_80065CEC (both still INCLUDE_ASM this round) */
+    Unk5CObj *unk5C;                /* +0x5C lazily-populated sub-object; guarded by unk60, set up by func_80065C5C, torn down by func_80065CEC */
     s32 unk60;                     /* +0x60 guard flag for unk5C: 0 if unk5C already existed and was borrowed rather than allocated, 1 if this instance owns it */
     s32 unk64;                     /* +0x64 plain s32 field; set verbatim by func_80065BF4(self, value) */
     Unk68Obj *unk68;                /* +0x68 zeroed in the constructor; consumed by func_80066150, which calls unk68->methods->slot88(unk68, 6) when self->unk64 == 1 and unk68 is set */
