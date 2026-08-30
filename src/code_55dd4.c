@@ -46,7 +46,11 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
     return self;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_8006573C);
+void func_8006573C(Class65650 *self)
+{
+    self->methods->slot_teardown5C(self);
+    func_80057C84()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065790);
 
