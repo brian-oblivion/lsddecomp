@@ -36,7 +36,21 @@ void func_8005C508(void)
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C508);
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C5E8);
+void func_8005C5E8(void)
+{
+    DreamAuxSlot *slot = D_80088D28;
+    u32 done;
+
+    for (done = 0; done < 1; done++) {
+        DreamAuxObj *obj = slot->obj;
+
+        if (obj != NULL) {
+            DreamAuxTickFn tick = (DreamAuxTickFn)obj->vtable[1];
+            slot->obj = tick(obj);
+        }
+        slot++;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C650);
 
