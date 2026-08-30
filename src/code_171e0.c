@@ -13,7 +13,18 @@ void *func_800269F0(UnkFlagsObj_171e0 *this) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026A50);
+void func_80026A50(UnkFlagsObj_171e0 *this) {
+    func_80018390()->ctor(this);
+    this->methods = (UnkFlagsObjMethods_171e0 *) func_80026C9C();
+    this->unk0C = 0;
+    this->unk10 = NULL;
+    this->unk14 = 0;
+    this->unk20 = 0;
+    this->unk22 = 0;
+    this->unknown_value_0x24 = 0;
+    this->unk28 = 0;
+    this->unk2A = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026AB4);
 
