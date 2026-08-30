@@ -82,7 +82,24 @@ call:
     func_8005BF68(1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C76C);
+void func_8005C76C(void)
+{
+    u32 done;
+    DreamAuxSlot *slot;
+
+    done = 0;
+    slot = D_80088D2C;
+
+    for (; done < 1; done++) {
+        DreamAuxObj *obj = slot->obj;
+
+        if (obj != NULL) {
+            DreamAuxTickFn tick = (DreamAuxTickFn)obj->vtable[1];
+            slot->obj = tick(obj);
+        }
+        slot++;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C7D4);
 
