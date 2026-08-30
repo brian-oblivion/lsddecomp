@@ -93,7 +93,19 @@ Vec3_171e0 *func_80026CE8(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CFC);
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026D88);
+void func_80026D88(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
+    dst->unk40 = src->unk40;
+    dst->unk44 = src->unk44;
+    dst->unk48 = src->unk48;
+    dst->unk4C = src->unk4C;
+    dst->unk50 = src->unk50;
+    dst->unk54 = src->unk54;
+    dst->unk58 = src->unk58;
+    dst->unk68 = src->unk68;
+    dst->unk6C = src->unk6C;
+    dst->unk70 = src->unk70;
+    dst->unk74 = src->unk74;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026E0C);
 
