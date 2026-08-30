@@ -195,7 +195,12 @@ s32 func_80059A58(DreamSys *this)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059AEC);
+s32 func_80059AEC(DreamSys *this)
+{
+	if (this->unk_0x70 != 0)
+		return this->unk_0x70;
+	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059B50);
 
