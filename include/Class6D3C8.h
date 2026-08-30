@@ -55,7 +55,7 @@ typedef struct Class6D3C8CtorArgs {
     u8 unk04[4];                /* +0x04 .. +0x07, not yet decoded */
     void *unk08;                  /* +0x08, gates func_80026348's whole body */
     void *unk0C;                    /* +0x0C, gates func_80026170's whole body */
-    u8 unk10[4];                      /* +0x10 .. +0x13, not yet decoded */
+    void *unk10;                       /* +0x10, gates func_80026410's whole body */
     s32 unk14;                          /* +0x14, passed into the DreamSys call */
 } Class6D3C8CtorArgs;
 
@@ -84,7 +84,7 @@ typedef struct Class6D3C8Methods {
     void *unk4C;                                            /* +0x04C func_8003B110 */
     void (*slot50)(Class6D3C8 *self);                       /* +0x050 func_80026170 */
     void (*slot54)(Class6D3C8 *self);                       /* +0x054 func_80026348 */
-    void *slot58;                                           /* +0x058 func_80026410 */
+    s32 (*slot58)(Class6D3C8 *self);                        /* +0x058 func_80026410 */
     void (*slot5C)(void);                                   /* +0x05C func_80026690 */
     void *slot60;                                           /* +0x060 func_80026698 */
     void *slot64;                                           /* +0x064 func_80026900 */
@@ -191,5 +191,40 @@ extern LoaderTask *func_8003BE94(s32 a0, s32 a1, s32 a2);
  * callback. Already matched: s32 func_80026328(void) { return
  * func_8004A070(0); } */
 s32 func_80026328(void);
+
+/* A third small class, constructed directly by a caller-supplied function
+ * pointer (func_80026518's own a0) rather than through a New_X-style
+ * allocator -- confirmed by func_80026518's shape: `jalr` straight on the
+ * incoming a0 with the object argument in a0, no allocation call at all.
+ * Shares slot +0x004/+0x044 offsets and signatures with LoaderTaskMethods,
+ * consistent with the class-framework's shared low base-class slots, but
+ * kept as its own type since nothing ties the two classes together. */
+typedef struct PollTaskMethods {
+    s32 header;                                   /* +0x000 */
+    void (*slot4)(void *self);                      /* +0x004 */
+    u8 pad08[0x044 - 0x008];                          /* +0x008 .. +0x043 */
+    s32 (*slot44)(void *self, s32 a1, s32 a2);          /* +0x044 */
+} PollTaskMethods;
+
+typedef struct PollTask {
+    PollTaskMethods *methods;
+} PollTask;
+
+typedef PollTask *(*PollTaskCtor)(void *arg);
+
+/* This unit's own function, defined later in ROM order (forward declared
+ * for func_80026410, which comes first). Constructs a PollTask via the
+ * caller-supplied `ctor`, dispatches slot44(task, extra, 0) and slot4(task)
+ * on it, and returns slot44's result. */
+s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra);
+
+/* This unit's own function, defined later in ROM order (forward declared
+ * for func_80026410, which comes first). */
+void func_8002658C(Class6D3C8 *self);
+
+/* PollTask constructors, uncarved (not this unit's to write). Called
+ * directly (not through any vtable) as func_80026518's `ctor` argument. */
+extern PollTask *func_80057F68(void *dreamSys);
+extern PollTask *func_8004D518(void *dreamSys);
 
 #endif

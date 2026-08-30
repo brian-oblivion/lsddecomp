@@ -193,7 +193,10 @@ struct vtable_DreamSys{
 	u32 unknown_functions_0x140[22];
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
-	void *func_8005A2E4;
+	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as
+	   this->vt->func_8005A2E4(this, 0), compared against 1. Real name and
+	   full semantics unknown outside that one call site. */
+	s32 (*func_8005A2E4)(DreamSys *this, s32 arg1);
 	s32 (*AdvanceDay)(DreamSys *this);
 	void *func_8005A33C;
 	void *func_8005A344;

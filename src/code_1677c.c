@@ -101,7 +101,43 @@ void func_80026348(Class6D3C8 *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026410);
+/* Gated by self->arg->unk10. Checks the DreamSys's own status slot
+ * (+0x1A0); if it isn't already "1" and self->unk24 hasn't latched, kicks
+ * off one PollTask (func_80057F68) and, if THAT reports "2", runs
+ * func_8002658C. Then polls a second PollTask (func_8004D518) in a loop,
+ * restarting the first PollTask each time it reports "2", until it
+ * reports anything else; clears self->unk24 and returns 0 or 2 depending
+ * on whether that final status was below 1. */
+s32 func_80026410(Class6D3C8 *self) {
+    s32 status;
+    s32 pollDone;
+
+    if (self->arg->unk10 != 0) {
+        func_80026F34(0, 0, 0);
+
+        status = self->dreamSys->vt->func_8005A2E4(self->dreamSys, 0);
+        if (status != 1) {
+            if (self->unk24 == 0) {
+                status = func_80026518(func_80057F68, self->dreamSys, self->unk1C);
+                if (status == 2) {
+                    func_8002658C(self);
+                }
+            }
+        }
+
+        pollDone = 2;
+    retry:
+        status = func_80026518(func_8004D518, self->dreamSys, self->unk1C);
+        if (status == pollDone) {
+            func_80026518(func_80057F68, self->dreamSys, self->unk1C);
+            goto retry;
+        }
+
+        self->unk24 = 0;
+        return ((u32)status < 1) << 1;
+    }
+    return 2;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026518);
 
