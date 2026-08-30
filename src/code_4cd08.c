@@ -255,7 +255,19 @@ INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CBC8);
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CD58);
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CDA8);
+bool func_8005CDA8(s32 a0, s32 a1)
+{
+    s32 target = (a0 - 1) / 30 + 1;
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        if (target == a1) {
+            return true;
+        }
+        a1 += 3;
+    }
+    return false;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CDF8);
 
