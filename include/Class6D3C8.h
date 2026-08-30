@@ -86,7 +86,7 @@ typedef struct Class6D3C8Methods {
     void (*slot54)(Class6D3C8 *self);                       /* +0x054 func_80026348 */
     s32 (*slot58)(Class6D3C8 *self);                        /* +0x058 func_80026410 */
     void (*slot5C)(void);                                   /* +0x05C func_80026690 */
-    void *slot60;                                           /* +0x060 func_80026698 */
+    void (*slot60)(Class6D3C8 *self);                       /* +0x060 func_80026698 */
     void *slot64;                                           /* +0x064 func_80026900 */
 } Class6D3C8Methods;
 
@@ -134,13 +134,19 @@ typedef struct StreamTaskMethods {
     void (*slot4)(void *self);                                      /* +0x004 */
     u8 pad08[0x044 - 0x008];                                          /* +0x008 .. +0x043 */
     /* +0x044: called with (self, a fixed word from the caller's own
-     * object, a filename string, a type/format code looked up via
-     * func_800493C8, and a literal 1 spilled onto the stack as a 5th
-     * argument -- confirmed a real 5th argument, not a scheduling
+     * object, a second word whose meaning varies by call site -- a
+     * filename string in func_80026170, a plain derived count in
+     * func_80026348, func_800493E4's return value in func_8002658C --
+     * a type/format code, and a literal 1 spilled onto the stack as a
+     * 5th argument -- confirmed a real 5th argument, not a scheduling
      * artifact, because MIPS o32 only spills to the stack once a0-a3 are
      * all otherwise assigned; a <=4-arg call would never need the
      * sp+0x10 store. */
-    void (*slot44)(void *self, s32 a1, const char *path, s32 typeLookup, s32 flag);
+    void (*slot44)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag);
+    u8 pad48[0x06C - 0x048];                                          /* +0x048 .. +0x06B */
+    void (*slot6C)(void *self, s32 a1);                                 /* +0x06C */
+    u8 pad70[0x12C - 0x070];                                              /* +0x070 .. +0x12B */
+    void (*slot12C)(void *self, s32 a1);                                    /* +0x12C */
 } StreamTaskMethods;
 
 typedef struct StreamTask {
@@ -226,5 +232,7 @@ void func_8002658C(Class6D3C8 *self);
  * directly (not through any vtable) as func_80026518's `ctor` argument. */
 extern PollTask *func_80057F68(void *dreamSys);
 extern PollTask *func_8004D518(void *dreamSys);
+
+extern s32 func_800493E4(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 
 #endif

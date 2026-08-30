@@ -150,7 +150,30 @@ s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra) {
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_8002658C);
+/* Called by func_80026410 when its first PollTask reports "2". Gated by
+ * self->arg->unk08 (same gate as func_80026348). Builds a StreamTask,
+ * derives a count via func_800493E4, initializes the task with that
+ * count's quotient-by-9 and a fixed sub-slot, then a 5-argument slot44
+ * call (a3 = -1, unlike the other slot44 call sites), then starts it. */
+void func_8002658C(Class6D3C8 *self) {
+    StreamTask *task;
+    struct {
+        u32 unk00;
+        u32 unk04;
+        u32 count;
+    } buf;
+    s32 extra;
+
+    if (self->arg->unk08 != 0) {
+        func_80026F34(0, 0, 0);
+        task = func_8003B854(0, 0, 0, 0);
+        extra = func_800493E4(&buf.count, 0, 10);
+        task->methods->slot6C(task, buf.count / 15);
+        task->methods->slot12C(task, 0);
+        task->methods->slot44(task, self->unk1C, extra, -1, 1);
+        task->methods->slot4(task);
+    }
+}
 
 void func_80026690(void) {
 }
