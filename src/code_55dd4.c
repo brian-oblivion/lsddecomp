@@ -133,4 +133,7 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066748);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800667B0);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066818);
+Class65650Methods *func_80066818(void)
+{
+    return &D_8008A6C4;
+}
