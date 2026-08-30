@@ -98,7 +98,10 @@ s32 func_8006613C(Class65650 *self)
     return self->unk8C = 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066148);
+void func_80066148(Class65650 *self)
+{
+    self->unk8C = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066150);
 
