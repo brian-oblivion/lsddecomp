@@ -139,7 +139,16 @@ s32 func_80026410(Class6D3C8 *self) {
     return 2;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026518);
+/* Constructs a PollTask via the caller-supplied `ctor`, dispatches
+ * slot44(task, extra, 0) and slot4(task) on it (fire-and-forget), and
+ * returns slot44's result. */
+s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra) {
+    PollTask *task = ctor(dreamSys);
+    s32 result = task->methods->slot44(task, extra, 0);
+
+    task->methods->slot4(task);
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_8002658C);
 
