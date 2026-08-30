@@ -160,7 +160,13 @@ void func_80066148(Class65650 *self)
     self->unk8C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066150);
+void func_80066150(Class65650 *self)
+{
+    self->methods->slotC4(self, -0x1E, 0);
+    if (self->unk64 == 1 && self->unk68 != NULL) {
+        self->unk68->methods->slot88(self->unk68, 6);
+    }
+}
 
 void func_800661C4(void) {
 }
