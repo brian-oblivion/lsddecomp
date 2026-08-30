@@ -60,8 +60,9 @@ typedef struct Class65650Methods {
     void *unk04;                                                    /* +0x004 BasicClass__func_17eb0, inherited */
     Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 class_65650__Constructor */
     void (*dtor)(Class65650 *self);                                   /* +0x00C func_8006573C */
-    void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 func_800570B4, inherited from D_800878D4 */
-    u8 pad14[0x2C];                                                     /* +0x014 .. +0x03C, inherited from D_800878D4 */
+    void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 func_800570B4, inherited -- "link" companion of slot14, see func_80066748 */
+    void (*slot14)(Class65650 *self, void *arg);                        /* +0x014 func_80057130, inherited -- "unlink" companion of slot10, see func_800667B0 */
+    u8 pad18[0x28];                                                      /* +0x018 .. +0x03C, inherited from D_800878D4, not yet needed */
     void (*slot40)(Class65650 *self);                                    /* +0x040 func_80065830, this class's own */
     u8 pad44[0xB0];                                                       /* +0x044 .. +0x0F0, inherited/not yet needed */
     s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 func_80065BFC */
@@ -86,7 +87,7 @@ struct Class65650 {
 
     s32 unk8C;                     /* +0x8C boolean-ish flag; set to 0 by func_80066148, to 1 (and returned) by func_8006613C */
     s32 unk90;                     /* +0x90 boolean-ish flag; set to 0 by func_800662B4, to 1 (and returned) by func_800662A8 */
-    s32 unk94;                     /* +0x94 zeroed in the constructor; no other observed use yet */
+    Class65650 *unk94;              /* +0x94 companion-object pointer; zeroed in the constructor, linked via slot10/slot14 in func_80066748/func_800667B0 (a symmetric buddy-link, not the s32 the first pass guessed) */
 };
 
 extern Class65650Methods D_8008A6C4;
