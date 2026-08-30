@@ -1,6 +1,8 @@
-/* 25 queued. DELIBERATELY UNWORKED in round 2026-08-29-a: five runners were
- * staffed elsewhere, not because this unit is hard. Pairs well with a later
- * Entity_b carve.
+/* 25 queued, all fresh. Offered to runners in round 2026-08-30-a; no longer
+ * banked. The first 25 of a 142-function block split at func_8005DE18; the
+ * remainder is Entity_b, still an asm segment, and pairs well with a later
+ * carve. No function in this unit touches a %gp_rel global, so none of it is
+ * exposed to the gp-relative blocker (docs/research/gp-relative-blocker.md).
  */
 #include "common.h"
 
