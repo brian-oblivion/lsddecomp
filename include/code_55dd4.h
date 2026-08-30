@@ -95,6 +95,10 @@ typedef struct Class65650Methods {
     u8 padFC[0x08];                                                          /* +0x0FC .. +0x100, this unit's own slots (func_80065D64/DBC), not dispatched through here */
     void (*slot_teardown70)(Class65650 *self);                                /* +0x104 func_80065DEC -- called by func_80065CEC */
     void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by func_80065B80 when its `val` == 2 */
+    u8 pad10C[0x0C];                                                            /* +0x10C .. +0x114, not yet needed as a call target */
+    void *slot118;                                                              /* +0x118 -- only ever taken as a pointer VALUE (func_800660BC), never called from this unit, so left untyped-as-function */
+    void *slot11C;                                                               /* +0x11C ditto */
+    void *slot120;                                                               /* +0x120 ditto */
 } Class65650Methods;
 
 /* Object size is 0x98 (from the allocator call in New_class_65650). Field
@@ -111,7 +115,8 @@ struct Class65650 {
     s32 unk6C;                     /* +0x6C count, paired with the unk70/unk74 arrays */
     void *unk70;                   /* +0x70 array of item pointers, allocated by func_80065E1C */
     u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by func_80065E1C; linearly searched by func_80065D64 */
-    u8 pad78[0x14];                 /* +0x78 .. +0x8B, not yet decoded */
+    void *unk78;                    /* +0x78 callback pointer; func_800660BC copies one of slot118/11C/120's VALUE (never calls it) here based on a small dispatch value */
+    u8 pad7C[0x10];                 /* +0x7C .. +0x8B, not yet decoded */
 
     s32 unk8C;                     /* +0x8C boolean-ish flag; set to 0 by func_80066148, to 1 (and returned) by func_8006613C */
     s32 unk90;                     /* +0x90 boolean-ish flag; set to 0 by func_800662B4, to 1 (and returned) by func_800662A8 */

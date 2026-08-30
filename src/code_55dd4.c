@@ -159,7 +159,20 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065F2C);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065FD8);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800660BC);
+void func_800660BC(Class65650 *self, s32 value)
+{
+    switch ((u8)value) {
+    case 0x41:
+        self->unk78 = self->methods->slot118;
+        break;
+    case 0x42:
+        self->unk78 = self->methods->slot11C;
+        break;
+    case 0x43:
+        self->unk78 = self->methods->slot120;
+        break;
+    }
+}
 
 s32 func_8006613C(Class65650 *self)
 {
