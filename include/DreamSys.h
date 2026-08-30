@@ -220,6 +220,14 @@ struct vtable_DreamSys{
 	void (*CalcUnlockScore)(DreamSys *this);
 	void *GameManager__AddFlashback;
 	void *GameManager__FlashbackSaving;
+	u32 unknown_functions_0x21c[3];
+	/* +0x228: called once, from Class6D3C8's constructor (func_80025FDC in
+	   src/code_1677c.c), as this->vt->func_228(this, arg->unk14) right after
+	   DreamSys is allocated by New_DreamSys. Real name/behaviour unknown --
+	   this slot lives past the previously-documented end of this struct
+	   (0x21c), discovered from that call site, not from any DreamSys-owning
+	   unit's own code. */
+	void (*func_228)(DreamSys *this, s32 arg1);
 };
 
 typedef enum DreamColors{
@@ -388,6 +396,13 @@ void DreamSys__ResetFlashbackList(DreamSys *this);
 /* @brief Gets the jumptable of "Virtual methods" assigned to the DreamSys class. */
 /* @return Pointer to vtable_DreamSys */
 struct vtable_DreamSys *Get_vtable_DreamSys(void);
+
+/* @brief Allocates and constructs a DreamSys instance.
+ * Still INCLUDE_ASM in src/DreamSys.c; declared here so other units'
+ * matched C (e.g. func_80025FDC in src/code_1677c.c) can call it -- see
+ * "Calling into a function that is still INCLUDE_ASM in another unit is
+ * fine" in docs/DECOMPILATION_LEARNINGS.md. */
+DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2);
 
 
 

@@ -2,6 +2,7 @@
 #define CLASS_6D3C8_H
 
 #include "common.h"
+#include "DreamSys.h"
 
 /*
  * The class allocated by new_class_6d3c8 / constructed by func_80025FDC.
@@ -33,7 +34,7 @@
 typedef struct MiddleClassMethods {
     s32 header;                                             /* +0x000 */
     void *unk04;                                             /* +0x004 */
-    void *ctor;                                               /* +0x008 func_8003AF8C */
+    void (*ctor)(void *self, s32 a1);                         /* +0x008 func_8003AF8C */
     void *unk0C;                                               /* +0x00C func_8003B024 (dtor override, shared with Class6D3C8) */
     void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
     void *unk3C;                                                /* +0x03C null slot */
@@ -45,12 +46,22 @@ typedef struct MiddleClassMethods {
 
 extern MiddleClassMethods *func_8003B20C(void);
 
+/* The constructor argument block for Class6D3C8 (func_80025FDC). Observed
+ * from its one call site (asm/main.s, D_80066828: {0x13, 0, 1, 1, 1, 1}) --
+ * only offsets +0x00 and +0x14 are actually read by func_80025FDC, so the
+ * rest stays opaque padding until another caller needs it. */
+typedef struct Class6D3C8CtorArgs {
+    s32 unk00;                 /* +0x00, passed as the base ctor's own arg */
+    u8 unk04[0x10];             /* +0x04 .. +0x13, not yet decoded */
+    s32 unk14;                   /* +0x14, passed into the DreamSys call */
+} Class6D3C8CtorArgs;
+
 typedef struct Class6D3C8 Class6D3C8;
 
 typedef struct Class6D3C8Methods {
     s32 header;                                            /* +0x000 */
     void *unk04;                                            /* +0x004 BasicClass__func_17eb0 */
-    Class6D3C8 *(*ctor)(Class6D3C8 *self, void *arg);       /* +0x008 func_80025FDC */
+    void (*ctor)(Class6D3C8 *self, Class6D3C8CtorArgs *arg); /* +0x008 func_80025FDC */
     void *unk0C;                                            /* +0x00C func_8003B024 (dtor override) */
     void *unk10;                                            /* +0x010 BasicClass__func_17f98 */
     void *unk14;                                            /* +0x014 BasicClass__func_17ff0 */
@@ -64,7 +75,7 @@ typedef struct Class6D3C8Methods {
     void *unk34;                                            /* +0x034 BasicClass__func_18350 */
     void *unk38;                                            /* +0x038 BasicClass__func_18358 */
     void *unk3C;                                            /* +0x03C null slot */
-    void (*slot40)(void);                                   /* +0x040 func_800260A4 */
+    void (*slot40)(Class6D3C8 *self);                       /* +0x040 func_800260A4 (ignores self) */
     void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 func_80026108 */
     void *unk48;                                            /* +0x048 func_8003B108 */
     void *unk4C;                                            /* +0x04C func_8003B110 */
@@ -83,11 +94,32 @@ struct Class6D3C8 {
     u8 unk04[0x14];                 /* +0x04 .. +0x17, not yet decoded */
     s32 unk18;                       /* +0x18 guards func_80026108's fallback to the base class */
     u8 unk1C_[4];                     /* +0x1C .. +0x1F, not yet decoded */
-    void *arg;                      /* +0x20 the constructor's `arg` parameter */
+    Class6D3C8CtorArgs *arg;        /* +0x20 the constructor's `arg` parameter */
     s32 unk24;                      /* +0x24 */
-    void *dreamSys;                 /* +0x28 result of New_DreamSys() */
+    DreamSys *dreamSys;              /* +0x28 result of New_DreamSys() */
 };
 
 extern Class6D3C8Methods D_8006D3C8;
+
+/* Cross-unit accessor, matched C in src/code_171e0.c (not this unit). No
+ * header currently declares it there, so it's declared here at the one
+ * call site that needs it (func_80025FDC). Returns &D_8006D3C8. */
+extern void *func_800269E0(void);
+
+/* Model-file-load request block used by func_80025FDC: {type; path}. Only
+ * one call site is known so far (func_80025FDC, loading "ETC\DREAME5.TMD"
+ * via D_800107A4), so field names are provisional. */
+typedef struct LoadModelRequest {
+    s32 type;
+    const char *path;
+    s32 unk08;
+    s32 unk0C;
+} LoadModelRequest;
+
+extern const char D_800107A4[];       /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
+
+extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so far */
+extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
+extern void *func_80043840(void *arg); /* code_1677c's own alloc+ctor shape, uncarved (psyq_memset.s); not this unit's to write */
 
 #endif
