@@ -5,15 +5,71 @@ void *func_800269E0(void) {
     return D_8006D3C8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800269F0);
+void *func_800269F0(UnkFlagsObj_171e0 *this) {
+    this->unk20 = 0;
+    this->methods->dtor(this);
+    func_80018390()->dtor(this);
+    func_80017CFC(this);
+    return NULL;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026A50);
+void func_80026A50(UnkFlagsObj_171e0 *this) {
+    func_80018390()->ctor(this);
+    this->methods = (UnkFlagsObjMethods_171e0 *) func_80026C9C();
+    this->unk0C = 0;
+    this->unk10 = NULL;
+    this->unk14 = 0;
+    this->unk20 = 0;
+    this->unk22 = 0;
+    this->unknown_value_0x24 = 0;
+    this->unk28 = 0;
+    this->unk2A = 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026AB4);
+void *func_80026AB4(UnkFlagsObj_171e0 *this) {
+    this->methods->slot48(this);
+    return this->methods->slot5C(this);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026B08);
+void func_80026B08(UnkFlagsObj_171e0 *this, s32 arg1) {
+    s32 savedUnk0C;
+    s32 size;
+    void *newRes;
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C20);
+    if (this->unk10 != NULL) {
+        return;
+    }
+    savedUnk0C = this->unk0C;
+    this->unk0C = 0;
+    this->methods->slot44(this, arg1, 1, 0);
+    size = this->methods->slot4C(this, 0, 2);
+    newRes = func_80017B34(size);
+    if (newRes != NULL) {
+        this->methods->slot4C(this, 0, 0);
+        this->methods->slot54(this, newRes, size);
+        this->methods->slot48(this);
+        this->unk10 = newRes;
+        this->unk14 = size;
+        this->unk0C = savedUnk0C;
+    } else {
+        func_80017CFC(NULL);
+        this->methods->slot48(this);
+    }
+}
+
+void func_80026C20(UnkFlagsObj_171e0 *this) {
+    if (this->unk10 == NULL) {
+        return;
+    }
+    if (this->unk14 == 0) {
+        return;
+    }
+    if (this->unk20 != 0) {
+        return;
+    }
+    func_80017CFC(this->unk10);
+    this->unk10 = NULL;
+}
 
 void func_80026C80(void) {
 }
@@ -37,7 +93,19 @@ Vec3_171e0 *func_80026CE8(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CFC);
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026D88);
+void func_80026D88(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
+    dst->unk40 = src->unk40;
+    dst->unk44 = src->unk44;
+    dst->unk48 = src->unk48;
+    dst->unk4C = src->unk4C;
+    dst->unk50 = src->unk50;
+    dst->unk54 = src->unk54;
+    dst->unk58 = src->unk58;
+    dst->unk68 = src->unk68;
+    dst->unk6C = src->unk6C;
+    dst->unk70 = src->unk70;
+    dst->unk74 = src->unk74;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026E0C);
 
@@ -63,6 +131,14 @@ INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270AC);
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270B8);
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270C4);
+char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
+    dest[0] = '\0';
+    if (arg2 != NULL) {
+        strcat(dest, arg2);
+    }
+    strcat(dest, arg1);
+    strcat(dest, arg3);
+    return dest;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", strcat);
