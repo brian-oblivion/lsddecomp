@@ -110,6 +110,8 @@ typedef struct Class65650Methods {
     void *slot118;                                                              /* +0x118 -- only ever taken as a pointer VALUE (func_800660BC), never called from this unit, so left untyped-as-function */
     void *slot11C;                                                               /* +0x11C ditto */
     void *slot120;                                                               /* +0x120 ditto */
+    u8 pad124[0x14];                                                             /* +0x124 .. +0x134, this unit's own slots, not dispatched through here */
+    void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
 } Class65650Methods;
 
 /* Object size is 0x98 (from the allocator call in New_class_65650). Field
