@@ -237,6 +237,8 @@ extern PollTask *func_80057F68(void *dreamSys);
 extern PollTask *func_8004D518(void *dreamSys);
 
 extern s32 func_800493E4(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
+extern s32 func_800491FC(s32 *out, s32 unused); /* psyq_memset.s: same "write to *out, return a
+    separate value" shape as func_800490F4/func_8004913C/func_800493E4 */
 extern s32 func_80049334(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining

@@ -223,4 +223,25 @@ void func_8002677C(Class6D3C8 *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026900);
+/* Class6D3C8Methods slot +0x064. Gated by self->arg->unk08 (same gate as
+ * func_80026348/func_8002658C). Builds a StreamTask, runs its slot12C,
+ * derives a type code via func_800491FC, looks it up via func_800493C8,
+ * initializes the task with it, then starts it -- the same shape as
+ * func_80026170/func_80026348, but with slot12C added and func_800491FC
+ * in place of func_800490F4/func_8004913C. */
+void func_80026900(Class6D3C8 *self) {
+    StreamTask *task;
+    s32 typeCode;
+    s32 outerValue;
+    s32 typeLookup;
+
+    if (self->arg->unk08 != 0) {
+        func_80026F34(0, 0, 0);
+        task = func_8003B854(0, 0, 0, 0);
+        task->methods->slot12C(task, 0);
+        outerValue = func_800491FC(&typeCode, 0);
+        typeLookup = func_800493C8(typeCode);
+        task->methods->slot44(task, self->unk1C, outerValue, typeLookup, 1);
+        task->methods->slot4(task);
+    }
+}
