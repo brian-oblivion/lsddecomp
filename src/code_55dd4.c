@@ -66,7 +66,10 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065AE0);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065B80);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065BF4);
+void func_80065BF4(Class65650 *self, s32 value)
+{
+    self->unk64 = value;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065BFC);
 
