@@ -61,7 +61,19 @@ void func_80026170(Class6D3C8 *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026254);
+/* Registers a "loader" task for the given resource path: allocates the
+ * task, gives it a completion callback (func_80026328) and context
+ * (self), then sets its remaining parameters (path, self->unk1C) and
+ * starts it. */
+void func_80026254(Class6D3C8 *self, const char *path) {
+    LoaderTask *task = func_8003BE94(0, 0, 0);
+
+    task->methods->slot98(task, func_80026328, self);
+    task->methods->slot6C(task, 0);
+    task->methods->slotD4(task, path, 0);
+    task->methods->slot44(task, self->unk1C, 0);
+    task->methods->slot4(task);
+}
 
 extern s32 func_8004A070(s32 a0);
 

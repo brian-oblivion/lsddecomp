@@ -160,4 +160,35 @@ extern const char D_800107C8[]; /* "ETC\OSDLOGO.TIM" */
  * order) is called by func_80026170, which comes first in the file. */
 void func_80026254(Class6D3C8 *self, const char *path);
 
+/* A second "New_X"-shaped task object, allocated by func_8003BE94
+ * (uncarved, asm/code_2c054.s) -- 0xA4 bytes, constructed through
+ * func_8003DFBC's slot +0x008. Different class from StreamTaskMethods
+ * above (different allocator, different slot signatures at the same
+ * offsets), used by func_80026254 to register a named resource with a
+ * completion callback. */
+typedef struct LoaderTaskMethods {
+    s32 header;                                              /* +0x000 */
+    void (*slot4)(void *self);                                 /* +0x004 */
+    u8 pad08[0x044 - 0x008];                                     /* +0x008 .. +0x043 */
+    void (*slot44)(void *self, s32 a1, s32 a2);                    /* +0x044 */
+    u8 pad48[0x06C - 0x048];                                         /* +0x048 .. +0x06B */
+    void (*slot6C)(void *self, s32 a1);                                /* +0x06C */
+    u8 pad70[0x098 - 0x070];                                             /* +0x070 .. +0x097 */
+    void (*slot98)(void *self, s32 (*callback)(void), void *ctx);         /* +0x098 */
+    u8 pad9C[0x0D4 - 0x09C];                                                /* +0x09C .. +0x0D3 */
+    void (*slotD4)(void *self, const char *path, s32 a2);                    /* +0x0D4 */
+} LoaderTaskMethods;
+
+typedef struct LoaderTask {
+    LoaderTaskMethods *methods;
+} LoaderTask;
+
+extern LoaderTask *func_8003BE94(s32 a0, s32 a1, s32 a2);
+
+/* Forward declaration: func_80026328 (this unit, defined right after
+ * func_80026254 in ROM order) is used by func_80026254 as a completion
+ * callback. Already matched: s32 func_80026328(void) { return
+ * func_8004A070(0); } */
+s32 func_80026328(void);
+
 #endif
