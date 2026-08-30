@@ -133,7 +133,15 @@ void func_800661C4(void) {
 void func_800661CC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800661D4);
+void func_800661D4(Class65650 *self, void *arg1)
+{
+    UnkArg2Obj *obj;
+
+    obj = self->arg2;
+    if (obj != NULL) {
+        obj->methods->slot80(obj, arg1, 0x6E, 0x6E);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066214);
 

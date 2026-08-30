@@ -44,6 +44,17 @@ typedef struct D800878D4Methods {
 
 extern D800878D4Methods *func_80057C84(void);
 
+/* Whatever class self->arg2 (below) points at: unidentified, only its
+ * vtable slot +0x080 is needed so far, by func_800661D4. */
+typedef struct UnkArg2Methods {
+    u8 pad00[0x80];                                       /* +0x000 .. +0x07C, unknown */
+    void (*slot80)(void *self, void *arg1, s32 a2, s32 a3); /* +0x080 */
+} UnkArg2Methods;
+
+typedef struct UnkArg2Obj {
+    UnkArg2Methods *methods;
+} UnkArg2Obj;
+
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
     void *unk04;                                                    /* +0x004 BasicClass__func_17eb0, inherited */
@@ -63,7 +74,7 @@ struct Class65650 {
     Class65650Methods *methods;   /* +0x00 */
     u8 unk04[0x54];                 /* +0x04 .. +0x57, BasicClass/intermediate-class instance fields, not this unit's to name */
 
-    void *arg2;                    /* +0x58 the constructor's third parameter, stashed verbatim; read by func_800661D4 as another object whose methods->slot0x80(obj, 0x6E, 0x6E) gets called when non-NULL */
+    UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; read by func_800661D4, which calls arg2->methods->slot80(arg2, forwardedArg, 0x6E, 0x6E) when non-NULL */
     void *unk5C;                   /* +0x5C lazily-populated sub-object; guarded by unk60, set up by func_80065C5C, torn down by func_80065CEC (both still INCLUDE_ASM this round) */
     s32 unk60;                     /* +0x60 guard flag for unk5C: 0 if unk5C already existed and was borrowed rather than allocated, 1 if this instance owns it */
     s32 unk64;                     /* +0x64 plain s32 field; set verbatim by func_80065BF4(self, value) */
