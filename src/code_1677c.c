@@ -178,8 +178,49 @@ void func_8002658C(Class6D3C8 *self) {
 void func_80026690(void) {
 }
 
+/* Builds a StatusObj, dispatches slot44(obj) then reads slot4(obj)'s
+ * return as a status code: 2 runs func_8002677C, 3 latches self->unk24.
+ * Then queries the DreamSys status slot again (as func_80026410 does),
+ * this time passing an out-param, and derives a 0/1 result from both the
+ * call's return and the out-param. */
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026698);
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_8002677C);
+/* Reads DreamSys's current cinematic slot, resolves it to a channel index
+ * (func_80049334); if that fails (-1), starts a LoaderTask on the fixed
+ * "no cinematic" path; otherwise, if self->arg->unk08 gates it, starts a
+ * StreamTask on the resolved channel. Either branch finishes by starting
+ * whichever task it built; if neither branch runs, nothing happens. */
+void func_8002677C(Class6D3C8 *self) {
+    CinematicCall cc;
+    struct {
+        s32 chan;
+        u32 unk04;
+        u32 unk08;
+    } chanBuf;
+    s32 groupId;
+    s32 lookup;
+    LoaderTask *task;
+
+    cc = self->dreamSys->vt->GetCinematic(self->dreamSys);
+    groupId = func_80049334(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
+    func_80026F34(0, 0, 0);
+
+    if (chanBuf.chan != -1) {
+        if (self->arg->unk08 != 0) {
+            StreamTask *streamTask = func_8003B854(0, 0, 0, 0);
+
+            streamTask->methods->slot12C(streamTask, 0);
+            lookup = func_800493C8(chanBuf.chan);
+            streamTask->methods->slot44(streamTask, self->unk1C, groupId, lookup, 1);
+            streamTask->methods->slot4(streamTask);
+        }
+    } else {
+        task = func_8003BE94(0, 0, 0);
+        task->methods->slot6C(task, 10);
+        task->methods->slotD4(task, groupId, 0);
+        task->methods->slot44(task, self->unk1C, 0);
+        task->methods->slot4(task);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026900);

@@ -52,7 +52,7 @@ extern MiddleClassMethods *func_8003B20C(void);
  * rest stays opaque padding until another caller needs it. */
 typedef struct Class6D3C8CtorArgs {
     s32 unk00;                 /* +0x00, passed as the base ctor's own arg */
-    u8 unk04[4];                /* +0x04 .. +0x07, not yet decoded */
+    s32 unk04;                 /* +0x04, forwarded as a plain word arg by func_80026698 */
     void *unk08;                  /* +0x08, gates func_80026348's whole body */
     void *unk0C;                    /* +0x0C, gates func_80026170's whole body */
     void *unk10;                       /* +0x10, gates func_80026410's whole body */
@@ -155,7 +155,10 @@ typedef struct StreamTask {
 
 extern StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3);
 
-extern void func_80026F34(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there */
+extern s32 func_80026F34(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
+                                                       the last value its internal dispatch loop got --
+                                                       func_80026170/func_80026348 discard it, but
+                                                       func_8002677C keeps it */
 extern const char *func_800490F4(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &D_800113DC */
 extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index] */
 extern s32 func_8004913C(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides func_80048CFC's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
@@ -234,5 +237,37 @@ extern PollTask *func_80057F68(void *dreamSys);
 extern PollTask *func_8004D518(void *dreamSys);
 
 extern s32 func_800493E4(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
+extern s32 func_80049334(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
+    {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
+    to *out (-1 if unresolved); the packing must zero-extend both halves before combining
+    (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
+    back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
+    func_8002677C. */
+
+/* A fourth small class, allocated by func_80049608 (uncarved,
+ * asm/class_39e08.s, New_X shape, 0x50 bytes). slot4 here is called with
+ * ONLY self (no extra args) and its return is used as a small status
+ * code -- a different signature from every other class's slot4 in this
+ * unit, confirming these per-class slot tables are independent even
+ * where offsets coincide. */
+typedef struct StatusObjMethods {
+    s32 header;                              /* +0x000 */
+    void (*slot4)(void *self);                  /* +0x004 */
+    u8 pad08[0x044 - 0x008];                     /* +0x008 .. +0x043 */
+    s32 (*slot44)(void *self);                    /* +0x044: return value matters -- confirmed by the
+                                                       call site, which keeps THIS return (not slot4's,
+                                                       captured via slot4's own jalr delay slot the same
+                                                       way func_80026518 keeps its own slot44 result). */
+} StatusObjMethods;
+
+typedef struct StatusObj {
+    StatusObjMethods *methods;
+} StatusObj;
+
+extern StatusObj *func_80049608(s32 a0, void *dreamSys, s32 a2);
+
+/* This unit's own function, defined later in ROM order (forward declared
+ * for func_80026698, which comes first). */
+void func_8002677C(Class6D3C8 *self);
 
 #endif
