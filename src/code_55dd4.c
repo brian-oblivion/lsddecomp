@@ -58,32 +58,125 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065830);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065918);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800659D0);
+void func_800659D0(Class65650 *self)
+{
+    if (self->unk0C != 0) {
+        self->methods->slot140(self);
+        if (self->unk50 != NULL) {
+            self->methods->slot14(self, self->unk50);
+        }
+        func_80057C84()->slot50(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065AE0);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065B80);
+void func_80065B80(Class65650 *self, void *arg1, s32 val)
+{
+    if (val == 2) {
+        self->methods->slot108(self);
+    }
+    if (val == 4) {
+        self->methods->slot04(self);
+    }
+}
 
 void func_80065BF4(Class65650 *self, s32 value)
 {
     self->unk64 = value;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065BFC);
+s32 func_80065BFC(Class65650 *self, void *arg1)
+{
+    if (self->unk5C != NULL) {
+        return 0;
+    }
+    return func_80065C5C(self, arg1);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065C2C);
+void func_80065C2C(Class65650 *self)
+{
+    if (self->unk5C != NULL) {
+        func_80065CEC(self);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065C5C);
+s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other)
+{
+    if (other->unk0C != NULL) {
+        self->unk5C = other->unk0C;
+        self->unk60 = 0;
+    } else {
+        self->unk5C = func_8004468C(other);
+        self->unk60 = 1;
+    }
+    if (self->unk5C == NULL) {
+        goto fail;
+    }
+    return self->methods->slot100(self);
+fail:
+    func_80065CEC(self);
+    return 1;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065CEC);
+void func_80065CEC(Class65650 *self)
+{
+    Unk5CObj *result;
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065D64);
+    self->methods->slot_teardown70(self);
+    if (self->unk60 != 0) {
+        result = self->unk5C->methods->slot4(self->unk5C);
+    } else {
+        result = NULL;
+    }
+    self->unk5C = result;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065DBC);
+s32 func_80065D64(Class65650 *self, s32 value)
+{
+    u8 *arr;
+    s32 count;
+    s32 i;
+    u8 target;
+    u8 unused[8];
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065DEC);
+    if (self->unk74 == NULL) {
+        return -1;
+    }
+    arr = self->unk74;
+    __asm__("");
+    count = self->unk6C;
+    if (count <= 0) {
+        return -1;
+    }
+    i = 0;
+    target = (u8)value;
+    do {
+        if (*arr == target) {
+            return i;
+        }
+        i++;
+        arr++;
+    } while (i < count);
+    return -1;
+}
+
+s32 func_80065DBC(Class65650 *self)
+{
+    if (self->unk70 != NULL) {
+        return 0;
+    }
+    return func_80065E1C(self);
+}
+
+void func_80065DEC(Class65650 *self)
+{
+    if (self->unk70 != NULL) {
+        func_80065F2C(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
 
@@ -91,7 +184,20 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065F2C);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065FD8);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800660BC);
+void func_800660BC(Class65650 *self, s32 value)
+{
+    switch ((u8)value) {
+    case 0x41:
+        self->unk78 = self->methods->slot118;
+        break;
+    case 0x42:
+        self->unk78 = self->methods->slot11C;
+        break;
+    case 0x43:
+        self->unk78 = self->methods->slot120;
+        break;
+    }
+}
 
 s32 func_8006613C(Class65650 *self)
 {
@@ -103,7 +209,13 @@ void func_80066148(Class65650 *self)
     self->unk8C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066150);
+void func_80066150(Class65650 *self)
+{
+    self->methods->slotC4(self, -0x1E, 0);
+    if (self->unk64 == 1 && self->unk68 != NULL) {
+        self->unk68->methods->slot88(self->unk68, 6);
+    }
+}
 
 void func_800661C4(void) {
 }
@@ -111,7 +223,15 @@ void func_800661C4(void) {
 void func_800661CC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800661D4);
+void func_800661D4(Class65650 *self, void *arg1)
+{
+    UnkArg2Obj *obj;
+
+    obj = self->arg2;
+    if (obj != NULL) {
+        obj->methods->slot80(obj, arg1, 0x6E, 0x6E);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066214);
 
@@ -129,9 +249,26 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066340);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066748);
+void func_80066748(Class65650 *self, Class65650 *other)
+{
+    if (other != NULL) {
+        other->methods->slot10(other, self);
+        self->methods->slot10(self, other);
+        self->unk94 = other;
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800667B0);
+void func_800667B0(Class65650 *self)
+{
+    Class65650 *other;
+
+    other = self->unk94;
+    if (other != NULL) {
+        other->methods->slot14(other, self);
+        self->methods->slot14(self, self->unk94);
+        self->unk94 = NULL;
+    }
+}
 
 Class65650Methods *func_80066818(void)
 {
