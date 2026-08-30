@@ -91,6 +91,17 @@ struct Unk5CObj {
     Unk5CMethods *methods;
 };
 
+/* The constructor's `arg1` (forwarded through slot_setup5C into
+ * func_80065C5C): unidentified, only its +0x00C field is needed so far --
+ * a Unk5CObj* this class can either borrow (if already set) or allocate
+ * a fresh one of its own (via func_8004468C) and own outright. */
+typedef struct UnkArg1Obj {
+    u8 pad00[0x0C];
+    Unk5CObj *unk0C;
+} UnkArg1Obj;
+
+extern Unk5CObj *func_8004468C(UnkArg1Obj *arg);
+
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
     void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__func_17eb0, inherited -- used by func_80065B80 when its `val` == 4 */
@@ -105,7 +116,8 @@ typedef struct Class65650Methods {
     u8 padC8[0x2C];                                                        /* +0x0C8 .. +0x0F0, inherited/not yet needed */
     s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 func_80065BFC */
     void (*slot_teardown5C)(Class65650 *self);                              /* +0x0F8 func_80065C2C */
-    u8 padFC[0x08];                                                          /* +0x0FC .. +0x100, this unit's own slots (func_80065D64/DBC), not dispatched through here */
+    u8 padFC[0x04];                                                          /* +0x0FC, this unit's own slot (func_80065D64), not dispatched through here */
+    s32 (*slot100)(Class65650 *self);                                         /* +0x100 -- called by func_80065C5C on success (its own return value) */
     void (*slot_teardown70)(Class65650 *self);                                /* +0x104 func_80065DEC -- called by func_80065CEC */
     void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by func_80065B80 when its `val` == 2 */
     u8 pad10C[0x0C];                                                            /* +0x10C .. +0x114, not yet needed as a call target */
@@ -157,7 +169,7 @@ extern void *func_80017CFC(void *ptr);
  * (dispatched through slot_setup70/slot_teardown70). Neither E1C nor F2C
  * reference their own $a1 anywhere in their bodies, so they take only
  * `self`; C5C does use its own second argument (a1->0xC), so it keeps one. */
-extern s32 func_80065C5C(Class65650 *self, void *arg1);
+extern s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other);
 extern void func_80065CEC(Class65650 *self);
 extern s32 func_80065E1C(Class65650 *self);
 extern void func_80065F2C(Class65650 *self);

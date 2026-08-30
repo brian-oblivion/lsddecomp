@@ -103,7 +103,23 @@ void func_80065C2C(Class65650 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065C5C);
+s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other)
+{
+    if (other->unk0C != NULL) {
+        self->unk5C = other->unk0C;
+        self->unk60 = 0;
+    } else {
+        self->unk5C = func_8004468C(other);
+        self->unk60 = 1;
+    }
+    if (self->unk5C == NULL) {
+        goto fail;
+    }
+    return self->methods->slot100(self);
+fail:
+    func_80065CEC(self);
+    return 1;
+}
 
 void func_80065CEC(Class65650 *self)
 {
