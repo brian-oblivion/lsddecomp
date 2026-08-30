@@ -38,7 +38,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D7FC);
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D864);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetMoodEffect);
+void *Entity__GetMoodEffect(Entity *this) {
+    return &D_80089EA4[this->moodIndex * 0x10];
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetUnlockEffect);
 
