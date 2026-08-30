@@ -56,7 +56,12 @@ void func_8005D9F4(Entity *this) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DA3C);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DAAC);
+void func_8005DAAC(Entity *this, s32 arg1) {
+    if (arg1 != 0) {
+        this->methods->slot30(this, 9);
+    }
+    this->unkF4 = arg1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DAFC);
 
