@@ -71,7 +71,13 @@ void func_80065BF4(Class65650 *self, s32 value)
     self->unk64 = value;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065BFC);
+s32 func_80065BFC(Class65650 *self, void *arg1)
+{
+    if (self->unk5C != NULL) {
+        return 0;
+    }
+    return func_80065C5C(self, arg1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065C2C);
 

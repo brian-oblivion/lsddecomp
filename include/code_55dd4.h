@@ -84,4 +84,16 @@ extern Class65650Methods *func_80066818(void);
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
 
+/* Same-unit helpers called directly by name (still INCLUDE_ASM this round).
+ * func_80065C5C/func_80065CEC are the +0x5C sub-object's setup/teardown
+ * bodies (dispatched through slot_setup5C/slot_teardown5C); func_80065E1C/
+ * func_80065F2C are the +0x70/+0x74 arrays' setup/teardown bodies
+ * (dispatched through slot_setup70/slot_teardown70). Neither E1C nor F2C
+ * reference their own $a1 anywhere in their bodies, so they take only
+ * `self`; C5C does use its own second argument (a1->0xC), so it keeps one. */
+extern s32 func_80065C5C(Class65650 *self, void *arg1);
+extern void func_80065CEC(Class65650 *self);
+extern s32 func_80065E1C(Class65650 *self);
+extern void func_80065F2C(Class65650 *self);
+
 #endif
