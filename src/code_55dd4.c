@@ -90,7 +90,34 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065C5C);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065CEC);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065D64);
+s32 func_80065D64(Class65650 *self, s32 value)
+{
+    u8 *arr;
+    s32 count;
+    s32 i;
+    u8 target;
+    u8 unused[8];
+
+    if (self->unk74 == NULL) {
+        return -1;
+    }
+    arr = self->unk74;
+    __asm__("");
+    count = self->unk6C;
+    if (count <= 0) {
+        return -1;
+    }
+    i = 0;
+    target = (u8)value;
+    do {
+        if (*arr == target) {
+            return i;
+        }
+        i++;
+        arr++;
+    } while (i < count);
+    return -1;
+}
 
 s32 func_80065DBC(Class65650 *self)
 {

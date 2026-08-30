@@ -81,7 +81,7 @@ struct Class65650 {
     void *unk68;                   /* +0x68 zeroed in the constructor; consumed by func_80065830's tail (a pointer whose +0x20 is a callback arg) */
     s32 unk6C;                     /* +0x6C count, paired with the unk70/unk74 arrays */
     void *unk70;                   /* +0x70 array of item pointers, allocated by func_80065E1C */
-    void *unk74;                   /* +0x74 parallel byte array, allocated by func_80065E1C */
+    u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by func_80065E1C; linearly searched by func_80065D64 */
     u8 pad78[0x14];                 /* +0x78 .. +0x8B, not yet decoded */
 
     s32 unk8C;                     /* +0x8C boolean-ish flag; set to 0 by func_80066148, to 1 (and returned) by func_8006613C */
