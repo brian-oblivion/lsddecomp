@@ -57,7 +57,7 @@ typedef struct UnkArg2Obj {
 
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
-    void *unk04;                                                    /* +0x004 BasicClass__func_17eb0, inherited */
+    void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__func_17eb0, inherited -- used by func_80065B80 when its `val` == 4 */
     Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 class_65650__Constructor */
     void (*dtor)(Class65650 *self);                                   /* +0x00C func_8006573C */
     void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 func_800570B4, inherited -- "link" companion of slot14, see func_80066748 */
@@ -67,6 +67,8 @@ typedef struct Class65650Methods {
     u8 pad44[0xB0];                                                       /* +0x044 .. +0x0F0, inherited/not yet needed */
     s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 func_80065BFC */
     void (*slot_teardown5C)(Class65650 *self);                              /* +0x0F8 func_80065C2C */
+    u8 padFC[0x0C];                                                          /* +0x0FC .. +0x104, this unit's own slots (func_80065D64/DBC/DEC), not dispatched through here */
+    void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by func_80065B80 when its `val` == 2 */
 } Class65650Methods;
 
 /* Object size is 0x98 (from the allocator call in New_class_65650). Field

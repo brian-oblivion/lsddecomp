@@ -64,7 +64,15 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065AE0);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065B80);
+void func_80065B80(Class65650 *self, void *arg1, s32 val)
+{
+    if (val == 2) {
+        self->methods->slot108(self);
+    }
+    if (val == 4) {
+        self->methods->slot04(self);
+    }
+}
 
 void func_80065BF4(Class65650 *self, s32 value)
 {
