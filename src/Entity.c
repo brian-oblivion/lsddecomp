@@ -5,6 +5,7 @@
  * exposed to the gp-relative blocker (docs/research/gp-relative-blocker.md).
  */
 #include "common.h"
+#include "Entity.h"
 
 INCLUDE_ASM("asm/nonmatchings/Entity", New_Entity);
 
@@ -26,7 +27,10 @@ INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D560);
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D658);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D6D4);
+void func_8005D6D4(Entity *this) {
+    func_8002CD08(this->unk58, this->unk9C);
+    this->unkFC++;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D714);
 
@@ -34,7 +38,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D7FC);
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D864);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetMoodEffect);
+void *Entity__GetMoodEffect(Entity *this) {
+    return &D_80089EA4[this->moodIndex * 0x10];
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetUnlockEffect);
 
@@ -42,15 +48,29 @@ INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetLinkStage);
 
 INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetEventVideo);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D9F4);
+void func_8005D9F4(Entity *this) {
+    this->methods->slot60(this, 1);
+    this->unkF0 = 1;
+    this->unk24 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DA3C);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DAAC);
+void func_8005DAAC(Entity *this, s32 arg1) {
+    if (arg1 != 0) {
+        this->methods->slot30(this, 9);
+    }
+    this->unkF4 = arg1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DAFC);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DB8C);
+void func_8005DB8C(Entity *this) {
+    func_8002CC84(this->unk58, this->unk9C);
+    this->methods->slot130(this);
+    this->methods->slot114(this);
+    this->unkF8 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DBF0);
 
