@@ -1,6 +1,78 @@
 # strcat
 
-**Unit:** code_171e0 · **Size:** 42 instructions (0xA8 bytes) · **Status:** STALLED, best 16/42 in-range, class DELAY-SLOT-FILLER DUPLICATION
+**Unit:** code_171e0 · **Size:** 42 instructions (0xA8 bytes) · **Status:**
+STALLED at **41/42**, class REDUNDANT DELAY-SLOT VALUE DUPLICATION (one
+instruction).
+
+> **HEAD ADJUDICATION, round 2026-08-30-a.** The runner filed this at 16/42 and
+> classified the whole residue as an unreachable compiler-internal choice. That
+> classification was **wrong for the larger of the two gaps**, and the head
+> reached 41/42 by changing the source. Everything below the runner's byline is
+> its original text, kept because its derivation and its ruled-out attempts are
+> still accurate and still useful; read this section first for what actually
+> holds. See "Head adjudication" immediately below.
+
+## Head adjudication — most of this was source-reachable
+
+The runner's own diff contained the evidence that its classification was too
+broad, and it is worth naming the tell, because it generalises.
+
+**The two branches had DIFFERENT TARGETS, not just different delay slots.**
+
+```
+retail:  beqz v0,17998        <- targets the `addiu s1,s1,-1` fixup
+         addiu s1,v1,1            and undoes the increment on the taken path
+mine:    beqz v0,179a0        <- targets PAST the fixup, skipping it
+         nop
+         addiu s1,s1,1
+```
+
+A differing delay slot is a scheduler choice. A differing branch *target* is a
+different control-flow graph, and a different CFG comes from different source.
+That is the discriminator: **before classifying a residue as a scheduler whim,
+check whether the branch targets agree.** If they do not, the source shape is
+still wrong and there is nothing compiler-internal about it yet.
+
+Here the CFG says retail increments the scan pointer **unconditionally** and
+then backs it up, which is the post-increment idiom, not the pre-test one:
+
+```c
+while (*dest) {     /* runner's shape  -> 16/42 */
+    dest++;
+}
+
+while (*dest++) {   /* retail's shape  -> 41/42 */
+}
+dest--;
+```
+
+That single change is worth **25 words**. With it, every instruction in the
+function matches retail except one.
+
+### What actually remains: one redundant move
+
+```
+retail:  jal 13348 / move a0,s1     ($a0 already holds dest; retail restates it)
+mine:    jal 13348 / nop
+```
+
+This *is* the class the runner named, and its reasoning about this half stands:
+same register, same value, retail's delay-slot filler restates an already-live
+value and ours does not. It is now isolated to exactly one instruction, which
+makes it directly comparable to `new_class_6d3c8` (23/24, one instruction, same
+phenomenon).
+
+Nine further source shapes were built against the 41/42 body and none moved it:
+`__asm__("")` before the overlap check, inside the taken branch, a named
+temporary for the first length, combined null checks, `!=`-negated and
+subtraction-form guards, and assigning `origDest` before the checks. Two made it
+much worse (`origDest` hoisted to the top, 22/42; the overlap check written
+through `origDest`, 3/42), which is itself informative — it confirms retail
+copies the original pointer *after* the guard, in the `beq` delay slot.
+
+**Disposition.** Restored to `INCLUDE_ASM`; 41/42 is not a match and no score
+short of byte-exact may stay in `src/`. This is now the project's best-posed
+permuter target: two instances, both one instruction, both the same phenomenon.
 
 ## What it does
 
@@ -37,6 +109,10 @@ two isolated missing/differently-filled delay slots, not a structural or
 register-identity problem.
 
 ## Residue — two delay-slot-filler gaps, not register or control-flow bugs
+
+> **SUPERSEDED IN PART.** Gap 2 below was not a delay-slot-filler gap; it was a
+> different CFG, and the post-increment scan loop closes it. Gap 1 stands.
+> Kept for the record because the instruction-level reading is accurate.
 
 Read with `tools/asm-differ/diff.py strcat` at the best (16/42) attempt:
 
@@ -78,6 +154,9 @@ is 1 word and after both it is netted against retail's own count correctly
 
 ## Why this is classified TOOLCHAIN/COMPILER-INTERNAL, not a reshaping target
 
+> **SUPERSEDED.** This section's conclusion was wrong for Gap 2, which was
+> reachable from C and is now closed. It remains correct for Gap 1 alone.
+
 Both gaps are the same phenomenon documented in
 `docs/match-reports/new_class_6d3c8.md` (a different unit, `code_1677c`,
 found independently by a different runner): GCC 2.6.3's `-O2` delay-slot
@@ -91,6 +170,10 @@ larger (42-word) body with three-way branching, guard clauses, and two
 independent loops — strictly harder terrain for the same problem.
 
 ## Attempts tried (did not change the residue)
+
+> These were all run against the 16/42 scan-loop shape. They are still valid
+> negative results about the guard and the two `strlen` calls, which the 41/42
+> body keeps unchanged.
 
 1. Named `s32 lenDest, lenSrc;` locals for both `strlen` results, then
    `if (dest + lenDest == src + lenSrc)` — worse (11/42): forces GCC to spill
@@ -131,10 +214,12 @@ consistent with the finding in `new_class_6d3c8.md` that this residue class
 does not yield to `if`/`goto`/`return` spelling, temp-variable placement, or
 scheduling barriers.
 
-## Preserved body
+## Preserved body (41/42 — the head's shape, supersedes the runner's 16/42)
 
 ```c
 #if 0
+/* include/code_171e0.h already declares:  extern s32 func_80013348(char *s); */
+
 char *strcat(char *dest, char *src) {
     char *origDest;
 
@@ -148,9 +233,9 @@ char *strcat(char *dest, char *src) {
         goto fail;
     }
     origDest = dest;
-    while (*dest) {
-        dest++;
+    while (*dest++) {
     }
+    dest--;
     while ((*dest++ = *src++) != 0) {
     }
     return origDest;
@@ -160,9 +245,8 @@ fail:
 #endif
 ```
 
-(`func_80013348` is declared `extern s32 func_80013348(char *s);` in
-`include/code_171e0.h`; it's a still-uncarved helper, address only, shaped
-like `strlen`.)
+The runner's original body differed from this only in the scan loop
+(`while (*dest) { dest++; }`) and scored 16/42.
 
 ## Head broadcast levers — applicability
 
@@ -195,15 +279,23 @@ like `strlen`.)
 
 ## Proposed learning
 
-This is the **second** independent instance (after `new_class_6d3c8` in
-`code_1677c`) of GCC 2.6.3's delay-slot filler duplicating (or failing to
-duplicate) an already-live register value, with no source-level lever found
-across a combined 20+ attempts between the two functions. Promoting this to
-a named residue class is worth doing project-wide: **"redundant delay-slot
-value duplication"** — same value, same register, retail either restates it
-or doesn't, and neither restating it manually (impossible without banned
-register pins) nor barriers nor control-flow reshaping moves it. Per
-`new_class_6d3c8.md`'s own conclusion, this is the strongest candidate for
-the project's first permuter target once set up — and now has two known
-occurrences to validate any candidate fix against, in two different units,
-found by two different runners.
+**Check whether the branch TARGETS agree before classifying a residue as a
+scheduler or delay-slot choice.** A differing delay slot is a scheduling
+artifact; a differing branch target is a differing control-flow graph, and a
+differing CFG always comes from the source. Here that distinction was worth 25
+words, and reading past it produced a confident "compiler-internal, unreachable"
+classification for a residue that a one-line source change closed.
+
+**`while (*p) { p++; }` and `while (*p++) { } p--;` are different code.** The
+post-increment idiom increments unconditionally and backs up at the merge, so
+its guard branch targets the fixup; the pre-test idiom skips it. When retail's
+guard branch jumps to an `addiu rN,rN,-1`, the source used post-increment.
+
+**A genuinely isolated one-instruction residue class now has two instances.**
+Retail's delay-slot filler restates an already-live value (`move a0,s1` where
+`$a0` already holds it); ours emits `nop`. Same register, same value, no
+control-flow difference, and the branch targets agree — which is what makes
+this one a real instance of the class rather than a misread. See
+`new_class_6d3c8.md` (23/24) for the other. Both are one instruction, both
+resist reshaping and barriers, and together they are the project's best-posed
+permuter target.
