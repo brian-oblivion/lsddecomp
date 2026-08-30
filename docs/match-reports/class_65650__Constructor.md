@@ -1,0 +1,86 @@
+# class_65650__Constructor
+
+**Unit:** code_55dd4 · **Size:** 59 words (0xEC bytes) · **Status:** MATCHED
+(59/59 words, whole-image `./build-and-verify.sh` green)
+
+## What it does
+
+The constructor for the class at method table `D_8008A6C4` (see
+`include/code_55dd4.h` for the resolved inheritance:
+`BasicClass -> D_800878D4 (intermediate, header 0x34) -> this class`).
+Signature `(self, arg1, arg2)`, matching `New_class_65650`'s call. Sequence:
+
+1. Call the base class's constructor through its own vtable, slot `+0x008`
+   (`func_80057C84()->ctor(self)`, per `docs/research/class-framework.md`'s
+   "base constructor called through the base table's slot +0x008" shape). If
+   it returns `NULL`, bail out immediately (no partial teardown needed —
+   nothing of this class's own has been touched yet).
+2. Install this class's own vtable (`func_80066818()`, a `Get_vtable`-style
+   accessor — **called, not inlined as `&D_8008A6C4` directly**, because
+   retail's own bytes are a `jal` to that function, not a `lui`/`addiu`).
+3. Field init: `self->arg2 = arg2` (the constructor's own third parameter,
+   stashed verbatim at `+0x58`); zero `+0x5C`, `+0x68`, `+0x70`, `+0x94`.
+4. Call `self->methods->slot_setup5C(self, arg1)` (`+0x0F4`, still
+   `INCLUDE_ASM` this round as `func_80065BFC`) — forwarding the
+   constructor's own `arg1` through. If it returns nonzero (failure), roll
+   back: fetch the base table *again* (a second, independent
+   `func_80057C84()` call — retail really does call it twice, not cache the
+   first result) and call its dtor slot, then return `NULL`.
+5. On success, call `self->methods->slot10(self, self->unk5C)` (`+0x010`,
+   inherited from the base, not overridden here) and
+   `self->methods->slot40(self)` (`+0x040`, this class's own override,
+   `func_80065830`, still `INCLUDE_ASM`), then return `self`.
+
+```c
+Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
+{
+    D800878D4Methods *base;
+
+    base = func_80057C84();
+    if (base->ctor(self) == NULL) {
+        return NULL;
+    }
+    self->methods = func_80066818();
+    self->arg2 = arg2;
+    self->unk5C = NULL;
+    self->unk68 = NULL;
+    self->unk70 = NULL;
+    self->unk94 = 0;
+    if (self->methods->slot_setup5C(self, arg1) != 0) {
+        base = func_80057C84();
+        base->dtor(self);
+        return NULL;
+    }
+    self->methods->slot10(self, self->unk5C);
+    self->methods->slot40(self);
+    return self;
+}
+```
+
+Matched with no reshaping at all beyond the direct translation above — no
+`goto`, no scheduling barrier. Both early-exit branches (`base->ctor` failure,
+`slot_setup5C` failure) are plain `if (...) return NULL;`, and both matched
+byte-exact on the first successful build.
+
+## Notes on the header
+
+The struct/vtable derivation is in `include/code_55dd4.h`. Key point for
+future work in this unit: `self->methods->ctor`/`slot_setup5C`/etc. are
+**vtable slots**, resolved indirectly at runtime; calling into
+`func_80065BFC` (`slot_setup5C`) and `func_80065830` (`slot40`), both still
+`INCLUDE_ASM`, required **no forward `extern` prototype for those functions
+by name** — the call goes through a typed function-pointer field in
+`Class65650Methods`, so only the struct's field type needs to be right, not
+a direct declaration of the not-yet-matched function. This is cheaper than
+the "calling into a function that is still `INCLUDE_ASM`" pattern in
+CLAUDE.md, which applies to *direct* `jal`-by-name calls (like
+`func_80057C84` here), not vtable dispatch.
+
+### Proposed learning
+
+When a constructor/method calls another slot of its OWN class's vtable (not
+a base-class slot), you do not need an extern prototype for the not-yet-
+matched target function — type the vtable struct's field correctly and let
+the indirect call go through `self->methods->slotN(...)`. This sidesteps the
+whole "forward declaration for a same-unit INCLUDE_ASM callee" question for
+every method-table dispatch, which is most calls in this class framework.

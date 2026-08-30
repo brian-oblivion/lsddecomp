@@ -22,7 +22,29 @@ void *New_class_65650(void *arg1, void *arg2)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", class_65650__Constructor);
+Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
+{
+    D800878D4Methods *base;
+
+    base = func_80057C84();
+    if (base->ctor(self) == NULL) {
+        return NULL;
+    }
+    self->methods = func_80066818();
+    self->arg2 = arg2;
+    self->unk5C = NULL;
+    self->unk68 = NULL;
+    self->unk70 = NULL;
+    self->unk94 = 0;
+    if (self->methods->slot_setup5C(self, arg1) != 0) {
+        base = func_80057C84();
+        base->dtor(self);
+        return NULL;
+    }
+    self->methods->slot10(self, self->unk5C);
+    self->methods->slot40(self);
+    return self;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_8006573C);
 
