@@ -1,5 +1,23 @@
 # Entity__GetUnlockEffect
 
+> **HEAD ADJUDICATION, round 2026-08-30-a.** The diagnosis in this report is
+> CORRECT and the head reproduced it independently from scratch. It is now
+> written up project-wide in **`docs/research/addiu-at-blocker.md`**, with an
+> isolated reproducer and a corpus census: retail uses the unfolded (`addiu_at`)
+> form for **502 of 502** runtime-indexed global accesses across 39 files, and
+> the folded form **zero** times. There is no counterexample anywhere in the
+> executable.
+>
+> **One correction to the proposed remedy.** Repinning `--aspsx-version` to 2.29
+> is not surgical and should not be presented as the fix. `config_for_aspsx_version`
+> flips **four** flags below 2.30, not one — `addiu_at` plus three nop-insertion
+> rules (`nop_at_expansion`, `nop_mflo_mfhi`, `nop_lw_lw`) that affect constructs
+> throughout the image, including inside the 57 functions that currently match.
+> maspsx exposes no `--addiu-at` flag, so the behaviour cannot be enabled alone
+> without patching maspsx. This is the same shape as the already-rejected `-G`
+> experiment. See the research document; the ruling is the operator's.
+
+
 **Unit:** Entity · **Size:** 14 instructions · **Status:** STALLED, class TOOLCHAIN (maspsx `addiu_at` macro-expansion mismatch)
 
 ## What it does
