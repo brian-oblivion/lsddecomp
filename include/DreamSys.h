@@ -169,8 +169,8 @@ typedef struct DreamSys {
 	   to 1 by func_80059B50 (round 2026-08-30). */
 	s32 unk_0xA0;
 	s8 unknown_values_0xA4[4];
-	/* (unk_0xA0 == 1) as computed by func_800598E8; cleared by
-	   func_80059A1C when unk_0xA0 is 0 (round 2026-08-30). */
+	/* (unk_0xA0 == 1) as computed by func_800598E8; unconditionally cleared
+	   to 0 by func_80059A1C on every call (round 2026-08-30). */
 	s32 unk_0xA8;
 	s8 unknown_values_0xAC[24];
 	/* Set to 1 by func_800596E8's arg1==2 case, alongside unk_0xC8 and
