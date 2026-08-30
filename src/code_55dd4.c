@@ -1,5 +1,6 @@
-/* 34 queued. DELIBERATELY UNWORKED in round 2026-08-29-a: five runners
- * were staffed elsewhere, not because this unit is hard. Next round's first pick.
+/* 34 queued, all fresh. Offered to runners in round 2026-08-30-a; no longer
+ * banked. No function in this unit touches a %gp_rel global, so none of it is
+ * exposed to the gp-relative blocker (docs/research/gp-relative-blocker.md).
  */
 #include "common.h"
 
