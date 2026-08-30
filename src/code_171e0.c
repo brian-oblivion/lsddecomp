@@ -57,7 +57,19 @@ void func_80026B08(UnkFlagsObj_171e0 *this, s32 arg1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026C20);
+void func_80026C20(UnkFlagsObj_171e0 *this) {
+    if (this->unk10 == NULL) {
+        return;
+    }
+    if (this->unk14 == 0) {
+        return;
+    }
+    if (this->unk20 != 0) {
+        return;
+    }
+    func_80017CFC(this->unk10);
+    this->unk10 = NULL;
+}
 
 void func_80026C80(void) {
 }
