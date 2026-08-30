@@ -81,7 +81,25 @@ s32 func_80026328(void) {
     return func_8004A070(0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026348);
+/* Optional stream-task init block, gated by self->arg->unk08 (the same
+ * shape as func_80026170's self->arg->unk0C gate, minus the two
+ * func_80026254 loader-task calls, and using func_8004913C instead of
+ * func_800490F4 to derive the type code). */
+void func_80026348(Class6D3C8 *self) {
+    s32 derivedValue;
+    s32 typeCode;
+    s32 typeLookup;
+    StreamTask *task;
+
+    if (self->arg->unk08 != 0) {
+        func_80026F34(0, 0, 0);
+        task = func_8003B854(0, 0, 0, 0);
+        derivedValue = func_8004913C(&typeCode, 0);
+        typeLookup = func_800493C8(typeCode);
+        task->methods->slot44(task, self->unk1C, derivedValue, typeLookup, 1);
+        task->methods->slot4(task);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026410);
 

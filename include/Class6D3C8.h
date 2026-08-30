@@ -52,11 +52,11 @@ extern MiddleClassMethods *func_8003B20C(void);
  * rest stays opaque padding until another caller needs it. */
 typedef struct Class6D3C8CtorArgs {
     s32 unk00;                 /* +0x00, passed as the base ctor's own arg */
-    u8 unk04[8];                /* +0x04 .. +0x0B, not yet decoded */
-    void *unk0C;                  /* +0x0C, gates func_80026170's whole body (and,
-                                      going by its shape, likely func_80026348's too) */
-    u8 unk10[4];                    /* +0x10 .. +0x13, not yet decoded */
-    s32 unk14;                        /* +0x14, passed into the DreamSys call */
+    u8 unk04[4];                /* +0x04 .. +0x07, not yet decoded */
+    void *unk08;                  /* +0x08, gates func_80026348's whole body */
+    void *unk0C;                    /* +0x0C, gates func_80026170's whole body */
+    u8 unk10[4];                      /* +0x10 .. +0x13, not yet decoded */
+    s32 unk14;                          /* +0x14, passed into the DreamSys call */
 } Class6D3C8CtorArgs;
 
 typedef struct Class6D3C8 Class6D3C8;
@@ -83,7 +83,7 @@ typedef struct Class6D3C8Methods {
     void *unk48;                                            /* +0x048 func_8003B108 */
     void *unk4C;                                            /* +0x04C func_8003B110 */
     void (*slot50)(Class6D3C8 *self);                       /* +0x050 func_80026170 */
-    void *slot54;                                           /* +0x054 func_80026348 */
+    void (*slot54)(Class6D3C8 *self);                       /* +0x054 func_80026348 */
     void *slot58;                                           /* +0x058 func_80026410 */
     void (*slot5C)(void);                                   /* +0x05C func_80026690 */
     void *slot60;                                           /* +0x060 func_80026698 */
@@ -151,7 +151,8 @@ extern StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3);
 
 extern void func_80026F34(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there */
 extern const char *func_800490F4(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &D_800113DC */
-extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index]; return unused at this call site */
+extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index] */
+extern s32 func_8004913C(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides func_80048CFC's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
 extern const char D_800107B4[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char D_800107C8[]; /* "ETC\OSDLOGO.TIM" */
