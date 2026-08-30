@@ -195,7 +195,17 @@ void func_80066748(Class65650 *self, Class65650 *other)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800667B0);
+void func_800667B0(Class65650 *self)
+{
+    Class65650 *other;
+
+    other = self->unk94;
+    if (other != NULL) {
+        other->methods->slot14(other, self);
+        self->methods->slot14(self, self->unk94);
+        self->unk94 = NULL;
+    }
+}
 
 Class65650Methods *func_80066818(void)
 {
