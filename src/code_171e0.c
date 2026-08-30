@@ -26,7 +26,10 @@ void func_80026A50(UnkFlagsObj_171e0 *this) {
     this->unk2A = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026AB4);
+void *func_80026AB4(UnkFlagsObj_171e0 *this) {
+    this->methods->slot48(this);
+    return this->methods->slot5C(this);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026B08);
 
