@@ -92,7 +92,13 @@ INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065CEC);
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065D64);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065DBC);
+s32 func_80065DBC(Class65650 *self)
+{
+    if (self->unk70 != NULL) {
+        return 0;
+    }
+    return func_80065E1C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065DEC);
 
