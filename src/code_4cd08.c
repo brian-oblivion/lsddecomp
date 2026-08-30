@@ -1,4 +1,38 @@
 #include "common.h"
+#include "code_4cd08.h"
+
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_8005C508.md. Best reached:
+ * 40/56 words (0x4CD08-0x4CDE8). Everything matches byte-for-byte except one
+ * extra retail instruction materializing &D_80088D28[i] as a full absolute
+ * address (lui+addiu) before adding the running byte offset, where every
+ * source shape tried here folds %lo(D_80088D28) into the store's own
+ * displacement instead, making the function 4 bytes short and shifting
+ * everything after it. If reused, this needs
+ * const char D_8001186C[] = "ETC\\SYMSPY.MOM";
+ * const char D_8001187C[] = "ETC\\SYMDOG.MOM";
+ * defined ahead of it (see the report for why).
+ */
+void func_8005C508(void)
+{
+    DreamAuxLoadReq req;
+    u32 i;
+    s32 j;
+
+    for (i = 0; i < 14; i++) {
+        for (j = 0; j < D_80089A7C[i]; j++) {
+            D_80089A44[i][j].flag = 0;
+        }
+    }
+
+    func_80026CE8(&req, 0, D_8001186C, 1);
+
+    for (i = 0; i < 1; i++) {
+        D_80088D28[i].obj = func_8004468C(&req);
+        req.name = D_8001187C;
+    }
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C508);
 
