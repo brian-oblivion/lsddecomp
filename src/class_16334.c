@@ -1,7 +1,18 @@
 #include "common.h"
 #include "class_16334.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025B34);
+Pad *func_80025B34(void *arg1, s32 port) {
+    Pad *self;
+
+    self = func_80017B34(0x20);
+    if (self == NULL) {
+        goto fail;
+    }
+    func_80025E9C()->ctor(self, arg1, port);
+    return self;
+fail:
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_16334", func_80025BA0);
 

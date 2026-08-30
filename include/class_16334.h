@@ -71,7 +71,7 @@ typedef struct BasicClassMethods {
 } BasicClassMethods;
 
 extern BasicClassMethods *func_80018390(void);
-extern void *func_80017B34(s32 size, s32 zone);
+extern void *func_80017B34(s32 size);
 
 /* Psy-Q Pad library helpers (asm/psyq_PadInit.s, uncarved). */
 extern void func_80025EAC(void *arg1);
