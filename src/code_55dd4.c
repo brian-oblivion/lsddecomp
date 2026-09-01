@@ -232,7 +232,22 @@ void func_80065F2C(Class65650 *self)
     self->unk70 = func_80017CFC(self->unk70);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065FD8);
+void func_80065FD8(Class65650 *self)
+{
+    self->unk24 = self->unk24 + 1;
+    if (self->unk8C != 0) {
+        ((void (*)(void))self->unk78)();
+    }
+    if (self->unk90 != 0 && self->unk80 >= 2) {
+        self->unk88 = self->methods->slot134(self, self->unk88, 0);
+        self->unk84 = self->unk84 + 1;
+        if (self->unk84 >= self->unk80) {
+            self->unk84 = 0;
+            self->unk88 = (u8 *)(*(GroupObj **)(self->unk5C->unk30->arr + 8 + self->unk7C * 4))->entry + 8;
+        }
+    }
+    *self->unk14 = 0;
+}
 
 void func_800660BC(Class65650 *self, s32 value)
 {

@@ -183,7 +183,7 @@ typedef struct Class65650Methods {
     void (*slot128)(Class65650 *self, s32 arg);                                    /* +0x128 -- called by func_80065830 as slot128(self, 0) */
     u8 pad12C[0x04];                                                                /* +0x12C .. +0x12F, this unit's own slot, not dispatched through here */
     void (*slot130)(Class65650 *self);                                               /* +0x130 -- called by func_80065830 as slot130(self) */
-    void (*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by func_80066214 as slot134(self, self->unk88, 0) */
+    u8 *(*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by func_80066214 (which discards the return -- legal for any return type, not evidence it's void) and by func_80065FD8, which DOES consume it (self->unk88 = self->methods->slot134(self, self->unk88, 0)), confirming the return type is u8 * to match self->unk88's own type */
     void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
     void (*slot13C)(Class65650 *self, Class65650 *other);                            /* +0x13C func_80066748, this unit's own -- confirmed as a real dispatch target by func_80065918's self->methods->slot13C(self, arg1) call; func_80066748's own signature (self, other) matches */
     void (*slot140)(Class65650 *self);                                               /* +0x140 func_800667B0 -- called by func_800659D0 */
@@ -195,7 +195,11 @@ struct Class65650 {
     Class65650Methods *methods;   /* +0x00 */
     u8 pad04[0x08];                  /* +0x04 .. +0x0B, BasicClass/intermediate-class instance fields, not this unit's to name */
     s32 unk0C;                       /* +0x0C guard flag gating func_800659D0's whole body (slot140/slot14/base-slot50 cleanup); parallels DreamSys's own unk_0xC gate field in the SAME shared base class, though not proven equivalent */
-    u8 pad10[0x40];                   /* +0x10 .. +0x4F, not this unit's to name */
+    u8 pad10[0x04];                   /* +0x10 .. +0x13, not this unit's to name */
+    s32 *unk14;                        /* +0x14 pointer whose first word func_80065FD8 unconditionally zeroes on every call (*self->unk14 = 0) */
+    u8 pad18[0x0C];                     /* +0x18 .. +0x23, not this unit's to name */
+    s32 unk24;                           /* +0x24 counter, incremented unconditionally by func_80065FD8 on every call */
+    u8 pad28[0x28];                       /* +0x28 .. +0x4F, not this unit's to name */
     Class65650 *unk50;                 /* +0x50 companion-object pointer, unlinked via slot14 in func_800659D0 when set -- a second link slot distinct from unk94's */
     u8 pad54[0x04];                     /* +0x54 .. +0x57, not this unit's to name */
 
