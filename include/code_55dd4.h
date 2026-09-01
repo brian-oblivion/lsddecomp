@@ -44,6 +44,8 @@ typedef struct D800878D4Methods {
     void (*slot38)(Class65650 *self, void *arg1, s32 arg2); /* +0x038 -- called by func_80065790 as slot38(self, arg1, arg2) */
     u8 pad3C[0x14];                                         /* +0x03C .. +0x04C, not yet needed */
     void (*slot50)(Class65650 *self);                       /* +0x050 -- called by func_800659D0 */
+    u8 pad54[0x1C];                                          /* +0x054 .. +0x06F, not yet needed */
+    void (*slot70)(Class65650 *self, void *arg);              /* +0x070 -- called by func_80065AE0 via func_80057C84()->slot70(self, arg) */
 } D800878D4Methods;
 
 extern D800878D4Methods *func_80057C84(void);
@@ -86,6 +88,8 @@ typedef struct Unk68Obj {
 typedef struct Unk70ElemMethods {
     u8 pad00[0x60];                          /* +0x000 .. +0x05C, unknown */
     void (*slot60)(void *self, void *arg);    /* +0x060 */
+    u8 pad64[0x0C];                            /* +0x064 .. +0x06C, unknown */
+    void (*slot70)(void *self, void *arg);      /* +0x070 -- called by func_80065AE0's loop, same signature as slot60 */
 } Unk70ElemMethods;
 
 typedef struct Unk70ElemObj {
