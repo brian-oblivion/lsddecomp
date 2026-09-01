@@ -425,7 +425,15 @@ void DreamSys__InitSpawnLoc(DreamSys *this)
 	this->unknwon_int_0x44 = 0xB;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__DynamicLink);
+void DreamSys__DynamicLink(DreamSys *this)
+{
+	s32 stage;
+
+	if (this->unknwon_int_0x44 == 0) {
+		stage = GetRandomSpawnFromStage(&this->linkCoordinates, this->currentStage, this->dreamTimer);
+		ExecuteLink(this, stage, 0xC, 1);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StaticWallLink);
 
