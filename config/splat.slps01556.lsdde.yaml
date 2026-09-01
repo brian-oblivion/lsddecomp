@@ -127,10 +127,15 @@ segments:
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
       # one runner may own a unit. Carved in slices; the remainder stays
-      # `asm` until someone needs it. 0x4E618 is a real function boundary
-      # (func_8005DE18), checked against the glabel list.
+      # `asm` until someone needs it. Both 0x4E618 (func_8005DE18) and
+      # 0x4F754 (func_8005EF54) are real function boundaries, checked
+      # against the glabel list: each allocates its own frame before it
+      # touches $sp, and the function before it ends in a `jr $ra`.
+      # Entity_b carries NO switch jump tables -- the whole 117-function
+      # block had zero `jlabel`s -- so no rodata slot needed attaching.
       - [0x4D7DC, c, Entity]
-      - [0x4E618, asm, Entity_b]
+      - [0x4E618, c, Entity_b]
+      - [0x4F754, asm, Entity_c]
       - [0x55DD4, c, code_55dd4]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
