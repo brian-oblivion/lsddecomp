@@ -114,6 +114,15 @@ void func_8004A35C(void) {
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A364);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A3EC);
+/* ClassA::onEvent (+0x060), shared with ClassB -- forwards to ClassA's own
+ * base implementation of this same slot (reached through func_8003E5C8),
+ * then on event 4 marks the output flag and notifies slot7C. */
+void func_8004A3EC(ClassA *self, s32 event) {
+    func_8003E5C8()->onEvent(self, event);
+    if (event == 4) {
+        self->unk28 = 1;
+        self->methods->slot7C(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A458);
