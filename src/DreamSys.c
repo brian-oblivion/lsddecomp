@@ -43,7 +43,18 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__WallLink);
 void func_800590E0(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800590E8);
+s32 func_800590E8(DreamSys *this, DreamColors *out, s32 value)
+{
+	s32 old;
+
+	old = this->isFlashbackSession;
+	if (value < 0) {
+		*out = CalcDreamColor(&this->moodPreviousDays[this->currentDay]);
+	} else {
+		this->isFlashbackSession = value;
+	}
+	return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059148);
 
