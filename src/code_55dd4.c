@@ -52,7 +52,16 @@ void func_8006573C(Class65650 *self)
     func_80057C84()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065790);
+void func_80065790(Class65650 *self, TagCheckArg *arg1, s32 arg2)
+{
+    D800878D4Methods *base;
+
+    base = func_80057C84();
+    base->slot38(self, arg1, arg2);
+    if (arg1->tagged->tag == 0x5F03 && arg2 == 1 && self->unk60 == 0) {
+        self->methods->slot04(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065830);
 

@@ -40,11 +40,24 @@ typedef struct D800878D4Methods {
     void (*slot10)(void *self, void *arg);             /* +0x010 func_800570B4 */
     void *unk14;                                        /* +0x014 func_80057130 */
     void *unk18;                                         /* +0x018 func_800571A8 */
-    u8 pad1C[0x34];                                       /* +0x01C .. +0x04C, not yet needed */
+    u8 pad1C[0x1C];                                       /* +0x01C .. +0x037, not yet needed */
+    void (*slot38)(Class65650 *self, void *arg1, s32 arg2); /* +0x038 -- called by func_80065790 as slot38(self, arg1, arg2) */
+    u8 pad3C[0x14];                                         /* +0x03C .. +0x04C, not yet needed */
     void (*slot50)(Class65650 *self);                       /* +0x050 -- called by func_800659D0 */
 } D800878D4Methods;
 
 extern D800878D4Methods *func_80057C84(void);
+
+/* func_80065790's `arg1`: unidentified, only its own +0x000 field (itself
+ * a pointer) is needed so far -- that pointed-at object's +0x000 field is
+ * a u16 "type tag", checked against the magic value 0x5F03. */
+typedef struct TaggedObj {
+    u16 tag;   /* +0x000 */
+} TaggedObj;
+
+typedef struct TagCheckArg {
+    TaggedObj *tagged;   /* +0x000 */
+} TagCheckArg;
 
 /* Whatever class self->arg2 (below) points at: unidentified, only its
  * vtable slot +0x080 is needed so far, by func_800661D4. */
@@ -87,8 +100,34 @@ typedef struct Unk5CMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     Unk5CObj *(*slot4)(Unk5CObj *self);       /* +0x004 */
 } Unk5CMethods;
+
+/* self->unk5C->unk30's element chain (func_80066214 only):
+ * Unk30Obj->arr is a header pointer; the element array itself starts 8
+ * bytes past it (array[i] = *(GroupObj **)(arr + 8 + i * 4)). Each
+ * GroupObj's own +0x10 field is an EntryObj*, whose +0x4 field is the
+ * scalar func_80066214 copies into self->unk80, and whose address + 8
+ * (NOT its +0x8 field's value -- the pointer itself, offset) is what
+ * self->unk88 is set to, i.e. "the start of this entry's own inline data,
+ * same +8-past-a-2-word-header shape yet again". */
+typedef struct EntryObj2 {
+    u8 pad00[0x04];
+    s32 unk4;            /* +0x004 -- copied verbatim into self->unk80 */
+} EntryObj2;
+
+typedef struct GroupObj {
+    u8 pad00[0x10];
+    EntryObj2 *entry;    /* +0x010 */
+} GroupObj;
+
+typedef struct Unk30Obj {
+    u8 pad00[0x10];
+    u8 *arr;             /* +0x010 -- element i lives at *(GroupObj **)(arr + 8 + i * 4) */
+} Unk30Obj;
+
 struct Unk5CObj {
-    Unk5CMethods *methods;
+    Unk5CMethods *methods;   /* +0x00 */
+    u8 pad04[0x2C];            /* +0x04 .. +0x2F, not this unit's to name */
+    Unk30Obj *unk30;            /* +0x30 -- func_80066214's index table, see Unk30Obj above */
 };
 
 /* The constructor's `arg1` (forwarded through slot_setup5C into
@@ -124,7 +163,8 @@ typedef struct Class65650Methods {
     void *slot118;                                                              /* +0x118 -- only ever taken as a pointer VALUE (func_800660BC), never called from this unit, so left untyped-as-function */
     void *slot11C;                                                               /* +0x11C ditto */
     void *slot120;                                                               /* +0x120 ditto */
-    u8 pad124[0x14];                                                             /* +0x124 .. +0x134, this unit's own slots, not dispatched through here */
+    u8 pad124[0x10];                                                             /* +0x124 .. +0x133, this unit's own slots, not dispatched through here */
+    void (*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by func_80066214 as slot134(self, self->unk88, 0) */
     void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
     u8 pad13C[0x04];                                                                /* +0x13C func_80066748, this unit's own, not dispatched through here */
     void (*slot140)(Class65650 *self);                                               /* +0x140 func_800667B0 -- called by func_800659D0 */
@@ -149,7 +189,11 @@ struct Class65650 {
     Unk70ElemObj **unk70;           /* +0x70 array of item pointers, allocated by func_80065E1C; each element's own slot +0x060 is invoked (element, arg) by func_80065A5C */
     u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by func_80065E1C; linearly searched by func_80065D64 */
     void *unk78;                    /* +0x78 callback pointer; func_800660BC copies one of slot118/11C/120's VALUE (never calls it) here based on a small dispatch value */
-    u8 pad7C[0x10];                 /* +0x7C .. +0x8B, not yet decoded */
+
+    s32 unk7C;                      /* +0x7C set verbatim from func_80066214's `index` argument */
+    s32 unk80;                       /* +0x80 set by func_80066214 from the resolved GroupObj's EntryObj2->unk4 */
+    s32 unk84;                        /* +0x84 reset to 0 by func_80066214 -- looks like an iteration count paired with unk88 */
+    u8 *unk88;                         /* +0x88 set by func_80066214 to (u8 *)entry + 8, then passed to methods->slot134 -- an iterator "current" pointer */
 
     s32 unk8C;                     /* +0x8C boolean-ish flag; set to 0 by func_80066148, to 1 (and returned) by func_8006613C */
     s32 unk90;                     /* +0x90 boolean-ish flag; set to 0 by func_800662B4, to 1 (and returned) by func_800662A8 */
