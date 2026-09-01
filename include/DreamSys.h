@@ -114,10 +114,14 @@ typedef struct DreamSysUnk5C {
    whether it is the SAME class as DreamSys::unk_0x4C below -- is unknown.
    Elsewhere in this unit unk_0x58 is set/read as a plain s32
    (func_8005937C, func_8005A134's call into func_8002CC84), which is
-   consistent with it being a pointer value just not typed that way there. */
+   consistent with it being a pointer value just not typed that way there.
+   slot0x84 takes TWO arguments, not one -- head-adjudicated 2026-08-30-c:
+   the guard value (DreamSys::unk_0xBC) loaded into $a1 by func_80059E3C is
+   never overwritten before the jalr, so it is passed through, not just
+   branched on. See func_80059E3C.md. */
 typedef struct DreamSysUnk58Vtable {
 	u8 pad00[0x84];
-	void (*slot0x84)(void *self);
+	void (*slot0x84)(void *self, s32 flag);
 } DreamSysUnk58Vtable;
 typedef struct DreamSysUnk58 {
 	DreamSysUnk58Vtable *vt;
