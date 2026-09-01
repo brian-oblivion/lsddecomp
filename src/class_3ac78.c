@@ -20,12 +20,10 @@ Class866E8 *func_8004A4C8(void *arg0, void *arg1)
 	Class866E8 *self;
 
 	self = func_80017B34(0x1E8);
-	if (self == NULL) {
-		goto fail;
+	if (self != NULL) {
+		func_8004D244()->ctor(self, arg0, arg1);
+		return self;
 	}
-	func_8004D244()->ctor(self, arg0, arg1);
-	return self;
-fail:
 	return NULL;
 }
 
