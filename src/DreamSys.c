@@ -259,7 +259,16 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059E3C);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059E98);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A050);
+void func_8005A050(DreamSys *this)
+{
+	s32 idx;
+
+	idx = this->unk_0xA4;
+	if (idx != 0) {
+		this->vt->func_8001CEB4(this, 0, &D_80087E80[idx]);
+		this->unk_0xA4 = 0;
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A0B0);
 
