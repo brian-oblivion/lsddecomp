@@ -34,6 +34,26 @@ typedef struct D_80087E84Entry {
 } D_80087E84Entry;
 extern D_80087E84Entry D_80087E84[8];
 
+/* Address-of only (never loaded through) by DreamSys__func_588ec, forwarded
+   as func_8001CEB4's arg2. Still raw `nonmatching` data; element type/count
+   unconfirmed (round 2026-08-30-b). */
+extern u8 D_80087E08[];
+
+/* 12-byte-stride table, address-of only (never loaded through) by
+   func_8005A050, indexed by DreamSys::unk_0xA4 and forwarded as
+   func_8001CEB4's arg2. Splat resolves this to the SAME symbol name as
+   &D_80087E84[-1] (see that field's comment above), but the two call sites
+   use incompatible strides (4 vs 12 bytes) -- likely two unrelated globals
+   that just happen to sit at adjacent addresses, not one shared array.
+   Element layout unconfirmed; still raw `nonmatching` data
+   (round 2026-08-30-b). */
+typedef struct D_80087E80Entry {
+	s32 unk0;
+	s32 unk4;
+	s32 unk8;
+} D_80087E80Entry;
+extern D_80087E80Entry D_80087E80[];
+
 typedef struct CinematicCall{
 	s16 bank;
 	s16 entry;
@@ -88,6 +108,63 @@ typedef struct DreamSysUnk5C {
 	s32 unk_0x24;
 } DreamSysUnk5C;
 
+/* Object pointed to by DreamSys::unk_0x58, used ONLY by func_80059E3C (this
+   round): loaded, dereferenced for its own vtable pointer at offset 0, and
+   called through slot +0x84. Everything else about this class -- including
+   whether it is the SAME class as DreamSys::unk_0x4C below -- is unknown.
+   Elsewhere in this unit unk_0x58 is set/read as a plain s32
+   (func_8005937C, func_8005A134's call into func_8002CC84), which is
+   consistent with it being a pointer value just not typed that way there. */
+typedef struct DreamSysUnk58Vtable {
+	u8 pad00[0x84];
+	void (*slot0x84)(void *self);
+} DreamSysUnk58Vtable;
+typedef struct DreamSysUnk58 {
+	DreamSysUnk58Vtable *vt;
+} DreamSysUnk58;
+
+/* Object pointed to by DreamSys::unk_0x4C, used ONLY by func_80058A94 (this
+   round): same "vtable pointer at offset 0" shape as DreamSysUnk58 above,
+   but slot +0xF0 instead. Unidentified class; unknown if related to
+   DreamSysUnk58. */
+typedef struct DreamSysUnk4CMethods {
+	u8 pad00[0xF0];
+	void (*slot0xF0)(void *self);
+} DreamSysUnk4CMethods;
+typedef struct DreamSysUnk4CObj {
+	DreamSysUnk4CMethods *methods;
+} DreamSysUnk4CObj;
+
+/* Shared intermediate base class table (D_800878D4 -- see
+   docs/research/class-framework.md and code_55dd4.h's D800878D4Methods,
+   which types the same table for Class65650, a sibling of DreamSys under
+   this same base). Declared locally here rather than pulled in from
+   code_55dd4.h to avoid a cross-unit include; only slot +0x050 is needed by
+   this unit (func_80058A94, this round). */
+typedef struct DreamSysBaseMethods {
+	u8 pad00[0x50];
+	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes
+	   the real `typedef struct DreamSys {...}` below, so GCC 2.6.3 warns
+	   "declared inside parameter list ... probably not what you want" and
+	   scopes a distinct tag here. A forward `typedef struct DreamSys
+	   DreamSys;` to avoid the warning does NOT work: this compiler treats
+	   the later real typedef as a "redefinition of DreamSys" error instead.
+	   The warning is cosmetic -- both tags are pointer-compatible at the
+	   ABI level, and the call site casts implicitly with no codegen
+	   difference (round 2026-08-30-b). */
+	void (*slot0x50)(struct DreamSys *self);
+} DreamSysBaseMethods;
+extern DreamSysBaseMethods *func_80057C84(void);
+
+/* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
+   class_16334.h for the other units that also declare it locally. */
+extern void *func_80017B34(s32 size);
+
+/* Also declared in Entity.h for a different (Entity) struct's fields; here
+   called by func_8005A134 as (this->unk_0x58, this->unk_0xCC)
+   (round 2026-08-30-b). */
+extern void func_8002CC84(s32 arg0, void *arg1);
+
 typedef struct DreamSys {
 	struct vtable_DreamSys *vt;
 	s8 unknown_values_0x4[8];
@@ -109,7 +186,12 @@ typedef struct DreamSys {
 	s8 unknown_values_0x28[28];
 
 	s32 unknwon_int_0x44;
-	s8 unknown_values_0x48[16];
+	s8 unknown_values_0x48[4];
+	/* Pointer to an unidentified object (own vtable at offset 0, slot
+	   +0xF0 called with itself as the sole argument). Used by
+	   func_80058A94 (round 2026-08-30-b); see DreamSysUnk4CObj above. */
+	DreamSysUnk4CObj *unk_0x4C;
+	s8 unknown_values_0x50[8];
 
 	/* Set by func_8005937C(this, value); no other observed use. */
 	s32 unk_0x58;
@@ -168,11 +250,26 @@ typedef struct DreamSys {
 	   func_800598E8; also toggled/incremented by func_80059A1C and forced
 	   to 1 by func_80059B50 (round 2026-08-30). */
 	s32 unk_0xA0;
-	s8 unknown_values_0xA4[4];
+	/* Index into the 12-byte-stride D_80087E80 table; consumed and reset
+	   to 0 by func_8005A050 (round 2026-08-30-b). */
+	s32 unk_0xA4;
 	/* (unk_0xA0 == 1) as computed by func_800598E8; unconditionally cleared
 	   to 0 by func_80059A1C on every call (round 2026-08-30). */
 	s32 unk_0xA8;
-	s8 unknown_values_0xAC[24];
+	/* "Current" value; func_8005A1A4 overwrites this with unk_0xB0.
+	   func_8005A168's bounds-checked setter (vtable +0x180) writes both
+	   this and unk_0xB0 together; func_8005A184 copies the OLD value of
+	   this into unk_0xB0 before overwriting it, when the new value
+	   differs (round 2026-08-30-b). */
+	s32 unk_0xAC;
+	/* "Previous"/paired value; see unk_0xAC (round 2026-08-30-b). */
+	s32 unk_0xB0;
+	s8 unknown_values_0xB4[8];
+	/* Gate flag: func_80059E3C runs its body (a call through
+	   unk_0x58->vt->slot0x84, then resets this to -1) only while this is
+	   >= 0 (round 2026-08-30-b). */
+	s32 unk_0xBC;
+	s8 unknown_values_0xC0[4];
 	/* Set to 1 by func_800596E8's arg1==2 case, alongside unk_0xC8 and
 	   callback_0x98 (round 2026-08-30). */
 	s32 unk_0xC4;
@@ -188,7 +285,13 @@ typedef struct DreamSys {
 	s32 unk_0x120;
 	/* Result of func_80059394's (dreamTimer % unk_0x120 == 0) check. */
 	s32 unk_0x124;
-	s8 unknown_values_0x128[12];
+	/* unk_0x124/0x128/0x12C/0x130 are also bounds-checked-set as a group of
+	   four by func_8005A1B0 (vtable +0x18C): each is overwritten with the
+	   corresponding argument only when that argument is >= 0
+	   (round 2026-08-30-b). */
+	s32 unk_0x128;
+	s32 unk_0x12C;
+	s32 unk_0x130;
 
 	s32 dreamTimeLimit;
 	s8 unknown_values_0x138[12];
@@ -224,23 +327,59 @@ typedef struct DreamSys {
 
 	s32 unk_0x878;
 	s32 currentFlashbackIndex;
-	s8 unknown_values_0x880[12];
+	s8 unknown_values_0x880[4];
+	/* Gate flag read by func_80059148 (round 2026-08-30-b): when nonzero
+	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
+	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
+	s32 unk_0x884;
+	s8 unknown_values_0x888[4];
 
 	s32 storedDay;
+
+	/* The struct previously ended here (0x890), but New_DreamSys allocates
+	   sizeof(DreamSys) via a literal `ori $a0, $zero, 0x928` -- 0x98 bytes
+	   more than any field so far discovered accounts for. Extended to the
+	   allocator's real size (round 2026-08-30-b); the four words
+	   DreamSys__func_588ec clears are named, the rest of the tail is still
+	   unclaimed. */
+	s8 unknown_values_0x890[0x78];
+	s32 unk_0x908;
+	s32 unk_0x90C;
+	s32 unk_0x910;
+	s8 unknown_values_0x914[0x10];
+	s32 unk_0x924;
 } DreamSys;
 
 struct vtable_DreamSys{
 	u32 unknown_int;
 	void *extfunc_17eb0;
-	void *Constructor;
-	u32 unknown_functions_0xc[13];
+	/* Called by New_DreamSys as (allocation, arg0, arg1, arg2) -- see
+	   New_DreamSys, round 2026-08-30-b. Return value is discarded there
+	   (New_DreamSys returns the allocation regardless). Still INCLUDE_ASM
+	   (DreamSys__DreamSys); types here are New_DreamSys's own forwarded
+	   parameter types, not independently confirmed by this round. */
+	DreamSys *(*Constructor)(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
+	u32 unknown_functions_0xc[2];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x014); shared
+	   with Class65650's inherited slot14 (code_55dd4.h: "'unlink' companion
+	   of slot10"). Called by func_80058A94 as (this, this->unk_0x4C)
+	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
+	   outside this unit/runner's range. */
+	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
+	u32 unknown_functions_0x18[10];
 	void *func_800588EC;
 	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */
 	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);
 	u32 unknown_functions_0x48[1];
 	void *func_58968;
-	u32 unknown_functions_0x50[18];
+	u32 unknown_functions_0x50[4];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x060). Called by
+	   DreamSys__func_588ec as (this, 0) (round 2026-08-30-b). Still
+	   INCLUDE_ASM; address 0x8001D344 is outside this unit/runner's
+	   range. */
+	void (*func_8001D344)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x64[13];
 	void *TimerTick;
 	u32 unknown_functions_0x9c[17];
 	void *LinkWall;
@@ -290,7 +429,11 @@ struct vtable_DreamSys{
 	/* Referenced by func_80059AEC/func_80059B50; still INCLUDE_ASM outside
 	   this runner's range. Return value is threaded into func_80059E98. */
 	s32 (*func_80059BE0)(DreamSys *this, s32 arg1);
-	u32 unknown_functions_0x168[2];
+	u32 unknown_functions_0x168[1];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x16C). Not
+	   called through the vtable by any function in this round; named
+	   because its slot is now known (round 2026-08-30-b). */
+	void (*func_80059E3C)(DreamSys *this);
 	/* Referenced by func_80059AEC/func_80059B50; still INCLUDE_ASM. */
 	s32 (*func_80059E98)(DreamSys *this, s32 arg1);
 	/* Referenced by func_80059A58; still INCLUDE_ASM. Called with (this)
@@ -302,7 +445,15 @@ struct vtable_DreamSys{
 	/* Referenced by func_800596E8's entry guard (this->unk_0x9C==2); called
 	   as (this, 0). */
 	void (*func_8005A134)(DreamSys *this, s32 arg1);
-	u32 unknown_functions_0x180[5];
+	/* +0x180..+0x190: resolved via tools/classtable.py DREAMSYS_METHODS,
+	   all five matched this round (2026-08-30-b). func_8005A168 is also
+	   called directly (not through the vtable) by func_80059148, as
+	   (this, 1). */
+	s32 (*func_8005A168)(DreamSys *this, s32 value);
+	void (*func_8005A184)(DreamSys *this, s32 value);
+	void (*func_8005A1A4)(DreamSys *this);
+	void (*func_8005A1B0)(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
+	void (*func_8005A1EC)(DreamSys *this, s32 value);
 	/* Referenced by func_800596E8's arg1==2 case: its raw address (never
 	   called there) is forwarded as func_8002CC34's 5th argument. */
 	void *func_8005A1F4;
