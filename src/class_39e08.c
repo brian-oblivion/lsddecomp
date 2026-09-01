@@ -1,6 +1,18 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049608);
+/* New_ClassA: allocate a 0x50-byte instance and construct it. */
+ClassA *func_80049608(void *arg1, void *arg2, s32 arg3) {
+    ClassA *self;
+
+    self = func_80017B34(0x50);
+    if (self == NULL) {
+        goto fail;
+    }
+    func_8004A060()->ctor(self, arg1, arg2, arg3);
+    return self;
+fail:
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049684);
 
