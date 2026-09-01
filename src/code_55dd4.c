@@ -52,11 +52,47 @@ void func_8006573C(Class65650 *self)
     func_80057C84()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065790);
+void func_80065790(Class65650 *self, TagCheckArg *arg1, s32 arg2)
+{
+    D800878D4Methods *base;
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065830);
+    base = func_80057C84();
+    base->slot38(self, arg1, arg2);
+    if (arg1->tagged->tag == 0x5F03 && arg2 == 1 && self->unk60 == 0) {
+        self->methods->slot04(self);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065918);
+void func_80065830(Class65650 *self)
+{
+    D800878D4Methods *base;
+
+    base = func_80057C84();
+    base->slot60(self, 0);
+    self->methods->slotF0(self, 1);
+    self->methods->slotE4(self, 0x12C);
+    self->methods->slot114(self);
+    self->methods->slot10C(self, 0x41);
+    self->methods->slot130(self);
+    self->methods->slot128(self, 0);
+    if (self->unk68 != NULL) {
+        func_8001E770(self, self->unk68->unk20);
+    }
+}
+
+void func_80065918(Class65650 *self, Class65650 *other, void *arg2, void *arg3, void *arg4)
+{
+    D800878D4Methods *base;
+
+    if (self->unk0C == 0) {
+        base = func_80057C84();
+        base->slot4C(self, arg3, arg4);
+        if (arg2 != NULL && self->unk50 == NULL) {
+            self->methods->slot10(self, arg2);
+        }
+        self->methods->slot13C(self, other);
+    }
+}
 
 void func_800659D0(Class65650 *self)
 {
@@ -180,9 +216,38 @@ void func_80065DEC(Class65650 *self)
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065F2C);
+void func_80065F2C(Class65650 *self)
+{
+    Unk70ElemObj **p;
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065FD8);
+    if (self->unk70 != NULL && self->unk74 != NULL) {
+        p = self->unk70;
+        while (self->unk6C-- > 0) {
+            (*p)->methods->slot4(*p);
+            p++;
+        }
+        self->unk68 = 0;
+    }
+    self->unk74 = func_80017CFC(self->unk74);
+    self->unk70 = func_80017CFC(self->unk70);
+}
+
+void func_80065FD8(Class65650 *self)
+{
+    self->unk24 = self->unk24 + 1;
+    if (self->unk8C != 0) {
+        ((void (*)(void))self->unk78)();
+    }
+    if (self->unk90 != 0 && self->unk80 >= 2) {
+        self->unk88 = self->methods->slot134(self, self->unk88, 0);
+        self->unk84 = self->unk84 + 1;
+        if (self->unk84 >= self->unk80) {
+            self->unk84 = 0;
+            self->unk88 = (u8 *)(*(GroupObj **)(self->unk5C->unk30->arr + 8 + self->unk7C * 4))->entry + 8;
+        }
+    }
+    *self->unk14 = 0;
+}
 
 void func_800660BC(Class65650 *self, s32 value)
 {
