@@ -31,7 +31,14 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049AC0);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049B54);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049C50);
+/* ClassA::slot50 -- dispatches the two calls on the unk18 sub-object. */
+void func_80049C50(ClassA *self) {
+    Dispatch18 *obj;
+
+    obj = self->unk18;
+    obj->methods->slot90(obj);
+    obj->methods->slot74(obj);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
 
