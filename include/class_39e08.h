@@ -72,7 +72,10 @@ typedef struct Dispatch4C {
     Dispatch4CMethods *methods;
 } Dispatch4C;
 
-extern void *func_80052B70(void *arg0, s32 arg1, s32 arg2, s32 arg3);
+/* FIVE arguments, not four: func_80052B70 reads its fifth at 0x48($sp)
+ * against a 0x38 frame, i.e. the caller's stack argument slot at
+ * 0x10($sp). See docs/match-reports/func_80049E20.md. */
+extern void *func_80052B70(void *arg0, s32 arg1, void *arg2, void *arg3, s32 arg4);
 
 /* An object of unresolved class reached through ClassA::unk34 (a listener,
  * notified from ClassB's dtor when unk30 is set). Only the +0x004 slot is

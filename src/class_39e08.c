@@ -46,7 +46,16 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
 /* STALL (32/33 words) -- see docs/match-reports/func_80049E20.md. Retail
  * spills the never-read-again second parameter to 0x10($sp); no reshaping
  * tried reproduces that store. */
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049E20);
+void func_80049E20(ClassA *self, s32 arg1)
+{
+	Dispatch4C *d;
+
+	d = func_80052B70(self->unk34, self->unk40, self->unk44, self->unk48, arg1);
+	self->unk4C = d;
+	self->methods->slot10(self, d);
+	self->unk4C->methods->slot44(self->unk4C, self->unk0C, self->unk38);
+	self->state = 2;
+}
 
 void func_80049EA4(void) {
 }
