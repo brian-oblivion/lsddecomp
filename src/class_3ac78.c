@@ -61,7 +61,17 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ADD8);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AEA4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AFE0);
+void func_8004AFE0(Class866E8 *self, u8 *arg1, s32 arg2)
+{
+	u8 b3;
+
+	self->unk7C = (s8)arg1[2] - 1;
+	b3 = arg1[3];
+	self->unk80 = arg2;
+	self->unk84 = arg2;
+	self->unk7E = (s8)b3 - 1;
+	func_8004C93C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
