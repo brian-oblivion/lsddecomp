@@ -87,7 +87,12 @@ void *func_8004A228(ClassA *self) {
     return func_8003E5C8()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A294);
+/* ClassB::resetState (+0x040) -- resets the radius field through the
+ * (shared) virtual setter with -1, which the setter's own sign check leaves
+ * unscaled. */
+void func_8004A294(ClassA *self) {
+    self->methods->setRadius(self, -1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A2C4);
 
