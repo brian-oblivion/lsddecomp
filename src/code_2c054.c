@@ -53,7 +53,11 @@ void func_8003BCF4(StreamTask *self, s32 a1) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD10);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD74);
+/* StreamTask's override of slot +0x080: a pure passthrough to the base
+ * task class's own copy of the same slot. */
+s32 func_8003BD74(StreamTask *self) {
+    return func_8003DFBC()->slot80(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BDAC);
 
