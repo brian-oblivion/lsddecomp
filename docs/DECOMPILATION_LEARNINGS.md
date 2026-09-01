@@ -238,6 +238,105 @@ through it. Only the load is exposed.
   render guessing unreliable. One function's assumed "divide by 9" was actually
   15. (`func_8002658C`)
 
+- **A value in an ARGUMENT register that is live at the next call IS an
+  argument — even when its only visible use is a branch condition.** This is
+  the round-2026-08-30-c headline lever: it converted two functions that had
+  been filed as unreachable *register-identity* stalls into ordinary matches,
+  in two different units. `func_80059E3C` stalled at 21/23 with retail doing
+  `lw $a1, 0xBC($s0)` / `bltz $a1` where the natural codegen produced
+  `lw $v0` / `bltz $v0` — same branch target, everything else byte-identical.
+  Tracing forward, nothing overwrote `$a1` before the following `jalr`, so it
+  was still live at the call: retail's source read
+  `obj->vt->slot0x84(obj, this->unk_0xBC)`, and the body under test was one
+  parameter short. GCC only picked an argument register *because* the value was
+  an argument; the register choice was a consequence of the missing parameter,
+  not an independent codegen quirk.
+
+  **The test, before ever classifying a residue as register-identity:** trace
+  forward from the load to the next `jal`/`jalr`. If the register is `$a0`–`$a3`
+  and nothing overwrites it in between, the parameter list is wrong and this is
+  an ordinary match.
+
+  **The negative half matters just as much, and is what keeps the test safe.**
+  Three of the round's residues looked similar and were NOT this class:
+  `New_DreamSys`'s residue register was `$v0` (a return value, never live into
+  a following call) and closed with an ordinary reshape; `func_80065A5C`'s
+  residue is prologue callee-save STORE ORDER, not a value in the wrong
+  register; `func_800662BC`'s is a loop-carried value never passed to the call
+  at all. A `$v0` residue, or a register dead at the next call, is genuinely
+  not this class — do not go hunting a parameter that was never there.
+  (`func_80059E3C`, `func_8005DD18`; negatives `New_DreamSys`, `func_80065A5C`,
+  `func_800662BC`)
+- **A missing argument can be invisible from the callee's own disassembly.**
+  `func_8005DD18` passes a literal `0` that `func_8005DF9C` never reads — the
+  callee overwrites the register as scratch on entry. A signature derived by
+  reading the callee alone is therefore wrong with nothing to flag it, and only
+  the CALLER's register setup recovers it. Type a slot from its call sites, not
+  from its body. (`func_8005DD18`)
+- **A discarded return value is never evidence of `void`.** A previous round
+  recorded `Class65650Methods` slot `+0x134` as returning `void` because the one
+  known call site threw the result away; it actually returns `u8 *`. This is the
+  same trap the runner prompt already flags for one-line tail-call wrappers,
+  in a second guise — a byte match constrains the return type only where the
+  caller USES the value. (`func_80065FD8`)
+- **When two structurally-similar residues want different C shapes, retail's
+  own instruction count is the tell.** Two "get old value, conditionally set
+  new" functions in DreamSys needed opposite spellings — `func_8005A168` a
+  single hoisted load, `func_8005BA20` a load duplicated into each branch.
+  Nothing in the surrounding code distinguishes them; the word count does.
+  Count before reshaping blind. (`func_8005A168`, `func_8005BA20`)
+- **`__asm__("")` is not a local lever — it perturbs the WHOLE function's
+  register allocation.** It fixed a store/branch-ordering residue in
+  `func_80065E1C` and simultaneously introduced a full `$s1`/`$s2` identity swap
+  between `self` and the array-walk pointer across the entire function. The
+  blast radius scales with function size, so reach for it late and revert it
+  fast. This does not make it banned — it still only reorders — but "it helped
+  here" and "it is safe here" are different claims. Related: an 8-byte padding
+  local fixed callee-save store order in `func_80065AE0` for free, with no
+  barrier at all. (`func_80065E1C`, `func_80065AE0`)
+- **Verify struct offsets with a host `-m32` `offsetof` build, not a native
+  one.** Native 64-bit pointers silently widen every pointer field and the
+  cross-check passes while the real layout is wrong. A runner lost real time to
+  this before catching it; `sizeof(DreamSys)` turned out to be 0x928, some 0x98
+  bytes past where it had been modelled — recovered from the allocator's own
+  literal `ori $a0, $zero, 0x928`. An allocation size in the caller is
+  load-bearing evidence about a struct's true extent. (`New_DreamSys`)
+- **Vtable slot order follows function ADDRESS order, exhaustively.** Confirmed
+  against `DREAMSYS_METHODS` with `tools/classtable.py`: a run of five
+  consecutive slots (`+0x180`..`+0x190`) maps onto five functions at consecutive
+  addresses. Useful for resolving unnamed slots — but keep resolving with the
+  tool rather than by counting; the ordering tells you where to LOOK, and it
+  corrected a previously-wrong comment about a gap that did not exist.
+- **Six residues from one 258-word function, each closed independently.**
+  `func_80066340` reached 252/258 and is the project's most detailed partial
+  derivation; the levers generalize to any large body. Do not cache a struct
+  field that is read in several places (`self->unk5C`) — it costs an extra
+  register; a multi-way tag dispatch must be a real `switch`, not an
+  `if`/`else if` chain; do not cache a flags byte across separated tests; a
+  tail copy wants batched loads into a dedicated local; inner loops want
+  INCREMENTING POINTERS, not array indexing; and loop setup sometimes wants an
+  explicit `i = 0;` statement between two pointer initialisations rather than a
+  `for`'s implicit initializer. (`func_80066340`)
+
+### New residue classes opened this round (not yet closed)
+
+- **"Identical assignment reaching different merge points."** GCC tail-merges
+  two identical `doDetach = 1;` statements that retail keeps separate.
+  Unreached by reshaping, by `__asm__("")` barriers, or by the argument-register
+  test. (`func_8005DBF0`, 72/74 — the round's closest near-miss)
+- **Magic-multiply constant load POSITION.** A GCC-synthesized multiplier
+  constant whose load placement has no direct C-source counterpart; two
+  symmetric 3-word clusters, unmoved by six reshapes and by a late barrier
+  (which made it worse). Flagged as a candidate "not a source-shape question"
+  case. (`func_80066340`, 252/258)
+- **Pure instruction-scheduling residue in a branch-free, call-free body.**
+  Neither of this round's two resolved-stall levers can apply, since both need
+  a branch or a call to reason about. Nine reshapes, best 8/14.
+  (`DreamSys__LogMood`)
+
+All three are permuter candidates rather than reshape candidates; see Gate 3
+in docs/PARALLEL-RUNS.md.
+
 ### Still unconfirmed here
 
 Candidates from other GCC 2.x projects — treat each as a thing to test:
@@ -303,12 +402,15 @@ Practical consequences:
 
 ## Open questions
 
-- **What is the class-table header word at `+0x000`?** Not a pointer, and it
-  varies per class (`0x1F34`, `0x34`, `0x1130`, `0x00011144`, `0x0E03`…). Some
-  values look like packed fields — the low byte is often `0x03`, `0x44`, `0x64`.
-  A class id, a flags word, or an instance size. Answerable by cross-referencing
-  the values against what the framework's own code at `class_16334` /
-  `code_179d8` does with them; nobody has looked.
+- **What is the class-table header word at `+0x000`? PARTLY ANSWERED
+  (2026-09-01): the low 12 bits are a class identifier.** `func_80058E8C` is the
+  first confirmed in-game READ of it — it masks the word with `0xFFF` and
+  compares the result against a literal class id, which is a runtime type check.
+  That settles the low half; the upper bits are still unaccounted for, and the
+  packed-field reading of the original values (`0x1F34`, `0x1130`,
+  `0x00011144`…) survives for them. Next step is the same one as before, now
+  better posed: find the WRITES, in the framework code at `class_16334` /
+  `code_179d8`, and see what composes the upper bits.
 - **What are the four dead-looking data slots** at `0x57070`, `0x76DC8`,
   `0x79528` and the `sbss` runs? They assemble and link fine as plain data, so
   nothing is blocked, but their owners are unidentified. **Partly answered for

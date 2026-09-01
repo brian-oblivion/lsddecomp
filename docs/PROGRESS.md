@@ -6,6 +6,164 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-01 — round 5: 3 runners, 6 passes, 56 matches, DreamSys past halfway
+
+**98 -> 154 matched (11.36% of game code). 102 queued: 27 fresh, 75 stalled, 0
+banked. Build green throughout, verified in main after every one of six
+merges.**
+
+Gate 2 was already done, so this was Gate 1 triage and provisioning only. The
+operator's brief asked for five runners; the true state supported three, and the
+brief's other two premises were both wrong in ways worth recording.
+
+### Gate 1 corrected two premises before any runner was spawned
+
+- **The brief said 244 fresh. `progress.py` said 92.** The stub-reporting work
+  done during round 4's consolidation is exactly what made the smaller number
+  truthful; it had not been carried into the brief.
+- **The brief named `class_16334` (8) as the natural cold start. It has ZERO
+  fresh ground.** The "8" is its *matched* count. Both its queued functions
+  carry reports and are gp-relative-blocked. A runner staffed there would have
+  spent its entire budget re-deriving a documented blocker. **This is the second
+  consecutive round in which `class_16334`'s matched count was mistaken for
+  available work** — round 4's log records the same error. The `matched` and
+  `fresh` columns sit adjacent in `progress.py` output and are easy to confuse;
+  read the `fresh` column, and read it for the unit you intend to assign.
+
+Only `DreamSys` (72), `Entity` (11) and `code_55dd4` (9) had assignable ground,
+so the round ran three runners — one per unit, per collision rule 1. The spare
+capacity question was put to the operator rather than resolved by splitting a
+unit across runners or by carving against instruction; the operator chose to
+stay at three.
+
+**All 92 fresh functions were screened for both toolchain blockers before
+assignment. All 92 were clean**, and no runner reported a blocker hit — the
+first round in which the pre-screen came back entirely negative.
+
+### The stall corpus was audited, and it held
+
+Before spawning, the head mechanically re-derived every one of the 66 stall
+classifications: for each report claiming BLOCKED, does the function's own `.s`
+actually contain a `gp_rel` or `addiu $at, $at, %lo` discriminator?
+
+**All 44 BLOCKED confirmed. All 12 STALLED-TOOLCHAIN confirmed.** The two
+carrying no discriminator (`func_80065A5C`, `func_800662BC`) correctly claim
+*structural* stalls rather than toolchain ones. Nothing was mis-parked. This
+also means `fresh` is trustworthy as a ceiling — no hidden ground in the stall
+pile. Worth re-running after any round that files many stalls; it is seconds.
+
+### The round's lever: the argument-register test
+
+`func_80059E3C` had been filed by a runner as an unreachable register-identity
+stall at 21/23 — retail `lw $a1` / `bltz $a1` against a built `lw $v0` /
+`bltz $v0`, same branch target, everything else identical. Head adjudication
+traced `$a1` forward and found nothing overwrote it before the following
+`jalr`: it was still live at the call, so it was an ARGUMENT. The source was one
+parameter short. Matched 23/23 once fixed.
+
+Broadcast mid-round to all three runners with an explicit request for the
+negative answer. Both halves came back, and the negative half is what makes the
+test safe to keep:
+
+- **Applies** (`func_8005DD18`, Entity): a literal `0` argument the callee never
+  reads — it overwrites the register as scratch on entry. **A signature derived
+  by reading the callee alone is wrong with nothing to flag it.**
+- **Does not apply** (`New_DreamSys`; and five stalls in `code_55dd4`): a `$v0`
+  residue is a return value, never live into a call. `code_55dd4`'s runner
+  separated three distinct residue shapes the test cannot reach — prologue
+  callee-save STORE ORDER, a loop-carried value, and a call whose arity was
+  already correct.
+
+Without that negative half the test would send future runners hunting phantom
+parameters on every `$v0` residue. Both halves are now in
+DECOMPILATION_LEARNINGS.md.
+
+**Two stalls filed with stop rules properly applied fell to a lever discovered
+after they were written.** That is an argument for cheap, complete stall reports
+— and a caution that "stalled" means "stalled given what was known then".
+
+### Runner-to-unit outcomes
+
+| runner | unit | passes | matched | stalls | end state |
+| --- | --- | --- | --- | --- | --- |
+| alpha | `DreamSys` | 3 | 41 | 6 | 27 fresh left, all 35+ instructions |
+| bravo | `Entity` | 1 | 13 | 1 | **unit dry** |
+| charlie | `code_55dd4` | 2 | 5 | 4 | **unit dry** |
+
+Alpha was sent back twice under protocol 3c rather than being replaced, and its
+second and third passes produced 30 of its 41 matches. Its first pass was
+range-limited to `0x80058774`-`0x8005A1EC`; once the operator settled the round
+at three runners, the range was lifted to the whole unit because no one else
+could contend for it. Bravo's 13 include three previously-matched functions it
+had to fix up after retyping a shared field — all three re-verified as still
+matching, which is a regression risk worth checking explicitly whenever a runner
+retypes something shared.
+
+### A toolchain lead, with a corpus census attached
+
+`func_8005950C` (17/33) stalls on **two extra `nop`s between `mflo` and a
+following `div`** that retail does not have. The runner reproduced it in
+complete isolation through the pinned pipeline with a five-line `(a*b)/c`
+snippet — no project types involved — and correctly declined to escalate it
+independently, flagging it for triage instead.
+
+The mechanism is `maspsx`'s `nop_mflo_mfhi`, already named in
+`docs/research/addiu-at-blocker.md` as one of the four flags a version bump
+below 2.30 would flip. **That document treats `nop_mflo_mfhi = False` as
+collateral damage of the bump. The census attached to it now says the opposite
+for most of the image** — retail omits the nop in 557 of 603 `mflo`/`mfhi` sites
+(92.4%).
+
+But it is **not uniform**, which is the decision-relevant part: in the specific
+hazard construct, retail has no intervening nop 180 times and does have one 65
+times. A global boolean cannot be right for both. So this is **not** a
+"flip the flag" result — it is evidence that the flag is the right mechanism and
+the wrong granularity, and it sharpens rather than resolves the open blocker.
+Full numbers and the leading hypothesis are in the blocker doc. Operator's call,
+per CLAUDE.md rule 5; nothing was changed.
+
+### Also banked
+
+- **First confirmed in-game READ of the class-table header word** at `+0x000`,
+  a standing open question. `func_80058E8C` masks it to `0xFFF` and compares
+  against a literal class id, so the low 12 bits are a class identifier. Open
+  question updated in place rather than left standing.
+- A stale `build/lsdde.map` from an earlier failed compile sent a runner chasing
+  a false "off-by-4 symbol" lead. **A failed link leaves the previous map in
+  place, exactly as it leaves the previous binary** — the fourth way a build
+  artifact can lie, and the only one not yet in CLAUDE.md's list of three.
+- `sizeof(DreamSys)` was modelled 0x98 bytes short; recovered from the
+  allocator's own literal `ori $a0, $zero, 0x928`.
+- `Class65650Methods` slot `+0x134` was recorded as returning `void` on the
+  strength of a call site that discarded the result. It returns `u8 *`.
+
+### Permuter targets, now well-posed
+
+Three new residue classes, none reachable by source reshaping, all with bodies
+preserved as literal source:
+
+| function | score | class |
+| --- | --- | --- |
+| `func_8005DBF0` | 72/74 | identical assignment tail-merged across two merge points |
+| `func_80066340` | 252/258 | magic-multiply constant LOAD POSITION, no C counterpart |
+| `DreamSys__LogMood` | 8/14 | pure scheduling, branch-free and call-free |
+
+`func_80066340` is the project's most detailed partial derivation: 258 words,
+six residues closed independently, and its slot `+0x138` signature
+cross-validated against `func_800662BC`'s call site from the other side. **A
+stalled caller and its stalled callee constrain each other; use both ends.**
+
+### Next round
+
+`fresh` is 27 and they are all in `DreamSys`, all 35+ instructions — the cheap
+seam is gone. Three of the eight carved units are now dry, and four more are
+entirely blocked. **The next round should be a CARVE, not runners**: one unit
+cannot support three runners, and there is no second unit to give anyone.
+`class_39e08` (415), `code_179d8` (274) and `Entity_b` (117) are the candidates;
+`Entity_b` pairs naturally with the now-exhausted `Entity`.
+
+---
+
 ## 2026-08-30 — round 4: 5 runners, 59 matches, and a second toolchain blocker
 
 **39 -> 98 matched (7.23% of game code). 158 queued: 92 fresh, 66 stalled, 0

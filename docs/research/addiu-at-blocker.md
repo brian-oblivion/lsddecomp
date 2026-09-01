@@ -189,3 +189,96 @@ short with everything after it shifted.
 touches the same table. It only *forms* the address (`&arr[i]`) and never loads
 through it, so no macro expansion is involved. Address-only table arithmetic is
 safe; loading through a runtime-indexed global is not.
+
+## Addendum, round 2026-09-01: `nop_mflo_mfhi` is implicated directly, with a corpus census
+
+**Nothing was changed. This section is evidence for the operator's decision, per
+CLAUDE.md rule 5.**
+
+A third function, `func_8005950C` in `DreamSys`, stalled at 17/33 on a residue
+that is NOT the `addiu_at` construct but IS one of the other three flags this
+document already identifies as moving together with it.
+
+### The stall, and its isolated reproducer
+
+Retail computes `(dv * scaledArg2) / dt` as `mult; mflo v0; div zero,v0,a3`.
+The pinned pipeline inserts **two `nop`s between the `mflo` and the `div`**.
+Six source reshapes never moved that gap by a single word.
+
+Reproduced in complete isolation, no project types involved — a five-line file
+through the exact pinned pipeline:
+
+```c
+int f(int a, int b, int c) {
+	int p = a * b;
+	return p / c;
+}
+```
+
+This is the `nop_mflo_mfhi` flag named in the table above, which a version bump
+below 2.30 would set to `False`.
+
+### The census, over the byte-exact build (read-only)
+
+Counting `mflo`/`mfhi` sites across the whole image via `objdump -d` on
+`build/lsdde.elf`:
+
+| | count | share |
+| --- | --- | --- |
+| `mflo`/`mfhi` immediately followed by `nop` | 46 | 7.6% |
+| `mflo`/`mfhi` NOT followed by `nop` | 557 | 92.4% |
+| **total** | **603** | |
+
+Narrowing to the specific hazard construct — an `mflo`/`mfhi` with a
+`mult`/`div` within the next four instructions, which is exactly what
+`func_8005950C` hits:
+
+| | count |
+| --- | --- |
+| no intervening `nop` | 180 |
+| one or more intervening `nop` | 65 |
+| **total occurrences** | **245** |
+
+(Some of the 65 are attributable to an intervening load's own delay slot rather
+than to the `mflo` — e.g. `between=['lw','nop']` — so 65 is an upper bound on
+genuine `mflo`-hazard nops.)
+
+### What this changes, and what it does not
+
+**It changes the framing of `nop_mflo_mfhi` in the section above.** That section
+lists `nop_mflo_mfhi = False` among the *collateral damage* of a version bump —
+"a global codegen change wearing a version number". For the large majority of
+the image that characterisation is backwards: retail overwhelmingly does NOT
+have the nop, so `False` is closer to retail's behaviour than the current
+setting is.
+
+**It does not make the bump the remedy.** Retail is not uniform: 180 sites want
+no nop and up to 65 want one. **A global boolean cannot be right for both**, so
+flipping the flag trades one set of failures for another, and the count of what
+it would break is not knowable from this census alone.
+
+The leading hypothesis, untested and deliberately so: the 46 immediate nops are
+emitted by **cc1** as part of its own scheduling, and the correct assembler
+behaviour is to insert none at all. That would reconcile every number here.
+Testing it means running the pinned pipeline with a changed flag, which is a
+toolchain change and therefore not something a head or runner does.
+
+### Bearing on the blocker
+
+The four flags move together, so this is not an independent lead — it is a
+second, independently-discovered symptom of the same version question, arriving
+from a different unit and a different construct. It raises the value of
+resolving the version question and lowers the credibility of "the bump is purely
+destructive", without making the bump safe.
+
+It also adds one function to the blocked population that the `gp_rel` and
+`addiu_at` greps do NOT catch. **Screening cannot currently see this class.** A
+candidate screen for it, if the operator wants blocked functions flagged before
+they are staffed:
+
+```sh
+grep -nE 'mflo|mfhi' asm/nonmatchings/<unit>/<func>.s
+```
+
+That over-reports heavily (603 sites, most harmless), so it is a triage hint and
+not a blocker test like the other two.
