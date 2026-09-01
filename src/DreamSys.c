@@ -500,7 +500,13 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitMoodContibutors);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LogChunkMood);
+void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	MoodGraphPoint *mood;
+
+	mood = GetMoodFromStageChunk(this->currentStage, (StageChunk *)currentPos);
+	this->vt->LogMood(this, &this->areaMoods, mood);
+}
 
 void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
 {
