@@ -117,7 +117,16 @@ void func_8003BCF4(StreamTask *self, s32 a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD10);
+/* StreamTask's override of slot +0x078: chains into the base task class's
+ * own copy first, then, only when unkCC is set, marks unk38 as state 2 and
+ * re-enters this object's own slot +0x060 (func_8003BC14) with 0x12. */
+void func_8003BD10(StreamTask *self) {
+    func_8003DFBC()->slot78(self);
+    if (self->unkCC != 0) {
+        self->unk38 = 2;
+        self->methods->slot60(self, 0x12);
+    }
+}
 
 /* StreamTask's override of slot +0x080: a pure passthrough to the base
  * task class's own copy of the same slot. */
