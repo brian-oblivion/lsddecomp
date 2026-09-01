@@ -146,7 +146,16 @@ void func_8003BDE4(void) {
 void func_8003BDEC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BDF4);
+/* StreamTask's override of slot +0x094: when unkD4 is set, ticks the
+ * sub-object's slot +0x04C; otherwise re-enters this object's own slot
+ * +0x060 (func_8003BC14) with a literal 7. */
+void func_8003BDF4(StreamTask *self) {
+    if (self->unkD4 != 0) {
+        self->unkB4->methods->slot4C(self->unkB4);
+    } else {
+        self->methods->slot60(self, 7);
+    }
+}
 
 /* StreamTask field setters, one per field also touched wholesale by
  * func_8003BA38's reset. */
