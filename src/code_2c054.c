@@ -222,7 +222,15 @@ void func_8003C11C(BaseTask *self) {
     self->unk3C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C1DC);
+/* The base task class's own override of slot +0x044 -- the function
+ * StreamTask's own override (func_8003BA58) chains into via
+ * func_8003DFBC(). Chains one level further into the grandparent class's
+ * own copy of the same slot (its result discarded), then returns this
+ * object's own "state" field (unk38, also touched by func_8003BD10). */
+s32 func_8003C1DC(StreamTask *self, s32 a1, s32 a2) {
+    func_8003E5C8()->slot44(self, a1, a2);
+    return self->unk38;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C238);
 
