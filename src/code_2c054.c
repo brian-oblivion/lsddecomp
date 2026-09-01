@@ -186,7 +186,16 @@ StreamTaskMethods *func_8003BE84(void) {
     return &D_8006E5F8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE94);
+/* New_X-shaped allocator for a bare base-task instance: 0xA4 bytes, ctor
+ * fetched from func_8003DFBC()'s own slot +0x008. */
+BaseTask *func_8003BE94(s32 a0, s32 a1, s32 a2) {
+    BaseTask *self = func_80017B34(0xA4);
+    if (self != NULL) {
+        func_8003DFBC()->ctor(self, a0, a1, a2);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BF10);
 
