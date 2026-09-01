@@ -99,4 +99,8 @@ void func_8004B32C(Class866E8 *self, s32 arg1)
 	self->unk78 = (s16)(arg1 >> 12);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B344);
+void func_8004B344(Class866E8 *self, s32 arg1)
+{
+	self->methods->slot40(self);
+	self->unk68 = arg1;
+}
