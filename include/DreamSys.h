@@ -111,19 +111,25 @@ typedef struct DreamSysUnk5C {
 	s32 unk_0x24;
 } DreamSysUnk5C;
 
-/* Object pointed to by DreamSys::unk_0x58, used ONLY by func_80059E3C (this
-   round): loaded, dereferenced for its own vtable pointer at offset 0, and
-   called through slot +0x84. Everything else about this class -- including
-   whether it is the SAME class as DreamSys::unk_0x4C below -- is unknown.
-   Elsewhere in this unit unk_0x58 is set/read as a plain s32
-   (func_8005937C, func_8005A134's call into func_8002CC84), which is
-   consistent with it being a pointer value just not typed that way there.
+/* Object pointed to by DreamSys::unk_0x58, loaded, dereferenced for its own
+   vtable pointer at offset 0, and called through slot +0x84 (func_80059E3C)
+   or slot +0x80 (ExecuteLink, round 2026-09-01-e). Everything else about
+   this class -- including whether it is the SAME class as DreamSys::unk_0x4C
+   below -- is unknown. Elsewhere in this unit unk_0x58 is set/read as a
+   plain s32 (func_8005937C, func_8005A134's call into func_8002CC84), which
+   is consistent with it being a pointer value just not typed that way there.
    slot0x84 takes TWO arguments, not one -- head-adjudicated 2026-08-30-c:
    the guard value (DreamSys::unk_0xBC) loaded into $a1 by func_80059E3C is
    never overwritten before the jalr, so it is passed through, not just
-   branched on. See func_80059E3C.md. */
+   branched on. See func_80059E3C.md. slot0x80 takes THREE s32 arguments,
+   confirmed by ExecuteLink's call site (round 2026-09-01-e): three literal
+   constants (0x90, 0x6E, 0x6E) are loaded straight into $a1-$a3 with nothing
+   else read from `this`, most plausibly a text-bank/entry-pair dialog
+   trigger (same {bank, entry} shape as `CinematicCall`), but nothing in
+   ExecuteLink itself confirms that beyond the argument count. */
 typedef struct DreamSysUnk58Vtable {
-	u8 pad00[0x84];
+	u8 pad00[0x80];
+	void (*slot0x80)(void *self, s32 arg1, s32 arg2, s32 arg3);
 	void (*slot0x84)(void *self, s32 flag);
 } DreamSysUnk58Vtable;
 typedef struct DreamSysUnk58 {
@@ -441,7 +447,15 @@ struct vtable_DreamSys{
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
 	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
-	u32 unknown_functions_0x18[10];
+	u32 unknown_functions_0x18[6];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x030) as the
+	   inherited `BasicClass__func_182cc` slot. Called by ExecuteLink as
+	   (this, unk1) -- unk1 is also stored into `this->unknwon_int_0x44`
+	   right before the call, and re-read afterward as the success gate
+	   (round 2026-09-01-e). Address 0x800182CC is outside this
+	   unit/runner's range. */
+	void (*func_800182CC)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x34[3];
 	void *func_800588EC;
 	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */

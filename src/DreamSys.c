@@ -513,7 +513,24 @@ bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A82C);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", ExecuteLink);
+bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
+{
+	DreamSysUnk58 *obj;
+
+	system->unknwon_int_0x44 = unk1;
+	system->vt->func_800182CC(system, unk1);
+	if (system->unknwon_int_0x44 == 0)
+		return false;
+	system->currentStage = stage;
+	if (system->isFlashbackSession) {
+		system->dreamTimer = 0;
+	}
+	if (unk2 != 0) {
+		obj = (DreamSysUnk58 *)system->unk_0x58;
+		obj->vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+	}
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
