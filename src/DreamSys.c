@@ -348,7 +348,14 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A1F4);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitNewGame);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetSetScreenShake);
+void DreamSys__GetSetScreenShake(DreamSys *this, bool *value)
+{
+	bool old;
+
+	old = this->screenShakeOn;
+	this->screenShakeOn = *value;
+	*value = old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A2E4);
 
