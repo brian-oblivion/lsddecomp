@@ -110,6 +110,8 @@ typedef struct Unk5CObj Unk5CObj;
 typedef struct Unk5CMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     Unk5CObj *(*slot4)(Unk5CObj *self);       /* +0x004 */
+    u8 pad08[0x78];                            /* +0x008 .. +0x07C, unknown */
+    s32 (*slot80)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 -- called by func_80065E1C twice: once as slot80(unk5C, NULL, buf) to get a count (low byte of the return) and populate a small scratch buffer, once as slot80(unk5C, self->unk74, buf) to fill self->unk74 with real data using the same buffer */
 } Unk5CMethods;
 
 /* self->unk5C->unk30's element chain (func_80066214 only):
@@ -229,6 +231,7 @@ extern Class65650Methods *func_80066818(void);
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern void func_8001E770(Class65650 *self, s32 arg);
+extern void *func_80056FE4(void);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).
  * func_80065C5C/func_80065CEC are the +0x5C sub-object's setup/teardown
