@@ -74,7 +74,15 @@ segments:
       - [0x1890, rodata]
       - [0x19DC, rodata]
       - [0x1A90, rodata]
-      - [0x1C0C, rodata]
+      # jtbl_8001140C -- 10 words, all targets inside func_80049EB4, which
+      # the class_39e08 carve moved into C. Attached with the dot form so
+      # migrate_rodata_to_functions puts the table in that function's own
+      # .s, where its .L labels are in scope. The REST of the old 0x1C0C
+      # slot (strings, then jtbl_8001157C and jtbl_80011594, whose targets
+      # are at 0x8004Fxxx/0x8005xxx and still live in `asm`) stays a
+      # standalone rodata object from 0x1C34.
+      - [0x1C0C, .rodata, class_39e08]
+      - [0x1C34, rodata]
       - [0x1E28, rodata]
       - [0x1EF4, rodata]
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
@@ -122,7 +130,8 @@ segments:
       # monolithic `asm` segment awaiting a carve (docs/PARALLEL-RUNS.md
       # Gate 2).
       - [0x39cb4, c, StageGrid]
-      - [0x39e08, asm, class_39e08]
+      - [0x39e08, c, class_39e08]
+      - [0x3ac78, asm, class_3ac78]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
