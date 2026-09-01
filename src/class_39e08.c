@@ -125,4 +125,11 @@ void func_8004A3EC(ClassA *self, s32 event) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A458);
+/* ClassA::setRadius (+0x06C), shared with ClassB -- stores the value
+ * verbatim, then rescales it by *20 unless it was negative. */
+void func_8004A458(ClassA *self, s32 val) {
+    self->radius = val;
+    if (val >= 0) {
+        self->radius = val * 20;
+    }
+}
