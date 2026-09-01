@@ -42,7 +42,8 @@ typedef struct D800878D4Methods {
     void *unk18;                                         /* +0x018 func_800571A8 */
     u8 pad1C[0x1C];                                       /* +0x01C .. +0x037, not yet needed */
     void (*slot38)(Class65650 *self, void *arg1, s32 arg2); /* +0x038 -- called by func_80065790 as slot38(self, arg1, arg2) */
-    u8 pad3C[0x14];                                         /* +0x03C .. +0x04C, not yet needed */
+    u8 pad3C[0x10];                                         /* +0x03C .. +0x04B, not yet needed */
+    void (*slot4C)(Class65650 *self, void *arg1, void *arg2); /* +0x04C -- called by func_80065918 as slot4C(self, arg3, arg5) */
     void (*slot50)(Class65650 *self);                       /* +0x050 -- called by func_800659D0 */
     u8 pad54[0x1C];                                          /* +0x054 .. +0x06F, not yet needed */
     void (*slot70)(Class65650 *self, void *arg);              /* +0x070 -- called by func_80065AE0 via func_80057C84()->slot70(self, arg) */
@@ -172,7 +173,7 @@ typedef struct Class65650Methods {
     u8 pad124[0x10];                                                             /* +0x124 .. +0x133, this unit's own slots, not dispatched through here */
     void (*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by func_80066214 as slot134(self, self->unk88, 0) */
     void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
-    u8 pad13C[0x04];                                                                /* +0x13C func_80066748, this unit's own, not dispatched through here */
+    void (*slot13C)(Class65650 *self, Class65650 *other);                            /* +0x13C func_80066748, this unit's own -- confirmed as a real dispatch target by func_80065918's self->methods->slot13C(self, arg1) call; func_80066748's own signature (self, other) matches */
     void (*slot140)(Class65650 *self);                                               /* +0x140 func_800667B0 -- called by func_800659D0 */
 } Class65650Methods;
 
