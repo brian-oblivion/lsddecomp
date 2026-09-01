@@ -4,10 +4,16 @@
 
 ## What it does
 
-Calls a still-uncarved function, `func_8002CC84(this->unk58, this->unk9C)`
+Calls a still-uncarved function, `func_8002CC84(this->unk58, &this->unk9C)`
 (the same two-argument shape `func_8005D6D4` uses with `func_8002CD08` — see
 that report), then calls this entity's own vtable slots `+0x130` and
 `+0x114` (both no-argument), and clears `this->unkF8`.
+
+**Updated in round 2026-09-01 (runner bravo, Entity 11-function pass):**
+`this->unk9C` changed from a `u8[]` array to a plain `s32` (see
+`func_8005D6D4.md`'s update note); this call site's array-decay
+`this->unk9C` became an explicit `&this->unk9C`, same compiled address.
+Re-verified byte-exact.
 
 ## Derivation
 
@@ -30,7 +36,7 @@ sw   $zero, 0xF8($s0)        ; this->unkF8 = 0
 
 ```c
 void func_8005DB8C(Entity *this) {
-    func_8002CC84(this->unk58, this->unk9C);
+    func_8002CC84(this->unk58, &this->unk9C);
     this->methods->slot130(this);
     this->methods->slot114(this);
     this->unkF8 = 0;
