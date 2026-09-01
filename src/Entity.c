@@ -99,7 +99,12 @@ void func_8005D480(Entity *this, s32 a1, s32 a2) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D560);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D658);
+void func_8005D658(Entity *this, s32 a1, s32 a2) {
+    func_80066818()->slotE0(this, a1, a2);
+    if (a2 == 4) {
+        this->methods->slot160(this);
+    }
+}
 
 void func_8005D6D4(Entity *this) {
     func_8002CD08(this->unk58, &this->unk9C);
