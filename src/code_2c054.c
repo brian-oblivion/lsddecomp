@@ -83,7 +83,30 @@ void func_8003BB5C(StreamTask *self, s32 a1, s32 a2) {
     self->methods->slot60(self, 7);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BC14);
+/* StreamTask's override of slot +0x060: chains into the base task class's
+ * own copy first, then handles a small set of specific `a1` codes: 7/5 set
+ * or clear unkD8, 8 forwards to the sub-object's slot +0x04C (guarded by
+ * unkD4), 0x12 re-enters this object's own slot +0x094
+ * (func_8003BDF4). Anything else is a no-op. */
+void func_8003BC14(StreamTask *self, s32 a1) {
+    func_8003DFBC()->slot60(self, a1);
+    switch (a1) {
+    case 5:
+        self->unkD8 = 0;
+        break;
+    case 7:
+        self->unkD8 = 1;
+        break;
+    case 8:
+        if (self->unkD4 == 0) {
+            self->unkB4->methods->slot4C(self->unkB4);
+        }
+        break;
+    case 0x12:
+        self->methods->slot94(self);
+        break;
+    }
+}
 
 /* StreamTask's override of slot +0x06C: always stores a1 verbatim, then
  * for non-negative a1 overwrites with a1*15 (sll by 4, then subu a1). */
