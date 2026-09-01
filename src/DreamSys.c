@@ -21,7 +21,12 @@ void DreamSys__func_588ec(DreamSys *this)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__func_58968);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058A94);
+void func_80058A94(DreamSys *this)
+{
+	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
+	this->vt->func_80057130(this, this->unk_0x4C);
+	func_80057C84()->slot0x50(this);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058B08);
 
