@@ -1,10 +1,18 @@
 #include "common.h"
+#include "code_2c054.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B854);
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B8E4);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B9DC);
+/* StreamTask's dtor override (StreamTaskMethods slot +0x00C). Ticks the
+ * sub-object at +0xB4 (its own slot +0x004, self-only), then chains into
+ * the base task class's own dtor (func_8003DFBC()->dtor), the same
+ * "ownDtorChain" shape documented in code_171e0.h. */
+void *func_8003B9DC(StreamTask *self) {
+    self->unkB4->methods->slot4(self->unkB4);
+    return func_8003DFBC()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA38);
 
