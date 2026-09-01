@@ -135,7 +135,7 @@ s32 func_8005D7FC(Entity *this, EntityRegionRef *region) {
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D864);
 
 void *Entity__GetMoodEffect(Entity *this) {
-    return &D_80089EA4[this->moodIndex * 0x10];
+    return &D_80089EA4[this->moodIndex];
 }
 
 INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetUnlockEffect);

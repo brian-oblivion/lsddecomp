@@ -4,11 +4,23 @@
 
 ## What it does
 
-`return &D_80089EA4[this->moodIndex * 0x10];` — forms the address of a
-16-byte-stride table row selected by `this->moodIndex`, without loading
-through it. Same index (`moodIndex`, `Entity.h` offset `+0x98`) as the other
-three `Entity__Get*Effect/Stage/Video` functions in this unit, each keyed to
-its own table.
+`return &D_80089EA4[this->moodIndex];` — forms the address of a 16-byte-stride
+table row selected by `this->moodIndex`, without loading through it. Same
+index (`moodIndex`, `Entity.h` offset `+0x98`) as the other three
+`Entity__Get*Effect/Stage/Video` functions in this unit, each keyed to its
+own table.
+
+**Updated in round 2026-09-01 (runner bravo, Entity 11-function pass):**
+`D_80089EA4` is no longer typed as a bare `u8[]` indexed with a manual
+`* 0x10`. `func_8005DBF0`/`func_8005DD18` (this same table's other readers,
+matched in that pass) needed named sub-byte fields inside each 16-byte row
+(`detachKind` at +0x3, `linkKind` at +0x4, plus `unk5`/`unk9`), so the table
+is now `extern EntityMoodRow D_80089EA4[];` (see `include/Entity.h`) and this
+function's own indexing changed from `D_80089EA4[this->moodIndex * 0x10]` to
+`D_80089EA4[this->moodIndex]` to match — `sizeof(EntityMoodRow)` is 16, so
+the compiler's own array-stride multiply reproduces the identical
+`sll $v0,$v0,4` either way. Re-verified byte-exact after the change; the
+disassembly below is unchanged.
 
 ## Derivation
 
@@ -25,13 +37,13 @@ jr   $ra
 
 ```c
 void *Entity__GetMoodEffect(Entity *this) {
-    return &D_80089EA4[this->moodIndex * 0x10];
+    return &D_80089EA4[this->moodIndex];
 }
 ```
 
-`D_80089EA4` is declared `extern u8 D_80089EA4[];` in `Entity.h` (byte-sized
-element so the `* 0x10` literal is a direct byte offset, not double-scaled
-through `sizeof`).
+`D_80089EA4` is declared `extern EntityMoodRow D_80089EA4[];` in `Entity.h`
+(a real 16-byte struct now, see the note above — was `extern u8 D_80089EA4[]`
+with a manual `* 0x10` before this round).
 
 ## Attempt log
 
