@@ -94,7 +94,14 @@ void func_8004A294(ClassA *self) {
     self->methods->setRadius(self, -1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A2C4);
+/* ClassB::slot44 (+0x044) -- zeroes the output field, lets ClassA's base
+ * implementation (reached through func_8003E5C8, not this object's own
+ * methods pointer) populate it, then returns whatever it left behind. */
+s32 func_8004A2C4(ClassA *self, void *arg1, void *arg2) {
+    self->unk28 = 0;
+    func_8003E5C8()->slot44(self, arg1, arg2);
+    return self->unk28;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A324);
 
