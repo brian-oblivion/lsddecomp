@@ -460,7 +460,13 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcDreamColor);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__ClearMoodGraph);
+void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
+{
+	contributor->lastMood.value = 0;
+	contributor->sumMoods.upper = 0;
+	contributor->sumMoods.dynamic = 0;
+	contributor->amountMoods = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LogMood);
 
