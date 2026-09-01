@@ -76,7 +76,16 @@ fail:
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A19C);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A228);
+/* ClassB::dtor -- notifies unk34 if present, then defers to ClassA's own
+ * dtor (reached through func_8003E5C8's table, not this object's own
+ * methods pointer -- calling through self->methods here would recurse into
+ * this same override). */
+void *func_8004A228(ClassA *self) {
+    if (self->unk30 != 0) {
+        self->unk34->methods->slot4(self->unk34);
+    }
+    return func_8003E5C8()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A294);
 
