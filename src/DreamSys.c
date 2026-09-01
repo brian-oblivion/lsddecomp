@@ -374,7 +374,10 @@ s32 DreamSys__AdvanceDay(DreamSys *this)
 	return this->currentDay;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A33C);
+void func_8005A33C(DreamSys *this)
+{
+	this->unk_0x878 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A344);
 

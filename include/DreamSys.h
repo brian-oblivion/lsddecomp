@@ -471,7 +471,8 @@ struct vtable_DreamSys{
 	   passes literal 0, compatible with either. */
 	s32 (*func_8005A2E4)(DreamSys *this, s32 *arg1);
 	s32 (*AdvanceDay)(DreamSys *this);
-	void *func_8005A33C;
+	/* Zeroes unk_0x878 unconditionally (round 2026-08-30-c). */
+	void (*func_8005A33C)(DreamSys *this);
 	void *func_8005A344;
 	void *func_8005A350;
 	s32 (*StartDay)(DreamSys *this);
