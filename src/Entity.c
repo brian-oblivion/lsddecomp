@@ -51,7 +51,7 @@ INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D560);
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D658);
 
 void func_8005D6D4(Entity *this) {
-    func_8002CD08(this->unk58, this->unk9C);
+    func_8002CD08(this->unk58, &this->unk9C);
     this->unkFC++;
 }
 
