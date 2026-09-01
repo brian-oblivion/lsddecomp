@@ -515,7 +515,11 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BB14);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", GetRandomSpawnFromStage);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", TestForStaticLink);
+s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
+{
+	return GetStaticSpawn(target, currentPos, stage, LEN_STAGE_PERMALINK_TRIGGERS,
+	                       STAGE_PERMALINK_TRIGGERS, STAGE_PERMALINK_SPAWNS, 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4TunnelLinks);
 

@@ -574,6 +574,16 @@ extern s16 SPECIAL_DAYS[];
 
 extern s8 SPECIAL_COLORS[];
 
+/* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
+   Test4InstantTeleporters, each of which forwards its own three args
+   straight through and appends a fixed trailing quadruple (length table,
+   trigger table, spawn table, literal 1). Still INCLUDE_ASM; return type is
+   a guess (s32, compared with `bltz` at DreamSys__StaticWallLink's call
+   site) -- CLAUDE.md's tail-call-wrapper warning applies: byte match alone
+   proves nothing about it (round 2026-08-30-c). */
+extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
+                           s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
+
 /* This function might be called when the player hits a wall?
 It tries to do an static link first, then a dynamic one */
 void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2);
