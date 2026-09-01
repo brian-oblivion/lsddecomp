@@ -83,7 +83,9 @@ void func_8003BE64(StreamTask *self, s32 a1) {
     self->unkC8 = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE6C);
+void func_8003BE6C(StreamTask *self, s32 a1) {
+    self->unkCC = a1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE74);
 
