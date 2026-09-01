@@ -93,14 +93,45 @@ typedef struct Unk68Obj {
 typedef struct Unk70ElemMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     void (*slot4)(void *self);                /* +0x004 -- called by func_80065F2C's teardown loop */
-    u8 pad08[0x58];                            /* +0x008 .. +0x05C, unknown */
+    u8 pad08[0x44];                            /* +0x008 .. +0x04B, unknown */
+    void (*slot4C)(void *self, void *arg1, s32 arg2); /* +0x04C -- called by func_80066340 (CASE3) as slot4C(elem, arg1, 0); arg1 varies between a Class65650* and an Unk70ElemObj* across call sites, hence void * */
+    u8 pad50[0x10];                             /* +0x050 .. +0x05F, unknown */
     void (*slot60)(void *self, void *arg);    /* +0x060 */
     u8 pad64[0x0C];                            /* +0x064 .. +0x06C, unknown */
     void (*slot70)(void *self, void *arg);      /* +0x070 -- called by func_80065AE0's loop, same signature as slot60 */
 } Unk70ElemMethods;
 
+/* self->unk70[i]'s own +0x14 field (below): unidentified, only the fields
+ * func_80066340 actually touches are named. +0x00 is unconditionally
+ * zeroed on every func_80066340 call; +0x44 is a SECOND pointer (to
+ * TimeTargetObj, see below) whose own arrays get read/written depending
+ * on the outBuf[1]==1 flags byte; +0x18/+0x1C/+0x20 are copied out of
+ * that TimeTargetObj's own +0x18 array whenever outBuf[2]'s bit 3 is set. */
+typedef struct TimeTargetObj {
+    s32 arr00[3];    /* +0x000 .. +0x00B -- flags&4 target/source (func_80066340) */
+    u8 pad0C[0x04];   /* +0x00C .. +0x00F */
+    s16 arr10[3];      /* +0x010 .. +0x015 -- flags&2 target/source */
+    u8 pad16[0x02];     /* +0x016 .. +0x017 */
+    s32 arr18[3];         /* +0x018 .. +0x023 -- flags&8 target/source, copied out to Elem14Obj+0x18.. on success */
+} TimeTargetObj;
+
+typedef struct Elem14Obj {
+    s32 unk00;                /* +0x000 -- unconditionally zeroed by func_80066340 */
+    u8 pad04[0x14];            /* +0x004 .. +0x017, unknown */
+    s32 unk18;                  /* +0x018 */
+    s32 unk1C;                   /* +0x01C */
+    s32 unk20;                    /* +0x020 */
+    u8 pad24[0x20];                 /* +0x024 .. +0x043, unknown */
+    TimeTargetObj *unk44;             /* +0x044 */
+} Elem14Obj;
+
 typedef struct Unk70ElemObj {
-    Unk70ElemMethods *methods;
+    Unk70ElemMethods *methods;   /* +0x00 */
+    u8 pad04[0x0C];                /* +0x04 .. +0x0F, unknown */
+    s32 unk10;                       /* +0x10 -- a bitmask field: func_80066340 CASE0 does `unk10 = (unk10 & mask) | bits;` */
+    Elem14Obj *unk14;                  /* +0x14 */
+    u8 pad18[0x08];                      /* +0x18 .. +0x1F, unknown */
+    s32 unk20;                             /* +0x20 -- guard flag checked by func_80066340 CASE2 */
 } Unk70ElemObj;
 
 /* Whatever class self->unk5C (below) points at: unidentified, only its
@@ -112,7 +143,19 @@ typedef struct Unk5CMethods {
     Unk5CObj *(*slot4)(Unk5CObj *self);       /* +0x004 */
     u8 pad08[0x78];                            /* +0x008 .. +0x07C, unknown */
     s32 (*slot80)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 -- called by func_80065E1C twice: once as slot80(unk5C, NULL, buf) to get a count (low byte of the return) and populate a small scratch buffer, once as slot80(unk5C, self->unk74, buf) to fill self->unk74 with real data using the same buffer */
+    void *(*slot84)(Unk5CObj *self, void *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3); /* +0x084 -- called by func_80066340 as slot84(unk5C, acc, &outbuf[0..3]); outbuf[2..3] are passed as the o32 ABI's 5th/6th (stack) arguments, not registers */
 } Unk5CMethods;
+
+/* self->unk5C->unk2C (below): unidentified, only its vtable slot +0x080 is
+ * needed so far, by func_80066340's CASE2. */
+typedef struct Unk2CMethods {
+    u8 pad00[0x80];                           /* +0x000 .. +0x07C, unknown */
+    s32 (*slot80)(void *self, s32 arg);         /* +0x080 */
+} Unk2CMethods;
+
+typedef struct Unk2CObj {
+    Unk2CMethods *methods;
+} Unk2CObj;
 
 /* self->unk5C->unk30's element chain (func_80066214 only):
  * Unk30Obj->arr is a header pointer; the element array itself starts 8
@@ -139,7 +182,8 @@ typedef struct Unk30Obj {
 
 struct Unk5CObj {
     Unk5CMethods *methods;   /* +0x00 */
-    u8 pad04[0x2C];            /* +0x04 .. +0x2F, not this unit's to name */
+    u8 pad04[0x28];            /* +0x04 .. +0x2B, not this unit's to name */
+    Unk2CObj *unk2C;             /* +0x2C -- used by func_80066340's CASE2 */
     Unk30Obj *unk30;            /* +0x30 -- func_80066214's index table, see Unk30Obj above */
 };
 
@@ -230,7 +274,7 @@ extern Class65650Methods *func_80066818(void);
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
-extern void func_8001E770(Class65650 *self, s32 arg);
+extern void func_8001E770(void *self, s32 arg); /* first param confirmed generic: func_80065830 passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
 extern void *func_80056FE4(void);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).
