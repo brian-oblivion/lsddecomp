@@ -1,7 +1,17 @@
 #include "common.h"
 #include "code_2c054.h"
+#include "code_2c054.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B854);
+/* New_X-shaped allocator for a StreamTask: 0xDC bytes, ctor fetched from
+ * func_8003BE84()'s own class table, slot +0x008. */
+StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3) {
+    StreamTask *self = func_80017B34(0xDC);
+    if (self != NULL) {
+        func_8003BE84()->ctor(self, a0, a1, a2, a3);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B8E4);
 
@@ -96,8 +106,8 @@ void func_8003BE7C(StreamTask *self, s32 a1) {
 }
 
 /* Returns StreamTask's own class table, &D_8006E5F8 -- same shape as
- * code_171e0.h's func_80026C9C. Used by func_8003B854 (uncarved by this
- * runner) to fetch the ctor from slot +0x008. */
+ * code_171e0.h's func_80026C9C. Used by func_8003B854 to fetch the ctor
+ * from slot +0x008. */
 StreamTaskMethods *func_8003BE84(void) {
     return &D_8006E5F8;
 }
