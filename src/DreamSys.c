@@ -558,7 +558,16 @@ s32 CalcMoodAxis(s32 lank, s32 sum, s32 amount)
 	return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__CalcUnlockScore);
+void DreamSys__CalcUnlockScore(DreamSys *this)
+{
+	this->navigationFlasbackUnlockScore = CalcNavigationScore();
+	if (this->instanceFlasbackUnlockScore < 0) {
+		this->instanceFlasbackUnlockScore = 0;
+	} else if (this->instanceFlasbackUnlockScore > 50000000) {
+		this->instanceFlasbackUnlockScore = 50000000;
+	}
+	this->totalFlasbackUnlockScore = this->navigationFlasbackUnlockScore + this->instanceFlasbackUnlockScore;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__AddFlashback);
 
