@@ -63,7 +63,22 @@ void func_80065790(Class65650 *self, TagCheckArg *arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065830);
+void func_80065830(Class65650 *self)
+{
+    D800878D4Methods *base;
+
+    base = func_80057C84();
+    base->slot60(self, 0);
+    self->methods->slotF0(self, 1);
+    self->methods->slotE4(self, 0x12C);
+    self->methods->slot114(self);
+    self->methods->slot10C(self, 0x41);
+    self->methods->slot130(self);
+    self->methods->slot128(self, 0);
+    if (self->unk68 != NULL) {
+        func_8001E770(self, self->unk68->unk20);
+    }
+}
 
 void func_80065918(Class65650 *self, Class65650 *other, void *arg2, void *arg3, void *arg4)
 {

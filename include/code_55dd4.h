@@ -45,7 +45,9 @@ typedef struct D800878D4Methods {
     u8 pad3C[0x10];                                         /* +0x03C .. +0x04B, not yet needed */
     void (*slot4C)(Class65650 *self, void *arg1, void *arg2); /* +0x04C -- called by func_80065918 as slot4C(self, arg3, arg5) */
     void (*slot50)(Class65650 *self);                       /* +0x050 -- called by func_800659D0 */
-    u8 pad54[0x1C];                                          /* +0x054 .. +0x06F, not yet needed */
+    u8 pad54[0x0C];                                          /* +0x054 .. +0x05F, not yet needed */
+    void (*slot60)(Class65650 *self, s32 arg);                /* +0x060 -- called by func_80065830 as slot60(self, 0) */
+    u8 pad64[0x0C];                                             /* +0x064 .. +0x06F, not yet needed */
     void (*slot70)(Class65650 *self, void *arg);              /* +0x070 -- called by func_80065AE0 via func_80057C84()->slot70(self, arg) */
 } D800878D4Methods;
 
@@ -81,7 +83,9 @@ typedef struct Unk68Methods {
 } Unk68Methods;
 
 typedef struct Unk68Obj {
-    Unk68Methods *methods;
+    Unk68Methods *methods;   /* +0x00 */
+    u8 pad04[0x1C];            /* +0x04 .. +0x1F, unknown */
+    s32 unk20;                  /* +0x20 -- read directly (not via ->methods) by func_80065830, passed as func_8001E770's second argument */
 } Unk68Obj;
 
 /* Whatever class each self->unk70[i] (below) points at: unidentified,
@@ -159,18 +163,26 @@ typedef struct Class65650Methods {
     void (*slot40)(Class65650 *self);                                    /* +0x040 func_80065830, this class's own */
     u8 pad44[0x80];                                                       /* +0x044 .. +0x0C0, inherited/not yet needed */
     void (*slotC4)(Class65650 *self, s32 arg1, s32 arg2);                  /* +0x0C4 -- called by func_80066150 as slotC4(self, -0x1E, 0) */
-    u8 padC8[0x2C];                                                        /* +0x0C8 .. +0x0F0, inherited/not yet needed */
+    u8 padC8[0x1C];                                                        /* +0x0C8 .. +0x0E3, inherited/not yet needed */
+    void (*slotE4)(Class65650 *self, s32 arg);                              /* +0x0E4 -- called by func_80065830 as slotE4(self, 0x12C) */
+    u8 padE8[0x08];                                                          /* +0x0E8 .. +0x0EF, inherited/not yet needed */
+    void (*slotF0)(Class65650 *self, s32 arg);                                /* +0x0F0 -- called by func_80065830 as slotF0(self, 1) */
     s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 func_80065BFC */
     void (*slot_teardown5C)(Class65650 *self);                              /* +0x0F8 func_80065C2C */
     u8 padFC[0x04];                                                          /* +0x0FC, this unit's own slot (func_80065D64), not dispatched through here */
     s32 (*slot100)(Class65650 *self);                                         /* +0x100 -- called by func_80065C5C on success (its own return value) */
     void (*slot_teardown70)(Class65650 *self);                                /* +0x104 func_80065DEC -- called by func_80065CEC */
     void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by func_80065B80 when its `val` == 2 */
-    u8 pad10C[0x0C];                                                            /* +0x10C .. +0x114, not yet needed as a call target */
+    void (*slot10C)(Class65650 *self, s32 arg);                                 /* +0x10C -- called by func_80065830 as slot10C(self, 0x41) */
+    u8 pad110[0x04];                                                             /* +0x110 .. +0x113, not yet needed as a call target */
+    void (*slot114)(Class65650 *self);                                           /* +0x114 -- called by func_80065830 as slot114(self) */
     void *slot118;                                                              /* +0x118 -- only ever taken as a pointer VALUE (func_800660BC), never called from this unit, so left untyped-as-function */
     void *slot11C;                                                               /* +0x11C ditto */
     void *slot120;                                                               /* +0x120 ditto */
-    u8 pad124[0x10];                                                             /* +0x124 .. +0x133, this unit's own slots, not dispatched through here */
+    u8 pad124[0x04];                                                             /* +0x124 .. +0x127, this unit's own slot, not dispatched through here */
+    void (*slot128)(Class65650 *self, s32 arg);                                    /* +0x128 -- called by func_80065830 as slot128(self, 0) */
+    u8 pad12C[0x04];                                                                /* +0x12C .. +0x12F, this unit's own slot, not dispatched through here */
+    void (*slot130)(Class65650 *self);                                               /* +0x130 -- called by func_80065830 as slot130(self) */
     void (*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by func_80066214 as slot134(self, self->unk88, 0) */
     void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
     void (*slot13C)(Class65650 *self, Class65650 *other);                            /* +0x13C func_80066748, this unit's own -- confirmed as a real dispatch target by func_80065918's self->methods->slot13C(self, arg1) call; func_80066748's own signature (self, other) matches */
@@ -212,6 +224,7 @@ extern Class65650Methods *func_80066818(void);
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
+extern void func_8001E770(Class65650 *self, s32 arg);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).
  * func_80065C5C/func_80065CEC are the +0x5C sub-object's setup/teardown
