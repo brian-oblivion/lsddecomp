@@ -206,6 +206,35 @@ typedef struct Func8005A1F4Arg {
 	s32 field_0x34;
 } Func8005A1F4Arg;
 
+/* Struct pointed to by DreamSys::unk_0x14. `+0x38` is a 3-word vector
+   (read by func_8001E600/func_8005942C, both outside this runner's range).
+   Confirmed further by func_8005B904 (round 2026-09-01-e), which block-
+   copies the first 0x50 bytes of this struct (so through `+0x50`, past
+   both the vector and the pointer below) into `this+0x890`, then
+   block-copies 0x28 bytes from `*unk_0x44` into `this+0x8E0` -- together
+   filling `DreamSys`'s `unknown_values_0x890[0x78]` tail exactly
+   (0x50 + 0x28 == 0x78). Everything between `+0x0` and `+0x38`, and the
+   full layout of the 0x28-byte block `unk_0x44` points to, remain
+   unconfirmed -- only the sizes needed to reproduce the two block copies
+   are named here. */
+/* Sized purely from func_8005B904's own second block copy (0x28 bytes);
+   internal layout unconfirmed (round 2026-09-01-e). Typed here (not just
+   `void *`) so the compiler can prove `unk_0x44`'s pointee is 4-byte
+   aligned at compile time -- through a `void *` field, GCC 2.6.3 cannot
+   make that assumption and emits a runtime alignment check (`or`/`andi`/
+   `beqz` picking between an aligned lw/sw path and an unaligned lwl/lwr
+   one) that retail does not have. */
+typedef struct DreamSysUnk14Ext {
+	s32 raw[0x28 / 4];
+} DreamSysUnk14Ext;
+
+typedef struct DreamSysUnk14 {
+	u8 unknown_values_0x0[0x38];
+	s32 vector[3];
+	DreamSysUnk14Ext *unk_0x44;
+	u8 unknown_values_0x48[0x50 - 0x48];
+} DreamSysUnk14;
+
 /* Full-word (x,y,z) vector, distinct from `struct RelativePos` (s16 triplet
    -- the on-disk/network form). func_8005AF64 builds one of these on the
    stack as a-b with y forced to 0; func_8005A0B0 passes the static
@@ -260,7 +289,7 @@ typedef struct DreamSys {
 	/* Pointer to an unidentified struct; a 3-word vector lives at +0x38
 	   of what this points to (read by func_8001E600 / func_8005942C,
 	   guarded by unk_0xC above). */
-	void *unk_0x14;
+	DreamSysUnk14 *unk_0x14;
 	s8 unknown_values_0x18[12];
 
 	s32 dreamTimer;
