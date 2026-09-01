@@ -484,7 +484,15 @@ s32 func_8005AFD0(DreamSys *this)
 	return this->currentStage;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__ProcessChunkChange);
+void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
+{
+	PlayerSpawnPoint *pos;
+
+	if (effect == 5) {
+		pos = ((DreamSysEntityObj *)entity)->methods->slot0x10C(entity, 0, 0);
+		this->vt->LogChunkMood(this, pos);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
