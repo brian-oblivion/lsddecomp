@@ -13,65 +13,220 @@
  * queued functions actually dispatch through are typed below; the struct is
  * NOT padded out to its full size (New_Entity allocates 0x108 bytes, but
  * nothing here needs the whole layout).
+ *
+ * The vtable itself is `D_80089AD4` (asm/data/79528.data.s, offsets 0x000..
+ * 0x180) and it doubles as a legible cross-check: whichever function each
+ * slot currently HOLDS is the function that OVERRIDES/OCCUPIES that slot,
+ * not the function that CALLS it. Do not confuse the two -- the "called by"
+ * comments on `slot30`/`slot60`/`slot114`/`slot130` below name a CALLER
+ * of that slot (found by reading that caller's own disassembly), while
+ * "this unit's own slot" comments elsewhere name the function occupying a
+ * slot in the table. Early slots (+0x004, +0x010, +0x014, +0x01C..+0x038)
+ * hold `BasicClass__func_*`/`func_800570B4`/`func_80057130` -- the SAME
+ * addresses `code_55dd4.h`'s `Class65650Methods` holds at its own +0x004/
+ * +0x010/+0x014, confirming Entity and Class65650 share the identical
+ * "BasicClass" ancestor and its vtable layout convention (ctor at +0x008,
+ * dtor at +0x00C universally). `func_80066818()` (matched in code_55dd4.c)
+ * returns that SHARED ancestor's own vtable (`&D_8008A6C4`) directly -- so
+ * a `func_80066818()->slotNN(...)` call from Entity's own functions is a
+ * call into a function inherited from the same base as Class65650, not a
+ * Class65650-specific call, even though the accessor's name and declared
+ * return type come from that unit. `BasicClassMethods` below is Entity's
+ * OWN minimal, local view of exactly that shared table -- only the slots
+ * this unit's functions actually reach through it, independent of (and not
+ * editing) `code_55dd4.h`'s own `Class65650Methods` view of the same table.
  */
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
+typedef struct Unk100Obj Unk100Obj;
+typedef struct Unk100Methods Unk100Methods;
+typedef struct BasicClassMethods BasicClassMethods;
+typedef struct EntityPos EntityPos;
+typedef struct EntityMoodRow EntityMoodRow;
+typedef struct EntityRegionSlot EntityRegionSlot;
+typedef struct EntityRegionRef EntityRegionRef;
 
 struct EntityMethods {
     /* +0x00 */ s32 header;
     /* +0x04 */ void *unk04;
     /* +0x08 */ void *(*ctor)(Entity *self, void *arg0, void *arg1, void *arg2); /* New_Entity's call */
     /* +0x0C */ u8 pad0C[0x30 - 0x0C];
-    /* +0x30 */ void (*slot30)(Entity *self, s32 arg1);   /* func_8005DAAC */
-    /* +0x34 */ u8 pad34[0x60 - 0x34];
-    /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* func_8005D9F4 */
+    /* +0x30 */ void (*slot30)(Entity *self, s32 arg1);   /* called by func_8005DAAC, func_8005DF9C */
+    /* +0x34 */ u8 pad34[0x40 - 0x34];
+    /* +0x40 */ void (*slot40)(Entity *self);              /* called by Entity__Entity, right after this->methods is (re)assigned */
+    /* +0x44 */ u8 pad44[0x60 - 0x44];
+    /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by func_8005D9F4, func_8005DA3C */
     /* +0x64 */ u8 pad64[0x114 - 0x64];
-    /* +0x114 */ void (*slot114)(Entity *self);           /* func_8005DB8C */
+    /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
-    /* +0x130 */ void (*slot130)(Entity *self);           /* func_8005DB8C */
+    /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
+    /* +0x134 */ u8 pad134[0x15C - 0x134];
+    /* +0x15C */ void (*slot15C)(Entity *self);            /* called by func_8005DBF0 */
+    /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
+    /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C */
+    /* +0x168 */ u8 pad168[0x16C - 0x168];
+    /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C */
+    /* +0x170 */ s32 (*slot170)(Entity *self);                  /* called by func_8005D480 */
+    /* +0x174 */ void (*slot174)(Entity *self);                  /* called by func_8005D480 */
+    /* +0x178 */ void (*slot178)(Entity *self);                   /* called by func_8005D480 */
+    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by func_8005D480 */
+    /* +0x180 */ void (*slot180)(Entity *self);                     /* called by func_8005D480 */
+};
+
+/* Entity's own local view of the shared "BasicClass" ancestor vtable
+ * returned by `func_80066818()` (matched in code_55dd4.c/code_55dd4.h,
+ * which owns the canonical `Class65650Methods` view of this SAME table --
+ * see the big comment above). Only the offsets this unit's functions reach
+ * through it are named; everything else is inherited/not-yet-needed
+ * padding, same convention as `Class65650Methods`. */
+struct BasicClassMethods {
+    /* +0x000 */ u8 pad00[0x08];
+    /* +0x008 */ void *(*ctor)(void *self, s32 arg1, s32 arg2); /* Entity__Entity's base-class construction call */
+    /* +0x00C */ void (*dtor)(void *self);                       /* called by func_8005D1EC */
+    /* +0x010 */ u8 pad10[0x50 - 0x10];
+    /* +0x050 */ void (*slot50)(void *self);                       /* called by func_8005D418 */
+    /* +0x054 */ u8 pad54[0x98 - 0x54];
+    /* +0x098 */ void (*slot98)(void *self, s32 arg1, s32 arg2);      /* called by func_8005D480 */
+    /* +0x09C */ u8 pad9C[0xE0 - 0x9C];
+    /* +0x0E0 */ void (*slotE0)(void *self, s32 arg1, s32 arg2);        /* called by func_8005D658 */
+};
+
+extern BasicClassMethods *func_80066818(void);
+
+/* An object cached in `Entity::unk100`/`unk104`, unrelated to `EntityMethods`
+ * -- its own method table, dispatched through in func_8005D1EC/func_8005D108.
+ * Real shape unknown beyond the slots reached here. */
+struct Unk100Methods {
+    /* +0x00 */ u8 pad00[0x04];
+    /* +0x04 */ void (*slot04)(Unk100Obj *self);                          /* called by func_8005D1EC */
+    /* +0x08 */ u8 pad08[0x4C - 0x08];
+    /* +0x4C */ void (*slot4C)(Unk100Obj *self, Entity *arg1, void *arg2); /* called by func_8005D108 */
+    /* +0x50 */ void (*slot50)(Unk100Obj *self);                           /* called by func_8005D108 */
+    /* +0x54 */ u8 pad54[0xD0 - 0x54];
+    /* +0xD0 */ void (*slotD0)(Unk100Obj *self, void *arg1);                /* called by func_8005D108 */
+};
+
+struct Unk100Obj {
+    Unk100Methods *methods; /* +0x00 */
+};
+
+extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
+
+/* Default arguments func_8005D108 substitutes when its own `name`/`arg2`
+ * parameters are NULL -- both plain 2-word buffers (asm/data/7B3F8.sdata.s),
+ * not strings; `D_8008AC14` reads as {0x140, 0xF0} (320, 240, a plausible
+ * screen-extent default) and `D_8008AC0C` as {-100, -100}. */
+extern s32 D_8008AC14[2];
+extern s32 D_8008AC0C[2];
+
+/* A 3-word (x, y, z) position, pointed to by `Entity::unk14`. Only the
+ * words at +0x18/+0x20 (x/z) are read by this unit's functions; +0x1C (y)
+ * is inferred from func_8005D714 consuming all three as one vector
+ * (asm/nonmatchings/Entity/func_8005D714.s, still `addiu_at`-blocked, copies
+ * its arg1[0]/[1]/[2] verbatim onto its own stack). */
+struct EntityPos {
+    u8 pad00[0x18];
+    s32 x; /* +0x18 */
+    s32 y; /* +0x1C, unconfirmed -- no reader in this unit */
+    s32 z; /* +0x20 */
+};
+
+/* func_8005D7FC's second argument: a flag plus a pointer to an array of
+ * 0x38-byte slots (element [1] is the only one read here). Not an Entity
+ * type -- func_8005D7FC never dereferences `this->methods`, and this
+ * pointer's own fields don't match anything else in this unit. */
+struct EntityRegionSlot {
+    s32 x0;             /* +0x00 */
+    u8 pad04[0x04];
+    s32 z0;              /* +0x08 */
+    u8 pad0C[0x38 - 0x0C];
+};
+
+struct EntityRegionRef {
+    u8 pad00[0x0C];
+    s32 flag;                    /* +0x0C */
+    u8 pad10[0x04];
+    EntityRegionSlot *slots;       /* +0x14 */
 };
 
 /* Field offsets derived from this unit's own functions (func_8005D6D4,
  * func_8005D9F4, func_8005DAAC, func_8005DB8C, and the Get*Effect/Stage/Video
  * family). `unk9C` is only ever address-taken (passed as an output buffer to
  * two still-uncarved functions, func_8002CD08/func_8002CC84), never read
- * here, so its true size/shape is unconfirmed -- it's padded out only as far
- * as +0xF0, where the next known field starts. */
+ * here beyond its first word (zeroed by Entity__Entity), so its true
+ * size/shape past that first s32 is still unconfirmed -- it's padded out
+ * only as far as +0xF0, where the next known field starts. */
 struct Entity {
     /* +0x00 */ EntityMethods *methods;
-    /* +0x04 */ u8 pad04[0x24 - 0x04];
-    /* +0x24 */ s32 unk24;             /* cleared by func_8005D9F4 */
-    /* +0x28 */ u8 pad28[0x58 - 0x28];
+    /* +0x04 */ u8 pad04[0x0C - 0x04];
+    /* +0x0C */ s32 unk0C;              /* gate flag checked by func_8005D418 -- parallels Class65650/DreamSys's own shared-base +0xC gate, see code_55dd4.h */
+    /* +0x10 */ u8 pad10[0x14 - 0x10];
+    /* +0x14 */ EntityPos *unk14;        /* the 3-word position func_8005D714/func_8005D7FC read via +0x18 */
+    /* +0x18 */ u8 pad18[0x24 - 0x18];
+    /* +0x24 */ s32 unk24;             /* cleared by func_8005D9F4; xored against a mood-row-derived value in func_8005DD18 */
+    /* +0x28 */ u8 pad28[0x44 - 0x28];
+    /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1 */
+    /* +0x48 */ u8 pad48[0x4C - 0x48];
+    /* +0x4C */ s32 unk4C;               /* cleared by func_8005D418 */
+    /* +0x50 */ u8 pad50[0x58 - 0x50];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
     /* +0x5C */ u8 pad5C[0x98 - 0x5C];
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
-    /* +0x9C */ u8 unk9C[0xF0 - 0x9C]; /* address-of target only, see above */
-    /* +0xF0 */ s32 unkF0;             /* set to 1 by func_8005D9F4 */
+    /* +0x9C */ s32 unk9C;             /* zeroed by Entity__Entity; address-taken by func_8005D6D4/func_8005DB8C */
+    /* +0xA0 */ u8 padA0[0xF0 - 0xA0];
+    /* +0xF0 */ s32 unkF0;             /* set to 1 by func_8005D9F4; gate flag for func_8005DBF0/func_8005DD18 */
     /* +0xF4 */ s32 unkF4;             /* set from func_8005DAAC's arg1 */
     /* +0xF8 */ s32 unkF8;             /* cleared by func_8005DB8C */
     /* +0xFC */ s32 unkFC;             /* incremented by func_8005D6D4 */
+    /* +0x100 */ Unk100Obj *unk100;      /* lazily created/cached by func_8005D108; torn down by func_8005D1EC */
+    /* +0x104 */ Unk100Obj *unk104;       /* torn down by func_8005D1EC, never set within this unit */
 };
 
 extern EntityMethods *Get_vtable_Entity(void);
 extern void *func_80017B34(s32 size);
 extern void func_80017CFC(void *arg);
 
-/* Both still uncarved (no asm/nonmatchings file -- library or not-yet-carved
- * game code); called directly by name (jal), not through a vtable, so they
- * need a real extern prototype per CLAUDE.md's "calling into a function that
- * is still INCLUDE_ASM" guidance. Neither call site here uses the return
- * value, so void is a safe read regardless of the real return type. */
+/* All three still uncarved (no asm/nonmatchings file -- library or
+ * not-yet-carved game code); called directly by name (jal), not through a
+ * vtable, so they need a real extern prototype per CLAUDE.md's "calling
+ * into a function that is still INCLUDE_ASM" guidance. func_8005D714 itself
+ * DOES have a carved (but addiu_at-blocked, still-INCLUDE_ASM) .s file in
+ * this unit; its param shape is read directly off that disassembly: a0 is
+ * `this` (dereferences ->0x98/->0x94, both known Entity fields), a1 points
+ * at a 3-word vector copied onto its own stack, a2/a3 are single signed
+ * bytes it scales/negates. func_8002CD08/func_8002CC84's return values are
+ * unused at both call sites, so void is a safe read regardless of the real
+ * return type. */
 extern void func_8002CD08(s32 arg0, void *arg1);
 extern void func_8002CC84(s32 arg0, void *arg1);
+extern s32 func_8005D714(Entity *this, void *pos, s8 arg2, s8 arg3);
+extern void func_8005DF9C(Entity *this, s32 arg1);
+extern s32 rand(void);
 
-/* The four mood-indexed table lookups (D_80089EA4/A6/AB/AC), all sharing the
- * `this->moodIndex * 16` index computed independently in each function --
- * retail recomputes it every time rather than caching, so each of these is
- * written the same way. Table element types are `s8` (signed byte loads),
+/* The mood-indexed table lookups. `D_80089EA4` is a real struct array (16
+ * bytes/entry, `this->moodIndex` selects the row) -- func_8005DBF0 reads
+ * its +0x3 (signed) and func_8005DD18 its +0x4 (UNSIGNED) as two DIFFERENT
+ * small-enum fields, not the same byte reinterpreted; both also read +0x5
+ * (signed) and +0x9 (signed). `D_80089EA6`/`D_80089EAB`/`D_80089EAC` are
+ * SEPARATE global arrays (own base symbols, own `lui`/`addiu`), each also
+ * 16-byte/entry and independently `this->moodIndex`-indexed -- despite the
+ * base addresses' proximity, they are not sub-fields of the D_80089EA4 row.
+ * Table element types past what's listed here are `s8` (signed byte loads),
  * not `char`, despite `-funsigned-char` making plain `char` unsigned project-
  * wide -- these tables are explicitly `lb`, not `lbu`, in every user seen so
- * far (contrast Entity__GetUnlockEffect's `D_80089EA6`, also `lb`). */
-extern u8 D_80089EA4[]; /* GetMoodEffect: base of an array of unknown-shaped entries, 16 bytes/entry */
+ * far (contrast `linkKind`, `D_80089EA6`, both `lbu`/`lb`-mixed by design,
+ * not by the project's usual char convention). */
+struct EntityMoodRow {
+    u8 pad00[0x03];
+    s8 detachKind;   /* +0x03, read by func_8005DBF0 */
+    u8 linkKind;      /* +0x04, read by func_8005DD18 (unsigned load) */
+    s8 unk5;           /* +0x05 */
+    u8 pad06[0x03];
+    s8 unk9;            /* +0x09 */
+    u8 pad0A[0x06];
+};
+
+extern EntityMoodRow D_80089EA4[];
 extern s8 D_80089EA6[];  /* GetUnlockEffect */
 extern s8 D_80089EAB[];  /* GetLinkStage */
 extern s8 D_80089EAC[];  /* GetEventVideo */
