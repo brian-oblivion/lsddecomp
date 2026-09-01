@@ -5,7 +5,19 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", New_DreamSys);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__DreamSys);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__func_588ec);
+void DreamSys__func_588ec(DreamSys *this)
+{
+	this->vt->func_8001D344(this, 0);
+	this->vt->func_8001CEB4(this, 1, D_80087E08);
+	this->callback_0x80 = NULL;
+	this->callback_0x98 = NULL;
+	*(s32 *)this->unk_0xCC = 0;
+	this->unk_0x908 = 0;
+	this->unk_0x90C = 0;
+	this->unk_0x910 = 0;
+	this->unk_0x78 = 0;
+	this->unk_0x924 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__func_58968);
 
