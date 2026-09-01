@@ -2,6 +2,9 @@
 #define CLASS_DREAMSYS
 
 #include "common.h"
+/* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
+   (round 2026-08-30-d). */
+#include "StageGrid.h"
 
 /* .sbss values. The 7B4B4 sbss segment that actually holds these is still
    plain `data` (un-flipped to dot-form), so it already provides these
@@ -157,8 +160,66 @@ typedef struct DreamSysBaseMethods {
 	   ABI level, and the call site casts implicitly with no codegen
 	   difference (round 2026-08-30-b). */
 	void (*slot0x50)(struct DreamSys *self);
+	u8 pad54[0x9C - 0x54];
+	/* Called by func_80058E8C as (this, arg1, arg2) -- round 2026-08-30-d. */
+	void (*slot0x9C)(struct DreamSys *self, void *arg1, s32 arg2);
 } DreamSysBaseMethods;
 extern DreamSysBaseMethods *func_80057C84(void);
+
+/* Opaque view of whatever object DreamSys__ProcessChunkChange's `entity`
+   parameter points to -- almost certainly an `Entity*` (include/Entity.h),
+   but that unit's own `EntityMethods` doesn't type this slot (+0x10C) and
+   extending it is out of this unit's scope. Declared minimally, locally,
+   for this one call site only (round 2026-08-30-d). */
+typedef struct DreamSysEntityMethods {
+	u8 pad00[0x10C];
+	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
+} DreamSysEntityMethods;
+typedef struct DreamSysEntityObj {
+	DreamSysEntityMethods *methods;
+} DreamSysEntityObj;
+
+/* Struct pointed to by func_8005A1F4's arg1 -- forwarded (never called) as
+   func_8002CC34's 5th argument via func_800596E8's arg1==2 case, so its
+   real caller/owner lives outside this unit. Only the offsets
+   func_8005A1F4 itself touches are named; +0x8..+0x1C and +0x24..+0x30
+   are unconfirmed gaps (round 2026-08-30-d). */
+typedef struct Func8005A1F4Arg {
+	s32 mode;             /* +0x0, compared against literal 1 */
+	s32 value;              /* +0x4, divided by 20 */
+	s8 unknown_values_0x8[0x14];
+	s32 field_0x1C;
+	s32 field_0x20;
+	s8 unknown_values_0x24[0xC];
+	s32 field_0x30;
+	s32 field_0x34;
+} Func8005A1F4Arg;
+
+/* Full-word (x,y,z) vector, distinct from `struct RelativePos` (s16 triplet
+   -- the on-disk/network form). func_8005AF64 builds one of these on the
+   stack as a-b with y forced to 0; func_8005A0B0 passes the static
+   D_80087EA4 instance of one. Both feed vtable slot +0xBC
+   (func_800573A8, round 2026-08-30-d). */
+typedef struct DreamSysVec3 {
+	s32 x, y, z;
+} DreamSysVec3;
+extern DreamSysVec3 D_80087EA4;
+
+/* Argument shape for func_8005950C: two "keyframe" points, each with a
+   value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
+   (unread by this function). Called by still-INCLUDE_ASM func_8005942C as
+   func_8005950C(&this->unk_0x5C->unknown_values_0x0[0x14], arg2, arg3) --
+   the first argument is one of DreamSysUnk5C's two documented "point"
+   fields (round 2026-08-30-d). */
+typedef struct DreamSysInterpPoint {
+	s8 unknown_values_0x0[4];
+	s32 value;
+	s32 position;
+} DreamSysInterpPoint;
+
+/* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
+   classified into {0,1,2} by CalcDreamColor first (round 2026-08-30-d). */
+extern s8 D_80087E14[9];
 
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
    class_16334.h for the other units that also declare it locally. */
@@ -168,6 +229,11 @@ extern void *func_80017B34(s32 size);
    called by func_8005A134 as (this->unk_0x58, this->unk_0xCC)
    (round 2026-08-30-b). */
 extern void func_8002CC84(s32 arg0, void *arg1);
+
+/* Also declared in Entity.h. Called by func_8005A0B0 as
+   (this->unk_0x58, this->unk_0xCC) -- same argument shape as
+   func_8002CC84 above (round 2026-08-30-d). */
+extern void func_8002CD08(s32 arg0, void *arg1);
 
 typedef struct DreamSys {
 	struct vtable_DreamSys *vt;
@@ -385,7 +451,15 @@ struct vtable_DreamSys{
 	void (*func_8001D344)(DreamSys *this, s32 arg1);
 	u32 unknown_functions_0x64[13];
 	void *TimerTick;
-	u32 unknown_functions_0x9c[17];
+	/* This function's OWN slot; resolved via tools/classtable.py
+	   (round 2026-08-30-d). */
+	void (*func_80058E8C)(DreamSys *this, void *arg1, s32 arg2);
+	u32 unknown_functions_0xa0[7];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0BC). Called by
+	   func_8005AF64 and func_8005A0B0 with a DreamSysVec3* second argument
+	   (round 2026-08-30-d). */
+	void (*func_800573A8)(DreamSys *this, DreamSysVec3 *arg1);
+	u32 unknown_functions_0xc0[8];
 	void *LinkWall;
 	u32 unknown_functions_0xe4[6];
 	void (*func_80059310)(DreamSys *this);
@@ -459,8 +533,10 @@ struct vtable_DreamSys{
 	void (*func_8005A1B0)(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
 	void (*func_8005A1EC)(DreamSys *this, s32 value);
 	/* Referenced by func_800596E8's arg1==2 case: its raw address (never
-	   called there) is forwarded as func_8002CC34's 5th argument. */
-	void *func_8005A1F4;
+	   called there) is forwarded as func_8002CC34's 5th argument. arg0 is
+	   unused in the body; kept generic rather than typed DreamSys* since
+	   nothing here confirms it (round 2026-08-30-d). */
+	void (*func_8005A1F4)(void *arg0, Func8005A1F4Arg *arg1);
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as
@@ -488,7 +564,7 @@ struct vtable_DreamSys{
 	u32 unknown_functions_0x1d0[4];
 	/* Getter for currentStage (round 2026-08-30-c). */
 	s32 (*func_8005AFD0)(DreamSys *this);
-	void *ProcessChunkChange;
+	void (*ProcessChunkChange)(DreamSys *this, void *entity, s32 effect);
 	void (*InstanceEffectsOnPlayer)(DreamSys *this, void *entity, int effect);
 	void (*GetPreviousDayMood)(DreamSys *this, MoodGraphPoint *target, bool unknown);
 	void (*InitMoodContibutors)(DreamSys *this, MoodGraphPoint *special);
@@ -583,6 +659,17 @@ extern s8 SPECIAL_COLORS[];
    proves nothing about it (round 2026-08-30-c). */
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
                            s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
+
+/* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
+   STAGE_PERMALINK_* triple above but for tunnel links specifically. */
+extern s8 D_800889F0[];
+extern StaticLinkTrigger* D_80088980[];
+extern StageSpawn* D_80088820[];
+
+/* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
+extern s8 D_80088CBC[];
+extern StaticLinkTrigger* D_80088C4C[];
+extern StageSpawn* D_80088BA4[];
 
 /* This function might be called when the player hits a wall?
 It tries to do an static link first, then a dynamic one */
