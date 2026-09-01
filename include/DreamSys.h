@@ -475,7 +475,9 @@ struct vtable_DreamSys{
 	void (*func_8005A33C)(DreamSys *this);
 	/* Getter for unk_0x878 (round 2026-08-30-c). */
 	s32 (*func_8005A344)(DreamSys *this);
-	void *func_8005A350;
+	/* Optionally writes a literal 0x700 through arg1 (if non-NULL), always
+	   returns &this->unknown_sdata_0x178 (round 2026-08-30-c). */
+	s32 *(*func_8005A350)(DreamSys *this, s32 *arg1);
 	s32 (*StartDay)(DreamSys *this);
 	s32 (*EndDay)(DreamSys *this, s32 arg1);
 	CinematicCall (*GetCinematic)(DreamSys *this);

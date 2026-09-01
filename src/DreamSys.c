@@ -384,7 +384,12 @@ s32 func_8005A344(DreamSys *this)
 	return this->unk_0x878;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A350);
+s32 *func_8005A350(DreamSys *this, s32 *arg1)
+{
+	if (arg1 != NULL)
+		*arg1 = 0x700;
+	return &this->unknown_sdata_0x178;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StartDay);
 
