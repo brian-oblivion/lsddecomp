@@ -14,7 +14,16 @@ void *func_8003B9DC(StreamTask *self) {
     return func_8003DFBC()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA38);
+/* StreamTask's override of slot +0x040: resets the five fields also
+ * reachable individually through func_8003BE5C..func_8003BE7C to their
+ * default values. */
+void func_8003BA38(StreamTask *self) {
+    self->unkC8 = -1;
+    self->unkC4 = 0;
+    self->unkCC = 1;
+    self->unkD0 = 0;
+    self->unkD4 = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA58);
 
