@@ -708,7 +708,15 @@ void func_8005B904(DreamSys *this)
 	*(DreamSysUnk14Ext *)((u8 *)this + 0x8E0) = *u14->unk_0x44;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B990);
+void func_8005B990(DreamSys *this)
+{
+	DreamSysUnk14 *u14;
+
+	u14 = this->unk_0x14;
+	*u14 = *(DreamSysUnk14 *)((u8 *)this + 0x890);
+	*u14->unk_0x44 = *(DreamSysUnk14Ext *)((u8 *)this + 0x8E0);
+	u14->unk_0x0 = 0;
+}
 
 s32 func_8005BA20(DreamSys *this, s32 value)
 {

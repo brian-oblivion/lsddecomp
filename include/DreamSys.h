@@ -229,7 +229,12 @@ typedef struct DreamSysUnk14Ext {
 } DreamSysUnk14Ext;
 
 typedef struct DreamSysUnk14 {
-	u8 unknown_values_0x0[0x38];
+	/* Cleared to 0 unconditionally by func_8005B990 (round 2026-09-01-e),
+	   after that function restores the two block-copies func_8005B904
+	   saves; plausibly a dirty/pending flag, but nothing here confirms
+	   more than "written 0" at this offset. */
+	s32 unk_0x0;
+	u8 unknown_values_0x4[0x38 - 4];
 	s32 vector[3];
 	DreamSysUnk14Ext *unk_0x44;
 	u8 unknown_values_0x48[0x50 - 0x48];
