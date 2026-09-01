@@ -44,7 +44,13 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058C58);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TimerTick);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058E8C);
+void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
+{
+	func_80057C84()->slot0x9C(this, arg1, arg2);
+	if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
+		this->vt->ProcessChunkChange(this, arg1, arg2);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058F18);
 
@@ -289,7 +295,15 @@ void func_8005A050(DreamSys *this)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A0B0);
+void func_8005A0B0(DreamSys *this)
+{
+	if (this->unk_0xC4 != 0) {
+		this->vt->func_800573A8(this, &D_80087EA4);
+		this->unk_0x5C->unk_0x24 -= 0x258;
+	}
+	if (this->unk_0xC8 != 0)
+		func_8002CD08(this->unk_0x58, this->unk_0xCC);
+}
 
 void func_8005A134(DreamSys *this, s32 arg1)
 {
@@ -400,11 +414,39 @@ CinematicCall DreamSys__GetCinematic(DreamSys *this)
 	return this->nextCinematic;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitSpawnLoc);
+void DreamSys__InitSpawnLoc(DreamSys *this)
+{
+	MoodGraphPoint mood;
+	s32 timeLimit;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__DynamicLink);
+	this->vt->GetPreviousDayMood(this, &mood, 1);
+	this->currentStage = GenerateInitialSpawn(&this->linkCoordinates, &timeLimit, &mood, this->currentDay);
+	timeLimit = this->vt->GetSetDreamTimeLimit(this, timeLimit);
+	this->unknwon_int_0x44 = 0xB;
+}
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StaticWallLink);
+void DreamSys__DynamicLink(DreamSys *this)
+{
+	s32 stage;
+
+	if (this->unknwon_int_0x44 == 0) {
+		stage = GetRandomSpawnFromStage(&this->linkCoordinates, this->currentStage, this->dreamTimer);
+		ExecuteLink(this, stage, 0xC, 1);
+	}
+}
+
+bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = TestForStaticLink(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0)
+		return false;
+	ExecuteLink(this, result, 0xD, 1);
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LoadNextFlashback);
 
@@ -426,14 +468,31 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AD68);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AE40);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AF64);
+void func_8005AF64(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
+{
+	DreamSysVec3 diff;
+
+	diff.x = a->x - b->x;
+	diff.y = a->y - b->y;
+	diff.z = a->z - b->z;
+	diff.y = 0;
+	this->vt->func_800573A8(this, &diff);
+}
 
 s32 func_8005AFD0(DreamSys *this)
 {
 	return this->currentStage;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__ProcessChunkChange);
+void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
+{
+	PlayerSpawnPoint *pos;
+
+	if (effect == 5) {
+		pos = ((DreamSysEntityObj *)entity)->methods->slot0x10C(entity, 0, 0);
+		this->vt->LogChunkMood(this, pos);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
@@ -441,7 +500,13 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitMoodContibutors);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LogChunkMood);
+void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	MoodGraphPoint *mood;
+
+	mood = GetMoodFromStageChunk(this->currentStage, (StageChunk *)currentPos);
+	this->vt->LogMood(this, &this->areaMoods, mood);
+}
 
 void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
 {
@@ -470,11 +535,39 @@ void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LogMood);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetMoodAverage);
+void DreamSys__GetMoodAverage(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *ret)
+{
+	if (layer->amountMoods != 0) {
+		ret->axis.dynamic = CalcMoodAxis(layer->lastMood.axis.dynamic, layer->sumMoods.dynamic, layer->amountMoods);
+		ret->axis.upper = CalcMoodAxis(layer->lastMood.axis.upper, layer->sumMoods.upper, layer->amountMoods);
+	} else {
+		ret->value = layer->lastMood.value;
+	}
+}
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcMoodAxis);
+s32 CalcMoodAxis(s32 lank, s32 sum, s32 amount)
+{
+	s32 result;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__CalcUnlockScore);
+	result = sum / amount;
+	result += lank / 3;
+	if (result >= 10)
+		result = -9;
+	else if (result < -9)
+		result = 9;
+	return result;
+}
+
+void DreamSys__CalcUnlockScore(DreamSys *this)
+{
+	this->navigationFlasbackUnlockScore = CalcNavigationScore();
+	if (this->instanceFlasbackUnlockScore < 0) {
+		this->instanceFlasbackUnlockScore = 0;
+	} else if (this->instanceFlasbackUnlockScore > 50000000) {
+		this->instanceFlasbackUnlockScore = 50000000;
+	}
+	this->totalFlasbackUnlockScore = this->navigationFlasbackUnlockScore + this->instanceFlasbackUnlockScore;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__AddFlashback);
 
@@ -521,7 +614,11 @@ s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s3
 	                       STAGE_PERMALINK_TRIGGERS, STAGE_PERMALINK_SPAWNS, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4TunnelLinks);
+s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
+{
+	return GetStaticSpawn(target, currentPos, stage, D_800889F0,
+	                       D_80088980, D_80088820, 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BD3C);
 
@@ -537,7 +634,13 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4InstantTeleporters);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BFC4);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4StaircaseNodes);
+s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
+{
+	if (arg2 == 0)
+		return GetStaticSpawn(target, currentPos, 0, D_80088CBC,
+		                       D_80088C4C, D_80088BA4, 0);
+	return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C02C);
 
