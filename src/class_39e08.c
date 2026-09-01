@@ -1,4 +1,5 @@
 #include "common.h"
+#include "class_39e08.h"
 
 /* New_ClassA: allocate a 0x50-byte instance and construct it. */
 ClassA *func_80049608(void *arg1, void *arg2, s32 arg3) {
@@ -42,6 +43,9 @@ void func_80049C50(ClassA *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
 
+/* STALL (32/33 words) -- see docs/match-reports/func_80049E20.md. Retail
+ * spills the never-read-again second parameter to 0x10($sp); no reshaping
+ * tried reproduces that store. */
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049E20);
 
 void func_80049EA4(void) {
@@ -50,6 +54,9 @@ void func_80049EA4(void) {
 void func_80049EAC(void) {
 }
 
+/* BLOCKED: addiu_at via jump table jtbl_8001140C, see
+ * docs/research/addiu-at-blocker.md and docs/match-reports/func_80049EB4.md.
+ * Pre-screened; not attempted. */
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049EB4);
 
 /* Get_vtable_ClassA -- a direct address load, not a call. */
@@ -57,6 +64,8 @@ ClassAMethods *func_8004A060(void) {
     return &D_800865C8;
 }
 
+/* BLOCKED: gp_rel, see docs/research/gp-relative-blocker.md and
+ * docs/match-reports/func_8004A070.md. Pre-screened; not attempted. */
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A070);
 
 /* New_ClassC: allocate a 0x38-byte instance of a third, unrelated class and
