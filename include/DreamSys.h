@@ -98,7 +98,12 @@ typedef struct {
 	struct Angle heading;
 	struct Angle roll; /* Ditto */
 	s16 timeLimit;
-	s32 unknown_value_0x1c;
+	/* Was a single s32 -- corrected to two s16 halves (round 2026-09-01-e,
+	   DreamSys__AddFlashback): retail stores its 5th argument here with a
+	   halfword `sh`, not a word `sw`, so only +0x1C is written by that
+	   function. +0x1E is untouched by it and remains unconfirmed. */
+	s16 unknown_value_0x1c;
+	s16 unknown_value_0x1e;
 	s32 day;
 } FlashbackEntry;
 
