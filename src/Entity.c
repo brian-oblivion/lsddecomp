@@ -113,7 +113,24 @@ void func_8005D6D4(Entity *this) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D714);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D7FC);
+s32 func_8005D7FC(Entity *this, EntityRegionRef *region) {
+    EntityRegionSlot *range;
+    EntityPos *pos;
+    s32 dx;
+    s32 dz;
+
+    range = NULL;
+    if (region->flag != 0) {
+        range = &region->slots[1];
+    }
+    pos = this->unk14;
+    dx = pos->x - range->x0;
+    if (dx < 0) {
+        dx = ~dx + 1;
+    }
+    dz = pos->z - range->z0;
+    return (dz >= 0) ? (dx + dz) : (dx - dz);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D864);
 
