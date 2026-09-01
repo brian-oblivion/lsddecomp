@@ -473,7 +473,8 @@ struct vtable_DreamSys{
 	s32 (*AdvanceDay)(DreamSys *this);
 	/* Zeroes unk_0x878 unconditionally (round 2026-08-30-c). */
 	void (*func_8005A33C)(DreamSys *this);
-	void *func_8005A344;
+	/* Getter for unk_0x878 (round 2026-08-30-c). */
+	s32 (*func_8005A344)(DreamSys *this);
 	void *func_8005A350;
 	s32 (*StartDay)(DreamSys *this);
 	s32 (*EndDay)(DreamSys *this, s32 arg1);
