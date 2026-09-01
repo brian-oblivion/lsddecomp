@@ -44,7 +44,13 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058C58);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TimerTick);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058E8C);
+void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
+{
+	func_80057C84()->slot0x9C(this, arg1, arg2);
+	if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
+		this->vt->ProcessChunkChange(this, arg1, arg2);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058F18);
 
