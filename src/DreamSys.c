@@ -480,7 +480,36 @@ bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A7A0);
+/* Still INCLUDE_ASM, outside this runner's range; typed from this and
+   func_8005A700's call sites (round 2026-09-01-e). func_8005BE90's own
+   return is a spawn/link index; func_8005BF48 ignores all four of its
+   arguments and returns either NULL or `&D_8008ABF0` (see below). */
+extern s32 func_8005BE90(PlayerSpawnPoint *target, s32 mode, PlayerSpawnPoint *currentPos, s32 dreamTimer);
+/* Takes NO arguments -- confirmed from ITS OWN body (still visible in this
+   unit's asm), which never reads $a0-$a3 at all, only a %gp_rel global.
+   The call site's own registers ($a0=this, $a1=result, $a2=0x10, $a3=0) are
+   argument setup for the FOLLOWING call (ExecuteLink), not this one -- the
+   `jal func_8005BF48` itself has a bare `nop` delay slot. Declaring this
+   with a false 4-argument signature made GCC emit real arg-setup code
+   before this call instead of after it, growing the function by two words
+   and drifting everything downstream (round 2026-09-01-e). */
+extern void *func_8005BF48(void);
+
+bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = func_8005BE90(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
+	if (result < 0)
+		return false;
+	this->unk_0x880 = func_8005BF48();
+	this->unk_0x884 = 0;
+	this->unk_0x888 = 0;
+	ExecuteLink(this, result, 0x10, 0);
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A82C);
 
