@@ -1,6 +1,19 @@
-# New_DreamSys — STALL
+# New_DreamSys — MATCHED (round 2026-08-30-c)
 
-**Unit:** DreamSys · **Size:** 31 instructions · **Best reached:** 30/31 words
+**Unit:** DreamSys · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
+
+> **RESOLVED, round 2026-08-30-c.** Head-adjudicated re-check after
+> `func_80059E3C` turned out to be a wrong-parameter-list bug, not a true
+> register-identity stall (see that report). New_DreamSys does NOT have the
+> same root cause -- the residue register was `$v0` (the return-value
+> register), not an argument register `$a0`-`$a3`, and it was never live
+> into a subsequent call in either branch, so the "loaded-into-an-argument-
+> register-and-not-overwritten" test does not apply here. It WAS still
+> reachable, though, by a sixth reshape distinct from every prior attempt
+> (see below) -- two explicit `return` statements at the tail, rather than
+> one trailing `return this;` after an early exit. Kept as attempt 6 of the
+> history below rather than replacing it, per the instruction to preserve
+> the attempt record.
 
 ## What it does
 
@@ -27,25 +40,35 @@ fields). The finding stands regardless of this function's own match status
 -- it comes from retail's own INCLUDE_ASM bytes, not from anything this
 round wrote.
 
-## Best-reached body (does NOT compile to retail bytes)
+## The matching C
 
 ```c
-#if 0
 DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 {
 	DreamSys *this;
 
 	this = func_80017B34(sizeof(DreamSys));
-	if (this != NULL)
+	if (this != NULL) {
 		Get_vtable_DreamSys()->Constructor(this, arg0, arg1, arg2);
-	return this;
+		return this;
+	}
+	return NULL;
 }
-#endif
 ```
 
-## Residue (NOT blocking, but not reachable by reshaping in ~6 tries):
+The only difference from reshape 1 below: `return this;` moved INSIDE the
+`if` block (immediately after the constructor call), with a second, explicit
+`return NULL;` as the function's final statement, instead of one trailing
+`return this;` reached by fallthrough from both branches. Same single
+variable, same overall shape as reshape 3 (`goto`) -- but this one moved the
+residue and the `goto` version didn't. Not fully explained; recorded as
+"reshape 6 works, reshape 3 doesn't" without a deeper theory, since the two
+looked equivalent going in.
+
+## History: the residue that took 6 reshapes to close (kept for the record)
+
 retail materializes a literal 0 for the null-allocation return path where
-this body reuses the already-zero register
+five of the six attempted bodies reused the already-zero register instead
 
 Single-word diff, offset `0x800587A8`:
 
@@ -60,11 +83,10 @@ path, `$s0` (== `this`) is ALREADY zero, since that's exactly what the
 return value as the literal `$zero` register instead of reusing `$s0`; this
 body's natural codegen reuses `$s0`.
 
-Reshapes tried, all either reproducing the exact same single-word diff or
-making it worse:
+Reshapes tried:
 
-1. Plain `if (this != NULL) { ctor(); } return this;` (shown above) -- 30/31,
-   this exact residue.
+1. Plain `if (this != NULL) { ctor(); } return this;` -- 30/31, this exact
+   residue.
 2. `if (this == NULL) return NULL; ctor(); return this;` (early return with a
    literal `NULL`) -- changed the function's OWN SIZE (GCC 2.6.3 did not
    share the epilogue between the two return points), which shifted every
@@ -87,28 +109,33 @@ making it worse:
    -- changed prologue INSTRUCTION ORDER (new mismatches appeared elsewhere,
    27/31) without touching this residue at all. Confirms it isn't an
    ordering issue.
+6. **(round 2026-08-30-c, the one that worked)** Single variable again, like
+   1-3, but `return this;` moved INSIDE the `if` block right after the
+   constructor call, with an explicit trailing `return NULL;` as the
+   function's own last statement -- see "The matching C" above. 31/31.
 
-This looks like the same class `DECOMPILATION_LEARNINGS.md` already
-describes for `new_class_6d3c8` and the "redundant `move`" entries: a value
-GCC materializes that plain source reshaping doesn't reach, not a stall
-caused by wrong control flow or wrong types. Flagging as a second permuter
-candidate alongside `new_class_6d3c8` given the `New_X` shape overlap --
-worth checking whether the same source form that closes one closes both.
+This was NOT the `new_class_6d3c8` / "redundant move" residue class after
+all, despite looking identical to it through attempts 1-5 -- it was an
+ordinary reshape that just hadn't been tried yet. Retracting the earlier
+"second permuter candidate" suggestion below; no permuter target here.
 
 ### Proposed learning
 
-A second `New_X` sub-shape stalls on the SAME kind of residue as
-`new_class_6d3c8` (a materialized value reshaping can't reach), not a new
-one: when both branches of a null-checked allocator return the same logical
-value, don't assume the "default value in a delay slot" idiom applies just
-because retail's disassembly LOOKS like that idiom (a literal in one delay
-slot) -- introducing the second variable that idiom implies can cost an
-EXTRA callee-saved register if the allocator result and the return value
-were already unified in the working register, making the diff much worse,
-not better. Check the register budget (how many `s`-regs retail's own
-prologue saves) before restructuring into two variables.
+Two explicit `return` statements (one inside the success branch, one as the
+function's trailing statement) are NOT interchangeable with `goto`-to-a-
+shared-return OR with one trailing `return this;` reached by fallthrough
+from both branches, even when all three read as "the same control flow" and
+even when the early-return-changes-size trap (attempt 2) doesn't apply
+because both paths return the same logical value. All four single-variable
+shapes (1, 2, 3, 6) look equivalent on paper; only 2 and 6 differ from 1 and
+3 in an observable way (2 changes size, 6 changes register selection), and
+that difference isn't explained by anything else this round found. Try the
+early-return-inside-the-if variant (6) as a distinct, cheap reshape before
+concluding a residue is a genuine stall -- it is easy to skip over because
+it looks redundant with the `goto` version.
 
 ## Provenance
 
-round 2026-08-30-b, runner ALPHA, address range
-`0x80058774`-`0x8005A1EC`. Restored to `INCLUDE_ASM`.
+round 2026-08-30-b, runner ALPHA, address range `0x80058774`-`0x8005A1EC`
+(reshapes 1-5, stalled). Resolved round 2026-08-30-c, same runner, address
+range widened to the whole unit (reshape 6, matched).

@@ -114,10 +114,14 @@ typedef struct DreamSysUnk5C {
    whether it is the SAME class as DreamSys::unk_0x4C below -- is unknown.
    Elsewhere in this unit unk_0x58 is set/read as a plain s32
    (func_8005937C, func_8005A134's call into func_8002CC84), which is
-   consistent with it being a pointer value just not typed that way there. */
+   consistent with it being a pointer value just not typed that way there.
+   slot0x84 takes TWO arguments, not one -- head-adjudicated 2026-08-30-c:
+   the guard value (DreamSys::unk_0xBC) loaded into $a1 by func_80059E3C is
+   never overwritten before the jalr, so it is passed through, not just
+   branched on. See func_80059E3C.md. */
 typedef struct DreamSysUnk58Vtable {
 	u8 pad00[0x84];
-	void (*slot0x84)(void *self);
+	void (*slot0x84)(void *self, s32 flag);
 } DreamSysUnk58Vtable;
 typedef struct DreamSysUnk58 {
 	DreamSysUnk58Vtable *vt;
@@ -461,12 +465,19 @@ struct vtable_DreamSys{
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as
 	   this->vt->func_8005A2E4(this, 0), compared against 1. Real name and
-	   full semantics unknown outside that one call site. */
-	s32 (*func_8005A2E4)(DreamSys *this, s32 arg1);
+	   full semantics unknown outside that one call site. arg1 is an OUTPUT
+	   pointer (this->currentYear is written through it when non-NULL), not
+	   a plain s32 -- retyped round 2026-08-30-c; the one external call site
+	   passes literal 0, compatible with either. */
+	s32 (*func_8005A2E4)(DreamSys *this, s32 *arg1);
 	s32 (*AdvanceDay)(DreamSys *this);
-	void *func_8005A33C;
-	void *func_8005A344;
-	void *func_8005A350;
+	/* Zeroes unk_0x878 unconditionally (round 2026-08-30-c). */
+	void (*func_8005A33C)(DreamSys *this);
+	/* Getter for unk_0x878 (round 2026-08-30-c). */
+	s32 (*func_8005A344)(DreamSys *this);
+	/* Optionally writes a literal 0x700 through arg1 (if non-NULL), always
+	   returns &this->unknown_sdata_0x178 (round 2026-08-30-c). */
+	s32 *(*func_8005A350)(DreamSys *this, s32 *arg1);
 	s32 (*StartDay)(DreamSys *this);
 	s32 (*EndDay)(DreamSys *this, s32 arg1);
 	CinematicCall (*GetCinematic)(DreamSys *this);
@@ -474,7 +485,9 @@ struct vtable_DreamSys{
 	void (*DynamicLink)(DreamSys *this);
 	bool (*StaticWallLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	bool (*LoadNextFlashback)(DreamSys *this, bool unknown);
-	u32 unknown_functions_0x1d0[5];
+	u32 unknown_functions_0x1d0[4];
+	/* Getter for currentStage (round 2026-08-30-c). */
+	s32 (*func_8005AFD0)(DreamSys *this);
 	void *ProcessChunkChange;
 	void (*InstanceEffectsOnPlayer)(DreamSys *this, void *entity, int effect);
 	void (*GetPreviousDayMood)(DreamSys *this, MoodGraphPoint *target, bool unknown);
@@ -489,14 +502,34 @@ struct vtable_DreamSys{
 	void (*CalcUnlockScore)(DreamSys *this);
 	void *GameManager__AddFlashback;
 	void *GameManager__FlashbackSaving;
-	u32 unknown_functions_0x21c[3];
-	/* +0x228: called once, from Class6D3C8's constructor (func_80025FDC in
-	   src/code_1677c.c), as this->vt->func_228(this, arg->unk14) right after
-	   DreamSys is allocated by New_DreamSys. Real name/behaviour unknown --
-	   this slot lives past the previously-documented end of this struct
-	   (0x21c), discovered from that call site, not from any DreamSys-owning
-	   unit's own code. */
-	void (*func_228)(DreamSys *this, s32 arg1);
+	void (*ResetFlashbackList)(DreamSys *this);
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x220/+0x224);
+	   both do block-copies of storedFlasbacks-adjacent memory (this+0x890,
+	   this+0x8E0 -- inside this round's newly-extended struct tail) driven
+	   by a length read from this->unk_0x14. Out of scope this round;
+	   named only, not typed beyond `void *` (round 2026-08-30-c). */
+	void *func_8005B904;
+	void *func_8005B990;
+	/* This field is named `func_228`, not `func_8005BA20`, even though it
+	   IS func_8005BA20's slot (resolved via tools/classtable.py this
+	   round) -- src/code_1677c.c (a different unit, out of this runner's
+	   scope) already references it by this name
+	   (`self->dreamSys->vt->func_228(...)`), and renaming the field would
+	   require an out-of-scope edit there. Do not "fix" this name without
+	   updating that call site in the same commit.
+	   This slot was previously thought to sit PAST a documented struct end
+	   at 0x21c; that was also wrong -- it directly follows
+	   ResetFlashbackList/func_8005B904/func_8005B990 above, no gap.
+	   Original call-site note preserved: called once, from Class6D3C8's
+	   constructor (func_80025FDC in src/code_1677c.c), as
+	   this->vt->func_228(this, arg->unk14) right after DreamSys is
+	   allocated by New_DreamSys -- the call site's own signature (single
+	   s32 arg, return value discarded) matches func_8005BA20's own
+	   (this, s32 value) -> s32 get/set exactly, hence the retype from
+	   `void (*)(DreamSys*, s32)` to `s32 (*)(DreamSys*, s32)` (a discarded
+	   non-void return in a bare statement is legal C either way, so this
+	   retype does not require touching code_1677c.c). */
+	s32 (*func_228)(DreamSys *this, s32 arg1);
 };
 
 typedef enum DreamColors{
@@ -540,6 +573,16 @@ extern s8 LEN_STAGE_PERMALINK_TRIGGERS[];
 extern s16 SPECIAL_DAYS[];
 
 extern s8 SPECIAL_COLORS[];
+
+/* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
+   Test4InstantTeleporters, each of which forwards its own three args
+   straight through and appends a fixed trailing quadruple (length table,
+   trigger table, spawn table, literal 1). Still INCLUDE_ASM; return type is
+   a guess (s32, compared with `bltz` at DreamSys__StaticWallLink's call
+   site) -- CLAUDE.md's tail-call-wrapper warning applies: byte match alone
+   proves nothing about it (round 2026-08-30-c). */
+extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
+                           s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
 
 /* This function might be called when the player hits a wall?
 It tries to do an static link first, then a dynamic one */
