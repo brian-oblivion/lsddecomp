@@ -34,7 +34,35 @@ Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D108);
+Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+    Unk100Obj *cached;
+    Unk100Obj *sub;
+    Unk100Methods *m;
+    void *dispatchArg2;
+
+    cached = this->unk100;
+    if (cached == NULL) {
+        if (name == NULL) {
+            name = D_8008AC14;
+        }
+        sub = func_8003FDB0(name, 0, arg4);
+        if (sub == NULL) {
+            return NULL;
+        }
+        this->unk100 = sub;
+    } else {
+        sub = cached;
+    }
+    sub->methods->slot50(sub);
+    m = sub->methods;
+    dispatchArg2 = arg2;
+    if (dispatchArg2 == NULL) {
+        dispatchArg2 = D_8008AC0C;
+    }
+    m->slot4C(sub, this, dispatchArg2);
+    sub->methods->slotD0(sub, arg3);
+    return sub;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D1EC);
 
