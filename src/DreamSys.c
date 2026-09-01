@@ -395,7 +395,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StartDay);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__EndDay);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetCinematic);
+CinematicCall DreamSys__GetCinematic(DreamSys *this)
+{
+	return this->nextCinematic;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitSpawnLoc);
 
