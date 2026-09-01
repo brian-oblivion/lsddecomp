@@ -46,7 +46,20 @@ void func_8003BA58(StreamTask *self, s32 a1, s32 a2, s32 typeLookup, s32 flag) {
     func_8003DFBC()->slot44(self, a1, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BAB4);
+/* StreamTask's override of slot +0x04C: chains into the base task class's
+ * own copy of the same slot, resets unkA4, ticks the sub-object's slot
+ * +0x06C, then dispatches its slot +0x040 and (if non-zero) re-enters this
+ * object's own slot +0x06C (func_8003BCF4) with a literal 0. */
+void func_8003BAB4(StreamTask *self) {
+    s32 status;
+    func_8003DFBC()->slot4C(self);
+    self->unkA4 = 0;
+    self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
+    status = self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8);
+    if (status != 0) {
+        self->methods->slot6C(self, 0);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BB5C);
 
