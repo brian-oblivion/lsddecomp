@@ -357,7 +357,12 @@ void DreamSys__GetSetScreenShake(DreamSys *this, bool *value)
 	*value = old;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A2E4);
+s32 func_8005A2E4(DreamSys *this, s32 *arg1)
+{
+	if (arg1 != NULL)
+		*arg1 = this->currentYear;
+	return this->currentDay + 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__AdvanceDay);
 

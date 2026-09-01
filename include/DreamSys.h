@@ -465,8 +465,11 @@ struct vtable_DreamSys{
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as
 	   this->vt->func_8005A2E4(this, 0), compared against 1. Real name and
-	   full semantics unknown outside that one call site. */
-	s32 (*func_8005A2E4)(DreamSys *this, s32 arg1);
+	   full semantics unknown outside that one call site. arg1 is an OUTPUT
+	   pointer (this->currentYear is written through it when non-NULL), not
+	   a plain s32 -- retyped round 2026-08-30-c; the one external call site
+	   passes literal 0, compatible with either. */
+	s32 (*func_8005A2E4)(DreamSys *this, s32 *arg1);
 	s32 (*AdvanceDay)(DreamSys *this);
 	void *func_8005A33C;
 	void *func_8005A344;
