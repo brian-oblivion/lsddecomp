@@ -59,7 +59,20 @@ ClassAMethods *func_8004A060(void) {
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A070);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A130);
+/* New_ClassC: allocate a 0x38-byte instance of a third, unrelated class and
+ * construct it through BasicClass's own ctor slot. */
+void *func_8004A130(void *arg1, void *arg2) {
+    void *self;
+
+    self = func_80017B34(0x38);
+    if (self == NULL) {
+        goto fail;
+    }
+    func_8004A4B8()->ctor(self, arg1, arg2);
+    return self;
+fail:
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A19C);
 
