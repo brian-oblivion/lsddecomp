@@ -414,7 +414,16 @@ CinematicCall DreamSys__GetCinematic(DreamSys *this)
 	return this->nextCinematic;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitSpawnLoc);
+void DreamSys__InitSpawnLoc(DreamSys *this)
+{
+	MoodGraphPoint mood;
+	s32 timeLimit;
+
+	this->vt->GetPreviousDayMood(this, &mood, 1);
+	this->currentStage = GenerateInitialSpawn(&this->linkCoordinates, &timeLimit, &mood, this->currentDay);
+	timeLimit = this->vt->GetSetDreamTimeLimit(this, timeLimit);
+	this->unknwon_int_0x44 = 0xB;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__DynamicLink);
 
