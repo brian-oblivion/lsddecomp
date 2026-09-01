@@ -98,7 +98,12 @@ typedef struct {
 	struct Angle heading;
 	struct Angle roll; /* Ditto */
 	s16 timeLimit;
-	s32 unknown_value_0x1c;
+	/* Was a single s32 -- corrected to two s16 halves (round 2026-09-01-e,
+	   DreamSys__AddFlashback): retail stores its 5th argument here with a
+	   halfword `sh`, not a word `sw`, so only +0x1C is written by that
+	   function. +0x1E is untouched by it and remains unconfirmed. */
+	s16 unknown_value_0x1c;
+	s16 unknown_value_0x1e;
 	s32 day;
 } FlashbackEntry;
 
@@ -111,19 +116,25 @@ typedef struct DreamSysUnk5C {
 	s32 unk_0x24;
 } DreamSysUnk5C;
 
-/* Object pointed to by DreamSys::unk_0x58, used ONLY by func_80059E3C (this
-   round): loaded, dereferenced for its own vtable pointer at offset 0, and
-   called through slot +0x84. Everything else about this class -- including
-   whether it is the SAME class as DreamSys::unk_0x4C below -- is unknown.
-   Elsewhere in this unit unk_0x58 is set/read as a plain s32
-   (func_8005937C, func_8005A134's call into func_8002CC84), which is
-   consistent with it being a pointer value just not typed that way there.
+/* Object pointed to by DreamSys::unk_0x58, loaded, dereferenced for its own
+   vtable pointer at offset 0, and called through slot +0x84 (func_80059E3C)
+   or slot +0x80 (ExecuteLink, round 2026-09-01-e). Everything else about
+   this class -- including whether it is the SAME class as DreamSys::unk_0x4C
+   below -- is unknown. Elsewhere in this unit unk_0x58 is set/read as a
+   plain s32 (func_8005937C, func_8005A134's call into func_8002CC84), which
+   is consistent with it being a pointer value just not typed that way there.
    slot0x84 takes TWO arguments, not one -- head-adjudicated 2026-08-30-c:
    the guard value (DreamSys::unk_0xBC) loaded into $a1 by func_80059E3C is
    never overwritten before the jalr, so it is passed through, not just
-   branched on. See func_80059E3C.md. */
+   branched on. See func_80059E3C.md. slot0x80 takes THREE s32 arguments,
+   confirmed by ExecuteLink's call site (round 2026-09-01-e): three literal
+   constants (0x90, 0x6E, 0x6E) are loaded straight into $a1-$a3 with nothing
+   else read from `this`, most plausibly a text-bank/entry-pair dialog
+   trigger (same {bank, entry} shape as `CinematicCall`), but nothing in
+   ExecuteLink itself confirms that beyond the argument count. */
 typedef struct DreamSysUnk58Vtable {
-	u8 pad00[0x84];
+	u8 pad00[0x80];
+	void (*slot0x80)(void *self, s32 arg1, s32 arg2, s32 arg3);
 	void (*slot0x84)(void *self, s32 flag);
 } DreamSysUnk58Vtable;
 typedef struct DreamSysUnk58 {
@@ -195,6 +206,40 @@ typedef struct Func8005A1F4Arg {
 	s32 field_0x34;
 } Func8005A1F4Arg;
 
+/* Struct pointed to by DreamSys::unk_0x14. `+0x38` is a 3-word vector
+   (read by func_8001E600/func_8005942C, both outside this runner's range).
+   Confirmed further by func_8005B904 (round 2026-09-01-e), which block-
+   copies the first 0x50 bytes of this struct (so through `+0x50`, past
+   both the vector and the pointer below) into `this+0x890`, then
+   block-copies 0x28 bytes from `*unk_0x44` into `this+0x8E0` -- together
+   filling `DreamSys`'s `unknown_values_0x890[0x78]` tail exactly
+   (0x50 + 0x28 == 0x78). Everything between `+0x0` and `+0x38`, and the
+   full layout of the 0x28-byte block `unk_0x44` points to, remain
+   unconfirmed -- only the sizes needed to reproduce the two block copies
+   are named here. */
+/* Sized purely from func_8005B904's own second block copy (0x28 bytes);
+   internal layout unconfirmed (round 2026-09-01-e). Typed here (not just
+   `void *`) so the compiler can prove `unk_0x44`'s pointee is 4-byte
+   aligned at compile time -- through a `void *` field, GCC 2.6.3 cannot
+   make that assumption and emits a runtime alignment check (`or`/`andi`/
+   `beqz` picking between an aligned lw/sw path and an unaligned lwl/lwr
+   one) that retail does not have. */
+typedef struct DreamSysUnk14Ext {
+	s32 raw[0x28 / 4];
+} DreamSysUnk14Ext;
+
+typedef struct DreamSysUnk14 {
+	/* Cleared to 0 unconditionally by func_8005B990 (round 2026-09-01-e),
+	   after that function restores the two block-copies func_8005B904
+	   saves; plausibly a dirty/pending flag, but nothing here confirms
+	   more than "written 0" at this offset. */
+	s32 unk_0x0;
+	u8 unknown_values_0x4[0x38 - 4];
+	s32 vector[3];
+	DreamSysUnk14Ext *unk_0x44;
+	u8 unknown_values_0x48[0x50 - 0x48];
+} DreamSysUnk14;
+
 /* Full-word (x,y,z) vector, distinct from `struct RelativePos` (s16 triplet
    -- the on-disk/network form). func_8005AF64 builds one of these on the
    stack as a-b with y forced to 0; func_8005A0B0 passes the static
@@ -249,7 +294,7 @@ typedef struct DreamSys {
 	/* Pointer to an unidentified struct; a 3-word vector lives at +0x38
 	   of what this points to (read by func_8001E600 / func_8005942C,
 	   guarded by unk_0xC above). */
-	void *unk_0x14;
+	DreamSysUnk14 *unk_0x14;
 	s8 unknown_values_0x18[12];
 
 	s32 dreamTimer;
@@ -397,12 +442,17 @@ typedef struct DreamSys {
 
 	s32 unk_0x878;
 	s32 currentFlashbackIndex;
-	s8 unknown_values_0x880[4];
+	/* Set by func_8005A7A0 from func_8005BF48's return, which is itself
+	   either 0 or `&D_8008ABF0` -- pointer-shaped, not a plain word
+	   (round 2026-09-01-e). */
+	void *unk_0x880;
 	/* Gate flag read by func_80059148 (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
 	s32 unk_0x884;
-	s8 unknown_values_0x888[4];
+	/* Cleared to 0 by func_8005A7A0 alongside unk_0x880/unk_0x884; no other
+	   observed use (round 2026-09-01-e). */
+	s32 unk_0x888;
 
 	s32 storedDay;
 
@@ -436,7 +486,15 @@ struct vtable_DreamSys{
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
 	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
-	u32 unknown_functions_0x18[10];
+	u32 unknown_functions_0x18[6];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x030) as the
+	   inherited `BasicClass__func_182cc` slot. Called by ExecuteLink as
+	   (this, unk1) -- unk1 is also stored into `this->unknwon_int_0x44`
+	   right before the call, and re-read afterward as the success gate
+	   (round 2026-09-01-e). Address 0x800182CC is outside this
+	   unit/runner's range. */
+	void (*func_800182CC)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x34[3];
 	void *func_800588EC;
 	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */

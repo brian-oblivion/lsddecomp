@@ -450,13 +450,87 @@ bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LoadNextFlashback);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A700);
+/* Forward decl: defined later in this unit (Test4TunnelLinks, still in
+   ROM-address order), used here before that point in the file. */
+extern s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+/* Still INCLUDE_ASM, outside this runner's range; typed from this call
+   site's own register setup (round 2026-09-01-e). The 0x10-byte stack
+   buffer `func_8001E6F8` fills and `func_8005BD3C` reads back is of
+   unconfirmed element type -- kept as a raw word buffer rather than
+   guessing a struct neither function's OWN body confirms. */
+extern void func_8001E6F8(DreamSys *this, void *out);
+extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A7A0);
+bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 buf[4];
+	s32 result;
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0)
+		return false;
+	func_8001E6F8(this, buf);
+	if (func_8005BD3C(&this->unk_0x888, &this->unk_0x884, buf) == 0)
+		return false;
+	if (this->unk_0xA8 == 0)
+		return false;
+	ExecuteLink(this, result, 0xF, 0);
+	return true;
+}
+
+/* Still INCLUDE_ASM, outside this runner's range; typed from this and
+   func_8005A700's call sites (round 2026-09-01-e). func_8005BE90's own
+   return is a spawn/link index; func_8005BF48 ignores all four of its
+   arguments and returns either NULL or `&D_8008ABF0` (see below). */
+extern s32 func_8005BE90(PlayerSpawnPoint *target, s32 mode, PlayerSpawnPoint *currentPos, s32 dreamTimer);
+/* Takes NO arguments -- confirmed from ITS OWN body (still visible in this
+   unit's asm), which never reads $a0-$a3 at all, only a %gp_rel global.
+   The call site's own registers ($a0=this, $a1=result, $a2=0x10, $a3=0) are
+   argument setup for the FOLLOWING call (ExecuteLink), not this one -- the
+   `jal func_8005BF48` itself has a bare `nop` delay slot. Declaring this
+   with a false 4-argument signature made GCC emit real arg-setup code
+   before this call instead of after it, growing the function by two words
+   and drifting everything downstream (round 2026-09-01-e). */
+extern void *func_8005BF48(void);
+
+bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = func_8005BE90(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
+	if (result < 0)
+		return false;
+	this->unk_0x880 = func_8005BF48();
+	this->unk_0x884 = 0;
+	this->unk_0x888 = 0;
+	ExecuteLink(this, result, 0x10, 0);
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A82C);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", ExecuteLink);
+bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
+{
+	DreamSysUnk58 *obj;
+
+	system->unknwon_int_0x44 = unk1;
+	system->vt->func_800182CC(system, unk1);
+	if (system->unknwon_int_0x44 == 0)
+		return false;
+	system->currentStage = stage;
+	if (system->isFlashbackSession) {
+		system->dreamTimer = 0;
+	}
+	if (unk2 != 0) {
+		obj = (DreamSysUnk58 *)system->unk_0x58;
+		obj->vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+	}
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
@@ -498,7 +572,15 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitMoodContibutors);
+void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
+{
+	this->vt->ClearMoodGraph(this, &this->areaMoods);
+	this->vt->ClearMoodGraph(this, &this->entityMoods);
+	if (special != NULL) {
+		this->vt->LogMood(this, &this->areaMoods, special);
+		this->vt->LogMood(this, &this->entityMoods, special);
+	}
+}
 
 void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
@@ -513,7 +595,19 @@ void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
 	this->vt->LogMood(this, &this->entityMoods, source);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__UpdateDreamChart);
+void DreamSys__UpdateDreamChart(DreamSys *this, MoodGraphPoint *ret)
+{
+	MoodGraphPoint area;
+	MoodGraphPoint entity;
+
+	this->vt->GetMoodAverage(this, &this->areaMoods, &area);
+	this->vt->GetMoodAverage(this, &this->entityMoods, &entity);
+	if (this->entityMoods.amountMoods == 0) {
+		entity = area;
+	}
+	ret->axis.dynamic = (area.axis.dynamic + entity.axis.dynamic) / 2;
+	ret->axis.upper = (area.axis.upper + entity.axis.upper) / 2;
+}
 
 DreamColors DreamSys__GetDreamColor(DreamSys *this)
 {
@@ -569,7 +663,34 @@ void DreamSys__CalcUnlockScore(DreamSys *this)
 	this->totalFlasbackUnlockScore = this->navigationFlasbackUnlockScore + this->instanceFlasbackUnlockScore;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__AddFlashback);
+struct DreamSysAngles3 {
+	struct Angle pitch;
+	struct Angle heading;
+	struct Angle roll;
+};
+
+void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles, s32 unknown, s32 time, s32 day)
+{
+	s32 count;
+	s32 wordIndex;
+	FlashbackEntry *entry;
+
+	entry = this->storedFlasbacks;
+	if (this->amountFlashbacksAvailable < 10) {
+		count = this->amountFlashbacksAvailable;
+		this->amountFlashbacksAvailable = count + 1;
+		wordIndex = count * 9;
+	} else {
+		wordIndex = ((u32)this->dreamTimer % 9) * 9;
+	}
+	entry = (FlashbackEntry *)((s32 *)entry + wordIndex);
+	entry->stageID = stage;
+	entry->position = *pos;
+	*(struct DreamSysAngles3 *)&entry->pitch = *(struct DreamSysAngles3 *)angles;
+	entry->unknown_value_0x1c = unknown;
+	entry->timeLimit = time;
+	entry->day = day;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__FlashbackSaving);
 
@@ -578,9 +699,24 @@ void DreamSys__ResetFlashbackList(DreamSys *this)
 	this->amountFlashbacksAvailable = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B904);
+void func_8005B904(DreamSys *this)
+{
+	DreamSysUnk14 *u14;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B990);
+	u14 = this->unk_0x14;
+	*(DreamSysUnk14 *)((u8 *)this + 0x890) = *u14;
+	*(DreamSysUnk14Ext *)((u8 *)this + 0x8E0) = *u14->unk_0x44;
+}
+
+void func_8005B990(DreamSys *this)
+{
+	DreamSysUnk14 *u14;
+
+	u14 = this->unk_0x14;
+	*u14 = *(DreamSysUnk14 *)((u8 *)this + 0x890);
+	*u14->unk_0x44 = *(DreamSysUnk14Ext *)((u8 *)this + 0x8E0);
+	u14->unk_0x0 = 0;
+}
 
 s32 func_8005BA20(DreamSys *this, s32 value)
 {
