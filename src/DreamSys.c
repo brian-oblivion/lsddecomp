@@ -56,7 +56,15 @@ s32 func_800590E8(DreamSys *this, DreamColors *out, s32 value)
 	return old;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059148);
+void func_80059148(DreamSys *this, s32 value)
+{
+	this->unk_0x6c = value;
+	if (value != 0) {
+		this->vt->func_8005A168(this, 1);
+		if (this->unk_0x884 != 0)
+			this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800591B4);
 
