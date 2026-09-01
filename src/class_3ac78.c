@@ -1,6 +1,14 @@
 #include "common.h"
+#include "class_3ac78.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A478);
+void func_8004A478(Class3AC78Sub34 *self, s32 arg1)
+{
+	Class86668 *child = self->child;
+
+	if (child != NULL) {
+		child->methods->slot80(child, arg1, 0x7F, 0x7F);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A4B8);
 
