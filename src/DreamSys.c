@@ -450,7 +450,35 @@ bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LoadNextFlashback);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A700);
+/* Forward decl: defined later in this unit (Test4TunnelLinks, still in
+   ROM-address order), used here before that point in the file. */
+extern s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+/* Still INCLUDE_ASM, outside this runner's range; typed from this call
+   site's own register setup (round 2026-09-01-e). The 0x10-byte stack
+   buffer `func_8001E6F8` fills and `func_8005BD3C` reads back is of
+   unconfirmed element type -- kept as a raw word buffer rather than
+   guessing a struct neither function's OWN body confirms. */
+extern void func_8001E6F8(DreamSys *this, void *out);
+extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
+
+bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 buf[4];
+	s32 result;
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0)
+		return false;
+	func_8001E6F8(this, buf);
+	if (func_8005BD3C(&this->unk_0x888, &this->unk_0x884, buf) == 0)
+		return false;
+	if (this->unk_0xA8 == 0)
+		return false;
+	ExecuteLink(this, result, 0xF, 0);
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A7A0);
 

@@ -397,12 +397,17 @@ typedef struct DreamSys {
 
 	s32 unk_0x878;
 	s32 currentFlashbackIndex;
-	s8 unknown_values_0x880[4];
+	/* Set by func_8005A7A0 from func_8005BF48's return, which is itself
+	   either 0 or `&D_8008ABF0` -- pointer-shaped, not a plain word
+	   (round 2026-09-01-e). */
+	void *unk_0x880;
 	/* Gate flag read by func_80059148 (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
 	s32 unk_0x884;
-	s8 unknown_values_0x888[4];
+	/* Cleared to 0 by func_8005A7A0 alongside unk_0x880/unk_0x884; no other
+	   observed use (round 2026-09-01-e). */
+	s32 unk_0x888;
 
 	s32 storedDay;
 
