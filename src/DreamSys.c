@@ -502,7 +502,10 @@ s32 func_8005BA20(DreamSys *this, s32 value)
 	return old;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", Get_vtable_DreamSys);
+struct vtable_DreamSys *Get_vtable_DreamSys(void)
+{
+	return &DREAMSYS_METHODS;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", InitNavChallengesArray);
 
