@@ -489,7 +489,18 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B904);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B990);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BA20);
+s32 func_8005BA20(DreamSys *this, s32 value)
+{
+	s32 old;
+
+	if (value >= 0) {
+		old = this->unk_0x924;
+		this->unk_0x924 = value;
+	} else {
+		old = this->unk_0x924;
+	}
+	return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", Get_vtable_DreamSys);
 
