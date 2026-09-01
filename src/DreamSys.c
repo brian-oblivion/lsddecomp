@@ -468,7 +468,16 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AD68);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AE40);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AF64);
+void func_8005AF64(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
+{
+	DreamSysVec3 diff;
+
+	diff.x = a->x - b->x;
+	diff.y = a->y - b->y;
+	diff.z = a->z - b->z;
+	diff.y = 0;
+	this->vt->func_800573A8(this, &diff);
+}
 
 s32 func_8005AFD0(DreamSys *this)
 {
