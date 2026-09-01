@@ -485,7 +485,9 @@ struct vtable_DreamSys{
 	void (*DynamicLink)(DreamSys *this);
 	bool (*StaticWallLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	bool (*LoadNextFlashback)(DreamSys *this, bool unknown);
-	u32 unknown_functions_0x1d0[5];
+	u32 unknown_functions_0x1d0[4];
+	/* Getter for currentStage (round 2026-08-30-c). */
+	s32 (*func_8005AFD0)(DreamSys *this);
 	void *ProcessChunkChange;
 	void (*InstanceEffectsOnPlayer)(DreamSys *this, void *entity, int effect);
 	void (*GetPreviousDayMood)(DreamSys *this, MoodGraphPoint *target, bool unknown);

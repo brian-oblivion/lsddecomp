@@ -428,7 +428,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AE40);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AF64);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AFD0);
+s32 func_8005AFD0(DreamSys *this)
+{
+	return this->currentStage;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__ProcessChunkChange);
 
