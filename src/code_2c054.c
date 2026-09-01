@@ -73,7 +73,11 @@ void func_8003BDEC(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BDF4);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE5C);
+/* StreamTask field setters, one per field also touched wholesale by
+ * func_8003BA38's reset. */
+void func_8003BE5C(StreamTask *self, s32 a1) {
+    self->unkC4 = a1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE64);
 
