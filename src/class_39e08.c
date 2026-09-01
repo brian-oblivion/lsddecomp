@@ -20,7 +20,10 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049830);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049958);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049A14);
+/* ClassA::resetState -- +0x040 slot. */
+void func_80049A14(ClassA *self) {
+    self->state = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049A1C);
 
