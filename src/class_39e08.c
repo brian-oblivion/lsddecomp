@@ -103,7 +103,11 @@ s32 func_8004A2C4(ClassA *self, void *arg1, void *arg2) {
     return self->unk28;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A324);
+/* ClassB::slot48 (+0x048) -- a pure passthrough to ClassA's base
+ * implementation of the same slot. */
+s32 func_8004A324(ClassA *self) {
+    return func_8003E5C8()->slot48(self);
+}
 
 void func_8004A35C(void) {
 }
