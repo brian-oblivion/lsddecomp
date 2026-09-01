@@ -502,14 +502,34 @@ struct vtable_DreamSys{
 	void (*CalcUnlockScore)(DreamSys *this);
 	void *GameManager__AddFlashback;
 	void *GameManager__FlashbackSaving;
-	u32 unknown_functions_0x21c[3];
-	/* +0x228: called once, from Class6D3C8's constructor (func_80025FDC in
-	   src/code_1677c.c), as this->vt->func_228(this, arg->unk14) right after
-	   DreamSys is allocated by New_DreamSys. Real name/behaviour unknown --
-	   this slot lives past the previously-documented end of this struct
-	   (0x21c), discovered from that call site, not from any DreamSys-owning
-	   unit's own code. */
-	void (*func_228)(DreamSys *this, s32 arg1);
+	void (*ResetFlashbackList)(DreamSys *this);
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x220/+0x224);
+	   both do block-copies of storedFlasbacks-adjacent memory (this+0x890,
+	   this+0x8E0 -- inside this round's newly-extended struct tail) driven
+	   by a length read from this->unk_0x14. Out of scope this round;
+	   named only, not typed beyond `void *` (round 2026-08-30-c). */
+	void *func_8005B904;
+	void *func_8005B990;
+	/* This field is named `func_228`, not `func_8005BA20`, even though it
+	   IS func_8005BA20's slot (resolved via tools/classtable.py this
+	   round) -- src/code_1677c.c (a different unit, out of this runner's
+	   scope) already references it by this name
+	   (`self->dreamSys->vt->func_228(...)`), and renaming the field would
+	   require an out-of-scope edit there. Do not "fix" this name without
+	   updating that call site in the same commit.
+	   This slot was previously thought to sit PAST a documented struct end
+	   at 0x21c; that was also wrong -- it directly follows
+	   ResetFlashbackList/func_8005B904/func_8005B990 above, no gap.
+	   Original call-site note preserved: called once, from Class6D3C8's
+	   constructor (func_80025FDC in src/code_1677c.c), as
+	   this->vt->func_228(this, arg->unk14) right after DreamSys is
+	   allocated by New_DreamSys -- the call site's own signature (single
+	   s32 arg, return value discarded) matches func_8005BA20's own
+	   (this, s32 value) -> s32 get/set exactly, hence the retype from
+	   `void (*)(DreamSys*, s32)` to `s32 (*)(DreamSys*, s32)` (a discarded
+	   non-void return in a bare statement is legal C either way, so this
+	   retype does not require touching code_1677c.c). */
+	s32 (*func_228)(DreamSys *this, s32 arg1);
 };
 
 typedef enum DreamColors{

@@ -480,7 +480,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__AddFlashback);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__FlashbackSaving);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__ResetFlashbackList);
+void DreamSys__ResetFlashbackList(DreamSys *this)
+{
+	this->amountFlashbacksAvailable = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B904);
 
