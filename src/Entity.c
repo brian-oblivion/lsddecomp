@@ -150,7 +150,12 @@ void func_8005D9F4(Entity *this) {
     this->unk24 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DA3C);
+void func_8005DA3C(Entity *this) {
+    this->methods->slot60(this, 0);
+    this->methods->slot16C(this);
+    this->methods->slot164(this, 0);
+    this->unkF0 = 0;
+}
 
 void func_8005DAAC(Entity *this, s32 arg1) {
     if (arg1 != 0) {
