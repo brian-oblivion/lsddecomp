@@ -112,7 +112,8 @@ segments:
       - [0x171e0, c, code_171e0]
       - [0x179d8, asm, code_179d8]
       - [0x272c8, asm, psyq_SpuSetMute]
-      - [0x2c054, asm, code_2c054]
+      - [0x2c054, c, code_2c054]
+      - [0x2cc8c, asm, code_2cc8c]
       - [0x3197c, asm, psyq_memset]
       - [0x39c80, asm, psyq_rand]
 
