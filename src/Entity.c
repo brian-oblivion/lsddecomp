@@ -21,7 +21,18 @@ Entity *New_Entity(void *arg0, void *arg1, void *arg2) {
     return obj;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", Entity__Entity);
+Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
+    if (func_80066818()->ctor(this, arg2, arg3) != NULL) {
+        this->methods = Get_vtable_Entity();
+        this->moodIndex = arg1;
+        this->unk9C = 0;
+        this->unk100 = NULL;
+        this->unk104 = NULL;
+        this->methods->slot40(this);
+        return this;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D108);
 
