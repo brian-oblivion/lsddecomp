@@ -234,4 +234,18 @@ s32 func_8003C1DC(StreamTask *self, s32 a1, s32 a2) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C238);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C3D0);
+/* Shared verbatim between StreamTask's own vtable and the base task
+ * class's vtable at slot +0x050 (an unoverridden inherited slot, per
+ * classtable.py). Ticks two slots on the unk18 sub-object, one slot on the
+ * unk78 sub-object, then, when unk34 is set, dereferences unkC and
+ * dispatches ITS slot +0x078 with the address of this object's own unk93
+ * field. */
+void func_8003C3D0(StreamTask *self) {
+    Obj18 *obj18 = self->unk18;
+    obj18->methods->slot90(obj18);
+    obj18->methods->slot74(obj18);
+    self->unk78->methods->slot50(self->unk78);
+    if (self->unk34 != 0) {
+        (*self->unkC)->methods->slot78(*self->unkC, &self->unk93, 0);
+    }
+}
