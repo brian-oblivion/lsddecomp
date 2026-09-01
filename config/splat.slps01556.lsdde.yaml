@@ -131,7 +131,8 @@ segments:
       # Gate 2).
       - [0x39cb4, c, StageGrid]
       - [0x39e08, c, class_39e08]
-      - [0x3ac78, asm, class_3ac78]
+      - [0x3ac78, c, class_3ac78]
+      - [0x3bb8c, asm, class_3bb8c]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
