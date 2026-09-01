@@ -95,7 +95,12 @@ void func_8003BE7C(StreamTask *self, s32 a1) {
     self->unkD4 = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE84);
+/* Returns StreamTask's own class table, &D_8006E5F8 -- same shape as
+ * code_171e0.h's func_80026C9C. Used by func_8003B854 (uncarved by this
+ * runner) to fetch the ctor from slot +0x008. */
+StreamTaskMethods *func_8003BE84(void) {
+    return &D_8006E5F8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE94);
 
