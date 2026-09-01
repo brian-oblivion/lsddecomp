@@ -634,7 +634,13 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4InstantTeleporters);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BFC4);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4StaircaseNodes);
+s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
+{
+	if (arg2 == 0)
+		return GetStaticSpawn(target, currentPos, 0, D_80088CBC,
+		                       D_80088C4C, D_80088BA4, 0);
+	return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C02C);
 
