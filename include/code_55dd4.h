@@ -86,7 +86,9 @@ typedef struct Unk68Obj {
 /* Whatever class each self->unk70[i] (below) points at: unidentified,
  * only its vtable slot +0x060 is needed so far, by func_80065A5C. */
 typedef struct Unk70ElemMethods {
-    u8 pad00[0x60];                          /* +0x000 .. +0x05C, unknown */
+    u8 pad00[0x04];                          /* +0x000, unknown */
+    void (*slot4)(void *self);                /* +0x004 -- called by func_80065F2C's teardown loop */
+    u8 pad08[0x58];                            /* +0x008 .. +0x05C, unknown */
     void (*slot60)(void *self, void *arg);    /* +0x060 */
     u8 pad64[0x0C];                            /* +0x064 .. +0x06C, unknown */
     void (*slot70)(void *self, void *arg);      /* +0x070 -- called by func_80065AE0's loop, same signature as slot60 */

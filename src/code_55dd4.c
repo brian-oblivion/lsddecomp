@@ -189,7 +189,21 @@ void func_80065DEC(Class65650 *self)
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065F2C);
+void func_80065F2C(Class65650 *self)
+{
+    Unk70ElemObj **p;
+
+    if (self->unk70 != NULL && self->unk74 != NULL) {
+        p = self->unk70;
+        while (self->unk6C-- > 0) {
+            (*p)->methods->slot4(*p);
+            p++;
+        }
+        self->unk68 = 0;
+    }
+    self->unk74 = func_80017CFC(self->unk74);
+    self->unk70 = func_80017CFC(self->unk70);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065FD8);
 
