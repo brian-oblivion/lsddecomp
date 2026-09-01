@@ -77,7 +77,12 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B2D4);
+void func_8004B2D4(Class866E8 *self)
+{
+	if (self != NULL && (self->unk36 & 0x80) != 0) {
+		self->methods->slot38(self);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B31C);
 
