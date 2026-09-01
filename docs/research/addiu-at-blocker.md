@@ -282,3 +282,94 @@ grep -nE 'mflo|mfhi' asm/nonmatchings/<unit>/<func>.s
 
 That over-reports heavily (603 sites, most harmless), so it is a triage hint and
 not a blocker test like the other two.
+
+## Addendum, round 2026-09-02 (carve round): the blocker also covers every
+## jump-table `switch`
+
+**Nothing was changed. Evidence only, per CLAUDE.md rule 5.**
+
+The document above frames `addiu_at` as an *indexed global* problem —
+`sym[reg]`. That framing is too narrow, and it matters for routing, because it
+lets a runner look at a plain C `switch` with no array in sight and conclude the
+blocker cannot apply.
+
+A dense `switch` compiles to a jump table, and the dispatch is the same indexed
+load through `$at`. Retail, at `func_80049EB4` in the newly carved
+`class_39e08`:
+
+```
+lui   $at, %hi(jtbl_8001140C)
+addiu $at, $at, %lo(jtbl_8001140C)
+addu  $at, $at, $v0
+lw    $v0, 0x0($at)
+jr    $v0
+```
+
+### The reproducer
+
+Self-contained, no project headers needed beyond the standard invocation:
+
+```c
+extern int sink(int);
+int probe(int i) {
+    switch (i) {
+    case 0: return sink(11);
+    case 1: return sink(22);
+    case 2: return sink(33);
+    case 3: return sink(44);
+    case 4: return sink(55);
+    case 5: return sink(66);
+    case 6: return sink(77);
+    case 7: return sink(88);
+    case 8: return sink(99);
+    }
+    return -1;
+}
+```
+
+Through the pinned pipeline, varying only `--aspsx-version`:
+
+| version | dispatch expansion |
+| --- | --- |
+| **2.34** (the pin) | `lui $at,%hi($L12)` / `addu $at,$at,$2` / `lw $2,%lo($L12)($at)` — folded, 3 instructions |
+| 2.29 | `lui` / `addiu $at,$at,%lo($L12)` / `addu` / `lw $2,0x0($at)` — **retail's shape** |
+| 2.21 | same as 2.29 |
+
+Identical behaviour to the indexed-array case, same flag, same remedy question.
+This does not add a new blocker; it widens the reach of the one already
+escalated, and it strengthens option 1 (patch `addiu_at` alone) by adding a
+second independent construct that the flag gets right and the three nop rules
+have nothing to say about.
+
+### Corpus census
+
+Across every `.s` in `asm/`:
+
+| | count |
+| --- | --- |
+| distinct `jtbl_*` symbols in rodata | **27** |
+| dispatch sites using the unfolded (2.29) form | **27** |
+| dispatch sites using the folded (2.34) form | **0** |
+
+The 27 tables are spread over 11 files. They are a subset of the 502 indexed
+sites already counted above, so the ceiling does not move — what moves is the
+*description* of which C constructs are exposed.
+
+### Routing rule, extended
+
+The existing grep still finds these, because the jump table's dispatch contains
+the same instruction:
+
+```sh
+grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+```
+
+What changes is what a runner should conclude when it hits. Add: **a `switch`
+dense enough to become a jump table is blocked, even with no array in the C.**
+Sparse switches that compile to compare-and-branch chains are fine and several
+already match (`func_8005966C` and `func_800596E8` in `DreamSys`, four cases
+each).
+
+At carve time this is also a boundary question, not only a routing one: a
+carved unit that takes ownership of a function containing a jump table takes
+ownership of that table's rodata slot too. See the `class_39e08` carve commit.
