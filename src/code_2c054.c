@@ -201,7 +201,26 @@ INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BF10);
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C008);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C11C);
+/* The base task class's own override of slot +0x040 (the base-class
+ * counterpart to StreamTask's func_8003BA38). Never reached through a
+ * StreamTask -- StreamTask's own slot +0x040 never chains to the base --
+ * so `self` here is always a bare BaseTask. Dispatches four of its own
+ * (dynamic) vtable slots, then resets a fixed set of fields. */
+void func_8003C11C(BaseTask *self) {
+    TaskBaseMethods *methods = self->methods;
+    methods->slot6C(self, -1);
+    methods->slotA4(self, D_8006E860, D_8006E860 + 3, D_8006E860 + 6);
+    methods->slot9C(self, 1);
+    methods->slotA0(self, 1);
+    self->unk84 = 9;
+    self->unk28 = 3;
+    self->unk2C = 0x12C;
+    self->unk30 = 0x40;
+    self->unk9C = 0;
+    self->unkA0 = 0;
+    self->unk34 = 1;
+    self->unk3C = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C1DC);
 
