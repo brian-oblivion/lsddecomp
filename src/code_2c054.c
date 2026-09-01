@@ -42,7 +42,14 @@ INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BB5C);
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BC14);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BCF4);
+/* StreamTask's override of slot +0x06C: always stores a1 verbatim, then
+ * for non-negative a1 overwrites with a1*15 (sll by 4, then subu a1). */
+void func_8003BCF4(StreamTask *self, s32 a1) {
+    self->unk40 = a1;
+    if (a1 >= 0) {
+        self->unk40 = a1 * 15;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD10);
 
