@@ -450,7 +450,13 @@ void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__UpdateDreamChart);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetDreamColor);
+DreamColors DreamSys__GetDreamColor(DreamSys *this)
+{
+	MoodGraphPoint local;
+
+	this->vt->UpdateDreamChart(this, &local);
+	return CalcDreamColor(&local);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcDreamColor);
 
