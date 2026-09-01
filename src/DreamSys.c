@@ -295,7 +295,15 @@ void func_8005A050(DreamSys *this)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A0B0);
+void func_8005A0B0(DreamSys *this)
+{
+	if (this->unk_0xC4 != 0) {
+		this->vt->func_800573A8(this, &D_80087EA4);
+		this->unk_0x5C->unk_0x24 -= 0x258;
+	}
+	if (this->unk_0xC8 != 0)
+		func_8002CD08(this->unk_0x58, this->unk_0xCC);
+}
 
 void func_8005A134(DreamSys *this, s32 arg1)
 {
