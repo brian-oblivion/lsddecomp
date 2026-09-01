@@ -320,7 +320,10 @@ void func_8005A1B0(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
 		this->unk_0x130 = d;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A1EC);
+void func_8005A1EC(DreamSys *this, s32 value)
+{
+	this->unk_0x120 = value;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A1F4);
 
