@@ -10,7 +10,10 @@ void func_8004A478(Class3AC78Sub34 *self, s32 arg1)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A4B8);
+Class86668Methods *func_8004A4B8(void)
+{
+	return &D_80086668;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A4C8);
 
