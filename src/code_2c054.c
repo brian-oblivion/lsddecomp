@@ -25,7 +25,16 @@ void func_8003BA38(StreamTask *self) {
     self->unkD4 = 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA58);
+/* StreamTask's override of slot +0x044: stashes three caller-supplied
+ * values (the third from the stack, a 5th argument) into the object, then
+ * chains into the base task class's own slot +0x044 with a literal 0 as
+ * its own third argument. */
+void func_8003BA58(StreamTask *self, s32 a1, s32 a2, s32 typeLookup, s32 flag) {
+    self->unkB8 = a2;
+    self->unkBC = typeLookup;
+    self->unkC0 = flag;
+    func_8003DFBC()->slot44(self, a1, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BAB4);
 
