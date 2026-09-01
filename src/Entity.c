@@ -64,7 +64,15 @@ Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 a
     return sub;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D1EC);
+void func_8005D1EC(Entity *this) {
+    if (this->unk100 != NULL) {
+        this->unk100->methods->slot04(this->unk100);
+    }
+    if (this->unk104 != NULL) {
+        this->unk104->methods->slot04(this->unk104);
+    }
+    func_80066818()->dtor(this);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D278);
 
