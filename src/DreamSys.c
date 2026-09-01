@@ -435,7 +435,18 @@ void DreamSys__DynamicLink(DreamSys *this)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StaticWallLink);
+bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = TestForStaticLink(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0)
+		return false;
+	ExecuteLink(this, result, 0xD, 1);
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LoadNextFlashback);
 
