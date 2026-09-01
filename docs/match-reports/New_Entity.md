@@ -1,0 +1,81 @@
+# New_Entity
+
+**Unit:** Entity · **Size:** 35 words · **Status:** MATCHED (35/35 words, whole-image build verified byte-exact)
+
+## What it does
+
+The allocator for `Entity`: `func_80017B34(0x108)` allocates 0x108 bytes,
+then `Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2)` (the vtable's own
+`ctor` slot, `Entity__Entity` — see that report) constructs it in place. On
+allocation failure, returns NULL immediately. On construction failure
+(`ctor` returns NULL), frees the allocation via `func_80017CFC` and returns
+NULL. On success, returns the constructed object.
+
+## Derivation
+
+Straightforward from the disassembly; the only real question was C shape,
+not semantics — see the attempt log.
+
+## Final C
+
+```c
+Entity *New_Entity(void *arg0, void *arg1, void *arg2) {
+    Entity *obj;
+    Entity *result;
+
+    obj = func_80017B34(0x108);
+    result = NULL;
+    if (obj != NULL) {
+        result = obj;
+        if (Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2) == NULL) {
+            func_80017CFC(obj);
+            result = NULL;
+        }
+    }
+    return result;
+}
+```
+
+## Attempt log
+
+Two size-correct-but-not-byte-exact attempts before this one:
+
+1. `obj = alloc(); result = NULL; if (obj) { result = obj; if (ctor(...)==NULL) {...; result=NULL;} } return result;`
+   — matched retail's overall size (0x8C) but diverged on ONE instruction:
+   retail's first `beqz $s0,END` fills its delay slot with `move $v0,zero`
+   (the failure-return value, computed *before* the branch is even decided),
+   while this shape put `move $v0,$s0` there instead — GCC hadn't spilled the
+   allocation result into `$s0` yet at that point, it kept it live in `$v0`
+   across the whole first check.
+2. `obj = alloc(); if (obj != NULL) { if (ctor(...)==NULL) {free; obj=NULL;} } return obj;`
+   (single variable, no separate `result`) — this got the `move $s0,$v0`
+   *timing* right (spilled immediately after the alloc call, matching
+   retail), but now the delay slot held `move $v0,$s0` instead of retail's
+   `move $v0,zero`, and the function grew 4 bytes (0x90) from an extra
+   `move` needed to route the final NULL back through `$s0`.
+
+**What matched:** going back to the early-`return NULL;` idiom
+(`if (obj == NULL) { return NULL; }`) rather than a single shared-`result`
+flag threaded through an `if`/`else`. With *nothing else* in that branch,
+GCC folds the constant return value into the branch's own delay slot AND
+still eagerly spills `obj` into `$s0` right after the allocation call —
+exactly retail's shape. The naive assumption that an early return duplicates
+epilogue code (and would therefore *grow* the function) was wrong here; GCC
+2.6.3 merges both `return NULL;` sites (the early one and the
+post-`func_80017CFC` one) onto the same physical epilogue via branches, using
+the branch's delay slot for the free case.
+
+## Proposed learning
+
+For a `New_X`-shaped allocator (`alloc → null check → ctor → null check →
+optional free → return`), prefer a **simple early `if (x == NULL) return
+NULL;`** for the allocation-failure check over threading a separate
+`result` variable through the whole function. The early-return form let GCC
+both (a) eagerly spill the allocated pointer into a callee-saved register
+right after the call, and (b) fold the failure return value into the
+branch's own delay slot — a single-variable, single-purpose local matches
+retail's register allocation more often than a "value defaults to failure,
+gets overwritten on success" flag pattern does, at least for this compiler
+at `-O2`. This generalizes the project's existing note (`new_class_6d3c8`,
+`docs/MATCHING-GUIDE.md`) that the `New_X` shape is common across ~60
+classes — worth trying the early-return form first on any future one.

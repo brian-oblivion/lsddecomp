@@ -1,0 +1,73 @@
+# func_8005D7FC
+
+**Unit:** Entity · **Size:** 26 words · **Status:** MATCHED (26/26 words, whole-image build verified byte-exact)
+
+## What it does
+
+Not an `Entity`/`Entity`-pair function despite living in this unit's vtable
+(`D_80089AD4` offset `+0x144`, see the class-table note in `Entity.h`) — its
+SECOND argument is an unrelated type (`EntityRegionRef *`, newly named this
+round: a flag plus a pointer to an array of 0x38-byte slots, element `[1]`
+of which is read). Computes a "distance" between `this`'s 3D position
+(`this->unk14`, an `EntityPos *`) and one such slot: `|pos.x - slot.x0| +
+|pos.z - slot.z0|` — always the *sum* of the two axis deltas' absolute
+values, regardless of which delta is negative (both retail's `bltz`/`j`
+branch structure and this reconstruction compute the same closed form either
+way, just via different instruction paths per sign).
+
+## Derivation
+
+```
+range = (region->flag != 0) ? &region->slots[1] : NULL;    // NULL is safe here per the data, never actually dereferenced with flag==0
+dx = |this->unk14->x - range->x0|
+dz = this->unk14->z - range->z0
+return (dz >= 0) ? (dx + dz) : (dx - dz);
+```
+
+## Final C
+
+```c
+s32 func_8005D7FC(Entity *this, EntityRegionRef *region) {
+    EntityRegionSlot *range;
+    EntityPos *pos;
+    s32 dx;
+    s32 dz;
+
+    range = NULL;
+    if (region->flag != 0) {
+        range = &region->slots[1];
+    }
+    pos = this->unk14;
+    dx = pos->x - range->x0;
+    if (dx < 0) {
+        dx = ~dx + 1;
+    }
+    dz = pos->z - range->z0;
+    return (dz >= 0) ? (dx + dz) : (dx - dz);
+}
+```
+
+## Attempt log
+
+Two residues, both closed by matching retail's exact bit-level idiom rather
+than the "obviously equivalent" one:
+
+1. `if (dx < 0) { dx = -dx; }` compiled to a single `negu` (`subu $a1,$zero,$a1`)
+   — retail spells the negation out as `nor $v0,$zero,$a1` /
+   `addiu $a1,$v0,1` (two instructions, the textbook two's-complement-by-hand
+   form). Writing `dx = ~dx + 1;` explicitly reproduced retail's two-instruction
+   form exactly.
+2. The final `dz >= 0 ? dx+dz : dx-dz` return needed to be an actual ternary
+   expression, not an `if`/`return`/`return` — both are logically identical
+   and GCC compiled the `if` form to the exact same (wrong) shape regardless
+   of which arm was written first, but the ternary spelling produced
+   retail's `bltz`-then-`j`-over-the-other-arm shape on the first try.
+
+## Proposed learning
+
+For a two-armed arithmetic return where BOTH arms are used depending on a
+sign test, prefer a ternary (`cond ? a : b`) over `if (cond) return a; return
+b;` when the two don't match on the first attempt — they are not
+interchangeable to this compiler even though they're semantically identical
+C, and swapping which arm comes first in the `if` form did not help where
+switching to a ternary did.
