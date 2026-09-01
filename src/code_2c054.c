@@ -1,7 +1,17 @@
 #include "common.h"
 #include "code_2c054.h"
+#include "code_2c054.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B854);
+/* New_X-shaped allocator for a StreamTask: 0xDC bytes, ctor fetched from
+ * func_8003BE84()'s own class table, slot +0x008. */
+StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3) {
+    StreamTask *self = func_80017B34(0xDC);
+    if (self != NULL) {
+        func_8003BE84()->ctor(self, a0, a1, a2, a3);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B8E4);
 
@@ -36,11 +46,67 @@ void func_8003BA58(StreamTask *self, s32 a1, s32 a2, s32 typeLookup, s32 flag) {
     func_8003DFBC()->slot44(self, a1, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BAB4);
+/* StreamTask's override of slot +0x04C: chains into the base task class's
+ * own copy of the same slot, resets unkA4, ticks the sub-object's slot
+ * +0x06C, then dispatches its slot +0x040 and (if non-zero) re-enters this
+ * object's own slot +0x06C (func_8003BCF4) with a literal 0. */
+void func_8003BAB4(StreamTask *self) {
+    s32 status;
+    func_8003DFBC()->slot4C(self);
+    self->unkA4 = 0;
+    self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
+    status = self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8);
+    if (status != 0) {
+        self->methods->slot6C(self, 0);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BB5C);
+/* StreamTask's override of slot +0x05C: chains into the base task class's
+ * own copy first, then (only if unkA4 was already zero) polls the
+ * sub-object's slot +0x048 and, when that both succeeds and unkD8 is still
+ * clear, re-enters this object's own slot +0x060 (func_8003BC14) with a
+ * literal 7. */
+void func_8003BB5C(StreamTask *self, s32 a1, s32 a2) {
+    s32 result;
+    func_8003DFBC()->slot5C(self, a1, a2);
+    if (self->unkA4 != 0) {
+        return;
+    }
+    result = self->unkB4->methods->slot48(self->unkB4);
+    self->unkA4 = result;
+    if (result == 0) {
+        return;
+    }
+    if (self->unkD8 != 0) {
+        return;
+    }
+    self->methods->slot60(self, 7);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BC14);
+/* StreamTask's override of slot +0x060: chains into the base task class's
+ * own copy first, then handles a small set of specific `a1` codes: 7/5 set
+ * or clear unkD8, 8 forwards to the sub-object's slot +0x04C (guarded by
+ * unkD4), 0x12 re-enters this object's own slot +0x094
+ * (func_8003BDF4). Anything else is a no-op. */
+void func_8003BC14(StreamTask *self, s32 a1) {
+    func_8003DFBC()->slot60(self, a1);
+    switch (a1) {
+    case 5:
+        self->unkD8 = 0;
+        break;
+    case 7:
+        self->unkD8 = 1;
+        break;
+    case 8:
+        if (self->unkD4 == 0) {
+            self->unkB4->methods->slot4C(self->unkB4);
+        }
+        break;
+    case 0x12:
+        self->methods->slot94(self);
+        break;
+    }
+}
 
 /* StreamTask's override of slot +0x06C: always stores a1 verbatim, then
  * for non-negative a1 overwrites with a1*15 (sll by 4, then subu a1). */
@@ -51,7 +117,16 @@ void func_8003BCF4(StreamTask *self, s32 a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD10);
+/* StreamTask's override of slot +0x078: chains into the base task class's
+ * own copy first, then, only when unkCC is set, marks unk38 as state 2 and
+ * re-enters this object's own slot +0x060 (func_8003BC14) with 0x12. */
+void func_8003BD10(StreamTask *self) {
+    func_8003DFBC()->slot78(self);
+    if (self->unkCC != 0) {
+        self->unk38 = 2;
+        self->methods->slot60(self, 0x12);
+    }
+}
 
 /* StreamTask's override of slot +0x080: a pure passthrough to the base
  * task class's own copy of the same slot. */
@@ -71,7 +146,16 @@ void func_8003BDE4(void) {
 void func_8003BDEC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BDF4);
+/* StreamTask's override of slot +0x094: when unkD4 is set, ticks the
+ * sub-object's slot +0x04C; otherwise re-enters this object's own slot
+ * +0x060 (func_8003BC14) with a literal 7. */
+void func_8003BDF4(StreamTask *self) {
+    if (self->unkD4 != 0) {
+        self->unkB4->methods->slot4C(self->unkB4);
+    } else {
+        self->methods->slot60(self, 7);
+    }
+}
 
 /* StreamTask field setters, one per field also touched wholesale by
  * func_8003BA38's reset. */
@@ -96,22 +180,72 @@ void func_8003BE7C(StreamTask *self, s32 a1) {
 }
 
 /* Returns StreamTask's own class table, &D_8006E5F8 -- same shape as
- * code_171e0.h's func_80026C9C. Used by func_8003B854 (uncarved by this
- * runner) to fetch the ctor from slot +0x008. */
+ * code_171e0.h's func_80026C9C. Used by func_8003B854 to fetch the ctor
+ * from slot +0x008. */
 StreamTaskMethods *func_8003BE84(void) {
     return &D_8006E5F8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE94);
+/* New_X-shaped allocator for a bare base-task instance: 0xA4 bytes, ctor
+ * fetched from func_8003DFBC()'s own slot +0x008. */
+BaseTask *func_8003BE94(s32 a0, s32 a1, s32 a2) {
+    BaseTask *self = func_80017B34(0xA4);
+    if (self != NULL) {
+        func_8003DFBC()->ctor(self, a0, a1, a2);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BF10);
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C008);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C11C);
+/* The base task class's own override of slot +0x040 (the base-class
+ * counterpart to StreamTask's func_8003BA38). Never reached through a
+ * StreamTask -- StreamTask's own slot +0x040 never chains to the base --
+ * so `self` here is always a bare BaseTask. Dispatches four of its own
+ * (dynamic) vtable slots, then resets a fixed set of fields. */
+void func_8003C11C(BaseTask *self) {
+    TaskBaseMethods *methods = self->methods;
+    methods->slot6C(self, -1);
+    methods->slotA4(self, D_8006E860, D_8006E860 + 3, D_8006E860 + 6);
+    methods->slot9C(self, 1);
+    methods->slotA0(self, 1);
+    self->unk84 = 9;
+    self->unk28 = 3;
+    self->unk2C = 0x12C;
+    self->unk30 = 0x40;
+    self->unk9C = 0;
+    self->unkA0 = 0;
+    self->unk34 = 1;
+    self->unk3C = 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C1DC);
+/* The base task class's own override of slot +0x044 -- the function
+ * StreamTask's own override (func_8003BA58) chains into via
+ * func_8003DFBC(). Chains one level further into the grandparent class's
+ * own copy of the same slot (its result discarded), then returns this
+ * object's own "state" field (unk38, also touched by func_8003BD10). */
+s32 func_8003C1DC(StreamTask *self, s32 a1, s32 a2) {
+    func_8003E5C8()->slot44(self, a1, a2);
+    return self->unk38;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C238);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C3D0);
+/* Shared verbatim between StreamTask's own vtable and the base task
+ * class's vtable at slot +0x050 (an unoverridden inherited slot, per
+ * classtable.py). Ticks two slots on the unk18 sub-object, one slot on the
+ * unk78 sub-object, then, when unk34 is set, dereferences unkC and
+ * dispatches ITS slot +0x078 with the address of this object's own unk93
+ * field. */
+void func_8003C3D0(StreamTask *self) {
+    Obj18 *obj18 = self->unk18;
+    obj18->methods->slot90(obj18);
+    obj18->methods->slot74(obj18);
+    self->unk78->methods->slot50(self->unk78);
+    if (self->unk34 != 0) {
+        (*self->unkC)->methods->slot78(*self->unkC, &self->unk93, 0);
+    }
+}
