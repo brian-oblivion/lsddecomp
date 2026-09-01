@@ -308,7 +308,17 @@ void func_8005A1A4(DreamSys *this)
 	this->unk_0xAC = this->unk_0xB0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A1B0);
+void func_8005A1B0(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
+{
+	if (a >= 0)
+		this->unk_0x124 = a;
+	if (b >= 0)
+		this->unk_0x128 = b;
+	if (c >= 0)
+		this->unk_0x12C = c;
+	if (d >= 0)
+		this->unk_0x130 = d;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A1EC);
 
