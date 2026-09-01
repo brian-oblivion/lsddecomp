@@ -443,7 +443,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitMoodContibutors);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LogChunkMood);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LogInstanceMood);
+void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
+{
+	this->vt->LogMood(this, &this->entityMoods, source);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__UpdateDreamChart);
 
