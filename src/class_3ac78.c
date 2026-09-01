@@ -35,7 +35,12 @@ void func_8004AB24(Class866E8 *self)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AB88);
+void func_8004AB88(Class866E8 *self, AnyObj *other)
+{
+	if (other->methods->headerLowByte == 0x34) {
+		self->methods->slotD0(self, other);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
 
