@@ -175,4 +175,36 @@ void func_8005DB8C(Entity *this) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DBF0);
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DD18);
+s32 func_8005DD18(Entity *this) {
+    EntityMoodRow *row;
+    s32 doDetach;
+    s32 dist;
+    s32 scaled;
+
+    if (this->unkF0 != 0) {
+        row = &D_80089EA4[this->moodIndex];
+        doDetach = 0;
+        func_8005DF9C(this, 0);
+        if (row->linkKind != 0 && row->linkKind != 3) {
+            if (row->linkKind >= 10) {
+                scaled = this->unk24;
+                if ((scaled ^ (row->linkKind * 15)) == 0) {
+                    doDetach = 1;
+                }
+            } else if (row->unk5 != 0) {
+                dist = func_8005D714(this, &this->unk14->x, row->unk5, row->unk9);
+                if (dist != 0) {
+                    if (row->linkKind == 1) {
+                        doDetach = 1;
+                    }
+                } else if (row->linkKind == 2) {
+                    doDetach = 1;
+                }
+            }
+        }
+        if (doDetach) {
+            this->methods->slot160(this);
+        }
+    }
+    return this->unkF0;
+}
