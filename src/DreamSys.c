@@ -545,7 +545,18 @@ void DreamSys__GetMoodAverage(DreamSys *this, MoodGraphContributor *layer, MoodG
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcMoodAxis);
+s32 CalcMoodAxis(s32 lank, s32 sum, s32 amount)
+{
+	s32 result;
+
+	result = sum / amount;
+	result += lank / 3;
+	if (result >= 10)
+		result = -9;
+	else if (result < -9)
+		result = 9;
+	return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__CalcUnlockScore);
 
