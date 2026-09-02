@@ -83,7 +83,20 @@ EntityMethods *Get_vtable_Entity(void) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E160);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E3C4);
+void func_8005E3C4(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = 0;
+    if (out->unk4 == 0) {
+        out->unk1C = 0x14;
+        out->unk30 = 0x14;
+        out->unk44 = 0x14;
+        this->unk94->methods->slot130(this->unk94, 1);
+    }
+    func_8001EACC(this, this->unk94, 1, 0, 0);
+    this->methods->slotC4(this, -0x5A, 0);
+    if (this->unkFC == 0x1E) {
+        this->methods->slot30(this, 0xA);
+    }
+}
 
 void func_8005E480(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
