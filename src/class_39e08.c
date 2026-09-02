@@ -13,9 +13,23 @@ void func_80049A14(Obj865C8 *self) {
     self->unk3C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049A1C);
+void func_80049A1C(Obj865C8 *self) {
+    SubObjD *sub = self->unk38;
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049AC0);
+    sub->methods->slot10(sub, self->unk0C->unk4);
+    sub->methods->slot10(sub, self->unk0C->unk8);
+    sub->methods->slot110(sub, self->unk0C->unk10);
+    func_8004A4B8()->slot44(self, (s32)self->unk0C, 0);
+}
+
+void func_80049AC0(Obj865C8 *self) {
+    SubObjD *sub = self->unk38;
+
+    func_8004A4B8()->slot48(self);
+    sub->methods->slot110(sub, 0);
+    sub->methods->slot14(sub, self->unk0C->unk4);
+    sub->methods->slot14(sub, self->unk10);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049B54);
 
@@ -31,7 +45,7 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
 void func_80049E20(Obj865C8 *self, s32 arg1) {
     self->unk4C = func_80052B70(self->subB, self->unk40, self->unk44, self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
-    self->unk4C->methods->slot44(self->unk4C, self->unk0C, self->unk38);
+    self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
     self->unk3C = 2;
 }
 
@@ -51,7 +65,17 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A070);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A130);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A19C);
+void func_8004A19C(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
+    func_8003E5C8()->ctor(self);
+    self->methods = (Class865C8Methods *)func_8004A4B8();
+    if (arg1 != 0) {
+        self->subB = func_8002C480(arg1);
+    } else {
+        self->subB = arg2;
+    }
+    self->unk30 = arg1;
+    self->methods->resetUnk3C(self);
+}
 
 void func_8004A228(Obj865C8 *self) {
     if (self->unk30 != 0) {

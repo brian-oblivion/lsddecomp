@@ -95,14 +95,44 @@ struct Obj4C {
     Obj4CMethods *methods;
 };
 
+/* Opaque view of whatever object Obj865C8::unk0C points to (used by
+ * func_80049AC0/func_80049A1C, which read its own +0x004/+0x008/+0x010
+ * fields -- no vtable dispatch through this one, so no methods pointer is
+ * declared). */
+typedef struct Obj0C {
+    u8 pad00[0x04];
+    s32 unk4;                     /* +0x004 */
+    s32 unk8;                     /* +0x008 */
+    u8 padC[0x10 - 0xC];
+    s32 unk10;                    /* +0x010 */
+} Obj0C;
+
+/* Opaque view of whatever object Obj865C8::unk38 points to (used by
+ * func_80049AC0/func_80049A1C): same "vtable at offset 0, only the reached
+ * slots named" policy as SubObjA/SubObjB/Obj4C above. */
+typedef struct SubObjD SubObjD;
+typedef struct SubObjDMethods {
+    u8 pad00[0x10];
+    void (*slot10)(SubObjD *self, s32 arg1);
+    void (*slot14)(SubObjD *self, s32 arg1);
+    u8 pad18[0x110 - 0x18];
+    void (*slot110)(SubObjD *self, s32 arg1);
+} SubObjDMethods;
+struct SubObjD {
+    SubObjDMethods *methods;
+};
+
 /* Object size unconfirmed (this unit never allocates one of these itself --
  * func_8004A130 allocates the SIBLING class below instead). Field offsets
  * are only the ones this round's functions touch. */
 struct Obj865C8 {
     Class865C8Methods *methods;   /* +0x000 */
     u8 pad04[0x0C - 0x04];
-    s32 unk0C;                    /* +0x00C, func_80049E20 (2nd arg to func_8003E5C8()->slot44) */
-    u8 pad10[0x18 - 0x10];
+    Obj0C *unk0C;                 /* +0x00C, func_80049AC0 dereferences (->unk4); passed
+                                      through as a plain register value to
+                                      func_8003E5C8()->slot44's 2nd arg by func_80049E20 */
+    s32 unk10;                    /* +0x010, func_80049AC0 (2nd arg to a slot14 call) */
+    u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, func_80049C50 */
     s32 unk1C;                    /* +0x01C, func_8004A364 (compared against unk2C) */
     u8 pad20[0x28 - 0x20];
@@ -110,7 +140,9 @@ struct Obj865C8 {
     s32 unk2C;                    /* +0x02C, func_8004A458 */
     s32 unk30;                    /* +0x030, func_8004A228 (guard) */
     SubObjB *subB;                /* +0x034, func_8004A228 */
-    s32 unk38;                    /* +0x038, func_80049E20 (3rd arg to func_8003E5C8()->slot44) */
+    SubObjD *unk38;                /* +0x038, func_80049AC0 dereferences (->methods); passed
+                                       through as a plain register value to
+                                       func_8003E5C8()->slot44's 3rd arg by func_80049E20 */
     s32 unk3C;                    /* +0x03C, func_80049A14 */
     s32 unk40;                    /* +0x040, func_80049E20 (2nd arg to func_80052B70) */
     s32 unk44;                    /* +0x044, func_80049E20 (3rd arg to func_80052B70) */
@@ -123,7 +155,8 @@ struct Obj865C8 {
  * unit's functions dispatch through when explicitly calling the BASE
  * implementation are typed. */
 typedef struct IntermediateBaseMethods {
-    u8 pad00[0x0C];
+    u8 pad00[0x008];
+    void *(*ctor)(void *self);             /* +0x008, called by func_8004A19C with only `self` set up */
     void (*dtor)(void *self);              /* +0x00C */
     u8 pad10[0x44 - 0x10];
     /* Same accessor/slot combination code_2c054.h calls
@@ -157,12 +190,30 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
  * D_800865C8's slots (+0x008, +0x00C, +0x040, +0x044, +0x048) while sharing
  * the rest verbatim (+0x058..+0x070, confirmed identical function
  * addresses in both tables by tools/classtable.py). Constructed by
- * func_8004A130, a New_X allocator (0x38-byte instance). Only the ctor
- * slot is typed; everything else is out of this round's scope
- * (func_8004A19C/func_8004A2C4, still INCLUDE_ASM elsewhere in this unit). */
+ * func_8004A130, a New_X allocator (0x38-byte instance). Instances share
+ * `Obj865C8`'s own layout (func_8004A19C writes `unk30`/`subB` at the exact
+ * same offsets `Obj865C8`'s other functions already use), so this class's
+ * own instances are typed `Obj865C8 *` too rather than inventing a second,
+ * parallel struct.
+ *
+ * `ctor` (+0x008, func_8004A19C) never uses its own return value at either
+ * of its two call sites (its own body sets no explicit `$v0` before
+ * returning either -- CLAUDE.md's "discarded return is never evidence of
+ * void" rule is about NOT assuming void from a discarding caller alone, but
+ * here the callee's OWN body never materializes a return value at all, so
+ * `void` is the callee-side reading, not an inference from the caller). */
 typedef struct Class86668Methods {
     u8 pad00[0x08];
-    void *(*ctor)(void *self, void *arg1, void *arg2); /* +0x008 func_8004A19C */
+    void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
+    u8 pad0C[0x44 - 0x0C];
+    /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
+     * the base's own slot44, returns self->unk28. Called by func_80049A1C
+     * as func_8004A4B8()->slot44(self, self->unk0C, 0), return discarded. */
+    s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
+    /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
+     * func_8003E5C8()->slot48(self). Called by func_80049AC0 as
+     * func_8004A4B8()->slot48(self). */
+    void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
 } Class86668Methods;
 
 /* A plain accessor with no parameters, returning &D_80086668. Defined in the
@@ -174,5 +225,11 @@ extern Class86668Methods *func_8004A4B8(void);
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
  * class_16334.h for the other units that also declare it locally. */
 extern void *func_80017B34(s32 size);
+
+/* Allocator in the still-uncarved unit code_179d8 (asm/code_179d8.s):
+ * allocates a 0x64-byte instance and, on success, ctors it with the single
+ * forwarded argument. Only call site here is func_8004A19C, which stores
+ * the result straight into `Obj865C8::subB` (`SubObjB *`). */
+extern SubObjB *func_8002C480(s32 arg1);
 
 #endif
