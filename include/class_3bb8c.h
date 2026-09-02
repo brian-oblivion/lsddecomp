@@ -73,6 +73,8 @@ struct Obj866E8 {
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
     u8 pad74[0xEC - 0x74];
     Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434 */
+    u8 pad1B0[0x1CC - 0x1B0];
+    s32 unk1CC;                    /* +0x1CC, func_8004CFA8 (address-of only, real type unknown) */
 };
 
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),

@@ -1,4 +1,9 @@
+/* Second slice of the 365-function class_3bb8c block, 0x3CD88..0x3DA54 --
+ * same class (Obj866E8, D_800866E8) as class_3bb8c.c's first slice, split
+ * only for parallel runners, so this unit reuses that unit's header
+ * (same convention as Entity.c/Entity_b.c). */
 #include "common.h"
+#include "class_3bb8c.h"
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C588);
 
@@ -20,7 +25,9 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CDA4);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CE24);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CFA8);
+void *func_8004CFA8(Obj866E8 *self) {
+    return &self->unk1CC;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CFB0);
 
