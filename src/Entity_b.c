@@ -56,7 +56,26 @@ s32 func_8005DEE0(Entity *this) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005DF9C);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E02C);
+s32 func_8005E02C(Entity *this, s32 arg1) {
+    Unk94Obj *other;
+    s32 oy, ty;
+
+    __asm__("");
+    other = this->unk94;
+    oy = other->unk14->y;
+    ty = this->unk14->y;
+    if (oy + 0x200 < ty) {
+        goto fail;
+    }
+    if (ty < oy - 0x200) {
+        goto fail;
+    }
+    if (this->methods->slot144(this, other) < arg1) {
+        return 1;
+    }
+fail:
+    return 0;
+}
 
 s32 func_8005E0B0(Entity *this) {
     EntityMoodRow *row;
