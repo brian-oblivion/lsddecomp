@@ -40,17 +40,79 @@ void func_8003C794(Obj86B60 *self, s32 a1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C7B4);
+void func_8003C7B4(Obj86B60 *self, s32 a1)
+{
+    Unk48Obj *child;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C7F4);
+    child = self->unk48;
+    if (child != NULL) {
+        child->methods->slot80(child, a1, 0x60, 0x60);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C858);
+void func_8003C7F4(Obj86B60 *self, s32 a1)
+{
+    if (self->unk4C != NULL) {
+        self->methods->slot70(self, 0x10);
+        self->methods->slot60(self, 0xA);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C8D0);
+void func_8003C858(Obj86B60 *self, s32 a1)
+{
+    s32 reason;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C944);
+    if (self->unk4C != NULL) {
+        self->methods->slot70(self, 0x10);
+        reason = 0xF;
+        if (self->unk3C == 1) {
+            reason = 0xB;
+        }
+        self->methods->slot60(self, reason);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C9B0);
+void func_8003C8D0(Obj86B60 *self, s32 a1)
+{
+    if (self->unk4C != NULL && self->unk3C != 1) {
+        self->methods->slot70(self, 0x10);
+        self->methods->slot60(self, 0x11);
+    }
+}
+
+void func_8003C944(Obj86B60 *self, s32 a1)
+{
+    void (*handler)(Obj86B60 *self);
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    if (self->unk3C == 1) {
+        handler = self->methods->slotEC;
+    } else if (self->unk3C == 2) {
+        handler = self->methods->slot118;
+    } else {
+        return;
+    }
+    handler(self);
+}
+
+void func_8003C9B0(Obj86B60 *self, s32 a1)
+{
+    void (*handler)(Obj86B60 *self);
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    if (self->unk3C == 1) {
+        handler = self->methods->slotE8;
+    } else if (self->unk3C == 2) {
+        handler = self->methods->slot114;
+    } else {
+        return;
+    }
+    handler(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CA1C);
 

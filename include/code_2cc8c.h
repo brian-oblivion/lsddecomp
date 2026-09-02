@@ -103,7 +103,10 @@ struct Obj86B60Methods {
     u8 pad000[0x060];
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
                                                       (func_8004D90C) */
-    u8 pad064[0x090 - 0x064];
+    u8 pad064[0x070 - 0x064];
+    void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
+                                                      func_8003C7B4 */
+    u8 pad074[0x090 - 0x074];
     s32 (*slot90)(Obj86B60 *self);                /* +0x090, external
                                                       (func_8003DA10);
                                                       OBSERVED: func_8003C63C
@@ -130,7 +133,12 @@ struct Obj86B60Methods {
                                                        func_8003CC2C and
                                                        func_8003C63C (STALL,
                                                        not attempted) */
-    u8 pad0E8[0x0F0 - 0xE8];
+    void (*slotE8)(Obj86B60 *self);                 /* +0x0E8, external
+                                                       (func_8003D3B0);
+                                                       OBSERVED: func_8003C9B0 */
+    void (*slotEC)(Obj86B60 *self);                 /* +0x0EC, external
+                                                       (func_8003D444);
+                                                       OBSERVED: func_8003C944 */
     void (*slotF0)(Obj86B60 *self, s32 a1, s32 a2); /* +0x0F0, external
                                                        (func_8004DABC);
                                                        OBSERVED:
@@ -142,13 +150,14 @@ struct Obj86B60Methods {
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */
-    u8 pad110[0x110 - 0x110];
     s32 (*slot110)(Obj86B60 *self);                 /* +0x110, external
                                                        (func_8003DCAC);
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */
-    u8 pad114[0x118 - 0x114];
+    void (*slot114)(Obj86B60 *self);                /* +0x114, external
+                                                       (func_8003DDC8);
+                                                       OBSERVED: func_8003C9B0 */
     s32 (*slot118)(Obj86B60 *self);                 /* +0x118, external
                                                        (func_8003DFA0);
                                                        OBSERVED: func_8003C944 */
