@@ -31,7 +31,12 @@ INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BB5C);
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BC14);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BCF4);
+void func_8003BCF4(StreamTaskObj *self, s32 a1) {
+    self->unk40 = a1;
+    if (a1 >= 0) {
+        self->unk40 = a1 * 15;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD10);
 
