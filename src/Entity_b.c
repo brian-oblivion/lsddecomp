@@ -12,6 +12,9 @@ extern u8 D_80089CA0[];
 extern u8 D_80089C94[];
 extern u8 D_80089C88[];
 extern u8 D_80089D3C[];
+extern u8 D_80089DA8[];
+extern u8 D_80089CE8[];
+extern u8 D_80089CF4[];
 
 s32 func_8005DE18(Entity *this) {
     EntityMoodRow *row;
@@ -104,7 +107,45 @@ EntityMethods *Get_vtable_Entity(void) {
     return &D_80089AD4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E160);
+void func_8005E160(Entity *this, EntityMoodHandlerArg *out) {
+    if (out->unk4 == 0) {
+        if (this->unk94->methods->slot200(this->unk94) == 5) {
+            this->unk44 = 0x64;
+        }
+    }
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk44 == 0) {
+        if (out->unk4 % 10 == 0) {
+            out->unk1C = 5;
+            out->unk20 = -2;
+        }
+        if (this->unkFC == 0x960) {
+            this->unkFC = -1;
+        } else if (this->unkFC < 0x4B0) {
+            this->methods->slotC4(this, 0x32, 0);
+        } else {
+            this->methods->slotC4(this, -0x32, 0);
+        }
+    } else if (this->unkFC < 0xFA) {
+        if (out->unk4 % 10 == 0) {
+            out->unk1C = 5;
+            out->unk20 = -2;
+        }
+        if (this->unkFC < 0x64) {
+            this->methods->slotC4(this, 0x32, 0);
+        } else if (this->unkFC < 0xFA) {
+            this->methods->slotBC(this, D_80089DA8);
+        }
+    } else if (this->unkFC == 0xFA) {
+        this->methods->slot130(this);
+        out->unk1C = -2;
+    } else if (this->unkFC >= 0x105 && this->unkFC < 0x238) {
+        this->methods->slotC4(this, -0x32, 0);
+        this->methods->slot44(this, 1, D_80089CE8);
+    } else if (this->unkFC >= 0x239) {
+        this->methods->slot44(this, 1, D_80089CF4);
+    }
+}
 
 void func_8005E3C4(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;

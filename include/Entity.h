@@ -140,6 +140,8 @@ extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
 struct Unk94Methods {
     u8 pad000[0x130];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
+    u8 pad134[0x200 - 0x134];
+    s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5 -- value-returning, not void */
 };
 
 struct Unk94Obj {
