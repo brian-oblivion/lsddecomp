@@ -10,7 +10,13 @@ void func_8003B9DC(StreamTaskObj *self) {
     func_8003DFBC()->slot0C(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA38);
+void func_8003BA38(StreamTaskObj *self) {
+    self->unkC8 = -1;
+    self->unkC4 = 0;
+    self->unkCC = 1;
+    self->unkD0 = 0;
+    self->unkD4 = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA58);
 
