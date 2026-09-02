@@ -174,7 +174,10 @@ void func_8003CB30(Obj86B60 *self, s32 a1)
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CB68);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CBB8);
+void func_8003CBB8(Obj86B60 *self, s32 a1)
+{
+    self->unk84 = a1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CBC0);
 
