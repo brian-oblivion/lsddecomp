@@ -6,6 +6,104 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-02 — round 9: 2 runners, 15 matches, and a lesson about consolidation
+
+**299 -> 320 matched (22.05% -> 23.60% of game code). Build green in main
+throughout.** Two runners by operator choice, on the only two units that had
+full queues.
+
+**Gates.** Gate 1 screened both queues and excluded two functions with
+existing stub reports. Gate 2 carved `class_3bb8c_c` (20 functions) before
+provisioning, and in doing so **corrected a prediction round 8 had written
+down**: the yaml comment and round 8's own PROGRESS entry both said the next
+carve was where the BIOS-trampoline and jump-table dispositions would have to
+be settled. Measured, 80 functions precede the segment's first `jlabel` and 96
+precede its first `jr $t2`, so roughly four more slices fit first. Acting on
+the old note would have meant expensive work four carves early. The yaml now
+carries the measurement.
+
+**Runners: 14 matches, 3 stalls.** bravo went **9 for 9** on `class_3bb8c_c`,
+brand-new ground carved hours earlier, no stalls. alpha took 5 of 8 on
+`class_3bb8c_b`, whose cheap seam went last round — including `func_8004CE24`
+at 97 words, which needed four independent fixes composed. bravo also found
+**two previously unknown sibling vtable classes** by tracing a getter's
+`lui`/`addiu` back into `asm/data/*.s`, which `classtable.py` had no knowledge
+of; that technique is now a promoted learning.
+
+**The shared-header collision was predicted, announced, and cheap.** Round 8
+discovered that collision rule 1 partitions `src/` but not headers, and paid
+for it at merge time. This round the head spotted at ASSIGNMENT time that both
+units describe the same `Obj866E8` class, told both runners (additive edits,
+declarations beside related ones, state any change to an existing
+declaration), and predicted the specific conflict point — bravo's unit reads
+`0x2F4($a0)`, past the struct's then-current `+0x1E4` tail. It landed exactly
+there: **one** conflict region, alpha's retype of `unk1E4` against bravo's
+appended tail, complementary, resolved in one pass. The rule worked.
+
+**The round's most useful finding is about the head's own job.** alpha stalled
+`func_8004D1D0` one word short on the redundant-`move` class and, following
+MATCHING-GUIDE's "best-posed permuter target" advice, correctly declined to
+burn attempts. The lever that closes it had been derived **last round** by
+another runner on `func_8004C0AC`, four addresses away in the same class
+block — mention the source expression twice, bound first, loop variable
+second — and **round 8's consolidation failed to promote it** out of that one
+match report. The head applied it this round: **29/29 first try.**
+
+So: an unpromoted learning does not exist. The runner's process was correct
+throughout and the cost landed a round later as a stall someone had already
+solved. That entry is now in DECOMPILATION_LEARNINGS with its own history
+attached, alongside the direction distinction it needs to be usable — round
+8's lever REMOVES a redundant `move` your source restates, this one ADDS the
+`move` retail genuinely has, and both are the same rule about mention count.
+
+**Head stall triage, 3 for 3 audited, 1 reclaimed:**
+
+| function | runner verdict | head verdict |
+| --- | --- | --- |
+| `func_8004D1D0` | stall, permuter target | **MATCHED 29/29** with last round's unpromoted lever |
+| `func_8004CFB8` | stall, cc1 RTL choice | stall CONFIRMED, **reclassified**: source-shape + permuter, NOT a toolchain blocker |
+| `func_8004CAF0` | stall, frame off by 2 registers | CONFIRMED, and the untried next move named |
+
+The reclassification matters for routing. `func_8004CFB8`'s reproducer work
+was exemplary and rules the downstream tools out, but "cc1 expands this
+statement shape differently" is the ordinary condition of an unsolved
+function, not a pending operator decision — filing it beside the two
+escalated blockers would have implied one. The head also tested one further
+shape there (retail has ONE logical multiply, speculatively hoisted into the
+delay slot) and it scored **17/28 against the runner's 25/28**, closing off
+the most plausible remaining non-permuter reading.
+
+`func_8004CAF0`'s 8/92 is a cascade, not a distance: a frame-size difference
+moves every stack offset in the function. Its fix inverts the usual instinct —
+give each intermediate its own named local so the frame GROWS to retail's
+`-0x38`, rather than reusing one temp and letting GCC coalesce.
+
+**Also settled this round:** `func_8004D3DC` prompted a check of
+a helper-arity question. The callee `func_8001E57C` reads
+neither `$a0` nor `$a1` — it takes **no arguments** and returns
+`&D_8006B5CC`. So `src/class_3ac78.c`'s 2-argument declaration and
+`class_3bb8c.h`'s 1-argument declaration are both wrong about the function and
+both right about their own call site, and both units are byte-exact. Retail's
+source called one zero-argument getter with different argument counts from
+different files, which is what C89 does with no prototype in scope. Both sites
+are now annotated do-not-reconcile, because collapsing either to `(void)`
+changes the caller's argument setup and breaks the match.
+
+**Toolchain: nothing new.** `nop_mflo_mfhi` still stands at two instances from
+round 8; no round-9 function reached either open blocker except the one stubbed
+at carve time.
+
+**Next move: runners, and carve first.** Both units worked this round are now
+down to 2 and 4 fresh, so the fresh queue is thin per unit again even though
+the total is respectable. `Entity_d` (77 uncarved) is the natural next carve
+and there is no shortage — 922 game functions remain uncarved. The permuter
+now has three named candidates whose reports say what to try
+(`func_8004CFB8`, best isolated at 3 words in 28; `func_8004CD38`;
+`func_8004C470`), and `func_8004CAF0` is explicitly NOT one of them — it wants
+a runner with the variable-lifetime hypothesis stated up front.
+
+---
+
 ## 2026-09-02 — round 8: 4 runners, 33 matches, and the permuter's first run
 
 **266 -> 299 matched (19.62% -> 22.05% of game code). Build green in main

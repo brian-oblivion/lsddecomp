@@ -245,6 +245,37 @@ three rounds.
 
 ### Confirmed on this game (each backed by a byte-exact match)
 
+- **A two-armed `if`/`else`'s LAYOUT and its VALUE-PER-ARM are independently
+  wrong-able, and sometimes both need fixing.** Which arm falls through and
+  which is the branch target is one degree of freedom; which value each arm
+  produces is another. Fixing only the one you noticed leaves the other and
+  reads as an unrelated residue. (`func_8004C620`, `func_8004CE24`)
+- **A `for` loop's multi-variable increment clause has a load-bearing order**,
+  even with no data dependency between the variables — `for (; c; a++, b++)`
+  and `for (; c; b++, a++)` are not interchangeable in the output.
+  (`func_8004CE24`)
+- **Walk an array with an incrementing pointer and dereference it directly.**
+  `(*cell)->field` beats caching `*cell` in a local, and pointer increment
+  beats array indexing — the cached form changes register assignment.
+  (`func_8004CE24`; the same family as the explicit-element-pointer entry
+  below, which is about the opposite mistake, so read both.)
+- **An unused parameter in the callee shows up in the CALLER as a genuinely
+  uninitialised local.** If retail's call site passes a register nothing ever
+  set, do not invent a value for it: declare the local and pass it unset. The
+  callee ignores it. Reading this as a bug in your own derivation is the trap.
+  (`func_8004CC74`, whose callee `func_8004CDA4` ignores its 2nd argument.)
+- **A getter's vtable can be found even when `classtable.py` does not know
+  it**, by tracing the getter's own `lui`/`addiu` `%hi`/`%lo` pair back into
+  `asm/data/*.s`. The fingerprint of a class method table is a count/header
+  word followed by `BasicClass__func_17eb0` at `+0x004`. This found two
+  previously unknown sibling classes in one round. (`func_8004D37C`,
+  `func_8004D508`)
+- **`sizeof` is not how this game allocates.** `New_X` wrappers pass a
+  literal byte count to the allocator, so extending a struct's tail in a
+  header cannot change an allocation size — which makes appending newly
+  discovered trailing fields a safe, non-invasive edit. The one exception in
+  `src/` is `DreamSys`, which does use `sizeof`. Check before you rely on it.
+
 - **Write a small early exit as an inverted guard clause, not as the `else` of
   a big `if`.** `if (cond) { lots } else { return k; }` stops being reproduced
   once the `lots` side grows past some size threshold; `if (!cond) return k;`
