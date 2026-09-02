@@ -8,6 +8,7 @@
  * header rather than starting a new one.
  */
 #include "common.h"
+#include "Entity.h"
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EF54);
 
@@ -15,7 +16,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EFF4);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F0D8);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F1A8);
+void func_8005F1A8(Entity *this) {
+    func_8001EACC(this, this->unk94, 1, 0, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F1D4);
 
