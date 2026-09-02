@@ -165,6 +165,18 @@ a lost one. Check them by hand, every time.
    fabricated permuter-exhausted verdict is expensive — it is exactly the
    finding that stops future rounds from trying.
 
+   **And there is a decisive way to check, better than comparing timestamps.**
+   Round 10's echo, asked the same question, answered it from EXIT CODES
+   rather than inference: GNU `timeout` returns **124** when it is the one
+   that killed the child on schedule, whereas a child SIGKILLed from outside
+   surfaces as **137**. So a search wrapped in `timeout N` that came back 124
+   terminated on its own terms, and no `pkill` reached it. Wrap long searches
+   in `timeout` for exactly this reason — it makes "did my own limit fire, or
+   did someone shoot it?" a question with a recorded answer instead of a
+   judgement call. A harness-level cap (e.g. a tool's own wall-clock limit)
+   is a third case again, and its wording identifies it; say which of the
+   three ended the run.
+
 3. **No shared-doc edits in parallel mode.** Runners must NOT edit
    `DECOMPILATION_LEARNINGS.md`, `MATCHING-GUIDE.md`, `PROGRESS.md`,
    `config/symbols.slps01556.lsdde.txt` or the splat yaml. A generalizable
