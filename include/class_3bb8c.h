@@ -366,6 +366,18 @@ struct Class869D8 {
 extern Class869D8Methods D_800869D8;
 extern Class869D8Methods *func_8004D37C(void);
 
+/*
+ * Base-class ctor-table getter, chained by func_8004D2A4. Only the ctor
+ * slot (+0x008, single `self` argument -- this call site sets up no
+ * second argument register) is needed here.
+ */
+typedef struct BaseCtorTable_3bb8c_c {
+    u8 pad0[0x008];
+    void (*ctor)(void *self);
+} BaseCtorTable_3bb8c_c;
+
+extern BaseCtorTable_3bb8c_c *func_8003F24C(void);
+
 extern void *func_80017B34(s32 size);
 
 #endif

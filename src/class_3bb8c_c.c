@@ -13,7 +13,12 @@ Class869D8 *func_8004D254(void)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D2A4);
+void func_8004D2A4(Class869D8 *self)
+{
+    func_8003F24C()->ctor(self);
+    self->methods = func_8004D37C();
+    self->methods->slot40(self);
+}
 
 void func_8004D2F8(void) {
 }
