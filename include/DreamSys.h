@@ -726,7 +726,14 @@ struct vtable_DreamSys{
 	   DreamSys__WallLink as (this) -- the callee ignores its argument
 	   (round 2026-09-02). */
 	void (*func_800590E0)(DreamSys *this);
-	u32 unknown_functions_0xec[4];
+	u32 unknown_functions_0xec[3];
+	/* This function's OWN slot (+0x0F8, resolved via
+	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:
+	   calls LogChunkMood/func_8005966C/func_800596E8/func_8005A168/
+	   func_8005A1B0/func_8005A1EC in sequence, then zeroes a large block of
+	   per-dream state, ending with a func_8001E6F8/func_8001CEB4 pair over a
+	   small local buffer (round 2026-09-02). */
+	void (*func_800591B4)(DreamSys *this, s32 arg1, s32 arg2);
 	void (*func_80059310)(DreamSys *this);
 	s32 (*func_8005931C)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);

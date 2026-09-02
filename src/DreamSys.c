@@ -179,7 +179,46 @@ void func_80059148(DreamSys *this, s32 value)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800591B4);
+void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
+{
+	struct {
+		s8 unknown_values_0x0[8];
+		s16 field_0x8;
+		s16 field_0xA;
+	} local;
+
+	this->vt->LogChunkMood(this, &this->linkCoordinates);
+	this->vt->func_8005966C(this, 1);
+	this->vt->func_800596E8(this, 1);
+	this->vt->func_8005A168(this, arg1);
+
+	this->unk_0xBC = -1;
+	this->unk_0xB4 = 0;
+	this->unk_0xB8 = 0;
+	this->unk_0xA0 = 0;
+	this->unk_0xA4 = 0;
+	this->unk_0x88 = 0;
+	this->unk_0x90 = 0;
+	this->unk_0x8C = 0;
+	this->unk_0x94 = 0;
+	this->vt->func_8005A1B0(this, 0, 1, 1, 1);
+
+	this->vt->func_8005A1EC(this, arg2);
+
+	this->nextCinematic.entry = -1;
+	this->unk_0x70 = 0;
+	this->unknwon_int_0x44 = 0;
+	this->unk_0x74 = 0;
+	this->unk_0x908 = 0;
+	this->unk_0x90C = 0;
+	this->unk_0x910 = 0;
+	this->unk_0x78 = 0;
+	func_8001E6F8(this, &local);
+
+	local.field_0x8 = 0;
+	local.field_0xA = 1;
+	this->vt->func_8001CEB4(this, 1, &local);
+}
 
 void func_80059310(DreamSys *this)
 {
