@@ -134,7 +134,20 @@ INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E7F8);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EA94);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EBB4);
+void func_8005EBB4(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (out->unk4 == 0) {
+        out->unk1C = 0xC;
+        this->unk44++;
+    } else if (out->unk4 >= this->unk80 - 1) {
+        out->unk4 = -1;
+    }
+    if (this->unk44 == 0x24) {
+        if (rand() % 3 == 0) {
+            this->methods->slot30(this, 0xB);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EC98);
 

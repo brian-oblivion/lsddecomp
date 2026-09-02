@@ -200,7 +200,7 @@ struct Entity {
     /* +0x18 */ u8 pad18[0x24 - 0x18];
     /* +0x24 */ s32 unk24;             /* cleared by func_8005D9F4; xored against a mood-row-derived value in func_8005DD18 */
     /* +0x28 */ u8 pad28[0x44 - 0x28];
-    /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1 */
+    /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by func_8005EBB4 */
     /* +0x48 */ u8 pad48[0x4C - 0x48];
     /* +0x4C */ s32 unk4C;               /* cleared by func_8005D418 */
     /* +0x50 */ u8 pad50[0x58 - 0x50];
