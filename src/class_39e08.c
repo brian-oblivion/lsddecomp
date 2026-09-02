@@ -78,4 +78,6 @@ void func_8004A3EC(Obj865C8 *self, s32 arg1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A458);
+void func_8004A458(Obj865C8 *self, s32 arg1) {
+    self->unk2C = (arg1 < 0) ? arg1 : arg1 * 20;
+}
