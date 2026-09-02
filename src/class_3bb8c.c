@@ -14,7 +14,15 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B38C);
+s32 func_8004B38C(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
+    s32 stackBuf[3];
+    s32 ret;
+
+    self->unk6C = arg2;
+    self->unkBC = *arg3;
+    ret = func_8004B44C(arg1, stackBuf, self->unk68, &self->unk54, arg3);
+    return self->methods->slotF8(self, ret, stackBuf, &D_80086904);
+}
 
 s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
     s32 outBuf[3];
