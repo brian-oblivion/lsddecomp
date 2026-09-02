@@ -73,7 +73,7 @@ struct EntityMethods {
     /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
     /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C and func_8005DE18 (as slot164(self, 1)) */
     /* +0x168 */ void (*slot168)(Entity *self);               /* called by func_8005DEE0 */
-    /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C */
+    /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C, func_8005E0B0 */
     /* +0x170 */ s32 (*slot170)(Entity *self);                  /* called by func_8005D480 */
     /* +0x174 */ void (*slot174)(Entity *self);                  /* called by func_8005D480 */
     /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by func_8005D480; holds func_8005DE18, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
