@@ -6,11 +6,10 @@
 
 `Class866E8Methods` slot `+0x0D0` (`slotD0`, already documented as such by
 `func_8004AB88`'s comment before this round). Gates on `count`: only
-proceeds for `count` in `{2,3}` or `[5,8]` (`count == 4` and `count >= 9`
-both bail early, matching the four independent `slti`/branch checks
-retail performs — NOT a single boolean expression, see below). If the gate
-passes, walks `self->unkE8` as a NUL-terminated `s32` array of tag values;
-for every entry equal to `list`'s own vtable header word
+proceeds for `count` in `{2,3,5,6,7,8}` (`count < 2`, `count == 4`, and
+`count >= 9` all bail early). If the gate passes, walks `self->unkE8` as a
+NUL-terminated `s32` array of tag values; for every entry equal to
+`list`'s own vtable header word
 (`((GenericObject*)list)->methods->header`), calls
 `self->methods->slot12C(self, list, count)`.
 
@@ -22,16 +21,18 @@ void func_8004ADD8(Class866E8 *self, void *list, s32 count)
     s32 *p;
     u8 unused[24];
 
-    if (count < 2)
+    switch (count) {
+    case 2:
+    case 3:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        break;
+    default:
         return;
-    if (count < 4)
-        goto scan;
-    if (count >= 9)
-        return;
-    if (count < 5)
-        return;
+    }
 
-scan:
     p = (s32 *)self->unkE8;
     if (p == NULL)
         return;
@@ -46,6 +47,20 @@ scan:
     } while (*p != 0);
 }
 ```
+
+**Update (head-requested follow-up, one attempt):** the original match
+used a four-branch `if`/`goto` chain (`if (count<2) return; if (count<4)
+goto scan; if (count>=9) return; if (count<5) return;`) that reproduced
+retail's exact `slti`/branch sequence but read as an opaque puzzle. Tried
+rewriting the gate as the `switch` shown above — **it reaches the
+identical 51/51 bytes, whole-image SHA1 still green, zero-cost.** Kept the
+`switch` as final since it says what the gate actually IS (`count` is one
+of six specific values) instead of encoding that as branch arithmetic.
+This doesn't resolve what `count` enumerates or why `4` specifically is
+excluded (see the note below), but it's a positive data point: the real
+source could plausibly have been a `switch` over a small case set, which
+is a narrower, more plausible hypothesis than an arbitrary compound
+boolean.
 
 `self->unkE8` was previously typed plain `s32` (set by `func_8004ADD0`,
 already matched); this function reads it back as a pointer to a
@@ -73,6 +88,20 @@ compiler.** Adding `u8 unused[24];` (sized to exactly the missing 24
 bytes, declared but never referenced) grew the frame from `-0x28` to
 `-0x40` and closed every remaining word, all in one attempt.
 
+**This local is evidence, not an explanation.** `u8 unused[24]` reproduces
+retail's BYTES, but nothing says the real source declared a 24-byte
+`char` buffer specifically — GCC 2.6.3 reserving a stack slot for a
+provably-dead local most likely means the ORIGINAL source had some local
+aggregate (a struct, a small array of a different element type, or
+several separate locals whose combined size is 24 bytes) that a slightly
+different reconstruction of THIS function's logic would actually use —
+most plausibly by passing its address somewhere, which is the normal way
+a local ends up needing a real stack slot even after the compiler could
+otherwise prove it dead. The padding local closes the byte diff without
+identifying what that real local was. Anyone revisiting this function (or
+`func_8004ADD0`/`self->unkE8`'s neighbours) should treat the 24 bytes as
+a size constraint on the missing piece, not a solved question.
+
 ### Proposed learning
 
 **When every visible instruction already matches (branches, calls,
@@ -88,4 +117,5 @@ quirk rather than something specific to those two functions' unit.
 
 round 2026-09-02, runner ALPHA, unit class_3ac78. First attempt 39/51
 (pure frame-size gap, logic already exact); second attempt (padding local)
-closed it, 51/51.
+closed it, 51/51. Follow-up (same day, head-requested): `switch` rewrite
+of the gate, one attempt, also 51/51 — adopted as final.

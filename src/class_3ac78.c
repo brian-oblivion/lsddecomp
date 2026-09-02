@@ -108,16 +108,18 @@ void func_8004ADD8(Class866E8 *self, void *list, s32 count)
     s32 *p;
     u8 unused[24];
 
-    if (count < 2)
+    switch (count) {
+    case 2:
+    case 3:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        break;
+    default:
         return;
-    if (count < 4)
-        goto scan;
-    if (count >= 9)
-        return;
-    if (count < 5)
-        return;
+    }
 
-scan:
     p = (s32 *)self->unkE8;
     if (p == NULL)
         return;
@@ -132,7 +134,41 @@ scan:
     } while (*p != 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AEA4);
+extern void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2);
+extern void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2);
+extern void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
+
+void func_8004AEA4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
+{
+    s32 gateArg;
+    HistoryBlock_3ac78 saved;
+    UnkArgObj_3ac78 buf;
+    s32 savedUnk88;
+
+    if (arg1->unk0C != 0) {
+        gateArg = (s32)((u8 *)arg1->unk14 + 0x38);
+    } else {
+        gateArg = 0;
+    }
+
+    if (self->methods->slot110(self, &buf, gateArg) != 0) {
+        return;
+    }
+
+    savedUnk88 = self->unk88;
+    saved = self->unk8C;
+
+    if (self->unk68->unk4 == 0) {
+        func_8004AFE0(self, &buf, 3);
+    } else {
+        func_8004B030(self, &buf, 3);
+    }
+
+    func_8004B100(self, arg1, arg2);
+
+    self->unk88 = savedUnk88;
+    self->unk8C = saved;
+}
 
 extern void func_8004C93C(Class866E8 *self);
 
@@ -174,7 +210,7 @@ void func_8004B32C(Class866E8 *self, s32 arg1)
     self->unk78 = (s16)(arg1 >> 12);
 }
 
-void func_8004B344(Class866E8 *self, s32 arg1)
+void func_8004B344(Class866E8 *self, UnkPtr68Obj_3ac78 *arg1)
 {
     self->methods->slot40(self);
     self->unk68 = arg1;
