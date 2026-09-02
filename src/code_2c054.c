@@ -76,7 +76,9 @@ void func_8003BE7C(StreamTaskObj *self, s32 a1) {
     self->unkD4 = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE84);
+StreamTaskObjMethods *func_8003BE84(void) {
+    return &D_8006E5F8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BE94);
 
