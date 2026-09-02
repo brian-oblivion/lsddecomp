@@ -42,6 +42,8 @@ typedef struct Unk100Obj Unk100Obj;
 typedef struct Unk100Methods Unk100Methods;
 typedef struct Unk94Obj Unk94Obj;
 typedef struct Unk94Methods Unk94Methods;
+typedef struct Unk4CObj Unk4CObj;
+typedef struct Unk4CMethods Unk4CMethods;
 typedef struct BasicClassMethods BasicClassMethods;
 typedef struct EntityPos EntityPos;
 typedef struct EntityMoodRow EntityMoodRow;
@@ -144,6 +146,21 @@ struct Unk94Obj {
     EntityPos *unk14;        /* +0x14, read by func_8005E02C (its own +0x1C, i.e. y) */
 };
 
+/* Object pointed to by `Entity::unk4C` (previously modeled as a plain `s32`
+ * on the strength of func_8005D418's `this->unk4C = 0;`, which type-checks
+ * against a pointer just as well). func_8005EA94 dereferences it at +0x00 as
+ * a method-table pointer (the same class-framework idiom as `Unk94Obj`) and
+ * calls its own +0x138 slot with two extra literal-1 arguments. Shape beyond
+ * that single slot is unknown. */
+struct Unk4CMethods {
+    u8 pad000[0x138];
+    void (*slot138)(Unk4CObj *self, s32 arg1, s32 arg2); /* called by func_8005EA94; return value discarded at this one call site, so void is a safe read for THIS call's bytes regardless of the real return type (same caveat as func_8002CD08/func_8002CC84 elsewhere in this unit -- a discarded return is never positive evidence of void) */
+};
+
+struct Unk4CObj {
+    Unk4CMethods *methods; /* +0x00 */
+};
+
 /* Default arguments func_8005D108 substitutes when its own `name`/`arg2`
  * parameters are NULL -- both plain 2-word buffers (asm/data/7B3F8.sdata.s),
  * not strings; `D_8008AC14` reads as {0x140, 0xF0} (320, 240, a plausible
@@ -203,7 +220,7 @@ struct Entity {
     /* +0x28 */ u8 pad28[0x44 - 0x28];
     /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by func_8005EBB4 */
     /* +0x48 */ u8 pad48[0x4C - 0x48];
-    /* +0x4C */ s32 unk4C;               /* cleared by func_8005D418 */
+    /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by func_8005D418; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
     /* +0x50 */ u8 pad50[0x58 - 0x50];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
     /* +0x5C */ u8 pad5C[0x80 - 0x5C];
