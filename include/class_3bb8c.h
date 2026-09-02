@@ -448,6 +448,11 @@ struct Class869D8Methods {
 
 struct Class869D8 {
     Class869D8Methods *methods;                /* +0x000 */
+    u8 pad004[0x010 - 0x004];
+    s32 unk10;                                  /* +0x010, func_8004D300: gates the slot9C call (nonzero test) */
+    u8 pad14[0x070 - 0x014];
+    s32 unk70;                                  /* +0x070, func_8004D300: gates the slot9C call (nonzero test) */
+    u8 pad74[0x0DC - 0x074];                     /* struct ends at the New_Class869D8 alloc size, 0xDC */
 };
 
 extern Class869D8Methods D_800869D8;
@@ -461,6 +466,9 @@ extern Class869D8Methods *func_8004D37C(void);
 typedef struct BaseCtorTable_3bb8c_c {
     u8 pad0[0x008];
     void (*ctor)(void *self);
+    u8 pad00C[0x09C - 0x00C];
+    void (*slot9C)(void *self);   /* +0x09C, func_8004D300's forward target (gated by
+                                      Class869D8::unk10/unk70 both being nonzero) */
 } BaseCtorTable_3bb8c_c;
 
 extern BaseCtorTable_3bb8c_c *func_8003F24C(void);

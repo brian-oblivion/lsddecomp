@@ -23,7 +23,12 @@ void func_8004D2A4(Class869D8 *self)
 void func_8004D2F8(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D300);
+void func_8004D300(Class869D8 *self)
+{
+    if (self->unk10 != 0 && self->unk70 != 0) {
+        func_8003F24C()->slot9C(self);
+    }
+}
 
 void func_8004D35C(void) {
 }
