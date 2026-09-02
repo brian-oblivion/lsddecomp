@@ -157,7 +157,14 @@ segments:
       # block had zero `jlabel`s -- so no rodata slot needed attaching.
       - [0x4D7DC, c, Entity]
       - [0x4E618, c, Entity_b]
-      - [0x4F754, asm, Entity_c]
+      # Entity_c: first 20-function slice of the 97-function remainder,
+      # 0x4F754..0x5077C. 0x5077C (func_8005FF7C) is a real boundary --
+      # func_8005FEF8 ends `jr $ra; nop` and func_8005FF7C opens with its
+      # own `addiu $sp, $sp, -0x20`. The WHOLE 97-function block has zero
+      # `jlabel`s and zero `jr $t2`, so neither slice needs a rodata slot
+      # attached and none of it is a BIOS trampoline.
+      - [0x4F754, c, Entity_c]
+      - [0x5077C, asm, Entity_d]
       - [0x55DD4, c, code_55dd4]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
