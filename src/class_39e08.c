@@ -3,7 +3,33 @@
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049608);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049684);
+void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
+    LoadRequest req;
+    s32 tmp;
+
+    func_8004A4B8()->ctor(self, func_80048E08(0), 0);
+    self->methods = func_8004A060();
+    func_8005C508();
+    self->unk44 = func_8003B39C(D_800113EC);
+    self->unk44->methods->slot78(self->unk44);
+    self->unk44->methods->slot5C(self->unk44);
+    req.type = 0;
+    req.path = D_800113F8;
+    self->unk48 = func_80043840(&req);
+    tmp = func_80048D74(0);
+    self->unk40 = func_800398E0(tmp, 0, 1);
+    func_8004A070(1);
+    func_80026F34((u32)arg3 < 1, 1, 1);
+    self->unk0C = arg1;
+    arg1->unk10 = func_8004D254();
+    arg1->unk8 = func_80042400();
+    arg1->unkC = (SubObjG *)func_8004A4C8(0, 1);
+    self->unk38 = arg2;
+    self->methods->slot10(self, (Obj4C *)arg2);
+    arg2->methods->slot10C(arg2, self->subB);
+    arg2->methods->slot114(arg2, self->unk44);
+    self->methods->resetUnk3C(self);
+}
 
 void func_80049830(Obj865C8 *self) {
     Obj0C *o = self->unk0C;

@@ -174,6 +174,14 @@ typedef struct SubObjG SubObjG;
 typedef struct SubObjGMethods {
     u8 pad00[0x04];
     SubObjG *(*slot4)(SubObjG *self);
+    u8 pad8[0x5C - 0x8];
+    /* func_80049684 (ctor): called on a just-constructed instance,
+     * return discarded. */
+    void (*slot5C)(SubObjG *self);         /* +0x05C */
+    u8 pad60[0x78 - 0x60];
+    /* func_80049684 (ctor): called immediately after construction on
+     * self->unk44, return discarded. */
+    void (*slot78)(SubObjG *self);         /* +0x078 */
 } SubObjGMethods;
 struct SubObjG {
     SubObjGMethods *methods;
@@ -207,9 +215,15 @@ typedef struct SubObjDMethods {
     u8 pad00[0x10];
     void (*slot10)(SubObjD *self, s32 arg1);
     void (*slot14)(SubObjD *self, s32 arg1);
-    u8 pad18[0x110 - 0x18];
+    u8 pad18[0x10C - 0x18];
+    /* func_80049684 (ctor): called as arg2->methods->slot10C(arg2,
+     * self->subB). */
+    void (*slot10C)(SubObjD *self, SubObjB *arg1);   /* +0x10C */
     void (*slot110)(SubObjD *self, s32 arg1);
-    u8 pad114[0x1B4 - 0x114];
+    /* func_80049684 (ctor): called as arg2->methods->slot114(arg2,
+     * self->unk44). */
+    void (*slot114)(SubObjD *self, SubObjG *arg1);   /* +0x114 */
+    u8 pad118[0x1B4 - 0x118];
     /* func_80049CA8's `case 1`: return value used (`>= 0` check), so this
      * is genuinely non-void. */
     s32 (*slot1B4)(SubObjD *self);                /* +0x1B4 */
@@ -369,5 +383,91 @@ extern u8 D_8008665C[];
  * fine" convention, extended to an already-matched cross-unit function:
  * only a local extern prototype is needed). No return value used. */
 extern void func_8005C5E8(void);
+
+/* The ctor, func_80049684. A large web of external calls; each is declared
+ * locally with the minimal signature its call site here demonstrates (per
+ * CLAUDE.md's "calling into a function that is still INCLUDE_ASM elsewhere
+ * is fine" convention -- several of these ARE already declared, with a
+ * different but ABI-compatible return type, in OTHER units' own local
+ * views; this unit keeps its own, per the project's established
+ * multiple-independent-local-views policy). */
+
+/* Reads an unnamed small-data global's first field; return value is
+ * forwarded, unread by its own body, as the sibling ctor's arg1 (which
+ * that ctor stores directly into `Obj865C8::unk30`, an `s32`). Uncarved,
+ * asm/psyq_memset.s. */
+extern s32 func_80048E08(s32 arg1);
+
+/* Matched in code_4cd08.c (still called `func_8005C508` there, STALLED at
+ * 40/56 -- see docs/match-reports/func_8005C508.md). Takes no arguments,
+ * return value (if any) unused here. */
+extern void func_8005C508(void);
+
+/* "New_X"-shaped allocator (uncarved, asm/psyq_SpuSetMute.s): allocates,
+ * ctors with the one forwarded argument, returns the new instance (or 0).
+ * Stored into `Obj865C8::unk44` here, which this function's own body then
+ * immediately dispatches through `SubObjGMethods::slot78`/`slot5C` --
+ * consistent with the existing `SubObjG` family. */
+extern SubObjG *func_8003B39C(const char *path);
+
+/* Filenames right next to each other in the same rodata blob
+ * (asm/data/1A90.rodata.s): "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD". */
+extern const char D_800113EC[];
+extern const char D_800113F8[];
+
+/* Same request-block shape `Class6D3C8.h` already established at
+ * `func_80025FDC`'s call site (`LoadModelRequest`, learned there to be
+ * 0x10 bytes even though only the first two fields are ever written --
+ * "local struct SIZE matters, not shape"). This unit's own local view,
+ * not a shared header, per this project's per-unit-view convention. */
+typedef struct LoadRequest {
+    s32 type;
+    const char *path;
+    s32 unk08;
+    s32 unk0C;
+} LoadRequest;
+
+/* Uncarved, asm/psyq_memset.s: loads a resource named by `req->path`,
+ * returns a handle/object. Already declared elsewhere (Class6D3C8.h) as
+ * `extern void *func_80043840(void *arg)`; this unit's own local view types
+ * the return `SubObjG *` to match where it's stored here
+ * (`Obj865C8::unk48`). */
+extern SubObjG *func_80043840(LoadRequest *req);
+
+/* Uncarved, asm/psyq_memset.s: a magic-multiply division idiom over its one
+ * argument (not an allocator -- no `func_80017B34` call in its own body).
+ * Its return value is forwarded as `func_800398E0`'s own 1st argument. */
+extern s32 func_80048D74(s32 arg1);
+
+/* "New_X"-shaped allocator (uncarved, asm/psyq_SpuSetMute.s), 3 forwarded
+ * arguments. Stored into `Obj865C8::unk40`. */
+extern SubObjG *func_800398E0(s32 arg1, s32 arg2, s32 arg3);
+
+/* Already declared elsewhere (code_1677c.c) as `extern s32
+ * func_8004A070(s32 a0)`; this unit's own local view, same signature.
+ * Return value discarded at this call site. */
+extern s32 func_8004A070(s32 arg1);
+
+/* Already declared elsewhere (Class6D3C8.h) with this exact signature; this
+ * unit's own local view. Return value discarded at this call site. */
+extern s32 func_80026F34(s32 arg1, s32 arg2, s32 arg3);
+
+/* "New_X"-shaped allocator (uncarved, asm/class_3bb8c.s), zero forwarded
+ * arguments (its own ctor call passes only the new instance). Stored into
+ * `Obj0C::unk10`. */
+extern SubObjG *func_8004D254(void);
+
+/* Same "New_X" shape, zero arguments (uncarved, asm/psyq_memset.s). Stored
+ * into `Obj0C::unk8`. */
+extern SubObjG *func_80042400(void);
+
+/* Already declared, fully typed, in class_3ac78.h as `Class866E8
+ * *func_8004A4C8(s32, s32)` (an established New_X allocator for a
+ * DIFFERENT, richer-typed class). Stored into `Obj0C::unkC` here, which
+ * this unit's own local view types `SubObjG *` -- an explicit cast is used
+ * at the one call site rather than importing class_3ac78's type, per this
+ * project's per-unit-view convention (same policy as the other externs on
+ * this page). */
+extern void *func_8004A4C8(s32 arg1, s32 arg2);
 
 #endif
