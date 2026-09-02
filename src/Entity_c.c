@@ -10,6 +10,8 @@
 #include "common.h"
 #include "Entity.h"
 
+extern u8 D_80089E38[];
+
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EF54);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EFF4);
@@ -30,7 +32,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F544);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F608);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F6D4);
+s32 func_8005F6D4(Entity *this) {
+    return this->methods->slot48(this, 1, D_80089E38);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F708);
 
