@@ -28,7 +28,12 @@ void func_80049C50(Obj865C8 *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049E20);
+void func_80049E20(Obj865C8 *self, s32 arg1) {
+    self->unk4C = func_80052B70(self->subB, self->unk40, self->unk44, self->unk48, arg1);
+    self->methods->slot10(self, self->unk4C);
+    self->unk4C->methods->slot44(self->unk4C, self->unk0C, self->unk38);
+    self->unk3C = 2;
+}
 
 void func_80049EA4(void) {
 }
