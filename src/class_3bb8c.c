@@ -39,7 +39,18 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BB3C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BCE0);
+s32 func_8004BCE0(Obj866E8 *self) {
+    s32 count;
+    s32 i;
+
+    count = 0;
+    for (i = 0; i < 7; i++) {
+        if (self->arr[i].flag != 0) {
+            count++;
+        }
+    }
+    return count;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BD14);
 

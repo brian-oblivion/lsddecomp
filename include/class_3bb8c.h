@@ -33,10 +33,20 @@ typedef struct Obj866E8Methods {
     void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
 } Obj866E8Methods;
 
+/* self+0xEC: a 7-element array, each element 0x1C bytes. Established by
+ * func_8004BCE0, which reads each element's own +0x000 (u16 flag,
+ * nonzero-ness only). Nothing else about an element's shape is known yet. */
+typedef struct Elem {
+    u16 flag;                      /* +0x000 */
+    u8 pad02[0x1C - 0x02];
+} Elem;
+
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x70 - 0x04];
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
+    u8 pad74[0xEC - 0x74];
+    Elem arr[7];                   /* +0x0EC, func_8004BCE0 */
 };
 
 #endif
