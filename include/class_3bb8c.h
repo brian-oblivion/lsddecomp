@@ -448,6 +448,11 @@ struct Class869D8Methods {
 
 struct Class869D8 {
     Class869D8Methods *methods;                /* +0x000 */
+    u8 pad004[0x010 - 0x004];
+    s32 unk10;                                  /* +0x010, func_8004D300: gates the slot9C call (nonzero test) */
+    u8 pad14[0x070 - 0x014];
+    s32 unk70;                                  /* +0x070, func_8004D300: gates the slot9C call (nonzero test) */
+    u8 pad74[0x0DC - 0x074];                     /* struct ends at the New_Class869D8 alloc size, 0xDC */
 };
 
 extern Class869D8Methods D_800869D8;
@@ -461,6 +466,9 @@ extern Class869D8Methods *func_8004D37C(void);
 typedef struct BaseCtorTable_3bb8c_c {
     u8 pad0[0x008];
     void (*ctor)(void *self);
+    u8 pad00C[0x09C - 0x00C];
+    void (*slot9C)(void *self);   /* +0x09C, func_8004D300's forward target (gated by
+                                      Class869D8::unk10/unk70 both being nonzero) */
 } BaseCtorTable_3bb8c_c;
 
 extern BaseCtorTable_3bb8c_c *func_8003F24C(void);
@@ -469,6 +477,11 @@ extern void *func_80017B34(s32 size);
 
 typedef struct Class86AA0 Class86AA0;
 typedef struct Class86AA0Methods Class86AA0Methods;
+
+/* Forward declaration: full definition (GenericTagMethods_3bb8c_c /
+ * GenericTagInst_3bb8c_c) is below, established from func_8004D434; needed
+ * here already for Class86AA0Methods::slotA0's parameter type. */
+typedef struct GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;
 
 /*
  * Vtable D_80086AA0 (asm/data/76DC8.data.s, header word 0x24). Sibling of
@@ -480,7 +493,23 @@ typedef struct Class86AA0Methods Class86AA0Methods;
 struct Class86AA0Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86AA0 *self);            /* +0x008, func_8004D3DC */
-    u8 pad00C[0x0B8 - 0x00C];
+    u8 pad00C[0x0A0 - 0x00C];
+    /* Called by func_8004D47C (self's own slot +0x0B8 occupant, see below)
+     * when its own arg2 is in [5, 9). arg1 is forwarded opaquely; return
+     * value unused. */
+    void (*slotA0)(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2); /* +0x0A0 */
+    u8 pad0A4[0x0B8 - 0x0A4];
+    /* Declared here 1-argument to match func_8004D434's own call site
+     * (`self->methods->slotB8(self)`, already matched) -- but this slot's
+     * REAL occupant is func_8004D47C, whose own body reads three args
+     * (self, arg1, arg2). Both are right about their own codegen; see
+     * func_8004D3DC's report/func_8001E57C's declaration below for the
+     * identical situation on a different symbol. Not reconciled: widening
+     * this field to 3 args would force func_8004D434's call site to
+     * synthesize an arg2 it doesn't have, breaking that already-matched
+     * function. func_8004D47C's own C definition is typed independently
+     * of this field (the vtable's storage is still raw asm data, so
+     * nothing here type-checks it either way). */
     void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by func_8004D434 */
 };
 
@@ -507,8 +536,31 @@ extern Class86AA0Methods *func_8004D508(void);
  * right about their own codegen and both are wrong about the function.
  * Do not "reconcile" them and do not reduce either to (void) -- that changes
  * the argument setup the caller emits and breaks the match. See
- * docs/match-reports/func_8004D3DC.md. */
-extern BaseCtorTable_3bb8c_c *func_8001E57C(void *self);
+ * docs/match-reports/func_8004D3DC.md.
+ *
+ * Return type: round 9 split this OFF `BaseCtorTable_3bb8c_c` (func_8003F24C's
+ * own return type) into its own `BaseCtorTableB_3bb8c_c`, because
+ * func_8004D47C (this unit, round 9) reached +0x09C on THIS getter's table
+ * with a 3-argument call (self, arg1, arg2) -- a genuine arity conflict with
+ * `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established from
+ * func_8004D300 via the OTHER getter, func_8003F24C). Same-offset arity
+ * conflict means different table/different class, per this project's
+ * established split policy (see e.g. TaskCoreObjMethods in
+ * include/code_2c054.h). Purely a type-name change here -- func_8004D3DC's
+ * own already-matched call (`func_8001E57C(self)->ctor(self)`) only touches
+ * the +0x008 `ctor` slot, whose layout is identical in both names, so this
+ * renaming changes no bytes. */
+typedef struct BaseCtorTableB_3bb8c_c BaseCtorTableB_3bb8c_c;
+struct BaseCtorTableB_3bb8c_c {
+    u8 pad0[0x008];
+    void (*ctor)(void *self);                     /* +0x008, func_8004D3DC */
+    u8 pad00C[0x09C - 0x00C];
+    /* func_8004D47C's forward target (self, arg1 opaque, arg2 int),
+     * unconditional first statement of that function. */
+    void (*slot9C)(void *self, void *arg1, s32 arg2); /* +0x09C */
+};
+
+extern BaseCtorTableB_3bb8c_c *func_8001E57C(void *self);
 
 /*
  * Generic class-instance shape used only to read another object's own
@@ -520,9 +572,141 @@ typedef struct GenericTagMethods_3bb8c_c {
     u8 tag;                                     /* +0x000, low byte of the header word */
 } GenericTagMethods_3bb8c_c;
 
-typedef struct GenericTagInst_3bb8c_c {
+struct GenericTagInst_3bb8c_c {
     GenericTagMethods_3bb8c_c *methods;         /* +0x000 */
-} GenericTagInst_3bb8c_c;
+};
+
+/*
+ * A third small sibling class (New_X/ctor pair, same shape as Class869D8
+ * and Class86AA0 above), named by its vtable's address `D_80086B60`
+ * (returned by `func_8004E2D0`, still raw asm in the uncarved
+ * `asm/class_3bb8c_d.s` -- called directly, not through any vtable).
+ * `func_8004D518` is the New_X allocator (alloc size 0xC4); `func_8004D578`
+ * is the ctor itself, which SETS `self->methods` directly to this table's
+ * own pointer (the base-class constructor chaining pattern already seen
+ * in `TaskCoreMethods::slotD8`, include/code_2c054.h) rather than fetching
+ * it through another getter first.
+ */
+typedef struct Class86B60 Class86B60;
+typedef struct Class86B60Methods Class86B60Methods;
+
+struct Class86B60Methods {
+    u8 pad000[0x008];
+    void (*ctor)(Class86B60 *self, void *dreamSys);  /* +0x008, func_8004D578 occupies this slot */
+    u8 pad00C[0x040 - 0x00C];
+    void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, func_8004D578's own last call */
+    u8 pad044[0x0D8 - 0x044];
+    void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, func_8004D578's own call, arg1 = &D_80086D44 */
+};
+
+struct Class86B60 {
+    Class86B60Methods *methods;    /* +0x000 */
+    u8 pad004[0x048 - 0x004];
+    /* Set up by the base ctor chain (func_8003DFBC()->slot08 below), read
+     * (never written) by func_8004D578 right after. Same offset/shape as
+     * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
+     * chain output), but kept as its own local type since nothing ties
+     * the two classes together and the one slot this unit dispatches
+     * through (+0x09C) isn't among that type's own known slots. */
+    struct Class86B60Unk48Obj *unk48;  /* +0x048, func_8004D578 */
+    u8 pad04C[0x0A4 - 0x04C];
+    void *unkA4;                    /* +0x0A4, func_8004D578: stores its own dreamSys arg raw */
+    u8 pad0A8[0x0AC - 0x0A8];
+    s32 unkAC;                      /* +0x0AC, func_8004D578: zeroed */
+    u8 pad0B0[0x0BC - 0x0B0];
+    s32 unkBC;                      /* +0x0BC, func_8004D578: return value of dreamSys->methods->slot1B0 */
+    s32 unkC0;                      /* +0x0C0, func_8004D578: output buffer address passed BY REFERENCE
+                                        to dreamSys->methods->slot1B0 -- last word of the 0xC4-byte
+                                        allocation (0xC0+4 == 0xC4), which is why this field is exactly
+                                        one word wide rather than a guess */
+};
+
+extern Class86B60Methods D_80086B60;
+extern Class86B60Methods *func_8004E2D0(void);   /* still raw asm, asm/class_3bb8c_d.s -- called
+                                                       directly (jal), not through any vtable */
+
+/*
+ * self->unk48's own pointee (Class86B60Unk48Obj). Only slot9C is reached,
+ * by func_8004D578, with a single s32 argument (-1); return value unused.
+ */
+typedef struct Class86B60Unk48ObjMethods {
+    u8 pad000[0x09C];
+    void (*slot9C)(struct Class86B60Unk48Obj *self, s32 arg1); /* +0x09C */
+} Class86B60Unk48ObjMethods;
+
+typedef struct Class86B60Unk48Obj {
+    Class86B60Unk48ObjMethods *methods;   /* +0x000 */
+} Class86B60Unk48Obj;
+
+/*
+ * Local, opaque view of func_8004D578's `dreamSys` argument -- only the
+ * two vtable slots that function reaches (+0x1A0, +0x1B0) are typed. This
+ * project already has a much larger, canonical `DreamSys` type
+ * (include/DreamSys.h) with its own `vt` field, but neither offset is
+ * established there yet and this unit does not edit that header -- kept
+ * as an independent local view per this project's established convention
+ * (see e.g. Obj866E8 vs. Class866E8 at the top of this file). The `void
+ * *dreamSys` parameter type on func_8004D518/func_8004D578 themselves is
+ * kept untyped/opaque to match the ALREADY-established external
+ * declaration `extern PollTask *func_8004D518(void *dreamSys);` in
+ * include/Class6D3C8.h (a different unit's own independent view of this
+ * same New_X allocator, used there as a `PollTaskCtor` callback) --
+ * this local dispatch type is used only inside func_8004D578's own body.
+ */
+typedef struct DreamSysView_3bb8c_c DreamSysView_3bb8c_c;
+typedef struct DreamSysViewMethods_3bb8c_c DreamSysViewMethods_3bb8c_c;
+
+struct DreamSysViewMethods_3bb8c_c {
+    u8 pad000[0x1A0];
+    /* Return value forwarded straight to func_8004D6AC's own arg0. */
+    s32 (*slot1A0)(DreamSysView_3bb8c_c *self, s32 arg1);      /* +0x1A0 */
+    u8 pad1A4[0x1B0 - 0x1A4];
+    /* Return value stored into Class86B60::unkBC; arg1 is the address of
+     * Class86B60::unkC0 (an output buffer this slot presumably fills). */
+    s32 (*slot1B0)(DreamSysView_3bb8c_c *self, void *arg1);     /* +0x1B0 */
+};
+
+struct DreamSysView_3bb8c_c {
+    DreamSysViewMethods_3bb8c_c *methods;   /* +0x000 */
+};
+
+/*
+ * func_8004D578's own local view of `func_8003DFBC`'s return type -- ALSO
+ * independently declared, with a DIFFERENT 4-argument signature, as
+ * `TaskCoreMethods` in include/code_2c054.h (`slot08`, confirmed 3-argument-
+ * plus-self there from func_8003B8E4's own byte-exact call). Same real
+ * global (`D_8006E730`) two units deep, two independent arities recorded
+ * from two real call sites -- the identical situation already documented
+ * for func_8001E57C above and for func_8004D3DC's report. Kept local
+ * rather than including code_2c054.h, since this unit does not otherwise
+ * need that header and each translation unit gets its own extern
+ * prototype for a symbol in this project.
+ */
+typedef struct BaseTaskCtorTable_3bb8c_c BaseTaskCtorTable_3bb8c_c;
+struct BaseTaskCtorTable_3bb8c_c {
+    u8 pad000[0x008];
+    /* func_8004D578's own unconditional first statement:
+     * func_8003DFBC()->slot08(self, &D_80086D44, &D_800114DC, 0). */
+    void (*slot08)(void *self, void *arg1, void *arg2, s32 arg3); /* +0x008 */
+};
+
+extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
+
+/* Address-of only in this unit (func_8004D578 passes &D_80086D44 both as
+ * the base ctor's arg1 and, again, as slotD8's own arg1). Placeholder s32
+ * type since only the address is taken here. */
+extern s32 D_80086D44;
+
+/* Address-of only in this unit (func_8004D578 passes &D_800114DC as the
+ * base ctor's arg2). Placeholder s32 type since only the address is taken
+ * here. */
+extern s32 D_800114DC;
+
+/* Still raw asm in this unit (gp-relative-blocked, see
+ * docs/match-reports/func_8004D6AC.md) -- not this round's function, but
+ * func_8004D578 calls it with one forwarded s32 argument (the return
+ * value of dreamSys->methods->slot1A0); return value unused there. */
+extern void func_8004D6AC(s32 arg0);
 
 /*
  * First argument of func_8004D678: an unrelated, larger caller-side
