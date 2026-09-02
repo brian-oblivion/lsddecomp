@@ -318,6 +318,48 @@ through it. Only the load is exposed.
   explicit `i = 0;` statement between two pointer initialisations rather than a
   `for`'s implicit initializer. (`func_80066340`)
 
+**From round 2026-09-02 (5 runners: DreamSys, Entity_b, class_39e08, class_3ac78,
+code_2c054).**
+
+- **A dedicated local pins an address-of expression's SCHEDULING.** Assigning
+  `&this->unk14->x` to its own local, in the statement position retail computes
+  it, pins GCC's placement. Written inline as a call argument, the compiler
+  defers it arbitrarily. (`func_8005DE18`)
+- **An over-narrow parameter type forces a spurious sign-extend at the CALL
+  SITE.** `func_8005D714`'s `arg2`/`arg3` were modelled `s8` because every known
+  caller happens to pass a byte-range value. The callee's own body treats them
+  as full words with no narrowing on entry, and the `s8` declaration cost an
+  extra sign-extend at any call site whose argument was an already-computed
+  `s32`. **Read the callee's body for the width it actually uses, not the
+  callers for the width they happen to pass.** Retyped with no regression to the
+  existing matched caller. (found via `func_8005DE18`'s residue)
+- **A `void`-typed vtable slot that fails to compile against a
+  `return callee(...)` wrapper is itself evidence the slot typing is wrong.** A
+  free signal — the compile error arrives before any attempt budget is spent.
+- **MIPS o32 fills argument registers strictly left to right.** So a vtable call
+  that sets `$a2`/`$a3` to literals while leaving `$a1` untouched PROVES `$a1`
+  carries a real forwarded parameter; there is no "skip a register" call shape.
+  (`class_3ac78`)
+- **The converse does NOT hold.** A `jalr` with a plain `nop` delay slot and no
+  argument setup is not proof of a zero- or one-argument call. Check the
+  callee's own body, or another caller, for its true arity before treating an
+  untouched register as leftover garbage. (`class_3ac78`)
+- **Establish a sibling-class relationship by diffing both candidates against a
+  COMMON BASE, not against each other.** A long run of identical slots can come
+  from two independent overrides that share an implementation, not from
+  inheritance. (`tools/classtable.py <t> --vs <base>`, `class_39e08`)
+- **A function shared verbatim between two sibling vtable slots is only safely
+  reusable if every instance field it touches sits at the same offset in BOTH
+  classes.** Same code at the same slot offset does not imply the same layout
+  behind `self`. (`class_39e08`)
+- **The "a byte match tells you nothing about the return type" trap applies to
+  an INTERMEDIATE link in a delegation chain, not just to an outermost
+  wrapper.** A slot typed `void` on the strength of one unit's discarding caller
+  records what that CALLER does with the value, not what the occupant computes.
+  Read the occupant's own disassembly. This corrected
+  `LoaderTaskMethods::slot44` in `include/Class6D3C8.h` to `s32`, ABI-neutrally
+  and at zero byte cost. (`func_8003C1DC`)
+
 ### New residue classes opened this round (not yet closed)
 
 - **"Identical assignment reaching different merge points."** GCC tail-merges
@@ -334,8 +376,31 @@ through it. Only the load is exposed.
   a branch or a call to reason about. Nine reshapes, best 8/14.
   (`DreamSys__LogMood`)
 
-All three are permuter candidates rather than reshape candidates; see Gate 3
+- **The `New_X` epilogue-merge residue — the project's DOMINANT stall class, at
+  24 instances.** Written up in full, with a corpus census and every attempt
+  already spent, in **`docs/research/epilogue-merge-residue.md`**. Read that
+  before touching any `New_X` allocator. The short form:
+
+  > **GCC 2.6.3 (Psy-Q) `-O2` will not merge two function exits carrying
+  > DIFFERENT values into one epilogue.**
+
+  Retail plainly does merge them, so the compiler can be made to — we have not
+  found the source form. Every hand-reachable shape either returns the pointer
+  on both paths (one epilogue, but no materialized constant: 26/27) or forces a
+  single exit and then grows a second epilogue or an extra callee-saved
+  register. Two runners on different units reached this independently in one
+  round and classified it identically. **Not a toolchain blocker and not an
+  operator escalation** — the toolchain is innocent, the input is unknown.
+
+All four are permuter candidates rather than reshape candidates; see Gate 3
 in docs/PARALLEL-RUNS.md.
+
+**The cheap tell that you are in the wrong shape FAMILY, not one reshape from
+a match:** funcdiff's *"differs OUTSIDE this range"* warning carrying a
+six-figure byte count. That means your function changed SIZE and every later
+address shifted. Two independent runners plus the head each hit it this round;
+recognising it early is worth several attempts. Read it as "wrong family, start
+over", never as "close, keep pushing".
 
 ### Still unconfirmed here
 
@@ -343,8 +408,14 @@ Candidates from other GCC 2.x projects — treat each as a thing to test:
 
 - Member loads hoisted into a local at the top of a loop.
 - A struct pointer to a global block, rather than several separate globals.
-- Comma expressions and assignment-in-condition, which 2.x schedules
-  differently from the separated form.
+- ~~Comma expressions and assignment-in-condition~~ — **TESTED 2026-09-02, and
+  for the two-exit case the answer is NO.** A comma-ternary
+  (`return c ? (f(x), p) : NULL;`) compiled byte-for-byte identically to the
+  separated early-return form, down to the same outside-range byte count, so
+  2.6.3 does NOT schedule it differently there — it lowers both to the same
+  RTL. Still untested as a scheduling lever in a SINGLE-exit body, which is a
+  different question and remains open. (head adjudication of `func_8004A130`,
+  see `docs/research/epilogue-merge-residue.md`)
 
 ## The class framework (SETTLED — the game is plain C)
 
