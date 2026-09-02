@@ -179,7 +179,19 @@ void func_8003CBB8(Obj86B60 *self, s32 a1)
     self->unk84 = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CBC0);
+s32 func_8003CBC0(Obj86B60 *self, s32 a1)
+{
+    s32 result;
+
+    result = 1;
+    if (self->unk88 != NULL) {
+        result = self->unk88(self);
+    }
+    if (result != 0) {
+        self->methods->slot60(self, 5);
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CC2C);
 
