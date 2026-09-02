@@ -32,10 +32,29 @@ typedef struct StreamTaskUnkCObj StreamTaskUnkCObj;
 typedef struct TaskTextObj TaskTextObj;
 typedef struct TaskTextMethods TaskTextMethods;
 typedef struct TaskCoreObj TaskCoreObj;
+typedef struct StreamTaskInitData StreamTaskInitData;
+
+/* A 3-word struct: func_8003B8E4's optional 5th (stack) argument, and also
+ * func_8003DFCC()'s return type -- both feed the exact same 3-word copy into
+ * StreamTaskObj::unkA8/unkAC/unkB0, so they're the same shape. Real field
+ * meanings unknown (never dereferenced beyond word offset by this unit's
+ * queued functions). */
+struct StreamTaskInitData {
+    s32 unk0; /* +0x000 */
+    s32 unk4; /* +0x004 */
+    s32 unk8; /* +0x008 */
+};
+
+extern StreamTaskInitData *func_8003DFCC(void);
 
 struct StreamTaskObjMethods {
     s32 header; /* +0x000 */
-    u8 pad04[0x060 - 0x004];
+    u8 pad04[0x040 - 0x004];
+    void (*slot40)(StreamTaskObj *self); /* +0x040, func_8003B8E4's forward target;
+                                              occupied by this unit's own func_8003BA38
+                                              (per tools/classtable.py D_8006E5F8) --
+                                              confirms the single-argument signature */
+    u8 pad44[0x060 - 0x044];
     void (*slot60)(StreamTaskObj *self, s32 a1); /* +0x060, func_8003BC14 occupies this slot
                                                       (per tools/classtable.py D_8006E5F8) */
     u8 pad64[0x06C - 0x064];
@@ -93,7 +112,11 @@ struct StreamTaskObj {
     s32 unkA0;                           /* +0x0A0, set to 0 by func_8003C11C */
     s32 unkA4;                     /* +0x0A4, reset to 0 by func_8003BAB4; read
                                         and set to a call result by func_8003BB5C */
-    u8 padA8[0x0B4 - 0x0A8];
+    StreamTaskInitData unkA8;         /* +0x0A8, whole-struct-copied by func_8003B8E4 from
+                                          either its 5th argument or func_8003DFCC()'s
+                                          default (retail batches all 3 loads before all
+                                          3 stores -- a struct assignment, not 3 separate
+                                          field writes) */
     StreamTaskUnkB4Obj *unkB4;      /* +0x0B4, an object with its own 1-slot vtable
                                         (see StreamTaskUnkB4Obj below); dispatched
                                         through by func_8003B9DC */
@@ -199,7 +222,10 @@ struct TaskTextObj {
 typedef struct TaskCoreMethods TaskCoreMethods;
 
 struct TaskCoreMethods {
-    u8 pad00[0x00C];
+    u8 pad00[0x008];
+    void (*slot08)(StreamTaskObj *self, s32 a1, s32 a2, s32 a3); /* +0x008, func_8003B8E4's
+                                              forward target (D_8006E730+0x008 = func_8003BF10,
+                                              this unit's own queued function -- confirms arity) */
     void (*slot0C)(StreamTaskObj *self);                    /* +0x00C, func_8003B9DC's 2nd call */
     u8 pad10[0x044 - 0x010];
     s32 (*slot44)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x044, func_8003C1DC occupies this slot */
@@ -250,5 +276,11 @@ struct TaskUtilMethods {
 };
 
 extern TaskUtilMethods *func_8003E5C8(void); /* returns &D_8006E878 */
+
+/* Allocates/initializes self->unkB4 (a StreamTaskUnkB4Obj); called by
+ * func_8003B8E4 as `func_80045438(func_8003DFCC(), 0, 0)`. Not this unit's
+ * own function (no INCLUDE_ASM here), so only the call site's own argument
+ * and return types are modeled. */
+extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2);
 
 #endif

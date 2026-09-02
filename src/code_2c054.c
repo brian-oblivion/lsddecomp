@@ -3,7 +3,18 @@
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B854);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B8E4);
+void func_8003B8E4(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
+    func_8003DFBC()->slot08(self, a1, a2, a3);
+    self->methods = func_8003BE84();
+    if (a4 != NULL) {
+        self->unkA8 = *a4;
+    } else {
+        self->unkA8 = *func_8003DFCC();
+    }
+    self->unkB4 = func_80045438(func_8003DFCC(), 0, 0);
+    self->unkB8 = 0;
+    self->methods->slot40(self);
+}
 
 void func_8003B9DC(StreamTaskObj *self) {
     self->unkB4->methods->slot04(self->unkB4);
