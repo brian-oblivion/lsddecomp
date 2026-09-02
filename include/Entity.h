@@ -66,8 +66,9 @@ struct EntityMethods {
     /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
     /* +0xC0 */ u8 padC0[0xC4 - 0xC0];
     /* +0xC4 */ void (*slotC4)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7A8 as slotC4(self, -0x1E, 0) -- same shared BasicClass-inherited slot as Class65650Methods.slotC4 in code_55dd4.h (both tables hold func_8005748C at +0xC4, confirmed with tools/classtable.py) */
-    /* +0xC8 */ u8 padC8[0xD0 - 0xC8];
-    /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005ED30 as slotD0(this, -0x176, rand() % 2) */
+    /* +0xC8 */ u8 padC8[0xCC - 0xC8];
+    /* +0xCC */ void (*slotCC)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7F8 as slotCC(this, -0xC8, 0) */
+    /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005ED30 as slotD0(this, -0x176, rand() % 2), and by func_8005E7F8 as slotD0(this, this->unk48, 0) */
     /* +0xD4 */ u8 padD4[0x114 - 0xD4];
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
@@ -138,7 +139,9 @@ extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
  * Entity.c) -- two different functions in two different tables that merely
  * share a numeric offset; do not conflate them. */
 struct Unk94Methods {
-    u8 pad000[0x130];
+    u8 pad000[0x100];
+    s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
+    u8 pad104[0x130 - 0x104];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
     u8 pad134[0x200 - 0x134];
     s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5 -- value-returning, not void */
@@ -221,9 +224,11 @@ struct Entity {
     /* +0x14 */ EntityPos *unk14;        /* the 3-word position func_8005D714/func_8005D7FC read via +0x18 */
     /* +0x18 */ u8 pad18[0x24 - 0x18];
     /* +0x24 */ s32 unk24;             /* cleared by func_8005D9F4; xored against a mood-row-derived value in func_8005DD18 */
-    /* +0x28 */ u8 pad28[0x44 - 0x28];
+    /* +0x28 */ s32 unk28;             /* read by func_8005E7F8, gates its final slotCC call */
+    /* +0x2C */ u8 pad2C[0x44 - 0x2C];
     /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by func_8005EBB4 */
-    /* +0x48 */ u8 pad48[0x4C - 0x48];
+    /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- func_8005E7F8 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
+    /* +0x4A */ u8 pad4A[0x4C - 0x4A];
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by func_8005D418; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
     /* +0x50 */ u8 pad50[0x58 - 0x50];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
