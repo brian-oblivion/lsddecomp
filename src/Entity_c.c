@@ -42,7 +42,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F800);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F970);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FA64);
+void func_8005FA64(Entity *this) {
+    this->methods->slotC4(this, -0x1E, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FA94);
 
