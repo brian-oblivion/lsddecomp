@@ -44,7 +44,9 @@ struct Class866E8Methods {
     /* +0x0F4 */ void (*slotF4)(Class866E8 *self);                              /* func_8004B5BC; called by func_8004AB24 */
     /* +0x0F8 */ u8 pad0F8[0x100 - 0x0F8];
     /* +0x100 */ void (*slot100)(Class866E8 *self, void *arg1, s32 arg2);        /* func_8004BD14; called by func_8004A984 */
-    /* +0x104 */ u8 pad104[0x12C - 0x104];
+    /* +0x104 */ u8 pad104[0x124 - 0x104];
+    /* +0x124 */ void *(*slot124)(Class866E8 *self, void *arg1);                /* func_8004C5D0; called by func_8004B030 */
+    /* +0x128 */ u8 pad128[0x12C - 0x128];
     /* +0x12C */ void (*slot12C)(Class866E8 *self, void *list, s32 count);       /* func_8004AEA4; called by func_8004ADD8 */
     /* +0x130 */ u8 pad130[0x13C - 0x130];
     /* +0x13C */ void (*slot13C)(Class866E8 *self);                             /* func_8004D028; called by func_8004AB24 */
@@ -70,7 +72,13 @@ struct Class866E8 {
     /* +0x07E */ s16 unk7E;                  /* func_8004AFE0: (s8)arg1->unk3 - 1 */
     /* +0x080 */ s32 unk80;                  /* func_8004AFE0 arg2, stored raw */
     /* +0x084 */ s32 unk84;                  /* func_8004AFE0 arg2, stored raw (same value as unk80) */
-    /* +0x088 */ u8 pad088[0x0E8 - 0x088];
+    /* +0x088 */ s32 unk88;                  /* func_8004B030: always set to 1 */
+    /* +0x08C */ void *unk8C;                /* func_8004B030: self->methods->slot124(self, arg1->unk28) return value */
+    /* +0x090 */ s16 unk90;                  /* func_8004B030: derived from arg1->unk2 */
+    /* +0x092 */ s16 unk92;                  /* func_8004B030: derived from arg1->unk3 */
+    /* +0x094 */ s16 unk94;                  /* func_8004B030: derived from count and arg1->unk2 */
+    /* +0x096 */ s16 unk96;                  /* func_8004B030: derived from count and arg1->unk3 */
+    /* +0x098 */ u8 pad098[0x0E8 - 0x098];
     /* +0x0E8 */ s32 unkE8;                  /* func_8004ADD0 arg1; func_8004ADD8 reads it back as a NUL-terminated s32 tag array -- true element type still s32, only usage differs per call site */
     /* +0x0EC */ u8 pad0EC[0x1BC - 0x0EC];
     /* +0x1BC */ UnkListObj_3ac78 *unk1BC;   /* func_8004AA6C arg2, stored raw */
@@ -115,6 +123,8 @@ typedef struct {
     u8 pad0[2];
     s8 unk2;
     s8 unk3;
+    u8 pad4[0x28 - 0x4];
+    void *unk28;   /* func_8004B030: reread and forwarded to self->methods->slot124 */
 } UnkArgObj_3ac78;
 
 /*
