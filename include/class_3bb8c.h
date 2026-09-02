@@ -149,7 +149,11 @@ typedef struct Obj866E8Methods {
      * so this is almost certainly `return &self->arr[index];` -- not
      * this round's function to match. */
     Elem *(*slot118)(Obj866E8 *self, s32 index);   /* +0x118 */
-    u8 pad11C[0x124 - 0x11C];
+    u8 pad11C[0x120 - 0x11C];
+    /* Called twice by func_8004CAF0, each time with a small offset off
+     * its own arg3; the return value is stored as a freshly-created
+     * GridSlot866E8's `elemIdx`. */
+    s32 (*slot120)(Obj866E8 *self, s32 arg1);      /* +0x120 */
     /* Called by func_8004CDA4 with its own arg3 (unmodified); the return
      * value is stored into the first word of a freshly-copied 3-word
      * slot at self+0x8C+key*0xC (see func_8004CDA4). */
