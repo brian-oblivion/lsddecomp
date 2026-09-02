@@ -13,7 +13,14 @@ void func_80049A14(Obj865C8 *self) {
     self->unk3C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049A1C);
+void func_80049A1C(Obj865C8 *self) {
+    SubObjD *sub = self->unk38;
+
+    sub->methods->slot10(sub, self->unk0C->unk4);
+    sub->methods->slot10(sub, self->unk0C->unk8);
+    sub->methods->slot110(sub, self->unk0C->unk10);
+    func_8004A4B8()->slot44(self, (s32)self->unk0C, 0);
+}
 
 void func_80049AC0(Obj865C8 *self) {
     SubObjD *sub = self->unk38;

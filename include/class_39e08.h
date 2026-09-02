@@ -95,20 +95,25 @@ struct Obj4C {
     Obj4CMethods *methods;
 };
 
-/* Opaque view of whatever object Obj865C8::unk0C points to (used only by
- * func_80049AC0, which reads its own +0x004 field -- no vtable dispatch
- * through this one, so no methods pointer is declared). */
+/* Opaque view of whatever object Obj865C8::unk0C points to (used by
+ * func_80049AC0/func_80049A1C, which read its own +0x004/+0x008/+0x010
+ * fields -- no vtable dispatch through this one, so no methods pointer is
+ * declared). */
 typedef struct Obj0C {
     u8 pad00[0x04];
-    s32 unk4;
+    s32 unk4;                     /* +0x004 */
+    s32 unk8;                     /* +0x008 */
+    u8 padC[0x10 - 0xC];
+    s32 unk10;                    /* +0x010 */
 } Obj0C;
 
-/* Opaque view of whatever object Obj865C8::unk38 points to (used only by
- * func_80049AC0): same "vtable at offset 0, only the reached slots named"
- * policy as SubObjA/SubObjB/Obj4C above. */
+/* Opaque view of whatever object Obj865C8::unk38 points to (used by
+ * func_80049AC0/func_80049A1C): same "vtable at offset 0, only the reached
+ * slots named" policy as SubObjA/SubObjB/Obj4C above. */
 typedef struct SubObjD SubObjD;
 typedef struct SubObjDMethods {
-    u8 pad00[0x14];
+    u8 pad00[0x10];
+    void (*slot10)(SubObjD *self, s32 arg1);
     void (*slot14)(SubObjD *self, s32 arg1);
     u8 pad18[0x110 - 0x18];
     void (*slot110)(SubObjD *self, s32 arg1);
@@ -200,7 +205,11 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 typedef struct Class86668Methods {
     u8 pad00[0x08];
     void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
-    u8 pad0C[0x48 - 0x0C];
+    u8 pad0C[0x44 - 0x0C];
+    /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
+     * the base's own slot44, returns self->unk28. Called by func_80049A1C
+     * as func_8004A4B8()->slot44(self, self->unk0C, 0), return discarded. */
+    s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
     /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
      * func_8003E5C8()->slot48(self). Called by func_80049AC0 as
      * func_8004A4B8()->slot48(self). */
