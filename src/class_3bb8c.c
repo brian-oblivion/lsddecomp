@@ -62,7 +62,20 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BE54);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C0AC);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C158);
+Descriptor10 *func_8004C158(Obj866E8 *self, s32 arg1, void **out) {
+    void *v1;
+
+    v1 = (u8 *)self->unk6C->unk14 + 0x18;
+    if (out != 0) {
+        *out = v1;
+    }
+    if (arg1 != 0) {
+        if (self->methods->slot110(self, arg1, v1) != 0) {
+            return 0;
+        }
+    }
+    return &self->unkBC;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C1C0);
 
