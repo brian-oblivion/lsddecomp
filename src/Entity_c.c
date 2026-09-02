@@ -8,6 +8,9 @@
  * header rather than starting a new one.
  */
 #include "common.h"
+#include "Entity.h"
+
+extern u8 D_80089E38[];
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EF54);
 
@@ -15,7 +18,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EFF4);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F0D8);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F1A8);
+void func_8005F1A8(Entity *this) {
+    func_8001EACC(this, this->unk94, 1, 0, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F1D4);
 
@@ -27,7 +32,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F544);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F608);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F6D4);
+s32 func_8005F6D4(Entity *this) {
+    return this->methods->slot48(this, 1, D_80089E38);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F708);
 
@@ -35,7 +42,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F800);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F970);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FA64);
+void func_8005FA64(Entity *this) {
+    this->methods->slotC4(this, -0x1E, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FA94);
 
@@ -45,6 +54,13 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FC58);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FDFC);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FEC8);
+s32 func_8005FEC8(Entity *this) {
+    return this->methods->slotCC(this, -0x5A, 0);
+}
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FEF8);
+void func_8005FEF8(Entity *this, EntityMoodHandlerArg *out) {
+    if (out->unk4 % 120 == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 1;
+    }
+}
