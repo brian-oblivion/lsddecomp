@@ -19,7 +19,12 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049AC0);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049B54);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049C50);
+void func_80049C50(Obj865C8 *self) {
+    SubObjA *sub = self->subA;
+
+    sub->methods->slot90(sub);
+    sub->methods->slot74(sub);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
 
