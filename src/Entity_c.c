@@ -20,6 +20,7 @@ extern u8 D_80089C70[];
 extern u8 D_80089C58[];
 extern u8 D_80089E74[];
 extern u8 D_80089D18[];
+extern u8 D_80089DB4[];
 
 void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
@@ -126,7 +127,33 @@ void func_8005F708(Entity *this) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F800);
+void func_8005F800(Entity *this) {
+    if (this->unk44 == 0) {
+        if (this->unk94->methods->slot200(this->unk94) == 1) {
+            this->unk44 = 0xB;
+        } else {
+            this->unk44 = 0xC;
+        }
+    }
+
+    if (this->unk44 == 0xC) {
+        this->methods->slot48(this, 1, D_80089DF0);
+        this->methods->slotCC(this, -0x1E, 0);
+    } else {
+        func_8001EACC(this, this->unk94, 1, 0, 0);
+        if (this->unk44 == 0xB) {
+            this->methods->slotC4(this, -0x64, 0);
+            if ((u32)(this->unkFC - 0x55) < 0x1E) {
+                this->methods->slotCC(this, 0x50, 0);
+            } else if (this->unkFC == 0x78) {
+                this->unk44 = 0xD;
+            }
+        } else if (this->unk44 == 0xD) {
+            this->methods->slotB8(this, &this->unk94->unk14->x);
+            this->methods->slotBC(this, D_80089DB4);
+        }
+    }
+}
 
 void func_8005F970(Entity *this, EntityMoodHandlerArg *out) {
     func_8001EACC(this, this->unk94, 1, 0, 0);

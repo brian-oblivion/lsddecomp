@@ -62,7 +62,8 @@ struct EntityMethods {
     /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E694 (result discarded) and func_8005EF20 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, func_8005EF20 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by func_8005D9F4, func_8005DA3C */
-    /* +0x64 */ u8 pad64[0xBC - 0x64];
+    /* +0x64 */ u8 pad64[0xB8 - 0x64];
+    /* +0xB8 */ void (*slotB8)(Entity *self, void *arg1);  /* called by func_8005F800 as slotB8(this, &this->unk94->unk14->x) -- a vector-pointer argument, same shape as func_8005D714's still-INCLUDE_ASM arg1 */
     /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
     /* +0xC0 */ u8 padC0[0xC4 - 0xC0];
     /* +0xC4 */ void (*slotC4)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7A8/func_8005EBB4/func_8005EC98/func_8005E160/etc (all discard the result) and func_8005FA64 (its tail call) -- same shared BasicClass-inherited slot as Class65650Methods.slotC4 in code_55dd4.h (both tables hold func_8005748C at +0xC4, confirmed with tools/classtable.py). CLAUDE.md's "one-line wrapper" rule would normally push this toward s32-returning on func_8005FA64's strength alone -- but retyping it to s32 changes func_8005E160's OWN codegen (verified: GCC stops tail-merging its two identical slotC4(this,0x32,0)-reached-from-different-branches call sites, costing that ALREADY-MATCHED function 4 words and shifting every later function in the unit). func_8005E160's own bytes are the stronger, more direct evidence and they require void. Kept void; func_8005FA64 is void too, with a bare statement call, not `return`. (slotCC below faced the same question and was independently verified NOT to have this problem.) */
