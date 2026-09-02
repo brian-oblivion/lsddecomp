@@ -90,7 +90,17 @@ Class86AA0Methods *func_8004D508(void)
     return &D_80086AA0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D518);
+Class86B60 *func_8004D518(void *dreamSys)
+{
+    Class86B60 *self;
+
+    self = func_80017B34(0xC4);
+    if (self != NULL) {
+        func_8004E2D0()->ctor(self, dreamSys);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D578);
 

@@ -577,6 +577,138 @@ struct GenericTagInst_3bb8c_c {
 };
 
 /*
+ * A third small sibling class (New_X/ctor pair, same shape as Class869D8
+ * and Class86AA0 above), named by its vtable's address `D_80086B60`
+ * (returned by `func_8004E2D0`, still raw asm in the uncarved
+ * `asm/class_3bb8c_d.s` -- called directly, not through any vtable).
+ * `func_8004D518` is the New_X allocator (alloc size 0xC4); `func_8004D578`
+ * is the ctor itself, which SETS `self->methods` directly to this table's
+ * own pointer (the base-class constructor chaining pattern already seen
+ * in `TaskCoreMethods::slotD8`, include/code_2c054.h) rather than fetching
+ * it through another getter first.
+ */
+typedef struct Class86B60 Class86B60;
+typedef struct Class86B60Methods Class86B60Methods;
+
+struct Class86B60Methods {
+    u8 pad000[0x008];
+    void (*ctor)(Class86B60 *self, void *dreamSys);  /* +0x008, func_8004D578 occupies this slot */
+    u8 pad00C[0x040 - 0x00C];
+    void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, func_8004D578's own last call */
+    u8 pad044[0x0D8 - 0x044];
+    void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, func_8004D578's own call, arg1 = &D_80086D44 */
+};
+
+struct Class86B60 {
+    Class86B60Methods *methods;    /* +0x000 */
+    u8 pad004[0x048 - 0x004];
+    /* Set up by the base ctor chain (func_8003DFBC()->slot08 below), read
+     * (never written) by func_8004D578 right after. Same offset/shape as
+     * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
+     * chain output), but kept as its own local type since nothing ties
+     * the two classes together and the one slot this unit dispatches
+     * through (+0x09C) isn't among that type's own known slots. */
+    struct Class86B60Unk48Obj *unk48;  /* +0x048, func_8004D578 */
+    u8 pad04C[0x0A4 - 0x04C];
+    void *unkA4;                    /* +0x0A4, func_8004D578: stores its own dreamSys arg raw */
+    u8 pad0A8[0x0AC - 0x0A8];
+    s32 unkAC;                      /* +0x0AC, func_8004D578: zeroed */
+    u8 pad0B0[0x0BC - 0x0B0];
+    s32 unkBC;                      /* +0x0BC, func_8004D578: return value of dreamSys->methods->slot1B0 */
+    s32 unkC0;                      /* +0x0C0, func_8004D578: output buffer address passed BY REFERENCE
+                                        to dreamSys->methods->slot1B0 -- last word of the 0xC4-byte
+                                        allocation (0xC0+4 == 0xC4), which is why this field is exactly
+                                        one word wide rather than a guess */
+};
+
+extern Class86B60Methods D_80086B60;
+extern Class86B60Methods *func_8004E2D0(void);   /* still raw asm, asm/class_3bb8c_d.s -- called
+                                                       directly (jal), not through any vtable */
+
+/*
+ * self->unk48's own pointee (Class86B60Unk48Obj). Only slot9C is reached,
+ * by func_8004D578, with a single s32 argument (-1); return value unused.
+ */
+typedef struct Class86B60Unk48ObjMethods {
+    u8 pad000[0x09C];
+    void (*slot9C)(struct Class86B60Unk48Obj *self, s32 arg1); /* +0x09C */
+} Class86B60Unk48ObjMethods;
+
+typedef struct Class86B60Unk48Obj {
+    Class86B60Unk48ObjMethods *methods;   /* +0x000 */
+} Class86B60Unk48Obj;
+
+/*
+ * Local, opaque view of func_8004D578's `dreamSys` argument -- only the
+ * two vtable slots that function reaches (+0x1A0, +0x1B0) are typed. This
+ * project already has a much larger, canonical `DreamSys` type
+ * (include/DreamSys.h) with its own `vt` field, but neither offset is
+ * established there yet and this unit does not edit that header -- kept
+ * as an independent local view per this project's established convention
+ * (see e.g. Obj866E8 vs. Class866E8 at the top of this file). The `void
+ * *dreamSys` parameter type on func_8004D518/func_8004D578 themselves is
+ * kept untyped/opaque to match the ALREADY-established external
+ * declaration `extern PollTask *func_8004D518(void *dreamSys);` in
+ * include/Class6D3C8.h (a different unit's own independent view of this
+ * same New_X allocator, used there as a `PollTaskCtor` callback) --
+ * this local dispatch type is used only inside func_8004D578's own body.
+ */
+typedef struct DreamSysView_3bb8c_c DreamSysView_3bb8c_c;
+typedef struct DreamSysViewMethods_3bb8c_c DreamSysViewMethods_3bb8c_c;
+
+struct DreamSysViewMethods_3bb8c_c {
+    u8 pad000[0x1A0];
+    /* Return value forwarded straight to func_8004D6AC's own arg0. */
+    s32 (*slot1A0)(DreamSysView_3bb8c_c *self, s32 arg1);      /* +0x1A0 */
+    u8 pad1A4[0x1B0 - 0x1A4];
+    /* Return value stored into Class86B60::unkBC; arg1 is the address of
+     * Class86B60::unkC0 (an output buffer this slot presumably fills). */
+    s32 (*slot1B0)(DreamSysView_3bb8c_c *self, void *arg1);     /* +0x1B0 */
+};
+
+struct DreamSysView_3bb8c_c {
+    DreamSysViewMethods_3bb8c_c *methods;   /* +0x000 */
+};
+
+/*
+ * func_8004D578's own local view of `func_8003DFBC`'s return type -- ALSO
+ * independently declared, with a DIFFERENT 4-argument signature, as
+ * `TaskCoreMethods` in include/code_2c054.h (`slot08`, confirmed 3-argument-
+ * plus-self there from func_8003B8E4's own byte-exact call). Same real
+ * global (`D_8006E730`) two units deep, two independent arities recorded
+ * from two real call sites -- the identical situation already documented
+ * for func_8001E57C above and for func_8004D3DC's report. Kept local
+ * rather than including code_2c054.h, since this unit does not otherwise
+ * need that header and each translation unit gets its own extern
+ * prototype for a symbol in this project.
+ */
+typedef struct BaseTaskCtorTable_3bb8c_c BaseTaskCtorTable_3bb8c_c;
+struct BaseTaskCtorTable_3bb8c_c {
+    u8 pad000[0x008];
+    /* func_8004D578's own unconditional first statement:
+     * func_8003DFBC()->slot08(self, &D_80086D44, &D_800114DC, 0). */
+    void (*slot08)(void *self, void *arg1, void *arg2, s32 arg3); /* +0x008 */
+};
+
+extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
+
+/* Address-of only in this unit (func_8004D578 passes &D_80086D44 both as
+ * the base ctor's arg1 and, again, as slotD8's own arg1). Placeholder s32
+ * type since only the address is taken here. */
+extern s32 D_80086D44;
+
+/* Address-of only in this unit (func_8004D578 passes &D_800114DC as the
+ * base ctor's arg2). Placeholder s32 type since only the address is taken
+ * here. */
+extern s32 D_800114DC;
+
+/* Still raw asm in this unit (gp-relative-blocked, see
+ * docs/match-reports/func_8004D6AC.md) -- not this round's function, but
+ * func_8004D578 calls it with one forwarded s32 argument (the return
+ * value of dreamSys->methods->slot1A0); return value unused there. */
+extern void func_8004D6AC(s32 arg0);
+
+/*
  * First argument of func_8004D678: an unrelated, larger caller-side
  * struct (only seen from its one caller, func_8004DE08 in the still-
  * uncarved asm/class_3bb8c_d.s) whose own +0x0BC field is a pointer to
