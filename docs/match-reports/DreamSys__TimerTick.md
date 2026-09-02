@@ -1,8 +1,14 @@
-# DreamSys__TimerTick
+# DreamSys__TimerTick — MATCHED
 
-**Unit:** DreamSys · **Size:** 62 words (0xF8 bytes) · **Status:** STALL —
-61/62 words (best reshape). Single-instruction residue, `build exit=0` restored
-(`INCLUDE_ASM` reinstated), whole-image SHA1 green.
+**Unit:** DreamSys · **Size:** 62 words (0xF8 bytes) · **Status:** MATCHED
+(62/62 words), whole-image SHA1 verified green by `build-and-verify.sh`.
+Closed round 2026-09-02, runner BRAVO, by pointing the previously-untried
+`__asm__("")` lever at the exact single-instruction residue this report's
+first author (round 2026-08-30-something, see "What was tried" below) had
+already isolated and flagged as worth trying. See "MATCHED: the
+`__asm__("")` lever" below for what closed it and why. The rest of this
+report (the original 61/62 STALL writeup) is kept verbatim as the
+derivation history.
 
 ## What it does
 
@@ -26,6 +32,7 @@ void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
 
 	if (this->isFlashbackSession) {
 		if (this->unknwon_int_0x44 != 0 || this->vt->LoadNextFlashback(this, 0)) {
+			__asm__("");
 			this->dreamTimer = 0;
 			return;
 		}
@@ -121,3 +128,59 @@ independent instances (`func_8005DBF0` 72/74, `DreamSys__TimerTick` 61/62)
 across two rounds, both stalled after multiple reshapes and both closest
 possible short of full match. Worth flagging as a permuter candidate rather
 than continuing to spend manual reshape attempts on new instances.
+
+## MATCHED: the `__asm__("")` lever (round 2026-09-02, runner BRAVO)
+
+The previous author explicitly flagged this as untried and reasoned that
+the barrier "operates on delay-slot/register-allocation choices *within*
+one already-selected block, not on cross-jump target selection between two
+co-existing duplicate blocks" — a plausible-sounding argument that turned
+out to be wrong for this specific case. Placement mattered enormously:
+
+1. **`__asm__("")` as the function's very first statement** (the
+   canonical placement per `DECOMPILATION_LEARNINGS.md`'s existing
+   `func_80025D10` precedent): made it MUCH worse — 3/62, plus whole-file
+   address drift (an extra instruction). Reverted immediately.
+2. **Right before `if (this->isFlashbackSession)`** (i.e. right after the
+   `goto tick_only;` early-exit, at the top of the block containing the
+   residue): no change at all — still 61/62, identical residue, but at
+   least no drift this time.
+3. **Inside the `if (this->unknwon_int_0x44 != 0 ||
+   this->vt->LoadNextFlashback(this, 0))` true-branch, as the very FIRST
+   statement — immediately before `this->dreamTimer = 0;`, i.e. right at
+   the top of the block whose entry point is the ambiguous branch target
+   itself**: **62/62, full match.**
+
+So the working placement is not "function entry" (the default reflex from
+the one documented precedent) but literally inside the specific basic
+block the residue's branch target selection was choosing between — a much
+narrower target than the barrier has needed elsewhere in this project so
+far.
+
+**Rule-6 verification, done explicitly rather than assumed:** removed just
+the barrier (kept everything else identical) and rebuilt. The result
+reverts to exactly the ORIGINAL 61/62 residue — same instruction
+(`bnez $v0, ...`), same register (`$v0`), only the branch TARGET address
+differs (`0x49604` vs `0x49640`, both holding byte-identical code). No
+register identity changed with the barrier removed, only which of the two
+physical copies of the tail block the branch reaches. This is squarely the
+permitted "changes instruction ORDER only" case CLAUDE.md rule 6 describes,
+not the banned "changes WHICH REGISTER holds a value" case.
+
+### Updated proposed learning (supersedes the one below for THIS function)
+
+**A cross-jump/tail-duplication "which identical copy does this branch
+reach" residue CAN be closed by `__asm__("")`, but only when the barrier
+sits inside the specific candidate block whose selection is ambiguous —
+not at the function's top, and not merely "before the branch that picks
+between them."** The barrier at the top of `DreamSys__TimerTick` made
+things categorically worse (drift, not just a non-improvement), while the
+same barrier one block over did nothing, and one further in — at the top
+of the actual duplicate-tail block being selected between — closed it
+completely. Before assuming this class is permuter-only work (as the
+original writeup here recommended, and as `func_8005DBF0`'s report still
+does), try the barrier at EACH block that is a candidate cross-jump target,
+not just at the function entry. The original "worth flagging as a permuter
+candidate" note below is retracted for this function; `func_8005DBF0`
+(72/74, different function, not yet re-attempted this round) may still
+be worth a similar targeted retry before reaching for the permuter.
