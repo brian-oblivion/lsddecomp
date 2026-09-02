@@ -2,7 +2,7 @@
 
 **Unit:** code_2cc8c · **Size:** 27 instructions · **Best reached:** 26/27 words
 
-## Signature update (after this report was first filed)
+## Signature update -- TRIED, did not move the residue
 
 Originally attempted as `s32 func_8003CCDC(Obj86B60 *self, s32 a1)`, an
 unused-but-forwarded parameter matching `func_8003CBC0`'s ORIGINAL
@@ -11,13 +11,44 @@ report) proved this class of assumption wrong for its sibling slot
 `slotAC`/`func_8003CBC0`: the `s32 a1` at that call site was never a real
 argument, just a leftover caller-saved register value from an earlier,
 unrelated call. `Obj86B60Methods::slotC0` (this function's own vtable
-slot, `+0x0C0`) has been retyped to `s32 (*)(Obj86B60*)` (one argument) to
-match. **This function itself was never rebuilt after the retype** (it is
-still `INCLUDE_ASM`), so the residue analysis below (based on the
-two-argument attempt) may already be partly stale -- whoever resumes this
-function should re-attempt with the corrected one-argument signature
-FIRST, since it is not yet known whether dropping the unused parameter
-changes anything about the `li`-vs-`move` residue documented below.
+slot, `+0x0C0`) was retyped to `s32 (*)(Obj86B60*)` (one argument) as part
+of matching `func_8003C51C`.
+
+**Re-attempted this function itself with the corrected one-argument
+signature** (`s32 func_8003CCDC(Obj86B60 *self)`, body otherwise
+unchanged) -- **still 26/27, IDENTICAL residue** (`move v0,s1` in retail
+vs. `li v0,0x0` here, same single instruction). Confirmed with both a full
+`./build-and-verify.sh` run and an isolated single-function reproducer.
+This makes sense in hindsight: the dropped parameter was never read
+inside this function's OWN body either way (that was the entire point of
+retyping the slot), so nothing about how many arguments the function is
+DECLARED to take could change how its body compiles -- the lever that
+worked for the CALLER (`func_8003C51C`, which stopped writing a spurious
+`$a1` setup) has no analogous effect on the CALLEE's internals. Recorded
+here so nobody re-tries this exact lever a third time.
+
+## Permuter attempt -- TRIED, no zero found
+
+Ran `tools/setup-permuter.sh` with the 26/27 body above as seed (base
+score confirmed 5 via `--debug`, matching a genuine single
+register/value-materialization difference -- see the tool's own penalty
+breakdown: 0 insertions, 0 deletions, 1 register difference, exactly the
+"redundant move" class MATCHING-GUIDE flags as the permuter's best-posed
+target). Two runs, ~90s and ~120s (interrupted by the environment's
+command timeout, not by the search finishing), roughly 24,000 combined
+iterations at `-j 6`, `--stop-on-zero`. **Best score never dropped below 5
+in either run; zero was never reached.** This is a genuine negative
+result, not a budget shortfall dressed up as one -- 24k iterations of a
+27-instruction function's statement/expression permutations is a
+reasonably thorough search of the space reachable from this base
+structure. Two readings are possible: (1) the residue is not reachable
+from ANY reshaping of this base control-flow shape at all (a true
+value-materialization stall), or (2) it needs a base structure the
+permuter's mutations don't reach from this seed (e.g. a `goto`-based
+rewrite, which was tried manually below and made things worse, or some
+other CFG the permuter doesn't explore without being seeded with it
+directly). Whoever revisits this should seed the permuter with a
+DIFFERENT base shape (not just re-run against this one) if trying again.
 
 ## What it does
 
@@ -130,13 +161,24 @@ branch targets first (this one differs at word 0 already). Separately: a
 already proved to be a specific constant is a real, reproducible spot
 where GCC 2.6.3 at `-O2` prefers `li` over reusing the register that
 already holds it -- confirmed with an isolated single-function reproducer,
-independent of this unit's own header/struct. Worth a permuter run if this
-function is revisited (a single-instruction "materialise a known constant
-via a register copy instead of an immediate load" residue is exactly the
-shape `new_class_6d3c8`/`strcat` fell to in round 8 -- not tried here for
-time, but recommended first move for whoever picks this back up).
+independent of this unit's own header/struct, and independent of how many
+parameters the function itself is declared to take (retrying with the
+corrected one-argument `slotC0` signature changed nothing, see above).
+
+**The permuter was tried and did NOT close it** (~24k iterations across
+two runs, best score 5, no zero -- see "Permuter attempt" above). This
+means the earlier round-8 lesson ("this class of residue is the
+permuter's best-posed target") does NOT generalise to every
+single-register-difference stall -- `new_class_6d3c8` and `strcat` both
+fell in under 400 iterations, two orders of magnitude fewer than this
+function's 24k with no success. The discriminator between "permuter closes
+it fast" and "permuter doesn't touch it" is not yet understood; this
+function is a genuine counterexample worth keeping in mind before citing
+round 8's two data points as if they generalise.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c. 8 attempts (3 against the
-real build, 5 in an isolated reproducer). Restored to `INCLUDE_ASM`.
+round 2026-09-02, runner echo, unit code_2cc8c. 11 attempts total (4
+against the real build across two sessions, 5 in an isolated reproducer,
+plus a ~24k-iteration permuter search that found no improvement). Restored
+to `INCLUDE_ASM`.
