@@ -24,8 +24,8 @@ s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B44C);
 
-s32 func_8004B570(Obj866E8 *self) {
-    return self->unk70 = 1;
+void func_8004B570(Obj866E8 *self) {
+    self->unk70 = 1;
 }
 
 void func_8004B57C(Obj866E8 *self) {
