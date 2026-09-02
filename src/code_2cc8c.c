@@ -193,6 +193,18 @@ s32 func_8003CBC0(Obj86B60 *self, s32 a1)
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CC2C);
+s32 func_8003CC2C(Obj86B60 *self)
+{
+    s32 prod;
+    u8 buffer[3];
+
+    prod = self->unk1C * self->unk84;
+    buffer[0] = prod + self->unk90[0];
+    buffer[1] = prod + self->unk90[1];
+    buffer[2] = prod + self->unk90[2];
+    self->methods->slotE4(self, buffer);
+    self->unk78->methods->slotB8(self->unk78, 1, buffer);
+    return (u8)prod >= 0x81;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CCDC);
