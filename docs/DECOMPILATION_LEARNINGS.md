@@ -360,6 +360,16 @@ code_2c054).**
   `LoaderTaskMethods::slot44` in `include/Class6D3C8.h` to `s32`, ABI-neutrally
   and at zero byte cost. (`func_8003C1DC`)
 
+- **A repeated read of an unchanging pointer field is NOT reliably CSE'd across
+  statements when a whole-struct assignment sits between the reads.** GCC 2.6.3
+  reloads it. Cache the pointer in an explicit local instead. Note this is the
+  OPPOSITE prescription to `func_80066340`'s "do not cache a struct field read
+  in several places" — the discriminator is what sits BETWEEN the reads: an
+  intervening aggregate assignment defeats the compiler's aliasing analysis and
+  forces the reload, whereas plain straight-line reads are CSE'd fine and the
+  cache then costs a register. Read the intervening statements before choosing.
+  (`func_8005B904`)
+
 ### New residue classes opened this round (not yet closed)
 
 - **"Identical assignment reaching different merge points."** GCC tail-merges
@@ -392,7 +402,17 @@ code_2c054).**
   round and classified it identically. **Not a toolchain blocker and not an
   operator escalation** — the toolchain is innocent, the input is unknown.
 
-All four are permuter candidates rather than reshape candidates; see Gate 3
+- **Shared-literal early-exit delay-slot placement.** A function with several
+  early-exit points all returning the SAME literal can have that constant's
+  delay-slot placement scheduled differently from retail while matching on
+  instruction count AND control-flow graph. Not reachable by goto/return
+  spelling, statement reorder, explicit locals, or an `__asm__("")` barrier
+  (which made it worse). Note this is a DISTINCT class from the epilogue-merge
+  residue above: there the two exits carry *different* values and the epilogue
+  count differs; here the values are identical and the CFG already matches.
+  (`func_8005A82C`, 58/63)
+
+All five are permuter candidates rather than reshape candidates; see Gate 3
 in docs/PARALLEL-RUNS.md.
 
 **The cheap tell that you are in the wrong shape FAMILY, not one reshape from
@@ -473,15 +493,24 @@ Practical consequences:
 
 ## Open questions
 
-- **What is the class-table header word at `+0x000`? PARTLY ANSWERED
-  (2026-09-01): the low 12 bits are a class identifier.** `func_80058E8C` is the
-  first confirmed in-game READ of it — it masks the word with `0xFFF` and
-  compares the result against a literal class id, which is a runtime type check.
-  That settles the low half; the upper bits are still unaccounted for, and the
-  packed-field reading of the original values (`0x1F34`, `0x1130`,
-  `0x00011144`…) survives for them. Next step is the same one as before, now
-  better posed: find the WRITES, in the framework code at `class_16334` /
-  `code_179d8`, and see what composes the upper bits.
+- **What is the class-table header word at `+0x000`? PARTLY ANSWERED, and the
+  first answer was TOO NARROW.** It holds a class identifier, but **the field is
+  wider than 12 bits.**
+  - 2026-09-01, `func_80058E8C`: the first confirmed in-game READ. Masks the
+    word with `0xFFF` and compares against a literal class id — a runtime type
+    check. This was written up as "the low 12 bits are a class identifier".
+  - **2026-09-02, `func_80058F18` (the sibling check) CORRECTS that**: it masks
+    with **`0xFFFFF`** — 20 bits — and compares against **`0x1F234`**, which is
+    `D_80089AD4`'s own header value. A 20-bit comparand cannot fit the 12-bit
+    reading, so `0xFFF` was **one function's mask, not the field's width**. Two
+    call sites, two different masks, both against real class ids.
+
+  The generalizable error is worth keeping: a single masked read tells you an
+  identifier is *at least* that wide, never that it is *exactly* that wide.
+  Treat the widest observed mask as the current lower bound. The next step is
+  unchanged but better posed: find the WRITES, in the framework code at
+  `class_16334` / `code_179d8`, and see what composes the field — and whether
+  anything ever uses the top 12 bits of the word.
 - **What are the four dead-looking data slots** at `0x57070`, `0x76DC8`,
   `0x79528` and the `sbss` runs? They assemble and link fine as plain data, so
   nothing is blocked, but their owners are unidentified. **Partly answered for

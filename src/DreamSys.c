@@ -1,6 +1,18 @@
 #include "common.h"
 #include "DreamSys.h"
 
+/* Forward declarations for two of this unit's OWN functions, both called
+   around line 450 but not defined until ~200 lines later, in ROM order.
+   Without these, C89 implicitly declares them as `int ()` at the call site
+   and cpp emits "implicit declaration of function". The implicit type
+   happens to agree with the real one here, so nothing miscompiled -- but an
+   implicit declaration also disables argument checking, which is precisely
+   what caught func_8005D714's over-narrow `s8` parameters in include/Entity.h
+   this round. A declaration is not a definition, so this does NOT affect the
+   strict ROM-address ordering of the definitions below. */
+s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+
 DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 {
 	DreamSys *this;
