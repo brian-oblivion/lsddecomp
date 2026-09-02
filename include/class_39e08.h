@@ -143,8 +143,11 @@ typedef struct SubObjB {
  * "vtable at offset 0, only the one dispatched slot named" policy as
  * SubObjA/SubObjB above. */
 typedef struct Obj4CMethods {
-    u8 pad00[0x44];
+    u8 pad00[0x4];
+    void (*slot4)(Obj4C *self);                       /* +0x004, func_80049CA8, return discarded */
+    u8 pad8[0x44 - 0x8];
     void (*slot44)(Obj4C *self, s32 arg1, s32 arg2);
+    void (*slot48)(Obj4C *self);                       /* +0x048, func_80049CA8, return discarded */
 } Obj4CMethods;
 struct Obj4C {
     Obj4CMethods *methods;
@@ -206,6 +209,15 @@ typedef struct SubObjDMethods {
     void (*slot14)(SubObjD *self, s32 arg1);
     u8 pad18[0x110 - 0x18];
     void (*slot110)(SubObjD *self, s32 arg1);
+    u8 pad114[0x1B4 - 0x114];
+    /* func_80049CA8's `case 1`: return value used (`>= 0` check), so this
+     * is genuinely non-void. */
+    s32 (*slot1B4)(SubObjD *self);                /* +0x1B4 */
+    void (*slot1B8)(SubObjD *self, s32 arg1);      /* +0x1B8 */
+    u8 pad1BC[0x1E0 - 0x1BC];
+    /* func_80049CA8's `case 3`: return value used (forwarded straight into
+     * func_80049E20's own 2nd argument). */
+    s32 (*slot1E0)(SubObjD *self);                 /* +0x1E0 */
 } SubObjDMethods;
 struct SubObjD {
     SubObjDMethods *methods;
@@ -320,6 +332,13 @@ typedef struct Class86668Methods {
      * func_8003E5C8()->slot48(self). Called by func_80049AC0 as
      * func_8004A4B8()->slot48(self). */
     void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
+    u8 pad4C[0x54 - 0x4C];
+    /* Inherited, shared verbatim with D_800865C8's own occupant of this
+     * offset (func_80049CA8, this unit): D_80086668's own +0x054 is
+     * func_8003E418 (a base/inherited slot, out of this unit's scope).
+     * Called by func_80049CA8 as func_8004A4B8()->slot54(self, arg1,
+     * arg2), return discarded. */
+    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 func_8003E418 */
 } Class86668Methods;
 
 /* A plain accessor with no parameters, returning &D_80086668. Defined in the

@@ -82,7 +82,37 @@ void func_80049C50(Obj865C8 *self) {
     sub->methods->slot74(sub);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
+/* Defined later in this file (ROM order); forward-declared here since
+ * func_80049CA8 calls it. */
+extern void func_80049E20(Obj865C8 *self, s32 arg1);
+
+void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
+    s32 result;
+
+    func_8004A4B8()->slot54(self, arg1, arg2);
+    if (arg2 == 2 && self->unk3C != arg2) {
+        switch (self->unk3C) {
+        case 1:
+            result = self->unk38->methods->slot1B4(self->unk38);
+            if (result < 0) {
+                self->unk38->methods->slot1B8(self->unk38, 0);
+                self->unk28 = arg2;
+                self->methods->onEventArg(self, 3);
+                return;
+            }
+            func_80049E20(self, result);
+            break;
+        case 2:
+            break;
+        case 3:
+            self->unk4C->methods->slot48(self->unk4C);
+            self->unk4C->methods->slot4(self->unk4C);
+            result = self->unk38->methods->slot1E0(self->unk38);
+            func_80049E20(self, result);
+            break;
+        }
+    }
+}
 
 void func_80049E20(Obj865C8 *self, s32 arg1) {
     self->unk4C = func_80052B70(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
