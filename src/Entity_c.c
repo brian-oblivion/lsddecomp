@@ -32,7 +32,20 @@ void func_8005EFF4(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x64, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F0D8);
+void func_8005F0D8(Entity *this, EntityMoodHandlerArg *out) {
+    s32 half;
+    s32 rem;
+
+    out->unk10 = this->methods->slot148(this);
+    half = this->unk80 / 2;
+    rem = out->unk4 % half;
+    if (rem == 0) {
+        out->unk1C = 0xA;
+    } else if (rem == 3) {
+        out->unk30 = 0xD;
+    }
+    this->methods->slotC4(this, -0x1E, 1);
+}
 
 void func_8005F1A8(Entity *this) {
     func_8001EACC(this, this->unk94, 1, 0, 0);
