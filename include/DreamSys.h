@@ -88,17 +88,35 @@ typedef struct PlayerSpawnPoint {
 	} position;
 } PlayerSpawnPoint;
 
-typedef struct {
-	s32 stageID;
-	PlayerSpawnPoint position;
+/* pitch/heading/roll grouped into one 12-byte nested struct (round
+   2026-09-02, DreamSys__AddFlashback): that function block-copies all
+   three from its `angles` argument in ONE retail load-all-then-store-all
+   sequence (six unaligned lwl/lwr loads, all before any of the six
+   unaligned swl/swr stores) -- the same "whole-struct assignment, not a
+   per-word copy" idiom already documented for other block moves in this
+   project. A per-field or looped copy would not reproduce that
+   instruction ordering. */
+typedef struct FlashbackRotation {
 	struct Angle{
 		s16 angle;
 		s16 one;
 	} pitch; /* Does not do what you think it does */
 	struct Angle heading;
 	struct Angle roll; /* Ditto */
+} FlashbackRotation;
+
+typedef struct {
+	s32 stageID;
+	PlayerSpawnPoint position;
+	FlashbackRotation rotation;
 	s16 timeLimit;
-	s32 unknown_value_0x1c;
+	/* Was `s32`; retyped (round 2026-09-02): DreamSys__AddFlashback writes
+	   it with a bare `sh` (halfword store) from an `s32` argument, which
+	   only makes sense if the field itself is 2 bytes -- an `s32` field
+	   fed by an `s32` argument would store all 4 bytes (`sw`), not 2. The
+	   remaining 2 bytes before `day` are ordinary C struct alignment
+	   padding, not a separate field. */
+	s16 unknown_value_0x1c;
 	s32 day;
 } FlashbackEntry;
 
@@ -731,6 +749,14 @@ extern StaticLinkTrigger* STAGE_PERMALINK_TRIGGERS[];
 extern s8 LEN_STAGE_PERMALINK_TRIGGERS[];
 
 extern s16 SPECIAL_DAYS[];
+
+/* The fixed "special day" mood, returned by IsDaySpecial on a match
+   (round 2026-09-02); only ever address-taken there, never dereferenced by
+   this unit's queued functions. */
+extern MoodGraphPoint D_8008ABF4;
+
+/* Also declared in Entity.h for the same libc-style function. */
+extern s32 rand(void);
 
 extern s8 SPECIAL_COLORS[];
 

@@ -445,7 +445,19 @@ s32 DreamSys__StartDay(DreamSys *this)
 	return this->currentStage;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__EndDay);
+s32 DreamSys__EndDay(DreamSys *this, s32 arg1)
+{
+	this->currentDay = this->storedDay;
+	if (!this->isFlashbackSession && arg1 == 0) {
+		this->vt->CalcUnlockScore(this);
+		this->vt->UpdateDreamChart(this, &this->moodPreviousDays[this->currentDay]);
+		this->vt->AdvanceDay(this);
+	} else if (arg1 == 2) {
+		this->vt->InitNewGame(this);
+		this->unk_0x878 = 1;
+	}
+	return this->isFlashbackSession;
+}
 
 CinematicCall DreamSys__GetCinematic(DreamSys *this)
 {
@@ -696,7 +708,23 @@ void DreamSys__CalcUnlockScore(DreamSys *this)
 	this->totalFlasbackUnlockScore = this->navigationFlasbackUnlockScore + this->instanceFlasbackUnlockScore;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__AddFlashback);
+void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles, s32 unknown, s32 time, s32 day)
+{
+	FlashbackEntry *entry;
+
+	entry = this->storedFlasbacks;
+	if (this->amountFlashbacksAvailable < 10) {
+		entry += this->amountFlashbacksAvailable++;
+	} else {
+		entry += (u32)this->dreamTimer % 9;
+	}
+	entry->stageID = stage;
+	entry->position = *pos;
+	entry->rotation = *(FlashbackRotation *)angles;
+	entry->unknown_value_0x1c = unknown;
+	entry->timeLimit = time;
+	entry->day = day;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__FlashbackSaving);
 
