@@ -57,7 +57,7 @@ struct Class866E8 {
 };
 
 /* Get-vtable helper for Class866E8. Still raw asm: it lives in class_3bb8c,
- * an uncarved monolithic segment, not yet a src/*.c unit anywhere. */
+ * an uncarved monolithic segment, not yet a carved src/ unit anywhere. */
 extern Class866E8Methods *func_8004D244(void);
 
 /* The generic allocator, established already in DreamSys.h/Entity.h/etc. */
