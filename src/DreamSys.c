@@ -649,7 +649,35 @@ s32 func_8005AD68(DreamSys *this)
 	return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AE40);
+s32 func_8005AE40(DreamSys *this)
+{
+	s32 flag;
+
+	if (this->unk_0x914 == 0) {
+		func_8005AF64(this, &D_8008ABD8, &this->unk_0x91C);
+	}
+	if (this->unk_0xAC != 4) {
+		if (this->unk_0x914 >= 0x71)
+			return 1;
+		if ((u32)(this->unk_0x914 - 0x1E) < 0xF || (u32)(this->unk_0x914 - 0x52) < 0xF) {
+			this->unk_0xA4 = 1;
+		}
+		flag = (u32)(this->unk_0x914 - 0x1E) < 0x34;
+	} else {
+		if (this->unk_0x914 >= 0x13)
+			return 1;
+		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xF) < 2) {
+			this->vt->func_8001CEB4(this, 0, &D_80087F08);
+		}
+		flag = (u32)this->unk_0x914 < 9;
+	}
+	if (flag) {
+		this->unk_0x88 = 2;
+	}
+	this->unk_0xA0 = 1;
+	this->unk_0x914++;
+	return 0;
+}
 
 void func_8005AF64(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
 {

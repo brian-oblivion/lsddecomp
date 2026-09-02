@@ -308,11 +308,21 @@ extern struct RelativePos D_8008ABD0;
    different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABC0;
 
+/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+   argument by func_8005AE40 -- same call shape as D_8008ABD0/D_8008ABC0
+   above, just a different constant (round 2026-09-02). */
+extern struct RelativePos D_8008ABD8;
+
 /* Address-of only (never dereferenced by this unit's queued functions),
    forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AD68
    (round 2026-09-02) -- same "opaque generic pointer" shape as that slot's
    other known call site (D_80087E84[-1]). */
 extern u8 D_80087EFC[];
+
+/* Same "opaque generic pointer" shape as D_80087EFC above, forwarded as
+   vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AE40
+   (round 2026-09-02) -- a different constant/address, same call shape. */
+extern u8 D_80087F08[];
 
 /* Argument shape for func_8005950C: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
