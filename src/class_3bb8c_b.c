@@ -21,7 +21,18 @@ s32 func_8004C588(Obj866E8 *self, s32 key) {
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C5D0);
+s32 func_8004C5D0(Obj866E8 *self, s32 key) {
+    s32 i;
+    Elem *e;
+
+    for (i = 0; i < 7; i++) {
+        e = &self->arr[i];
+        if (e->unk4->unk30 == key && e->unk4->unk2C != 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C620);
 
@@ -49,7 +60,20 @@ void func_8004CFB0(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CFB8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D028);
+/* Forward declaration: defined later in this file (after func_8004D028 in
+ * ROM-address order), but passed to func_8004D140 as a function-pointer
+ * argument before its own definition appears. */
+void func_8004D0D0(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item);
+
+void func_8004D028(Obj866E8 *self) {
+    if (self->unk1E0 > 0) {
+        func_8004D140(self, func_8004D0D0, 0);
+        self->unk1E0 -= 1;
+        if (self->unk1E0 == 0) {
+            self->unk1E0 = -1;
+        }
+    }
+}
 
 /* Forward declaration: defined later in this file (after func_8004D088 in
  * ROM-address order), but passed to func_8004D140 as a function-pointer
