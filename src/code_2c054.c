@@ -18,7 +18,12 @@ void func_8003BA38(StreamTaskObj *self) {
     self->unkD4 = 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA58);
+void func_8003BA58(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag) {
+    self->unkB8 = arg2;
+    self->unkBC = typeLookup;
+    self->unkC0 = flag;
+    func_8003DFBC()->slot44(self, a1, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BAB4);
 
