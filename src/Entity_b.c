@@ -5,6 +5,7 @@
  * call as an opaque argument -- never dereferenced here, so an opaque byte
  * array is enough to form &D_8008xxxx correctly. Real element type/count
  * unknown. */
+extern u8 D_80089DD8[];
 extern u8 D_80089DF0[];
 extern u8 D_80089D78[];
 
@@ -110,4 +111,6 @@ void func_8005ED10(Entity *this, EntityMoodHandlerArg *out) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005ED30);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EF20);
+s32 func_8005EF20(Entity *this) {
+    return this->methods->slot48(this, 1, D_80089DD8);
+}
