@@ -412,6 +412,19 @@ struct Class86AA0 {
 extern Class86AA0Methods D_80086AA0;
 extern Class86AA0Methods *func_8004D508(void);
 
+/* MEASURED, round 9: func_8001E57C TAKES NO ARGUMENTS. Its whole body is
+ * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` (asm/code_d294.s) -- it reads
+ * neither $a0 nor $a1, and just returns &D_8006B5CC. It is the plain
+ * no-parameter vtable getter documented in docs/research/class-framework.md,
+ * the same shape as func_800269E0.
+ *
+ * The arg list below is therefore NOT the callee's signature; it is what THIS
+ * call site passes, and it is what this unit's bytes need. src/class_3ac78.c
+ * passes TWO args to the same symbol and is equally byte-exact. Both are
+ * right about their own codegen and both are wrong about the function.
+ * Do not "reconcile" them and do not reduce either to (void) -- that changes
+ * the argument setup the caller emits and breaks the match. See
+ * docs/match-reports/func_8004D3DC.md. */
 extern BaseCtorTable_3bb8c_c *func_8001E57C(void *self);
 
 /*

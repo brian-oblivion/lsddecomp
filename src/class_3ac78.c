@@ -31,6 +31,13 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A534);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A7C0);
 
+/* MEASURED, round 9: func_8001E57C TAKES NO ARGUMENTS -- its body is
+ * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` and it reads neither $a0 nor $a1
+ * (asm/code_d294.s). The two args below are what THIS call site passes, not
+ * the callee's signature; include/class_3bb8c.h passes ONE to the same symbol
+ * and is equally byte-exact. Retail's source called one zero-argument getter
+ * with different argument counts from different files, which is what C89 does
+ * with no prototype in scope. Do not reconcile the two declarations. */
 extern void *func_8001E57C(Class866E8 *self, s32 arg1);
 
 void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
