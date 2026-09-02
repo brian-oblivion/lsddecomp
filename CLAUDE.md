@@ -229,10 +229,10 @@ Gate 2.
 6. On a match: keep the C idiomatic, name things sensibly, add new struct
    knowledge to `include/`, write the report, commit.
 
-## The three ways a score lies
+## The four ways a score lies
 
 `funcdiff.py` guards two of these mechanically and will exit 2 rather than
-hand you a number it does not trust. Know all three anyway — the guards are a
+hand you a number it does not trust. Know all four anyway — the guards are a
 backstop, not a substitute for reading `build exit=`.
 
 1. **Stale build.** funcdiff reads the BUILT file. A failed compile *or a
@@ -252,6 +252,27 @@ backstop, not a substitute for reading `build exit=`.
    shifts and the per-function window no longer means what it says. funcdiff
    reports how many bytes differ OUTSIDE the range; a non-zero count there
    makes the in-range score untrustworthy. `build-and-verify.sh` is the oracle.
+4. **A conflicted merge.** This one bites the HEAD, not a runner, which is
+   why it went unwritten for ten rounds. `git merge` exits non-zero and leaves
+   conflict markers in a `src/` file — and `./build-and-verify.sh` run
+   immediately afterwards can still print `build exit=0` and
+   `OK: build matches retail`, because the object for the conflicted unit was
+   not rebuilt. Both halves of the usual discipline pass: the exit status is
+   0 and funcdiff raises no staleness warning. Nothing in the oracle chain
+   knows a merge is half-finished.
+
+   **So `build exit=` is necessary but not sufficient during a merge.** Check
+   the merge itself:
+
+   ```sh
+   git merge --no-ff runner/<name> ...; echo "merge exit=$?"
+   git rev-parse -q --verify MERGE_HEAD >/dev/null && echo "MERGE IN PROGRESS"
+   ```
+
+   A green build on top of `MERGE IN PROGRESS` means nothing at all. Resolve
+   first, then verify. Round 10 hit this merging a runner whose unit file the
+   head had also edited on `main` mid-round — see the note below on why that
+   edit should not have happened.
 
 ## Standing checks
 

@@ -151,6 +151,23 @@ a lost one. Check them by hand, every time.
    the head's consolidation commit. If you must work during a round, use
    another worktree.
 
+6. **A correction goes down ONE channel, not both.** When the head discovers
+   mid-round that something in a live runner's unit is wrong, it can message
+   the runner or it can fix the file on `main` — doing both produces the same
+   paragraph written twice, differently, and a merge conflict in a `src/`
+   file at the worst moment. Round 10 retracted a blocker misclassification
+   by messaging runner echo AND editing echo's unit header comment on main;
+   echo complied, wrote its own better version, and the merge conflicted. The
+   conflict was cheap to resolve, but it arrived attached to the round's
+   largest branch (16 matches) and it is what exposed the conflicted-merge
+   oracle trap in CLAUDE.md's "four ways a score lies".
+
+   **Default to the message.** The runner is holding the unit, has the
+   context, and will write it better than the head will — echo's version was
+   kept. Edit `main` only for files no live runner owns: shared docs, another
+   unit's header, the splat config. If the head must fix a live unit's file
+   anyway, say so in the message explicitly so the runner leaves it alone.
+
 ## The head-agent protocol
 
 The head runs in the MAIN checkout on an expensive model. Its loop:
