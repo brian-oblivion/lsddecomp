@@ -1,5 +1,33 @@
 # func_8004CAF0 — STALL (best 8/92 words; frame size off by 8 bytes)
 
+> **HEAD VERIFICATION, round 9: classification CONFIRMED, and it is the most
+> actionable of this round's three stalls despite having the worst score.**
+>
+> The reasoning holds and the score is misleading in a specific way worth
+> naming: retail's frame is `-0x38` saving `$s0`-`$s7` + `$ra`, ours is
+> `-0x30` saving at most six. A frame-size difference moves every stack
+> offset and every saved-register slot in the function, so 8/92 measures the
+> cascade, not the distance. Do not read it as "nowhere near" — the report's
+> own claim that control flow, field writes and semantics are settled is
+> consistent with it.
+>
+> **The concrete next move follows from the diagnosis and has not been tried.**
+> Retail keeping two MORE callee-saved registers means retail's source had two
+> more values that had to survive the `slot120` vtable call. The preserved body
+> reuses a single `v` for several unrelated intermediates (the `slot120`
+> return, then `p5 ± 10`, then later reuses), which is exactly what lets GCC
+> coalesce them into one register and shrink the frame. **Give each distinct
+> value its own named local** — one for the slot120 result, one for the h4
+> value, one for each quantity live across the call — and let the frame grow
+> to match rather than trying to reshape control flow. That is the opposite of
+> the usual advice (fewer temps, reuse), which is why it is easy to miss.
+>
+> This is a reconstruction, not a residue fix, so it is runner-scale work
+> rather than head triage — it wants a fresh attempt budget with the
+> variable-lifetime hypothesis stated up front. It is NOT a permuter target:
+> the permuter mutates a source whose shape is already close, and here the
+> variable set itself is wrong.
+
 The biggest attempted this round (97 words) and the one that resisted
 byte-exactness. An 8-parameter function that populates one or two
 `GridSlot866E8` entries (the same type established this round from
