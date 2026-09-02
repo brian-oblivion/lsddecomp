@@ -12,7 +12,13 @@
 
 extern u8 D_80089E38[];
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EF54);
+void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (out->unk4 % 10 == 0) {
+        out->unk1C = 0x11;
+    }
+    this->methods->slotC4(this, -0x100, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EFF4);
 
