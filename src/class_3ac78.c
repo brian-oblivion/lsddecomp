@@ -21,7 +21,20 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A534);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A7C0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A984);
+extern void *func_8001E57C(Class866E8 *self, s32 arg1);
+
+void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
+{
+    void (*fn)(Class866E8 *self, GenericObject *arg1, s32 arg2);
+
+    fn = *(void (**)(Class866E8 *, GenericObject *, s32))
+        ((u8 *)func_8001E57C(self, (s32)arg1) + 0x38);
+    fn(self, arg1, arg2);
+
+    if ((arg1->methods->header & 0xF) == 1) {
+        self->methods->slot100(self, arg1, arg2);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA10);
 
