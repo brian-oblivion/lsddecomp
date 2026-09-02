@@ -60,7 +60,9 @@ struct EntityMethods {
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
-    /* +0x134 */ u8 pad134[0x15C - 0x134];
+    /* +0x134 */ u8 pad134[0x148 - 0x134];
+    /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds func_8005D864 (still addiu_at-blocked in Entity.c) */
+    /* +0x14C */ u8 pad14C[0x15C - 0x14C];
     /* +0x15C */ void (*slot15C)(Entity *self);            /* called by func_8005DBF0 */
     /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
     /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C and func_8005DE18 (as slot164(self, 1)) */
@@ -258,5 +260,27 @@ extern EntityMethods D_80089AD4;
  * is a safe read regardless of the real return type (same caveat as
  * func_8002CD08/func_8002CC84 above). */
 extern void func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
+
+/* Second argument threaded through the moodIndex-selected event-dispatch
+ * handlers (func_8005ED10, func_8005E480, func_8005E7A8, and the sibling
+ * handlers this unit hasn't reached yet -- all reachable as {handler,
+ * data0, data1, data2} 16-byte rows of the D_80089EB0 table in
+ * asm/data/79528.data.s, immediately after D_80089EAC). Not an Entity --
+ * these handlers only ever read a gate flag out of it and write result
+ * codes back in. Real name/size unknown; only the offsets touched so far
+ * are given. */
+typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
+struct EntityMoodHandlerArg {
+    u8 pad00[0x04];
+    s32 unk4;    /* +0x04, gate flag read by func_8005E480/func_8005E7A8 */
+    u8 pad08[0x08];
+    s32 unk10;    /* +0x10, written by func_8005ED10/func_8005E480/func_8005E7A8 */
+    u8 pad14[0x08];
+    s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8 */
+    u8 pad20[0x10];
+    s32 unk30;      /* +0x30, written by func_8005E7A8 only */
+    u8 pad34[0x10];
+    s32 unk44;       /* +0x44, written by func_8005E7A8 only */
+};
 
 #endif
