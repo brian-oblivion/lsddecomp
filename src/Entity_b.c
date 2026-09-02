@@ -101,7 +101,12 @@ INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EBB4);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EC98);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005ED10);
+void func_8005ED10(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0) {
+        out->unk10 = 0;
+        out->unk1C = 0xF;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005ED30);
 
