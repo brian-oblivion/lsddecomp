@@ -48,7 +48,12 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A130);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A19C);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A228);
+void func_8004A228(Obj865C8 *self) {
+    if (self->unk30 != 0) {
+        self->subB->methods->slot4(self->subB);
+    }
+    func_8003E5C8()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A294);
 
