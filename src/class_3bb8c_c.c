@@ -42,7 +42,17 @@ Class869D8Methods *func_8004D37C(void)
     return &D_800869D8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D38C);
+Class86AA0 *func_8004D38C(void)
+{
+    Class86AA0 *self;
+
+    self = func_80017B34(0x3C);
+    if (self != NULL) {
+        func_8004D508()->ctor(self);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D3DC);
 

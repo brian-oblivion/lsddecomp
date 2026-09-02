@@ -380,4 +380,24 @@ extern BaseCtorTable_3bb8c_c *func_8003F24C(void);
 
 extern void *func_80017B34(s32 size);
 
+typedef struct Class86AA0 Class86AA0;
+typedef struct Class86AA0Methods Class86AA0Methods;
+
+/*
+ * Vtable D_80086AA0 (asm/data/76DC8.data.s, header word 0x24). Sibling of
+ * Class869D8Methods above, same shape: ctor at +0x008 (func_8004D3DC,
+ * called by New_Class86AA0/func_8004D38C).
+ */
+struct Class86AA0Methods {
+    u8 pad000[0x008];
+    void (*ctor)(Class86AA0 *self);            /* +0x008, func_8004D3DC */
+};
+
+struct Class86AA0 {
+    Class86AA0Methods *methods;                /* +0x000 */
+};
+
+extern Class86AA0Methods D_80086AA0;
+extern Class86AA0Methods *func_8004D508(void);
+
 #endif
