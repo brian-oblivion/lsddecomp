@@ -80,7 +80,10 @@ void *func_8004D500(void *self)
     return self;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D508);
+Class86AA0Methods *func_8004D508(void)
+{
+    return &D_80086AA0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D518);
 
