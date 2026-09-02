@@ -445,7 +445,19 @@ s32 DreamSys__StartDay(DreamSys *this)
 	return this->currentStage;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__EndDay);
+s32 DreamSys__EndDay(DreamSys *this, s32 arg1)
+{
+	this->currentDay = this->storedDay;
+	if (!this->isFlashbackSession && arg1 == 0) {
+		this->vt->CalcUnlockScore(this);
+		this->vt->UpdateDreamChart(this, &this->moodPreviousDays[this->currentDay]);
+		this->vt->AdvanceDay(this);
+	} else if (arg1 == 2) {
+		this->vt->InitNewGame(this);
+		this->unk_0x878 = 1;
+	}
+	return this->isFlashbackSession;
+}
 
 CinematicCall DreamSys__GetCinematic(DreamSys *this)
 {
