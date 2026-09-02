@@ -1,4 +1,5 @@
 #include "common.h"
+#include "class_39e08.h"
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049608);
 
@@ -8,7 +9,9 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049830);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049958);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049A14);
+void func_80049A14(Obj865C8 *self) {
+    self->unk3C = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049A1C);
 
