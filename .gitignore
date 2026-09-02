@@ -48,6 +48,14 @@ tools/maspsx
 tools/decomp-permuter
 tools/gcc263
 permuter-work
+# Seed scaffolds a runner hands the permuter. Generated working state, same
+# as permuter-work, and NOT the durable record: a preserved body belongs
+# inlined in its match report, never as a path into an ignored directory
+# (PARALLEL-RUNS collision rule 2). Untracked and unignored, this directory
+# made it impossible for a runner using the permuter to ever report the
+# empty `git status --porcelain` the runner protocol requires -- which is a
+# check the round relies on, so it must not be the thing that cries wolf.
+permuter-seeds
 # `permuter.py --debug` writes these into the CURRENT directory, not into the
 # permuter dir. MATCHING-GUIDE now tells everyone to run --debug first (a
 # scaffold whose base score does not match the match report is scoring the
