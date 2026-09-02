@@ -96,7 +96,37 @@ s32 func_8004BCE0(Obj866E8 *self) {
     return count;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BD14);
+void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
+    s32 i;
+    Elem *e;
+    s32 curMode;
+
+    if (mode != 2) {
+        return;
+    }
+    for (i = 0; i < 7; i++) {
+        e = &self->arr[i];
+        if (e->unk4->unk2E != 0) {
+            e->unk4->unk2E = 0;
+            self->methods->slot88(self, 7, e, i);
+        }
+        curMode = self->unk1B0;
+        if (curMode == 1 && e->flag != 0) {
+            if (e->unk4->unk2C != 0) {
+                self->methods->slot104(self, e);
+                e->unk4->unk2C = 2;
+                e->flag = 0;
+                if (--self->unk1B4 == 0) {
+                    self->unk1B4 = 0;
+                    self->unk1B0 = 0;
+                    self->unk1B8 = curMode;
+                }
+            } else if (e->unk4->unk2A == 0) {
+                e->flag = 0;
+            }
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BE54);
 
