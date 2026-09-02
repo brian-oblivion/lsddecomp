@@ -6,12 +6,17 @@ stale, prose elsewhere is not.
 
 ---
 
-## 2026-09-02 — round 6: 5 runners, 43 matches, and one runner ran the head's protocol on itself
+## 2026-09-02 — round 6: 5 runners, 48 matches, and the runners would not stop
 
-**160 -> 203 matched (11.80% -> 14.97% of game code). 151 queued: 66 fresh, 85
-stalled, 0 banked. Matched bytes 13760 -> 16548. Build green in main after every
-one of five merges, and green again after a full `make clean` + `make extract`
-rebuild at the end.**
+**160 -> 208 matched (11.80% -> 15.34% of game code, crossing 10% of ALL
+functions). 146 queued: 85 stalled, 0 banked. Build green in main after every
+one of NINE merges, and green again after a full `make clean` + `make extract`
+rebuild.**
+
+**Teardown was DEFERRED, deliberately — the worktrees are still standing.** See
+"The runners kept working after reporting" below. This entry's counts are a
+snapshot taken while the tree was still moving, which is unusual for this log
+and is the reason it says so here.
 
 Five runners, one per unit with fresh ground: `DreamSys` (alpha),
 `Entity_b` (bravo), `class_39e08` (charlie), `class_3ac78` (delta),
@@ -102,6 +107,59 @@ Why it matters anyway:
   but a runner that cannot use git to restore state will improvise, and
   improvised restores are how a wrong body reaches a commit. Worth an operator
   look; not something the head should paper over.
+
+### The runners kept working after reporting, and teardown was deferred
+
+All five runners delivered a final structured summary and the head merged all
+five. Then **new commits kept appearing on the runner branches**, timestamped
+after their own completion reports, and they were real: five further byte-exact
+matches, each properly scoped to one unit with its own match report.
+
+| late match | unit | words | landed on branch |
+| --- | --- | --- | --- |
+| `func_8004A2C4` | class_39e08 | 24/24 | runner/charlie |
+| `func_80049E20` | class_39e08 | 33/33 | runner/charlie |
+| `func_8004A364` | class_39e08 | 34/34 | runner/charlie |
+| `func_8003BD10` | code_2c054 | 25/25 | **runner/bravo** |
+| `func_8003BDF4` | code_2c054 | 26/26 | **runner/bravo** |
+
+Note the last two: `code_2c054` is ECHO's unit, and echo's worktree and branch
+had already been torn down (by alpha — see above). The work landed on BRAVO's
+branch instead. It is correctly scoped to `code_2c054`'s own files and it
+verifies, but no runner should be committing another runner's unit, and the
+one-unit-per-runner collision rule is what normally makes a merge conflict
+impossible. It held here by luck, not by design: echo was already merged, so
+nothing contended.
+
+All five were merged and individually confirmed with funcdiff; the whole-image
+SHA1 stayed green throughout. **Discarding them was never the right call** —
+they are valid matches with reports, and the alternative to merging verified
+work is throwing it away.
+
+**Why teardown was deferred.** §4b's four preconditions are meant to be checked
+once. Here precondition 3 (`main..runner/<name>` is EMPTY) kept
+*un*-satisfying itself: it read 0 for all four branches, then 1, then 2, then 0
+again, as commits continued to land. At the point of writing, `runner/bravo` and
+`runner/delta` each still hold uncommitted files. `git worktree remove --force`
+on a worktree with live uncommitted work destroys it, and `--force` is exactly
+the flag that disables the "are you sure?" backstop — which PARALLEL-RUNS
+already warns is the only thing between a finished round and a lost one.
+
+So the round ends with everything merged, everything verified, and the five
+worktrees left standing for the operator to tear down once the agents are
+confirmed quiescent:
+
+```sh
+for n in alpha bravo charlie delta; do
+    git worktree remove --force ../<checkout>-wt-$n && git branch -d runner/$n
+done
+```
+
+**Protocol gap this exposes.** §4b assumes "has REPORTED" implies "has
+finished". It does not. A runner's final summary is not a guarantee that its
+process has stopped writing. The preconditions need to be checked *immediately
+before* the `--force`, not once at the start of consolidation — and ideally
+twice, with a gap, to catch a branch that is still advancing.
 
 ### Head consolidation
 

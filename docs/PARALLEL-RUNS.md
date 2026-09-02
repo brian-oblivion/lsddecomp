@@ -148,6 +148,18 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 4. **Merge** sequentially, in main: `git merge --no-ff runner/<name>` →
    `./build-and-verify.sh` → next. Disjoint units make conflicts rare.
 
+4b. **Check the preconditions IMMEDIATELY before the `--force`, not once at the
+   start of consolidation — and check the branch one twice, with a gap.**
+   "Has REPORTED" does NOT imply "has stopped writing". Round 6 (2026-09-02) had
+   all five runners deliver final summaries, merged all five, and then watched
+   new commits keep landing on the runner branches — five further byte-exact
+   matches, one of them on a *different* runner's unit whose own worktree had
+   already been removed. `main..runner/<name>` read empty, then non-empty, then
+   empty again. Two worktrees still held uncommitted files at the end of the
+   round, so teardown was deferred rather than forced, and the worktrees were
+   left standing for the operator. A stale precondition check plus `--force` is
+   how a finished round becomes a lost one.
+
 4b. **Teardown has four preconditions.** Check all four before
    `git worktree remove --force` — which, because generated files always make
    plain `remove` refuse, is the command you will actually type, with its
