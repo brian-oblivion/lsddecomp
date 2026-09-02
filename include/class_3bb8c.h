@@ -94,6 +94,13 @@ struct Obj866E8 {
     Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
 };
 
+/* Get-vtable helper, same shape and same real function as
+ * class_3ac78.h's `func_8004D244` (independent view: this unit names the
+ * return type Obj866E8Methods, not Class866E8Methods). It now has a real
+ * body in this unit (class_3bb8c_b); class_3ac78 still calls it via `jal`
+ * as a raw external. */
+extern Obj866E8Methods D_800866E8;
+
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
  * called only by func_8004B418. Declared locally with the minimal
  * signature that call site demonstrates; not this round's function to

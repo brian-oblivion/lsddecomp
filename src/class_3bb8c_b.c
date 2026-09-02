@@ -47,4 +47,6 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D140);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D1D0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D244);
+Obj866E8Methods *func_8004D244(void) {
+    return &D_800866E8;
+}
