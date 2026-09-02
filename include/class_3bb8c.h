@@ -139,6 +139,11 @@ extern Obj866E8Methods D_800866E8;
  * prototype is documentation, not load-bearing. */
 extern void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item), Elem *item);
 
+/* 3-word (12-byte) data block, address-of only -- passed to
+ * Unk10ChildMethods_3bb8c_b::slot48 as an opaque arg2 by func_8004D108.
+ * Never dereferenced in this unit, so left untyped in size only. */
+extern s32 D_800869CC[3];
+
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
  * called only by func_8004B418. Declared locally with the minimal
  * signature that call site demonstrates; not this round's function to
