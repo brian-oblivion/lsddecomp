@@ -32,10 +32,37 @@ approval on ordinary commands — most visibly `git commit`, which they run
 often — while the head in the main checkout is never asked. It is not a
 misconfiguration and nothing is wrong with the worktree.
 
-Decide before spawning: either grant the worktree paths for the session
-(so the round runs unattended), or expect to approve runner commands
-interactively. Granting is a permission change, so it is the operator's call,
-not the head's — ask, do not assume.
+Decide before spawning: either grant the worktree paths (so the round runs
+unattended), or expect to approve runner commands interactively. Granting is a
+permission change, so it is the operator's call, not the head's — ask, do not
+assume.
+
+**On this machine the operator has granted it**, in
+`.claude/settings.local.json`:
+
+```json
+{ "permissions": { "additionalDirectories": [
+    "<abs path>/<checkout>-wt-alpha", "...-wt-bravo", "...-wt-charlie",
+    "...-wt-delta", "...-wt-echo" ] } }
+```
+
+That file is the right home for it and the committed `.claude/settings.json` is
+not: `additionalDirectories` takes ABSOLUTE paths, and the worktree path is
+derived from the basename of whoever's checkout it is, so a committed entry
+would be wrong in every clone but one. `settings.local.json` is gitignored, so
+each operator grants their own.
+
+**Two consequences for the head, and the first one is a real constraint:**
+
+- **The grant is an allowlist of five FIXED names — alpha, bravo, charlie,
+  delta, echo.** Provisioning a worktree under any other name puts it outside
+  the grant and the round starts prompting again, with no error that says why.
+  Stick to those five, which also caps a round at five runners. If you need a
+  sixth, that is a settings change and therefore an operator decision.
+- **It does not shrink §4a.** Fixed, recycled names are exactly what made two
+  heads collide in rounds 6 and 7, and a standing grant on those names gives
+  the next head one more reason to reuse them without looking. Run the §4a
+  checks anyway.
 
 **`<checkout>` is the basename of YOUR main checkout, not a fixed string.**
 The script derives the destination from it, so a clone named `lsddecomp`
