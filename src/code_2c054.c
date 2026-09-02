@@ -88,7 +88,10 @@ INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C008);
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C11C);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C1DC);
+s32 func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
+    func_8003E5C8()->slot44(self, a1, a2);
+    return self->unk38;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C238);
 
