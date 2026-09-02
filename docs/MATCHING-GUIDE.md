@@ -216,15 +216,56 @@ the keyboard:
 
 ## Permuter
 
-Not yet set up on this project. When a near-miss is worth it,
-`tools/decomp-permuter` is cloned and `tools/permuter_settings.toml` points at
-the Psy-Q compiler.
+**Set up and proven, round 8 (2026-09-02).** One command provisions a run:
 
-**The first target is chosen: `new_class_6d3c8`.** It is the `New_X` allocator
-shape (malloc → null check → constructor through slot `+0x008` → return the
-allocation), it stalls on one delay-slot residue that manual reshaping and a
-`__asm__("")` barrier both failed to close, and roughly 60 classes share the
-shape. One source form that closes it plausibly unblocks every `New_X` in the
-game, which is a far better return than permuting an isolated near-miss. A permuter zero is a LEAD: translate it to idiomatic C and
-re-verify with funcdiff. If only undefined-behaviour or duplicate-arm forms
-reach zero, mark the class permuter-exhausted in the report and move on.
+```sh
+tools/setup-permuter.sh <func> <seed.c>      # -> permuter-work/<func>
+PATH=$PWD/permuter-work/bin:$PATH \
+  .venv/bin/python3 tools/decomp-permuter/permuter.py --debug permuter-work/<func>
+PATH=$PWD/permuter-work/bin:$PATH \
+  .venv/bin/python3 tools/decomp-permuter/permuter.py -j 6 \
+    --stop-on-zero --best-only permuter-work/<func>
+```
+
+`<seed.c>` is a few lines: the project `#include`s plus ONE function
+definition, normally the near-miss body copied out of its match report. The
+script generates `compile.sh` from the Makefile's own C rule, assembles retail's
+bytes into `target.o`, reduces the seed to `base.c`, and proves the scaffold
+compiles before handing it back. It also documents the four setup traps that
+each look like a broken toolchain — read its header comment rather than
+rediscovering them.
+
+**Always run `--debug` first and check the base score against what the match
+report claims.** A scaffold that scores something other than the reported
+residue is scoring a different function than you think, and the whole search is
+then wasted. `--debug` prints a penalty list: one insertion + one deletion
+(score 200) is the signature of a genuine one-instruction residue.
+
+**Sanity-check the numbers.** `permuter.py`'s score is not funcdiff's. Zero
+means "identical to `target.o`"; it is not a word count, and it is not the
+oracle. `./build-and-verify.sh` is.
+
+**A permuter zero is a LEAD, not an answer.** Translate it to idiomatic C and
+re-verify with `build-and-verify.sh` plus `funcdiff.py`. This is not a
+formality — it decided both of the round-8 matches:
+
+- `new_class_6d3c8` (24/24): the permuter's zero WAS idiomatic and went in
+  essentially as found (`return` inside the `if`, null path falls off the end).
+- `strcat` (42/42): the permuter's zero was a **dead store** on the null path.
+  Committing it would have put provably dead code in `src/`. It was still a
+  correct lead — it said retail's source *uses* `dest` there — and the
+  idiomatic way to use it, `return dest;` instead of `return NULL;`, scored
+  identically.
+
+If only undefined-behaviour or duplicate-arm forms reach zero and no idiomatic
+translation scores the same, mark the class permuter-exhausted in the report and
+move on.
+
+**What it is good for, from two data points.** Both round-8 targets were
+one-instruction residues that three rounds of manual reshaping, `__asm__("")`
+barriers and detailed `reorg.c` root-cause reasoning had failed to close, and
+both fell in under 400 iterations (47 and 320) — well under a minute each. Both
+turned out to be a mismatch in how many times the source MENTIONS a value, not
+a scheduling choice. That is the class to reach for the permuter on. It is not
+a substitute for getting the control-flow shape right: if the branch targets
+differ, fix the source first.
