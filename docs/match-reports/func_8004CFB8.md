@@ -1,5 +1,40 @@
 # func_8004CFB8 — STALL (25/28 words, best attempt)
 
+> **HEAD VERIFICATION, round 9. Classification CONFIRMED as a stall, but
+> RECLASSIFIED as to kind: this is a SOURCE-SHAPE stall and a permuter
+> candidate, NOT a toolchain blocker.** The distinction matters for routing.
+> The two escalated blockers (`gp-relative`, `addiu_at`) are maspsx/flag
+> issues with a known mechanism, a measured corpus census and a known
+> non-remedy; filing this next to them would imply an operator decision is
+> pending, and none is. Nothing here is waiting on a toolchain change. What is
+> true is narrower and the runner stated it correctly: cc1 makes a different
+> RTL-expansion choice for every statement shape tried so far. That is the
+> ordinary condition of an unsolved function, and the reproducer work below is
+> exactly right — it rules the downstream tools out, which is the useful half.
+>
+> **One further shape tested by the head, NEGATIVE.** The runner's six
+> variants all keep two separate products. I tried the reading where retail
+> has only ONE logical multiply and the `mult` in the branch's delay slot is a
+> speculative hoist — negating in place before a single multiplication:
+>
+> ```c
+> merge:
+>     if (rate < 0) {
+>         rate = ~rate + 1;
+>     }
+>     self->unk1E0 = self->unk1E4->unk6 * rate;
+> ```
+>
+> **17/28 — materially worse than the runner's 25/28.** So retail really does
+> compute two products, and the deferred single `mflo` is not a delay-slot
+> hoist of one multiply. That closes off the most plausible remaining
+> non-permuter reading, which is worth knowing before anyone spends attempts
+> re-deriving it.
+>
+> Routing: permuter candidate, and a good one — the residue is 3 words in a
+> 28-word function with the first half already byte-exact, so the search space
+> is small and well isolated. Do NOT escalate this as a toolchain lead.
+
 `self->unk1E4 = &(one of four static 0xC-byte table entries)`, selected by
 `(rate > 0, flag != 0)`, then `self->unk1E0 = table->unk6 * abs(rate)`
 computed retail's way: an unconditional `mult` with the raw (possibly
