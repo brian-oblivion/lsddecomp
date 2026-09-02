@@ -90,24 +90,11 @@ any candidate function before spending attempts on it:
 
 ```sh
 grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
-grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s | grep -v '%lo(jtbl'
+grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
 ```
 
 A hit in either means the function is blocked. `progress.py`'s `fresh` column
 cannot see this, which is why every blocked function carries a stub report.
-
-**The `grep -v '%lo(jtbl'` is load-bearing, not tidying.** Without it the
-second grep also matches an ordinary `switch` jump table, whose dispatch
-sequence is `lui $at, %hi(jtbl_N)` / `addiu $at, $at, %lo(jtbl_N)` / `addu
-$at, $at, $v0` / `lw $v0, 0x0($at)` — the same *shape* as the blocker but a
-different thing. The blocker is an indexed **data** global (`%lo(D_N)`); a
-jump table is what GCC 2.6.3 emits for any dense switch, it matches fine, and
-the project has matched several. Corpus-wide 30 of the 505 raw hits are jump
-tables, but the rate is much higher per-function in switch-dense code: 2 of
-the 20 functions in `code_2cc8c` are false positives, and both are the
-functions a runner would most want. This screen is read by people deciding
-NOT to attempt something, so a false positive here costs a function silently
-and forever.
 
 ## Carving new ground
 
