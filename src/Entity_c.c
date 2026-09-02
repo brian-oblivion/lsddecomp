@@ -54,6 +54,8 @@ INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FC58);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FDFC);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FEC8);
+s32 func_8005FEC8(Entity *this) {
+    return this->methods->slotCC(this, -0x5A, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FEF8);
