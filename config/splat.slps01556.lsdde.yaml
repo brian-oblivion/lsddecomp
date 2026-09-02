@@ -71,7 +71,16 @@ segments:
       - [0xFA4, rodata]   # code_1677c
       - [0xFD8, rodata]   # code_179d8
       - [0x1764, rodata]
-      - [0x1890, rodata]
+      # 0x1890 holds three jump tables. jtbl_80011090 and jtbl_800110D0
+      # belong to code_2cc8c's first 20-function slice (now a C unit), so
+      # that part of the slot must be ATTACHED to it -- a standalone rodata
+      # object cannot see the `.L` labels that live inside the unit's own
+      # objects. jtbl_80011108 (0x1908) belongs to func_8003FB1C, still in
+      # the code_2cc8c_b asm remainder, so the slot is SPLIT rather than
+      # attached whole: attaching all of it would move that table into the
+      # C unit and break its references the other way.
+      - [0x1890, .rodata, code_2cc8c]
+      - [0x1908, rodata]   # jtbl_80011108 -> code_2cc8c_b
       - [0x19DC, rodata]
       - [0x1A90, rodata]
       # jtbl_8001140C -- 10 words, all targets inside func_80049EB4, which
@@ -121,7 +130,14 @@ segments:
       - [0x179d8, asm, code_179d8]
       - [0x272c8, asm, psyq_SpuSetMute]
       - [0x2c054, c, code_2c054]
-      - [0x2cc8c, asm, code_2cc8c]
+      # code_2cc8c is 153 functions. Round 10 carved the first 20-function
+      # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as
+      # code_2cc8c_b. Blocker census at carve time: 4 of 153 functions
+      # (3%) hit the gp_rel / addiu-$at blockers -- the lowest density of
+      # any uncarved segment, which is why this block was picked over the
+      # larger code_179d8 (43% blocked).
+      - [0x2cc8c, c, code_2cc8c]
+      - [0x2D548, asm, code_2cc8c_b]
       - [0x3197c, asm, psyq_memset]
       - [0x39c80, asm, psyq_rand]
 
