@@ -12,6 +12,7 @@
  * docs/PARALLEL-RUNS.md.
  */
 #include "common.h"
+#include "class_3bb8c.h"
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B38C);
 
@@ -19,7 +20,9 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B418);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B44C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B570);
+s32 func_8004B570(Obj866E8 *self) {
+    return self->unk70 = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B57C);
 
