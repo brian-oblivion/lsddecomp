@@ -751,7 +751,17 @@ void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s3
 	entry->day = day;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__FlashbackSaving);
+void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2)
+{
+	PlayerSpawnPoint *pos;
+	s32 local[4];
+
+	if (this->unk_0x4C != NULL && rand() % 3 == 0) {
+		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
+		func_8001E6F8(this, local);
+		this->vt->AddFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
+	}
+}
 
 void DreamSys__ResetFlashbackList(DreamSys *this)
 {

@@ -191,6 +191,15 @@ typedef struct DreamSysUnk4CMethods {
 	void (*slot0xE8)(void *self, void *arg1, PlayerSpawnPoint *arg2);
 	u8 pad_0xEC[0xF0 - 0xEC];
 	void (*slot0xF0)(void *self);
+	u8 pad_0xF4[0x10C - 0xF4];
+	/* Called by DreamSys__FlashbackSaving as (this->unk_0x4C, 0, 0), return
+	   value forwarded straight into DreamSys::AddFlashback's `pos` argument.
+	   Same slot OFFSET and signature as DreamSysEntityMethods::slot0x10C
+	   below (used for the unrelated `entity` parameter in
+	   DreamSys__ProcessChunkChange) -- plausibly the same underlying class,
+	   but kept as a separate local view per this unit's convention for
+	   "multiple local views of the same table" (round 2026-09-02). */
+	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
 } DreamSysUnk4CMethods;
 typedef struct DreamSysUnk4CObj {
 	DreamSysUnk4CMethods *methods;
@@ -694,8 +703,20 @@ struct vtable_DreamSys{
 	void (*LogMood)(DreamSys* this, MoodGraphContributor* layer, MoodGraphPoint* mood);
 	void (*GetMoodAverage)(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *ret);
 	void (*CalcUnlockScore)(DreamSys *this);
-	void *GameManager__AddFlashback;
-	void *GameManager__FlashbackSaving;
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x214): called by
+	   DreamSys__FlashbackSaving (round 2026-09-02) as (this,
+	   this->currentStage, pos, &local, arg1, arg2, this->currentDay) --
+	   exactly DreamSys__AddFlashback's own parameter shape, 3 in registers
+	   and 4 more forwarded on the stack past a3 (o32 ABI). Retyped from the
+	   previous untyped `void *` placeholder; no other caller referenced the
+	   old field name (grep across src/include turned up none), so this is a
+	   plain correction. */
+	void (*AddFlashback)(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles, s32 unknown, s32 time, s32 day);
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x218): this is
+	   DreamSys__FlashbackSaving's OWN slot (round 2026-09-02). Not called
+	   through the vtable by any function in this unit; retyped for
+	   documentation only, matching the function's real signature. */
+	void (*FlashbackSaving)(DreamSys *this, s32 arg1, s32 arg2);
 	void (*ResetFlashbackList)(DreamSys *this);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x220/+0x224).
 	   Typed and matched this round (2026-09-02): a save/restore pair for
