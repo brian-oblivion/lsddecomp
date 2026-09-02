@@ -64,12 +64,12 @@ struct EntityMethods {
     /* +0x15C */ void (*slot15C)(Entity *self);            /* called by func_8005DBF0 */
     /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
     /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C and func_8005DE18 (as slot164(self, 1)) */
-    /* +0x168 */ u8 pad168[0x16C - 0x168];
+    /* +0x168 */ void (*slot168)(Entity *self);               /* called by func_8005DEE0 */
     /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C */
     /* +0x170 */ s32 (*slot170)(Entity *self);                  /* called by func_8005D480 */
     /* +0x174 */ void (*slot174)(Entity *self);                  /* called by func_8005D480 */
     /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by func_8005D480; holds func_8005DE18, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
-    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by func_8005D480 */
+    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by func_8005D480; holds func_8005DEE0, which ends `return this->unkF8;` */
     /* +0x180 */ void (*slot180)(Entity *self);                     /* called by func_8005D480 */
 };
 
@@ -230,7 +230,9 @@ struct EntityMoodRow {
     s8 unk6;            /* +0x06, read by func_8005DE18: sign selects whether func_8001EACC also fires, magnitude (after abs) is func_8005D714's distance arg */
     u8 pad07[0x02];
     s8 unk9;              /* +0x09, distance-fixup byte shared by func_8005DE18/func_8005DEE0/func_8005E0B0 */
-    u8 pad0A[0x06];
+    u8 pad0A[0x01];
+    s8 unkB;                /* +0x0B, read by func_8005DEE0/func_8005E0B0 -- SEPARATE field from unk6, not the same byte reread (different functions, different offsets) */
+    u8 pad0C[0x04];
 };
 
 extern EntityMoodRow D_80089EA4[];

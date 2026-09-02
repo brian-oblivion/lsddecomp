@@ -25,7 +25,26 @@ s32 func_8005DE18(Entity *this) {
     return this->unkF4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005DEE0);
+s32 func_8005DEE0(Entity *this) {
+    EntityMoodRow *row;
+    s32 *xptr;
+    s32 dist;
+
+    if (this->unkF0 != 0 && this->unkF8 == 0 && this->unk44 != 1) {
+        row = &D_80089EA4[this->moodIndex];
+        if (row->unkB != 0) {
+            xptr = &this->unk14->x;
+            dist = row->unkB;
+            if (dist < 0) {
+                dist = ~dist + 1;
+            }
+            if (func_8005D714(this, xptr, dist, row->unk9) != 0) {
+                this->methods->slot168(this);
+            }
+        }
+    }
+    return this->unkF8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005DF9C);
 
