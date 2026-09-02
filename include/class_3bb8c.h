@@ -119,7 +119,7 @@ struct Obj866E8 {
     s32 unk1CC;                    /* +0x1CC, func_8004CFA8 (address-of only, real type unknown) */
     u8 pad1D0[0x1DC - 0x1D0];
     Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
-    u8 pad1E0[0x1E4 - 0x1E0];
+    s32 unk1E0;                    /* +0x1E0, func_8004D028/func_8004D088: a countdown gate */
     void *unk1E4;                  /* +0x1E4, func_8004D0D0: forwarded opaquely to Unk10ChildMethods_3bb8c_b::slot48 */
 };
 
@@ -138,6 +138,15 @@ extern Obj866E8Methods D_800866E8;
  * unit's own C (only from within func_8004D140's still-raw body), so this
  * prototype is documentation, not load-bearing. */
 extern void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item), Elem *item);
+
+/* Still raw asm in this unit (not this round's target): iterates
+ * self->arr, invoking an optional per-element callback (arg2, called
+ * (self, &arr[i]) when non-NULL) and then always forwarding (self, arg1,
+ * &arr[i]) to func_8004D1D0. func_8004D028/func_8004D088 both call it
+ * with arg2 = NULL (no per-element callback), passing a function POINTER
+ * as arg1 instead -- that pointer is consumed further down in
+ * func_8004D1D0, not by this function itself. */
+extern void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item), void (*arg2)(Obj866E8 *self, Elem *item));
 
 /* 3-word (12-byte) data block, address-of only -- passed to
  * Unk10ChildMethods_3bb8c_b::slot48 as an opaque arg2 by func_8004D108.

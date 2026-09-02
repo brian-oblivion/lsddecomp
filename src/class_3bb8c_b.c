@@ -51,7 +51,17 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CFB8);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D028);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D088);
+/* Forward declaration: defined later in this file (after func_8004D088 in
+ * ROM-address order), but passed to func_8004D140 as a function-pointer
+ * argument before its own definition appears. */
+void func_8004D108(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item);
+
+void func_8004D088(Obj866E8 *self) {
+    if (self->unk1E0 != 0) {
+        func_8004D140(self, func_8004D108, 0);
+        self->unk1E0 = 0;
+    }
+}
 
 void func_8004D0D0(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
     item->methods->slot48(item, 0, self->unk1E4);
