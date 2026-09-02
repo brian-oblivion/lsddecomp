@@ -33,8 +33,12 @@ call, not a runner's or the head's.
 
 ## Unit context
 
-`code_171e0` now has **no runner-workable ground left**. Of its 15 remaining
-queued functions, 14 are gp-relative blocked (8 stalled in round 2026-08-29-a
-plus the 6 stubbed this round) and the 15th is `strcat`, stalled at 41/42 on a
-one-instruction residue. Do not staff this unit again until the blocker is
-resolved or a permuter round is run against `strcat`.
+`code_171e0` has **no runner-workable ground left**, and as of round 8 that is
+now unconditional. Of the 15 functions queued when this stub was written, 14
+are gp-relative blocked (8 stalled in round 2026-08-29-a plus the 6 stubbed
+that round). The 15th was `strcat`, stalled at 41/42 — **that one is now
+MATCHED** (round 8, 2026-09-02; the guard returns `dest` rather than `NULL`,
+see `docs/match-reports/strcat.md`). So the permuter recommendation this
+paragraph used to carry has been discharged, and what is left in the unit is
+entirely blocker-bound. Do not staff this unit again until the gp-relative
+blocker is resolved.

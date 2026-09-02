@@ -158,11 +158,26 @@ segments:
       # first `jlabel` is at 0x8004FC78 and its first BIOS trampoline
       # (`jr $t2`) at 0x800508EC, both far past 0x8004D254. So this slice
       # needs no rodata slot attached and no `hasm`/`.word` disposition.
-      # WHOEVER CARVES class_3bb8c_c MUST DECIDE BOTH AT CARVE TIME: the
-      # 48 `jlabel`s need their rodata slot found and attached, and all 13
-      # BIOS stubs live in that remainder.
+      # Both hazards live in the remainder, but NOT at its front -- measured,
+      # not guessed: 80 functions precede the first `jlabel` (0x8004FC78) and
+      # 96 precede the first BIOS trampoline (0x800508EC). So roughly four
+      # more 20-function slices fit before either has to be dealt with. An
+      # earlier version of this comment said the next carve had to settle
+      # both; that was wrong, and acting on it would have meant doing
+      # expensive work four carves early.
       - [0x3CD88, c, class_3bb8c_b]
-      - [0x3DA54, asm, class_3bb8c_c]
+      # class_3bb8c_c: third 20-function slice, 0x3DA54..0x3DF04.
+      # 0x3DF04 (func_8004D704) is a real boundary -- func_8004D6AC closes
+      # with `nop` + `endlabel` and func_8004D704 opens its own frame.
+      # Checked on both sides: no function in the slice has more than one
+      # `addiu $sp, $sp, -N`, and none touches $sp before allocating. The
+      # eight frameless functions in it are leaves that open with `jr $ra`,
+      # a `lui %hi(...)` global fetch, or a load through their own $a0 --
+      # never through the caller's frame.
+      # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
+      # no rodata slot to attach and no hasm/.word disposition here either.
+      - [0x3DA54, c, class_3bb8c_c]
+      - [0x3DF04, asm, class_3bb8c_d]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
