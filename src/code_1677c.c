@@ -204,7 +204,53 @@ void func_80026690(void) {
  * Then queries the DreamSys status slot again (as func_80026410 does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */
-INCLUDE_ASM("asm/nonmatchings/code_1677c", func_80026698);
+/* Builds a StatusObj for this instance's current state, reads one status
+ * code off it, tears it down, and reacts to two of the codes. Then asks the
+ * owned DreamSys a question and reports whether its answer was 1.
+ *
+ * Two things here were long-standing misreadings, both worth keeping written
+ * down (docs/match-reports/func_80026698.md):
+ *
+ *  - `case 3` stores 1, NOT 3. Retail's `li $v0, 0x1` sits in the delay slot
+ *    of the case-3 branch, so it executes before the jump is taken and $v0
+ *    holds 1 -- not the 3 it held for the comparison -- by the time the
+ *    store runs. Reading the store as `unk24 = 3` (the discriminant) was
+ *    what produced the old 53/57 and the "the compiler materialises an
+ *    unused default-arm constant" theory attached to it. There is no unused
+ *    constant: `li $v0, 0x1` is the value being stored, hoisted into a delay
+ *    slot on the only path that needs it.
+ *  - `result = (check == 1)` is the whole comparison. GCC 2.6.3 lowers an
+ *    equality test against a small constant to `xori` + `sltiu`, which reads
+ *    back out of the disassembly as `(u32)(check ^ 1) < 1`. That transcription
+ *    is arithmetically right and cost two instructions; the plain `== 1` is
+ *    what the source said. */
+s32 func_80026698(Class6D3C8 *self) {
+    s32 status;
+    StatusObj *obj;
+    s32 outVal;
+    s32 check;
+    s32 result;
+
+    obj = func_80049608(self->unk1C, self->dreamSys, self->arg->unk04);
+    status = obj->methods->slot44(obj);
+    obj->methods->slot4(obj);
+
+    switch (status) {
+    case 2:
+        func_8002677C(self);
+        break;
+    case 3:
+        self->unk24 = 1;
+        break;
+    }
+
+    check = self->dreamSys->vt->func_8005A2E4(self->dreamSys, &outVal);
+    result = 0;
+    if (outVal != 0) {
+        result = (check == 1);
+    }
+    return result;
+}
 
 /* Reads DreamSys's current cinematic slot, resolves it to a channel index
  * (func_80049334); if that fails (-1), starts a LoaderTask on the fixed
