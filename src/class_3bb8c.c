@@ -68,7 +68,20 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BD14);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BE54);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C0AC);
+void func_8004C0AC(Obj866E8 *self, Elem *entry) {
+    EntryChildObj **p;
+    EntryChildObj **end;
+
+    if (entry->unk4->unk30 >= 0) {
+        entry->unk4->methods->slot7C(entry->unk4, entry);
+        end = entry->unk10 + 0x19A;
+        for (p = entry->unk10; p < end; p++) {
+            (*p)->unk10 |= 0x80000000;
+            (*p)->unk20 = 0;
+            (*p)->unk18 = 0;
+        }
+    }
+}
 
 Descriptor10 *func_8004C158(Obj866E8 *self, s32 arg1, void **out) {
     void *v1;
