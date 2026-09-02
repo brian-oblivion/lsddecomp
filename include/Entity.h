@@ -245,6 +245,11 @@ s32 Entity__GetEventVideo(Entity *this);
 s32 Entity__GetUnlockEffect(Entity *this);
 s32 Entity__GetLinkStage(Entity *this);
 
+/* The vtable data slot Get_vtable_Entity returns the address of. Still a raw
+ * asm data blob (asm/data/79528.data.s, offsets 0x000..0x180) -- only an
+ * extern of the right TYPE is needed here, the bytes stay splat-generated. */
+extern EntityMethods D_80089AD4;
+
 /* Still uncarved (code_d294.s). func_8005DE18 calls it with this->unk94 as
  * the second argument, a literal 1 as the third, and 0 for both the fourth
  * argument and a fifth argument passed on the stack; the callee itself

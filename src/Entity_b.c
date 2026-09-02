@@ -52,7 +52,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E02C);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E0B0);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", Get_vtable_Entity);
+EntityMethods *Get_vtable_Entity(void) {
+    return &D_80089AD4;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E160);
 
