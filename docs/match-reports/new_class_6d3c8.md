@@ -1,175 +1,98 @@
 # new_class_6d3c8
 
-**Unit:** code_1677c · **Size:** 24 words (0x60 bytes) · **Status:** STALLED 23/24
+**Unit:** code_1677c · **Size:** 24 words (0x60 bytes) ·
+**Status: MATCHED 24/24**, whole-image SHA1 green. Closed by the head in
+round 8 (2026-09-02) with the project's first permuter run.
 
-## What it does
+> **This report is kept in full, including three rounds of negative results
+> that are now superseded.** They are what made the permuter case, and the
+> class of residue they map out is real; only the conclusion "no source-level
+> lever exists" was wrong. Read the RESOLUTION section first — everything below
+> it under "Derivation", "Residue" and "Round-3 follow-up" is the state of
+> knowledge BEFORE the fix, preserved deliberately.
 
-The `New_X` allocator for the class whose method table is `D_8006D3C8`
-(resolved with `tools/classtable.py 0x8006D3C8 --vs 0x8006B58C`): allocates
-a 0x2C-byte instance via `func_80017B34` (the game's allocator, elsewhere
-inside `code_8220.s`), and on success calls the class's constructor —
-slot `+0x008` of its own method table, `func_80025FDC` — through the table
-fetched from `func_800269E0()`. Returns the allocated pointer regardless of
-whether the constructor ran (matches the `New_DreamSys` shape documented in
-`docs/research/class-framework.md`).
-
-`func_800269E0` is a plain accessor with **no parameters** — confirmed from
-its own disassembly (`asm/nonmatchings/code_171e0/func_800269E0.s`, owned by
-another unit): it never reads `$a0`, just returns `&D_8006D3C8`. The call
-site doesn't set up `$a0` before calling it either — `$a0` is only prepared
-*after* the call returns, for the subsequent `jalr`. This is the same shape
-as the `Get_vtable_DreamSys()` example in class-framework.md.
-
-## Derivation
-
-```
-addiu $sp, $sp, -0x20
-sw    $s1, 0x14($sp)
-addu  $s1, $a0, $zero      ; s1 = arg
-ori   $a0, $zero, 0x2C
-sw    $ra, 0x18($sp)
-jal   func_80017B34         ; malloc(0x2C)
- sw   $s0, 0x10($sp)
-addu  $s0, $v0, $zero        ; s0 = self
-beqz  $s0, .L80025FC4
- nop                          ; <-- RETAIL: nop.  MINE: "move v0,s0" (residue)
-jal   func_800269E0()         ; note: no args set up for this call
- nop
-addu  $a0, $s0, $zero          ; a0 = self, for the NEXT call
-lw    $v0, 0x8($v0)             ; ctor slot
-nop
-jalr  $v0
- addu $a1, $s1, $zero            ; a1 = arg
-addu  $v0, $s0, $zero             ; v0 = self (ctor's return value is discarded)
-.L80025FC4:
-...
-jr    $ra
-```
-
-Written as:
+## RESOLUTION — the matching form
 
 ```c
-Class6D3C8 *new_class_6d3c8(void *arg) {
+Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
     Class6D3C8 *self = func_80017B34(0x2C);
 
-    if (self != 0)
-        func_800269E0()->ctor(self, arg);
-    return self;
+    if (self != 0) {
+        ((Class6D3C8Methods *)func_800269E0())->ctor(self, arg);
+        return self;
+    }
 }
 ```
 
-This reproduces every instruction **except one**: retail leaves the `beqz`
-delay slot as `nop`; every C shape I tried compiles it to `move $v0, $s0`
-instead — a byte-identical-value but extra/duplicate copy of the same
-computation retail performs anyway at the merge point (0x167c0, right after
-the `jalr`). 23 of 24 words match; the one miss is purely a delay-slot
-filler choice, never a register-identity change.
+**The `return` moves INSIDE the `if`, and the null path falls off the end of
+a non-void function.** That is the whole fix, and it is why every reshaping
+attempt in the three rounds below failed: they all kept a `return` on the
+null path, and *any* `return` there costs the instruction. `func_80017B34`
+already left the null in `$v0`, so the original source never had to restate
+it — which is exactly why retail's `beqz` delay slot is a bare `nop`.
 
-## Residue
+The residue was never a delay-slot *filler* problem. It was a redundant
+value materialisation: our C asked for a value retail's C never asked for.
+The delay slot was only where the compiler happened to put it.
 
-**Class: instruction order / delay-slot filler duplication — not a register
-mismatch.** Confirmed via `tools/asm-differ/diff.py new_class_6d3c8`: the
-only diff line is `nop` (target) vs `move v0,s0` (mine) at the branch's
-delay slot; every other instruction, including the *real* `move v0,s0` at
-0x167c0, matches exactly.
+**Measured against retail, every neighbouring spelling** (harness: the pinned
+pipeline into `mipsel-linux-gnu-objdump`, instruction-text diff against the
+assembled retail `.s`):
 
-None of the following changed the result (all still 23/24, or made it worse
-by duplicating the epilogue):
+| source form | diff |
+| --- | --- |
+| `if (p != 0) { ctor(); return p; }` — no return on the null path | **0** |
+| `if (p == 0) return 0;` then body, `return p` | 4 (27 insns: second epilogue) |
+| `if (p == 0) return p;` then body, `return p` | 4 |
+| `if (p != 0) ctor(); return p;` (the old 23/24) | 2 |
+| `if (p != 0) { ctor(); return p; } return 0;` | 2 |
+| `if (p != 0) { ctor(); return p; } return p;` | 2 |
 
-- `if (self != NULL) { ... } return self;` in every spelling I tried
-  (`!= NULL`, `!= 0`, `if (self)`, braces vs no braces, `self` vs `void *`
-  vs `Class6D3C8 *` typed, ctor field typed to return `void` vs
-  `Class6D3C8 *`, discarding vs. assigning the ctor's return, a separate
-  `vtable` temporary at function scope or block scope).
-- `goto done; ... done: return self;` — control-flow-equivalent to the
-  above, same result (confirms this isn't about early-return vs.
-  fall-through; it's the same after GCC's jump optimization).
-- An early `return self;` / `return NULL;` inside the `if` — this does NOT
-  reproduce a single shared epilogue the way retail's does; GCC 2.6.3
-  emitted a **second, separate** epilogue instead (function grew from 24 to
-  30+ words, diff went to 14/24 with a "differs outside range" warning).
-  So retail's single-epilogue shape is confirmed correct; the extra
-  instruction is not compensating for a missing merge.
-- A bare `__asm__("")` and a stronger `__asm__ volatile ("" ::: "memory")`
-  placed immediately after the malloc call, and again as the first
-  statement inside the `if` body — **no effect on this particular
-  instruction**, in either position.
+Only the fall-through form reaches zero. GCC 2.6.3 warns *"control reaches
+end of non-void function"* on it; the warning is correct about the C, and the
+bytes are what say the original source had it anyway. **Do not "fix" the
+warning** — doing so un-matches the function.
 
-**Root-cause hypothesis** (read against GCC's `reorg.c`, from a same-vintage
-old-GCC tree — `southpark-decomp/tools/build-gcc-pm-sp/gcc-papermario/
-reorg.c` — the actual `gcc-2.6.3-psx` source isn't vendored in this repo,
-so this is informed inference, not a confirmed read of the exact compiler):
-this is `fill_eager_delay_slots`, not ordinary instruction scheduling, which
-is why an `asm("")` blockage (meant for the ordinary scheduler) doesn't
-touch it. Its static branch predictor treats an `EQ`-against-zero condition
-(`mostly_true_jump`, the `case EQ: return 0;` arm) as "probably not taken",
-which routes it to try stealing delay-slot filler material from the
-**fallthrough** thread first (`fill_slots_from_thread` with
-`own_fallthrough`). Walking that thread, `s0` (self) is callee-saved and
-untouched by the intervening calls, so `move v0,s0` — the same instruction
-retail keeps once, at the true merge point — is a legal, side-effect-free
-steal, and it duplicates rather than moves because the merge point still
-needs its own copy on the branch-not-taken path... except retail's own
-branch-not-taken path is exactly this same fallthrough-owned block, so by
-this reasoning retail should hit the identical steal. It doesn't, which
-means either `redundant_insn` (same file) found this exact copy *already
-implied* before the branch in retail's RTL and skipped re-emitting it, or
-some earlier optimizer pass (constant/copy propagation ahead of `reorg.c`)
-shaped retail's RTL slightly differently in a way that isn't visible in the
-final assembly for any instruction except this one. I could not find a
-source-level lever that reliably suppresses or reproduces that shaping in
-14+ real build-and-diff attempts.
+### How it was found, and what that cost
 
-## Preserved body
+`tools/decomp-permuter` had never been run on this project (MATCHING-GUIDE
+said "Not yet set up"). The head set it up this round against this exact
+function — the target MATCHING-GUIDE had already nominated — and it reached
+score 0 at **iteration 47**, in well under a minute of search. Three rounds
+of careful manual reshaping, 20+ recorded attempts, and a root-cause
+hypothesis read against GCC's `reorg.c` had not found it.
 
-```c
-#if 0
-typedef struct Class6D3C8 Class6D3C8;
+The transferable lesson is not about `reorg.c`. It is that **a residue
+described as "the compiler chose a different delay-slot filler" can actually
+be "our source computes one more value than the original did"** — and those
+two look identical in a diff, because the surplus value has to go *somewhere*
+and a free delay slot is where the scheduler puts it. The hypothesis below
+was mechanically detailed and confidently argued, and it pointed away from
+the fix.
 
-typedef struct Class6D3C8Methods {
-    s32 header;
-    void *unk04;
-    Class6D3C8 *(*ctor)(Class6D3C8 *self, void *arg);       /* +0x008 func_80025FDC */
-    void *unk0C;                                            /* +0x00C func_8003B024 */
-    /* ... see include/Class6D3C8.h for the rest, already committed. */
-} Class6D3C8Methods;
+See the `### Proposed learning
 
-struct Class6D3C8 {
-    Class6D3C8Methods *methods;
-    u8 unk04[0x1C];
-    void *arg;
-    s32 unk24;
-    void *dreamSys;
-};
+**Superseded by the RESOLUTION above — the permuter run it asked for was made
+this round and it closed the function.** The prediction that one source shape
+would close the whole class was correct; the shape is `return` inside the
+conditional with no return on the other path.
 
-extern Class6D3C8 *func_80017B34(s32 size);
-extern Class6D3C8Methods *func_800269E0(void);
+The durable generalisation, promoted to DECOMPILATION_LEARNINGS.md:
 
-Class6D3C8 *new_class_6d3c8(void *arg) {
-    Class6D3C8 *self = func_80017B34(0x2C);
-
-    if (self != 0)
-        func_800269E0()->ctor(self, arg);
-    return self;
-}
-#endif
-```
-
-(`include/Class6D3C8.h`, already committed and used by other stalls in this
-unit, has the full struct — only the `ctor` slot is typed concretely so far.)
-
-## Proposed learning
-
-`New_X` allocator wrappers (`malloc` → null check → call ctor through the
-class's own method-table slot `+0x008` → return the allocation regardless of
-the ctor's own return value) are likely to recur across most/all of this
-game's ~60 classes, per class-framework.md. This exact shape hit a **single
-delay-slot residue that no amount of `if`/`goto`/temp-variable restructuring
-or `__asm__("")` barrier fixed** — worth trying a permuter pass (once set up)
-on the very first `New_X` that reaches this point, rather than re-deriving
-the same 20+ manual attempts per class. If a permuter run ever finds a
-source shape that closes this, promote it here immediately; it would
-unblock every other `New_X` wrapper in the game at once.
+1. **A single redundant `move $v0, <reg>` — in a branch delay slot or just
+   before the epilogue — where retail has `nop` or nothing means the source
+   restates a return value the original never restated.** The value is
+   already in `$v0` from a preceding call. Do not reshape control flow;
+   remove the restatement, which usually means moving the `return` inside the
+   conditional and letting the other path fall off the end of a non-void
+   function.
+2. **"Different delay-slot filler" and "one surplus value" are
+   indistinguishable in a diff**, because a surplus value lands in whatever
+   slot is free. Prefer the surplus-value reading first: it has a source-level
+   fix, and the scheduling reading does not.
+3. `New_X` allocator wrappers (malloc → null check → ctor through slot
+   `+0x008` → return the allocation) recur across this game's ~60 classes.
+   This form is now the one to write FIRST for every one of them.
 
 ## Round-3 follow-up (head-directed, 5-attempt budget, all negative)
 

@@ -1,7 +1,28 @@
 #include "common.h"
 #include "Class6D3C8.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_1677c", new_class_6d3c8);
+/* The `New_X` allocator for the class whose method table is D_8006D3C8:
+ * allocates a 0x2C-byte instance and, on success, runs the class's own
+ * constructor through slot +0x008 of the table func_800269E0() returns.
+ *
+ * The null path deliberately falls off the end rather than returning a
+ * value. That is not an oversight in the transcription -- it is what
+ * retail does, and it is the ONLY form that matches. `func_80017B34`
+ * already left the null in $v0, so the original source never had to
+ * restate it; every spelling that returns explicitly on that path
+ * (`return 0`, `return self`, an early return, a goto to a shared exit)
+ * costs an extra instruction that retail does not have. GCC 2.6.3 warns
+ * "control reaches end of non-void function" here, and the warning is
+ * correct about the C -- the bytes are what say the original had it too.
+ * See docs/match-reports/new_class_6d3c8.md for the full derivation. */
+Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
+    Class6D3C8 *self = func_80017B34(0x2C);
+
+    if (self != 0) {
+        ((Class6D3C8Methods *)func_800269E0())->ctor(self, arg);
+        return self;
+    }
+}
 
 /* Constructs a Class6D3C8 instance: runs the intermediate base class's own
  * constructor (through its ctor slot), installs this class's own vtable,
