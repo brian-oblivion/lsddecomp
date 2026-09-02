@@ -289,7 +289,10 @@ struct Obj866E8 {
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
     Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
-    u8 pad74[0xBC - 0x74];
+    u8 pad74[0x78 - 0x74];
+    s16 unk78;                     /* +0x078, func_8004C620 (halfword, doubled into an index) */
+    s16 unk7A;                     /* +0x07A, func_8004C620 (halfword, passed on as an arg) */
+    u8 pad7C[0xBC - 0x7C];
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
     Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/func_8004C588/func_8004C5D0/func_8004BD14/func_8004D1D0 */

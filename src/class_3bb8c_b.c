@@ -34,7 +34,30 @@ s32 func_8004C5D0(Obj866E8 *self, s32 key) {
     return -1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C620);
+/* Forward declarations: all three are defined later in this file (in ROM
+ * order, after func_8004C620), but func_8004C620 calls them before their
+ * own definitions appear. Signatures are typed from the registers loaded
+ * at each call site, per this unit's established convention for calling a
+ * same-unit function whose body is still INCLUDE_ASM. */
+extern void func_8004CE24(Obj866E8 *self, s32 arg1);
+extern void func_8004CC74(Obj866E8 *self);
+extern void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2);
+
+void func_8004C620(Obj866E8 *self) {
+    s32 idx;
+
+    if (self->unk1B8 == 0) {
+        return;
+    }
+    idx = self->unk78 * 2;
+    func_8004CE24(self, 0);
+    if (self->unk68->unk4 == 0) {
+        func_8004C6A8(self, idx, self->unk7A);
+    } else {
+        func_8004CC74(self);
+    }
+    func_8004CE24(self, 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
 
@@ -95,7 +118,18 @@ void func_8004D108(Obj866E8 *self, EntryChildObj *item) {
     item->methods->slot48(item, 1, D_800869CC);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D140);
+void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item)) {
+    s32 i;
+    Elem *e;
+
+    for (i = 0; i < 7; i++) {
+        e = &self->arr[i];
+        if (arg2 != 0) {
+            arg2(self, e);
+        }
+        func_8004D1D0(self, arg1, e);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D1D0);
 
