@@ -48,6 +48,12 @@ tools/maspsx
 tools/decomp-permuter
 tools/gcc263
 permuter-work
+# `permuter.py --debug` writes these into the CURRENT directory, not into the
+# permuter dir. MATCHING-GUIDE now tells everyone to run --debug first (a
+# scaffold whose base score does not match the match report is scoring the
+# wrong thing), so they will keep reappearing in the repo root.
+debug_source.c
+debug_compiled_object.o
 
 __pycache__/
 *.pyc
