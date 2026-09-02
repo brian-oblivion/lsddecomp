@@ -32,6 +32,47 @@ typedef struct Unk78Obj Unk78Obj;
 typedef struct Unk78ObjMethods Unk78ObjMethods;
 
 /*
+ * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
+ * framework): a note on how much to trust `Unk48Obj`/`Unk4CObj`/`Unk78Obj`
+ * below, since all three are minimal placeholder types and it matters
+ * which part of that is "confirmed small" vs. "not yet looked at".
+ *
+ * - **The `padNNN[K]` byte ranges in all three are UNOBSERVED, not
+ *   confirmed-unused.** Nothing in this unit's 16 matched + 4 stalled
+ *   functions ever reads or writes those bytes -- that is the entire
+ *   basis for calling them padding. It is NOT evidence those bytes are
+ *   inert; per this project's class-framework shape (CLAUDE.md, "Writing
+ *   a class method"), every one of these three is almost certainly a full
+ *   object with its own real fields beyond offset 0, this unit's
+ *   functions simply never touch them. Treat every `padNNN` here as "ends
+ *   here only because our evidence ends here", and extend/narrow it the
+ *   moment a function in `code_2cc8c_b` (or any other unit) reads inside
+ *   one of these ranges.
+ * - **Offset 0 being a method-table pointer IS confirmed for two of the
+ *   three** (`Unk48Obj`, `Unk78Obj`) -- each is dereferenced through the
+ *   `lw self,0; lw slot,N(methods); jalr` idiom at least once, which is
+ *   real evidence, not a framework assumption.
+ * - **`Unk4CObj` is different in kind: nothing in this unit ever loads
+ *   `*(unk4C+0)` at all.** Every access goes through named fields at
+ *   +0x008/+0x00C/+0x010/+0x024 directly; the struct is never
+ *   dereferenced through a "methods" pointer anywhere in this unit's
+ *   functions. Do not assume `Unk4CObj` starts with a method-table
+ *   pointer the way the other two do just because this codebase is
+ *   class-framework-heavy -- it may be a plain data record instead (a
+ *   "target descriptor", by its usage). `pad000[0x008]` here is
+ *   genuinely unknown, unlike the padding at the START of `Unk48Obj`/
+ *   `Unk78Obj`, which at least is known to be `(methods, then K unread
+ *   bytes)`.
+ * - **None of the three has a known SIZE.** Each struct below is only as
+ *   large as its highest observed field plus that field's own size --
+ *   `Unk48Obj` could plausibly be anywhere from 0x084 bytes (just past
+ *   `slot80`) to much larger; `Unk4CObj` is at least 0x028 bytes (past
+ *   `unk24`) with no upper bound; `Unk78Obj` is at least 0x0BC bytes. If a
+ *   future unit's allocator call reveals a literal byte count for any of
+ *   these three classes, record it here.
+ */
+
+/*
  * self->unk4C's pointee ("target"). Established from six independent
  * functions all agreeing:
  *  - func_8003C7F4/func_8003C858/func_8003C8D0/func_8003C944/func_8003C9B0
