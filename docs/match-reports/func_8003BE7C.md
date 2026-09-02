@@ -1,25 +1,32 @@
 # func_8003BE7C
 
-**Unit:** code_2c054 · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
+**Unit:** code_2c054 · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
-One-line field setter: `self->unkD4 = a1`.
+Plain setter: `self->unkD4 = value;`. Fifth (last) of the run of five
+described in `func_8003BE5C`'s report (same class, table slot `+0x134`); see
+that report for the shared context.
 
-## The C
+## Derivation
+
+```
+jr   $ra
+ sw  $a1, 0xD4($a0)
+```
 
 ```c
-void func_8003BE7C(StreamTask *self, s32 a1) {
+void func_8003BE7C(StreamTaskObj *self, s32 a1) {
     self->unkD4 = a1;
 }
 ```
 
-## How it was found
+Matched first attempt.
 
-Same shape as func_8003BE5C, four fields over (`classtable.py` slot
-`+0x134`, the last slot in D_8006E5F8's 77-slot table). See
-func_8003BE5C.md for the shared context.
+## New struct/header knowledge
 
-## Provenance
+See `func_8003BE5C`'s report — same header, `include/code_2c054.h`.
 
-round 2026-09-01, runner alpha, unit code_2c054 (unit's first pass).
+## Proposed learning
+
+None beyond `func_8003BE5C`'s.

@@ -37,49 +37,82 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    it only changes instruction ORDER, it is allowed. A register-identity
    mismatch is a STALL — write the report.
 
-## Current state
+## Where the project is
 
-Run `python3 tools/progress.py` for live numbers; the figures below go stale.
+**Measure it, do not read it here.** Counts, percentages and per-unit queues
+change every round, so this file deliberately quotes none of them:
 
-- **2080 functions** in the executable: **1356 game code**, **724 Psy-Q SDK
-  library**. The library split is derived from the splat config, not
-  hardcoded — any subsegment named `psyq_*` counts as library everywhere.
-- **154 matched** (11.36% of game code), as of round 2026-09-01. Nine of those
-  splat generated itself (bodies that are just `jr $ra; nop`); the rest are real.
-- **102 queued** across **eight carved units**, **1100 uncarved** still inside
-  monolithic `asm` segments. A unit has exactly one owner, so eight units is the
-  ceiling on parallel runners — but after round 2026-09-01 only **ONE unit has
-  fresh ground left** (`DreamSys`, 27 functions, all 35+ instructions). Three
-  units are dry (`Entity`, `code_55dd4`, and effectively `code_1677c`) and four
-  are entirely toolchain-blocked. **The next round must CARVE — one unit cannot
-  support multiple runners.**
-- **TWO toolchain blockers are open, and together they account for 75 of the
-  102 queued.** Both are escalated with reproducers and corpus censuses, both
-  are the operator's call, and neither is something to experiment with:
-  `docs/research/gp-relative-blocker.md` (the `-G` experiment was run with
-  authorisation and REJECTED) and `docs/research/addiu-at-blocker.md` (not
-  tested; the obvious version bump is not the remedy — and round 2026-09-01
-  attached a corpus census showing the `nop_mflo_mfhi` flag inside it is the
-  right MECHANISM at the wrong GRANULARITY, which sharpens the blocker without
-  resolving it). Screen any candidate function before spending attempts on it:
+```sh
+python3 tools/progress.py
+```
 
-  ```sh
-  grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
-  grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
-  ```
+**No number about project state belongs in this file.** A count written here is
+correct for one round and quietly wrong for every round after, and the reader
+cannot tell which they are in. Worse than the numbers are the *conclusions*
+drawn from them — "the next round must carve", "only one unit has fresh
+ground", a list of the biggest uncarved blocks. Those read as standing
+instructions, so a stale one sends a whole round to redo finished work or to
+carve a segment that no longer exists under that name. If you catch yourself
+adding a figure below, put it in `docs/PROGRESS.md` (a dated log, where being a
+snapshot is the point) or derive it from a command.
 
-  A hit in either means the function is blocked. `progress.py`'s `fresh` column
-  cannot see this, which is why every blocked function carries a stub report.
-- The build verifies. A clean `./build-and-verify.sh` takes under a second,
-  which is what makes many parallel runners cheap here.
+How to read `progress.py` correctly:
 
-The biggest uncarved blocks, for the next carve (Gate 2 in
-docs/PARALLEL-RUNS.md): `class_39e08` (415 functions), `code_179d8` (274),
-`code_2c054` (181), `Entity_b` (117). Do NOT budget time for under-split
-hunting — it was predicted here, measured, and does not happen (894 of 894
-table-dispatched entry points already have symbols). Do budget for the two
-carve failures that ARE routine: an orphaned rodata jump-table slot, and a
-segment whose tail is data. Both are documented in Gate 2.
+- **The library split is derived, not hardcoded.** Any subsegment named
+  `psyq_*` in the splat config counts as Psy-Q SDK everywhere, and is excluded
+  from the game-code percentage.
+- **Not every matched function was work.** Some bodies are just `jr $ra; nop`
+  and splat generated them itself.
+- **The `fresh` column cannot see toolchain blockers** — screen candidates
+  yourself, below.
+- **A unit has exactly one owner**, so the number of carved units is the
+  ceiling on parallel runners. The `unit` table is therefore the staffing plan:
+  if only one unit has `fresh` left, the next round has to carve before it can
+  run more than one runner.
+
+The build verifies, and a clean `./build-and-verify.sh` takes under a second —
+which is what makes many parallel runners cheap here.
+
+## Open toolchain blockers
+
+Two are open. Both are escalated with reproducers and corpus censuses, both are
+the operator's call, and neither is something to experiment with:
+
+- `docs/research/gp-relative-blocker.md` — the `-G` experiment was run with
+  authorisation and REJECTED.
+- `docs/research/addiu-at-blocker.md` — not tested; the obvious version bump is
+  not the remedy. A corpus census attached to it shows the `nop_mflo_mfhi` flag
+  inside it is the right MECHANISM at the wrong GRANULARITY, which sharpens the
+  blocker without resolving it.
+
+Between them they account for a large fraction of everything queued, so screen
+any candidate function before spending attempts on it:
+
+```sh
+grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
+grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+```
+
+A hit in either means the function is blocked. `progress.py`'s `fresh` column
+cannot see this, which is why every blocked function carries a stub report.
+
+## Carving new ground
+
+Uncarved code sits in monolithic top-level `asm/*.s` segments. List them
+biggest-first — the names change as carving proceeds, so derive them rather
+than trusting any list:
+
+```sh
+for f in asm/*.s; do b=$(basename "$f" .s); case "$b" in psyq_*|header) continue;; esac
+    printf '%6d %s\n' "$(grep -c '^glabel' "$f")" "$b"; done | sort -rn
+```
+
+Carving a unit out of one of those is Gate 2 in `docs/PARALLEL-RUNS.md`. Do NOT
+budget time for under-split hunting — it was predicted, measured, and does not
+happen (894 of 894 table-dispatched entry points already have symbols). Do
+budget for the two carve failures that ARE routine: an orphaned rodata
+jump-table slot, and a segment whose tail is data. Both are documented in
+Gate 2.
 
 ## Key technical facts (derived from the binary)
 
@@ -257,8 +290,8 @@ tools/setup-worktree.sh <name>     # provision a parallel runner
 
 - `docs/PARALLEL-RUNS.md` — running several matching sessions at once under a
   head agent. **Read this before spawning anything.**
-- `docs/MATCHING-GUIDE.md` — the per-function loop in detail, plus the
-  per-unit state list.
+- `docs/MATCHING-GUIDE.md` — the per-function loop in detail, and how to read
+  a unit's real state instead of a transcribed one.
 - `docs/DECOMPILATION_LEARNINGS.md` — source-shape idioms and open questions.
 - `docs/PROGRESS.md` — the running session log.
 - `CREDITS.md` — this project stands on FirecatFG's lsddecomp for its

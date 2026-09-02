@@ -1,41 +1,51 @@
 # func_8003B9DC
 
-**Unit:** code_2c054 · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
+**Unit:** code_2c054 · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
-StreamTask's dtor override (method-table slot `+0x00C`). Ticks the
-sub-object referenced from `self->unkB4` (a class instance of its own,
-method table at its own offset 0; only its slot `+0x004`, a self-only
-call, is dispatched here), then chains into the base task class's own
-dtor via `func_8003DFBC()->dtor(self)` -- the same "ownDtorChain" shape
-already documented in `include/code_171e0.h` (`func_800269F0`).
+Two dispatches in a row, both discarding/forwarding through `self`, no other
+side effect. First, a genuine virtual call through `self->unkB4`'s own
+1-slot vtable (a small object type distinct from `StreamTaskObj`, discovered
+here for the first time in this unit); second, the same
+`func_8003DFBC()`-mediated delegation to the sibling class `D_8006E730`
+(`LoaderTaskMethods`) used by `func_8003BD74`/`func_8003BDAC`, this time
+slot `+0x00C`. Occupies `D_8006E5F8` slot `+0x00C` itself.
 
-## The C
+## Derivation
+
+```
+lw   $a0, 0xB4($s0)          ; a0 = self->unkB4
+lw   $v0, 0x0($a0)            ; v0 = a0->methods
+lw   $v0, 0x4($v0)             ; v0 = methods->slot04
+jalr $v0                          ; a0 (still the sub-object) unchanged
+jal  func_8003DFBC
+lw   $v0, 0xC($v0)                ; v0 = table->slot0C
+jalr $v0
+ addu $a0, $s0, zero               ; a0 = self, explicitly reloaded
+...epilogue
+```
 
 ```c
-void *func_8003B9DC(StreamTask *self) {
-    self->unkB4->methods->slot4(self->unkB4);
-    return func_8003DFBC()->dtor(self);
+void func_8003B9DC(StreamTaskObj *self) {
+    self->unkB4->methods->slot04(self->unkB4);
+    func_8003DFBC()->slot0C(self);
 }
 ```
 
-## How it was found
+Matched first attempt. The first call's argument register (`$a0`) is never
+reloaded between the two loads and the `jalr` -- confirming the call target
+is `self->unkB4` itself (a virtual self-call on the sub-object), not `self`.
 
-Raw disassembly: `lw $a0, 0xB4($s0)` then two `lw`s to resolve
-`a0->methods->slot4` and a `jalr` with `a0` (the sub-object) still
-current, followed by `jal func_8003DFBC` (whose own argument is ignored),
-`lw $v0, 0xC($v0)` and a final `jalr $v0` with `$a0` explicitly reset to
-`self`. `classtable.py D_8006E5F8` places this function at slot `+0x00C`
-(the dtor slot, by the class-framework convention documented in
-CLAUDE.md); `classtable.py D_8006E730` shows the base class's own dtor at
-the same offset is `func_8003C008`.
+## New struct/header knowledge
 
-**Return type is a guess, not evidence.** `void *` was chosen to match
-BasicClass's own dtor convention (`void *(*dtor)(void *self)`, per
-`include/code_171e0.h`'s `BasicClassMethods171e0`), not because this
-function's own disassembly or callers confirm it.
+Added `include/code_2c054.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
+(a new, previously-unseen 1-slot-vtable object reached through
+`StreamTaskObj::unkB4`, `+0x0B4`) and `TaskCoreMethods::slot0C` (this unit's
+local view of `D_8006E730`, see `func_8003BD74`'s report).
 
-## Provenance
+## Proposed learning
 
-round 2026-09-01, runner alpha, unit code_2c054 (unit's first pass).
+Same open return-type question as `func_8003BD74`/`func_8003BDAC` for the
+tail call through `slot0C` -- typed `void` on the same sibling-slot-
+convention basis, unconfirmed by any found caller.

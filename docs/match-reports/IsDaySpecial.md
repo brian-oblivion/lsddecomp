@@ -139,3 +139,20 @@ raw `cpp | cc1` stream shows what the compiler actually decided — separately
 from what the assembler then does to it. A residue that is present after
 maspsx and absent in cc1's output is a toolchain question and no amount of
 source reshaping will close it.
+
+## A second, independent account exists
+
+This function was worked twice, on two machines, from the same base commit
+(`0a544ff`) — the two rounds overlapped without knowing it. The other
+machine's runner reached the same C, including the same `(u32)i` cast on the
+comparison, and stopped at 18/52 with the two `nop`s unexplained.
+
+That account is preserved in git history at `cc4208e`
+(`docs/match-reports/IsDaySpecial.md` on that commit). It has its own attempt
+log, which differs from echo's. Nothing in it contradicts this report; it
+simply stops one step earlier, before the `nop`s were traced to
+`nop_mflo_mfhi` rather than to GCC's scheduler.
+
+Worth noting for its own sake: **two independent runners converged on the
+`(u32)i` comparison cast.** That is the strongest evidence available that the
+cast is the right reading and not an artifact of one session's search order.

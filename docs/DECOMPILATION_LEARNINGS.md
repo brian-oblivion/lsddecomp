@@ -318,6 +318,183 @@ through it. Only the load is exposed.
   explicit `i = 0;` statement between two pointer initialisations rather than a
   `for`'s implicit initializer. (`func_80066340`)
 
+**From round 2026-09-02 (5 runners: DreamSys, Entity_b, class_39e08, class_3ac78,
+code_2c054).**
+
+- **A dedicated local pins an address-of expression's SCHEDULING.** Assigning
+  `&this->unk14->x` to its own local, in the statement position retail computes
+  it, pins GCC's placement. Written inline as a call argument, the compiler
+  defers it arbitrarily. (`func_8005DE18`)
+- **An over-narrow parameter type forces a spurious sign-extend at the CALL
+  SITE.** `func_8005D714`'s `arg2`/`arg3` were modelled `s8` because every known
+  caller happens to pass a byte-range value. The callee's own body treats them
+  as full words with no narrowing on entry, and the `s8` declaration cost an
+  extra sign-extend at any call site whose argument was an already-computed
+  `s32`. **Read the callee's body for the width it actually uses, not the
+  callers for the width they happen to pass.** Retyped with no regression to the
+  existing matched caller. (found via `func_8005DE18`'s residue)
+- **A `void`-typed vtable slot that fails to compile against a
+  `return callee(...)` wrapper is itself evidence the slot typing is wrong.** A
+  free signal — the compile error arrives before any attempt budget is spent.
+- **MIPS o32 fills argument registers strictly left to right.** So a vtable call
+  that sets `$a2`/`$a3` to literals while leaving `$a1` untouched PROVES `$a1`
+  carries a real forwarded parameter; there is no "skip a register" call shape.
+  (`class_3ac78`)
+- **The converse does NOT hold.** A `jalr` with a plain `nop` delay slot and no
+  argument setup is not proof of a zero- or one-argument call. Check the
+  callee's own body, or another caller, for its true arity before treating an
+  untouched register as leftover garbage. (`class_3ac78`)
+- **Establish a sibling-class relationship by diffing both candidates against a
+  COMMON BASE, not against each other.** A long run of identical slots can come
+  from two independent overrides that share an implementation, not from
+  inheritance. (`tools/classtable.py <t> --vs <base>`, `class_39e08`)
+- **A function shared verbatim between two sibling vtable slots is only safely
+  reusable if every instance field it touches sits at the same offset in BOTH
+  classes.** Same code at the same slot offset does not imply the same layout
+  behind `self`. (`class_39e08`)
+- **The "a byte match tells you nothing about the return type" trap applies to
+  an INTERMEDIATE link in a delegation chain, not just to an outermost
+  wrapper.** A slot typed `void` on the strength of one unit's discarding caller
+  records what that CALLER does with the value, not what the occupant computes.
+  Read the occupant's own disassembly. This corrected
+  `LoaderTaskMethods::slot44` in `include/Class6D3C8.h` to `s32`, ABI-neutrally
+  and at zero byte cost. (`func_8003C1DC`)
+
+- **A repeated read of an unchanging pointer field is NOT reliably CSE'd across
+  statements when a whole-struct assignment sits between the reads.** GCC 2.6.3
+  reloads it. Cache the pointer in an explicit local instead. Note this is the
+  OPPOSITE prescription to `func_80066340`'s "do not cache a struct field read
+  in several places" — the discriminator is what sits BETWEEN the reads: an
+  intervening aggregate assignment defeats the compiler's aliasing analysis and
+  forces the reload, whereas plain straight-line reads are CSE'd fine and the
+  cache then costs a register. Read the intervening statements before choosing.
+  (`func_8005B904`)
+
+- **A register-identity residue can be a MISSING CALL ARGUMENT. Cross-check
+  another caller of the same vtable slot before you accept the
+  classification.** The strongest result of round 7, and it retired a stall
+  that fourteen attempts across two authors had confirmed. `func_8005E02C`
+  kept landing `this->unk94` in `$v0` where retail has `$a1`, unmoved by
+  every reshape of the code computing it. The cause was that
+  `EntityMethods::slot144` takes a SECOND argument — `this->unk94` itself —
+  so retail parks the value in `$a1` for the whole function *because that is
+  the register the call needs it in*. With the two-argument prototype it
+  matched first try, no barrier and no reshape.
+
+  The trap is that the call site under test looked like positive evidence
+  for the one-argument signature: a plain `nop` in the delay slot and no
+  fresh `$a1` load. There was no fresh load because the value had been
+  resident in `$a1` since the top of the function. A *different* caller
+  (`func_8005EA94`) loads it explicitly right before the `jalr`, which is
+  unambiguous. **CLAUDE.md rule 6's test is still right as written** —
+  reshaping genuinely could not move that register — but "reshaping" has to
+  include the call's own ARGUMENT LIST, not just the statements feeding it.
+  A slot's arity is a property of the slot; derive it from whichever caller
+  makes it visible. (`func_8005E02C`, `func_8005EA94`)
+
+- **Retyping a shared vtable slot is NOT a local change.** `void` -> `s32` on
+  `EntityMethods::slotC4` fixed the wrapper under test and silently broke an
+  already-matched function in another unit: with `slotC4` `void`, GCC
+  tail-merges two of `func_8005E160`'s identical discarded `slotC4` calls
+  into one; typed `s32` it stops merging, costing 4 words and shifting every
+  later function in the file. `slotCC` faced the identical question in the
+  same round, was checked the same way, came back clean, and was retyped —
+  **two superficially symmetric slots, opposite answers.** Check every other
+  caller (rebuild; a broken slot retype is a RED BUILD, not a diff in your
+  own function) rather than reasoning by analogy from a sibling slot.
+  (`func_8005FA64` kept `void`, `func_8005FEC8` retyped)
+
+- **A value reused after an intervening indirect call needs an explicit
+  local.** GCC 2.6.3 has no aliasing guarantee that a `jalr` through an
+  unknown function pointer did not write back through the object, so a bare
+  repeated field access forces a reload, which changes register allocation
+  and can shift the frame size. **The fast tell is a frame with the wrong
+  number of callee-saved registers versus retail.** Confirmed independently
+  several times in one round, and it generalizes past `self->field`: it
+  applies to a call's own return value, and to a value whose next use is
+  many calls later rather than the next one. (`func_8003C3D0`,
+  `func_8003C11C`, `func_8003BF10`, `func_8003C238`)
+
+- **An arity conflict at an already-typed vtable offset is real
+  counter-evidence — trust it over an earlier positive-but-circumstantial
+  slot match.** It is what legitimately *un*-unifies two fields previously
+  modelled as the same class. Round 7 used it twice in one function to split
+  a wrongly-shared method table and to revert a wrongly-unified field type,
+  both as pure header relabeling with zero compiled-byte impact.
+  (`func_8003C238`)
+
+- **An empty-bodied vtable occupant is not evidence the SLOT takes no
+  arguments** — only that this occupant ignores them. The parameter-side twin
+  of the established "a discarded return value is never evidence of `void`".
+  Relatedly, a slot's *field name* is whatever the first-resolved occupant
+  suggested; it describes layout and signature, never which function runs.
+  That risk is narrow, though — tested against ten functions across two
+  units with no second instance found, and it only bites when a dispatch
+  through `self->methods` sits BETWEEN two writes to it. A mere double-write
+  is not sufficient.
+
+- **GCC 2.6.3's switch pivot tree depends on the exact case-value SET,
+  including otherwise-empty cases — not on declaration order.** `{1,3}` and
+  `{0,1,3}` both produced the wrong comparison tree where `{1,2,3}` with an
+  empty `case 2:` matched. Read the other way round: a GAP in the case values
+  you can see is itself a signal that the original had an empty case there.
+  (`func_80049CA8`, 9 attempts)
+
+- **Split a value's COMPUTATION from its STORE through a named local** when
+  retail defers the store into a later instruction's delay slot (a tail
+  call's, for instance). Textual adjacency alone does not predict this.
+  (`func_8004AFE0`)
+
+- **Stack-local DECLARATION ORDER decides which local lands at which `$sp`
+  offset**, and `if`/`else` versus its logical inverse compile to different
+  branch polarities (`beqz` vs `bnez`) — neither is a free choice.
+  (`func_8004AEA4`)
+
+- **A source-level re-test of an already-established condition is not dead
+  code** — 2.6.3 compiles it literally. Conversely a chain of
+  mutually-exclusive-*looking* literal checks may be independent `if`s rather
+  than `else if`: check whether retail's bytes re-test the later conditions
+  after an earlier one already matched. (`func_8005E160`, `func_8005E7F8`)
+
+- **Statement order, not data dependency, decides register class and store
+  order** for independent assignments. This compiler does not reorder either
+  on its own. (`func_8005ED30`, `func_8005E7F8`)
+
+- **Counting slots forward from a `classtable.py`-confirmed neighbour often
+  resolves a "new" slot to an ALREADY-MATCHED function**, turning apparent
+  new-header work into none. Worth trying before typing a slot as new: in one
+  DreamSys batch every raw offset touched but two turned out to be already
+  named. (round 7, DreamSys)
+
+- **`bool` is `typedef int bool` here — a full word, not a byte.** Reading a
+  raw struct offset as byte-granular because a field is boolean produces a
+  layout error that looks like a struct-size mistake rather than a typedef
+  mistake.
+
+- **The `__asm__("")` barrier is a scheduling nudge, not a fence — and its
+  scope is narrower than previously assumed.** Two round-7 results bound it
+  from both sides. It DID change which instruction fills a load-delay slot at
+  its own position (forcing retail's order, `move` before the barrier and an
+  explicit `nop` after). It did NOT stop a loop-offset increment from being
+  hoisted BACKWARD across it into an earlier delay slot, past several
+  intervening independent statements. So: use it for local delay-slot fill,
+  do not expect it to pin anything across statements, and never expect it to
+  move a register choice (it operates in a later pass than register
+  allocation). (`func_8005E02C` positive, `func_8004ABD0` negative)
+
+- **GCC reserves stack space for a completely dead, unreferenced local**, so
+  `u8 unused[N];` closes a pure frame-size gap when every instruction already
+  matches. Third project instance, so it is a reliable idiom — but treat the
+  gap as EVIDENCE, not explanation: a 24-byte hole is most likely a real
+  local aggregate the original source passed somewhere, and the padding
+  reproduces the bytes without explaining them. Say so in the report.
+  (`func_8004ADD8`)
+
+- **Multiple independent local views of the SAME method table, one per unit,
+  is the established convention** — do not edit another unit's header to
+  unify them. Round 7 had two units both describing `D_800866E8` under
+  different type names, deliberately. (`class_3ac78`, `class_3bb8c`)
+
 ### New residue classes opened this round (not yet closed)
 
 - **"Identical assignment reaching different merge points."** GCC tail-merges
@@ -334,8 +511,70 @@ through it. Only the load is exposed.
   a branch or a call to reason about. Nine reshapes, best 8/14.
   (`DreamSys__LogMood`)
 
-All three are permuter candidates rather than reshape candidates; see Gate 3
+- **The `New_X` epilogue-merge residue — the project's DOMINANT stall class, at
+  24 instances.** Written up in full, with a corpus census and every attempt
+  already spent, in **`docs/research/epilogue-merge-residue.md`**. Read that
+  before touching any `New_X` allocator. The short form:
+
+  > **GCC 2.6.3 (Psy-Q) `-O2` will not merge two function exits carrying
+  > DIFFERENT values into one epilogue.**
+
+  Retail plainly does merge them, so the compiler can be made to — we have not
+  found the source form. Every hand-reachable shape either returns the pointer
+  on both paths (one epilogue, but no materialized constant: 26/27) or forces a
+  single exit and then grows a second epilogue or an extra callee-saved
+  register. Two runners on different units reached this independently in one
+  round and classified it identically. **Not a toolchain blocker and not an
+  operator escalation** — the toolchain is innocent, the input is unknown.
+
+- **Shared-literal early-exit delay-slot placement.** A function with several
+  early-exit points all returning the SAME literal can have that constant's
+  delay-slot placement scheduled differently from retail while matching on
+  instruction count AND control-flow graph. Not reachable by goto/return
+  spelling, statement reorder, explicit locals, or an `__asm__("")` barrier
+  (which made it worse). Note this is a DISTINCT class from the epilogue-merge
+  residue above: there the two exits carry *different* values and the epilogue
+  count differs; here the values are identical and the CFG already matches.
+  (`func_8005A82C`, 58/63)
+
+- **Asymmetric codegen on structurally identical sibling blocks.** Two
+  byte-extraction blocks against sibling struct fields, written identically,
+  get different codegen; fixing one symptom (a redundant sign-extend) trades
+  it for another (a 16-byte-oversized frame). Best 19/52, correct size, no
+  drift. (`func_8004B030`)
+- **Loop-offset increment scheduling.** The increment lands in the wrong
+  delay slot regardless of where in the loop body it is written — six
+  positions tried, plus a barrier, which did not block the backward hoist.
+  The structural part (two recomputed registers vs one incrementing pointer)
+  WAS reproduced; only that one instruction's placement resists. Best 9/74,
+  correct size. (`func_8004ABD0`)
+- **Duplicated loop test in a destructor scan loop.** A conditional
+  skip-to-continue-check duplicates the loop condition. Three
+  control-flow-equivalent spellings (`do`/`while`, `goto`, `while`) compile
+  **byte-identically to each other** and none matches retail — a stronger
+  negative than a single failed reshape, because it rules out the whole
+  spelling family rather than one member. (`func_8004A7C0`)
+
+All eight are permuter candidates rather than reshape candidates; see Gate 3
 in docs/PARALLEL-RUNS.md.
+
+**One class was CLOSED this round, and how it closed is the transferable
+part.** The "vacate-then-reuse-argument-register" residue was written up with
+a corpus census as a rare, poor permuter target. It was not a scheduling or
+allocation class at all — it was a missing call argument (see the
+cross-check-another-caller entry above), and the census had been measuring a
+shape that merely *co-occurs* with it: a value sitting in an argument
+register because it is a future argument. **A census of a residue's surface
+SHAPE is not a census of its CAUSE**, and a plausible mechanism attached to a
+real measurement is still a hypothesis. The head confirmed that stall twice
+before a runner overturned it.
+
+**The cheap tell that you are in the wrong shape FAMILY, not one reshape from
+a match:** funcdiff's *"differs OUTSIDE this range"* warning carrying a
+six-figure byte count. That means your function changed SIZE and every later
+address shifted. Two independent runners plus the head each hit it this round;
+recognising it early is worth several attempts. Read it as "wrong family, start
+over", never as "close, keep pushing".
 
 ### Still unconfirmed here
 
@@ -343,8 +582,14 @@ Candidates from other GCC 2.x projects — treat each as a thing to test:
 
 - Member loads hoisted into a local at the top of a loop.
 - A struct pointer to a global block, rather than several separate globals.
-- Comma expressions and assignment-in-condition, which 2.x schedules
-  differently from the separated form.
+- ~~Comma expressions and assignment-in-condition~~ — **TESTED 2026-09-02, and
+  for the two-exit case the answer is NO.** A comma-ternary
+  (`return c ? (f(x), p) : NULL;`) compiled byte-for-byte identically to the
+  separated early-return form, down to the same outside-range byte count, so
+  2.6.3 does NOT schedule it differently there — it lowers both to the same
+  RTL. Still untested as a scheduling lever in a SINGLE-exit body, which is a
+  different question and remains open. (head adjudication of `func_8004A130`,
+  see `docs/research/epilogue-merge-residue.md`)
 
 ## The class framework (SETTLED — the game is plain C)
 
@@ -402,15 +647,24 @@ Practical consequences:
 
 ## Open questions
 
-- **What is the class-table header word at `+0x000`? PARTLY ANSWERED
-  (2026-09-01): the low 12 bits are a class identifier.** `func_80058E8C` is the
-  first confirmed in-game READ of it — it masks the word with `0xFFF` and
-  compares the result against a literal class id, which is a runtime type check.
-  That settles the low half; the upper bits are still unaccounted for, and the
-  packed-field reading of the original values (`0x1F34`, `0x1130`,
-  `0x00011144`…) survives for them. Next step is the same one as before, now
-  better posed: find the WRITES, in the framework code at `class_16334` /
-  `code_179d8`, and see what composes the upper bits.
+- **What is the class-table header word at `+0x000`? PARTLY ANSWERED, and the
+  first answer was TOO NARROW.** It holds a class identifier, but **the field is
+  wider than 12 bits.**
+  - 2026-09-01, `func_80058E8C`: the first confirmed in-game READ. Masks the
+    word with `0xFFF` and compares against a literal class id — a runtime type
+    check. This was written up as "the low 12 bits are a class identifier".
+  - **2026-09-02, `func_80058F18` (the sibling check) CORRECTS that**: it masks
+    with **`0xFFFFF`** — 20 bits — and compares against **`0x1F234`**, which is
+    `D_80089AD4`'s own header value. A 20-bit comparand cannot fit the 12-bit
+    reading, so `0xFFF` was **one function's mask, not the field's width**. Two
+    call sites, two different masks, both against real class ids.
+
+  The generalizable error is worth keeping: a single masked read tells you an
+  identifier is *at least* that wide, never that it is *exactly* that wide.
+  Treat the widest observed mask as the current lower bound. The next step is
+  unchanged but better posed: find the WRITES, in the framework code at
+  `class_16334` / `code_179d8`, and see what composes the field — and whether
+  anything ever uses the top 12 bits of the word.
 - **What are the four dead-looking data slots** at `0x57070`, `0x76DC8`,
   `0x79528` and the `sbss` runs? They assemble and link fine as plain data, so
   nothing is blocked, but their owners are unidentified. **Partly answered for

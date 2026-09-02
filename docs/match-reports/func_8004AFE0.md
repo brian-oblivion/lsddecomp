@@ -1,86 +1,75 @@
-# func_8004AFE0
+# func_8004AFE0 — MATCH
 
-**Unit:** class_3ac78 · **Size:** 20 instructions · **Status:** MATCHED (20/20 words)
+**Unit:** class_3ac78 · **Size:** 20 instructions · **Result:** 20/20 words
 
 ## What it does
 
-Reads two signed bytes out of a byte buffer (`arg1[2]`, `arg1[3]`), each
-minus one, stored as two `s16` fields; sets two other fields to the same
-`s32` value (`arg2`); then calls a helper with the object, discarding its
-result.
+Sets `self->unk7C`/`unk7E` from two signed bytes read off an opaque
+descriptor buffer (`arg1`, offsets 2 and 3, each decremented by one), and
+stashes `arg2` verbatim into both `self->unk80` and `self->unk84`. Finishes
+with a plain (non-virtual) tail call to `func_8004C93C(self)`.
 
-## The C
+`arg1`'s buffer is populated elsewhere (out of this round's scope, by a
+call through `Class866E8Methods` slot `+0x110`, itself not decompiled) so
+only the two bytes this function actually reads are typed — added as
+`UnkArgObj_3ac78` in `include/class_3ac78.h`, following the
+`Unk*Obj_<unit>` naming convention already used in `code_171e0.h`.
+
+## Final source
 
 ```c
-void func_8004AFE0(Class866E8 *self, u8 *arg1, s32 arg2)
+void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
 {
-	u8 b3;
+    s16 t;
 
-	self->unk7C = (s8)arg1[2] - 1;
-	b3 = arg1[3];
-	self->unk80 = arg2;
-	self->unk84 = arg2;
-	self->unk7E = (s8)b3 - 1;
-	func_8004C93C(self);
+    self->unk7C = arg1->unk2 - 1;
+    t = arg1->unk3 - 1;
+    self->unk80 = arg2;
+    self->unk84 = arg2;
+    self->unk7E = t;
+    func_8004C93C(self);
 }
 ```
 
-```c
-extern void func_8004C93C(Class866E8 *self);
-```
+## Residue and the fix that closed it
 
-## The residue this took several tries to close, and how it closed
+First attempt (natural source order — compute+store `unk7C`, store
+`unk80`/`unk84`, compute+store `unk7E`, call) reached only 12/20: retail
+leaves the FIRST `lbu`'s (arg1->unk2) load-delay slot as a genuine `nop`,
+but this body's scheduler eagerly hoisted the very next statement's store
+(`self->unk80 = arg2`) into that slot instead — four instructions earlier
+than where retail places it (which is the SECOND `lbu`'s delay slot,
+`arg1->unk3`).
 
-The obvious first draft --
+**Fix: compute `arg1->unk3 - 1` into a named local (`t`) placed
+immediately after the `unk7C` store, but defer the ASSIGNMENT to
+`self->unk7E` until after both `unk80`/`unk84` stores.** This reproduces
+retail's actual instruction order exactly: the byte-3 load happens early
+(right after `unk7C`'s store, its own delay slot filled by the `unk80`
+store that was sitting ready), and the final `sh` into `unk7E` becomes a
+cheap register-only store that the scheduler slides into the `jal`'s own
+delay slot at the very end — retail does precisely this (`sh v0,0x7e(a0)`
+is the tail call's delay-slot instruction).
 
-```c
-self->unk7C = (s8)arg1[2] - 1;
-self->unk80 = arg2;
-self->unk84 = arg2;
-self->unk7E = (s8)arg1[3] - 1;
-func_8004C93C(self);
-```
-
--- matched 12/20 words at the right total SIZE (0x50, same as retail) but
-in the WRONG ORDER: GCC 2.6.3's scheduler filled the first `lbu`'s load-delay
-slot with `sw a2, 0x80(a0)` (since it's independent and available), leaving
-a genuine `nop` later where retail instead has one right after the FIRST
-`lbu` and fills the SECOND `lbu`'s delay slot with that same store. Same
-instructions, same registers, purely a different delay-slot-filling choice
-by the scheduler -- squarely the "instruction order only" residue class in
-`docs/MATCHING-GUIDE.md`.
-
-Two things that did NOT work, tried before the fix (both instruction-count
-regressions, discarded immediately as size changes are a hard signal to
-back off):
-
-- A bare `__asm__("");` scheduling barrier right after the `unk7C` store --
-  this forced an actual extra instruction into the output (21 words instead
-  of 20), which is the wrong shape of "barrier changes order, not
-  registers" -- here it changed the COUNT, so it was wrong to keep.
-- Reordering the C statements outright (moving `unk84`/`unk80` before
-  `unk7C`) -- same size, but a *different* wrong order (11/20).
-
-What worked: pulling `arg1[3]` out into its own statement (`b3 = arg1[3];`)
-positioned textually BETWEEN the `unk7C` store and the `unk80`/`unk84`
-stores, with the sign-extend-and-subtract-1 done on the cached `b3` value
-afterward. This didn't change what gets computed, but it gave the scheduler
-a byte-sized load with no immediate consumer to place ahead of the two
-independent stores, and it picked exactly retail's slot-filling choice.
-
-## Provenance
-
-round 2026-09-01, runner charlie, unit class_3ac78 (first pass, unit carved
-this round).
+Two other orderings were tried and both scored WORSE (11/20 and 12/20 with
+different word patterns): plain reordering of the four statements without
+splitting the *compute* of `unk7E` from its *store* never reproduced
+retail's exact delay-slot assignment, no matter which of the four
+statements came first.
 
 ### Proposed learning
 
-When a same-size, same-register, same-branch-target residue is purely a
-different delay-slot-filling CHOICE between two adjacent loads (not a
-single load's slot vs. no slot), pulling the second load's value out into
-its own named local, positioned between the two stores it competes with in
-source order, can retarget GCC 2.6.3's scheduler onto retail's exact choice
-without changing instruction count. Try this before reaching for
-`__asm__("")` — the barrier in this instance forced a real extra
-instruction (wrong direction entirely) where the temp-variable reshape cost
-nothing.
+**When a value is computed early but its store is delay-slot bait for a
+LATER instruction (a call, here), split the computation from the store
+with a named local, and place the local's assignment to the field at the
+point in source order where the STORE (not the load) should land.**
+Textual adjacency of two independent statements is not enough to predict
+which delay slot the scheduler fills — GCC 2.6.3's scheduler here bypassed
+a `nop`-bound load-delay slot four instructions early and instead used the
+LAST instruction of the function (a tail call) as a landing spot for a
+value computed much earlier. Splitting compute-from-store made that
+placement reachable from C.
+
+## Provenance
+
+round 2026-09-02, runner ALPHA, unit class_3ac78.

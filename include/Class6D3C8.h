@@ -180,7 +180,16 @@ typedef struct LoaderTaskMethods {
     s32 header;                                              /* +0x000 */
     void (*slot4)(void *self);                                 /* +0x004 */
     u8 pad08[0x044 - 0x008];                                     /* +0x008 .. +0x043 */
-    void (*slot44)(void *self, s32 a1, s32 a2);                    /* +0x044 */
+    /* +0x044: RETURNS s32, not void. This slot's occupant is func_8003C1DC
+     * (matched in code_2c054), and its own body loads self->unk38 into $v0
+     * immediately before the epilogue with nothing else consuming it -- a
+     * load whose only purpose is to be the return value. The earlier `void`
+     * came from THIS header's caller, which discards the result; that
+     * describes what the caller does with the value, not what the callee
+     * computes. Harmless at the ABI level either way (a discarding caller
+     * simply never reads $v0), which is why correcting it changes zero bytes.
+     * Matches PollTaskMethods::slot44 below, as the comment there predicts. */
+    s32 (*slot44)(void *self, s32 a1, s32 a2);                     /* +0x044 */
     u8 pad48[0x06C - 0x048];                                         /* +0x048 .. +0x06B */
     void (*slot6C)(void *self, s32 a1);                                /* +0x06C */
     u8 pad70[0x098 - 0x070];                                             /* +0x070 .. +0x097 */

@@ -1,124 +1,110 @@
-# DreamSys__AddFlashback -- MATCHED (52/52 words)
+# DreamSys__AddFlashback
 
-Unit: `DreamSys`. Round 2026-09-01-e (runner echo). ~7 attempts.
+**Unit:** DreamSys · **Size:** 52 words · **Status:** MATCHED (52/52)
 
-## Final C
+## What it does
+
+Already forward-declared (`void DreamSys__AddFlashback(DreamSys *this, s32
+stage, PlayerSpawnPoint* pos, s32 *angles, s32 unknown, s32 time, s32
+day);`). Picks a storage slot -- appending if there's room, otherwise
+evicting a pseudo-random one keyed off `dreamTimer` -- and writes all seven
+fields of a `FlashbackEntry` into it.
+
+## The C
 
 ```c
-struct DreamSysAngles3 {
-	struct Angle pitch;
-	struct Angle heading;
-	struct Angle roll;
-};
-
 void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles, s32 unknown, s32 time, s32 day)
 {
-	s32 count;
-	s32 wordIndex;
 	FlashbackEntry *entry;
 
 	entry = this->storedFlasbacks;
 	if (this->amountFlashbacksAvailable < 10) {
-		count = this->amountFlashbacksAvailable;
-		this->amountFlashbacksAvailable = count + 1;
-		wordIndex = count * 9;
+		entry += this->amountFlashbacksAvailable++;
 	} else {
-		wordIndex = ((u32)this->dreamTimer % 9) * 9;
+		entry += (u32)this->dreamTimer % 9;
 	}
-	entry = (FlashbackEntry *)((s32 *)entry + wordIndex);
 	entry->stageID = stage;
 	entry->position = *pos;
-	*(struct DreamSysAngles3 *)&entry->pitch = *(struct DreamSysAngles3 *)angles;
+	entry->rotation = *(FlashbackRotation *)angles;
 	entry->unknown_value_0x1c = unknown;
 	entry->timeLimit = time;
 	entry->day = day;
 }
 ```
 
-Retail is a full LEAF function -- no stack frame, no saved registers, `a0`-`a3`
-and `t0`-`t4` only -- which made this the strictest-shaped function tried
-this round: any extra local that outlived its natural register lifetime
-showed up immediately as a spilled-register prologue.
+## Two struct corrections (both load-bearing, not cosmetic)
 
-## Derivation
+- **`FlashbackEntry::unknown_value_0x1c` was `s32`, retyped to `s16`.** This
+  function writes it with a bare `sh` (halfword store) from an `s32`
+  argument (`unknown`) -- a genuinely `s32` field fed by an `s32` value
+  would store all 4 bytes (`sw`), not 2. Exactly the class of mistake the
+  head flagged after `ExecuteLink`'s `bool`-is-`int` finding: assuming word
+  granularity at a raw offset reads as a struct-layout error, but the real
+  cause is a field that's narrower than guessed. The 2 bytes this frees up
+  before `day` become ordinary C alignment padding, keeping
+  `sizeof(FlashbackEntry) == 0x24` unchanged (confirmed independently by
+  `DreamSys__LoadNextFlashback`'s index arithmetic this round).
+- **`pitch`/`heading`/`roll` grouped into one new 12-byte nested struct,
+  `FlashbackRotation`.** This function's own `angles` argument is
+  block-copied into all three in ONE retail load-all-then-store-all
+  sequence (six unaligned `lwl`/`lwr` loads, all six BEFORE any of the six
+  unaligned `swl`/`swr` stores) -- the already-documented "whole-struct
+  assignment reproduces retail's block-move codegen" idiom, this time at a
+  12-byte, non-power-of-2 size. Three separate field assignments, or a
+  loop, would not reproduce that instruction ordering (confirmed by the
+  residue below).
 
-`amountFlashbacksAvailable` gates a fixed-size (10-slot) ring: while there is
-room, append at the current count and increment it; once full, overwrite a
-slot chosen by `dreamTimer % 9` (an 9-wide sub-cycle inside the 10-slot
-array -- unconfirmed WHY 9 rather than 10, but the magic constant leaves no
-ambiguity about WHAT it computes). `FlashbackEntry` is `0x24` (36) bytes =
-9 words, and retail's addressing is genuinely `wordIndex * 4`, not
-`entryIndex * 36` collapsed into one multiply -- see the residue class below.
+## The real residue: register identity, resolved by variable shape, not declaration order
 
-- `this->storedFlasbacks[0]`'s address is hoisted into its own register
-  (`t0 = this + 0x470`) UNCONDITIONALLY, before the `if`, and used
-  identically by both branches. `this` (`a0`) is then free to be clobbered
-  in the `else` branch to hold `dreamTimer`.
-- Both divisor identifications are solved arithmetically, not guessed: `9`
-  from the `0x38E38E39` magic constant with the standard "one extra `sra`"
-  reduction described for `IsDaySpecial`'s `%12`.
-- `FlashbackEntry::unknown_value_0x1c` was `s32`; retyped to two `s16`
-  halves (`unknown_value_0x1c` / `unknown_value_0x1e`) in
-  `include/DreamSys.h` -- retail stores this function's 5th argument there
-  with `sh`, not `sw`, so only the first half is confirmed written by this
-  function.
+First three attempts all reached the SAME instruction sequence with
+DIFFERENT physical registers throughout the whole function body (`t0` vs.
+`a2`/`v0`, `a0` vs. `v1`, etc. -- a textbook "same instructions, different
+registers" residue per `DECOMPILATION_LEARNINGS.md`). The variants tried,
+in order:
 
-## The residue chain (three distinct issues, each independently confirmed)
+1. `idx` + `&this->storedFlasbacks[idx]` computed fresh after the branch
+   (no hoisted base pointer): wrong from the start (3/52) -- GCC never
+   isolated `this + 0x470` into its own register, so it had to keep `this`
+   alive to the very end, which starved a register `retail` frees for
+   reuse (dreamTimer's modulo) partway through, cascading register
+   pressure into `pos`'s handling too.
+2. `FlashbackEntry *base = this->storedFlasbacks;` computed up front, `idx`
+   a separate local, `entry = &base[idx]` after the branch: reordering
+   fixed the base-pointer hoist (matched `t0`'s early computation exactly)
+   but a NEW register swap appeared around `pos`/`idx` (`t0`↔`a2`, `a0`↔`v1`
+   throughout) -- reordering the three declarations (`base`/`idx`/`entry`)
+   did not change this.
+3. **Merging `base` and `idx` into ONE pointer variable, incremented in
+   place** (`entry = this->storedFlasbacks; entry += ...;`) instead of a
+   separate index added at the end: matched immediately, all 52 words.
 
-1. **Sharing the `wordIndex * 9` multiply across both branches, instead of
-   duplicating it inside each, drops the multiply entirely from the `true`
-   branch and costs the whole shared merge its shape.** First attempt wrote
-   `entry = &this->storedFlasbacks[index];` (clean array indexing) placed
-   AFTER the `if`/`else`, so GCC computed ONE `index * 36` for both paths --
-   collapsing retail's `(candidate * 9)` computed separately per branch,
-   THEN a shared `* 4`. Retail's shape requires literally writing `wordIndex
-   = candidate * 9;` inside EACH branch and doing the final `* 4` via
-   pointer arithmetic (`(s32 *)entry + wordIndex`) after the merge -- the
-   two-step decomposition (`* 9` then `* 4`, not one `* 36`) is not
-   idiom-visible from `storedFlasbacks[index]` and has to be written
-   explicitly.
-2. **The `else` branch's modulo needs an explicit `(u32)` cast.**
-   `this->dreamTimer % 9` (plain `s32 %`) compiles to `mult` (signed) with a
-   sign-correction `sra`; retail uses `multu` (unsigned) with none. Nothing
-   else in this function treats `dreamTimer` as unsigned, so this cast is
-   local to this one expression, not a struct-wide retype.
-3. **The 12-byte `pitch`/`heading`/`roll` triple wants ONE struct
-   assignment, not three separate per-field ones.** Three separate
-   `entry->pitch = ang[0]; entry->heading = ang[1]; entry->roll = ang[2];`
-   statements compile to an interleaved LOAD-STORE-LOAD-STORE-LOAD-STORE
-   sequence (reusing one register). Retail's actual sequence is
-   LOAD-LOAD-LOAD-STORE-STORE-STORE across three DIFFERENT registers (`v0`,
-   `v1`, `a0` held live simultaneously) -- the signature of a single 12-byte
-   block-move codegen, matching CLAUDE.md's "whole-struct assignment, not
-   an indexed loop, for a block copy" idiom exactly, just for THREE
-   contiguous struct fields treated as one unit rather than an array. Fixed
-   by declaring a local 3-`Angle` container type and doing ONE cast-and-copy
-   assignment (`*(struct DreamSysAngles3 *)&entry->pitch = *(struct
-   DreamSysAngles3 *)angles;`) instead of three field assignments.
+The working shape has exactly ONE local surviving the branch (a pointer,
+already advanced to its final value inside each arm) rather than TWO
+(a base pointer plus a separate index combined afterward) -- fewer
+simultaneously-live locals gave GCC 2.6.3's allocator less to juggle,
+and it picked the same registers retail's compiler did once there was
+nothing else competing for them.
 
-Each of the three was isolated and fixed independently, in that order,
-confirmed by re-running `funcdiff` after each change (18/52 baseline segfault
--> 24/52 after hoisting the base pointer -> 38/52 after fixing #1+#2
-together -> 52/52 after #3).
+## Third-learning check (per head's request)
+
+**Not needed.** `entry` (after the fix) is written once per branch and read
+several times afterward with no intervening `jalr` anywhere in the
+function -- this is a leaf function, no calls at all. The residue here was
+pure register-identity/allocation-shape, unrelated to the `jalr`-aliasing
+lever from the previous unit.
 
 ## Proposed learning
 
-- **When retail's per-field struct-member writes come as three (or more)
-  LOADS followed by three (or more) STORES using DIFFERENT scratch
-  registers, that is one block-copy assignment of a MULTI-FIELD span, not
-  N separate field assignments** -- even when the fields involved
-  (`pitch`/`heading`/`roll`) are individually named and semantically
-  distinct. The existing "whole-struct assignment for a block copy" idiom
-  in DECOMPILATION_LEARNINGS.md is stated for a single array/struct; this
-  extends it to "or several adjacent struct fields you'd otherwise assign
-  one at a time." Declaring a small local struct wrapping just those fields
-  and doing one cast-assignment is the mechanical fix.
-- **A shared post-branch index computation is not always what retail did,
-  even when the same multiply appears in both branches of an if/else.**
-  When retail computes the SAME multiply (`candidate * N`) separately
-  inside EACH branch rather than hoisting the candidate value out and
-  multiplying once after the merge, only the FOLLOWING step (here, `* 4` to
-  convert word offset to byte offset) is actually shared. Telling the two
-  apart from the .s: if the multiply-by-N reconstruction sequence
-  (`sll`/`addu`) appears twice, once per branch, before the branches merge,
-  it is NOT hoistable in the source either -- write it once per branch.
+**When a residue is "same instructions, all registers swapped, throughout
+the WHOLE function" (not just one instruction), try reducing the number of
+LIVE locals before trying declaration-order permutations.** Two variables
+carrying what is conceptually one pointer value (a base + a later-added
+offset) gave the register allocator more simultaneously-live state to place
+than one variable that is incrementally advanced to its final value inside
+each branch -- collapsing them changed the allocator's own choices, even
+though every arithmetic operation and its order stayed identical between
+attempts 2 and 3. Reordering the *declarations* alone (already tried, no
+effect) is a cheaper first move than reshaping the *variables*, but when it
+doesn't move a whole-function register swap, reshaping the variable count
+is the next lever, not a `register T v asm("$N")` pin (which would still be
+banned here regardless).

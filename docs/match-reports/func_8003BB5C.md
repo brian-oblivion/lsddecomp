@@ -1,28 +1,19 @@
 # func_8003BB5C
 
-**Unit:** code_2c054 · **Size:** 46 instructions · **Status:** MATCHED (46/46 words)
+**Unit:** code_2c054 · **Size:** 46 words · **Status:** MATCHED (46/46)
 
-## What it does
+## Summary
 
-StreamTask's override of method-table slot `+0x05C`: chains into the base
-task class's own copy first, then -- only when `unkA4` is still zero --
-polls the sub-object's slot `+0x048`, stores the result back into
-`unkA4`, and, only if that result is non-zero AND `unkD8` is still clear,
-re-enters this object's own slot `+0x060` (`func_8003BC14`) with a
-literal 7.
-
-## The C
+Three sequential early-return guards.
 
 ```c
-void func_8003BB5C(StreamTask *self, s32 a1, s32 a2) {
-    s32 result;
+void func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
     func_8003DFBC()->slot5C(self, a1, a2);
     if (self->unkA4 != 0) {
         return;
     }
-    result = self->unkB4->methods->slot48(self->unkB4);
-    self->unkA4 = result;
-    if (result == 0) {
+    self->unkA4 = self->unkB4->methods->slot48(self->unkB4);
+    if (self->unkA4 == 0) {
         return;
     }
     if (self->unkD8 != 0) {
@@ -32,17 +23,27 @@ void func_8003BB5C(StreamTask *self, s32 a1, s32 a2) {
 }
 ```
 
-## How it was found
+## Evidence
 
-Retail's own control flow is a chain of early-exit branches, all landing
-on the same epilogue label -- NOT nested `if`s. Writing it as three
-sequential `if (...) { return; }` guards (rather than nesting) reproduces
-that shape exactly; nesting would still be logically equivalent but was
-not needed here (unlike func_8003B854/func_8003BE94's `New_X` shape,
-where the exact nesting choice DID matter for instruction count -- see
-those reports). `classtable.py D_8006E5F8` places this function at slot
-`+0x05C`.
+- `func_8003DFBC()->slot5C`: `TaskCoreMethods` slot `+0x05C`, occupied by
+  `func_8003C51C` (a different unit, not touched here). Takes `(self, a1,
+  a2)` matching this function's own two forwarded parameters; result
+  discarded, typed `void`.
+- `self->unkA4`: established this round (`func_8003BAB4`'s report). Here it
+  is both read (first guard) and **assigned** from `slot48`'s return, unlike
+  `func_8003BAB4` where the analogous `slot40` result is tested but never
+  stored — confirmed the two call sites genuinely differ, see that report's
+  "pitfall" section.
+- `self->unkB4->methods->slot48(self->unkB4)`: single-argument call on
+  `StreamTaskUnkB4Methods`; the disassembly stores `$v0` into `self->unkA4`
+  in the branch's own delay slot (`sw $v0, 0xA4($s2)` right after `beqz $v0,
+  ...`), so it is `s32`-returning.
+- New field `self->unkD8` (`+0x0D8`, `s32`) — the last word before the
+  object's documented 0xDC size, read-only here.
 
-## Provenance
+## Proposed learning
 
-round 2026-09-01, runner alpha, unit code_2c054 (second pass).
+Matched cleanly on the first attempt once `func_8003BAB4`'s slot40/slot48
+distinction (tested-not-stored vs. stored) was already sorted out — this is
+the confirming positive case for that report's "reread, don't backfill by
+analogy" note.

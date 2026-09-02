@@ -1,28 +1,29 @@
 # func_8003BDAC
 
-**Unit:** code_2c054 · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
+**Unit:** code_2c054 · **Size:** 14 instructions (0x38 bytes) · **Status:** MATCHED (14/14 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
-StreamTask's override of method-table slot `+0x084`: the identical
-passthrough shape as func_8003BD74, one slot over.
+Identical shape to `func_8003BD74` (see that report for the full
+derivation and the return-type discussion) one slot over: forwards to
+`func_8003DFBC()`'s (i.e. `D_8006E730`'s / `LoaderTaskMethods`'s) slot
+`+0x084` instead of `+0x080`. Occupies `D_8006E5F8` slot `+0x084` itself.
 
-## The C
+## Derivation
 
 ```c
-s32 func_8003BDAC(StreamTask *self) {
-    return func_8003DFBC()->slot84(self);
+void func_8003BDAC(StreamTaskObj *self) {
+    func_8003DFBC()->slot84(self);
 }
 ```
 
-## How it was found
+Matched first attempt, same reasoning as `func_8003BD74`.
 
-Same shape as func_8003BD74 (see that report for the full derivation).
-`classtable.py` confirms D_8006E5F8 and D_8006E730 share the same
-function address (`func_8003C9B0`) at offset `+0x084`. Return type is
-likewise an unproven `s32` guess, flagged for the same reason as
-func_8003BD74.
+## New struct/header knowledge
 
-## Provenance
+Added `TaskCoreMethods::slot84` alongside `slot80` in
+`include/code_2c054.h` (see `func_8003BD74`'s report).
 
-round 2026-09-01, runner alpha, unit code_2c054 (unit's first pass).
+## Proposed learning
+
+None beyond `func_8003BD74`'s -- same shape, same open return-type flag.

@@ -19,9 +19,17 @@ own working tree, build directory and branch, while sharing history so merges
 are ordinary.
 
 ```sh
-tools/setup-worktree.sh alpha     # -> ../lsddecomp2-wt-alpha, branch runner/alpha
-tools/setup-worktree.sh bravo     # -> ../lsddecomp2-wt-bravo, branch runner/bravo
+tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alpha
+tools/setup-worktree.sh bravo     # -> ../<checkout>-wt-bravo, branch runner/bravo
 ```
+
+**`<checkout>` is the basename of YOUR main checkout, not a fixed string.**
+The script derives the destination from it, so a clone named `lsddecomp`
+produces `../lsddecomp-wt-alpha`. This document previously hardcoded a
+`lsddecomp2-` prefix from the checkout it was written in, which is wrong in any
+clone named anything else — and it appeared in the `--force` teardown command
+below, where a stale path is not a typo but a hazard. Read the real path off
+the script's own output, or off `git worktree list`.
 
 The script symlinks the gitignored essentials (the executable, the venv, the
 toolchain), runs `make extract`, and **proves the worktree byte-verifies before
@@ -31,7 +39,7 @@ does not verify produces scores that mean nothing, and it has no way to notice.
 Teardown, after the four preconditions in §4b:
 
 ```sh
-git worktree remove --force ../lsddecomp2-wt-<name> && git branch -d runner/<name>
+git worktree remove --force ../<checkout>-wt-<name> && git branch -d runner/<name>
 ```
 
 **`--force` is required here, not a shortcut.** `asm/`, `build/` and `lsdde.ld`
@@ -119,7 +127,7 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 
    ```sh
    for n in alpha bravo charlie delta; do
-       printf '%s: ' "$n"; git -C ../lsddecomp2-wt-$n status --porcelain | wc -l
+       printf '%s: ' "$n"; git -C ../<checkout>-wt-$n status --porcelain | wc -l
    done
    ```
 
@@ -140,6 +148,48 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 4. **Merge** sequentially, in main: `git merge --no-ff runner/<name>` →
    `./build-and-verify.sh` → next. Disjoint units make conflicts rare.
 
+4a. **BEFORE ANYTHING ELSE, establish that you are the only head in this
+   checkout.** Rounds 6 and 7 (2026-09-02) ran CONCURRENTLY: the operator
+   started round 7's head while round 6's head was still live, and both worked
+   the same `main`. Nothing was corrupted — every commit was real, no protected
+   file was touched, and `main` byte-verified throughout — but each head
+   misread the other's actions as its own runners misbehaving, and both wrote
+   that misreading down as fact. Round 6's PROGRESS entry accused its runner
+   alpha of a protocol violation for two commits round 7's head had made, and
+   filed round 7's runner output as "the runners kept working after reporting".
+   Round 7's head, symmetrically, found commits on `main` it had not made and
+   had to rule out a rogue runner before it could rule in a second head.
+
+   **The mechanism is RECYCLED NAMES.** Worktrees and branches are `runner/
+   alpha`…`runner/echo` every round. A head that tears down and re-provisions
+   those names hands the other head a branch with the same name, a different
+   round's work on it, and no signal that it changed underneath. `git merge
+   runner/charlie` then merges a stranger's commits, verifies green (they are
+   real matches), and reads as completely normal.
+
+   Cheap checks, in order:
+
+   ```sh
+   git log --oneline -5                     # commits you do not remember making
+   git reflog -15                           # merges/commits you did not perform
+   git reflog show origin/main              # pushes you did not make
+   git worktree list                        # worktrees you did not provision
+   ```
+
+   **A quiet `git log` is not evidence the other session has ended.** Round 6's
+   head stopped committing at 13:59 and round 7's head recorded it as
+   finished on that basis — but `main` was pushed to `origin` twice more
+   during round 7, carrying round 7's own commits. Only
+   `git reflog show origin/main` showed it. Re-check before teardown, not
+   just at the start.
+
+   A commit in `git log` that is not in your own record is the tell, and
+   authorship does NOT distinguish it — every agent commits as the operator.
+   If you find one: **do not delete or re-create any worktree or branch**
+   (that is what caused the collision), let live runners finish and commit,
+   merge what is genuinely yours, and escalate to the operator. Recycling a
+   name is only safe when you know no other head is holding it.
+
 4b. **Teardown has four preconditions.** Check all four before
    `git worktree remove --force` — which, because generated files always make
    plain `remove` refuse, is the command you will actually type, with its
@@ -149,6 +199,23 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    - `git log --oneline main..runner/<name>` is EMPTY for every branch.
      (`git branch -d` refusing to delete is a backstop, not a check.)
    - The agent-ID-to-runner mapping is right for any wrap-up messages.
+
+   **Check them immediately before the `--force`, not once at the start of
+   consolidation.** Cheap, and sound regardless of why a branch moved. Round 6
+   read a moving branch as "has REPORTED does not imply has stopped writing";
+   the branches were in fact advancing because another head's runners were
+   committing to the same recycled names (§4a). A runner writing on past its
+   own summary has not actually been observed here. Re-check because the tree
+   can move, not because you know which agent moves it.
+
+   **And do not skip teardown.** Round 6 deferred it for good reasons and left
+   five worktrees standing; round 7 inherited them, and one held THREE
+   uncommitted byte-exact matches with their reports (`func_8005A7A0`,
+   `func_8005B904`, `func_8005B990`) that no summary had ever mentioned. They
+   survived only because nobody ran `--force` on that worktree. Deferring is
+   the right call when agents may still be live — but it hands the next head a
+   §4c salvage it has no way to anticipate, so say so explicitly in PROGRESS,
+   naming the worktrees.
 
 4c. **When a runner dies to INFRASTRUCTURE rather than its own stop rule,
    salvage its uncommitted body before teardown.** The runner cannot file its
@@ -204,14 +271,26 @@ wrote down. Keep both honesty mechanisms fed:
   inflates `fresh` by its whole size and the next head mis-triages.
 
 `fresh` is a ceiling, not a work order: it cannot see "large body, deep
-reconstruction, low cold-runner yield". Read the unit-state list in
-MATCHING-GUIDE before believing a number.
+reconstruction, low cold-runner yield". Before believing a number, size the
+queue (`wc -l asm/nonmatchings/<unit>/*.s | sort -rn`) and read the match
+reports for the functions you intend to assign — see "Unit and segment state"
+in MATCHING-GUIDE.
 
 **Gate 2 — carve to refill.** If fresh-assignable functions are fewer than
 roughly (runners × per-runner target), carve new units BEFORE provisioning.
-There are **1230 uncarved functions** here, so this gate will fire early and
-often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
-`code_2c054` (181), `Entity` (142), `psyq_*` (library — leave for last).
+Most of the game is still uncarved, so this gate fires early and often.
+
+List the candidates live, largest first. **Do not work from a written list** —
+carving renames things, and every list of these written down so far has ended
+up naming segments that no longer exist:
+
+```sh
+for f in asm/*.s; do b=$(basename "$f" .s); case "$b" in psyq_*|header) continue;; esac
+    printf '%6d %s\n' "$(grep -c '^glabel' "$f")" "$b"; done | sort -rn
+```
+
+The `psyq_*` segments are Sony SDK code: excluded from the game-code
+denominator, and left for last. Matching them proves nothing about this game.
 
 1. Pick the next contiguous run of uncarved functions, ~20 per unit.
 2. **Check boundaries in the disassembly, on both sides.**
@@ -257,6 +336,20 @@ often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
      `^(\w+):` regex matches: `grep -rn '^\s*alabel' asm/nonmatchings/<unit>/`.
      That check can only fire AFTER extraction, so run it as a post-carve
      confirmation.
+   - *BIOS call stubs are not expressible in C.* A body of the shape `jr $t2`
+     with the vector in `$t2` and the call number in `$t1` is a PSX BIOS
+     trampoline (`0xB0`/`0x33` is BIOS `malloc`). There is no C that compiles
+     to it, so it needs an `hasm` segment or a literal `.word` disposition —
+     **decide which at carve time**, not when a runner hits one and burns an
+     attempt budget discovering it. They cluster in the class-framework block:
+
+     ```sh
+     grep -c 'jr *\$t2' asm/<segment>.s
+     ```
+
+     At the time of writing every one of them (13) sits in a single segment,
+     but that segment is a carve remainder and its name changes as carving
+     proceeds — run the grep rather than trusting a name.
    - *A dead orphan is not automatically inert.* Grep the orphan's `.s` for
      label references (`grep -o '\.L[0-9A-F]*'`). Empty output means a
      fall-through orphan: `INCLUDE_ASM` forever, done. Non-empty means it
@@ -285,6 +378,11 @@ often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
      `- [0xNNNN, .rodata, <unit>]`. `code_4cd08` needed `0x206C` — a slot the
      inherited yaml had labelled `# greyman`, so **do not trust the inherited
      rodata comments to say who owns a slot**.
+
+     Two standalone slots are known to hold text pointers and will need
+     attaching when their segments are carved: **`0xFD8` (`code_179d8`)** and
+     **`0xA8C` (`code_8220`)**. Both were confirmed against the data, not read
+     off the yaml comment.
    - **`undefined reference to 'D_XXXXXXXX'`** — the segment's tail is DATA,
      not code, and an `asm` segment was emitting it inline. Find where the text
      really ends and declare the rest: `code_55dd4`'s text stops at `0x57028`
@@ -383,6 +481,24 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > tells you NOTHING about the return type** — a `void` wrapper around an `s32`
 > tail call is byte-identical. Write `return callee(...);` unless you have
 > positive evidence the function is void.
+>
+> **But if acting on that means retyping a SHARED VTABLE SLOT, check every
+> other caller first.** Retyping a slot `void` -> `s32` is not local: it can
+> change an ALREADY-MATCHED function's codegen elsewhere. Round 7 hit this
+> exactly — with `EntityMethods::slotC4` typed `void`, GCC tail-merges two of
+> `func_8005E160`'s identical discarded `slotC4` calls into one; retyped to
+> `s32` it stops merging them, costing 4 words and shifting every later
+> function in that unit. The runner caught it by recompiling the other
+> caller's translation unit in isolation and diffing the `.s` BEFORE touching
+> the real build, and kept the slot `void`. In the same round `slotCC` faced
+> the identical question, was checked the same way, came back clean, and WAS
+> retyped: **two superficially symmetric slots needed opposite answers**, so
+> the check is per-slot and cannot be reasoned by analogy.
+>
+> The cheap version of the check: `grep -rn 'slotNN' src/` for every other
+> caller, rebuild, and confirm the whole-image SHA1 is still green — a slot
+> retype that breaks another function shows up as a red build, not as a
+> diff in the function you are working on.
 >
 > PARALLEL MODE RULES: do not edit DECOMPILATION_LEARNINGS.md,
 > MATCHING-GUIDE.md, PROGRESS.md, config/, or any file outside your unit. Put

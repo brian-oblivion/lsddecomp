@@ -1,8 +1,14 @@
-# DreamSys__InitMoodContibutors -- MATCHED (44/44 words)
+# DreamSys__InitMoodContibutors
 
-Unit: `DreamSys`. Round 2026-09-01-e (runner echo).
+**Unit:** DreamSys · **Size:** 44 words · **Status:** MATCHED (44/44)
 
-## Final C
+## What it does
+
+Already forward-declared (`void DreamSys__InitMoodContibutors(DreamSys
+*this, MoodGraphPoint *special);`). Clears both mood contributors, then --
+only if a `special` mood point is supplied -- logs it into both.
+
+## The C
 
 ```c
 void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
@@ -16,18 +22,30 @@ void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
 }
 ```
 
-## Derivation
+## Evidence
 
-Straightforward once the two vtable slots the body dispatches through were
-resolved: `+0x204` is `ClearMoodGraph` (already matched,
-`DreamSys__ClearMoodGraph`) and `+0x208` is `LogMood` (still `INCLUDE_ASM`,
-but its prototype was already in `include/DreamSys.h` from an earlier
-round). Both dispatches are through THIS function's own `this->vt`, not a
-different class's table -- straight passthrough calls on `areaMoods` /
-`entityMoods`, guarded once by `special != NULL` for the two `LogMood`
-calls. Matched on the first attempt; no residue.
+- `&this->areaMoods` / `&this->entityMoods`: `addiu $s2, $s0, 0x144` /
+  `addiu $s3, $s0, 0x154` -- exactly the offsets already established for
+  these two fields (`MoodGraphContributor`, 0x10 bytes each, so
+  0x144+0x10=0x154 checks out).
+- `this->vt->ClearMoodGraph`: vtable slot `+0x204`, already named and typed
+  by `DreamSys__ClearMoodGraph.md` (matched an earlier round).
+- `this->vt->LogMood`: vtable slot `+0x208`, immediately after
+  `ClearMoodGraph` in both the disassembly (`0x204` then `0x208`) and the
+  already-declared `vtable_DreamSys` struct order in
+  `include/DreamSys.h` -- no new typing needed, just confirms the existing
+  declaration's slot position is right.
+
+No new fields, no new slots. Matched on the first attempt.
+
+## Third-learning check (per head's request)
+
+**Not applicable.** No field is read, survives a `jalr`, and is read again
+-- `this` itself is the only thing that crosses the four calls, and it's a
+parameter (never reloaded from memory, no aliasing concern). No locals
+needed beyond the parameters themselves.
 
 ## Proposed learning
 
-None beyond what is already documented; this one was a clean vtable-slot
-resolution with no residue.
+None -- straightforward confirmation that `ClearMoodGraph`/`LogMood` are
+adjacent vtable slots, consistent with their already-recorded offsets.

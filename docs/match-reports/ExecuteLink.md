@@ -1,8 +1,18 @@
-# ExecuteLink -- MATCHED (41/41 words)
+# ExecuteLink
 
-Unit: `DreamSys`. Round 2026-09-01-e (runner echo).
+**Unit:** DreamSys · **Size:** 41 words · **Status:** MATCHED (41/41)
 
-## Final C
+## What it does
+
+Already forward-declared (`bool ExecuteLink(DreamSys *system, s32 stage,
+s32 unk1, s32 unk2);`) and called from four already-matched functions
+(`DreamSys__DynamicLink`, `DreamSys__StaticWallLink`, `func_8005A700`).
+This is the body: records `unk1` into `unknwon_int_0x44`, calls a
+base-class hook, bails if that hook cleared the flag, otherwise commits the
+new stage and (conditionally) resets the dream timer and fires a secondary
+notification.
+
+## The C
 
 ```c
 bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
@@ -10,9 +20,10 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 	DreamSysUnk58 *obj;
 
 	system->unknwon_int_0x44 = unk1;
-	system->vt->func_800182CC(system, unk1);
-	if (system->unknwon_int_0x44 == 0)
+	system->vt->slot30(system, unk1);
+	if (system->unknwon_int_0x44 == 0) {
 		return false;
+	}
 	system->currentStage = stage;
 	if (system->isFlashbackSession) {
 		system->dreamTimer = 0;
@@ -25,49 +36,68 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 }
 ```
 
-`ExecuteLink`'s prototype (`bool ExecuteLink(DreamSys *system, s32 stage, s32
-unk1, s32 unk2)`) was already declared in `include/DreamSys.h` by an earlier
-round; only the body was `INCLUDE_ASM` and is filled in here.
+## Field identification (all via manual offset accounting, not guesswork)
 
-## Derivation
+`unknwon_int_0x44` was already named at exactly this offset. The other
+three raw offsets this function touches (`0x68`, `0x24`, `0x164`) were NOT
+obviously anything from their surrounding comments, so I hand-summed
+`include/DreamSys.h`'s `DreamSys` struct field-by-field from the top
+(every pointer field counted as 4 bytes, matching this project's `-m32`
+verification convention from `DECOMPILATION_LEARNINGS.md` — a real `-m32`
+host build wasn't available in this environment, `gnu/stubs-32.h` missing,
+so this was done by direct arithmetic on the struct instead):
 
-The common tail call of both `func_8005A700` and `func_8005A7A0` in this
-runner's range.
+- `+0x24` → `dreamTimer` (falls right after `unk_0x14` + its 12-byte pad).
+- `+0x68` → `isFlashbackSession`. This one is easy to miss: `bool` in this
+  codebase is `typedef int bool;` (`include/types.h`), so it is a full
+  32-bit field, not a single byte — the `lw`/`beqz` word-test in the
+  disassembly is consistent with that, not with a byte-sized flag.
+- `+0x164` → `currentStage` (after `areaMoods`/`entityMoods`, two
+  0x10-byte `MoodGraphContributor`s, landing exactly on `currentStage`).
 
-- `system->vt->func_800182CC(system, unk1)` -- vtable slot `+0x030`,
-  resolved with `tools/classtable.py DREAMSYS_METHODS` to the inherited
-  `BasicClass__func_182cc` slot (address `0x800182CC`, outside this unit and
-  this runner's range). Named and added to `struct vtable_DreamSys` in
-  `include/DreamSys.h`, splitting the 10-word `unknown_functions_0x18[10]`
-  gap into `[6]` + this slot + `[3]`.
-- **The residue that took several iterations: `currentStage`/`dreamTimer`
-  assignment order.** Retail's `beqz $v0(isFlashbackSession), .L...` has
-  `sw $s1, 0x164($s0)` (`currentStage = stage`) IN ITS DELAY SLOT -- which
-  executes unconditionally regardless of the branch, while
-  `sw $zero, 0x24($s0)` (`dreamTimer = 0`) sits AFTER the branch target and
-  only runs when NOT skipped. Writing this as
-  `if (isFlashbackSession) { currentStage = stage; dreamTimer = 0; }` (both
-  assignments inside the guard) compiles to a real conditional store for
-  `currentStage` too, costing one extra `nop` and growing the function by a
-  word. The source is actually `currentStage = stage;` UNCONDITIONALLY,
-  followed by `if (isFlashbackSession) dreamTimer = 0;` -- a second instance
-  of DECOMPILATION_LEARNINGS.md's "default value slides into the guarding
-  branch's delay slot for free" idiom, just with the "default" write being
-  unconditional rather than a fallback.
-- `system->unk_0x58` cast to `DreamSysUnk58 *` and called through a NEW
-  slot, `+0x80` (`slot0x80`, three `s32` arguments) -- added alongside the
-  already-known `slot0x84` (two arguments, `func_80059E3C`) in
-  `DreamSysUnk58Vtable`. The three literal constants (`0x90`, `0x6E`,
-  `0x6E`) loaded into `$a1`-`$a3` with nothing else read from `this`
-  suggest a text-bank/entry trigger (same shape as `CinematicCall`), but
-  nothing here confirms that beyond the argument count.
+`unk_0x58` stays `s32` in the struct itself (matches the established
+dual-typed convention from `func_80059E3C` — cast locally to
+`DreamSysUnk58 *` rather than retyping the field project-wide, since other
+call sites in this unit still use it as a plain integer).
+
+## New vtable slots
+
+- `vtable_DreamSys` gained `slot30` (`+0x030`), resolved via
+  `tools/classtable.py DREAMSYS_METHODS` to `BasicClass__func_182cc` — the
+  same shared base-class slot `class_3ac78.h`/`Class6D3C8.h` already name
+  `slot30` with an identical `(self, s32 arg1)` signature. Return
+  discarded here too.
+- `DreamSysUnk58Vtable` gained `slot0x80` (three `s32` args, all literal
+  constants — `0x90`, `0x6E`, `0x6E` — at this one call site; nothing here
+  suggests their meaning).
+
+## Residue and fix
+
+First attempt wrote `system->currentStage = stage;` in natural trailing
+position (after the `isFlashbackSession` guard, before the `unk2` guard) —
+38/41, with the `sw $s1, 0x164($s0)` instruction landing one delay slot
+later than retail. Retail schedules that store into the delay slot of the
+EARLIER branch (`beqz v0, ...` testing `isFlashbackSession`), since it does
+not depend on that branch's outcome — the standard "unconditional value
+computed early, for free, in a branch's delay slot" idiom already
+documented in `DECOMPILATION_LEARNINGS.md`. Moving the assignment earlier
+in the C source, immediately after the early-return guard and before the
+`isFlashbackSession` check, reproduced the exact scheduling. This is a
+source-order fix, not a reshape — the statement's dependencies didn't
+change, only where GCC saw it relative to the branch it could hide behind.
+
+## Third-learning check (per head's request)
+
+**Not needed.** Every field read happens once, with the only cross-call
+survivor being the already-known `unk1` value held in `$a1`/`this` across
+the `slot30` call — and that's a live PARAMETER value re-read from the
+just-stored field (`system->unknwon_int_0x44`), not a value threaded
+through a local. GCC reloaded it from memory on its own with no local
+needed, matching retail's own `lw $v0, 0x44($s0)` reload after the call.
+No `jalr`-aliasing lever applied here.
 
 ## Proposed learning
 
-- **"Assign the value unconditionally, then conditionally clear/overwrite a
-  DIFFERENT field" is a real variant of the existing "default value slides
-  into the delay slot" idiom** (DECOMPILATION_LEARNINGS.md already has the
-  "default, then conditionally overwritten" case for a SINGLE field). Here
-  it is two DIFFERENT fields: one assignment is unconditional and rides the
-  branch's delay slot for free; the second is genuinely conditional. Writing
-  both inside the same `if` block over-guards the first and costs a word.
+None beyond re-confirming the existing "default value computed early, in
+whichever branch's delay slot needs it" idiom — worth noting it applies to
+a store into `*self` just as much as to a scalar return value.

@@ -4,170 +4,481 @@
 #include "common.h"
 
 /*
- * Two classes carved from the head of the old 415-function class_39e08
- * segment this round (see docs/match-reports for the evidence trail).
+ * The class whose method table is D_800865C8 (33 slots, resolved with
+ * tools/classtable.py 0x800865C8 -- diff against 0x8006E878 to see the
+ * override set). No FirecatFG name survives for this class, so fields are
+ * named by offset until real names are known.
  *
- * ClassA's table is D_800865C8 (33 slots): a direct child of BasicClass
- * (D_8006B58C, resolved with tools/classtable.py), overriding the ctor
- * (+0x008, func_80049684), the dtor (+0x00C, func_80049830) and +0x038,
- * and adding new virtuals from +0x040 to +0x084.
- *
- * ClassB's table is D_80086668 (28 slots): confirmed a subclass of ClassA
- * with `classtable.py D_80086668 --vs D_800865C8` -- 19 of 33 slots are
- * byte-identical copies, and ClassB overrides the ctor (func_8004A19C),
- * dtor (func_8004A228), +0x038 (func_8003E030, not this unit's), and the
- * three new-virtual slots +0x040/+0x044/+0x048 (func_8004A294/func_8004A2C4/
- * func_8004A324). It reuses ClassA's own +0x05C/+0x060/+0x06C bodies
- * verbatim (func_8004A364/func_8004A3EC/func_8004A458 appear at the same
- * offsets in both tables) and simply doesn't extend the table past +0x070,
- * so ClassB objects are typed as ClassA here -- no instance field beyond
- * ClassA's is observed from this unit's functions.
- *
- * No FirecatFG name survives for either class (only ordinary func_ names in
- * config/symbols), so fields are named by offset/use, not by hypothesis.
- * Only slots and fields this unit's carved functions actually touch are
- * given concrete types; the rest stay opaque so the struct keeps the right
- * size without requiring every method to be typed up front.
+ * Only the slots this unit's functions actually call through are given
+ * concrete field types; the rest stay opaque `void *`/`u8 pad` so the
+ * struct keeps the right size/offsets without requiring every method to be
+ * typed up front (same policy as include/Class6D3C8.h).
  */
+/* Tag-only forward declaration: Obj0C is fully defined further down, but
+ * Class865C8Methods::ctor below needs to name it first. A tag-only decl
+ * does not collide with the later `typedef struct Obj0C {...} Obj0C;`. */
+struct Obj0C;
+typedef struct Obj865C8 Obj865C8;
+typedef struct Obj4C Obj4C;
+typedef struct SubObjA SubObjA;
+typedef struct SubObjD SubObjD;
+typedef struct SubObjF SubObjF;
 
-typedef struct ClassA ClassA;
-typedef struct ClassAMethods ClassAMethods;
+/* What func_80049958 (Class865C8Methods slot +0x038) inspects: `arg1` is a
+ * pointer to a small wrapper whose own field 0 is a pointer to some OTHER,
+ * unrelated header-tagged object (double indirection confirmed by the
+ * disassembly's two chained `lw ..., 0x0(reg)`). Only the one word each
+ * struct exposes here is named; neither is this unit's own object type. */
+typedef struct HeaderObj {
+    s32 header;
+} HeaderObj;
+typedef struct EventArg {
+    HeaderObj *target;
+} EventArg;
 
-/* BasicClass's own table, reached here via func_8004A4B8 (defined in the
- * class_3ac78 unit, not this one) rather than a direct address load --
- * see func_8004A130's match report. Only the ctor slot this unit calls
- * through it is typed. */
-typedef struct BasicClassMethods {
-    /* +0x000 */ s32 header;
-    /* +0x004 */ void *unk04;
-    /* +0x008 */ void *(*ctor)(void *self, void *arg1, void *arg2);
-    /* +0x00C */ void *unk0C;
-} BasicClassMethods;
+/* +0x008 (ctor) and most BasicClass-inherited slots are not this round's
+ * functions (func_80049684, still INCLUDE_ASM elsewhere in this unit) --
+ * left untyped. */
+typedef struct Class865C8Methods {
+    s32 header;                                   /* +0x000 */
+    void *unk04;                                   /* +0x004 BasicClass__func_17eb0 */
+    /* Typed because func_80049608 (this unit) dispatches it as
+     * func_8004A060()->ctor(self, arg1, arg2, arg3); the signature is
+     * func_80049684's own, defined just below. */
+    void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 func_80049684 */
+    void (*dtor)(Obj865C8 *self);                  /* +0x00C func_80049830 */
+    /* BasicClass-inherited (BasicClass__func_17f98 -- same address as
+     * Class6D3C8.h's own local unk10 view of this same shared slot).
+     * Called by func_80049E20 as self->methods->slot10(self, newObj). */
+    void (*slot10)(Obj865C8 *self, Obj4C *arg1);   /* +0x010 */
+    /* Called by func_80049830 as self->methods->slot14(self, self->unk38). */
+    void (*slot14)(Obj865C8 *self, SubObjD *arg1); /* +0x014 */
+    void *unk18, *unk1C;                           /* BasicClass, inherited */
+    void *unk20, *unk24, *unk28, *unk2C;           /* BasicClass, inherited */
+    void *unk30, *unk34;                           /* BasicClass, inherited */
+    /* Occupied here by func_80049958 itself; only reachable from THIS
+     * struct via func_8004A4B8()'s own D_80086668 view of the same offset
+     * (Class86668Methods::slot38 below), where it forwards to the inherited
+     * func_8003E030. */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_80049958 */
+    void *unk3C;                                   /* +0x03C null slot */
+    void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 func_80049A14 */
+    void *slot44;                                  /* +0x044 func_80049A1C */
+    void *slot48;                                  /* +0x048 func_80049AC0 */
+    void *slot4C;                                  /* +0x04C func_80049B54 */
+    void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 func_80049C50 */
+    void *slot54;                                  /* +0x054 func_80049CA8 */
+    void (*noop58)(void);                          /* +0x058 func_8004A35C (no-op, matched) */
+    void *slot5C;                                  /* +0x05C func_8004A364 */
+    /* Shared with D_80086668 (see Class86668Methods below) -- literally the
+     * same function address at the same offset in both tables. */
+    void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 func_8004A3EC */
+    void *unk64, *unk68;                           /* shared base slots (func_8003E538/78) */
+    /* Also shared with D_80086668 at the same offset. */
+    void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C func_8004A458 */
+    void *unk70;                                   /* func_8004A478 */
+    void *unk74, *unk78;                           /* null slots */
+    void (*noop7C)(Obj865C8 *self);                /* +0x07C func_80049EA4 (no-op, matched) */
+    /* Retyped from `void (*noop80)(void)`: func_80049958 dispatches this
+     * slot as `self->methods->slot80(self, arg1, arg2)` with real
+     * arguments loaded into $a1/$a2 -- func_80049EAC (D_800865C8's own
+     * occupant, still matched, `void func_80049EAC(void) {}`) simply
+     * ignores them. A no-op BODY is not evidence the SLOT's signature takes
+     * no arguments; only THIS slot's other occupants would be. */
+    void (*slot80)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x080 func_80049EAC (no-op body, matched) */
+    /* Same signature as slot80 by the same call site (func_80049958's other
+     * branch); occupant func_80049EB4 is still addiu_at-blocked. */
+    void (*slot84)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x084 func_80049EB4, addiu_at-blocked */
+} Class865C8Methods;
 
-extern BasicClassMethods *func_8004A4B8(void);
+extern Class865C8Methods D_800865C8;
+
+/* Opaque view of whatever object Obj865C8::subA points to (used only by
+ * func_80049C50): its own vtable pointer sits at offset 0, and only the two
+ * slots func_80049C50 dispatches through are named here -- declared
+ * minimally, locally, for this one call site (same policy as
+ * DreamSysEntityObj in include/DreamSys.h). */
+typedef struct SubObjAMethods {
+    u8 pad00[0x44];
+    void (*slot44)(SubObjA *self, s32 arg1);                /* +0x044, func_80049B54 */
+    u8 pad48[0x4C - 0x48];
+    void (*slot4C)(SubObjA *self, s32 arg1);                /* +0x04C, func_80049B54 */
+    u8 pad50[0x70 - 0x50];
+    /* func_80049B54's 5-arg call: 4 register args plus a literal 0 in the
+     * 5th (stack) slot. arg1/arg2/arg3 types are just "address taken, never
+     * dereferenced here" -- SubObjD* for arg1 because that's what
+     * Obj865C8::unk38 already is, void* for the two rodata symbol
+     * addresses (arg2/arg3, real element type unknown). */
+    void (*slot70)(SubObjA *self, SubObjD *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070 */
+    void (*slot74)(void *self);
+    u8 pad78[0x8C - 0x78];
+    void (*slot8C)(SubObjA *self);                          /* +0x08C, func_80049B54 */
+    void (*slot90)(void *self);
+    u8 pad94[0xAC - 0x94];
+    /* Returns an object with its OWN 1-slot-known vtable (SubObjF below);
+     * func_80049B54 immediately dispatches the result's own +0x060. */
+    SubObjF *(*slot0xAC)(SubObjA *self);                    /* +0x0AC, func_80049B54 */
+} SubObjAMethods;
+struct SubObjA {
+    SubObjAMethods *methods;
+};
+
+/* Opaque view of whatever object SubObjAMethods::slot0xAC returns (used
+ * only by func_80049B54): same "vtable at offset 0, only the reached slot
+ * named" policy as SubObjE above. */
+typedef struct SubObjFMethods {
+    u8 pad00[0x60];
+    void (*slot60)(SubObjF *self, s32 arg1);
+} SubObjFMethods;
+struct SubObjF {
+    SubObjFMethods *methods;
+};
+
+/* Opaque view of whatever object Obj865C8::subB points to (used only by
+ * func_8004A228, guarded by Obj865C8::unk30): same "vtable at offset 0,
+ * only slot +0x004 named" policy. */
+typedef struct SubObjBMethods {
+    u8 pad00[0x04];
+    void (*slot4)(void *self);
+} SubObjBMethods;
+typedef struct SubObjB {
+    SubObjBMethods *methods;
+} SubObjB;
+
+/* Opaque view of whatever object func_80052B70 (uncarved, unit class_3bb8c)
+ * returns and stores at Obj865C8::unk4C (used only by func_80049E20): same
+ * "vtable at offset 0, only the one dispatched slot named" policy as
+ * SubObjA/SubObjB above. */
+typedef struct Obj4CMethods {
+    u8 pad00[0x4];
+    void (*slot4)(Obj4C *self);                       /* +0x004, func_80049CA8, return discarded */
+    u8 pad8[0x44 - 0x8];
+    void (*slot44)(Obj4C *self, s32 arg1, s32 arg2);
+    void (*slot48)(Obj4C *self);                       /* +0x048, func_80049CA8, return discarded */
+} Obj4CMethods;
+struct Obj4C {
+    Obj4CMethods *methods;
+};
+
+/* Opaque view of whatever object Obj0C::obj (below) points to (used only by
+ * func_80049B54): same "vtable at offset 0, only the reached slot named"
+ * policy as SubObjA/SubObjB/Obj4C. */
+typedef struct SubObjE SubObjE;
+typedef struct SubObjEMethods {
+    u8 pad00[0x7C];
+    s32 (*slot7C)(SubObjE *self, s32 arg1);
+} SubObjEMethods;
+struct SubObjE {
+    SubObjEMethods *methods;
+};
+
+/* Opaque view of an object family that gets "stepped" through a single
+ * self-consuming call, `obj = obj->methods->slot4(obj)` -- confirmed at SIX
+ * independent call sites in func_80049830 alone (three `Obj0C` fields below,
+ * plus `Obj865C8::unk40/unk44/unk48`), all identical shape. Same "vtable at
+ * offset 0, only the reached slot named" policy as SubObjA/SubObjB/Obj4C. */
+typedef struct SubObjG SubObjG;
+typedef struct SubObjGMethods {
+    u8 pad00[0x04];
+    SubObjG *(*slot4)(SubObjG *self);
+    u8 pad8[0x5C - 0x8];
+    /* func_80049684 (ctor): called on a just-constructed instance,
+     * return discarded. */
+    void (*slot5C)(SubObjG *self);         /* +0x05C */
+    u8 pad60[0x78 - 0x60];
+    /* func_80049684 (ctor): called immediately after construction on
+     * self->unk44, return discarded. */
+    void (*slot78)(SubObjG *self);         /* +0x078 */
+} SubObjGMethods;
+struct SubObjG {
+    SubObjGMethods *methods;
+};
+
+/* Opaque view of whatever object Obj865C8::unk0C points to (used by
+ * func_80049AC0/func_80049A1C, which read its own +0x004/+0x008/+0x010
+ * fields, func_80049B54, which dereferences +0x000, and func_80049830,
+ * which dereferences +0x008/+0x00C/+0x010 as `SubObjG *` -- no vtable
+ * dispatch through Obj0C ITSELF, so no methods pointer is declared for
+ * Obj0C; its own fields point at other objects that have one).
+ *
+ * +0x008/+0x010 were typed `s32` from func_80049A1C/func_80049AC0 alone,
+ * which only ever forward them as opaque register values through a vtable
+ * call that never dereferences them -- consistent with EITHER a scalar or a
+ * pointer. func_80049830 dereferences both directly (`->methods->slot4`),
+ * settling it: they are `SubObjG *`. func_80049A1C's own forwarding call
+ * sites got an explicit `(s32)` cast rather than staying wrong. */
+typedef struct Obj0C {
+    SubObjE *obj;                 /* +0x000, func_80049B54 */
+    s32 unk4;                     /* +0x004 -- untouched by func_80049830, still unconfirmed either way */
+    SubObjG *unk8;                /* +0x008, func_80049830 (was s32) */
+    SubObjG *unkC;                 /* +0x00C, func_80049830 (new) */
+    SubObjG *unk10;                /* +0x010, func_80049830 (was s32) */
+} Obj0C;
+
+/* Opaque view of whatever object Obj865C8::unk38 points to (used by
+ * func_80049AC0/func_80049A1C): same "vtable at offset 0, only the reached
+ * slots named" policy as SubObjA/SubObjB/Obj4C above. */
+typedef struct SubObjDMethods {
+    u8 pad00[0x10];
+    void (*slot10)(SubObjD *self, s32 arg1);
+    void (*slot14)(SubObjD *self, s32 arg1);
+    u8 pad18[0x10C - 0x18];
+    /* func_80049684 (ctor): called as arg2->methods->slot10C(arg2,
+     * self->subB). */
+    void (*slot10C)(SubObjD *self, SubObjB *arg1);   /* +0x10C */
+    void (*slot110)(SubObjD *self, s32 arg1);
+    /* func_80049684 (ctor): called as arg2->methods->slot114(arg2,
+     * self->unk44). */
+    void (*slot114)(SubObjD *self, SubObjG *arg1);   /* +0x114 */
+    u8 pad118[0x1B4 - 0x118];
+    /* func_80049CA8's `case 1`: return value used (`>= 0` check), so this
+     * is genuinely non-void. */
+    s32 (*slot1B4)(SubObjD *self);                /* +0x1B4 */
+    void (*slot1B8)(SubObjD *self, s32 arg1);      /* +0x1B8 */
+    u8 pad1BC[0x1E0 - 0x1BC];
+    /* func_80049CA8's `case 3`: return value used (forwarded straight into
+     * func_80049E20's own 2nd argument). */
+    s32 (*slot1E0)(SubObjD *self);                 /* +0x1E0 */
+} SubObjDMethods;
+struct SubObjD {
+    SubObjDMethods *methods;
+};
+
+/* Object size unconfirmed (this unit never allocates one of these itself --
+ * func_8004A130 allocates the SIBLING class below instead). Field offsets
+ * are only the ones this round's functions touch. */
+struct Obj865C8 {
+    Class865C8Methods *methods;   /* +0x000 */
+    u8 pad04[0x0C - 0x04];
+    Obj0C *unk0C;                 /* +0x00C, func_80049AC0 dereferences (->unk4); passed
+                                      through as a plain register value to
+                                      func_8003E5C8()->slot44's 2nd arg by func_80049E20 */
+    s32 unk10;                    /* +0x010, func_80049AC0 (2nd arg to a slot14 call) */
+    u8 pad14[0x18 - 0x14];
+    SubObjA *subA;                /* +0x018, func_80049C50 */
+    s32 unk1C;                    /* +0x01C, func_8004A364 (compared against unk2C) */
+    u8 pad20[0x28 - 0x20];
+    s32 unk28;                    /* +0x028, func_8004A3EC */
+    s32 unk2C;                    /* +0x02C, func_8004A458 */
+    s32 unk30;                    /* +0x030, func_8004A228 (guard) */
+    SubObjB *subB;                /* +0x034, func_8004A228 */
+    SubObjD *unk38;                /* +0x038, func_80049AC0 dereferences (->methods); passed
+                                       through as a plain register value to
+                                       func_8003E5C8()->slot44's 3rd arg by func_80049E20 */
+    s32 unk3C;                    /* +0x03C, func_80049A14 */
+    /* Retyped from `s32` (func_80049E20's own usage only ever forwards
+     * these as opaque register values into func_80052B70, never
+     * dereferencing them): func_80049830 dereferences all three directly
+     * as `SubObjG *` (`self->unkNN->methods->slot4(self->unkNN)`, result
+     * discarded). func_80049E20's call site got an explicit `(s32)` cast. */
+    SubObjG *unk40;                /* +0x040, func_80049E20 (2nd arg to func_80052B70), func_80049830 */
+    SubObjG *unk44;                /* +0x044, func_80049E20 (3rd arg to func_80052B70), func_80049830 */
+    SubObjG *unk48;                /* +0x048, func_80049E20 (4th arg to func_80052B70), func_80049830 */
+    Obj4C *unk4C;                 /* +0x04C, func_80049E20 -- result of func_80052B70 */
+};
+
+/* Base class table shared by D_800865C8 and D_80086668 (resolved with
+ * tools/classtable.py 0x800865C8 --vs 0x8006E878). Only the slots this
+ * unit's functions dispatch through when explicitly calling the BASE
+ * implementation are typed. */
+typedef struct IntermediateBaseMethods {
+    u8 pad00[0x008];
+    void *(*ctor)(void *self);             /* +0x008, called by func_8004A19C with only `self` set up */
+    void (*dtor)(void *self);              /* +0x00C */
+    u8 pad10[0x44 - 0x10];
+    /* Same accessor/slot combination code_2c054.h calls
+     * `TaskUtilMethods::slot44` on -- there it forwards to
+     * `self->unk38 = <base result>` (func_8003C1DC). Here the caller
+     * (func_8004A2C4, D_80086668's own +0x044 override) zeroes
+     * `self->unk28` immediately before the call and reads it back
+     * immediately after: same "default, then base may overwrite" shape. */
+    void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
+    void (*slot48)(void *self);            /* +0x048 */
+    u8 pad4C[0x5C - 0x4C];
+    void (*slot5C)(void *self, s32 arg1, s32 arg2); /* +0x05C, called by func_8004A364 */
+    void (*slot60)(void *self, s32 arg1);  /* +0x060 */
+} IntermediateBaseMethods;
+
+/* Uncarved (asm/code_2cc8c.s, not this unit's to write): a plain accessor
+ * with no parameters, returning &D_8006E878. Same shape as
+ * Get_vtable_DreamSys / func_800269E0 (docs/research/class-framework.md). */
+extern IntermediateBaseMethods *func_8003E5C8(void);
+
+/* Allocator in the still-uncarved unit class_3bb8c (asm/class_3bb8c.s):
+ * allocates an 0x88-byte instance, ctors it, and dispatches its own slot
+ * +0x008 with the 5 forwarded arguments, returning the new instance (or 0
+ * on allocation failure). Only the one call site here (func_80049E20)
+ * cares about its signature; `a0`'s type is inherited from whatever the
+ * caller actually passes (this unit's own `SubObjB *`), the remaining
+ * scalar args are untyped beyond their register width. */
+extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
+
+/* A sibling class (D_80086668, 28 slots) that overrides several of
+ * D_800865C8's slots (+0x008, +0x00C, +0x040, +0x044, +0x048) while sharing
+ * the rest verbatim (+0x058..+0x070, confirmed identical function
+ * addresses in both tables by tools/classtable.py). Constructed by
+ * func_8004A130, a New_X allocator (0x38-byte instance). Instances share
+ * `Obj865C8`'s own layout (func_8004A19C writes `unk30`/`subB` at the exact
+ * same offsets `Obj865C8`'s other functions already use), so this class's
+ * own instances are typed `Obj865C8 *` too rather than inventing a second,
+ * parallel struct.
+ *
+ * `ctor` (+0x008, func_8004A19C) never uses its own return value at either
+ * of its two call sites (its own body sets no explicit `$v0` before
+ * returning either -- CLAUDE.md's "discarded return is never evidence of
+ * void" rule is about NOT assuming void from a discarding caller alone, but
+ * here the callee's OWN body never materializes a return value at all, so
+ * `void` is the callee-side reading, not an inference from the caller). */
+typedef struct Class86668Methods {
+    u8 pad00[0x08];
+    void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
+    /* func_8004A228 (this unit, matched): the sibling class's own dtor
+     * override. Called by func_80049830 (D_800865C8's own dtor) as
+     * func_8004A4B8()->dtor(self) -- a base-class dtor forwarding to a
+     * DIFFERENT sibling's override, same shape as slot38/slot44/slot48
+     * below. */
+    void (*dtor)(Obj865C8 *self);                          /* +0x00C func_8004A228 */
+    u8 pad10[0x38 - 0x10];
+    /* Inherited, shared verbatim with D_800865C8's own occupant of this
+     * offset (func_80049958, this unit): D_80086668's own +0x038 is
+     * func_8003E030 (a base/inherited slot, out of this unit's scope).
+     * Called by func_80049958 as func_8004A4B8()->slot38(self, arg1, arg2). */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_8003E030 */
+    u8 pad3C[0x44 - 0x3C];
+    /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
+     * the base's own slot44, returns self->unk28. Called by func_80049A1C
+     * as func_8004A4B8()->slot44(self, self->unk0C, 0), return discarded. */
+    s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
+    /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
+     * func_8003E5C8()->slot48(self). Called by func_80049AC0 as
+     * func_8004A4B8()->slot48(self). */
+    void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
+    u8 pad4C[0x54 - 0x4C];
+    /* Inherited, shared verbatim with D_800865C8's own occupant of this
+     * offset (func_80049CA8, this unit): D_80086668's own +0x054 is
+     * func_8003E418 (a base/inherited slot, out of this unit's scope).
+     * Called by func_80049CA8 as func_8004A4B8()->slot54(self, arg1,
+     * arg2), return discarded. */
+    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 func_8003E418 */
+} Class86668Methods;
+
+/* A plain accessor with no parameters, returning &D_80086668. Defined in the
+ * class_3ac78 unit, not this one -- matched there as C in round 2026-09-02,
+ * so it is no longer INCLUDE_ASM. Declared here only because this unit
+ * dispatches through it; class_3ac78.h holds its owning view. */
+/* Defined in this unit at ROM order 0x3A860, i.e. AFTER func_80049608,
+ * which dispatches through it -- so it needs a prototype here. */
+extern Class865C8Methods *func_8004A060(void);
+
+extern Class86668Methods *func_8004A4B8(void);
+
+/* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
+ * class_16334.h for the other units that also declare it locally. */
 extern void *func_80017B34(s32 size);
 
-/* An object of unresolved class reached through ClassA::unk18. Only the two
- * slots func_80049C50 dispatches through (+0x074 and +0x090) are typed;
- * everything else is padding to keep the offsets right. */
-typedef struct Dispatch18Methods {
-    u8 pad00[0x74];
-    void (*slot74)(void *self);
-    u8 pad78[0x18];
-    void (*slot90)(void *self);
-} Dispatch18Methods;
+/* Allocator in the still-uncarved unit code_179d8 (asm/code_179d8.s):
+ * allocates a 0x64-byte instance and, on success, ctors it with the single
+ * forwarded argument. Only call site here is func_8004A19C, which stores
+ * the result straight into `Obj865C8::subB` (`SubObjB *`). */
+extern SubObjB *func_8002C480(s32 arg1);
 
-typedef struct Dispatch18 {
-    Dispatch18Methods *methods;
-} Dispatch18;
+/* Rodata symbols right next to this unit's own D_80086668/D_800865C8
+ * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before D_80086668
+ * respectively). Only their ADDRESSES are taken, as the 2nd/3rd args to
+ * SubObjAMethods::slot70 (func_80049B54); real element type/size unknown. */
+extern u8 D_80086650[];
+extern u8 D_8008665C[];
 
-/* An object of unresolved class, produced by func_80052B70 and stashed at
- * ClassA::unk4C. Only the +0x044 slot func_80049E20 calls is typed. */
-typedef struct Dispatch4CMethods {
-    u8 pad00[0x44];
-    void (*slot44)(void *self, s32 arg1, s32 arg2);
-} Dispatch4CMethods;
+/* Matched in code_4cd08.c, called here as a plain global (per CLAUDE.md's
+ * "calling into a function that is still INCLUDE_ASM in another unit is
+ * fine" convention, extended to an already-matched cross-unit function:
+ * only a local extern prototype is needed). No return value used. */
+extern void func_8005C5E8(void);
 
-typedef struct Dispatch4C {
-    Dispatch4CMethods *methods;
-} Dispatch4C;
+/* The ctor, func_80049684. A large web of external calls; each is declared
+ * locally with the minimal signature its call site here demonstrates (per
+ * CLAUDE.md's "calling into a function that is still INCLUDE_ASM elsewhere
+ * is fine" convention -- several of these ARE already declared, with a
+ * different but ABI-compatible return type, in OTHER units' own local
+ * views; this unit keeps its own, per the project's established
+ * multiple-independent-local-views policy). */
 
-/* FIVE arguments, not four: func_80052B70 reads its fifth at 0x48($sp)
- * against a 0x38 frame, i.e. the caller's stack argument slot at
- * 0x10($sp). See docs/match-reports/func_80049E20.md. */
-extern void *func_80052B70(void *arg0, s32 arg1, void *arg2, void *arg3, s32 arg4);
+/* Reads an unnamed small-data global's first field; return value is
+ * forwarded, unread by its own body, as the sibling ctor's arg1 (which
+ * that ctor stores directly into `Obj865C8::unk30`, an `s32`). Uncarved,
+ * asm/psyq_memset.s. */
+extern s32 func_80048E08(s32 arg1);
 
-/* An object of unresolved class reached through ClassA::unk34 (a listener,
- * notified from ClassB's dtor when unk30 is set). Only the +0x004 slot is
- * typed; it is called with the object itself as its sole argument, the
- * same obj->methods->slotN(obj) shape as Dispatch18/Dispatch4C above. */
-typedef struct Dispatch34Methods {
-    void *unk00;
-    void (*slot4)(void *self);
-} Dispatch34Methods;
+/* Matched in code_4cd08.c (still called `func_8005C508` there, STALLED at
+ * 40/56 -- see docs/match-reports/func_8005C508.md). Takes no arguments,
+ * return value (if any) unused here. */
+extern void func_8005C508(void);
 
-typedef struct Dispatch34 {
-    Dispatch34Methods *methods;
-} Dispatch34;
+/* "New_X"-shaped allocator (uncarved, asm/psyq_SpuSetMute.s): allocates,
+ * ctors with the one forwarded argument, returns the new instance (or 0).
+ * Stored into `Obj865C8::unk44` here, which this function's own body then
+ * immediately dispatches through `SubObjGMethods::slot78`/`slot5C` --
+ * consistent with the existing `SubObjG` family. */
+extern SubObjG *func_8003B39C(const char *path);
 
-/* func_8003E5C8 (defined outside this unit, asm/code_2cc8c.s -- uncarved)
- * is called from four of this unit's functions and every slot read off its
- * result (+0x00C, +0x044, +0x048, +0x060) matches ClassA's OWN base
- * implementation at that offset, including cases where the caller is
- * ClassB's override of that very slot (func_8004A2C4 is ClassB's +0x044,
- * and reads +0x044 off this call's result to reach ClassA's un-overridden
- * func_80049A1C rather than recursing into itself). Typed as returning
- * ClassAMethods* on that evidence -- see the match reports for
- * func_8004A228/func_8004A2C4/func_8004A324/func_8004A3EC. */
-extern ClassAMethods *func_8003E5C8(void);
+/* Filenames right next to each other in the same rodata blob
+ * (asm/data/1A90.rodata.s): "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD". */
+extern const char D_800113EC[];
+extern const char D_800113F8[];
 
-struct ClassAMethods {
-    /* +0x000 */ s32 header;                                       /* class-id/flags word */
-    /* +0x004 */ void *unk04;                                      /* BasicClass__func_17eb0, inherited */
-    /* +0x008 */ void (*ctor)(ClassA *self, void *arg1, void *arg2, s32 arg3);  /* func_80049684 */
-    /* +0x00C */ void *(*dtor)(ClassA *self);                      /* func_80049830 */
-    /* +0x010 */ void (*slot10)(ClassA *self, void *arg1);         /* BasicClass__func_17f98, inherited; used by func_80049E20 */
-    /* +0x014 */ void *unk14;                                      /* BasicClass__func_17ff0, inherited */
-    /* +0x018 */ void *unk18;                                      /* BasicClass__func_18040, inherited */
-    /* +0x01C */ void *unk1C;                                      /* BasicClass__func_180bc, inherited */
-    /* +0x020 */ void *unk20;                                      /* BasicClass__func_180fc, inherited */
-    /* +0x024 */ void *unk24;                                      /* BasicClass__func_1811c, inherited */
-    /* +0x028 */ void *unk28;                                      /* BasicClass__func_1813c, inherited */
-    /* +0x02C */ void *unk2C;                                      /* BasicClass__func_1816c, inherited */
-    /* +0x030 */ void *unk30;                                      /* BasicClass__func_182cc, inherited */
-    /* +0x034 */ void *unk34;                                      /* BasicClass__func_18350, inherited */
-    /* +0x038 */ void *unk38;                                      /* func_80049958, ClassA override; func_8003E030 in ClassB */
-    /* +0x03C */ void *unk3C;                                      /* null slot */
-    /* +0x040 */ void (*resetState)(ClassA *self);                 /* func_80049A14; func_8004A294 in ClassB */
-    /* +0x044 */ void (*slot44)(ClassA *self, void *arg1, void *arg2);  /* func_80049A1C; func_8004A2C4 in ClassB */
-    /* +0x048 */ s32 (*slot48)(ClassA *self);                      /* func_80049AC0; func_8004A324 in ClassB */
-    /* +0x04C */ void *unk4C;                                      /* func_80049B54; absent (null run) in ClassB */
-    /* +0x050 */ void (*slot50)(ClassA *self);                     /* func_80049C50; absent in ClassB */
-    /* +0x054 */ void *unk54;                                      /* func_80049CA8; func_8003E418 in ClassB */
-    /* +0x058 */ void (*slot58)(void);                             /* func_8004A35C (empty stub), shared */
-    /* +0x05C */ void *unk5C;                                      /* func_8004A364, shared */
-    /* +0x060 */ void (*onEvent)(ClassA *self, s32 event);         /* func_8004A3EC, shared */
-    /* +0x064 */ void *unk64;                                      /* func_8003E538, shared */
-    /* +0x068 */ void *unk68;                                      /* func_8003E578, shared */
-    /* +0x06C */ void (*setRadius)(ClassA *self, s32 val);         /* func_8004A458, shared */
-    /* +0x070 */ void *unk70;                                      /* func_8004A478 (class_3ac78 unit), shared */
-    /* +0x074 */ void *unk74;                                      /* null slot, ClassA only */
-    /* +0x078 */ void *unk78;                                      /* null slot, ClassA only */
-    /* +0x07C */ void (*slot7C)(ClassA *self);                     /* func_80049EA4 (empty stub), ClassA only; called with self by func_8004A3EC */
-    /* +0x080 */ void (*slot80)(void);                             /* func_80049EAC (empty stub), ClassA only */
-    /* +0x084 */ void (*slot84)(void);                             /* func_80049EB4, ClassA only -- BLOCKED, see report */
-};
+/* Same request-block shape `Class6D3C8.h` already established at
+ * `func_80025FDC`'s call site (`LoadModelRequest`, learned there to be
+ * 0x10 bytes even though only the first two fields are ever written --
+ * "local struct SIZE matters, not shape"). This unit's own local view,
+ * not a shared header, per this project's per-unit-view convention. */
+typedef struct LoadRequest {
+    s32 type;
+    const char *path;
+    s32 unk08;
+    s32 unk0C;
+} LoadRequest;
 
-struct ClassA {
-    /* +0x00 */ ClassAMethods *methods;
-    /* +0x04 */ u8 unk04[8];        /* BasicClass instance fields; owned by whatever unit decompiles BasicClass itself */
-    /* +0x0C */ void *unk0C;        /* ctor arg1, stored verbatim (func_80049684) */
-    /* +0x10 */ u8 unk10[8];        /* unresolved; not touched by this unit's carved functions */
-    /* +0x18 */ Dispatch18 *unk18;  /* an unresolved-class object; func_80049C50 dispatches its +0x074/+0x090 */
-    /* +0x1C */ u8 unk1C[0xC];      /* unresolved */
-    /* +0x28 */ s32 unk28;          /* flag/output word; written 0 then possibly 1 by ClassB's onEvent/slot44 override, read back as a return value */
-    /* +0x2C */ s32 radius;         /* set verbatim if negative, else value*20 (func_8004A458) */
-    /* +0x30 */ s32 unk30;          /* boolean; gates a notify-on-destroy call in ClassB's dtor */
-    /* +0x34 */ Dispatch34 *unk34;  /* a listener object; ->methods->slot4(unk34) called from ClassB's dtor when unk30 is set */
-    /* +0x38 */ void *unk38;        /* ctor arg2, stored verbatim; a big-vtable object (func_80049684 calls slots 0x10C/0x114 on it) */
-    /* +0x3C */ s32 state;          /* reset to 0 by resetState (func_80049A14), set to 2 by func_80049E20 */
-    /* +0x40 */ s32 unk40;          /* func_8004A070's result, forwarded into func_80052B70 */
-    /* +0x44 */ void *unk44;        /* func_8003B39C's result, forwarded into func_80052B70 */
-    /* +0x48 */ void *unk48;        /* func_80048D74's result, forwarded into func_80052B70 */
-    /* +0x4C */ Dispatch4C *unk4C;  /* func_80052B70's result; func_80049E20 dispatches its +0x044 */
-};
+/* Uncarved, asm/psyq_memset.s: loads a resource named by `req->path`,
+ * returns a handle/object. Already declared elsewhere (Class6D3C8.h) as
+ * `extern void *func_80043840(void *arg)`; this unit's own local view types
+ * the return `SubObjG *` to match where it's stored here
+ * (`Obj865C8::unk48`). */
+extern SubObjG *func_80043840(LoadRequest *req);
 
-/* ClassA's own table (still raw asm data, asm/data/76DC8.data.s -- not
- * decompiled to a C initializer by this unit). */
-extern ClassAMethods D_800865C8;
+/* Uncarved, asm/psyq_memset.s: a magic-multiply division idiom over its one
+ * argument (not an allocator -- no `func_80017B34` call in its own body).
+ * Its return value is forwarded as `func_800398E0`'s own 1st argument. */
+extern s32 func_80048D74(s32 arg1);
 
-/* ClassA's own vtable getter -- a direct address load, not a call (compare
- * func_8004A4B8, which is BasicClass's, defined in the class_3ac78 unit and
- * reached via jal everywhere else in this unit). */
-ClassAMethods *func_8004A060(void);
+/* "New_X"-shaped allocator (uncarved, asm/psyq_SpuSetMute.s), 3 forwarded
+ * arguments. Stored into `Obj865C8::unk40`. */
+extern SubObjG *func_800398E0(s32 arg1, s32 arg2, s32 arg3);
 
-/* ClassB shares ClassA's instance layout; no field beyond it is observed
- * from this unit's carved functions, so it is typed as ClassA at call
- * sites rather than introducing an empty subtype. */
+/* Already declared elsewhere (code_1677c.c) as `extern s32
+ * func_8004A070(s32 a0)`; this unit's own local view, same signature.
+ * Return value discarded at this call site. */
+extern s32 func_8004A070(s32 arg1);
+
+/* Already declared elsewhere (Class6D3C8.h) with this exact signature; this
+ * unit's own local view. Return value discarded at this call site. */
+extern s32 func_80026F34(s32 arg1, s32 arg2, s32 arg3);
+
+/* "New_X"-shaped allocator (uncarved, asm/class_3bb8c.s), zero forwarded
+ * arguments (its own ctor call passes only the new instance). Stored into
+ * `Obj0C::unk10`. */
+extern SubObjG *func_8004D254(void);
+
+/* Same "New_X" shape, zero arguments (uncarved, asm/psyq_memset.s). Stored
+ * into `Obj0C::unk8`. */
+extern SubObjG *func_80042400(void);
+
+/* Already declared, fully typed, in class_3ac78.h as `Class866E8
+ * *func_8004A4C8(s32, s32)` (an established New_X allocator for a
+ * DIFFERENT, richer-typed class). Stored into `Obj0C::unkC` here, which
+ * this unit's own local view types `SubObjG *` -- an explicit cast is used
+ * at the one call site rather than importing class_3ac78's type, per this
+ * project's per-unit-view convention (same policy as the other externs on
+ * this page). */
+extern void *func_8004A4C8(s32 arg1, s32 arg2);
 
 #endif

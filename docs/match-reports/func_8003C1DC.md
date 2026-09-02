@@ -1,50 +1,79 @@
 # func_8003C1DC
 
-**Unit:** code_2c054 · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
+**Unit:** code_2c054 · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
-The base task class's own (unoverridden) implementation of method-table
-slot `+0x044` -- the function StreamTask's own override (func_8003BA58,
-first pass) chains into via `func_8003DFBC()`. Chains ONE level further
-into a THIRD, grandparent class's own copy of the same slot (its result
-discarded), then returns this object's own "state" field (`unk38`, also
-touched by func_8003BD10).
+Forwards to a SECOND sibling class's table (`func_8003E5C8()`, returns
+`&D_8006E878`) at slot `+0x044`, passing `self` and both of its own
+arguments unchanged, discards that call's return, then reads and returns
+`self->unk38`. This function itself occupies `D_8006E730` slot `+0x044` --
+i.e. it is the delegation TARGET that `func_8003BA58` (`D_8006E5F8::slot44`)
+calls into (see that report). One level further down the same chain:
+`D_8006E5F8::slot44` (`func_8003BA58`) -> `D_8006E730::slot44`
+(`func_8003C1DC`, this function) -> `D_8006E878::slot44` (unnamed,
+uncarved).
 
-## The C
+## Derivation
+
+```
+addu $s2, $a0, zero            ; s2 = self
+addu $s0, $a1, zero            ; s0 = a1
+jal  func_8003E5C8
+ addu $s1, $a2, zero            ; s1 = a2 (delay slot)
+addu $a0, $s2, zero
+addu $a1, $s0, zero
+lw   $v0, 0x44($v0)
+jalr $v0
+ addu $a2, $s1, zero
+lw   $v0, 0x38($s2)              ; v0 = self->unk38, AFTER the call returns
+...epilogue, returns v0
+```
 
 ```c
-s32 func_8003C1DC(StreamTask *self, s32 a1, s32 a2) {
+s32 func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
     func_8003E5C8()->slot44(self, a1, a2);
     return self->unk38;
 }
 ```
 
-## A third class discovered: the grandparent
+Matched first attempt.
 
-`func_8003E5C8()` (defined in the still-uncarved `asm/code_2cc8c.s`, right
-next to `func_8003DFBC()`) has the identical "always returns the same
-fixed table address, ignores its argument" shape: `lui $v0,%hi(D_8006E878);
-addiu $v0,$v0,%lo(D_8006E878); jr $ra`. This is a class table ONE LEVEL
-ABOVE the base task class (`D_8006E730`), reached only from this one
-function in this unit. Nothing about `D_8006E878` beyond this single
-slot's signature (`self, a1, a2`) is derived here -- typed in
-`include/code_2c054.h` as `TaskGrandBaseMethods`, deliberately minimal.
+**Return-type discrepancy with `include/Class6D3C8.h`, flagged for the
+head:** that header already types this exact slot (`D_8006E730::slot44`,
+its own `LoaderTaskMethods::slot44`) as `void`, established from a
+*different, discarding* caller's call sites in another unit. This function's
+own disassembly, however, unambiguously reads `self->unk38` into `$v0`
+*after* the inner call returns and *before* the epilogue -- a load with no
+purpose except to be the return value (nothing else touches it). A truly
+`void` source would not need this load at all. The two typings are not in
+conflict at the ABI level (a caller that ignores the return through a
+`void`-typed function pointer simply never reads `$v0`, which is exactly
+what `Class6D3C8.h`'s own caller does), so `Class6D3C8.h`'s existing callers
+are unaffected either way -- but the FUNCTION's true return type is `s32`,
+and `Class6D3C8.h`'s `LoaderTaskMethods::slot44` typing looks incomplete now
+that the occupant is known. Not fixed here (out of this unit's scope to edit
+that header under the parallel-run rules); worth the head reconciling in
+`Class6D3C8.h` directly, in a later round.
 
-This also means the class chain this unit has now confirmed spans THREE
-levels: `D_8006E878` (grandparent) -> `D_8006E730` (base task,
-`func_8003DFBC()`) -> `D_8006E5F8` (StreamTask, `func_8003BE84()`).
+## New struct/header knowledge
 
-## How the return type was derived
+Added `include/code_2c054.h`'s `TaskUtilMethods` (this unit's own local view
+of `D_8006E878`) with slot `+0x044` typed
+`void (*)(StreamTaskObj *self, s32 a1, s32 a2)` (its own return is
+discarded at this call site, so its true type is unconfirmed either way).
+Named `StreamTaskObj::unk38`.
 
-Unlike most of this unit's chain-to-base slots, this one does NOT simply
-forward the base's own return value -- it explicitly reloads
-`self->unk38` AFTER the grandparent call and returns THAT instead,
-discarding whatever the grandparent's slot `+0x044` produced. This is
-positive evidence (not just an unproven guess) that this slot's real
-return type is `s32`, since the value returned is a genuine object field,
-not leftover register noise.
+## Proposed learning
 
-## Provenance
-
-round 2026-09-01, runner alpha, unit code_2c054 (second pass).
+**The "byte match tells you nothing about return type" trap applies to an
+INTERMEDIATE link in a delegation chain, not just to the outermost
+wrapper.** This function's own body proves its return type is non-void
+(`self->unk38` is read purely to become the return value) even though an
+ALREADY-ESTABLISHED header from a different unit types the slot it occupies
+as void -- that header's typing describes what ITS caller does with the
+value (nothing), not what the callee itself computes. When a function this
+unit needs to write already occupies a slot typed elsewhere, read the
+occupant's OWN disassembly before trusting the existing slot typing at face
+value; the existing typing can be right for its own call site and still
+under-describe the function.

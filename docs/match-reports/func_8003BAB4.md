@@ -1,41 +1,61 @@
 # func_8003BAB4
 
-**Unit:** code_2c054 · **Size:** 42 instructions · **Status:** MATCHED (42/42 words)
+**Unit:** code_2c054 · **Size:** 42 words · **Status:** MATCHED (42/42)
 
-## What it does
-
-StreamTask's override of method-table slot `+0x04C`: chains into the base
-task class's own copy of the same slot first, resets `unkA4` to 0, ticks
-the sub-object's (`unkB4`) slot `+0x06C`, dispatches its slot `+0x040`
-(capturing the s32 status), and, if that status is non-zero, re-enters
-this object's own slot `+0x06C` (`func_8003BCF4`) with a literal 0.
-
-## The C
+## Summary
 
 ```c
-void func_8003BAB4(StreamTask *self) {
-    s32 status;
+void func_8003BAB4(StreamTaskObj *self) {
     func_8003DFBC()->slot4C(self);
     self->unkA4 = 0;
     self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
-    status = self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8);
-    if (status != 0) {
+    if (self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8) != 0) {
         self->methods->slot6C(self, 0);
     }
 }
 ```
 
-## How it was found
+## Evidence
 
-Same "chain to base, then extra work" shape already established in this
-unit's first pass (func_8003BA58, func_8003B9DC). Field order in the C
-matches retail's own instruction order exactly (unkA4 reset happens
-between the base-class call and the sub-object dispatch, not before or
-after as a batch). `classtable.py D_8006E5F8` places this function at
-slot `+0x04C`; `classtable.py D_8006E730` confirms the base class's own
-unoverridden copy at that slot is `func_8003C238` (not yet matched by
-this unit).
+- `func_8003DFBC()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
+  D_8006E730` shows it occupied by `func_8003C238`, this unit's own (still
+  queued, larger) function — confirms existence/arity, result discarded here
+  so typed `void`.
+- `self->unkB4->methods->slot6C(self->unkB4, self->unkC0)`: two-argument
+  forward on `StreamTaskUnkB4Methods`, return discarded, typed `void`.
+- `self->unkB4->methods->slot40(...)`: five-argument call (4 register args
+  plus one stack-spilled 5th, `self->unkC8`), **return value tested directly
+  by the following `beqz`, never stored anywhere** — typed `s32`.
+- `self->methods->slot6C(self, 0)`: reuses the slot established to be
+  `func_8003BCF4`'s occupied slot (`+0x06C` on `D_8006E5F8`), called only
+  when `slot40`'s result is nonzero.
+- New field `self->unkA4` (`+0x0A4`, `s32`): reset to 0 unconditionally here;
+  a different function (`func_8003BB5C`, this same round) both reads it and
+  assigns a call result to it — this function only zeroes it.
 
-## Provenance
+## Pitfall hit and corrected
 
-round 2026-09-01, runner alpha, unit code_2c054 (second pass).
+First attempt wrongly assumed the `slot40` call's return was stored into
+`self->unkA4` before the test (`self->unkA4 = ...; if (self->unkA4 != 0)`),
+by analogy with a structurally similar pattern in `func_8003BB5C` seen while
+reading ahead in the same unit. That produced a **41/42-ish residue**: retail
+computes the branch's argument-setup (`move a0, s0` — preparing the call
+inside the `if`-body) *in the branch's own delay slot*, which only happens
+when the value tested is not first materialized into a store. Rereading the
+raw disassembly showed there is in fact **no `sw` of the call result at all**
+in this function — the `beqz` tests `$v0` straight off the `jalr`. Removing
+the spurious assignment and testing the call expression directly fixed both
+residue words at once.
+
+## Proposed learning
+
+**Do not backfill a struct-field write into a call site by analogy with a
+different, structurally similar function in the same unit — reread that
+function's own disassembly line by line first.** Two calls to the same
+vtable slot (`slot40` here) can differ in whether the caller *stores* the
+return value at all; only one of `func_8003BAB4`/`func_8003BB5C` does. The
+tell, from the delay-slot-scheduling angle already documented for `if`-body
+argument setup: if retail schedules an unconditional value (like the callee's
+`self` argument) into the guarding branch's own delay slot, the source is not
+storing the tested value to a struct field — it is testing a live temporary
+directly.

@@ -88,24 +88,64 @@ typedef struct PlayerSpawnPoint {
 	} position;
 } PlayerSpawnPoint;
 
-typedef struct {
-	s32 stageID;
-	PlayerSpawnPoint position;
+/* pitch/heading/roll grouped into one 12-byte nested struct (round
+   2026-09-02, DreamSys__AddFlashback): that function block-copies all
+   three from its `angles` argument in ONE retail load-all-then-store-all
+   sequence (six unaligned lwl/lwr loads, all before any of the six
+   unaligned swl/swr stores) -- the same "whole-struct assignment, not a
+   per-word copy" idiom already documented for other block moves in this
+   project. A per-field or looped copy would not reproduce that
+   instruction ordering. */
+typedef struct FlashbackRotation {
 	struct Angle{
 		s16 angle;
 		s16 one;
 	} pitch; /* Does not do what you think it does */
 	struct Angle heading;
 	struct Angle roll; /* Ditto */
+} FlashbackRotation;
+
+typedef struct {
+	s32 stageID;
+	PlayerSpawnPoint position;
+	FlashbackRotation rotation;
 	s16 timeLimit;
-	/* Was a single s32 -- corrected to two s16 halves (round 2026-09-01-e,
-	   DreamSys__AddFlashback): retail stores its 5th argument here with a
-	   halfword `sh`, not a word `sw`, so only +0x1C is written by that
-	   function. +0x1E is untouched by it and remains unconfirmed. */
+	/* Was `s32`; retyped (round 2026-09-02): DreamSys__AddFlashback writes
+	   it with a bare `sh` (halfword store) from an `s32` argument, which
+	   only makes sense if the field itself is 2 bytes -- an `s32` field
+	   fed by an `s32` argument would store all 4 bytes (`sw`), not 2. The
+	   remaining 2 bytes before `day` are ordinary C struct alignment
+	   padding, not a separate field. */
 	s16 unknown_value_0x1c;
-	s16 unknown_value_0x1e;
 	s32 day;
 } FlashbackEntry;
+
+/* Opaque 0x28-byte block, block-copied wholesale by func_8005B904 (read) /
+   func_8005B990 (write) -- see DreamSysUnk14::unk_0x44 below. Declared as a
+   word array (not a byte array) so a whole-struct assignment reproduces
+   retail's 4-word-per-iteration block-move codegen, per the confirmed idiom
+   in DECOMPILATION_LEARNINGS.md ("A whole-struct assignment... for a block
+   copy"); internal field layout is unconfirmed (round 2026-09-02). */
+typedef struct DreamSysUnk14Tail {
+	s32 raw[0x28 / 4];
+} DreamSysUnk14Tail;
+
+/* Struct pointed to by DreamSys::unk_0x14. Confirmed fields, all from
+   func_8005B904/func_8005B990 (round 2026-09-02): +0x0 is a word cleared to
+   0 by func_8005B990 (restore) after the rest of the struct is overwritten;
+   +0x38 is the pre-existing 3-word vector (func_8001E600/func_8005942C,
+   still INCLUDE_ASM); +0x44 is a pointer to a DreamSysUnk14Tail, itself
+   block-copied (not just followed) by the same two functions. The whole
+   0x50-byte struct (this field included, raw) is block-copied to/from
+   DreamSys::unk14Snapshot -- see that field's comment. Bytes 0x4..0x38 and
+   0x48..0x50 are unconfirmed padding. */
+typedef struct DreamSysUnk14 {
+	s32 unk_0x0;
+	s32 unknown_values_0x4[0x34 / 4];
+	s32 vec[3];
+	DreamSysUnk14Tail *unk_0x44;
+	s32 unknown_values_0x48[0x8 / 4];
+} DreamSysUnk14;
 
 /* Struct pointed to by DreamSys::unk_0x5C. +0x14 / +0x20 are a pair of
    two-word (x,y) points per func_8005942C (still INCLUDE_ASM elsewhere in
@@ -116,37 +156,40 @@ typedef struct DreamSysUnk5C {
 	s32 unk_0x24;
 } DreamSysUnk5C;
 
-/* Object pointed to by DreamSys::unk_0x58, loaded, dereferenced for its own
-   vtable pointer at offset 0, and called through slot +0x84 (func_80059E3C)
-   or slot +0x80 (ExecuteLink, round 2026-09-01-e). Everything else about
-   this class -- including whether it is the SAME class as DreamSys::unk_0x4C
-   below -- is unknown. Elsewhere in this unit unk_0x58 is set/read as a
-   plain s32 (func_8005937C, func_8005A134's call into func_8002CC84), which
-   is consistent with it being a pointer value just not typed that way there.
-   slot0x84 takes TWO arguments, not one -- head-adjudicated 2026-08-30-c:
-   the guard value (DreamSys::unk_0xBC) loaded into $a1 by func_80059E3C is
-   never overwritten before the jalr, so it is passed through, not just
-   branched on. See func_80059E3C.md. slot0x80 takes THREE s32 arguments,
-   confirmed by ExecuteLink's call site (round 2026-09-01-e): three literal
-   constants (0x90, 0x6E, 0x6E) are loaded straight into $a1-$a3 with nothing
-   else read from `this`, most plausibly a text-bank/entry-pair dialog
-   trigger (same {bank, entry} shape as `CinematicCall`), but nothing in
-   ExecuteLink itself confirms that beyond the argument count. */
+/* Object pointed to by DreamSys::unk_0x58, used by func_80059E3C (slot
+   +0x84) and, this round, ExecuteLink (slot +0x80): loaded, dereferenced
+   for its own vtable pointer at offset 0, and called through. Everything
+   else about this class -- including whether it is the SAME class as
+   DreamSys::unk_0x4C below -- is unknown. Elsewhere in this unit unk_0x58
+   is set/read as a plain s32 (func_8005937C, func_8005A134's call into
+   func_8002CC84), which is consistent with it being a pointer value just
+   not typed that way there. slot0x84 takes TWO arguments, not one --
+   head-adjudicated 2026-08-30-c: the guard value (DreamSys::unk_0xBC)
+   loaded into $a1 by func_80059E3C is never overwritten before the jalr, so
+   it is passed through, not just branched on. See func_80059E3C.md.
+   slot0x80 (ExecuteLink, round 2026-09-02) takes three arguments, all
+   literal constants at that call site (0x90, 0x6E, 0x6E) -- nothing here
+   suggests what they mean. */
 typedef struct DreamSysUnk58Vtable {
 	u8 pad00[0x80];
-	void (*slot0x80)(void *self, s32 arg1, s32 arg2, s32 arg3);
+	void (*slot0x80)(void *self, s32 a1, s32 a2, s32 a3);
 	void (*slot0x84)(void *self, s32 flag);
 } DreamSysUnk58Vtable;
 typedef struct DreamSysUnk58 {
 	DreamSysUnk58Vtable *vt;
 } DreamSysUnk58;
 
-/* Object pointed to by DreamSys::unk_0x4C, used ONLY by func_80058A94 (this
-   round): same "vtable pointer at offset 0" shape as DreamSysUnk58 above,
-   but slot +0xF0 instead. Unidentified class; unknown if related to
-   DreamSysUnk58. */
+/* Object pointed to by DreamSys::unk_0x4C, used by func_80058A94 (slot
+   +0xF0) and func_8005A82C (slot +0xE8, this round): same "vtable pointer
+   at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
+   related to DreamSysUnk58. */
 typedef struct DreamSysUnk4CMethods {
-	u8 pad00[0xF0];
+	u8 pad00[0xE8];
+	/* Called by func_8005A82C as (this->unk_0x4C, &local, &this->
+	   linkCoordinates) -- `local` is an output buffer also consumed by
+	   vt->slot0xB8 right after (round 2026-09-02). */
+	void (*slot0xE8)(void *self, void *arg1, PlayerSpawnPoint *arg2);
+	u8 pad_0xEC[0xF0 - 0xEC];
 	void (*slot0xF0)(void *self);
 } DreamSysUnk4CMethods;
 typedef struct DreamSysUnk4CObj {
@@ -174,6 +217,12 @@ typedef struct DreamSysBaseMethods {
 	u8 pad54[0x9C - 0x54];
 	/* Called by func_80058E8C as (this, arg1, arg2) -- round 2026-08-30-d. */
 	void (*slot0x9C)(struct DreamSys *self, void *arg1, s32 arg2);
+	u8 padA0[0xDC - 0xA0];
+	/* Called unconditionally by func_80058F18 (this unit's own +0xDC slot)
+	   as (this, arg1, arg2) -- same argument shape as slot0x9C above
+	   (round 2026-09-02). Resolves to func_80057B90 in D_800878D4, out of
+	   this unit's scope. */
+	void (*slot0xDC)(struct DreamSys *self, void *arg1, s32 arg2);
 } DreamSysBaseMethods;
 extern DreamSysBaseMethods *func_80057C84(void);
 
@@ -206,40 +255,6 @@ typedef struct Func8005A1F4Arg {
 	s32 field_0x34;
 } Func8005A1F4Arg;
 
-/* Struct pointed to by DreamSys::unk_0x14. `+0x38` is a 3-word vector
-   (read by func_8001E600/func_8005942C, both outside this runner's range).
-   Confirmed further by func_8005B904 (round 2026-09-01-e), which block-
-   copies the first 0x50 bytes of this struct (so through `+0x50`, past
-   both the vector and the pointer below) into `this+0x890`, then
-   block-copies 0x28 bytes from `*unk_0x44` into `this+0x8E0` -- together
-   filling `DreamSys`'s `unknown_values_0x890[0x78]` tail exactly
-   (0x50 + 0x28 == 0x78). Everything between `+0x0` and `+0x38`, and the
-   full layout of the 0x28-byte block `unk_0x44` points to, remain
-   unconfirmed -- only the sizes needed to reproduce the two block copies
-   are named here. */
-/* Sized purely from func_8005B904's own second block copy (0x28 bytes);
-   internal layout unconfirmed (round 2026-09-01-e). Typed here (not just
-   `void *`) so the compiler can prove `unk_0x44`'s pointee is 4-byte
-   aligned at compile time -- through a `void *` field, GCC 2.6.3 cannot
-   make that assumption and emits a runtime alignment check (`or`/`andi`/
-   `beqz` picking between an aligned lw/sw path and an unaligned lwl/lwr
-   one) that retail does not have. */
-typedef struct DreamSysUnk14Ext {
-	s32 raw[0x28 / 4];
-} DreamSysUnk14Ext;
-
-typedef struct DreamSysUnk14 {
-	/* Cleared to 0 unconditionally by func_8005B990 (round 2026-09-01-e),
-	   after that function restores the two block-copies func_8005B904
-	   saves; plausibly a dirty/pending flag, but nothing here confirms
-	   more than "written 0" at this offset. */
-	s32 unk_0x0;
-	u8 unknown_values_0x4[0x38 - 4];
-	s32 vector[3];
-	DreamSysUnk14Ext *unk_0x44;
-	u8 unknown_values_0x48[0x50 - 0x48];
-} DreamSysUnk14;
-
 /* Full-word (x,y,z) vector, distinct from `struct RelativePos` (s16 triplet
    -- the on-disk/network form). func_8005AF64 builds one of these on the
    stack as a-b with y forced to 0; func_8005A0B0 passes the static
@@ -249,6 +264,16 @@ typedef struct DreamSysVec3 {
 	s32 x, y, z;
 } DreamSysVec3;
 extern DreamSysVec3 D_80087EA4;
+
+/* A `struct RelativePos` constant, passed as func_8005AF64's `a` argument
+   by func_8005AD68 (round 2026-09-02). */
+extern struct RelativePos D_8008ABD0;
+
+/* Address-of only (never dereferenced by this unit's queued functions),
+   forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AD68
+   (round 2026-09-02) -- same "opaque generic pointer" shape as that slot's
+   other known call site (D_80087E84[-1]). */
+extern u8 D_80087EFC[];
 
 /* Argument shape for func_8005950C: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
@@ -291,9 +316,11 @@ typedef struct DreamSys {
 	s32 unk_0xC;
 	s8 unknown_values_0x10[4];
 
-	/* Pointer to an unidentified struct; a 3-word vector lives at +0x38
-	   of what this points to (read by func_8001E600 / func_8005942C,
-	   guarded by unk_0xC above). */
+	/* Pointer to DreamSysUnk14 (see that type for confirmed fields); a
+	   3-word vector lives at +0x38 of what this points to (read by
+	   func_8001E600 / func_8005942C, guarded by unk_0xC above). The whole
+	   struct is saved/restored to/from unk14Snapshot below by
+	   func_8005B904/func_8005B990 (round 2026-09-02). */
 	DreamSysUnk14 *unk_0x14;
 	s8 unknown_values_0x18[12];
 
@@ -442,16 +469,15 @@ typedef struct DreamSys {
 
 	s32 unk_0x878;
 	s32 currentFlashbackIndex;
-	/* Set by func_8005A7A0 from func_8005BF48's return, which is itself
-	   either 0 or `&D_8008ABF0` -- pointer-shaped, not a plain word
-	   (round 2026-09-01-e). */
-	void *unk_0x880;
+	/* Set (whole word) by func_8005A7A0 to func_8005BF48()'s return value,
+	   right before an ExecuteLink (round 2026-09-02). */
+	s32 unk_0x880;
 	/* Gate flag read by func_80059148 (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
 	s32 unk_0x884;
-	/* Cleared to 0 by func_8005A7A0 alongside unk_0x880/unk_0x884; no other
-	   observed use (round 2026-09-01-e). */
+	/* Zeroed (whole word) by func_8005A7A0 alongside unk_0x884
+	   (round 2026-09-02). */
 	s32 unk_0x888;
 
 	s32 storedDay;
@@ -461,12 +487,28 @@ typedef struct DreamSys {
 	   more than any field so far discovered accounts for. Extended to the
 	   allocator's real size (round 2026-08-30-b); the four words
 	   DreamSys__func_588ec clears are named, the rest of the tail is still
-	   unclaimed. */
-	s8 unknown_values_0x890[0x78];
+	   unclaimed.
+
+	   The first 0x78 bytes of that tail are a save/restore scratch buffer
+	   for *unk_0x14: func_8005B904 copies *unk_0x14 (0x50 bytes) then
+	   *unk_0x14->unk_0x44 (0x28 bytes, DreamSysUnk14Tail) into these two
+	   fields; func_8005B990 copies them back and then clears
+	   unk_0x14->unk_0x0 to 0 (round 2026-09-02). */
+	DreamSysUnk14 unk14Snapshot;
+	DreamSysUnk14Tail unk14TailSnapshot;
 	s32 unk_0x908;
 	s32 unk_0x90C;
 	s32 unk_0x910;
-	s8 unknown_values_0x914[0x10];
+	/* A retry/attempt counter (round 2026-09-02, func_8005AD68): read as a
+	   whole word, compared against several literal bands, and incremented
+	   by 1 at that function's normal exit. */
+	s32 unk_0x914;
+	s8 unknown_values_0x918[4];
+	/* A `struct RelativePos`, address-taken and passed to func_8005AF64 as
+	   its `b` argument (round 2026-09-02, func_8005AD68) -- carved out of
+	   what was raw padding in the same 0x10-byte block as unk_0x914 above. */
+	struct RelativePos unk_0x91C;
+	s8 unknown_values_0x922[2];
 	s32 unk_0x924;
 } DreamSys;
 
@@ -487,13 +529,11 @@ struct vtable_DreamSys{
 	   outside this unit/runner's range. */
 	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
 	u32 unknown_functions_0x18[6];
-	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x030) as the
-	   inherited `BasicClass__func_182cc` slot. Called by ExecuteLink as
-	   (this, unk1) -- unk1 is also stored into `this->unknwon_int_0x44`
-	   right before the call, and re-read afterward as the success gate
-	   (round 2026-09-01-e). Address 0x800182CC is outside this
-	   unit/runner's range. */
-	void (*func_800182CC)(DreamSys *this, s32 arg1);
+	/* +0x030, BasicClass__func_182cc -- shared base-class slot, same one
+	   `class_3ac78.h`/`Class6D3C8.h` name (see their comments); called by
+	   ExecuteLink as (this, unk1) with its return discarded
+	   (round 2026-09-02). */
+	void (*slot30)(DreamSys *this, s32 arg1);
 	u32 unknown_functions_0x34[3];
 	void *func_800588EC;
 	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
@@ -512,7 +552,12 @@ struct vtable_DreamSys{
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-08-30-d). */
 	void (*func_80058E8C)(DreamSys *this, void *arg1, s32 arg2);
-	u32 unknown_functions_0xa0[7];
+	u32 unknown_functions_0xa0[6];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0B8). Called by
+	   func_8005A82C right after unk_0x4C->methods->slot0xE8, as (this,
+	   &local) using that same output buffer (round 2026-09-02). Address
+	   0x80057384 is outside this unit/runner's range; still INCLUDE_ASM. */
+	void (*func_80057384)(DreamSys *this, void *arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0BC). Called by
 	   func_8005AF64 and func_8005A0B0 with a DreamSysVec3* second argument
 	   (round 2026-08-30-d). */
@@ -619,11 +664,26 @@ struct vtable_DreamSys{
 	void (*DynamicLink)(DreamSys *this);
 	bool (*StaticWallLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	bool (*LoadNextFlashback)(DreamSys *this, bool unknown);
-	u32 unknown_functions_0x1d0[4];
+	u32 unknown_functions_0x1d0[1];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D4), this
+	   round. Tests this->unknwon_int_0x44, then a static-link-with-timer
+	   test (func_8005BE90) against this->linkCoordinates/currentStage/
+	   dreamTimer, then ExecuteLinks with literal type 0x10 on success --
+	   see func_8005A7A0.md. */
+	bool (*func_8005A7A0)(DreamSys *this, PlayerSpawnPoint *currentPos);
+	u32 unknown_functions_0x1d8[2];
 	/* Getter for currentStage (round 2026-08-30-c). */
 	s32 (*func_8005AFD0)(DreamSys *this);
 	void (*ProcessChunkChange)(DreamSys *this, void *entity, s32 effect);
-	void (*InstanceEffectsOnPlayer)(DreamSys *this, void *entity, int effect);
+	/* Renamed from the previous placeholder `InstanceEffectsOnPlayer` --
+	   this slot's real symbol (config/symbols.slps01556.lsdde.txt) is
+	   `DreamSys__InstanceEffectsOnJournal` (see the forward declaration
+	   below and src/DreamSys.c), confirmed via tools/classtable.py
+	   DREAMSYS_METHODS (+0x1E8) while resolving func_80058F18's call
+	   through this slot (round 2026-09-02). No call site referenced the
+	   old name, so this is a plain correction, not a rename requiring an
+	   out-of-scope edit elsewhere. */
+	void (*InstanceEffectsOnJournal)(DreamSys *this, void *entity, s32 effect);
 	void (*GetPreviousDayMood)(DreamSys *this, MoodGraphPoint *target, bool unknown);
 	void (*InitMoodContibutors)(DreamSys *this, MoodGraphPoint *special);
 	void (*LogChunkMood)(DreamSys *this, PlayerSpawnPoint *currentPos);
@@ -637,13 +697,16 @@ struct vtable_DreamSys{
 	void *GameManager__AddFlashback;
 	void *GameManager__FlashbackSaving;
 	void (*ResetFlashbackList)(DreamSys *this);
-	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x220/+0x224);
-	   both do block-copies of storedFlasbacks-adjacent memory (this+0x890,
-	   this+0x8E0 -- inside this round's newly-extended struct tail) driven
-	   by a length read from this->unk_0x14. Out of scope this round;
-	   named only, not typed beyond `void *` (round 2026-08-30-c). */
-	void *func_8005B904;
-	void *func_8005B990;
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x220/+0x224).
+	   Typed and matched this round (2026-09-02): a save/restore pair for
+	   *this->unk_0x14 (see DreamSysUnk14). func_8005B904 saves *unk_0x14
+	   and *unk_0x14->unk_0x44 into this->unk14Snapshot/unk14TailSnapshot;
+	   func_8005B990 restores them and clears unk_0x14->unk_0x0 to 0. Both
+	   take only `this` -- the previous note's "driven by a length read
+	   from this->unk_0x14" undersold it: unk_0x14 is a POINTER, dereferenced
+	   for its own bytes, not read as a length. */
+	void (*func_8005B904)(DreamSys *this);
+	void (*func_8005B990)(DreamSys *this);
 	/* This field is named `func_228`, not `func_8005BA20`, even though it
 	   IS func_8005BA20's slot (resolved via tools/classtable.py this
 	   round) -- src/code_1677c.c (a different unit, out of this runner's
@@ -706,6 +769,14 @@ extern s8 LEN_STAGE_PERMALINK_TRIGGERS[];
 
 extern s16 SPECIAL_DAYS[];
 
+/* The fixed "special day" mood, returned by IsDaySpecial on a match
+   (round 2026-09-02); only ever address-taken there, never dereferenced by
+   this unit's queued functions. */
+extern MoodGraphPoint D_8008ABF4;
+
+/* Also declared in Entity.h for the same libc-style function. */
+extern s32 rand(void);
+
 extern s8 SPECIAL_COLORS[];
 
 /* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
@@ -717,6 +788,54 @@ extern s8 SPECIAL_COLORS[];
    proves nothing about it (round 2026-08-30-c). */
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
                            s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
+
+/* Called by func_8005A7A0 as (&this->linkCoordinates, this->currentStage,
+   currentPos, this->dreamTimer); result compared with `bltz` exactly like
+   TestForStaticLink's call site, so s32 (round 2026-09-02). Blocked by the
+   gp-relative addressing blocker -- see docs/match-reports/func_8005BE90.md
+   -- so it stays INCLUDE_ASM; this prototype only types the call site. */
+extern s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
+
+/* Called by func_8005A7A0 with NO arguments (the disassembly's call site has
+   an empty delay slot and no a0-a3 setup); its return value is stored whole
+   into this->unk_0x880, hence s32 (round 2026-09-02). Blocked by the
+   gp-relative addressing blocker -- see docs/match-reports/func_8005BF48.md
+   -- so it stays INCLUDE_ASM; this prototype only types the call site. */
+extern s32 func_8005BF48(void);
+
+/* Called by func_8005A700 as (this, &local) where `local` is a 0x10-byte
+   stack buffer also forwarded to func_8005BD3C below; return value is
+   discarded at this call site (round 2026-09-02). NOT in this unit at all --
+   its body disassembles into asm/code_d294.s, an uncarved segment -- so this
+   prototype only types this one call site, per the "calling into a function
+   that is still INCLUDE_ASM elsewhere is fine" convention
+   (DECOMPILATION_LEARNINGS.md). A discarded return is not evidence of
+   `void` (same doc); kept `void` here only because nothing at this call
+   site constrains it further. */
+extern void func_8001E6F8(DreamSys *this, void *arg1);
+
+/* Called by func_8005A700 as (&this->unk_0x888, &this->unk_0x884, &local) --
+   same `local` buffer func_8001E6F8 fills above; result used as a truth
+   value (`beqz`), so s32 (round 2026-09-02). Blocked by both the
+   gp-relative and addiu_at blockers -- see
+   docs/match-reports/func_8005BD3C.md -- so it stays INCLUDE_ASM; this
+   prototype only types the call site. */
+extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
+
+/* Same (target, currentPos, stage) forwarding shape as Test4TunnelLinks
+   above (see that function's own comment) -- called by func_8005A82C as
+   (&this->linkCoordinates, currentPos, this->currentStage), result compared
+   with `bltz` (round 2026-09-02). Blocked by the gp-relative addressing
+   blocker -- see docs/match-reports/Test4InstantTeleporters.md -- so it
+   stays INCLUDE_ASM; this prototype only types the call site. */
+extern s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+
+/* Called by func_8005A82C with NO arguments, same shape as func_8005BF48
+   above; return value is forwarded straight into ExecuteLink's stage-type
+   argument, hence s32 (round 2026-09-02). Blocked by the gp-relative
+   addressing blocker -- see docs/match-reports/func_8005BFC4.md -- so it
+   stays INCLUDE_ASM; this prototype only types the call site. */
+extern s32 func_8005BFC4(void);
 
 /* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
    STAGE_PERMALINK_* triple above but for tunnel links specifically. */

@@ -3,7 +3,10 @@
 #
 #   tools/setup-worktree.sh <name> [branch]
 #
-# Creates ../lsddecomp2-wt-<name> on branch runner/<name>, symlinks the
+# Creates ../<checkout>-wt-<name> on branch runner/<name> -- <checkout> is the
+# basename of the MAIN checkout, derived at run time, not a fixed string (the
+# script's own output prints the real path; trust that, not this comment).
+# Symlinks the
 # gitignored essentials from the main checkout (the executable, the venv, the
 # toolchain), extracts asm/, and PROVES the worktree byte-verifies before
 # handing it over.

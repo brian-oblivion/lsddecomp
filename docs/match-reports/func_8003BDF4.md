@@ -1,17 +1,13 @@
 # func_8003BDF4
 
-**Unit:** code_2c054 · **Size:** 26 instructions · **Status:** MATCHED (26/26 words)
+**Unit:** code_2c054 · **Size:** 26 words · **Status:** MATCHED (26/26)
 
-## What it does
+## Summary
 
-StreamTask's override of method-table slot `+0x094`: when `unkD4` is set,
-ticks the sub-object's slot `+0x04C`; otherwise re-enters this object's
-own slot `+0x060` (`func_8003BC14`) with a literal 7.
-
-## The C
+An `if`/`else` selecting one of two forwarding calls based on `self->unkD4`.
 
 ```c
-void func_8003BDF4(StreamTask *self) {
+void func_8003BDF4(StreamTaskObj *self) {
     if (self->unkD4 != 0) {
         self->unkB4->methods->slot4C(self->unkB4);
     } else {
@@ -20,18 +16,20 @@ void func_8003BDF4(StreamTask *self) {
 }
 ```
 
-## How it was found
+## Evidence
 
-Unlike most of this unit's other slots, func_8003BDF4 does NOT chain into
-the base task class at all -- there is no `func_8003DFBC()` call anywhere
-in its disassembly, just a straight `if`/`else` on `unkD4`. This is the
-target func_8003BC14's own `case 0x12` re-enters (see func_8003BC14.md),
-and it itself re-enters func_8003BC14's `case 8` path (the sub-object
-slot `+0x04C` dispatch) and `case 7` path (via `self->methods->slot60`,
-same slot, same argument 7) respectively -- the two functions call into
-each other's territory in a small mutual-dispatch cluster.
-`classtable.py D_8006E5F8` places this function at slot `+0x094`.
+- `self->unkD4` is the field set by this unit's `func_8003BE7C` (already
+  established).
+- `self->unkB4->methods->slot4C(self->unkB4)`: `self->unkB4` is
+  `StreamTaskUnkB4Obj*` (established). Its vtable had only slot `+0x004`
+  named before this function; this one dereferences `unkB4->methods` and
+  calls slot `+0x04C` with `unkB4` as the sole argument and a discarded
+  return, so it is typed `void (*)(StreamTaskUnkB4Obj *self)` here, no
+  counter-evidence.
+- `self->methods->slot60(self, 7)` reuses the slot established matching
+  `func_8003BD10` in the same round (`StreamTaskObjMethods::slot60`,
+  occupied by `func_8003BC14` per `classtable.py D_8006E5F8`).
 
-## Provenance
+## Proposed learning
 
-round 2026-09-01, runner alpha, unit code_2c054 (second pass).
+None beyond what `func_8003BD10`'s report already states.

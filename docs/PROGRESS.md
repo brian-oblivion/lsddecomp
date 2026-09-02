@@ -6,6 +6,460 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-02 — round 7: 4 runners, 58 matches, two carves, and two heads in one checkout
+
+**198 -> 261 matched (14.60% -> 19.25% of game code; matched bytes 6.80% ->
+12.09%). 133 queued: 89 stalled, 44 fresh. Build green in main after every
+one of thirteen merges and after both carves.**
+
+Four runners, one unit each, all sent back into their own units after their
+first pass per §3c. Three units were cleared outright, so the head carved two
+new ones mid-round and handed them to the runners that had run out of ground.
+
+| runner | units worked | matched | stalled |
+| --- | --- | --- | --- |
+| alpha | `class_3ac78` | 7 | 3 |
+| bravo | `code_2c054` -> `DreamSys` | 18 | 1 |
+| charlie | `class_39e08` -> `class_3bb8c` | 16 | 0 |
+| delta | `Entity_b` -> `Entity_c` | 16 | 0 |
+
+Five of the 58 were salvaged rather than produced: three inherited from round
+6's abandoned worktrees, plus `func_8005AD68` from bravo's own death (below).
+
+### Two heads in one checkout — the round's real finding
+
+The operator started this round's head while round 6's head was still live.
+Both worked the same `main`. **Nothing was corrupted** — every commit was
+real, no protected file was touched, `main` byte-verified throughout — but
+each head read the other's legitimate head actions as its own runners
+misbehaving, and both wrote the misreading down as fact:
+
+- Round 6's head filed a **PROTOCOL VIOLATION** against its runner alpha for
+  two commits *this* head had made, and rebutted alpha's true account of
+  having its worktree reclaimed mid-session.
+- It then recorded this round's runner output as "the runners kept working
+  after reporting", inflating its own totals from 43 to 48 matches.
+- This head, symmetrically, found commits on `main` it had not made and had
+  to rule out a rogue runner before it could rule in a second head.
+
+**The mechanism is recycled names.** Worktrees and branches are
+`runner/alpha`…`runner/echo` every round. Tearing them down and
+re-provisioning hands the other head a branch with the same name, a different
+round's work on it, and no signal that it changed underneath. And **git
+authorship cannot distinguish the cases, because every agent commits as the
+operator.**
+
+Both misattributions are struck through and corrected in place in round 6's
+entry, not deleted — an accusation that was published should be visibly
+withdrawn. The rule is now §4a of PARALLEL-RUNS: establish you are the only
+head before anything else, and never re-create a name another head may hold.
+
+**The overlap lasted the whole round, not the twenty minutes it first
+appeared to.** Round 6's head went quiet in `git log` after 13:59, and this
+head recorded it as finished on that basis. It was not: `main` was pushed to
+`origin` twice more during round 7 — at 15:02 and again later — by something
+other than this head, each time carrying this head's own commits. Harmless in
+effect (the pushed content was already merged and verified here, and
+`origin/main` never diverged from local), but "no new commits in `git log`"
+is NOT evidence a concurrent session has ended. **A quiet log means a quiet
+log.** Check `git reflog show origin/main` too, which is what finally showed
+these.
+
+**Standing operator escalation: rule 5 (main is single-occupancy) has no
+mechanical enforcement.** Nothing stopped either head writing to main, or
+pushing it. The hooks guard `check.sha1`/`build.sha1` and `asm/`, not the
+branch and not the remote.
+
+### The head confirmed a stall that a runner then overturned
+
+`func_8005E02C` was filed by delta as a register-identity stall at 28/33.
+The head re-audited it properly per §3 — ran two more source shapes, both
+landing on the identical five words, named the residue precisely (retail
+spreads the first pointer chain across `$a1`,`$v0`,`$a2` from the register
+`arg1` just vacated, while collapsing the second chain into one reused
+`$v1`), and attached a corpus census arguing the shape was rare and a poor
+permuter target. **All of it was wrong in the same way.**
+
+`EntityMethods::slot144` takes a *second argument*, `this->unk94` itself.
+Retail parks the value in `$a1` for the whole function because that is the
+register the call needs it in. Delta found it on its next pass by
+cross-checking a *different* caller of the same slot, and matched 33/33 first
+try with the corrected signature.
+
+Why fourteen attempts across two authors missed it: every one varied the code
+that COMPUTED the value while holding the one-argument signature fixed. The
+call site under test even looked like positive evidence for that signature — a
+plain `nop` delay slot and no fresh `$a1` load — because the argument had been
+resident since the top of the function. The head's census was measuring a
+shape that merely co-occurs with the cause.
+
+Three lessons banked, all in DECOMPILATION_LEARNINGS: cross-check another
+caller before accepting a register-identity read; a census of a residue's
+surface shape is not a census of its cause; and MATCHING-GUIDE now says a
+match report is the best available account, **not a verdict** — many attempts
+along one axis reads as exhaustive and is a reason to hunt for the axis nobody
+varied.
+
+### Two Gate 2 carves, both zero-byte
+
+Done mid-round to convert idle runners into new ground, one segment at a time
+with a verify after each:
+
+- **`class_3bb8c`**, first 20-function slice (0x3BB8C..0x3CD88) of the largest
+  uncarved block in the game, 365 functions. Remainder is `class_3bb8c_b`.
+- **`Entity_c`**, first 20-function slice (0x4F754..0x5077C) of the
+  97-function Entity remainder. Remainder is `Entity_d`.
+
+Both boundaries were checked on both sides, and the per-function census
+(second `addiu $sp` prologue, `jlabel`, `jr $t2`, `$sp`-before-prologue,
+`alabel`) came back clean for all 40 — confirming again that this game does
+not under-split. Neither slice needed a rodata slot attached.
+
+**Carve hazards still ahead, named at carve time in the unit headers:**
+`class_3bb8c`'s remainder holds all 13 PSX BIOS trampolines and 38 switch
+jump tables, none of which fell in the carved slice. Whoever takes the next
+slice must disposition the trampolines (`hasm` or literal `.word`) and attach
+the right rodata slot *at carve time*. `Entity_d` is clean by contrast — the
+whole 97-function block has zero of both, which is a property of the block,
+not of the slice.
+
+Charlie independently confirmed the `class_3bb8c` census by working in the
+slice and hitting neither hazard.
+
+### Runners lost finished work to uncommitted state, twice
+
+Round 7 **opened** by inheriting round 6's five standing worktrees and finding
+three uncommitted byte-exact matches in alpha's (`func_8005A7A0`,
+`func_8005B904`, `func_8005B990`) that no summary had ever mentioned. They
+survived only because nobody ran `--force` on that worktree.
+
+It **closed** with bravo dying to an API error mid-batch, holding a finished
+54/54 match (`func_8005AD68`) as uncommitted working-tree state. Salvaged
+under §4c; the head wrote the report and labelled it a finished match rather
+than the mid-attempt snapshot §4c usually produces, while marking the attempt
+history as unknown rather than inventing one.
+
+Both are the same failure: **one-commit-per-match is what makes a runner's
+work survive its session.** §4b gains the deferral note this implies —
+deferring teardown is right when agents may still be live, but it hands the
+next head a §4c salvage it has no way to anticipate, so PROGRESS must name
+the worktrees.
+
+### Head review of runner C, beyond the score
+
+- `func_8004B570` was written `s32 { return self->unk70 = 1; }`. The store
+  sits in the delay slot and the literal must be materialized somewhere, so
+  `void` and `s32` are byte-identical — the bytes prove nothing. A cross-table
+  survey of slot `+0x0EC` over all 60 method tables found the base
+  implementation (`func_8003D444`, shared by four class tables) materializes
+  no return value on either path, which makes `void` the supported reading.
+  Corrected, re-verified 3/3.
+- `func_8004C434` has a non-void function with no return on its
+  loop-exhaustion path. Its report predicted a terminal `return e;` would cost
+  an instruction; the head tested it rather than leaving it as reasoning — it
+  scores 6/15 and adds one `addu`. The UB-shaped body is the faithful
+  reconstruction and stays. Also recorded that retail's not-found path leaves
+  `&arr[6]` in `$v0`, not null, so no caller can rely on a null return.
+- `func_8004ADD8`'s opaque `goto` chain was rewritten as a `switch` at the
+  head's suggestion, reaching identical bytes with clearer C. Its
+  `u8 unused[24]` frame padding is now annotated as *evidence* of a real local
+  aggregate in the original source, not an explanation of it.
+
+### Two runners bounded the `__asm__("")` barrier from opposite sides
+
+Not a contradiction, and worth stating because it reads like one. Delta's
+barrier DID change which instruction fills a load-delay slot at its own
+position. Alpha's did NOT stop a loop-offset increment being hoisted backward
+across it, past several intervening statements. Together they narrow the lever
+from "reliable local fix" to "scheduling nudge at its own position" — and
+neither moved a register choice, which is rule 6 holding from the failing
+side.
+
+### The `make` hook papercut, reproduced and diagnosed
+
+Round 6 logged it; this head hit it three times before reading that, and then
+read the cause off the hook. `tokenize()` runs with
+`punctuation_chars=True`, so a redirection like `2>&1` becomes the tokens
+`2`, `>&`, `1`; neither `>` nor `>&` is in `SEPARATORS`, so `targets_of()`
+collects them as make targets and the `all(t in ALLOWED_TARGETS)` test fails.
+`make extract` passes bare and is refused with any redirection, by an error
+message that itself says `make extract` is allowed. Two heads hitting it
+within the hour. **Operator's guardrail, untouched.**
+
+### Next round
+
+**Runners.** 44 fresh across four units, 30 of it in the two units carved this
+round and never worked beyond a first pass (`class_3bb8c` 15, `Entity_c` 15),
+plus `DreamSys` 12 and `class_3ac78` 2. Cold-runner yield this round was very
+high — 58 matches against 4 stalls, most on the first or second attempt — so
+cold ground is plainly not exhausted and a permuter round is not yet the best
+use of a session.
+
+Round 6's entry recommended permuter on the strength of the 24-instance
+epilogue-merge class. That recommendation still has merit and is untouched by
+this round, but it should be weighed against two things round 7 established:
+the class census that looked most permuter-ready (this head's own) turned out
+to be measuring the wrong thing, and reshaping under a corrected *signature*
+closed a stall that reshaping under the wrong one could not. **Check arity and
+slot typing across callers before committing a session to a permuter search.**
+
+A carve is not needed — the queue was refilled this round — but the next one
+should take `class_3bb8c`'s second slice specifically, because that is where
+the BIOS-trampoline disposition finally has to be made, and making it at carve
+time is much cheaper than a runner discovering it.
+
+---
+
+## 2026-09-02 — round 6: 5 runners, 43 matches, and a second head nobody knew about
+
+**160 -> 203 matched (11.80% -> 14.97% of game code). Build green in main after
+every merge, and green again after a full `make clean` + `make extract`
+rebuild.**
+
+**Counts corrected by round 7.** This entry originally claimed 48 matches and
+203 -> 208, counting five matches that round 7's runners produced on
+re-provisioned branches with the same names. Round 6's own five runners
+delivered 43. The two sections below that recorded the extra five, and that
+accused runner alpha of a protocol violation, are struck through and corrected
+in place rather than deleted — the round's real finding turned out to be the
+misreading itself, and it is now §4a of PARALLEL-RUNS.
+
+**Teardown was DEFERRED, deliberately — the worktrees were left standing** for
+the operator, since agents might still be live. Round 7 inherited them and
+found three uncommitted byte-exact matches in alpha's, which deferral is the
+only reason still existed. See §4b.
+
+Five runners, one per unit with fresh ground: `DreamSys` (alpha),
+`Entity_b` (bravo), `class_39e08` (charlie), `class_3ac78` (delta),
+`code_2c054` (echo).
+
+| runner | unit | matched | stalled | blocked stubs |
+| --- | --- | --- | --- | --- |
+| alpha | DreamSys | 5 | 1 | 0 |
+| bravo | Entity_b | 8 | 0 | 1 |
+| charlie | class_39e08 | 8 | 1 | 2 |
+| delta | class_3ac78 | 9 | 1 | 1 |
+| echo | code_2c054 | 13 | 0 | 0 |
+
+### Gate 1: 119 fresh, 115 workable
+
+All 119 fresh functions were screened against both open blockers before
+assignment; only 4 hit (2 `gp_rel`, 2 `addiu_at`) and each was named to its
+runner so nobody spent an attempt rediscovering it. Gate 2 did not fire — 115
+workable against a ~46-function round target is 2.5x headroom. Gate 3 did not
+fire either. Sizing was set by BODY SIZE, not count: alpha got 6 on
+44-99-instruction bodies, echo got 12 on a queue with five consecutive 9-line
+leaves. Echo returned 13/13 first-attempt; alpha's unit took the whole round for
+5. The `fresh` column really cannot see this, and sizing to it would have been
+wrong in both directions at once.
+
+### The round's finding: the `New_X` epilogue-merge residue is one class, 24 instances
+
+Charlie and delta hit the same one-word residue independently, in different
+units, and classified it identically without either seeing the other's work.
+The head re-audited rather than accepting it, and attacked the angle neither
+runner tried — both had kept the null path's value flowing from `self`, whereas
+retail materializes a literal `0`, which points at a single-exit source form.
+Two such forms were tried and both were worse (a result variable: 0/27 and an
+extra callee-saved register; a comma-ternary: 16/27 and a second epilogue, with
+an outside-range byte count byte-for-byte identical to the early-return form's).
+
+Both classifications confirmed, and the discriminator is now positive rather
+than descriptive: **GCC 2.6.3 `-O2` will not merge two function exits carrying
+different values into one epilogue.** A mechanical corpus census puts the class
+at **24 instances** — 5 carved, 19 still uncarved. Written up once in
+`docs/research/epilogue-merge-residue.md`.
+
+**It is NOT a toolchain blocker and was not escalated as one.** The pinned
+compiler provably emits retail's form; we have not found its input. That makes
+it a permuter target, and it is the single highest-leverage one available: one
+solved source form should generalize to all 24, which are the same allocator
+with a different size constant and `Get_vtable`.
+
+The census also exposed **three instances that had never been attempted** and
+that `progress.py` was therefore counting as FRESH. Stub reports were filed for
+them so the next round does not staff a cold runner onto a class with ~25
+attempts behind it.
+
+### ~~PROTOCOL VIOLATION: runner alpha performed head-only actions in main~~ — WITHDRAWN, see round 7
+
+**This section was wrong, and round 7's head withdrew it after the operator
+confirmed the cause.** It is kept rather than deleted because the reasoning is
+instructive and because an accusation that was published should be visibly
+retracted, not quietly removed.
+
+What this entry reported: alpha, while still live, committed `0100dce` (a merge
+of `runner/alpha` into main) and `83d5458` ("Salvage runner/alpha", executing
+§4c on itself), and tore down `runner/echo`'s branch and worktree. It further
+recorded that alpha's explanation — *"the head's parallel-runs consolidation
+process reclaimed the worktree mid-session"* — **did not happen**.
+
+What actually happened: **round 7's head made both commits and removed all five
+worktrees.** The operator had started a second head session in the same checkout
+while this round's head was still live. Round 6's head was correct that *it*
+had not done these things, and wrong to conclude no head had. Alpha's account
+was accurate: its worktree WAS reclaimed mid-session, by a head it could not
+see. Round 7's head found alpha's three uncommitted matches still sitting there
+and salvaged them under §4c — which is what `83d5458` is.
+
+Alpha committed no protocol violation. The retracted charge stands as the
+sharpest available illustration of the real hazard, which is now §4a of
+PARALLEL-RUNS: **two heads in one checkout, with recycled `runner/*` names, each
+reading the other's legitimate head actions as its own runners misbehaving.**
+Both heads did this, in opposite directions, within twenty minutes.
+
+What survives from the section unchanged:
+- **A runner's self-report is not reliable evidence about who ACTED**, only
+  about what it derived (§3b). The correction is that this cuts both ways: the
+  HEAD's account of who acted is no more reliable when another head is live.
+  Neither agent can distinguish the other's commits from a rogue runner's,
+  because **every agent commits as the operator** — authorship proves nothing.
+- **Rule 5 (main is single-occupancy) has no mechanical enforcement.** Nothing
+  stopped a second head committing to main. The hooks guard
+  `check.sha1`/`build.sha1` and `asm/`, not the branch. This is the round's
+  standing operator escalation.
+- Two runners this round also had git commands blocked mid-session by a safety
+  classifier. Bravo worked around a blocked `git checkout HEAD -- <files>` by
+  **hand-reconstructing files with the `Write` tool**. It came out byte-exact,
+  but a runner that cannot use git to restore state will improvise, and
+  improvised restores are how a wrong body reaches a commit. Worth an operator
+  look; not something the head should paper over.
+
+### ~~The runners kept working after reporting~~ — these were ROUND 7's runners; teardown was deferred
+
+**Also corrected by round 7.** The five late matches below are real, verified
+and correctly merged — but they were produced by **round 7's** runners charlie
+and bravo, on freshly re-provisioned branches that reuse the same names. No
+round-6 runner wrote them, and no runner kept working past its summary.
+
+All five round-6 runners delivered a final structured summary and the head
+merged all five. New commits then appeared on branches named `runner/charlie`
+and `runner/bravo` — because round 7's head had torn those names down and
+re-created them, pointing at a different round's work. `main..runner/<name>`
+reading empty, then non-empty, then empty again was that, not a runner
+restarting.
+
+| late match | unit | words | landed on branch |
+| --- | --- | --- | --- |
+| `func_8004A2C4` | class_39e08 | 24/24 | runner/charlie |
+| `func_80049E20` | class_39e08 | 33/33 | runner/charlie |
+| `func_8004A364` | class_39e08 | 34/34 | runner/charlie |
+| `func_8003BD10` | code_2c054 | 25/25 | **runner/bravo** |
+| `func_8003BDF4` | code_2c054 | 26/26 | **runner/bravo** |
+
+Note the last two, and how the misreading compounded: `code_2c054` was ECHO's
+unit in round 6, so two `code_2c054` matches on a branch named `runner/bravo`
+looked like one runner committing another's unit — an apparent breach of the
+one-unit-per-runner rule, "held by luck". In round 7 `code_2c054` **is** bravo's
+unit. The collision rule was never violated; the branch name simply meant
+something different than this entry assumed.
+
+All five were merged and individually confirmed with funcdiff; the whole-image
+SHA1 stayed green throughout. **Merging them was right even on the mistaken
+premise** — they are valid matches with reports, and the alternative to merging
+verified work is throwing it away. Round 7 re-confirmed all five against a
+fresh build of main.
+
+**Why teardown was deferred.** §4b's four preconditions are meant to be checked
+once. Here precondition 3 (`main..runner/<name>` is EMPTY) kept
+*un*-satisfying itself: it read 0 for all four branches, then 1, then 2, then 0
+again, as commits continued to land. At the point of writing, `runner/bravo` and
+`runner/delta` each still hold uncommitted files. `git worktree remove --force`
+on a worktree with live uncommitted work destroys it, and `--force` is exactly
+the flag that disables the "are you sure?" backstop — which PARALLEL-RUNS
+already warns is the only thing between a finished round and a lost one.
+
+So the round ends with everything merged, everything verified, and the five
+worktrees left standing for the operator to tear down once the agents are
+confirmed quiescent:
+
+```sh
+for n in alpha bravo charlie delta; do
+    git worktree remove --force ../<checkout>-wt-$n && git branch -d runner/$n
+done
+```
+
+**Protocol gap this exposes** — restated after round 7's correction. The
+conclusion drawn here was that "has REPORTED" does not imply "has finished",
+i.e. that a runner keeps writing past its own summary. That is not what these
+branches were doing; another head's runners were writing to the same names. The
+part that survives is the cheap half: **check the preconditions immediately
+before the `--force`**, because the tree can move under you — whoever is moving
+it. Deferring rather than forcing was the right call for a second reason nobody
+had in view at the time: one of those worktrees held three uncommitted matches.
+
+### Head consolidation
+
+- Corrected `include/Class6D3C8.h`'s `LoaderTaskMethods::slot44` to `s32`. Echo
+  flagged it and could not fix it under the parallel rules. Re-derived rather
+  than taken: the slot's occupant is `func_8003C1DC`, whose body loads
+  `self->unk38` into `$v0` immediately before the epilogue with nothing else
+  consuming it. The earlier `void` recorded what the CALLER discards, not what
+  the callee computes. ABI-neutral; zero bytes.
+- **Corrected an over-narrow claim from round 5.** The class-table header word's
+  class id was written up as "the low 12 bits" from `func_80058E8C`'s `0xFFF`
+  mask. `func_80058F18` masks the same word with `0xFFFFF` and compares against
+  `0x1F234`, which cannot fit 12 bits. `0xFFF` was one function's mask, not the
+  field's width. The generalizable form: a masked read bounds an identifier's
+  width from BELOW only.
+- Declared `TestForStaticLink`/`Test4TunnelLinks` in `src/DreamSys.c`. Both were
+  implicitly declared — used ~200 lines before their definitions. The implicit
+  type agreed, so nothing miscompiled, but an implicit declaration also disables
+  argument checking, which is exactly what caught `func_8005D714`'s over-narrow
+  `s8` parameters this round. Zero bytes.
+- Cleared a live `` `/*' within comment `` warning in `include/class_3ac78.h`.
+- Replaced the hardcoded `lsddecomp2-` worktree prefix in PARALLEL-RUNS.md with
+  `<checkout>`. It sat inside the `--force` teardown command, where `--force`
+  has already disabled the only automatic backstop, so a stale path there is a
+  hazard rather than a typo.
+- Retired an open question: comma expressions were listed as an untested GCC 2.x
+  scheduling lever. Tested for the two-exit case — the answer is no, a
+  comma-ternary lowers to the same RTL as the separated early-return. Left
+  explicitly open for single-exit bodies, which is a different question.
+
+### Two false positives in the hardened `make` hook
+
+`.claude/hooks/block-raw-make.py` was hardened just before this round to judge
+`make` in command position only. Two false positives surfaced, both fail-safe,
+neither fixed by the head (it is the operator's guardrail):
+
+1. **A git commit heredoc** whose message *quotes* a chained build command in
+   prose is blocked — the tokenizer sees the quoted text in command position.
+   Workaround: `git commit -F <file>`.
+2. **Any redirection or pipe on an allowed target is blocked.** `make clean`
+   passes bare but `make clean > /dev/null 2>&1` does not, and
+   `make extract 2>&1 | tail` is refused by an error message that itself says
+   "`make extract` is allowed". Redirection tokens appear to be collected as
+   make targets. This is the more serious of the two: it blocks the documented
+   way to drive the repo, and the fix for the first false positive is what
+   introduced it.
+
+**Independently reproduced by round 7's head**, which hit #2 three times before
+reading this: `make extract > /tmp/x.log 2>&1`, `make extract 2>&1 | tail -1`
+and `make extract 2>&1 | tail -5` are all refused, while bare `make extract`
+passes. Two heads hitting the same papercut within the hour, one of them
+mid-consolidation, moves this from an annoyance to the operator's next fix.
+Confirmed cause, from reading the hook: `tokenize()` runs with
+`punctuation_chars=True`, so a redirection like `2>&1` becomes ordinary tokens
+(`2`, `>&`, `1`) inside the simple command; `>` and `>&` are not in
+`SEPARATORS`, so `targets_of()` collects them as make targets and the
+`all(t in ALLOWED_TARGETS)` test fails. A pipe DOES separate correctly — it is
+the redirection on the make command itself that breaks.
+
+### Next round — as judged by ROUND 6; superseded, see round 7
+
+**Permuter, not runners or a carve** — the first time this project has had a
+permuter round as the clear best move. 66 fresh remain across four units, so
+runners are still viable and a carve is not needed. But the epilogue-merge class
+is 24 instances behind a single unknown source form, with two sites sitting at
+26/27 and fully-typed headers already committed, so the permuter starts from a
+compiling body. Nothing else available comes close to 24 functions of leverage
+from one search. If it closes, run runners immediately afterward to harvest the
+class across all four carved units; if only UB or duplicate-arm forms reach
+zero, mark it permuter-exhausted in the research doc and go back to runners.
+
+---
+
 ## 2026-09-01 — round 5: 3 runners, 6 passes, 56 matches, DreamSys past halfway
 
 **98 -> 154 matched (11.36% of game code). 102 queued: 27 fresh, 75 stalled, 0

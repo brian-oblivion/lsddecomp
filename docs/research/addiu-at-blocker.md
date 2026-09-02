@@ -474,3 +474,103 @@ grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/<unit>/<func>.s | grep -E '\b(mu
 ```
 
 A hit means retail did not take the nops and the pin will insert them.
+## Addendum, round 2026-09-02b: cc1 does NOT emit the nops — maspsx does. Confirmed by reading cc1's output.
+
+**Nothing was changed. Evidence only, per CLAUDE.md rule 5.**
+
+The 2026-09-01 addendum above closes with a hypothesis, explicitly marked
+untested and deliberately so:
+
+> The leading hypothesis, untested and deliberately so: the 46 immediate nops
+> are emitted by **cc1** as part of its own scheduling, and the correct
+> assembler behaviour is to insert none at all.
+
+**Half of that is now settled, and it did not need a flag change to settle —
+only reading cc1's output instead of maspsx's.** cc1 emits no nops at all
+here. It emits `#nop`, commented out, as a *hint*:
+
+```
+	mult	$2,$17
+	mfhi	$4
+	#nop
+	#nop
+	mult	$16,$17
+```
+
+That is the raw `cpp | cc1` stream. The `mult` sits immediately after the
+`mfhi`, which is retail's shape, and the two `#nop` lines are markers saying
+"a hazard nop may be required here". Psy-Q-patched cc1 leaves the decision to
+the assembler.
+
+maspsx is what decides. At 2.34 (`nop_mflo_mfhi = True`) it converts the hints
+into real instructions and displaces the `mult` behind them; its own debug
+output shows the substitution:
+
+```
+mult	$2,$3
+mfhi	$4
+nop
+nop
+mult	$16,$3
+# #nop  # DEBUG: skipped
+# #nop  # DEBUG: skipped
+# mult	$16,$3  # DEBUG: skipped
+```
+
+At 2.29 and 2.21 it leaves them commented and the stream keeps cc1's order.
+
+### Consequence for the framing
+
+The hypothesis said cc1 emitted the nops and the assembler should insert none.
+**cc1 emits none, so the second half — that the correct assembler behaviour is
+to insert none — is the only remaining question, and the census above already
+answers it for the majority of the image**: 180 sites want no nop against up to
+65 that want one.
+
+This does not change the conclusion that a global boolean cannot be right for
+both, and it does not make a version bump safe — the other three flags still
+move with it. What it does change is where the remaining uncertainty lives. It
+is no longer "who emits these"; it is only "what should the 65 sites be".
+
+### A full-function reproducer, not a construct
+
+Every prior entry in this document rests on a minimal construct. This one has
+a whole retail function behind it.
+
+`IsDaySpecial` (DreamSys, 52 instructions) was stalled at 18/52 by a runner as
+a scheduling residue with "no C-level lever". Both of its residues are now
+closed. One was a missing cast (`(u32)i < 42` rather than `u32 i`, so the
+comparison goes unsigned while `i % 12` keeps its signed magic-multiply). The
+other is this flag.
+
+With that cast, compiled standalone through the pinned pipeline varying
+**only** `--aspsx-version`:
+
+| version | `.text` | result |
+| --- | --- | --- |
+| **2.34** (the pin) | 0xD8 | two nops between `mfhi` and `mult`; 2 instructions long |
+| 2.29 | 0xD0 | **all 52 instructions match retail one-for-one, register for register** |
+
+The full side-by-side is in `docs/match-reports/IsDaySpecial.md`, along with
+the body, which is complete and needs no further work if the flag question is
+ever resolved.
+
+This is the strongest form of evidence this document has: a real function,
+correct C, and a single flag standing between it and a byte match. It is worth
+weighing against the 65 sites on the other side of the census — but it does not
+by itself decide them, and the pin stays where it is until the operator says
+otherwise.
+
+### Screening
+
+Unchanged from the previous addendum, and still the weak point: neither the
+`gp_rel` nor the `addiu_at` grep catches this class, and `mflo|mfhi` over-reports
+badly (603 sites). A tighter screen, now that the mechanism is known — a `mflo`
+or `mfhi` with a `mult`, `multu`, `div` or `divu` within the next two
+instructions in RETAIL:
+
+```sh
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/<unit>/<func>.s | grep -E '\b(mult|multu|div|divu)\b'
+```
+
+A hit means retail did not take the nops and the pin will insert them.

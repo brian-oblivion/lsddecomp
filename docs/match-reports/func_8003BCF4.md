@@ -1,18 +1,30 @@
 # func_8003BCF4
 
-**Unit:** code_2c054 · **Size:** 7 instructions · **Status:** MATCHED (7/7 words)
+**Unit:** code_2c054 · **Size:** 7 instructions (0x1C bytes) · **Status:** MATCHED (7/7 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
-StreamTask's override of method-table slot `+0x06C`: unconditionally
-stores `a1` into `self->unk40`, then, if `a1` is non-negative, overwrites
-it with `a1 * 15` (computed as `(a1 << 4) - a1`, matching retail's
-`sll`/`subu` pair rather than an actual multiply instruction).
+Sets `self->unk40 = a1`, then, only when `a1 >= 0`, overwrites it with
+`a1 * 15`. Textbook instance of the project's already-confirmed "default
+value, then conditionally overwritten by an `if` with no `else`" idiom
+(`docs/DECOMPILATION_LEARNINGS.md`, `func_8005C9A4`): 2.6.3 slides the
+unconditional store into the guarding branch's delay slot for free.
 
-## The C
+## Derivation
+
+```
+bltz  $a1, .L8003BD08
+ sw   $a1, 0x40($a0)
+sll   $v0, $a1, 4
+subu  $v0, $v0, $a1        ; a1*16 - a1 == a1*15
+sw    $v0, 0x40($a0)
+.L8003BD08:
+jr    $ra
+ nop
+```
 
 ```c
-void func_8003BCF4(StreamTask *self, s32 a1) {
+void func_8003BCF4(StreamTaskObj *self, s32 a1) {
     self->unk40 = a1;
     if (a1 >= 0) {
         self->unk40 = a1 * 15;
@@ -20,15 +32,17 @@ void func_8003BCF4(StreamTask *self, s32 a1) {
 }
 ```
 
-## How it was found
+Matched first attempt. `a1 * 15` reproduces retail's shift-subtract
+multiply-by-constant expansion directly; no need to write the shift/subtract
+by hand.
 
-Raw disassembly: `bltz $a1, .L; sw $a1, 0x40($a0)` (delay slot store
-happens regardless of the branch), then on the fallthrough (non-negative)
-path `sll $v0,$a1,4; subu $v0,$v0,$a1; sw $v0,0x40($a0)`. Writing the
-multiply as `a1 * 15` reproduces the identical shift/subtract sequence
-under `-O2`. `classtable.py D_8006E5F8` places this function at slot
-`+0x06C`.
+## New struct/header knowledge
 
-## Provenance
+Named `StreamTaskObj::unk40` in `include/code_2c054.h`.
 
-round 2026-09-01, runner alpha, unit code_2c054 (unit's first pass).
+## Proposed learning
+
+Another confirmed instance of the "default value, conditionally overwritten,
+no `else`" idiom from `docs/DECOMPILATION_LEARNINGS.md` -- worth keeping on
+the shortlist of shapes to try first when the residue is "one extra
+instruction" or a delay-slot store that looks unconditional at a glance.
