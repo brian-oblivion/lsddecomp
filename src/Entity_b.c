@@ -1,6 +1,13 @@
 #include "common.h"
 #include "Entity.h"
 
+/* Data rows this unit's mood-dispatch handlers pass through to a vtable
+ * call as an opaque argument -- never dereferenced here, so an opaque byte
+ * array is enough to form &D_8008xxxx correctly. Real element type/count
+ * unknown. */
+extern u8 D_80089DF0[];
+extern u8 D_80089D78[];
+
 s32 func_8005DE18(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
@@ -69,7 +76,10 @@ void func_8005E480(Entity *this, EntityMoodHandlerArg *out) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E4D0);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E694);
+void func_8005E694(Entity *this) {
+    this->methods->slot48(this, 1, D_80089DF0);
+    this->methods->slotBC(this, D_80089D78);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E6F0);
 

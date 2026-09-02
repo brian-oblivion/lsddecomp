@@ -54,9 +54,13 @@ struct EntityMethods {
     /* +0x30 */ void (*slot30)(Entity *self, s32 arg1);   /* called by func_8005DAAC, func_8005DF9C */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*slot40)(Entity *self);              /* called by Entity__Entity, right after this->methods is (re)assigned */
-    /* +0x44 */ u8 pad44[0x60 - 0x44];
+    /* +0x44 */ u8 pad44[0x48 - 0x44];
+    /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E694 (result discarded) and func_8005EF20 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, func_8005EF20 has no positive evidence of void */
+    /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by func_8005D9F4, func_8005DA3C */
-    /* +0x64 */ u8 pad64[0x114 - 0x64];
+    /* +0x64 */ u8 pad64[0xBC - 0x64];
+    /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
+    /* +0xC0 */ u8 padC0[0x114 - 0xC0];
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
