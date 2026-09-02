@@ -66,7 +66,9 @@ struct EntityMethods {
     /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
     /* +0xC0 */ u8 padC0[0xC4 - 0xC0];
     /* +0xC4 */ void (*slotC4)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7A8 as slotC4(self, -0x1E, 0) -- same shared BasicClass-inherited slot as Class65650Methods.slotC4 in code_55dd4.h (both tables hold func_8005748C at +0xC4, confirmed with tools/classtable.py) */
-    /* +0xC8 */ u8 padC8[0x114 - 0xC8];
+    /* +0xC8 */ u8 padC8[0xD0 - 0xC8];
+    /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005ED30 as slotD0(this, -0x176, rand() % 2) */
+    /* +0xD4 */ u8 padD4[0x114 - 0xD4];
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
