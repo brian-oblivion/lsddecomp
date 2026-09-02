@@ -6,6 +6,143 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-02 — round 10: 5 runners, 30 matches, and the head breaking its own rule
+
+**320 -> 350 matched (23.60% -> 25.81% of game code; past a quarter). Build
+green in main at every step.** Five runners, the maximum the permission grant
+allows. `Entity_c` became the project's fourth fully-matched unit at 20/20.
+
+**Gates.** Gate 4a clean — no other head, no stale worktrees. Gate 1 found 22
+fresh, all clear of both blockers. Gate 2 carved `code_2cc8c` (20 functions),
+chosen over the larger `code_179d8` on a **blocker-density census** rather than
+size: 3% of `code_2cc8c`'s functions hit the open blockers against 43% of
+`code_179d8`'s. That census is worth re-running at every carve; it inverted the
+obvious pick. The carve needed its rodata jump-table slot **split** rather than
+attached, because slot `0x1890` holds three tables and one belongs to a
+function out in the asm remainder — attaching it whole would have broken that
+table in the other direction.
+
+**Runners.** echo took **16 of 20** on `code_2cc8c`, ground carved hours
+earlier, against a target of 8 — and established the unit's whole type
+vocabulary, which is what makes the block's remaining 133 functions cheaper.
+alpha went 6 for 6 on `Entity_c` then closed a sixth-round stall to finish the
+unit. bravo took 3 of 4 in `DreamSys` and closed `DreamSys__TimerTick` (62/62)
+with a single `__asm__("")` its own report had recorded as untried. delta took
+3 in `class_3bb8c_c`, then moved to `class_3ac78` and spent its second pass on
+struct corrections. charlie matched nothing in `class_3bb8c` but moved
+`func_8004B700` 52/140 -> 125/140 and characterised all four of its stalls.
+
+**Redeploying finishers into their own units paid for itself.** Every one of
+the four early finishers was sent back rather than idled or replaced, and that
+produced two matches (`func_8005F544`, `DreamSys__TimerTick`), three
+exhausted-class verdicts, and the `code_2cc8c.h` evidence-boundary work. The
+two matches were both closed by levers the functions' OWN prior reports had
+named and left untried.
+
+### The head's own error, which cost the round more than any stall
+
+Screening the carve, I found two functions whose only `addiu $at, $at, %lo`
+hit was a `%lo(jtbl_*)` jump table. I reasoned that a table loading a CODE
+address must be a different construct from an indexed DATA global, "corrected"
+CLAUDE.md's screening grep to exclude `jtbl`, audited the corpus, recovered
+three functions that had been banked as blocked, and **broadcast it to five
+live runners — one of which had already been handed two of them as work.**
+
+Then I measured it. cc1 emits the same generic pseudo-op for both
+(`lw $2,$L13($2)` against `lbu $2,D_x($4)`), and the folding happens in maspsx
+*below* cc1, which cannot tell them apart. Dense switches are inside the
+blocker. All five runners got retractions; the grep is reverted with a note at
+the point of temptation; the blocker doc carries the reproducer.
+
+**The generalisation, now in CLAUDE.md:** the project rule "never escalate a
+toolchain lead you have not reproduced in isolation" runs in **both
+directions**, and de-escalating is the worse one. Widening a blocker's scope
+costs attempts; narrowing it sends runners at functions that cannot match and
+leaves behind reports indistinguishable from ordinary stalls. The reproducer
+took under a second and was available from the first minute.
+
+It also caused the round's only merge conflict, because I both messaged echo
+AND edited echo's unit file on main. New PARALLEL-RUNS rule 6: **a correction
+goes down one channel.** Default to the message — echo's version of the
+paragraph was better and is what I kept.
+
+### Three workflow bugs the round exposed
+
+- **A conflicted merge is a FOURTH way a score lies.** `git merge` returned 1
+  with conflict markers in a `src/` file, and `build-and-verify.sh` run
+  immediately after still printed `build exit=0` and `OK`. Both halves of the
+  usual discipline pass. Now documented next to the other three, with the
+  `MERGE_HEAD` check.
+- **A worktree isolates files, not the process table.** alpha finished with the
+  permuter, tidied up with `pkill -9 -f "decomp-permuter"`, and killed bravo's
+  in-progress searches in another worktree. Same shape as round 8's shared
+  `/tmp/b.log` crossover. It fails SILENTLY — bravo's summary would have read
+  "the permuter found nothing", indistinguishable from the truth, and a
+  fabricated permuter-exhausted verdict is exactly what stops future rounds
+  trying. Detected only because alpha self-reported. Now collision rule 2b,
+  with the scoped-kill form.
+- **`permuter-seeds/` was not gitignored**, so any runner using the permuter
+  was structurally unable to report the clean `git status --porcelain` the
+  protocol demands. That check is one of two honesty mechanisms the round
+  depends on; it must not cry wolf on the runners doing the hardest work.
+
+**And a good discriminator came out of it:** asked to prove its searches were
+not killed, echo answered from exit codes rather than inference — GNU `timeout`
+returns **124** when it killed the child itself, versus **137** for an external
+SIGKILL. Wrap long searches in `timeout` so "did someone shoot my search?" has
+a recorded answer.
+
+### The permuter, run in anger for the first time
+
+Five searches, ~140,000 iterations: two matches, three exhausted verdicts. What
+separated them was **seeding, not closeness**. `func_8005F544` went to zero in
+23 iterations once re-seeded from a manual near-miss whose only remaining
+defect was a register difference. `func_8003CB68` — a single-register residue —
+found no improvement over its seed at all in 13.5k iterations, which retires an
+earlier round's claim that the permuter closes those fast.
+
+**A base score of 5 that will not move is a stronger negative than a base of
+460 that halves.** `--debug`'s base-score COMPOSITION (register differences
+versus insertions and deletions) predicts viability where its magnitude
+misleads. Three of the five searches converged on forms that are not real C —
+stale-register reuse, a `volatile unsigned int` return in place of an enum —
+and the runners rejected all three. bravo marked `CalcDreamColor` exhausted
+*for its region* but explicitly not overall, because the same search surfaced a
+clean candidate at 135 it did not have budget to apply. That granularity is the
+right habit.
+
+### Head verification, and where it did not pay
+
+The protocol calls stall adjudication the highest-yield head activity. This
+round it was mixed, and both halves are worth recording. It caught real
+problems: delta's "3-way rotation" is a 2-way exchange (its proposed learning
+would have misfired as a screen), delta credited its own type split to round 9,
+and charlie labelled two STALLED functions "MATCHED" in header comments the
+whole region's declarations rest on. All three would have hardened into
+precedent.
+
+But two head attempts on `func_8004D47C` failed. Retail reads `arg2` four
+times against two each for the others and `$s0` goes to the most-referenced
+pseudo, so equalising reference counts looked decisive; a block-scope
+declaration will not compile (C89 keeps the outer prototype's arity) and an
+empty-parens file-scope declaration regressed a neighbouring match 20/20 ->
+19/20. Filed as **unresolved rather than refuted** — the counts were never
+actually equalised.
+
+### Fresh queue is nearly dry — next round must carve
+
+**3 fresh functions left**, all large: `func_8004A534` (163 insn, deliberately
+left unattempted and unreported by delta so it stays counted as fresh),
+`func_8004C6A8` (165), `func_8004C93C` (109). 101 of the 104 queued functions
+now carry stall reports.
+
+Carve candidates, measured this round with the RAW (correct) grep —
+`class_3bb8c_d` 305 functions at 17% blocked, `code_179d8` 274 at 43%,
+`code_2cc8c_b` 133 at 1%, `Entity_d` 77 at 1%, `code_8220` 56 at 14%,
+`code_d294` 55 at 4%. **`code_2cc8c_b` and `Entity_d` are the standouts**, and
+`code_2cc8c_b` has echo's fresh header to inherit. Re-derive rather than trust
+these numbers.
+
 ## 2026-09-02 — round 9: 2 runners, 15 matches, and a lesson about consolidation
 
 **299 -> 320 matched (22.05% -> 23.60% of game code). Build green in main
