@@ -37,7 +37,10 @@ void func_8004D36C(void) {
 void func_8004D374(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D37C);
+Class869D8Methods *func_8004D37C(void)
+{
+    return &D_800869D8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D38C);
 
