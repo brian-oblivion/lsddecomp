@@ -89,6 +89,19 @@ typedef struct Descriptor10 {
 } Descriptor10;
 
 /*
+ * EVIDENCE STATUS, round 10: every declaration in this region was derived
+ * from functions that STALLED -- func_8004C1C0 (72/106), func_8004B700
+ * (125/140), func_8004BB3C (structurally 104/105). None of it is backed by a
+ * byte-exact match. The offsets and access widths are OBSERVED from the
+ * disassembly and are reliable; the TYPES and the names are inferred, and the
+ * grouping into structs is a hypothesis.
+ *
+ * (These comments originally said "MATCHED" for func_8004C1C0 and
+ * func_8004B700. That was wrong -- the runner matched nothing in this unit
+ * this round -- and it mattered, because it presented inferred structure as
+ * byte-verified and would have discouraged the next reader from questioning
+ * it. Relabelled by the head at merge.)
+ *
  * Output struct of func_8004C1C0 (Obj866E8Methods::slot110). A `Descriptor10`
  * embedded at +0x000 (natural alignment 2, so the next member falls at the
  * next 4-byte boundary, +0x00C -- matches exactly) followed by 8 more s32-
@@ -233,7 +246,8 @@ typedef struct Obj866E8Methods {
      * signature is `(self, arr1, count)`, matching a `SetupEntry866E8`
      * array and a count, per func_8004BB3C's own stalled-but-structurally-
      * derived body (see docs/match-reports/func_8004BB3C.md). Called by
-     * func_8004B700 (this round, MATCHED) at the end of its own loop with
+     * func_8004B700 (this round: STALLED at 125/140, register identity only)
+     * at the end of its own loop with
      * a 7-slot stack buffer it filled and the number of slots actually
      * used. */
     void (*slotFC)(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count); /* +0x0FC */
@@ -250,7 +264,7 @@ typedef struct Obj866E8Methods {
     /* Called by func_8004CC74 with its own stack-local query buffer
      * (see `CC74QueryBuf`) and a literal 0; return value unused there. */
     s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2); /* +0x10C */
-    /* = func_8004C1C0 (this round, MATCHED). Resolves `in` (may be NULL at
+    /* = func_8004C1C0 (this round: STALLED at 72/106). Resolves `in` (may be NULL at
      * other call sites; func_8004C1C0 itself never null-checks it) via
      * slot11C, then fills `out`. Returns 0 on success, 1 if the slot11C
      * lookup misses. Matches class_3ac78's independent view of the same
@@ -287,7 +301,7 @@ typedef struct Obj866E8Methods {
  * Opaque object pointed to by UnkCObj::unk14. `unk1C` established by this
  * round's func_8004C1C0 (plain s32, single-width read). `unk18`/`unk20`
  * were originally typed plain s32 from func_8004C470 (still INCLUDE_ASM,
- * so provisional); func_8004C1C0 (MATCHED) reads them BOTH as a full s32
+ * so provisional); func_8004C1C0 (STALLED, 72/106) reads them BOTH as a full s32
  * (coarse) and, separately and later in the function, as just the low
  * `u16` half (fine) -- retail re-loads from memory at the narrower width
  * rather than deriving it from the already-loaded s32, so each is a union
