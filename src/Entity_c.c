@@ -244,7 +244,47 @@ void func_8005FB6C(Entity *this) {
     methods->slotC4(this, arg1, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FC58);
+void func_8005FC58(Entity *this) {
+    s32 rem500;
+    s32 arg1a;
+    s32 arg1b;
+    s32 arg1c;
+    s32 (**slotCC)(Entity *self, s32 arg1, s32 arg2);
+    void (**slotC8)(Entity *self, s32 arg1, s32 arg2);
+    void (**slotC4)(Entity *self, s32 arg1, s32 arg2);
+
+    rem500 = this->unkFC % 500;
+
+    slotCC = &this->methods->slotCC;
+    if (this->unkFC % 6 < 3) {
+        arg1a = -0x40;
+    } else {
+        arg1a = 0x40;
+    }
+    (*slotCC)(this, arg1a, 0);
+
+    slotC8 = &this->methods->slotC8;
+    if (this->unkFC % 12 < 6) {
+        arg1b = -0x40;
+    } else {
+        arg1b = 0x40;
+    }
+    (*slotC8)(this, arg1b, 0);
+
+    slotC4 = &this->methods->slotC4;
+    if (this->unkFC % 64 < 0x20) {
+        arg1c = -0x80;
+    } else {
+        arg1c = 0x80;
+    }
+    (*slotC4)(this, arg1c, 0);
+
+    if (rem500 < 0x20) {
+        this->methods->slotBC(this, D_80089D78);
+    } else if (rem500 < 0x40) {
+        this->methods->slotBC(this, D_80089D60);
+    }
+}
 
 void func_8005FDFC(Entity *this) {
     u8 *arg2;
