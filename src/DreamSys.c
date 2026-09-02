@@ -579,7 +579,28 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AB2C);
+s32 func_8005AB2C(DreamSys *this)
+{
+	if (this->unk_0x914 == 0) {
+		func_8005AF64(this, &D_8008ABC0, &this->unk_0x91C);
+	}
+	if (this->unk_0xAC != 4) {
+		if (this->unk_0x914 >= 0x85)
+			return 1;
+		if ((u32)(this->unk_0x914 - 0x2B) < 0xF || (u32)(this->unk_0x914 - 0x4B) < 0xF) {
+			this->unk_0xA4 = 2;
+		}
+	} else {
+		if (this->unk_0x914 >= 0x13)
+			return 1;
+		if ((u32)(this->unk_0x914 - 8) < 2 || (u32)(this->unk_0x914 - 0xD) < 2) {
+			this->vt->func_8001CEB4(this, 0, &D_80087EFC);
+		}
+	}
+	this->unk_0xA0 = 1;
+	this->unk_0x914++;
+	return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AC24);
 

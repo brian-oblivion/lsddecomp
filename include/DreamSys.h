@@ -278,6 +278,11 @@ extern DreamSysVec3 D_80087EA4;
    by func_8005AD68 (round 2026-09-02). */
 extern struct RelativePos D_8008ABD0;
 
+/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+   argument by func_8005AB2C -- same call shape as D_8008ABD0 above, just a
+   different constant (round 2026-09-02). */
+extern struct RelativePos D_8008ABC0;
+
 /* Address-of only (never dereferenced by this unit's queued functions),
    forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AD68
    (round 2026-09-02) -- same "opaque generic pointer" shape as that slot's
