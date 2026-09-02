@@ -5,7 +5,23 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049608);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049684);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049830);
+void func_80049830(Obj865C8 *self) {
+    Obj0C *o = self->unk0C;
+    SubObjG *g;
+
+    self->methods->slot14(self, self->unk38);
+    g = o->unkC;
+    o->unkC = g->methods->slot4(g);
+    g = o->unk8;
+    o->unk8 = g->methods->slot4(g);
+    g = o->unk10;
+    o->unk10 = g->methods->slot4(g);
+    self->unk40->methods->slot4(self->unk40);
+    self->unk48->methods->slot4(self->unk48);
+    self->unk44->methods->slot4(self->unk44);
+    func_8005C5E8();
+    func_8004A4B8()->dtor(self);
+}
 
 void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
@@ -27,8 +43,8 @@ void func_80049A1C(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     sub->methods->slot10(sub, self->unk0C->unk4);
-    sub->methods->slot10(sub, self->unk0C->unk8);
-    sub->methods->slot110(sub, self->unk0C->unk10);
+    sub->methods->slot10(sub, (s32)self->unk0C->unk8);
+    sub->methods->slot110(sub, (s32)self->unk0C->unk10);
     func_8004A4B8()->slot44(self, (s32)self->unk0C, 0);
 }
 
@@ -69,7 +85,7 @@ void func_80049C50(Obj865C8 *self) {
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049CA8);
 
 void func_80049E20(Obj865C8 *self, s32 arg1) {
-    self->unk4C = func_80052B70(self->subB, self->unk40, self->unk44, self->unk48, arg1);
+    self->unk4C = func_80052B70(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
     self->unk3C = 2;
