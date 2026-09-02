@@ -708,7 +708,23 @@ void DreamSys__CalcUnlockScore(DreamSys *this)
 	this->totalFlasbackUnlockScore = this->navigationFlasbackUnlockScore + this->instanceFlasbackUnlockScore;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__AddFlashback);
+void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles, s32 unknown, s32 time, s32 day)
+{
+	FlashbackEntry *entry;
+
+	entry = this->storedFlasbacks;
+	if (this->amountFlashbacksAvailable < 10) {
+		entry += this->amountFlashbacksAvailable++;
+	} else {
+		entry += (u32)this->dreamTimer % 9;
+	}
+	entry->stageID = stage;
+	entry->position = *pos;
+	entry->rotation = *(FlashbackRotation *)angles;
+	entry->unknown_value_0x1c = unknown;
+	entry->timeLimit = time;
+	entry->day = day;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__FlashbackSaving);
 
