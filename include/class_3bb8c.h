@@ -110,6 +110,10 @@ extern s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct 
  * placeholder since only its address is taken. */
 extern s32 D_80086904;
 
+/* Constant `Unk54Struct` (unk0=-1, unk4=0, unk8=0x140014) whole-struct-copied
+ * by func_8004CDA4 into self+0x8C+key*0xC. */
+extern Unk54Struct D_80086990;
+
 /* Only the slots this unit's functions dispatch through (via
  * self->methods->slotNN) are typed; everything else stays opaque so the
  * struct keeps the right size/offsets without requiring every method to be
@@ -142,6 +146,11 @@ typedef struct Obj866E8Methods {
      * so this is almost certainly `return &self->arr[index];` -- not
      * this round's function to match. */
     Elem *(*slot118)(Obj866E8 *self, s32 index);   /* +0x118 */
+    u8 pad11C[0x124 - 0x11C];
+    /* Called by func_8004CDA4 with its own arg3 (unmodified); the return
+     * value is stored into the first word of a freshly-copied 3-word
+     * slot at self+0x8C+key*0xC (see func_8004CDA4). */
+    s32 (*slot124)(Obj866E8 *self, s32 arg1);      /* +0x124 */
 } Obj866E8Methods;
 
 /*

@@ -69,7 +69,14 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CC74);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CD38);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CDA4);
+s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
+    Unk54Struct *slot;
+
+    slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));
+    *slot = D_80086990;
+    slot->unk0 = self->methods->slot124(self, arg3);
+    return key + 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CE24);
 
