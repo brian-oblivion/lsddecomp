@@ -386,11 +386,15 @@ typedef struct Class86AA0Methods Class86AA0Methods;
 /*
  * Vtable D_80086AA0 (asm/data/76DC8.data.s, header word 0x24). Sibling of
  * Class869D8Methods above, same shape: ctor at +0x008 (func_8004D3DC,
- * called by New_Class86AA0/func_8004D38C).
+ * called by New_Class86AA0/func_8004D38C). +0x0B8 is dispatched by this
+ * class's own func_8004D434 (slot +0x09C in the same table); its exact
+ * purpose is unestablished beyond "called on self with no other args".
  */
 struct Class86AA0Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86AA0 *self);            /* +0x008, func_8004D3DC */
+    u8 pad00C[0x0B8 - 0x00C];
+    void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by func_8004D434 */
 };
 
 struct Class86AA0 {
@@ -405,5 +409,19 @@ extern Class86AA0Methods D_80086AA0;
 extern Class86AA0Methods *func_8004D508(void);
 
 extern BaseCtorTable_3bb8c_c *func_8001E57C(void *self);
+
+/*
+ * Generic class-instance shape used only to read another object's own
+ * vtable header-tag BYTE (the low byte of the header word at the vtable's
+ * own +0x000) -- func_8004D434's own second argument is dispatched this
+ * way, compared against a literal 0x34.
+ */
+typedef struct GenericTagMethods_3bb8c_c {
+    u8 tag;                                     /* +0x000, low byte of the header word */
+} GenericTagMethods_3bb8c_c;
+
+typedef struct GenericTagInst_3bb8c_c {
+    GenericTagMethods_3bb8c_c *methods;         /* +0x000 */
+} GenericTagInst_3bb8c_c;
 
 #endif

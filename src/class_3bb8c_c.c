@@ -66,7 +66,12 @@ void func_8004D3DC(Class86AA0 *self)
 void func_8004D42C(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D434);
+void func_8004D434(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
+{
+    if (arg1->methods->tag == 0x34) {
+        self->methods->slotB8(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D47C);
 
