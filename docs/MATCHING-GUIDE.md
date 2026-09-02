@@ -205,6 +205,30 @@ live rather than transcribed:
   read a one-instruction residue": did a delay slot move a value, and did the
   author transcribe a lowering instead of the expression behind it?
 
+  **Round 10 retired a fourth, and the variant is different enough to name.**
+  `func_8005F544` had stood at 30/49 with a careful six-attempt report
+  describing **a single-instruction residue** — and it was FOUR independent
+  residues stacked. The report was not misdiagnosed; it was under-counted.
+  Closing the first three moved the score not at all, which is exactly what
+  had made "one problem" the natural reading in the first place.
+
+  So add a third question to the two above: **is this one defect, or several
+  whose scores do not add?** The tell is a residue description that accounts
+  for the shape but not the arithmetic — a report saying "one instruction
+  short" while the diff shows differences in several unrelated places. Fix
+  incrementally and re-measure after each change rather than looking for the
+  single explanation that covers the whole gap, and do not revert a change
+  with independent evidence behind it just because the score did not move
+  (see DECOMPILATION_LEARNINGS on entangled residues, where a fix that scored
+  *worse* alone was the key unlock in combination).
+
+  **And a low score is not evidence of a distant shape.** `func_8004BB3C`
+  scores 14/105 while being structurally 104 of 105 instructions identical to
+  retail; one missing `addiu` shifted everything after it. Triaging stalls by
+  score alone would have written it off as the unit's worst prospect when it
+  is its best. Cross-check the real compiled length with
+  `objdump -d build/src/<unit>.c.o` before believing a bad number.
+
 For uncarved ground, see Gate 2 in `docs/PARALLEL-RUNS.md`, which lists the
 segments live and records the carve hazards found so far.
 
