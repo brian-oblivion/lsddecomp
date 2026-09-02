@@ -78,7 +78,44 @@ s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     return key + 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CE24);
+void func_8004CE24(Obj866E8 *self, s32 setBit) {
+    s32 i;
+    s32 j;
+    s32 k;
+    GridSlot866E8 *slot;
+    Elem *e;
+    EntryChildObj **cell;
+    EntryChildObj *next;
+
+    slot = self->slots8C;
+    for (i = 0; i < self->unk88; slot++, i++) {
+        e = &self->arr[slot->elemIdx];
+        if (e->unk4->unk2C == 0) {
+            continue;
+        }
+        cell = e->unk10 + slot->h4 + slot->h6 * 20;
+        for (j = 0; j < slot->hA; j++) {
+            for (k = 0; k < slot->h8; k++) {
+                if (setBit != 0) {
+                    (*cell)->unk10 &= 0x7FFFFFFF;
+                } else {
+                    (*cell)->unk10 |= 0x80000000;
+                }
+                next = (*cell)->unk38;
+                while (next != 0) {
+                    if (setBit != 0) {
+                        next->unk10 &= 0x7FFFFFFF;
+                    } else {
+                        next->unk10 |= 0x80000000;
+                    }
+                    next = next->unk38;
+                }
+                cell++;
+            }
+            cell += 20 - slot->h8;
+        }
+    }
+}
 
 void *func_8004CFA8(Obj866E8 *self) {
     return &self->unk1CC;

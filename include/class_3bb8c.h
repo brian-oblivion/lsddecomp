@@ -246,11 +246,13 @@ typedef struct EntryChildObjMethods {
 struct EntryChildObj {
     EntryChildObjMethods *methods;  /* +0x000, func_8004D0D0/func_8004D108 */
     u8 pad04[0x10 - 0x04];
-    u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000 */
+    u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000; func_8004CE24: bit31 set/cleared per its own arg1 */
     u8 pad14[0x18 - 0x14];
     s32 unk18;                      /* +0x018, func_8004C0AC: zeroed */
     u8 pad1C[0x20 - 0x1C];
     s32 unk20;                      /* +0x020, func_8004C0AC: zeroed */
+    u8 pad24[0x38 - 0x24];
+    EntryChildObj *unk38;           /* +0x038, func_8004CE24: singly-linked chain, walked while non-NULL */
 };
 
 /*
@@ -312,6 +314,28 @@ extern EntryDesc866E8 D_800869A8;
 extern EntryDesc866E8 D_800869B4;
 extern EntryDesc866E8 D_800869C0;
 
+/*
+ * self+0x8C's array element (`Obj866E8::slots8C`, see below). Established
+ * from func_8004CE24, which reads all five fields: `elemIdx` selects
+ * `self->arr[elemIdx]`; `h4`/`h6` locate a starting cell in that element's
+ * `unk10` pointer grid (row stride 20 cells, confirmed by the `* 20`
+ * offset math); `h8`/`hA` are the sub-rectangle's width/height walked
+ * from that starting cell. func_8004CDA4 (already matched, a different
+ * unit's round) writes a whole one of these via a 3-word block copy using
+ * the coarser, already-committed `Unk54Struct` view of the SAME memory --
+ * per this project's independent-views convention, that write-side view
+ * is left alone; this is a separate, more granular READ-side view of the
+ * same 0xC bytes, justified because a whole-struct copy does not care
+ * about the internal layout it is copying.
+ */
+typedef struct GridSlot866E8 {
+    s32 elemIdx;   /* +0x0, func_8004CE24: selects self->arr[elemIdx] */
+    s16 h4;        /* +0x4, func_8004CE24: starting column */
+    s16 h6;        /* +0x6, func_8004CE24: starting row (row stride 20) */
+    s16 h8;        /* +0x8, func_8004CE24: sub-rectangle width */
+    s16 hA;        /* +0xA, func_8004CE24: sub-rectangle height */
+} GridSlot866E8;
+
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x54 - 0x04];
@@ -323,7 +347,9 @@ struct Obj866E8 {
     u8 pad74[0x78 - 0x74];
     s16 unk78;                     /* +0x078, func_8004C620 (halfword, doubled into an index) */
     s16 unk7A;                     /* +0x07A, func_8004C620 (halfword, passed on as an arg) */
-    u8 pad7C[0xBC - 0x7C];
+    u8 pad7C[0x88 - 0x7C];
+    s32 unk88;                     /* +0x088, func_8004CE24: loop count over slots8C[] (bounded by slots8C's own 4-element capacity) */
+    GridSlot866E8 slots8C[4];      /* +0x08C, func_8004CE24 (reads); func_8004CDA4 (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
     Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/func_8004C588/func_8004C5D0/func_8004BD14/func_8004D1D0 */
