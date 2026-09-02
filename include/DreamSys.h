@@ -217,7 +217,12 @@ typedef struct DreamSysFunc58968ArgObj {
    at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
    related to DreamSysUnk58. */
 typedef struct DreamSysUnk4CMethods {
-	u8 pad00[0xE8];
+	u8 pad00[0xD4];
+	/* Called by DreamSys__WallLink as (this->unk_0x4C, arg1), return value
+	   whole-struct-assigned into this->linkCoordinates (a PlayerSpawnPoint)
+	   (round 2026-09-02). */
+	PlayerSpawnPoint *(*slot0xD4)(void *self, void *arg1);
+	u8 pad_0xD8[0xE8 - 0xD8];
 	/* Called by func_8005A82C as (this->unk_0x4C, &local, &this->
 	   linkCoordinates) -- `local` is an output buffer also consumed by
 	   vt->slot0xB8 right after (round 2026-09-02). */
@@ -279,6 +284,9 @@ typedef struct DreamSysBaseMethods {
 	   (round 2026-09-02). Resolves to func_80057B90 in D_800878D4, out of
 	   this unit's scope. */
 	void (*slot0xDC)(struct DreamSys *self, void *arg1, s32 arg2);
+	/* Called by DreamSys__WallLink as (this, arg1, arg2) -- same argument
+	   shape as slot0x9C/slot0xDC above (round 2026-09-02). */
+	void (*slot0xE0)(struct DreamSys *self, void *arg1, s32 arg2);
 } DreamSysBaseMethods;
 extern DreamSysBaseMethods *func_80057C84(void);
 
@@ -649,8 +657,15 @@ struct vtable_DreamSys{
 	   (round 2026-08-30-d). */
 	void (*func_800573A8)(DreamSys *this, DreamSysVec3 *arg1);
 	u32 unknown_functions_0xc0[8];
-	void *LinkWall;
-	u32 unknown_functions_0xe4[6];
+	/* This function's OWN slot; resolved via tools/classtable.py
+	   (round 2026-09-02). */
+	void (*LinkWall)(DreamSys *this, void *arg1, s32 arg2);
+	u32 unknown_functions_0xe4[1];
+	/* This unit's own no-op stub (`func_800590E0`, `{ }`). Called by
+	   DreamSys__WallLink as (this) -- the callee ignores its argument
+	   (round 2026-09-02). */
+	void (*func_800590E0)(DreamSys *this);
+	u32 unknown_functions_0xec[4];
 	void (*func_80059310)(DreamSys *this);
 	s32 (*func_8005931C)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);

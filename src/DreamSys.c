@@ -106,7 +106,20 @@ void func_80058F18(DreamSys *this, void *arg1, s32 arg2)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__WallLink);
+void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
+{
+	func_80057C84()->slot0xE0(this, unk_class_86aa0, arg2);
+	if (arg2 != 4)
+		return;
+	if (this->unknwon_int_0x44 != 0)
+		return;
+	this->linkCoordinates = *this->unk_0x4C->methods->slot0xD4(this->unk_0x4C, unk_class_86aa0);
+	if (!this->vt->StaticWallLink(this, &this->linkCoordinates) && this->unk_0x124 != 0) {
+		this->vt->DynamicLink(this);
+	}
+	this->vt->func_8005B990(this);
+	this->vt->func_800590E0(this);
+}
 
 void func_800590E0(void) {
 }
