@@ -68,7 +68,10 @@ void func_8004B2D4(Class866E8 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B31C);
+void *func_8004B31C(Class866E8 *self)
+{
+    return &self->unk1C0;
+}
 
 void func_8004B324(void) {
 }
