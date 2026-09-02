@@ -40,6 +40,8 @@ typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
 typedef struct Unk100Obj Unk100Obj;
 typedef struct Unk100Methods Unk100Methods;
+typedef struct Unk94Obj Unk94Obj;
+typedef struct Unk94Methods Unk94Methods;
 typedef struct BasicClassMethods BasicClassMethods;
 typedef struct EntityPos EntityPos;
 typedef struct EntityMoodRow EntityMoodRow;
@@ -66,14 +68,15 @@ struct EntityMethods {
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
-    /* +0x134 */ u8 pad134[0x148 - 0x134];
+    /* +0x134 */ u8 pad134[0x144 - 0x134];
+    /* +0x144 */ s32 (*slot144)(Entity *self);            /* called by func_8005E02C (still INCLUDE_ASM, stalled on a register-identity residue -- see its match report), compared against a threshold with slt -- value-returning, not void */
     /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds func_8005D864 (still addiu_at-blocked in Entity.c) */
     /* +0x14C */ u8 pad14C[0x15C - 0x14C];
     /* +0x15C */ void (*slot15C)(Entity *self);            /* called by func_8005DBF0 */
     /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
     /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C and func_8005DE18 (as slot164(self, 1)) */
     /* +0x168 */ void (*slot168)(Entity *self);               /* called by func_8005DEE0 */
-    /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C */
+    /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C, func_8005E0B0 */
     /* +0x170 */ s32 (*slot170)(Entity *self);                  /* called by func_8005D480 */
     /* +0x174 */ void (*slot174)(Entity *self);                  /* called by func_8005D480 */
     /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by func_8005D480; holds func_8005DE18, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
@@ -120,6 +123,27 @@ struct Unk100Obj {
 
 extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
 
+/* Object pointed to by `Entity::unk94`. NOT another `Entity`, despite +0x14
+ * also holding an `EntityPos *` (same convention as `Entity::unk14`):
+ * `func_8001EACC` (still INCLUDE_ASM, code_d294.s) dereferences this object
+ * at +0xC, and Entity's OWN +0xC (`Entity::unk0C`) is a plain `s32` flag,
+ * not a pointer -- that mismatch rules Entity itself out. Its vtable slot
+ * +0x130 takes an extra `s32` argument at the one call site reached so far
+ * (func_8005E3C4, `ori $a1, $zero, 0x1` before the `jalr`), unlike Entity's
+ * OWN +0x130 slot (`EntityMethods::slot130`, self-only per func_8005DB8C in
+ * Entity.c) -- two different functions in two different tables that merely
+ * share a numeric offset; do not conflate them. */
+struct Unk94Methods {
+    u8 pad000[0x130];
+    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
+};
+
+struct Unk94Obj {
+    Unk94Methods *methods; /* +0x00 */
+    u8 pad04[0x14 - 0x04];
+    EntityPos *unk14;        /* +0x14, read by func_8005E02C (its own +0x1C, i.e. y) */
+};
+
 /* Default arguments func_8005D108 substitutes when its own `name`/`arg2`
  * parameters are NULL -- both plain 2-word buffers (asm/data/7B3F8.sdata.s),
  * not strings; `D_8008AC14` reads as {0x140, 0xF0} (320, 240, a plausible
@@ -127,15 +151,19 @@ extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
 extern s32 D_8008AC14[2];
 extern s32 D_8008AC0C[2];
 
-/* A 3-word (x, y, z) position, pointed to by `Entity::unk14`. Only the
- * words at +0x18/+0x20 (x/z) are read by this unit's functions; +0x1C (y)
- * is inferred from func_8005D714 consuming all three as one vector
- * (asm/nonmatchings/Entity/func_8005D714.s, still `addiu_at`-blocked, copies
- * its arg1[0]/[1]/[2] verbatim onto its own stack). */
+/* A 3-word (x, y, z) position, pointed to by `Entity::unk14` (and by
+ * `Unk94Obj::unk14`, same convention). +0x1C (y) is now confirmed by a
+ * direct reader: func_8005E02C's own disassembly compares `this->unk14->y`
+ * against `this->unk94->unk14->y` +/- 0x200 (that function itself stalled
+ * on a register-identity residue, see its match report, but this field
+ * derivation is unaffected). It is also inferred from func_8005D714
+ * consuming all three as one vector (asm/nonmatchings/Entity/func_8005D714.s,
+ * still `addiu_at`-blocked, copies its arg1[0]/[1]/[2] verbatim onto its own
+ * stack). */
 struct EntityPos {
     u8 pad00[0x18];
     s32 x; /* +0x18 */
-    s32 y; /* +0x1C, unconfirmed -- no reader in this unit */
+    s32 y; /* +0x1C, read by func_8005E02C */
     s32 z; /* +0x20 */
 };
 
@@ -173,13 +201,16 @@ struct Entity {
     /* +0x18 */ u8 pad18[0x24 - 0x18];
     /* +0x24 */ s32 unk24;             /* cleared by func_8005D9F4; xored against a mood-row-derived value in func_8005DD18 */
     /* +0x28 */ u8 pad28[0x44 - 0x28];
-    /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1 */
+    /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by func_8005EBB4 */
     /* +0x48 */ u8 pad48[0x4C - 0x48];
     /* +0x4C */ s32 unk4C;               /* cleared by func_8005D418 */
     /* +0x50 */ u8 pad50[0x58 - 0x50];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
-    /* +0x5C */ u8 pad5C[0x94 - 0x5C];
-    /* +0x94 */ void *unk94;            /* passed as func_8001EACC's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18; that callee dereferences it at +0xC/+0x14, so it is a pointer to SOME object, real type unconfirmed */
+    /* +0x5C */ u8 pad5C[0x80 - 0x5C];
+    /* +0x80 */ s32 unk80;             /* read by func_8005E6F0/func_8005E7F8 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and func_8005EBB4 (compared to `out->unk4` as `this->unk80 - 1`) */
+    /* +0x84 */ s32 unk84;             /* compared against a literal (func_8005EC98: `== 0xA`) or against `this->unk80 / 2` (func_8005E4D0) */
+    /* +0x88 */ u8 pad88[0x94 - 0x88];
+    /* +0x94 */ Unk94Obj *unk94;         /* passed as func_8001EACC's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
     /* +0x9C */ s32 unk9C;             /* zeroed by Entity__Entity; address-taken by func_8005D6D4/func_8005DB8C */
     /* +0xA0 */ u8 padA0[0xF0 - 0xA0];

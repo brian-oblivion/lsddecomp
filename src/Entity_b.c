@@ -58,7 +58,24 @@ INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005DF9C);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E02C);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E0B0);
+s32 func_8005E0B0(Entity *this) {
+    EntityMoodRow *row;
+    s32 *xptr;
+    s32 dist;
+
+    if (this->unkF0 != 0 && this->unkF8 != 0) {
+        row = &D_80089EA4[this->moodIndex];
+        dist = row->unkB;
+        if (dist < 0) {
+            dist = ~dist + 1;
+            xptr = &this->unk14->x;
+            if (func_8005D714(this, xptr, dist, row->unk9) == 0) {
+                this->methods->slot16C(this);
+            }
+        }
+    }
+    return this->unkF8;
+}
 
 EntityMethods *Get_vtable_Entity(void) {
     return &D_80089AD4;
@@ -66,7 +83,20 @@ EntityMethods *Get_vtable_Entity(void) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E160);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E3C4);
+void func_8005E3C4(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = 0;
+    if (out->unk4 == 0) {
+        out->unk1C = 0x14;
+        out->unk30 = 0x14;
+        out->unk44 = 0x14;
+        this->unk94->methods->slot130(this->unk94, 1);
+    }
+    func_8001EACC(this, this->unk94, 1, 0, 0);
+    this->methods->slotC4(this, -0x5A, 0);
+    if (this->unkFC == 0x1E) {
+        this->methods->slot30(this, 0xA);
+    }
+}
 
 void func_8005E480(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
@@ -82,7 +112,13 @@ void func_8005E694(Entity *this) {
     this->methods->slotBC(this, D_80089D78);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E6F0);
+void func_8005E6F0(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (out->unk4 % (this->unk80 / 2) == 0) {
+        out->unk1C = 0xA;
+    }
+    this->methods->slotC4(this, -0x1E, 0);
+}
 
 void func_8005E7A8(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
@@ -98,9 +134,28 @@ INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E7F8);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EA94);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EBB4);
+void func_8005EBB4(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (out->unk4 == 0) {
+        out->unk1C = 0xC;
+        this->unk44++;
+    } else if (out->unk4 >= this->unk80 - 1) {
+        out->unk4 = -1;
+    }
+    if (this->unk44 == 0x24) {
+        if (rand() % 3 == 0) {
+            this->methods->slot30(this, 0xB);
+        }
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EC98);
+void func_8005EC98(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk84 == 0xA) {
+        out->unk1C = 0xD;
+    }
+    this->methods->slotC4(this, -0xA, 0);
+}
 
 void func_8005ED10(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
