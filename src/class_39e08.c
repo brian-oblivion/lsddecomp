@@ -77,7 +77,12 @@ void func_8004A324(Obj865C8 *self) {
 void func_8004A35C(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A364);
+void func_8004A364(Obj865C8 *self, s32 arg1, s32 arg2) {
+    func_8003E5C8()->slot5C(self, arg1, arg2);
+    if ((u32)self->unk1C > (u32)self->unk2C) {
+        self->methods->onEventArg(self, 4);
+    }
+}
 
 void func_8004A3EC(Obj865C8 *self, s32 arg1) {
     func_8003E5C8()->slot60(self, arg1);
