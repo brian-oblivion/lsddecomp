@@ -7,7 +7,17 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049684);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049830);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049958);
+void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+    s32 tag;
+
+    func_8004A4B8()->slot38(self, arg1, arg2);
+    tag = arg1->target->header;
+    if ((tag & 0xFFFF) == 0x1F34) {
+        self->methods->slot80(self, arg1, arg2);
+    } else if ((tag & 0xFFFFF) == 0x2F230) {
+        self->methods->slot84(self, arg1, arg2);
+    }
+}
 
 void func_80049A14(Obj865C8 *self) {
     self->unk3C = 0;

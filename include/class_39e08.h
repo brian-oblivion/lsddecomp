@@ -17,6 +17,18 @@
 typedef struct Obj865C8 Obj865C8;
 typedef struct Obj4C Obj4C;
 
+/* What func_80049958 (Class865C8Methods slot +0x038) inspects: `arg1` is a
+ * pointer to a small wrapper whose own field 0 is a pointer to some OTHER,
+ * unrelated header-tagged object (double indirection confirmed by the
+ * disassembly's two chained `lw ..., 0x0(reg)`). Only the one word each
+ * struct exposes here is named; neither is this unit's own object type. */
+typedef struct HeaderObj {
+    s32 header;
+} HeaderObj;
+typedef struct EventArg {
+    HeaderObj *target;
+} EventArg;
+
 /* +0x008/+0x00C (ctor/dtor) and most BasicClass-inherited slots are not
  * this round's functions (func_80049684/func_80049830, still INCLUDE_ASM
  * elsewhere in this unit) -- left untyped. */
@@ -32,7 +44,11 @@ typedef struct Class865C8Methods {
     void *unk14, *unk18, *unk1C;                   /* BasicClass, inherited */
     void *unk20, *unk24, *unk28, *unk2C;           /* BasicClass, inherited */
     void *unk30, *unk34;                           /* BasicClass, inherited */
-    void *slot38;                                  /* +0x038 func_80049958 */
+    /* Occupied here by func_80049958 itself; only reachable from THIS
+     * struct via func_8004A4B8()'s own D_80086668 view of the same offset
+     * (Class86668Methods::slot38 below), where it forwards to the inherited
+     * func_8003E030. */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_80049958 */
     void *unk3C;                                   /* +0x03C null slot */
     void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 func_80049A14 */
     void *slot44;                                  /* +0x044 func_80049A1C */
@@ -51,8 +67,16 @@ typedef struct Class865C8Methods {
     void *unk70;                                   /* func_8004A478 */
     void *unk74, *unk78;                           /* null slots */
     void (*noop7C)(Obj865C8 *self);                /* +0x07C func_80049EA4 (no-op, matched) */
-    void (*noop80)(void);                          /* +0x080 func_80049EAC (no-op, matched) */
-    void *slot84;                                  /* +0x084 func_80049EB4, addiu_at-blocked */
+    /* Retyped from `void (*noop80)(void)`: func_80049958 dispatches this
+     * slot as `self->methods->slot80(self, arg1, arg2)` with real
+     * arguments loaded into $a1/$a2 -- func_80049EAC (D_800865C8's own
+     * occupant, still matched, `void func_80049EAC(void) {}`) simply
+     * ignores them. A no-op BODY is not evidence the SLOT's signature takes
+     * no arguments; only THIS slot's other occupants would be. */
+    void (*slot80)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x080 func_80049EAC (no-op body, matched) */
+    /* Same signature as slot80 by the same call site (func_80049958's other
+     * branch); occupant func_80049EB4 is still addiu_at-blocked. */
+    void (*slot84)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x084 func_80049EB4, addiu_at-blocked */
 } Class865C8Methods;
 
 extern Class865C8Methods D_800865C8;
@@ -205,7 +229,13 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 typedef struct Class86668Methods {
     u8 pad00[0x08];
     void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
-    u8 pad0C[0x44 - 0x0C];
+    u8 pad0C[0x38 - 0x0C];
+    /* Inherited, shared verbatim with D_800865C8's own occupant of this
+     * offset (func_80049958, this unit): D_80086668's own +0x038 is
+     * func_8003E030 (a base/inherited slot, out of this unit's scope).
+     * Called by func_80049958 as func_8004A4B8()->slot38(self, arg1, arg2). */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_8003E030 */
+    u8 pad3C[0x44 - 0x3C];
     /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
      * the base's own slot44, returns self->unk28. Called by func_80049A1C
      * as func_8004A4B8()->slot44(self, self->unk0C, 0), return discarded. */
