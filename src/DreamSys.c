@@ -565,7 +565,15 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitMoodContibutors);
+void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
+{
+	this->vt->ClearMoodGraph(this, &this->areaMoods);
+	this->vt->ClearMoodGraph(this, &this->entityMoods);
+	if (special != NULL) {
+		this->vt->LogMood(this, &this->areaMoods, special);
+		this->vt->LogMood(this, &this->entityMoods, special);
+	}
+}
 
 void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
