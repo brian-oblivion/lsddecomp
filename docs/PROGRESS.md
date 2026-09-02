@@ -6,6 +6,198 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-02 — round 7: 4 runners, 58 matches, two carves, and two heads in one checkout
+
+**198 -> 261 matched (14.60% -> 19.25% of game code; matched bytes 6.80% ->
+12.09%). 133 queued: 89 stalled, 44 fresh. Build green in main after every
+one of thirteen merges and after both carves.**
+
+Four runners, one unit each, all sent back into their own units after their
+first pass per §3c. Three units were cleared outright, so the head carved two
+new ones mid-round and handed them to the runners that had run out of ground.
+
+| runner | units worked | matched | stalled |
+| --- | --- | --- | --- |
+| alpha | `class_3ac78` | 7 | 3 |
+| bravo | `code_2c054` -> `DreamSys` | 18 | 1 |
+| charlie | `class_39e08` -> `class_3bb8c` | 16 | 0 |
+| delta | `Entity_b` -> `Entity_c` | 16 | 0 |
+
+Five of the 58 were salvaged rather than produced: three inherited from round
+6's abandoned worktrees, plus `func_8005AD68` from bravo's own death (below).
+
+### Two heads in one checkout — the round's real finding
+
+The operator started this round's head while round 6's head was still live.
+Both worked the same `main`. **Nothing was corrupted** — every commit was
+real, no protected file was touched, `main` byte-verified throughout — but
+each head read the other's legitimate head actions as its own runners
+misbehaving, and both wrote the misreading down as fact:
+
+- Round 6's head filed a **PROTOCOL VIOLATION** against its runner alpha for
+  two commits *this* head had made, and rebutted alpha's true account of
+  having its worktree reclaimed mid-session.
+- It then recorded this round's runner output as "the runners kept working
+  after reporting", inflating its own totals from 43 to 48 matches.
+- This head, symmetrically, found commits on `main` it had not made and had
+  to rule out a rogue runner before it could rule in a second head.
+
+**The mechanism is recycled names.** Worktrees and branches are
+`runner/alpha`…`runner/echo` every round. Tearing them down and
+re-provisioning hands the other head a branch with the same name, a different
+round's work on it, and no signal that it changed underneath. And **git
+authorship cannot distinguish the cases, because every agent commits as the
+operator.**
+
+Both misattributions are struck through and corrected in place in round 6's
+entry, not deleted — an accusation that was published should be visibly
+withdrawn. The rule is now §4a of PARALLEL-RUNS: establish you are the only
+head before anything else, and never re-create a name another head may hold.
+
+**Standing operator escalation: rule 5 (main is single-occupancy) has no
+mechanical enforcement.** Nothing stopped either head writing to main. The
+hooks guard `check.sha1`/`build.sha1` and `asm/`, not the branch.
+
+### The head confirmed a stall that a runner then overturned
+
+`func_8005E02C` was filed by delta as a register-identity stall at 28/33.
+The head re-audited it properly per §3 — ran two more source shapes, both
+landing on the identical five words, named the residue precisely (retail
+spreads the first pointer chain across `$a1`,`$v0`,`$a2` from the register
+`arg1` just vacated, while collapsing the second chain into one reused
+`$v1`), and attached a corpus census arguing the shape was rare and a poor
+permuter target. **All of it was wrong in the same way.**
+
+`EntityMethods::slot144` takes a *second argument*, `this->unk94` itself.
+Retail parks the value in `$a1` for the whole function because that is the
+register the call needs it in. Delta found it on its next pass by
+cross-checking a *different* caller of the same slot, and matched 33/33 first
+try with the corrected signature.
+
+Why fourteen attempts across two authors missed it: every one varied the code
+that COMPUTED the value while holding the one-argument signature fixed. The
+call site under test even looked like positive evidence for that signature — a
+plain `nop` delay slot and no fresh `$a1` load — because the argument had been
+resident since the top of the function. The head's census was measuring a
+shape that merely co-occurs with the cause.
+
+Three lessons banked, all in DECOMPILATION_LEARNINGS: cross-check another
+caller before accepting a register-identity read; a census of a residue's
+surface shape is not a census of its cause; and MATCHING-GUIDE now says a
+match report is the best available account, **not a verdict** — many attempts
+along one axis reads as exhaustive and is a reason to hunt for the axis nobody
+varied.
+
+### Two Gate 2 carves, both zero-byte
+
+Done mid-round to convert idle runners into new ground, one segment at a time
+with a verify after each:
+
+- **`class_3bb8c`**, first 20-function slice (0x3BB8C..0x3CD88) of the largest
+  uncarved block in the game, 365 functions. Remainder is `class_3bb8c_b`.
+- **`Entity_c`**, first 20-function slice (0x4F754..0x5077C) of the
+  97-function Entity remainder. Remainder is `Entity_d`.
+
+Both boundaries were checked on both sides, and the per-function census
+(second `addiu $sp` prologue, `jlabel`, `jr $t2`, `$sp`-before-prologue,
+`alabel`) came back clean for all 40 — confirming again that this game does
+not under-split. Neither slice needed a rodata slot attached.
+
+**Carve hazards still ahead, named at carve time in the unit headers:**
+`class_3bb8c`'s remainder holds all 13 PSX BIOS trampolines and 38 switch
+jump tables, none of which fell in the carved slice. Whoever takes the next
+slice must disposition the trampolines (`hasm` or literal `.word`) and attach
+the right rodata slot *at carve time*. `Entity_d` is clean by contrast — the
+whole 97-function block has zero of both, which is a property of the block,
+not of the slice.
+
+Charlie independently confirmed the `class_3bb8c` census by working in the
+slice and hitting neither hazard.
+
+### Runners lost finished work to uncommitted state, twice
+
+Round 7 **opened** by inheriting round 6's five standing worktrees and finding
+three uncommitted byte-exact matches in alpha's (`func_8005A7A0`,
+`func_8005B904`, `func_8005B990`) that no summary had ever mentioned. They
+survived only because nobody ran `--force` on that worktree.
+
+It **closed** with bravo dying to an API error mid-batch, holding a finished
+54/54 match (`func_8005AD68`) as uncommitted working-tree state. Salvaged
+under §4c; the head wrote the report and labelled it a finished match rather
+than the mid-attempt snapshot §4c usually produces, while marking the attempt
+history as unknown rather than inventing one.
+
+Both are the same failure: **one-commit-per-match is what makes a runner's
+work survive its session.** §4b gains the deferral note this implies —
+deferring teardown is right when agents may still be live, but it hands the
+next head a §4c salvage it has no way to anticipate, so PROGRESS must name
+the worktrees.
+
+### Head review of runner C, beyond the score
+
+- `func_8004B570` was written `s32 { return self->unk70 = 1; }`. The store
+  sits in the delay slot and the literal must be materialized somewhere, so
+  `void` and `s32` are byte-identical — the bytes prove nothing. A cross-table
+  survey of slot `+0x0EC` over all 60 method tables found the base
+  implementation (`func_8003D444`, shared by four class tables) materializes
+  no return value on either path, which makes `void` the supported reading.
+  Corrected, re-verified 3/3.
+- `func_8004C434` has a non-void function with no return on its
+  loop-exhaustion path. Its report predicted a terminal `return e;` would cost
+  an instruction; the head tested it rather than leaving it as reasoning — it
+  scores 6/15 and adds one `addu`. The UB-shaped body is the faithful
+  reconstruction and stays. Also recorded that retail's not-found path leaves
+  `&arr[6]` in `$v0`, not null, so no caller can rely on a null return.
+- `func_8004ADD8`'s opaque `goto` chain was rewritten as a `switch` at the
+  head's suggestion, reaching identical bytes with clearer C. Its
+  `u8 unused[24]` frame padding is now annotated as *evidence* of a real local
+  aggregate in the original source, not an explanation of it.
+
+### Two runners bounded the `__asm__("")` barrier from opposite sides
+
+Not a contradiction, and worth stating because it reads like one. Delta's
+barrier DID change which instruction fills a load-delay slot at its own
+position. Alpha's did NOT stop a loop-offset increment being hoisted backward
+across it, past several intervening statements. Together they narrow the lever
+from "reliable local fix" to "scheduling nudge at its own position" — and
+neither moved a register choice, which is rule 6 holding from the failing
+side.
+
+### The `make` hook papercut, reproduced and diagnosed
+
+Round 6 logged it; this head hit it three times before reading that, and then
+read the cause off the hook. `tokenize()` runs with
+`punctuation_chars=True`, so a redirection like `2>&1` becomes the tokens
+`2`, `>&`, `1`; neither `>` nor `>&` is in `SEPARATORS`, so `targets_of()`
+collects them as make targets and the `all(t in ALLOWED_TARGETS)` test fails.
+`make extract` passes bare and is refused with any redirection, by an error
+message that itself says `make extract` is allowed. Two heads hitting it
+within the hour. **Operator's guardrail, untouched.**
+
+### Next round
+
+**Runners.** 44 fresh across four units, 30 of it in the two units carved this
+round and never worked beyond a first pass (`class_3bb8c` 15, `Entity_c` 15),
+plus `DreamSys` 12 and `class_3ac78` 2. Cold-runner yield this round was very
+high — 58 matches against 4 stalls, most on the first or second attempt — so
+cold ground is plainly not exhausted and a permuter round is not yet the best
+use of a session.
+
+Round 6's entry recommended permuter on the strength of the 24-instance
+epilogue-merge class. That recommendation still has merit and is untouched by
+this round, but it should be weighed against two things round 7 established:
+the class census that looked most permuter-ready (this head's own) turned out
+to be measuring the wrong thing, and reshaping under a corrected *signature*
+closed a stall that reshaping under the wrong one could not. **Check arity and
+slot typing across callers before committing a session to a permuter search.**
+
+A carve is not needed — the queue was refilled this round — but the next one
+should take `class_3bb8c`'s second slice specifically, because that is where
+the BIOS-trampoline disposition finally has to be made, and making it at carve
+time is much cheaper than a runner discovering it.
+
+---
+
 ## 2026-09-02 — round 6: 5 runners, 43 matches, and a second head nobody knew about
 
 **160 -> 203 matched (11.80% -> 14.97% of game code). Build green in main after
