@@ -84,7 +84,39 @@ void func_80058A94(DreamSys *this)
 	func_80057C84()->slot0x50(this);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058B08);
+void func_80058B08(DreamSys *this, s32 arg1)
+{
+	s32 v;
+
+	func_80057C84()->slot0x88(this, arg1);
+	if (arg1 == -2)
+		goto handle_neg2;
+	if (arg1 != -1)
+		return;
+
+	v = this->unk_0x28->unk_0x36 & 0x7F;
+	this->unk_0xB8 = v;
+	if (v >= 0x18)
+		this->unk_0xB8 = 0;
+
+	if (this->unknwon_int_0x44 == 15 && this->unk_0xB8 == 0)
+		this->unk_0xB8 = 2;
+
+	if (this->currentStage != 9)
+		return;
+	goto shared_tail;
+
+handle_neg2:
+	if (this->unk_0x4C->methods->slot0x11C(this->unk_0x4C, (u8 *)this->unk_0x14 + 0x18)->unk_0x4->unk_0x2C != 2)
+		goto neg2_mismatch;
+
+shared_tail:
+	this->vt->func_8005A7A0(this, this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0));
+	return;
+
+neg2_mismatch:
+	this->vt->func_8005B990(this);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058C58);
 
@@ -147,7 +179,46 @@ void func_80059148(DreamSys *this, s32 value)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800591B4);
+void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
+{
+	struct {
+		s8 unknown_values_0x0[8];
+		s16 field_0x8;
+		s16 field_0xA;
+	} local;
+
+	this->vt->LogChunkMood(this, &this->linkCoordinates);
+	this->vt->func_8005966C(this, 1);
+	this->vt->func_800596E8(this, 1);
+	this->vt->func_8005A168(this, arg1);
+
+	this->unk_0xBC = -1;
+	this->unk_0xB4 = 0;
+	this->unk_0xB8 = 0;
+	this->unk_0xA0 = 0;
+	this->unk_0xA4 = 0;
+	this->unk_0x88 = 0;
+	this->unk_0x90 = 0;
+	this->unk_0x8C = 0;
+	this->unk_0x94 = 0;
+	this->vt->func_8005A1B0(this, 0, 1, 1, 1);
+
+	this->vt->func_8005A1EC(this, arg2);
+
+	this->nextCinematic.entry = -1;
+	this->unk_0x70 = 0;
+	this->unknwon_int_0x44 = 0;
+	this->unk_0x74 = 0;
+	this->unk_0x908 = 0;
+	this->unk_0x90C = 0;
+	this->unk_0x910 = 0;
+	this->unk_0x78 = 0;
+	func_8001E6F8(this, &local);
+
+	local.field_0x8 = 0;
+	local.field_0xA = 1;
+	this->vt->func_8001CEB4(this, 1, &local);
+}
 
 void func_80059310(DreamSys *this)
 {
@@ -649,7 +720,35 @@ s32 func_8005AB2C(DreamSys *this)
 	return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AC24);
+s32 func_8005AC24(DreamSys *this)
+{
+	s32 flag;
+
+	if (this->unk_0x914 == 0) {
+		func_8005AF64(this, &D_8008ABC8, &this->unk_0x91C);
+	}
+	if (this->unk_0xAC != 4) {
+		if (this->unk_0x914 >= 0x95)
+			return 1;
+		if ((u32)(this->unk_0x914 - 0x16) < 0xF || (u32)(this->unk_0x914 - 0x39) < 0x10 || (u32)(this->unk_0x914 - 0x6E) < 0xF) {
+			this->unk_0xA4 = 1;
+		}
+		flag = (u32)(this->unk_0x914 - 0x39) < 0x35;
+	} else {
+		if (this->unk_0x914 >= 0x19)
+			return 1;
+		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xB) < 2 || (u32)(this->unk_0x914 - 0x14) < 2) {
+			this->vt->func_8001CEB4(this, 0, &D_80087F08);
+		}
+		flag = (u32)(this->unk_0x914 - 3) < 0xE;
+	}
+	if (flag) {
+		this->unk_0x88 = 2;
+	}
+	this->unk_0xA0 = 1;
+	this->unk_0x914++;
+	return 0;
+}
 
 s32 func_8005AD68(DreamSys *this)
 {

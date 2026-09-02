@@ -150,9 +150,13 @@ typedef struct DreamSysUnk14 {
 /* Struct pointed to by DreamSys::unk_0x5C. +0x14 / +0x20 are a pair of
    two-word (x,y) points per func_8005942C (still INCLUDE_ASM elsewhere in
    this unit; not confirmed by this round). +0x24 (the second point's y) is
-   confirmed: func_80059814 (round 2026-08-30) nudges it. */
+   confirmed: func_80059814 (round 2026-08-30) nudges it. +0x18 (the first
+   point's y) is also now confirmed: func_80059BE0 (round 2026-09-02) nudges
+   it by the SAME delta as +0x24, in the same statement pair. */
 typedef struct DreamSysUnk5C {
-	s8 unknown_values_0x0[0x24];
+	s8 unknown_values_0x0[0x18];
+	s32 unk_0x18;
+	s8 unknown_values_0x1C[8];
 	s32 unk_0x24;
 } DreamSysUnk5C;
 
@@ -212,6 +216,22 @@ typedef struct DreamSysFunc58968ArgObj {
 	DreamSysFunc58968ArgMethods *methods;
 } DreamSysFunc58968ArgObj;
 
+/* Inner struct chased by func_80058B08's `arg1 == -2` path: the return of
+   DreamSysUnk4CMethods::slot0x11C (a DreamSysUnk11CResult below) has a
+   pointer at +0x4 to one of THESE, and only +0x2C (a `s16`, compared
+   against the literal 2) is read (round 2026-09-02). */
+typedef struct DreamSysUnk11CInner {
+	s8 unknown_values_0x0[0x2C];
+	s16 unk_0x2C;
+} DreamSysUnk11CInner;
+
+/* Return type of DreamSysUnk4CMethods::slot0x11C. Only +0x4 (a pointer to
+   DreamSysUnk11CInner above) is read, by func_80058B08 (round 2026-09-02). */
+typedef struct DreamSysUnk11CResult {
+	s8 unknown_values_0x0[4];
+	DreamSysUnk11CInner *unk_0x4;
+} DreamSysUnk11CResult;
+
 /* Object pointed to by DreamSys::unk_0x4C, used by func_80058A94 (slot
    +0xF0) and func_8005A82C (slot +0xE8, this round): same "vtable pointer
    at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
@@ -237,7 +257,17 @@ typedef struct DreamSysUnk4CMethods {
 	   DreamSys__ProcessChunkChange) -- plausibly the same underlying class,
 	   but kept as a separate local view per this unit's convention for
 	   "multiple local views of the same table" (round 2026-09-02). */
+	/* Called with (this->unk_0x4C, 0, 0) by DreamSys__FlashbackSaving (see
+	   above); ALSO called with the identical (0, 0) argument pair by
+	   func_80058B08's shared tail block, whose return value is forwarded
+	   straight into vtable slot +0x1D4 (func_8005A7A0)'s `currentPos`
+	   argument (round 2026-09-02) -- same signature, different caller. */
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
+	u8 pad_0x110[0x11C - 0x110];
+	/* Called by func_80058B08's `arg1 == -2` path as (this->unk_0x4C,
+	   (u8 *)this->unk_0x14 + 0x18); the result's `unk_0x4` is chased and its
+	   `unk_0x2C` compared against the literal 2 (round 2026-09-02). */
+	DreamSysUnk11CResult *(*slot0x11C)(void *self, void *arg1);
 } DreamSysUnk4CMethods;
 typedef struct DreamSysUnk4CObj {
 	DreamSysUnk4CMethods *methods;
@@ -275,7 +305,11 @@ typedef struct DreamSysBaseMethods {
 	   ABI level, and the call site casts implicitly with no codegen
 	   difference (round 2026-08-30-b). */
 	void (*slot0x50)(struct DreamSys *self);
-	u8 pad54[0x9C - 0x54];
+	u8 pad54[0x88 - 0x54];
+	/* Called by func_80058B08 (this unit's own +0x088 slot) as
+	   (this, arg1), return value discarded (round 2026-09-02). */
+	void (*slot0x88)(struct DreamSys *self, s32 arg1);
+	u8 pad8C[0x9C - 0x8C];
 	/* Called by func_80058E8C as (this, arg1, arg2) -- round 2026-08-30-d. */
 	void (*slot0x9C)(struct DreamSys *self, void *arg1, s32 arg2);
 	u8 padA0[0xDC - 0xA0];
@@ -339,6 +373,11 @@ extern struct RelativePos D_8008ABD0;
 extern struct RelativePos D_8008ABC0;
 
 /* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+   argument by func_8005AC24 -- same call shape as D_8008ABC0/D_8008ABD0
+   above, just a different constant (round 2026-09-02). */
+extern struct RelativePos D_8008ABC8;
+
+/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
    argument by func_8005AE40 -- same call shape as D_8008ABD0/D_8008ABC0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABD8;
@@ -365,6 +404,14 @@ typedef struct DreamSysInterpPoint {
 	s32 value;
 	s32 position;
 } DreamSysInterpPoint;
+
+/* Struct pointed to by DreamSys::unk_0x28. Only +0x36 is touched (a `u16`,
+   masked to 0x7F by func_80058B08, round 2026-09-02); everything else is
+   unconfirmed. */
+typedef struct DreamSysUnk28Target {
+	s8 unknown_values_0x0[0x36];
+	u16 unk_0x36;
+} DreamSysUnk28Target;
 
 /* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
    classified into {0,1,2} by CalcDreamColor first (round 2026-08-30-d). */
@@ -404,7 +451,11 @@ typedef struct DreamSys {
 	s8 unknown_values_0x18[12];
 
 	s32 dreamTimer;
-	s8 unknown_values_0x28[28];
+	/* Read as a pointer by func_80058B08 (round 2026-09-02): loaded, then
+	   dereferenced at +0x36 for a `u16` (masked to 0x7F and stashed into
+	   unk_0xB8 below). Target type otherwise unconfirmed. */
+	DreamSysUnk28Target *unk_0x28;
+	s8 unknown_values_0x2C[24];
 
 	s32 unknwon_int_0x44;
 	s8 unknown_values_0x48[4];
@@ -488,7 +539,16 @@ typedef struct DreamSys {
 	s32 unk_0xAC;
 	/* "Previous"/paired value; see unk_0xAC (round 2026-08-30-b). */
 	s32 unk_0xB0;
-	s8 unknown_values_0xB4[8];
+	/* Attempt/beat counter incremented (and bounded to [0,4)) by
+	   func_80059BE0 on every call while unk_0xA0 is nonzero; reset to 0 once
+	   unk_0xA0 goes back to 0. Compared against 3 there to pick a +-50
+	   nudge applied to unk_0x5C's y fields, and against 4 (together with
+	   unk_0xAC) to force unk_0xA0 back to 0 (round 2026-09-02). */
+	s32 unk_0xB4;
+	/* Derived from `unknown_values_0x28[0x36]` masked to 0x7F, or forced to
+	   0 (if >= 0x18) or 2 (if `unknwon_int_0x44 == 15` and this is still 0)
+	   by func_80058B08's `arg1 == -1` path (round 2026-09-02). */
+	s32 unk_0xB8;
 	/* Gate flag: func_80059E3C runs its body (a call through
 	   unk_0x58->vt->slot0x84, then resets this to -1) only while this is
 	   >= 0 (round 2026-08-30-b). */
@@ -641,7 +701,13 @@ struct vtable_DreamSys{
 	   INCLUDE_ASM; address 0x8001D344 is outside this unit/runner's
 	   range. */
 	void (*func_8001D344)(DreamSys *this, s32 arg1);
-	u32 unknown_functions_0x64[13];
+	u32 unknown_functions_0x64[9];
+	/* This function's OWN slot (+0x088, resolved via
+	   tools/classtable.py DREAMSYS_METHODS). Dispatches on `arg1`
+	   (-2 / -1 / anything else) after an unconditional call through the
+	   shared base table's own +0x088 slot (round 2026-09-02). */
+	void (*func_80058B08)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x8c[3];
 	void *TimerTick;
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-08-30-d). */
@@ -665,7 +731,14 @@ struct vtable_DreamSys{
 	   DreamSys__WallLink as (this) -- the callee ignores its argument
 	   (round 2026-09-02). */
 	void (*func_800590E0)(DreamSys *this);
-	u32 unknown_functions_0xec[4];
+	u32 unknown_functions_0xec[3];
+	/* This function's OWN slot (+0x0F8, resolved via
+	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:
+	   calls LogChunkMood/func_8005966C/func_800596E8/func_8005A168/
+	   func_8005A1B0/func_8005A1EC in sequence, then zeroes a large block of
+	   per-dream state, ending with a func_8001E6F8/func_8001CEB4 pair over a
+	   small local buffer (round 2026-09-02). */
+	void (*func_800591B4)(DreamSys *this, s32 arg1, s32 arg2);
 	void (*func_80059310)(DreamSys *this);
 	s32 (*func_8005931C)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);
@@ -708,13 +781,25 @@ struct vtable_DreamSys{
 	s32 (*func_80059B50)(DreamSys *this);
 	/* Sets unk_0xA0 to 1 and returns 1 (round 2026-08-30). */
 	s32 (*func_80059BD4)(DreamSys *this);
-	/* Referenced by func_80059AEC/func_80059B50; still INCLUDE_ASM outside
-	   this runner's range. Return value is threaded into func_80059E98. */
+	/* Referenced by func_80059AEC/func_80059B50; return value is threaded
+	   into func_80059E98. Still INCLUDE_ASM -- STALLED at 45/79 words round
+	   2026-09-02 on a register-identity/delay-slot-filler residue, not a
+	   value/structure error: bumps unk_0xB4 while unk_0xA0 is nonzero,
+	   conditionally calls func_80059D1C (slot +0x168) or func_80059E3C
+	   (slot +0x16C), nudges unk_0x5C's y fields, and always returns the
+	   ORIGINAL unk_0xA0 value read on entry (0 if it was already 0). See
+	   docs/match-reports/func_80059BE0.md for the best-reached body and
+	   what was tried. */
 	s32 (*func_80059BE0)(DreamSys *this, s32 arg1);
-	u32 unknown_functions_0x168[1];
-	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x16C). Not
-	   called through the vtable by any function in this round; named
-	   because its slot is now known (round 2026-08-30-b). */
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x168). Called by
+	   func_80059BE0 as (this), return value discarded -- still INCLUDE_ASM,
+	   blocked (addiu_at indexed-global load; see
+	   docs/match-reports/func_80059D1C.md). This prototype only types that
+	   call site (round 2026-09-02). */
+	void (*func_80059D1C)(DreamSys *this);
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x16C). Called by
+	   func_80059BE0 as (this) on the path where the +0x168 slot was NOT
+	   taken (round 2026-09-02). */
 	void (*func_80059E3C)(DreamSys *this);
 	/* Referenced by func_80059AEC/func_80059B50; still INCLUDE_ASM. */
 	s32 (*func_80059E98)(DreamSys *this, s32 arg1);
