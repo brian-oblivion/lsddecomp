@@ -214,6 +214,29 @@ three rounds.
   - A `mult`/`mfhi`/sign-fix chain is `%` or `/` by a constant — see the
     entry below.
 
+- **The constructive direction: when retail HAS a redundant `move` and you do
+  not, mention the source expression TWICE, dependent-quantity first.** For the
+  common loop shape — a pointer and a bound derived from one loaded field —
+  write
+
+  ```c
+  end = item->unk10 + N;     /* bound first, from the field */
+  p   = item->unk10;         /* then the loop variable, from the field again */
+  ```
+
+  rather than caching the field in `p` and deriving `end` from `p`. CSE still
+  emits a single load, but this order is what makes the compiler materialise
+  the extra `move` into the callee-saved register instead of folding the loop
+  variable into the loaded one. (`func_8004C0AC` derived it, `func_8004D1D0`
+  confirmed it 29/29 a round later.)
+
+  **This entry is here because not writing it down cost a stall.** It was
+  derived in round 8 and left in one match report; round 9 stalled a function
+  four addresses away on the identical residue, because the runner looked in
+  this file, did not find it, and followed MATCHING-GUIDE's "best-posed
+  permuter target" advice instead — which was correct behaviour given what was
+  written down. An unpromoted learning does not exist.
+
 - **Still the first discriminator, and it comes before all of the above: do the
   branch TARGETS agree?** A differing delay slot is a scheduling artifact; a
   differing branch target is a differing control-flow graph, and a differing

@@ -202,7 +202,16 @@ void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *i
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D1D0);
+void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
+    EntryChildObj **p;
+    EntryChildObj **end;
+
+    end = item->unk10 + (0x668 / 4);
+    p = item->unk10;
+    for (; p < end; p++) {
+        callback(self, *p);
+    }
+}
 
 Obj866E8Methods *func_8004D244(void) {
     return &D_800866E8;
