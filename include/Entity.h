@@ -54,22 +54,30 @@ struct EntityMethods {
     /* +0x30 */ void (*slot30)(Entity *self, s32 arg1);   /* called by func_8005DAAC, func_8005DF9C */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*slot40)(Entity *self);              /* called by Entity__Entity, right after this->methods is (re)assigned */
-    /* +0x44 */ u8 pad44[0x60 - 0x44];
+    /* +0x44 */ u8 pad44[0x48 - 0x44];
+    /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E694 (result discarded) and func_8005EF20 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, func_8005EF20 has no positive evidence of void */
+    /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by func_8005D9F4, func_8005DA3C */
-    /* +0x64 */ u8 pad64[0x114 - 0x64];
+    /* +0x64 */ u8 pad64[0xBC - 0x64];
+    /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
+    /* +0xC0 */ u8 padC0[0xC4 - 0xC0];
+    /* +0xC4 */ void (*slotC4)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7A8 as slotC4(self, -0x1E, 0) -- same shared BasicClass-inherited slot as Class65650Methods.slotC4 in code_55dd4.h (both tables hold func_8005748C at +0xC4, confirmed with tools/classtable.py) */
+    /* +0xC8 */ u8 padC8[0x114 - 0xC8];
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
-    /* +0x134 */ u8 pad134[0x15C - 0x134];
+    /* +0x134 */ u8 pad134[0x148 - 0x134];
+    /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds func_8005D864 (still addiu_at-blocked in Entity.c) */
+    /* +0x14C */ u8 pad14C[0x15C - 0x14C];
     /* +0x15C */ void (*slot15C)(Entity *self);            /* called by func_8005DBF0 */
     /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
-    /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C */
-    /* +0x168 */ u8 pad168[0x16C - 0x168];
+    /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C and func_8005DE18 (as slot164(self, 1)) */
+    /* +0x168 */ void (*slot168)(Entity *self);               /* called by func_8005DEE0 */
     /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C */
     /* +0x170 */ s32 (*slot170)(Entity *self);                  /* called by func_8005D480 */
     /* +0x174 */ void (*slot174)(Entity *self);                  /* called by func_8005D480 */
-    /* +0x178 */ void (*slot178)(Entity *self);                   /* called by func_8005D480 */
-    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by func_8005D480 */
+    /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by func_8005D480; holds func_8005DE18, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
+    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by func_8005D480; holds func_8005DEE0, which ends `return this->unkF8;` */
     /* +0x180 */ void (*slot180)(Entity *self);                     /* called by func_8005D480 */
 };
 
@@ -170,7 +178,8 @@ struct Entity {
     /* +0x4C */ s32 unk4C;               /* cleared by func_8005D418 */
     /* +0x50 */ u8 pad50[0x58 - 0x50];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
-    /* +0x5C */ u8 pad5C[0x98 - 0x5C];
+    /* +0x5C */ u8 pad5C[0x94 - 0x5C];
+    /* +0x94 */ void *unk94;            /* passed as func_8001EACC's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18; that callee dereferences it at +0xC/+0x14, so it is a pointer to SOME object, real type unconfirmed */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
     /* +0x9C */ s32 unk9C;             /* zeroed by Entity__Entity; address-taken by func_8005D6D4/func_8005DB8C */
     /* +0xA0 */ u8 padA0[0xF0 - 0xA0];
@@ -193,13 +202,18 @@ extern void func_80017CFC(void *arg);
  * DOES have a carved (but addiu_at-blocked, still-INCLUDE_ASM) .s file in
  * this unit; its param shape is read directly off that disassembly: a0 is
  * `this` (dereferences ->0x98/->0x94, both known Entity fields), a1 points
- * at a 3-word vector copied onto its own stack, a2/a3 are single signed
- * bytes it scales/negates. func_8002CD08/func_8002CC84's return values are
- * unused at both call sites, so void is a safe read regardless of the real
- * return type. */
+ * at a 3-word vector copied onto its own stack. a2/a3 are `s32`, NOT `s8`:
+ * every known caller (func_8005DD18, func_8005DE18, func_8005DEE0) happens
+ * to pass a byte-range value, but func_8005D714's own body (dividing 0x800
+ * by a3 and shifting the quotient by 11) treats them as full words with no
+ * narrowing on entry, and declaring them `s8` forces a spurious sign-extend
+ * at any call site whose argument is already a full-width computed `s32`
+ * (found via func_8005DE18's own residue -- see its match report).
+ * func_8002CD08/func_8002CC84's return values are unused at both call
+ * sites, so void is a safe read regardless of the real return type. */
 extern void func_8002CD08(s32 arg0, void *arg1);
 extern void func_8002CC84(s32 arg0, void *arg1);
-extern s32 func_8005D714(Entity *this, void *pos, s8 arg2, s8 arg3);
+extern s32 func_8005D714(Entity *this, void *pos, s32 arg2, s32 arg3);
 extern void func_8005DF9C(Entity *this, s32 arg1);
 extern s32 rand(void);
 
@@ -221,9 +235,12 @@ struct EntityMoodRow {
     s8 detachKind;   /* +0x03, read by func_8005DBF0 */
     u8 linkKind;      /* +0x04, read by func_8005DD18 (unsigned load) */
     s8 unk5;           /* +0x05 */
-    u8 pad06[0x03];
-    s8 unk9;            /* +0x09 */
-    u8 pad0A[0x06];
+    s8 unk6;            /* +0x06, read by func_8005DE18: sign selects whether func_8001EACC also fires, magnitude (after abs) is func_8005D714's distance arg */
+    u8 pad07[0x02];
+    s8 unk9;              /* +0x09, distance-fixup byte shared by func_8005DE18/func_8005DEE0/func_8005E0B0 */
+    u8 pad0A[0x01];
+    s8 unkB;                /* +0x0B, read by func_8005DEE0/func_8005E0B0 -- SEPARATE field from unk6, not the same byte reread (different functions, different offsets) */
+    u8 pad0C[0x04];
 };
 
 extern EntityMoodRow D_80089EA4[];
@@ -235,5 +252,41 @@ void *Entity__GetMoodEffect(Entity *this);
 s32 Entity__GetEventVideo(Entity *this);
 s32 Entity__GetUnlockEffect(Entity *this);
 s32 Entity__GetLinkStage(Entity *this);
+
+/* The vtable data slot Get_vtable_Entity returns the address of. Still a raw
+ * asm data blob (asm/data/79528.data.s, offsets 0x000..0x180) -- only an
+ * extern of the right TYPE is needed here, the bytes stay splat-generated. */
+extern EntityMethods D_80089AD4;
+
+/* Still uncarved (code_d294.s). func_8005DE18 calls it with this->unk94 as
+ * the second argument, a literal 1 as the third, and 0 for both the fourth
+ * argument and a fifth argument passed on the stack; the callee itself
+ * dereferences that second argument at +0xC/+0x14, confirming it is a
+ * pointer, not a plain word. Return value unused at this call site, so void
+ * is a safe read regardless of the real return type (same caveat as
+ * func_8002CD08/func_8002CC84 above). */
+extern void func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
+
+/* Second argument threaded through the moodIndex-selected event-dispatch
+ * handlers (func_8005ED10, func_8005E480, func_8005E7A8, and the sibling
+ * handlers this unit hasn't reached yet -- all reachable as {handler,
+ * data0, data1, data2} 16-byte rows of the D_80089EB0 table in
+ * asm/data/79528.data.s, immediately after D_80089EAC). Not an Entity --
+ * these handlers only ever read a gate flag out of it and write result
+ * codes back in. Real name/size unknown; only the offsets touched so far
+ * are given. */
+typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
+struct EntityMoodHandlerArg {
+    u8 pad00[0x04];
+    s32 unk4;    /* +0x04, gate flag read by func_8005E480/func_8005E7A8 */
+    u8 pad08[0x08];
+    s32 unk10;    /* +0x10, written by func_8005ED10/func_8005E480/func_8005E7A8 */
+    u8 pad14[0x08];
+    s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8 */
+    u8 pad20[0x10];
+    s32 unk30;      /* +0x30, written by func_8005E7A8 only */
+    u8 pad34[0x10];
+    s32 unk44;       /* +0x44, written by func_8005E7A8 only */
+};
 
 #endif
