@@ -135,7 +135,10 @@ typedef struct Obj866E8Methods {
     /* Called by func_8004BD14 with one of the object's own Elem array
      * slots. */
     void (*slot104)(Obj866E8 *self, Elem *entry);  /* +0x104 */
-    u8 pad108[0x110 - 0x108];
+    u8 pad108[0x10C - 0x108];
+    /* Called by func_8004CC74 with its own stack-local query buffer
+     * (see `CC74QueryBuf`) and a literal 0; return value unused there. */
+    s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2); /* +0x10C */
     /* Called by func_8004C158 with its own arg1 and a computed pointer;
      * matches class_3ac78's independent view of the same slot
      * (`slot110`/func_8004C1C0, s32 return, not this round's function). */
@@ -335,6 +338,22 @@ typedef struct GridSlot866E8 {
     s16 h8;        /* +0x8, func_8004CE24: sub-rectangle width */
     s16 hA;        /* +0xA, func_8004CE24: sub-rectangle height */
 } GridSlot866E8;
+
+/*
+ * func_8004CC74's own stack-local query buffer, filled by a call through
+ * `Obj866E8Methods::slot10C` and read back at two offsets: `+0x2` (a
+ * signed [x,y] byte pair, forwarded to func_8004CD38 as its `point`
+ * argument) and `+0x28` (a plain `s32`, read directly by func_8004CC74
+ * itself). Everything else is unproven -- this is a local, not part of
+ * `Obj866E8`, so it stays a minimal opaque type sized only to cover the
+ * two known offsets.
+ */
+typedef struct CC74QueryBuf {
+    u8 pad0[0x2];
+    s8 point[2];        /* +0x2, func_8004CC74: forwarded to func_8004CD38 */
+    u8 pad4[0x28 - 0x4];
+    s32 count;          /* +0x28, func_8004CC74 */
+} CC74QueryBuf;
 
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */

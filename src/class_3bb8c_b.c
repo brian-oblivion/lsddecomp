@@ -65,7 +65,34 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CAF0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CC74);
+/* Forward declaration: defined later in this file (in ROM order, after
+ * func_8004CC74), and EXCLUDED from this round's targets (documented
+ * STALL, see docs/match-reports/func_8004CD38.md) -- calling into it
+ * while it is still INCLUDE_ASM is fine, per this unit's established
+ * convention. Signature per that report. */
+extern s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point);
+
+/* Forward declaration: defined later in this file (in ROM order, after
+ * func_8004CD38), but func_8004CC74 calls it before its own definition
+ * appears. */
+extern s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3);
+
+void func_8004CC74(Obj866E8 *self) {
+    s32 junk;
+    CC74QueryBuf buf;
+
+    self->methods->slot10C(self, &buf, 0);
+    self->unk88 = 0;
+    self->unk88 = func_8004CDA4(self, junk, 0, buf.count);
+    if (func_8004CD38(self->unk1DC, buf.point) != 0) {
+        if (buf.count + 1 < self->unk68->count) {
+            self->unk88 = func_8004CDA4(self, junk, self->unk88, buf.count + 1);
+        }
+    }
+    if (buf.count - 1 >= 0) {
+        self->unk88 = func_8004CDA4(self, junk, self->unk88, buf.count - 1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CD38);
 
