@@ -283,7 +283,9 @@ typedef struct Bounds866E8_3bb8c_b {
 
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
-    u8 pad04[0x54 - 0x04];
+    u8 pad04[0x0C - 0x04];
+    s32 unkC;                      /* +0x00C, func_8004D678 (compared against 9999999) */
+    u8 pad10[0x54 - 0x10];
     Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
     u8 pad60[0x68 - 0x60];
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
@@ -304,6 +306,8 @@ struct Obj866E8 {
     Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
     s32 unk1E0;                    /* +0x1E0, func_8004D028/func_8004D088: a countdown gate */
     void *unk1E4;                  /* +0x1E4, func_8004D0D0: forwarded opaquely to EntryChildObjMethods::slot48 */
+    u8 pad1E8[0x2F4 - 0x1E8];
+    s32 unk2F4;                    /* +0x2F4, func_8004D678: zero-checked when unkC > 9999999 */
 };
 
 /* Get-vtable helper, same shape and same real function as
@@ -423,5 +427,28 @@ typedef struct GenericTagMethods_3bb8c_c {
 typedef struct GenericTagInst_3bb8c_c {
     GenericTagMethods_3bb8c_c *methods;         /* +0x000 */
 } GenericTagInst_3bb8c_c;
+
+/*
+ * First argument of func_8004D678: an unrelated, larger caller-side
+ * struct (only seen from its one caller, func_8004DE08 in the still-
+ * uncarved asm/class_3bb8c_d.s) whose own +0x0BC field is a pointer to
+ * the Obj866E8 instance this function actually operates on -- NOT
+ * Obj866E8's own +0x0BC (that offset on Obj866E8 itself is the
+ * already-documented embedded Descriptor10 `unkBC`). Named distinctly to
+ * avoid implying any relation to Obj866E8's own layout.
+ */
+typedef struct Ctx678_3bb8c_c {
+    u8 pad00[0x0BC];
+    Obj866E8 *target;                           /* +0x0BC */
+} Ctx678_3bb8c_c;
+
+/*
+ * Second argument of func_8004D678: holds a pointer at +0x018 to a small
+ * result block whose word at +0x004 is the flag func_8004D678 computes.
+ */
+typedef struct Result678_3bb8c_c {
+    u8 pad00[0x018];
+    s32 *block;                                 /* +0x018, func_8004D678 writes block[1] */
+} Result678_3bb8c_c;
 
 #endif

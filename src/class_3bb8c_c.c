@@ -89,6 +89,15 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D518);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D578);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D678);
+void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
+{
+    Obj866E8 *target = ctx->target;
+    s32 flag = 1;
+
+    if (target->unkC > 9999999) {
+        flag = (target->unk2F4 == 0);
+    }
+    out->block[1] = flag;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D6AC);
