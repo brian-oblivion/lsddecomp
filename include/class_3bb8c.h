@@ -44,8 +44,11 @@ typedef struct Obj866E8Methods {
 } Obj866E8Methods;
 
 typedef struct ElemTarget {
-    u8 pad00[0x32];
-    s16 unk32;                     /* +0x032, compared by func_8004C434 */
+    u8 pad00[0x2C];
+    s16 unk2C;                     /* +0x02C, compared (nonzero) by func_8004C5D0 */
+    u8 pad2E[0x30 - 0x2E];
+    s16 unk30;                     /* +0x030, compared by func_8004C5D0 */
+    s16 unk32;                     /* +0x032, compared by func_8004C434/func_8004C588 */
 } ElemTarget;
 
 /*
@@ -74,9 +77,11 @@ struct Unk10ChildObj_3bb8c_b {
  * multiple independent functions:
  *  - func_8004BCE0 reads each element's own +0x000 (u16 flag, nonzero-
  *    ness only).
- *  - func_8004C434 reads each element's own +0x004 (a pointer), then
- *    dereferences THAT pointer's +0x032 (s16) to compare against a search
- *    key.
+ *  - func_8004C434/func_8004C588 read each element's own +0x004 (a
+ *    pointer), then dereference THAT pointer's +0x032 (s16) to compare
+ *    against a search key.
+ *  - func_8004C5D0 reads the SAME +0x004 pointer's +0x030 and +0x02C
+ *    (both s16), also compared against a search key / nonzero-tested.
  *  - func_8004D1D0 reads the element's own +0x010 (a pointer to an array
  *    of Unk10ChildObj_3bb8c_b*, walked up to +0x668 bytes -- the SAME
  *    field class_3ac78.h's independent view names `unk10`).
@@ -114,7 +119,7 @@ struct Obj866E8 {
     u8 pad6C[0x70 - 0x6C];
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
     u8 pad74[0xEC - 0x74];
-    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434 */
+    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/func_8004C588/func_8004C5D0/func_8004D1D0 */
     u8 pad1B0[0x1CC - 0x1B0];
     s32 unk1CC;                    /* +0x1CC, func_8004CFA8 (address-of only, real type unknown) */
     u8 pad1D0[0x1DC - 0x1D0];

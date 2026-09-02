@@ -21,7 +21,18 @@ s32 func_8004C588(Obj866E8 *self, s32 key) {
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C5D0);
+s32 func_8004C5D0(Obj866E8 *self, s32 key) {
+    s32 i;
+    Elem *e;
+
+    for (i = 0; i < 7; i++) {
+        e = &self->arr[i];
+        if (e->unk4->unk30 == key && e->unk4->unk2C != 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C620);
 
