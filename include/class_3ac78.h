@@ -129,7 +129,15 @@ struct Class866E8Methods {
     /* +0x10C */ u8 pad10C[0x110 - 0x10C];
     /* +0x110 */ s32 (*slot110)(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2); /* func_8004C1C0; called by func_8004AEA4 */
     /* +0x114 */ u8 pad114[0x124 - 0x114];
-    /* +0x124 */ void *(*slot124)(Class866E8 *self, void *arg1);                /* func_8004C5D0; called by func_8004B030 */
+    /* +0x124 */ s32 (*slot124)(Class866E8 *self, s32 key);                     /* func_8004C5D0; called by func_8004B030.
+                  * RETYPED round 8 from `void *(*)(Class866E8 *, void *)` on the strength of the
+                  * occupant's own BYTE-EXACT body, matched that round in class_3bb8c_b as
+                  * `s32 func_8004C5D0(Obj866E8 *self, s32 key)`: it returns a loop INDEX
+                  * (`move v0,a2`) or -1, never a pointer, and `key` is compared against a
+                  * s16 field so it is a scalar. Safe to change because slot124 has no C call
+                  * site yet -- its only caller, func_8004B030, is still INCLUDE_ASM -- and the
+                  * whole-image SHA1 was re-verified after the change. Whoever matches
+                  * func_8004B030 should treat THIS as the signature to write against. */
     /* +0x128 */ u8 pad128[0x12C - 0x128];
     /* +0x12C */ void (*slot12C)(Class866E8 *self, void *list, s32 count);       /* func_8004AEA4; called by func_8004ADD8 */
     /* +0x130 */ u8 pad130[0x13C - 0x130];
@@ -209,7 +217,8 @@ struct UnkArgObj_3ac78 {
     s8 unk2;
     s8 unk3;
     u8 pad4[0x28 - 0x4];
-    void *unk28;   /* func_8004B030 (STALLED): reread and forwarded to self->methods->slot124 */
+    s32 unk28;     /* func_8004B030 (STALLED): reread and forwarded to self->methods->slot124
+                    * as its `key` argument -- scalar, not a pointer; see slot124 above. */
 };
 
 /*

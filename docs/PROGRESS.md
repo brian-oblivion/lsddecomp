@@ -6,6 +6,117 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-02 — round 8: 4 runners, 33 matches, and the permuter's first run
+
+**266 -> 299 matched (19.62% -> 22.05% of game code). Build green in main
+throughout. `code_1677c` is now the project's third fully-matched unit.**
+
+**Gates.** Gate 1 found 44 nominal `fresh`, but screening every candidate
+against the two open blockers cut DreamSys's 12 to what it really had and
+turned up two functions in `class_3bb8c` that `progress.py` was counting as
+fresh while they sat squarely on the `addiu_at` blocker — stub reports filed
+before provisioning, which is the only thing that stops the next round staffing
+someone onto them. Gate 2 carved `class_3bb8c_b`, 20 functions off the front of
+the old remainder, all 20 clear of both blockers; the boundary checks and the
+BIOS-stub/jump-table hazards still ahead of it are recorded in the splat yaml.
+Gate 3 did not fire: 62 screened-clean fresh functions is not a dry queue.
+
+**Runners: 30 matches, 5 stalls, across four units.** alpha 9/10
+(`class_3bb8c_b`, brand-new ground), bravo 8/9 (`Entity_c`), charlie 7/9
+(`class_3bb8c`), delta 6/8 (`DreamSys`). Every runner filed a report for every
+function it touched, matched ones included, and every tree was clean at report
+time — though two runners had to be asked, one of them twice, before they
+stopped batching commits. Cold-runner yield stays high on freshly carved
+ground, which is the third round in a row saying carve-and-staff beats
+polishing residue.
+
+**The head's own result is the round's headline: `tools/decomp-permuter` had
+never been run on this project, and it closed a three-round stall within a
+minute of working.** MATCHING-GUIDE had already nominated the target
+(`new_class_6d3c8`); the permuter reached score 0 at iteration 47 after three
+rounds, 20+ recorded attempts and a root-cause hypothesis argued against GCC's
+`reorg.c` had all failed. Two more standing stalls fell the same day. The
+setup is now `tools/setup-permuter.sh`, committed rather than left in the
+gitignored `permuter-work/` where I first built it, with the four
+looks-like-a-broken-toolchain traps fixed and explained in its header.
+
+**Three retired stalls, and none of them was what its report said.**
+
+| function | had stood as | actually was |
+| --- | --- | --- |
+| `new_class_6d3c8` (24/24) | delay-slot filler choice, 3 rounds | one surplus `return` on the null path |
+| `strcat` (42/42) | ditto + a head adjudication | `return dest;` not `return NULL;` on a guard |
+| `func_80026698` (57/57) | switch-lowering internals, 2 rounds | the stored value misread as 3; it is 1 |
+
+The generalisation, now the first subsection of DECOMPILATION_LEARNINGS'
+source-shape idioms: **when a diff is one redundant or one missing `move`,
+count how many times your source mentions the value.** `new_class_6d3c8`
+mentioned it once too many, `strcat` once too few, and in both the surplus or
+missing copy landed in a delay slot — which is precisely why both read as
+scheduler whims. A surplus value has to go somewhere and a free delay slot is
+where the scheduler puts it, so "different filler" and "one value too many"
+are indistinguishable in a diff. Prefer the surplus-value reading; it has a
+fix.
+
+`func_80026698` came from neither reshaping nor the permuter (which improved it
+215 -> 130 and stalled). It came from noticing that `li $v0, 0x1` sat in the
+delay slot of the case-3 branch, so `$v0` holds 1 — not the 3 it held for the
+comparison — by the time the target's store runs. One misread value had
+manufactured two separate compiler mysteries across two rounds.
+
+**Permuter limits, measured rather than assumed.** Two searches found nothing:
+`func_8005DBF0` (700 -> 660) and, indirectly, `func_80026698`. Both negatives
+are informative and both are recorded in their reports. The permuter searches
+source SHAPES; `func_8005DBF0`'s residue is GCC's cross-jumping pass collapsing
+two textually identical assignments, which is not a shape, and
+`func_80026698`'s was a semantic misreading. That report now redirects the next
+attempt at a TYPE change instead, on the strength of round 7's `slotC4`
+finding — the one precedent this project has for suppressing a tail-merge.
+
+**Two workflow bugs, both real, both fixed at the source.** The runner prompt
+hardcoded `/tmp/b.log` for every runner; `/tmp` is not per-worktree, and two
+runners crossed over on it, one acting on the other's build result — a false
+oracle in the log a runner greps to decide whether its score means anything.
+And collision rule 1 partitioned `src/` but not headers, so assigning two
+adjacent slices of one carve handed two runners one shared header and produced
+the round's only conflict. Both are now documented with their reasons.
+
+**Resolving that conflict is worth reading as a template.** Neither runner was
+wrong. They had derived the same objects from opposite ends: both
+independently found the same struct field from different call sites, each had
+fields the other lacked, both kept the struct size right. The only true
+collision was two different type NAMES for one field, which I unified — the
+multiple-independent-local-views convention is for views in different unit
+headers, not inside one. Every match from both runners was then re-verified
+individually, because a shared-declaration merge that compiles is not
+necessarily one that preserves codegen.
+
+**Toolchain: `nop_mflo_mfhi` now has a SECOND independent instance.** delta hit
+it on `DreamSys__GetPreviousDayMood`, whose logic is confirmed correct
+instruction-for-instruction via asm-differ, after `IsDaySpecial` in round 7.
+Two instances in two functions is the point at which a corpus census is worth
+doing. Escalated, not acted on.
+
+**Also reconciled:** `class_3ac78.h` typed `D_800866E8` slot `+0x124` as
+`void *(*)(Class866E8 *, void *)`. alpha matched the occupant byte-exactly as
+`s32 func_8004C5D0(Obj866E8 *self, s32 key)` and correctly left the other
+unit's header alone; the head retyped it. Safe here only because the slot has
+no C call site yet — its caller is still `INCLUDE_ASM` — and the whole-image
+SHA1 was re-verified after.
+
+**Next move: runners again, on a carve.** The fresh queue is 26 and thin per
+unit; `class_3bb8c_b` retains the most at 10, and it is the same freshly
+carved ground that produced this round's best cold yield. Carve one or two
+more slices first — `class_3bb8c_c` is next in line and is where the
+BIOS-trampoline and jump-table dispositions finally have to be made, which the
+yaml now says explicitly. A permuter round is no longer speculative: it has a
+working harness and three named candidates whose reports say what to try
+(`func_8004CD38`, better posed than the rest; `func_8005F544`;
+`func_8004C470`). But it is still worth less than cold ground while carving is
+this productive.
+
+---
+
 ## 2026-09-02 — round 7: 4 runners, 58 matches, two carves, and two heads in one checkout
 
 **198 -> 261 matched (14.60% -> 19.25% of game code; matched bytes 6.80% ->
