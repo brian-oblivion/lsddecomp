@@ -142,9 +142,35 @@ void func_8003CAEC(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
     self->unkA0 = a2;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CAF8);
+void func_8003CAF8(Obj86B60 *self, s32 a1)
+{
+    Obj86B60Methods *methods;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CB30);
+    methods = self->methods;
+    switch (a1) {
+    case 0:
+        self->unk88 = NULL;
+        break;
+    case 1:
+        self->unk88 = methods->slotB0;
+        break;
+    }
+}
+
+void func_8003CB30(Obj86B60 *self, s32 a1)
+{
+    Obj86B60Methods *methods;
+
+    methods = self->methods;
+    switch (a1) {
+    case 0:
+        self->unk8C = NULL;
+        break;
+    case 1:
+        self->unk8C = methods->slotC4;
+        break;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CB68);
 
