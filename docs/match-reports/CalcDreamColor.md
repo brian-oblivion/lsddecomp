@@ -1,6 +1,6 @@
 # CalcDreamColor — STALL
 
-**Unit:** DreamSys · **Size:** 35 instructions · **Best reached:** 28/35 words
+**Unit:** DreamSys · **Size:** 35 instructions · **Best reached:** 28/35 words. **PERMUTER-EXHAUSTED** for the legitimate search space (round 2026-09-02, runner BRAVO) -- see "Permuter run" below; one untried legitimate lead is flagged there for a future attempt.
 
 ## What it does
 
@@ -102,7 +102,88 @@ first) can still resist further reshaping. Worth trying as a first move on
 any `table[f(x) + g(y)]` residue before assuming it's unreachable; expect
 it to get you most of the way, not necessarily all the way.
 
+## Permuter run (round 2026-09-02, runner BRAVO) — PERMUTER-EXHAUSTED
+
+Set up per `tools/setup-permuter.sh` with the kept near-miss body above as
+the seed. Base score confirmed 610 in `--debug` mode, matching this
+report's own diagnosis (the register-swapped final `addu` pair).
+
+Ran in two windows totaling **~40400 iterations over ~8m55s wall clock**
+(`-j 8`, `--stop-on-zero --best-only`):
+
+- **Window 1: cut short by an external, unscoped `pkill -f "decomp-permuter"`
+  run by another runner in this round tidying up ITS OWN permuter session**
+  -- not a bug in this search; confirmed after the fact by the process
+  dying well before this round's own timebox and the log's
+  multiprocessing "leaked semaphore" warning (the `SIGKILL` signature).
+  27708 iterations before the external kill landed.
+- **Window 2: a fresh restart, run to its own bounded, PID-scoped timeout**
+  (no pattern-based kill) -- a further ~12700 iterations, no improvement
+  over window 1's best.
+
+**Best score reached: 120** (base 610), never 0, across twelve distinct
+saved "best" outputs.
+
+### The 120-score candidate was REJECTED
+
+It retypes the function's return as `volatile unsigned int` in place of
+the real `DreamColors` enum return type:
+
+```c
+volatile unsigned int CalcDreamColor(MoodGraphPoint *mood)
+{
+	...
+	return entry[local.axis.upper];
+}
+```
+
+`volatile` forces the compiler to treat every access as having an
+observable side effect, which changes scheduling/reload behavior enough
+to move the residue -- but it is not a claim about the retail source; the
+real declaration (`typedef enum DreamColors {...} DreamColors;`, used as
+this function's return type everywhere else it's referenced, e.g.
+`src/DreamSys.c`'s two call sites) has no `volatile` anywhere in this
+codebase. Rejected as a different function, not a match.
+
+### One candidate at 135 is legitimate C and UNTRIED in the real build
+
+A separate saved output (`output-135-1`), score 135, keeps the correct
+`DreamColors` return type and makes no UB-adjacent move -- it only routes
+the table-base pointer through the loop's own `s8 *p` variable before
+assigning it to `entry`:
+
+```c
+{
+	s32 index;
+	s8 *entry;
+
+	index = local.axis.dynamic * 3;
+	p = &D_80087E14[index];
+	entry = p;
+	return entry[local.axis.upper];
+}
+```
+
+This is a real, legitimate C reshape (reusing `p` as scratch rather than
+computing `entry` directly) that was NOT tried by hand in the four manual
+attempts already on record above, and it scored better (135 vs. the kept
+attempt's 610... note: attempt 3's kept form above is actually the
+610-scoring BASE for this permuter run, i.e. the intermediate-pointer
+split alone was not enough; THIS candidate adds the `p`-then-`entry`
+indirection on top of it). Per this round's "do not start anything new"
+instruction, it was NOT applied to `src/DreamSys.c` or verified against
+`build-and-verify.sh` this round -- flagging it here as the concrete next
+manual attempt rather than a fresh blind permuter search.
+
+**Verdict: PERMUTER-EXHAUSTED for the volatile/UB region of the search
+space** (twelve candidates, all either `volatile`-typed or otherwise
+non-idiomatic, none reaching 0) -- **but NOT exhausted overall**, because
+the 135-score candidate above is genuine C that was found but not yet
+manually verified. A future round should try that ONE specific reshape by
+hand (three lines) before reaching for the permuter again.
+
 ## Provenance
 
 round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
-Restored to `INCLUDE_ASM`.
+Restored to `INCLUDE_ASM`. Permuter run added round 2026-09-02, runner
+BRAVO; still `INCLUDE_ASM`.
