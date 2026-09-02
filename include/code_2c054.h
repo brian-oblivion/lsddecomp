@@ -62,6 +62,7 @@ struct StreamTaskObj {
     s32 unkCC;                            /* +0x0CC, get/set by func_8003BE6C */
     s32 unkD0;                             /* +0x0D0, get/set by func_8003BE74 */
     s32 unkD4;                              /* +0x0D4, get/set by func_8003BE7C */
+    s32 unkD8;                               /* +0x0D8, read by func_8003BB5C (object end, 0xDC) */
 };
 
 /* This class's own "GetMethods" accessor (compare `Get_vtable_Entity` in
@@ -81,7 +82,9 @@ struct StreamTaskUnkB4Methods {
     s32 (*slot40)(StreamTaskUnkB4Obj *self, s32 a1, s32 a2, s32 a3, s32 a4); /* +0x040,
                                         func_8003BAB4's forward target; return tested
                                         directly (not stored) there */
-    u8 pad44[0x04C - 0x044];
+    u8 pad44[0x048 - 0x044];
+    s32 (*slot48)(StreamTaskUnkB4Obj *self); /* +0x048, func_8003BB5C's forward target;
+                                        return stored into StreamTaskObj::unkA4 there */
     void (*slot4C)(StreamTaskUnkB4Obj *self); /* +0x04C, func_8003BDF4's forward target */
     u8 pad50[0x06C - 0x050];
     void (*slot6C)(StreamTaskUnkB4Obj *self, s32 a1); /* +0x06C, func_8003BAB4's forward target */
@@ -119,7 +122,10 @@ struct TaskCoreMethods {
     u8 pad48[0x04C - 0x048];
     void (*slot4C)(StreamTaskObj *self);                       /* +0x04C, func_8003BAB4's forward target
                                                                      (D_8006E730+0x04C = func_8003C238) */
-    u8 pad50[0x078 - 0x050];
+    u8 pad50[0x05C - 0x050];
+    void (*slot5C)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x05C, func_8003BB5C's forward target
+                                                                     (D_8006E730+0x05C = func_8003C51C) */
+    u8 pad60[0x078 - 0x060];
     void (*slot78)(StreamTaskObj *self);                        /* +0x078, func_8003BD10's forward target
                                                                       (D_8006E730+0x078 = func_8003C858) */
     u8 pad7C[0x080 - 0x07C];
