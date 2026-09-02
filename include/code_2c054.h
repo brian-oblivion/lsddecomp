@@ -32,6 +32,11 @@ struct StreamTaskObjMethods {
     u8 pad04[0x060 - 0x004];
     void (*slot60)(StreamTaskObj *self, s32 a1); /* +0x060, func_8003BC14 occupies this slot
                                                       (per tools/classtable.py D_8006E5F8) */
+    u8 pad64[0x06C - 0x064];
+    void (*slot6C)(StreamTaskObj *self, s32 a1); /* +0x06C, func_8003BCF4 occupies this slot
+                                                      (per tools/classtable.py D_8006E5F8);
+                                                      func_8003BAB4 dispatches through it rather
+                                                      than calling func_8003BCF4 directly */
 };
 
 /* Object size is 0xDC (from func_8003B854's allocator call). Only the
@@ -42,7 +47,10 @@ struct StreamTaskObj {
     s32 unk38;                     /* +0x038, read (and returned) by func_8003C1DC */
     u8 pad3C[0x040 - 0x03C];
     s32 unk40;                     /* +0x040, set by func_8003BCF4 */
-    u8 pad44[0x0B4 - 0x044];
+    u8 pad44[0x0A4 - 0x044];
+    s32 unkA4;                     /* +0x0A4, reset to 0 by func_8003BAB4; read
+                                        and set to a call result by func_8003BB5C */
+    u8 padA8[0x0B4 - 0x0A8];
     StreamTaskUnkB4Obj *unkB4;      /* +0x0B4, an object with its own 1-slot vtable
                                         (see StreamTaskUnkB4Obj below); dispatched
                                         through by func_8003B9DC */
@@ -69,8 +77,14 @@ extern StreamTaskObjMethods D_8006E5F8;
 struct StreamTaskUnkB4Methods {
     u8 pad00[0x04];
     void (*slot04)(StreamTaskUnkB4Obj *self); /* +0x004 */
-    u8 pad08[0x04C - 0x008];
+    u8 pad08[0x040 - 0x008];
+    s32 (*slot40)(StreamTaskUnkB4Obj *self, s32 a1, s32 a2, s32 a3, s32 a4); /* +0x040,
+                                        func_8003BAB4's forward target; return tested
+                                        directly (not stored) there */
+    u8 pad44[0x04C - 0x044];
     void (*slot4C)(StreamTaskUnkB4Obj *self); /* +0x04C, func_8003BDF4's forward target */
+    u8 pad50[0x06C - 0x050];
+    void (*slot6C)(StreamTaskUnkB4Obj *self, s32 a1); /* +0x06C, func_8003BAB4's forward target */
 };
 
 struct StreamTaskUnkB4Obj {
@@ -102,7 +116,10 @@ struct TaskCoreMethods {
     void (*slot0C)(StreamTaskObj *self);                    /* +0x00C, func_8003B9DC's 2nd call */
     u8 pad10[0x044 - 0x010];
     s32 (*slot44)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x044, func_8003C1DC occupies this slot */
-    u8 pad48[0x078 - 0x048];
+    u8 pad48[0x04C - 0x048];
+    void (*slot4C)(StreamTaskObj *self);                       /* +0x04C, func_8003BAB4's forward target
+                                                                     (D_8006E730+0x04C = func_8003C238) */
+    u8 pad50[0x078 - 0x050];
     void (*slot78)(StreamTaskObj *self);                        /* +0x078, func_8003BD10's forward target
                                                                       (D_8006E730+0x078 = func_8003C858) */
     u8 pad7C[0x080 - 0x07C];
