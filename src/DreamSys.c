@@ -423,7 +423,27 @@ s32 *func_8005A350(DreamSys *this, s32 *arg1)
 	return &this->unknown_sdata_0x178;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StartDay);
+s32 DreamSys__StartDay(DreamSys *this)
+{
+	s32 oldDay;
+	MoodGraphPoint *special;
+
+	oldDay = this->currentDay;
+	this->currentFlashbackIndex = 0;
+	this->dreamTimer = 0;
+	this->storedDay = oldDay;
+	if (this->isFlashbackSession) {
+		this->vt->LoadNextFlashback(this, 1);
+	} else {
+		special = IsDaySpecial(&this->nextCinematic, this->currentDay + 1);
+		this->vt->InitMoodContibutors(this, special);
+		if (special != NULL) {
+			return -1;
+		}
+		this->vt->InitSpawnLoc(this);
+	}
+	return this->currentStage;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__EndDay);
 
