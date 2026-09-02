@@ -55,7 +55,19 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ADD8);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AEA4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AFE0);
+extern void func_8004C93C(Class866E8 *self);
+
+void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
+{
+    s16 t;
+
+    self->unk7C = arg1->unk2 - 1;
+    t = arg1->unk3 - 1;
+    self->unk80 = arg2;
+    self->unk84 = arg2;
+    self->unk7E = t;
+    func_8004C93C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 

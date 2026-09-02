@@ -25,15 +25,27 @@ struct Class866E8Methods {
     /* +0x004 */ void *unk04;                                                   /* BasicClass__func_17eb0 */
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* func_8004A534; called by func_8004A4C8 */
     /* +0x00C */ void *dtor;                                                    /* func_8004A7C0; not dispatched by this round's functions */
-    /* +0x010 */ u8 pad010[0x038 - 0x010];
+    /* +0x010 */ u8 pad010[0x030 - 0x010];
+    /* +0x030 */ void (*slot30)(Class866E8 *self);                              /* BasicClass__func_182cc; called by func_8004AA6C */
+    /* +0x034 */ u8 pad034[0x038 - 0x034];
     /* +0x038 */ void (*slot38)(Class866E8 *self);                              /* func_8004A984; called by func_8004B2D4 */
     /* +0x03C */ u8 pad03C[0x040 - 0x03C];
     /* +0x040 */ void (*slot40)(Class866E8 *self);                              /* func_8004AA10 (gp_rel-blocked, docs/research/gp-relative-blocker.md); called by func_8004B344 */
     /* +0x044 */ u8 pad044[0x080 - 0x044];
     /* +0x080 */ void (*slot80)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* func_8001D4AC; called by func_8004A478 through Class86668::unk34 */
-    /* +0x084 */ u8 pad084[0x0D0 - 0x084];
+    /* +0x084 */ u8 pad084[0x0B8 - 0x084];
+    /* +0x0B8 */ void *(*slotB8)(Class866E8 *self, s32 index);                  /* func_80042828; called by func_8004ACF8, returns an opaque child object */
+    /* +0x0BC */ u8 pad0BC[0x0D0 - 0x0BC];
     /* +0x0D0 */ void (*slotD0)(Class866E8 *self, void *list, s32 count);        /* func_8004ADD8; called by func_8004AB88 */
-    /* +0x0D4 */ u8 pad0D4[0x140 - 0x0D4];
+    /* +0x0D4 */ u8 pad0D4[0x0F4 - 0x0D4];
+    /* +0x0F4 */ void (*slotF4)(Class866E8 *self);                              /* func_8004B5BC; called by func_8004AB24 */
+    /* +0x0F8 */ u8 pad0F8[0x100 - 0x0F8];
+    /* +0x100 */ void (*slot100)(Class866E8 *self, void *arg1, s32 arg2);        /* func_8004BD14; called by func_8004A984 */
+    /* +0x104 */ u8 pad104[0x12C - 0x104];
+    /* +0x12C */ void (*slot12C)(Class866E8 *self, void *list, s32 count);       /* func_8004AEA4; called by func_8004ADD8 */
+    /* +0x130 */ u8 pad130[0x13C - 0x130];
+    /* +0x13C */ void (*slot13C)(Class866E8 *self);                             /* func_8004D028; called by func_8004AB24 */
+    /* +0x140 */ u8 pad140[0x144 - 0x140];                                      /* func_8004D088 lives here (classtable.py D_800866E8); not dispatched by this round's functions */
 };
 
 /* Object size is 0x1E8, from func_8004A4C8's allocator call. Field offsets
@@ -50,8 +62,12 @@ struct Class866E8 {
     /* +0x074 */ s32 unk74;                  /* func_8004B32C arg1, stored raw */
     /* +0x078 */ s16 unk78;                  /* func_8004B32C: arg1 >> 12 */
     /* +0x07A */ s16 unk7A;                  /* func_8004B32C: arg1 >> 11 */
-    /* +0x07C */ u8 pad07C[0x0E8 - 0x07C];
-    /* +0x0E8 */ s32 unkE8;                  /* func_8004ADD0 arg1 */
+    /* +0x07C */ s16 unk7C;                  /* func_8004AFE0: (s8)arg1->unk2 - 1 */
+    /* +0x07E */ s16 unk7E;                  /* func_8004AFE0: (s8)arg1->unk3 - 1 */
+    /* +0x080 */ s32 unk80;                  /* func_8004AFE0 arg2, stored raw */
+    /* +0x084 */ s32 unk84;                  /* func_8004AFE0 arg2, stored raw (same value as unk80) */
+    /* +0x088 */ u8 pad088[0x0E8 - 0x088];
+    /* +0x0E8 */ s32 unkE8;                  /* func_8004ADD0 arg1; func_8004ADD8 reads it back as a NUL-terminated s32 tag array -- true element type still s32, only usage differs per call site */
     /* +0x0EC */ u8 pad0EC[0x1C0 - 0x0EC];
     /* +0x1C0 */ u8 unk1C0[0x1E8 - 0x1C0];   /* address-of only, returned by func_8004B31C; real element type unknown */
 };
@@ -82,6 +98,19 @@ struct Class86668 {
 };
 
 extern Class86668Methods D_80086668;
+
+/*
+ * Opaque descriptor buffer passed as func_8004AFE0's arg1 (and, out of this
+ * round's scope, func_8004AEA4/func_8004B030's shared buffer). Populated by
+ * a call through Class866E8Methods slot +0x110, which is not decompiled
+ * anywhere yet, so only the two bytes func_8004AFE0 actually reads are
+ * typed. Named after the convention in code_171e0.h (`Unk*Obj_<unit>`).
+ */
+typedef struct {
+    u8 pad0[2];
+    s8 unk2;
+    s8 unk3;
+} UnkArgObj_3ac78;
 
 /*
  * Generic "object with a vtable pointer at offset 0" view, used only by
