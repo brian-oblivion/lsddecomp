@@ -1,8 +1,19 @@
 #include "common.h"
+#include "class_3ac78.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A478);
+void func_8004A478(Class86668 *self, s32 arg1)
+{
+    Class866E8 *sub = self->unk34;
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A4B8);
+    if (sub != NULL) {
+        sub->methods->slot80(sub, arg1, 0x7F, 0x7F);
+    }
+}
+
+Class86668Methods *func_8004A4B8(void)
+{
+    return &D_80086668;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A4C8);
 
@@ -18,15 +29,27 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA6C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AB24);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AB88);
+void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
+{
+    if ((u8)other->methods->header == 0x34) {
+        self->methods->slotD0(self, other, count);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ACF8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ADC4);
+void func_8004ADC4(Class866E8 *self, s32 arg1, s32 arg2)
+{
+    self->unk60 = arg1;
+    self->unk64 = arg2;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ADD0);
+void func_8004ADD0(Class866E8 *self, s32 arg1)
+{
+    self->unkE8 = arg1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ADD8);
 
@@ -38,13 +61,30 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B2D4);
+void func_8004B2D4(Class866E8 *self)
+{
+    if (self != NULL && (self->flags36 & 0x80)) {
+        self->methods->slot38(self);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B31C);
+void *func_8004B31C(Class866E8 *self)
+{
+    return &self->unk1C0;
+}
 
 void func_8004B324(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B32C);
+void func_8004B32C(Class866E8 *self, s32 arg1)
+{
+    self->unk74 = arg1;
+    self->unk7A = (s16)(arg1 >> 11);
+    self->unk78 = (s16)(arg1 >> 12);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B344);
+void func_8004B344(Class866E8 *self, s32 arg1)
+{
+    self->methods->slot40(self);
+    self->unk68 = arg1;
+}
