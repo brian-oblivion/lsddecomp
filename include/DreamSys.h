@@ -750,6 +750,14 @@ extern s8 LEN_STAGE_PERMALINK_TRIGGERS[];
 
 extern s16 SPECIAL_DAYS[];
 
+/* The fixed "special day" mood, returned by IsDaySpecial on a match
+   (round 2026-09-02); only ever address-taken there, never dereferenced by
+   this unit's queued functions. */
+extern MoodGraphPoint D_8008ABF4;
+
+/* Also declared in Entity.h for the same libc-style function. */
+extern s32 rand(void);
+
 extern s8 SPECIAL_COLORS[];
 
 /* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
