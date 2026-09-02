@@ -10,6 +10,27 @@ typedef struct Class86668Methods Class86668Methods;
 typedef struct UnkListObj_3ac78 UnkListObj_3ac78;
 typedef struct UnkChildMethods_3ac78 UnkChildMethods_3ac78;
 typedef struct UnkChildObj_3ac78 UnkChildObj_3ac78;
+typedef struct UnkSlotChildMethods_3ac78 UnkSlotChildMethods_3ac78;
+typedef struct UnkSlotChildObj_3ac78 UnkSlotChildObj_3ac78;
+typedef struct UnkSlotListObj_3ac78 UnkSlotListObj_3ac78;
+typedef struct UnkSlotEntry_3ac78 UnkSlotEntry_3ac78;
+
+/*
+ * One entry of Class866E8::unkEC[7] (func_8004ABD0). 0x1C bytes; only the
+ * three fields that function touches are typed. Its own two pointer
+ * members' full types (UnkSlotChildObj_3ac78, UnkSlotListObj_3ac78) are
+ * defined further down -- fine, since a pointer only needs the forward
+ * `typedef struct X X;` above, not the full body. This struct itself has
+ * to come before Class866E8 below because Class866E8::unkEC is an ARRAY
+ * member, which (unlike a pointer) needs a COMPLETE type.
+ */
+struct UnkSlotEntry_3ac78 {
+    u16 unk0;                        /* zeroed at the top of each loop pass */
+    u8 pad2[0x4 - 0x2];
+    UnkSlotChildObj_3ac78 *unk4;
+    UnkSlotListObj_3ac78 *unk8;
+    u8 padC[0x1C - 0xC];
+};
 
 /*
  * Class866E8 -- constructed by func_8004A4C8 (New_Class866E8: allocates
@@ -36,7 +57,9 @@ struct Class866E8Methods {
     /* +0x040 */ void (*slot40)(Class866E8 *self);                              /* func_8004AA10 (gp_rel-blocked, docs/research/gp-relative-blocker.md); called by func_8004B344 */
     /* +0x044 */ u8 pad044[0x080 - 0x044];
     /* +0x080 */ void (*slot80)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* func_8001D4AC; called by func_8004A478 through Class86668::unk34 */
-    /* +0x084 */ u8 pad084[0x0B8 - 0x084];
+    /* +0x084 */ u8 pad084[0x088 - 0x084];
+    /* +0x088 */ void (*slot88)(Class866E8 *self, s32 arg1, void *arg2, s32 arg3); /* func_8004AA6C; called by func_8004ABD0 with a 4th arg AA6C's own body never reads */
+    /* +0x08C */ u8 pad08C[0x0B8 - 0x08C];
     /* +0x0B8 */ UnkChildObj_3ac78 *(*slotB8)(Class866E8 *self, s32 index);      /* func_80042828; called by func_8004ACF8 */
     /* +0x0BC */ u8 pad0BC[0x0D0 - 0x0BC];
     /* +0x0D0 */ void (*slotD0)(Class866E8 *self, void *list, s32 count);        /* func_8004ADD8; called by func_8004AB88 */
@@ -44,13 +67,15 @@ struct Class866E8Methods {
     /* +0x0F4 */ void (*slotF4)(Class866E8 *self);                              /* func_8004B5BC; called by func_8004AB24 */
     /* +0x0F8 */ u8 pad0F8[0x100 - 0x0F8];
     /* +0x100 */ void (*slot100)(Class866E8 *self, void *arg1, s32 arg2);        /* func_8004BD14; called by func_8004A984 */
-    /* +0x104 */ u8 pad104[0x124 - 0x104];
+    /* +0x104 */ u8 pad104[0x108 - 0x104];
+    /* +0x108 */ void (*slot108)(Class866E8 *self, UnkSlotEntry_3ac78 *entry);   /* func_8004C0AC; called by func_8004ABD0 */
+    /* +0x10C */ u8 pad10C[0x124 - 0x10C];
     /* +0x124 */ void *(*slot124)(Class866E8 *self, void *arg1);                /* func_8004C5D0; called by func_8004B030 */
     /* +0x128 */ u8 pad128[0x12C - 0x128];
     /* +0x12C */ void (*slot12C)(Class866E8 *self, void *list, s32 count);       /* func_8004AEA4; called by func_8004ADD8 */
     /* +0x130 */ u8 pad130[0x13C - 0x130];
     /* +0x13C */ void (*slot13C)(Class866E8 *self);                             /* func_8004D028; called by func_8004AB24 */
-    /* +0x140 */ u8 pad140[0x144 - 0x140];                                      /* func_8004D088 lives here (classtable.py D_800866E8); not dispatched by this round's functions */
+    /* +0x140 */ void (*slot140)(Class866E8 *self);                             /* func_8004D088; called by func_8004ABD0 */
 };
 
 /* Object size is 0x1E8, from func_8004A4C8's allocator call. Field offsets
@@ -80,7 +105,11 @@ struct Class866E8 {
     /* +0x096 */ s16 unk96;                  /* func_8004B030: derived from count and arg1->unk3 */
     /* +0x098 */ u8 pad098[0x0E8 - 0x098];
     /* +0x0E8 */ s32 unkE8;                  /* func_8004ADD0 arg1; func_8004ADD8 reads it back as a NUL-terminated s32 tag array -- true element type still s32, only usage differs per call site */
-    /* +0x0EC */ u8 pad0EC[0x1BC - 0x0EC];
+    /* +0x0EC */ UnkSlotEntry_3ac78 unkEC[7]; /* func_8004ABD0: 7 x 0x1C-byte slots, walked 0..6 */
+    /* +0x1B0 */ u8 pad1B0[0x1B4 - 0x1B0];
+    /* +0x1B4 */ s16 unk1B4;                 /* func_8004ABD0: zeroed after the loop */
+    /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
+    /* +0x1B8 */ s32 unk1B8;                 /* func_8004ABD0: zeroed after the loop */
     /* +0x1BC */ UnkListObj_3ac78 *unk1BC;   /* func_8004AA6C arg2, stored raw */
     /* +0x1C0 */ u8 unk1C0[0x1E8 - 0x1C0];   /* address-of only, returned by func_8004B31C; real element type unknown */
 };
@@ -174,6 +203,34 @@ struct UnkChildMethods_3ac78 {
 
 struct UnkChildObj_3ac78 {
     UnkChildMethods_3ac78 *methods;
+};
+
+/*
+ * Opaque "child" object referenced by each Class866E8::unkEC[] slot entry
+ * (func_8004ABD0). Class unknown; only the two dispatched slots are typed.
+ * A DIFFERENT class from UnkChildObj_3ac78 above (different offsets), kept
+ * as its own type rather than reusing that one.
+ */
+struct UnkSlotChildMethods_3ac78 {
+    u8 pad0[0x74];
+    void (*slot74)(UnkSlotChildObj_3ac78 *self);
+    u8 pad78[0x84 - 0x78];
+    void (*slot84)(UnkSlotChildObj_3ac78 *self);
+};
+
+struct UnkSlotChildObj_3ac78 {
+    UnkSlotChildMethods_3ac78 *methods;
+};
+
+/*
+ * Opaque "list" object referenced by each Class866E8::unkEC[] slot entry
+ * (func_8004ABD0). Only field +0x2C (a GenericObject*, refreshed through
+ * its own ->methods->unk04 base-class slot exactly like
+ * func_8004AA6C's arg2->unk14) is typed.
+ */
+struct UnkSlotListObj_3ac78 {
+    u8 pad0[0x2C];
+    GenericObject *unk2C;
 };
 
 #endif
