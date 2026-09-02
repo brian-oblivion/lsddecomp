@@ -14,6 +14,7 @@ extern u8 D_80089E38[];
 extern u8 D_80089E50[];
 extern u8 D_80089DF0[];
 extern u8 D_80089DCC[];
+extern u8 D_80089CA0[];
 
 void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
@@ -55,7 +56,16 @@ void func_8005F1A8(Entity *this) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F1D4);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F368);
+void func_8005F368(Entity *this, EntityMoodHandlerArg *out) {
+    if (out->unk4 % 15 == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 7;
+        out->unk20 = -2;
+    }
+    this->methods->slot48(this, 1, D_80089DF0);
+    this->methods->slot44(this, 0, D_80089CA0);
+    this->methods->slotC4(this, -0x200, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F454);
 
