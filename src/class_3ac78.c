@@ -203,9 +203,25 @@ void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
+extern void func_8004B2D4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
+
+/* STALL, round 2026-09-02 (runner delta): best reached 95/117, see
+ * docs/match-reports/func_8004B100.md for the preserved near-miss body
+ * and the residue analysis (a single instruction-scheduling swap at the
+ * inner loop's tail -- correct branch/register shape everywhere else). */
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
 
-void func_8004B2D4(Class866E8 *self)
+/* Widened this round (func_8004B100) from a single-param signature to
+ * accept two more, unused, forwarded params: func_8004B100's own call
+ * sites explicitly set up $a1/$a2 before every call here (unlike
+ * func_8001E57C's "leftover, already-there" args -- these are real,
+ * explicit `move` instructions), so the call itself needs a matching
+ * 3-param prototype to compile. Confirmed harmless to THIS function's own
+ * already-matched body: neither extra param is read, and GCC does not
+ * reserve stack space for unused trailing integer/pointer args on this
+ * target, so the definition's own bytes are unaffected (reverified
+ * 18/18 after the widening). */
+void func_8004B2D4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 {
     if (self != NULL && (self->flags36 & 0x80)) {
         self->methods->slot38(self);

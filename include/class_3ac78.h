@@ -36,33 +36,68 @@ struct UnkSlotEntry_3ac78 {
     UnkSlotChildObj_3ac78 *unk4;
     UnkSlotListObj_3ac78 *unk8;
     GenericObject *unkC;             /* func_8004A7C0: refreshed (discarded) through ->methods->unk04 when non-NULL */
-    GenericObject **unk10;           /* func_8004A7C0: array of GenericObject*, scanned up to +0x668 bytes */
+    /* RETYPED this round (func_8004B100) from `GenericObject **` (func_8004A7C0's
+     * still-unconfirmed, INCLUDE_ASM-only comment) to `Class866E8 **`: a 2D
+     * grid of pointers, row stride 20 cells (0x50 bytes), each cell holding
+     * ANOTHER Class866E8 instance -- func_8004B100 forwards a cell's value
+     * straight into func_8004B2D4, which dereferences `self->flags36`
+     * (a genuine Class866E8 field, +0x036), and walks a `->unk38` chain off
+     * the SAME pointer (also added to Class866E8 this round). Safe: this
+     * comment was evidence-only, never compiled (func_8004A7C0 is still
+     * INCLUDE_ASM). */
+    Class866E8 **unk10;              /* func_8004B100: 2D grid, row stride 20 cells */
     u8 pad14[0x1C - 0x14];
 };
 
 /*
- * One entry of Class866E8::unk8C.e[3] (func_8004AEA4/func_8004B030). 0x10
- * bytes. func_8004B030 (STALLED, see docs/match-reports/func_8004B030.md)
- * writes element [0]'s fields directly (unk0 = a call's return pointer,
- * unk4/6/8/A = four s16 values); func_8004AEA4 (matched) treats the WHOLE
- * 3-element block opaquely, saving and restoring it around a pair of
- * calls via whole-struct assignment. Both readings are consistent with
- * the SAME 0x10-byte element layout; only the top-level field name
- * changed (previously modeled as five separate top-level Class866E8
- * fields, unk8C/unk90/unk92/unk94/unk96 -- see func_8004B030.md's
- * "Update" note for the correction).
+ * One entry of Class866E8::unk8C.e[4] (func_8004AEA4/func_8004B030/
+ * func_8004B100). 0xC bytes, densely packed -- REVISED this round
+ * (func_8004B100) from an earlier 0x10-byte/3-element guess. Two
+ * independent pieces of evidence now agree:
+ *  - func_8004B030 (STALLED) writes `self->unk8C = self->methods->
+ *    slot124(...)` into element [0]'s first field; `slot124`'s real
+ *    occupant (func_8004C5D0) was independently retyped, round 8, to
+ *    return an s32 LOOP INDEX, never a pointer (see Class866E8Methods::
+ *    slot124's own comment) -- so this field is an index, not a pointer.
+ *  - func_8004B100 reads that same first field back and uses it as
+ *    exactly that: an index into `self->unkEC[]` (`&self->unkEC[elemIdx]`,
+ *    reproduced by retail as a multiply-by-0x1C, matching
+ *    `UnkSlotEntry_3ac78`'s own 0x1C-byte size). The four following
+ *    fields it reads as a dense, PADDING-FREE run of four `s16`s
+ *    immediately after the `s32` (offsets +4/+6/+8/+0xA, no gap before
+ *    the next element at +0xC) -- a grid rectangle descriptor: starting
+ *    column, starting row, width, height. This is the SAME field shape
+ *    (index + col + row + width + height) as `GridSlot866E8` in the
+ *    SIBLING unit's `include/class_3bb8c.h` (a different unit, different
+ *    concrete `self` type -- independent view, not the same C type) --
+ *    recognizing the shape is what caught the stale trailing-padding
+ *    guess here.
+ * Renamed accordingly (`unk0`->`elemIdx`, `unk4`->`col`, `unk6`->`row`,
+ * `unk8`->`width`, `unkA`->`height`); `func_8004B030.md`'s STALL report
+ * keeps its OLD field names in its preserved best-attempt body (per this
+ * project's "preserved code, not doctrine" policy) with a note pointing
+ * here.
  */
 struct HistoryEntry_3ac78 {
-    void *unk0;
-    s16 unk4;
-    s16 unk6;
-    s16 unk8;
-    s16 unkA;
-    u8 padC[0x10 - 0xC];
+    s32 elemIdx;
+    s16 col;
+    s16 row;
+    s16 width;
+    s16 height;
 };
 
 /*
- * Class866E8::unk8C as a whole, 0x30 bytes (3 x HistoryEntry_3ac78).
+ * Class866E8::unk8C as a whole, 0x30 bytes -- CONFIRMED by func_8004AEA4's
+ * byte-exact whole-struct copy (a batched 4-word-per-iteration block
+ * move whose total width does not depend on how the elements inside are
+ * sliced). Now modeled as 4 x 0xC-byte HistoryEntry_3ac78 (4*0xC == 0x30
+ * exactly, zero padding needed) rather than the earlier 3 x 0x10 guess
+ * (which needed 4 bytes of unexplained trailing padding per element) --
+ * see HistoryEntry_3ac78's own comment for the evidence. Total size is
+ * unchanged, so this revision does not disturb func_8004AEA4's match
+ * (reverified: whole-image SHA1 stays green with func_8004AEA4 still
+ * compiled as real C).
+ *
  * Wrapped in a struct (rather than left as a bare array field) so it can
  * be copied with a plain `=` -- GCC 2.6.3 compiles a whole-struct
  * assignment to a batched 4-word-per-iteration block move, which is
@@ -72,7 +107,7 @@ struct HistoryEntry_3ac78 {
  * precedent this follows.
  */
 struct HistoryBlock_3ac78 {
-    HistoryEntry_3ac78 e[3];
+    HistoryEntry_3ac78 e[4];
 };
 
 /*
@@ -151,7 +186,8 @@ struct Class866E8 {
     /* +0x000 */ Class866E8Methods *methods;
     /* +0x004 */ u8 pad004[0x036 - 0x004];
     /* +0x036 */ u16 flags36;                /* bit 0x80 tested by func_8004B2D4 */
-    /* +0x038 */ u8 pad038[0x060 - 0x038];
+    /* +0x038 */ Class866E8 *unk38;          /* func_8004B100: singly-linked chain of OTHER Class866E8 instances sharing one grid cell, walked while non-NULL -- same "chained instances in one slot" idiom as the sibling unit's EntryChildObj::unk38 (include/class_3bb8c.h) */
+    /* +0x03C */ u8 pad03C[0x060 - 0x03C];
     /* +0x060 */ s32 unk60;                  /* func_8004ADC4 arg1 */
     /* +0x064 */ s32 unk64;                  /* func_8004ADC4 arg2 */
     /* +0x068 */ UnkPtr68Obj_3ac78 *unk68;   /* func_8004B344 arg1, stored raw; func_8004AEA4 dereferences ->unk4 */
@@ -166,7 +202,8 @@ struct Class866E8 {
     /* +0x084 */ s32 unk84;                  /* func_8004AFE0 arg2, stored raw (same value as unk80) */
     /* +0x088 */ s32 unk88;                  /* func_8004B030 (STALLED): always set to 1; func_8004AEA4 saves/restores it around a pair of calls */
     /* +0x08C */ HistoryBlock_3ac78 unk8C;   /* func_8004AEA4: saved/restored via whole-struct assignment; func_8004B030 (STALLED) writes element [0]'s fields directly -- see HistoryEntry_3ac78 */
-    /* +0x0BC */ u8 pad0BC_tail[0x0E8 - 0x0BC];
+    /* +0x0BC */ u16 unkBC;                  /* func_8004B100: copied verbatim into unk1C0 on every grid cell visited (a "current pass" tag, plausibly) */
+    /* +0x0BE */ u8 pad0BE_tail[0x0E8 - 0x0BE];
     /* +0x0E8 */ s32 unkE8;                  /* func_8004ADD0 arg1; func_8004ADD8 reads it back as a NUL-terminated s32 tag array -- true element type still s32, only usage differs per call site */
     /* +0x0EC */ UnkSlotEntry_3ac78 unkEC[7]; /* func_8004ABD0: 7 x 0x1C-byte slots, walked 0..6 */
     /* +0x1B0 */ u8 pad1B0[0x1B4 - 0x1B0];
@@ -174,7 +211,10 @@ struct Class866E8 {
     /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
     /* +0x1B8 */ s32 unk1B8;                 /* func_8004ABD0: zeroed after the loop */
     /* +0x1BC */ UnkListObj_3ac78 *unk1BC;   /* func_8004AA6C arg2, stored raw */
-    /* +0x1C0 */ u8 unk1C0[0x1E8 - 0x1C0];   /* address-of only, returned by func_8004B31C; real element type unknown */
+    /* +0x1C0 */ u16 unk1C0;                 /* func_8004B100: set to self->unkBC on every grid cell visited */
+    /* +0x1C2 */ u8 unk1C2;                  /* func_8004B100: current grid column (entry->col + loop offset), truncated to a byte */
+    /* +0x1C3 */ u8 unk1C3;                  /* func_8004B100: current grid row (entry->row + loop offset), truncated to a byte */
+    /* +0x1C4 */ u8 pad1C4[0x1E8 - 0x1C4];   /* func_8004B31C still only takes the address of the block as a whole; real extent of further fields unknown */
 };
 
 /* Get-vtable helper for Class866E8. Still raw asm: it lives in class_3bb8c,
@@ -292,6 +332,8 @@ struct UnkSlotChildMethods_3ac78 {
 
 struct UnkSlotChildObj_3ac78 {
     UnkSlotChildMethods_3ac78 *methods;
+    u8 pad4[0x2C - 0x4];
+    s16 unk2C;    /* func_8004B100: gates the whole per-history-entry grid walk (nonzero test) */
 };
 
 /*
