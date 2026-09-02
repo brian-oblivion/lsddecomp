@@ -163,6 +163,12 @@ typedef struct DreamSysBaseMethods {
 	u8 pad54[0x9C - 0x54];
 	/* Called by func_80058E8C as (this, arg1, arg2) -- round 2026-08-30-d. */
 	void (*slot0x9C)(struct DreamSys *self, void *arg1, s32 arg2);
+	u8 padA0[0xDC - 0xA0];
+	/* Called unconditionally by func_80058F18 (this unit's own +0xDC slot)
+	   as (this, arg1, arg2) -- same argument shape as slot0x9C above
+	   (round 2026-09-02). Resolves to func_80057B90 in D_800878D4, out of
+	   this unit's scope. */
+	void (*slot0xDC)(struct DreamSys *self, void *arg1, s32 arg2);
 } DreamSysBaseMethods;
 extern DreamSysBaseMethods *func_80057C84(void);
 
@@ -565,7 +571,15 @@ struct vtable_DreamSys{
 	/* Getter for currentStage (round 2026-08-30-c). */
 	s32 (*func_8005AFD0)(DreamSys *this);
 	void (*ProcessChunkChange)(DreamSys *this, void *entity, s32 effect);
-	void (*InstanceEffectsOnPlayer)(DreamSys *this, void *entity, int effect);
+	/* Renamed from the previous placeholder `InstanceEffectsOnPlayer` --
+	   this slot's real symbol (config/symbols.slps01556.lsdde.txt) is
+	   `DreamSys__InstanceEffectsOnJournal` (see the forward declaration
+	   below and src/DreamSys.c), confirmed via tools/classtable.py
+	   DREAMSYS_METHODS (+0x1E8) while resolving func_80058F18's call
+	   through this slot (round 2026-09-02). No call site referenced the
+	   old name, so this is a plain correction, not a rename requiring an
+	   out-of-scope edit elsewhere. */
+	void (*InstanceEffectsOnJournal)(DreamSys *this, void *entity, s32 effect);
 	void (*GetPreviousDayMood)(DreamSys *this, MoodGraphPoint *target, bool unknown);
 	void (*InitMoodContibutors)(DreamSys *this, MoodGraphPoint *special);
 	void (*LogChunkMood)(DreamSys *this, PlayerSpawnPoint *currentPos);
