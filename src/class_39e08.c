@@ -61,7 +61,9 @@ void func_8004A294(Obj865C8 *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A2C4);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A324);
+void func_8004A324(Obj865C8 *self) {
+    func_8003E5C8()->slot48(self);
+}
 
 void func_8004A35C(void) {
 }
