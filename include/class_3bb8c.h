@@ -33,12 +33,24 @@ typedef struct Obj866E8Methods {
     void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
 } Obj866E8Methods;
 
-/* self+0xEC: a 7-element array, each element 0x1C bytes. Established by
- * func_8004BCE0, which reads each element's own +0x000 (u16 flag,
- * nonzero-ness only). Nothing else about an element's shape is known yet. */
+typedef struct ElemTarget {
+    u8 pad00[0x32];
+    s16 unk32;                     /* +0x032, compared by func_8004C434 */
+} ElemTarget;
+
+/* self+0xEC: a 7-element array, each element 0x1C bytes. Established from
+ * TWO independent functions:
+ *  - func_8004BCE0 reads each element's own +0x000 (u16 flag, nonzero-
+ *    ness only).
+ *  - func_8004C434 reads each element's own +0x004 (a pointer), then
+ *    dereferences THAT pointer's +0x032 (s16) to compare against a search
+ *    key.
+ * Nothing else about an element's shape is known yet. */
 typedef struct Elem {
     u16 flag;                      /* +0x000 */
-    u8 pad02[0x1C - 0x02];
+    u8 pad02[0x04 - 0x02];
+    ElemTarget *unk4;              /* +0x004 */
+    u8 pad08[0x1C - 0x08];
 } Elem;
 
 struct Obj866E8 {
