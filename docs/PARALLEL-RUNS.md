@@ -133,6 +133,38 @@ a lost one. Check them by hand, every time.
    worktree, machine or clone. The same applies to a probe harness: if a probe
    establishes something, inline the probe.
 
+2b. **A worktree isolates FILES, not the PROCESS TABLE — never `pkill -f` on
+   a tool name.** Round 10's runner alpha finished with the permuter, cleaned
+   up after itself with `pkill -9 -f "decomp-permuter"`, and killed runner
+   **bravo's** in-progress search in a different worktree. The pattern matched
+   because the tool path is identical in every worktree: nothing about
+   `-f decomp-permuter` is scoped to the caller. Alpha self-reported it, which
+   is the only reason it was ever detected — bravo's own summary would have
+   read as "the permuter found nothing", and that is indistinguishable from
+   the truth.
+
+   **This is the same shape as the `/tmp/b.log` crossover in round 8**, and
+   worth generalising once rather than rediscovering a third time: a git
+   worktree gives each runner its own files, build directory and branch. It
+   gives them a SHARED `/tmp`, a SHARED process table, and shared ports. Any
+   runner action addressed by a global name rather than a path can reach into
+   another runner, and it fails silently because the other runner has no way
+   to distinguish sabotage from a normal negative result.
+
+   Kill by PID you captured yourself, or scope the match to your own worktree
+   path:
+
+   ```sh
+   pkill -9 -f "lsddecomp2-wt-<name>.*decomp-permuter"   # scoped
+   pkill -9 -f decomp-permuter                            # hits EVERY runner
+   ```
+
+   The head's part: when a runner reports a permuter or long-running search
+   that found nothing, and another runner ran one in the same window, **check
+   whether the negative is real before writing it into a report.** A
+   fabricated permuter-exhausted verdict is expensive — it is exactly the
+   finding that stops future rounds from trying.
+
 3. **No shared-doc edits in parallel mode.** Runners must NOT edit
    `DECOMPILATION_LEARNINGS.md`, `MATCHING-GUIDE.md`, `PROGRESS.md`,
    `config/symbols.slps01556.lsdde.txt` or the splat yaml. A generalizable
@@ -533,6 +565,15 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > oracle in the worst possible place: the log you grep to decide whether
 > your score means anything. Substitute your own name into the path here
 > and in every later invocation.
+>
+> **And by the same logic, never `pkill -f` a tool name.** Your worktree
+> isolates files, not the process table: `pkill -9 -f decomp-permuter`
+> matches every runner's permuter, because the tool path is identical in
+> every worktree. Round 10's alpha did exactly this while tidying up and
+> killed bravo's in-progress search. Kill by a PID you captured yourself,
+> or scope the pattern to your own worktree path
+> (`pkill -f "…-wt-<name>.*decomp-permuter"`). `/tmp`, the process table
+> and ports are all shared; only files and git state are yours.
 > — the ONLY line that decides whether the number is meaningful is `build
 > exit=`. funcdiff also guards this itself and exits 2 when it cannot trust the
 > number; read its warnings. A failed COMPILE and a failed LINK both leave the
