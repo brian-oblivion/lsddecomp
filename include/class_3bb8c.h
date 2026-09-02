@@ -281,6 +281,28 @@ typedef struct Bounds866E8_3bb8c_b {
     s32 unk8;                      /* +0x008, func_8004CD38: this < point[1] -> out of range (also the function's own return value) */
 } Bounds866E8_3bb8c_b;
 
+/*
+ * self->unk1E4's pointee: one of four static 0xC-byte table entries at
+ * D_8008699C/D_800869A8/D_800869B4/D_800869C0 (addresses confirmed 0xC
+ * apart), selected by func_8004CFB8 from (rate > 0, flag != 0) and never
+ * dereferenced past +0x006. The same 0xC stride lines up with
+ * D_800869CC (declared `extern s32 D_800869CC[3]` below, by
+ * func_8004D108) as a plausible fifth entry of the same table, but
+ * nothing in this unit reaches that entry through THIS pointer type, so
+ * the two stay independently declared rather than unified into one
+ * array of unproven length.
+ */
+typedef struct EntryDesc866E8 {
+    u8 pad0[0x6];
+    s16 unk6;          /* +0x006, func_8004CFB8: multiplied against abs(rate) */
+    u8 pad8[0xC - 0x8];
+} EntryDesc866E8;
+
+extern EntryDesc866E8 D_8008699C;
+extern EntryDesc866E8 D_800869A8;
+extern EntryDesc866E8 D_800869B4;
+extern EntryDesc866E8 D_800869C0;
+
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x54 - 0x04];
@@ -306,7 +328,7 @@ struct Obj866E8 {
     u8 pad1D0[0x1DC - 0x1D0];
     Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
     s32 unk1E0;                    /* +0x1E0, func_8004D028/func_8004D088: a countdown gate */
-    void *unk1E4;                  /* +0x1E4, func_8004D0D0: forwarded opaquely to EntryChildObjMethods::slot48 */
+    EntryDesc866E8 *unk1E4;        /* +0x1E4, func_8004D0D0 (forwarded opaquely)/func_8004CFB8 (selects one of four statics and reads +0x6) */
 };
 
 /* Get-vtable helper, same shape and same real function as
