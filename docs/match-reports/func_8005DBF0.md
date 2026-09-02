@@ -142,3 +142,43 @@ It may be specific to how many total predecessors converge on the shared
 target (2 in `func_8005DD18`'s analogous spot, which matched; 3 here, which
 didn't) — worth testing on the next instance of this shape before spending
 another 10+ attempts re-deriving the same negative result.
+
+---
+
+## Head follow-up, round 8 (2026-09-02) — permuter run, NEGATIVE
+
+Still a stall. Recorded so the next reader knows this has now been attacked
+with the permuter and not just by hand.
+
+`tools/setup-permuter.sh` was set up this round and run against the preserved
+body above. Scaffold verified faithful first (`--debug` base score 700 = 1
+insertion + 3 deletions + 5 reorderings, which is the 2-net-word residue this
+report describes). The search improved to **660 and no further** across a full
+15-minute run at `-j 6`. No zero, and nothing that translated to a lead.
+
+One hand test the report had not tried was also run: **inverting the
+`func_8005D714` guard so the returned-zero arm comes textually FIRST**, on the
+theory that cross-jumping merges in one direction and reversing the arms would
+change which block is the merge tail. It moved nothing (33 vs 34 diff lines in
+an instruction-text comparison — noise, not a lever).
+
+**What this narrows.** The residue is GCC's cross-jumping/tail-merging pass
+collapsing two textually identical `doDetach = 1;` writes that retail keeps
+separate. That is not a source SHAPE the permuter can reach by rewriting
+expressions and control flow, which is consistent with it finding nothing: the
+permuter searches shapes, and this is a decision the optimiser makes about
+identical blocks regardless of how they are spelled.
+
+There IS one known precedent for suppressing this on this project, and it is
+not a shape change: round 7 found that `EntityMethods::slotC4` typed `void`
+made GCC tail-merge two identical discarded calls in `func_8005E160`, and
+retyping the slot to `s32` stopped the merge. **So the lever for tail-merge
+suppression here, if one exists, is more likely to be a TYPE change than a
+control-flow change** — something that makes the two blocks non-identical at
+the RTL level without changing what the C says. Worth trying before another
+permuter run: check whether `slot15C`'s signature, or `doDetach`'s type, or
+`EntityMoodRow`'s field types make the two assignments differ.
+
+Do NOT spend another permuter run on this without trying that first. And note
+the per-slot warning from round 7: a slot retype is not local, so check every
+other caller and the whole-image SHA1 before believing it.
