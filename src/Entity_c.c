@@ -131,7 +131,33 @@ void func_8005F454(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F544);
+void func_8005F544(Entity *this, EntityMoodHandlerArg *out) {
+    s32 v1;
+    s32 arg1;
+    void (**slotD0)(Entity *self, s32 arg1, s32 arg2);
+
+    /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
+     * register allocation only -- see the match report. Without it GCC
+     * swaps which callee-saved register holds `this` vs `out` for the
+     * whole function. */
+    do {
+        if (out->unk4 % this->unk80 == 0) {
+            out->unk10 = this->methods->slot148(this);
+            out->unk1C = 0x1A;
+            __asm__("");
+            v1 = 0x6E;
+            goto compare;
+        }
+    } while (0);
+    v1 = 0x6E;
+compare:
+    slotD0 = &this->methods->slotD0;
+    arg1 = -0x180;
+    if (this->unkFC == v1) {
+        arg1 = -0x2D00;
+    }
+    (*slotD0)(this, arg1, 0);
+}
 
 void func_8005F608(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 70 == 0) {
