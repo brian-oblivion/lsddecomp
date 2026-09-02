@@ -207,7 +207,8 @@ struct Entity {
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
     /* +0x5C */ u8 pad5C[0x80 - 0x5C];
     /* +0x80 */ s32 unk80;             /* read by func_8005E6F0/func_8005E7F8 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and func_8005EBB4 (compared to `out->unk4` as `this->unk80 - 1`) */
-    /* +0x84 */ u8 pad84[0x94 - 0x84];
+    /* +0x84 */ s32 unk84;             /* compared against a literal (func_8005EC98: `== 0xA`) or against `this->unk80 / 2` (func_8005E4D0) */
+    /* +0x88 */ u8 pad88[0x94 - 0x88];
     /* +0x94 */ Unk94Obj *unk94;         /* passed as func_8001EACC's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
     /* +0x9C */ s32 unk9C;             /* zeroed by Entity__Entity; address-taken by func_8005D6D4/func_8005DB8C */

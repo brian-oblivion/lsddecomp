@@ -149,7 +149,13 @@ void func_8005EBB4(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EC98);
+void func_8005EC98(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk84 == 0xA) {
+        out->unk1C = 0xD;
+    }
+    this->methods->slotC4(this, -0xA, 0);
+}
 
 void func_8005ED10(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
