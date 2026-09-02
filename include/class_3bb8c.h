@@ -23,10 +23,20 @@
  */
 typedef struct Obj866E8 Obj866E8;
 
+/* Only the slots this unit's functions dispatch through (via
+ * self->methods->slotNN) are typed; everything else stays opaque so the
+ * struct keeps the right size/offsets without requiring every method to be
+ * typed up front (same policy as include/class_39e08.h). */
+typedef struct Obj866E8Methods {
+    u8 pad00[0xC0];
+    /* Called by func_8004B57C right before it zeroes self->unk70. */
+    void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
+} Obj866E8Methods;
+
 struct Obj866E8 {
-    void *methods;                 /* +0x000 */
+    Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x70 - 0x04];
-    s32 unk70;                     /* +0x070, func_8004B570 */
+    s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
 };
 
 #endif
