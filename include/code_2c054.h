@@ -43,6 +43,13 @@ struct StreamTaskObjMethods {
                                                       (per tools/classtable.py D_8006E5F8);
                                                       func_8003BAB4 dispatches through it rather
                                                       than calling func_8003BCF4 directly */
+    u8 pad70[0x09C - 0x070];
+    void (*slot9C)(StreamTaskObj *self, s32 a1); /* +0x09C, func_8003C11C's forward target
+                                                      (D_8006E5F8+0x09C = func_8003CAF8) */
+    void (*slotA0)(StreamTaskObj *self, s32 a1); /* +0x0A0, func_8003C11C's forward target
+                                                      (D_8006E5F8+0x0A0 = func_8003CB30) */
+    void (*slotA4)(StreamTaskObj *self, u8 *a1, u8 *a2, u8 *a3); /* +0x0A4, func_8003C11C's
+                                                      forward target (D_8006E5F8+0x0A4 = func_8003CB68) */
 };
 
 /* Object size is 0xDC (from func_8003B854's allocator call). Only the
@@ -57,20 +64,28 @@ struct StreamTaskObj {
     TaskCoreObj *unk18;             /* +0x018, an object whose vtable has the same
                                         shape as TaskCoreMethods (see TaskCoreObj
                                         below); dispatched through by func_8003C3D0 */
-    u8 pad1C[0x034 - 0x01C];
-    s32 unk34;                       /* +0x034, tested by func_8003C3D0 */
+    u8 pad1C[0x028 - 0x01C];
+    s32 unk28;                        /* +0x028, set to 3 by func_8003C11C */
+    s32 unk2C;                         /* +0x02C, set to 0x12C by func_8003C11C */
+    s32 unk30;                          /* +0x030, set to 0x40 by func_8003C11C */
+    s32 unk34;                       /* +0x034, tested by func_8003C3D0, set to 1 by
+                                          func_8003C11C */
     s32 unk38;                     /* +0x038, read (and returned) by func_8003C1DC */
-    u8 pad3C[0x040 - 0x03C];
+    s32 unk3C;                     /* +0x03C, set to 0 by func_8003C11C */
     s32 unk40;                     /* +0x040, set by func_8003BCF4 */
     u8 pad44[0x078 - 0x044];
     StreamTaskUnk78Obj *unk78;       /* +0x078, an object with its own tiny vtable
                                           (see StreamTaskUnk78Obj below); dispatched
                                           through by func_8003C3D0 */
-    u8 pad7C[0x093 - 0x07C];
+    u8 pad7C[0x084 - 0x07C];
+    s32 unk84;                       /* +0x084, set to 9 by func_8003C11C */
+    u8 pad88[0x093 - 0x088];
     s8 unk93;                          /* +0x093, only ever address-taken (a buffer
                                             passed to func_8003C3D0's slot78 call);
                                             real extent beyond one byte unknown */
-    u8 pad94[0x0A4 - 0x094];
+    u8 pad94[0x09C - 0x094];
+    s32 unk9C;                          /* +0x09C, set to 0 by func_8003C11C */
+    s32 unkA0;                           /* +0x0A0, set to 0 by func_8003C11C */
     s32 unkA4;                     /* +0x0A4, reset to 0 by func_8003BAB4; read
                                         and set to a call result by func_8003BB5C */
     u8 padA8[0x0B4 - 0x0A8];
@@ -94,6 +109,12 @@ struct StreamTaskObj {
  * fetch the ctor at slot +0x008. */
 extern StreamTaskObjMethods *func_8003BE84(void);
 extern StreamTaskObjMethods D_8006E5F8;
+
+/* A rodata table func_8003C11C reaches only by ADDRESS (`lui`/`addiu`, no
+ * `lw`/`sw` here) -- passed to slotA4 as three pointers 3 bytes apart
+ * (base, base+3, base+6). Never decoded further by this unit's queued
+ * functions, so typed as a plain byte array. */
+extern u8 D_8006E860[];
 
 /* self->unkB4's own tiny class: a 1-slot vtable, dispatched through by
  * func_8003B9DC as `self->unkB4->methods->slot04(self->unkB4)` (this
