@@ -43,7 +43,12 @@ struct StreamTaskObjMethods {
                                                       (per tools/classtable.py D_8006E5F8);
                                                       func_8003BAB4 dispatches through it rather
                                                       than calling func_8003BCF4 directly */
-    u8 pad70[0x09C - 0x070];
+    u8 pad70[0x094 - 0x070];
+    void (*slot94)(StreamTaskObj *self); /* +0x094, func_8003BC14's forward target;
+                                                D_8006E5F8+0x094 = func_8003BDF4, this unit's
+                                                own already-matched function (single-arg
+                                                signature confirms the arity here) */
+    u8 pad98[0x09C - 0x098];
     void (*slot9C)(StreamTaskObj *self, s32 a1); /* +0x09C, func_8003C11C's forward target
                                                       (D_8006E5F8+0x09C = func_8003CAF8) */
     void (*slotA0)(StreamTaskObj *self, s32 a1); /* +0x0A0, func_8003C11C's forward target
@@ -204,7 +209,9 @@ struct TaskCoreMethods {
     u8 pad50[0x05C - 0x050];
     void (*slot5C)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x05C, func_8003BB5C's forward target
                                                                      (D_8006E730+0x05C = func_8003C51C) */
-    u8 pad60[0x074 - 0x060];
+    void (*slot60)(StreamTaskObj *self, s32 a1);                /* +0x060, func_8003BC14's forward target
+                                                                     (D_8006E730+0x060 = func_8003C63C) */
+    u8 pad64[0x074 - 0x064];
     void (*slot74)(TaskCoreObj *self);                          /* +0x074, func_8003C3D0's forward target
                                                                       via self->unk18, an OWN INSTANCE of this
                                                                       class rather than the D_8006E730 singleton
