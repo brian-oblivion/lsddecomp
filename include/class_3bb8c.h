@@ -88,6 +88,72 @@ typedef struct Descriptor10 {
     s16 h8;
 } Descriptor10;
 
+/*
+ * Output struct of func_8004C1C0 (Obj866E8Methods::slot110). A `Descriptor10`
+ * embedded at +0x000 (natural alignment 2, so the next member falls at the
+ * next 4-byte boundary, +0x00C -- matches exactly) followed by 8 more s32-
+ * sized fields the function fills from a resolved Elem/Unk14Obj pair.
+ * `base.b0`/`base.b1` are filled by the callee `func_8004C368` (mod/div of
+ * the raw rate); `base.b2`/`base.b3`/`h4`/`h6`/`h8` are computed in
+ * func_8004C1C0 itself. Field meaning beyond that is unestablished -- named
+ * by offset like the rest of this unit's opaque types.
+ */
+typedef struct Descriptor10Ext {
+    Descriptor10 base;   /* +0x000 */
+    s32 unkC;            /* +0x00C */
+    s32 unk10;           /* +0x010 */
+    s32 unk14;           /* +0x014 */
+    s32 unk18;           /* +0x018 */
+    s32 unk1C;           /* +0x01C */
+    s32 unk20;           /* +0x020 */
+    Elem *unk24;         /* +0x024, func_8004C1C0: the Elem it resolved via slot11C */
+    s32 unk28;           /* +0x028, func_8004C1C0: the raw ElemTarget->unk30 rate, sign-extended */
+} Descriptor10Ext;
+
+/*
+ * "in" struct of func_8004C1C0 (Obj866E8Methods::slot110's 3rd param).
+ * Three fields, each read BOTH as a full s32 (for a coarse cell-index
+ * computation) and, separately and later, as just the low `u16` half (for a
+ * fine sub-cell offset computation) -- the same memory, two widths, at
+ * non-adjacent points in the function, which is why each is a union here
+ * rather than a plain s32: writing it as a plain field and casting at the
+ * use site would not force retail's observed re-load-at-the-narrower-width
+ * behaviour. Provenance: func_8004C158 (this unit) passes
+ * `(u8 *)self->unk6C->unk14 + 0x18` as this pointer.
+ */
+typedef struct QueryPos866E8 {
+    union { s32 w; u16 h; } unk0;   /* +0x000 */
+    union { s32 w; u16 h; } unk4;   /* +0x004 */
+    union { s32 w; u16 h; } unk8;   /* +0x008 */
+} QueryPos866E8;
+
+/*
+ * func_8004BB3C's 2nd parameter: a 0xC-byte-strided array, one entry per
+ * loop iteration. Established from that function alone: `ptr0` is tested
+ * for NULL to pick a branch and then, on the non-NULL branch, forwarded
+ * VERBATIM (untouched) to `ElemTargetMethods::slot78` -- consistent with a
+ * pointer, though its pointee is never dereferenced in this unit; `rate`
+ * is read as a plain halfword and copied into the resolved Elem's
+ * `unk4->unk30` (already an `s16` there); `id` is read as a full word and
+ * passed as `Obj866E8Methods::slot118`'s index argument.
+ *
+ * NOTE for whoever revisits func_8004BB3C: retail walks `ptr0` and the
+ * `rate`/`id` pair via TWO INDEPENDENTLY-INCREMENTING pointers (registers
+ * `$s4`/`$s3`, both `+= 0xC` per iteration), not one indexed base -- no
+ * source shape tried this round (plain `arr1[i].field`, an explicit
+ * `&arr1[i]` element pointer, a nested sub-struct accessed via
+ * `arr1[i].sub.field`, or manual byte-cast pointer walking) reproduced
+ * this; every attempt landed on ONE induction variable and was exactly 4
+ * bytes short (a missing `addiu $s4,$s4,0xc`), or regressed further. See
+ * the match report for the full attempt log before re-deriving this.
+ */
+typedef struct SetupEntry866E8 {
+    void *ptr0;     /* +0x0 */
+    s16 rate;       /* +0x4 */
+    u8 pad6[0x8 - 0x6];
+    s32 id;         /* +0x8 */
+} SetupEntry866E8;
+
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
  * called by func_8004B418 and func_8004B38C (both already matched) and
  * itself attempted-but-stalled this round (58/73, see
@@ -114,6 +180,37 @@ extern s32 D_80086904;
  * by func_8004CDA4 into self+0x8C+key*0xC. */
 extern Unk54Struct D_80086990;
 
+/*
+ * func_8004B700's per-outer-loop-iteration key/enable pair, read from its
+ * own `arg3` parameter (a 2-byte-strided array, one entry per element of
+ * `self->arr`). `key` is copied into the resolved Elem's own `unk2` and
+ * doubles as an index into `D_80086838` (`key * 0xC`, i.e. `D_80086838
+ * + key`, since that table's own stride is 0xC == sizeof(Unk54Struct));
+ * `flag` gates the whole per-element body (skip if 0).
+ */
+typedef struct TargetSpec866E8 {
+    u8 key;   /* +0x0 */
+    u8 flag;  /* +0x1 */
+} TargetSpec866E8;
+
+/* Data table, 0xC-byte stride, indexed by `TargetSpec866E8::key` in
+ * func_8004B700 -- reuses `Unk54Struct`'s shape (three consecutive `s32`
+ * words) since that is exactly how func_8004B700 reads it (offsets
+ * 0x0/0x4/0x8, all as plain `s32`, no evidence of any other width). Bound
+ * unknown from this unit alone (`key` is an arbitrary byte from the
+ * caller), so left unsized. */
+extern Unk54Struct D_80086838[];
+
+/* Uncarved sibling in this same unit (asm/class_3bb8c.s past this slice),
+ * called once per element from func_8004B700's outer loop (this round) with
+ * seven arguments: `self`, the stack-buffer slot being filled
+ * (`&stackBuf[count]`, a `SetupEntry866E8*`), `self->unk68->divisor`, the
+ * `val / divisor` quotient's low bit, `val` itself, the earlier
+ * `func_8004B930(self, val, flag)` result, and `arg3[i].key`. Not this
+ * round's function to match -- the call site establishes only its
+ * ARGUMENT shape, not its body. */
+extern void func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key);
+
 /* Only the slots this unit's functions dispatch through (via
  * self->methods->slotNN) are typed; everything else stays opaque so the
  * struct keeps the right size/offsets without requiring every method to be
@@ -131,25 +228,51 @@ typedef struct Obj866E8Methods {
      * SAME stack buffer that was func_8004B44C's `outBuf` argument, and
      * the address of an unidentified global (`D_80086904`). */
     s32 (*slotF8)(Obj866E8 *self, s32 arg1, s32 *arg2, s32 *arg3);   /* +0x0F8 */
-    u8 pad0FC[0x104 - 0xFC];
+    /* = func_8004BB3C. This IS func_8004BB3C's own identity slot (verified
+     * via classtable), not something func_8004BB3C calls -- its actual
+     * signature is `(self, arr1, count)`, matching a `SetupEntry866E8`
+     * array and a count, per func_8004BB3C's own stalled-but-structurally-
+     * derived body (see docs/match-reports/func_8004BB3C.md). Called by
+     * func_8004B700 (this round, MATCHED) at the end of its own loop with
+     * a 7-slot stack buffer it filled and the number of slots actually
+     * used. */
+    void (*slotFC)(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count); /* +0x0FC */
+    u8 pad100[0x104 - 0x100];
     /* Called by func_8004BD14 with one of the object's own Elem array
      * slots. */
     void (*slot104)(Obj866E8 *self, Elem *entry);  /* +0x104 */
-    u8 pad108[0x10C - 0x108];
+    /* = called by func_8004BB3C (this round) with one of the object's own
+     * Elem array slots, in BOTH branches of an `arr1[i].ptr0 != 0` test --
+     * guarded by the SAME `entry->unk4->unk2C != 0` condition each time.
+     * Return value unused. Distinct from slot104 above, which
+     * func_8004BD14 dispatches under a different (mode==1) condition. */
+    void (*slot108)(Obj866E8 *self, Elem *entry); /* +0x108 */
     /* Called by func_8004CC74 with its own stack-local query buffer
      * (see `CC74QueryBuf`) and a literal 0; return value unused there. */
     s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2); /* +0x10C */
-    /* Called by func_8004C158 with its own arg1 and a computed pointer;
-     * matches class_3ac78's independent view of the same slot
-     * (`slot110`/func_8004C1C0, s32 return, not this round's function). */
-    s32 (*slot110)(Obj866E8 *self, s32 arg1, void *arg2);   /* +0x110 */
+    /* = func_8004C1C0 (this round, MATCHED). Resolves `in` (may be NULL at
+     * other call sites; func_8004C1C0 itself never null-checks it) via
+     * slot11C, then fills `out`. Returns 0 on success, 1 if the slot11C
+     * lookup misses. Matches class_3ac78's independent view of the same
+     * slot -- `self->methods->slot110(self, &buf, gateArg)` in that unit's
+     * func_8004AEA4 uses the identical (out-pointer, in-pointer) argument
+     * order, which is what fixed these two params as pointers rather than
+     * the previous round's placeholder (s32, void*). func_8004C158 (this
+     * unit) passes its own `arg1` param through as `out` and a computed
+     * pointer as `in` -- see func_8004C158's retyped signature below. */
+    s32 (*slot110)(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in);   /* +0x110 */
     u8 pad114[0x118 - 0x114];
     /* Called by func_8004C470 with a plain array index (0..6); the
      * returned pointer is subsequently read like an Elem slot accessor,
      * so this is almost certainly `return &self->arr[index];` -- not
      * this round's function to match. */
     Elem *(*slot118)(Obj866E8 *self, s32 index);   /* +0x118 */
-    u8 pad11C[0x120 - 0x11C];
+    /* Called by func_8004C1C0 with its own `in` (QueryPos866E8*) param,
+     * forwarded opaquely; return value dereferenced exactly like an Elem
+     * (->unk4, ->unkC), so this is almost certainly an Elem-lookup sibling
+     * to slot118 (func_8004C434) -- not this round's function to match
+     * (func_8004C470, still INCLUDE_ASM in this unit). */
+    Elem *(*slot11C)(Obj866E8 *self, QueryPos866E8 *arg1);   /* +0x11C */
     /* Called twice by func_8004CAF0, each time with a small offset off
      * its own arg3; the return value is stored as a freshly-created
      * GridSlot866E8's `elemIdx`. */
@@ -161,14 +284,28 @@ typedef struct Obj866E8Methods {
 } Obj866E8Methods;
 
 /*
- * Opaque object pointed to by ElemTarget::unk4::unk14 (func_8004C470).
- * Only the two s32 fields that function reads are typed.
+ * Opaque object pointed to by UnkCObj::unk14. `unk1C` established by this
+ * round's func_8004C1C0 (plain s32, single-width read). `unk18`/`unk20`
+ * were originally typed plain s32 from func_8004C470 (still INCLUDE_ASM,
+ * so provisional); func_8004C1C0 (MATCHED) reads them BOTH as a full s32
+ * (coarse) and, separately and later in the function, as just the low
+ * `u16` half (fine) -- retail re-loads from memory at the narrower width
+ * rather than deriving it from the already-loaded s32, so each is a union
+ * here rather than a plain field (same reasoning as `QueryPos866E8`
+ * above). func_8004C470's own s32-only reads remain valid against the
+ * `.w` member, so this is additive, not a contradiction of what it
+ * established.
  */
 struct Unk14Obj {
-    u8 pad00[0x18];
-    s32 unk18;
-    u8 pad1C[0x20 - 0x1C];
-    s32 unk20;
+    /* func_8004B700 (round: charlie/4): cleared to 0 right after unk18/
+     * unk1C/unk20 are filled -- a genuine RELOAD of the same Unk14Obj*
+     * (not the same register kept live), so it is a real memory write, not
+     * dead code. */
+    s32 unk0;                         /* +0x000 */
+    u8 pad4[0x18 - 0x4];
+    union { s32 w; u16 h; } unk18;   /* +0x018 */
+    s32 unk1C;                        /* +0x01C, func_8004C1C0 */
+    union { s32 w; u16 h; } unk20;    /* +0x020 */
 };
 
 /*
@@ -191,7 +328,15 @@ struct UnkCObj {
  * (already matched) established +0x032. func_8004BD14 additionally reads
  * +0x02A/+0x02C/+0x02E on this same pointer. */
 struct ElemTargetMethods {
-    u8 pad000[0x7C];
+    u8 pad000[0x74];
+    /* = called by func_8004BB3C (this round) as `e->unk4->methods->slot74(
+     * e->unk4)` when `e->unk4->unk2A != 0`, right before zeroing the
+     * Elem's own `flag`. Single arg (self), return unused. */
+    void (*slot74)(ElemTarget *self);  /* +0x074 */
+    /* = called by func_8004BB3C (this round) as `e->unk4->methods->slot78(
+     * e->unk4, arr1[i].ptr0)` -- the SAME raw pointer that gated the
+     * branch (tested non-NULL, then forwarded verbatim). Return unused. */
+    void (*slot78)(ElemTarget *self, void *arg1);  /* +0x078 */
     /* Called by func_8004C0AC as `entry->unk4->methods->slot7C(entry->unk4,
      * entry)` -- dispatch target is the ElemTarget itself, not self. */
     void (*slot7C)(ElemTarget *self, Elem *entry);  /* +0x07C */
@@ -217,7 +362,11 @@ struct ElemTarget {
  */
 struct Elem {
     u16 flag;                      /* +0x000 */
-    u8 pad02[0x04 - 0x02];
+    /* func_8004B700 (round: charlie/4): copied from `arg3[i].key` (a raw
+     * byte, zero-extended then stored as a halfword) and, in a second
+     * separate loop over all 7 elements, copied onward into
+     * `unk4->unk32` (already established). */
+    u16 unk2;                      /* +0x002 */
     ElemTarget *unk4;               /* +0x004 */
     u8 pad08[0x0C - 0x08];
     UnkCObj *unkC;                  /* +0x00C, func_8004C470 (via slot118's return) */

@@ -145,7 +145,7 @@ void func_8004C0AC(Obj866E8 *self, Elem *entry) {
     }
 }
 
-Descriptor10 *func_8004C158(Obj866E8 *self, s32 arg1, void **out) {
+Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     void *v1;
 
     v1 = (u8 *)self->unk6C->unk14 + 0x18;
