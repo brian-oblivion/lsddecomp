@@ -38,7 +38,28 @@ void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA10);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA6C);
+void func_8004AA6C(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
+{
+    void (*fn)(Class866E8 *self, s32 arg1);
+
+    fn = *(void (**)(Class866E8 *, s32))((u8 *)func_8001E57C(self, arg1) + 0x88);
+    fn(self, arg1);
+
+    if (arg1 == 6)
+        goto handle6;
+    if (arg1 == 7)
+        goto merge;
+    return;
+
+handle6:
+    if (arg2->unk14 != NULL) {
+        arg2->unk14 = arg2->unk14->methods->unk04(arg2->unk14);
+    }
+
+merge:
+    self->unk1BC = arg2;
+    self->methods->slot30(self, arg1);
+}
 
 void func_8004AB24(Class866E8 *self)
 {

@@ -7,6 +7,7 @@ typedef struct Class866E8 Class866E8;
 typedef struct Class866E8Methods Class866E8Methods;
 typedef struct Class86668 Class86668;
 typedef struct Class86668Methods Class86668Methods;
+typedef struct UnkListObj_3ac78 UnkListObj_3ac78;
 
 /*
  * Class866E8 -- constructed by func_8004A4C8 (New_Class866E8: allocates
@@ -26,7 +27,7 @@ struct Class866E8Methods {
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* func_8004A534; called by func_8004A4C8 */
     /* +0x00C */ void *dtor;                                                    /* func_8004A7C0; not dispatched by this round's functions */
     /* +0x010 */ u8 pad010[0x030 - 0x010];
-    /* +0x030 */ void (*slot30)(Class866E8 *self);                              /* BasicClass__func_182cc; called by func_8004AA6C */
+    /* +0x030 */ void (*slot30)(Class866E8 *self, s32 arg1);                    /* BasicClass__func_182cc; called by func_8004AA6C */
     /* +0x034 */ u8 pad034[0x038 - 0x034];
     /* +0x038 */ void (*slot38)(Class866E8 *self);                              /* func_8004A984; called by func_8004B2D4 */
     /* +0x03C */ u8 pad03C[0x040 - 0x03C];
@@ -69,7 +70,8 @@ struct Class866E8 {
     /* +0x084 */ s32 unk84;                  /* func_8004AFE0 arg2, stored raw (same value as unk80) */
     /* +0x088 */ u8 pad088[0x0E8 - 0x088];
     /* +0x0E8 */ s32 unkE8;                  /* func_8004ADD0 arg1; func_8004ADD8 reads it back as a NUL-terminated s32 tag array -- true element type still s32, only usage differs per call site */
-    /* +0x0EC */ u8 pad0EC[0x1C0 - 0x0EC];
+    /* +0x0EC */ u8 pad0EC[0x1BC - 0x0EC];
+    /* +0x1BC */ UnkListObj_3ac78 *unk1BC;   /* func_8004AA6C arg2, stored raw */
     /* +0x1C0 */ u8 unk1C0[0x1E8 - 0x1C0];   /* address-of only, returned by func_8004B31C; real element type unknown */
 };
 
@@ -121,13 +123,30 @@ typedef struct {
  * docs/research/class-framework.md), so this reads as a family/base-class
  * check, not an exact-class check. True type of the pointed-to object is
  * unconfirmed; only the one byte this function reads is modeled here.
+ *
+ * unk04 is the shared "BasicClass" base-method slot at +0x004 -- the same
+ * slot Class866E8Methods documents as `BasicClass__func_17eb0`. Its exact
+ * semantics are unknown; func_8004AA6C calls it on a GenericObject and
+ * stores the (pointer) return value back where the object came from,
+ * suggesting a release-and-replace pattern, but that is not confirmed.
  */
 typedef struct {
     s32 header;
+    void *(*unk04)(void *self);
 } GenericMethodsHeader;
 
 typedef struct {
     GenericMethodsHeader *methods;
 } GenericObject;
+
+/*
+ * Opaque list/args object passed as func_8004AA6C's arg2 and stashed at
+ * self->unk1BC. Only the one field that function actually reaches is
+ * typed; everything else stays unknown.
+ */
+struct UnkListObj_3ac78 {
+    u8 pad0[0x14];
+    GenericObject *unk14;   /* func_8004AA6C: replaced via ->methods->unk04(unk14) when non-NULL */
+};
 
 #endif
