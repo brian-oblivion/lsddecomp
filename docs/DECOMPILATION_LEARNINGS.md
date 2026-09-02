@@ -656,6 +656,87 @@ code_2c054).**
   unify them. Round 7 had two units both describing `D_800866E8` under
   different type names, deliberately. (`class_3ac78`, `class_3bb8c`)
 
+- **"One instruction short" describes the SCORE, not the defect count.** The
+  round's clearest diagnostic lesson. `func_8005F544` sat at 30/49 with a
+  report describing a single-instruction residue; it was FOUR independent
+  residues stacked, each needing a different lever, and closing three of them
+  moved the score not at all until the fourth went. Diagnose incrementally
+  and re-measure after each change rather than looking for one explanation
+  that accounts for the whole gap. (`func_8005F544`, closed 49/49 after a
+  six-attempt stall)
+
+- **Retail's PHYSICAL BLOCK ORDER is part of the match, and nested
+  `if`/`else if` chooses its own.** Where retail dispatches into a shared
+  continuation with one arm's failure path relocated *past* the shared block,
+  no arrangement of nested conditionals reproduces the layout — explicit
+  `goto` and labels, laid out in the disassembly's own physical order, do.
+  The conditional form gets every VALUE right, which is what makes this hard
+  to spot. (`func_80058B08`; same family as the two-armed-`if` layout entry
+  above, but about a merge point rather than two arms)
+
+- **To duplicate a compile-time constant across the predecessors of a CFG
+  merge, write it as its own statement in each predecessor and `goto` a
+  shared label.** A single expression at the merge point never produces the
+  duplication, because there is only one of it. Retail does this whenever a
+  caller-saved register holding a constant is clobbered by an intervening
+  call and the value is still needed after the merge. Expect to need an
+  `__asm__("")` alongside, to stop GCC floating the statement past unrelated
+  stores. (`func_8005F544`)
+
+- **Cache a vtable pointer into an explicit local BEFORE any intervening
+  call, or every use after that call reloads it from memory.** The cost is
+  not one word: it can consume a whole callee-saved register and produce the
+  wrong frame size. This is the opposite-direction companion to the
+  address-of-slot entry below, so read both — one is about caching too
+  little, one about caching the wrong thing. (`func_8003CAF8`,
+  `func_8003C51C`)
+
+- **`&obj->vtable->slotNN` — the ADDRESS of the slot, not the pointer value
+  — assigned to a local before a branch, reproduces GCC 2.6.3's split-load
+  scheduling** (base pointer early, slot value adjacent to the call). A bare
+  cached pointer VALUE is free to float arbitrarily far up the block and
+  will. Give each call site its own local rather than sharing one; sharing
+  forces a coarser allocation and costs a `move`. (`func_8005FC58`, found by
+  permuter; reused by hand on `func_8005F544`)
+
+- **Keep a pointer computation that is one retail expression as ONE C
+  statement.** Splitting it across two statements — even where that reads
+  more clearly — can make GCC commit the intermediate to a permanent
+  callee-saved register one statement early. This single change moved
+  `func_8004B100` from 47/117 to 95/117. (`func_8004B100`)
+
+- **Unconditional-then-overwrite, not a ternary, for a two-constant
+  selection.** `d = -50; if (cond) d = 50;` reproduces retail's branch
+  polarity where `d = cond ? 50 : -50;` does not. Related but distinct: a
+  lazy-init store of a small integer into a struct field also prefers
+  `if`/`else` over `?:`, which can put the literal in a different register
+  entirely. (`func_8005AC24`, `func_8005F800`)
+
+- **A byte copy is `lbu` under `-funsigned-char` no matter what you write —
+  unless the value passes through a wider (`s32`) local first, which forces
+  `lb`.** C-level signedness of the source or destination does not reach the
+  load; the promotion does. (`func_8003CB68`, where it was the one residue
+  that DID yield)
+
+- **`addu`/`+` operand order in a byte-truncated sum follows the source's
+  left-to-right expression order.** (`func_8003CC2C`)
+
+- **When a function closely resembles an already-matched sibling in the same
+  file, copy the sibling's exact local-variable-versus-repeated-field-access
+  idiom before deriving anything.** `func_8005AC24` matched on the first
+  attempt this way — cheaper than the permuter and cheaper than manual
+  derivation, and the idiom is not recoverable from the disassembly alone.
+  (`func_8005AC24`, from `func_8005AB2C`/`func_8005AD68`/`func_8005AE40`)
+
+- **An argument register that survives an intervening CALL is not reliably an
+  argument.** Trace forward past every call, not just to the next `jalr`,
+  before deciding a register is a parameter. (`code_2cc8c`, round 10)
+
+- **A base constructor that sets `self->methods` directly can still dispatch
+  through `self->methods` immediately afterwards in the same function** —
+  plain sequential assignment then dispatch, no re-fetch through a getter and
+  no caching. (`func_8004D578`)
+
 ### New residue classes opened this round (not yet closed)
 
 - **"Identical assignment reaching different merge points."** GCC tail-merges
@@ -667,6 +748,30 @@ code_2c054).**
   symmetric 3-word clusters, unmoved by six reshapes and by a late barrier
   (which made it worse). Flagged as a candidate "not a source-shape question"
   case. (`func_80066340`, 252/258)
+- **Register-identity EXCHANGE of two parameters, driven by reference-count
+  priority.** Retail assigns `a0->$s1, a1->$s2, a2->$s0` where the compiler
+  gives `self->$s0, arg1->$s2, arg2->$s1` — `arg1` is stable and only two
+  values trade, so this is an exchange rather than a rotation. GCC 2.6.3's
+  local allocator prioritises pseudos by reference count and `$s0` goes to
+  the most-referenced, which retail's `arg2` is (four reads against two
+  each). **So count references in RETAIL versus in your C before calling it
+  unreachable** — equalising them is the lever. It was not applicable here
+  only because the surplus reference sat in a call whose declaration is
+  shared with an already-matched neighbour, and changing it regressed that
+  neighbour. Unresolved, not refuted. (`func_8004D47C`, 23/33)
+
+- **Load-delay-slot fill at a loop tail.** Retail schedules the loop
+  increment into an `lh`'s delay slot; every C shape tried (combined `for`,
+  `while`, explicit `do`/`while`, `__asm__("")` at three positions) emits a
+  `nop` there instead. (`func_8004B100`, 95/117)
+
+- **`li` versus `move` for a known-zero return value.** Retail materialises
+  it as `move v0,s1` from a register that already holds zero; every C form
+  produces `li v0,0`. Confirmed with an isolated reproducer, and NOT fixed by
+  correcting the callee signature (the dropped parameter was never read in
+  the body, so the callee's codegen could not change — a reasonable head
+  lever, closed). (`func_8003CCDC`, 26/27 — the round's closest near-miss)
+
 - **Pure instruction-scheduling residue in a branch-free, call-free body.**
   Neither of this round's two resolved-stall levers can apply, since both need
   a branch or a call to reason about. Nine reshapes, best 8/14.
@@ -718,6 +823,53 @@ code_2c054).**
 
 All eight are permuter candidates rather than reshape candidates; see Gate 3
 in docs/PARALLEL-RUNS.md.
+
+**Round 10 ran the permuter in anger for the first time, and the results
+split sharply. Read this before assuming "permuter candidate" means
+"solvable".** Five searches on four functions, ~140,000 iterations total:
+
+| target | base | best | outcome |
+| --- | --- | --- | --- |
+| `func_8005FC58` | — | **0** | MATCHED — found the address-of-slot lever |
+| `func_8005F544` | 60 | **0** | MATCHED in 23 iterations, re-seeded from a near-miss |
+| `func_8005A82C` | 460 | 200 | exhausted; convergent form is UB |
+| `CalcDreamColor` | 610 | 120 | UB-only at 120; a clean 135 candidate left untried |
+| `func_8003CCDC` | 5 | 5 | no movement in ~24k iterations |
+| `func_8003CB68` | 70 | 70 | **no improvement over the seed at all** |
+
+What separates the two halves is **what you seed it with**, not how close the
+score is:
+
+- **Re-seed from your closest MANUAL near-miss, never from the original flat
+  form.** `func_8005F544` went to zero in 23 iterations once seeded from a
+  body whose remaining defect was purely a register difference — after three
+  other residues had been closed by hand first. Seeded earlier it would have
+  been searching several problems at once.
+- **`--debug`'s base-score COMPOSITION predicts viability better than its
+  magnitude.** A base score made of register differences with zero
+  insertions or deletions is a live search. One dominated by insertions and
+  deletions means the shape is still wrong, and the permuter will grind
+  without converging — which is exactly what `func_8003CB68` (no movement
+  whatsoever) and `func_8003CCDC` (base 5, best 5) look like.
+- **A base score of 5 that will not move is a stronger negative than a base
+  of 460 that halves.** Do not read a low base score as "nearly there".
+
+**And judge what it returns.** Three of the five searches converged on forms
+that are not real C: a spare local read through stale-register reuse on a
+path that never assigns it, and a return retyped `volatile unsigned int` in
+place of the true enum. Per Gate 3 those are exhausted-class verdicts, not
+leads. **Rejecting them is the discipline** — a zero reached by UB fails the
+next reader, not the SHA1.
+
+**Mark exhaustion at the right GRANULARITY.** `CalcDreamColor`'s report says
+permuter-exhausted *for that region* and explicitly not overall, because the
+same search surfaced a legitimate candidate at 135 — correct return type, no
+UB — that was never applied. A blanket "exhausted" would have buried it.
+
+**Correction to an earlier round's advice:** "the permuter closes
+single-register residues fast" does not generalise. It did for
+`func_8005F544` and `func_8005FC58`; `func_8003CB68` is a single-register
+residue on which the permuter found nothing in 13.5k iterations.
 
 **One class was CLOSED this round, and how it closed is the transferable
 part.** The "vacate-then-reuse-argument-register" residue was written up with
