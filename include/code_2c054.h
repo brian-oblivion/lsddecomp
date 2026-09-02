@@ -26,6 +26,12 @@ typedef struct StreamTaskObj StreamTaskObj;
 typedef struct StreamTaskObjMethods StreamTaskObjMethods;
 typedef struct StreamTaskUnkB4Obj StreamTaskUnkB4Obj;
 typedef struct StreamTaskUnkB4Methods StreamTaskUnkB4Methods;
+typedef struct StreamTaskUnk78Obj StreamTaskUnk78Obj;
+typedef struct StreamTaskUnk78Methods StreamTaskUnk78Methods;
+typedef struct StreamTaskUnkCObj StreamTaskUnkCObj;
+typedef struct TaskTextObj TaskTextObj;
+typedef struct TaskTextMethods TaskTextMethods;
+typedef struct TaskCoreObj TaskCoreObj;
 
 struct StreamTaskObjMethods {
     s32 header; /* +0x000 */
@@ -43,11 +49,28 @@ struct StreamTaskObjMethods {
  * fields this unit's queued functions touch are named. */
 struct StreamTaskObj {
     StreamTaskObjMethods *methods; /* +0x000 */
-    u8 pad04[0x038 - 0x004];
+    u8 pad04[0x00C - 0x004];
+    StreamTaskUnkCObj *unkC;       /* +0x00C, a pointer to a 1-word holder whose own
+                                        word 0 is the actual dispatch target (see
+                                        StreamTaskUnkCObj below); read by func_8003C3D0 */
+    u8 pad10[0x018 - 0x010];
+    TaskCoreObj *unk18;             /* +0x018, an object whose vtable has the same
+                                        shape as TaskCoreMethods (see TaskCoreObj
+                                        below); dispatched through by func_8003C3D0 */
+    u8 pad1C[0x034 - 0x01C];
+    s32 unk34;                       /* +0x034, tested by func_8003C3D0 */
     s32 unk38;                     /* +0x038, read (and returned) by func_8003C1DC */
     u8 pad3C[0x040 - 0x03C];
     s32 unk40;                     /* +0x040, set by func_8003BCF4 */
-    u8 pad44[0x0A4 - 0x044];
+    u8 pad44[0x078 - 0x044];
+    StreamTaskUnk78Obj *unk78;       /* +0x078, an object with its own tiny vtable
+                                          (see StreamTaskUnk78Obj below); dispatched
+                                          through by func_8003C3D0 */
+    u8 pad7C[0x093 - 0x07C];
+    s8 unk93;                          /* +0x093, only ever address-taken (a buffer
+                                            passed to func_8003C3D0's slot78 call);
+                                            real extent beyond one byte unknown */
+    u8 pad94[0x0A4 - 0x094];
     s32 unkA4;                     /* +0x0A4, reset to 0 by func_8003BAB4; read
                                         and set to a call result by func_8003BB5C */
     u8 padA8[0x0B4 - 0x0A8];
@@ -94,6 +117,41 @@ struct StreamTaskUnkB4Obj {
     StreamTaskUnkB4Methods *methods; /* +0x000 */
 };
 
+/* self->unk78's own tiny class -- structurally identical shape to
+ * StreamTaskUnkB4Obj/Methods (a 1-word vtable pointer object), but kept as a
+ * SEPARATE type rather than reused: nothing ties the two fields to the same
+ * concrete class, only the same generic "vtable at offset 0" idiom every
+ * class in this game uses. Only the one slot func_8003C3D0 reaches is
+ * known. */
+struct StreamTaskUnk78Methods {
+    u8 pad00[0x050];
+    void (*slot50)(StreamTaskUnk78Obj *self); /* +0x050, func_8003C3D0's forward target */
+};
+
+struct StreamTaskUnk78Obj {
+    StreamTaskUnk78Methods *methods; /* +0x000 */
+};
+
+/* self->unkC points at a 1-word holder (not a class instance itself -- its
+ * one word is read but its own vtable, if it has one, is never reached).
+ * That word is the real dispatch target, `TaskTextObj`: another generic
+ * "vtable at offset 0" object, reached by func_8003C3D0 through one slot
+ * (+0x078) that takes a buffer pointer and a flag -- resembles a
+ * print-into-buffer call, but nothing here confirms that beyond the shape
+ * of the call (self->unk93's address is the second argument). */
+struct StreamTaskUnkCObj {
+    TaskTextObj *unk0; /* +0x000 */
+};
+
+struct TaskTextMethods {
+    u8 pad00[0x078];
+    void (*slot78)(TaskTextObj *self, s8 *buf, s32 flag); /* +0x078 */
+};
+
+struct TaskTextObj {
+    TaskTextMethods *methods; /* +0x000 */
+};
+
 /* A sibling class's own method table (D_8006E730, per `tools/classtable.py
  * D_8006E730`) that `StreamTaskObj`'s own slots +0x00C/+0x080/+0x084
  * (func_8003B9DC/func_8003BD74/func_8003BDAC) forward straight through to,
@@ -125,15 +183,32 @@ struct TaskCoreMethods {
     u8 pad50[0x05C - 0x050];
     void (*slot5C)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x05C, func_8003BB5C's forward target
                                                                      (D_8006E730+0x05C = func_8003C51C) */
-    u8 pad60[0x078 - 0x060];
+    u8 pad60[0x074 - 0x060];
+    void (*slot74)(TaskCoreObj *self);                          /* +0x074, func_8003C3D0's forward target
+                                                                      via self->unk18, an OWN INSTANCE of this
+                                                                      class rather than the D_8006E730 singleton
+                                                                      (D_8006E730+0x074 = func_8003C7F4) */
     void (*slot78)(StreamTaskObj *self);                        /* +0x078, func_8003BD10's forward target
                                                                       (D_8006E730+0x078 = func_8003C858) */
     u8 pad7C[0x080 - 0x07C];
     void (*slot80)(StreamTaskObj *self);                        /* +0x080, func_8003BD74's forward target */
     void (*slot84)(StreamTaskObj *self);                         /* +0x084, func_8003BDAC's forward target */
+    u8 pad88[0x090 - 0x088];
+    void (*slot90)(TaskCoreObj *self);                            /* +0x090, func_8003C3D0's forward target
+                                                                        via self->unk18 (same instance as slot74;
+                                                                        D_8006E730+0x090 = func_8003CA1C) */
 };
 
 extern TaskCoreMethods *func_8003DFBC(void); /* returns &D_8006E730 */
+
+/* An actual instance of TaskCoreMethods's class (as opposed to the
+ * D_8006E730 singleton `func_8003DFBC` always returns) -- reached through
+ * `StreamTaskObj::unk18`. Only the vtable-pointer field is needed: every
+ * call through it passes the TaskCoreObj itself as `self`, exactly like
+ * StreamTaskUnkB4Obj/StreamTaskUnk78Obj above. */
+struct TaskCoreObj {
+    TaskCoreMethods *methods; /* +0x000 */
+};
 
 /* A second sibling table (D_8006E878, `tools/classtable.py D_8006E878`),
  * used by func_8003C1DC to forward its own work one level further down the
