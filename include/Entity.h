@@ -58,7 +58,7 @@ struct EntityMethods {
     /* +0x30 */ void (*slot30)(Entity *self, s32 arg1);   /* called by func_8005DAAC, func_8005DF9C */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*slot40)(Entity *self);              /* called by Entity__Entity, right after this->methods is (re)assigned */
-    /* +0x44 */ u8 pad44[0x48 - 0x44];
+    /* +0x44 */ void (*slot44)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E4D0 as slot44(this, 0, D_80089CA0) */
     /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E694 (result discarded) and func_8005EF20 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, func_8005EF20 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by func_8005D9F4, func_8005DA3C */
@@ -326,15 +326,18 @@ extern void func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4
 typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
 struct EntityMoodHandlerArg {
     u8 pad00[0x04];
-    s32 unk4;    /* +0x04, gate flag read by func_8005E480/func_8005E7A8 */
+    s32 unk4;    /* +0x04, gate flag read by func_8005E480/func_8005E7A8/func_8005E6F0/func_8005EBB4, and by func_8005E4D0 (as `out->unk4 % 90`) */
     u8 pad08[0x08];
-    s32 unk10;    /* +0x10, written by func_8005ED10/func_8005E480/func_8005E7A8 */
+    s32 unk10;    /* +0x10, written by func_8005ED10/func_8005E480/func_8005E7A8/... */
     u8 pad14[0x08];
-    s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8 */
-    u8 pad20[0x10];
-    s32 unk30;      /* +0x30, written by func_8005E7A8 only */
-    u8 pad34[0x10];
-    s32 unk44;       /* +0x44, written by func_8005E7A8 only */
+    s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8/... */
+    s32 unk20;      /* +0x20, written by func_8005E4D0 only (paired with unk1C the same round) */
+    u8 pad24[0x0C];
+    s32 unk30;      /* +0x30, written by func_8005E7A8/func_8005E4D0 */
+    s32 unk34;       /* +0x34, written by func_8005E4D0 only (paired with unk30) */
+    u8 pad38[0x0C];
+    s32 unk44;       /* +0x44, written by func_8005E7A8/func_8005E4D0 */
+    s32 unk48;        /* +0x48, written by func_8005E4D0 only (paired with unk44) */
 };
 
 #endif
