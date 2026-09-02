@@ -102,7 +102,23 @@ Class86B60 *func_8004D518(void *dreamSys)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D578);
+void func_8004D578(Class86B60 *self, void *dreamSys)
+{
+    DreamSysView_3bb8c_c *dream;
+    Class86B60Unk48Obj *obj;
+
+    func_8003DFBC()->slot08(self, &D_80086D44, &D_800114DC, 0);
+    self->methods = func_8004E2D0();
+    obj = self->unk48;
+    obj->methods->slot9C(obj, -1);
+    self->unkA4 = dreamSys;
+    self->unkAC = 0;
+    dream = dreamSys;
+    self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
+    func_8004D6AC(dream->methods->slot1A0(dream, 0));
+    self->methods->slotD8(self, &D_80086D44);
+    self->methods->slot40(self, dreamSys);
+}
 
 void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 {
