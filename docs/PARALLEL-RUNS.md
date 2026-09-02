@@ -172,8 +172,16 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    ```sh
    git log --oneline -5                     # commits you do not remember making
    git reflog -15                           # merges/commits you did not perform
+   git reflog show origin/main              # pushes you did not make
    git worktree list                        # worktrees you did not provision
    ```
+
+   **A quiet `git log` is not evidence the other session has ended.** Round 6's
+   head stopped committing at 13:59 and round 7's head recorded it as
+   finished on that basis — but `main` was pushed to `origin` twice more
+   during round 7, carrying round 7's own commits. Only
+   `git reflog show origin/main` showed it. Re-check before teardown, not
+   just at the start.
 
    A commit in `git log` that is not in your own record is the tell, and
    authorship does NOT distinguish it — every agent commits as the operator.

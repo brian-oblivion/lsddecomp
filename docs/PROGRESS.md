@@ -54,9 +54,21 @@ entry, not deleted — an accusation that was published should be visibly
 withdrawn. The rule is now §4a of PARALLEL-RUNS: establish you are the only
 head before anything else, and never re-create a name another head may hold.
 
+**The overlap lasted the whole round, not the twenty minutes it first
+appeared to.** Round 6's head went quiet in `git log` after 13:59, and this
+head recorded it as finished on that basis. It was not: `main` was pushed to
+`origin` twice more during round 7 — at 15:02 and again later — by something
+other than this head, each time carrying this head's own commits. Harmless in
+effect (the pushed content was already merged and verified here, and
+`origin/main` never diverged from local), but "no new commits in `git log`"
+is NOT evidence a concurrent session has ended. **A quiet log means a quiet
+log.** Check `git reflog show origin/main` too, which is what finally showed
+these.
+
 **Standing operator escalation: rule 5 (main is single-occupancy) has no
-mechanical enforcement.** Nothing stopped either head writing to main. The
-hooks guard `check.sha1`/`build.sha1` and `asm/`, not the branch.
+mechanical enforcement.** Nothing stopped either head writing to main, or
+pushing it. The hooks guard `check.sha1`/`build.sha1` and `asm/`, not the
+branch and not the remote.
 
 ### The head confirmed a stall that a runner then overturned
 
