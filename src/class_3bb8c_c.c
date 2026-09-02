@@ -75,7 +75,10 @@ void func_8004D434(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D47C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D500);
+void *func_8004D500(void *self)
+{
+    return self;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D508);
 
