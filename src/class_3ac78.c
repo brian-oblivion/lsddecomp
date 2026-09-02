@@ -103,7 +103,34 @@ void func_8004ADD0(Class866E8 *self, s32 arg1)
     self->unkE8 = arg1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ADD8);
+void func_8004ADD8(Class866E8 *self, void *list, s32 count)
+{
+    s32 *p;
+    u8 unused[24];
+
+    if (count < 2)
+        return;
+    if (count < 4)
+        goto scan;
+    if (count >= 9)
+        return;
+    if (count < 5)
+        return;
+
+scan:
+    p = (s32 *)self->unkE8;
+    if (p == NULL)
+        return;
+    if (*p == 0)
+        return;
+
+    do {
+        if (*p == ((GenericObject *)list)->methods->header) {
+            self->methods->slot12C(self, list, count);
+        }
+        p++;
+    } while (*p != 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AEA4);
 
