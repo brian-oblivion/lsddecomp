@@ -84,7 +84,39 @@ void func_80058A94(DreamSys *this)
 	func_80057C84()->slot0x50(this);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058B08);
+void func_80058B08(DreamSys *this, s32 arg1)
+{
+	s32 v;
+
+	func_80057C84()->slot0x88(this, arg1);
+	if (arg1 == -2)
+		goto handle_neg2;
+	if (arg1 != -1)
+		return;
+
+	v = this->unk_0x28->unk_0x36 & 0x7F;
+	this->unk_0xB8 = v;
+	if (v >= 0x18)
+		this->unk_0xB8 = 0;
+
+	if (this->unknwon_int_0x44 == 15 && this->unk_0xB8 == 0)
+		this->unk_0xB8 = 2;
+
+	if (this->currentStage != 9)
+		return;
+	goto shared_tail;
+
+handle_neg2:
+	if (this->unk_0x4C->methods->slot0x11C(this->unk_0x4C, (u8 *)this->unk_0x14 + 0x18)->unk_0x4->unk_0x2C != 2)
+		goto neg2_mismatch;
+
+shared_tail:
+	this->vt->func_8005A7A0(this, this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0));
+	return;
+
+neg2_mismatch:
+	this->vt->func_8005B990(this);
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058C58);
 
