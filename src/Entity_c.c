@@ -58,4 +58,9 @@ s32 func_8005FEC8(Entity *this) {
     return this->methods->slotCC(this, -0x5A, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005FEF8);
+void func_8005FEF8(Entity *this, EntityMoodHandlerArg *out) {
+    if (out->unk4 % 120 == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 1;
+    }
+}
