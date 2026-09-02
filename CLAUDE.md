@@ -96,6 +96,44 @@ grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
 A hit in either means the function is blocked. `progress.py`'s `fresh` column
 cannot see this, which is why every blocked function carries a stub report.
 
+**A `%lo(jtbl_*)` hit counts. A dense `switch` is blocked exactly like an
+indexed global, and this is the one place the screen looks like it is
+over-reporting when it is not.** The temptation is obvious: a jump-table
+dispatch loads a CODE address and jumps (`lw $v0, 0x0($at)` then `jr $v0`),
+an indexed global loads a DATA value, so they look like two constructs and
+the `jtbl_*` one looks harmless. Round 10's head acted on that reading,
+"corrected" this grep to `| grep -v '%lo(jtbl'`, told five live runners to
+use the corrected version, and had to retract all of it.
+
+They are ONE construct at the layer that decides. cc1 emits the same generic
+pseudo-op for both and expresses no opinion on addressing:
+
+```
+lbu $2,D_80089EAC($4)     # indexed global
+lw  $2,$L13($2)           # switch jump table
+```
+
+The folding happens in maspsx, BELOW cc1, which cannot tell them apart and
+does not try. Through the pinned pipeline a dense 10-case switch comes out
+FOLDED (`lui $at` / `addu $at,$at,$v0` / `lw $v0,%lo(...)($at)` — three
+instructions) where retail has the UNFOLDED four. Reproducer, if you want to
+see it yourself rather than trust this paragraph — it is under a second:
+
+```c
+extern int sink(int);
+int probe(int sel) {
+    switch (sel) {   /* ten dense cases, each `return sink(N);` */
+    case 0: return sink(10);
+    /* ... cases 1..9 ... */
+    }
+    return -1;
+}
+```
+
+The lesson generalises past this grep: **a blocker's SCOPE is measured, not
+reasoned.** The two constructs differ in every way that is visible in the
+disassembly and in no way that matters to the tool doing the expanding.
+
 ## Carving new ground
 
 Uncarved code sits in monolithic top-level `asm/*.s` segments. List them

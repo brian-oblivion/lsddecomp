@@ -3,9 +3,16 @@
  *
  * Carved in round 10 because this block has the LOWEST toolchain-blocker
  * density of any uncarved segment: 1 of the 133 remaining functions, and
- * 0 of these 20. (func_8003C48C and func_8003C63C match the `addiu $at`
- * screening grep, but only via `%lo(jtbl_*)` -- an ordinary switch jump
- * table, not the indexed-global blocker. See docs/research/addiu-at-blocker.md.)
+ * 2 of these 20.
+ *
+ * Those 2 are func_8003C48C and func_8003C63C, and they are BLOCKED by
+ * `addiu_at` (docs/research/addiu-at-blocker.md). The carve comment here
+ * originally claimed the opposite -- that their `%lo(jtbl_*)` hits were
+ * ordinary switch jump tables and so not the indexed-global blocker. That
+ * was wrong and was retracted the same round: cc1 emits the same generic
+ * pseudo-op for a switch table as for an indexed global (`lw $2,$L13($2)`
+ * vs `lbu $2,D_x($4)`), and maspsx folds both identically. Do not re-derive
+ * this; see the note under "Open toolchain blockers" in CLAUDE.md.
  *
  * Shape: this is class-framework code. Objects carry their method table at
  * offset 0 (`lw $v1, 0x0($a0)` then `lw $v0, 0xNN($v1)` then `jalr`), so

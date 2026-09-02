@@ -574,3 +574,94 @@ grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/<unit>/<func>.s | grep -E '\b(mu
 ```
 
 A hit means retail did not take the nops and the pin will insert them.
+
+## Addendum (round 10): the blocker's SCOPE, measured
+
+**Dense `switch` jump tables are inside this blocker, not beside it.** This was
+already assumed in a couple of stub reports, but it had never been measured,
+and it is the assumption a careful reader is most likely to overturn — so here
+is the measurement, cheap enough to repeat.
+
+The reason it invites doubt: the two constructs share nothing that is visible
+in the disassembly. A jump-table dispatch loads a **code** address and jumps to
+it; an indexed global load produces a **data** value the code then uses. The
+symbol names differ too — `jtbl_*` against `D_*`. Reading the `.s`, they look
+like separate phenomena, and the natural conclusion is that the screening grep
+over-reports on the `jtbl_*` ones.
+
+It does not. cc1 emits the **same generic pseudo-op** for both and expresses no
+opinion about addressing:
+
+```
+indexed global:      lbu $2,D_80089EAC($4)
+switch jump table:   lw  $2,$L13($2)
+```
+
+The expansion happens in maspsx, *below* cc1, which cannot distinguish them and
+does not try. Through the pinned pipeline a dense ten-case switch comes out in
+the folded three-instruction form where retail has the unfolded four — the same
+one-instruction deficit, with the same non-local consequence for everything
+after it in the translation unit.
+
+Reproducer:
+
+```c
+extern int sink(int);
+int probe(int sel)
+{
+    switch (sel) {
+    case 0: return sink(10);
+    case 1: return sink(11);
+    case 2: return sink(12);
+    case 3: return sink(13);
+    case 4: return sink(14);
+    case 5: return sink(15);
+    case 6: return sink(16);
+    case 7: return sink(17);
+    case 8: return sink(18);
+    case 9: return sink(19);
+    }
+    return -1;
+}
+```
+
+Through the pipeline in CLAUDE.md's "Escalate, do not experiment" section:
+
+```
+lui   at, %hi(.rodata)
+addu  at, at, v0
+lw    v0, %lo(.rodata)(at)     <- folded; retail resolves the base first
+nop
+jr    v0
+```
+
+### What this changes
+
+- **Nothing about the escalation.** Same mechanism, same remedy question, same
+  operator call. The version bump is still not the remedy.
+- **The footprint is bigger than a `D_*`-only reading suggests**, and the
+  corpus census should be read with the raw grep: of 505 `addiu $at, $at, %lo`
+  sites, 30 are `jtbl_*`. All 505 count.
+- **Corroborating negative:** no matched C function in the project owns a dense
+  `switch` jump table. The matched `switch` statements that do exist are sparse
+  (e.g. `func_8003BC14`'s cases 5/7/8/0x12), which GCC 2.6.3 compiles to a
+  compare chain and which matches fine. That is consistent with dense switches
+  being unreachable under the pin, and it is the reason the gap went unnoticed.
+
+### How this was found, and the cheaper route
+
+Round 10's head found two `jtbl_*` hits while carving `code_2cc8c`, reasoned
+they were false positives, edited CLAUDE.md's screening grep to exclude them,
+audited the corpus and "recovered" three functions, and broadcast the
+correction to five live runners — one of which had already been handed two of
+the recovered functions as work. Then it ran the reproducer above, got the
+opposite result, and retracted all of it.
+
+The reproducer took under a second and was available from the first minute. The
+project rule it violated is already written down in CLAUDE.md: *never escalate
+a toolchain lead you have not tried and failed to reproduce in isolation.* The
+same rule applies in reverse — **never DE-escalate one either.** Narrowing a
+blocker's scope is a toolchain claim and needs the same reproducer as widening
+it, and it is the more dangerous direction: widening one costs attempts,
+narrowing one sends runners at functions that cannot match and reads, in the
+match reports left behind, exactly like ordinary stalls.
