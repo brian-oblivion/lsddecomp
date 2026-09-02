@@ -18,6 +18,8 @@ typedef struct HistoryEntry_3ac78 HistoryEntry_3ac78;
 typedef struct HistoryBlock_3ac78 HistoryBlock_3ac78;
 typedef struct UnkPtr68Obj_3ac78 UnkPtr68Obj_3ac78;
 typedef struct UnkArgObj_3ac78 UnkArgObj_3ac78;
+typedef struct GenericMethodsHeader GenericMethodsHeader;
+typedef struct GenericObject GenericObject;
 
 /*
  * One entry of Class866E8::unkEC[7] (func_8004ABD0). 0x1C bytes; only the
@@ -29,11 +31,13 @@ typedef struct UnkArgObj_3ac78 UnkArgObj_3ac78;
  * member, which (unlike a pointer) needs a COMPLETE type.
  */
 struct UnkSlotEntry_3ac78 {
-    u16 unk0;                        /* zeroed at the top of each loop pass */
+    u16 unk0;                        /* zeroed at the top of each loop pass (func_8004ABD0) */
     u8 pad2[0x4 - 0x2];
     UnkSlotChildObj_3ac78 *unk4;
     UnkSlotListObj_3ac78 *unk8;
-    u8 padC[0x1C - 0xC];
+    GenericObject *unkC;             /* func_8004A7C0: refreshed (discarded) through ->methods->unk04 when non-NULL */
+    GenericObject **unk10;           /* func_8004A7C0: array of GenericObject*, scanned up to +0x668 bytes */
+    u8 pad14[0x1C - 0x14];
 };
 
 /*
@@ -100,7 +104,9 @@ struct Class866E8Methods {
     /* +0x004 */ void *unk04;                                                   /* BasicClass__func_17eb0 */
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* func_8004A534; called by func_8004A4C8 */
     /* +0x00C */ void *dtor;                                                    /* func_8004A7C0; not dispatched by this round's functions */
-    /* +0x010 */ u8 pad010[0x030 - 0x010];
+    /* +0x010 */ u8 pad010[0x014 - 0x010];
+    /* +0x014 */ void (*slot14)(Class866E8 *self, void *arg1);                  /* func_8001CCB4; called by func_8004A7C0 */
+    /* +0x018 */ u8 pad018[0x030 - 0x018];
     /* +0x030 */ void (*slot30)(Class866E8 *self, s32 arg1);                    /* BasicClass__func_182cc; called by func_8004AA6C */
     /* +0x034 */ u8 pad034[0x038 - 0x034];
     /* +0x038 */ void (*slot38)(Class866E8 *self);                              /* func_8004A984; called by func_8004B2D4 */
@@ -221,14 +227,14 @@ struct UnkArgObj_3ac78 {
  * stores the (pointer) return value back where the object came from,
  * suggesting a release-and-replace pattern, but that is not confirmed.
  */
-typedef struct {
+struct GenericMethodsHeader {
     s32 header;
     void *(*unk04)(void *self);
-} GenericMethodsHeader;
+};
 
-typedef struct {
+struct GenericObject {
     GenericMethodsHeader *methods;
-} GenericObject;
+};
 
 /*
  * Opaque list/args object passed as func_8004AA6C's arg2 (stashed at
@@ -267,7 +273,9 @@ struct UnkChildObj_3ac78 {
  * as its own type rather than reusing that one.
  */
 struct UnkSlotChildMethods_3ac78 {
-    u8 pad0[0x74];
+    u8 pad0[0x4];
+    void *(*unk04)(UnkSlotChildObj_3ac78 *self);  /* func_8004A7C0: same shared BasicClass base slot as GenericMethodsHeader::unk04 */
+    u8 pad8[0x74 - 0x8];
     void (*slot74)(UnkSlotChildObj_3ac78 *self);
     u8 pad78[0x84 - 0x78];
     void (*slot84)(UnkSlotChildObj_3ac78 *self);
@@ -284,7 +292,8 @@ struct UnkSlotChildObj_3ac78 {
  * func_8004AA6C's arg2->unk14) is typed.
  */
 struct UnkSlotListObj_3ac78 {
-    u8 pad0[0x2C];
+    GenericMethodsHeader *methods;   /* func_8004A7C0: refreshed via ->methods->unk04(self), stored back into the owning entry's unk8 */
+    u8 pad4[0x2C - 0x4];
     GenericObject *unk2C;
 };
 
