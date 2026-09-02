@@ -395,9 +395,15 @@ struct Class86AA0Methods {
 
 struct Class86AA0 {
     Class86AA0Methods *methods;                /* +0x000 */
+    u8 pad004[0x034 - 0x004];
+    u16 unk34;                                 /* +0x034, func_8004D3DC: zeroed in the ctor */
+    u16 unk36;                                 /* +0x036, func_8004D3DC: zeroed in the ctor */
+    s32 unk38;                                 /* +0x038, func_8004D3DC: zeroed in the ctor */
 };
 
 extern Class86AA0Methods D_80086AA0;
 extern Class86AA0Methods *func_8004D508(void);
+
+extern BaseCtorTable_3bb8c_c *func_8001E57C(void *self);
 
 #endif

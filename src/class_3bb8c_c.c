@@ -54,7 +54,14 @@ Class86AA0 *func_8004D38C(void)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D3DC);
+void func_8004D3DC(Class86AA0 *self)
+{
+    func_8001E57C(self)->ctor(self);
+    self->methods = func_8004D508();
+    self->unk34 = 0;
+    self->unk36 = 0;
+    self->unk38 = 0;
+}
 
 void func_8004D42C(void) {
 }
