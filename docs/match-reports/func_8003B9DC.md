@@ -1,0 +1,51 @@
+# func_8003B9DC
+
+**Unit:** code_2c054 · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
+
+## What it does
+
+Two dispatches in a row, both discarding/forwarding through `self`, no other
+side effect. First, a genuine virtual call through `self->unkB4`'s own
+1-slot vtable (a small object type distinct from `StreamTaskObj`, discovered
+here for the first time in this unit); second, the same
+`func_8003DFBC()`-mediated delegation to the sibling class `D_8006E730`
+(`LoaderTaskMethods`) used by `func_8003BD74`/`func_8003BDAC`, this time
+slot `+0x00C`. Occupies `D_8006E5F8` slot `+0x00C` itself.
+
+## Derivation
+
+```
+lw   $a0, 0xB4($s0)          ; a0 = self->unkB4
+lw   $v0, 0x0($a0)            ; v0 = a0->methods
+lw   $v0, 0x4($v0)             ; v0 = methods->slot04
+jalr $v0                          ; a0 (still the sub-object) unchanged
+jal  func_8003DFBC
+lw   $v0, 0xC($v0)                ; v0 = table->slot0C
+jalr $v0
+ addu $a0, $s0, zero               ; a0 = self, explicitly reloaded
+...epilogue
+```
+
+```c
+void func_8003B9DC(StreamTaskObj *self) {
+    self->unkB4->methods->slot04(self->unkB4);
+    func_8003DFBC()->slot0C(self);
+}
+```
+
+Matched first attempt. The first call's argument register (`$a0`) is never
+reloaded between the two loads and the `jalr` -- confirming the call target
+is `self->unkB4` itself (a virtual self-call on the sub-object), not `self`.
+
+## New struct/header knowledge
+
+Added `include/code_2c054.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
+(a new, previously-unseen 1-slot-vtable object reached through
+`StreamTaskObj::unkB4`, `+0x0B4`) and `TaskCoreMethods::slot0C` (this unit's
+local view of `D_8006E730`, see `func_8003BD74`'s report).
+
+## Proposed learning
+
+Same open return-type question as `func_8003BD74`/`func_8003BDAC` for the
+tail call through `slot0C` -- typed `void` on the same sibling-slot-
+convention basis, unconfirmed by any found caller.

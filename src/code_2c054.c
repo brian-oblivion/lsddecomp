@@ -1,10 +1,14 @@
 #include "common.h"
+#include "code_2c054.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B854);
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B8E4);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003B9DC);
+void func_8003B9DC(StreamTaskObj *self) {
+    self->unkB4->methods->slot04(self->unkB4);
+    func_8003DFBC()->slot0C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BA38);
 
