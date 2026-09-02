@@ -373,6 +373,11 @@ extern struct RelativePos D_8008ABD0;
 extern struct RelativePos D_8008ABC0;
 
 /* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+   argument by func_8005AC24 -- same call shape as D_8008ABC0/D_8008ABD0
+   above, just a different constant (round 2026-09-02). */
+extern struct RelativePos D_8008ABC8;
+
+/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
    argument by func_8005AE40 -- same call shape as D_8008ABD0/D_8008ABC0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABD8;
