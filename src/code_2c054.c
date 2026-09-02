@@ -201,7 +201,29 @@ s32 func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
     return self->unk38;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003C238);
+void func_8003C238(StreamTaskObj *self) {
+    TaskCoreObj *unk18;
+    TaskCoreObjMethods *core;
+
+    unk18 = self->unk18;
+    core = unk18->methods;
+    self->methods->slotE0(self, self->unk14);
+    self->unk78->methods->slot4C(self->unk78, self->unk14, 0);
+    if (self->unk88 != 0) {
+        self->methods->slotE4(self, &self->unk90);
+        self->unk78->methods->slotB8(self->unk78, 1, &self->unk90);
+    }
+    if (self->unk74 == 0) {
+        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, D_8006E854);
+    }
+    self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, 0);
+    core->slot48(unk18, self->unk28);
+    core->slot4C(unk18, self->unk2C);
+    core->slot50(unk18, self->unk30);
+    core->slot70(unk18, self->unk14, D_8006E86C, D_8006E86C, 0);
+    core->slot8C(unk18);
+    self->unk38 = 0;
+}
 
 void func_8003C3D0(StreamTaskObj *self) {
     TaskCoreObj *obj = self->unk18;
