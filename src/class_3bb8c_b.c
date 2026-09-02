@@ -29,7 +29,9 @@ void *func_8004CFA8(Obj866E8 *self) {
     return &self->unk1CC;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CFB0);
+void func_8004CFB0(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
+    self->unk1DC = arg1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CFB8);
 

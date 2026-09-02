@@ -63,6 +63,21 @@ typedef struct Elem {
     u8 pad08[0x1C - 0x08];
 } Elem;
 
+/*
+ * Opaque target of Obj866E8::unk1DC (func_8004CFB0 stores it raw;
+ * func_8004CD38 -- a plain, non-virtual helper, NOT a vtable slot, see
+ * tools/classtable.py D_800866E8 -- dereferences it as a min/max bounding
+ * box against an [x,y] byte pair). Field meaning inferred from the four
+ * comparisons in func_8004CD38: `unk0`/`unk2` gate the LOW side, `unk4`/
+ * `unk8` the HIGH side, of the point's two axes respectively.
+ */
+typedef struct Bounds866E8_3bb8c_b {
+    s16 unk0;                      /* +0x000, func_8004CD38: point[0] < this -> out of range */
+    s16 unk2;                      /* +0x002, func_8004CD38: point[1] < this -> out of range */
+    s32 unk4;                      /* +0x004, func_8004CD38: this < point[0] -> out of range */
+    s32 unk8;                      /* +0x008, func_8004CD38: this < point[1] -> out of range (also the function's own return value) */
+} Bounds866E8_3bb8c_b;
+
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x54 - 0x04];
@@ -75,6 +90,8 @@ struct Obj866E8 {
     Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434 */
     u8 pad1B0[0x1CC - 0x1B0];
     s32 unk1CC;                    /* +0x1CC, func_8004CFA8 (address-of only, real type unknown) */
+    u8 pad1D0[0x1DC - 0x1D0];
+    Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
 };
 
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
