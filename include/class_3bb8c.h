@@ -538,10 +538,15 @@ extern Class86AA0Methods *func_8004D508(void);
  * the argument setup the caller emits and breaks the match. See
  * docs/match-reports/func_8004D3DC.md.
  *
- * Return type: round 9 split this OFF `BaseCtorTable_3bb8c_c` (func_8003F24C's
- * own return type) into its own `BaseCtorTableB_3bb8c_c`, because
- * func_8004D47C (this unit, round 9) reached +0x09C on THIS getter's table
- * with a 3-argument call (self, arg1, arg2) -- a genuine arity conflict with
+ * Return type: round 10 split this OFF `BaseCtorTable_3bb8c_c` (func_8003F24C's
+ * own return type) into its own `BaseCtorTableB_3bb8c_c`. (The split is round
+ * 10's -- round 9 settled only the ARITY question above. The comment here
+ * originally credited round 9 with both, which would have made this a settled
+ * precedent rather than a fresh judgement open to challenge.)
+ *
+ * The reason for the split: func_8004D47C (this unit) reaches +0x09C on THIS
+ * getter's table with a 3-argument call (self, arg1, arg2) -- a genuine arity
+ * conflict with
  * `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established from
  * func_8004D300 via the OTHER getter, func_8003F24C). Same-offset arity
  * conflict means different table/different class, per this project's
@@ -549,7 +554,19 @@ extern Class86AA0Methods *func_8004D508(void);
  * include/code_2c054.h). Purely a type-name change here -- func_8004D3DC's
  * own already-matched call (`func_8001E57C(self)->ctor(self)`) only touches
  * the +0x008 `ctor` slot, whose layout is identical in both names, so this
- * renaming changes no bytes. */
+ * renaming changes no bytes.
+ *
+ * Head-verified round 10 by measuring both callees rather than reasoning from
+ * the arity conflict: func_8001E57C returns &D_8006B5CC (asm/code_d294.s) and
+ * func_8003F24C returns &D_8006E8E4 (asm/code_2cc8c_b.s). Different globals,
+ * so genuinely different tables -- one type could not have carried both, and
+ * the split would have been right even without the arity conflict that
+ * prompted it.
+ *
+ * NOTE: func_8004D47C itself is STALLED, not matched, so the 3-argument
+ * `slot9C` below is read off its disassembly rather than proven by a byte
+ * match. The offset and the argument count are observed; the parameter TYPES
+ * are inferred. */
 typedef struct BaseCtorTableB_3bb8c_c BaseCtorTableB_3bb8c_c;
 struct BaseCtorTableB_3bb8c_c {
     u8 pad0[0x008];
