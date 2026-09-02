@@ -486,7 +486,27 @@ bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LoadNextFlashback);
+bool DreamSys__LoadNextFlashback(DreamSys *this, bool unknown)
+{
+	s32 idx;
+	FlashbackEntry *entry;
+
+	idx = this->currentFlashbackIndex;
+	if (idx >= this->amountFlashbacksAvailable) {
+		goto fail;
+	}
+	this->unknwon_int_0x44 = 0xE;
+	entry = &this->storedFlasbacks[idx];
+	if (!unknown) {
+		this->vt->slot30(this, 0xE);
+	}
+	this->currentDay = entry->day;
+	this->currentStage = entry->stageID;
+	this->linkCoordinates = entry->position;
+	return true;
+fail:
+	return false;
+}
 
 bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
