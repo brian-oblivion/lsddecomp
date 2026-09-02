@@ -95,14 +95,39 @@ struct Obj4C {
     Obj4CMethods *methods;
 };
 
+/* Opaque view of whatever object Obj865C8::unk0C points to (used only by
+ * func_80049AC0, which reads its own +0x004 field -- no vtable dispatch
+ * through this one, so no methods pointer is declared). */
+typedef struct Obj0C {
+    u8 pad00[0x04];
+    s32 unk4;
+} Obj0C;
+
+/* Opaque view of whatever object Obj865C8::unk38 points to (used only by
+ * func_80049AC0): same "vtable at offset 0, only the reached slots named"
+ * policy as SubObjA/SubObjB/Obj4C above. */
+typedef struct SubObjD SubObjD;
+typedef struct SubObjDMethods {
+    u8 pad00[0x14];
+    void (*slot14)(SubObjD *self, s32 arg1);
+    u8 pad18[0x110 - 0x18];
+    void (*slot110)(SubObjD *self, s32 arg1);
+} SubObjDMethods;
+struct SubObjD {
+    SubObjDMethods *methods;
+};
+
 /* Object size unconfirmed (this unit never allocates one of these itself --
  * func_8004A130 allocates the SIBLING class below instead). Field offsets
  * are only the ones this round's functions touch. */
 struct Obj865C8 {
     Class865C8Methods *methods;   /* +0x000 */
     u8 pad04[0x0C - 0x04];
-    s32 unk0C;                    /* +0x00C, func_80049E20 (2nd arg to func_8003E5C8()->slot44) */
-    u8 pad10[0x18 - 0x10];
+    Obj0C *unk0C;                 /* +0x00C, func_80049AC0 dereferences (->unk4); passed
+                                      through as a plain register value to
+                                      func_8003E5C8()->slot44's 2nd arg by func_80049E20 */
+    s32 unk10;                    /* +0x010, func_80049AC0 (2nd arg to a slot14 call) */
+    u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, func_80049C50 */
     s32 unk1C;                    /* +0x01C, func_8004A364 (compared against unk2C) */
     u8 pad20[0x28 - 0x20];
@@ -110,7 +135,9 @@ struct Obj865C8 {
     s32 unk2C;                    /* +0x02C, func_8004A458 */
     s32 unk30;                    /* +0x030, func_8004A228 (guard) */
     SubObjB *subB;                /* +0x034, func_8004A228 */
-    s32 unk38;                    /* +0x038, func_80049E20 (3rd arg to func_8003E5C8()->slot44) */
+    SubObjD *unk38;                /* +0x038, func_80049AC0 dereferences (->methods); passed
+                                       through as a plain register value to
+                                       func_8003E5C8()->slot44's 3rd arg by func_80049E20 */
     s32 unk3C;                    /* +0x03C, func_80049A14 */
     s32 unk40;                    /* +0x040, func_80049E20 (2nd arg to func_80052B70) */
     s32 unk44;                    /* +0x044, func_80049E20 (3rd arg to func_80052B70) */
@@ -173,6 +200,11 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 typedef struct Class86668Methods {
     u8 pad00[0x08];
     void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
+    u8 pad0C[0x48 - 0x0C];
+    /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
+     * func_8003E5C8()->slot48(self). Called by func_80049AC0 as
+     * func_8004A4B8()->slot48(self). */
+    void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
 } Class86668Methods;
 
 /* A plain accessor with no parameters, returning &D_80086668. Defined in the
