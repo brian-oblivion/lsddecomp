@@ -52,7 +52,13 @@ void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058F18);
+void func_80058F18(DreamSys *this, void *arg1, s32 arg2)
+{
+	func_80057C84()->slot0xDC(this, arg1, arg2);
+	if ((*(s32 *)(*(void **)arg1) & 0xFFFFF) == 0x1F234) {
+		this->vt->InstanceEffectsOnJournal(this, arg1, arg2);
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__WallLink);
 
@@ -450,7 +456,24 @@ bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LoadNextFlashback);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A700);
+bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+	s32 local[4];
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0)
+		return false;
+	func_8001E6F8(this, local);
+	if (!func_8005BD3C(&this->unk_0x888, &this->unk_0x884, local))
+		return false;
+	if (this->unk_0xA8 == 0)
+		return false;
+	ExecuteLink(this, result, 0xF, 0);
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A7A0);
 
