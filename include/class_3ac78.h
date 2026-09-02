@@ -8,6 +8,8 @@ typedef struct Class866E8Methods Class866E8Methods;
 typedef struct Class86668 Class86668;
 typedef struct Class86668Methods Class86668Methods;
 typedef struct UnkListObj_3ac78 UnkListObj_3ac78;
+typedef struct UnkChildMethods_3ac78 UnkChildMethods_3ac78;
+typedef struct UnkChildObj_3ac78 UnkChildObj_3ac78;
 
 /*
  * Class866E8 -- constructed by func_8004A4C8 (New_Class866E8: allocates
@@ -35,7 +37,7 @@ struct Class866E8Methods {
     /* +0x044 */ u8 pad044[0x080 - 0x044];
     /* +0x080 */ void (*slot80)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* func_8001D4AC; called by func_8004A478 through Class86668::unk34 */
     /* +0x084 */ u8 pad084[0x0B8 - 0x084];
-    /* +0x0B8 */ void *(*slotB8)(Class866E8 *self, s32 index);                  /* func_80042828; called by func_8004ACF8, returns an opaque child object */
+    /* +0x0B8 */ UnkChildObj_3ac78 *(*slotB8)(Class866E8 *self, s32 index);      /* func_80042828; called by func_8004ACF8 */
     /* +0x0BC */ u8 pad0BC[0x0D0 - 0x0BC];
     /* +0x0D0 */ void (*slotD0)(Class866E8 *self, void *list, s32 count);        /* func_8004ADD8; called by func_8004AB88 */
     /* +0x0D4 */ u8 pad0D4[0x0F4 - 0x0D4];
@@ -147,6 +149,21 @@ typedef struct {
 struct UnkListObj_3ac78 {
     u8 pad0[0x14];
     GenericObject *unk14;   /* func_8004AA6C: replaced via ->methods->unk04(unk14) when non-NULL */
+};
+
+/*
+ * Opaque child object returned by Class866E8Methods::slotB8. Class unknown;
+ * only the two adjacent method slots func_8004ACF8 dispatches through are
+ * typed.
+ */
+struct UnkChildMethods_3ac78 {
+    u8 pad0[0x44];
+    void (*slot44)(UnkChildObj_3ac78 *self, s32 arg1, s32 arg2);
+    void (*slot48)(UnkChildObj_3ac78 *self, s32 arg1, s32 arg2);
+};
+
+struct UnkChildObj_3ac78 {
+    UnkChildMethods_3ac78 *methods;
 };
 
 #endif

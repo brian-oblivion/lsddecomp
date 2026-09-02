@@ -78,7 +78,19 @@ void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ACF8);
+void func_8004ACF8(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
+{
+    s32 i;
+    UnkChildObj_3ac78 *child;
+
+    for (i = 0; i < count; i++) {
+        child = self->methods->slotB8(self, i);
+        child->methods->slot44(child, 1, arg3);
+        arg3 += 3;
+        child->methods->slot48(child, 1, arg2);
+        arg2 += 6;
+    }
+}
 
 void func_8004ADC4(Class866E8 *self, s32 arg1, s32 arg2)
 {
