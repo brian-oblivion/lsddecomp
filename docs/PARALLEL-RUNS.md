@@ -148,17 +148,39 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 4. **Merge** sequentially, in main: `git merge --no-ff runner/<name>` →
    `./build-and-verify.sh` → next. Disjoint units make conflicts rare.
 
-4b. **Check the preconditions IMMEDIATELY before the `--force`, not once at the
-   start of consolidation — and check the branch one twice, with a gap.**
-   "Has REPORTED" does NOT imply "has stopped writing". Round 6 (2026-09-02) had
-   all five runners deliver final summaries, merged all five, and then watched
-   new commits keep landing on the runner branches — five further byte-exact
-   matches, one of them on a *different* runner's unit whose own worktree had
-   already been removed. `main..runner/<name>` read empty, then non-empty, then
-   empty again. Two worktrees still held uncommitted files at the end of the
-   round, so teardown was deferred rather than forced, and the worktrees were
-   left standing for the operator. A stale precondition check plus `--force` is
-   how a finished round becomes a lost one.
+4a. **BEFORE ANYTHING ELSE, establish that you are the only head in this
+   checkout.** Rounds 6 and 7 (2026-09-02) ran CONCURRENTLY: the operator
+   started round 7's head while round 6's head was still live, and both worked
+   the same `main`. Nothing was corrupted — every commit was real, no protected
+   file was touched, and `main` byte-verified throughout — but each head
+   misread the other's actions as its own runners misbehaving, and both wrote
+   that misreading down as fact. Round 6's PROGRESS entry accused its runner
+   alpha of a protocol violation for two commits round 7's head had made, and
+   filed round 7's runner output as "the runners kept working after reporting".
+   Round 7's head, symmetrically, found commits on `main` it had not made and
+   had to rule out a rogue runner before it could rule in a second head.
+
+   **The mechanism is RECYCLED NAMES.** Worktrees and branches are `runner/
+   alpha`…`runner/echo` every round. A head that tears down and re-provisions
+   those names hands the other head a branch with the same name, a different
+   round's work on it, and no signal that it changed underneath. `git merge
+   runner/charlie` then merges a stranger's commits, verifies green (they are
+   real matches), and reads as completely normal.
+
+   Cheap checks, in order:
+
+   ```sh
+   git log --oneline -5                     # commits you do not remember making
+   git reflog -15                           # merges/commits you did not perform
+   git worktree list                        # worktrees you did not provision
+   ```
+
+   A commit in `git log` that is not in your own record is the tell, and
+   authorship does NOT distinguish it — every agent commits as the operator.
+   If you find one: **do not delete or re-create any worktree or branch**
+   (that is what caused the collision), let live runners finish and commit,
+   merge what is genuinely yours, and escalate to the operator. Recycling a
+   name is only safe when you know no other head is holding it.
 
 4b. **Teardown has four preconditions.** Check all four before
    `git worktree remove --force` — which, because generated files always make
@@ -169,6 +191,23 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    - `git log --oneline main..runner/<name>` is EMPTY for every branch.
      (`git branch -d` refusing to delete is a backstop, not a check.)
    - The agent-ID-to-runner mapping is right for any wrap-up messages.
+
+   **Check them immediately before the `--force`, not once at the start of
+   consolidation.** Cheap, and sound regardless of why a branch moved. Round 6
+   read a moving branch as "has REPORTED does not imply has stopped writing";
+   the branches were in fact advancing because another head's runners were
+   committing to the same recycled names (§4a). A runner writing on past its
+   own summary has not actually been observed here. Re-check because the tree
+   can move, not because you know which agent moves it.
+
+   **And do not skip teardown.** Round 6 deferred it for good reasons and left
+   five worktrees standing; round 7 inherited them, and one held THREE
+   uncommitted byte-exact matches with their reports (`func_8005A7A0`,
+   `func_8005B904`, `func_8005B990`) that no summary had ever mentioned. They
+   survived only because nobody ran `--force` on that worktree. Deferring is
+   the right call when agents may still be live — but it hands the next head a
+   §4c salvage it has no way to anticipate, so say so explicitly in PROGRESS,
+   naming the worktrees.
 
 4c. **When a runner dies to INFRASTRUCTURE rather than its own stop rule,
    salvage its uncommitted body before teardown.** The runner cannot file its

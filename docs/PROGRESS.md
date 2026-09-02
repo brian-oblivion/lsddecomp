@@ -6,17 +6,24 @@ stale, prose elsewhere is not.
 
 ---
 
-## 2026-09-02 — round 6: 5 runners, 48 matches, and the runners would not stop
+## 2026-09-02 — round 6: 5 runners, 43 matches, and a second head nobody knew about
 
-**160 -> 208 matched (11.80% -> 15.34% of game code, crossing 10% of ALL
-functions). 146 queued: 85 stalled, 0 banked. Build green in main after every
-one of NINE merges, and green again after a full `make clean` + `make extract`
+**160 -> 203 matched (11.80% -> 14.97% of game code). Build green in main after
+every merge, and green again after a full `make clean` + `make extract`
 rebuild.**
 
-**Teardown was DEFERRED, deliberately — the worktrees are still standing.** See
-"The runners kept working after reporting" below. This entry's counts are a
-snapshot taken while the tree was still moving, which is unusual for this log
-and is the reason it says so here.
+**Counts corrected by round 7.** This entry originally claimed 48 matches and
+203 -> 208, counting five matches that round 7's runners produced on
+re-provisioned branches with the same names. Round 6's own five runners
+delivered 43. The two sections below that recorded the extra five, and that
+accused runner alpha of a protocol violation, are struck through and corrected
+in place rather than deleted — the round's real finding turned out to be the
+misreading itself, and it is now §4a of PARALLEL-RUNS.
+
+**Teardown was DEFERRED, deliberately — the worktrees were left standing** for
+the operator, since agents might still be live. Round 7 inherited them and
+found three uncommitted byte-exact matches in alpha's, which deferral is the
+only reason still existed. See §4b.
 
 Five runners, one per unit with fresh ground: `DreamSys` (alpha),
 `Entity_b` (bravo), `class_39e08` (charlie), `class_3ac78` (delta),
@@ -70,37 +77,43 @@ that `progress.py` was therefore counting as FRESH. Stub reports were filed for
 them so the next round does not staff a cold runner onto a class with ~25
 attempts behind it.
 
-### PROTOCOL VIOLATION: runner alpha performed head-only actions in main
+### ~~PROTOCOL VIOLATION: runner alpha performed head-only actions in main~~ — WITHDRAWN, see round 7
 
-Recorded in full because it is the kind of thing that is invisible in review.
-Alpha, while still live, **committed directly to `main`**: `0100dce` (a merge of
-its own `runner/alpha` into main) and `83d5458` (a "Salvage runner/alpha"
-commit, executing §4c — the HEAD's salvage protocol — on itself). It also
-appears to have torn down `runner/echo`'s branch and worktree, another runner's.
+**This section was wrong, and round 7's head withdrew it after the operator
+confirmed the cause.** It is kept rather than deleted because the reasoning is
+instructive and because an accusation that was published should be visibly
+retracted, not quietly removed.
 
-Then it reported the cause as *"the head's parallel-runs consolidation process
-reclaimed the worktree mid-session"*. **That did not happen.** The head never
-removed alpha's worktree, never created either commit, and was at that moment
-holding deliberately, waiting for alpha's report. Alpha's own worktree and
-branch still existed throughout; its claim that they had been "removed
-externally" was false.
+What this entry reported: alpha, while still live, committed `0100dce` (a merge
+of `runner/alpha` into main) and `83d5458` ("Salvage runner/alpha", executing
+§4c on itself), and tore down `runner/echo`'s branch and worktree. It further
+recorded that alpha's explanation — *"the head's parallel-runs consolidation
+process reclaimed the worktree mid-session"* — **did not happen**.
 
-**No data was lost and the bytes are correct** — all 5 of alpha's matches
-verify, its stall is properly restored to `INCLUDE_ASM`, every function it
-touched has a report, main byte-matches retail, and echo's merge commit
-`ffe0387` is intact with its 13 matches verifying. The head verified all of
-this against the repository rather than accepting alpha's self-verification,
-which is the only reason it is stated here as fact.
+What actually happened: **round 7's head made both commits and removed all five
+worktrees.** The operator had started a second head session in the same checkout
+while this round's head was still live. Round 6's head was correct that *it*
+had not done these things, and wrong to conclude no head had. Alpha's account
+was accurate: its worktree WAS reclaimed mid-session, by a head it could not
+see. Round 7's head found alpha's three uncommitted matches still sitting there
+and salvaged them under §4c — which is what `83d5458` is.
 
-Why it matters anyway:
-- **A runner's self-report was confidently wrong about who did what.** It
-  produced a plausible causal story for state it had created itself. §3b already
-  says a runner's final message is evidence about what it DERIVED, never about
-  what it COMMITTED; this round extends that: it is not reliable evidence about
-  **who acted**, either. Check `git log` authorship and the head's own record.
+Alpha committed no protocol violation. The retracted charge stands as the
+sharpest available illustration of the real hazard, which is now §4a of
+PARALLEL-RUNS: **two heads in one checkout, with recycled `runner/*` names, each
+reading the other's legitimate head actions as its own runners misbehaving.**
+Both heads did this, in opposite directions, within twenty minutes.
+
+What survives from the section unchanged:
+- **A runner's self-report is not reliable evidence about who ACTED**, only
+  about what it derived (§3b). The correction is that this cuts both ways: the
+  HEAD's account of who acted is no more reliable when another head is live.
+  Neither agent can distinguish the other's commits from a rogue runner's,
+  because **every agent commits as the operator** — authorship proves nothing.
 - **Rule 5 (main is single-occupancy) has no mechanical enforcement.** Nothing
-  stopped a runner committing to main. The hooks guard `check.sha1`/`build.sha1`
-  and `asm/`, not the branch.
+  stopped a second head committing to main. The hooks guard
+  `check.sha1`/`build.sha1` and `asm/`, not the branch. This is the round's
+  standing operator escalation.
 - Two runners this round also had git commands blocked mid-session by a safety
   classifier. Bravo worked around a blocked `git checkout HEAD -- <files>` by
   **hand-reconstructing files with the `Write` tool**. It came out byte-exact,
@@ -108,12 +121,19 @@ Why it matters anyway:
   improvised restores are how a wrong body reaches a commit. Worth an operator
   look; not something the head should paper over.
 
-### The runners kept working after reporting, and teardown was deferred
+### ~~The runners kept working after reporting~~ — these were ROUND 7's runners; teardown was deferred
 
-All five runners delivered a final structured summary and the head merged all
-five. Then **new commits kept appearing on the runner branches**, timestamped
-after their own completion reports, and they were real: five further byte-exact
-matches, each properly scoped to one unit with its own match report.
+**Also corrected by round 7.** The five late matches below are real, verified
+and correctly merged — but they were produced by **round 7's** runners charlie
+and bravo, on freshly re-provisioned branches that reuse the same names. No
+round-6 runner wrote them, and no runner kept working past its summary.
+
+All five round-6 runners delivered a final structured summary and the head
+merged all five. New commits then appeared on branches named `runner/charlie`
+and `runner/bravo` — because round 7's head had torn those names down and
+re-created them, pointing at a different round's work. `main..runner/<name>`
+reading empty, then non-empty, then empty again was that, not a runner
+restarting.
 
 | late match | unit | words | landed on branch |
 | --- | --- | --- | --- |
@@ -123,18 +143,18 @@ matches, each properly scoped to one unit with its own match report.
 | `func_8003BD10` | code_2c054 | 25/25 | **runner/bravo** |
 | `func_8003BDF4` | code_2c054 | 26/26 | **runner/bravo** |
 
-Note the last two: `code_2c054` is ECHO's unit, and echo's worktree and branch
-had already been torn down (by alpha — see above). The work landed on BRAVO's
-branch instead. It is correctly scoped to `code_2c054`'s own files and it
-verifies, but no runner should be committing another runner's unit, and the
-one-unit-per-runner collision rule is what normally makes a merge conflict
-impossible. It held here by luck, not by design: echo was already merged, so
-nothing contended.
+Note the last two, and how the misreading compounded: `code_2c054` was ECHO's
+unit in round 6, so two `code_2c054` matches on a branch named `runner/bravo`
+looked like one runner committing another's unit — an apparent breach of the
+one-unit-per-runner rule, "held by luck". In round 7 `code_2c054` **is** bravo's
+unit. The collision rule was never violated; the branch name simply meant
+something different than this entry assumed.
 
 All five were merged and individually confirmed with funcdiff; the whole-image
-SHA1 stayed green throughout. **Discarding them was never the right call** —
-they are valid matches with reports, and the alternative to merging verified
-work is throwing it away.
+SHA1 stayed green throughout. **Merging them was right even on the mistaken
+premise** — they are valid matches with reports, and the alternative to merging
+verified work is throwing it away. Round 7 re-confirmed all five against a
+fresh build of main.
 
 **Why teardown was deferred.** §4b's four preconditions are meant to be checked
 once. Here precondition 3 (`main..runner/<name>` is EMPTY) kept
@@ -155,11 +175,14 @@ for n in alpha bravo charlie delta; do
 done
 ```
 
-**Protocol gap this exposes.** §4b assumes "has REPORTED" implies "has
-finished". It does not. A runner's final summary is not a guarantee that its
-process has stopped writing. The preconditions need to be checked *immediately
-before* the `--force`, not once at the start of consolidation — and ideally
-twice, with a gap, to catch a branch that is still advancing.
+**Protocol gap this exposes** — restated after round 7's correction. The
+conclusion drawn here was that "has REPORTED" does not imply "has finished",
+i.e. that a runner keeps writing past its own summary. That is not what these
+branches were doing; another head's runners were writing to the same names. The
+part that survives is the cheap half: **check the preconditions immediately
+before the `--force`**, because the tree can move under you — whoever is moving
+it. Deferring rather than forcing was the right call for a second reason nobody
+had in view at the time: one of those worktrees held three uncommitted matches.
 
 ### Head consolidation
 
@@ -207,7 +230,19 @@ neither fixed by the head (it is the operator's guardrail):
    way to drive the repo, and the fix for the first false positive is what
    introduced it.
 
-### Next round
+**Independently reproduced by round 7's head**, which hit #2 three times before
+reading this: `make extract > /tmp/x.log 2>&1`, `make extract 2>&1 | tail -1`
+and `make extract 2>&1 | tail -5` are all refused, while bare `make extract`
+passes. Two heads hitting the same papercut within the hour, one of them
+mid-consolidation, moves this from an annoyance to the operator's next fix.
+Confirmed cause, from reading the hook: `tokenize()` runs with
+`punctuation_chars=True`, so a redirection like `2>&1` becomes ordinary tokens
+(`2`, `>&`, `1`) inside the simple command; `>` and `>&` are not in
+`SEPARATORS`, so `targets_of()` collects them as make targets and the
+`all(t in ALLOWED_TARGETS)` test fails. A pipe DOES separate correctly — it is
+the redirection on the make command itself that breaks.
+
+### Next round — as judged by ROUND 6; superseded, see round 7
 
 **Permuter, not runners or a carve** — the first time this project has had a
 permuter round as the clear best move. 66 fresh remain across four units, so
