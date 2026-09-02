@@ -27,7 +27,13 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA10);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA6C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AB24);
+void func_8004AB24(Class866E8 *self)
+{
+    if (self->unk70) {
+        self->methods->slotF4(self);
+        self->methods->slot13C(self);
+    }
+}
 
 void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
 {

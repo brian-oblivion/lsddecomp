@@ -58,7 +58,8 @@ struct Class866E8 {
     /* +0x060 */ s32 unk60;                  /* func_8004ADC4 arg1 */
     /* +0x064 */ s32 unk64;                  /* func_8004ADC4 arg2 */
     /* +0x068 */ s32 unk68;                  /* func_8004B344 arg1 */
-    /* +0x06C */ u8 pad06C[0x074 - 0x06C];
+    /* +0x06C */ u8 pad06C[0x070 - 0x06C];
+    /* +0x070 */ s32 unk70;                  /* func_8004AB24: gates slotF4/slot13C dispatch */
     /* +0x074 */ s32 unk74;                  /* func_8004B32C arg1, stored raw */
     /* +0x078 */ s16 unk78;                  /* func_8004B32C: arg1 >> 12 */
     /* +0x07A */ s16 unk7A;                  /* func_8004B32C: arg1 >> 11 */
