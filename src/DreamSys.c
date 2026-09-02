@@ -423,7 +423,27 @@ s32 *func_8005A350(DreamSys *this, s32 *arg1)
 	return &this->unknown_sdata_0x178;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StartDay);
+s32 DreamSys__StartDay(DreamSys *this)
+{
+	s32 oldDay;
+	MoodGraphPoint *special;
+
+	oldDay = this->currentDay;
+	this->currentFlashbackIndex = 0;
+	this->dreamTimer = 0;
+	this->storedDay = oldDay;
+	if (this->isFlashbackSession) {
+		this->vt->LoadNextFlashback(this, 1);
+	} else {
+		special = IsDaySpecial(&this->nextCinematic, this->currentDay + 1);
+		this->vt->InitMoodContibutors(this, special);
+		if (special != NULL) {
+			return -1;
+		}
+		this->vt->InitSpawnLoc(this);
+	}
+	return this->currentStage;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__EndDay);
 
@@ -466,7 +486,27 @@ bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LoadNextFlashback);
+bool DreamSys__LoadNextFlashback(DreamSys *this, bool unknown)
+{
+	s32 idx;
+	FlashbackEntry *entry;
+
+	idx = this->currentFlashbackIndex;
+	if (idx >= this->amountFlashbacksAvailable) {
+		goto fail;
+	}
+	this->unknwon_int_0x44 = 0xE;
+	entry = &this->storedFlasbacks[idx];
+	if (!unknown) {
+		this->vt->slot30(this, 0xE);
+	}
+	this->currentDay = entry->day;
+	this->currentStage = entry->stageID;
+	this->linkCoordinates = entry->position;
+	return true;
+fail:
+	return false;
+}
 
 bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
@@ -505,7 +545,25 @@ bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A82C);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", ExecuteLink);
+bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
+{
+	DreamSysUnk58 *obj;
+
+	system->unknwon_int_0x44 = unk1;
+	system->vt->slot30(system, unk1);
+	if (system->unknwon_int_0x44 == 0) {
+		return false;
+	}
+	system->currentStage = stage;
+	if (system->isFlashbackSession) {
+		system->dreamTimer = 0;
+	}
+	if (unk2 != 0) {
+		obj = (DreamSysUnk58 *)system->unk_0x58;
+		obj->vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+	}
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
@@ -547,7 +605,15 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitMoodContibutors);
+void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
+{
+	this->vt->ClearMoodGraph(this, &this->areaMoods);
+	this->vt->ClearMoodGraph(this, &this->entityMoods);
+	if (special != NULL) {
+		this->vt->LogMood(this, &this->areaMoods, special);
+		this->vt->LogMood(this, &this->entityMoods, special);
+	}
+}
 
 void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
@@ -562,7 +628,19 @@ void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
 	this->vt->LogMood(this, &this->entityMoods, source);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__UpdateDreamChart);
+void DreamSys__UpdateDreamChart(DreamSys *this, MoodGraphPoint *ret)
+{
+	MoodGraphPoint areaAvg;
+	MoodGraphPoint entityAvg;
+
+	this->vt->GetMoodAverage(this, &this->areaMoods, &areaAvg);
+	this->vt->GetMoodAverage(this, &this->entityMoods, &entityAvg);
+	if (this->entityMoods.amountMoods == 0) {
+		entityAvg.value = areaAvg.value;
+	}
+	ret->axis.dynamic = (areaAvg.axis.dynamic + entityAvg.axis.dynamic) / 2;
+	ret->axis.upper = (areaAvg.axis.upper + entityAvg.axis.upper) / 2;
+}
 
 DreamColors DreamSys__GetDreamColor(DreamSys *this)
 {

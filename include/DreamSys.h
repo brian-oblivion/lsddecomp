@@ -138,19 +138,23 @@ typedef struct DreamSysUnk5C {
 	s32 unk_0x24;
 } DreamSysUnk5C;
 
-/* Object pointed to by DreamSys::unk_0x58, used ONLY by func_80059E3C (this
-   round): loaded, dereferenced for its own vtable pointer at offset 0, and
-   called through slot +0x84. Everything else about this class -- including
-   whether it is the SAME class as DreamSys::unk_0x4C below -- is unknown.
-   Elsewhere in this unit unk_0x58 is set/read as a plain s32
-   (func_8005937C, func_8005A134's call into func_8002CC84), which is
-   consistent with it being a pointer value just not typed that way there.
-   slot0x84 takes TWO arguments, not one -- head-adjudicated 2026-08-30-c:
-   the guard value (DreamSys::unk_0xBC) loaded into $a1 by func_80059E3C is
-   never overwritten before the jalr, so it is passed through, not just
-   branched on. See func_80059E3C.md. */
+/* Object pointed to by DreamSys::unk_0x58, used by func_80059E3C (slot
+   +0x84) and, this round, ExecuteLink (slot +0x80): loaded, dereferenced
+   for its own vtable pointer at offset 0, and called through. Everything
+   else about this class -- including whether it is the SAME class as
+   DreamSys::unk_0x4C below -- is unknown. Elsewhere in this unit unk_0x58
+   is set/read as a plain s32 (func_8005937C, func_8005A134's call into
+   func_8002CC84), which is consistent with it being a pointer value just
+   not typed that way there. slot0x84 takes TWO arguments, not one --
+   head-adjudicated 2026-08-30-c: the guard value (DreamSys::unk_0xBC)
+   loaded into $a1 by func_80059E3C is never overwritten before the jalr, so
+   it is passed through, not just branched on. See func_80059E3C.md.
+   slot0x80 (ExecuteLink, round 2026-09-02) takes three arguments, all
+   literal constants at that call site (0x90, 0x6E, 0x6E) -- nothing here
+   suggests what they mean. */
 typedef struct DreamSysUnk58Vtable {
-	u8 pad00[0x84];
+	u8 pad00[0x80];
+	void (*slot0x80)(void *self, s32 a1, s32 a2, s32 a3);
 	void (*slot0x84)(void *self, s32 flag);
 } DreamSysUnk58Vtable;
 typedef struct DreamSysUnk58 {
@@ -487,7 +491,13 @@ struct vtable_DreamSys{
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
 	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
-	u32 unknown_functions_0x18[10];
+	u32 unknown_functions_0x18[6];
+	/* +0x030, BasicClass__func_182cc -- shared base-class slot, same one
+	   `class_3ac78.h`/`Class6D3C8.h` name (see their comments); called by
+	   ExecuteLink as (this, unk1) with its return discarded
+	   (round 2026-09-02). */
+	void (*slot30)(DreamSys *this, s32 arg1);
+	u32 unknown_functions_0x34[3];
 	void *func_800588EC;
 	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */
