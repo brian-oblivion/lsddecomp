@@ -336,5 +336,36 @@ extern void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChil
  * Never dereferenced in this unit, so left untyped in size only. */
 extern s32 D_800869CC[3];
 
+/* -------------------------------------------------------------------
+ * class_3bb8c_c additions below. Two small sibling classes, each built
+ * by its own New_X/ctor pair (allocator + base-chain + own-vtable-set,
+ * the same shape as func_8004A19C in class_39e08.c). Named by their
+ * vtable's address, same convention as Class866E8/Class86668.
+ * ------------------------------------------------------------------- */
+
+typedef struct Class869D8 Class869D8;
+typedef struct Class869D8Methods Class869D8Methods;
+
+/*
+ * Vtable D_800869D8 (asm/data/76DC8.data.s, header word 0x17). Only the
+ * slots this unit's own functions reach are typed: +0x008 (ctor,
+ * func_8004D2A4, called by New_Class869D8/func_8004D254) and +0x040 (a
+ * post-construct hook, func_8004D2F8 -- already matched, empty body).
+ */
+struct Class869D8Methods {
+    u8 pad000[0x008];
+    void (*ctor)(Class869D8 *self);            /* +0x008, func_8004D2A4 */
+    u8 pad00C[0x040 - 0x00C];
+    void (*slot40)(Class869D8 *self);          /* +0x040, func_8004D2F8 */
+};
+
+struct Class869D8 {
+    Class869D8Methods *methods;                /* +0x000 */
+};
+
+extern Class869D8Methods D_800869D8;
+extern Class869D8Methods *func_8004D37C(void);
+
+extern void *func_80017B34(s32 size);
 
 #endif

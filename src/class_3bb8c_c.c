@@ -1,6 +1,17 @@
 #include "common.h"
+#include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D254);
+Class869D8 *func_8004D254(void)
+{
+    Class869D8 *self;
+
+    self = func_80017B34(0xDC);
+    if (self != NULL) {
+        func_8004D37C()->ctor(self);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D2A4);
 
