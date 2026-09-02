@@ -1,7 +1,7 @@
 # Matching guide
 
-The per-function loop, in detail, plus the current per-unit state. Read
-CLAUDE.md first for the hard rules and the toolchain facts.
+The per-function loop, in detail. Read CLAUDE.md first for the hard rules and
+the toolchain facts.
 
 ## The loop
 
@@ -137,51 +137,37 @@ into one of these. This list is short because this project is young — add to i
   placement, barriers and `volatile`. It is the project's best-posed permuter
   target — do not spend a fresh attempt budget re-deriving it.
 
-## Unit state
+## Unit and segment state
 
-Keep this current: the head reads it in Gate 1, and a number in `progress.py`
-cannot express "large body, deep reconstruction, low cold-runner yield".
+**Not recorded here.** It changed every round, this file said "keep this
+current", and it still went stale — naming units that had been carved and
+segments that no longer existed under those names. A snapshot that is wrong
+half the time is worse than no snapshot, because a reader cannot tell which
+half they are in. Derive it instead:
 
-State after round 2026-09-01 (3 runners, 6 passes; alpha took three passes on
-one unit under protocol 3c, bravo and charlie each exhausted theirs).
+```sh
+python3 tools/progress.py     # matched / queued / stalled / fresh, per unit
+```
 
-**98 -> 154 matched.** All 92 functions assignable at round start were
-pre-screened for both toolchain blockers and all 92 were clean — the first round
-with an entirely negative pre-screen. The 66 stall classifications inherited
-from round 4 were mechanically re-audited against their own disassembly and all
-66 held, so the `fresh` column below is trustworthy as a ceiling.
+`fresh` is a ceiling, not a work order — it cannot see "large body, deep
+reconstruction, low cold-runner yield". Two things tell you that, and both are
+live rather than transcribed:
 
-**Three units are now DRY and four more are entirely blocked. Only `DreamSys`
-has fresh ground, and its 27 remaining are all 35+ instructions.** One unit
-cannot support three runners — **the next round should be a carve, not runners.**
+- **Size.** The remaining queue for a unit, biggest first. A unit whose cheap
+  seam is exhausted shows it here as a floor of 35+ instruction bodies:
 
-| unit | queued | fresh | state |
-| --- | --- | --- | --- |
-| `DreamSys` | 55 | 27 | **66 matched — the round's engine**, 41 of them this round across three passes by one runner. `include/DreamSys.h` is now substantial: `sizeof` corrected to 0x928 (recovered from the allocator's own `ori $a0, $zero, 0x928`), the mood-graph and flashback struct tails mapped, ~16 vtable slots resolved. The cheap seam is EXHAUSTED — every one of the 27 remaining is 35+ instructions and several are 60-87, so this is large-body reconstruction work, not tail-pass work. Size it accordingly: fewer functions per runner, not more. 28 of its queue are stalled/blocked and stubbed. |
-| `Entity` | 10 | 0 | **15 matched. DRY.** All 10 remaining are `addiu_at`-blocked and stubbed. Do not staff until that blocker is resolved. Pairs with an `Entity_b` carve, which is where its future is. |
-| `code_55dd4` | 6 | 0 | **30 matched. DRY** — fully worked across four passes over two rounds. Its 6 stalls are all structural (none toolchain-blocked), so all 6 are in principle reachable: `func_80066340` (252/258) and `func_80065A5C` (30/33) are the best of them. Slot `+0x134` returns `u8 *`, NOT `void` — corrected this round; the earlier `void` came from a call site that discarded the result. |
-| `code_4cd08` | 10 | 0 | **7 matched, 10 blocked.** Every remaining function is toolchain-blocked and stubbed. Do not staff until a blocker is resolved. |
-| `code_171e0` | 15 | 0 | **12 matched, 15 blocked/stalled.** 14 gp-relative blocked, plus `strcat` at 41/42 (one redundant `move`, permuter target). No workable ground. |
-| `code_1677c` | 2 | 0 | **13 matched.** Both remainders are stalls: `new_class_6d3c8` (23/24) and `func_80026698` (53/57), both permuter targets with bodies preserved. Both re-audited this round and both classifications hold — `new_class_6d3c8` in particular has had 20+ attempts and its branch targets verified; do not re-staff it, permute it. |
-| `class_16334` | 2 | 0 | **8 matched.** Fully decompiled except its two gp-relative-blocked functions. **The "8" is a MATCHED count and this unit has ZERO fresh ground** — it has now been mistaken for available work in two consecutive round briefs. |
-| `StageGrid` | 2 | 0 | **3 matched.** Its two remainders are `addiu_at`-blocked. Understanding the `STAGE_CHUNK_MOODS`/`STAGE_GRID_DIMENSIONS` data would not help; both index those tables through the fully-resolved `$at` form. |
+  ```sh
+  wc -l asm/nonmatchings/<unit>/*.s | sort -rn | head -20
+  ```
 
-## Uncarved ground
+- **`docs/match-reports/<func>.md`.** Every stalled or blocked function has
+  one, and it carries what a column cannot: the residue, how many attempts have
+  been spent, whether it is a permuter target, and whether it is toolchain-
+  blocked. **Read the report before staffing anyone onto a function** — several
+  carry an explicit do-not-re-staff finding, and re-deriving one costs a round.
 
-1100 functions still sit inside monolithic `asm` segments. Largest first:
-
-| segment | functions | note |
-| --- | --- | --- |
-| `class_39e08` | 415 | Biggest single block; the class framework plus a large hierarchy. **Contains 13 PSX BIOS call stubs** (`jr $t2` with the vector in `$t2` and the call number in `$t1` — `0xB0`/`0x33` is BIOS `malloc`). Those are NOT expressible in C and will need an `hasm` segment or a literal-`.word` disposition; decide that at carve time, not when a runner hits one. Also holds 19 `jr $reg` dispatchers. |
-| `code_179d8` | 274 | Owns the `0xFD8` rodata slot — 179 text pointers, so it will need attaching when carved. |
-| `code_2c054` | 181 | |
-| `Entity_b` | 117 | The remainder of Entity after the 2026-08-28 slice. Carve the next ~25 the same way. |
-| `code_8220` | 56 | Owns the `0xA8C` rodata slot. |
-| `code_d294` | 55 | |
-
-The `psyq_*` segments (724 functions) are Sony SDK code. They are excluded from
-the game-code denominator and should be left until the game's own code is done —
-matching them proves nothing about this game.
+For uncarved ground, see Gate 2 in `docs/PARALLEL-RUNS.md`, which lists the
+segments live and records the carve hazards found so far.
 
 ## Writing a class method
 

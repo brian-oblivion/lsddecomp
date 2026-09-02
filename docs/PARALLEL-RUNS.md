@@ -204,14 +204,26 @@ wrote down. Keep both honesty mechanisms fed:
   inflates `fresh` by its whole size and the next head mis-triages.
 
 `fresh` is a ceiling, not a work order: it cannot see "large body, deep
-reconstruction, low cold-runner yield". Read the unit-state list in
-MATCHING-GUIDE before believing a number.
+reconstruction, low cold-runner yield". Before believing a number, size the
+queue (`wc -l asm/nonmatchings/<unit>/*.s | sort -rn`) and read the match
+reports for the functions you intend to assign — see "Unit and segment state"
+in MATCHING-GUIDE.
 
 **Gate 2 — carve to refill.** If fresh-assignable functions are fewer than
 roughly (runners × per-runner target), carve new units BEFORE provisioning.
-There are **1230 uncarved functions** here, so this gate will fire early and
-often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
-`code_2c054` (181), `Entity` (142), `psyq_*` (library — leave for last).
+Most of the game is still uncarved, so this gate fires early and often.
+
+List the candidates live, largest first. **Do not work from a written list** —
+carving renames things, and every list of these written down so far has ended
+up naming segments that no longer exist:
+
+```sh
+for f in asm/*.s; do b=$(basename "$f" .s); case "$b" in psyq_*|header) continue;; esac
+    printf '%6d %s\n' "$(grep -c '^glabel' "$f")" "$b"; done | sort -rn
+```
+
+The `psyq_*` segments are Sony SDK code: excluded from the game-code
+denominator, and left for last. Matching them proves nothing about this game.
 
 1. Pick the next contiguous run of uncarved functions, ~20 per unit.
 2. **Check boundaries in the disassembly, on both sides.**
@@ -257,6 +269,20 @@ often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
      `^(\w+):` regex matches: `grep -rn '^\s*alabel' asm/nonmatchings/<unit>/`.
      That check can only fire AFTER extraction, so run it as a post-carve
      confirmation.
+   - *BIOS call stubs are not expressible in C.* A body of the shape `jr $t2`
+     with the vector in `$t2` and the call number in `$t1` is a PSX BIOS
+     trampoline (`0xB0`/`0x33` is BIOS `malloc`). There is no C that compiles
+     to it, so it needs an `hasm` segment or a literal `.word` disposition —
+     **decide which at carve time**, not when a runner hits one and burns an
+     attempt budget discovering it. They cluster in the class-framework block:
+
+     ```sh
+     grep -c 'jr *\$t2' asm/<segment>.s
+     ```
+
+     At the time of writing every one of them (13) sits in a single segment,
+     but that segment is a carve remainder and its name changes as carving
+     proceeds — run the grep rather than trusting a name.
    - *A dead orphan is not automatically inert.* Grep the orphan's `.s` for
      label references (`grep -o '\.L[0-9A-F]*'`). Empty output means a
      fall-through orphan: `INCLUDE_ASM` forever, done. Non-empty means it
@@ -285,6 +311,11 @@ often. The candidates, largest first: `class_39e08` (415), `code_179d8` (274),
      `- [0xNNNN, .rodata, <unit>]`. `code_4cd08` needed `0x206C` — a slot the
      inherited yaml had labelled `# greyman`, so **do not trust the inherited
      rodata comments to say who owns a slot**.
+
+     Two standalone slots are known to hold text pointers and will need
+     attaching when their segments are carved: **`0xFD8` (`code_179d8`)** and
+     **`0xA8C` (`code_8220`)**. Both were confirmed against the data, not read
+     off the yaml comment.
    - **`undefined reference to 'D_XXXXXXXX'`** — the segment's tail is DATA,
      not code, and an `asm` segment was emitting it inline. Find where the text
      really ends and declare the rest: `code_55dd4`'s text stops at `0x57028`
