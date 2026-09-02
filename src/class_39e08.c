@@ -59,7 +59,11 @@ void func_8004A294(Obj865C8 *self) {
     self->methods->setUnk2C(self, -1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A2C4);
+s32 func_8004A2C4(Obj865C8 *self, s32 arg1, s32 arg2) {
+    self->unk28 = 0;
+    func_8003E5C8()->slot44(self, arg1, arg2);
+    return self->unk28;
+}
 
 void func_8004A324(Obj865C8 *self) {
     func_8003E5C8()->slot48(self);

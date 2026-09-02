@@ -101,7 +101,14 @@ struct Obj865C8 {
 typedef struct IntermediateBaseMethods {
     u8 pad00[0x0C];
     void (*dtor)(void *self);              /* +0x00C */
-    u8 pad10[0x48 - 0x10];
+    u8 pad10[0x44 - 0x10];
+    /* Same accessor/slot combination code_2c054.h calls
+     * `TaskUtilMethods::slot44` on -- there it forwards to
+     * `self->unk38 = <base result>` (func_8003C1DC). Here the caller
+     * (func_8004A2C4, D_80086668's own +0x044 override) zeroes
+     * `self->unk28` immediately before the call and reads it back
+     * immediately after: same "default, then base may overwrite" shape. */
+    void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
     void (*slot48)(void *self);            /* +0x048 */
     u8 pad4C[0x60 - 0x4C];
     void (*slot60)(void *self, s32 arg1);  /* +0x060 */
