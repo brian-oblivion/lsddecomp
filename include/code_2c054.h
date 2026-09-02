@@ -74,6 +74,9 @@ struct StreamTaskObjMethods {
                                                       (D_8006E5F8+0x0A0 = func_8003CB30) */
     void (*slotA4)(StreamTaskObj *self, u8 *a1, u8 *a2, u8 *a3); /* +0x0A4, func_8003C11C's
                                                       forward target (D_8006E5F8+0x0A4 = func_8003CB68) */
+    u8 padA8[0x0D4 - 0x0A8];
+    void (*slotD4)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x0D4, func_8003BF10's forward
+                                                      target (D_8006E5F8+0x0D4 = func_8003CDE0) */
 };
 
 /* Object size is 0xDC (from func_8003B854's allocator call). Only the
@@ -97,11 +100,16 @@ struct StreamTaskObj {
     s32 unk38;                     /* +0x038, read (and returned) by func_8003C1DC */
     s32 unk3C;                     /* +0x03C, set to 0 by func_8003C11C */
     s32 unk40;                     /* +0x040, set by func_8003BCF4 */
-    u8 pad44[0x078 - 0x044];
+    s32 unk44;                       /* +0x044, set from func_8003BF10's arg2 */
+    s32 unk48;                        /* +0x048, set by func_8003BF10: either a call
+                                           result (arg2 nonzero) or arg3 verbatim */
+    u8 pad4C[0x078 - 0x04C];
     StreamTaskUnk78Obj *unk78;       /* +0x078, an object with its own tiny vtable
                                           (see StreamTaskUnk78Obj below); dispatched
-                                          through by func_8003C3D0 */
-    u8 pad7C[0x084 - 0x07C];
+                                          through by func_8003C3D0; set by func_8003BF10
+                                          from a call result */
+    s32 unk7C;                        /* +0x07C, set by func_8003BF10 from a call result */
+    s32 unk80;                         /* +0x080, set by func_8003BF10 from a call result */
     s32 unk84;                       /* +0x084, set to 9 by func_8003C11C */
     u8 pad88[0x093 - 0x088];
     s8 unk93;                          /* +0x093, only ever address-taken (a buffer
@@ -251,6 +259,15 @@ struct TaskCoreMethods {
     void (*slot90)(TaskCoreObj *self);                            /* +0x090, func_8003C3D0's forward target
                                                                         via self->unk18 (same instance as slot74;
                                                                         D_8006E730+0x090 = func_8003CA1C) */
+    u8 pad94[0x0D8 - 0x094];
+    void (*slotD8)(StreamTaskObj *self, s32 a1);                    /* +0x0D8, func_8003BF10's forward
+                                                                        target -- called on `self` itself, not
+                                                                        an unk18-style sub-instance, right after
+                                                                        self->methods is (temporarily) set to
+                                                                        this table's own pointer: a base-class
+                                                                        constructor chaining pattern, see that
+                                                                        function's report
+                                                                        (D_8006E730+0x0D8 = func_8003CE98) */
 };
 
 extern TaskCoreMethods *func_8003DFBC(void); /* returns &D_8006E730 */
@@ -271,7 +288,10 @@ struct TaskCoreObj {
 typedef struct TaskUtilMethods TaskUtilMethods;
 
 struct TaskUtilMethods {
-    u8 pad00[0x044];
+    u8 pad00[0x008];
+    void (*slot08)(StreamTaskObj *self); /* +0x008, func_8003BF10's forward target
+                                              (D_8006E878+0x008 = func_8003DFDC) */
+    u8 pad0C[0x044 - 0x00C];
     void (*slot44)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x044 */
 };
 
@@ -282,5 +302,12 @@ extern TaskUtilMethods *func_8003E5C8(void); /* returns &D_8006E878 */
  * own function (no INCLUDE_ASM here), so only the call site's own argument
  * and return types are modeled. */
 extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2);
+
+/* Four more externs reached only by func_8003BF10's own tail, none of them
+ * in this unit. Types are the call sites' own register usage only. */
+extern s32 func_8002C480(s32 a0);
+extern s32 func_80044F30(s32 a0);
+extern s32 func_80044CD4(s32 a0, s32 a1);
+extern StreamTaskUnk78Obj *func_800441B4(s32 a0, s32 a1);
 
 #endif
