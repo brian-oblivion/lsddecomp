@@ -60,7 +60,13 @@ void func_8003BDE4(void) {
 void func_8003BDEC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BDF4);
+void func_8003BDF4(StreamTaskObj *self) {
+    if (self->unkD4 != 0) {
+        self->unkB4->methods->slot4C(self->unkB4);
+    } else {
+        self->methods->slot60(self, 7);
+    }
+}
 
 void func_8003BE5C(StreamTaskObj *self, s32 a1) {
     self->unkC4 = a1;

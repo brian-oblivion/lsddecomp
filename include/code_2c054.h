@@ -69,6 +69,8 @@ extern StreamTaskObjMethods D_8006E5F8;
 struct StreamTaskUnkB4Methods {
     u8 pad00[0x04];
     void (*slot04)(StreamTaskUnkB4Obj *self); /* +0x004 */
+    u8 pad08[0x04C - 0x008];
+    void (*slot4C)(StreamTaskUnkB4Obj *self); /* +0x04C, func_8003BDF4's forward target */
 };
 
 struct StreamTaskUnkB4Obj {
