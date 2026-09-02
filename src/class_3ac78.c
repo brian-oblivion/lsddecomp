@@ -29,7 +29,12 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA6C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AB24);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AB88);
+void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
+{
+    if ((u8)other->methods->header == 0x34) {
+        self->methods->slotD0(self, other, count);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
 
