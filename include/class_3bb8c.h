@@ -23,6 +23,16 @@
  */
 typedef struct Obj866E8 Obj866E8;
 
+/* self+0x54: an inline (not pointer) 3-word sub-struct, dereferenced by
+ * func_8004B44C (uncarved helper in this same unit, not this round's own
+ * target -- called by func_8004B418). Field meaning unknown beyond "3
+ * words, read/written as a group". */
+typedef struct Unk54Struct {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+} Unk54Struct;
+
 /* Only the slots this unit's functions dispatch through (via
  * self->methods->slotNN) are typed; everything else stays opaque so the
  * struct keeps the right size/offsets without requiring every method to be
@@ -55,10 +65,21 @@ typedef struct Elem {
 
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
-    u8 pad04[0x70 - 0x04];
+    u8 pad04[0x54 - 0x04];
+    Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
+    u8 pad60[0x68 - 0x60];
+    void *unk68;                   /* +0x068, func_8004B418 (forwarded opaquely, never dereferenced here) */
+    u8 pad6C[0x70 - 0x6C];
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
     u8 pad74[0xEC - 0x74];
-    Elem arr[7];                   /* +0x0EC, func_8004BCE0 */
+    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434 */
 };
+
+/* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
+ * called only by func_8004B418. Declared locally with the minimal
+ * signature that call site demonstrates; not this round's function to
+ * match. Returns a plain scalar (its own body computes a value into $v0
+ * with ordinary integer ops, no pointer arithmetic on the result). */
+extern s32 func_8004B44C(void *arg0, void *outBuf, void *arg2, Unk54Struct *arg3, void *arg4);
 
 #endif

@@ -16,7 +16,11 @@
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B38C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B418);
+s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
+    s32 outBuf[3];
+
+    return func_8004B44C(arg1, outBuf, self->unk68, &self->unk54, arg2);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B44C);
 
