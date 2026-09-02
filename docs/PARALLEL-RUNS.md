@@ -474,6 +474,24 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > tail call is byte-identical. Write `return callee(...);` unless you have
 > positive evidence the function is void.
 >
+> **But if acting on that means retyping a SHARED VTABLE SLOT, check every
+> other caller first.** Retyping a slot `void` -> `s32` is not local: it can
+> change an ALREADY-MATCHED function's codegen elsewhere. Round 7 hit this
+> exactly — with `EntityMethods::slotC4` typed `void`, GCC tail-merges two of
+> `func_8005E160`'s identical discarded `slotC4` calls into one; retyped to
+> `s32` it stops merging them, costing 4 words and shifting every later
+> function in that unit. The runner caught it by recompiling the other
+> caller's translation unit in isolation and diffing the `.s` BEFORE touching
+> the real build, and kept the slot `void`. In the same round `slotCC` faced
+> the identical question, was checked the same way, came back clean, and WAS
+> retyped: **two superficially symmetric slots needed opposite answers**, so
+> the check is per-slot and cannot be reasoned by analogy.
+>
+> The cheap version of the check: `grep -rn 'slotNN' src/` for every other
+> caller, rebuild, and confirm the whole-image SHA1 is still green — a slot
+> retype that breaks another function shows up as a red build, not as a
+> diff in the function you are working on.
+>
 > PARALLEL MODE RULES: do not edit DECOMPILATION_LEARNINGS.md,
 > MATCHING-GUIDE.md, PROGRESS.md, config/, or any file outside your unit. Put
 > generalizable discoveries in the match report under `### Proposed learning`.

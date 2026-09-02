@@ -370,6 +370,131 @@ code_2c054).**
   cache then costs a register. Read the intervening statements before choosing.
   (`func_8005B904`)
 
+- **A register-identity residue can be a MISSING CALL ARGUMENT. Cross-check
+  another caller of the same vtable slot before you accept the
+  classification.** The strongest result of round 7, and it retired a stall
+  that fourteen attempts across two authors had confirmed. `func_8005E02C`
+  kept landing `this->unk94` in `$v0` where retail has `$a1`, unmoved by
+  every reshape of the code computing it. The cause was that
+  `EntityMethods::slot144` takes a SECOND argument — `this->unk94` itself —
+  so retail parks the value in `$a1` for the whole function *because that is
+  the register the call needs it in*. With the two-argument prototype it
+  matched first try, no barrier and no reshape.
+
+  The trap is that the call site under test looked like positive evidence
+  for the one-argument signature: a plain `nop` in the delay slot and no
+  fresh `$a1` load. There was no fresh load because the value had been
+  resident in `$a1` since the top of the function. A *different* caller
+  (`func_8005EA94`) loads it explicitly right before the `jalr`, which is
+  unambiguous. **CLAUDE.md rule 6's test is still right as written** —
+  reshaping genuinely could not move that register — but "reshaping" has to
+  include the call's own ARGUMENT LIST, not just the statements feeding it.
+  A slot's arity is a property of the slot; derive it from whichever caller
+  makes it visible. (`func_8005E02C`, `func_8005EA94`)
+
+- **Retyping a shared vtable slot is NOT a local change.** `void` -> `s32` on
+  `EntityMethods::slotC4` fixed the wrapper under test and silently broke an
+  already-matched function in another unit: with `slotC4` `void`, GCC
+  tail-merges two of `func_8005E160`'s identical discarded `slotC4` calls
+  into one; typed `s32` it stops merging, costing 4 words and shifting every
+  later function in the file. `slotCC` faced the identical question in the
+  same round, was checked the same way, came back clean, and was retyped —
+  **two superficially symmetric slots, opposite answers.** Check every other
+  caller (rebuild; a broken slot retype is a RED BUILD, not a diff in your
+  own function) rather than reasoning by analogy from a sibling slot.
+  (`func_8005FA64` kept `void`, `func_8005FEC8` retyped)
+
+- **A value reused after an intervening indirect call needs an explicit
+  local.** GCC 2.6.3 has no aliasing guarantee that a `jalr` through an
+  unknown function pointer did not write back through the object, so a bare
+  repeated field access forces a reload, which changes register allocation
+  and can shift the frame size. **The fast tell is a frame with the wrong
+  number of callee-saved registers versus retail.** Confirmed independently
+  several times in one round, and it generalizes past `self->field`: it
+  applies to a call's own return value, and to a value whose next use is
+  many calls later rather than the next one. (`func_8003C3D0`,
+  `func_8003C11C`, `func_8003BF10`, `func_8003C238`)
+
+- **An arity conflict at an already-typed vtable offset is real
+  counter-evidence — trust it over an earlier positive-but-circumstantial
+  slot match.** It is what legitimately *un*-unifies two fields previously
+  modelled as the same class. Round 7 used it twice in one function to split
+  a wrongly-shared method table and to revert a wrongly-unified field type,
+  both as pure header relabeling with zero compiled-byte impact.
+  (`func_8003C238`)
+
+- **An empty-bodied vtable occupant is not evidence the SLOT takes no
+  arguments** — only that this occupant ignores them. The parameter-side twin
+  of the established "a discarded return value is never evidence of `void`".
+  Relatedly, a slot's *field name* is whatever the first-resolved occupant
+  suggested; it describes layout and signature, never which function runs.
+  That risk is narrow, though — tested against ten functions across two
+  units with no second instance found, and it only bites when a dispatch
+  through `self->methods` sits BETWEEN two writes to it. A mere double-write
+  is not sufficient.
+
+- **GCC 2.6.3's switch pivot tree depends on the exact case-value SET,
+  including otherwise-empty cases — not on declaration order.** `{1,3}` and
+  `{0,1,3}` both produced the wrong comparison tree where `{1,2,3}` with an
+  empty `case 2:` matched. Read the other way round: a GAP in the case values
+  you can see is itself a signal that the original had an empty case there.
+  (`func_80049CA8`, 9 attempts)
+
+- **Split a value's COMPUTATION from its STORE through a named local** when
+  retail defers the store into a later instruction's delay slot (a tail
+  call's, for instance). Textual adjacency alone does not predict this.
+  (`func_8004AFE0`)
+
+- **Stack-local DECLARATION ORDER decides which local lands at which `$sp`
+  offset**, and `if`/`else` versus its logical inverse compile to different
+  branch polarities (`beqz` vs `bnez`) — neither is a free choice.
+  (`func_8004AEA4`)
+
+- **A source-level re-test of an already-established condition is not dead
+  code** — 2.6.3 compiles it literally. Conversely a chain of
+  mutually-exclusive-*looking* literal checks may be independent `if`s rather
+  than `else if`: check whether retail's bytes re-test the later conditions
+  after an earlier one already matched. (`func_8005E160`, `func_8005E7F8`)
+
+- **Statement order, not data dependency, decides register class and store
+  order** for independent assignments. This compiler does not reorder either
+  on its own. (`func_8005ED30`, `func_8005E7F8`)
+
+- **Counting slots forward from a `classtable.py`-confirmed neighbour often
+  resolves a "new" slot to an ALREADY-MATCHED function**, turning apparent
+  new-header work into none. Worth trying before typing a slot as new: in one
+  DreamSys batch every raw offset touched but two turned out to be already
+  named. (round 7, DreamSys)
+
+- **`bool` is `typedef int bool` here — a full word, not a byte.** Reading a
+  raw struct offset as byte-granular because a field is boolean produces a
+  layout error that looks like a struct-size mistake rather than a typedef
+  mistake.
+
+- **The `__asm__("")` barrier is a scheduling nudge, not a fence — and its
+  scope is narrower than previously assumed.** Two round-7 results bound it
+  from both sides. It DID change which instruction fills a load-delay slot at
+  its own position (forcing retail's order, `move` before the barrier and an
+  explicit `nop` after). It did NOT stop a loop-offset increment from being
+  hoisted BACKWARD across it into an earlier delay slot, past several
+  intervening independent statements. So: use it for local delay-slot fill,
+  do not expect it to pin anything across statements, and never expect it to
+  move a register choice (it operates in a later pass than register
+  allocation). (`func_8005E02C` positive, `func_8004ABD0` negative)
+
+- **GCC reserves stack space for a completely dead, unreferenced local**, so
+  `u8 unused[N];` closes a pure frame-size gap when every instruction already
+  matches. Third project instance, so it is a reliable idiom — but treat the
+  gap as EVIDENCE, not explanation: a 24-byte hole is most likely a real
+  local aggregate the original source passed somewhere, and the padding
+  reproduces the bytes without explaining them. Say so in the report.
+  (`func_8004ADD8`)
+
+- **Multiple independent local views of the SAME method table, one per unit,
+  is the established convention** — do not edit another unit's header to
+  unify them. Round 7 had two units both describing `D_800866E8` under
+  different type names, deliberately. (`class_3ac78`, `class_3bb8c`)
+
 ### New residue classes opened this round (not yet closed)
 
 - **"Identical assignment reaching different merge points."** GCC tail-merges
@@ -412,8 +537,37 @@ code_2c054).**
   count differs; here the values are identical and the CFG already matches.
   (`func_8005A82C`, 58/63)
 
-All five are permuter candidates rather than reshape candidates; see Gate 3
+- **Asymmetric codegen on structurally identical sibling blocks.** Two
+  byte-extraction blocks against sibling struct fields, written identically,
+  get different codegen; fixing one symptom (a redundant sign-extend) trades
+  it for another (a 16-byte-oversized frame). Best 19/52, correct size, no
+  drift. (`func_8004B030`)
+- **Loop-offset increment scheduling.** The increment lands in the wrong
+  delay slot regardless of where in the loop body it is written — six
+  positions tried, plus a barrier, which did not block the backward hoist.
+  The structural part (two recomputed registers vs one incrementing pointer)
+  WAS reproduced; only that one instruction's placement resists. Best 9/74,
+  correct size. (`func_8004ABD0`)
+- **Duplicated loop test in a destructor scan loop.** A conditional
+  skip-to-continue-check duplicates the loop condition. Three
+  control-flow-equivalent spellings (`do`/`while`, `goto`, `while`) compile
+  **byte-identically to each other** and none matches retail — a stronger
+  negative than a single failed reshape, because it rules out the whole
+  spelling family rather than one member. (`func_8004A7C0`)
+
+All eight are permuter candidates rather than reshape candidates; see Gate 3
 in docs/PARALLEL-RUNS.md.
+
+**One class was CLOSED this round, and how it closed is the transferable
+part.** The "vacate-then-reuse-argument-register" residue was written up with
+a corpus census as a rare, poor permuter target. It was not a scheduling or
+allocation class at all — it was a missing call argument (see the
+cross-check-another-caller entry above), and the census had been measuring a
+shape that merely *co-occurs* with it: a value sitting in an argument
+register because it is a future argument. **A census of a residue's surface
+SHAPE is not a census of its CAUSE**, and a plausible mechanism attached to a
+real measurement is still a hypothesis. The head confirmed that stall twice
+before a runner overturned it.
 
 **The cheap tell that you are in the wrong shape FAMILY, not one reshape from
 a match:** funcdiff's *"differs OUTSIDE this range"* warning carrying a
