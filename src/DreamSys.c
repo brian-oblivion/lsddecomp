@@ -608,7 +608,19 @@ void DreamSys__LogInstanceMood(DreamSys *this, MoodGraphPoint *source)
 	this->vt->LogMood(this, &this->entityMoods, source);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__UpdateDreamChart);
+void DreamSys__UpdateDreamChart(DreamSys *this, MoodGraphPoint *ret)
+{
+	MoodGraphPoint areaAvg;
+	MoodGraphPoint entityAvg;
+
+	this->vt->GetMoodAverage(this, &this->areaMoods, &areaAvg);
+	this->vt->GetMoodAverage(this, &this->entityMoods, &entityAvg);
+	if (this->entityMoods.amountMoods == 0) {
+		entityAvg.value = areaAvg.value;
+	}
+	ret->axis.dynamic = (areaAvg.axis.dynamic + entityAvg.axis.dynamic) / 2;
+	ret->axis.upper = (areaAvg.axis.upper + entityAvg.axis.upper) / 2;
+}
 
 DreamColors DreamSys__GetDreamColor(DreamSys *this)
 {
