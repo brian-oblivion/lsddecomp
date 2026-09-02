@@ -51,11 +51,9 @@ struct Unk4CObj {
     u8 pad000[0x008];
     s32 unk8;           /* +0x008, OBSERVED: func_8003C63C (not attempted) */
     s32 unkC;            /* +0x00C, OBSERVED: func_8003CA1C */
-    u8 pad10[0x010];     /* +0x010, INFERRED 3-byte colour buffer read by
-                             address only (func_8003C63C, not attempted) --
-                             left as opaque bytes since no field boundary
-                             within it is observed */
-    u8 pad14[0x024 - 0x014];
+    u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
+                              address only (func_8003C63C, not attempted) */
+    u8 pad13[0x024 - 0x013];
     void **unk24;         /* +0x024, OBSERVED: func_8003CA1C, word-pointer
                               array indexed by self->unk58 */
 };
@@ -107,13 +105,18 @@ struct Obj86B60Methods {
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
                                                       func_8003C7B4 */
     u8 pad074[0x090 - 0x074];
-    s32 (*slot90)(Obj86B60 *self);                /* +0x090, external
-                                                      (func_8003DA10);
+    void (*slot90)(Obj86B60 *self);               /* +0x090, external
+                                                      (func_8004D9D4);
                                                       OBSERVED: func_8003C63C
                                                       (STALL, not attempted --
                                                       read off the
                                                       disassembly only) */
-    u8 pad094[0x0AC - 0x094];
+    void (*slot94)(Obj86B60 *self);                /* +0x094, external
+                                                       (func_8004DABC);
+                                                       OBSERVED:
+                                                       func_8003CA1C and
+                                                       func_8003C63C (STALL) */
+    u8 pad098[0x0AC - 0x098];
     s32 (*slotAC)(Obj86B60 *self, s32 a1);         /* +0x0AC, OBSERVED:
                                                        IS func_8003CBC0 */
     s32 (*slotB0)(Obj86B60 *self);                 /* +0x0B0, IS
@@ -144,7 +147,10 @@ struct Obj86B60Methods {
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */
-    u8 pad0F4[0x10C - 0xF4];
+    u8 pad0F4[0x108 - 0xF4];
+    void (*slot108)(Obj86B60 *self);                /* +0x108, external
+                                                       (func_8003DA10);
+                                                       OBSERVED: func_8003CA1C */
     s32 (*slot10C)(Obj86B60 *self);                 /* +0x10C, external
                                                        (func_8003DAD4);
                                                        OBSERVED:

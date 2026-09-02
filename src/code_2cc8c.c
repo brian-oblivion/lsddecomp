@@ -114,7 +114,19 @@ void func_8003C9B0(Obj86B60 *self, s32 a1)
     handler(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CA1C);
+void func_8003CA1C(Obj86B60 *self)
+{
+    Unk4CObj *target;
+    s32 idx;
+
+    target = self->unk4C;
+    idx = self->unk58;
+    if (target->unk24[idx] != NULL) {
+        self->methods->slot108(self);
+    } else if (idx == target->unkC) {
+        self->methods->slot94(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CA94);
 
