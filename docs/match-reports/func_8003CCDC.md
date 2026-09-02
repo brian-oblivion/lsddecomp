@@ -2,6 +2,23 @@
 
 **Unit:** code_2cc8c · **Size:** 27 instructions · **Best reached:** 26/27 words
 
+## Signature update (after this report was first filed)
+
+Originally attempted as `s32 func_8003CCDC(Obj86B60 *self, s32 a1)`, an
+unused-but-forwarded parameter matching `func_8003CBC0`'s ORIGINAL
+signature. `func_8003C51C`'s own residue (matched separately, see its
+report) proved this class of assumption wrong for its sibling slot
+`slotAC`/`func_8003CBC0`: the `s32 a1` at that call site was never a real
+argument, just a leftover caller-saved register value from an earlier,
+unrelated call. `Obj86B60Methods::slotC0` (this function's own vtable
+slot, `+0x0C0`) has been retyped to `s32 (*)(Obj86B60*)` (one argument) to
+match. **This function itself was never rebuilt after the retype** (it is
+still `INCLUDE_ASM`), so the residue analysis below (based on the
+two-argument attempt) may already be partly stale -- whoever resumes this
+function should re-attempt with the corrected one-argument signature
+FIRST, since it is not yet known whether dropping the unused parameter
+changes anything about the `li`-vs-`move` residue documented below.
+
 ## What it does
 
 The `self->unk8C` counterpart to `func_8003CBC0`'s `self->unk88` (both set
@@ -12,7 +29,7 @@ skipping the `slot60` call entirely, rather than reaching the same skip via
 a single unified `if (result != 0)` test the way `func_8003CBC0` does.
 
 ```c
-s32 func_8003CCDC(Obj86B60 *self, s32 a1)
+s32 func_8003CCDC(Obj86B60 *self)
 {
     s32 result;
 
@@ -82,7 +99,7 @@ search blind.
 
 ```c
 #if 0
-s32 func_8003CCDC(Obj86B60 *self, s32 a1)
+s32 func_8003CCDC(Obj86B60 *self)
 {
     s32 result;
 

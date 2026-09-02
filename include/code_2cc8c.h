@@ -93,9 +93,11 @@ struct Unk78Obj {
  * how self->unk88/unk8C are later CALLED (func_8003CBC0/func_8003CCDC).
  *
  * slotAC/slotC0 ARE func_8003CBC0/func_8003CCDC respectively (OBSERVED from
- * classtable.py); func_8003C51C calls them with a caller-forwarded `s32 a1`
- * that their own bodies never read (see those two functions' own reports
- * for the "unused parameter in the callee" idiom this produces).
+ * classtable.py). func_8003C51C calls them with `self` only -- register
+ * `$a1` is genuinely live-but-unconsumed at those two call sites (leftover
+ * from an earlier `self->methods->slot60(self, 6)` call a few instructions
+ * before, on the branch that reaches them), not a real argument; neither
+ * callee's own body reads it. See func_8003C51C's own report.
  */
 struct Obj86B60Methods {
     u8 pad000[0x060];
@@ -117,13 +119,13 @@ struct Obj86B60Methods {
                                                        func_8003CA1C and
                                                        func_8003C63C (STALL) */
     u8 pad098[0x0AC - 0x098];
-    s32 (*slotAC)(Obj86B60 *self, s32 a1);         /* +0x0AC, OBSERVED:
+    s32 (*slotAC)(Obj86B60 *self);                 /* +0x0AC, OBSERVED:
                                                        IS func_8003CBC0 */
     s32 (*slotB0)(Obj86B60 *self);                 /* +0x0B0, IS
                                                        func_8003CC2C; read as
                                                        DATA by func_8003CAF8 */
     u8 pad0B4[0x0C0 - 0xB4];
-    s32 (*slotC0)(Obj86B60 *self, s32 a1);         /* +0x0C0, IS
+    s32 (*slotC0)(Obj86B60 *self);                 /* +0x0C0, IS
                                                        func_8003CCDC */
     s32 (*slotC4)(Obj86B60 *self);                  /* +0x0C4, external
                                                        (func_8003CD48); read
