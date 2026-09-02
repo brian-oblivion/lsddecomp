@@ -45,7 +45,39 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B5BC);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B700);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B930);
+s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
+    Unk68Struct *u;
+    s32 divisor;
+    s32 unk4;
+    s32 count;
+    s32 flags;
+    s32 i;
+
+    u = self->unk68;
+    divisor = u->divisor;
+    unk4 = u->unk4;
+    count = u->count;
+    if (unk4 == 0) {
+        flags = (val < divisor) ? 3 : 0;
+        if (val >= divisor * (count - 1)) {
+            flags |= 0x60;
+        }
+        if (val % divisor == 0) {
+            flags |= flag ? 0x25 : 4;
+        }
+        if ((val + 1) % divisor != 0) {
+            return ~flags;
+        }
+        flags |= flag ? 0x10 : 0x52;
+        return ~flags;
+    } else {
+        flags = -1;
+        for (i = 0; i < count; i++) {
+            flags <<= 1;
+        }
+        return ~flags;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
 
