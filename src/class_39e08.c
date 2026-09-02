@@ -70,6 +70,12 @@ void func_8004A35C(void) {
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A364);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A3EC);
+void func_8004A3EC(Obj865C8 *self, s32 arg1) {
+    func_8003E5C8()->slot60(self, arg1);
+    if (arg1 == 4) {
+        self->unk28 = 1;
+        self->methods->noop7C(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A458);
