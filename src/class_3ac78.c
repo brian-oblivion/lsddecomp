@@ -108,16 +108,18 @@ void func_8004ADD8(Class866E8 *self, void *list, s32 count)
     s32 *p;
     u8 unused[24];
 
-    if (count < 2)
+    switch (count) {
+    case 2:
+    case 3:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        break;
+    default:
         return;
-    if (count < 4)
-        goto scan;
-    if (count >= 9)
-        return;
-    if (count < 5)
-        return;
+    }
 
-scan:
     p = (s32 *)self->unkE8;
     if (p == NULL)
         return;
