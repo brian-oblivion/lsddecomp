@@ -11,6 +11,7 @@
 #include "Entity.h"
 
 extern u8 D_80089E38[];
+extern u8 D_80089E50[];
 
 void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
@@ -20,7 +21,16 @@ void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x100, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005EFF4);
+void func_8005EFF4(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0 && rand() % 7 == 0) {
+        this->methods->slot48(this, 1, D_80089E50);
+    }
+    if ((out->unk4 & 3) == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 0x1C;
+    }
+    this->methods->slotC4(this, -0x64, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_c", func_8005F0D8);
 
