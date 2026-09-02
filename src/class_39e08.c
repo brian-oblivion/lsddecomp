@@ -55,7 +55,9 @@ void func_8004A228(Obj865C8 *self) {
     func_8003E5C8()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A294);
+void func_8004A294(Obj865C8 *self) {
+    self->methods->setUnk2C(self, -1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A2C4);
 
