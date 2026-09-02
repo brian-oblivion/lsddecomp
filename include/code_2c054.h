@@ -29,6 +29,9 @@ typedef struct StreamTaskUnkB4Methods StreamTaskUnkB4Methods;
 
 struct StreamTaskObjMethods {
     s32 header; /* +0x000 */
+    u8 pad04[0x060 - 0x004];
+    void (*slot60)(StreamTaskObj *self, s32 a1); /* +0x060, func_8003BC14 occupies this slot
+                                                      (per tools/classtable.py D_8006E5F8) */
 };
 
 /* Object size is 0xDC (from func_8003B854's allocator call). Only the
@@ -97,7 +100,10 @@ struct TaskCoreMethods {
     void (*slot0C)(StreamTaskObj *self);                    /* +0x00C, func_8003B9DC's 2nd call */
     u8 pad10[0x044 - 0x010];
     s32 (*slot44)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x044, func_8003C1DC occupies this slot */
-    u8 pad48[0x080 - 0x048];
+    u8 pad48[0x078 - 0x048];
+    void (*slot78)(StreamTaskObj *self);                        /* +0x078, func_8003BD10's forward target
+                                                                      (D_8006E730+0x078 = func_8003C858) */
+    u8 pad7C[0x080 - 0x07C];
     void (*slot80)(StreamTaskObj *self);                        /* +0x080, func_8003BD74's forward target */
     void (*slot84)(StreamTaskObj *self);                         /* +0x084, func_8003BDAC's forward target */
 };
