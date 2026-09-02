@@ -104,7 +104,8 @@ struct Obj865C8 {
     s32 unk0C;                    /* +0x00C, func_80049E20 (2nd arg to func_8003E5C8()->slot44) */
     u8 pad10[0x18 - 0x10];
     SubObjA *subA;                /* +0x018, func_80049C50 */
-    u8 pad1C[0x28 - 0x1C];
+    s32 unk1C;                    /* +0x01C, func_8004A364 (compared against unk2C) */
+    u8 pad20[0x28 - 0x20];
     s32 unk28;                    /* +0x028, func_8004A3EC */
     s32 unk2C;                    /* +0x02C, func_8004A458 */
     s32 unk30;                    /* +0x030, func_8004A228 (guard) */
@@ -133,7 +134,8 @@ typedef struct IntermediateBaseMethods {
      * immediately after: same "default, then base may overwrite" shape. */
     void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
     void (*slot48)(void *self);            /* +0x048 */
-    u8 pad4C[0x60 - 0x4C];
+    u8 pad4C[0x5C - 0x4C];
+    void (*slot5C)(void *self, s32 arg1, s32 arg2); /* +0x05C, called by func_8004A364 */
     void (*slot60)(void *self, s32 arg1);  /* +0x060 */
 } IntermediateBaseMethods;
 
