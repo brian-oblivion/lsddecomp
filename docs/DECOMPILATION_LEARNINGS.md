@@ -163,6 +163,26 @@ through it. Only the load is exposed.
   table in the same `.s` as the switch that uses it. `0x1F88` (DreamSys) is the
   one such slot today.
 
+### `funcdiff.py`'s byte range is not a stalled function's true length
+
+**Round 10.** For a function that is still `INCLUDE_ASM` or whose C compiles
+to a different size, the range `funcdiff.py` prints is the range it COMPARED,
+not evidence of what your C actually produced. `func_8004BB3C` scored 14/105
+while being structurally 104 of 105 instructions identical to retail — one
+missing `addiu $s4,$s4,0xc` shifted everything after it, and the score
+understated the near-miss by an order of magnitude.
+
+**So a low score is not evidence of a distant shape.** Cross-check the real
+compiled length before concluding a body is wrong:
+
+```sh
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/<unit>.c.o
+```
+
+This is the same family as "address drift" in CLAUDE.md's four-ways-a-score-
+lies list, seen from the other side: drift makes a good score untrustworthy,
+and it also makes a bad score uninformative.
+
 ## Source-shape idioms
 
 ### How to read a one-instruction residue (round 8, three stalls closed by it)
@@ -736,6 +756,32 @@ code_2c054).**
   through `self->methods` immediately afterwards in the same function** —
   plain sequential assignment then dispatch, no re-fetch through a getter and
   no caching. (`func_8004D578`)
+
+- **Two residues can be ENTANGLED, so a change with independent evidence is
+  not refuted by scoring worse alone.** An `if`/`else` branch-polarity fix
+  scored *worse* in isolation and was the key unlock once combined with an
+  unrelated scheduling fix. A/B testing one change at a time is the right
+  default, but it silently discards any fix whose benefit only appears in
+  combination — so if a change has independent evidence behind it, keep it
+  and keep looking rather than reverting on the score. (`func_8004B700`,
+  52/140 -> 125/140)
+
+- **GCC 2.6.3's strength reduction collapses two array-field accesses into
+  ONE induction variable once it can prove they share a base and index, and
+  C-level grouping does not stop it.** Plain indexing, an intermediate
+  element pointer, a nested sub-struct and a manual byte-cast dual-pointer
+  walk all collapse identically. Retail walking an array with two
+  independently-incrementing pointers therefore needs the relationship
+  genuinely severed — or, as in `func_8004B700`, the second walk to be over
+  an unrelated array. (`func_8004BB3C`, missing exactly one
+  `addiu $s4,$s4,0xc`)
+
+- **A store-then-reread of a narrow SIGNED field can compile as an unsigned
+  reload plus a manual sign-extend rather than retail's single `lb`**,
+  costing an instruction. Isolated reproducer in the report. Note this is a
+  different mechanism from the `-funsigned-char` byte-copy entry above,
+  which is about the load width; this one is about the sign-extension
+  strategy after a reload. (`func_8004C1C0`)
 
 ### New residue classes opened this round (not yet closed)
 
