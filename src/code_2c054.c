@@ -40,7 +40,9 @@ void func_8003BCF4(StreamTaskObj *self, s32 a1) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD10);
 
-INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BD74);
+void func_8003BD74(StreamTaskObj *self) {
+    func_8003DFBC()->slot80(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2c054", func_8003BDAC);
 
