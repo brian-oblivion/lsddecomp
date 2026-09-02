@@ -265,6 +265,16 @@ typedef struct DreamSysVec3 {
 } DreamSysVec3;
 extern DreamSysVec3 D_80087EA4;
 
+/* A `struct RelativePos` constant, passed as func_8005AF64's `a` argument
+   by func_8005AD68 (round 2026-09-02). */
+extern struct RelativePos D_8008ABD0;
+
+/* Address-of only (never dereferenced by this unit's queued functions),
+   forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AD68
+   (round 2026-09-02) -- same "opaque generic pointer" shape as that slot's
+   other known call site (D_80087E84[-1]). */
+extern u8 D_80087EFC[];
+
 /* Argument shape for func_8005950C: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
    (unread by this function). Called by still-INCLUDE_ASM func_8005942C as
@@ -489,7 +499,16 @@ typedef struct DreamSys {
 	s32 unk_0x908;
 	s32 unk_0x90C;
 	s32 unk_0x910;
-	s8 unknown_values_0x914[0x10];
+	/* A retry/attempt counter (round 2026-09-02, func_8005AD68): read as a
+	   whole word, compared against several literal bands, and incremented
+	   by 1 at that function's normal exit. */
+	s32 unk_0x914;
+	s8 unknown_values_0x918[4];
+	/* A `struct RelativePos`, address-taken and passed to func_8005AF64 as
+	   its `b` argument (round 2026-09-02, func_8005AD68) -- carved out of
+	   what was raw padding in the same 0x10-byte block as unk_0x914 above. */
+	struct RelativePos unk_0x91C;
+	s8 unknown_values_0x922[2];
 	s32 unk_0x924;
 } DreamSys;
 

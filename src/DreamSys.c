@@ -583,7 +583,32 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AB2C);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AC24);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AD68);
+s32 func_8005AD68(DreamSys *this)
+{
+	if (this->unk_0x914 == 0) {
+		func_8005AF64(this, &D_8008ABD0, &this->unk_0x91C);
+	}
+	if (this->unk_0xAC != 4) {
+		if (this->unk_0x914 < 0x65) {
+			if ((u32)(this->unk_0x914 - 0x2B) < 0xF) {
+				this->unk_0xA4 = 2;
+			}
+		} else {
+			return 1;
+		}
+	} else {
+		if (this->unk_0x914 < 15) {
+			if ((u32)(this->unk_0x914 - 8) < 2) {
+				this->vt->func_8001CEB4(this, 0, &D_80087EFC);
+			}
+		} else {
+			return 1;
+		}
+	}
+	this->unk_0xA0 = 1;
+	this->unk_0x914++;
+	return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AE40);
 
