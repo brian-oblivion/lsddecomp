@@ -408,7 +408,9 @@ typedef struct DreamSys {
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
 	s32 unk_0x884;
-	s8 unknown_values_0x888[4];
+	/* Zeroed (whole word) by func_8005A7A0 alongside unk_0x884
+	   (round 2026-09-02). */
+	s32 unk_0x888;
 
 	s32 storedDay;
 
@@ -673,6 +675,25 @@ extern s8 SPECIAL_COLORS[];
    proves nothing about it (round 2026-08-30-c). */
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
                            s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
+
+/* Called by func_8005A700 as (this, &local) where `local` is a 0x10-byte
+   stack buffer also forwarded to func_8005BD3C below; return value is
+   discarded at this call site (round 2026-09-02). NOT in this unit at all --
+   its body disassembles into asm/code_d294.s, an uncarved segment -- so this
+   prototype only types this one call site, per the "calling into a function
+   that is still INCLUDE_ASM elsewhere is fine" convention
+   (DECOMPILATION_LEARNINGS.md). A discarded return is not evidence of
+   `void` (same doc); kept `void` here only because nothing at this call
+   site constrains it further. */
+extern void func_8001E6F8(DreamSys *this, void *arg1);
+
+/* Called by func_8005A700 as (&this->unk_0x888, &this->unk_0x884, &local) --
+   same `local` buffer func_8001E6F8 fills above; result used as a truth
+   value (`beqz`), so s32 (round 2026-09-02). Blocked by both the
+   gp-relative and addiu_at blockers -- see
+   docs/match-reports/func_8005BD3C.md -- so it stays INCLUDE_ASM; this
+   prototype only types the call site. */
+extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
    STAGE_PERMALINK_* triple above but for tunnel links specifically. */
