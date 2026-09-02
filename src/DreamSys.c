@@ -475,7 +475,21 @@ bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A7A0);
+bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+
+	if (this->unknwon_int_0x44 != 0)
+		return false;
+	result = func_8005BE90(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
+	if (result < 0)
+		return false;
+	this->unk_0x880 = func_8005BF48();
+	this->unk_0x884 = 0;
+	this->unk_0x888 = 0;
+	ExecuteLink(this, result, 0x10, 0);
+	return true;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A82C);
 
@@ -601,9 +615,22 @@ void DreamSys__ResetFlashbackList(DreamSys *this)
 	this->amountFlashbacksAvailable = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B904);
+void func_8005B904(DreamSys *this)
+{
+	DreamSysUnk14 *p = this->unk_0x14;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005B990);
+	this->unk14Snapshot = *p;
+	this->unk14TailSnapshot = *p->unk_0x44;
+}
+
+void func_8005B990(DreamSys *this)
+{
+	DreamSysUnk14 *p = this->unk_0x14;
+
+	*p = this->unk14Snapshot;
+	*p->unk_0x44 = this->unk14TailSnapshot;
+	p->unk_0x0 = 0;
+}
 
 s32 func_8005BA20(DreamSys *this, s32 value)
 {
