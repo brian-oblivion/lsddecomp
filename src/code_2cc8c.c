@@ -128,7 +128,13 @@ void func_8003CA1C(Obj86B60 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CA94);
+void func_8003CA94(Obj86B60 *self)
+{
+    if (self->unk9C != NULL) {
+        self->unk9C(self->unkA0);
+    }
+    self->methods->slot60(self, 7);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CAEC);
 
