@@ -166,6 +166,18 @@ live rather than transcribed:
   blocked. **Read the report before staffing anyone onto a function** — several
   carry an explicit do-not-re-staff finding, and re-deriving one costs a round.
 
+  **But a report is the best available account, not a verdict.** Round 7
+  retired a stall whose report carried fourteen attempts by two authors, a
+  head re-audit that CONFIRMED the classification, and a corpus census
+  supporting it — and it was still the wrong diagnosis. Trust a report to
+  tell you what has been tried; do not let it tell you what is impossible.
+  The specific way it went wrong is worth knowing, because it is cheap to
+  repeat: every attempt varied the code that COMPUTED a value while holding
+  the call's signature fixed, so the whole attempt history explored one
+  branch of the space and read as if it had explored all of it. When a report
+  shows many attempts along one axis, that is a reason to look for the axis
+  nobody varied.
+
 For uncarved ground, see Gate 2 in `docs/PARALLEL-RUNS.md`, which lists the
 segments live and records the carve hazards found so far.
 
