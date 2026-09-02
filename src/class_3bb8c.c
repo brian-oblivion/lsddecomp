@@ -66,9 +66,15 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C158);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C1C0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C368);
+void func_8004C368(Obj866E8 *self, u8 *out, s32 val) {
+    out[0] = val % self->unk68->divisor;
+    out[1] = val / self->unk68->divisor;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C3F0);
+Unk1BCObj *func_8004C3F0(Obj866E8 *self, u8 *out) {
+    func_8004C368(self, out, self->unk1BC->unk4->unk30);
+    return self->unk1BC;
+}
 
 Elem *func_8004C434(Obj866E8 *self, s32 key) {
     s32 i;
