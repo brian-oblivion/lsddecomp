@@ -23,6 +23,20 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
 tools/setup-worktree.sh bravo     # -> ../<checkout>-wt-bravo, branch runner/bravo
 ```
 
+**Worktrees land OUTSIDE the project directory, so they are outside whatever
+directory the session trusts.** `../<checkout>-wt-<name>` is a sibling of the
+checkout, not a child, which is ordinary git practice but means an agent
+working in one is operating outside the primary working directory. In
+permissive/auto permission modes that shows up as runners prompting for
+approval on ordinary commands — most visibly `git commit`, which they run
+often — while the head in the main checkout is never asked. It is not a
+misconfiguration and nothing is wrong with the worktree.
+
+Decide before spawning: either grant the worktree paths for the session
+(so the round runs unattended), or expect to approve runner commands
+interactively. Granting is a permission change, so it is the operator's call,
+not the head's — ask, do not assume.
+
 **`<checkout>` is the basename of YOUR main checkout, not a fixed string.**
 The script derives the destination from it, so a clone named `lsddecomp`
 produces `../lsddecomp-wt-alpha`. This document previously hardcoded a
@@ -53,6 +67,31 @@ a lost one. Check them by hand, every time.
 1. **One unit per runner.** A runner is assigned exactly one `src/<unit>.c` and
    touches only that file plus `docs/match-reports/` entries for functions in
    it. Nothing else.
+
+   **This rule does NOT partition headers, and the head must plan for that.**
+   Round 8 assigned `class_3bb8c` and `class_3bb8c_b` — adjacent slices of one
+   class block — to two runners, who then both edited `include/class_3bb8c.h`
+   and produced the round's only merge conflict. Two consequences, both the
+   head's job:
+
+   - **At assignment time**, notice when two units share a header (adjacent
+     slices of one carve almost always do) and tell both runners: header edits
+     strictly ADDITIVE, place each new declaration next to related existing
+     ones rather than in a block at the top or bottom, and *state explicitly in
+     the final summary* any change to an EXISTING declaration. That last part
+     is what makes the merge cheap; both round-8 runners complied and the
+     conflict took one pass to resolve.
+   - **At merge time**, expect the two runners' views to be COMPLEMENTARY
+     rather than contradictory, and union them. In round 8 both had
+     independently found the same struct field from different call sites, each
+     had fields the other lacked, both had kept the struct size right, and the
+     only true collision was that they had given one field two different type
+     NAMES. Unify the name: the project's multiple-independent-local-views
+     convention is for views in DIFFERENT unit headers, and two names for one
+     field inside a single header is a trap for the next reader.
+   - **Then re-verify EVERY match from BOTH runners individually**, not just
+     the whole-image SHA1. A shared-declaration merge that compiles is not the
+     same as one that preserves codegen.
 
 2. **A preserved body must be INLINED in the match report, as literal source,
    with every declaration it needs, positioned where it would compile.** Both
@@ -441,7 +480,15 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 >
 > **The oracle.** `./build-and-verify.sh` plus `tools/funcdiff.py`. Chain them
 > so you cannot read a score from a failed build:
-> `./build-and-verify.sh > /tmp/b.log 2>&1; echo "build exit=$?"; grep -nE 'Error [0-9]|error:|parse error|undefined reference' /tmp/b.log | head -8; .venv/bin/python3 tools/funcdiff.py <fn>`
+> `./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; grep -nE 'Error [0-9]|error:|parse error|undefined reference' /tmp/<name>_b.log | head -8; .venv/bin/python3 tools/funcdiff.py <fn>`
+>
+> **The log path MUST carry your runner name.** This prompt used to say
+> `/tmp/b.log` for everyone, and in round 8 two runners writing that one
+> file crossed over — one of them read another runner's build result and
+> acted on it before noticing. `/tmp` is not per-worktree. That is a false
+> oracle in the worst possible place: the log you grep to decide whether
+> your score means anything. Substitute your own name into the path here
+> and in every later invocation.
 > — the ONLY line that decides whether the number is meaningful is `build
 > exit=`. funcdiff also guards this itself and exits 2 when it cannot trust the
 > number; read its warnings. A failed COMPILE and a failed LINK both leave the

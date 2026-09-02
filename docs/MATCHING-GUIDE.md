@@ -67,6 +67,12 @@ grep -nE 'Error [0-9]|error:|parse error|undefined reference' /tmp/b.log | head 
 `build exit=` is the only line that decides whether the score means anything.
 See CLAUDE.md "The three ways a score lies".
 
+**In a parallel round, put your runner name in the log path** —
+`/tmp/<name>_b.log`. `/tmp` is shared between worktrees, and in round 8 two
+runners both writing `/tmp/b.log` crossed over: one read the other's build
+result. A shared scratch path turns the log you grep to validate your score
+into a fourth way a score can lie.
+
 To read a diff rather than score it:
 
 ```sh
@@ -177,6 +183,27 @@ live rather than transcribed:
   branch of the space and read as if it had explored all of it. When a report
   shows many attempts along one axis, that is a reason to look for the axis
   nobody varied.
+
+  **Round 8 retired three more, and the pattern repeated exactly.** All three
+  were written up as compiler-internal with mechanically detailed reasoning —
+  one cited GCC's `reorg.c` by function name — and all three fell to a
+  source-level change:
+
+  | function | had stood as | actually was |
+  | --- | --- | --- |
+  | `new_class_6d3c8` | delay-slot filler choice, 3 rounds, 20+ attempts | one surplus `return` on the null path |
+  | `strcat` | ditto, plus a head adjudication | `return dest;` vs `return NULL;` on a guard |
+  | `func_80026698` | switch-lowering internals, 2 rounds | the store's value misread as 3; it is 1 |
+
+  The common failure was not laziness — every one of those reports was
+  careful. It was that **a plausible mechanism attached to a real measurement
+  still has to be checked against the instructions.** Two of the three were
+  fixed by re-reading four instructions; the third by noticing that a delay
+  slot had changed a register before the branch target read it. Before you
+  believe any "compiler-internal" verdict, re-read the residue's immediate
+  neighbourhood and ask the two questions in DECOMPILATION_LEARNINGS' "How to
+  read a one-instruction residue": did a delay slot move a value, and did the
+  author transcribe a lowering instead of the expression behind it?
 
 For uncarved ground, see Gate 2 in `docs/PARALLEL-RUNS.md`, which lists the
 segments live and records the carve hazards found so far.

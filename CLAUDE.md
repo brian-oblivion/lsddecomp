@@ -179,6 +179,9 @@ Gate 2.
    .venv/bin/python3 tools/funcdiff.py <func>
    ```
 
+   Working in parallel? Use `/tmp/<name>_b.log`, not the shared `/tmp/b.log`
+   — see docs/PARALLEL-RUNS.md.
+
    The only line that decides whether the number is meaningful is `build
    exit=`. To *read* a diff rather than score it, use asm-differ:
    `.venv/bin/python3 tools/asm-differ/diff.py <func>`.

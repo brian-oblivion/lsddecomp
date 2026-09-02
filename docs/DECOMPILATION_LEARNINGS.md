@@ -103,6 +103,24 @@ through it. Only the load is exposed.
 
 ## Build hygiene (proven, the hard way)
 
+- **Address drift looks exactly like a broken symbol, and TWO runners lost
+  time to it independently in one round.** If your function is the wrong
+  length, every symbol linked after it shifts, so an unrelated and already
+  correct data symbol resolves to the wrong address in the map, and a byte
+  diff shows a "wrong" immediate. Both runners suspected symbol or table
+  layout; in both cases the real fault was their own function's word count.
+  **Check your own function's size first, and check the plain `.o`'s
+  relocations (`objdump -dr`) before suspecting anything about symbols.**
+  funcdiff's "differs OUTSIDE this range" count firing at the tens-of-KB
+  scale is the tell that you are looking at drift, not at a symbol bug.
+  (`func_8005FB6C`, `func_8005AB2C` — found separately, in different units.)
+- **Do not share a scratch path between parallel runners.** The runner prompt
+  in PARALLEL-RUNS.md used to hardcode `/tmp/b.log`, so every runner in a
+  round wrote and grepped the same file, and one runner read another's build
+  result before noticing. That is a false oracle in the one place the workflow
+  cannot afford one — the log a runner greps to decide whether its score means
+  anything. Runner-unique paths are now mandatory; see the runner prompt.
+
 - **A header edit rebuilds everything, on purpose.** The Makefile makes every
   C object depend on every header. Without that, editing a struct layout
   rebuilt nothing, `make` reported success, and the next funcdiff scored the
@@ -147,7 +165,96 @@ through it. Only the load is exposed.
 
 ## Source-shape idioms
 
+### How to read a one-instruction residue (round 8, three stalls closed by it)
+
+Put this first because it retired more standing stalls in one round than any
+other idea here, and because the thing it replaces — a detailed, plausible
+theory about GCC's scheduler — is what those stalls had been written up as for
+three rounds.
+
+- **When your diff is ONE redundant or ONE missing `move`, count how many
+  times your SOURCE mentions the value.** It is almost never a scheduling
+  choice. Two instances, closed the same round, pointing opposite ways:
+  - `new_class_6d3c8` mentioned its return value once too **many** — a
+    `return self;` on a path where the allocator had already left the value in
+    `$v0`. The fix moved the `return` inside the `if` and let the null path
+    fall off the end of a non-void function. Removing a mention removed a
+    `move`.
+  - `strcat` mentioned `dest` once too **few** — a null-guard spelled
+    `return NULL;` where retail spelled `return dest;`. Identical value (dest
+    *is* null there), but returning it USES it, keeping it live so the
+    compiler establishes it in `$a0`. Adding a mention added a `move`.
+
+  In both cases the surplus/missing copy landed in a branch delay slot, which
+  is exactly why both read as delay-slot filler choices. **A surplus value has
+  to go somewhere, and a free delay slot is where the scheduler puts it — so
+  "different filler" and "one value too many" are indistinguishable in a
+  diff.** Prefer the surplus-value reading: it has a source-level fix and the
+  scheduling reading does not.
+
+- **A delay-slot instruction belongs to the TAKEN path too.** MIPS runs it
+  before control transfers, so when a branch's delay slot writes a register the
+  TARGET reads, evaluate the value at the target, not at the branch.
+  `func_80026698` had `li $v0, 0x1` in the delay slot of its case-3 branch and
+  `sw $v0, 0x24(s1)` at the target — so the store writes **1**, not the `3`
+  that `$v0` held for the comparison. Two rounds read it as `= 3` and that one
+  wrong value manufactured two separate compiler mysteries: a "materialised
+  unused default-arm constant" (not unused — it IS the stored value) and a
+  "wrong register" store (with the right value, `$v0` is simply where the 1
+  already is).
+
+- **Do not transcribe a lowering back into C.** If your C reproduces retail's
+  instruction sequence rather than the expression behind it, it usually costs a
+  word. GCC 2.6.3 lowerings met so far:
+  - `xori $r,$r,K` then `sltiu $r,$r,1` is `x == K` — *not*
+    `(u32)(x ^ K) < 1`. That transcription is arithmetically correct and two
+    instructions long. (`func_80026698`)
+  - `sltu $r,$zero,$r` is `x != 0`; `sltiu $r,$r,1` is `x == 0`.
+  - A `sll`/`sra` pair by the same amount is a cast to a narrower signed type.
+  - A `mult`/`mfhi`/sign-fix chain is `%` or `/` by a constant — see the
+    entry below.
+
+- **Still the first discriminator, and it comes before all of the above: do the
+  branch TARGETS agree?** A differing delay slot is a scheduling artifact; a
+  differing branch target is a differing control-flow graph, and a differing
+  CFG always comes from the source. (`strcat`, where reading past this cost 25
+  words.)
+
 ### Confirmed on this game (each backed by a byte-exact match)
+
+- **Write a small early exit as an inverted guard clause, not as the `else` of
+  a big `if`.** `if (cond) { lots } else { return k; }` stops being reproduced
+  once the `lots` side grows past some size threshold; `if (!cond) return k;`
+  followed by the body reproduces it. Confirmed three times in one round
+  (`DreamSys__TimerTick`, `func_8005AB2C`, `func_8005AE40`).
+- **An early-exit guard may have to leave the whole FUNCTION, not just the
+  block it appears to wrap.** Check where the failing branch actually lands
+  rather than what it visually encloses — if it lands on the epilogue, an
+  unconditional tail call later in the function must not fire on the failure
+  path. (`DreamSys__WallLink`)
+- **Take an explicit intermediate element pointer in an array loop.**
+  `Elem *e = &self->arr[i];` rather than repeated `self->arr[i].field`, or GCC
+  2.6.3 repurposes `self` itself as the induction variable and the loop's
+  register assignment diverges. Confirmed twice (`func_8004C588`,
+  `func_8004C5D0`).
+- **Statement order around a call decides whether a "default, then
+  conditionally overridden" local survives it.** Assign the default AFTER the
+  intervening call, not before: assigned before, the value has to live across
+  the call and GCC promotes it to a callee-saved register, growing the frame.
+  (`func_8005FDFC`; and the inverse negative — the same lever applied to a
+  compile-time LITERAL rather than a struct-field read makes things worse, see
+  `func_8005F544`.)
+- **Do not cache a `this->field` across an intervening vtable call.** Re-read
+  it at each use site; caching forces the same spurious callee-saved
+  promotion. (`func_8005FB6C`)
+- **A bare `andi $v0,$v0,N` with no sign-fix sequence is `& (N-1)`, not
+  `% N`.** The `%` form always drags in the `mult`/`mfhi` sign-fix chain, so
+  its absence is the discriminator. (`func_8005EFF4`)
+- **A struct whose members are all `s8`/`s16` has alignment 2, and that is
+  load-bearing.** It is what makes a whole-struct copy compile to unaligned
+  `lwl`/`lwr` + `swl`/`swr` instead of aligned `lw`/`sw`. One stray `s32`
+  member changes the alignment and the copy no longer matches.
+  (`func_8004B38C`, and `FlashbackRotation` in `include/DreamSys.h` earlier.)
 
 - **`x % N` for a compile-time-constant `N`: just write `%`.** Retail's
   `mult`/`mfhi`/`sra`-`subu` sign-fix followed by a `sll`+`addu` chain that
