@@ -51,7 +51,17 @@ INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A070);
 
 INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A130);
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A19C);
+void func_8004A19C(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
+    func_8003E5C8()->ctor(self);
+    self->methods = (Class865C8Methods *)func_8004A4B8();
+    if (arg1 != 0) {
+        self->subB = func_8002C480(arg1);
+    } else {
+        self->subB = arg2;
+    }
+    self->unk30 = arg1;
+    self->methods->resetUnk3C(self);
+}
 
 void func_8004A228(Obj865C8 *self) {
     if (self->unk30 != 0) {

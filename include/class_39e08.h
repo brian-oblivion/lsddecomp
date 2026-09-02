@@ -123,7 +123,8 @@ struct Obj865C8 {
  * unit's functions dispatch through when explicitly calling the BASE
  * implementation are typed. */
 typedef struct IntermediateBaseMethods {
-    u8 pad00[0x0C];
+    u8 pad00[0x008];
+    void *(*ctor)(void *self);             /* +0x008, called by func_8004A19C with only `self` set up */
     void (*dtor)(void *self);              /* +0x00C */
     u8 pad10[0x44 - 0x10];
     /* Same accessor/slot combination code_2c054.h calls
@@ -157,12 +158,21 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
  * D_800865C8's slots (+0x008, +0x00C, +0x040, +0x044, +0x048) while sharing
  * the rest verbatim (+0x058..+0x070, confirmed identical function
  * addresses in both tables by tools/classtable.py). Constructed by
- * func_8004A130, a New_X allocator (0x38-byte instance). Only the ctor
- * slot is typed; everything else is out of this round's scope
- * (func_8004A19C/func_8004A2C4, still INCLUDE_ASM elsewhere in this unit). */
+ * func_8004A130, a New_X allocator (0x38-byte instance). Instances share
+ * `Obj865C8`'s own layout (func_8004A19C writes `unk30`/`subB` at the exact
+ * same offsets `Obj865C8`'s other functions already use), so this class's
+ * own instances are typed `Obj865C8 *` too rather than inventing a second,
+ * parallel struct.
+ *
+ * `ctor` (+0x008, func_8004A19C) never uses its own return value at either
+ * of its two call sites (its own body sets no explicit `$v0` before
+ * returning either -- CLAUDE.md's "discarded return is never evidence of
+ * void" rule is about NOT assuming void from a discarding caller alone, but
+ * here the callee's OWN body never materializes a return value at all, so
+ * `void` is the callee-side reading, not an inference from the caller). */
 typedef struct Class86668Methods {
     u8 pad00[0x08];
-    void *(*ctor)(void *self, void *arg1, void *arg2); /* +0x008 func_8004A19C */
+    void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
 } Class86668Methods;
 
 /* A plain accessor with no parameters, returning &D_80086668. Defined in the
@@ -174,5 +184,11 @@ extern Class86668Methods *func_8004A4B8(void);
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
  * class_16334.h for the other units that also declare it locally. */
 extern void *func_80017B34(s32 size);
+
+/* Allocator in the still-uncarved unit code_179d8 (asm/code_179d8.s):
+ * allocates a 0x64-byte instance and, on success, ctors it with the single
+ * forwarded argument. Only call site here is func_8004A19C, which stores
+ * the result straight into `Obj865C8::subB` (`SubObjB *`). */
+extern SubObjB *func_8002C480(s32 arg1);
 
 #endif
