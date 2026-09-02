@@ -283,7 +283,9 @@ typedef struct Bounds866E8_3bb8c_b {
 
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
-    u8 pad04[0x54 - 0x04];
+    u8 pad04[0x0C - 0x04];
+    s32 unkC;                      /* +0x00C, func_8004D678 (compared against 9999999) */
+    u8 pad10[0x54 - 0x10];
     Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
     u8 pad60[0x68 - 0x60];
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
@@ -304,6 +306,8 @@ struct Obj866E8 {
     Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
     s32 unk1E0;                    /* +0x1E0, func_8004D028/func_8004D088: a countdown gate */
     void *unk1E4;                  /* +0x1E4, func_8004D0D0: forwarded opaquely to EntryChildObjMethods::slot48 */
+    u8 pad1E8[0x2F4 - 0x1E8];
+    s32 unk2F4;                    /* +0x2F4, func_8004D678: zero-checked when unkC > 9999999 */
 };
 
 /* Get-vtable helper, same shape and same real function as
@@ -336,5 +340,115 @@ extern void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChil
  * Never dereferenced in this unit, so left untyped in size only. */
 extern s32 D_800869CC[3];
 
+/* -------------------------------------------------------------------
+ * class_3bb8c_c additions below. Two small sibling classes, each built
+ * by its own New_X/ctor pair (allocator + base-chain + own-vtable-set,
+ * the same shape as func_8004A19C in class_39e08.c). Named by their
+ * vtable's address, same convention as Class866E8/Class86668.
+ * ------------------------------------------------------------------- */
+
+typedef struct Class869D8 Class869D8;
+typedef struct Class869D8Methods Class869D8Methods;
+
+/*
+ * Vtable D_800869D8 (asm/data/76DC8.data.s, header word 0x17). Only the
+ * slots this unit's own functions reach are typed: +0x008 (ctor,
+ * func_8004D2A4, called by New_Class869D8/func_8004D254) and +0x040 (a
+ * post-construct hook, func_8004D2F8 -- already matched, empty body).
+ */
+struct Class869D8Methods {
+    u8 pad000[0x008];
+    void (*ctor)(Class869D8 *self);            /* +0x008, func_8004D2A4 */
+    u8 pad00C[0x040 - 0x00C];
+    void (*slot40)(Class869D8 *self);          /* +0x040, func_8004D2F8 */
+};
+
+struct Class869D8 {
+    Class869D8Methods *methods;                /* +0x000 */
+};
+
+extern Class869D8Methods D_800869D8;
+extern Class869D8Methods *func_8004D37C(void);
+
+/*
+ * Base-class ctor-table getter, chained by func_8004D2A4. Only the ctor
+ * slot (+0x008, single `self` argument -- this call site sets up no
+ * second argument register) is needed here.
+ */
+typedef struct BaseCtorTable_3bb8c_c {
+    u8 pad0[0x008];
+    void (*ctor)(void *self);
+} BaseCtorTable_3bb8c_c;
+
+extern BaseCtorTable_3bb8c_c *func_8003F24C(void);
+
+extern void *func_80017B34(s32 size);
+
+typedef struct Class86AA0 Class86AA0;
+typedef struct Class86AA0Methods Class86AA0Methods;
+
+/*
+ * Vtable D_80086AA0 (asm/data/76DC8.data.s, header word 0x24). Sibling of
+ * Class869D8Methods above, same shape: ctor at +0x008 (func_8004D3DC,
+ * called by New_Class86AA0/func_8004D38C). +0x0B8 is dispatched by this
+ * class's own func_8004D434 (slot +0x09C in the same table); its exact
+ * purpose is unestablished beyond "called on self with no other args".
+ */
+struct Class86AA0Methods {
+    u8 pad000[0x008];
+    void (*ctor)(Class86AA0 *self);            /* +0x008, func_8004D3DC */
+    u8 pad00C[0x0B8 - 0x00C];
+    void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by func_8004D434 */
+};
+
+struct Class86AA0 {
+    Class86AA0Methods *methods;                /* +0x000 */
+    u8 pad004[0x034 - 0x004];
+    u16 unk34;                                 /* +0x034, func_8004D3DC: zeroed in the ctor */
+    u16 unk36;                                 /* +0x036, func_8004D3DC: zeroed in the ctor */
+    s32 unk38;                                 /* +0x038, func_8004D3DC: zeroed in the ctor */
+};
+
+extern Class86AA0Methods D_80086AA0;
+extern Class86AA0Methods *func_8004D508(void);
+
+extern BaseCtorTable_3bb8c_c *func_8001E57C(void *self);
+
+/*
+ * Generic class-instance shape used only to read another object's own
+ * vtable header-tag BYTE (the low byte of the header word at the vtable's
+ * own +0x000) -- func_8004D434's own second argument is dispatched this
+ * way, compared against a literal 0x34.
+ */
+typedef struct GenericTagMethods_3bb8c_c {
+    u8 tag;                                     /* +0x000, low byte of the header word */
+} GenericTagMethods_3bb8c_c;
+
+typedef struct GenericTagInst_3bb8c_c {
+    GenericTagMethods_3bb8c_c *methods;         /* +0x000 */
+} GenericTagInst_3bb8c_c;
+
+/*
+ * First argument of func_8004D678: an unrelated, larger caller-side
+ * struct (only seen from its one caller, func_8004DE08 in the still-
+ * uncarved asm/class_3bb8c_d.s) whose own +0x0BC field is a pointer to
+ * the Obj866E8 instance this function actually operates on -- NOT
+ * Obj866E8's own +0x0BC (that offset on Obj866E8 itself is the
+ * already-documented embedded Descriptor10 `unkBC`). Named distinctly to
+ * avoid implying any relation to Obj866E8's own layout.
+ */
+typedef struct Ctx678_3bb8c_c {
+    u8 pad00[0x0BC];
+    Obj866E8 *target;                           /* +0x0BC */
+} Ctx678_3bb8c_c;
+
+/*
+ * Second argument of func_8004D678: holds a pointer at +0x018 to a small
+ * result block whose word at +0x004 is the flag func_8004D678 computes.
+ */
+typedef struct Result678_3bb8c_c {
+    u8 pad00[0x018];
+    s32 *block;                                 /* +0x018, func_8004D678 writes block[1] */
+} Result678_3bb8c_c;
 
 #endif
