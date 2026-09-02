@@ -110,6 +110,10 @@ extern s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct 
  * placeholder since only its address is taken. */
 extern s32 D_80086904;
 
+/* Constant `Unk54Struct` (unk0=-1, unk4=0, unk8=0x140014) whole-struct-copied
+ * by func_8004CDA4 into self+0x8C+key*0xC. */
+extern Unk54Struct D_80086990;
+
 /* Only the slots this unit's functions dispatch through (via
  * self->methods->slotNN) are typed; everything else stays opaque so the
  * struct keeps the right size/offsets without requiring every method to be
@@ -131,7 +135,10 @@ typedef struct Obj866E8Methods {
     /* Called by func_8004BD14 with one of the object's own Elem array
      * slots. */
     void (*slot104)(Obj866E8 *self, Elem *entry);  /* +0x104 */
-    u8 pad108[0x110 - 0x108];
+    u8 pad108[0x10C - 0x108];
+    /* Called by func_8004CC74 with its own stack-local query buffer
+     * (see `CC74QueryBuf`) and a literal 0; return value unused there. */
+    s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2); /* +0x10C */
     /* Called by func_8004C158 with its own arg1 and a computed pointer;
      * matches class_3ac78's independent view of the same slot
      * (`slot110`/func_8004C1C0, s32 return, not this round's function). */
@@ -142,6 +149,15 @@ typedef struct Obj866E8Methods {
      * so this is almost certainly `return &self->arr[index];` -- not
      * this round's function to match. */
     Elem *(*slot118)(Obj866E8 *self, s32 index);   /* +0x118 */
+    u8 pad11C[0x120 - 0x11C];
+    /* Called twice by func_8004CAF0, each time with a small offset off
+     * its own arg3; the return value is stored as a freshly-created
+     * GridSlot866E8's `elemIdx`. */
+    s32 (*slot120)(Obj866E8 *self, s32 arg1);      /* +0x120 */
+    /* Called by func_8004CDA4 with its own arg3 (unmodified); the return
+     * value is stored into the first word of a freshly-copied 3-word
+     * slot at self+0x8C+key*0xC (see func_8004CDA4). */
+    s32 (*slot124)(Obj866E8 *self, s32 arg1);      /* +0x124 */
 } Obj866E8Methods;
 
 /*
@@ -237,11 +253,13 @@ typedef struct EntryChildObjMethods {
 struct EntryChildObj {
     EntryChildObjMethods *methods;  /* +0x000, func_8004D0D0/func_8004D108 */
     u8 pad04[0x10 - 0x04];
-    u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000 */
+    u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000; func_8004CE24: bit31 set/cleared per its own arg1 */
     u8 pad14[0x18 - 0x14];
     s32 unk18;                      /* +0x018, func_8004C0AC: zeroed */
     u8 pad1C[0x20 - 0x1C];
     s32 unk20;                      /* +0x020, func_8004C0AC: zeroed */
+    u8 pad24[0x38 - 0x24];
+    EntryChildObj *unk38;           /* +0x038, func_8004CE24: singly-linked chain, walked while non-NULL */
 };
 
 /*
@@ -281,6 +299,66 @@ typedef struct Bounds866E8_3bb8c_b {
     s32 unk8;                      /* +0x008, func_8004CD38: this < point[1] -> out of range (also the function's own return value) */
 } Bounds866E8_3bb8c_b;
 
+/*
+ * self->unk1E4's pointee: one of four static 0xC-byte table entries at
+ * D_8008699C/D_800869A8/D_800869B4/D_800869C0 (addresses confirmed 0xC
+ * apart), selected by func_8004CFB8 from (rate > 0, flag != 0) and never
+ * dereferenced past +0x006. The same 0xC stride lines up with
+ * D_800869CC (declared `extern s32 D_800869CC[3]` below, by
+ * func_8004D108) as a plausible fifth entry of the same table, but
+ * nothing in this unit reaches that entry through THIS pointer type, so
+ * the two stay independently declared rather than unified into one
+ * array of unproven length.
+ */
+typedef struct EntryDesc866E8 {
+    u8 pad0[0x6];
+    s16 unk6;          /* +0x006, func_8004CFB8: multiplied against abs(rate) */
+    u8 pad8[0xC - 0x8];
+} EntryDesc866E8;
+
+extern EntryDesc866E8 D_8008699C;
+extern EntryDesc866E8 D_800869A8;
+extern EntryDesc866E8 D_800869B4;
+extern EntryDesc866E8 D_800869C0;
+
+/*
+ * self+0x8C's array element (`Obj866E8::slots8C`, see below). Established
+ * from func_8004CE24, which reads all five fields: `elemIdx` selects
+ * `self->arr[elemIdx]`; `h4`/`h6` locate a starting cell in that element's
+ * `unk10` pointer grid (row stride 20 cells, confirmed by the `* 20`
+ * offset math); `h8`/`hA` are the sub-rectangle's width/height walked
+ * from that starting cell. func_8004CDA4 (already matched, a different
+ * unit's round) writes a whole one of these via a 3-word block copy using
+ * the coarser, already-committed `Unk54Struct` view of the SAME memory --
+ * per this project's independent-views convention, that write-side view
+ * is left alone; this is a separate, more granular READ-side view of the
+ * same 0xC bytes, justified because a whole-struct copy does not care
+ * about the internal layout it is copying.
+ */
+typedef struct GridSlot866E8 {
+    s32 elemIdx;   /* +0x0, func_8004CE24: selects self->arr[elemIdx] */
+    s16 h4;        /* +0x4, func_8004CE24: starting column */
+    s16 h6;        /* +0x6, func_8004CE24: starting row (row stride 20) */
+    s16 h8;        /* +0x8, func_8004CE24: sub-rectangle width */
+    s16 hA;        /* +0xA, func_8004CE24: sub-rectangle height */
+} GridSlot866E8;
+
+/*
+ * func_8004CC74's own stack-local query buffer, filled by a call through
+ * `Obj866E8Methods::slot10C` and read back at two offsets: `+0x2` (a
+ * signed [x,y] byte pair, forwarded to func_8004CD38 as its `point`
+ * argument) and `+0x28` (a plain `s32`, read directly by func_8004CC74
+ * itself). Everything else is unproven -- this is a local, not part of
+ * `Obj866E8`, so it stays a minimal opaque type sized only to cover the
+ * two known offsets.
+ */
+typedef struct CC74QueryBuf {
+    u8 pad0[0x2];
+    s8 point[2];        /* +0x2, func_8004CC74: forwarded to func_8004CD38 */
+    u8 pad4[0x28 - 0x4];
+    s32 count;          /* +0x28, func_8004CC74 */
+} CC74QueryBuf;
+
 struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x0C - 0x04];
@@ -291,7 +369,12 @@ struct Obj866E8 {
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
     Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
-    u8 pad74[0xBC - 0x74];
+    u8 pad74[0x78 - 0x74];
+    s16 unk78;                     /* +0x078, func_8004C620 (halfword, doubled into an index) */
+    s16 unk7A;                     /* +0x07A, func_8004C620 (halfword, passed on as an arg) */
+    u8 pad7C[0x88 - 0x7C];
+    s32 unk88;                     /* +0x088, func_8004CE24: loop count over slots8C[] (bounded by slots8C's own 4-element capacity) */
+    GridSlot866E8 slots8C[4];      /* +0x08C, func_8004CE24 (reads); func_8004CDA4 (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
     Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/func_8004C588/func_8004C5D0/func_8004BD14/func_8004D1D0 */
@@ -305,7 +388,7 @@ struct Obj866E8 {
     u8 pad1D0[0x1DC - 0x1D0];
     Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
     s32 unk1E0;                    /* +0x1E0, func_8004D028/func_8004D088: a countdown gate */
-    void *unk1E4;                  /* +0x1E4, func_8004D0D0: forwarded opaquely to EntryChildObjMethods::slot48 */
+    EntryDesc866E8 *unk1E4;        /* +0x1E4, func_8004D0D0 (forwarded opaquely)/func_8004CFB8 (selects one of four statics and reads +0x6) */
     u8 pad1E8[0x2F4 - 0x1E8];
     s32 unk2F4;                    /* +0x2F4, func_8004D678: zero-checked when unkC > 9999999 */
 };

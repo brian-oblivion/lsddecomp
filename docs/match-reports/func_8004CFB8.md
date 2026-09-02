@@ -1,0 +1,171 @@
+# func_8004CFB8 — STALL (25/28 words, best attempt)
+
+`self->unk1E4 = &(one of four static 0xC-byte table entries)`, selected by
+`(rate > 0, flag != 0)`, then `self->unk1E0 = table->unk6 * abs(rate)`
+computed retail's way: an unconditional `mult` with the raw (possibly
+negative) `rate` in the branch's delay slot, corrected by a second `mult`
+with the negated value if `rate < 0`, with only ONE `mflo` extracting
+whichever product is current at the merge point.
+
+## What got solved
+
+The table-selection half is **byte-exact** — verified independently by
+building it alone (isolating it from the second half showed 0 residue in
+that window). It needed the "default value, then conditionally
+overwritten" idiom applied via explicit `goto`, not plain nested
+`if`/`else`:
+
+- Plain nested `if`/`else` (each of the four leaves doing its own
+  `self->unk1E4 = CONST;`) compiled 3 words **too long**: GCC generated
+  an independent `sw` in every leaf, none shared. Retail shares ONE `sw`
+  across three of the four leaves (the two `flag == 0` cases plus the
+  `rate <= 0, flag != 0` fallthrough), with only the `rate > 0, flag != 0`
+  leaf taking an early exit that stores in its own jump's delay slot.
+- Writing it as an explicit CFG with `goto` (default assigned per `rate`
+  branch, then conditionally overridden, with a shared `store:` label)
+  reproduced this exactly.
+
+## What did NOT get solved
+
+The `self->unk1E0 = table->unk6 * abs(rate)` half. Retail's asm:
+
+```
+lh   $v1, 0x6($v0)         ; v1 = table->unk6
+bgez $a1, MERGE
+ mult $v1, $a1              ; delay slot: v1 * rate, UNCONDITIONAL
+nor  $v0, $zero, $a1        ; (not taken, rate < 0): v0 = ~rate
+addiu $v0, $v0, 1           ;                        v0 = -rate
+mult $v1, $v0               ; redo: v1 * -rate
+MERGE:
+mflo $v0                    ; ONE extraction, whichever mult is current
+jr   $ra
+ sw  $v0, 0x1e0($a0)
+```
+
+Every C shape tried for this reproduces the VALUE correctly but not this
+exact instruction sequence:
+
+1. `val = table->unk6 * (rate >= 0 ? rate : -rate);` — cc1 computes the
+   abs value first (cond-move + `negu`, ONE instruction) then a SINGLE
+   `mult`/`mflo`. Correct value, wrong shape (missing the wasted first
+   `mult`) — 1 word short in this section.
+2. `val = table->unk6 * rate; if (rate < 0) { val = table->unk6 *
+   -rate; }` (the literal "default, then conditionally overwritten"
+   idiom that fixed the FIRST half of this same function) — cc1
+   generates the retail-matching double-`mult` structure AND the
+   retail-matching `nor`/`addiu` negation (confirmed by using `~rate + 1`
+   instead of unary `-rate` for the second operand — that alone gets the
+   negation instructions byte-identical), but eagerly extracts the FIRST
+   `mult` via `mflo` immediately after computing it, before testing the
+   branch — retail defers that `mflo` to the merge point. Net: 3 extra
+   words (an `mflo` right after the first `mult`, redundantly
+   materializing a value the branch may immediately discard).
+3. Same as #2 but with an explicit `goto`-based CFG instead of
+   `if`/`else` (mirroring what fixed the first half) — cc1 output
+   byte-identical to #2. The `goto` restructuring that worked for the
+   STORE-sharing problem does not touch this residue at all.
+4. Plain `if (rate >= 0) { val = A; } else { val = B; }` (no shared
+   default) — worse: cc1 re-loads `self->unk1E4` from memory a second
+   time in the `else` arm (an extra `lw`) and does not share the tail
+   `sw` between arms at all. 6 words too long.
+5. Assigning directly to `self->unk1E0` inside the branches instead of
+   through a local `val` (removing the intermediate variable entirely,
+   combined with #4's shape) — worse again, same extra reload plus two
+   independent `sw`s.
+6. A bare `__asm__("")` scheduling barrier inserted between the first
+   `val = ...;` and the `if` — no effect (confirms this is not a
+   delay-slot/scheduling choice reorg.c could be argued into; it is an
+   eager-extraction decision cc1 itself makes during RTL expansion,
+   verified by inspecting cc1's OWN `.s` output directly, bypassing
+   maspsx/gas/the linker entirely).
+
+All six variants were confirmed against cc1's raw output (piped directly
+through the pinned `cpp | cc1` stage, per CLAUDE.md's reproducer recipe)
+to rule out any maspsx/gas/linker involvement — this is a genuine cc1
+RTL-expansion choice for this exact statement shape, not a downstream
+tool artifact.
+
+## Best-attempt body (inline, `#if 0`)
+
+```c
+#if 0
+void func_8004CFB8(Obj866E8 *self, s32 rate, s32 flag) {
+    EntryDesc866E8 *table;
+    s32 val;
+
+    if (rate <= 0) {
+        goto rate_le;
+    }
+    table = &D_8008699C;
+    if (flag == 0) {
+        goto store;
+    }
+    self->unk1E4 = &D_800869A8;
+    goto merge;
+rate_le:
+    table = &D_800869B4;
+    if (flag == 0) {
+        goto store;
+    }
+    table = &D_800869C0;
+store:
+    self->unk1E4 = table;
+merge:
+    val = self->unk1E4->unk6 * rate;
+    if (rate < 0) {
+        val = self->unk1E4->unk6 * (~rate + 1);
+    }
+    self->unk1E0 = val;
+}
+#endif
+```
+
+`EntryDesc866E8`, the four `D_80086*` externs, and the `unk1E4` retype
+(from `void *` to `EntryDesc866E8 *`) are committed to
+`include/class_3bb8c.h` regardless — they are correct and proven by the
+byte-exact first half, and useful for whoever picks this back up.
+
+## New struct knowledge (`include/class_3bb8c.h`)
+
+- New type `EntryDesc866E8`: a 0xC-byte struct, only `+0x006` (`s16`,
+  `unk6`) typed — the rest is unproven padding.
+- `D_8008699C`, `D_800869A8`, `D_800869B4`, `D_800869C0` — four static
+  instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
+  existing `D_800869CC` (`extern s32 D_800869CC[3]`, declared by an
+  earlier round from `func_8004D108`) is a plausible fifth entry of the
+  same table by the same stride, but is left independently declared —
+  nothing in this unit reaches it through the `EntryDesc866E8` type.
+- **`Obj866E8::unk1E4` retyped** from `void *` to `EntryDesc866E8 *`.
+  Only reference elsewhere in this unit is `func_8004D0D0`, which
+  forwards it opaquely to a `void *` parameter (`EntryChildObjMethods::
+  slot48`'s `arg2`) — implicit pointer-to-`void *` conversion, so this
+  does not disturb that already-matched function's bytes. Flagging per
+  the shared-header rule: this is a change to an existing declaration's
+  type, not a pure addition.
+
+## Attempts
+
+6 (see above). Restored to `INCLUDE_ASM` — no score short of byte-exact
+stays in `src/`.
+
+### Proposed learning
+
+**"Default value, then conditionally overwritten" does not generalize
+from a simple assignment to a multiply-producing value.** The idiom
+(confirmed in this same function for a plain pointer assignment, and
+elsewhere in `docs/DECOMPILATION_LEARNINGS.md`) relies on GCC 2.6.3
+sliding the default's *materialization* into the guard branch's delay
+slot for free. For a `mult`, the "materialization" is a separate `mflo`
+instruction, not the `mult` itself — and cc1 extracts that `mflo`
+eagerly right after the assignment statement, before evaluating the
+next `if`, regardless of whether the value survives to be used. Retail's
+matching shape (unconditional `mult` in the delay slot, single deferred
+`mflo` at the merge point) was NOT reproduced by any source-level
+rephrasing tried here; suspect this needs either a different, unfound
+statement shape, or is a case where cc1's per-statement RTL expansion
+genuinely cannot avoid the early `mflo`, making the deferred-extraction
+version something only OTHER compilers/versions would produce. If a
+future attempt finds the shape, it should update this entry rather than
+re-deriving the six ruled-out variants above. Also a plausible permuter
+target: the search space here is small (one statement's phrasing) and
+well-characterized.
