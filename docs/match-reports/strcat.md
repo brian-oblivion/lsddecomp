@@ -1,8 +1,63 @@
 # strcat
 
-**Unit:** code_171e0 · **Size:** 42 instructions (0xA8 bytes) · **Status:**
-STALLED at **41/42**, class REDUNDANT DELAY-SLOT VALUE DUPLICATION (one
-instruction).
+**Unit:** code_171e0 · **Size:** 42 instructions (0xA8 bytes) ·
+**Status: MATCHED 42/42**, whole-image SHA1 green. Closed by the head in
+round 8 (2026-09-02) with the project's second permuter run.
+
+> **Kept in full.** Everything below the RESOLUTION section is the state of
+> knowledge before the fix, across two earlier rounds and a head
+> adjudication. The instruction-level readings in it are accurate and the
+> 25-word post-increment finding is what made the last instruction reachable
+> at all; only the final classification ("compiler-internal, unreachable")
+> was wrong.
+
+## RESOLUTION — the last instruction was one word of source
+
+The residue was retail having `move a0,s1` in the first call's delay slot
+where ours had `nop` — retail restating a value that was already live. The
+fix is on the NULL-`dest` guard, and it is one word:
+
+```c
+    if (dest == NULL) {
+        return dest;      /* NOT `return NULL` */
+    }
+```
+
+`dest` *is* null on that path, so the two spellings return the identical
+value and the C is equally correct either way. But `return dest;` **uses**
+`dest`, and that use keeps it live through the guard, which is what makes
+the compiler establish it in `$a0` the way retail does. `return NULL;`
+mentions it zero times, the value dies at the branch, and the instruction
+disappears. The other two exits do return a real `NULL` and share one tail,
+exactly as the earlier adjudication found.
+
+**Measured** (pinned pipeline, instruction-text diff against retail):
+
+| source form | diff |
+| --- | --- |
+| `if (dest == NULL) return dest;` | **0** |
+| permuter's raw output: dead `origDest = dest;` in the NULL arm | **0** |
+| `if (dest == NULL) goto fail;` (the old 41/42) | 2 |
+| `char *origDest = dest;` at declaration | 36 |
+| single shared `fail: return origDest;` with `origDest = NULL` init | 38 |
+
+### The permuter's zero was NOT the answer, and this is the pattern to copy
+
+The permuter reached zero at iteration 320 with a **dead store** —
+`origDest = dest;` inside the `if (dest == NULL)` arm, on a path where
+`origDest` is never read. That is precisely the duplicate-arm artifact Gate 3
+warns about, and committing it would have put provably dead code in `src/`
+with no explanation attached.
+
+But it was a *lead*, and it pointed at the right thing: it said retail's
+source **uses `dest` on the null path**. The idiomatic way to use it there is
+to return it. That form also reaches zero, and it is code a person would
+write.
+
+**So: run the permuter, then throw its output away and keep only what it told
+you.** Gate 3's "a zero is a LEAD, not an answer" is not a formality — here
+the difference between the lead and the answer was dead code versus a
+one-word idiom, and both scored identically.
 
 > **HEAD ADJUDICATION, round 2026-08-30-a.** The runner filed this at 16/42 and
 > classified the whole residue as an unreachable compiler-internal choice. That
@@ -278,6 +333,25 @@ The runner's original body differed from this only in the scan loop
   doesn't reach it either way.
 
 ## Proposed learning
+
+> The three entries below all still hold; the third one's conclusion
+> ("resists reshaping, best-posed permuter target") was acted on this round
+> and the permuter closed it. Added on top:
+
+**Counting mentions beats reasoning about schedulers.** Both one-instruction
+residues closed this round were a mismatch in how many times the SOURCE
+mentions a value, not a scheduling choice:
+
+- `new_class_6d3c8` mentioned its return value once too MANY (a `return` on a
+  path where the value was already in `$v0`) — the fix removed a mention.
+- `strcat` mentioned `dest` once too FEW on the null path (`return NULL`
+  where retail returned the pointer itself) — the fix added a mention.
+
+Same phenomenon, opposite directions, and in both cases the surplus or
+missing copy landed in a delay slot, which is what made both look like
+delay-slot filler choices for three rounds. **When a diff is one redundant or
+one missing `move`, count where the value is mentioned in your source before
+theorising about `reorg.c`.**
 
 **Check whether the branch TARGETS agree before classifying a residue as a
 scheduler or delay-slot choice.** A differing delay slot is a scheduling

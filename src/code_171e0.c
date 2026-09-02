@@ -141,4 +141,44 @@ char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
     return dest;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", strcat);
+/* Not the textbook libc `strcat`. It carries a guard textbook `strcat` has
+ * no reason to: after taking both lengths it bails if the two strings' END
+ * pointers coincide. That, plus returning NULL rather than `dest` on a NULL
+ * input, reads as Psy-Q-library defensive code rather than game code.
+ *
+ * Two source shapes here are load-bearing and both look like free choices:
+ *
+ *  - `while (*dest++) {} dest--;` -- the POST-increment scan, which walks
+ *    unconditionally and backs up at the merge. The pre-test spelling
+ *    `while (*dest) dest++;` is different code: retail's guard branch
+ *    targets the `addiu` fixup, which only the post-increment form emits.
+ *    Worth 25 words.
+ *  - `return dest;` on the NULL-dest path, NOT `return NULL`. The two are
+ *    the same value -- dest IS null there -- but returning `dest` USES it,
+ *    which keeps it live and produces retail's `move a0,s1` in the first
+ *    call's delay slot. Spelling it `NULL` costs exactly that instruction.
+ *    The other two exits genuinely do return NULL and share one tail.
+ *
+ * See docs/match-reports/strcat.md. */
+char *strcat(char *dest, char *src) {
+    char *origDest;
+
+    if (dest == NULL) {
+        return dest;
+    }
+    if (src == NULL) {
+        goto fail;
+    }
+    if ((dest + func_80013348(dest)) == (src + func_80013348(src))) {
+        goto fail;
+    }
+    origDest = dest;
+    while (*dest++) {
+    }
+    dest--;
+    while ((*dest++ = *src++) != 0) {
+    }
+    return origDest;
+fail:
+    return NULL;
+}
