@@ -120,7 +120,35 @@ neg2_mismatch:
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058C58);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TimerTick);
+void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
+{
+	s32 old;
+
+	if (arg2 != 2)
+		return;
+
+	old = this->dreamTimer;
+	this->dreamTimer = old + 1;
+	if ((u32)old < (u32)this->dreamTimeLimit)
+		goto tick_only;
+
+	if (this->isFlashbackSession) {
+		if (this->unknwon_int_0x44 != 0 || this->vt->LoadNextFlashback(this, 0)) {
+			__asm__("");
+			this->dreamTimer = 0;
+			return;
+		}
+	} else {
+		this->vt->FlashbackSaving(this, 0, 0x10);
+	}
+	this->vt->slot30(this, 0xA);
+	this->dreamTimer = 0;
+	return;
+
+tick_only:
+	this->vt->func_80059394(this);
+	this->vt->func_800593D8(this);
+}
 
 void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
 {
