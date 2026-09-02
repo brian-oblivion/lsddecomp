@@ -89,18 +89,21 @@ typedef struct Descriptor10 {
 } Descriptor10;
 
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
- * called only by func_8004B418. Declared locally with the minimal
- * signature that call site demonstrates; not this round's function to
- * match. Returns a plain scalar (its own body computes a value into $v0
- * with ordinary integer ops, no pointer arithmetic on the result).
+ * called by func_8004B418 and func_8004B38C (both already matched) and
+ * itself attempted-but-stalled this round (58/73, see
+ * docs/match-reports/func_8004B44C.md) -- not a byte-exact match, so its
+ * body stays raw asm, but the prototype below reflects what the attempt
+ * established.
  *
- * Parameter types were tightened this round (all pointer-type-only
- * changes, so this does not disturb func_8004B418's already-matched
- * bytes): `arg2` is `self->unk68` at the one known call site (Unk68Struct
- * *, see above); `arg4` is the 5th/stack argument (Descriptor10 *, see
- * above); `outBuf` is fed a 3-word local array by that same call site, so
- * it is typed `s32 *` rather than opaque `void *`. */
-extern s32 func_8004B44C(void *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4);
+ * Parameter types were tightened this round (all pointer-TYPE-only
+ * changes -- same pointer size/ABI, so this does not disturb either
+ * existing caller's already-matched bytes): `arg0` is written through as
+ * two `s32` words at both known call sites (`s32 *`, was `void *`);
+ * `arg2` is `self->unk68` at both call sites (Unk68Struct *, see above);
+ * `arg4` is the 5th/stack argument (Descriptor10 *, see above); `outBuf`
+ * is fed a 3-word local array by both call sites, so it is typed `s32 *`
+ * rather than opaque `void *`. */
+extern s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4);
 
 /* Unidentified global, address-only use (func_8004B38C passes `&D_80086904`
  * as an argument, never reads it directly here). Typed `s32` purely as a
