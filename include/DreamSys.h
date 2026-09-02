@@ -179,18 +179,65 @@ typedef struct DreamSysUnk58 {
 	DreamSysUnk58Vtable *vt;
 } DreamSysUnk58;
 
+/* Object pointed to by DreamSys__DreamSys's `arg1` constructor parameter --
+   same "vtable pointer at offset 0" shape as the other opaque classes in
+   this unit. Stored verbatim into DreamSys::unk_0x60 and also used
+   immediately: `arg1->methods->slot0x80(arg1, 0)`'s return value (a
+   companion pointer, forwarded as `void *`) is passed to DreamSys's own
+   `vt->slot10` right after -- the same "buddy-link" shape code_55dd4.h
+   documents for Class65650's `slot10`/`slot14` pair (round 2026-09-02).
+   Nothing else identifies this class. */
+typedef struct DreamSysCtorArgMethods {
+	u8 pad00[0x80];
+	void *(*slot0x80)(void *self, s32 arg1);
+} DreamSysCtorArgMethods;
+typedef struct DreamSysCtorArgObj {
+	DreamSysCtorArgMethods *methods;
+} DreamSysCtorArgObj;
+
+/* Object pointed to by DreamSys__func_58968's `arg1` parameter -- same
+   "vtable pointer at offset 0" shape as this unit's other opaque classes.
+   Unidentified; may or may not be the same class as DreamSysCtorArgObj
+   above (both are eventually forwarded to vt->slot10, but this one is
+   passed through directly rather than via a derived value) -- kept as a
+   separate local view per this unit's "multiple independent views of one
+   table" convention until proven otherwise (round 2026-09-02). */
+typedef struct DreamSysFunc58968ArgMethods {
+	u8 pad00[0xE4];
+	/* Called by DreamSys__func_58968 as (arg1, &local, this,
+	   &this->linkCoordinates); return value discarded. */
+	void (*slot0xE4)(void *self, void *arg1, struct DreamSys *arg2, PlayerSpawnPoint *arg3);
+} DreamSysFunc58968ArgMethods;
+typedef struct DreamSysFunc58968ArgObj {
+	DreamSysFunc58968ArgMethods *methods;
+} DreamSysFunc58968ArgObj;
+
 /* Object pointed to by DreamSys::unk_0x4C, used by func_80058A94 (slot
    +0xF0) and func_8005A82C (slot +0xE8, this round): same "vtable pointer
    at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
    related to DreamSysUnk58. */
 typedef struct DreamSysUnk4CMethods {
-	u8 pad00[0xE8];
+	u8 pad00[0xD4];
+	/* Called by DreamSys__WallLink as (this->unk_0x4C, arg1), return value
+	   whole-struct-assigned into this->linkCoordinates (a PlayerSpawnPoint)
+	   (round 2026-09-02). */
+	PlayerSpawnPoint *(*slot0xD4)(void *self, void *arg1);
+	u8 pad_0xD8[0xE8 - 0xD8];
 	/* Called by func_8005A82C as (this->unk_0x4C, &local, &this->
 	   linkCoordinates) -- `local` is an output buffer also consumed by
 	   vt->slot0xB8 right after (round 2026-09-02). */
 	void (*slot0xE8)(void *self, void *arg1, PlayerSpawnPoint *arg2);
 	u8 pad_0xEC[0xF0 - 0xEC];
 	void (*slot0xF0)(void *self);
+	u8 pad_0xF4[0x10C - 0xF4];
+	/* Called by DreamSys__FlashbackSaving as (this->unk_0x4C, 0, 0), return
+	   value forwarded straight into DreamSys::AddFlashback's `pos` argument.
+	   Same slot OFFSET and signature as DreamSysEntityMethods::slot0x10C
+	   below (used for the unrelated `entity` parameter in
+	   DreamSys__ProcessChunkChange) -- plausibly the same underlying class,
+	   but kept as a separate local view per this unit's convention for
+	   "multiple local views of the same table" (round 2026-09-02). */
+	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
 } DreamSysUnk4CMethods;
 typedef struct DreamSysUnk4CObj {
 	DreamSysUnk4CMethods *methods;
@@ -203,7 +250,21 @@ typedef struct DreamSysUnk4CObj {
    code_55dd4.h to avoid a cross-unit include; only slot +0x050 is needed by
    this unit (func_80058A94, this round). */
 typedef struct DreamSysBaseMethods {
-	u8 pad00[0x50];
+	u8 pad00[0x8];
+	/* Shared with Class65650's own inherited "ctor" slot at the same offset
+	   in the SAME base table (code_55dd4.h's D800878D4Methods, which already
+	   names and resolves this exact slot as `func_80057044`, taking/
+	   returning `Class65650 *self`). Called by DreamSys__DreamSys as
+	   (this), its return value discarded (round 2026-09-02) -- consistent
+	   with the base ctor returning `self` for chaining, unneeded here since
+	   the caller already has `this`. */
+	struct DreamSys *(*ctor)(struct DreamSys *self);
+	u8 pad0C[0x4C - 0xC];
+	/* Shared with Class65650's own inherited "slot4C" at the same offset in
+	   the SAME base table (code_55dd4.h's D800878D4Methods: "called by
+	   func_80065918 as slot4C(self, arg3, arg5)"). Called by
+	   DreamSys__func_58968 as (this, arg1, &local) (round 2026-09-02). */
+	void (*slot4C)(struct DreamSys *self, void *arg1, void *arg2);
 	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes
 	   the real `typedef struct DreamSys {...}` below, so GCC 2.6.3 warns
 	   "declared inside parameter list ... probably not what you want" and
@@ -223,6 +284,9 @@ typedef struct DreamSysBaseMethods {
 	   (round 2026-09-02). Resolves to func_80057B90 in D_800878D4, out of
 	   this unit's scope. */
 	void (*slot0xDC)(struct DreamSys *self, void *arg1, s32 arg2);
+	/* Called by DreamSys__WallLink as (this, arg1, arg2) -- same argument
+	   shape as slot0x9C/slot0xDC above (round 2026-09-02). */
+	void (*slot0xE0)(struct DreamSys *self, void *arg1, s32 arg2);
 } DreamSysBaseMethods;
 extern DreamSysBaseMethods *func_80057C84(void);
 
@@ -269,11 +333,26 @@ extern DreamSysVec3 D_80087EA4;
    by func_8005AD68 (round 2026-09-02). */
 extern struct RelativePos D_8008ABD0;
 
+/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+   argument by func_8005AB2C -- same call shape as D_8008ABD0 above, just a
+   different constant (round 2026-09-02). */
+extern struct RelativePos D_8008ABC0;
+
+/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+   argument by func_8005AE40 -- same call shape as D_8008ABD0/D_8008ABC0
+   above, just a different constant (round 2026-09-02). */
+extern struct RelativePos D_8008ABD8;
+
 /* Address-of only (never dereferenced by this unit's queued functions),
    forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AD68
    (round 2026-09-02) -- same "opaque generic pointer" shape as that slot's
    other known call site (D_80087E84[-1]). */
 extern u8 D_80087EFC[];
+
+/* Same "opaque generic pointer" shape as D_80087EFC above, forwarded as
+   vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AE40
+   (round 2026-09-02) -- a different constant/address, same call shape. */
+extern u8 D_80087F08[];
 
 /* Argument shape for func_8005950C: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
@@ -341,7 +420,10 @@ typedef struct DreamSys {
 	   func_8005942C (this->unk_0x5C + 0x14 and + 0x20 are passed to
 	   func_8005950C), so it points to a pair of two-word (x,y) points. */
 	DreamSysUnk5C *unk_0x5C;
-	s8 unknown_values_0x60[4];
+	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
+	   (round 2026-09-02) -- see DreamSysCtorArgObj. No other observed use in
+	   this unit's queued functions. */
+	void *unk_0x60;
 	/* Set by func_8005938C(this, value); no other observed use. */
 	s32 unk_0x64;
 
@@ -521,7 +603,14 @@ struct vtable_DreamSys{
 	   (DreamSys__DreamSys); types here are New_DreamSys's own forwarded
 	   parameter types, not independently confirmed by this round. */
 	DreamSys *(*Constructor)(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
-	u32 unknown_functions_0xc[2];
+	u32 unknown_functions_0xc[1];
+	/* Shared with Class65650's own vtable at the same offset (code_55dd4.h:
+	   `slot10`, resolved there as `func_800570B4`, the "link" companion of
+	   `slot14`/`func_80057130` immediately below -- this unit already names
+	   THAT slot `func_80057130` and notes the same companion relationship).
+	   Called by DreamSys__DreamSys as (this, arg1->methods->slot0x80(arg1,
+	   0)) -- the constructor's own "buddy-link" step (round 2026-09-02). */
+	void (*slot10)(DreamSys *this, void *arg);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x014); shared
 	   with Class65650's inherited slot14 (code_55dd4.h: "'unlink' companion
 	   of slot10"). Called by func_80058A94 as (this, this->unk_0x4C)
@@ -535,12 +624,17 @@ struct vtable_DreamSys{
 	   (round 2026-09-02). */
 	void (*slot30)(DreamSys *this, s32 arg1);
 	u32 unknown_functions_0x34[3];
-	void *func_800588EC;
+	/* Called by DreamSys__DreamSys as the constructor's LAST step, as
+	   (this); its return value is never overwritten before the function's
+	   own epilogue, so it becomes DreamSys__DreamSys's own return value
+	   unchanged (round 2026-09-02) -- typed `DreamSys *` to match. */
+	DreamSys *(*func_800588EC)(DreamSys *this);
 	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */
 	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);
 	u32 unknown_functions_0x48[1];
-	void *func_58968;
+	/* This function's OWN slot; called this round (round 2026-09-02). */
+	void (*func_58968)(DreamSys *this, DreamSysFunc58968ArgObj *arg1);
 	u32 unknown_functions_0x50[4];
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x060). Called by
 	   DreamSys__func_588ec as (this, 0) (round 2026-08-30-b). Still
@@ -563,8 +657,15 @@ struct vtable_DreamSys{
 	   (round 2026-08-30-d). */
 	void (*func_800573A8)(DreamSys *this, DreamSysVec3 *arg1);
 	u32 unknown_functions_0xc0[8];
-	void *LinkWall;
-	u32 unknown_functions_0xe4[6];
+	/* This function's OWN slot; resolved via tools/classtable.py
+	   (round 2026-09-02). */
+	void (*LinkWall)(DreamSys *this, void *arg1, s32 arg2);
+	u32 unknown_functions_0xe4[1];
+	/* This unit's own no-op stub (`func_800590E0`, `{ }`). Called by
+	   DreamSys__WallLink as (this) -- the callee ignores its argument
+	   (round 2026-09-02). */
+	void (*func_800590E0)(DreamSys *this);
+	u32 unknown_functions_0xec[4];
 	void (*func_80059310)(DreamSys *this);
 	s32 (*func_8005931C)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);
@@ -694,8 +795,20 @@ struct vtable_DreamSys{
 	void (*LogMood)(DreamSys* this, MoodGraphContributor* layer, MoodGraphPoint* mood);
 	void (*GetMoodAverage)(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *ret);
 	void (*CalcUnlockScore)(DreamSys *this);
-	void *GameManager__AddFlashback;
-	void *GameManager__FlashbackSaving;
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x214): called by
+	   DreamSys__FlashbackSaving (round 2026-09-02) as (this,
+	   this->currentStage, pos, &local, arg1, arg2, this->currentDay) --
+	   exactly DreamSys__AddFlashback's own parameter shape, 3 in registers
+	   and 4 more forwarded on the stack past a3 (o32 ABI). Retyped from the
+	   previous untyped `void *` placeholder; no other caller referenced the
+	   old field name (grep across src/include turned up none), so this is a
+	   plain correction. */
+	void (*AddFlashback)(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles, s32 unknown, s32 time, s32 day);
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x218): this is
+	   DreamSys__FlashbackSaving's OWN slot (round 2026-09-02). Not called
+	   through the vtable by any function in this unit; retyped for
+	   documentation only, matching the function's real signature. */
+	void (*FlashbackSaving)(DreamSys *this, s32 arg1, s32 arg2);
 	void (*ResetFlashbackList)(DreamSys *this);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x220/+0x224).
 	   Typed and matched this round (2026-09-02): a save/restore pair for

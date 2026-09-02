@@ -25,7 +25,25 @@ DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 	return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__DreamSys);
+DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
+{
+	void *val;
+
+	func_80057C84()->ctor(this);
+	this->vt = Get_vtable_DreamSys();
+	this->unk_0x58 = arg2;
+	this->unk_0x5C = (DreamSysUnk5C *)arg3;
+	this->unk_0x64 = 0;
+	this->unk_0x60 = arg1;
+	val = ((DreamSysCtorArgObj *)arg1)->methods->slot0x80(arg1, 0);
+	this->vt->slot10(this, val);
+	this->vt->GetSetDreamTimeLimit(this, -1);
+	this->unk_0x70 = 1;
+	this->unk_0x6c = 0;
+	this->unk_0x878 = 1;
+	this->vt->InitNewGame(this);
+	return this->vt->func_800588EC(this);
+}
 
 void DreamSys__func_588ec(DreamSys *this)
 {
@@ -41,7 +59,23 @@ void DreamSys__func_588ec(DreamSys *this)
 	this->unk_0x924 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__func_58968);
+void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
+{
+	s32 local[4];
+
+	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
+	func_80057C84()->slot4C(this, arg1, local);
+	this->vt->slot10(this, arg1);
+	if (this->unknwon_int_0x44 == 0xE) {
+		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
+		this->vt->func_8001CEB4(this, 1, &entry->rotation);
+		this->vt->GetSetDreamTimeLimit(this, entry->timeLimit + 4);
+		this->currentFlashbackIndex++;
+	}
+	if (this->unk_0x6c != 0 && this->unk_0x888 != 0) {
+		this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x888);
+	}
+}
 
 void func_80058A94(DreamSys *this)
 {
@@ -72,7 +106,20 @@ void func_80058F18(DreamSys *this, void *arg1, s32 arg2)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__WallLink);
+void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
+{
+	func_80057C84()->slot0xE0(this, unk_class_86aa0, arg2);
+	if (arg2 != 4)
+		return;
+	if (this->unknwon_int_0x44 != 0)
+		return;
+	this->linkCoordinates = *this->unk_0x4C->methods->slot0xD4(this->unk_0x4C, unk_class_86aa0);
+	if (!this->vt->StaticWallLink(this, &this->linkCoordinates) && this->unk_0x124 != 0) {
+		this->vt->DynamicLink(this);
+	}
+	this->vt->func_8005B990(this);
+	this->vt->func_800590E0(this);
+}
 
 void func_800590E0(void) {
 }
@@ -579,7 +626,28 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AB2C);
+s32 func_8005AB2C(DreamSys *this)
+{
+	if (this->unk_0x914 == 0) {
+		func_8005AF64(this, &D_8008ABC0, &this->unk_0x91C);
+	}
+	if (this->unk_0xAC != 4) {
+		if (this->unk_0x914 >= 0x85)
+			return 1;
+		if ((u32)(this->unk_0x914 - 0x2B) < 0xF || (u32)(this->unk_0x914 - 0x4B) < 0xF) {
+			this->unk_0xA4 = 2;
+		}
+	} else {
+		if (this->unk_0x914 >= 0x13)
+			return 1;
+		if ((u32)(this->unk_0x914 - 8) < 2 || (u32)(this->unk_0x914 - 0xD) < 2) {
+			this->vt->func_8001CEB4(this, 0, &D_80087EFC);
+		}
+	}
+	this->unk_0xA0 = 1;
+	this->unk_0x914++;
+	return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AC24);
 
@@ -610,7 +678,35 @@ s32 func_8005AD68(DreamSys *this)
 	return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005AE40);
+s32 func_8005AE40(DreamSys *this)
+{
+	s32 flag;
+
+	if (this->unk_0x914 == 0) {
+		func_8005AF64(this, &D_8008ABD8, &this->unk_0x91C);
+	}
+	if (this->unk_0xAC != 4) {
+		if (this->unk_0x914 >= 0x71)
+			return 1;
+		if ((u32)(this->unk_0x914 - 0x1E) < 0xF || (u32)(this->unk_0x914 - 0x52) < 0xF) {
+			this->unk_0xA4 = 1;
+		}
+		flag = (u32)(this->unk_0x914 - 0x1E) < 0x34;
+	} else {
+		if (this->unk_0x914 >= 0x13)
+			return 1;
+		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xF) < 2) {
+			this->vt->func_8001CEB4(this, 0, &D_80087F08);
+		}
+		flag = (u32)this->unk_0x914 < 9;
+	}
+	if (flag) {
+		this->unk_0x88 = 2;
+	}
+	this->unk_0xA0 = 1;
+	this->unk_0x914++;
+	return 0;
+}
 
 void func_8005AF64(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
 {
@@ -751,7 +847,17 @@ void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s3
 	entry->day = day;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__FlashbackSaving);
+void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2)
+{
+	PlayerSpawnPoint *pos;
+	s32 local[4];
+
+	if (this->unk_0x4C != NULL && rand() % 3 == 0) {
+		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
+		func_8001E6F8(this, local);
+		this->vt->AddFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
+	}
+}
 
 void DreamSys__ResetFlashbackList(DreamSys *this)
 {
