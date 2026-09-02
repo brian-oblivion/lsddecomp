@@ -16,6 +16,9 @@
  */
 typedef struct Obj865C8 Obj865C8;
 typedef struct Obj4C Obj4C;
+typedef struct SubObjA SubObjA;
+typedef struct SubObjD SubObjD;
+typedef struct SubObjF SubObjF;
 
 /* What func_80049958 (Class865C8Methods slot +0x038) inspects: `arg1` is a
  * pointer to a small wrapper whose own field 0 is a pointer to some OTHER,
@@ -87,14 +90,40 @@ extern Class865C8Methods D_800865C8;
  * minimally, locally, for this one call site (same policy as
  * DreamSysEntityObj in include/DreamSys.h). */
 typedef struct SubObjAMethods {
-    u8 pad00[0x74];
+    u8 pad00[0x44];
+    void (*slot44)(SubObjA *self, s32 arg1);                /* +0x044, func_80049B54 */
+    u8 pad48[0x4C - 0x48];
+    void (*slot4C)(SubObjA *self, s32 arg1);                /* +0x04C, func_80049B54 */
+    u8 pad50[0x70 - 0x50];
+    /* func_80049B54's 5-arg call: 4 register args plus a literal 0 in the
+     * 5th (stack) slot. arg1/arg2/arg3 types are just "address taken, never
+     * dereferenced here" -- SubObjD* for arg1 because that's what
+     * Obj865C8::unk38 already is, void* for the two rodata symbol
+     * addresses (arg2/arg3, real element type unknown). */
+    void (*slot70)(SubObjA *self, SubObjD *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070 */
     void (*slot74)(void *self);
-    u8 pad78[0x90 - 0x78];
+    u8 pad78[0x8C - 0x78];
+    void (*slot8C)(SubObjA *self);                          /* +0x08C, func_80049B54 */
     void (*slot90)(void *self);
+    u8 pad94[0xAC - 0x94];
+    /* Returns an object with its OWN 1-slot-known vtable (SubObjF below);
+     * func_80049B54 immediately dispatches the result's own +0x060. */
+    SubObjF *(*slot0xAC)(SubObjA *self);                    /* +0x0AC, func_80049B54 */
 } SubObjAMethods;
-typedef struct SubObjA {
+struct SubObjA {
     SubObjAMethods *methods;
-} SubObjA;
+};
+
+/* Opaque view of whatever object SubObjAMethods::slot0xAC returns (used
+ * only by func_80049B54): same "vtable at offset 0, only the reached slot
+ * named" policy as SubObjE above. */
+typedef struct SubObjFMethods {
+    u8 pad00[0x60];
+    void (*slot60)(SubObjF *self, s32 arg1);
+} SubObjFMethods;
+struct SubObjF {
+    SubObjFMethods *methods;
+};
 
 /* Opaque view of whatever object Obj865C8::subB points to (used only by
  * func_8004A228, guarded by Obj865C8::unk30): same "vtable at offset 0,
@@ -119,12 +148,25 @@ struct Obj4C {
     Obj4CMethods *methods;
 };
 
+/* Opaque view of whatever object Obj0C::obj (below) points to (used only by
+ * func_80049B54): same "vtable at offset 0, only the reached slot named"
+ * policy as SubObjA/SubObjB/Obj4C. */
+typedef struct SubObjE SubObjE;
+typedef struct SubObjEMethods {
+    u8 pad00[0x7C];
+    s32 (*slot7C)(SubObjE *self, s32 arg1);
+} SubObjEMethods;
+struct SubObjE {
+    SubObjEMethods *methods;
+};
+
 /* Opaque view of whatever object Obj865C8::unk0C points to (used by
  * func_80049AC0/func_80049A1C, which read its own +0x004/+0x008/+0x010
- * fields -- no vtable dispatch through this one, so no methods pointer is
- * declared). */
+ * fields, and func_80049B54, which dereferences +0x000 -- no vtable
+ * dispatch through Obj0C ITSELF, so no methods pointer is declared for
+ * Obj0C; its own +0x000 field points at a DIFFERENT object that has one). */
 typedef struct Obj0C {
-    u8 pad00[0x04];
+    SubObjE *obj;                 /* +0x000, func_80049B54 */
     s32 unk4;                     /* +0x004 */
     s32 unk8;                     /* +0x008 */
     u8 padC[0x10 - 0xC];
@@ -134,7 +176,6 @@ typedef struct Obj0C {
 /* Opaque view of whatever object Obj865C8::unk38 points to (used by
  * func_80049AC0/func_80049A1C): same "vtable at offset 0, only the reached
  * slots named" policy as SubObjA/SubObjB/Obj4C above. */
-typedef struct SubObjD SubObjD;
 typedef struct SubObjDMethods {
     u8 pad00[0x10];
     void (*slot10)(SubObjD *self, s32 arg1);
@@ -261,5 +302,12 @@ extern void *func_80017B34(s32 size);
  * forwarded argument. Only call site here is func_8004A19C, which stores
  * the result straight into `Obj865C8::subB` (`SubObjB *`). */
 extern SubObjB *func_8002C480(s32 arg1);
+
+/* Rodata symbols right next to this unit's own D_80086668/D_800865C8
+ * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before D_80086668
+ * respectively). Only their ADDRESSES are taken, as the 2nd/3rd args to
+ * SubObjAMethods::slot70 (func_80049B54); real element type/size unknown. */
+extern u8 D_80086650[];
+extern u8 D_8008665C[];
 
 #endif

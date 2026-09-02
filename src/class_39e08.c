@@ -41,7 +41,23 @@ void func_80049AC0(Obj865C8 *self) {
     sub->methods->slot14(sub, self->unk10);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049B54);
+void func_80049B54(Obj865C8 *self) {
+    SubObjE *obj;
+    SubObjA *subA;
+    SubObjF *ret;
+    s32 result;
+
+    obj = self->unk0C->obj;
+    subA = self->subA;
+    result = obj->methods->slot7C(obj, 0);
+    subA->methods->slot44(subA, result);
+    ret = subA->methods->slot0xAC(subA);
+    ret->methods->slot60(ret, 1);
+    subA->methods->slot4C(subA, 0x4B0);
+    subA->methods->slot70(subA, self->unk38, D_80086650, D_8008665C, 0);
+    subA->methods->slot8C(subA);
+    self->unk3C = 1;
+}
 
 void func_80049C50(Obj865C8 *self) {
     SubObjA *sub = self->subA;
