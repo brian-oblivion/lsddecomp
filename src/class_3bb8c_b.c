@@ -5,7 +5,21 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C588);
+s32 func_8004C588(Obj866E8 *self, s32 key) {
+    s32 result;
+    s32 i;
+    Elem *e;
+
+    result = 0;
+    for (i = 0; i < 7; i++) {
+        e = &self->arr[i];
+        if (e->unk4->unk32 == key) {
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C5D0);
 
