@@ -124,9 +124,10 @@ typedef struct Class86668Methods {
     void *(*ctor)(void *self, void *arg1, void *arg2); /* +0x008 func_8004A19C */
 } Class86668Methods;
 
-/* Uncarved (asm/nonmatchings/class_3ac78/func_8004A4B8.s -- owned by
- * runner bravo's unit, not this one): a plain accessor with no parameters,
- * returning &D_80086668. */
+/* A plain accessor with no parameters, returning &D_80086668. Defined in the
+ * class_3ac78 unit, not this one -- matched there as C in round 2026-09-02,
+ * so it is no longer INCLUDE_ASM. Declared here only because this unit
+ * dispatches through it; class_3ac78.h holds its owning view. */
 extern Class86668Methods *func_8004A4B8(void);
 
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /

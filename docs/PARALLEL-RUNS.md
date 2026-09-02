@@ -19,9 +19,17 @@ own working tree, build directory and branch, while sharing history so merges
 are ordinary.
 
 ```sh
-tools/setup-worktree.sh alpha     # -> ../lsddecomp2-wt-alpha, branch runner/alpha
-tools/setup-worktree.sh bravo     # -> ../lsddecomp2-wt-bravo, branch runner/bravo
+tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alpha
+tools/setup-worktree.sh bravo     # -> ../<checkout>-wt-bravo, branch runner/bravo
 ```
+
+**`<checkout>` is the basename of YOUR main checkout, not a fixed string.**
+The script derives the destination from it, so a clone named `lsddecomp`
+produces `../lsddecomp-wt-alpha`. This document previously hardcoded a
+`lsddecomp2-` prefix from the checkout it was written in, which is wrong in any
+clone named anything else — and it appeared in the `--force` teardown command
+below, where a stale path is not a typo but a hazard. Read the real path off
+the script's own output, or off `git worktree list`.
 
 The script symlinks the gitignored essentials (the executable, the venv, the
 toolchain), runs `make extract`, and **proves the worktree byte-verifies before
@@ -31,7 +39,7 @@ does not verify produces scores that mean nothing, and it has no way to notice.
 Teardown, after the four preconditions in §4b:
 
 ```sh
-git worktree remove --force ../lsddecomp2-wt-<name> && git branch -d runner/<name>
+git worktree remove --force ../<checkout>-wt-<name> && git branch -d runner/<name>
 ```
 
 **`--force` is required here, not a shortcut.** `asm/`, `build/` and `lsdde.ld`
@@ -119,7 +127,7 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 
    ```sh
    for n in alpha bravo charlie delta; do
-       printf '%s: ' "$n"; git -C ../lsddecomp2-wt-$n status --porcelain | wc -l
+       printf '%s: ' "$n"; git -C ../<checkout>-wt-$n status --porcelain | wc -l
    done
    ```
 
