@@ -8,6 +8,13 @@
 extern u8 D_80089DD8[];
 extern u8 D_80089DF0[];
 extern u8 D_80089D78[];
+extern u8 D_80089CA0[];
+extern u8 D_80089C94[];
+extern u8 D_80089C88[];
+extern u8 D_80089D3C[];
+extern u8 D_80089DA8[];
+extern u8 D_80089CE8[];
+extern u8 D_80089CF4[];
 
 s32 func_8005DE18(Entity *this) {
     EntityMoodRow *row;
@@ -56,7 +63,26 @@ s32 func_8005DEE0(Entity *this) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005DF9C);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E02C);
+s32 func_8005E02C(Entity *this, s32 arg1) {
+    Unk94Obj *other;
+    s32 oy, ty;
+
+    __asm__("");
+    other = this->unk94;
+    oy = other->unk14->y;
+    ty = this->unk14->y;
+    if (oy + 0x200 < ty) {
+        goto fail;
+    }
+    if (ty < oy - 0x200) {
+        goto fail;
+    }
+    if (this->methods->slot144(this, other) < arg1) {
+        return 1;
+    }
+fail:
+    return 0;
+}
 
 s32 func_8005E0B0(Entity *this) {
     EntityMoodRow *row;
@@ -81,7 +107,45 @@ EntityMethods *Get_vtable_Entity(void) {
     return &D_80089AD4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E160);
+void func_8005E160(Entity *this, EntityMoodHandlerArg *out) {
+    if (out->unk4 == 0) {
+        if (this->unk94->methods->slot200(this->unk94) == 5) {
+            this->unk44 = 0x64;
+        }
+    }
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk44 == 0) {
+        if (out->unk4 % 10 == 0) {
+            out->unk1C = 5;
+            out->unk20 = -2;
+        }
+        if (this->unkFC == 0x960) {
+            this->unkFC = -1;
+        } else if (this->unkFC < 0x4B0) {
+            this->methods->slotC4(this, 0x32, 0);
+        } else {
+            this->methods->slotC4(this, -0x32, 0);
+        }
+    } else if (this->unkFC < 0xFA) {
+        if (out->unk4 % 10 == 0) {
+            out->unk1C = 5;
+            out->unk20 = -2;
+        }
+        if (this->unkFC < 0x64) {
+            this->methods->slotC4(this, 0x32, 0);
+        } else if (this->unkFC < 0xFA) {
+            this->methods->slotBC(this, D_80089DA8);
+        }
+    } else if (this->unkFC == 0xFA) {
+        this->methods->slot130(this);
+        out->unk1C = -2;
+    } else if (this->unkFC >= 0x105 && this->unkFC < 0x238) {
+        this->methods->slotC4(this, -0x32, 0);
+        this->methods->slot44(this, 1, D_80089CE8);
+    } else if (this->unkFC >= 0x239) {
+        this->methods->slot44(this, 1, D_80089CF4);
+    }
+}
 
 void func_8005E3C4(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
@@ -105,7 +169,31 @@ void func_8005E480(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E4D0);
+void func_8005E4D0(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk84 == this->unk80 / 2) {
+        out->unk1C = 0x7;
+        out->unk20 = -0x2;
+        out->unk30 = 0x3;
+        out->unk34 = -0x2;
+    }
+    if (out->unk4 % 90 < 3) {
+        out->unk44 = 0x6;
+        out->unk48 = -0x1;
+    }
+    if (this->unkFC >= 0x79) {
+        this->methods->slot44(this, 0, D_80089CA0);
+        this->methods->slotC4(this, -0x140, 0);
+    } else if (this->unkFC >= 0x38 ||
+               func_8005D714(this, &this->unk14->x, 1, 1) != 0) {
+        this->methods->slotBC(this, D_80089D78);
+    } else if (this->unkFC >= 0xA) {
+        func_8001EACC(this, this->unk94, 1, 0, 0);
+        this->methods->slotC4(this, -0x100, 0);
+    } else {
+        func_8001EACC(this, this->unk94, 1, 0, 0);
+    }
+}
 
 void func_8005E694(Entity *this) {
     this->methods->slot48(this, 1, D_80089DF0);
@@ -130,9 +218,93 @@ void func_8005E7A8(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x1E, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005E7F8);
+void func_8005E7F8(Entity *this, EntityMoodHandlerArg *out) {
+    u8 *row;
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005EA94);
+    this->unk48 = -0x14;
+    out->unk10 = this->methods->slot148(this);
+    row = 0;
+    if (out->unk4 % (this->unk80 / 2) == 0) {
+        out->unk1C = 0xA;
+        out->unk20 = 1;
+    }
+    if (this->unk44 == 0xB) {
+        if (this->unkFC == 0xA8C) {
+            row = D_80089C94;
+        }
+        if (this->unkFC == 0xC6C) {
+            row = D_80089C88;
+        }
+        if (this->unkFC == 0xE10) {
+            row = D_80089C94;
+        }
+        if ((u32)(this->unkFC - 0xD5D) < 0x78) {
+            if (this->unk94->methods->slot100(this->unk94) != 0) {
+                this->unkFC = 0;
+                this->unk44 = 0xD;
+            }
+        }
+    } else if (this->unk44 == 0xC) {
+        if (this->unkFC == 0x7BC) {
+            row = D_80089C94;
+        }
+    } else if (this->unk44 == 0xD) {
+        this->unk48 = -0x78;
+        func_8001EACC(this, this->unk94, 1, 0, 0);
+        this->methods->slot48(this, 1, D_80089DD8);
+        if (this->methods->slot144(this, this->unk94) < 0x400) {
+            this->methods->slot30(this, 0xB);
+        }
+    }
+    if (this->unkFC == 0x618) {
+        if ((rand() & 1) != 0) {
+            row = D_80089C88;
+            this->unk44 = 0xB;
+        } else {
+            row = D_80089C94;
+            this->unk44 = 0xC;
+        }
+    }
+    if (row != 0) {
+        this->methods->slot44(this, 0, row);
+    }
+    this->methods->slotD0(this, this->unk48, 0);
+    if (this->unk44 != 0xC) {
+        if (this->unk28 != 0) {
+            this->methods->slotCC(this, -0xC8, 0);
+        }
+    }
+}
+
+void func_8005EA94(Entity *this) {
+    s32 y;
+    s32 result;
+    s32 oldFC;
+
+    if (this->unkFC == 0) {
+        if ((rand() & 1) == 0) {
+            this->unk44 = 0xB;
+        }
+    }
+    y = this->unk14->y;
+    if (y < 0x7D0) {
+        func_8001EACC(this, this->unk94, 1, 0, 0);
+    }
+    if (this->unk44 == 0xB) {
+        result = this->methods->slot144(this, this->unk94);
+        if (result < 0xA00) {
+            this->unk4C->methods->slot138(this->unk4C, 1, 1);
+            this->unkFC = 1;
+            this->unk44 = 0xC;
+        }
+    } else if (this->unk44 == 0xC) {
+        oldFC = this->unkFC;
+        this->unkFC = oldFC + 1;
+        if (oldFC == 0x12C) {
+            this->methods->slot30(this, 0xC);
+        }
+    }
+}
 
 void func_8005EBB4(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
@@ -164,7 +336,37 @@ void func_8005ED10(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_b", func_8005ED30);
+void func_8005ED30(Entity *this) {
+    u8 *arg2;
+    s32 roll;
+
+    if (this->unkFC == 0) {
+        if ((rand() & 1) != 0) {
+            this->unk44 = 0xB;
+        }
+    }
+    if (this->unk44 == 0) {
+        if (this->unkFC < 0x40) {
+            this->methods->slotC4(this, -0x5A, 0);
+        } else if (this->unkFC == 0x40) {
+            roll = rand() & 1;
+            arg2 = D_80089C94;
+            if (roll != 0) {
+                arg2 = D_80089C88;
+            }
+            this->methods->slot44(this, 0, arg2);
+            this->methods->slotBC(this, D_80089D3C);
+        } else {
+            this->methods->slotD0(this, -0x176, rand() % 2);
+        }
+    } else if (this->unk44 == 0xB) {
+        if (this->unkFC % 5 == 0) {
+            this->methods->slot44(this, 0, D_80089C88);
+        }
+        this->methods->slotC4(this, -0x800, 0);
+        this->methods->slot60(this, (rand() % 7) == 0);
+    }
+}
 
 s32 func_8005EF20(Entity *this) {
     return this->methods->slot48(this, 1, D_80089DD8);

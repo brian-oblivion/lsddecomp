@@ -42,6 +42,8 @@ typedef struct Unk100Obj Unk100Obj;
 typedef struct Unk100Methods Unk100Methods;
 typedef struct Unk94Obj Unk94Obj;
 typedef struct Unk94Methods Unk94Methods;
+typedef struct Unk4CObj Unk4CObj;
+typedef struct Unk4CMethods Unk4CMethods;
 typedef struct BasicClassMethods BasicClassMethods;
 typedef struct EntityPos EntityPos;
 typedef struct EntityMoodRow EntityMoodRow;
@@ -56,7 +58,7 @@ struct EntityMethods {
     /* +0x30 */ void (*slot30)(Entity *self, s32 arg1);   /* called by func_8005DAAC, func_8005DF9C */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*slot40)(Entity *self);              /* called by Entity__Entity, right after this->methods is (re)assigned */
-    /* +0x44 */ u8 pad44[0x48 - 0x44];
+    /* +0x44 */ void (*slot44)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E4D0 as slot44(this, 0, D_80089CA0) */
     /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E694 (result discarded) and func_8005EF20 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, func_8005EF20 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by func_8005D9F4, func_8005DA3C */
@@ -64,12 +66,15 @@ struct EntityMethods {
     /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
     /* +0xC0 */ u8 padC0[0xC4 - 0xC0];
     /* +0xC4 */ void (*slotC4)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7A8 as slotC4(self, -0x1E, 0) -- same shared BasicClass-inherited slot as Class65650Methods.slotC4 in code_55dd4.h (both tables hold func_8005748C at +0xC4, confirmed with tools/classtable.py) */
-    /* +0xC8 */ u8 padC8[0x114 - 0xC8];
+    /* +0xC8 */ u8 padC8[0xCC - 0xC8];
+    /* +0xCC */ void (*slotCC)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7F8 as slotCC(this, -0xC8, 0) */
+    /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005ED30 as slotD0(this, -0x176, rand() % 2), and by func_8005E7F8 as slotD0(this, this->unk48, 0) */
+    /* +0xD4 */ u8 padD4[0x114 - 0xD4];
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x130 - 0x118];
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
     /* +0x134 */ u8 pad134[0x144 - 0x134];
-    /* +0x144 */ s32 (*slot144)(Entity *self);            /* called by func_8005E02C (still INCLUDE_ASM, stalled on a register-identity residue -- see its match report), compared against a threshold with slt -- value-returning, not void */
+    /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by func_8005E02C, as slot144(this, this->unk94) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->unk94 in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
     /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds func_8005D864 (still addiu_at-blocked in Entity.c) */
     /* +0x14C */ u8 pad14C[0x15C - 0x14C];
     /* +0x15C */ void (*slot15C)(Entity *self);            /* called by func_8005DBF0 */
@@ -134,14 +139,33 @@ extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
  * Entity.c) -- two different functions in two different tables that merely
  * share a numeric offset; do not conflate them. */
 struct Unk94Methods {
-    u8 pad000[0x130];
+    u8 pad000[0x100];
+    s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
+    u8 pad104[0x130 - 0x104];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
+    u8 pad134[0x200 - 0x134];
+    s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5 -- value-returning, not void */
 };
 
 struct Unk94Obj {
     Unk94Methods *methods; /* +0x00 */
     u8 pad04[0x14 - 0x04];
     EntityPos *unk14;        /* +0x14, read by func_8005E02C (its own +0x1C, i.e. y) */
+};
+
+/* Object pointed to by `Entity::unk4C` (previously modeled as a plain `s32`
+ * on the strength of func_8005D418's `this->unk4C = 0;`, which type-checks
+ * against a pointer just as well). func_8005EA94 dereferences it at +0x00 as
+ * a method-table pointer (the same class-framework idiom as `Unk94Obj`) and
+ * calls its own +0x138 slot with two extra literal-1 arguments. Shape beyond
+ * that single slot is unknown. */
+struct Unk4CMethods {
+    u8 pad000[0x138];
+    void (*slot138)(Unk4CObj *self, s32 arg1, s32 arg2); /* called by func_8005EA94; return value discarded at this one call site, so void is a safe read for THIS call's bytes regardless of the real return type (same caveat as func_8002CD08/func_8002CC84 elsewhere in this unit -- a discarded return is never positive evidence of void) */
+};
+
+struct Unk4CObj {
+    Unk4CMethods *methods; /* +0x00 */
 };
 
 /* Default arguments func_8005D108 substitutes when its own `name`/`arg2`
@@ -200,10 +224,12 @@ struct Entity {
     /* +0x14 */ EntityPos *unk14;        /* the 3-word position func_8005D714/func_8005D7FC read via +0x18 */
     /* +0x18 */ u8 pad18[0x24 - 0x18];
     /* +0x24 */ s32 unk24;             /* cleared by func_8005D9F4; xored against a mood-row-derived value in func_8005DD18 */
-    /* +0x28 */ u8 pad28[0x44 - 0x28];
+    /* +0x28 */ s32 unk28;             /* read by func_8005E7F8, gates its final slotCC call */
+    /* +0x2C */ u8 pad2C[0x44 - 0x2C];
     /* +0x44 */ s32 unk44;              /* gates func_8005DBF0's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by func_8005EBB4 */
-    /* +0x48 */ u8 pad48[0x4C - 0x48];
-    /* +0x4C */ s32 unk4C;               /* cleared by func_8005D418 */
+    /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- func_8005E7F8 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
+    /* +0x4A */ u8 pad4A[0x4C - 0x4A];
+    /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by func_8005D418; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
     /* +0x50 */ u8 pad50[0x58 - 0x50];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
     /* +0x5C */ u8 pad5C[0x80 - 0x5C];
@@ -309,15 +335,18 @@ extern void func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4
 typedef struct EntityMoodHandlerArg EntityMoodHandlerArg;
 struct EntityMoodHandlerArg {
     u8 pad00[0x04];
-    s32 unk4;    /* +0x04, gate flag read by func_8005E480/func_8005E7A8 */
+    s32 unk4;    /* +0x04, gate flag read by func_8005E480/func_8005E7A8/func_8005E6F0/func_8005EBB4, and by func_8005E4D0 (as `out->unk4 % 90`) */
     u8 pad08[0x08];
-    s32 unk10;    /* +0x10, written by func_8005ED10/func_8005E480/func_8005E7A8 */
+    s32 unk10;    /* +0x10, written by func_8005ED10/func_8005E480/func_8005E7A8/... */
     u8 pad14[0x08];
-    s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8 */
-    u8 pad20[0x10];
-    s32 unk30;      /* +0x30, written by func_8005E7A8 only */
-    u8 pad34[0x10];
-    s32 unk44;       /* +0x44, written by func_8005E7A8 only */
+    s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8/... */
+    s32 unk20;      /* +0x20, written by func_8005E4D0 only (paired with unk1C the same round) */
+    u8 pad24[0x0C];
+    s32 unk30;      /* +0x30, written by func_8005E7A8/func_8005E4D0 */
+    s32 unk34;       /* +0x34, written by func_8005E4D0 only (paired with unk30) */
+    u8 pad38[0x0C];
+    s32 unk44;       /* +0x44, written by func_8005E7A8/func_8005E4D0 */
+    s32 unk48;        /* +0x48, written by func_8005E4D0 only (paired with unk44) */
 };
 
 #endif
