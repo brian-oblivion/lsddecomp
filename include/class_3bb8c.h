@@ -478,6 +478,11 @@ extern void *func_80017B34(s32 size);
 typedef struct Class86AA0 Class86AA0;
 typedef struct Class86AA0Methods Class86AA0Methods;
 
+/* Forward declaration: full definition (GenericTagMethods_3bb8c_c /
+ * GenericTagInst_3bb8c_c) is below, established from func_8004D434; needed
+ * here already for Class86AA0Methods::slotA0's parameter type. */
+typedef struct GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;
+
 /*
  * Vtable D_80086AA0 (asm/data/76DC8.data.s, header word 0x24). Sibling of
  * Class869D8Methods above, same shape: ctor at +0x008 (func_8004D3DC,
@@ -488,7 +493,23 @@ typedef struct Class86AA0Methods Class86AA0Methods;
 struct Class86AA0Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86AA0 *self);            /* +0x008, func_8004D3DC */
-    u8 pad00C[0x0B8 - 0x00C];
+    u8 pad00C[0x0A0 - 0x00C];
+    /* Called by func_8004D47C (self's own slot +0x0B8 occupant, see below)
+     * when its own arg2 is in [5, 9). arg1 is forwarded opaquely; return
+     * value unused. */
+    void (*slotA0)(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2); /* +0x0A0 */
+    u8 pad0A4[0x0B8 - 0x0A4];
+    /* Declared here 1-argument to match func_8004D434's own call site
+     * (`self->methods->slotB8(self)`, already matched) -- but this slot's
+     * REAL occupant is func_8004D47C, whose own body reads three args
+     * (self, arg1, arg2). Both are right about their own codegen; see
+     * func_8004D3DC's report/func_8001E57C's declaration below for the
+     * identical situation on a different symbol. Not reconciled: widening
+     * this field to 3 args would force func_8004D434's call site to
+     * synthesize an arg2 it doesn't have, breaking that already-matched
+     * function. func_8004D47C's own C definition is typed independently
+     * of this field (the vtable's storage is still raw asm data, so
+     * nothing here type-checks it either way). */
     void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by func_8004D434 */
 };
 
@@ -515,8 +536,31 @@ extern Class86AA0Methods *func_8004D508(void);
  * right about their own codegen and both are wrong about the function.
  * Do not "reconcile" them and do not reduce either to (void) -- that changes
  * the argument setup the caller emits and breaks the match. See
- * docs/match-reports/func_8004D3DC.md. */
-extern BaseCtorTable_3bb8c_c *func_8001E57C(void *self);
+ * docs/match-reports/func_8004D3DC.md.
+ *
+ * Return type: round 9 split this OFF `BaseCtorTable_3bb8c_c` (func_8003F24C's
+ * own return type) into its own `BaseCtorTableB_3bb8c_c`, because
+ * func_8004D47C (this unit, round 9) reached +0x09C on THIS getter's table
+ * with a 3-argument call (self, arg1, arg2) -- a genuine arity conflict with
+ * `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established from
+ * func_8004D300 via the OTHER getter, func_8003F24C). Same-offset arity
+ * conflict means different table/different class, per this project's
+ * established split policy (see e.g. TaskCoreObjMethods in
+ * include/code_2c054.h). Purely a type-name change here -- func_8004D3DC's
+ * own already-matched call (`func_8001E57C(self)->ctor(self)`) only touches
+ * the +0x008 `ctor` slot, whose layout is identical in both names, so this
+ * renaming changes no bytes. */
+typedef struct BaseCtorTableB_3bb8c_c BaseCtorTableB_3bb8c_c;
+struct BaseCtorTableB_3bb8c_c {
+    u8 pad0[0x008];
+    void (*ctor)(void *self);                     /* +0x008, func_8004D3DC */
+    u8 pad00C[0x09C - 0x00C];
+    /* func_8004D47C's forward target (self, arg1 opaque, arg2 int),
+     * unconditional first statement of that function. */
+    void (*slot9C)(void *self, void *arg1, s32 arg2); /* +0x09C */
+};
+
+extern BaseCtorTableB_3bb8c_c *func_8001E57C(void *self);
 
 /*
  * Generic class-instance shape used only to read another object's own
@@ -528,9 +572,9 @@ typedef struct GenericTagMethods_3bb8c_c {
     u8 tag;                                     /* +0x000, low byte of the header word */
 } GenericTagMethods_3bb8c_c;
 
-typedef struct GenericTagInst_3bb8c_c {
+struct GenericTagInst_3bb8c_c {
     GenericTagMethods_3bb8c_c *methods;         /* +0x000 */
-} GenericTagInst_3bb8c_c;
+};
 
 /*
  * First argument of func_8004D678: an unrelated, larger caller-side
