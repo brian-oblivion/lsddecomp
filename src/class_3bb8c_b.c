@@ -39,7 +39,9 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D028);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D088);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D0D0);
+void func_8004D0D0(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
+    item->methods->slot48(item, 0, self->unk1E4);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004D108);
 
