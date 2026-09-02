@@ -132,7 +132,19 @@ segments:
       - [0x39cb4, c, StageGrid]
       - [0x39e08, c, class_39e08]
       - [0x3ac78, c, class_3ac78]
-      - [0x3bb8c, asm, class_3bb8c]
+      # class_3bb8c is 365 functions -- the largest uncarved block in the
+      # game, and the one holding all 13 PSX BIOS trampolines (`jr $t2`,
+      # not expressible in C). Carved in slices from the front, like Entity.
+      # 0x3CD88 (func_8004C588) is a real boundary: func_8004C470 ends in
+      # `jr $ra` and func_8004C588 opens with `addu $a3, $zero, $zero` --
+      # a leaf that never allocates a frame, not a pre-prologue fragment.
+      # This first slice carries NO switch jump tables (zero `jlabel`s in
+      # the 20 functions) and none of the BIOS stubs, so no rodata slot
+      # needs attaching and no `hasm`/`.word` disposition is required yet.
+      # BOTH are still ahead in the remainder: whoever carves the next
+      # slice must decide the BIOS-stub disposition AT CARVE TIME.
+      - [0x3bb8c, c, class_3bb8c]
+      - [0x3CD88, asm, class_3bb8c_b]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
