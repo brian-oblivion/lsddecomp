@@ -195,6 +195,23 @@ typedef struct DreamSysCtorArgObj {
 	DreamSysCtorArgMethods *methods;
 } DreamSysCtorArgObj;
 
+/* Object pointed to by DreamSys__func_58968's `arg1` parameter -- same
+   "vtable pointer at offset 0" shape as this unit's other opaque classes.
+   Unidentified; may or may not be the same class as DreamSysCtorArgObj
+   above (both are eventually forwarded to vt->slot10, but this one is
+   passed through directly rather than via a derived value) -- kept as a
+   separate local view per this unit's "multiple independent views of one
+   table" convention until proven otherwise (round 2026-09-02). */
+typedef struct DreamSysFunc58968ArgMethods {
+	u8 pad00[0xE4];
+	/* Called by DreamSys__func_58968 as (arg1, &local, this,
+	   &this->linkCoordinates); return value discarded. */
+	void (*slot0xE4)(void *self, void *arg1, struct DreamSys *arg2, PlayerSpawnPoint *arg3);
+} DreamSysFunc58968ArgMethods;
+typedef struct DreamSysFunc58968ArgObj {
+	DreamSysFunc58968ArgMethods *methods;
+} DreamSysFunc58968ArgObj;
+
 /* Object pointed to by DreamSys::unk_0x4C, used by func_80058A94 (slot
    +0xF0) and func_8005A82C (slot +0xE8, this round): same "vtable pointer
    at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
@@ -237,7 +254,12 @@ typedef struct DreamSysBaseMethods {
 	   with the base ctor returning `self` for chaining, unneeded here since
 	   the caller already has `this`. */
 	struct DreamSys *(*ctor)(struct DreamSys *self);
-	u8 pad0C[0x50 - 0xC];
+	u8 pad0C[0x4C - 0xC];
+	/* Shared with Class65650's own inherited "slot4C" at the same offset in
+	   the SAME base table (code_55dd4.h's D800878D4Methods: "called by
+	   func_80065918 as slot4C(self, arg3, arg5)"). Called by
+	   DreamSys__func_58968 as (this, arg1, &local) (round 2026-09-02). */
+	void (*slot4C)(struct DreamSys *self, void *arg1, void *arg2);
 	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes
 	   the real `typedef struct DreamSys {...}` below, so GCC 2.6.3 warns
 	   "declared inside parameter list ... probably not what you want" and
@@ -603,7 +625,8 @@ struct vtable_DreamSys{
 	   if any, unused (round 2026-08-30). */
 	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);
 	u32 unknown_functions_0x48[1];
-	void *func_58968;
+	/* This function's OWN slot; called this round (round 2026-09-02). */
+	void (*func_58968)(DreamSys *this, DreamSysFunc58968ArgObj *arg1);
 	u32 unknown_functions_0x50[4];
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x060). Called by
 	   DreamSys__func_588ec as (this, 0) (round 2026-08-30-b). Still

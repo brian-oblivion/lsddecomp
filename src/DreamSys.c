@@ -59,7 +59,23 @@ void DreamSys__func_588ec(DreamSys *this)
 	this->unk_0x924 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__func_58968);
+void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
+{
+	s32 local[4];
+
+	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
+	func_80057C84()->slot4C(this, arg1, local);
+	this->vt->slot10(this, arg1);
+	if (this->unknwon_int_0x44 == 0xE) {
+		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
+		this->vt->func_8001CEB4(this, 1, &entry->rotation);
+		this->vt->GetSetDreamTimeLimit(this, entry->timeLimit + 4);
+		this->currentFlashbackIndex++;
+	}
+	if (this->unk_0x6c != 0 && this->unk_0x888 != 0) {
+		this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x888);
+	}
+}
 
 void func_80058A94(DreamSys *this)
 {
