@@ -179,6 +179,22 @@ typedef struct DreamSysUnk58 {
 	DreamSysUnk58Vtable *vt;
 } DreamSysUnk58;
 
+/* Object pointed to by DreamSys__DreamSys's `arg1` constructor parameter --
+   same "vtable pointer at offset 0" shape as the other opaque classes in
+   this unit. Stored verbatim into DreamSys::unk_0x60 and also used
+   immediately: `arg1->methods->slot0x80(arg1, 0)`'s return value (a
+   companion pointer, forwarded as `void *`) is passed to DreamSys's own
+   `vt->slot10` right after -- the same "buddy-link" shape code_55dd4.h
+   documents for Class65650's `slot10`/`slot14` pair (round 2026-09-02).
+   Nothing else identifies this class. */
+typedef struct DreamSysCtorArgMethods {
+	u8 pad00[0x80];
+	void *(*slot0x80)(void *self, s32 arg1);
+} DreamSysCtorArgMethods;
+typedef struct DreamSysCtorArgObj {
+	DreamSysCtorArgMethods *methods;
+} DreamSysCtorArgObj;
+
 /* Object pointed to by DreamSys::unk_0x4C, used by func_80058A94 (slot
    +0xF0) and func_8005A82C (slot +0xE8, this round): same "vtable pointer
    at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
@@ -212,7 +228,16 @@ typedef struct DreamSysUnk4CObj {
    code_55dd4.h to avoid a cross-unit include; only slot +0x050 is needed by
    this unit (func_80058A94, this round). */
 typedef struct DreamSysBaseMethods {
-	u8 pad00[0x50];
+	u8 pad00[0x8];
+	/* Shared with Class65650's own inherited "ctor" slot at the same offset
+	   in the SAME base table (code_55dd4.h's D800878D4Methods, which already
+	   names and resolves this exact slot as `func_80057044`, taking/
+	   returning `Class65650 *self`). Called by DreamSys__DreamSys as
+	   (this), its return value discarded (round 2026-09-02) -- consistent
+	   with the base ctor returning `self` for chaining, unneeded here since
+	   the caller already has `this`. */
+	struct DreamSys *(*ctor)(struct DreamSys *self);
+	u8 pad0C[0x50 - 0xC];
 	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes
 	   the real `typedef struct DreamSys {...}` below, so GCC 2.6.3 warns
 	   "declared inside parameter list ... probably not what you want" and
@@ -355,7 +380,10 @@ typedef struct DreamSys {
 	   func_8005942C (this->unk_0x5C + 0x14 and + 0x20 are passed to
 	   func_8005950C), so it points to a pair of two-word (x,y) points. */
 	DreamSysUnk5C *unk_0x5C;
-	s8 unknown_values_0x60[4];
+	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
+	   (round 2026-09-02) -- see DreamSysCtorArgObj. No other observed use in
+	   this unit's queued functions. */
+	void *unk_0x60;
 	/* Set by func_8005938C(this, value); no other observed use. */
 	s32 unk_0x64;
 
@@ -535,7 +563,14 @@ struct vtable_DreamSys{
 	   (DreamSys__DreamSys); types here are New_DreamSys's own forwarded
 	   parameter types, not independently confirmed by this round. */
 	DreamSys *(*Constructor)(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
-	u32 unknown_functions_0xc[2];
+	u32 unknown_functions_0xc[1];
+	/* Shared with Class65650's own vtable at the same offset (code_55dd4.h:
+	   `slot10`, resolved there as `func_800570B4`, the "link" companion of
+	   `slot14`/`func_80057130` immediately below -- this unit already names
+	   THAT slot `func_80057130` and notes the same companion relationship).
+	   Called by DreamSys__DreamSys as (this, arg1->methods->slot0x80(arg1,
+	   0)) -- the constructor's own "buddy-link" step (round 2026-09-02). */
+	void (*slot10)(DreamSys *this, void *arg);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x014); shared
 	   with Class65650's inherited slot14 (code_55dd4.h: "'unlink' companion
 	   of slot10"). Called by func_80058A94 as (this, this->unk_0x4C)
@@ -549,7 +584,11 @@ struct vtable_DreamSys{
 	   (round 2026-09-02). */
 	void (*slot30)(DreamSys *this, s32 arg1);
 	u32 unknown_functions_0x34[3];
-	void *func_800588EC;
+	/* Called by DreamSys__DreamSys as the constructor's LAST step, as
+	   (this); its return value is never overwritten before the function's
+	   own epilogue, so it becomes DreamSys__DreamSys's own return value
+	   unchanged (round 2026-09-02) -- typed `DreamSys *` to match. */
+	DreamSys *(*func_800588EC)(DreamSys *this);
 	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */
 	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);

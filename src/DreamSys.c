@@ -25,7 +25,25 @@ DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 	return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__DreamSys);
+DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
+{
+	void *val;
+
+	func_80057C84()->ctor(this);
+	this->vt = Get_vtable_DreamSys();
+	this->unk_0x58 = arg2;
+	this->unk_0x5C = (DreamSysUnk5C *)arg3;
+	this->unk_0x64 = 0;
+	this->unk_0x60 = arg1;
+	val = ((DreamSysCtorArgObj *)arg1)->methods->slot0x80(arg1, 0);
+	this->vt->slot10(this, val);
+	this->vt->GetSetDreamTimeLimit(this, -1);
+	this->unk_0x70 = 1;
+	this->unk_0x6c = 0;
+	this->unk_0x878 = 1;
+	this->vt->InitNewGame(this);
+	return this->vt->func_800588EC(this);
+}
 
 void DreamSys__func_588ec(DreamSys *this)
 {
