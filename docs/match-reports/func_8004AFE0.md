@@ -1,0 +1,75 @@
+# func_8004AFE0 — MATCH
+
+**Unit:** class_3ac78 · **Size:** 20 instructions · **Result:** 20/20 words
+
+## What it does
+
+Sets `self->unk7C`/`unk7E` from two signed bytes read off an opaque
+descriptor buffer (`arg1`, offsets 2 and 3, each decremented by one), and
+stashes `arg2` verbatim into both `self->unk80` and `self->unk84`. Finishes
+with a plain (non-virtual) tail call to `func_8004C93C(self)`.
+
+`arg1`'s buffer is populated elsewhere (out of this round's scope, by a
+call through `Class866E8Methods` slot `+0x110`, itself not decompiled) so
+only the two bytes this function actually reads are typed — added as
+`UnkArgObj_3ac78` in `include/class_3ac78.h`, following the
+`Unk*Obj_<unit>` naming convention already used in `code_171e0.h`.
+
+## Final source
+
+```c
+void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
+{
+    s16 t;
+
+    self->unk7C = arg1->unk2 - 1;
+    t = arg1->unk3 - 1;
+    self->unk80 = arg2;
+    self->unk84 = arg2;
+    self->unk7E = t;
+    func_8004C93C(self);
+}
+```
+
+## Residue and the fix that closed it
+
+First attempt (natural source order — compute+store `unk7C`, store
+`unk80`/`unk84`, compute+store `unk7E`, call) reached only 12/20: retail
+leaves the FIRST `lbu`'s (arg1->unk2) load-delay slot as a genuine `nop`,
+but this body's scheduler eagerly hoisted the very next statement's store
+(`self->unk80 = arg2`) into that slot instead — four instructions earlier
+than where retail places it (which is the SECOND `lbu`'s delay slot,
+`arg1->unk3`).
+
+**Fix: compute `arg1->unk3 - 1` into a named local (`t`) placed
+immediately after the `unk7C` store, but defer the ASSIGNMENT to
+`self->unk7E` until after both `unk80`/`unk84` stores.** This reproduces
+retail's actual instruction order exactly: the byte-3 load happens early
+(right after `unk7C`'s store, its own delay slot filled by the `unk80`
+store that was sitting ready), and the final `sh` into `unk7E` becomes a
+cheap register-only store that the scheduler slides into the `jal`'s own
+delay slot at the very end — retail does precisely this (`sh v0,0x7e(a0)`
+is the tail call's delay-slot instruction).
+
+Two other orderings were tried and both scored WORSE (11/20 and 12/20 with
+different word patterns): plain reordering of the four statements without
+splitting the *compute* of `unk7E` from its *store* never reproduced
+retail's exact delay-slot assignment, no matter which of the four
+statements came first.
+
+### Proposed learning
+
+**When a value is computed early but its store is delay-slot bait for a
+LATER instruction (a call, here), split the computation from the store
+with a named local, and place the local's assignment to the field at the
+point in source order where the STORE (not the load) should land.**
+Textual adjacency of two independent statements is not enough to predict
+which delay slot the scheduler fills — GCC 2.6.3's scheduler here bypassed
+a `nop`-bound load-delay slot four instructions early and instead used the
+LAST instruction of the function (a tail call) as a landing spot for a
+value computed much earlier. Splitting compute-from-store made that
+placement reachable from C.
+
+## Provenance
+
+round 2026-09-02, runner ALPHA, unit class_3ac78.

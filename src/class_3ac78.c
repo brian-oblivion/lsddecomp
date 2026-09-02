@@ -21,13 +21,53 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A534);
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A7C0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A984);
+extern void *func_8001E57C(Class866E8 *self, s32 arg1);
+
+void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
+{
+    void (*fn)(Class866E8 *self, GenericObject *arg1, s32 arg2);
+
+    fn = *(void (**)(Class866E8 *, GenericObject *, s32))
+        ((u8 *)func_8001E57C(self, (s32)arg1) + 0x38);
+    fn(self, arg1, arg2);
+
+    if ((arg1->methods->header & 0xF) == 1) {
+        self->methods->slot100(self, arg1, arg2);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA10);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA6C);
+void func_8004AA6C(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
+{
+    void (*fn)(Class866E8 *self, s32 arg1);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AB24);
+    fn = *(void (**)(Class866E8 *, s32))((u8 *)func_8001E57C(self, arg1) + 0x88);
+    fn(self, arg1);
+
+    if (arg1 == 6)
+        goto handle6;
+    if (arg1 == 7)
+        goto merge;
+    return;
+
+handle6:
+    if (arg2->unk14 != NULL) {
+        arg2->unk14 = arg2->unk14->methods->unk04(arg2->unk14);
+    }
+
+merge:
+    self->unk1BC = arg2;
+    self->methods->slot30(self, arg1);
+}
+
+void func_8004AB24(Class866E8 *self)
+{
+    if (self->unk70) {
+        self->methods->slotF4(self);
+        self->methods->slot13C(self);
+    }
+}
 
 void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
 {
@@ -38,7 +78,19 @@ void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ACF8);
+void func_8004ACF8(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
+{
+    s32 i;
+    UnkChildObj_3ac78 *child;
+
+    for (i = 0; i < count; i++) {
+        child = self->methods->slotB8(self, i);
+        child->methods->slot44(child, 1, arg3);
+        arg3 += 3;
+        child->methods->slot48(child, 1, arg2);
+        arg2 += 6;
+    }
+}
 
 void func_8004ADC4(Class866E8 *self, s32 arg1, s32 arg2)
 {
@@ -51,11 +103,50 @@ void func_8004ADD0(Class866E8 *self, s32 arg1)
     self->unkE8 = arg1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ADD8);
+void func_8004ADD8(Class866E8 *self, void *list, s32 count)
+{
+    s32 *p;
+    u8 unused[24];
+
+    if (count < 2)
+        return;
+    if (count < 4)
+        goto scan;
+    if (count >= 9)
+        return;
+    if (count < 5)
+        return;
+
+scan:
+    p = (s32 *)self->unkE8;
+    if (p == NULL)
+        return;
+    if (*p == 0)
+        return;
+
+    do {
+        if (*p == ((GenericObject *)list)->methods->header) {
+            self->methods->slot12C(self, list, count);
+        }
+        p++;
+    } while (*p != 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AEA4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AFE0);
+extern void func_8004C93C(Class866E8 *self);
+
+void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
+{
+    s16 t;
+
+    self->unk7C = arg1->unk2 - 1;
+    t = arg1->unk3 - 1;
+    self->unk80 = arg2;
+    self->unk84 = arg2;
+    self->unk7E = t;
+    func_8004C93C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
