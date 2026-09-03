@@ -36,21 +36,20 @@ void func_8001979C(void *dst, s32 flag)
 }
 
 #if 0
-/* STALL snapshot -- see docs/match-reports/func_800197C4.md. Head pass,
- * round 13: this reaches the CORRECT INSTRUCTION COUNT AND LENGTH (no
- * inserted or deleted instructions anywhere in the function). The residue
- * is two register-identity choices plus one delay-slot filler retail has
- * and this does not. Two things got it here and both generalise to the
- * seven sibling functions in this family:
- *   1. The OT splice is a 24-BIT BITFIELD write (`OtTag.addr`), not
- *      hand-written `& 0xFF000000` / `& 0x00FFFFFF` masking. Same value,
- *      different register allocation.
- *   2. The OT expression must be RE-EVALUATED, not cached in a local --
- *      retail re-reads `arg1->unk30` for the second store. That is macro
- *      argument semantics (Psy-Q's `addPrim(ot, p)` expands `ot` twice).
- * Still open: retail fills a load-delay slot with `addiu $v0, $s1, 0x14`,
- * i.e. it computes `arg0 + 0x14` somewhere in this branch; this body has
- * nothing to schedule there and GCC emits a `nop`.
+/* STALL snapshot round 2 -- see docs/match-reports/func_800197C4.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Residue is
+ * two register-identity choices ($a2 vs $a1 for the OT high-byte mask,
+ * cascading to the second reload's register) plus one load-delay-slot
+ * filler: retail forms `$s1 + 0x14` (= arg0 + 0x14) and this body has
+ * nothing there. VERIFIED across all 8 siblings: the filler's offset
+ * always equals (highest self-relative offset touched anywhere in the
+ * CALLS branch) + (the access width at that offset) -- i.e. one byte past
+ * the last field of `self` the function ever reads. Tried: computing that
+ * "one past" pointer as an unconditionally-live local (cross-branch) --
+ * forces a 4th callee-saved register (drift, 0/54). Tried: computing it
+ * only within the `if` branch with (void)-cast non-use -- eliminated by
+ * -O2, matching func_8001A268's same finding for a genuinely unused local.
+ * Not cracked.
  */
 void func_800197C4(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
@@ -68,17 +67,287 @@ void func_800197C4(void *arg0, void *arg1) {
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800197C4);
 
+/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+ * why this is needed even at accidentally-4-aligned offsets. */
+typedef struct {
+    s16 x, y;
+} Vec2s16_98;
+
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_8001989C.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted -- ONE
+ * differing line, the delay-slot filler below). TWO residues stack here,
+ * both already documented: (a) the shared family residue ($a2 vs $a1 for
+ * the OT mask, plus missing `addiu $v0,$s1,0x1c` = self+0x1c, matching
+ * the cross-sibling formula -- last touched self field is +0x18, a
+ * PolyUV4, width 4, end 0x1c); (b) this function's OWN pre-existing
+ * self/prim register swap ($s1=prim, $s2=self, opposite of retail and
+ * every OTHER sibling), already investigated exhaustively in this
+ * report's round-1 attempts -- re-tried swapping the local declaration
+ * order here too (prim before self) and got the SAME regression as
+ * round 1 (address drift), confirming it's not fixed by the bitfield
+ * rewrite either. Not cracked.
+ */
+void func_8001989C(void *arg0, void *arg1) {
+    u8 *self = (u8 *)arg0;
+    u8 *prim = (u8 *)arg1;
+
+    if (*(s32 *)(prim + 0x78) == 0) {
+        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    } else {
+        func_8001A380(D_8008ACD0, prim, self + 0x4, 0, 0, 0);
+        func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+                      (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
+                      (PolyUV4 *)(self + 0x18));
+
+        *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);
+        *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
+        *(u16 *)(*(u8 **)(prim + 0x90) + 0xA) = *(u8 *)(self + 0x17);
+
+        *(Vec2s16_98 *)(*(u8 **)(prim + 0x88) + 0xC) = *(Vec2s16_98 *)(self + 0x4);
+        *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
+        *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
+
+        func_8001AD54(self, D_8008ACD0);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
+
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_800199EC.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class as func_800197C4: $a2 vs $a1 for the OT high-byte mask,
+ * plus one missing `addiu $v0,$s1,0x20` = arg0 + 0x20, one byte past the
+ * last self field this function touches (arg0+0x1E, a u16). Matches the
+ * verified cross-sibling formula in func_800197C4.md. Not cracked.
+ */
+void func_800199EC(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
+        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    } else {
+        func_8001A380(D_8008ACD0, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+                      (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
+                      (PolyUV4 *)((u8 *)arg0 + 0x18));
+
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x88) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x88) + 0x8) = *(u16 *)((u8 *)arg0 + 0xC);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
+
+        func_8001B6B4(arg0, D_8008ACD0);
+    }
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800199EC);
 
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_80019B24.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class as func_800197C4 in this unit: $a2 vs $a1 for the OT
+ * high-byte mask (cascading register renames), plus one missing
+ * load-delay-slot filler `addiu $v0,$s1,0x18` = arg0 + 0x18, which is
+ * exactly one byte past uv3 (arg0+0x14, a PolyUV4, the last arg0 field
+ * this function's calls branch touches) -- see func_800197C4.md for the
+ * verified cross-sibling formula and the two ruled-out hypotheses for
+ * reproducing it. Not cracked.
+ */
+void func_80019B24(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
+        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    } else {
+        func_8001A380(D_8008AEE8, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        func_8001A4C0((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+                      (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
+        func_8001A8D4(arg0, D_8008AEE8);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019B24);
+
+/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+ * why this is needed even at accidentally-4-aligned offsets. */
+typedef struct {
+    s16 x, y;
+} Vec2s16_C04;
+
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_80019C04.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class: $a2 vs $a1 for the OT mask, plus one missing
+ * `addiu $v0,$s1,0x24` = one byte past `self+0x20` (the last arg0 field
+ * touched, `func_8001A4C0`'s last argument, treated as a PolyUV4-width-4
+ * pointer per the cross-sibling formula in func_800197C4.md). Not
+ * cracked.
+ */
+void func_80019C04(void *arg0, void *arg1) {
+    u8 *self = (u8 *)arg0;
+    u8 *prim = (u8 *)arg1;
+
+    if (*(s32 *)(prim + 0x78) == 0) {
+        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    } else {
+        func_8001A380(D_8008AEE8, prim, self + 0x4, 0, 0, 0);
+        func_8001A4C0(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
+                      self + 0x18, self + 0x20);
+
+        *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u8 *)(self + 0xF);
+        *(u16 *)(*(u8 **)(prim + 0x98) + 0xA) = *(u8 *)(self + 0xF);
+        *(u16 *)(*(u8 **)(prim + 0x9C) + 0xA) = *(u8 *)(self + 0x17);
+        *(u16 *)(*(u8 **)(prim + 0xA0) + 0xA) = *(u8 *)(self + 0x1F);
+
+        *(Vec2s16_C04 *)(*(u8 **)(prim + 0x94) + 0xC) = *(Vec2s16_C04 *)(self + 0x4);
+        *(Vec2s16_C04 *)(*(u8 **)(prim + 0x98) + 0xC) = *(Vec2s16_C04 *)(self + 0xC);
+        *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
+        *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
+
+        func_8001B164(self, D_8008AEE8);
+    }
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019C04);
 
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_80019D84.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class: $a2 vs $a1 for the OT high-byte mask, plus one missing
+ * `addiu $v0,$s1,0x28`. This is the first sibling where the raw
+ * "last-field-offset + access-width" formula from func_800197C4.md does
+ * NOT land exactly on the filler: the highest arg0 field this function
+ * touches is +0x24 (a u16 read, raw end 0x26), but the filler is 0x28.
+ * 0x28 = align-up-to-4(0x26). Every other sibling's raw sum was already a
+ * multiple of 4, so this is the first case that distinguishes "one byte
+ * past the last field" from "start of the next 4-byte-aligned slot" --
+ * the latter is what actually matches here. Worth re-checking the other
+ * seven against this refined rule rather than the raw one. Not cracked.
+ */
+void func_80019D84(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
+        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    } else {
+        func_8001A380(D_8008AEE8, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        func_8001A4C0((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+                      (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x18, (u8 *)arg0 + 0x20);
+
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x94) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x98) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x9C) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0xA0) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x94) + 0x8) = *(u16 *)((u8 *)arg0 + 0xC);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x98) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x9C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0xA0) + 0x8) = *(u16 *)((u8 *)arg0 + 0x24);
+
+        func_8001BAB4(arg0, D_8008AEE8);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019D84);
 
+/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+ * why this is needed even at accidentally-4-aligned offsets. */
+typedef struct {
+    s16 x, y;
+} Vec2s16_EE4;
+
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_80019EE4.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class as func_800197C4: $a2 vs $a1 for the OT mask, plus one
+ * missing `addiu $v0,$s1,0x28`. Matches the align-4-refined cross-sibling
+ * formula from func_80019D84.md: last touched self field is +0x24 (a
+ * u16), raw end 0x26, align_up_4(0x26) = 0x28. Not cracked.
+ */
+void func_80019EE4(void *arg0, void *arg1) {
+    u8 *self = (u8 *)arg0;
+    u8 *prim = (u8 *)arg1;
+
+    if (*(s32 *)(prim + 0x78) == 0) {
+        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    } else {
+        func_8001A380(D_8008ACD0, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+                      (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x14),
+                      (PolyUV4 *)(self + 0x20));
+
+        *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u16 *)(self + 0x26);
+        *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u16 *)(self + 0x26);
+        *(u16 *)(*(u8 **)(prim + 0x90) + 0xA) = *(u16 *)(self + 0x26);
+
+        *(Vec2s16_EE4 *)(*(u8 **)(prim + 0x88) + 0xC) = *(Vec2s16_EE4 *)(self + 0x4);
+        *(Vec2s16_EE4 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_EE4 *)(self + 0x10);
+        *(Vec2s16_EE4 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_EE4 *)(self + 0x1C);
+
+        *(u16 *)(*(u8 **)(prim + 0x88) + 0x8) = *(u16 *)(self + 0xC);
+        *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x18);
+        *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x24);
+
+        func_8001BFD4(self, D_8008ACD0);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019EE4);
+
+/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+ * why this is needed even at accidentally-4-aligned offsets. */
+typedef struct {
+    s16 x, y;
+} Vec2s16_A64;
+
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_8001A064.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class: $a2 vs $a1 for the OT mask, plus one missing
+ * `addiu $v0,$s1,0x34`. Confirms the align-4-refined cross-sibling
+ * formula a third time: last touched self field is +0x30 (a u16), raw
+ * end 0x32, align_up_4(0x32) = 0x34. Not cracked.
+ */
+void func_8001A064(void *arg0, void *arg1) {
+    u8 *self = (u8 *)arg0;
+    u8 *prim = (u8 *)arg1;
+
+    if (*(s32 *)(prim + 0x78) == 0) {
+        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    } else {
+        func_8001A380(D_8008AEE8, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        func_8001A4C0(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
+                      self + 0x20, self + 0x2C);
+
+        *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);
+        *(u16 *)(*(u8 **)(prim + 0x98) + 0xA) = *(u16 *)(self + 0x26);
+        *(u16 *)(*(u8 **)(prim + 0x9C) + 0xA) = *(u16 *)(self + 0x32);
+        *(u16 *)(*(u8 **)(prim + 0xA0) + 0xA) = *(u16 *)(self + 0x32);
+
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0x94) + 0xC) = *(Vec2s16_A64 *)(self + 0x4);
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0x98) + 0xC) = *(Vec2s16_A64 *)(self + 0x10);
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_A64 *)(self + 0x1C);
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_A64 *)(self + 0x28);
+
+        *(u16 *)(*(u8 **)(prim + 0x94) + 0x8) = *(u16 *)(self + 0xC);
+        *(u16 *)(*(u8 **)(prim + 0x98) + 0x8) = *(u16 *)(self + 0x18);
+        *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x24);
+        *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x30);
+
+        func_8001C474(self, D_8008AEE8);
+    }
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A064);
 
