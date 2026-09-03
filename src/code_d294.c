@@ -50,7 +50,12 @@ void func_8001CBA4(Class6B5CCObj *self) {
     func_80018390()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CC48);
+void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other) {
+    func_80018390()->slot10(self, other);
+    if ((other->methods->header & 0xF) == 9) {
+        func_8001E770(self, other);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CCB4);
 
