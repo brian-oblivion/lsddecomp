@@ -79,17 +79,88 @@ s32 func_8004F4C8(s32 *arr, s32 count) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F55C);
+void func_8004F55C(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a5, s32 a6, s32 a7) {
+    self->unk30 = a1;
+    self->unk34 = a2;
+    self->unk38 = 0;
+    self->unk68 = a6;
+    self->unk6C = a7;
+    self->methods->addChild(self, (void *)a3);
+    self->methods->addChild(self, (void *)a5);
+    self->unk70 = 0;
+    self->unk28 = 0;
+    self->unk24 = 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F5DC);
+void func_8004F5DC(TaskObjF *self) {
+    self->unk6C = 0;
+    self->unk68 = 0;
+    self->methods->removeChild(self, (void *)self->unk60);
+    self->methods->removeChild(self, (void *)self->unk64);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F638);
+void func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
+    s32 result;
+    s32 code;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F704);
+    self->unk40 = a1;
+    self->unk44 = a2;
+    self->unk54 = a3;
+    self->unk24 = 1;
+    self->unk58 = a4;
+    if (func_8004F9D8(self)) {
+        func_8004F810(self);
+        func_8004F704(self);
+        result = self->methods->slot5C(self, self->unk38, self->unk3C, self->unk30, self->unk34);
+        self->unk2C = result;
+        if (result != 0) {
+            func_8004F784(self);
+            if (self->unk28 == 0xE) {
+                code = 0xF;
+            } else {
+                code = 0x12;
+            }
+        } else {
+            code = 0xD;
+            self->unk2C = 0xF;
+        }
+        self->methods->slot7C(self, code);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F784);
+void func_8004F704(TaskObjF *self) {
+    s32 i;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F810);
+    if (self->unk38 == 0) {
+        self->unk38 = func_80017B34(0x40);
+        for (i = 0; i < 15; i++) {
+            self->unk38[i] = func_80017B34(0x41);
+        }
+        self->unk3C = func_80017B34(0x40);
+    }
+}
+
+void func_8004F784(TaskObjF *self) {
+    s32 i;
+
+    for (i = self->unk2C; i < 15; i++) {
+        self->unk38[i] = func_80017CFC(self->unk38[i]);
+    }
+    self->unk38[i] = 0;
+}
+
+void func_8004F810(TaskObjF *self) {
+    s32 i;
+
+    if (self->unk38 != 0) {
+        func_80017CFC(self->unk3C);
+        for (i = 0; i < self->unk2C; i++) {
+            func_80017CFC(self->unk38[i]);
+        }
+        func_80017CFC(self->unk38);
+        self->unk38 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F8A4);
 
