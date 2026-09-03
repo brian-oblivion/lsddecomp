@@ -898,6 +898,17 @@ struct Class86B60Unk4CObj_3bb8c_d {
 };
 
 /*
+ * self->unk60's pointee. Only `unk14` is reached, by func_8004DABC, as a
+ * plain `s32` copied into a one-word stack buffer before being forwarded
+ * by address to `DreamSysViewMethods_3bb8c_c::slot19C`.
+ */
+typedef struct Class86B60Unk60Obj_3bb8c_d Class86B60Unk60Obj_3bb8c_d;
+struct Class86B60Unk60Obj_3bb8c_d {
+    u8 pad0[0x014];
+    s32 unk14; /* +0x014, func_8004DABC */
+};
+
+/*
  * Generic class-instance shape used only to reach the shared BasicClass-
  * family "release" slot (`+0x004`, same offset as `BasicClassMethods::
  * release` in include/code_8220.h -- "virtual finalize, then free self")
@@ -1004,7 +1015,9 @@ struct Class86B60 {
     Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, func_8004D90C */
     u8 pad050[0x058 - 0x050];
     s32 unk58;                       /* +0x058, func_8004D9D4: 5-valued dispatch (0-4) */
-    u8 pad05C[0x093 - 0x05C];
+    u8 pad05C[0x060 - 0x05C];
+    Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, func_8004DABC */
+    u8 pad064[0x093 - 0x064];
     /* +0x093, func_8004D898: address-of only, forwarded as
      * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
      * loop iteration; real extent beyond one byte unknown. */
@@ -1135,6 +1148,10 @@ struct BaseTaskCtorTable_3bb8c_c {
     u8 pad064[0x090 - 0x064];
     /* +0x090, func_8004D9D4's own first, unconditional call, `self` only. */
     void (*slot90)(void *self);
+    /* +0x094, func_8004DABC's own first, unconditional call, `self`
+     * only. Distinct from `Class86B60Methods::slot94` (see
+     * func_8004D9D4's report) -- same offset number, unrelated table. */
+    void (*slot94)(void *self);
 };
 
 extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
