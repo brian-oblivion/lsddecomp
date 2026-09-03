@@ -1,7 +1,25 @@
 #include "common.h"
 #include "Entity.h"
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80061A90);
+void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0 && rand() % 10 == 0) {
+        this->unk44 = 0xC;
+    }
+    if (out->unk4 % 10 == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 0xC;
+        out->unk20 = -1;
+    }
+    if (this->unkFC == 0) {
+        if (rand() & 1) {
+            this->methods->slotCC(this, 0x800, 0);
+        }
+    }
+    this->methods->slotC4(this, -0x80, 0);
+    if (this->unk44 == 0xC && this->unkFC == 0x12C) {
+        this->unk4C->methods->slot138(this->unk4C, 1, 1);
+    }
+}
 
 void func_80061C04(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 == 0x1E) {
