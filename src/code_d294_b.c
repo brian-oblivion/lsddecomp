@@ -42,7 +42,20 @@ void func_8001D600(Class6B5CCObj *self, void *dest) {
     func_8001F51C(self->unk20, dest);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D624);
+/* Copies a1's own count*8 elements into self->unk14->unk24 (via
+ * func_8001EE04, both its src and dest args are &a1->unk4 -- computed once,
+ * copied, per the disassembly), zeroes unk28/unk2C, stashes a1 into unk30
+ * for the duration of a single self->methods->slot30(self, a2) dispatch
+ * (an inherited BasicClass slot, not this unit's own code), then clears
+ * unk30 again. */
+void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
+    func_8001EE04(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
+    self->unk28 = 0;
+    self->unk2C = 0;
+    self->unk30 = a1;
+    self->methods->slot30(self, a2);
+    self->unk30 = NULL;
+}
 
 void func_8001D6A4(void) {
 }
