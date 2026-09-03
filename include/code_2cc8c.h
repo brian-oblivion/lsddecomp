@@ -1427,6 +1427,13 @@ struct Obj6EAC0 {
                                   through their own `->methods` */
 };
 
+/* Same generic packed-bitfield-word accessor documented in
+ * include/code_d294.h (`u32 func_8001EDAC(u32 *word, s32 shift, s32
+ * width, u32 value)`), reached here over `&self->unk58` instead of
+ * `&self->unk10`. Declared again here under this unit's own local view
+ * per the established multiple-independent-local-views convention. */
+extern u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value);
+
 extern Obj6EAC0Methods D_8006EAC0; /* the base table itself, so
                                        func_800408BC's own definition
                                        (this unit) can return &D_8006EAC0 */
