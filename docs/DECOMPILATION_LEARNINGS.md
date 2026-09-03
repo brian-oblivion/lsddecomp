@@ -1124,6 +1124,38 @@ code_2c054).**
   **When two runners report the same anomaly, sweep the corpus before writing
   either report up.**
 
+#### Round 14 CORRECTION: the register threshold is 7, not 5
+
+**The round-13 threshold below is wrong and was written by the head that
+promoted it. Round 14 more than tripled the sample and it did not survive.**
+
+Pooled over rounds 13 and 14 — 81 matched functions and 10 stalled:
+
+| band | matched | stalled | verdict |
+| --- | --- | --- | --- |
+| 5-6 registers | **5** | 1 | **83% MATCHED** — not a stall signal at all |
+| 7+ registers | **0** | 4 | 100% stalled |
+
+No function needing 7 or more distinct callee-saved registers has ever
+matched, across 81 samples. Every function at 9 (fully saturated) that was
+attempted has stalled. But the 5-6 band, which round 13 treated as the
+danger zone, is where `func_8004EB88` (6), `func_8004F4C8` (6),
+`func_8004ED40` (5), `func_8004EDC0` (5) and `func_8004F40C` (5) all matched
+— four of them on functions a runner had been told to expect a stall on.
+
+**Why the original number was wrong, since the mistake is repeatable.**
+Round 13's sample had 22 matched functions and *none* of them happened to
+land at 5 or above. "None of 22 matched needed 5+" is a true statement about
+that sample and says almost nothing about the threshold: with a max observed
+demand of 4, the data could not distinguish "5 is fatal" from "9 is fatal".
+The head read the boundary of the observed range as the boundary of the
+possible, promoted it, and then used it to set expectations for a whole
+round. **A threshold needs samples on BOTH sides of it before it is a
+threshold; until then it is just the edge of what you have seen.**
+
+The screen itself is still good and still one-directional — it is only the
+number that moved. Use **7+** to deprioritise. Treat 5-6 as ordinary work.
+
 #### Round 13: retail's callee-saved-register demand is a VALIDATED pre-work screen
 
 Round 12 opened "retail saturates the callee-saved register file" as a residue

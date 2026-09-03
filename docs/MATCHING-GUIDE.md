@@ -192,15 +192,25 @@ three are live rather than transcribed:
   grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/<unit>/<func>.s | sort -u | wc -l
   ```
 
-  Over round 13's 27 worked functions: the 22 that matched averaged **1.86**
-  distinct callee-saved registers and none needed 5 or more; the 5 that
-  stalled averaged 5.00, and both functions demanding 8+ stalled.
+  Pooled over rounds 13 and 14 — 81 matched functions, 10 stalled:
 
-  **Use it in ONE direction only.** A high count predicts a
-  register-allocation stall. A low count predicts nothing — three of those
-  five stalls sat at 2–3 registers and failed for unrelated reasons
-  (tail-merge granularity, a redundant constant materialisation, the
-  `nop_mflo_mfhi` blocker). So it deprioritises; it never promises.
+  | band | matched | stalled |
+  | --- | --- | --- |
+  | 5-6 registers | **5** | 1 |
+  | 7+ registers | **0** | 4 |
+
+  **The threshold is 7, not 5.** No function needing 7 or more has ever
+  matched; every fully saturated one (9) that was attempted stalled. Round 13
+  published 5, on a sample whose maximum observed demand among matches was 4
+  — it could not tell "5 is fatal" from "9 is fatal", and round 14 matched
+  five functions in the 5-6 band, four of them after a runner had been told
+  to expect a stall.
+
+  **Use it in ONE direction only.** A high count deprioritises; it never
+  promises. And a LOW count predicts nothing at all — stalls at 2-4
+  registers are common and fail for entirely unrelated reasons (tail-merge
+  granularity, redundant constant materialisation, the `nop_mflo_mfhi`
+  blocker, shared-tail dispatch).
 
   Mind the register naming: `$30` is `$fp` and `$s8` and the same register.
   splat's `.s` writes `$fp`; `objdump` renders it `s8`. A screen written for
