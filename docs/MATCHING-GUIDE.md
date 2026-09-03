@@ -156,8 +156,8 @@ python3 tools/progress.py     # matched / queued / stalled / fresh, per unit
 ```
 
 `fresh` is a ceiling, not a work order — it cannot see "large body, deep
-reconstruction, low cold-runner yield". Two things tell you that, and both are
-live rather than transcribed:
+reconstruction, low cold-runner yield". Three things tell you that, and all
+three are live rather than transcribed:
 
 - **Size.** The remaining queue for a unit, biggest first. A unit whose cheap
   seam is exhausted shows it here as a floor of 35+ instruction bodies:
@@ -183,6 +183,30 @@ live rather than transcribed:
   branch of the space and read as if it had explored all of it. When a report
   shows many attempts along one axis, that is a reason to look for the axis
   nobody varied.
+
+- **Retail's callee-saved-register demand** (added round 13, after a runner
+  used it predictively and the head validated it against that round's
+  outcomes):
+
+  ```sh
+  grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/<unit>/<func>.s | sort -u | wc -l
+  ```
+
+  Over round 13's 27 worked functions: the 22 that matched averaged **1.86**
+  distinct callee-saved registers and none needed 5 or more; the 5 that
+  stalled averaged 5.00, and both functions demanding 8+ stalled.
+
+  **Use it in ONE direction only.** A high count predicts a
+  register-allocation stall. A low count predicts nothing — three of those
+  five stalls sat at 2–3 registers and failed for unrelated reasons
+  (tail-merge granularity, a redundant constant materialisation, the
+  `nop_mflo_mfhi` blocker). So it deprioritises; it never promises.
+
+  Mind the register naming: `$30` is `$fp` and `$s8` and the same register.
+  splat's `.s` writes `$fp`; `objdump` renders it `s8`. A screen written for
+  one and run over the other undercounts by exactly one, which is the
+  difference between "8 of 9" and fully saturated. The head made that error
+  in round 13 and the runner's figure was the correct one.
 
   **Round 8 retired three more, and the pattern repeated exactly.** All three
   were written up as compiler-internal with mechanically detailed reasoning —
