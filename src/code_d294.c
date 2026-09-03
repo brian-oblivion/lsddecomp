@@ -75,7 +75,9 @@ INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D280);
 void func_8001D33C(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D344);
+s32 func_8001D344(Class6B5CCObj *self, s32 a1) {
+    return func_8001EDAC(&self->unk10, 0x1F, 1, a1 == 0) == 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D374);
 
