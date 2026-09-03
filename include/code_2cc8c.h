@@ -261,7 +261,9 @@ struct Obj86B60Methods {
     void (*slot100)(Obj86B60 *self, s32 a1, s32 a2); /* +0x100, external;
                                                        OBSERVED:
                                                        func_8003DA10 */
-    u8 pad104[0x108 - 0x104];
+    void (*slot104)(Obj86B60 *self, void *a1);      /* +0x104, external;
+                                                       OBSERVED:
+                                                       func_8003D2CC */
     void (*slot108)(Obj86B60 *self);                /* +0x108, external
                                                        (func_8003DA10);
                                                        OBSERVED: func_8003CA1C */
@@ -327,8 +329,11 @@ struct Obj86B60 {
     Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
     s32 unk50;                  /* +0x050, func_8003D3B0: capacity/wrap
                                     bound for the unk58 index into
-                                    unk4C->unk18[] */
-    u8 pad054[0x058 - 0x054];
+                                    unk4C->unk18[] (also func_8003D2CC's
+                                    loop count) */
+    Unk64Elem **unk54;          /* +0x054, func_8003D2CC: walked with an
+                                    incrementing pointer, dereferenced
+                                    directly for each element */
     s32 unk58;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
