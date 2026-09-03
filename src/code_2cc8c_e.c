@@ -2,11 +2,48 @@
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F2AC);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F674);
+extern s32 func_8003F764(s32 *arr);
+extern s32 func_8003F82C(s32 a0);
+
+void func_8003F674(s32 *src, s32 *dst) {
+    s32 maxAbs;
+    s32 shift;
+
+    maxAbs = func_8003F764(src);
+    shift = func_8003F82C(maxAbs);
+    if (shift >= 0x10) {
+        shift -= 0xF;
+        dst[0] = src[0] >> shift;
+        dst[1] = src[1] >> shift;
+        dst[2] = src[2] >> shift;
+        dst[3] = src[3] >> shift;
+        dst[4] = src[4] >> shift;
+        dst[5] = src[5] >> shift;
+    } else {
+        dst[0] = src[0];
+        dst[1] = src[1];
+        dst[2] = src[2];
+        dst[3] = src[3];
+        dst[4] = src[4];
+        dst[5] = src[5];
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F764);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F82C);
+s32 func_8003F82C(s32 a0) {
+    s32 count;
+
+    count = 0;
+    if (a0 <= 0) {
+        return count;
+    }
+    do {
+        a0 >>= 1;
+        count++;
+    } while (a0 > 0);
+    return count;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F848);
 
