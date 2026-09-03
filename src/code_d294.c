@@ -83,7 +83,9 @@ u32 func_8001D374(Class6B5CCObj *self, s32 a1) {
     return func_8001EDAC(&self->unk10, 0x1E, 1, a1 != 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D3A0);
+u32 func_8001D3A0(Class6B5CCObj *self, u32 a1) {
+    return func_8001EDAC(&self->unk10, 0x1C, 2, a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D3CC);
 
