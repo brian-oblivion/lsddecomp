@@ -67,6 +67,53 @@ void func_800197C4(void *arg0, void *arg1) {
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800197C4);
 
+/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+ * why this is needed even at accidentally-4-aligned offsets. */
+typedef struct {
+    s16 x, y;
+} Vec2s16_98;
+
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_8001989C.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted -- ONE
+ * differing line, the delay-slot filler below). TWO residues stack here,
+ * both already documented: (a) the shared family residue ($a2 vs $a1 for
+ * the OT mask, plus missing `addiu $v0,$s1,0x1c` = self+0x1c, matching
+ * the cross-sibling formula -- last touched self field is +0x18, a
+ * PolyUV4, width 4, end 0x1c); (b) this function's OWN pre-existing
+ * self/prim register swap ($s1=prim, $s2=self, opposite of retail and
+ * every OTHER sibling), already investigated exhaustively in this
+ * report's round-1 attempts -- re-tried swapping the local declaration
+ * order here too (prim before self) and got the SAME regression as
+ * round 1 (address drift), confirming it's not fixed by the bitfield
+ * rewrite either. Not cracked.
+ */
+void func_8001989C(void *arg0, void *arg1) {
+    u8 *self = (u8 *)arg0;
+    u8 *prim = (u8 *)arg1;
+
+    if (*(s32 *)(prim + 0x78) == 0) {
+        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    } else {
+        func_8001A380(D_8008ACD0, prim, self + 0x4, 0, 0, 0);
+        func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+                      (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
+                      (PolyUV4 *)(self + 0x18));
+
+        *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);
+        *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
+        *(u16 *)(*(u8 **)(prim + 0x90) + 0xA) = *(u8 *)(self + 0x17);
+
+        *(Vec2s16_98 *)(*(u8 **)(prim + 0x88) + 0xC) = *(Vec2s16_98 *)(self + 0x4);
+        *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
+        *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
+
+        func_8001AD54(self, D_8008ACD0);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
 
 #if 0
