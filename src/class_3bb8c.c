@@ -81,6 +81,50 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
 
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_8004BB3C.md. 90/105 words
+ * with CORRECT total length: every instruction in the loop body and the
+ * epilogue matches retail one-for-one, including BOTH `addiu sN,sN,0xc`
+ * walker increments. The residue is a whole-function $s3<->$s4 identity
+ * swap plus the prologue scheduling that follows from it -- a
+ * register-identity stall, which project rule 6 forbids fixing with a
+ * register pin. The two-differently-BASED-walker shape below is what
+ * recovered the previously-missing second increment; do not go back to a
+ * single indexed base.
+ */
+void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
+    SetupEntry866E8 *ep = arr1;
+    s32 i;
+    Elem *e;
+    SetupSub866E8 *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);
+
+    for (i = 0; i < count; i++) {
+        e = self->methods->slot118(self, sp->id);
+        self->methods->slot88(self, 6, e, i);
+        if (ep->ptr0 != 0) {
+            if (e->unk4->unk2C != 0) {
+                self->methods->slot108(self, e);
+            }
+            e->unk4->unk30 = sp->rate;
+            e->unk4->methods->slot78(e->unk4, ep->ptr0);
+            e->flag = 1;
+            self->unk1B0 = 1;
+        } else {
+            if (e->unk4->unk2C != 0) {
+                self->methods->slot108(self, e);
+            }
+            if (e->unk4->unk2A != 0) {
+                e->unk4->methods->slot74(e->unk4);
+                e->flag = 0;
+            }
+        }
+        ep++;
+        sp++;
+    }
+    self->unk1B4 = func_8004BCE0(self);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BB3C);
 
 s32 func_8004BCE0(Obj866E8 *self) {

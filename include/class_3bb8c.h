@@ -152,13 +152,16 @@ typedef struct QueryPos866E8 {
  *
  * NOTE for whoever revisits func_8004BB3C: retail walks `ptr0` and the
  * `rate`/`id` pair via TWO INDEPENDENTLY-INCREMENTING pointers (registers
- * `$s4`/`$s3`, both `+= 0xC` per iteration), not one indexed base -- no
- * source shape tried this round (plain `arr1[i].field`, an explicit
- * `&arr1[i]` element pointer, a nested sub-struct accessed via
- * `arr1[i].sub.field`, or manual byte-cast pointer walking) reproduced
- * this; every attempt landed on ONE induction variable and was exactly 4
- * bytes short (a missing `addiu $s4,$s4,0xc`), or regressed further. See
- * the match report for the full attempt log before re-deriving this.
+ * `$s4`/`$s3`, both `+= 0xC` per iteration), not one indexed base. This
+ * WAS reproduced, in round 13: the lever is two walkers of DIFFERENTLY
+ * BASED types -- a `SetupEntry866E8 *` at `arr1` for `ptr0` and a
+ * `SetupSub866E8 *` at `arr1 + 4` for `rate`/`id` (see that typedef
+ * below) -- each advanced by a natural `++`. Both `addiu` increments then
+ * appear and the function reaches 90/105 words at the CORRECT length.
+ * Regroupings that keep ONE base (plain `arr1[i].field`, an `&arr1[i]`
+ * element pointer, a nested `arr1[i].sub.field`) all collapse to one
+ * induction variable; byte-cast walking regresses further. The remaining
+ * residue is a `$s3`/`$s4` identity swap. See the match report.
  */
 typedef struct SetupEntry866E8 {
     void *ptr0;     /* +0x0 */
@@ -166,6 +169,21 @@ typedef struct SetupEntry866E8 {
     u8 pad6[0x8 - 0x6];
     s32 id;         /* +0x8 */
 } SetupEntry866E8;
+
+/* A SECOND view of the SAME 0xC-byte stride, based at `+0x4` instead of
+ * `+0x0`. Exists only as the target type of func_8004BB3C's `rate`/`id`
+ * walking pointer, so that a natural `++` strides the real array pitch
+ * without a byte cast inside the loop; it is deliberately NOT embedded in
+ * SetupEntry866E8 (doing so would corrupt that struct's size). Retail
+ * seeds this walker at `arr1 + 4` and the `ptr0` walker at `arr1`, which
+ * is why two differently-BASED types are needed rather than two pointers
+ * of one type. */
+typedef struct SetupSub866E8 {
+    s16 rate;       /* +0x4 in SetupEntry866E8 terms */
+    u8 pad2[0x4 - 0x2];
+    s32 id;         /* +0x8 */
+    u8 pad8[0xC - 0x8];
+} SetupSub866E8;
 
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
  * called by func_8004B418 and func_8004B38C (both already matched) and

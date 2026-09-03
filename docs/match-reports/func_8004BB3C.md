@@ -1,4 +1,45 @@
-# func_8004BB3C -- STALL (14/105 words on the last diff; structurally 104/105 instructions, missing ONE)
+# func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
+
+> **HEAD UPDATE, round 13 (2026-09-03).** Attempt 6 below -- left explicitly
+> unfinished ("the most promising untried direction") -- was finished, and it
+> WORKED. The missing `addiu $s4,$s4,0xc` is recovered, the function's total
+> length is now correct, and the score went **14/105 -> 90/105**.
+>
+> **The lever: two walkers of DIFFERENTLY BASED types, not two pointers of
+> one type.** Retail seeds `$s4` at `arr1` and `$s3` at `arr1 + 4`, so the
+> two induction variables have different BASES, which is what stops GCC
+> 2.6.3's strength reduction proving them one family. The blocker the
+> original attempt hit -- "padding `SetupSub866E8` to 0xC would corrupt
+> `sizeof(SetupEntry866E8)`" -- dissolves once the sub type is never
+> embedded in `SetupEntry866E8` at all; it exists only as a local walking
+> pointer's target type, and `SetupEntry866E8` is already 0xC so its own
+> `++` needs no help:
+>
+> ```c
+> SetupEntry866E8 *ep = arr1;                                    /* ptr0  */
+> SetupSub866E8   *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);       /* rate/id */
+> ```
+>
+> The single `(u8 *)` cast is OUTSIDE the loop, so it costs the one
+> `addiu` retail also has and none of the per-iteration overhead that sank
+> attempt 5's cast-based walking.
+>
+> **What remains is a whole-function `$s3` <-> `$s4` identity swap** (retail
+> `$s4` = the `ptr0` walker, built `$s3` = it) plus the prologue `sw`/`move`
+> scheduling that follows from it. Every one of the 15 differing words is a
+> same-instruction, different-register diff; asm-differ shows two
+> order-only markers and no inserted or deleted instruction in the loop or
+> the epilogue. That is a **register-identity stall**, which CLAUDE.md rule
+> 6 forbids fixing with `register T v asm("$N")`, so the function stops
+> here rather than being reshaped further.
+>
+> Two further round-13 attempts, both no better, both recorded so nobody
+> repeats them:
+> - **Declaring `sp` before `ep`** -- WORSE (the `+4` moves to `a1`-relative
+>   but register numbering shifts further out of line).
+> - **Declaring `sp` after `i`/`e` instead of first** -- byte-identical to
+>   the best shape. GCC 2.6.3's `$s`-register assignment here does not
+>   follow declaration position.
 
 Unit: `class_3bb8c`. Slot `Obj866E8Methods::slotFC` (verified against
 `tools/classtable.py 0x800866E8`). Not toolchain-blocked: no `gp_rel` hit,
@@ -109,7 +150,9 @@ ever derives ONE `$s`-register induction variable and reads `ptr0`/`rate`/
 `id` all relative to it -- functionally identical, one instruction shorter,
 does not match.
 
-Tried and rejected (all against this exact function, in this order):
+Tried and rejected (all against this exact function, in this order). Note
+that (6), listed here as unfinished, was completed in round 13 and is the
+shape that worked -- see the head update at the top of this file:
 
 1. Plain `arr1[i].field` for everything (id/ptr0/rate) -- 14/105, one
    induction variable, missing the extra `addiu`.
@@ -160,10 +203,33 @@ walk). Best and current-best: attempt 1 (also 2, 3, 4 -- all tied), 14/105
 apparent, structurally 104/105 real instructions matching, one missing
 `addiu`.
 
-### Proposed learning
+### Proposed learnings
 
-**GCC 2.6.3's strength reduction does not appear controllable from source
-once it can PROVE two array accesses share a base+index** -- every
+**GCC 2.6.3's strength reduction IS controllable from source, but only by
+changing the BASE, never by regrouping the fields.** Confirmed both ways on
+this function: every shape that keeps one base (`arr1[i].fieldA` /
+`arr1[i].fieldB`, an `&arr1[i]` element pointer, a nested
+`arr1[i].sub.field`, a per-iteration sub-pointer) collapses to ONE
+induction variable; two walking pointers whose TARGET TYPES are based at
+different offsets into the same stride (`T *` at `arr1`, `U *` at
+`arr1 + 4`, where `sizeof(U) == sizeof(T) ==` the stride) produce TWO. The
+recipe, when retail shows N independently-incrementing walkers over one
+array: define N types, each a view of the same stride starting at a
+different field offset, keep them OUT of the real element struct, seed each
+walker with one cast outside the loop, and advance with a natural `++`.
+A byte-cast `+= stride` inside the loop reaches the same CFG but costs
+extra addressing instructions.
+
+**And a preserved body's own "untried direction" note is worth more than a
+fresh derivation.** This function went 14/105 -> 90/105 in three builds
+because the previous author wrote down exactly which lever they had not
+pulled and why they could not pull it -- including the wrong reason
+(struct-size corruption) that made it look blocked. Reading that reason
+carefully is what showed it was avoidable.
+
+**Superseded (kept for the record):** this report originally concluded
+"GCC 2.6.3's strength reduction does not appear controllable from source
+once it can PROVE two array accesses share a base+index" -- every
 C-level regrouping of `arr1[i].fieldA` vs `arr1[i].fieldB` (plain indexing,
 an intermediate element pointer, a nested sub-struct, a per-iteration
 sub-pointer) produced the IDENTICAL single-induction-variable output in
