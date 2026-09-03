@@ -80,7 +80,10 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040D74);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040E14);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040EDC);
+void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
+    Obj6EAC0 *elem = self->unkB4[a2];
+    elem->methods->slotC4(elem, a1 & 0xFF);
+}
 
 void func_80040F20(void) {
 }
