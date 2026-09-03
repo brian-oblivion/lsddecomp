@@ -420,6 +420,26 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    toolchain deltas, hook violations or oracle anomalies, match count. Then
    recommend: another runner round, a carve, or permuter.
 
+7. **Commit everything, then PUSH `main`.** Rule 4 says a runner never pushes
+   and the head merges; it did not say who pushes, and for twelve rounds
+   nothing here did. The head pushes, at the end of the round, after the
+   final `./build-and-verify.sh` is green and `git status --porcelain` is
+   empty:
+
+   ```sh
+   git status --porcelain          # MUST be empty
+   ./build-and-verify.sh; echo "build exit=$?"
+   git log --oneline origin/main..main | wc -l    # what you are about to push
+   git push origin main
+   ```
+
+   Do it AFTER teardown's four preconditions, not before — a worktree that
+   still holds uncommitted matches (§4c) is work that is not in any commit
+   and therefore not in the push. And re-run
+   `git reflog show origin/main` first if §4a ever gave you a reason to
+   suspect a second head: pushing is the one action in this protocol that
+   another session cannot undo for you.
+
 Escalate immediately if: a branch fails to verify after a runner claimed
 matches; a runner edited protected files; two runners produced contradictory
 learnings.
