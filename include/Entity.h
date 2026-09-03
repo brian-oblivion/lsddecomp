@@ -141,11 +141,19 @@ extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
  * Entity.c) -- two different functions in two different tables that merely
  * share a numeric offset; do not conflate them. */
 struct Unk94Methods {
-    u8 pad000[0x100];
+    u8 pad000[0x44];
+    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(unk94, 1, D_80089C94); return value unused at this, its only known call site */
+    u8 pad048[0xB8 - 0x48];
+    void (*slotB8)(Unk94Obj *self, void *arg1); /* called by func_80060B34 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
+    u8 pad0BC[0xCC - 0xBC];
+    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(unk94, -0x64, 0); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
+    u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
     u8 pad104[0x130 - 0x104];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
-    u8 pad134[0x200 - 0x134];
+    u8 pad134[0x1A0 - 0x134];
+    s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
+    u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5 -- value-returning, not void */
 };
 
@@ -343,7 +351,9 @@ struct EntityMoodHandlerArg {
     u8 pad14[0x08];
     s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8/... */
     s32 unk20;      /* +0x20, written by func_8005E4D0 only (paired with unk1C the same round) */
-    u8 pad24[0x0C];
+    s32 unk24;       /* +0x24, written by func_80060148 (Entity_d) */
+    s32 unk28;        /* +0x28, written by func_80060148 (Entity_d) */
+    u8 pad2C[0x04];
     s32 unk30;      /* +0x30, written by func_8005E7A8/func_8005E4D0 */
     s32 unk34;       /* +0x34, written by func_8005E4D0 only (paired with unk30) */
     u8 pad38[0x0C];
