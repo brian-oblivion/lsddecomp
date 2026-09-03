@@ -485,4 +485,56 @@ void func_8001D600(Class6B5CCObj *self, void *dest);
 void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
 void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
 
+/* ratan2 (Psy-Q library, not game code; symbol address per
+ * config/symbols.slps01556.lsdde.txt, 0x8001F0C8): arctangent of
+ * (dy, dx) in PSX-native 4096-per-circle BAM units, matching every other
+ * angle representation this unit's own functions already use (see
+ * `WholeFrac_d294` above and `func_8001E6F8`'s degree conversion). Real
+ * argument order confirmed from func_8001EACC's own two call sites,
+ * below. */
+extern s32 ratan2(s32 dy, s32 dx);
+
+/* func_8001EACC (round 14, this unit -- the SAME external symbol
+ * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,
+ * `func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
+ * arg4)`; same "per-call-site signature, not a callee property"
+ * precedent as `func_8001E57C`/`func_8001D33C` above -- this unit's own
+ * view differs in the first two parameters' types only, see below).
+ *
+ * A "face target" orientation setter: computes yaw/pitch from `self` to
+ * `target` via two `ratan2` calls, converts both to degrees (see
+ * `func_8001E6F8`'s same `x*360>>12` idiom -- pitch gets an EXTRA `+
+ * 0x400` [90 degrees] added before conversion, yaw does not), builds a
+ * `WholeFrac_d294[3]` {pitch, yaw, 0} table (each `.frac = 1`), and
+ * dispatches it to `slot44`. `arg2 != 0` forces the pitch entry to 0
+ * (a "yaw only" mode); `arg3 == 0` adds 180 degrees to yaw (see below);
+ * a non-NULL `arg4` fires a SECOND `slot44(self, 0, arg4)` call with the
+ * caller's own table forwarded as-is.
+ *
+ * THE ARGUMENT-SWAP FINDING, CONFIRMED FROM THIS FUNCTION'S OWN BODY:
+ * `self` and `target` (this unit's own params 1/2) are used completely
+ * SYMMETRICALLY -- both need only a `Class6B5CCObj`-SHAPED object
+ * (`->unkC` null-checked, `->unk14->unk38` read as a 3-word table), and
+ * the position subtraction is always `target - self`. `arg3` is what
+ * makes this safe to call with the roles swapped: `Entity.h`'s own
+ * documented finding (all `a3==0` call sites pass `(this, this->unk94)`,
+ * all `a3==1` sites pass `(this->unk94, this)`) now has a mechanism, not
+ * just a correlation -- swapping which object is `self` vs `target`
+ * negates the computed direction, and the function's own `+180 degrees
+ * on arg3==0` step is EXACTLY the correction needed to compensate. A
+ * caller that already swapped the two objects at the call site (`a3==1`)
+ * skips the correction because it does not need it; a caller passing
+ * them in the "natural" order (`a3==0`) gets the correction applied
+ * internally. This resolves the mechanism (not just the correlation)
+ * without asserting a name for whatever base type `Entity`/`Unk94Obj`/
+ * `Class6B5CCObj` share -- that question stays open, per the caller-side
+ * finding in Entity.h and DECOMPILATION_LEARNINGS.
+ *
+ * This unit's own two parameters are typed `Class6B5CCObj *` rather than
+ * a shared/generic type: `self->methods` is dispatched directly (needs
+ * the real vtable type), and `target`'s `->unkC`/`->unk14->unk38` shape
+ * matches `Class6B5CCObj` exactly, with no evidence in this call site
+ * alone for anything narrower or wider. */
+void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4);
+
 #endif

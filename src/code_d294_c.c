@@ -49,7 +49,53 @@ void func_8001EA8C(s32 *dest, s16 *b, s16 *a) {
     dest[2] = a[2] - b[2];
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EACC);
+void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4) {
+    s32 *pos;
+    s32 *table;
+    s32 dx;
+    s32 dz;
+    WholeFrac_d294 out[3];
+
+    pos = &self->unk14->unk18;
+    table = target->unkC != 0 ? target->unk14->unk38 : 0;
+
+    if (table[0] != pos[0]) {
+        dx = table[0] - pos[0];
+        dz = table[2] - pos[2];
+        out[1].whole = ratan2(dx, dz);
+    } else {
+        dz = table[2] - pos[2];
+        out[1].whole = ratan2(1, dz);
+    }
+
+    if (table[2] != pos[2]) {
+        dz = table[2] - pos[2];
+        dx = table[1] - pos[1];
+        out[0].whole = ratan2(dz, dx);
+    } else {
+        dx = table[1] - pos[1];
+        out[0].whole = ratan2(1, dx);
+    }
+
+    out[0].whole = (out[0].whole + 0x400) * 360 / 4096;
+    out[1].whole = out[1].whole * 360 / 4096;
+
+    out[2].whole = 0;
+    out[2].frac = 1;
+    out[1].frac = 1;
+    out[0].frac = 1;
+    if (arg2 != 0) {
+        out[0].whole = 0;
+    }
+    if (arg3 == 0) {
+        out[1].whole = out[1].whole + 0xB4;
+    }
+
+    self->methods->slot44(self, 1, out);
+    if (arg4 != 0) {
+        self->methods->slot44(self, 0, arg4);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EC84);
 
