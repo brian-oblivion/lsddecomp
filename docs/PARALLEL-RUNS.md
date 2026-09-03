@@ -430,6 +430,43 @@ Run these IN ORDER at the start of every round. Never spawn runners into a
 state a gate should have fixed first. These are the head's jobs, not
 escalations.
 
+**Gate 0 — the checkout must VERIFY and re-extract before you triage.**
+Cheap, unconditional, and round 13 found it the hard way: a `git pull` that
+brings in another head's carves does **not** re-extract `asm/`. `asm/` is
+gitignored, so it is per-checkout state that nothing in git describes, and the
+newly carved units have no `asm/nonmatchings/<unit>/` at all. Two things then
+happen, and only the first is loud:
+
+- `./build-and-verify.sh` goes RED with
+  `can't open asm/nonmatchings/<unit>/<func>.s for reading`. Reads exactly like
+  somebody broke the tree, and is not attributable to any commit.
+- **`progress.py` silently UNDER-REPORTS.** It prints a stale-asm WARNING
+  naming the leftover monolithic `asm/*.s` files, and then prints a table
+  computed as if the un-extracted units did not exist. Round 13 measured
+  **581** uncarved game functions before re-extracting and **742** after, with
+  the matched percentages wrong in the same direction. Every triage decision
+  reads off that table.
+
+The warning is the tell, and it prints ABOVE the table — so it is exactly what
+scrolls away if you pipe `progress.py` through `tail`. Do this first, every
+round, before believing any number:
+
+```sh
+python3 tools/progress.py            # read the TOP of the output, not just the table
+rm -f asm/<each stale monolith it named>.s
+make extract && ./build-and-verify.sh ; echo "build exit=$?"
+```
+
+`make extract` is one of the four targets the build hook permits, and a correct
+re-extraction changes zero committed bytes. If the build is not green after
+this, stop and diagnose — do not triage, do not carve, do not spawn.
+
+This is the same decay shape as the `settings.local.json` lesson above: **a
+doc or a tool claim about PER-CHECKOUT state is nobody's job to re-measure**,
+so it survives being wrong. The generalisation for the gates: `progress.py` is
+an oracle about the REPOSITORY, not about your working tree, and it will
+answer confidently either way.
+
 **Gate 1 — true queue triage (always).** Assign from `progress.py`'s **`fresh`**
 column, never from raw `queued` — the latter includes documented stalls, and
 staffing a runner onto one means paying again to re-derive what someone already
