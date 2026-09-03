@@ -715,3 +715,66 @@ a symbol came from; do not infer "matched" from the absence of an
 larger than the matched space, so that inference will keep being wrong in the
 same direction — flattering, and toward de-escalating a blocker, which this
 document already records as the more dangerous direction to be wrong in.
+
+## Re-measurement, round 13 (2026-09-03): queued hits 2 → 4
+
+**Nothing was changed. This is the number the section above asked to be
+re-measured, re-measured.** That section closed with: *"Revisit if the 7
+uncarved hits turn into queued ones as carving proceeds — that is the number to
+re-measure, not this paragraph."* Carving has proceeded, so here it is.
+
+Round 13's runner bravo stalled `func_8001CEB4` (`code_d294`) on exactly this
+construct — the pinned pipeline inserting two `nop`s between an `mfhi` and a
+following `mult` that retail's own bytes do not have — and correctly declined
+to act on it. It found the construct with the tighter screen this document
+already publishes, which is NOT one of the two greps CLAUDE.md names, so the
+head's Gate 1 pre-screen had not caught it before assignment.
+
+Method: same as round 11's, but run over the whole image rather than by link
+map. Disassemble `build/lsdde.elf`, find every `mflo`/`mfhi` followed within
+two instructions by `mult`/`multu`/`div`/`divu` with **no intervening `nop`**,
+and bucket each owning function by disposition — a real C definition in
+`src/*.c` (with `#if 0` preserved bodies stripped first, so a preserved stall
+body cannot be miscounted as matched), an `INCLUDE_ASM` entry, or a `glabel` in
+an uncarved top-level `asm/*.s`.
+
+| bucket | round 11 | round 13 |
+| --- | --- | --- |
+| matched C (a real definition, not `INCLUDE_ASM`) | **0** | **0** |
+| queued `INCLUDE_ASM` | 2 | **4** |
+| uncarved `asm` segments | 7 | 7 |
+| Psy-Q library (`psyq_*`, outside the game denominator) | not counted | 11 |
+
+The four queued hits are `func_8005950C`, `DreamSys__GetPreviousDayMood`,
+**`IsDaySpecial`** and **`func_8001CEB4`** — the last two new since round 11.
+All four now carry match-report files, so `progress.py` counts them as
+documented stalls rather than fresh ground.
+
+**What this changes and what it does not.**
+
+- **The hypothesis is still not falsified, and is now better supported.** Zero
+  matched C functions contain the pattern, across 474 matched functions rather
+  than round 11's smaller set. That is what a real blocker looks like.
+- **The rejection of a PER-RUNNER standing screen stands.** 4 of 156 queued
+  functions still does not justify having every runner grep every function
+  before every attempt, for the reason round 11 gave: the 30-attempt cap
+  already bounds the cost of walking into one.
+- **But round 11's cost model was wrong about the cost, in one direction.** It
+  assumed walking into this blocker costs bounded attempts. `func_8001CEB4`
+  cost bravo a *full derivation* — three field reads, a dispatch structure, and
+  a `/360` division verified against the pinned `cc1` — before the construct
+  surfaced. That is not what a 30-attempt cap bounds cheaply.
+
+**So the fix is granularity, not scope** — which is the same correction this
+document already applies to the flag itself, one layer up. The screen belongs
+where it is paid for ONCE PER ROUND instead of once per function per runner:
+the head's Gate 1 triage, as a single loop over the queue. It is seconds, and
+it would have moved `func_8001CEB4` out of bravo's queue before assignment
+without costing any runner anything. Added to `docs/PARALLEL-RUNS.md` Gate 1;
+deliberately NOT added to CLAUDE.md's per-function screen, where round 11
+correctly declined to put it.
+
+The number to re-measure next remains the **uncarved** row. It is still 7, and
+the two new queued hits did not come out of it — so uncarved hits are appearing
+at roughly the rate they are being consumed, and the queued row should be
+expected to keep growing as carving proceeds.

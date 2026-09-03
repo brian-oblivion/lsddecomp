@@ -479,6 +479,37 @@ wrote down. Keep both honesty mechanisms fed:
   move the unit into the `banked` column instead of `fresh`. Without it a carve
   inflates `fresh` by its whole size and the next head mis-triages.
 
+**Screen the queue with THREE greps, not two.** CLAUDE.md names two ---
+`gp_rel` and `addiu $at, $at, %lo`. There is a third, published inside
+`docs/research/addiu-at-blocker.md` rather than in CLAUDE.md, and round 13's
+head missed it at Gate 1 and assigned a blocked function because of that:
+
+```sh
+for f in $(grep -oP 'INCLUDE_ASM\("[^"]*", \K\w+' src/<unit>.c); do
+    grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/<unit>/$f.s \
+      | grep -qE '\b(mult|multu|div|divu)\b' && echo "BLOCKED (nop_mflo_mfhi): $f"
+done
+```
+
+An `mflo`/`mfhi` within two instructions of a `mult`/`multu`/`div`/`divu`,
+with no `nop` between them in retail's own bytes, is blocked exactly like
+`addiu_at`: the pinned pipeline inserts `nop`s retail does not have.
+
+**This grep belongs to the HEAD and not to the runners, deliberately.**
+`addiu-at-blocker.md` measured the scope twice and both times declined to
+promote it to a per-runner standing screen --- at 4 of 156 queued functions it
+does not earn every runner grepping every function. Run once per round over the
+queue it is seconds, and it catches the same thing. Do not "helpfully" move it
+into CLAUDE.md's per-function screen; that placement was considered and
+rejected on measured grounds, and the reasons are in that document.
+
+Why it matters more than 4-of-156 suggests: round 11 assumed the 30-attempt cap
+bounds the cost of walking into this blocker cheaply. It does not. Round 13's
+bravo spent a full derivation on `func_8001CEB4` --- field reads, a dispatch
+structure, and a `/360` division verified against the pinned `cc1` --- before
+the construct surfaced at all. A blocker that only shows up after you have
+understood the function is not bounded by an attempt counter.
+
 `fresh` is a ceiling, not a work order: it cannot see "large body, deep
 reconstruction, low cold-runner yield". Before believing a number, size the
 queue (`wc -l asm/nonmatchings/<unit>/*.s | sort -rn`) and read the match
