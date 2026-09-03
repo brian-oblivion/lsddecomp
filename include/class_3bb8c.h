@@ -949,7 +949,14 @@ struct Class86B60Methods {
     u8 pad070[0x078 - 0x070];
     void (*slot78)(Class86B60 *self); /* +0x078, func_8004D90C's own last call, `self` only */
     void (*slot7C)(Class86B60 *self); /* +0x07C, func_8004D90C's own 2nd call, `self` only */
-    u8 pad080[0x0D4 - 0x080];
+    u8 pad080[0x094 - 0x080];
+    /* +0x094, func_8004D9D4's shared tail call target for its `unk58==1`
+     * and `unk58==4` cases -- a crossjump-merge-safe local function
+     * pointer (see round 12's "local function pointer variable" lever)
+     * rather than a retyped slot, since `slot130`/`slot134` reach the
+     * SAME call site with the same signature. */
+    void (*slot94)(Class86B60 *self);
+    u8 pad098[0x0D4 - 0x098];
     /* +0x0D4, func_8004D814's own first call, arg1 = &D_800114E8, arg2 = 0. */
     void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, func_8004D578's own call, arg1 = &D_80086D44 */
@@ -960,7 +967,9 @@ struct Class86B60Methods {
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
     u8 pad0F4[0x124 - 0x0F4];
     void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, func_8004D90C (arg1=0)/func_8004E230 (arg1=0x16) */
-    u8 pad128[0x138 - 0x128];
+    u8 pad128[0x130 - 0x128];
+    void (*slot130)(Class86B60 *self); /* +0x130, func_8004D9D4's `unk58==2` tail target */
+    void (*slot134)(Class86B60 *self); /* +0x134, func_8004D9D4's `unk58==3` tail target */
     /* +0x138, func_8004D788's forward target, only reached when its own
      * arg1's header-word low nibble == 0xB (a runtime-type-id gate) --
      * called with all three of func_8004D788's own parameters verbatim. */
@@ -975,7 +984,16 @@ struct Class86B60 {
     s32 unk2C;                      /* +0x02C, func_8004D814: set to 0x190 */
     u8 pad030[0x034 - 0x030];
     s32 unk34;                      /* +0x034, func_8004D814: zeroed */
-    u8 pad038[0x048 - 0x038];
+    /* +0x038, func_8004D9D4: set to 0 on the `unk58==1` path and to the
+     * literal 2 on the `unk58==4` path -- read by nothing else in this
+     * unit. The literal 2 is the SAME constant `func_8004D9D4` compares
+     * `self->unk58` against for its `case 2`, and retail keeps it
+     * resident in one register across the whole function rather than
+     * re-materializing it, which is what proves this is a literal `2`
+     * and not (as a first reading of the raw asm suggested) `self`
+     * re-stored through a leftover register. */
+    s32 unk38;
+    u8 pad03C[0x048 - 0x03C];
     /* Set up by the base ctor chain (func_8003DFBC()->slot08 below), read
      * (never written) by func_8004D578 right after. Same offset/shape as
      * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
@@ -984,7 +1002,9 @@ struct Class86B60 {
      * through (+0x09C) isn't among that type's own known slots. */
     struct Class86B60Unk48Obj *unk48;  /* +0x048, func_8004D578 */
     Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, func_8004D90C */
-    u8 pad050[0x093 - 0x050];
+    u8 pad050[0x058 - 0x050];
+    s32 unk58;                       /* +0x058, func_8004D9D4: 5-valued dispatch (0-4) */
+    u8 pad05C[0x093 - 0x05C];
     /* +0x093, func_8004D898: address-of only, forwarded as
      * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
      * loop iteration; real extent beyond one byte unknown. */

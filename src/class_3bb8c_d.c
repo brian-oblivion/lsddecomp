@@ -53,7 +53,32 @@ void func_8004D90C(Class86B60 *self, s32 arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D9D4);
+void func_8004D9D4(Class86B60 *self)
+{
+    void (*fn)(Class86B60 *);
+
+    func_8003DFBC()->slot90(self);
+    switch (self->unk58) {
+    case 1:
+        self->unk38 = 0;
+        self->unkA4->methods->slotF0(self->unkA4, 0, 1);
+        fn = self->methods->slot94;
+        break;
+    case 2:
+        fn = self->methods->slot130;
+        break;
+    case 3:
+        fn = self->methods->slot134;
+        break;
+    case 4:
+        self->unk38 = 2;
+        fn = self->methods->slot94;
+        break;
+    default:
+        return;
+    }
+    fn(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DABC);
 
