@@ -144,7 +144,20 @@ void func_80050670(Class86E00_3bb8c_g *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050730);
+void func_80050730(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
+{
+    switch (arg2) {
+    case 2:
+        self->unk80 = arg1->methods->slot9C(arg1);
+        self->methods->slotAC(self);
+        self->methods->slot7C(self, 0xE);
+        break;
+    case 3:
+        self->methods->slotAC(self);
+        self->methods->slot7C(self, 0x17);
+        break;
+    }
+}
 
 GenericCtorTable_3bb8c_d *func_800507E8(void)
 {
