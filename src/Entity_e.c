@@ -39,7 +39,21 @@ INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800620C4);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800621A8);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800623E8);
+void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk84 == this->unk80 - 1) {
+        out->unk1C = 0x19;
+        out->unk20 = -2;
+    }
+    if (out->unk4 % 4 == 0) {
+        out->unk30 = 0x15;
+        out->unk34 = -1;
+    }
+    if (out->unk4 % 200 == 0) {
+        out->unk44 = 0xD;
+        out->unk48 = 1;
+    }
+}
 
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
  * handlers -- same convention as Entity_c.c/Entity_d.c's own separate
