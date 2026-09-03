@@ -15,7 +15,10 @@ void BasicClass__func_18358(BasicClass *self, void *arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018390);
+BasicClassMethods *func_80018390(void)
+{
+    return &D_8006B58C;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800183A0);
 

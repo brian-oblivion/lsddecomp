@@ -111,10 +111,15 @@ extern s32 func_80011F68(void *ptr);                                /* marks the
 extern s32 func_800181AC(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
 extern void func_80018208(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
 
-/* Not yet carved (asm/code_8220_b.s, the tail of this 56-function block). */
+/* Still INCLUDE_ASM in code_8220_b this round. */
 extern void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */
 extern void func_80018288(BasicClassListNode **head);                          /* free every node in the list, does not clear *head itself */
-extern BasicClassMethods *func_80018390(void);                                 /* returns &D_8006B58C, i.e. BASICCLASS_METHODS */
+
+/* BasicClass's own method table (BASICCLASS_METHODS), asm/data/57070.data.s.
+ * 14 slots per BasicClassMethods, matching func_80018390 (code_8220_b, round
+ * 12) which returns its address. */
+extern BasicClassMethods D_8006B58C;
+extern BasicClassMethods *func_80018390(void);                                 /* returns &D_8006B58C */
 
 /* The "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n" format string,
  * asm/data/A8C.rodata.s. */
