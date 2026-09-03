@@ -32,7 +32,20 @@ void func_8004FFF4(Class86E00_3bb8c_g *self, s32 arg1)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050034);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_800501F0);
+void func_800501F0(Class86E00_3bb8c_g *self)
+{
+    switch (self->unk28) {
+    case 4:
+    case 6:
+    case 0xA:
+    case 0xE:
+        self->methods->slot8C(self, 0x10);
+        self->methods->slot7C(self, 0x17);
+        break;
+    default:
+        break;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050280);
 
