@@ -14,6 +14,17 @@ extern s16 D_80089EA2;
  * for every other such wrapper in this unit). */
 extern void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
 
+/* Data tables reached with a raw pointer by this unit's mood-dispatch
+ * handlers -- same convention as Entity_c.c's own D_80089E50/D_80089E38/etc
+ * externs (separate local view per translation unit, not shared via the
+ * header). */
+extern u8 D_80089C64[];
+extern u8 D_80089C70[];
+
+/* Forward declaration: func_80060710 is defined later in this file (higher
+ * ROM address) but func_800604DC, at a lower address, calls it directly. */
+void func_80060710(Entity *this);
+
 INCLUDE_ASM("asm/nonmatchings/Entity_d", func_8005FF7C);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80060148);
@@ -58,7 +69,28 @@ void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_800604DC);
+void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
+    s32 a1val;
+    s32 r2;
+    u8 *table;
+
+    func_80060710(this);
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk84 == 0 || this->unk84 == 0xF) {
+        out->unk1C = 0x12;
+        out->unk30 = 0x12;
+    }
+    if (this->unkFC >= 0x141) {
+        a1val = (rand() & 1) ? -0x3C : 0x3C;
+        this->methods->slotC8(this, a1val, 0);
+        r2 = rand();
+        table = D_80089C64;
+        if ((r2 & 3) != 0) {
+            table = D_80089C70;
+        }
+        this->methods->slot44(this, 0, table);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_d", func_800605D0);
 
