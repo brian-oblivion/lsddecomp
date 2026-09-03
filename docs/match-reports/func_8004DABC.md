@@ -1,0 +1,39 @@
+# func_8004DABC -- MATCH
+
+Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
+SHA1 matches retail. `funcdiff.py func_8004DABC`: 23/23 words match.
+
+## Source
+
+```c
+void func_8004DABC(Class86B60 *self)
+{
+    s32 buf;
+
+    func_8003DFBC()->slot94(self);
+    buf = self->unk60->unk14;
+    self->unkA4->methods->slot19C(self->unkA4, &buf);
+}
+```
+
+First attempt, byte-exact. Straightforward transcription: a call to the
+shared base table, then a one-word value copied from `self->unk60` into a
+stack-local buffer whose address is forwarded to `self->unkA4`
+(the `DreamSysView_3bb8c_c`)'s own `slot19C`.
+
+## Struct changes (additive, `include/class_3bb8c.h`)
+
+- `BaseTaskCtorTable_3bb8c_c::slot94` -- new slot, `void (*)(void *self)`.
+  Distinct from `Class86B60Methods::slot94` (established by
+  `func_8004D9D4`'s report) -- same offset number, unrelated table, no
+  conflict.
+- New type `Class86B60Unk60Obj_3bb8c_d` (self->unk60's pointee, only
+  `unk14` reached, a plain `s32`).
+- `Class86B60::unk60` -- new field, carved from the `pad05C` gap.
+- `DreamSysViewMethods_3bb8c_c::slot19C` -- new slot (already added ahead
+  of this function while deriving `func_8004D814`'s neighbourhood; this
+  is the function that actually exercises it).
+
+### Proposed learning
+
+None new.
