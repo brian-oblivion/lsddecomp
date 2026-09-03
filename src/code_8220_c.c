@@ -69,6 +69,36 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800197C4);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
 
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_800199EC.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class as func_800197C4: $a2 vs $a1 for the OT high-byte mask,
+ * plus one missing `addiu $v0,$s1,0x20` = arg0 + 0x20, one byte past the
+ * last self field this function touches (arg0+0x1E, a u16). Matches the
+ * verified cross-sibling formula in func_800197C4.md. Not cracked.
+ */
+void func_800199EC(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
+        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    } else {
+        func_8001A380(D_8008ACD0, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+                      (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
+                      (PolyUV4 *)((u8 *)arg0 + 0x18));
+
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x88) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x88) + 0x8) = *(u16 *)((u8 *)arg0 + 0xC);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
+
+        func_8001B6B4(arg0, D_8008ACD0);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800199EC);
 
 #if 0
