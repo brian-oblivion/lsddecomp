@@ -69,7 +69,19 @@ void func_8001CD20(Class6B5CCObj *self) {
     func_80018390()->slot18(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CD60);
+void func_8001CD60(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
+    s32 tag;
+
+    func_80018390()->slot38(self, other, arg2);
+    tag = other->methods->header & 0xF;
+    if (tag == 2) {
+        self->methods->slot94(self, other, arg2);
+    } else if (tag == 5) {
+        self->methods->slot98(self, other, arg2);
+    } else if (tag == 4) {
+        self->methods->slot9C(self, other, arg2);
+    }
+}
 
 void func_8001CE30(Class6B5CCObj *self) {
     self->unk24 = 0;
@@ -82,7 +94,25 @@ void func_8001CE30(Class6B5CCObj *self) {
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CEB4);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D008);
+void func_8001D008(Class6B5CCObj *self, s32 flag, void *data) {
+    s32 r0, r1, r2;
+    Class6B5CCSub44 *dst;
+
+    r0 = func_8001EC84(data);
+    r1 = func_8001EC84((u8 *)data + 4);
+    r2 = func_8001EC84((u8 *)data + 8);
+    dst = self->unk14->unk44;
+    if (flag) {
+        dst->unk0 = (s16)r0;
+        dst->unk4 = (s16)r1;
+        dst->unk8 = (s16)r2;
+    } else {
+        dst->unk0 += (s16)r0;
+        dst->unk4 += (s16)r1;
+        dst->unk8 += (s16)r2;
+    }
+    self->unk14->unk0 = 0;
+}
 
 Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
     Class6B5CCSub14 *sub;

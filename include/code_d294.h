@@ -42,6 +42,7 @@
 typedef struct Class6B5CCObj Class6B5CCObj;
 typedef struct Class6B5CCMethods Class6B5CCMethods;
 typedef struct Class6B5CCSub14 Class6B5CCSub14;
+typedef struct Class6B5CCSub44 Class6B5CCSub44;
 
 /* self->unk14's target: a 0x50-byte block allocated by the ctor
  * (func_8001CAF4). Round 2 (func_8001D0EC, func_8001CE30, func_8001D1A4)
@@ -73,9 +74,38 @@ struct Class6B5CCSub14 {
      * a typed field. Renamed from `pad24` now that something references it
      * by name. */
     u8 unk24[0x044 - 0x024];
-    void *unk44;  /* +0x044, a second heap block (0x28 bytes, alloc'd by the ctor) */
+    /* +0x044, RETYPED (round 13) from an opaque `void *` to
+     * `Class6B5CCSub44 *` now that func_8001D008 and func_8001CEB4 (both
+     * this unit) between them fill in its first 0x14 bytes -- see
+     * Class6B5CCSub44's own comment below. Still a second heap block
+     * (0x28 bytes, alloc'd by the ctor); the retype only narrows what's
+     * KNOWN about its contents, it does not change the allocation. */
+    Class6B5CCSub44 *unk44;
     s32 unk48;    /* +0x048, zeroed by the ctor and by func_8001D1A4 (slot +0x050);
                    * set to `obj->unk14` by func_8001D0EC's "attach" */
+};
+
+/* Class6B5CCSub14::unk44's target (round 13, func_8001D008/func_8001CEB4).
+ * Both functions apply `func_8001EC84` three times to a 3-entry `{s16,s16}`
+ * table (their own 3rd argument, `data`) and write the three s32 results
+ * into this block -- func_8001D008 into +0x000/+0x004/+0x008 (either
+ * overwriting or accumulating, per its own `flag` argument); func_8001CEB4
+ * into +0x010/+0x012/+0x014 as u16 (either overwriting after dividing each
+ * result by 360, or accumulating a /360'd delta into the existing value and
+ * wrapping the sum modulo 4096 -- a full-turn wrap, consistent with these
+ * being PSX-native 4096-per-circle angle units). +0x00C..+0x010 is still
+ * unknown (not read/written by either function); the block is 0x28 bytes
+ * total per the ctor's own allocation size, so the tail past +0x016 is
+ * still opaque padding too. */
+struct Class6B5CCSub44 {
+    s32 unk0;   /* +0x000 */
+    s32 unk4;   /* +0x004 */
+    s32 unk8;   /* +0x008 */
+    u8 padC[0x010 - 0x00C];
+    s16 unk10;  /* +0x010 */
+    s16 unk12;  /* +0x012 */
+    s16 unk14;  /* +0x014 */
+    u8 pad16[0x028 - 0x016];
 };
 
 /* A plain 3-word vector, used only as func_8001D0EC's optional 3rd
@@ -107,6 +137,13 @@ struct BasicClassMethodsD294 {
     void (*slot10)(void *self, void *other); /* +0x010 */
     void (*slot14)(void *self, void *other); /* +0x014 */
     void (*slot18)(void *self);              /* +0x018, func_8001CD20's forward target */
+    u8 pad01C[0x038 - 0x01C];
+    /* +0x038, func_8001CD60's (this unit) own forward target -- called
+     * unconditionally as its very first action, `(self, other, arg2)`,
+     * same three-argument shape as func_8001CD60 itself. Real BasicClass-
+     * level meaning unknown from this unit alone, same caveat as
+     * slot10/slot14 above. */
+    void (*slot38)(void *self, void *other, s32 arg2);
 };
 
 extern BasicClassMethodsD294 *func_80018390(void);
@@ -201,11 +238,19 @@ struct Class6B5CCMethods {
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as func_8001E57C above. */
     void (*slot5C)(Class6B5CCObj *self, s32 arg1);
-    /* +0x060..+0x09C: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
+    /* +0x060..+0x094: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
      * (all this unit, all already matched) -- not typed here as struct
      * fields because nothing dispatches through the table at these offsets;
      * every call site invokes them directly by symbol name. */
-    u8 pad060[0x0A0 - 0x060];
+    u8 pad060[0x094 - 0x060];
+    /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
+     * triple -- func_8001CD60 (this unit) dispatches to exactly one of
+     * these three depending on `other->methods->header & 0xF` (2 -> +0x094,
+     * 5 -> +0x098, 4 -> +0x09C; any other tag value fires none of them).
+     * Real per-slot meaning unknown from this call site alone. */
+    void (*slot94)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
+    void (*slot98)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
+    void (*slot9C)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
     /* +0x0A0, func_8001D6B4's own call target (round 12): dispatched with
      * only `self`, per that function's own disassembly (`jalr $v0` with
      * `$a0` untouched since function entry). func_8001D714 (still queued)
