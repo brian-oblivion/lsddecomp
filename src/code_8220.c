@@ -132,4 +132,24 @@ s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_80018208);
+void func_80018208(BasicClassListNode **head, BasicClass *value)
+{
+    BasicClassListNode *prev;
+    BasicClassListNode *node;
+
+    prev = NULL;
+    node = *head;
+    while (node != NULL) {
+        if (node->value == value) {
+            if (prev != NULL) {
+                prev->next = node->next;
+            } else {
+                *head = node->next;
+            }
+            func_80017CFC(node);
+            return;
+        }
+        prev = node;
+        node = node->next;
+    }
+}
