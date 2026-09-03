@@ -170,6 +170,8 @@ struct Unk94Methods {
     s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
     u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5, and by func_80061400 (Entity_d), compared against 6 -- value-returning, not void */
+    u8 pad204[0x21C - 0x204];
+    void (*slot21C)(Unk94Obj *self);           /* called by func_80064618 (Entity_g); return value unused at this, its only known call site */
 };
 
 struct Unk94Obj {

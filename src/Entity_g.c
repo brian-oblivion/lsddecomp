@@ -1,6 +1,16 @@
 #include "common.h"
+#include "Entity.h"
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064618);
+void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkF4 != 0) {
+        if (func_8005D108(this, NULL, 0, 0xA, 0) != 0) {
+            this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
+            this->methods->slot160(this);
+            this->unk94->methods->slot21C(this->unk94);
+        }
+    }
+    this->methods->slotC4(this, -0x1E, 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_800646D8);
 
