@@ -379,7 +379,11 @@ extern char D_8008A8F0[4];  /* address-taken only by this unit */
  * through is modelled.
  */
 struct SubHandleObjMethods {
-    u8 pad000[0x04C];
+    u8 pad000[0x004];
+    void (*slot4)(SubHandleObj *self); /* +0x004, OBSERVED: func_8003F1A8
+                                    (round 14) -- release-shaped, no extra
+                                    args */
+    u8 pad008[0x04C - 0x008];
     void (*slot4C)(SubHandleObj *self, void *arg1, void *arg2); /* +0x04C,
                                     OBSERVED: func_8003E628 */
 };
@@ -400,6 +404,10 @@ extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
                             func_8003FDB0's "name" argument */
 extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
                             SubHandleObjMethods::slot4C's 3rd argument */
+extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
+                            not decompiled): address-taken only, passed as
+                            func_8003EACC's own default value for slot80's
+                            2nd argument when its own arg5 is NULL. */
 
 /*
  * `Unk18Obj->unkAC`'s pointee (round 13, func_8003E6CC) -- the return of
@@ -429,10 +437,19 @@ struct Unk18AcObj {
  */
 struct GenericObjMethods {
     s32 header; /* +0x000 */
+    /* +0x050/+0x054, round 14 (func_8003F04C's own call site): dispatched
+       as `(self)` only. Occupants unknown (self->unkC's real class is not
+       otherwise identified in this unit). */
+    u8 pad004[0x050 - 0x004];
+    void (*slot50)(GenericObj *self); /* +0x050, return value unused */
+    s32 (*slot54)(GenericObj *self);  /* +0x054, return stored into self->unk74 */
 };
 struct GenericObj {
     GenericObjMethods *methods; /* +0x000 */
-    u8 pad004[0x014 - 0x004];
+    u8 pad004[0x00C - 0x004];
+    void *unkC;                 /* +0x00C, OBSERVED: func_8003EEC0 (round 14),
+                                    truthy-tested only */
+    u8 pad010[0x014 - 0x010];
     s32 unk14;                  /* +0x014, OBSERVED: func_8003E770 */
 };
 
@@ -445,6 +462,18 @@ struct GenericObj {
  * of the class table it constructs. Only the one slot func_8003E10C
  * dispatches through is modelled.
  */
+/* Round 14 (code_2cc8c_d): a plain 3-word vector, copied wholesale from a
+ * caller-supplied source into Unk18Obj::unk14 (func_8003EBC4). Local view,
+ * same shape as code_d294.h's own Vec3_d294 but this project's convention
+ * is not to unify independent per-unit views of an unnamed shape. Declared
+ * here (ahead of Unk18ObjMethods) since that struct's own slot78 needs it.
+ */
+typedef struct Vec3_2cc8c {
+    s32 x;
+    s32 y;
+    s32 z;
+} Vec3_2cc8c;
+
 struct Unk18ObjMethods {
     u8 pad000[0x004];
     void *(*slot4)(Unk18Obj *self);            /* +0x004, inherited
@@ -475,13 +504,53 @@ struct Unk18ObjMethods {
     u8 pad044[0x074 - 0x044];
     void (*slot74)(Unk18Obj *self);            /* +0x074, OBSERVED:
                                                     func_8003E6CC (round 13) */
-    u8 pad078[0x090 - 0x078];
+    /* +0x078/+0x07C/+0x080, round 14 (func_8003EACC's own call site,
+       guarded by `self->unk10 == NULL`): dispatched as `(self, a2)`,
+       `(self, a3)`, `(self, a1_or_default)` respectively. Occupants (this
+       unit, per tools/classtable.py D_8006E8E4): func_8003EBC4 (+0x078,
+       still queued), func_8003EBF8 (+0x07C, still queued), func_8003EC2C
+       (+0x080, the documented gp_rel blocker -- NOT decompiled here). */
+    void (*slot78)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x078, retyped round 14 once func_8003EBC4 (its own occupant) confirmed the shape */
+    void (*slot7C)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x07C, retyped round 14 once func_8003EBF8 (its own occupant) confirmed the shape */
+    void (*slot80)(Unk18Obj *self, void *a1); /* +0x080 */
+    u8 pad084[0x090 - 0x084];
     void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
                                                     func_8003E6CC (round 13) */
-    u8 pad094[0x0A8 - 0x094];
+    /* +0x094/+0x098, round 14 (code_2cc8c_d): func_8003E8B8's own call
+       site -- dispatched as `(self, arg1, arg2)` when a GenericObj arg1's
+       header tag is 5 (slot94) or 1 (slot98). Occupants (this unit, still
+       queued as of this comment): func_8003EE40 (+0x094), func_8003EE88
+       (+0x098). */
+    void (*slot94)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x094 */
+    void (*slot98)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x098 */
+    void (*slot9C)(Unk18Obj *self); /* +0x09C, occupant func_8003EEC0 (round 14); dispatched by func_8003EE40 */
+    /* +0x0A0, occupant func_80012064 (asm/psyq_2258.s, PsyQ library, not
+       decompiled) -- dispatched by func_8003EEC0 (round 14) at three call
+       sites with different arities (self alone; self+unkAC; self+another
+       Unk18Obj*), so kept as an untyped function pointer and cast per
+       call site rather than picking one fixed signature. */
+    void *slotA0;
+    void (*slotA4)(Unk18Obj *self); /* +0x0A4, occupant func_8003F04C (round 14, still queued as of this comment); dispatched by func_8003EE88 */
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
                                                     func_8003E6CC (round 13) */
 };
+/* Round 14 (code_2cc8c_d): a plain 2-word record, copied as one whole-
+   struct assignment (see Unk18Obj::unk34/unk38, func_8003EA0C) --
+   MEASURED, retail loads both source words before storing either, ruling
+   out sequential per-field copies same as the SByte3_d294 tell below. */
+typedef struct Pair32_d294 {
+    s32 a;
+    s32 b;
+} Pair32_d294;
+
+/* Round 13 (code_2cc8c_d): a 3-signed-byte record, copied as one whole-
+   struct assignment (see Unk18Obj::unk58/unk5B). */
+typedef struct SByte3_d294 {
+    s8 b0;
+    s8 b1;
+    s8 b2;
+} SByte3_d294;
+
 struct Unk18Obj {
     Unk18ObjMethods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
@@ -493,11 +562,76 @@ struct Unk18Obj {
                                   (func_8003E628); OBSERVED (round 13,
                                   set to `arg1`) by func_8003E770 when
                                   `arg1->methods->header & 0xF == 4` */
-    u8 pad014[0x030 - 0x014];
+    /* +0x014, round 14: a Vec3, written wholesale by func_8003EBC4 from
+       its own arg1 -- RETYPED from an opaque byte span once
+       func_8003EBC4's own store pattern (3 plain word stores at +0x14/
+       +0x18/+0x1C) confirmed the shape; func_8003EACC's own use (only the
+       address, forwarded to func_8003F2AC) is unaffected by the retype. */
+    Vec3_2cc8c unk14;
+    /* +0x020, round 14: another Vec3, written wholesale by func_8003EBF8
+       from its own arg1 -- same shape/evidence as unk14 just above. */
+    Vec3_2cc8c unk20;
+    u8 pad2C[0x030 - 0x02C];
     s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
-    u8 pad034[0x0AC - 0x034];
+    /* +0x034, round 14 (func_8003EA0C): copied wholesale from a caller-
+       supplied Pair32_d294 -- MEASURED, retail loads both source words
+       before storing either, ruling out sequential per-field stores. */
+    Pair32_d294 unk34;
+    /* +0x03C..+0x048, round 13 (code_2cc8c_d): four plain field setters
+       (func_8003EA24/EA2C/EA48/EA64), all `sw $a1, N($a0)` or the same
+       guarded by `if (self->unk70 == 0)`. No further evidence of real
+       type/meaning beyond "a stored word", so kept `s32`. */
+    s32 unk3C;                  /* +0x03C, OBSERVED: func_8003EA24 (round 13) */
+    s32 unk40;                  /* +0x040, OBSERVED: func_8003EA64 (round 13) */
+    s32 unk44;                  /* +0x044, OBSERVED: func_8003EA2C (round 13),
+                                    only written when `self->unk70 == 0` */
+    s32 unk48;                  /* +0x048, OBSERVED: func_8003EA48 (round 13),
+                                    only written when `self->unk70 == 0` */
+    s32 unk4C;                  /* +0x04C, OBSERVED: func_8003EEC0 (round 14) */
+    s32 unk50;                  /* +0x050, OBSERVED: func_8003EEC0 (round 14) */
+    s32 unk54;                  /* +0x054, OBSERVED: func_8003EA7C (round 13) */
+    /* +0x058/+0x05B, round 13 (code_2cc8c_d): two 3-byte fields, each
+       copied wholesale from a caller-supplied 3-byte source via a WHOLE
+       struct assignment (func_8003EA84/EAA4 -- MEASURED: retail loads all
+       three source bytes before storing any of them, ruling out a
+       sequential per-field copy). Bytes are signed (`lb`, not `lbu`).
+       Real element type unknown, so named generically rather than guessed
+       as e.g. an RGB triple. */
+    SByte3_d294 unk58;          /* +0x058, OBSERVED: func_8003EA84 (round 13) */
+    SByte3_d294 unk5B;          /* +0x05B, OBSERVED: func_8003EAA4 (round 13) */
+    u8 pad05E[0x060 - 0x05E];
+    s32 unk60;                  /* +0x060, OBSERVED: func_8003EAC4 (round 13) */
+    u8 pad064[0x070 - 0x064];
+    /* +0x070, round 13 (code_2cc8c_d): a guard flag -- func_8003EA2C/EA48
+       (above) only write unk44/unk48 when this is zero/NULL, i.e. a
+       "already initialized" latch. RESOLVED round 14: func_8003ECD0 is its
+       own set site -- a one-time allocator/init routine, guarded by this
+       same flag, that sets it to 1 (and zeroes unk74) once it succeeds. */
+    s32 unk70;
+    s32 unk74;                  /* +0x074, OBSERVED: func_8003ECD0 (round 14),
+                                    zeroed alongside unk70 */
+    /* +0x078..+0x08C, round 14 (func_8003ECD0): seven `s32`-typed
+       addresses/sizes carved out of one `func_80017B34` allocation --
+       MEASURED, not modeled as real pointer types since retail computes
+       every one of them via plain word arithmetic (not pointer-typed
+       addition), and unk78/unk7C are ALSO dereferenced directly as raw
+       2-word records (`*(s32*)unk78 = ...; *(s32*)(unk78+4) = ...;`).
+       Real structure/meaning beyond "byte offsets within one buffer"
+       unknown. */
+    s32 unk78;
+    s32 unk7C;
+    s32 unk80;
+    s32 unk84;
+    s32 unk88;
+    s32 unk8C;
+    s32 unk90;                  /* +0x090, OBSERVED: func_8003EE40 (round 14),
+                                    incremented unconditionally every call */
+    u8 pad094[0x098 - 0x094];
+    s32 unk98;                  /* +0x098, OBSERVED: func_8003EEC0 (round 14),
+                                    a running count incremented by 1 each call */
+    u8 pad09C[0x0AC - 0x09C];
     Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: func_8003E628 (round 13,
                                   set from `func_8001CA94()`, a
                                   `New_Class6B5CC` allocator, `code_d294.c`)
@@ -505,17 +639,117 @@ struct Unk18Obj {
                                   and released -- see `Unk18AcObj`'s own
                                   comment) */
     SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: func_8003E628 (round
-                                  13) -- set from `func_8003FDB0` */
+                                  13) -- set from `func_8003FDB0`; also read
+                                  back by func_8003F230 (round 13, this
+                                  unit) as a plain getter */
+    s32 unkB4;                  /* +0x0B4, OBSERVED: func_8003F23C (round 13) */
+    s32 unkB8;                  /* +0x0B8, OBSERVED: func_8003F244 (round 13) */
 };
 
-extern Unk18ObjMethods *func_8003F24C(void); /* external (not this unit);
-                                    getter for Unk18Obj's own class table,
-                                    used only by func_8003E5D8's own New_X
-                                    allocator */
+extern Unk18ObjMethods D_8006E8E4; /* the table itself (Unk18ObjMethods, resolved via tools/classtable.py D_8006E8E4), so func_8003F24C's own definition (code_2cc8c_d.c) can return &D_8006E8E4 */
+extern Unk18ObjMethods *func_8003F24C(void); /* getter for Unk18Obj's own
+                                    class table (returns &D_8006E8E4);
+                                    used by func_8003E5D8's own New_X
+                                    allocator. RETARGETED round 13: this
+                                    used to live in a still-uncarved
+                                    remainder, alpha's own comment said
+                                    "not this unit's function to write" --
+                                    the round-13 carve of code_2cc8c_d
+                                    brought it in, so it is matched there
+                                    now. */
 extern Unk18Obj *func_8003E5D8(void); /* this unit's own New_X allocator for
                                     Unk18Obj, 0xBC bytes; forward-declared
                                     here since func_8003E10C (earlier in ROM
                                     order) calls it */
+
+/* Round 13 (code_2cc8c_d): the rest of Unk18ObjMethods's own slot
+   occupants this unit carves. Trivial setters/getters typed straight to
+   Unk18Obj's own newly-discovered fields above; see the field comments
+   for what each was OBSERVED from. */
+void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+
+/* func_8003F2AC (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
+   func_8003EACC (round 14, this unit) calls it with only `&self->unk14`
+   set up; declared here only with that call site's own shape. */
+extern void func_8003F2AC(void *arg0);
+
+/* func_8003FC18 (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
+   func_8003ECD0 (round 14, this unit) calls it twice, always with its own
+   1st/2nd arguments literal 0 and its own 3rd argument one of the two
+   buffer addresses it just built; declared here only with that shape. */
+extern void func_8003FC18(s32 a0, s32 a1, s32 a2);
+
+/* func_80021114 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+   func_8003EDF4 (round 14, this unit) calls it with a literal 0 and
+   ignores the return; declared here only with that shape. */
+extern void func_80021114(s32 a0);
+
+/* The following (asm/code_2cc8c_e.s, the NEXT slice, still uncarved)
+   are all called only from func_8003EEC0 (round 14, this unit); declared
+   here only with that call site's own shapes. */
+extern void func_8003FB0C(s32 a0);
+extern void func_8003FC70(s32 a0);
+extern void func_8003FD4C(s32 a0, s32 a1);
+extern void func_8003FBE4(s32 a0);
+
+/* func_80024AE4 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+   func_8003EEC0 calls it with self->unk5B's own three bytes reinterpreted
+   as UNSIGNED (`lbu`, not `lb` -- despite `unk5B` itself being written as
+   signed bytes by func_8003EAA4, this call site reads them unsigned; kept
+   as a local cast rather than retyping the field, since the two readings
+   disagree). */
+extern void func_80024AE4(u8 a0, u8 a1, u8 a2);
+
+/* ResetGraph (asm/psyq_GsLinkObject4.s, PsyQ library, LIBGPU.H's own
+   declared signature is `extern int ResetGraph(int mode);` -- declared
+   locally here rather than including the whole SDK header, matching this
+   unit's existing PsyQ-declaration style). func_8003F04C calls it with a
+   literal 1 and ignores the return. */
+extern s32 ResetGraph(s32 mode);
+
+/* func_80023DA0 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+   func_8003F04C calls it with self->unk58's own three bytes (read
+   unsigned, same "writer reads signed, this reader reads unsigned"
+   situation as unk5B/func_8003EEC0) plus one more word; declared here
+   only with that call site's own shape. */
+extern void func_80023DA0(u8 a0, u8 a1, u8 a2, s32 a3);
+
+/* func_8003FBF4 (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
+   func_8003F04C calls it with one of the same unk74-indexed slots used
+   just above. */
+extern void func_8003FBF4(s32 a0);
+
+void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
+void func_8003EB84(Unk18Obj *self);
+void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
+void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1);
+void func_8003ECD0(Unk18Obj *self);
+void func_8003EDF4(Unk18Obj *self);
+void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void func_8003EEC0(Unk18Obj *self);
+void func_8003F04C(Unk18Obj *self);
+void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1);
+void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
+void func_8003EA24(Unk18Obj *self, s32 a1);
+void func_8003EA2C(Unk18Obj *self, s32 a1);
+void func_8003EA48(Unk18Obj *self, s32 a1);
+void func_8003EA64(Unk18Obj *self, s32 a1);
+void func_8003EA7C(Unk18Obj *self, s32 a1);
+void func_8003EA84(Unk18Obj *self, SByte3_d294 *src);
+void func_8003EAA4(Unk18Obj *self, SByte3_d294 *src);
+void func_8003EAC4(Unk18Obj *self, s32 a1);
+SubHandleObj *func_8003F230(Unk18Obj *self);
+void func_8003F23C(Unk18Obj *self, s32 a1);
+void func_8003F244(Unk18Obj *self, s32 a1);
+Unk18Obj *func_8003F25C(Unk18Obj *self);
+
+/* func_80024B90 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+   func_8003F28C (round 13, code_2cc8c_d) calls it with `self` forwarded
+   unexamined and ignores the return; declared here only with that
+   call site's own shape. */
+extern void func_80024B90(Unk18Obj *self);
+void func_8003F28C(Unk18Obj *self);
 
 extern void *func_80042400(void); /* external, no args; local view returns
                                     void* (used as a generic word/child
