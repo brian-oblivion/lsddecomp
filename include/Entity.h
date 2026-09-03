@@ -160,8 +160,9 @@ struct Unk94Methods {
     u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
     u8 pad104[0x130 - 0x104];
-    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 and func_80061400 (Entity_d), as slot130(unk94, 0) */
-    u8 pad134[0x1A0 - 0x134];
+    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 and func_80061400 (Entity_d), as slot130(unk94, 0), and by func_80061778 (Entity_d) as slot130(unk94, 1) */
+    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061778 (Entity_d) as slot134(unk94, 1, 1); return value unused at this, its only known call site */
+    u8 pad138[0x1A0 - 0x138];
     s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
     u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5, and by func_80061400 (Entity_d), compared against 6 -- value-returning, not void */
@@ -365,6 +366,11 @@ extern EntityMethods D_80089AD4;
  * is a safe read regardless of the real return type (same caveat as
  * func_8002CD08/func_8002CC84 above). */
 extern void func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
+
+/* Already matched in Entity_b.c (not INCLUDE_ASM), but not previously called
+ * from outside that unit -- func_80061778 (Entity_d) is its first cross-unit
+ * caller. */
+extern s32 func_8005E02C(Entity *this, s32 arg1);
 
 /* Second argument threaded through the moodIndex-selected event-dispatch
  * handlers (func_8005ED10, func_8005E480, func_8005E7A8, and the sibling
