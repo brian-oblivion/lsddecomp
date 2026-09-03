@@ -203,4 +203,9 @@ extern void func_8001BAB4(void *self, void *table);
  * func_80019EE4 (code_8220_c) with (self, table). */
 extern void func_8001BFD4(void *self, void *table);
 
+/* Psy-Q SDK (asm/psyq_rcpolygt3.s, same file as func_8001BFD4, not a
+ * carved C unit). Called by func_8001A064 (code_8220_c) with (self,
+ * table) -- Gouraud-shaded quad, quad-flavored sibling of func_8001BFD4. */
+extern void func_8001C474(void *self, void *table);
+
 #endif
