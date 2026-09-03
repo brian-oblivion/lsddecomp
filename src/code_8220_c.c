@@ -129,6 +129,43 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019B24);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019C04);
 
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_80019D84.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class: $a2 vs $a1 for the OT high-byte mask, plus one missing
+ * `addiu $v0,$s1,0x28`. This is the first sibling where the raw
+ * "last-field-offset + access-width" formula from func_800197C4.md does
+ * NOT land exactly on the filler: the highest arg0 field this function
+ * touches is +0x24 (a u16 read, raw end 0x26), but the filler is 0x28.
+ * 0x28 = align-up-to-4(0x26). Every other sibling's raw sum was already a
+ * multiple of 4, so this is the first case that distinguishes "one byte
+ * past the last field" from "start of the next 4-byte-aligned slot" --
+ * the latter is what actually matches here. Worth re-checking the other
+ * seven against this refined rule rather than the raw one. Not cracked.
+ */
+void func_80019D84(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
+        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    } else {
+        func_8001A380(D_8008AEE8, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        func_8001A4C0((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+                      (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x18, (u8 *)arg0 + 0x20);
+
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x94) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x98) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x9C) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0xA0) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x94) + 0x8) = *(u16 *)((u8 *)arg0 + 0xC);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x98) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x9C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
+        *(u16 *)(*(u8 **)((u8 *)arg1 + 0xA0) + 0x8) = *(u16 *)((u8 *)arg0 + 0x24);
+
+        func_8001BAB4(arg0, D_8008AEE8);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019D84);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019EE4);
