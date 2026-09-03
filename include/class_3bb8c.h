@@ -931,6 +931,27 @@ struct GenericReleaseObj_3bb8c_d {
 };
 
 /*
+ * Class86B60::unkB0's pointee. Shares the same `release` slot at `+0x004`
+ * as `GenericReleaseObj_3bb8c_d`, but also exposes `+0x04C` (reached by
+ * func_8004DC64), so it gets its own local view rather than reusing that
+ * minimal type.
+ */
+typedef struct Class86B60UnkB0ObjMethods_3bb8c_d Class86B60UnkB0ObjMethods_3bb8c_d;
+typedef struct Class86B60UnkB0Obj_3bb8c_d Class86B60UnkB0Obj_3bb8c_d;
+
+struct Class86B60UnkB0ObjMethods_3bb8c_d {
+    u8 pad000[0x004];
+    void (*release)(Class86B60UnkB0Obj_3bb8c_d *self); /* +0x004, func_8004DC08 */
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, func_8004DC64's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
+    void (*slot4C)(Class86B60UnkB0Obj_3bb8c_d *self, s32 arg1, void *arg2);
+};
+
+struct Class86B60UnkB0Obj_3bb8c_d {
+    Class86B60UnkB0ObjMethods_3bb8c_d *methods; /* +0x000 */
+};
+
+/*
  * Generic class-instance shape used only to read another object's own
  * vtable header WORD (the full `s32` at the vtable's own `+0x000`), the
  * same "arg->methods->header" runtime-type-id shape already documented
@@ -1046,8 +1067,12 @@ struct Class86B60 {
     GenericReleaseObj_3bb8c_d *unkAC; /* +0x0AC, func_8004D578: zeroed; func_8004D704: guards both releases */
     /* +0x0B0, func_8004DC08: a third owned sub-object, released
      * unconditionally (no null check) through the same shared `release`
-     * slot as `unkA8`/`unkAC`. */
-    GenericReleaseObj_3bb8c_d *unkB0;
+     * slot as `unkA8`/`unkAC`. Typed its own `Class86B60UnkB0Obj_3bb8c_d`
+     * rather than reusing `GenericReleaseObj_3bb8c_d` -- func_8004DC64
+     * reaches a SECOND slot (`+0x04C`) on the same pointer that
+     * `unkA8`/`unkAC` never do, so it is kept a distinct local view
+     * rather than assuming the other two share its fuller shape. */
+    Class86B60UnkB0Obj_3bb8c_d *unkB0;
     u8 pad0B4[0x0BC - 0x0B4];
     s32 unkBC;                      /* +0x0BC, func_8004D578: return value of dreamSys->methods->slot1B0 */
     s32 unkC0;                      /* +0x0C0, func_8004D578: output buffer address passed BY REFERENCE
@@ -1160,6 +1185,9 @@ struct BaseTaskCtorTable_3bb8c_c {
     /* +0x0DC, func_8004DC08's own last call, `self` only, right after
      * releasing `Class86B60::unkB0`. */
     void (*slotDC)(void *self);
+    /* +0x0E0, func_8004DC64's own first call: `(self, arg1)`, arg1 its
+     * own forwarded 2nd parameter. */
+    void (*slotE0)(void *self, s32 arg1);
 };
 
 extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
@@ -1184,6 +1212,11 @@ extern s32 D_800114E8;
  * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
  * itself. Placeholder s32 type; real element layout unknown. */
 extern s32 D_80086DAC;
+
+/* Address-of only in this unit (func_8004DC64 passes &D_8008A9B4 to
+ * `Class86B60UnkB0ObjMethods_3bb8c_d::slot4C`). Placeholder s32 type
+ * since only the address is taken here. */
+extern s32 D_8008A9B4;
 
 /* Still raw asm in this unit (gp-relative-blocked, see
  * docs/match-reports/func_8004D6AC.md) -- not this round's function, but
