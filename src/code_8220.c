@@ -63,7 +63,11 @@ void BasicClass__func_17f98(BasicClass *self, BasicClass *child)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_17ff0);
+void BasicClass__func_17ff0(BasicClass *self, BasicClass *child)
+{
+    func_80018208(&self->children, child);
+    child->methods->removeParentRef(child, self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_18040);
 
