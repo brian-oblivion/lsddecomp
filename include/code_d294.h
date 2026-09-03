@@ -177,6 +177,16 @@ struct Class6B5CCMethods {
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as func_8001E57C above. */
     void (*slot5C)(Class6B5CCObj *self, s32 arg1);
+    /* +0x060..+0x09C: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
+     * (all this unit, all already matched) -- not typed here as struct
+     * fields because nothing dispatches through the table at these offsets;
+     * every call site invokes them directly by symbol name. */
+    u8 pad060[0x0A0 - 0x060];
+    /* +0x0A0, func_8001D6B4's own call target (round 12): dispatched with
+     * only `self`, per that function's own disassembly (`jalr $v0` with
+     * `$a0` untouched since function entry). func_8001D714 (still queued)
+     * is this slot's occupant per `tools/classtable.py D_8006B5CC`. */
+    void (*slotA0)(Class6B5CCObj *self);
 };
 
 /* MEASURED: func_8001E57C's whole body is `lui/addiu %hi/%lo(D_8006B5CC);
@@ -225,6 +235,10 @@ struct Class6B5CCObj {
      * this unit's chosen functions dereference through it directly. */
     void *unk20;
     s32 unk24;                  /* +0x024, zeroed by func_8001CE30 (this unit) */
+    /* +0x028, round 12 (code_d294_b): func_8001D6B4 sets this to its own
+     * `a1` (a plain `s32`, per m2c's own inference -- never dereferenced by
+     * this unit's chosen functions) when called with a2==4. */
+    s32 unk28;
 };
 
 /* func_8001EC84 (asm/code_d294_b.s, still uncarved): reads a `{s16 whole;
@@ -323,5 +337,6 @@ u32 func_8001D480(Class6B5CCObj *self, u32 a1);
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
 
 void func_8001D600(Class6B5CCObj *self, void *dest);
+void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
 
 #endif

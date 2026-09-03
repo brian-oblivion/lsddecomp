@@ -50,7 +50,20 @@ void func_8001D6A4(void) {
 void func_8001D6AC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D6B4);
+/* a2 selects one of three behaviors: 2 or 3 dispatches through the vtable
+ * (self->methods->slotA0), exactly 4 stores a1 into self->unk28, and
+ * anything else (< 2 or > 4) is a no-op. */
+void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
+    switch (a2) {
+    case 2:
+    case 3:
+        self->methods->slotA0(self);
+        break;
+    case 4:
+        self->unk28 = a1;
+        break;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
 
