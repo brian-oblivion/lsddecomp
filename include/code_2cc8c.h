@@ -1347,12 +1347,18 @@ struct Obj6EAC0Methods {
     void (*slot40)(Obj6EAC0 *self, s32 a1); /* +0x040, IS func_80040A88
                                   (derived, this unit) */
     u8 pad044[0x04C - 0x044];
-    void (*slot4C)(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3); /* +0x04C,
-                                  widest OBSERVED call is func_80040854's
-                                  4-arg forward; IS func_80040664 (base,
-                                  this unit, only reads 3) and
-                                  func_80040AE8 (derived, this unit, only
-                                  reads 3) */
+    void (*slot4C)(); /* +0x04C, DELIBERATELY UNPROTOTYPED (K&R style):
+                                  call sites in this unit need it at BOTH
+                                  3 and 4 explicit arguments
+                                  (func_80040854 forwards 4;
+                                  func_80040AE8 calls it at 3, twice, with
+                                  different argument MEANINGS each time)
+                                  and C requires an exact arg-count match
+                                  through a prototyped function-pointer
+                                  type, which no single prototype here
+                                  could satisfy. IS func_80040664 (base,
+                                  this unit, reads 3) and func_80040AE8
+                                  (derived, this unit, reads 3) */
     void (*slot50)(Obj6EAC0 *self); /* +0x050, IS func_80040C00 (derived,
                                   this unit) */
     u8 pad054[0x060 - 0x054];
@@ -1379,13 +1385,13 @@ struct Obj6EAC0Methods {
     void (*slotC0)(Obj6EAC0 *self, void *a1); /* +0x0C0, IS func_80040824
                                   (base, this unit); a1 a 2-halfword
                                   struct pointer */
-    void (*slotC4)(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3); /* +0x0C4,
-                                  widest OBSERVED call is self-dispatch
-                                  with 4 raw args; IS func_80040854
-                                  (base, this unit, only reads 3) and
-                                  func_80040EDC (derived, this unit, only
-                                  reads 2 -- see per-call-site note
-                                  above) */
+    void (*slotC4)(); /* +0x0C4, DELIBERATELY UNPROTOTYPED, same reason as
+                                  slot4C above: func_80040854 forwards 4
+                                  args, func_80040F28 dispatches a CHILD's
+                                  slotC4 at only 2. IS func_80040854
+                                  (base, this unit, reads 3) and
+                                  func_80040EDC (derived, this unit,
+                                  reads 2) */
     void (*slotC8)(Obj6EAC0 *self, s32 a1); /* +0x0C8, IS func_800408A0
                                   (base, this unit, setter) and
                                   func_80040F20 (derived, this unit,
@@ -1436,7 +1442,9 @@ struct Obj6EAC0 {
     u8 unkA9;                  /* +0x0A9, OBSERVED: func_80040A30 (passed
                                   as func_800183DC's count arg),
                                   func_80040E14 (loop bound) */
-    u8 padAA[0x0AB - 0x0AA];
+    u8 unkAA;                  /* +0x0AA, OBSERVED: func_80040AE8 -- a
+                                  one-shot "extra offset" gate compared
+                                  against the loop index */
     u8 unkAB;                  /* +0x0AB, OBSERVED: a per-slice element
                                   COUNT, paired with unkAC as the base
                                   index -- func_80040AE8, func_80040C00,
