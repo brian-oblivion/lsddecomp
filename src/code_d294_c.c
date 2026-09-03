@@ -38,7 +38,27 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EACC);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EC84);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001ECFC);
+s32 func_8001ECFC(s16 *box, s16 *point) {
+    s32 flags;
+
+    flags = 0;
+    if (box[3] < point[0]) {
+        flags = 8;
+    } else if (point[0] < box[0]) {
+        flags = 4;
+    }
+    if (box[4] < point[1]) {
+        flags |= 2;
+    } else if (point[1] < box[1]) {
+        flags |= 1;
+    }
+    if (box[5] < point[2]) {
+        flags |= 0x20;
+    } else if (point[2] < box[2]) {
+        flags |= 0x10;
+    }
+    return flags;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EDAC);
 
