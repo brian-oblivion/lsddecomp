@@ -1,6 +1,19 @@
 #include "common.h"
+#include "code_d294.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CA94);
+Class6B5CCObj *func_8001CA94(void) {
+    Class6B5CCObj *obj;
+
+    obj = func_80017B34(0x44);
+    if (obj == NULL) {
+        return NULL;
+    }
+    if (func_8001E57C()->ctor(obj) != NULL) {
+        return obj;
+    }
+    func_80017CFC(obj);
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CAF4);
 
