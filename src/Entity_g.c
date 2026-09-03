@@ -1,6 +1,18 @@
 #include "common.h"
 #include "Entity.h"
 
+/* Data rows this unit's mood-dispatch handlers pass through to a vtable
+ * call as an opaque argument -- never dereferenced here, so an opaque byte
+ * array is enough to form &D_8008xxxx correctly. Real element type/count
+ * unknown. Same per-unit local-declaration convention as Entity_b.c/
+ * Entity_c.c/Entity_e.c (each unit keeps its own extern, not shared). */
+extern u8 D_80089CAC[];
+extern u8 D_80089E14[];
+extern u8 D_80089DE4[];
+extern u8 D_80089DD8[];
+extern u8 D_80089E20[];
+extern u8 D_80089DCC[];
+
 void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
         if (func_8005D108(this, NULL, 0, 0xA, 0) != 0) {
@@ -12,7 +24,53 @@ void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x1E, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_800646D8);
+void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
+    void *a2;
+
+    if (this->unkFC == 0) {
+        this->methods->slotCC(this, -0x200, 0);
+    }
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk84 == this->unk80 / 2) {
+        out->unk1C = 7;
+        out->unk20 = -2;
+        out->unk30 = 3;
+        out->unk34 = -2;
+    }
+    if (this->unkFC >= 0x33) {
+        this->methods->slot44(this, 0, D_80089CAC);
+    }
+    if (this->unkFC >= 0x30D) {
+        func_8001EACC(this, this->unk94, 1, 0, 0);
+        if (this->unkFC >= 0x790) {
+            a2 = D_80089E14;
+        } else if (this->unkFC >= 0x78B) {
+            a2 = D_80089DE4;
+        } else if (this->unkFC >= 0x786) {
+            a2 = D_80089DD8;
+        } else if (this->unkFC >= 0x781) {
+            a2 = D_80089DCC;
+        } else {
+            a2 = D_80089E20;
+        }
+        this->methods->slot48(this, 1, a2);
+        if (this->unkFC < 0x7D0) {
+            this->methods->slotC4(this, -0x40, 0);
+        } else {
+            this->unk44 = 1;
+        }
+    } else {
+        this->methods->slotC4(this, -0x100, 0);
+    }
+    if (this->unkF4 != 0 && this->unk44 == 0) {
+        this->unk44 = 0xC;
+        this->unk94->methods->slot130(this->unk94, 1);
+        this->methods->slot30(this, 0xA);
+    }
+    if (this->unk44 == 0xC) {
+        this->unk94->methods->slotC4(this->unk94, 0x100, 0);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064928);
 
