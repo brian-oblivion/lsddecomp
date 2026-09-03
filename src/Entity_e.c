@@ -35,7 +35,22 @@ void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800620C4);
+void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0) {
+        if (rand() % 3 == 0) {
+            this->unk44 = 0xB;
+        }
+    }
+    if (this->unk44 == 0xB) {
+        if (this->unkFC == 0x1F6) {
+            this->methods->slotCC(this, 0x800, 0);
+            func_8001EACC(this, this->unk94, 1, 0, 0);
+        }
+        if (this->unkFC >= 0x1F5) {
+            this->methods->slotC4(this, -0x200, 0);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800621A8);
 
