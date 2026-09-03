@@ -130,7 +130,14 @@ segments:
       - [0x1C34, rodata]
       - [0x1D7C, .rodata, class_3bb8c_g]   # jtbl_8001157C + jtbl_80011594
       - [0x1DD0, rodata]
-      - [0x1E28, rodata]
+      # Split at the ownership boundary (third instance of the shared-slot
+      # case this round -- see PARALLEL-RUNS Gate 2). Ownership, one grep per
+      # symbol: jtbl_80011628 -> class_3bb8c_i (its .L labels are local to
+      # that unit's own function .s, so it MUST be attached);
+      # D_800116A4 unreferenced; D_800116E4 -> class_3bb8c_j, still uncarved,
+      # so it must stay in a standalone object.
+      - [0x1E28, .rodata, class_3bb8c_i]   # jtbl_80011628
+      - [0x1EA4, rodata]                   # D_800116A4 / D_800116E4 -> not ours
       - [0x1EF4, rodata]
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
       # unit. Its words are pointers to `.L8005....` labels INSIDE DreamSys's
@@ -448,7 +455,23 @@ segments:
       # .claude/hooks/block-asm-edits.sh in the same step, which makes it an
       # operator-scale change rather than a head one. The cheapest next slice
       # therefore starts AFTER 0x41398, not at 0x410E8.
+      # class_3bb8c_h: the BIOS TRAMPOLINE BLOCK ONLY, 0x410E8..0x413A8.
+      # All 13 `jr $t2` PSX BIOS trampolines live in exactly this span and
+      # nothing else does. Kept as its own asm segment so every future carve
+      # can simply start after it. Carving THIS span needs an `hasm` segment
+      # or a literal `.word` disposition, and an hasm segment touches
+      # .gitignore and .claude/hooks/block-asm-edits.sh in the same step,
+      # which makes it an operator-scale change rather than a head one.
       - [0x410E8, asm, class_3bb8c_h]
+      # class_3bb8c_i: first slice after the trampolines, 0x413A8..0x41F84,
+      # 20 functions. Carved round 14. Blocker profile: 2 of 20 --
+      # func_80050C14 (gp_rel) and func_800513D0 (addiu-$at, and it owns a
+      # jump table, so expect the rodata attach/split from Gate 2). 18 clean,
+      # none wanting 7+ callee-saved registers (the corrected threshold; the
+      # one function at 5 is ordinary work, see DECOMPILATION_LEARNINGS).
+      - [0x413A8, c, class_3bb8c_i]
+      # class_3bb8c_j: the remaining ~193 functions, 0x41F84.. -- UNCARVED.
+      - [0x41F84, asm, class_3bb8c_j]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
