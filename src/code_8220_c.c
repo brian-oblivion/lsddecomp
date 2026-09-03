@@ -18,7 +18,22 @@ void func_80019774(void *dst, s32 flag)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001979C);
+void func_8001979C(void *dst, s32 flag)
+{
+    if (flag) {
+        __asm__ volatile (
+            "swc2 $12, 0x8(%0)\n\t"
+            "swc2 $13, 0x14(%0)\n\t"
+            "swc2 $14, 0x20(%0)"
+            : : "r" (dst) : "memory");
+    } else {
+        char *p = (char *)dst + 0x2c;
+
+        __asm__ volatile (
+            "swc2 $14, 0x0(%0)"
+            : : "r" (p) : "memory");
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800197C4);
 
