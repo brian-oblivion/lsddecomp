@@ -99,23 +99,23 @@ void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EC84);
 
-s32 func_8001ECFC(s16 *box, s16 *point) {
+s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point) {
     s32 flags;
 
     flags = 0;
-    if (box[3] < point[0]) {
+    if (box->hi.x < point->x) {
         flags = 8;
-    } else if (point[0] < box[0]) {
+    } else if (point->x < box->lo.x) {
         flags = 4;
     }
-    if (box[4] < point[1]) {
+    if (box->hi.y < point->y) {
         flags |= 2;
-    } else if (point[1] < box[1]) {
+    } else if (point->y < box->lo.y) {
         flags |= 1;
     }
-    if (box[5] < point[2]) {
+    if (box->hi.z < point->z) {
         flags |= 0x20;
-    } else if (point[2] < box[2]) {
+    } else if (point->z < box->lo.z) {
         flags |= 0x10;
     }
     return flags;
