@@ -143,7 +143,55 @@ void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EEC0);
+/* Per-frame update, guarded by self->unk70 (only runs once func_8003ECD0's
+ * init has succeeded). Notifies slotA0 if self->unk10->unkC is set,
+ * updates three sub-objects (unk40/unk4C/unk54), conditionally re-notifies
+ * a PsyQ helper when unk54 is 1 or 3, resets self->unk30's pointee,
+ * recomputes self->unk98 from the (unk50-unk4C)/(1<<unk3C) division,
+ * forwards the current unk74-indexed slot to two more helpers, dispatches
+ * slotA0 again with self->unkAC, and finally -- if self->unk10 is set --
+ * walks it to its list tail and dispatches slotA0 a third time with that
+ * tail. */
+void func_8003EEC0(Unk18Obj *self) {
+    s32 idx;
+    Unk18Obj *tail;
+
+    if (self->unk70 == 0) {
+        return;
+    }
+
+    if (self->unk10->unkC != NULL) {
+        ((void (*)(Unk18Obj *, GenericObj *))self->methods->slotA0)(self, self->unk10);
+    }
+
+    func_8003F28C((Unk18Obj *)self->unk40);
+    func_8003FB0C(self->unk4C);
+    func_8003FC70(self->unk54);
+
+    if (self->unk54 == 1 || self->unk54 == 3) {
+        u8 *rawBytes = (u8 *)&self->unk5B;
+        func_80024AE4(rawBytes[0], rawBytes[1], rawBytes[2]);
+        func_8003FD4C(self->unk60, self->unk40);
+    }
+
+    func_8003F2AC(&self->unk14);
+    *(s32 *)self->unk30 = 0;
+
+    self->unk98 = (u32)(self->unk50 - self->unk4C) / (u32)(1 << self->unk3C) + 1;
+
+    idx = self->unk74;
+    func_8003FBE4(*(s32 *)((u8 *)self + 0x88 + idx * 4));
+
+    idx = self->unk74;
+    func_8003FC18(0, 0, *(s32 *)((u8 *)self + 0x78 + idx * 4));
+
+    ((void (*)(Unk18Obj *, void *))self->methods->slotA0)(self, self->unkAC);
+
+    if (self->unk10 != NULL) {
+        tail = func_8003F25C((Unk18Obj *)self->unk10);
+        ((void (*)(Unk18Obj *, Unk18Obj *))self->methods->slotA0)(self, tail);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F04C);
 
