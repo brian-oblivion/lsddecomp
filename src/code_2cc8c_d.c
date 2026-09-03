@@ -43,7 +43,9 @@ void func_8003EA84(Unk18Obj *self, SByte3_d294 *src) {
     self->unk58 = *src;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EAA4);
+void func_8003EAA4(Unk18Obj *self, SByte3_d294 *src) {
+    self->unk5B = *src;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EAC4);
 
