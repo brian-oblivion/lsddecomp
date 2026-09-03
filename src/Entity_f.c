@@ -1,6 +1,21 @@
 #include "common.h"
 #include "Entity.h"
 
+/* Data tables reached with a raw pointer by this unit's mood-dispatch
+ * handlers -- same convention as Entity_d.c/Entity_c.c's own D_80089E50/
+ * D_80089E38/etc externs (separate local view per translation unit, not
+ * shared via the header). */
+extern u8 D_80089C64[];
+extern u8 D_80089C7C[];
+extern u8 D_80089CD0[];
+extern u8 D_80089CDC[];
+
+/* Forward declarations: both are defined later in this file (in ROM
+ * order), but func_80063874 and func_80063BC0 call them before their own
+ * definitions appear -- same convention as Entity_d.c's own forward calls. */
+void func_80063C84(EntityMoodHandlerArg *out);
+void func_80063CAC(EntityMoodHandlerArg *out);
+
 void func_800634A8(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0 && this->unkFC == 0) {
         if (rand() % 3 != 0) {
@@ -79,7 +94,65 @@ void func_80063784(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_f", func_80063874);
+void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unk44 == 0) {
+        if (this->unk84 == 5) {
+            func_80063C84(out);
+        }
+        if (this->unkFC == this->unk80) {
+            this->methods->slot130(this);
+            this->unk44 = 0xA;
+            this->unkFC = -1;
+        }
+    } else if (this->unk44 == 0xA) {
+        if (this->unkFC < 0xA) {
+            this->methods->slot44(this, 0, D_80089C64);
+            if (this->unk94->methods->slot100(this->unk94) != 0) {
+                func_80063C84(out);
+                this->unk44 = 0xC;
+                this->unkFC = -1;
+            }
+        } else {
+            this->unk94->methods->slot130(this->unk94, 1);
+            this->unk44 = 0xB;
+            this->unkFC = -1;
+        }
+    } else if (this->unk44 == 0xB) {
+        func_8001EACC(this, this->unk94, 1, 0, 0);
+        if (this->unkFC < 0x1E) {
+            this->methods->slotC4(this, -0xA, 0);
+        } else {
+            func_80063C84(out);
+            if (func_8005D108(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
+                this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
+            }
+            this->unk44 = 0xD;
+            this->unkFC = -1;
+        }
+    } else if (this->unk44 == 0xD) {
+        if (this->unkFC < 0x5A) {
+            if (this->unkFC == 0x1E) {
+                if (func_8005D108(this, NULL, NULL, (void *)0xA, 0) != NULL) {
+                    this->unk100->methods->slotD8(this->unk100, this->unk50, 0, 0);
+                }
+            }
+            this->unk94->methods->slot44(this->unk94, 0, D_80089CD0);
+        } else {
+            func_80063CAC(out);
+            this->unk94->methods->slot44(this->unk94, 1, D_80089C7C);
+            this->methods->slot30(this, (rand() % 5 != 0) ? 0xA : 0xC);
+            this->unk44 = 0xE;
+        }
+    } else if (this->unk44 == 0xC) {
+        if (this->unkFC < 0xA) {
+            this->methods->slot44(this, 0, D_80089CDC);
+        } else {
+            func_80063CAC(out);
+            this->methods->slot16C(this);
+            this->unk44 = 1;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_f", func_80063BC0);
 

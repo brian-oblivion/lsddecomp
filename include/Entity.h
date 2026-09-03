@@ -128,7 +128,8 @@ struct Unk100Methods {
     /* +0x50 */ void (*slot50)(Unk100Obj *self);                           /* called by func_8005D108 */
     /* +0x54 */ u8 pad54[0xD0 - 0x54];
     /* +0xD0 */ void (*slotD0)(Unk100Obj *self, void *arg1);                /* called by func_8005D108 */
-    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80061198 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0); return value unused at this, its only known call site */
+    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80061198 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0), and by func_80063874 (Entity_f) as slotD4(this->unk100, this->unk50, 7, 0) */
+    /* +0xD8 */ void (*slotD8)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80063874 (Entity_f) as slotD8(this->unk100, this->unk50, 0, 0); return value unused at this, its only known call site */
 };
 
 struct Unk100Obj {
