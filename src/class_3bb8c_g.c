@@ -1,4 +1,5 @@
 #include "common.h"
+#include "class_3bb8c.h"
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FBE4);
 
@@ -28,6 +29,9 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050670);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050730);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_800507E8);
+GenericCtorTable_3bb8c_d *func_800507E8(void)
+{
+    return &D_80086DC4;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_800507F8);

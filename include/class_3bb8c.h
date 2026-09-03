@@ -1298,6 +1298,7 @@ struct GenericCtorTable_3bb8c_d {
     void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call */
 };
 
-extern GenericCtorTable_3bb8c_d *func_800507E8(void);
+extern GenericCtorTable_3bb8c_d D_80086DC4;
+extern GenericCtorTable_3bb8c_d *func_800507E8(void); /* returns &D_80086DC4; matched in class_3bb8c_g */
 
 #endif
