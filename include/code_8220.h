@@ -111,7 +111,7 @@ extern s32 func_80011F68(void *ptr);                                /* marks the
 extern s32 func_800181AC(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
 extern void func_80018208(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
 
-/* Still INCLUDE_ASM in code_8220_b this round. */
+/* Matched in code_8220_b, round 13. */
 extern void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */
 extern void func_80018288(BasicClassListNode **head);                          /* free every node in the list, does not clear *head itself */
 
