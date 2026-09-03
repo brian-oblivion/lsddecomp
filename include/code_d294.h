@@ -144,6 +144,35 @@ typedef struct BoundsBox_d294 {
     Vec3S16_d294 hi;
 } BoundsBox_d294;
 
+/* Round 13 (func_8001DA28): a 12-byte, all-s16, 6-field record -- MEASURED,
+ * same all-s16-struct-copy idiom as Vec3S16_d294 (whole-value assignment
+ * compiles to unaligned lwl/lwr). Used as func_8001F50C's own return-array
+ * element type and as this function's own second running-tracker. Field
+ * names are placeholders; the tail comparison pairs them with
+ * BoundsBox_d294 fields in a scrambled order (f5<->lo.z, f2<->hi.z,
+ * f3<->lo.x, f4<->lo.y, f1<->hi.y, f0<->hi.x) consistent with `f0..f2`
+ * being some OTHER box's hi corner and `f3..f5` its lo corner, but this is
+ * not confirmed beyond the offsets themselves. */
+typedef struct Sixteen6_d294 {
+    s16 f0;
+    s16 f1;
+    s16 f2;
+    s16 f3;
+    s16 f4;
+    s16 f5;
+} Sixteen6_d294;
+
+/* Round 13 (func_8001DA28): `arg1`'s own struct -- a count followed by the
+ * FIRST corner (`hdr`), with `count*8 - 1` more Vec3S16_d294 corners
+ * immediately after (stride 6, walked by raw pointer arithmetic since a
+ * C89 flexible array member isn't available). MEASURED: `count*48` is the
+ * byte span from `&hdr` to the array's end, i.e. 8 corners per `count`. */
+typedef struct CornerList_d294 CornerList_d294;
+struct CornerList_d294 {
+    s32 count;         /* +0x000 */
+    Vec3S16_d294 hdr;  /* +0x004, corner[0]; corner[1..] follow at +0x00A */
+};
+
 /* This unit's own minimal, local view of the shared BasicClass ancestor
  * table (D_8006B58C, returned by func_80018390, which lives in the
  * still-uncarved code_8220 segment) -- same shape and same "ctor at +0x008,
@@ -474,6 +503,17 @@ extern void func_8001F51C(void *arg0, void *dest);
  * (boolean-ish) here. Not decompiled in this project. */
 extern s32 func_8001F3A4(void *arg0);
 
+/* func_8001F4E4/func_8001F50C (asm/psyq_GsLinkObject4.s, PsyQ library, not
+ * game code): func_8001F4E4 fills a PsyQ-internal global
+ * (D_8008B21C, via func_8001F3B0) from its own argument; func_8001F50C
+ * IGNORES both its arguments and just returns `&D_8008B21C` -- MEASURED,
+ * its whole body is `lui/addiu %hi/%lo(D_8008B21C); jr $ra`. func_8001DA28
+ * (round 13, this unit) calls the pair as `func_8001F4E4(self->unk20);
+ * arr = func_8001F50C(self->unk20, 0);` -- declared here typed to that
+ * call site's own use of the result (an array of Sixteen6_d294). */
+extern void func_8001F4E4(void *arg0);
+extern Sixteen6_d294 *func_8001F50C(void *arg0, s32 arg1);
+
 /* func_8001EE04 (asm/code_d294_c.s, the NEXT slice, still uncarved): an
  * element-copy loop -- `count` iterations, 6 bytes/element, reading from
  * `src` and writing (by way of func_80015D58, not decompiled here either)
@@ -573,5 +613,6 @@ void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, V
 extern s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point);
 
 s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
+s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
 
 #endif
