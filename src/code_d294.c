@@ -84,7 +84,28 @@ INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CEB4);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D008);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D0EC);
+Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
+    Class6B5CCSub14 *sub;
+
+    if (self->unkC == NULL) {
+        self->unkC = obj;
+        sub = self->unk14;
+        sub->unk48 = obj->unk14;
+        obj->methods->slot10(obj, self);
+        sub = self->unk14;
+        if (vec != NULL) {
+            sub->unk18 = vec->x;
+            sub->unk1C = vec->y;
+            sub->unk20 = vec->z;
+        } else {
+            sub->unk18 = 0;
+            sub->unk1C = 0;
+            sub->unk20 = 0;
+        }
+        self->unk14->unk0 = 0;
+    }
+    return self;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D1A4);
 
