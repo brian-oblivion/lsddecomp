@@ -71,6 +71,30 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800199EC);
 
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_80019B24.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class as func_800197C4 in this unit: $a2 vs $a1 for the OT
+ * high-byte mask (cascading register renames), plus one missing
+ * load-delay-slot filler `addiu $v0,$s1,0x18` = arg0 + 0x18, which is
+ * exactly one byte past uv3 (arg0+0x14, a PolyUV4, the last arg0 field
+ * this function's calls branch touches) -- see func_800197C4.md for the
+ * verified cross-sibling formula and the two ruled-out hypotheses for
+ * reproducing it. Not cracked.
+ */
+void func_80019B24(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
+        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    } else {
+        func_8001A380(D_8008AEE8, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        func_8001A4C0((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+                      (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
+        func_8001A8D4(arg0, D_8008AEE8);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019B24);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019C04);
