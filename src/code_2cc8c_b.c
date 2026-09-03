@@ -43,11 +43,18 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D444);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D4DC);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D5C0);
+s32 func_8003D5C0(Obj86B60 *self)
+{
+    return self->unk58;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D5CC);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D6D4);
+void func_8003D6D4(Obj86B60 *self)
+{
+    func_800183DC(self->unk64[self->unk58], self->unk5C[self->unk58]);
+    func_80017CFC(self->unk64[self->unk58]);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D73C);
 

@@ -151,6 +151,16 @@ extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
                                                        view retyped to this
                                                        unit's own Unk74Obj */
 
+extern void *func_80017B34(s32 size);   /* allocator, confirmed across many
+                                            units */
+extern void func_80017CFC(void *ptr);   /* matching free/release, confirmed
+                                            void-returning in code_171e0.h
+                                            and Entity.h */
+extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
+                                                    this project; typed from
+                                                    func_8003D6D4's own call
+                                                    site only */
+
 /*
  * self->methods. Only the slots this unit's functions actually CALL
  * THROUGH (as opposed to slots that simply ARE these functions, entered
@@ -275,7 +285,13 @@ struct Obj86B60 {
     s32 unk58;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
-    u8 pad05C[0x070 - 0x05C];
+    void **unk5C;                /* +0x05C, func_8003D6D4: array indexed by
+                                     unk58, giving func_800183DC's 2nd arg */
+    u8 pad060[0x064 - 0x060];
+    void **unk64;                /* +0x064, func_8003D6D4: array indexed by
+                                     unk58, giving func_800183DC's 1st arg
+                                     and func_80017CFC's arg */
+    u8 pad068[0x070 - 0x068];
     const char *unk70;          /* +0x070, func_8003CDE0: truthy gate and a
                                     cache of the path last passed to
                                     func_8003B39C */
