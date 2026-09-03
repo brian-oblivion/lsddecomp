@@ -1031,8 +1031,8 @@ extern IntermediateBaseMethods D_8006E878; /* the table itself, so
  * established independently in include/class_16334.h, include/code_171e0.h
  * and include/code_d294.h. Declared again here, under a unit-local name,
  * per this project's policy of NOT unifying independent local views of the
- * same table into one shared header. Only the one slot func_8003E874
- * dispatches through is modelled.
+ * same table into one shared header. Only the slots this unit's queued
+ * functions actually dispatch through are modelled.
  */
 typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
 struct BasicClassMethodsCC8C {
@@ -1046,7 +1046,10 @@ struct BasicClassMethodsCC8C {
                                   BasicClass__func_17f98 (code_8220.c,
                                   "addChild"); OBSERVED: func_8003E770
                                   (round 13) */
-    u8 pad014[0x018 - 0x014];
+    void (*slot14)(void *self, void *child); /* +0x014, IS
+                                  BasicClass__func_17ff0 (code_8220.c,
+                                  "removeChild"); OBSERVED: func_8003E7F4
+                                  (round 13) */
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS

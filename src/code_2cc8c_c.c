@@ -209,7 +209,19 @@ void func_8003E770(Unk18Obj *self, GenericObj *arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E7F4);
+void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
+{
+    s32 header;
+
+    header = arg1->methods->header & 0xF;
+    if (header == 4) {
+        self->unk30 = 0;
+        self->unk10 = NULL;
+    } else if (header == 1) {
+        self->unkC = NULL;
+    }
+    func_80018390()->slot14(self, arg1);
+}
 
 void func_8003E874(Obj86B60 *self)
 {
