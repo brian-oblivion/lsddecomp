@@ -43,6 +43,8 @@ typedef struct Unk14Obj Unk14Obj;
 typedef struct Unk14ObjMethods Unk14ObjMethods;
 typedef struct Unk18Obj Unk18Obj;
 typedef struct Unk18ObjMethods Unk18ObjMethods;
+typedef struct SubHandleObj SubHandleObj;
+typedef struct SubHandleObjMethods SubHandleObjMethods;
 typedef struct Obj86B60InitArgs Obj86B60InitArgs;
 typedef struct Unk10Obj Unk10Obj;
 typedef struct Unk10ObjMethods Unk10ObjMethods;
@@ -365,6 +367,35 @@ extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
 extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
 /*
+ * The pointee of `Unk18Obj->unkB0` (round 13, func_8003E628), returned by
+ * `func_8003FDB0` -- a function already known elsewhere in this project
+ * (`include/Entity.h`'s own `Unk100Obj`/`func_8003FDB0`), kept here under a
+ * unit-local name per this project's established "independent local views"
+ * convention. Only the one slot this unit's `func_8003E628` dispatches
+ * through is modelled.
+ */
+struct SubHandleObjMethods {
+    u8 pad000[0x04C];
+    void (*slot4C)(SubHandleObj *self, void *arg1, void *arg2); /* +0x04C,
+                                    OBSERVED: func_8003E628 */
+};
+struct SubHandleObj {
+    SubHandleObjMethods *methods; /* +0x000 */
+};
+
+extern SubHandleObj *func_8003FDB0(void *name, s32 arg1, s32 arg2); /* local
+                                    view of include/Entity.h's own
+                                    `func_8003FDB0` */
+extern void *func_8001CA94(void); /* local view of include/code_d294.h's own
+                                    `New_Class6B5CC` allocator -- return
+                                    value never dereferenced by this unit,
+                                    only forwarded as an argument */
+extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
+                            func_8003FDB0's "name" argument */
+extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
+                            SubHandleObjMethods::slot4C's 3rd argument */
+
+/*
  * self->unk18's pointee, round 13 (func_8003E10C). Constructed by a
  * New_X allocator this unit itself carves (func_8003E5D8, 0xBC bytes) via
  * `func_8003F24C()->ctor(self)` -- func_8003F24C lives in a still-uncarved
@@ -391,9 +422,31 @@ struct Unk18ObjMethods {
                                                     BasicClass removeChild;
                                                     OBSERVED: func_8003E280
                                                     (round 13) */
+    u8 pad018[0x040 - 0x018];
+    void (*slot40)(Unk18Obj *self);            /* +0x040, OBSERVED:
+                                                    func_8003E628 (round 13)
+                                                    -- a DIFFERENT table from
+                                                    Obj86B60Methods's own
+                                                    slot40 (`D_8006E8E4`'s
+                                                    own occupant here is
+                                                    `func_8003E968`, not
+                                                    `func_8003E100`) */
 };
 struct Unk18Obj {
     Unk18ObjMethods *methods; /* +0x000 */
+    u8 pad004[0x00C - 0x004];
+    s32 unkC;                 /* +0x00C, OBSERVED: func_8003E628 (round 13),
+                                  zeroed by the ctor */
+    s32 unk10;                /* +0x010, OBSERVED: func_8003E628 (round 13),
+                                  zeroed by the ctor */
+    u8 pad014[0x0AC - 0x014];
+    void *unkAC;               /* +0x0AC, OBSERVED: func_8003E628 (round 13)
+                                  -- set from `func_8001CA94()` (a
+                                  `New_Class6B5CC` allocator, `code_d294.c`);
+                                  never dereferenced by this unit, only
+                                  forwarded as an argument */
+    SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: func_8003E628 (round
+                                  13) -- set from `func_8003FDB0` */
 };
 
 extern Unk18ObjMethods *func_8003F24C(void); /* external (not this unit);

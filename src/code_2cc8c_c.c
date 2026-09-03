@@ -171,7 +171,20 @@ Unk18Obj *func_8003E5D8(void)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E628);
+void func_8003E628(Unk18Obj *self)
+{
+    SubHandleObj *obj;
+
+    func_80018390()->ctor(self);
+    self->methods = func_8003F24C();
+    self->unkC = 0;
+    self->unk10 = 0;
+    self->unkAC = func_8001CA94();
+    obj = func_8003FDB0(D_8008A90C, 0, 0);
+    self->unkB0 = obj;
+    obj->methods->slot4C(obj, self->unkAC, D_8008A904);
+    self->methods->slot40(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E6CC);
 
