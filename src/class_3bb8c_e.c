@@ -219,12 +219,53 @@ s32 func_8004E678(Node3bb8cE *self)
     return 1;
 }
 
+extern s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3);
+
+/* STALL -- see docs/match-reports/func_8004E6B8.md. Best reached: correct
+ * CONTROL FLOW and correct VALUES (confirmed via objdump against the exact
+ * disassembly), but the compiled body is one word short with different
+ * callee-saved register numbering and a different call-argument delay-slot
+ * split. Restored to INCLUDE_ASM so the correct-length placeholder doesn't
+ * cascade drift into func_8004E77C and everything after it in this unit. */
+#if 0
+s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
+{
+    s32 retries;
+    s32 localFlag;
+    s32 result;
+
+    retries = 10;
+    *p2 = 0;
+    result = func_8004E77C(self, p1, &localFlag, p3);
+    goto check;
+retry:
+    if (retries == 0) {
+        goto done;
+    }
+    retries--;
+    result = func_8004E77C(self, p1, p2, p3);
+check:
+    if (result == 0) {
+        goto retry;
+    }
+    if (*p1 != 0) {
+        goto retry;
+    }
+    if (*p3 == 0) {
+        goto retry;
+    }
+done:
+    *p2 = *p2 | localFlag;
+    return result;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E6B8);
 
 extern s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2);
 extern s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2);
 
-void func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
+s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
     if (func_8004E7D0(self, p1, p2) != 0) {
         func_8004E890(self, p1, p3);
