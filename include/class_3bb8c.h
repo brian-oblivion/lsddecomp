@@ -887,6 +887,17 @@ struct Class86B60UnkCObj_3bb8c_d {
 };
 
 /*
+ * self->unk4C's pointee. Only `unk8` is reached, by func_8004D90C, as an
+ * opaque value forwarded verbatim to `Class86B60Methods::slotF0`'s 2nd
+ * argument.
+ */
+typedef struct Class86B60Unk4CObj_3bb8c_d Class86B60Unk4CObj_3bb8c_d;
+struct Class86B60Unk4CObj_3bb8c_d {
+    u8 pad0[0x008];
+    void *unk8; /* +0x008, func_8004D90C */
+};
+
+/*
  * Generic class-instance shape used only to reach the shared BasicClass-
  * family "release" slot (`+0x004`, same offset as `BasicClassMethods::
  * release` in include/code_8220.h -- "virtual finalize, then free self")
@@ -935,11 +946,21 @@ struct Class86B60Methods {
     void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, func_8004D578's own last call */
     u8 pad044[0x06C - 0x044];
     void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, func_8004D814's own 2nd call, arg1 = 0xA */
-    u8 pad070[0x0D4 - 0x070];
+    u8 pad070[0x078 - 0x070];
+    void (*slot78)(Class86B60 *self); /* +0x078, func_8004D90C's own last call, `self` only */
+    void (*slot7C)(Class86B60 *self); /* +0x07C, func_8004D90C's own 2nd call, `self` only */
+    u8 pad080[0x0D4 - 0x080];
     /* +0x0D4, func_8004D814's own first call, arg1 = &D_800114E8, arg2 = 0. */
     void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, func_8004D578's own call, arg1 = &D_80086D44 */
-    u8 pad0DC[0x138 - 0x0DC];
+    u8 pad0DC[0x0F0 - 0x0DC];
+    /* +0x0F0, func_8004D90C's own 3rd call: `(self, self->unk4C->unk8,
+     * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
+     * func_8004D814's report) -- same offset number, unrelated table. */
+    void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
+    u8 pad0F4[0x124 - 0x0F4];
+    void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, func_8004D90C (arg1=0)/func_8004E230 (arg1=0x16) */
+    u8 pad128[0x138 - 0x128];
     /* +0x138, func_8004D788's forward target, only reached when its own
      * arg1's header-word low nibble == 0xB (a runtime-type-id gate) --
      * called with all three of func_8004D788's own parameters verbatim. */
@@ -962,7 +983,8 @@ struct Class86B60 {
      * the two classes together and the one slot this unit dispatches
      * through (+0x09C) isn't among that type's own known slots. */
     struct Class86B60Unk48Obj *unk48;  /* +0x048, func_8004D578 */
-    u8 pad04C[0x093 - 0x04C];
+    Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, func_8004D90C */
+    u8 pad050[0x093 - 0x050];
     /* +0x093, func_8004D898: address-of only, forwarded as
      * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
      * loop iteration; real extent beyond one byte unknown. */

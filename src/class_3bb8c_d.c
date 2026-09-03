@@ -40,7 +40,18 @@ void func_8004D898(Class86B60 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D90C);
+void func_8004D90C(Class86B60 *self, s32 arg1)
+{
+    func_8003DFBC()->slot60(self, arg1);
+    if (arg1 == 5) {
+        self->methods->slot124(self, 0);
+    }
+    if (arg1 == 0xA) {
+        self->methods->slot7C(self);
+        self->methods->slotF0(self, self->unk4C->unk8, 1);
+        self->methods->slot78(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D9D4);
 
