@@ -1,4 +1,49 @@
-# func_8001A3EC — MATCHED (53/53 words)
+# func_8001A3EC — MATCHED (53/53 words, as ordinary C)
+
+> **HEAD REWORK, round 13 (2026-09-03).** This was first matched with a
+> whole-function raw-register `__asm__` transcription (preserved below for
+> the record). **It is reachable as ordinary C, and now is** — six lines,
+> byte-exact, whole image green:
+>
+> ```c
+> void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+>                    PolyUV4 *uv2) {
+>     dst[0]->xy = src[0]->xy;
+>     dst[1]->xy = src[1]->xy;
+>     dst[2]->xy = src[2]->xy;
+>     dst[0]->uv = *uv0;
+>     dst[1]->uv = *uv1;
+>     dst[2]->uv = *uv2;
+> }
+> ```
+>
+> The lever is already documented and was already confirmed three times in
+> this project, twice before this round and once during it: **a struct whose
+> members are all `s8`/`s16` has alignment 2, and that is what makes a
+> whole-struct assignment compile to unaligned `lwl`/`lwr` + `swl`/`swr`
+> instead of aligned `lw`/`sw`** (DECOMPILATION_LEARNINGS; `func_8004B38C`,
+> `FlashbackRotation`, and delta's `func_8001E2E8` this round). `PolyXY8` is
+> four `s16`, `PolyUV4` is two, and both live in `include/code_8220.h` with
+> the alignment requirement stated next to them, because one stray `s32`
+> member silently breaks the copy.
+>
+> **Why this rework matters more than one function.** The judgement in the
+> original write-up was that a whole-function `__asm__` was justified because
+> the body is straight-line and frameless. That is not the test. The test is
+> whether a C form EXISTS: `func_800195EC` in `code_8220_b` earns its inline
+> asm because GTE `rtpt`/`nclip`/`cfc2` have no C spelling at all, and
+> CLAUDE.md HARD RULE 6's exception is scoped to exactly that. An unaligned
+> struct copy is merely awkward to TYPE, which is a different thing, and the
+> original text cited `func_800195EC` as precedent for it — so left standing
+> this would have become the precedent for transcribing any hard-to-type
+> function. Every other `__asm__` block remaining in `code_8220_c` is
+> `swc2`-only and legitimate; this was the only avoidable one.
+>
+> **And "no C form exists" deserves the same standard as a toolchain lead:
+> try the documented idiom and fail before asserting it.** The original
+> attempt log records avoiding "guessing a struct type precise enough to
+> force `lwl`/`lwr` at two non-adjacent offsets" — but that struct type was
+> not a guess, it was written down.
 
 Unit: `src/code_8220_c.c`. Copies three unaligned 8-byte fields
 (`arg1[0]`/`[4]`/`[8]` -> `arg0[0]`/`[4]`/`[8]`, treating `arg0`/`arg1` as
@@ -8,7 +53,14 @@ respectively) into `dst+0x10`. Called by `func_8001A4C0` (this unit, next
 in the queue), which forwards its own unused `a2`/`a3` straight through as
 this function's `arg2`/`arg3`.
 
-## Final source
+## Superseded original source (raw-register `__asm__` transcription)
+
+Kept for the record. Two problems beyond being unnecessary: it reads the
+argument registers `$4`-`$7` and `0x10($sp)` by number rather than through
+operands, bypassing its own declared parameters entirely; and it lists `$5`
+as a clobber while also relying on it as an input.
+
+### Original source
 
 ```c
 /*

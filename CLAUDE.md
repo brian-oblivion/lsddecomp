@@ -57,6 +57,25 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    flagged the tension; the head confirmed the precedent with
    `grep -rcE '"[rm]" *\(' src/` rather than by reasoning about intent.
 
+   **The exception is scoped to "no C form EXISTS", not to "hard to type in
+   C", and the difference is not a judgement call either.** GTE
+   `rtpt`/`nclip`/`cfc2` and COP2 `swc2`/`lwc2` have no C spelling; an
+   awkward unaligned struct copy has one. Round 13 matched
+   `func_8001A3EC` with a whole-function raw-register `__asm__` on the
+   reasoning that its body is straight-line and frameless, citing the GTE
+   function above as precedent. The head reworked it to six lines of
+   ordinary C, byte-exact, using an idiom that was already written down and
+   already confirmed three times (all-`s8`/`s16` struct -> alignment 2 ->
+   whole-struct assignment compiles to `lwl`/`lwr` + `swl`/`swr`). Left
+   standing it would have become the precedent for transcribing any
+   hard-to-type function, which is what `INCLUDE_ASM` already does, more
+   honestly and without pretending to be C.
+
+   So: **"there is no C form" is a claim, and it earns the same standard as
+   a toolchain lead — try the documented idiom, fail, and say so.** If you
+   do write a whole-function `__asm__`, name the instruction that has no C
+   spelling. If you cannot name one, it is not this exception.
+
    Two traps inside the exception, both measured in round 13, both cheap to
    hit and expensive to diagnose:
 

@@ -145,8 +145,37 @@ extern s32 func_800195EC(void *arg0, void *arg1);
  * code_8220_c, round 13. */
 extern void func_8001A268(void *prim, s32 code);
 
-/* Unaligned struct-field copy helpers, code_8220_c (round 13). */
-extern void func_8001A3EC(void *dstArr, void *srcArr, void *src0, void *src1, void *src2);
+/* func_8001A3EC's payload types (round 13). Both are ALL-s16 and that is
+ * load-bearing: all-s16 members give alignment 2, which is what makes a
+ * whole-struct assignment compile to unaligned lwl/lwr + swl/swr instead of
+ * aligned lw/sw. See DECOMPILATION_LEARNINGS, "A struct whose members are
+ * all s8/s16 has alignment 2". One stray s32 member and the copy stops
+ * matching. */
+typedef struct PolyXY8 {
+    s16 a;
+    s16 b;
+    s16 c;
+    s16 d;
+} PolyXY8;
+
+typedef struct PolyUV4 {
+    s16 u;
+    s16 v;
+} PolyUV4;
+
+/* func_8001A3EC's element type. Only the 8-byte payload at +0x000 and the
+ * 4-byte payload at +0x010 are touched by that function; the span between
+ * is opaque from it alone. */
+typedef struct PolyVtx {
+    PolyXY8 xy;                  /* +0x000 */
+    u8 pad008[0x010 - 0x008];
+    PolyUV4 uv;                  /* +0x010 */
+} PolyVtx;
+
+/* Unaligned struct-field copy helper, code_8220_c (round 13). Takes two
+ * 3-element arrays of PolyVtx pointers plus three UV sources. */
+extern void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
+                          PolyUV4 *uv1, PolyUV4 *uv2);
 
 /* gp_rel-blocked (docs/research/gp-relative-blocker.md), code_8220_c
  * round 13 -- see docs/match-reports/func_8001A380.md. Declared here only

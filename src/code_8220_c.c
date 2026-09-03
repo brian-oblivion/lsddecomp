@@ -81,67 +81,16 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A380);
  * the o32-ish calling convention (5th integer arg) and is read directly
  * from 0x10($sp) rather than through a C-level operand.
  */
-void func_8001A3EC(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4)
-{
-    (void)arg0;
-    (void)arg1;
-    (void)arg2;
-    (void)arg3;
-    (void)arg4;
-    __asm__ volatile (
-        "lw $3, 0x0($4)\n\t"
-        "lw $2, 0x0($5)\n\t"
-        "lw $8, 0x10($sp)\n\t"
-        "lwl $9, 0x3($2)\n\t"
-        "lwr $9, 0x0($2)\n\t"
-        "lwl $10, 0x7($2)\n\t"
-        "lwr $10, 0x4($2)\n\t"
-        "swl $9, 0x3($3)\n\t"
-        "swr $9, 0x0($3)\n\t"
-        "swl $10, 0x7($3)\n\t"
-        "swr $10, 0x4($3)\n\t"
-        "lw $3, 0x4($4)\n\t"
-        "lw $2, 0x4($5)\n\t"
-        "nop\n\t"
-        "lwl $9, 0x3($2)\n\t"
-        "lwr $9, 0x0($2)\n\t"
-        "lwl $10, 0x7($2)\n\t"
-        "lwr $10, 0x4($2)\n\t"
-        "swl $9, 0x3($3)\n\t"
-        "swr $9, 0x0($3)\n\t"
-        "swl $10, 0x7($3)\n\t"
-        "swr $10, 0x4($3)\n\t"
-        "lw $3, 0x8($4)\n\t"
-        "lw $2, 0x8($5)\n\t"
-        "nop\n\t"
-        "lwl $5, 0x3($2)\n\t"
-        "lwr $5, 0x0($2)\n\t"
-        "lwl $9, 0x7($2)\n\t"
-        "lwr $9, 0x4($2)\n\t"
-        "swl $5, 0x3($3)\n\t"
-        "swr $5, 0x0($3)\n\t"
-        "swl $9, 0x7($3)\n\t"
-        "swr $9, 0x4($3)\n\t"
-        "lw $2, 0x0($4)\n\t"
-        "lwl $3, 0x3($6)\n\t"
-        "lwr $3, 0x0($6)\n\t"
-        "nop\n\t"
-        "swl $3, 0x13($2)\n\t"
-        "swr $3, 0x10($2)\n\t"
-        "lw $2, 0x4($4)\n\t"
-        "lwl $3, 0x3($7)\n\t"
-        "lwr $3, 0x0($7)\n\t"
-        "nop\n\t"
-        "swl $3, 0x13($2)\n\t"
-        "swr $3, 0x10($2)\n\t"
-        "lw $2, 0x8($4)\n\t"
-        "lwl $3, 0x3($8)\n\t"
-        "lwr $3, 0x0($8)\n\t"
-        "nop\n\t"
-        "swl $3, 0x13($2)\n\t"
-        "swr $3, 0x10($2)\n\t"
-        : : : "$2", "$3", "$5", "$8", "$9", "$10", "memory");
+void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+                   PolyUV4 *uv2) {
+    dst[0]->xy = src[0]->xy;
+    dst[1]->xy = src[1]->xy;
+    dst[2]->xy = src[2]->xy;
+    dst[0]->uv = *uv0;
+    dst[1]->uv = *uv1;
+    dst[2]->uv = *uv2;
 }
+
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A4C0);
 
