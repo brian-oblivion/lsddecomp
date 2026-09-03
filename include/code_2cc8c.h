@@ -498,7 +498,7 @@ struct Unk18ObjMethods {
        still queued), func_8003EBF8 (+0x07C, still queued), func_8003EC2C
        (+0x080, the documented gp_rel blocker -- NOT decompiled here). */
     void (*slot78)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x078, retyped round 14 once func_8003EBC4 (its own occupant) confirmed the shape */
-    void (*slot7C)(Unk18Obj *self, void *a1); /* +0x07C */
+    void (*slot7C)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x07C, retyped round 14 once func_8003EBF8 (its own occupant) confirmed the shape */
     void (*slot80)(Unk18Obj *self, void *a1); /* +0x080 */
     u8 pad084[0x090 - 0x084];
     void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
@@ -548,7 +548,10 @@ struct Unk18Obj {
        +0x18/+0x1C) confirmed the shape; func_8003EACC's own use (only the
        address, forwarded to func_8003F2AC) is unaffected by the retype. */
     Vec3_2cc8c unk14;
-    u8 pad20[0x030 - 0x020];
+    /* +0x020, round 14: another Vec3, written wholesale by func_8003EBF8
+       from its own arg1 -- same shape/evidence as unk14 just above. */
+    Vec3_2cc8c unk20;
+    u8 pad2C[0x030 - 0x02C];
     s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
@@ -630,6 +633,7 @@ extern void func_8003F2AC(void *arg0);
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EB84(Unk18Obj *self);
 void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
+void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);

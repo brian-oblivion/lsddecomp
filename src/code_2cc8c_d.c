@@ -101,7 +101,13 @@ void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EBF8);
+/* Sibling of func_8003EBC4: copies a1 wholesale into self->unk20, guarded
+ * by the same self->unk10 flag. */
+void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1) {
+    if (self->unk10 != NULL) {
+        self->unk20 = *a1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EC2C);
 
