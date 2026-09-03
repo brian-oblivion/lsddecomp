@@ -57,7 +57,8 @@ struct Node3bb8cE {
     u8 pad00[0x00C];
     s32 unkC;              /* +0x00C, func_8004E5D4 sets it (caller value); func_8004E940 nonzero-tests it; func_8004EA38/func_8004ECCC forward it as func_8004F32C's arg1 */
     s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to func_80050B18/func_80050B08/func_80050B28 */
-    u8 pad14[0x060 - 0x014];
+    s32 threads[4];        /* +0x014..+0x020, func_8004E5E4: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
+    u8 pad24[0x060 - 0x024];
     Res3bb8cE *unk60;      /* +0x060, tag 2 */
     Res3bb8cE *unk64;      /* +0x064, tag 5 */
     Res3bb8cE *unk68;      /* +0x068, zeroed only -- no setter in this unit */
@@ -84,6 +85,7 @@ extern s32 func_8004F4A4(void *self);
  * plain lw at increasing offsets), never gp-relative, so unaffected by the
  * project's gp_rel blocker. */
 extern s32 D_80086E78[4];
+extern s32 func_80038F7C(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
 /* Two format-string-like globals selected by func_8004E940 on self->unkC's
  * truth value; passed opaquely (never dereferenced in this unit). */
@@ -174,7 +176,26 @@ void func_8004E5D4(Node3bb8cE *self, s32 val)
     self->unk10 = val << 4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E5E4);
+extern void func_80024CE0(void);
+extern void func_80024CF0(void);
+
+s32 func_8004E5E4(Node3bb8cE *self)
+{
+    s32 i;
+    Node3bb8cE *cur;
+
+    func_80024CE0();
+    i = 0;
+    cur = self;
+    do {
+        cur->threads[0] = func_80038F7C(0xF4000001, D_80086E78[i], 0x2000, 0);
+        i++;
+        cur = (Node3bb8cE *)((u8 *)cur + 4);
+    } while (i < 4);
+    func_80024CF0();
+    func_8004F394(self);
+    return 1;
+}
 
 extern void func_8003902C(void);
 
@@ -247,7 +268,21 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
     return status;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E940);
+extern s32 func_80050918(s32 *arg0);
+
+s32 func_8004E940(Node3bb8cE *self)
+{
+    s32 retries;
+    s32 result;
+    s32 *path;
+
+    retries = 10;
+    do {
+        path = self->unkC != 0 ? &D_8008AA9C : &D_8008AAA4;
+        result = func_80050918(path);
+    } while (result == 0 && retries-- != 0);
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E9AC);
 
