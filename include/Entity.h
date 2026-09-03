@@ -42,6 +42,8 @@ typedef struct Unk100Obj Unk100Obj;
 typedef struct Unk100Methods Unk100Methods;
 typedef struct Unk94Obj Unk94Obj;
 typedef struct Unk94Methods Unk94Methods;
+typedef struct Unk5CObj Unk5CObj;
+typedef struct Unk5CMethods Unk5CMethods;
 typedef struct Unk4CObj Unk4CObj;
 typedef struct Unk4CMethods Unk4CMethods;
 typedef struct BasicClassMethods BasicClassMethods;
@@ -145,13 +147,16 @@ struct Unk94Methods {
     void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(unk94, 1, D_80089C94); return value unused at this, its only known call site */
     u8 pad048[0xB8 - 0x48];
     void (*slotB8)(Unk94Obj *self, void *arg1); /* called by func_80060B34 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
-    u8 pad0BC[0xCC - 0xBC];
+    u8 pad0BC[0xC4 - 0xBC];
+    void (*slotC4)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80062730 (Entity_e) as slotC4(unk94, 0x80, 0) and slotC4(unk94, -N, 1); return value unused at both known call sites, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
+    u8 pad0C8[0xCC - 0xC8];
     void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(unk94, -0x64, 0); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
     u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
     u8 pad104[0x130 - 0x104];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
-    u8 pad134[0x1A0 - 0x134];
+    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80062730 (Entity_e) as slot134(unk94, 1, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
+    u8 pad138[0x1A0 - 0x138];
     s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
     u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5 -- value-returning, not void */
@@ -161,6 +166,21 @@ struct Unk94Obj {
     Unk94Methods *methods; /* +0x00 */
     u8 pad04[0x14 - 0x04];
     EntityPos *unk14;        /* +0x14, read by func_8005E02C (its own +0x1C, i.e. y) */
+    u8 pad18[0x5C - 0x18];
+    Unk5CObj *unk5C;          /* +0x5C, dereferenced through its OWN vtable (see Unk5CObj's own comment) by func_80062730 (Entity_e) -- yet another instance of the class-framework object-pointer-at-a-field convention, same shape as Entity::unk4C/Entity::unk100 */
+};
+
+/* Object pointed to by `Unk94Obj::unk5C` -- named for the offset it sits at
+ * in ITS parent, same convention as `Unk94Obj`/`Unk4CObj`/`Unk100Obj` being
+ * named for the offset they sit at in THEIRS (`Entity`). Shape beyond the
+ * one slot reached so far is unknown. */
+struct Unk5CMethods {
+    u8 pad000[0x64];
+    void (*slot64)(Unk5CObj *self, void *arg1); /* called by func_80062730 (Entity_e) as slot64(unk94->unk5C, D_8008AC1C); no other argument passed (only self+arg1 set up before the jalr) */
+};
+
+struct Unk5CObj {
+    Unk5CMethods *methods; /* +0x00 */
 };
 
 /* Object pointed to by `Entity::unk4C` (previously modeled as a plain `s32`
