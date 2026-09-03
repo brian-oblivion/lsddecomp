@@ -32,7 +32,20 @@ void func_8003DFDC(Obj86B60 *self)
     self->methods->slot40(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E030);
+void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
+{
+    s32 header;
+
+    func_80018390()->slot38(self, arg1, arg2);
+    header = arg1->target->header & 0xF;
+    if (header == 1) {
+        self->methods->slot54(self, arg1, arg2);
+    } else if (header == 2) {
+        self->methods->slot58(self, arg1, arg2);
+    } else if (header == 5) {
+        self->methods->slot5C(self, arg1, arg2);
+    }
+}
 
 void func_8003E100(Obj86B60 *self)
 {

@@ -37,6 +37,8 @@ typedef struct Unk64ElemMethods Unk64ElemMethods;
 typedef struct Unk68Obj Unk68Obj;
 typedef struct Unk68ObjMethods Unk68ObjMethods;
 typedef struct SrcDesc SrcDesc;
+typedef struct HeaderObj HeaderObj;
+typedef struct EventArg EventArg;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -78,6 +80,22 @@ typedef struct SrcDesc SrcDesc;
  *   future unit's allocator call reveals a literal byte count for any of
  *   these three classes, record it here.
  */
+
+/*
+ * A generic "event" argument, round 13: `arg1->target->header` is read by
+ * func_8003E030 to pick which of self->methods->slot54/58/5C to forward to.
+ * Same two-type shape as class_39e08.h's own independent `EventArg`/
+ * `HeaderObj` local view (a `target` pointer to an object whose first word
+ * is a low-nibble-coded header/kind value) -- this unit keeps its own
+ * separate local view per the project's established convention. Only the
+ * one field/offset func_8003E030 touches is modelled.
+ */
+struct HeaderObj {
+    s32 header; /* +0x000 */
+};
+struct EventArg {
+    HeaderObj *target; /* +0x000 */
+};
 
 /*
  * self->unk4C's pointee ("target"). Established from six independent
@@ -361,7 +379,21 @@ struct Obj86B60Methods {
                                                       func_8003E100 (already
                                                       matched); OBSERVED:
                                                       func_8003DFDC */
-    u8 pad044[0x060 - 0x044];
+    u8 pad044[0x054 - 0x044];
+    void (*slot54)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x054, IS
+                                                      func_8003E418;
+                                                      OBSERVED: func_8003E030 */
+    void (*slot58)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x058,
+                                                      external (func_8003C48C,
+                                                      STALL in code_2cc8c);
+                                                      OBSERVED: func_8003E030 */
+    void (*slot5C)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x05C, IS
+                                                      func_8003C51C (already
+                                                      matched there with a1
+                                                      typed s32 -- an
+                                                      independent local view,
+                                                      same shared slot);
+                                                      OBSERVED: func_8003E030 */
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
                                                       (func_8004D90C) */
     u8 pad064[0x070 - 0x064];
@@ -677,6 +709,10 @@ struct BasicClassMethodsCC8C {
                                   (code_8220.c); OBSERVED: func_8003DFDC */
     u8 pad00C[0x018 - 0x00C];
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
+    u8 pad01C[0x038 - 0x01C];
+    void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
+                                  BasicClass__func_18358 (code_8220_b);
+                                  OBSERVED: func_8003E030 */
 };
 
 extern BasicClassMethodsCC8C *func_80018390(void);
