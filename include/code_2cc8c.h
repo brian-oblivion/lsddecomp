@@ -1409,10 +1409,10 @@ struct Pair32E99C {
 struct ClassEAC0Methods {
     s32 header;                                        /* +0x000 */
     void *unk04;                                        /* +0x004, BasicClass__func_17eb0, inherited, unused here */
-    void (*ctor)(ClassEAC0Obj *self, void *a1, void *a2, s32 a3); /* +0x008, func_8004054C (this unit) */
+    void (*ctor)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x008, func_8004054C (this unit) */
     void (*dtor)(ClassEAC0Obj *self);                   /* +0x00C, func_8001CBA4, shared with Class6B5CCMethods */
     u8 pad010[0x040 - 0x010];
-    void (*slot40)(ClassEAC0Obj *self, s32 a1, s32 a2, s32 a3); /* +0x040, func_800405D0 (this unit) */
+    void (*slot40)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, func_800405D0 (this unit) */
     u8 pad044[0x0B8 - 0x044];
     /* +0x0B8, OBSERVED (this unit, func_800405D0/func_80040024/
        func_800400B0): dispatched as `(self, 1, tableEntry)` where
@@ -1517,7 +1517,7 @@ struct Class6E99CMethods {
     s32 (*slotDC)(Class6E99CObj *self);              /* +0x0DC, func_80040154 */
     void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, func_800402F0 */
     void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, func_800403F8 */
-    void (*slotE8)(Class6E99CObj *self, void *a1, void *a2); /* +0x0E8, func_8004042C */
+    void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, func_8004042C */
     void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, func_80040490 */
     void (*slotF0)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, func_800404B4 */
 };

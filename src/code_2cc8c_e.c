@@ -224,9 +224,25 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040154);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800402F0);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800403F8);
+void *func_800403F8(Class6E99CObj *self) {
+    if (self->unk78 == 0xF) {
+        return D_8006EAA8;
+    }
+    return &D_8006EA90[self->unk78 * 3];
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004042C);
+void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+    if (self->unkC != 0) {
+        self->unk88 = self->unk60;
+        self->unk8C = self->unk62;
+        self->unk90 = self->unk50;
+        self->unk94 = self->unk54;
+        self->unk60 = a1->x;
+        self->unk62 = a1->y;
+        self->unk50 = a2->a;
+        self->unk54 = a2->b;
+    }
+}
 
 void func_80040490(Class6E99CObj *self) {
     self->unk50 = self->unk90;
@@ -244,8 +260,34 @@ Class6E99CMethods *func_800404C0(void) {
     return &D_8006E99C;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800404D0);
+ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
+    ClassEAC0Obj *self;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004054C);
+    self = func_80017B34(0x6C);
+    if (self != NULL) {
+        func_800408BC()->ctor(self, a0, a1, a2);
+    }
+    return self;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800405D0);
+void func_8004054C(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+    func_8001E57C()->ctor(self);
+    self->methods = func_800408BC();
+    self->methods->slot40(self, a1, a2, a3);
+}
+
+void func_800405D0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+    self->unk44 = a3;
+    self->unk48 = 1;
+    self->unk4C = 0;
+    self->unk58 = 0;
+    self->unk5C = 0;
+    self->unk5E = 0;
+    self->unk60 = a1->x;
+    self->unk62 = a1->y;
+    if (a2 == NULL) {
+        a2 = D_8008A924;
+    }
+    self->methods->slotB8(self, 1, a2);
+    self->methods->slotCC(self, 0xD);
+}
