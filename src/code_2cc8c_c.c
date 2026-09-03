@@ -15,7 +15,15 @@ void *func_8003DFBC(void)
     return D_8006E730;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003DFCC);
+/* A 3-word struct (see code_2c054.h's own StreamTaskInitData local view);
+ * opaque here since this unit never dereferences it, only returns its
+ * address. */
+extern u8 D_8006E854[];
+
+void *func_8003DFCC(void)
+{
+    return D_8006E854;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003DFDC);
 
