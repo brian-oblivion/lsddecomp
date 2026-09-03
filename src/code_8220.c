@@ -84,7 +84,13 @@ void BasicClass__func_18040(BasicClass *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_180bc);
+void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
+{
+    if (*outChild == NULL) {
+        *cursor = self->children;
+    }
+    func_800183A0(outChild, cursor);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_180fc);
 
