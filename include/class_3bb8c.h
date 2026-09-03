@@ -1284,4 +1284,20 @@ typedef struct Result678_3bb8c_c {
     s32 *block;                                 /* +0x018, func_8004D678 writes block[1] */
 } Result678_3bb8c_c;
 
+/*
+ * func_8004E2E0's own New_X allocator target -- yet another small
+ * sibling class (same shape as `Class869D8`/`Class86AA0`/`Class86B60`
+ * above): pool-allocate a fixed 0x84-byte block, and if it succeeds,
+ * construct it through this table's own `ctor` slot at `+0x008`. Kept
+ * fully opaque (no instance type at all) since func_8004E2E0 never
+ * dereferences the allocation itself, only forwards it.
+ */
+typedef struct GenericCtorTable_3bb8c_d GenericCtorTable_3bb8c_d;
+struct GenericCtorTable_3bb8c_d {
+    u8 pad000[0x008];
+    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call */
+};
+
+extern GenericCtorTable_3bb8c_d *func_800507E8(void);
+
 #endif

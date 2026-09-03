@@ -139,6 +139,18 @@ Class86B60Methods *func_8004E2D0(void)
     return &D_80086B60;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E2E0);
+void *func_8004E2E0(void *arg0, void *arg1)
+{
+    void *self;
+
+    self = func_80017B34(0x84);
+    if (self == NULL) {
+        goto fail;
+    }
+    func_800507E8()->ctor(self, arg0, arg1);
+    return self;
+fail:
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E34C);
