@@ -39,7 +39,7 @@ Same precedent as `func_8001E57C`, documented in `include/class_3bb8c.h`.
 
 ## Provenance
 
-round 10, runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build once `func_8001CAF4`'s size-drift bug (see its
 own report) was fixed — this function's own diff was already 41/41 before
 that point; the WARNING about out-of-range bytes was entirely

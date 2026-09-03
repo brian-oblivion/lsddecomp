@@ -18,6 +18,6 @@ u32 func_8001D3CC(Class6B5CCObj *self, s32 a1) {
 
 ## Provenance
 
-round 10, runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
 group; see `func_8001D344.md`).

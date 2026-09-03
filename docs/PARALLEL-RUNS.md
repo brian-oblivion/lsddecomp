@@ -239,6 +239,24 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
      turned a "toolchain lead" into an ordinary match on the head's first
      attempt. Budget head time for it explicitly; it is worth more per token
      than one more runner.
+   - **Count the runner's matches from the COMMITS, not from its summary
+     table.** Round 11's alpha reported "8/8 attempted, 0 stalls" and listed
+     "4 functions untouched"; the branch held 7 commits, 7 reports and 5
+     remaining `INCLUDE_ASM`. The work was entirely sound — all 7 verified
+     byte-exact — but the count was wrong in both directions at once, and the
+     tell was a duplicated row in its own table. Nothing about a self-reported
+     count is load-bearing; the branch is:
+
+     ```sh
+     git log --oneline main..runner/<name>
+     git show runner/<name>:src/<unit>.c | grep -c INCLUDE_ASM
+     ```
+
+     This is cheap and it matters beyond bookkeeping: an over-counted "matched"
+     figure inflates the round's headline, and an under-counted "remaining"
+     list silently drops a function from the next round's queue. Alpha's
+     omitted function (`func_8003DAD4`) would have gone unstaffed on the
+     strength of a summary nobody checked.
    - **Check a report file exists for every function touched, matched ones
      included.** Mechanically: `python3 tools/progress.py` and read the unit's
      `stalled` column. A runner that filed several stalls and shows `stalled 0`

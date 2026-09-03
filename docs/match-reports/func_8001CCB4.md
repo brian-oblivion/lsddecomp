@@ -35,4 +35,4 @@ simply always live in a register here.
 
 ## Provenance
 
-round 2, runner charlie, unit code_d294. Matched on the first build.
+round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.

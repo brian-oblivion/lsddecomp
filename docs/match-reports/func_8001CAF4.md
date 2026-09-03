@@ -76,6 +76,6 @@ void *func_8001CAF4(Class6B5CCObj *self) {
 
 ## Provenance
 
-round 10, runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Both fixes above were found within the 30-attempt budget (2 rebuild
 iterations total).

@@ -783,12 +783,131 @@ code_2c054).**
   which is about the load width; this one is about the sign-extension
   strategy after a reload. (`func_8004C1C0`)
 
+#### Round 11 (62 matches across four fresh carves)
+
+- **GCC 2.6.3's CROSS-JUMP / tail-merge pass folds two source-distinct but
+  RTL-identical statements into one shared instruction, and a bare
+  `__asm__("")` does NOT stop it.** Cross-jump operates at block level, not on
+  local instruction scheduling, so the barrier has nothing to bite on. Two
+  independent runners hit this in different units in one round: two `i++;`
+  statements merged into one (`func_8003D3B0`), and an `if`-guard plus a
+  `do/while`'s own test — two textually identical calls — folded to a single
+  call site (`BasicClass__func_18040`). The fix is to remove the RTL identity
+  rather than to suppress the pass: fold the increment into the
+  branch-deciding expression (post-increment array index), or write the two
+  calls in the shape that keeps them distinct.
+
+- **THE DISCRIMINATOR for whether `__asm__("")` can help at all.** These two
+  look alike in a diff and need opposite responses:
+  - *Same instructions, different ORDER* — two independent, already
+    identically-registered instructions swapped. A bare `__asm__("")` fixes
+    it, including as a loop body's own last statement after a manual
+    increment. (`func_8003D2CC`)
+  - *Missing or duplicated instruction* from cross-jump merging. The barrier
+    does nothing; reshape the source. (`func_8003D3B0`,
+    `BasicClass__func_18040`)
+
+  This refines the project's standing register-vs-order rule rather than
+  replacing it: a barrier that changes WHICH REGISTER holds a value is still
+  banned, and a register-identity mismatch is still a stall.
+
+- **A single function that is one word short makes EVERY later function in
+  ROM order score near-zero at once — and the fingerprint is specific.**
+  `funcdiff`'s "differs outside range" count shows the SAME six-figure value
+  across all the affected functions. Check for that shared value BEFORE
+  debugging each function as its own bug, then fix the earliest function in
+  ROM address order; the rest resolve themselves. CLAUDE.md's "four ways a
+  score lies" already names address drift, but had no stated signature for
+  it. Three instances in one round, one of them caught and applied
+  deliberately by the runner that found it. (`func_80060710`, `func_80061070`,
+  `func_80060148`)
+
+- **Eager initialization, and its converse — neither is a default.** A struct
+  field or local whose value must survive an intervening call often has to be
+  read/initialized as the function's FIRST statement, because retail keeps it
+  in a callee-saved register across the call; the tell is a frame missing one
+  callee-saved register pair. (`func_80061070`, `func_80060148`,
+  `func_800605D0`) But the converse is equally real: `func_80060D80` matched
+  only by initializing at retail's actual delay-slot init point rather than
+  reflexively at the top. **Read the disassembly's init point per function.**
+
+- **A "unit-wide field-read order" is a per-function property, not an
+  invariant — measured, and falsified.** An `unk58 -> unk64 -> unk5C` read
+  order held across five functions in `code_2cc8c_b` and looked like a unit
+  convention worth assuming. `func_8003DE9C` violates it outright
+  (`unk58 -> unk60 -> unk64 -> unk4C`) and matched immediately when written in
+  its own literal disassembly order. The order tracks whichever field that
+  function's source references first. Recorded because the head explicitly
+  invited the generalization and the runner correctly reported the negative.
+
+- **A value that is only READ inside an `if` is not evidence it is only
+  ASSIGNED there.** Retail frequently computes and stores unconditionally and
+  gates only the call. Check whether the suspect store sits in a branch's
+  delay slot — which always executes — before trusting the naive C guard
+  scope. (`func_8003D4DC`, two independent instances in one function)
+
+- **Caching a loop bound that the source actually re-reads costs a whole
+  extra callee-saved register**, and it is diagnosable by a FRAME SIZE
+  mismatch (word count / saved-register count) rather than a register-identity
+  swap. The general rule the round converged on, from both ends: cache a
+  re-read struct field only across a CALL-FREE span, and reload it after any
+  intervening call. Charlie reached the same rule from the opposite direction
+  and it is stated once here rather than as two observations. (`func_8003D2CC`,
+  `func_8001CAF4`)
+
+- **Asymmetric vtable-pointer caching is not a contradiction.** One function
+  can legitimately cache `this->methods` for one call site and reload it fresh
+  after an intervening call. Read each call site independently rather than
+  imposing one policy on the function. (`func_80060B34`)
+
+- **GCC 2.6.3 at `-O2` does not eliminate a dead store into an address-taken
+  local**, even when a callee overwrites it unconditionally immediately after.
+  An initializer that looks logically redundant may still be load-bearing.
+  (`func_8001D204`)
+
+- **The same magic-multiply constant can encode two different divisors**
+  depending on an extra post-`mfhi` shift, so the hex constant alone does not
+  identify the divisor. (`func_8005FF7C`, `0x2AAAAAAB`)
+
+- **Branch-polarity is not reflexively "invert the small early exit".** When
+  a function returns a plain literal on both paths rather than reusing a
+  just-nulled register, the POSITIVE `if` can be the correct shape. Check
+  which block is retail's actual fall-through. A two-armed `if`/`else` can
+  also have correct per-arm VALUES with swapped LAYOUT — three residue words
+  vanished from one polarity flip. (`func_800181AC`, `func_80018208`)
+
+- **Per-call-site arity and typing, reconfirmed twice more.** A call site can
+  pass two arguments into a slot whose current occupant is a no-arg
+  `void(void)` no-op, and two functions can pass the same two stack slots
+  while treating one as a boolean and the other as a list cursor. This is the
+  established per-call-site convention, not a bug in either.
+  (`func_8001CBA4`, `func_8001D204`/`func_8001D280`)
+
 ### New residue classes opened this round (not yet closed)
 
 - **"Identical assignment reaching different merge points."** GCC tail-merges
   two identical `doDetach = 1;` statements that retail keeps separate.
   Unreached by reshaping, by `__asm__("")` barriers, or by the argument-register
-  test. (`func_8005DBF0`, 72/74 — the round's closest near-miss)
+  test. (`func_8005DBF0`, 72/74 — that round's closest near-miss)
+
+  **UPDATE (round 11): this class is reachable, and the lever is not the one
+  it looks like.** In `func_80060148` a bare `__asm__("")` placed in one of
+  the two merge candidates DID block the merge and reproduce retail's two
+  separate blocks (86/89 the moment it was added) — the first confirmed
+  instance of this class yielding to anything. But the function did not match
+  until a separate residue was fixed: retail computed a table address BEFORE
+  an adjacent store, where the natural narrative order writes the store first.
+  With the statements in retail's order, **GCC stopped performing the merge on
+  its own and the barrier was no longer needed** — it was removed and 89/89
+  reconfirmed on a clean rebuild.
+
+  So the merge was a SYMPTOM of wrong statement order, not an independent
+  optimiser quirk to be suppressed. When retrying `func_8005DBF0`, hunt the
+  statement-order cause first; reach for the barrier only as a diagnostic to
+  confirm the merge is what you are fighting. **And re-test removing any
+  barrier after fixing any other residue in the same function** — a later fix
+  can make an earlier barrier redundant, and the version without it is the one
+  to commit. (`func_80060148`, 89/89)
 - **Magic-multiply constant load POSITION.** A GCC-synthesized multiplier
   constant whose load placement has no direct C-source counterpart; two
   symmetric 3-word clusters, unmoved by six reshapes and by a late barrier
@@ -987,6 +1106,24 @@ Practical consequences:
   Resolve `<off>` with `tools/classtable.py <table> [--vs <base>]`; the `--vs`
   diff is the subclass's behaviour in one screen.
 - **60 classes, ~1425 method slots.** This is the game's backbone, not a corner.
+- **`BasicClass` is the ROOT of the framework, and its internals are now
+  matched** (round 11, `code_8220`, 16 functions byte-exact). Every object in
+  the game inherits this layout, so it is worth reading before working any
+  class:
+  - `BMemPMgrInit` builds a pool header (`freeListHead`, `poolSize`) over a
+    heap allocation. The pool seeding itself is in a `gp_rel`-blocked function.
+  - A `BasicClass` object owns **two pool-allocated singly-linked lists**:
+    `children` at `+0x004` and `parentRefs` at `+0x008` (back-references).
+  - `addChild`/`removeChild` dispatch **bidirectional notifications through
+    the CHILD's own vtable**, not the parent's — which is why a child class's
+    slots get called from code that appears to belong to the parent.
+  - Two underlying list primitives do the real work: `func_800181AC` (push)
+    and `func_80018208` (find-unlink-free).
+
+  The design was reconstructed from the callers alone BEFORE the primitives
+  were matched, and every extern declaration predicted that way turned out
+  correct against the real bodies — worth noting as evidence that reading a
+  class's callers is a reliable way into it. Layout in `include/code_8220.h`.
 - **A patchy `--vs` diff may mean you picked the wrong ancestor, not that
   there is no inheritance.** If a derived table's *high* slots line up
   byte-for-byte with some other candidate table's high slots, re-run `--vs`
@@ -994,15 +1131,28 @@ Practical consequences:
   `code_1677c`'s class was found to descend from `D_8006E4F0`, an intermediate
   between `BasicClass` and itself, rather than directly from `BasicClass`.
   (`func_80026108`)
-- **`New_X` allocator wrappers are a recurring shape with a known residue.**
-  malloc → null check → constructor through the class's own slot `+0x008` →
-  return the allocation regardless of the constructor's return. The first one
-  attempted (`new_class_6d3c8`) stalled on a single delay-slot residue that no
-  `if`/`goto`/temp-variable reshaping and no `__asm__("")` barrier closed.
-  Since roughly 60 classes share this shape, this is the highest-value single
-  target for the first permuter round: one source shape that closes it
-  plausibly unblocks every `New_X` in the game. Do not re-derive the same 20+
-  manual attempts per class in the meantime.
+- **`New_X` allocator wrappers are a recurring shape, and there are TWO
+  variants — only one of them is stalled.** Both start malloc → null check →
+  constructor through the class's own slot `+0x008`. They differ in what they
+  do with the constructor's return:
+  - *Checked variant* — test the ctor's return, free the block and return
+    `NULL` on failure, else return the allocation. **This one matches.**
+    `New_Entity` (`src/Entity.c`) and `New_Class6B5CC` (`func_8001CA94`,
+    24/24, round 11, first attempt) are both this shape.
+  - *Return-regardless variant* — ignore the ctor's return and hand back the
+    allocation unconditionally. `new_class_6d3c8` stalls here on a single
+    delay-slot residue that no `if`/`goto`/temp-variable reshaping and no
+    `__asm__("")` barrier closed.
+
+  **This entry previously said `New_X` as a whole was the highest-value single
+  permuter target, on the reading that the shape was unmatched anywhere.** That
+  was too broad: the checked variant was already matched in `Entity.c` when the
+  claim was written, and round 11 matched a second one cold on the first
+  attempt. The permuter target is specifically the RETURN-REGARDLESS variant,
+  which is a smaller population — so before spending a permuter round on it,
+  count how many `New_X` sites actually ignore the ctor return rather than
+  assuming all ~60 classes do. Do not re-derive the same 20+ manual attempts
+  per class in the meantime.
 
 ## Open questions
 

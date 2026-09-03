@@ -6,6 +6,127 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-03 — round 11: 4 runners, 62 matches, and a headline number that was wrong
+
+**353 -> 415 matched (26.03% -> 30.60% of game code; past thirty percent).
+Build green in main after every one of the eight merges.** Four runners, each
+given a freshly carved unit and then sent back into the SAME unit for a second
+pass. `code_8220` became the project's fifth fully-worked unit (16 matched, 4
+correctly-blocked, 0 fresh).
+
+**A correction before any gate: the project's stated percentage was wrong.**
+`progress.py` was warning about two stale `asm/*.s` files left behind by an
+earlier rename. Because they were not declared in the splat config the tool
+IGNORED them — and ignoring them removed real functions from the denominator.
+Uncarved game code read 464 when the truth was 902, and game-code completion
+read **38.13% when it was actually 26.03%**. Deleting the two files and
+re-extracting fixed it. No previously claimed match is affected; every one of
+them still verifies. What was wrong was only the headline, and it was wrong in
+the flattering direction for an unknown number of rounds. **A `progress.py`
+warning is not cosmetic — clear it before reading the numbers under it.**
+
+**Gates.** 4a clean: no other head, no foreign commits, no pre-existing
+worktrees. Gate 1 found **3** true fresh functions, far under (4 runners x 8),
+so Gate 2 fired and the head carved four 20-function slices before provisioning
+anything: `code_2cc8c_b`, `Entity_d`, `code_d294`, `code_8220`. Blocker-density
+census at carve time, per round 10's lesson — three of the four came out at
+zero blocked functions, `code_8220` at 4 of 20. `fresh` went 3 -> 80. Each
+carve was verified green on its own before the next was attempted.
+
+**Runners.** All four went 8-for-8 on the first pass, so all four were sent
+back into their own units (§3c) rather than idled. charlie took **16** on
+`code_d294` and reconstructed a whole class from nothing — no header existed
+for that block when it started. delta took **15** and closed out `code_8220`
+entirely, reconstructing `BasicClass`, the ROOT of the game's class framework,
+from its callers before matching the primitives that confirmed it. bravo took
+**16** on `Entity_d`, alpha **15** on `code_2cc8c_b`. Zero stalls across all
+62 matches — the four carves were unusually clean ground, and the second
+passes hit the larger bodies without a single unrecoverable residue.
+
+**The round's best finding is a fingerprint, not a match.** bravo found that
+one function being a single word short makes EVERY later function in ROM order
+score near-zero simultaneously, and that the tell is `funcdiff`'s "differs
+outside range" showing the SAME six-figure value across all of them. CLAUDE.md
+already named address drift as one of the four ways a score lies; it had no
+stated signature. bravo then hit it a second time and applied the rule
+deliberately instead of debugging downstream symptoms.
+
+**Two runners independently hit GCC 2.6.3's cross-jump/tail-merge pass** in
+different units — alpha establishing that a bare `__asm__("")` cannot suppress
+it (cross-jump is block-level, not local scheduling), delta finding it folds
+two textually identical calls into one site. Two independent instances in one
+round makes it a rule. alpha then produced the discriminator that makes the
+pair actionable: same instructions in a different ORDER means a barrier helps;
+a missing or duplicated instruction from cross-jumping means it will not.
+
+**An open residue class moved.** bravo reached the "identical assignment
+reaching different merge points" class (open since `func_8005DBF0`, 72/74)
+with a barrier — but the function only matched once a statement-order fix
+removed the root cause, after which the barrier was unnecessary and was
+removed. So the merge was a SYMPTOM of wrong statement order. The retry lever
+for `func_8005DBF0` is the statement order, not the barrier.
+
+**A generalization the head invited and a runner correctly refused.** Asked
+whether a unit-wide field-read order held, alpha found it held for five
+functions and was violated outright by a sixth, which matched immediately in
+its own literal order. Reported as a negative rather than as the confirmation
+the question was fishing for. The order is per-function.
+
+**Three inherited "facts" corrected, all by measurement:**
+
+- PARALLEL-RUNS Gate 2 listed `0xA8C` as a text-pointer rodata slot needing
+  attachment, "confirmed against the data". It holds zero pointers — 12 ASCII
+  words, one printf format string. `code_8220` carved and linked green with it
+  left standalone. (`0xFD8` was re-surveyed and does stand: 179 real pointers.)
+- DECOMPILATION_LEARNINGS called `New_X` allocator wrappers the highest-value
+  permuter target on the reading that the shape was unmatched. There are two
+  variants: the CHECKED one already matched in `Entity.c` and matched again
+  cold this round (`func_8001CA94`, first attempt), and the RETURN-REGARDLESS
+  one that actually stalls. The permuter target is the second, smaller
+  population — count it before spending a round on it.
+- A match report proposed promoting a THIRD standing blocker screen
+  (`nop_mflo_mfhi`). Measured: 2 of 181 queued functions, against `gp_rel`'s
+  125. Not falsified — zero matched C functions contain the pattern — but far
+  too narrow for a standing grep. Recorded in the blocker doc with the number
+  to re-measure as carving proceeds.
+
+**A head-protocol lesson, from the head's own near-miss.** alpha reported
+"8/8 attempted" and listed 4 functions remaining; the branch held 7 commits, 7
+reports and 5 remaining `INCLUDE_ASM`. The work was sound and all 7 verified,
+but the count was wrong in both directions and the omitted function
+(`func_8003DAD4`) would have silently dropped out of the next round's queue.
+Count from the commits, never from the summary table. Added to §3.
+
+**Also corrected:** charlie's 16 reports were labelled "round 10" and "round 2"
+(its own second pass), both ambiguous in the durable record. Relabelled to
+round 11 with dates.
+
+**Deliberately left, and why.** charlie stopped with 3 functions untouched
+(`func_8001CD60`, `func_8001CEB4`, `func_8001D008`) rather than rush
+unexplored fixed-point magic-constant division; alpha left the 5 largest in
+`code_2cc8c_b` (80-147 words); bravo left 3 (156-224 words). None were
+attempted, so none carries a report and all correctly read as `fresh`. That is
+honest bookkeeping, not an omission.
+
+**Next round.** Runners again, but Gate 2 will fire first: 14 fresh across
+three units is under (4 runners x 8), and 11 of those 14 are the large bodies
+three runners deliberately declined. Uncarved blocks available, derived at
+close of round:
+
+```
+305 class_3bb8c_d    274 code_179d8    113 code_2cc8c_c
+ 57 Entity_e          36 code_8220_b    35 code_d294_b
+```
+
+`code_179d8` remains the one to avoid — 43% blocked. `code_8220_b` and
+`code_d294_b` are the immediate continuations of the two blocks whose class
+designs were reconstructed this round, so they are the cheapest ground
+available despite being the smallest: the type vocabulary already exists.
+
+A permuter round is NOT indicated. This round produced **zero stalls**, so
+there is no near-miss residue to permute — the permuter's input is exactly
+what a clean round fails to generate.
+
 ## 2026-09-02 — round 10: 5 runners, 30 matches, and the head breaking its own rule
 
 **320 -> 350 matched (23.60% -> 25.81% of game code; past a quarter). Build

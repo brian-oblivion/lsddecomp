@@ -79,7 +79,7 @@ right before an epilogue.
 
 ## Provenance
 
-round 2, runner charlie, unit code_d294. 3 build iterations (initial
+round 11 (2026-09-03), runner charlie, unit code_d294, second pass. 3 build iterations (initial
 attempt, then one fix per residue above). Established `UnkOwner_d294`/
 `UnkOwnerMethods_d294` (the attach/detach target class, `+0x010`
 ctor-like/`+0x014` dtor-like slots) and `Class6B5CCSub14`'s
