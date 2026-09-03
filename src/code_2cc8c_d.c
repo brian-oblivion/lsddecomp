@@ -85,7 +85,9 @@ SubHandleObj *func_8003F230(Unk18Obj *self) {
     return self->unkB0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F23C);
+void func_8003F23C(Unk18Obj *self, s32 a1) {
+    self->unkB4 = a1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F244);
 
