@@ -1362,10 +1362,11 @@ struct Obj6EAC0Methods {
     void (*slot50)(Obj6EAC0 *self); /* +0x050, IS func_80040C00 (derived,
                                   this unit) */
     u8 pad054[0x060 - 0x054];
-    void (*slot60)(Obj6EAC0 *self, s32 a1); /* +0x060, IS func_80040CD0
+    s32 (*slot60)(Obj6EAC0 *self, s32 a1); /* +0x060, IS func_80040CD0
                                   (derived, this unit), which recurses
                                   into a child's own slot60 with the same
-                                  a1 */
+                                  a1 and threads the return value through
+                                  as its own return (last-iteration wins) */
     s32 (*slot64)(Obj6EAC0 *self, s32 a1); /* +0x064, IS func_80040714
                                   (base, this unit) -- tail-returns a
                                   packed-bitfield accessor */
