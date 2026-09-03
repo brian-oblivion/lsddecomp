@@ -66,7 +66,13 @@ struct Class6B5CCSub14 {
     s32 unk18;                   /* +0x018, Vec3.x */
     s32 unk1C;                   /* +0x01C, Vec3.y */
     s32 unk20;                   /* +0x020, Vec3.z */
-    u8 pad24[0x044 - 0x024];
+    /* +0x024, round 12 (code_d294_b, func_8001D624): only its ADDRESS is
+     * taken (`&self->unk14->unk24`, forwarded to func_8001EE04 as a
+     * write-destination base) -- nothing dereferences through it in this
+     * unit's chosen functions, so it stays an opaque byte span rather than
+     * a typed field. Renamed from `pad24` now that something references it
+     * by name. */
+    u8 unk24[0x044 - 0x024];
     void *unk44;  /* +0x044, a second heap block (0x28 bytes, alloc'd by the ctor) */
     s32 unk48;    /* +0x048, zeroed by the ctor and by func_8001D1A4 (slot +0x050);
                    * set to `obj->unk14` by func_8001D0EC's "attach" */
@@ -147,6 +153,18 @@ struct GenericObj_d294 {
     void *unkC;                    /* +0x00C, func_8001D280 (still queued) compares this to a Class6B5CCObj* */
 };
 
+/* A third small "count + data" shape, seen only through func_8001D624's own
+ * 2nd argument (round 12): `unk0` is read once and multiplied by 8 to form
+ * func_8001EE04's own iteration count, and `&unk4` (the address only, never
+ * dereferenced here) is func_8001EE04's own source/dest base pointer. Real
+ * class identity unknown -- opaque past `unk4`'s own address, so `unk4` is
+ * left a single byte rather than a guessed element type. */
+typedef struct GenericCountList_d294 GenericCountList_d294;
+struct GenericCountList_d294 {
+    s32 unk0;  /* +0x000, multiplied by 8 to form func_8001EE04's count arg */
+    u8 unk4;   /* +0x004, address-only */
+};
+
 /* Class6B5CC's own table (D_8006B5CC). Only the slots this unit's chosen
  * functions actually dispatch through are typed; see the file banner above
  * for the full slot census from classtable.py. */
@@ -155,7 +173,13 @@ struct Class6B5CCMethods {
     void *unk04;                              /* +0x004, BasicClass__func_17eb0, inherited, unused here */
     void *(*ctor)(void *self);                /* +0x008, func_8001CAF4 (this unit) */
     void  (*dtor)(void *self);                /* +0x00C, func_8001CBA4 (this unit) */
-    u8 pad010[0x040 - 0x010];
+    u8 pad010[0x030 - 0x010];
+    /* +0x030, BasicClass__func_182cc, inherited verbatim (per the file
+     * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
+     * is a different unit's own ancestor code. func_8001D624 (round 12,
+     * this unit) dispatches through it as `(self, s32 arg1)`. */
+    void (*slot30)(Class6B5CCObj *self, s32 arg1);
+    u8 pad034[0x040 - 0x034];
     void (*slot40)(Class6B5CCObj *self);      /* +0x040, func_8001CE30 (this unit) */
     /* +0x044/+0x048, a `(self, s32 flag, void *data)` pair -- func_8001CE30
      * calls both with flag=1 and `data` pointing at a 3-entry table of
@@ -177,6 +201,16 @@ struct Class6B5CCMethods {
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as func_8001E57C above. */
     void (*slot5C)(Class6B5CCObj *self, s32 arg1);
+    /* +0x060..+0x09C: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
+     * (all this unit, all already matched) -- not typed here as struct
+     * fields because nothing dispatches through the table at these offsets;
+     * every call site invokes them directly by symbol name. */
+    u8 pad060[0x0A0 - 0x060];
+    /* +0x0A0, func_8001D6B4's own call target (round 12): dispatched with
+     * only `self`, per that function's own disassembly (`jalr $v0` with
+     * `$a0` untouched since function entry). func_8001D714 (still queued)
+     * is this slot's occupant per `tools/classtable.py D_8006B5CC`. */
+    void (*slotA0)(Class6B5CCObj *self);
 };
 
 /* MEASURED: func_8001E57C's whole body is `lui/addiu %hi/%lo(D_8006B5CC);
@@ -184,6 +218,13 @@ struct Class6B5CCMethods {
  * own vtable. See the file banner for the cross-unit precedent on why this
  * local 0-argument declaration doesn't need to agree with other units'. */
 extern Class6B5CCMethods *func_8001E57C(void);
+
+/* This unit's own vtable data, D_8006B5CC (see `tools/classtable.py
+ * D_8006B5CC` in the file banner above) -- func_8001E57C (round 12,
+ * code_d294_b) just returns `&D_8006B5CC`. Still rodata (not carved as C
+ * here), so only the address is declared, typed to the return of the one
+ * getter this unit implements. */
+extern Class6B5CCMethods D_8006B5CC;
 
 struct Class6B5CCObj {
     Class6B5CCMethods *methods; /* +0x000 */
@@ -208,14 +249,26 @@ struct Class6B5CCObj {
     Class6B5CCSub14 *unk14;     /* +0x014, the ctor's 0x50-byte allocation */
     s32 unk18;                  /* +0x018, zeroed by the ctor */
     u8 unk1C[0x020 - 0x01C];    /* unknown; not touched by this unit's chosen functions */
-    s32 unk20;                  /* +0x020, zeroed by the ctor. func_8001CC48's still-queued
-                                  * forward target func_8001E770 (code_d294_b.s) stores its
-                                  * own 2nd argument into this offset -- i.e. unk20 is
-                                  * genuinely a pointer once that function runs, not just an
-                                  * always-zero s32. Left untyped `s32` here since nothing
-                                  * THIS unit's chosen functions dereference through it; a
-                                  * later carve of code_d294_b should retype it. */
+    /* +0x020, zeroed by the ctor. func_8001CC48's still-queued forward
+     * target func_8001E770 (code_d294_b.s) stores its own 2nd argument into
+     * this offset. RETYPED round 12 (code_d294_b, func_8001D600): that
+     * function passes `self->unk20` straight through as func_8001F51C's own
+     * `void *` arg0 (psyq_GsLinkObject4.s; func_8001F51C forwards it
+     * unmodified to func_8001F3B0, which dereferences it at +0x10) --
+     * genuinely a pointer, not an always-zero s32. Still opaque: nothing
+     * this unit's chosen functions dereference through it directly. */
+    void *unk20;
     s32 unk24;                  /* +0x024, zeroed by func_8001CE30 (this unit) */
+    /* +0x028, round 12 (code_d294_b): func_8001D6B4 sets this to its own
+     * `a1` (a plain `s32`, per m2c's own inference -- never dereferenced by
+     * this unit's chosen functions) when called with a2==4. */
+    s32 unk28;
+    s32 unk2C;  /* +0x02C, round 12 (func_8001D624): zeroed, alongside unk28 */
+    /* +0x030, round 12 (func_8001D624): set to that call's own 2nd argument
+     * for the duration of a single `self->methods->slot30(self, a2)`
+     * dispatch, then zeroed again right after -- reads like a "currently
+     * processing" scratch slot rather than a durable field. */
+    GenericCountList_d294 *unk30;
 };
 
 /* func_8001EC84 (asm/code_d294_b.s, still uncarved): reads a `{s16 whole;
@@ -260,6 +313,25 @@ extern void func_80012838(s32 arg0, void *dest);
  * from this unit) rather than generically. */
 extern void func_800183A0(GenericObj_d294 **out, GenericObj_d294 **cursor);
 
+/* func_8001F51C (asm/psyq_GsLinkObject4.s, Psy-Q library, not game code):
+ * fills a caller-supplied struct (its own arg1) from a small on-stack
+ * buffer via func_8001F3B0 (its own arg0 forwarded straight through). Its
+ * own last write to $v0 is leftover from an unrelated `lhu` a few
+ * instructions earlier, not a deliberate return value -- read as `void`.
+ * func_8001D600 (this unit, round 12) calls it as `func_8001F51C(self->unk20,
+ * dest)`; declared here only with the opaque `void *` shape that call site
+ * needs. */
+extern void func_8001F51C(void *arg0, void *dest);
+
+/* func_8001EE04 (asm/code_d294_c.s, the NEXT slice, still uncarved): an
+ * element-copy loop -- `count` iterations, 6 bytes/element, reading from
+ * `src` and writing (by way of func_80015D58, not decompiled here either)
+ * into `dest`. func_8001D624 (this unit, round 12) calls it with `src` and
+ * `dest` (its own arg0/arg1) equal to the SAME address -- read off its own
+ * disassembly (`addiu $a0,$s1,4` then `addu $a1,$a0,$zero`), not reasoned
+ * from the name. Declared only with the opaque shape that call site needs. */
+extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
+
 extern Class6B5CCObj *func_8001CA94(void);
 void *func_8001CAF4(Class6B5CCObj *self);
 void func_8001CBA4(Class6B5CCObj *self);
@@ -294,5 +366,17 @@ u32 func_8001D374(Class6B5CCObj *self, s32 a1);
 u32 func_8001D3A0(Class6B5CCObj *self, u32 a1);
 u32 func_8001D3CC(Class6B5CCObj *self, s32 a1);
 u32 func_8001D3F8(Class6B5CCObj *self, u32 a1);
+
+/* Round 12 (code_d294_b): four more self->unk10 bitfield siblings, same
+ * family as the five above. See src/code_d294_b.c for the per-function
+ * shift/width/return-type notes. */
+u32 func_8001D424(Class6B5CCObj *self, u32 a1);
+s32 func_8001D450(Class6B5CCObj *self, s32 a1);
+u32 func_8001D480(Class6B5CCObj *self, u32 a1);
+s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
+
+void func_8001D600(Class6B5CCObj *self, void *dest);
+void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
+void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
 
 #endif
