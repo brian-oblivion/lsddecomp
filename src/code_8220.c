@@ -69,7 +69,20 @@ void BasicClass__func_17ff0(BasicClass *self, BasicClass *child)
     child->methods->removeParentRef(child, self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_18040);
+void BasicClass__func_18040(BasicClass *self)
+{
+    BasicClass *child;
+    BasicClass **childPtr;
+    BasicClassListNode *cursor;
+
+    childPtr = &child;
+    cursor = self->children;
+    if (func_800183A0(childPtr, &cursor), child != NULL) {
+        do {
+            self->methods->removeChild(self, child);
+        } while (func_800183A0(childPtr, &cursor), child != NULL);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_180bc);
 
