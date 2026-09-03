@@ -28,6 +28,7 @@ extern u8 D_80089C7C[];
 extern u8 D_80089C94[];
 extern u8 D_80089C88[];
 extern u8 D_80089E5C[];
+extern u8 D_80089D24[];
 
 /* Forward declaration: func_80060710 is defined later in this file (higher
  * ROM address) but func_800604DC, at a lower address, calls it directly. */
@@ -391,8 +392,106 @@ void func_80061158(Entity *this) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80061198);
+void func_80061198(Entity *this, EntityMoodHandlerArg *out) {
+    s32 mood;
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80061400);
+    if (this->unkFC == 0) {
+        this->unk44 = rand() % 3;
+        if (this->unk44 == 0) {
+            this->methods->slot130(this);
+            this->methods->slotCC(this, 0x1800, 0);
+        }
+    }
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk44 != 0) {
+        mood = this->unk84;
+        if (mood < 0x1E) {
+            out->unk1C = 0xC;
+            out->unk20 = -1;
+        } else if (mood == 0x1E) {
+            out->unk1C = -2;
+        } else if (mood == 0x23) {
+            out->unk44 = 0x16;
+            out->unk48 = -2;
+        } else if (mood == 0x30) {
+            if (func_8005D714(this, &this->unk14->x, 0xF, 0xA)) {
+                if (func_8005D108(this, NULL, NULL, (void *)0xA, 0) != NULL) {
+                    this->unk100->methods->slotD4(this->unk100, this->unk50, 4, 0);
+                }
+                if (rand() & 1) {
+                    this->methods->slot30(this, 0xB);
+                }
+            }
+        } else if (mood == 0x3B) {
+            this->methods->slot160(this);
+            this->unk44 = 1;
+        }
+        return;
+    }
+    out->unk1C = 0xC;
+    out->unk20 = -1;
+    this->methods->slotC4(this, -0x200, 0);
+    if ((u32)(this->unkFC - 0x80) < 0xC2) {
+        this->methods->slotCC(this, -0x80, 0);
+    } else if (this->unkFC == 0x142) {
+        this->methods->slot12C(this);
+        this->unk44 = 1;
+    }
+}
+
+void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0) {
+        out->unk10 = 0;
+        out->unk1C = 0xC;
+        if (this->unk94->methods->slot200(this->unk94) == 6) {
+            this->unk44 = 0xB;
+        } else if (rand() % 3 == 0) {
+            this->unk44 = 0xC;
+        }
+    }
+    if (out->unk4 % 100 == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 0xC;
+        out->unk20 = -1;
+    }
+    if (this->unk44 == 0xB) {
+        if (this->methods->slot144(this, this->unk94) < 0x400) {
+            this->unk94->methods->slot130(this->unk94, 0);
+            this->unk44 = 0xD;
+            this->unkFC = 0;
+        }
+    } else if (this->unk44 == 0xC) {
+        if (this->methods->slot144(this, this->unk94) < 0x400) {
+            this->methods->slot130(this);
+            this->unk44 = 0xE;
+            this->unkFC = 0;
+        }
+    }
+    if (this->unk44 == 0xD) {
+        if (this->unkFC < 0x32) {
+            this->unk94->methods->slotCC(this->unk94, -0x14, 0);
+        } else if (this->unkFC < 0x1F4) {
+            this->unk94->methods->slotC8(this->unk94, (this->unkFC % 40 < 0x14) ? -5 : 5, 0);
+        } else if (this->unkFC == 0x1F4) {
+            this->methods->slot30(this, 0xC);
+        }
+    }
+    if (this->unk44 == 0xE) {
+        if (this->unkFC < 0xA) {
+            this->methods->slotCC(this, 0xC8, 0);
+            return;
+        }
+        if (this->unkFC == 0xA) {
+            out->unk1C = 0x12;
+            out->unk10 = 0;
+            out->unk30 = 3;
+            this->methods->slot44(this, 1, D_80089D24);
+            this->methods->slotC8(this, 0x960, 0);
+            this->methods->slotCC(this, 0x5DC, 0);
+            this->unk70->unk4->methods->slot60(this->unk70->unk4, 0);
+            this->unk44 = 1;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80061778);

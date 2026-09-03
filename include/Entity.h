@@ -44,6 +44,9 @@ typedef struct Unk94Obj Unk94Obj;
 typedef struct Unk94Methods Unk94Methods;
 typedef struct Unk4CObj Unk4CObj;
 typedef struct Unk4CMethods Unk4CMethods;
+typedef struct Unk70Obj Unk70Obj;
+typedef struct Unk70Sub Unk70Sub;
+typedef struct Unk70SubMethods Unk70SubMethods;
 typedef struct BasicClassMethods BasicClassMethods;
 typedef struct EntityPos EntityPos;
 typedef struct EntityMoodRow EntityMoodRow;
@@ -122,6 +125,7 @@ struct Unk100Methods {
     /* +0x50 */ void (*slot50)(Unk100Obj *self);                           /* called by func_8005D108 */
     /* +0x54 */ u8 pad54[0xD0 - 0x54];
     /* +0xD0 */ void (*slotD0)(Unk100Obj *self, void *arg1);                /* called by func_8005D108 */
+    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80061198 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0); return value unused at this, its only known call site */
 };
 
 struct Unk100Obj {
@@ -129,6 +133,11 @@ struct Unk100Obj {
 };
 
 extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
+
+/* Already matched in Entity.c (not INCLUDE_ASM), but not previously called
+ * from outside that unit -- func_80061198 (Entity_d) is its first cross-unit
+ * caller, hence the extern here rather than only a file-local definition. */
+extern Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 arg4);
 
 /* Object pointed to by `Entity::unk94`. NOT another `Entity`, despite +0x14
  * also holding an `EntityPos *` (same convention as `Entity::unk14`):
@@ -145,16 +154,18 @@ struct Unk94Methods {
     void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(unk94, 1, D_80089C94); return value unused at this, its only known call site */
     u8 pad048[0xB8 - 0x48];
     void (*slotB8)(Unk94Obj *self, void *arg1); /* called by func_80060B34 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
-    u8 pad0BC[0xCC - 0xBC];
-    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(unk94, -0x64, 0); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
+    u8 pad0BC[0xC8 - 0xBC];
+    void (*slotC8)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061400 (Entity_d) as slotC8(unk94, (this->unkFC % 40 < 0x14) ? -5 : 5, 0); return value unused at this, its only known call site */
+    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(unk94, -0x64, 0) and func_80061400 (Entity_d) as slotCC(unk94, -0x14, 0); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
     u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
     u8 pad104[0x130 - 0x104];
-    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
-    u8 pad134[0x1A0 - 0x134];
+    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 and func_80061400 (Entity_d), as slot130(unk94, 0), and by func_80061778 (Entity_d) as slot130(unk94, 1) */
+    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061778 (Entity_d) as slot134(unk94, 1, 1); return value unused at this, its only known call site */
+    u8 pad138[0x1A0 - 0x138];
     s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
     u8 pad1A4[0x200 - 0x1A4];
-    s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5 -- value-returning, not void */
+    s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5, and by func_80061400 (Entity_d), compared against 6 -- value-returning, not void */
 };
 
 struct Unk94Obj {
@@ -176,6 +187,25 @@ struct Unk4CMethods {
 
 struct Unk4CObj {
     Unk4CMethods *methods; /* +0x00 */
+};
+
+/* Object pointed to by `Entity::unk70`. func_80061400 (Entity_d) dereferences
+ * its own +0x04 to get a second, further object (`Unk70Sub`) and calls that
+ * one's own vtable slot +0x60 -- the same two-level class-framework idiom as
+ * `Unk94Obj`/`Unk100Obj`, just one hop deeper. Shape beyond the one slot
+ * reached here is unknown. */
+struct Unk70SubMethods {
+    u8 pad00[0x60];
+    void (*slot60)(Unk70Sub *self, s32 arg1); /* called by func_80061400 (Entity_d) as slot60(this->unk70->unk4, 0); return value unused at this, its only known call site */
+};
+
+struct Unk70Sub {
+    Unk70SubMethods *methods; /* +0x00 */
+};
+
+struct Unk70Obj {
+    u8 pad00[0x04];
+    Unk70Sub *unk4; /* +0x04, read by func_80061400 (Entity_d) */
 };
 
 /* Default arguments func_8005D108 substitutes when its own `name`/`arg2`
@@ -240,9 +270,12 @@ struct Entity {
     /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- func_8005E7F8 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
     /* +0x4A */ u8 pad4A[0x4C - 0x4A];
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by func_8005D418; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
-    /* +0x50 */ u8 pad50[0x58 - 0x50];
+    /* +0x50 */ s32 unk50;              /* read by func_80061198 (Entity_d), passed opaquely to this->unk100->methods->slotD4 as its arg1 */
+    /* +0x54 */ u8 pad54[0x58 - 0x54];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
-    /* +0x5C */ u8 pad5C[0x80 - 0x5C];
+    /* +0x5C */ u8 pad5C[0x70 - 0x5C];
+    /* +0x70 */ Unk70Obj *unk70;       /* read by func_80061400 (Entity_d), see Unk70Obj's own comment */
+    /* +0x74 */ u8 pad74[0x80 - 0x74];
     /* +0x80 */ s32 unk80;             /* read by func_8005E6F0/func_8005E7F8 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and func_8005EBB4 (compared to `out->unk4` as `this->unk80 - 1`) */
     /* +0x84 */ s32 unk84;             /* compared against a literal (func_8005EC98: `== 0xA`) or against `this->unk80 / 2` (func_8005E4D0) */
     /* +0x88 */ u8 pad88[0x94 - 0x88];
@@ -333,6 +366,11 @@ extern EntityMethods D_80089AD4;
  * is a safe read regardless of the real return type (same caveat as
  * func_8002CD08/func_8002CC84 above). */
 extern void func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
+
+/* Already matched in Entity_b.c (not INCLUDE_ASM), but not previously called
+ * from outside that unit -- func_80061778 (Entity_d) is its first cross-unit
+ * caller. */
+extern s32 func_8005E02C(Entity *this, s32 arg1);
 
 /* Second argument threaded through the moodIndex-selected event-dispatch
  * handlers (func_8005ED10, func_8005E480, func_8005E7A8, and the sibling
