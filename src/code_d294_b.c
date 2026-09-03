@@ -33,7 +33,14 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D4DC);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D568);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D600);
+/* Forwards self->unk20 (still opaque, retyped `void *` this round -- see
+ * include/code_d294.h) and its own 2nd argument straight through to
+ * func_8001F51C, untouched. func_8001F51C's own body (psyq_GsLinkObject4.s)
+ * has no deliberate return value -- see the extern's own comment -- so this
+ * wrapper is void, not `return func_8001F51C(...)`. */
+void func_8001D600(Class6B5CCObj *self, void *dest) {
+    func_8001F51C(self->unk20, dest);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D624);
 

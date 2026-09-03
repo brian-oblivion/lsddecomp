@@ -215,13 +215,15 @@ struct Class6B5CCObj {
     Class6B5CCSub14 *unk14;     /* +0x014, the ctor's 0x50-byte allocation */
     s32 unk18;                  /* +0x018, zeroed by the ctor */
     u8 unk1C[0x020 - 0x01C];    /* unknown; not touched by this unit's chosen functions */
-    s32 unk20;                  /* +0x020, zeroed by the ctor. func_8001CC48's still-queued
-                                  * forward target func_8001E770 (code_d294_b.s) stores its
-                                  * own 2nd argument into this offset -- i.e. unk20 is
-                                  * genuinely a pointer once that function runs, not just an
-                                  * always-zero s32. Left untyped `s32` here since nothing
-                                  * THIS unit's chosen functions dereference through it; a
-                                  * later carve of code_d294_b should retype it. */
+    /* +0x020, zeroed by the ctor. func_8001CC48's still-queued forward
+     * target func_8001E770 (code_d294_b.s) stores its own 2nd argument into
+     * this offset. RETYPED round 12 (code_d294_b, func_8001D600): that
+     * function passes `self->unk20` straight through as func_8001F51C's own
+     * `void *` arg0 (psyq_GsLinkObject4.s; func_8001F51C forwards it
+     * unmodified to func_8001F3B0, which dereferences it at +0x10) --
+     * genuinely a pointer, not an always-zero s32. Still opaque: nothing
+     * this unit's chosen functions dereference through it directly. */
+    void *unk20;
     s32 unk24;                  /* +0x024, zeroed by func_8001CE30 (this unit) */
 };
 
@@ -267,6 +269,16 @@ extern void func_80012838(s32 arg0, void *dest);
  * from this unit) rather than generically. */
 extern void func_800183A0(GenericObj_d294 **out, GenericObj_d294 **cursor);
 
+/* func_8001F51C (asm/psyq_GsLinkObject4.s, Psy-Q library, not game code):
+ * fills a caller-supplied struct (its own arg1) from a small on-stack
+ * buffer via func_8001F3B0 (its own arg0 forwarded straight through). Its
+ * own last write to $v0 is leftover from an unrelated `lhu` a few
+ * instructions earlier, not a deliberate return value -- read as `void`.
+ * func_8001D600 (this unit, round 12) calls it as `func_8001F51C(self->unk20,
+ * dest)`; declared here only with the opaque `void *` shape that call site
+ * needs. */
+extern void func_8001F51C(void *arg0, void *dest);
+
 extern Class6B5CCObj *func_8001CA94(void);
 void *func_8001CAF4(Class6B5CCObj *self);
 void func_8001CBA4(Class6B5CCObj *self);
@@ -309,5 +321,7 @@ u32 func_8001D424(Class6B5CCObj *self, u32 a1);
 s32 func_8001D450(Class6B5CCObj *self, s32 a1);
 u32 func_8001D480(Class6B5CCObj *self, u32 a1);
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
+
+void func_8001D600(Class6B5CCObj *self, void *dest);
 
 #endif
