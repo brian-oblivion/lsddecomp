@@ -14,6 +14,7 @@ extern u8 D_80089E20[];
 extern u8 D_80089DCC[];
 extern u8 D_80089CB8[];
 extern u8 D_80089E2C[];
+extern u8 D_80089E38[];
 
 void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
@@ -129,7 +130,10 @@ void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC8(this, (this->unkFC % 20 < 10) ? 0x20 : -0x20, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064CA4);
+void func_80064CA4(Entity *this, EntityMoodHandlerArg *out) {
+    func_80062570(this, out);
+    this->methods->slot48(this, 1, D_80089E38);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064CEC);
 

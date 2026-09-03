@@ -421,4 +421,9 @@ struct EntityMoodHandlerArg {
     s32 unk48;        /* +0x48, written by func_8005E4D0 only (paired with unk44) */
 };
 
+/* Already matched in Entity_e.c (not INCLUDE_ASM), but not previously called
+ * from outside that unit -- func_80064CA4 (Entity_g) is its first cross-unit
+ * caller, forwarding its own (this, out) straight through. */
+extern void func_80062570(Entity *this, EntityMoodHandlerArg *out);
+
 #endif
