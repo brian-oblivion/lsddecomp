@@ -433,6 +433,12 @@ struct Unk18AcObj {
  */
 struct GenericObjMethods {
     s32 header; /* +0x000 */
+    /* +0x050/+0x054, round 14 (func_8003F04C's own call site): dispatched
+       as `(self)` only. Occupants unknown (self->unkC's real class is not
+       otherwise identified in this unit). */
+    u8 pad004[0x050 - 0x004];
+    void (*slot50)(GenericObj *self); /* +0x050, return value unused */
+    s32 (*slot54)(GenericObj *self);  /* +0x054, return stored into self->unk74 */
 };
 struct GenericObj {
     GenericObjMethods *methods; /* +0x000 */
@@ -690,6 +696,25 @@ extern void func_8003FBE4(s32 a0);
    disagree). */
 extern void func_80024AE4(u8 a0, u8 a1, u8 a2);
 
+/* ResetGraph (asm/psyq_GsLinkObject4.s, PsyQ library, LIBGPU.H's own
+   declared signature is `extern int ResetGraph(int mode);` -- declared
+   locally here rather than including the whole SDK header, matching this
+   unit's existing PsyQ-declaration style). func_8003F04C calls it with a
+   literal 1 and ignores the return. */
+extern s32 ResetGraph(s32 mode);
+
+/* func_80023DA0 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+   func_8003F04C calls it with self->unk58's own three bytes (read
+   unsigned, same "writer reads signed, this reader reads unsigned"
+   situation as unk5B/func_8003EEC0) plus one more word; declared here
+   only with that call site's own shape. */
+extern void func_80023DA0(u8 a0, u8 a1, u8 a2, s32 a3);
+
+/* func_8003FBF4 (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
+   func_8003F04C calls it with one of the same unk74-indexed slots used
+   just above. */
+extern void func_8003FBF4(s32 a0);
+
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EB84(Unk18Obj *self);
 void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
@@ -699,6 +724,7 @@ void func_8003EDF4(Unk18Obj *self);
 void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 void func_8003EEC0(Unk18Obj *self);
+void func_8003F04C(Unk18Obj *self);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);

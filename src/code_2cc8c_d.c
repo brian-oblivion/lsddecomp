@@ -193,7 +193,48 @@ void func_8003EEC0(Unk18Obj *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F04C);
+/* Recomputes self->unk74 from self->unkC->methods->slot54, optionally
+ * resets the graphics context and re-notifies self->unkC->methods->slot50
+ * (once, or twice more if unk74 is still 0), forwards the current
+ * unk74-indexed slot to two rendering helpers, then finally collapses
+ * self->unk74 to a plain boolean (1 if it was 0, else 0). */
+void func_8003F04C(Unk18Obj *self) {
+    s32 idx;
+    u8 *rawBytes;
+
+    if (self->unk70 == 0) {
+        return;
+    }
+
+    self->unk74 = self->unkC->methods->slot54(self->unkC);
+    if (self->unkB8 == 0) {
+        goto tail_check;
+    }
+
+    ResetGraph(1);
+    self->unkC->methods->slot50(self->unkC);
+
+    if (self->unkB4 != 0) {
+        if (self->unk74 == 0) {
+            self->unkC->methods->slot50(self->unkC);
+        }
+    }
+
+    idx = self->unk74;
+    rawBytes = (u8 *)&self->unk58;
+    func_80023DA0(rawBytes[0], rawBytes[1], rawBytes[2],
+                  *(s32 *)((u8 *)self + 0x78 + idx * 4));
+
+    idx = self->unk74;
+    func_8003FBF4(*(s32 *)((u8 *)self + 0x78 + idx * 4));
+
+    if (self->unkB4 != 0 && self->unk74 == 0) {
+        self->unkC->methods->slot50(self->unkC);
+    }
+
+tail_check:
+    self->unk74 = (self->unk74 == 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F1A8);
 
