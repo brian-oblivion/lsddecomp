@@ -76,11 +76,13 @@ segments:
       # that part of the slot must be ATTACHED to it -- a standalone rodata
       # object cannot see the `.L` labels that live inside the unit's own
       # objects. jtbl_80011108 (0x1908) belongs to func_8003FB1C, still in
-      # the code_2cc8c_b asm remainder, so the slot is SPLIT rather than
-      # attached whole: attaching all of it would move that table into the
-      # C unit and break its references the other way.
+      # the asm remainder, so the slot is SPLIT rather than attached whole:
+      # attaching all of it would move that table into the C unit and break
+      # its references the other way. That remainder is renamed by each
+      # carve of this block (code_2cc8c_b -> code_2cc8c_c in round 11), so
+      # the owning function is named here rather than the segment.
       - [0x1890, .rodata, code_2cc8c]
-      - [0x1908, rodata]   # jtbl_80011108 -> code_2cc8c_b
+      - [0x1908, rodata]   # jtbl_80011108 -> func_8003FB1C, in the asm remainder
       - [0x19DC, rodata]
       - [0x1A90, rodata]
       # jtbl_8001140C -- 10 words, all targets inside func_80049EB4, which
@@ -114,13 +116,43 @@ segments:
       # game's own code is done.
       - [0x20DC, asm, main]
       - [0x2258, asm, psyq_2258]
-      - [0x8220, asm, code_8220]
+      # code_8220 is 56 functions, and it is the BasicClass block -- most of
+      # its symbols are already named (BasicClass__*), so it is the most
+      # legible uncarved ground in the game. First 20-function slice,
+      # 0x8220..0x8A88, carved to C in round 11; remainder stays asm as
+      # code_8220_b. 0x8A88 (func_80018288) is a real boundary --
+      # func_80018208 closes `jr $ra; nop` + endlabel and func_80018288
+      # opens with its own `addiu $sp, $sp, -0x18`. Checked on both sides:
+      # no function has more than one prologue, none touches $sp before
+      # allocating, and the three frameless ones (func_80017A9C,
+      # func_80017AC8, func_80017EA8) all end in their own `jr $ra`.
+      # Zero `jlabel` and zero `jr $t2`. Four of the 20 are gp_rel-blocked
+      # (func_80017A9C, func_80017AC8, func_80017B34, func_80017CFC).
+      # The 0xA8C rodata slot does NOT need attaching: measured against the
+      # data, all 48 bytes are one printf format string used by
+      # BMemPMgrInit, with no text pointers and no `.L` labels, so a
+      # standalone rodata object resolves it by symbol. (PARALLEL-RUNS.md
+      # Gate 2 previously listed 0xA8C as a text-pointer slot needing
+      # attachment; that was wrong, and the carve links green without it.)
+      - [0x8220, c, code_8220]
+      - [0x8A88, asm, code_8220_b]
       - [0xAD64, asm, psyq_rcpolyf3]
       - [0xB0D4, asm, psyq_rcpolyf4]
       - [0xB554, asm, psyq_rcpolyg3]
       - [0xC2B4, asm, psyq_rcpolyft3]
       - [0xC7D4, asm, psyq_rcpolygt3]
-      - [0xD294, asm, code_d294]
+      # code_d294 is 55 functions. First 20-function slice, 0xD294..0xDC24,
+      # carved to C in round 11; the remainder stays asm as code_d294_b.
+      # 0xDC24 (func_8001D424) is a real boundary -- func_8001D3F8 closes
+      # `jr $ra; nop` + endlabel and func_8001D424 opens with its own
+      # `addiu $sp, $sp, -0x18`. Checked on both sides: no function in the
+      # slice has more than one prologue, and none touches $sp before
+      # allocating. The one frameless function (func_8001D33C) is a bare
+      # `jr $ra; nop` leaf. Blocker census over the slice: zero gp_rel,
+      # zero addiu-$at, zero `jlabel`, zero `jr $t2` -- so no rodata slot
+      # to attach and no hasm/.word disposition.
+      - [0xD294, c, code_d294]
+      - [0xDC24, asm, code_d294_b]
       - [0xF770, asm, psyq_GsLinkObject4]
       - [0x15D04, asm, psyq_15d04]
       - [0x16334, c, class_16334]
@@ -137,7 +169,19 @@ segments:
       # any uncarved segment, which is why this block was picked over the
       # larger code_179d8 (43% blocked).
       - [0x2cc8c, c, code_2cc8c]
-      - [0x2D548, asm, code_2cc8c_b]
+      # code_2cc8c_b: second 20-function slice, 0x2D548..0x2E7A0.
+      # 0x2E7A0 (func_8003DFA0) is a real boundary -- func_8003DE9C closes
+      # `jr $ra; nop` + endlabel, and func_8003DFA0 opens by loading through
+      # its own $a0, never through the caller's frame. Checked on both
+      # sides: no function in the slice has more than one
+      # `addiu $sp, $sp, -N`, and none touches $sp before allocating.
+      # The one frameless function (func_8003D5C0) is a two-instruction
+      # leaf that ends in its own `jr $ra`, not a fall-through orphan.
+      # HIGHEST-YIELD SLICE OF THIS ROUND: zero gp_rel and zero addiu-$at
+      # hits across all 20 functions, and zero `jlabel`/`jr $t2`, so no
+      # rodata slot needs attaching and no hasm/.word disposition applies.
+      - [0x2D548, c, code_2cc8c_b]
+      - [0x2E7A0, asm, code_2cc8c_c]
       - [0x3197c, asm, psyq_memset]
       - [0x39c80, asm, psyq_rand]
 
@@ -213,7 +257,18 @@ segments:
       # `jlabel`s and zero `jr $t2`, so neither slice needs a rodata slot
       # attached and none of it is a BIOS trampoline.
       - [0x4F754, c, Entity_c]
-      - [0x5077C, asm, Entity_d]
+      # Entity_d: second 20-function slice of the remainder,
+      # 0x5077C..0x52290. 0x52290 (func_80061A90) is a real boundary --
+      # func_80061778 closes `jr $ra; nop` + endlabel and func_80061A90
+      # opens with its own `addiu $sp, $sp, -0x20`. Checked on both sides:
+      # no function in the slice has more than one prologue, and none
+      # touches $sp before allocating its own frame. The one frameless
+      # function (func_800607F8) is a bare `jr $ra; nop` leaf.
+      # Still zero `jlabel` and zero `jr $t2` in the whole remainder, so
+      # no rodata slot to attach and no hasm/.word disposition. Blocker
+      # census over the slice: zero gp_rel, zero addiu-$at.
+      - [0x5077C, c, Entity_d]
+      - [0x52290, asm, Entity_e]
       - [0x55DD4, c, code_55dd4]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
