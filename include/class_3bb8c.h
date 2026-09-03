@@ -1330,6 +1330,27 @@ typedef struct Class86E00_3bb8c_g Class86E00_3bb8c_g;
 typedef struct Class86E00Methods_3bb8c_g Class86E00Methods_3bb8c_g;
 
 /*
+ * self->unk6C's pointee. func_8004FFF4 is the function that PROVES this
+ * is a pointer (dereferences its `+0x080` vtable slot) -- before that
+ * function was read, `unk6C` looked like a plain `s32` value forwarded
+ * opaquely to `Class86E00SubObj_3bb8c_g::slot4C`'s 3rd argument, which is
+ * why that parameter is typed with this pointer rather than `s32` below.
+ */
+typedef struct Class86E00Unk6CObj_3bb8c_g Class86E00Unk6CObj_3bb8c_g;
+typedef struct Class86E00Unk6CObjMethods_3bb8c_g Class86E00Unk6CObjMethods_3bb8c_g;
+
+struct Class86E00Unk6CObjMethods_3bb8c_g {
+    u8 pad000[0x080];
+    /* +0x080, func_8004FFF4's own call: `(self, arg1, 0x7F, 0x7F)`,
+     * `arg1` forwarded verbatim from func_8004FFF4's own 2nd parameter. */
+    void (*slot80)(Class86E00Unk6CObj_3bb8c_g *self, s32 arg1, s32 arg2, s32 arg3);
+};
+
+struct Class86E00Unk6CObj_3bb8c_g {
+    Class86E00Unk6CObjMethods_3bb8c_g *methods; /* +0x000 */
+};
+
+/*
  * self->unk78's and self->unk7C's shared pointee -- two parallel fields
  * of the SAME sub-object shape (func_80050340/func_80050410 exercise
  * `unk78`; func_800505A8/func_80050670 exercise `unk7C` the identical
@@ -1347,7 +1368,7 @@ struct Class86E00SubObjMethods_3bb8c_g {
     void (*slot48)(Class86E00SubObj_3bb8c_g *self); /* +0x048, func_80050410/func_80050670 */
     /* +0x04C, func_80050340/func_800505A8's own call:
      * `(self, unk60, unk64, unk6C)` from the OWNING `Class86E00_3bb8c_g`. */
-    void (*slot4C)(Class86E00SubObj_3bb8c_g *self, s32 a1, s32 a2, s32 a3);
+    void (*slot4C)(Class86E00SubObj_3bb8c_g *self, s32 a1, s32 a2, Class86E00Unk6CObj_3bb8c_g *a3);
     void (*slot50)(Class86E00SubObj_3bb8c_g *self); /* +0x050, func_80050410/func_80050670 */
 };
 
@@ -1445,7 +1466,11 @@ struct Class86E00_3bb8c_g {
      * func_80050670) -- both must be non-zero before the body runs.
      * Kept a bare `s32`; never dereferenced in this unit. */
     s32 unk68;
-    s32 unk6C;   /* +0x06C, forwarded to `unk78`/`unk7C`'s own `slot4C` arg3 */
+    /* +0x06C, forwarded to `unk78`/`unk7C`'s own `slot4C` arg3.
+     * func_8004FFF4 proves this is a pointer (dereferences its `+0x080`
+     * vtable slot), not the plain `s32` it looked like from the slot4C
+     * call site alone -- retyped here, same size, no layout change. */
+    Class86E00Unk6CObj_3bb8c_g *unk6C;
     Class86E00Unk70Obj_3bb8c_g *unk70; /* +0x070, func_8004FF40 */
     /* +0x074, a one-shot flag set to 1 by func_80050340/func_800505A8
      * right after attaching `unk78`/`unk7C`, and consumed (guarding a
