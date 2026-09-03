@@ -1,7 +1,16 @@
 #include "common.h"
 #include "code_8220.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018288);
+void func_80018288(BasicClassListNode **head)
+{
+    BasicClassListNode *node = *head;
+
+    while (node != NULL) {
+        BasicClassListNode *cur = node;
+        node = node->next;
+        func_80017CFC(cur);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", BasicClass__func_182cc);
 
