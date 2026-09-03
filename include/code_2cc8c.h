@@ -211,7 +211,10 @@ extern Unk64Elem *func_800408CC(void *ctx, s32 len, char *name); /* not
  * instead of a slot.
  */
 struct Unk64ElemMethods {
-    u8 pad000[0x0B8];
+    u8 pad000[0x060];
+    void (*slot60)(Unk64Elem *self, s32 a1);   /* +0x060, OBSERVED:
+                                                    func_8003DCAC */
+    u8 pad064[0x0B8 - 0x064];
     void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
 };
 struct Unk64Elem {
