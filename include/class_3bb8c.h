@@ -1030,7 +1030,8 @@ struct Class86B60Methods {
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
     u8 pad0F4[0x124 - 0x0F4];
     void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, func_8004D90C (arg1=0)/func_8004E230 (arg1=0x16) */
-    u8 pad128[0x130 - 0x128];
+    u8 pad128[0x12C - 0x128];
+    void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
     void (*slot130)(Class86B60 *self); /* +0x130, func_8004D9D4's `unk58==2` tail target */
     void (*slot134)(Class86B60 *self); /* +0x134, func_8004D9D4's `unk58==3` tail target */
     /* +0x138, func_8004D788's forward target, only reached when its own

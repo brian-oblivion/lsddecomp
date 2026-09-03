@@ -121,7 +121,18 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E0E4);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E1C4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E230);
+void func_8004E230(Class86B60 *self, s32 arg1, s32 value)
+{
+    if (value < 0x18) {
+        if (value >= 0x16) {
+            self->methods->slot12C(self);
+            if (value == 0x16) {
+                self->unkA4->methods->slot1A8(self->unkA4);
+                self->methods->slot124(self, 0x16);
+            }
+        }
+    }
+}
 
 Class86B60Methods *func_8004E2D0(void)
 {
