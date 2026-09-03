@@ -876,6 +876,26 @@ struct GenericReleaseObj_3bb8c_d {
     GenericReleaseMethods_3bb8c_d *methods; /* +0x000 */
 };
 
+/*
+ * Generic class-instance shape used only to read another object's own
+ * vtable header WORD (the full `s32` at the vtable's own `+0x000`), the
+ * same "arg->methods->header" runtime-type-id shape already documented
+ * project-wide. Distinct from `GenericTagInst_3bb8c_c` above, which reads
+ * only the LOW BYTE of the same word (a `lbu`) -- func_8004D788 loads and
+ * masks the FULL WORD (`lw` then `andi ..,0xF`), so reusing that byte-typed
+ * struct here would emit the wrong load width.
+ */
+typedef struct GenericHeaderMethods_3bb8c_d GenericHeaderMethods_3bb8c_d;
+typedef struct GenericHeaderObj_3bb8c_d GenericHeaderObj_3bb8c_d;
+
+struct GenericHeaderMethods_3bb8c_d {
+    s32 header; /* +0x000 */
+};
+
+struct GenericHeaderObj_3bb8c_d {
+    GenericHeaderMethods_3bb8c_d *methods; /* +0x000 */
+};
+
 struct Class86B60Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86B60 *self, void *dreamSys);  /* +0x008, func_8004D578 occupies this slot */
@@ -883,6 +903,11 @@ struct Class86B60Methods {
     void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, func_8004D578's own last call */
     u8 pad044[0x0D8 - 0x044];
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, func_8004D578's own call, arg1 = &D_80086D44 */
+    u8 pad0DC[0x138 - 0x0DC];
+    /* +0x138, func_8004D788's forward target, only reached when its own
+     * arg1's header-word low nibble == 0xB (a runtime-type-id gate) --
+     * called with all three of func_8004D788's own parameters verbatim. */
+    void (*slot138)(Class86B60 *self, void *arg1, s32 arg2);
 };
 
 struct Class86B60 {
@@ -992,7 +1017,11 @@ struct BaseTaskCtorTable_3bb8c_c {
      * called after `self`'s own two owned sub-objects (`unkA8`/`unkAC`)
      * are released. */
     void (*slot0C)(void *self);
-    u8 pad010[0x060 - 0x010];
+    u8 pad010[0x038 - 0x010];
+    /* +0x038, func_8004D788's own unconditional first call, forwarding
+     * all three of its own parameters verbatim. */
+    void (*slot38)(void *self, void *arg1, s32 arg2);
+    u8 pad03C[0x060 - 0x03C];
     /* +0x060, func_8004D90C's own first call, `(self, arg1)` where arg1 is
      * that function's own forwarded 2nd parameter. */
     void (*slot60)(void *self, s32 arg1);

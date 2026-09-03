@@ -10,7 +10,13 @@ void func_8004D704(Class86B60 *self)
     func_8003DFBC()->slot0C(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D788);
+void func_8004D788(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
+{
+    func_8003DFBC()->slot38(self, arg1, arg2);
+    if ((arg1->methods->header & 0xF) == 0xB) {
+        self->methods->slot138(self, arg1, arg2);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D814);
 
