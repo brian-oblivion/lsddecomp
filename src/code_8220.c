@@ -49,7 +49,12 @@ void BasicClass__BasicClass(BasicClass *self)
     self->children = NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_17f2c);
+void BasicClass__func_17f2c(BasicClass *self)
+{
+    self->methods->onFinalize(self, 1);
+    self->methods->removeAllChildren(self);
+    self->methods->clearParentRefs(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_17f98);
 
