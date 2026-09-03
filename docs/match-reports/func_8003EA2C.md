@@ -1,0 +1,33 @@
+# func_8003EA2C — MATCHED
+
+Unit: `code_2cc8c_d`. Round 14, runner delta. 7/7 words, full match.
+
+## Signature
+
+```c
+void func_8003EA2C(Unk18Obj *self, s32 a1);
+```
+
+`Unk18ObjMethods`'s own `+0x04C` slot occupant.
+
+## What it does
+
+Writes `unk44` only the first time — guarded by `self->unk70`, a latch this
+unit's queue never itself sets (its own setter, if any, lies outside this
+carve).
+
+```c
+void func_8003EA2C(Unk18Obj *self, s32 a1) {
+    if (self->unk70 == 0) {
+        self->unk44 = a1;
+    }
+}
+```
+
+## Header changes
+
+`include/code_2cc8c.h`: `Unk18Obj` gains `unk44` (`+0x044`) and `unk70`
+(`+0x070`, the guard flag; no evidence of its own set site within this
+unit). Same carve pass as `func_8003EA24`/`EA48`/`EA64`/`EA7C`/`EAC4`
+(`+0x03C..+0x060` span), all typed `s32` for lack of further evidence
+beyond "a stored word".

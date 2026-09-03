@@ -11,7 +11,12 @@ void func_8003EA24(Unk18Obj *self, s32 a1) {
     self->unk3C = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA2C);
+/* Only writes unk44 the first time (guarded by the unk70 latch). */
+void func_8003EA2C(Unk18Obj *self, s32 a1) {
+    if (self->unk70 == 0) {
+        self->unk44 = a1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA48);
 
