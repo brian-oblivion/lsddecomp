@@ -12,7 +12,15 @@ void func_80018288(BasicClassListNode **head)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", BasicClass__func_182cc);
+void BasicClass__func_182cc(BasicClass *self, s32 arg1)
+{
+    BasicClassListNode *cursor = self->parentRefs;
+    BasicClass *value;
+
+    for (func_800183A0(&value, &cursor); value != NULL; func_800183A0(&value, &cursor)) {
+        value->methods->slot38(value, self, arg1);
+    }
+}
 
 void BasicClass__func_18350(void) {
 }

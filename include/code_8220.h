@@ -58,7 +58,7 @@ struct BasicClassMethods {
     /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls func_80018208, which is void (see below) */
     /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
     /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */
-    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__func_182cc; out of this round's carved slice (code_8220_b) */
+    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__func_182cc; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, arg1) */
     /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b */
     /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__func_18358; code_8220_b */
 };
