@@ -83,7 +83,45 @@ void func_8001934C(void *arg0, void *arg1)
     *((u8 *)arg1 + 0x15) = a[7];
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800193C0);
+s32 func_800193C0(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *))
+{
+    *(void **)(prim + 0xa4) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx0 * 8;
+    *(void **)(prim + 0xa8) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx1 * 8;
+    *(void **)(prim + 0xac) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx2 * 8;
+
+    __asm__ volatile (
+        "lwc2 $0, 0x0(%0)\n\t"
+        "lwc2 $1, 0x4(%0)\n\t"
+        "lwc2 $2, 0x0(%1)\n\t"
+        "lwc2 $3, 0x4(%1)\n\t"
+        "lwc2 $4, 0x0(%2)\n\t"
+        "lwc2 $5, 0x4(%2)\n\t"
+        :
+        : "r" (*(void **)(prim + 0xa4)), "r" (*(void **)(prim + 0xa8)), "r" (*(void **)(prim + 0xac)));
+
+    if (func_800195EC(arg0, prim) != 0) {
+        goto fail;
+    }
+
+    {
+        u8 *p0 = *(u8 **)(prim + 0x88) + 0x14;
+        u8 *p1 = *(u8 **)(prim + 0x8c) + 0x14;
+        u8 *p2 = *(u8 **)(prim + 0x90) + 0x14;
+
+        __asm__ volatile (
+            "swc2 $17, 0x0(%0)\n\t"
+            "swc2 $18, 0x0(%1)\n\t"
+            "swc2 $19, 0x0(%2)\n\t"
+            :
+            : "r" (p0), "r" (p1), "r" (p2)
+            : "memory");
+    }
+    callback(arg0);
+    func_8001A268(prim, 3);
+    return 0;
+fail:
+    return 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800194A4);
 

@@ -140,4 +140,9 @@ extern s32 D_8008E248;
  * order and so precede its own definition in the .c file. */
 extern s32 func_800195EC(void *arg0, void *arg1);
 
+/* Called by func_800193C0/func_800194A4 after a successful OT insertion,
+ * with a small literal "primitive kind" code (3 = triangle, 4 = quad).
+ * Not yet carved/declared elsewhere. */
+extern void func_8001A268(void *prim, s32 code);
+
 #endif
