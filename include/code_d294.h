@@ -507,4 +507,15 @@ void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 
 void func_8001E4A4(Class6B5CCObj *self, void *node);
 void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 
+/* func_8001ECFC (asm/code_d294_c.s, the NEXT slice, still uncarved):
+ * computes the SAME 6-bit box-vs-point outcode func_8001E2E8's own `flags`
+ * computation does (bit-for-bit identical comparison chain against the
+ * same 6 field offsets) -- MEASURED, not guessed; this is the shared
+ * primitive both functions build on. Returns the accumulated flags in
+ * `$v0` unmasked (the mask is the CALLER's job, per func_8001E110's own
+ * repeated `andi ...,0xFF` every time it re-reads a stored result). */
+extern s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point);
+
+s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
+
 #endif
