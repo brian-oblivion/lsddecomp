@@ -18,7 +18,12 @@ void func_8003EA2C(Unk18Obj *self, s32 a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA48);
+/* Same guard as func_8003EA2C, writes unk48 instead. */
+void func_8003EA48(Unk18Obj *self, s32 a1) {
+    if (self->unk70 == 0) {
+        self->unk48 = a1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA64);
 
