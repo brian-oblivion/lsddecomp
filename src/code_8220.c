@@ -108,7 +108,13 @@ void BasicClass__func_1813c(BasicClass *self)
     self->parentRefs = NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_1816c);
+void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
+{
+    if (*outParent == NULL) {
+        *cursor = self->parentRefs;
+    }
+    func_800183A0(outParent, cursor);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_800181AC);
 
