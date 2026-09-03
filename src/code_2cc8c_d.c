@@ -98,6 +98,14 @@ Unk18ObjMethods *func_8003F24C(void) {
     return &D_8006E8E4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F25C);
+/* Walks self->unkC repeatedly while non-NULL, finding the tail of a
+ * singly-linked list rooted at self, threaded through unkC. Returns self
+ * itself unchanged if self->unkC is already NULL. */
+Unk18Obj *func_8003F25C(Unk18Obj *self) {
+    while (self->unkC != NULL) {
+        self = (Unk18Obj *)self->unkC;
+    }
+    return self;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F28C);
