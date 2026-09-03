@@ -34,6 +34,7 @@ typedef struct Unk74Obj Unk74Obj;
 typedef struct Unk74ObjMethods Unk74ObjMethods;
 typedef struct Unk64Elem Unk64Elem;
 typedef struct Unk64ElemMethods Unk64ElemMethods;
+typedef struct SrcDesc SrcDesc;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -168,6 +169,34 @@ extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
                                                     this project; typed from
                                                     func_8003D6D4's own call
                                                     site only */
+
+/*
+ * func_8003D5CC's 2nd parameter -- an unrelated "source list" descriptor,
+ * NOT an Obj86B60 or any class in this unit's own hierarchy (no method
+ * table dereference anywhere in that function). Only the two fields it
+ * touches are modelled.
+ */
+struct SrcDesc {
+    u8 pad000[0x004];
+    s32 unk4;    /* +0x004, becomes self->unk60[idx] */
+    u8 pad008[0x018 - 0x008];
+    char **unk18; /* +0x018, NULL-terminated array of C strings -- each
+                      element is passed to func_80013348 (strlen, already
+                      typed `s32 func_80013348(char *s)` in
+                      code_171e0.h) and to func_800408CC */
+};
+
+extern s32 func_80013348(char *s); /* already matched elsewhere
+                                        (code_171e0.c) as a strlen-shaped
+                                        helper; local view here */
+extern Unk64Elem *func_800408CC(void *ctx, s32 len, char *name); /* not
+                                        yet seen elsewhere; typed from
+                                        func_8003D5CC's own call site --
+                                        its return value is stored directly
+                                        into the same self->unk64[idx]
+                                        array func_8003D980/func_8003D2CC/
+                                        func_8003DA10/func_8003DE9C walk as
+                                        Unk64Elem * */
 
 /*
  * self->unk64[idx]'s pointee, as walked by func_8003D980 -- a DIFFERENT

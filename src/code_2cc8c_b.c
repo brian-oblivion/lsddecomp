@@ -139,7 +139,35 @@ s32 func_8003D5C0(Obj86B60 *self)
     return self->unk58;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D5CC);
+void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
+{
+    char **list;
+    s32 idx;
+    s32 count;
+    Unk64Elem **buf;
+
+    list = a1->unk18;
+    idx = self->unk58;
+    count = 0;
+    while (*list++ != NULL) {
+        count++;
+    }
+    buf = func_80017B34(count * 4);
+    self->unk64[idx] = (void *)buf;
+    self->unk60[idx] = a1->unk4;
+    self->unk5C[idx] = count;
+
+    list = a1->unk18;
+    if (*list != NULL) {
+        do {
+            s32 len = func_80013348(*list);
+
+            *buf = func_800408CC(a2, len, *list);
+            list++;
+            buf++;
+        } while (*list != NULL);
+    }
+}
 
 void func_8003D6D4(Obj86B60 *self)
 {
