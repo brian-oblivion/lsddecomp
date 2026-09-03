@@ -351,7 +351,28 @@ segments:
       # disposition. Blocker census over the slice: 1 of 20 gp_rel-blocked
       # (func_80062C58), zero addiu-$at.
       - [0x52290, c, Entity_e]
-      - [0x53CA8, asm, Entity_f]
+      # Entity_f / Entity_g: the 37-function Entity remainder, 0x53CA8..0x55DD4
+      # (bounded by code_55dd4, already carved C, so there is no data tail).
+      # Carved round 13 and SPLIT IN TWO deliberately: 37 in one unit would
+      # cap the next round at one runner on this ground, and the number of
+      # carved units is the ceiling on parallel runners.
+      #
+      # Gate 2 checks, run before the carve over the whole 37 and all clean:
+      # no function has more than one `addiu $sp, $sp, -N` prologue; zero
+      # `jr $t2` BIOS trampolines; zero `alabel`; zero jump tables and zero
+      # `.word .L` references, so no rodata slot needs attaching.
+      #
+      # This is the cleanest ground measured on the project so far. All THREE
+      # blocker screens return ZERO across all 37 functions -- no `gp_rel`, no
+      # `addiu $at,$at,%lo`, no `nop_mflo_mfhi` -- and so does the round-13
+      # callee-saved-register screen: 0 of 37 demand 5 or more registers,
+      # against a measured threshold where no matched function this round
+      # needed 5+ and both functions at 8+ stalled.
+      #
+      # Entity_f: first 17, 0x53CA8..0x54E18.
+      - [0x53CA8, c, Entity_f]
+      # Entity_g: remaining 20, 0x54E18..0x55DD4.
+      - [0x54E18, c, Entity_g]
       - [0x55DD4, c, code_55dd4]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
