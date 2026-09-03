@@ -11,6 +11,7 @@ extern u8 D_80089CD0[];
 extern u8 D_80089CDC[];
 extern u8 D_80089D90[];
 extern u8 D_80089DE4[];
+extern u8 D_80089E38[];
 
 /* Forward declarations: both are defined later in this file (in ROM
  * order), but func_80063874 and func_80063BC0 call them before their own
@@ -299,7 +300,32 @@ void func_800641C0(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_f", func_80064294);
+void func_80064294(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0) {
+        if (this->unk94->methods->slot200(this->unk94) != 7) {
+            this->unk44 = 0xB;
+        }
+    }
+    out->unk10 = this->methods->slot148(this);
+    if (out->unk4 % 10 == 0) {
+        out->unk1C = 0xE;
+    }
+    if (this->unkFC == this->unk80) {
+        this->methods->slot128(this, 1);
+        if (this->unk44 != 0) {
+            if ((rand() & 1) == 0) {
+                this->methods->slot48(this, 1, D_80089E38);
+                this->methods->slotCC(this, 0x800, 0);
+            }
+        }
+        if (rand() % 3 == 0) {
+            this->methods->slot44(this, 0, D_80089C7C);
+        }
+    }
+    if (this->unk7C != 0) {
+        this->methods->slotC4(this, -0x80, 1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_f", func_80064450);
 
