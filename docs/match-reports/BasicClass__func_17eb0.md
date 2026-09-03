@@ -1,0 +1,55 @@
+# BasicClass__func_17eb0
+
+**Unit:** code_8220 · **Size:** 18 instructions · **Status:** MATCHED (18/18 words)
+
+BasicClass vtable slot `+0x004` — see `BasicClass__BasicClass.md` for the
+class's overall design (two pool-allocated linked lists, `children` and
+`parentRefs`).
+
+## What it does
+
+The base "release"/destroy method: dispatches the virtual finalize hook
+(`self->methods->finalize`, this unit's own `BasicClass__func_17f2c`, slot
+`+0x00C`) to let a subclass tear down its own state, then frees `self`
+itself back to the pool via `func_80017CFC` (one argument — see that
+function's own stub report for why), and always returns `NULL`.
+
+## The C
+
+```c
+void *BasicClass__func_17eb0(BasicClass *self)
+{
+    self->methods->finalize(self);
+    func_80017CFC(self);
+    return NULL;
+}
+```
+
+## Signature: one argument, `void *` return — resolved from the CALL, not
+## from the callee alone
+
+Two things had to be gotten right before this compiled to the right shape:
+
+- **One argument, not two.** A first reading assumed a second parameter
+  (a "pool" to forward into `func_80017CFC`, since `$a1` is never
+  explicitly set before that call and per DECOMPILATION_LEARNINGS "a value
+  in an argument register that survives is a genuine argument" this looked
+  like the documented positive case). It is not — `func_80017CFC` is
+  already established project-wide as ONE argument (see its stub report),
+  and the unread `$a1` here is exactly DECOMPILATION_LEARNINGS' NEGATIVE
+  case instead: a register dead at the next call, carrying no real meaning.
+  The tell: this function explicitly overwrites `$v0` to `0` with its OWN
+  final instruction, right after the `func_80017CFC` call and NOT in that
+  call's delay slot — so whatever `func_80017CFC` itself returns is
+  discarded here regardless, which is only sensible if the second register
+  it might have depended on was equally irrelevant.
+- **`void *`, matching `func_80017CFC`'s own return type**, not `void`.
+  The explicit `addu $v0,$zero,$zero` after the call is a real, deliberate
+  return-value write (not incidental fallthrough), so `return NULL;` is
+  correct rather than a bare `return;`.
+
+## Provenance
+
+round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). Matched
+first attempt once `code_8220.h`'s `BasicClass`/`BasicClassMethods` types
+existed.
