@@ -859,6 +859,34 @@ typedef struct Class86B60Methods Class86B60Methods;
 typedef struct DreamSysView_3bb8c_c DreamSysView_3bb8c_c;
 
 /*
+ * self->unkC's pointee. `unk0` is itself a pointer to a small vtable
+ * object (`slot78`, reached by func_8004D898 in a fixed 2-iteration loop
+ * alongside a table walk); `unk4` is an opaque value forwarded verbatim
+ * by func_8004E054 as an argument to `Class86B60Methods::slot10`.
+ */
+typedef struct Class86B60UnkCObj_3bb8c_d Class86B60UnkCObj_3bb8c_d;
+typedef struct Class86B60UnkC0ObjMethods_3bb8c_d Class86B60UnkC0ObjMethods_3bb8c_d;
+typedef struct Class86B60UnkC0Obj_3bb8c_d Class86B60UnkC0Obj_3bb8c_d;
+
+struct Class86B60UnkC0ObjMethods_3bb8c_d {
+    u8 pad000[0x078];
+    /* +0x078, func_8004D898's own call: `(childObj, &self->unk93,
+     * tableEntry)`, where `tableEntry` walks a fixed external table
+     * (`D_80086DAC`, stride 0xC) starting fresh each call to this
+     * function. */
+    void (*slot78)(Class86B60UnkC0Obj_3bb8c_d *self, void *arg1, void *arg2);
+};
+
+struct Class86B60UnkC0Obj_3bb8c_d {
+    Class86B60UnkC0ObjMethods_3bb8c_d *methods; /* +0x000 */
+};
+
+struct Class86B60UnkCObj_3bb8c_d {
+    Class86B60UnkC0Obj_3bb8c_d *unk0; /* +0x000, func_8004D898 */
+    void *unk4;                        /* +0x004, func_8004E054: opaque, forwarded verbatim */
+};
+
+/*
  * Generic class-instance shape used only to reach the shared BasicClass-
  * family "release" slot (`+0x004`, same offset as `BasicClassMethods::
  * release` in include/code_8220.h -- "virtual finalize, then free self")
@@ -920,7 +948,9 @@ struct Class86B60Methods {
 
 struct Class86B60 {
     Class86B60Methods *methods;    /* +0x000 */
-    u8 pad004[0x02C - 0x004];
+    u8 pad004[0x00C - 0x004];
+    Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, func_8004D898/func_8004E054 */
+    u8 pad010[0x02C - 0x010];
     s32 unk2C;                      /* +0x02C, func_8004D814: set to 0x190 */
     u8 pad030[0x034 - 0x030];
     s32 unk34;                      /* +0x034, func_8004D814: zeroed */
@@ -932,7 +962,12 @@ struct Class86B60 {
      * the two classes together and the one slot this unit dispatches
      * through (+0x09C) isn't among that type's own known slots. */
     struct Class86B60Unk48Obj *unk48;  /* +0x048, func_8004D578 */
-    u8 pad04C[0x0A4 - 0x04C];
+    u8 pad04C[0x093 - 0x04C];
+    /* +0x093, func_8004D898: address-of only, forwarded as
+     * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
+     * loop iteration; real extent beyond one byte unknown. */
+    u8 unk93;
+    u8 pad094[0x0A4 - 0x094];
     /* +0x0A4, func_8004D578: stores its own dreamSys arg raw. RETYPED this
      * round from a bare `void *` to `DreamSysView_3bb8c_c *` --
      * func_8004D814 (this unit) is the first function to dereference it
@@ -1076,6 +1111,12 @@ extern s32 D_800114DC;
  * `Class86B60Methods::slotD4`). Placeholder s32 type since only the
  * address is taken here. */
 extern s32 D_800114E8;
+
+/* Address-of only in this unit -- func_8004D898 walks it with an
+ * explicit 0xC-byte stride, passing each entry's address on to
+ * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
+ * itself. Placeholder s32 type; real element layout unknown. */
+extern s32 D_80086DAC;
 
 /* Still raw asm in this unit (gp-relative-blocked, see
  * docs/match-reports/func_8004D6AC.md) -- not this round's function, but

@@ -27,7 +27,18 @@ void func_8004D814(Class86B60 *self)
     self->unkA4->methods->slotF0(self->unkA4, 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D898);
+void func_8004D898(Class86B60 *self)
+{
+    u32 i;
+    u8 *entry;
+
+    i = 0;
+    entry = (u8 *)&D_80086DAC;
+    for (; i < 2; i++) {
+        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk93, entry);
+        entry += 0xC;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D90C);
 
