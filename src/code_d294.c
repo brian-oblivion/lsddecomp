@@ -119,7 +119,17 @@ Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self) {
     return self;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D204);
+void func_8001D204(Class6B5CCObj *self) {
+    GenericObj_d294 *entry = NULL;
+    s32 cont;
+
+    do {
+        self->methods->slot58(self, &entry, &cont);
+        if (entry != NULL) {
+            entry->methods->slot50(entry);
+        }
+    } while (cont);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D280);
 
