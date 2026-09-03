@@ -301,5 +301,6 @@ u32 func_8001D3F8(Class6B5CCObj *self, u32 a1);
 u32 func_8001D424(Class6B5CCObj *self, u32 a1);
 s32 func_8001D450(Class6B5CCObj *self, s32 a1);
 u32 func_8001D480(Class6B5CCObj *self, u32 a1);
+s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
 
 #endif
