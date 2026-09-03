@@ -111,7 +111,7 @@ extern s32 func_80011F68(void *ptr);                                /* marks the
 extern s32 func_800181AC(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
 extern void func_80018208(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
 
-/* Still INCLUDE_ASM in code_8220_b this round. */
+/* Matched in code_8220_b, round 13. */
 extern void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */
 extern void func_80018288(BasicClassListNode **head);                          /* free every node in the list, does not clear *head itself */
 
@@ -142,7 +142,70 @@ extern s32 func_800195EC(void *arg0, void *arg1);
 
 /* Called by func_800193C0/func_800194A4 after a successful OT insertion,
  * with a small literal "primitive kind" code (3 = triangle, 4 = quad).
- * Not yet carved/declared elsewhere. */
+ * code_8220_c, round 13. */
 extern void func_8001A268(void *prim, s32 code);
+
+/* Unaligned struct-field copy helpers, code_8220_c (round 13). */
+extern void func_8001A3EC(void *dstArr, void *srcArr, void *src0, void *src1, void *src2);
+
+/* gp_rel-blocked (docs/research/gp-relative-blocker.md), code_8220_c
+ * round 13 -- see docs/match-reports/func_8001A380.md. Declared here only
+ * so its ONE caller in this unit (func_800197C4) can compile; the extra
+ * two args arrive on the stack in retail as plain 32-bit zero words (its
+ * own body happens to read them with `lhu`, but that is internal to a
+ * function that will never be matched under this toolchain). */
+extern void func_8001A380(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4, s32 arg5);
+
+/* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
+ * func_800197C4 (code_8220_c) with (self, table). */
+extern void func_8001A564(void *self, void *table);
+
+/* Opaque table, referenced only by ADDRESS (never dereferenced in this
+ * unit) and handed to func_8001A380/func_8001A564. asm/data, not yet
+ * carved -- real element type unknown. */
+extern u8 D_8008ACD0[];
+
+/* Quad-flavored sibling of D_8008ACD0/func_8001A380/func_8001A564,
+ * referenced the same way by func_80019B24 (code_8220_c, round 13). */
+extern u8 D_8008AEE8[];
+
+/* Unaligned struct-field copy helper (quad flavor: 4 fields, not 3),
+ * code_8220_c round 13. STALLED -- see docs/match-reports/func_8001A4C0.md,
+ * declared here only so its caller func_80019B24 can compile. */
+extern void func_8001A4C0(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5);
+
+/* Psy-Q SDK (asm/psyq_rcpolyf4.s, not a carved C unit). Called by
+ * func_80019B24 (code_8220_c) with (self, table) -- quad-flavored sibling
+ * of func_8001A564. */
+extern void func_8001A8D4(void *self, void *table);
+
+/* Psy-Q SDK (asm/psyq_rcpolyg3.s, not a carved C unit). Called by
+ * func_8001989C (code_8220_c) with (self, table) -- Gouraud-shaded
+ * sibling of func_8001A564/func_8001A8D4. */
+extern void func_8001AD54(void *self, void *table);
+
+/* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as func_8001AD54, not a
+ * carved C unit). Called by func_800199EC (code_8220_c) with
+ * (self, table). */
+extern void func_8001B6B4(void *self, void *table);
+
+/* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as func_8001AD54/func_8001B6B4,
+ * not a carved C unit). Called by func_80019C04 (code_8220_c) with
+ * (self, table) -- Gouraud-shaded quad, quad-flavored sibling of
+ * func_8001AD54. */
+extern void func_8001B164(void *self, void *table);
+
+/* Psy-Q SDK (asm/psyq_rcpolyft3.s, not a carved C unit). Called by
+ * func_80019D84 (code_8220_c) with (self, table). */
+extern void func_8001BAB4(void *self, void *table);
+
+/* Psy-Q SDK (asm/psyq_rcpolygt3.s, not a carved C unit). Called by
+ * func_80019EE4 (code_8220_c) with (self, table). */
+extern void func_8001BFD4(void *self, void *table);
+
+/* Psy-Q SDK (asm/psyq_rcpolygt3.s, same file as func_8001BFD4, not a
+ * carved C unit). Called by func_8001A064 (code_8220_c) with (self,
+ * table) -- Gouraud-shaded quad, quad-flavored sibling of func_8001BFD4. */
+extern void func_8001C474(void *self, void *table);
 
 #endif
