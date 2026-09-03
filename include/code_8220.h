@@ -184,4 +184,9 @@ extern void func_8001A8D4(void *self, void *table);
  * sibling of func_8001A564/func_8001A8D4. */
 extern void func_8001AD54(void *self, void *table);
 
+/* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as func_8001AD54, not a
+ * carved C unit). Called by func_800199EC (code_8220_c) with
+ * (self, table). */
+extern void func_8001B6B4(void *self, void *table);
+
 #endif
