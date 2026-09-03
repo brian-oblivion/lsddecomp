@@ -225,7 +225,27 @@ void func_80065238(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_8006536C);
+void func_8006536C(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0) {
+        if ((rand() & 3) == 0) {
+            goto trigger;
+        }
+    }
+    if (this->unkFC != 0xE10) {
+        goto merge;
+    }
+trigger:
+    this->methods->slot160(this);
+    this->unk44 = 1;
+merge:
+    this->methods->slot48(this, 1, D_80089E44);
+    out->unk10 = this->methods->slot148(this);
+    if (out->unk4 % (this->unk80 / 2) == 0) {
+        out->unk1C = 0xA;
+        out->unk20 = 1;
+    }
+    this->methods->slotC4(this, -0xA, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_800654A0);
 
