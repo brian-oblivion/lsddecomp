@@ -284,7 +284,63 @@ s32 func_8004E940(Node3bb8cE *self)
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E9AC);
+/* func_8004EA38's 3rd parameter (`filterName` here) is forwarded verbatim
+ * by func_8004E9AC but never read by func_8004EA38's own body -- the same
+ * "unused parameter invisible from the callee's own disassembly" shape
+ * already established elsewhere in this project (only the CALLER's setup
+ * proves it's a real parameter). */
+extern s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName);
+
+s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
+{
+    s32 retries;
+    s32 result;
+
+    retries = 0;
+    if (filterName == NULL || *filterName == 0) {
+        return 0;
+    }
+    do {
+        result = func_8004EA38(self, destBuf, filterName);
+    } while (result == 0 && retries-- != 0);
+    return result;
+}
+
+extern void *func_8004F32C();
+extern s32 func_80050938(void *arg0, s32 arg1);
+extern s32 func_80050928(s32 arg0, void *arg1, s32 arg2);
+extern s32 func_800508F8(s32 arg0);
+
+/* STALL -- see docs/match-reports/func_8004EA38.md. Best reached: 1/41
+ * words in-range, but with ZERO instruction-count drift (40 vs retail's
+ * 41 -- confirmed via objdump on the compiled .o) caused by one missing
+ * redundant register move; every semantic value and branch is right.
+ * Preserved body below, restored to INCLUDE_ASM so this correct-length
+ * placeholder doesn't cascade drift into every function after it in this
+ * unit. */
+#if 0
+s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
+{
+    s32 pathBuf[8];
+    void *path;
+    s32 handle;
+    void *buf;
+
+    path = func_8004F32C(pathBuf, self->unkC);
+    handle = func_80050938(path, 1);
+    if (handle == -1) {
+        return 0;
+    }
+    if (destBuf != NULL) {
+        buf = func_80017B34(0x80);
+        func_80050928(handle, buf, 0x80);
+        strcpy((char *)destBuf, (char *)buf + 4);
+        func_80017CFC(buf);
+    }
+    func_800508F8(handle);
+    return 1;
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EA38);
 
@@ -292,6 +348,36 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EADC);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EB88);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EC5C);
+extern s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004ECCC);
+s32 func_8004EC5C(Node3bb8cE *self, u8 id, s32 sizeArg)
+{
+    s32 retries;
+    s32 result;
+
+    retries = 10;
+    do {
+        result = func_8004ECCC(self, id, sizeArg);
+    } while (result == 0 && retries-- != 0);
+    return result;
+}
+
+extern s32 func_80050908(void *arg0);
+
+s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)
+{
+    s32 pathBuf[8];
+    void *path;
+    s32 handle;
+    s32 sectors;
+
+    sectors = (u32)(sizeArg + 0x21FF) >> 13;
+    path = func_8004F32C(pathBuf, self->unkC, &D_8008AAAC);
+    handle = func_80050938(path, (sectors << 16) | 0x200);
+    if (handle == -1) {
+        return 0;
+    }
+    func_800508F8(handle);
+    func_80050908(pathBuf);
+    return 1;
+}
