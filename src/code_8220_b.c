@@ -38,7 +38,14 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800194A4);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800195EC);
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800196D4);
+void func_800196D4(void *dst)
+{
+    __asm__ volatile (
+        "swc2 $12, 0x8(%0)\n\t"
+        "swc2 $13, 0xc(%0)\n\t"
+        "swc2 $14, 0x10(%0)"
+        : : "r" (dst) : "memory");
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800196E8);
 
