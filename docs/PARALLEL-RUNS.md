@@ -481,6 +481,16 @@ make extract && ./build-and-verify.sh ; echo "build exit=$?"
 re-extraction changes zero committed bytes. If the build is not green after
 this, stop and diagnose — do not triage, do not carve, do not spawn.
 
+**The stale monolith is PER-WORKTREE, so cleaning `main` does not clean the
+runners.** `asm/` is gitignored and each worktree extracts its own. When a
+runner fast-forwards onto a carve and runs `make extract`, splat leaves the
+old top-level `asm/<segment>.s` behind in THAT worktree, and `progress.py`
+warns there even though `main` is clean — round 13's delta reported exactly
+this and was right about its own tree while `main` had already been fixed.
+It is harmless to the counts and to the build, so the correct handling is to
+tell the runner it is expected rather than to send it into `asm/`, which is
+off-limits to runners anyway.
+
 This is the same decay shape as the `settings.local.json` lesson above: **a
 doc or a tool claim about PER-CHECKOUT state is nobody's job to re-measure**,
 so it survives being wrong. The generalisation for the gates: `progress.py` is

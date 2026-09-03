@@ -373,6 +373,16 @@ follow, and both are worth having.
   ordinary field INSERTION with a forgotten pad is easier to trigger than a
   retype and has identical consequences. Treat every struct edit as
   potentially non-local, not just retypes.
+
+  **This is a STANDING pattern, not an anecdote: four live instances across
+  two rounds, all self-caught.** Round 13 alone produced three — a `slotA8`
+  that silently slid from `+0xA8` to `+0x9C` and broke an
+  already-matched function in the same round, a `GenericObj::unkC`
+  insertion that left a 4-byte gap and broke another, and the
+  `GenericMethods_d294` case that found the class. Every one compiled clean
+  and every one presented only as a whole-image SHA1 failure. So the check
+  below is not a debugging tip to reach for when puzzled; **run it after any
+  struct edit, before trusting any score.**
 - **Localizing it: `cmp -l`, then the map.** When `build-and-verify.sh`
   fails with no compile error, find the differing byte and turn it into a
   function name:

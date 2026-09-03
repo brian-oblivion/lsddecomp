@@ -1310,6 +1310,48 @@ of a documented stall, not of a match.
   other. There is no general rule here; try both directions and keep the
   measurement, do not reason from a sibling.
 
+#### Round 13, final batch
+
+- **A field can be read SIGNED at its writer and UNSIGNED at a different
+  reader, and both are right.** Two instances in one unit (`unk5B` via
+  `func_8003EEC0`, `unk58` via `func_8003F04C`). Do not "fix" one reader to
+  agree with the other; type the field where it is written and cast at the
+  reader that disagrees.
+
+- **The range-check fold's desirability is READ OFF THE DISASSEMBLY, per
+  function, never assumed.** `(unsigned)(x - LO) < N` needed an explicit cast
+  to reach `sltiu` in one unit this round, and in another unit a natural
+  `||` chain reproduced the fold correctly and the explicit form was wrong.
+  Two units, opposite answers, same round. There is no default here.
+
+- **A delay-slot store can be UNCONDITIONAL even though it sits inside what
+  reads as a guarded assignment.** Check whether the store is in a branch's
+  delay slot before concluding the source guards it. (`func_8003F1A8`.)
+
+- **Watch for a "leftover register" implicit argument to a vtable slot** — a
+  register still live from earlier code that the callee reads, with nothing
+  at the call site setting it. It looks like a 3-argument call with a garbage
+  third argument. (`func_8003EEC0`'s `slotA0`.)
+
+- **`x / N` and `x >> log2(N)` are not interchangeable even for power-of-two
+  `N`.** Signed division rounds toward zero and needs the sign-fix chain; a
+  shift floors. If retail has the sign-fix, the source said `/`.
+
+- **A delay-slot filler whose value looks dead is CODE MOTION of a real
+  computation, not an arithmetic artifact.** Confirmed on the `func_800197C4`
+  family: the filler's value is an address the OTHER branch genuinely
+  computes. So do not try to reconstruct the NUMBER — reconstruct a source
+  expression that makes that value live at the branch. This is the
+  operational form of "2.6.3 hoists an existing instruction into a
+  load-delay slot; it never invents one".
+
+- **Count trivial functions separately from real ones when reporting.** A
+  freshly carved unit can be a third `jr $ra; nop` setters and getters, and
+  splat generates some of them as C itself. 14 of one unit's 26 matches this
+  round were one-liners. They are real matches and they are not real work;
+  folding them into a headline number misrepresents both the round and the
+  unit's remaining difficulty. Size a carve by NON-TRIVIAL count.
+
 ### New residue classes opened this round (not yet closed)
 
 - **NEW, round 12: "retail saturates the callee-saved register file."**
