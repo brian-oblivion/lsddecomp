@@ -15,7 +15,11 @@ s32 func_80040740(Obj6EAC0 *self, s32 a1) {
     return func_8001EDAC(&self->unk58, 0x1C, 2, a1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_8004076C);
+void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
+
+void func_8004076C(Obj6EAC0 *self, s32 overwrite, u8 *src) {
+    func_80040790(self, self->unk64, src, overwrite);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040790);
 
