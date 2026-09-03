@@ -69,7 +69,19 @@ void func_8001CD20(Class6B5CCObj *self) {
     func_80018390()->slot18(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CD60);
+void func_8001CD60(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
+    s32 tag;
+
+    func_80018390()->slot38(self, other, arg2);
+    tag = other->methods->header & 0xF;
+    if (tag == 2) {
+        self->methods->slot94(self, other, arg2);
+    } else if (tag == 5) {
+        self->methods->slot98(self, other, arg2);
+    } else if (tag == 4) {
+        self->methods->slot9C(self, other, arg2);
+    }
+}
 
 void func_8001CE30(Class6B5CCObj *self) {
     self->unk24 = 0;
