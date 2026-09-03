@@ -145,6 +145,22 @@ extern s32 func_800195EC(void *arg0, void *arg1);
  * code_8220_c, round 13. */
 extern void func_8001A268(void *prim, s32 code);
 
+/* Round 13: this unit's own minimal, local view of the Psy-Q GPU primitive
+ * tag word -- the same shape as `P_TAG` in include/psyq/LIBGPU.H, declared
+ * locally because that SDK header does not compile standalone under this
+ * toolchain (it needs the LIBGTE/RECT chain) and no unit includes it yet.
+ *
+ * The 24-bit BITFIELD is the load-bearing part. On little-endian MIPS
+ * `addr` occupies bits 0..23, so writing it is a read-modify-write that
+ * GCC 2.6.3 emits as `& 0xFF000000` on the old word, `& 0x00FFFFFF` on the
+ * new value, and an `or` -- which is exactly retail's OT linked-list
+ * splice. Hand-writing those masks produces the same VALUE with different
+ * register allocation and does NOT match. */
+typedef struct OtTag {
+    u32 addr : 24;
+    u32 len  : 8;
+} OtTag;
+
 /* func_8001A3EC's payload types (round 13). Both are ALL-s16 and that is
  * load-bearing: all-s16 members give alignment 2, which is what makes a
  * whole-struct assignment compile to unaligned lwl/lwr + swl/swr instead of

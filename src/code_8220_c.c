@@ -35,6 +35,37 @@ void func_8001979C(void *dst, s32 flag)
     }
 }
 
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_800197C4.md. Head pass,
+ * round 13: this reaches the CORRECT INSTRUCTION COUNT AND LENGTH (no
+ * inserted or deleted instructions anywhere in the function). The residue
+ * is two register-identity choices plus one delay-slot filler retail has
+ * and this does not. Two things got it here and both generalise to the
+ * seven sibling functions in this family:
+ *   1. The OT splice is a 24-BIT BITFIELD write (`OtTag.addr`), not
+ *      hand-written `& 0xFF000000` / `& 0x00FFFFFF` masking. Same value,
+ *      different register allocation.
+ *   2. The OT expression must be RE-EVALUATED, not cached in a local --
+ *      retail re-reads `arg1->unk30` for the second store. That is macro
+ *      argument semantics (Psy-Q's `addPrim(ot, p)` expands `ot` twice).
+ * Still open: retail fills a load-delay slot with `addiu $v0, $s1, 0x14`,
+ * i.e. it computes `arg0 + 0x14` somewhere in this branch; this body has
+ * nothing to schedule there and GCC emits a `nop`.
+ */
+void func_800197C4(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
+        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    } else {
+        func_8001A380(D_8008ACD0, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+                      (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
+                      (PolyUV4 *)((u8 *)arg0 + 0x10));
+        func_8001A564(arg0, D_8008ACD0);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800197C4);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
