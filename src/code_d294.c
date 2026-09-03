@@ -38,7 +38,17 @@ void *func_8001CAF4(Class6B5CCObj *self) {
     return self;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CBA4);
+void func_8001CBA4(Class6B5CCObj *self) {
+    Class6B5CCSub14 *sub;
+
+    self->methods->slot50(self);
+    self->methods->slot54(self);
+    self->methods->slot5C(self, 0);
+    sub = self->unk14;
+    func_80017CFC(sub->unk44);
+    func_80017CFC(self->unk14);
+    func_80018390()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CC48);
 
