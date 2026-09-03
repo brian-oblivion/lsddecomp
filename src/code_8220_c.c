@@ -303,6 +303,52 @@ void func_80019EE4(void *arg0, void *arg1) {
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019EE4);
 
+/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+ * why this is needed even at accidentally-4-aligned offsets. */
+typedef struct {
+    s16 x, y;
+} Vec2s16_A64;
+
+#if 0
+/* STALL snapshot round 2 -- see docs/match-reports/func_8001A064.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
+ * residue class: $a2 vs $a1 for the OT mask, plus one missing
+ * `addiu $v0,$s1,0x34`. Confirms the align-4-refined cross-sibling
+ * formula a third time: last touched self field is +0x30 (a u16), raw
+ * end 0x32, align_up_4(0x32) = 0x34. Not cracked.
+ */
+void func_8001A064(void *arg0, void *arg1) {
+    u8 *self = (u8 *)arg0;
+    u8 *prim = (u8 *)arg1;
+
+    if (*(s32 *)(prim + 0x78) == 0) {
+        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    } else {
+        func_8001A380(D_8008AEE8, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        func_8001A4C0(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
+                      self + 0x20, self + 0x2C);
+
+        *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);
+        *(u16 *)(*(u8 **)(prim + 0x98) + 0xA) = *(u16 *)(self + 0x26);
+        *(u16 *)(*(u8 **)(prim + 0x9C) + 0xA) = *(u16 *)(self + 0x32);
+        *(u16 *)(*(u8 **)(prim + 0xA0) + 0xA) = *(u16 *)(self + 0x32);
+
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0x94) + 0xC) = *(Vec2s16_A64 *)(self + 0x4);
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0x98) + 0xC) = *(Vec2s16_A64 *)(self + 0x10);
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_A64 *)(self + 0x1C);
+        *(Vec2s16_A64 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_A64 *)(self + 0x28);
+
+        *(u16 *)(*(u8 **)(prim + 0x94) + 0x8) = *(u16 *)(self + 0xC);
+        *(u16 *)(*(u8 **)(prim + 0x98) + 0x8) = *(u16 *)(self + 0x18);
+        *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x24);
+        *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x30);
+
+        func_8001C474(self, D_8008AEE8);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A064);
 
 void func_8001A224(void *arg0, void *arg1, s32 kind)
