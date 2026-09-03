@@ -1,7 +1,15 @@
 #include "common.h"
 #include "code_d294.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E58C);
+void func_8001E58C(Class6B5CCObj *self, Class6B5CCSub44 *dst, s16 *src) {
+    u8 buf[0x20];
+
+    self->methods->slot84(self, buf, 0);
+    dst->unk0 = src[0];
+    dst->unk4 = src[1];
+    dst->unk8 = src[2];
+    func_8001EE98(dst, dst, 1, buf);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E600);
 

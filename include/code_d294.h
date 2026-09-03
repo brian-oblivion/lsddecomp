@@ -239,11 +239,24 @@ struct Class6B5CCMethods {
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as func_8001E57C above. */
     void (*slot5C)(Class6B5CCObj *self, s32 arg1);
-    /* +0x060..+0x094: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
+    /* +0x060..+0x080: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480
      * (all this unit, all already matched) -- not typed here as struct
      * fields because nothing dispatches through the table at these offsets;
      * every call site invokes them directly by symbol name. */
-    u8 pad060[0x094 - 0x060];
+    u8 pad060[0x084 - 0x060];
+    /* +0x084, occupant `func_8001D4DC` per `tools/classtable.py
+     * D_8006B5CC` -- lives in code_d294_b, out of this carve's scope.
+     * func_8001E58C (this unit, round 14) dispatches to it as
+     * `slot84(self, out, 0)`, `out` pointing at a 0x20-byte stack buffer
+     * (MEASURED from the caller's own frame size -- func_8001E58C's stack
+     * layout only closes if `out` is a full 0x20 bytes, not the 0xC that
+     * would fit just the leading vector its OWN caller reads back). Only
+     * the leading 0xC bytes are read back by func_8001E58C's own
+     * `func_8001EE98` call a few lines later; the rest is opaque callback
+     * output this call site never touches. Read as a "fill a buffer"
+     * callback; real per-word meaning unknown from this call site alone. */
+    void (*slot84)(Class6B5CCObj *self, void *out, s32 arg2);
+    u8 pad088[0x094 - 0x088];
     /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
      * triple -- func_8001CD60 (this unit) dispatches to exactly one of
      * these three depending on `other->methods->header & 0xF` (2 -> +0x094,
@@ -384,6 +397,23 @@ extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
  * disassembly (`addiu $a0,$s1,4` then `addu $a1,$a0,$zero`), not reasoned
  * from the name. Declared only with the opaque shape that call site needs. */
 extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
+
+/* func_80015618 (still uncarved, a different/earlier segment): called once
+ * per iteration by func_8001EE98 below as `(fixed, b, a)`; not decompiled
+ * here, declared only with the opaque shape that call site needs. */
+extern void func_80015618(void *fixed, void *b, void *a);
+
+/* func_8001EE98 (this unit, round 14): a paired-array iteration sibling to
+ * func_8001EE04 above -- `count` iterations, 0xC bytes/element (no
+ * unaligned-load complication this time, both `a`/`b` are read directly),
+ * calling `func_80015618(fixed, b, a)` once per element and advancing both
+ * `a`/`b` by 0xC each time while `fixed` stays constant across every call.
+ * func_8001E58C (this unit, round 14) calls it as `func_8001EE98(dst, dst,
+ * 1, &buf)` where `dst` is func_8001E58C's own 2nd argument and `buf` is a
+ * 0xC-byte stack vector `self->methods`'s own `slot84` just filled in --
+ * i.e. `a`/`b` here are the SAME pointer at that one call site, so it does
+ * not by itself distinguish their roles. */
+void func_8001EE98(void *a, void *b, s32 count, void *fixed);
 
 extern Class6B5CCObj *func_8001CA94(void);
 void *func_8001CAF4(Class6B5CCObj *self);
