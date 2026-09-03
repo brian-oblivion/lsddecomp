@@ -1,0 +1,80 @@
+# func_8005FF7C -- MATCHED (115/115 words)
+
+Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler,
+lowest ROM address in this unit's queue. `void
+func_8005FF7C(Entity *this, EntityMoodHandlerArg *out)`.
+
+## Final source
+
+```c
+void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
+    s32 r;
+
+    if (this->unkFC == 0) {
+        r = this->unk94->methods->slot1A0(this->unk94, 0) % 3;
+        if (r == 0) {
+            if (rand() % 3 != 0) {
+                goto skip48;
+            }
+        } else if (r != 2) {
+            goto skip48;
+        }
+        this->methods->slot48(this, 1, D_80089E5C);
+    }
+skip48:
+    if (out->unk4 % 22 == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 2;
+    }
+    if (rand() % 12 == 0) {
+        this->methods->slot130(this);
+    } else if (rand() % 6 == 0) {
+        this->methods->slot12C(this);
+    }
+}
+```
+
+## Derivation notes
+
+Matched first attempt, no iteration needed -- this is the third function in
+this unit to reuse the exact `Unk94Methods::slot1A0` result-mod-3 dispatch
+shape first derived in `func_80060800`'s report (see that report for the
+full residue history: the reachability condition `(r==0 && rand()%3==0) ||
+r==2` needed the same `goto skip48;` pattern proven there, applied directly
+with no new derivation needed this time).
+
+- `out->unk4 % 22 == 0` is the magic-multiply-by-22 idiom -- same family as
+  `func_80060F38`'s divide-by-20 and this unit's divide-by-5/divide-by-10
+  instances, extending the confirmed generalization further (22 = not a
+  power of 5 times 2^n this time, a genuinely different magic constant
+  `0x2E8BA2E9`, and it still needed no manual reconstruction -- plain `%`
+  reproduced it exactly).
+- **The same base magic constant (`0x2AAAAAAB`) computes TWO DIFFERENT
+  divisors depending on whether an extra `sra ...,1` follows the `mfhi`.**
+  With the extra shift: divide-by-12. Without it: divide-by-6. Both are
+  used in this one function, back to back (`rand() % 12 == 0` then, only if
+  that fails, `rand() % 6 == 0` on a FRESH `rand()` call). Both reproduced
+  directly with plain `%`; no manual arithmetic needed, but worth recording
+  because it means the SAME hex magic constant appearing twice in a
+  disassembly is not evidence of the same divisor -- check the post-`mfhi`
+  shift amount each time.
+- Reuses already-typed `slot1A0`, `slot48`, `slot148`, `slot130`, and
+  `slot12C` (the last two both `EntityMethods` slots, not `Unk94Methods` --
+  worth noting since the function mixes calls through `this->methods` and
+  `this->unk94->methods` in the same body, and it is easy to mis-route a
+  slot number to the wrong table when both happen to be in play). No header
+  changes needed.
+
+### Proposed learning
+
+- **A magic-multiply divisor family confirmed via `func_80060800`
+  generalizes across functions with zero rederivation once the C idiom
+  (`goto` to a shared label for a two-clause OR reachability condition) is
+  established** -- this function needed no new investigation, just applying
+  the known pattern. Worth checking any REMAINING unattempted function
+  in this unit for the identical `slot1A0 % 3` dispatch shape before
+  re-deriving it from scratch.
+- **The same magic-multiply constant can encode different divisors
+  depending on an extra post-`mfhi` shift.** Do not assume two appearances
+  of the same hex constant in one function imply the same divisor -- check
+  the shift amount at each site independently.
