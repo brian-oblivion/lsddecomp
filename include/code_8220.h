@@ -58,7 +58,7 @@ struct BasicClassMethods {
     /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls func_80018208, which is void (see below) */
     /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
     /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */
-    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__func_182cc; out of this round's carved slice (code_8220_b) */
+    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__func_182cc; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, arg1) */
     /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b */
     /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__func_18358; code_8220_b */
 };
@@ -124,5 +124,25 @@ extern BasicClassMethods *func_80018390(void);                                 /
 /* The "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n" format string,
  * asm/data/A8C.rodata.s. */
 extern const char D_8001028C[];
+
+/* Global boolean flag read by func_8001934C, asm/data (bss/data, not yet
+ * carved). Read-only from this unit; nothing here writes it. */
+extern s32 D_8008E248;
+
+/* GTE transform/clip/OT-bucket routine, this unit (code_8220_b, hand-rolled
+ * asm -- see docs/match-reports/func_800195EC.md). arg1 is a per-primitive
+ * scratch/context struct (OT base +0x0, OT shift +0x4, culled-flag +0x78,
+ * SXY0-2 cache +0x60/0x64/0x68, computed OT bucket pointer +0x30, ...);
+ * arg0's only touched field is a single output byte at +0x3, copied from
+ * arg1->0x14. Returns 0 on success (OT bucket computed and stored), 1 if
+ * the primitive was culled/degenerate. Declared here because its two
+ * callers in this unit (func_800193C0, func_800194A4) are earlier in ROM
+ * order and so precede its own definition in the .c file. */
+extern s32 func_800195EC(void *arg0, void *arg1);
+
+/* Called by func_800193C0/func_800194A4 after a successful OT insertion,
+ * with a small literal "primitive kind" code (3 = triangle, 4 = quad).
+ * Not yet carved/declared elsewhere. */
+extern void func_8001A268(void *prim, s32 code);
 
 #endif
