@@ -39,7 +39,15 @@ void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800183DC);
+void func_800183DC(BasicClass **array, s32 count)
+{
+    if (count-- > 0) {
+        do {
+            *array = (BasicClass *)(*array)->methods->release(*array);
+            array++;
+        } while (count-- > 0);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_8001844C);
 
