@@ -53,8 +53,21 @@ struct Res3bb8cE {
  * but has no setter anywhere in this unit, so its pointee type is unproven.
  */
 typedef struct Node3bb8cE Node3bb8cE;
+
+/* The object's OWN vtable, at offset 0 -- distinct from the separately
+ * fetched base-class table (`func_80018390()`, `BaseMethods3bb8cE` above).
+ * Only the one slot this unit's functions reach is typed. */
+typedef struct SelfMethods3bb8cE SelfMethods3bb8cE;
+struct SelfMethods3bb8cE {
+    u8 pad000[0x054];
+    /* func_8004EADC: called (self, 0, buf) per candidate string; 0 return
+     * means "match" (buf is returned as the winning string). */
+    s32 (*slot54)(Node3bb8cE *self, s32 arg1, char *arg2); /* +0x054 */
+};
+
 struct Node3bb8cE {
-    u8 pad00[0x00C];
+    SelfMethods3bb8cE *methods;   /* +0x000, func_8004EADC */
+    u8 pad04[0x00C - 0x004];
     s32 unkC;              /* +0x00C, func_8004E5D4 sets it (caller value); func_8004E940 nonzero-tests it; func_8004EA38/func_8004ECCC forward it as func_8004F32C's arg1 */
     s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to func_80050B18/func_80050B08/func_80050B28 */
     s32 threads[4];        /* +0x014..+0x020, func_8004E5E4: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
@@ -344,7 +357,18 @@ s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EA38);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EADC);
+char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
+{
+    while (*entries != NULL) {
+        strcpy(buf, middle);
+        strcat(buf, *entries);
+        if (self->methods->slot54(self, 0, buf) == 0) {
+            return buf;
+        }
+        entries++;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EB88);
 
