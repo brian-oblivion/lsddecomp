@@ -34,6 +34,7 @@ typedef struct Unk74Obj Unk74Obj;
 typedef struct Unk74ObjMethods Unk74ObjMethods;
 typedef struct Unk64Elem Unk64Elem;
 typedef struct Unk64ElemMethods Unk64ElemMethods;
+typedef struct SrcDesc SrcDesc;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -170,6 +171,34 @@ extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
                                                     site only */
 
 /*
+ * func_8003D5CC's 2nd parameter -- an unrelated "source list" descriptor,
+ * NOT an Obj86B60 or any class in this unit's own hierarchy (no method
+ * table dereference anywhere in that function). Only the two fields it
+ * touches are modelled.
+ */
+struct SrcDesc {
+    u8 pad000[0x004];
+    s32 unk4;    /* +0x004, becomes self->unk60[idx] */
+    u8 pad008[0x018 - 0x008];
+    char **unk18; /* +0x018, NULL-terminated array of C strings -- each
+                      element is passed to func_80013348 (strlen, already
+                      typed `s32 func_80013348(char *s)` in
+                      code_171e0.h) and to func_800408CC */
+};
+
+extern s32 func_80013348(char *s); /* already matched elsewhere
+                                        (code_171e0.c) as a strlen-shaped
+                                        helper; local view here */
+extern Unk64Elem *func_800408CC(void *ctx, s32 len, char *name); /* not
+                                        yet seen elsewhere; typed from
+                                        func_8003D5CC's own call site --
+                                        its return value is stored directly
+                                        into the same self->unk64[idx]
+                                        array func_8003D980/func_8003D2CC/
+                                        func_8003DA10/func_8003DE9C walk as
+                                        Unk64Elem * */
+
+/*
  * self->unk64[idx]'s pointee, as walked by func_8003D980 -- a DIFFERENT
  * reading of the same field func_8003D6D4/func_8003DDC8/func_8003DE30 use
  * as an opaque resource handle. func_8003D980 reinterprets that handle as
@@ -182,7 +211,10 @@ extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
  * instead of a slot.
  */
 struct Unk64ElemMethods {
-    u8 pad000[0x0B8];
+    u8 pad000[0x060];
+    void (*slot60)(Unk64Elem *self, s32 a1);   /* +0x060, OBSERVED:
+                                                    func_8003DCAC */
+    u8 pad064[0x0B8 - 0x064];
     void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
 };
 struct Unk64Elem {
@@ -257,7 +289,13 @@ struct Obj86B60Methods {
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */
-    u8 pad0F4[0x108 - 0xF4];
+    u8 pad0F4[0x100 - 0xF4];
+    void (*slot100)(Obj86B60 *self, s32 a1, s32 a2); /* +0x100, external;
+                                                       OBSERVED:
+                                                       func_8003DA10 */
+    void (*slot104)(Obj86B60 *self, void *a1);      /* +0x104, external;
+                                                       OBSERVED:
+                                                       func_8003D2CC */
     void (*slot108)(Obj86B60 *self);                /* +0x108, external
                                                        (func_8003DA10);
                                                        OBSERVED: func_8003CA1C */
@@ -294,7 +332,12 @@ struct Obj86B60Methods {
  */
 struct Obj86B60 {
     Obj86B60Methods *methods;   /* +0x000 */
-    u8 pad004[0x01C - 0x004];
+    u8 pad004[0x014 - 0x004];
+    s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
+                                    slot100's 2nd arg, otherwise untouched
+                                    by this unit -- generic word, not
+                                    dereferenced here */
+    u8 pad018[0x01C - 0x018];
     s32 unk1C;                  /* +0x01C, func_8003CC2C (a running count/
                                     frame value multiplied against unk84);
                                     func_8003C63C (STALL) zeroes it on
@@ -318,8 +361,11 @@ struct Obj86B60 {
     Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
     s32 unk50;                  /* +0x050, func_8003D3B0: capacity/wrap
                                     bound for the unk58 index into
-                                    unk4C->unk18[] */
-    u8 pad054[0x058 - 0x054];
+                                    unk4C->unk18[] (also func_8003D2CC's
+                                    loop count) */
+    Unk64Elem **unk54;          /* +0x054, func_8003D2CC: walked with an
+                                    incrementing pointer, dereferenced
+                                    directly for each element */
     s32 unk58;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */

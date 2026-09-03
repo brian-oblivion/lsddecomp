@@ -35,7 +35,31 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D050);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D194);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D2CC);
+void func_8003D2CC(Obj86B60 *self, void *a1)
+{
+    s32 origIdx;
+    Unk64Elem **arr;
+    s32 i;
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    arr = self->unk54;
+    origIdx = self->unk58;
+    for (i = 0; i < self->unk50;) {
+        Unk64Elem *elem = *arr;
+
+        arr++;
+        elem->methods->slotB8(elem, a1);
+        if (self->unk4C->unk24[i] != NULL) {
+            self->unk58 = i;
+            self->methods->slot104(self, a1);
+        }
+        i++;
+        __asm__("");
+    }
+    self->unk58 = origIdx;
+}
 
 void func_8003D3B0(Obj86B60 *self)
 {
@@ -62,16 +86,88 @@ void func_8003D3B0(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D444);
+void func_8003D444(Obj86B60 *self)
+{
+    s32 i;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D4DC);
+    if (self->unk4C == NULL) {
+        return;
+    }
+    i = self->unk58;
+    i--;
+    for (;;) {
+        if (i < 0) {
+            i = self->unk50 - 1;
+        }
+        if (i == self->unk58) {
+            break;
+        }
+        if (self->unk4C->unk18[i--] != NULL) {
+            continue;
+        }
+        i++;
+        break;
+    }
+    self->methods->slotF0(self, i, 1);
+}
+
+void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
+{
+    s32 idx;
+    Unk64Elem *elemB;
+    Unk64Elem *elemA;
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    idx = self->unk58;
+    elemB = self->unk54[idx];
+    elemA = self->unk54[a1];
+    if (idx >= 0) {
+        elemB->methods->slotB8(elemB, self->unk4C->unk10);
+    }
+    elemA->methods->slotB8(elemA, (u8 *)self->unk4C + 0x13);
+    self->unk58 = a1;
+    if (a2 != NULL) {
+        self->methods->slot70(self, 0);
+    }
+    self->methods->slot60(self, 9);
+}
 
 s32 func_8003D5C0(Obj86B60 *self)
 {
     return self->unk58;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D5CC);
+void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
+{
+    char **list;
+    s32 idx;
+    s32 count;
+    Unk64Elem **buf;
+
+    list = a1->unk18;
+    idx = self->unk58;
+    count = 0;
+    while (*list++ != NULL) {
+        count++;
+    }
+    buf = func_80017B34(count * 4);
+    self->unk64[idx] = (void *)buf;
+    self->unk60[idx] = a1->unk4;
+    self->unk5C[idx] = count;
+
+    list = a1->unk18;
+    if (*list != NULL) {
+        do {
+            s32 len = func_80013348(*list);
+
+            *buf = func_800408CC(a2, len, *list);
+            list++;
+            buf++;
+        } while (*list != NULL);
+    }
+}
 
 void func_8003D6D4(Obj86B60 *self)
 {
@@ -95,11 +191,51 @@ void func_8003D980(Obj86B60 *self, void *a1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DA10);
+void func_8003DA10(Obj86B60 *self)
+{
+    s32 idx;
+    Unk64Elem *elem;
+    u8 *buf;
+
+    if (self->unk3C != 1) {
+        return;
+    }
+    idx = self->unk58;
+    self->methods->slot100(self, self->unk14, 1);
+    elem = ((Unk64Elem **)self->unk64[idx])[self->unk60[idx]];
+    buf = (u8 *)self->unk4C->unk24[idx] + 8;
+    elem->methods->slotB8(elem, buf);
+    self->unk3C = 2;
+    self->methods->slot60(self, 14);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DAD4);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DCAC);
+void func_8003DCAC(Obj86B60 *self)
+{
+    s32 idx;
+    s32 counter;
+    Unk64Elem **arr;
+    Unk64Elem *elem1;
+    Unk64Elem *elem2;
+    s32 newVal;
+
+    if (self->unk3C != 2) {
+        return;
+    }
+    idx = self->unk58;
+    counter = self->unk60[idx];
+    self->methods->slot100(self, self->unk14, 0);
+    arr = (Unk64Elem **)self->unk64[idx];
+    elem1 = arr[counter];
+    elem1->methods->slotB8(elem1, self->unk4C->unk10);
+    newVal = ((s32 *)self->unk4C->unk24[idx])[1];
+    self->unk60[idx] = newVal;
+    elem2 = arr[newVal];
+    elem2->methods->slot60(elem2, 1);
+    self->unk3C = 1;
+    self->methods->slot60(self, 17);
+}
 
 void func_8003DDC8(Obj86B60 *self)
 {
@@ -125,4 +261,26 @@ void func_8003DE30(Obj86B60 *self)
     self->methods->slot11C(self, v, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DE9C);
+void func_8003DE9C(Obj86B60 *self, s32 a1, void *a2)
+{
+    s32 idx;
+    s32 counter;
+    Unk64Elem **arr;
+    Unk64Elem *elem1;
+    Unk64Elem *elem2;
+    u8 *buf;
+
+    idx = self->unk58;
+    counter = self->unk60[idx];
+    arr = (Unk64Elem **)self->unk64[idx];
+    elem1 = arr[counter];
+    elem2 = arr[a1];
+    elem1->methods->slotB8(elem1, self->unk4C->unk10);
+    buf = (u8 *)self->unk4C->unk24[idx] + 8;
+    elem2->methods->slotB8(elem2, buf);
+    self->unk60[idx] = a1;
+    if (a2 != NULL) {
+        self->methods->slot70(self, 0);
+    }
+    self->methods->slot60(self, 9);
+}
