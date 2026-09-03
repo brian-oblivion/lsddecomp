@@ -98,7 +98,13 @@ struct Unk4CObj {
     s32 unkC;            /* +0x00C, OBSERVED: func_8003CA1C */
     u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
                               address only (func_8003C63C, not attempted) */
-    u8 pad13[0x024 - 0x013];
+    u8 pad13[0x018 - 0x013];
+    void **unk18;          /* +0x018, OBSERVED: func_8003D3B0, an array of
+                               pointers indexed by an Obj86B60 index and
+                               null-checked (never dereferenced) -- a
+                               registration slot table, one entry per index
+                               tracked by Obj86B60->unk58/unk50 */
+    u8 pad01C[0x024 - 0x01C];
     void **unk24;         /* +0x024, OBSERVED: func_8003CA1C, word-pointer
                               array indexed by self->unk58 */
 };
@@ -310,7 +316,10 @@ struct Obj86B60 {
     u8 pad044[0x048 - 0x044];
     Unk48Obj *unk48;            /* +0x048, func_8003C7B4 only */
     Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
-    u8 pad050[0x058 - 0x050];
+    s32 unk50;                  /* +0x050, func_8003D3B0: capacity/wrap
+                                    bound for the unk58 index into
+                                    unk4C->unk18[] */
+    u8 pad054[0x058 - 0x054];
     s32 unk58;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
