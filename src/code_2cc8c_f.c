@@ -46,7 +46,16 @@ Obj6EAC0Methods *func_800408BC(void) {
     return &D_8006EAC0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_800408CC);
+Obj6EAC0Methods *func_80040FB0(void);
+
+Unk64Elem *func_800408CC(void *ctx, s32 len, char *name) {
+    Obj6EAC0 *self = func_80017B34(0xB8);
+    if (self != NULL) {
+        func_80040FB0()->slot08(self, (s32)ctx, len, (s32)name);
+        return (Unk64Elem *)self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040948);
 
