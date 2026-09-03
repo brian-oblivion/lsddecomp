@@ -193,7 +193,9 @@ void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slot44(this, 0, a2);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_8006519C);
+void func_8006519C(Entity *this, EntityMoodHandlerArg *out) {
+    this->methods->slot48(this, 1, D_80089E38);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_800651D0);
 
