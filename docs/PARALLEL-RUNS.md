@@ -506,10 +506,26 @@ denominator, and left for last. Matching them proves nothing about this game.
      inherited yaml had labelled `# greyman`, so **do not trust the inherited
      rodata comments to say who owns a slot**.
 
-     Two standalone slots are known to hold text pointers and will need
-     attaching when their segments are carved: **`0xFD8` (`code_179d8`)** and
-     **`0xA8C` (`code_8220`)**. Both were confirmed against the data, not read
-     off the yaml comment.
+     **`0xFD8` (`code_179d8`)** is a standalone slot that genuinely does hold
+     text pointers and will need attaching when its segment is carved: of its
+     483 words, 179 are vram addresses inside `code_179d8`'s own text (the
+     first at `0x1010 -> 0x80027A8C`) and 283 are ASCII.
+
+     **`0xA8C` (`code_8220`) is NOT such a slot, and this document previously
+     said it was** — listing it alongside `0xFD8` as "confirmed against the
+     data". Read out of the executable, all 12 of its words are ASCII and NONE
+     is a vram address: the slot is one printf format string,
+     `bMemPMgr = %p, poolSize = %ld in BMemPMgrInit`. `code_8220` was carved in
+     round 11 with the slot left standalone and the link came up green, which
+     is the check that settles it. A string is referenced by SYMBOL, and a
+     standalone rodata object resolves that fine; only `.L` labels local to a
+     unit's function `.s` files force an attach.
+
+     The general point, since the wrong entry cost nothing only because it was
+     re-measured: **"confirmed against the data" in a doc is a claim, not the
+     data.** Both slots take one script to survey — count how many words fall
+     in `0x80010000..0x8008B800` — so survey the slot at carve time rather
+     than inheriting a verdict about it.
    - **`undefined reference to 'D_XXXXXXXX'`** — the segment's tail is DATA,
      not code, and an `asm` segment was emitting it inline. Find where the text
      really ends and declare the rest: `code_55dd4`'s text stops at `0x57028`
