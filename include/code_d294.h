@@ -231,11 +231,19 @@ struct Class6B5CCMethods {
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as func_8001E57C above. */
     void (*slot5C)(Class6B5CCObj *self, s32 arg1);
-    /* +0x060..+0x09C: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
-     * (all this unit, all already matched) -- not typed here as struct
+    /* +0x060..+0x088: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC/
+     * D4DC (all this unit, all already matched) -- not typed here as struct
      * fields because nothing dispatches through the table at these offsets;
      * every call site invokes them directly by symbol name. */
-    u8 pad060[0x0A0 - 0x060];
+    u8 pad060[0x08C - 0x060];
+    /* +0x08C/+0x090, round 13 (func_8001D568's own call site): dispatched
+     * as `(self, dest)` and `(self, a1, a2)` respectively, matching
+     * func_8001D600/func_8001D624's own direct-call prototypes below
+     * exactly (both already matched, this unit) -- `tools/classtable.py
+     * D_8006B5CC` confirms they occupy these two slots. */
+    void (*slot8C)(Class6B5CCObj *self, void *dest); /* +0x08C, func_8001D600 */
+    void (*slot90)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, func_8001D624 */
+    u8 pad094[0x0A0 - 0x094];
     /* +0x0A0, func_8001D6B4's own call target (round 12): dispatched with
      * only `self`, per that function's own disassembly (`jalr $v0` with
      * `$a0` untouched since function entry). func_8001D714 (still queued)
@@ -353,6 +361,13 @@ extern void func_800183A0(GenericObj_d294 **out, GenericObj_d294 **cursor);
  * needs. */
 extern void func_8001F51C(void *arg0, void *dest);
 
+/* func_8001F3A4 (asm/psyq_GsLinkObject4.s, Psy-Q library, not game code): a
+ * predicate over the same opaque `self->unk20` pointer func_8001D600 and
+ * func_8001F51C above already treat as `void *` -- func_8001D568 (round 13,
+ * this unit) tests its `$v0` result for non-zero, so declared `s32`
+ * (boolean-ish) here. Not decompiled in this project. */
+extern s32 func_8001F3A4(void *arg0);
+
 /* func_8001EE04 (asm/code_d294_c.s, the NEXT slice, still uncarved): an
  * element-copy loop -- `count` iterations, 6 bytes/element, reading from
  * `src` and writing (by way of func_80015D58, not decompiled here either)
@@ -414,6 +429,7 @@ s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
 extern void func_800160B0(S16Quad_d294 *vec, s32 a1);
 
 void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
+void func_8001D568(Class6B5CCObj *self, s32 a1);
 
 void func_8001D600(Class6B5CCObj *self, void *dest);
 void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);

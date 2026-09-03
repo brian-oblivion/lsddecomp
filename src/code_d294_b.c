@@ -49,7 +49,38 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
     func_800160B0(&buf, a1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D568);
+/* a1 gates a small range (2 <= a1 < 4). When self->unk20 is set and
+ * func_8001F3A4(self->unk20) reports true, fills a stack buffer through
+ * this class's own +0x8C slot (func_8001D600, already matched in this
+ * unit -- fills it via func_8001F51C(self->unk20, dest)) then forwards
+ * that same buffer, retyped as a GenericCountList_d294, into +0x90
+ * (func_8001D624, also already matched in this unit), with the original
+ * a1 passed through as func_8001D624's own a2. */
+void func_8001D568(Class6B5CCObj *self, s32 a1) {
+    /* Sized to reproduce retail's own frame (0x58): func_8001D600's own
+     * target (func_8001F51C, PsyQ, asm/psyq_GsLinkObject4.s, not
+     * decompiled here) fills fields out past +0x32 of its own `dest`
+     * argument, so the true destination struct is bigger than the 8 bytes
+     * GenericCountList_d294 alone would reserve -- not derived beyond its
+     * size, since the field layout past what func_8001D624 itself reads
+     * (+0x0/+0x4) is PsyQ-internal. */
+    u8 buf[0x38];
+
+    if (a1 >= 4) {
+        return;
+    }
+    if (a1 < 2) {
+        return;
+    }
+    if (self->unk20 == NULL) {
+        return;
+    }
+    if (!func_8001F3A4(self->unk20)) {
+        return;
+    }
+    self->methods->slot8C(self, buf);
+    self->methods->slot90(self, (GenericCountList_d294 *)buf, a1);
+}
 
 /* Forwards self->unk20 (still opaque, retyped `void *` this round -- see
  * include/code_d294.h) and its own 2nd argument straight through to
