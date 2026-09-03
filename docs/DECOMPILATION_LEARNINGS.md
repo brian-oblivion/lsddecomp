@@ -28,6 +28,38 @@ with fifty unverified claims teaches sessions to skim it.
   `include/labels.inc` and `include/gte_macros.inc`** on extract when they are
   missing. Do not hand-edit them expecting the edit to survive; if you need a
   different `INCLUDE_ASM` expansion, that is a splat option, not a file edit.
+- **The Psy-Q inline macro layer is INERT — do not reach for `gte_*` or the
+  LIBGPU `set*` macros (round 12).** Eight headers under `include/psyq/` have
+  CRLF line endings, and 2.6.3's `cpp` splices `\` only when `LF` follows
+  immediately. 1134 multi-line macros (1043 in `INLINE.H`, 87 in `LIBGPU.H`,
+  4 in `LIBGS.H`) therefore expand to `{\ ;` — an empty block plus a null
+  statement. **That is valid C: it compiles clean, warns nothing, and emits
+  nothing.** So a call to `gte_stsxy3(...)` silently does NOTHING and the
+  function scores a mismatch with the stores simply absent. There are zero
+  `gte_*` call sites in `src/` today, so nothing is broken yet; it is a
+  landmine. Census, reproducer and disposition:
+  `docs/research/psyq-header-crlf-blocker.md`. **Escalated, not fixed** —
+  un-breaking 1134 macros in pinned vendored headers is an operator call.
+- **A COP2/GTE store leaf has no plain-C form, and hand-rolled inline asm for
+  it is NOT banned by the register rule (round 12).** There is no C expression
+  that emits `swc2`. The form that reproduces retail is
+  `__asm__ volatile("swc2 $12, 0x8(%0)" : : "r"(ptr) : "memory")`, and it
+  passes CLAUDE.md's test: `"r"` leaves the GPR to the allocator, and
+  `$12`/`$13`/`$14` are COP2 *data* registers named in the instruction text
+  with no GPR identity to pin. Sony's own `INLINE.H` is built out of exactly
+  this construct. Do carry the SDK's fuller clobber list
+  (`"$12","$13","$14","$15","memory"`) rather than the `"memory"`-only form:
+  the thin version matches for a standalone leaf whose whole body is the asm,
+  but does not tell GCC the COP2 registers are live inputs and would break if
+  anyone made it `static inline`.
+  (`func_800196D4`, `func_800196E8`, `func_800196FC`, `func_80019710`,
+  `func_80019724`, `func_8001974C`)
+- **A negative result about a MACRO is only evidence once you have proved the
+  macro EXPANDED (round 12).** Testing whether the SDK could express retail's
+  GTE sequence produced an objdump with the macro emitting nothing at all,
+  which reads exactly like a clean negative and was actually the CRLF bug
+  above. Check the preprocessed output, not just the objdump:
+  `cpp ... | sed -n '/yourfunc/,/^}/p'`.
 
 ### BLOCKED: no C function can reach a small-data global (2026-08-29)
 
@@ -882,6 +914,72 @@ code_2c054).**
   while treating one as a boolean and the other as a list cursor. This is the
   established per-call-site convention, not a bug in either.
   (`func_8001CBA4`, `func_8001D204`/`func_8001D280`)
+
+#### Round 12 (32 byte-exact matches across four units)
+
+- **Do not hand-decode a magic-multiply divisor — probe `cc1` for it.** Write
+  a one-line `int f(int x){return x % N;}`, run it through the pinned pipeline,
+  and compare constants. A first hand-decode of `func_80061E60` mis-guessed the
+  divisor outright. This is the cheap, reliable half of the already-recorded
+  fact that one constant can encode two divisors depending on a post-`mfhi`
+  shift. (`func_80061E60` `% 300`, `func_8006204C` `% 30`)
+- **A statement sitting in a branch's DELAY SLOT is unconditional** — it is not
+  part of the guarded body, and reading it as guarded gets the logic wrong
+  *and* changes the function's length, cascading address drift into every later
+  function in the unit. Two failures for the price of one, and the second one
+  looks like unrelated regressions elsewhere. (`func_80062660`)
+- **`cond ? A : B` and `!cond ? B : A` are value-equivalent but not
+  byte-equivalent.** When a ternary leaves a same-size residue that looks like
+  inverted branch polarity, flipping the ternary is the one-character fix to
+  try before reshaping anything. (`func_800624BC`, `== 0 ? -0x100 : 0x100`)
+- **A syntactically redundant outer guard is not free — GCC 2.6.3 does not
+  eliminate it.** An `if (x != 0)` wrapped around a test that already implies
+  it costs real instructions, which means retail's source wrote it out
+  explicitly and yours must too. The instinct to simplify it away is what
+  leaves the residue. (`func_80063094`)
+- **A `bne`-guards-a-store shape reads backwards on a quick skim.** Check the
+  equality direction explicitly rather than trusting the first reading; a
+  polarity slip here produces a logically-inverted function that still has the
+  right instruction count. (`func_8006204C`)
+- **Crossjump/tail-merge is sensitive to a vtable slot's DECLARED RETURN TYPE,
+  and a LOCAL function-pointer variable is the safe lever.** When two branches
+  call differently-typed slots that retail tail-merges into one call site,
+  assign both into one local `void (*fn)(...)` (casting at the assignment) and
+  call `fn`. This forces the merge **without retyping a shared slot** — which
+  is the round-7 `slotC4` hazard, where a retype silently changed an
+  already-matched function in another unit. Prefer the local every time; the
+  shared retype needs a per-slot check that cannot be reasoned by analogy.
+  (`func_80062970`, merging `slot44`/`slot48`)
+- **Source statement ORDER decides register allocation for a value that
+  crosses two dependent loads.** With an independent store sandwiched between
+  them, write the store where retail's delay-slot fill puts it. Assigning the
+  local before the independent store cost one extra register move.
+  (`func_8003E538`, 11/16 → 16/16 on statement reorder)
+- **A sparse `switch` can beat an `if`/`else` chain that is logically
+  identical.** GCC 2.6.3 -O2's block placement for a 3-way dispatch was
+  reproduced by a `switch` after `if`/`else`/early-return shapes would not
+  converge. **This does NOT contradict the dense-switch blocker** — the
+  discriminator is DENSITY, not the keyword. `func_8001D6B4`'s switch compiles
+  to `slti`/`bnez` compares with ZERO jump tables (verified: no `jlabel`, no
+  `%lo(jtbl`), whereas a dense run of cases becomes a jump table and is
+  blocked. Screen the result, do not assume from the source form.
+  (`func_8001D6B4`)
+- **A "struct knowledge established" line naming a slot's OCCUPANT is a claim
+  about DATA, and matching does not check it.** A caller that dispatches
+  through a slot and discards the result matches byte-exactly regardless of
+  which function the slot actually holds — so a wrong occupant name survives
+  the only verification the round performs, and gets copied forward. Resolve
+  with `tools/classtable.py` before reusing another report's attribution. First
+  recorded instance: `Obj86B60Methods::slot118` was attributed to
+  `func_8003DFA0` (really at `+0x120`; `+0x118` is `func_8003DE30`) and
+  propagated one round. (found while matching `func_8003DFA0`; corrected in
+  `func_8003C944.md`)
+- **A folded immediate offset and a precomputed pointer at zero offset can
+  produce identical ADDRESSES but different INSTRUCTIONS.** When retail's delay
+  slot computes an address unconditionally ahead of a branch
+  (`addiu $v0, $a0, 0x14`), reproduce that as an explicit pointer local before
+  the `if` — not as an inline literal offset inside each arm. "Same effective
+  address" is not the test. (`func_80019724`, `func_8001974C`)
 
 ### New residue classes opened this round (not yet closed)
 
