@@ -88,7 +88,18 @@ void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
 void func_80040F20(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040F28);
+void func_80040F28(Obj6EAC0 *self, u8 *a1) {
+    Obj6EAC0 **elemp = self->unkB4;
+    u8 *p = a1;
+    if (p != NULL && *p != 0) {
+        do {
+            Obj6EAC0 *elem = *elemp;
+            elem->methods->slotC4(elem, *p);
+            p++;
+            elemp++;
+        } while (*p != 0);
+    }
+}
 
 void func_80040FA0(void) {
 }
