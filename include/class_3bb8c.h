@@ -1300,4 +1300,153 @@ struct GenericCtorTable_3bb8c_d {
 
 extern GenericCtorTable_3bb8c_d *func_800507E8(void);
 
+/*
+ * class_3bb8c_f: a SEPARATE class from Obj866E8 above -- no evidence unifies
+ * them (distinct field layouts), and func_8004F32C below writes raw bytes
+ * over its own object's first 6 bytes, which would corrupt Obj866E8's own
+ * vtable pointer if the two were the same type. This is this unit's own
+ * BasicClass-derived (docs/research/class-framework.md, include/code_8220.h)
+ * task-ish object: it dispatches through the INHERITED BasicClass
+ * addChild/removeChild slots at +0x010/+0x014 (func_80018390()'s own table
+ * establishes those two slots' exact signatures) and adds its own slots
+ * from +0x044 on. No FirecatFG name survives, so fields are named by
+ * offset. Only the slots/fields this unit's functions actually touch are
+ * given concrete types; the rest stays opaque padding. `child`'s type is
+ * kept `void *` here (not `BasicClass *`) to avoid pulling in
+ * include/code_8220.h just for a parameter type nothing in this unit
+ * dereferences.
+ */
+typedef struct TaskObjF TaskObjF;
+typedef struct TaskObjFMethods TaskObjFMethods;
+
+struct TaskObjFMethods {
+    s32 header;                                                /* +0x000 */
+    void *unk04;                                                /* +0x004 */
+    void *ctor;                                                  /* +0x008 */
+    void *unk0C;                                                  /* +0x00C */
+    void (*addChild)(TaskObjF *self, void *child);                 /* +0x010, func_8004F55C (x2) */
+    void (*removeChild)(TaskObjF *self, void *child);               /* +0x014, func_8004F5DC (x2) */
+    void *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* inherited BasicClass slots, untouched by this unit */
+    u8 pad3C[0x044 - 0x03C];
+    void (*slot44)(TaskObjF *self);                                   /* +0x044, func_8004F9D8 */
+    s32 (*slot48)(TaskObjF *self);                                     /* +0x048, func_8004F9D8 */
+    s32 (*slot4C)(TaskObjF *self, s32 *out1, s32 *out2, s32 *out3);      /* +0x04C, func_8004F9D8 */
+    u8 pad50[0x054 - 0x050];
+    s32 (*slot54)(TaskObjF *self, s32 a1, s32 a2);                          /* +0x054, func_8004F8A4 */
+    u8 pad58[0x05C - 0x058];
+    s32 (*slot5C)(TaskObjF *self, void *a1, void *a2, s32 a3, s32 a4);        /* +0x05C, func_8004F638 */
+    s32 (*slot60)(TaskObjF *self, s32 a1, s32 a2);                              /* +0x060, func_8004F8A4 */
+    u8 pad64[0x07C - 0x064];
+    s32 (*slot7C)(TaskObjF *self, s32 a1);                                        /* +0x07C, func_8004F638/func_8004F8A4/func_8004F9D8 */
+    u8 pad80[0x088 - 0x080];
+    void (*slot88)(TaskObjF *self, void *arg1, s32 arg2);                          /* +0x088, func_8004FB04 */
+    u8 pad8C[0x098 - 0x08C];
+    void (*slot98)(TaskObjF *self, void *arg1, s32 arg2);                            /* +0x098, func_8004FB04 */
+    u8 pad9C[0x0A4 - 0x09C];
+    void (*slotA4)(TaskObjF *self, void *arg1, s32 arg2);                              /* +0x0A4, func_8004FB04 */
+    u8 padA8[0x0B0 - 0x0A8];
+    void (*slotB0)(TaskObjF *self, void *arg1, s32 arg2);                                /* +0x0B0, func_8004FB04 */
+};
+
+struct TaskObjF {
+    TaskObjFMethods *methods;   /* +0x000 */
+    u8 pad04[0x00C - 0x004];     /* BasicClass::children/parentRefs, untouched by this unit */
+    s32 unk0C;                    /* +0x00C, func_8004EDC0: passed as func_8004F32C's "selector" (device slot 0/1) */
+    u8 pad10[0x014 - 0x010];
+    s32 field14[4];                /* +0x014, func_8004F40C (walks all 4, early-exit)/func_8004F4A4 (passes &field14[0], count 4) */
+    s32 unk24;                       /* +0x024, a state/mode tag: func_8004F638 sets 1, func_8004F8A4 sets 2, func_8004F9D8 reads (==1?) */
+    s32 unk28;                        /* +0x028, a result/error code: func_8004F55C/func_8004F638 clear or set it, func_8004F8A4/func_8004F9D8 read it */
+    s32 unk2C;                         /* +0x02C, func_8004F638 (slot5C's return)/func_8004F784/func_8004F810 (loop bound over unk38's array) */
+    s32 unk30;                          /* +0x030, func_8004F55C (arg1)/func_8004F638 (slot5C's arg3) */
+    s32 unk34;                           /* +0x034, func_8004F55C (arg2)/func_8004F638 (slot5C's stack arg4) */
+    void **unk38;                         /* +0x038, a 16-entry pointer array allocated by func_8004F704, torn down by func_8004F810, walked by func_8004F784; also func_8004F638's slot5C arg1 */
+    void *unk3C;                            /* +0x03C, a single buffer allocated by func_8004F704, freed by func_8004F810; also func_8004F638's slot5C arg2 */
+    s32 unk40;                                /* +0x040, func_8004F638 (arg1)/func_8004F8A4 (arg1, forwarded to slot54 as its own arg2) */
+    s32 unk44;                                 /* +0x044, func_8004F638 (arg2)/func_8004F8A4 (arg2) */
+    s32 unk48;                                  /* +0x048, func_8004F8A4 (arg3) */
+    u8 unk4C;                                     /* +0x04C, func_8004F8A4's 5th (byte) arg; also forwarded live to slot60's arg1 */
+    u8 pad4D[0x050 - 0x04D];
+    s32 unk50;                                      /* +0x050, func_8004F8A4's 6th arg */
+    s32 unk54;                                       /* +0x054, func_8004F638 (arg3)/func_8004F8A4's 7th arg */
+    s32 unk58;                                        /* +0x058, func_8004F638's 5th/stack arg/func_8004F8A4's 8th arg; also forwarded live to slot60's arg2 */
+    u8 pad5C[0x060 - 0x05C];
+    s32 unk60;                                          /* +0x060, func_8004F5DC: removeChild's arg */
+    s32 unk64;                                            /* +0x064, func_8004F5DC: removeChild's arg */
+    s32 unk68;                                             /* +0x068, func_8004F55C (arg6)/func_8004F5DC (cleared) */
+    s32 unk6C;                                              /* +0x06C, func_8004F55C (arg7)/func_8004F5DC (cleared) */
+    s32 unk70;                                                /* +0x070, func_8004F55C (cleared) */
+};
+
+/* func_8004F394/func_8004F3BC/func_8004F3E4 forward `self` unchanged into
+ * func_8004F40C with a distinct library callback each; func_80038F6C/
+ * func_8003903C are Psy-Q SPU routines (asm/psyq_SpuSetMute.s, uncarved),
+ * func_800390F4 is the SAME validity check func_8004F4C8 (below) uses on
+ * its own array argument. */
+extern s32 func_80038F6C(s32 arg);
+extern s32 func_8003903C(s32 arg);
+extern s32 func_800390F4(s32 arg);
+
+/* Generic "find the first of up to `count` entries for which
+ * func_800390F4 accepts it, retrying the whole array forever if none
+ * qualify yet" helper -- func_8004F4A4 calls it on this unit's own
+ * TaskObjF::field14 (count 4). D_80086E78 is a small lookup table indexed
+ * by the winning slot; bound unknown from this unit alone, left unsized. */
+extern s32 D_80086E78[];
+extern s32 func_8004F4C8(s32 *arr, s32 count);
+
+/* The generic pool allocator/free pair, already established the same way
+ * by include/code_8220.h, include/code_55dd4.h etc -- `func_80017CFC`
+ * returning `void *` (not `void`) matches func_8004F784's own use here,
+ * which stores its return value back into the freed slot. */
+/* func_80017B34/func_80017CFC already declared above in this header. */
+extern void *func_80017CFC(void *ptr);
+
+/* Psy-Q semaphore-ish lock/unlock pair, called (with no arguments) around
+ * func_8004F40C's own scan loop when its `flag` argument is set. Not this
+ * unit's own functions -- typed purely from this call site's own register
+ * usage (no return value read, no argument set up). */
+extern void func_80024CE0(void);
+extern void func_80024CF0(void);
+
+/* A fixed 6-byte memory-card device-name template ("bu00:"/"bu10:", PS-X
+ * BIOS device names -- asm/data/7B008.sdata.s). An all-`s8` struct
+ * (natural alignment 1) so the whole-struct assignment in func_8004F32C
+ * reproduces retail's unaligned lwl/lwr + byte-store copy, the same idiom
+ * already documented for `Descriptor10` above. */
+typedef struct DeviceName866E8 {
+    s8 b0, b1, b2, b3, b4, b5;
+} DeviceName866E8;
+
+extern DeviceName866E8 D_8008AA9C;   /* "bu10:" */
+extern DeviceName866E8 D_8008AAA4;   /* "bu00:" */
+
+/* This project's own strcat (matched elsewhere, src/code_171e0.c) --
+ * func_8004F32C is this unit's only caller. */
+extern char *strcat(char *dest, char *src);
+
+/* BasicClass's own method table getter (include/code_8220.h's
+ * `func_80018390`/`BasicClassMethods`, established there from
+ * BASICCLASS_METHODS/D_8006B58C -- see that header for slot38's exact
+ * signature, `void (*)(BasicClass *self, void *arg1, s32 arg2)`, which
+ * this local view matches). Kept as this unit's own independent local
+ * view (same policy as Obj866E8Methods vs. class_3ac78's Class866E8Methods
+ * above) rather than including code_8220.h, since nothing here needs any
+ * OTHER field of BasicClass. */
+typedef struct BasicMethods866E8F BasicMethods866E8F;
+struct BasicMethods866E8F {
+    u8 pad00[0x038];
+    void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, func_8004FB04's first dispatch */
+};
+extern BasicMethods866E8F *func_80018390(void);
+
+/* Uncarved library helpers reached by func_8004EDC0/func_8004EEA0/
+ * func_8004EF6C (a CD-stream open/read/seek/close family) -- typed purely
+ * from these call sites' own register usage, no other unit's evidence. */
+extern s32 func_80050938(char *path, s32 mode);          /* open by path, returns a handle or -1 */
+extern s32 func_80050928(s32 handle, void *buf, s32 size); /* read `size` bytes into `buf` */
+extern s32 func_800508E8(s32 handle, s32 pos, s32 whence); /* seek */
+extern s32 func_800508F8(s32 handle);                       /* close */
+extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
+extern s32 func_80050908(void *arg0);                          /* func_8004EF6C */
+
 #endif
