@@ -47,11 +47,19 @@ s32 func_8003F82C(s32 a0) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F848);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FB0C);
+extern void *D_800902E4;
+
+void func_8003FB0C(void *a0) {
+    D_800902E4 = a0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FB1C);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FBE4);
+extern void *D_8008E794;
+
+void func_8003FBE4(void *a0) {
+    D_8008E794 = a0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FBF4);
 
