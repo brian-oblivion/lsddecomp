@@ -585,10 +585,27 @@ struct Unk18Obj {
     u8 pad064[0x070 - 0x064];
     /* +0x070, round 13 (code_2cc8c_d): a guard flag -- func_8003EA2C/EA48
        (above) only write unk44/unk48 when this is zero/NULL, i.e. a
-       "already initialized" latch. Not itself written by any function
-       this unit attempted, so its own set site is unknown. */
+       "already initialized" latch. RESOLVED round 14: func_8003ECD0 is its
+       own set site -- a one-time allocator/init routine, guarded by this
+       same flag, that sets it to 1 (and zeroes unk74) once it succeeds. */
     s32 unk70;
-    u8 pad074[0x0AC - 0x074];
+    s32 unk74;                  /* +0x074, OBSERVED: func_8003ECD0 (round 14),
+                                    zeroed alongside unk70 */
+    /* +0x078..+0x08C, round 14 (func_8003ECD0): seven `s32`-typed
+       addresses/sizes carved out of one `func_80017B34` allocation --
+       MEASURED, not modeled as real pointer types since retail computes
+       every one of them via plain word arithmetic (not pointer-typed
+       addition), and unk78/unk7C are ALSO dereferenced directly as raw
+       2-word records (`*(s32*)unk78 = ...; *(s32*)(unk78+4) = ...;`).
+       Real structure/meaning beyond "byte offsets within one buffer"
+       unknown. */
+    s32 unk78;
+    s32 unk7C;
+    s32 unk80;
+    s32 unk84;
+    s32 unk88;
+    s32 unk8C;
+    u8 pad090[0x0AC - 0x090];
     Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: func_8003E628 (round 13,
                                   set from `func_8001CA94()`, a
                                   `New_Class6B5CC` allocator, `code_d294.c`)
@@ -630,10 +647,17 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    set up; declared here only with that call site's own shape. */
 extern void func_8003F2AC(void *arg0);
 
+/* func_8003FC18 (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
+   func_8003ECD0 (round 14, this unit) calls it twice, always with its own
+   1st/2nd arguments literal 0 and its own 3rd argument one of the two
+   buffer addresses it just built; declared here only with that shape. */
+extern void func_8003FC18(s32 a0, s32 a1, s32 a2);
+
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EB84(Unk18Obj *self);
 void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1);
+void func_8003ECD0(Unk18Obj *self);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);
