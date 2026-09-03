@@ -30,6 +30,9 @@ typedef struct UnkCObj UnkCObj;
 typedef struct Unk14Obj Unk14Obj;
 typedef struct Unk1BCObj Unk1BCObj;
 typedef struct Unk6CObj Unk6CObj;
+typedef struct Unk6C14Obj Unk6C14Obj;
+typedef struct Unk6C14SubObj Unk6C14SubObj;
+typedef struct QueryTemplate866E8 QueryTemplate866E8;
 
 /* self+0x54: an inline (not pointer) 3-word sub-struct, dereferenced by
  * func_8004B44C (arg3) and also matches func_8004C470's `arg1` descriptor
@@ -280,7 +283,9 @@ typedef struct Obj866E8Methods {
      * func_8004BD14 dispatches under a different (mode==1) condition. */
     void (*slot108)(Obj866E8 *self, Elem *entry); /* +0x108 */
     /* Called by func_8004CC74 with its own stack-local query buffer
-     * (see `CC74QueryBuf`) and a literal 0; return value unused there. */
+     * (see `CC74QueryBuf`) and a literal 0; return value unused there.
+     * Also called by func_8004C6A8 with the identical (own stack-local
+     * CC74QueryBuf, 0) shape; return value unused there either. */
     s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2); /* +0x10C */
     /* = func_8004C1C0 (this round: STALLED at 72/106). Resolves `in` (may be NULL at
      * other call sites; func_8004C1C0 itself never null-checks it) via
@@ -455,15 +460,73 @@ struct Unk1BCObj {
 };
 
 /*
+ * self+0x6C->unk14's pointee (round 13, func_8004C6A8). Only field
+ * established: +0x044, a further pointer (Unk6C14SubObj*).
+ */
+struct Unk6C14Obj {
+    u8 pad00[0x44];
+    Unk6C14SubObj *unk44;           /* +0x044, func_8004C6A8 */
+};
+
+/*
+ * Unk6C14Obj::unk44's pointee. `+0x010` is only ever address-taken
+ * (forwarded raw to func_800160B0, never dereferenced in this unit);
+ * `+0x012` is read BOTH as a signed halfword (to test its sign, adding
+ * 0x1000 to the unsigned reading when negative -- a 12-bit two's
+ * complement unpack) and, separately, as the resulting unsigned value
+ * used for the range dispatch that follows. func_8004C158's own
+ * `(u8 *)self->unk6C->unk14 + 0x18` -- one level UP the chain, on
+ * Unk6C14Obj's OWN address, not this sub-object -- stays a raw cast in
+ * that unit, untouched here.
+ */
+struct Unk6C14SubObj {
+    u8 pad00[0x12];
+    u16 unk12;                      /* +0x012, func_8004C6A8 */
+};
+
+/*
  * self+0x6C's pointee. func_8004B38C only ever STORES its own arg2 here
  * raw (never dereferences it); func_8004C158 dereferences it and reads
  * +0x014, itself a pointer used only for address-of-plus-offset
- * arithmetic (`+0x018`), never further dereferenced.
+ * arithmetic (`+0x018`), never further dereferenced. Retyped this round
+ * (round 13, func_8004C6A8) from `void *` to `Unk6C14Obj *` -- the ONLY
+ * other reader, func_8004C158, already casts it straight to `(u8 *)`
+ * before doing arithmetic, so the retype does not change that already-
+ * matched function's bytes (verified: full rebuild stays green).
  */
 struct Unk6CObj {
     u8 pad00[0x14];
-    void *unk14;                    /* +0x014, func_8004C158 */
+    Unk6C14Obj *unk14;              /* +0x014, func_8004C158/func_8004C6A8 */
 };
+
+/*
+ * Template struct copied wholesale by func_8004C6A8 from the constant
+ * global `D_8008E98C` into a stack-local descriptor, then partially
+ * overwritten (`unk14`/`unk18` zeroed, `unk1C` set from `self->unk74`)
+ * before being handed to two uncarved library helpers
+ * (`func_800160B0`/`func_80015618`) as an in/out parameter block. Field
+ * meaning beyond "8 words, offsets 0x00-0x1C" is unestablished; the first
+ * five words are read/written only as the opaque whole-struct copy.
+ */
+struct QueryTemplate866E8 {
+    s32 unk0[5];                    /* +0x000..+0x010, opaque (untouched by func_8004C6A8) */
+    s32 unk14;                      /* +0x014, func_8004C6A8: zeroed before the call, then an in/out arg to func_80015618 */
+    s32 unk18;                      /* +0x018, func_8004C6A8: zeroed before the call */
+    s32 unk1C;                      /* +0x01C, func_8004C6A8: set to self->unk74 before the call */
+};
+
+extern QueryTemplate866E8 D_8008E98C;
+
+/* Uncarved library helpers (round 13, func_8004C6A8's only known call
+ * site). `func_800160B0`'s first argument is `(u8 *)sub + 0x10` where
+ * `sub` is a `Unk6C14SubObj *` -- never dereferenced in this unit, so
+ * typed as a raw pointer rather than claiming a struct shape for it.
+ * `func_80015618` is called with its 2nd and 3rd arguments pointing at
+ * the SAME address (`&desc.unk14` passed twice) -- confirmed against the
+ * raw disassembly (`$a1`/`$a2` both `sp+0x54`), not a transcription
+ * shortcut. */
+extern void func_800160B0(void *arg0, QueryTemplate866E8 *arg1);
+extern void func_80015618(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2);
 
 /*
  * Opaque target of Obj866E8::unk1DC (func_8004CFB0 stores it raw;
@@ -550,10 +613,13 @@ struct Obj866E8 {
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
     Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
-    u8 pad74[0x78 - 0x74];
+    s32 unk74;                     /* +0x074, func_8004C6A8: copied into its stack-local QueryTemplate866E8's unk1C before calling func_800160B0 */
     s16 unk78;                     /* +0x078, func_8004C620 (halfword, doubled into an index) */
     s16 unk7A;                     /* +0x07A, func_8004C620 (halfword, passed on as an arg) */
-    u8 pad7C[0x88 - 0x7C];
+    s16 unk7C;                     /* +0x07C, func_8004C93C: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with unk80 to decide whether the grid footprint spans one or two 20-unit cells; also written directly by func_8004C6A8 */
+    s16 unk7E;                     /* +0x07E, func_8004C93C: same convention as unk7C, vertical; also written directly by func_8004C6A8 */
+    s32 unk80;                     /* +0x080, func_8004C6A8 (writes arg1 or arg2 depending on its own dispatch), then read/forwarded by func_8004C93C to func_8004CAF0's p7 */
+    s32 unk84;                     /* +0x084, func_8004C6A8 (writes the other of arg1/arg2), then read/forwarded by func_8004C93C to func_8004CAF0's p8 */
     s32 unk88;                     /* +0x088, func_8004CE24: loop count over slots8C[] (bounded by slots8C's own 4-element capacity) */
     GridSlot866E8 slots8C[4];      /* +0x08C, func_8004CE24 (reads); func_8004CDA4 (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
