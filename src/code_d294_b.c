@@ -29,7 +29,25 @@ s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
     return func_8001EDAC(&self->unk10, 8, 1, a1 == 0) == 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D4DC);
+/* self->unk14->unk44 is a 0x28-byte heap block whose +0x10 holds an
+ * S16Quad_d294 (see include/code_d294.h). a2 selects between negating x/y/z
+ * into a local copy (the 4th short left uninitialised, exactly as retail's
+ * own negate path never stores to it) or copying the quad verbatim, then
+ * forwards the result -- plus a1, passed straight through -- to the PsyQ
+ * helper func_800160B0. */
+void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
+    S16Quad_d294 buf;
+    S16Quad_d294 *src = &self->unk14->unk44->vec;
+
+    if (a2) {
+        buf.x = -src->x;
+        buf.y = -src->y;
+        buf.z = -src->z;
+    } else {
+        buf = *src;
+    }
+    func_800160B0(&buf, a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D568);
 

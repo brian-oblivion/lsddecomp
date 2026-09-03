@@ -43,6 +43,34 @@ typedef struct Class6B5CCObj Class6B5CCObj;
 typedef struct Class6B5CCMethods Class6B5CCMethods;
 typedef struct Class6B5CCSub14 Class6B5CCSub14;
 
+/* Round 13 (code_d294_b, func_8001D4DC): a plain s16 quad, all-s16 members
+ * (alignment 2) -- MEASURED, this is what makes retail's whole-struct copy
+ * of it compile to unaligned lwl/lwr instead of a plain lw/sw (see
+ * DECOMPILATION_LEARNINGS' "struct whose members are all s8/s16" idiom).
+ * Only x/y/z are ever written by func_8001D4DC's own two paths; w is left
+ * as whatever was already in the destination on the negate path, exactly
+ * as retail's own disassembly does (no store to it there). Likely an
+ * SVECTOR-shaped angle triple (PsyQ's own SVECTOR isn't typedef'd anywhere
+ * reachable from this unit's headers, so this is a fresh local type, not a
+ * borrowed one). */
+typedef struct S16Quad_d294 S16Quad_d294;
+struct S16Quad_d294 {
+    s16 x;  /* +0x000 */
+    s16 y;  /* +0x002 */
+    s16 z;  /* +0x004 */
+    s16 w;  /* +0x006, never written by func_8001D4DC's negate path */
+};
+
+/* Round 13: self->unk14->unk44's own struct (the 0x28-byte second heap
+ * block) -- only the S16Quad_d294 at +0x10 is known, from func_8001D4DC.
+ * Everything else in the block is still opaque, so this stays a
+ * pad-then-known-field shape like Class6B5CCSub14 itself. */
+typedef struct Class6B5CCBlock44 Class6B5CCBlock44;
+struct Class6B5CCBlock44 {
+    u8 pad0[0x010];
+    S16Quad_d294 vec;  /* +0x010 */
+};
+
 /* self->unk14's target: a 0x50-byte block allocated by the ctor
  * (func_8001CAF4). Round 2 (func_8001D0EC, func_8001CE30, func_8001D1A4)
  * filled in most of the rest of this layout:
@@ -73,7 +101,9 @@ struct Class6B5CCSub14 {
      * a typed field. Renamed from `pad24` now that something references it
      * by name. */
     u8 unk24[0x044 - 0x024];
-    void *unk44;  /* +0x044, a second heap block (0x28 bytes, alloc'd by the ctor) */
+    Class6B5CCBlock44 *unk44;  /* +0x044, a second heap block (0x28 bytes, alloc'd by the ctor);
+                   * RETYPED round 13 (func_8001D4DC) from opaque `void *` once the
+                   * S16Quad_d294 at its own +0x10 was measured. */
     s32 unk48;    /* +0x048, zeroed by the ctor and by func_8001D1A4 (slot +0x050);
                    * set to `obj->unk14` by func_8001D0EC's "attach" */
 };
@@ -374,6 +404,16 @@ u32 func_8001D424(Class6B5CCObj *self, u32 a1);
 s32 func_8001D450(Class6B5CCObj *self, s32 a1);
 u32 func_8001D480(Class6B5CCObj *self, u32 a1);
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
+
+/* func_800160B0 (asm/psyq_2258.s, PsyQ library, not game code): takes an
+ * s16-quad-shaped pointer (this call site's own S16Quad_d294) and a 2nd
+ * argument this unit's own caller passes straight through, unexamined.
+ * $v0 is never read after this call site's own `jal`, so declared void
+ * here -- other units may see a different arity/return, same per-call-site
+ * precedent as func_8001E57C above. */
+extern void func_800160B0(S16Quad_d294 *vec, s32 a1);
+
+void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
 
 void func_8001D600(Class6B5CCObj *self, void *dest);
 void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
