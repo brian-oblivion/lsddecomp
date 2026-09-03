@@ -338,4 +338,17 @@ void func_80064450(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_f", func_800644E8);
+void func_800644E8(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0) {
+        this->methods->slot128(this, rand() % 4);
+        return;
+    }
+    if (this->unkFC % this->unk80 == 0) {
+        this->methods->slot128(this, rand() % 4);
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 0x16;
+        out->unk20 = 2;
+        out->unk24 = 0x40;
+        out->unk28 = 0x20;
+    }
+}
