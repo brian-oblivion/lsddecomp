@@ -109,7 +109,13 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DE08);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DF64);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E054);
+void func_8004E054(Class86B60 *self)
+{
+    self->methods->slot10(self, self->unkC->unk4);
+    self->methods->slot10(self, self->unk10);
+    self->methods->slot14(self, self->unkAC);
+    self->unkAC->methods->slot70(self->unkAC);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E0E4);
 

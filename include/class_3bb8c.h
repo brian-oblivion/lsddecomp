@@ -952,6 +952,28 @@ struct Class86B60UnkB0Obj_3bb8c_d {
 };
 
 /*
+ * Class86B60::unkAC's fuller shape -- shares the same `release` slot at
+ * `+0x004` as the generic view (established by func_8004D704), but
+ * func_8004E054 also reaches `+0x070`. Same reasoning as
+ * `Class86B60UnkB0Obj_3bb8c_d` above: kept a dedicated type rather than
+ * assuming `unkA8` shares this fuller interface too, since nothing in
+ * this unit ever dispatches a second slot on `unkA8`.
+ */
+typedef struct Class86B60UnkACObjMethods_3bb8c_d Class86B60UnkACObjMethods_3bb8c_d;
+typedef struct Class86B60UnkACObj_3bb8c_d Class86B60UnkACObj_3bb8c_d;
+
+struct Class86B60UnkACObjMethods_3bb8c_d {
+    u8 pad000[0x004];
+    void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, func_8004D704 */
+    u8 pad008[0x070 - 0x008];
+    void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, func_8004E054 */
+};
+
+struct Class86B60UnkACObj_3bb8c_d {
+    Class86B60UnkACObjMethods_3bb8c_d *methods; /* +0x000 */
+};
+
+/*
  * Generic class-instance shape used only to read another object's own
  * vtable header WORD (the full `s32` at the vtable's own `+0x000`), the
  * same "arg->methods->header" runtime-type-id shape already documented
@@ -974,7 +996,16 @@ struct GenericHeaderObj_3bb8c_d {
 struct Class86B60Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86B60 *self, void *dreamSys);  /* +0x008, func_8004D578 occupies this slot */
-    u8 pad00C[0x040 - 0x00C];
+    u8 pad00C[0x010 - 0x00C];
+    /* +0x010, func_8004E054's own first two calls -- called TWICE with
+     * different arguments (`self->unkC->unk4`, then `self->unk10`), both
+     * opaque values forwarded verbatim. */
+    void (*slot10)(Class86B60 *self, void *arg1);
+    /* +0x014, func_8004E054's own 3rd call: `(self, self->unkAC)`, the
+     * pointer forwarded opaquely rather than dereferenced by this slot's
+     * caller. */
+    void (*slot14)(Class86B60 *self, void *arg1);
+    u8 pad018[0x040 - 0x018];
     void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, func_8004D578's own last call */
     u8 pad044[0x06C - 0x044];
     void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, func_8004D814's own 2nd call, arg1 = 0xA */
@@ -1012,7 +1043,8 @@ struct Class86B60 {
     Class86B60Methods *methods;    /* +0x000 */
     u8 pad004[0x00C - 0x004];
     Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, func_8004D898/func_8004E054 */
-    u8 pad010[0x02C - 0x010];
+    void *unk10;                     /* +0x010, func_8004E054: opaque, forwarded verbatim */
+    u8 pad014[0x02C - 0x014];
     s32 unk2C;                      /* +0x02C, func_8004D814: set to 0x190 */
     u8 pad030[0x034 - 0x030];
     s32 unk34;                      /* +0x034, func_8004D814: zeroed */
@@ -1064,7 +1096,11 @@ struct Class86B60 {
      * vtable, so it is retyped a pointer here (same size, no layout
      * change). */
     GenericReleaseObj_3bb8c_d *unkA8; /* +0x0A8, func_8004D704: released iff unkAC != NULL */
-    GenericReleaseObj_3bb8c_d *unkAC; /* +0x0AC, func_8004D578: zeroed; func_8004D704: guards both releases */
+    /* +0x0AC, func_8004D578: zeroed; func_8004D704: guards both releases.
+     * RETYPED from the minimal `GenericReleaseObj_3bb8c_d *` to the
+     * dedicated `Class86B60UnkACObj_3bb8c_d *` -- func_8004E054 reaches a
+     * second slot (`+0x070`) on it. Same size, no layout change. */
+    Class86B60UnkACObj_3bb8c_d *unkAC;
     /* +0x0B0, func_8004DC08: a third owned sub-object, released
      * unconditionally (no null check) through the same shared `release`
      * slot as `unkA8`/`unkAC`. Typed its own `Class86B60UnkB0Obj_3bb8c_d`
