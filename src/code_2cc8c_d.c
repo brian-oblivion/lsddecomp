@@ -81,7 +81,9 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F04C);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F1A8);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F230);
+SubHandleObj *func_8003F230(Unk18Obj *self) {
+    return self->unkB0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F23C);
 
