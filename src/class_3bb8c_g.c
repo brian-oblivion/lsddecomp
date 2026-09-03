@@ -12,7 +12,16 @@ void func_8004FF40(Class86E00_3bb8c_g *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FF90);
+void func_8004FF90(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
+{
+    if (self->unk28 != 0) {
+        if (arg2 == 0x19) {
+            self->methods->slot90(self);
+        } else if (arg2 == 0x17) {
+            self->methods->slot94(self);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FFF4);
 
