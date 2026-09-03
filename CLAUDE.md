@@ -37,6 +37,43 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    it only changes instruction ORDER, it is allowed. A register-identity
    mismatch is a STALL — write the report.
 
+   **The ban is on fixing REGISTER IDENTITY, and it is scoped to code that
+   has a C form at all.** It does NOT forbid an operand constraint that is
+   the only way to name a value from an instruction C cannot express. The
+   PS1 GTE is the case that matters: `swc2`/`lwc2` move data to and from
+   COP2 registers, which are a numbering disjoint from the GPRs, and there
+   is no C that emits them. Handing such a block a pointer with
+   `: : "r" (dst) : "memory"` is not register pinning, it is the only way to
+   reference the pointer. `src/code_8220_b.c` has carried eight such
+   constraints, byte-verified, since before this rule was written down —
+   `func_800196D4` and its five siblings — and round 13 matched three more
+   functions the same way.
+
+   **This paragraph exists because the categorical wording above was, on its
+   own, false about this repository**, and "not judgement calls" forecloses
+   the reading that would have rescued it. A runner obeying the literal rule
+   would either refuse a legitimate match or believe it had violated a HARD
+   RULE by achieving one. Round 13's charlie did the work correctly and
+   flagged the tension; the head confirmed the precedent with
+   `grep -rcE '"[rm]" *\(' src/` rather than by reasoning about intent.
+
+   Two traps inside the exception, both measured in round 13, both cheap to
+   hit and expensive to diagnose:
+
+   - **Name the right clobbers.** A GPR clobber on an `lwc2`/`swc2` block
+     that names `$2`-`$5` when the instructions target COP2 data registers
+     forces spurious evictions that cascade through the whole surrounding
+     function's allocation. It looks exactly like an unrelated
+     register-identity residue somewhere else entirely.
+   - **Bracket real branches.** An `__asm__` block containing an actual
+     branch or jump mnemonic (`beq`/`bne`/`blez`/`j`/`jal` — not the
+     `beqz`/`bnez` pseudo-forms) needs an explicit tab-delimited
+     `".set\tnoreorder\n\t"` … `".set\treorder\n\t"` bracket, or maspsx's
+     defensive nop-after-branch insertion corrupts the delay-slot semantics
+     and, left unclosed, eats the nop off the NEXT generated code. The
+     bracket is a source construct and yours to use; maspsx's underlying
+     behaviour is an open operator escalation, not something to adjust.
+
 ## Where the project is
 
 **Measure it, do not read it here.** Counts, percentages and per-unit queues
@@ -95,6 +132,20 @@ grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
 
 A hit in either means the function is blocked. `progress.py`'s `fresh` column
 cannot see this, which is why every blocked function carries a stub report.
+
+**Run the screen before you accept a stall's CAUSE, not only before you assign
+work.** Round 13 found `func_8005CBC8` filed as a one-word near-miss whose
+residue was attributed to an instruction-selection preference in a conditional
+preamble — while an `addiu $at, $at, %lo(jtbl_8001188C)` hit sat unexamined at
+line 66 of that function's own `.s`. It was two words short, and one of the two
+was the blocker. Seven attempts had gone into the wrong half.
+
+The asymmetry is what makes this worth a rule: a wrong SCORE gets corrected the
+next time anyone measures, because measuring is the job. A wrong CAUSE is what
+the next round acts on, so it converts a blocked function into a permanent
+near-miss that keeps attracting attempts and keeps generating reports agreeing
+with each other. Screening costs one second and is the difference between
+"unmatchable until the blocker moves" and "so close, try again".
 
 **A `%lo(jtbl_*)` hit counts. A dense `switch` is blocked exactly like an
 indexed global, and this is the one place the screen looks like it is
