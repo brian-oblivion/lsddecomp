@@ -249,6 +249,13 @@ struct Obj86B60Methods {
     s32 (*slot118)(Obj86B60 *self);                 /* +0x118, external
                                                        (func_8003DFA0);
                                                        OBSERVED: func_8003C944 */
+    void (*slot11C)(Obj86B60 *self, s32 a1, s32 a2); /* +0x11C, external;
+                                                       OBSERVED:
+                                                       func_8003DDC8,
+                                                       func_8003DE30 (both
+                                                       call it with a
+                                                       computed index value
+                                                       and a literal 1) */
 };
 
 /*
@@ -285,9 +292,21 @@ struct Obj86B60 {
     s32 unk58;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
-    void **unk5C;                /* +0x05C, func_8003D6D4: array indexed by
-                                     unk58, giving func_800183DC's 2nd arg */
-    u8 pad060[0x064 - 0x060];
+    s32 *unk5C;                  /* +0x05C, array indexed by unk58: a
+                                     per-slot capacity/bound.
+                                     func_8003D6D4 passes unk5C[unk58] as
+                                     func_800183DC's 2nd arg (raw register,
+                                     type doesn't affect those bytes);
+                                     func_8003DDC8/func_8003DE30 use it as
+                                     an explicit upper bound compared
+                                     against unk60[unk58], which is what
+                                     settles it as a count, not a pointer */
+    s32 *unk60;                   /* +0x060, array indexed by unk58: a
+                                     per-slot running count, incremented
+                                     (wrapping to 0 past unk5C[unk58]) by
+                                     func_8003DDC8 and decremented
+                                     (wrapping to unk5C[unk58]-1 below 0) by
+                                     func_8003DE30 -- a ring-buffer index */
     void **unk64;                /* +0x064, func_8003D6D4: array indexed by
                                      unk58, giving func_800183DC's 1st arg
                                      and func_80017CFC's arg */

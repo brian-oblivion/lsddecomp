@@ -66,8 +66,28 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DAD4);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DCAC);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DDC8);
+void func_8003DDC8(Obj86B60 *self)
+{
+    s32 idx = self->unk58;
+    s32 v = self->unk60[idx];
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DE30);
+    v++;
+    if (v >= self->unk5C[idx]) {
+        v = 0;
+    }
+    self->methods->slot11C(self, v, 1);
+}
+
+void func_8003DE30(Obj86B60 *self)
+{
+    s32 idx = self->unk58;
+    s32 v = self->unk60[idx];
+
+    v--;
+    if (v < 0) {
+        v = self->unk5C[idx] - 1;
+    }
+    self->methods->slot11C(self, v, 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DE9C);
