@@ -91,4 +91,19 @@ void func_80019724(void *dst, s32 flag)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_8001974C);
+void func_8001974C(void *dst, s32 flag)
+{
+    char *p = (char *)dst + 0x20;
+
+    if (flag) {
+        __asm__ volatile (
+            "swc2 $12, 0x8(%0)\n\t"
+            "swc2 $13, 0x10(%0)\n\t"
+            "swc2 $14, 0x18(%0)"
+            : : "r" (dst) : "memory");
+    } else {
+        __asm__ volatile (
+            "swc2 $14, 0x0(%0)"
+            : : "r" (p) : "memory");
+    }
+}
