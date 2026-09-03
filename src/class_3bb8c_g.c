@@ -5,7 +5,12 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FBE4);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FE24);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FF40);
+void func_8004FF40(Class86E00_3bb8c_g *self)
+{
+    if (self->unk70 != NULL) {
+        self->unk70 = self->unk70->methods->slot4(self->unk70);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FF90);
 
