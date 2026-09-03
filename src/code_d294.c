@@ -131,7 +131,25 @@ void func_8001D204(Class6B5CCObj *self) {
     } while (cont);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D280);
+void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
+    s32 tag;
+
+    tag = 4;
+    do {
+        if (*entry == NULL) {
+            *cursor = self->unk4;
+        }
+        func_800183A0(entry, cursor);
+        if (*entry != NULL) {
+            if ((((*entry)->methods->header) & 0xF) == tag) {
+                if ((*entry)->unkC == self) {
+                    return;
+                }
+            }
+        }
+    } while (*cursor != NULL);
+    *entry = NULL;
+}
 
 void func_8001D33C(void) {
 }
