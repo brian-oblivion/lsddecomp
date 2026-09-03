@@ -773,6 +773,17 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > retype that breaks another function shows up as a red build, not as a
 > diff in the function you are working on.
 >
+> **And this is not limited to RETYPES — round 13 widened it.** Any edit to a
+> struct that another already-matched function reads can break that function,
+> including an ordinary field INSERTION where you forgot the leading
+> `u8 padNN[...]`. Round 13's delta did exactly that, shifted every later
+> field, and broke an already-matched function in a different unit by one
+> byte with a clean compile. So run the same check for every struct edit, not
+> just slot retypes. If the build goes red with no compile error, localize it:
+> `cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head`, convert the position
+> (**1-based**) with `vram = (N - 1) - 0x800 + 0x80010000`, and look that up
+> in `build/lsdde.map`.
+>
 > PARALLEL MODE RULES: do not edit DECOMPILATION_LEARNINGS.md,
 > MATCHING-GUIDE.md, PROGRESS.md, config/, or any file outside your unit. Put
 > generalizable discoveries in the match report under `### Proposed learning`.

@@ -325,6 +325,52 @@ backstop, not a substitute for reading `build exit=`.
    head had also edited on `main` mid-round — see the note below on why that
    edit should not have happened.
 
+**There is no fifth, and one was proposed and rejected — read this before
+adding one.** Round 13's delta inserted a new field into a shared vtable
+struct and forgot its leading `u8 padNN[...]`. Everything after it shifted,
+which broke an ALREADY-MATCHED function in a DIFFERENT unit
+(`func_8001D204`, `code_d294.c`) by exactly one byte. It compiled clean, and
+nothing in delta's own function's output showed anything wrong. Delta
+proposed it as a fifth way a score lies.
+
+**It is not one, and the distinction matters.** The four above are cases
+where the oracle hands you a wrong GREEN or a wrong NUMBER. Here the oracle
+went RED and was right to: `build exit` was non-zero and the whole-image
+SHA1 failed. Nothing lied. Filing it as a fifth would teach the next runner
+that the oracle cannot be trusted in precisely the case where it can, which
+is a worse error than the one it documents. Delta's own write-up reaches the
+same conclusion in its last sentence — *"the signal only ever shows up in
+the whole-image byte count, which is why the loop insists on re-running the
+full oracle after every source change"* — the discipline already covers it.
+
+What delta actually found is a **DIAGNOSTIC** gap: a red build with no
+compile error and no diff in the function you were editing. Two things
+follow, and both are worth having.
+
+- **The shared-struct hazard is broader than the "shared vtable slot
+  retype" warning states.** That warning (in the runner prompt in
+  `docs/PARALLEL-RUNS.md`) is about RETYPING a slot. The real risk class is
+  *any* edit to a struct another already-matched function reads — and an
+  ordinary field INSERTION with a forgotten pad is easier to trigger than a
+  retype and has identical consequences. Treat every struct edit as
+  potentially non-local, not just retypes.
+- **Localizing it: `cmp -l`, then the map.** When `build-and-verify.sh`
+  fails with no compile error, find the differing byte and turn it into a
+  function name:
+
+  ```sh
+  cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head
+  # cmp -l positions are 1-BASED. vram = (N - 1) - 0x800 + 0x80010000
+  python3 -c 'print(hex((0xD561 - 1) - 0x800 + 0x80010000))'   # -> 0x8001cd60
+  grep -n '0x8001cd60' build/lsdde.map
+  ```
+
+  **The 1-based part is not a nitpick and delta's version of this recipe had
+  it wrong**, giving `file_offset - 0x800 + 0x80010000` applied straight to
+  `cmp -l`'s output. Verified here: `cmp -l` on two 4-byte files differing at
+  0-based index 2 reports `3`. Off by one usually still lands inside the same
+  function, which is exactly why the error survives being used.
+
 ## Standing checks
 
 ```sh
