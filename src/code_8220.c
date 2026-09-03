@@ -35,7 +35,12 @@ INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017CFC);
 void func_80017EA8(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_17eb0);
+void *BasicClass__func_17eb0(BasicClass *self)
+{
+    self->methods->finalize(self);
+    func_80017CFC(self);
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__BasicClass);
 
