@@ -71,7 +71,14 @@ void func_8001CD20(Class6B5CCObj *self) {
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CD60);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CE30);
+void func_8001CE30(Class6B5CCObj *self) {
+    self->unk24 = 0;
+    self->unk10 = 0;
+    func_80012838(0, self->unk14);
+    self->methods->slot44(self, 1, D_8006B684);
+    self->methods->slot48(self, 1, D_8006B690);
+    self->unk14->unk0 = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CEB4);
 
