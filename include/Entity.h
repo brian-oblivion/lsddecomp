@@ -155,7 +155,9 @@ extern Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3
 struct Unk94Methods {
     u8 pad000[0x44];
     void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(unk94, 1, D_80089C94); return value unused at this, its only known call site */
-    u8 pad048[0xB8 - 0x48];
+    u8 pad048[0x94 - 0x48];
+    void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80065238 (Entity_g), twice, as slot94(unk94, 0, 2) and slot94(unk94, 0, 7); return value unused at either call site */
+    u8 pad098[0xB8 - 0x98];
     void (*slotB8)(Unk94Obj *self, void *arg1); /* called by func_80060B34 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
     u8 pad0BC[0xC4 - 0xBC];
     void (*slotC4)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80062730 (Entity_e) as slotC4(unk94, 0x80, 0) and slotC4(unk94, -N, 1); return value unused at both known call sites, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
