@@ -122,6 +122,7 @@ struct Unk100Methods {
     /* +0x50 */ void (*slot50)(Unk100Obj *self);                           /* called by func_8005D108 */
     /* +0x54 */ u8 pad54[0xD0 - 0x54];
     /* +0xD0 */ void (*slotD0)(Unk100Obj *self, void *arg1);                /* called by func_8005D108 */
+    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80061198 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0); return value unused at this, its only known call site */
 };
 
 struct Unk100Obj {
@@ -129,6 +130,11 @@ struct Unk100Obj {
 };
 
 extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
+
+/* Already matched in Entity.c (not INCLUDE_ASM), but not previously called
+ * from outside that unit -- func_80061198 (Entity_d) is its first cross-unit
+ * caller, hence the extern here rather than only a file-local definition. */
+extern Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 arg4);
 
 /* Object pointed to by `Entity::unk94`. NOT another `Entity`, despite +0x14
  * also holding an `EntityPos *` (same convention as `Entity::unk14`):
@@ -240,7 +246,8 @@ struct Entity {
     /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- func_8005E7F8 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
     /* +0x4A */ u8 pad4A[0x4C - 0x4A];
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by func_8005D418; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
-    /* +0x50 */ u8 pad50[0x58 - 0x50];
+    /* +0x50 */ s32 unk50;              /* read by func_80061198 (Entity_d), passed opaquely to this->unk100->methods->slotD4 as its arg1 */
+    /* +0x54 */ u8 pad54[0x58 - 0x54];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
     /* +0x5C */ u8 pad5C[0x80 - 0x5C];
     /* +0x80 */ s32 unk80;             /* read by func_8005E6F0/func_8005E7F8 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and func_8005EBB4 (compared to `out->unk4` as `this->unk80 - 1`) */

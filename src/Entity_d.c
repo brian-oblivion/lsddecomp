@@ -391,7 +391,52 @@ void func_80061158(Entity *this) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80061198);
+void func_80061198(Entity *this, EntityMoodHandlerArg *out) {
+    s32 mood;
+
+    if (this->unkFC == 0) {
+        this->unk44 = rand() % 3;
+        if (this->unk44 == 0) {
+            this->methods->slot130(this);
+            this->methods->slotCC(this, 0x1800, 0);
+        }
+    }
+    out->unk10 = this->methods->slot148(this);
+    if (this->unk44 != 0) {
+        mood = this->unk84;
+        if (mood < 0x1E) {
+            out->unk1C = 0xC;
+            out->unk20 = -1;
+        } else if (mood == 0x1E) {
+            out->unk1C = -2;
+        } else if (mood == 0x23) {
+            out->unk44 = 0x16;
+            out->unk48 = -2;
+        } else if (mood == 0x30) {
+            if (func_8005D714(this, &this->unk14->x, 0xF, 0xA)) {
+                if (func_8005D108(this, NULL, NULL, (void *)0xA, 0) != NULL) {
+                    this->unk100->methods->slotD4(this->unk100, this->unk50, 4, 0);
+                }
+                if (rand() & 1) {
+                    this->methods->slot30(this, 0xB);
+                }
+            }
+        } else if (mood == 0x3B) {
+            this->methods->slot160(this);
+            this->unk44 = 1;
+        }
+        return;
+    }
+    out->unk1C = 0xC;
+    out->unk20 = -1;
+    this->methods->slotC4(this, -0x200, 0);
+    if ((u32)(this->unkFC - 0x80) < 0xC2) {
+        this->methods->slotCC(this, -0x80, 0);
+    } else if (this->unkFC == 0x142) {
+        this->methods->slot12C(this);
+        this->unk44 = 1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80061400);
 
