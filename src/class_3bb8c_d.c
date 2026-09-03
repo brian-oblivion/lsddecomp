@@ -18,7 +18,14 @@ void func_8004D788(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D814);
+void func_8004D814(Class86B60 *self)
+{
+    self->unk34 = 0;
+    self->unk2C = 0x190;
+    self->methods->slotD4(self, &D_800114E8, 0);
+    self->methods->slot6C(self, 0xA);
+    self->unkA4->methods->slotF0(self->unkA4, 0, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D898);
 
