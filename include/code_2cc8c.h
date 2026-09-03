@@ -30,6 +30,8 @@ typedef struct Unk48Obj Unk48Obj;
 typedef struct Unk48ObjMethods Unk48ObjMethods;
 typedef struct Unk78Obj Unk78Obj;
 typedef struct Unk78ObjMethods Unk78ObjMethods;
+typedef struct Unk74Obj Unk74Obj;
+typedef struct Unk74ObjMethods Unk74ObjMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -121,6 +123,33 @@ struct Unk78ObjMethods {
 struct Unk78Obj {
     Unk78ObjMethods *methods; /* +0x000 */
 };
+
+/* self->unk74's pointee ("sub-resource handle"). Only func_8003CDE0 touches
+ * it, loaded via `func_8003B39C(path)` (already matched, `class_39e08.c`,
+ * where it returns the unit's own local view `SubObjG *` -- this unit keeps
+ * its own local view of the same table per the project's established
+ * multiple-independent-local-views convention). slot4's return value is
+ * discarded at its one call site here, so it is typed `void *` rather than
+ * copying `class_39e08.h`'s `SubObjG *` return type -- a discarded return is
+ * never evidence of the callee's real return type (see
+ * DECOMPILATION_LEARNINGS), and this unit has no use for the more specific
+ * type. */
+struct Unk74ObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk74Obj *self);  /* +0x004 */
+    u8 pad008[0x05C - 0x008];
+    void (*slot5C)(Unk74Obj *self);  /* +0x05C */
+    u8 pad060[0x078 - 0x060];
+    void (*slot78)(Unk74Obj *self);  /* +0x078 */
+};
+struct Unk74Obj {
+    Unk74ObjMethods *methods;        /* +0x000 */
+};
+
+extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
+                                                       class_39e08.c; local
+                                                       view retyped to this
+                                                       unit's own Unk74Obj */
 
 /*
  * self->methods. Only the slots this unit's functions actually CALL
@@ -246,7 +275,11 @@ struct Obj86B60 {
     s32 unk58;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
-    u8 pad05C[0x078 - 0x05C];
+    u8 pad05C[0x070 - 0x05C];
+    const char *unk70;          /* +0x070, func_8003CDE0: truthy gate and a
+                                    cache of the path last passed to
+                                    func_8003B39C */
+    Unk74Obj *unk74;            /* +0x074, func_8003CDE0 only */
     Unk78Obj *unk78;             /* +0x078, func_8003CC2C only */
     u8 pad07C[0x084 - 0x07C];
     s32 unk84;                  /* +0x084, func_8003CC2C: multiplied

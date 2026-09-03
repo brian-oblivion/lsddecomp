@@ -14,7 +14,20 @@ s32 func_8003CD48(Obj86B60 *self)
     return (u8)c >= 0x81;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003CDE0);
+void func_8003CDE0(Obj86B60 *self, const char *a1, Unk74Obj *a2)
+{
+    if (a1 != NULL) {
+        if (self->unk70 != NULL) {
+            self->unk74->methods->slot4(self->unk74);
+        }
+        self->unk74 = func_8003B39C(a1);
+        self->unk74->methods->slot78(self->unk74);
+        self->unk74->methods->slot5C(self->unk74);
+    } else {
+        self->unk74 = a2;
+    }
+    self->unk70 = a1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003CE98);
 
