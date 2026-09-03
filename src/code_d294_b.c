@@ -62,4 +62,8 @@ void func_8001E49C(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E4A4);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E57C);
+/* This unit's own no-argument vtable getter -- see the extended note on
+ * D_8006B5CC in include/code_d294.h and the file banner up top. */
+Class6B5CCMethods *func_8001E57C(void) {
+    return &D_8006B5CC;
+}

@@ -185,6 +185,13 @@ struct Class6B5CCMethods {
  * local 0-argument declaration doesn't need to agree with other units'. */
 extern Class6B5CCMethods *func_8001E57C(void);
 
+/* This unit's own vtable data, D_8006B5CC (see `tools/classtable.py
+ * D_8006B5CC` in the file banner above) -- func_8001E57C (round 12,
+ * code_d294_b) just returns `&D_8006B5CC`. Still rodata (not carved as C
+ * here), so only the address is declared, typed to the return of the one
+ * getter this unit implements. */
+extern Class6B5CCMethods D_8006B5CC;
+
 struct Class6B5CCObj {
     Class6B5CCMethods *methods; /* +0x000 */
     /* +0x004..+0x00C: BasicClass instance fields, owned by whatever unit
