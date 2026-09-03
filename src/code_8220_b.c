@@ -55,7 +55,25 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018458);
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018464);
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_8001934C);
+void func_8001934C(void *arg0, void *arg1)
+{
+    u8 *a = (u8 *)arg0;
+
+    if (*(s32 *)((u8 *)arg1 + 0x1C) != 0) {
+        a[7] = a[7] | 0x2;
+    } else {
+        a[7] = a[7] & 0xFD;
+    }
+
+    if (D_8008E248 != 0) {
+        a[7] = a[7] | 0x1;
+    } else {
+        a[7] = a[7] & 0xFE;
+    }
+
+    *((u8 *)arg1 + 0x14) = a[3];
+    *((u8 *)arg1 + 0x15) = a[7];
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800193C0);
 

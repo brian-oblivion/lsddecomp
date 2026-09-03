@@ -125,4 +125,8 @@ extern BasicClassMethods *func_80018390(void);                                 /
  * asm/data/A8C.rodata.s. */
 extern const char D_8001028C[];
 
+/* Global boolean flag read by func_8001934C, asm/data (bss/data, not yet
+ * carved). Read-only from this unit; nothing here writes it. */
+extern s32 D_8008E248;
+
 #endif
