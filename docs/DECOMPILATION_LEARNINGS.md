@@ -1007,6 +1007,123 @@ code_2c054).**
   register-only statement will not yield to one.
   (`func_8003DAD4`, `func_8003D73C`)
 
+#### Round 13 (2026-09-03)
+
+- **`~x + 1` and `-x` are NOT interchangeable.** `-x` compiles to a single
+  `negu`. `~x + 1` compiles to `nor $vN, $zero, $rX` followed by
+  `addiu $rY, $vN, 1`. So a retail `nor`+`addiu` pair IS the source saying
+  `~x + 1`, and no amount of reshaping around a `-x` will reach it.
+  Generalises past this one operator: **read retail's CHOICE OF INSTRUCTIONS
+  as evidence about the source EXPRESSION**, not only about its control flow.
+  A two-instruction encoding of something the compiler can do in one is
+  usually the source spelling it out. (`func_8005CBC8` — seven prior attempts
+  all used `-sel`, so none of them could reach it.)
+
+- **N independently-incrementing walkers over one array need N differently
+  BASED view types.** This SUPERSEDES the round-12 conclusion that GCC
+  2.6.3's strength reduction is uncontrollable from source once it can prove
+  two accesses share a base+index. It is controllable — but only by changing
+  the BASE, never by regrouping the fields. Measured both directions on one
+  function: every shape that keeps ONE base collapses to one induction
+  variable (`arr[i].fieldA`/`arr[i].fieldB`, an `&arr[i]` element pointer, a
+  nested `arr[i].sub.field`, a per-iteration sub-pointer — all identical
+  output). The recipe when retail shows N walkers over one array:
+
+  ```c
+  /* stride is 0xC; BOTH types are the full stride so a natural ++ works */
+  SetupEntry866E8 *ep = arr1;                              /* based at +0 */
+  SetupSub866E8   *sp = (SetupSub866E8 *)((u8 *)arr1 + 4); /* based at +4 */
+  ...
+  ep++; sp++;
+  ```
+
+  Keep the second type OUT of the real element struct — embedding it corrupts
+  the element struct's size, and that false blocker is what stopped the
+  previous attempt. Seed each walker with ONE cast outside the loop; a
+  byte-cast `+= stride` INSIDE the loop reaches the same CFG but costs extra
+  addressing instructions and scores worse. (`func_8004BB3C`, 14/105 → 90/105
+  at correct length; residue then a pure `$s3`/`$s4` identity swap.)
+
+- **Never size a per-function residue with the whole-image byte count when
+  the function contains a `switch`.** Compiling the switch from C replaces
+  the `.s` file's embedded jump table with GCC's own, relocating rodata and
+  shifting the ENTIRE image, so the whole-image count is dominated by drift
+  and is not a residue measurement at all. Use asm-differ's
+  inserted/deleted instruction markers, or `funcdiff.py`'s in-range word
+  score. (`func_8005CBC8` was sized at one word this way and is two.)
+
+- **A preserved body's own "untried direction" note outperforms a fresh
+  derivation — INCLUDING when the stated reason it went untried is wrong.**
+  `func_8004BB3C` gained 76 words in three builds because the previous author
+  wrote down exactly which lever they had not pulled and why they believed
+  they could not. The belief (struct-size corruption) was mistaken, and
+  reading it carefully is what showed the lever was available. When you stop,
+  record the direction you did not take and your reason for not taking it,
+  even if the reason feels obvious.
+
+- **The shift amount after `mfhi` fingerprints a division's divisor** faster
+  than decoding the magic multiplier constant. (`Entity_e`, several)
+
+- **Hoist a `rand() % K` into a named local before scaling or reusing it.**
+  A `(rand() & 1) * K`-shaped expression used inline leaves a
+  register-identity residue through the `mult`/`mfhi` expansion; the named
+  local matches. Note this cuts the opposite way from the usual
+  "drop the intermediate" advice — `func_80061198` needed its intermediate
+  local REMOVED for the same idiom. The lever is real in both directions, so
+  try both rather than assuming which. (`func_80062570`, `func_80061198`)
+
+- **An unsigned range check needs an EXPLICIT cast to get `sltiu`.** Write
+  `(u32)(x - LO) < N`; without the cast you get `slti`. Same word count,
+  wrong opcode — so it survives a length check and shows up only as a diff.
+  Relatedly, `x == 0` / `!x` on a masked expression lowers differently by
+  signedness: only a named **unsigned** local compared with `<` reaches
+  `sltiu`. (`func_80062730`, `func_800621A8`)
+
+- **A comparison reachable from two converging branches, with its operand
+  re-materialised on one path, is `A && B` short-circuit form**, not nested
+  `if`s. (`func_80061C2C`)
+
+- **Reuse one counter for a guard and its loop test.** Retail's paired
+  guard-then-loop shape comes from `if (count--) { ... while (count--) ... }`
+  on the SAME variable; a fresh `remaining` local does not reproduce it.
+  (`func_800183DC`)
+
+- **Two adjacent updates to the same byte are independent statements, each
+  reloading from memory.** Do not share a "new flags" temp between them.
+  (`func_8001934C`)
+
+- **In a free-list walk, copy the about-to-be-freed value into a temp BEFORE
+  advancing the cursor**, not after — that ordering is what matches retail's
+  register reuse. Separately, test the advanced pointer directly rather than
+  giving it a second `next` name. (`func_80018288`)
+
+- **A wrong GPR clobber on an `lwc2`/`swc2` block cascades.** Naming
+  `$2`-`$5` when the instructions target COP2 data registers — a disjoint
+  numbering — forces spurious evictions through the whole surrounding
+  function's allocation, and presents as a register-identity residue
+  somewhere else entirely. See CLAUDE.md HARD RULE 6 for the GTE exception
+  this sits inside, and `docs/research/maspsx-noreorder-lead.md` for the
+  `.set noreorder` bracket a branch-containing block also needs.
+  (`func_800195EC`)
+
+- **`func_8001EACC`'s first two arguments are symmetric and `$a3` names the
+  direction.** All 9 asm call sites and all 19 matched C call sites with
+  `a3 == 0` pass `(this, this->unk94)`; both `a3 == 1` sites pass
+  `(this->unk94, this)`. The caller pre-swaps rather than the callee
+  branching. Do NOT "fix" a swapped site back, and do NOT retype the extern
+  on the strength of one. Open, deliberately unasserted: if both objects fit
+  either slot, the real parameter type is probably a common base shared by
+  `Entity` and `Unk94Obj` rather than `Entity *` — resolve with
+  `tools/classtable.py` before declaring it.
+  (`func_80061778`, `func_80063144`)
+
+  Method note, which is the transferable part: two runners in different units
+  flagged the same oddity independently. One sighting reads as a
+  transcription error; the second is what justifies a corpus sweep, and the
+  sweep is what found the flag correlation neither sighting could see alone.
+  **When two runners report the same anomaly, sweep the corpus before writing
+  either report up.**
+
 ### New residue classes opened this round (not yet closed)
 
 - **NEW, round 12: "retail saturates the callee-saved register file."**
