@@ -135,7 +135,24 @@ segments:
       # Gate 2 previously listed 0xA8C as a text-pointer slot needing
       # attachment; that was wrong, and the carve links green without it.)
       - [0x8220, c, code_8220]
-      - [0x8A88, asm, code_8220_b]
+      # code_8220_b: second 20-function slice, 0x8A88..0x9F74.
+      # 0x9F74 (func_80019774) is a real boundary -- func_8001974C is a
+      # 10-word frameless leaf that ends in its own `jr $ra; nop`, and
+      # func_80019774 is the next such leaf, opening `beqz $a1, .L80019790`
+      # without ever reading the caller's frame. Checked on both sides: no
+      # function in the slice has more than one prologue, and none touches
+      # $sp before allocating. THIRTEEN of the 20 are frameless leaves --
+      # unusually many, because this is the tail of the BasicClass block
+      # and most of them are 5-10 word accessors, which makes it the
+      # cheapest ground in the game per function. Zero `jlabel`, zero
+      # `jr $t2`, so no rodata slot to attach and no hasm/.word
+      # disposition. Blocker census over the slice: 2 of 20 gp_rel-blocked
+      # (func_8001844C, func_80018458), zero addiu-$at.
+      # ONE OUTLIER TO KNOW ABOUT: func_80018464 is 954 words, by far the
+      # largest function in any carved unit. It is not blocked, but it is
+      # not cold-runner ground either -- budget it separately.
+      - [0x8A88, c, code_8220_b]
+      - [0x9F74, asm, code_8220_c]
       - [0xAD64, asm, psyq_rcpolyf3]
       - [0xB0D4, asm, psyq_rcpolyf4]
       - [0xB554, asm, psyq_rcpolyg3]
@@ -152,7 +169,19 @@ segments:
       # zero addiu-$at, zero `jlabel`, zero `jr $t2` -- so no rodata slot
       # to attach and no hasm/.word disposition.
       - [0xD294, c, code_d294]
-      - [0xDC24, asm, code_d294_b]
+      # code_d294_b: second 20-function slice, 0xDC24..0xED8C.
+      # 0xED8C (func_8001E58C) is a real boundary -- func_8001E57C is a
+      # 4-word leaf that returns `&D_8006B5CC` and ends `jr $ra; nop`, and
+      # func_8001E58C opens with its own `addiu $sp, $sp, -0x40`. Checked
+      # on both sides: no function in the slice has more than one
+      # prologue, and none touches $sp before allocating. The four
+      # frameless functions (func_8001D6A4, func_8001D6AC, func_8001E49C,
+      # func_8001E57C) are 2-4 word leaves, each ending in its own
+      # `jr $ra`. Zero `jlabel`, zero `jr $t2`, so no rodata slot to
+      # attach and no hasm/.word disposition. Blocker census over the
+      # slice: 1 of 20 gp_rel-blocked (func_8001DDF4), zero addiu-$at.
+      - [0xDC24, c, code_d294_b]
+      - [0xED8C, asm, code_d294_c]
       - [0xF770, asm, psyq_GsLinkObject4]
       - [0x15D04, asm, psyq_15d04]
       - [0x16334, c, class_16334]
@@ -181,7 +210,23 @@ segments:
       # hits across all 20 functions, and zero `jlabel`/`jr $t2`, so no
       # rodata slot needs attaching and no hasm/.word disposition applies.
       - [0x2D548, c, code_2cc8c_b]
-      - [0x2E7A0, asm, code_2cc8c_c]
+      # code_2cc8c_c: third 20-function slice, 0x2E7A0..0x2F0B8.
+      # 0x2F0B8 (func_8003E8B8) is a real boundary -- func_8003E874 closes
+      # `addiu $sp, $sp, 0x18; jr $ra; nop` and func_8003E8B8 opens with
+      # its own `addiu $sp, $sp, -0x20`. Checked on both sides: no
+      # function in the slice has more than one prologue, and none touches
+      # $sp before allocating. The six frameless functions in it
+      # (func_8003DFA0, func_8003DFBC, func_8003DFCC, func_8003E100,
+      # func_8003E4A4, func_8003E5C8) are 3-7 word leaves ending in their
+      # own `jr $ra`.
+      # BEST SLICE OF ROUND 12: ZERO gp_rel and ZERO addiu-$at across all
+      # 20 functions, and zero `jlabel`/`jr $t2`. The segment's only jump
+      # table belongs to func_8003FB1C, the 60th function -- still deep in
+      # the asm remainder, where the yaml already parks its rodata slot at
+      # 0x1908. So nothing to attach and no hasm/.word disposition; that
+      # decision lands on whoever carves past function 59.
+      - [0x2E7A0, c, code_2cc8c_c]
+      - [0x2F0B8, asm, code_2cc8c_d]
       - [0x3197c, asm, psyq_memset]
       - [0x39c80, asm, psyq_rand]
 
@@ -268,7 +313,19 @@ segments:
       # no rodata slot to attach and no hasm/.word disposition. Blocker
       # census over the slice: zero gp_rel, zero addiu-$at.
       - [0x5077C, c, Entity_d]
-      - [0x52290, asm, Entity_e]
+      # Entity_e: third 20-function slice of the remainder,
+      # 0x52290..0x53CA8. 0x53CA8 (func_800634A8) is a real boundary --
+      # func_80063144 closes `addiu $sp, $sp, 0x28; jr $ra; nop` and
+      # func_800634A8 opens with its own `addiu $sp, $sp, -0x28`. Checked
+      # on both sides: no function in the slice has more than one prologue,
+      # and none touches $sp before allocating its own frame. The one
+      # frameless function (func_80061C04) is a 10-word leaf ending in its
+      # own `jr $ra`. Still zero `jlabel` and zero `jr $t2` in the whole
+      # remainder, so no rodata slot to attach and no hasm/.word
+      # disposition. Blocker census over the slice: 1 of 20 gp_rel-blocked
+      # (func_80062C58), zero addiu-$at.
+      - [0x52290, c, Entity_e]
+      - [0x53CA8, asm, Entity_f]
       - [0x55DD4, c, code_55dd4]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
