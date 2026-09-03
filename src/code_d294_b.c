@@ -9,7 +9,15 @@ u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
     return func_8001EDAC(&self->unk10, 0, 3, a1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D450);
+/* Sibling of func_8001D344 (the ONLY one of the five already-matched
+ * self->unk10 bitfield accessors that both converts its input to a boolean
+ * (`a1 == 0`) AND inverts its own result (`== 0`)). This function does
+ * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
+ * return type as func_8001D344 rather than the plain `u32` of the other
+ * three siblings. */
+s32 func_8001D450(Class6B5CCObj *self, s32 a1) {
+    return func_8001EDAC(&self->unk10, 7, 1, a1 == 0) == 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D480);
 
