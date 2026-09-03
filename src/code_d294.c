@@ -50,27 +50,106 @@ void func_8001CBA4(Class6B5CCObj *self) {
     func_80018390()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CC48);
+void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other) {
+    func_80018390()->slot10(self, other);
+    if ((other->methods->header & 0xF) == 9) {
+        func_8001E770(self, other);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CCB4);
+void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
+    if ((other->methods->header & 0xF) == 9) {
+        func_8001E7B0(self);
+    }
+    func_80018390()->slot14(self, other);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CD20);
+void func_8001CD20(Class6B5CCObj *self) {
+    func_8001E7B0(self);
+    func_80018390()->slot18(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CD60);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CE30);
+void func_8001CE30(Class6B5CCObj *self) {
+    self->unk24 = 0;
+    self->unk10 = 0;
+    func_80012838(0, self->unk14);
+    self->methods->slot44(self, 1, D_8006B684);
+    self->methods->slot48(self, 1, D_8006B690);
+    self->unk14->unk0 = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CEB4);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D008);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D0EC);
+Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
+    Class6B5CCSub14 *sub;
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D1A4);
+    if (self->unkC == NULL) {
+        self->unkC = obj;
+        sub = self->unk14;
+        sub->unk48 = obj->unk14;
+        obj->methods->slot10(obj, self);
+        sub = self->unk14;
+        if (vec != NULL) {
+            sub->unk18 = vec->x;
+            sub->unk1C = vec->y;
+            sub->unk20 = vec->z;
+        } else {
+            sub->unk18 = 0;
+            sub->unk1C = 0;
+            sub->unk20 = 0;
+        }
+        self->unk14->unk0 = 0;
+    }
+    return self;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D204);
+Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self) {
+    UnkOwner_d294 *owner;
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D280);
+    owner = self->unkC;
+    if (owner != NULL) {
+        owner->methods->slot14(owner, self);
+        self->unk14->unk48 = 0;
+        self->unkC = NULL;
+    }
+    return self;
+}
+
+void func_8001D204(Class6B5CCObj *self) {
+    GenericObj_d294 *entry = NULL;
+    s32 cont;
+
+    do {
+        self->methods->slot58(self, &entry, &cont);
+        if (entry != NULL) {
+            entry->methods->slot50(entry);
+        }
+    } while (cont);
+}
+
+void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
+    s32 tag;
+
+    tag = 4;
+    do {
+        if (*entry == NULL) {
+            *cursor = self->unk4;
+        }
+        func_800183A0(entry, cursor);
+        if (*entry != NULL) {
+            if ((((*entry)->methods->header) & 0xF) == tag) {
+                if ((*entry)->unkC == self) {
+                    return;
+                }
+            }
+        }
+    } while (*cursor != NULL);
+    *entry = NULL;
+}
 
 void func_8001D33C(void) {
 }
