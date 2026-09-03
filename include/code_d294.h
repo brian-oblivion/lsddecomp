@@ -190,7 +190,15 @@ typedef struct GenericMethods_d294 GenericMethods_d294;
 typedef struct GenericObj_d294 GenericObj_d294;
 struct GenericMethods_d294 {
     s32 header;                  /* +0x000, low nibble is a class-tag; func_8001CC48/CCB4 compare it against 9 */
-    u8 pad004[0x050 - 0x004];
+    u8 pad004[0x010 - 0x004];
+    /* +0x010, round 13 (func_8001E4A4): dispatched as `(entry, arg)` where
+     * `entry` is the receiver itself and `arg` is func_8001E4A4's own
+     * `self` parameter (a Class6B5CCObj*) -- only reached once the FULL
+     * byte at +0x000 (not just its low nibble) equals 0x34, i.e. a more
+     * specific check than the header-tag-4 test guarding entry into this
+     * whole block. */
+    void (*slot10)(GenericObj_d294 *self, Class6B5CCObj *arg); /* +0x010 */
+    u8 pad014[0x050 - 0x014];
     void (*slot50)(GenericObj_d294 *self); /* +0x050, func_8001D204's call target */
 };
 struct GenericObj_d294 {
@@ -458,6 +466,17 @@ extern void func_800160B0(S16Quad_d294 *vec, s32 a1);
  * local buffers; declared only with that shape. */
 extern void func_80015BFC(void *arg0, void *arg1);
 
+/* BasicClass__func_1816c (src/code_8220.c, code_8220 unit, already matched
+ * there as `void BasicClass__func_1816c(BasicClass *self, BasicClass
+ * **outParent, BasicClassListNode **cursor)` -- "getNextParentRef": on the
+ * first call for a given walk (`*outParent == NULL`), seeds `*cursor` from
+ * `self->parentRefs`; every call pops one entry via `func_800183A0`.
+ * Redeclared here with this unit's own opaque/local types rather than
+ * `#include "code_8220.h"`, per this project's per-unit-local-view
+ * convention (same precedent as BasicClassMethodsD294 above) -- pointer
+ * shapes are ABI-identical across translation units, so this is safe. */
+extern void BasicClass__func_1816c(void *self, GenericObj_d294 **outParent, void **cursor);
+
 void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D568(Class6B5CCObj *self, s32 a1);
 
@@ -465,5 +484,6 @@ void func_8001D600(Class6B5CCObj *self, void *dest);
 void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
 void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
+void func_8001E4A4(Class6B5CCObj *self, void *node);
 
 #endif
