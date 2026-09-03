@@ -59,7 +59,10 @@ void func_8003E538(Obj86B60 *self)
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E578);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E5C8);
+IntermediateBaseMethods *func_8003E5C8(void)
+{
+    return &D_8006E878;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E5D8);
 

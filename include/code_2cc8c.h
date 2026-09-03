@@ -491,15 +491,16 @@ struct Obj86B60 {
 };
 
 /*
- * Shared "IntermediateBase" utility class, reached only through
- * func_8003E5C8() (still raw asm elsewhere in the still-uncarved
- * code_2cc8c_b portion of this segment -- not this unit's function to
- * write). Same idiom already established in src/code_2c054.c
- * (TaskUtilMethods) and src/class_39e08.c (IntermediateBaseMethods): each
- * unit that reaches it keeps its own local view, self typed `void *`
- * since it is shared across unrelated classes. Only the two slots this
- * unit's func_8003C51C (and func_8003C63C, STALL) actually reach are
- * modelled.
+ * Shared "IntermediateBase" utility class, reached through func_8003E5C8().
+ * UPDATED (round 12, runner alpha): func_8003E5C8 has now been carved into
+ * THIS unit's own code_2cc8c_c.c and is defined there -- this comment
+ * previously said "not this unit's function to write" because it was
+ * written before that carve. Same idiom already established in
+ * src/code_2c054.c (TaskUtilMethods) and src/class_39e08.c
+ * (IntermediateBaseMethods): each unit that reaches it keeps its own local
+ * view, self typed `void *` since it is shared across unrelated classes.
+ * Only the two slots this unit's func_8003C51C (and func_8003C63C, STALL)
+ * actually reach are modelled.
  */
 typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 struct IntermediateBaseMethods {
@@ -513,5 +514,9 @@ extern IntermediateBaseMethods *func_8003E5C8(void); /* returns &D_8006E878,
                                                           as code_2c054.h's
                                                           and class_39e08.h's
                                                           own views */
+extern IntermediateBaseMethods D_8006E878; /* the table itself, so
+                                                func_8003E5C8's own
+                                                definition (code_2cc8c_c.c)
+                                                can return &D_8006E878 */
 
 #endif
