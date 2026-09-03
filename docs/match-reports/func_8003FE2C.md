@@ -5,18 +5,30 @@ Unit `code_2cc8c_e`, carved round 14. `Class6E99CObj`'s own constructor
 
 ```c
 void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
+    ClassEAC0Methods *base;
     void *tableEntry;
 
+    base = func_800408BC();
     if (a2 != 0) {
         tableEntry = &D_8006EA90[a2 * 3];
     } else {
         tableEntry = D_8006EAA8;
     }
-    func_800408BC()->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
+    base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
     self->methods = func_800404C0();
     self->methods->slot40(self, a2);
 }
 ```
+
+**Correction: the `func_800408BC()` call must be hoisted into its own
+statement BEFORE the `if`/`else`, matching retail's own evaluation order.**
+An earlier version of this report called it inline as part of the
+`base->ctor(...)` expression, positioned textually AFTER the `if`/`else` --
+that version actually inflated the function from 43 to 46 words (a real
+register-saturation regression, +3 callee-saved registers) because GCC
+evaluated `func_800408BC()` late instead of early. Confirmed with a full
+rebuild and an address cross-check against `build/lsdde.map`; the version
+above is the one that reaches the real 43/43 stated below.
 
 Textbook "call the further-base ctor first (through a getter for its
 table, not by direct name -- `func_800408BC` returns `&D_8006EAC0`), THEN
