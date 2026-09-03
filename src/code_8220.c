@@ -84,16 +84,72 @@ void BasicClass__func_18040(BasicClass *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_180bc);
+void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
+{
+    if (*outChild == NULL) {
+        *cursor = self->children;
+    }
+    func_800183A0(outChild, cursor);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_180fc);
+s32 BasicClass__func_180fc(BasicClass *self, BasicClass *parent)
+{
+    return func_800181AC(&self->parentRefs, parent);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_1811c);
+void BasicClass__func_1811c(BasicClass *self, BasicClass *parent)
+{
+    func_80018208(&self->parentRefs, parent);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_1813c);
+void BasicClass__func_1813c(BasicClass *self)
+{
+    func_80018288(&self->parentRefs);
+    self->parentRefs = NULL;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_1816c);
+void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
+{
+    if (*outParent == NULL) {
+        *cursor = self->parentRefs;
+    }
+    func_800183A0(outParent, cursor);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_800181AC);
+s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
+{
+    BasicClassListNode *node;
+    BasicClassListNode *oldHead;
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_80018208);
+    node = func_80017B34(0x8);
+    if (node != NULL) {
+        oldHead = *head;
+        node->value = value;
+        node->next = oldHead;
+        *head = node;
+        return 1;
+    }
+    return 0;
+}
+
+void func_80018208(BasicClassListNode **head, BasicClass *value)
+{
+    BasicClassListNode *prev;
+    BasicClassListNode *node;
+
+    prev = NULL;
+    node = *head;
+    while (node != NULL) {
+        if (node->value == value) {
+            if (prev != NULL) {
+                prev->next = node->next;
+            } else {
+                *head = node->next;
+            }
+            func_80017CFC(node);
+            return;
+        }
+        prev = node;
+        node = node->next;
+    }
+}
