@@ -510,7 +510,8 @@ struct Unk18ObjMethods {
        (+0x098). */
     void (*slot94)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x094 */
     void (*slot98)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x098 */
-    u8 pad09C[0x0A8 - 0x09C];
+    void (*slot9C)(Unk18Obj *self); /* +0x09C, OBSERVED: func_8003EE40 (round 14) */
+    u8 pad0A0[0x0A8 - 0x0A0];
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
                                                     func_8003E6CC (round 13) */
 };
@@ -605,7 +606,9 @@ struct Unk18Obj {
     s32 unk84;
     s32 unk88;
     s32 unk8C;
-    u8 pad090[0x0AC - 0x090];
+    s32 unk90;                  /* +0x090, OBSERVED: func_8003EE40 (round 14),
+                                    incremented unconditionally every call */
+    u8 pad094[0x0AC - 0x094];
     Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: func_8003E628 (round 13,
                                   set from `func_8001CA94()`, a
                                   `New_Class6B5CC` allocator, `code_d294.c`)
@@ -664,6 +667,7 @@ void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003ECD0(Unk18Obj *self);
 void func_8003EDF4(Unk18Obj *self);
+void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);

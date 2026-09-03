@@ -128,7 +128,14 @@ void func_8003EDF4(Unk18Obj *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EE40);
+/* Increments self->unk90 unconditionally, and additionally dispatches
+ * self->methods->slot9C when arg2 is 2 or 3. */
+void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
+    self->unk90 = self->unk90 + 1;
+    if (arg2 == 2 || arg2 == 3) {
+        self->methods->slot9C(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EE88);
 
