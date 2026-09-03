@@ -59,7 +59,11 @@ Unk64Elem *func_800408CC(void *ctx, s32 len, char *name) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040948);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040A30);
+void func_80040A30(Obj6EAC0 *self) {
+    func_800183DC(self->unkB4, self->unkA9);
+    self->unkB4 = func_80017CFC(self->unkB4);
+    func_80041C3C()->slot0C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040A88);
 

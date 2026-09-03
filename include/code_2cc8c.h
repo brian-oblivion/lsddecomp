@@ -253,9 +253,27 @@ extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
 
 extern void *func_80017B34(s32 size);   /* allocator, confirmed across many
                                             units */
-extern void func_80017CFC(void *ptr);   /* matching free/release, confirmed
-                                            void-returning in code_171e0.h
-                                            and Entity.h */
+extern void *func_80017CFC(void *ptr);  /* matching free/release. Its own
+                                            disassembly (still INCLUDE_ASM,
+                                            asm/nonmatchings/code_8220/
+                                            func_80017CFC.s) ends with an
+                                            explicit `addu $v0,$zero,$zero`
+                                            -- it genuinely returns NULL,
+                                            not void. code_171e0.h/Entity.h
+                                            type it `void` because every
+                                            caller there discards the
+                                            result (the established
+                                            "a discarded return value is
+                                            never evidence of void" trap);
+                                            round 14 (code_2cc8c_f) needs
+                                            the real return value, so this
+                                            unit's shared view is retyped.
+                                            Every existing call site in
+                                            this unit (code_2cc8c_b.c,
+                                            code_2cc8c_d.c) discards the
+                                            result too, so this is a
+                                            zero-byte-cost retype -- full
+                                            build reconfirmed green. */
 extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
                                                     this project; typed from
                                                     func_8003D6D4's own call
