@@ -252,7 +252,41 @@ segments:
       # 0x1908. So nothing to attach and no hasm/.word disposition; that
       # decision lands on whoever carves past function 59.
       - [0x2E7A0, c, code_2cc8c_c]
-      - [0x2F0B8, asm, code_2cc8c_d]
+      # code_2cc8c_d: first slice of the 93-function code_2cc8c remainder,
+      # 0x2F0B8..0x2FAAC, 33 functions. Carved round 13.
+      #
+      # Sized by NON-TRIVIAL function count, not raw count: 9 of the 33 are
+      # 2-instruction `jr $ra; nop` bodies that splat generated itself and
+      # that are matches without being work (see CLAUDE.md, "Not every
+      # matched function was work"). Real content is 21 clean non-trivial
+      # functions plus 2 blocked ones.
+      #
+      # Gate 2 checks over the slice, all clean: no function has more than
+      # one `addiu $sp, $sp, -N` prologue; zero `jr $t2` BIOS trampolines;
+      # zero `alabel`; and zero jump tables or `.word .L` references, so no
+      # rodata slot needs attaching HERE.
+      #
+      # Blocker profile, all three screens plus the register screen:
+      # func_8003E968 is gp_rel-blocked, func_8003EC2C is
+      # nop_mflo_mfhi-blocked (a second uncarved hit from
+      # docs/research/addiu-at-blocker.md turning into a queued one). Both
+      # carry stub reports. Nothing in the slice demands 5+ callee-saved
+      # registers.
+      - [0x2F0B8, c, code_2cc8c_d]
+      # code_2cc8c_e: the remaining 60 functions, 0x2FAAC.. -- left UNCARVED
+      # deliberately, so whoever carves it screens it themselves.
+      #
+      # TWO things already measured about it, to save that person the work:
+      #   * func_8003F2AC (0x2FAAC, 242 instructions, the segment's first)
+      #     is nop_mflo_mfhi-blocked AND demands 6 callee-saved registers.
+      #     It is the worst function in the whole remainder on both screens;
+      #     do not lead a runner with it.
+      #   * func_8003FB1C (0x3031C) is addiu_at-blocked and owns a real
+      #     jump table (`jtbl_80011108`). Its rodata slot WILL need
+      #     attaching when this segment is carved -- that is the
+      #     `undefined reference to '.LXXXXXXXX'` failure in Gate 2. Survey
+      #     the slot at carve time rather than trusting this comment.
+      - [0x2FAAC, asm, code_2cc8c_e]
       - [0x3197c, asm, psyq_memset]
       - [0x39c80, asm, psyq_rand]
 
