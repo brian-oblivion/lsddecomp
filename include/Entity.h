@@ -74,7 +74,8 @@ struct EntityMethods {
     /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005ED30 as slotD0(this, -0x176, rand() % 2), and by func_8005E7F8 as slotD0(this, this->unk48, 0) */
     /* +0xD4 */ u8 padD4[0x114 - 0xD4];
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
-    /* +0x118 */ u8 pad118[0x12C - 0x118];
+    /* +0x118 */ u8 pad118[0x128 - 0x118];
+    /* +0x128 */ void (*slot128)(Entity *self, s32 arg1); /* called by func_80062A40 (Entity_e) as slot128(this, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     /* +0x12C */ void (*slot12C)(Entity *self);           /* called by func_800603C4 */
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C, func_800603C4 */
     /* +0x134 */ u8 pad134[0x144 - 0x134];
@@ -85,7 +86,7 @@ struct EntityMethods {
     /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
     /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by func_8005DA3C and func_8005DE18 (as slot164(self, 1)) */
     /* +0x168 */ void (*slot168)(Entity *self);               /* called by func_8005DEE0 */
-    /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C, func_8005E0B0 */
+    /* +0x16C */ void (*slot16C)(Entity *self);                /* called by func_8005DA3C, func_8005E0B0, func_80062A40 (Entity_e) */
     /* +0x170 */ s32 (*slot170)(Entity *self);                  /* called by func_8005D480 */
     /* +0x174 */ void (*slot174)(Entity *self);                  /* called by func_8005D480 */
     /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by func_8005D480; holds func_8005DE18, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
@@ -262,7 +263,8 @@ struct Entity {
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by func_8005D418; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
     /* +0x50 */ u8 pad50[0x58 - 0x50];
     /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/func_8002CC84 */
-    /* +0x5C */ u8 pad5C[0x80 - 0x5C];
+    /* +0x5C */ u8 pad5C[0x7C - 0x5C];
+    /* +0x7C */ s32 unk7C;             /* gate flag read by func_80062A40 (Entity_e); when 0, that function returns immediately after its unkFC==unk80/slot128/rand() dice-roll block */
     /* +0x80 */ s32 unk80;             /* read by func_8005E6F0/func_8005E7F8 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and func_8005EBB4 (compared to `out->unk4` as `this->unk80 - 1`) */
     /* +0x84 */ s32 unk84;             /* compared against a literal (func_8005EC98: `== 0xA`) or against `this->unk80 / 2` (func_8005E4D0) */
     /* +0x88 */ u8 pad88[0x94 - 0x88];
