@@ -92,7 +92,17 @@ void func_80050340(Class86E00_3bb8c_g *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050410);
+void func_80050410(Class86E00_3bb8c_g *self)
+{
+    if (self->unk68 != 0 && self->unk60 != 0 && self->unk78 != NULL) {
+        self->unk78->methods->slot50(self->unk78);
+        self->unk78->methods->slot48(self->unk78);
+        if (self->unk74 != 0) {
+            self->unk78->methods->release(self->unk78);
+            self->unk78 = NULL;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_800504D0);
 
