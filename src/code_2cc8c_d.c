@@ -108,4 +108,6 @@ Unk18Obj *func_8003F25C(Unk18Obj *self) {
     return self;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F28C);
+void func_8003F28C(Unk18Obj *self) {
+    func_80024B90(self);
+}
