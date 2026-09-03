@@ -312,8 +312,36 @@ struct Obj86B60Methods {
     void (*slot114)(Obj86B60 *self);                /* +0x114, external
                                                        (func_8003DDC8);
                                                        OBSERVED: func_8003C9B0 */
-    s32 (*slot118)(Obj86B60 *self);                 /* +0x118, external
-                                                       (func_8003DFA0);
+    s32 (*slot118)(Obj86B60 *self);                 /* +0x118. CORRECTED
+                                                       (round 12, runner
+                                                       alpha): the occupant
+                                                       is func_8003DE30, NOT
+                                                       func_8003DFA0 as this
+                                                       comment previously
+                                                       said -- verified by
+                                                       reading the raw table
+                                                       bytes at
+                                                       D_80086B60+0x118 in
+                                                       disk/SLPS_015.56
+                                                       directly (also
+                                                       cross-checked with
+                                                       tools/classtable.py
+                                                       D_80086B60). The old
+                                                       attribution came from
+                                                       func_8003C944.md's
+                                                       "Struct knowledge
+                                                       established" section,
+                                                       which was itself
+                                                       wrong about WHICH
+                                                       function occupies this
+                                                       slot even though the
+                                                       byte OFFSET it matched
+                                                       against (0x118) was
+                                                       correct -- a call
+                                                       site discarding/not
+                                                       discarding a return
+                                                       value says nothing
+                                                       about slot identity.
                                                        OBSERVED: func_8003C944 */
     void (*slot11C)(Obj86B60 *self, s32 a1, s32 a2); /* +0x11C, external;
                                                        OBSERVED:
@@ -322,6 +350,37 @@ struct Obj86B60Methods {
                                                        call it with a
                                                        computed index value
                                                        and a literal 1) */
+    s32 (*slot120)(Obj86B60 *self);                 /* +0x120, external:
+                                                       IS func_8003DFA0
+                                                       (verified the same
+                                                       way as slot118 above;
+                                                       `func_8003DFA0` itself
+                                                       returns
+                                                       `self->unk60[self->
+                                                       unk58]`, s32) */
+};
+
+/*
+ * self->unkC's pointee, observed only by func_8003E538 -- a shared
+ * base-class method also reachable through UNRELATED classes' own vtables
+ * at this same slot offset (class_39e08.h documents func_8003E538/78
+ * occupying Obj865C8Methods/Class86668Methods +0x064/+0x068). Dispatch
+ * shape: `self->unkC->target->methods->slot48(target)` -- one extra level
+ * of indirection past the usual `self->fieldN->methods->slotM(self->fieldN)`
+ * idiom. Only the one field/slot func_8003E538 touches is modelled.
+ */
+typedef struct Obj86B60UnkC Obj86B60UnkC;
+typedef struct Obj86B60UnkCTarget Obj86B60UnkCTarget;
+typedef struct Obj86B60UnkCTargetMethods Obj86B60UnkCTargetMethods;
+struct Obj86B60UnkCTargetMethods {
+    u8 pad000[0x048];
+    void (*slot48)(Obj86B60UnkCTarget *self); /* +0x048, OBSERVED: func_8003E538 */
+};
+struct Obj86B60UnkCTarget {
+    Obj86B60UnkCTargetMethods *methods; /* +0x000 */
+};
+struct Obj86B60UnkC {
+    Obj86B60UnkCTarget *target; /* +0x000, OBSERVED: func_8003E538 */
 };
 
 /*
@@ -332,7 +391,26 @@ struct Obj86B60Methods {
  */
 struct Obj86B60 {
     Obj86B60Methods *methods;   /* +0x000 */
-    u8 pad004[0x014 - 0x004];
+    u8 pad004[0x00C - 0x004];
+    Obj86B60UnkC *unkC;          /* +0x00C, func_8003E538 (see Obj86B60UnkC's
+                                    own comment): `self->unkC->target->methods
+                                    ->slot48(target)`. Also zeroed by
+                                    func_8003E874 (a ctor-shaped function that
+                                    also zeroes unk10/unk30 below). NOTE: this
+                                    slot is reached through a SHARED base-class
+                                    method -- class_39e08.h's own view of an
+                                    unrelated class documents the same
+                                    func_8003E538 occupying its own vtable at
+                                    the identical offset (+0x064), so this
+                                    field is very likely part of a common
+                                    base-object layout every subclass shares
+                                    at this offset, not something Obj86B60
+                                    itself introduces -- kept here anyway,
+                                    per this header's flat single-struct
+                                    style (no explicit base/derived split). */
+    s32 unk10;                  /* +0x010, func_8003E874 only: zeroed by the
+                                    same ctor-shaped function as unkC/unk30;
+                                    real meaning unknown, generic word */
     s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
                                     slot100's 2nd arg, otherwise untouched
                                     by this unit -- generic word, not
@@ -345,7 +423,11 @@ struct Obj86B60 {
     u8 pad020[0x020 - 0x020];
     s32 unk20;                  /* +0x020, func_8003C63C (STALL) sets it
                                     to a literal 5 */
-    u8 pad024[0x038 - 0x024];
+    u8 pad024[0x030 - 0x024];
+    s32 unk30;                  /* +0x030, func_8003E874 only: zeroed by the
+                                    same ctor-shaped function as unkC/unk10;
+                                    real meaning unknown, generic word */
+    u8 pad034[0x038 - 0x034];
     s32 unk38;                  /* +0x038, func_8003C63C (STALL) sets it
                                     to 1 */
     s32 unk3C;                  /* +0x03C, a mode/state value: func_8003C858
@@ -417,15 +499,16 @@ struct Obj86B60 {
 };
 
 /*
- * Shared "IntermediateBase" utility class, reached only through
- * func_8003E5C8() (still raw asm elsewhere in the still-uncarved
- * code_2cc8c_b portion of this segment -- not this unit's function to
- * write). Same idiom already established in src/code_2c054.c
- * (TaskUtilMethods) and src/class_39e08.c (IntermediateBaseMethods): each
- * unit that reaches it keeps its own local view, self typed `void *`
- * since it is shared across unrelated classes. Only the two slots this
- * unit's func_8003C51C (and func_8003C63C, STALL) actually reach are
- * modelled.
+ * Shared "IntermediateBase" utility class, reached through func_8003E5C8().
+ * UPDATED (round 12, runner alpha): func_8003E5C8 has now been carved into
+ * THIS unit's own code_2cc8c_c.c and is defined there -- this comment
+ * previously said "not this unit's function to write" because it was
+ * written before that carve. Same idiom already established in
+ * src/code_2c054.c (TaskUtilMethods) and src/class_39e08.c
+ * (IntermediateBaseMethods): each unit that reaches it keeps its own local
+ * view, self typed `void *` since it is shared across unrelated classes.
+ * Only the two slots this unit's func_8003C51C (and func_8003C63C, STALL)
+ * actually reach are modelled.
  */
 typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 struct IntermediateBaseMethods {
@@ -439,5 +522,27 @@ extern IntermediateBaseMethods *func_8003E5C8(void); /* returns &D_8006E878,
                                                           as code_2c054.h's
                                                           and class_39e08.h's
                                                           own views */
+extern IntermediateBaseMethods D_8006E878; /* the table itself, so
+                                                func_8003E5C8's own
+                                                definition (code_2cc8c_c.c)
+                                                can return &D_8006E878 */
+
+/*
+ * This unit's own local view of the shared BasicClass ancestor table
+ * (returned by func_80018390, a no-argument getter -- same "ctor at
+ * +0x008, dtor at +0x00C, self typed void* universally" idiom already
+ * established independently in include/class_16334.h, include/code_171e0.h
+ * and include/code_d294.h. Declared again here, under a unit-local name,
+ * per this project's policy of NOT unifying independent local views of the
+ * same table into one shared header. Only the one slot func_8003E874
+ * dispatches through is modelled.
+ */
+typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
+struct BasicClassMethodsCC8C {
+    u8 pad000[0x018];
+    void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
+};
+
+extern BasicClassMethodsCC8C *func_80018390(void);
 
 #endif
