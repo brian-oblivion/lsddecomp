@@ -129,19 +129,96 @@ void func_8003FD4C(s32 a0, s32 a1) {
     func_80024BA8(0x1400000);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FDB0);
+Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
+    Class6E99CObj *self;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FE2C);
+    self = func_80017B34(0xA0);
+    if (self != NULL) {
+        func_800404C0()->ctor(self, a1, a2, a3);
+    }
+    return self;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FED8);
+void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
+    void *tableEntry;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FF44);
+    if (a2 != 0) {
+        tableEntry = &D_8006EA90[a2 * 3];
+    } else {
+        tableEntry = D_8006EAA8;
+    }
+    func_800408BC()->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
+    self->methods = func_800404C0();
+    self->methods->slot40(self, a2);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004001C);
+void func_8003FED8(Class6E99CObj *self, s32 a1) {
+    self->unk70 = a1;
+    self->unk6C = 0;
+    self->unk74 = 0xA;
+    self->unk78 = 0;
+    self->unk7C = 0;
+    self->methods->slot60(self, 0);
+    self->methods->slot64(self, 0);
+    self->unk98 = 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040024);
+void func_8003FF44(Class6E99CObj *self, void *a1, s32 a2) {
+    s32 old;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800400B0);
+    if (a2 != 2) {
+        return;
+    }
+    old = self->unk80;
+    self->unk80 = old - 1;
+    if (old <= 0) {
+        self->methods->slotE0(self, a1);
+        return;
+    }
+    if (self->unk7C == 9) {
+        return;
+    }
+    if (self->unk78 & 4) {
+        self->unk64 += (u8)self->unk74;
+    }
+    if (self->unk78 & 2) {
+        self->unk65 += (u8)self->unk74;
+    }
+    if (self->unk78 & 1) {
+        self->unk66 += (u8)self->unk74;
+    }
+}
+
+void func_8004001C(Class6E99CObj *self, s32 a1) {
+    self->unk74 = a1;
+}
+
+void func_80040024(Class6E99CObj *self) {
+    s32 idx;
+
+    if (self->unk6C != 0) {
+        return;
+    }
+    idx = self->methods->slotDC(self);
+    self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
+    self->unk6C = 1;
+    self->unk74 = -self->unk74;
+}
+
+void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
+    s32 idx;
+
+    if (self->unk6C != 0) {
+        return;
+    }
+    idx = self->methods->slotDC(self);
+    if (self->unk98 != 0) {
+        self->unk80--;
+    } else {
+        self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
+    }
+    self->unk6C = 2;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040154);
 
@@ -151,11 +228,21 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800403F8);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004042C);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040490);
+void func_80040490(Class6E99CObj *self) {
+    self->unk50 = self->unk90;
+    self->unk54 = self->unk94;
+    self->unk60 = self->unk88;
+    self->unk62 = self->unk8C;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800404B4);
+void func_800404B4(Class6E99CObj *self, s32 a1, s32 a2) {
+    self->unk98 = a1;
+    self->unk9C = a2;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800404C0);
+Class6E99CMethods *func_800404C0(void) {
+    return &D_8006E99C;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800404D0);
 
