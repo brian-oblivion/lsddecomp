@@ -400,6 +400,10 @@ extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
                             func_8003FDB0's "name" argument */
 extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
                             SubHandleObjMethods::slot4C's 3rd argument */
+extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
+                            not decompiled): address-taken only, passed as
+                            func_8003EACC's own default value for slot80's
+                            2nd argument when its own arg5 is NULL. */
 
 /*
  * `Unk18Obj->unkAC`'s pointee (round 13, func_8003E6CC) -- the return of
@@ -475,7 +479,16 @@ struct Unk18ObjMethods {
     u8 pad044[0x074 - 0x044];
     void (*slot74)(Unk18Obj *self);            /* +0x074, OBSERVED:
                                                     func_8003E6CC (round 13) */
-    u8 pad078[0x090 - 0x078];
+    /* +0x078/+0x07C/+0x080, round 14 (func_8003EACC's own call site,
+       guarded by `self->unk10 == NULL`): dispatched as `(self, a2)`,
+       `(self, a3)`, `(self, a1_or_default)` respectively. Occupants (this
+       unit, per tools/classtable.py D_8006E8E4): func_8003EBC4 (+0x078,
+       still queued), func_8003EBF8 (+0x07C, still queued), func_8003EC2C
+       (+0x080, the documented gp_rel blocker -- NOT decompiled here). */
+    void (*slot78)(Unk18Obj *self, void *a1); /* +0x078 */
+    void (*slot7C)(Unk18Obj *self, void *a1); /* +0x07C */
+    void (*slot80)(Unk18Obj *self, void *a1); /* +0x080 */
+    u8 pad084[0x090 - 0x084];
     void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
                                                     func_8003E6CC (round 13) */
     /* +0x094/+0x098, round 14 (code_2cc8c_d): func_8003E8B8's own call
@@ -517,7 +530,11 @@ struct Unk18Obj {
                                   (func_8003E628); OBSERVED (round 13,
                                   set to `arg1`) by func_8003E770 when
                                   `arg1->methods->header & 0xF == 4` */
-    u8 pad014[0x030 - 0x014];
+    /* +0x014, round 14 (func_8003EACC): only its ADDRESS is taken
+       (`&self->unk14`, forwarded to func_8003F2AC -- asm/code_2cc8c_e.s,
+       the NEXT slice, still uncarved). Kept an opaque byte span since
+       nothing this unit's chosen functions dereference through it. */
+    u8 unk14[0x030 - 0x014];
     s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
@@ -590,6 +607,13 @@ extern Unk18Obj *func_8003E5D8(void); /* this unit's own New_X allocator for
    Unk18Obj's own newly-discovered fields above; see the field comments
    for what each was OBSERVED from. */
 void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+
+/* func_8003F2AC (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
+   func_8003EACC (round 14, this unit) calls it with only `&self->unk14`
+   set up; declared here only with that call site's own shape. */
+extern void func_8003F2AC(void *arg0);
+
+void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);

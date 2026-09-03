@@ -68,7 +68,23 @@ void func_8003EAC4(Unk18Obj *self, s32 a1) {
     self->unk60 = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EACC);
+/* One-time init, guarded by self->unk10: registers `a1` as a child (via
+ * the inherited BasicClass "addChild" slot10), dispatches slot78/slot7C
+ * with a2/a3, dispatches slot80 with arg5 (or a default, D_8008A8F4, when
+ * arg5 is NULL), then hands &self->unk14 to func_8003F2AC. Does nothing at
+ * all once self->unk10 is already set. */
+void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
+    Unk18ObjMethods *m = self->methods;
+
+    if (self->unk10 != NULL) {
+        return;
+    }
+    m->slot10(self, a1);
+    m->slot78(self, a2);
+    m->slot7C(self, a3);
+    m->slot80(self, arg5 != NULL ? arg5 : D_8008A8F4);
+    func_8003F2AC(self->unk14);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EB84);
 
