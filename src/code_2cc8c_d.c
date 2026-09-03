@@ -137,7 +137,11 @@ void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EE88);
+void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
+    if (arg2 == 2) {
+        self->methods->slotA4(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EEC0);
 

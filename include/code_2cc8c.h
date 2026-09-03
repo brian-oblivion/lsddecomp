@@ -511,7 +511,8 @@ struct Unk18ObjMethods {
     void (*slot94)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x094 */
     void (*slot98)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x098 */
     void (*slot9C)(Unk18Obj *self); /* +0x09C, OBSERVED: func_8003EE40 (round 14) */
-    u8 pad0A0[0x0A8 - 0x0A0];
+    u8 pad0A0[0x0A4 - 0x0A0];
+    void (*slotA4)(Unk18Obj *self); /* +0x0A4, OBSERVED: func_8003EE88 (round 14) */
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
                                                     func_8003E6CC (round 13) */
 };
@@ -668,6 +669,7 @@ void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003ECD0(Unk18Obj *self);
 void func_8003EDF4(Unk18Obj *self);
 void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);
