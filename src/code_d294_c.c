@@ -13,7 +13,10 @@ void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other) {
     GsLinkObject4((u8 *)((GenericObj_d294 *)self->unk20)->unkC + 0xC, &self->unk10, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E7B0);
+void func_8001E7B0(Class6B5CCObj *self) {
+    self->unk18 = 0;
+    self->unk20 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E7BC);
 
