@@ -229,6 +229,30 @@ live rather than transcribed:
   is its best. Cross-check the real compiled length with
   `objdump -d build/src/<unit>.c.o` before believing a bad number.
 
+  **Round 12 added a second instance of that, and this one has a one-command
+  discriminator.** `func_8003D73C` scores 40/145 with *exactly correct total
+  length* and zero inserted or deleted instructions — every non-matching word
+  is the same instruction on a different register. The cause is that retail
+  saturates the callee-saved file, so a body needing one more live cross-call
+  value spills into `$fp` and renumbers everything downstream:
+
+  ```sh
+  grep -oE 'sw +\$s[0-9]' asm/nonmatchings/<unit>/<func>.s | sort -u | wc -l
+  ```
+
+  8 means no spare callee-saved register. Run this before staffing any
+  register-flavoured stall — it is the difference between an unfixable
+  register-identity stall and one with a specific permitted lever (reduce
+  values live across calls).
+
+  **It also caught a report mis-grouping two stalls.** `func_8003D73C`'s report
+  described itself as the same class as its sibling `func_8003DAD4` (114/118);
+  the census says 8 registers versus 6, so one is saturated and the other has
+  two s-regs and `$fp` spare. The report had even recorded that the sibling's
+  fixes did not transfer — which is the tell. **When two stalls in one unit are
+  both described as "register" problems, measure before believing they are one
+  class**, because the shared label is doing the grouping, not the evidence.
+
 For uncarved ground, see Gate 2 in `docs/PARALLEL-RUNS.md`, which lists the
 segments live and records the carve hazards found so far.
 

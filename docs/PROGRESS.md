@@ -6,6 +6,130 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-03 — round 12: 5 runners, 35 matches, and the SDK's macro layer found inert
+
+**415 -> 454 matched (30.60% -> 33.48% of game code; matched bytes 22.04% ->
+23.47%). Build green in main after every one of the five merges.** Five
+runners, each on its own unit, one pass each. 35 matches came from the runners;
+the other 4 of the +39 are `jr $ra; nop` bodies splat generated itself in the
+newly carved units.
+
+**Gates.** 4a clean: no other head, no foreign commits, no pre-existing
+worktrees, `origin/main` reflog re-checked before teardown. Gate 1 found **14**
+true fresh functions — all clear of both blockers, but spread 5/3/3/2/1 across
+five units, which is four units too thin to staff. So Gate 2 fired and the head
+carved four 20-function slices before provisioning anything: `code_2cc8c_c`,
+`Entity_e`, `code_8220_b`, `code_d294_b`. Blocker-density census at carve time
+per round 10's lesson: `code_2cc8c_c` 0/20, `Entity_e` 1/20, `code_d294_b`
+1/20, `code_8220_b` 2/20. `fresh` went 14 -> 90. Each carve verified green on
+its own before the next was attempted.
+
+**The worktree permission grant PARALLEL-RUNS.md described as being in place
+did not exist.** No `.claude/settings.local.json`, and no
+`additionalDirectories` key at project or user level either — so for eleven
+rounds the doc had asserted, as settled fact, a setup that had never existed in
+this clone, and every prior round was approving runner commands interactively.
+The same paragraph also claimed the file was gitignored; it was not, so the
+first head to actually write it would have committed one operator's absolute
+paths into every clone. Escalated to the operator, granted, and the
+`.gitignore` entry added. **A doc claim about MACHINE STATE decays differently
+from one about the binary**: a wrong fact about the executable gets caught the
+next time someone measures it, because measuring is the job; a wrong fact about
+a settings file is nobody's job to re-measure and survives on age alone.
+
+**TOOLCHAIN LEAD, escalated and NOT acted on — the Psy-Q inline macro layer is
+silently inert.** Eight headers under `include/psyq/` have CRLF line endings,
+and 2.6.3's `cpp` splices `\` only when `LF` follows immediately. **1134
+multi-line macros** — 1043 in `INLINE.H`, 87 in `LIBGPU.H`, 4 in `LIBGS.H` —
+expand to `{\ ;`, an empty block plus a null statement. That is valid C: it
+compiles clean, warns nothing, and emits nothing. So `gte_stsxy3(...)` silently
+does NOTHING. Blast radius today is zero (no `gte_*` call sites in `src/`), so
+it is a landmine rather than an active bug. Census and reproducer in
+`docs/research/psyq-header-crlf-blocker.md`. Not fixed: un-breaking 1134 macros
+in pinned vendored headers is the operator's call under rule 5.
+
+It also produced a near-miss worth recording. The first test of whether the SDK
+could express retail's GTE sequence showed the macro emitting nothing at all —
+which reads exactly like a clean negative and was actually the CRLF bug. **A
+negative result about a macro is only evidence once you have proved the macro
+expanded.** Check the preprocessed output, not just the objdump.
+
+**Runners.** charlie 8/8 on `code_8220_b`, alpha 8/8 on `code_2cc8c_c`, bravo
+8/8 on `Entity_e`, delta 8/8 on `code_d294_b`, echo 3/5 on `code_2cc8c_b` with
+two stalls. Every claimed match was re-verified individually in main after
+merging, and every count was taken from the commits rather than the summaries
+(§3) — all five reconciled exactly this round, including reports-per-function
+and remaining `INCLUDE_ASM`.
+
+charlie matched six GTE store leaves whose bodies are necessarily inline asm —
+there is no C that emits `swc2`. Checked against HARD RULE 6 and it passes:
+`"r"(ptr)` leaves the GPR to the allocator, `$12`/`$13`/`$14` are COP2 *data*
+registers with no GPR identity to pin, and the project already ships Sony
+headers built on exactly that construct. Two overstatements in its report were
+corrected: it asserted "the only way" without ever testing the SDK path, and
+its clobber list is thinner than Sony's own (fine for a standalone leaf, wrong
+as a template).
+
+**Head triage found two real defects in otherwise sound work, both of the same
+species — a label doing the work of evidence.**
+
+1. **A misattributed method-table slot, propagated one round.**
+   `Obj86B60Methods::slot118` was recorded in `func_8003C944.md` as holding
+   `func_8003DFA0`, which actually sits at `+0x120`; `+0x118` is
+   `func_8003DE30`. Alpha caught it, the head re-verified against the table
+   bytes. It survived because `func_8003C944` only dispatches through the slot
+   and discards the result — its match was byte-exact with the wrong name
+   written down, and stayed byte-exact after the fix. **An entry naming a
+   slot's OCCUPANT is a claim about DATA; the compiled offset that matching
+   verifies is a different claim, and only the second one ever gets checked.**
+
+2. **Two different stall classes filed as one.** Echo reported
+   `func_8003D73C` (40/145) as the same register-identity class as
+   `func_8003DAD4` (114/118). The retail-side census says otherwise: DAD4 saves
+   6 callee-saved registers (`$s0..$s5`) with two s-regs and `$fp` spare, and
+   its residue is delay-slot placement plus one temp choice. D73C saves **8**
+   (`$s0..$s7`) — the entire callee-saved file, zero headroom — so its body
+   needs a 9th live cross-call value, spills into `$fp`, and renumbers every
+   register downstream. Exact length, zero inserted/deleted instructions,
+   40/145. Echo had even recorded the evidence against its own framing (DAD4's
+   fixes did not transfer) without connecting it.
+
+   **New stall class, and unlike register-identity it has a lever.**
+   `grep -oE 'sw +\$s[0-9]' <func>.s | sort -u | wc -l` — 8 means saturated.
+   The fix is to reduce values live across calls, and echo had already filed
+   that exact lever as an unrelated observation (re-dereference rather than
+   cache in a local).
+
+**Learnings promoted:** 15 entries — 3 toolchain facts and 12 source-shape
+idioms, plus the new stall class. Highlights: crossjump is sensitive to a
+vtable slot's declared return type and a LOCAL function pointer is the safe
+lever (bravo avoided the round-7 shared-retype hazard correctly); a sparse
+`switch` can beat an `if`/`else` chain **without** contradicting the
+dense-switch blocker, because the discriminator is DENSITY (verified zero jump
+tables in the instance); a statement in a branch's delay slot is unconditional;
+a `"memory"` clobber anchors memory only and a register-only `i = 0` floats
+across it; and re-dereference-don't-cache, with its shape-specific counter-case
+where retail DOES cache an array-indexed loop bound — two superficially
+identical questions with opposite answers, the same trap shape as round 7's
+`slotC4`/`slotCC`.
+
+**Housekeeping.** The carve left four orphaned monolithic `asm/*.s` behind on
+rename; `progress.py` warned, they were deleted and re-extracted, and the build
+re-verified. This is the same warning that concealed round 11's wrong headline
+number — clearing it is not cosmetic.
+
+**Left deliberately unworked:** `func_80018464` (954 words, `code_8220_b`) is
+by far the largest function in any carved unit. Not blocked — real work, just
+not a fit for one runner's attempt budget. Left as `INCLUDE_ASM` with **no**
+report so it stays FRESH for a round that can staff it deliberately.
+
+**Next round: runners.** `fresh` stands at 49 across seven units with no carve
+needed — `code_2cc8c_c` 12, `Entity_e` 11, `code_8220_b` 9, `code_d294_b` 8,
+`Entity_d` 3, `code_d294` 3, `class_3bb8c_b` 2, `class_3ac78` 1. Four units
+carry 8+ each, which staffs four runners without touching the yaml.
+
+---
+
 ## 2026-09-03 — round 11: 4 runners, 62 matches, and a headline number that was wrong
 
 **353 -> 415 matched (26.03% -> 30.60% of game code; past thirty percent).
