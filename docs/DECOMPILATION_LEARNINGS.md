@@ -1384,6 +1384,80 @@ of a documented stall, not of a match.
   folding them into a headline number misrepresents both the round and the
   unit's remaining difficulty. Size a carve by NON-TRIVIAL count.
 
+#### Round 14
+
+- **A leftover argument register is not always a real argument — and you can
+  act on that WITHOUT retyping the shared slot.** Where a vtable slot's
+  canonical type has N arguments but one call site genuinely passes N-1 (the
+  extra register being untouched leftover from the incoming parameter), cast
+  the slot down to a narrower function-pointer type **at that one call site**
+  and leave the struct field alone for the callers that do use all N. This
+  closed `func_80040948` exactly, and it is strictly better than the
+  alternatives: retyping the field breaks the other callers, and leaving the
+  extra argument in emits a redundant `move`.
+
+- **Two entangled residues can each be WORSE alone and correct together.**
+  `func_80040D74` went 36/40 → 38/40 only when a pre-loop operand order that
+  measurably regressed the score on its own was combined with a specific
+  named-temp split of the in-loop recompute. If two candidate levers each
+  make things worse, that is not proof either is wrong — try them together
+  before writing both off.
+
+- **A `switch` and its "equivalent" `if`/`else if` chain differ in PHYSICAL
+  LAYOUT, not just comparison order** — inline versus out-of-line case bodies
+  — and they diverge even for two values. (`func_800504D0`.)
+
+- **Splitting a fused boolean condition into separate `if`-`goto` statements
+  can defeat a GCC cross-jump merge.** Useful against a shared-tail residue.
+  Conversely, a crossjump-mergeable tail needs the full call statement
+  written out in each branch rather than deferred through a function-pointer
+  local, when the branches share one slot with different arguments.
+  (`func_8004E6B8`, `func_80050280`.)
+
+- **Retyping an already-matched `void`-shaped function to a real return type
+  by ADDING explicit `return` statements can grow its compiled size** (21 →
+  23 words) even though the change is semantically a no-op. Retype the
+  DECLARATION and leave the body's implicit-`$v0` shape alone.
+  (`func_8004E77C`.)
+
+- **The `goto fail;` idiom is REQUIRED, not stylistic, for a `New_X`
+  allocator whose null and success paths share one return variable.** A bare
+  early `return NULL;` duplicates the epilogue and regressed a 26/27
+  near-miss to 16/27. (`func_8004E2E0`.)
+
+- **A combined `&&` and the equivalent nested `if` are not interchangeable at
+  `-O2`, and the direction is not fixed.** In `func_8004E230` the combined
+  form compiled SHORTER than retail — the reverse of the usual "simplifying a
+  guard costs instructions" case. Try both.
+
+- **A do-while with a post-decrement loop condition, and reusing a callee's
+  own return value instead of re-deriving it**, both closed
+  register-heavy functions this round. So did computing seek-offset
+  arithmetic as one whole expression rather than transcribing the
+  disassembly's around-a-call interleaving. (`func_8004ED40`,
+  `func_8004EDC0`.)
+
+- **Finding an unknown method table: grep the retail binary for the raw
+  pointer values of the functions you already have.** Echo found
+  `D_80086E00`, a 29-slot table unrelated to anything known, by searching for
+  its unit's own function addresses — each appeared exactly once, in one
+  contiguous run. That is a table, and its extent falls out of the same scan.
+
+- **When other runners' branches are unmerged, suffix new type names with
+  your unit.** Echo named everything `_3bb8c_g`, class name included,
+  specifically because two other runners were live on the same header and
+  might name the same class. It costs nothing and removes a whole category of
+  merge adjudication. Adopt it whenever more than one runner shares a header.
+
+- **A vtable slot genuinely called at several arities can be declared
+  unprototyped (K&R, `void (*slot)()`)** — a legitimate escape hatch in this
+  codebase, since the class framework does reuse slots. But it silently
+  disables argument checking for every other caller in that header, so it is
+  a last resort, it belongs only in a header no other live runner is editing
+  if that can be arranged, and it should be narrowed the moment one
+  consistent signature is established. (`code_2cc8c_f`'s `slot4C`/`slotC4`,
+  re-checked and confirmed genuinely multi-arity.)
+
 ### New residue classes opened this round (not yet closed)
 
 - **NEW, round 12: "retail saturates the callee-saved register file."**
