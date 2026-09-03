@@ -129,7 +129,32 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D950);
+/* Fills buf1 from self's own +0x84 slot, then folds in every node of the
+ * self->unkC list (each node's own +0x84 slot combined into buf1 via
+ * func_80015BFC) before using buf1 as func_8001EE04's own "out" argument,
+ * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
+ * arg1 is non-NULL. */
+void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
+    u8 buf2[0x20];
+    u8 buf1[0x20];
+    UnkOwner_d294 *node;
+
+    self->methods->slot84(self, buf1, 1);
+
+    node = self->unkC;
+    if (node != NULL) {
+        do {
+            node->methods->slot84(node, buf2, 1);
+            func_80015BFC(buf2, buf1);
+            node = node->next;
+        } while (node != NULL);
+    }
+
+    func_8001EE04(arg2, arg3, count, buf1);
+    if (arg1 != NULL) {
+        func_8001EE04(arg1, arg1, 1, buf1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
 

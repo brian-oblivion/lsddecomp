@@ -151,17 +151,33 @@ extern void func_80017CFC(void *arg);
  * is a plain data field (func_8001D0EC reads it into
  * `self->unk14->unk48`); real meaning unknown. Real class identity
  * unknown -- named for the field it lives behind, per this unit's own
- * convention (see Class6B5CCSub14, also field-named). */
+ * convention (see Class6B5CCSub14, also field-named).
+ *
+ * Round 13 (func_8001D950): self->unkC is also walked as an intrusive
+ * singly-linked list -- MEASURED, `lw $s0, 0xC($s0)` repeated with a
+ * `bnez` back-edge -- so this class has its own self-referential `next` at
+ * +0xC, and its vtable has a slot at +0x84 with the same `(self, void
+ * *out, s32 flag)` shape Class6B5CCMethods' own +0x84 has (see below);
+ * likely a shared ancestor slot both classes inherit, not a coincidence,
+ * but the ancestor itself is out of this unit's reach. */
 typedef struct UnkOwner_d294 UnkOwner_d294;
 typedef struct UnkOwnerMethods_d294 UnkOwnerMethods_d294;
 struct UnkOwnerMethods_d294 {
     u8 pad0[0x010];
     void (*slot10)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x010, "attach" */
     void (*slot14)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x014, "detach" */
+    /* +0x084, func_8001D950's own call target on each list node (round 13).
+     * `out` is a 0x20-byte buffer (MATRIX-shaped -- func_80015BFC, this
+     * call site's own consumer, loads it into GTE control regs 0-4 via
+     * `ctc2`, PsyQ, not decompiled). */
+    u8 pad018[0x084 - 0x018];
+    void (*slot84)(UnkOwner_d294 *self, void *out, s32 flag);
 };
 struct UnkOwner_d294 {
     UnkOwnerMethods_d294 *methods; /* +0x000 */
-    u8 pad04[0x014 - 0x004];
+    u8 pad04[0x00C - 0x004];
+    UnkOwner_d294 *next;            /* +0x00C, round 13 (func_8001D950) -- MEASURED, see above */
+    u8 pad10[0x014 - 0x010];
     s32 unk14;                     /* +0x014 */
 };
 
@@ -231,11 +247,17 @@ struct Class6B5CCMethods {
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as func_8001E57C above. */
     void (*slot5C)(Class6B5CCObj *self, s32 arg1);
-    /* +0x060..+0x088: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC/
-     * D4DC (all this unit, all already matched) -- not typed here as struct
+    /* +0x060..+0x080: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
+     * (all this unit, all already matched) -- not typed here as struct
      * fields because nothing dispatches through the table at these offsets;
      * every call site invokes them directly by symbol name. */
-    u8 pad060[0x08C - 0x060];
+    u8 pad060[0x084 - 0x060];
+    /* +0x084, func_8001D950's own call target on `self` itself (round 13) --
+     * see UnkOwnerMethods_d294's own +0x084, same slot number, same shape
+     * -- likely a shared ancestor method. `out` is a 0x20-byte MATRIX-
+     * shaped buffer, see there for the func_80015BFC/`ctc2` evidence. */
+    void (*slot84)(Class6B5CCObj *self, void *out, s32 flag);
+    u8 pad088[0x08C - 0x088];
     /* +0x08C/+0x090, round 13 (func_8001D568's own call site): dispatched
      * as `(self, dest)` and `(self, a1, a2)` respectively, matching
      * func_8001D600/func_8001D624's own direct-call prototypes below
@@ -428,11 +450,20 @@ s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
  * precedent as func_8001E57C above. */
 extern void func_800160B0(S16Quad_d294 *vec, s32 a1);
 
+/* func_80015BFC (asm/psyq_2258.s, PsyQ library, not game code): loads its
+ * own arg0 into GTE control regs 0-4 via `ctc2` (5 words, the packed
+ * MATRIX rotation part) then combines it with arg1 -- a matrix-compose
+ * primitive (PsyQ's `CompMatrix` family). func_8001D950 (round 13, this
+ * unit) calls it as `func_80015BFC(buf2, buf1)`, both 0x20-byte opaque
+ * local buffers; declared only with that shape. */
+extern void func_80015BFC(void *arg0, void *arg1);
+
 void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D568(Class6B5CCObj *self, s32 a1);
 
 void func_8001D600(Class6B5CCObj *self, void *dest);
 void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
 void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
+void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
 
 #endif
