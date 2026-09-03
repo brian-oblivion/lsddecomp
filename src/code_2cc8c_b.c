@@ -62,7 +62,30 @@ void func_8003D3B0(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D444);
+void func_8003D444(Obj86B60 *self)
+{
+    s32 i;
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    i = self->unk58;
+    i--;
+    for (;;) {
+        if (i < 0) {
+            i = self->unk50 - 1;
+        }
+        if (i == self->unk58) {
+            break;
+        }
+        if (self->unk4C->unk18[i--] != NULL) {
+            continue;
+        }
+        i++;
+        break;
+    }
+    self->methods->slotF0(self, i, 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D4DC);
 
