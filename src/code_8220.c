@@ -21,7 +21,10 @@ void *BMemPMgrInit(s32 poolSize)
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017A9C);
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017AA8);
+s32 func_80017AA8(void *ptr)
+{
+    return func_80011F68(ptr);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017AC8);
 
