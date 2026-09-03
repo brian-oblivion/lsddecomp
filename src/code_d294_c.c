@@ -11,7 +11,22 @@ void func_8001E58C(Class6B5CCObj *self, Class6B5CCSub44 *dst, s16 *src) {
     func_8001EE98(dst, dst, 1, buf);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E600);
+void func_8001E600(Class6B5CCObj *self, s32 *dst, s32 *src) {
+    u8 buf[0x20];
+    s32 *table;
+
+    self->methods->slot84(self, buf, 0);
+    func_8001EE98(dst, src, 1, buf);
+
+    table = self->unkC != 0 ? self->unk14->unk38 : 0;
+    dst[0] = dst[0] + table[0];
+
+    table = self->unkC != 0 ? self->unk14->unk38 : 0;
+    dst[1] = dst[1] + table[1];
+
+    table = self->unkC != 0 ? self->unk14->unk38 : 0;
+    dst[2] = dst[2] + table[2];
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E6F8);
 

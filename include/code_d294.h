@@ -73,7 +73,15 @@ struct Class6B5CCSub14 {
      * unit's chosen functions, so it stays an opaque byte span rather than
      * a typed field. Renamed from `pad24` now that something references it
      * by name. */
-    u8 unk24[0x044 - 0x024];
+    u8 unk24[0x038 - 0x024];
+    /* +0x038, round 14 (code_d294_c, func_8001E600): a 3-word (0xC-byte)
+     * `s32` table, read (never written) as a per-axis delta added into a
+     * caller-supplied vector -- `self->unk14->unk38[i]` for `i` in 0..2,
+     * only when `self->unkC != NULL` (see func_8001E600's own report for
+     * why a NULL `self->unkC` reads through address 0 unconditionally
+     * anyway, reproducing retail's own apparent behavior rather than
+     * guarding against it). Real per-word meaning unknown. */
+    s32 unk38[3];
     /* +0x044, RETYPED (round 13) from an opaque `void *` to
      * `Class6B5CCSub44 *` now that func_8001D008 and func_8001CEB4 (both
      * this unit) between them fill in its first 0x14 bytes -- see
