@@ -145,7 +145,14 @@ void func_8003E538(Obj86B60 *self)
     target->methods->slot48(target);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E578);
+void func_8003E578(Obj86B60 *self)
+{
+    Unk0ArgObj *obj0;
+
+    obj0 = ((Obj86B60InitArgs *)self->unkC)->unk0;
+    obj0->methods->slot4C(obj0);
+    self->unk1C = 0;
+}
 
 IntermediateBaseMethods *func_8003E5C8(void)
 {

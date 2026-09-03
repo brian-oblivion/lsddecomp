@@ -479,6 +479,24 @@ struct Unk4ArgObj {
 };
 
 /*
+ * self->unkC->unk0's pointee (round 13, func_8003E578) -- the SAME field
+ * `func_8003E10C`/`func_8003E280` forward as an opaque `addChild`/
+ * `removeChild` child; this function is the first to dereference it as a
+ * real class instance (same "one field, multiple independent-evidence
+ * readings" shape as `Unk4ArgObj` for the adjacent `unk4` field). Only the
+ * one slot this function dispatches through is modelled.
+ */
+typedef struct Unk0ArgObj Unk0ArgObj;
+typedef struct Unk0ArgObjMethods Unk0ArgObjMethods;
+struct Unk0ArgObjMethods {
+    u8 pad000[0x04C];
+    void (*slot4C)(Unk0ArgObj *self); /* +0x04C, OBSERVED: func_8003E578 */
+};
+struct Unk0ArgObj {
+    Unk0ArgObjMethods *methods; /* +0x000 */
+};
+
+/*
  * func_8003E10C's 2nd parameter (round 13) -- a small "init args" struct:
  * two children forwarded to the inherited BasicClass addChild (self->
  * methods->slot10), and three optional fields each read with a "use if
@@ -487,7 +505,10 @@ struct Unk4ArgObj {
  * modelled.
  */
 struct Obj86B60InitArgs {
-    void *unk0;      /* +0x000, forwarded to self->methods->slot10 (child) */
+    Unk0ArgObj *unk0; /* +0x000, forwarded to self->methods->slot10 (child)
+                          as `void *`; ALSO OBSERVED (round 13) dereferenced
+                          directly by func_8003E578 as a real class instance
+                          -- see Unk0ArgObj's own comment */
     Unk4ArgObj *unk4; /* +0x004, forwarded to self->methods->slot10 (child)
                           as `void *`; ALSO OBSERVED (round 13) dereferenced
                           directly by func_8003E418 as a real class instance
