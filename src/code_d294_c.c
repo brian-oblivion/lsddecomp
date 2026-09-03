@@ -20,7 +20,11 @@ void func_8001E7B0(Class6B5CCObj *self) {
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E7BC);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EA8C);
+void func_8001EA8C(s32 *dest, s16 *b, s16 *a) {
+    dest[0] = a[0] - b[0];
+    dest[1] = a[1] - b[1];
+    dest[2] = a[2] - b[2];
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EACC);
 
