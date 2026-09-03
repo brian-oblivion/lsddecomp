@@ -15,7 +15,28 @@ Class6B5CCObj *func_8001CA94(void) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CAF4);
+void *func_8001CAF4(Class6B5CCObj *self) {
+    void *blockB;
+
+    self->unk14 = func_80017B34(0x50);
+    if (self->unk14 == NULL) {
+        return NULL;
+    }
+    blockB = func_80017B34(0x28);
+    self->unk14->unk44 = blockB;
+    if (blockB == NULL) {
+        func_80017CFC(self->unk14);
+        return NULL;
+    }
+    func_80018390()->ctor(self);
+    self->methods = func_8001E57C();
+    self->unk20 = 0;
+    self->unk18 = 0;
+    self->unkC = NULL;
+    self->unk14->unk48 = 0;
+    self->methods->slot40(self);
+    return self;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CBA4);
 
