@@ -41,7 +41,10 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E280);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E418);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E4A4);
+void func_8003E4A4(Obj86B60 *self)
+{
+    self->unk1C++;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E4B8);
 
