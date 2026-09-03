@@ -25,7 +25,9 @@ void func_8003EA48(Unk18Obj *self, s32 a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA64);
+void func_8003EA64(Unk18Obj *self, s32 a1) {
+    self->unk40 = a1;
+}
 
 void func_8003EA6C(void) {
 }
