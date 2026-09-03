@@ -18,6 +18,8 @@ extern u8 D_80089E38[];
 extern u8 D_80089E44[];
 extern u8 D_80089D00[];
 extern u8 D_80089D18[];
+extern u8 D_80089C70[];
+extern u8 D_80089C64[];
 
 /* func_80064FBC, this unit's own function, is called by func_80064E34
  * (earlier in ROM order) before its own definition below -- forward
@@ -177,7 +179,19 @@ void func_800650D4(Entity *this, EntityMoodHandlerArg *out) {
     func_80060D80(this, out);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_800650F4);
+void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
+    void *a2;
+
+    if (rand() % 3 == 0) {
+        return;
+    }
+    if (rand() % 3 != 0) {
+        a2 = D_80089C64;
+    } else {
+        a2 = D_80089C70;
+    }
+    this->methods->slot44(this, 0, a2);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_8006519C);
 
