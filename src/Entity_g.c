@@ -173,7 +173,9 @@ INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064E34);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064FBC);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_800650D4);
+void func_800650D4(Entity *this, EntityMoodHandlerArg *out) {
+    func_80060D80(this, out);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_800650F4);
 

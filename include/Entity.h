@@ -426,4 +426,9 @@ struct EntityMoodHandlerArg {
  * caller, forwarding its own (this, out) straight through. */
 extern void func_80062570(Entity *this, EntityMoodHandlerArg *out);
 
+/* Already matched in Entity_d.c (not INCLUDE_ASM), but not previously called
+ * from outside that unit -- func_800650D4 (Entity_g) is its first cross-unit
+ * caller, forwarding its own (this, out) straight through. */
+extern void func_80060D80(Entity *this, EntityMoodHandlerArg *out);
+
 #endif
