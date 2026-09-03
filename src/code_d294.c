@@ -107,7 +107,17 @@ Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 
     return self;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D1A4);
+Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self) {
+    UnkOwner_d294 *owner;
+
+    owner = self->unkC;
+    if (owner != NULL) {
+        owner->methods->slot14(owner, self);
+        self->unk14->unk48 = 0;
+        self->unkC = NULL;
+    }
+    return self;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001D204);
 
