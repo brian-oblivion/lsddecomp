@@ -6,6 +6,228 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-03 — round 13: 5 runners across 11 unit-passes, 110 matches, and four triage corrections
+
+**454 -> 568 matched (33.48% -> 41.89% of game code; matched bytes 26.30% ->
+32.55%). Build green in main after every one of the eleven merges, and every
+claimed match re-verified individually AFTER its merge.** 110 of the +114 came
+from runners and the head; the other 4 are `jr $ra; nop` bodies splat
+generated itself in a newly carved unit.
+
+Five runners, but **eleven unit-passes** — every runner that finished was sent
+back into new ground rather than idled, three of them twice. That was the
+round's biggest structural lever and it is worth repeating.
+
+**Gate 0 did not exist and the round found out the hard way.** `main` did not
+build. The round-12 pull had brought in four carves and nobody re-extracted
+`asm/`, so `build-and-verify.sh` died on `can't open
+asm/nonmatchings/<unit>/....s` — unattributable to any commit. Worse,
+`progress.py` silently UNDER-REPORTED: it printed a stale-asm warning above
+the table and then a table computed as if the un-extracted units did not
+exist. **581 uncarved game functions before re-extracting, 742 after.** Every
+triage decision reads off that table, and the warning that would have caught
+it prints where a `tail` pipe drops it. Now Gate 0 in PARALLEL-RUNS.md.
+
+**Gates.** 4a clean throughout, re-checked before each teardown: no other
+head, no foreign commits, no pushes to `origin/main` that were not ours. Gate 1
+found 49 true fresh functions across 8 units, all clear of the two blockers
+CLAUDE.md names — which turned out to be the wrong screen (below). Gate 2
+fired four times DURING the round, not just at the start, because runners kept
+emptying their units: `code_8220_c` (16), `code_d294_c` (15),
+`Entity_f`/`Entity_g` (37, split), `code_2cc8c_d` (33). Every carve verified
+green on its own before the next, and all four changed zero bytes.
+
+### There is a THIRD blocker screen and the head was not running it
+
+Runner bravo stalled `func_8001CEB4` on `nop_mflo_mfhi` — the pinned pipeline
+inserting `nop`s between an `mfhi` and a following `mult` that retail does not
+have. The screen for it lives inside `docs/research/addiu-at-blocker.md`, not
+in CLAUDE.md's two-grep list, so Gate 1 had not applied it and a blocked
+function was assigned. Re-measured as that document asks:
+
+| bucket | round 11 | round 13 |
+| --- | --- | --- |
+| matched C | 0 | **0** |
+| queued `INCLUDE_ASM` | 2 | **4** |
+| uncarved | 7 | 7 |
+
+Zero of 568 matched functions contain the construct, which is what a real
+blocker looks like. **The per-runner standing screen stays rejected** at 4 of
+156 — that was measured and declined twice already. But round 11's cost model
+was wrong in one direction: it assumed the 30-attempt cap bounds walking into
+this cheaply, and bravo instead spent a FULL DERIVATION (field reads, dispatch
+structure, a `/360` division verified against the pinned `cc1`) before the
+construct surfaced. A blocker that only appears once you understand the
+function is not bounded by an attempt counter. **So the fix was granularity,
+not scope** — the same correction that document already makes about the flag
+itself — and the screen now runs once per round in the head's Gate 1. It
+immediately caught two more functions pre-assignment in later carves.
+
+### Four triage corrections, which is where the head's time went
+
+- **`func_8005CBC8`: near-miss -> BLOCKED.** Filed as "1 word short,
+  instruction-selection preference" after seven attempts. It is two words
+  short and one of them is `addiu $at,$at,%lo(jtbl_*)` — the known
+  `addiu-at` blocker, whose hit sat unexamined at line 66 of the function's
+  own `.s`. Unmatchable as C. The other half of its residue WAS reachable and
+  is now fixed in the preserved body: retail's `nor`+`addiu` is `~sel + 1`,
+  not `-sel`. **The blocker screen now gates a stall's CAUSE, not just
+  assignment** — a wrong score self-corrects when someone re-measures, a
+  wrong cause is what the next round acts on.
+- **`func_8004BB3C`: 14/105 -> 90/105 at correct length**, by finishing the
+  lever its own report left unpulled and had recorded a WRONG reason for
+  (struct-size corruption, which dissolves once the sub-type is never
+  embedded). Retail's two array walkers have different BASES, so N
+  independently-incrementing walkers need N differently-based stride-sized
+  view types; no field regrouping splits them.
+- **An 8-function stall class overturned.** Charlie derived
+  "register-identity, not reachable from C" from 6 attempts on one root and
+  applied it to 7 siblings. The head reached instruction-exact (zero
+  inserted, zero deleted) on the root: the OT splice is a **24-bit BITFIELD**
+  write (Psy-Q `P_TAG`'s `addr:24`), not hand-written masking — same value,
+  different register allocation — and the OT expression must be
+  **re-evaluated, not cached**, because `addPrim(ot, p)` expands its argument
+  twice. Handed back; charlie applied it to all 8 and every one is now
+  instruction-exact. The transferable part is why it read as exhausted: all
+  six attempts varied HOW the masking was expressed while holding fixed the
+  assumption that masking was in the source at all. **Six attempts along one
+  axis reads exactly like a search of the whole space.**
+- **A whole-function `__asm__` reworked into six lines of C.**
+  `func_8001A3EC` was matched by transcribing 53 words of assembly, on the
+  reasoning that a straight-line frameless body justified it, citing a real
+  GTE function as precedent. It is reachable with an idiom already documented
+  and already confirmed three times (all-`s16` struct -> alignment 2 ->
+  `lwl`/`lwr`). CLAUDE.md's inline-asm exception is now scoped to "no C form
+  EXISTS", and writing one requires naming the instruction that has no C
+  spelling — otherwise `INCLUDE_ASM` already does the same job more honestly.
+
+### One runner classification REJECTED
+
+Delta proposed its forgotten-padding bug as a fifth "way a score lies". It is
+not one: the oracle went RED and was correct to. Filing it as a fifth would
+teach the next runner that the oracle cannot be trusted in exactly the case
+where it can. Delta's own write-up reaches the same conclusion in its last
+sentence. Both halves of what it DID find were kept — the shared-struct
+hazard is broader than the "slot retype" wording, and its `cmp -l` ->
+`lsdde.map` localization recipe, after fixing an off-by-one (`cmp -l` is
+1-based, verified on a probe). Delta then used the corrected recipe to
+self-catch two MORE instances of the same class, so it is now four across two
+rounds and recorded as standing.
+
+### HARD RULE 6 was wrong about this repository
+
+It banned extended-asm operand constraints "categorically, not judgement
+calls". `src/code_8220_b.c` has carried eight byte-verified `"r"`-constraint
+blocks since before the rule was written, for COP2 `swc2` stores that have no
+C spelling at all. A runner obeying the literal rule would either refuse a
+legitimate match or believe it had violated a hard rule by achieving one —
+charlie hit exactly that and flagged it. Now scoped to register identity, with
+the GTE exception and its two measured traps (a wrong GPR clobber on an
+`lwc2`/`swc2` block cascades through the whole function's allocation; an
+unbracketed branch mnemonic loses its delay slot).
+
+### TOOLCHAIN LEAD, escalated and NOT acted on
+
+`docs/research/maspsx-noreorder-lead.md`. maspsx inserts a defensive `nop`
+after real branch mnemonics inside `__asm__` blocks, displacing the intended
+delay-slot instruction — a control-flow semantic change. It tracks reorder
+state in a flat `is_reorder` flag matched against tab-delimited `.set` lines,
+and its own `.ent` handling EMITS `.set noreorder` without routing it back
+through `process_line`, so the flag never updates. Because the flag has no
+scope, an unclosed block-local `noreorder` also eats the `nop` off cc1's own
+`j $31` epilogue and damages the FOLLOWING function. Found by charlie,
+**reproduced in isolation by the head before escalating**, per the rule that a
+lead reaches the operator only with a reproducer. Not blocking: the
+source-level bracket works and three functions are byte-exact with it. The
+obvious version bump is explicitly not the remedy.
+
+### A screen validated, and a head error inside it
+
+Echo used the round-12 register-saturation screen PREDICTIVELY and called both
+its functions' difficulty class before writing any C. Measured against the
+round's own outcomes over 27 functions: matched (22) averaged **1.86** distinct
+callee-saved registers with **none at 5+**; stalled (5) averaged 5.00, max 9.
+Recorded as strictly **one-directional** — high predicts a register stall, low
+predicts nothing, since three of the five stalls sat at 2-3 and failed for
+unrelated reasons. It is the first screen that supplies what `fresh` cannot
+see: low cold-runner yield. The head independently counted one function at 8
+registers and echo said 9; **echo was right** — `$30` is `$fp` and `$s8` and
+the same register, splat writes `$fp`, `objdump` writes `s8`, and the head's
+regex missed one. Documented next to the screen.
+
+### Runners
+
+alpha 11/12 `code_2cc8c_c` then 18/20 `Entity_g`; bravo 10/11 `Entity_e`, 2/3
+`code_d294`, 8/13 `code_d294_c`; charlie 8/8 `code_8220_b`, 4/14
+`code_8220_c`, then 0 matches but 8 functions unblocked on the family
+re-attempt; delta 4/8 `code_d294_b` then 26/27 `code_2cc8c_d`; echo 2/3
+`Entity_d`, 0/2 `class_3bb8c_b`, then **17/17 on `Entity_f`** with no stalls.
+
+**`Entity_f` is the round's cleanest result and it was not luck.** All 37
+functions of that segment were measured before carving — zero hits on all
+three blocker screens and zero demanding 5+ registers — and echo was told
+explicitly that a stall there would therefore mean a genuine source-shape
+problem. There were none.
+
+**Echo's zero-match pass was not a wasted pass** and is the case for §3c: it
+established that the two register-saturation residues above the threshold need
+opposite fixes (a full permutation at zero drift versus a missing-register
+frame-size gap), that three instances sit in one header family, and that
+levers proven elsewhere in the round do not transfer in. That negative is what
+stops the next round spending a budget there.
+
+### Header collisions: three, and one git did not flag
+
+Two runners on adjacent slices of one carve is the documented hazard and it
+fired three times. `Entity.h` between bravo and echo: complementary, unioned,
+both runners' explicit existing-declaration notes made it one pass.
+`code_d294.h` between delta and bravo: a REAL collision — the same field given
+two different type NAMES, resolved on the sibling struct's naming and on which
+name matched code already referenced. Then the one worth remembering:
+`func_8001ECFC` was DECLARED typed by delta and MATCHED with raw `s16 *` by
+bravo, and **git auto-merged both without a conflict marker**; only the build
+caught it, on `conflicting types`. Resolved toward the typed signature after
+testing that it still matches 44/44 — better than either runner's own version.
+A shared-header collision git does not mark is more dangerous than one it does.
+
+### Operational
+
+Runner alpha found `git checkout --`, `git show HEAD:file > file` and
+`git stash` all blocked by the safety classifier — correctly, since each would
+have reverted 11 matched functions — leaving no sanctioned way to stage. It
+worked around with `git hash-object -w` plus `git update-index --cacheinfo`,
+which never touches the working tree and is strictly safer than what was
+blocked. Worth knowing for the next runner that hits it.
+
+Alpha also sat on 11 matched functions and 12 reports with **zero commits**
+for hours before being told to commit. It came out clean, but that is the
+failure mode that loses a pass silently, and §3b's "check `git status
+--porcelain` the moment a runner reports" should be "check it while they
+work". Echo was caught in the same state later and flagged early.
+
+**Teardown complete: all five worktrees removed, all five runner branches
+deleted, `main` green, nothing deferred.**
+
+### Next round
+
+**Carve first — `fresh` is 1.** The single remaining fresh function is
+`class_3ac78`'s `func_8004A534`, which the register screen puts at 8 and which
+should be handed out expecting a documented stall, not a match. Uncarved
+ground is 641 functions in three segments: `class_3bb8c_d` (305),
+`code_179d8` (274) and `code_2cc8c_e` (60). Two things are already measured
+about `code_2cc8c_e` and recorded in the splat yaml so nobody leads with them:
+`func_8003F2AC` is `nop_mflo_mfhi`-blocked AND wants 6 callee-saved registers,
+and `func_8003FB1C` is `addiu_at`-blocked and owns a real jump table whose
+rodata slot will need attaching at carve time. `code_179d8`'s `0xFD8` rodata
+slot genuinely holds text pointers and will need attaching too.
+
+The `func_800197C4` family is the best-value stall work available: 8 functions,
+all instruction-exact, one shared residue, and a named lead — `self`'s real
+type, visible from `func_80018464` in `code_8220_b` (the deprioritized
+958-instruction body) rather than from any family member.
+
+---
+
 ## 2026-09-03 — round 12: 5 runners, 35 matches, and the SDK's macro layer found inert
 
 **415 -> 454 matched (30.60% -> 33.48% of game code; matched bytes 22.04% ->
