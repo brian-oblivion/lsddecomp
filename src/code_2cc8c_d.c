@@ -1,4 +1,5 @@
 #include "common.h"
+#include "code_2cc8c.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E8B8);
 
@@ -6,7 +7,9 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E968);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA0C);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA24);
+void func_8003EA24(Unk18Obj *self, s32 a1) {
+    self->unk3C = a1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA2C);
 
