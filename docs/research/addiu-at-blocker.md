@@ -665,3 +665,53 @@ blocker's scope is a toolchain claim and needs the same reproducer as widening
 it, and it is the more dangerous direction: widening one costs attempts,
 narrowing one sends runners at functions that cannot match and reads, in the
 match reports left behind, exactly like ordinary stalls.
+
+## The `nop_mflo_mfhi` sibling: measured scope (round 11, head)
+
+`docs/match-reports/func_8005950C.md` flagged a connection for "whoever
+triages this document next": its residue is a mandatory `nop` pair between an
+`mflo`/`mfhi` and the next instruction reading that result, which matches the
+NAME of the `nop_mflo_mfhi` flag that `config_for_aspsx_version` flips together
+with `addiu_at` below aspsx 2.30. That report proposed promoting a THIRD
+pre-work screening grep alongside `gp_rel` and `addiu $at,$at,%lo`.
+
+**Measured before promoting, per CLAUDE.md's rule that a blocker's scope is
+measured rather than reasoned. The scope does not justify a standing screen.**
+
+Method: disassemble `build/lsdde.elf`, find every function containing an
+`mflo`/`mfhi` followed within one instruction by `div`/`divu` with no
+intervening `nop`, and bucket each hit by which object file the LINK MAP says
+it came from — `build/src/*.o` for genuinely-compiled C, `build/asm/*.o` for
+an uncarved monolithic segment.
+
+| bucket | hits |
+| --- | --- |
+| matched C (`build/src/*.o`, not `INCLUDE_ASM`) | **0** |
+| queued `INCLUDE_ASM` | **2** |
+| uncarved `asm` segments | 7 |
+
+The two queued hits are `func_8005950C` — the function that proposed the
+learning — and `DreamSys__GetPreviousDayMood`.
+
+**What this settles, and what it does not.** The hypothesis is NOT falsified:
+zero matched C functions contain the pattern, which is exactly what a real
+blocker looks like. But it is not worth a standing screen either, at 2 of 181
+queued functions against `gp_rel`'s 125 and `addiu $at,$at,%lo`'s 45. The
+existing two greps earn their place by catching a large fraction of the queue
+cheaply; a third that fires twice would cost every runner a grep on every
+function to relocate a stall the 30-attempt cap already bounds. Revisit if the
+7 uncarved hits turn into queued ones as carving proceeds — that is the number
+to re-measure, not this paragraph.
+
+**A methodology note that cost a wrong answer on the first pass.** Bucketing
+"matched" as "not in the `INCLUDE_ASM` set" reports **7 matched functions with
+the pattern**, which reads as a clean falsification — proof the construct
+compiles fine and the blocker claim is bogus. It is wrong. Functions in
+uncarved monolithic `asm` segments are not `INCLUDE_ASM` in any `src/*.c`
+either, so that test silently pools them with matched C, and in this corpus
+every one of the 7 is an uncarved-asm function. **Ask the link map which object
+a symbol came from; do not infer "matched" from the absence of an
+`INCLUDE_ASM`.** The uncarved bulk of this game makes the negative space much
+larger than the matched space, so that inference will keep being wrong in the
+same direction — flattering, and toward de-escalating a blocker, which this
+document already records as the more dangerous direction to be wrong in.
