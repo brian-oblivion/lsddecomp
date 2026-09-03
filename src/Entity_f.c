@@ -169,7 +169,15 @@ void func_80063BC0(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_f", func_80063C84);
+void func_80063C84(EntityMoodHandlerArg *out) {
+    out->unk10 = 0;
+    out->unk1C = 7;
+    out->unk20 = -2;
+    out->unk30 = 7;
+    out->unk34 = -2;
+    out->unk44 = 7;
+    out->unk48 = -2;
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_f", func_80063CAC);
 
