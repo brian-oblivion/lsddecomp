@@ -37,6 +37,23 @@ typedef struct Unk64ElemMethods Unk64ElemMethods;
 typedef struct Unk68Obj Unk68Obj;
 typedef struct Unk68ObjMethods Unk68ObjMethods;
 typedef struct SrcDesc SrcDesc;
+typedef struct HeaderObj HeaderObj;
+typedef struct EventArg EventArg;
+typedef struct Unk14Obj Unk14Obj;
+typedef struct Unk14ObjMethods Unk14ObjMethods;
+typedef struct Unk18Obj Unk18Obj;
+typedef struct Unk18ObjMethods Unk18ObjMethods;
+typedef struct SubHandleObj SubHandleObj;
+typedef struct SubHandleObjMethods SubHandleObjMethods;
+typedef struct Unk18AcObj Unk18AcObj;
+typedef struct Unk18AcObjMethods Unk18AcObjMethods;
+typedef struct GenericObj GenericObj;
+typedef struct GenericObjMethods GenericObjMethods;
+typedef struct Obj86B60InitArgs Obj86B60InitArgs;
+typedef struct Unk10Obj Unk10Obj;
+typedef struct Unk10ObjMethods Unk10ObjMethods;
+typedef struct Unk4ArgObj Unk4ArgObj;
+typedef struct Unk4ArgObjMethods Unk4ArgObjMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -78,6 +95,22 @@ typedef struct SrcDesc SrcDesc;
  *   future unit's allocator call reveals a literal byte count for any of
  *   these three classes, record it here.
  */
+
+/*
+ * A generic "event" argument, round 13: `arg1->target->header` is read by
+ * func_8003E030 to pick which of self->methods->slot54/58/5C to forward to.
+ * Same two-type shape as class_39e08.h's own independent `EventArg`/
+ * `HeaderObj` local view (a `target` pointer to an object whose first word
+ * is a low-nibble-coded header/kind value) -- this unit keeps its own
+ * separate local view per the project's established convention. Only the
+ * one field/offset func_8003E030 touches is modelled.
+ */
+struct HeaderObj {
+    s32 header; /* +0x000 */
+};
+struct EventArg {
+    HeaderObj *target; /* +0x000 */
+};
 
 /*
  * self->unk4C's pointee ("target"). Established from six independent
@@ -338,6 +371,266 @@ extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
 extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
 /*
+ * The pointee of `Unk18Obj->unkB0` (round 13, func_8003E628), returned by
+ * `func_8003FDB0` -- a function already known elsewhere in this project
+ * (`include/Entity.h`'s own `Unk100Obj`/`func_8003FDB0`), kept here under a
+ * unit-local name per this project's established "independent local views"
+ * convention. Only the one slot this unit's `func_8003E628` dispatches
+ * through is modelled.
+ */
+struct SubHandleObjMethods {
+    u8 pad000[0x04C];
+    void (*slot4C)(SubHandleObj *self, void *arg1, void *arg2); /* +0x04C,
+                                    OBSERVED: func_8003E628 */
+};
+struct SubHandleObj {
+    SubHandleObjMethods *methods; /* +0x000 */
+};
+
+extern SubHandleObj *func_8003FDB0(void *name, s32 arg1, s32 arg2); /* local
+                                    view of include/Entity.h's own
+                                    `func_8003FDB0` */
+extern Unk18AcObj *func_8001CA94(void); /* local view of include/code_d294.h's
+                                    own `New_Class6B5CC` allocator, returning
+                                    `Class6B5CCObj *` there -- this unit's
+                                    own view retyped (round 13) once
+                                    func_8003E6CC dereferenced it, see
+                                    Unk18AcObj's own comment */
+extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
+                            func_8003FDB0's "name" argument */
+extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
+                            SubHandleObjMethods::slot4C's 3rd argument */
+
+/*
+ * `Unk18Obj->unkAC`'s pointee (round 13, func_8003E6CC) -- the return of
+ * `func_8001CA94`, first stored opaquely by `func_8003E628` and here
+ * dereferenced and released through the inherited BasicClass "release"
+ * slot. Only that one slot is modelled.
+ */
+struct Unk18AcObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk18AcObj *self); /* +0x004, inherited BasicClass
+                                          "release"; OBSERVED: func_8003E6CC */
+};
+struct Unk18AcObj {
+    Unk18AcObjMethods *methods; /* +0x000 */
+};
+
+/*
+ * A generic class-instance view (round 13, func_8003E770): every class's
+ * vtable in this game begins with a "header" word (`tools/classtable.py`'s
+ * own label for it, "not a pointer; varies per class -- id/flags"), and
+ * `func_8003E770` discriminates its 2nd parameter's DYNAMIC CLASS by
+ * reading `arg1->methods->header & 0xF` -- i.e. runtime type identification
+ * through the vtable header nibble, not a struct field of `arg1` itself.
+ * Only that one field, plus the one instance field (`unk14`) this function
+ * also reads, are modelled; `arg1`'s real class is unknown and irrelevant
+ * to this function's own behaviour.
+ */
+struct GenericObjMethods {
+    s32 header; /* +0x000 */
+};
+struct GenericObj {
+    GenericObjMethods *methods; /* +0x000 */
+    u8 pad004[0x014 - 0x004];
+    s32 unk14;                  /* +0x014, OBSERVED: func_8003E770 */
+};
+
+/*
+ * self->unk18's pointee, round 13 (func_8003E10C). Constructed by a
+ * New_X allocator this unit itself carves (func_8003E5D8, 0xBC bytes) via
+ * `func_8003F24C()->ctor(self)` -- func_8003F24C lives in a still-uncarved
+ * remainder of this segment (not this unit's function to write), so it is
+ * declared here only as an external returning this unit's own local view
+ * of the class table it constructs. Only the one slot func_8003E10C
+ * dispatches through is modelled.
+ */
+struct Unk18ObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk18Obj *self);            /* +0x004, inherited
+                                                    BasicClass "release"
+                                                    (finalize then free);
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
+    void (*ctor)(Unk18Obj *self);              /* +0x008, called by
+                                                    func_8003E5D8 with only
+                                                    `self` set up */
+    u8 pad00C[0x010 - 0x00C];
+    void (*slot10)(Unk18Obj *self, void *a1);  /* +0x010, inherited
+                                                    BasicClass addChild;
+                                                    OBSERVED: func_8003E10C */
+    void (*slot14)(Unk18Obj *self, void *a1);  /* +0x014, inherited
+                                                    BasicClass removeChild;
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
+    u8 pad018[0x040 - 0x018];
+    void (*slot40)(Unk18Obj *self);            /* +0x040, OBSERVED:
+                                                    func_8003E628 (round 13)
+                                                    -- a DIFFERENT table from
+                                                    Obj86B60Methods's own
+                                                    slot40 (`D_8006E8E4`'s
+                                                    own occupant here is
+                                                    `func_8003E968`, not
+                                                    `func_8003E100`) */
+    u8 pad044[0x074 - 0x044];
+    void (*slot74)(Unk18Obj *self);            /* +0x074, OBSERVED:
+                                                    func_8003E6CC (round 13) */
+    u8 pad078[0x090 - 0x078];
+    void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
+                                                    func_8003E6CC (round 13) */
+    u8 pad094[0x0A8 - 0x094];
+    void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
+                                                    func_8003E6CC (round 13) */
+};
+struct Unk18Obj {
+    Unk18ObjMethods *methods; /* +0x000 */
+    u8 pad004[0x00C - 0x004];
+    GenericObj *unkC;          /* +0x00C, zeroed by the ctor
+                                  (func_8003E628); OBSERVED (round 13,
+                                  set to `arg1`) by func_8003E770 when
+                                  `arg1->methods->header & 0xF == 1` */
+    GenericObj *unk10;         /* +0x010, zeroed by the ctor
+                                  (func_8003E628); OBSERVED (round 13,
+                                  set to `arg1`) by func_8003E770 when
+                                  `arg1->methods->header & 0xF == 4` */
+    u8 pad014[0x030 - 0x014];
+    s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
+                                  13), set from `arg1->unk14` on the same
+                                  `header == 4` path that sets `unk10` */
+    u8 pad034[0x0AC - 0x034];
+    Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: func_8003E628 (round 13,
+                                  set from `func_8001CA94()`, a
+                                  `New_Class6B5CC` allocator, `code_d294.c`)
+                                  and func_8003E6CC (round 13, dereferenced
+                                  and released -- see `Unk18AcObj`'s own
+                                  comment) */
+    SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: func_8003E628 (round
+                                  13) -- set from `func_8003FDB0` */
+};
+
+extern Unk18ObjMethods *func_8003F24C(void); /* external (not this unit);
+                                    getter for Unk18Obj's own class table,
+                                    used only by func_8003E5D8's own New_X
+                                    allocator */
+extern Unk18Obj *func_8003E5D8(void); /* this unit's own New_X allocator for
+                                    Unk18Obj, 0xBC bytes; forward-declared
+                                    here since func_8003E10C (earlier in ROM
+                                    order) calls it */
+
+extern void *func_80042400(void); /* external, no args; local view returns
+                                    void* (used as a generic word/child
+                                    pointer here); same callee as
+                                    class_39e08.h's own `SubObjG *` view */
+extern void *func_80042694(void); /* external, no args; not yet seen
+                                    elsewhere in this project */
+
+/*
+ * An ALTERNATE reading of self->unk14 (round 13, func_8003E10C only): the
+ * field itself stays `s32` in `Obj86B60` below (already established,
+ * generic-word usage confirmed by a sibling unit's func_8003DA10 forwarding
+ * it untyped to slot100) -- same "keep the general field, cast locally"
+ * shape already used for Unk4CObj->unk24[idx]/Unk64Elem's own
+ * func_8003D980 alternate reading. Here func_8003E10C dispatches through it
+ * as a pointer to an object with its own vtable; only the one slot it
+ * reaches is modelled.
+ */
+struct Unk14ObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk14Obj *self);            /* +0x004, inherited
+                                                    BasicClass "release";
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
+    u8 pad008[0x010 - 0x008];
+    void (*slot10)(Unk14Obj *self, void *a1);  /* +0x010, inherited
+                                                    BasicClass addChild;
+                                                    OBSERVED: func_8003E10C */
+    void (*slot14)(Unk14Obj *self, void *a1);  /* +0x014, inherited
+                                                    BasicClass removeChild;
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
+};
+struct Unk14Obj {
+    Unk14ObjMethods *methods; /* +0x000 */
+};
+
+/*
+ * A THIRD alternate reading of the same shape, this time for self->unk10
+ * (round 13, func_8003E280 only): released through the identical inherited
+ * BasicClass "release" slot self->unk14/unk18's own pointee types use.
+ * self->unk10 itself stays `s32` in `Obj86B60` (already established,
+ * generic-word/child-pointer usage confirmed by func_8003E10C) -- cast
+ * locally here, same convention as `Unk14Obj`.
+ */
+struct Unk10ObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk10Obj *self);            /* +0x004, inherited
+                                                    BasicClass "release";
+                                                    OBSERVED: func_8003E280 */
+    u8 pad008[0x044 - 0x008];
+    void (*slot44)(Unk10Obj *self);            /* +0x044, OBSERVED:
+                                                    func_8003E418 (round 13) */
+};
+struct Unk10Obj {
+    Unk10ObjMethods *methods; /* +0x000 */
+};
+
+/*
+ * self->unkC->unk4's pointee (round 13, func_8003E418) -- the SAME field
+ * `func_8003E10C` forwards as an opaque `addChild` child and `func_8003E280`
+ * forwards as a `removeChild` target; this function is the first to
+ * dereference it as a real class instance. Only the two slots it dispatches
+ * through are modelled.
+ */
+struct Unk4ArgObjMethods {
+    u8 pad000[0x044];
+    void (*slot44)(Unk4ArgObj *self); /* +0x044, OBSERVED: func_8003E418 */
+    void (*slot48)(Unk4ArgObj *self); /* +0x048, OBSERVED: func_8003E418 */
+};
+struct Unk4ArgObj {
+    Unk4ArgObjMethods *methods; /* +0x000 */
+};
+
+/*
+ * self->unkC->unk0's pointee (round 13, func_8003E578) -- the SAME field
+ * `func_8003E10C`/`func_8003E280` forward as an opaque `addChild`/
+ * `removeChild` child; this function is the first to dereference it as a
+ * real class instance (same "one field, multiple independent-evidence
+ * readings" shape as `Unk4ArgObj` for the adjacent `unk4` field). Only the
+ * one slot this function dispatches through is modelled.
+ */
+typedef struct Unk0ArgObj Unk0ArgObj;
+typedef struct Unk0ArgObjMethods Unk0ArgObjMethods;
+struct Unk0ArgObjMethods {
+    u8 pad000[0x04C];
+    void (*slot4C)(Unk0ArgObj *self); /* +0x04C, OBSERVED: func_8003E578 */
+};
+struct Unk0ArgObj {
+    Unk0ArgObjMethods *methods; /* +0x000 */
+};
+
+/*
+ * func_8003E10C's 2nd parameter (round 13) -- a small "init args" struct:
+ * two children forwarded to the inherited BasicClass addChild (self->
+ * methods->slot10), and three optional fields each read with a "use if
+ * set, else derive from a helper call" idiom mirroring self->unk10/unk14/
+ * unk18's own construction. Only the five fields func_8003E10C touches are
+ * modelled.
+ */
+struct Obj86B60InitArgs {
+    Unk0ArgObj *unk0; /* +0x000, forwarded to self->methods->slot10 (child)
+                          as `void *`; ALSO OBSERVED (round 13) dereferenced
+                          directly by func_8003E578 as a real class instance
+                          -- see Unk0ArgObj's own comment */
+    Unk4ArgObj *unk4; /* +0x004, forwarded to self->methods->slot10 (child)
+                          as `void *`; ALSO OBSERVED (round 13) dereferenced
+                          directly by func_8003E418 as a real class instance
+                          -- see Unk4ArgObj's own comment */
+    void *unk8;      /* +0x008, fallback source for self->unk10 */
+    void *unkC;      /* +0x00C, fallback source for self->unk14 */
+    Unk18Obj *unk10; /* +0x010, fallback source for self->unk18 */
+};
+
+/*
  * self->methods. Only the slots this unit's functions actually CALL
  * THROUGH (as opposed to slots that simply ARE these functions, entered
  * from elsewhere) are given here -- there is no need to model a slot this
@@ -356,10 +649,64 @@ extern char D_8008A8F0[4];  /* address-taken only by this unit */
  * callee's own body reads it. See func_8003C51C's own report.
  */
 struct Obj86B60Methods {
-    u8 pad000[0x060];
+    u8 pad000[0x010];
+    void (*slot10)(Obj86B60 *self, void *a1);     /* +0x010, inherited
+                                                      BasicClass addChild
+                                                      (BasicClass__func_17f98);
+                                                      OBSERVED: func_8003E10C */
+    void (*slot14)(Obj86B60 *self, void *a1);     /* +0x014, inherited
+                                                      BasicClass removeChild
+                                                      (BasicClass__func_17ff0);
+                                                      OBSERVED: func_8003E280
+                                                      (round 13) */
+    u8 pad018[0x030 - 0x018];
+    void (*slot30)(Obj86B60 *self);               /* +0x030, inherited
+                                                      BasicClass slot
+                                                      (BasicClass__func_182cc);
+                                                      OBSERVED: func_8003E4B8
+                                                      (round 13) */
+    u8 pad034[0x040 - 0x034];
+    void (*slot40)(Obj86B60 *self);               /* +0x040, IS
+                                                      func_8003E100 (already
+                                                      matched); OBSERVED:
+                                                      func_8003DFDC */
+    u8 pad044[0x048 - 0x044];
+    void (*slot48)(Obj86B60 *self);               /* +0x048, IS
+                                                      func_8003E280;
+                                                      OBSERVED: func_8003E10C */
+    void (*slot4C)(Obj86B60 *self, s32 a1, s32 a2, s32 a3); /* +0x04C,
+                                                      external (func_8003C238);
+                                                      OBSERVED: func_8003E10C */
+    void (*slot50)(Obj86B60 *self);               /* +0x050, external
+                                                      (func_8004D898);
+                                                      OBSERVED: func_8003E280
+                                                      (round 13) */
+    void (*slot54)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x054, IS
+                                                      func_8003E418;
+                                                      OBSERVED: func_8003E030 */
+    void (*slot58)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x058,
+                                                      external (func_8003C48C,
+                                                      STALL in code_2cc8c);
+                                                      OBSERVED: func_8003E030 */
+    void (*slot5C)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x05C, IS
+                                                      func_8003C51C (already
+                                                      matched there with a1
+                                                      typed s32 -- an
+                                                      independent local view,
+                                                      same shared slot);
+                                                      OBSERVED: func_8003E030 */
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
                                                       (func_8004D90C) */
-    u8 pad064[0x070 - 0x064];
+    void (*slot64)(Obj86B60 *self);               /* +0x064, IS
+                                                      func_8003E538 (already
+                                                      matched); OBSERVED:
+                                                      func_8003E4B8
+                                                      (round 13) */
+    void (*slot68)(Obj86B60 *self);               /* +0x068, IS
+                                                      func_8003E578;
+                                                      OBSERVED: func_8003E4B8
+                                                      (round 13) */
+    u8 pad06C[0x070 - 0x06C];
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
                                                       func_8003C7B4 */
     u8 pad074[0x090 - 0x074];
@@ -531,14 +878,33 @@ struct Obj86B60 {
                                     itself introduces -- kept here anyway,
                                     per this header's flat single-struct
                                     style (no explicit base/derived split). */
-    s32 unk10;                  /* +0x010, func_8003E874 only: zeroed by the
-                                    same ctor-shaped function as unkC/unk30;
-                                    real meaning unknown, generic word */
+    s32 unk10;                  /* +0x010, func_8003E874: zeroed by the same
+                                    ctor-shaped function as unkC/unk30.
+                                    ALSO OBSERVED (round 13) by func_8003E10C,
+                                    which sets it from an init-args field or
+                                    a helper call and forwards it BOTH as an
+                                    addChild-style child argument and (cast
+                                    locally) as Unk14Obj::slot10's 2nd arg --
+                                    kept `s32` (the more general reading) per
+                                    this header's "keep the general field,
+                                    cast locally" convention; see Unk14Obj's
+                                    own comment above. */
     s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
-                                    slot100's 2nd arg, otherwise untouched
-                                    by this unit -- generic word, not
-                                    dereferenced here */
-    u8 pad018[0x01C - 0x018];
+                                    slot100's 2nd arg -- generic word.
+                                    ALSO OBSERVED (round 13) by func_8003E10C,
+                                    which both sets it (from an init-args
+                                    field or a helper call) and, on one path,
+                                    dispatches through it as a pointer to an
+                                    object with its own vtable (cast locally
+                                    to `Unk14Obj *`, see that type's own
+                                    comment) -- kept `s32` here since that is
+                                    still the more general of the two
+                                    observed readings. */
+    Unk18Obj *unk18;             /* +0x018, func_8003E10C (round 13): set
+                                    from an init-args field or from this
+                                    unit's own New_X allocator
+                                    (func_8003E5D8), then dispatched through
+                                    (`self->unk18->methods->slot10(...)`) */
     s32 unk1C;                  /* +0x01C, func_8003CC2C (a running count/
                                     frame value multiplied against unk84);
                                     func_8003C63C (STALL) zeroes it on
@@ -546,7 +912,10 @@ struct Obj86B60 {
     u8 pad020[0x020 - 0x020];
     s32 unk20;                  /* +0x020, func_8003C63C (STALL) sets it
                                     to a literal 5 */
-    u8 pad024[0x030 - 0x024];
+    s32 unk24;                  /* +0x024, func_8003E10C (round 13): set to
+                                    arg2 (also gates the rest of that
+                                    function's body on == 0) */
+    u8 pad028[0x030 - 0x028];
     s32 unk30;                  /* +0x030, func_8003E874 only: zeroed by the
                                     same ctor-shaped function as unkC/unk10;
                                     real meaning unknown, generic word */
@@ -662,13 +1031,30 @@ extern IntermediateBaseMethods D_8006E878; /* the table itself, so
  * established independently in include/class_16334.h, include/code_171e0.h
  * and include/code_d294.h. Declared again here, under a unit-local name,
  * per this project's policy of NOT unifying independent local views of the
- * same table into one shared header. Only the one slot func_8003E874
- * dispatches through is modelled.
+ * same table into one shared header. Only the slots this unit's queued
+ * functions actually dispatch through are modelled.
  */
 typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
 struct BasicClassMethodsCC8C {
-    u8 pad000[0x018];
+    u8 pad000[0x008];
+    void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
+                                  (code_8220.c); OBSERVED: func_8003DFDC */
+    void (*slot0C)(void *self); /* +0x00C, IS BasicClass__func_17f2c
+                                  (code_8220.c, "finalize"); OBSERVED:
+                                  func_8003E6CC (round 13) */
+    void (*slot10)(void *self, void *child); /* +0x010, IS
+                                  BasicClass__func_17f98 (code_8220.c,
+                                  "addChild"); OBSERVED: func_8003E770
+                                  (round 13) */
+    void (*slot14)(void *self, void *child); /* +0x014, IS
+                                  BasicClass__func_17ff0 (code_8220.c,
+                                  "removeChild"); OBSERVED: func_8003E7F4
+                                  (round 13) */
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
+    u8 pad01C[0x038 - 0x01C];
+    void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
+                                  BasicClass__func_18358 (code_8220_b);
+                                  OBSERVED: func_8003E030 */
 };
 
 extern BasicClassMethodsCC8C *func_80018390(void);

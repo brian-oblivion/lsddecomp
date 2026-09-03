@@ -1,0 +1,52 @@
+# func_8003DFDC — MATCH (21/21 words)
+
+**Unit:** code_2cc8c_c · **Size:** 21 instructions
+
+## What it does
+
+This IS `D_8006E878`'s own +0x008 slot -- the "IntermediateBase" shared
+utility class's constructor (`tools/classtable.py D_8006E878` shows
+`+0x008 func_8003DFDC`). Runs the BasicClass ctor through `func_80018390()`,
+installs this class's own vtable (`&D_8006E878`, via the already-matched
+getter `func_8003E5C8`), then dispatches its own freshly-installed slot40
+(`func_8003E100`, already matched, void-returning) once.
+
+Same self-typing convention as this unit's other already-matched siblings
+from the same shared table (`func_8003E100`, `func_8003E4A4`, `func_8003E538`):
+`Obj86B60 *self`, even though the class is generically shared across many
+unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
+`D_8006E878+0x008`, called there as `func_8003E5C8()->slot08(self)` on a
+`StreamTaskObj *self`).
+
+## The C
+
+```c
+void func_8003DFDC(Obj86B60 *self)
+{
+    func_80018390()->ctor(self);
+    self->methods = (Obj86B60Methods *)func_8003E5C8();
+    self->methods->slot40(self);
+}
+```
+
+## Header notes
+
+- Added `ctor` (+0x008) to this unit's local `BasicClassMethodsCC8C`, typed
+  `void (*ctor)(void *self)` from `include/code_8220.h`'s own authoritative
+  `BasicClassMethods` (`BasicClass__BasicClass`, confirmed void-returning,
+  already matched there).
+- Added `slot40` to `Obj86B60Methods` (`Obj86B60 *self`), the slot this
+  function calls through after installing its own vtable -- it IS
+  `func_8003E100`, already matched elsewhere in this unit.
+- The explicit cast `(Obj86B60Methods *)func_8003E5C8()` mirrors
+  `src/class_39e08.c`'s own `self->methods = (Class865C8Methods *)
+  func_8004A4B8();` -- assigning a shared/generic table getter's return
+  into a locally-typed `methods` field is an established idiom in this
+  codebase, not a workaround.
+
+## Provenance
+
+round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the first
+build. Classtable dump of `D_8006E878` (26 slots) resolved this and six
+sibling queue functions' exact slot identities in one pass; see
+`func_8003E030.md` for the full table.
