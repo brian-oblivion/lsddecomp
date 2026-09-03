@@ -1124,6 +1124,71 @@ code_2c054).**
   **When two runners report the same anomaly, sweep the corpus before writing
   either report up.**
 
+#### Round 13: retail's callee-saved-register demand is a VALIDATED pre-work screen
+
+Round 12 opened "retail saturates the callee-saved register file" as a residue
+class with a screening command. Round 13's echo used it *predictively* --
+running it before writing any C -- and correctly called both of its functions'
+difficulty class in advance. So the head validated it against the round's
+actual outcomes, which is the check that turns a plausible screen into a tool.
+
+Count the DISTINCT callee-saved registers retail saves in the function's
+prologue:
+
+```sh
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/<unit>/<func>.s | sort -u | wc -l
+```
+
+**Mind the register naming, it differs by tool.** `$30` is `$fp` and `$s8` and
+the same register. splat's `.s` writes `$fp`; `objdump` renders it `s8`. A
+screen written for one and run over the other silently undercounts by exactly
+one register --- which is the difference between "8 of 9" and "fully
+saturated". The head made this error while validating and echo's figure of 9
+was the correct one.
+
+Measured over round 13's 27 worked functions:
+
+| | n | mean regs | max | >= 5 | fully saturated (9) |
+| --- | --- | --- | --- | --- | --- |
+| matched byte-exact | 22 | **1.86** | 4 | **0** | 0 |
+| stalled | 5 | 5.00 | 9 | 2 | 1 |
+
+**It is a ONE-DIRECTIONAL screen and must be used as one.** A high count
+predicts a register-allocation stall: not one of 22 matches needed 5 or more,
+and both functions demanding 8+ stalled. A LOW count predicts nothing --- three
+of the five stalls sat at 2-3 registers and failed for unrelated reasons
+(tail-merge granularity, a redundant constant, `nop_mflo_mfhi`). So use it to
+DEPRIORITISE and to set expectations, never to promise a match.
+
+This is the first screen that gives `progress.py`'s `fresh` column the thing it
+explicitly cannot see --- "large body, deep reconstruction, low cold-runner
+yield" (`docs/PARALLEL-RUNS.md`, Gate 1). Run it per unit at triage time to rank
+the queue, not just per function.
+
+**Two distinct residue classes live above the threshold, and they do not share
+a fix** --- echo established this by hitting both in one pass:
+
+- **Full register-identity PERMUTATION with zero address drift.** The word
+  count and total length are exactly right and every instruction matches
+  opcode-for-opcode; ~8 simultaneously-live values are shifted across
+  `$s0`-`$s7`. `func_8004C93C`: 7 source-shape variants (declaration order,
+  boolean-vs-requery, read order, pointer-assignment timing) failed to move
+  `self` off `$s3` onto retail's `$s2`.
+- **Missing-register / FRAME-SIZE gap.** Retail saves 9 (all of `$s0`-`$s7`
+  plus `$fp`); every C shape reaches 8, so the frame is smaller and everything
+  after it drifts. `func_8004C6A8` and the pre-existing `func_8004CAF0`.
+
+Three instances now sit in the `class_3bb8c` / `class_3bb8c_b` /
+`class_3bb8c_c` header family, which is what makes it a class rather than three
+coincidences. **Levers proven elsewhere do not transfer into it** --- Entity_d's
+"collapse into one call expression" lever moved `func_8004C6A8` by one word,
+not by a register.
+
+Triage consequence, live at the time of writing: `class_3ac78`'s single
+remaining fresh function, `func_8004A534`, demands **8** registers. It is the
+last item in the reserve pool and it should be handed out with the expectation
+of a documented stall, not of a match.
+
 ### New residue classes opened this round (not yet closed)
 
 - **NEW, round 12: "retail saturates the callee-saved register file."**
