@@ -3,6 +3,13 @@
 
 #include "common.h"
 
+/* Forward typedefs, used by `extern` declarations further up this file
+ * than their own struct bodies (round 14, code_2cc8c_e's own local views,
+ * referenced by earlier code_2cc8c_d call-site declarations). */
+typedef struct TexPageDesc TexPageDesc;
+typedef struct Class6E99CObj Class6E99CObj;
+typedef struct ClassEAC0Obj ClassEAC0Obj;
+
 /*
  * The class whose method table is D_80086B60 (78 slots, base) with a
  * derived override table at D_80087AAC (73 slots) -- resolved with
@@ -381,10 +388,15 @@ struct Unk68Obj {
     Unk68ObjMethods *methods; /* +0x000 */
 };
 
-extern Unk68Obj *func_800404D0(void *a0, void *a1, s32 a2); /* external
-                                    (code_2cc8c_d, not this unit); local
-                                    view -- return type inferred from
-                                    self->unk68's own dispatch pattern */
+/* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
+   New_X allocator for `ClassEAC0Obj` (see the Class6E99CObj/ClassEAC0Obj
+   section far below) -- `func_80017B34(0x6C)` then
+   `func_800408BC()->ctor(self, a0, a1, a2)`. Parameter types are UNCHANGED
+   from the existing declaration (both already pointer/pointer/s32, matching
+   this call site's own real arguments exactly); only the RETURN type
+   differs from `code_2cc8c_b.c`'s own `Unk68Obj *` view -- ABI-identical
+   (a plain pointer either way), verified with a full rebuild. */
+extern ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2);
 extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
 extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
@@ -409,9 +421,22 @@ struct SubHandleObj {
     SubHandleObjMethods *methods; /* +0x000 */
 };
 
-extern SubHandleObj *func_8003FDB0(void *name, s32 arg1, s32 arg2); /* local
-                                    view of include/Entity.h's own
-                                    `func_8003FDB0` */
+/* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
+   New_X allocator for `Class6E99CObj` (this unit's own view, see the
+   Class6E99CObj/ClassEAC0Obj section far below) -- `func_80017B34(0xA0)`
+   then `func_800404C0()->ctor(self, a1, a2, a3)`. `a1`/`a2`/`a3` forward
+   straight through to that ctor unmodified; `a1` is a pointer (confirmed
+   by THIS unit's own two real callers, `code_2cc8c_c.c` passing
+   `D_8008A90C` and `Entity.c` passing its own `name` parameter, both
+   already-matched). The return type differs from the narrower
+   `SubHandleObj *`/`Unk100Obj *` views those two callers (and
+   `include/Entity.h`) keep for their OWN local field types -- ABI-
+   identical (a plain pointer either way), so this is a compatible
+   retype: both existing call sites already assign the result into their
+   OWN separately-typed local, so this only changes an implicit-conversion
+   warning at the assignment, not the compiled bytes. Verified with a full
+   rebuild. */
+extern Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3);
 extern Unk18AcObj *func_8001CA94(void); /* local view of include/code_d294.h's
                                     own `New_Class6B5CC` allocator, returning
                                     `Class6B5CCObj *` there -- this unit's
@@ -691,24 +716,37 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    set up; declared here only with that call site's own shape. */
 extern void func_8003F2AC(void *arg0);
 
-/* func_8003FC18 (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
-   func_8003ECD0 (round 14, this unit) calls it twice, always with its own
-   1st/2nd arguments literal 0 and its own 3rd argument one of the two
-   buffer addresses it just built; declared here only with that shape. */
-extern void func_8003FC18(s32 a0, s32 a1, s32 a2);
+/* func_8003FC18 (code_2cc8c_e, round 14, now carved): func_8003ECD0 (this
+   unit) calls it twice, always with its own 1st/2nd arguments literal 0
+   and its own 3rd argument one of the two buffer addresses it just built.
+   Retyped once code_2cc8c_e's own body was matched: the 3rd argument is a
+   `TexPageDesc *` (code_2cc8c_e.c's own local view of a small
+   shift/stride/width/height descriptor) -- ABI-identical to the original
+   `s32 a2` (both a plain word), so this does not change this call site's
+   own compiled bytes; the buffer address it already passes is simply
+   viewed through the more specific pointer type now. */
+extern void func_8003FC18(s32 a0, s32 a1, TexPageDesc *a2);
 
 /* func_80021114 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
    func_8003EDF4 (round 14, this unit) calls it with a literal 0 and
    ignores the return; declared here only with that shape. */
 extern void func_80021114(s32 a0);
 
-/* The following (asm/code_2cc8c_e.s, the NEXT slice, still uncarved)
-   are all called only from func_8003EEC0 (round 14, this unit); declared
-   here only with that call site's own shapes. */
-extern void func_8003FB0C(s32 a0);
+/* The following (code_2cc8c_e, round 14, now carved) are all called only
+   from func_8003EEC0 (this unit). Retyped once code_2cc8c_e's own bodies
+   were matched -- func_8003FB0C/func_8003FBE4 are plain `void *` global
+   setters (this call site happens to pass an already-`s32`-shaped value,
+   which is an ordinary int-to-pointer conversion with identical codegen,
+   same precedent as func_8001D6B4/func_8001D714 in code_d294.h), and
+   func_8003FC70 is a `s32` mode selector. Only the ORIGINAL 3 signatures
+   (s32-only) are the ones from this call site's own shape; the retypes are
+   from func_8003FB0C.c/func_8003FBE4.c's own definitions, ABI-identical
+   (word-sized values either way) so this does not change this call site's
+   own compiled bytes. */
+extern void func_8003FB0C(void *a0);
 extern void func_8003FC70(s32 a0);
 extern void func_8003FD4C(s32 a0, s32 a1);
-extern void func_8003FBE4(s32 a0);
+extern void func_8003FBE4(void *a0);
 
 /* func_80024AE4 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
    func_8003EEC0 calls it with self->unk5B's own three bytes reinterpreted
@@ -732,10 +770,12 @@ extern s32 ResetGraph(s32 mode);
    only with that call site's own shape. */
 extern void func_80023DA0(u8 a0, u8 a1, u8 a2, s32 a3);
 
-/* func_8003FBF4 (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
-   func_8003F04C calls it with one of the same unk74-indexed slots used
-   just above. */
-extern void func_8003FBF4(s32 a0);
+/* func_8003FBF4 (code_2cc8c_e, round 14, now carved): func_8003F04C calls
+   it with one of the same unk74-indexed slots used just above. Retyped
+   once code_2cc8c_e's own body was matched: `self` is a `Class6E99CObj *`
+   (its own field access is `self->unk10`), ABI-identical to the original
+   `s32 a0` so this does not change this call site's own compiled bytes. */
+extern void func_8003FBF4(Class6E99CObj *self);
 
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EB84(Unk18Obj *self);
@@ -1312,6 +1352,28 @@ struct BasicClassMethodsCC8C {
 extern BasicClassMethodsCC8C *func_80018390(void);
 
 /*
+/*
+ * HEAD NOTE, round 14: the two class views below model the SAME table
+ * family, from two units, and both are kept deliberately.
+ *
+ * `Obj6EAC0` (runner bravo, code_2cc8c_f) and `ClassEAC0Obj` (runner alpha,
+ * code_2cc8c_e) are independent local views of D_8006EAC0 and its siblings.
+ * They were derived in parallel, from different call sites, and each is
+ * depended on by its own unit's ALREADY-MATCHED code -- so neither can be
+ * dropped without re-verifying the other unit's byte-exact functions.
+ *
+ * This is the project's multiple-independent-local-views convention landing
+ * inside ONE header, which is unusual and is normally the thing to unify.
+ * It is not unified here because unification would edit matched code for a
+ * naming benefit, and matched code is the thing this project exists to
+ * protect. Whoever next works either unit should unify them -- alpha's view
+ * carries the deeper inheritance chain (Class6B5CCObj -> ClassEAC0 ->
+ * Class6E99C, established via classtable.py against D_8006B58C) and bravo's
+ * carries the per-call-site slot arity, so the union of the two is strictly
+ * better than either.
+ */
+
+/*
  * A previously-unnamed BasicClass-derived class family, round 14
  * (code_2cc8c_f): base table D_8006EAC0 ("d") and its override table
  * D_8006EB90, resolved with `tools/classtable.py D_8006EAC0 --vs
@@ -1514,11 +1576,333 @@ extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
  * the same symbol -- see class_3ac78.c's comment on func_8001E57C for
  * why that is expected.
  */
-typedef struct D6B5CCGetterMethodsCC8CF D6B5CCGetterMethodsCC8CF;
-struct D6B5CCGetterMethodsCC8CF {
-    u8 pad000[0x04C];
-    void (*slot4C)(Obj6EAC0 *self, s32 a1, s32 a2); /* +0x04C */
+/* func_8001E57C's return type, UNIFIED by the head at merge time. Runners
+ * alpha and bravo each built a local view of it in the same round, with
+ * different names AND different members -- bravo's had only `slot4C` at
+ * +0x04C, alpha's only `ctor` at +0x008 -- which collided as `conflicting
+ * types` the moment both landed in this one header. Merged here at the
+ * correct offsets rather than picked between, so both units' call sites keep
+ * working. The canonical definition is src/code_d294_b.c's
+ * `Class6B5CCMethods *func_8001E57C(void)`. */
+typedef struct D6B5CCGetterMethodsCC8C D6B5CCGetterMethodsCC8C;
+struct D6B5CCGetterMethodsCC8C {
+    u8 pad000[0x008];
+    void *(*ctor)(void *self);                      /* +0x008, code_2cc8c_e */
+    u8 pad00C[0x04C - 0x00C];
+    void (*slot4C)(Obj6EAC0 *self, s32 a1, s32 a2); /* +0x04C, code_2cc8c_f */
 };
-extern D6B5CCGetterMethodsCC8CF *func_8001E57C(void);
+extern D6B5CCGetterMethodsCC8C *func_8001E57C(void);
+
+/*
+ * Round 14 (code_2cc8c_e): a THIRD independent class pair, found while
+ * carving the segment's remaining 60-function tail. `tools/classtable.py
+ * D_8006E99C --vs D_8006B58C` shows D_8006E99C shares its dtor (+0x00C)
+ * and three more slots (+0x010/+0x014/+0x018) plus all seven BasicClass-
+ * inherited slots (+0x01C..+0x038) with D_8006B5CC (code_d294.h's own
+ * `Class6B5CCMethods`) -- the same base-class fingerprint code_d294.h
+ * already established, so D_8006E99C is a Class6B5CCObj descendant. It is
+ * NOT a direct child, though: its own ctor (func_8003FE2C, this unit)
+ * calls `func_800408BC()->ctor(self, a1, a2, a3)` before overwriting
+ * `self->methods` with `&D_8006E99C` and re-dispatching through it --
+ * exactly the established "base ctor first, then set own vtable pointer,
+ * then dispatch through it" idiom (see e.g. func_8004D578's entry in
+ * DECOMPILATION_LEARNINGS). `func_800408BC` (code_2cc8c_f, bravo's own
+ * function) is a bare no-argument getter for a SECOND table, D_8006EAC0
+ * -- itself sharing the identical fingerprint with D_8006B5CC, so the
+ * real chain is Class6B5CCObj -> "ClassEAC0" -> "Class6E99C". Two
+ * `New_X`-shaped allocators confirm the two concrete sizes: func_8003FDB0
+ * allocates 0xA0 bytes for a Class6E99C instance (getting its own table
+ * via func_800404C0, a bare getter this unit also implements) and
+ * func_800404D0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
+ * instance (getting D_8006EAC0 via func_800408BC) -- consistent with
+ * ClassEAC0 being the smaller, less-derived class. func_8004054C is
+ * ClassEAC0's OWN ctor, sharing the identical "call a further-base ctor,
+ * reset methods, redispatch slot40" shape one level up: it calls
+ * `func_8001E57C()->ctor(self)` (func_8001E57C, code_d294.h's own getter
+ * for the ACTUAL Class6B5CCObj table, D_8006B5CC) first.
+ *
+ * Per this project's established multiple-independent-local-views
+ * convention, these are THIS unit's own flat views -- no attempt is made
+ * to literally embed Class6B5CCObj (code_d294.h) as a C base member, since
+ * that unit only models fields up to +0x030 and the real extent of either
+ * class here is unknown past what this unit's own functions touch. Only
+ * the slots/fields this unit's functions actually reach are typed; the
+ * rest stays opaque padding. Field names are offset-based
+ * (`unkNN`) until real names are known.
+ */
+typedef struct ClassEAC0Methods ClassEAC0Methods;
+typedef struct Class6E99CMethods Class6E99CMethods;
+
+/* A small two-value record read only via 16-bit loads at a 4-byte stride
+ * (offsets +0x000/+0x004, not +0x000/+0x002) -- func_8004042C's own `a1`
+ * argument. The 4-byte spacing between two 2-byte reads means the real
+ * source struct has an untouched field in between (or after); not
+ * modelled further since nothing here reads it. */
+typedef struct SkipShort2 SkipShort2;
+struct SkipShort2 {
+    s16 x;             /* +0x000 */
+    u8 pad2[0x004 - 0x002];
+    s16 y;             /* +0x004 */
+};
+
+/* A small "shift/stride/width/height" texture-page-like descriptor --
+ * func_8003FC18's own 3rd argument (round 14, code_2cc8c_e). Only the
+ * fields that function touches are named. (typedef forward-declared near
+ * the top of this file, see there.) */
+struct TexPageDesc {
+    s32 shift;   /* +0x000 */
+    s32 stride;  /* +0x004 */
+    s32 width;   /* +0x008 */
+    s32 height;  /* +0x00C */
+    s32 size;    /* +0x010, computed = (4 << shift) + stride - 4 */
+};
+
+/* A small two-`s32` record -- func_8004042C's own `a2` argument, read as a
+ * plain consecutive pair and copied wholesale into the object's own
+ * unk50/unk54. */
+typedef struct Pair32E99C Pair32E99C;
+struct Pair32E99C {
+    s32 a; /* +0x000 */
+    s32 b; /* +0x004 */
+};
+
+struct ClassEAC0Methods {
+    s32 header;                                        /* +0x000 */
+    void *unk04;                                        /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void (*ctor)(ClassEAC0Obj *self, void *a1, void *a2, s32 a3); /* +0x008,
+                                func_8004054C (this unit). `a1`/`a2` kept as
+                                plain `void *` here (not `SkipShort2 *`) --
+                                this is the SLOT's own type, used by every
+                                CALLER of the ctor through the vtable
+                                (func_8003FDB0/func_8003FE2C/func_800404D0,
+                                none of which know about `SkipShort2`); the
+                                occupant's own definition is free to use a
+                                more specific parameter type internally. */
+    void (*dtor)(ClassEAC0Obj *self);                   /* +0x00C, func_8001CBA4, shared with Class6B5CCMethods */
+    u8 pad010[0x040 - 0x010];
+    void (*slot40)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, func_800405D0 (this unit) */
+    u8 pad044[0x0B8 - 0x044];
+    /* +0x0B8, OBSERVED (this unit, func_800405D0/func_80040024/
+       func_800400B0): dispatched as `(self, 1, tableEntry)` where
+       `tableEntry` is a computed address into D_8006EA90 (indexed) or the
+       fixed D_8006EAA8/D_8008A924. Occupant `func_8004076C`
+       (code_2cc8c_f, bravo's own function) -- not this unit's to type
+       further. */
+    void (*slotB8)(ClassEAC0Obj *self, s32 a1, void *tableEntry);
+    u8 pad0BC[0x0CC - 0x0BC];
+    /* +0x0CC, OBSERVED (func_800405D0): dispatched as `(self, 0xD)`.
+       Occupant `func_800408A8` (code_2cc8c_f). */
+    void (*slotCC)(ClassEAC0Obj *self, s32 a1);
+    u8 pad0D0[0x0DC - 0x0D0];
+    /* +0x0DC, OBSERVED (func_80040024/func_800400B0): dispatched with only
+       `self`, and its own return feeds `slotB8`'s table index. For THIS
+       class's own leaf instances the occupant is `func_80040154` (this
+       unit, a Class6E99C-table slot) -- a method calling a sibling slot
+       back through the vtable rather than by name, which is legal and
+       already established. */
+    s32 (*slotDC)(ClassEAC0Obj *self);
+};
+struct ClassEAC0Obj {
+    ClassEAC0Methods *methods; /* +0x000 */
+    u8 pad004[0x044 - 0x004];
+    s32 unk44;                 /* +0x044, OBSERVED: func_800405D0 (ctor's own a3) */
+    s32 unk48;                 /* +0x048, OBSERVED: func_800405D0, set to 1 */
+    s32 unk4C;                 /* +0x04C, OBSERVED: func_800405D0, zeroed */
+    u8 pad050[0x058 - 0x050];
+    s32 unk58;                 /* +0x058, OBSERVED: func_800405D0, zeroed */
+    s16 unk5C;                 /* +0x05C, OBSERVED: func_800405D0, zeroed */
+    s16 unk5E;                 /* +0x05E, OBSERVED: func_800405D0, zeroed */
+    s16 unk60;                 /* +0x060, OBSERVED: func_800405D0, from a1->0x0 */
+    s16 unk62;                 /* +0x062, OBSERVED: func_800405D0, from a1->0x4 */
+    u8 pad064[0x06C - 0x064];
+    s32 unk6C;                 /* +0x06C, OBSERVED: func_800402F0/func_80040024/
+                                   func_800400B0, a small dispatch-state tag */
+    u8 pad070[0x074 - 0x070];
+    s32 unk74;                 /* +0x074, OBSERVED: func_80040024, negated on the
+                                   "already had one" path; func_8004001C's own
+                                   setter also targets this offset on the
+                                   Class6E99C leaf, same field */
+    u8 pad078[0x098 - 0x078];
+    s32 unk98;                 /* +0x098, OBSERVED: func_800402F0, truthy-tested;
+                                   func_800404B4's own setter also targets this
+                                   offset on the Class6E99C leaf, same field */
+};
+
+struct Class6E99CMethods {
+    s32 header;                                     /* +0x000 */
+    void *unk04;                                     /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void (*ctor)(Class6E99CObj *self, void *a1, s32 a2, s32 a3); /* +0x008,
+                                func_8003FE2C (this unit). `a2` is a RAW
+                                index/mode (0 or a small positive count),
+                                not a pointer -- func_8003FE2C's own body
+                                converts it into a tableEntry pointer
+                                internally before forwarding to the next
+                                ctor down the chain (ClassEAC0Methods::ctor,
+                                whose OWN `a2` really is a pointer). */
+    void (*dtor)(Class6E99CObj *self);               /* +0x00C, func_8001CBA4, shared */
+    /* +0x010/+0x014/+0x018, IS Class6B5CCMethods's own +0x010/+0x014/+0x018
+       (func_8001CC48/func_8001CCB4/func_8001CD20) -- identical addresses in
+       both tables per the file banner's classtable.py census. */
+    void (*slot10)(Class6E99CObj *self); /* +0x010, OBSERVED: func_80040154 */
+    void (*slot14)(Class6E99CObj *self, s32 a1); /* +0x014, OBSERVED: func_800402F0 */
+    u8 pad018[0x030 - 0x018];
+    /* +0x030, BasicClass-inherited (per the file banner's census, matches
+       D_8006B58C's own +0x030 verbatim) -- OBSERVED: func_800402F0
+       dispatches it as `(self, s32 a1)` with a1 a small literal (5 or 6). */
+    void (*slot30)(Class6E99CObj *self, s32 a1);
+    u8 pad034[0x040 - 0x034];
+    void (*slot40)(Class6E99CObj *self, s32 a1); /* +0x040, func_8003FED8
+                                (this unit). Two args, not four: its own
+                                call site (func_8003FE2C) only sets `a1`;
+                                `a2`/`a3` are leftover from the preceding
+                                ctor call and the occupant's own body never
+                                reads them. */
+    u8 pad044[0x060 - 0x044];
+    /* +0x060/+0x064, OBSERVED: func_8003FED8/func_800402F0, both dispatched
+       as `(self, s32 a1)`. Occupants (code_2cc8c_f, bravo's own functions):
+       func_800406E4 (+0x060), func_80040714 (+0x064). */
+    void (*slot60)(Class6E99CObj *self, s32 a1);
+    void (*slot64)(Class6E99CObj *self, s32 a1);
+    /* +0x068, OBSERVED: func_80040154, dispatched as `(self, s32 flag)`
+       where `flag` is that same function's own locally-computed 1-or-2
+       mode value. */
+    void (*slot68)(Class6E99CObj *self, s32 a1);
+    u8 pad06C_[0x098 - 0x06C];
+    /* +0x098, OBSERVED: func_8003FF44's own call target when `a2 == 2`.
+       This unit's own function. */
+    void (*slot98)(Class6E99CObj *self, void *a1, s32 a2); /* +0x098, func_8003FF44 */
+    u8 pad09C[0x0B8 - 0x09C];
+    /* +0x0B8/+0x0CC, IS ClassEAC0Methods's own +0x0B8/+0x0CC
+       (func_8004076C/func_800408A8, both code_2cc8c_f) -- identical
+       addresses in both tables (this class does not override them), same
+       fingerprint as the other shared slots above. OBSERVED:
+       func_80040024/func_800400B0 (both this unit). */
+    void (*slotB8)(Class6E99CObj *self, s32 a1, void *tableEntry);
+    u8 pad0BC[0x0CC - 0x0BC];
+    void (*slotCC)(Class6E99CObj *self, s32 a1);
+    void (*slotD0)(Class6E99CObj *self, s32 a1);     /* +0x0D0, func_8004001C */
+    void (*slotD4)(Class6E99CObj *self);             /* +0x0D4, func_80040024 */
+    void (*slotD8)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, func_800400B0 */
+    /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- func_80040154 (this
+       unit) is the shared occupant either way. */
+    s32 (*slotDC)(Class6E99CObj *self);              /* +0x0DC, func_80040154 */
+    void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, func_800402F0 */
+    void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, func_800403F8 */
+    void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, func_8004042C */
+    void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, func_80040490 */
+    void (*slotF0)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, func_800404B4 */
+};
+struct Class6E99CObj {
+    Class6E99CMethods *methods; /* +0x000 */
+    u8 pad004[0x00C - 0x004];
+    void *unkC;                /* +0x00C, OBSERVED: func_8004042C, truthy-tested only */
+    /* +0x010, OBSERVED: func_8003FBF4 -- loaded and forwarded opaquely as
+       `func_80021678`'s own arg0, which itself only ever forwards the value
+       further without dereferencing it. Same base offset as
+       Class6B5CCObj's own inherited `unk10` (code_d294.h, a `u32` packed
+       bit-flags word) -- plausibly the same underlying field reused
+       opaquely here, but kept independent per this project's
+       multiple-local-views convention. */
+    void *unk10;
+    u8 pad014[0x050 - 0x014];
+    s32 unk50;                 /* +0x050, OBSERVED: func_80040490/func_8004042C */
+    s32 unk54;                 /* +0x054, OBSERVED: func_80040490/func_8004042C */
+    u8 pad058[0x060 - 0x058];
+    /* +0x060/+0x062, OBSERVED: func_80040490/func_8004042C -- `u16`, not
+       `s16`: func_8004042C widens these into the `s32` unk88/unk8C fields
+       via a plain assignment, and retail's `lhu` there (zero-extending)
+       only matches when the source type is unsigned. */
+    u16 unk60;
+    u16 unk62;
+    /* +0x064/+0x065/+0x066, OBSERVED: func_8003FF44 -- three independent
+       byte counters, each incremented by the low byte of `unk74` when the
+       corresponding bit of `unk78` (0x4/0x2/0x1) is set. */
+    u8 unk64;
+    u8 unk65;
+    u8 unk66;
+    u8 pad067[0x068 - 0x067];
+    s32 unk68;                 /* +0x068, OBSERVED: func_80040154, a divisor */
+    /* +0x06C, OBSERVED: func_800402F0/func_80040024/func_800400B0/
+       func_8003FED8 (zeroed by the ctor override) -- a small dispatch-state
+       tag (0, 1, or 2 observed). */
+    s32 unk6C;
+    s32 unk70;                 /* +0x070, OBSERVED: func_8003FED8, set from
+                                   its own `a1` parameter */
+    /* +0x074, OBSERVED: func_8003FED8 (ctor override sets it to 0xA),
+       func_80040024 (negated on the "already had one" path), func_8004001C
+       (a plain setter, `self->unk74 = a1`); also read a BYTE at a time by
+       func_8003FF44 via its low byte. */
+    s32 unk74;
+    s32 unk78;                 /* +0x078, OBSERVED: func_80040154/func_8003FF44/
+                                   func_800403F8, a flags/mode word tested
+                                   against 0xF and against bit masks
+                                   0x1/0x2/0x4 */
+    /* +0x07C, OBSERVED: func_8003FED8 (ctor override zeroes it),
+       func_8003FF44 (tested `== 9`), func_80040154 (set from its own a3
+       parameter). */
+    s32 unk7C;
+    s32 unk80;                 /* +0x080, OBSERVED: func_8003FF44, a countdown */
+    s32 unk84;                 /* +0x084, OBSERVED: func_80040154, a division result */
+    /* +0x088/+0x08C, OBSERVED: func_80040490 (read via `lhu`, into `s16`
+       unk60/unk62 -- a narrowing read of only the low halfword) and
+       func_8004042C (WRITTEN via a plain WORD `sw`, from `lhu`-loaded
+       unk60/unk62 -- a genuine `s32` field, widened on write). Retail's
+       own `sw` at this offset is why these are `s32`, not `s16` -- an
+       earlier reading typed them `s16` from func_80040490's read alone and
+       inserted a 2-byte pad to keep unk90 at the right offset; the pad was
+       the wrong fix for the wrong field width. */
+    s32 unk88;
+    s32 unk8C;
+    s32 unk90;                 /* +0x090, OBSERVED: func_80040490/func_8004042C */
+    s32 unk94;                 /* +0x094, OBSERVED: func_80040490/func_8004042C */
+    s32 unk98;                 /* +0x098, OBSERVED: func_800404B4, setter arg1;
+                                   shared field identity with ClassEAC0Obj's
+                                   own unk98 above (same base offset) */
+    s32 unk9C;                 /* +0x09C, OBSERVED: func_800404B4, setter arg2;
+                                   func_80040154 also reads it as a divisor */
+    u8 padA0[0xA0 - 0xA0];
+};
+
+/* Round-14 static tables this unit's own functions index into or pass by
+ * address -- real element shape not derived (nothing this unit's chosen
+ * functions dereference beyond taking the address), so left as opaque
+ * byte blobs sized only by their known stride. `func_8003FE2C`/
+ * `func_80040024`/`func_800400B0`/`func_800403F8` all compute the index as
+ * a raw BYTE offset (`sll v0,i,1; addu v0,v0,i` = `i*3`, added directly to
+ * the base address with no further `*4`) -- i.e. `D_8006EA90` holds 3-BYTE
+ * entries (plausibly a signed-byte triple, same shape as this file's own
+ * `SByte3_d294`), not 0xC-byte ones. `D_8006EAA8` is indexed the SAME way
+ * by `func_800400B0` (not a single fixed entry as an earlier reading of
+ * `func_8003FE2C` alone suggested -- that one just always passes index 0),
+ * so left unsized rather than fixed at 3 bytes. `D_8008A924` has only the
+ * one (unindexed) use, so kept at a single entry's size. */
+extern u8 D_8006EA90[];
+extern u8 D_8006EAA8[];
+extern u8 D_8008A924[3];
+
+extern Class6E99CMethods D_8006E99C;
+/* D_8006EAC0 is declared once, above, as `Obj6EAC0Methods` -- bravo's
+ * matched src/code_2cc8c_f.c returns its address. code_2cc8c_e declared
+ * it too but never references it, so the duplicate is dropped. */
+extern Class6E99CMethods *func_800404C0(void); /* this unit's own bare getter
+                                                    for &D_8006E99C, same
+                                                    idiom as func_8001E57C
+                                                    (code_d294.h) */
+/* Declared ONCE, matching its definition in src/code_2cc8c_f.c
+ * (`Obj6EAC0Methods *func_800408BC(void)`). code_2cc8c_e declared it
+ * returning its own `ClassEAC0Methods *` view of the same table, which
+ * collided as `conflicting types`; that unit casts at its two call
+ * sites instead. */
+extern Obj6EAC0Methods *func_800408BC(void);  /* code_2cc8c_f (bravo's own
+                                                    function): bare getter
+                                                    for &D_8006EAC0 */
+
+/* This unit's own local view of the REAL base, `Class6B5CCObj`'s own table
+   (code_d294.h's `func_8001E57C`/`D_8006B5CC`) -- func_8004054C (this
+   unit) dispatches only the ctor slot, so only that one is modelled here,
+   per this project's independent-local-views convention. */
+/* (code_2cc8c_e's own view of func_8001E57C's return type was merged
+ * into D6B5CCGetterMethodsCC8C above by the head.) */
+
 
 #endif
