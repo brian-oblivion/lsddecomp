@@ -116,7 +116,20 @@ segments:
       # are at 0x8004Fxxx/0x8005xxx and still live in `asm`) stays a
       # standalone rodata object from 0x1C34.
       - [0x1C0C, .rodata, class_39e08]
+      # Slot 0x1C34 is shared by FIVE units. Only the two JUMP TABLES need
+      # attaching -- they hold `.L` labels local to class_3bb8c_g's own
+      # function .s files, which a standalone rodata object cannot resolve.
+      # Every `D_` symbol in the slot is referenced BY SYMBOL and resolves
+      # from a standalone object just fine, so attaching the whole slot would
+      # strand four other units' data (see PARALLEL-RUNS Gate 2). Ownership,
+      # measured one grep per symbol at carve time:
+      #   D_80011434  (unreferenced)      D_800114DC  class_3bb8c_c
+      #   D_800114E8  class_3bb8c_d       D_800114F8  class_3bb8c_d
+      #   D_80011530  class_3bb8c_f       jtbl_8001157C/jtbl_80011594  _g
+      #   D_800115D0  (unreferenced)      D_80011610/D_8001161C  class_3bb8c_h
       - [0x1C34, rodata]
+      - [0x1D7C, .rodata, class_3bb8c_g]   # jtbl_8001157C + jtbl_80011594
+      - [0x1DD0, rodata]
       - [0x1E28, rodata]
       - [0x1EF4, rodata]
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
@@ -416,7 +429,26 @@ segments:
       #     an `.rodata` attach when this is carved.
       # The first slice boundary was chosen at #59 precisely so that the
       # three C units above contain ZERO of either hazard.
-      - [0x403E4, asm, class_3bb8c_g]
+      # class_3bb8c_g: fourth slice, 0x403E4..0x410E8, 16 functions.
+      # Carved round 14 (second carve of the round, after echo emptied
+      # class_3bb8c_d). Boundary chosen at 0x410E8 = the FIRST `jr $t2` BIOS
+      # trampoline, so this unit contains none of them.
+      # Blocker profile: 4 of 16 blocked -- func_8004FBE4 (addiu-$at, owns a
+      # jump table), func_8004FE24 (addiu-$at), func_80050034 (addiu-$at,
+      # owns a jump table), func_800507F8 (gp_rel). 12 clean, none wanting
+      # 5+ callee-saved registers.
+      # TWO jump-table owners here, so expect the rodata attach/split dance
+      # documented in PARALLEL-RUNS Gate 2.
+      - [0x403E4, c, class_3bb8c_g]
+      # class_3bb8c_h: the remaining 230 functions, 0x410E8.. -- UNCARVED.
+      # Opens ON the trampoline cluster: all 13 `jr $t2` BIOS trampolines sit
+      # at 0x410E8..0x41398. No C compiles to one, so carving from here needs
+      # an `hasm` segment or a literal `.word` disposition decided FIRST --
+      # and an hasm segment means updating .gitignore and
+      # .claude/hooks/block-asm-edits.sh in the same step, which makes it an
+      # operator-scale change rather than a head one. The cheapest next slice
+      # therefore starts AFTER 0x41398, not at 0x410E8.
+      - [0x410E8, asm, class_3bb8c_h]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
