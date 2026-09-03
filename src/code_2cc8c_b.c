@@ -86,7 +86,36 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
     a1->unk4 = handle;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D050);
+void func_8003D050(Obj86B60 *self)
+{
+    Unk64Elem **arr;
+    s32 i;
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    if (self->unk4C->unk0 != NULL) {
+        Unk74Obj *o = self->unk4C->unk4;
+        o->methods->slot4(o);
+    }
+    self->unk68->methods->slot4(self->unk68);
+    arr = self->unk54;
+    for (i = 0; i < self->unk50; arr++) {
+        Unk64Elem *elem;
+
+        if (self->unk4C->unk24[i] != NULL) {
+            self->unk58 = i;
+            self->methods->slotFC(self);
+        }
+        elem = *arr;
+        elem->methods->slot4(elem);
+        i++;
+    }
+    func_80017CFC(self->unk64);
+    func_80017CFC(self->unk60);
+    func_80017CFC(self->unk5C);
+    func_80017CFC(self->unk54);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D194);
 
