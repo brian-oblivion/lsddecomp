@@ -152,7 +152,18 @@ segments:
       # largest function in any carved unit. It is not blocked, but it is
       # not cold-runner ground either -- budget it separately.
       - [0x8A88, c, code_8220_b]
-      - [0x9F74, asm, code_8220_c]
+      # code_8220_c: third and FINAL slice of the code_8220 block,
+      # 0x9F74..0xAD64 (the next segment is psyq_rcpolyf3), 16 functions.
+      # Carved round 13. Gate 2 checks, all run before the carve and all
+      # clean: no function has more than one `addiu $sp, $sp, -N` prologue
+      # (six are frameless leaves, which is normal); zero `jr $t2` BIOS
+      # trampolines; zero `alabel`; zero jump tables and zero `.word .L`
+      # references, so NO rodata slot needs attaching -- the only symbolic
+      # references are plain `%hi/%lo(D_...)` globals; and the segment ends
+      # on a segment boundary, so there is no data tail to declare.
+      # Blocker profile: 14 of 16 functions clean, only func_8001A380
+      # (4 hits) and func_8001A54C (2 hits) are gp_rel-blocked.
+      - [0x9F74, c, code_8220_c]
       - [0xAD64, asm, psyq_rcpolyf3]
       - [0xB0D4, asm, psyq_rcpolyf4]
       - [0xB554, asm, psyq_rcpolyg3]
