@@ -88,6 +88,16 @@ struct Class6B5CCBlock44 {
  * +0x004..+0x018 and +0x024..+0x044 are still unknown -- not padded out
  * field-by-field, since nothing this unit's chosen functions touch reads
  * them. */
+/* A plain 3-word vector, used as func_8001D0EC's optional 3rd argument
+ * (copied wholesale into Class6B5CCSub14::unk18/unk1C/unk20) and as
+ * Class6B5CCSub14's own +0x038 field below. Declared here, ahead of
+ * Class6B5CCSub14, so the struct below can use it directly. */
+typedef struct Vec3_d294 {
+    s32 x;
+    s32 y;
+    s32 z;
+} Vec3_d294;
+
 struct Class6B5CCSub14 {
     s32 unk0;                    /* +0x000, state/pending flag -- see above */
     u8 pad04[0x018 - 0x004];
@@ -100,21 +110,19 @@ struct Class6B5CCSub14 {
      * unit's chosen functions, so it stays an opaque byte span rather than
      * a typed field. Renamed from `pad24` now that something references it
      * by name. */
-    u8 unk24[0x044 - 0x024];
+    u8 unk24[0x038 - 0x024];
+    /* +0x038, round 13 (func_8001D714): a position Vec3 -- MEASURED, this
+     * function subtracts `self->unk14->pos` from the SAME field on another
+     * Class6B5CCSub14-shaped block (reached via a different class's own
+     * `unk14`, see GenericObj_d294 below) to get a relative offset, then
+     * range-checks each axis. */
+    Vec3_d294 pos;
     Class6B5CCBlock44 *unk44;  /* +0x044, a second heap block (0x28 bytes, alloc'd by the ctor);
                    * RETYPED round 13 (func_8001D4DC) from opaque `void *` once the
                    * S16Quad_d294 at its own +0x10 was measured. */
     s32 unk48;    /* +0x048, zeroed by the ctor and by func_8001D1A4 (slot +0x050);
                    * set to `obj->unk14` by func_8001D0EC's "attach" */
 };
-
-/* A plain 3-word vector, used only as func_8001D0EC's optional 3rd
- * argument (copied wholesale into Class6B5CCSub14::unk18/unk1C/unk20). */
-typedef struct Vec3_d294 {
-    s32 x;
-    s32 y;
-    s32 z;
-} Vec3_d294;
 
 /* Round 13 (func_8001E2E8): a 6-byte, all-s16 Vec3 -- MEASURED, all-s16
  * members give it alignment 2, which is what makes retail's own
@@ -208,6 +216,10 @@ struct UnkOwner_d294 {
  * `GenericTagInst_3bb8c_c`. */
 typedef struct GenericMethods_d294 GenericMethods_d294;
 typedef struct GenericObj_d294 GenericObj_d294;
+/* Forward-declared here (full definition below, with the other small
+ * "count + data" shapes) so GenericObj_d294's own +0x030 field (round 13,
+ * func_8001D714) can be typed to it. */
+typedef struct GenericCountList_d294 GenericCountList_d294;
 struct GenericMethods_d294 {
     s32 header;                  /* +0x000, low nibble is a class-tag; func_8001CC48/CCB4 compare it against 9 */
     u8 pad004[0x010 - 0x004];
@@ -218,13 +230,36 @@ struct GenericMethods_d294 {
      * specific check than the header-tag-4 test guarding entry into this
      * whole block. */
     void (*slot10)(GenericObj_d294 *self, Class6B5CCObj *arg); /* +0x010 */
-    u8 pad014[0x050 - 0x014];
+    u8 pad014[0x038 - 0x014];
+    /* +0x038, round 13 (func_8001D714's own call site): dispatched as
+     * `(other, self, 4)` where `self` is func_8001D714's own Class6B5CCObj*
+     * parameter and `4` a literal -- MEASURED from that call site alone,
+     * real meaning of the literal unknown. */
+    void (*slot38)(GenericObj_d294 *self, Class6B5CCObj *arg1, s32 arg2); /* +0x038 */
+    u8 pad03C[0x050 - 0x03C];
     void (*slot50)(GenericObj_d294 *self); /* +0x050, func_8001D204's call target */
 };
 struct GenericObj_d294 {
     GenericMethods_d294 *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
     void *unkC;                    /* +0x00C, func_8001D280 (still queued) compares this to a Class6B5CCObj* */
+    u8 pad10[0x014 - 0x010];
+    /* +0x014, round 13 (func_8001D714): same role as Class6B5CCObj's own
+     * `unk14` -- `other->unk14->pos` (+0x038 of the SAME Class6B5CCSub14
+     * shape) is subtracted from `self->unk14->pos`. MEASURED, not a name
+     * unification guess: both call sites reach the identical +0x038 Vec3
+     * through this field, at the same offset, in the same function. */
+    Class6B5CCSub14 *unk14;
+    u8 pad18[0x02C - 0x018];
+    /* +0x02C, round 13 (func_8001D714): only its ADDRESS is taken
+     * (forwarded as a vtable call's own opaque argument) -- real shape
+     * unknown, so this stays an opaque byte span like Class6B5CCSub14's
+     * own `unk24`. */
+    u8 unk2C[0x030 - 0x02C];
+    /* +0x030, round 13 (func_8001D714): same shape/usage as
+     * func_8001D624's own 2nd argument -- `unk0` read once and multiplied
+     * by 8, `&unk4` forwarded as an opaque data pointer. */
+    GenericCountList_d294 *unk30;
 };
 
 /* A third small "count + data" shape, seen only through func_8001D624's own
@@ -233,7 +268,6 @@ struct GenericObj_d294 {
  * dereferenced here) is func_8001EE04's own source/dest base pointer. Real
  * class identity unknown -- opaque past `unk4`'s own address, so `unk4` is
  * left a single byte rather than a guessed element type. */
-typedef struct GenericCountList_d294 GenericCountList_d294;
 struct GenericCountList_d294 {
     s32 unk0;  /* +0x000, multiplied by 8 to form func_8001EE04's count arg */
     u8 unk4;   /* +0x004, address-only */
@@ -299,6 +333,22 @@ struct Class6B5CCMethods {
      * `$a0` untouched since function entry). func_8001D714 (still queued)
      * is this slot's occupant per `tools/classtable.py D_8006B5CC`. */
     void (*slotA0)(Class6B5CCObj *self);
+    /* +0x0A4, round 13 (func_8001D714's own call site): this slot's
+     * occupant is func_8001D950 itself (`tools/classtable.py D_8006B5CC`),
+     * already matched this round -- dispatched indirectly (through the
+     * vtable, not a direct `jal`) since the slot is polymorphic even
+     * though this class's own table happens to point at it. Signature
+     * matches func_8001D950's own exactly. */
+    void (*slotA4)(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
+    /* +0x0A8, occupant func_8001DA28 (still queued this round). Return
+     * value IS tested by this call site (truthy -> continue, falsy ->
+     * early return), so non-void. */
+    s32 (*slotA8)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
+    /* +0x0AC, occupant func_8001DDF4 -- the documented gp_rel blocker
+     * (docs/match-reports/func_8001DDF4.md), NOT decompiled by this
+     * runner. Typed here only for this call site's own dispatch shape;
+     * return value is also tested truthy/falsy like slotA8's. */
+    s32 (*slotAC)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2, void *arg3);
 };
 
 /* MEASURED: func_8001E57C's whole body is `lui/addiu %hi/%lo(D_8006B5CC);
@@ -348,9 +398,15 @@ struct Class6B5CCObj {
     void *unk20;
     s32 unk24;                  /* +0x024, zeroed by func_8001CE30 (this unit) */
     /* +0x028, round 12 (code_d294_b): func_8001D6B4 sets this to its own
-     * `a1` (a plain `s32`, per m2c's own inference -- never dereferenced by
-     * this unit's chosen functions) when called with a2==4. */
-    s32 unk28;
+     * `a1` (a plain `s32`, per m2c's own inference) when called with
+     * a2==4. RETYPED round 13 (func_8001D714): `self->unk28 = other;`
+     * where `other` is a `GenericObj_d294 *` -- same offset, genuinely a
+     * pointer here. func_8001D6B4's own `self->unk28 = a1;` (a1 still
+     * `s32`) keeps compiling under this type (int-to-pointer, a warning
+     * not an error, and identical codegen either way -- MEASURED: rebuilt
+     * whole-image after this retype and func_8001D6B4 is still
+     * byte-exact). */
+    GenericObj_d294 *unk28;
     s32 unk2C;  /* +0x02C, round 12 (func_8001D624): zeroed, alongside unk28 */
     /* +0x030, round 12 (func_8001D624): set to that call's own 2nd argument
      * for the duration of a single `self->methods->slot30(self, a2)`

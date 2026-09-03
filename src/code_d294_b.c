@@ -127,6 +127,11 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
     }
 }
 
+/* Range-checks `other` against `self` (each axis of position difference
+ * must fit in +/-0x4000), then hands off to three vtable slots
+ * (+0xA4 = func_8001D950, +0xA8 = func_8001DA28, +0xAC = func_8001DDF4)
+ * with the resulting Vec3S16 difference, before registering `other` into
+ * self->unk28 and notifying it via its own +0x038 slot. */
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
