@@ -257,7 +257,11 @@ struct Obj86B60Methods {
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */
-    u8 pad0F4[0x108 - 0xF4];
+    u8 pad0F4[0x100 - 0xF4];
+    void (*slot100)(Obj86B60 *self, s32 a1, s32 a2); /* +0x100, external;
+                                                       OBSERVED:
+                                                       func_8003DA10 */
+    u8 pad104[0x108 - 0x104];
     void (*slot108)(Obj86B60 *self);                /* +0x108, external
                                                        (func_8003DA10);
                                                        OBSERVED: func_8003CA1C */
@@ -294,7 +298,12 @@ struct Obj86B60Methods {
  */
 struct Obj86B60 {
     Obj86B60Methods *methods;   /* +0x000 */
-    u8 pad004[0x01C - 0x004];
+    u8 pad004[0x014 - 0x004];
+    s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
+                                    slot100's 2nd arg, otherwise untouched
+                                    by this unit -- generic word, not
+                                    dereferenced here */
+    u8 pad018[0x01C - 0x018];
     s32 unk1C;                  /* +0x01C, func_8003CC2C (a running count/
                                     frame value multiplied against unk84);
                                     func_8003C63C (STALL) zeroes it on
