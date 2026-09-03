@@ -330,16 +330,31 @@ struct Class6B5CCObj {
     GenericCountList_d294 *unk30;
 };
 
-/* func_8001EC84 (asm/code_d294_b.s, still uncarved): reads a `{s16 whole;
- * s16 frac;}`-shaped pair at the given pointer and returns a 20.12
- * fixed-point value (whole << 12 | frac's own division-derived low bits) --
- * read off its own disassembly (a `div` by the pair's own two fields, not
- * decompiled here). func_8001D008 (still queued) applies it three times in
- * a row, at offsets +0x0, +0x4, +0x8 of its 3rd argument -- i.e. that
- * argument is a 3-entry table of these pairs (an angle-like x/y/z triple,
- * degrees-and-fraction each). Declared here with a `void *` argument since
- * this unit's chosen functions only ever pass the pointer through, never
- * dereference the pair themselves. */
+/* The `{s16 whole; s16 frac;}` pair `func_8001EC84` (below) reads and
+ * `func_8001E6F8` (round 14, code_d294_c) writes, three-in-a-row, at
+ * +0x0/+0x4/+0x8 of a 3-entry table (an angle-like x/y/z triple,
+ * degrees-and-fraction each -- `D_8006B684`/`D_8006B690` are exactly this
+ * shape). `func_8001E6F8` writes `frac` as a constant `1` in every entry
+ * it produces; real per-field meaning of `frac` beyond that one producer
+ * is still only inferred from `func_8001EC84`'s own `div`-by-`frac` body,
+ * not independently confirmed. */
+typedef struct WholeFrac_d294 WholeFrac_d294;
+struct WholeFrac_d294 {
+    s16 whole;
+    s16 frac;
+};
+
+/* func_8001EC84 (asm/code_d294_b.s, still uncarved -- and separately
+ * BLOCKED by the nop_mflo_mfhi toolchain flag once it IS carved, per
+ * docs/match-reports/func_8001EC84.md): reads a `WholeFrac_d294` at the
+ * given pointer and returns a 20.12 fixed-point value (`whole << 12 |
+ * frac`'s own division-derived low bits) -- read off its own
+ * disassembly (a `div` by the pair's own two fields, not decompiled
+ * here). `func_8001D008`/`func_8001CEB4` (both matched, this unit) apply
+ * it three times in a row, at offsets +0x0/+0x4/+0x8 of their own 3rd
+ * argument. Declared here with a `void *` argument since this unit's
+ * chosen functions only ever pass the pointer through, never dereference
+ * the pair themselves. */
 extern s32 func_8001EC84(void *pair);
 
 /* D_8006B684/D_8006B690 (rodata): two 3-entry, 0xC-byte tables in the shape
