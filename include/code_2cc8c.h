@@ -1374,11 +1374,15 @@ struct Obj6EAC0Methods {
                                   (base, this unit), same shape as
                                   slot64 */
     u8 pad06C[0x0B8 - 0x06C];
-    void (*slotB8)(Obj6EAC0 *self, s32 a1, void *a2); /* +0x0B8, widest
-                                  OBSERVED occupant is func_8004076C
-                                  (base, this unit, a2 a 3-byte colour
-                                  buffer); func_80040D74 (derived, this
-                                  unit) ignores a2 */
+    void (*slotB8)(Obj6EAC0 *self, s32 a1); /* +0x0B8, the only OBSERVED
+                                  CALL through this slot is
+                                  func_80040D74's own child dispatch, at
+                                  2 args. func_8004076C (base occupant)
+                                  takes a 3rd (`u8 *src`) in its own
+                                  definition, which is fine -- an
+                                  occupant's own arity need not match a
+                                  narrower call site (nothing in this
+                                  unit calls slotB8 at 3 args) */
     void (*slotBC)(Obj6EAC0 *self, void *a1); /* +0x0BC, IS func_800407F8
                                   (base, this unit) and func_80040E14
                                   (derived, this unit); a1 a 2-word
