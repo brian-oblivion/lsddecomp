@@ -116,6 +116,26 @@ typedef struct Vec3_d294 {
     s32 z;
 } Vec3_d294;
 
+/* Round 13 (func_8001E2E8): a 6-byte, all-s16 Vec3 -- MEASURED, all-s16
+ * members give it alignment 2, which is what makes retail's own
+ * struct-copy of it (in func_8001E2E8's loop tail) compile to unaligned
+ * lwl/lwr + swl/swr, same idiom as S16Quad_d294 above and the already-
+ * confirmed `func_8004B38C`/`FlashbackRotation` case in
+ * DECOMPILATION_LEARNINGS. */
+typedef struct Vec3S16_d294 {
+    s16 x;
+    s16 y;
+    s16 z;
+} Vec3S16_d294;
+
+/* Round 13 (func_8001E2E8): an axis-aligned bounding box, low corner then
+ * high corner -- MEASURED from func_8001E2E8's own field offsets
+ * (+0x0/+0x2/+0x4 = lo.x/y/z, +0x6/+0x8/+0xA = hi.x/y/z). */
+typedef struct BoundsBox_d294 {
+    Vec3S16_d294 lo;
+    Vec3S16_d294 hi;
+} BoundsBox_d294;
+
 /* This unit's own minimal, local view of the shared BasicClass ancestor
  * table (D_8006B58C, returned by func_80018390, which lives in the
  * still-uncarved code_8220 segment) -- same shape and same "ctor at +0x008,
@@ -485,5 +505,6 @@ void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
 void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
 void func_8001E4A4(Class6B5CCObj *self, void *node);
+void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 
 #endif

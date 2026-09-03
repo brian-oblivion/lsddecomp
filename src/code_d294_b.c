@@ -162,7 +162,61 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E110);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E2E8);
+/* Bisects the segment [near, far] against `box` until the midpoint exactly
+ * equals one endpoint, writing the running midpoint into `out` every
+ * iteration (the caller's real result is whatever `*out` holds when this
+ * returns). Each iteration computes an outcode (`flags`, matching the
+ * project's already-confirmed `u8`-flags idiom -- an explicit `andi
+ * $v0,$v1,0xFF` re-mask appears in retail wherever `flags` is read back)
+ * from `box` against the midpoint; a non-zero outcode means the midpoint
+ * overshot, so it becomes the new `far`, otherwise it becomes the new
+ * `near` -- each written into one of two ping-pong stack buffers so the
+ * OTHER endpoint's storage is never disturbed. */
+void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
+    Vec3S16_d294 buf0;
+    Vec3S16_d294 buf1;
+    Vec3S16_d294 *dst;
+    u8 flags;
+
+    for (;;) {
+        out->x = (near->x + far->x) >> 1;
+        out->y = (near->y + far->y) >> 1;
+        out->z = (near->z + far->z) >> 1;
+
+        if (out->x == near->x && out->y == near->y && out->z == near->z) {
+            return;
+        }
+        if (out->x == far->x && out->y == far->y && out->z == far->z) {
+            return;
+        }
+
+        flags = 0;
+        if (box->hi.x < out->x) {
+            flags = 8;
+        } else if (out->x < box->lo.x) {
+            flags = 4;
+        }
+        if (box->hi.y < out->y) {
+            flags |= 2;
+        } else if (out->y < box->lo.y) {
+            flags |= 1;
+        }
+        if (box->hi.z < out->z) {
+            flags |= 0x20;
+        } else if (out->z < box->lo.z) {
+            flags |= 0x10;
+        }
+
+        if (flags != 0) {
+            dst = &buf1;
+            far = dst;
+        } else {
+            dst = &buf0;
+            near = dst;
+        }
+        *dst = *out;
+    }
+}
 
 void func_8001E49C(void) {
 }
