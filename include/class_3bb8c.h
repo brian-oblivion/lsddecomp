@@ -854,6 +854,28 @@ struct GenericTagInst_3bb8c_c {
 typedef struct Class86B60 Class86B60;
 typedef struct Class86B60Methods Class86B60Methods;
 
+/*
+ * Generic class-instance shape used only to reach the shared BasicClass-
+ * family "release" slot (`+0x004`, same offset as `BasicClassMethods::
+ * release` in include/code_8220.h -- "virtual finalize, then free self")
+ * on an object whose concrete class this unit does not otherwise need to
+ * know. Local, independent view per this project's established
+ * multiple-independent-views convention (see e.g. GenericTagInst_3bb8c_c
+ * above). func_8004D704 calls this on both `Class86B60::unkA8` and
+ * `Class86B60::unkAC`.
+ */
+typedef struct GenericReleaseMethods_3bb8c_d GenericReleaseMethods_3bb8c_d;
+typedef struct GenericReleaseObj_3bb8c_d GenericReleaseObj_3bb8c_d;
+
+struct GenericReleaseMethods_3bb8c_d {
+    u8 pad000[0x004];
+    void (*release)(GenericReleaseObj_3bb8c_d *self); /* +0x004 */
+};
+
+struct GenericReleaseObj_3bb8c_d {
+    GenericReleaseMethods_3bb8c_d *methods; /* +0x000 */
+};
+
 struct Class86B60Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86B60 *self, void *dreamSys);  /* +0x008, func_8004D578 occupies this slot */
@@ -875,8 +897,18 @@ struct Class86B60 {
     struct Class86B60Unk48Obj *unk48;  /* +0x048, func_8004D578 */
     u8 pad04C[0x0A4 - 0x04C];
     void *unkA4;                    /* +0x0A4, func_8004D578: stores its own dreamSys arg raw */
-    u8 pad0A8[0x0AC - 0x0A8];
-    s32 unkAC;                      /* +0x0AC, func_8004D578: zeroed */
+    /* +0x0A8/+0x0AC, func_8004D704 (this unit's destructor): two owned
+     * sub-objects, each released through their own shared `release` slot.
+     * BOTH releases sit inside the SAME `unkAC != NULL` guard -- retail's
+     * single branch skips over both calls together, not just the first;
+     * there is no separate null check on `unkA8`. `unkAC` was previously
+     * typed a bare `s32` from func_8004D578's `zeroed` write alone, which
+     * is consistent with either a scalar 0 or a null pointer -- this
+     * round's func_8004D704 is what proves it is dereferenced through a
+     * vtable, so it is retyped a pointer here (same size, no layout
+     * change). */
+    GenericReleaseObj_3bb8c_d *unkA8; /* +0x0A8, func_8004D704: released iff unkAC != NULL */
+    GenericReleaseObj_3bb8c_d *unkAC; /* +0x0AC, func_8004D578: zeroed; func_8004D704: guards both releases */
     u8 pad0B0[0x0BC - 0x0B0];
     s32 unkBC;                      /* +0x0BC, func_8004D578: return value of dreamSys->methods->slot1B0 */
     s32 unkC0;                      /* +0x0C0, func_8004D578: output buffer address passed BY REFERENCE
@@ -952,6 +984,21 @@ struct BaseTaskCtorTable_3bb8c_c {
     /* func_8004D578's own unconditional first statement:
      * func_8003DFBC()->slot08(self, &D_80086D44, &D_800114DC, 0). */
     void (*slot08)(void *self, void *arg1, void *arg2, s32 arg3); /* +0x008 */
+    /* +0x00C, func_8004D704's own unconditional last call, `self` only.
+     * Same offset AND arity as `TaskCoreMethods::slot0C` in
+     * include/code_2c054.h (also derived from `D_8006E730`, the same real
+     * global this getter returns) -- independent confirmation, not a
+     * coincidence: this is the shared base class's destructor forward,
+     * called after `self`'s own two owned sub-objects (`unkA8`/`unkAC`)
+     * are released. */
+    void (*slot0C)(void *self);
+    u8 pad010[0x060 - 0x010];
+    /* +0x060, func_8004D90C's own first call, `(self, arg1)` where arg1 is
+     * that function's own forwarded 2nd parameter. */
+    void (*slot60)(void *self, s32 arg1);
+    u8 pad064[0x090 - 0x064];
+    /* +0x090, func_8004D9D4's own first, unconditional call, `self` only. */
+    void (*slot90)(void *self);
 };
 
 extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);

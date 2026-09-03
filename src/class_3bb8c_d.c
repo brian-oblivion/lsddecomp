@@ -1,7 +1,14 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D704);
+void func_8004D704(Class86B60 *self)
+{
+    if (self->unkAC != NULL) {
+        self->unkAC->methods->release(self->unkAC);
+        self->unkA8->methods->release(self->unkA8);
+    }
+    func_8003DFBC()->slot0C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D788);
 
