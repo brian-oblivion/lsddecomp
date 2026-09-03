@@ -553,7 +553,10 @@ struct Obj866E8 {
     u8 pad74[0x78 - 0x74];
     s16 unk78;                     /* +0x078, func_8004C620 (halfword, doubled into an index) */
     s16 unk7A;                     /* +0x07A, func_8004C620 (halfword, passed on as an arg) */
-    u8 pad7C[0x88 - 0x7C];
+    s16 unk7C;                     /* +0x07C, func_8004C93C: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with unk80 to decide whether the grid footprint spans one or two 20-unit cells */
+    s16 unk7E;                     /* +0x07E, func_8004C93C: same convention as unk7C, vertical */
+    s32 unk80;                     /* +0x080, func_8004C93C: horizontal span, also forwarded to func_8004CAF0's p7 */
+    s32 unk84;                     /* +0x084, func_8004C93C: forwarded to func_8004CAF0's p8, otherwise unread here */
     s32 unk88;                     /* +0x088, func_8004CE24: loop count over slots8C[] (bounded by slots8C's own 4-element capacity) */
     GridSlot866E8 slots8C[4];      /* +0x08C, func_8004CE24 (reads); func_8004CDA4 (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
