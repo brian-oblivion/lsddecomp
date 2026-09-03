@@ -39,7 +39,24 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_800603C4);
+void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
+    s32 divisor;
+
+    if (this->unkFC < 0x14) {
+        this->methods->slot130(this);
+        this->methods->slotC4(this, -0x1E, 0);
+    } else if (this->unkFC == 0x14) {
+        this->methods->slot12C(this);
+        out->unk10 = 0;
+        out->unk1C = 5;
+    } else {
+        divisor = this->unk80 * 3 + 0x14;
+        if (this->unkFC % divisor == 0) {
+            this->methods->slot130(this);
+            out->unk1C = -2;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_d", func_800604DC);
 
