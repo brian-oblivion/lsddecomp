@@ -37,8 +37,7 @@ unattended), or expect to approve runner commands interactively. Granting is a
 permission change, so it is the operator's call, not the head's — ask, do not
 assume.
 
-**On this machine the operator has granted it**, in
-`.claude/settings.local.json`:
+The grant lives in `.claude/settings.local.json`:
 
 ```json
 { "permissions": { "additionalDirectories": [
@@ -49,8 +48,36 @@ assume.
 That file is the right home for it and the committed `.claude/settings.json` is
 not: `additionalDirectories` takes ABSOLUTE paths, and the worktree path is
 derived from the basename of whoever's checkout it is, so a committed entry
-would be wrong in every clone but one. `settings.local.json` is gitignored, so
-each operator grants their own.
+would be wrong in every clone but one.
+
+**CHECK THAT THE FILE EXISTS; DO NOT INFER IT FROM THIS PARAGRAPH.** For eleven
+rounds this section read "on this machine the operator has granted it" as
+settled fact. Round 12 went to spawn runners and found no
+`.claude/settings.local.json` at all, and no `additionalDirectories` key at
+project or user level either — the grant had never existed in this clone, and
+every prior round had simply been approving runner commands interactively
+without the doc ever noticing. Worse, the same paragraph asserted
+`settings.local.json` "is gitignored"; it was not, so the first head to
+actually write the file would have committed one operator's absolute paths into
+everyone's clone — the exact failure the paragraph above explains how to avoid.
+Round 12 added the `.gitignore` entry.
+
+Two lessons, and the second is the general one:
+
+- The grant is a permission change, so it is the operator's call, not the
+  head's. Verify, then ASK — do not write it silently. One command:
+
+  ```sh
+  python3 -c "import json;print(json.load(open('.claude/settings.local.json')).get('permissions',{}).get('additionalDirectories'))"
+  ```
+
+- **A doc claim about MACHINE STATE decays differently from a doc claim about
+  the BINARY.** A wrong fact about the executable gets caught the next time
+  someone re-measures it, because measuring is the job. A wrong fact about a
+  gitignore entry or a settings file is nobody's job to re-measure, so it
+  survives indefinitely and is believed precisely because it has been there a
+  long time. Anything here describing a FILE THAT SHOULD EXIST needs the
+  one-line check that proves it printed next to it.
 
 **Two consequences for the head, and the first one is a real constraint:**
 

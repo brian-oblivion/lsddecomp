@@ -67,3 +67,10 @@ __pycache__/
 *.pyc
 .vscode/
 scratchpad/
+
+# Per-operator permission grants. `additionalDirectories` takes ABSOLUTE
+# paths, and a worktree path is derived from the basename of whoever's
+# checkout it is, so a committed entry would be wrong in every clone but
+# one. PARALLEL-RUNS.md has always described this file as gitignored; it
+# was not, until round 12 went to write it and found out.
+.claude/settings.local.json
