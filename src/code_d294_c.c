@@ -38,6 +38,18 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EE04);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EE98);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EF14);
+s32 func_8001EF14(s32 *a, s32 range, s32 *b) {
+    s32 i;
+
+    for (i = 0; i < 3; i++, a++, b++) {
+        if (*b < *a - range) {
+            return 0;
+        }
+        if (*a + range < *b) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EF60);
