@@ -10,10 +10,45 @@ void func_8004F784(TaskObjF *self);
 void func_8004F810(TaskObjF *self);
 s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 func_8004F4C8(s32 *arr, s32 count);
+s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004ED40);
+s32 func_8004ED40(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+    s32 count;
+    s32 result;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004EDC0);
+    count = 10;
+    do {
+        result = func_8004EDC0(self, suffix, outBuf, outSize);
+        if (result != 0) {
+            break;
+        }
+    } while (count-- != 0);
+    return result;
+}
+
+s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+    char pathBuf[0x20];
+    char *path;
+    s32 handle;
+    void *hdr;
+    s32 seekPos;
+    u8 raw;
+
+    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, suffix);
+    handle = func_80050938(path, 1);
+    if (handle == -1) {
+        return 0;
+    }
+    hdr = func_80017B34(0x80);
+    func_80050928(handle, hdr, 0x80);
+    raw = ((u8 *)hdr)[2];
+    seekPos = (raw << 7) - 0x780;
+    func_80017CFC(hdr);
+    func_800508E8(handle, seekPos, 0);
+    func_80050928(handle, outBuf, outSize);
+    func_800508F8(handle);
+    return 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004EEA0);
 

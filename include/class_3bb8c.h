@@ -1045,7 +1045,9 @@ struct TaskObjFMethods {
 
 struct TaskObjF {
     TaskObjFMethods *methods;   /* +0x000 */
-    u8 pad04[0x014 - 0x004];     /* BasicClass::children/parentRefs, untouched by this unit */
+    u8 pad04[0x00C - 0x004];     /* BasicClass::children/parentRefs, untouched by this unit */
+    s32 unk0C;                    /* +0x00C, func_8004EDC0: passed as func_8004F32C's "selector" (device slot 0/1) */
+    u8 pad10[0x014 - 0x010];
     s32 field14[4];                /* +0x014, func_8004F40C (walks all 4, early-exit)/func_8004F4A4 (passes &field14[0], count 4) */
     s32 unk24;                       /* +0x024, a state/mode tag: func_8004F638 sets 1, func_8004F8A4 sets 2, func_8004F9D8 reads (==1?) */
     s32 unk28;                        /* +0x028, a result/error code: func_8004F55C/func_8004F638 clear or set it, func_8004F8A4/func_8004F9D8 read it */
@@ -1131,5 +1133,15 @@ struct BasicMethods866E8F {
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, func_8004FB04's first dispatch */
 };
 extern BasicMethods866E8F *func_80018390(void);
+
+/* Uncarved library helpers reached by func_8004EDC0/func_8004EEA0/
+ * func_8004EF6C (a CD-stream open/read/seek/close family) -- typed purely
+ * from these call sites' own register usage, no other unit's evidence. */
+extern s32 func_80050938(char *path, s32 mode);          /* open by path, returns a handle or -1 */
+extern s32 func_80050928(s32 handle, void *buf, s32 size); /* read `size` bytes into `buf` */
+extern s32 func_800508E8(s32 handle, s32 pos, s32 whence); /* seek */
+extern s32 func_800508F8(s32 handle);                       /* close */
+extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
+extern s32 func_80050908(void *arg0);                          /* func_8004EF6C */
 
 #endif
