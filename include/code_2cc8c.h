@@ -1490,6 +1490,15 @@ extern Obj6EAC0Methods *func_80041C3C(void); /* returns &D_8006EC74, a
                                        DECOMPILATION_LEARNINGS about the
                                        psyq_memset boundary) */
 
+extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
+                                       allocator over this same class
+                                       family (0xAC bytes, ctor via
+                                       func_80041C3C()->slot08, "return-
+                                       regardless" variant); external to
+                                       this unit (asm/psyq_memset.s @
+                                       0x80041AB4); OBSERVED:
+                                       func_80040948 */
+
 /*
  * MEASURED elsewhere (round 9, include/class_3bb8c.h / src/class_3ac78.c):
  * func_8001E57C takes NO arguments and its whole body is a fixed
