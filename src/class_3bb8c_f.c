@@ -164,6 +164,64 @@ void func_8004F810(TaskObjF *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F8A4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F9D8);
+s32 func_8004F9D8(TaskObjF *self) {
+    s32 buf10;
+    s32 buf14;
+    s32 buf18;
+    s32 slot4CRet;
+    s32 code;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004FB04);
+    self->methods->slot44(self);
+    slot4CRet = self->methods->slot4C(self, &buf10, &buf14, &buf18);
+    self->methods->slot48(self);
+
+    if (slot4CRet != 0) {
+        if (buf14 == 0 && buf18 != 0) {
+            return 1;
+        }
+    }
+
+    if (slot4CRet == 0) {
+        code = 2;
+    } else if (buf10 != 0) {
+        code = 3;
+    } else if (buf14 != 0) {
+        code = 4;
+    } else if (buf18 != 0) {
+        goto dispatch;
+    } else if (self->unk24 == 1) {
+        code = 5;
+    } else {
+        code = 6;
+    }
+
+dispatch:
+    self->methods->slot7C(self, code);
+    return 0;
+}
+
+void func_8004FB04(TaskObjF *self, void *arg1, s32 arg2) {
+    TaskObjFMethods *methods;
+    BasicMethods866E8F *bm;
+    s32 tag;
+    s32 mask;
+
+    methods = self->methods;
+    bm = func_80018390();
+    bm->slot38(self, arg1, arg2);
+
+    tag = **(s32 **)arg1;
+    mask = tag & 0xF;
+    if (mask == 2) {
+        methods->slot88(self, arg1, arg2);
+    } else if (mask == 5) {
+        methods->slot98(self, arg1, arg2);
+    } else {
+        mask = tag & 0xFF;
+        if (mask == 0x10) {
+            methods->slotA4(self, arg1, arg2);
+        } else if (mask == 0x20) {
+            methods->slotB0(self, arg1, arg2);
+        }
+    }
+}
