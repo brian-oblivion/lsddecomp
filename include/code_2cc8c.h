@@ -379,7 +379,11 @@ extern char D_8008A8F0[4];  /* address-taken only by this unit */
  * through is modelled.
  */
 struct SubHandleObjMethods {
-    u8 pad000[0x04C];
+    u8 pad000[0x004];
+    void (*slot4)(SubHandleObj *self); /* +0x004, OBSERVED: func_8003F1A8
+                                    (round 14) -- release-shaped, no extra
+                                    args */
+    u8 pad008[0x04C - 0x008];
     void (*slot4C)(SubHandleObj *self, void *arg1, void *arg2); /* +0x04C,
                                     OBSERVED: func_8003E628 */
 };
@@ -725,6 +729,7 @@ void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 void func_8003EEC0(Unk18Obj *self);
 void func_8003F04C(Unk18Obj *self);
+void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);

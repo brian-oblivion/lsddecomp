@@ -236,7 +236,24 @@ tail_check:
     self->unk74 = (self->unk74 == 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F1A8);
+/* Only runs when self->unk10 is NULL: releases the current self->unkB0 (if
+ * any) via its own slot4, then -- if arg1 is non-NULL -- installs arg1 as
+ * the new self->unkB0 and notifies it (slot4C) with self->unkAC and the
+ * shared D_8008A904 constant. */
+void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1) {
+    if (self->unk10 != NULL) {
+        return;
+    }
+
+    if (self->unkB0 != NULL) {
+        self->unkB0->methods->slot4(self->unkB0);
+    }
+
+    self->unkB0 = arg1;
+    if (arg1 != NULL) {
+        arg1->methods->slot4C(arg1, self->unkAC, D_8008A904);
+    }
+}
 
 SubHandleObj *func_8003F230(Unk18Obj *self) {
     return self->unkB0;
