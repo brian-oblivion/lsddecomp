@@ -169,7 +169,34 @@ skip48:
     func_8001EACC(this, this->unk94, 1, 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_8006090C);
+void func_8006090C(Entity *this) {
+    if (this->unkF4 == 0) {
+        return;
+    }
+    if (this->unk44 == 0) {
+        this->unk44 = 0xC;
+        this->unkFC = 0;
+        return;
+    }
+    if (this->unk44 == 0xC) {
+        if (this->unkFC < 0x1E) {
+            if (this->unk94->methods->slot100(this->unk94) != 0) {
+                this->unk94->methods->slot130(this->unk94, 0);
+                this->unkFC = 0;
+                this->unk44 = 0xB;
+            }
+        } else {
+            this->methods->slot30(this, 0xB);
+            this->unk44 = 0xA;
+        }
+    } else if (this->unk44 == 0xB) {
+        if (this->unkFC == 0x64) {
+            this->methods->slot30(this, 0xC);
+        } else {
+            this->unk94->methods->slotCC(this->unk94, -0x64, 0);
+        }
+    }
+}
 
 void func_80060A4C(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;

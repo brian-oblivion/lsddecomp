@@ -141,7 +141,9 @@ extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
  * Entity.c) -- two different functions in two different tables that merely
  * share a numeric offset; do not conflate them. */
 struct Unk94Methods {
-    u8 pad000[0x100];
+    u8 pad000[0xCC];
+    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(unk94, -0x64, 0); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
+    u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
     u8 pad104[0x130 - 0x104];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
