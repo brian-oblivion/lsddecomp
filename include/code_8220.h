@@ -142,7 +142,27 @@ extern s32 func_800195EC(void *arg0, void *arg1);
 
 /* Called by func_800193C0/func_800194A4 after a successful OT insertion,
  * with a small literal "primitive kind" code (3 = triangle, 4 = quad).
- * Not yet carved/declared elsewhere. */
+ * code_8220_c, round 13. */
 extern void func_8001A268(void *prim, s32 code);
+
+/* Unaligned struct-field copy helpers, code_8220_c (round 13). */
+extern void func_8001A3EC(void *dstArr, void *srcArr, void *src0, void *src1, void *src2);
+
+/* gp_rel-blocked (docs/research/gp-relative-blocker.md), code_8220_c
+ * round 13 -- see docs/match-reports/func_8001A380.md. Declared here only
+ * so its ONE caller in this unit (func_800197C4) can compile; the extra
+ * two args arrive on the stack in retail as plain 32-bit zero words (its
+ * own body happens to read them with `lhu`, but that is internal to a
+ * function that will never be matched under this toolchain). */
+extern void func_8001A380(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4, s32 arg5);
+
+/* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
+ * func_800197C4 (code_8220_c) with (self, table). */
+extern void func_8001A564(void *self, void *table);
+
+/* Opaque table, referenced only by ADDRESS (never dereferenced in this
+ * unit) and handed to func_8001A380/func_8001A564. asm/data, not yet
+ * carved -- real element type unknown. */
+extern u8 D_8008ACD0[];
 
 #endif
