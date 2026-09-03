@@ -29,7 +29,15 @@ BasicClassMethods *func_80018390(void)
     return &D_8006B58C;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800183A0);
+void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor)
+{
+    if (*cursor != NULL) {
+        *outValue = (*cursor)->value;
+        *cursor = (*cursor)->next;
+    } else {
+        *outValue = NULL;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800183DC);
 
