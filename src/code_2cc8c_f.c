@@ -57,7 +57,30 @@ Unk64Elem *func_800408CC(void *ctx, s32 len, char *name) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040948);
+void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+    s32 i;
+    Obj6EAC0 **cursor;
+
+    ((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20);
+    self->methods = func_80040FB0();
+    self->unkA9 = a2;
+    self->unkAB = a2;
+    self->unkAC = 0;
+    self->unkAA = 0;
+    cursor = func_80017B34(a2 * 4);
+    if (cursor != NULL) {
+        self->unkB4 = cursor;
+        i = 0;
+        if (i < a2) {
+            do {
+                *cursor = func_80041AB4(a1, 0x20);
+                i++;
+                cursor++;
+            } while (i < a2);
+        }
+        self->methods->slot40(self, a3);
+    }
+}
 
 void func_80040A30(Obj6EAC0 *self) {
     func_800183DC(self->unkB4, self->unkA9);
