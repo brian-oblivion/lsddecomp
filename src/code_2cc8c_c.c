@@ -159,7 +159,17 @@ IntermediateBaseMethods *func_8003E5C8(void)
     return &D_8006E878;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E5D8);
+Unk18Obj *func_8003E5D8(void)
+{
+    Unk18Obj *self;
+
+    self = func_80017B34(0xBC);
+    if (self != NULL) {
+        func_8003F24C()->ctor(self);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E628);
 
