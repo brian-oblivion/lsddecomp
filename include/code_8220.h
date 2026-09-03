@@ -165,4 +165,18 @@ extern void func_8001A564(void *self, void *table);
  * carved -- real element type unknown. */
 extern u8 D_8008ACD0[];
 
+/* Quad-flavored sibling of D_8008ACD0/func_8001A380/func_8001A564,
+ * referenced the same way by func_80019B24 (code_8220_c, round 13). */
+extern u8 D_8008AEE8[];
+
+/* Unaligned struct-field copy helper (quad flavor: 4 fields, not 3),
+ * code_8220_c round 13. STALLED -- see docs/match-reports/func_8001A4C0.md,
+ * declared here only so its caller func_80019B24 can compile. */
+extern void func_8001A4C0(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5);
+
+/* Psy-Q SDK (asm/psyq_rcpolyf4.s, not a carved C unit). Called by
+ * func_80019B24 (code_8220_c) with (self, table) -- quad-flavored sibling
+ * of func_8001A564. */
+extern void func_8001A8D4(void *self, void *table);
+
 #endif
