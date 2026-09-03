@@ -75,7 +75,7 @@ struct Node3bb8cE {
 extern void *func_8004F32C();
 extern void func_8004F394(void *self);
 extern void *func_8004F3BC(void *self);
-extern void func_8004F3E4(void);
+extern void func_8004F3E4(void *self);
 extern void func_8004F40C(void *self, void (*fn)(void), s32 arg2);
 extern s32 func_8004F4A4(void *self);
 
@@ -187,11 +187,65 @@ s32 func_8004E678(Node3bb8cE *self)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E6B8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E77C);
+extern s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2);
+extern s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E7D0);
+void func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
+{
+    if (func_8004E7D0(self, p1, p2) != 0) {
+        func_8004E890(self, p1, p3);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E890);
+extern s32 func_80050B18(s32 arg0);
+extern s32 func_80050B28(s32 arg0);
+
+s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
+{
+    s32 status;
+    s32 code;
+
+    status = 1;
+    *p2 = *p1 = 0;
+    func_8004F3E4(self);
+    while (func_80050B18(self->unk10) == 0)
+        ;
+    code = func_8004F4A4(self);
+    if (code == 0x100) {
+        status = 0;
+    } else if (code == 0x8000) {
+        status = 0;
+        *p1 = 1;
+    } else if (code == 0x2000) {
+        *p2 = 1;
+        func_80050B28(self->unk10);
+    }
+    return status;
+}
+
+extern s32 func_80050B08(s32 arg0);
+
+s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
+{
+    s32 status;
+    s32 code;
+
+    status = 1;
+    *p2 = (*p1 = 0, status);
+    func_8004F3E4(self);
+    while (func_80050B08(self->unk10) == 0)
+        ;
+    code = func_8004F4A4(self);
+    if (code == 0x100) {
+        status = 0;
+    } else if (code == 0x8000) {
+        status = 0;
+        *p1 = 1;
+    } else if (code == 0x2000) {
+        *p2 = 0;
+    }
+    return status;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E940);
 
