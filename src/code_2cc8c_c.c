@@ -48,7 +48,14 @@ void func_8003E4A4(Obj86B60 *self)
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E4B8);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E538);
+void func_8003E538(Obj86B60 *self)
+{
+    Obj86B60UnkCTarget *target;
+
+    self->unk1C = 0;
+    target = self->unkC->target;
+    target->methods->slot48(target);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E578);
 

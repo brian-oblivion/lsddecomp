@@ -361,6 +361,29 @@ struct Obj86B60Methods {
 };
 
 /*
+ * self->unkC's pointee, observed only by func_8003E538 -- a shared
+ * base-class method also reachable through UNRELATED classes' own vtables
+ * at this same slot offset (class_39e08.h documents func_8003E538/78
+ * occupying Obj865C8Methods/Class86668Methods +0x064/+0x068). Dispatch
+ * shape: `self->unkC->target->methods->slot48(target)` -- one extra level
+ * of indirection past the usual `self->fieldN->methods->slotM(self->fieldN)`
+ * idiom. Only the one field/slot func_8003E538 touches is modelled.
+ */
+typedef struct Obj86B60UnkC Obj86B60UnkC;
+typedef struct Obj86B60UnkCTarget Obj86B60UnkCTarget;
+typedef struct Obj86B60UnkCTargetMethods Obj86B60UnkCTargetMethods;
+struct Obj86B60UnkCTargetMethods {
+    u8 pad000[0x048];
+    void (*slot48)(Obj86B60UnkCTarget *self); /* +0x048, OBSERVED: func_8003E538 */
+};
+struct Obj86B60UnkCTarget {
+    Obj86B60UnkCTargetMethods *methods; /* +0x000 */
+};
+struct Obj86B60UnkC {
+    Obj86B60UnkCTarget *target; /* +0x000, OBSERVED: func_8003E538 */
+};
+
+/*
  * The object itself. Every field below is OBSERVED (not inferred) from at
  * least one of this unit's 18 attempted functions -- see each function's
  * own match report for the specific derivation. Gaps are left as opaque
@@ -368,7 +391,22 @@ struct Obj86B60Methods {
  */
 struct Obj86B60 {
     Obj86B60Methods *methods;   /* +0x000 */
-    u8 pad004[0x014 - 0x004];
+    u8 pad004[0x00C - 0x004];
+    Obj86B60UnkC *unkC;          /* +0x00C, func_8003E538 (see Obj86B60UnkC's
+                                    own comment): `self->unkC->target->methods
+                                    ->slot48(target)`. NOTE: this slot is
+                                    reached through a SHARED base-class
+                                    method -- class_39e08.h's own view of an
+                                    unrelated class documents the same
+                                    func_8003E538 occupying its own vtable at
+                                    the identical offset (+0x064), so this
+                                    field is very likely part of a common
+                                    base-object layout every subclass shares
+                                    at this offset, not something Obj86B60
+                                    itself introduces -- kept here anyway,
+                                    per this header's flat single-struct
+                                    style (no explicit base/derived split). */
+    u8 pad010[0x014 - 0x010];
     s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
                                     slot100's 2nd arg, otherwise untouched
                                     by this unit -- generic word, not
