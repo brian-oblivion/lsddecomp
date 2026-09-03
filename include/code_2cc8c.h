@@ -1394,12 +1394,21 @@ struct Obj6EAC0 {
     s32 unk48;                /* +0x048, OBSERVED: zeroed by func_80040854 */
     s32 unk4C;                /* +0x04C, OBSERVED: func_80040854 (setter,
                                   from its own a3) */
-    u8 pad050[0x058 - 0x050];
+    s32 unk50;                 /* +0x050, OBSERVED: func_800407F8/
+                                  func_80040E14 (slotBC occupants) --
+                                  first word of a 2-word struct copied
+                                  from their own `a1` argument */
+    s32 unk54;                 /* +0x054, OBSERVED: ditto, second word */
     u32 unk58;                 /* +0x058, OBSERVED: a packed-bitfield word,
                                   passed as `func_8001EDAC(&self->unk58, ...)`
                                   -- same generic accessor as
                                   include/code_d294.h's `unk10` */
-    u8 pad05C[0x064 - 0x05C];
+    u8 pad05C[0x060 - 0x05C];
+    s16 unk60;                 /* +0x060, OBSERVED: func_80040824 (slotC0
+                                  occupant) -- first halfword of a
+                                  2-halfword struct copied from its own
+                                  `a1` argument */
+    s16 unk62;                 /* +0x062, OBSERVED: ditto, second halfword */
     u8 unk64[3];               /* +0x064, OBSERVED: func_8004076C -- a
                                   3-byte colour buffer, overwritten or
                                   added-into via func_80040790 */

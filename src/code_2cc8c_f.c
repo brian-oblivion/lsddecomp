@@ -25,7 +25,12 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040790);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_800407F8);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040824);
+void func_80040824(Obj6EAC0 *self, s32 *a1) {
+    if (self->unkC != 0) {
+        self->unk60 = ((u16 *)a1)[0];
+        self->unk62 = ((u16 *)&a1[1])[0];
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040854);
 
