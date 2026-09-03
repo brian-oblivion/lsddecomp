@@ -980,8 +980,64 @@ code_2c054).**
   (`addiu $v0, $a0, 0x14`), reproduce that as an explicit pointer local before
   the `if` — not as an inline literal offset inside each arm. "Same effective
   address" is not the test. (`func_80019724`, `func_8001974C`)
+- **Re-dereference; do not cache in a named local.** A value read from memory,
+  used, and then read again for a second use should be written as two separate
+  dereferences. Caching it in a local forces the value to survive across a call
+  boundary, which consumes a callee-saved register and can renumber registers
+  through the whole function. **This is the primary lever for the
+  saturated-callee-saved-file stall class below.** (`func_8003CE98`,
+  `func_8003D050`)
+- **…but that fix is shape-specific, and applying it to both shapes is wrong.**
+  A loop bound that is a cheap single-field read (`self->unk50`) stays uncached
+  in the loop condition; a bound reached through an array index
+  (`self->unk5C[idx]`) is expensive enough that retail DOES cache it. Two
+  superficially identical "hoist the bound?" questions with opposite answers —
+  same trap shape as round 7's `slotC4`/`slotCC`. (`func_8003D194`)
+- **-O2 tail-merges identical trailing statements out of `if`/`else` arms.**
+  Write the repeated statement in EACH arm rather than hoisting it after the
+  `if`; GCC produces the single shared block itself, and hoisting it in source
+  gives different code. Read together with bravo's crossjump entry above — same
+  optimizer, two directions. (`func_8003D194`)
+- **A `__asm__("" ::: "memory")` barrier anchors MEMORY operations only.** It
+  can force a genuine store-then-reload where the optimizer would otherwise
+  forward the value in a register — useful for reproducing a retail double
+  store. It does **not** pin a pure register assignment: an `i = 0` with no
+  memory side effect has nothing for the barrier to anchor and floats across it
+  freely. So a barrier is not a general scheduling lever, and a residue on a
+  register-only statement will not yield to one.
+  (`func_8003DAD4`, `func_8003D73C`)
 
 ### New residue classes opened this round (not yet closed)
+
+- **NEW, round 12: "retail saturates the callee-saved register file."**
+  Diagnosable in one command *before* spending an attempt budget:
+
+  ```sh
+  grep -oE 'sw +\$s[0-9]' asm/nonmatchings/<unit>/<func>.s | sort -u | wc -l
+  ```
+
+  **A count of 8 means retail uses all of `$s0..$s7` and has NO spare
+  callee-saved register.** Any C shape that needs a 9th value live across a
+  call must spill into `$s8`/`$fp`; the epilogue then restores one register too
+  many and every register number downstream shifts. The result *looks*
+  catastrophic and is not: exact total length, zero inserted/deleted
+  instructions, purely `r`-tagged renames — `func_8003D73C` scored **40/145**
+  in exactly this state.
+
+  **Why it matters that this is its own class:** it is NOT the unfixable
+  register-identity stall it resembles, and it has a specific permitted lever —
+  **reduce the number of values live across each call** (re-dereference instead
+  of caching in a local; narrowly scope post-loop re-derivations). Target a
+  budget of 8; do not chase the register numbers.
+
+  It is also NOT the scheduling class. `func_8003DAD4`, the sibling stall filed
+  the same round and initially reported as "the same shift", saves only 6
+  callee-saved registers with two s-regs and `$fp` spare — no pressure at all,
+  and its 114/118 residue is delay-slot placement plus one temp choice.
+  Its fixes were tried on `func_8003D73C` and did not transfer, which is the
+  expected result once the census is run. **Run the census before assuming two
+  register-flavoured stalls are the same class.**
+  (`func_8003D73C` 40/145; contrast `func_8003DAD4` 114/118)
 
 - **"Identical assignment reaching different merge points."** GCC tail-merges
   two identical `doDetach = 1;` statements that retail keeps separate.

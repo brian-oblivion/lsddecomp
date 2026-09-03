@@ -72,6 +72,30 @@ function's logic (confirmed: every OTHER instruction in the function,
 including all four call sites, both loops, and the final field write,
 matches byte-for-byte).
 
+### Head note (round 12) — this stall is NOT the same class as `func_8003D73C`
+
+Accepted as written; the classification above is correct for THIS function.
+Flagging only because the companion report filed the same round
+(`func_8003D73C.md`) described itself as "the same whole-function s-register
+renumbering shift documented in `func_8003DAD4`'s report". It is not, and this
+report never claimed such a shift:
+
+- Retail here saves **6** callee-saved registers (`$s0..$s5`), leaving two
+  s-registers and `$fp` spare — no pressure, and the 114/118 residue is purely
+  scheduling and one temp choice.
+- Retail in `func_8003D73C` saves **8** (`$s0..$s7`), saturating the file, and
+  that body's 40/145 comes from needing a 9th live cross-call value and
+  spilling into `$fp`.
+
+```sh
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/func_8003DAD4.s | sort -u | wc -l   # 6
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/func_8003D73C.s | sort -u | wc -l   # 8
+```
+
+Do not carry this function's fixes to that one expecting them to transfer —
+the companion report observed that they did not, and the register census above
+is why. See the reclassification in `func_8003D73C.md`.
+
 ## What DID work, for the next attempt
 
 Getting from a naive first draft (~10/118, ~180KB of image-wide address
