@@ -1,7 +1,22 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E8B8);
+/* Forwards to the inherited BasicClass slot38, then dispatches self's OWN
+ * slot94 or slot98 depending on arg1's dynamic class tag (5 or 1
+ * respectively, per its header nibble -- same tag idiom as func_8003E770,
+ * round 13). Neither dispatch happens for any other tag. */
+void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
+    s32 tag;
+
+    func_80018390()->slot38(self, arg1, arg2);
+
+    tag = arg1->methods->header & 0xF;
+    if (tag == 5) {
+        self->methods->slot94(self, arg1, arg2);
+    } else if (tag == 1) {
+        self->methods->slot98(self, arg1, arg2);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E968);
 

@@ -478,7 +478,14 @@ struct Unk18ObjMethods {
     u8 pad078[0x090 - 0x078];
     void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
                                                     func_8003E6CC (round 13) */
-    u8 pad094[0x0A8 - 0x094];
+    /* +0x094/+0x098, round 14 (code_2cc8c_d): func_8003E8B8's own call
+       site -- dispatched as `(self, arg1, arg2)` when a GenericObj arg1's
+       header tag is 5 (slot94) or 1 (slot98). Occupants (this unit, still
+       queued as of this comment): func_8003EE40 (+0x094), func_8003EE88
+       (+0x098). */
+    void (*slot94)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x094 */
+    void (*slot98)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x098 */
+    u8 pad09C[0x0A8 - 0x09C];
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
                                                     func_8003E6CC (round 13) */
 };
@@ -582,6 +589,7 @@ extern Unk18Obj *func_8003E5D8(void); /* this unit's own New_X allocator for
    occupants this unit carves. Trivial setters/getters typed straight to
    Unk18Obj's own newly-discovered fields above; see the field comments
    for what each was OBSERVED from. */
+void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);
