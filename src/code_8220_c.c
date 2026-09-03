@@ -36,21 +36,20 @@ void func_8001979C(void *dst, s32 flag)
 }
 
 #if 0
-/* STALL snapshot -- see docs/match-reports/func_800197C4.md. Head pass,
- * round 13: this reaches the CORRECT INSTRUCTION COUNT AND LENGTH (no
- * inserted or deleted instructions anywhere in the function). The residue
- * is two register-identity choices plus one delay-slot filler retail has
- * and this does not. Two things got it here and both generalise to the
- * seven sibling functions in this family:
- *   1. The OT splice is a 24-BIT BITFIELD write (`OtTag.addr`), not
- *      hand-written `& 0xFF000000` / `& 0x00FFFFFF` masking. Same value,
- *      different register allocation.
- *   2. The OT expression must be RE-EVALUATED, not cached in a local --
- *      retail re-reads `arg1->unk30` for the second store. That is macro
- *      argument semantics (Psy-Q's `addPrim(ot, p)` expands `ot` twice).
- * Still open: retail fills a load-delay slot with `addiu $v0, $s1, 0x14`,
- * i.e. it computes `arg0 + 0x14` somewhere in this branch; this body has
- * nothing to schedule there and GCC emits a `nop`.
+/* STALL snapshot round 2 -- see docs/match-reports/func_800197C4.md.
+ * Instruction-exact (asm-differ: zero inserted, zero deleted). Residue is
+ * two register-identity choices ($a2 vs $a1 for the OT high-byte mask,
+ * cascading to the second reload's register) plus one load-delay-slot
+ * filler: retail forms `$s1 + 0x14` (= arg0 + 0x14) and this body has
+ * nothing there. VERIFIED across all 8 siblings: the filler's offset
+ * always equals (highest self-relative offset touched anywhere in the
+ * CALLS branch) + (the access width at that offset) -- i.e. one byte past
+ * the last field of `self` the function ever reads. Tried: computing that
+ * "one past" pointer as an unconditionally-live local (cross-branch) --
+ * forces a 4th callee-saved register (drift, 0/54). Tried: computing it
+ * only within the `if` branch with (void)-cast non-use -- eliminated by
+ * -O2, matching func_8001A268's same finding for a genuinely unused local.
+ * Not cracked.
  */
 void func_800197C4(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
