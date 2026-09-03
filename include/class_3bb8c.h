@@ -1364,7 +1364,9 @@ struct Class86E00SubObjMethods_3bb8c_g {
     u8 pad000[0x004];
     void (*release)(Class86E00SubObj_3bb8c_g *self); /* +0x004, func_80050410/func_80050670 */
     u8 pad008[0x044 - 0x008];
-    void (*slot44)(Class86E00SubObj_3bb8c_g *self); /* +0x044, func_80050340/func_800505A8 */
+    /* +0x044, func_80050340/func_800505A8's own call: `(self, unk68)`
+     * from the OWNING `Class86E00_3bb8c_g`. */
+    void (*slot44)(Class86E00SubObj_3bb8c_g *self, s32 arg1);
     void (*slot48)(Class86E00SubObj_3bb8c_g *self); /* +0x048, func_80050410/func_80050670 */
     /* +0x04C, func_80050340/func_800505A8's own call:
      * `(self, unk60, unk64, unk6C)` from the OWNING `Class86E00_3bb8c_g`. */
@@ -1488,8 +1490,13 @@ struct Class86E00_3bb8c_g {
 extern void *func_80051A5C(void *arg0, s32 arg1);
 
 /* Not this round's function (lives outside this unit's slice) --
- * func_80050340's own external helper, called with `(self->unk48 << 1) +
- * self->unk44`; return value stored into `self->unk78`. */
-extern void *func_80050BA8(s32 arg0);
+ * func_80050340's own external helper, called with `((self->unk48 << 1)
+ * + self->unk44, 1)`; return value stored into `self->unk78`. The 2nd
+ * argument (a literal `1`) is materialized EARLY, in the delay slot of
+ * the guard testing `self->unk78 == NULL` several instructions before
+ * this call -- nothing overwrites `$a1` in between, which is what
+ * reveals it as a real 2nd argument rather than a scheduling artifact
+ * (see func_80050340's report). */
+extern void *func_80050BA8(s32 arg0, s32 arg1);
 
 #endif
