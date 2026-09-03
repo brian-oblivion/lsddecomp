@@ -86,7 +86,13 @@ void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
     func_8003F2AC(self->unk14);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EB84);
+/* Teardown counterpart to func_8003EACC's init: removes self->unk10 as a
+ * child (inherited BasicClass "removeChild") if it was ever set. */
+void func_8003EB84(Unk18Obj *self) {
+    if (self->unk10 != NULL) {
+        self->methods->slot14(self, self->unk10);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EBC4);
 

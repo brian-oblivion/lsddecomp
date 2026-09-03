@@ -614,6 +614,7 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 extern void func_8003F2AC(void *arg0);
 
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
+void func_8003EB84(Unk18Obj *self);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);
