@@ -1189,6 +1189,127 @@ remaining fresh function, `func_8004A534`, demands **8** registers. It is the
 last item in the reserve pool and it should be handed out with the expectation
 of a documented stall, not of a match.
 
+#### Round 13, second batch (later passes)
+
+- **GCC 2.6.3 does NOT cross-jump-merge two syntactically identical
+  call+assignment sequences reached from different branches.** Confirmed in
+  both directions in one unit. So the reliable lever for "one call reached
+  from several guards" is an explicit `goto` to a single physical call site —
+  whether the calls are identical or different. Cascading range/threshold
+  chains that collapse onto one call site transcribe reliably by matching the
+  disassembly's own labels with literal `goto`s.
+  (`Entity_g`, several; and see the counter-direction note below.)
+
+  **Read that together with the opposite finding from the same round**, or it
+  will mislead: `goto` is *not* a universal fix for 2.6.3 tail-merging.
+  `func_8001D714` reproduced a documented `goto` lever bit-identically and
+  still did not match. `goto` controls whether there is ONE physical call
+  site; it does not control how many trailing bytes the cross-jump pass
+  decides to share once there is.
+
+- **A `funcdiff` "differs outside range" warning does not mean "too long".**
+  It means "a different length", and the sign is not in the message. Check the
+  direction with `objdump` before chasing a fix — a body that is four words
+  SHORT and one that is four words long need opposite changes, and the warning
+  reads the same for both. (`func_80064E34`.)
+
+- **Retail redundantly re-materializing a literal across several branches
+  that reach a shared call is a real shape, and every leaner C form compiles
+  SHORTER.** Related to the "redundant move" class, generalised to constant
+  materialisation; treat it as a permuter target rather than spending attempts.
+  (`func_80064E34`, `func_80063144`.)
+
+- **Branch polarity is a real, separate residue from branch targets.** An
+  `if`/`else` pair can carry correct values on both arms and still compile with
+  the test inverted relative to retail; the fix is to swap which arm is written
+  first and negate the condition. Cheap to try, and it does not perturb
+  anything else. (`func_800634A8`, `func_80063874`, `func_8004C93C`.)
+
+- **In a multi-link `bne` chain, a constant sitting next to one branch may
+  belong to the NEXT link.** Reading each `ori` as though it were its own
+  test's operand is the natural mistake and it silently reassigns whole case
+  bodies: in `func_80063874` it swapped which of two bodies belonged to
+  `unk44 == 0xC` versus `== 0xD`. Re-trace every link's carried value against
+  the raw hex rather than the mnemonic column.
+
+- **Pin a divisor by the reconstruction arithmetic, not by the magic
+  constant.** The same magic multiplier is shared across divisors; what
+  disambiguates is the `sll`/`subu` chain that rebuilds `N * quotient`.
+  `func_800636E4` is `% 15` (`quotient*16 - quotient`), where the constant
+  alone suggested the more obvious `% 8`.
+
+- **Dump the shared table BEFORE reading any function in isolation.**
+  `tools/classtable.py <addr>`, or a row-alignment check against
+  `asm/data/*.s`, resolves a whole unit's slot identities and argument shapes
+  in one pass. Independently proposed by two runners in different units this
+  round, both after doing it the slow way first.
+
+- **A `jal`'s delay slot carries the value from the PRECEDING call's return,
+  not the callee's own.** Misreading this is plausible and produces silently
+  wrong field derivations. (`func_8003E628`, caught before committing.)
+
+- **`arg->methods->header & 0xF` — a double dereference through a method
+  table's offset-0 word — is a runtime type ID, not a struct field.** Learn the
+  shape on sight; it is how this game's hand-rolled class framework does
+  dispatch-on-concrete-type.
+
+- **An "unused-looking" local can still need real stack space** sized to match
+  retail's frame, independently of what the function reads back from it. Two
+  instances in one unit. (`func_8001D568`, `func_8001D714`.)
+
+- **An all-`s16` struct whole-assignment reliably reproduces retail's
+  `lwl`/`lwr` codegen** — now the third and fourth confirming instances,
+  including one where the head used it to replace a whole-function `__asm__`
+  transcription with six lines of C (`func_8001A3EC`). Reach for it whenever
+  retail shows unaligned load/store pairs over a small fixed-size payload.
+
+- **A 24-bit BITFIELD write is how the Psy-Q OT linked-list splice is
+  spelled, and hand-written masks are not equivalent.** Assigning
+  `unsigned addr : 24` (Psy-Q `P_TAG`, via `setaddr`/`getaddr`/`addPrim`) is a
+  read-modify-write that GCC 2.6.3 emits as `& 0xFF000000`, `& 0x00FFFFFF`,
+  `or`. Writing those masks by hand produces the identical VALUE with
+  different register allocation, and the difference presents as an
+  unreachable register-identity residue. Note `include/psyq/LIBGPU.H` does not
+  compile standalone under this toolchain (it needs the `LIBGTE`/`RECT`
+  chain), so declare a minimal local view of the tag instead — `OtTag` in
+  `include/code_8220.h` is the worked example. (`func_800197C4` and its seven
+  siblings.)
+
+- **A macro's argument is evaluated once per expansion, and that is visible in
+  the bytes.** `addPrim(ot, p)` expands to
+  `setaddr(p, getaddr(ot)), setaddr(ot, p)`, so `ot` is loaded TWICE. Caching
+  it in a local is two instructions short. This is the same family as the
+  existing "do not cache a `this->field` across an intervening vtable call"
+  rule, one step further out: here there is no call at all.
+
+- **GCC 2.6.3 hoists an EXISTING instruction into a load-delay slot; it never
+  invents one.** So a filler instruction whose result looks dead is evidence
+  that the real source computes that value somewhere. Do not write it off as a
+  "dead `addiu`" — it is a lead about the source. (`func_800197C4`.)
+
+- **A whole-function `__asm__` is for constructs with NO C form, not for
+  constructs that are hard to type.** See CLAUDE.md HARD RULE 6. GTE
+  `rtpt`/`nclip`/`cfc2` and COP2 `swc2`/`lwc2` qualify; an awkward unaligned
+  struct copy does not, and one was reworked into six lines of C this round
+  after being matched as a transcription. If you cannot name the instruction
+  that has no C spelling, it is not the exception.
+
+- **Two register-saturation residues that look alike need opposite fixes**, and
+  neither responds to the other's: a full register-identity PERMUTATION at
+  zero address drift (word count and length exactly right, ~8 live values
+  shifted across `$s0`-`$s7`) versus a missing-register FRAME-SIZE gap (retail
+  saves 9 including `$fp`, every C form reaches 8). Three instances in the
+  `class_3bb8c` header family. Levers proven elsewhere do not transfer in:
+  the "collapse into one call expression" lever moved `func_8004C6A8` by one
+  word, not by a register.
+
+- **Declaration-order and indirection tricks for steering register mapping are
+  non-monotonic and function-specific.** Two register-identity stalls in one
+  unit contradict each other as a predictive rule, and a third elsewhere in
+  the round found that the same trick helped in one direction and hurt in the
+  other. There is no general rule here; try both directions and keep the
+  measurement, do not reason from a sibling.
+
 ### New residue classes opened this round (not yet closed)
 
 - **NEW, round 12: "retail saturates the callee-saved register file."**
