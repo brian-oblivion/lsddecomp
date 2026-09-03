@@ -394,8 +394,10 @@ struct Obj86B60 {
     u8 pad004[0x00C - 0x004];
     Obj86B60UnkC *unkC;          /* +0x00C, func_8003E538 (see Obj86B60UnkC's
                                     own comment): `self->unkC->target->methods
-                                    ->slot48(target)`. NOTE: this slot is
-                                    reached through a SHARED base-class
+                                    ->slot48(target)`. Also zeroed by
+                                    func_8003E874 (a ctor-shaped function that
+                                    also zeroes unk10/unk30 below). NOTE: this
+                                    slot is reached through a SHARED base-class
                                     method -- class_39e08.h's own view of an
                                     unrelated class documents the same
                                     func_8003E538 occupying its own vtable at
@@ -406,7 +408,9 @@ struct Obj86B60 {
                                     itself introduces -- kept here anyway,
                                     per this header's flat single-struct
                                     style (no explicit base/derived split). */
-    u8 pad010[0x014 - 0x010];
+    s32 unk10;                  /* +0x010, func_8003E874 only: zeroed by the
+                                    same ctor-shaped function as unkC/unk30;
+                                    real meaning unknown, generic word */
     s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
                                     slot100's 2nd arg, otherwise untouched
                                     by this unit -- generic word, not
@@ -419,7 +423,11 @@ struct Obj86B60 {
     u8 pad020[0x020 - 0x020];
     s32 unk20;                  /* +0x020, func_8003C63C (STALL) sets it
                                     to a literal 5 */
-    u8 pad024[0x038 - 0x024];
+    u8 pad024[0x030 - 0x024];
+    s32 unk30;                  /* +0x030, func_8003E874 only: zeroed by the
+                                    same ctor-shaped function as unkC/unk10;
+                                    real meaning unknown, generic word */
+    u8 pad034[0x038 - 0x034];
     s32 unk38;                  /* +0x038, func_8003C63C (STALL) sets it
                                     to 1 */
     s32 unk3C;                  /* +0x03C, a mode/state value: func_8003C858
@@ -518,5 +526,23 @@ extern IntermediateBaseMethods D_8006E878; /* the table itself, so
                                                 func_8003E5C8's own
                                                 definition (code_2cc8c_c.c)
                                                 can return &D_8006E878 */
+
+/*
+ * This unit's own local view of the shared BasicClass ancestor table
+ * (returned by func_80018390, a no-argument getter -- same "ctor at
+ * +0x008, dtor at +0x00C, self typed void* universally" idiom already
+ * established independently in include/class_16334.h, include/code_171e0.h
+ * and include/code_d294.h. Declared again here, under a unit-local name,
+ * per this project's policy of NOT unifying independent local views of the
+ * same table into one shared header. Only the one slot func_8003E874
+ * dispatches through is modelled.
+ */
+typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
+struct BasicClassMethodsCC8C {
+    u8 pad000[0x018];
+    void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
+};
+
+extern BasicClassMethodsCC8C *func_80018390(void);
 
 #endif

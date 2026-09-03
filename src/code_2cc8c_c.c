@@ -74,4 +74,10 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E770);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E7F4);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E874);
+void func_8003E874(Obj86B60 *self)
+{
+    self->unk30 = 0;
+    self->unk10 = 0;
+    self->unkC = NULL;
+    func_80018390()->slot18(self);
+}
