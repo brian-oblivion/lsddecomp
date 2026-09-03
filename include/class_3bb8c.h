@@ -1298,7 +1298,206 @@ struct GenericCtorTable_3bb8c_d {
     void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call */
 };
 
-extern GenericCtorTable_3bb8c_d *func_800507E8(void);
+extern GenericCtorTable_3bb8c_d D_80086DC4;
+extern GenericCtorTable_3bb8c_d *func_800507E8(void); /* returns &D_80086DC4; matched in class_3bb8c_g */
+
+/*
+ * Class86E00 -- a large NEW class table, `D_80086E00` (29 slots + header,
+ * resolved with `tools/classtable.py 0x80086E00`), unrelated by
+ * inheritance to any of `D_8006B58C`/`D_800866E8`/`D_80086B60`/
+ * `D_80086DC4` already known in this header (`--vs` against all four
+ * found no matching run of slots -- an independent class, not a
+ * subclass of anything else this header names).
+ *
+ * class_3bb8c_g is the first unit to write any of THIS class's own
+ * methods -- specifically slots `+0x048` and up. Slots `+0x004..+0x03C`
+ * belong to `class_3bb8c_e`/`class_3bb8c_f`, this round's other two
+ * runners sharing this header; they are left fully opaque here since no
+ * function in this unit ever dispatches through them.
+ *
+ * Every type below is suffixed `_3bb8c_g`, INCLUDING the class name
+ * itself -- unlike `Class86B60`/`Class869D8`/`Class86AA0` above, which
+ * are single-owner. This table is reached by three units at once this
+ * round, so an unsuffixed `Class86E00` here could collide at merge with
+ * a same-named, differently-shaped definition from `class_3bb8c_e` or
+ * `class_3bb8c_f` with no conflict marker to catch it -- the exact
+ * round-13 hazard this shared header's rules exist to prevent.
+ *
+ * Only the offsets this unit's own functions touch are given concrete
+ * types; everything else stays opaque padding.
+ */
+typedef struct Class86E00_3bb8c_g Class86E00_3bb8c_g;
+typedef struct Class86E00Methods_3bb8c_g Class86E00Methods_3bb8c_g;
+
+/*
+ * self->unk6C's pointee. func_8004FFF4 is the function that PROVES this
+ * is a pointer (dereferences its `+0x080` vtable slot) -- before that
+ * function was read, `unk6C` looked like a plain `s32` value forwarded
+ * opaquely to `Class86E00SubObj_3bb8c_g::slot4C`'s 3rd argument, which is
+ * why that parameter is typed with this pointer rather than `s32` below.
+ */
+typedef struct Class86E00Unk6CObj_3bb8c_g Class86E00Unk6CObj_3bb8c_g;
+typedef struct Class86E00Unk6CObjMethods_3bb8c_g Class86E00Unk6CObjMethods_3bb8c_g;
+
+struct Class86E00Unk6CObjMethods_3bb8c_g {
+    u8 pad000[0x080];
+    /* +0x080, func_8004FFF4's own call: `(self, arg1, 0x7F, 0x7F)`,
+     * `arg1` forwarded verbatim from func_8004FFF4's own 2nd parameter. */
+    void (*slot80)(Class86E00Unk6CObj_3bb8c_g *self, s32 arg1, s32 arg2, s32 arg3);
+};
+
+struct Class86E00Unk6CObj_3bb8c_g {
+    Class86E00Unk6CObjMethods_3bb8c_g *methods; /* +0x000 */
+};
+
+/*
+ * self->unk78's and self->unk7C's shared pointee -- two parallel fields
+ * of the SAME sub-object shape (func_80050340/func_80050410 exercise
+ * `unk78`; func_800505A8/func_80050670 exercise `unk7C` the identical
+ * way), each independently attached via `Class86E00Methods_3bb8c_g::
+ * slot10` and torn down via a fixed `slot50`/`slot48`/`release` sequence.
+ */
+typedef struct Class86E00SubObj_3bb8c_g Class86E00SubObj_3bb8c_g;
+typedef struct Class86E00SubObjMethods_3bb8c_g Class86E00SubObjMethods_3bb8c_g;
+
+struct Class86E00SubObjMethods_3bb8c_g {
+    u8 pad000[0x004];
+    void (*release)(Class86E00SubObj_3bb8c_g *self); /* +0x004, func_80050410/func_80050670 */
+    u8 pad008[0x044 - 0x008];
+    /* +0x044, func_80050340/func_800505A8's own call: `(self, unk68)`
+     * from the OWNING `Class86E00_3bb8c_g`. */
+    void (*slot44)(Class86E00SubObj_3bb8c_g *self, s32 arg1);
+    void (*slot48)(Class86E00SubObj_3bb8c_g *self); /* +0x048, func_80050410/func_80050670 */
+    /* +0x04C, func_80050340/func_800505A8's own call:
+     * `(self, unk60, unk64, unk6C)` from the OWNING `Class86E00_3bb8c_g`. */
+    void (*slot4C)(Class86E00SubObj_3bb8c_g *self, s32 a1, s32 a2, Class86E00Unk6CObj_3bb8c_g *a3);
+    void (*slot50)(Class86E00SubObj_3bb8c_g *self); /* +0x050, func_80050410/func_80050670 */
+};
+
+struct Class86E00SubObj_3bb8c_g {
+    Class86E00SubObjMethods_3bb8c_g *methods; /* +0x000 */
+};
+
+/*
+ * self->unk70's pointee -- a DIFFERENT sub-object from
+ * `Class86E00SubObj_3bb8c_g` above. It shares the same `+0x004` slot
+ * offset only because every BasicClass-family table keeps a slot there
+ * (see `BasicClassMethods::release` in code_8220.h) -- the USAGE differs:
+ * func_8004FF40 assigns this call's RETURN VALUE back into `unk70` (an
+ * "advance" pattern), where `Class86E00SubObj_3bb8c_g::release`'s callers
+ * (func_80050410/func_80050670) discard the return and unconditionally
+ * null the field afterward instead. Different enough to keep separate
+ * rather than unify.
+ */
+typedef struct Class86E00Unk70Obj_3bb8c_g Class86E00Unk70Obj_3bb8c_g;
+typedef struct Class86E00Unk70ObjMethods_3bb8c_g Class86E00Unk70ObjMethods_3bb8c_g;
+
+struct Class86E00Unk70ObjMethods_3bb8c_g {
+    u8 pad000[0x004];
+    /* +0x004, func_8004FF40's own call: return value stored back into
+     * `Class86E00_3bb8c_g::unk70` itself. */
+    Class86E00Unk70Obj_3bb8c_g *(*slot4)(Class86E00Unk70Obj_3bb8c_g *self);
+};
+
+struct Class86E00Unk70Obj_3bb8c_g {
+    Class86E00Unk70ObjMethods_3bb8c_g *methods; /* +0x000 */
+};
+
+/*
+ * func_80050730's own `arg1` -- a third, unrelated small object, reached
+ * only through its own `+0x09C` slot, whose return value is stored into
+ * `Class86E00_3bb8c_g::unk80`.
+ */
+typedef struct GenericSlot9CObj_3bb8c_g GenericSlot9CObj_3bb8c_g;
+typedef struct GenericSlot9CMethods_3bb8c_g GenericSlot9CMethods_3bb8c_g;
+
+struct GenericSlot9CMethods_3bb8c_g {
+    u8 pad000[0x09C];
+    void *(*slot9C)(GenericSlot9CObj_3bb8c_g *self); /* +0x09C, func_80050730 */
+};
+
+struct GenericSlot9CObj_3bb8c_g {
+    GenericSlot9CMethods_3bb8c_g *methods; /* +0x000 */
+};
+
+struct Class86E00Methods_3bb8c_g {
+    u8 pad000[0x010];
+    /* +0x010, func_80050340/func_800505A8's own first call: `(self,
+     * subObj)`, registering/attaching whichever of `unk78`/`unk7C` that
+     * function owns. */
+    void (*slot10)(Class86E00_3bb8c_g *self, Class86E00SubObj_3bb8c_g *arg1);
+    u8 pad014[0x078 - 0x014];
+    /* +0x078, func_800504D0's own call for its `arg2==2` case: 7 extra
+     * arguments, the last four passed on the stack (`unk4C`, promoted
+     * from its native `u8` to a full word, then `unk50`/`unk54`/`unk58`). */
+    void (*slot78)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3,
+                    s32 a4, s32 a5, s32 a6, s32 a7);
+    /* +0x07C, the shared tail call of func_800501F0/func_80050280/
+     * func_800504D0/func_80050730: `(self, literal state code)`. */
+    void (*slot7C)(Class86E00_3bb8c_g *self, s32 arg1);
+    u8 pad080[0x08C - 0x080];
+    void (*slot8C)(Class86E00_3bb8c_g *self, s32 arg1); /* +0x08C, func_800501F0 */
+    void (*slot90)(Class86E00_3bb8c_g *self); /* +0x090, func_8004FF90's `arg2==0x19` case */
+    void (*slot94)(Class86E00_3bb8c_g *self); /* +0x094, func_8004FF90's `arg2==0x17` case */
+    u8 pad098[0x0A0 - 0x098];
+    void (*slotA0)(Class86E00_3bb8c_g *self); /* +0x0A0, func_800504D0's own first call, both cases */
+    u8 pad0A4[0x0AC - 0x0A4];
+    void (*slotAC)(Class86E00_3bb8c_g *self); /* +0x0AC, func_80050730's own 2nd call, both cases */
+};
+
+struct Class86E00_3bb8c_g {
+    Class86E00Methods_3bb8c_g *methods; /* +0x000 */
+    u8 pad004[0x028 - 0x004];
+    s32 unk28;   /* +0x028, dispatch/state code tested by several functions */
+    u8 pad02C[0x038 - 0x02C];
+    void *unk38; /* +0x038, func_800505A8: forwarded opaquely to `func_80051A5C`'s arg0 */
+    u8 pad03C[0x040 - 0x03C];
+    s32 unk40;   /* +0x040, func_80050340/func_800504D0 */
+    s32 unk44;   /* +0x044, func_80050340/func_800504D0 */
+    s32 unk48;   /* +0x048, func_80050340/func_800504D0 */
+    u8 unk4C;    /* +0x04C, func_800504D0: read `lbu`, promoted to a full word for `slot78`'s call */
+    u8 pad04D[0x050 - 0x04D];
+    s32 unk50;   /* +0x050, func_800504D0 */
+    s32 unk54;   /* +0x054, func_800504D0 */
+    s32 unk58;   /* +0x058, func_800504D0 */
+    s32 unk5C;   /* +0x05C, func_80050280: incremented, capped at 6 */
+    s32 unk60;   /* +0x060, forwarded to `unk78`/`unk7C`'s own `slot4C` arg1 */
+    s32 unk64;   /* +0x064, forwarded to `unk78`/`unk7C`'s own `slot4C` arg2 */
+    /* +0x068, a readiness gate checked alongside `unk60` in four
+     * functions (func_80050340/func_80050410/func_800505A8/
+     * func_80050670) -- both must be non-zero before the body runs.
+     * Kept a bare `s32`; never dereferenced in this unit. */
+    s32 unk68;
+    /* +0x06C, forwarded to `unk78`/`unk7C`'s own `slot4C` arg3.
+     * func_8004FFF4 proves this is a pointer (dereferences its `+0x080`
+     * vtable slot), not the plain `s32` it looked like from the slot4C
+     * call site alone -- retyped here, same size, no layout change. */
+    Class86E00Unk6CObj_3bb8c_g *unk6C;
+    Class86E00Unk70Obj_3bb8c_g *unk70; /* +0x070, func_8004FF40 */
+    /* +0x074, a one-shot flag set to 1 by func_80050340/func_800505A8
+     * right after attaching `unk78`/`unk7C`, and consumed (guarding a
+     * teardown callback) by func_80050410/func_80050670. */
+    s32 unk74;
+    Class86E00SubObj_3bb8c_g *unk78; /* +0x078, func_80050340/func_80050410 */
+    Class86E00SubObj_3bb8c_g *unk7C; /* +0x07C, func_800505A8/func_80050670 */
+    void *unk80; /* +0x080, func_80050730: set from `arg1->methods->slot9C(arg1)`'s return */
+};
+
+/* Address-of only in this unit's own screening -- func_800505A8 forwards
+ * `self->unk38` and the literal `1` to this external helper; return
+ * value stored into `self->unk7C`. Not this round's function (lives
+ * outside this unit's slice). */
+extern void *func_80051A5C(void *arg0, s32 arg1);
+
+/* Not this round's function (lives outside this unit's slice) --
+ * func_80050340's own external helper, called with `((self->unk48 << 1)
+ * + self->unk44, 1)`; return value stored into `self->unk78`. The 2nd
+ * argument (a literal `1`) is materialized EARLY, in the delay slot of
+ * the guard testing `self->unk78 == NULL` several instructions before
+ * this call -- nothing overwrites `$a1` in between, which is what
+ * reveals it as a real 2nd argument rather than a scheduling artifact
+ * (see func_80050340's report). */
+extern void *func_80050BA8(s32 arg0, s32 arg1);
 
 /*
  * class_3bb8c_f: a SEPARATE class from Obj866E8 above -- no evidence unifies
