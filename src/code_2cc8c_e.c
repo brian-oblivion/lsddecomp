@@ -80,7 +80,44 @@ void func_8003FC18(s32 a0, s32 a1, TexPageDesc *desc) {
     func_80021580(desc->stride, 1 << desc->shift);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FC70);
+extern s32 D_800902E0;
+extern void func_80012C20(const char *fmt, s32 arg1); /* asm/psyq_2258.s,
+                                                           Psy-Q printf-like;
+                                                           declared locally
+                                                           with THIS call
+                                                           site's own arity
+                                                           (fmt + 1 vararg),
+                                                           same convention as
+                                                           code_8220.h's own
+                                                           independent
+                                                           extern for it */
+
+void func_8003FC70(s32 mode) {
+    if (mode == 1) {
+        goto set;
+    }
+    if (mode < 2) {
+        if (mode == 0) {
+            goto zero;
+        }
+        goto err;
+    }
+    if (mode == 2) {
+        goto set;
+    }
+    if (mode == 3) {
+        goto set;
+    }
+    goto err;
+zero:
+    D_800902E0 = 0;
+    return;
+set:
+    D_800902E0 = mode;
+    return;
+err:
+    func_80012C20("not supported light mode %d\n", mode);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FCFC);
 
