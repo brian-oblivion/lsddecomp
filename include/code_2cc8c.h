@@ -449,6 +449,18 @@ struct GenericObj {
  * of the class table it constructs. Only the one slot func_8003E10C
  * dispatches through is modelled.
  */
+/* Round 14 (code_2cc8c_d): a plain 3-word vector, copied wholesale from a
+ * caller-supplied source into Unk18Obj::unk14 (func_8003EBC4). Local view,
+ * same shape as code_d294.h's own Vec3_d294 but this project's convention
+ * is not to unify independent per-unit views of an unnamed shape. Declared
+ * here (ahead of Unk18ObjMethods) since that struct's own slot78 needs it.
+ */
+typedef struct Vec3_2cc8c {
+    s32 x;
+    s32 y;
+    s32 z;
+} Vec3_2cc8c;
+
 struct Unk18ObjMethods {
     u8 pad000[0x004];
     void *(*slot4)(Unk18Obj *self);            /* +0x004, inherited
@@ -485,7 +497,7 @@ struct Unk18ObjMethods {
        unit, per tools/classtable.py D_8006E8E4): func_8003EBC4 (+0x078,
        still queued), func_8003EBF8 (+0x07C, still queued), func_8003EC2C
        (+0x080, the documented gp_rel blocker -- NOT decompiled here). */
-    void (*slot78)(Unk18Obj *self, void *a1); /* +0x078 */
+    void (*slot78)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x078, retyped round 14 once func_8003EBC4 (its own occupant) confirmed the shape */
     void (*slot7C)(Unk18Obj *self, void *a1); /* +0x07C */
     void (*slot80)(Unk18Obj *self, void *a1); /* +0x080 */
     u8 pad084[0x090 - 0x084];
@@ -530,11 +542,13 @@ struct Unk18Obj {
                                   (func_8003E628); OBSERVED (round 13,
                                   set to `arg1`) by func_8003E770 when
                                   `arg1->methods->header & 0xF == 4` */
-    /* +0x014, round 14 (func_8003EACC): only its ADDRESS is taken
-       (`&self->unk14`, forwarded to func_8003F2AC -- asm/code_2cc8c_e.s,
-       the NEXT slice, still uncarved). Kept an opaque byte span since
-       nothing this unit's chosen functions dereference through it. */
-    u8 unk14[0x030 - 0x014];
+    /* +0x014, round 14: a Vec3, written wholesale by func_8003EBC4 from
+       its own arg1 -- RETYPED from an opaque byte span once
+       func_8003EBC4's own store pattern (3 plain word stores at +0x14/
+       +0x18/+0x1C) confirmed the shape; func_8003EACC's own use (only the
+       address, forwarded to func_8003F2AC) is unaffected by the retype. */
+    Vec3_2cc8c unk14;
+    u8 pad20[0x030 - 0x020];
     s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
@@ -615,6 +629,7 @@ extern void func_8003F2AC(void *arg0);
 
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EB84(Unk18Obj *self);
+void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);
