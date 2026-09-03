@@ -47,6 +47,8 @@ typedef struct SubHandleObj SubHandleObj;
 typedef struct SubHandleObjMethods SubHandleObjMethods;
 typedef struct Unk18AcObj Unk18AcObj;
 typedef struct Unk18AcObjMethods Unk18AcObjMethods;
+typedef struct GenericObj GenericObj;
+typedef struct GenericObjMethods GenericObjMethods;
 typedef struct Obj86B60InitArgs Obj86B60InitArgs;
 typedef struct Unk10Obj Unk10Obj;
 typedef struct Unk10ObjMethods Unk10ObjMethods;
@@ -415,6 +417,26 @@ struct Unk18AcObj {
 };
 
 /*
+ * A generic class-instance view (round 13, func_8003E770): every class's
+ * vtable in this game begins with a "header" word (`tools/classtable.py`'s
+ * own label for it, "not a pointer; varies per class -- id/flags"), and
+ * `func_8003E770` discriminates its 2nd parameter's DYNAMIC CLASS by
+ * reading `arg1->methods->header & 0xF` -- i.e. runtime type identification
+ * through the vtable header nibble, not a struct field of `arg1` itself.
+ * Only that one field, plus the one instance field (`unk14`) this function
+ * also reads, are modelled; `arg1`'s real class is unknown and irrelevant
+ * to this function's own behaviour.
+ */
+struct GenericObjMethods {
+    s32 header; /* +0x000 */
+};
+struct GenericObj {
+    GenericObjMethods *methods; /* +0x000 */
+    u8 pad004[0x014 - 0x004];
+    s32 unk14;                  /* +0x014, OBSERVED: func_8003E770 */
+};
+
+/*
  * self->unk18's pointee, round 13 (func_8003E10C). Constructed by a
  * New_X allocator this unit itself carves (func_8003E5D8, 0xBC bytes) via
  * `func_8003F24C()->ctor(self)` -- func_8003F24C lives in a still-uncarved
@@ -463,11 +485,19 @@ struct Unk18ObjMethods {
 struct Unk18Obj {
     Unk18ObjMethods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    s32 unkC;                 /* +0x00C, OBSERVED: func_8003E628 (round 13),
-                                  zeroed by the ctor */
-    s32 unk10;                /* +0x010, OBSERVED: func_8003E628 (round 13),
-                                  zeroed by the ctor */
-    u8 pad014[0x0AC - 0x014];
+    GenericObj *unkC;          /* +0x00C, zeroed by the ctor
+                                  (func_8003E628); OBSERVED (round 13,
+                                  set to `arg1`) by func_8003E770 when
+                                  `arg1->methods->header & 0xF == 1` */
+    GenericObj *unk10;         /* +0x010, zeroed by the ctor
+                                  (func_8003E628); OBSERVED (round 13,
+                                  set to `arg1`) by func_8003E770 when
+                                  `arg1->methods->header & 0xF == 4` */
+    u8 pad014[0x030 - 0x014];
+    s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
+                                  13), set from `arg1->unk14` on the same
+                                  `header == 4` path that sets `unk10` */
+    u8 pad034[0x0AC - 0x034];
     Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: func_8003E628 (round 13,
                                   set from `func_8001CA94()`, a
                                   `New_Class6B5CC` allocator, `code_d294.c`)
@@ -1012,7 +1042,11 @@ struct BasicClassMethodsCC8C {
     void (*slot0C)(void *self); /* +0x00C, IS BasicClass__func_17f2c
                                   (code_8220.c, "finalize"); OBSERVED:
                                   func_8003E6CC (round 13) */
-    u8 pad010[0x018 - 0x010];
+    void (*slot10)(void *self, void *child); /* +0x010, IS
+                                  BasicClass__func_17f98 (code_8220.c,
+                                  "addChild"); OBSERVED: func_8003E770
+                                  (round 13) */
+    u8 pad014[0x018 - 0x014];
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
