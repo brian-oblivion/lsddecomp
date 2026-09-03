@@ -91,7 +91,11 @@ void func_8004DABC(Class86B60 *self)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DB18);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DC08);
+void func_8004DC08(Class86B60 *self)
+{
+    self->unkB0->methods->release(self->unkB0);
+    func_8003DFBC()->slotDC(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DC64);
 

@@ -1044,7 +1044,11 @@ struct Class86B60 {
      * change). */
     GenericReleaseObj_3bb8c_d *unkA8; /* +0x0A8, func_8004D704: released iff unkAC != NULL */
     GenericReleaseObj_3bb8c_d *unkAC; /* +0x0AC, func_8004D578: zeroed; func_8004D704: guards both releases */
-    u8 pad0B0[0x0BC - 0x0B0];
+    /* +0x0B0, func_8004DC08: a third owned sub-object, released
+     * unconditionally (no null check) through the same shared `release`
+     * slot as `unkA8`/`unkAC`. */
+    GenericReleaseObj_3bb8c_d *unkB0;
+    u8 pad0B4[0x0BC - 0x0B4];
     s32 unkBC;                      /* +0x0BC, func_8004D578: return value of dreamSys->methods->slot1B0 */
     s32 unkC0;                      /* +0x0C0, func_8004D578: output buffer address passed BY REFERENCE
                                         to dreamSys->methods->slot1B0 -- last word of the 0xC4-byte
@@ -1152,6 +1156,10 @@ struct BaseTaskCtorTable_3bb8c_c {
      * only. Distinct from `Class86B60Methods::slot94` (see
      * func_8004D9D4's report) -- same offset number, unrelated table. */
     void (*slot94)(void *self);
+    u8 pad098[0x0DC - 0x098];
+    /* +0x0DC, func_8004DC08's own last call, `self` only, right after
+     * releasing `Class86B60::unkB0`. */
+    void (*slotDC)(void *self);
 };
 
 extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
