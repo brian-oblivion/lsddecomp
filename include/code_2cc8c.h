@@ -30,6 +30,10 @@ typedef struct Unk48Obj Unk48Obj;
 typedef struct Unk48ObjMethods Unk48ObjMethods;
 typedef struct Unk78Obj Unk78Obj;
 typedef struct Unk78ObjMethods Unk78ObjMethods;
+typedef struct Unk74Obj Unk74Obj;
+typedef struct Unk74ObjMethods Unk74ObjMethods;
+typedef struct Unk64Elem Unk64Elem;
+typedef struct Unk64ElemMethods Unk64ElemMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -94,7 +98,13 @@ struct Unk4CObj {
     s32 unkC;            /* +0x00C, OBSERVED: func_8003CA1C */
     u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
                               address only (func_8003C63C, not attempted) */
-    u8 pad13[0x024 - 0x013];
+    u8 pad13[0x018 - 0x013];
+    void **unk18;          /* +0x018, OBSERVED: func_8003D3B0, an array of
+                               pointers indexed by an Obj86B60 index and
+                               null-checked (never dereferenced) -- a
+                               registration slot table, one entry per index
+                               tracked by Obj86B60->unk58/unk50 */
+    u8 pad01C[0x024 - 0x01C];
     void **unk24;         /* +0x024, OBSERVED: func_8003CA1C, word-pointer
                               array indexed by self->unk58 */
 };
@@ -120,6 +130,63 @@ struct Unk78ObjMethods {
 };
 struct Unk78Obj {
     Unk78ObjMethods *methods; /* +0x000 */
+};
+
+/* self->unk74's pointee ("sub-resource handle"). Only func_8003CDE0 touches
+ * it, loaded via `func_8003B39C(path)` (already matched, `class_39e08.c`,
+ * where it returns the unit's own local view `SubObjG *` -- this unit keeps
+ * its own local view of the same table per the project's established
+ * multiple-independent-local-views convention). slot4's return value is
+ * discarded at its one call site here, so it is typed `void *` rather than
+ * copying `class_39e08.h`'s `SubObjG *` return type -- a discarded return is
+ * never evidence of the callee's real return type (see
+ * DECOMPILATION_LEARNINGS), and this unit has no use for the more specific
+ * type. */
+struct Unk74ObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk74Obj *self);  /* +0x004 */
+    u8 pad008[0x05C - 0x008];
+    void (*slot5C)(Unk74Obj *self);  /* +0x05C */
+    u8 pad060[0x078 - 0x060];
+    void (*slot78)(Unk74Obj *self);  /* +0x078 */
+};
+struct Unk74Obj {
+    Unk74ObjMethods *methods;        /* +0x000 */
+};
+
+extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
+                                                       class_39e08.c; local
+                                                       view retyped to this
+                                                       unit's own Unk74Obj */
+
+extern void *func_80017B34(s32 size);   /* allocator, confirmed across many
+                                            units */
+extern void func_80017CFC(void *ptr);   /* matching free/release, confirmed
+                                            void-returning in code_171e0.h
+                                            and Entity.h */
+extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
+                                                    this project; typed from
+                                                    func_8003D6D4's own call
+                                                    site only */
+
+/*
+ * self->unk64[idx]'s pointee, as walked by func_8003D980 -- a DIFFERENT
+ * reading of the same field func_8003D6D4/func_8003DDC8/func_8003DE30 use
+ * as an opaque resource handle. func_8003D980 reinterprets that handle as
+ * `Unk64Elem **` (an array of `self->unk5C[idx]` object pointers) and
+ * dispatches through each element's own +0x0B8 slot. Both readings are
+ * kept -- the field itself stays `void **` in `Obj86B60` (the generic,
+ * more common usage) and this function alone casts locally, per this
+ * project's "empty-bodied vtable occupant is not evidence the SLOT takes
+ * no arguments" family of narrow-evidence cautions applied to a field
+ * instead of a slot.
+ */
+struct Unk64ElemMethods {
+    u8 pad000[0x0B8];
+    void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
+};
+struct Unk64Elem {
+    Unk64ElemMethods *methods; /* +0x000 */
 };
 
 /*
@@ -210,6 +277,13 @@ struct Obj86B60Methods {
     s32 (*slot118)(Obj86B60 *self);                 /* +0x118, external
                                                        (func_8003DFA0);
                                                        OBSERVED: func_8003C944 */
+    void (*slot11C)(Obj86B60 *self, s32 a1, s32 a2); /* +0x11C, external;
+                                                       OBSERVED:
+                                                       func_8003DDC8,
+                                                       func_8003DE30 (both
+                                                       call it with a
+                                                       computed index value
+                                                       and a literal 1) */
 };
 
 /*
@@ -242,11 +316,36 @@ struct Obj86B60 {
     u8 pad044[0x048 - 0x044];
     Unk48Obj *unk48;            /* +0x048, func_8003C7B4 only */
     Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
-    u8 pad050[0x058 - 0x050];
+    s32 unk50;                  /* +0x050, func_8003D3B0: capacity/wrap
+                                    bound for the unk58 index into
+                                    unk4C->unk18[] */
+    u8 pad054[0x058 - 0x054];
     s32 unk58;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
-    u8 pad05C[0x078 - 0x05C];
+    s32 *unk5C;                  /* +0x05C, array indexed by unk58: a
+                                     per-slot capacity/bound.
+                                     func_8003D6D4 passes unk5C[unk58] as
+                                     func_800183DC's 2nd arg (raw register,
+                                     type doesn't affect those bytes);
+                                     func_8003DDC8/func_8003DE30 use it as
+                                     an explicit upper bound compared
+                                     against unk60[unk58], which is what
+                                     settles it as a count, not a pointer */
+    s32 *unk60;                   /* +0x060, array indexed by unk58: a
+                                     per-slot running count, incremented
+                                     (wrapping to 0 past unk5C[unk58]) by
+                                     func_8003DDC8 and decremented
+                                     (wrapping to unk5C[unk58]-1 below 0) by
+                                     func_8003DE30 -- a ring-buffer index */
+    void **unk64;                /* +0x064, func_8003D6D4: array indexed by
+                                     unk58, giving func_800183DC's 1st arg
+                                     and func_80017CFC's arg */
+    u8 pad068[0x070 - 0x068];
+    const char *unk70;          /* +0x070, func_8003CDE0: truthy gate and a
+                                    cache of the path last passed to
+                                    func_8003B39C */
+    Unk74Obj *unk74;            /* +0x074, func_8003CDE0 only */
     Unk78Obj *unk78;             /* +0x078, func_8003CC2C only */
     u8 pad07C[0x084 - 0x07C];
     s32 unk84;                  /* +0x084, func_8003CC2C: multiplied
