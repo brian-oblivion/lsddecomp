@@ -93,7 +93,10 @@ void func_8003F244(Unk18Obj *self, s32 a1) {
     self->unkB8 = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F24C);
+/* Plain no-arg getter for Unk18Obj's own vtable. */
+Unk18ObjMethods *func_8003F24C(void) {
+    return &D_8006E8E4;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003F25C);
 
