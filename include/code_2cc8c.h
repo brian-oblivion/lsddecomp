@@ -482,6 +482,15 @@ struct Unk18ObjMethods {
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
                                                     func_8003E6CC (round 13) */
 };
+/* Round 14 (code_2cc8c_d): a plain 2-word record, copied as one whole-
+   struct assignment (see Unk18Obj::unk34/unk38, func_8003EA0C) --
+   MEASURED, retail loads both source words before storing either, ruling
+   out sequential per-field copies same as the SByte3_d294 tell below. */
+typedef struct Pair32_d294 {
+    s32 a;
+    s32 b;
+} Pair32_d294;
+
 /* Round 13 (code_2cc8c_d): a 3-signed-byte record, copied as one whole-
    struct assignment (see Unk18Obj::unk58/unk5B). */
 typedef struct SByte3_d294 {
@@ -505,7 +514,10 @@ struct Unk18Obj {
     s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
-    u8 pad034[0x03C - 0x034];
+    /* +0x034, round 14 (func_8003EA0C): copied wholesale from a caller-
+       supplied Pair32_d294 -- MEASURED, retail loads both source words
+       before storing either, ruling out sequential per-field stores. */
+    Pair32_d294 unk34;
     /* +0x03C..+0x048, round 13 (code_2cc8c_d): four plain field setters
        (func_8003EA24/EA2C/EA48/EA64), all `sw $a1, N($a0)` or the same
        guarded by `if (self->unk70 == 0)`. No further evidence of real
@@ -570,6 +582,7 @@ extern Unk18Obj *func_8003E5D8(void); /* this unit's own New_X allocator for
    occupants this unit carves. Trivial setters/getters typed straight to
    Unk18Obj's own newly-discovered fields above; see the field comments
    for what each was OBSERVED from. */
+void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);
 void func_8003EA48(Unk18Obj *self, s32 a1);

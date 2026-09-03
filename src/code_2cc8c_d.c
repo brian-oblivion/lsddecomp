@@ -5,7 +5,9 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E8B8);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E968);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EA0C);
+void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair) {
+    self->unk34 = *pair;
+}
 
 void func_8003EA24(Unk18Obj *self, s32 a1) {
     self->unk3C = a1;
