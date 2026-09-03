@@ -1,4 +1,5 @@
 #include "common.h"
+#include "code_8220.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018288);
 
@@ -7,7 +8,12 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_b", BasicClass__func_182cc);
 void BasicClass__func_18350(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", BasicClass__func_18358);
+void BasicClass__func_18358(BasicClass *self, void *arg1, s32 arg2)
+{
+    if (arg2 == 1) {
+        self->methods->removeChild(self, (BasicClass *)arg1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018390);
 
