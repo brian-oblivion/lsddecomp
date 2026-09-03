@@ -96,7 +96,28 @@ void func_800628D4(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80062970);
+extern u8 D_80089DFC[];
+extern u8 D_80089C64[];
+
+void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
+    void (*fn)(Entity *self, s32 arg1, void *arg2);
+    void *table;
+
+    if (this->unkF4 != 0) {
+        this->methods->slot12C(this);
+        if (this->unk84 == this->unk80 - 1) {
+            this->methods->slot130(this);
+            fn = (void (*)(Entity *, s32, void *))this->methods->slot48;
+            table = D_80089DFC;
+            fn(this, 0, table);
+        }
+    } else {
+        this->methods->slot130(this);
+        fn = this->methods->slot44;
+        table = D_80089C64;
+        fn(this, 0, table);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80062A40);
 
