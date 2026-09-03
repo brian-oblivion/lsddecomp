@@ -145,7 +145,9 @@ struct Unk94Methods {
     s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
     u8 pad104[0x130 - 0x104];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
-    u8 pad134[0x200 - 0x134];
+    u8 pad134[0x1A0 - 0x134];
+    s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
+    u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(Unk94Obj *self);            /* called by func_8005E160, compared against the literal 5 -- value-returning, not void */
 };
 
