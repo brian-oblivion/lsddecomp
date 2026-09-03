@@ -111,7 +111,28 @@ void func_8003D444(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D4DC);
+void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
+{
+    s32 idx;
+    Unk64Elem *elemB;
+    Unk64Elem *elemA;
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    idx = self->unk58;
+    elemB = self->unk54[idx];
+    elemA = self->unk54[a1];
+    if (idx >= 0) {
+        elemB->methods->slotB8(elemB, self->unk4C->unk10);
+    }
+    elemA->methods->slotB8(elemA, (u8 *)self->unk4C + 0x13);
+    self->unk58 = a1;
+    if (a2 != NULL) {
+        self->methods->slot70(self, 0);
+    }
+    self->methods->slot60(self, 9);
+}
 
 s32 func_8003D5C0(Obj86B60 *self)
 {
