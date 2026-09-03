@@ -168,10 +168,14 @@ fail:
 }
 
 #if 0
-/* STALL snapshot -- see docs/match-reports/func_8005CBC8.md. Best reached:
- * every instruction matches retail except ONE, in the sel<0 preamble (the
- * function is 4 bytes / one word short). Every reshaping tried compiles
- * this identically; see the report for the full list attempted.
+/* STALL snapshot -- see docs/match-reports/func_8005CBC8.md. This body is
+ * TWO words short, and one of those two words is the addiu-at jump-table
+ * folding blocker (docs/research/addiu-at-blocker.md): retail's switch
+ * dispatch is the UNFOLDED four, the pinned pipeline emits the FOLDED
+ * three. So this function is UNMATCHABLE as C no matter how it is
+ * reshaped. The remaining word is retail's redundant `j` over the
+ * switch-index join, a GCC block-ordering preference; see the report.
+ * `~sel + 1` (NOT `-sel`) is what reproduces retail's `nor`+`addiu`.
  */
 bool func_8005CBC8(s32 value, TriggerRecord *record)
 {
@@ -186,7 +190,7 @@ bool func_8005CBC8(s32 value, TriggerRecord *record)
         if (record->unk0 != 0) {
             return false;
         }
-        idx = -sel;
+        idx = ~sel + 1;
         goto have_idx;
     }
     idx = sel;

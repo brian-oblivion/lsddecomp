@@ -1,4 +1,26 @@
-# func_8005CBC8 -- STALL (extremely close: 1 word / 4 bytes short)
+# func_8005CBC8 -- STALL (addiu-at jump-table blocker, 2 words short)
+
+> **HEAD CORRECTION, round 13 (2026-09-03).** This report was filed as
+> "extremely close: 1 word / 4 bytes short", cause attributed to an
+> instruction-selection preference in the `sel<0` preamble. Re-measured with
+> asm-differ: the body is **TWO** words short, and one of the two is
+> `addiu $at, $at, %lo(jtbl_8001188C)` -- the **`addiu-at` jump-table folding
+> blocker** (`docs/research/addiu-at-blocker.md`). Retail's switch dispatch is
+> the UNFOLDED four (`lui $at` / `addiu $at` / `addu $at` / `lw 0($at)`); the
+> pinned pipeline emits the FOLDED three (`lui $at` / `addu $at` /
+> `lw %lo(...)($at)`). **This function cannot be matched as C under the pinned
+> toolchain regardless of source shape**, so it is a blocked function, not a
+> near-miss, and it should not be staffed again until that blocker is resolved.
+>
+> The tell was in this report's own file all along and was never run:
+> `grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_4cd08/func_8005CBC8.s`
+> hits at line 66. CLAUDE.md's screen says in terms that a `%lo(jtbl_*)` hit
+> counts; the screen was not applied to this function because it had already
+> been reasoned about as a preamble problem. **The blocker screen is a
+> precondition for a stall classification, not just for assignment.**
+>
+> One correction to the report's own accounting, though, went the other way:
+> the preamble residue IS partly reachable, and the fix is below.
 
 Unit `code_4cd08` ("DreamAux"). Restored to `INCLUDE_ASM`; no C left in
 `src/`. Owns the `0x206C` rodata slot's jump table (`jtbl_8001188C`, 20
@@ -6,11 +28,20 @@ entries) -- untouched, stays embedded in `asm/nonmatchings/code_4cd08/func_8005C
 since the function reverted to `INCLUDE_ASM`.
 
 Every branch target and every case body in this ~100-word, 20-case switch
-function matches retail byte-for-byte **except one instruction**, in the
-three-way preamble that computes the switch index. The function is
-consistently 4 bytes (one word) shorter than retail across every source
-shape tried, confirmed via `./build-and-verify.sh`'s whole-image diff
-staying at a constant byte count regardless of which equivalent C was used.
+function matches retail byte-for-byte. The residue is **two instructions**:
+one in the `sel<0` preamble that computes the switch index, and one in the
+`switch` DISPATCH itself -- the latter being the `addiu-at` folding blocker,
+which is what makes the function unmatchable. The body is 8 bytes / two
+words shorter than retail.
+
+The original text here read "except one instruction ... consistently 4
+bytes (one word) shorter ... confirmed via `build-and-verify.sh`'s
+whole-image diff staying at a constant byte count". That method is what
+produced the wrong count: compiling this `switch` from C replaces the `.s`
+file's embedded `jtbl_8001188C` with GCC's own copy, relocating rodata and
+shifting the entire image, so the whole-image byte count is dominated by
+drift and cannot size a per-function residue at all. asm-differ's
+inserted/deleted markers can, and they say two.
 
 ## What it does
 
@@ -34,7 +65,7 @@ when `record->unk0` (offset `0x0`, signed byte) is nonzero, else
 
 On any success path, `record->unk0` is set to `1` before returning `true`.
 
-## Near-miss body (compiles, builds green, 1 word short)
+## Best body (compiles, builds green, 2 words short -- one of them the blocker)
 
 ```c
 #include "common.h"
@@ -53,7 +84,7 @@ bool func_8005CBC8(s32 value, TriggerRecord *record)
         if (record->unk0 != 0) {
             return false;
         }
-        idx = -sel;
+        idx = ~sel + 1;
         goto have_idx;
     }
     idx = sel;
@@ -148,7 +179,9 @@ j    <epilogue>            ; unk0 != 0 -> return false
  ...
 ```
 
-Every C shape tried here compiles to the same, SHORTER sequence:
+Every C shape tried in the ORIGINAL round compiled to the same, SHORTER
+sequence (this is the pre-correction baseline; see the round-13 note below
+for what the `negu` line should have been):
 
 ```
 lb   a0, 1(s0)
@@ -166,13 +199,35 @@ negu a1, a0                  ; single instruction, not nor+addiu
  ...
 ```
 
-Both compute the identical value in `a1`/`idx` and reach the identical
-`<join>` point with identical live registers -- this is a real, provably
-correct compilation of the same algorithm, just more efficient than
-retail's (retail keeps an extra, avoidable `j`+delay-slot pair that a
-"smarter" codegen would drop). GCC 2.6.3 apparently always prefers the
-efficient form for this exact shape; no C-level reshaping tried made it
-choose the less-efficient one.
+**Round 13 correction: half of this residue WAS reachable.** The `negu`
+-vs- `nor`+`addiu` half is a source-shape difference, not a codegen
+preference. Retail computes the negation as `nor $v0, $zero, $a0` followed
+by `addiu $a1, $v0, 1` -- literally `~sel + 1`, in two instructions.
+Writing `idx = -sel;` gets GCC 2.6.3's single `negu`; writing
+`idx = ~sel + 1;` gets retail's `nor` + `addiu` exactly. All seven attempts
+below used `-sel`, so none of them could reach it. With `~sel + 1` the
+preamble residue collapses to a single word.
+
+What is left after that, and is NOT reachable, is retail's redundant `j`
+over the switch-index join. Retail lays the `sel>=0` block FIRST (so it
+must jump over the `sel<0` continue block to reach the join); GCC lays the
+`sel<0` continue block first and lets `sel>=0` fall through. Two further
+round-13 attempts on exactly this:
+
+- **Polarity** (`if (unk0 == 0) { idx = ~sel + 1; goto have_idx; } return
+  false;`, matching retail's `beqz`-to-continue) -- byte-identical output to
+  the `!= 0` early-return form. Confirms this report's attempt (4): GCC
+  canonicalizes the branch direction and the polarity is not a lever.
+- **Block order** (`if (sel >= 0) { idx = sel; goto have_idx; }` first, so
+  the `~sel + 1` block sits adjacent to the join, which is retail's own
+  layout) -- **worse, 3 words short.** GCC hoisted `move $a1, $a0` into the
+  `bgez` delay slot and dropped both the `j` and its `nop`. Reproducing
+  retail's block ORDER in the source made the compile MORE compact, not
+  less.
+
+So the standing residue is exactly two words: one blocker, one
+block-ordering preference. Since the blocker alone makes the function
+unmatchable, the remaining word is not worth further attempts.
 
 ## What was tried (all produced the IDENTICAL compiled result unless noted)
 
@@ -214,7 +269,30 @@ is genuinely an instruction-selection/scheduling choice, not a wrong CFG.
    confirmed via the whole-image byte-drift count going from 85827 to
    88204 bytes).
 
-## Proposed learning
+## Proposed learnings
+
+- **`~x + 1` and `-x` are NOT interchangeable source shapes for GCC 2.6.3.**
+  `-x` compiles to a single `negu`; `~x + 1` compiles to `nor` + `addiu`.
+  Where retail shows `nor $vN, $zero, $rX` followed by `addiu $rY, $vN, 1`,
+  the source said `~x + 1` and no amount of reshaping around a `-x` will
+  reach it. Generally: **read retail's CHOICE OF INSTRUCTIONS as evidence
+  about the source expression**, not only its control flow. A two-instruction
+  encoding of something the compiler can do in one is usually the source
+  spelling it out.
+
+- **Run the blocker screen before accepting a stall CLASSIFICATION, not just
+  before assigning work.** This report attributed a residue to instruction
+  selection while an `addiu $at, $at, %lo(jtbl_*)` hit sat unexamined in the
+  same `.s` file. A stall report's cause is the thing the next round acts on,
+  so a misattributed cause is more expensive than a wrong score: it turns a
+  blocked function into a permanent near-miss that keeps attracting attempts.
+
+- **A residue count is a measurement, and "1 word short" was wrong by one.**
+  The whole-image byte-drift number this report used to size the residue
+  counts rodata relocation too -- compiling a `switch` from C replaces the
+  `.s` file's embedded jump table with GCC's own, which shifts the whole
+  image and swamps the signal. Size a per-function residue with asm-differ's
+  inserted/deleted instruction markers, never with the whole-image count.
 
 - **Not every "retail keeps a redundant jump that a smarter compile would
   drop" residue is reachable by reshaping the surrounding conditional.**
