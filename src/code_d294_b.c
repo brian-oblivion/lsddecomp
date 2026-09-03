@@ -29,9 +29,58 @@ s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
     return func_8001EDAC(&self->unk10, 8, 1, a1 == 0) == 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D4DC);
+/* self->unk14->unk44 is a 0x28-byte heap block whose +0x10 holds an
+ * S16Quad_d294 (see include/code_d294.h). a2 selects between negating x/y/z
+ * into a local copy (the 4th short left uninitialised, exactly as retail's
+ * own negate path never stores to it) or copying the quad verbatim, then
+ * forwards the result -- plus a1, passed straight through -- to the PsyQ
+ * helper func_800160B0. */
+void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
+    S16Quad_d294 buf;
+    S16Quad_d294 *src = &self->unk14->unk44->vec;
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D568);
+    if (a2) {
+        buf.x = -src->x;
+        buf.y = -src->y;
+        buf.z = -src->z;
+    } else {
+        buf = *src;
+    }
+    func_800160B0(&buf, a1);
+}
+
+/* a1 gates a small range (2 <= a1 < 4). When self->unk20 is set and
+ * func_8001F3A4(self->unk20) reports true, fills a stack buffer through
+ * this class's own +0x8C slot (func_8001D600, already matched in this
+ * unit -- fills it via func_8001F51C(self->unk20, dest)) then forwards
+ * that same buffer, retyped as a GenericCountList_d294, into +0x90
+ * (func_8001D624, also already matched in this unit), with the original
+ * a1 passed through as func_8001D624's own a2. */
+void func_8001D568(Class6B5CCObj *self, s32 a1) {
+    /* Sized to reproduce retail's own frame (0x58): func_8001D600's own
+     * target (func_8001F51C, PsyQ, asm/psyq_GsLinkObject4.s, not
+     * decompiled here) fills fields out past +0x32 of its own `dest`
+     * argument, so the true destination struct is bigger than the 8 bytes
+     * GenericCountList_d294 alone would reserve -- not derived beyond its
+     * size, since the field layout past what func_8001D624 itself reads
+     * (+0x0/+0x4) is PsyQ-internal. */
+    u8 buf[0x38];
+
+    if (a1 >= 4) {
+        return;
+    }
+    if (a1 < 2) {
+        return;
+    }
+    if (self->unk20 == NULL) {
+        return;
+    }
+    if (!func_8001F3A4(self->unk20)) {
+        return;
+    }
+    self->methods->slot8C(self, buf);
+    self->methods->slot90(self, (GenericCountList_d294 *)buf, a1);
+}
 
 /* Forwards self->unk20 (still opaque, retyped `void *` this round -- see
  * include/code_d294.h) and its own 2nd argument straight through to
@@ -78,9 +127,39 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
     }
 }
 
+/* Range-checks `other` against `self` (each axis of position difference
+ * must fit in +/-0x4000), then hands off to three vtable slots
+ * (+0xA4 = func_8001D950, +0xA8 = func_8001DA28, +0xAC = func_8001DDF4)
+ * with the resulting Vec3S16 difference, before registering `other` into
+ * self->unk28 and notifying it via its own +0x038 slot. */
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D950);
+/* Fills buf1 from self's own +0x84 slot, then folds in every node of the
+ * self->unkC list (each node's own +0x84 slot combined into buf1 via
+ * func_80015BFC) before using buf1 as func_8001EE04's own "out" argument,
+ * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
+ * arg1 is non-NULL. */
+void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
+    u8 buf2[0x20];
+    u8 buf1[0x20];
+    UnkOwner_d294 *node;
+
+    self->methods->slot84(self, buf1, 1);
+
+    node = self->unkC;
+    if (node != NULL) {
+        do {
+            node->methods->slot84(node, buf2, 1);
+            func_80015BFC(buf2, buf1);
+            node = node->next;
+        } while (node != NULL);
+    }
+
+    func_8001EE04(arg2, arg3, count, buf1);
+    if (arg1 != NULL) {
+        func_8001EE04(arg1, arg1, 1, buf1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
 
@@ -88,7 +167,61 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E110);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E2E8);
+/* Bisects the segment [near, far] against `box` until the midpoint exactly
+ * equals one endpoint, writing the running midpoint into `out` every
+ * iteration (the caller's real result is whatever `*out` holds when this
+ * returns). Each iteration computes an outcode (`flags`, matching the
+ * project's already-confirmed `u8`-flags idiom -- an explicit `andi
+ * $v0,$v1,0xFF` re-mask appears in retail wherever `flags` is read back)
+ * from `box` against the midpoint; a non-zero outcode means the midpoint
+ * overshot, so it becomes the new `far`, otherwise it becomes the new
+ * `near` -- each written into one of two ping-pong stack buffers so the
+ * OTHER endpoint's storage is never disturbed. */
+void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
+    Vec3S16_d294 buf0;
+    Vec3S16_d294 buf1;
+    Vec3S16_d294 *dst;
+    u8 flags;
+
+    for (;;) {
+        out->x = (near->x + far->x) >> 1;
+        out->y = (near->y + far->y) >> 1;
+        out->z = (near->z + far->z) >> 1;
+
+        if (out->x == near->x && out->y == near->y && out->z == near->z) {
+            return;
+        }
+        if (out->x == far->x && out->y == far->y && out->z == far->z) {
+            return;
+        }
+
+        flags = 0;
+        if (box->hi.x < out->x) {
+            flags = 8;
+        } else if (out->x < box->lo.x) {
+            flags = 4;
+        }
+        if (box->hi.y < out->y) {
+            flags |= 2;
+        } else if (out->y < box->lo.y) {
+            flags |= 1;
+        }
+        if (box->hi.z < out->z) {
+            flags |= 0x20;
+        } else if (out->z < box->lo.z) {
+            flags |= 0x10;
+        }
+
+        if (flags != 0) {
+            dst = &buf1;
+            far = dst;
+        } else {
+            dst = &buf0;
+            near = dst;
+        }
+        *dst = *out;
+    }
+}
 
 void func_8001E49C(void) {
 }

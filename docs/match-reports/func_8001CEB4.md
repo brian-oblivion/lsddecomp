@@ -61,11 +61,11 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
     vals[1] /= 360;
     vals[2] /= 360;
     dst = self->unk14->unk44;
-    field = &dst->unk10;
+    field = &dst->vec.x;
     if (flag) {
-        dst->unk10 = vals[0];
-        dst->unk12 = vals[1];
-        dst->unk14 = vals[2];
+        dst->vec.x = vals[0];
+        dst->vec.y = vals[1];
+        dst->vec.z = vals[2];
     } else {
         s32 i;
 
@@ -95,11 +95,11 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
     vals[1] /= 360;
     vals[2] /= 360;
     dst = self->unk14->unk44;
-    field = &dst->unk10;
+    field = &dst->vec.x;
     if (flag) {
-        dst->unk10 = vals[0];
-        dst->unk12 = vals[1];
-        dst->unk14 = vals[2];
+        dst->vec.x = vals[0];
+        dst->vec.y = vals[1];
+        dst->vec.z = vals[2];
     } else {
         s32 i;
 
@@ -121,7 +121,7 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
   (magic `0xB60B60B7`, shift 8 -- verified against the pinned `cc1`,
   `int f(int x){return x/360;}` reproduces the exact `mult`/`mfhi`/
   `addu`/`sra 8`/`sra 31`/`subu` sequence byte-for-byte).
-- `flag != 0`: overwrite `dst->unk10/unk12/unk14` (three new `s16` fields
+- `flag != 0`: overwrite `dst->vec.x/unk12/unk14` (three new `s16` fields
   on `Class6B5CCSub44`, see below) directly with the divided values
   (truncated to 16 bits on store, same as `func_8001D008`'s `(s16)`-cast
   pattern but here implicit via the destination's own `s16` type).
@@ -132,7 +132,7 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
   exactly (verified against the pinned `cc1`: `int f(int x){return x %
   4096;}` matches byte-for-byte -- this is C's own truncating-toward-zero
   `%`, not a floor-mod, despite superficially resembling one).
-- **The `field = &dst->unk10;` pointer must be computed UNCONDITIONALLY,
+- **The `field = &dst->vec.x;` pointer must be computed UNCONDITIONALLY,
   before the `if`, not inside the `else` branch alone** -- moving it
   outside fixed an early residue (retail materializes it in the `beqz`
   branch's own delay slot, i.e. on both paths, even though only the
@@ -169,3 +169,17 @@ something upstream in the SAME function was 8 bytes too long. Screening
 both patterns before starting would have saved the derivation time (though
 not wasted, since the derived body is complete and correct pending the
 flag).
+
+## Head note, round 13: field names in the body above were retargeted
+
+`Class6B5CCSub44`'s `unk10`/`unk12`/`unk14` no longer exist under those
+names. Runner delta, matching `func_8001D4DC` in the sibling unit
+`code_d294_b` in the same round, measured that same byte range as an
+`S16Quad_d294` and named it `vec`. The head unified the two views on
+delta's, since a struct copy through `vec` is what an already-MATCHED
+function uses, and updated the preserved body above to `vec.x`/`vec.y`/
+`vec.z` so that it still compiles as preserved (project rule: a preserved
+body must compile where it sits, with every declaration it needs).
+
+`vec.w` at +0x016 exists too, and is a byte range this report had recorded
+as still opaque. Nothing else about the derivation changes.
