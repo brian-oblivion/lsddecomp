@@ -32,6 +32,8 @@ typedef struct Unk78Obj Unk78Obj;
 typedef struct Unk78ObjMethods Unk78ObjMethods;
 typedef struct Unk74Obj Unk74Obj;
 typedef struct Unk74ObjMethods Unk74ObjMethods;
+typedef struct Unk64Elem Unk64Elem;
+typedef struct Unk64ElemMethods Unk64ElemMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -160,6 +162,26 @@ extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
                                                     this project; typed from
                                                     func_8003D6D4's own call
                                                     site only */
+
+/*
+ * self->unk64[idx]'s pointee, as walked by func_8003D980 -- a DIFFERENT
+ * reading of the same field func_8003D6D4/func_8003DDC8/func_8003DE30 use
+ * as an opaque resource handle. func_8003D980 reinterprets that handle as
+ * `Unk64Elem **` (an array of `self->unk5C[idx]` object pointers) and
+ * dispatches through each element's own +0x0B8 slot. Both readings are
+ * kept -- the field itself stays `void **` in `Obj86B60` (the generic,
+ * more common usage) and this function alone casts locally, per this
+ * project's "empty-bodied vtable occupant is not evidence the SLOT takes
+ * no arguments" family of narrow-evidence cautions applied to a field
+ * instead of a slot.
+ */
+struct Unk64ElemMethods {
+    u8 pad000[0x0B8];
+    void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
+};
+struct Unk64Elem {
+    Unk64ElemMethods *methods; /* +0x000 */
+};
 
 /*
  * self->methods. Only the slots this unit's functions actually CALL
