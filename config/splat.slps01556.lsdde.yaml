@@ -82,7 +82,30 @@ segments:
       # carve of this block (code_2cc8c_b -> code_2cc8c_c in round 11), so
       # the owning function is named here rather than the segment.
       - [0x1890, .rodata, code_2cc8c]
-      - [0x1908, rodata]   # jtbl_80011108 -> func_8003FB1C, in the asm remainder
+      # 0x1908 holds jtbl_80011108, func_8003FB1C's jump table. ATTACHED to
+      # code_2cc8c_e in round 14 when that segment was carved: its words are
+      # `.L` labels LOCAL to func_8003FB1C's own .s file, which a standalone
+      # rodata object cannot see, so the link failed with
+      # `undefined reference to '.L8003FB98'` exactly as Gate 2 predicts.
+      # func_8003FB1C itself stays INCLUDE_ASM (addiu-$at blocked), and the
+      # attach is still required -- being INCLUDE_ASM does not embed the
+      # table, it only assembles the text.
+      # SPLIT, not attached whole -- a new Gate 2 sub-case found in round 14.
+      # The slot 0x1908..0x19DC holds BOTH unit-local rodata and rodata owned
+      # by a DIFFERENT segment:
+      #   0x1908 jtbl_80011108  -> func_8003FB1C   (code_2cc8c_e)
+      #   0x1994 D_80011194     -> func_8003FC70   (code_2cc8c_e)
+      #   0x19B4 D_800111B4     -> asm/psyq_memset.s
+      #   0x19C8 D_800111C8     -> asm/psyq_memset.s
+      # Attaching the WHOLE slot to code_2cc8c_e fixed the jump table's
+      # `undefined reference to '.L8003FB98'` and immediately broke
+      # `D_800111B4`/`D_800111C8` instead: with
+      # migrate_rodata_to_functions, an attached slot's symbols migrate into
+      # the OWNING unit's functions, and a symbol referenced only from
+      # another segment has nowhere to migrate to and drops out of the link.
+      # So the slot is split at the ownership boundary.
+      - [0x1908, .rodata, code_2cc8c_e]
+      - [0x19B4, rodata]   # D_800111B4/D_800111C8 -> psyq_memset, NOT ours
       - [0x19DC, rodata]
       - [0x1A90, rodata]
       # jtbl_8001140C -- 10 words, all targets inside func_80049EB4, which
@@ -286,7 +309,24 @@ segments:
       #     attaching when this segment is carved -- that is the
       #     `undefined reference to '.LXXXXXXXX'` failure in Gate 2. Survey
       #     the slot at carve time rather than trusting this comment.
-      - [0x2FAAC, asm, code_2cc8c_e]
+      # code_2cc8c_e / _f: the 60-function code_2cc8c remainder, carved as
+      # two 30-function C units in round 14. Best blocker density of any
+      # uncarved ground measured this round: 2 of 60 (3.3%).
+      #
+      # code_2cc8c_e: #0..#29, 0x2FAAC..0x30E64. Contains BOTH of the
+      # segment's blocked functions, already measured in round 13:
+      #   * func_8003F2AC (0x2FAAC, 242 instructions) -- nop_mflo_mfhi
+      #     blocked AND wants 6 callee-saved registers. The worst function in
+      #     the whole remainder on both screens; do not lead a runner with it.
+      #   * func_8003FB1C (0x3031C) -- addiu-$at blocked, and it owns a real
+      #     jump table (jtbl_80011108). Its rodata slot is declared
+      #     standalone at 0x1908; if the link fails with
+      #     `undefined reference to '.LXXXXXXXX'`, attach it as
+      #     `- [0x1908, .rodata, code_2cc8c_e]`.
+      - [0x2FAAC, c, code_2cc8c_e]
+      # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
+      # data tail). Zero blocked functions.
+      - [0x30E64, c, code_2cc8c_f]
       - [0x3197c, asm, psyq_memset]
       - [0x39c80, asm, psyq_rand]
 
@@ -342,7 +382,41 @@ segments:
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
       - [0x3DA54, c, class_3bb8c_c]
-      - [0x3DF04, asm, class_3bb8c_d]
+      # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
+      # remainder, split into three ~20-function C units in round 14. The
+      # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g
+      # because that is where both remainder hazards live -- see its own
+      # comment below.
+      #
+      # Segment-wide census measured before carving (305 functions):
+      # 70 blocked (23.0%) -- 41 gp_rel, 22 addiu-$at, 1 nop_mflo_mfhi,
+      # 13 `jr $t2` BIOS trampolines; 13 trivial; 23 wanting 5+ callee-saved
+      # registers; 199 clean non-trivial. Chosen over code_179d8, which
+      # re-measured at 43.4% blocked this round -- the round-10 figure held
+      # exactly.
+      #
+      # class_3bb8c_d: #0..#19, 0x3DF04..0x3EBF4.
+      - [0x3DF04, c, class_3bb8c_d]
+      # class_3bb8c_e: #20..#38, 0x3EBF4..0x3F540.
+      - [0x3EBF4, c, class_3bb8c_e]
+      # class_3bb8c_f: #39..#58, 0x3F540..0x403E4.
+      - [0x3F540, c, class_3bb8c_f]
+      # class_3bb8c_g: the remaining ~246 functions, 0x403E4.. -- UNCARVED
+      # deliberately. Both of Gate 2's routine carve hazards are in here and
+      # neither is in the three slices above:
+      #   * All 13 `jr $t2` PSX BIOS trampolines (#75..#91, 0x410E8..0x41398).
+      #     No C compiles to one, so carving them needs an `hasm` segment or
+      #     a literal `.word` disposition DECIDED AT CARVE TIME. An hasm
+      #     segment also means updating .gitignore and
+      #     .claude/hooks/block-asm-edits.sh in the same step, which makes it
+      #     an operator-scale change, not a head one.
+      #   * Five jump-table owners (#59 func_8004FBE4, #64 func_80050034,
+      #     #107 func_800513D0, #134 func_800522DC, #168 func_80053984).
+      #     Expect the `undefined reference to '.LXXXXXXXX'` link failure and
+      #     an `.rodata` attach when this is carved.
+      # The first slice boundary was chosen at #59 precisely so that the
+      # three C units above contain ZERO of either hazard.
+      - [0x403E4, asm, class_3bb8c_g]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
