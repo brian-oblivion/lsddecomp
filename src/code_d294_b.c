@@ -19,7 +19,10 @@ s32 func_8001D450(Class6B5CCObj *self, s32 a1) {
     return func_8001EDAC(&self->unk10, 7, 1, a1 == 0) == 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D480);
+/* Same family as func_8001D424, shift 9 width 3. Raw pass-through. */
+u32 func_8001D480(Class6B5CCObj *self, u32 a1) {
+    return func_8001EDAC(&self->unk10, 9, 3, a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D4AC);
 
