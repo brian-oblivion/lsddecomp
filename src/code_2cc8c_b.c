@@ -29,11 +29,121 @@ void func_8003CDE0(Obj86B60 *self, const char *a1, Unk74Obj *a2)
     self->unk70 = a1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003CE98);
+void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
+{
+    char **list;
+    s32 count;
+    s32 size;
+    Unk64Elem **arr;
+    Unk74Obj *handle;
+    s32 i;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D050);
+    self->unk4C = a1;
+    if (a1 == NULL) {
+        return;
+    }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D194);
+    list = a1->unk1C;
+    count = 0;
+    while (*list++ != NULL) {
+        count++;
+    }
+    size = count * 4;
+    arr = func_80017B34(size);
+    self->unk54 = arr;
+    self->unk5C = func_80017B34(size);
+    self->unk60 = func_80017B34(size);
+    self->unk64 = func_80017B34(size);
+    self->unk50 = count;
+
+    if (a1->unk0 != NULL) {
+        handle = func_8003B39C(a1->unk0);
+        handle->methods->slot78(handle);
+        handle->methods->slot5C(handle);
+    } else {
+        handle = a1->unk4;
+    }
+
+    list = a1->unk1C;
+    i = 0;
+    if (*list != NULL) {
+        do {
+            void *extra = a1->unk24[i];
+            s32 len = func_80013348(*list);
+
+            *arr = func_800408CC(handle, len, *list);
+            arr++;
+            if (extra != NULL) {
+                self->unk58 = i;
+                self->methods->slotF8(self, extra, handle);
+            }
+            list++;
+            i++;
+        } while (*list != NULL);
+    }
+
+    self->unk68 = func_800404D0(D_8008A8E8, D_8008A8F0, 0);
+    a1->unk4 = handle;
+}
+
+void func_8003D050(Obj86B60 *self)
+{
+    Unk64Elem **arr;
+    s32 i;
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    if (self->unk4C->unk0 != NULL) {
+        Unk74Obj *o = self->unk4C->unk4;
+        o->methods->slot4(o);
+    }
+    self->unk68->methods->slot4(self->unk68);
+    arr = self->unk54;
+    for (i = 0; i < self->unk50; arr++) {
+        Unk64Elem *elem;
+
+        if (self->unk4C->unk24[i] != NULL) {
+            self->unk58 = i;
+            self->methods->slotFC(self);
+        }
+        elem = *arr;
+        elem->methods->slot4(elem);
+        i++;
+    }
+    func_80017CFC(self->unk64);
+    func_80017CFC(self->unk60);
+    func_80017CFC(self->unk5C);
+    func_80017CFC(self->unk54);
+}
+
+void func_8003D194(Obj86B60 *self, void *a1)
+{
+    Unk64Elem **arr;
+    u8 *ptr;
+    s32 i;
+
+    if (self->unk4C == NULL) {
+        return;
+    }
+    arr = self->unk54;
+    ptr = self->unk4C->unk20;
+    for (i = 0; i < self->unk50; i++, arr++, ptr += 8) {
+        if (self->unk4C->unk18[i] == NULL) {
+            Unk64Elem *elem = *arr;
+
+            elem->methods->slot4C(elem, a1, ptr);
+            if (self->unk4C->unk24[i] != NULL) {
+                self->unk58 = i;
+                self->methods->slot100(self, a1, 0);
+            }
+        } else {
+            Unk64Elem *elem = *arr;
+
+            elem->methods->slot50(elem);
+        }
+    }
+}
 
 void func_8003D2CC(Obj86B60 *self, void *a1)
 {

@@ -34,6 +34,8 @@ typedef struct Unk74Obj Unk74Obj;
 typedef struct Unk74ObjMethods Unk74ObjMethods;
 typedef struct Unk64Elem Unk64Elem;
 typedef struct Unk64ElemMethods Unk64ElemMethods;
+typedef struct Unk68Obj Unk68Obj;
+typedef struct Unk68ObjMethods Unk68ObjMethods;
 typedef struct SrcDesc SrcDesc;
 
 /*
@@ -94,20 +96,76 @@ typedef struct SrcDesc SrcDesc;
  *    the same slot func_8003CC2C feeds a locally-built 3-byte buffer to).
  */
 struct Unk4CObj {
-    u8 pad000[0x008];
+    const char *unk0;   /* +0x000, OBSERVED: func_8003CE98 (round 12) -- a
+                            path: passed to func_8003B39C(unk0) when
+                            non-NULL to build unk4, mirroring
+                            Obj86B60->unk70's own path-cache idiom. ALSO
+                            OBSERVED (truthy-only) by func_8003D050, which
+                            gates a call through unk4 on this being
+                            non-NULL -- corrects this struct's earlier
+                            header note that nothing ever loads *(unk4C+0);
+                            that was true only of the 16 functions attempted
+                            through round 11. */
+    Unk74Obj *unk4;      /* +0x004, OBSERVED: func_8003CE98 (constructed via
+                            func_8003B39C(unk0) + slot78/slot5C when unk0 is
+                            set, else read as an existing handle and written
+                            back unchanged; same Unk74Obj slot4 interface
+                            Obj86B60->unk74 uses) and func_8003D050 (slot4
+                            called on it, gated by unk0's truthiness) */
     s32 unk8;           /* +0x008, OBSERVED: func_8003C63C (not attempted) */
     s32 unkC;            /* +0x00C, OBSERVED: func_8003CA1C */
     u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
-                              address only (func_8003C63C, not attempted) */
+                              address only (func_8003C63C, not attempted);
+                              CONFIRMED as a 3-byte buffer read (not just
+                              address-taken) by func_8003DCAC/func_8003DE9C,
+                              both already matched, passing it directly to
+                              an Unk64Elem slotB8 call */
     u8 pad13[0x018 - 0x013];
     void **unk18;          /* +0x018, OBSERVED: func_8003D3B0, an array of
                                pointers indexed by an Obj86B60 index and
                                null-checked (never dereferenced) -- a
                                registration slot table, one entry per index
                                tracked by Obj86B60->unk58/unk50 */
-    u8 pad01C[0x024 - 0x01C];
+    char **unk1C;           /* +0x01C, OBSERVED: func_8003CE98 (round 12) --
+                                a NULL-terminated array of C strings, DISTINCT
+                                from unk18 at +0x018 (adjacent field, same
+                                shape, different slot). Walked with
+                                `func_80013348` (strlen) and passed to
+                                `func_800408CC` to build each entry of
+                                Obj86B60->unk54[i]/unk64[i]. */
+    u8 *unk20;               /* +0x020, OBSERVED: func_8003D194 (round 12) --
+                                a pointer walked forward 8 bytes per loop
+                                iteration (an external array of 8-byte
+                                records this unit never reads through
+                                directly, only forwards as func_8003D194's
+                                3rd arg to an Unk64Elem slot4C call) */
     void **unk24;         /* +0x024, OBSERVED: func_8003CA1C, word-pointer
                               array indexed by self->unk58 */
+};
+
+/*
+ * The pointee of Unk4CObj->unk24[idx] (round 12, from func_8003DAD4 and
+ * func_8003D73C, cross-checked against already-matched func_8003DCAC's own
+ * `((s32 *)self->unk4C->unk24[idx])[1]` read at the same +0x004 offset).
+ * Only the three offsets these functions actually touch are modelled;
+ * func_8003DCAC/func_8003DE9C's own `(u8 *)...unk24[idx] + 8` buffer usage
+ * is left as a raw cast in those (already-matched) functions rather than
+ * retrofitted onto this type, per this project's convention of not
+ * editing matched functions to adopt a later, more specific type.
+ */
+typedef struct Unk24Elem Unk24Elem;
+struct Unk24Elem {
+    u8 pad000[0x004];
+    s32 unk4;    /* +0x004, a per-slot counter/index: SET here by
+                    func_8003DAD4, READ back as `newVal` by the
+                    already-matched func_8003DCAC */
+    u8 pad008[0x010 - 0x008];
+    s32 unk10;   /* +0x010 */
+    s32 unk14;   /* +0x014, combined with unk10 and a per-slot counter into
+                    a 2-word stack buffer (`{unk10, unk14 - counter*10}`)
+                    passed by address to an Unk64Elem slotBC call, then
+                    incremented by 10 per loop iteration -- see
+                    func_8003DAD4/func_8003D73C */
 };
 
 /* self->unk48's pointee ("child"). A DIFFERENT class from Obj86B60 -- its
@@ -211,15 +269,73 @@ extern Unk64Elem *func_800408CC(void *ctx, s32 len, char *name); /* not
  * instead of a slot.
  */
 struct Unk64ElemMethods {
-    u8 pad000[0x060];
+    u8 pad000[0x004];
+    void (*slot4)(Unk64Elem *self);            /* +0x004, OBSERVED:
+                                                    func_8003D050 (round 12) */
+    u8 pad008[0x04C - 0x008];
+    void (*slot4C)(Unk64Elem *self, void *a1, void *buf); /* +0x04C,
+                                                    OBSERVED: func_8003D194
+                                                    and func_8003D73C
+                                                    (round 12) -- both pass a
+                                                    raw buffer pointer as the
+                                                    3rd arg (an 8-byte-stride
+                                                    external record in
+                                                    func_8003D194, the
+                                                    address of a 2-word stack
+                                                    pair in func_8003D73C),
+                                                    so `buf` stays untyped */
+    void (*slot50)(Unk64Elem *self);            /* +0x050, OBSERVED:
+                                                    func_8003D73C (round 12) */
+    u8 pad054[0x060 - 0x054];
     void (*slot60)(Unk64Elem *self, s32 a1);   /* +0x060, OBSERVED:
                                                     func_8003DCAC */
     u8 pad064[0x0B8 - 0x064];
     void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
+    void (*slotBC)(Unk64Elem *self, void *a1); /* +0x0BC, OBSERVED:
+                                                    func_8003DAD4 (round 12),
+                                                    address of a 2-word
+                                                    stack pair */
 };
 struct Unk64Elem {
     Unk64ElemMethods *methods; /* +0x000 */
 };
+
+/*
+ * self->unk68's pointee (round 12, from func_8003D050/func_8003DAD4/
+ * func_8003D73C). Built by `func_800404D0(&D_8008A8E8, &D_8008A8F0, 0)` in
+ * func_8003CE98 -- func_800404D0 itself lives in the still-uncarved
+ * code_2cc8c_d segment (not this unit's function to attempt), so it is
+ * declared here only as an external returning this unit's own local view
+ * of the type it constructs. D_8008A8E8/D_8008A8F0 are likewise only ever
+ * address-taken here (never dereferenced by this unit), so they stay
+ * minimally typed.
+ */
+struct Unk68ObjMethods {
+    u8 pad000[0x004];
+    void (*slot4)(Unk68Obj *self);              /* +0x004, OBSERVED:
+                                                     func_8003D050 */
+    u8 pad008[0x04C - 0x008];
+    void (*slot4C)(Unk68Obj *self, s32 a1);      /* +0x04C, OBSERVED:
+                                                     func_8003D73C */
+    void (*slot50)(Unk68Obj *self);               /* +0x050, OBSERVED:
+                                                     func_8003DAD4,
+                                                     func_8003D73C */
+    u8 pad054[0x0C0 - 0x054];
+    void (*slotC0)(Unk68Obj *self, void *buf);     /* +0x0C0, OBSERVED:
+                                                     func_8003D73C, address
+                                                     of a 2-word stack pair
+                                                     `{0x28, count*12}` */
+};
+struct Unk68Obj {
+    Unk68ObjMethods *methods; /* +0x000 */
+};
+
+extern Unk68Obj *func_800404D0(void *a0, void *a1, s32 a2); /* external
+                                    (code_2cc8c_d, not this unit); local
+                                    view -- return type inferred from
+                                    self->unk68's own dispatch pattern */
+extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
+extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
 /*
  * self->methods. Only the slots this unit's functions actually CALL
@@ -289,7 +405,14 @@ struct Obj86B60Methods {
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */
-    u8 pad0F4[0x100 - 0xF4];
+    u8 pad0F4[0x0F8 - 0xF4];
+    void (*slotF8)(Obj86B60 *self, void *a1, Unk74Obj *a2); /* +0x0F8,
+                                                       OBSERVED:
+                                                       func_8003CE98
+                                                       (round 12) */
+    void (*slotFC)(Obj86B60 *self);                 /* +0x0FC, OBSERVED:
+                                                       func_8003D050
+                                                       (round 12) */
     void (*slot100)(Obj86B60 *self, s32 a1, s32 a2); /* +0x100, external;
                                                        OBSERVED:
                                                        func_8003DA10 */
@@ -469,7 +592,12 @@ struct Obj86B60 {
     void **unk64;                /* +0x064, func_8003D6D4: array indexed by
                                      unk58, giving func_800183DC's 1st arg
                                      and func_80017CFC's arg */
-    u8 pad068[0x070 - 0x068];
+    Unk68Obj *unk68;             /* +0x068, OBSERVED: func_8003D050,
+                                     func_8003DAD4, func_8003D73C (round 12)
+                                     -- built once by func_8003CE98 via
+                                     func_800404D0(&D_8008A8E8, &D_8008A8F0,
+                                     0), then dispatched through repeatedly */
+    u8 pad06C[0x070 - 0x06C];
     const char *unk70;          /* +0x070, func_8003CDE0: truthy gate and a
                                     cache of the path last passed to
                                     func_8003B39C */
