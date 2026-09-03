@@ -123,7 +123,69 @@ fail:
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_800194A4);
+s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, void (*callback)(void *, s32))
+{
+    u8 *vtxSlot = prim + 0xa4;
+
+    *(void **)(prim + 0xa4) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx0 * 8;
+    *(void **)(prim + 0xa8) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx1 * 8;
+    *(void **)(prim + 0xac) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx2 * 8;
+    *(void **)(prim + 0xb0) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx3 * 8;
+
+    __asm__ volatile (
+        "lwc2 $0, 0x0(%0)\n\t"
+        "lwc2 $1, 0x4(%0)\n\t"
+        "lwc2 $2, 0x0(%1)\n\t"
+        "lwc2 $3, 0x4(%1)\n\t"
+        "lwc2 $4, 0x0(%2)\n\t"
+        "lwc2 $5, 0x4(%2)\n\t"
+        :
+        : "r" (*(void **)(vtxSlot + 0x0)), "r" (*(void **)(vtxSlot + 0x4)), "r" (*(void **)(vtxSlot + 0x8)));
+
+    if (func_800195EC(arg0, prim) != 0) {
+        goto fail;
+    }
+
+    callback(arg0, 1);
+
+    __asm__ volatile (
+        "lwc2 $0, 0x0(%0)\n\t"
+        "lwc2 $1, 0x4(%0)\n\t"
+        "nop\n\t"
+        "nop\n\t"
+        ".word 0x4A180001\n\t"     /* rtps */
+        :
+        : "r" (*(void **)(vtxSlot + 0xc)));
+
+    {
+        u8 *p0 = *(u8 **)(prim + 0x94) + 0x14;
+        u8 *p1 = *(u8 **)(prim + 0x98) + 0x14;
+        u8 *p2 = *(u8 **)(prim + 0x9c) + 0x14;
+        u8 *p3 = *(u8 **)(prim + 0xa0) + 0x14;
+
+        __asm__ volatile (
+            "swc2 $16, 0x0(%0)\n\t"
+            "swc2 $17, 0x0(%1)\n\t"
+            "swc2 $18, 0x0(%2)\n\t"
+            "swc2 $19, 0x0(%3)\n\t"
+            :
+            : "r" (p0), "r" (p1), "r" (p2), "r" (p3)
+            : "memory");
+    }
+
+    callback(arg0, 0);
+
+    __asm__ volatile (
+        "swc2 $14, 0x0(%0)\n\t"
+        :
+        : "r" (prim + 0x6c)
+        : "memory");
+
+    func_8001A268(prim, 4);
+    return 0;
+fail:
+    return 1;
+}
 
 /*
  * GTE-heavy "handwritten function" per splat's own extraction (asm comment).
