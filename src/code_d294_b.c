@@ -1,6 +1,13 @@
 #include "common.h"
+#include "code_d294.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D424);
+/* Sibling of func_8001D344/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
+ * wrapper around func_8001EDAC over &self->unk10, shift 0 width 3. Raw
+ * pass-through value and raw pass-through result -- same shape as
+ * func_8001D374/D3A0/D3F8 (no `== 0` on either side). */
+u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
+    return func_8001EDAC(&self->unk10, 0, 3, a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D450);
 
