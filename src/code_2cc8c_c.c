@@ -186,7 +186,14 @@ void func_8003E628(Unk18Obj *self)
     self->methods->slot40(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E6CC);
+void func_8003E6CC(Unk18Obj *self)
+{
+    self->methods->slot90(self);
+    self->methods->slot74(self);
+    self->unkAC->methods->slot4(self->unkAC);
+    self->methods->slotA8(self, 0);
+    func_80018390()->slot0C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E770);
 

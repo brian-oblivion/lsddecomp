@@ -45,6 +45,8 @@ typedef struct Unk18Obj Unk18Obj;
 typedef struct Unk18ObjMethods Unk18ObjMethods;
 typedef struct SubHandleObj SubHandleObj;
 typedef struct SubHandleObjMethods SubHandleObjMethods;
+typedef struct Unk18AcObj Unk18AcObj;
+typedef struct Unk18AcObjMethods Unk18AcObjMethods;
 typedef struct Obj86B60InitArgs Obj86B60InitArgs;
 typedef struct Unk10Obj Unk10Obj;
 typedef struct Unk10ObjMethods Unk10ObjMethods;
@@ -386,14 +388,31 @@ struct SubHandleObj {
 extern SubHandleObj *func_8003FDB0(void *name, s32 arg1, s32 arg2); /* local
                                     view of include/Entity.h's own
                                     `func_8003FDB0` */
-extern void *func_8001CA94(void); /* local view of include/code_d294.h's own
-                                    `New_Class6B5CC` allocator -- return
-                                    value never dereferenced by this unit,
-                                    only forwarded as an argument */
+extern Unk18AcObj *func_8001CA94(void); /* local view of include/code_d294.h's
+                                    own `New_Class6B5CC` allocator, returning
+                                    `Class6B5CCObj *` there -- this unit's
+                                    own view retyped (round 13) once
+                                    func_8003E6CC dereferenced it, see
+                                    Unk18AcObj's own comment */
 extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
                             func_8003FDB0's "name" argument */
 extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
                             SubHandleObjMethods::slot4C's 3rd argument */
+
+/*
+ * `Unk18Obj->unkAC`'s pointee (round 13, func_8003E6CC) -- the return of
+ * `func_8001CA94`, first stored opaquely by `func_8003E628` and here
+ * dereferenced and released through the inherited BasicClass "release"
+ * slot. Only that one slot is modelled.
+ */
+struct Unk18AcObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk18AcObj *self); /* +0x004, inherited BasicClass
+                                          "release"; OBSERVED: func_8003E6CC */
+};
+struct Unk18AcObj {
+    Unk18AcObjMethods *methods; /* +0x000 */
+};
 
 /*
  * self->unk18's pointee, round 13 (func_8003E10C). Constructed by a
@@ -431,6 +450,15 @@ struct Unk18ObjMethods {
                                                     own occupant here is
                                                     `func_8003E968`, not
                                                     `func_8003E100`) */
+    u8 pad044[0x074 - 0x044];
+    void (*slot74)(Unk18Obj *self);            /* +0x074, OBSERVED:
+                                                    func_8003E6CC (round 13) */
+    u8 pad078[0x090 - 0x078];
+    void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
+                                                    func_8003E6CC (round 13) */
+    u8 pad094[0x0A8 - 0x094];
+    void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
+                                                    func_8003E6CC (round 13) */
 };
 struct Unk18Obj {
     Unk18ObjMethods *methods; /* +0x000 */
@@ -440,11 +468,12 @@ struct Unk18Obj {
     s32 unk10;                /* +0x010, OBSERVED: func_8003E628 (round 13),
                                   zeroed by the ctor */
     u8 pad014[0x0AC - 0x014];
-    void *unkAC;               /* +0x0AC, OBSERVED: func_8003E628 (round 13)
-                                  -- set from `func_8001CA94()` (a
-                                  `New_Class6B5CC` allocator, `code_d294.c`);
-                                  never dereferenced by this unit, only
-                                  forwarded as an argument */
+    Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: func_8003E628 (round 13,
+                                  set from `func_8001CA94()`, a
+                                  `New_Class6B5CC` allocator, `code_d294.c`)
+                                  and func_8003E6CC (round 13, dereferenced
+                                  and released -- see `Unk18AcObj`'s own
+                                  comment) */
     SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: func_8003E628 (round
                                   13) -- set from `func_8003FDB0` */
 };
@@ -980,7 +1009,10 @@ struct BasicClassMethodsCC8C {
     u8 pad000[0x008];
     void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
                                   (code_8220.c); OBSERVED: func_8003DFDC */
-    u8 pad00C[0x018 - 0x00C];
+    void (*slot0C)(void *self); /* +0x00C, IS BasicClass__func_17f2c
+                                  (code_8220.c, "finalize"); OBSERVED:
+                                  func_8003E6CC (round 13) */
+    u8 pad010[0x018 - 0x010];
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
