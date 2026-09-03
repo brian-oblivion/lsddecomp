@@ -1,6 +1,23 @@
 #include "common.h"
+#include "code_8220.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BMemPMgrInit);
+void *BMemPMgrInit(s32 poolSize)
+{
+    BMemPMgr *pool;
+
+    if ((u32)poolSize < 0x400) {
+        poolSize = 0x400;
+    }
+    pool = func_80011D34(poolSize + 0x20);
+    if (pool != NULL) {
+        pool->freeListHead = (u8 *)pool + 0x1C;
+        pool->poolSize = poolSize;
+        func_80017AC8(pool);
+    } else {
+        func_80012C20(D_8001028C, NULL, poolSize);
+    }
+    return pool;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017A9C);
 
