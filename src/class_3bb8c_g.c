@@ -119,7 +119,18 @@ void func_800504D0(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_800505A8);
+void func_800505A8(Class86E00_3bb8c_g *self)
+{
+    if (self->unk68 != 0 && self->unk60 != 0) {
+        if (self->unk7C == NULL) {
+            self->unk7C = func_80051A5C(self->unk38, 1);
+            self->unk74 = 1;
+        }
+        self->methods->slot10(self, self->unk7C);
+        self->unk7C->methods->slot44(self->unk7C, self->unk68);
+        self->unk7C->methods->slot4C(self->unk7C, self->unk60, self->unk64, self->unk6C);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050670);
 
