@@ -1,4 +1,5 @@
 #include "common.h"
+#include "code_2cc8c.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F2AC);
 
@@ -61,15 +62,35 @@ void func_8003FBE4(void *a0) {
     D_8008E794 = a0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FBF4);
+extern void func_80021678(void *arg0); /* asm/psyq_GsLinkObject4.s, Psy-Q
+                                           library, not game code */
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FC18);
+void func_8003FBF4(Class6E99CObj *self) {
+    func_80021678(self->unk10);
+}
+
+extern void func_80021580(s32 stride, s32 mask); /* asm/psyq_GsLinkObject4.s,
+                                                     Psy-Q library, not game
+                                                     code */
+
+void func_8003FC18(s32 a0, s32 a1, TexPageDesc *desc) {
+    desc->width = a0 & 0xFFFF;
+    desc->height = a1 & 0xFFFF;
+    desc->size = (4 << desc->shift) + desc->stride - 4;
+    func_80021580(desc->stride, 1 << desc->shift);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FC70);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FCFC);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FD4C);
+extern void func_80024B9C(s32 a0);
+extern void func_80024BA8(s32 a0);
+
+void func_8003FD4C(s32 a0, s32 a1) {
+    func_80024B9C((-(a0 * 5 * 64)) / a1);
+    func_80024BA8(0x1400000);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FDB0);
 
