@@ -116,6 +116,20 @@ void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClass
     func_800183A0(outParent, cursor);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_800181AC);
+s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
+{
+    BasicClassListNode *node;
+    BasicClassListNode *oldHead;
+
+    node = func_80017B34(0x8);
+    if (node != NULL) {
+        oldHead = *head;
+        node->value = value;
+        node->next = oldHead;
+        *head = node;
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80018208);
