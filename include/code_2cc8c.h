@@ -526,7 +526,13 @@ struct Obj86B60Methods {
                                                       (BasicClass__func_17ff0);
                                                       OBSERVED: func_8003E280
                                                       (round 13) */
-    u8 pad018[0x040 - 0x018];
+    u8 pad018[0x030 - 0x018];
+    void (*slot30)(Obj86B60 *self);               /* +0x030, inherited
+                                                      BasicClass slot
+                                                      (BasicClass__func_182cc);
+                                                      OBSERVED: func_8003E4B8
+                                                      (round 13) */
+    u8 pad034[0x040 - 0x034];
     void (*slot40)(Obj86B60 *self);               /* +0x040, IS
                                                       func_8003E100 (already
                                                       matched); OBSERVED:
@@ -558,7 +564,16 @@ struct Obj86B60Methods {
                                                       OBSERVED: func_8003E030 */
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
                                                       (func_8004D90C) */
-    u8 pad064[0x070 - 0x064];
+    void (*slot64)(Obj86B60 *self);               /* +0x064, IS
+                                                      func_8003E538 (already
+                                                      matched); OBSERVED:
+                                                      func_8003E4B8
+                                                      (round 13) */
+    void (*slot68)(Obj86B60 *self);               /* +0x068, IS
+                                                      func_8003E578;
+                                                      OBSERVED: func_8003E4B8
+                                                      (round 13) */
+    u8 pad06C[0x070 - 0x06C];
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
                                                       func_8003C7B4 */
     u8 pad074[0x090 - 0x074];
