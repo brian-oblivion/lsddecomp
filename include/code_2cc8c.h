@@ -356,7 +356,12 @@ extern char D_8008A8F0[4];  /* address-taken only by this unit */
  * callee's own body reads it. See func_8003C51C's own report.
  */
 struct Obj86B60Methods {
-    u8 pad000[0x060];
+    u8 pad000[0x040];
+    void (*slot40)(Obj86B60 *self);               /* +0x040, IS
+                                                      func_8003E100 (already
+                                                      matched); OBSERVED:
+                                                      func_8003DFDC */
+    u8 pad044[0x060 - 0x044];
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
                                                       (func_8004D90C) */
     u8 pad064[0x070 - 0x064];
@@ -667,7 +672,10 @@ extern IntermediateBaseMethods D_8006E878; /* the table itself, so
  */
 typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
 struct BasicClassMethodsCC8C {
-    u8 pad000[0x018];
+    u8 pad000[0x008];
+    void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
+                                  (code_8220.c); OBSERVED: func_8003DFDC */
+    u8 pad00C[0x018 - 0x00C];
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
 };
 

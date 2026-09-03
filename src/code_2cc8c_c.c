@@ -25,7 +25,12 @@ void *func_8003DFCC(void)
     return D_8006E854;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003DFDC);
+void func_8003DFDC(Obj86B60 *self)
+{
+    func_80018390()->ctor(self);
+    self->methods = (Obj86B60Methods *)func_8003E5C8();
+    self->methods->slot40(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E030);
 
