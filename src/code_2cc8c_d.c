@@ -119,7 +119,14 @@ void func_8003ECC8(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003ECD0);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EDF4);
+/* Teardown counterpart to func_8003ECD0's init. */
+void func_8003EDF4(Unk18Obj *self) {
+    if (self->unk70 != 0) {
+        func_80021114(0);
+        func_80017CFC((void *)self->unk78);
+        self->unk70 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EE40);
 

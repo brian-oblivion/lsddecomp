@@ -653,11 +653,17 @@ extern void func_8003F2AC(void *arg0);
    buffer addresses it just built; declared here only with that shape. */
 extern void func_8003FC18(s32 a0, s32 a1, s32 a2);
 
+/* func_80021114 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+   func_8003EDF4 (round 14, this unit) calls it with a literal 0 and
+   ignores the return; declared here only with that shape. */
+extern void func_80021114(s32 a0);
+
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EB84(Unk18Obj *self);
 void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1);
 void func_8003ECD0(Unk18Obj *self);
+void func_8003EDF4(Unk18Obj *self);
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
 void func_8003EA24(Unk18Obj *self, s32 a1);
 void func_8003EA2C(Unk18Obj *self, s32 a1);
