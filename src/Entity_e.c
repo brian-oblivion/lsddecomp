@@ -1,8 +1,15 @@
 #include "common.h"
+#include "Entity.h"
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80061A90);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80061C04);
+void func_80061C04(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unk84 == 0x1E) {
+        out->unk1C = 0x12;
+        out->unk10 = 0;
+        out->unk20 = -1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80061C2C);
 
