@@ -1,4 +1,5 @@
 #include "common.h"
+#include "class_3bb8c.h"
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004D704);
 
@@ -34,7 +35,10 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E1C4);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E230);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E2D0);
+Class86B60Methods *func_8004E2D0(void)
+{
+    return &D_80086B60;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E2E0);
 
