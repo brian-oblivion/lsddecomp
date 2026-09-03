@@ -18,6 +18,13 @@ extern u8 D_80089E38[];
 extern u8 D_80089E44[];
 extern u8 D_80089D00[];
 
+/* func_80064FBC, this unit's own function, is called by func_80064E34
+ * (earlier in ROM order) before its own definition below -- forward
+ * declaration, same convention CLAUDE.md documents for calling into a
+ * still-INCLUDE_ASM function. Already known cross-unit from Entity_d.c's
+ * own extern (func_80060148's caller there), reproduced here matching. */
+extern void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
+
 void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
         if (func_8005D108(this, NULL, 0, 0xA, 0) != 0) {
