@@ -90,7 +90,32 @@ void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E280);
+void func_8003E280(Obj86B60 *self)
+{
+    Obj86B60Methods *methods;
+    Unk18Obj *obj18;
+
+    methods = self->methods;
+    methods->slot50(self);
+    obj18 = self->unk18;
+    if (self->unk24 == 0) {
+        ((Unk14Obj *)self->unk14)->methods->slot14((Unk14Obj *)self->unk14, (void *)self->unk10);
+        obj18->methods->slot14(obj18, (void *)self->unk10);
+        obj18->methods->slot14(obj18, ((Obj86B60InitArgs *)self->unkC)->unk0);
+    }
+    methods->slot14(self, (void *)self->unk10);
+    methods->slot14(self, ((Obj86B60InitArgs *)self->unkC)->unk4);
+    methods->slot14(self, ((Obj86B60InitArgs *)self->unkC)->unk0);
+    if (((Obj86B60InitArgs *)self->unkC)->unk10 != obj18) {
+        self->unk18 = obj18->methods->slot4(obj18);
+    }
+    if ((void *)((Obj86B60InitArgs *)self->unkC)->unkC != (void *)self->unk14) {
+        self->unk14 = (s32)((Unk14Obj *)self->unk14)->methods->slot4((Unk14Obj *)self->unk14);
+    }
+    if (((Obj86B60InitArgs *)self->unkC)->unk8 != (void *)self->unk10) {
+        self->unk10 = (s32)((Unk10Obj *)self->unk10)->methods->slot4((Unk10Obj *)self->unk10);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E418);
 

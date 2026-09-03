@@ -44,6 +44,8 @@ typedef struct Unk14ObjMethods Unk14ObjMethods;
 typedef struct Unk18Obj Unk18Obj;
 typedef struct Unk18ObjMethods Unk18ObjMethods;
 typedef struct Obj86B60InitArgs Obj86B60InitArgs;
+typedef struct Unk10Obj Unk10Obj;
+typedef struct Unk10ObjMethods Unk10ObjMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -370,13 +372,23 @@ extern char D_8008A8F0[4];  /* address-taken only by this unit */
  * dispatches through is modelled.
  */
 struct Unk18ObjMethods {
-    u8 pad000[0x008];
+    u8 pad000[0x004];
+    void *(*slot4)(Unk18Obj *self);            /* +0x004, inherited
+                                                    BasicClass "release"
+                                                    (finalize then free);
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
     void (*ctor)(Unk18Obj *self);              /* +0x008, called by
                                                     func_8003E5D8 with only
                                                     `self` set up */
     u8 pad00C[0x010 - 0x00C];
-    void (*slot10)(Unk18Obj *self, void *a1);  /* +0x010, OBSERVED:
-                                                    func_8003E10C */
+    void (*slot10)(Unk18Obj *self, void *a1);  /* +0x010, inherited
+                                                    BasicClass addChild;
+                                                    OBSERVED: func_8003E10C */
+    void (*slot14)(Unk18Obj *self, void *a1);  /* +0x014, inherited
+                                                    BasicClass removeChild;
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
 };
 struct Unk18Obj {
     Unk18ObjMethods *methods; /* +0x000 */
@@ -409,12 +421,40 @@ extern void *func_80042694(void); /* external, no args; not yet seen
  * reaches is modelled.
  */
 struct Unk14ObjMethods {
-    u8 pad000[0x010];
-    void (*slot10)(Unk14Obj *self, void *a1);  /* +0x010, OBSERVED:
-                                                    func_8003E10C */
+    u8 pad000[0x004];
+    void *(*slot4)(Unk14Obj *self);            /* +0x004, inherited
+                                                    BasicClass "release";
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
+    u8 pad008[0x010 - 0x008];
+    void (*slot10)(Unk14Obj *self, void *a1);  /* +0x010, inherited
+                                                    BasicClass addChild;
+                                                    OBSERVED: func_8003E10C */
+    void (*slot14)(Unk14Obj *self, void *a1);  /* +0x014, inherited
+                                                    BasicClass removeChild;
+                                                    OBSERVED: func_8003E280
+                                                    (round 13) */
 };
 struct Unk14Obj {
     Unk14ObjMethods *methods; /* +0x000 */
+};
+
+/*
+ * A THIRD alternate reading of the same shape, this time for self->unk10
+ * (round 13, func_8003E280 only): released through the identical inherited
+ * BasicClass "release" slot self->unk14/unk18's own pointee types use.
+ * self->unk10 itself stays `s32` in `Obj86B60` (already established,
+ * generic-word/child-pointer usage confirmed by func_8003E10C) -- cast
+ * locally here, same convention as `Unk14Obj`.
+ */
+struct Unk10ObjMethods {
+    u8 pad000[0x004];
+    void *(*slot4)(Unk10Obj *self);            /* +0x004, inherited
+                                                    BasicClass "release";
+                                                    OBSERVED: func_8003E280 */
+};
+struct Unk10Obj {
+    Unk10ObjMethods *methods; /* +0x000 */
 };
 
 /*
@@ -457,7 +497,12 @@ struct Obj86B60Methods {
                                                       BasicClass addChild
                                                       (BasicClass__func_17f98);
                                                       OBSERVED: func_8003E10C */
-    u8 pad014[0x040 - 0x014];
+    void (*slot14)(Obj86B60 *self, void *a1);     /* +0x014, inherited
+                                                      BasicClass removeChild
+                                                      (BasicClass__func_17ff0);
+                                                      OBSERVED: func_8003E280
+                                                      (round 13) */
+    u8 pad018[0x040 - 0x018];
     void (*slot40)(Obj86B60 *self);               /* +0x040, IS
                                                       func_8003E100 (already
                                                       matched); OBSERVED:
@@ -469,7 +514,10 @@ struct Obj86B60Methods {
     void (*slot4C)(Obj86B60 *self, s32 a1, s32 a2, s32 a3); /* +0x04C,
                                                       external (func_8003C238);
                                                       OBSERVED: func_8003E10C */
-    u8 pad050[0x054 - 0x050];
+    void (*slot50)(Obj86B60 *self);               /* +0x050, external
+                                                      (func_8004D898);
+                                                      OBSERVED: func_8003E280
+                                                      (round 13) */
     void (*slot54)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x054, IS
                                                       func_8003E418;
                                                       OBSERVED: func_8003E030 */
