@@ -6,7 +6,14 @@ s32 func_8003DFA0(Obj86B60 *self)
     return self->unk60[self->unk58];
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003DFBC);
+/* TaskCoreMethods table (see code_2c054.h's own richer local view); opaque
+ * here since this unit never dereferences it, only returns its address. */
+extern u8 D_8006E730[];
+
+void *func_8003DFBC(void)
+{
+    return D_8006E730;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003DFCC);
 
