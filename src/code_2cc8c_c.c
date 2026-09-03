@@ -117,7 +117,17 @@ void func_8003E280(Obj86B60 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E418);
+void func_8003E418(Obj86B60 *self, EventArg *arg1, s32 arg2)
+{
+    Unk4ArgObj *obj4;
+
+    if (arg2 == 2) {
+        ((Unk10Obj *)self->unk10)->methods->slot44((Unk10Obj *)self->unk10);
+        obj4 = ((Obj86B60InitArgs *)self->unkC)->unk4;
+        obj4->methods->slot44(obj4);
+        obj4->methods->slot48(obj4);
+    }
+}
 
 void func_8003E4A4(Obj86B60 *self)
 {

@@ -46,6 +46,8 @@ typedef struct Unk18ObjMethods Unk18ObjMethods;
 typedef struct Obj86B60InitArgs Obj86B60InitArgs;
 typedef struct Unk10Obj Unk10Obj;
 typedef struct Unk10ObjMethods Unk10ObjMethods;
+typedef struct Unk4ArgObj Unk4ArgObj;
+typedef struct Unk4ArgObjMethods Unk4ArgObjMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -452,9 +454,28 @@ struct Unk10ObjMethods {
     void *(*slot4)(Unk10Obj *self);            /* +0x004, inherited
                                                     BasicClass "release";
                                                     OBSERVED: func_8003E280 */
+    u8 pad008[0x044 - 0x008];
+    void (*slot44)(Unk10Obj *self);            /* +0x044, OBSERVED:
+                                                    func_8003E418 (round 13) */
 };
 struct Unk10Obj {
     Unk10ObjMethods *methods; /* +0x000 */
+};
+
+/*
+ * self->unkC->unk4's pointee (round 13, func_8003E418) -- the SAME field
+ * `func_8003E10C` forwards as an opaque `addChild` child and `func_8003E280`
+ * forwards as a `removeChild` target; this function is the first to
+ * dereference it as a real class instance. Only the two slots it dispatches
+ * through are modelled.
+ */
+struct Unk4ArgObjMethods {
+    u8 pad000[0x044];
+    void (*slot44)(Unk4ArgObj *self); /* +0x044, OBSERVED: func_8003E418 */
+    void (*slot48)(Unk4ArgObj *self); /* +0x048, OBSERVED: func_8003E418 */
+};
+struct Unk4ArgObj {
+    Unk4ArgObjMethods *methods; /* +0x000 */
 };
 
 /*
@@ -467,7 +488,10 @@ struct Unk10Obj {
  */
 struct Obj86B60InitArgs {
     void *unk0;      /* +0x000, forwarded to self->methods->slot10 (child) */
-    void *unk4;      /* +0x004, forwarded to self->methods->slot10 (child) */
+    Unk4ArgObj *unk4; /* +0x004, forwarded to self->methods->slot10 (child)
+                          as `void *`; ALSO OBSERVED (round 13) dereferenced
+                          directly by func_8003E418 as a real class instance
+                          -- see Unk4ArgObj's own comment */
     void *unk8;      /* +0x008, fallback source for self->unk10 */
     void *unkC;      /* +0x00C, fallback source for self->unk14 */
     Unk18Obj *unk10; /* +0x010, fallback source for self->unk18 */
