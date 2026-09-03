@@ -65,7 +65,10 @@ void func_80040A30(Obj6EAC0 *self) {
     func_80041C3C()->slot0C(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040A88);
+void func_80040A88(Obj6EAC0 *self, s32 a1) {
+    self->methods->slotD4(self, 7);
+    self->methods->slotCC(self, a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040AE8);
 
