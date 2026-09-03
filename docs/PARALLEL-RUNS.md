@@ -669,6 +669,49 @@ denominator, and left for last. Matching them proves nothing about this game.
      data.** Both slots take one script to survey — count how many words fall
      in `0x80010000..0x8008B800` — so survey the slot at carve time rather
      than inheriting a verdict about it.
+   - **A rodata slot can be SHARED between segments, and attaching it whole
+     breaks the other one.** This is the sub-case that turns the two failures
+     above into a three-step dance, found in round 14 carving `code_2cc8c_e`:
+
+     1. Left standalone, the link fails with
+        `undefined reference to '.L8003FB98'` — the slot's words are `.L`
+        labels local to a function's own `.s`, so you attach it:
+        `- [0x1908, .rodata, code_2cc8c_e]`.
+     2. That fixes the labels and immediately breaks
+        `undefined reference to 'D_800111B4'` instead — because the slot
+        ALSO held two symbols referenced only from `asm/psyq_memset.s`, a
+        different segment. With `migrate_rodata_to_functions: True`, an
+        attached slot's symbols migrate into the OWNING unit's functions, and
+        a symbol referenced only from elsewhere has nowhere to migrate to and
+        drops out of the link entirely.
+     3. So SPLIT the slot at the ownership boundary — one entry attached, one
+        left standalone:
+
+        ```yaml
+        - [0x1908, .rodata, code_2cc8c_e]
+        - [0x19B4, rodata]   # -> psyq_memset, NOT ours
+        ```
+
+     **Find the boundary by asking who references each symbol**, which is one
+     grep per symbol and settles it:
+
+     ```sh
+     grep -n 'dlabel\|jtbl' asm/data/<slot>.rodata.s          # what's in there
+     grep -rl '<symbol>' asm/*.s asm/nonmatchings/*/*.s src/*.c | grep -v asm/data
+     ```
+
+     Two things about this that are easy to get backwards:
+
+     - **The attach is required even when the function owning the jump table
+       stays `INCLUDE_ASM`.** Being `INCLUDE_ASM` assembles the text; it does
+       not embed the table. Round 13's `func_8005CBC8` note reads as though
+       reverting to `INCLUDE_ASM` keeps the table with the function — it does
+       not, and `code_4cd08` needed its `0x206C` attach for exactly this
+       reason.
+     - **The error moving from `.L…` to `D_…` is progress, not a new
+       problem.** It means step 1 was right and the slot simply has two
+       owners. Do not undo the attach.
+
    - **`undefined reference to 'D_XXXXXXXX'`** — the segment's tail is DATA,
      not code, and an `asm` segment was emitting it inline. Find where the text
      really ends and declare the rest: `code_55dd4`'s text stops at `0x57028`
