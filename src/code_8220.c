@@ -42,7 +42,12 @@ void *BasicClass__func_17eb0(BasicClass *self)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__BasicClass);
+void BasicClass__BasicClass(BasicClass *self)
+{
+    self->methods = func_80018390();
+    self->parentRefs = NULL;
+    self->children = NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", BasicClass__func_17f2c);
 
