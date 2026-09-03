@@ -347,7 +347,9 @@ struct EntityMoodHandlerArg {
     u8 pad14[0x08];
     s32 unk1C;     /* +0x1C, written by func_8005ED10/func_8005E480/func_8005E7A8/... */
     s32 unk20;      /* +0x20, written by func_8005E4D0 only (paired with unk1C the same round) */
-    u8 pad24[0x0C];
+    s32 unk24;       /* +0x24, written by func_80060148 (Entity_d) */
+    s32 unk28;        /* +0x28, written by func_80060148 (Entity_d) */
+    u8 pad2C[0x04];
     s32 unk30;      /* +0x30, written by func_8005E7A8/func_8005E4D0 */
     s32 unk34;       /* +0x34, written by func_8005E4D0 only (paired with unk30) */
     u8 pad38[0x0C];

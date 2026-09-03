@@ -25,6 +25,8 @@ extern u8 D_80089DC0[];
 extern u8 D_80089E50[];
 extern u8 D_80089E38[];
 extern u8 D_80089C7C[];
+extern u8 D_80089C94[];
+extern u8 D_80089C88[];
 
 /* Forward declaration: func_80060710 is defined later in this file (higher
  * ROM address) but func_800604DC, at a lower address, calls it directly. */
@@ -32,7 +34,33 @@ void func_80060710(Entity *this);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_d", func_8005FF7C);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80060148);
+void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
+    void *table = NULL;
+
+    if (out->unk4 % 7 == 0) {
+        out->unk10 = this->methods->slot148(this);
+        out->unk1C = 3;
+        out->unk24 = 0x40;
+        out->unk28 = 0x40;
+    }
+    if (this->unkFC == 0xC8) {
+        table = D_80089C94;
+    } else if (this->unkFC == 0x190) {
+        table = D_80089C7C;
+    } else if (this->unkFC == 0x258) {
+        table = D_80089C88;
+    } else if (this->unkFC == 0x320) {
+        table = D_80089C7C;
+        this->unkFC = -1;
+    }
+    if (table != NULL) {
+        this->methods->slot44(this, 0, table);
+    }
+    this->methods->slotD0(this, -0x1E, 0);
+    if (this->unk28 != 0) {
+        this->methods->slotCC(this, -0xC8, 0);
+    }
+}
 
 void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
     s32 rv;
