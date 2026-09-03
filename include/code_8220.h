@@ -129,4 +129,15 @@ extern const char D_8001028C[];
  * carved). Read-only from this unit; nothing here writes it. */
 extern s32 D_8008E248;
 
+/* GTE transform/clip/OT-bucket routine, this unit (code_8220_b, hand-rolled
+ * asm -- see docs/match-reports/func_800195EC.md). arg1 is a per-primitive
+ * scratch/context struct (OT base +0x0, OT shift +0x4, culled-flag +0x78,
+ * SXY0-2 cache +0x60/0x64/0x68, computed OT bucket pointer +0x30, ...);
+ * arg0's only touched field is a single output byte at +0x3, copied from
+ * arg1->0x14. Returns 0 on success (OT bucket computed and stored), 1 if
+ * the primitive was culled/degenerate. Declared here because its two
+ * callers in this unit (func_800193C0, func_800194A4) are earlier in ROM
+ * order and so precede its own definition in the .c file. */
+extern s32 func_800195EC(void *arg0, void *arg1);
+
 #endif
