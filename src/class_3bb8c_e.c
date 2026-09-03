@@ -370,7 +370,25 @@ char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EB88);
+s32 func_8004EB88(Node3bb8cE *self, s32 *values, char **outArr, char *middle, char **entries)
+{
+    s32 count;
+    char buf[0x20];
+
+    count = 0;
+    while (*entries != NULL) {
+        strcpy(buf, middle);
+        strcat(buf, *entries);
+        if (self->methods->slot54(self, *values, buf) != 0) {
+            count++;
+            *outArr = *entries;
+            values++;
+            outArr++;
+        }
+        entries++;
+    }
+    return count;
+}
 
 extern s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg);
 
