@@ -312,8 +312,36 @@ struct Obj86B60Methods {
     void (*slot114)(Obj86B60 *self);                /* +0x114, external
                                                        (func_8003DDC8);
                                                        OBSERVED: func_8003C9B0 */
-    s32 (*slot118)(Obj86B60 *self);                 /* +0x118, external
-                                                       (func_8003DFA0);
+    s32 (*slot118)(Obj86B60 *self);                 /* +0x118. CORRECTED
+                                                       (round 12, runner
+                                                       alpha): the occupant
+                                                       is func_8003DE30, NOT
+                                                       func_8003DFA0 as this
+                                                       comment previously
+                                                       said -- verified by
+                                                       reading the raw table
+                                                       bytes at
+                                                       D_80086B60+0x118 in
+                                                       disk/SLPS_015.56
+                                                       directly (also
+                                                       cross-checked with
+                                                       tools/classtable.py
+                                                       D_80086B60). The old
+                                                       attribution came from
+                                                       func_8003C944.md's
+                                                       "Struct knowledge
+                                                       established" section,
+                                                       which was itself
+                                                       wrong about WHICH
+                                                       function occupies this
+                                                       slot even though the
+                                                       byte OFFSET it matched
+                                                       against (0x118) was
+                                                       correct -- a call
+                                                       site discarding/not
+                                                       discarding a return
+                                                       value says nothing
+                                                       about slot identity.
                                                        OBSERVED: func_8003C944 */
     void (*slot11C)(Obj86B60 *self, s32 a1, s32 a2); /* +0x11C, external;
                                                        OBSERVED:
@@ -322,6 +350,14 @@ struct Obj86B60Methods {
                                                        call it with a
                                                        computed index value
                                                        and a literal 1) */
+    s32 (*slot120)(Obj86B60 *self);                 /* +0x120, external:
+                                                       IS func_8003DFA0
+                                                       (verified the same
+                                                       way as slot118 above;
+                                                       `func_8003DFA0` itself
+                                                       returns
+                                                       `self->unk60[self->
+                                                       unk58]`, s32) */
 };
 
 /*

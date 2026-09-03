@@ -1,6 +1,10 @@
 #include "common.h"
+#include "code_2cc8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003DFA0);
+s32 func_8003DFA0(Obj86B60 *self)
+{
+    return self->unk60[self->unk58];
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003DFBC);
 
