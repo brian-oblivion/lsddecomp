@@ -41,7 +41,24 @@ INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800621A8);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800623E8);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_800624BC);
+/* Data tables reached with a raw pointer by this unit's mood-dispatch
+ * handlers -- same convention as Entity_c.c/Entity_d.c's own separate
+ * per-unit externs, not shared via the header. */
+extern u8 D_80089C7C[];
+
+void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC == 0) {
+        if (rand() & 1) {
+            this->unk44 = 0xB;
+        }
+    }
+    if (this->unkFC == 0x12C) {
+        this->methods->slot44(this, 0, D_80089C7C);
+    }
+    if (this->unkFC < 0x258) {
+        this->methods->slotC4(this, this->unk44 == 0 ? -0x100 : 0x100, 0);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80062570);
 
