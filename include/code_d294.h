@@ -188,6 +188,7 @@ struct GenericObj_d294 {
     GenericMethods_d294 *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
     void *unkC;                    /* +0x00C, func_8001D280 (still queued) compares this to a Class6B5CCObj* */
+    s32 unk10;                     /* +0x010, round 14 (code_d294_c, func_8001E770): read into self->unk18 */
 };
 
 /* A third small "count + data" shape, seen only through func_8001D624's own
@@ -336,14 +337,14 @@ extern s32 func_8001EC84(void *pair);
 extern u8 D_8006B684[0xC];
 extern u8 D_8006B690[0xC];
 
-/* func_8001E770/func_8001E7B0 (asm/code_d294_b.s, still uncarved), and
- * func_80012838 (asm/psyq_2258.s, Psy-Q library, not game code): three
+/* func_8001E770/func_8001E7B0 -- now carved (round 14, src/code_d294_c.c),
+ * and func_80012838 (asm/psyq_2258.s, Psy-Q library, not game code): three
  * helpers this unit's own +0x010/+0x014/+0x018/+0x040 overrides forward
  * into. func_8001E7B0's whole body is `self->unk18 = 0; self->unk20 = 0;`
  * (MEASURED, two `sw $zero` stores, no branches) -- confirms unk18/unk20
- * above independently of the ctor. func_8001E770 and func_80012838 are
- * NOT decompiled here (out of this carve's scope); declared only with the
- * argument shape their call sites need. */
+ * above independently of the ctor. func_80012838 is NOT decompiled here
+ * (Psy-Q, out of scope); declared only with the argument shape its call
+ * site needs. */
 extern void func_8001E7B0(Class6B5CCObj *self);
 extern void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other);
 extern void func_80012838(s32 arg0, void *dest);
@@ -367,6 +368,13 @@ extern void func_800183A0(GenericObj_d294 **out, GenericObj_d294 **cursor);
  * dest)`; declared here only with the opaque `void *` shape that call site
  * needs. */
 extern void func_8001F51C(void *arg0, void *dest);
+
+/* GsLinkObject4 (psyq_GsLinkObject4.s, Psy-Q library, not game code; symbol
+ * address per config/symbols.slps01556.lsdde.txt, 0x8001EF70). func_8001E770
+ * (round 14, code_d294_c) calls it as `GsLinkObject4((u8 *)other->unkC +
+ * 0xC, &self->unk10, 0)`; declared only with the opaque `void *`/`s32`
+ * shape that call site needs. */
+extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
 
 /* func_8001EE04 (asm/code_d294_c.s, the NEXT slice, still uncarved): an
  * element-copy loop -- `count` iterations, 6 bytes/element, reading from
