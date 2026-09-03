@@ -125,6 +125,21 @@ INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80062C58);
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80062FAC);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80063094);
+extern u8 D_80089D54[];
+
+void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unkFC < this->unk80) {
+        if (this->unk84 != 0) {
+            if (this->unk84 == 0x14) {
+                out->unk10 = 0;
+                out->unk1C = 0x10;
+            }
+        }
+    } else {
+        this->methods->slot130(this);
+        this->methods->slotBC(this, D_80089D54);
+    }
+    func_8001EACC(this, this->unk94, 1, 0, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80063144);
