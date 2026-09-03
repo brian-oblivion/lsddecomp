@@ -17,6 +17,7 @@ extern u8 D_80089E2C[];
 extern u8 D_80089E38[];
 extern u8 D_80089E44[];
 extern u8 D_80089D00[];
+extern u8 D_80089D18[];
 
 /* func_80064FBC, this unit's own function, is called by func_80064E34
  * (earlier in ROM order) before its own definition below -- forward
