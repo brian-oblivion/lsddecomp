@@ -72,8 +72,9 @@ struct EntityMethods {
     /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005ED30 as slotD0(this, -0x176, rand() % 2), and by func_8005E7F8 as slotD0(this, this->unk48, 0) */
     /* +0xD4 */ u8 padD4[0x114 - 0xD4];
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
-    /* +0x118 */ u8 pad118[0x130 - 0x118];
-    /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C */
+    /* +0x118 */ u8 pad118[0x12C - 0x118];
+    /* +0x12C */ void (*slot12C)(Entity *self);           /* called by func_800603C4 */
+    /* +0x130 */ void (*slot130)(Entity *self);           /* called by func_8005DB8C, func_800603C4 */
     /* +0x134 */ u8 pad134[0x144 - 0x134];
     /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by func_8005E02C, as slot144(this, this->unk94) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->unk94 in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
     /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds func_8005D864 (still addiu_at-blocked in Entity.c) */
