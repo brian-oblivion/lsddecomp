@@ -150,7 +150,17 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CA3C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CB18);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CB58);
+s32 func_8002CB58(ObjDA34 *self) {
+    s32 flag;
+
+    flag = self->unk56;
+    if (flag == 0) {
+        func_800336CC(1);
+        flag = 1;
+        self->unk56 = flag;
+    }
+    return flag;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CB9C);
 
