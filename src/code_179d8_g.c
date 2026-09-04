@@ -153,7 +153,10 @@ s32 func_8002B304(s32 arg0, s32 arg1)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3E4);
+void func_8002B3E4(s32 arg0)
+{
+    D_8006D8A4 = arg0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3F4);
 
