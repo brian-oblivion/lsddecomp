@@ -140,7 +140,16 @@ void func_80036118(s32 a0, s32 a1)
     func_80036B20(p);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_800361B0);
+extern s32 D_8008E268;
+
+void func_800361B0(s32 a0)
+{
+    s32 *p = &D_8008E258;
+
+    *p = 0x10;
+    D_8008E268 = (s16)a0;
+    func_80036B20(p);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_800361F0);
 
