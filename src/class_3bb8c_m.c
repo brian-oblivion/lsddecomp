@@ -103,7 +103,11 @@ s32 func_80054120(ObjM *self) {
 void func_800541CC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800541D4);
+void func_800541D4(ObjM *self) {
+    if (self->unk80 != 0 && self->unk20 == 0) {
+        self->unk84 = 1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054200);
 
