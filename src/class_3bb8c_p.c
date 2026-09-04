@@ -138,14 +138,27 @@ void func_80057C14(DreamSys *self, void *arg1, s32 count) {
     func_8001E57C()->slot9C(self, arg1, count);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057C6C);
+void func_80057C6C(DreamSys *self, s16 val) {
+    self->field_0x48 = val;
+}
 
 void func_80057C74(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057C7C);
+void func_80057C7C(DreamSys *self, void *extra) {
+    self->unk_0x54 = extra;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057C84);
+/* The shared intermediate base-class table -- see include/DreamSys.h's
+ * `DreamSysBaseMethods` comment and include/code_55dd4.h's own independent
+ * view (`D800878D4Methods`) of the SAME table. This unit's own extern,
+ * typed to match the return type `func_80057C84` already carried in
+ * include/DreamSys.h (round 2026-09-04). */
+extern DreamSysBaseMethods D_800878D4;
+
+DreamSysBaseMethods *func_80057C84(void) {
+    return &D_800878D4;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057C94);
 

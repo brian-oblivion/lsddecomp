@@ -468,7 +468,10 @@ typedef struct DreamSys {
 	   +0xF0 called with itself as the sole argument). Used by
 	   func_80058A94 (round 2026-08-30-b); see DreamSysUnk4CObj above. */
 	DreamSysUnk4CObj *unk_0x4C;
-	s8 unknown_values_0x50[8];
+	s8 unknown_values_0x50[4];
+	/* Written by this unit's own func_80057C7C (its own +0x0EC slot), a
+	   plain `sw` store of its `extra` argument (round 2026-09-04). */
+	void *unk_0x54;
 
 	/* Set by func_8005937C(this, value); no other observed use. */
 	s32 unk_0x58;
