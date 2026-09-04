@@ -53,6 +53,16 @@ struct Table6D940 {
 };
 extern Table6D940 D_8006D940;
 
+/* The 0x34-byte object new_class_6d940 allocates. Only the fields
+ * func_8002C18C itself touches are named. */
+typedef struct Obj6D940 Obj6D940;
+struct Obj6D940 {
+    Table6D940 *methods; /* +0x000, func_8002C18C */
+    u8 pad004[0x02C - 0x004];
+    s32 unk2C;            /* +0x02C, func_8002C18C: zeroed */
+    s32 unk30;             /* +0x030, func_8002C18C: zeroed */
+};
+
 /*
  * A second, DIFFERENT function-pointer table, reached only via the
  * uncarved accessor `func_80026CAC()` (not this unit's function to
@@ -114,7 +124,16 @@ void *new_class_6d940(s32 arg1)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C18C);
+void func_8002C18C(Obj6D940 *self, s32 arg1)
+{
+    func_80026CAC()->slot08(self);
+    self->methods = func_8002C3A8();
+    self->unk2C = 0;
+    self->unk30 = 0;
+    if (arg1 != 0) {
+        self->methods->slot6C(self, arg1);
+    }
+}
 
 s32 func_8002C200(void *self)
 {
