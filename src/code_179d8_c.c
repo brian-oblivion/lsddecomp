@@ -55,7 +55,10 @@ void func_80032998(void)
     func_80032708(1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800329B8);
+void func_800329B8(void)
+{
+    func_80032708(0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800329D8);
 
