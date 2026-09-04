@@ -182,7 +182,9 @@ void func_8002CBE4(void) {
 void func_8002CBEC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CBF4);
+void func_8002CBF4(ObjDA34 *self, s32 arg1) {
+    self->unk60 = arg1 * 12 - 0x18;
+}
 
 TableDA34 *func_8002CC0C(void) {
     return &D_8006DA34;
