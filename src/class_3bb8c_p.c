@@ -91,13 +91,109 @@ void func_80057618(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s3
     }
 }
 
+/* A 12-byte {s16,s16,s32,s32} query/result record. Built by this unit's
+ * own func_80057784 (still queued) into caller-supplied buffers, and
+ * walked as an array (stride 0xC) by func_80057954. Field meaning beyond
+ * shape unconfirmed; kept opaque. */
+typedef struct GridQuery {
+    s16 unk0;
+    s16 unk2;
+    s32 unk4;
+    s32 unk8;
+} GridQuery;
+
+/* A grid-bucket linked-list node: singly-linked chain at +0x38, the same
+ * "self-typed next pointer" idiom already established for `EntryChildObj`
+ * in include/class_3bb8c.h (an UNRELATED class, per this round's own
+ * research -- convergent shape, not a shared type). Walked by
+ * func_80057A18; matched against with func_80057B54 (already matched,
+ * this unit, below). */
+typedef struct GridElem {
+    u8 pad00[0x38];
+    struct GridElem *next;
+} GridElem;
+
+/* self->unk_0x4C's pointee dereferences to one of these via its own
+ * `+0x4` field (a s16 flag at +0x2C, read by func_80057954) and, when
+ * treated as func_80057A18's 5th argument, a grid-array base pointer at
+ * `+0x10`. Two independent call sites agree on this shape; kept opaque
+ * beyond the two fields actually read. */
+typedef struct GridArrElemInner {
+    u8 pad00[0x2C];
+    s16 unk2C;
+} GridArrElemInner;
+typedef struct GridArrElem {
+    u8 pad00[0x4];
+    GridArrElemInner *unk4;
+    u8 pad08[0x10 - 0x8];
+    GridElem **unk10;
+} GridArrElem;
+
+void *func_80057B54(void *arg0, void *arg1, void *arg2);
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057668);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057784);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057954);
+void *func_80057A18(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057A18);
+/* Walks `count` entries of `arr1` (a `GridQuery[]`, stride 0xC) paired
+ * element-for-element with `arr2` (a `GridArrElem *[]`, stride 4),
+ * skipping any entry whose `GridArrElem` doesn't have its `+0x2C` flag
+ * set, and calling `func_80057A18` on the rest; returns the first
+ * non-NULL result, or NULL if every entry was skipped or came back empty
+ * (round 2026-09-04). */
+void *func_80057954(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2) {
+    s32 i;
+
+    for (i = 0; i < count;) {
+        GridArrElem *elem = *arr2;
+        i++;
+        if (elem->unk4->unk2C != 0) {
+            void *result = func_80057A18(self, arg1, arg2, arr1, elem);
+            if (result != NULL) {
+                return result;
+            }
+        }
+        arr1 = (GridQuery *) ((u8 *) arr1 + 0xC);
+        arr2++;
+    }
+    return NULL;
+}
+
+/* Scans a rectangular window of a grid of `GridElem` bucket lists, rooted
+ * at `source->unk_0x10`, `query->unk8` rows by `query->unk4` columns,
+ * starting at row `query->unk2`, column `query->unk0` (each row is 0x50
+ * bytes = 20 bucket-head pointers; each column step is one bucket-head
+ * pointer, 4 bytes). For each bucket, tries `func_80057B54` against the
+ * head first, then each linked element in turn (`->next`), returning the
+ * first one `func_80057B54` accepts (non-NULL); NULL if the whole window
+ * comes up empty. `self` (this function's own first argument) is read
+ * from `a0` in the disassembly but never touched by the body -- present
+ * only to match its caller's calling convention (round 2026-09-04). */
+void *func_80057A18(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source) {
+    s32 row, col;
+    GridElem **bucket;
+
+    bucket = (GridElem **) ((u8 *) source->unk10 + query->unk2 * 0x50 + query->unk0 * 4);
+    for (row = 0; row < query->unk8; row++) {
+        for (col = 0; col < query->unk4; col++) {
+            GridElem *node;
+
+            if (func_80057B54(*bucket, arg1, arg2) != NULL) {
+                return *bucket;
+            }
+            for (node = (*bucket)->next; node != NULL; node = node->next) {
+                if (func_80057B54(node, arg1, arg2) != NULL) {
+                    return node;
+                }
+            }
+            bucket++;
+        }
+        bucket = (GridElem **) ((u8 *) bucket - (query->unk4 * 4 + 0x50));
+    }
+    return NULL;
+}
 
 extern s32 func_8001E7BC(void);
 
