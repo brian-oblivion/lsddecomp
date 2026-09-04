@@ -122,7 +122,45 @@ a lost one. Check them by hand, every time.
    touches only that file plus `docs/match-reports/` entries for functions in
    it. Nothing else.
 
-   **This rule does NOT partition headers, and the head must plan for that.**
+   **This rule does NOT partition headers, and the head must plan for that —
+   at ASSIGNMENT time, with one command, before provisioning anything:**
+
+   ```sh
+   python3 tools/headercontention.py                     # the whole map
+   python3 tools/headercontention.py <unit> <unit> ...   # verdict on a plan
+   ```
+
+   Two runners whose units include the same project header will both edit it.
+   That is not a hypothetical and it is not rare — it has fired in every round
+   that concentrated runners, and the cost scales with **how many runners share
+   a header**, not with how many runners there are:
+
+   | round | staffing | outcome |
+   | --- | --- | --- |
+   | 8 | 2 runners, adjacent slices of one carve | the round's only conflict |
+   | 13 | 3 shared-header collisions | one git auto-merged with **no conflict marker**; only the build caught it, on `conflicting types` |
+   | 15 | 5 runners, all `class_3bb8c_*` | **6 of 7 merges conflicted**; 4 hard prototype collisions, one latent across two merges |
+
+   None of those cost a match and none were unresolvable. What they cost was
+   **head attention** — the constraint this document names as binding. Round 15
+   left three runners un-resent with fresh ground still in their units because
+   the merge queue, not runner capacity, had become the bottleneck. Prefer
+   units whose header sets are disjoint; `headercontention.py` with no
+   arguments lists the units that share nothing with anyone, and those are free
+   to staff alongside anything.
+
+   **Contention is a property of the HEADER SET, not the unit-name prefix, and
+   this is the part that bites.** `class_3bb8c_k` looks like an ordinary
+   `class_3bb8c_*` slice, but it also includes `class_39e08.h` — and that is
+   exactly the edge that broke round 15, where a prototype one runner put in
+   `class_3bb8c.h` collided with the canonical declaration in `class_39e08.h`,
+   in the single unit that sees both. Grouping by name prefix would not have
+   shown it. Run the tool rather than reading the unit names.
+
+   **Concentrating is still sometimes right** — it is often the only ground
+   available, and a `fresh` queue that lives entirely in one block leaves no
+   choice. Take the trade knowingly: the tool prints the mitigations to apply
+   when you do, and they are the same ones the rest of this rule describes.
    Round 8 assigned `class_3bb8c` and `class_3bb8c_b` — adjacent slices of one
    class block — to two runners, who then both edited `include/class_3bb8c.h`
    and produced the round's only merge conflict. Two consequences, both the
@@ -609,6 +647,20 @@ queue (`wc -l asm/nonmatchings/<unit>/*.s | sort -rn`) and read the match
 reports for the functions you intend to assign — see "Unit and segment state"
 in MATCHING-GUIDE.
 
+**Then price the assignment's header contention, before provisioning:**
+
+```sh
+python3 tools/headercontention.py <the units you intend to assign>
+```
+
+`fresh` is blind to this the same way it is blind to toolchain blockers. Two
+units can both be full of clean fresh ground and still be a poor pair to staff
+together, because their runners will both edit one header and the head pays at
+merge time. Collision rule 1 has the measured three-round history and the
+mitigations; the point here is that **this is a Gate 1 decision, not a
+merge-time surprise** — it is the cheapest possible moment to act on it, and
+acting on it costs one command.
+
 **Gate 2 — carve to refill.** If fresh-assignable functions are fewer than
 roughly (runners × per-runner target), carve new units BEFORE provisioning.
 Most of the game is still uncarved, so this gate fires early and often.
@@ -625,7 +677,38 @@ for f in asm/*.s; do b=$(basename "$f" .s); case "$b" in psyq_*|header) continue
 The `psyq_*` segments are Sony SDK code: excluded from the game-code
 denominator, and left for last. Matching them proves nothing about this game.
 
-1. Pick the next contiguous run of uncarved functions, ~20 per unit.
+1. Pick a contiguous run of uncarved functions, ~20 per unit — but pick it by
+   **blocker density, not by "next"**. Blockers CLUSTER, so the aggregate rate
+   for a monolith is a bad guide to any particular slice of it, and the front
+   of a monolith is not a neutral place to cut. Measured 2026-09-04 over the
+   two remaining uncarved game monoliths, in non-overlapping 20-function
+   windows:
+
+   ```
+   code_179d8 (267 funcs, 44% blocked overall)
+     [  0.. 19]  6/20 clean      <- carving "the next 20" lands HERE
+     [ 20.. 39]  2/20 clean
+     [ 40.. 59] 15/20 clean
+     [ 60.. 79] 16/20 clean
+     [100..119] 20/20 clean      <- and this exists in the same segment
+     [140..159]  5/20 clean
+   class_3bb8c_n (113 funcs, 27% blocked overall)
+     [  0.. 19]  1/20 clean      <- carving "the next 20" lands HERE
+     [ 60.. 79] 19/20 clean
+     [ 80.. 99] 18/20 clean
+   ```
+
+   A 1-of-20 slice is a unit that cannot staff a runner, and it would have
+   been chosen by following the old wording literally. **`code_179d8`'s "43%
+   blocked" note in the splat yaml is true in aggregate and misleading as a
+   carve decision** — its clean windows are as good as anything round 15
+   carved. Run the three-grep screen across windows before choosing the
+   boundary; it is seconds, and it is the difference between a unit worth a
+   runner and one worth none.
+
+   Carving from the MIDDLE is fine and costs one extra segment: split the
+   monolith into `[.. before] asm`, `[the slice] c`, `[after ..] asm`. Name
+   the two remainders so the next head can tell them apart.
 2. **Check boundaries in the disassembly, on both sides.**
    - *Under-split.* A function allocates its frame exactly once, so more than
      one `addiu $sp, $sp, -N` inside a single function's `.s` means the symbol
@@ -837,6 +920,24 @@ substantial task of its own, stay at three.
 Queues need not be equal — give the leaf-dense unit to the runner with the
 largest queue. Carve BEFORE spawning so runners never touch the yaml.
 
+**And spread runners across units with DISJOINT HEADER SETS where you can.**
+This is the one sizing lever that reduces head attention rather than spending
+it: `python3 tools/headercontention.py <units>` before provisioning, details
+and the measured history in collision rule 1. It also changes what carving is
+FOR — when Gate 2 fires and you get to choose which monolith to carve into,
+carving across two different blocks buys a conflict-free round, while carving
+four more slices of the block you are already in guarantees another
+all-conflicting one. Round 15 carved four slices of a single block and got six
+conflicting merges out of seven; that was a defensible choice given where the
+fresh ground was, but it was a choice, and it was not free.
+
+**A concentrated round should be SMALLER than a spread one.** If the fresh
+ground genuinely lives in one block, four or five contending runners will
+saturate the head before the runners saturate the machine — round 15's evidence
+is that three of five finished early with ground left and could not be re-sent.
+Three contending runners plus re-sends is likely to beat five contending
+runners without them.
+
 **Mid-round broadcasts are worth their cost.** A lever found at hour one is
 worth several times more applied across four units than banked for the
 write-up. Push it to every live runner immediately, and **ask explicitly for the
@@ -939,6 +1040,17 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > `cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head`, convert the position
 > (**1-based**) with `vram = (N - 1) - 0x800 + 0x80010000`, and look that up
 > in `build/lsdde.map`.
+>
+> **A prototype for a function ANOTHER unit defines goes in YOUR `.c`, never
+> in a shared header.** Same for an `extern <your local type> D_XXXX;`. This
+> is the one shared-header mistake that git does not mark and your own green
+> build does not catch: the collision only appears in some OTHER unit that
+> includes both your header and a second one declaring the same name. Round 15
+> hit it four times; the worst instance stayed latent for two merges and then
+> broke a unit that had never touched the declaration. A unit-local view
+> belongs in the unit — if you name a type for your own reading of a class,
+> keep the type AND the declarations that use it next to your code. Put in the
+> shared header only what a sibling unit would genuinely reuse unchanged.
 >
 > PARALLEL MODE RULES: do not edit DECOMPILATION_LEARNINGS.md,
 > MATCHING-GUIDE.md, PROGRESS.md, config/, or any file outside your unit. Put

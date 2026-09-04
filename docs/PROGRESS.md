@@ -132,22 +132,49 @@ warnings instead of errors.
   buildable. Both were acceptable and both were disclosed, which is the part
   that mattered.
 
-### Next round
+### Next round — carve FIRST, into `code_179d8`, and spread
 
-**Runners, not a carve.** 17 fresh remain across three partially-worked units
-(`_i` 6, `_k` 6, `_l` 3) and 406 uncarved game functions sit in three
-monoliths (`code_179d8` 274, `class_3bb8c_j` remainder now `class_3bb8c_n`
-113, `class_3bb8c_h` 17 BIOS trampolines). That is under one runner-round of
-fresh ground, so **Gate 2 will fire immediately** — but the three partial
-units are cheap continuations for the first runners while the head carves.
+Round 15's own lesson was "spread runners across unrelated blocks". That is
+now a Gate 1 command (`tools/headercontention.py`, added after the round) and
+the groundwork below is measured so the next head does not re-derive it.
 
-Two things to do differently: **spread runners across unrelated blocks** if
-possible, since concentrating five on one class block is what produced six
-conflicting merges; and **budget head time for merges explicitly**, because
-that queue, not the runners, is what ended this round early.
+**Spreading is NOT available from existing fresh ground — measured.** The 17
+fresh functions live in `class_3bb8c_i` (6), `class_3bb8c_k` (6),
+`class_3bb8c_l` (3), all of which include `class_3bb8c.h` and therefore all
+contend; the only header-independent units left have 1 fresh each
+(`class_3ac78`, `code_2cc8c_f`). `headercontention.py` on those three returns a
+mutually-independent subset of **1 of 3**. So a spread round requires a carve
+into a different block, and **Gate 2 should fire before provisioning, not
+after**.
 
-`class_3bb8c_h`'s 13 `jr $t2` BIOS trampolines remain the one carve that needs
-an operator decision (`hasm` segment vs literal `.word`), unchanged.
+**Carve `code_179d8`.** It is the only large uncarved block that is not
+`class_3bb8c`, it has no existing project header, so a unit carved from it
+contends with nothing. Two cautions, both measured:
+
+- **Do not carve its first 20 functions** — that window is 6/20 clean.
+  Blockers cluster: `[100..119]` is **20/20 clean**, `[60..79]` 16/20,
+  `[40..59]` and `[80..99]` 15/20. The splat yaml's "43% blocked" note on this
+  segment is true in aggregate and a bad carve guide; see Gate 2's window
+  table.
+- **Its rodata slot `0xFD8` will need the attach/split dance**, and this one is
+  known to genuinely hold text pointers — 179 of its 483 words are vram
+  addresses inside `code_179d8`'s own text, the rest ASCII. Because those
+  pointers span the whole segment, expect to split the slot per carved slice
+  rather than attach it whole. Gate 2 documents the three-step version.
+
+`class_3bb8c_n` (113 functions, the round-15 remainder) also has clean
+windows — `[60..79]` 19/20, `[80..99]` 18/20, and its first 20 are 1/20, so
+the same do-not-carve-the-front caution applies. But it stays inside the
+contended block, so prefer it as the *second* carve, or for a deliberately
+concentrated smaller round.
+
+**Sizing.** Three contending runners plus re-sends likely beats five
+contending runners without them: round 15 left alpha, charlie and delta
+un-resent with fresh ground still in their units purely because the head's
+merge queue saturated. If the round does end up concentrated, make it smaller.
+
+`class_3bb8c_h`'s 13 `jr $t2` BIOS trampolines remain the one carve needing an
+operator decision (`hasm` segment vs literal `.word`), unchanged.
 
 ---
 

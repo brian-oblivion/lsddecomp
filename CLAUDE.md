@@ -299,6 +299,23 @@ Gate 2.
 6. On a match: keep the C idiomatic, name things sensibly, add new struct
    knowledge to `include/`, write the report, commit.
 
+   **"To `include/`" has one exception, and it is the mistake git does not
+   mark.** A prototype for a function ANOTHER unit defines — or an
+   `extern <your local type> D_XXXX;` — belongs in your own `.c`, not in a
+   header a sibling unit includes. Your build stays green either way; the
+   collision appears in whichever OTHER unit includes both your header and a
+   second one declaring the same name, as `conflicting types`. Round 15 hit
+   this four times and the worst instance stayed latent through two merges
+   before breaking a unit that had never touched the declaration.
+
+   The test is reuse, not tidiness: put in a shared header what a sibling
+   would use UNCHANGED, and keep next to your code anything that encodes
+   *your* reading of a class. The project's multiple-independent-local-views
+   convention is what makes two readings legitimate — it is placing them in
+   one shared header that breaks. `python3 tools/headercontention.py` shows
+   which units share a header and would therefore see each other's
+   declarations.
+
 ## The four ways a score lies
 
 `funcdiff.py` guards two of these mechanically and will exit 2 rather than
@@ -459,6 +476,7 @@ python3 tools/progress.py          # where the project is
 python3 tools/funcdiff.py <func>   # per-function score
 python3 tools/classtable.py --scan # the 60 class method tables
 python3 tools/classtable.py <t> --vs <base>   # what a subclass overrides
+python3 tools/headercontention.py  # which units would fight over a header
 tools/setup-worktree.sh <name>     # provision a parallel runner
 ```
 
