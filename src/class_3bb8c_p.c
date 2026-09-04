@@ -160,6 +160,29 @@ DreamSysBaseMethods *func_80057C84(void) {
     return &D_800878D4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057C94);
+extern void *func_80017B34(s32 size);
+
+/* The class allocated below, table D_800879C4 (49 slots, uncarved --
+ * lives in the still-monolithic asm/class_3bb8c_q.s, this unit's
+ * immediate successor per class_3bb8c_o.c's own file banner). Only the
+ * ctor slot (+0x008) is needed here, resolved via `tools/classtable.py
+ * D_800879C4` to this unit's own `func_80057D10` (see its own report).
+ * `func_80057F58` is a plain no-argument getter for `&D_800879C4` --
+ * confirmed by reading its own body directly in asm/class_3bb8c_q.s,
+ * which is otherwise off limits (uncarved ground, not this unit's). */
+typedef struct D_800879C4Methods {
+    u8 pad00[0x8];
+    void *(*ctor)(void *self, void *arg1, void *arg2, void *arg3);
+} D_800879C4Methods;
+extern D_800879C4Methods *func_80057F58(void);
+
+void *func_80057C94(void *arg1, void *arg2, void *arg3) {
+    void *obj = func_80017B34(0xA8);
+    if (obj != NULL) {
+        func_80057F58()->ctor(obj, arg1, arg2, arg3);
+        return obj;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057D10);
