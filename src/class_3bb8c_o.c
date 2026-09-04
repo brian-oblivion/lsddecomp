@@ -123,7 +123,114 @@ void func_80056F28(LinkOwnerObj *this) {
     func_800183DC((void **)this->arr84, 5);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056F4C);
+/* ------------------------------------------------------------------ *
+ * Group 2: func_80056F4C onward -- the shared intermediate base class,
+ * see the file banner.  BaseObjO/BaseObjOMethods is THIS unit's own view
+ * (established here, not copied from either sibling header).
+ * ------------------------------------------------------------------ */
+
+typedef struct BaseObjO BaseObjO;
+typedef struct BaseObjOMethods BaseObjOMethods;
+
+/* arg passed to slot10/slot14 (the link/unlink pair): only its own vtable
+ * HEADER WORD (masked, not just the tag byte) is read, to classify it as
+ * one of two companion-object kinds. */
+typedef struct TagWordMethodsO {
+    s32 header; /* +0x000 */
+} TagWordMethodsO;
+typedef struct TagWordObjO {
+    TagWordMethodsO *methods;
+} TagWordObjO;
+
+/* A different tag check (func_80057320's arg1, and self->unk28 in
+ * func_800571F8): only the vtable header's LOW BYTE is read. */
+typedef struct TagByteObjO TagByteObjO;
+typedef struct TagByteMethodsO {
+    u8 tag;                              /* +0x000 */
+    u8 pad1[0xE8 - 0x1];                   /* +0x001 .. +0x0E7, unknown */
+    void (*slotE8)(TagByteObjO *self);       /* +0x0E8 */
+} TagByteMethodsO;
+struct TagByteObjO {
+    TagByteMethodsO *methods;
+};
+
+/* Scratch buffer func_800571F8 builds on its own stack and forwards to
+ * slot8C/slot90/func_8001F66C.  Retail's own frame layout requires it to
+ * be 0x38 bytes (sp+0x10 .. sp+0x47, with the saved registers starting at
+ * sp+0x48) -- a plain `Vec3O` (0xC bytes) undersizes the frame and
+ * shifts everything after this function.  Field layout beyond that is
+ * unestablished. */
+typedef struct Buf38O {
+    u8 raw[0x38];
+} Buf38O;
+
+/* self->unk14's pointee (func_800573CC): +0x000 is a word cleared after
+ * the vector at +0x018 is written/accumulated into. */
+typedef struct Unk14ObjO {
+    s32 unk0;      /* +0x000 */
+    u8 pad4[0x14];   /* +0x004 .. +0x017, unknown */
+    Vec3O vec18;      /* +0x018 .. +0x023 */
+} Unk14ObjO;
+
+/* The FIXED base table returned by func_8001E57C(), which -- MEASURED
+ * elsewhere (class_3bb8c.h, code_d294.h) -- takes no real arguments and
+ * always returns the same global regardless of what garbage is in $a0 at
+ * the call site.  This unit's own reading needs slots +0x008 (ctor,
+ * checked against NULL -- so unlike class_3bb8c.h's existing
+ * `BaseCtorTableB_3bb8c_c` this one is NOT void), +0x010, +0x014, +0x018
+ * and +0x088. */
+typedef struct FixedBaseTable {
+    u8 pad0[0x8];                                     /* +0x000 .. +0x007 */
+    void *(*ctor)(void *self);                          /* +0x008 */
+    u8 pad0C[0x10 - 0xC];                                 /* +0x00C .. +0x00F */
+    void (*slot10)(BaseObjO *self, TagWordObjO *arg);       /* +0x010 */
+    void (*slot14)(BaseObjO *self, TagWordObjO *arg);        /* +0x014 */
+    void (*slot18)(BaseObjO *self);                             /* +0x018 */
+    u8 pad1C[0x88 - 0x1C];                                        /* +0x01C .. +0x087 */
+    void (*slot88)(BaseObjO *self, s32 arg1);                       /* +0x088 */
+} FixedBaseTable;
+
+extern FixedBaseTable *func_8001E57C(void);
+
+struct BaseObjOMethods {
+    s32 header;                                       /* +0x000 */
+    void *unk04;                                         /* +0x004 */
+    BaseObjO *(*ctor)(BaseObjO *self);                     /* +0x008 func_80057044 (this unit) */
+    void (*dtor)(BaseObjO *self);                            /* +0x00C */
+    void (*slot10)(BaseObjO *self, TagWordObjO *arg);          /* +0x010 func_800570B4 (this unit) */
+    void (*slot14)(BaseObjO *self, TagWordObjO *arg);            /* +0x014 func_80057130 (this unit) */
+    void (*slot18)(BaseObjO *self);                                 /* +0x018 func_800571A8 (this unit) */
+    u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
+    void (*slot40)(BaseObjO *self);                                     /* +0x040, called by func_80057044's own ctor; occupant outside this unit */
+    u8 pad44[0x8C - 0x44];                                                /* +0x044 .. +0x08B */
+    void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by func_800571F8 */
+    void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by func_800571F8 */
+    u8 pad94[0xBC - 0x94];                                                       /* +0x094 .. +0x0BB */
+    void (*slotBC)(BaseObjO *self, Vec3O *arg1);                                  /* +0x0BC func_800573A8 (this unit), called by func_80057444 */
+};
+
+struct BaseObjO {
+    BaseObjOMethods *methods; /* +0x000 */
+    u8 pad4[0x10];              /* +0x004 .. +0x013, unknown */
+    Unk14ObjO *unk14;             /* +0x014 */
+    u8 pad18[0x8];                  /* +0x018 .. +0x01F, unknown */
+    void *unk20;                      /* +0x020, checked non-NULL and passed to func_8001F3A4 */
+    u8 pad24[0x4];                      /* +0x024 .. +0x027, unknown */
+    TagByteObjO *unk28;                   /* +0x028 */
+    u8 pad2C[0x44 - 0x2C];                  /* +0x02C .. +0x043, unknown */
+    s32 unk44;                                /* +0x044 */
+    s16 unk48;                                  /* +0x048 */
+    u8 pad4A[0x2];                                /* +0x04A .. +0x04B, unknown */
+    TagWordObjO *unk4C;                             /* +0x04C, companion-object pointer #1 (header&0xFFF==0x114) */
+    TagWordObjO *unk50;                               /* +0x050, companion-object pointer #2 (header&0xF==5) */
+    s32 unk54;                                          /* +0x054 */
+};
+
+extern BaseObjOMethods D_800876FC;
+
+BaseObjOMethods *func_80056F4C(void) {
+    return &D_800876FC;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056F5C);
 
