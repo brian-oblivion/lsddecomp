@@ -55,6 +55,13 @@ typedef struct ObjA34_179D8H {
     u32 unk1C;
 } ObjA34_179D8H;
 
+/* func_800270B8, strcpy, strcat: still uncarved (code_171e0.c / this unit's
+ * own later entries respectively) -- declared LOCAL, per-call-site typed. */
+extern char *func_800270B8(void);
+extern char *strcpy(char *dest, char *src);
+extern char *strcat(char *dest, char *src);
+extern char D_8008A8A8[]; /* ";1", the ISO9660 CD file-version suffix */
+
 void func_80028898(UnkFlagsObj_171e0 *self) {
     ((UnkFlagsObjMethods_171e0 *)func_80026C9C())->ctor(self);
     self->methods = func_80027E68();
@@ -70,7 +77,13 @@ void func_80028918(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028920);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_800289CC);
+char *func_800289CC(char *dest, char *suffix) {
+    dest[0] = '\\';
+    strcpy(dest + 1, func_800270B8());
+    strcat(dest, suffix);
+    strcat(dest, D_8008A8A8);
+    return dest;
+}
 
 void func_80028A34(ObjA34_179D8H *self) {
     if (self->unk0C != 0) {
