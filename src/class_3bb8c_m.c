@@ -146,7 +146,16 @@ void func_800542D0(ObjM *self) {
     self->unk34->methods->slot88(self->unk34);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800543FC);
+void func_800543FC(ObjM *self) {
+    if (self->unk80 != 0) {
+        self->unk7C->methods->slot4(self->unk7C);
+    }
+    self->unk34->methods->slot8C(self->unk34);
+    self->unk54->methods->slot50(self->unk54);
+    self->unk10->methods->slot50(self->unk10);
+    self->unk18->methods->slotB4(self->unk18, 1);
+    self->unk80 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800544D4);
 
