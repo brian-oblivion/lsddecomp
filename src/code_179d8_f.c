@@ -70,7 +70,50 @@ s32 func_80036044(void)
     return func_80038D74(0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036064);
+/* Globals owned by the uncarved psyq_SpuSetMute unit, poked directly here. */
+extern s32 D_8008E258;
+extern s32 D_8008E25C;
+extern void func_80036B20(s32 *a0);
+
+s32 func_80036064(s32 a0)
+{
+    s32 neg = 0;
+    u32 v1 = a0;
+    s32 s0;
+    s32 result;
+
+    if ((s16)a0 < 0) {
+        neg = 1;
+        v1 = -a0;
+    }
+    if ((v1 & 0xFFFF) < 10) {
+        D_8008E258 = 1;
+        if (neg) {
+            D_8008E25C = (s16)(v1 | 0x100);
+        } else {
+            D_8008E25C = (s16)v1;
+        }
+        s0 = (s16)v1;
+        if (s0 == 0) {
+            /* Both arms are the same call. Found by permuter search: a
+             * plain `if (s0 == 0) func_80038D74(0);` merges a0's register
+             * into v1's, dropping retail's extra `move v1,a0`. Keeping a0
+             * referenced here (even in dead-equal branches) keeps the
+             * allocator from reusing its register for v1, matching retail's
+             * register footprint exactly. */
+            if (a0) {
+                func_80038D74(0);
+            } else {
+                func_80038D74(0);
+            }
+        }
+        func_80036B20(&D_8008E258);
+        result = s0;
+    } else {
+        result = -1;
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036108);
 
