@@ -122,7 +122,11 @@ u8 CdStatus(void) {
     return D_8006D60C;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028C44);
+extern u8 D_8006D61D;
+
+u8 func_80028C44(void) {
+    return D_8006D61D;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028C54);
 
