@@ -60,7 +60,14 @@ void func_8005227C(Class86F88 *self)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800522DC);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800523F0);
+void func_800523F0(Class86F88 *self, s32 arg1)
+{
+    Class86F88 *other = self->unk3C;
+
+    if (other != NULL) {
+        other->methods->slot80(other, arg1, 0x60, 0x60);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052430);
 
