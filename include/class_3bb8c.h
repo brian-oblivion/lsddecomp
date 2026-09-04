@@ -1648,4 +1648,154 @@ extern s32 func_800508F8(s32 handle);                       /* close */
 extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 extern s32 func_80050908(void *arg0);                          /* func_8004EF6C */
 
+/* -------------------------------------------------------------------
+ * class_3bb8c_m additions below (fourth 20-function slice of the tail,
+ * 0x44518..0x44F14 -- see src/class_3bb8c_m.c's header comment for the
+ * carve provenance). This is a DIFFERENT object graph from Obj866E8
+ * above: the field offsets established here (0x10, 0x14, 0x18, 0x20,
+ * 0x34, 0x3C, 0x54, 0x80, 0x84) don't correspond to anything already
+ * documented on Obj866E8's layout, and this unit's own self-vtable slots
+ * (0x10, 0x14, 0x30, 0xB8, 0xD4) collide with nothing already recorded in
+ * Obj866E8Methods either. Kept as an entirely independent type rather
+ * than folded into Obj866E8, per this project's established
+ * multiple-independent-local-views convention -- nothing in this unit's
+ * own evidence ties its `self` to that type. Named with an "M" suffix to
+ * avoid implying any relationship.
+ * ------------------------------------------------------------------- */
+
+typedef struct ObjM ObjM;
+typedef struct ObjMMethods ObjMMethods;
+typedef struct FieldM14 FieldM14;
+typedef struct FieldM14Methods FieldM14Methods;
+typedef struct FieldM18 FieldM18;
+typedef struct FieldM18Methods FieldM18Methods;
+typedef struct FieldM3C FieldM3C;
+typedef struct FieldM3CMethods FieldM3CMethods;
+typedef struct ChildM_AC ChildM_AC;
+typedef struct ChildM_ACMethods ChildM_ACMethods;
+typedef struct ChildM114 ChildM114;
+typedef struct SubM4 SubM4;
+typedef struct SubM4Methods SubM4Methods;
+typedef struct ParamM ParamM;
+typedef struct ParamMMethods ParamMMethods;
+
+/* self->unk3C's target (func_80053D18/func_80053D9C/func_80053E00/
+ * func_80053F84/func_80054120). Rich vtable; only the slots this unit's
+ * functions actually dispatch are typed. */
+struct FieldM3CMethods {
+    u8 pad000[0x0F0];
+    void (*slotF0)(FieldM3C *self, s32 *out, s32 arg2); /* +0x0F0, func_80053D18: writes *out */
+    void (*slotF4)(FieldM3C *self, s32 arg1);           /* +0x0F4, func_80053D9C/func_80053E00/func_80053F84 */
+    u8 pad0F8[0x0FC - 0x0F8];
+    void (*slotFC)(FieldM3C *self);                     /* +0x0FC, func_80053D18 */
+    u8 pad100[0x13C - 0x100];
+    void (*slot13C)(FieldM3C *self, s32 arg1);          /* +0x13C, func_80053E00 */
+    u8 pad140[0x17C - 0x140];
+    void (*slot17C)(FieldM3C *self, s32 arg1);          /* +0x17C, func_80053F84 */
+    u8 pad180[0x1A0 - 0x180];
+    void *(*slot1A0)(FieldM3C *self, s32 arg1);         /* +0x1A0, func_80054120 (return discarded there) */
+};
+struct FieldM3C {
+    FieldM3CMethods *methods;   /* +0x000 */
+};
+
+/* self->unk18's target (func_80053EB4/func_80053F84). */
+struct FieldM18Methods {
+    u8 pad000[0x064];
+    void (*slot64)(FieldM18 *self, s32 arg1);   /* +0x064, func_80053F84 */
+    u8 pad068[0x0AC - 0x068];
+    ChildM_AC *(*slotAC)(FieldM18 *self);       /* +0x0AC, func_80053EB4 */
+    u8 pad0B0[0x0B4 - 0x0B0];
+    void (*slotB4)(FieldM18 *self, s32 arg1);   /* +0x0B4, func_800543FC (not this round's target) */
+};
+struct FieldM18 {
+    FieldM18Methods *methods;   /* +0x000 */
+};
+
+/* Returned by FieldM18Methods::slotAC (func_80053EB4). */
+struct ChildM_ACMethods {
+    u8 pad000[0x0D0];
+    void (*slotD0)(ChildM_AC *self, s32 arg1);                      /* +0x0D0 */
+    u8 pad0D4[0x0D8 - 0x0D4];
+    void (*slotD8)(ChildM_AC *self, s32 arg1, s32 arg2, s32 arg3);  /* +0x0D8 */
+};
+struct ChildM_AC {
+    ChildM_ACMethods *methods;  /* +0x000 */
+};
+
+/* self->unk14's target (func_80054120). */
+struct FieldM14Methods {
+    u8 pad000[0x114];
+    ChildM114 *(*slot114)(FieldM14 *self, s32 *out);  /* +0x114, func_80054120 */
+};
+struct FieldM14 {
+    FieldM14Methods *methods;   /* +0x000 */
+};
+
+/* Returned by FieldM14Methods::slot114 (func_80054120). */
+struct SubM4Methods {
+    u8 pad000[0x084];
+    void (*slot84)(SubM4 *self);  /* +0x084, func_80054120 */
+};
+struct SubM4 {
+    SubM4Methods *methods;      /* +0x000 */
+    u8 pad004[0x034 - 0x004];
+    s32 unk34;                   /* +0x034, func_80054120 */
+};
+struct ChildM114 {
+    u8 pad0[0x004];
+    SubM4 *unk4;                 /* +0x004, func_80054120 */
+    u8 pad8[0x014 - 0x008];
+    s32 unk14;                    /* +0x014, func_80054120: set from func_8005C7D4's return */
+};
+
+/* func_80053F84's own arg1 parameter -- dispatched via its own vtable
+ * slot 0xE4. Independent of FieldM14 above (unrelated numeric slot
+ * range, nothing ties the two together). */
+struct ParamMMethods {
+    u8 pad000[0x0E4];
+    s32 (*slotE4)(ParamM *self);  /* +0x0E4, func_80053F84 */
+};
+struct ParamM {
+    ParamMMethods *methods;      /* +0x000 */
+};
+
+/* Uncarved sibling (src/code_4cd08.c, still INCLUDE_ASM), func_80054120's
+ * only external call. Typed purely from that call site's own register
+ * setup: (value, out-pointer, opaque-object) -> s32, whose result is
+ * stored into a ChildM114's unk14 and tested for zero. The third arg is
+ * FieldM3CMethods::slot1A0's own return value (not `self->unk14`'s
+ * child), so it stays void* rather than ChildM114* -- nothing ties the
+ * two together. */
+extern s32 func_8005C7D4(s32 arg0, s32 *arg1, void *arg2);
+
+/* The self type for this unit's func_80053D18..func_8005426C cluster.
+ * Only the slots/fields these functions actually reach are typed. */
+struct ObjMMethods {
+    u8 pad000[0x010];
+    void (*slot10)(ObjM *self, ChildM_AC *arg1);  /* +0x010, func_80053EB4 */
+    void (*slot14)(ObjM *self, ParamM *arg1);     /* +0x014, func_80053F84 */
+    u8 pad018[0x030 - 0x018];
+    void (*slot30)(ObjM *self, s32 arg1);          /* +0x030, func_80053E84/func_80053F84/func_80054208/func_8005426C */
+    u8 pad034[0x0B8 - 0x034];
+    void (*slotB8)(ObjM *self);                     /* +0x0B8, func_800540E8 */
+    u8 pad0BC[0x0D4 - 0x0BC];
+    void (*slotD4)(ObjM *self);                     /* +0x0D4, func_80054208/func_8005426C */
+};
+
+struct ObjM {
+    ObjMMethods *methods;   /* +0x000 */
+    u8 pad004[0x010 - 0x004];
+    s32 unk10;               /* +0x010, func_80053EB4: forwarded to ChildM_AC::slotD8 */
+    FieldM14 *unk14;         /* +0x014, func_80054120 */
+    FieldM18 *unk18;         /* +0x018, func_80053EB4/func_80053F84 */
+    u8 pad01C[0x020 - 0x01C];
+    s32 unk20;                /* +0x020, func_80053D18/func_80053D9C/func_80053E00/func_80053F84: a mode/state code */
+    u8 pad024[0x03C - 0x024];
+    FieldM3C *unk3C;          /* +0x03C, func_80053D18/func_80053D9C/func_80053E00/func_80053F84/func_80054120 */
+    u8 pad040[0x080 - 0x040];
+    s32 unk80;                 /* +0x080, func_800541D4 */
+    s32 unk84;                 /* +0x084, func_800541D4/func_80054200/func_80054208/func_8005426C */
+};
+
 #endif

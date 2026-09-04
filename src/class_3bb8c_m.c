@@ -16,8 +16,19 @@
  * Header edits must be strictly ADDITIVE.
  */
 #include "common.h"
+#include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053D18);
+/* Forward declaration: defined later in this same unit, but called by
+ * func_80053D18/func_80053D9C/func_80053E00 above its own definition. */
+extern void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+
+void func_80053D18(ObjM *self) {
+    s32 val;
+    self->unk20 = 7;
+    self->unk3C->methods->slotF0(self->unk3C, &val, -1);
+    func_80053EB4(self, val, 0, 5, 1);
+    self->unk3C->methods->slotFC(self->unk3C);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053D9C);
 
