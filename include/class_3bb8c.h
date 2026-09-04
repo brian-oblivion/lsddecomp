@@ -2215,7 +2215,15 @@ typedef struct TargetObj86ED0 TargetObj86ED0;
 typedef struct TargetMethods86ED0 TargetMethods86ED0;
 struct TargetMethods86ED0 {
     u8 pad000[0x080];
-    void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2); /* +0x080, func_8005161C */
+    /* +0x080, func_8005161C: `self->methods->slot80(self, arg1, 0x60, 0x60)`.
+     * 3 args, not 2 -- confirmed against this project's established
+     * self->methods->slot80(self, arg1, 0x60, 0x60) idiom seen at several
+     * other call sites (src/class_3bb8c_k.c, src/code_2cc8c.c,
+     * src/class_3bb8c_g.c, src/code_55dd4.c), all forwarding a caller-
+     * supplied arg1 alongside a repeated literal. func_8005161C itself
+     * takes that arg1 as its own second parameter and forwards it
+     * unchanged (same register, no move instruction). */
+    void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);
 };
 struct TargetObj86ED0 {
     TargetMethods86ED0 *methods; /* +0x000 */

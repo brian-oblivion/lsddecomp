@@ -179,7 +179,15 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_80051370);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_800513D0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_8005161C);
+void func_8005161C(Obj86ED0 *self, s32 arg1)
+{
+    TargetObj86ED0 *target;
+
+    target = self->unk3C;
+    if (target != NULL) {
+        target->methods->slot80(target, arg1, 0x60, 0x60);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_8005165C);
 
