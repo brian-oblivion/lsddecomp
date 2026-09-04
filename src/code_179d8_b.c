@@ -36,6 +36,7 @@ extern s32 D_8006D608;
 
 /* Still INCLUDE_ASM in asm/code_179d8_mid.s -- not this unit's to carve. */
 extern s32 func_800299BC(s32 arg0, s32 arg1);
+extern s32 func_80029C40(s32 arg0, s32 arg1);
 
 s32 func_80028CE0(s32 arg0)
 {
@@ -53,7 +54,10 @@ s32 func_80028D68(s32 arg0, s32 arg1)
     return func_800299BC(arg0, arg1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028D88);
+s32 func_80028D88(s32 arg0, s32 arg1)
+{
+    return func_80029C40(arg0, arg1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DA8);
 
