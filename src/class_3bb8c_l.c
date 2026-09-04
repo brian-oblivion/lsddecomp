@@ -91,7 +91,43 @@ void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053358);
+void func_80053358(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
+    Obj87034Methods_3bb8c_l *m = self->methods;
+    void (*fn)(Obj87034_3bb8c_l *);
+
+    if (self->unk68 == 0) {
+        return;
+    }
+    if (eventId == 0x16) {
+        goto case_c8;
+    }
+    if (eventId < 0x17) {
+        if (eventId == 0xC) {
+            goto case_c0;
+        }
+        return;
+    }
+    if (eventId == 0x21) {
+        goto case_74;
+    }
+    if (eventId == 0x2C) {
+        goto case_c4;
+    }
+    return;
+case_74:
+    fn = m->slot74;
+    goto call;
+case_c0:
+    fn = m->slotC0;
+    goto call;
+case_c8:
+    fn = m->slotC8;
+    goto call;
+case_c4:
+    fn = m->slotC4;
+call:
+    fn(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_800533F0);
 
