@@ -38,6 +38,23 @@ extern D_800879C4Table D_800879C4;
 
 extern void *func_80017B34(s32 size);
 
+typedef struct D_80087AACObj D_80087AACObj;
+
+/* This unit's own local view of the shared base-class table returned by
+ * func_8003DFBC() (a plain no-argument getter, established elsewhere --
+ * e.g. include/code_2c054.h, include/class_3bb8c.h -- as returning
+ * &D_8006E730). Only the slots this unit's own functions dispatch
+ * through are typed, per the project's "per-call-site signature"
+ * convention (multiple units already carry independent local views of
+ * this same table with different slot arities). */
+typedef struct D_8006E730Methods {
+    u8 pad00[0x44];
+    /* +0x044, called by this unit's own func_80058390 as (self, arg1,
+     * arg2). */
+    void (*slot44)(D_80087AACObj *self, void *arg1, void *arg2);
+} D_8006E730Methods;
+extern D_8006E730Methods *func_8003DFBC(void);
+
 void func_80057F38(void) {
 }
 
@@ -60,7 +77,6 @@ D_800879C4Table *func_80057F58(void) {
  * fields/slots each function actually touches are typed; the rest stay
  * opaque so the struct keeps the right size without requiring every
  * method to be named up front. */
-typedef struct D_80087AACObj D_80087AACObj;
 typedef struct D_80087AACMethods {
     u8 pad00[0x8];
     /* +0x008, this unit's own ctor (func_80057FC8). */
@@ -76,8 +92,11 @@ extern D_80087AACMethods *func_80058764(void);
 
 struct D_80087AACObj {
     D_80087AACMethods *methods;
-    u8 pad04[0x238 - 0x4];
-    /* +0x238, read by this unit's own func_800581C4. */
+    u8 pad04[0x38 - 0x4];
+    /* +0x038, read by this unit's own func_80058390. */
+    s32 unk_0x38;
+    u8 pad3C[0x238 - 0x3C];
+    /* +0x238, read by this unit's own func_800581C4/func_80058390. */
     s32 unk_0x238;
 };
 
@@ -107,7 +126,15 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058228);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058308);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058390);
+s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
+    s32 result;
+    func_8003DFBC()->slot44(self, arg1, arg2);
+    result = 2;
+    if (self->unk_0x238 == 0) {
+        result = self->unk_0x38;
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058404);
 
