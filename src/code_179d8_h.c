@@ -130,4 +130,8 @@ u8 func_80028C44(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028C54);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028CC0);
+extern void func_8002A510(void);
+
+void func_80028CC0(void) {
+    func_8002A510();
+}
