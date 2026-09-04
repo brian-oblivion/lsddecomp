@@ -206,7 +206,22 @@ void func_8005161C(Obj86ED0 *self, s32 arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_8005165C);
+void func_8005165C(Obj86ED0 *self)
+{
+    s32 old;
+    s32 v;
+
+    if (self->unk48 != NULL) {
+        old = self->unk18;
+        v = old + 1;
+        self->unk18 = v;
+        if (v < self->unk10) {
+            self->methods->slotA4(self, v, 1);
+        } else {
+            self->unk18 = old;
+        }
+    }
+}
 
 void func_800516C0(Obj86ED0 *self)
 {
