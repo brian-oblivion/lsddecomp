@@ -41,6 +41,7 @@ extern s32 D_8006D608;
 extern s32 func_800299BC(s32 arg0, s32 arg1);
 extern s32 func_80029C40(s32 arg0, s32 arg1);
 extern s32 func_8002A378(void *arg0);
+extern s32 func_8002B304(s32 arg0, s32 arg1);
 
 s32 func_80028CE0(s32 arg0)
 {
@@ -96,7 +97,10 @@ s32 func_800291C8(void *arg0)
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800291EC);
+s32 func_800291EC(s32 arg0, s32 arg1)
+{
+    return func_8002B304(arg0, arg1) == 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029210);
 
