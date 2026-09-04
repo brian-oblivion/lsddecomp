@@ -278,7 +278,22 @@ Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052C10);
+void func_80052C10(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+{
+    func_8004A4B8()->ctor((Obj865C8 *)self, 0, arg1);
+    self->methods = func_800544D4();
+    self->unk64 = 0;
+    self->unk68 = 0;
+    self->unk60 = 1;
+    self->unk54 = arg2;
+    self->unk38 = arg5;
+    self->unk6C = arg1;
+    self->unk74 = arg3;
+    self->unk70 = arg4;
+    self->unk80 = 0;
+    self->unk84 = 0;
+    self->methods->slot40(self);
+}
 
 void func_80052CD8(Obj865C8 *self)
 {
