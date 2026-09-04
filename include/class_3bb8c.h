@@ -2031,6 +2031,8 @@ typedef struct DreamSysMethods_3bb8c_l {
 } DreamSysMethods_3bb8c_l;
 typedef struct DreamSysObj_3bb8c_l {
     DreamSysMethods_3bb8c_l *methods;
+    u8 pad04[0x164 - 0x004];
+    s32 unk164;             /* +0x164, func_80053BE8: sign-checked gate */
 } DreamSysObj_3bb8c_l;
 
 /* Whatever arg1->unkC points to in func_80052DE8 -- a registration sink
@@ -2061,7 +2063,9 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, func_80053134 */
     void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, func_800531CC */
     void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, func_800533F0 */
-    u8 padC0[0x0C0 - 0x090];
+    u8 pad90[0x09C - 0x090];
+    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, func_80053BE8 */
+    u8 padA0[0x0C0 - 0x0A0];
     void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, func_80053358 (event 0xC) */
     void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, func_80053358 (event 0x2C)/func_80053458 */
     void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, func_80053358 (event 0x16) */

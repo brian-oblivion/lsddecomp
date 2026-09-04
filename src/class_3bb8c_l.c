@@ -196,17 +196,29 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053984);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053ACC);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053BE8);
-
-/* func_80053C94's own helper, and it lives in the sibling slice
- * class_3bb8c_m, where round 15's runner echo matched it byte-exact as
- * `void func_80053EB4(ObjM *self, s32, s32, s32, s32)`. Declared locally
- * rather than in include/class_3bb8c.h on purpose: this unit's view of the
- * class is `Obj87034_3bb8c_l` and echo's is `ObjM`, the two are the same
- * class (see the HEAD NOTE in that header), and a shared-header declaration
- * would put two incompatible prototypes for one function in front of both
- * translation units. The return type is echo's, from the definition. */
+/* func_80053BE8's (and func_80053C94's, further below) own helper, and it
+ * lives in the sibling slice class_3bb8c_m, where round 15's runner echo
+ * matched it byte-exact as `void func_80053EB4(ObjM *self, s32, s32, s32,
+ * s32)`. Declared locally rather than in include/class_3bb8c.h on purpose:
+ * this unit's view of the class is `Obj87034_3bb8c_l` and echo's is `ObjM`,
+ * the two are the same class (see the HEAD NOTE in that header), and a
+ * shared-header declaration would put two incompatible prototypes for one
+ * function in front of both translation units. The return type is echo's,
+ * from the definition. */
 extern void func_80053EB4(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+
+void func_80053BE8(Obj87034_3bb8c_l *self) {
+    s32 color;
+
+    if (self->unk3C->unk164 < 0) {
+        self->methods->slot9C(self);
+    } else {
+        self->unk20 = 5;
+        color = self->unk3C->methods->slot200(self->unk3C);
+        func_80053EB4(self, color, 0, 0xA, 1);
+        self->unk3C->methods->slotFC(self->unk3C);
+    }
+}
 
 void func_80053C94(Obj87034_3bb8c_l *self) {
     s32 color;
