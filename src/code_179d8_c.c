@@ -158,4 +158,7 @@ s16 func_80032C98(void *a0, s16 a1)
     return func_80032D34(a0, a1, 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032CCC);
+s16 func_80032CCC(void *a0, s16 a1, s32 a2)
+{
+    return func_80032D34(a0, a1, 1, a2);
+}

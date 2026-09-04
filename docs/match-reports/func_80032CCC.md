@@ -1,0 +1,29 @@
+# func_80032CCC
+
+**Unit:** code_179d8_c · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
+
+## What it does
+
+Sibling of `func_80032C98`: a three-argument tail-call wrapper around
+`func_80032D34`, forwarding `a0` and `a1` (`s16`, re-narrowed the same
+way) and passing the caller's own third argument through as the callee's
+fourth, with the callee's third argument fixed to `1` (vs. `0` in
+`func_80032C98`). See `func_80032C98.md` for what `func_80032D34` is.
+
+## The C
+
+```c
+s16 func_80032CCC(void *a0, s16 a1, s32 a2)
+{
+    return func_80032D34(a0, a1, 1, a2);
+}
+```
+
+(shares the `extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32
+a3);` prototype declared above `func_80032C98` in
+`src/code_179d8_c.c`.)
+
+## Provenance
+
+round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
+second pass). Matched first attempt, alongside `func_80032C98`.
