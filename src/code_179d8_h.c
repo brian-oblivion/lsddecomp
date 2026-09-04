@@ -159,6 +159,10 @@ u8 func_80028C44(void) {
     return D_8006D61D;
 }
 
+extern s32 func_8002A6EC(void);
+extern s32 func_8002A75C(void);
+extern s32 func_8002A5F8(void);
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028C54);
 
 extern void func_8002A510(void);
