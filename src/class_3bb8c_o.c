@@ -394,4 +394,9 @@ void func_80057444(BaseObjO *self, s16 *arg1) {
     self->methods->slotBC(self, &buf);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_8005748C);
+extern s32 D_8008ABA8;
+extern void func_80057534(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
+
+void func_8005748C(BaseObjO *self, s32 arg1, s32 arg2) {
+    func_80057534(self, &D_8008ABA8, arg1, arg2, 6);
+}
