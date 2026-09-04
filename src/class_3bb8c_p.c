@@ -114,13 +114,16 @@ typedef struct GridElem {
 } GridElem;
 
 /* self->unk_0x4C's pointee dereferences to one of these via its own
- * `+0x4` field (a s16 flag at +0x2C, read by func_80057954) and, when
- * treated as func_80057A18's 5th argument, a grid-array base pointer at
- * `+0x10`. Two independent call sites agree on this shape; kept opaque
- * beyond the two fields actually read. */
+ * `+0x4` field (a s16 flag at +0x2C, read by func_80057954, and a second
+ * s16 at +0x32, read by func_80057784) and, when treated as
+ * func_80057A18's 5th argument, a grid-array base pointer at `+0x10`.
+ * Multiple independent call sites agree on this shape; kept opaque
+ * beyond the fields actually read. */
 typedef struct GridArrElemInner {
     u8 pad00[0x2C];
     s16 unk2C;
+    u8 pad2E[0x32 - 0x2E];
+    s16 unk32;
 } GridArrElemInner;
 typedef struct GridArrElem {
     u8 pad00[0x4];
@@ -129,10 +132,25 @@ typedef struct GridArrElem {
     GridElem **unk10;
 } GridArrElem;
 
+/* Output buffer filled in by DreamSysUnk4CMethods::slot0x110 (see
+ * include/DreamSys.h) and read back by this unit's own func_80057784.
+ * Only the three fields actually touched are named. */
+typedef struct LinkQueryBuf {
+    u8 pad00[0x2];
+    s8 unk2;
+    s8 unk3;
+    u8 pad04[0x24 - 0x4];
+    GridArrElem *unk24;
+} LinkQueryBuf;
+
 void *func_80057B54(void *arg0, void *arg1, void *arg2);
+s32 func_80057784(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4);
+void *func_80057954(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057668);
 
+/* STALL -- see docs/match-reports/func_80057784.md. Best reached: 13/116
+ * words, preserved there in #if 0 with full declarations. */
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057784);
 
 void *func_80057A18(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);

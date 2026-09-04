@@ -263,14 +263,40 @@ typedef struct DreamSysUnk4CMethods {
 	   straight into vtable slot +0x1D4 (func_8005A7A0)'s `currentPos`
 	   argument (round 2026-09-02) -- same signature, different caller. */
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
-	u8 pad_0x110[0x11C - 0x110];
+	/* Called by this unit's own func_80057668 as (this->unk_0x4C, out,
+	   this->unk_0x14 + 0x18) -- an output buffer (`out`, later read by
+	   func_80057784 as its own `arg3`) and the same "self->unk_0x14 + 0x18"
+	   raw byte-offset position pointer as slot0x11C's own call site above
+	   (round 2026-09-04). */
+	s32 (*slot0x110)(void *self, void *out, void *pos);
+	u8 pad_0x114[0x118 - 0x114];
+	/* This unit's own func_80057784 dispatches to it twice, with a
+	   different argument count each time (per-call-site signature, see
+	   func_80057B54's report): `(this->unk_0x4C, arg1, arg2, arg3)` and
+	   `(this->unk_0x4C, arg1)` -- typed here with the fuller shape; the
+	   shorter call simply leaves the trailing two as whatever the
+	   registers already held. Return value is stored into a
+	   `GridArrElem *` array slot (round 2026-09-04). */
+	void *(*slot0x118)(void *self, s32 arg1, s32 arg2, void *arg3);
 	/* Called by func_80058B08's `arg1 == -2` path as (this->unk_0x4C,
 	   (u8 *)this->unk_0x14 + 0x18); the result's `unk_0x4` is chased and its
 	   `unk_0x2C` compared against the literal 2 (round 2026-09-02). */
 	DreamSysUnk11CResult *(*slot0x11C)(void *self, void *arg1);
 } DreamSysUnk4CMethods;
+
+/* Object pointed to by DreamSysUnk4CObj::unk_0x68 -- only the two fields
+ * this unit's own func_80057784 reads are named (round 2026-09-04). */
+typedef struct DreamSysUnk4C68Obj {
+	u8 pad00[0x2];
+	s16 unk_0x2;
+	s32 unk_0x4;
+} DreamSysUnk4C68Obj;
+
 typedef struct DreamSysUnk4CObj {
 	DreamSysUnk4CMethods *methods;
+	u8 pad04[0x68 - 0x4];
+	/* Read by this unit's own func_80057784 (round 2026-09-04). */
+	DreamSysUnk4C68Obj *unk_0x68;
 } DreamSysUnk4CObj;
 
 /* Shared intermediate base class table (D_800878D4 -- see
