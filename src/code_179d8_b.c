@@ -5,9 +5,12 @@
  * Carved round 16 by blocker DENSITY, not by "next": code_179d8 is 44%
  * blocked in aggregate but the blockers CLUSTER, so the aggregate says
  * nothing about any particular window. This one screened 16/20 clean.
- * The four blocked functions are already stubbed as match reports:
+ * The three blocked functions are already stubbed as match reports:
  *   func_80028CF8, func_80028D30, func_80029478  -- addiu_at
- *   func_800292F4                                -- nop_mflo_mfhi
+ * func_800292F4 was misclassified nop_mflo_mfhi by an inverted screen
+ * (round 16 head correction) -- it is fresh ground, not blocked. It
+ * contains mult->mfhi (the hazard-slot direction, not a blocker), retail's
+ * signed-divide-by-constant idiom.
  *
  * func_80029478 owns jtbl_800109F8, whose sub-slot of the 0xFD8 rodata
  * region is ATTACHED to this unit in the splat yaml. Leave that alone.
@@ -44,6 +47,16 @@ extern s32 func_8002A378(void *arg0);
 extern s32 func_8002B304(s32 arg0, s32 arg1);
 extern s32 func_80024D70(s32 arg0, s32 arg1); /* asm/psyq_GsLinkObject4.s */
 extern s32 func_8002B198(s32 arg0);
+extern s32 func_8002AEE0(s32 arg0, s32 arg1);
+extern s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2);
+
+/* CD-ROM MSF (minute/second/sector-in-frame) timecode, all three fields
+ * packed BCD. This unit's own local reading -- see func_800293F8. */
+typedef struct {
+    u8 minute;
+    u8 second;
+    u8 sector;
+} MSF179D8;
 
 s32 func_80028CE0(s32 arg0)
 {
@@ -114,12 +127,60 @@ s32 func_80029234(s32 arg0)
     return func_8002B198(arg0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029254);
+s32 func_80029254(s32 arg0, s32 arg1)
+{
+    return func_8002AEE0(arg0, arg1);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029274);
+s32 func_80029274(s32 arg0, s32 arg1, s32 arg2)
+{
+    s32 i;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800292F4);
+    for (i = 3; i != -1; i--) {
+        if (func_8002ADE8(arg1, arg0, arg2) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800293F8);
+MSF179D8 *func_800292F4(s32 arg0, MSF179D8 *arg1)
+{
+    s32 lba;
+    s32 totalSeconds;
+    s32 frame;
+    s32 minute;
+    s32 second;
+    s32 frameTens;
+
+    lba = arg0 + 150;
+    totalSeconds = lba / 75;
+    frame = lba % 75;
+    frameTens = (frame / 10) << 4;
+    minute = totalSeconds / 60;
+    second = totalSeconds % 60;
+
+    arg1->second = ((second / 10) << 4) + (second % 10);
+    arg1->sector = frameTens + (frame % 10);
+    arg1->minute = ((minute / 10) << 4) + (minute % 10);
+    return arg1;
+}
+
+s32 func_800293F8(MSF179D8 *arg0)
+{
+    u8 minute;
+    u8 second;
+    s32 decodedMinute;
+    u8 sector;
+    s32 total;
+
+    minute = arg0->minute;
+    second = arg0->second;
+    decodedMinute = (minute >> 4) * 10 + (minute & 0xF);
+    total = decodedMinute;
+    total = total * 60 + ((second >> 4) * 10 + (second & 0xF));
+    sector = arg0->sector;
+    return (total * 75 + ((sector >> 4) * 10 + (sector & 0xF))) - 150;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029478);
