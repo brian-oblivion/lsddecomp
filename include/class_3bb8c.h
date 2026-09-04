@@ -1844,4 +1844,204 @@ struct ObjM {
     s32 unk84;                 /* +0x084, func_800541D4/func_80054200/func_80054208/func_8005426C */
 };
 
+/* -------------------------------------------------------------------
+ * HEAD NOTE, round 15 merge: `ObjM` (above, from class_3bb8c_m) and
+ * `Obj87034_3bb8c_l` (below, from class_3bb8c_l) are the SAME CLASS.
+ * Both units independently reached method table D_80087034, which is
+ * exactly the collision runner delta anticipated when it suffixed its
+ * type names. The proof is a cross-unit call, not a guess:
+ * func_80053EB4 is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
+ * CALLED from class_3bb8c_l.c (func_80053C94) passing its own
+ * `Obj87034_3bb8c_l *self` as the same first argument.
+ *
+ * They are deliberately NOT unified yet. Both views are byte-exact as
+ * they stand, they were derived from disjoint evidence, and merging two
+ * field maps is a struct edit that reaches 24 matched functions across
+ * two units -- the round-13 hazard, and not something to do inside a
+ * merge resolution. Unify as its own change, with the whole-image SHA1
+ * re-verified after, and fold `ObjM`s offsets in as the more complete
+ * view. Until then, treat a field present in one view and absent in the
+ * other as unknown-but-real rather than contradictory.
+ * ------------------------------------------------------------------- */
+
+/*
+ * class_3bb8c_l -- the class whose method table is D_80087034 (53 slots,
+ * resolved with tools/classtable.py 0x80087034). This unit is the FIRST to
+ * write any of this class's own methods, but sibling units class_3bb8c_k
+ * and class_3bb8c_m are being carved/worked in the SAME round and may
+ * independently reach the SAME table -- per round 14's learning ("suffix
+ * new type names with your unit" when other runners are live on the same
+ * header), every type below carries the `_3bb8c_l` suffix so a later merge
+ * cannot collide on a name. Only the slots/fields this unit's own chosen
+ * functions actually dispatch through are given concrete types; everything
+ * else stays opaque padding.
+ */
+typedef struct Obj87034_3bb8c_l Obj87034_3bb8c_l;
+
+/* self->unk50's pointee: a plain (non-vtable) record, read directly by
+ * func_800531CC via ordinary field offsets, never through a methods
+ * pointer -- so it is NOT another Obj87034_3bb8c_l, just an opaque
+ * 3-field descriptor. */
+typedef struct Unk50Struct_3bb8c_l {
+    u8 pad00[0x0C];
+    void *unkC;   /* +0x00C, func_800531CC (address taken, forwarded opaquely) */
+    u8 pad10[0x014 - 0x010];
+    s32 unk14;    /* +0x014, func_800531CC: discriminant compared against 2 */
+    void *unk18;  /* +0x018, func_800531CC (address taken, forwarded opaquely) */
+} Unk50Struct_3bb8c_l;
+
+/* Whatever self->unk14 points to: an object of some OTHER, unidentified
+ * class -- it has its own methods pointer at +0x000 (func_8005393C
+ * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (func_800531CC
+ * reads it directly). Offset +0x10C happens to coincide with a DreamSys
+ * vtable offset, but DreamSys's own occupant there (func_8005937C) takes
+ * one s32 argument while this call site passes two -- different arities,
+ * so this is a different class, not DreamSys; left unnamed. */
+typedef struct Obj14Methods_3bb8c_l {
+    u8 pad00[0x10C];
+    void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, func_8005393C */
+} Obj14Methods_3bb8c_l;
+typedef struct Obj14_3bb8c_l {
+    Obj14Methods_3bb8c_l *methods; /* +0x000 */
+    u8 pad04[0x1B4 - 0x004];
+    u16 unk1B4;                     /* +0x1B4, func_800531CC */
+} Obj14_3bb8c_l;
+
+/* Whatever self->unk3C/self->unk18 point to. Resolved by cross-checking
+ * the exact offsets this unit's functions dispatch (+0x050, +0x074,
+ * +0x0FC, +0x104, +0x108, +0x200) against tools/classtable.py's dump of
+ * DREAMSYS_METHODS (0x80087BDC, include/DreamSys.h): every one lands on a
+ * real occupant there (func_80058A94, func_8001D424, func_80059310,
+ * DreamSys__GetSetDreamTimeLimit, func_80059360, DreamSys__GetDreamColor
+ * respectively), and the two whose header signatures are pinned down
+ * (+0x104 `s32(DreamSys*, s32)`, +0x108 `s32(DreamSys*)`) match this unit's
+ * own call-site arities exactly. So this almost certainly IS DreamSys, but
+ * declared as this unit's own minimal, independent, offset-only view
+ * (rather than including DreamSys.h) since none of DreamSys.h's own named
+ * fields cover these particular slots (they sit inside its
+ * `unknown_functions_0x..` padding arrays) and DreamSys.h is a different
+ * unit's header, not this one's to extend. */
+typedef struct DreamSysMethods_3bb8c_l {
+    u8 pad00[0x050];
+    void (*slot50)(void *self);          /* +0x050, func_800536B0 */
+    u8 pad54[0x074 - 0x054];
+    void (*slot74)(void *self);          /* +0x074, func_800536B0 */
+    u8 pad78[0x0FC - 0x078];
+    void (*slotFC)(void *self);          /* +0x0FC, func_800536B0/func_80053C94 */
+    u8 pad100[0x104 - 0x100];
+    s32 (*slot104)(void *self, s32 arg1); /* +0x104, func_800531CC */
+    s32 (*slot108)(void *self);           /* +0x108, func_800531CC */
+    u8 pad10C[0x200 - 0x10C];
+    s32 (*slot200)(void *self);           /* +0x200, func_80053C94 */
+} DreamSysMethods_3bb8c_l;
+typedef struct DreamSysObj_3bb8c_l {
+    DreamSysMethods_3bb8c_l *methods;
+} DreamSysObj_3bb8c_l;
+
+/* Whatever arg1->unkC points to in func_80052DE8 -- a registration sink
+ * of some kind (arg1->unkC->methods->slotC8(arg1->unkC, callback,
+ * userdata) reads like "subscribe `callback` for `userdata`"). Only the
+ * one slot this unit calls through is named. */
+typedef struct RegistrantMethods_3bb8c_l {
+    u8 pad00[0x0C8];
+    void (*slotC8)(void *self, void (*callback)(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3), Obj87034_3bb8c_l *userdata); /* +0x0C8, func_80052DE8 */
+} RegistrantMethods_3bb8c_l;
+typedef struct RegistrantObj_3bb8c_l {
+    RegistrantMethods_3bb8c_l *methods;
+} RegistrantObj_3bb8c_l;
+
+typedef struct Obj87034Methods_3bb8c_l {
+    s32 header;                                                    /* +0x000 */
+    void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by func_800531CC on its `other` argument */
+    u8 pad08[0x010 - 0x008];
+    void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, func_80052DE8 */
+    void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, func_80052EBC/func_800536B0 */
+    u8 pad18[0x048 - 0x018];
+    void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, func_80052EBC/func_80053134 (via self->unk54) */
+    u8 pad4C[0x074 - 0x04C];
+    void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, func_80053358 (event 0x21) */
+    u8 pad78[0x07C - 0x078];
+    void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, func_800531CC */
+    void (*slot80)(Obj87034_3bb8c_l *self);                        /* +0x080, func_800531CC */
+    void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, func_80053134 */
+    void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, func_800531CC */
+    void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, func_800533F0 */
+    u8 padC0[0x0C0 - 0x090];
+    void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, func_80053358 (event 0xC) */
+    void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, func_80053358 (event 0x2C)/func_80053458 */
+    void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, func_80053358 (event 0x16) */
+    u8 padCC[0x0D0 - 0x0CC];
+    void (*slotD0)(Obj87034_3bb8c_l *self);                        /* +0x0D0, func_800533F0/func_80053458 */
+    void (*slotD4)(Obj87034_3bb8c_l *self);                        /* +0x0D4, func_800536B0/func_80053458 */
+} Obj87034Methods_3bb8c_l;
+
+struct Obj87034_3bb8c_l {
+    Obj87034Methods_3bb8c_l *methods; /* +0x000 */
+    u8 pad04[0x00C - 0x004];
+    RegistrantObj_3bb8c_l *unkC;      /* +0x00C, func_80052DE8's `arg1->unkC` */
+    u8 pad10[0x014 - 0x010];
+    Obj14_3bb8c_l *unk14;              /* +0x014, func_800531CC/func_8005393C/func_800536B0 */
+    DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
+    s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
+    s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC and a computed value by func_80053BE8, out of this round's scope) */
+    u8 pad24[0x038 - 0x024];
+    void *unk38;                          /* +0x038, func_80052E7C: forwarded opaquely to func_80049060/func_80049098 */
+    DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
+    u8 pad40[0x050 - 0x040];
+    Unk50Struct_3bb8c_l *unk50;             /* +0x050, func_800531CC */
+    Obj87034_3bb8c_l *unk54;                 /* +0x054, func_80053134 */
+    Obj87034_3bb8c_l *unk58;                  /* +0x058, func_800531A0: forwarded as func_800531CC's `other` */
+    u8 pad5C[0x060 - 0x05C];
+    s32 unk60;                                 /* +0x060, func_800531CC: has-a-target gate, cleared after detaching */
+    s32 unk64;                                  /* +0x064, func_800531CC: set to 1 */
+    s32 unk68;                                   /* +0x068, func_800531CC/func_80053358/func_800533F0: zero-checked gate */
+    u8 pad6C[0x080 - 0x06C];
+    s32 unk80;                                    /* +0x080, func_800531CC (on `other`)/func_800533F0/func_80053458: zero-checked gate */
+};
+
+/* Global BasicClass-family accessor shared across many classes (see
+ * include/class_39e08.h's own fuller `Class86668Methods` view of the SAME
+ * table, D_80086668) -- declared here as this unit's own minimal,
+ * independent local view rather than including that header, per this
+ * project's multiple-independent-local-views convention. Only the one
+ * slot func_80052DE8 dispatches through is named. */
+typedef struct BaseMethods87034_3bb8c_l {
+    u8 pad00[0x044];
+    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, func_80052DE8 */
+    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, func_80052EBC */
+} BaseMethods87034_3bb8c_l;
+extern BaseMethods87034_3bb8c_l *func_8004A4B8(void);
+
+/* func_80052DE8's own registered callback -- forward-declared here since
+ * func_80052DE8 (ROM order earlier) takes its address before its own
+ * definition (ROM order later) is reached. */
+extern void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3);
+
+/* func_800531A0's tail call -- forward-declared for the same ROM-order
+ * reason as func_80052E7C above (func_800531CC is defined later). */
+extern void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
+
+/* func_80052E7C's own two helpers -- still-uncarved ground
+ * (asm/psyq_memset.s). func_80049060 is genuinely called at two different
+ * arities across the executable (func_80049098 forwards to it with 2 real
+ * arguments; func_80052E7C's own `code < 0` branch calls it with only 1,
+ * the second register being whatever the caller's own incoming `code`
+ * argument left behind -- a "leftover register", not a real second
+ * argument), so it is declared K&R/unprototyped here, the documented
+ * escape hatch for a genuinely multi-arity call (see
+ * DECOMPILATION_LEARNINGS round 14). */
+extern s32 func_80049060();
+extern void func_80049098(void *arg0, s32 arg1, s32 arg2);
+
+/* func_8005393C's own helper -- still-uncarved ground (asm/class_3bb8c_n.s).
+ * Typed purely from this call site's own register usage. */
+extern void func_800558F0(void *arg0, void *arg1, s32 arg2);
+
+/* func_80053134's own helpers -- still-uncarved ground
+ * (asm/class_3bb8c_n.s), called with no arguments and their return values
+ * unused. */
+extern void func_8005C76C(void);
+extern void func_80054D30(void);
+
+
 #endif
