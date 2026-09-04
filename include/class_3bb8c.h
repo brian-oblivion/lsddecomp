@@ -2354,7 +2354,11 @@ struct Class86F88Methods {
     /* +0x054 = func_800521D4 itself (this unit, matched). Dispatched by
      * func_8005227C as `self->methods->slot54(self, 4)`. */
     void (*slot54)(Class86F88 *self, s32 state);
-    u8 pad058[0x080 - 0x058];
+    u8 pad058[0x060 - 0x058];
+    /* +0x060, func_80052A58/func_8005281C's own trailing dispatch, both
+     * conditional on a caller-supplied flag, both `(self, 0)`. */
+    void (*slot60)(Class86F88 *self, s32 arg1);
+    u8 pad064[0x080 - 0x064];
     /* +0x080 = func_80052498 itself (this unit, matched), whose own body
      * ignores every argument past `self` -- the 3-argument shape below is
      * what func_800523F0's call site (dispatching through a DIFFERENT
@@ -2418,9 +2422,15 @@ struct Class86F88 {
 };
 
 extern Class86F88Methods D_80086F88;
+/* func_80052A58's fixed 2nd argument to Class86F88ElemMethods::slotB8 on
+ * its own FIRST dispatch (the element at the "old" index) -- immediately
+ * adjacent rodata to D_8008AB10 below (4 bytes before it), never
+ * dereferenced by this unit's own code, only its address taken. */
+extern s32 D_8008AB0C;
 /* func_800529FC's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
  * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
- * own code, only its address taken. */
+ * own code, only its address taken. Also func_80052A58's own SECOND
+ * dispatch (the element at the "new" index, after the increment/decrement). */
 extern s32 D_8008AB10;
 
 /* func_800544D4: a plain class-vtable getter (`lui`/`addiu`, no

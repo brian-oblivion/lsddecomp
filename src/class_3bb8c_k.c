@@ -294,7 +294,29 @@ void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
     elem->methods->slotB8(elem, &D_8008AB10);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052A58);
+void func_80052A58(Class86F88 *self, s32 dir, s32 flag)
+{
+    Class86F88Elem **p;
+    s32 idx;
+
+    if (!self->unk50) {
+        return;
+    }
+    idx = self->unk28 - self->unk20;
+    p = &self->unk40[idx];
+    (*p)->methods->slotB8(*p, &D_8008AB0C);
+    if (dir) {
+        self->unk28++;
+        p++;
+    } else {
+        self->unk28--;
+        p--;
+    }
+    (*p)->methods->slotB8(*p, &D_8008AB10);
+    if (flag) {
+        self->methods->slot60(self, 0);
+    }
+}
 
 s32 func_80052B54(Class86F88 *self)
 {
