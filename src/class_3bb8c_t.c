@@ -65,8 +65,21 @@ typedef struct D_80087AACMethods {
     u8 pad00[0x8];
     /* +0x008, this unit's own ctor (func_80057FC8). */
     D_80087AACObj *(*ctor)(D_80087AACObj *self, void *arg1);
+    u8 pad0C[0x70 - 0xC];
+    /* +0x070, called by this unit's own func_800581C4 as (self, size). */
+    void (*slot70)(D_80087AACObj *self, s32 arg1);
+    u8 pad74[0x94 - 0x74];
+    /* +0x094, called by this unit's own func_800581C4 as (self). */
+    void (*slot94)(D_80087AACObj *self);
 } D_80087AACMethods;
 extern D_80087AACMethods *func_80058764(void);
+
+struct D_80087AACObj {
+    D_80087AACMethods *methods;
+    u8 pad04[0x238 - 0x4];
+    /* +0x238, read by this unit's own func_800581C4. */
+    s32 unk_0x238;
+};
 
 void *func_80057F68(void *arg1) {
     void *obj = func_80017B34(0x244);
@@ -83,7 +96,12 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058078);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800580E0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800581C4);
+void func_800581C4(D_80087AACObj *self) {
+    if (self->unk_0x238 == 0) {
+        self->methods->slot70(self, 0x10);
+        self->methods->slot94(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058228);
 
