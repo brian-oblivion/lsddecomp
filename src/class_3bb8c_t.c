@@ -56,6 +56,10 @@ typedef struct D_8006E730Methods {
     /* +0x044, called by this unit's own func_80058390 as (self, arg1,
      * arg2). */
     void (*slot44)(D_80087AACObj *self, void *arg1, void *arg2);
+    u8 pad48[0x5C - 0x48];
+    /* +0x05C, called by this unit's own func_800580E0 as (self, arg1,
+     * arg2). */
+    void (*slot5C)(D_80087AACObj *self, void *arg1, void *arg2);
 } D_8006E730Methods;
 extern D_8006E730Methods *func_8003DFBC(void);
 
@@ -103,6 +107,10 @@ typedef struct D_80087AACMethods {
     void (*slotD4)(D_80087AACObj *self, char *str, s32 arg2);
     /* +0x0D8, called by this unit's own func_80057FC8 as (self, 0). */
     void (*slotD8)(D_80087AACObj *self, s32 arg1);
+    u8 padDC[0x124 - 0xDC];
+    /* +0x124, this unit's own func_80058694, called by func_800580E0 as
+     * (self). */
+    void (*slot124)(D_80087AACObj *self);
 } D_80087AACMethods;
 extern D_80087AACMethods *func_80058764(void);
 
@@ -111,7 +119,10 @@ extern D_80087AACMethods *func_80058764(void);
  * typed. */
 typedef struct D_80087AACEntry D_80087AACEntry;
 typedef struct D_80087AACEntryMethods {
-    u8 pad00[0xB8];
+    u8 pad00[0x60];
+    /* +0x060, called by this unit's own func_800580E0 as (self, flag). */
+    void (*slot60)(D_80087AACEntry *self, s32 arg1);
+    u8 pad64[0xB8 - 0x64];
     /* +0x0B8, called by this unit's own func_80058694 as (self, 1,
      * &global). */
     void (*slotB8)(D_80087AACEntry *self, s32 arg1, void *arg2);
@@ -137,11 +148,18 @@ struct D_80087AACUnk48Obj {
  * func_800580E0/func_80058404 (both still queued at slot +0x1B0). Only
  * that one slot is typed. */
 typedef struct D_80087AACUnkA4Obj D_80087AACUnkA4Obj;
+/* Return type of D_80087AACUnkA4Methods::slot1B0 -- only the two fields
+ * this unit's own func_800580E0 reads are named. */
+typedef struct D_80087AACUnkA4Result {
+    u8 pad00[0x4];
+    s32 unk_0x4;
+    s32 unk_0x8;
+} D_80087AACUnkA4Result;
 typedef struct D_80087AACUnkA4Methods {
     u8 pad00[0x1B0];
     /* +0x1B0, called by this unit's own func_800580E0/func_80058404 as
      * (self, 0). */
-    void *(*slot1B0)(D_80087AACUnkA4Obj *self, s32 arg1);
+    D_80087AACUnkA4Result *(*slot1B0)(D_80087AACUnkA4Obj *self, s32 arg1);
 } D_80087AACUnkA4Methods;
 struct D_80087AACUnkA4Obj {
     D_80087AACUnkA4Methods *methods;
@@ -159,7 +177,9 @@ struct D_80087AACObj {
     u8 pad30[0x38 - 0x30];
     /* +0x038, read by this unit's own func_80058390. */
     s32 unk_0x38;
-    u8 pad3C[0x48 - 0x3C];
+    /* +0x03C, read by this unit's own func_800580E0. */
+    s32 unk_0x3C;
+    u8 pad40[0x48 - 0x40];
     /* +0x048, read by this unit's own func_80057FC8. */
     D_80087AACUnk48Obj *unk_0x48;
     u8 pad4C[0x84 - 0x4C];
@@ -211,7 +231,16 @@ void func_80058078(D_80087AACObj *self) {
     self->methods->slot6C(self, 0xA);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800580E0);
+void func_800580E0(D_80087AACObj *self, void *arg1, void *arg2) {
+    func_8003DFBC()->slot5C(self, arg1, arg2);
+    if (self->unk_0x3C == 1) {
+        D_80087AACUnkA4Result *result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
+        if (result->unk_0x4 != 0 || result->unk_0x8 != 0) {
+            self->unk_0xA8[0]->methods->slot60(self->unk_0xA8[0], self->unk_0x1C & 1);
+        }
+    }
+    self->methods->slot124(self);
+}
 
 void func_800581C4(D_80087AACObj *self) {
     if (self->unk_0x238 == 0) {
