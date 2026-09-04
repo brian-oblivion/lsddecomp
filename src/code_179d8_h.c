@@ -48,12 +48,43 @@ extern UnkFlagsObjMethods_171e0 *func_80027E68(void);
  * gap, but that header is code_171e0.c's shared reading and is off-limits
  * to edit here (out of unit) -- kept as this unit's own LOCAL, narrower
  * view per the project's multiple-independent-local-views convention. */
+/* A 4-byte, alignment-2 pair -- the idiom CLAUDE.md documents for a struct
+ * whose whole-struct assignment compiles to lwl/lwr + swl/swr instead of a
+ * plain lw/sw (func_80028920's own unk18 copy needs this). Field meaning
+ * unestablished beyond width/alignment. */
+typedef struct Pair16_179D8H {
+    s16 unk0;
+    s16 unk2;
+} Pair16_179D8H;
+
 typedef struct ObjA34_179D8H {
     u8 pad0[0x0C];
     s32 unk0C;
-    u8 pad10[0x1C - 0x10];
+    u8 pad10[0x18 - 0x10];
+    Pair16_179D8H unk18;
     u32 unk1C;
 } ObjA34_179D8H;
+
+/* func_8002B640's own stat-like output buffer (func_80028920's local
+ * `sp+0x10`). Only the two fields func_80028920 itself copies out are
+ * named; the buffer runs up to sp+0x28, where func_80028920's own path
+ * string buffer starts, so it's at least 0x18 bytes -- the rest is
+ * unestablished. */
+typedef struct StatBuf179D8H {
+    Pair16_179D8H unk0;
+    u32 unk4;
+    u8 pad8[0x18 - 0x8];
+} StatBuf179D8H;
+
+/* func_8002B640: still uncarved in its own unit (code_179d8_g, BLOCKED
+ * addiu_at there) -- declared LOCAL here, per-call-site typed. */
+extern s32 func_8002B640(StatBuf179D8H *statBuf, char *path);
+extern void func_80012C20(const char *fmt, void *arg1);
+extern char D_800107F4[];
+
+/* Forward declaration: func_800289CC is defined later in this file (ROM
+ * order), but func_80028920 (earlier in ROM order) calls it. */
+char *func_800289CC(char *dest, char *suffix);
 
 /* func_800270B8, strcpy, strcat: still uncarved (code_171e0.c / this unit's
  * own later entries respectively) -- declared LOCAL, per-call-site typed. */
