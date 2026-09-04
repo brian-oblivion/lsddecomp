@@ -43,6 +43,7 @@ extern s32 func_80029C40(s32 arg0, s32 arg1);
 extern s32 func_8002A378(void *arg0);
 extern s32 func_8002B304(s32 arg0, s32 arg1);
 extern s32 func_80024D70(s32 arg0, s32 arg1); /* asm/psyq_GsLinkObject4.s */
+extern s32 func_8002B198(s32 arg0);
 
 s32 func_80028CE0(s32 arg0)
 {
@@ -108,7 +109,10 @@ s32 func_80029210(s32 arg0)
     return func_80024D70(3, arg0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029234);
+s32 func_80029234(s32 arg0)
+{
+    return func_8002B198(arg0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029254);
 
