@@ -2380,7 +2380,11 @@ struct Class86F88Methods {
     /* +0x054 = func_800521D4 itself (this unit, matched). Dispatched by
      * func_8005227C as `self->methods->slot54(self, 4)`. */
     void (*slot54)(Class86F88 *self, s32 state);
-    u8 pad058[0x080 - 0x058];
+    u8 pad058[0x060 - 0x058];
+    /* +0x060, func_80052A58/func_8005281C's own trailing dispatch, both
+     * conditional on a caller-supplied flag, both `(self, 0)`. */
+    void (*slot60)(Class86F88 *self, s32 arg1);
+    u8 pad064[0x080 - 0x064];
     /* +0x080 = func_80052498 itself (this unit, matched), whose own body
      * ignores every argument past `self` -- the 3-argument shape below is
      * what func_800523F0's call site (dispatching through a DIFFERENT
@@ -2412,6 +2416,10 @@ struct Class86F88ElemMethods {
     void (*release)(Class86F88Elem *self); /* +0x004 */
     u8 pad008[0x0B8 - 0x008];
     void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
+    u8 pad0BC[0x0CC - 0x0BC];
+    /* +0x0CC, func_8005281C: called once per active window element with a
+     * freshly-formatted (func_8005292C) fixed-width text buffer. */
+    void (*slotCC)(Class86F88Elem *self, char *arg1);
 };
 
 struct Class86F88Elem {
@@ -2423,7 +2431,14 @@ struct Class86F88 {
     u8 pad004[0x010 - 0x004];
     s32 unk10;                     /* +0x010, func_8005278C/func_8005281C: element count, clamped to a max of 4 */
     s32 unk14;                     /* +0x014, func_80052430: upper bound compared against unk24+0x1A */
-    u8 pad018[0x020 - 0x018];
+    /* +0x018, func_8005292C: a table of BYTE OFFSETS (s32 each), added to
+     * that function's own `base` (char *) argument to form a source
+     * pointer -- `self->unk18[idx]` is never scaled by anything other than
+     * its own natural s32 stride, and the resulting sum is used as a plain
+     * byte address (strlen/strncpy-style calls), so `base` is a byte
+     * pointer and this is an OFFSET table, not a pointer table. */
+    s32 *unk18;                    /* +0x018, func_8005292C */
+    u8 pad01C[0x020 - 0x01C];
     s32 unk20;                     /* +0x020, func_800523F0(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
     s32 unk24;                     /* +0x024, ditto */
     s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
@@ -2437,9 +2452,15 @@ struct Class86F88 {
 };
 
 extern Class86F88Methods D_80086F88;
+/* func_80052A58's fixed 2nd argument to Class86F88ElemMethods::slotB8 on
+ * its own FIRST dispatch (the element at the "old" index) -- immediately
+ * adjacent rodata to D_8008AB10 below (4 bytes before it), never
+ * dereferenced by this unit's own code, only its address taken. */
+extern s32 D_8008AB0C;
 /* func_800529FC's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
  * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
- * own code, only its address taken. */
+ * own code, only its address taken. Also func_80052A58's own SECOND
+ * dispatch (the element at the "new" index, after the increment/decrement). */
 extern s32 D_8008AB10;
 
 /* func_800544D4: a plain class-vtable getter (`lui`/`addiu`, no
