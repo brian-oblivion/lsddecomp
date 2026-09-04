@@ -127,11 +127,39 @@ void func_8005426C(ObjM *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800542D0);
+void func_800542D0(ObjM *self) {
+    s32 state = self->unk80;
+    if (state == 0) {
+        self->unk7C = func_800408CC(self->unk74, 5, &D_8008AB44[0]);
+        self->unk7C->methods->slot4C(self->unk7C, self->unk14, &D_8008AB38);
+        self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
+        self->unk80 = state + 1;
+        return;
+    }
+    self->unk80 = state + 1;
+    if (state != 4) {
+        return;
+    }
+    self->unk18->methods->slotB4(self->unk18, 0);
+    self->unk10->methods->slot4C(self->unk10);
+    self->unk54->methods->slot4C(self->unk54);
+    self->unk34->methods->slot88(self->unk34);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800543FC);
+void func_800543FC(ObjM *self) {
+    if (self->unk80 != 0) {
+        self->unk7C->methods->slot4(self->unk7C);
+    }
+    self->unk34->methods->slot8C(self->unk34);
+    self->unk54->methods->slot50(self->unk54);
+    self->unk10->methods->slot50(self->unk10);
+    self->unk18->methods->slotB4(self->unk18, 1);
+    self->unk80 = 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800544D4);
+void *func_800544D4(void) {
+    return &D_80087034;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800544E4);
 

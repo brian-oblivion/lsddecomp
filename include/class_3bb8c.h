@@ -1736,6 +1736,12 @@ typedef struct SubM4 SubM4;
 typedef struct SubM4Methods SubM4Methods;
 typedef struct ParamM ParamM;
 typedef struct ParamMMethods ParamMMethods;
+typedef struct FieldM34 FieldM34;
+typedef struct FieldM34Methods FieldM34Methods;
+typedef struct FieldM50 FieldM50;
+typedef struct FieldM50Methods FieldM50Methods;
+typedef struct FieldM7C FieldM7C;
+typedef struct FieldM7CMethods FieldM7CMethods;
 
 /* self->unk3C's target (func_80053D18/func_80053D9C/func_80053E00/
  * func_80053F84/func_80054120). Rich vtable; only the slots this unit's
@@ -1827,6 +1833,67 @@ struct ParamM {
  * two together. */
 extern s32 func_8005C7D4(s32 arg0, s32 *arg1, void *arg2);
 
+/* self->unk34's target (func_800543FC/func_800542D0). */
+struct FieldM34Methods {
+    u8 pad000[0x088];
+    void (*slot88)(FieldM34 *self);  /* +0x088, func_800542D0 */
+    void (*slot8C)(FieldM34 *self);  /* +0x08C, func_800543FC */
+};
+struct FieldM34 {
+    FieldM34Methods *methods;   /* +0x000 */
+};
+
+/* self->unk10/self->unk54's shared target (func_800543FC/func_800542D0).
+ * Distinct from `Unk64Elem` (include/code_2cc8c.h) despite sharing slot
+ * NUMBERS with it (0x4C/0x50): self->unk10's own slot4C call site here
+ * (func_800542D0) sets up only ONE argument (self), which conflicts with
+ * `Unk64ElemMethods::slot4C`'s already-established 3-argument signature
+ * (from that unit's own call sites) -- real counter-evidence against
+ * unifying the two, per this project's established arity-conflict rule.
+ * Kept as its own type. */
+struct FieldM50Methods {
+    u8 pad000[0x04C];
+    void (*slot4C)(FieldM50 *self);  /* +0x04C, func_800542D0 */
+    void (*slot50)(FieldM50 *self);  /* +0x050, func_800543FC */
+};
+struct FieldM50 {
+    FieldM50Methods *methods;   /* +0x000 */
+};
+
+/* self->unk7C's target (func_800543FC/func_800542D0). Returned by
+ * func_800408CC, matched elsewhere (src/code_2cc8c_f.c) with return type
+ * `Unk64Elem *` (include/code_2cc8c.h). This unit keeps its own
+ * independent local view rather than including code_2cc8c.h, per the
+ * project's established multiple-independent-local-views convention --
+ * every slot below (0x004/0x04C/0x0B8) matches `Unk64ElemMethods` exactly
+ * in both offset and signature, which is suggestive (not proof) that this
+ * IS that same class. A different translation unit is free to type a
+ * shared external function's return differently; this does not disturb
+ * code_2cc8c_f.c's already-matched bytes. */
+struct FieldM7CMethods {
+    u8 pad000[0x004];
+    void (*slot4)(FieldM7C *self);                              /* +0x004, func_800543FC */
+    u8 pad008[0x04C - 0x008];
+    void (*slot4C)(FieldM7C *self, FieldM14 *arg1, void *arg2); /* +0x04C, func_800542D0 */
+    u8 pad050[0x0B8 - 0x050];
+    void (*slotB8)(FieldM7C *self, void *arg1);                  /* +0x0B8, func_800542D0 */
+};
+struct FieldM7C {
+    FieldM7CMethods *methods;   /* +0x000 */
+};
+
+/* This unit's own view of the uncarved func_800408CC (see FieldM7C's
+ * comment above for why the return type differs from the other unit's
+ * already-matched view of the same external symbol). */
+extern FieldM7C *func_800408CC(void *ctx, s32 len, char *name);
+
+/* func_800542D0's own literal arguments -- a "Pause" name string plus two
+ * small opaque blocks, all reached only by address (never dereferenced in
+ * this unit). */
+extern char D_8008AB44[];   /* "Pause" (asm/data/7B008.sdata.s) */
+extern s32 D_8008AB38;      /* two-word opaque block, address-only here */
+extern s32 D_8008AB40;      /* one-word opaque block, address-only here */
+
 /* The self type for this unit's func_80053D18..func_8005426C cluster.
  * Only the slots/fields these functions actually reach are typed. */
 struct ObjMMethods {
@@ -1844,15 +1911,31 @@ struct ObjMMethods {
 struct ObjM {
     ObjMMethods *methods;   /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    s32 unk10;               /* +0x010, func_80053EB4: forwarded to ChildM_AC::slotD8 */
+    /* RETYPED round 15b (func_800542D0/func_800543FC): was `s32 unk10`,
+     * established from func_80053EB4's OWN call site as a plain forwarded
+     * register value (never dereferenced there). func_800543FC/
+     * func_800542D0 dereference this same field's vtable directly, so it
+     * IS a pointer -- func_80053EB4 forwards it opaquely either way, and
+     * a pointer-typed argument passed as a raw register value compiles to
+     * the identical `lw`/`move` regardless of C-level pointer-vs-s32
+     * typing (ABI-neutral retype, zero byte cost -- verified: full
+     * rebuild stays whole-image green after this change). */
+    FieldM50 *unk10;         /* +0x010, func_80053EB4 (opaque forward)/func_800543FC/func_800542D0 */
     FieldM14 *unk14;         /* +0x014, func_80054120 */
     FieldM18 *unk18;         /* +0x018, func_80053EB4/func_80053F84 */
     u8 pad01C[0x020 - 0x01C];
     s32 unk20;                /* +0x020, func_80053D18/func_80053D9C/func_80053E00/func_80053F84: a mode/state code */
-    u8 pad024[0x03C - 0x024];
+    u8 pad024[0x034 - 0x024];
+    FieldM34 *unk34;          /* +0x034, func_800543FC/func_800542D0 */
+    u8 pad038[0x03C - 0x038];
     FieldM3C *unk3C;          /* +0x03C, func_80053D18/func_80053D9C/func_80053E00/func_80053F84/func_80054120 */
-    u8 pad040[0x080 - 0x040];
-    s32 unk80;                 /* +0x080, func_800541D4 */
+    u8 pad040[0x054 - 0x040];
+    FieldM50 *unk54;          /* +0x054, func_800543FC/func_800542D0 -- same type as unk10 above */
+    u8 pad058[0x074 - 0x058];
+    void *unk74;               /* +0x074, func_800542D0: forwarded opaquely to func_800408CC's ctx arg */
+    u8 pad078[0x07C - 0x078];
+    FieldM7C *unk7C;          /* +0x07C, func_800542D0 (written)/func_800543FC (dispatched) */
+    s32 unk80;                 /* +0x080, func_800541D4/func_800542D0 */
     s32 unk84;                 /* +0x084, func_800541D4/func_80054200/func_80054208/func_8005426C */
 };
 
@@ -2328,5 +2411,14 @@ extern Class86F88Methods D_80086F88;
  * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
  * own code, only its address taken. */
 extern s32 D_8008AB10;
+
+/* func_800544D4: a plain class-vtable getter (`lui`/`addiu`, no
+ * `lw`/`sw`), returns `&D_80087034` verbatim. Confirmed a BasicClass-
+ * derived vtable with `tools/classtable.py 0x80087034` (header word then
+ * `BasicClass__func_17eb0` at +4, the class-framework fingerprint) --
+ * nothing in this unit dereferences it, so it stays untyped beyond the
+ * address itself, same convention as `D_80086904` above. */
+extern s32 D_80087034;
+extern void *func_800544D4(void);
 
 #endif
