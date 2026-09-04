@@ -56,8 +56,8 @@ extern s32 D_8006D8DC;   /* first of 10 consecutive words zeroed by a pointer wa
 extern s32 D_8006D8E0;
 extern s32 D_8006D8E4;
 extern s32 D_8006D8E8;
-extern s32 D_8006D8EC;
-extern s32 D_8006D8F0;
+extern volatile s32 D_8006D8EC;
+extern volatile s32 D_8006D8F0;
 extern s32 D_8006D8F4;
 extern s32 D_8006D8F8;
 extern s32 D_8006D8FC;
@@ -81,6 +81,10 @@ extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* asm/code_17
 extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* asm/code_179d8_mid.s, per code_179d8_b.c */
 extern s32 func_80029478(void);                                /* asm/nonmatchings/code_179d8_b, BLOCKED (addiu_at) */
 extern s32 func_8002C0AC(const char *arg0, const char *arg1, s32 arg2); /* asm/nonmatchings/code_179d8_d */
+
+/* Still INCLUDE_ASM in THIS unit (not yet converted) -- INCLUDE_ASM leaves no
+ * C-level prototype of its own, so callers within this file need one. */
+extern s32 func_8002AA6C(void);
 
 /* Forward declarations: taken by address before their own ROM-order definition
  * further down this file (func_8002A6EC/func_8002A75C hand func_8002B3F4 to
@@ -129,7 +133,61 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A75C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AA6C);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002ADE8);
+s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2)
+{
+    s32 t;
+    volatile s32 *p;
+
+    p = &D_8006D8EC;
+    *p = arg2;
+    t = *p & 0x30;
+
+    /* Retail keeps all three D_8006D8F0 stores as separate, unmerged blocks
+     * (three distinct address computations -- two folded through $at, one
+     * unfolded through a real GPR) instead of the single shared store GCC's
+     * cross-jump/tail-merge pass produces from the equivalent if/else-if/else
+     * or switch. The barrier on case1 and the local `volatile s32 *` pointers
+     * on case3/case2's-neighbour below are what keeps each store distinct
+     * enough that the merge heuristic can't unify them -- removing any one
+     * of the three re-merges a pair and drops 4-24 bytes. This is a
+     * scheduling/block-identity lever (order/selection), not a register-
+     * identity fix: no operand constraint pins a register here. */
+    if (t == 0) {
+        goto case1;
+    }
+    if (t == 0x20) {
+        goto case2;
+    }
+    goto case3;
+case1:
+    D_8006D8F0 = 0x200;
+    __asm__("");
+    goto join;
+case2:
+    D_8006D8F0 = 0x249;
+    goto join;
+case3:
+    {
+        volatile s32 *q3 = &D_8006D8F0;
+        *q3 = 0x246;
+    }
+join:
+
+    {
+        volatile s32 *q4 = &D_8006D8E4;
+        *q4 = arg0;
+    }
+    D_8006D8E0 = arg1;
+    D_8006D8DC = 8;
+    D_8006D8FC = D_8006D5FC;
+    D_8006D900 = D_8006D600;
+
+    if (D_8006D60C & 0xE0) {
+        func_80029F10(9, 0, 0, 0);
+    }
+    func_800299BC(0, 0);
+    return -(func_8002AA6C() < 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AEE0);
 
