@@ -186,7 +186,49 @@ void func_800536B0(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->unk14);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053764);
+void func_80053764(Obj87034_3bb8c_l *self) {
+    DreamSysMethods_3bb8c_l *m;
+    DreamSysMethods_3bb8c_l *m2;
+    DreamSysObj_3bb8c_l *unk18;
+    DreamSysObj_3bb8c_l *newObj;
+    Unk50Struct_3bb8c_l *unk50;
+    s32 local10;
+    s32 ret;
+    s32 a2;
+    void *a1;
+
+    self->unk68 = 1;
+    self->unk3C->methods->slotF8(self->unk3C, self->unk44, self->unk40);
+    self->unk14->methods->slotEC(self->unk14);
+
+    unk18 = self->unk18;
+    unk50 = self->unk50;
+    unk18->methods->slot60(unk18, 1);
+    unk18->methods->slot64(unk18, unk50->unkC);
+    unk18->methods->slot6C(unk18, unk50->unk1C);
+    m = unk18->methods;
+    if (unk50->unk14 != 1) {
+        a1 = unk50->unk18;
+    } else {
+        a1 = unk50->unkC;
+    }
+    m->slot68(unk18, a1);
+    unk18->methods->slotB0(unk18, 0);
+    unk18->methods->slotB4(unk18, 1);
+
+    newObj = unk18->methods->slotAC(unk18);
+    self->methods->slot10(self, (s32)newObj);
+
+    ret = self->unk3C->methods->slotF0(self->unk3C, &local10, -1);
+    newObj->methods->slotF0(newObj, (s32 *)ret, (ret != 0) ? 3 : 0);
+    m2 = newObj->methods;
+    if (ret == 0) {
+        a2 = -1;
+    } else {
+        a2 = local10;
+    }
+    m2->slotD4(newObj, self->unk10, a2, 0);
+}
 
 void func_8005393C(Obj87034_3bb8c_l *self) {
     func_800558F0(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
