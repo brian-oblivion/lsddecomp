@@ -49,6 +49,15 @@ struct Class87034Methods_3bb8c_k {
     /* +0x040, func_80052C10's own dispatch, right after filling self's
      * fields -- a post-construct hook, self only. */
     void (*slot40)(void *self);
+    u8 pad044[0x090 - 0x044];
+    /* +0x090/+0x0B0/+0x0B4, func_80052D10's own 3-way event-type dispatch
+     * (self, the same EventArg* it was itself called with, and its own
+     * arg2, forwarded verbatim to whichever slot the event's header tag
+     * selects). */
+    void (*slot90)(void *self, EventArg *arg1, s32 arg2);
+    u8 pad094[0x0B0 - 0x094];
+    void (*slotB0)(void *self, EventArg *arg1, s32 arg2);
+    void (*slotB4)(void *self, EventArg *arg1, s32 arg2);
 };
 
 struct Obj87034_3bb8c_k {
@@ -333,4 +342,17 @@ void func_80052CD8(Obj865C8 *self)
     func_8004A4B8()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052D10);
+void func_80052D10(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
+{
+    s32 tag;
+
+    func_8004A4B8()->slot38((Obj865C8 *)self, arg1, arg2);
+    tag = arg1->target->header;
+    if ((tag & 0xFFF) == 0x114) {
+        self->methods->slotB4(self, arg1, arg2);
+    } else if ((tag & 0xFFF) == 0x164) {
+        self->methods->slotB0(self, arg1, arg2);
+    } else if ((tag & 0xFFFF) == 0x1F34) {
+        self->methods->slot90(self, arg1, arg2);
+    }
+}
