@@ -175,7 +175,24 @@ void func_800512C8(Obj86ED0 *self, s32 arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_80051370);
+void func_80051370(Obj86ED0 *self)
+{
+    s32 tag;
+    s32 old;
+
+    tag = self->unk2C;
+    if (tag >= 4) {
+        return;
+    }
+    if (tag < 2) {
+        return;
+    }
+    old = self->unk30;
+    self->unk30 = old + 1;
+    if (old != 0) {
+        self->methods->slot54(self, 4);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_800513D0);
 
