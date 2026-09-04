@@ -122,7 +122,9 @@ void func_8002C428(void) {
 void func_8002C430(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C438);
+TableD9BC *func_8002C438(void) {
+    return &D_8006D9BC;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C448);
 
