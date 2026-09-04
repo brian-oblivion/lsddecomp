@@ -78,7 +78,19 @@ void func_8004D434(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_c", func_8004D47C);
+void func_8004D47C(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+{
+    func_8001E57C(self)->slot9C(self, arg1, arg2);
+    if (arg2 >= 9) {
+        return;
+    }
+    do {
+        if (arg2 < 5) {
+            return;
+        }
+    } while (0);
+    self->methods->slotA0(self, arg1, arg2);
+}
 
 void *func_8004D500(void *self)
 {
