@@ -36,7 +36,12 @@ void func_80053D9C(ObjM *self) {
     self->unk3C->methods->slotF4(self->unk3C, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053E00);
+void func_80053E00(ObjM *self) {
+    self->unk20 = 0xA;
+    func_80053EB4(self, 0, 0, 6, 1);
+    self->unk3C->methods->slot13C(self->unk3C, 2);
+    self->unk3C->methods->slotF4(self->unk3C, 2);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053E84);
 
