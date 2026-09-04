@@ -109,7 +109,9 @@ void func_800541D4(ObjM *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054200);
+void func_80054200(ObjM *self) {
+    self->unk84 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054208);
 
