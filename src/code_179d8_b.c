@@ -23,7 +23,23 @@
  */
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028CE0);
+/* code_179d8_b -- this window's globals are plain scalar state (not a
+ * classtable.py hit anywhere near D_8006D5FC..D_8006D8D8), most plausibly a
+ * low-level serial/link driver: func_8002A378 and func_8002B304 (still
+ * INCLUDE_ASM in the sibling monolith code_179d8_mid) poke raw-looking
+ * control words (0x20943, 0x1323, 0x1325) into a block of globals at
+ * D_8006D8C0..D_8006D934 that read like hardware/SIO register staging, not
+ * object fields. Nothing here is a class method table; extern prototypes
+ * below are this unit's own reading of that driver's entry points. */
+
+extern s32 D_8006D608;
+
+s32 func_80028CE0(s32 arg0)
+{
+    s32 old = D_8006D608;
+    D_8006D608 = arg0;
+    return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028CF8);
 
