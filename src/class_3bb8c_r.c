@@ -414,6 +414,9 @@ void *func_80056464(Obj876FC *self) {
     return func_80057C84()->dtor(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_800564A4);
+void func_800564A4(Obj876FC *self, Block24 *src) {
+    self->block58 = *src;
+    self->unk24 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_800564F4);
