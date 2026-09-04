@@ -206,7 +206,10 @@ s32 func_80052B54(Class86F88 *self)
     return self->unk28;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052B60);
+Class86F88Methods *func_80052B60(void)
+{
+    return &D_80086F88;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052B70);
 
