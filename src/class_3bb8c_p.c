@@ -81,7 +81,7 @@ void func_800575E0(DreamSys *self, s32 val, void *extra) {
 void func_80057610(void) {
 }
 
-void func_80057668(DreamSys *self);
+s32 func_80057668(DreamSys *self);
 
 void func_80057618(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s32 val, void *extra) {
     self->unk_0x28 = NULL;
@@ -141,13 +141,42 @@ typedef struct LinkQueryBuf {
     s8 unk3;
     u8 pad04[0x24 - 0x4];
     GridArrElem *unk24;
+    u8 pad28[0x30 - 0x28];
 } LinkQueryBuf;
 
 void *func_80057B54(void *arg0, void *arg1, void *arg2);
 s32 func_80057784(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4);
 void *func_80057954(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057668);
+s32 func_80057668(DreamSys *self) {
+    LinkQueryBuf sp18;
+    GridQuery sp48[3];
+    /* No known field needs this gap; empirically required to reproduce
+     * retail's exact stack layout for sp78/sp88 below (round 2026-09-04,
+     * see this function's match report). */
+    u8 pad48Tail[8];
+    GridArrElem *sp78[3];
+    DreamSysVec3 sp88;
+
+    if (self->unk_0x4C != NULL) {
+        void *pos = (u8 *) self->unk_0x14 + 0x18;
+
+        if (self->unk_0x4C->methods->slot0x110(self->unk_0x4C, &sp18, pos) == 0) {
+            s32 count = func_80057784(self, sp48, sp78, &sp18, 1);
+            void *result = func_80057954(self, &sp88, pos, count, sp48, sp78);
+
+            self->unk_0x28 = result;
+            if (result != NULL) {
+                self->vt->func_800573A8(self, &sp88);
+                self->vt->func_80058B08(self, -1);
+                return 1;
+            }
+            self->vt->func_80058B08(self, -2);
+            return 0;
+        }
+    }
+    return 0;
+}
 
 /* STALL -- see docs/match-reports/func_80057784.md. Best reached: 13/116
  * words, preserved there in #if 0 with full declarations. */
