@@ -306,4 +306,13 @@ void func_80036A7C(s32 a0, s32 a1)
     func_800368E8((s16)a0, (s16)a1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036AA8);
+/* func_80038E44 is defined in the uncarved psyq_SpuSetMute unit; its own
+ * body is a single straight-line path (no branches) ending in a chain of
+ * global stores with $v0 never touched afterward -- genuinely void, not
+ * just an unobserved return. */
+extern void func_80038E44(s32 a0);
+
+void func_80036AA8(void)
+{
+    func_80038E44(1);
+}
