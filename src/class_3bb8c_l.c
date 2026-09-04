@@ -18,6 +18,25 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
+/* This unit's local view of func_8004A4B8's table, and the prototype for
+ * that getter. Declared HERE, not in include/class_3bb8c.h: the canonical
+ * `extern Class86668Methods *func_8004A4B8(void);` lives in
+ * include/class_39e08.h, and any unit including BOTH headers gets
+ * `conflicting types for 'func_8004A4B8'` -- which is exactly how this was
+ * found, when class_3bb8c_k was merged. class_3bb8c_l does not include
+ * class_39e08.h, so a unit-local declaration is safe here.
+ *
+ * class_39e08.h's Class86668Methods already declares slot44 and slot48 at
+ * these same offsets with ABI-identical shapes. Prefer unifying onto that
+ * type when someone next touches this unit, as its own change with the
+ * whole-image SHA1 re-verified after. */
+typedef struct BaseMethods87034_3bb8c_l {
+    u8 pad00[0x044];
+    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, func_80052DE8 */
+    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, func_80052EBC */
+} BaseMethods87034_3bb8c_l;
+extern BaseMethods87034_3bb8c_l *func_8004A4B8(void);
+
 void func_80052DE0(void) {
 }
 

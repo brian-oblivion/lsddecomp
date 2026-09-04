@@ -13,43 +13,211 @@
  * Header edits must be strictly ADDITIVE.
  */
 #include "common.h"
+#include "class_3bb8c.h"
+#include "class_39e08.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800521D4);
+void func_800521D4(Class86F88 *self, s32 state)
+{
+    self->unk30 = 0;
+    if (state < 2) {
+        goto end;
+    }
+    if (state < 4) {
+        goto case_lt4;
+    }
+    if (state == 4) {
+        goto case_eq4;
+    }
+    goto end;
+case_lt4:
+    self->methods->slot14(self, self->unk34);
+    self->methods->slot48(self);
+    self->unk2C = state;
+    goto end;
+case_eq4:
+    self->methods->slot30(self, self->unk2C);
+end:
+    return;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005227C);
+void func_8005227C(Class86F88 *self)
+{
+    s32 old;
+
+    if (self->unk2C >= 4) {
+        return;
+    }
+    if (self->unk2C < 2) {
+        return;
+    }
+    old = self->unk30;
+    self->unk30 = old + 1;
+    if (old == 0) {
+        return;
+    }
+    self->methods->slot54(self, 4);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800522DC);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800523F0);
+void func_800523F0(Class86F88 *self, s32 arg1)
+{
+    Class86F88 *other = self->unk3C;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052430);
+    if (other != NULL) {
+        other->methods->slot80(other, arg1, 0x60, 0x60);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052498);
+void func_80052430(Class86F88 *self)
+{
+    Class86F88Methods *methods;
+    s32 tmp;
+    s32 count;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800524F8);
+    if (!self->unk50) {
+        return;
+    }
+    tmp = self->unk24;
+    count = tmp;
+    if (count + 0x1A >= self->unk14) {
+        return;
+    }
+    methods = self->methods;
+    count++;
+    self->unk24 = count;
+    methods->slot94(self, self->unk20, count, self->unk28, 1);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052598);
+void func_80052498(Class86F88 *self)
+{
+    s32 count;
+
+    if (!self->unk50) {
+        return;
+    }
+    count = self->unk24 - 1;
+    if (count < 0) {
+        return;
+    }
+    self->unk24 = count;
+    self->methods->slot94(self, self->unk20, count, self->unk28, 1);
+}
+
+void func_800524F8(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+{
+    s32 count;
+    s32 newUnk20;
+    s32 newUnk28;
+
+    if (!self->unk50) {
+        return;
+    }
+    count = self->unk28;
+    if (count - 1 < 0) {
+        return;
+    }
+    if (count - self->unk20 > 0) {
+        self->methods->slot98(self, 0, 1, arg3);
+    } else {
+        self->unk20--;
+        newUnk20 = self->unk20;
+        self->unk28--;
+        newUnk28 = self->unk28;
+        self->methods->slot94(self, newUnk20, self->unk24, newUnk28, 1);
+    }
+}
+
+void func_80052598(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+{
+    s32 newUnk20;
+    s32 newUnk28;
+    s32 prevUnk20;
+
+    if (!self->unk50) {
+        return;
+    }
+    if (self->unk28 + 1 >= self->unk10) {
+        return;
+    }
+    prevUnk20 = self->unk20 - 1;
+    if (self->unk28 - prevUnk20 < 4) {
+        self->methods->slot98(self, 1, 1, arg3);
+    } else {
+        self->unk20++;
+        newUnk20 = self->unk20;
+        self->unk28++;
+        newUnk28 = self->unk28;
+        self->methods->slot94(self, newUnk20, self->unk24, newUnk28, 1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052644);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005278C);
+void func_8005278C(Class86F88 *self)
+{
+    s32 count;
+    s32 i;
+    u8 unused[8];
+
+    if (!self->unk50) {
+        return;
+    }
+    count = self->unk10;
+    i = 0;
+    if (count >= 5) {
+        count = 4;
+    }
+    if (count <= 0) {
+        return;
+    }
+    do {
+        self->unk40[i]->methods->release(self->unk40[i]);
+        self->unk40[i] = NULL;
+        i++;
+    } while (i < count);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005281C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005292C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800529FC);
+void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
+{
+    Class86F88Elem *elem;
+    s32 flag = a4;
+
+    __asm__("");
+    self->unk20 = a1;
+    self->unk24 = a2;
+    self->unk28 = a3;
+    if (flag == 0) {
+        return;
+    }
+    a3 -= a1;
+    elem = self->unk40[a3];
+    elem->methods->slotB8(elem, &D_8008AB10);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052A58);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052B54);
+s32 func_80052B54(Class86F88 *self)
+{
+    return self->unk28;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052B60);
+Class86F88Methods *func_80052B60(void)
+{
+    return &D_80086F88;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052B70);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052C10);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052CD8);
+void func_80052CD8(Obj865C8 *self)
+{
+    func_8004A4B8()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052D10);

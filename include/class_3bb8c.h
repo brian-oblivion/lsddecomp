@@ -2017,12 +2017,22 @@ struct Obj87034_3bb8c_l {
  * independent local view rather than including that header, per this
  * project's multiple-independent-local-views convention. Only the one
  * slot func_80052DE8 dispatches through is named. */
-typedef struct BaseMethods87034_3bb8c_l {
-    u8 pad00[0x044];
-    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, func_80052DE8 */
-    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, func_80052EBC */
-} BaseMethods87034_3bb8c_l;
-extern BaseMethods87034_3bb8c_l *func_8004A4B8(void);
+/* HEAD NOTE round 15: `BaseMethods87034_3bb8c_l` and its
+ * `extern ... *func_8004A4B8(void);` prototype were moved into
+ * src/class_3bb8c_l.c. THIRD instance this merge of one rule: a cross-unit
+ * prototype in a unit-local type must not live in a shared header. This one
+ * was the nastiest, because it did not collide with another RUNNER -- it
+ * collided with the pre-existing canonical
+ * `extern Class86668Methods *func_8004A4B8(void);` in include/class_39e08.h,
+ * and it only surfaced when class_3bb8c_k (which includes BOTH headers) was
+ * merged two merges later. class_3bb8c_l includes only class_3bb8c.h, so
+ * nothing showed up when delta's own work was verified.
+ *
+ * Worth unifying deliberately: class_39e08.h's Class86668Methods ALREADY
+ * declares slot44 and slot48 at the same offsets with ABI-identical shapes,
+ * so delta's local view is a duplicate of a type the project already had.
+ * Not done here -- it changes a byte-exact unit's types inside a merge
+ * resolution, which is the round-13 hazard. */
 
 /* func_80052DE8's own registered callback -- forward-declared here since
  * func_80052DE8 (ROM order earlier) takes its address before its own
@@ -2201,5 +2211,122 @@ struct Obj86ED0 {
  * same convention as `strcpy`. Typed purely from this call site's own
  * register usage. */
 extern char *func_80040FC0(char *dest, char *src);
+
+/* -------------------------------------------------------------------
+ * HEAD NOTE, round 15 merge: D_80086F88 (below) CLOSES an open question
+ * from the alpha/bravo merge, and it is worth reading the two notes
+ * together.
+ *
+ * That note established that bravo's 0x54-byte New_X (func_80051A5C in
+ * class_3bb8c_j) ctors through func_80052B60(), "a DIFFERENT table getter
+ * living in class_3bb8c_k" that bravo had not identified. charlie has now
+ * MATCHED func_80052B60, and it returns &D_80086F88. So the 0x54-byte
+ * class's method table is D_80086F88 -- charlie's Class86F88 -- and NOT
+ * D_80086ED0.
+ *
+ * Consequence for the next reader: the type named `Class86ED0` in
+ * src/class_3bb8c_j.c is MISNAMED. It is the object of the 0x54-byte
+ * class (table D_80086F88); the name came from func_80051A4C, the only
+ * getter bravo had resolved at the time, which actually returns
+ * D_80086ED0 -- alpha's separate 0x4C-byte class in class_3bb8c_i.
+ *
+ * Nothing is wrong with the BYTES: class_3bb8c_j is byte-exact and a type
+ * name is not codegen. Only the name misleads. Left in place rather than
+ * renamed here because runner bravo is still live in that unit as this is
+ * written, and PARALLEL-RUNS collision rule 6 says a correction goes down
+ * ONE channel -- bravo was messaged, not edited.
+ * ------------------------------------------------------------------- */
+
+/*
+ * class_3bb8c_k's own view: the class whose method table is D_80086F88
+ * (39 slots, tools/classtable.py D_80086F88 -- header word 0x20). Carved
+ * round 15; this unit is the first to write any of its methods. Only the
+ * slots/fields this unit's functions actually touch are typed; the rest
+ * stays opaque. `func_80052644`/`func_800522DC` are two more of this
+ * class's own methods (toolchain-blocked, stub reports filed, still
+ * INCLUDE_ASM) -- not reflected here since nothing in this unit's C reads
+ * through them yet.
+ */
+typedef struct Class86F88Methods Class86F88Methods;
+typedef struct Class86F88 Class86F88;
+typedef struct Class86F88ElemMethods Class86F88ElemMethods;
+typedef struct Class86F88Elem Class86F88Elem;
+
+struct Class86F88Methods {
+    u8 pad000[0x014];
+    /* +0x014, func_800521D4's own first dispatch:
+     * `self->methods->slot14(self, self->unk34)`. */
+    void (*slot14)(Class86F88 *self, s32 arg1);
+    u8 pad018[0x030 - 0x018];
+    /* +0x030, func_800521D4's `state == 4` path:
+     * `self->methods->slot30(self, self->unk2C)`. */
+    void (*slot30)(Class86F88 *self, s32 arg1);
+    u8 pad034[0x048 - 0x034];
+    void (*slot48)(Class86F88 *self); /* +0x048, func_800521D4's own 2nd dispatch, self only */
+    u8 pad04C[0x054 - 0x04C];
+    /* +0x054 = func_800521D4 itself (this unit, matched). Dispatched by
+     * func_8005227C as `self->methods->slot54(self, 4)`. */
+    void (*slot54)(Class86F88 *self, s32 state);
+    u8 pad058[0x080 - 0x058];
+    /* +0x080 = func_80052498 itself (this unit, matched), whose own body
+     * ignores every argument past `self` -- the 3-argument shape below is
+     * what func_800523F0's call site (dispatching through a DIFFERENT
+     * instance's slot80, `self->unk3C`) actually passes. Per-call-site
+     * arity is this project's established convention; it does not
+     * contradict func_80052498's own narrower body. */
+    void (*slot80)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
+    u8 pad084[0x094 - 0x084];
+    /* +0x094 = func_8005281C itself (this unit, still INCLUDE_ASM as of
+     * this round). Signature fixed by three independent callers in this
+     * unit (func_80052430, func_80052498, func_800524F8, func_80052598),
+     * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
+    void (*slot94)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+    /* +0x098, occupant not in this unit's queue. Called by
+     * func_800524F8/func_80052598 with (self, arg1, arg2, arg3). */
+    void (*slot98)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
+};
+
+/*
+ * Each element of Class86F88::unk40[] -- resolved from func_800529FC's own
+ * dispatch, `elem->methods->slotB8(elem, &D_8008AB10)`. The `+0x004`
+ * "release" slot is the same shared base-class implementation seen at
+ * that offset in every vtable this project has resolved so far (compare
+ * `GenericReleaseMethods_3bb8c_d` above) -- func_8005278C dispatches
+ * through it on each element before clearing the slot.
+ */
+struct Class86F88ElemMethods {
+    u8 pad000[0x004];
+    void (*release)(Class86F88Elem *self); /* +0x004 */
+    u8 pad008[0x0B8 - 0x008];
+    void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
+};
+
+struct Class86F88Elem {
+    Class86F88ElemMethods *methods; /* +0x000 */
+};
+
+struct Class86F88 {
+    Class86F88Methods *methods;    /* +0x000 */
+    u8 pad004[0x010 - 0x004];
+    s32 unk10;                     /* +0x010, func_8005278C/func_8005281C: element count, clamped to a max of 4 */
+    s32 unk14;                     /* +0x014, func_80052430: upper bound compared against unk24+0x1A */
+    u8 pad018[0x020 - 0x018];
+    s32 unk20;                     /* +0x020, func_800523F0(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
+    s32 unk24;                     /* +0x024, ditto */
+    s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
+    s32 unk2C;                     /* +0x02C, func_8005227C/func_800521D4 */
+    s32 unk30;                     /* +0x030, func_8005227C/func_800521D4 */
+    s32 unk34;                     /* +0x034, func_800521D4's slot14 argument */
+    u8 pad038[0x03C - 0x038];
+    Class86F88 *unk3C;              /* +0x03C, func_800523F0: another instance of this same class */
+    Class86F88Elem *unk40[4];       /* +0x040, func_8005278C/func_8005281C/func_800529FC */
+    s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
+};
+
+extern Class86F88Methods D_80086F88;
+/* func_800529FC's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
+ * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
+ * own code, only its address taken. */
+extern s32 D_8008AB10;
 
 #endif
