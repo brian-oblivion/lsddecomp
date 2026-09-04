@@ -119,7 +119,9 @@ void func_80056E44(LinkOwnerObj *this) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056F28);
+void func_80056F28(LinkOwnerObj *this) {
+    func_800183DC((void **)this->arr84, 5);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056F4C);
 
