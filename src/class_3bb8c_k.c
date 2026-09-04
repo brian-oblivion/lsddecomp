@@ -231,9 +231,42 @@ void func_8005278C(Class86F88 *self)
     } while (i < count);
 }
 
+/* Psy-Q strlen (asm/psyq_GsLinkObject4.s, `func_80013348`, already matched
+ * elsewhere) and strncpy-like helper (`func_800238A8`: if dest==NULL
+ * return NULL, else copy `n` bytes from src to dest and return dest) --
+ * declared LOCAL to this unit, not in a shared header, since this is a
+ * cross-unit prototype for functions this unit does not define (see
+ * CLAUDE.md's header-contention rule). func_80013348 already has a
+ * differently-typed local declaration in class_3bb8c_j.c
+ * (`s32 func_80013348(void *arg0)`); this unit's own call site reads its
+ * argument as a byte pointer, so it is typed `char *` here instead --
+ * per-call-site typing of an undefined function's argument, same
+ * convention as func_80040FC0 (see include/class_3bb8c.h HEAD NOTE). */
+extern s32 func_80013348(char *s);
+extern char *func_800238A8(char *dest, char *src, s32 n);
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005281C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005292C);
+char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
+{
+    s32 idx = arg4 + arg3;
+    s32 len;
+    s32 i;
+
+    len = func_80013348(base + self->unk18[idx]);
+    if (len >= 0x1B) {
+        len = 0x1A;
+    }
+    func_800238A8(dest, base + self->unk18[idx], len);
+    i = len;
+    if (i < 0x1A) {
+        for (; i < 0x1A; i++) {
+            dest[i] = ' ';
+        }
+    }
+    dest[0x1A] = 0;
+    return dest;
+}
 
 void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
 {

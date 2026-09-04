@@ -2397,7 +2397,14 @@ struct Class86F88 {
     u8 pad004[0x010 - 0x004];
     s32 unk10;                     /* +0x010, func_8005278C/func_8005281C: element count, clamped to a max of 4 */
     s32 unk14;                     /* +0x014, func_80052430: upper bound compared against unk24+0x1A */
-    u8 pad018[0x020 - 0x018];
+    /* +0x018, func_8005292C: a table of BYTE OFFSETS (s32 each), added to
+     * that function's own `base` (char *) argument to form a source
+     * pointer -- `self->unk18[idx]` is never scaled by anything other than
+     * its own natural s32 stride, and the resulting sum is used as a plain
+     * byte address (strlen/strncpy-style calls), so `base` is a byte
+     * pointer and this is an OFFSET table, not a pointer table. */
+    s32 *unk18;                    /* +0x018, func_8005292C */
+    u8 pad01C[0x020 - 0x01C];
     s32 unk20;                     /* +0x020, func_800523F0(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
     s32 unk24;                     /* +0x024, ditto */
     s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
