@@ -1,4 +1,4 @@
-# func_80053ACC -- STALLED at 28/71 words
+# func_80053ACC -- STALLED, 2 instructions + 1 word short of 71
 
 Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16. `INCLUDE_ASM` restored;
 `./build-and-verify.sh` green.
@@ -162,3 +162,62 @@ distinguishing from a stall where the control-flow shape itself is still
 wrong, since the two call for very different next steps (the former is
 close to unmatchable-by-rearranging-C; the latter usually yields to more
 structural exploration).
+
+## HEAD NOTE (round 16): the 28/71 headline was a drift-corrupted number, and the real residue is TWO coupled instructions, not one
+
+The head spliced this preserved body back into `main`, built, and measured it
+before consolidating. Three corrections, in increasing order of importance.
+
+**1. `28/71` is not this body's score.** `funcdiff.py` reported it together
+with its own guard:
+
+```
+func_80053ACC: 28/71 words match (file 0x442CC-0x443E8)
+WARNING: the build differs OUTSIDE this range too (159121 bytes) - a size change may have
+         shifted linked addresses, so this per-function read is NOT trustworthy.
+```
+
+That is CLAUDE.md's way-a-score-lies #3 (address drift) firing exactly as
+designed. The body is one word SHORTER than retail, so every later address
+shifts and the per-function window stops meaning what it says. The report's
+own body already carried a hand-corrected `70/71`, so the analysis was sound
+-- but the TITLE and the summary line carried the untrustworthy number, and a
+title is what the next round triages from. **Never headline an in-range score
+that came with a drift warning.**
+
+**2. Read with `asm-differ`, which aligns rather than windows, the residue is
+two differing instructions and one missing word:**
+
+```
+retail                                built
+44324:  move  a0,v1     <- delay slot  44324:  li    v0,0x2    <- delay slot
+44348:  li    v0,0x2    <- br target   (absent -- this is the missing word)
+44374:  beq   a0,v0,44394              44370:  beq   v1,v0,44390
+```
+
+**3. And they are ONE decision, not two.** Retail's compiler copies the masked
+switch value `v1` into `a0` in the `bnez` delay slot, and then compares
+against that copy (`beq a0,v0`) for the case-3 test. The build instead sinks
+`li v0,0x2` into the delay slot and keeps comparing `v1`. So this is a
+rematerialize-into-the-argument-register choice whose consequence shows up in
+a later comparison -- not an isolated delay-slot filler. Note retail's
+`move a0,v1` is DEAD on the not-taken path (`a0` is overwritten by
+`move a0,s0` at 0x4432C), which is why it reads as a scheduling artifact and
+why the twelve hand reshapes could not reach it.
+
+### Consequence for the next round: this is a PERMUTER candidate, and the report's
+### own proposed learning should not be read as closing it
+
+Two instructions and one word in a 71-word function, with control flow and
+every literal already confirmed, is squarely Gate 3 territory in
+docs/PARALLEL-RUNS.md ("near-misses like 88/90"). The runner's proposed
+learning ends "close to unmatchable-by-rearranging-C", which is true and is
+exactly why it should go to the permuter rather than to another hand pass --
+the permuter mutates C source under the pinned toolchain, which is not a
+toolchain change. **A zero from it is a LEAD, not an answer:** translate it to
+idiomatic C and re-verify with funcdiff before believing it. If only UB or
+duplicate-arm forms reach zero, mark the class permuter-exhausted here.
+
+This is NOT a toolchain escalation. Nothing here has been reproduced in
+isolation, and a coupled register/delay-slot choice inside a switch is the
+kind of thing GCC 2.6.3 does legitimately.

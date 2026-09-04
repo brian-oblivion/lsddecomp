@@ -284,8 +284,26 @@ segments:
       - [0x171e0, c, code_171e0]
       # code_179d8 was 274 functions and 44% blocker-dense in aggregate, but
       # the density is CLUSTERED, so the aggregate is a bad carve guide. A
-      # three-grep screen (gp_rel / addiu-$at / nop_mflo_mfhi) over
-      # non-overlapping 20-function windows, run 2026-09-04:
+      # three-grep screen over non-overlapping 20-function windows, run
+      # 2026-09-04.
+      #
+      # CORRECTION, same day, by the head that wrote it: the nop_mflo_mfhi
+      # column below was computed with the screen INVERTED (looking for a
+      # mult/div BEFORE the mflo/mfhi instead of after), which is the exact
+      # error DECOMPILATION_LEARNINGS.md records round 15's head making. So
+      # the clean counts here are too PESSIMISTIC on that one axis. Measured
+      # cost of the inversion over the 239 functions of this monolith still
+      # visible as .s: 4 correct forward hits vs 14 inverted hits, of which
+      # 4 are pure false blockers. The gp_rel and addiu-$at columns are
+      # direction-independent and unaffected, and the relative RANKING of
+      # windows -- which is all the carve decision used -- survives.
+      #
+      # The screen only ever runs in one direction. Use the shell form, which
+      # is right by construction because `grep -A2` prints the FOLLOWING two
+      # lines; do not re-implement it in Python from memory:
+      #     grep -A2 -nE '\b(mflo|mfhi)\b' <f>.s | grep -qE '\b(mult|multu|div|divu)\b'
+      # `mult` -> `sra` -> `mfhi` is retail's signed-divide-by-constant idiom
+      # and is NOT blocked; it reproduces exactly through the pinned pipeline.
       #     [  0.. 19]  7/20 clean    [140..159]  9/20
       #     [ 20.. 39]  2/20          [160..179]  6/20
       #     [ 40.. 59] 16/20          [180..199]  8/20

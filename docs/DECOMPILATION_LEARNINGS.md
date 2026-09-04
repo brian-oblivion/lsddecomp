@@ -1188,11 +1188,47 @@ Pooled over rounds 13 and 14 — 81 matched functions and 10 stalled:
 | band | matched | stalled | verdict |
 | --- | --- | --- | --- |
 | 5-6 registers | **5** | 1 | **83% MATCHED** — not a stall signal at all |
-| 7+ registers | **0** | 4 | 100% stalled |
+| 7+ registers | **1** | 4 | see the round-16 correction below |
 
-No function needing 7 or more distinct callee-saved registers has ever
-matched, across 81 samples. Every function at 9 (fully saturated) that was
-attempted has stalled. But the 5-6 band, which round 13 treated as the
+> **ROUND 16 CORRECTION — the 7+ band is no longer 0-matched, and the
+> sentence that used to sit here ("No function needing 7 or more distinct
+> callee-saved registers has ever matched") is now FALSE.** `func_8004A534`
+> (`class_3ac78`) matched **163/163 words with 8 distinct callee-saved
+> registers** — `$s0`–`$s7`, saturated bar `$fp`. The head sent that runner
+> in *expecting a stall* on the strength of the old wording, told it a
+> measured stall report was the deliverable, and independently re-ran the
+> census (8) and re-verified the match byte-exact after merging. Corroborated
+> the same round by runner delta, which attempted all three of its large
+> bodies and reported that **register count was not the blocker in any of the
+> three** — the real costs were struct-shape reconstruction,
+> induction-variable/multiply behaviour, and switch-vs-if/else. Two of those
+> three turned out to need 0 and 1 s-registers anyway.
+>
+> **Read the count as a CORRELATE, not a cause.** High saturation travels
+> with "large function needing deep struct reconstruction", and it is the
+> reconstruction that costs. `func_8004A534`'s load-bearing insight was a
+> struct-shape one (a whole-struct copy misread as field-by-field), nothing
+> to do with register pressure.
+>
+> Still a real deprioritisation signal at 1-of-5 — **but never a reason to
+> skip a function, and never sufficient grounds on its own to stop.** If you
+> stop in this band, the report must name a residue, not a register count.
+>
+> **This is the SECOND time this threshold has been corrected** (round 14
+> moved it from 5 to 7), and round 14's own stated lesson is why: *"A
+> threshold needs samples on BOTH sides of it before it is a threshold; until
+> then it is just the edge of what you have seen."* The 7+ band had four
+> stalls and zero attempted-and-matched samples, so it could not distinguish
+> "7 is fatal" from "nobody has tried". One deliberate attempt settled it.
+> The general rule this keeps re-teaching: **a screen built only from the
+> failures it predicted needs a deliberate attempt on its wrong side before
+> it earns a number.**
+
+Prior to that correction the reading was that no function needing 7 or more
+distinct callee-saved registers had ever matched, across 81 samples. No
+function at a full 9 has matched yet either — but that is now a statement
+about a handful of samples with one known match at 8 next to them, so do not
+lean on it. But the 5-6 band, which round 13 treated as the
 danger zone, is where `func_8004EB88` (6), `func_8004F4C8` (6),
 `func_8004ED40` (5), `func_8004EDC0` (5) and `func_8004F40C` (5) all matched
 — four of them on functions a runner had been told to expect a stall on.
@@ -1209,6 +1245,9 @@ threshold; until then it is just the edge of what you have seen.**
 
 The screen itself is still good and still one-directional — it is only the
 number that moved. Use **7+** to deprioritise. Treat 5-6 as ordinary work.
+**And after round 16, "deprioritise" is the whole of it: the 7+ band has a
+byte-exact match in it, so ordering work by this screen is fine and declining
+to attempt on it is not.**
 
 #### Round 13: retail's callee-saved-register demand is a VALIDATED pre-work screen
 
@@ -1663,7 +1702,97 @@ that band before it becomes a screen, exactly as the 7-not-5 correction did —
 if many matched functions sit at 6-7 with long-lived values, the refinement is
 wrong and the distinguishing factor is elsewhere.
 
+#### Round 16 (2026-09-04, five runners; two class_3bb8c slices plus three fresh code_179d8 carves)
+
+**Confirmed, each backed by a byte-exact match:**
+
+- **The two-exit allocator shape, now confirmed TWICE across unrelated
+  blocks.** For "allocate; construct on success; return NULL on failure", put
+  the success-path `return` INSIDE the `if`-body and the failure
+  `return NULL;` as the trailing unconditional statement — not an early-return
+  guard, not a single shared result variable. Only that shape folds into one
+  branch with no extra jump. Established on `func_80052B70`
+  (`class_3bb8c_k`), then reused verbatim on `new_class_6d940`
+  (`code_179d8_d`, a different block entirely) and matched **first try**.
+- **GCC 2.6.3 does not dedupe an explicit `if` guard against a `for`/`while`
+  loop's own implicit entry test**, even when the two conditions are provably
+  identical — you get a redundant duplicate bounds check retail does not have.
+  Recurred twice in one round in unrelated units (`func_8005281C`,
+  `func_8002C014`). Its inverse is also a real fix: where retail HAS only one
+  check, `guard + do-while` is what expresses that (`func_800323A8`, verified
+  with a standalone toolchain reproducer).
+- **A loop-carried multiplicand must be recomputed from the loop counter, not
+  accumulated with `+=`.** cc1 strength-reduces a constant multiply over an
+  induction variable, so a `+=`-accumulated value produces the wrong shape;
+  recomputing it by multiplication each iteration reproduces retail.
+  (`func_800323A8`, verified with a standalone reproducer.)
+- **A genuine C `switch` is not interchangeable with an if/else chain**, and
+  the difference is worth attempts: switching `func_80032708` from if/else to
+  a real `switch` moved it 24 -> 65/164. This is a DISTINCT finding from the
+  block-order lever below, confirmed separately.
+
+**The block-order lever, WITH the boundary that a checked negative put on it
+— read both halves.**
+
+- **Where it works:** when a raw, uncompared value feeds `beqz`/`bnez`
+  directly, the `==0` vs `!=0` spelling controls which block GCC places INLINE
+  (fallthrough) and which OUT-OF-LINE (jumped to), not merely the polarity.
+  Matched `func_80032AD0` on a one-flip change, and generalised correctly to a
+  full two-sided `if`/`else` in `func_800329D8` (41/41).
+- **Where it does NOT: guard-clause range checks.** The head hypothesised the
+  same lever would move two stalls written `if (idx >= 3) return 0;` and asked
+  for the flip to be tried on both. **It regressed both** — `func_80032BB8`
+  gained a wrong branch direction and a duplicated inline block on top of its
+  register residue, and `func_80032C60` lost its clean one-instruction
+  residue for the same regression. So the lever is scoped to raw truthy/flag
+  values reaching a branch directly; for a guard-clause range check,
+  negative-first is already what retail's compiled form is.
+
+  **This entry exists in this shape deliberately.** The negative was
+  explicitly requested and explicitly reported, and it is what stops the
+  positive half from being over-generalised into "always try flipping the
+  guard" — which is what would have happened had only the two matches been
+  written up. **Ask runners for the negative answer; it is cheap, and it is
+  what turns a lever into a scoped lever.**
+
+**Method lessons about ATTEMPT BREADTH — the round's most transferable
+finding, seen in two runners independently.**
+
+- **A long attempt list is not the same as a broad one.** Two stalls this
+  round were argued with impressive attempt counts that all varied ONE axis
+  and left the deciding axis untested. `func_80032BB8`: seven reshapes, all
+  varying the *expression* form (array index vs pointer arithmetic, temp vs no
+  temp, declaration split, parameter type) — none changed the CONTROL FLOW.
+  `func_8002C048`: twenty-five variations, all keeping the cached `c1`/`c2`
+  locals — none tested whether those locals should exist at all, which is what
+  the documented no-cache idiom (see "Do not cache a `this->field`…" above)
+  points straight at. **Before filing a stall, list the axes you varied, not
+  the number of attempts.** If one axis has all the entries, that is the tell.
+- **A `volatile` cast is a codegen lever, not a statement about the program.**
+  It "worked" on `func_8002C048` (fixing a CSE'd-away reload) and paid for it
+  with a defensive `andi` re-mask, because a volatile-qualified load's value
+  is not trusted already-zero-extended for the following comparison, whereas
+  every plain `lbu` in the same function is. Two consequences: the mask is a
+  *symptom* of the lever, not an independent residue; and a preserved body
+  needing `volatile` would put source in the tree that misrepresents what the
+  game did, so prefer removing the thing being CSE'd.
+
 ### New residue classes opened this round (not yet closed)
+
+- **NEW, round 16: commutative-operand SLOT order in `addu`, not reachable
+  from C.** In `func_800323A8` every one of sixteen field accesses has retail
+  encoding `addu $v0,$a0,$v0` where the build encodes `addu $v0,$v0,$a0` —
+  same two registers, same values, same order, confirmed identical at every
+  instance, so this is **not** the register-identity class. It is purely which
+  operand slot (`rs` vs `rt`) the encoder picked for a commutative add.
+  Rewriting all 15 source sites from `(u8 *)(*rowPtr) + colOff` to
+  `colOff + (u8 *)(*rowPtr)` produced a **byte-identical build**: cc1
+  canonicalises pointer+integer addition to a fixed internal order regardless
+  of source order. This is the documented "prologue callee-save stores in the
+  wrong order — not reachable from C" class in MATCHING-GUIDE, generalised
+  from a register save to a commutative pointer addition. **Not a toolchain
+  escalation:** no flag is implicated, and the 15-site mechanical swap is the
+  isolation experiment that shows source cannot reach it.
 
 - **NEW, round 15: "PURE register rotation" — a residue with no
   instruction-level difference at all.** `func_80051F24` stalled at 75/95 with
