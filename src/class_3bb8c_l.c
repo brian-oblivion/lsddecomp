@@ -56,7 +56,40 @@ void func_800531A0(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_800531CC);
+void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
+    s32 ret;
+    s32 sel;
+    void *a1;
+    Obj87034Methods_3bb8c_l *m;
+
+    if (self->unk60 != 0) {
+        if (other->unk80 != 0) {
+            other->methods->slot04(other);
+            self->unk60 = 0;
+            self->methods->slot80(self);
+            ret = self->unk3C->methods->slot108(self->unk3C);
+            self->unk3C->methods->slot104(self->unk3C, ret + 0x1E);
+        } else if (other->unk3C != 0) {
+            sel = self->unk50->unk14;
+            m = other->methods;
+            if (sel != 2) {
+                a1 = self->unk50->unk18;
+            } else {
+                a1 = self->unk50->unkC;
+            }
+            m->slot7C(other, a1);
+            other->methods->slot04(other);
+            self->unk60 = 0;
+            self->methods->slot80(self);
+        }
+    }
+    if (self->unk60 == 0) {
+        if (self->unk14->unk1B4 == 0 && self->unk68 == 0) {
+            self->unk64 = 1;
+            self->methods->slot88(self);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053358);
 
