@@ -1981,8 +1981,9 @@ typedef struct Unk50Struct_3bb8c_l {
     u8 pad00[0x0C];
     void *unkC;   /* +0x00C, func_800531CC (address taken, forwarded opaquely) */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;    /* +0x014, func_800531CC: discriminant compared against 2 */
+    s32 unk14;    /* +0x014, func_800531CC: discriminant compared against 2; also func_80053764: discriminant compared against 1 */
     void *unk18;  /* +0x018, func_800531CC (address taken, forwarded opaquely) */
+    void *unk1C;  /* +0x01C, func_80053764 (address taken, forwarded opaquely) */
 } Unk50Struct_3bb8c_l;
 
 /* Whatever self->unk14 points to: an object of some OTHER, unidentified
@@ -1993,7 +1994,9 @@ typedef struct Unk50Struct_3bb8c_l {
  * one s32 argument while this call site passes two -- different arities,
  * so this is a different class, not DreamSys; left unnamed. */
 typedef struct Obj14Methods_3bb8c_l {
-    u8 pad00[0x10C];
+    u8 pad00[0x0EC];
+    void (*slotEC)(void *self);                        /* +0x0EC, func_80053764 */
+    u8 padF0[0x10C - 0x0F0];
     void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, func_8005393C */
 } Obj14Methods_3bb8c_l;
 typedef struct Obj14_3bb8c_l {
@@ -2019,9 +2022,31 @@ typedef struct Obj14_3bb8c_l {
 typedef struct DreamSysMethods_3bb8c_l {
     u8 pad00[0x050];
     void (*slot50)(void *self);          /* +0x050, func_800536B0 */
-    u8 pad54[0x074 - 0x054];
+    u8 pad54[0x060 - 0x054];
+    void (*slot60)(void *self, s32 arg1);          /* +0x060, func_80053764 */
+    void (*slot64)(void *self, void *arg1);        /* +0x064, func_80053764 */
+    void (*slot68)(void *self, void *arg1);        /* +0x068, func_80053764 */
+    void (*slot6C)(void *self, void *arg1);        /* +0x06C, func_80053764 */
+    u8 pad70[0x074 - 0x070];
     void (*slot74)(void *self);          /* +0x074, func_800536B0 */
-    u8 pad78[0x0FC - 0x078];
+    u8 pad78[0x0AC - 0x078];
+    /* Returns another DreamSysObj_3bb8c_l* -- its return value is dispatched
+     * through methods->slotF0/slotD4 the same way self->unk3C/self->unk18
+     * themselves are, so it is almost certainly a "related instance"
+     * accessor rather than a plain getter of scalar data. Named via the
+     * elaborated `struct DreamSysObj_3bb8c_l *` (not the typedef, which is
+     * not yet in scope this early in the header) to avoid a forward-typedef
+     * redefinition -- GCC 2.6.3 rejects `typedef struct X X;` twice even
+     * with an identical definition. */
+    struct DreamSysObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, func_80053764 */
+    void (*slotB0)(void *self, s32 arg1);          /* +0x0B0, func_80053764 */
+    void (*slotB4)(void *self, s32 arg1);          /* +0x0B4, func_80053764 */
+    u8 padB8[0x0D4 - 0x0B8];
+    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, func_80053764 */
+    u8 padD8[0x0F0 - 0x0D8];
+    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md). ALSO func_80053764, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
+    u8 padF4[0x0F8 - 0x0F4];
+    void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, func_80053764 */
     void (*slotFC)(void *self);          /* +0x0FC, func_800536B0/func_80053C94 */
     u8 pad100[0x104 - 0x100];
     s32 (*slot104)(void *self, s32 arg1); /* +0x104, func_800531CC */
@@ -2031,6 +2056,8 @@ typedef struct DreamSysMethods_3bb8c_l {
 } DreamSysMethods_3bb8c_l;
 typedef struct DreamSysObj_3bb8c_l {
     DreamSysMethods_3bb8c_l *methods;
+    u8 pad04[0x164 - 0x004];
+    s32 unk164;             /* +0x164, func_80053BE8: sign-checked gate */
 } DreamSysObj_3bb8c_l;
 
 /* Whatever arg1->unkC points to in func_80052DE8 -- a registration sink
@@ -2051,7 +2078,9 @@ typedef struct Obj87034Methods_3bb8c_l {
     u8 pad08[0x010 - 0x008];
     void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, func_80052DE8 */
     void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, func_80052EBC/func_800536B0 */
-    u8 pad18[0x048 - 0x018];
+    u8 pad18[0x030 - 0x018];
+    void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md) */
+    u8 pad34[0x048 - 0x034];
     void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, func_80052EBC/func_80053134 (via self->unk54) */
     u8 pad4C[0x074 - 0x04C];
     void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, func_80053358 (event 0x21) */
@@ -2061,7 +2090,9 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, func_80053134 */
     void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, func_800531CC */
     void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, func_800533F0 */
-    u8 padC0[0x0C0 - 0x090];
+    u8 pad90[0x09C - 0x090];
+    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, func_80053BE8 */
+    u8 padA0[0x0C0 - 0x0A0];
     void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, func_80053358 (event 0xC) */
     void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, func_80053358 (event 0x2C)/func_80053458 */
     void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, func_80053358 (event 0x16) */
@@ -2074,15 +2105,17 @@ struct Obj87034_3bb8c_l {
     Obj87034Methods_3bb8c_l *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, func_80052DE8's `arg1->unkC` */
-    u8 pad10[0x014 - 0x010];
+    s32 unk10;                        /* +0x010, func_80053764 */
     Obj14_3bb8c_l *unk14;              /* +0x014, func_800531CC/func_8005393C/func_800536B0 */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
     s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
-    s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC and a computed value by func_80053BE8, out of this round's scope) */
+    s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
     u8 pad24[0x038 - 0x024];
     void *unk38;                          /* +0x038, func_80052E7C: forwarded opaquely to func_80049060/func_80049098 */
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
-    u8 pad40[0x050 - 0x040];
+    s32 unk40;                             /* +0x040, func_80053764 */
+    s32 unk44;                              /* +0x044, func_80053764 */
+    u8 pad48[0x050 - 0x048];
     Unk50Struct_3bb8c_l *unk50;             /* +0x050, func_800531CC */
     Obj87034_3bb8c_l *unk54;                 /* +0x054, func_80053134 */
     Obj87034_3bb8c_l *unk58;                  /* +0x058, func_800531A0: forwarded as func_800531CC's `other` */

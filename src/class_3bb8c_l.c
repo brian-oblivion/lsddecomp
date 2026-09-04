@@ -186,7 +186,49 @@ void func_800536B0(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->unk14);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053764);
+void func_80053764(Obj87034_3bb8c_l *self) {
+    DreamSysMethods_3bb8c_l *m;
+    DreamSysMethods_3bb8c_l *m2;
+    DreamSysObj_3bb8c_l *unk18;
+    DreamSysObj_3bb8c_l *newObj;
+    Unk50Struct_3bb8c_l *unk50;
+    s32 local10;
+    s32 ret;
+    s32 a2;
+    void *a1;
+
+    self->unk68 = 1;
+    self->unk3C->methods->slotF8(self->unk3C, self->unk44, self->unk40);
+    self->unk14->methods->slotEC(self->unk14);
+
+    unk18 = self->unk18;
+    unk50 = self->unk50;
+    unk18->methods->slot60(unk18, 1);
+    unk18->methods->slot64(unk18, unk50->unkC);
+    unk18->methods->slot6C(unk18, unk50->unk1C);
+    m = unk18->methods;
+    if (unk50->unk14 != 1) {
+        a1 = unk50->unk18;
+    } else {
+        a1 = unk50->unkC;
+    }
+    m->slot68(unk18, a1);
+    unk18->methods->slotB0(unk18, 0);
+    unk18->methods->slotB4(unk18, 1);
+
+    newObj = unk18->methods->slotAC(unk18);
+    self->methods->slot10(self, (s32)newObj);
+
+    ret = self->unk3C->methods->slotF0(self->unk3C, &local10, -1);
+    newObj->methods->slotF0(newObj, (s32 *)ret, (ret != 0) ? 3 : 0);
+    m2 = newObj->methods;
+    if (ret == 0) {
+        a2 = -1;
+    } else {
+        a2 = local10;
+    }
+    m2->slotD4(newObj, self->unk10, a2, 0);
+}
 
 void func_8005393C(Obj87034_3bb8c_l *self) {
     func_800558F0(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
@@ -194,19 +236,71 @@ void func_8005393C(Obj87034_3bb8c_l *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053984);
 
+/* func_80053ACC's (and func_80053BE8's/func_80053C94's, further below) own
+ * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
+ * runner echo matched it byte-exact as `void func_80053EB4(ObjM *self, s32,
+ * s32, s32, s32)`. Declared locally rather than in include/class_3bb8c.h on
+ * purpose: this unit's view of the class is `Obj87034_3bb8c_l` and echo's is
+ * `ObjM`, the two are the same class (see the HEAD NOTE in that header), and
+ * a shared-header declaration would put two incompatible prototypes for one
+ * function in front of both translation units. The return type is echo's,
+ * from the definition. */
+extern void func_80053EB4(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+
+/* STALLED at 28/71 words -- see docs/match-reports/func_80053ACC.md for the
+ * full analysis. This body is structurally correct (every field, every
+ * argument value, the switch's case values and the outer zero-check are all
+ * confirmed against the disassembly) but diverges from retail by exactly one
+ * register-allocation choice in a branch delay slot that this round could
+ * not reproduce from source. Preserved here, out of the way, rather than
+ * only in the report, per project convention. */
+#if 0
+void func_80053ACC(Obj87034_3bb8c_l *self) {
+    s32 local18;
+    s32 t;
+    s32 arg3;
+
+    self->unk20 = 4;
+    if (self->unk3C->methods->slotF0(self->unk3C, &local18, -1) == 0) {
+        t = (self->unk1C + (s32)self->unk38) & 3;
+        if (t == 0) {
+            self->methods->slot30(self, 4);
+            return;
+        }
+        arg3 = 0xA;
+        switch (t) {
+        case 1:
+            local18 = 0;
+            break;
+        case 2:
+            local18 = 4;
+            break;
+        case 3:
+            local18 = 7;
+            arg3 = 5;
+            break;
+        }
+        func_80053EB4(self, local18, 0, arg3, 1);
+        return;
+    }
+    func_80053EB4(self, 0, 0, 5, 1);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053ACC);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053BE8);
+void func_80053BE8(Obj87034_3bb8c_l *self) {
+    s32 color;
 
-/* func_80053C94's own helper, and it lives in the sibling slice
- * class_3bb8c_m, where round 15's runner echo matched it byte-exact as
- * `void func_80053EB4(ObjM *self, s32, s32, s32, s32)`. Declared locally
- * rather than in include/class_3bb8c.h on purpose: this unit's view of the
- * class is `Obj87034_3bb8c_l` and echo's is `ObjM`, the two are the same
- * class (see the HEAD NOTE in that header), and a shared-header declaration
- * would put two incompatible prototypes for one function in front of both
- * translation units. The return type is echo's, from the definition. */
-extern void func_80053EB4(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+    if (self->unk3C->unk164 < 0) {
+        self->methods->slot9C(self);
+    } else {
+        self->unk20 = 5;
+        color = self->unk3C->methods->slot200(self->unk3C);
+        func_80053EB4(self, color, 0, 0xA, 1);
+        self->unk3C->methods->slotFC(self->unk3C);
+    }
+}
 
 void func_80053C94(Obj87034_3bb8c_l *self) {
     s32 color;
