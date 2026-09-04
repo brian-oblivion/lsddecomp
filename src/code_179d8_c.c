@@ -60,7 +60,44 @@ void func_800329B8(void)
     func_80032708(0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800329D8);
+extern void func_80024CE0(void);
+extern void func_80024DA0(s32 arg0);
+extern void func_80024D40(s32 arg0, void (*callback)(void));
+extern void func_80024CF0(void);
+extern s32 D_8006DCA8;
+extern s32 D_8006DC94;
+extern s32 D_8006DC8C;
+extern s32 D_8006DC90;
+extern void (*D_8006DC9C)(void);
+
+void func_800329D8(void)
+{
+    s32 v;
+
+    if (D_8006DCA8 != 0) {
+        return;
+    }
+
+    D_8006DC94 = 0;
+    func_80024CE0();
+
+    if (D_8006DC8C != 0) {
+        func_80024DA0(0);
+        D_8006DC8C = 0;
+    } else {
+        v = D_8006DC90;
+        if (v != -1) {
+            if (v != 0) {
+                func_80024D40(v, NULL);
+            } else {
+                func_80024D40(0, D_8006DC9C);
+            }
+            D_8006DC90 = -1;
+        }
+    }
+
+    func_80024CF0();
+}
 
 extern void func_80038FB0(void);
 
