@@ -1,7 +1,12 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040664);
+void func_80040664(Obj6EAC0 *self, s32 a1, void *a2) {
+    if (self->unkC == 0) {
+        func_8001E57C()->slot4C(self, a1, 0);
+        self->methods->slotBC(self, a2);
+    }
+}
 
 s32 func_800406E4(Obj6EAC0 *self, s32 a1) {
     return func_8001EDAC(&self->unk58, 0x1F, 1, a1 == 0) == 0;

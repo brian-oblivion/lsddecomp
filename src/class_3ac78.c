@@ -27,7 +27,101 @@ Class866E8 *func_8004A4C8(s32 arg1, s32 arg2)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A534);
+/*
+ * func_8004A534's own helpers -- all still-uncarved elsewhere, typed
+ * purely from this call site's own register usage.
+ */
+typedef struct BaseCtorTable_3ac78 BaseCtorTable_3ac78;
+struct BaseCtorTable_3ac78 {
+    u8 pad0[0x8];
+    void (*ctor)(void *self); /* +0x008, standard "further-base ctor first" slot */
+};
+
+extern BaseCtorTable_3ac78 *func_800428E4(void);
+extern UnkSlotChildObj_3ac78 *func_80048894(void);
+extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
+extern GenericObject *func_8004D38C(void);
+extern s32 func_80020C5C(void);
+extern Vec3_3ac78 D_8008682C;
+
+void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
+{
+    s32 i;
+    UnkSlotEntry_3ac78 *entry;
+    GenericObject *obj;
+    Class866E8 **cellp;
+    u8 *p;
+    u8 *end;
+    s32 buf[3];
+
+    func_800428E4()->ctor(self);
+    self->methods = func_8004D244();
+
+    if (arg1 != NULL) {
+        self->unk54 = *arg1;
+    } else {
+        self->unk54 = D_8008682C;
+    }
+
+    self->unk1B0 = 0;
+    self->unk1B4 = 0;
+    self->unk1B8 = 0;
+    self->unk70 = 0;
+    self->unk6C = 0;
+    self->unkE8 = 0;
+    self->unk1E0 = 0;
+
+    for (i = 0; i < 7; i++) {
+        entry = &self->unkEC[i];
+
+        entry->unk4 = func_80048894();
+        entry->unk4->unk20 = (entry->unk4->unk10 != 0);
+        entry->unk4->unk32 = i;
+        entry->unk4->methods->slot88(entry->unk4, arg2);
+
+        entry->unk14 = 0;
+        entry->unk18 = 0;
+        entry->unk2 = i;
+        entry->unk0 = 0;
+
+        entry->unk8 = new_class_6d940(0);
+        entry->unkC = func_8004D38C();
+        entry->unkC->methods->slot4C(entry->unkC, self, &self->unk54);
+
+        entry->unk10 = (Class866E8 **)func_80017B34(0x668);
+        if (entry->unk10 == NULL) {
+            return;
+        }
+
+        buf[0] = 0x400;
+        buf[1] = 0;
+        buf[2] = 0x400;
+
+        cellp = entry->unk10;
+        end = (u8 *)cellp + 0x668;
+        p = (u8 *)cellp;
+        while (p < end) {
+            obj = func_8004D38C();
+            *(GenericObject **)p = obj;
+            obj->methods->slot4C(obj, entry->unkC, buf);
+
+            buf[0] += 0x800;
+            if (buf[0] > 0xA400) {
+                buf[0] = 0x400;
+                buf[2] += 0x800;
+            }
+
+            obj = *(GenericObject **)p;
+            obj->methods->slot70(obj, 1);
+            obj = *(GenericObject **)p;
+            p += 4;
+            obj->unk10 |= 0x80000000;
+        }
+    }
+
+    self->methods->slot10(self, func_80020C5C());
+    self->methods->slot40(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A7C0);
 
