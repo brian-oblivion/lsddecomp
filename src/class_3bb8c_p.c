@@ -170,11 +170,30 @@ extern void *func_80017B34(s32 size);
  * `func_80057F58` is a plain no-argument getter for `&D_800879C4` --
  * confirmed by reading its own body directly in asm/class_3bb8c_q.s,
  * which is otherwise off limits (uncarved ground, not this unit's). */
+typedef struct D_800879C4Obj D_800879C4Obj;
 typedef struct D_800879C4Methods {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *arg1, void *arg2, void *arg3);
+    D_800879C4Obj *(*ctor)(D_800879C4Obj *self, void *arg1, void *arg2, void *arg3);
+    /* +0x00C..+0x03C not yet needed by this unit. */
+    u8 pad0C[0x40 - 0xC];
+    /* This class's OWN slot, resolved via `tools/classtable.py
+     * D_800879C4`: `func_80057DBC`, the FIRST function of this unit's
+     * successor `class_3bb8c_q` -- out of this unit/runner's range.
+     * Tail-called by this unit's own `func_80057D10` (its own ctor, see
+     * that function's report) as (self, arg1) once construction is
+     * otherwise complete (round 2026-09-04). */
+    void *(*slot40)(D_800879C4Obj *self, s32 arg1);
 } D_800879C4Methods;
 extern D_800879C4Methods *func_80057F58(void);
+
+/* This unit's own view of a D_800879C4 instance -- only the vtable
+ * pointer (set by this unit's own ctor, `func_80057D10`) and `+0xA4`
+ * (also written by that ctor) are named; the rest is opaque. */
+struct D_800879C4Obj {
+    D_800879C4Methods *methods;
+    u8 pad04[0xA4 - 0x4];
+    s32 unk_0xA4;
+};
 
 void *func_80057C94(void *arg1, void *arg2, void *arg3) {
     void *obj = func_80017B34(0xA8);
@@ -185,4 +204,29 @@ void *func_80057C94(void *arg1, void *arg2, void *arg3) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057D10);
+/* 2-element, 0xC-byte-stride table -- address-of only here (never
+ * dereferenced by this function), forwarded as the ctor call's `arg3`.
+ * Field layout unconfirmed beyond the stride; kept opaque. */
+typedef struct D_80087A8CEntry {
+    u8 unk[0xC];
+} D_80087A8CEntry;
+extern D_80087A8CEntry D_80087A8C[2];
+
+/* Another uncarved-ground getter (asm/psyq_memset.s, of all places --
+ * splat's segmentation, not a meaningful grouping): plain no-argument,
+ * `return &D_8006EE1C;`. Only the ctor slot is needed; the callee ignores
+ * this call's "arguments" (this function's OWN a0..a3, left untouched in
+ * registers from entry -- the "per-call-site signature" precedent again,
+ * see func_80057B54's report), so the C call site takes none either. */
+typedef struct D_8006EE1CMethods {
+    u8 pad00[0x8];
+    void *(*ctor)(void *self, void *arg1, s32 arg2, void *arg3, void *arg4, s32 arg5);
+} D_8006EE1CMethods;
+extern D_8006EE1CMethods *func_800422BC(void);
+
+void *func_80057D10(D_800879C4Obj *self, s32 arg1, void *arg2, void *arg3) {
+    func_800422BC()->ctor(self, arg3, 0, &D_80087A8C[arg1], arg2, 0);
+    self->methods = func_80057F58();
+    self->unk_0xA4 = 0;
+    return self->methods->slot40(self, arg1);
+}
