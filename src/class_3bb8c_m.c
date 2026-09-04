@@ -120,7 +120,12 @@ void func_80054208(ObjM *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_8005426C);
+void func_8005426C(ObjM *self) {
+    if (self->unk84) {
+        self->methods->slotD4(self);
+        self->methods->slot30(self, 0xC);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800542D0);
 
