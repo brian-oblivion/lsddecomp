@@ -133,6 +133,60 @@ A hit means blocked: file a stub report citing the research doc and move on.
 6/6 against the same table because it only forms `&arr[i]` and never loads
 through it. Only the load is exposed.
 
+### BLOCKED: the `nop_mflo_mfhi` screen runs FORWARD, and the backward reading is not a blocker (2026-09-04)
+
+**Measured this round with two reproducers through the pinned pipeline.** The
+third blocker grep (Gate 1 in `docs/PARALLEL-RUNS.md`, evidence in
+`docs/research/addiu-at-blocker.md`) is written as
+
+```sh
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/<unit>/<func>.s \
+  | grep -qE '\b(mult|multu|div|divu)\b'
+```
+
+`grep -A2` prints the `mflo`/`mfhi` line **plus the two FOLLOWING lines**, so
+the construct it screens for is *`mflo`/`mfhi` followed within two instructions
+by another multiply-unit op*. That direction is correct and it is the one the
+blocker is about. The head of round 15 re-implemented this screen in Python,
+inverted it to "a `mflo`/`mfhi` within two instructions **after** a
+`mult`/`div`", and got four false blockers — including a 252/258 near-miss
+where a wrong CAUSE is exactly the expensive kind of error.
+
+Both directions were then reproduced in isolation, and they behave oppositely:
+
+```c
+int div20(int a) { return a / 20; }                              /* CLEAN */
+int mulplain(int a, int b) { return a * b; }                     /* CLEAN */
+int mul_then_div(int a, int b, int c) { int p = a*b; return p/c; }  /* BLOCKED */
+int div_then_mul(int a, int b, int c) { int q = a/b; return q*c; }  /* BLOCKED */
+```
+
+- **`mult` -> `mfhi` (the hazard-slot direction) is NOT blocked.** The pinned
+  pipeline reproduces retail's signed-divide-by-constant idiom exactly —
+  `mult a0,magic` / `sra a0,a0,31` / `mfhi v0` / `sra` / `subu`, with the `sra`
+  filling the slot and **no `nop` inserted**. Same for a bare `mult` / `mflo`
+  with a zero-instruction gap. So every `mult; ...; mfhi` in retail is ordinary
+  matchable code, however tight the gap looks.
+- **`mflo`/`mfhi` -> `mult`/`div` IS blocked.** The pipeline inserts **two
+  `nop`s** between the result read and the next multiply-unit op, which retail
+  does not have. This is the case `addiu-at-blocker.md`'s 2026-09-01 addendum
+  already recorded for `func_8005950C` (`mult; mflo; div`); the reproducers
+  above show it fires for `mflo -> mult` as well, not just `mflo -> div`.
+
+Corpus census with the screen the right way round, over all 285 queued
+functions: **7 hits**, and all seven already have match reports naming the
+blocker. So the existing stall corpus has no mis-filed cause here — and 7 of
+285 keeps Gate 1's decision to leave this grep with the HEAD rather than
+promoting it to a per-runner screen correct on measured grounds.
+
+The generalisable part is not about multiplies. **A screen is a claim with a
+direction, and an inverted screen fails in the worst way available**: it
+manufactures blockers on functions that are actually workable, and CLAUDE.md's
+own asymmetry applies — a wrong score gets corrected the next time anyone
+measures, a wrong CAUSE is what the next round acts on. If you re-implement one
+of the three greps in another language, reproduce a known-positive and a
+known-negative through the pinned pipeline before believing its output.
+
 ## Build hygiene (proven, the hard way)
 
 - **Address drift looks exactly like a broken symbol, and TWO runners lost
