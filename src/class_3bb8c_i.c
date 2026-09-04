@@ -129,7 +129,63 @@ void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_80050F98);
+/*
+ * func_80050F98's own helpers/data -- resolves two "CARD\\<name>.TIM"
+ * memory-card icon/font resource paths (func_800270C4, already matched in
+ * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
+ * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
+ * func_80041C9C, unk44/unk40 via func_800408CC/func_80041AB4 -- both still
+ * uncarved elsewhere, typed purely from this call site's own register
+ * usage, same convention as func_80040FC0 above).
+ */
+extern char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3);
+extern ChildObj86ED0 *func_8003B39C(char *path);
+extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
+extern ChildObj86ED0 *func_80041AB4(ChildObj86ED0 *arg0, s32 arg1);
+
+extern const char D_80011610[]; /* "COMINPUT" */
+extern const char D_8001161C[]; /* "FONTICON" */
+extern const char D_8008AAE8[]; /* "CARD\\" */
+extern const char D_8008AAF0[]; /* ".TIM" */
+extern s32 D_80086F7C; /* 3-word opaque block, func_80041C9C's arg1, address-only here */
+extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
+extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
+extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
+extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
+
+void func_80050F98(Obj86ED0 *self, void *arg1)
+{
+    char path[0x20];
+    const char *dir;
+    const char *ext;
+    ChildObj86ED0 *handle1;
+    ChildObj86ED0 *handle2;
+
+    if (arg1 == NULL) {
+        return;
+    }
+    if (self->unk48 != NULL) {
+        return;
+    }
+
+    dir = D_8008AAE8;
+    ext = D_8008AAF0;
+
+    handle1 = func_8003B39C(func_800270C4(path, D_80011610, dir, ext));
+    handle1->methods->slot78(handle1);
+    self->unk48 = func_80041C9C(handle1, (void *)&D_80086F7C, 0);
+    handle1->methods->release(handle1);
+    self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
+
+    handle2 = func_8003B39C(func_800270C4(path, D_8001161C, dir, ext));
+    handle2->methods->slot78(handle2);
+    self->unk44 = func_800408CC(handle2, self->unk10, self->unk28);
+    self->unk40 = func_80041AB4(handle2, 0x5F);
+    handle2->methods->release(handle2);
+    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
+    self->unk44->methods->slotB8(self->unk44, (void *)&D_8008AAC8);
+    self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
+}
 
 void func_80051174(Obj86ED0 *self)
 {
@@ -175,14 +231,82 @@ void func_800512C8(Obj86ED0 *self, s32 arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_80051370);
+void func_80051370(Obj86ED0 *self)
+{
+    s32 tag;
+    s32 old;
+
+    tag = self->unk2C;
+    if (tag >= 4) {
+        return;
+    }
+    if (tag < 2) {
+        return;
+    }
+    old = self->unk30;
+    self->unk30 = old + 1;
+    if (old != 0) {
+        self->methods->slot54(self, 4);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_800513D0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_8005161C);
+void func_8005161C(Obj86ED0 *self, s32 arg1)
+{
+    TargetObj86ED0 *target;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_8005165C);
+    target = self->unk3C;
+    if (target != NULL) {
+        target->methods->slot80(target, arg1, 0x60, 0x60);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_800516C0);
+void func_8005165C(Obj86ED0 *self)
+{
+    s32 old;
+    s32 v;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_80051720);
+    if (self->unk48 != NULL) {
+        old = self->unk18;
+        v = old + 1;
+        self->unk18 = v;
+        if (v < self->unk10) {
+            self->methods->slotA4(self, v, 1);
+        } else {
+            self->unk18 = old;
+        }
+    }
+}
+
+void func_800516C0(Obj86ED0 *self)
+{
+    s32 old;
+    s32 v;
+
+    if (self->unk48 != NULL) {
+        old = self->unk18;
+        v = old - 1;
+        self->unk18 = v;
+        if (v >= 0) {
+            self->methods->slotA4(self, v, 1);
+        } else {
+            self->unk18 = old;
+        }
+    }
+}
+
+void func_80051720(Obj86ED0 *self)
+{
+    s32 v;
+
+    if (self->unk48 != NULL) {
+        v = self->unk1C + 1;
+        self->unk1C = v;
+        if (v < self->unk14) {
+            self->methods->slotA8(self, self->unk18, v, 1);
+        } else {
+            self->unk1C = 0;
+        }
+    }
+}

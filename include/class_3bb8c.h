@@ -2203,6 +2203,18 @@ typedef struct ChildMethods86ED0 ChildMethods86ED0;
 struct ChildMethods86ED0 {
     u8 pad000[0x004];
     void *(*release)(ChildObj86ED0 *self); /* +0x004, func_80051174 */
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, func_80050F98 (three call sites, always through self->unk40/
+     * unk44/unk48). Same offset/arity as the unrelated FieldM7CMethods::
+     * slot4C above -- not unified with it, per this project's established
+     * multiple-independent-local-views convention (this unit's own reading
+     * from its own call sites). arg1 is func_80050F98's own forwarded
+     * parameter; arg2 is a small opaque data blob passed only by address. */
+    void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
+    u8 pad050[0x078 - 0x050];
+    void (*slot78)(ChildObj86ED0 *self); /* +0x078, func_80050F98, on the short-lived handle before func_80041C9C/func_800408CC consume it */
+    u8 pad07C[0x0B8 - 0x07C];
+    void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, func_80050F98, self->unk44 only */
 };
 struct ChildObj86ED0 {
     ChildMethods86ED0 *methods; /* +0x000 */
@@ -2215,7 +2227,15 @@ typedef struct TargetObj86ED0 TargetObj86ED0;
 typedef struct TargetMethods86ED0 TargetMethods86ED0;
 struct TargetMethods86ED0 {
     u8 pad000[0x080];
-    void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2); /* +0x080, func_8005161C */
+    /* +0x080, func_8005161C: `self->methods->slot80(self, arg1, 0x60, 0x60)`.
+     * 3 args, not 2 -- confirmed against this project's established
+     * self->methods->slot80(self, arg1, 0x60, 0x60) idiom seen at several
+     * other call sites (src/class_3bb8c_k.c, src/code_2cc8c.c,
+     * src/class_3bb8c_g.c, src/code_55dd4.c), all forwarding a caller-
+     * supplied arg1 alongside a repeated literal. func_8005161C itself
+     * takes that arg1 as its own second parameter and forwards it
+     * unchanged (same register, no move instruction). */
+    void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);
 };
 struct TargetObj86ED0 {
     TargetMethods86ED0 *methods; /* +0x000 */
@@ -2247,7 +2267,13 @@ struct Obj86ED0Methods {
     void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, func_80050E78's tag==2 case -- this class's own slot, func_800513D0 (STALLED, addiu-$at/jump-table blocked) */
     u8 pad060[0x0A4 - 0x060];
     void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, func_8005165C/func_800516C0 -- func_800518F4, outside this unit's slice */
-    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2);        /* +0x0A8, func_80051720 -- func_80051998, outside this unit's slice */
+    /* +0x0A8, func_80051720. 3 args, not 2 -- retail's call sets $a1/$a3
+     * (`self->unk18`, `1`) and leaves $a2 holding the just-computed
+     * incremented `unk1C` value untouched from a few instructions earlier
+     * (no fresh load/li for it), which only makes sense if that register
+     * IS the call's own middle argument, forwarded because it was already
+     * live there. Same shape as TargetMethods86ED0::slot80 above. */
+    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);        /* +0x0A8, func_80051720 -- func_80051998, outside this unit's slice */
 };
 
 struct Obj86ED0 {
