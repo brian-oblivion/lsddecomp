@@ -371,7 +371,19 @@ void func_800573A8(BaseObjO *self, Vec3O *arg1) {
     func_800573CC(self, 0, arg1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800573CC);
+void func_800573CC(BaseObjO *self, s32 flag, Vec3O *v) {
+    BaseObjO *t = self;
+    Unk14ObjO *u = t->unk14;
+
+    if (flag) {
+        u->vec18 = *v;
+    } else {
+        u->vec18.x += v->x;
+        u->vec18.y += v->y;
+        u->vec18.z += v->z;
+    }
+    t->unk14->unk0 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057444);
 
