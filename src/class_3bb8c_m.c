@@ -16,33 +16,116 @@
  * Header edits must be strictly ADDITIVE.
  */
 #include "common.h"
+#include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053D18);
+/* Forward declaration: defined later in this same unit, but called by
+ * func_80053D18/func_80053D9C/func_80053E00 above its own definition. */
+extern void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053D9C);
+void func_80053D18(ObjM *self) {
+    s32 val;
+    self->unk20 = 7;
+    self->unk3C->methods->slotF0(self->unk3C, &val, -1);
+    func_80053EB4(self, val, 0, 5, 1);
+    self->unk3C->methods->slotFC(self->unk3C);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053E00);
+void func_80053D9C(ObjM *self) {
+    self->unk20 = 8;
+    func_80053EB4(self, 0, 0, 6, 1);
+    self->unk3C->methods->slotF4(self->unk3C, 1);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053E84);
+void func_80053E00(ObjM *self) {
+    self->unk20 = 0xA;
+    func_80053EB4(self, 0, 0, 6, 1);
+    self->unk3C->methods->slot13C(self->unk3C, 2);
+    self->unk3C->methods->slotF4(self->unk3C, 2);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053EB4);
+void func_80053E84(ObjM *self) {
+    self->methods->slot30(self, 0xB);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80053F84);
+void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
+    if (arg3 != 0) {
+        obj->methods->slotD0(obj, arg3);
+    }
+    if (arg4 != 0) {
+        self->methods->slot10(self, obj);
+    }
+    obj->methods->slotD8(obj, self->unk10, arg1, arg2);
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800540E8);
+void func_80053F84(ObjM *self, ParamM *p1, s32 sel) {
+    s32 v;
+    switch (sel) {
+    case 5:
+        self->methods->slot14(self, p1);
+        self->unk3C->methods->slotF4(self->unk3C, 0);
+        self->unk20 = 0;
+        break;
+    case 6:
+        self->methods->slot14(self, p1);
+        v = p1->methods->slotE4(p1);
+        self->unk18->methods->slot64(self->unk18, v);
+        if (self->unk20 != 5 && self->unk20 != 8 && self->unk20 == 0xA) {
+            self->unk3C->methods->slot17C(self->unk3C, 1);
+            self->unk3C->methods->slotF4(self->unk3C, 0);
+            self->unk20 = 4;
+        }
+        self->methods->slot30(self, self->unk20);
+        break;
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054120);
+void func_800540E8(ObjM *self, s32 arg1, s32 arg2) {
+    if (arg2 == 7) {
+        self->methods->slotB8(self);
+    }
+}
+
+s32 func_80054120(ObjM *self) {
+    s32 out;
+    s32 result;
+    ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
+    void *thing = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    result = func_8005C7D4(child->unk4->unk34, &out, thing);
+    child->unk14 = result;
+    if (result != 0) {
+        return 0;
+    }
+    child->unk4->methods->slot84(child->unk4);
+    return 1;
+}
 
 void func_800541CC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800541D4);
+void func_800541D4(ObjM *self) {
+    if (self->unk80 != 0 && self->unk20 == 0) {
+        self->unk84 = 1;
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054200);
+void func_80054200(ObjM *self) {
+    self->unk84 = 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054208);
+void func_80054208(ObjM *self) {
+    if (self->unk84) {
+        self->methods->slotD4(self);
+        self->methods->slot30(self, 0xD);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_8005426C);
+void func_8005426C(ObjM *self) {
+    if (self->unk84) {
+        self->methods->slotD4(self);
+        self->methods->slot30(self, 0xC);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800542D0);
 
