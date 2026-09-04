@@ -33,6 +33,7 @@
  * below are this unit's own reading of that driver's entry points. */
 
 extern s32 D_8006D5FC;
+extern s32 D_8006D600;
 extern s32 D_8006D608;
 
 /* Still INCLUDE_ASM in asm/code_179d8_mid.s -- not this unit's to carve. */
@@ -67,7 +68,12 @@ s32 func_80028DA8(s32 arg0)
     return old;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DC0);
+s32 func_80028DC0(s32 arg0)
+{
+    s32 old = D_8006D600;
+    D_8006D600 = arg0;
+    return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DD8);
 
