@@ -1648,4 +1648,96 @@ extern s32 func_800508F8(s32 handle);                       /* close */
 extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 extern s32 func_80050908(void *arg0);                          /* func_8004EF6C */
 
+/*
+ * class_3bb8c_k's own view: the class whose method table is D_80086F88
+ * (39 slots, tools/classtable.py D_80086F88 -- header word 0x20). Carved
+ * round 15; this unit is the first to write any of its methods. Only the
+ * slots/fields this unit's functions actually touch are typed; the rest
+ * stays opaque. `func_80052644`/`func_800522DC` are two more of this
+ * class's own methods (toolchain-blocked, stub reports filed, still
+ * INCLUDE_ASM) -- not reflected here since nothing in this unit's C reads
+ * through them yet.
+ */
+typedef struct Class86F88Methods Class86F88Methods;
+typedef struct Class86F88 Class86F88;
+typedef struct Class86F88ElemMethods Class86F88ElemMethods;
+typedef struct Class86F88Elem Class86F88Elem;
+
+struct Class86F88Methods {
+    u8 pad000[0x014];
+    /* +0x014, func_800521D4's own first dispatch:
+     * `self->methods->slot14(self, self->unk34)`. */
+    void (*slot14)(Class86F88 *self, s32 arg1);
+    u8 pad018[0x030 - 0x018];
+    /* +0x030, func_800521D4's `state == 4` path:
+     * `self->methods->slot30(self, self->unk2C)`. */
+    void (*slot30)(Class86F88 *self, s32 arg1);
+    u8 pad034[0x048 - 0x034];
+    void (*slot48)(Class86F88 *self); /* +0x048, func_800521D4's own 2nd dispatch, self only */
+    u8 pad04C[0x054 - 0x04C];
+    /* +0x054 = func_800521D4 itself (this unit, matched). Dispatched by
+     * func_8005227C as `self->methods->slot54(self, 4)`. */
+    void (*slot54)(Class86F88 *self, s32 state);
+    u8 pad058[0x080 - 0x058];
+    /* +0x080 = func_80052498 itself (this unit, matched), whose own body
+     * ignores every argument past `self` -- the 3-argument shape below is
+     * what func_800523F0's call site (dispatching through a DIFFERENT
+     * instance's slot80, `self->unk3C`) actually passes. Per-call-site
+     * arity is this project's established convention; it does not
+     * contradict func_80052498's own narrower body. */
+    void (*slot80)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
+    u8 pad084[0x094 - 0x084];
+    /* +0x094 = func_8005281C itself (this unit, still INCLUDE_ASM as of
+     * this round). Signature fixed by three independent callers in this
+     * unit (func_80052430, func_80052498, func_800524F8, func_80052598),
+     * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
+    void (*slot94)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+    /* +0x098, occupant not in this unit's queue. Called by
+     * func_800524F8/func_80052598 with (self, arg1, arg2, arg3). */
+    void (*slot98)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
+};
+
+/*
+ * Each element of Class86F88::unk40[] -- resolved from func_800529FC's own
+ * dispatch, `elem->methods->slotB8(elem, &D_8008AB10)`. The `+0x004`
+ * "release" slot is the same shared base-class implementation seen at
+ * that offset in every vtable this project has resolved so far (compare
+ * `GenericReleaseMethods_3bb8c_d` above) -- func_8005278C dispatches
+ * through it on each element before clearing the slot.
+ */
+struct Class86F88ElemMethods {
+    u8 pad000[0x004];
+    void (*release)(Class86F88Elem *self); /* +0x004 */
+    u8 pad008[0x0B8 - 0x008];
+    void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
+};
+
+struct Class86F88Elem {
+    Class86F88ElemMethods *methods; /* +0x000 */
+};
+
+struct Class86F88 {
+    Class86F88Methods *methods;    /* +0x000 */
+    u8 pad004[0x010 - 0x004];
+    s32 unk10;                     /* +0x010, func_8005278C/func_8005281C: element count, clamped to a max of 4 */
+    s32 unk14;                     /* +0x014, func_80052430: upper bound compared against unk24+0x1A */
+    u8 pad018[0x020 - 0x018];
+    s32 unk20;                     /* +0x020, func_800523F0(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
+    s32 unk24;                     /* +0x024, ditto */
+    s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
+    s32 unk2C;                     /* +0x02C, func_8005227C/func_800521D4 */
+    s32 unk30;                     /* +0x030, func_8005227C/func_800521D4 */
+    s32 unk34;                     /* +0x034, func_800521D4's slot14 argument */
+    u8 pad038[0x03C - 0x038];
+    Class86F88 *unk3C;              /* +0x03C, func_800523F0: another instance of this same class */
+    Class86F88Elem *unk40[4];       /* +0x040, func_8005278C/func_8005281C/func_800529FC */
+    s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
+};
+
+extern Class86F88Methods D_80086F88;
+/* func_800529FC's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
+ * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
+ * own code, only its address taken. */
+extern s32 D_8008AB10;
+
 #endif

@@ -13,8 +13,32 @@
  * Header edits must be strictly ADDITIVE.
  */
 #include "common.h"
+#include "class_3bb8c.h"
+#include "class_39e08.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800521D4);
+void func_800521D4(Class86F88 *self, s32 state)
+{
+    self->unk30 = 0;
+    if (state < 2) {
+        goto end;
+    }
+    if (state < 4) {
+        goto case_lt4;
+    }
+    if (state == 4) {
+        goto case_eq4;
+    }
+    goto end;
+case_lt4:
+    self->methods->slot14(self, self->unk34);
+    self->methods->slot48(self);
+    self->unk2C = state;
+    goto end;
+case_eq4:
+    self->methods->slot30(self, self->unk2C);
+end:
+    return;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005227C);
 
