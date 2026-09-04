@@ -107,7 +107,17 @@ void func_80056E1C(void *this) {
     func_80056D18(this, 0, 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056E44);
+void func_80056E44(LinkOwnerObj *this) {
+    LinkElemObj **p = &this->arr84[1];
+    s32 i;
+
+    for (i = 0; i < 4; i++, p++) {
+        u32 r = rand();
+
+        (*p)->methods->slot48(*p, 1, &D_8008788C[r % 6]);
+        (*p)->unk84 = (rand() % 360) << 12;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056F28);
 
