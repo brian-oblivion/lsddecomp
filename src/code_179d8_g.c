@@ -58,7 +58,7 @@ extern s32 D_8006D8E4;
 extern s32 D_8006D8E8;
 extern volatile s32 D_8006D8EC;
 extern volatile s32 D_8006D8F0;
-extern s32 D_8006D8F4;
+extern volatile s32 D_8006D8F4;
 extern s32 D_8006D8F8;
 extern s32 D_8006D8FC;
 extern s32 D_8006D900;
