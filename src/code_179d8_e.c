@@ -60,7 +60,9 @@ extern TableD9BC D_8006D9BC;
  * through.  Only the slots this unit's own functions call or are assigned to
  * are named. */
 typedef struct TableDA34 {
-    u8 pad000[0x078];
+    u8 pad000[0x008];
+    void (*slot08)(void *self, s32 arg1); /* func_8002C4E0, BLOCKED (gp_rel) -- this unit's own new_class_da34 dispatch */
+    u8 pad00C[0x078 - 0x00C];
     s32 (*slot78)(ObjDA34 *self, s32 arg1); /* func_8002C824 */
     s32 (*slot7C)(ObjDA34 *self);           /* func_8002C890, BLOCKED (gp_rel) */
     s32 (*slot84)(ObjDA34 *self, s32 arg1); /* func_8002CB18, arg1 is s16-truncated by the callee */
@@ -103,6 +105,10 @@ extern void func_80031F3C(s32 arg0);
 extern void func_8003370C(s32 arg0);
 extern s32 func_800336CC(s32 arg0);
 
+/* Forward declaration: func_8002CC0C is defined later in this file (ROM
+ * order), but func_8002C480 (earlier in ROM order) calls it. */
+TableDA34 *func_8002CC0C(void);
+
 s32 func_8002C408(void) {
     return 0;
 }
@@ -134,7 +140,16 @@ s32 func_8002C478(void) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C480);
+void *func_8002C480(s32 arg0) {
+    void *self;
+
+    self = func_80017B34(0x64);
+    if (self != NULL) {
+        func_8002CC0C()->slot08(self, arg0);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C4E0);
 
