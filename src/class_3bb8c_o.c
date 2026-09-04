@@ -367,7 +367,9 @@ void func_80057384(BaseObjO *self, Vec3O *arg1) {
     func_800573CC(self, 1, arg1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800573A8);
+void func_800573A8(BaseObjO *self, Vec3O *arg1) {
+    func_800573CC(self, 0, arg1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800573CC);
 
