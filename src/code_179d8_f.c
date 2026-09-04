@@ -55,7 +55,15 @@ void func_80035F3C(s32 a0, s32 a1, UnkStruct80035F3C *a2)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80035F98);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036024);
+/* func_80038D74 is defined in the uncarved psyq_SpuSetMute unit; a leading
+ * `beqz $a0` / `beq $a0,1` / else dispatch on a mode, and it returns a real
+ * value read from D_8006DD2C right before its own jr $ra. */
+extern s32 func_80038D74(s32 a0);
+
+s32 func_80036024(void)
+{
+    return func_80038D74(1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036044);
 
