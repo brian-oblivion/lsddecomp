@@ -1813,6 +1813,67 @@ finding, seen in two runners independently.**
   needing `volatile` would put source in the tree that misrepresents what the
   game did, so prefer removing the thing being CSE'd.
 
+- **NEW, round 17, reproduced in isolation: GCC 2.6.3 `-O2` merges
+  per-branch constant stores to one global into a SINGLE shared store.**
+  Each arm materialises its constant into a register and one `lui`/`sw` pair
+  follows the join; retail sometimes keeps a store in each arm instead.
+  Reproducer, straight through the pinned pipeline:
+
+  ```c
+  extern int g;
+  void probe(int x) { if (x > 0) { g = 1; } else { g = 2; } }
+  ```
+
+  ```
+  bgtz  a0, .L      li v0,1      li v0,2      lui at,0x0     sw v0,0(at)
+  ```
+
+  The three-way form (`if`/`else if`/`else`) merges the same way. Levers that
+  moved it in real functions: a bare `__asm__("")` barrier, and a local
+  `volatile T *` forcing unfolded addressing — but **the pointer lever
+  backfires inside a loop** over a loop-invariant target, where it defeats to
+  loop-invariant code motion instead. (runner delta, `func_8002ADE8`,
+  `func_8002B4D4`; head-verified with the reproducer above.)
+- **A repeated `x & IMM` is CSE'd on the VALUE, not on the immediate**, and
+  the distinction matters because the wrong reading sends you hunting for an
+  immediate-matching pass that does not exist. Measured: two `x & 0xFF` on
+  the same `x` produce ONE `andi` reused; `x & 0xFF` and `y & 0xFF` produce
+  TWO. It is ordinary common-subexpression elimination. When retail shows two
+  independent `andi` with equal immediates, the question is what makes the
+  two operands different, not how to defeat an immediate-matcher. (runner
+  charlie, `func_80035F3C` — the fix there was real and permuter-found; this
+  corrects the mechanism it was filed under.)
+
+### Proposed learnings that did NOT earn promotion (round 17)
+
+Recorded because an unpromoted claim that leaves no trace gets re-derived,
+and because both failures share one shape: **a claim of "unconditional"
+compiler behaviour that was only ever tested along one axis.**
+
+- **"A `for`-header increment is not interchangeable with the same statement
+  as the body's second line; GCC ties the header form to the loop tail."**
+  Does not reproduce. Three spellings — increment in the `for` header,
+  increment as the body's last line, increment as the body's second line —
+  emit **byte-identical** code through the pinned pipeline. Whatever moved in
+  the originating function had another cause. Note this does NOT contradict
+  the confirmed multi-variable entry above (`a++, b++` vs `b++, a++` inside
+  ONE header clause), which is a different question and still holds.
+- **"GCC unconditionally folds `x - (x/N or x>>k)*N` into `x & (N-1)` once it
+  can prove `x >= 0`."** False. Seven probes supported it, all varying `/` vs
+  `>>`, guard vs no guard, and barrier vs none — while holding the
+  intermediate's TYPE fixed at `s32`. Type is the axis that matters:
+  narrowing the multiplicand (`lo = index - (short)hi * 16;`) blocks the fold
+  and reproduces retail's whole sequence bar one operand. See the head
+  adjudication in `docs/match-reports/func_8002CA3C.md`.
+
+  The transferable rule, and the reason both of these are worth the space:
+  **retail came out of THIS compiler, so "no C reaches these bytes" is a
+  claim about the entire shape space, not about the axis you happened to
+  vary.** It earns the same standard CLAUDE.md already sets for the
+  no-C-form exception — name the construct that has no C spelling, or it is
+  not that exception. A blocker filed on one axis becomes a stub, and a stub
+  removes the function from `fresh` permanently.
+
 ### New residue classes opened this round (not yet closed)
 
 - **NEW, round 16: the "retry-loop driver" cluster — three instances of ONE
