@@ -231,7 +231,12 @@ void func_80051E20(Class86ED0 *self)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051E64);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051F14);
+void func_80051F14(Class86ED0 *self)
+{
+    self->unk20 = 0;
+    self->unk24 = 0;
+    self->unk28 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051F24);
 
