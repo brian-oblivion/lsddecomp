@@ -76,6 +76,11 @@ struct BaseTable6D940 {
 };
 extern BaseTable6D940 *func_80026CAC(void);
 
+/* Pool allocator, already established elsewhere (e.g.
+ * include/class_16334.h, include/code_8220.h) -- declared LOCAL here since
+ * this unit does not include either header. */
+extern void *func_80017B34(s32 size);
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BC40);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
@@ -95,7 +100,19 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C048);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C0AC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", new_class_6d940);
+void *new_class_6d940(s32 arg1)
+{
+    void *self;
+    Table6D940 *table;
+
+    self = func_80017B34(0x34);
+    if (self != NULL) {
+        table = func_8002C3A8();
+        table->slot08(self, arg1);
+        return self;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C18C);
 
