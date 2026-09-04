@@ -242,4 +242,18 @@ s32 func_8003CC2C(Obj86B60 *self)
     return (u8)prod >= 0x81;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CCDC);
+s32 func_8003CCDC(Obj86B60 *self)
+{
+    s32 result;
+
+    result = 1;
+    if (self->unk8C != NULL) {
+        result = self->unk8C(self);
+        if (result == 0) {
+            goto epilogue;
+        }
+    }
+    self->methods->slot60(self, 8);
+epilogue:
+    return result;
+}

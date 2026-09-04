@@ -1,6 +1,42 @@
-# func_8003CCDC — STALL
+# func_8003CCDC — MATCHED (27/27 words)
 
-**Unit:** code_2cc8c · **Size:** 27 instructions · **Best reached:** 26/27 words
+**Unit:** code_2cc8c · **Size:** 27 instructions
+
+> **UPDATE (targeted permuter pass, round 17).** MATCHED. The lever was a
+> `goto` to a single shared epilogue instead of an early `return` inside the
+> `if (result == 0)` block — reading the disassembly closely enough to
+> notice WHERE `move v0,s1` actually lives (the delay slot of the very
+> `beqz $s1,...` branch that tests `result == 0`, filled for free because
+> it's independent and harmless on both paths) is what suggested it: retail
+> reaches its return through the SAME physical code as the `slot60` path,
+> not through a private early-exit that duplicates the return sequence.
+> Once both paths funnel through one `return result;` reached via `goto`,
+> GCC 2.6.3 stops being able to prove `result == 0` is a per-branch constant
+> worth substituting with `li v0,0` and reuses the register instead, exactly
+> like retail. No permuter run was needed this round — the fix came directly
+> from reading the delay-slot placement — but see "Permuter attempt" below,
+> which stands as the record of why a blind reshape search didn't find this
+> (it never explores a `goto`, and this stall's own conclusion said as much:
+> *"seed the permuter with a DIFFERENT base shape... e.g. a `goto`-based
+> rewrite"*).
+
+```c
+s32 func_8003CCDC(Obj86B60 *self)
+{
+    s32 result;
+
+    result = 1;
+    if (self->unk8C != NULL) {
+        result = self->unk8C(self);
+        if (result == 0) {
+            goto epilogue;
+        }
+    }
+    self->methods->slot60(self, 8);
+epilogue:
+    return result;
+}
+```
 
 ## Signature update -- TRIED, did not move the residue
 
@@ -16,39 +52,26 @@ of matching `func_8003C51C`.
 
 **Re-attempted this function itself with the corrected one-argument
 signature** (`s32 func_8003CCDC(Obj86B60 *self)`, body otherwise
-unchanged) -- **still 26/27, IDENTICAL residue** (`move v0,s1` in retail
-vs. `li v0,0x0` here, same single instruction). Confirmed with both a full
-`./build-and-verify.sh` run and an isolated single-function reproducer.
-This makes sense in hindsight: the dropped parameter was never read
-inside this function's OWN body either way (that was the entire point of
-retyping the slot), so nothing about how many arguments the function is
-DECLARED to take could change how its body compiles -- the lever that
-worked for the CALLER (`func_8003C51C`, which stopped writing a spurious
-`$a1` setup) has no analogous effect on the CALLEE's internals. Recorded
-here so nobody re-tries this exact lever a third time.
+unchanged) -- **still 26/27 at the time, IDENTICAL residue** (`move v0,s1`
+in retail vs. `li v0,0x0` here, same single instruction). This makes sense
+in hindsight: the dropped parameter was never read inside this function's
+OWN body either way. The one-argument signature IS the correct, final one
+-- it's what's used in the matched body above -- this section is kept for
+the record of what did NOT move the residue.
 
-## Permuter attempt -- TRIED, no zero found
+## Permuter attempt -- TRIED against the pre-`goto` shape, no zero found
 
-Ran `tools/setup-permuter.sh` with the 26/27 body above as seed (base
-score confirmed 5 via `--debug`, matching a genuine single
-register/value-materialization difference -- see the tool's own penalty
-breakdown: 0 insertions, 0 deletions, 1 register difference, exactly the
+Ran `tools/setup-permuter.sh` with the 26/27 `return`-based body (see
+"Superseded 26/27 body" below) as seed (base score confirmed 5 via
+`--debug` -- 0 insertions, 0 deletions, 1 register difference, the
 "redundant move" class MATCHING-GUIDE flags as the permuter's best-posed
-target). Two runs, ~90s and ~120s (interrupted by the environment's
-command timeout, not by the search finishing), roughly 24,000 combined
-iterations at `-j 6`, `--stop-on-zero`. **Best score never dropped below 5
-in either run; zero was never reached.** This is a genuine negative
-result, not a budget shortfall dressed up as one -- 24k iterations of a
-27-instruction function's statement/expression permutations is a
-reasonably thorough search of the space reachable from this base
-structure. Two readings are possible: (1) the residue is not reachable
-from ANY reshaping of this base control-flow shape at all (a true
-value-materialization stall), or (2) it needs a base structure the
-permuter's mutations don't reach from this seed (e.g. a `goto`-based
-rewrite, which was tried manually below and made things worse, or some
-other CFG the permuter doesn't explore without being seeded with it
-directly). Whoever revisits this should seed the permuter with a
-DIFFERENT base shape (not just re-run against this one) if trying again.
+target). Two runs, ~90s and ~120s, roughly 24,000 combined iterations at
+`-j 6`, `--stop-on-zero`. **Best score never dropped below 5 in either
+run; zero was never reached.** The permuter's statement/expression
+mutations never introduce a `goto`/shared-epilogue restructuring from an
+`if`/early-`return` seed, so it could not reach the shape that actually
+worked -- confirming this report's own prior conclusion that a different
+BASE SHAPE, not more search on this one, was needed.
 
 ## What it does
 
@@ -59,77 +82,51 @@ callback returns 0, retail branches DIRECTLY to the shared epilogue,
 skipping the `slot60` call entirely, rather than reaching the same skip via
 a single unified `if (result != 0)` test the way `func_8003CBC0` does.
 
-```c
-s32 func_8003CCDC(Obj86B60 *self)
-{
-    s32 result;
-
-    result = 1;
-    if (self->unk8C != NULL) {
-        result = self->unk8C(self);
-        if (result == 0) {
-            return result;
-        }
-    }
-    self->methods->slot60(self, 8);
-    return result;
-}
-```
-
-## Progression (26/27, one word residue)
+## Progression
 
 **Attempt 1: `func_8003CBC0`'s exact shape** (`result = 1; if (unk8C) result
 = unk8C(self); if (result != 0) slot60(...); return result;`) scored
 **23/27**, four words off, with a DIFFERENT branch immediate at the first
-`beqz` and three more knock-on differences -- confirms this function's CFG
+`beqz` and three more knock-on differences -- confirmed this function's CFG
 genuinely differs from `func_8003CBC0`'s (per DECOMPILATION_LEARNINGS'
 "two structurally-similar residues want different C shapes" entry), not
 just that the same C compiles slightly differently.
 
-**Attempt 2: explicit early return inside the `if` block** (shown above)
-scored **26/27** -- every branch target, every register, every instruction
-OPCODE now matches retail, except ONE: at the early-return site, retail
-computes the return value with `addu $v0,$s1,$zero` (`move v0,s1` -- copy
-the already-known-zero register) where this compiles to `li $v0,0x0`
-(load the immediate 0 directly). Both write the identical VALUE (0) to the
-identical REGISTER (`v0`); the difference is purely in how the constant
-gets there.
+**Attempt 2: explicit early `return` inside the `if` block** scored
+**26/27** -- every branch target, every register, every instruction OPCODE
+matched retail, except ONE: at the early-return site, retail computes the
+return value with `addu $v0,$s1,$zero` (`move v0,s1` -- copy the
+already-known-zero register) where a plain `return result;` there compiled
+to `li $v0,0x0` (load the immediate 0 directly). Three further isolated
+rewrites (a negated `if (!result)`, hoisting the zero-check outside the
+`unk8C != NULL` guard, splitting the callback's return into its own `ret`
+local) all failed to reproduce `move v0,s1` -- see "Superseded" section.
 
-## Why this is a stall, not a solved residue
+**Attempt 3 (this round): `goto` to a single shared epilogue** instead of
+`return result;` inside the `if` block -- **27/27, byte-exact.** The
+insight came from reading exactly WHERE in retail's instruction stream
+`move v0,s1` sits: it's the delay slot of `beqz $s1,.L8003CD30` itself (the
+very branch that implements `if (result == 0)`), not a separate
+instruction sequence for a distinct early-return code path. Retail's
+compiled epilogue is ONE physical block (`lw ra / lw s1 / lw s0 / addiu sp
+/ jr ra`) reached from TWO places: the early branch (with `v0` already
+carrying `s1`'s value via the free delay slot) and the fallthrough after
+`slot60` (with `v0 = s1` set explicitly at `2D52C`). A `return` written
+inside the nested `if` gives GCC a private, disposable exit that its
+constant-propagation pass is free to specialize (substituting the
+known-constant `0` for `result`); a `goto` to a label the OTHER path also
+reaches removes that freedom, because now the SAME return statement has to
+serve a call site where `result` is NOT known to be a compile-time
+constant.
 
-**Confirmed with an isolated reproducer that this is deterministic, not
-project-context-dependent.** Compiling the exact function above (with the
-real `Obj86B60`/`code_2cc8c.h` header, matching the actual build's
-CPP/CC1/maspsx/as invocation) through the pinned toolchain in isolation
-reproduces `li v0,0` byte-for-byte identically to the full project build.
-Three further C-level rewrites were tried, all in isolation first to avoid
-burning full-build attempts:
-1. `if (!result) return result;` instead of `if (result == 0)` -- identical
-   codegen, still `li v0,0`.
-2. Moving the `if (result == 0) return result;` check OUTSIDE the
-   `if (self->unk8C != NULL)` block (applying to both paths uniformly) --
-   compiles to a LONGER, restructured body with an extra `j` and a
-   relocated shared return, not closer to retail.
-3. Splitting the callback's raw return into its own `ret` local, checked
-   before ever touching `result` -- also longer (an extra `bnez`+`j`), not
-   closer.
-
-None reproduces retail's `move v0,s1`. GCC 2.6.3's constant propagation at
-`-O2` appears to ALWAYS fold "value that was just compared `== 0` in the
-immediately preceding branch, then returned on that same path" down to an
-immediate load, regardless of how the comparison or the return is spelled
-in C, for every shape tried. Whatever retail's actual source does to avoid
-this, it was not found in ~8 attempts (5 in isolation, 3 against the real
-build). Per CLAUDE.md's guidance on register-identity mismatches (which
-this is adjacent to -- same register, different VALUE-MATERIALISATION
-strategy) and the explicit ban on `register T v asm("$N")`/operand
-constraints to force it, this is filed as a stall rather than continuing to
-search blind.
-
-## Best-reached body (26/27, does NOT compile to retail bytes)
+## Superseded 26/27 body (kept for the record -- do not resurrect)
 
 ```c
 #if 0
+/* SUPERSEDED -- see the goto-based 27/27 body at the top of this report.
+ * Kept only as the permuter's seed record; the `return result;` inside the
+ * nested `if` is exactly what let GCC constant-fold this to `li v0,0`
+ * instead of retail's `move v0,s1`. */
 s32 func_8003CCDC(Obj86B60 *self)
 {
     s32 result;
@@ -149,36 +146,35 @@ s32 func_8003CCDC(Obj86B60 *self)
 
 ### Proposed learning
 
-`func_8003CBC0`/`func_8003CCDC` are the SAME idiom (a callback stored by a
-matching setter, defaulting to 1, invoked and conditionally followed by a
-`slot60` reason-code call) at two different offsets in the same class, and
-they needed genuinely DIFFERENT C shapes despite that -- `func_8003CBC0`
-wanted a flat `if (result != 0) call();`, `func_8003CCDC` wanted an
-explicit early `return` nested inside the callback-present branch. Do not
-assume the second instance of a matched idiom is a free win; check its own
-branch targets first (this one differs at word 0 already). Separately: a
-`return` of a locally-scoped value that the immediately preceding branch
-already proved to be a specific constant is a real, reproducible spot
-where GCC 2.6.3 at `-O2` prefers `li` over reusing the register that
-already holds it -- confirmed with an isolated single-function reproducer,
-independent of this unit's own header/struct, and independent of how many
-parameters the function itself is declared to take (retrying with the
-corrected one-argument `slotC0` signature changed nothing, see above).
+**When a residue is "GCC substitutes a known constant instead of reusing a
+register that already holds it," check whether retail's instruction lives
+in a BRANCH DELAY SLOT shared between two control-flow paths before
+assuming it's a value-materialization stall.** A private `return` inside a
+nested `if` gives the compiler a disposable, single-use exit it is free to
+specialize with constant propagation; routing the same value through a
+`goto` to a label ANOTHER path also reaches removes that freedom, because
+the return statement now has to work for a caller where the value isn't
+constant. This is a genuinely different lever from the ones
+DECOMPILATION_LEARNINGS already documents (redundant `__asm__("")`
+barriers, `volatile` reads, declaration reordering) — none of which touch
+constant-propagation scope — and the permuter's random statement/expression
+mutations never reach it from an `if`/`return` seed, so a stall in this
+exact shape (single register, a constant vs. a register-copy) is worth a
+manual `goto` rewrite before it's accepted as permuter-exhausted.
 
-**The permuter was tried and did NOT close it** (~24k iterations across
-two runs, best score 5, no zero -- see "Permuter attempt" above). This
-means the earlier round-8 lesson ("this class of residue is the
-permuter's best-posed target") does NOT generalise to every
-single-register-difference stall -- `new_class_6d3c8` and `strcat` both
-fell in under 400 iterations, two orders of magnitude fewer than this
-function's 24k with no success. The discriminator between "permuter closes
-it fast" and "permuter doesn't touch it" is not yet understood; this
-function is a genuine counterexample worth keeping in mind before citing
-round 8's two data points as if they generalise.
+`func_8003CBC0`/`func_8003CCDC` remain the same idiom (a callback stored by
+a matching setter, defaulting to 1, invoked and conditionally followed by a
+`slot60` reason-code call) at two different offsets in the same class,
+needing genuinely different C shapes despite that.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c. 11 attempts total (4
+Originally: round 2026-09-02, runner echo, unit code_2cc8c. 11 attempts (4
 against the real build across two sessions, 5 in an isolated reproducer,
-plus a ~24k-iteration permuter search that found no improvement). Restored
-to `INCLUDE_ASM`.
+plus a ~24k-iteration permuter search that found no improvement) — filed as
+a stall at 26/27.
+
+Closed: round 17, targeted permuter pass, runner charlie. Matched via a
+manual `goto` restructuring after reading the delay-slot placement in the
+target disassembly; no fresh permuter run was needed once the base shape
+changed.
