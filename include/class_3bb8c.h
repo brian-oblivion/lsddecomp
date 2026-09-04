@@ -1667,18 +1667,30 @@ extern char *strcat(char *dest, char *src);
  * this local view matches). Kept as this unit's own independent local
  * view (same policy as Obj866E8Methods vs. class_3ac78's Class866E8Methods
  * above) rather than including code_8220.h, since nothing here needs any
- * OTHER field of BasicClass. */
+ * OTHER field of BasicClass.
+ *
+ * Extended round 14 (class_3bb8c_i) to name the ctor/finalize/addChild/
+ * removeChild/removeAllChildren slots -- previously opaque pad, now named
+ * from that unit's own functions dispatching through them (func_80050C14's
+ * base-ctor call, func_80050CE8/func_80050D30/func_80050DB4/func_80050E34's
+ * explicit `func_80018390()->slotN(...)` base-class calls). Pure pad-to-
+ * field split, same total size, offset of the pre-existing `slot38` is
+ * unchanged. `void *self` throughout, matching `slot38`'s existing style. */
 typedef struct BasicMethods866E8F BasicMethods866E8F;
 struct BasicMethods866E8F {
-    u8 pad000[0x00C];
-    /* class_3bb8c_j (round 15) additions below -- BasicClassMethods'
-     * canonical finalize/addChild/removeChild/removeAllChildren
-     * (include/code_8220.h), reached via this unit's own local view of
-     * the same real getter/table. */
-    void (*finalize)(void *self);                    /* +0x00C, func_80051C84 */
-    void (*addChild)(void *self, void *child);         /* +0x010, func_80051D1C */
-    void (*removeChild)(void *self, void *child);       /* +0x014, func_80051DA0 */
-    void (*removeAllChildren)(void *self);                /* +0x018, func_80051E20 */
+    u8 pad000[0x008];
+    /* Named round 14 by class_3bb8c_i and round 15 by class_3bb8c_j, from
+     * disjoint call sites that AGREE on every offset and signature -- the
+     * complementary-views case in PARALLEL-RUNS collision rule 1, unioned
+     * here. These are BasicClassMethods' canonical slots
+     * (include/code_8220.h), reached through each unit's own local view of
+     * the same real getter/table. Pure pad-to-field split: same total
+     * size, `slot38`'s offset unchanged. */
+    void (*ctor)(void *self);                    /* +0x008, func_80050C14 (base ctor, no extra args) */
+    void (*finalize)(void *self);                /* +0x00C, func_80050CE8 (_i) / func_80051C84 (_j) */
+    void (*addChild)(void *self, void *child);   /* +0x010, func_80050D30 (_i) / func_80051D1C (_j) */
+    void (*removeChild)(void *self, void *child);/* +0x014, func_80050DB4 (_i) / func_80051DA0 (_j) */
+    void (*removeAllChildren)(void *self);       /* +0x018, func_80050E34 (_i) / func_80051E20 (_j) */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, func_8004FB04's first dispatch */
 };
@@ -2043,5 +2055,151 @@ extern void func_800558F0(void *arg0, void *arg1, s32 arg2);
 extern void func_8005C76C(void);
 extern void func_80054D30(void);
 
+
+/* -------------------------------------------------------------------
+ * HEAD NOTE, round 15 merge: `Obj86ED0` below and `Class86ED0` in
+ * src/class_3bb8c_j.c are TWO NAMES for the table at D_80086ED0, given
+ * independently by runners alpha and bravo in the same round. Unify
+ * deliberately, not inside a merge.
+ *
+ * Read alongside that, one of the two summaries was wrong and the binary
+ * settles it. bravo reported this class as "alloc size 0x54, vtable
+ * D_80086ED0"; alpha reported 0x4C. Measured:
+ *
+ *   func_80050BA8  li a0,0x4c -> func_80017B34, then ctors through
+ *                  func_80051A4C(), which returns &D_80086ED0.
+ *   func_80051A5C  allocates 0x54 and ctors through func_80052B60(),
+ *                  a DIFFERENT table getter living in class_3bb8c_k.
+ *
+ * So D_80086ED0's class is 0x4C bytes (alpha is right), and bravo's
+ * 0x54-byte New_X belongs to a different class whose table it had not yet
+ * identified -- it typed that object `Class86ED0` after the getter it did
+ * recognise. Neither unit's BYTES are affected; both are byte-exact, and
+ * a type name is not codegen. What was at risk was the next reader
+ * inheriting "D_80086ED0 == 0x54 bytes" as fact.
+ * ------------------------------------------------------------------- */
+/*
+ * Obj86ED0 -- BasicClass-derived class, vtable D_80086ED0 (resolved with
+ * `tools/classtable.py D_80086ED0`, 42 slots; the ONLY class this unit
+ * (class_3bb8c_i) itself defines methods for). func_80051A4C (this class's
+ * own table getter, `class_3bb8c_j`, still INCLUDE_ASM) returns
+ * `&D_80086ED0`; func_80050BA8 is the `New_X`-shaped factory that
+ * allocates the 0x4C-byte instance and dispatches its ctor (slot 0x008).
+ * Slots 0x004-0x038 line up one-for-one with BasicClass's own 14-slot
+ * layout (include/code_8220.h's BasicClassMethods) -- `classtable.py --vs
+ * D_8006B58C` confirms release/getNextChild/addParentRef/removeParentRef/
+ * clearParentRefs/getNextParentRef/onFinalize/slot34 are UNMODIFIED
+ * BasicClass pointers, while ctor/finalize/addChild/removeChild/
+ * removeAllChildren/slot38 are all overridden by this unit's own
+ * functions. Only the slots this unit's own functions dispatch through
+ * SELF (`self->methods->slotN`, as opposed to the explicit
+ * `func_80018390()->slotN` base-table calls, which go through
+ * `BasicMethods866E8F` above) are named below; the rest stays opaque
+ * padding, same policy as `Obj866E8Methods` elsewhere in this header.
+ */
+typedef struct Obj86ED0 Obj86ED0;
+typedef struct Obj86ED0Methods Obj86ED0Methods;
+
+/* Generic BasicClass-family child object -- only `release` (+0x004,
+ * matching BasicClassMethods's own layout) is dispatched on one of
+ * these from this unit (func_80051174, on self->unk40/unk44/unk48).
+ * Kept minimal/opaque beyond that, same policy as
+ * `Class86E00SubObj_3bb8c_g` elsewhere in this header. */
+typedef struct ChildObj86ED0 ChildObj86ED0;
+typedef struct ChildMethods86ED0 ChildMethods86ED0;
+struct ChildMethods86ED0 {
+    u8 pad000[0x004];
+    void *(*release)(ChildObj86ED0 *self); /* +0x004, func_80051174 */
+};
+struct ChildObj86ED0 {
+    ChildMethods86ED0 *methods; /* +0x000 */
+};
+
+/* self->unk3C's pointee -- an unrelated class (own vtable, unconnected to
+ * D_80086ED0), reached only through its own +0x080 slot by func_8005161C.
+ * Field meaning beyond that slot is unestablished. */
+typedef struct TargetObj86ED0 TargetObj86ED0;
+typedef struct TargetMethods86ED0 TargetMethods86ED0;
+struct TargetMethods86ED0 {
+    u8 pad000[0x080];
+    void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2); /* +0x080, func_8005161C */
+};
+struct TargetObj86ED0 {
+    TargetMethods86ED0 *methods; /* +0x000 */
+};
+
+struct Obj86ED0Methods {
+    u8 pad000[0x008];
+    /* +0x008, func_80050BA8's own dispatch target -- this class's own
+     * ctor, OVERRIDING BasicClass's no-arg ctor with a 2-arg one.
+     * func_80050C14 itself, STALLED (gp_rel-blocked), see its match
+     * report; the signature below reflects that stalled function's own
+     * register usage (self, arg1, arg2), which IS how func_80050BA8
+     * calls it, and is what the header already declared for
+     * func_80050BA8 before this round. */
+    void (*ctor)(Obj86ED0 *self, s32 arg1, s32 arg2);
+    u8 pad00C[0x010 - 0x00C];
+    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, func_80051200 (OVERRIDES BasicClass's addChild: func_80050D30) */
+    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, func_80051270/func_800512C8 (OVERRIDES BasicClass's removeChild: func_80050DB4) */
+    u8 pad018[0x030 - 0x018];
+    /* +0x030, func_800512C8's own dispatch -- UNMODIFIED BasicClass
+     * onFinalize (BasicClass__func_182cc, code_8220_b), reached through
+     * self's own table this one time instead of `func_80018390()`. */
+    void (*onFinalize)(Obj86ED0 *self, s32 arg1);
+    u8 pad034[0x048 - 0x034];
+    void (*slot48)(Obj86ED0 *self);                      /* +0x048, func_800512C8 -- this class's own slot, func_80051174 */
+    u8 pad04C[0x054 - 0x04C];
+    void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, func_80051370 -- this class's own slot, func_800512C8 */
+    void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, func_80050E78's tag==5 case -- this class's own slot, func_80051370 */
+    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, func_80050E78's tag==2 case -- this class's own slot, func_800513D0 (STALLED, addiu-$at/jump-table blocked) */
+    u8 pad060[0x0A4 - 0x060];
+    void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, func_8005165C/func_800516C0 -- func_800518F4, outside this unit's slice */
+    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2);        /* +0x0A8, func_80051720 -- func_80051998, outside this unit's slice */
+};
+
+struct Obj86ED0 {
+    Obj86ED0Methods *methods;  /* +0x000 */
+    u8 pad004[0x00C - 0x004];   /* inherited BasicClass children/parentRefs, untouched by this unit */
+    s32 unkC;                    /* +0x00C, func_80050F28: its own `mode` argument */
+    s32 unk10;                   /* +0x010, func_80050F28 (halved when mode==1)/func_8005165C (upper bound tested against unk18+1) */
+    s32 unk14;                   /* +0x014, func_80051720 (upper bound tested against unk1C+1) */
+    s32 unk18;                   /* +0x018, func_80050F28 (zeroed)/func_8005165C/func_800516C0 (inc/dec counter, capped by unk10) */
+    s32 unk1C;                   /* +0x01C, func_80050F28 (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
+    s32 unk20;                   /* +0x020, func_80051200 (zeroed) */
+    char *unk24;                 /* +0x024, func_80050F28: its own `arg1` (name string) */
+    char *unk28;                 /* +0x028, func_80050CE8 (freed in finalize)/func_80050F28 (func_80040FC0/strcpy destination) */
+    s32 unk2C;                   /* +0x02C, func_80051200 (zeroed)/func_800512C8 (set to its own arg1 for arg1 in [2,4); read as onFinalize's arg1 for arg1==4)/func_80051370 (range-checked against [2,4)) */
+    s32 unk30;                   /* +0x030, func_800512C8 (zeroed)/func_80051370 (incremented; gates the slot54 call on the OLD value being nonzero) */
+    void *unk34;                 /* +0x034, func_80050D30/func_80050DB4 (addChild/removeChild target when child's tag==2)/func_800512C8/func_80051270 (removeChild target) */
+    void *unk38;                 /* +0x038, func_80050D30/func_80050DB4 (tag==5)/func_80051270 (removeChild target) */
+    TargetObj86ED0 *unk3C;        /* +0x03C, func_80051200 (its own arg3)/func_8005161C (dispatch target)/func_80051270 (zeroed) */
+    ChildObj86ED0 *unk40;          /* +0x040, func_80051174 (released, no null-back store) */
+    ChildObj86ED0 *unk44;           /* +0x044, func_80051174 (released, no null-back store) */
+    ChildObj86ED0 *unk48;            /* +0x048, func_80051174 (release+null-back)/func_80050CD8/func_80050E34 (zeroed)/func_8005165C/func_800516C0/func_80051720 (nonzero readiness gate)/func_80050F98 (set from a resolved resource handle) */
+};
+
+/* HEAD NOTE round 15: alpha's `extern Obj86ED0Methods *func_80051A4C(void);`
+ * also moved into src/class_3bb8c_i.c, for the same reason as the symbol
+ * above and with a sharper edge -- runner bravo DEFINES func_80051A4C in
+ * src/class_3bb8c_j.c returning its own `Class86ED0Methods *`, so a
+ * shared-header prototype in another unit's type is `conflicting types for
+ * 'func_80051A4C'`, a hard compile error rather than a warning. A
+ * cross-unit prototype for a function ANOTHER unit defines belongs in the
+ * caller, not in the shared header, whenever the two units hold different
+ * local views of the same class. */
+/* HEAD NOTE round 15: the `extern Obj86ED0Methods D_80086ED0;` that stood
+ * here was moved into src/class_3bb8c_i.c. src/class_3bb8c_j.c carries its
+ * own `extern Class86ED0Methods D_80086ED0;` for the same object, and two
+ * incompatible declarations of one symbol in a SHARED header reach both
+ * translation units. Unit-local views belong in the unit -- which is what
+ * runner bravo did with `Class86ED0` deliberately. The TYPES below stay
+ * here because they are the richer, measured view; only the symbol moved. */
+
+/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- func_80050F28's
+ * own call. Translates each byte of `src` (a name string) into `dest`
+ * (folding a couple of special-case byte ranges) and returns `dest`,
+ * same convention as `strcpy`. Typed purely from this call site's own
+ * register usage. */
+extern char *func_80040FC0(char *dest, char *src);
 
 #endif
