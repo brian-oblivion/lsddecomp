@@ -63,9 +63,16 @@ typedef struct BaseTable6D940 BaseTable6D940;
 struct BaseTable6D940 {
     u8 pad000[0x008];
     void (*slot08)(void *self); /* +0x008, func_8002C18C's own base-chain call */
-    void (*slot0C)(void *self); /* +0x00C, func_8002C200 */
+    /* +0x00C, func_8002C200's own dispatch -- that function's whole body
+     * is this one call with nothing after it, so its own return type is
+     * genuinely ambiguous (a void wrapper around an s32 tail call is
+     * byte-identical); typed s32 here per CLAUDE.md's rule to default to
+     * `return callee(...)` absent positive void evidence. */
+    s32 (*slot0C)(void *self);
     u8 pad010[0x064 - 0x010];
-    void (*slot64)(void *self); /* +0x064, func_8002C238 */
+    /* +0x064, func_8002C238's own dispatch -- same tail-call ambiguity as
+     * slot0C above. */
+    s32 (*slot64)(void *self);
 };
 extern BaseTable6D940 *func_80026CAC(void);
 
@@ -85,7 +92,10 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_d", new_class_6d940);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C18C);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C200);
+s32 func_8002C200(void *self)
+{
+    return func_80026CAC()->slot0C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C238);
 
