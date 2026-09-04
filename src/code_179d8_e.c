@@ -105,6 +105,25 @@ extern void func_80031F3C(s32 arg0);
 extern void func_8003370C(s32 arg0);
 extern s32 func_800336CC(s32 arg0);
 
+/* func_8002CC34's own "obj" (its `arg1`) -- a small slot-table object,
+ * unrelated to ObjDA34 (this function is NOT a D_8006DA34 vtable slot; its
+ * only callers pass a plain heap/stack struct pointer).  Only the fields
+ * this unit's own function touches are named. */
+typedef struct Slot179D8ECC34 {
+    s32 unk0; /* -1 = free/sentinel after init */
+    u8 pad4[0x14 - 0x4];
+} Slot179D8ECC34;
+
+typedef struct ObjCC34 {
+    s32 unk0;   /* +0x00, guard: 0 = uninitialized */
+    s32 unk4;   /* +0x04 */
+    void *unk8; /* +0x08 */
+    s32 unkC;   /* +0x0C */
+    u8 pad10[0x14 - 0x10];
+    s32 unk14;  /* +0x14 */
+    Slot179D8ECC34 arr[3]; /* +0x18 */
+} ObjCC34;
+
 /* Forward declaration: func_8002CC0C is defined later in this file (ROM
  * order), but func_8002C480 (earlier in ROM order) calls it. */
 TableDA34 *func_8002CC0C(void);
@@ -230,6 +249,28 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC1C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC28);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC34);
+s32 func_8002CC34(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
+    Slot179D8ECC34 *slot;
+    s32 count;
+    s32 sentinel;
+
+    if (obj->unk0 != 0) {
+        return 0;
+    }
+    slot = obj->arr;
+    sentinel = -1;
+    count = 2;
+    obj->unk0 = arg2;
+    obj->unk8 = arg3;
+    obj->unkC = arg4;
+    do {
+        slot->unk0 = sentinel;
+        count--;
+        slot++;
+    } while (count >= 0);
+    obj->unk4 = 0;
+    obj->unk14 = 10;
+    return 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC84);
