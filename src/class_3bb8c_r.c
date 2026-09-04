@@ -162,7 +162,27 @@ void func_80055BC8(ParamObj *ctx, ParamObj *self) {
     self->unk50 = 0xA;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80055CA8);
+void func_80055CA8(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = func_8005627C(ctx);
+    if (self->unk4 % 3 == 0) {
+        self->unk1C = 0x1E;
+        self->unk20 = 0;
+    }
+    if (self->unk4 % 5 == 0) {
+        self->unk30 = 0x1E;
+        self->unk34 = 0;
+        self->unk38 = 0x18;
+        self->unk3C = 0x18;
+    }
+    if (self->unk4 % 7 == 0) {
+        self->unk1C = 0x1E;
+        self->unk20 = 0;
+    }
+    self->unk44 = 6;
+    self->unk48 = 1;
+    self->unk4C = 0x2A;
+    self->unk50 = 0xA;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80055DB4);
 
