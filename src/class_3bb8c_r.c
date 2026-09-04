@@ -395,7 +395,19 @@ void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_800563C0);
+void *func_800563C0(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+    if (func_80057C84()->ctor(self) == NULL) {
+        goto fail;
+    }
+    self->methods = func_80056F4C();
+    self->unk44 = 0;
+    self->unk54 = arg1;
+    self->methods->slot40(self, arg2);
+    func_80056520(self, arg3, arg4);
+    return self;
+fail:
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80056464);
 
