@@ -419,4 +419,9 @@ void func_800564A4(Obj876FC *self, Block24 *src) {
     self->unk24 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_800564F4);
+extern void func_80056640(Obj876FC *self);
+
+void func_800564F4(Obj876FC *self) {
+    self->unk24 = self->unk24 + 1;
+    func_80056640(self);
+}
