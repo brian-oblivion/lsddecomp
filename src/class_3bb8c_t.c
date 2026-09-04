@@ -96,9 +96,27 @@ typedef struct D_80087AACMethods {
 } D_80087AACMethods;
 extern D_80087AACMethods *func_80058764(void);
 
+/* This unit's own view of one entry of D_80087AACObj::unk_0xA8 -- only
+ * the one slot this unit's own func_80058694 dispatches through is
+ * typed. */
+typedef struct D_80087AACEntry D_80087AACEntry;
+typedef struct D_80087AACEntryMethods {
+    u8 pad00[0xB8];
+    /* +0x0B8, called by this unit's own func_80058694 as (self, 1,
+     * &global). */
+    void (*slotB8)(D_80087AACEntry *self, s32 arg1, void *arg2);
+} D_80087AACEntryMethods;
+struct D_80087AACEntry {
+    D_80087AACEntryMethods *methods;
+};
+
 struct D_80087AACObj {
     D_80087AACMethods *methods;
-    u8 pad04[0x2C - 0x4];
+    u8 pad04[0x1C - 0x4];
+    /* +0x01C, read by this unit's own func_80058694 (unsigned
+     * comparisons -- `sltiu`). */
+    u32 unk_0x1C;
+    u8 pad20[0x2C - 0x20];
     /* +0x02C, written by this unit's own func_80058078. */
     s32 unk_0x2C;
     u8 pad30[0x38 - 0x30];
@@ -107,9 +125,18 @@ struct D_80087AACObj {
     u8 pad3C[0x84 - 0x3C];
     /* +0x084, written by this unit's own func_80058078. */
     s32 unk_0x84;
-    u8 pad88[0x238 - 0x88];
+    u8 pad88[0xA8 - 0x88];
+    /* +0x0A8, a 100-entry array of `D_80087AACEntry *` -- built by this
+     * unit's own func_80058228 (still queued), destroyed by
+     * func_80058308 (still queued), indexed by func_80058694. */
+    D_80087AACEntry *unk_0xA8[100];
     /* +0x238, read by this unit's own func_800581C4/func_80058390. */
     s32 unk_0x238;
+    /* +0x23C, read/written by this unit's own func_80058694 (unsigned
+     * comparison -- `sltiu`). */
+    u32 unk_0x23C;
+    /* +0x240, read by this unit's own func_80058694. */
+    s8 *unk_0x240;
 };
 
 void *func_80057F68(void *arg1) {
@@ -159,7 +186,21 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058404);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800585B4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058694);
+extern s32 D_8008ABBC;
+
+void func_80058694(D_80087AACObj *self) {
+    if (self->unk_0x238 != 0) {
+        if (self->unk_0x1C >= 0x1F) {
+            if (self->unk_0x23C < 4) {
+                if ((self->unk_0x1C % 24) == 0) {
+                    s8 idx = self->unk_0x240[self->unk_0x23C];
+                    self->unk_0xA8[idx]->methods->slotB8(self->unk_0xA8[idx], 1, &D_8008ABBC);
+                    self->unk_0x23C += 1;
+                }
+            }
+        }
+    }
+}
 
 extern D_80087AACMethods D_80087AAC;
 
