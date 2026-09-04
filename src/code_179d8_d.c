@@ -99,7 +99,23 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BC40);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BFA8);
+/* Cross-unit calls into the still-INCLUDE_ASM code_179d8_b (charlie's
+ * unit, this round) -- declared LOCAL to this unit, per-call-site typed,
+ * since none of them have an established prototype anywhere yet. */
+extern void func_800292F4(void *arg0, s32 *outBuf);
+extern void func_80028DF0(s32 arg0, s32 *buf, s32 arg2);
+extern void func_80029274(void *arg0, void *arg1, s32 arg2);
+extern s32 func_80029254(s32 arg0, s32 arg1);
+
+s32 func_8002BFA8(void *p0, void *p1, void *p2)
+{
+    s32 buf[2];
+
+    func_800292F4(p1, buf);
+    func_80028DF0(2, buf, 0);
+    func_80029274(p0, p2, 0x80);
+    return (u32)func_80029254(0, 0) < 1;
+}
 
 void func_8002C014(char *dest, char *src, s32 count)
 {
