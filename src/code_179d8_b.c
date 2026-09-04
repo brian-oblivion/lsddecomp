@@ -23,21 +23,69 @@
  */
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028CE0);
+/* code_179d8_b -- this window's globals are plain scalar state (not a
+ * classtable.py hit anywhere near D_8006D5FC..D_8006D8D8), most plausibly a
+ * low-level serial/link driver: func_8002A378 and func_8002B304 (still
+ * INCLUDE_ASM in the sibling monolith code_179d8_mid) poke raw-looking
+ * control words (0x20943, 0x1323, 0x1325) into a block of globals at
+ * D_8006D8C0..D_8006D934 that read like hardware/SIO register staging, not
+ * object fields. Nothing here is a class method table; extern prototypes
+ * below are this unit's own reading of that driver's entry points. */
+
+extern s32 D_8006D5FC;
+extern s32 D_8006D600;
+extern s32 D_8006D604;
+extern s32 D_8006D608;
+
+/* Still INCLUDE_ASM in asm/code_179d8_mid.s -- not this unit's to carve. */
+extern s32 func_800299BC(s32 arg0, s32 arg1);
+extern s32 func_80029C40(s32 arg0, s32 arg1);
+extern s32 func_8002A378(void *arg0);
+extern s32 func_8002B304(s32 arg0, s32 arg1);
+extern s32 func_80024D70(s32 arg0, s32 arg1); /* asm/psyq_GsLinkObject4.s */
+extern s32 func_8002B198(s32 arg0);
+
+s32 func_80028CE0(s32 arg0)
+{
+    s32 old = D_8006D608;
+    D_8006D608 = arg0;
+    return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028CF8);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028D30);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028D68);
+s32 func_80028D68(s32 arg0, s32 arg1)
+{
+    return func_800299BC(arg0, arg1);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028D88);
+s32 func_80028D88(s32 arg0, s32 arg1)
+{
+    return func_80029C40(arg0, arg1);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DA8);
+s32 func_80028DA8(s32 arg0)
+{
+    s32 old = D_8006D5FC;
+    D_8006D5FC = arg0;
+    return old;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DC0);
+s32 func_80028DC0(s32 arg0)
+{
+    s32 old = D_8006D600;
+    D_8006D600 = arg0;
+    return old;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DD8);
+s32 func_80028DD8(s32 arg0)
+{
+    s32 old = D_8006D604;
+    D_8006D604 = arg0;
+    return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DF0);
 
@@ -45,13 +93,26 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028F38);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029074);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800291C8);
+s32 func_800291C8(void *arg0)
+{
+    func_8002A378(arg0);
+    return 1;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800291EC);
+s32 func_800291EC(s32 arg0, s32 arg1)
+{
+    return func_8002B304(arg0, arg1) == 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029210);
+s32 func_80029210(s32 arg0)
+{
+    return func_80024D70(3, arg0);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029234);
+s32 func_80029234(s32 arg0)
+{
+    return func_8002B198(arg0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029254);
 
