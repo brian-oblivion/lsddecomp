@@ -234,7 +234,22 @@ BaseObjOMethods *func_80056F4C(void) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056F5C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056FE4);
+extern void *func_80017B34(s32 size);
+extern void *func_80017CFC(void *ptr);
+extern BaseObjOMethods *func_80057C84(void);
+
+void *func_80056FE4(void) {
+    BaseObjO *self = func_80017B34(0x58);
+
+    if (self != NULL) {
+        if (func_80057C84()->ctor(self) != NULL) {
+            return self;
+        }
+        func_80017CFC(self);
+        return NULL;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057044);
 
