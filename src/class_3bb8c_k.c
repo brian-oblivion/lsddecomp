@@ -128,7 +128,29 @@ void func_800524F8(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052598);
+void func_80052598(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+{
+    s32 newUnk20;
+    s32 newUnk28;
+    s32 prevUnk20;
+
+    if (!self->unk50) {
+        return;
+    }
+    if (self->unk28 + 1 >= self->unk10) {
+        return;
+    }
+    prevUnk20 = self->unk20 - 1;
+    if (self->unk28 - prevUnk20 < 4) {
+        self->methods->slot98(self, 1, 1, arg3);
+    } else {
+        self->unk20++;
+        newUnk20 = self->unk20;
+        self->unk28++;
+        newUnk28 = self->unk28;
+        self->methods->slot94(self, newUnk20, self->unk24, newUnk28, 1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052644);
 
