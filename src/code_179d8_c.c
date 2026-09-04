@@ -61,8 +61,8 @@ void func_800329B8(void)
 }
 
 extern void func_80024CE0(void);
-extern void func_80024DA0(s32 arg0);
-extern void func_80024D40(s32 arg0, void (*callback)(void));
+extern void func_80024DA0(void (*cb)(void));
+extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void);
 extern void func_80024CF0(void);
 extern s32 D_8006DCA8;
 extern s32 D_8006DC94;
