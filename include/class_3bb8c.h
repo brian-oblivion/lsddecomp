@@ -2255,7 +2255,13 @@ struct Obj86ED0Methods {
     void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, func_80050E78's tag==2 case -- this class's own slot, func_800513D0 (STALLED, addiu-$at/jump-table blocked) */
     u8 pad060[0x0A4 - 0x060];
     void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, func_8005165C/func_800516C0 -- func_800518F4, outside this unit's slice */
-    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2);        /* +0x0A8, func_80051720 -- func_80051998, outside this unit's slice */
+    /* +0x0A8, func_80051720. 3 args, not 2 -- retail's call sets $a1/$a3
+     * (`self->unk18`, `1`) and leaves $a2 holding the just-computed
+     * incremented `unk1C` value untouched from a few instructions earlier
+     * (no fresh load/li for it), which only makes sense if that register
+     * IS the call's own middle argument, forwarded because it was already
+     * live there. Same shape as TargetMethods86ED0::slot80 above. */
+    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);        /* +0x0A8, func_80051720 -- func_80051998, outside this unit's slice */
 };
 
 struct Obj86ED0 {
