@@ -101,7 +101,11 @@ void func_80056DF8(LinkOwnerObj *this) {
     func_800183DC((void **)this->arr84, 5);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056E1C);
+extern void func_80056D18(void *arg0, s32 arg1, s32 arg2, s32 arg3);
+
+void func_80056E1C(void *this) {
+    func_80056D18(this, 0, 0, 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056E44);
 
