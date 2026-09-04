@@ -1731,6 +1731,42 @@ wrong and the distinguishing factor is elsewhere.
   a real `switch` moved it 24 -> 65/164. This is a DISTINCT finding from the
   block-order lever below, confirmed separately.
 
+**Framed wrappers — promoted, with the negative check that earns it.**
+
+- **A framed wrapper is not evidence against tail-call elimination on this
+  target.** A function that allocates and restores a stack frame, saves and
+  restores `$ra`, calls exactly one function and never touches `$v0`
+  afterwards is still just `return callee(fwd-args);` — GCC 2.6.3 here always
+  pays for the frame. Read it that way and type it from whether the callee
+  sets `$v0`, not from the presence of a frame.
+
+  **Promoted because the negative was checked, on request:** every
+  single-call forwarding wrapper across two passes of `code_179d8_b`
+  (`func_80028D68`, `func_80028D88`, `func_80029234`, `func_80029254`) pays
+  for a full frame, and no `.s` sibling in the unit shows a bare `jal` plus
+  immediate return with no `addiu $sp`/`sw $ra`. Contrast the entry below,
+  which was NOT promoted for want of exactly this.
+
+**NOT promoted — two patterns at one or two sightings, recorded so the next
+round can sweep rather than re-derive.** Both runners were asked for a
+negative check and both answered honestly that they had none, which is why
+these are here and not above.
+
+- **An unexplained register near a call may mean a vtable slot's arity is
+  short by one.** Two positive sightings (`slot80`, `slotA8` in
+  `class_3bb8c_i`), zero negative checks — nobody looked for an untouched
+  register that was *not* a forwarded argument. A near-cousin found the same
+  round sharpens what the tell actually is: `new_class_6d940`'s
+  untouched-looking `$a0` was a fresh `move a0, zero` for an explicit literal
+  `0` argument, not a forwarded value. So the real signal is **unexplained
+  register activity near a call**, and "forwarded argument" is only its most
+  common cause. Needs a corpus sweep before it is a rule.
+- **`$a1` set by its own `lui` before its only read means scratch, not a
+  forwarded argument** (`func_8002B198`, giving a genuine arity of 1 where
+  the call site looked like 2). One sighting, explicitly re-checked in a
+  second pass with no further instance found. An oddity worth a sweep, not a
+  rule.
+
 **The block-order lever, WITH the boundary that a checked negative put on it
 — read both halves.**
 
@@ -1778,6 +1814,35 @@ finding, seen in two runners independently.**
   game did, so prefer removing the thing being CSE'd.
 
 ### New residue classes opened this round (not yet closed)
+
+- **NEW, round 16: the "retry-loop driver" cluster — three instances of ONE
+  shape, stalled on two cross-confirmed residues.** `func_80028DF0`,
+  `func_80028F38` and `func_80029074` (`code_179d8_b`) are the same
+  retry-loop driver, fully reverse-engineered (control flow, the
+  `D_8006D5FC` save/restore bracket, tag/flag semantics, all confirmed
+  against m2c and the raw bytes) and stalled at 10/82, 1/79 and 55/85 — the
+  last with an EXACT length match. About 90 manual attempts plus ~70k
+  permuter iterations across three seeded searches went into them. **Neither
+  residue is register count** — the runner was asked directly and answered
+  that the 7+ screen did not influence where it stopped.
+
+  1. **A status-value fold.** A local set to `0`, reassigned `-1` in the
+     loop-exhausted tail, returned as `value + 1`. Retail keeps it in a real
+     callee-saved register across the whole loop; **a from-scratch reproducer
+     of the identical shape through the pinned pipeline has GCC 2.6.3 fold it
+     away entirely.** That the reproducer was built and does not reproduce
+     retail's shape is itself the finding — it says the divergence is not a
+     toolchain defect to escalate but something contextual still missing from
+     the C. Open question for whoever picks this up.
+  2. **A prologue register-mapping puzzle, in all three.** Retail processes
+     `arg1` into the lowest persistent register *before* `arg0`, even though
+     `arg0` is referenced first in every natural C reading. Six
+     variable-ordering experiments each produced a *different* wrong mapping
+     and never retail's; the full table is in `func_80029074`'s report.
+
+  The cluster is the useful artifact: three instances of one shape with the
+  same two residues is what turns "a hard function" into a named class, and
+  it is why a zero-match pass that files reports is not a wasted pass.
 
 - **NEW, round 16: commutative-operand SLOT order in `addu`, not reachable
   from C.** In `func_800323A8` every one of sixteen field accesses has retail
