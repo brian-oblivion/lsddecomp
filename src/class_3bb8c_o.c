@@ -294,7 +294,10 @@ void func_800571A8(BaseObjO *self) {
     func_8001E57C()->slot18(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800571E8);
+void func_800571E8(BaseObjO *self) {
+    self->unk48 = 0x12C;
+    self->unk54 = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800571F8);
 
