@@ -96,7 +96,10 @@ Table6D940 *func_8002C3A8(void)
     return &D_8006D940;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3B8);
+s32 func_8002C3B8(void)
+{
+    return 0;
+}
 
 void func_8002C3C0(void) {
 }
