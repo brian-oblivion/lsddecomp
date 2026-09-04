@@ -81,21 +81,33 @@ typedef struct D_80087AACMethods {
     u8 pad00[0x8];
     /* +0x008, this unit's own ctor (func_80057FC8). */
     D_80087AACObj *(*ctor)(D_80087AACObj *self, void *arg1);
-    u8 pad0C[0x70 - 0xC];
+    u8 pad0C[0x6C - 0xC];
+    /* +0x06C, called by this unit's own func_80058078 as (self, flag). */
+    void (*slot6C)(D_80087AACObj *self, s32 arg1);
     /* +0x070, called by this unit's own func_800581C4 as (self, size). */
     void (*slot70)(D_80087AACObj *self, s32 arg1);
     u8 pad74[0x94 - 0x74];
     /* +0x094, called by this unit's own func_800581C4 as (self). */
     void (*slot94)(D_80087AACObj *self);
+    u8 pad98[0xD4 - 0x98];
+    /* +0x0D4, called by this unit's own func_80058078 as (self, str,
+     * 0). */
+    void (*slotD4)(D_80087AACObj *self, char *str, s32 arg2);
 } D_80087AACMethods;
 extern D_80087AACMethods *func_80058764(void);
 
 struct D_80087AACObj {
     D_80087AACMethods *methods;
-    u8 pad04[0x38 - 0x4];
+    u8 pad04[0x2C - 0x4];
+    /* +0x02C, written by this unit's own func_80058078. */
+    s32 unk_0x2C;
+    u8 pad30[0x38 - 0x30];
     /* +0x038, read by this unit's own func_80058390. */
     s32 unk_0x38;
-    u8 pad3C[0x238 - 0x3C];
+    u8 pad3C[0x84 - 0x3C];
+    /* +0x084, written by this unit's own func_80058078. */
+    s32 unk_0x84;
+    u8 pad88[0x238 - 0x88];
     /* +0x238, read by this unit's own func_800581C4/func_80058390. */
     s32 unk_0x238;
 };
@@ -111,7 +123,14 @@ void *func_80057F68(void *arg1) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80057FC8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058078);
+extern char D_80011778[];
+
+void func_80058078(D_80087AACObj *self) {
+    self->unk_0x84 = 5;
+    self->unk_0x2C = 0x190;
+    self->methods->slotD4(self, D_80011778, 0);
+    self->methods->slot6C(self, 0xA);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800580E0);
 
