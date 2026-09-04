@@ -115,7 +115,12 @@ s32 func_80036064(s32 a0)
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036108);
+/* D_8008E25C is stored as a full 32-bit sign-extended s16 value (see
+ * func_80036064 above) but read back here through a 16-bit view. */
+s32 func_80036108(void)
+{
+    return *(s16 *)&D_8008E25C;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036118);
 
