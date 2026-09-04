@@ -130,7 +130,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C448);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C468);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C478);
+s32 func_8002C478(void) {
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C480);
 
