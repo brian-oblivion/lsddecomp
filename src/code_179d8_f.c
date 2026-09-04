@@ -164,7 +164,12 @@ void func_800361F0(s32 a0)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036230);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_800363FC);
+extern s16 D_8008E84C;
+
+void func_800363FC(void)
+{
+    D_8008E84C = 2;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036410);
 
