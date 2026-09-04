@@ -89,7 +89,20 @@ void func_80052430(Class86F88 *self)
     methods->slot94(self, self->unk20, count, self->unk28, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052498);
+void func_80052498(Class86F88 *self)
+{
+    s32 count;
+
+    if (!self->unk50) {
+        return;
+    }
+    count = self->unk24 - 1;
+    if (count < 0) {
+        return;
+    }
+    self->unk24 = count;
+    self->methods->slot94(self, self->unk20, count, self->unk28, 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800524F8);
 
