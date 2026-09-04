@@ -46,6 +46,14 @@ extern s32 func_80024D70(s32 arg0, s32 arg1); /* asm/psyq_GsLinkObject4.s */
 extern s32 func_8002B198(s32 arg0);
 extern s32 func_8002AEE0(s32 arg0, s32 arg1);
 
+/* CD-ROM MSF (minute/second/sector-in-frame) timecode, all three fields
+ * packed BCD. This unit's own local reading -- see func_800293F8. */
+typedef struct {
+    u8 minute;
+    u8 second;
+    u8 sector;
+} MSF179D8;
+
 s32 func_80028CE0(s32 arg0)
 {
     s32 old = D_8006D608;
@@ -124,6 +132,21 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029274);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800292F4);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800293F8);
+s32 func_800293F8(MSF179D8 *arg0)
+{
+    u8 minute;
+    u8 second;
+    s32 decodedMinute;
+    u8 sector;
+    s32 total;
+
+    minute = arg0->minute;
+    second = arg0->second;
+    decodedMinute = (minute >> 4) * 10 + (minute & 0xF);
+    total = decodedMinute;
+    total = total * 60 + ((second >> 4) * 10 + (second & 0xF));
+    sector = arg0->sector;
+    return (total * 75 + ((sector >> 4) * 10 + (sector & 0xF))) - 150;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029478);
