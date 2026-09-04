@@ -20,10 +20,103 @@
  * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM addresses,
  * not at class boundaries.  Identify each class with tools/classtable.py
  * rather than assuming the unit has one.
+ *
+ * Confirmed round 17 continuation (runner bravo): TWO classes, resolved with
+ * `tools/classtable.py --scan` plus a direct read of `asm/data/76DC8.data.s`
+ * since one table's own slot count coincides with (but is NOT) BasicClass's:
+ *
+ *  - func_80055A88 .. func_80056238 (14 functions) are the complete slot
+ *    list of `D_800874B0` (14 slots, header word 0). Despite matching
+ *    BasicClassMethods' slot COUNT, these bodies are NOT
+ *    add/removeChild-shaped -- every one calls the shared helper
+ *    `func_8005627C(ctx)` then dispatches on `target->unk4` ("kind") to
+ *    fill in a handful of numeric fields. Kept as its own local view,
+ *    `ParamObj`/`ParamMethods` -- nothing here justifies asserting a
+ *    BasicClass relationship just because the slot count coincides.
+ *  - func_800563C0 (ctor) / func_80056464 (dtor) / func_800564A4 (slot40)
+ *    / func_800564F4 are occupants of `D_800876FC` -- the SAME sibling
+ *    table `class_3bb8c_o.c` (round 17, previous pass, already merged)
+ *    partly resolved from the OTHER side (its own `func_80056F4C` returns
+ *    `&D_800876FC`, and its shared-base slots +0x010/+0x014/+0x018/+0x088/
+ *    etc. are INHERITED, not overridden, by this class). This unit
+ *    supplies the class's OWN slots (ctor/dtor/slot40), confirmed by both
+ *    chaining to `func_80057C84()` -- the SAME shared-base getter
+ *    `class_3bb8c_o.c` already used for its own ctor/New_X pair. Kept as
+ *    this unit's own local view, `Obj876FC`/`Obj876FCMethods` --
+ *    `class_3bb8c_o.c` is not this unit's to edit, and per the
+ *    multiple-independent-local-views convention there is no reason a
+ *    fresh view here should match its field names field-for-field.
+ *  - func_80056320 is a plain `New_X` allocator (0x98 bytes) for the
+ *    `D_800876FC` class, dispatching through `func_80056F4C()->ctor`
+ *    (cross-unit call into the ALREADY-MATCHED `class_3bb8c_o.c` symbol)
+ *    rather than calling `func_800563C0` by name.
+ *  - func_8005627C is the shared helper every `D_800874B0` occupant calls
+ *    first (and `func_800560E4` reaches transitively, via a plain call to
+ *    `func_80056054`): reads a small tag byte off `ctx->methods`, looks it
+ *    up (with a NEGATIVE index) into a global table, and returns a
+ *    chained division result.
  */
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80055A88);
+/* ------------------------------------------------------------------ *
+ * D_800874B0's 14 slots (func_80055A88..func_80056238) plus the shared
+ * helper func_8005627C they all call first.
+ * ------------------------------------------------------------------ */
+
+typedef struct ParamObj ParamObj;
+typedef struct ParamMethods {
+    u8 pad0[0x6];
+    s8 tag; /* +0x006, a small type id -- read signed, used as a NEGATIVE
+             * index into D_80087474 (see func_8005627C). */
+} ParamMethods;
+struct ParamObj {
+    ParamMethods *methods; /* +0x000 */
+    s32 unk4;                /* +0x004, a "kind" selector the 14 slot
+                               * occupants below all dispatch on */
+    u8 pad8[0x10 - 0x8];        /* +0x008 .. +0x00F, unknown */
+    s32 unk10;                    /* +0x010, func_8005627C's own result */
+    u8 pad14[0x1C - 0x14];          /* +0x014 .. +0x01B, unknown */
+    s32 unk1C;
+    s32 unk20;
+    s32 unk24;
+    s32 unk28;
+    s32 unk2C;
+    s32 unk30;
+    s32 unk34;
+    s32 unk38;
+    s32 unk3C;
+    u8 pad40[0x44 - 0x40]; /* +0x040 .. +0x043, unknown */
+    s32 unk44;
+    s32 unk48;
+    s32 unk4C;
+    s32 unk50;
+};
+
+/* func_8005627C's own ROM address (0x8005627C) is AFTER all 14 slot
+ * occupants below (it sits right before the blocked func_8005630C), so
+ * its definition lives in that position further down this file to keep
+ * strict ROM-address order -- forward-declared here since every occupant
+ * calls it. */
+s32 func_8005627C(ParamObj *ctx);
+
+void func_80055A88(ParamObj *ctx, ParamObj *self) {
+    s32 kind;
+
+    self->unk10 = func_8005627C(ctx);
+    kind = self->unk4;
+    if (kind == 0) {
+        self->unk1C = 7;
+        self->unk20 = 0;
+    } else if (kind == 2) {
+        self->unk30 = 7;
+        self->unk34 = 0;
+    } else if (kind == 5) {
+        self->unk44 = 7;
+        self->unk48 = 0;
+    } else if (kind >= 8) {
+        self->unk4 = -1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80055B10);
 
