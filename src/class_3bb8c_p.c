@@ -21,12 +21,52 @@
  * whether your view of one belongs in include/class_3bb8c.h or here.
  */
 #include "common.h"
+#include "DreamSys.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_800574C4);
+/* Two-element s16 array -- func_800574C4 and func_800574FC each write one
+ * element (index 0 and 1 respectively) via a plain `sh` through a pointer
+ * computed as %hi/%lo of `D_8008ABA4 + 2*index`, so splat's single-word
+ * dlabel is really this 2-element array, not a lone s32 (round 2026-09-04).
+ * Not referenced anywhere else in the repo (checked with grep), so this is
+ * this unit's own reading -- kept local rather than added to a shared
+ * header. */
+extern s16 D_8008ABA4[2];
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_800574FC);
+void func_80057534(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057534);
+void func_800574C4(DreamSys *self, s32 val, void *extra) {
+    func_80057534(self, &D_8008ABA4[0], val, extra, 7);
+}
+
+void func_800574FC(DreamSys *self, s32 val, void *extra) {
+    func_80057534(self, &D_8008ABA4[1], val, extra, 8);
+}
+
+/* `count` is `volatile` so it stays a stack reference reloaded at its one use
+ * site, rather than being promoted to a callee-saved register across the
+ * intervening func_80057444 call -- confirmed with a standalone reproducer
+ * through the pinned toolchain: dropping `volatile` grows the frame by one
+ * callee-saved register (s3) and changes 0x1c/0x20 byte offsets throughout,
+ * which is not what retail does (round 2026-09-04).
+ *
+ * `val` arrives as `s32` (its callers forward an incoming register with no
+ * conversion -- typing it `s16` here made the CALLERS re-sign-extend it on
+ * every call, which retail does not do), but the two stores below are
+ * genuinely 16-bit (`sh`). Truncating once into a local `s16` and storing
+ * THAT (rather than truncating `val` twice inline) is what reproduces
+ * retail's callee-saved register assignment for `slot`/`extra`
+ * (confirmed with a standalone reproducer: inline truncation swaps which
+ * of s0/s1 holds which, round 2026-09-04). */
+void func_80057534(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count) {
+    s16 val16 = (s16) val;
+    *slot = val16;
+    self->field_0x48 = val16;
+    self->vt->func_80057444(self, &D_8008ABA4[0]);
+    *slot = 0;
+    if (extra != NULL) {
+        self->vt->func_80058B08(self, count);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_800575B0);
 
