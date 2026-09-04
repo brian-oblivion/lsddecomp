@@ -717,7 +717,14 @@ struct vtable_DreamSys{
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-08-30-d). */
 	void (*func_80058E8C)(DreamSys *this, void *arg1, s32 arg2);
-	u32 unknown_functions_0xa0[6];
+	/* Called by this unit's own func_80057B90 as (this, arg1, count) when
+	   `5 <= count < 9` -- dispatched through THIS object's own vtable
+	   (unlike func_80057B90's other, unconditional call, which goes
+	   through the shared base table via func_8001E57C() instead).
+	   Resolves to func_8001D714, not overridden at the DreamSys level
+	   (round 2026-09-04). */
+	void (*slotA0)(DreamSys *this, void *arg1, s32 count);
+	u32 unknown_functions_0xa4[5];
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0B8). Called by
 	   func_8005A82C right after unk_0x4C->methods->slot0xE8, as (this,
 	   &local) using that same output buffer (round 2026-09-02). Address

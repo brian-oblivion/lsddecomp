@@ -99,11 +99,44 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057954);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057A18);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057B54);
+extern s32 func_8001E7BC(void);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057B90);
+void *func_80057B54(void *arg0, void *arg1, void *arg2) {
+    if (arg0 != NULL) {
+        if (func_8001E7BC() != 0) {
+            return arg0;
+        }
+    }
+    return NULL;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057C14);
+/* This unit's own local view of func_8001E57C()'s return, matching only
+ * the one slot this unit's own functions dispatch through directly (the
+ * OTHER slot these functions use, +0xA0, is reached through the object's
+ * OWN vtable instead -- see include/DreamSys.h's `slotA0`) -- per the
+ * project's established "per-call-site signature" precedent
+ * (include/code_d294.h's own file banner; that header's `Class6B5CCMethods`
+ * types this SAME slot with a different argument count for ITS OWN call
+ * sites, which is fine because the actual callee ignores unused trailing
+ * register arguments). Kept local rather than added to code_d294.h. */
+typedef struct DreamSysBasicSlots {
+    u8 pad00[0x9C];
+    void (*slot9C)(DreamSys *self, void *arg1, s32 count);
+} DreamSysBasicSlots;
+extern DreamSysBasicSlots *func_8001E57C(void);
+
+void func_80057B90(DreamSys *self, void *arg1, s32 count) {
+    func_8001E57C()->slot9C(self, arg1, count);
+    if (count < 9) {
+        if (count >= 5) {
+            self->vt->slotA0(self, arg1, count);
+        }
+    }
+}
+
+void func_80057C14(DreamSys *self, void *arg1, s32 count) {
+    func_8001E57C()->slot9C(self, arg1, count);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057C6C);
 
