@@ -1638,7 +1638,57 @@ project rule. Try all three before filing one.
   lever was the double-assignment above, which is ordinary C. Do not discard a
   UB-tainted zero without decomposing it, and do not adopt the UB either.
 
+- **A permuter lead that scores well against the permuter's own stripped
+  scaffold does not always transfer to the real build.** `func_80051F24`'s
+  score-30 lead did not survive translation back. Run `--debug` on the
+  CANDIDATE, not only on the base, before trusting a promising non-zero score
+  — otherwise you spend the translation effort to discover the scaffold was
+  what made it work.
+
+- **A `do { ... } while (0)` wrapper around an otherwise-unconditional body can
+  be load-bearing for delay-slot scheduling.** `func_80052110`: the identical
+  statements scored differently inside the wrapper versus outside it,
+  confirmed by an isolated A/B test. **Mechanism unexplained** — recorded as a
+  measured lever, not as understood behaviour. Worth trying against a
+  delay-slot residue; worth investigating if it recurs.
+
+**Proposed refinement to the register-saturation screen (one instance, NOT yet
+validated).** The existing validated predictor is a *saturated* callee-saved
+demand (8-9 of 9) — see the round-13/14 threshold note above, which corrected
+5 to 7. `func_80051AC8` suggests the risk zone is wider: **6-7 of 9 s-registers
+combined with several independent long-lived values** also produced an
+intractable register-identity rotation. Treat this as a hypothesis with a
+single data point. It needs a corpus census over already-matched functions in
+that band before it becomes a screen, exactly as the 7-not-5 correction did —
+if many matched functions sit at 6-7 with long-lived values, the refinement is
+wrong and the distinguishing factor is elsewhere.
+
 ### New residue classes opened this round (not yet closed)
+
+- **NEW, round 15: "PURE register rotation" — a residue with no
+  instruction-level difference at all.** `func_80051F24` stalled at 75/95 with
+  the permuter's `--debug` reporting **0 reorderings, 0 insertions, 0
+  deletions — only register differences.** `self` and `arg1` already sit
+  exactly where retail puts them; three *locally introduced* values (two
+  global addresses and one handle) rotate among themselves. `func_80051AC8`
+  is the same class at 9/107, where the correct total LENGTH was reached but
+  every reshape rotated differently.
+
+  This is worth its own name because of what it rules out. There is nothing to
+  reorder, nothing missing and nothing extra, so every lever that works by
+  changing instruction selection or scheduling is inapplicable by
+  construction — including the `__asm__("")` barrier, which only reorders. The
+  three register-identity levers found this round (redundant
+  double-assignment, in-place parameter mutation, hoisting a store above a
+  loop guard) are the candidate set, and all three were tried on
+  `func_80051AC8` without success.
+
+  Diagnostic, and it is cheap: run the permuter with `--debug` and read
+  whether the diff is register-only. **A register-only diff is a STALL under
+  the project's own rules** (fixing register identity with
+  `register T v asm("$N")` or an operand constraint is banned), so
+  establishing that early is what stops the attempt budget being spent on
+  reshapes that cannot possibly move it.
 
 - **NEW, round 12: "retail saturates the callee-saved register file."**
   Diagnosable in one command *before* spending an attempt budget:

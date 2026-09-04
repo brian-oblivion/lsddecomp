@@ -6,6 +6,151 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-04 — round 15: 5 runners, 67 matches, 2 stalls, and one rule found four times
+
+**665 -> 732 matched (49.04% -> 53.98% of game code; matched bytes 36.94% ->
+40.20%). Build green in main after every one of the seven merges, and every
+claimed match re-verified individually AFTER its merge.** All 67 came from
+runners; two functions stalled, both with reports.
+
+| runner | unit | pass 1 | pass 2 | stalls | end state |
+| --- | --- | --- | --- | --- | --- |
+| alpha | `class_3bb8c_i` | 12 | — | 0 | 6 fresh left |
+| bravo | `class_3bb8c_j` | 12 | 4 | 2 | **fully worked** |
+| charlie | `class_3bb8c_k` | 12 | — | 0 | 6 fresh left |
+| delta | `class_3bb8c_l` | 12 | — | 0 | 3 fresh left |
+| echo | `class_3bb8c_m` | 12 | 3 | 0 | **fully worked** |
+
+Every runner matched everything it attempted on the first pass — 60 for 60.
+Two of the three early finishers were sent back into their own units (§3c) and
+produced 7 more matches plus both stalls. Alpha, charlie and delta were not
+re-sent because the head's merge queue had become the bottleneck, which is the
+honest reason and a sizing lesson: **head attention, not runner capacity, is
+what capped this round.**
+
+**Gate 0 fired again, and it is now the second round running where a `pull`
+was the cause.** `progress.py` named five stale monoliths; cleaning them and
+re-extracting moved uncarved game code from **276 to 486**. The build was
+green throughout — this round's symptom was purely the silent under-report,
+not round 13's red build, which means the loud half of the failure is not
+reliable and the warning at the top of the output is the only tell.
+
+**Gate 2: carved four units** (`class_3bb8c_j`/`_k`/`_l`/`_m`, 80 functions)
+out of the 193-function remainder, one segment at a time, verified after each.
+The `0x1EF4` rodata slot had **three** owners and split twice; it came up green
+first try because the ownership greps were run before the attach rather than
+after a red link. Head filed stub reports for the 11 screened-blocked
+functions, which is what makes `fresh` honest — 86, not 97.
+
+### The round's main finding: shared-header prototypes, hit four times
+
+All five runners worked adjacent slices of ONE class block, so all five edited
+`include/class_3bb8c.h` and **six of seven merges conflicted.** Every conflict
+was complementary (runners naming different slots of the same structs from
+different call sites) and cheap to union. The expensive part was four
+collisions git cannot see, all the same shape — a cross-unit prototype in a
+unit-local type placed in the shared header:
+
+1. `func_80051A4C` — alpha's header prototype vs bravo's *definition*. Hard
+   compile error.
+2. `func_80053EB4` — delta declared it "still INCLUDE_ASM" while echo matched
+   it the same round.
+3. `func_8004A4B8` — **the one that matters.** delta's header prototype
+   collided with the project's pre-existing canonical declaration in
+   `class_39e08.h`. Invisible when delta's own work verified, because
+   `class_3bb8c_l` does not include that header; it surfaced **two merges
+   later** in `class_3bb8c_k`, the first unit to include both. So the runner
+   who writes this sees green and the unit that breaks is one that never
+   touched it.
+4. `func_80040FC0` — alpha's header prototype vs bravo's local one, where
+   *nobody* has the definition (still `INCLUDE_ASM` in `code_2cc8c_f`), so
+   both are call-site typings and both units are byte-exact with their own.
+
+Rule now in PARALLEL-RUNS §1, with the head's post-merge grep. After the
+fourth, the head swept all **41** prototypes in that header against every
+including unit and every other project header rather than waiting for a fifth.
+
+**Flagged for the operator, not acted on:** that sweep shows
+`include/class_3bb8c.h` has accumulated prototypes that shadow canonical
+declarations in other headers with different types. Four remain as
+warning-level pointer-vs-pointer disagreements — the same 4 warnings present
+*before* this round, and they are the sanctioned
+multiple-independent-local-views convention rather than new damage. Left
+alone deliberately: byte-exact and green, and retyping to tidy them would
+reach hundreds of matched functions for no byte gain. It is real debt and it
+is only the accident of which unit includes which header that keeps most of it
+warnings instead of errors.
+
+### Two runner claims corrected from the binary
+
+- **`D_80086ED0`'s instance size.** bravo reported 0x54, alpha 0x4C.
+  `func_80050BA8` does `li a0,0x4c` and ctors through `func_80051A4C()`, which
+  returns `&D_80086ED0` — alpha is right. charlie's match of `func_80052B60`
+  then showed bravo's 0x54 object belongs to `D_80086F88`, a class bravo had
+  not yet identified. So the type named `Class86ED0` in `class_3bb8c_j.c` is
+  **misnamed**. No bytes affected; bravo was messaged rather than its live file
+  edited (§6).
+- **`ObjM` == `Obj87034_3bb8c_l`.** Proven by a cross-unit call, not a
+  resemblance: `func_80053EB4` is defined in `_m` taking `ObjM *` and called
+  from `_l` passing `Obj87034_3bb8c_l *`. Deliberately **not** unified —
+  merging two field maps is a struct edit reaching 24 matched functions, which
+  is the round-13 hazard and not something to do inside a merge resolution.
+  Recorded as a HEAD NOTE for a dedicated change.
+
+### Head corrections of its own work
+
+- **The `nop_mflo_mfhi` screen.** Auditing the stall corpus for round 13's
+  wrong-CAUSE trap, the head re-implemented Gate 1's third grep in Python and
+  **inverted it** — `grep -A2 mflo` reads the two lines *after*, not before.
+  That produced four false blockers, one on a 252/258 near-miss. Both
+  directions were then reproduced in isolation: `mult -> mfhi` is CLEAN (the
+  divide-by-constant idiom comes out exactly as retail has it), `mflo/mfhi ->
+  mult/div` is BLOCKED (two nops inserted). Re-run correctly over all 285
+  queued functions: **7 hits, all 7 already reported as blocked.** The corpus
+  had no mis-filed cause, and 7-of-285 keeps that grep with the head.
+- **`func_80053F84`'s "redundant" guard.** Its
+  `x != 5 && x != 8 && x == 0xA` has two provably-dead conjuncts. The head
+  hypothesised a sparse `switch` and **measured it: 109627 bytes off.** Echo's
+  form is correct; the note now in that report exists so nobody "simplifies"
+  it.
+- **The remaining-work grep was unanchored** and counted `INCLUDE_ASM` inside
+  a runner's own comment, reading bravo's 8 remaining as 9 — impugning an
+  accurate summary, the inverse of what the check is for. Now `^INCLUDE_ASM`.
+
+### Other structural findings
+
+- **Three of five units spanned two or more vtables**, and all three runners
+  filed it as an *anomaly* because the carve comment implied one class per
+  unit. A slice cut at ROM-address boundaries has no reason to align with
+  class boundaries. Gate 2 corrected.
+- **Runner commit granularity slipped once, disclosed.** Alpha could not
+  produce per-function source commits (its 12 were derived together and a
+  replay was blocked by a permission classifier), so it landed one combined
+  source commit plus 12 report commits and said so plainly. Echo's first pass
+  assembled its commits index-only via `git apply --cached`; the branch tip is
+  what was verified, and its intermediate commits are not independently
+  buildable. Both were acceptable and both were disclosed, which is the part
+  that mattered.
+
+### Next round
+
+**Runners, not a carve.** 17 fresh remain across three partially-worked units
+(`_i` 6, `_k` 6, `_l` 3) and 406 uncarved game functions sit in three
+monoliths (`code_179d8` 274, `class_3bb8c_j` remainder now `class_3bb8c_n`
+113, `class_3bb8c_h` 17 BIOS trampolines). That is under one runner-round of
+fresh ground, so **Gate 2 will fire immediately** — but the three partial
+units are cheap continuations for the first runners while the head carves.
+
+Two things to do differently: **spread runners across unrelated blocks** if
+possible, since concentrating five on one class block is what produced six
+conflicting merges; and **budget head time for merges explicitly**, because
+that queue, not the runners, is what ended this round early.
+
+`class_3bb8c_h`'s 13 `jr $t2` BIOS trampolines remain the one carve that needs
+an operator decision (`hasm` segment vs literal `.word`), unchanged.
+
+---
+
 ## 2026-09-03 — round 13: 5 runners across 11 unit-passes, 110 matches, and four triage corrections
 
 **454 -> 568 matched (33.48% -> 41.89% of game code; matched bytes 26.30% ->
