@@ -343,7 +343,23 @@ void func_800571F8(BaseObjO *self, s32 arg1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057320);
+typedef struct DispatchObjO DispatchObjO;
+typedef struct DispatchObjOMethods {
+    u8 pad0[0xDC];                        /* +0x000 .. +0x0DB, unknown */
+    void (*slotDC)(DispatchObjO *self);      /* +0x0DC */
+    void (*slotE0)(DispatchObjO *self);        /* +0x0E0 */
+} DispatchObjOMethods;
+struct DispatchObjO {
+    DispatchObjOMethods *methods;
+};
+
+void func_80057320(DispatchObjO *self, TagByteObjO *arg1) {
+    if (arg1->methods->tag == 0x34) {
+        self->methods->slotDC(self);
+    } else if (arg1->methods->tag == 0x24) {
+        self->methods->slotE0(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057384);
 
