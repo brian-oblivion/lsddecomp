@@ -1518,8 +1518,12 @@ struct Class86E00_3bb8c_g {
 
 /* Address-of only in this unit's own screening -- func_800505A8 forwards
  * `self->unk38` and the literal `1` to this external helper; return
- * value stored into `self->unk7C`. Not this round's function (lives
- * outside this unit's slice). */
+ * value stored into `self->unk7C`. Not this round's function here -- it
+ * is class_3bb8c_j's New_Class86ED0 (matched round 15, src/class_3bb8c_j.c):
+ * `func_80017B34(0x54)` then, on success, its own ctor-table getter's
+ * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
+ * evidence (arg1 a literal `1`) is what fixed the 2nd parameter as `s32`
+ * rather than a pointer. */
 extern void *func_80051A5C(void *arg0, s32 arg1);
 
 /* Not this round's function (lives outside this unit's slice) --
@@ -1666,7 +1670,16 @@ extern char *strcat(char *dest, char *src);
  * OTHER field of BasicClass. */
 typedef struct BasicMethods866E8F BasicMethods866E8F;
 struct BasicMethods866E8F {
-    u8 pad00[0x038];
+    u8 pad000[0x00C];
+    /* class_3bb8c_j (round 15) additions below -- BasicClassMethods'
+     * canonical finalize/addChild/removeChild/removeAllChildren
+     * (include/code_8220.h), reached via this unit's own local view of
+     * the same real getter/table. */
+    void (*finalize)(void *self);                    /* +0x00C, func_80051C84 */
+    void (*addChild)(void *self, void *child);         /* +0x010, func_80051D1C */
+    void (*removeChild)(void *self, void *child);       /* +0x014, func_80051DA0 */
+    void (*removeAllChildren)(void *self);                /* +0x018, func_80051E20 */
+    u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, func_8004FB04's first dispatch */
 };
 extern BasicMethods866E8F *func_80018390(void);

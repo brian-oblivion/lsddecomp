@@ -24,16 +24,14 @@
  *    class (alloc size 0x54, vtable D_80086ED0 -- see func_80051A4C, a
  *    plain address-of getter, and func_80051A5C, its New_X allocator).
  *    Named `Class86ED0` here, LOCAL to this unit (not added to the shared
- *    header -- nothing else references it yet, and its own base-class
- *    getter `func_80018390()` already has an INCOMPATIBLE local view
- *    established by class_3bb8c_f inside class_3bb8c.h itself
- *    (`BasicMethods866E8F`), so redeclaring it with a different return
- *    type in a shared header would conflict. This unit's own view is
- *    `BaseMethods3bb8cJ`, following the same per-unit-local-view
- *    precedent as class_3bb8c_e.c's `BaseMethods3bb8cE`.). The real
- *    class is BasicClass (include/code_8220.h) -- slots 0x0C/0x10/0x14/
- *    0x18 line up exactly with BasicClassMethods' finalize/addChild/
- *    removeChild/removeAllChildren.
+ *    header -- nothing else references it yet). Its base class IS
+ *    BasicClass (include/code_8220.h): slots 0x0C/0x10/0x14/0x18 line up
+ *    exactly with BasicClassMethods' finalize/addChild/removeChild/
+ *    removeAllChildren. Reached via func_80018390(), which class_3bb8c.h
+ *    ALREADY declares (class_3bb8c_f's own local view, `BasicMethods866E8F`)
+ *    -- this round additively named those four slots on THAT existing
+ *    type rather than adding a second, incompatible local declaration of
+ *    the same function (which would conflict in this translation unit).
  */
 #include "common.h"
 #include "class_3bb8c.h"
@@ -90,7 +88,28 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_800518F4);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051998);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051A4C);
+/*
+ * Class86ED0 -- a small BasicClass-derived sibling class, LOCAL to this
+ * unit (see the file header comment for why this is not added to the
+ * shared class_3bb8c.h). Alloc size 0x54 (func_80051A5C). Vtable
+ * D_80086ED0 (func_80051A4C, a plain address-of getter).
+ *
+ * unk34/unk38 are single-slot caches for the most recently added child of
+ * two distinguished "tag" kinds (established from func_80051D1C/
+ * func_80051DA0: a child object's own `*(s32*)(*(void**)child) & 0xF`
+ * selects unk34 for tag 2, unk38 for tag 5), layered on top of the
+ * INHERITED BasicClass generic children list (added/removed via
+ * func_80018390()'s addChild/removeChild in the same two functions).
+ */
+typedef struct Class86ED0Methods Class86ED0Methods; /* opaque -- no slot this round's functions dispatch through */
+typedef struct Class86ED0 Class86ED0;
+
+extern Class86ED0Methods D_80086ED0;
+
+Class86ED0Methods *func_80051A4C(void)
+{
+    return &D_80086ED0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051A5C);
 
