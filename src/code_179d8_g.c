@@ -164,6 +164,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B4D4);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B640);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B928);
+s32 func_8002B928(const char *arg0, const char *arg1)
+{
+    return func_8002C0AC(arg0, arg1, 0xC) == 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B94C);
