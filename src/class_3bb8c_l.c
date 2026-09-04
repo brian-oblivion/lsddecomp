@@ -179,4 +179,11 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053ACC);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053BE8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053C94);
+void func_80053C94(Obj87034_3bb8c_l *self) {
+    s32 color;
+
+    self->unk20 = 6;
+    color = self->unk3C->methods->slot200(self->unk3C);
+    func_80053EB4(self, color, 0, 0x1E, 1);
+    self->unk3C->methods->slotFC(self->unk3C);
+}
