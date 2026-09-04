@@ -80,7 +80,11 @@ void func_80053F84(ObjM *self, ParamM *p1, s32 sel) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800540E8);
+void func_800540E8(ObjM *self, s32 arg1, s32 arg2) {
+    if (arg2 == 7) {
+        self->methods->slotB8(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054120);
 
