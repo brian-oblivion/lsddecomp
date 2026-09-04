@@ -32,6 +32,43 @@
  */
 #include "common.h"
 
+/*
+ * D_8006D940: a function-pointer table this unit's own `new_class_6d940`/
+ * `func_8002C18C` dispatch through. Named/typed as a plain local struct,
+ * NOT claimed to be a class-framework vtable -- per this unit's header
+ * comment (sibling-slice finding: no classtable.py hit anywhere near this
+ * region). Only the two slots this unit's own functions reach are typed;
+ * the rest stays opaque padding. Kept LOCAL to this file, not a shared
+ * header, per this round's rule for code_179d8 slices.
+ */
+typedef struct Table6D940 Table6D940;
+struct Table6D940 {
+    u8 pad000[0x008];
+    /* +0x008, new_class_6d940's own dispatch -- this IS func_8002C18C
+     * itself (same 2-arg (self, arg1) shape). */
+    void (*slot08)(void *self, s32 arg1);
+    u8 pad00C[0x06C - 0x00C];
+    /* +0x06C, func_8002C18C's own conditional dispatch. */
+    void (*slot6C)(void *self, s32 arg1);
+};
+extern Table6D940 D_8006D940;
+
+/*
+ * A second, DIFFERENT function-pointer table, reached only via the
+ * uncarved accessor `func_80026CAC()` (not this unit's function to
+ * define). Only the three slots this unit's functions dispatch through
+ * are typed.
+ */
+typedef struct BaseTable6D940 BaseTable6D940;
+struct BaseTable6D940 {
+    u8 pad000[0x008];
+    void (*slot08)(void *self); /* +0x008, func_8002C18C's own base-chain call */
+    void (*slot0C)(void *self); /* +0x00C, func_8002C200 */
+    u8 pad010[0x064 - 0x010];
+    void (*slot64)(void *self); /* +0x064, func_8002C238 */
+};
+extern BaseTable6D940 *func_80026CAC(void);
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BC40);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
@@ -54,7 +91,10 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C238);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C278);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3A8);
+Table6D940 *func_8002C3A8(void)
+{
+    return &D_8006D940;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3B8);
 
