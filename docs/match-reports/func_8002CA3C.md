@@ -194,3 +194,107 @@ non-negativity check just like this one*, screen for this residue shape
 (`andi` in your build where retail has `sll`+`subu`, with hi's bias-check
 also missing on both sides) before spending attempts reshaping the C -- it
 reproduces in isolation and is very unlikely to be source-shape-fixable.
+
+---
+
+## HEAD ADJUDICATION (round 17) — the class is WRONG; this is not a blocker
+
+Runner echo classified this as a possible third toolchain blocker on the
+strength of seven probes, all of which folded. **The head re-ran the probe
+matrix and the fold is NOT unconditional.** Reclassified: **source-shape
+residue, one operand short of the reproduced sequence.**
+
+### Why the "new blocker" reading could not have been right
+
+Retail came out of THIS compiler. A construct that the pinned pipeline
+cannot emit is a blocker; a construct it *does* emit from some other source
+form is a shape problem. Before accepting "no C reaches this", the shape
+space has to be exhausted, and the seven probes all varied the same axis —
+`/` vs `>>`, guard vs no guard, barrier vs none — while holding the TYPE of
+`hi` fixed at `s32`. Type is the axis that matters.
+
+### The lever: narrow the multiplicand
+
+The fold `index - (index>>4)*16` -> `index & 0xF` fires only while GCC 2.6.3
+can prove the multiplicand equals `index >> 4`. Narrowing it to 16 bits
+breaks that proof and the fold does not happen:
+
+```c
+extern int sink(int,int,int,int);
+struct S { int *p[8]; };
+int probe(struct S *self, int index) {
+    int hi, lo;
+    if (index < 0) return -1;
+    hi  = index >> 4;
+    lo  = index - (short)hi * 16;          /* <-- the narrowing */
+    return sink((short)hi, (short)lo, (int)self->p[hi], lo);
+}
+```
+
+Through the pinned pipeline (`cpp` -> `cc1 -mips1 -mcpu=3000 -G0 -O2` ->
+`maspsx --aspsx-version=2.34 --dont-force-G0 --expand-div` -> `as`):
+
+```
+bltz  a1, ...
+sra   v0, a1, 0x4       hi, bare arithmetic shift, NO bias correction
+sll   a0, v0, 0x10
+sra   a0, a0, 0x10      (s16)hi
+sll   a3, a0, 0x4       hi16 << 4
+subu  a3, a1, a3        lo -- UNFOLDED, the subu retail has
+sll   a1, a3, 0x10
+sra   a1, a1, 0x10      (s16)lo
+sll   v0, v0, 0x2       hi * 4, off the UNTRUNCATED int hi
+lw    a2, 0(v0)
+```
+
+Compare retail (`asm/nonmatchings/code_179d8_e/func_8002CA3C.s`, 0x8002CA64
+onward):
+
+```
+sra   $v0, $a0, 4
+sll   $a1, $v0, 16
+sra   $a1, $a1, 16
+sll   $v1, $v0, 4        <-- retail shifts $v0 (untruncated)
+subu  $v1, $a0, $v1
+sll   $a2, $v1, 16
+sra   $a2, $a2, 16
+sll   $v0, $v0, 2
+sll   $v1, $v1, 5
+```
+
+**Every structural element matches**: the bare `sra` for `hi`, both s16
+widen pairs, the `sll`+`subu` for `lo`, and the `sll 2` on the untruncated
+`hi` for the array-of-pointers index. The instruction COUNT is right, which
+is what the 5/55 score was really measuring — that score came from three
+missing instructions cascading into total drift, not from a wrong body.
+
+### What is actually left
+
+ONE operand. Retail feeds the `sll ..,0x4` from the **untruncated** `$v0`;
+the probe above feeds it from the truncated copy. Semantically identical
+whenever `hi` fits in 16 bits, so both are legal codegen for the same
+source — but no shape tried yet gets the fold blocked AND the multiply on
+the untruncated value at once. `(short)hi * 16` blocks the fold by
+narrowing the multiplicand, which is exactly the operand that then appears
+in the shift.
+
+So the remaining question is narrow and well posed: **what source form
+denies GCC the `index >> 4` identity without narrowing the value that
+feeds the multiply?** Candidates not yet tried include routing `hi` through
+a struct field or a second function's return value, and any form where the
+divisor is not a compile-time 16 at the point of the subtraction.
+
+### Disposition
+
+**Not a toolchain escalation. Do not file it as one.** It is a live
+matching problem with the shape already reproduced, and it is a good
+permuter target — the permuter mutates C source under the pinned toolchain,
+which is precisely the search the seven hand-probes were doing one at a
+time. Re-staff it with the probe above as the starting body.
+
+Everything echo established about the FUNCTION stands unchanged and was not
+re-derived here: the signature, the `self->unk50[hi][lo]` addressing with
+0x20-byte stride, the `s16 self->unk54` / `u16 self->unk60` field widths,
+and the double-`arg2` seventh argument to `func_80030E90` (visible in
+retail as `sw $s1, 0x14($sp)` and `sw $s1, 0x18($sp)` from one
+sign-extension).
