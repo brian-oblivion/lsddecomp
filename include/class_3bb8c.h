@@ -1686,7 +1686,7 @@ struct BasicMethods866E8F {
      * (include/code_8220.h), reached through each unit's own local view of
      * the same real getter/table. Pure pad-to-field split: same total
      * size, `slot38`'s offset unchanged. */
-    void (*ctor)(void *self);                    /* +0x008, func_80050C14 (base ctor, no extra args) */
+    void (*ctor)(void *self);                    /* +0x008, func_80050C14 (_i) / func_80051AC8 (_j, STALLED) */
     void (*finalize)(void *self);                /* +0x00C, func_80050CE8 (_i) / func_80051C84 (_j) */
     void (*addChild)(void *self, void *child);   /* +0x010, func_80050D30 (_i) / func_80051D1C (_j) */
     void (*removeChild)(void *self, void *child);/* +0x014, func_80050DB4 (_i) / func_80051DA0 (_j) */
@@ -2288,12 +2288,16 @@ struct Obj86ED0 {
  * runner bravo did with `Class86ED0` deliberately. The TYPES below stay
  * here because they are the richer, measured view; only the symbol moved. */
 
-/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- func_80050F28's
- * own call. Translates each byte of `src` (a name string) into `dest`
- * (folding a couple of special-case byte ranges) and returns `dest`,
- * same convention as `strcpy`. Typed purely from this call site's own
- * register usage. */
-extern char *func_80040FC0(char *dest, char *src);
+/* HEAD NOTE round 15: alpha's `extern char *func_80040FC0(char *dest, char
+ * *src);` moved into src/class_3bb8c_i.c -- FOURTH instance of the
+ * shared-header prototype rule this round. func_80040FC0 is still
+ * INCLUDE_ASM in code_2cc8c_f, so NOBODY has its definition and every
+ * declaration is a call-site typing; class_3bb8c_i reads it as
+ * `char *(char *, char *)` and class_3bb8c_j as `void (void *, void *)`.
+ * Both units are byte-exact with their own reading, because the return
+ * type of an INCLUDE_ASM callee only affects the CALLER's codegen. Two
+ * call-site typings of one undefined function are exactly the case that
+ * must stay unit-local. */
 
 /* -------------------------------------------------------------------
  * HEAD NOTE, round 15 merge: D_80086F88 (below) CLOSES an open question

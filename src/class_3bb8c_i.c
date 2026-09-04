@@ -5,6 +5,15 @@
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
 extern char *strcpy(char *dest, char *src);
 
+/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- func_80050F28's own
+ * call. Translates each byte of `src` (a name string) into `dest` (folding a
+ * couple of special-case byte ranges) and returns `dest`, same convention as
+ * `strcpy`. Typed purely from this call site's own register usage. Declared
+ * HERE, not in include/class_3bb8c.h: src/class_3bb8c_j.c types the same
+ * (still undefined) function as `void (void *, void *)` from its own call
+ * site, and two call-site typings of one function cannot share a header. */
+extern char *func_80040FC0(char *dest, char *src);
+
 /* This class's method table. Declared HERE and not in include/class_3bb8c.h
  * because src/class_3bb8c_j.c declares the same object as its own
  * `Class86ED0Methods` local view, and two incompatible declarations of one
