@@ -2021,7 +2021,9 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slot50)(void *self);          /* +0x050, func_800536B0 */
     u8 pad54[0x074 - 0x054];
     void (*slot74)(void *self);          /* +0x074, func_800536B0 */
-    u8 pad78[0x0FC - 0x078];
+    u8 pad78[0x0F0 - 0x078];
+    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md) */
+    u8 padF4[0x0FC - 0x0F4];
     void (*slotFC)(void *self);          /* +0x0FC, func_800536B0/func_80053C94 */
     u8 pad100[0x104 - 0x100];
     s32 (*slot104)(void *self, s32 arg1); /* +0x104, func_800531CC */
@@ -2053,7 +2055,9 @@ typedef struct Obj87034Methods_3bb8c_l {
     u8 pad08[0x010 - 0x008];
     void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, func_80052DE8 */
     void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, func_80052EBC/func_800536B0 */
-    u8 pad18[0x048 - 0x018];
+    u8 pad18[0x030 - 0x018];
+    void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md) */
+    u8 pad34[0x048 - 0x034];
     void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, func_80052EBC/func_80053134 (via self->unk54) */
     u8 pad4C[0x074 - 0x04C];
     void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, func_80053358 (event 0x21) */
@@ -2082,7 +2086,7 @@ struct Obj87034_3bb8c_l {
     Obj14_3bb8c_l *unk14;              /* +0x014, func_800531CC/func_8005393C/func_800536B0 */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
     s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
-    s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC and a computed value by func_80053BE8, out of this round's scope) */
+    s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
     u8 pad24[0x038 - 0x024];
     void *unk38;                          /* +0x038, func_80052E7C: forwarded opaquely to func_80049060/func_80049098 */
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */

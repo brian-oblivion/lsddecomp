@@ -194,18 +194,58 @@ void func_8005393C(Obj87034_3bb8c_l *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053984);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053ACC);
-
-/* func_80053BE8's (and func_80053C94's, further below) own helper, and it
- * lives in the sibling slice class_3bb8c_m, where round 15's runner echo
- * matched it byte-exact as `void func_80053EB4(ObjM *self, s32, s32, s32,
- * s32)`. Declared locally rather than in include/class_3bb8c.h on purpose:
- * this unit's view of the class is `Obj87034_3bb8c_l` and echo's is `ObjM`,
- * the two are the same class (see the HEAD NOTE in that header), and a
- * shared-header declaration would put two incompatible prototypes for one
+/* func_80053ACC's (and func_80053BE8's/func_80053C94's, further below) own
+ * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
+ * runner echo matched it byte-exact as `void func_80053EB4(ObjM *self, s32,
+ * s32, s32, s32)`. Declared locally rather than in include/class_3bb8c.h on
+ * purpose: this unit's view of the class is `Obj87034_3bb8c_l` and echo's is
+ * `ObjM`, the two are the same class (see the HEAD NOTE in that header), and
+ * a shared-header declaration would put two incompatible prototypes for one
  * function in front of both translation units. The return type is echo's,
  * from the definition. */
 extern void func_80053EB4(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+
+/* STALLED at 28/71 words -- see docs/match-reports/func_80053ACC.md for the
+ * full analysis. This body is structurally correct (every field, every
+ * argument value, the switch's case values and the outer zero-check are all
+ * confirmed against the disassembly) but diverges from retail by exactly one
+ * register-allocation choice in a branch delay slot that this round could
+ * not reproduce from source. Preserved here, out of the way, rather than
+ * only in the report, per project convention. */
+#if 0
+void func_80053ACC(Obj87034_3bb8c_l *self) {
+    s32 local18;
+    s32 t;
+    s32 arg3;
+
+    self->unk20 = 4;
+    if (self->unk3C->methods->slotF0(self->unk3C, &local18, -1) == 0) {
+        t = (self->unk1C + (s32)self->unk38) & 3;
+        if (t == 0) {
+            self->methods->slot30(self, 4);
+            return;
+        }
+        arg3 = 0xA;
+        switch (t) {
+        case 1:
+            local18 = 0;
+            break;
+        case 2:
+            local18 = 4;
+            break;
+        case 3:
+            local18 = 7;
+            arg3 = 5;
+            break;
+        }
+        func_80053EB4(self, local18, 0, arg3, 1);
+        return;
+    }
+    func_80053EB4(self, 0, 0, 5, 1);
+}
+#endif
+
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053ACC);
 
 void func_80053BE8(Obj87034_3bb8c_l *self) {
     s32 color;
