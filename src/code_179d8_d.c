@@ -82,7 +82,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BFA8);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C014);
+void func_8002C014(char *dest, char *src, s32 count)
+{
+    s32 i;
+
+    for (i = count - 1; i != -1; i--) {
+        *dest++ = *src++;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C048);
 
