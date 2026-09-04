@@ -103,6 +103,22 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051998);
  */
 typedef struct Class86ED0Methods Class86ED0Methods; /* opaque -- no slot this round's functions dispatch through */
 typedef struct Class86ED0 Class86ED0;
+struct Class86ED0 {
+    Class86ED0Methods *methods;    /* +0x000 */
+    u8 pad04[0x10 - 0x04];
+    s32 unk10;                      /* +0x010, func_80051C84: element count for unk18[]/unk1C */
+    u8 pad14[0x18 - 0x14];
+    void **unk18;                    /* +0x018, func_80051C84: array of unk10 pointers, each individually freed */
+    void *unk1C;                      /* +0x01C, func_80051C84: single pointer, freed separately */
+    s32 unk20;                         /* +0x020, func_80051F14 */
+    s32 unk24;                          /* +0x024, func_80051F14 */
+    s32 unk28;                           /* +0x028, func_80051F14 */
+    u8 pad2C[0x34 - 0x2C];
+    void *unk34;                          /* +0x034, "tag==2" registered-child cache */
+    void *unk38;                           /* +0x038, "tag==5" registered-child cache */
+    u8 pad3C[0x50 - 0x3C];
+    void *unk50;                            /* +0x050 */
+};
 
 extern Class86ED0Methods D_80086ED0;
 
@@ -111,7 +127,48 @@ Class86ED0Methods *func_80051A4C(void)
     return &D_80086ED0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051A5C);
+/*
+ * New_Class86ED0. func_80017B34/func_80017CFC already declared for the
+ * Obj866E8 group above are the same generic pool allocator/free pair --
+ * not redeclared here.
+ *
+ * BasicClass's own method table getter is ALREADY declared in the shared
+ * class_3bb8c.h (`func_80018390`/`BasicMethods866E8F`, class_3bb8c_f's
+ * local view -- reused here rather than redeclared, since a second
+ * incompatible extern for the same function in one translation unit is a
+ * conflicting-types error). This round additively named its
+ * finalize/addChild/removeChild/removeAllChildren slots (+0x00C/+0x010/
+ * +0x014/+0x018) in that header, matching include/code_8220.h's canonical
+ * BasicClassMethods layout exactly.
+ */
+extern void *func_80017B34(s32 size);
+extern void *func_80017CFC(void *ptr);
+
+/* New_X allocator's ctor-table getter. func_80052B60 is a real function,
+ * defined in the sibling unit class_3bb8c_k (still INCLUDE_ASM there) --
+ * only its own ctor slot (+0x008) is needed by this unit's func_80051A5C.
+ * arg1's type (`s32`, not a pointer) is fixed by class_3bb8c.h's own
+ * already-established `func_80051A5C` prototype (class_3bb8c_f calls it
+ * with a literal `1`). */
+typedef struct Class86ED0CtorTable Class86ED0CtorTable;
+struct Class86ED0CtorTable {
+    u8 pad0[0x008];
+    void (*ctor)(Class86ED0 *self, void *arg0, s32 arg1);
+};
+extern Class86ED0CtorTable *func_80052B60(void);
+
+void *func_80051A5C(void *arg0, s32 arg1)
+{
+    Class86ED0 *self = func_80017B34(0x54);
+
+    if (self == NULL) {
+        goto fail;
+    }
+    func_80052B60()->ctor(self, arg0, arg1);
+    return self;
+fail:
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051AC8);
 
