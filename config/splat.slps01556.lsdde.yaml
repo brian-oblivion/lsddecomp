@@ -69,7 +69,21 @@ segments:
       - [0xABC, rodata]   # psyq_GsLinkObject4
       - [0xF28, rodata]   # psyq_15d04
       - [0xFA4, rodata]   # code_1677c
-      - [0xFD8, rodata]   # code_179d8
+      - [0xFD8, rodata]   # code_179d8 (head remainder, still asm)
+      # jtbl_800109F8 belongs to func_80029478, which lives in the
+      # code_179d8_b slice. Its words are `.L` labels LOCAL to that
+      # function's own `.s`, so this sub-slot must be ATTACHED to the unit or
+      # the link fails with `undefined reference to '.L800296D4'`. The words
+      # either side belong to other slices of the same monolith and stay
+      # standalone. Survey before moving a boundary here: of the 483 words in
+      # the original 0xFD8..0x1764 slot, 179 are vram addresses inside
+      # code_179d8's own text and the rest are ASCII.
+      - [0x11F8, .rodata, code_179d8_b]
+      - [0x120C, rodata]  # code_179d8_mid remainder
+      # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
+      # same situation as 0x11F8 above.
+      - [0x14D8, .rodata, code_179d8_c]
+      - [0x14F0, rodata]  # code_179d8_mid / _tail remainder
       - [0x1764, rodata]
       # 0x1890 holds three jump tables. jtbl_80011090 and jtbl_800110D0
       # belong to code_2cc8c's first 20-function slice (now a C unit), so
@@ -268,7 +282,37 @@ segments:
       - [0x166ac, asm, psyq_PadInit]
       - [0x1677c, c, code_1677c]
       - [0x171e0, c, code_171e0]
+      # code_179d8 was 274 functions and 44% blocker-dense in aggregate, but
+      # the density is CLUSTERED, so the aggregate is a bad carve guide. A
+      # three-grep screen (gp_rel / addiu-$at / nop_mflo_mfhi) over
+      # non-overlapping 20-function windows, run 2026-09-04:
+      #     [  0.. 19]  7/20 clean    [140..159]  9/20
+      #     [ 20.. 39]  2/20          [160..179]  6/20
+      #     [ 40.. 59] 16/20          [180..199]  8/20
+      #     [ 60.. 79] 16/20  <- code_179d8_b
+      #     [ 80.. 99] 14/20          [200..219] 16/20  <- code_179d8_c
+      #     [100..119] 17/20          [220..239]  9/20
+      #     [120..139] 14/20          [240..259]  4/20
+      # Round 16 carved the two 16/20 windows with the most substantial
+      # bodies. [100..119] scores higher (17/20) but 9 of its 20 are 4-6
+      # word `jr $ra` leaves, so it is worth less than the raw count says.
+      # Both boundaries checked on both sides: each predecessor closes
+      # `jr $ra; nop` + endlabel, and each slice-start allocates its own
+      # frame or opens on its own argument register. Corpus checks over the
+      # whole monolith: zero functions with more than one
+      # `addiu $sp, $sp, -N`, zero `alabel`, zero `jr $t2` BIOS trampolines.
+      # Expect a slice cut at ROM-address boundaries to span more than one
+      # class; identify each with tools/classtable.py rather than assuming
+      # the unit has one.
       - [0x179d8, asm, code_179d8]
+      # code_179d8_b: window [60..79], 0x194E0..0x1A1BC (20 functions).
+      - [0x194E0, c, code_179d8_b]
+      # code_179d8_mid: functions 80..199 of the original monolith. UNCARVED.
+      - [0x1A1BC, asm, code_179d8_mid]
+      # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
+      - [0x22948, c, code_179d8_c]
+      # code_179d8_tail: functions 220..273 of the original. UNCARVED.
+      - [0x23500, asm, code_179d8_tail]
       - [0x272c8, asm, psyq_SpuSetMute]
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function

@@ -1,0 +1,67 @@
+/*
+ * code_179d8_c -- window [200..219] of the original 274-function code_179d8
+ * monolith, 0x22948..0x23500 (vram 0x80032148..0x80032D00).
+ *
+ * Carved round 16 by blocker DENSITY (see code_179d8_b's header for the
+ * full window census). This window screened 16/20 clean. The four blocked
+ * functions are already stubbed as match reports, all addiu_at:
+ *   func_80032148, func_80032588, func_80032BF0, func_80032C28
+ *
+ * func_80032588 owns jtbl_80010CD8, whose sub-slot of the 0xFD8 rodata
+ * region is ATTACHED to this unit in the splat yaml. Leave that alone.
+ *
+ * Note func_80032AD0/SetRCnt: this window holds what look like Psy-Q root
+ * counter routines linked into game text rather than into a psyq_* segment.
+ * They are ordinary work, but do not generalise a finding from them to the
+ * game's own code.
+ *
+ * This slice was cut at ROM-address boundaries, so it has no reason to
+ * align with class boundaries -- expect it to span more than one class,
+ * and identify each with tools/classtable.py rather than assuming one.
+ *
+ * Declarations: keep anything that encodes THIS unit's reading of a class
+ * next to the code, in this file. Do not create a shared code_179d8*.h --
+ * the sibling slices are staffed independently and a shared header is what
+ * makes their merges collide.
+ */
+#include "common.h"
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032148);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_8003221C);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032368);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032388);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800323A8);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032588);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032708);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032998);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800329B8);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800329D8);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032A7C);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032A9C);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032AD0);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", SetRCnt);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032BB8);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032BF0);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032C28);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032C60);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032C98);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032CCC);
