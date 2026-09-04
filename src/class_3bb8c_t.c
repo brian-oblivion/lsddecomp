@@ -48,7 +48,11 @@ typedef struct D_80087AACObj D_80087AACObj;
  * convention (multiple units already carry independent local views of
  * this same table with different slot arities). */
 typedef struct D_8006E730Methods {
-    u8 pad00[0x44];
+    u8 pad00[0x8];
+    /* +0x008, called by this unit's own func_80057FC8 as (self, 0, str,
+     * 0). */
+    void (*slot8)(D_80087AACObj *self, s32 arg1, char *str, s32 arg2);
+    u8 pad0C[0x44 - 0xC];
     /* +0x044, called by this unit's own func_80058390 as (self, arg1,
      * arg2). */
     void (*slot44)(D_80087AACObj *self, void *arg1, void *arg2);
@@ -81,7 +85,11 @@ typedef struct D_80087AACMethods {
     u8 pad00[0x8];
     /* +0x008, this unit's own ctor (func_80057FC8). */
     D_80087AACObj *(*ctor)(D_80087AACObj *self, void *arg1);
-    u8 pad0C[0x6C - 0xC];
+    u8 pad0C[0x40 - 0xC];
+    /* +0x040, called by this unit's own func_80057FC8 as (self, arg1) --
+     * a TAIL CALL, its return value forwarded as func_80057FC8's own. */
+    void *(*slot40)(D_80087AACObj *self, void *arg1);
+    u8 pad44[0x6C - 0x44];
     /* +0x06C, called by this unit's own func_80058078 as (self, flag). */
     void (*slot6C)(D_80087AACObj *self, s32 arg1);
     /* +0x070, called by this unit's own func_800581C4 as (self, size). */
@@ -93,6 +101,8 @@ typedef struct D_80087AACMethods {
     /* +0x0D4, called by this unit's own func_80058078 as (self, str,
      * 0). */
     void (*slotD4)(D_80087AACObj *self, char *str, s32 arg2);
+    /* +0x0D8, called by this unit's own func_80057FC8 as (self, 0). */
+    void (*slotD8)(D_80087AACObj *self, s32 arg1);
 } D_80087AACMethods;
 extern D_80087AACMethods *func_80058764(void);
 
@@ -110,6 +120,33 @@ struct D_80087AACEntry {
     D_80087AACEntryMethods *methods;
 };
 
+/* Object pointed to by D_80087AACObj::unk_0x48 -- only the one slot
+ * this unit's own func_80057FC8 dispatches through is typed. */
+typedef struct D_80087AACUnk48Obj D_80087AACUnk48Obj;
+typedef struct D_80087AACUnk48Methods {
+    u8 pad00[0x9C];
+    /* +0x09C, called by this unit's own func_80057FC8 as (self, -1). */
+    void (*slot9C)(D_80087AACUnk48Obj *self, s32 arg1);
+} D_80087AACUnk48Methods;
+struct D_80087AACUnk48Obj {
+    D_80087AACUnk48Methods *methods;
+};
+
+/* Object pointed to by D_80087AACObj::unk_0xA4 -- passed in as this
+ * unit's own ctor's `arg1` (func_80057FC8) and dispatched through by
+ * func_800580E0/func_80058404 (both still queued at slot +0x1B0). Only
+ * that one slot is typed. */
+typedef struct D_80087AACUnkA4Obj D_80087AACUnkA4Obj;
+typedef struct D_80087AACUnkA4Methods {
+    u8 pad00[0x1B0];
+    /* +0x1B0, called by this unit's own func_800580E0/func_80058404 as
+     * (self, 0). */
+    void *(*slot1B0)(D_80087AACUnkA4Obj *self, s32 arg1);
+} D_80087AACUnkA4Methods;
+struct D_80087AACUnkA4Obj {
+    D_80087AACUnkA4Methods *methods;
+};
+
 struct D_80087AACObj {
     D_80087AACMethods *methods;
     u8 pad04[0x1C - 0x4];
@@ -122,10 +159,16 @@ struct D_80087AACObj {
     u8 pad30[0x38 - 0x30];
     /* +0x038, read by this unit's own func_80058390. */
     s32 unk_0x38;
-    u8 pad3C[0x84 - 0x3C];
+    u8 pad3C[0x48 - 0x3C];
+    /* +0x048, read by this unit's own func_80057FC8. */
+    D_80087AACUnk48Obj *unk_0x48;
+    u8 pad4C[0x84 - 0x4C];
     /* +0x084, written by this unit's own func_80058078. */
     s32 unk_0x84;
-    u8 pad88[0xA8 - 0x88];
+    u8 pad88[0xA4 - 0x88];
+    /* +0x0A4, set by this unit's own ctor (func_80057FC8) to its own
+     * `arg1`; dispatched through by func_800580E0/func_80058404. */
+    D_80087AACUnkA4Obj *unk_0xA4;
     /* +0x0A8, a 100-entry array of `D_80087AACEntry *` -- built by this
      * unit's own func_80058228 (still queued), destroyed by
      * func_80058308 (still queued), indexed by func_80058694. */
@@ -148,7 +191,16 @@ void *func_80057F68(void *arg1) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80057FC8);
+extern char D_8001176C[];
+
+void *func_80057FC8(D_80087AACObj *self, void *arg1) {
+    func_8003DFBC()->slot8(self, 0, D_8001176C, 0);
+    self->methods = func_80058764();
+    self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
+    self->unk_0xA4 = arg1;
+    self->methods->slotD8(self, 0);
+    return self->methods->slot40(self, arg1);
+}
 
 extern char D_80011778[];
 
