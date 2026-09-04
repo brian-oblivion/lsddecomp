@@ -1,0 +1,144 @@
+# func_8002C0AC -- STALL (30/32 words, same instruction-order residue as func_8002C048)
+
+**Unit:** code_179d8_d · **Size:** 32 instructions (0x80 bytes) ·
+**Status: STALLED at 30/32 words**, restored to `INCLUDE_ASM`.
+
+## Role
+
+The 3-arg `strncmp` sibling of `func_8002C048` (this unit, this round) --
+same NULL-safe preamble, same loop shape with a trip count (`n`) added.
+`func_8002C048`'s report documents the same underlying idioms this
+function needed; this report focuses on what's specific to `n`.
+
+## Best body reached (30/32, NOT byte-exact -- do not merge)
+
+```c
+#if 0
+s32 func_8002C0AC(char *s1, char *s2, s32 n)
+{
+    char c1;
+    char c2;
+
+    if (s1 == NULL) {
+        goto check_eq;
+    }
+    if (s2 != NULL) {
+        goto loop_entry;
+    }
+check_eq:
+    if (s1 != s2) {
+        goto not_equal;
+    }
+    goto return_zero;
+not_equal:
+    if (s1 == NULL) {
+        return -1;
+    }
+    return 1;
+
+loop_entry:
+    n--;
+    if (n < 0) {
+        return 0;
+    }
+loop_top:
+    c1 = *s1;
+    c2 = *s2;
+    s2++;
+    if (c1 != c2) {
+        goto mismatch;
+    }
+    if (c1 == 0) {
+        goto return_zero;
+    }
+    s1++;
+    n--;
+    __asm__("");
+    if (n >= 0) {
+        goto loop_top;
+    }
+mismatch:
+    if (n < 0) {
+        goto return_zero;
+    }
+    return *s1 - *(s2 - 1);
+return_zero:
+    return 0;
+}
+#endif
+```
+
+## Three residues found and fixed
+
+1. **The shared `return 0` block sits at the OPPOSITE end of the function
+   from `func_8002C048`'s.** In `func_8002C048`, the shared tail is
+   positioned EARLY (right after the `s1==s2` check, reached by
+   fallthrough from there and by `goto` from the loop). In THIS function,
+   retail positions it at the very END (right before the epilogue,
+   reached ONLY by explicit `goto` from three different sites: `s1==s2`,
+   the loop's `c1==0` match, and the mismatch tail's `n<0` check -- none
+   of them adjacent to it, none of them a fallthrough). Placing
+   `return_zero: return 0;` early (mirroring `func_8002C048`'s layout,
+   the natural first guess) put ONE of the three jump targets at the
+   wrong address entirely (confirmed via `objdump`: `beq a0,a1` landed on
+   the loop body instead of the shared tail). Moving the label to the end
+   of the function body, with all three sites using an EXPLICIT `goto`
+   (no fallthrough anywhere), reproduced retail's three-way share exactly.
+   **Lesson: don't assume a sibling function's shared-tail layout
+   transfers -- check where retail actually puts the block, every time.**
+2. **A "wasted" `nop` after the loop-continuation branch, only reproduced
+   with a scheduling barrier.** Before any fix, GCC found a genuinely
+   MORE efficient schedule than retail's own: it filled the `bgez
+   $a2,loop_top` branch's delay slot with `addiu $a0,$a0,1` (`s1++`)
+   instead of leaving it as a `nop`, and moved `addiu $a2,$a2,-1` (`n--`)
+   into the EARLIER `beqz $v1,return_zero` branch's delay slot instead
+   (which retail fills with `s1++`, not `n--`). Both schedules are
+   semantically identical and equally valid MIPS -- retail's is simply
+   less aggressively packed. Source statement order (`s1++; n--;` vs
+   `n--; s1++;`) had NO effect on which delay slot got which instruction
+   (confirmed by testing both). A bare `__asm__("");` placed between
+   `n--;` and the `if (n >= 0)` check DID force retail's less-packed
+   schedule -- this is squarely the ALLOWED use of the barrier per
+   CLAUDE.md's own test (order changed, not register identity: `n` and
+   `s1` still end up correctly updated either way).
+3. **The mismatch tail's re-cache into `c1`/`c2`, fixed the same way as
+   `func_8002C048`'s** -- dereferencing `*s1`/`*(s2 - 1)` directly in the
+   `return` expression rather than reassigning locals first, per the
+   head's no-cache-across-CSE direction. No `volatile` needed here either.
+
+## The remaining residue: identical to func_8002C048's
+
+With all three fixes in place, the ONLY remaining difference is the exact
+same class as `func_8002C048`'s own stall: the loop-top's two independent
+`lbu`s (`c1 = *s1;` / `c2 = *s2;`) compile in the OPPOSITE order from
+retail (`$v0`/c2 from `$a1` loaded first, `$v1`/c1 from `$a0` second) --
+both registers end up holding the CORRECT values (register-identity safe,
+confirmed via `objdump`), only their relative instruction order differs.
+
+Tried, no effect (same levers as `func_8002C048`, not re-exhausted here
+since the mechanism is identical): swapping the C statement order of the
+two reads, a bare `__asm__("");` placed between them.
+
+**Classification:** same pure instruction-order residue as
+`func_8002C048`. Given it is the SAME two-instruction swap shape in a
+SECOND function in this unit (same file, same day), this reads less like
+an isolated fluke and more like a systematic scheduling-heuristic
+difference the pinned toolchain has for this specific "two independent
+`lbu`s feeding an immediate comparison" pattern -- worth flagging for
+whoever next has a `-mips1`/`gcc-2.6.3` toolchain lead to investigate, though
+that is an operator escalation, not something to experiment with further
+here. Legitimate permuter candidate at 30/32, same as `func_8002C048` at
+23/25.
+
+### Proposed learning
+
+A shared multi-way-`goto` return block's physical position in the
+function body is NOT predictable from a sibling function's layout, even
+when the sibling is otherwise structurally near-identical (same
+preamble, same loop shape) -- check retail's actual block order via
+`objdump` before assuming a shared tail belongs where a related function
+put its own. Also: the same two-independent-loads instruction-order
+residue recurring in two sibling functions in one unit is worth recording
+as a pattern, not just two isolated near-misses -- see
+`func_8002C048`'s report for the fuller catalogue of what was tried
+against it.

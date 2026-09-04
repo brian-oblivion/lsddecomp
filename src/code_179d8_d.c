@@ -10,9 +10,13 @@
  * Those five count as `matched` in tools/progress.py without having been
  * work, which is exactly the caveat CLAUDE.md attaches to that column.
  *
- * The three blocked functions already have stub reports:
+ * Two blocked functions have stub reports:
  *   func_8002BC40, func_8002BCEC  -- addiu_at
- *   func_8002C278                 -- nop_mflo_mfhi
+ * func_8002C278 was originally screened as a third (nop_mflo_mfhi) but
+ * that screen was inverted (checked mult/div BEFORE mflo/mfhi instead of
+ * after) -- the head corrected it mid-round and deleted the stub report.
+ * It is fresh ground; the mult/mfhi pair in its body is retail's signed-
+ * divide-by-constant idiom, not the blocked mflo/mfhi-then-mult direction.
  *
  * Unlike its siblings code_179d8_b and code_179d8_c, this slice owns NO
  * jump table -- all seven jtbl blocks in the 0xFD8 rodata slot fall outside
@@ -95,7 +99,23 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BC40);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BFA8);
+/* Cross-unit calls into the still-INCLUDE_ASM code_179d8_b (charlie's
+ * unit, this round) -- declared LOCAL to this unit, per-call-site typed,
+ * since none of them have an established prototype anywhere yet. */
+extern void func_800292F4(void *arg0, s32 *outBuf);
+extern void func_80028DF0(s32 arg0, s32 *buf, s32 arg2);
+extern void func_80029274(void *arg0, void *arg1, s32 arg2);
+extern s32 func_80029254(s32 arg0, s32 arg1);
+
+s32 func_8002BFA8(void *p0, void *p1, void *p2)
+{
+    s32 buf[2];
+
+    func_800292F4(p1, buf);
+    func_80028DF0(2, buf, 0);
+    func_80029274(p0, p2, 0x80);
+    return (u32)func_80029254(0, 0) < 1;
+}
 
 void func_8002C014(char *dest, char *src, s32 count)
 {
@@ -145,6 +165,60 @@ s32 func_8002C238(s32 *self)
     self[0xC] = 1;
     return func_80026CAC()->slot64(self);
 }
+
+/*
+ * func_8002C278's own "descriptor" pointer, resolved either from a cached
+ * byte offset (Obj278::unk34) or freshly from `index*12+8` into
+ * Ctx278::unk10's byte array. Field meaning unestablished beyond
+ * offset/width -- this region reads as raw hardware/SIO register staging
+ * (no classtable.py hit anywhere nearby), not class-framework data.
+ */
+typedef struct Entry278 {
+    u8 unk0;   /* +0x0, tag/kind: zero means "not present", tested first */
+    u8 unk1;   /* +0x1 */
+    u16 unk2;  /* +0x2 */
+    u8 unk4;   /* +0x4 */
+    u8 unk5;   /* +0x5 */
+    s16 unk6;  /* +0x6 */
+    s32 unk8;  /* +0x8 */
+} Entry278;
+
+/* func_8002C278's own object (its own `arg1`). Only the fields this
+ * function itself touches are named. */
+typedef struct Obj278 {
+    u8 pad0[0xC];
+    s32 unkC;   /* +0xC */
+    s32 unk10;  /* +0x10 */
+    s32 unk14;  /* +0x14 */
+    u8 pad18[0x1A - 0x18];
+    s16 unk1A;  /* +0x1A */
+    u8 pad1C[0x2C - 0x1C];
+    s16 unk2C;  /* +0x2C */
+    s16 unk2E;  /* +0x2E */
+    s32 unk30;  /* +0x30, cache-hit flag: 1 if unk34 was reused, 0 if freshly computed */
+    s32 unk34;  /* +0x34, BEFORE resolution: a cached byte offset into Ctx278::unk10; AFTER: Entry278::unk8 */
+    s32 unk38;  /* +0x38 */
+} Obj278;
+
+/* Opaque target of Ctx278::unk2C -- only the one dispatched slot named. */
+typedef struct Ctx278SubMethods Ctx278SubMethods;
+typedef struct Ctx278Sub Ctx278Sub;
+struct Ctx278SubMethods {
+    u8 pad000[0x080];
+    s32 (*slot80)(Ctx278Sub *self);
+};
+struct Ctx278Sub {
+    Ctx278SubMethods *methods;
+};
+
+/* func_8002C278's own `arg0`. Only the fields this function itself
+ * touches are named. */
+typedef struct Ctx278 {
+    u8 pad0[0x10];
+    u8 *unk10;       /* +0x10, byte-addressed base for the Entry278 table */
+    u8 pad14[0x2C - 0x14];
+    Ctx278Sub *unk2C; /* +0x2C */
+} Ctx278;
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C278);
 
