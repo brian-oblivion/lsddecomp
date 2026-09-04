@@ -301,6 +301,9 @@ void func_80036A54(s32 a0)
     func_800368E8((s16)a0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036A7C);
+void func_80036A7C(s32 a0, s32 a1)
+{
+    func_800368E8((s16)a0, (s16)a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036AA8);
