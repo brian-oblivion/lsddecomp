@@ -288,7 +288,11 @@ void func_80057130(BaseObjO *self, TagWordObjO *arg) {
     func_8001E57C()->slot14(self, arg);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800571A8);
+void func_800571A8(BaseObjO *self) {
+    self->unk4C = NULL;
+    self->unk50 = NULL;
+    func_8001E57C()->slot18(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800571E8);
 
