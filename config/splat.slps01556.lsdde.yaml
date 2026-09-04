@@ -325,8 +325,19 @@ segments:
       - [0x179d8, asm, code_179d8]
       # code_179d8_b: window [60..79], 0x194E0..0x1A1BC (20 functions).
       - [0x194E0, c, code_179d8_b]
-      # code_179d8_mid: functions 80..99 of the original monolith. UNCARVED.
+      # code_179d8_mid: functions 80..82 of the original monolith. UNCARVED
+      # remainder after the code_179d8_g carve below -- all three are
+      # addiu-$at blocked, so there is nothing to staff here.
       - [0x1A1BC, asm, code_179d8_mid]
+      # code_179d8_g: functions 83..99 of the original, 0x1AB78..0x1C440
+      # (17 functions).  Census 2026-09-04 with the three-grep screen run
+      # over each function's own text: 14/17 clean; the three blocked are
+      # func_8002AEE0, func_8002B640, func_8002B94C, all addiu-$at.  No
+      # trivial `jr $ra` leaves at all and several large bodies (196, 223,
+      # 186, 189 instructions), so this unit is smaller in count and larger
+      # in work than its 17 suggests.  Owns NO switch jump table (zero
+      # `jtbl_` references in the slice), so no rodata attach.
+      - [0x1AB78, c, code_179d8_g]
       # code_179d8_d: window [100..119], 0x1C440..0x1CC08 (20 functions),
       # carved mid-round 16 to re-staff a runner whose own unit was
       # exhausted. 17/20 clean on the three-grep screen -- the highest of
@@ -336,12 +347,35 @@ segments:
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
       - [0x1C440, c, code_179d8_d]
-      # code_179d8_mid_b: functions 120..199 of the original. UNCARVED.
-      - [0x1CC08, asm, code_179d8_mid_b]
+      # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
+      # (29 functions).  Census 2026-09-04, three-grep screen per function:
+      # 21/29 clean, the eight blocked all gp_rel (func_8002C448/C468/C4E0/
+      # C638/C6FC/C890/CC1C/CC28).  READ THE COUNT WITH CARE: ten of the 29
+      # are 2-instruction `jr $ra; nop` leaves splat generates itself, so
+      # the real queue is ~11 bodies.  Owns NO switch jump table (zero
+      # `jtbl_` references in the slice), so no rodata attach.
+      - [0x1CC08, c, code_179d8_e]
+      # code_179d8_mid_c: functions 149..199 of the original.  UNCARVED and
+      # not worth carving as it stands: 0x1D508.. is the addiu-$at dense
+      # heart of this monolith (of its 51 functions only ~12 are clean, and
+      # they are scattered rather than in a window).
+      - [0x1D508, asm, code_179d8_mid_c]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
       - [0x22948, c, code_179d8_c]
-      # code_179d8_tail: functions 220..273 of the original. UNCARVED.
+      # code_179d8_tail: functions 220..255 of the original.  UNCARVED
+      # remainder in front of the code_179d8_f carve below, and left that
+      # way deliberately: 0x23500..0x2673C is addiu-$at dense (26 of its 36
+      # functions blocked) and owns BOTH of this segment's switch jump
+      # tables, at func_80034690 and func_800357B0.  Carving it will need
+      # the rodata attach/split dance from Gate 2; the _f slice below does
+      # not, which is why the cut is here.
       - [0x23500, asm, code_179d8_tail]
+      # code_179d8_f: functions 256..273 of the original, 0x2673C..0x272C8
+      # (18 functions).  Census 2026-09-04, three-grep screen per function:
+      # 16/18 clean, the two blocked are func_80036230 and func_80036528,
+      # both addiu-$at (and both large -- 115 and 240 instructions).  No
+      # trivial leaves.  Owns NO switch jump table, so no rodata attach.
+      - [0x2673C, c, code_179d8_f]
       - [0x272c8, asm, psyq_SpuSetMute]
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
@@ -590,10 +624,31 @@ segments:
       # LAST four in ROM order, so the clean run is contiguous. Owns NO
       # switch jump table.
       - [0x44518, c, class_3bb8c_m]
-      # class_3bb8c_n: the remaining ~113 functions, 0x44F14.. -- UNCARVED.
-      # Holds D_8001176C / D_80011778 (the two strings left standalone in the
-      # 0x1EF4 slot split), referenced from func_80057FEC and func_80058084.
+      # class_3bb8c_n: functions 0..53 of the old 113-function remainder,
+      # 0x44F14..0x475F0.  UNCARVED and left that way deliberately: its
+      # front is the gp_rel-densest ground in the executable (of its first
+      # 20 functions exactly ONE is clean).  Its indices 20..53 are much
+      # better (~28 of 34 clean) and are the obvious next carve here.
       - [0x44F14, asm, class_3bb8c_n]
+      # class_3bb8c_o: functions 54..73 of that remainder, 0x475F0..0x47CC4
+      # (20 functions).  Census 2026-09-04, three-grep screen per function:
+      # 19/20 clean, the one blocked is func_80056F5C (gp_rel).  Owns NO
+      # switch jump table (zero `jtbl_` references in the slice), so no
+      # rodata attach.  EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS -- it
+      # is cut at ROM addresses, not at class boundaries; identify each
+      # with tools/classtable.py rather than assuming one class per unit.
+      - [0x475F0, c, class_3bb8c_o]
+      # class_3bb8c_p: functions 74..93 of that remainder, 0x47CC4..0x485BC
+      # (20 functions).  Census 2026-09-04: 20/20 clean on all three greps
+      # -- the cleanest window found anywhere this round.  Four are
+      # 2-instruction leaves.  Owns NO switch jump table, so no rodata
+      # attach.  Same multi-class caveat as _o above.
+      - [0x47CC4, c, class_3bb8c_p]
+      # class_3bb8c_q: functions 94..112 of that remainder, 0x485BC..
+      # UNCARVED.  Holds D_8001176C / D_80011778 (the two strings left
+      # standalone in the 0x1EF4 slot split), referenced from func_80057FEC
+      # and func_80058084 -- both of which live in THIS remainder.
+      - [0x485BC, asm, class_3bb8c_q]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
