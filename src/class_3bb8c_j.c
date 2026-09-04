@@ -172,7 +172,12 @@ fail:
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051AC8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051C74);
+void func_80051C74(Class86ED0 *self)
+{
+    self->unk34 = NULL;
+    self->unk38 = NULL;
+    self->unk50 = NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051C84);
 
