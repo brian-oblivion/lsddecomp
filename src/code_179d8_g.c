@@ -129,7 +129,31 @@ void func_8002A510(void)
     *D_8006D8D0 = 0x1325;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A5F8);
+s32 func_8002A5F8(void)
+{
+    u8 buf[4];
+
+    if (D_8006D8D4[0xDC] == 0 && D_8006D8D4[0xDD] == 0) {
+        D_8006D8D4[0xC0] = 0x3FFF;
+        D_8006D8D4[0xC1] = 0x3FFF;
+    }
+    D_8006D8D4[0xD8] = 0x3FFF;
+    D_8006D8D4[0xD9] = 0x3FFF;
+    D_8006D8D4[0xD5] = 0xC001;
+
+    buf[2] = 0x80;
+    buf[0] = 0x80;
+    buf[3] = 0;
+    buf[1] = 0;
+    *D_8006D8C0 = 2;
+    *D_8006D8C8 = buf[0];
+    *D_8006D8CC = buf[1];
+    *D_8006D8C0 = 3;
+    *D_8006D8C4 = buf[2];
+    *D_8006D8C8 = buf[3];
+    *D_8006D8CC = 0x20;
+    return 0;
+}
 
 void func_8002A6EC(void)
 {
