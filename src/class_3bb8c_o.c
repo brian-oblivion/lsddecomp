@@ -385,6 +385,13 @@ void func_800573CC(BaseObjO *self, s32 flag, Vec3O *v) {
     t->unk14->unk0 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057444);
+extern void func_8001E58C(BaseObjO *self, Vec3O *dst, s16 *src);
+
+void func_80057444(BaseObjO *self, s16 *arg1) {
+    Vec3O buf;
+
+    func_8001E58C(self, &buf, arg1);
+    self->methods->slotBC(self, &buf);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_8005748C);
