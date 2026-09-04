@@ -57,13 +57,27 @@ typedef struct Pair16_179D8H {
     s16 unk2;
 } Pair16_179D8H;
 
-typedef struct ObjA34_179D8H {
-    u8 pad0[0x0C];
+typedef struct ObjA34_179D8H ObjA34_179D8H;
+
+/* ObjA34_179D8H's own methods table -- only the one slot func_80028A84
+ * dispatches through is named. Total leading padding through +0xC is
+ * unchanged from before this slot was identified (0x4 + 0x8 = 0xC), so
+ * this is not a shifting edit -- confirmed by re-verifying func_80028A34
+ * and func_80028A50 (both already matched, both readers of this struct)
+ * after adding it. */
+typedef struct MethodsA34_179D8H {
+    u8 pad000[0x48];
+    void (*slot48)(ObjA34_179D8H *self);
+} MethodsA34_179D8H;
+
+struct ObjA34_179D8H {
+    MethodsA34_179D8H *methods;
+    u8 pad4[0x0C - 0x04];
     s32 unk0C;
     u8 pad10[0x18 - 0x10];
     Pair16_179D8H unk18;
     u32 unk1C;
-} ObjA34_179D8H;
+};
 
 /* func_8002B640's own stat-like output buffer (func_80028920's local
  * `sp+0x10`). Only the two fields func_80028920 itself copies out are
@@ -135,6 +149,11 @@ s32 func_80028A50(ObjA34_179D8H *self) {
 
 void func_80028A7C(void) {
 }
+
+extern void func_80028DF0(s32 arg0, Pair16_179D8H *buf, s32 arg2);
+extern s32 func_80028D68(s32 arg0, void *buf);
+extern s32 func_80029274(s32 arg0, void *arg1, s32 arg2);
+extern s32 func_80029254(s32 arg0, s32 arg1);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A84);
 
