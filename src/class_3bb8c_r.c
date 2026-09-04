@@ -409,7 +409,10 @@ fail:
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80056464);
+void *func_80056464(Obj876FC *self) {
+    func_80056718(self);
+    return func_80057C84()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_800564A4);
 
