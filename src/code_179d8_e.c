@@ -165,7 +165,9 @@ void func_8002CBEC(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CBF4);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC0C);
+TableDA34 *func_8002CC0C(void) {
+    return &D_8006DA34;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC1C);
 
