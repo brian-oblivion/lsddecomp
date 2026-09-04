@@ -32,31 +32,131 @@
  */
 #include "common.h"
 
+/*
+ * D_8006D940: a function-pointer table this unit's own `new_class_6d940`/
+ * `func_8002C18C` dispatch through. Named/typed as a plain local struct,
+ * NOT claimed to be a class-framework vtable -- per this unit's header
+ * comment (sibling-slice finding: no classtable.py hit anywhere near this
+ * region). Only the two slots this unit's own functions reach are typed;
+ * the rest stays opaque padding. Kept LOCAL to this file, not a shared
+ * header, per this round's rule for code_179d8 slices.
+ */
+typedef struct Table6D940 Table6D940;
+struct Table6D940 {
+    u8 pad000[0x008];
+    /* +0x008, new_class_6d940's own dispatch -- this IS func_8002C18C
+     * itself (same 2-arg (self, arg1) shape). */
+    void (*slot08)(void *self, s32 arg1);
+    u8 pad00C[0x06C - 0x00C];
+    /* +0x06C, func_8002C18C's own conditional dispatch. */
+    void (*slot6C)(void *self, s32 arg1);
+};
+extern Table6D940 D_8006D940;
+
+/* The 0x34-byte object new_class_6d940 allocates. Only the fields
+ * func_8002C18C itself touches are named. */
+typedef struct Obj6D940 Obj6D940;
+struct Obj6D940 {
+    Table6D940 *methods; /* +0x000, func_8002C18C */
+    u8 pad004[0x02C - 0x004];
+    s32 unk2C;            /* +0x02C, func_8002C18C: zeroed */
+    s32 unk30;             /* +0x030, func_8002C18C: zeroed */
+};
+
+/*
+ * A second, DIFFERENT function-pointer table, reached only via the
+ * uncarved accessor `func_80026CAC()` (not this unit's function to
+ * define). Only the three slots this unit's functions dispatch through
+ * are typed.
+ */
+typedef struct BaseTable6D940 BaseTable6D940;
+struct BaseTable6D940 {
+    u8 pad000[0x008];
+    void (*slot08)(void *self); /* +0x008, func_8002C18C's own base-chain call */
+    /* +0x00C, func_8002C200's own dispatch -- that function's whole body
+     * is this one call with nothing after it, so its own return type is
+     * genuinely ambiguous (a void wrapper around an s32 tail call is
+     * byte-identical); typed s32 here per CLAUDE.md's rule to default to
+     * `return callee(...)` absent positive void evidence. */
+    s32 (*slot0C)(void *self);
+    u8 pad010[0x064 - 0x010];
+    /* +0x064, func_8002C238's own dispatch -- same tail-call ambiguity as
+     * slot0C above. */
+    s32 (*slot64)(void *self);
+};
+extern BaseTable6D940 *func_80026CAC(void);
+
+/* Pool allocator, already established elsewhere (e.g.
+ * include/class_16334.h, include/code_8220.h) -- declared LOCAL here since
+ * this unit does not include either header. */
+extern void *func_80017B34(s32 size);
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BC40);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BFA8);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C014);
+void func_8002C014(char *dest, char *src, s32 count)
+{
+    s32 i;
+
+    for (i = count - 1; i != -1; i--) {
+        *dest++ = *src++;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C048);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C0AC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", new_class_6d940);
+void *new_class_6d940(s32 arg1)
+{
+    void *self;
+    Table6D940 *table;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C18C);
+    self = func_80017B34(0x34);
+    if (self != NULL) {
+        table = func_8002C3A8();
+        table->slot08(self, arg1);
+        return self;
+    }
+    return NULL;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C200);
+void func_8002C18C(Obj6D940 *self, s32 arg1)
+{
+    func_80026CAC()->slot08(self);
+    self->methods = func_8002C3A8();
+    self->unk2C = 0;
+    self->unk30 = 0;
+    if (arg1 != 0) {
+        self->methods->slot6C(self, arg1);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C238);
+s32 func_8002C200(void *self)
+{
+    return func_80026CAC()->slot0C(self);
+}
+
+s32 func_8002C238(s32 *self)
+{
+    self[0xC] = 1;
+    return func_80026CAC()->slot64(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C278);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3A8);
+Table6D940 *func_8002C3A8(void)
+{
+    return &D_8006D940;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3B8);
+s32 func_8002C3B8(void)
+{
+    return 0;
+}
 
 void func_8002C3C0(void) {
 }
@@ -64,9 +164,15 @@ void func_8002C3C0(void) {
 void func_8002C3C8(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3D0);
+void func_8002C3D0(void)
+{
+    char buf[0x40];
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3E0);
+void func_8002C3E0(void)
+{
+    char buf[0x40];
+}
 
 void func_8002C3F0(void) {
 }
