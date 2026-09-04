@@ -86,7 +86,19 @@ void func_800540E8(ObjM *self, s32 arg1, s32 arg2) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054120);
+s32 func_80054120(ObjM *self) {
+    s32 out;
+    s32 result;
+    ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
+    void *thing = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    result = func_8005C7D4(child->unk4->unk34, &out, thing);
+    child->unk14 = result;
+    if (result != 0) {
+        return 0;
+    }
+    child->unk4->methods->slot84(child->unk4);
+    return 1;
+}
 
 void func_800541CC(void) {
 }
