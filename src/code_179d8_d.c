@@ -126,7 +126,45 @@ void func_8002C014(char *dest, char *src, s32 count)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C048);
+s32 func_8002C048(char *s1, char *s2)
+{
+    char c1;
+    char c2;
+    s32 eq;
+
+    if (s1 == NULL) {
+        goto check_eq;
+    }
+    if (s2 != NULL) {
+        goto loop_start;
+    }
+check_eq:
+    if (s1 != s2) {
+        goto not_equal;
+    }
+return_zero:
+    return 0;
+not_equal:
+    if (s1 == NULL) {
+        return -1;
+    }
+    return 1;
+
+loop_check:
+    if (c1 == 0) {
+        goto return_zero;
+    }
+    s1++;
+loop_start:
+    c1 = *s1;
+    c2 = *s2;
+    eq = c1 == c2;
+    s2++;
+    if (eq) {
+        goto loop_check;
+    }
+    return *s1 - *(s2 - 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C0AC);
 
