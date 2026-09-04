@@ -65,6 +65,7 @@ typedef struct TableDA34 {
     u8 pad00C[0x078 - 0x00C];
     s32 (*slot78)(ObjDA34 *self, s32 arg1); /* func_8002C824 */
     s32 (*slot7C)(ObjDA34 *self);           /* func_8002C890, BLOCKED (gp_rel) */
+    u8 pad080[0x084 - 0x080];
     s32 (*slot84)(ObjDA34 *self, s32 arg1); /* func_8002CB18, arg1 is s16-truncated by the callee */
     u8 pad088[0x09C - 0x088];
 } TableDA34;
@@ -273,4 +274,16 @@ s32 func_8002CC34(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC84);
+void func_8002CC84(ObjDA34 *self, ObjCC34 *obj) {
+    s32 i;
+    Slot179D8ECC34 *slot;
+
+    slot = obj->arr;
+    for (i = 0; i < 3; i++) {
+        if (slot->unk0 >= 0) {
+            slot->unk0 = self->methods->slot84(self, slot->unk0);
+        }
+        slot++;
+    }
+    obj->unk0 = 0;
+}
