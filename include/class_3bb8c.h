@@ -1881,4 +1881,13 @@ struct ObjM {
     s32 unk84;                 /* +0x084, func_800541D4/func_80054200/func_80054208/func_8005426C */
 };
 
+/* func_800544D4: a plain class-vtable getter (`lui`/`addiu`, no
+ * `lw`/`sw`), returns `&D_80087034` verbatim. Confirmed a BasicClass-
+ * derived vtable with `tools/classtable.py 0x80087034` (header word then
+ * `BasicClass__func_17eb0` at +4, the class-framework fingerprint) --
+ * nothing in this unit dereferences it, so it stays untyped beyond the
+ * address itself, same convention as `D_80086904` above. */
+extern s32 D_80087034;
+extern void *func_800544D4(void);
+
 #endif
