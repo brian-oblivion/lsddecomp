@@ -221,7 +221,13 @@ void func_80051DA0(Class86ED0 *self, void *arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051E20);
+void func_80051E20(Class86ED0 *self)
+{
+    self->unk34 = NULL;
+    self->unk38 = NULL;
+    self->unk50 = NULL;
+    func_80018390()->removeAllChildren(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051E64);
 
