@@ -16,11 +16,17 @@
  * Header edits must be strictly ADDITIVE.
  */
 #include "common.h"
+#include "class_3bb8c.h"
 
 void func_80052DE0(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80052DE8);
+void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
+    arg1->unkC->methods->slotC8(arg1->unkC, func_80052E7C, self);
+    self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
+    func_8004A4B8()->slot44(self, arg1, 1);
+    self->methods->slot10(self, arg2);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80052E7C);
 
