@@ -60,6 +60,10 @@ typedef struct D_8006E730Methods {
     /* +0x05C, called by this unit's own func_800580E0 as (self, arg1,
      * arg2). */
     void (*slot5C)(D_80087AACObj *self, void *arg1, void *arg2);
+    u8 pad60[0xDC - 0x60];
+    /* +0x0DC, called by this unit's own func_80058308 as (self) -- the
+     * base-class dtor step. */
+    void (*slotDC)(D_80087AACObj *self);
 } D_8006E730Methods;
 extern D_8006E730Methods *func_8003DFBC(void);
 
@@ -119,7 +123,11 @@ extern D_80087AACMethods *func_80058764(void);
  * typed. */
 typedef struct D_80087AACEntry D_80087AACEntry;
 typedef struct D_80087AACEntryMethods {
-    u8 pad00[0x60];
+    u8 pad00[0x4];
+    /* +0x004, called by this unit's own func_80058308 as (self) -- a
+     * per-entry destructor, in a 100-iteration loop over unk_0xA8. */
+    void (*slot4)(D_80087AACEntry *self);
+    u8 pad08[0x60 - 0x8];
     /* +0x060, called by this unit's own func_800580E0 as (self, flag). */
     void (*slot60)(D_80087AACEntry *self, s32 arg1);
     u8 pad64[0xB8 - 0x64];
@@ -251,7 +259,17 @@ void func_800581C4(D_80087AACObj *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058228);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058308);
+extern void func_80017CFC(void *arg);
+
+void func_80058308(D_80087AACObj *self) {
+    s32 i;
+
+    func_80017CFC(self->unk_0x240);
+    for (i = 0; i < 100; i++) {
+        self->unk_0xA8[i]->methods->slot4(self->unk_0xA8[i]);
+    }
+    func_8003DFBC()->slotDC(self);
+}
 
 s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
     s32 result;
