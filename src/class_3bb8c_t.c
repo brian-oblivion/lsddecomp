@@ -36,6 +36,8 @@
 typedef struct D_800879C4Table D_800879C4Table;
 extern D_800879C4Table D_800879C4;
 
+extern void *func_80017B34(s32 size);
+
 void func_80057F38(void) {
 }
 
@@ -52,7 +54,28 @@ D_800879C4Table *func_80057F58(void) {
     return &D_800879C4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80057F68);
+/* The class allocated below, table D_80087AAC (73 slots, resolved via
+ * tools/classtable.py). This unit owns the whole class -- ctor, dtor and
+ * every slot referenced from within it are all in this file. Only the
+ * fields/slots each function actually touches are typed; the rest stay
+ * opaque so the struct keeps the right size without requiring every
+ * method to be named up front. */
+typedef struct D_80087AACObj D_80087AACObj;
+typedef struct D_80087AACMethods {
+    u8 pad00[0x8];
+    /* +0x008, this unit's own ctor (func_80057FC8). */
+    D_80087AACObj *(*ctor)(D_80087AACObj *self, void *arg1);
+} D_80087AACMethods;
+extern D_80087AACMethods *func_80058764(void);
+
+void *func_80057F68(void *arg1) {
+    void *obj = func_80017B34(0x244);
+    if (obj != NULL) {
+        func_80058764()->ctor(obj, arg1);
+        return obj;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80057FC8);
 
