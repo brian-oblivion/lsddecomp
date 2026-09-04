@@ -2203,6 +2203,18 @@ typedef struct ChildMethods86ED0 ChildMethods86ED0;
 struct ChildMethods86ED0 {
     u8 pad000[0x004];
     void *(*release)(ChildObj86ED0 *self); /* +0x004, func_80051174 */
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, func_80050F98 (three call sites, always through self->unk40/
+     * unk44/unk48). Same offset/arity as the unrelated FieldM7CMethods::
+     * slot4C above -- not unified with it, per this project's established
+     * multiple-independent-local-views convention (this unit's own reading
+     * from its own call sites). arg1 is func_80050F98's own forwarded
+     * parameter; arg2 is a small opaque data blob passed only by address. */
+    void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
+    u8 pad050[0x078 - 0x050];
+    void (*slot78)(ChildObj86ED0 *self); /* +0x078, func_80050F98, on the short-lived handle before func_80041C9C/func_800408CC consume it */
+    u8 pad07C[0x0B8 - 0x07C];
+    void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, func_80050F98, self->unk44 only */
 };
 struct ChildObj86ED0 {
     ChildMethods86ED0 *methods; /* +0x000 */
