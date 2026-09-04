@@ -171,19 +171,44 @@ void func_800363FC(void)
     D_8008E84C = 2;
 }
 
-/* A 172 (0xAC)-byte record; only the fields this function touches are
- * named. D_800902E8 is an array of pointers to arrays of these, indexed
+/* A 172 (0xAC)-byte record; only the fields functions in this unit touch
+ * are named. D_800902E8 is an array of pointers to arrays of these, indexed
  * [screen/player][slot]-style by two signed 16-bit indices. */
 typedef struct {
     u8 pad0[0x4];
     s32 unk4;
     s32 unk8;
-    u8 pad0C[0x2B - 0xC];
+    s32 unkC;
+    u8 unk10;
+    u8 unk11;
+    u8 unk12;
+    u8 unk13;
+    u8 unk14;
+    u8 unk15;
+    u8 unk16;
+    u8 unk17[0x10];
+    u8 unk27;
+    u8 unk28;
+    u8 unk29;
+    u8 unk2A;
     u8 unk2B;
-    u8 pad2C[0x46 - 0x2C];
+    u8 unk2C[0x10];
+    u8 pad3C[0x46 - 0x3C];
     s16 unk46;
     s16 unk48;
-    u8 pad4A[0x90 - 0x4A];
+    u8 pad4A[0x4E - 0x4A];
+    s16 unk4E[0x10];
+    u8 pad6E[0x70 - 0x6E];
+    s16 unk70;
+    s16 unk72;
+    u8 pad74[0x78 - 0x74];
+    s16 unk78;
+    s16 unk7A;
+    s32 unk7C;
+    s32 unk80;
+    s32 unk84;
+    s32 unk88;
+    s32 unk8C;
     s32 unk90;
     u8 pad94[0xAC - 0x94];
 } Entry90902E8;
@@ -213,7 +238,63 @@ void func_80036518(void)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036528);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_800368E8);
+extern s32 func_8003069C(s32 a0);
+
+void func_800368E8(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+    Entry90902E8 *s0 = &D_800902E8[sa0][sa1];
+    s32 v7c, v84, v8, vC;
+    s16 v72;
+    s32 i;
+
+    s0->unk90 &= ~1;
+    D_800902E8[sa0][sa1].unk90 &= ~2;
+    D_800902E8[sa0][sa1].unk90 &= ~8;
+    D_800902E8[sa0][sa1].unk90 |= 4;
+    func_8003069C((sa1 << 8) | sa0);
+
+    v7c = s0->unk7C;
+    v84 = s0->unk84;
+    v72 = s0->unk72;
+    v8 = s0->unk8;
+    /* Retail reloads +0x8 a second time here rather than reusing v8's
+     * value; a plain re-read gets CSE'd back into one load. A volatile
+     * read of the same address forces the second `lw` without acting as
+     * a general scheduling fence. */
+    vC = *(volatile s32 *)&s0->unk8;
+
+    s0->unk2B = 0;
+    s0->unk80 = 0;
+    s0->unk27 = 0;
+    s0->unk13 = 0;
+    s0->unk14 = 0;
+    s0->unk29 = 0;
+    s0->unk15 = 0;
+    s0->unk16 = 0;
+    s0->unk2A = 0;
+    s0->unk12 = 0;
+    s0->unk48 = 0;
+    s0->unk27 = 0;
+    s0->unk28 = 0;
+    s0->unk10 = 0;
+    s0->unk11 = 0;
+    s0->unk88 = v7c;
+    s0->unk8C = v84;
+    s0->unk70 = v72;
+    s0->unk4 = v8;
+    s0->unkC = vC;
+
+    for (i = 0; i < 16; i++) {
+        s0->unk2C[i] = i;
+        s0->unk17[i] = 0x40;
+        s0->unk4E[i] = 0x7F;
+    }
+
+    s0->unk78 = 0x7F;
+    s0->unk7A = 0x7F;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036A54);
 
