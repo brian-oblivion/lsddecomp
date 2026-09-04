@@ -1,5 +1,56 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **UPDATE, round 17, targeted permuter pass.** Still a STALL. Re-verified
+> the preserved 90/105 body against the current build first (per
+> CLAUDE.md's struct-edit/header-merge discipline after a `git merge main`)
+> -- confirmed unchanged: `funcdiff.py func_8004BB3C` reports 90/105 words,
+> `build exit=2` (not byte-exact, correctly left as `INCLUDE_ASM`).
+>
+> **A permuter run was attempted and turned out to be measuring a DIFFERENT
+> problem than the real build, which is worth recording as its own
+> finding.** `tools/setup-permuter.sh`'s own scaffold, `--debug`'d before
+> searching (per its own printed instructions), reported **base score 460**
+> with 2 insertions and 2 deletions -- but the REAL build's residue, per
+> `funcdiff.py` and `asm-differ`, has NO insertions or deletions at all
+> (105/105 words present, only 15 differ, all register-identity/scheduling).
+> Comparing the scaffold's own rendered diff against the real build's
+> `asm-differ` output showed WHY: in the isolated single-function
+> compilation, the `sp = (SetupSub866E8 *)((u8 *)arr1 + 4)` computation
+> gets scheduled EARLY (an `addiu $s4,$s3,4` right in the parameter-save
+> preamble), where the REAL in-context build defers it PAST the
+> `blez`-guarded early-exit (`addiu $s3,a1,4`, computed from the raw
+> parameter register, right before the loop body) -- exactly matching
+> retail's OWN placement for that instruction. **The scaffold is not
+> reproducing the surrounding register-pressure/scheduling context that
+> makes retail's placement reachable at all**, so search results against it
+> do not transfer. This is precisely the trap `tools/setup-permuter.sh`'s
+> own header warns about ("A scaffold that scores something other than the
+> reported residue is scoring a different function than you think").
+>
+> Ran anyway, bounded (`timeout 300`, `-j 6 --stop-on-zero --best-only`),
+> as a low-cost check in case it stumbled onto a transferable lever despite
+> the mismatch. It did not: best score reached was **310** (never
+> approached 0), and the run eventually hit an internal scoring crash
+> (`KeyError: 'func_8004BCE0'`, from the same missing-prototype situation
+> that produces an ordinary, harmless `implicit declaration` warning in the
+> real build) partway through, around iteration 40900. **No exit code was
+> captured** -- the trailing `echo "permuter exit=$?"` after the `timeout`
+> invocation never ran, meaning the wrapping shell itself was torn down
+> before reaching it (not a `137` vs `124` distinction either, just no
+> signal at all reached the log) -- worth knowing for whoever next tries to
+> rely on that pattern for THIS kind of background permuter invocation.
+>
+> **Verdict: permuter-inconclusive, not permuter-exhausted.** The search
+> ran against a scaffold that was provably scoring a different residue than
+> the real build's, so a negative result here says nothing about whether
+> the actual register-identity swap is permuter-reachable. If this function
+> is revisited, the scaffold itself needs fixing first -- likely by
+> including enough of the REAL surrounding context (more of
+> `src/class_3bb8c.c`, or matching whatever produces the early-vs-late
+> `addiu` scheduling difference) before trusting a base-score sanity check,
+> per the setup script's own advice, rather than re-running the search
+> as-is.
+>
 > **HEAD UPDATE, round 13 (2026-09-03).** Attempt 6 below -- left explicitly
 > unfinished ("the most promising untried direction") -- was finished, and it
 > WORKED. The missing `addiu $s4,$s4,0xc` is recovered, the function's total
