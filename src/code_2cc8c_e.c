@@ -142,7 +142,16 @@ void func_8003FD4C(s32 a0, s32 a1) {
     func_80024BA8(0x1400000);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FDB0);
+Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
+    Class6E99CObj *self;
+
+    self = func_80017B34(0xA0);
+    if (self != NULL) {
+        func_800404C0()->ctor(self, a1, a2, a3);
+        return self;
+    }
+    return NULL;
+}
 
 void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
