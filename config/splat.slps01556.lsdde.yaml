@@ -138,7 +138,18 @@ segments:
       # so it must stay in a standalone object.
       - [0x1E28, .rodata, class_3bb8c_i]   # jtbl_80011628
       - [0x1EA4, rodata]                   # D_800116A4 / D_800116E4 -> not ours
-      - [0x1EF4, rodata]
+      # Slot 0x1EF4 has THREE owners, so it splits twice (the shared-slot case
+      # from PARALLEL-RUNS Gate 2). Ownership, one grep per symbol:
+      #   jtbl_800116F4 -> func_800522DC, class_3bb8c_k  (must be ATTACHED:
+      #     its words are .L labels local to that function's own .s)
+      #   jtbl_8001174C -> func_80053984, class_3bb8c_l  (same, ATTACHED)
+      #   D_8001176C / D_80011778 -> referenced ONLY from func_80057FEC and
+      #     func_80058084, both still in the uncarved class_3bb8c_m
+      #     remainder, so they must stay in a STANDALONE object -- attaching
+      #     them to _l would strand them (nowhere to migrate to).
+      - [0x1EF4, .rodata, class_3bb8c_k]   # jtbl_800116F4
+      - [0x1F4C, .rodata, class_3bb8c_l]   # jtbl_8001174C
+      - [0x1F6C, rodata]                   # two strings -> remainder, NOT ours
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
       # unit. Its words are pointers to `.L8005....` labels INSIDE DreamSys's
       # functions -- labels that are local to each function's .s file -- so a
@@ -470,8 +481,46 @@ segments:
       # none wanting 7+ callee-saved registers (the corrected threshold; the
       # one function at 5 is ordinary work, see DECOMPILATION_LEARNINGS).
       - [0x413A8, c, class_3bb8c_i]
-      # class_3bb8c_j: the remaining ~193 functions, 0x41F84.. -- UNCARVED.
-      - [0x41F84, asm, class_3bb8c_j]
+      # class_3bb8c_j: first 20-function slice of the 193-function remainder,
+      # 0x41F84..0x429D4. Carved round 15. Boundary checked on both sides:
+      # func_8005217C closes `jr $ra; nop` + endlabel and func_800521D4 opens
+      # with its own `addiu $sp, $sp, -0x20`. Corpus census over the whole
+      # 193-function block: zero functions with more than one prologue, zero
+      # `jr $t2` trampolines, zero `alabel`s.
+      # Blocker profile: 2 of 20 -- func_800518F4 and func_80051998, both
+      # gp_rel. 18 clean. Owns NO switch jump table, so no rodata attach.
+      - [0x41F84, c, class_3bb8c_j]
+      # class_3bb8c_k: second 20-function slice, 0x429D4..0x435E0. Carved
+      # round 15. Boundary checked on both sides: func_80052D10 closes
+      # `jr $ra; nop` + endlabel and func_80052DE0 is a frameless
+      # `jr $ra; nop` stub with its own glabel.
+      # Blocker profile: 2 of 20 -- func_800522DC (addiu-$at, and it OWNS
+      # jtbl_800116F4, so the rodata slot at 0x1EF4 is attached here) and
+      # func_80052644 (gp_rel). 18 clean.
+      - [0x429D4, c, class_3bb8c_k]
+      # class_3bb8c_l: third 20-function slice, 0x435E0..0x44518. Carved
+      # round 15. Boundary checked on both sides: func_80053C94 closes
+      # `jr $ra; nop` + endlabel and func_80053D18 opens with its own
+      # `addiu $sp, $sp, -0x28`.
+      # Blocker profile: 3 of 20 -- func_80052F10 (addiu-$at),
+      # func_800534C8 (gp_rel) and func_80053984 (addiu-$at, and it OWNS
+      # jtbl_8001174C, so the rodata slot at 0x1F4C is attached here).
+      # 17 clean.
+      - [0x435E0, c, class_3bb8c_l]
+      # class_3bb8c_m: fourth 20-function slice, 0x44518..0x44F14. Carved
+      # round 15. Boundary checked on both sides: func_80054660 closes
+      # `jr $ra; nop` + endlabel and func_80054714 opens with its own
+      # `addiu $sp, $sp, -0x18` (its first instruction does not touch $sp).
+      # Blocker profile: 4 of 20 -- func_800544E4 (gp_rel), func_80054558
+      # (BOTH gp_rel and addiu-$at), func_800545FC (addiu-$at) and
+      # func_80054660 (gp_rel). 16 clean, and the four blocked ones are the
+      # LAST four in ROM order, so the clean run is contiguous. Owns NO
+      # switch jump table.
+      - [0x44518, c, class_3bb8c_m]
+      # class_3bb8c_n: the remaining ~113 functions, 0x44F14.. -- UNCARVED.
+      # Holds D_8001176C / D_80011778 (the two strings left standalone in the
+      # 0x1EF4 slot split), referenced from func_80057FEC and func_80058084.
+      - [0x44F14, asm, class_3bb8c_n]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
