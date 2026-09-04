@@ -27,8 +27,27 @@
  * the check for your own functions rather than inheriting either verdict.
  */
 #include "common.h"
+/* code_171e0.h's UnkFlagsObj_171e0/UnkFlagsObjMethods_171e0 already
+ * describe D_8006D430's class exactly -- func_80028898 dispatches
+ * func_80026C9C()->ctor(self) (offset +0x008), matching that header's own
+ * ctor slot. Reused UNCHANGED per CLAUDE.md's header discipline (a sibling
+ * would use it unchanged), not redefined locally. */
+#include "code_171e0.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028898);
+/* func_80027E68 is still uncarved (asm/code_179d8.s) -- returns &D_8006D4E8,
+ * a DIFFERENT class table (tools/classtable.py --scan: 29 slots, header
+ * 0x13) than D_8006D430. func_80028898 chains UnkFlagsObj_171e0's base ctor
+ * then overwrites self->methods with this class's own table -- the
+ * standard "call base ctor, then install the derived vtable" idiom. Typed
+ * against UnkFlagsObjMethods_171e0 for the assignment's sake; the two
+ * tables are different classes but share the base's slot layout. */
+extern UnkFlagsObjMethods_171e0 *func_80027E68(void);
+
+void func_80028898(UnkFlagsObj_171e0 *self) {
+    ((UnkFlagsObjMethods_171e0 *)func_80026C9C())->ctor(self);
+    self->methods = func_80027E68();
+    self->unk0C = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_800288E0);
 
