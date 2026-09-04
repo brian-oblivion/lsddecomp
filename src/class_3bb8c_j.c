@@ -10,10 +10,48 @@
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
+ *
+ * TWO classes share this unit's address range, discovered this round:
+ *  - The first four functions (func_80051784/func_800517EC/func_80051814/
+ *    func_80051858), plus the two gp_rel-blocked siblings, are Obj866E8
+ *    methods (the SAME class already established across class_3bb8c_b/c/
+ *    etc.) -- they touch offsets 0x10/0x14/0x18/0x1C/0x20/0x48, all
+ *    previously-unnamed padding, and dispatch through the SAME
+ *    Obj866E8Methods table (slotA4/slotA8, also newly named). See
+ *    include/class_3bb8c.h's Obj866E8/Obj866E8Methods for the additive
+ *    edits.
+ *  - Everything from func_80051A4C on is a SEPARATE, much smaller sibling
+ *    class (alloc size 0x54, vtable D_80086ED0 -- see func_80051A4C, a
+ *    plain address-of getter, and func_80051A5C, its New_X allocator).
+ *    Named `Class86ED0` here, LOCAL to this unit (not added to the shared
+ *    header -- nothing else references it yet, and its own base-class
+ *    getter `func_80018390()` already has an INCOMPATIBLE local view
+ *    established by class_3bb8c_f inside class_3bb8c.h itself
+ *    (`BasicMethods866E8F`), so redeclaring it with a different return
+ *    type in a shared header would conflict. This unit's own view is
+ *    `BaseMethods3bb8cJ`, following the same per-unit-local-view
+ *    precedent as class_3bb8c_e.c's `BaseMethods3bb8cE`.). The real
+ *    class is BasicClass (include/code_8220.h) -- slots 0x0C/0x10/0x14/
+ *    0x18 line up exactly with BasicClassMethods' finalize/addChild/
+ *    removeChild/removeAllChildren.
  */
 #include "common.h"
+#include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051784);
+void func_80051784(Obj866E8 *self)
+{
+    s32 count;
+
+    if (self->unk48) {
+        count = self->unk1C - 1;
+        self->unk1C = count;
+        if (count > 0) {
+            self->methods->slotA8(self, self->unk18, count, 1);
+        } else {
+            self->unk1C = self->unk14;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_800517EC);
 

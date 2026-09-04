@@ -254,7 +254,19 @@ typedef struct Obj866E8Methods {
     /* Called by func_8004BD14 with a literal 7, one of the object's own
      * Elem array slots, and the loop index. */
     void (*slot88)(Obj866E8 *self, s32 arg1, Elem *entry, s32 arg3); /* +0x088 */
-    u8 pad08C[0xC0 - 0x8C];
+    u8 pad08C[0xA4 - 0x8C];
+    /* = the "flush all" finalizer, class_3bb8c_j round 15: called once by
+     * func_80051858 right after its countdown-flush loop, with (self,
+     * self->unk18, literal 1). Return unused. */
+    void (*slotA4)(Obj866E8 *self, s32 arg1, s32 arg2);   /* +0x0A4, func_80051858 */
+    /* = the countdown/flush callback, class_3bb8c_j round 15: called by
+     * func_80051784 (self, self->unk18, decremented countdown, literal 1),
+     * func_80051814 (self, self->unk18, literal 0, literal 1) and
+     * func_80051858's own loop (self, loop index, self->unk1C, literal 0).
+     * Argument MEANING differs per call site (index vs. self->unk18) but
+     * all three pass exactly 3 args beyond self; return unused. */
+    void (*slotA8)(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0A8, func_80051784/func_80051814/func_80051858 */
+    u8 pad0AC[0xC0 - 0xAC];
     /* Called by func_8004B57C right before it zeroes self->unk70. */
     void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
     u8 pad0C4[0xF8 - 0xC4];
@@ -607,7 +619,28 @@ struct Obj866E8 {
     Obj866E8Methods *methods;      /* +0x000 */
     u8 pad04[0x0C - 0x04];
     s32 unkC;                      /* +0x00C, func_8004D678 (compared against 9999999) */
-    u8 pad10[0x54 - 0x10];
+    /*
+     * +0x010..+0x048: a "countdown/flush" subsystem, established by
+     * class_3bb8c_j (round 15) from four functions (func_80051784,
+     * func_800517EC, func_80051814, func_80051858) plus two gp_rel-blocked
+     * siblings in the same unit (func_800518F4, func_80051998, both confirmed
+     * to touch the SAME unk48/unk18/unk1C fields -- see those functions'
+     * stub reports). unk10 is a trip count read once per "flush all" call
+     * (func_80051858); unk14 is the countdown's own reset value; unk18 is
+     * forwarded as methods->slotA8/slotA4's own arg1; unk1C is the live
+     * countdown, decremented per call and reset from unk14 on expiry; unk20
+     * is an unrelated boolean toggled independently by func_800517EC; unk48
+     * is a readiness/enable gate every function in the group tests non-zero
+     * before doing anything, never itself dereferenced in this unit.
+     */
+    s32 unk10;                     /* +0x010, func_80051858 */
+    s32 unk14;                     /* +0x014, func_80051784 */
+    s32 unk18;                     /* +0x018, func_80051784/func_80051814/func_80051858 */
+    s32 unk1C;                     /* +0x01C, func_80051784/func_80051814/func_80051858 */
+    s32 unk20;                     /* +0x020, func_800517EC (xor-toggled) */
+    u8 pad24[0x48 - 0x24];
+    s32 unk48;                     /* +0x048, func_80051784/func_800517EC/func_80051814/func_80051858 */
+    u8 pad4C[0x54 - 0x4C];
     Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
     u8 pad60[0x68 - 0x60];
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
