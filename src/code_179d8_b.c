@@ -32,6 +32,7 @@
  * object fields. Nothing here is a class method table; extern prototypes
  * below are this unit's own reading of that driver's entry points. */
 
+extern s32 D_8006D5FC;
 extern s32 D_8006D608;
 
 /* Still INCLUDE_ASM in asm/code_179d8_mid.s -- not this unit's to carve. */
@@ -59,7 +60,12 @@ s32 func_80028D88(s32 arg0, s32 arg1)
     return func_80029C40(arg0, arg1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DA8);
+s32 func_80028DA8(s32 arg0)
+{
+    s32 old = D_8006D5FC;
+    D_8006D5FC = arg0;
+    return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028DC0);
 
