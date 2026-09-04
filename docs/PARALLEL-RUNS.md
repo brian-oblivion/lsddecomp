@@ -147,6 +147,54 @@ a lost one. Check them by hand, every time.
      the whole-image SHA1. A shared-declaration merge that compiles is not the
      same as one that preserves codegen.
 
+   **A cross-unit PROTOTYPE in a unit-local type must never go in a shared
+   header — and this one can stay latent across several merges before it
+   breaks a DIFFERENT runner's unit.** Round 15 hit it three times in one
+   round, which is why it has its own rule now. The pattern: runner A writes
+   `extern <A's local type> *func_XXXX(void);` into `include/<shared>.h`,
+   because A calls that function. It is fine until some translation unit sees
+   a second, incompatible declaration of the same name:
+
+   - **against another runner's DEFINITION.** alpha declared
+     `extern Obj86ED0Methods *func_80051A4C(void);` in the shared header;
+     bravo DEFINES `func_80051A4C` returning its own `Class86ED0Methods *`.
+     That is `conflicting types for 'func_80051A4C'` — a hard compile error,
+     not a warning, and it is what the merge actually died on.
+   - **against a PRE-EXISTING canonical declaration in another header, which
+     is the nasty one.** delta put
+     `extern BaseMethods87034_3bb8c_l *func_8004A4B8(void);` in
+     `class_3bb8c.h`, colliding with the project's long-standing
+     `extern Class86668Methods *func_8004A4B8(void);` in `class_39e08.h`.
+     **Nothing showed up when delta's own work was verified, and nothing
+     could have** — `src/class_3bb8c_l.c` includes only `class_3bb8c.h`. It
+     surfaced two merges later in `class_3bb8c_k`, the first unit to include
+     both headers. So the runner who wrote it sees a green build, and the
+     runner who breaks is one who never touched the declaration.
+
+   The fix is always the same and always cheap: **move the declaration into
+   the calling unit's own `.c`.** Same for an `extern <local type> D_XXXX;`
+   for a data symbol another unit declares differently. A unit-local view
+   belongs in the unit — which is exactly what round 15's bravo did
+   deliberately with `Class86ED0`, writing "LOCAL to this unit (not added to
+   the shared header)" in its own source. That instinct was right and it is
+   the one to copy.
+
+   Head's part, at merge time: after resolving any shared-header conflict,
+   **grep the whole tree for every symbol the resolution declares** before
+   trusting a green build, because the unit that breaks may not be in this
+   merge:
+
+   ```sh
+   grep -rn '<symbol>' src/ include/ | grep -v '<the unit you just merged>'
+   ```
+
+   And a staffing lesson: this round put all five runners on adjacent slices
+   of ONE class block, so all five edited one header and four of the five
+   merges conflicted. The conflicts were all complementary and none cost
+   much, but **if you can spread runners across unrelated blocks, header
+   contention drops to zero.** Concentrating them is a real (and sometimes
+   worthwhile) trade, not a free one — make it deliberately.
+
 2. **A preserved body must be INLINED in the match report, as literal source,
    with every declaration it needs, positioned where it would compile.** Both
    halves matter. A body inlined perfectly whose types and globals live only in
@@ -276,8 +324,23 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 
      ```sh
      git log --oneline main..runner/<name>
-     git show runner/<name>:src/<unit>.c | grep -c INCLUDE_ASM
+     git show runner/<name>:src/<unit>.c | grep -c '^INCLUDE_ASM'
      ```
+
+     **Anchor that second grep — `^INCLUDE_ASM`, not bare `INCLUDE_ASM`.**
+     It was unanchored here for fifteen rounds and round 15's head hit the
+     consequence immediately: bravo's unit read as 9 remaining against a
+     reported 8, and the extra hit was the literal string `INCLUDE_ASM`
+     inside one of bravo's own explanatory comments. Runners write good
+     comments, and good comments about a unit's remaining work mention
+     `INCLUDE_ASM` by name.
+
+     The failure mode is worth naming because it inverts this section's
+     whole point. This grep exists so the head does not trust a runner's
+     self-reported count — so when it disagrees with the summary, the
+     reflex is "the runner miscounted". An over-count here manufactures a
+     phantom remaining function and impugns an accurate summary, which is
+     the opposite of the error the check was added to catch.
 
      This is cheap and it matters beyond bookkeeping: an over-counted "matched"
      figure inflates the round's headline, and an under-counted "remaining"
@@ -632,6 +695,26 @@ denominator, and left for last. Matching them proves nothing about this game.
      attempt budget.
 3. Split the segment in the splat yaml, `make extract`, create the new
    `src/<unit>.c`.
+
+   **Do NOT let the unit's header comment imply one class per unit.** A
+   ~20-function slice cut at ROM-address boundaries has no reason to align
+   with class boundaries, and round 15 measured this: **three of five units
+   spanned two or more vtables**, and all three runners reported it as an
+   anomaly because the carve comment had led them to expect one.
+
+   - `class_3bb8c_j`: `Obj866E8` for the first functions, then a separate
+     `BasicClass`-derived sibling from `func_80051A4C` on.
+   - `class_3bb8c_k`: `D_80086F88` (its primary class) plus the ctor/dtor
+     and first methods of `D_80087034` landing in its tail.
+   - `class_3bb8c_l` / `class_3bb8c_m`: both reached `D_80087034`
+     independently, from opposite ends.
+
+   Say "expect this slice to span more than one class; identify each with
+   `tools/classtable.py` rather than assuming the unit has one" in the
+   carve comment. It costs a line and it converts three "anomalous" reports
+   into ordinary expected work. A class that spans a carve boundary is also
+   the normal reason two runners independently name the same table — see
+   the shared-header rule above.
 4. **`./build-and-verify.sh` MUST stay green — a correct carve changes zero
    bytes.** Red build → fix or revert; never force it. **Carve ONE segment at a
    time and verify each**, rather than a batch: the whole cycle is about two

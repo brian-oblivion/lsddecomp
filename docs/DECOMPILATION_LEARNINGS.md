@@ -1512,6 +1512,132 @@ of a documented stall, not of a match.
   consistent signature is established. (`code_2cc8c_f`'s `slot4C`/`slotC4`,
   re-checked and confirmed genuinely multi-arity.)
 
+#### Round 15 (2026-09-04, five runners on five class_3bb8c slices)
+
+**Branch shape and polarity — the round's densest cluster, four runners
+independently.**
+
+- **GCC 2.6.3's `if`/`else` codegen is MECHANICAL, so solve for the written
+  condition instead of guessing from semantics.** The compiled branch test is
+  always `NOT(the condition you wrote)`; the `if`-body always lands at the
+  fallthrough and the `else`-body at the branch target. So when retail puts a
+  particular block at the branch target, that tells you the polarity of the
+  source condition directly. Confirmed 3x in one unit (`func_80052E7C`,
+  `func_800531CC`, `func_80053358`), and it turns polarity from guesswork into
+  arithmetic.
+
+- **A redundant-looking condition can be LOAD-BEARING; measure before
+  simplifying.** `func_80053F84` matches byte-exact on
+  `if (x != 5 && x != 8 && x == 0xA)`, where the first two conjuncts are
+  provably dead — `x == 0xA` implies both. The head hypothesised the real
+  source was a sparse `switch (x) { case 5: case 8: break; case 0xA: ... }`,
+  which would explain the three compares honestly, and **measured it: whole
+  image red, 109627 bytes different.** GCC 2.6.3 emits the three sequential
+  compares (all branching to one target) from the short-circuit `&&` chain
+  and something structurally different from the switch. Do not "clean up" a
+  condition like this.
+
+- **For a genuine multi-way (>2 arm) dispatch, transcribe retail's CFG
+  literally with `goto`/labels in its own physical block order.** Both
+  `func_80053358` and `func_800521D4` needed this after nested `if`/`else if`
+  picked the wrong shape and would not converge. This generalises the
+  project's existing `goto fail;` idiom: the labels are not a hack, they are
+  how you express a block order the compiler will not otherwise choose.
+
+- **A two-armed dispatch on ONE scrutinee, where each arm does unrelated
+  work, is a `switch` and not two independent `if`s.** Two separate `if`s make
+  GCC re-materialize and re-compare the scrutinee, costing an instruction and
+  cascading address drift (`func_80053F84`, first pass). Note this sits
+  *beside* the round-14 finding that a `switch` and its equivalent `if`/`else
+  if` chain differ in physical layout — neither form is "the" answer; they are
+  two distinct levers and the disassembly says which.
+
+- **`if`/`else-if` and a `return`-terminated sequential-`if` compile
+  IDENTICALLY, so switching between them is not a lever — but a `switch` is.**
+  Useful negative result: it stops you spending attempts on a reshape that
+  cannot move a single byte (`func_800512C8`).
+
+- **`if`/`else` ARM ORDER is load-bearing independently of logical polarity.**
+  Which arm is the fallthrough and which is the branch target matters even
+  when you have the condition right (`func_80051784`, call-as-fallthrough vs
+  reset-as-branch-target).
+
+**Register identity — three new levers, and all three are ordinary C.**
+
+These matter because a register-identity residue is otherwise a STALL by
+project rule. Try all three before filing one.
+
+- **A redundant `local2 = local1;` double-assignment can be load-bearing for
+  register allocation, with no UB involved.** Confirmed 3x in one unit
+  (`func_80052430`, `func_800524F8`, `func_80052598`). **Check this before
+  accepting a `$v0`/`$v1` swap as a stall.**
+
+- **Mutating a parameter in place (`a3 -= a1;`) rather than introducing a
+  fresh local** is a legitimate fix for a register-identity residue around a
+  call argument (`func_800529FC` — which a ~6500-iteration permuter run had
+  failed to close).
+
+- **Hoisting an unconditional store to BEFORE an unrelated loop guard** closes
+  the documented "redundant move, resists everything" class, which had been
+  recorded as source-unfixable. `func_80051858`: manual attempts (barrier,
+  explicit re-mention) failed or made it worse; the permuter found the hoist in
+  14 iterations. **The class has a source-level fix in at least one case** —
+  do not treat it as permuter-only.
+
+- **Conversely, a deferred-call pattern that matched in one function is NOT
+  safe to reuse by analogy in a sibling** with different register pressure — it
+  can swap register identity between two variables (`func_80053458`). Same
+  shape as round 7's two-symmetric-slots lesson: check per site.
+
+**Return types, from the opposite side of the standing rule.**
+
+- **A multi-exit function that stores a literal into a field and returns that
+  same literal right after a `jalr` CANNOT be typed `s32`, however you phrase
+  it — try `void`.** `func_800542D0`, confirmed with **18 isolated reproducers**
+  through the pinned pipeline, none matching: keeping `$v0` consistent across
+  the multi-exit merge evicts the store's operand to `$v1`, costing one real
+  instruction. Typed `void`, there is no caller-visible return register and the
+  eviction never happens.
+
+  Read this together with the standing runner rule ("a `void` wrapper around
+  an `s32` tail call is byte-identical, so write `return callee(...)` absent
+  evidence"). Both say the same thing: **the bytes do not pin the return type.**
+  The rule is not "prefer `s32`" — here `s32` was unreachable and `void` was
+  the answer.
+
+**Struct and vtable discipline.**
+
+- **A vtable slot that resolves by address to an already-named C function must
+  STILL be called through the struct's function-pointer field**, never by that
+  name — `jal` and `jalr` are different bytes. Use the name only to cross-check
+  identity and signature (`func_80053C94`).
+
+- **Do not cache `self->methods` in a local unless retail's own disassembly
+  shows one load reused.** Writing the cache when retail reloads (or vice
+  versa) is a whole-instruction difference.
+
+- **A `New_X` allocator's null check must use the proven idiom verbatim** —
+  `if (self) { ctor(...); return self; } return NULL;`. Two plausible
+  rephrasings compile to non-matching shapes (`func_80050BA8`). Relatedly, the
+  `goto`/`return`-with-a-different-value lever applies to pointer-vs-NULL early
+  exits, not only integer constants (`func_80051A5C`).
+
+- **A delay-slot store is not necessarily conditional.** Reading one as part of
+  the branch it follows produces a wrong CFG that then resists every reshape.
+
+- **Compile immediately after drafting any struct with more than two fields.**
+  A missing `u8 padNN[...]` right after the first pointer field is easy to miss
+  because the struct still "looks" right, and it presents only as a whole-image
+  SHA1 failure — see the shared-struct hazard above.
+
+**Permuter craft.**
+
+- **A permuter zero reached via UB can have an unrelated, purely idiomatic fix
+  buried in the same diff — isolate and test each part.** `func_80052430`'s
+  permuter zero carried a `(float)1` cast that was a red herring; the actual
+  lever was the double-assignment above, which is ordinary C. Do not discard a
+  UB-tainted zero without decomposing it, and do not adopt the UB either.
+
 ### New residue classes opened this round (not yet closed)
 
 - **NEW, round 12: "retail saturates the callee-saved register file."**
