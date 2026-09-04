@@ -171,7 +171,40 @@ void func_800363FC(void)
     D_8008E84C = 2;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036410);
+/* A 172 (0xAC)-byte record; only the fields this function touches are
+ * named. D_800902E8 is an array of pointers to arrays of these, indexed
+ * [screen/player][slot]-style by two signed 16-bit indices. */
+typedef struct {
+    u8 pad0[0x4];
+    s32 unk4;
+    s32 unk8;
+    u8 pad0C[0x2B - 0xC];
+    u8 unk2B;
+    u8 pad2C[0x46 - 0x2C];
+    s16 unk46;
+    s16 unk48;
+    u8 pad4A[0x90 - 0x4A];
+    s32 unk90;
+    u8 pad94[0xAC - 0x94];
+} Entry90902E8;
+
+extern Entry90902E8 *D_800902E8[];
+
+void func_80036410(s32 a0, s32 a1)
+{
+    Entry90902E8 *p = &D_800902E8[(s16)a0][(s16)a1];
+
+    p->unk46 = 1;
+    p->unk48 = 0;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x100;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x8;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x2;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x4;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x200;
+    p->unk4 = p->unk8;
+    p->unk2B = 1;
+    D_800902E8[(s16)a0][(s16)a1].unk90 |= 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036518);
 
