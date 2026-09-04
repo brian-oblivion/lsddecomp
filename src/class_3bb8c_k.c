@@ -40,7 +40,23 @@ end:
     return;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005227C);
+void func_8005227C(Class86F88 *self)
+{
+    s32 old;
+
+    if (self->unk2C >= 4) {
+        return;
+    }
+    if (self->unk2C < 2) {
+        return;
+    }
+    old = self->unk30;
+    self->unk30 = old + 1;
+    if (old == 0) {
+        return;
+    }
+    self->methods->slot54(self, 4);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800522DC);
 
