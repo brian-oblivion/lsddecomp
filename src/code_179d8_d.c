@@ -10,9 +10,13 @@
  * Those five count as `matched` in tools/progress.py without having been
  * work, which is exactly the caveat CLAUDE.md attaches to that column.
  *
- * The three blocked functions already have stub reports:
+ * Two blocked functions have stub reports:
  *   func_8002BC40, func_8002BCEC  -- addiu_at
- *   func_8002C278                 -- nop_mflo_mfhi
+ * func_8002C278 was originally screened as a third (nop_mflo_mfhi) but
+ * that screen was inverted (checked mult/div BEFORE mflo/mfhi instead of
+ * after) -- the head corrected it mid-round and deleted the stub report.
+ * It is fresh ground; the mult/mfhi pair in its body is retail's signed-
+ * divide-by-constant idiom, not the blocked mflo/mfhi-then-mult direction.
  *
  * Unlike its siblings code_179d8_b and code_179d8_c, this slice owns NO
  * jump table -- all seven jtbl blocks in the 0xFD8 rodata slot fall outside
