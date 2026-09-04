@@ -69,7 +69,16 @@ void func_80032A7C(void)
     func_80038FB0();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032A9C);
+extern void func_80033738(void);
+extern void (*D_8006DC9C)(void);
+
+void func_80032A9C(void)
+{
+    if (D_8006DC9C != NULL) {
+        D_8006DC9C();
+    }
+    func_80033738();
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032AD0);
 
