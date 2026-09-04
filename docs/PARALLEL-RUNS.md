@@ -140,6 +140,57 @@ a lost one. Check them by hand, every time.
    | 8 | 2 runners, adjacent slices of one carve | the round's only conflict |
    | 13 | 3 shared-header collisions | one git auto-merged with **no conflict marker**; only the build caught it, on `conflicting types` |
    | 15 | 5 runners, all `class_3bb8c_*` | **6 of 7 merges conflicted**; 4 hard prototype collisions, one latent across two merges |
+   | 16 | 5 runners: **3** on `class_3bb8c_*`, **2** on fresh `code_179d8` carves with no project header | **0 of 10 merges conflicted on a header.** Three runners edited `class_3bb8c.h` and every one auto-merged |
+
+   **Round 16 is the measurement that makes this rule actionable rather than
+   cautionary, and the mechanism is worth stating plainly: contention is not
+   a function of HOW MANY runners share a header, it is a function of what
+   they put IN it.** Three runners edited `class_3bb8c.h` in round 16 — the
+   same header, one more runner than round 13's three collisions — and
+   nothing conflicted, across ten merges. What changed was not the count:
+
+   - Every edit was an **additive pad split whose total was preserved**
+     (verify this by hand at merge time; it is arithmetic, and the head
+     checked every one). No offset moved, so no already-matched function's
+     codegen could shift.
+   - **No cross-unit prototype went into the shared header.** One runner
+     matched a function whose canonical declaration already lived in
+     `class_39e08.h` and *matched that declaration* instead of writing its
+     own — the exact failure that killed round 15.
+   - **Two runners independently reached the same class (`D_80087034`) and
+     did not collide**, because one deliberately kept its view local to its
+     own `.c` while the other put its view in the shared header. That is the
+     multiple-independent-local-views convention working as intended.
+
+   So the mitigations in this rule are not damage control for a bad staffing
+   choice — applied up front they reduce contention to zero at three runners
+   on one header. Tell runners all three things explicitly at spawn time.
+
+   **NEW conflict class, round 16, and it is the HEAD's own doing.** Both of
+   that round's two conflicts were `CONFLICT (modify/delete)` on a
+   `docs/match-reports/` file: the head had written a stub report for a
+   function it believed blocked, discovered mid-round that the screen was
+   wrong, **deleted the stub on `main`** — and the live runner meanwhile
+   turned that same file into a real report. Resolution is trivial (`git add`
+   the runner's version; it is strictly better than a deleted stub), but two
+   things about it matter:
+
+   - It is invisible in the contention tooling, because it is not a header
+     and not a `src/` file. `headercontention.py` cannot predict it.
+   - It arrives as `merge exit=1` with `MERGE IN PROGRESS`, which is the
+     state where a green `build-and-verify.sh` means **nothing** (see
+     CLAUDE.md's fourth way a score lies). Resolve first, verify after.
+
+   If you delete a stub report for a function a live runner holds, expect
+   this and prefer telling the runner over racing it.
+
+   **And a plainer trap the same round: the head can block its own merge.**
+   `git merge` returned `exit=2` and refused to start — `Your local changes
+   to the following files would be overwritten by merge` — because the head
+   had uncommitted consolidation work touching the same report files. That is
+   not a conflict and leaves no `MERGE_HEAD`; the fix is to commit your own
+   work first. Check `git status --porcelain` in `main` before each merge,
+   not just in the worktrees.
 
    None of those cost a match and none were unresolvable. What they cost was
    **head attention** — the constraint this document names as binding. Round 15
@@ -622,9 +673,44 @@ for f in $(grep -oP 'INCLUDE_ASM\("[^"]*", \K\w+' src/<unit>.c); do
 done
 ```
 
-An `mflo`/`mfhi` within two instructions of a `mult`/`multu`/`div`/`divu`,
-with no `nop` between them in retail's own bytes, is blocked exactly like
-`addiu_at`: the pinned pipeline inserts `nop`s retail does not have.
+An `mflo`/`mfhi` **FOLLOWED WITHIN TWO INSTRUCTIONS BY** a
+`mult`/`multu`/`div`/`divu`, with no `nop` between them in retail's own bytes,
+is blocked exactly like `addiu_at`: the pinned pipeline inserts `nop`s retail
+does not have.
+
+**RUN THAT COMMAND. DO NOT RE-IMPLEMENT IT.** The direction is load-bearing
+and the shell form is right *by construction*, because `grep -A2` prints the
+two FOLLOWING lines. Every reimplementation so far has inverted it:
+
+- Round 15's head rewrote it in Python as "an `mflo`/`mfhi` within two
+  instructions **after** a `mult`/`div`" and got four false blockers,
+  including a 252/258 near-miss.
+- **Round 16's head did it again**, in a Python window census at carve time —
+  having read that entry — and wrote two stub reports for functions that were
+  never blocked. Measured over the 239 functions of the old `code_179d8`
+  monolith: **4 correct forward hits versus 14 inverted, of which 4 are pure
+  false blockers.** One of the two wrongly-stubbed functions was matched at
+  **65/65** by a runner within the hour of the correction.
+
+The two directions are opposite in effect, reproduced in isolation (see
+`docs/DECOMPILATION_LEARNINGS.md`, "the `nop_mflo_mfhi` screen runs FORWARD"):
+`mult` -> `sra` -> `mfhi` is retail's **signed-divide-by-constant idiom** and
+reproduces exactly with no `nop` inserted, so it is ordinary matchable code
+however tight the gap looks. Only the result-read-then-multiply direction is
+blocked.
+
+**Why this specific error keeps recurring, and what to do about it.** The
+inverted form is not obviously wrong when you read it — it looks like a
+hazard-slot check, which is a real thing on MIPS, just not this thing. And it
+fails in the expensive direction: it *invents* blockers, and a false blocker
+becomes a stub report, which `progress.py` counts as a documented stall, which
+removes the function from `fresh` **permanently**. Nobody re-measures a
+function everyone believes is blocked. So: paste the shell form, and if you
+must screen in bulk, shell out to it rather than re-expressing the window.
+
+A false blocker is strictly worse than a missed one — a missed blocker costs a
+runner some attempts and produces a report; a false blocker silently deletes
+matchable ground from every future round.
 
 **This grep belongs to the HEAD and not to the runners, deliberately.**
 `addiu-at-blocker.md` measured the scope twice and both times declined to
@@ -705,6 +791,27 @@ denominator, and left for last. Matching them proves nothing about this game.
    carved. Run the three-grep screen across windows before choosing the
    boundary; it is seconds, and it is the difference between a unit worth a
    runner and one worth none.
+
+   **STALE AS OF ROUND 16 — the `code_179d8` half of that table no longer
+   addresses anything, and this is the doc's own "do not work from a written
+   list" lesson landing on the doc itself.** Round 16 carved three units out
+   of that monolith (`code_179d8_b`, `_c`, `_d`), so it is now five segments
+   and those window indices index nothing. Two further reasons not to
+   reconcile against it: the table counts **267** functions where a round-16
+   `grep -c '^glabel'` counted **274**, so the windows were never aligned
+   with anyone else's; and a re-census cannot reproduce it now, because 35 of
+   those functions have been matched and no longer have a `.s` at all.
+
+   The per-slice censuses that ARE current live in the splat yaml next to each
+   carve, with their method and their caveats attached. Re-derive from the
+   live segment list rather than from any table, here or there — which is
+   what the paragraph above this one already tells you to do.
+
+   The transferable point, since this is the third written list in this
+   document to go stale by being acted on: **a census is evidence about a
+   segmentation, and carving changes the segmentation.** Record a census
+   where the thing it describes lives (the yaml entry for that carve), not in
+   a guide that outlives it.
 
    Carving from the MIDDLE is fine and costs one extra segment: split the
    monolith into `[.. before] asm`, `[the slice] c`, `[after ..] asm`. Name

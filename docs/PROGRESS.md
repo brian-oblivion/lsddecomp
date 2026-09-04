@@ -6,6 +6,213 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-04 — round 16: 5 runners, 51 matches, and two corrections to inherited screens
+
+**732 -> 788 matched (53.98% -> 58.11% of game code; matched bytes 40.20% ->
+42.70%). Build green in main after every one of the ten merges, and every
+claimed match re-verified individually AFTER its merge.** 51 of the 56 new
+matches came from runner work; the other 5 are empty `jr $ra; nop` bodies
+splat generated itself in a fresh carve, and are counted here only because
+`progress.py` counts them.
+
+**The fresh queue ended at 0 — every one of the 222 queued functions now has
+a report file.**
+
+| runner | unit(s) | p1 | p2 | p3 | stalls | end state |
+| --- | --- | --- | --- | --- | --- | --- |
+| alpha | `class_3bb8c_i`, then `code_2cc8c_f` + `class_3ac78` | 6 | 2 | — | 0 | all exhausted |
+| bravo | `class_3bb8c_k`, then `code_179d8_d` | 6 | 9 | 1 | 3 | both exhausted |
+| charlie | `code_179d8_b` | 10 | 4 | — | 3 | exhausted |
+| delta | `code_179d8_c` | 8 | 3 | — | 5 | exhausted |
+| echo | `class_3bb8c_l` | 2 | — | — | 1 | exhausted |
+
+Every unit staffed this round is now fully worked. Four of five runners were
+re-sent at least once (§3c); bravo went three passes across two units and was
+the round's most productive at 16.
+
+### Gate 2: carve across blocks, and the contention result that justifies it
+
+Gate 1 found only 17 fresh functions, 15 of them in one class block. Rather
+than staff five contending runners as round 15 did, the head carved two units
+out of `code_179d8` (`_b` = window [60..79], `_c` = [200..219]) chosen by
+measured blocker density rather than by "next", and later a third (`_d` =
+[100..119]) mid-round to re-staff bravo. Both `_b` and `_c` owned exactly one
+jump table in the shared `0xFD8` rodata slot, so it was split at two ownership
+boundaries rather than attached whole; `_d` owned none.
+
+**Result: 0 of 10 merges conflicted on a header, with three runners editing
+`class_3bb8c.h`** — against 6 of 7 conflicting in round 15. PARALLEL-RUNS'
+contention table now carries the mechanism: it is not the number of runners
+sharing a header, it is what they put in it. Every edit was an additive pad
+split with its total preserved (the head verified each by arithmetic, not by
+trusting the build); no cross-unit prototype went into the shared header, and
+one runner matched `class_39e08.h`'s pre-existing canonical declaration for
+`func_80052B70` instead of writing its own — the exact failure that killed
+round 15. Two runners independently reached class `D_80087034` and did not
+collide, one keeping its view local by choice.
+
+The two conflicts that DID happen were both the head's own doing, and are a
+new class: `modify/delete` on a match-report file, because the head deleted a
+stub report while a live runner was turning that same file into a real one.
+
+### Correction 1: the head inverted the third blocker screen — again
+
+The head re-implemented the `nop_mflo_mfhi` grep in Python for a carve-time
+window census and wrote it **backwards** (looking for `mult`/`div` *before*
+the `mflo`/`mfhi`), which is precisely the error DECOMPILATION_LEARNINGS
+records round 15's head making — committed by a head that had read that entry.
+The Gate 1 screen over the assigned queue used the correct shell form, so no
+runner was handed a blocked function, but the carve census was wrong and the
+head wrote **two stub reports for functions that were never blocked.**
+
+Measured cost over the 239 functions of the old monolith still visible as
+`.s`: 4 correct forward hits versus 14 inverted, of which 4 are pure false
+blockers. `func_800292F4` — one of the two the head stubbed — was **matched at
+65/65** by runner charlie within the hour of the correction. The other,
+`func_8002C278`, was attempted and stalled at 11/76 on register identity, so
+it too belonged in a runner's queue rather than in a stub.
+
+**Why this is the round's most important entry: a false blocker is strictly
+worse than a missed one.** A missed blocker costs a runner some attempts and
+still produces a report. A false blocker becomes a stub, `progress.py` counts
+a stub as a documented stall, and the function leaves `fresh` **permanently** —
+nobody re-measures what everyone believes is blocked. PARALLEL-RUNS now says
+run the shell form and do not re-express it.
+
+Both stubs were deleted (returning the functions to `fresh`), and the header
+comments in the two affected units were fixed **by the runners holding those
+files**, not by the head, per collision rule 6's one-channel rule.
+
+### Correction 2: the 7+ callee-saved-register band is no longer 0-matched
+
+`func_8004A534` matched **163/163 with 8 distinct callee-saved registers**
+(`$s0`-`$s7`). The head sent alpha into it *expecting a stall* on the strength
+of the documented 0-matched/4-stalled figure, told it a measured stall report
+was the deliverable, and then verified both the register census (8) and the
+match. Corroborated the same round by delta, which attempted all three of its
+large bodies and reported that **register count was not the blocker in any of
+them** — two needed 0 and 1 s-registers anyway — and by charlie, which said
+the same of its three stalls when asked directly.
+
+This is the **second** correction to this threshold (round 14 moved it 5 -> 7),
+and round 14's own lesson explains why: a threshold needs samples on both
+sides before it is a threshold. The 7+ band had four stalls and no
+attempted-and-matched samples, so it could not distinguish "7 is fatal" from
+"nobody has tried". One deliberate attempt settled it. Read the count as a
+**correlate** of "large function needing deep struct reconstruction", which is
+what actually costs — `func_8004A534`'s load-bearing insight was a struct-shape
+one. Still a real deprioritisation signal at 1-of-5; never grounds to skip.
+
+### The method lesson: a long attempt list is not a broad one
+
+Two stalls were argued with impressive attempt counts that all varied ONE
+axis. `func_80032BB8`: seven reshapes, every one varying the *expression* form
+(array index vs pointer arithmetic, temp vs no temp, declaration split,
+parameter type), none changing the control flow. `func_8002C048`: twenty-five
+variations, all keeping the cached `c1`/`c2` locals, none testing whether
+those locals should exist — which is exactly what the already-documented
+no-cache idiom points at. Both runners were sent back on the untested axis,
+and the results went in opposite directions:
+
+- `func_8002C048` **improved as a stall**: the no-cache idiom produced a body
+  with **no `volatile` anywhere** and removed the spurious `andi`, landing at
+  23/25 versus 24/25. A *lower* score and a better artifact — the residue is
+  now a genuine instruction-order swap rather than an artifact of a codegen
+  lever, and a preserved body needing `volatile` would have put source in the
+  tree that misrepresents the game. Bravo also bounded it: blanket-removing
+  *all* cached locals regressed to 13/25, because one cache is a genuine
+  cross-iteration carry. The idiom is a scalpel, not a blanket rule.
+- The head's own guard-polarity hypothesis was **wrong**, and delta proved it
+  by request: flipping both stalls to positive-first regressed both. That
+  checked negative is what scopes the block-order lever to raw values reaching
+  `beqz`/`bnez` directly and stops it being over-generalised to guard-clause
+  range checks. Asking for the negative is cheap and it is what turns a lever
+  into a scoped lever.
+
+### New residue classes
+
+- **Commutative-operand SLOT order in `addu`, not reachable from C.** In
+  `func_800323A8` all sixteen field accesses differ only in which operand slot
+  (`rs` vs `rt`) a commutative add uses — same registers, same values, so not
+  the register-identity class. Rewriting all 15 source sites with the operands
+  swapped produced a **byte-identical build**: cc1 canonicalises
+  pointer+integer addition regardless of source order. Not a toolchain
+  escalation; the 15-site swap *is* the isolation experiment.
+- **The retry-loop driver cluster** — `func_80028DF0`, `func_80028F38`,
+  `func_80029074`, three instances of one shape, fully reverse-engineered,
+  stalled on a status-value fold and a prologue register-mapping puzzle after
+  ~90 manual attempts and ~70k permuter iterations (best 55/85 with an exact
+  length match). Charlie built a pinned-pipeline reproducer of the
+  status-value shape and it did **not** reproduce retail — the more useful
+  result, ruling out a toolchain defect and saying something contextual is
+  still missing from the C.
+
+### A score that lied, caught by splicing rather than by reading
+
+Echo filed `func_80053ACC` as "STALLED at 28/71". `funcdiff` had printed that
+number **together with its own drift warning** (159121 bytes differing outside
+the range, because the body is one word shorter than retail) — way-a-score-lies
+#3 firing exactly as designed. Echo's analysis body had hand-corrected to
+~70/71, so its reasoning was sound; the **title** carried the untrustworthy
+number, and a title is what the next round triages from.
+
+The head spliced the preserved body back into `main`, built, and read it with
+`asm-differ` instead: the residue is two differing instructions and one missing
+word, and they are **one** decision — retail copies the masked switch value
+into `$a0` in the `bnez` delay slot and then compares against that copy, where
+the build sinks `li v0,0x2` into the slot and keeps comparing `$v1`. Retail's
+`move a0,v1` is even dead on the not-taken path. That reclassifies it from
+"close to unmatchable" to a **permuter candidate**. Report corrected.
+
+**Never headline an in-range score that came with a drift warning.**
+
+### Two patterns that did NOT earn promotion
+
+Both runners were asked for a negative check and both answered honestly that
+they had none — the only reason these are recorded as open rather than
+promoted. The "untouched register means a vtable slot's arity is short"
+pattern has two positive sightings and zero negative checks; the "`$a1`
+`lui`-set before its only read means scratch" pattern has one sighting,
+re-checked in a second pass with no second instance. A near-cousin found the
+same round sharpens the first: an untouched-looking `$a0` that was a fresh
+`move a0, zero` for a literal argument. So the real tell is unexplained
+register *activity* near a call, not "forwarded argument". Both need a sweep.
+
+### Bookkeeping
+
+- **Self-reported counts were wrong twice, in both directions**, both caught
+  by counting commits rather than reading summaries (§3). Delta reported "14
+  total for this unit" against an actual 11; charlie's first-pass summary
+  listed functions it had not reached. All the *work* was sound in both cases
+  — every claimed match verified byte-exact. Nothing self-reported is
+  load-bearing; the branch is.
+- `progress.py`'s stale-asm warning fires benignly in this workflow: a matched
+  function's `.s` lingers until the next re-extract, and splat emits both an
+  empty `void f(void){}` body *and* a `.s` for trivial `jr $ra; nop`
+  functions, so those five in `code_179d8_d` are stale by construction and
+  re-extracting cannot clear them. The warning's suggested fix does not apply
+  to that case.
+- The head blocked its own merge once (`git merge` exit 2, refusing to start)
+  by having uncommitted consolidation work touching the same report files.
+  Check `git status --porcelain` in `main` before each merge, not only in the
+  worktrees.
+
+### Next round
+
+**Runners on a fresh carve, plus a permuter pass.** The fresh queue is 0, so
+Gate 2 fires immediately: 346 uncarved game functions remain, in `code_179d8`
+(head), `code_179d8_mid`, `code_179d8_mid_b`, `code_179d8_tail`,
+`class_3bb8c_n` (113) and `class_3bb8c_h` (the BIOS trampoline block, which
+needs an `hasm`/`.word` disposition decided at carve time, not by a runner).
+Carve across two different blocks to keep header contention at zero, and take
+the census with the shell screen.
+
+There is also now a real permuter queue of honest one- and two-word
+near-misses: `func_80053ACC` (2 instructions + 1 word), `func_8002C0AC`
+(30/32), `func_8002C048` (23/25), `func_80029074` (55/85, exact length).
+
+---
+
 ## 2026-09-04 — round 15: 5 runners, 67 matches, 2 stalls, and one rule found four times
 
 **665 -> 732 matched (49.04% -> 53.98% of game code; matched bytes 36.94% ->

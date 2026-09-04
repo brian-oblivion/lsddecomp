@@ -184,6 +184,25 @@ three are live rather than transcribed:
   shows many attempts along one axis, that is a reason to look for the axis
   nobody varied.
 
+  **Round 16 hit this twice in one round, which makes it a standing check
+  rather than an anecdote: a long attempt list is not a broad one.**
+
+  - `func_80032BB8` — seven reshapes, every one varying the *expression* form
+    (array index vs pointer arithmetic, temp vs no temp, declaration split,
+    parameter type). None changed the CONTROL FLOW.
+  - `func_8002C048` — twenty-five variations, every one keeping the cached
+    `c1`/`c2` locals. None tested whether those locals should exist, which is
+    exactly where the already-documented no-cache idiom points.
+
+  Both were sent back on the untested axis. One improved into a cleaner stall
+  (dropping a `volatile` that had been fighting a CSE, and the spurious mask
+  it caused, at the cost of one nominal word); the other confirmed its stall
+  and, in doing so, bounded the lever that had been proposed for it.
+
+  **So when you file a stall, list the AXES you varied, not the number of
+  attempts.** If every entry sits on one axis, that is the tell — and it is
+  the tell whether you are the author or the reader.
+
 - **Retail's callee-saved-register demand** (added round 13, after a runner
   used it predictively and the head validated it against that round's
   outcomes):
@@ -197,14 +216,31 @@ three are live rather than transcribed:
   | band | matched | stalled |
   | --- | --- | --- |
   | 5-6 registers | **5** | 1 |
-  | 7+ registers | **0** | 4 |
+  | 7+ registers | **1** (round 16) | 4 |
 
-  **The threshold is 7, not 5.** No function needing 7 or more has ever
-  matched; every fully saturated one (9) that was attempted stalled. Round 13
-  published 5, on a sample whose maximum observed demand among matches was 4
-  — it could not tell "5 is fatal" from "9 is fatal", and round 14 matched
-  five functions in the 5-6 band, four of them after a runner had been told
-  to expect a stall.
+  **The threshold is 7, not 5** — round 13 published 5 on a sample whose
+  maximum observed demand among matches was 4, so it could not tell "5 is
+  fatal" from "9 is fatal", and round 14 matched five functions in the 5-6
+  band, four of them after a runner had been told to expect a stall.
+
+  **ROUND 16: the 7+ band is no longer 0-matched, so it is a priority order
+  and nothing more.** `func_8004A534` matched **163/163 with 8 distinct
+  callee-saved registers** — sent in *expecting* a stall, on the strength of
+  the 0-matched figure this table used to print. Two other runners the same
+  round attempted six more large bodies between them and reported, when asked
+  directly, that **register count was not the blocker in any of them**; two of
+  those needed 0 and 1 s-registers anyway.
+
+  Read the count as a **correlate** of "large function needing deep struct
+  reconstruction" — that is what actually costs. `func_8004A534`'s
+  load-bearing insight was a struct-shape one (a whole-struct copy misread as
+  field-by-field), nothing to do with register pressure. **Never skip a
+  function on this screen, and never stop on it: if you stop in this band,
+  your report must name a residue, not a register count.**
+
+  Twice corrected now, and the reason is the same both times: a screen built
+  only from the failures it predicted needs a deliberate attempt on its wrong
+  side before it earns a number.
 
   **Use it in ONE direction only.** A high count deprioritises; it never
   promises. And a LOW count predicts nothing at all — stalls at 2-4
