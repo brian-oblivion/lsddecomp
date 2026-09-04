@@ -49,7 +49,9 @@ void func_80028898(UnkFlagsObj_171e0 *self) {
     self->unk0C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_800288E0);
+void *func_800288E0(UnkFlagsObj_171e0 *self) {
+    return ((UnkFlagsObjMethods_171e0 *)func_80026C9C())->dtor(self);
+}
 
 void func_80028918(void) {
 }
