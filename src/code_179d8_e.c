@@ -162,7 +162,16 @@ s32 func_8002CB58(ObjDA34 *self) {
     return flag;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CB9C);
+s32 func_8002CB9C(ObjDA34 *self) {
+    s32 flag;
+
+    flag = self->unk56;
+    if (flag != 0) {
+        flag = func_800336CC(0);
+        self->unk56 = 0;
+    }
+    return flag;
+}
 
 void func_8002CBDC(void) {
 }
