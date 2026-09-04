@@ -313,7 +313,17 @@ void func_80056238(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_8005627C);
+/* A 15-entry table indexed with the NEGATIVE of `ctx->methods->tag`
+ * (`D_80087474 - tag*4`, i.e. `D_80087474[-tag]` for `tag` in [-14, 0]).
+ * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
+extern s32 D_80087474[];
+
+s32 func_8005627C(ParamObj *ctx) {
+    s32 t = D_80087474[-ctx->methods->tag];
+    s32 q = t / ctx->unk28;
+
+    return ctx->unk10 / q;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_8005630C);
 
