@@ -459,6 +459,38 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    down. Do not commit on its behalf unless the runner is dead — it knows which
    report belongs to which function and you are guessing.
 
+2c. **A runner can get stuck in a permuter WAIT-LOOP, and it looks exactly
+   like a runner that is still working.** Round 17's charlie ended three
+   consecutive turns on "I'll wait for the permuter to report back". The
+   mechanism is mechanical, not a judgement failure: `--stop-on-zero` means
+   a search that never reaches zero **never terminates**, so "wait for it to
+   finish" has no end state. Its first two runs were still alive, 34 and 20
+   minutes in, holding twelve cores, when it reported them killed.
+
+   Three consequences, all the head's job:
+
+   - **Put the bound in the ASSIGNMENT, not in a correction.** Tell runners
+     to wrap every long search in `timeout N` up front. GNU `timeout`
+     returns **124** when it stopped the child itself versus **137** for an
+     outside SIGKILL, which is what turns "did my limit fire or did someone
+     shoot it?" into a recorded answer (§2b). A runner told this at spawn
+     time does not need rescuing later.
+   - **"Do not start anything new" is not a sufficient instruction.** The
+     head sent exactly that and charlie launched a third search anyway —
+     bounded, which was the improvement that mattered. Prohibitions are
+     weaker than bounds: say "give it N minutes, then land the report
+     whatever the score is", not "stop".
+   - **Verify the kill yourself before teardown.** `pgrep -af permuter` plus
+     `readlink /proc/<pid>/cwd` attributes each survivor to a worktree; kill
+     those by PID. Do NOT `pkill -f decomp-permuter` — that is the round-10
+     cross-runner kill this document already forbids, and the head is no
+     more exempt from it than a runner.
+
+   The round-10 rule says a runner's negative permuter result may be
+   fabricated by another runner's `pkill`. This is its sibling: a runner's
+   permuter result may never arrive at all, and the tell is a summary that
+   is a status line rather than a finding.
+
 3c. **Send an early finisher back into its OWN unit** (message the same agent —
    same worktree, same branch, context intact) rather than letting it idle or
    spawning a cold replacement. This is the highest-yield *structural* move
@@ -873,6 +905,34 @@ denominator, and left for last. Matching them proves nothing about this game.
      At the time of writing every one of them (13) sits in a single segment,
      but that segment is a carve remainder and its name changes as carving
      proceeds — run the grep rather than trusting a name.
+
+     **And run it BEFORE you believe the blocker screen, because the screen
+     is blind to this class and fails in the flattering direction.** A
+     trampoline has no `gp_rel`, no `addiu $at`, and no `mflo`/`mfhi`, so
+     the three greps all pass it — and a trampoline-dense segment therefore
+     reads as the CLEANEST ground left in the executable while being the
+     least matchable. Measured round 17, at the point where every good
+     window had been carved out: `class_3bb8c_h` screened **15 of 17 clean**,
+     the best figure of any remaining segment, and was in fact **13 BIOS
+     trampolines plus two addiu-$at functions — two workable functions out
+     of seventeen.** A head triaging on the screen alone would have carved
+     it first and staffed a runner into a wall.
+
+     So the trampoline grep is not only a carve-time disposition chore, it
+     is the fourth screen, and it belongs next to the other three whenever
+     you are ranking segments rather than preparing one:
+
+     ```sh
+     printf 'trampolines: %s of %s\n' \
+       "$(grep -c 'jr *\$t2' asm/<segment>.s)" \
+       "$(grep -c '^glabel' asm/<segment>.s)"
+     ```
+
+     The general shape, which is the same one this document keeps
+     rediscovering: **a screen measures the obstruction it was built for,
+     and says nothing about the ones it was not.** The three-grep screen
+     answers "can the pinned pipeline emit these bytes from C"; it does not
+     answer "is there any C here at all".
    - *A dead orphan is not automatically inert.* Grep the orphan's `.s` for
      label references (`grep -o '\.L[0-9A-F]*'`). Empty output means a
      fall-through orphan: `INCLUDE_ASM` forever, done. Non-empty means it
@@ -997,6 +1057,25 @@ denominator, and left for last. Matching them proves nothing about this game.
      carve means deleting the generated `.c` in the same step.**
 5. Commit the carve on main as its own commit, THEN provision worktrees, so
    runners inherit it and never touch the yaml.
+
+**Gate 1b — the near-miss corpus is a QUEUE, and it is screened from the
+ASM, not from the report text.** `progress.py` counts every documented stall
+identically, so the difference between a 104/105 near-miss and a
+gp_rel-blocked function is invisible in its table. Build the list yourself:
+walk the live `INCLUDE_ASM` symbols, read each one's report, drop the ones
+whose asm hits a blocker grep, and rank what is left by best recorded score.
+Round 17 found **72** non-blocker scored near-misses this way, only 4 of them
+already permuter-exhausted — a bigger and better-posed queue than the cold
+ground remaining in the whole executable.
+
+**Screen those candidates against the ASM before assigning them, even though
+they already have reports.** Filtering on the report's own prose is not the
+same check and it is weaker: round 17's first pass keyed on words like
+`gp_rel`/`addiu_at` appearing in the report and let `func_8003C63C` (15/16)
+through, because its report says only "toolchain blocked" without naming the
+class. One `grep` over its `.s` settles it in a second. The rule from
+CLAUDE.md applies unchanged here — **a blocker's scope is measured, not
+read** — and a report is prose about the bytes, not the bytes.
 
 **Gate 3 — permuter round instead.** If the fresh queue is dry and carving is
 blocked, or the stall residue is worth more than cold ground (near-misses like
