@@ -305,7 +305,13 @@ void func_80056194(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80056238);
+void func_80056238(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = func_8005627C(ctx);
+    if (self->unk4 == 0) {
+        self->unk1C = 0x18;
+        self->unk20 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_8005627C);
 
