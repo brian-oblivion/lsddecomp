@@ -65,7 +65,10 @@ s32 func_80036024(void)
     return func_80038D74(1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036044);
+s32 func_80036044(void)
+{
+    return func_80038D74(0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036064);
 
