@@ -30,9 +30,17 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032148);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_8003221C);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032368);
+extern void func_8003221C(s32 arg0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032388);
+void func_80032368(void)
+{
+    func_8003221C(0);
+}
+
+void func_80032388(void)
+{
+    func_8003221C(1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800323A8);
 
@@ -40,19 +48,100 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032588);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032708);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032998);
+extern void func_80032708(s32 arg0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800329B8);
+void func_80032998(void)
+{
+    func_80032708(1);
+}
+
+void func_800329B8(void)
+{
+    func_80032708(0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_800329D8);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032A7C);
+extern void func_80038FB0(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032A9C);
+void func_80032A7C(void)
+{
+    func_80038FB0();
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032AD0);
+extern void func_80033738(void);
+extern void (*D_8006DC9C)(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", SetRCnt);
+void func_80032A9C(void)
+{
+    if (D_8006DC9C != NULL) {
+        D_8006DC9C();
+    }
+    func_80033738();
+}
+
+extern s32 D_8006DCA0;
+
+void func_80032AD0(void)
+{
+    if (D_8006DCA0 == 0) {
+        D_8006DCA0 = 1;
+    } else {
+        D_8006DCA0 = 0;
+        func_80033738();
+    }
+}
+
+/* Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
+ * TARGET, each a hardware halfword, 0x10 apart -- matches the real
+ * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
+ * pointer to this table, not the table itself. */
+typedef struct {
+    u16 count;              /* 0x0 */
+    u8  pad2[0x4 - 0x2];
+    u16 mode;                /* 0x4 */
+    u8  pad6[0x8 - 0x6];
+    u16 target;               /* 0x8 */
+    u8  padA[0x10 - 0xA];
+} RCntEntry;
+
+extern RCntEntry *D_8006DCB0;
+
+s32 SetRCnt(s32 n, s16 target, u32 mode)
+{
+    s32 idx = (u16)n;
+    u16 md = 0x48;
+    u32 isLow;
+
+    if (idx >= 3) {
+        return 0;
+    }
+
+    isLow = (u32)idx < 2;
+    D_8006DCB0[idx].mode = 0;
+    D_8006DCB0[idx].target = target;
+    __asm__("");
+
+    if (isLow) {
+        if (mode & 0x10) {
+            md = 0x49;
+        }
+        if (!(mode & 1)) {
+            md |= 0x100;
+        }
+    } else if (idx == 2) {
+        if (!(mode & 1)) {
+            md = 0x248;
+        }
+    }
+
+    if (mode & 0x1000) {
+        md |= 0x10;
+    }
+
+    D_8006DCB0[idx].mode = md;
+    return 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032BB8);
 
