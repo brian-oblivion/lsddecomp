@@ -129,7 +129,19 @@ call:
     fn(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_800533F0);
+void func_800533F0(Obj87034_3bb8c_l *self) {
+    void (*fn)(Obj87034_3bb8c_l *);
+
+    if (self->unk68 != 0) {
+        self->unk1C++;
+        if (self->unk80 != 0) {
+            fn = self->methods->slotD0;
+        } else {
+            fn = self->methods->slot8C;
+        }
+        fn(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053458);
 
