@@ -2390,6 +2390,10 @@ struct Class86F88ElemMethods {
     void (*release)(Class86F88Elem *self); /* +0x004 */
     u8 pad008[0x0B8 - 0x008];
     void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
+    u8 pad0BC[0x0CC - 0x0BC];
+    /* +0x0CC, func_8005281C: called once per active window element with a
+     * freshly-formatted (func_8005292C) fixed-width text buffer. */
+    void (*slotCC)(Class86F88Elem *self, char *arg1);
 };
 
 struct Class86F88Elem {

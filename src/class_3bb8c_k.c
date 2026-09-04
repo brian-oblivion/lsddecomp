@@ -254,7 +254,31 @@ void func_8005278C(Class86F88 *self)
 extern s32 func_80013348(char *s);
 extern char *func_800238A8(char *dest, char *src, s32 n);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005281C);
+void func_8005281C(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+    s32 count;
+    s32 i;
+    char buf[0x20];
+    Class86F88Elem **p;
+
+    if (!self->unk50) {
+        return;
+    }
+    count = self->unk10;
+    p = &self->unk40[0];
+    if (count >= 5) {
+        count = 4;
+    }
+    for (i = 0; i < count; i++) {
+        func_8005292C(self, buf, i, arg1, (char *)arg2);
+        (*p)->methods->slotCC(*p, buf);
+        p++;
+    }
+    func_800529FC(self, arg1, arg2, arg3, 0);
+    if (arg4) {
+        self->methods->slot60(self, 0);
+    }
+}
 
 char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
 {
