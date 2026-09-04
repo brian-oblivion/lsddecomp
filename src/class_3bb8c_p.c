@@ -68,14 +68,28 @@ void func_80057534(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_800575B0);
+void func_80057618(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s32 val, void *extra);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_800575E0);
+void func_800575B0(DreamSys *self, s32 val, void *extra) {
+    func_80057618(self, self->vt->func_8005748C, val, extra);
+}
+
+void func_800575E0(DreamSys *self, s32 val, void *extra) {
+    func_80057618(self, self->vt->func_800574C4, val, extra);
+}
 
 void func_80057610(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057618);
+void func_80057668(DreamSys *self);
+
+void func_80057618(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s32 val, void *extra) {
+    self->unk_0x28 = NULL;
+    callback(self, val, extra);
+    if (self->unk_0x28 == NULL) {
+        func_80057668(self);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", func_80057668);
 

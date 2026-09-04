@@ -746,12 +746,12 @@ struct vtable_DreamSys{
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C4
 	   (func_8005748C) as a raw callback value and forwards it, with its
 	   own two arguments, to func_80057618 (round 2026-09-04). */
-	void (*func_800575B0)(DreamSys *this, void *arg1, void *arg2);
+	void (*func_800575B0)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C8
 	   (func_800574C4, self-referential) as a raw callback value and
 	   forwards it, with its own two arguments, to func_80057618
 	   (round 2026-09-04). */
-	void (*func_800575E0)(DreamSys *this, void *arg1, void *arg2);
+	void (*func_800575E0)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; empty stub `{ }` (round 2026-09-04). */
 	void (*func_80057610)(DreamSys *this);
 	u32 unknown_functions_0xdc[1];
