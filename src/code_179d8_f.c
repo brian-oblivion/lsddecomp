@@ -23,7 +23,35 @@
  */
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80035F3C);
+/* 9 packed halfword fields, unpacked from two 16-bit-ish words (a0, a1).
+ * Field semantics unknown -- named by offset per project convention. */
+typedef struct {
+    s16 unk0;  /* +0x0 */
+    s16 unk2;  /* +0x2 */
+    s16 unk4;  /* +0x4 */
+    s16 unk6;  /* +0x6 */
+    s16 unk8;  /* +0x8 */
+    s16 unkA;  /* +0xA */
+    s16 unkC;  /* +0xC */
+    s16 unkE;  /* +0xE */
+    s16 unk10; /* +0x10 */
+} UnkStruct80035F3C;
+
+void func_80035F3C(s32 a0, s32 a1, UnkStruct80035F3C *a2)
+{
+    int t;
+
+    a2->unkA = a0 & 0x8000;
+    t = a1 & 0x8000;
+    a2->unkC = t;
+    a2->unk10 = a1 & 0x4000;
+    a2->unkE = a1 & 0x20;
+    a2->unk0 = ((u16)a0 >> 8) & 0x7F;
+    a2->unk2 = ((u16)a0 >> 4) & 0xF;
+    a2->unk4 = a0 & 0xF;
+    a2->unk6 = ((u32)a1 >> 6) & 0x7F;
+    a2->unk8 = a1 & 0x1F;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80035F98);
 
