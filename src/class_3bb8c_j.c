@@ -53,7 +53,12 @@ void func_80051784(Obj866E8 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_800517EC);
+void func_800517EC(Obj866E8 *self)
+{
+    if (self->unk48) {
+        self->unk20 ^= 1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051814);
 
