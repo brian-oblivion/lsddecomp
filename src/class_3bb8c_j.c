@@ -350,4 +350,9 @@ void func_80052110(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3)
     } while (0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_8005217C);
+void func_8005217C(Class86ED0 *self)
+{
+    self->methods->slot14(self, self->unk34);
+    self->methods->slot14(self, self->unk38);
+    self->unk3C = 0;
+}
