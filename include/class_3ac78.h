@@ -32,7 +32,7 @@ typedef struct GenericObject GenericObject;
  */
 struct UnkSlotEntry_3ac78 {
     u16 unk0;                        /* zeroed at the top of each loop pass (func_8004ABD0) */
-    u8 pad2[0x4 - 0x2];
+    u16 unk2;                        /* func_8004A534 (ctor): set to the loop index (0..6) */
     UnkSlotChildObj_3ac78 *unk4;
     UnkSlotListObj_3ac78 *unk8;
     GenericObject *unkC;             /* func_8004A7C0: refreshed (discarded) through ->methods->unk04 when non-NULL */
@@ -45,8 +45,9 @@ struct UnkSlotEntry_3ac78 {
      * the SAME pointer (also added to Class866E8 this round). Safe: this
      * comment was evidence-only, never compiled (func_8004A7C0 is still
      * INCLUDE_ASM). */
-    Class866E8 **unk10;              /* func_8004B100: 2D grid, row stride 20 cells */
-    u8 pad14[0x1C - 0x14];
+    Class866E8 **unk10;              /* func_8004B100: 2D grid, row stride 20 cells. func_8004A534 (ctor): allocates 0x668 raw bytes (func_80017B34) and fills it with pointers built in an inner loop, before this field's grid-of-Class866E8 reading was established */
+    s32 unk14;                       /* func_8004A534 (ctor): zeroed */
+    s32 unk18;                       /* func_8004A534 (ctor): zeroed */
 };
 
 /*
@@ -123,11 +124,27 @@ struct UnkPtr68Obj_3ac78 {
 };
 
 /*
+ * self->unk54's pointee (func_8004A534, the ctor) -- a 3-word block copied
+ * via a WHOLE-STRUCT assignment (`self->unk54 = *arg1;`, retail: 3 loads
+ * then 3 stores, batched) from either the ctor's own `arg1` when non-NULL,
+ * or the default global `D_8008682C` otherwise. Same "whole-struct
+ * assignment compiles to a batched load/store block" idiom as
+ * `HistoryBlock_3ac78` above.
+ */
+typedef struct Vec3_3ac78 Vec3_3ac78;
+struct Vec3_3ac78 {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+};
+
+/*
  * Class866E8 -- constructed by func_8004A4C8 (New_Class866E8: allocates
  * 0x1E8 bytes, gets the vtable via func_8004D244, calls ctor slot +0x008).
  * Vtable is D_800866E8 (80 slots, header 0x114), resolved with
- * tools/classtable.py D_800866E8. Ctor is func_8004A534 (177 words) and
- * dtor is func_8004A7C0 (128 words); both out of this round's scope.
+ * tools/classtable.py D_800866E8. Ctor is func_8004A534 (177 words,
+ * attempted this round -- see its match report) and dtor is func_8004A7C0
+ * (128 words, still out of scope).
  *
  * No FirecatFG name survives for this class (only anonymous func_ symbols
  * in the symbol file), so it is named by its vtable address, same
@@ -139,7 +156,7 @@ struct Class866E8Methods {
     /* +0x004 */ void *unk04;                                                   /* BasicClass__func_17eb0 */
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* func_8004A534; called by func_8004A4C8 */
     /* +0x00C */ void *dtor;                                                    /* func_8004A7C0; not dispatched by this round's functions */
-    /* +0x010 */ u8 pad010[0x014 - 0x010];
+    /* +0x010 */ void (*slot10)(Class866E8 *self, s32 arg1);                    /* func_8004A534 (ctor); called with func_80020C5C()'s return, after the 7-entry unkEC[] init loop */
     /* +0x014 */ void (*slot14)(Class866E8 *self, void *arg1);                  /* func_8001CCB4; called by func_8004A7C0 */
     /* +0x018 */ u8 pad018[0x030 - 0x018];
     /* +0x030 */ void (*slot30)(Class866E8 *self, s32 arg1);                    /* BasicClass__func_182cc; called by func_8004AA6C */
@@ -187,11 +204,12 @@ struct Class866E8 {
     /* +0x004 */ u8 pad004[0x036 - 0x004];
     /* +0x036 */ u16 flags36;                /* bit 0x80 tested by func_8004B2D4 */
     /* +0x038 */ Class866E8 *unk38;          /* func_8004B100: singly-linked chain of OTHER Class866E8 instances sharing one grid cell, walked while non-NULL -- same "chained instances in one slot" idiom as the sibling unit's EntryChildObj::unk38 (include/class_3bb8c.h) */
-    /* +0x03C */ u8 pad03C[0x060 - 0x03C];
+    /* +0x03C */ u8 pad03C[0x054 - 0x03C];
+    /* +0x054 */ Vec3_3ac78 unk54;           /* func_8004A534 (ctor): copied field-by-field from its own arg1 (when non-NULL) or the default global D_8008682C */
     /* +0x060 */ s32 unk60;                  /* func_8004ADC4 arg1 */
     /* +0x064 */ s32 unk64;                  /* func_8004ADC4 arg2 */
     /* +0x068 */ UnkPtr68Obj_3ac78 *unk68;   /* func_8004B344 arg1, stored raw; func_8004AEA4 dereferences ->unk4 */
-    /* +0x06C */ u8 pad06C[0x070 - 0x06C];
+    /* +0x06C */ s32 unk6C;                  /* func_8004A534 (ctor): zeroed */
     /* +0x070 */ s32 unk70;                  /* func_8004AB24: gates slotF4/slot13C dispatch */
     /* +0x074 */ s32 unk74;                  /* func_8004B32C arg1, stored raw */
     /* +0x078 */ s16 unk78;                  /* func_8004B32C: arg1 >> 12 */
@@ -206,7 +224,7 @@ struct Class866E8 {
     /* +0x0BE */ u8 pad0BE_tail[0x0E8 - 0x0BE];
     /* +0x0E8 */ s32 unkE8;                  /* func_8004ADD0 arg1; func_8004ADD8 reads it back as a NUL-terminated s32 tag array -- true element type still s32, only usage differs per call site */
     /* +0x0EC */ UnkSlotEntry_3ac78 unkEC[7]; /* func_8004ABD0: 7 x 0x1C-byte slots, walked 0..6 */
-    /* +0x1B0 */ u8 pad1B0[0x1B4 - 0x1B0];
+    /* +0x1B0 */ s32 unk1B0;                 /* func_8004A534 (ctor): zeroed */
     /* +0x1B4 */ s16 unk1B4;                 /* func_8004ABD0: zeroed after the loop */
     /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
     /* +0x1B8 */ s32 unk1B8;                 /* func_8004ABD0: zeroed after the loop */
@@ -214,7 +232,9 @@ struct Class866E8 {
     /* +0x1C0 */ u16 unk1C0;                 /* func_8004B100: set to self->unkBC on every grid cell visited */
     /* +0x1C2 */ u8 unk1C2;                  /* func_8004B100: current grid column (entry->col + loop offset), truncated to a byte */
     /* +0x1C3 */ u8 unk1C3;                  /* func_8004B100: current grid row (entry->row + loop offset), truncated to a byte */
-    /* +0x1C4 */ u8 pad1C4[0x1E8 - 0x1C4];   /* func_8004B31C still only takes the address of the block as a whole; real extent of further fields unknown */
+    /* +0x1C4 */ u8 pad1C4[0x1E0 - 0x1C4];   /* func_8004B31C still only takes the address of the block as a whole; real extent of further fields unknown */
+    /* +0x1E0 */ s32 unk1E0;                 /* func_8004A534 (ctor): zeroed */
+    /* +0x1E4 */ u8 pad1E4[0x1E8 - 0x1E4];
 };
 
 /* Get-vtable helper for Class866E8. Still raw asm: it lives in class_3bb8c,
@@ -279,10 +299,22 @@ struct UnkArgObj_3ac78 {
 struct GenericMethodsHeader {
     s32 header;
     void *(*unk04)(void *self);
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, func_8004A534 (ctor). Same offset as every other
+     * "generic base object" vtable in this project (FieldM7CMethods,
+     * ChildMethods86ED0, Class86ED0Handle -- all sibling units, all
+     * independent local views); called at two different arities here
+     * across two call sites in the SAME function, so kept generic
+     * (`void *`) rather than picking one call site's shape. */
+    void (*slot4C)(void *self, void *arg1, void *arg2);
+    u8 pad050[0x070 - 0x050];
+    void (*slot70)(void *self, s32 arg1); /* +0x070, func_8004A534 (ctor) */
 };
 
 struct GenericObject {
     GenericMethodsHeader *methods;
+    u8 pad004[0x010 - 0x004];
+    u32 unk10; /* +0x010, func_8004A534 (ctor): OR'd with 0x80000000 (a flag bit) */
 };
 
 /*
@@ -328,12 +360,19 @@ struct UnkSlotChildMethods_3ac78 {
     void (*slot74)(UnkSlotChildObj_3ac78 *self);
     u8 pad78[0x84 - 0x78];
     void (*slot84)(UnkSlotChildObj_3ac78 *self);
+    void (*slot88)(UnkSlotChildObj_3ac78 *self, s32 arg1); /* +0x088, func_8004A534 (ctor): called with self->unkEC[i].unk4 dispatched right after the object is freshly returned by func_80048894, arg1 = func_8004A534's own arg2 forwarded */
 };
 
 struct UnkSlotChildObj_3ac78 {
     UnkSlotChildMethods_3ac78 *methods;
-    u8 pad4[0x2C - 0x4];
+    u8 pad4[0x10 - 0x4];
+    s32 unk10;    /* func_8004A534 (ctor): tested nonzero (sltu), the boolean result stored into unk20 */
+    u8 pad14[0x20 - 0x14];
+    u16 unk20;    /* func_8004A534 (ctor): set to (unk10 != 0) */
+    u8 pad22[0x2C - 0x22];
     s16 unk2C;    /* func_8004B100: gates the whole per-history-entry grid walk (nonzero test) */
+    u8 pad2E[0x32 - 0x2E];
+    u16 unk32;    /* func_8004A534 (ctor): set to the outer loop index (0..6) */
 };
 
 /*
