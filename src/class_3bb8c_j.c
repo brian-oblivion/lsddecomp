@@ -60,7 +60,13 @@ void func_800517EC(Obj866E8 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051814);
+void func_80051814(Obj866E8 *self)
+{
+    if (self->unk48) {
+        self->unk1C = 0;
+        self->methods->slotA8(self, self->unk18, 0, 1);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051858);
 
