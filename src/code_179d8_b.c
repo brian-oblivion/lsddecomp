@@ -5,9 +5,12 @@
  * Carved round 16 by blocker DENSITY, not by "next": code_179d8 is 44%
  * blocked in aggregate but the blockers CLUSTER, so the aggregate says
  * nothing about any particular window. This one screened 16/20 clean.
- * The four blocked functions are already stubbed as match reports:
+ * The three blocked functions are already stubbed as match reports:
  *   func_80028CF8, func_80028D30, func_80029478  -- addiu_at
- *   func_800292F4                                -- nop_mflo_mfhi
+ * func_800292F4 was misclassified nop_mflo_mfhi by an inverted screen
+ * (round 16 head correction) -- it is fresh ground, not blocked. It
+ * contains mult->mfhi (the hazard-slot direction, not a blocker), retail's
+ * signed-divide-by-constant idiom.
  *
  * func_80029478 owns jtbl_800109F8, whose sub-slot of the 0xFD8 rodata
  * region is ATTACHED to this unit in the splat yaml. Leave that alone.
