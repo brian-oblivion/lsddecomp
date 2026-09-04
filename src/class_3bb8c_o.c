@@ -299,7 +299,49 @@ void func_800571E8(BaseObjO *self) {
     self->unk54 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800571F8);
+extern s32 func_8001F3A4(void *arg0);
+extern void func_8001F66C(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
+
+void func_800571F8(BaseObjO *self, s32 arg1) {
+    func_8001E57C()->slot88(self, arg1);
+    /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
+     * range test -- the combined form optimizes into a single unsigned
+     * `(arg1-5) < 4` comparison, which is not what retail does (two
+     * separate `slti`s). */
+    if (arg1 < 9) {
+        if (arg1 >= 5) {
+            Buf38O buf;
+
+            if (self->unk20 != NULL && func_8001F3A4(self->unk20)) {
+                self->methods->slot8C(self, &buf);
+                if (arg1 != 5) {
+                    s16 h = self->unk48;
+                    s32 isSeven = (arg1 == 7);
+                    s32 nonneg = (h >= 0);
+                    s32 adjusted;
+
+                    /* `goto`, not `if/else`, to match retail's actual
+                     * branch shape (see the match report). */
+                    if (h < 0) {
+                        goto negative;
+                    }
+                    adjusted = h + self->unk54;
+                    goto joinAdjust;
+                negative:
+                    adjusted = h - self->unk54;
+                joinAdjust:
+                    func_8001F66C(&buf, isSeven, nonneg, adjusted);
+                }
+                self->methods->slot90(self, &buf, arg1);
+                if (self->unk28 != NULL) {
+                    if (self->unk28->methods->tag == 0x34) {
+                        self->unk28->methods->slotE8(self->unk28);
+                    }
+                }
+            }
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057320);
 
