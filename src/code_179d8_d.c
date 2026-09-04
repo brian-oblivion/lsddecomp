@@ -97,7 +97,11 @@ s32 func_8002C200(void *self)
     return func_80026CAC()->slot0C(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C238);
+s32 func_8002C238(s32 *self)
+{
+    self[0xC] = 1;
+    return func_80026CAC()->slot64(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C278);
 
