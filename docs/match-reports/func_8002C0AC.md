@@ -1,7 +1,104 @@
-# func_8002C0AC -- STALL (30/32 words, same instruction-order residue as func_8002C048)
+# func_8002C0AC -- MATCHED (32/32 words), round 17 permuter pass
 
 **Unit:** code_179d8_d · **Size:** 32 instructions (0x80 bytes) ·
-**Status: STALLED at 30/32 words**, restored to `INCLUDE_ASM`.
+**Status: MATCHED.** The report below documents a real stall at 30/32,
+explicitly recommended in its own text as "a legitimate permuter
+candidate" -- a round-17 permuter pass closed it in ~40s. Full history
+kept below; the fix is described first.
+
+## Round 17: what closed it
+
+`tools/setup-permuter.sh`, seeded from this report's own preserved 30/32
+body (unchanged). `--debug` base score 20, all register-difference
+penalty (4 registers x 5), zero insertion/deletion/reordering -- matching
+this report's own "pure instruction-order residue... register-identity
+safe" description exactly. Search found a zero at iteration 95.
+
+The winning mutation hoists the comparison itself into a named temp,
+evaluated BETWEEN the two loads and the `s2++` increment (rather than
+inline inside the `if`):
+
+```c
+s32 func_8002C0AC(char *s1, char *s2, s32 n)
+{
+    char c1;
+    char c2;
+    s32 mismatch_flag;
+
+    if (s1 == NULL) {
+        goto check_eq;
+    }
+    if (s2 != NULL) {
+        goto loop_entry;
+    }
+check_eq:
+    if (s1 != s2) {
+        goto not_equal;
+    }
+    goto return_zero;
+not_equal:
+    if (s1 == NULL) {
+        return -1;
+    }
+    return 1;
+
+loop_entry:
+    n--;
+    if (n < 0) {
+        return 0;
+    }
+loop_top:
+    c1 = *s1;
+    c2 = *s2;
+    mismatch_flag = c1 != c2;
+    s2++;
+    if (mismatch_flag) {
+        goto mismatch;
+    }
+    if (c1 == 0) {
+        goto return_zero;
+    }
+    s1++;
+    n--;
+    __asm__("");
+    if (n >= 0) {
+        goto loop_top;
+    }
+mismatch:
+    if (n < 0) {
+        goto return_zero;
+    }
+    return *s1 - *(s2 - 1);
+return_zero:
+    return 0;
+}
+```
+
+**This is the final source, committed as-is.** The permuter's own raw
+output used `short new_var` for the temp; verified byte-identical against
+`permuter-work/func_8002C0AC/target.o` (retail's own bytes, independently
+assembled) via a hand rebuild through the pinned pipeline, THEN simplified
+for commit -- retyped `short` -> `s32` (this project's usual boolean-flag
+width) and renamed `new_var` -> `mismatch_flag`, re-verified byte-identical
+after each change before committing either. `./build-and-verify.sh`
+confirms the whole-image SHA1, not just this function.
+
+### Proposed learning
+
+**Hoisting an inline comparison (`if (a != b)`) into a named temp
+assigned BETWEEN the two loads it depends on and a later unrelated
+statement (here, `s2++`) is a real lever for the "two independent loads
+compile in the opposite order, values register-safe" residue class** --
+distinct from (and evidently more effective than) the bare
+`__asm__("")` barrier already tried and rejected for this exact residue
+shape in both this function and its sibling `func_8002C048`. Try this
+BEFORE reaching for the permuter on the next instance of this residue
+signature (base-score debug output: all register-difference penalty,
+zero insertion/deletion/reordering) -- it may be cheap enough to attempt
+by hand. `func_8002C048` (this same unit) still carries the identical
+residue and is worth revisiting with this specific lever.
+
+## Full history (original stall report)
 
 ## Role
 

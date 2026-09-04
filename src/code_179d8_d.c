@@ -128,7 +128,59 @@ void func_8002C014(char *dest, char *src, s32 count)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C048);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C0AC);
+s32 func_8002C0AC(char *s1, char *s2, s32 n)
+{
+    char c1;
+    char c2;
+    s32 mismatch_flag;
+
+    if (s1 == NULL) {
+        goto check_eq;
+    }
+    if (s2 != NULL) {
+        goto loop_entry;
+    }
+check_eq:
+    if (s1 != s2) {
+        goto not_equal;
+    }
+    goto return_zero;
+not_equal:
+    if (s1 == NULL) {
+        return -1;
+    }
+    return 1;
+
+loop_entry:
+    n--;
+    if (n < 0) {
+        return 0;
+    }
+loop_top:
+    c1 = *s1;
+    c2 = *s2;
+    mismatch_flag = c1 != c2;
+    s2++;
+    if (mismatch_flag) {
+        goto mismatch;
+    }
+    if (c1 == 0) {
+        goto return_zero;
+    }
+    s1++;
+    n--;
+    __asm__("");
+    if (n >= 0) {
+        goto loop_top;
+    }
+mismatch:
+    if (n < 0) {
+        goto return_zero;
+    }
+    return *s1 - *(s2 - 1);
+return_zero:
+    return 0;
+}
 
 void *new_class_6d940(s32 arg1)
 {
