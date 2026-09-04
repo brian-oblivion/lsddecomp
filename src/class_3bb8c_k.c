@@ -154,7 +154,29 @@ void func_80052598(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052644);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005278C);
+void func_8005278C(Class86F88 *self)
+{
+    s32 count;
+    s32 i;
+    u8 unused[8];
+
+    if (!self->unk50) {
+        return;
+    }
+    count = self->unk10;
+    i = 0;
+    if (count >= 5) {
+        count = 4;
+    }
+    if (count <= 0) {
+        return;
+    }
+    do {
+        self->unk40[i]->methods->release(self->unk40[i]);
+        self->unk40[i] = NULL;
+        i++;
+    } while (i < count);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005281C);
 
