@@ -78,7 +78,16 @@ void func_80028A34(ObjA34_179D8H *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A50);
+s32 func_80028A50(ObjA34_179D8H *self) {
+    u32 result;
+
+    if (self->unk0C == 0) {
+        result = 0;
+    } else {
+        result = ((self->unk1C >> 11) + 1) << 11;
+    }
+    return result;
+}
 
 void func_80028A7C(void) {
 }
