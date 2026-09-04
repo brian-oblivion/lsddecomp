@@ -63,7 +63,7 @@ typedef struct TableDA34 {
     u8 pad000[0x078];
     s32 (*slot78)(ObjDA34 *self, s32 arg1); /* func_8002C824 */
     s32 (*slot7C)(ObjDA34 *self);           /* func_8002C890, BLOCKED (gp_rel) */
-    s32 (*slot84)(ObjDA34 *self, s32 arg1); /* func_8002CB18 */
+    s32 (*slot84)(ObjDA34 *self, s32 arg1); /* func_8002CB18, arg1 is s16-truncated by the callee */
     u8 pad088[0x09C - 0x088];
 } TableDA34;
 extern TableDA34 D_8006DA34;
@@ -98,7 +98,7 @@ struct ObjDA34 {
 extern void *func_80017B34(s32 size);
 extern s16 func_80030E90(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
 extern void func_80031E94(s16 a0, s16 a1, s16 a2, s32 a3);
-extern void func_80031890(s32 index);
+extern void func_80031890(s16 index);
 extern void func_80031F3C(s32 arg0);
 extern void func_8003370C(s32 arg0);
 extern s32 func_800336CC(s32 arg0);
@@ -148,7 +148,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C890);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CA3C);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CB18);
+s32 func_8002CB18(ObjDA34 *self, s32 index) {
+    if (index < 0x18) {
+        func_80031890(index);
+    } else {
+        func_80031F3C(0);
+    }
+    return -1;
+}
 
 s32 func_8002CB58(ObjDA34 *self) {
     s32 flag;
