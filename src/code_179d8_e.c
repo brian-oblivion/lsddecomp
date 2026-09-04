@@ -89,7 +89,7 @@ struct ObjDA34 {
     s16 unk54;             /* +0x054 */
     s16 unk56;              /* +0x056, boolean-ish flag */
     s16 unk58;              /* +0x058 */
-    s16 unk5A;               /* +0x05A */
+    u16 unk5A;               /* +0x05A */
     u8 pad05C[0x060 - 0x05C];
     s32 unk60;               /* +0x060 */
 };
@@ -157,7 +157,21 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C638);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C6FC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C824);
+s32 func_8002C824(ObjDA34 *self, s32 arg1) {
+    s32 result;
+
+    result = 0;
+    if (self->unk5A != 0) {
+        if (arg1 != 0) {
+            func_8003370C(1);
+            self->unk5A = 0;
+            self->unk58 = 1;
+            self->methods->slot7C(self);
+            result = 1;
+        }
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C890);
 
