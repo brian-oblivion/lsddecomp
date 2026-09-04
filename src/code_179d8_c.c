@@ -80,7 +80,17 @@ void func_80032A9C(void)
     func_80033738();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032AD0);
+extern s32 D_8006DCA0;
+
+void func_80032AD0(void)
+{
+    if (D_8006DCA0 == 0) {
+        D_8006DCA0 = 1;
+    } else {
+        D_8006DCA0 = 0;
+        func_80033738();
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", SetRCnt);
 
