@@ -116,7 +116,11 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_h", strcpy);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", strstr);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", CdStatus);
+extern u8 D_8006D60C;
+
+u8 CdStatus(void) {
+    return D_8006D60C;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028C44);
 
