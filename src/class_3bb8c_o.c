@@ -361,7 +361,11 @@ void func_80057320(DispatchObjO *self, TagByteObjO *arg1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057384);
+extern void func_800573CC(BaseObjO *self, s32 flag, Vec3O *v);
+
+void func_80057384(BaseObjO *self, Vec3O *arg1) {
+    func_800573CC(self, 1, arg1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800573A8);
 
