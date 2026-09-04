@@ -323,6 +323,18 @@ segments:
       # class; identify each with tools/classtable.py rather than assuming
       # the unit has one.
       - [0x179d8, asm, code_179d8]
+      # code_179d8_h: functions 43..59 of the original monolith's head,
+      # 0x19098..0x194E0 (17 functions).  Carved MID-round 17 to re-staff a
+      # runner whose own unit was exhausted.  Census 2026-09-04, three-grep
+      # screen per function: 16/17 clean, the one blocked is func_80028B6C
+      # (gp_rel, 3 instructions).  Three are 2-instruction leaves and three
+      # carry real names inherited from FirecatFG (strcpy, strstr,
+      # CdStatus).  The head remainder in FRONT of it (indices 0..42) is
+      # gp_rel-saturated -- 33 of its 43 functions blocked -- and also owns
+      # this segment's only jump table (func_80027A24), so the cut is placed
+      # here to leave both debts behind.  This slice owns NO jump table and
+      # needs no rodata attach.
+      - [0x19098, c, code_179d8_h]
       # code_179d8_b: window [60..79], 0x194E0..0x1A1BC (20 functions).
       - [0x194E0, c, code_179d8_b]
       # code_179d8_mid: functions 80..82 of the original monolith. UNCARVED
@@ -624,12 +636,26 @@ segments:
       # LAST four in ROM order, so the clean run is contiguous. Owns NO
       # switch jump table.
       - [0x44518, c, class_3bb8c_m]
-      # class_3bb8c_n: functions 0..53 of the old 113-function remainder,
-      # 0x44F14..0x475F0.  UNCARVED and left that way deliberately: its
-      # front is the gp_rel-densest ground in the executable (of its first
-      # 20 functions exactly ONE is clean).  Its indices 20..53 are much
-      # better (~28 of 34 clean) and are the obvious next carve here.
+      # class_3bb8c_n: functions 0..22 of the old 113-function remainder,
+      # 0x44F14..0x46288.  UNCARVED and left that way deliberately: this is
+      # the gp_rel-densest ground in the executable -- of these 23 functions
+      # exactly TWO are clean.  Not worth a runner until the gp-relative
+      # blocker moves.
       - [0x44F14, asm, class_3bb8c_n]
+      # class_3bb8c_r: functions 23..43 of that remainder, 0x46288..0x46D20
+      # (21 functions).  Carved MID-round 17 to re-staff a runner whose own
+      # unit was exhausted.  Census 2026-09-04, three-grep screen per
+      # function: 20/21 clean, the one blocked is func_8005630C (gp_rel, and
+      # only 5 instructions).  Zero trivial leaves -- every one is a real
+      # body, several 40-70 instructions.  Owns NO switch jump table, so no
+      # rodata attach.  Expect it to span more than one class; identify each
+      # with tools/classtable.py rather than assuming.
+      - [0x46288, c, class_3bb8c_r]
+      # class_3bb8c_s: functions 44..53 of that remainder, 0x46D20..0x475F0.
+      # UNCARVED.  10 functions, 5 clean -- a poor unit on its own, but it
+      # adjoins class_3bb8c_o and could be folded in if that block is
+      # revisited.
+      - [0x46D20, asm, class_3bb8c_s]
       # class_3bb8c_o: functions 54..73 of that remainder, 0x475F0..0x47CC4
       # (20 functions).  Census 2026-09-04, three-grep screen per function:
       # 19/20 clean, the one blocked is func_80056F5C (gp_rel).  Owns NO
