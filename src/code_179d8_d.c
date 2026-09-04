@@ -112,7 +112,10 @@ void func_8002C3D0(void)
     char buf[0x40];
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C3E0);
+void func_8002C3E0(void)
+{
+    char buf[0x40];
+}
 
 void func_8002C3F0(void) {
 }
