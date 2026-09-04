@@ -251,7 +251,19 @@ void *func_80056FE4(void) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057044);
+BaseObjO *func_80057044(BaseObjO *self) {
+    if (func_8001E57C()->ctor(self) == NULL) {
+        goto fail;
+    }
+    self->methods = func_80057C84();
+    self->unk44 = 0;
+    self->unk4C = NULL;
+    self->unk50 = NULL;
+    self->methods->slot40(self);
+    return self;
+fail:
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800570B4);
 
