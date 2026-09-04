@@ -179,7 +179,17 @@ void func_80051C74(Class86ED0 *self)
     self->unk50 = NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051C84);
+void func_80051C84(Class86ED0 *self)
+{
+    s32 i;
+
+    for (i = 0; i < self->unk10; i++) {
+        func_80017CFC(self->unk18[i]);
+    }
+    func_80017CFC(self->unk1C);
+    func_80017CFC(self->unk18);
+    func_80018390()->finalize(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051D1C);
 
