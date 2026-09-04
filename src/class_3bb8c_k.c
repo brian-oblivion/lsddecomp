@@ -215,6 +215,9 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052B70);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052C10);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052CD8);
+void func_80052CD8(Obj865C8 *self)
+{
+    func_8004A4B8()->dtor(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052D10);
