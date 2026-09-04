@@ -191,7 +191,20 @@ void func_80051C84(Class86ED0 *self)
     func_80018390()->finalize(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051D1C);
+void func_80051D1C(Class86ED0 *self, void *arg1)
+{
+    s32 tag;
+
+    if (arg1) {
+        func_80018390()->addChild(self, arg1);
+        tag = **(s32 **)arg1 & 0xF;
+        if (tag == 2) {
+            self->unk34 = arg1;
+        } else if (tag == 5) {
+            self->unk38 = arg1;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051DA0);
 
