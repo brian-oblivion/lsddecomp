@@ -327,7 +327,73 @@ s32 func_8005627C(ParamObj *ctx) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_8005630C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_80056320);
+/* ------------------------------------------------------------------ *
+ * D_800876FC's own slots (ctor/dtor/slot40), plus its `New_X` allocator.
+ * See the file banner: this is the SAME sibling table `class_3bb8c_o.c`
+ * (round 17, previous pass) already partly resolved; this unit's own
+ * local view is kept independent, per the multiple-independent-views
+ * convention -- `class_3bb8c_o.c` is not this unit's to edit.
+ * ------------------------------------------------------------------ */
+
+typedef struct Obj876FC Obj876FC;
+typedef struct Obj876FCMethods {
+    u8 pad0[0x8];
+    void *(*ctor)(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4); /* +0x008 func_800563C0 (this unit) */
+    void *(*dtor)(Obj876FC *self);                                                   /* +0x00C func_80056464 (this unit) */
+    u8 pad10[0x40 - 0x10];                                                              /* +0x010 .. +0x03F, shared-base slots, not this unit's to name */
+    void (*slot40)(Obj876FC *self, void *arg1);                                           /* +0x040 func_800564A4 (this unit) */
+} Obj876FCMethods;
+
+/* Declared as a WORD array, not a byte array, so a whole-struct assignment
+ * reproduces retail's aligned 4-word-per-iteration block-move codegen
+ * (the already-confirmed idiom, e.g. DreamSys.h's DreamSysUnk14Tail) --
+ * a byte array has alignment 1 and compiles the copy as a generic
+ * runtime-alignment-checked memcpy loop instead. */
+typedef struct Block24 {
+    s32 raw[0x24 / 4];
+} Block24;
+
+struct Obj876FC {
+    Obj876FCMethods *methods; /* +0x000 */
+    u8 pad4[0x24 - 0x4];        /* +0x004 .. +0x023, unknown */
+    s32 unk24;                    /* +0x024, cleared by func_800564A4 */
+    u8 pad28[0x44 - 0x28];          /* +0x028 .. +0x043, unknown */
+    s32 unk44;                        /* +0x044 */
+    u8 pad48[0x54 - 0x48];               /* +0x048 .. +0x053, unknown */
+    void *unk54;                           /* +0x054, the ctor's own arg1, stashed verbatim */
+    Block24 block58;                         /* +0x058, func_800564A4's own 0x24-byte block-copy target */
+};
+
+/* The shared base-class table getter, SAME symbol `class_3bb8c_o.c`
+ * already established as `func_80057C84` there (also MEASURED to take no
+ * real arguments). Fresh local reading here: this unit needs both `ctor`
+ * (+0x008, checked against NULL) and `dtor` (+0x00C, its return value
+ * forwarded by func_80056464). */
+typedef struct FixedBaseTableR {
+    u8 pad0[0x8];
+    void *(*ctor)(void *self); /* +0x008 */
+    void *(*dtor)(void *self);   /* +0x00C */
+} FixedBaseTableR;
+extern FixedBaseTableR *func_80057C84(void);
+
+extern void *func_80017B34(s32 size);
+extern void *func_80017CFC(void *ptr);
+extern Obj876FCMethods *func_80056F4C(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &D_800876FC */
+extern void func_80056718(Obj876FC *self);
+extern void *func_80056520(Obj876FC *self, void *arg1, void *arg2);
+
+void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3) {
+    Obj876FC *self = func_80017B34(0x98);
+
+    if (self != NULL) {
+        if (func_80056F4C()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
+            return self;
+        }
+        func_80017CFC(self);
+        return NULL;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_800563C0);
 
