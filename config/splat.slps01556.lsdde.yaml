@@ -670,11 +670,21 @@ segments:
       # 2-instruction leaves.  Owns NO switch jump table, so no rodata
       # attach.  Same multi-class caveat as _o above.
       - [0x47CC4, c, class_3bb8c_p]
-      # class_3bb8c_q: functions 94..112 of that remainder, 0x485BC..
-      # UNCARVED.  Holds D_8001176C / D_80011778 (the two strings left
-      # standalone in the 0x1EF4 slot split), referenced from func_80057FEC
-      # and func_80058084 -- both of which live in THIS remainder.
+      # class_3bb8c_q: functions 94..95 of that remainder, 0x485BC..0x48738.
+      # UNCARVED, and both are blocked -- func_80057DBC on addiu-$at and
+      # func_80057DF4 on nop_mflo_mfhi -- so there is nothing to staff here.
       - [0x485BC, asm, class_3bb8c_q]
+      # class_3bb8c_t: functions 96..112 of that remainder, 0x48738..0x48F74
+      # (17 functions).  Carved MID-round 17 to re-staff a runner whose own
+      # unit was exhausted.  Census 2026-09-04, three-grep screen per
+      # function: 16/17 clean, the one blocked is func_800585B4 (addiu-$at).
+      # Four are 2-instruction leaves.  Holds D_8001176C / D_80011778 (the
+      # two strings left standalone in the 0x1EF4 slot split), referenced
+      # from func_80057FEC and func_80058084 -- both in THIS slice.  Those
+      # are STRINGS referenced by symbol, which a standalone rodata object
+      # resolves fine (the 0xA8C precedent), so no attach is expected; the
+      # slice owns no `jtbl_` reference either.
+      - [0x48738, c, class_3bb8c_t]
       - [0x48F74, c, DreamSys]
       - [0x4CD08, c, code_4cd08]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
