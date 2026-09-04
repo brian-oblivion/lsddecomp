@@ -326,7 +326,13 @@ extern s32 D_800116E4;
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051F24);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_800520A0);
+void func_800520A0(Class86ED0 *self)
+{
+    if (self->unk50) {
+        self->methods->slot90(self);
+        self->unk50 = self->unk50->methods->slot4(self->unk50);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80052110);
 
