@@ -294,7 +294,18 @@ void func_80051E20(Class86ED0 *self)
     func_80018390()->removeAllChildren(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051E64);
+void func_80051E64(Class86ED0 *self, void *arg1, s32 arg2)
+{
+    s32 tag;
+
+    func_80018390()->slot38(self, arg1, arg2);
+    tag = **(s32 **)arg1 & 0xF;
+    if (tag == 2) {
+        self->methods->slot5C(self, arg1, arg2);
+    } else if (tag == 5) {
+        self->methods->slot58(self, arg1, arg2);
+    }
+}
 
 void func_80051F14(Class86ED0 *self)
 {
