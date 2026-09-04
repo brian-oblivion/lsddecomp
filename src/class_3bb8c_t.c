@@ -97,4 +97,8 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800585B4);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058694);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058764);
+extern D_80087AACMethods D_80087AAC;
+
+D_80087AACMethods *func_80058764(void) {
+    return &D_80087AAC;
+}
