@@ -265,7 +265,17 @@ fail:
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800570B4);
+void func_800570B4(BaseObjO *self, TagWordObjO *arg) {
+    s32 tag;
+
+    func_8001E57C()->slot10(self, arg);
+    tag = arg->methods->header;
+    if ((tag & 0xFFF) == 0x114) {
+        self->unk4C = arg;
+    } else if ((tag & 0xF) == 5) {
+        self->unk50 = arg;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057130);
 
