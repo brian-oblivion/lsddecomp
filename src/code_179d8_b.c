@@ -144,7 +144,27 @@ s32 func_80029274(s32 arg0, s32 arg1, s32 arg2)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800292F4);
+MSF179D8 *func_800292F4(s32 arg0, MSF179D8 *arg1)
+{
+    s32 lba;
+    s32 totalSeconds;
+    s32 frame;
+    s32 minute;
+    s32 second;
+    s32 frameTens;
+
+    lba = arg0 + 150;
+    totalSeconds = lba / 75;
+    frame = lba % 75;
+    frameTens = (frame / 10) << 4;
+    minute = totalSeconds / 60;
+    second = totalSeconds % 60;
+
+    arg1->second = ((second / 10) << 4) + (second % 10);
+    arg1->sector = frameTens + (frame % 10);
+    arg1->minute = ((minute / 10) << 4) + (minute % 10);
+    return arg1;
+}
 
 s32 func_800293F8(MSF179D8 *arg0)
 {
