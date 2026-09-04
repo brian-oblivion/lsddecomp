@@ -49,7 +49,7 @@ extern volatile s32 *D_8006D8D0;
 extern volatile u16 *D_8006D8D4;   /* HW register block; offsets are byte offsets */
 extern u8 D_8006D8D8;
 extern u8 D_8006D8D9;
-extern u8 D_8006D8DA;
+extern volatile u8 D_8006D8DA;
 extern s32 D_8006D8DC;   /* first of 10 consecutive words zeroed by a pointer walk;
                           * D_8006D8E0..D_8006D900 are the other nine, each
                           * already individually named -- not a real array. */
@@ -107,7 +107,27 @@ s32 func_8002A378(u8 *arg0)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A400);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A510);
+void func_8002A510(void)
+{
+    volatile u8 *q;
+
+    *D_8006D8C0 = 1;
+    while (*D_8006D8CC & 7) {
+        *D_8006D8C0 = 1;
+        *D_8006D8CC = 7;
+        *D_8006D8C8 = 7;
+    }
+
+    D_8006D8DA = 0;
+    q = &D_8006D8D9;
+    D_8006D61C = 0;
+    *q = D_8006D8DA;
+    __asm__("");
+    D_8006D8D8 = 2;
+    *D_8006D8C0 = 0;
+    *D_8006D8CC = 0;
+    *D_8006D8D0 = 0x1325;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A5F8);
 
