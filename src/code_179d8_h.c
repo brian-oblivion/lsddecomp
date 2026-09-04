@@ -43,6 +43,18 @@
  * tables are different classes but share the base's slot layout. */
 extern UnkFlagsObjMethods_171e0 *func_80027E68(void);
 
+/* func_80028A34/func_80028A50's own `self` -- offsets +0xC/+0x1C happen to
+ * coincide with UnkFlagsObj_171e0::unk0C and its documented-unknown pad18
+ * gap, but that header is code_171e0.c's shared reading and is off-limits
+ * to edit here (out of unit) -- kept as this unit's own LOCAL, narrower
+ * view per the project's multiple-independent-local-views convention. */
+typedef struct ObjA34_179D8H {
+    u8 pad0[0x0C];
+    s32 unk0C;
+    u8 pad10[0x1C - 0x10];
+    u32 unk1C;
+} ObjA34_179D8H;
+
 void func_80028898(UnkFlagsObj_171e0 *self) {
     ((UnkFlagsObjMethods_171e0 *)func_80026C9C())->ctor(self);
     self->methods = func_80027E68();
@@ -60,7 +72,11 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028920);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_800289CC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A34);
+void func_80028A34(ObjA34_179D8H *self) {
+    if (self->unk0C != 0) {
+        self->unk0C = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A50);
 
