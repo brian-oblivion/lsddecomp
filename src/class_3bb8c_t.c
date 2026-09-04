@@ -25,6 +25,17 @@
  */
 #include "common.h"
 
+/* The class allocated by this unit's own func_80057F68, table D_800879C4
+ * (49 slots, resolved via tools/classtable.py). Its ctor (func_80057D10)
+ * and its own funcs 80057F38/40/48/50 live in the neighbouring
+ * `class_3bb8c_p` unit (round 2026-09-04 earlier this round), which
+ * already carries its own local view of this table
+ * (`D_800879C4Methods`/`D_800879C4Obj` in that file). This unit's own
+ * view is kept separate per the multiple-independent-local-views
+ * convention -- func_80057F58 itself needs no fields, only the address. */
+typedef struct D_800879C4Table D_800879C4Table;
+extern D_800879C4Table D_800879C4;
+
 void func_80057F38(void) {
 }
 
@@ -37,7 +48,9 @@ void func_80057F48(void) {
 void func_80057F50(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80057F58);
+D_800879C4Table *func_80057F58(void) {
+    return &D_800879C4;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80057F68);
 
