@@ -135,7 +135,23 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AEE0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B198);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B304);
+s32 func_8002B304(s32 arg0, s32 arg1)
+{
+    *D_8006D8C0 = 0;
+    *D_8006D8CC = 0x80;
+    *D_8006D924 = 0x20943;
+    *D_8006D8D0 = 0x1323;
+    *D_8006D928 |= 0x8000;
+    *D_8006D92C = arg0;
+    *D_8006D930 = arg1 | 0x10000;
+    *D_8006D934 = 0x11000000;
+
+    while (*D_8006D934 & 0x1000000) {
+    }
+
+    *D_8006D8D0 = 0x1325;
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3E4);
 
