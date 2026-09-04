@@ -122,7 +122,23 @@ s32 func_80036108(void)
     return *(s16 *)&D_8008E25C;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036118);
+extern s16 D_8008E260;
+extern s16 D_8008E262;
+
+/* a0, a1 are treated as signed 16-bit inputs (0..127-ish range going by the
+ * /127 below) and rescaled to a signed 15-bit-ish range (*32767/127) before
+ * being poked into the same SPU-ish struct func_80036064 above writes. */
+void func_80036118(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+    s32 *p = &D_8008E258;
+
+    *p = 6;
+    D_8008E260 = (s32)sa0 * 32767 / 127;
+    D_8008E262 = (s32)sa1 * 32767 / 127;
+    func_80036B20(p);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_800361B0);
 
