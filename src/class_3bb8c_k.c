@@ -182,7 +182,22 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005281C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_8005292C);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800529FC);
+void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
+{
+    Class86F88Elem *elem;
+    s32 flag = a4;
+
+    __asm__("");
+    self->unk20 = a1;
+    self->unk24 = a2;
+    self->unk28 = a3;
+    if (flag == 0) {
+        return;
+    }
+    a3 -= a1;
+    elem = self->unk40[a3];
+    elem->methods->slotB8(elem, &D_8008AB10);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052A58);
 
