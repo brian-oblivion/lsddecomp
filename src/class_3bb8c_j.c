@@ -334,6 +334,20 @@ void func_800520A0(Class86ED0 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80052110);
+void func_80052110(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3)
+{
+    typedef void (*Slot10NarrowFn)(Class86ED0 *self, s32 arg1);
+    void (*fn)(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3);
+    s32 zero;
+
+    zero = 0;
+    fn = self->methods->slot10;
+    do {
+        fn(self, arg1, arg2, arg3);
+        ((Slot10NarrowFn)self->methods->slot10)(self, arg2);
+        self->unk3C = arg3;
+        self->unk2C = zero;
+    } while (0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_8005217C);
