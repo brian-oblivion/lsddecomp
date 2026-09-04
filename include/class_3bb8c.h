@@ -1670,11 +1670,12 @@ extern char *strcat(char *dest, char *src);
  * OTHER field of BasicClass. */
 typedef struct BasicMethods866E8F BasicMethods866E8F;
 struct BasicMethods866E8F {
-    u8 pad000[0x00C];
+    u8 pad000[0x008];
     /* class_3bb8c_j (round 15) additions below -- BasicClassMethods'
-     * canonical finalize/addChild/removeChild/removeAllChildren
+     * canonical ctor/finalize/addChild/removeChild/removeAllChildren
      * (include/code_8220.h), reached via this unit's own local view of
      * the same real getter/table. */
+    void (*ctor)(void *self);                          /* +0x008, func_80051AC8 */
     void (*finalize)(void *self);                    /* +0x00C, func_80051C84 */
     void (*addChild)(void *self, void *child);         /* +0x010, func_80051D1C */
     void (*removeChild)(void *self, void *child);       /* +0x014, func_80051DA0 */
