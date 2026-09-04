@@ -277,7 +277,16 @@ void func_800570B4(BaseObjO *self, TagWordObjO *arg) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80057130);
+void func_80057130(BaseObjO *self, TagWordObjO *arg) {
+    s32 tag = arg->methods->header;
+
+    if ((tag & 0xFFF) == 0x114) {
+        self->unk4C = NULL;
+    } else if ((tag & 0xF) == 5) {
+        self->unk50 = NULL;
+    }
+    func_8001E57C()->slot14(self, arg);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_800571A8);
 
