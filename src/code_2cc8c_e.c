@@ -247,7 +247,16 @@ Class6E99CMethods *func_800404C0(void) {
     return &D_8006E99C;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800404D0);
+ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
+    ClassEAC0Obj *self;
+
+    self = func_80017B34(0x6C);
+    if (self != NULL) {
+        ((ClassEAC0Methods *)func_800408BC())->ctor(self, a0, a1, a2);
+        return self;
+    }
+    return NULL;
+}
 
 void func_8004054C(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     func_8001E57C()->ctor(self);
