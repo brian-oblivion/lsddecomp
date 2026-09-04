@@ -45,6 +45,7 @@ extern s32 func_8002B304(s32 arg0, s32 arg1);
 extern s32 func_80024D70(s32 arg0, s32 arg1); /* asm/psyq_GsLinkObject4.s */
 extern s32 func_8002B198(s32 arg0);
 extern s32 func_8002AEE0(s32 arg0, s32 arg1);
+extern s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2);
 
 /* CD-ROM MSF (minute/second/sector-in-frame) timecode, all three fields
  * packed BCD. This unit's own local reading -- see func_800293F8. */
@@ -128,7 +129,17 @@ s32 func_80029254(s32 arg0, s32 arg1)
     return func_8002AEE0(arg0, arg1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80029274);
+s32 func_80029274(s32 arg0, s32 arg1, s32 arg2)
+{
+    s32 i;
+
+    for (i = 3; i != -1; i--) {
+        if (func_8002ADE8(arg1, arg0, arg2) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_800292F4);
 
