@@ -71,6 +71,8 @@ extern s32 D_8008B3EC;
 extern u8 D_80010AE0[];
 extern u8 D_80010984[];
 extern u8 D_80010994[];
+extern u8 D_80010A40[];
+extern u8 D_80010A50[];
 extern u8 D_8006D908[];
 extern u8 D_8006D90C[];
 extern volatile s32 *D_8006D924;
@@ -113,7 +115,32 @@ s32 func_8002A378(u8 *arg0)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A400);
+void func_8002A400(void)
+{
+    s32 saved;
+    s32 counter = 0;
+
+    if (D_8006D904 < D_8006D614) {
+        saved = D_8006D5FC;
+        D_8006D5FC = 0;
+
+        while (D_8006D60C & 0x10) {
+            if ((u8)counter == 0) {
+                func_80025AE4(D_80010A40);
+            }
+            counter++;
+            func_80029F10(1, 0, 0, 0);
+        }
+
+        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
+            func_80029F10(1, 0, 0, 0);
+            func_80025AE4(D_80010A50);
+        }
+
+        D_8006D5FC = saved;
+        D_8006D904 = D_8006D614;
+    }
+}
 
 void func_8002A510(void)
 {
