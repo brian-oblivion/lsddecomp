@@ -28,7 +28,13 @@ void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
     self->methods->slot10(self, arg2);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80052E7C);
+void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
+    if (code >= 0) {
+        func_80049060(self->unk38);
+    } else {
+        func_80049098(self->unk38, arg2, arg3);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80052EBC);
 
