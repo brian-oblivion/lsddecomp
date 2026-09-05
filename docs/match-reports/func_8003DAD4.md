@@ -1,5 +1,92 @@
 # func_8003DAD4 — STALL (register-identity, 114/118 words on the best body)
 
+## Round 20 (runner delta): two more attempts, both negative; residues confirmed identical to round 19's description
+
+Drift-checked the preserved body fresh (`git diff` shows no changes had
+crept in): rebuilds to exactly 114/118 with no outside-range drift,
+matching this report's own baseline precisely. Both residues confirmed
+via `tools/asm-differ` at the same two spots this report already names:
+
+1. `move $s1,zero` (the loop counter's zero-init) lands in retail's
+   `blez $s3,.L2e3d0` delay slot (the LOOP GUARD, right where the loop
+   itself begins); this body's compiled form hoists it all the way to
+   the function's FIRST branch instead (`bne $v1,$v0,.L2e484`, the
+   `self->unk3C != 2` early-return guard) -- a much larger hoist distance
+   than "one delay slot over," and the same mechanism this round's other
+   reports name precisely (a scheduler filling an available slot with
+   independent, already-computable work): `func_8003FCFC.md`,
+   `func_8003F848.md`, and this unit's own `func_8003D73C.md` (companion
+   function, same round).
+2. `target->unk14`'s temp lands in `$v0` here vs `$a1` in retail --
+   IDENTICAL residue and IDENTICAL surrounding code shape to
+   `func_8003D73C`'s own residue 2 (same `Unk24Elem` struct, same
+   `unk10`/`unk14` field pair, same local-buffer-build idiom). Confirmed
+   side-by-side this round rather than assumed from the two reports'
+   separate descriptions.
+
+### Attempts (2)
+
+1. **A bare `__asm__("")` scheduling barrier placed immediately after the
+   `self->unk3C != 2` guard** (a position round 12's own attempts did not
+   try -- that report tried a barrier "immediately before the loop,"
+   this one targets the OTHER end of the hoist, where the value ends up
+   landing): **regressed sharply to 23/118** with a large outside-range
+   drift warning, the same failure mode `func_8003FCFC.md` and
+   `func_8003F848.md` hit this round with barriers placed elsewhere in
+   their own functions. **A fifth confirmed instance (with those two,
+   plus round-12's own two barrier attempts on THIS function) of
+   `__asm__("")` failing to generalize past its one documented use**
+   (callee-save prologue ordering) -- this is now a large enough count
+   that it should be read as "presumptively harmful on a hoist-distance
+   residue," not merely "sometimes doesn't help."
+2. **A fresh, block-scoped loop variable** (`{ s32 j; for (j = 0; j <
+   count; j++) {...} }` instead of the pre-declared `i`, isolating the
+   loop's own scope from the rest of the function's declarations): no
+   change at all -- byte-identical to the baseline 114/118. Confirms
+   (again, as this report's own round-12 "what did NOT work" section
+   already established for OTHER declaration-order questions) that GCC
+   2.6.3's hoist-distance choice for a zero-initialization is not
+   influenced by the variable's C-level name or declaration scope, only
+   by its data-dependency graph -- which has nothing forcing it to stay
+   local to the loop guard's own delay slot.
+
+Both reverted immediately; final state re-verified byte-identical to the
+114/118 baseline before restoring `INCLUDE_ASM`.
+
+### Proposed learning
+
+**`__asm__("")` failing to generalize past its one documented use is no
+longer a occasional caution -- it is now a 5-for-5 negative record this
+round alone** (this function's two new attempts, plus
+`func_8003FCFC`'s barrier, plus `func_8003F848`'s implicit confirmation
+via the same class, plus round-12's own two attempts on this same
+function). Every barrier tried on a hoist-distance/delay-slot-placement
+residue this round either did nothing or actively regressed by breaking
+an already-correct DIFFERENT delay-slot filler elsewhere in the same
+function. The one documented working case (callee-save prologue
+ordering) remains the only confirmed positive instance in the project's
+history. Worth treating "try a barrier" as a LOW-PRIORITY, likely-harmful
+lever for this residue class specifically, not a cheap first thing to
+reach for.
+
+**This function's residue 1 (hoist DISTANCE, not just delay-slot choice)
+is a variant worth distinguishing from residue 2 (register CHOICE) and
+from `func_8003D73C`'s residue 1 (instruction ORDER swap that opens/
+closes an available slot)** -- three related-looking but mechanically
+distinct sub-classes now confirmed within this one unit's `Unk24Elem`-
+touching family:
+- a wrong-slot hoist that travels ACROSS multiple branches (this
+  function, residue 1),
+- a swap between two adjacent, commutative-order instructions that
+  changes which slot even EXISTS to be filled (`func_8003D73C`,
+  residue 1),
+- a same-instruction, different-register temp choice with no
+  scheduling component at all (`func_8003D73C` residue 2 and this
+  function's residue 2 -- confirmed identical this round).
+
+Restored to `INCLUDE_ASM`. Full oracle re-confirmed green
+(`build exit=0`, `OK: build matches retail`) before moving on.
+
 ## Round 19: two more attempts on the delay-slot residue, both negative
 
 Re-examined per this round's brief (register-shaped verdicts are the
