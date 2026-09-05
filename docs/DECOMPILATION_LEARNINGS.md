@@ -695,6 +695,47 @@ three instances across two units. It is recorded here as an OPEN observation,
 not a promoted class: nobody has yet found its discriminating test, and the
 lesson directly above says that is what would settle it.
 
+### One named C variable gets ONE storage location — retail's transient-rematerialization shape has no C spelling (round 20)
+
+**GCC 2.6.3's allocator is not SSA: a named C variable has one fixed storage
+location for its whole scope.** So the moment any reachable path requires that
+variable to survive a call, the WHOLE variable is promoted to a callee-saved
+register — no matter how many redundant assignment sites you write.
+
+Retail sometimes does something a C author cannot ask for: several
+**independent, transient, scratch-register recomputations** of the same value,
+converging on one physical merge point, with no single variable ever living
+across the calls.
+
+Established by echo on `func_80064E34` (98 words) with six structural variants
+deliberately **bracketing retail's length from both directions** — four
+independent call sites (110 words, 12 over), two call sites (104, 6 over), a
+combined `||` guard (drift), a `goto`-based shared label (92, 6 under), and a
+named variable reassigned at each of retail's four rematerialization sites
+(97/99 — one word off in *either* direction, the closest reached). Bracketing
+like this is the right way to argue a shape is unreachable: it shows the target
+sits between two adjacent expressible forms rather than merely that several
+guesses missed.
+
+**Three things this is NOT, and they matter:**
+
+- **Not a toolchain lead.** The pinned compiler is behaving as designed. There
+  is nothing to escalate and nothing to reproduce in isolation; a
+  register-allocation policy is not a bug.
+- **Not grounds for raw asm.** CLAUDE.md's "no C form EXISTS" exception is
+  scoped to INSTRUCTIONS with no C spelling — GTE `rtpt`/`nclip`, COP2
+  `swc2`/`lwc2`. "The allocator will not produce this arrangement" is
+  emphatically not that, and round 13 already had one whole-function `__asm__`
+  reworked into six lines of ordinary C for making a weaker version of this
+  argument.
+- **Not a reason to stop measuring.** It is a characterised STALL, and the
+  characterisation is what makes it cheap to recognise next time.
+
+**The recognisable signature:** retail recomputes a value at several sites and
+never keeps it in a callee-saved register, while every C form you write either
+hoists it into one (too few words) or duplicates surrounding setup (too many).
+If bracketing puts you one word out on both sides, you are probably here.
+
 ### The `__asm__("")` barrier in round 20: two wins, four regressions, and the discriminator (round 20)
 
 The bare scheduling barrier is the one lever CLAUDE.md permits for an
