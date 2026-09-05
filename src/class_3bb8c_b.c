@@ -61,6 +61,83 @@ void func_8004C620(Obj866E8 *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
 
+/* STALLED at 45/109 words -- see docs/match-reports/func_8004C93C.md for
+ * the full round-19 analysis. Two real CFG/scheduling fixes closed most of
+ * the gap (a hoisted "flag=0" default matching the project's established
+ * "default value in the guarding branch's delay slot" idiom; a
+ * deliberately-duplicated `slot0 = &self->slots8C[0];` on both arms of the
+ * h6<0 test, held apart with a bare `__asm__("")` scheduling barrier to
+ * stop the compiler tail-merging the two identical stores back into one).
+ * What remains is a clean register-identity rotation across the whole
+ * function (self/h4/h6/slot0/span all permuted, matching set of registers)
+ * -- restored here per project convention. */
+#if 0
+void func_8004C93C(Obj866E8 *self) {
+    s32 flag;
+    s32 h4;
+    s32 width;
+    s32 height;
+    s32 quadrant;
+    s32 h6;
+    GridSlot866E8 *slot0;
+    s32 span;
+    s32 count;
+    GridSlot866E8 *slot1;
+
+    flag = 0;
+    h4 = self->unk7C;
+    width = self->unk80;
+    height = self->unk84;
+    quadrant = 3;
+    if (h4 < 0) {
+        h4 += 0x14;
+        flag = 1;
+        quadrant = 2;
+    }
+    h6 = self->unk7E;
+    if (h6 < 0) {
+        if (flag == 0) {
+            h6 += 0x14;
+            if (h4 < 0xA) {
+                h4 += 0xA;
+                quadrant = 0;
+            } else {
+                h4 -= 0xA;
+                quadrant = 1;
+            }
+        } else {
+            h4 -= 0xA;
+            quadrant = 0;
+        }
+        slot0 = &self->slots8C[0];
+    } else {
+        __asm__("");
+        slot0 = &self->slots8C[0];
+    }
+    slot0->elemIdx = self->methods->slot120(self, quadrant);
+    slot0->h4 = (h4 >= 0) ? h4 : 0;
+    slot0->h6 = h6;
+    span = h4 + width;
+    if (span >= 0x15) {
+        span -= 0x14;
+        slot0->h8 = width - span;
+        count = func_8004CAF0(self, slot0, 0, quadrant, h4, h6, width, height);
+        count += 1;
+        slot1 = &self->slots8C[count];
+        slot1->elemIdx = self->methods->slot120(self, quadrant + 1);
+        slot1->h4 = 0;
+        slot1->h6 = self->slots8C[0].h6;
+        slot1->h8 = span;
+        slot1->hA = self->slots8C[0].hA;
+    } else {
+        slot0->h8 = width;
+        count = func_8004CAF0(self, slot0, 0, quadrant, h4, h6, width, height);
+    }
+    count += 1;
+    self->unk88 = count;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 
 /* STALLED at 55/97 words -- see docs/match-reports/func_8004CAF0.md for the
