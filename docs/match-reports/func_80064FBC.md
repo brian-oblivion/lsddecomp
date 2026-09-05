@@ -1,4 +1,4 @@
-# func_80064FBC — STALL (register-store order, best 65/70)
+# func_80064FBC — MATCHED (was misdiagnosed as register-store-order; real fix was a wrong conditional grouping)
 
 **Unit:** Entity_g · **Size:** 70 instructions · **Attempts:** 5
 
@@ -136,3 +136,92 @@ risks exactly the kind of collateral reassignment attempt 3 hit.
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. 5 attempts,
 `INCLUDE_ASM` restored.
+
+## MATCHED -- round: permuter pass (runner delta)
+
+**The 5-attempt manual round's diagnosis was wrong about the residue's
+CAUSE.** It read this as "retail moves `arg3` into `$s1` earlier than any
+C form naturally demands" (a register-commit-timing residue). The
+permuter (`-j 6 --stop-on-zero --best-only`, zero reached at iteration
+6810 of an unbounded-until-zero run) found the actual fix in under a
+minute: **`out->unk10 = 0;` is NOT gated by `out->unk4 == 6` -- it runs
+UNCONDITIONALLY, every call, before that check.** Every manual attempt
+had it nested inside the `if`, alongside `unk1C`/`unk30`/`unk44` (which
+genuinely ARE conditional on `unk4 == 6`). Moving just that one store
+outside the `if` is the entire fix -- no barrier, no local, no reordering
+of anything else.
+
+```c
+void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
+    s32 unkFC;
+
+    out->unk10 = 0;
+    if (out->unk4 == 6) {
+        out->unk1C = 4;
+        out->unk30 = 4;
+        out->unk44 = 4;
+    }
+    unkFC = this->unkFC;
+    if (unkFC < arg2) {
+        goto L18;
+    }
+    if (!(arg2 + 0x5B < unkFC)) {
+        goto L50;
+    }
+L18:
+    if (unkFC < arg2 + 0x155) {
+        goto L34;
+    }
+    if (!(arg2 + 0x1B1 < unkFC)) {
+        goto L50;
+    }
+L34:
+    if (unkFC < arg2 + 0x2BA) {
+        goto L74;
+    }
+    if (arg2 + 0x317 < unkFC) {
+        goto L74;
+    }
+L50:
+    this->methods->slot44(this, 0, D_80089D18);
+L74:
+    this->methods->slotC4(this, arg4, 0);
+    if (this->unkFC == arg3) {
+        this->methods->slot160(this);
+        this->unk44 = 1;
+    }
+}
+```
+
+Verified byte-exact: `./build-and-verify.sh` -- `OK: build matches retail
+SLPS_015.56` -- and `tools/funcdiff.py func_80064FBC` -- `70/70 words
+match`. This is now the live body in `src/Entity_g.c` (`INCLUDE_ASM`
+removed).
+
+### New struct knowledge
+
+`EntityMoodHandlerArg::unk10` is reset to 0 on EVERY call into this
+handler shape, not just when `unk4 == 6` -- i.e. it is this function's own
+"clear the field before any conditional overwrite" idiom, not part of the
+`unk4==6` bundle. Worth checking whether sibling mood-handler functions in
+this unit/family (`Entity_d.c`, `Entity_e.c`, `Entity_g.c`) that also
+touch `out->unk10` make the same unconditional-vs-conditional mistake if
+their own near-miss reports show a similar unexplained residue.
+
+### Proposed learning
+
+**A register/scheduling-shaped residue with no obvious source lever is
+worth checking for a wrong CONDITIONAL GROUPING before reaching for a
+barrier or a local.** This round's manual attempts (1-5, preserved above)
+never questioned whether all four of the `unk4==6` block's stores
+actually belonged together in the source -- they treated the block as
+verified-correct because the VALUES and the vtable/vslot identities were
+right, and hunted for a scheduling explanation for the one register that
+wouldn't line up. The permuter doesn't have that bias: it mutates
+statement placement freely, and this is a second (after `func_80063144`'s
+divergence #1 this same round) case of it finding a real logic-grouping
+fix inside a body whose control flow and field IDENTITIES were already
+confirmed correct. When several C-level reshapes of a small block all
+converge on the identical residue, that convergence is evidence the levers
+tried are the wrong axis -- not evidence the axis (conditional grouping,
+statement scope) has been exhausted.
