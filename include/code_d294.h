@@ -618,11 +618,27 @@ extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
 
 /* func_80015618 (still uncarved, a different/earlier segment): called once
  * per iteration by func_8001EE98 below as `(fixed, b, a)`; not decompiled
- * here, declared only with the opaque shape that call site needs. */
-extern void func_80015618(void *fixed, void *b, void *a);
+ * here, declared only with the opaque shape that call site needs.
+ *
+ * DELIBERATELY UNPROTOTYPED (round 19, echo -- see
+ * docs/match-reports/func_8001EE98.md's "MATCHED" section for the full
+ * derivation): func_8001EE98's own outgoing-argument stack reservation is
+ * 24 bytes (six words), not the 16-byte/three-word minimum its one LIVE
+ * call site needs. An isolated reproducer under the pinned toolchain
+ * confirmed retail's exact bytes -- frame size, live call site, AND the
+ * unreachable-code source shape -- only when `func_80015618` is called
+ * BOTH with 3 live arguments (this unit's real call, inside the loop) AND
+ * with 6 arguments inside a `if (0) { ... }` dead branch elsewhere in the
+ * SAME function (GCC 2.6.3 sizes the outgoing-arg area from every call
+ * expression's arg count during RTL expansion, before the dead branch is
+ * eliminated -- so the frame remembers an arg count the emitted code
+ * never uses). A K&R/unprototyped declaration is required for this: an
+ * ANSI prototype would make the mismatched-arity calls a compile error. */
+extern void func_80015618();
 
-/* func_8001EE98 (this unit, round 14): a paired-array iteration sibling to
- * func_8001EE04 above -- `count` iterations, 0xC bytes/element (no
+/* func_8001EE98 (this unit, round 14; MATCHED round 19, echo -- see
+ * docs/match-reports/func_8001EE98.md): a paired-array iteration sibling
+ * to func_8001EE04 above -- `count` iterations, 0xC bytes/element (no
  * unaligned-load complication this time, both `a`/`b` are read directly),
  * calling `func_80015618(fixed, b, a)` once per element and advancing both
  * `a`/`b` by 0xC each time while `fixed` stays constant across every call.

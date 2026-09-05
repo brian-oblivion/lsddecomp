@@ -140,7 +140,19 @@ u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value) {
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EE04);
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EE98);
+void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
+    u8 *end;
+
+    end = (u8 *)a + count * 0xC;
+    while ((u8 *)a < end) {
+        func_80015618(fixed, b, a);
+        a = (u8 *)a + 0xC;
+        b = (u8 *)b + 0xC;
+    }
+    if (0) {
+        func_80015618(fixed, b, a, 0, 0, 0);
+    }
+}
 
 s32 func_8001EF14(s32 *a, s32 range, s32 *b) {
     s32 i;
