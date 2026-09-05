@@ -215,7 +215,36 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800400B0);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040154);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800402F0);
+void func_800402F0(Class6E99CObj *self, void *a1) {
+    Class6E99CMethods *methods;
+    s32 mode;
+
+    methods = self->methods;
+    if (self->unk6C == 0) {
+        return;
+    }
+    if (self->unk6C == 1) {
+        mode = 5;
+        if (self->unk98 == 0) {
+            methods->slot60(self, 0);
+            methods->slot64(self, 0);
+        }
+    } else {
+        mode = 6;
+        if (self->unk98 != 0) {
+            if (self->unk78 == 0xF) {
+                methods->slotB8(self, 1, D_8006EAA8);
+            }
+            methods->slot64(self, 0);
+        }
+    }
+    methods->slot14(self, a1);
+    if (self->unk74 < 0) {
+        self->unk74 = -self->unk74;
+    }
+    self->unk6C = 0;
+    methods->slot30(self, mode);
+}
 
 void *func_800403F8(Class6E99CObj *self) {
     if (self->unk78 == 0xF) {
