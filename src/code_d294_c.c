@@ -138,7 +138,34 @@ u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value) {
     return old;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EE04);
+/* Element type for func_8001EE04's own per-record copy: 6 bytes, a 32-bit
+ * value (as two s16 halves, never accessed as a native s32 -- keeping the
+ * struct's OWN members all s16 is what gives it alignment 2, the same
+ * "all-s8/s16 struct -> alignment 2 -> whole-struct copy compiles to
+ * unaligned lwl/lwr + swl/swr" idiom documented in
+ * DECOMPILATION_LEARNINGS for Vec3S16_d294/FlashbackRotation, confirmed
+ * here by an isolated toolchain reproducer) plus a trailing s16. */
+typedef struct Rec6_d294 {
+    s16 w0;
+    s16 w1;
+    s16 h;
+} Rec6_d294;
+
+extern void func_80015D58(void *out, void *buf, void *src);
+
+void func_8001EE04(void *src, void *dest, s32 count, void *out) {
+    u8 *end;
+
+    end = (u8 *)src + count * 6;
+    while ((u8 *)src < end) {
+        Rec6_d294 buf;
+
+        buf = *(Rec6_d294 *)dest;
+        func_80015D58(out, &buf, src);
+        dest = (u8 *)dest + 6;
+        src = (u8 *)src + 6;
+    }
+}
 
 void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
     u8 *end;

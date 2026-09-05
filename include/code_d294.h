@@ -607,13 +607,18 @@ extern Sixteen6_d294 *func_8001F50C(void *arg0, s32 arg1);
  * with the opaque `void *`/`s32` shape that call site needs. */
 extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
 
-/* func_8001EE04 (asm/code_d294_c.s, the NEXT slice, still uncarved): an
- * element-copy loop -- `count` iterations, 6 bytes/element, reading from
- * `src` and writing (by way of func_80015D58, not decompiled here either)
- * into `dest`. func_8001D624 (this unit, round 12) calls it with `src` and
- * `dest` (its own arg0/arg1) equal to the SAME address -- read off its own
- * disassembly (`addiu $a0,$s1,4` then `addu $a1,$a0,$zero`), not reasoned
- * from the name. Declared only with the opaque shape that call site needs. */
+/* func_8001EE04 (this unit; MATCHED round 19, echo -- see
+ * docs/match-reports/func_8001EE04.md): an element-copy loop -- `count`
+ * iterations, 6 bytes/element. CORRECTED naming vs. the original guess
+ * below (confirmed against the byte-exact disassembly, not reasoned from
+ * the name): each iteration reads a 6-byte `Rec6_d294` record OUT OF
+ * `dest` into a stack-local copy, then forwards that copy AND `src`
+ * (unchanged, raw pointer, never dereferenced by this function itself) to
+ * `func_80015D58(out, &buf, src)`. `func_8001D624` (this unit, round 12)
+ * calls it with `src` and `dest` (its own arg0/arg1) equal to the SAME
+ * address, which is why this asymmetry was invisible until this function
+ * was actually matched. Declared only with the opaque shape its callers
+ * need. */
 extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
 
 /* func_80015618 (still uncarved, a different/earlier segment): called once
