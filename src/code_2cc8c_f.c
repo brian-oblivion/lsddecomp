@@ -156,7 +156,27 @@ void func_80040AE8(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040C00);
+void func_80040C00(Obj6EAC0 *self) {
+    Obj6EAC0 **elemp;
+    s32 i, bound;
+
+    if (self->unkC != 0) {
+        if (self->unkB4 != NULL) {
+            elemp = self->unkB4 + self->unkAC;
+            i = self->unkAC;
+            bound = i;
+            if (i < bound + self->unkAB) {
+                do {
+                    (*elemp)->methods->slot50(*elemp);
+                    elemp++;
+                    bound = self->unkAC;
+                    i++;
+                } while (i < bound + self->unkAB);
+            }
+        }
+        func_80041C3C()->slot50(self);
+    }
+}
 
 s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
