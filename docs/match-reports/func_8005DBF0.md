@@ -182,3 +182,45 @@ permuter run: check whether `slot15C`'s signature, or `doDetach`'s type, or
 Do NOT spend another permuter run on this without trying that first. And note
 the per-slot warning from round 7: a slot retype is not local, so check every
 other caller and the whole-image SHA1 before believing it.
+
+## ROUND 20 (runner echo): tested the type-retype lever flagged above -- negative
+
+Tested the specific untried lever this report's round-8 section flagged
+(the `func_8005E160`/`EntityMethods::slotC4` precedent: retyping a slot's
+return type suppressed an unwanted tail-merge of two identical discarded
+calls). The only retypeable value in THIS function's residue is
+`doDetach` itself (there is no discarded call return in play here, unlike
+the precedent) -- tried narrowing it from `s32` to `s8`.
+
+**Result: regressed, 33/74 with a genuine 125566-byte outside-range
+drift** -- a real size change (narrower `doDetach` forces different store/
+test instructions elsewhere, not just a suppressed merge), not a
+neutral rephrasing. Reverted immediately. The type lever does not apply
+here the way it did for the `slotC4` precedent: that case worked by
+changing what the COMPILER SEES ABOUT A DISCARDED CALL RESULT (an
+implicit dead-value analysis difference between `void` and `s32`
+returns); here there is no call at either merge site, only a plain
+`s32 = 1;` assignment, so there is no analogous "discarded value" axis
+for a type change to perturb. Confirmed empirically rather than assumed.
+
+**This function's residue, precisely characterized against
+`func_80061778`'s (this same round's OTHER tail-merge assignment) for the
+coordinator's discriminator question:** `func_8005DBF0`'s residue is a
+**whole-statement, single-level merge-count question** -- exactly THREE
+predecessors reach an identical trivial statement (`doDetach = 1;`, one
+instruction, `ori $s2,$zero,0x1`), and retail's cross-jump pass unifies
+only TWO of them (the `detachKind==1` direct branch and the
+rand-check-passed fallthrough), leaving the THIRD (`detachKind==2`) with
+its own separate, textually-identical copy of the same one-word
+statement plus its own now-unnecessary `j`. There is no partial-suffix
+question here -- the merged/unmerged unit IS the entire content of each
+predecessor's block (one instruction). This is the simplest possible
+version of the phenomenon, and it is the one where NEITHER of this
+round's two tested levers (type retype here; operand/statement reshaping
+in the original round-8 pass) reaches it.
+
+**Disposition unchanged: STALL at 72/74 words (8 bytes / 2 words short),
+`INCLUDE_ASM` restored.** PERMUTER-EXHAUSTED (round 8, 15-minute run,
+floor 660 vs base 700, no zero). No new lever found this round; the
+type-retype avenue this report flagged as the one remaining untried idea
+is now a confirmed negative, not an open thread.
