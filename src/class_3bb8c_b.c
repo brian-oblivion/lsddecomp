@@ -63,6 +63,63 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 
+/* STALLED at 55/97 words -- see docs/match-reports/func_8004CAF0.md for the
+ * full round-19 analysis. Frame size, callee-saved register SET and CFG
+ * shape all now match retail exactly (round 9's "frame off by 8 bytes,
+ * reconstruction problem" diagnosis is SUPERSEDED); the residue is a clean
+ * 3-register rotation (self/slot/a third reused value among $s0/$s1/$s3)
+ * confirmed inert to declaration reordering, consistent with this
+ * project's established register-identity-rotation class. Preserved here
+ * per project convention rather than only in the report. */
+#if 0
+s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+    s32 hSpan;
+    s32 hSpan2;
+    s32 h4;
+    s32 nextArg;
+
+    if (p6 + p8 >= 21) {
+        hSpan = (p6 + p8) - 20;
+        hSpan2 = hSpan;
+        slot->hA = p8 - hSpan;
+        count = count + 1;
+        slot = &self->slots8C[count];
+
+        if (p5 < 10) {
+            nextArg = baseIdx + 2;
+            slot->elemIdx = self->methods->slot120(self, nextArg);
+            __asm__("");
+            h4 = p5 + 10;
+        } else {
+            nextArg = baseIdx + 3;
+            slot->elemIdx = self->methods->slot120(self, nextArg);
+            __asm__("");
+            h4 = p5 - 10;
+        }
+        slot->h4 = h4;
+        slot->hA = hSpan2;
+
+        hSpan2 = slot->h4 + p7;
+        slot->h6 = 0;
+        if (hSpan2 >= 21) {
+            count = count + 1;
+            slot->h8 = (p7 + 20) - hSpan2;
+            slot = &self->slots8C[count];
+            slot->elemIdx = self->methods->slot120(self, nextArg + 1);
+            slot->h4 = 0;
+            slot->h6 = 0;
+            slot->h8 = hSpan2 - 20;
+            slot->hA = hSpan;
+            return count;
+        }
+        slot->h8 = p7;
+        return count;
+    }
+    slot->hA = p8;
+    return count;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CAF0);
 
 /* Forward declaration: defined later in this file (in ROM order, after
