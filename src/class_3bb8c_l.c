@@ -247,22 +247,16 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053984);
  * from the definition. */
 extern void func_80053EB4(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
-/* STALLED at 28/71 words -- see docs/match-reports/func_80053ACC.md for the
- * full analysis. This body is structurally correct (every field, every
- * argument value, the switch's case values and the outer zero-check are all
- * confirmed against the disassembly) but diverges from retail by exactly one
- * register-allocation choice in a branch delay slot that this round could
- * not reproduce from source. Preserved here, out of the way, rather than
- * only in the report, per project convention. */
-#if 0
 void func_80053ACC(Obj87034_3bb8c_l *self) {
     s32 local18;
+    s32 span;
     s32 t;
     s32 arg3;
 
     self->unk20 = 4;
     if (self->unk3C->methods->slotF0(self->unk3C, &local18, -1) == 0) {
-        t = (self->unk1C + (s32)self->unk38) & 3;
+        span = (self->unk1C + (s32)self->unk38) & 3;
+        t = span;
         if (t == 0) {
             self->methods->slot30(self, 4);
             return;
@@ -285,9 +279,6 @@ void func_80053ACC(Obj87034_3bb8c_l *self) {
     }
     func_80053EB4(self, 0, 0, 5, 1);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053ACC);
 
 void func_80053BE8(Obj87034_3bb8c_l *self) {
     s32 color;

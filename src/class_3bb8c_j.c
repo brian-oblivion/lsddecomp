@@ -235,6 +235,61 @@ extern s32 func_80013348(void *arg0);
 extern void func_80040FC0(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
+/* STALLED at 6/107 words -- see docs/match-reports/func_80051AC8.md for the
+ * full round-19 analysis (round 9's 9-10/107 register-identity diagnosis
+ * still holds; this round fixed a genuine independent bug -- a sign/
+ * unsigned-promotion mistake in the halving idiom that made a `sra` come
+ * out as `srl` -- and matched two more of retail's scheduling choices, but
+ * the core register rotation is unmoved). Preserved here per project
+ * convention rather than only in the report. */
+#if 0
+void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
+{
+    void **p;
+    s32 count;
+    s32 index;
+    s32 len;
+
+    func_80018390()->ctor(self);
+    self->methods = func_80052B60();
+
+    count = 0;
+    for (p = arg1; *p != NULL; p++) {
+        count++;
+    }
+
+    self->unk10 = count;
+    self->unk18 = func_80017B34(count * 4);
+    p = arg1;
+    self->unk1C = func_80017B34(self->unk10 * 4);
+
+    if (count > 0) {
+        self->unk14 = 0;
+        for (index = 0; index < self->unk10; index++) {
+            len = func_80013348(*p);
+            if (arg2 == 1) {
+                len = (s32)(len + ((u32)len >> 31)) >> 1;
+            }
+            self->unk1C[index] = len;
+            self->unk18[index] = func_80017B34(len + 4);
+            if (arg2 == 1) {
+                func_80040FC0(self->unk18[index], *p);
+            } else {
+                strcpy(self->unk18[index], *p);
+            }
+            if (self->unk14 < len) {
+                self->unk14 = len;
+            }
+            p++;
+        }
+    }
+
+    self->unkC = arg2;
+    func_80051C74(self);
+    self->methods->slot40(self);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051AC8);
 
 void func_80051C74(Class86ED0 *self)
