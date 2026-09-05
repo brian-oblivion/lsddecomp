@@ -204,3 +204,53 @@ future attempt finds the shape, it should update this entry rather than
 re-deriving the six ruled-out variants above. Also a plausible permuter
 target: the search space here is small (one statement's phrasing) and
 well-characterized.
+
+---
+
+## Permuter run (round 18, echo) — bounded search, no improvement (NOT re-classified as permuter-exhausted)
+
+Seed: the "Best-attempt body" above (25/28-equivalent shape after the
+first, byte-exact half). `--debug` base score: **360** (1 reordering + 3
+insertions, `func_8004CFB8` header), consistent with the report's own
+"3 extra words" reading of the second half's residue (the eager `mflo`
+plus its knock-on reordering).
+
+Bounded search: `timeout 600 -j 6 --stop-on-zero --best-only`. Ran
+**36023 iterations**; the score never dropped below the base (360) at
+any point in the run -- every single candidate the permuter tried was
+either exactly as good as the seed or worse (spot check of the log: scores
+observed include 360, 465, 505, 610, 660, 750, 825, 885, 940, 1055, 1085,
+1090, 1100, 1120 ... 1160, 1205, 1210, 1220, 1265, 1300, 1435, 1505, 1640,
+1795, 1865, 1940, 2060, 2270, 2580, 2790, 2945, 2970, 3205, 3215, 3865,
+5005, 5070, 5730, ... never anything under 360). **Zero was never reached.**
+
+`timeout`'s own exit code could not be captured cleanly: the trailing
+`echo "permuter exit=$?" >> ...` never landed in the log (verified: `grep
+-c 'permuter exit=' <log>` = 0), almost certainly because the outer Bash
+tool's own 600000ms bound and the inner `timeout 600` (600000ms) expired
+within the same window and the wrapping shell was reaped before it could
+run the trailing append. The run's own log shows 36023 completed
+iterations and a clean `multiprocessing` shutdown (only the routine
+leaked-semaphore `UserWarning`, not a traceback), which is the same
+signature as every other bounded run in this round that DID land a clean
+`exit=124` -- treating this as **an ordinary self-stop, not a crash**, but
+flagging that the exit code itself is not independently verified this
+time.
+
+**Disposition: bounded search exhausted its time budget with no
+improvement, NOT "permuter-exhausted" in the guide's technical sense** --
+that term is for when zero IS reached but only via UB/duplicate-arm forms;
+here zero was never reached at all, so per the head's standing instruction
+this must not be upgraded to a closed classification on the strength of a
+clock running out. What this run DOES add: 36023 mutations of the
+second-half statement shape never found anything at or below the seed's
+own score, which corroborates the existing classification (a genuine cc1
+RTL-expansion choice for this exact statement shape) from an independent
+angle -- not just six hand-written variants, but a broad randomized search
+over the same statement's mutation space. It does not prove no C shape
+exists; it means this seed's local mutation neighborhood is empty within
+36k tries. Restored to `INCLUDE_ASM` (never touched -- the function was
+never moved into `src/` this round). Still open to a differently-seeded
+permuter run (e.g. seeded from a shape that varies the FIRST half's
+already-solved structure jointly with the second, rather than holding it
+fixed) or a fresh hand-written idea; not closed off.
