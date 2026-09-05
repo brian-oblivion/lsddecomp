@@ -214,7 +214,64 @@ void func_8004F810(TaskObjF *self) {
     }
 }
 
+/* STALL snapshot -- see docs/match-reports/func_8004F8A4.md. Best
+ * reached: 36/77 words, 0x130/0x134 (1 word / 4 bytes short, zero
+ * address drift beyond that). This is the branch-polarity-corrected
+ * variant of the report's own "function-pointer dispatch" lever --
+ * confirmed via a fast isolated cpp|cc1|maspsx|as reproducer this
+ * round that GCC 2.6.3's own block-layout choice for this exact
+ * 3-fetch/1-call tail-merge shape does not respond to if/else vs
+ * goto/label phrasing, or to reordering which block appears first
+ * in source. Preserved here per convention -- not live C. */
+#if 0
+s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+    s32 code;
+    s32 (*dispatch)(TaskObjF *, s32);
+
+    self->unk40 = a1;
+    self->unk44 = a2;
+    self->unk48 = a3;
+    self->unk24 = 2;
+    self->unk4C = a5;
+    self->unk50 = a6;
+    self->unk54 = a7;
+    self->unk58 = a8;
+    if (func_8004F9D8(self)) {
+        if (self->methods->slot54(self, 0, a1) == 0) {
+            goto slot60_path;
+        }
+        code = 0xA;
+        if (self->unk28 == code) {
+            code = 0x11;
+        } else if (self->unk28 == 0x11) {
+            code = 0xB;
+        }
+
+    top_dispatch:
+        dispatch = self->methods->slot7C;
+        goto call_it;
+
+    slot60_path:
+        if (!self->methods->slot60(self, a5, a8)) {
+            code = 9;
+            dispatch = self->methods->slot7C;
+            goto call_it;
+        }
+        code = 0x11;
+        if (self->unk28 == code) {
+            code = 0xB;
+        }
+        dispatch = self->methods->slot7C;
+
+    call_it:
+        return dispatch(self, code);
+    }
+    return 0;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F8A4);
+
 
 s32 func_8004F9D8(TaskObjF *self) {
     s32 buf10;
