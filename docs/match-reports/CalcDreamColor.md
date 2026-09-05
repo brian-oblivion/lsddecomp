@@ -182,6 +182,70 @@ the 135-score candidate above is genuine C that was found but not yet
 manually verified. A future round should try that ONE specific reshape by
 hand (three lines) before reaching for the permuter again.
 
+## Round: verified the untried 135-candidate and a new ordering lever (runner delta, round 19) -- both REGRESS against the real oracle
+
+Re-read `asm/nonmatchings/DreamSys/CalcDreamColor.s` directly (the same
+"verify from raw asm, not from the report" discipline that found a real
+misread bug in `func_8005A1F4` this round). No hidden semantic bug found
+here -- the classification loop and the table lookup are exactly what this
+report already describes. Two concrete follow-ups, both tested against the
+real oracle (`./build-and-verify.sh` + `funcdiff.py`), not just reasoned
+about:
+
+1. **The BRAVO-flagged 135-score permuter candidate (`p` as scratch before
+   assigning to `entry`) is a REGRESSION, not a lead.** Built it verbatim
+   (renamed `entry`->`base` for local style only):
+   ```c
+   index = local.axis.dynamic * 3;
+   p = &D_80087E14[index];
+   base = p;
+   return base[local.axis.upper];
+   ```
+   Result: **17/35, with a genuine 13-byte outside-range drift** (confirmed
+   via `funcdiff.py`'s own warning) -- i.e. this candidate is not just a
+   worse register match, it compiles to the WRONG SIZE. The permuter's
+   "135 < 610" ordering does not imply "closer to a real match" once a
+   candidate changes the instruction count; this is exactly the trap
+   CLAUDE.md/DECOMPILATION_LEARNINGS.md warn about for permuter scores in
+   general, now with a concrete instance for this function. Do not try this
+   shape again without a different translation.
+2. **Forcing the table-base pointer into its own statement BEFORE `index`
+   is computed also regresses (23/35, 13-byte drift), even though retail's
+   own disassembly computes the `lui`/`addiu` base address immediately
+   after loading `dynamic` and BEFORE the `sll`/`addu` that forms
+   `dynamic*3`:**
+   ```c
+   base = D_80087E14;
+   index = local.axis.dynamic * 3;
+   return base[index + local.axis.upper];
+   ```
+   Matching retail's OBSERVED instruction order by hand, statement-for-
+   statement, is not sufficient here -- GCC 2.6.3 schedules the two
+   differently depending on how the base and index are FUSED in the source
+   expression, not just what order they're written in. The known-good
+   28/35 form (`entry = &D_80087E14[index]; return entry[upper];`, base and
+   index summed in one fused address-of expression rather than as two
+   separate prior statements) remains the best C reached; this round did
+   not find anything better.
+
+**Verdict unchanged: STALL at 28/35, PERMUTER-EXHAUSTED for the legitimate
+search space, and the one previously "untried" lead is now a confirmed
+negative** (item 1 above) rather than an open thread. No source changes;
+`INCLUDE_ASM` untouched throughout this round's testing.
+
+### Proposed learning
+
+A permuter candidate's SCORE ORDERING (135 better than 610) is not evidence
+about the REAL oracle unless it is re-verified end to end, including
+`funcdiff`'s outside-range drift check -- a candidate can score better on
+the permuter's internal metric while being a different, WRONG size. This is
+the same caution CLAUDE.md's "four ways a score lies" already states for
+`funcdiff` itself; it applies with equal force to a permuter's own score,
+and this function is a second confirmed instance (after `func_8005A1F4`'s
+round-18 "50-point candidate" scare, which was structurally different
+rather than size-wrong, but the same "read it back against the disassembly
+before trusting it" discipline caught both).
+
 ## Provenance
 
 round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).

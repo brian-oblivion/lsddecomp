@@ -522,7 +522,21 @@ void func_8005A1EC(DreamSys *this, s32 value)
 	this->unk_0x120 = value;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A1F4);
+void func_8005A1F4(void *arg0, Func8005A1F4Arg *arg1)
+{
+	s32 isDivisible;
+
+	if (arg1->mode == 1) {
+		isDivisible = (arg1->value % 20) == 0;
+		if (isDivisible) {
+			arg1->field_0x1C = 9;
+			arg1->field_0x20 = -1;
+		} else {
+			arg1->field_0x30 = 9;
+			arg1->field_0x34 = -1;
+		}
+	}
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitNewGame);
 
