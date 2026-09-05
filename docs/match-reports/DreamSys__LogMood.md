@@ -119,3 +119,47 @@ further manual attempts.
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
 Restored to `INCLUDE_ASM`.
+
+## MATCHED -- round: permuter pass (runner delta)
+
+The permuter found the fix at **iteration 2** (`-j 6 --stop-on-zero
+--best-only`, zero reached almost immediately). The fix is a pure
+statement REORDER, exactly the residue class this report already
+diagnosed -- just not one of the 9 manual reshapes happened to land on
+it: swap the last two statements so `sumMoods.upper` is updated BEFORE
+`amountMoods` is incremented.
+
+```c
+void DreamSys__LogMood(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *mood)
+{
+	layer->lastMood.value = mood->value;
+	layer->sumMoods.dynamic = mood->axis.dynamic + layer->sumMoods.dynamic;
+	layer->sumMoods.upper = mood->axis.upper + layer->sumMoods.upper;
+	layer->amountMoods = layer->amountMoods + 1;
+}
+```
+
+Verified byte-exact: `./build-and-verify.sh` -- `OK: build matches retail
+SLPS_015.56` -- and `tools/funcdiff.py DreamSys__LogMood` -- `14/14 words
+match`. This is now the live body in `src/DreamSys.c` (`INCLUDE_ASM`
+removed).
+
+### Proposed learning
+
+**This is the cleanest possible confirmation of the report's own
+closing line**: "a well-posed permuter target ... rather than a good use
+of further manual attempts." Nine manual reshapes (four statement-order/
+temp variations, one compound-operator check, three barrier placements,
+one delta-hoist variant) explored the wrong two axes (operand order,
+named temps, barrier placement) without ever trying the one working
+axis (swapping the LAST TWO statements' relative order) -- a 4-statement
+straight-line block has only 24 possible orderings subject to the two
+real data dependencies (`lastMood` must precede nothing it depends on;
+`dynamic`/`upper`/`amountMoods` are mutually independent), and exhaustive
+manual search of that space is exactly the kind of small, well-bounded
+combinatorial problem the permuter is for. Two iterations to zero here
+(one lucky early guess, then the exact swap) versus nine hand-picked
+misses is the sharpest contrast either the round-8 or this round's
+permuter targets have produced -- worth citing as the canonical
+"a small straight-line block with only a few candidate orderings is a
+permuter problem, not a reasoning problem" example.
