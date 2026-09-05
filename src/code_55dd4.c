@@ -107,6 +107,32 @@ void func_800659D0(Class65650 *self)
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
 
+/* STALL -- see docs/match-reports/func_80065AE0.md. Best reached: 33/40
+ * words in-range, no size drift, residue is the `arg` parameter's copy
+ * into its callee-saved register being deferred past the `blez` guard.
+ * Restored to INCLUDE_ASM per project rule. */
+#if 0
+void func_80065AE0(Class65650 *self, void *arg)
+{
+    u8 unused[8];
+    Unk70ElemObj **p;
+    s32 i;
+    D800878D4Methods *base;
+
+    p = self->unk70;
+    if (self->unk6C > 0) {
+        i = 0;
+        do {
+            (*p)->methods->slot70(*p, arg);
+            i++;
+            p++;
+        } while (i < self->unk6C);
+    }
+    base = func_80057C84();
+    base->slot70(self, arg);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065AE0);
 
 void func_80065B80(Class65650 *self, void *arg1, s32 val)
@@ -365,6 +391,34 @@ void func_800662B4(Class65650 *self)
 {
     self->unk90 = 0;
 }
+
+/* STALL -- see docs/match-reports/func_800662BC.md. Best reached: 17/33
+ * words in-range, residue is `count`'s load routing through $v0 instead
+ * of directly into its long-lived register. Restored to INCLUDE_ASM per
+ * project rule. */
+#if 0
+void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+{
+    void *acc;
+    u16 count;
+    u32 i;
+    u8 unused[8];
+
+    count = *(u16 *)((u8 *)hdr + 2);
+    acc = (u8 *)hdr + 8;
+    if (count != 0) {
+        s32 cont;
+
+        i = 1;
+        do {
+            acc = self->methods->slot138(self, acc, extra);
+            cont = i < count;
+            i++;
+        } while (cont);
+    }
+    return acc;
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
 

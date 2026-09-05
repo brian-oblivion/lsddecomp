@@ -149,3 +149,163 @@ lines of MIPS. Distinguish this class explicitly from the "best-reached
 body, restored to INCLUDE_ASM" class in `docs/PARALLEL-RUNS.md`'s own
 staffing guidance, since the two need different next steps (write C vs.
 read disassembly).
+
+## Round 19 (echo): deeper structural read (still no C attempted -- see
+## reasoning below), several open questions closed
+
+Re-read the full disassembly instruction-by-instruction (not skimmed) to
+pin down several things this report's original pass left open. **Still
+no C was written or built** -- the reasoning for that holds even more
+strongly after this pass: the function needs a genuine cross-unit field
+retype (below) plus a 4-buffer, exactly-8-bytes-each stack layout nailed
+down by trial, which is real derivation work, not a quick attempt. This
+continues to not count against the 30-attempt budget.
+
+**Closed: `self->unk10 < 0` and `self->unkC != 0` gate the SAME block
+together, not independently.** The outer guard is
+`if (self->unk10 < 0 && self->unkC != 0) { <backup copy + accumulation
+loop> }` -- confirmed by tracing both branch targets: `bgez` (unk10>=0)
+skips straight past the whole block, and a SEPARATE `beqz` on `unkC`
+right after it ALSO skips the whole block (to the same landing spot the
+`bgez` path also reaches), each setting up what's needed for the
+FOLLOWING independent computation. This wasn't stated as a combined
+condition in the original pass.
+
+**Closed: the "apparent dead/defensive check" is real and gates only the
+backup-copy + loop, not the whole block** -- `if ((u8 *)self->unk14 + 0x38
+== 0)` skips just that inner section, confirmed by its own branch target.
+
+**Closed: the ternary `(self->unkC != 0) ? self->unk14->unk38 : NULL`
+(the "backup" pointer, ALREADY a committed `s32 unk38[3]` field on
+`Class6B5CCSub14` per this unit's own header, established independently
+by `func_8001E600`/`func_8001EACC` this same round) is recomputed FRESH,
+inline, at FOUR separate points**: once per axis (x/y/z) inside the
+accumulation loop, plus once more after the loop for the final delta
+computation -- never cached in a named local, each occurrence re-testing
+`self->unkC` from scratch. This is the same "no cross-statement caching"
+idiom already on record for this project, just at a larger scale (4
+independent re-derivations of one conceptual value) than any prior
+documented instance.
+
+**Closed: `func_8001F8B8`'s real arity is 6, not "5-ish".** Register
+trace: `a0 = self->unk20`, `a1 = &buf30` (an output buffer),
+`a2 = &buf28` (a second output buffer), `a3 = 0` (literal), plus TWO
+stack-passed arguments at `sp+0x10`/`sp+0x14` -- `arg5 = &buf18` (an
+8-byte buffer already used as `slotA4`'s own output buffer earlier in
+the SAME function, reused here as an input) and `arg6 = &angleTable` (a
+freshly-built 3-entry `s16` table, written into the SAME 8 bytes the
+`delta` local occupied before `slotA4` consumed it -- a genuine
+stack-slot lifetime reuse, not a bug). Both calls are otherwise
+identical except the angle table's construction (`buf18[1] - 0x400` vs
+`buf18[1] + 0x400`, confirming the report's "+/-90-degree BAM offset on
+one axis" reading, specifically axis index 1).
+
+**Closed: the local-variable stack layout is four 8-byte buffers, back
+to back**, `sp+0x18` (`buf18`, written by `slotA4`, read as `s16[?]` at
+indices 0/1/2 later), `sp+0x20` (`delta`, written before `slotA4`, then
+its SAME memory reused for the angle table after), `sp+0x28` (`buf28`,
+an output-only buffer for `func_8001F8B8`), `sp+0x30` (`buf30`, likewise)
+-- derived from the frame total (`0x58`), the saved-register block
+(`0x38`..`0x54`, seven registers `s0`-`s5`+`ra`), and the outgoing-arg
+area (`sp+0x00`..`sp+0x18`, 24 bytes/6 words, sized by `func_8001F8B8`'s
+own 6-argument arity, 4 in registers + 2 on the stack -- consistent with
+this round's `func_8001EE98` finding that outgoing-arg sizing reflects
+the WIDEST call in the function, though here the wide call is genuinely
+live, not dead code).
+
+**Open, and the reason a build was still not attempted: `UnkOwner_d294::
+unk14` needs to be usable as a POINTER here** (`node->unk14->unk18/
+unk1C/unk20`, the same "position" shape as `Class6B5CCObj::unk14`'s own
+`Class6B5CCSub14 *`), but it is currently typed `s32` in
+`include/code_d294.h`, established by `func_8001D0EC` (already matched,
+this unit) which only ever COPIES the raw value
+(`self->unk14->unk48 = owner->unk14;`, both currently `s32`) and never
+dereferences it. A straight `lw`/`sw` word copy is emitted identically
+whether the field is `s32` or a pointer, so retyping it to
+`Class6B5CCSub14 *` (matching the exact field-access shape this function
+needs) is very likely SAFE for `func_8001D0EC`'s existing match -- but
+"very likely safe" is exactly the kind of shared-struct-edit CLAUDE.md
+says to verify with the full oracle before trusting, not assume. This is
+the concrete next step for whoever attempts the C: retype
+`UnkOwner_d294::unk14`, immediately re-run `./build-and-verify.sh` to
+confirm `func_8001D0EC` (and anything else touching that field) is
+unaffected, THEN write this function's body using the four-buffer stack
+layout and the four-times-repeated ternary above.
+
+### Proposed learning
+
+**A function whose remaining blocker is a cross-function shared-field
+retype (not a missing struct, not an uncarved callee) is a different
+kind of "not yet attempted" than one blocked on genuinely unknown
+shape.** Everything about this function's CONTROL FLOW, ARGUMENT
+COUNTS, and STACK LAYOUT is now pinned down precisely; the one
+remaining prerequisite is a single-field retype that risks (at low
+probability, given the copy-only usage) an already-matched sibling
+function elsewhere in the SAME unit. Flagging this distinction because
+the retype-then-verify step is exactly one `./build-and-verify.sh` run
+before real C-writing can start, not more open-ended derivation.
+
+## Round 19 (echo) continued: first real C attempt, 29/180 (drifted),
+## the retype done and verified
+
+Went ahead with the retype flagged above: `UnkOwner_d294::unk14` changed
+from `s32` to `Class6B5CCSub14 *` in `include/code_d294.h`. **Verified
+safe immediately** -- `func_8001D0EC` (`src/code_d294.c`, a DIFFERENT
+unit this runner does not own for editing, but the shared header is
+owned by this runner this round) still compiles (one new warning,
+"assignment makes integer from pointer without a cast", not an error --
+left as-is rather than editing a file outside this runner's assigned
+units) and the whole-image SHA1 stayed green. This is now committed.
+
+Wrote the full function body per the structural analysis above and
+built it. **First result: 19/180, and the ENTIRE `self->unk10 < 0`
+guarded block (backup copy + accumulation loop) was silently eliminated
+by the compiler** -- traced to `Class6B5CCObj::unk10` already being
+typed `u32` (a packed bit-flags word, established by other already-
+matched functions this project round using it that way) in the shared
+header. Writing `self->unk10 < 0` against an unsigned field is a
+compile-time-constant-false comparison in C, so GCC 2.6.3 proved the
+entire guarded block dead and removed it, branch condition and all --
+not a runtime residue, a source bug. **Fixed with an explicit
+`(s32)self->unk10 < 0` cast** (no header retype needed or wanted --
+`unk10`'s other established use is a genuine unsigned bitfield host, this
+function just needs to read the SAME bits with a signed comparison for
+ITS OWN purposes). This alone reproduced the block's presence and
+raised the score to **29/180, still WITH address drift** (351943 bytes
+outside range) -- not a trustworthy score yet, but real, verified
+progress: the backup-copy block's instructions now appear at
+approximately retail's own positions, with what looks like a register
+identity difference (`$a1`/`$a3` swapped for the "node"/list-walk
+pointer) as the visible residue in that section, and the tail
+(`func_8001F8B8` calls, buffer layout) not yet independently verified
+correct.
+
+**Preserved the 29/180 body in `src/code_d294_c.c` as `#if 0`** (this
+function's FIRST-EVER inline preserved body -- there was none before
+this round). Stopped here rather than continuing to iterate the
+register-identity/buffer-layout residue: this function's remaining
+distance to a match is still substantial (the four-buffer stack layout,
+the two `func_8001F8B8` calls, and `func_8001EA8C`'s argument buffers are
+all unverified against the real oracle beyond "compiles and produces a
+plausible partial score"), and this round's remaining time was better
+spent finishing verification of the rest of this runner's work list.
+`INCLUDE_ASM` restored; this does count as a real attempt now (one, not
+thirty), unlike the round-14 "structural analysis only" pass.
+
+### Proposed learning
+
+**A field already established as `unsigned` by ONE already-matched
+function elsewhere in the project can silently kill a DIFFERENT
+function's dead branch when reused with a signed comparison, with NO
+compiler error or warning** -- `self->unk10 < 0` against a `u32` field
+compiles clean and simply drops the entire guarded block, which then
+LOOKS like an unrelated "why is my loop missing" mystery rather than
+what it actually is (a type mismatch with an already-committed shared
+field). The fix is a local cast (`(s32)self->unk10 < 0`), not a header
+retype -- the field's WIDTH is right, only the road SIGNEDNESS needs
+correcting for this one read site, and other established uses of the
+same field are unaffected. When a compiled body is unexpectedly missing
+an entire guarded block with no error, check whether one of its OWN
+condition's operands is a shared field whose established type doesn't
+match what this new read site needs signedness-wise, before assuming a
+scheduling or optimization mystery.

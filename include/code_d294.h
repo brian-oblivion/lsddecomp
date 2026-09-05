@@ -290,7 +290,16 @@ struct UnkOwner_d294 {
     u8 pad04[0x00C - 0x004];
     UnkOwner_d294 *next;            /* +0x00C, round 13 (func_8001D950) -- MEASURED, see above */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;                     /* +0x014 */
+    /* RETYPED round 19 (echo, func_8001E7BC): from a plain `s32` to
+     * `Class6B5CCSub14 *` -- func_8001E7BC dereferences it
+     * (`node->unk14->unk18/unk1C/unk20`, the same position shape as
+     * `Class6B5CCObj::unk14`'s own field). Safe: `func_8001D0EC` (already
+     * matched, same unit) only ever COPIES this field's raw value
+     * (`sub->unk48 = obj->unk14;`, a plain 32-bit word copy either way,
+     * never dereferenced there) -- reverified after this retype,
+     * func_8001D0EC's own match is unaffected (whole-image SHA1 stays
+     * green with it still compiled as real C). */
+    Class6B5CCSub14 *unk14;        /* +0x014 */
 };
 
 /* A generic "just enough to dispatch" view of some OTHER class, used where
@@ -607,22 +616,43 @@ extern Sixteen6_d294 *func_8001F50C(void *arg0, s32 arg1);
  * with the opaque `void *`/`s32` shape that call site needs. */
 extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
 
-/* func_8001EE04 (asm/code_d294_c.s, the NEXT slice, still uncarved): an
- * element-copy loop -- `count` iterations, 6 bytes/element, reading from
- * `src` and writing (by way of func_80015D58, not decompiled here either)
- * into `dest`. func_8001D624 (this unit, round 12) calls it with `src` and
- * `dest` (its own arg0/arg1) equal to the SAME address -- read off its own
- * disassembly (`addiu $a0,$s1,4` then `addu $a1,$a0,$zero`), not reasoned
- * from the name. Declared only with the opaque shape that call site needs. */
+/* func_8001EE04 (this unit; MATCHED round 19, echo -- see
+ * docs/match-reports/func_8001EE04.md): an element-copy loop -- `count`
+ * iterations, 6 bytes/element. CORRECTED naming vs. the original guess
+ * below (confirmed against the byte-exact disassembly, not reasoned from
+ * the name): each iteration reads a 6-byte `Rec6_d294` record OUT OF
+ * `dest` into a stack-local copy, then forwards that copy AND `src`
+ * (unchanged, raw pointer, never dereferenced by this function itself) to
+ * `func_80015D58(out, &buf, src)`. `func_8001D624` (this unit, round 12)
+ * calls it with `src` and `dest` (its own arg0/arg1) equal to the SAME
+ * address, which is why this asymmetry was invisible until this function
+ * was actually matched. Declared only with the opaque shape its callers
+ * need. */
 extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
 
 /* func_80015618 (still uncarved, a different/earlier segment): called once
  * per iteration by func_8001EE98 below as `(fixed, b, a)`; not decompiled
- * here, declared only with the opaque shape that call site needs. */
-extern void func_80015618(void *fixed, void *b, void *a);
+ * here, declared only with the opaque shape that call site needs.
+ *
+ * DELIBERATELY UNPROTOTYPED (round 19, echo -- see
+ * docs/match-reports/func_8001EE98.md's "MATCHED" section for the full
+ * derivation): func_8001EE98's own outgoing-argument stack reservation is
+ * 24 bytes (six words), not the 16-byte/three-word minimum its one LIVE
+ * call site needs. An isolated reproducer under the pinned toolchain
+ * confirmed retail's exact bytes -- frame size, live call site, AND the
+ * unreachable-code source shape -- only when `func_80015618` is called
+ * BOTH with 3 live arguments (this unit's real call, inside the loop) AND
+ * with 6 arguments inside a `if (0) { ... }` dead branch elsewhere in the
+ * SAME function (GCC 2.6.3 sizes the outgoing-arg area from every call
+ * expression's arg count during RTL expansion, before the dead branch is
+ * eliminated -- so the frame remembers an arg count the emitted code
+ * never uses). A K&R/unprototyped declaration is required for this: an
+ * ANSI prototype would make the mismatched-arity calls a compile error. */
+extern void func_80015618();
 
-/* func_8001EE98 (this unit, round 14): a paired-array iteration sibling to
- * func_8001EE04 above -- `count` iterations, 0xC bytes/element (no
+/* func_8001EE98 (this unit, round 14; MATCHED round 19, echo -- see
+ * docs/match-reports/func_8001EE98.md): a paired-array iteration sibling
+ * to func_8001EE04 above -- `count` iterations, 0xC bytes/element (no
  * unaligned-load complication this time, both `a`/`b` are read directly),
  * calling `func_80015618(fixed, b, a)` once per element and advancing both
  * `a`/`b` by 0xC each time while `fixed` stays constant across every call.

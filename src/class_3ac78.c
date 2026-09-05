@@ -234,6 +234,40 @@ void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
     }
 }
 
+/* STALL -- see docs/match-reports/func_8004ABD0.md. Best reached: 9/74
+ * words in-range, correct size, no address drift. Residue is a
+ * scheduling-only "the offset increment keeps landing in the wrong
+ * delay slot" issue. Restored to INCLUDE_ASM per project rule. */
+#if 0
+void func_8004ABD0(Class866E8 *self)
+{
+    s32 i;
+    s32 offset;
+    UnkSlotEntry_3ac78 *entry;
+
+    offset = 0xEC;
+    for (i = 0; i < 7; i++) {
+        GenericObject *check;
+
+        entry = (UnkSlotEntry_3ac78 *)((u8 *)self + offset);
+        entry->unk4->methods->slot74(entry->unk4);
+        entry->unk0 = 0;
+        self->methods->slot108(self, entry);
+        check = entry->unk8->unk2C;
+        offset += 0x1C;
+        if (check != NULL) {
+            entry->unk8->unk2C = check->methods->unk04(check);
+        }
+        self->methods->slot88(self, 6, entry, i);
+        entry->unk4->methods->slot84(entry->unk4);
+    }
+
+    self->unk1B8 = 0;
+    self->unk1B4 = 0;
+    self->methods->slot140(self);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
 
 void func_8004ACF8(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
@@ -341,6 +375,58 @@ void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
     self->unk7E = t;
     func_8004C93C(self);
 }
+
+/* STALL -- see docs/match-reports/func_8004B030.md. Best reached: 19/52
+ * words in-range, correct size, no address drift. Restored to
+ * INCLUDE_ASM per project rule. Field names below use the CURRENT
+ * HistoryEntry_3ac78 layout (round 19, echo -- was unk90/92/94/96 in the
+ * report's own preserved body, before func_8004B100's field-shape
+ * correction). */
+#if 0
+void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
+{
+    s8 b2;
+    s8 b3;
+    s32 raw3;
+    s16 col;
+    s16 row;
+    s16 width;
+    s16 height;
+
+    b2 = arg1->unk2;
+    b3 = arg1->unk3;
+    raw3 = b3;
+    width = count;
+
+    if (b2 != 0) {
+        col = b2 - 1;
+    } else {
+        col = b2;
+        width = count - 1;
+    }
+    if (b2 == 0x13) {
+        width -= 1;
+    }
+
+    height = count;
+    if (raw3 != 0) {
+        row = raw3 - 1;
+    } else {
+        row = b3;
+        height = count - 1;
+    }
+    if (raw3 == 0x13) {
+        height -= 1;
+    }
+
+    self->unk88 = 1;
+    self->unk8C.e[0].elemIdx = self->methods->slot124(self, arg1->unk28);
+    self->unk8C.e[0].col = col;
+    self->unk8C.e[0].row = row;
+    self->unk8C.e[0].width = width;
+    self->unk8C.e[0].height = height;
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
