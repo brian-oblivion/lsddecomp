@@ -1445,10 +1445,12 @@ struct Obj6EAC0Methods {
                                   occupant's own arity need not match a
                                   narrower call site (nothing in this
                                   unit calls slotB8 at 3 args) */
-    void (*slotBC)(Obj6EAC0 *self, void *a1); /* +0x0BC, IS func_800407F8
+    void (*slotBC)(Obj6EAC0 *self, struct Pair32E99C *a1); /* +0x0BC, IS func_800407F8
                                   (base, this unit) and func_80040E14
                                   (derived, this unit); a1 a 2-word
-                                  struct pointer in both */
+                                  struct pointer in both -- same shape as
+                                  Class6E99CObj's own Pair32E99C (see
+                                  func_8004042C) */
     void (*slotC0)(Obj6EAC0 *self, void *a1); /* +0x0C0, IS func_80040824
                                   (base, this unit); a1 a 2-halfword
                                   struct pointer */

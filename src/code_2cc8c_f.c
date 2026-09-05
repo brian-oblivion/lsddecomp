@@ -28,7 +28,11 @@ void func_8004076C(Obj6EAC0 *self, s32 overwrite, u8 *src) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040790);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_800407F8);
+void func_800407F8(Obj6EAC0 *self, struct Pair32E99C *a1) {
+    if (self->unkC != 0) {
+        *(struct Pair32E99C *)&self->unk50 = *a1;
+    }
+}
 
 void func_80040824(Obj6EAC0 *self, s32 *a1) {
     if (self->unkC != 0) {
