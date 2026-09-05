@@ -920,7 +920,13 @@ void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
 	contributor->amountMoods = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__LogMood);
+void DreamSys__LogMood(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *mood)
+{
+	layer->lastMood.value = mood->value;
+	layer->sumMoods.dynamic = mood->axis.dynamic + layer->sumMoods.dynamic;
+	layer->sumMoods.upper = mood->axis.upper + layer->sumMoods.upper;
+	layer->amountMoods = layer->amountMoods + 1;
+}
 
 void DreamSys__GetMoodAverage(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *ret)
 {

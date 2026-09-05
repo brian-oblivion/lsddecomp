@@ -174,7 +174,45 @@ void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
 
 INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064E34);
 
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064FBC);
+void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
+    s32 unkFC;
+
+    out->unk10 = 0;
+    if (out->unk4 == 6) {
+        out->unk1C = 4;
+        out->unk30 = 4;
+        out->unk44 = 4;
+    }
+    unkFC = this->unkFC;
+    if (unkFC < arg2) {
+        goto L18;
+    }
+    if (!(arg2 + 0x5B < unkFC)) {
+        goto L50;
+    }
+L18:
+    if (unkFC < arg2 + 0x155) {
+        goto L34;
+    }
+    if (!(arg2 + 0x1B1 < unkFC)) {
+        goto L50;
+    }
+L34:
+    if (unkFC < arg2 + 0x2BA) {
+        goto L74;
+    }
+    if (arg2 + 0x317 < unkFC) {
+        goto L74;
+    }
+L50:
+    this->methods->slot44(this, 0, D_80089D18);
+L74:
+    this->methods->slotC4(this, arg4, 0);
+    if (this->unkFC == arg3) {
+        this->methods->slot160(this);
+        this->unk44 = 1;
+    }
+}
 
 void func_800650D4(Entity *this, EntityMoodHandlerArg *out) {
     func_80060D80(this, out);
