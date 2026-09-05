@@ -154,3 +154,63 @@ round; flagging as the strongest re-attempt candidate this sweep found.
    dst; }`, `func_80051858`'s own idiom) applied to `result`/`dst`: 135, no
    change -- the trick that worked elsewhere in this project does not
    transfer to this exact shape.
+
+## Round 19 (runner alpha): permuter run, still 135; whole-struct-assignment axis does not apply here
+
+Re-verified attempt 6's body (`s16 *func_8003FCFC(s16*,s16*)`, `return
+dst;`, the interleaved `t1`/`t2`/`t3` load/store body) rebuilds clean and
+scores 2/20 words by raw funcdiff (expected -- this is a pure
+register-identity residue, so almost every word's bytes differ even
+though the instruction PATTERN is exact; `--debug` confirms `135`, exactly
+matching this report's attempt 6-8 figure).
+
+**Ran the permuter properly this round** (`tools/setup-permuter.sh` +
+`--stack-diffs`, which round 18's own report explicitly skipped due to
+time budget). `--debug --stack-diffs` confirms base 135 = 27 Register
+Differences (weight 5 each), 0 Stack/Branch/Reordering/Insertion/Deletion
+-- a pure, isolated register-identity signature, nothing hidden by a
+missing `--stack-diffs` flag. Bounded search: `timeout 300`,
+`-j 6 --stack-diffs --stop-on-zero --best-only`, no `PERM()` macros (none
+written -- this is bare randomization over the attempt-6 seed). **~45,000
+iterations in 300s, best score found: 135 -- never beaten, not even
+matched by a differently-shaped candidate.** Not phrasing this as
+permuter-exhausted (no PERM macros were written to guide the search, and
+45k iterations under a `-j 6` shared-machine budget is not an exhaustive
+search of this space) -- phrasing precisely: **not closed in ~45,000
+iterations under load.**
+
+**Why the `func_8004042C`/`func_800407F8` whole-struct-assignment lever
+does not transfer here, checked explicitly rather than assumed:** both of
+those functions' residues were a two-SEPARATE-SCALAR-ASSIGNMENT shape
+copying one struct's fields into another struct's fields, where GCC 2.6.3
+interleaves the pair and retail batches it (or vice versa) -- rewriting
+the two scalars as one aggregate assignment removed the two-statement
+shape entirely and, as a side effect, also fixed neighbouring register
+allocation. This function's residue is structurally different: it is a
+3x3 MATRIX TRANSPOSE (a permutation across 9 independent scalar elements,
+not a copy of one contiguous struct's bytes into another), and the
+specific residue is a return-value/argument COALESCING choice (`dst`
+kept live in `$a1` throughout the body vs. copied once into `$v0` at
+entry and never touched again), not an interleave-vs-batch scheduling
+difference between adjacent loads/stores. There is no natural aggregate
+to assign as a whole here -- `dst[0..8] = f(src[0..8])` is a scatter, not
+a struct-to-struct copy -- so the lever's precondition (two statements
+that could become one aggregate assignment) does not exist in this body.
+Recorded so the next reader does not re-derive this by re-attempting the
+lever from scratch.
+
+**Verdict unchanged: STALL, register-identity, best 135 (`--debug`
+score) / 2/20 words (raw funcdiff), restored to `INCLUDE_ASM`.** This
+remains the strongest re-attempt candidate in the corpus by elimination
+(cleanest, most isolated residue found across the round-18/19 sweep) but
+needs a genuinely new lever, not a repeat of the return-type fix, the
+three coalescing-avoidance shapes, or unguided permutation -- all of
+which are now closed negatives.
+
+### Attempts this round (1, beyond the original 8)
+
+9. Bounded permuter search (`-j 6 --stack-diffs --stop-on-zero
+   --best-only`, `timeout 300`, no PERM macros), seeded from attempt 6:
+   ~45,000 iterations, best score 135, never improved. Not upgraded to
+   permuter-exhausted -- no PERM macros were written, so the search space
+   actually covered is narrower than "exhausted" would imply.
