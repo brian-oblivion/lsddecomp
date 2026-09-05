@@ -290,7 +290,16 @@ struct UnkOwner_d294 {
     u8 pad04[0x00C - 0x004];
     UnkOwner_d294 *next;            /* +0x00C, round 13 (func_8001D950) -- MEASURED, see above */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;                     /* +0x014 */
+    /* RETYPED round 19 (echo, func_8001E7BC): from a plain `s32` to
+     * `Class6B5CCSub14 *` -- func_8001E7BC dereferences it
+     * (`node->unk14->unk18/unk1C/unk20`, the same position shape as
+     * `Class6B5CCObj::unk14`'s own field). Safe: `func_8001D0EC` (already
+     * matched, same unit) only ever COPIES this field's raw value
+     * (`sub->unk48 = obj->unk14;`, a plain 32-bit word copy either way,
+     * never dereferenced there) -- reverified after this retype,
+     * func_8001D0EC's own match is unaffected (whole-image SHA1 stays
+     * green with it still compiled as real C). */
+    Class6B5CCSub14 *unk14;        /* +0x014 */
 };
 
 /* A generic "just enough to dispatch" view of some OTHER class, used where
