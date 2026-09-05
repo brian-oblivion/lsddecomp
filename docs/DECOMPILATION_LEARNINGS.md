@@ -695,6 +695,47 @@ three instances across two units. It is recorded here as an OPEN observation,
 not a promoted class: nobody has yet found its discriminating test, and the
 lesson directly above says that is what would settle it.
 
+### "N words short" and "N/M words match" are DIFFERENT measurements that read identically — the head got this wrong in round 20
+
+`docs/PARALLEL-RUNS.md` Gate 1b already says to rank from title/verdict lines
+and to rebuild any figure before putting it in an assignment. Round 20's head
+did the first and **not the second**, and it is worth recording because the
+sub-case is new.
+
+`func_8004F8A4`'s title read:
+
+> best 0x130 (1 word / 4 bytes short), zero logic/CFG miss
+
+That is a **LENGTH** statement: the compiled body was 0x130 bytes against
+retail's 0x134, i.e. one word short in SIZE. It says nothing whatever about
+how many words MATCH — which was **33 of 77**. The head read "1 word" as a
+match residue and staffed it as *"the closest unmatched function in the whole
+queue apart from one 258-word outlier."* It was not; runner charlie found the
+real position on arrival.
+
+**This is a different failure from the three already recorded.** Rounds 18 and
+19 pulled figures out of report BODIES, where variants that were tried and
+discarded contaminate the text. This one came from the TITLE — the place the
+guidance calls safe — and the title was not wrong. Two honest measurements of
+the same body simply read the same way in prose:
+
+| phrase | what it measures | good news or bad |
+| --- | --- | --- |
+| "1 word short" | compiled LENGTH vs retail | says nothing about correctness |
+| "76/77 words match" | per-word agreement | says nothing about length |
+
+A body can be the exact right length and match almost nothing (delta's
+`func_8003D73C`: 144/145 words compiled, 50/145 raw), or be one word short
+while matching a third of its words (this case).
+
+**So the Gate 1b rule needs its second half enforced, not just its first:**
+ranking from titles is necessary and not sufficient. Before a figure goes into
+an assignment, say out loud which of the two quantities it is — and if the
+title does not make that unambiguous, open the report or re-run
+`funcdiff.py`. When you write a title, give both: *"best 36/77 words, compiled
+length 1 word short"* leaves nothing to infer. That is how
+`func_8004F8A4`'s title now reads.
+
 ### One named C variable gets ONE storage location — retail's transient-rematerialization shape has no C spelling (round 20)
 
 **GCC 2.6.3's allocator is not SSA: a named C variable has one fixed storage
