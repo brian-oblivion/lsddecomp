@@ -346,10 +346,44 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
 extern void func_8004B2D4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
 
-/* STALL, round 2026-09-02 (runner delta): best reached 95/117, see
- * docs/match-reports/func_8004B100.md for the preserved near-miss body
- * and the residue analysis (a single instruction-scheduling swap at the
- * inner loop's tail -- correct branch/register shape everywhere else). */
+/* STALL, round 2026-09-02 (runner delta); re-verified round 19 (echo):
+ * best reached 95/117, see docs/match-reports/func_8004B100.md for the
+ * preserved near-miss body and the residue analysis (a single
+ * instruction-scheduling swap at the inner loop's tail -- correct
+ * branch/register shape everywhere else). */
+#if 0
+void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
+{
+    s32 i;
+    s32 row;
+    s32 col;
+    HistoryEntry_3ac78 *entry;
+    UnkSlotEntry_3ac78 *slot;
+    Class866E8 **cell;
+    Class866E8 *obj;
+
+    entry = self->unk8C.e;
+    for (i = 0; i < self->unk88; i++, entry++) {
+        slot = &self->unkEC[entry->elemIdx];
+        if (slot->unk4->unk2C != 0) {
+            cell = (slot->unk10 + entry->col) + entry->row * 20;
+            for (row = 0; row < entry->height; row++) {
+                for (col = 0; col < entry->width; col++, cell++) {
+                    self->unk1C0 = self->unkBC;
+                    self->unk1C2 = entry->col + col;
+                    self->unk1C3 = entry->row + row;
+                    func_8004B2D4(*cell, arg1, arg2);
+                    for (obj = (*cell)->unk38; obj != NULL; obj = obj->unk38) {
+                        func_8004B2D4(obj, arg1, arg2);
+                    }
+                }
+                cell += 20 - entry->width;
+            }
+        }
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
 
 /* Widened this round (func_8004B100) from a single-param signature to
