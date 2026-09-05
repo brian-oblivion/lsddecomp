@@ -214,6 +214,55 @@ void func_80065DEC(Class65650 *self)
     }
 }
 
+/* STALL -- see docs/match-reports/func_80065E1C.md. Best reached: 49/68
+ * words in-range, no size drift, residue is a whole-function self<->p
+ * register-identity swap ($s1/$s2). Restored to INCLUDE_ASM per project
+ * rule. */
+#if 0
+s32 func_80065E1C(Class65650 *self)
+{
+    s32 buf[4];
+    s32 count;
+    s32 i;
+    Unk70ElemObj **p;
+
+    count = self->unk5C->methods->slot80(self->unk5C, NULL, buf) & 0xFF;
+    self->unk70 = func_80017B34(count * 4);
+    if (self->unk70 == NULL) {
+        goto alloc_fail;
+    }
+    self->unk74 = func_80017B34(count);
+    if (self->unk74 == NULL) {
+        goto alloc_fail;
+    }
+    self->unk5C->methods->slot80(self->unk5C, self->unk74, buf);
+
+    p = self->unk70;
+    i = 0;
+    self->unk6C = 0;
+    if (count != 0) {
+        do {
+            *p = func_80056FE4();
+            __asm__("");
+            if (*p == NULL) {
+                goto fail;
+            }
+            p++;
+            self->unk6C = self->unk6C + 1;
+            i++;
+        } while (i < count);
+    }
+    self->unk68 = self->unk70[buf[0]];
+    return 0;
+
+alloc_fail:
+    self->unk74 = NULL;
+fail:
+    func_80065F2C(self);
+    return 1;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
 
 void func_80065F2C(Class65650 *self)
