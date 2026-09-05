@@ -234,6 +234,40 @@ void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
     }
 }
 
+/* STALL -- see docs/match-reports/func_8004ABD0.md. Best reached: 9/74
+ * words in-range, correct size, no address drift. Residue is a
+ * scheduling-only "the offset increment keeps landing in the wrong
+ * delay slot" issue. Restored to INCLUDE_ASM per project rule. */
+#if 0
+void func_8004ABD0(Class866E8 *self)
+{
+    s32 i;
+    s32 offset;
+    UnkSlotEntry_3ac78 *entry;
+
+    offset = 0xEC;
+    for (i = 0; i < 7; i++) {
+        GenericObject *check;
+
+        entry = (UnkSlotEntry_3ac78 *)((u8 *)self + offset);
+        entry->unk4->methods->slot74(entry->unk4);
+        entry->unk0 = 0;
+        self->methods->slot108(self, entry);
+        check = entry->unk8->unk2C;
+        offset += 0x1C;
+        if (check != NULL) {
+            entry->unk8->unk2C = check->methods->unk04(check);
+        }
+        self->methods->slot88(self, 6, entry, i);
+        entry->unk4->methods->slot84(entry->unk4);
+    }
+
+    self->unk1B8 = 0;
+    self->unk1B4 = 0;
+    self->methods->slot140(self);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
 
 void func_8004ACF8(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
