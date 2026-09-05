@@ -40,9 +40,9 @@ void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     }
 }
 
-void func_800407F8(Obj6EAC0 *self, struct Pair32E99C *a1) {
+void func_800407F8(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->unkC != 0) {
-        *(struct Pair32E99C *)&self->unk50 = *a1;
+        *(Pair32E99C *)&self->unk50 = *a1;
     }
 }
 
@@ -138,7 +138,28 @@ void func_80040D74(Obj6EAC0 *self, s32 a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040E14);
+void func_80040E14(Obj6EAC0 *self, Pair32E99C *a1) {
+    if (self->unkC != 0) {
+        Pair32E99C buf;
+        s32 i;
+        s32 bound;
+        Obj6EAC0 **elemp;
+
+        func_80041C3C()->slotBC(self, a1);
+        buf = *a1;
+        i = 0;
+        elemp = self->unkB4;
+        if (i < self->unkA9) {
+            do {
+                (*elemp)->methods->slotBC(*elemp, &buf);
+                buf.a += self->unkB0;
+                bound = self->unkA9;
+                elemp++;
+                i++;
+            } while (i < bound);
+        }
+    }
+}
 
 void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 *elem = self->unkB4[a2];
