@@ -182,7 +182,21 @@ extern s32 func_8002A6EC(void);
 extern s32 func_8002A75C(void);
 extern s32 func_8002A5F8(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028C54);
+s32 func_80028C54(s32 mode) {
+    if (mode == 2) {
+        func_8002A6EC();
+        return 1;
+    }
+    if (func_8002A75C() != 0) {
+        return 0;
+    }
+    if (mode == 1) {
+        if (func_8002A5F8() != 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 extern void func_8002A510(void);
 
