@@ -30,51 +30,7 @@ void func_8003F674(s32 *src, s32 *dst) {
     }
 }
 
-s32 func_8003F764(s32 *arr) {
-    s32 max;
-    s32 v;
-
-    max = arr[0];
-    v = arr[1];
-    if (max < 0) {
-        max = -max;
-    }
-    if (v < 0) {
-        v = -v;
-    }
-    if (max < v) {
-        max = v;
-    }
-    v = arr[2];
-    if (v < 0) {
-        v = -v;
-    }
-    if (max < v) {
-        max = v;
-    }
-    v = arr[3];
-    if (v < 0) {
-        v = -v;
-    }
-    if (max < v) {
-        max = v;
-    }
-    v = arr[4];
-    if (v < 0) {
-        v = -v;
-    }
-    if (max < v) {
-        max = v;
-    }
-    v = arr[5];
-    if (v < 0) {
-        v = -v;
-    }
-    if (max < v) {
-        max = v;
-    }
-    return max;
-}
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F764);
 
 s32 func_8003F82C(s32 a0) {
     s32 count;
@@ -297,20 +253,7 @@ void *func_800403F8(Class6E99CObj *self) {
     return &D_8006EA90[self->unk78 * 3];
 }
 
-void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
-    if (self->unkC != 0) {
-        self->unk88 = self->unk60;
-        self->unk8C = self->unk62;
-        __asm__("" ::: "memory");
-        self->unk90 = self->unk50;
-        self->unk94 = self->unk54;
-        __asm__("" ::: "memory");
-        self->unk60 = a1->x;
-        self->unk62 = a1->y;
-        __asm__("" ::: "memory");
-        *(Pair32E99C *)&self->unk50 = *a2;
-    }
-}
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004042C);
 
 void func_80040490(Class6E99CObj *self) {
     s32 t0, t1;
