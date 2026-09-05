@@ -695,6 +695,55 @@ three instances across two units. It is recorded here as an OPEN observation,
 not a promoted class: nobody has yet found its discriminating test, and the
 lesson directly above says that is what would settle it.
 
+### The `__asm__("")` barrier in round 20: two wins, four regressions, and the discriminator (round 20)
+
+The bare scheduling barrier is the one lever CLAUDE.md permits for an
+order-only residue, and round 20 exercised it hard enough to say something
+useful about when it bites. **Do not read this entry as "barriers are
+harmful" — it closed real ground twice this round.**
+
+| runner | function | outcome |
+| --- | --- | --- |
+| bravo | `func_8002AA6C` | **WIN** — a missing barrier on a reused tail block was part of getting 119 → 202/223 |
+| alpha | `func_8001DA28` | **WIN** — first-statement barrier fixed a deferred-self-materialization residue |
+| alpha | `func_80065AE0`, `func_8001E4A4` | inert at two positions |
+| delta | `func_8003FCFC` | regressed badly |
+| delta | `func_8003DAD4` | regressed sharply, 114/118 → 23/118 |
+
+**The discriminator is what the residue actually IS, not how it looks.** The
+two wins were both cases where a genuine ORDERING decision was in play — a
+statement whose placement relative to a block boundary was wrong. Every
+regression was a case where the residue was a register CHOICE or a
+cross-basic-block CFG decision wearing an order-shaped appearance; there the
+barrier does not merely fail, it perturbs delay-slot filling and can add real
+`nop`s or shift allocation.
+
+This is the round-14 `func_8001E6F8` lesson at a larger sample: **a barrier is
+not guaranteed to be a pure no-op even when CLAUDE.md's register-identity test
+says it is allowed** — it can grow the function, which disqualifies it for a
+different reason than the banned register pinning does. Delta's phrasing is the
+right one to carry: for a register-choice or cross-block residue the barrier is
+**presumptively harmful rather than a cheap first lever**. For a genuine
+placement/ordering residue it remains the correct first thing to try.
+
+Test a barrier's effect on WORD COUNT, not just on position, before trusting
+what it did.
+
+### `make extract` is match-status-aware — it deletes the `.s` for a function that is live C (round 20)
+
+Splat reads `src/*.c` to decide which functions still need a generated
+`asm/nonmatchings/<unit>/<func>.s`. So while you have a function spliced in as
+real C mid-investigation, `make extract` will **not regenerate — and will
+remove — that function's stub**, and the build then fails on a missing `.s` the
+moment you restore its `INCLUDE_ASM`.
+
+This is expected behaviour, not a bug, and it is the same mechanism behind
+`progress.py`'s "stale asm/nonmatchings/**/*.s with no live INCLUDE_ASM"
+warning after a match. Delta lost time to it looking like a tooling failure.
+The fix is one command — restore the `INCLUDE_ASM` first, then `make extract`
+— and the rule is: **do not run `make extract` while a function is spliced in
+as live C.**
+
 ### "Tail merge" is an UMBRELLA, not a class — two shapes, and they do not transfer (round 20)
 
 Several reports label a residue "tail-merge". They are not all the same thing,

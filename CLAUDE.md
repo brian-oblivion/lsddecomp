@@ -362,6 +362,31 @@ backstop, not a substitute for reading `build exit=`.
    shifts and the per-function window no longer means what it says. funcdiff
    reports how many bytes differ OUTSIDE the range; a non-zero count there
    makes the in-range score untrustworthy. `build-and-verify.sh` is the oracle.
+
+   **The drift need not come from the function you are editing, and that is an
+   ATTRIBUTION hazard rather than a fifth way (round 20).** Runner alpha left
+   an earlier experiment's C live in its unit — `func_8001D714` without its
+   `#if 0`/`INCLUDE_ASM` wrapper — and every LATER function in the unit then
+   measured against a shifted window, including the one alpha was actually
+   working on. The guard fired correctly: the out-of-range byte count was
+   there in the same command's output. What fails here is not the oracle but
+   the reading, because the instinct on seeing drift is to blame the function
+   under the cursor, not an unrelated sibling a hundred lines up.
+
+   So when a diff looks structurally wrong rather than like a plausible
+   near-miss — a completely different instruction where you expected a
+   register swap — **check `build/lsdde.map` for the function's actual linked
+   address against its retail one before reading anything else**, and check
+   that every other function in your unit is still wrapped:
+
+   ```sh
+   grep -c '^INCLUDE_ASM' src/<unit>.c    # against the count you started with
+   ```
+
+   Alpha proposed this as a new entry in this list. It is not one, for the
+   same reason round 13's proposal was not (see below): the oracle went red
+   and the guard fired. Filing it as a fifth way would teach the next runner
+   that drift detection is unreliable in exactly the case where it worked.
 4. **A conflicted merge.** This one bites the HEAD, not a runner, which is
    why it went unwritten for ten rounds. `git merge` exits non-zero and leaves
    conflict markers in a `src/` file — and `./build-and-verify.sh` run
