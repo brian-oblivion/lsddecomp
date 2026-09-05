@@ -162,7 +162,31 @@ void func_80028B64(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028B6C);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", strcpy);
+char *strcpy(char *dest, char *src) {
+    char *newVar;
+    char *result;
+    char c;
+    char c2;
+
+    result = NULL;
+    if (dest != NULL && src != NULL) {
+        newVar = dest;
+        c = *src;
+        src = src + 1;
+        dest = dest + 1;
+        *newVar = c;
+        if (c != 0) {
+            do {
+                c2 = *src;
+                src++;
+                *dest = c2;
+                dest++;
+            } while (c2 != 0);
+        }
+        result = newVar;
+    }
+    return result;
+}
 
 char *strstr(char *haystack, char *needle) {
     char *cursor;
