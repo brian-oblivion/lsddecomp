@@ -1,5 +1,20 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 19 (bravo): drift claim RE-VERIFIED per the head's mid-round
+> broadcast** (two other reports' "clean/drift-free" claims turned out
+> false this round). Rebuilt this exact preserved body from a clean
+> `INCLUDE_ASM` baseline: `funcdiff.py` reports 90/105 with NO "differs
+> outside range" warning, and `objdump -t` confirms the compiled length is
+> `0x1A4` (105 words) -- IDENTICAL to retail's own `.s` header
+> (`nonmatching func_8004BB3C, 0x1A4`). `asm-differ` shows only the
+> already-documented `$s3`<->`$s4` prologue-scheduling difference; no
+> genuine extra or missing instruction. **This report's claim is
+> accurate.** Restored to `INCLUDE_ASM` unchanged; no new attempt made
+> this round beyond the verification (this residue matches the round's
+> independently-confirmed "declaration order is inert" finding for this
+> exact class, already tested twice on this function specifically -- see
+> the round-13 entries below).
+
 > **UPDATE, round 17, targeted permuter pass.** Still a STALL. Re-verified
 > the preserved 90/105 body against the current build first (per
 > CLAUDE.md's struct-edit/header-merge discipline after a `git merge main`)
