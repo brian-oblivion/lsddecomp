@@ -389,6 +389,35 @@ typedef struct DreamSysVec3 {
 } DreamSysVec3;
 extern DreamSysVec3 D_80087EA4;
 
+/* D_80087EE8 is the LAST word of an unnamed 3-word (DreamSysVec3-shaped)
+   global scratch vector; the other two words are NOT independently named
+   -- splat's dlabel boundary put them inside `D_80087EC8`'s dlabel as
+   unlabeled tail bytes (asm/data/783DC.data.s), because nothing took their
+   address directly until func_8005942C (round 19). Do not rename/resegment
+   this round (config/ out of scope); reach the vector's start with pointer
+   arithmetic off this symbol instead: `(DreamSysVec3 *)((s32 *)&D_80087EE8
+   - 2)`.
+
+   Two independent pieces of evidence pin this down, not a guess:
+   - `func_80058B08` (this unit, already matched) clamps
+     `this->unk_0xB8 = (this->unk_0x28->unk_0x36 & 0x7F); if (unk_0xB8 >=
+     0x18) unk_0xB8 = 0;` -- i.e. `unk_0xB8` is bounded to [0, 0x18). Both
+     `D_80087EB0` and `D_80087EC8` (each already-named 24+-byte byte
+     tables) are indexed by this SAME bounded value in `func_80059D1C`
+     (`D_80087EC8[unk_0xB8]`), so `D_80087EC8`'s real, ever-read extent is
+     exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
+     bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
+     never reached by that indexed access and belong to something else.
+   - `func_8001E600` (code_d294_c, already matched) forwards its own `src`
+     parameter to `func_8001EE98(dst, src, 1, buf)`, and `func_8001EE98`'s
+     own doc comment (include/code_d294.h) confirms it treats both
+     pointers as 0xC-byte (3-word) elements. `func_8005942C` passes
+     `(s32 *)&D_80087EE8 - 2` as that exact `src` argument, which only
+     type-checks sensibly as a 3-word vector's start -- matching the 8
+     "spare" bytes above exactly (2 words = 8 bytes immediately before
+     `D_80087EE8`, which is the vector's 3rd word). */
+extern s32 D_80087EE8;
+
 /* A `struct RelativePos` constant, passed as func_8005AF64's `a` argument
    by func_8005AD68 (round 2026-09-02). */
 extern struct RelativePos D_8008ABD0;
@@ -821,7 +850,7 @@ struct vtable_DreamSys{
 	void (*func_8005938C)(DreamSys *this, s32 value);
 	void (*func_80059394)(DreamSys *this);
 	void (*func_800593D8)(DreamSys *this);
-	s32 (*func_8005942C)(DreamSys *this, void *out, s32 day, s32 *arg3);
+	s32 (*func_8005942C)(DreamSys *this, void *out, s32 day, s32 *reference, s32 tolerance);
 	void (*func_80059590)(DreamSys *this);
 	void (*func_80059598)(DreamSys *this);
 	s32 (*func_800595A0)(DreamSys *this);
