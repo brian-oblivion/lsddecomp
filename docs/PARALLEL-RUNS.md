@@ -1145,7 +1145,26 @@ denominator, and left for last. Matching them proves nothing about this game.
    runners inherit it and never touch the yaml.
 
 **Gate 1b — the near-miss corpus is a QUEUE, and it is screened from the
-ASM, not from the report text.** `progress.py` counts every documented stall
+ASM, not from the report text.** **Round 20 turned this gate into a tool —
+run it instead of rebuilding it by hand:**
+
+```sh
+python3 tools/nearmiss.py            # blocker-clean queue, smallest first
+python3 tools/nearmiss.py --all      # plus the blocked ones, with their class
+```
+
+It walks the live `INCLUDE_ASM` symbols, runs all FOUR screens, and prints
+each function's report **title/verdict region verbatim**. It exists because
+this gate has two documented recurring failure modes and both are mechanical:
+heads re-implement the `nop_mflo_mfhi` window backwards (rounds 15 and 16), and
+heads parse a score out of a report BODY (rounds 18, 19 and 20). The tool
+shells out to the canonical grep forms rather than re-expressing them, and it
+never extracts a figure — it hands you the text and leaves the ranking to you.
+
+Round 20 built the same census by hand first and the two agreed exactly, which
+is the check that says the tool is faithful rather than merely convenient.
+Re-run that comparison if you change it.
+ `progress.py` counts every documented stall
 identically, so the difference between a 104/105 near-miss and a
 gp_rel-blocked function is invisible in its table. Build the list yourself:
 walk the live `INCLUDE_ASM` symbols, read each one's report, drop the ones
