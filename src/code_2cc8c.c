@@ -207,7 +207,14 @@ void func_8003CB30(Obj86B60 *self, s32 a1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003CB68);
+typedef struct { s8 r, g, b; } RGB8003CB68;
+
+void func_8003CB68(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
+{
+    *(RGB8003CB68 *)self->unk90 = *(RGB8003CB68 *)a1;
+    *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;
+    *(RGB8003CB68 *)self->unk96 = *(RGB8003CB68 *)a3;
+}
 
 void func_8003CBB8(Obj86B60 *self, s32 a1)
 {

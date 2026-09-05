@@ -9,6 +9,7 @@
 typedef struct TexPageDesc TexPageDesc;
 typedef struct Class6E99CObj Class6E99CObj;
 typedef struct ClassEAC0Obj ClassEAC0Obj;
+typedef struct Pair32E99C Pair32E99C;
 
 /*
  * The class whose method table is D_80086B60 (78 slots, base) with a
@@ -1445,10 +1446,12 @@ struct Obj6EAC0Methods {
                                   occupant's own arity need not match a
                                   narrower call site (nothing in this
                                   unit calls slotB8 at 3 args) */
-    void (*slotBC)(Obj6EAC0 *self, void *a1); /* +0x0BC, IS func_800407F8
+    void (*slotBC)(Obj6EAC0 *self, Pair32E99C *a1); /* +0x0BC, IS func_800407F8
                                   (base, this unit) and func_80040E14
                                   (derived, this unit); a1 a 2-word
-                                  struct pointer in both */
+                                  struct pointer in both -- same shape as
+                                  Class6E99CObj's own Pair32E99C (see
+                                  func_8004042C) */
     void (*slotC0)(Obj6EAC0 *self, void *a1); /* +0x0C0, IS func_80040824
                                   (base, this unit); a1 a 2-halfword
                                   struct pointer */
@@ -1659,8 +1662,9 @@ struct TexPageDesc {
 
 /* A small two-`s32` record -- func_8004042C's own `a2` argument, read as a
  * plain consecutive pair and copied wholesale into the object's own
- * unk50/unk54. */
-typedef struct Pair32E99C Pair32E99C;
+ * unk50/unk54. Forward-typedef'd at the top of this file since
+ * Obj6EAC0Methods::slotBC (below) needs the name before this body is
+ * seen -- see that forward-typedef block's own comment. */
 struct Pair32E99C {
     s32 a; /* +0x000 */
     s32 b; /* +0x004 */

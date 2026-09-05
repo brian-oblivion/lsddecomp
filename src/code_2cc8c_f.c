@@ -26,9 +26,25 @@ void func_8004076C(Obj6EAC0 *self, s32 overwrite, u8 *src) {
     func_80040790(self, self->unk64, src, overwrite);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040790);
+typedef struct { s8 r, g, b; } RGB80040790;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_800407F8);
+void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+    u8 *d;
+    d = dst;
+    if (overwrite) {
+        *(RGB80040790 *)d = *(RGB80040790 *)src;
+    } else {
+        d[0] += src[0];
+        d[1] += src[1];
+        d[2] += src[2];
+    }
+}
+
+void func_800407F8(Obj6EAC0 *self, Pair32E99C *a1) {
+    if (self->unkC != 0) {
+        *(Pair32E99C *)&self->unk50 = *a1;
+    }
+}
 
 void func_80040824(Obj6EAC0 *self, s32 *a1) {
     if (self->unkC != 0) {
@@ -37,7 +53,22 @@ void func_80040824(Obj6EAC0 *self, s32 *a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040854);
+void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+{
+    void (*fn)();
+    Obj6EAC0 *q;
+
+    q = self;
+    fn = q->methods->slot4C;
+    /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
+     * delay-slot scheduling only -- see the match report. Without it GCC
+     * swaps the prologue's $ra/$s1 callee-save STORE ORDER. */
+    do {
+        fn(q, a1, a2, a3);
+        q->unk48 = 0;
+        q->unk4C = a3;
+    } while (0);
+}
 
 void func_800408A0(Obj6EAC0 *self, s32 a1) {
     self->unk44 = a1;
@@ -98,11 +129,72 @@ void func_80040A88(Obj6EAC0 *self, s32 a1) {
     self->methods->slotCC(self, a1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040AE8);
+void func_80040AE8(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
+    Pair32E99C buf;
+    s32 i, bound;
+    Obj6EAC0 **elemp;
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040C00);
+    if (self->unkC != 0) {
+        return;
+    }
+    func_80041C3C()->slot4C(self, a1, a2);
+    buf = *a2;
+    elemp = self->unkB4 + self->unkAC;
+    i = self->unkAC;
+    bound = i;
+    if (i < bound + self->unkAB) {
+        do {
+            if (self->unkAA != 0 && i == self->unkAA) {
+                buf.a += 0x10;
+            }
+            (*elemp)->methods->slot4C(*elemp, self, &buf);
+            buf.a += self->unkB0;
+            bound = self->unkAC;
+            elemp++;
+            i++;
+        } while (i < bound + self->unkAB);
+    }
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040CD0);
+void func_80040C00(Obj6EAC0 *self) {
+    Obj6EAC0 **elemp;
+    s32 i, bound;
+
+    if (self->unkC != 0) {
+        if (self->unkB4 != NULL) {
+            elemp = self->unkB4 + self->unkAC;
+            i = self->unkAC;
+            bound = i;
+            if (i < bound + self->unkAB) {
+                do {
+                    (*elemp)->methods->slot50(*elemp);
+                    elemp++;
+                    bound = self->unkAC;
+                    i++;
+                } while (i < bound + self->unkAB);
+            }
+        }
+        func_80041C3C()->slot50(self);
+    }
+}
+
+s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
+    Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
+    s32 i = self->unkAC;
+    s32 bound = i;
+    if (i < bound + self->unkAB) {
+        do {
+            Obj6EAC0 *elem = *elemp;
+            s32 result;
+            elemp++;
+            i++;
+            result = elem->methods->slot60(elem, a1);
+            bound = self->unkAC;
+            a2 = result;
+        } while (i < bound + self->unkAB);
+    }
+    return a2;
+}
 
 void func_80040D74(Obj6EAC0 *self, s32 a1) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
@@ -122,7 +214,28 @@ void func_80040D74(Obj6EAC0 *self, s32 a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040E14);
+void func_80040E14(Obj6EAC0 *self, Pair32E99C *a1) {
+    if (self->unkC != 0) {
+        Pair32E99C buf;
+        s32 i;
+        s32 bound;
+        Obj6EAC0 **elemp;
+
+        func_80041C3C()->slotBC(self, a1);
+        buf = *a1;
+        i = 0;
+        elemp = self->unkB4;
+        if (i < self->unkA9) {
+            do {
+                (*elemp)->methods->slotBC(*elemp, &buf);
+                buf.a += self->unkB0;
+                bound = self->unkA9;
+                elemp++;
+                i++;
+            } while (i < bound);
+        }
+    }
+}
 
 void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 *elem = self->unkB4[a2];
