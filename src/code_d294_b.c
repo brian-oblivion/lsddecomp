@@ -132,6 +132,85 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
  * (+0xA4 = func_8001D950, +0xA8 = func_8001DA28, +0xAC = func_8001DDF4)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
+/* STALL -- see docs/match-reports/func_8001D714.md. Best reached: 47/143
+ * words in-range, ~13-word size deficit from a cross-jump merge (GCC
+ * collapses 6 slti/beqz pairs into 3). Restored to INCLUDE_ASM per
+ * project rule. */
+#if 0
+void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
+    Vec3_d294 *posA;
+    Vec3_d294 *posB;
+    Vec3_d294 diffRaw;
+    Vec3S16_d294 diff;
+    s32 count;
+    u8 buf54[0x4C];
+    s32 abs;
+
+    if (self->unk20 == NULL) {
+        return;
+    }
+    if (!func_8001F3A4(self->unk20)) {
+        return;
+    }
+
+    posA = (other->unkC != NULL) ? (Vec3_d294 *)other->unk14->unk38 : NULL;
+    diffRaw = *posA;
+
+    posB = (self->unkC != NULL) ? (Vec3_d294 *)self->unk14->unk38 : NULL;
+    diffRaw.x = diffRaw.x - posB->x;
+    diffRaw.y = diffRaw.y - posB->y;
+    diffRaw.z = diffRaw.z - posB->z;
+
+    if (diffRaw.x >= 0) {
+        if (diffRaw.x >= 0x4001) {
+            return;
+        }
+    } else {
+        abs = ~diffRaw.x + 1;
+        if (abs >= 0x4001) {
+            return;
+        }
+    }
+    if (diffRaw.y >= 0) {
+        if (diffRaw.y >= 0x4001) {
+            return;
+        }
+    } else {
+        abs = ~diffRaw.y + 1;
+        if (abs >= 0x4001) {
+            return;
+        }
+    }
+    if (diffRaw.z >= 0) {
+        if (diffRaw.z >= 0x4001) {
+            return;
+        }
+    } else {
+        abs = ~diffRaw.z + 1;
+        if (abs >= 0x4001) {
+            return;
+        }
+    }
+
+    diff.x = diffRaw.x;
+    diff.y = diffRaw.y;
+    diff.z = diffRaw.z;
+
+    count = other->unk30->unk0;
+    self->methods->slotA4(self, &diff, buf54, &other->unk30->unk4, count * 8);
+
+    if (!self->methods->slotA8(self, &count, &diff)) {
+        return;
+    }
+    if (!self->methods->slotAC(self, other->unk2C, &diff, &count)) {
+        return;
+    }
+
+    self->unk28 = other;
+    other->methods->slot38(other, self, 4);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
