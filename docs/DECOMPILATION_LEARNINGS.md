@@ -271,6 +271,140 @@ and it also makes a bad score uninformative.
 
 ## Source-shape idioms
 
+### A "register-identity" verdict is the least reliable class in this corpus (round 18)
+
+**Two functions filed as unfixable register-identity stalls were overturned in
+one round, and a census then found the class is 26% of everything queued.** Put
+this near the top because it is the largest pool of possibly-recoverable ground
+the project has, and because the verdict is self-sealing: a function filed this
+way stops attracting attempts, so nobody re-measures it.
+
+The two overturns, both by ordinary C:
+
+- **`func_8004EEA0` (matched 51/51).** Filed as "register-identity
+  permutation, not fixable by reshaping". The actual cause was **a masked byte
+  parameter mistyped `s32`** — only ever used as `a3 & 0xFF`. Retyping it to
+  `char` closed the whole function. Nothing was ever a rotation of independent
+  values; one wrong type cascaded into a register-shaped appearance across the
+  entire body.
+- **`func_8004042C` (25 words, now 1 residue word).** Filed as a whole-function
+  register-bank swap (`self`/`a1` -> `$a3`/`$t0`), with its report explicitly
+  recording that the permuter was never tried *because of* that filing.
+  Rewriting a field-copy pair as one whole-struct assignment fixed a real
+  structural defect **and** flipped `self`'s allocation to `$a3` to match
+  retail.
+
+**The mechanism to internalise: a wrong TYPE produces register-shaped
+symptoms.** Signedness, width, and a parameter's declared type all change
+allocation and coalescing, so the visible diff is "the values are in the wrong
+registers" while the fault is upstream in a declaration. `func_8003FCFC` is a
+third instance found the same round: its "register bank differs" verdict was a
+**discarded return value** — retail copies `dst` into `$v0` for a function
+declared `void`; retyping to `s16 *` with `return dst;` moved `--debug` 290 ->
+135.
+
+**But do NOT over-apply the type lever — it closed exactly one function and was
+a clean negative everywhere else it was tried.** Measured the same round:
+alpha's five variants across two functions (signed bitfield markedly worse,
+widened copy and concrete struct types all unchanged), charlie's two exhaustive
+searches (432-combo and 24-combo, no movement), echo's direct test on
+`func_8004C93C` (**1/109 with major drift — much worse**), delta's checks
+(fields already word-width, axis inapplicable). It is one axis worth trying
+early because it is cheap, not the answer.
+
+**The epistemics trap, which is the transferable part.** `func_8004EEA0`'s
+wrong verdict had been *corroborated by a sibling* — `func_8004C93C`, seven
+variants, zero movement. **Two functions agreeing did not validate the class,
+because both shared the same unexamined assumption.** A stall class several
+reports agree on is not thereby confirmed; it may be one error copied. Echo
+wrote the correction into `func_8004C93C`'s own report in the right words:
+*`func_8004EEA0`'s fix does not validate this function's classification — same
+symptom, different function, not yet the same diagnosis.*
+
+**And a register-shaped SYMPTOM is not a register-shaped RESIDUE.** Screen it,
+do not read it. `func_80066340` sits in the census and turned out to have
+`Register Differences: 0` — six words of pure instruction *reordering* in a
+divide-by-360 magic-multiply setup. `--debug`'s bucket breakdown answers this
+in one command; the report's prose does not.
+
+Axes that DID close register-shaped residues in round 18, none of them exotic:
+
+- **Retype a parameter to its real width** (`func_8004EEA0`).
+- **Whole-struct assignment instead of a field-copy pair** (`func_8004042C`).
+- **Split one combined expression into two sequential statements** — how
+  `func_8001EDAC` matched 22/22 after seven failed manual attempts: splitting
+  `*word = (*word & ~mask) | (value << shift);` in two closed a register-pair
+  swap. A genuinely distinct axis from order/naming/operand-order.
+- **`return dst;` on a wrongly-`void` function** (`func_8003FCFC`, partial).
+
+Confirmed INERT for this class, so do not spend attempts on it: **declaration
+and introduction ORDER**, across 3 functions and 9 attempts, byte-identical
+every time.
+
+### A near-miss word count describes WORD COUNT, not the number of divergences (round 18)
+
+`func_80063144` was carried as a **216/217** one-word residue — the most
+attractive target of the round. `permuter.py --debug` scored its preserved body
+at **465**, not the ~200 a genuine one-instruction residue gives, and the
+reason was that **two divergences of equal size were hiding behind a word-count
+coincidence.** Closing the first moved funcdiff 69/217 -> 77/217 and `objdump`
+confirmed it closed that one and only that one; the second is still open.
+
+So: **before believing "everything else matches", cross-check the word count
+against `--debug`'s bucket breakdown** (`Register Differences`, `Reorderings`,
+`Insertions`, `Deletions`). They measure different things and only the second
+one tells you how many independent problems you have.
+
+**File this under how to READ a number, not as a fifth way a score lies.** The
+four in CLAUDE.md are cases where the oracle hands you a wrong green or a wrong
+number. Here funcdiff's number was true; someone read information into it that
+it does not carry. Round 13 had a proposed fifth rejected on exactly this
+distinction, and misfiling this one would teach the next runner to distrust the
+oracle precisely where it is reliable.
+
+Corollary, measured the same round: **a caller's score never validates a
+callee.** `func_8001EE98`'s report carried both a 19/31 and a 29/29; the 29/29
+belongs to `func_8001E58C`, an already-matched *caller*. A `jal` encodes only a
+symbol address, so a caller's bytes are invariant to whatever the callee's body
+does.
+
+### The permuter on libc functions: three data points, three different shapes (round 18)
+
+Round 8's `strcat` produced a zero that was a **dead store**, needing
+translation to an idiomatic form that scored identically. It was tempting to
+generalise that into "expect a dead store". Two more data points say the
+pattern is about the AXIS, not the artefact:
+
+- **`strstr` (30/30)** — permuter zero at iteration 1068 via ordinary hoisting
+  (`matchStart = haystack;` lifted above the empty-haystack guard). Went in
+  **verbatim**, no translation. Notably this was an axis seven prior hand
+  attempts never touched: all seven had varied `cursor`'s placement.
+- **`strcpy` (17/17)** — the permuter **never reached zero** in 52148
+  iterations (best 100, base 315). The non-zero diff was not committable, but
+  its *axis* — "an extra copy of `dest`, distinct from both the guard and the
+  write cursor" — closed the function by hand in two more iterations.
+
+**The claim that survives: a permuter result, zero or not, is a lead about
+WHICH AXIS moved.** Whether it needs translation, goes in verbatim, or is
+merely directional has to be decided per instance. A non-zero result is still
+worth reading for its axis — that is what closed `strcpy`.
+
+### A third escape from the `sltiu` boolean-materialization fold (round 18)
+
+Round 17 established two ways out of GCC 2.6.3's branchless `sltiu`
+materialization (a side effect in an arm; return values that are not a bare
+0/1 pair). `func_80028C54` (matched 27/27) adds a third, and it is the one that
+explains retail's genuine two-branch tail:
+
+**Nest the final decision inside its own guard with a direct early `return`,
+rather than flattening it.** A trailing `if (cond) return X; return Y;` pair and
+a single accumulator assigned then conditionally overwritten **both fold
+identically** — round 17 tried both, six attempts. The un-flattened nested-guard
+form does not fold at all. The test going forward: if a trailing boolean return
+sits inside an `if` that also guards other retail-required control flow, try the
+nested form before concluding the fold is unavoidable.
+
+
 ### How to read a one-instruction residue (round 8, three stalls closed by it)
 
 Put this first because it retired more standing stalls in one round than any

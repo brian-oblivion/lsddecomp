@@ -283,15 +283,38 @@ Gate 2.
 
    ```sh
    ./build-and-verify.sh > /tmp/b.log 2>&1; echo "build exit=$?"; \
-   grep -nE 'Error [0-9]|error:|parse error|undefined reference' /tmp/b.log | head -8; \
+   grep -nE 'error:|parse error|undefined reference' /tmp/b.log | head -8; \
    .venv/bin/python3 tools/funcdiff.py <func>
    ```
 
    Working in parallel? Use `/tmp/<name>_b.log`, not the shared `/tmp/b.log`
    — see docs/PARALLEL-RUNS.md.
 
-   The only line that decides whether the number is meaningful is `build
-   exit=`. To *read* a diff rather than score it, use asm-differ:
+   **`build exit=` is necessary but NOT sufficient, and the reason is
+   measured, not reasoned.** `build-and-verify.sh` exits 1 only when
+   `disk/SLPS_015.56` itself is missing or wrong; everything else runs under
+   `set -e` and propagates make's exit code, which is **2**. So a genuine
+   compile error and an ordinary clean-compile-but-SHA1-mismatch BOTH exit 2 —
+   and the second is the normal state every time you iterate on a function
+   that does not match yet. The exit code alone cannot tell them apart.
+
+   The grep is what separates them, which is why `Error [0-9]` was REMOVED
+   from it (round 18). That pattern matches make's own summary line
+   `make: *** [Makefile:74: check] Error 1`, which make prints when the SHA1
+   check fails — i.e. it fires on a perfectly good build. Measured in an idle
+   worktree:
+
+   | case | `build exit=` | old grep | new grep |
+   | --- | --- | --- | --- |
+   | genuine compile error | 2 | 2 hits | **1 hit** |
+   | clean compile, SHA1 mismatch | 2 | 1 hit | **0 hits** |
+
+   With the compiler-only patterns the signal is clean: **any hit means your C
+   did not build, so any funcdiff number is from the previous build.** No hits
+   plus exit 2 means the build is fresh and simply does not match yet, which is
+   what iterating looks like.
+
+   To *read* a diff rather than score it, use asm-differ:
    `.venv/bin/python3 tools/asm-differ/diff.py <func>`.
 5. Iterate. On a stall, restore the `INCLUDE_ASM` and write the match report
    (see below). **No score short of byte-exact justifies leaving C in `src/`** —

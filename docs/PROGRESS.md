@@ -6,6 +6,179 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-05 — round 18: a permuter round, 9 matches, and a stall class that is 26% of the queue
+
+**921 -> 930 matched (67.92% -> 68.58% of game code). Build green in main after
+every one of the round's ~20 merges, and every claimed match re-verified
+INDIVIDUALLY after its merge, not just on the whole-image SHA1.** Gate 1 was
+dry (`fresh` = 1 of 248 queued), so this was a Gate 3 permuter round against
+the Gate 1b near-miss corpus rather than new ground.
+
+| runner | units | matched | end state |
+| --- | --- | --- | --- |
+| alpha | `code_8220_c` | 0 | reported cleanly |
+| bravo | `code_2cc8c_e/_f/_c`, `code_2cc8c` | 2 | reported cleanly |
+| charlie | `code_55dd4`, `code_d294_c` | 1 | reported cleanly |
+| delta | `Entity_e/_g/_d`, `DreamSys`, `code_179d8_g` | 2 | reported cleanly |
+| echo | `class_3bb8c_b/_f/_j`, `code_179d8_h` | 4 | reported cleanly |
+
+All five reported cleanly — the first round since 13 with no runner lost to
+infrastructure. Cross-runner header contention was **zero by construction**:
+units were grouped by header family so each project header had exactly one
+owner, and none of the ~20 merges conflicted.
+
+Matches: `strstr` 30/30, `func_80028C54` 27/27, `strcpy` 17/17, `func_8004EEA0`
+51/51 (echo); `DreamSys__LogMood` 14/14, `func_80064FBC` 70/70 (delta);
+`func_8001EDAC` 22/22 (charlie); `func_800402F0` 66/66, `func_80040D74` 40/40
+(bravo).
+
+### The round's finding: "register-identity" is the least reliable verdict in the corpus
+
+Two functions filed as unfixable register-identity stalls were overturned, and
+a census then showed **62 of 240 queued functions — 26% — carry a
+register-shaped verdict.**
+
+- **`func_8004EEA0`** (matched 51/51): the cause was a masked byte parameter
+  **mistyped `s32`**, cascading into what merely looked like a register
+  permutation across the whole body.
+- **`func_8004042C`** (25 words, now 1): filed as a whole-function register-bank
+  swap, its report explicitly recording that the permuter was never tried
+  *because of* that filing. A whole-struct assignment fixed a real structural
+  defect and flipped `self`'s allocation to match retail.
+- **`func_8003FCFC`** (third instance, partial): its "register bank differs"
+  verdict was a **discarded return value** — retail copies `dst` into `$v0` for
+  a `void`-declared function. `--debug` 290 -> 135.
+
+**The epistemics trap is the transferable part.** `func_8004EEA0`'s wrong
+verdict had been *corroborated by a sibling* (`func_8004C93C`, seven variants,
+zero movement). Two functions agreeing did not validate the class, because both
+shared the same unexamined assumption. Echo wrote the correction into
+`func_8004C93C`'s own report rather than letting the match imply a verdict it
+had not earned.
+
+**The head over-promoted the fix mid-round and the runners corrected it.** The
+type/declaration axis was broadcast as "the reusable lever" on the strength of
+one success; the round's full evidence is that it closed exactly that one
+function and was a **clean negative everywhere else** — alpha's five variants,
+charlie's two exhaustive searches, echo's direct test on `func_8004C93C`
+(1/109, markedly worse), delta's checks. Recorded in DECOMPILATION_LEARNINGS as
+one cheap axis to try early, not the answer. Likewise the 62-function census is
+a SCREENING list, not a verdict: `func_80066340` sits on it and has
+`Register Differences: 0`.
+
+Axes that did close register-shaped residues, all ordinary C: retype a
+parameter to its real width; whole-struct assignment instead of a field-copy
+pair; **split one combined expression into two statements** (`func_8001EDAC`,
+after seven failed manual attempts); `return dst;` on a wrongly-`void`
+function. Confirmed INERT across 3 functions and 9 attempts: declaration and
+introduction ORDER.
+
+### Two tooling defects, both measured
+
+**1. `permuter.py --debug` without `--stack-diffs` falsely scores ZERO on a
+pure frame-size residue.** Charlie's `func_80065AE0` "zero" was really 28/40
+with an 8-byte frame overshoot. The trap is sharpened by the display: without
+the flag the output still prints `Stack Differences: 0`, which is a field that
+was never filled in and reads exactly like a clean result. Broadcast mid-round;
+delta re-measured `func_80063144`'s headline 465 with the flag and got an
+identical 465 with `Stack Differences: 0` genuinely measured, so that finding
+holds under the stricter test. Now in MATCHING-GUIDE.
+
+**2. The documented oracle chain could not distinguish a compile failure from an
+ordinary SHA1 mismatch.** `build-and-verify.sh` exits 1 only for a bad retail
+dump; everything else propagates make's exit code, **2**. Measured in an idle
+worktree:
+
+| case | `build exit=` | old grep | new grep |
+| --- | --- | --- | --- |
+| genuine compile error | 2 | 2 hits | 1 hit |
+| clean compile, SHA1 mismatch | 2 | **1 hit** | 0 hits |
+
+The old pattern's `Error [0-9]` matched make's own summary line
+(`make: *** [Makefile:74: check] Error 1`), which make prints when the SHA1
+check fails — i.e. it fired on a perfectly good build, in the single most
+common situation there is. `Error [0-9]` removed from the chain in CLAUDE.md,
+MATCHING-GUIDE and the runner prompt; the compiler-only patterns separate the
+cases cleanly.
+
+### A permuter score drop is a LEAD, never a RESULT — 0 for 3 this round
+
+Every permuter-local improvement found on a register-shaped residue was FALSE
+against the real oracle: a cached-OT-pointer candidate scoring 240 (real 17/54,
+funcdiff's drift warning firing); an algebraically-identical loop-end rewrite
+scoring 60, found reproducibly twice (real 52/70 — one word WORSE, an in-range
+regression the permuter's own diff could not see); and the `func_80065AE0`
+false zero. Alpha oracle-verified and reverted both of its own leads rather
+than banking them, which is what makes the negative trustworthy.
+
+### Collision rule 2c has two halves and round 17 fixed only one
+
+Every runner got `timeout` in its assignment and **every search terminated on
+its own** — the termination half stayed solved. But four of five runners still
+ended turns waiting on those bounded timers, about a dozen times between them,
+and two reached ~20 minutes with **zero commits** — one holding an entire
+seven-function characterisation that existed only in its context window. A
+prohibition ("do not end your turn to wait") produced one more stop each; an
+explicit numbered work order with hand work in it fixed it immediately and in
+every case. Written up in PARALLEL-RUNS 2c, along with the one-search-at-a-time
+rule (three runners ran 2-3 concurrent searches, peaking at load 62 on 32
+cores, one running two searches on the SAME function) and the contention
+caveat on negatives.
+
+### Head errors worth recording
+
+- **A pre-merge check that defeated itself.** The head's `git status`
+  invocation printed a literal `(empty=clean)` regardless of the actual output,
+  so a real modification in main was in the output and merged past. It was
+  benign — a runner had written a title change to a main path instead of its
+  worktree, with the authoritative version safe on its branch — but the check
+  existed precisely to catch that. Print raw status with an end-marker.
+- **Gate 1b scores must not be parsed from report PROSE.** The head's queue
+  ranking pulled `func_8004042C`'s "25/25" out of a *correction preamble*
+  describing the number being retracted, and conflated `func_8001EE98`'s 19/31
+  with a 29/29 belonging to `func_8001E58C`, an already-matched **caller**. A
+  `jal` encodes only a symbol address, so a caller's score can never validate a
+  callee. Parse only a report's title/verdict line, and treat any figure near
+  "correction"/"earlier version"/"superseded" as retracted.
+- **A false contention alarm.** `grep -l 'code_8220.h' src/*.c` matched five
+  units and briefly looked like cross-runner contention; all five were prose
+  mentions inside comments. `headercontention.py` parses `#include` properly
+  and was right. Wrong instrument, not a tool bug.
+
+### Open, for the operator
+
+- **`make extract` is BLOCKED in the main checkout** by
+  `.claude/hooks/block-raw-make.py`, though the hook's own message lists that
+  target as allowed, and it accepted the identical command in all five
+  worktrees. Three invocation forms were tried and none worked; the hook was
+  not worked around. Impact was nil this round (the stale files are exactly the
+  functions matched, `progress.py` states outright that counts are unaffected,
+  build green) but it will bite whenever main genuinely needs a re-extract.
+- **The `permuter exit=$?` line is lost intermittently** — three runners
+  independently reported the trailing echo never landing, from a race between
+  the outer tool timeout and the inner `timeout` plus multiprocessing shutdown.
+  That defeats the 124-vs-137 mechanism exactly when it is needed. Redirect the
+  exit code to its own file rather than appending to the search log.
+- **An agent thread's cwd resets between Bash calls**, so a runner command
+  without an explicit `cd` lands in the MAIN checkout. Delta hit it twice,
+  caught both itself. This is the mechanism behind rule 5 violations that look
+  like a second head.
+- `origin/main` was pushed again by something that is not this head (round 17
+  flagged the same). No foreign commits, branches or worktrees exist — every
+  commit is this session's. **Not pushed by this head; the operator's call.**
+
+**Next move.** Runners again, on the register-shaped corpus. This round showed
+the class is recoverable by ordinary C at a meaningful rate, the queue is 62
+functions with reports already written, and the cheapest entry points are
+named: `func_8003FCFC` (290 -> 135, strongest re-attempt), `func_8004042C` (one
+word), `func_8004C93C` (never searched; its `--debug` shows 11 insertions/11
+deletions, not the clean register-only signature its classification implies),
+and `func_80063144`'s open divergence #2. Carving is NOT the next move —
+`fresh` is 1 and 187 uncarved functions remain, but the near-miss corpus is
+better posed than cold ground.
+
+---
+
 ## 2026-09-05 — round 17: 5 runners, 115 matches, and three "unconditional" claims that were not
 
 **788 -> 921 matched (58.11% -> 67.92% of game code; matched bytes 42.70% ->

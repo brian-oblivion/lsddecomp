@@ -491,6 +491,59 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    permuter result may never arrive at all, and the tell is a summary that
    is a status line rather than a finding.
 
+   **ROUND 18: the bound works, and it only fixes HALF of 2c. Budget for the
+   other half.** Every runner was given `timeout` in its assignment, and every
+   search terminated on its own — the termination half is solved and stayed
+   solved. But four of five runners still ended turns waiting on those bounded
+   timers, roughly a dozen times between them, with summaries that were status
+   lines ("waiting for the monitor notification") rather than findings. The
+   cost was not lost searches; it was that two runners reached ~20 minutes with
+   **zero commits**, one of them holding an entire seven-function
+   characterisation that existed only in its context window.
+
+   So 2c has two independent failure modes and they need different fixes:
+
+   | failure | fix | status |
+   | --- | --- | --- |
+   | the search never ends | `timeout` in the ASSIGNMENT | solved, round 17 |
+   | the RUNNER stops working while it runs | an ordered work list | round 18 |
+
+   **A prohibition does not fix the second one.** "Do not end your turn to
+   wait" was sent to four runners and produced one more turn-ending stop each.
+   What worked, immediately and in every case, was an explicit numbered order
+   with hand work in it:
+
+   > 1. `git commit` what you have now. 2. Collect the finished search, record
+   > its exit code, commit. 3. Launch ONE new search in the background. 4.
+   > **While it runs**, read the asm for X and Y, prepare their seeds, update
+   > their reports. 5. Only then collect and repeat.
+
+   The generalisable sentence to put in the assignment: **a bounded search is
+   BACKGROUND work — it needs cores, not your turn.** There is always hand work
+   available (reading disassembly, checking a report's claims against the `.s`,
+   preparing the next seed), and none of it needs a search result.
+
+   This is the same lesson round 17 recorded — "prohibitions are weaker than
+   bounds" — arriving on a second axis. Round 17 replaced a prohibition with a
+   bound; round 18 had to replace a prohibition with a WORK ORDER. In both
+   cases the thing that failed was telling a runner what not to do.
+
+   **Corollary the head must also enforce: ONE search at a time.** Three
+   runners independently launched 2-3 concurrent searches, peaking the machine
+   at load 62 on 32 cores, and one launched two searches on the SAME function.
+   Under saturation a second concurrent search does not add throughput, it
+   halves both searches' iteration rates — and because the payoff is binary
+   (reach zero inside a fixed `timeout` or not), that strictly reduces the
+   chance of closing *either*. Sequential beats concurrent, and it is worth
+   saying so at spawn time rather than three corrections later.
+
+   **And a contention caveat on every negative:** an iteration count collected
+   at a third of a core is much weaker evidence than the same count on an idle
+   box. Tell runners up front to phrase such results as "not closed in N
+   iterations under load" and never to upgrade one to *permuter-exhausted* —
+   that verdict removes a function from `fresh` permanently, and under
+   contention it would be wrong.
+
 3c. **Send an early finisher back into its OWN unit** (message the same agent —
    same worktree, same branch, context intact) rather than letting it idle or
    spawning a cold replacement. This is the highest-yield *structural* move
@@ -1140,7 +1193,7 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 >
 > **The oracle.** `./build-and-verify.sh` plus `tools/funcdiff.py`. Chain them
 > so you cannot read a score from a failed build:
-> `./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; grep -nE 'Error [0-9]|error:|parse error|undefined reference' /tmp/<name>_b.log | head -8; .venv/bin/python3 tools/funcdiff.py <fn>`
+> `./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; grep -nE 'error:|parse error|undefined reference' /tmp/<name>_b.log | head -8; .venv/bin/python3 tools/funcdiff.py <fn>`
 >
 > **The log path MUST carry your runner name.** This prompt used to say
 > `/tmp/b.log` for everyone, and in round 8 two runners writing that one

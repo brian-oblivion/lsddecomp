@@ -60,7 +60,7 @@ flow and frequently wrong about types.
 
 ```sh
 ./build-and-verify.sh > /tmp/b.log 2>&1; echo "build exit=$?"
-grep -nE 'Error [0-9]|error:|parse error|undefined reference' /tmp/b.log | head -8
+grep -nE 'error:|parse error|undefined reference' /tmp/b.log | head -8
 .venv/bin/python3 tools/funcdiff.py <func>
 ```
 
@@ -379,6 +379,41 @@ bytes into `target.o`, reduces the seed to `base.c`, and proves the scaffold
 compiles before handing it back. It also documents the four setup traps that
 each look like a broken toolchain — read its header comment rather than
 rediscovering them.
+
+**ALWAYS PASS `--stack-diffs`, to `--debug` AND to the real search.** Without
+it `permuter.py` does not measure the stack frame at all, and therefore
+**falsely scores ZERO on any pure frame-size residue**. Round 18 hit exactly
+this: `func_80065AE0` reported a zero that was really 28/40 with an 8-byte
+frame overshoot, invisible until the flag was passed. The trap is sharpened by
+the display: **without the flag the output still prints `Stack Differences: 0`**
+— that line is not a measurement saying the frames agree, it is a field that
+was never filled in, and it reads exactly like a clean result.
+
+Two consequences, both paid for in round 18:
+
+- Re-check any zero or near-zero measured without the flag before it goes into
+  a report as a result. A false zero written down as a real one is the kind of
+  finding that misleads every later round.
+- Where a number is load-bearing, re-measure it with the flag and SAY you did.
+  `func_80063144`'s two-divergence finding was re-run this way and came back an
+  identical 465 with `Stack Differences: 0` genuinely measured, which is what
+  makes it trustworthy rather than merely plausible.
+
+**A permuter score drop is a LEAD, never a RESULT, until the real oracle
+confirms it — and round 18 went 0-for-3 on trusting one.** Every permuter-local
+improvement found on a register-shaped residue that round was FALSE against
+`build-and-verify.sh` plus `funcdiff.py`:
+
+- a cached-OT-pointer candidate scoring 240: real result 17/54, with funcdiff's
+  drift warning firing (296814 bytes differing outside the range);
+- an algebraically-identical loop-end rewrite scoring 60 (reproducibly, found
+  twice): real result 52/70, **one word WORSE** than the 53/70 it started from,
+  an in-range regression the permuter's own diff could not see;
+- the `func_80065AE0` false zero above.
+
+The permuter's scorer and the project's oracle do not measure the same thing.
+Verify every candidate through the full chain before believing it, including —
+especially — the ones that look best.
 
 **Always run `--debug` first and check the base score against what the match
 report claims.** A scaffold that scores something other than the reported
