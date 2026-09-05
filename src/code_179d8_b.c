@@ -39,6 +39,8 @@ extern s32 D_8006D5FC;
 extern s32 D_8006D600;
 extern s32 D_8006D604;
 extern s32 D_8006D608;
+extern s32 D_8006D57C[];       /* word array, indexed by the low byte of arg0 */
+extern u8 D_8006D60C;
 
 /* Still INCLUDE_ASM in asm/code_179d8_mid.s -- not this unit's to carve. */
 extern s32 func_800299BC(s32 arg0, s32 arg1);
@@ -49,6 +51,8 @@ extern s32 func_80024D70(s32 arg0, s32 arg1); /* asm/psyq_GsLinkObject4.s */
 extern s32 func_8002B198(s32 arg0);
 extern s32 func_8002AEE0(s32 arg0, s32 arg1);
 extern s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8002A400(void);              /* ditto */
+extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* ditto */
 
 /* CD-ROM MSF (minute/second/sector-in-frame) timecode, all three fields
  * packed BCD. This unit's own local reading -- see func_800293F8. */
