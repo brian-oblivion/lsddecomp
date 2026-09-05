@@ -165,6 +165,66 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
 
+/* STALL -- see docs/match-reports/func_8001E110.md. Best reached: 16/118
+ * words in-range, block order/CFG confirmed correct, residue is a 3-way
+ * register rotation (retail: p1->s1, p2->s2, r1->s0; this attempt:
+ * p1->s0, p2->s1, r1->s2). Restored to INCLUDE_ASM per project rule. */
+#if 0
+s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
+    u8 r1;
+    u8 r2;
+    Vec3S16_d294 mid;
+
+    r1 = func_8001ECFC(box, p1);
+    r2 = func_8001ECFC(box, p2);
+
+    if (r1 == 0 && r2 == 0) {
+        return 1;
+    }
+    if (r1 != 0 && r2 == 0) {
+        if (out != NULL) {
+            func_8001E2E8(out, box, p2, p1);
+        }
+        return 3;
+    }
+    if (r1 == 0 && r2 != 0) {
+        if (out != NULL) {
+            func_8001E2E8(out, box, p1, p2);
+        }
+        return 2;
+    }
+
+    if ((r1 & r2) != 0) {
+        return 0;
+    }
+
+    mid.x = (p1->x + p2->x) >> 1;
+    mid.y = (p1->y + p2->y) >> 1;
+    mid.z = (p1->z + p2->z) >> 1;
+
+    if (p1->x == mid.x && p1->y == mid.y && p1->z == mid.z) {
+        return 0;
+    }
+    if (p2->x == mid.x && p2->y == mid.y && p2->z == mid.z) {
+        return 0;
+    }
+
+    {
+        s32 result = func_8001E110(out, box, p1, &mid);
+        if (result != 0) {
+            return result;
+        }
+    }
+    {
+        s32 result = func_8001E110(out, box, &mid, p2);
+        if (result != 0) {
+            return result;
+        }
+    }
+    return 0;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E110);
 
 /* Bisects the segment [near, far] against `box` until the midpoint exactly
@@ -225,6 +285,52 @@ void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, V
 
 void func_8001E49C(void) {
 }
+
+/* STALL -- see docs/match-reports/func_8001E4A4.md. Best reached this
+ * round: 48/54 words in-range (up from the round-13 best of 47/54), a
+ * clean self<->tag register-pair swap in $s1/$s2, no size drift.
+ * Restored to INCLUDE_ASM per project rule. */
+#if 0
+void func_8001E4A4(Class6B5CCObj *self, void *node) {
+    Class6B5CCObj *s;
+    void *n;
+    GenericObj_d294 *entry;
+    void *cursor;
+    s32 tag;
+    s32 masked;
+
+    s = self;
+    n = node;
+    tag = 4;
+    entry = NULL;
+loop:
+    BasicClass__func_1816c(n, &entry, &cursor);
+    if (entry == NULL) {
+        goto check_cursor;
+    }
+    masked = entry->methods->header & 0xF;
+    if (masked == tag) {
+        goto dispatch;
+    }
+check_cursor:
+    if (cursor != NULL) {
+        goto loop;
+    }
+    entry = NULL;
+dispatch:
+    if (entry == NULL) {
+        goto tail;
+    }
+    if (*(u8 *)entry->methods != 0x34) {
+        goto tail;
+    }
+    entry->methods->slot10(entry, s);
+tail:
+    if (cursor != NULL) {
+        goto loop;
+    }
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E4A4);
 

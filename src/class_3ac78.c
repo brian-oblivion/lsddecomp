@@ -35,6 +35,7 @@ typedef struct BaseCtorTable_3ac78 BaseCtorTable_3ac78;
 struct BaseCtorTable_3ac78 {
     u8 pad0[0x8];
     void (*ctor)(void *self); /* +0x008, standard "further-base ctor first" slot */
+    void (*dtor)(void *self); /* +0x00C, func_8004A7C0: standard "further-base dtor" slot, mirroring ctor */
 };
 
 extern BaseCtorTable_3ac78 *func_800428E4(void);
@@ -42,6 +43,7 @@ extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
 extern GenericObject *func_8004D38C(void);
 extern s32 func_80020C5C(void);
+extern void func_80017CFC(void *arg1);
 extern Vec3_3ac78 D_8008682C;
 
 void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
@@ -123,7 +125,52 @@ void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     self->methods->slot40(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A7C0);
+void func_8004A7C0(Class866E8 *self)
+{
+    s32 i;
+    UnkSlotEntry_3ac78 *entry;
+    GenericObject *obj;
+    Class866E8 **cellp;
+    u8 *p;
+    u8 *end;
+
+    self->methods->slot14(self, (void *)func_80020C5C());
+
+    for (i = 0; i < 7; i++) {
+        entry = &self->unkEC[i];
+        self->methods->slot88(self, 6, entry, i);
+
+        if (entry->unk4 != NULL) {
+            entry->unk4->methods->unk04(entry->unk4);
+        }
+
+        if (entry->unk8 != NULL) {
+            if (entry->unk8->unk2C != NULL) {
+                entry->unk8->unk2C->methods->unk04(entry->unk8->unk2C);
+            }
+            entry->unk8 = (UnkSlotListObj_3ac78 *)entry->unk8->methods->unk04(entry->unk8);
+        }
+
+        if (entry->unkC != NULL) {
+            entry->unkC->methods->unk04(entry->unkC);
+        }
+
+        cellp = entry->unk10;
+        end = (u8 *)cellp + 0x668;
+        p = (u8 *)cellp;
+        while (p < end) {
+            obj = *(GenericObject **)p;
+            if (obj != NULL) {
+                obj->methods->unk04(obj);
+            }
+            p += 4;
+        }
+
+        func_80017CFC(entry->unk10);
+    }
+
+    func_800428E4()->dtor(self);
+}
 
 /* MEASURED, round 9: func_8001E57C TAKES NO ARGUMENTS -- its body is
  * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` and it reads neither $a0 nor $a1
@@ -299,10 +346,44 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
 
 extern void func_8004B2D4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
 
-/* STALL, round 2026-09-02 (runner delta): best reached 95/117, see
- * docs/match-reports/func_8004B100.md for the preserved near-miss body
- * and the residue analysis (a single instruction-scheduling swap at the
- * inner loop's tail -- correct branch/register shape everywhere else). */
+/* STALL, round 2026-09-02 (runner delta); re-verified round 19 (echo):
+ * best reached 95/117, see docs/match-reports/func_8004B100.md for the
+ * preserved near-miss body and the residue analysis (a single
+ * instruction-scheduling swap at the inner loop's tail -- correct
+ * branch/register shape everywhere else). */
+#if 0
+void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
+{
+    s32 i;
+    s32 row;
+    s32 col;
+    HistoryEntry_3ac78 *entry;
+    UnkSlotEntry_3ac78 *slot;
+    Class866E8 **cell;
+    Class866E8 *obj;
+
+    entry = self->unk8C.e;
+    for (i = 0; i < self->unk88; i++, entry++) {
+        slot = &self->unkEC[entry->elemIdx];
+        if (slot->unk4->unk2C != 0) {
+            cell = (slot->unk10 + entry->col) + entry->row * 20;
+            for (row = 0; row < entry->height; row++) {
+                for (col = 0; col < entry->width; col++, cell++) {
+                    self->unk1C0 = self->unkBC;
+                    self->unk1C2 = entry->col + col;
+                    self->unk1C3 = entry->row + row;
+                    func_8004B2D4(*cell, arg1, arg2);
+                    for (obj = (*cell)->unk38; obj != NULL; obj = obj->unk38) {
+                        func_8004B2D4(obj, arg1, arg2);
+                    }
+                }
+                cell += 20 - entry->width;
+            }
+        }
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
 
 /* Widened this round (func_8004B100) from a single-param signature to

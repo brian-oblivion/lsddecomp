@@ -214,6 +214,55 @@ void func_80065DEC(Class65650 *self)
     }
 }
 
+/* STALL -- see docs/match-reports/func_80065E1C.md. Best reached: 49/68
+ * words in-range, no size drift, residue is a whole-function self<->p
+ * register-identity swap ($s1/$s2). Restored to INCLUDE_ASM per project
+ * rule. */
+#if 0
+s32 func_80065E1C(Class65650 *self)
+{
+    s32 buf[4];
+    s32 count;
+    s32 i;
+    Unk70ElemObj **p;
+
+    count = self->unk5C->methods->slot80(self->unk5C, NULL, buf) & 0xFF;
+    self->unk70 = func_80017B34(count * 4);
+    if (self->unk70 == NULL) {
+        goto alloc_fail;
+    }
+    self->unk74 = func_80017B34(count);
+    if (self->unk74 == NULL) {
+        goto alloc_fail;
+    }
+    self->unk5C->methods->slot80(self->unk5C, self->unk74, buf);
+
+    p = self->unk70;
+    i = 0;
+    self->unk6C = 0;
+    if (count != 0) {
+        do {
+            *p = func_80056FE4();
+            __asm__("");
+            if (*p == NULL) {
+                goto fail;
+            }
+            p++;
+            self->unk6C = self->unk6C + 1;
+            i++;
+        } while (i < count);
+    }
+    self->unk68 = self->unk70[buf[0]];
+    return 0;
+
+alloc_fail:
+    self->unk74 = NULL;
+fail:
+    func_80065F2C(self);
+    return 1;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
 
 void func_80065F2C(Class65650 *self)
@@ -298,7 +347,14 @@ void func_800661D4(Class65650 *self, void *arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066214);
+void func_80066214(Class65650 *self, s32 index)
+{
+    self->unk7C = index;
+    self->unk80 = (*(GroupObj **)(self->unk5C->unk30->arr + 8 + index * 4))->entry->unk4;
+    self->unk88 = (u8 *)(*(GroupObj **)(self->unk5C->unk30->arr + 8 + self->unk7C * 4))->entry + 8;
+    self->unk84 = 0;
+    self->methods->slot134(self, self->unk88, 0);
+}
 
 s32 func_800662A8(Class65650 *self)
 {
@@ -311,6 +367,186 @@ void func_800662B4(Class65650 *self)
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
+
+/* STALL -- see docs/match-reports/func_80066340.md. Best reached: 252/258
+ * words in-range, no size drift, residue is two symmetric 3-word
+ * instruction-scheduling clusters around a compiler-synthesized
+ * magic-multiply constant. Restored to INCLUDE_ASM per project rule. */
+#if 0
+void *func_80066340(Class65650 *self, void *acc, void *extra)
+{
+    u8 outbuf[4];
+    void *s0;
+    s32 idx;
+    Unk70ElemObj *elem;
+    Elem14Obj *e14;
+    TimeTargetObj *t0;
+    s32 i;
+
+    s0 = self->unk5C->methods->slot84(self->unk5C, acc, &outbuf[0], &outbuf[1], &outbuf[2], &outbuf[3]);
+    idx = func_80065D64(self, outbuf[0]);
+    if (idx < 0) {
+        goto end;
+    }
+    elem = self->unk70[idx];
+    e14 = elem->unk14;
+    e14->unk00 = 0;
+    t0 = e14->unk44;
+
+    switch (outbuf[1]) {
+    case 0:
+        elem->unk10 = (elem->unk10 & ((s32 *)s0)[0]) | ((s32 *)s0)[1];
+        break;
+    case 1: {
+        if (outbuf[2] & 1) {
+            if (outbuf[2] & 2) {
+                s32 *pin;
+                s16 *p16 = t0->arr10;
+
+                i = 0;
+                pin = (s32 *)s0;
+                while (i < 3) {
+                    s16 tmp;
+                    tmp = *p16 + *pin / 360;
+                    *p16 = tmp;
+                    *p16 = tmp % 4096;
+                    pin++;
+                    i++;
+                    p16++;
+                }
+                s0 = (u8 *)s0 + 0xC;
+            }
+            if (outbuf[2] & 4) {
+                s32 *p32 = t0->arr00;
+
+                i = 0;
+                {
+                    s16 *pin = (s16 *)s0;
+
+                    while (i < 3) {
+                        *p32 = (*pin * *p32) / 4096;
+                        pin++;
+                        i++;
+                        p32++;
+                    }
+                }
+                s0 = (u8 *)s0 + 8;
+            }
+            if (!(outbuf[2] & 8)) {
+                goto end;
+            }
+            {
+                s32 *p32 = t0->arr18;
+
+                i = 0;
+                {
+                    s32 *pin = (s32 *)s0;
+
+                    while (i < 3) {
+                        *p32 += *pin;
+                        pin++;
+                        i++;
+                        p32++;
+                    }
+                }
+            }
+        } else {
+            if (outbuf[2] & 2) {
+                s32 *pin;
+                s16 *p16 = t0->arr10;
+
+                i = 0;
+                pin = (s32 *)s0;
+                while (i < 3) {
+                    *p16 = *pin / 360;
+                    pin++;
+                    i++;
+                    p16++;
+                }
+                s0 = (u8 *)s0 + 0xC;
+            }
+            if (outbuf[2] & 4) {
+                s32 *p32 = t0->arr00;
+
+                i = 0;
+                {
+                    s16 *pin = (s16 *)s0;
+
+                    while (i < 3) {
+                        *p32 = *pin;
+                        pin++;
+                        i++;
+                        p32++;
+                    }
+                }
+                s0 = (u8 *)s0 + 8;
+            }
+            if (!(outbuf[2] & 8)) {
+                goto end;
+            }
+            {
+                s32 *p32 = t0->arr18;
+
+                i = 0;
+                {
+                    s32 *pin = (s32 *)s0;
+
+                    while (i < 3) {
+                        *p32 = *pin;
+                        pin++;
+                        i++;
+                        p32++;
+                    }
+                }
+            }
+        }
+        {
+            Elem14Obj *e14b;
+            s32 v1, v2, v3;
+
+            e14b = elem->unk14;
+            v1 = t0->arr18[0];
+            v2 = t0->arr18[1];
+            v3 = t0->arr18[2];
+            e14b->unk18 = v1;
+            e14b->unk1C = v2;
+            e14b->unk20 = v3;
+            __asm__("");
+        }
+        break;
+    }
+    case 2: {
+        u16 count;
+
+        count = *(u16 *)s0;
+        if (count != 0 && elem->unk20 == 0) {
+            s32 v;
+
+            v = self->unk5C->unk2C->methods->slot80(self->unk5C->unk2C, count - 1);
+            func_8001E770(elem, v);
+        }
+        break;
+    }
+    case 3: {
+        s32 v1;
+
+        v1 = *(s32 *)s0;
+        if (v1 == 0 || v1 == 0xFFFF) {
+            elem->methods->slot4C(elem, self, 0);
+        } else {
+            s32 idx2;
+
+            idx2 = func_80065D64(self, *(u8 *)s0);
+            elem->methods->slot4C(elem, self->unk70[idx2], 0);
+        }
+        break;
+    }
+    }
+
+end:
+    return (u8 *)acc + outbuf[3] * 4;
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066340);
 
