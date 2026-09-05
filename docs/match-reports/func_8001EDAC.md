@@ -1,4 +1,4 @@
-# func_8001EDAC -- STALL (register-identity residue, 16/22 words)
+# func_8001EDAC -- MATCHED (22/22, round 18 permuter pass)
 
 Unit: `code_d294_c` (round 14). The generic packed-bitfield accessor
 already MEASURED and documented (before this carve existed) in
@@ -118,3 +118,63 @@ unrelated bitwise intermediates) get consistently cross-allocated versus
 retail, treat it as the same permuter-target class rather than continuing
 to vary source shape -- the six variants tried here span every reasonable
 axis (order, form, naming) without moving either register.
+
+## Round 18 (permuter pass, charlie): MATCHED
+
+`permuter.py --debug` first confirmed the scaffold reproduces this exact
+residue (`Register Differences: 8`, base score 40, consistent with the
+16/22 recorded above -- permuter's scorer counts the two swapped registers
+across all their occurrences). Ran the bounded search: `timeout 480
+permuter.py -j 6 --stop-on-zero --best-only`. **Zero found at iteration
+975** (`permuter exit=0`, the search stopped itself, not a timeout kill).
+
+**The winning form is a plain, idiomatic source change**, not UB or a
+duplicate-arm trick -- splitting the final combined expression into two
+sequential statements:
+
+```c
+/* was (16/22): */
+*word = (*word & ~mask) | (value << shift);
+
+/* zero-scoring form: */
+*word = *word & ~mask;
+*word = *word | (value << shift);
+```
+
+Nothing else changed from the preserved 16/22 body. This is the same
+"register PAIR consistently cross-allocated" residue described above
+(`~mask` and `value << shift` swapping `$a0`/`$v1` against retail) --
+apparently GCC 2.6.3's register allocator makes a different choice for
+which pseudo gets which hardware register when the AND and OR are two
+statements each assigning to `*word` versus one expression combining both
+before a single store, even though the two forms are semantically
+identical and (per the six prior manual attempts) statement order,
+operand order, and intermediate-naming alone hadn't found this specific
+split.
+
+**Translated to `src/code_d294_c.c` verbatim and reverified with the real
+oracle** (not just the permuter's own scorer):
+
+```
+build exit=0
+func_8001EDAC: 22/22 words match (file 0xF5AC-0xF604)
+OK: build matches retail SLPS_015.56
+```
+
+Full match, whole-image green. `include/code_d294.h`'s comment on this
+function's role (generic packed-bitfield accessor) is unaffected -- no
+struct or signature changes, so no other unit is affected.
+
+### Proposed learning (supersedes the single-source "register PAIR" entry above)
+
+**A register-pair swap that resists 6 statement-order/operand-order/
+naming reshapes can still be a single-expression-vs-two-statements
+question** -- collapsing two independent stores to the same lvalue into
+one expression (`a = (a & m) | b;`) versus writing them as two plain
+statements (`a = a & m; a = a | b;`) is a NINTH axis this residue class
+had not been tried on, and it is exactly the kind of small, semantically
+inert rewrite the permuter's random statement-level mutation finds fast
+(975 iterations here) that manual guessing had not reached in 7 real
+attempts. Worth trying this specific split early on any future
+"register pair swapped, both semantically-transparent reshapes exhausted"
+residue, before spending a permuter budget on it.

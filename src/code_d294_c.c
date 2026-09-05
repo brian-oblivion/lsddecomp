@@ -121,7 +121,22 @@ s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point) {
     return flags;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EDAC);
+u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value) {
+    u32 mask;
+    s32 i;
+    u32 old;
+
+    mask = 1;
+    for (i = 0; i < width; i++) {
+        mask <<= 1;
+    }
+    mask -= 1;
+    mask <<= shift;
+    old = (*word & mask) >> shift;
+    *word = *word & ~mask;
+    *word = *word | (value << shift);
+    return old;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EE04);
 
