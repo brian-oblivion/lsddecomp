@@ -1,4 +1,4 @@
-# func_8003FCFC -- STALL (register-identity, best structurally exact)
+# func_8003FCFC -- STALL, MISFILED CLASS CORRECTED (return-type fix found, register residue narrower but not closed)
 
 Unit `code_2cc8c_e`, carved round 14. Screened clean (no `gp_rel`, no
 `addiu $at,$at,%lo`, 0 callee-saved registers) -- not a toolchain blocker.
@@ -98,3 +98,59 @@ alone) has `lh` -- widening the temp to `s32` reproduces the sign-extending
 load even when the value is immediately narrowed back on store. Worth
 checking on any other narrow-passthrough residue that shows a load OPCODE
 mismatch rather than an operand mismatch.
+
+## Round-bravo sweep: the "void, register bank differs" classification is WRONG -- this is a discarded-return-value case
+
+Read as part of a coordinator-requested sweep of register-shaped reports
+in this unit, not a full re-attempt. Retail's raw disassembly (checked
+directly, not just this report's transcription) has a dead giveaway the
+original report's own diff quotes but does not explain: the SECOND
+instruction in the whole function is `addu $v0, $a1, $zero` -- copying
+`dst` (the `a1` parameter) into `$v0`, the return-value register --
+computed once, very early, and never read again by anything else in the
+function (every actual `sh` store keeps using `$a1` directly). A
+`void`-declared function has no business ever writing `$v0` at all. This
+is exactly DECOMPILATION_LEARNINGS' own "a discarded return value is never
+evidence of `void`" trap, and this report's 4 attempts never questioned
+the `void` return type.
+
+**Retyping the function to `s16 *func_8003FCFC(s16 *src, s16 *dst)` with
+`return dst;` added at the end is a real, verified improvement**: `--debug`
+score drops from 290 (confirmed base score for the ORIGINAL `void` attempt-4
+body -- worse than this report's word-count framing suggested, once
+measured with the tool rather than read by eye) to 135. The remaining 135
+is NOT a clean isolated residue, though: retail computes `v0 = a1` ONCE,
+early, and then keeps using `a1` directly for every store, while every C
+shape tried (plain `return dst;`, an explicit `s16 *result = dst;` cached
+before the loop and returned at the end, and a branch-forced-copy trick
+`if (src) { result = dst; } else { result = dst; }` copied from
+`func_80051858`'s own precedent) coalesces `dst` and its returned copy into
+ONE register throughout (`$v0` used for the return AND every store),
+where retail keeps them as two separate register identities (`$a1` for
+the stores, `$v0` for the return alone). All three variants scored
+identically (135) -- none closed the remaining gap.
+
+**Verdict for the coordinator's register-shaped-class sweep: MISFILED, not
+a genuine register-identity stall as originally classified.** The
+underlying function almost certainly does return `dst` (matching a
+`memcpy`-like idiom this codebase uses elsewhere), and the "register bank
+differs" framing was measuring the CONSEQUENCE of a wrong return type, not
+an intrinsic property of the loads/stores. Recommend re-staffing this one
+specifically (not dismissing it as an unfixable register class) --the
+remaining 135 looks like the SAME "keep an argument live in its own
+register separately from a coalesced copy" shape `func_8004042C.md` hit
+and did not fully solve either (see that report's own final residue), so a
+lever that closes one may close both. Not spent further attempts this
+round; flagging as the strongest re-attempt candidate this sweep found.
+
+### Attempts this round (4, beyond the original 4)
+
+5. `--debug` on the original attempt-4 (`void`, `s32` temps) body:
+   confirmed 290, not merely "structurally exact" as originally read.
+6. Retyped `s16 *`, `return dst;` added, otherwise identical: 135.
+7. `s16 *result = dst;` cached before the loop, `return result;`: 135, no
+   change -- copy-propagated to the same thing as attempt 6.
+8. Branch-forced-copy trick (`if (src) { result = dst; } else { result =
+   dst; }`, `func_80051858`'s own idiom) applied to `result`/`dst`: 135, no
+   change -- the trick that worked elsewhere in this project does not
+   transfer to this exact shape.
