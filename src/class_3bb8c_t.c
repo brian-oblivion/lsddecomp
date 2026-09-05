@@ -257,7 +257,41 @@ void func_800581C4(D_80087AACObj *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058228);
+/* A 3-byte colour-ish triple, read/written strictly byte-for-byte in
+ * DECLARATION order (round 19, verified against retail byte-for-byte --
+ * the natural sequential order is what matches, no reordering needed).
+ * Field names are a plausible RGB reading of a colour-cycling table
+ * builder, not confirmed evidence; see this function's own match report. */
+typedef struct D_8008ABB8Color {
+    s8 r;
+    s8 g;
+    s8 b;
+} D_8008ABB8Color;
+extern u8 D_8008ABAC;
+extern u8 D_8008ABB4;
+extern D_8008ABB8Color D_8008ABB8;
+extern D_80087AACEntry *func_800404D0(void *a0, void *a1, s32 a2);
+
+void func_80058228(D_80087AACObj *self) {
+    D_8008ABB8Color rgb;
+    s32 i;
+
+    self->unk_0xA8[0] = func_800404D0(&D_8008ABAC, &D_8008ABB4, 0);
+    rgb = D_8008ABB8;
+    for (i = 1; i < 100; i++) {
+        s32 dec;
+
+        self->unk_0xA8[i] = func_800404D0(&D_8008ABAC, &rgb, 0);
+        dec = 1;
+        if (i < 7) {
+            dec = 0x14;
+        }
+        rgb.r -= dec;
+        rgb.g -= dec;
+        rgb.b -= dec;
+    }
+    self->unk_0x240 = func_80017B34(4);
+}
 
 extern void func_80017CFC(void *arg);
 
