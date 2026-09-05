@@ -395,3 +395,10 @@ CURRENT known-best structural state (not just against an old report's
 stale number) before running a search is the same discipline
 `func_8004CD38`'s report already flags, now confirmed on a second,
 independently-carved function.
+
+**Checked against the head's second mid-round broadcast (aggregate/whole-
+struct assignment closing 5 sibling functions elsewhere this round): does
+NOT apply here.** Every `GridSlot866E8` field written in this function is
+a freshly computed value (`slot->elemIdx = self->methods->slot120(...)`,
+`slot->h4 = h4;`, etc.), never a verbatim copy of several adjacent fields
+from one existing struct instance into another. The shape does not occur.
