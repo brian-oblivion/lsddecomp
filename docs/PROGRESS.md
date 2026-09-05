@@ -264,6 +264,71 @@ from a standalone slot, per the settled `0xA8C` precedent). It was deferred: a
 `config/` change inside a live runner's unit family is how a head breaks its own
 merge.
 
+### Round 19 follow-up: two of the three tooling defects are FIXED
+
+Fixed with the operator's authorisation after the round closed. Both were
+workflow tooling, not the pinned toolchain -- no compiler, flag, `maspsx` or
+verification file was touched, and `check.sha1`/`build.sha1` are untouched.
+
+**1. `block-raw-make.py` no longer blocks what it advertises as allowed.**
+Two defects, one cause -- the tokeniser judged non-target words as make
+targets:
+
+- **Redirection.** `SEPARATORS` had no redirection operator, so in
+  `make extract > log` the `>` and the log path stayed inside make's span and
+  were judged as *targets*. Adding them to `SEPARATORS` would NOT have worked:
+  `shlex(punctuation_chars=True)` splits a leading file descriptor into its own
+  token *before* the operator, so `2>&1` arrives as `("2", ">&", "1")` and the
+  stray `"2"` would still have read as a target. The fix is a
+  `strip_redirections()` pass that drops the operator, its target word, and a
+  preceding bare-digit fd.
+- **Heredoc bodies.** A heredoc body was tokenised as though it were a command
+  line, so writing documentation *about* the hook was blocked by the hook --
+  the exact papercut class its own docstring claims to have fixed for
+  `grep make Makefile`. `strip_heredoc_bodies()` removes them.
+
+  **The heredoc fix does NOT become a bypass**, which is the part worth
+  checking: a heredoc fed to a *shell* really is a script, so the body is
+  recursed into rather than discarded when a shell name appears in the
+  introducing line. `bash <<'EOF' / make build / EOF` is still BLOCKED.
+
+  Verified against 28 cases -- 15 that must be allowed and 13 that must still
+  be blocked, including `make`, `make build`, `make > log`, `make 2>&1`,
+  `make extract && make`, `sh -c 'make build'`, `time make`, and the two shell
+  heredocs. The allow-rule is unchanged (`targets and all(t in
+  ALLOWED_TARGETS)`), so a bare `make` with no targets still fails it.
+
+**2. `tools/setup-permuter.sh` no longer dies opaquely on a PERM_* seed.**
+Its scaffold validation compiles the seed with the real `cc1`, which has never
+heard of `PERM_GENERAL`/`PERM_VAR` -- those are read by the permuter's own
+pycparser front end, which substitutes concrete variants before any compile.
+The result was `parse error before 'int'` under `set -e`, aborting the script
+with no hint, which is why several reports' recommended "hinted PERM_GENERAL
+search" could not be followed. Now detected: the scaffold build is skipped, the
+reason is printed, and the permuter's own `--debug` is named as the correct
+validator. Recorded as trap 5 in the script's own header. Both branches tested.
+
+Two smaller fixes in the same file: the printed advice now says
+`--debug --stack-diffs` in both places (without it a pure frame-size residue
+falsely scores ZERO -- round 18), and the closing line no longer claims "base
+compiles" in the branch where it deliberately did not.
+
+**3. NOT fixed, and it is not a harness bug: permuter scaffolds disagreeing
+with the real in-context build.** Three instances, all inside
+`class_3bb8c.h`. The mechanism is real and not a defect to patch out -- an
+isolated single-function compile genuinely does not reproduce the surrounding
+register pressure, so it schedules differently (`func_8004BB3C`: the scaffold
+hoists a pointer computation the real build defers past a `blez` guard). No
+scaffold generator can fix that; it is what "compile one function alone" means.
+
+What the script now does instead is make the DETECTION cheap: it prints the
+`--debug --stack-diffs` invocation and says to check the base score against the
+match report's residue before searching. **If the scaffold's base score
+disagrees with `funcdiff`'s residue, the scaffold is scoring a different
+problem and its results will not transfer.** That check is the remedy; the
+divergence itself stays open, and whether it is systemic to that class's
+register pressure is still unmeasured.
+
 ### Next move
 
 **Runners again, and the queue is better posed than it was at the start of this

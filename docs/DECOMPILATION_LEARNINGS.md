@@ -668,31 +668,46 @@ iterations flat on `func_8004B100` says something different from 122K iterations
 that wandered.
 
 
-### Tooling defects found in round 19 (all measured, none worked around)
+### Tooling defects found in round 19 (two since FIXED, one is not a bug)
 
-- **`tools/setup-permuter.sh`'s scaffold validation runs the seed through the
-  real `cc1`, which cannot parse `PERM_GENERAL`/`PERM_VAR`.** So the guided-PERM
-  approach that several match reports recommend as a next step is **not usable
-  through this project's harness as written**. Alpha hit this; the
-  recommendation is stale in every report that carries it.
-- **Permuter scaffolds disagree with the real in-context build, three times now,
-  all inside `class_3bb8c.h`.** `func_8004BB3C`'s scaffold reports base 460 with
+- **FIXED.** `tools/setup-permuter.sh`'s scaffold validation ran the seed
+  through the real `cc1`, which cannot parse `PERM_GENERAL`/`PERM_VAR` — those
+  are read by the permuter's own pycparser front end, which substitutes concrete
+  variants before any compile happens. It died with `parse error before 'int'`
+  under `set -e` and no explanation, which is why the "hinted PERM_GENERAL
+  search" several reports recommend could not be followed. The script now detects
+  a PERM_* seed, skips the scaffold build, and names the permuter's own
+  `--debug` as the correct validator (trap 5 in its header).
+- **NOT A BUG, and not fixable in the harness: permuter scaffolds disagree with
+  the real in-context build, three times now, all inside `class_3bb8c.h`.** `func_8004BB3C`'s scaffold reports base 460 with
   2 insertions/2 deletions against a residue that has none, because the isolated
   single-function compile schedules a pointer computation early where the real
   build defers it past a `blez` guard. Bravo hit two more. Possibly systemic to
-  that class's register pressure. **Before spending a search, check the
-  scaffold's base score agrees with `funcdiff`'s residue** — if it does not, the
-  scaffold is scoring a different problem and its results will not transfer.
+  that class's register pressure. An isolated single-function compile genuinely
+  does not reproduce the surrounding register pressure — that is what compiling
+  one function alone *means*, so no scaffold generator can patch it out.
+  **Before spending a search, check the scaffold's base score agrees with
+  `funcdiff`'s residue** — if it does not, the scaffold is scoring a different
+  problem and its results will not transfer. `setup-permuter.sh` now prints that
+  check as its handover instruction.
 - **`make clean` + re-extract desync.** Extracting `asm/` while a `src/` file
   still holds a non-`INCLUDE_ASM` body leaves that function's `.s` missing and
   hard-fails the next revert. Restore the `INCLUDE_ASM` *before* re-extracting.
-- **The `block-raw-make.py` hook blocks a REDIRECTED `make extract`**, which it
-  advertises as allowed, because its `SEPARATORS` set omits redirection
-  operators — so `>` and the log path are parsed as make *targets*. Bare and
-  piped forms work. It also blocks writing prose about itself via a shell
-  heredoc, since a heredoc body is command position to the tokeniser. Round 18
-  escalated this as an unexplained per-checkout difference; it is neither
-  unexplained nor per-checkout. **Guardrail change = operator's call.**
+- **FIXED.** The `block-raw-make.py` hook blocked a REDIRECTED `make extract`,
+  which it advertises as allowed, because `SEPARATORS` omitted redirection
+  operators — so `>` and the log path were judged as make *targets*. It also
+  blocked writing prose about itself via a heredoc, since a heredoc body is
+  command position to the tokeniser. Round 18 escalated this as an unexplained
+  per-checkout difference; it was neither unexplained nor per-checkout (round 18
+  simply used redirected forms in main and bare ones in the worktrees).
+
+  Note for anyone touching this again: adding the operators to `SEPARATORS` does
+  **not** work, because `shlex(punctuation_chars=True)` splits a leading file
+  descriptor into its own token *before* the operator (`2>&1` -> `"2"`, `">&"`,
+  `"1"`), leaving a stray `"2"` that still reads as a target. The fix is a
+  `strip_redirections()` pass. The heredoc fix recurses into bodies fed to a
+  *shell* rather than discarding them, so `bash <<'EOF' / make build / EOF` is
+  still blocked — verified across 28 allow/block cases.
 
 ### A permuter number is in PERMUTER units, not retail words — three distinct misreadings in one round (round 19)
 

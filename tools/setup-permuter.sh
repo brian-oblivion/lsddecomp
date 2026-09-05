@@ -12,9 +12,10 @@
 #     .venv/bin/python3 tools/decomp-permuter/permuter.py \
 #       -j 6 --stop-on-zero --best-only permuter-work/<func>
 #
-# WHY THIS SCRIPT EXISTS. Setting this up by hand hits four traps that each
-# look like a broken toolchain, and all four cost real time the first time
-# (round 8, 2026-09-02). They are fixed here so nobody pays twice:
+# WHY THIS SCRIPT EXISTS. Setting this up by hand hits five traps that each
+# look like a broken toolchain. The first four cost real time in round 8
+# (2026-09-02) and the fifth in round 19; they are fixed here so nobody pays
+# twice:
 #
 #   1. `prelude.inc` ends with `.set gp=64`, and our `as` rejects that against
 #      an r3000: "`gp=64' used with a 32-bit processor". Dropped below.
@@ -29,6 +30,10 @@
 #      itself copes, but a hand-rolled scoring harness built on the stripped
 #      base.c will die with "parse error before `*'" on the target's own
 #      return type. Score candidates against the REAL headers instead.
+#   5. A seed carrying the permuter's own PERM_* macros cannot be validated by
+#      the real cc1 at all -- cc1 has never heard of them, and the parse error
+#      reads like a broken seed. The scaffold build is skipped for such seeds,
+#      with the permuter's own parser named as the validator. See TRAP 5 below.
 #
 # THE COMPILE PIPELINE HERE IS THE MAKEFILE'S, VERBATIM. The permuter mutates
 # SOURCE under a fixed toolchain -- that is why using it is not a toolchain
@@ -102,13 +107,45 @@ tools/gcc263/cpp -Iinclude -Iinclude/psyq -undef -lang-c -nostdinc \
 # A permuter dir whose base does not even compile wastes a whole search, and
 # one whose base score is not the score the match report claims is scoring
 # something other than the function you think it is.
-"$dir/compile.sh" "$dir/base.c" -o "$dir/base.o"
+#
+# TRAP 5 (round 19): a seed carrying decomp-permuter's own PERM_* macros CANNOT
+# be validated this way, and the failure is opaque. Those macros are read by the
+# permuter's pycparser front end, which expands them into concrete variants; the
+# real `cc1` has never heard of them and dies on a parse error that reads like a
+# broken seed. Several match reports recommend a "hinted PERM_GENERAL search" as
+# the next step, and following that advice used to make this script fail with no
+# hint as to why. Detect it and say so instead.
+if grep -qE '\bPERM_[A-Z]+[A-Z_]*[[:space:]]*\(' "$dir/base.c"; then
+    echo
+    echo "NOTE: this seed uses decomp-permuter PERM_* macros, so the real cc1"
+    echo "      cannot parse it and the usual scaffold build is SKIPPED."
+    echo "      That is expected, not a broken seed -- PERM_* is read by the"
+    echo "      permuter's own parser, which substitutes concrete variants"
+    echo "      before any compile happens."
+    echo
+    echo "      Validate it with the permuter itself, which runs that parser:"
+    echo
+    echo "        PATH=$REPO/permuter-work/bin:\$PATH \\"
+    echo "          .venv/bin/python3 tools/decomp-permuter/permuter.py --debug --stack-diffs $dir"
+    echo
+    echo "      A parse error there is a real problem with the seed; silence is"
+    echo "      a working scaffold. Note the base score it prints is in PERMUTER"
+    echo "      units (a weighted penalty), NOT a word count -- check it against"
+    echo "      the match report's residue before trusting the scaffold."
+    echo
+else
+    "$dir/compile.sh" "$dir/base.c" -o "$dir/base.o"
+fi
 echo
-echo "scaffold built in $dir -- base compiles, target assembled."
+if [ -f "$dir/base.o" ]; then
+    echo "scaffold built in $dir -- base compiles, target assembled."
+else
+    echo "scaffold built in $dir -- target assembled; base NOT compiled (PERM_* seed, see note above)."
+fi
 echo "Sanity-check the base score against the match report BEFORE searching:"
 echo
 echo "  PATH=$REPO/permuter-work/bin:\$PATH \\"
-echo "    .venv/bin/python3 tools/decomp-permuter/permuter.py --debug $dir"
+echo "    .venv/bin/python3 tools/decomp-permuter/permuter.py --debug --stack-diffs $dir"
 echo
 echo "Then search (a zero is a LEAD -- translate it to idiomatic C and"
 echo "re-verify with ./build-and-verify.sh plus tools/funcdiff.py):"

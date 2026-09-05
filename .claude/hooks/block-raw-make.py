@@ -67,6 +67,21 @@ KEYWORDS = frozenset({"then", "do", "else", "elif", "if", "while", "until", "!"}
 FLAGS_WITH_VALUE = frozenset({"-C", "-f", "-o", "-W", "-I", "-j", "--directory",
                               "--file", "--makefile", "--jobs"})
 
+# Redirection operators. These are NOT separators -- `make extract > log` is one
+# command, not two -- but the operator and its target are not make TARGETS
+# either, and leaving them in the span made the hook block `make extract > log`
+# while allowing the identical `make extract | tail`. Round 18 spent a round
+# believing that was a per-checkout difference; round 19 measured it here.
+#
+# `shlex(punctuation_chars=True)` splits a leading file descriptor into its own
+# token BEFORE the operator, so `2>&1` arrives as ("2", ">&", "1") -- which is
+# why adding these to SEPARATORS does not fix it and stripping does.
+REDIRECTS = frozenset({">", ">>", ">|", ">&", "<", "<<", "<<-", "<<<", "<&",
+                       "<>", "&>", "&>>"})
+
+# `<<WORD` / `<<-'WORD'` -- the introducer, not the body.
+HEREDOC_INTRO = re.compile(r"<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+
 
 def project_dir() -> str:
     return os.path.realpath(
@@ -93,6 +108,55 @@ def tokenize(command: str):
     return list(lexer)
 
 
+def strip_heredoc_bodies(command: str):
+    """Split a command into (text_without_heredoc_bodies, [(intro, body), ...]).
+
+    A heredoc body is DATA fed to a command's stdin, not a command line -- but
+    the tokeniser cannot tell, so `cat <<'EOF' ... make extract > log ... EOF`
+    used to be judged as though the documentation inside it were a build. That
+    made the hook block writing prose ABOUT itself, which is the papercut its
+    own docstring says it fixed for `grep make Makefile`.
+
+    The bodies are returned rather than discarded because for a SHELL the body
+    really is a script (`bash <<'EOF' ... make ... EOF`), and dropping it would
+    turn this fix into a bypass. The caller recurses into those.
+    """
+    lines = command.split("\n")
+    kept, bodies, i = [], [], 0
+    while i < len(lines):
+        line = lines[i]
+        kept.append(line)
+        i += 1
+        match = HEREDOC_INTRO.search(line)
+        if not match:
+            continue
+        delimiter = match.group(2)
+        body = []
+        while i < len(lines) and lines[i].strip() != delimiter:
+            body.append(lines[i])
+            i += 1
+        if i < len(lines):
+            i += 1  # consume the terminator line
+        bodies.append((line, "\n".join(body)))
+    return "\n".join(kept), bodies
+
+
+def strip_redirections(tokens):
+    """Drop redirection operators, their targets, and any leading fd digit."""
+    out, i = [], 0
+    while i < len(tokens):
+        token = tokens[i]
+        if token in REDIRECTS:
+            # `2>&1` tokenises as ("2", ">&", "1"): the fd landed in `out`.
+            if out and out[-1].isdigit():
+                out.pop()
+            i += 2  # the operator and the word it redirects to
+            continue
+        out.append(token)
+        i += 1
+    return out
+
+
 def simple_commands(tokens):
     """Split a token stream into simple commands at shell separators."""
     spans, current = [], []
@@ -116,8 +180,21 @@ def make_invocations(command: str, depth: int = 0):
     if depth > 4:  # A shell nested this deep is not an honest build.
         return [[]]
 
+    command, heredocs = strip_heredoc_bodies(command)
+
     found = []
-    for span in simple_commands(tokenize(command)):
+    # A heredoc fed to a SHELL is a script; anything else is data. Be
+    # conservative about which is which -- if a shell name appears anywhere in
+    # the introducing line, treat the body as code.
+    for intro, body in heredocs:
+        try:
+            intro_words = {os.path.basename(t) for t in tokenize(intro)}
+        except ValueError:
+            intro_words = set()
+        if intro_words & SHELLS and MENTIONS_MAKE.search(body):
+            found.extend(make_invocations(body, depth + 1))
+
+    for span in simple_commands(strip_redirections(tokenize(command))):
         # Leading `VAR=value` assignments keep us in command position.
         while span and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", span[0]):
             span = span[1:]
