@@ -528,6 +528,189 @@ completeness, not as a candidate.
 
 Regenerate with the script in `docs/match-reports/func_8001EE98.md`.
 
+#### ROUND 20: the signature is a screen for FRAME SIZE ONLY, and the census's two best rows are now falsified
+
+**The lever and a callee-save STORE-ORDER residue are unrelated GCC decisions,
+even when a function's numeric signature matches this census exactly.** Runner
+alpha established this in isolation on the two "0-`jal`" rows above —
+`func_80065A5C` and `func_800662BC`, the strongest-looking candidates in the
+table — and on `func_80066340`.
+
+The method is the part worth copying: rather than spending real builds, alpha
+compiled two variants through the pinned pipeline and diffed the `cc1` output.
+Variant (a) supplied the extra frame bytes with a genuinely unused local;
+variant (b) with a dead six-argument call. **The assembly is byte-identical.**
+The only difference is `cc1`'s own `.frame` comment (`vars=8, args=16` vs
+`vars=0, args=24`) and internal label numbers that do not survive to machine
+code — including, unchanged in both, the exact prologue store permutation those
+functions' whole stall history is about (`s2,s3,ra,s1,s0` against retail's
+`s2,s3,s0,ra,s1`).
+
+So the reasoning chain above is sound and its conclusion is narrower than it
+reads: **the outgoing area tells you the width of the widest call expression
+the compiler saw, and nothing whatsoever about the ORDER or IDENTITY of the
+registers around it.** Where a body's frame is already the right SIZE, this
+lever has nothing left to fix — which is the case for every function alpha
+tested, since their compiled lengths were already exact.
+
+Round 19 recorded this as a one-function caution (`func_80065AE0`, "frame
+already correctly sized"). It is now a general limit with a reproducer, and it
+means **the remaining rows of the census are weaker candidates than the table
+makes them look.** Confirm the frame is actually the wrong SIZE before
+spending attempts; if the length is already exact, this is not your residue.
+
+### An inherited report's PROSE can be wrong while its NUMBER is right — three independent instances in one round (round 20)
+
+`funcdiff.py` scores bytes. It has no opinion whatever about a report's
+*narrative* — what the residue is made of, which side does what, or which
+earlier lever is supposed to have fixed what. Round 20 had **three runners, in
+three unrelated units, each independently find a false mechanism claim in a
+report they inherited**, in a single round:
+
+| runner | report | the false claim |
+| --- | --- | --- |
+| alpha | `func_80065AE0` | a padding local was said to also fix the callee-save store order "for free"; it does not — the same unfixed permutation is still there, compounded with an `arg`-copy deferral |
+| bravo | `func_8002B3F4` family | a prose description of "which side does what" disagreed with a fresh `objdump` read, and the mismatch was **hiding a real fix** |
+| charlie | `func_8004C470` | retail and built were **swapped** in the operand-order description |
+
+Three in one round, found by three agents who did not talk to each other, is
+not bad luck — it is the base rate for prose that nobody re-measures. Compare
+`docs/PARALLEL-RUNS.md`'s standing lesson that a claim about MACHINE STATE
+decays differently from a claim about the BINARY: a wrong score gets corrected
+the next time anyone measures, because measuring is the job. **A wrong
+narrative is nobody's job to re-measure, so it survives, and the next runner
+builds on it.**
+
+Two practical rules, both cheap:
+
+- **Re-derive the residue from `asm-differ` / `objdump` before acting on any
+  report's description of it**, exactly as you already re-derive a preserved
+  body's drift claim. Charlie's swapped retail/built would have sent a runner
+  reshaping in precisely the wrong direction.
+- **When you correct one, correct it in the report** rather than only in your
+  summary. All three of these are now fixed in place.
+
+### A lever's NEGATIVE is scoped to the state it was tested under (round 20)
+
+Every stall report accumulates "tried X, inert" lines, and they read as
+permanent. They are not. **Re-check cheap levers after any structural fix that
+changes the function's shape** — register pressure and scheduling state are
+inputs to whether a lever can bite.
+
+Measured by bravo on `func_8002B4D4`: round 19 tested the dispatch-code guard
+polarity and found it inert. Round 20 applied an unrelated structural fix (the
+unfolded-address local-pointer idiom for `D_8006D8F8`'s store), **re-tested the
+same guard polarity, and it worked** — matching retail's delay-slot-sharing
+trick byte-for-byte. That function went 34 → 60/91 with its compiled length
+becoming exact.
+
+The corollary for how to write a report: an inert-lever line is worth much more
+with the surrounding state named ("inert at 34/91, before the `D_8006D8F8`
+fix") than as a bare "tried, no effect".
+
+### The permuter can produce a SEMANTICALLY WRONG candidate that scores 176/177 (round 20)
+
+The existing caution — *a permuter zero is a LEAD, not an answer* — implicitly
+puts the danger at zero. **The danger is not at zero.** Runner delta, working
+`func_8003F848`, hit a candidate that scored **176 of 177 words** against the
+real oracle and was outright incorrect C.
+
+The mechanism is what makes this general rather than an anecdote. The candidate
+**hoisted a call out of a loop**, so `func_80012AF8` executes once instead of
+once per node. GCC does not unroll that loop, so the call's instructions appear
+exactly once in the binary either way: moving it across the loop's back-edge
+changes **only the backward branch's target immediate**, which is a ONE-WORD
+effect. A call-hoisting bug and a genuine one-word near-miss are therefore
+indistinguishable by static word count — to the permuter's own scorer *and* to
+`funcdiff.py`.
+
+**So a near-perfect score is not evidence of near-correct semantics, and the
+closer the score the more this matters.** Before believing any candidate, check
+its CONTROL FLOW against the original disassembly's own branch targets — the
+project's existing "branch targets disagree = outranks everything" rule is the
+right instrument and it is not implied by the score. Delta verified and
+rejected this one on semantics regardless of score, which is the behaviour to
+copy.
+
+### Commutative-operand-order canonicalization: 5 instances, 2 units, and one clean negative unit (round 20)
+
+**cc1 canonicalizes the register operand order of a commutative op
+independently of the order written in C.** Confirmed independently by two
+runners who never communicated, in unrelated units:
+
+- **echo, `code_179d8_c` (3 instances)** — e.g. retail `addu v1,v1,v0` against
+  built `addu v0,v0,v1`; survived five reshapes plus a 64631-iteration bounded
+  permuter search with the floor stuck.
+- **charlie, `class_3bb8c` (2 instances, `addu` and `or`)** — retail
+  `addu v0,s4,v1` against built `addu v0,v1,s4`, and the decisive datum:
+  **both C operand orders (`tol + r->unk18` and `r->unk18 + tol`) produced the
+  SAME wrong order.** That is what rules out source control and makes it an
+  RTL canonicalization.
+
+**Screen for the shape:** same opcode, same immediate/operands, only register
+POSITIONS swapped. File it under this class and do not spend attempts
+reordering commutative operands hoping to match.
+
+**And the scope boundary, which is the more useful half.** echo then tested a
+third unrelated unit (`class_3ac78`, three functions) and found **no instance**
+— those residues are a load-delay-slot scheduling swap, a register-role
+asymmetry between two structurally identical byte blocks, and a backward
+delay-slot hoist across a call. So the class is real and cross-unit but **not
+universal**, and "is this that class?" remains a question to answer per
+function rather than assume. Both halves are recorded deliberately: "this class
+is everywhere" and "this class is real in some units and absent in others" lead
+to very different next rounds.
+
+*(Note on provenance: echo's own report concluded the class was confined to its
+origin unit and "not yet promotable". That was correct on echo's information
+and wrong on the round's — echo could not see charlie's parallel work. The head
+compared the two residue descriptions directly before merging them into one
+class. This is the adjudication `docs/PARALLEL-RUNS.md` assigns to the head,
+and it is why runners are told to describe a residue rather than only name it.)*
+
+### The two-independently-live-locals lever, and the discriminator that predicts it (round 20)
+
+Splitting a table-address computation into two independently-live locals —
+`base = D_8006DCB0; entry = &base[idx];` instead of one combined expression —
+closed 5 of 7 residue words on `func_80032BB8` (7/14 → 12/14).
+
+**It does not generalise, and echo measured exactly where it stops.** One win,
+two regressions (`func_80032C60` 13/14 → 2/14 *with drift*; `func_8004B100`
+95/117 → 92/117), and two functions with no applicable shape at all.
+
+**The discriminator:** the lever helps only when the starting shape is a single
+expression built from an *unnamed global folded directly into one line*. Where
+the "base" is already a named separate value — a parameter, or a local already
+split for other reasons — it costs register pressure for no benefit.
+
+A lever reported with its measured failure cases is worth far more than one
+reported only where it worked; this entry exists in that form on purpose.
+
+### A rodata `D_XXXXXXXX` holding a STRING is a symbol to REFERENCE, never a string to retype (round 20)
+
+Splat has already emitted those bytes. Writing the string literal in your C
+emits a **second** copy, and since `section_order` puts `.rodata` first, the
+duplicate shifts the whole image.
+
+**The diagnostic signature is what makes this worth its own entry: a clean
+compile, a red whole-image SHA1, and a first differing byte in RODATA
+thousands of bytes AHEAD of anything you edited** — carrying no hint of which
+unit caused it. It is a sibling of the forgotten-`padNN` struct hazard in
+CLAUDE.md, and it presents the same way.
+
+Found closing `func_8003FC70` (35/35), a stall that had stood since round 14.
+`D_80011194` *is* the format string `"not supported light mode %d\n"`. Round 14
+had correctly identified that the function could not be C while its rodata slot
+stayed attached, prescribed splitting the slot, tried boundary `0x1994`,
+measured **339541 bytes** off, and filed "likely an alignment constraint on
+where a rodata section may begin" as the open lead. **There is no alignment
+constraint** — the split is byte-neutral on its own. The 339541 was the
+duplicate string. Both halves are required: split the slot *and* write
+`extern const char D_XXXXXXXX[];`.
+
+**Before writing any string literal, grep `asm/data/*.rodata.s` for the
+symbol.** If it is there, the extern is the only correct spelling.
+
 ### Aggregate assignment vs scalar field-copy, and the rule that predicts which helps (round 19)
 
 **Whole-struct/aggregate assignment and field-by-field scalar copy are not

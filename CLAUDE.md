@@ -434,6 +434,19 @@ follow, and both are worth having.
   grep -n '0x8001cd60' build/lsdde.map
   ```
 
+- **A second construct produces the identical signature: a duplicated rodata
+  string.** A `D_XXXXXXXX` in rodata that holds a string is a SYMBOL to
+  reference, not a string to retype — splat has already emitted those bytes,
+  and writing the literal in C emits a second copy. Because `section_order`
+  puts `.rodata` first, the duplicate shifts the whole image and the first
+  differing byte lands in rodata, thousands of bytes AHEAD of the code you
+  edited. Round 20 closed `func_8003FC70` (35/35) on this after round 14 had
+  measured 339541 bytes off and attributed it to a rodata alignment
+  constraint that does not exist. Before writing any string literal, grep
+  `asm/data/*.rodata.s` for the symbol; if it is there,
+  `extern const char D_XXXXXXXX[];` is the only correct spelling. Details in
+  `docs/DECOMPILATION_LEARNINGS.md`.
+
   **The 1-based part is not a nitpick and delta's version of this recipe had
   it wrong**, giving `file_offset - 0x800 + 0x80010000` applied straight to
   `cmp -l`'s output. Verified here: `cmp -l` on two 4-byte files differing at
