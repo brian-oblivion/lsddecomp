@@ -251,3 +251,69 @@ before trusting it" discipline caught both).
 round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
 Restored to `INCLUDE_ASM`. Permuter run added round 2026-09-02, runner
 BRAVO; still `INCLUDE_ASM`.
+
+## ROUND 20 (runner echo): confirmed as the commutative-add operand-order class -- SIXTH instance, THIRD unrelated unit
+
+Per the coordinator's standing request to apply this screen to every
+residue hit this round: re-read this function's residue against the raw
+disassembly directly. Retail's tail:
+
+```
+lb   v1,0(sp)        ; dynamic
+lui  a0,0x8008        ; base address (computed EARLY, right after dynamic)
+addiu a0,a0,0x7e14
+sll  v0,v1,1
+addu v0,v0,v1          ; index = dynamic*3
+lb   v1,1(sp)          ; upper (loaded LATE, only after index+base are ready)
+addu v0,v0,a0           ; += base
+addu v0,v0,v1            ; += upper
+```
+
+This build's compiled tail (same source, rebuilt fresh this round to
+confirm rather than trusting the report's prior prose):
+
+```
+lb   v1,0(sp)        ; dynamic
+lb   a0,1(sp)          ; upper (loaded EARLY instead -- right after dynamic)
+sll  v0,v1,1
+addu v0,v0,v1           ; index = dynamic*3
+lui  v1,0x8008           ; base (computed LATE, reusing v1 once dynamic is dead)
+addiu v1,v1,0x7e14
+addu v0,v0,v1             ; += base   (retail: += a0 here)
+addu v0,v0,a0              ; += upper  (retail: += v1 here)
+```
+
+Same two operand registers (`a0`, `v1`) feed the final two `addu`s in
+both, just with `base`/`upper` holding the OPPOSITE register each time,
+and the two `addu`s consequently swapped in which operand each consumes.
+
+**Applied the coordinator's decisive test directly: reversed the C-level
+operand order of the final addition** (`return *(local.axis.upper +
+entry);` instead of `return entry[local.axis.upper];`, i.e. `upper +
+entry` instead of `entry[upper]` -- an addition-order reversal, not just
+a subscript-notation change) and rebuilt. **Byte-identical to the
+un-reversed form: 28/35, same two words differing, same diff.** Both C
+operand orders produce the identical wrong register/operand assignment
+-- exactly the datum the coordinator used to confirm charlie's two
+`class_3bb8c` instances as the same phenomenon.
+
+**This makes CalcDreamColor a sixth confirmed instance of the class, and
+the third unrelated unit** (after three in `code_179d8_c` and two in
+`class_3bb8c`), independently found without knowing charlie's result in
+advance -- this report's own residue description ("both addus end up
+register-swapped relative to retail... reshapes... all four producing
+the identical result") already matches the class's signature exactly; it
+just wasn't cross-referenced against the class until this round. The
+one nuance worth recording: unlike `func_80032BB8`'s instance (a single
+`addu` with a genuine destination-register choice), here the swap
+presents across TWO separate `addu`s and is entangled with an
+independent load (`upper`) being scheduled early -- but the decisive
+test (operand-order reversal producing an identical wrong result) is the
+same, and that is the test the coordinator is treating as authoritative
+for class membership, not the surface shape.
+
+**Disposition unchanged: STALL at 28/35, PERMUTER-EXHAUSTED** (prior
+rounds' 40400-iteration search already covers this exact residue).
+`INCLUDE_ASM` restored; the operand-order-reversal test was reverted
+immediately after confirming the identical result (`git diff --stat`
+empty before continuing).
