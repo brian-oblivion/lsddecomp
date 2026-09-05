@@ -104,7 +104,23 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040C00);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040CD0);
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040D74);
+void func_80040D74(Obj6EAC0 *self, s32 a1) {
+    Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
+    s32 i = self->unkAC;
+    s32 bound = i;
+    s32 count = i + self->unkAB;
+    if (i < count) {
+        do {
+            Obj6EAC0 *elem = *elemp;
+            s32 ab;
+            elemp++;
+            ab = self->unkAB;
+            elem->methods->slotB8(elem, a1);
+            i++;
+            bound = self->unkAC;
+        } while (i < (bound + self->unkAB));
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040E14);
 
