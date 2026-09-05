@@ -132,10 +132,13 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
  * (+0xA4 = func_8001D950, +0xA8 = func_8001DA28, +0xAC = func_8001DDF4)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
-/* STALL -- see docs/match-reports/func_8001D714.md. Best reached: 47/143
- * words in-range, ~13-word size deficit from a cross-jump merge (GCC
- * collapses 6 slti/beqz pairs into 3). Restored to INCLUDE_ASM per
- * project rule. */
+/* STALL -- see docs/match-reports/func_8001D714.md. Round 20: closed 11
+ * of the original 13-word size deficit (130 -> 141 words) via a
+ * `count = expr; if (count)` intermediate-assignment lever on the X and
+ * Z axes' negative-branch magnitude checks, which prevents GCC's
+ * cross-jump merge on those two branches without reintroducing it
+ * elsewhere. 2 words remain; every other axis/branch combination tried
+ * regressed. Restored to INCLUDE_ASM per project rule. */
 #if 0
 void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
@@ -167,7 +170,8 @@ void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
         }
     } else {
         abs = ~diffRaw.x + 1;
-        if (abs >= 0x4001) {
+        count = abs >= 0x4001;
+        if (count) {
             return;
         }
     }
@@ -187,7 +191,8 @@ void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
         }
     } else {
         abs = ~diffRaw.z + 1;
-        if (abs >= 0x4001) {
+        count = abs >= 0x4001;
+        if (count) {
             return;
         }
     }
@@ -240,14 +245,154 @@ void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 
     }
 }
 
+/* STALL -- see docs/match-reports/func_8001DA28.md. Round 20: reached
+ * 14/243 words in-range (up from round 13's 6/243) after fixing the
+ * frame size (0x98 -> 0xF8, a 24-word unused-buffer padding) and a
+ * deferred-self-materialization residue (barrier as first statement).
+ * Remaining residue: arg2 gets copied into a scratch register ($t2)
+ * where retail keeps it in $a2 throughout, plus substantial further
+ * structural work in the two loop bodies and tail comparison.
+ * Restored to INCLUDE_ASM per project rule. */
+#if 0
+s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
+    CornerList_d294 *list;
+    Vec3S16_d294 *cur;
+    s16 *zview;
+    u8 *end;
+    s32 count;
+    BoundsBox_d294 mm;
+    Sixteen6_d294 *arr;
+    s16 *cur2;
+    s16 *view2;
+    u8 *end2;
+    s32 cnt2;
+    Sixteen6_d294 track;
+    s16 v;
+    u8 pad[0x60];
+
+    __asm__("");
+    list = (CornerList_d294 *)arg1;
+    list->hdr.x = list->hdr.x + arg2->x;
+    list->hdr.y = list->hdr.y + arg2->y;
+    list->hdr.z = list->hdr.z + arg2->z;
+
+    count = list->count;
+    end = (u8 *)&list->hdr + count * 48;
+
+    mm.lo = list->hdr;
+    mm.hi = list->hdr;
+
+    cur = (Vec3S16_d294 *)((u8 *)&list->hdr + 6);
+    zview = (s16 *)((u8 *)cur + 4);
+
+    if ((u8 *)cur < end) {
+        do {
+            cur->x = cur->x + arg2->x;
+            *(zview - 1) = *(zview - 1) + arg2->y;
+            *zview = *zview + arg2->z;
+
+            v = cur->x;
+            if (v < mm.lo.x) {
+                mm.lo.x = v;
+            }
+            v = *(zview - 1);
+            if (v < mm.lo.y) {
+                mm.lo.y = v;
+            }
+            v = *zview;
+            if (v < mm.lo.z) {
+                mm.lo.z = v;
+            }
+            v = cur->x;
+            if (mm.hi.x < v) {
+                mm.hi.x = v;
+            }
+            v = *(zview - 1);
+            if (mm.hi.y < v) {
+                mm.hi.y = v;
+            }
+            v = *zview;
+            if (mm.hi.z < v) {
+                mm.hi.z = v;
+            }
+
+            cur = (Vec3S16_d294 *)((u8 *)cur + 6);
+            zview = (s16 *)((u8 *)zview + 6);
+        } while ((u8 *)cur < end);
+    }
+
+    func_8001F4E4(self->unk20);
+    arr = func_8001F50C(self->unk20, 0);
+    cnt2 = func_8001F3A4(self->unk20);
+
+    track = *arr;
+
+    end2 = (u8 *)arr + cnt2 * 12;
+    cur2 = (s16 *)((u8 *)arr + 12);
+    view2 = cur2 + 5;
+
+    if ((u8 *)cur2 < end2) {
+        do {
+            v = cur2[0];
+            if (v < track.f0) {
+                track.f0 = v;
+            }
+            v = view2[-4];
+            if (v < track.f1) {
+                track.f1 = v;
+            }
+            v = view2[-3];
+            if (v < track.f2) {
+                track.f2 = v;
+            }
+            v = view2[-2];
+            if (v < track.f3) {
+                track.f3 = v;
+            }
+            v = view2[-1];
+            if (v < track.f4) {
+                track.f4 = v;
+            }
+            v = view2[0];
+            if (v < track.f5) {
+                track.f5 = v;
+            }
+
+            cur2 = (s16 *)((u8 *)cur2 + 12);
+            view2 = (s16 *)((u8 *)view2 + 12);
+        } while ((u8 *)cur2 < end2);
+    }
+
+    if (track.f5 < mm.lo.z) {
+        return 0;
+    }
+    if (mm.hi.z < track.f2) {
+        return 0;
+    }
+    if (track.f3 < mm.lo.x) {
+        return 0;
+    }
+    if (track.f4 < mm.lo.y) {
+        return 0;
+    }
+    if (mm.hi.y < track.f1) {
+        return 0;
+    }
+    return mm.hi.x >= track.f0;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
 
-/* STALL -- see docs/match-reports/func_8001E110.md. Best reached: 16/118
- * words in-range, block order/CFG confirmed correct, residue is a 3-way
- * register rotation (retail: p1->s1, p2->s2, r1->s0; this attempt:
- * p1->s0, p2->s1, r1->s2). Restored to INCLUDE_ASM per project rule. */
+/* STALL -- see docs/match-reports/func_8001E110.md. Round 20: the
+ * "register rotation" diagnosis was WRONG -- re-derivation from retail's
+ * exact tail-merge/shared-block CFG closed the register mapping
+ * completely and reached 95/118 words in-range (up from 16/118), WITH
+ * drift (1 word overshoot: an extra `move v1,v0` before the SECOND
+ * recursive call's result test, where retail tests $v0 directly).
+ * Restored to INCLUDE_ASM per project rule. */
 #if 0
 s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
     u8 r1;
@@ -257,22 +402,30 @@ s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3
     r1 = func_8001ECFC(box, p1);
     r2 = func_8001ECFC(box, p2);
 
-    if (r1 == 0 && r2 == 0) {
+    if (r1 == 0) {
+        if (r2 != 0) {
+            goto shared_test;
+        }
         return 1;
     }
-    if (r1 != 0 && r2 == 0) {
-        if (out != NULL) {
-            func_8001E2E8(out, box, p2, p1);
-        }
-        return 3;
+    if (r2 != 0) {
+        goto shared_test;
     }
-    if (r1 == 0 && r2 != 0) {
-        if (out != NULL) {
-            func_8001E2E8(out, box, p1, p2);
-        }
-        return 2;
+    if (out != NULL) {
+        func_8001E2E8(out, box, p2, p1);
     }
+    return 3;
 
+shared_test:
+    if (r1 != 0) {
+        goto combined;
+    }
+    if (out != NULL) {
+        func_8001E2E8(out, box, p1, p2);
+    }
+    return 2;
+
+combined:
     if ((r1 & r2) != 0) {
         return 0;
     }
