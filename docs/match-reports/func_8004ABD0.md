@@ -155,3 +155,43 @@ indexing / incrementing pointer / offset accumulator), best 9/74 with the
 loop's overall two-register shape reproduced but one instruction's
 delay-slot placement unmoved. Moved on to stay within budget for the
 remaining assigned functions. Restored to `INCLUDE_ASM`.
+
+## Round 19 (echo): permuter pass (negative), on this report's own
+## flagged residue class
+
+Re-verified 9/74 first (matches exactly). Sanity-checked the permuter
+scaffold with `--debug --stack-diffs`: base score 1056 (`Stack
+Differences: 56` -- despite the report's own confirmed "no address
+drift" via the real oracle; treating this as a scorer artifact rather
+than a real frame mismatch, consistent with `--stack-diffs`' known
+imprecision noted elsewhere this round for other functions).
+
+Ran the bounded search WITHOUT `--stack-diffs` (matching this report's
+own residue, a pure delay-slot-fill/scheduling question with no stack
+component per the real-oracle confirmation): `timeout 600 permuter.py -j
+8 --stop-on-zero --best-only`. **`permuter exit=124`** (bound fired).
+**140,928 iterations**, best score progression `1000 -> 900 -> 685 ->
+385 -> 240`, **no zero found**. Per the project's standing rule, this is
+phrased as "not closed in 140,928 iterations," not evidence of
+exhaustion -- the search improved on the permuter's OWN scoring metric
+without reaching the real oracle's zero.
+
+Did not attempt to translate the score-240 candidate to `src/` and
+re-verify against the real oracle -- per CLAUDE.md, a nonzero permuter
+score is never itself a result, only a lead, and with six real manual
+attempts already having established the residue's exact shape (a single
+instruction's delay-slot placement), a partial permuter improvement
+without reaching zero does not change this function's filed status.
+Remains a STALL at 9/74, `INCLUDE_ASM` restored (permuter work confined
+to `permuter-work/`, gitignored, `src/` untouched this round beyond the
+earlier body-preservation commit).
+
+### Proposed learning
+
+No new learning beyond what this report and this round's other permuter
+passes already establish -- filed here mainly so the next round does not
+re-run an unhinted blind search on this exact residue without first
+checking whether a source-level hint (the "reduce the increment's
+apparent independence to the scheduler" direction this report's own
+analysis suggests, still untried) could produce a more targeted future
+search than another blind 140K-iteration pass.
