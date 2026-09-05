@@ -69,7 +69,134 @@ s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg
     return result;
 }
 
+/* STALL snapshot -- see docs/match-reports/func_8004EF6C.md. Best
+ * reached: 188/240 words, 0x3BC/0x3C0 (1 word / 4 bytes short, zero
+ * address drift beyond that). Genuinely fresh derivation this round --
+ * full struct layout (StreamSrcObj/StreamReq/etc, all new) derived from
+ * scratch and confirmed correct in control flow, arithmetic (including
+ * two signed/unsigned shift fixes -- retail uses `srl`, a naive signed
+ * `>>` on `s32 arg7` compiles to `sra`), and struct-copy shape (the
+ * aligned-vs-unaligned runtime-checked copy idiom, matching
+ * class_3bb8c_r.c's Block24 precedent). The residue is confirmed as
+ * the SAME 9-register-saturation class already documented for this
+ * function's own caller, func_8004EEA0 -- a single delay-slot
+ * scheduling choice (which of two independent register-materializing
+ * moves fills a branch's delay slot) that did not respond to any
+ * position/type/declaration-order variant tried. Preserved here per
+ * convention -- not live C. */
+#if 0
+/* func_8004EF6C's own local types -- none shared elsewhere in this unit. */
+
+/* A small opaque sub-record, read/written as a whole -- all s16 members
+ * (alignment 2, no s32) so a whole-struct copy compiles to the unaligned
+ * lwl/lwr + swl/swr idiom already documented (Descriptor10 in
+ * class_3bb8c.h, Block24 in class_3bb8c_r.c). Two of these sit back to
+ * back (0x14..0x33) in the source object and (0x60..0x7F) in the request
+ * buffer -- copied as an array of 2, not a loop (matches retail: fully
+ * unrolled, no branch, no runtime alignment check). */
+typedef struct StreamSmallSub {
+    s16 f0, f2, f4, f6, f8, fA, fC, fE;
+} StreamSmallSub;
+
+/* A raw, opaque 0x80-byte span -- alignment 1 (a plain byte array), so a
+ * whole-struct copy compiles to the RUNTIME-alignment-checked
+ * lw/sw-vs-lwl/lwr dual path retail shows for these three chunks (the
+ * same idiom src/class_3bb8c_r.c's Block24 documents: "a byte array...
+ * compiles the copy as a generic runtime-alignment-checked memcpy loop
+ * instead"). Three of these are copied in sequence. */
+typedef struct StreamRawBlock {
+    u8 raw[0x80];
+} StreamRawBlock;
+
+/* arg5->unk10's pointee -- only the two small subs (+0x14/+0x24) and the
+ * three raw 0x80-byte spans (+0x40/+0xC0/+0x140) are ever read by this
+ * function; nothing establishes the leading 0x14 bytes or the 0xC-byte
+ * gap at +0x34. */
+typedef struct StreamSrcObj {
+    u8 pad0[0x14];
+    StreamSmallSub arr[2];      /* +0x14 */
+    u8 pad34[0x40 - 0x34];
+    StreamRawBlock blkA;          /* +0x40 */
+    StreamRawBlock blkB;            /* +0xC0 */
+    StreamRawBlock blkC;              /* +0x140 */
+} StreamSrcObj;
+
+/* arg5's own type -- only +0x10 (a StreamSrcObj*) is ever read. */
+typedef struct StreamArg5Obj {
+    u8 pad0[0x10];
+    StreamSrcObj *unk10;
+} StreamArg5Obj;
+
+/* The 0x200-byte request buffer this function builds and submits.
+ * tag0/tag1 are the literal bytes 'S'/'C'; b2/b3 are computed size/mode
+ * bytes; name is a strcpy target (source: this function's own `handle`
+ * parameter, which despite its established `s32` type across this file
+ * is used here as a raw C string -- kept `s32` at the parameter per this
+ * project's per-site-cast convention, since retyping it risks the
+ * ALREADY-MATCHED func_8004EEA0's own signature). */
+typedef struct StreamReq {
+    u8 tag0;
+    u8 tag1;
+    u8 b2;
+    u8 b3;
+    char name[0x5C];
+    StreamSmallSub arr[2];
+    StreamRawBlock blkA;
+    StreamRawBlock blkB;
+    StreamRawBlock blkC;
+} StreamReq;
+
+extern const char D_80011530[];  /* rodata string "File not create in WriteFile\n" */
+extern s32 func_80013488(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
+extern void func_80012C20(const char *fmt);  /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
+
+s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
+    char pathBuf[0x20];
+    char *path;
+    s32 fileHandle;
+    s32 openMode;
+    s32 flagCopy;
+    s32 payload;
+    StreamSrcObj *src;
+    StreamReq *req;
+
+    payload = arg6;
+    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, (char *)a1);
+    func_80050908(path);
+    openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
+    fileHandle = func_80050938(path, openMode);
+    flagCopy = a3;
+    if (fileHandle == -1) {
+        func_80012C20(D_80011530);
+        return 0;
+    }
+    func_800508F8(fileHandle);
+    fileHandle = func_80050938(path, 2);
+    if (fileHandle == -1) {
+        return 0;
+    }
+    src = ((StreamArg5Obj *)arg5)->unk10;
+    req = (StreamReq *)func_80017B34(0x200);
+    req->tag0 = 'S';
+    req->tag1 = 'C';
+    req->b2 = a3 + 0x10;
+    req->b3 = ((u32)arg7 + 0x1FFF) >> 13;
+    strcpy(req->name, (char *)handle);
+    req->arr[0] = src->arr[0];
+    req->arr[1] = src->arr[1];
+    req->blkA = src->blkA;
+    req->blkB = src->blkB;
+    req->blkC = src->blkC;
+    func_80013488(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
+    func_80017CFC(req);
+    func_80013488(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
+    func_800508F8(fileHandle);
+    return 1;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004EF6C);
+
 
 char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix) {
     DeviceName866E8 *src;
@@ -214,7 +341,64 @@ void func_8004F810(TaskObjF *self) {
     }
 }
 
+/* STALL snapshot -- see docs/match-reports/func_8004F8A4.md. Best
+ * reached: 36/77 words, 0x130/0x134 (1 word / 4 bytes short, zero
+ * address drift beyond that). This is the branch-polarity-corrected
+ * variant of the report's own "function-pointer dispatch" lever --
+ * confirmed via a fast isolated cpp|cc1|maspsx|as reproducer this
+ * round that GCC 2.6.3's own block-layout choice for this exact
+ * 3-fetch/1-call tail-merge shape does not respond to if/else vs
+ * goto/label phrasing, or to reordering which block appears first
+ * in source. Preserved here per convention -- not live C. */
+#if 0
+s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+    s32 code;
+    s32 (*dispatch)(TaskObjF *, s32);
+
+    self->unk40 = a1;
+    self->unk44 = a2;
+    self->unk48 = a3;
+    self->unk24 = 2;
+    self->unk4C = a5;
+    self->unk50 = a6;
+    self->unk54 = a7;
+    self->unk58 = a8;
+    if (func_8004F9D8(self)) {
+        if (self->methods->slot54(self, 0, a1) == 0) {
+            goto slot60_path;
+        }
+        code = 0xA;
+        if (self->unk28 == code) {
+            code = 0x11;
+        } else if (self->unk28 == 0x11) {
+            code = 0xB;
+        }
+
+    top_dispatch:
+        dispatch = self->methods->slot7C;
+        goto call_it;
+
+    slot60_path:
+        if (!self->methods->slot60(self, a5, a8)) {
+            code = 9;
+            dispatch = self->methods->slot7C;
+            goto call_it;
+        }
+        code = 0x11;
+        if (self->unk28 == code) {
+            code = 0xB;
+        }
+        dispatch = self->methods->slot7C;
+
+    call_it:
+        return dispatch(self, code);
+    }
+    return 0;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F8A4);
+
 
 s32 func_8004F9D8(TaskObjF *self) {
     s32 buf10;
