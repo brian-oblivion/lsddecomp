@@ -64,6 +64,10 @@ typedef struct D_8006E730Methods {
     /* +0x0DC, called by this unit's own func_80058308 as (self) -- the
      * base-class dtor step. */
     void (*slotDC)(D_80087AACObj *self);
+    /* +0x0E0, called by this unit's own func_80058404 as (self, arg1) --
+     * the FIRST thing that function does, before touching anything else
+     * (round 19). */
+    void (*slotE0)(D_80087AACObj *self, void *arg1);
 } D_8006E730Methods;
 extern D_8006E730Methods *func_8003DFBC(void);
 
@@ -134,6 +138,11 @@ typedef struct D_80087AACEntryMethods {
     /* +0x0B8, called by this unit's own func_80058694 as (self, 1,
      * &global). */
     void (*slotB8)(D_80087AACEntry *self, s32 arg1, void *arg2);
+    u8 padBC[0xC4 - 0xBC];
+    /* +0x0C4, called by this unit's own func_80058404 as (self, arg1,
+     * &point, 0), where `point` is a 2-word {x, y}-shaped local (round
+     * 19). */
+    void (*slotC4)(D_80087AACEntry *self, void *arg1, s32 *point, s32 arg3);
 } D_80087AACEntryMethods;
 struct D_80087AACEntry {
     D_80087AACEntryMethods *methods;
@@ -315,7 +324,65 @@ s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_80058404);
+extern s32 func_800585B4(D_80087AACObj *self, D_80087AACUnkA4Result *arg1);
+
+/* A 2-word {x, y}-shaped point, matching what this unit's own func_80058404
+ * passes to D_80087AACEntryMethods::slotC4 (round 19). */
+typedef struct Point2 {
+    s32 x, y;
+} Point2;
+
+void func_80058404(D_80087AACObj *self, void *arg1) {
+    D_80087AACUnkA4Result *result;
+    s32 count;
+    s32 i;
+    s32 idx;
+    s32 flag;
+    Point2 point;
+    Point2 firstPoint;
+
+    func_8003DFBC()->slotE0(self, arg1);
+    result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
+    self->unk_0x238 = func_800585B4(self, result);
+
+    flag = 0;
+    if (result->unk_0x4 != 0) {
+        count = 100;
+    } else {
+        count = result->unk_0x8;
+        if (count >= 0x65) {
+            count = 100;
+        }
+    }
+
+    idx = result->unk_0x8 - 1;
+    for (i = 0; i < count; i++, idx--) {
+        s8 *p;
+        s8 dx, dy;
+        s32 ndy;
+
+        if (idx < 0) {
+            idx = 0x16C;
+        }
+        p = (s8 *)((u8 *)result + idx * 2);
+        dx = p[0x18];
+        point.x = dx * 10 - 5;
+        dy = p[0x19];
+        ndy = -dy;
+        point.y = ndy * 10 - 5;
+
+        if (i == 0) {
+            firstPoint = point;
+            flag = 1;
+        } else {
+            self->unk_0xA8[i]->methods->slotC4(self->unk_0xA8[i], arg1, (s32 *)&point, 0);
+        }
+    }
+
+    if (flag) {
+        self->unk_0xA8[0]->methods->slotC4(self->unk_0xA8[0], arg1, (s32 *)&firstPoint, 0);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800585B4);
 
