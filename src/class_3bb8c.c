@@ -181,6 +181,188 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
     }
 }
 
+/* STALL snapshot -- see docs/match-reports/func_8004BE54.md. 130/150 words
+ * at CORRECT total length (no address drift): every instruction present,
+ * none missing or extra. The residue is two well-documented classes only --
+ * plain register identity (info/hdr's ResInfo866E8* lives in v0 in retail,
+ * a1 here; a handful of others) and commutative-op operand-order
+ * canonicalization (`or`/`addu` reversed regardless of C source order,
+ * same phenomenon independently confirmed in func_8004C470's report).
+ * Preserved here per convention -- not live C. */
+#if 0
+/* func_8004BE54 (Obj866E8Methods::slot104) -- own local view of several
+ * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
+ * of the 11 sibling units sharing that header touch these. */
+
+/* ElemTarget::field10's pointee -- a small size/offset header block. */
+struct ResInfo866E8 {
+    u8 pad0[0x4];
+    s32 unk4;   /* +0x004 */
+    s32 unk8;   /* +0x008 */
+};
+
+/* target->unk2C's pointee -- only its self-only teardown slot is reached. */
+typedef struct LinkResourceMethods LinkResourceMethods;
+typedef struct LinkResource {
+    LinkResourceMethods *methods;   /* +0x000 */
+} LinkResource;
+struct LinkResourceMethods {
+    u8 pad0[0x4];
+    void (*slot4)(LinkResource *self);  /* +0x004 */
+};
+
+/* slot78's own non-0/non-(-1) return value -- a resolved link-target
+ * record, read only for its `unk10` (tmd base address). */
+typedef struct LinkResEntry {
+    u8 pad0[0x10];
+    s32 unk10;   /* +0x010 */
+} LinkResEntry;
+
+/* Elem::unk8's pointee -- coordinates the per-frame GPU link/load loop. */
+typedef struct LinkTarget866E8Methods LinkTarget866E8Methods;
+struct LinkTarget866E8 {  /* forward-typedef'd in class_3bb8c.h */
+    LinkTarget866E8Methods *methods;  /* +0x000 */
+    u8 pad004[0x010 - 0x004];
+    s32 unk10;                          /* +0x010 */
+    s32 unk14;                            /* +0x014 */
+    u8 pad018[0x02C - 0x018];
+    LinkResource *unk2C;                    /* +0x02C */
+};
+struct LinkTarget866E8Methods {
+    u8 pad000[0x78];
+    s32 (*slot78)(LinkTarget866E8 *self, void *outBuf, s32 arg2); /* +0x078 */
+};
+
+/* EntryChildObj::unk14's pointee. */
+typedef struct EntryGpuVec {
+    u8 pad0[0x10];
+    s16 unk10;   /* +0x010 */
+    s16 unk12;   /* +0x012 */
+    s16 unk14;   /* +0x014 */
+} EntryGpuVec;
+struct EntryGpu {
+    s32 unk0;                    /* +0x000 */
+    u8 pad4[0x18 - 0x4];
+    s32 unk18;                    /* +0x018 */
+    s32 unk1C;                      /* +0x01C */
+    s32 unk20;                        /* +0x020 */
+    u8 pad24[0x44 - 0x24];
+    EntryGpuVec *unk44;                  /* +0x044 */
+};
+
+/* slot78's own stack-allocated outBuf, 0x38 bytes -- fields established
+ * purely from this function's own reads of it. */
+typedef struct BE54OutBuf {
+    u8 pad0[0xC];
+    s32 b;          /* +0x00C */
+    s32 c;            /* +0x010 */
+    s32 d;              /* +0x014 */
+    u8 pad18[0x1A - 0x18];
+    u16 h1;               /* +0x01A */
+    u8 pad1C[0x2E - 0x1C];
+    u16 h2;                 /* +0x02E */
+    s32 flag2;                /* +0x030 */
+    s32 found;                  /* +0x034 */
+    u8 pad38[0x8];               /* trailing bytes never read/written by this function */
+} BE54OutBuf;
+
+typedef struct BE54LoadReq {
+    s32 field0;
+    u8 pad4[0xC];
+} BE54LoadReq;
+
+extern LinkResource *func_80043840(BE54LoadReq *req);
+extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
+
+void func_8004BE54(Obj866E8 *self, Elem *entry) {
+    ResInfo866E8 *info;
+    ElemTarget *hdr;
+    LinkTarget866E8 *target;
+    LinkResource *res;
+    EntryChildObj **slot;
+    u8 *base;
+    EntryGpu *gpu;
+    EntryGpuVec *vec;
+    s32 b;
+    s32 c;
+    s32 d;
+    s32 h1;
+    s32 idxVal;
+    s32 flagBit;
+    s32 i;
+    s32 off1;
+    s32 off2;
+    BE54OutBuf outBuf;
+    BE54LoadReq req;
+
+    hdr = entry->unk4;
+    target = entry->unk8;
+    info = hdr->field10;
+    target->unk10 = (s32)info + info->unk4;
+    target->unk14 = 0;
+    res = target->unk2C;
+    if (res != 0) {
+        res->methods->slot4(res);
+    }
+    info = hdr->field10;
+    req.field0 = (s32)info + info->unk4 + info->unk8;
+    target->unk2C = func_80043840(&req);
+    outBuf.found = 0;
+
+    i = 0;
+    flagBit = 0x80000000;
+    off1 = 0;
+    off2 = 0x640;
+    for (;;) {
+        idxVal = target->methods->slot78(target, &outBuf, i);
+        if (idxVal == 0) {
+            return;
+        }
+        if (idxVal == -1) {
+            slot = (EntryChildObj **)((u8 *)entry->unk10 + off1);
+            (*slot)->unk10 |= flagBit;
+            (*slot)->unk20 = 0;
+            (*slot)->unk18 = 0;
+        } else {
+            base = (u8 *)entry->unk10;
+            if (outBuf.flag2 != 0) {
+                slot = (EntryChildObj **)(base + off2);
+                off2 += 4;
+            } else {
+                slot = (EntryChildObj **)(base + off1);
+            }
+            (*slot)->unk20 = idxVal;
+            (*slot)->unk18 = ((LinkResEntry *)(*slot)->unk20)->unk10;
+            GsLinkObject4(((LinkResEntry *)(*slot)->unk20)->unk10, (u8 *)(*slot) + 0x10, 0);
+            gpu = (*slot)->unk14;
+            __asm__("");
+            b = outBuf.b;
+            c = outBuf.c;
+            d = outBuf.d;
+            gpu->unk18 = b;
+            gpu->unk1C = c;
+            gpu->unk20 = d;
+            vec = (*slot)->unk14->unk44;
+            vec->unk10 = 0;
+            h1 = outBuf.h1;
+            vec->unk14 = 0;
+            vec->unk12 = h1;
+            (*slot)->unk36 = outBuf.h2;
+            gpu = (*slot)->unk14;
+            gpu->unk0 = 0;
+            (*slot)->unk10 |= flagBit;
+        }
+        if (outBuf.found) {
+            (*slot)->unk38 = *(EntryChildObj **)((u8 *)entry->unk10 + off2);
+            continue;
+        }
+        off1 += 4;
+        (*slot)->unk38 = 0;
+        i++;
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BE54);
 
 void func_8004C0AC(Obj866E8 *self, Elem *entry) {
