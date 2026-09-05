@@ -1,4 +1,74 @@
-# func_80053ACC -- STALLED, 2 instructions + 1 word short of 71
+# func_80053ACC -- MATCHED 71/71, round 19 (bravo)
+
+Unit: `src/class_3bb8c_l.c`. Originally stalled by echo (round 16), CLOSED by
+bravo (round 19) via the permuter. `./build-and-verify.sh` green,
+byte-exact (verified directly against `disk/SLPS_015.56` at
+`0x442CC-0x443E8`, independent of the whole-image SHA1 which was still red
+this round for unrelated reasons -- another function mid-edit in a
+different unit).
+
+## Round 19 close: the permuter found it, one variable rename made it real
+
+Set up `tools/setup-permuter.sh func_80053ACC` from the preserved body
+below. `--debug --stack-diffs` confirmed the base score (165: 1 register
+diff, 1 reordering, 1 deletion, 0 insertions, 0 stack diffs) matched the
+report's own characterization exactly before spending any search budget.
+Bounded search (`timeout 300`, `-j 6 --stack-diffs --stop-on-zero`) found a
+**zero at iteration 698** (~697 non-zero iterations first, scores bouncing
+between 165 and several thousand under load with 5 other runners' searches
+concurrently active on the same machine).
+
+The winning permuter candidate:
+
+```c
+int new_var;
+...
+new_var = (self->unk1C + ((s32) self->unk38)) & 3;
+t = new_var;
+if (t == 0) { ... }
+```
+
+i.e. the switch discriminant computed into a SEPARATE variable (`new_var`)
+and then COPIED into `t`, rather than assigned to `t` directly. This is
+exactly the "mention the source expression twice" lever already documented
+in `docs/DECOMPILATION_LEARNINGS.md`, applied to a scalar rather than a
+loop bound: keeping both `new_var` (the freshly-computed value, which
+lands in retail's `$a0`/`move a0,v1` delay-slot register) and `t` (the
+value actually tested and switched on, in `$v1`) alive simultaneously
+across the switch is what makes GCC materialize the redundant `move`.
+
+Translated verbatim into idiomatic C (renamed `new_var` to `span` for
+clarity, otherwise unchanged structure/order):
+
+```c
+s32 span;
+s32 t;
+...
+span = (self->unk1C + (s32)self->unk38) & 3;
+t = span;
+if (t == 0) { ... }
+```
+
+Rebuilt through the real toolchain: **71/71, byte-exact, no drift**.
+Twelve prior hand-reshaping attempts (round 16) never introduced a SECOND
+variable holding the same value -- every one either assigned straight into
+`t` or experimented with control-flow shape (switch vs if-chain, case
+order, outer polarity), which is exactly the untested axis this closes.
+
+### Proposed learning
+
+**The "mention the value twice, dependent quantity first" lever (already
+documented for loop bound/pointer pairs) also applies to a plain scalar
+switch discriminant`,` not just to loop setup.** A `move`-into-an-otherwise-
+dead-argument-register residue, confined to one delay slot with the rest of
+the function settled, is a strong signal to try "compute into a throwaway
+local, then copy" before accepting the residue as an unreachable scheduling
+artifact -- and the permuter is the fast way to find WHICH untested axis is
+live when 12+ manual attempts have already covered order/shape/polarity.
+
+---
+
+# Prior state (round 16-18), preserved for context
 
 Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16. `INCLUDE_ASM` restored;
 `./build-and-verify.sh` green.
