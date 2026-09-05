@@ -632,7 +632,7 @@ right instrument and it is not implied by the score. Delta verified and
 rejected this one on semantics regardless of score, which is the behaviour to
 copy.
 
-### Commutative-operand-order canonicalization: 5 instances, 2 units, and one clean negative unit (round 20)
+### Commutative-operand-order canonicalization: 6 instances, 3 units — SETTLED as a project-wide class (round 20)
 
 **cc1 canonicalizes the register operand order of a commutative op
 independently of the order written in C.** Confirmed independently by two
@@ -667,6 +667,32 @@ and wrong on the round's — echo could not see charlie's parallel work. The hea
 compared the two residue descriptions directly before merging them into one
 class. This is the adjudication `docs/PARALLEL-RUNS.md` assigns to the head,
 and it is why runners are told to describe a residue rather than only name it.)*
+
+**SETTLED later the same round, by the decisive test rather than by tallying.**
+echo took the both-orders test into a THIRD unrelated unit (`DreamSys`) and
+applied it to `CalcDreamColor`: reversing the C-level operand order of the
+final addition produced a **byte-identical wrong result**. That is a sixth
+instance, in a third unit, re-derived from the raw disassembly before
+cross-referencing anything. The class is project-wide and no longer needs
+further confirmation.
+
+**What earns a screen's promotion is the DISCRIMINATING test, not the count.**
+Five instances across two units left the scope genuinely open; one application
+of "reverse the operands in C and see whether the output changes" closed it.
+When you find a candidate class, look for the test that could falsify it and
+run that, rather than accumulating agreeing observations — and note that this
+one is cheap enough to run per function.
+
+**A neighbouring family, deliberately kept separate: delay-slot-fill choice.**
+echo screened five functions across three units against the commutative class
+and got two positives and three negatives — and the negatives were not
+formless. `func_8005A82C`, `func_80059BE0` and `class_3ac78`'s `func_8004B100`
+all diverge on **which instruction fills a delay slot** (retail placing real
+work or a `nop` where the build hoists something else), with no commutative op
+involved in either diverging word. That looks like a second class, currently at
+three instances across two units. It is recorded here as an OPEN observation,
+not a promoted class: nobody has yet found its discriminating test, and the
+lesson directly above says that is what would settle it.
 
 ### The two-independently-live-locals lever, and the discriminator that predicts it (round 20)
 
