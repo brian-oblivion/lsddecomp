@@ -164,7 +164,34 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028B6C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", strcpy);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", strstr);
+char *strstr(char *haystack, char *needle) {
+    char *cursor;
+    char *matchStart;
+    s32 matching;
+
+    matching = 0;
+    cursor = needle;
+    matchStart = haystack;
+    if (*haystack != 0) {
+        do {
+            if (*haystack == *cursor) {
+                cursor++;
+                if (*cursor == 0) {
+                    return matchStart;
+                }
+                if (matching == 0) {
+                    matchStart = haystack;
+                    matching = 1;
+                }
+            } else {
+                cursor = needle;
+                matching = 0;
+            }
+            haystack++;
+        } while (*haystack != 0);
+    }
+    return NULL;
+}
 
 extern u8 D_8006D60C;
 

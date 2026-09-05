@@ -1,7 +1,116 @@
-# strstr -- STALL (best: 26/30 words, instruction-order residue)
+# strstr -- MATCHED 30/30 (round 18, echo, via permuter)
 
-Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment). Restored to
-`INCLUDE_ASM`.
+Unit: `code_179d8_h`.
+
+## RESOLUTION (round 18) — permuter zero, and it was ALREADY idiomatic
+
+Ran the permuter bounded (`timeout 600`, `-j 6 --stop-on-zero`) against the
+round-17 26/30 near-miss body. `--debug` base score 210 (1 insertion + 1
+deletion penalty, the documented one-instruction-residue signature),
+matching the report's claimed residue class. Reached score 0 at iteration
+1068. `timeout` exit code: **0** (the run stopped itself on `--stop-on-zero`
+finding a match; it did not hit the 600s bound).
+
+**The winning diff, verbatim from `permuter-work/strstr/output-0-1/diff.txt`:**
+
+```diff
+   matching = 0;
+   cursor = needle;
++  matchStart = haystack;
+   if ((*haystack) != 0)
+   {
+-    matchStart = haystack;
+     do
+```
+
+I.e. hoist `matchStart = haystack;` out of the `if` block to sit
+unconditionally right after `cursor = needle;`, leaving everything else
+(including the `if`'s condition and the loop) untouched.
+
+**Verdict on the `strcat` precedent (the question this round's brief asked
+directly): it did NOT repeat, and the reason is worth recording precisely.**
+`strcat`'s permuter zero was a *provably dead* store (`origDest = dest;`
+inside the branch that returns `dest`, on a path where `origDest` is never
+read again) — committing it verbatim would have been dead code, and the
+idiomatic translation (`return dest;` instead of `return NULL;`) had to be
+derived separately, then verified to score identically. Here, `matchStart =
+haystack;` is dead ONLY on the empty-`haystack` early-exit path (where the
+function returns `NULL` without ever reading `matchStart`) — but it is very
+much NOT dead on the path that matters, where `*haystack != 0` and the loop
+runs: it is `matchStart`'s only initializer, read on every subsequent
+iteration and returned on a match. Moving a variable's initialization above
+an unrelated guard, when the variable's value doesn't depend on that guard,
+is ordinary, unremarkable C style — nobody would flag `matchStart =
+haystack;` sitting next to `cursor = needle;` as a hack. **The permuter's
+raw output needed NO translation here; it went into `src/` verbatim.**
+
+So: two data points, not yet three, and they diverge on the one thing that
+matters (does the winning form need a rewrite before it's committable) —
+`strcat` did, `strstr` did not. The common thread across both is narrower
+than "expect a dead store": it is "the residue is a MENTION-COUNT/ORDERING
+question, not a value question" — both were one-instruction residues where
+the retail instruction in question was an initialization whose exact
+placement (which guard it sits before/after) was the entire gap. Whether
+that placement change reads as dead code or as ordinary hoisting depends on
+whether the variable is used elsewhere on the same path, which has to be
+checked per-instance -- it is not something the permuter's score tells you.
+
+**Committed body (identical to the one above, in `src/code_179d8_h.c`):**
+
+```c
+char *strstr(char *haystack, char *needle) {
+    char *cursor;
+    char *matchStart;
+    s32 matching;
+
+    matching = 0;
+    cursor = needle;
+    matchStart = haystack;
+    if (*haystack != 0) {
+        do {
+            if (*haystack == *cursor) {
+                cursor++;
+                if (*cursor == 0) {
+                    return matchStart;
+                }
+                if (matching == 0) {
+                    matchStart = haystack;
+                    matching = 1;
+                }
+            } else {
+                cursor = needle;
+                matching = 0;
+            }
+            haystack++;
+        } while (*haystack != 0);
+    }
+    return NULL;
+}
+```
+
+`build exit=0`, `funcdiff`: `strstr: 30/30 words match`, whole-image SHA1
+verified (`./build-and-verify.sh` -> `OK: build matches retail
+SLPS_015.56`).
+
+### Proposed learning
+
+**A one-instruction "wrong side of a guard" residue is worth a permuter run
+even when 7 hand attempts on the SAME axis (as round 17's were, all
+varying `cursor`'s placement) failed** — the permuter found the fix on the
+adjacent, untried axis (`matchStart`, not `cursor`) in closer to 1000
+iterations than the ~7 manual tries, and the result required zero
+translation. Contrast with `strcat`: always re-derive whether a winning
+diff is dead code or ordinary hoisting by checking whether the touched
+variable is read on the path where the change is "unnecessary" — do not
+assume either answer from the `strcat` precedent alone.
+
+---
+
+## Prior state (round 17) -- STALL at 26/30, since resolved above
+
+Runner: echo, round 17 (second assignment). Restored to `INCLUDE_ASM` at
+the time; kept below for the correct algorithm derivation and the seven
+ruled-out attempts, all on the (as it turned out, wrong) axis.
 
 ## Class: instruction order (one instruction sunk into a branch by GCC, not
 retail) -- NOT register identity, and a scheduling barrier did not fix it
