@@ -1,80 +1,317 @@
-# func_8004EF6C
+# func_8004EF6C -- STALL, close (188/240 words; correct total length off by
+1, zero drift beyond that)
 
-**Unit:** class_3bb8c_f · **Size:** 240 words (0x3C0) · **Status:** STALL
-— predicted-hard, screened and read but not attempted in C given scale;
-no C written, `INCLUDE_ASM` untouched
+Unit: `class_3bb8c_f`. Not toolchain-blocked: no `gp_rel` hit, no
+`addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` dispatch in
+`asm/nonmatchings/class_3bb8c_f/func_8004EF6C.s`.
 
-## Why this one was not attempted
+**This is the first C ever attempted against this function.** The previous
+round's report ("predicted-hard, screened and read but not attempted...
+given scale") is superseded by this one -- a full derivation was attempted,
+all struct layouts/control flow/arithmetic are confirmed against a real
+build, and the residue is now pinned to a single, precisely-characterized
+scheduling choice.
 
-This is both the largest function in this unit's queue (240 words — the
-next largest, `func_8004F8A4`, is 77) and one of the two 9-register-
-saturated functions the round's register census flagged (`func_8004EEA0`
-= 9, `func_8004EF6C` = 9). `func_8004EEA0` — the smaller (51-word) sibling
-that calls THIS function in a retry loop — was attempted first and hit
-CLAUDE.md's documented zero-drift register-PERMUTATION residue (see its
-own report): every branch and field settled, exact length, but a full
-9-value bijection permuted relative to retail's own, and per that class's
-established behavior in this project (`func_8004C93C`, 7 reshaping
-variants, zero movement), reshaping does not resolve it.
+## What it does
 
-Given that finding, sinking a full multi-hundred-instruction transcription
-effort into this function's OWN body — four times the size, same register
-saturation, same class of hazard — was judged low-expected-value against
-this round's attempt budget, which covers 20 functions across this unit.
-This is a scope decision, not a failed attempt: no C was written, so
-there is no near-miss body to preserve, and `funcdiff`/`asm-differ` were
-not run against it.
+`s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5,
+s32 arg6, s32 arg7)` (signature per its one caller, `func_8004EEA0`, which
+is ALREADY MATCHED -- no parameter type here was changed in a way that
+touches that caller's own compiled bytes, see the header-discipline note
+below). Reads as a **"WriteFile" memory-card/CD streaming write** (the
+error string this function logs on failure is literally `"File not create
+in WriteFile\n"`, confirmed in rodata at `D_80011530`):
 
-## What it does (read from the disassembly, not verified by compiling)
+1. Builds a device path via `func_8004F32C(pathBuf, self->unk0C, (char
+   *)a1)` (already-matched sibling; `a1` is really a `char *` suffix
+   despite its established `s32` type in this file's forward
+   declarations -- kept `s32` at the parameter, cast at the call site,
+   same reasoning as `handle` below).
+2. `func_80050908(path)` -- return value unused, likely a stat/probe call.
+3. Computes an "open mode" word: `((((u32)arg7 + 0x21FF) >> 13) << 16) |
+   0x200` -- `arg7` (the payload size) rounded up past a reserved
+   0x200-byte header, converted to a count of 0x2000-byte blocks, packed
+   into the mode word's upper 16 bits alongside a literal `0x200` mode
+   flag. Opens with `func_80050938(path, openMode)`. On failure (`-1`),
+   logs the error and returns 0.
+4. On success: closes that probe handle immediately
+   (`func_800508F8`), then re-opens the SAME path with a plain mode `2`
+   (`func_80050938(path, 2)`) -- this second handle is the one actually
+   used for the rest of the function. Fails the same way (return 0, no
+   error log this time) if this second open also fails.
+5. Resolves `src = ((StreamArg5Obj *)arg5)->unk10` -- `arg5`'s own type is
+   otherwise unestablished; only this one field is ever read.
+6. Allocates a 0x200-byte request buffer (`func_80017B34`), fills a 4-byte
+   header (`'S'`, `'C'`, `(u8)(a3+0x10)`, `(u8)ceil(arg7/0x2000)`),
+   `strcpy`s a filename into it (source: `handle`, the function's OWN 3rd
+   parameter -- see below), then copies FIVE regions from `src` into it:
+   two small 0x10-byte sub-records (an unrolled 2-element array, no loop,
+   no alignment check -- a low-alignment whole-struct copy) followed by
+   three raw 0x80-byte spans (each with a genuine RUNTIME
+   `(src|dst)&3`-checked aligned/unaligned copy, matching the
+   already-documented "byte array forces a runtime-checked copy" idiom).
+7. Submits two `func_80013488` read/write requests: one for the
+   just-built request buffer (size `((a3&0xFF)<<7)+0x80`), one directly
+   into the CALLER's own buffer `arg6` (size `arg7` rounded up to a
+   multiple of 0x80). Frees the request buffer between the two calls (NOT
+   after both -- the second call never touches it). Closes the handle,
+   returns 1.
 
-`s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 flag, s32
-arg5, s32 arg6, s32 arg7)` (signature per its one caller,
-`func_8004EEA0`). Builds a memory-card path via `func_8004F32C` (this
-unit, matched) and opens it (`func_80050908`), computes a size from
-`arg5`/`arg7` (bit-shift arithmetic against `0x2000`/`0x1000`-ish
-boundaries), and — if the open failed — logs an error
-(`func_80012C20` with a format string at `D_80011530`) and returns 0.
-On success it seeks (`func_800508F8`/`func_80050938` with mode 2),
-allocates a 0x200-byte request buffer, writes a small fixed header into
-it (`'S'`, `'C'`, then two computed bytes) followed by a filename
-(`strcpy`), then whole-struct-copies roughly 0x100-0x180 bytes from
-`self`'s own fields into the freshly-built buffer in four `0x40`-byte
-chunks — each chunk independently choosing between an ALIGNED
-(`lw`/`sw`) and an UNALIGNED (`lwl`/`lwr`/`swl`/`swr`) copy path based on
-a runtime `(src | dst) & 3` check, repeated per chunk rather than decided
-once for the whole transfer. Finally it submits two `func_80013488` calls
-(read-request submission, by the signature shape: address, position,
-size) — one for a small computed header-sized read, one for the full
-payload sized from `arg7` — frees the temporary request buffer, closes
-the handle (`func_800508F8`), and returns 1.
+### The `handle` parameter is really a C string, not a numeric handle
 
-This reads as a **CD/memory-card streaming request builder**: the
-per-chunk alignment branching (four separate aligned/unaligned checks
-rather than one for the whole copy) suggests the SOURCE struct-copies four
-separate SUB-STRUCTS in sequence (matching a `Descriptor`-style compound
-object build), not one large `memcpy`.
+Despite the name (inherited from this file's existing forward
+declaration, established before this round) and its `s32` type, this
+function's own use of it is exclusively as `strcpy`'s SOURCE argument --
+i.e. a filename/tag string, unrelated to the internal file handles this
+function opens and closes via `func_80050938`. **Kept `s32` at the
+parameter** (cast to `(char *)handle` at the one use site) rather than
+retyped, since `func_8004EEA0` -- the ONLY caller, already matched --
+forwards this same value through unchanged with its own `s32 handle`
+parameter; retyping either signature risks that caller's own compiled
+bytes for no byte-level benefit (the cast is functionally identical
+either way).
 
-## Screening done (per the round's standing checks)
+## New types (all local to `class_3bb8c_f.c` -- none shared, no header
+## changes made this round)
+
+```c
+typedef struct StreamSmallSub {
+    s16 f0, f2, f4, f6, f8, fA, fC, fE;
+} StreamSmallSub;
+
+typedef struct StreamRawBlock {
+    u8 raw[0x80];
+} StreamRawBlock;
+
+typedef struct StreamSrcObj {
+    u8 pad0[0x14];
+    StreamSmallSub arr[2];      /* +0x14 */
+    u8 pad34[0x40 - 0x34];
+    StreamRawBlock blkA;          /* +0x40 */
+    StreamRawBlock blkB;            /* +0xC0 */
+    StreamRawBlock blkC;              /* +0x140 */
+} StreamSrcObj;
+
+typedef struct StreamArg5Obj {
+    u8 pad0[0x10];
+    StreamSrcObj *unk10;
+} StreamArg5Obj;
+
+typedef struct StreamReq {
+    u8 tag0;
+    u8 tag1;
+    u8 b2;
+    u8 b3;
+    char name[0x5C];
+    StreamSmallSub arr[2];
+    StreamRawBlock blkA;
+    StreamRawBlock blkB;
+    StreamRawBlock blkC;
+} StreamReq;
+```
+
+`StreamSmallSub` deliberately has no `s32` member (alignment 2) so a
+whole-struct copy compiles to the unaligned `lwl`/`lwr` + `swl`/`swr`
+idiom already documented for `Descriptor10`
+(`include/class_3bb8c.h`) and `Block24` (`src/class_3bb8c_r.c`).
+`StreamRawBlock` is a plain byte array (alignment 1) so a whole-struct
+copy compiles to the RUNTIME-alignment-checked dual-path copy retail
+actually shows for the three 0x80-byte spans -- confirmed against
+`class_3bb8c_r.c`'s own comment on `Block24`: *"a byte array... compiles
+the copy as a generic runtime-alignment-checked memcpy loop instead"*.
+Both idioms transferred to this function unchanged, on the first attempt,
+for all five copy regions.
+
+Also new: `extern const char D_80011530[];` (the rodata error string --
+referenced, not retyped, per this round's broadcast) and two
+project-external prototypes local to this call site's own shape (neither
+declared elsewhere in the project): `extern s32 func_80013488(s32 handle,
+void *buf, s32 size);` and `extern void func_80012C20(const char *fmt);`
+(this call site passes only the format string; `code_8220.h`'s existing
+3-arg view of the same symbol is a DIFFERENT call site's shape, per the
+per-unit local-view convention).
+
+## Best body reached (188/240, 0x3BC/0x3C0 -- 1 word short, zero drift
+## beyond that)
+
+```c
+s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
+    char pathBuf[0x20];
+    char *path;
+    s32 fileHandle;
+    s32 openMode;
+    s32 flagCopy;
+    s32 payload;
+    StreamSrcObj *src;
+    StreamReq *req;
+
+    payload = arg6;
+    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, (char *)a1);
+    func_80050908(path);
+    openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
+    fileHandle = func_80050938(path, openMode);
+    flagCopy = a3;
+    if (fileHandle == -1) {
+        func_80012C20(D_80011530);
+        return 0;
+    }
+    func_800508F8(fileHandle);
+    fileHandle = func_80050938(path, 2);
+    if (fileHandle == -1) {
+        return 0;
+    }
+    src = ((StreamArg5Obj *)arg5)->unk10;
+    req = (StreamReq *)func_80017B34(0x200);
+    req->tag0 = 'S';
+    req->tag1 = 'C';
+    req->b2 = a3 + 0x10;
+    req->b3 = ((u32)arg7 + 0x1FFF) >> 13;
+    strcpy(req->name, (char *)handle);
+    req->arr[0] = src->arr[0];
+    req->arr[1] = src->arr[1];
+    req->blkA = src->blkA;
+    req->blkB = src->blkB;
+    req->blkC = src->blkC;
+    func_80013488(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
+    func_80017CFC(req);
+    func_80013488(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
+    func_800508F8(fileHandle);
+    return 1;
+}
+```
+
+## Levers that mattered, in order
+
+1. **A naive signed `>>` on `arg7` compiles to `sra`; retail uses `srl`
+   (logical) at all three of this function's shift sites.** `arg7` is
+   `s32`, so `(arg7 + K) >> N` sign-extends by default. Retail's own
+   original source evidently treated these as unsigned at the shift.
+   Casting the shifted operand to `(u32)` first (`((u32)arg7 + K) >> N`)
+   reproduces `srl` exactly at all three sites (`openMode`'s block count,
+   `req->b3`, and the final payload-size rounding) with zero other
+   change. A one-line, mechanical, fully-resolved fix -- not a residue.
+2. **The struct-copy idioms (low-alignment whole-struct copy vs.
+   byte-array runtime-checked copy) transferred perfectly on the first
+   attempt**, closing what was, by instruction count, the bulk of this
+   function (roughly 130 of its 240 words) with zero iteration needed
+   beyond getting the two struct SHAPES (`StreamSmallSub` all-`s16`,
+   `StreamRawBlock` a plain byte array) right.
+3. **The register/frame-size gap (this function is 9-register-saturated,
+   per the round's own census) needed two explicit, EARLY-assigned local
+   variables that are otherwise pure duplicates of an existing
+   parameter** (`flagCopy = a3;` and `payload = arg6;`, both assigned
+   immediately after the point retail's own asm shows the equivalent
+   materialization) to get GCC to allocate a persistent register for
+   each, closing the frame size from `0x50` (8 registers, 2 short) to the
+   correct `0x58` (10 registers, exact). Without both locals, the
+   register count undershoots; with a differently-typed or
+   differently-positioned single local, it either undershoots by 2 words
+   or OVERSHOOTS by 1 (see residue below) -- this pairing is the only
+   combination found that lands the frame size exactly while staying
+   within one word of the total length.
+
+## Residue: one word, confirmed as the SAME register-saturation /
+## delay-slot-scheduling class already documented for this function's own
+## caller
+
+Every remaining word difference is either (a) a pure register-identity
+swap (the whole callee-saved set is permuted relative to retail's own --
+`s0`↔`s1`↔`s2` etc., same values, same instructions, different physical
+registers throughout) or (b) this ONE genuine scheduling difference:
+retail's compiled tail places the SECOND duplicate-register move
+(`move $s7, $s4` -- materializing `flagCopy` into its persistent home)
+in the DELAY SLOT of the `bne $s2, $s1, ...` branch that tests the first
+open call's result; this build computes the equivalent move ONE
+INSTRUCTION EARLIER instead, leaving that exact delay slot as an explicit
+`nop`. Same total number of "real" instructions, same values, same final
+register assignments after the branch -- purely a one-word scheduling
+placement, the same "which independent instruction fills a delay slot"
+class already documented in several other functions' reports this round.
+
+**Confirmed this is genuinely hard to move, not merely unexplored**, via
+~10 variants, each rebuilt and re-measured:
+- Both explicit locals typed `s32` vs. one/both typed `void *` -- no
+  change to either the frame size or the delay-slot placement (typing is
+  cosmetic here).
+- `flagCopy`/`payload` assigned at their "natural" position (immediately
+  before first use) vs. both moved to the very top of the function, vs.
+  swapped (whichever one is "first" moved to the top) -- length oscillated
+  between 235 and 241 words depending on the exact combination, NEVER
+  landing on the correct 240 with zero drift; the 239/240 configuration
+  documented above is the closest reached.
+- A bare `__asm__("");` scheduling barrier (the permitted form -- reorders
+  only, per CLAUDE.md's own test) placed immediately before `flagCopy =
+  a3;`, to try to force the assignment to stay adjacent to the branch --
+  made the score WORSE (187 vs 188), confirming the barrier does not
+  target the specific reordering needed here.
+- Declaration order of the two locals swapped -- byte-identical output,
+  consistent with this project's repeated finding that declaration order
+  alone does not drive register/scheduling decisions in this GCC 2.6.3
+  build.
+
+This is the SAME class `func_8004EF6C`'s own caller, `func_8004EEA0`,
+already hit and documented (per that function's own report, referenced
+in this function's prior round's write-up) as "a full 9-value bijection
+permuted relative to retail's own... reshaping does not resolve it" --
+and per `func_8004C93C`'s precedent (7 reshaping variants, zero
+movement), this project's own experience is that this class does not
+respond to further manual source reshaping. Not pursued further this
+round; `func_8004EEA0`'s residue is register PERMUTATION with zero
+length drift, while this one is permutation PLUS a one-word scheduling
+gap -- worth noting as a variant of the same family (register-saturated
+functions can show EITHER pure permutation OR permutation-plus-one-word,
+depending on whether the specific values in play happen to need a
+duplicate-register materialization), not a new independent class.
+
+## Screening
 
 ```
 grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_f/func_8004EF6C.s        # no hits
 grep -n 'addiu *$at, *$at, *%lo' asm/nonmatchings/class_3bb8c_f/func_8004EF6C.s  # no hits
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/class_3bb8c_f/func_8004EF6C.s | sort -u | wc -l  # 9 ($fp + $s0-$s7, fully saturated)
 ```
-Clean of both open toolchain blockers; one prologue, no jump table, no
-`alabel`.
+Clean of both open toolchain blockers (per the coordinator's own
+screening this round, not re-run).
 
-## For whoever picks this up next
+## Attempts
 
-- Do NOT re-run the register screen — it is already confirmed 9/9
-  saturated above.
-- Given `func_8004EEA0`'s finding, budget for this being ANOTHER
-  permutation-class stall rather than a straightforward match; a
-  worthwhile first move is a `--sig`-seeded `m2c` pass to get real field
-  names for the four `self`-offset struct copies (`self+0x40`,
-  `self+0xC0`, `self+0x140`(?), `self+0x1C0`(?) by the pattern) before
-  attempting a full transcription, since establishing that struct
-  correctly is useful even if the function itself ultimately stalls.
-- `func_80013488`'s signature (read-request submission) is established
-  only by this function's own call sites; typing it accurately here would
-  be new ground, not yet in `include/class_3bb8c.h`.
+~14 iterations: initial full transcription (2/240 raw, 235/240 true
+length -- 5 words short, no compile errors, all struct/control-flow
+derivation correct on the first pass) -> two signed/unsigned shift fixes
+(genuine correctness fixes, zero length change, but necessary for a
+trustworthy score) -> `flagCopy` local alone (236/240, +1 word) ->
+`payload` local alone, `void *`-typed, assigned at its "natural" late
+position (241/240, one word TOO LONG -- a redundant register-materializing
+move retail does not have) -> `payload` moved to the very top of the
+function (239/240, 188 real words matching -- the configuration kept) ->
+five further variants (position swaps, `s32` vs `void *` typing, a
+scheduling barrier, declaration-order swap) all either matched or
+regressed the 188/240 best, none improved it.
+
+### Proposed learnings
+
+- **A register-saturated function's residue is not always PURE
+  permutation.** `func_8004EEA0` (this function's own caller) hit a
+  9-value bijection with ZERO length drift; this function, also
+  9-register-saturated, hits permutation PLUS a genuine one-word
+  delay-slot placement difference. Screen for BOTH shapes when a
+  function is flagged register-saturated -- a 1-word gap on top of an
+  otherwise-permuted register set is not evidence the derivation is
+  wrong, it can be this same family showing up slightly differently.
+- **Two independent local variables, each a pure duplicate of an
+  existing parameter, may BOTH be needed to reach a saturated function's
+  correct register count -- and the exact PAIRING (which is assigned
+  early vs. late, matching or not matching) determines whether the total
+  length lands short, long, or exact**, independent of either variable's
+  own type. This is a search worth doing systematically (try all
+  early/late combinations) before concluding a saturated function is a
+  pure-permutation stall, since the combination space is small (a handful
+  of position pairs) and cheap to enumerate with the fast
+  `build-and-verify.sh` cycle this project already has.
+- **The "byte array forces a runtime-alignment-checked copy vs. a
+  no-`s32`-member struct forces the unconditional `lwl`/`lwr` idiom"
+  pair (documented separately for `Block24` and `Descriptor10`/`Elem`-
+  family structs) transfers cleanly to a genuinely new, much larger
+  derivation with zero iteration.** Worth trusting fully on sight when
+  the disassembly shows this exact shape (a runtime `(src|dst)&3` check
+  with two code paths vs. an unconditional `lwl`/`lwr` sequence with
+  none) rather than re-deriving it from first principles each time.
