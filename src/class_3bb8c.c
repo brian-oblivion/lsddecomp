@@ -213,6 +213,64 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     return &self->unkBC;
 }
 
+/* STALLED at 72/106 words -- see docs/match-reports/func_8004C1C0.md for
+ * the full analysis (two independent residue classes: an $a1-vs-$a3
+ * register-identity choice for u14b, and a store-then-reread narrow-field
+ * codegen sensitivity confirmed with an isolated toolchain reproducer).
+ * Re-verified drift-free this round (72/106, compiled length 0x1A8
+ * matching retail's own .s header exactly) per the head's mid-round
+ * broadcast; not re-attempted further. Preserved here per convention. */
+#if 0
+s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
+    Elem *e;
+    Unk14Obj *u14a;
+    Unk14Obj *u14b;
+    s32 rate;
+    s32 t;
+    s8 b2;
+    s8 b3;
+
+    e = self->methods->slot11C(self, in);
+    if (e != 0) {
+        rate = e->unk4->unk30;
+        out->unk28 = rate;
+        func_8004C368(self, (u8 *)out, rate);
+
+        u14a = self->methods->slot118(self, e->unk4->unk32)->unkC->unk14;
+        out->unkC = u14a->unk18.w + 0x5000;
+        out->unk10 = u14a->unk1C;
+        out->unk14 = u14a->unk20.w + 0x5000;
+
+        u14b = e->unkC->unk14;
+        out->unk18 = in->unk0.w - out->unkC;
+        out->unk1C = in->unk4.w;
+        out->unk20 = in->unk8.w - out->unk14;
+
+        t = in->unk0.w - u14b->unk18.w;
+        if (t < 0) {
+            t += 0x7FF;
+        }
+        b2 = t >> 11;
+        out->base.b2 = b2;
+
+        t = in->unk8.w - u14b->unk20.w;
+        if (t < 0) {
+            t += 0x7FF;
+        }
+        b3 = t >> 11;
+        out->base.b3 = b3;
+
+        out->base.h4 = (in->unk0.h - 0x400) - (u14b->unk18.h + (b2 << 11));
+        out->base.h6 = in->unk4.h;
+        out->unk24 = e;
+        out->base.h8 = (in->unk8.h - 0x400) - (u14b->unk20.h + (b3 << 11));
+
+        return 0;
+    }
+    return 1;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C1C0);
 
 void func_8004C368(Obj866E8 *self, u8 *out, s32 val) {
