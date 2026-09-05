@@ -119,6 +119,16 @@ segments:
       # another segment has nowhere to migrate to and drops out of the link.
       # So the slot is split at the ownership boundary.
       - [0x1908, .rodata, code_2cc8c_e]
+      # ROUND 20: split at 0x1994 so D_80011194 leaves the ATTACHED part of
+      # the slot. While attached, migrate_rodata_to_functions placed it in
+      # func_8003FC70's generated .s, so that function could never be C.
+      # Standalone, it is an ordinary symbol the C references by name.
+      # NOTE the round-14 report's diagnosis was INCOMPLETE: this split alone
+      # still fails (339541 bytes off), because D_80011194 is a STRING
+      # LITERAL and C that spells the string out emits a SECOND copy. The
+      # split is necessary; referencing `extern const char D_80011194[]` is
+      # the other half. Both together -> func_8003FC70 matches 35/35.
+      - [0x1994, rodata]   # D_80011194 "not supported light mode %d\n"
       - [0x19B4, rodata]   # D_800111B4/D_800111C8 -> psyq_memset, NOT ours
       - [0x19DC, rodata]
       - [0x1A90, rodata]

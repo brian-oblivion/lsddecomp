@@ -92,15 +92,8 @@ extern void func_80012C20(const char *fmt, s32 arg1); /* asm/psyq_2258.s,
                                                            independent
                                                            extern for it */
 
-#if 0
-/* PRESERVED, and this body is believed CORRECT -- see
- * docs/match-reports/func_8003FC70.md. It is not restored to C because
- * matching it MOVES RODATA: this function owns D_80011194, which lives
- * in the 0x1908 slot attached to this unit. While the function is
- * INCLUDE_ASM, migrate_rodata_to_functions places D_80011194 with its
- * generated .s; as C there is no migration target, the rodata block
- * relocates, and the whole image goes 1707 bytes off while this
- * function's own text still looks right. */
+extern const char D_80011194[];
+
 void func_8003FC70(s32 mode) {
     if (mode == 1) {
         goto set;
@@ -125,12 +118,10 @@ set:
     D_800902E0 = mode;
     return;
 err:
-    func_80012C20("not supported light mode %d\n", mode);
+    func_80012C20(D_80011194, mode);
 }
 
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FC70);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FCFC);
 
