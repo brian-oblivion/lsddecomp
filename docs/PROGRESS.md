@@ -6,6 +6,173 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-05 — round 17: 5 runners, 115 matches, and three "unconditional" claims that were not
+
+**788 -> 921 matched (58.11% -> 67.92% of game code; matched bytes 42.70% ->
+47.92%). Build green in main after every one of the twelve merges, and every
+claimed match re-verified individually AFTER its merge.** 115 of the 133 new
+matches came from runner work; the other 18 are `jr $ra; nop` bodies splat
+generated itself in the eight fresh carves.
+
+**The round ended on an infrastructure failure, not a stop rule** — four of
+five runners were killed mid-work by the weekly API limit. Their committed
+work was merged and two in-flight bodies were salvaged under §4c. **Five
+worktrees are still standing, deliberately; see "Teardown deferred" below.**
+
+| runner | units | p1 | p2 | p3 | stalls | end state |
+| --- | --- | --- | --- | --- | --- | --- |
+| alpha | `class_3bb8c_p`, then `class_3bb8c_t` | 17 | 10 | — | 1 + 1 salvaged | died to API limit |
+| bravo | `class_3bb8c_o`, `class_3bb8c_r`, then a permuter pass | 18 | 20 | 2 | 0 | died to API limit |
+| charlie | `code_179d8_f`, then a permuter pass | 15 | 1 | 4 | 1 | died to API limit |
+| delta | `code_179d8_g` | 9 | 0 | — | 4 + 1 salvaged | died to API limit |
+| echo | `code_179d8_e`, then `code_179d8_h` | 12 | 8 | — | 6 | reported cleanly |
+
+Bravo was the round's strongest at 40 matches across three assignments with
+zero stalls, and never once touched a shared header.
+
+### Gate 1 was dry, so the round was mostly carving
+
+`fresh` was **0** at the start — all 222 queued functions already had reports.
+Eight units were carved in three waves (five up front, three mid-round to
+re-staff runners whose units were exhausted): `code_179d8_e/_f/_g/_h`,
+`class_3bb8c_o/_p/_r/_t`. Every slice was chosen by MEASURED blocker density
+per 20-function window, not by "next", and every one verified green with zero
+bytes changed. None contained a `jtbl_` reference, so none needed a rodata
+attach — the `code_179d8_tail` cut was deliberately placed BEHIND both of that
+segment's jump-table owners to leave that debt in the remainder.
+
+Gate 0 earned its place again: a stale `asm/class_3bb8c_j.s` monolith plus 37
+stale nonmatchings made `progress.py` report **293** uncarved game functions
+where the truth after re-extracting was **346**.
+
+**Header contention was zero by construction.** Carving across two blocks put
+three runners on units with no project header at all;
+`headercontention.py` on the five-unit plan printed "NO CONTENTION". Of the
+twelve merges, **none conflicted**. Alpha did edit `include/DreamSys.h` (shared
+with `DreamSys.c`'s 89 matched functions) and every one of its six edits was
+verified size-preserving BY ARITHMETIC before merging, not by trusting the
+build: pad 12 -> 4+4+4, 4 -> 2+2, 8 -> 4+4, vtable 24 -> 4+20, 32 -> 8x4, 4 -> 4,
+12 -> 4+8.
+
+### The round's real finding: three "unconditional" compiler claims, all wrong
+
+Three separate runners filed a stall as an unconditional compiler behaviour,
+two of them proposing a new toolchain blocker. **All three were tested along
+exactly one axis, and all three broke on the second axis the head tried.**
+
+1. **echo, `func_8002CA3C`** — "GCC unconditionally folds `x - (x>>k)*N` into
+   `x & (N-1)` once it can prove `x >= 0`", backed by seven probes. All seven
+   varied `/` vs `>>`, guard vs no guard, barrier vs none, while holding the
+   intermediate's TYPE fixed. Narrowing the multiplicand
+   (`lo = index - (short)hi * 16`) blocks the fold and reproduces retail's
+   whole sequence bar one operand. Moved from "5/55, possible blocker" to
+   "shape reproduced, one operand off".
+2. **echo, `func_80028C54`** — the branchless `sltiu` fold, flagged as possibly
+   the same class as the above. It is not, and it is not unconditional: it is
+   boolean materialization, and it breaks on either a side effect in an arm or
+   return values that are not a bare 0/1 pair. Retail has a branch there, so
+   retail's source is doing something else on one path.
+3. **charlie, `func_80035F3C`** — "CSEs two `x & IMM` sharing the same-valued
+   IMMEDIATE". Measured: the merge is keyed on the VALUE. Two `x & 0xFF` on the
+   same `x` give one `andi`; on different operands they give two. Ordinary CSE.
+   The fix was real; the mechanism was not.
+
+**The generalisation, now in DECOMPILATION_LEARNINGS: retail came out of THIS
+compiler, so "no C reaches these bytes" is a claim about the entire shape
+space, not about the axis you happened to vary.** It earns the same standard
+CLAUDE.md already sets for the no-C-form exception. This matters because a
+blocker filed on one axis becomes a stub, and a stub removes the function from
+`fresh` permanently — round 16's lesson, arriving from a new direction.
+
+Four proposed learnings were checked against reproducers rather than
+transcribed. Two were promoted (delta's per-branch-constant-store merge, which
+reproduces cleanly; charlie's CSE finding with its mechanism corrected), and
+two were recorded as NOT promoted (the fold above, and alpha's claim that a
+`for`-header increment differs from the same statement in the body — three
+spellings emit byte-identical code).
+
+### Gate 3 works, and the near-miss corpus is a better queue than cold ground
+
+With the good windows carved out, both idle runners went onto targeted
+permuter passes over documented near-misses instead of a thin carve. **Six
+near-misses closed** — `func_8003CCDC` 27/27, `func_8002C048` 25/25,
+`func_8003FDB0` 31/31, `func_800404D0` 31/31, `func_8004D47C` 33/33,
+`func_8002C0AC` 32/32 — across five units nobody was holding.
+
+That queue is now documented as **Gate 1b**: 72 non-blocker scored near-misses,
+only 4 already permuter-exhausted. It must be screened from the ASM, not the
+report prose — the head's first list included `func_8003C63C` (15/16) because
+its report says "toolchain blocked" without naming the class, and it is
+addiu-$at.
+
+### Three new rules in PARALLEL-RUNS, each paid for this round
+
+- **The blocker screen is BLIND to BIOS trampolines, and fails flatteringly.**
+  `class_3bb8c_h` screens 15 of 17 clean — the best figure of any remaining
+  segment — and is 13 BIOS trampolines plus two addiu-$at functions. **Two
+  workable functions out of seventeen.** The trampoline grep is the fourth
+  screen when RANKING segments, not just a carve-time chore.
+- **Collision rule 2c: the permuter WAIT-LOOP.** A runner ended three
+  consecutive turns on "waiting for the permuter", indistinguishable from one
+  still working. `--stop-on-zero` means a search that never reaches zero never
+  terminates. Put the bound in the ASSIGNMENT (`timeout`, and its 124-vs-137
+  exit codes) — a prohibition is weaker than a bound, and "do not start
+  anything new" was sent and a fourth search started anyway. Two of its runs
+  were still alive, 34 and 20 minutes in, holding twelve cores, when it
+  reported them killed; the head verified by `/proc/<pid>/cwd` and killed by
+  PID.
+- **Gate 1b**, above.
+
+### Teardown deferred — five worktrees are still standing
+
+`alpha`, `bravo`, `charlie`, `delta`, `echo` at
+`../lsddecomp2-wt-<name>`. All five branches are fully merged
+(`main..runner/<name>` is empty for every one) and both remaining dirty files
+have been salvaged into reports, so nothing is at risk. They were left up for
+one reason:
+
+**`origin/main` was pushed to `adb9e92` at 2026-09-04 19:05 by something that
+was not this head.** No foreign commit, worktree or branch exists — every
+commit at and below that point is this session's own work, and the runner
+branches are exactly where they were left. So this is most likely the operator
+or an automation pushing this session's commits, not a second head. But it is
+unexplained, and the two irreversible actions available here are `git push` and
+`git worktree remove --force`. **Neither was taken.** `main` is 17 commits
+ahead of `origin/main` and NOT pushed; the operator's call.
+
+### §4c salvage
+
+- `func_80058228` (`class_3bb8c_t`) — **52/56**, scored by the documented
+  method (copy into main, full oracle, funcdiff, restore, re-verify green).
+  Length matches so the in-range read is trustworthy. Residue is two SWAPPED
+  store offsets on a colour struct: a field-order question, not codegen.
+- `func_8002AA6C` (`code_179d8_g`) — **deliberately unscored.** funcdiff
+  refused the number (296081 bytes differ outside the range), which is
+  CLAUDE.md's third way a score lies caught by its own guard. Recording an
+  invented figure would wrongly settle whether the body is worth resuming.
+
+Both are labelled MID-ATTEMPT SNAPSHOT: no author applied a stop rule to
+either. Worth recording against the runners' own last words — alpha's was
+"Matched immediately. Let's write the report and commit", which referred to a
+function it had ALREADY committed; the uncommitted body is a different,
+non-matching one. **A dying runner's last line is evidence about what it was
+thinking, never about what is in the tree.**
+
+### Next move
+
+**Permuter round, not runners and not a carve.** The near-miss corpus (72
+scored, 4 exhausted) is now larger and better-posed than the cold ground left:
+~45 truly workable uncarved game functions, scattered across segments that are
+20-33% clean, with `class_3bb8c_h` a trampoline trap. Six near-misses fell to
+the permuter this round in a few hours of two runners' time.
+
+Two things to settle when convenient, neither urgent: the `class_3bb8c_h`
+trampoline block needs an `hasm`-vs-`.word` disposition decided, and the
+724-function Psy-Q library is untouched and excluded from the game
+denominator.
+
+---
+
 ## 2026-09-04 — round 16: 5 runners, 51 matches, and two corrections to inherited screens
 
 **732 -> 788 matched (53.98% -> 58.11% of game code; matched bytes 40.20% ->
