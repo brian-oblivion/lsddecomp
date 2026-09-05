@@ -1,7 +1,6 @@
-# func_8004EEA0
+# func_8004EEA0 -- MATCHED 51/51 (round 18, echo, via permuter -- targeted PERM macros)
 
-**Unit:** class_3bb8c_f · **Size:** 51 words (0xCC) · **Status:** STALL —
-register-identity PERMUTATION at zero address drift, best 33/51
+**Unit:** class_3bb8c_f · **Size:** 51 words (0xCC)
 
 ## What it does
 
@@ -107,3 +106,111 @@ simultaneously-live values and GCC 2.6.3 happens to pick a different
 source did. Worth flagging in `docs/DECOMPILATION_LEARNINGS.md`'s
 existing entry on this class as a THIRD confirmed instance, now spanning
 two units.
+
+## RESOLUTION (round 18) — the permuter found the real lever, and it was a TYPE, not a register
+
+Given this function's own STALL classification cited CLAUDE.md's
+"register-identity permutation, not fixable by reshaping" class (confirmed
+independently by `func_8004C93C`, 7 variants, zero movement), a permuter
+run was set up with TARGETED `PERM_GENERAL` macros over the two axes
+round-17's manual attempts had already identified as levers (declaration
+order of `count`/`result`; statement order of `count = 10;` vs. the
+pre-loop `func_800507F8` call), wrapped in `PERM_RANDOMIZE` for open
+search beyond those two switches.
+
+**Note on setup:** `tools/setup-permuter.sh` pipes the seed through the
+REAL `cpp`/`cc1` to prove it compiles before handing the scaffold back --
+this rejects `PERM_` macros outright (`cc1` has no idea what they are).
+The fix: run `setup-permuter.sh` with a PLAIN (macro-free) seed to get a
+valid, fully-preprocessed `base.c`, then hand-edit the PERM macros into
+that generated `base.c` directly (the permuter's own `perm/parser.py`
+expands them at each iteration; they were never meant to survive real
+`cpp`). `--debug` afterward confirmed the base score (500) matched the
+plain seed's own `--debug` score exactly, proving the macro edit didn't
+change the DEFAULT (first-listed) expansion.
+
+Bounded search (`timeout 600`, `-j 6 --stop-on-zero`): reached **score 0
+at iteration 4160**. `permuter exit=0` (captured cleanly this time --
+`--stop-on-zero` stopped the run itself well inside the 600s bound, no
+race with the outer Bash timeout).
+
+**The winning diff, verbatim from `output-0-1/diff.txt`:**
+
+```diff
+-s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7)
++s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7)
+```
+
+**Neither PERM_GENERAL axis mattered at all.** The permuter's own random
+mutation found something round 17's hand attempts never considered
+because the whole investigation had been framed as "which register does
+each already-`s32`-typed value land in" -- the actual gap was the
+PARAMETER'S DECLARED TYPE. `a3` is used in the body only as `a3 & 0xFF`
+(masked to a byte); retyping the parameter itself to `char` (unsigned, per
+this project's `-funsigned-char`) rather than `s32` changes how GCC 2.6.3
+handles the incoming register at the function's own entry point, which
+was enough to re-derive retail's ENTIRE 9-register assignment -- this
+was never a rotation-of-independent-values problem at all, it was one
+mistyped parameter cascading into what LOOKED like a register permutation
+across the whole function.
+
+**Applied verbatim to `src/class_3bb8c_f.c`** (body otherwise unchanged
+from the preserved near-miss):
+
+```c
+s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7) {
+    s32 count;
+    s32 result;
+
+    count = 10;
+    func_800507F8(handle, a1);
+    do {
+        result = func_8004EF6C(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
+        if (result != 0) {
+            break;
+        }
+    } while (count-- != 0);
+    if (result == 0) {
+        func_800507F8(handle, 0);
+    }
+    return result;
+}
+```
+
+Also added a forward declaration for `func_8004EF6C` (defined later in
+this unit, ROM order) at the top of the file -- the previous report
+claimed one was "already present", which was not the case; without it,
+`cc1` implicitly declares `func_8004EF6C` returning `int` with unpromoted
+argument types, which HAPPENED to still byte-match here (`int`==`s32`,
+and `char`/other args promote to the same registers either way under this
+ABI) but is not something to rely on -- the explicit prototype is
+free and removes the compiler's own warning.
+
+**`build exit=0`, `funcdiff`: `func_8004EEA0: 51/51 words match`,
+whole-image SHA1 verified.**
+
+### Proposed learning
+
+**A function classified into the "register-identity permutation, zero
+drift" stall class on the strength of "every value is already the right
+TYPE, only the register differs" should still have its ARGUMENT/LOCAL
+TYPES individually re-examined, not assumed correct, before accepting the
+classification.** This function's own residue was filed as a 3-instance
+confirmation of that class alongside `func_8004C93C`/`func_80051F24` (see
+those reports, also round 18) -- but unlike those two (where nine
+combined declaration-order attempts across three functions moved nothing),
+this one's actual cause was a narrower, single-parameter type mismatch
+that happened to cascade into a register reassignment affecting the WHOLE
+function's frame, presenting identically to a "pure rotation" residue.
+**The tell, in hindsight: the parameter in question (`a3`) is masked with
+`& 0xFF` at its only use site** -- a byte-range operation on a value
+declared wider than a byte is exactly the shape worth re-typing before
+accepting a register-identity stall, the same way CLAUDE.md's `s8`/`s16`
+struct-field guidance already treats a narrow access as a signal about the
+DECLARED width. Suggest cross-referencing this note from
+`func_8004C93C`'s and `func_80051F24`'s entries in
+`docs/DECOMPILATION_LEARNINGS.md`'s existing class writeup, since this
+round closed one of three instances that class currently claims and the
+mechanism that closed it does not generalize to the other two (both
+re-verified inert to declaration-order changes this same round, and
+neither has an obvious narrow-masked parameter to retype).

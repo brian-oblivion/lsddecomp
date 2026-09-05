@@ -11,6 +11,7 @@ void func_8004F810(TaskObjF *self);
 s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 func_8004F4C8(s32 *arr, s32 count);
 s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
+s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7);
 
 s32 func_8004ED40(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     s32 count;
@@ -50,7 +51,23 @@ s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004EEA0);
+s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7) {
+    s32 count;
+    s32 result;
+
+    count = 10;
+    func_800507F8(handle, a1);
+    do {
+        result = func_8004EF6C(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
+        if (result != 0) {
+            break;
+        }
+    } while (count-- != 0);
+    if (result == 0) {
+        func_800507F8(handle, 0);
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004EF6C);
 
