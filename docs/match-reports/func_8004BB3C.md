@@ -14,6 +14,24 @@
 > independently-confirmed "declaration order is inert" finding for this
 > exact class, already tested twice on this function specifically -- see
 > the round-13 entries below).
+>
+> **Checked against the head's second mid-round broadcast, which named
+> this function as "a candidate shape" for a saturated-register-file
+> misdiagnosis (a cross-call cached local inflating the count by one).**
+> `grep -oE 'sw +\$s[0-9]' asm/nonmatchings/class_3bb8c/func_8004BB3C.s | sort -u`
+> gives exactly **7** distinct registers (`$s0`-`$s6`), both in retail
+> and in this build -- not 8 or 9, so this is NOT a saturated-plus-one
+> case. The register COUNT already matches exactly; the residue is a
+> clean 2-way identity swap between two already-correctly-counted
+> registers (`$s3`<->`$s4`, ep/sp), not an extra live value to hunt
+> down and remove. The saturation mechanism does not apply here.
+>
+> Also checked against the aggregate-assignment lever (5 closures
+> elsewhere this round, whole-struct vs field-by-field copy): **does not
+> apply here.** Every struct field write is either freshly computed
+> (`e->unk4->unk30 = sp->rate;`) or a single isolated field; never
+> several adjacent fields of one struct copied verbatim from another
+> instance.
 
 > **UPDATE, round 17, targeted permuter pass.** Still a STALL. Re-verified
 > the preserved 90/105 body against the current build first (per
