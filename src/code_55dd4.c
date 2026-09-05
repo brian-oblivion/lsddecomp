@@ -298,7 +298,14 @@ void func_800661D4(Class65650 *self, void *arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066214);
+void func_80066214(Class65650 *self, s32 index)
+{
+    self->unk7C = index;
+    self->unk80 = (*(GroupObj **)(self->unk5C->unk30->arr + 8 + index * 4))->entry->unk4;
+    self->unk88 = (u8 *)(*(GroupObj **)(self->unk5C->unk30->arr + 8 + self->unk7C * 4))->entry + 8;
+    self->unk84 = 0;
+    self->methods->slot134(self, self->unk88, 0);
+}
 
 s32 func_800662A8(Class65650 *self)
 {
