@@ -298,7 +298,41 @@ void func_800593D8(DreamSys *this)
 	if (this->callback_0x98 != NULL)
 		this->callback_0x98(this);
 }
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005942C);
+/* Local prototypes, own local view (func_8001E600 is a different unit's
+ * already-matched function taking an unrelated class as arg0; func_8005950C
+ * is this unit's own next-in-queue function, forward-declared per
+ * CLAUDE.md's convention for calling into a not-yet-preceding definition).
+ * arg4 on func_8001E600 is unused by its own body but IS set (to 0) by this
+ * call site's own disassembly, so it is declared here to reproduce that. */
+extern void func_8001E600(void *self, s32 *dst, s32 *src, s32 arg4);
+extern s32 func_8005950C(void *a, void *b, s32 day);
+extern s32 func_8001EF14(s32 *a, s32 range, s32 *b);
+
+s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
+{
+	s32 local[3];
+	s32 ret;
+	s32 *vec;
+	s32 *p;
+
+	p = &D_80087EE8;
+	*p = day;
+	func_8001E600(this, local, p - 2, 0);
+
+	ret = func_8005950C((void *)((u8 *)this->unk_0x5C + 0x14),
+	                     (void *)((u8 *)this->unk_0x5C + 0x20), day);
+
+	vec = this->unk_0xC != 0 ? (s32 *)((u8 *)this->unk_0x14 + 0x38) : 0;
+	local[1] = ret + vec[1];
+
+	if (out != NULL) {
+		*(DreamSysVec3 *)out = *(DreamSysVec3 *)local;
+	}
+
+	if (reference != NULL)
+		return func_8001EF14(local, tolerance, reference);
+	return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005950C);
 
