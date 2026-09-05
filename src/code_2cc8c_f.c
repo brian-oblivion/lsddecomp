@@ -53,7 +53,22 @@ void func_80040824(Obj6EAC0 *self, s32 *a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040854);
+void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+{
+    void (*fn)();
+    Obj6EAC0 *q;
+
+    q = self;
+    fn = q->methods->slot4C;
+    /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
+     * delay-slot scheduling only -- see the match report. Without it GCC
+     * swaps the prologue's $ra/$s1 callee-save STORE ORDER. */
+    do {
+        fn(q, a1, a2, a3);
+        q->unk48 = 0;
+        q->unk4C = a3;
+    } while (0);
+}
 
 void func_800408A0(Obj6EAC0 *self, s32 a1) {
     self->unk44 = a1;
