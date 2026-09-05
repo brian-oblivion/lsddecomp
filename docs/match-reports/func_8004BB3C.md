@@ -1,5 +1,19 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 20 (charlie): re-verified, no new attempt.** Confirmed against
+> this round's build (header additions from `func_8004BE54` this same
+> round touch DIFFERENT structs -- `Elem::unk8`, `ElemTarget::field10`,
+> `EntryChildObj::unk14`/`unk36` -- none of which this function reads, so
+> no re-check needed beyond the standard `cmp -l`-clean whole-image build
+> already confirmed for the round). Still 90/105, correct length, same
+> `$s3`/`$s4` whole-function identity swap. Not re-attempted: the permuter
+> already ran against this exact function (round 17, logged below,
+> inconclusive due to a scaffold mismatch, not exhausted) and a second
+> manual pass would only re-tread the same well-documented wall. Time this
+> round went to `func_8004BE54` (fresh ground) instead, per the staffing
+> guidance to move off a register-identity wall once it's this well
+> established.
+
 > **ROUND 19 (bravo): drift claim RE-VERIFIED per the head's mid-round
 > broadcast** (two other reports' "clean/drift-free" claims turned out
 > false this round). Rebuilt this exact preserved body from a clean

@@ -33,6 +33,9 @@ typedef struct Unk6CObj Unk6CObj;
 typedef struct Unk6C14Obj Unk6C14Obj;
 typedef struct Unk6C14SubObj Unk6C14SubObj;
 typedef struct QueryTemplate866E8 QueryTemplate866E8;
+typedef struct LinkTarget866E8 LinkTarget866E8;
+typedef struct ResInfo866E8 ResInfo866E8;
+typedef struct EntryGpu EntryGpu;
 
 /* self+0x54: an inline (not pointer) 3-word sub-struct, dereferenced by
  * func_8004B44C (arg3) and also matches func_8004C470's `arg1` descriptor
@@ -393,7 +396,14 @@ struct ElemTargetMethods {
 
 struct ElemTarget {
     ElemTargetMethods *methods;    /* +0x000, func_8004C0AC */
-    u8 pad004[0x02A - 0x004];
+    u8 pad004[0x010 - 0x004];
+    /* func_8004BE54: a small size/offset header block, read at ITS OWN
+     * +0x004 and +0x008 (both s32) and combined with this pointer's own
+     * address to build byte ranges for a resource-load request. Full body
+     * (`ResInfo866E8`) kept in class_3bb8c.c -- nothing else in this unit
+     * needs it. */
+    ResInfo866E8 *field10;          /* +0x010, func_8004BE54 */
+    u8 pad014[0x02A - 0x014];
     u16 unk2A;                     /* +0x02A, func_8004BD14 */
     s16 unk2C;                     /* +0x02C, func_8004BD14/func_8004C5D0 (nonzero test) */
     s16 unk2E;                     /* +0x02E, func_8004BD14 */
@@ -417,7 +427,11 @@ struct Elem {
      * `unk4->unk32` (already established). */
     u16 unk2;                      /* +0x002 */
     ElemTarget *unk4;               /* +0x004 */
-    u8 pad08[0x0C - 0x08];
+    /* func_8004BE54: a per-frame GPU link/load coordinator -- its own
+     * vtable slot78 drives that function's whole loop. Full body
+     * (`LinkTarget866E8`) kept in class_3bb8c.c, this unit's own reading
+     * of a class none of Elem's other established fields touch. */
+    LinkTarget866E8 *unk8;           /* +0x008, func_8004BE54 */
     UnkCObj *unkC;                  /* +0x00C, func_8004C470 (via slot118's return) */
     /* func_8004C0AC: array of pointers, walked over 0x668 raw bytes --
      * the true element count is not a round number of elements, so this
@@ -452,11 +466,18 @@ struct EntryChildObj {
     EntryChildObjMethods *methods;  /* +0x000, func_8004D0D0/func_8004D108 */
     u8 pad04[0x10 - 0x04];
     u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000; func_8004CE24: bit31 set/cleared per its own arg1 */
-    u8 pad14[0x18 - 0x14];
+    /* func_8004BE54: a GsCOORDINATE2-shaped per-entry GPU link record --
+     * full body (`EntryGpu`) kept in class_3bb8c.c. Note this sits right
+     * where a `GsDOBJ2` embedded at THIS object's own +0x010 would put its
+     * `coord2` field (`GsDOBJ2::attribute` at +0x000 lines up with this
+     * object's own +0x010 `unk10`, used as GsLinkObject4's `objp`) --
+     * consistent, not asserted as the real PSYQ type here. */
+    EntryGpu *unk14;                 /* +0x014, func_8004BE54 */
     s32 unk18;                      /* +0x018, func_8004C0AC: zeroed */
     u8 pad1C[0x20 - 0x1C];
     s32 unk20;                      /* +0x020, func_8004C0AC: zeroed */
-    u8 pad24[0x38 - 0x24];
+    u8 pad24[0x36 - 0x24];
+    s16 unk36;                       /* +0x036, func_8004BE54 */
     EntryChildObj *unk38;           /* +0x038, func_8004CE24: singly-linked chain, walked while non-NULL */
 };
 
