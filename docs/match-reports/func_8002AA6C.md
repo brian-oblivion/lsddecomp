@@ -1,4 +1,4 @@
-# func_8002AA6C -- STALL (MID-ATTEMPT SNAPSHOT, unscoreable)
+# func_8002AA6C -- STALL (119/223 words, drift confined to 1 real instruction -- established a real baseline in round 19, see below)
 
 Unit `code_179d8_g`. Runner delta, round 17. 223 instructions.
 
@@ -151,3 +151,77 @@ Positioned between `func_8002A75C` and `func_8002ADE8` in ROM order.
   merely idiomatic) for GCC 2.6.3 to recognise loop-invariant address
   hoisting; and the local `volatile T *` lever **backfires inside a loop** over
   a loop-invariant target, where it defeats to LICM instead.
+
+## Round 19: got this to a real, scoreable baseline (runner charlie)
+
+Per the head's second-pass brief, and per this report's own instruction
+("the first thing the next attempt should do is get the LENGTH right"):
+compiled the salvaged body as-is (adding the two missing extern
+declarations it needed, `D_80010AAC[]`/`D_80010ABC[]` -- both `u8[]`
+string-literal-shaped globals passed to `func_80025AE4`/`func_80012C20`,
+no other functions in this unit reference them yet). It compiles clean
+and lands at **119/223 words, with the compiled length only 1
+instruction short of retail's 223** (`objdump`: 222 real instructions).
+This is a genuine, trustworthy near-miss now, not an unscoreable
+snapshot -- confirmed via `objdump`, not just `funcdiff`'s own
+in-range/out-of-range split (which still warns, correctly, since 1
+instruction of drift is still drift, but it's now precisely
+characterized rather than unknown).
+
+**One structural fix applied and confirmed real, though it didn't
+change the final word count:** the function's tail (`D_8006D8F4 = -1;
+return D_8006D8F4;`) needed the same unfolded-address `volatile s32 *`
+local-pointer idiom this round's `func_8002B4D4` report independently
+found for the identical global and an identical write-then-read shape.
+Before the fix, this build FOLDED the store's address (`sw
+v0,-0x2710(at)`); after routing it through a local pointer, it matches
+retail's unfolded `lui/addiu` + plain-offset store exactly. This is now
+a THIRD confirmed site (after `func_8002ADE8`'s `D_8006D8EC`/`D_8006D8F0`
+and `func_8002B4D4`'s own `D_8006D8F4` else-branch) where a global
+already declared `volatile` at file scope still needs a LOCAL pointer
+dereference to get unfolded addressing at one specific access -- see
+`func_8002B4D4.md`'s proposed learning, now confirmed a fourth time
+across two different functions touching the SAME global.
+
+**What's left, confined to a narrow, well-characterized area:** the
+retry-loop's per-iteration decrement (`n = *pRetry; *pRetry = n - 1;`
+under the `tail:` label, and the mirrored statement at function entry)
+allocates `pRetry`'s address into a fresh register (`$a0`) at the very
+last use, where retail keeps it in the SAME persistent register (`$s3`)
+it was allocated to earlier in the function. This is the same
+parameter/local-persists-in-one-register-vs-gets-reloaded-fresh
+register-identity question this round's other reports (`func_80032BB8`,
+`func_8002C278`) already document as resistant to reshaping -- not
+re-attempted here given the round's broader finding that this specific
+class rarely yields to source-level levers, and given the function is
+now at a solid, well-understood baseline rather than an unknown one.
+
+**Not yet checked**: the `p2[-1] = p2[-2]; ... p2[2] = p2[-3]; p2[3] =
+...; return p2[2];` pointer-arithmetic block and the two `func_80029F10`
+guard calls -- the diff shows these regions ALREADY MATCH retail
+byte-for-byte (confirmed via `asm-differ`, no markers in that range),
+so the salvaged body's derivation of these fields was already correct;
+nothing to re-derive there.
+
+Restored to `INCLUDE_ASM` (no score short of byte-exact stays in
+`src/`); the two extern declarations for `D_80010AAC`/`D_80010ABC` are
+kept live in `src/code_179d8_g.c` since they're needed by any future
+attempt and cost nothing to carry forward.
+
+### Proposed learning
+
+**"Unscoreable" is a property of the SESSION that produced a snapshot,
+not necessarily of the function.** This body had never been through a
+single measure-and-reshape cycle before this round; simply compiling it
+as-is (no reshaping at all) immediately produced a real, close,
+trustworthy score. Before spending attempts reshaping a body flagged
+"unscoreable" or "mid-attempt," check whether it will compile and
+measure cleanly with zero changes first -- that alone may resolve the
+open question the flag exists to raise.
+
+Also reinforces `func_8002B4D4.md`'s finding from this same round:
+`D_8006D8F4` specifically (and by extension, this driver's other
+`volatile`-qualified scalars) needs the local-pointer-dereference idiom
+at EVERY write-then-immediate-read site, not just once per function --
+this is now confirmed at two independent sites in two different
+functions touching the same global.

@@ -75,6 +75,8 @@ extern u8 D_80010A40[];
 extern u8 D_80010A50[];
 extern u8 D_80010A94[];
 extern u8 D_80010AA0[];
+extern u8 D_80010AAC[];
+extern u8 D_80010ABC[];
 extern u8 D_8006D908[];
 extern u8 D_8006D90C[];
 extern volatile s32 *D_8006D924;
