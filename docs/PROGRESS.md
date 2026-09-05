@@ -6,6 +6,108 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-05 — round 20: 2 matches, six near-misses moved, and four inherited reports found wrong
+
+**947 -> 949 matched (69.84% -> 69.99% of game code, 50.04% of game bytes).
+Build green in main after every one of the round's 11 merges. Zero merge
+conflicts — the five units were staffed with disjoint header sets and
+`headercontention.py` reported NO CONTENTION before provisioning.**
+
+**This round bought progress on RESIDUES rather than on the match count, and
+that is the honest headline.** Two functions closed. Six moved substantially,
+four of them by getting a compiled LENGTH exact — which converts a score that
+`funcdiff.py` cannot be trusted to report into one that it can:
+
+| function | unit | before -> after | note |
+| --- | --- | --- | --- |
+| `func_8003FC70` | code_2cc8c_e | **MATCH 35/35** | head; stall standing since round 14 |
+| `func_8001A4C0` | code_8220_c | **MATCH 35/35** | echo; raw asm reworked into ordinary C |
+| `func_8003F848` | code_2cc8c_e | 0 -> 173/177 | delta; never attempted before |
+| `func_8004EF6C` | class_3bb8c_f | 0 -> 188/240 | charlie; never attempted, length off by 1 |
+| `func_8002AA6C` | code_179d8_g | 119 -> 202/223 | bravo; **length now exact** |
+| `func_8004BE54` | class_3bb8c | 0 -> 130/150 | charlie; **length exact**, 4 structs derived |
+| `func_8001E110` | code_d294_b | 16 -> 95/118 | alpha; false diagnosis corrected |
+| `func_8001D714` | code_d294_b | 130 -> 141/143 | alpha; permuter-found cross-jump lever |
+| `func_80028DF0` | code_179d8_b | 10 -> 45/82 | bravo; **length now exact** |
+| `func_80028F38` | code_179d8_b | 11 -> 46/79 | bravo; **length now exact**, fix transferred |
+| `func_8002B4D4` | code_179d8_g | 34 -> 60/91 | bravo; **length now exact** |
+| `func_80032BB8` | code_179d8_c | 7 -> 12/14 | echo; overturned "not fixable by reshaping" |
+| `func_80059BE0` | DreamSys | drift 2 -> 1 word | echo; tail-merge defect fixed outright |
+
+### The round's most transferable finding: inherited report PROSE is unreliable
+
+**Four runners, in four unrelated units, each independently found a false
+mechanism claim in a report they inherited** — alpha (`func_80065AE0`, a
+padding local credited with a fix it never made), bravo (a prose/`objdump`
+mismatch that was hiding a real fix), charlie (`func_8004C470`, retail and
+built **swapped**), echo (`func_80061778`, a flat merge that is really a nested
+two-level cross-jump). Alpha's `func_8001E110` is the costliest instance: a
+"16/118, no drift" claim carried across rounds 13 and 19 while the contradicting
+drift warning sat in the same command's own output. Correcting it reached
+95/118.
+
+`funcdiff.py` scores bytes and has no opinion about narrative. A wrong score is
+corrected the next time anyone measures, because measuring is the job; **a wrong
+narrative is nobody's job to re-measure**, so it survives and the next runner
+builds on it.
+
+### Classes settled, opened, and declined
+
+- **Commutative-operand-order canonicalization: SETTLED**, 6 instances across 3
+  unrelated units. cc1 fixes a commutative op's register operand order
+  regardless of C source order — charlie's decisive datum is that *both* C
+  orders produce the identical wrong output. Promoted on the strength of a
+  discriminating test, not a tally.
+- **"Tail merge" is an UMBRELLA, not a class.** echo separated merge-COUNT from
+  merge-DEPTH and showed neither lever transfers.
+- **Dead-call frame sizing is a screen for frame SIZE ONLY.** alpha falsified
+  the round-19 census's two strongest rows with an isolated `cc1` reproducer: a
+  dead 6-arg call and an unused local produce byte-identical output.
+- **Delay-slot-fill choice** recorded as an OPEN observation, not a class —
+  nobody has found its discriminating test.
+- **A fifth "way a score lies" was proposed and DECLINED**, per the round-13
+  precedent: alpha's own report confirms the drift warning fired, so the oracle
+  worked. Recorded instead as an attribution hazard on way #3.
+
+### Head errors this round, both recorded in the learnings
+
+- **I gave charlie a figure I had not rebuilt.** `func_8004F8A4`'s title said
+  "1 word / 4 bytes short" — a LENGTH statement — and I staffed it as the
+  closest function in the queue. Its match score was 33/77. This is a *new*
+  sub-case: rounds 18 and 19 misread figures out of report BODIES, mine came
+  from the TITLE, which the guidance calls safe. Titles should give both
+  quantities.
+- **My COP2-clobber hypothesis for `code_8220_c` was wrong.** echo falsified it
+  cleanly (zero GTE/COP2 mnemonics in all ten functions) and I re-verified with
+  a sanity check that the grep fires 8x on the unit's known GTE bodies.
+
+### Process
+
+**Re-sends dominated again, as in round 19: 11 merges from 5 runners.** echo
+ran six passes across five units. Every runner's first pass was merged before
+its second was assigned, so nothing was ever at risk in a worktree.
+
+`tools/nearmiss.py` was added — Gate 1b's queue as a tool, because heads have
+re-implemented the `nop_mflo_mfhi` screen backwards twice and misread report
+figures three times. It shells out to the canonical greps and prints verdict
+text verbatim rather than extracting figures. Built the census by hand first;
+both agreed exactly.
+
+Rodata slot `0x1908` was split at `0x1994`, dissolving round 14's "alignment
+constraint" lead — there is no alignment constraint; `D_80011194` is a string
+literal and the C was emitting a second copy of it.
+
+**Next round: runners again.** `fresh` is 0 and the 187 uncarved functions are
+only ~26% blocker-clean (best segment 33%; `class_3bb8c_h` is 13/17 BIOS
+trampolines), so carving still loses to the near-miss queue — 81 blocker-clean
+functions, now much better characterised than at round 20's start. Best
+first targets: `func_8001D714` (141/143), `func_8003D73C` (144/145 compiled),
+`func_8004EF6C` (188/240, one word of length), `func_8003F848` (173/177),
+`func_8002AA6C` (202/223). Run `python3 tools/nearmiss.py` rather than trusting
+this list.
+
+---
+
 ## 2026-09-05 — round 19: 17 matches, the last fresh function, and a frame size that reads dead code
 
 **930 -> 947 matched (68.58% -> 69.84% of game code). Build green in main after

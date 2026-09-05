@@ -695,6 +695,68 @@ three instances across two units. It is recorded here as an OPEN observation,
 not a promoted class: nobody has yet found its discriminating test, and the
 lesson directly above says that is what would settle it.
 
+### A `for`-loop keeps a status value register-resident where `goto`/labels folds it away (round 20)
+
+**Spelling a retry loop as a genuine `for` loop rather than `goto`/labels
+changes whether GCC 2.6.3 keeps a loop-carried status value in a register.**
+With the `goto` form the compiler folds the value away; with the `for` form it
+stays register-resident, which is what retail does.
+
+Found by bravo on `func_80028DF0` (10/82 → 45/82) and **transferred to the
+sibling `func_80028F38` with zero per-function tuning** (11/79 → 46/79). Both
+compiled lengths became exact — `func_80028DF0` had been two words short and
+now matches retail's 82 words byte-for-byte. Moving the status value's `-1`
+reset inside the loop body closed the remaining length gap.
+
+This closes a question rounds 16 and 19 both left open on these functions, and
+the clean transfer is what promotes it from a one-function accident to an
+idiom: **the two siblings' reports had carried a shared-root-cause hypothesis
+since round 16, and this confirmed it.**
+
+Add it to the reshaping repertoire next to the existing `do { } while (0)` and
+nested-guard entries: **when a loop-carried value's residency looks wrong, try
+the other loop spelling before concluding the residue is allocation.**
+
+### Two DISTINCT permuter false-lead patterns, both caught in round 20
+
+The permuter earns its place, but round 20 produced two different ways it
+misleads, and they need different defences. Both were caught by runners who
+verified against the real oracle rather than the permuter's own scorer.
+
+**1. An isolated-scorer improvement that REGRESSES the real build.** bravo, on
+`func_80029074`: a candidate scored 835 against a base of 1170 — a large
+apparent gain — and verified *worse* against the real build, at 2/85 words with
+the length grown from 85 to 89. bravo caught two more of these in the same
+pass. The permuter scores in isolation and cannot see what the linked image
+does; a score improvement is a hypothesis, and the real oracle is the only
+test.
+
+**2. A candidate that is SEMANTICALLY WRONG yet scores almost perfectly.**
+delta, on `func_8003F848`: 176/177 words, and incorrect C — it hoisted a call
+out of a loop. See that entry above for the mechanism; the short version is
+that moving code across an un-unrolled loop's back-edge changes only the branch
+target immediate, a one-word effect.
+
+**The defences are different and you need both.** Pattern 1 is caught by
+re-verifying every candidate against `build-and-verify.sh` + `funcdiff.py`.
+Pattern 2 survives that check — it *is* a near-perfect score — and is caught
+only by reading the candidate's CONTROL FLOW against the disassembly's own
+branch targets. **A high real-oracle score is not evidence of correct
+semantics.**
+
+### A residue next to a just-fixed defect may be the same root cause wearing a different face (round 20)
+
+bravo's load-bearing proposed learning, and it is the practical form of the
+"re-check cheap levers after a structural fix" entry above. After closing one
+defect, **test whether the adjacent residue moves under the same structural
+lever before assuming it needs its own fix.** On `func_80028F38` the sibling's
+entire fix transferred with no tuning at all.
+
+The counterweight, so this does not become over-applied: echo established the
+opposite result on the Entity tail-merge pair, where two residues under one
+label were genuinely different shapes and neither lever transferred. **Test the
+transfer; do not assume it in either direction.**
+
 ### "N words short" and "N/M words match" are DIFFERENT measurements that read identically — the head got this wrong in round 20
 
 `docs/PARALLEL-RUNS.md` Gate 1b already says to rank from title/verdict lines
