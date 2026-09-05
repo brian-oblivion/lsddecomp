@@ -1,5 +1,93 @@
 # func_8003FCFC -- STALL, MISFILED CLASS CORRECTED (return-type fix found, register residue narrower but not closed)
 
+## Round 20 (runner delta): mechanism identified precisely, two more attempts, both negative
+
+Rebuilt attempt 6's body (`s16 *func_8003FCFC(s16*,s16*)`, no named
+`result`, direct `return dst;`) fresh: reproduces 2/20 raw words exactly,
+`--debug` would confirm the reported 135 (not re-run this round, no
+reason to doubt the prior measurement -- the raw word count and
+instruction pattern match the report's own description exactly).
+
+**Found the actual MECHANISM behind the residue via `tools/asm-differ`,
+which the prior three rounds' reports did not pin down**: the
+`move $v0,$a1` retail places second-instruction-early is NOT there
+because of any explicit early "cache the return value" C statement --
+it is the R3000's LOAD-DELAY-SLOT FILLER for the function's very FIRST
+`lh` (a real hardware hazard: the instruction immediately after any load
+cannot read that load's destination register, so the scheduler needs
+SOME safe, independent instruction to fill that slot, and "materialize
+the return value early" is a free one since `dst`/`a1` is live the whole
+function and never touched by anything before the return). **This
+attempt-6 body ALREADY reproduces that placement byte-for-byte** --
+`asm-differ` shows `30500: move v0,a1` identical on both sides, at the
+identical address, in the identical delay slot. The residue is NOT about
+WHEN `v0=a1` happens (that already matches); it is entirely about what
+happens AFTER: retail continues using `$a1` directly for every
+subsequent store, while this body's compiled form switches to using
+`$v0` for every subsequent store instead (and shifts `t1`/`t2`/`t3`'s
+bank down by one register to compensate, `$t1/t2/t3` -> `$v1/a1/a2`).
+Confirmed via `asm-differ`'s per-instruction diff, not by reading the
+raw word count.
+
+This reframes the residue precisely: it is not "coalescing" in the
+vague sense the round-19 report used, it is specifically **which
+register identity (the parameter's own `$a1`, or the freshly-computed
+`$v0` copy of it) the compiler chooses to keep using for the REST of the
+function once both hold the identical value**. GCC 2.6.3 picks `$v0`
+here; retail's real compile picked `$a1`.
+
+### Attempts (2)
+
+1. **Bare `__asm__("")` barrier** immediately after an explicit
+   `result = dst;` at the top (before the load/store body), attempting
+   to pin the early materialization AND discourage the switch to using
+   `result`'s register for the rest of the function: **regressed
+   sharply** -- it did not merely fail to fix the residue, it broke the
+   ALREADY-MATCHING delay-slot-filler placement too, forcing the
+   `move v0,a1` to happen strictly BEFORE the first `lh` (rather than
+   in its delay slot) and inserting a genuine extra `nop` where the
+   filler used to go (confirmed via `asm-differ`: an extra instruction
+   appears, plus an outside-range drift warning). This is the
+   documented "`__asm__("")` is not a local lever -- it perturbs the
+   WHOLE function's scheduling" caution, now with a THIRD confirmed
+   instance beyond the two CLAUDE.md/MATCHING-GUIDE already record.
+2. **Flipped which variable is the "derived" one**: introduced a
+   separate local `d = dst;` used for every STORE (`d[i] = ...`
+   throughout), while `return dst;` returns the ORIGINAL, untouched
+   parameter directly (the mirror image of round-18's attempt 7, which
+   cached the RETURN value and kept `dst` for the stores). Reasoning:
+   if retail's real source has the OPPOSITE variable playing the
+   "derived, gets $v0" role, swapping which one is nominally the "copy"
+   at the C level might flip the register allocator's choice too. No
+   change: still 2/20, byte-identical instruction pattern to the
+   baseline (down to which specific bytes differ). GCC 2.6.3 evidently
+   does not distinguish "which C name is the alias" once both provably
+   hold the same value throughout -- confirms this choice is being made
+   by the register allocator's own internal ordering/preference, not by
+   anything expressible through source-level aliasing.
+
+### Proposed learning
+
+**The delay-slot-filler EXPLANATION for where `move $v0,$a1` lands is
+now confirmed and already reproduced correctly** -- three rounds of
+reports described this as a vague "coalescing" or "register bank"
+residue without checking WHERE the copy instruction actually sits
+relative to retail's own load-delay hazard. It sits in EXACTLY the right
+place already. The remaining, unclosed piece is a strictly narrower
+question: once a value is live in two registers simultaneously (the
+original parameter register and a freshly-copied return-value register),
+which one GCC 2.6.3 continues to reference for later, independent uses.
+Neither naming (attempt 2, and round-18's attempts 6-8), nor a scheduling
+barrier (this round's attempt 1, worse), nor an unguided permuter (round
+19, ~45,000 iterations) has found a lever for this specific choice.
+**A THIRD confirmed case of `__asm__("")` failing to generalize past its
+one documented use** (callee-save prologue ordering) -- worth folding
+into that caution's running count rather than treating as a one-off.
+
+Restored to `INCLUDE_ASM`. Full oracle re-confirmed green
+(`build exit=0`, `OK: build matches retail`) before moving on to the
+next assigned unit.
+
 Unit `code_2cc8c_e`, carved round 14. Screened clean (no `gp_rel`, no
 `addiu $at,$at,%lo`, 0 callee-saved registers) -- not a toolchain blocker.
 
