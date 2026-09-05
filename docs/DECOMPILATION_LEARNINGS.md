@@ -563,8 +563,8 @@ spending attempts; if the length is already exact, this is not your residue.
 
 `funcdiff.py` scores bytes. It has no opinion whatever about a report's
 *narrative* — what the residue is made of, which side does what, or which
-earlier lever is supposed to have fixed what. Round 20 had **three runners, in
-three unrelated units, each independently find a false mechanism claim in a
+earlier lever is supposed to have fixed what. Round 20 had **four runners, in
+four unrelated units, each independently find a false mechanism claim in a
 report they inherited**, in a single round:
 
 | runner | report | the false claim |
@@ -572,8 +572,9 @@ report they inherited**, in a single round:
 | alpha | `func_80065AE0` | a padding local was said to also fix the callee-save store order "for free"; it does not — the same unfixed permutation is still there, compounded with an `arg`-copy deferral |
 | bravo | `func_8002B3F4` family | a prose description of "which side does what" disagreed with a fresh `objdump` read, and the mismatch was **hiding a real fix** |
 | charlie | `func_8004C470` | retail and built were **swapped** in the operand-order description |
+| echo | `func_80061778` | described as a flat tail merge; the retail bytes are a **nested two-level cross-jump** |
 
-Three in one round, found by three agents who did not talk to each other, is
+Four in one round, found by four agents who did not talk to each other, is
 not bad luck — it is the base rate for prose that nobody re-measures. Compare
 `docs/PARALLEL-RUNS.md`'s standing lesson that a claim about MACHINE STATE
 decays differently from a claim about the BINARY: a wrong score gets corrected
@@ -693,6 +694,34 @@ involved in either diverging word. That looks like a second class, currently at
 three instances across two units. It is recorded here as an OPEN observation,
 not a promoted class: nobody has yet found its discriminating test, and the
 lesson directly above says that is what would settle it.
+
+### "Tail merge" is an UMBRELLA, not a class — two shapes, and they do not transfer (round 20)
+
+Several reports label a residue "tail-merge". They are not all the same thing,
+and treating them as one costs attempts. echo was given two Entity-family
+functions filed under that label and asked what test would falsify "these are
+the same class". The answer is that they are **two distinct shapes under one
+umbrella mechanism (GCC's cross-jump pass)**:
+
+| function | shape | the question retail answers differently |
+| --- | --- | --- |
+| `func_8005DBF0` | single-level, whole-statement | merge **COUNT** — three identical predecessors, retail merges only two |
+| `func_80061778` | multi-level, partial-suffix | merge **DEPTH** — retail builds a two-level hierarchy of nested shared tails (a 6-word merge between two arms, with a 3-word suffix carved out and shared with a third, differently-set-up arm) |
+
+**The falsifying test, run:** neither lever transfers. The type-retype that the
+`func_8005E160`/`slotC4` precedent suggests has no applicable target in
+`func_80061778` (no discarded-return call anywhere in its merge chains), and
+the nesting nudge has no equivalent shape in `func_8005DBF0` (nothing
+hierarchical about a flat three-way merge onto one instruction). Both were
+tried and both regressed.
+
+**So: check a third instance against WHICH of these two shapes it matches
+before inheriting either report's attempt history.** Count-vs-depth is the
+discriminator, and it is readable straight off the disassembly.
+
+Note also that `func_80061778`'s own report described its merge as flat; the
+retail bytes are the nested two-level structure above. That is the fourth
+inherited-prose correction of the round — see the entry on that above.
 
 ### The two-independently-live-locals lever, and the discriminator that predicts it (round 20)
 
