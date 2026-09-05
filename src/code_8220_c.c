@@ -392,6 +392,11 @@ void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
 }
 
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A4C0);
+void func_8001A4C0(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+                   PolyUV4 *uv2, PolyUV4 *uv3) {
+    func_8001A3EC(dst, src, uv0, uv1, uv2);
+    dst[3]->xy = src[3]->xy;
+    dst[3]->uv = *uv3;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A54C);

@@ -214,10 +214,12 @@ extern u8 D_8008ACD0[];
  * referenced the same way by func_80019B24 (code_8220_c, round 13). */
 extern u8 D_8008AEE8[];
 
-/* Unaligned struct-field copy helper (quad flavor: 4 fields, not 3),
- * code_8220_c round 13. STALLED -- see docs/match-reports/func_8001A4C0.md,
- * declared here only so its caller func_80019B24 can compile. */
-extern void func_8001A4C0(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5);
+/* Unaligned struct-field copy helper (quad flavor: 4 fields, not 3).
+ * Extends func_8001A3EC to a 4th vertex: forwards elements 0-2 to it
+ * unchanged, then does its own dst[3]->xy = src[3]->xy / dst[3]->uv = *uv3
+ * (round 20). */
+extern void func_8001A4C0(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+                          PolyUV4 *uv2, PolyUV4 *uv3);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf4.s, not a carved C unit). Called by
  * func_80019B24 (code_8220_c) with (self, table) -- quad-flavored sibling
