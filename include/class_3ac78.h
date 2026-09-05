@@ -36,16 +36,20 @@ struct UnkSlotEntry_3ac78 {
     UnkSlotChildObj_3ac78 *unk4;
     UnkSlotListObj_3ac78 *unk8;
     GenericObject *unkC;             /* func_8004A7C0: refreshed (discarded) through ->methods->unk04 when non-NULL */
-    /* RETYPED this round (func_8004B100) from `GenericObject **` (func_8004A7C0's
+    /* RETYPED from `GenericObject **` (func_8004A7C0's earlier,
      * still-unconfirmed, INCLUDE_ASM-only comment) to `Class866E8 **`: a 2D
      * grid of pointers, row stride 20 cells (0x50 bytes), each cell holding
      * ANOTHER Class866E8 instance -- func_8004B100 forwards a cell's value
      * straight into func_8004B2D4, which dereferences `self->flags36`
      * (a genuine Class866E8 field, +0x036), and walks a `->unk38` chain off
-     * the SAME pointer (also added to Class866E8 this round). Safe: this
-     * comment was evidence-only, never compiled (func_8004A7C0 is still
-     * INCLUDE_ASM). */
-    Class866E8 **unk10;              /* func_8004B100: 2D grid, row stride 20 cells. func_8004A534 (ctor): allocates 0x668 raw bytes (func_80017B34) and fills it with pointers built in an inner loop, before this field's grid-of-Class866E8 reading was established */
+     * the SAME pointer (also added to Class866E8 this round). func_8004A7C0
+     * (round 19, MATCHED, 113/113) confirms the field is also walked as a
+     * flat 0x668-byte array of 4-byte cells there -- its teardown loop reads
+     * each cell generically through `GenericObject`'s shared `methods->unk04`
+     * base-class slot, legitimate for a `Class866E8 *` element since
+     * `methods` sits at the same +0x000 offset either way; this does not
+     * contradict the 2D-grid-of-Class866E8 reading above. */
+    Class866E8 **unk10;              /* func_8004B100: 2D grid, row stride 20 cells. func_8004A534 (ctor): allocates 0x668 raw bytes (func_80017B34) and fills it with pointers built in an inner loop. func_8004A7C0 (dtor, MATCHED): walks the same 0x668-byte span tearing down each non-NULL cell, then frees it. */
     s32 unk14;                       /* func_8004A534 (ctor): zeroed */
     s32 unk18;                       /* func_8004A534 (ctor): zeroed */
 };
@@ -143,8 +147,9 @@ struct Vec3_3ac78 {
  * 0x1E8 bytes, gets the vtable via func_8004D244, calls ctor slot +0x008).
  * Vtable is D_800866E8 (80 slots, header 0x114), resolved with
  * tools/classtable.py D_800866E8. Ctor is func_8004A534 (177 words,
- * attempted this round -- see its match report) and dtor is func_8004A7C0
- * (128 words, still out of scope).
+ * MATCHED) and dtor is func_8004A7C0 (113 words, MATCHED round 19 --
+ * see its match report; mirrors the ctor's own per-slot teardown, one
+ * `unkEC[]` entry at a time).
  *
  * No FirecatFG name survives for this class (only anonymous func_ symbols
  * in the symbol file), so it is named by its vtable address, same
@@ -155,7 +160,7 @@ struct Class866E8Methods {
     /* +0x000 */ s32 header;
     /* +0x004 */ void *unk04;                                                   /* BasicClass__func_17eb0 */
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* func_8004A534; called by func_8004A4C8 */
-    /* +0x00C */ void *dtor;                                                    /* func_8004A7C0; not dispatched by this round's functions */
+    /* +0x00C */ void *dtor;                                                    /* func_8004A7C0 (MATCHED); not dispatched by any of this project's decompiled callers yet */
     /* +0x010 */ void (*slot10)(Class866E8 *self, s32 arg1);                    /* func_8004A534 (ctor); called with func_80020C5C()'s return, after the 7-entry unkEC[] init loop */
     /* +0x014 */ void (*slot14)(Class866E8 *self, void *arg1);                  /* func_8001CCB4; called by func_8004A7C0 */
     /* +0x018 */ u8 pad018[0x030 - 0x018];

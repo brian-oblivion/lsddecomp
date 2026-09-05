@@ -35,6 +35,7 @@ typedef struct BaseCtorTable_3ac78 BaseCtorTable_3ac78;
 struct BaseCtorTable_3ac78 {
     u8 pad0[0x8];
     void (*ctor)(void *self); /* +0x008, standard "further-base ctor first" slot */
+    void (*dtor)(void *self); /* +0x00C, func_8004A7C0: standard "further-base dtor" slot, mirroring ctor */
 };
 
 extern BaseCtorTable_3ac78 *func_800428E4(void);
@@ -42,6 +43,7 @@ extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
 extern GenericObject *func_8004D38C(void);
 extern s32 func_80020C5C(void);
+extern void func_80017CFC(void *arg1);
 extern Vec3_3ac78 D_8008682C;
 
 void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
@@ -123,7 +125,52 @@ void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     self->methods->slot40(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004A7C0);
+void func_8004A7C0(Class866E8 *self)
+{
+    s32 i;
+    UnkSlotEntry_3ac78 *entry;
+    GenericObject *obj;
+    Class866E8 **cellp;
+    u8 *p;
+    u8 *end;
+
+    self->methods->slot14(self, (void *)func_80020C5C());
+
+    for (i = 0; i < 7; i++) {
+        entry = &self->unkEC[i];
+        self->methods->slot88(self, 6, entry, i);
+
+        if (entry->unk4 != NULL) {
+            entry->unk4->methods->unk04(entry->unk4);
+        }
+
+        if (entry->unk8 != NULL) {
+            if (entry->unk8->unk2C != NULL) {
+                entry->unk8->unk2C->methods->unk04(entry->unk8->unk2C);
+            }
+            entry->unk8 = (UnkSlotListObj_3ac78 *)entry->unk8->methods->unk04(entry->unk8);
+        }
+
+        if (entry->unkC != NULL) {
+            entry->unkC->methods->unk04(entry->unkC);
+        }
+
+        cellp = entry->unk10;
+        end = (u8 *)cellp + 0x668;
+        p = (u8 *)cellp;
+        while (p < end) {
+            obj = *(GenericObject **)p;
+            if (obj != NULL) {
+                obj->methods->unk04(obj);
+            }
+            p += 4;
+        }
+
+        func_80017CFC(entry->unk10);
+    }
+
+    func_800428E4()->dtor(self);
+}
 
 /* MEASURED, round 9: func_8001E57C TAKES NO ARGUMENTS -- its body is
  * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` and it reads neither $a0 nor $a1
