@@ -392,6 +392,34 @@ void func_800662B4(Class65650 *self)
     self->unk90 = 0;
 }
 
+/* STALL -- see docs/match-reports/func_800662BC.md. Best reached: 17/33
+ * words in-range, residue is `count`'s load routing through $v0 instead
+ * of directly into its long-lived register. Restored to INCLUDE_ASM per
+ * project rule. */
+#if 0
+void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+{
+    void *acc;
+    u16 count;
+    u32 i;
+    u8 unused[8];
+
+    count = *(u16 *)((u8 *)hdr + 2);
+    acc = (u8 *)hdr + 8;
+    if (count != 0) {
+        s32 cont;
+
+        i = 1;
+        do {
+            acc = self->methods->slot138(self, acc, extra);
+            cont = i < count;
+            i++;
+        } while (cont);
+    }
+    return acc;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
 
 /* STALL -- see docs/match-reports/func_80066340.md. Best reached: 252/258
