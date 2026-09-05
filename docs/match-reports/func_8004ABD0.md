@@ -195,3 +195,83 @@ checking whether a source-level hint (the "reduce the increment's
 apparent independence to the scheduler" direction this report's own
 analysis suggests, still untried) could produce a more targeted future
 search than another blind 140K-iteration pass.
+
+## ROUND 20 (runner echo): lever transferability test plus two fresh C attempts, all negative
+
+**Per the coordinator's explicit instruction, no permuter search this
+round -- time spent entirely on the C.**
+
+**Lever transferability (the coordinator's cross-unit question):** this
+function's `entry = (u8 *)self + offset` recompute is the closest
+analogue in this unit to `func_80032BB8`'s `base`/`entry` split, but the
+lever does not map onto it the way it did there. `func_80032BB8`'s
+starting shape was a single expression built from a GLOBAL table
+(`D_8006DCB0[idx]`) that had never been given its own name; splitting the
+global reference out into its own `base` local is what created slack.
+Here, `self` is already a distinct, separately-named parameter (not a
+global folded into one expression), and the existing best body already
+combines `self`+`offset` as ONE statement, which is independently
+required (this report's own attempts 1-3 already show splitting THIS
+computation into a persisted/accumulated form regresses badly). There is
+no unnamed global or struct-base reference in this function's body to
+extract into a second independently-live local -- **the lever has
+nothing to apply to here; not tested for lack of an applicable shape**,
+which is itself the answer to the transferability question for this
+function specifically.
+
+**Two fresh structural ideas tried instead, re-derived from the raw
+disassembly (not resumed from the preserved body verbatim):**
+
+1. **Moved `offset += 0x1C;` into the `for` loop's own increment clause**
+   (`for (i = 0; i < 7; i++, offset += 0x1C)`), untried by any prior
+   attempt (1-6 all keep it as a body statement in various positions).
+   **Regressed hard: 0/74, 196263-byte drift.** GCC strength-reduced/
+   restructured this into a single incrementing-pointer shape (the same
+   failure mode already documented for attempt 3's plain accumulator-at-
+   loop-end placement) -- confirms the for-clause position is not a
+   free variant of the accumulator idea, it triggers the identical
+   collapse.
+2. **Removed the `check` local entirely**, reading
+   `entry->unk8->unk2C` three separate times inline (once for the test,
+   twice more for the refresh's LHS/RHS) instead of caching the loaded
+   value in a named variable at all -- on the theory that a genuinely
+   short-lived named local, rather than the increment's position, might
+   be what changes how eagerly the scheduler searches backward past it.
+   **Byte-identical to the existing 9/74 body, in every single word** --
+   confirmed via direct `objdump` diff of the two compiled `.o` outputs
+   line for line, not just the funcdiff score. This is a clean negative
+   on a genuinely new axis: the named intermediate `check` is not what
+   licenses the backward hoist; removing it changes nothing at all.
+
+**Confirmed independently (via `objdump` on the actual compiled object,
+not just inference from the report's prose) that the hoist is real and
+exactly as described:** the increment lands in `slot74`'s own `jalr`
+delay slot (`798: jalr v0` / `79c: addiu s3,s3,0x1c`), 13 instructions
+and one full `jalr` call earlier than its written position, while
+retail's OWN slot74 delay slot is a genuine `nop` and the increment sits
+in the `beqz`'s delay slot instead -- exactly where the C statement is
+textually written. GCC 2.6.3's backward delay-slot search is reaching
+across an entire unrelated call to grab an available, dependency-free
+instruction that retail's own build did not have available at that
+point (or chose not to take), and neither changing where the increment
+is worded, how it's computed (accumulator vs. for-clause), nor whether
+its consumer is cached in a named local moves that choice.
+
+**Disposition unchanged: STALL at 9/74, `INCLUDE_ASM` restored.** No new
+lever found this round; the residue remains a pure GCC-internal
+delay-slot-fill preference with, per this round's and the prior round's
+combined evidence (6 manual attempts, 2 barrier placements, 1 permuter
+pass at 140,928 iterations, and now 2 more fresh structural axes this
+round), no known C-level control.
+
+### Proposed learning
+
+**A named intermediate local's PRESENCE OR ABSENCE is not, by itself, a
+lever against a backward delay-slot hoist** -- removing `check` entirely
+(reading its source expression three times inline instead) produced a
+byte-IDENTICAL compiled object to keeping it as a local, confirmed via
+direct object-file diff. This narrows the search space for whoever
+revisits this residue: the scheduler's choice of WHICH instruction fills
+`slot74`'s delay slot does not depend on how the later-consumed value is
+named or cached, only on its (in this case, real) independence from
+everything between its natural position and the earlier call.
