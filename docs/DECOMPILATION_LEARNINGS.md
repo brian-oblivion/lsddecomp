@@ -287,12 +287,25 @@ The two overturns, both by ordinary C:
   `char` closed the whole function. Nothing was ever a rotation of independent
   values; one wrong type cascaded into a register-shaped appearance across the
   entire body.
-- **`func_8004042C` (25 words, now 1 residue word).** Filed as a whole-function
-  register-bank swap (`self`/`a1` -> `$a3`/`$t0`), with its report explicitly
-  recording that the permuter was never tried *because of* that filing.
-  Rewriting a field-copy pair as one whole-struct assignment fixed a real
-  structural defect **and** flipped `self`'s allocation to `$a3` to match
+- **`func_8004042C` (25 words, now 22/25 — see the correction below).** Filed as
+  a whole-function register-bank swap (`self`/`a1` -> `$a3`/`$t0`), with its
+  report explicitly recording that the permuter was never tried *because of*
+  that filing. Rewriting a field-copy pair as one whole-struct assignment fixed
+  a real structural defect **and** flipped `self`'s allocation to `$a3` to match
   retail.
+
+  **CORRECTION (round 19): this entry originally read "now 1 residue word" and
+  that figure was wrong.** It came from reading the permuter's weighted penalty
+  score (210 = 2 register-diffs x5 + 1 insertion x100 + 1 deletion x100) as a
+  word count. Rebuilt against the real oracle the body is **22/25 — three wrong
+  words.** The missing `move $t0,$a1` is one missing *instruction*, but its
+  absence forces two downstream loads to read `$a1` instead of `$t0`. A
+  single-instruction cause is not a single-word residue. The wrong figure
+  propagated from the function's own report title into PROGRESS, into round
+  19's staffing, and back to a runner as an instruction to "close the one
+  remaining word" before anyone rebuilt it. See "A permuter number is in
+  PERMUTER units, not retail words" below. The function is now
+  permuter-exhausted across two independent searches (28k + 48k iterations).
 
 **The mechanism to internalise: a wrong TYPE produces register-shaped
 symptoms.** Signedness, width, and a parameter's declared type all change
@@ -340,6 +353,44 @@ Axes that DID close register-shaped residues in round 18, none of them exotic:
 Confirmed INERT for this class, so do not spend attempts on it: **declaration
 and introduction ORDER**, across 3 functions and 9 attempts, byte-identical
 every time.
+
+#### Round 19 confirmed the class and added four more mechanisms
+
+A second full round against this corpus (5 runners, 67 blocker-clean
+register-shaped functions) closed **17** functions. The verdict remains the
+least reliable in the corpus, and the list of things that hide behind it is now:
+
+- **A missing field-offset term.** `func_80040C00` (matched 52/52) was filed for
+  rounds as a same-length "register permutation from word 1". The body was
+  simply missing a `+ self->unkAC`. A wrong *value* looks exactly like a wrong
+  *register*.
+- **A statement-order swap between two independent stores.** `func_80066214`
+  (matched 37/37) — swapping two unrelated stores freed the register retail
+  needed and closed a 23-word gap. No barrier required.
+- **A stale helper signature.** `func_8004A7C0` (matched 113/113) — the
+  inherited body used no-argument declarations for two helpers that an
+  already-matched sibling constructor had since corrected. **Check what matched
+  siblings in the unit already do before re-deriving anything**; echo closed
+  most of this function by adopting the sibling ctor's own pointer-walk idiom.
+- **A cross-call cached local masquerading as register-file SATURATION.**
+  `func_8003D73C` — removing one took it from 9 registers (saturated-plus-one)
+  to retail's exact 8-register file, 144 of 145 words. It did not close, but the
+  *saturation* verdict dissolved entirely. If a report blames a saturated
+  register file, look here first.
+
+Also worth carrying: a **misread of GCC's own scheduling as source order**.
+`func_80058228` (matched 56/56) had a preserved body writing three colour-field
+decrements as `r, b, g`, on the theory that retail's write pattern demanded it.
+That apparent order is GCC interleaving three independent byte operations; the
+plain declared order `r, g, b` reproduces retail. Same family of error as
+reading a permuter bucket label as a word count — **a compiler artifact is not
+evidence about the source.**
+
+Genuine register rotations do exist and several were re-confirmed this round
+(`func_8004BB3C` at 7 registers — not saturated; `func_8004CAF0` narrowed to a
+clean 3-register rotation; `func_80066340` a clean 3-instruction rotation with
+`Register Differences: 0`). The class is real. It is just heavily contaminated,
+and every contaminant so far has been ordinary C.
 
 ### A near-miss word count describes WORD COUNT, not the number of divergences (round 18)
 
@@ -403,6 +454,323 @@ identically** — round 17 tried both, six attempts. The un-flattened nested-gua
 form does not fold at all. The test going forward: if a trailing boolean return
 sits inside an `if` that also guards other retail-required control flow, try the
 nested form before concluding the fold is unavoidable.
+
+
+### An oversized outgoing-arg frame is EVIDENCE OF DEAD CODE in the original source (round 19)
+
+**GCC 2.6.3 sizes the outgoing-argument area from every call expression's
+argument count during RTL expansion — BEFORE dead-code elimination removes an
+unreachable branch.** So a call inside `if (0) { ... }` emits zero instructions
+and still enlarges the frame.
+
+Found by echo closing `func_8001EE98` (**31/31**) after the head reframed a
+stalled measurement. Retail reserved `0x18` (24 bytes = six words) where the
+o32 minimum is `0x10`, with exactly one surviving `jal` to a callee that uses
+only `a0`/`a1`/`a2`, and **nothing ever written or read in those 24 bytes**. The
+reproducing source is an unprototyped `func_80015618()` called with three live
+arguments in a loop, plus a **dead six-argument call** to it inside `if (0)`.
+
+**This makes an unexplained frame size a readable signal rather than a dead
+end.** The reasoning chain, in the order to apply it:
+
+1. Compute the outgoing area = lowest saved-register offset (`sw $sN/$ra`).
+   Anything above `0x10` is non-minimal.
+2. Grep every `$sp` access. If nothing touches the region, it is outgoing-arg
+   reservation, not locals.
+3. `outgoing / 4` is the argument count of the **widest call expression the
+   compiler saw** — not necessarily one that survives in the disassembly.
+4. If no visible `jal` needs that many arguments, the missing width belonged to
+   a call that was compiled away.
+
+**Do not over-fit to `if (0)`.** That is the shape that reproduced here; any
+construct the optimiser folds away after RTL expansion has the same effect. What
+is established is the *ordering* (frame sizing precedes DCE), not one spelling
+of dead code.
+
+**A caution the same round supplies:** echo checked `func_80065AE0`, which has
+the same numeric signature, and reports its frame is already correctly sized
+with a parameter-copy *timing* residue instead. So the signature is a
+**screening** signal, not a verdict — the same status as the register-shaped
+census. Confirm per function.
+
+#### The live census (2026-09-05, 222 queued)
+
+Functions whose outgoing-arg area exceeds `0x10` with **nothing ever stored or
+loaded in it**. Re-derive rather than trusting this table — it goes stale as
+functions match:
+
+| `jal` | outgoing | frame | unit / function | blocker screen |
+| --- | --- | --- | --- | --- |
+| **0** | 0x18 | 0x30 | `code_55dd4/func_80065A5C` | CLEAN |
+| **0** | 0x18 | 0x30 | `code_55dd4/func_800662BC` | CLEAN |
+| 1 | 0x18 | 0x20 | `code_4cd08/func_8005C8AC` | gp_rel, addiu_at |
+| 1 | 0x18 | 0x30 | `code_55dd4/func_80065AE0` | CLEAN (echo: not this class) |
+| 1 | 0x18 | 0x38 | `class_3bb8c/func_8004BB3C` | CLEAN |
+| 2 | 0x14 | 0x38 | `code_4cd08/func_8005C508` | addiu_at |
+| 3 | 0x20 | 0x30 | `DreamSys/func_8005A82C` | CLEAN |
+| 4 | 0x20 | 0x30 | `DreamSys/func_8005A9CC` | addiu_at |
+| 4 | 0x30 | 0x38 | `code_179d8_e/func_8002C6FC` | gp_rel |
+| 4 | 0x820 | 0x838 | `code_179d8_h/func_80028A84` | CLEAN |
+| 7 | 0x30 | 0x40 | `class_3bb8c_e/func_8004EA38` | CLEAN |
+| 9 | 0x18 | 0x38 | `class_3bb8c_j/func_80051AC8` | CLEAN |
+| 10 | 0x30 | 0x40 | `code_179d8_e/func_8002C4E0` | gp_rel |
+| 12 | 0x30 | 0x58 | `class_3bb8c_f/func_8004EF6C` | CLEAN |
+
+**The two `0`-`jal` rows are the strongest leads in the table and should be
+worked first: a function that makes no calls at all cannot justify ANY outgoing
+area from live code**, so the entire `0x18` is unexplained. Both are
+blocker-clean and both are small.
+
+`func_80028A84`'s `0x820` is a different animal — that is a ~2KB stack buffer,
+almost certainly a real local array the screen mis-classifies because it is
+addressed through a register rather than a literal `$sp` offset. Listed for
+completeness, not as a candidate.
+
+Regenerate with the script in `docs/match-reports/func_8001EE98.md`.
+
+### Aggregate assignment vs scalar field-copy, and the rule that predicts which helps (round 19)
+
+**Whole-struct/aggregate assignment and field-by-field scalar copy are not
+interchangeable to GCC 2.6.3.** Writing a run of adjacent field copies as one
+aggregate assignment closed **seven functions across three unit families** in
+one round. It is the single highest-yield source-shape lever the project has
+found.
+
+But the round also measured where it does NOT help, from four independent
+directions, and the negatives are what make it usable:
+
+| runner | unit family | candidate | result |
+| --- | --- | --- | --- |
+| alpha | `code_2cc8c_f`/`code_2cc8c` | five, incl. a 3-byte RGB struct | **closed 5** |
+| delta | `DreamSys` | 3-word out-parameter copy, 9 instructions vs retail's 6 | **closed 1** |
+| echo | `code_55dd4` | `arr18` -> three contiguous same-type `s32`s, via a wrapper struct | **identical score, no movement** |
+| delta | `code_8220_c` | the OT-splice family's `u16` tail copies | **no movement, with a mechanism** |
+| charlie | `code_179d8_*` | none — shape absent from the units | n/a |
+
+**The predictive rule, from delta's mechanism rather than from the tally:**
+
+> The lever helps when the address being copied through is a **genuinely
+> runtime-only value that resists constant folding** — a second pointer, an
+> array index, an out-parameter. It does nothing when the address is a
+> **compile-time-constant `self + literal`**, because that folds to the same
+> single instruction however you spell it, leaving nothing for the scheduler's
+> delay-slot filler pass to hoist.
+
+Echo's negative fits the same rule from the other side: a naturally-aligned run
+of same-type `s32`s already compiles optimally as scalars, so there is no
+suboptimality for the aggregate form to fix. Restated as a screen: **try it
+where the natural scalar compile is not already optimal (padded, odd-sized, or
+runtime-addressed aggregates); do not try it on naturally-aligned same-type runs
+at constant offsets.**
+
+Delta closed the obvious escape route on the `code_8220_c` family too: making
+the offset runtime-valued would mean writing the tail copies as a loop, and
+retail's own disassembly shows them manually unrolled and branch-free on every
+sibling. So that family is not a candidate at all, rather than a candidate that
+failed.
+
+Two extensions worth keeping:
+
+- It applies to an **out-parameter**, not only to a struct-to-struct copy
+  (delta, `func_8005942C`): `*(Vec3 *)out = *(Vec3 *)local;` replaced a 3-word
+  element copy and removed a 3-word overshoot. The idiom had previously been
+  written down only as "whole-struct assignment for a block copy".
+- Arrays are not assignable in C89, so an array-shaped candidate needs a
+  wrapper struct to test — echo did this correctly and it is the right way to
+  get a clean negative rather than a false one.
+
+**Scope honesty:** alpha declined to claim beyond `code_2cc8c`-descended units
+from its own evidence, which was right at the time. The promotion above rests on
+delta reaching the same idiom independently in `DreamSys` — a different unit,
+different class, different route — which is what two independent families buys
+that five siblings in one do not.
+
+
+### `do { } while (0)` wrapping is a SMALL-BODY lever, and round 19 narrowed it (round 19)
+
+Confirmed load-bearing for delay-slot scheduling a third time (alpha,
+`func_80040854`, 19/19). **But two confirmed negatives the same round show it
+actively REGRESSES larger functions containing loops or branches** (alpha,
+`func_8003DAD4` and `func_8003E4B8`).
+
+This NARROWS an existing learning rather than broadening it. Reach for it on a
+small straight-line body; do not reach for it on a big one. A third data point
+in the same direction from charlie: barrier/wrapper placement is
+**non-monotonic** — moving a barrier one statement can go from 30/33 to 5/33
+*with drift*, so "closer to the residue" is not a gradient you can climb.
+
+
+### A preserved body's "clean / drift-free" claim must be RE-VERIFIED, not inherited (round 19)
+
+**Five preserved stall bodies out of roughly thirty checked carried a
+word-count claim that was false**, found independently by three runners in three
+unit families:
+
+- `func_80059BE0` — report said "clean (drift-free) build" at 45/79; the body
+  compiles to **81 words, 2 longer** than retail's 79.
+- `func_80063144` — "divergence #2" described as a zero-cost pure reordering; it
+  is **1 word longer**. A net insertion.
+- `func_80040C00` — report said "correct total length, no outside-range
+  warning"; the literal body compiles to **4/52 with 191204 bytes of drift**.
+  Alpha closed the function anyway, but only because it re-derived from
+  `objdump` instead of trusting the report.
+
+**The mechanism, and the part that generalises: a permuter `--debug` bucket
+label such as `"Reorderings: 2"` names the SCORER'S INTERNAL EDIT-DISTANCE
+OPERATION. It says nothing about word count against retail.** Two of the three
+false claims trace directly to reading a bucket label as a size guarantee.
+
+Once a body drifts, its in-range `funcdiff` score is meaningless — that is
+CLAUDE.md's third way a score lies, arriving through an *inherited* body rather
+than through your own edit, which is why the usual discipline does not catch it.
+
+**The check, before building on any preserved body** (delta's wording, and it
+is seconds):
+
+```sh
+# paste the preserved body in, build, then BOTH of:
+.venv/bin/python3 tools/funcdiff.py <fn>     # non-zero OUTSIDE-range count == drift
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/.../<unit>.o   # literal word count
+# compare against the .s header's own declared size, e.g. `nonmatching func_X, 0x4C`
+```
+
+A trustworthy answer is: outside-range count zero, **and** the word count equal
+to the `.s`'s declared size. If either fails, the recorded in-range score is not
+a starting point and the residue the report describes is not the real residue.
+
+**Run it on bodies you actually resume, not as a sweep.** The other twenty-five
+checked clean, so this is a real hazard at roughly one in six, not a reason to
+distrust the corpus.
+
+
+### A permuter zero is validated in ISOLATION and cannot see cross-TU damage (round 19)
+
+Charlie found a **genuine zero** on `func_8002B3F4` — and rejected it. Reaching
+zero required declaring a shared global `volatile`, which shifted a neighbouring
+symbol's linked address and **corrupted an already-matched sibling**
+(`func_8002A510`).
+
+The permuter scores the target function compiled in isolation. It has no view of
+the link, so a change that is locally perfect and globally destructive scores as
+a win. This is a distinct failure from the known "a permuter score drop is a
+LEAD, not a RESULT" rule: there the local score was misleading about the same
+function; here the local score was *correct* about the target and wrong about the
+image.
+
+**So a zero earns the same whole-image oracle run as anything else**, and
+specifically: any candidate that retypes, qualifies, or moves a symbol with
+external linkage must be checked against `./build-and-verify.sh`, not just
+`funcdiff` on the target.
+
+Related, from echo: **a permuter run that never improves off the base score even
+once is a stronger negative than the usual partial improvement** — 122K
+iterations flat on `func_8004B100` says something different from 122K iterations
+that wandered.
+
+
+### Tooling defects found in round 19 (all measured, none worked around)
+
+- **`tools/setup-permuter.sh`'s scaffold validation runs the seed through the
+  real `cc1`, which cannot parse `PERM_GENERAL`/`PERM_VAR`.** So the guided-PERM
+  approach that several match reports recommend as a next step is **not usable
+  through this project's harness as written**. Alpha hit this; the
+  recommendation is stale in every report that carries it.
+- **Permuter scaffolds disagree with the real in-context build, three times now,
+  all inside `class_3bb8c.h`.** `func_8004BB3C`'s scaffold reports base 460 with
+  2 insertions/2 deletions against a residue that has none, because the isolated
+  single-function compile schedules a pointer computation early where the real
+  build defers it past a `blez` guard. Bravo hit two more. Possibly systemic to
+  that class's register pressure. **Before spending a search, check the
+  scaffold's base score agrees with `funcdiff`'s residue** — if it does not, the
+  scaffold is scoring a different problem and its results will not transfer.
+- **`make clean` + re-extract desync.** Extracting `asm/` while a `src/` file
+  still holds a non-`INCLUDE_ASM` body leaves that function's `.s` missing and
+  hard-fails the next revert. Restore the `INCLUDE_ASM` *before* re-extracting.
+- **The `block-raw-make.py` hook blocks a REDIRECTED `make extract`**, which it
+  advertises as allowed, because its `SEPARATORS` set omits redirection
+  operators — so `>` and the log path are parsed as make *targets*. Bare and
+  piped forms work. It also blocks writing prose about itself via a shell
+  heredoc, since a heredoc body is command position to the tokeniser. Round 18
+  escalated this as an unexplained per-checkout difference; it is neither
+  unexplained nor per-checkout. **Guardrail change = operator's call.**
+
+### A permuter number is in PERMUTER units, not retail words — three distinct misreadings in one round (round 19)
+
+Put this next to the drift check, because it is the same failure wearing three
+different costumes and it produced the round's only wrong *published* figures.
+Every one of these numbers is printed by the permuter, looks like a measurement
+of the function, and is not a word count against retail:
+
+| what was read | what it actually is | cost |
+| --- | --- | --- |
+| `"Reorderings: 2"` | a **bucket label** naming the scorer's internal edit-distance operation | `func_80063144`'s "zero-cost pure reordering" was a net **+1 word** insertion |
+| `210` (a base score) | a **weighted penalty**: 2 register-diffs x5 + 1 insertion x100 + 1 deletion x100 | `func_8004042C` was published as **"1 word remaining"** when it is 22/25, i.e. **3** |
+| `Stack Differences: 0` without `--stack-diffs` | a field that was **never filled in** | `func_80065AE0` scored a false **zero** on an 8-byte frame overshoot (round 18) |
+
+**The `func_8004042C` case is the one to internalise, because the arithmetic is
+seductive.** One missing `move $t0,$a1` really is one missing instruction — so
+"one word" reads as a faithful translation of the diff. It is not: the absent
+`move` forces two downstream loads to read `$a1` instead of `$t0`, so the byte
+comparison shows **three** wrong words. A single-instruction *cause* is not a
+single-word *residue*, and nothing in the permuter's output distinguishes them.
+
+That figure propagated from the report's title line into `PROGRESS.md`, into the
+round-19 assignment built from it, and back to the runner as an instruction to
+"close the one remaining word" — **three consumers, none of whom could have
+caught it without rebuilding the body.** Alpha rebuilt it and corrected the
+title, the prose, and every downstream claim.
+
+**The rule: a permuter number is only ever a LEAD about a direction. The only
+statements about word count come from `funcdiff.py` and `objdump` against a real
+build.** When you write a score into a report's verdict line, write where it came
+from.
+
+**And a corollary for whoever ranks the queue** (a head job): build the Gate 1b
+ranking from report **title/verdict lines only**, never from figures parsed out
+of report bodies. Round 18 wrote this down after conflating a caller's score with
+its callee's; round 19's head did it anyway and pulled `func_80032BB8`'s "0/14"
+out of a sentence comparing a **rejected** variant — the real residue is 7/14, as
+charlie established and corrected. The guidance as round 18 phrased it ("treat
+figures near correction/superseded wording as retracted") is necessary but not
+sufficient, because this figure sat in an ordinary attempt narrative with no
+warning keyword anywhere near it. Only the title line is safe, and it is safe
+only once someone has verified it — which is what this section is about.
+
+### "Unscoreable" describes a SESSION's state, not a function's — compile a salvaged body as-is FIRST (round 19)
+
+Two independent instances in one round, both of bodies recovered under
+PARALLEL-RUNS 4c from runners killed mid-function:
+
+- **`func_8005942C`** (delta) — filed as a mid-attempt snapshot at 19/56 with
+  **140723 bytes of outside-range drift**, explicitly labelled "far from
+  correct, not a near-miss", and carrying a note that the region needed naming
+  in `include/` before it was worth retrying. Delta **matched it 56/56.** The
+  control flow was already correct; it had three separable expression-shape
+  bugs.
+- **`func_8002AA6C`** (charlie) — no score had **ever** been recorded, because
+  no author survived long enough to run the oracle on it. Charlie compiled the
+  salvaged body unchanged, with no reshaping at all, and got **119/223, one
+  instruction short.**
+
+**The rule: before reshaping a salvaged body, compile it exactly as it is and
+take a number.** A 4c salvage carries no stop rule, so its recorded state
+reflects where a session was interrupted, not where the function resists. The
+head's own 4c procedure already says to score a rescued body — these two cases
+show the score is not just bookkeeping for a future round, it is frequently the
+cheapest match available *right now*.
+
+**Why this is easy to get backwards:** a mid-attempt snapshot's paperwork looks
+exactly like a well-worked stall's — preserved body, a score, prose about what
+is wrong — so it inherits the authority of a considered plateau it never earned.
+`func_8005942C`'s own report said the right thing ("this is not a considered
+plateau") and it still read as discouraging, because the accompanying number was
+terrible. The number was terrible because nobody had finished the work, which is
+the one reading the number cannot convey.
+
+Corollary for whoever writes a 4c salvage report: say **"no stop rule was
+applied"** in the verdict line, not only in the body, and put the drift figure
+next to the score so the next reader can see the in-range number is meaningless
+rather than merely bad.
 
 
 ### How to read a one-instruction residue (round 8, three stalls closed by it)

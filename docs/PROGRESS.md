@@ -6,6 +6,287 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-05 — round 19: 17 matches, the last fresh function, and a frame size that reads dead code
+
+**930 -> 947 matched (68.58% -> 69.84% of game code). Build green in main after
+every one of the round's 10 merges, and every claimed match re-verified
+INDIVIDUALLY after its merge.** Gate 1 was dry (`fresh` = 1 of 239), Gate 2's
+carve was **rejected on measurement**, so this was a second Gate 1b round
+against the register-shaped near-miss corpus. `fresh` is now **0** and
+`stalled` equals `queued` exactly (222 = 222): every queued function in the
+project has a report.
+
+| runner | units | passes | matched | end state |
+| --- | --- | --- | --- | --- |
+| alpha | `code_2cc8c_e/_f/_b/_c`, `code_2cc8c` | 2 | 8 | reported cleanly |
+| bravo | `class_3bb8c_b/_j/_l`, `class_3bb8c` | 1 | 1 | reported cleanly |
+| charlie | `code_179d8_b/_c/_d/_f/_g` | 2 | 0 | reported cleanly |
+| delta | `Entity_e/_g`, `DreamSys`, `class_3bb8c_p`, then `code_8220_c`, then `class_3bb8c_t` | 4 | 5 | reported cleanly |
+| echo | `code_d294_b/_c`, `code_55dd4`, `class_3ac78`, `class_3bb8c_e` | 2 | 4 | reported cleanly |
+
+All five reported cleanly for the second round running. **Cross-runner header
+contention was zero across all 10 merges** — units were grouped so each project
+header had exactly one owner, and `headercontention.py` was run on the plan
+before provisioning.
+
+### Gate 2 was rejected on measurement, and here is the measurement
+
+Four-screen census over all **187** uncarved game functions: **46 clean.**
+`code_179d8_mid_c` (51 funcs, 17 clean) and `code_179d8_tail` (36, 10) are
+`addiu_at`-saturated; `code_179d8` (43, 9) is `gp_rel`-saturated;
+`class_3bb8c_h` (17, 2) is 11 BIOS trampolines, confirming round 17. The
+best-density segment, `class_3bb8c_s` at 5 of 10, is too small to staff. No
+20-function window approaches what round 16 carved.
+
+Method note, since Gate 2 warns every written census goes stale by being acted
+on: this one split each monolithic `asm/*.s` at `^glabel` into per-function
+files and ran the **documented shell greps verbatim** against each, rather than
+re-expressing the `nop_mflo_mfhi` window in Python. That reimplementation has
+now been inverted three times by three heads; shelling out costs nothing and
+cannot invert.
+
+### The round's finding: an oversized outgoing-arg frame reads DEAD CODE
+
+**GCC 2.6.3 sizes the outgoing-argument area from every call expression's
+argument count during RTL expansion — BEFORE dead-code elimination.** A call
+inside `if (0)` emits zero instructions and still enlarges the frame.
+
+Echo closed `func_8001EE98` (**31/31**) on this. Retail reserved `0x18` (six
+words) against an o32 minimum of `0x10`, with one surviving `jal` to a callee
+using only `a0`/`a1`/`a2`, and nothing ever written or read in those 24 bytes.
+The reproducing source is an unprototyped `func_80015618()` called with three
+live arguments plus a **dead six-argument call** to it inside `if (0)`.
+
+**How it was reached is the process point.** Echo filed this as an unexplained
+gap after building a reproducer proving a 3-argument call cannot reach 24
+bytes. That reproducer was sound and its conclusion correct — but it tested the
+hypothesis already known to be false, so it could not discriminate. The head
+re-read the frame, confirmed the 24 bytes are untouched, observed that 24 is
+*six words*, and handed back the six-argument hypothesis. That is the "verify
+the reasoning, not just the score" job paying off; the runner had done all the
+hard measurement and was one framing away.
+
+A **census of the signature is now in DECOMPILATION_LEARNINGS**: 14 live
+functions reserve more than `0x10` of outgoing-arg space that nothing ever
+touches, 8 of them blocker-clean. **Two — `func_80065A5C` and `func_800662BC`,
+both `code_55dd4`, both small and clean — have ZERO `jal` instructions**, so no
+live call can justify any outgoing area at all. Those are the strongest leads
+the project currently has.
+
+It is a screening signal, not a verdict: echo checked `func_80065AE0`, which
+has the same numeric signature, and found a parameter-copy timing residue
+instead.
+
+### The aggregate-assignment lever, and how it got bounded
+
+Alpha closed **five** functions with one idiom — whole-struct/aggregate
+assignment instead of scalar field-by-field copy, not interchangeable to GCC
+2.6.3 even for a 3-byte struct. It was broadcast mid-round **with its boundary
+stated**, because all five closures were siblings in one unit family and round
+18's head had over-promoted a lever on a single success.
+
+Every runner was asked for the **negative**, and all four answered:
+
+- **delta** hit the same idiom independently in `DreamSys` (a 3-word
+  out-parameter copy, 9 instructions vs retail's 6) — a second family, which is
+  what promoted it from lead to learning, and an out-parameter variant that
+  widens it past the "block copy in a loop" framing.
+- **echo** found a real candidate in `code_55dd4`, tested it via a wrapper
+  struct (arrays are not assignable in C89), and got **identical score, no
+  movement**.
+- **charlie** reported the shape absent from its units, with the two candidates
+  named.
+- **delta again**, on `code_8220_c`, produced not just a negative but a
+  **mechanism**: the filler's operand is a compile-time-constant `self +
+  literal`, which folds to the same instruction however it is spelled, leaving
+  nothing for the delay-slot filler pass to hoist — and retail's own
+  disassembly shows the tail copies manually unrolled, so making the offset
+  runtime-valued is not available.
+
+That yields a **predictive rule** rather than a list of exceptions: the lever
+helps where the address is a genuinely runtime-only value that resists constant
+folding, and does nothing where the compiler folds it anyway or where a
+naturally-aligned same-type run already compiles optimally. Asking for the
+negative is what produced this; the tally alone would have said "5 for 7".
+
+### A permuter number is in PERMUTER units — three misreadings, one root cause
+
+Three different permuter outputs were read as word counts, across two rounds:
+
+| read as a word count | actually |
+| --- | --- |
+| `"Reorderings: 2"` | a bucket label for the scorer's internal edit-distance op |
+| base score `210` | a weighted penalty (2 reg-diffs x5 + 1 ins x100 + 1 del x100) |
+| `Stack Differences: 0` without `--stack-diffs` | a field never filled in |
+
+**`func_8004042C` is the expensive one.** Its report title said "closed to ONE
+isolated word". Alpha rebuilt it: **22/25 — three words.** The missing `move
+$t0,$a1` is one missing *instruction*, but its absence forces two downstream
+loads to read the wrong register. A single-instruction cause is not a
+single-word residue. That figure had propagated from the report title into
+round 18's PROGRESS, into round 19's staffing, and back to alpha as an
+instruction to close "the one remaining word" — **three consumers, none of whom
+could have caught it without rebuilding.** Alpha corrected the title and every
+downstream claim, and reconfirmed permuter-exhausted over two searches.
+
+### Preserved-body drift: five wrong out of ~thirty, found by three runners
+
+Delta found two reports claiming "clean / drift-free" bodies that compile 2 and
+1 words longer than retail. Broadcast mid-round; alpha independently found a
+third (`func_80040C00`, claimed clean, actually 4/52 with 191204 bytes of
+drift) and closed the function only because it re-derived from `objdump`.
+Charlie and echo then verified ~20 more bodies as sound.
+
+So the hazard is real at roughly **one in six** and now bounded rather than
+alarming. The standing check is in DECOMPILATION_LEARNINGS in delta's own
+wording.
+
+### "Unscoreable" describes a SESSION's state, not a function's
+
+Two 4c-salvaged bodies, both from runners killed mid-function:
+
+- `func_8005942C` — filed at 19/56 with **140723 bytes of drift**, labelled
+  "far from correct, not a near-miss". Delta **matched it 56/56**; the control
+  flow was already right and it had three separable expression-shape bugs.
+- `func_8002AA6C` — **never scored at all**, because no author survived to run
+  the oracle. Charlie compiled it unchanged and got **119/223, one instruction
+  short.**
+
+Before reshaping a salvaged body, compile it as-is and take a number. A
+salvage's paperwork looks exactly like a well-worked stall's, so it inherits
+authority it never earned.
+
+### Charlie: zero matches, and the discipline of the round
+
+Charlie found a **genuine permuter zero** on `func_8002B3F4` and **rejected
+it** — closing it required a `volatile` global that shifted a neighbouring
+symbol's linked address and corrupted an already-matched sibling. A permuter
+scores the target in isolation and has no view of the link, so a change that is
+locally perfect and globally destructive scores as a win.
+
+Charlie later distinguished the two cases that look identical in source:
+`volatile` on a *global's declaration* (moves symbols, dangerous) versus on a
+*local pointer dereferencing it* (safe, and the lever that took `func_8002B4D4`
+17/91 -> 34/91). Its second pass, moved deliberately off the register-shaped
+set to a different residue class, produced `func_8002A75C` **58/196 -> 171/196**
+on two structural fixes.
+
+### Re-sending runners was the highest-yield structural move
+
+Nine of the round's 17 matches came from second, third and fourth passes by
+agents already holding the context. **Delta alone ran four passes**: 5 matches,
+three overturned verdicts, one mechanically-explained negative on the hardest
+cluster in the project, and it closed the last fresh function. A zero-match
+first pass is not a wasted pass — charlie's produced the round's best negatives.
+
+Two of round 18's 2c problems stayed fixed (every search bounded, every one
+terminated) and the third recurred once: alpha ended a turn on a status line
+with uncommitted work and two concurrent searches, one of which had drifted into
+the **main checkout** via the cwd reset. An explicit numbered work order with
+hand work in it fixed it immediately, exactly as round 18 recorded. Main's tree
+was clean throughout; the stray search damaged nothing but its results were
+unattributable.
+
+### Head errors this round — three, all the same root cause
+
+1. **Ranked the queue by parsing residues out of report BODIES.** Round 18 had
+   already written down that only the title/verdict line is safe. Charlie caught
+   `func_80032BB8`'s "0/14", which I had pulled from a sentence comparing a
+   **rejected** variant; the real residue is 7/14. Round 18's phrasing ("treat
+   figures near correction/superseded wording as retracted") is necessary but
+   not sufficient — this figure sat in an ordinary attempt narrative with no
+   warning keyword near it.
+2. **Told delta `func_80058228` was the fresh function.** It was backwards:
+   that one had a report (a 52/56 stall) and `func_80058404` had none. My own
+   near-miss data showed it and I named them the wrong way round. Cost nothing
+   — delta matched both — but delta had to spend a paragraph correcting the
+   assignment.
+3. **Repeated the "one word remaining" figure** for `func_8004042C` into
+   alpha's assignment without rebuilding it.
+
+All three are the same error: **trusting a derived summary of my own census
+instead of the census.** The mitigation is mechanical, not attitudinal — build
+the Gate 1b ranking from title lines only, and rebuild any inherited figure
+before putting it in an assignment.
+
+### Two hook defects, both measured, neither worked around
+
+Round 18 escalated "`make extract` is BLOCKED in the main checkout though the
+hook lists that target as allowed, and it accepted the identical command in all
+five worktrees; three invocation forms were tried and none worked."
+
+**It is redirection, and the hook is not worktree-sensitive.**
+`block-raw-make.py` tokenises with `shlex(punctuation_chars=True)` and splits at
+`SEPARATORS`, which contains `|` and `;` but **no redirection operator** — so in
+a redirected invocation the `>` and the log path stay inside make's span and are
+judged as *targets*. Measured: bare and piped forms are ALLOWED; `> log` and
+`2>&1 | tail` are BLOCKED. Round 18 simply happened to use redirected forms in
+main and bare ones in the worktrees.
+
+**Second defect, found by hitting it: the hook blocks PROSE about itself.**
+Writing this section via a `cat <<'EOF'` heredoc was blocked, because a heredoc
+body is command position to the tokeniser. The hook's docstring claims to have
+fixed exactly this papercut class for `grep make Makefile` and `echo "run
+make"`. This very likely bit round 18's head while writing its PROGRESS entry.
+
+Both have clean workarounds (pipe instead of redirect; write files with the
+Write tool). **Fixing a guardrail is the operator's call and neither was
+touched.**
+
+### Other tooling defects (measured, not acted on)
+
+- **`tools/setup-permuter.sh` validates seeds through the real `cc1`, which
+  cannot parse `PERM_GENERAL`/`PERM_VAR`** — so the guided-PERM approach several
+  match reports recommend as a next step is not usable through this harness as
+  written. Alpha hit it; the recommendation is stale wherever it appears.
+- **Permuter scaffolds disagree with the real in-context build, three times, all
+  inside `class_3bb8c.h`.** Possibly systemic to that class's register pressure.
+  Check the scaffold's base score against `funcdiff`'s residue before spending a
+  search.
+- **`make clean` + re-extract desync** (charlie): extracting `asm/` while a
+  `src/` file still holds a non-`INCLUDE_ASM` body leaves that function's `.s`
+  missing and hard-fails the next revert. Restore the `INCLUDE_ASM` first.
+- **Two runners did not capture permuter exit codes to a dedicated file**, which
+  is the round-18 remedy for the lost-`$?` race. Alpha self-reported it.
+
+### The rodata-migration blocker has exactly ONE instance
+
+`func_8003FC70`'s report documents a fifth blocker the four-grep screen cannot
+see. Censused: 16 generated `.s` files carry a migrated `.section .rodata`, all
+live — and **15 are already caught by the `addiu_at` screen**, because the
+migrated symbol is a `jtbl_*` and a jump table is that blocker by construction.
+Only `func_8003FC70` is clean-screened and blocked by migration alone.
+
+**So it does not earn a fifth standing screen** — the same measured-scope
+argument `addiu-at-blocker.md` makes for itself. A way out exists (split slot
+`0x1908` at `0x1994`, leaving `D_80011194` standalone; a plain symbol resolves
+from a standalone slot, per the settled `0xA8C` precedent). It was deferred: a
+`config/` change inside a live runner's unit family is how a head breaks its own
+merge.
+
+### Next move
+
+**Runners again, and the queue is better posed than it was at the start of this
+round.** Carving is still not the move — `fresh` is 0 but the 187 uncarved
+functions are 75% blocked and the best window is 5 of 10.
+
+Named entry points, in order:
+
+1. **`func_80065A5C` and `func_800662BC`** (`code_55dd4`, both clean, both
+   small) — zero `jal`, reserving `0x18` of outgoing-arg space that no live call
+   can justify. The dead-call mechanism's best targets.
+2. The rest of the 8 blocker-clean rows in the outgoing-arg census.
+3. **`func_8002AA6C`** at 119/223 one instruction short, and **`func_8002A75C`**
+   at 171/196 — both charlie's, both freshly narrowed with the residue named.
+4. **`func_8003D73C`** at 144/145 with the register-saturation class already
+   dissolved.
+5. `func_8003FC70` via the rodata re-segmentation, as a head task at Gate 2.
+
+The register-shaped corpus is not exhausted — 17 matches came out of it this
+round and the contaminant list grew from three mechanisms to seven.
+
+---
+
 ## 2026-09-05 — round 18: a permuter round, 9 matches, and a stall class that is 26% of the queue
 
 **921 -> 930 matched (67.92% -> 68.58% of game code). Build green in main after
@@ -154,6 +435,16 @@ caveat on negatives.
   not worked around. Impact was nil this round (the stale files are exactly the
   functions matched, `progress.py` states outright that counts are unaffected,
   build green) but it will bite whenever main genuinely needs a re-extract.
+
+  **RESOLVED IN ROUND 19 — it is REDIRECTION, and the hook is not
+  worktree-sensitive.** `SEPARATORS` in `block-raw-make.py` omits redirection
+  operators, so `>` and the log path stay inside make's span and are judged as
+  *targets*. Bare and piped forms are allowed; `> log` and `2>&1 | tail` are
+  blocked. Round 18 happened to use redirected forms in main and bare ones in
+  the worktrees, which made it look per-checkout. Round 19 re-extracted main
+  successfully with the piped form. Still a real defect (and the hook also
+  blocks writing prose about itself via a heredoc), still the operator's call
+  to fix — see round 19's entry.
 - **The `permuter exit=$?` line is lost intermittently** — three runners
   independently reported the trailing echo never landing, from a race between
   the outer tool timeout and the inner `timeout` plus multiprocessing shutdown.

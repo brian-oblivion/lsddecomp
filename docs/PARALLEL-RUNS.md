@@ -554,6 +554,39 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    expected to survive, and tell it to UPDATE existing reports rather than
    replace them. Merge the first pass anyway; merging twice is free.
 
+   **ROUND 19 MEASURED THIS AND IT IS THE ROUND'S BIGGEST STRUCTURAL RESULT:
+   9 of 17 matches came from second, third and fourth passes.** Delta alone ran
+   **four** — 5 matches, three overturned verdicts, one mechanically-explained
+   negative on the hardest cluster in the project, and it closed the last
+   `fresh` function in the executable. Re-sending beat every other lever
+   available to the head, including the choice of who to staff in the first
+   place.
+
+   Three things that made re-sends pay, all of them the head's work:
+
+   - **Send it somewhere DIFFERENT when the first pass says the ground is
+     hard.** Charlie got zero matches on a register-shaped set; its second
+     assignment was deliberately non-register-shaped ground in the same units
+     and produced 58/196 -> 171/196. Re-sending into the same wall is not the
+     move.
+   - **A runner whose own units are exhausted can take an UNOWNED unit.** Check
+     `headercontention.py` first — delta's third and fourth passes were in unit
+     families no live runner held, so they stayed conflict-free. This is also
+     how a deliberately-unstaffed hard cluster gets a cheap attempt late in the
+     round, once its opportunity cost has dropped to zero.
+   - **Say what a good negative looks like, explicitly.** Delta was told before
+     starting `code_8220_c` that "the aggregate-assignment axis is a clean
+     negative here, and here is why" would be a genuine result. It returned a
+     mechanism rather than a shrug. Runners given only a match target report
+     status lines when they miss.
+
+   **Reconcile every re-send from the branch, not the summary.** Round 19's
+   alpha reported eight matches accurately but silently omitted two assigned
+   functions from its disposition — one of them the cheapest open function in
+   the corpus. Ask explicitly for the disposition of *every* assigned function
+   including "did not reach"; an unlisted function drops out of the next
+   round's queue.
+
 4. **Merge** sequentially, in main: `git merge --no-ff runner/<name>` →
    `./build-and-verify.sh` → next. Disjoint units make conflicts rare.
 
@@ -1129,6 +1162,39 @@ through, because its report says only "toolchain blocked" without naming the
 class. One `grep` over its `.s` settles it in a second. The rule from
 CLAUDE.md applies unchanged here — **a blocker's scope is measured, not
 read** — and a report is prose about the bytes, not the bytes.
+
+**RANK FROM TITLE/VERDICT LINES ONLY. Never parse a figure out of a report
+BODY — and this has now caught three consecutive heads, so treat it as a
+mechanical rule rather than a caution.** Round 18's head pulled a "25/25" from
+a *correction preamble* describing the number being retracted, and conflated a
+callee's score with an already-matched **caller's**. Round 18 wrote the fix
+down as "treat any figure near `correction`/`earlier version`/`superseded` as
+retracted". **Round 19's head read that and still got it wrong**, pulling
+`func_80032BB8`'s "0/14" out of an ordinary attempt narrative comparing a
+*rejected* variant against the kept one — no warning keyword anywhere near it.
+The real residue is 7/14.
+
+So the keyword heuristic is necessary and **not sufficient**: a report body is
+full of numbers describing variants that were tried and thrown away, and
+nothing distinguishes them lexically from the one that stands. Only the
+title/verdict line is safe.
+
+**And a title line is only as good as the last person who rebuilt it.** Round
+19 found `func_8004042C`'s title claiming "closed to ONE isolated word" when
+the body measures 22/25 — the "1" was the permuter's *weighted penalty score*
+read as a word count. That figure propagated title -> PROGRESS -> staffing ->
+back to the runner as an instruction to close a word that was three words.
+**So: rank from titles, but rebuild any figure before you put it in an
+assignment**, and see DECOMPILATION_LEARNINGS' "A permuter number is in
+PERMUTER units, not retail words".
+
+**Screen for a fourth thing while you are here: preserved-body DRIFT.** Round
+19 measured roughly one inherited body in six carrying a false "clean /
+drift-free" claim (5 of ~30, found independently by three runners). A drifted
+body's in-range score is meaningless, so it is mis-ranked by construction. You
+cannot check thirty bodies at Gate 1, but you can tell runners to check the
+ones they actually resume — which is what that round did, and it is how the
+three were found.
 
 **Gate 3 — permuter round instead.** If the fresh queue is dry and carving is
 blocked, or the stall residue is worth more than cold ground (near-misses like
