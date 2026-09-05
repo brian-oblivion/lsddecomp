@@ -244,10 +244,13 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
 
-/* STALL -- see docs/match-reports/func_8001E110.md. Best reached: 16/118
- * words in-range, block order/CFG confirmed correct, residue is a 3-way
- * register rotation (retail: p1->s1, p2->s2, r1->s0; this attempt:
- * p1->s0, p2->s1, r1->s2). Restored to INCLUDE_ASM per project rule. */
+/* STALL -- see docs/match-reports/func_8001E110.md. Round 20: the
+ * "register rotation" diagnosis was WRONG -- re-derivation from retail's
+ * exact tail-merge/shared-block CFG closed the register mapping
+ * completely and reached 95/118 words in-range (up from 16/118), WITH
+ * drift (1 word overshoot: an extra `move v1,v0` before the SECOND
+ * recursive call's result test, where retail tests $v0 directly).
+ * Restored to INCLUDE_ASM per project rule. */
 #if 0
 s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
     u8 r1;
@@ -257,22 +260,30 @@ s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3
     r1 = func_8001ECFC(box, p1);
     r2 = func_8001ECFC(box, p2);
 
-    if (r1 == 0 && r2 == 0) {
+    if (r1 == 0) {
+        if (r2 != 0) {
+            goto shared_test;
+        }
         return 1;
     }
-    if (r1 != 0 && r2 == 0) {
-        if (out != NULL) {
-            func_8001E2E8(out, box, p2, p1);
-        }
-        return 3;
+    if (r2 != 0) {
+        goto shared_test;
     }
-    if (r1 == 0 && r2 != 0) {
-        if (out != NULL) {
-            func_8001E2E8(out, box, p1, p2);
-        }
-        return 2;
+    if (out != NULL) {
+        func_8001E2E8(out, box, p2, p1);
     }
+    return 3;
 
+shared_test:
+    if (r1 != 0) {
+        goto combined;
+    }
+    if (out != NULL) {
+        func_8001E2E8(out, box, p1, p2);
+    }
+    return 2;
+
+combined:
     if ((r1 & r2) != 0) {
         return 0;
     }
