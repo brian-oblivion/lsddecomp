@@ -1,5 +1,49 @@
 # func_8003DAD4 — STALL (register-identity, 114/118 words on the best body)
 
+## Round 19: two more attempts on the delay-slot residue, both negative
+
+Re-examined per this round's brief (register-shaped verdicts are the
+least reliable class). The two remaining residues are unchanged from
+the round-12 description below: (1) `i = 0`'s move schedules into the
+function's very FIRST branch's delay slot (the early `self->unk3C != 2`
+guard) instead of the loop-guard `blez`'s delay slot where retail puts
+it, and (2) `target->unk14`'s temp reuses `$v0` where retail keeps it in
+a separate `$a1`.
+
+1. **`for (i = 0; ...)` -> explicit `i = 0;` followed by a `while`
+   loop** (removing the for-loop's combined init/test/increment
+   clause, in case the for-loop's specific lowering was pinning the
+   delay-slot choice): byte-identical output to the `for` version, no
+   change at all (114/118, same two residues).
+2. **Wrapped the `arr`/`count`/loop block in its own
+   `do { ... } while (0)`** (the lever that closed `func_80040854` this
+   round for an almost identical symptom -- a delay-slot filler placed
+   in the wrong of two available slots): this REGRESSED badly, to
+   18/118 with a whole-function length change (the "differs outside
+   range" warning fired). Unlike `func_80040854`'s case, the `do/while`
+   wrapper here doesn't just re-route one delay-slot filler; it changes
+   the compiled length of the loop-adjacent code entirely. Reverted
+   immediately.
+
+Both closed as firm negatives for this instance. The `do/while(0)`
+lever is confirmed NOT a general delay-slot-residue fix -- it worked for
+`func_80040854`'s specific shape (a single unconditional call-plus-two-
+stores block) and actively hurts this considerably larger, branch-and-
+loop-containing function. Restored to `INCLUDE_ASM`, build re-confirmed
+clean (`build exit=0`) before moving on.
+
+### Proposed learning (round 19 addition)
+
+Narrows `func_80040854`'s new `do/while(0)`-wrapper learning: it is a
+lever to TRY on a delay-slot-filler-placement residue, not a lever that
+generalises to every such residue regardless of the surrounding
+function's size or control-flow complexity. Confirmed here as an active
+regression on a larger, loop-containing function where it helped a much
+simpler call-plus-stores block elsewhere in this same round. Try it
+cheaply, verify immediately, and revert without hesitation if it makes
+things worse -- do not assume it will help just because the SYMPTOM
+(wrong delay slot for an otherwise-correct instruction) looks the same.
+
 **Unit:** code_2cc8c_b · round 12 straggler · slot `+0x10C` (`slot10C`,
 per `Obj86B60Methods`).
 
