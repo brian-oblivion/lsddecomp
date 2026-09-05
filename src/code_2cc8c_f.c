@@ -26,7 +26,19 @@ void func_8004076C(Obj6EAC0 *self, s32 overwrite, u8 *src) {
     func_80040790(self, self->unk64, src, overwrite);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040790);
+typedef struct { s8 r, g, b; } RGB80040790;
+
+void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+    u8 *d;
+    d = dst;
+    if (overwrite) {
+        *(RGB80040790 *)d = *(RGB80040790 *)src;
+    } else {
+        d[0] += src[0];
+        d[1] += src[1];
+        d[2] += src[2];
+    }
+}
 
 void func_800407F8(Obj6EAC0 *self, struct Pair32E99C *a1) {
     if (self->unkC != 0) {
