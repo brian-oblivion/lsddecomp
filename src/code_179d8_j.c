@@ -131,7 +131,14 @@ s32 func_800305F4(s32 p0)
     return tbl[recIdx].unk74;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030648);
+s32 func_80030648(s32 p0)
+{
+    Entry90902E8 *tbl = D_800902E8[(u8) p0];
+
+    __asm__("");
+    D_8008EA22 = p0;
+    return tbl[(p0 & 0xFF00) >> 8].unk76;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_8003069C);
 
