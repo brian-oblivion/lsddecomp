@@ -103,6 +103,19 @@ typedef struct PlayerSpawnPoint {
 	} position;
 } PlayerSpawnPoint;
 
+/* The `chunk`+`tile` half of a PlayerSpawnPoint (4 bytes), reinterpreted as
+   one struct so a single whole-struct assignment reproduces retail's
+   unaligned 4-byte `lwl`/`lwr` + `swl`/`swr` copy -- func_8005A9CC (round
+   2026-09-06) copies a `PlayerSpawnPoint *currentPos` piecewise into
+   DreamSys::unk_0x918 (this type) and DreamSys::unk_0x91C (a plain
+   `struct RelativePos`, the `position` half) rather than as one 10-byte
+   copy, matching retail's own two separate unaligned-copy instruction
+   groups. */
+typedef struct PlayerSpawnGridPos {
+	struct MapChunk chunk;
+	struct MapTile tile;
+} PlayerSpawnGridPos;
+
 /* pitch/heading/roll grouped into one 12-byte nested struct (round
    2026-09-02, DreamSys__AddFlashback): that function block-copies all
    three from its `angles` argument in ONE retail load-all-then-store-all
@@ -758,12 +771,19 @@ typedef struct DreamSys {
 	   confirmed safe since its only two writers (round 2026-08-30) both
 	   set it to the literal 0. */
 	u32 unk_0x90C;
-	s32 unk_0x910;
+	/* Function pointer, called as `unk_0x910(this)` and its `s32` result
+	   used as a truth value (func_8005A9CC, round 2026-09-06); set from
+	   `D_80087EEC[func_8005C118()]` (both still INCLUDE_ASM) or NULLed --
+	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
+	   being called through. */
+	s32 (*unk_0x910)(struct DreamSys *this);
 	/* A retry/attempt counter (round 2026-09-02, func_8005AD68): read as a
 	   whole word, compared against several literal bands, and incremented
 	   by 1 at that function's normal exit. */
 	s32 unk_0x914;
-	s8 unknown_values_0x918[4];
+	/* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
+	   PlayerSpawnPoint whole-struct-copied here by func_8005A9CC. */
+	PlayerSpawnGridPos unk_0x918;
 	/* A `struct RelativePos`, address-taken and passed to func_8005AF64 as
 	   its `b` argument (round 2026-09-02, func_8005AD68) -- carved out of
 	   what was raw padding in the same 0x10-byte block as unk_0x914 above. */
@@ -776,6 +796,21 @@ typedef struct DreamSys {
    comment near D_80087E20/D_80087E34 above. Same element signature as
    func_800575B0/func_800575E0 below. */
 extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);
+
+/* 4-entry table of `s32 (DreamSys *this)` functions (func_8005AB2C,
+   func_8005AC24, func_8005AD68, func_8005AE40, all already matched with
+   exactly that signature), indexed by func_8005C118()'s return value and
+   stashed into DreamSys::unk_0x910 by func_8005A9CC (round 2026-09-06). */
+extern s32 (*D_80087EEC[4])(DreamSys *this);
+
+/* Called by func_8005A9CC with NO explicit argument setup (the disassembly's
+   call site leaves `$a0` holding an unrelated leftover value from the
+   preceding statement, same "empty delay slot, no a0-a3 setup" shape as
+   func_8005BF48 above); return value used as D_80087EEC's index. Blocked by
+   both the gp-relative and addiu_at blockers -- see
+   docs/match-reports/func_8005C118.md -- so it stays INCLUDE_ASM; this
+   prototype only types the call site. */
+extern s32 func_8005C118(void);
 
 struct vtable_DreamSys{
 	u32 unknown_int;
@@ -1194,6 +1229,20 @@ extern void func_8001E6F8(DreamSys *this, void *arg1);
    docs/match-reports/func_8005BD3C.md -- so it stays INCLUDE_ASM; this
    prototype only types the call site. */
 extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
+
+/* Called by func_8005A9CC (round 2026-09-06) as (&this->linkCoordinates,
+   currentPos, this->currentStage) -- same forwarding shape as
+   Test4TunnelLinks/TestForStaticLink above. Defined later in this unit's own
+   ROM order (`src/DreamSys.c`); this is a forward declaration for that
+   earlier call site, not a cross-unit prototype. */
+extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
+
+/* Called by func_8005A9CC as (&this->unk_0x888, &this->unk_0x884, &local) --
+   identical call shape to func_8005BD3C above (same `local` buffer, same two
+   `this` fields), so the same signature. Blocked by both the gp-relative and
+   addiu_at blockers -- see docs/match-reports/func_8005C02C.md -- so it
+   stays INCLUDE_ASM; this prototype only types the call site. */
+extern s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Same (target, currentPos, stage) forwarding shape as Test4TunnelLinks
    above (see that function's own comment) -- called by func_8005A82C as

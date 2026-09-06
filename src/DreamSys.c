@@ -828,6 +828,60 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 	return true;
 }
 
+#if 0
+/* Best-reached body, 57/88 words, no address drift -- see
+   docs/match-reports/func_8005A9CC.md for the residue analysis. Restored to
+   INCLUDE_ASM below per project rule (no score short of byte-exact stays in
+   src/). */
+bool func_8005A9CC(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+	s32 local[4];
+
+	if (this->unknwon_int_0x44 != 0) {
+		return false;
+	}
+
+	if (this->unk_0x910 == 0) {
+		goto staircase;
+	}
+	if (!this->unk_0x910(this)) {
+		return false;
+	}
+	this->unk_0x908 = 0;
+	this->unk_0x910 = 0;
+	this->unk_0x90C = 0;
+	if (this->unk_0xAC != 4) {
+		return false;
+	}
+	this->vt->func_8005A1A4(this);
+	return false;
+
+staircase:
+	result = Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0) {
+		return false;
+	}
+	func_8001E6F8(this, local);
+	if (!func_8005C02C(&this->unk_0x888, &this->unk_0x884, local)) {
+		return false;
+	}
+	if (this->unk_0xA8 == 0) {
+		return false;
+	}
+
+	this->unk_0x918 = *(PlayerSpawnGridPos *)currentPos;
+	this->unk_0x91C = currentPos->position;
+	this->unk_0x908 = 1;
+	this->unk_0x90C = 1;
+	this->unk_0x914 = 0;
+	this->unk_0x910 = D_80087EEC[func_8005C118()];
+	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
+	this->unk_0x910(this);
+	return false;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
 s32 func_8005AB2C(DreamSys *this)
