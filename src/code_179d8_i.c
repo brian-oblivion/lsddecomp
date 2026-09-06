@@ -81,4 +81,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80034020);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800340B0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_8003410C);
+extern s32 func_80034138(s16 a0, s16 a1);
+
+s32 func_8003410C(s16 a0, s16 a1)
+{
+    return func_80034138(a0, a1);
+}
