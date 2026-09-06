@@ -108,7 +108,12 @@ void func_80056718(LinkNode *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_80056794);
+/* Plain Vec3 add: dst = a + b. Frameless -- no self/vtable involved. */
+void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b) {
+    dst->x = a->x + b->x;
+    dst->y = a->y + b->y;
+    dst->z = a->z + b->z;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800567D4);
 
