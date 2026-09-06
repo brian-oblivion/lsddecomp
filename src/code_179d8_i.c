@@ -227,7 +227,18 @@ void func_80033FB8(s32 a0, s32 a1)
     D_800902E8[sa0][sa1].unk90 &= ~8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80034020);
+extern void func_80038CD8(s32 a0);
+extern s32 D_80090BD4[];
+extern s16 D_80090BD0;
+
+void func_80034020(s16 a0)
+{
+    if ((u16)a0 < 0x10 && D_8008EA2C[a0] == 1) {
+        func_80038CD8(D_80090BD4[a0]);
+        D_8008EA2C[a0] = 0;
+        D_80090BD0--;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800340B0);
 
