@@ -46,7 +46,85 @@ s32 func_8003F82C(s32 a0) {
     return count;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003F848);
+typedef struct HistorySnapshot HistorySnapshot;
+struct HistorySnapshot {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+    s32 unkC;
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
+    s32 unk1C;
+};
+
+typedef struct HistoryNode HistoryNode;
+struct HistoryNode {
+    s32 unk0;                  /* +0x000, an "owner" tag: 0 (free), a real
+                                   owner value, or the D_80090B74 sentinel
+                                   (latched/finalized) */
+    HistorySnapshot cur;       /* +0x004, "live" values */
+    HistorySnapshot backup;    /* +0x024, finalized/cached copy of `cur` */
+    u8 pad44[0x048 - 0x044];
+    HistoryNode *parent;       /* +0x048 */
+};
+
+extern HistoryNode *D_80090260[0x64];
+extern HistoryNode *D_8009025C[];  /* splat's own symbol at D_80090260-4;
+                                       indexed here starting at 1, never 0 */
+extern s32 D_80090B74;
+extern void func_80012AF8(HistorySnapshot *out, HistorySnapshot *a1);
+
+void func_8003F848(HistoryNode *self, HistorySnapshot *out) {
+    HistoryNode *cur;
+    HistoryNode *parent;
+    s32 i;
+    s32 lastFree;
+    HistoryNode *src;
+
+    cur = self;
+    i = 0;
+    lastFree = 0x64;
+    for (;;) {
+        D_80090260[i] = cur;
+        parent = cur->parent;
+        if (parent == NULL) {
+            if (cur->unk0 == D_80090B74 || cur->unk0 == 0) {
+                cur->backup = cur->cur;
+                *out = cur->backup;
+                cur->unk0 = D_80090B74;
+                break;
+            }
+            i = lastFree + 1;
+            if (lastFree == 0x64) {
+                i = 0;
+                *out = D_80090260[0]->backup;
+            } else {
+                src = D_80090260[i];
+                *out = src->backup;
+            }
+            break;
+        }
+        if (cur->unk0 == D_80090B74) {
+            *out = cur->backup;
+            break;
+        }
+        if (cur->unk0 == 0) {
+            lastFree = i;
+        }
+        cur = parent;
+        i++;
+    }
+
+    if (i > 0) {
+        do {
+            func_80012AF8(out, &D_8009025C[i]->cur);
+            D_8009025C[i]->backup = *out;
+            D_8009025C[i]->unk0 = D_80090B74;
+            i--;
+        } while (i > 0);
+    }
+}
 
 extern void *D_800902E4;
 
