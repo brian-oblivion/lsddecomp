@@ -154,7 +154,15 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031A44);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031BA4);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031C98);
+s32 func_80031C98(s16 idx, s16 *out1, s16 *out2)
+{
+    if ((u16) idx < 0x18) {
+        *out1 = D_8006DAD4[idx].unk0;
+        *out2 = D_8006DAD4[idx].unk2;
+        return 0;
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031CF0);
 
