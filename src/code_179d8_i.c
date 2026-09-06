@@ -81,7 +81,77 @@ typedef struct {
 
 extern Entry90902E8 *D_800902E8[];
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033738);
+extern s32 D_8008E934;
+extern s16 D_80090B68;
+extern s16 D_80090B6C;
+extern s32 D_8008EA00;
+
+extern void func_8002F700(void);
+extern s32 func_8003410C(s16 a0, s16 a1);
+extern void func_80036528(s32 a0, s32 a1);
+extern void func_80033AB0(s32 a0, s32 a1);
+extern void func_80033C90(s32 a0, s32 a1);
+extern void func_800339AC(s32 a0, s32 a1);
+extern void func_80033FB8(s32 a0, s32 a1);
+extern void func_800368E8(s32 a0, s32 a1);
+
+void func_80033738(void)
+{
+    s32 screen;
+    s32 slot;
+    s32 flags;
+    s16 screen16;
+    s16 slot16;
+
+    if (D_8008E934 == 1) {
+        return;
+    }
+    D_8008E934 = 1;
+    func_8002F700();
+    for (screen = 0; screen < D_80090B68; screen++) {
+        if (!((1 << screen) & D_8008EA00)) {
+            continue;
+        }
+        for (slot = 0; slot < D_80090B6C; slot++) {
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 1) {
+                screen16 = screen;
+                slot16 = slot;
+                func_8003410C(screen16, slot16);
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x10) {
+                    func_80036528(screen16, slot16);
+                }
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x20) {
+                    func_80033C90(screen16, slot16);
+                }
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x40) {
+                    func_80033AB0(screen16, slot16);
+                }
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x80) {
+                    func_80033AB0(screen16, slot16);
+                }
+            }
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 2) {
+                func_800339AC((s16)screen, (s16)slot);
+            }
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 8) {
+                func_80033FB8((s16)screen, (s16)slot);
+            }
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 4) {
+                func_800368E8(screen, slot);
+                D_800902E8[screen][slot].unk90 = 0;
+            }
+        }
+    }
+    D_8008E934 = 0;
+}
 
 extern s32 func_8003069C(s32 a0);
 
