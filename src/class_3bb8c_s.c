@@ -166,7 +166,14 @@ void func_80056858(LinkNode *self, s32 reuse) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800569A8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_80056B8C);
+extern void func_800183DC(void **array, s32 count);
+
+/* self->unk6C-guarded release of the fixed 2-element arr7C array. */
+void func_80056B8C(LinkNode *self) {
+    if (self->unk6C != 0) {
+        func_800183DC((void **)self->arr7C, 2);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_80056BBC);
 
