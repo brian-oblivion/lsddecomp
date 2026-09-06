@@ -141,7 +141,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_8003149C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031890);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_800319B4);
+s32 func_800319B4(s32 p0, s16 p1, s16 p2, s32 p3, u16 p4)
+{
+    func_80032148(p1, p2);
+    D_8008EA22 = 0x21;
+    if (func_8002F3E8((s16) p0, 0x21, p1, p2, p4) == 0)
+        return -1;
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031A44);
 
