@@ -115,7 +115,15 @@ void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b) {
     dst->z = a->z + b->z;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800567D4);
+/* Forwards straight through to a child's own slot4C/slot44/slot48, using
+ * whatever the caller already set up in arg1/arg2 (an outer node pointer and
+ * an accumulator Vec3, respectively -- see func_80056858's own two call
+ * sites) plus its own arg3/arg4. */
+void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4) {
+    self->methods->slot4C(self, arg1, arg2);
+    self->methods->slot44(self, 1, arg3);
+    self->methods->slot48(self, 1, arg4);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_80056858);
 
