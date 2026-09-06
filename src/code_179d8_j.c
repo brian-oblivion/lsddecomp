@@ -65,6 +65,22 @@ typedef struct EntryDAD4 {
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
 
+/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+ * these, indexed [screen][slot]-style by a packed argument (slot in the
+ * high byte, screen in the low byte) -- see code_179d8_i.c's own
+ * func_800339AC, which builds exactly this packing before calling into
+ * this unit's func_8003069C. Reduced local view: only the two leading s16
+ * fields this unit's own accessors touch are named. See code_179d8_f.c /
+ * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
+ * each unit keeps its own independent reading, per project convention. */
+typedef struct {
+    u8 pad0[0x74];
+    s16 unk74; /* +0x74 */
+    s16 unk76; /* +0x76 */
+    u8 pad78[0xAC - 0x78];
+} Entry90902E8;
+extern Entry90902E8 *D_800902E8[];
+
 s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
 {
     u16 outA;
@@ -93,11 +109,36 @@ void func_800303FC(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030404);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030584);
+s32 func_80030584(s32 p0, s16 *out1, s16 *out2)
+{
+    Entry90902E8 *tbl = D_800902E8[(u8) p0];
+    s16 *cur = (s16 *) &D_8008EA22;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_800305F4);
+    *cur = (s16) p0;
+    *out1 = tbl[(p0 & 0xFF00) >> 8].unk74;
+    *out2 = tbl[(p0 & 0xFF00) >> 8].unk76;
+    return *cur;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030648);
+s32 func_800305F4(s32 p0)
+{
+    s32 channel = p0 & 0xFF;
+    Entry90902E8 *tbl = D_800902E8[channel];
+    s32 recIdx = (p0 & 0xFF00) >> 8;
+
+    __asm__("");
+    D_8008EA22 = channel;
+    return tbl[recIdx].unk74;
+}
+
+s32 func_80030648(s32 p0)
+{
+    Entry90902E8 *tbl = D_800902E8[(u8) p0];
+
+    __asm__("");
+    D_8008EA22 = p0;
+    return tbl[(p0 & 0xFF00) >> 8].unk76;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_8003069C);
 
