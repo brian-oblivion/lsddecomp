@@ -1084,7 +1084,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", InitNavChallengesArray);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcNavigationScore);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BB14);
+s32 func_8005BB14(s32 stage)
+{
+	return STAGE_TIME_LIMITS[stage];
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", GetRandomSpawnFromStage);
 
