@@ -1,175 +1,127 @@
-# func_80056BBC -- STALL (86/87 words, one-instruction dead-store residue)
+# func_80056BBC -- MATCHED 87/87 (head adjudication of a mis-classified stall)
 
-Unit `class_3bb8c_s`. `self` is the owning `LinkNode`. The carve-time census
-flagged this function's only screen hit as `addiu_at`, which was RESOLVED in
-round 21 (see `docs/research/addiu-at-blocker.md`) -- it is NOT why this
-stalled. This is a genuine residue, not a toolchain blocker.
+Unit `class_3bb8c_s`. Round 22. Runner delta reached 86/87 and filed this as a
+**stall of the documented "redundant move" class** -- "a genuine dead store in
+retail's own compiled output", one instruction the source cannot produce. The
+head re-read the residue and it is **not a dead store at all**. The function is
+now byte-exact; the fix was one character of type information.
 
-## Classification
+## What the residue actually was
 
-A rand()-driven message/attach dispatcher over `self->arr84[1]`/`arr84[2]`,
-plus a call into the still-`gp_rel`-blocked `func_80056D18` (left
-`INCLUDE_ASM`, not edited) with a table pointer picked by a `rand() % 2`
-parity roll used again later for a second table choice.
-
-Two real defects were found and fixed during this attempt (both by
-comparing `tools/asm-differ/diff.py` output against retail instruction by
-instruction):
-
-1. **Scheduling: the "reload child->methods" needs to happen BEFORE the
-   branch, not after.** The first draft loaded `child->methods` fresh at the
-   point of the `slotB8` call (after the branch merge), leaving the earlier
-   `bnez self->unk78` branch's load-delay slot (after `lw a1,0x78(s1)`) with
-   nothing useful to fill -> a real `nop`, plus a second, separate reload of
-   `child->methods` later where retail reused the one register. Explicitly
-   caching `LinkNodeMethods *m = child->methods;` right after the
-   `func_800573A8` call (BEFORE computing the `arg` ternary that gates the
-   branch) let the compiler's own scheduler hoist that load into the earlier
-   delay slot exactly as retail does. This closed 2 of the then-3 residual
-   words (from a base score of 705 down to 265 on the permuter's own
-   scorer, `--stack-diffs`).
-2. **Ternary branch sense, and dropping a shared temp for a tail call.** The
-   `(parity == 0) ? D_80087874 : D_8008785C` selector had the branch sense
-   backwards relative to retail's default/override shape (retail defaults to
-   `D_80087874` and overrides to `D_8008785C` only when `parity != 0` --
-   flipping the ternary's arm order to `(parity != 0) ? D_8008785C :
-   D_80087874` fixed the branch AND its target address, both of which showed
-   as diffs before this). Separately, holding `self->arr84[2]` in a shared
-   `child` local for the final `slot60` call put it in a saved register
-   (`$s0`) retail does not use there (retail uses `$a0`/`$v0` directly, since
-   nothing else needs that value preserved past a call) -- inlining
-   `self->arr84[2]->methods->slot60(self->arr84[2], 0)` directly (no local)
-   fixed the register identity and an insertion/deletion pair the permuter's
-   scorer flagged.
-
-## Residue
-
-After both fixes the ONLY remaining diff is a single retail instruction this
-C does not produce:
+The unmatched instruction is the delay-slot filler of the `self->unk70 < 2`
+branch:
 
 ```
-/* 4741C 8005671C 01000534 */   ori  $a1, $zero, 0x1
+/* 47418 80056C18 17004014 */  bnez  $v0, .L80056C78
+/* 4741C 80056C1C 01000534 */   ori  $a1, $zero, 0x1
 ```
 
-This sits as the delay-slot filler for the branch testing `self->unk70 < 2`
-(`bnez v0, .L80056C78` at `0x80056C18`), and it is NEVER READ on either the
-branch-taken path (`func_80056BBC`'s "< 2" body, which sets `$a1` itself
-before its own uses) or the fallthrough path (the ">= 2" body, which
-overwrites `$a1` with `D_80087880`'s address in the very next instruction).
-It is a genuine dead store in retail's own compiled output, matching
-`docs/MATCHING-GUIDE.md`'s documented "redundant move" residue class
-verbatim (same symptom as `new_class_6d3c8`/`strcat`/the round-16 third
-instance).
+The stall report argued `$a1` is never read on either path. That is right for
+the fallthrough (`$a1` is overwritten by `%hi(D_80087880)` in the very next
+instruction) and **wrong for the branch-taken path**, which is the half that
+decides. Read `.L80056C78` forward to its first call:
 
-Confirmed with `tools/asm-differ/diff.py func_80056BBC`: every other
-instruction in the function lines up 1:1 with retail once this one line is
-accounted for; everything downstream of it in the diff differs only by the
-constant 4-byte address shift this one missing instruction causes (each
-`%lo`/`jal` immediate off by exactly 4), not by any independent defect.
+```
+.L80056C78:
+    lw    $s0, 0x88($s1)
+    nop
+    lw    $v0, 0x0($s0)
+    nop
+    lw    $v0, 0x64($v0)
+    nop
+    jalr  $v0                 <- slot64
+     addu $a0, $s0, $zero
+```
 
-## Permuter
+**Nothing between the label and that `jalr` writes `$a1`.** The `ori` is not
+dead: it is the SECOND ARGUMENT of the `slot64` call, hoisted by GCC into the
+branch's delay slot in the ordinary way. `$a1` is live across seven
+instructions of branch, and a residue that survives an argument register into a
+call is an argument, not a leftover.
 
-Set up per `docs/MATCHING-GUIDE.md`'s permuter section
-(`tools/setup-permuter.sh func_80056BBC <seed>`). Base score with
-`--stack-diffs`: **265** (1 register difference, 1 reordering, 0 insertions,
-2 deletions -- consistent with exactly one missing instruction). Ran
-`-j 6 --stop-on-zero --best-only` for ~8000 iterations (60s wall-clock
-timeout) without finding a zero -- unlike the three already-documented
-instances of this class, which closed in under 400 iterations each. This one
-did not reproduce inside the attempt budget; **not asserting it is
-permuter-exhausted**, just that it did not close in this session. A longer
-unattended run (`--stop-on-zero`, no wall-clock cap) is the natural next
-step if someone picks this back up.
+## The fix
 
-## Best-reached body (restored to `INCLUDE_ASM`, not left in `src/`)
+The unit's local `LinkNodeMethods` view typed the slot with one parameter:
 
 ```c
-#if 0
-typedef struct LinkNode LinkNode;
-
-typedef struct LinkNodeMethods {
-    u8 pad0[0x44];
-    void (*slot44)(LinkNode *self, s32 flag, s32 val);
-    void (*slot48)(LinkNode *self, s32 flag, void *arg);
-    void (*slot4C)(LinkNode *self, void *arg1, void *arg2);
-    u8 pad50[0x60 - 0x50];
-    void (*slot60)(LinkNode *self, s32 arg1);
-    void (*slot64)(LinkNode *self);
-    void (*slot68)(LinkNode *self, s32 arg1);
-    u8 pad6C[0xB8 - 0x6C];
-    void (*slotB8)(LinkNode *self, void *arg1);
-} LinkNodeMethods;
-
-struct LinkNode {
-    LinkNodeMethods *methods;
-    u8 pad4[0x20 - 0x4];
-    s32 unk20;
-    u8 pad24[0x54 - 0x24];
-    s32 unk54;
-    u8 pad58[0x64 - 0x58];
-    s32 unk64;
-    void *unk68;
-    s32 unk6C;
-    s32 unk70;
-    void *unk74;
-    void *unk78;
-    LinkNode *arr7C[2];
-    LinkNode *arr84[5];
-};
-
-typedef struct Vec3S {
-    s32 x, y, z;
-} Vec3S;
-
-extern s32 rand(void);
-extern void func_80056D18(void *self, s32 arg1, s32 arg2, void *arg3);
-extern void func_800573A8(void *self, Vec3S *arg1);
-extern s32 D_80087844[];
-extern s32 D_8008785C[];
-extern s32 D_80087868[];
-extern s32 D_80087874[];
-extern Vec3S D_80087880;
-
-/* 86/87 words -- one dead-store residue, see the classification above. */
-void func_80056BBC(LinkNode *self) {
-    s32 parity = rand() % 2;
-    void *tblOrNull = parity ? NULL : D_80087868;
-    s32 one = 1;
-    LinkNode *child;
-    void *arg;
-
-    func_80056D18(self, 0, 0, tblOrNull);
-
-    if (self->unk70 >= 2) {
-        LinkNodeMethods *m;
-
-        child = self->arr84[1];
-        D_80087880.x = D_80087844[self->unk70];
-        func_800573A8(child, &D_80087880);
-        m = child->methods;
-        arg = (self->unk78 != NULL) ? self->unk78 : self->unk74;
-        m->slotB8(child, arg);
-    } else {
-        child = self->arr84[1];
-        child->methods->slot64(child);
-        child->methods->slot68(child, 0);
-        child->methods->slot48(child, one, (parity != 0) ? D_8008785C : D_80087874);
-    }
-
-    self->arr84[2]->methods->slot60(self->arr84[2], 0);
-}
-#endif
+void (*slot64)(LinkNode *self);           /* what stalled at 86/87 */
+void (*slot64)(LinkNode *self, s32 arg1); /* what matches 87/87 */
 ```
+
+and the call site becomes `child->methods->slot64(child, 1);`. With no second
+parameter in the type there is no `li $a1, 1` anywhere in the C, so there was
+nothing for the delay-slot filler to hoist and the slot came out as a `nop`.
+
+**This was cross-checkable without touching the assembler, and that is the
+transferable part.** Every other unit in the project that names this slot
+already passes it a second argument:
+
+```
+src/class_3bb8c_m.c:72   self->unk18->methods->slot64(self->unk18, v);
+src/Entity_e.c:244       this->unk94->unk5C->methods->slot64(..., D_8008AC1C);
+src/code_2cc8c_e.c:319   self->methods->slot64(self, 0);
+src/code_2cc8c_e.c:419   methods->slot64(self, 1);
+src/code_2cc8c_e.c:437   methods->slot64(self, 0);
+src/code_2cc8c_e.c:445   methods->slot64(self, 0);
+src/class_3bb8c_l.c:207  unk18->methods->slot64(unk18, unk50->unkC);
+```
+
+(`code_179d8_d.c`'s `s32 (*slot64)(void *)` is a different class's table and
+not evidence either way.) Six matched call sites in four units agree on the
+arity; this unit's one-argument view was the outlier, and the project's
+multiple-independent-local-views convention is exactly what makes checking the
+siblings cheap and non-binding.
+
+Delta's other two findings were correct and are kept: the `child->methods`
+hoist that fills an earlier load-delay slot, and the `(parity != 0) ?
+D_8008785C : D_80087874` branch sense. Without those this is 84/87, not 86/87 --
+the head's contribution here is the last word, not the body.
+
+## Adjudication: why the class was wrong, and the discriminator that catches it
+
+"Redundant move / dead store" is a real class in this project
+(`strcat`, `func_80051858`, and the round-16 instance), and it is the class you
+reach for when an instruction has no visible consumer. **The check that
+separates it from an ordinary hoisted argument is one grep, and it is a
+liveness question, not a similarity question:**
+
+> Walk FORWARD from the residue along the branch-TAKEN path to the first
+> `jal`/`jalr`. If nothing writes the register in between and the register is
+> `$a0`-`$a3`, it is a call argument. It is only a dead store if BOTH successors
+> redefine it before any call.
+
+The stall report checked the fallthrough path (correctly) and asserted the
+taken path "sets `$a1` itself before its own uses" -- which the listing
+contradicts four instructions in. A single-path liveness check is not a
+liveness check.
+
+A second-order note for whoever reads a report like this next: the near-miss
+score was accurate, the two fixes in it were real and load-bearing, and the
+permuter numbers were honestly reported (delta explicitly declined to claim
+permuter-exhaustion). **The classification was the only thing wrong, and it was
+the only thing that would have kept this function stalled** -- an
+`INCLUDE_ASM` with a "genuine dead store in retail's own output" verdict is
+one nobody re-opens. This is what PARALLEL-RUNS means by a wrong CAUSE costing
+more than a wrong score.
+
+Also corrected from the prior draft: the residue's address was transcribed as
+`8005671C`, a digit transposition of `80056C1C`, which is before the function's
+own entry point and would not have resolved for the next reader.
+
+## Final body
+
+Lives in `src/class_3bb8c_s.c` in ROM order between `func_80056B8C` and
+`func_80056D18`.
 
 ### Proposed learning
 
-**The "reload a shared value before a branch so it can fill an earlier
-branch's load-delay slot" lever is real and mechanical, not luck.** Moving an
-independent load (here, `child->methods`) to an earlier statement position --
-BEFORE a conditional expression that does not depend on it -- let GCC 2.6.3's
-own scheduler hoist it into a load-delay slot one branch earlier, closing two
-words in one edit. This is a source-level, non-register-pinning lever (pure
-statement reordering) worth reaching for before suspecting a residue is
-unreachable: check whether an unrelated load sitting right after your
-function's near-miss point could instead be moved earlier to fill a delay
-slot that currently holds a `nop`.
+**A one-instruction residue in a branch delay slot that sets `$a0`-`$a3` is an
+argument to a call in the taken arm until proven otherwise -- check liveness
+along the TAKEN path, not just the fallthrough.** A function-pointer slot typed
+with too few parameters produces exactly this and nothing else: the call itself
+is `jalr`, identical either way, so the arity is invisible at the call site and
+shows up only as a missing argument-register setup that the scheduler had
+hoisted somewhere non-obvious. Cross-check a slot's arity against every other
+unit that calls it (`grep -rn 'slotNN' src/`) before classifying such a residue
+as unfixable -- the project's per-unit local views make disagreement cheap to
+find and are themselves the evidence.

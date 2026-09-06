@@ -58,7 +58,7 @@ typedef struct LinkNodeMethods {
     void (*slot4C)(LinkNode *self, void *arg1, void *arg2);     /* +0x04C */
     u8 pad50[0x60 - 0x50];
     void (*slot60)(LinkNode *self, s32 arg1);                     /* +0x060 */
-    void (*slot64)(LinkNode *self);                                 /* +0x064 */
+    void (*slot64)(LinkNode *self, s32 arg1);                       /* +0x064 */
     void (*slot68)(LinkNode *self, s32 arg1);                         /* +0x068 */
     u8 pad6C[0xB8 - 0x6C];
     void (*slotB8)(LinkNode *self, void *arg1);                          /* +0x0B8 */
@@ -93,6 +93,13 @@ typedef struct Vec3S {
 
 extern void func_80056DF8(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void func_80056F28(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
+extern void func_800573A8(void *self, Vec3S *v);   /* class_3bb8c_t.c */
+extern void func_80056D18(void *self, s32 a1, s32 a2, void *tbl); /* below */
+extern s32 D_80087844[];
+extern s32 D_8008785C[];
+extern s32 D_80087868[];
+extern s32 D_80087874[];
+extern Vec3S D_80087880;
 
 void func_80056B8C(LinkNode *self);
 
@@ -188,6 +195,31 @@ void func_80056B8C(LinkNode *self) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_80056BBC);
+void func_80056BBC(LinkNode *self) {
+    s32 parity = rand() % 2;
+    void *tblOrNull = parity ? NULL : D_80087868;
+    LinkNode *child;
+    void *arg;
+
+    func_80056D18(self, 0, 0, tblOrNull);
+
+    if (self->unk70 >= 2) {
+        LinkNodeMethods *m;
+
+        child = self->arr84[1];
+        D_80087880.x = D_80087844[self->unk70];
+        func_800573A8(child, &D_80087880);
+        m = child->methods;
+        arg = (self->unk78 != NULL) ? self->unk78 : self->unk74;
+        m->slotB8(child, arg);
+    } else {
+        child = self->arr84[1];
+        child->methods->slot64(child, 1);
+        child->methods->slot68(child, 0);
+        child->methods->slot48(child, 1, (parity != 0) ? D_8008785C : D_80087874);
+    }
+
+    self->arr84[2]->methods->slot60(self->arr84[2], 0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_80056D18);
