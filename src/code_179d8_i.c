@@ -109,7 +109,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033AB0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033C90);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033FB8);
+void func_80033FB8(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+
+    D_800902E8[sa0][sa1].unk2B = 1;
+    D_800902E8[sa0][sa1].unk90 &= ~8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80034020);
 
