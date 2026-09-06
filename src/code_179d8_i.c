@@ -103,7 +103,42 @@ void func_800334A0(s16 a0, s16 a1)
     func_8003760C(&s);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800334F0);
+/* 0x10-byte-strided table shared with code_179d8_j.c's own SlotE968 local
+ * view of the same D_8008E968 global (a pointer variable, not an array
+ * symbol -- confirmed by the `lw` of its VALUE here, matching that file's
+ * own `extern SlotE968 *D_8008E968;`). This unit's own reduced view names
+ * only the fields this function touches. */
+typedef struct {
+    u8 unk0;
+    u8 unk1;
+    u8 unk2;
+    u8 unk3;
+    u8 unk4;
+    u8 pad5[0x6 - 0x5];
+    u16 unk6;
+    u8 pad8[0x10 - 0x8];
+} Entry8E968;
+
+extern Entry8E968 *D_8008E968;
+extern s32 func_80032148(s16 a0, s16 a1);
+
+s16 func_800334F0(s16 a0, s16 a1, Entry8E968 *out)
+{
+    s16 idx;
+
+    if (D_8008EA2C[a0] == 1) {
+        idx = a1;
+        func_80032148(a0, idx);
+        out->unk0 = D_8008E968[idx].unk0;
+        out->unk1 = D_8008E968[idx].unk1;
+        out->unk2 = D_8008E968[idx].unk2;
+        out->unk3 = D_8008E968[idx].unk3;
+        out->unk4 = D_8008E968[idx].unk4;
+        out->unk6 = D_8008E968[idx].unk6;
+        return 0;
+    }
+    return -1;
+}
 
 extern void func_80039158(s32 a0);
 extern void func_8003918C(s32 a0);
