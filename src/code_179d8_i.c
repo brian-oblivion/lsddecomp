@@ -65,9 +65,36 @@ s16 func_8003370C(s16 a0)
     return func_8003904C(a0);
 }
 
+/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+ * these, indexed [screen][slot]-style by two signed 16-bit indices. This is
+ * a reduced LOCAL view -- only the fields this unit's functions touch are
+ * named. See code_179d8_f.c's own Entry90902E8 for a fuller layout of the
+ * same array; each unit keeps its own independent reading, per project
+ * convention (multiple local views of one struct are expected here). */
+typedef struct {
+    u8 pad0[0x2B];
+    u8 unk2B;
+    u8 pad2C[0x90 - 0x2C];
+    s32 unk90;
+    u8 pad94[0xAC - 0x94];
+} Entry90902E8;
+
+extern Entry90902E8 *D_800902E8[];
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033738);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800339AC);
+extern s32 func_8003069C(s32 a0);
+
+void func_800339AC(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+    Entry90902E8 *p = &D_800902E8[sa0][sa1];
+
+    func_8003069C((sa1 << 8) | sa0);
+    p->unk2B = 0;
+    D_800902E8[sa0][sa1].unk90 &= ~2;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033A4C);
 
