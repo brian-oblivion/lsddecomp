@@ -96,7 +96,14 @@ void func_800339AC(s32 a0, s32 a1)
     D_800902E8[sa0][sa1].unk90 &= ~2;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033A4C);
+void func_80033A4C(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+
+    D_800902E8[sa0][sa1].unk2B = 0;
+    D_800902E8[sa0][sa1].unk90 &= ~0x100;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033AB0);
 
