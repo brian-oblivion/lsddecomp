@@ -240,7 +240,20 @@ void func_80034020(s16 a0)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800340B0);
+extern s16 func_80032C98(void *a0, s16 a1);
+extern s16 func_800335FC(s32 a0, s16 a1);
+extern s32 D_80090C1C[];
+
+s16 func_800340B0(void *a0)
+{
+    s16 idx = func_80032C98(a0, -1);
+    s16 result = idx;
+
+    if (idx != -1) {
+        result = func_800335FC(D_80090C1C[idx], idx);
+    }
+    return result;
+}
 
 extern s32 func_80034138(s16 a0, s16 a1);
 
