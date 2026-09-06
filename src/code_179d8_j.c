@@ -27,7 +27,61 @@
 
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_800302DC);
+/* ------------------------------------------------------------------------
+ * Cross-unit calls, typed per-call-site from the registers loaded before
+ * each `jal` -- none of these callees have an established prototype yet
+ * (several are themselves addiu-$at blocked in their own units), so these
+ * are local guesses, not authoritative.  See CLAUDE.md's note on this.
+ * ------------------------------------------------------------------------ */
+extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);
+extern s32 func_80032148(s16 a0, s16 a1);
+extern s16 func_8002F3E8(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
+extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
+extern void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3);
+
+extern u16 D_8008EA22;
+
+/* Base pointer for a table of 0x10-byte slots, indexed by the small
+ * (<0x10) channel id `func_80032148` validates/selects.  Only the two
+ * byte fields this unit's own accessors touch are named -- everything
+ * else is opaque per this project's local-reading convention. */
+typedef struct SlotE968 {
+    u8 pad0[0x1];
+    u8 unk1; /* +0x1 */
+    u8 pad2[0x4 - 0x2];
+    u8 unk4; /* +0x4 */
+    u8 pad5[0x10 - 0x5];
+} SlotE968;
+extern SlotE968 *D_8008E968;
+
+/* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
+ * id.  Only the two leading s16 fields this unit's own accessors touch
+ * are named. */
+typedef struct EntryDAD4 {
+    s16 unk0; /* +0x0 */
+    s16 unk2; /* +0x2 */
+    u8 pad4[0x10 - 0x4];
+} EntryDAD4;
+extern EntryDAD4 *D_8006DAD4;
+
+s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
+{
+    u16 outA;
+    u16 outB;
+
+    if (p4 == p5) {
+        outB = 0x40;
+        outA = p4;
+    } else if (p5 < p4) {
+        outA = p4;
+        outB = (p5 << 6) / p4;
+    } else {
+        outA = p5;
+        outB = 0x7F - ((p4 << 6) / p5);
+    }
+    return func_8002FAC4(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_800303C8);
 
