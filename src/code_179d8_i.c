@@ -197,9 +197,19 @@ s16 func_8003370C(s16 a0)
 typedef struct {
     u8 pad0[0x2B];
     u8 unk2B;
-    u8 pad2C[0x90 - 0x2C];
+    u8 pad2C[0x44 - 0x2C];
+    s16 unk44;
+    u8 pad46[0x4A - 0x46];
+    s16 unk4A;
+    u8 pad4C[0x70 - 0x4C];
+    s16 unk70;
+    u8 pad72[0x8C - 0x72];
+    u32 unk8C;
     s32 unk90;
-    u8 pad94[0xAC - 0x94];
+    u8 pad94[0xA0 - 0x94];
+    s32 unkA0;
+    u32 unkA4;
+    u8 padA8[0xAC - 0xA8];
 } Entry90902E8;
 
 extern Entry90902E8 *D_800902E8[];
@@ -212,7 +222,7 @@ extern s32 D_8008EA00;
 extern void func_8002F700(void);
 extern s32 func_8003410C(s16 a0, s16 a1);
 extern void func_80036528(s32 a0, s32 a1);
-extern void func_80033AB0(s32 a0, s32 a1);
+extern void func_80033AB0(s16 a0, s16 a1);
 extern void func_80033C90(s32 a0, s32 a1);
 extern void func_800339AC(s32 a0, s32 a1);
 extern void func_80033FB8(s32 a0, s32 a1);
@@ -298,7 +308,54 @@ void func_80033A4C(s32 a0, s32 a1)
     D_800902E8[sa0][sa1].unk90 &= ~0x100;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033AB0);
+extern u32 D_8009024C;
+
+void func_80033AB0(s16 a0, s16 a1)
+{
+    Entry90902E8 *e = &D_800902E8[a0][a1];
+
+    e->unkA0 -= 1;
+    if (e->unk44 > 0) {
+        if ((u32)e->unkA0 % (u32)e->unk44 != 0) {
+            return;
+        }
+        {
+            u32 new8C;
+
+            if (e->unk8C > e->unkA4) {
+                new8C = e->unk8C - 1;
+            } else if (e->unk8C < e->unkA4) {
+                new8C = e->unk8C + 1;
+            } else {
+                goto skip1;
+            }
+            e->unk8C = new8C;
+        skip1:;
+        }
+    } else {
+        if (e->unk8C > e->unkA4) {
+            e->unk8C += e->unk44;
+            if (e->unk8C < e->unkA4) {
+                e->unk8C = e->unkA4;
+            }
+        } else if (e->unk8C < e->unkA4) {
+            e->unk8C -= e->unk44;
+            if (e->unkA4 < e->unk8C) {
+                e->unk8C = e->unkA4;
+            }
+        }
+    }
+
+    e->unk70 = e->unk4A * (s32)e->unk8C * 10 / (D_8009024C * 60);
+    if (e->unk70 <= 0) {
+        e->unk70 = 1;
+    }
+
+    if (e->unkA0 == 0 || e->unk8C == e->unkA4) {
+        D_800902E8[a0][a1].unk90 &= ~0x40;
+        D_800902E8[a0][a1].unk90 &= ~0x80;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033C90);
 
