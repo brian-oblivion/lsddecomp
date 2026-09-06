@@ -193,7 +193,56 @@ s32 func_800319B4(s32 p0, s16 p1, s16 p2, s32 p3, u16 p4)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031A44);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031BA4);
+/* 52-byte-stride parallel tables; 16-byte-stride pair for the mutable
+ * fields.  See func_80031CF0's report for why these are independent arrays
+ * rather than fields of one struct (each access computes its own address). */
+typedef struct {
+    s16 unk0;
+    u8 pad2[0x34 - 0x2];
+} Rec34D994;
+
+typedef struct {
+    s16 unk0;
+    u8 pad2[0x10 - 0x2];
+} Rec16D7F0;
+
+extern Rec34D994 D_8008D994[];
+extern Rec34D994 D_8008D99A[];
+extern Rec34D994 D_8008D99E[];
+extern Rec16D7F0 D_8008D7F8[];
+extern Rec16D7F0 D_8008D7FA[];
+extern u8 D_8008D970[];
+
+/* `dead` is never read and the write is unreachable; it exists to make GCC
+ * allocate retail's empty 8-byte frame, which is what puts the two
+ * stack-passed arguments at 0x18/0x1C($sp) instead of 0x10/0x14.  See this
+ * function's match report -- the frame is the ONLY thing the idiom is for,
+ * and adding anything else on top of it breaks the scheduling. */
+s32 func_80031BA4(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
+    s32 dead[2];
+
+    if ((u16)idx < 0x18) {
+        if (D_8008D99E[idx].unk0 != p1) {
+            return -1;
+        }
+        if (D_8008D99A[idx].unk0 != p2) {
+            return -1;
+        }
+        if (D_8008D994[idx].unk0 != p3) {
+            return -1;
+        }
+        D_8008D7F8[idx].unk0 = p4;
+        __asm__("");
+        D_8008D7FA[idx].unk0 = p5;
+        __asm__("");
+        D_8008D970[idx] |= 0x30;
+        return 0;
+    }
+    if (0) {
+        dead[0] = 1;
+    }
+    return -1;
+}
 
 s32 func_80031C98(s16 idx, s16 *out1, s16 *out2)
 {
