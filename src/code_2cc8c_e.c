@@ -303,8 +303,37 @@ void func_8004001C(Class6E99CObj *self, s32 a1) {
     self->unk74 = a1;
 }
 
+#if 0
+void func_80040024(Class6E99CObj *self) {
+    s32 idx;
+
+    if (self->unk6C != 0) {
+        return;
+    }
+    idx = self->methods->slotDC(self);
+    self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
+    self->unk6C = 1;
+    self->unk74 = -self->unk74;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040024);
 
+#if 0
+void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
+    s32 idx;
+
+    if (self->unk6C != 0) {
+        return;
+    }
+    idx = self->methods->slotDC(self);
+    if (self->unk98 != 0) {
+        self->unk80--;
+    } else {
+        self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
+    }
+    self->unk6C = 2;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800400B0);
 
 s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
