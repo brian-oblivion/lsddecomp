@@ -112,6 +112,25 @@ clone tools/asm-differ      https://github.com/simonlindholm/asm-differ.git   di
 clone tools/m2c             https://github.com/matt-kempster/m2c.git          m2c.py
 clone tools/decomp-permuter https://github.com/simonlindholm/decomp-permuter.git permuter.py
 
+# maspsx does not expose addiu_at independently of --aspsx-version: it is only
+# switched on below 2.30, where it drags three nop-insertion rules with it
+# (nop_at_expansion, nop_mflo_mfhi, nop_lw_lw) that the 2.34 defaults get right
+# across every matched function. This patch adds a --addiu-at flag that sets
+# ONLY addiu_at. Retail uses the unfolded indexed form at 502 of 502 sites and
+# the folded form at none, so the flag is required, not optional -- the
+# Makefile passes it and the build does not match without it.
+# See docs/research/addiu-at-blocker.md.
+if [ -f tools/maspsx/maspsx.py ]; then
+    if grep -q -- '--addiu-at' tools/maspsx/maspsx.py; then
+        skip "maspsx addiu_at patch (already applied)"
+    elif git -C tools/maspsx apply --check ../../tools/patches/maspsx-addiu-at.patch 2>/dev/null; then
+        git -C tools/maspsx apply ../../tools/patches/maspsx-addiu-at.patch \
+            && ok "maspsx addiu_at patch"
+    else
+        die "tools/patches/maspsx-addiu-at.patch does not apply to this maspsx checkout -- upstream has moved. The build WILL NOT match until this is resolved; see docs/research/addiu-at-blocker.md."
+    fi
+fi
+
 # ---------------------------------------------------------------------------
 step "Psy-Q compiler (GCC 2.6.3) and mipsel binutils"
 

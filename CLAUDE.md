@@ -131,26 +131,45 @@ which is what makes many parallel runners cheap here.
 
 ## Open toolchain blockers
 
-Two are open. Both are escalated with reproducers and corpus censuses, both are
-the operator's call, and neither is something to experiment with:
+**`addiu_at` is RESOLVED as of round 21 (2026-09-06) — do NOT screen for it,
+and do NOT file a stall against it.** maspsx gained a `--addiu-at` flag
+(`tools/patches/maspsx-addiu-at.patch`, applied by `tools/setup.sh`, passed by
+the Makefile) that sets `addiu_at` alone, decoupled from the sub-2.30 version
+bump that used to drag three nop-insertion rules with it. The pipeline now
+emits retail's unfolded four-instruction indexed form directly and the
+whole-image build stays byte-exact. 76 functions were unblocked and 66 stall
+reports retired. Full evidence in `docs/research/addiu-at-blocker.md`.
+
+**Two remain open.** Both are escalated with reproducers and corpus censuses,
+both are the operator's call, and neither is something to experiment with:
 
 - `docs/research/gp-relative-blocker.md` — the `-G` experiment was run with
-  authorisation and REJECTED.
-- `docs/research/addiu-at-blocker.md` — not tested; the obvious version bump is
-  not the remedy. A corpus census attached to it shows the `nop_mflo_mfhi` flag
-  inside it is the right MECHANISM at the wrong GRANULARITY, which sharpens the
-  blocker without resolving it.
+  authorisation and REJECTED. 82 functions.
+- **`nop_mflo_mfhi`**, documented inside `addiu-at-blocker.md` rather than in
+  its own file. 9 functions. The census there argues it is the right MECHANISM
+  at the wrong GRANULARITY — which is exactly what was true of `addiu_at`
+  before round 21, so the same remedy (a flag decoupling it from the version)
+  is the obvious candidate. **It has not been tested. That is an operator
+  escalation, not a head decision.**
 
-Between them they account for a large fraction of everything queued, so screen
-any candidate function before spending attempts on it:
+So screen any candidate function against TWO greps, not three:
 
 ```sh
 grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
-grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/<unit>/<func>.s \
+  | grep -E '\b(mult|multu|div|divu)\b'
 ```
 
-A hit in either means the function is blocked. `progress.py`'s `fresh` column
-cannot see this, which is why every blocked function carries a stub report.
+A hit in either means the function is blocked. Note the second runs FORWARD —
+an `mflo`/`mfhi` FOLLOWED WITHIN TWO INSTRUCTIONS BY a `mult`/`div`. The
+backward reading is not a blocker and inventing it has cost two rounds; see
+Gate 1 in docs/PARALLEL-RUNS.md. `progress.py`'s `fresh` column cannot see
+either, which is why every blocked function carries a stub report.
+
+**`tools/nearmiss.py` runs both for you** and still reports the `addiu_at`
+construct, tagged `addiu_at(RESOLVED-not-a-blocker)`, without counting it —
+older reports still blame it, so the marker is how you tell "this report's
+verdict predates the fix" from "this is really blocked".
 
 **Run the screen before you accept a stall's CAUSE, not only before you assign
 work.** Round 13 found `func_8005CBC8` filed as a one-word near-miss whose
@@ -159,6 +178,11 @@ preamble — while an `addiu $at, $at, %lo(jtbl_8001188C)` hit sat unexamined at
 line 66 of that function's own `.s`. It was two words short, and one of the two
 was the blocker. Seven attempts had gone into the wrong half.
 
+**That half is now matchable** — the blocker it names was `addiu_at`. The rule
+survives its own example, because the FAILURE MODE is about attributing a
+residue to the wrong cause, not about which blocker happened to be involved.
+Run the two remaining screens the same way.
+
 The asymmetry is what makes this worth a rule: a wrong SCORE gets corrected the
 next time anyone measures, because measuring is the job. A wrong CAUSE is what
 the next round acts on, so it converts a blocked function into a permanent
@@ -166,9 +190,13 @@ near-miss that keeps attracting attempts and keeps generating reports agreeing
 with each other. Screening costs one second and is the difference between
 "unmatchable until the blocker moves" and "so close, try again".
 
-**A `%lo(jtbl_*)` hit counts. A dense `switch` is blocked exactly like an
-indexed global, and this is the one place the screen looks like it is
-over-reporting when it is not.** The temptation is obvious: a jump-table
+**HISTORICAL as of round 21 — the construct below is no longer blocked,
+because `addiu_at` is resolved. The LESSON is not historical and is why the
+section is kept.**
+
+**A `%lo(jtbl_*)` hit counted. A dense `switch` was blocked exactly like an
+indexed global, and this was the one place the screen looked like it was
+over-reporting when it was not.** The temptation is obvious: a jump-table
 dispatch loads a CODE address and jumps (`lw $v0, 0x0($at)` then `jr $v0`),
 an indexed global loads a DATA value, so they look like two constructs and
 the `jtbl_*` one looks harmless. Round 10's head acted on that reading,

@@ -66,10 +66,21 @@ def screens(path):
     if subprocess.run(["grep", "-q", "gp_rel", path]).returncode == 0:
         hits.append("gp_rel")
 
+    # addiu_at is NO LONGER A BLOCKER as of round 21 (2026-09-06).  maspsx
+    # gained a --addiu-at flag (tools/patches/maspsx-addiu-at.patch, applied
+    # by tools/setup.sh, passed by the Makefile) that sets addiu_at ALONE,
+    # decoupled from the sub-2.30 version bump that used to drag three
+    # nop-insertion rules along with it.  The pipeline now emits retail's
+    # unfolded four-instruction indexed form directly.
+    #
+    # The screen is kept, reported, and NOT counted as a blocker, because the
+    # construct still marks functions whose earlier stall reports blamed it --
+    # see docs/research/addiu-at-blocker.md.  Delete this block only once no
+    # report references the class.
     if subprocess.run(
         ["grep", "-qE", r"addiu *\$at, *\$at, *%lo", path]
     ).returncode == 0:
-        hits.append("addiu_at")
+        hits.append("addiu_at(RESOLVED-not-a-blocker)")
 
     # THE ORDER MATTERS: an mflo/mfhi FOLLOWED WITHIN TWO INSTRUCTIONS BY a
     # mult/div.  Piped exactly as the doc writes it.
@@ -125,15 +136,25 @@ def main():
             words = int(m.group(1), 16) // 4 if m else 0
             rows.append((words, unit, func, screens(spath), verdict(func)))
 
-    clean = [r for r in rows if not r[3]]
-    blocked = [r for r in rows if r[3]]
+    # A screen hit is only a BLOCKER if the pinned pipeline still cannot emit
+    # retail's bytes for it.  addiu_at is reported but no longer blocks (round
+    # 21) -- partitioning on "any hit" would keep 76 assignable functions
+    # hidden in the blocked column, which is the same
+    # false-blocker-deletes-matchable-ground failure the nop_mflo_mfhi
+    # inversions caused in rounds 15 and 16.
+    def real_blockers(hits):
+        return [h for h in hits if not h.endswith("(RESOLVED-not-a-blocker)")]
+
+    clean = [r for r in rows if not real_blockers(r[3])]
+    blocked = [r for r in rows if real_blockers(r[3])]
 
     print(f"live INCLUDE_ASM queue: {len(rows)}   "
           f"blocker-clean: {len(clean)}   blocked: {len(blocked)}")
     if blocked:
         tally = {}
         for r in blocked:
-            tally[",".join(r[3])] = tally.get(",".join(r[3]), 0) + 1
+            k = ",".join(real_blockers(r[3]))
+            tally[k] = tally.get(k, 0) + 1
         print("  blocked by: " + "  ".join(
             f"{k}={v}" for k, v in sorted(tally.items(), key=lambda x: -x[1])))
     print()

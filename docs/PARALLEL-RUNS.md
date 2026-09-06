@@ -779,10 +779,14 @@ wrote down. Keep both honesty mechanisms fed:
   move the unit into the `banked` column instead of `fresh`. Without it a carve
   inflates `fresh` by its whole size and the next head mis-triages.
 
-**Screen the queue with THREE greps, not two.** CLAUDE.md names two ---
-`gp_rel` and `addiu $at, $at, %lo`. There is a third, published inside
-`docs/research/addiu-at-blocker.md` rather than in CLAUDE.md, and round 13's
-head missed it at Gate 1 and assigned a blocked function because of that:
+**Screen the queue with TWO greps as of round 21 — it used to be three.**
+`addiu $at, $at, %lo` is NO LONGER A BLOCKER (resolved round 21; see
+`docs/research/addiu-at-blocker.md`), so screening for it now invents
+blockers, which is the strictly worse failure described below. The two live
+ones are `gp_rel` and `nop_mflo_mfhi`. **Prefer `python3 tools/nearmiss.py`,
+which runs both correctly and reports the resolved construct without counting
+it.** The `nop_mflo_mfhi` form, which round 13's head missed at Gate 1 and
+assigned a blocked function because of it:
 
 ```sh
 for f in $(grep -oP 'INCLUDE_ASM\("[^"]*", \K\w+' src/<unit>.c); do

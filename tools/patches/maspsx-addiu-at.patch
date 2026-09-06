@@ -1,0 +1,28 @@
+diff --git a/maspsx.py b/maspsx.py
+index ed7f23a..4e3a382 100644
+--- a/maspsx.py
++++ b/maspsx.py
+@@ -58,6 +58,7 @@ def main() -> None:
+     parser.add_argument("--expand-div", action="store_true")
+     parser.add_argument("--macro-inc", action="store_true")
+     parser.add_argument("--dont-expand-li", action="store_true")
++    parser.add_argument("--addiu-at", action="store_true")
+     parser.add_argument("--force-stdin", action="store_true")
+     parser.add_argument("--passthrough", action="store_true")
+     parser.add_argument("--use-comm-section", action="store_true")
+@@ -137,6 +138,15 @@ def main() -> None:
+         if args.dont_expand_li and version_config.expand_li:
+             version_config.expand_li = False
+ 
++        # Decouple addiu_at from the version bump. config_for_aspsx_version
++        # only turns it on below 2.30, where it drags three nop rules with it
++        # (nop_at_expansion, nop_mflo_mfhi, nop_lw_lw) -- a global codegen
++        # change wearing a version number. This flag sets ONLY addiu_at and
++        # leaves the 2.34 nop defaults alone. See
++        # docs/research/addiu-at-blocker.md, "Options", option 1.
++        if args.addiu_at:
++            version_config.addiu_at = True
++
+         processor = MaspsxProcessor(
+             in_lines,
+             sdata_limit=sdata_limit,

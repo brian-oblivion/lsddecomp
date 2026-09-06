@@ -1,5 +1,112 @@
 # The `addiu_at` indexed-addressing blocker
 
+**STATUS: RESOLVED, round 21 (2026-09-06). This is no longer a blocker.**
+
+Option 1 from "Options, in rough order of promise" below — *patch `addiu_at`
+alone, decoupled from the version* — was authorised by the operator and is
+implemented. Everything after this section is the original escalation, kept
+verbatim because its census and reasoning are what made the fix obvious and
+because two of its addenda (the `nop_mflo_mfhi` sibling, and the jump-table
+scope) remain live for the OTHER classes they describe.
+
+## The fix
+
+`tools/patches/maspsx-addiu-at.patch`, committed to this repo and applied by
+`tools/setup.sh` after it clones maspsx. It adds a `--addiu-at` CLI flag that
+sets `version_config.addiu_at = True` and nothing else. The Makefile passes it
+in `MASPSX_FLAGS`.
+
+This is precisely what the "Why this is NOT a version bump" section said was
+needed: `addiu_at` is already a clean independent boolean on
+`MaspsxProcessor`, and maspsx's own upstream tests (`tests/test_at.py`) set it
+in isolation. Only `config_for_aspsx_version` couples it to the three
+nop-insertion rules, and the flag bypasses that coupling without touching
+them. The 2.34 `nop_mflo_mfhi` / `nop_at_expansion` / `nop_lw_lw` defaults are
+unchanged.
+
+## The evidence, in the order it was taken
+
+1. **The census reproduces at 971 matched functions.** Re-run over `asm/`:
+   **502 unfolded, 0 folded**, spanning 100 files — identical to the original
+   count, and all 502 still in `asm/`. After 21 rounds, **not one matched
+   function exercises this construct**, so the pin had never been tested
+   against it. That is what made the change safe to try.
+
+2. **The whole-image build stays byte-exact with the flag on.** `rm -rf build`
+   (mandatory — `MASPSX_FLAGS` is invisible to the dependency graph, see the
+   procedure section below), full rebuild, `OK: build matches retail`. This is
+   the decisive result: the flag is provably inert across all 971 matched
+   functions.
+
+3. **The flag produces retail's form.** The doc's own reproducer, through the
+   pinned pipeline:
+
+   ```
+   baseline 2.34            with --addiu-at
+   lui   $at,%hi(sym)       lui   $at,%hi(sym)
+   addu  $at,$at,$4         addiu $at,$at,%lo(sym)
+   lbu   $2,%lo(sym)($at)   addu  $at,$at,$4
+                            lbu   $2,0x0($at)
+   ```
+
+   Four instructions, unfolded, exactly as retail.
+
+4. **A previously-blocked function was taken as a live test.**
+   `func_800305F4` (`code_179d8_j`, 21 words) had a stub report reading
+   "addiu-$at blocker, not attempted". With the flag it compiles to the
+   correct length with no drift, and the previously-impossible sequence
+   matches word for word — the build emits `e8022124`
+   (`addiu $at,$at,%lo(D_800902E8)`), which retail has and the old pipeline
+   could not produce at all. It scored 6/21 on a first pass; the residue is
+   ordinary instruction scheduling. **That is the whole point: it moved from
+   unmatchable to ordinary matching work.** No C was kept — the function is
+   back to `INCLUDE_ASM` and is now fresh ground.
+
+## Consequences that were applied in the same round
+
+- **76 functions unblocked.** `tools/nearmiss.py` blocker-clean went 85 -> 161;
+  blocked 167 -> 91 (`gp_rel`=82, `nop_mflo_mfhi`=9).
+- **`tools/nearmiss.py` no longer counts `addiu_at` as a blocker.** It still
+  REPORTS the construct, tagged `addiu_at(RESOLVED-not-a-blocker)`, because
+  older reports still blame it. Partitioning on "any screen hit" would have
+  kept 76 assignable functions in the blocked column — the same
+  false-blocker-hides-matchable-ground failure the `nop_mflo_mfhi` inversions
+  caused in rounds 15 and 16.
+- **66 stall reports retired.** 27+39 pure blocker stubs deleted, so those
+  functions return to `fresh` (0 -> 62). One report rewritten to cite only its
+  remaining `gp_rel` hit. Five substantive reports KEPT — their structural
+  analysis is still good — with a banner saying the verdict is stale and the
+  function is assignable: `func_80018464`, `func_8003C48C`, `func_8003C63C`,
+  `func_8004109C`, `func_80049EB4`.
+
+  `func_8003C63C` is worth singling out: CLAUDE.md cites it as the case where
+  **seven attempts went into the wrong half** of a two-word residue because an
+  `addiu $at` sat unexamined at line 66 of its own `.s`. That half is now
+  matchable.
+
+## What this does NOT resolve
+
+- **`gp_rel` is untouched and still blocks 82 functions.** Different
+  mechanism, different remedy, and its `-G` experiment was run with
+  authorisation and REJECTED. See `gp-relative-blocker.md`.
+- **`nop_mflo_mfhi` still blocks 9.** The addendum below argues it is the right
+  MECHANISM at the wrong GRANULARITY; that argument stands and is now the
+  obvious next candidate for the same treatment — a flag that decouples it from
+  the version. **It has NOT been tested and is an operator escalation, not a
+  head decision.**
+- **maspsx is cloned `--depth 1` from upstream master and is NOT pinned to a
+  commit** (`tools/setup.sh`). That is a pre-existing reproducibility gap, not
+  one this change introduced, but the patch makes it sharper: if upstream moves
+  the patched lines, `setup.sh` now fails loudly with a message pointing here
+  rather than silently building something else. **Pinning the clone is an
+  operator decision.** The right long-term fix is upstreaming the flag to
+  mkst/maspsx, which is an external contribution and therefore also not a head
+  decision.
+
+---
+
+# ORIGINAL ESCALATION (kept verbatim below this line)
+
 **Status: ESCALATED, NOT TESTED. Diagnosis confirmed by the head with an
 isolated reproducer and a corpus census. The obvious remedy is NOT surgical and
 has the same shape as the `-G` trap — read "Why this is not a version bump"

@@ -41,7 +41,7 @@ CPP_FLAGS  += -D_LANGUAGE_C -DLANGUAGE_C
 CC_FLAGS   := -mips1 -mcpu=3000 -quiet -Wall -fno-builtin -mno-abicalls
 CC_FLAGS   += -funsigned-char -G0 -O2
 
-MASPSX_FLAGS := --aspsx-version=2.34 --dont-force-G0 --expand-div
+MASPSX_FLAGS := --aspsx-version=2.34 --dont-force-G0 --expand-div --addiu-at
 
 AS_FLAGS   := -Iinclude -Iinclude/psyq -march=r3000 -mtune=r3000 -EL
 AS_FLAGS   += -no-pad-sections -G0 -O2

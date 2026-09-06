@@ -122,11 +122,63 @@ sibling family as one unit of work, and a cluster of narrowing/branch-polarity
 bullets from alpha and bravo — including the stack-argument `lhu` vs
 `lw`+`sll`+`sra` rule, which had never been recorded for the stack case.
 
+### POST-ROUND: the `addiu_at` blocker was RESOLVED (operator-authorised)
+
+After the round closed, the operator authorised the bounded experiment the
+`addiu-at-blocker.md` escalation had been waiting on since 2026-08-30. It
+worked, and it changes the next round's triage completely.
+
+**The fix is option 1 from that doc's own list**: a `--addiu-at` flag on maspsx
+that sets `addiu_at` ALONE, decoupled from the sub-2.30 version bump that drags
+three nop-insertion rules with it. `tools/patches/maspsx-addiu-at.patch`,
+committed here and applied by `tools/setup.sh`; `MASPSX_FLAGS` passes it.
+
+Evidence, in order taken: the census reproduces at 971 matched (502 unfolded,
+0 folded, **all 502 still unmatched — the pin had never been exercised against
+this construct in 21 rounds**); `rm -rf build` + full rebuild stays byte-exact,
+so the flag is provably inert on every matched function; the pinned pipeline
+now emits retail's unfolded four-instruction form; and a real blocked function
+(`func_800305F4`) went from unmatchable to 6/21 at exact length with the
+previously-impossible `addiu $at,$at,%lo(...)` matching word for word. No C was
+kept from that test.
+
+**Effect on triage: `fresh` 0 -> 62, blocker-clean 85 -> 161, blocked 167 -> 91.**
+76 functions unblocked. 66 pure blocker stubs deleted so those functions return
+to `fresh`; one report rewritten to cite only its remaining `gp_rel` hit; five
+substantive reports KEPT with a stale-verdict banner because their structural
+analysis is still good — `func_80018464`, `func_8003C48C`, `func_8003C63C`,
+`func_8004109C`, `func_80049EB4`. `func_8003C63C` is the function CLAUDE.md
+cites as the case where seven attempts went into the wrong half of a two-word
+residue; that half is now matchable.
+
+`tools/nearmiss.py` no longer counts `addiu_at` as a blocker but still reports
+it, tagged `addiu_at(RESOLVED-not-a-blocker)`, so a stale verdict is
+distinguishable from a real block. CLAUDE.md's screen is down to two greps.
+
+**Still open, and still the operator's:** `gp_rel` (82 functions, `-G` tried
+and rejected) and `nop_mflo_mfhi` (9 functions). The latter is now the obvious
+next candidate for exactly the same treatment — its own census already argues
+it is the right mechanism at the wrong granularity, which is what was true of
+`addiu_at` before this. **Untested. Not a head decision.**
+
+**One pre-existing hazard this sharpened rather than caused:** `tools/setup.sh`
+clones maspsx `--depth 1` from upstream master with **no pinned commit**. If
+upstream moves the patched lines the build silently becomes something else —
+except that `setup.sh` now fails loudly pointing at the research doc. Pinning
+the clone, or upstreaming the flag to mkst/maspsx, are both operator calls.
+
 ### Next round
 
-`fresh` is back to **0**. `class_3bb8c_s` is carved and banked with 5 workable
-functions, so one runner can start without a carve; anything beyond that needs
-Gate 2 first. Remaining uncarved game code is 133 functions and the good
+**SUPERSEDED by the POST-ROUND section above — `fresh` is 62, not 0.** Left
+here rather than rewritten, because the reasoning below about WHICH ground is
+left is still correct and only the staffing conclusion changed.
+
+As the round closed `fresh` was **0**, and the plan was: `class_3bb8c_s` is
+carved and banked with 5 workable functions, so one runner can start without a
+carve; anything beyond that needs Gate 2 first. **The `addiu_at` resolution
+removed that constraint entirely** — 62 fresh functions across many units is
+enough to staff a full round with no carve at all, and Gate 2 should NOT fire
+next round. Remaining uncarved game code is 133 functions and the good
 windows are thinning — `code_179d8_mid_c`'s head (5 clean of 24),
 `code_179d8_tail`'s remainder (1 clean of 18, both switch tables), `code_179d8`
 proper (9 clean of 42, gp_rel-dense) and `class_3bb8c_n` (2 clean of 22).
