@@ -1105,7 +1105,44 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BD3C);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE28);
+/* Unit-local reading of the second parameter: the caller (func_8005BD3C)
+   passes down a `s32 local[4]` buffer that func_8001E6F8 (code_d294_c) fills
+   with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
+   that table's `out[1].whole` (a degrees value, per func_8001E6F8's own
+   report). This function reads it unsigned (`lhu`), independent of
+   WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
+   bytes, so it is kept local rather than folded into that shared struct. */
+typedef struct DirectionCheckArg {
+	s8 unk0[4];
+	u16 heading;
+} DirectionCheckArg;
+
+/* 4-entry cardinal-direction table (12-byte stride); only the first u16 of
+   each entry (the angle: 0/90/180/270) is read anywhere in this unit's
+   queue. Kept local for the same reason as DirectionCheckArg above. */
+typedef struct DirectionTableEntry {
+	u16 angle;
+	u16 unk2;
+	u16 unk4;
+	u16 unk6;
+	u16 unk8;
+	u16 unkA;
+} DirectionTableEntry;
+
+extern DirectionTableEntry D_8008875C[];
+
+s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
+{
+	s16 diff;
+
+	diff = a0->heading - D_8008875C[a1].angle;
+	if (diff >= 181) {
+		diff -= 360;
+	} else if (diff < -180) {
+		diff += 360;
+	}
+	return (u16)(diff + 44) < 89;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE90);
 
