@@ -1,5 +1,76 @@
 # func_8003FCFC -- STALL, MISFILED CLASS CORRECTED (return-type fix found, register residue narrower but not closed)
 
+## Round 21 (runner delta): class re-verified fresh, one new attempt, negative
+
+Restored attempt 6's exact preserved body (`s16 *func_8003FCFC(s16*,s16*)`,
+`return dst;`) and rebuilt fresh before touching anything: reproduces
+`2/20 words match` exactly. Cross-checked the ASSEMBLED SOURCE against
+retail's own `.s` (`asm/nonmatchings/code_2cc8c_e/func_8003FCFC.s`),
+which the prior rounds' reports describe but do not quote directly: the
+`t1`/`t2`/`t3` reuse PATTERN in the preserved C body matches retail's
+own load/store interleaving instruction-for-instruction (both cycle
+`src[0],src[3],src[6],src[1],src[4],src[7],src[2],src[5],src[8]` through
+three temps in the identical order) -- the residue really is only WHICH
+hardware register each cycling temp lands in, confirming the "misfiled
+class corrected" verdict still holds; this is not a second latent
+return-type or shape bug.
+
+Disassembled the CURRENT build directly
+(`mipsel-linux-gnu-objdump -d build/lsdde.elf`) to see the actual
+registers rather than trust the report's `$v0`/`$v1`/`$a2` paraphrase:
+the built function uses `v1`/`a1`/`a2` for the three cycling temps, and
+-- more precisely than any prior round stated -- ALSO switches every
+store's BASE register from `a1` (the `dst` parameter, retail's own base
+throughout) to `v0` (the early `move v0,a1` return-value materialization)
+once that copy exists. Retail keeps `a1` as the store base the WHOLE
+function and touches `v0` only once, at entry, never again until `jr
+ra`. This is the exact same coalescing shape as `func_8004042C`'s
+PERMUTER-EXHAUSTED residue (a value retail deliberately keeps live in
+TWO separate registers -- one for the parameter's ongoing use, one for
+a return/redundant copy -- that GCC 2.6.3 here collapses back into one).
+
+**One attempt beyond the 11 already recorded across rounds 18-20,
+targeting the base-register-switch specifically:**
+
+12. A `#pragma`-free forced two-identity approach: `s16 *volatile out =
+    dst;` (a volatile-qualified separate local, used for every store
+    subscript, with `return dst;` returning the untouched parameter).
+    Reasoning: `volatile` might prevent GCC from recognizing `out` and
+    `dst` hold the same value and collapsing them. Regressed HARD
+    (blew past 20 words, real frame-size change): `volatile` forces
+    `out` to a real stack slot the way it did for `func_800400B0`'s
+    dead-store attempt -- same mechanism, wrong direction entirely (a
+    stack-resident copy is not what retail's register-only two-name
+    residue needs). Reverted immediately.
+
+**Verdict unchanged: STALL, register-identity/coalescing, best 135
+(`--debug`) / 2/20 words (raw funcdiff).** This is now confirmed to
+share its exact mechanism with `func_8004042C`'s already
+PERMUTER-EXHAUSTED "redundant move"/coalescing class (see that report),
+which took ~28,000 + ~48,000 permuter iterations across two rounds to
+exhaust without closing. Not re-running an unguided permuter search
+here a third time on the identical mechanism without a new guided lever
+(the `PERM_VAR`/`PERM_GENERAL` tooling boundary documented in this
+report's own round-19 section is still unresolved, still an operator
+decision). Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
+
+### Proposed learning (round 21 addition)
+
+**The "two live copies of the same pointer value, retail keeps them in
+separate registers, GCC 2.6.3 collapses them to one" coalescing class
+now has two confirmed instances in this single unit**
+(`func_8003FCFC`'s `dst`/return-copy, `func_8004042C`'s `a1`/redundant-
+`$t0`-copy) and neither closed despite a `volatile` local, named
+copies, branch-forced-copy tricks, and tens of thousands of permuter
+iterations between them. Worth treating this as this project's
+hardest-known register-identity subclass -- a `volatile` local pushes
+the value to memory (wrong direction: it stops the coalescing by
+destroying the register-only property retail actually has), and every
+naming/branch trick that stays register-only gets copy-propagated back
+to one identity anyway. A guided (`PERM_VAR`) permuter search remains
+the only unexplored lever, and it is blocked by the same tooling
+boundary in both reports.
+
 ## Round 20 (runner delta): mechanism identified precisely, two more attempts, both negative
 
 Rebuilt attempt 6's body (`s16 *func_8003FCFC(s16*,s16*)`, no named

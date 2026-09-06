@@ -201,6 +201,31 @@ err:
 
 
 
+#if 0
+s16 *func_8003FCFC(s16 *src, s16 *dst) {
+    s32 t1, t2, t3;
+
+    t1 = src[0];
+    dst[0] = t1;
+    t2 = src[3];
+    t1 = src[6];
+    dst[1] = t2;
+    t3 = src[1];
+    dst[2] = t1;
+    t2 = src[4];
+    dst[3] = t3;
+    t1 = src[7];
+    dst[4] = t2;
+    t3 = src[2];
+    dst[5] = t1;
+    t2 = src[5];
+    dst[6] = t3;
+    t1 = src[8];
+    dst[7] = t2;
+    dst[8] = t1;
+    return dst;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FCFC);
 
 extern void func_80024B9C(s32 a0);
