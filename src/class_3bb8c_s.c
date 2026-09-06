@@ -10,6 +10,19 @@
  * func_80056520, func_80056640 and func_80056D18 -- each still carries a
  * current stall report and none of the three is touched here.
  *
+ * MATCHED this round: func_80056718, func_80056794, func_800567D4,
+ * func_80056858, func_80056B8C -- byte-exact, see docs/match-reports/.
+ *
+ * func_80056BBC was attempted (the addiu_at hit in it is the now-resolved
+ * construct, not a real blocker) and got to a one-instruction residue -- a
+ * retail dead store (`li $a1, 1`) that never gets read on either branch it
+ * precedes, the same "redundant move" class MATCHING-GUIDE.md already
+ * documents as permuter territory. ~8000 permuter iterations did not find a
+ * zero; restored to INCLUDE_ASM per the hard rule. See its match report.
+ *
+ * func_800569A8 is still untouched (its only screen hit is the same
+ * now-resolved addiu_at construct; it remains fresh ground).
+ *
  * This slice spans (at least) parts of the same class as the neighbouring
  * `class_3bb8c_o` slice: `self` here is the SAME kind of node as that unit's
  * `LinkOwnerObj` (a 5-element `arr84` link array is confirmed via
