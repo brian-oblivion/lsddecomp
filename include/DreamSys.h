@@ -173,11 +173,23 @@ typedef struct DreamSysUnk5C {
    it is passed through, not just branched on. See func_80059E3C.md.
    slot0x80 (ExecuteLink, round 2026-09-02) takes three arguments, all
    literal constants at that call site (0x90, 0x6E, 0x6E) -- nothing here
-   suggests what they mean. */
+   suggests what they mean.
+
+   func_80059D1C (round 2026-09-06) adds two more confirmed facts: slot0x80
+   DOES return a value -- it stores the result into DreamSys::unk_0xBC on one
+   call path -- so its return type widens from `void` to `s32` here; this is
+   safe for every existing call site (ExecuteLink, DreamSys__DreamSys's own
+   slot0x80 use on the DIFFERENT DreamSysCtorArgObj vtable below) because none
+   of them ever read $v0 after the call, so a discarded s32 return compiles
+   identically to a void one. func_80059D1C also reaches a new slot at +0x9C,
+   one argument, called three times with a byte-table value and small
+   literal constants (1, 2); nothing here suggests what it does either. */
 typedef struct DreamSysUnk58Vtable {
 	u8 pad00[0x80];
-	void (*slot0x80)(void *self, s32 a1, s32 a2, s32 a3);
+	s32 (*slot0x80)(void *self, s32 a1, s32 a2, s32 a3);
 	void (*slot0x84)(void *self, s32 flag);
+	u8 pad88[0x14];
+	void (*slot0x9C)(void *self, s32 a1);
 } DreamSysUnk58Vtable;
 typedef struct DreamSysUnk58 {
 	DreamSysUnk58Vtable *vt;
@@ -472,6 +484,17 @@ typedef struct DreamSysUnk28Target {
    classified into {0,1,2} by CalcDreamColor first (round 2026-08-30-d). */
 extern s8 D_80087E14[9];
 
+/* Byte tables indexed by DreamSys::unk_0xB8 (already bounded to [0,0x18) at
+   the write site -- see that field's own comment). func_80059D1C
+   (round 2026-09-06) reads both: D_80087EB0[unk_0xB8] (values 0..0x1E) feeds
+   DreamSysUnk58Vtable::slot0x80's `a1` argument, left-shifted by 4;
+   D_80087EC8[unk_0xB8] (values include -2..2, hence `s8` not `u8`) feeds
+   slot0x9C's `a1` argument directly. D_80087EC8's real extent is exactly
+   these 24 bytes -- the trailing zero bytes splat lumped into its dlabel
+   belong to the D_80087EE8 vector documented above, not to this table. */
+extern const s8 D_80087EB0[0x18];
+extern const s8 D_80087EC8[0x18];
+
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
    class_16334.h for the other units that also declare it locally. */
 extern void *func_80017B34(s32 size);
@@ -610,7 +633,12 @@ typedef struct DreamSys {
 	s32 unk_0xB4;
 	/* Derived from `unknown_values_0x28[0x36]` masked to 0x7F, or forced to
 	   0 (if >= 0x18) or 2 (if `unknwon_int_0x44 == 15` and this is still 0)
-	   by func_80058B08's `arg1 == -1` path (round 2026-09-02). */
+	   by func_80058B08's `arg1 == -1` path (round 2026-09-02). Also an index:
+	   func_80059D1C (round 2026-09-06) does nothing when this is 0, else
+	   uses it to index D_80087EB0/D_80087EC8 (see those externs), compares
+	   it against 0x16 (22) to decide whether to keep or discard
+	   unk_0xBC's new value, and against 0xB (11) to gate two extra vtable
+	   calls. */
 	s32 unk_0xB8;
 	/* Gate flag: func_80059E3C runs its body (a call through
 	   unk_0x58->vt->slot0x84, then resets this to -1) only while this is

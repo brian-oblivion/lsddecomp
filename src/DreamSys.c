@@ -467,6 +467,41 @@ s32 func_80059BD4(DreamSys *this)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059BE0);
 
+#if 0
+/* Best-reached body, 55/72 words -- see docs/match-reports/func_80059D1C.md
+   for the residue analysis. Restored to INCLUDE_ASM below per project rule
+   (no score short of byte-exact stays in src/). */
+void func_80059D1C(DreamSys *this)
+{
+	DreamSysUnk58 *obj;
+	s32 idx;
+	DreamSysUnk58Vtable *vt;
+	s32 heading;
+
+	obj = (DreamSysUnk58 *)this->unk_0x58;
+	vt = obj->vt;
+	idx = this->unk_0xB8;
+	if (idx == 0) {
+		return;
+	}
+
+	heading = D_80087EB0[idx];
+	heading <<= 4;
+	vt->slot0x9C(obj, D_80087EC8[idx]);
+	this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
+	if (this->unk_0xB8 != 0x16) {
+		this->unk_0xBC = -1;
+	}
+
+	if (this->unk_0xB8 == 0xB) {
+		vt->slot0x9C(obj, 1);
+		vt->slot0x80(obj, heading, 0x6E, 0x6E);
+		vt->slot0x9C(obj, 2);
+		vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+	}
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059D1C);
 
 void func_80059E3C(DreamSys *this)
