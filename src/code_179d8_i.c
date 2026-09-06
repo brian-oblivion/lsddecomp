@@ -22,7 +22,12 @@
 
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80032D00);
+extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32 a3);
+
+s16 func_80032D00(void *a0, s16 a1, s32 a2)
+{
+    return func_80032D34(a0, a1, 1, a2);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80032D34);
 
