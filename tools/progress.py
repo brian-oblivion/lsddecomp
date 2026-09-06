@@ -16,6 +16,17 @@ them (docs/PARALLEL-RUNS.md, Gate 1):
   banked    queued, unattempted, in a unit whose header says DELIBERATELY
             UNWORKED -- carved to fix a boundary or bank the ground, but
             classified as senior work rather than cold-runner work.
+  reopened  queued AND has a report, but that report says REOPENED -- ASSIGNABLE
+            on a line of its own. Counted as FRESH, not as a stall. A report
+            written while a toolchain blocker was live outlives the blocker,
+            and a function everybody believes is blocked is one nobody
+            re-measures -- so when a blocker is resolved, the reports it
+            invalidated silently delete matchable ground from every future
+            round. `addiu_at` resolving in round 21 left five such reports.
+            This marker is the counterpart of DELIBERATELY UNWORKED: an exact
+            phrase, keyed on by this tool, that lets a report stay on disk (its
+            derivation is still worth reading) without still claiming the
+            function is worked.
   fresh     queued - stalled - banked. THE ONLY COLUMN TO ASSIGN FROM. Raw
             `queued` includes documented stalls, and staffing a runner onto
             one means paying again to re-derive what someone already recorded.
@@ -41,6 +52,7 @@ NM = ROOT / "tools/binutils/bin/mipsel-linux-gnu-nm"
 ELF = ROOT / "build/lsdde.elf"
 YAML = ROOT / "config/splat.slps01556.lsdde.yaml"
 REPORTS = ROOT / "docs/match-reports"
+REOPENED_RE = re.compile(r"^[\s>*_#-]*REOPENED -- ASSIGNABLE\b", re.M)
 
 VRAM_BASE = 0x80010000
 FILE_BASE = 0x800
@@ -143,7 +155,14 @@ def text_symbols():
 def main():
     info = text_symbols()
     sizes = {n: s for n, (_, s) in info.items()}
-    reports = {p.stem for p in REPORTS.glob("*.md")} if REPORTS.exists() else set()
+    # A report marked REOPENED -- ASSIGNABLE is deliberately NOT a stall: see
+    # the `reopened` entry in the module docstring. The phrase must stand on
+    # its own line so that a report *discussing* the convention (this file's
+    # own docs, a learnings entry quoting it) cannot trip the marker.
+    all_reports = list(REPORTS.glob("*.md")) if REPORTS.exists() else []
+    reopened = {p.stem for p in all_reports
+                if REOPENED_RE.search(p.read_text())}
+    reports = {p.stem for p in all_reports} - reopened
 
     per_unit = {}
     matched = queued = stalled = banked = 0
@@ -238,6 +257,7 @@ def main():
     live_inc = set()
     for c in srcpath.src_files():
         live_inc.update(INCLUDE_RE.findall(strip_dead_code(c.read_text())))
+    reopened_live = len(reopened & live_inc)
     stale_nm = [p for p in srcpath.nm_all() if p.stem not in live_inc]
 
     library += library_matched + library_queued
@@ -251,7 +271,8 @@ def main():
     if "--json" in sys.argv:
         print(json.dumps({
             "matched": matched, "queued": queued, "stalled": stalled,
-            "banked": banked, "fresh": fresh, "uncarved": uncarved,
+            "banked": banked, "fresh": fresh, "reopened": reopened_live,
+            "uncarved": uncarved,
             "library": library, "handwritten": handwritten,
             "total": total, "game": game,
             "bytes": {"matched": matched_b, "queued": queued_b,
@@ -285,6 +306,9 @@ def main():
     print(f"    stalled (has report):     {stalled:5d}")
     print(f"    banked (unit unworked):   {banked:5d}")
     print(f"    fresh (runner-workable):  {fresh:5d}   <- ASSIGN FROM THIS")
+    if reopened_live:
+        print(f"      of which reopened:      {reopened_live:5d}   "
+              f"(report kept, marked REOPENED -- ASSIGNABLE)")
     print(f"  uncarved game code:         {uncarved:5d}")
     if handwritten:
         print(f"  hand-written asm (DONE):    {handwritten:5d}"
