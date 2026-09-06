@@ -60,7 +60,7 @@ flow and frequently wrong about types.
 
 ```sh
 ./build-and-verify.sh > /tmp/b.log 2>&1; echo "build exit=$?"
-grep -nE 'error:|parse error|undefined reference' /tmp/b.log | head -8
+grep -nE 'error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]' /tmp/b.log | head -8
 .venv/bin/python3 tools/funcdiff.py <func>
 ```
 

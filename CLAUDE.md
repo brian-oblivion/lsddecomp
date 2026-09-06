@@ -283,7 +283,7 @@ Gate 2.
 
    ```sh
    ./build-and-verify.sh > /tmp/b.log 2>&1; echo "build exit=$?"; \
-   grep -nE 'error:|parse error|undefined reference' /tmp/b.log | head -8; \
+   grep -nE 'error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]' /tmp/b.log | head -8; \
    .venv/bin/python3 tools/funcdiff.py <func>
    ```
 
@@ -301,18 +301,53 @@ Gate 2.
    The grep is what separates them, which is why `Error [0-9]` was REMOVED
    from it (round 18). That pattern matches make's own summary line
    `make: *** [Makefile:74: check] Error 1`, which make prints when the SHA1
-   check fails — i.e. it fires on a perfectly good build. Measured in an idle
-   worktree:
+   check fails — i.e. it fires on a perfectly good build.
 
-   | case | `build exit=` | old grep | new grep |
+   **But the compiler-only patterns round 18 left behind MISS most real
+   compile errors, and they miss them in the direction that produces false
+   confidence (round 21).** GCC 2.6.3 predates the `error:` prefix
+   convention: it writes `/tmp/t.c:1: conflicting types for 'T'`, with no
+   `error:` anywhere. `parse error` catches syntax errors and `undefined
+   reference` catches the linker, so between them they cover the two loudest
+   failures — and every SEMANTIC error in between produces **zero hits**.
+   Measured through the pinned pipeline, one construct per row, all seven
+   fatal (`cc1` exits 33):
+
+   | construct | cc1 message | `error:`/`parse error` hit? |
+   | --- | --- | --- |
+   | `parse error` | ``parse error before `)' `` | yes |
+   | conflicting types | ``conflicting types for `T' `` | **no** |
+   | redefinition | ``redefinition of `f' `` | **no** |
+   | undeclared variable | ``` `zzz' undeclared ``` | **no** |
+   | too many arguments | ``too many arguments to function `g' `` | **no** |
+   | incompatible return | `incompatible types in return` | **no** |
+   | duplicate member | ``duplicate member `a' `` | **no** |
+
+   So the fix is to match make's failure on a COMPILE target rather than the
+   message text, which is what `\*\*\* \[[^]]*\.o\]` does — it fires on
+   `make: *** [Makefile:113: build/src/<unit>.c.o] Error 33` and not on
+   `make: *** [Makefile:74: check] Error 1`. That keeps round 18's result
+   (the SHA1-check line must not fire) while closing the gap it opened.
+   Measured in an idle worktree, both cases induced deliberately:
+
+   | case | `build exit=` | round-18 grep | with `*** [….o]` |
    | --- | --- | --- | --- |
-   | genuine compile error | 2 | 2 hits | **1 hit** |
-   | clean compile, SHA1 mismatch | 2 | 1 hit | **0 hits** |
+   | genuine compile error (`conflicting types`) | 2 | **0 hits** | **1 hit** |
+   | clean compile, SHA1 mismatch | 2 | 0 hits | **0 hits** |
 
-   With the compiler-only patterns the signal is clean: **any hit means your C
-   did not build, so any funcdiff number is from the previous build.** No hits
-   plus exit 2 means the build is fresh and simply does not match yet, which is
+   With that pattern added the signal is clean: **any hit means your C did not
+   build, so any funcdiff number is from the previous build.** No hits plus
+   exit 2 means the build is fresh and simply does not match yet, which is
    what iterating looks like.
+
+   **How this was found matters more than the patch, because it is the loop
+   auditing itself.** The head hit it running an ordinary experiment: a
+   duplicate `typedef` gave `build exit=2`, zero grep hits, and a funcdiff
+   score — the exact signature of "fresh build, does not match yet". The only
+   thing that caught it was `funcdiff.py`'s own mtime staleness guard, which
+   is documented as a BACKSTOP. When the backstop is the sole detector, the
+   primary check has failed silently, and "the guard fired" is the wrong
+   lesson to draw — the right one is to go measure why the primary did not.
 
    To *read* a diff rather than score it, use asm-differ:
    `.venv/bin/python3 tools/asm-differ/diff.py <func>`.

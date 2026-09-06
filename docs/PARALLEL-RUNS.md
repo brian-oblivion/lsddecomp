@@ -1278,7 +1278,18 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 >
 > **The oracle.** `./build-and-verify.sh` plus `tools/funcdiff.py`. Chain them
 > so you cannot read a score from a failed build:
-> `./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; grep -nE 'error:|parse error|undefined reference' /tmp/<name>_b.log | head -8; .venv/bin/python3 tools/funcdiff.py <fn>`
+> `./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; grep -nE 'error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]' /tmp/<name>_b.log | head -8; .venv/bin/python3 tools/funcdiff.py <fn>`
+>
+> **The `*** [….o]` alternative is load-bearing and was added in round 21 —
+> do not trim it back to the three text patterns.** GCC 2.6.3 predates the
+> `error:` prefix, so `conflicting types`, `redefinition`, `undeclared`,
+> `too many arguments`, `incompatible types in return` and `duplicate
+> member` are ALL fatal and ALL produce zero hits on the text patterns. It
+> matches make's failure on a compile target
+> (`*** [Makefile:113: build/src/<unit>.c.o] Error 33`) and deliberately
+> NOT on the SHA1 check's own line
+> (`*** [Makefile:74: check] Error 1`), which is what round 18 removed
+> `Error [0-9]` for. Measured table in CLAUDE.md, step 4.
 >
 > **The log path MUST carry your runner name.** This prompt used to say
 > `/tmp/b.log` for everyone, and in round 8 two runners writing that one
