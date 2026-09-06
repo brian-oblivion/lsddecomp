@@ -31,7 +31,56 @@ s16 func_80032D00(void *a0, s16 a1, s32 a2)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80032D34);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", SsUtGetVabHdr);
+/* Field layout matches VabHdr in include/psyq/LIBSND.H, which declares
+ * `extern short SsUtGetVabHdr(short, VabHdr*);` -- strong evidence this
+ * game-unit function IS the SDK utility, not a coincidentally-named local
+ * one. Not #include-d directly: LIBSND.H's own `#include <sys/types.h>`
+ * does not resolve under this pinned include path on a case-sensitive
+ * filesystem (only uppercase SYS/TYPES.H exists), confirmed with cpp
+ * (exit 33, "sys/types.h: No such file or directory"). Local copy of the
+ * same 0x20-byte layout instead, per this project's independent-local-view
+ * convention. */
+typedef struct {
+    s32 form;
+    s32 ver;
+    s32 id;
+    u32 fsize;
+    u16 reserved0;
+    u16 ps;
+    u16 ts;
+    u16 vs;
+    u8 mvol;
+    u8 pan;
+    u8 attr1;
+    u8 attr2;
+    u32 reserved1;
+} VabHdr;
+
+extern u8 D_8008EA2C[];
+extern VabHdr *D_8008E80C[];
+extern VabHdr *D_8008E970;
+
+short SsUtGetVabHdr(short vabId, VabHdr *hdr)
+{
+    VabHdr *vab;
+
+    if (D_8008EA2C[vabId] != 1) {
+        return -1;
+    }
+    vab = D_8008E80C[vabId];
+    hdr->form = vab->form;
+    hdr->id = vab->id;
+    hdr->ver = vab->ver;
+    hdr->ps = vab->ps;
+    hdr->ts = vab->ts;
+    D_8008E970 = vab;
+    hdr->vs = vab->vs;
+    hdr->mvol = vab->mvol;
+    hdr->pan = D_8008E970->pan;
+    hdr->attr1 = D_8008E970->attr1;
+    hdr->attr2 = D_8008E970->attr2;
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033260);
 
