@@ -467,6 +467,41 @@ s32 func_80059BD4(DreamSys *this)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059BE0);
 
+#if 0
+/* Best-reached body, 55/72 words -- see docs/match-reports/func_80059D1C.md
+   for the residue analysis. Restored to INCLUDE_ASM below per project rule
+   (no score short of byte-exact stays in src/). */
+void func_80059D1C(DreamSys *this)
+{
+	DreamSysUnk58 *obj;
+	s32 idx;
+	DreamSysUnk58Vtable *vt;
+	s32 heading;
+
+	obj = (DreamSysUnk58 *)this->unk_0x58;
+	vt = obj->vt;
+	idx = this->unk_0xB8;
+	if (idx == 0) {
+		return;
+	}
+
+	heading = D_80087EB0[idx];
+	heading <<= 4;
+	vt->slot0x9C(obj, D_80087EC8[idx]);
+	this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
+	if (this->unk_0xB8 != 0x16) {
+		this->unk_0xBC = -1;
+	}
+
+	if (this->unk_0xB8 == 0xB) {
+		vt->slot0x9C(obj, 1);
+		vt->slot0x80(obj, heading, 0x6E, 0x6E);
+		vt->slot0x9C(obj, 2);
+		vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+	}
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059D1C);
 
 void func_80059E3C(DreamSys *this)
@@ -480,7 +515,29 @@ void func_80059E3C(DreamSys *this)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059E98);
+s32 func_80059E98(DreamSys *this, s32 arg1)
+{
+	s32 delta;
+	PlayerSpawnPoint *pos;
+
+	if (arg1 != 0) {
+		delta = D_80087E34[arg1] * D_80087E20[this->unk_0xAC];
+		this->vt->func_800595A0(this);
+		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
+		if (!this->vt->func_8005A9CC(this, pos)
+		 && !this->vt->func_8005A82C(this, pos)
+		 && !this->vt->func_8005A700(this, pos)) {
+			this->vt->func_8005B904(this);
+			D_80087E3C[arg1](this, delta, (void *)(this->unk_0x90C < 1));
+			if (this->currentStage == 0
+			 && this->unk_0x14->unk_0x1C < -0x7D0
+			 && this->unk_0x14->unk_0x18 >= -0x1F3) {
+				this->vt->LinkWall(this, this, 4);
+			}
+		}
+		this->unk_0x14->unk_0x0 = 0;
+	}
+}
 
 void func_8005A050(DreamSys *this)
 {
@@ -771,6 +828,60 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 	return true;
 }
 
+#if 0
+/* Best-reached body, 57/88 words, no address drift -- see
+   docs/match-reports/func_8005A9CC.md for the residue analysis. Restored to
+   INCLUDE_ASM below per project rule (no score short of byte-exact stays in
+   src/). */
+bool func_8005A9CC(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+	s32 local[4];
+
+	if (this->unknwon_int_0x44 != 0) {
+		return false;
+	}
+
+	if (this->unk_0x910 == 0) {
+		goto staircase;
+	}
+	if (!this->unk_0x910(this)) {
+		return false;
+	}
+	this->unk_0x908 = 0;
+	this->unk_0x910 = 0;
+	this->unk_0x90C = 0;
+	if (this->unk_0xAC != 4) {
+		return false;
+	}
+	this->vt->func_8005A1A4(this);
+	return false;
+
+staircase:
+	result = Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0) {
+		return false;
+	}
+	func_8001E6F8(this, local);
+	if (!func_8005C02C(&this->unk_0x888, &this->unk_0x884, local)) {
+		return false;
+	}
+	if (this->unk_0xA8 == 0) {
+		return false;
+	}
+
+	this->unk_0x918 = *(PlayerSpawnGridPos *)currentPos;
+	this->unk_0x91C = currentPos->position;
+	this->unk_0x908 = 1;
+	this->unk_0x90C = 1;
+	this->unk_0x914 = 0;
+	this->unk_0x910 = D_80087EEC[func_8005C118()];
+	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
+	this->unk_0x910(this);
+	return false;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
 s32 func_8005AB2C(DreamSys *this)
@@ -908,6 +1019,62 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
 		this->vt->LogChunkMood(this, pos);
 	}
 }
+
+#if 0
+/* Best-reached body, 106/110 words truly correct (see the match report for
+   why funcdiff's own count reads far lower) -- see
+   docs/match-reports/DreamSys__InstanceEffectsOnJournal.md for the residue
+   analysis. Restored to INCLUDE_ASM below per project rule (no score short
+   of byte-exact stays in src/). */
+void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
+{
+	if (this->unknwon_int_0x44 != 0) {
+		return;
+	}
+
+	switch (effect) {
+	case 4:
+		((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this);
+		break;
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		break;
+	case 9:
+		if (this->isFlashbackSession != 0) {
+			return;
+		}
+		this->vt->LogInstanceMood(this, ((DreamSysEntityObj *)entity)->methods->slot0x14C(entity));
+		this->instanceFlasbackUnlockScore += ((DreamSysEntityObj *)entity)->methods->slot0x150(entity);
+		this->vt->FlashbackSaving(this, 0, 0x10);
+		break;
+	case 10: {
+		s32 saved = this->currentStage;
+		this->currentStage = -((DreamSysEntityObj *)entity)->methods->slot0x154(entity);
+		this->vt->DynamicLink(this);
+		if (this->currentStage < 0) {
+			this->currentStage = saved;
+		}
+		break;
+	}
+	case 11:
+		if (this->isFlashbackSession != 0) {
+			return;
+		}
+		this->nextCinematic.bank = -1;
+		this->dreamTimer = this->dreamTimeLimit;
+		this->nextCinematic.entry = ((DreamSysEntityObj *)entity)->methods->slot0x158(entity);
+		break;
+	case 12:
+		if (this->isFlashbackSession != 0) {
+			return;
+		}
+		this->dreamTimer = this->dreamTimeLimit;
+		break;
+	}
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
@@ -1084,7 +1251,10 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", InitNavChallengesArray);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcNavigationScore);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BB14);
+s32 func_8005BB14(s32 stage)
+{
+	return STAGE_TIME_LIMITS[stage];
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", GetRandomSpawnFromStage);
 
@@ -1102,7 +1272,44 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BD3C);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE28);
+/* Unit-local reading of the second parameter: the caller (func_8005BD3C)
+   passes down a `s32 local[4]` buffer that func_8001E6F8 (code_d294_c) fills
+   with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
+   that table's `out[1].whole` (a degrees value, per func_8001E6F8's own
+   report). This function reads it unsigned (`lhu`), independent of
+   WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
+   bytes, so it is kept local rather than folded into that shared struct. */
+typedef struct DirectionCheckArg {
+	s8 unk0[4];
+	u16 heading;
+} DirectionCheckArg;
+
+/* 4-entry cardinal-direction table (12-byte stride); only the first u16 of
+   each entry (the angle: 0/90/180/270) is read anywhere in this unit's
+   queue. Kept local for the same reason as DirectionCheckArg above. */
+typedef struct DirectionTableEntry {
+	u16 angle;
+	u16 unk2;
+	u16 unk4;
+	u16 unk6;
+	u16 unk8;
+	u16 unkA;
+} DirectionTableEntry;
+
+extern DirectionTableEntry D_8008875C[];
+
+s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
+{
+	s16 diff;
+
+	diff = a0->heading - D_8008875C[a1].angle;
+	if (diff >= 181) {
+		diff -= 360;
+	} else if (diff < -180) {
+		diff += 360;
+	}
+	return (u16)(diff + 44) < 89;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE90);
 
