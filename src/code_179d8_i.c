@@ -56,7 +56,29 @@ void func_800334A0(s16 a0, s16 a1)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800334F0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800335FC);
+extern void func_80039158(s32 a0);
+extern void func_8003918C(s32 a0);
+extern void func_800391C8(s32 a0, s32 a1);
+extern void func_80039228(s32 a0);
+extern u8 D_8008EA2C[];
+extern s32 D_80090BD4[];
+extern s32 D_80090B90[];
+
+s16 func_800335FC(s32 a0, s16 a1)
+{
+    s16 chan = a1;
+
+    if ((u16)a1 < 0x11 && D_8008EA2C[chan] == 2) {
+        s32 t = D_80090BD4[chan];
+        func_80039158(0);
+        func_8003918C(t);
+        func_800391C8(a0, D_80090B90[chan]);
+        D_8008EA2C[chan] = 1;
+        return chan;
+    }
+    func_80039228(0);
+    return -1;
+}
 
 extern void func_80036AC8(s32 a0);
 
