@@ -22,7 +22,12 @@
 
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80032D00);
+extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32 a3);
+
+s16 func_80032D00(void *a0, s16 a1, s32 a2)
+{
+    return func_80032D34(a0, a1, 1, a2);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80032D34);
 
@@ -30,30 +35,183 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_i", SsUtGetVabHdr);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033260);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800334A0);
+typedef struct {
+    s32 unk0;
+    s16 unk4;
+    s16 unk6;
+    u8 pad8[0x28 - 0x8];
+} UnkStruct_800334A0;
+
+extern void func_8003760C(UnkStruct_800334A0 *arg);
+
+void func_800334A0(s16 a0, s16 a1)
+{
+    UnkStruct_800334A0 s;
+
+    s.unk0 = 3;
+    s.unk4 = a0 * 129;
+    s.unk6 = a1 * 129;
+    func_8003760C(&s);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800334F0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800335FC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800336CC);
+extern void func_80036AC8(s32 a0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_8003370C);
+void func_800336CC(u8 a0)
+{
+    s32 mode;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033738);
+    if (a0 != 0) {
+        if (a0 != 1) {
+            return;
+        }
+        mode = 1;
+    } else {
+        mode = 0;
+    }
+    func_80036AC8(mode);
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800339AC);
+extern s32 func_8003904C(s16 a0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033A4C);
+s16 func_8003370C(s16 a0)
+{
+    return func_8003904C(a0);
+}
+
+/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+ * these, indexed [screen][slot]-style by two signed 16-bit indices. This is
+ * a reduced LOCAL view -- only the fields this unit's functions touch are
+ * named. See code_179d8_f.c's own Entry90902E8 for a fuller layout of the
+ * same array; each unit keeps its own independent reading, per project
+ * convention (multiple local views of one struct are expected here). */
+typedef struct {
+    u8 pad0[0x2B];
+    u8 unk2B;
+    u8 pad2C[0x90 - 0x2C];
+    s32 unk90;
+    u8 pad94[0xAC - 0x94];
+} Entry90902E8;
+
+extern Entry90902E8 *D_800902E8[];
+
+extern s32 D_8008E934;
+extern s16 D_80090B68;
+extern s16 D_80090B6C;
+extern s32 D_8008EA00;
+
+extern void func_8002F700(void);
+extern s32 func_8003410C(s16 a0, s16 a1);
+extern void func_80036528(s32 a0, s32 a1);
+extern void func_80033AB0(s32 a0, s32 a1);
+extern void func_80033C90(s32 a0, s32 a1);
+extern void func_800339AC(s32 a0, s32 a1);
+extern void func_80033FB8(s32 a0, s32 a1);
+extern void func_800368E8(s32 a0, s32 a1);
+
+void func_80033738(void)
+{
+    s32 screen;
+    s32 slot;
+    s32 flags;
+    s16 screen16;
+    s16 slot16;
+
+    if (D_8008E934 == 1) {
+        return;
+    }
+    D_8008E934 = 1;
+    func_8002F700();
+    for (screen = 0; screen < D_80090B68; screen++) {
+        if (!((1 << screen) & D_8008EA00)) {
+            continue;
+        }
+        for (slot = 0; slot < D_80090B6C; slot++) {
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 1) {
+                screen16 = screen;
+                slot16 = slot;
+                func_8003410C(screen16, slot16);
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x10) {
+                    func_80036528(screen16, slot16);
+                }
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x20) {
+                    func_80033C90(screen16, slot16);
+                }
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x40) {
+                    func_80033AB0(screen16, slot16);
+                }
+                flags = D_800902E8[screen][slot].unk90;
+                if (flags & 0x80) {
+                    func_80033AB0(screen16, slot16);
+                }
+            }
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 2) {
+                func_800339AC((s16)screen, (s16)slot);
+            }
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 8) {
+                func_80033FB8((s16)screen, (s16)slot);
+            }
+            flags = D_800902E8[screen][slot].unk90;
+            if (flags & 4) {
+                func_800368E8(screen, slot);
+                D_800902E8[screen][slot].unk90 = 0;
+            }
+        }
+    }
+    D_8008E934 = 0;
+}
+
+extern s32 func_8003069C(s32 a0);
+
+void func_800339AC(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+    Entry90902E8 *p = &D_800902E8[sa0][sa1];
+
+    func_8003069C((sa1 << 8) | sa0);
+    p->unk2B = 0;
+    D_800902E8[sa0][sa1].unk90 &= ~2;
+}
+
+void func_80033A4C(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+
+    D_800902E8[sa0][sa1].unk2B = 0;
+    D_800902E8[sa0][sa1].unk90 &= ~0x100;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033AB0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033C90);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033FB8);
+void func_80033FB8(s32 a0, s32 a1)
+{
+    s16 sa0 = (s16)a0;
+    s16 sa1 = (s16)a1;
+
+    D_800902E8[sa0][sa1].unk2B = 1;
+    D_800902E8[sa0][sa1].unk90 &= ~8;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80034020);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800340B0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_8003410C);
+extern s32 func_80034138(s16 a0, s16 a1);
+
+s32 func_8003410C(s16 a0, s16 a1)
+{
+    return func_80034138(a0, a1);
+}
