@@ -6,6 +6,141 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-06 — round 21: 22 matches off fresh carve, an oracle defect fixed, and a three-round-old figure corrected
+
+**949 -> 971 matched (69.99% -> 71.61% of game code; 50.04% -> 51.54% of game
+bytes). Build green in main after all four merges, zero merge conflicts —
+`headercontention.py` reported NO CONTENTION before provisioning.**
+
+The round started with **`fresh` at 0**: all 220 queued functions across 55
+carved units were documented stalls. So Gate 2 fired and the head carved
+before staffing anyone.
+
+### Carve (head, 3 units, each verified separately, all zero-byte-change)
+
+| unit | funcs | clean | source |
+| --- | --- | --- | --- |
+| `code_179d8_i` | 18 | 9 | front slice of old `code_179d8_tail` |
+| `code_179d8_j` | 26 | 12 | **middle** slice of `code_179d8_mid_c` |
+| `class_3bb8c_s` | 10 | 5 | whole segment — banked `DELIBERATELY UNWORKED` |
+
+Cut by blocker density rather than by "next": `code_179d8_mid_c`'s head is 5
+clean of 24 and stays asm, so `code_179d8_j` comes out of the middle leaving a
+one-function remainder (`code_179d8_mid_d`). Neither cut needed a rodata
+attach — `code_179d8_mid_c` has zero `jtbl_` and zero `.word .L` across the
+whole monolith, and `code_179d8_i`'s boundary keeps both of the old tail's
+switch tables in the remainder. `class_3bb8c_h` was ruled out on the
+trampoline screen: 15 of 17 "clean" but 13 BIOS trampolines, confirming the
+round-17 note. 28 stub reports written for the blocked functions.
+
+`fresh` 0 -> 20, `banked` 0 -> 5, uncarved 187 -> 133.
+
+### Matches
+
+| runner | unit | result |
+| --- | --- | --- |
+| alpha | `code_179d8_i` | **9 of 9**, five on the first attempt (incl. a 157-word dispatcher) |
+| bravo | `code_179d8_j` | **10 of 11**, one stall (`func_80031D6C`, register identity) |
+| delta | `code_2cc8c_e` | **2 matches**: `func_8003F848` 173->177/177, `func_80040154` 101->103/103 |
+| charlie | `code_8220_c` | **0 matches** — confirmatory negative, 8 functions foreclosed |
+
+Both freshly carved units were worked out in one round: `code_179d8_i` has no
+workable ground left and `code_179d8_j` has none either, which is why `fresh`
+is back to 0 (see "next round" below).
+
+### The round's most valuable result was not a match
+
+**The documented oracle grep missed 6 of 7 fatal compile errors, and had done
+for 20 rounds.** Found by the head while running an ordinary experiment, not
+while auditing: a duplicate `typedef` produced `build exit=2`, **zero grep
+hits, and a plausible funcdiff score** — the exact signature the loop teaches
+you to read as "fresh build, does not match yet". Only `funcdiff.py`'s mtime
+staleness guard caught it, and that guard is documented as a BACKSTOP.
+
+GCC 2.6.3 predates the `error:` prefix convention. Measured through the pinned
+pipeline, all seven fatal (`cc1` exits 33): `parse error` is caught;
+`conflicting types`, `redefinition`, `undeclared`, `too many arguments`,
+`incompatible types in return` and `duplicate member` are all **missed**.
+`parse error` covers syntax and `undefined reference` covers the linker — every
+SEMANTIC error in between was invisible.
+
+Fixed by matching make's failure on a COMPILE TARGET rather than message text:
+`\*\*\* \[[^]]*\.o\]` fires on `[build/src/<unit>.c.o] Error 33` and not on
+`[Makefile:74: check] Error 1`, preserving round 18's result while closing the
+gap it opened. Updated in CLAUDE.md (with the measured table),
+`docs/MATCHING-GUIDE.md` and the runner prompt, and broadcast mid-round to all
+three live runners. **All three re-verified their banked scores under the
+corrected grep; no score moved, and none had hit a masked error.** That
+negative is worth recording — the defect was real but did not corrupt this
+round's results.
+
+### `func_800400B0`: a wrong figure that survived three rounds
+
+Delta found `code_2cc8c_e`'s `func_800400B0` had carried "29/41, same total
+instruction count, purely reordered" through rounds 18, 19 and 20. It is a
+genuine one-word length regression — 40 compiled words against retail's 41,
+with `func_80040154` linking at `0x80040150` instead of `0x80040154`.
+
+**The head reproduced it, and the drift guard fires loudly every time:**
+`WARNING: the build differs OUTSIDE this range too (224685 bytes)`, printed in
+the same output as the score, three rounds running. **This is therefore NOT a
+new way a score lies and was deliberately not filed as one** — CLAUDE.md is
+explicit that recording a fired-guard case as an oracle defect teaches the next
+runner to distrust the oracle exactly where it worked. It is round 20's
+drift-attribution lesson in a worse form: there the drift was misattributed,
+here it was not read at all. Written up under the round-19 preserved-body entry
+as a sixth instance.
+
+### charlie's negative, and the head's follow-up
+
+charlie re-confirmed the `code_8220_c` OT-splice family (8 siblings, 46/54 to
+104/112) as a genuine wall, and did one thing better than previous rounds: it
+checked the "same cause, same position" claim by grepping all eight siblings'
+own disassembly side by side rather than by pairwise analogy across reports.
+The head verified this independently — `lui $a2, 0xFF000000>>16` sits at
+instruction #13 in all eight.
+
+charlie ruled out the `__asm__("")` barrier lever by ANALOGY to round 20's
+`func_8003DAD4` regression. The reasoning was sound, but the project's rule is
+that a lever's scope is measured, so the head ran it: four placements on
+`func_8001A064`, three inert at 104/112, one regressing to 18/112. Same answer,
+now evidence — and it produced a **precondition** that generalises past the
+family: a barrier reorders instructions GCC already scheduled and cannot
+CREATE one, so an ABSENT-instruction residue (`retail=<insn> built=00000000`)
+is not a barrier candidate at all. Recorded in DECOMPILATION_LEARNINGS.
+
+The head also spotted a one-past-end-pointer lead in this family and did NOT
+re-send charlie on it — it turned out to be already on record as
+`align_up_4(last_offset + width)` with a recorded negative permuter search.
+
+### Learnings promoted
+
+Two existing entries extended (the `__asm__("")` barrier precondition; the
+preserved-body drift entry's sixth instance) and three new ones: the
+delete-a-named-value lever pair from delta's two matches, the same-size
+sibling family as one unit of work, and a cluster of narrowing/branch-polarity
+bullets from alpha and bravo — including the stack-argument `lhu` vs
+`lw`+`sll`+`sra` rule, which had never been recorded for the stack case.
+
+### Next round
+
+`fresh` is back to **0**. `class_3bb8c_s` is carved and banked with 5 workable
+functions, so one runner can start without a carve; anything beyond that needs
+Gate 2 first. Remaining uncarved game code is 133 functions and the good
+windows are thinning — `code_179d8_mid_c`'s head (5 clean of 24),
+`code_179d8_tail`'s remainder (1 clean of 18, both switch tables), `code_179d8`
+proper (9 clean of 42, gp_rel-dense) and `class_3bb8c_n` (2 clean of 22).
+`class_3bb8c_h` is 13 BIOS trampolines and needs an `hasm` disposition decision
+rather than a runner.
+
+The blocker-clean near-miss corpus (`tools/nearmiss.py`) remains the
+better-posed queue at 81 entries, and round 21 is evidence it pays: delta
+closed two long-standing ones. **But rank it with fresh scepticism about title
+figures — round 21 makes three consecutive rounds in which a title-line number
+was wrong, by a third distinct mechanism each time.**
+
+---
+
 ## 2026-09-05 — round 20: 2 matches, six near-misses moved, and four inherited reports found wrong
 
 **947 -> 949 matched (69.84% -> 69.99% of game code, 50.04% of game bytes).

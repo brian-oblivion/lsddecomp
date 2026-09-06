@@ -873,6 +873,39 @@ placement/ordering residue it remains the correct first thing to try.
 Test a barrier's effect on WORD COUNT, not just on position, before trusting
 what it did.
 
+**Round 21 adds a PRECONDITION that sits upstream of the discriminator, and
+it is cheaper to check than the discriminator is.** A barrier reorders
+instructions GCC has already scheduled from real C statements. It cannot
+CREATE one. So if the residue is an instruction retail has and your build
+does not — an ABSENT instruction rather than a misplaced one — the barrier
+is not a candidate at all, whatever the residue looks like, and no
+placement of it can help.
+
+Read the residue's direction off `funcdiff` before reaching for the lever:
+
+| `funcdiff` row shape | residue | barrier a candidate? |
+| --- | --- | --- |
+| `retail=<insn> built=<different insn>` | substitution — order or register | maybe: apply the discriminator |
+| `retail=<insn> built=00000000` | **absent** — retail has a word you do not | **no** |
+
+Measured on `func_8001A064` (`code_8220_c`), whose residue is one of each:
+word 12 is a register choice (`$a2` vs `$a1`) and word 21 is absent
+(`retail=34002226 built=00000000`, i.e. retail's `addiu $v0,$s1,0x34`
+against our `nop`). Four barrier placements, whole-image oracle each time:
+three inert at 104/112, one regressing to 18/112. **Zero moved word 21**,
+which is what the precondition predicts and what makes it worth stating
+separately — the discriminator alone would have sent you to test it.
+
+The reason this earns its own paragraph rather than a footnote: round 21's
+charlie reached the same conclusion for this family by ANALOGY to round
+20's `func_8003DAD4` regression, and was right. But the project's own rule
+is that a lever's scope is measured, not reasoned — round 7 found two
+superficially symmetric vtable slots needing OPPOSITE answers — so the
+head ran it. Same answer, now evidence, and the precondition above is the
+part that generalises beyond the family. **An absent-instruction residue
+needs a source-shape change that makes the compiler COMPUTE the missing
+value; there is no scheduling lever for it.**
+
 ### `make extract` is match-status-aware — it deletes the `.s` for a function that is live C (round 20)
 
 Splat reads `src/*.c` to decide which functions still need a generated
@@ -958,6 +991,72 @@ duplicate string. Both halves are required: split the slot *and* write
 
 **Before writing any string literal, grep `asm/data/*.rodata.s` for the
 symbol.** If it is there, the extern is the only correct spelling.
+
+### Two levers that closed long-standing near-misses by DELETING a named value (round 21)
+
+Both of round 21's delta matches closed by removing a C-level name rather
+than by adding or reordering anything, and both had survived multiple prior
+rounds of operand-order and declaration-order reshaping. They are worth
+stating together because the shared shape is the useful part: **a named
+local is a promise to the allocator that a value must stay live, and the
+lever is to withdraw the promise.**
+
+- **Eliminate a pointer local that lives across loop iterations; index the
+  array directly instead.** `func_8003F848` sat at 173/177 for two rounds
+  with the residue described as "a single register-pair swap in one
+  region". The fix was to delete the tail loop's decrementing `p`/`node`
+  pointer locals and write `D_8009025C[i]` at the point of use. Round 20
+  had rewritten the operand order and the declaration order of those same
+  locals repeatedly; **it never removed the pointer itself**, and no amount
+  of reshaping around a live pointer reaches the allocation decision the
+  pointer forces. 177/177.
+
+  Note this is the DUAL of the existing "take an explicit intermediate
+  element pointer in an array loop" bullet, which fixes the opposite
+  failure. They are not in conflict — one adds a name to stop GCC
+  repurposing `self` as the induction variable, the other removes a name to
+  stop GCC keeping a register pinned across iterations. The discriminator
+  is what the residue is: a diverging INDUCTION variable wants the added
+  pointer; a register-pair swap in a loop body wants it deleted. Try the
+  one matching your residue, and try the other if it fails — between them
+  they cover both directions and each is one edit.
+
+- **Write a division in place into its dying dividend.** `func_80040154`'s
+  last 2-word residue was the destination register of a third `mflo`.
+  `self->unk84 = q2 / self->unk80;` and `q2 = q2 / self->unk80;
+  self->unk84 = q2;` are the same computation; only the second lets the
+  allocator reuse the now-dead dividend's register for the quotient, which
+  is what retail does. 103/103.
+
+  Generalising past division: **when a residue is "the result went to the
+  wrong register" and one operand is dead after the operation, assigning
+  the result back into that operand names the register you want without
+  naming a register** — which keeps it on the legal side of the ban in
+  HARD RULE 6, because removing it changes instruction selection rather
+  than pinning a register by hand.
+
+### A same-size sibling family is a single unit of work, not N units (round 21)
+
+Round 21's bravo matched ten of eleven functions in a freshly carved unit,
+and the shape that made it cheap was that four of them were same-size
+21-word siblings of one "validate an index, then read or write a global
+slot table" idiom. **The first sibling took real derivation; the rest were
+one-attempt matches once its shape was known.**
+
+Two practical consequences for a head and for a runner:
+
+- **Order the queue by SIBLING GROUP, not by size.** Sorting a fresh unit
+  smallest-first is the right default only until a family is visible. Once
+  two functions have the same word count and the same call shape, do the
+  family together while its idiom is in hand.
+- **Same size plus same shape is a hypothesis worth stating in the report
+  either way.** Round 21's bravo confirmed it for the slot-table four;
+  the negative — a same-size group that does NOT share an idiom — is
+  equally worth recording, because the next runner will otherwise form the
+  hypothesis again from the same evidence. Round 21's alpha had the
+  complementary case: six flag-bit dispatches in one function split into
+  four nested and two flat, distinguished by branch TARGETS rather than by
+  delay slots.
 
 ### Aggregate assignment vs scalar field-copy, and the rule that predicts which helps (round 19)
 
@@ -1054,6 +1153,47 @@ false claims trace directly to reading a bucket label as a size guarantee.
 Once a body drifts, its in-range `funcdiff` score is meaningless — that is
 CLAUDE.md's third way a score lies, arriving through an *inherited* body rather
 than through your own edit, which is why the usual discipline does not catch it.
+
+**Round 21 found a sixth, and it is the worst-behaved one yet because the
+false claim survived THREE rounds of being acted on.** `func_800400B0`
+(`code_2cc8c_e`) carried "29/41, same total instruction count, same
+registers, purely reordered" through rounds 18, 19 and 20. It is not a
+reordering: the body compiles to **40 words against retail's 41**, and
+`build/lsdde.map` shows the next function in ROM order, `func_80040154`,
+linking at `0x80040150` instead of retail's `0x80040154`.
+
+**The guard was firing the whole time.** Reproduced by the head from the
+report's own verbatim body:
+
+```
+func_800400B0: 20/41 words match (file 0x308B0-0x30954)
+WARNING: the build differs OUTSIDE this range too (224685 bytes) — a size change may have
+         shifted linked addresses, so this per-function read is NOT trustworthy.
+```
+
+224685 bytes of drift, printed in the same output as the score, three
+rounds running, and each round wrote the in-range number into the corpus
+anyway. **So this is NOT a new way a score lies and must not be filed as
+one** — CLAUDE.md is explicit that recording a fired-guard case as an
+oracle defect teaches the next runner to distrust the oracle exactly where
+it worked. It is round 20's drift-attribution lesson in a worse form: there
+the drift was misattributed to the wrong function, here it was not read at
+all.
+
+Two things follow that the round-19 entry above does not already say:
+
+- **The failure is in READING, not in detection, so a better check will not
+  fix it.** The check already exists, already runs by default, and already
+  says "NOT trustworthy" in words. What failed is that a plausible in-range
+  number sat directly above the warning and got copied out. Treat any
+  `funcdiff` output containing the word `WARNING` as having NO score in it.
+- **A wrong figure in a report title is self-propagating in a way a wrong
+  prose claim is not**, because Gate 1b ranks from title lines. `29/41`
+  read as a near-miss and kept attracting attempts across three rounds;
+  the true 20/41-with-drift would have ranked it nowhere near the top. This
+  is the third distinct mechanism by which a title-line figure has misled
+  a head (rounds 18, 19, 21) — see "A permuter number is in PERMUTER units"
+  and "An inherited report's PROSE can be wrong while its NUMBER is right".
 
 **The check, before building on any preserved body** (delta's wording, and it
 is seconds):
@@ -1335,6 +1475,21 @@ three rounds.
   once the `lots` side grows past some size threshold; `if (!cond) return k;`
   followed by the body reproduces it. Confirmed three times in one round
   (`DreamSys__TimerTick`, `func_8005AB2C`, `func_8005AE40`).
+- **But the inverted guard clause is a DEFAULT, not a rule, and round 21
+  found the counter-shape.** For a small bounds-check-then-body function,
+  retail's polarity can be the plain `if (valid) { body } return -1;` —
+  i.e. the un-inverted form the bullet above warns against. The size
+  threshold cuts both ways: below it, the plain shape is what reproduces.
+  **Check which arm actually falls through in the disassembly before
+  assuming a polarity**, rather than applying the inversion reflexively
+  (bravo, `func_80031C98` 22/22).
+- **And nesting order, not the truth table, decides BLOCK order.** For
+  `if (A) X; else if (B) Y; else Z;`, which branch is written as the outer
+  `if` versus the `else` changes the order the blocks are emitted in, even
+  where the two spellings are logically identical. On a near-miss that is
+  short by one instruction or has blocks in the wrong order, swap the
+  outer/inner nesting before suspecting anything subtler (alpha,
+  `func_800336CC` 16/16).
 - **An early-exit guard may have to leave the whole FUNCTION, not just the
   block it appears to wrap.** Check where the failing branch actually lands
   rather than what it visually encloses — if it lands on the epilogue, an
@@ -1548,6 +1703,23 @@ code_2c054).**
   `s32`. **Read the callee's body for the width it actually uses, not the
   callers for the width they happen to pass.** Retyped with no regression to the
   existing matched caller. (found via `func_8005DE18`'s residue)
+- **The same width rule governs STACK arguments, which was not previously
+  recorded.** An unsigned narrow stack argument loads as a single `lhu`;
+  a signed one as `lw` + `sll` + `sra`. Identical in principle to the
+  register-argument rule above, but the stack case had never been written
+  down here, and reading a `lhu` as "unsigned" is the fast way to fix a
+  three-instruction residue that looks structural (bravo, round 21).
+- **Passing a `u8` lvalue straight to an `int`/`s32` parameter costs a
+  redundant `andi $x, $y, 0xff` at the call site** — including when you
+  have just assigned it a small literal, where the mask is provably
+  useless. Introduce a plain `s32` temp and pass that. This is the
+  call-site mirror of the over-narrow-parameter bullet above: there the
+  narrow type was on the callee, here it is on the local (alpha,
+  `func_800336CC`).
+- **A negative mask materialised as `addiu $vN, $zero, -N` is `~(N-1)`,
+  not `~N`.** `-3` is `~2`. Convert to the explicit two's-complement bit
+  pattern before writing the C, rather than reading the decimal off the
+  disassembly and complementing it (alpha, `func_800339AC` 40/40).
 - **A `void`-typed vtable slot that fails to compile against a
   `return callee(...)` wrapper is itself evidence the slot typing is wrong.** A
   free signal — the compile error arrives before any attempt budget is spent.
