@@ -400,12 +400,27 @@ extern DreamSysBaseMethods *func_80057C84(void);
 
 /* Opaque view of whatever object DreamSys__ProcessChunkChange's `entity`
    parameter points to -- almost certainly an `Entity*` (include/Entity.h),
-   but that unit's own `EntityMethods` doesn't type this slot (+0x10C) and
+   but that unit's own `EntityMethods` doesn't type these slots and
    extending it is out of this unit's scope. Declared minimally, locally,
-   for this one call site only (round 2026-08-30-d). */
+   for this unit's own call sites only (round 2026-08-30-d;
+   +0x38/+0x14C/+0x150/+0x154/+0x158 added round 2026-09-06 by
+   DreamSys__InstanceEffectsOnJournal). +0x38 takes the DreamSys instance
+   as its own second argument, same shape as DreamSysBaseMethods::slot0x50
+   above; +0x14C returns a pointer forwarded straight into
+   LogInstanceMood, so `MoodGraphPoint *`; +0x150/+0x154 return plain s32
+   (added to/negated into DreamSys fields); +0x158's return is stored with
+   a bare `sh`, consistent with either `s16` or `s32` at this call shape,
+   kept `s32` for uniformity with its self-only siblings. */
 typedef struct DreamSysEntityMethods {
-	u8 pad00[0x10C];
+	u8 pad00[0x38];
+	void (*slot0x38)(void *self, struct DreamSys *arg1);
+	u8 pad3C[0x10C - 0x3C];
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
+	u8 pad110[0x14C - 0x110];
+	MoodGraphPoint *(*slot0x14C)(void *self);
+	s32 (*slot0x150)(void *self);
+	s32 (*slot0x154)(void *self);
+	s32 (*slot0x158)(void *self);
 } DreamSysEntityMethods;
 typedef struct DreamSysEntityObj {
 	DreamSysEntityMethods *methods;

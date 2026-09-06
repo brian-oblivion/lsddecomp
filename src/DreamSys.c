@@ -1020,6 +1020,62 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
 	}
 }
 
+#if 0
+/* Best-reached body, 106/110 words truly correct (see the match report for
+   why funcdiff's own count reads far lower) -- see
+   docs/match-reports/DreamSys__InstanceEffectsOnJournal.md for the residue
+   analysis. Restored to INCLUDE_ASM below per project rule (no score short
+   of byte-exact stays in src/). */
+void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
+{
+	if (this->unknwon_int_0x44 != 0) {
+		return;
+	}
+
+	switch (effect) {
+	case 4:
+		((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this);
+		break;
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		break;
+	case 9:
+		if (this->isFlashbackSession != 0) {
+			return;
+		}
+		this->vt->LogInstanceMood(this, ((DreamSysEntityObj *)entity)->methods->slot0x14C(entity));
+		this->instanceFlasbackUnlockScore += ((DreamSysEntityObj *)entity)->methods->slot0x150(entity);
+		this->vt->FlashbackSaving(this, 0, 0x10);
+		break;
+	case 10: {
+		s32 saved = this->currentStage;
+		this->currentStage = -((DreamSysEntityObj *)entity)->methods->slot0x154(entity);
+		this->vt->DynamicLink(this);
+		if (this->currentStage < 0) {
+			this->currentStage = saved;
+		}
+		break;
+	}
+	case 11:
+		if (this->isFlashbackSession != 0) {
+			return;
+		}
+		this->nextCinematic.bank = -1;
+		this->dreamTimer = this->dreamTimeLimit;
+		this->nextCinematic.entry = ((DreamSysEntityObj *)entity)->methods->slot0x158(entity);
+		break;
+	case 12:
+		if (this->isFlashbackSession != 0) {
+			return;
+		}
+		this->dreamTimer = this->dreamTimeLimit;
+		break;
+	}
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
