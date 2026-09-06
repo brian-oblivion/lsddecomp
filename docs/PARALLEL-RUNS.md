@@ -778,6 +778,25 @@ wrote down. Keep both honesty mechanisms fed:
   UNWORKED`** in its header comment. `progress.py` keys on that exact phrase to
   move the unit into the `banked` column instead of `fresh`. Without it a carve
   inflates `fresh` by its whole size and the next head mis-triages.
+- every report whose stall verdict has since been INVALIDATED — most often
+  because the blocker it blamed was resolved — MUST say **`REOPENED --
+  ASSIGNABLE`** at the start of a line. `progress.py` keys on that exact phrase
+  (round 22) to stop counting the function as a documented stall and return it
+  to `fresh`, without deleting a derivation that is still worth reading.
+
+  **This is the third honesty mechanism and it closes the one direction the
+  other two could not.** A report is written while a blocker is live; the
+  blocker gets resolved; the report outlives it and keeps the function out of
+  `fresh` forever, because a function everybody believes is blocked is one
+  nobody re-measures. That is the *expensive* direction of error this document
+  already names ("a false blocker silently deletes matchable ground from every
+  future round") — it just had no way to be undone. Round 21 resolved
+  `addiu_at` and annotated five live reports with "BLOCKER RESOLVED — THIS
+  FUNCTION IS NOW ASSIGNABLE" in prose no tool could read; all five were
+  invisible to `fresh` until round 22 marked them.
+
+  So when you resolve or retire a blocker, marking its reports is part of the
+  same job, not a follow-up. `gp_rel` alone currently has 82 of them.
 
 **Screen the queue with TWO greps as of round 21 — it used to be three.**
 `addiu $at, $at, %lo` is NO LONGER A BLOCKER (resolved round 21; see

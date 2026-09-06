@@ -906,6 +906,148 @@ part that generalises beyond the family. **An absent-instruction residue
 needs a source-shape change that makes the compiler COMPUTE the missing
 value; there is no scheduling lever for it.**
 
+**Round 22 adds a THIRD condition, and it is positional rather than
+diagnostic — where in the statement stream the barrier sits.** Two runners hit
+opposite sides of it in the same round, which is what makes it separable from
+the discriminator above:
+
+| runner | placement | outcome |
+| --- | --- | --- |
+| delta | between two straight-line stores (`func_80056BBC`) | **WIN** — closed a scheduling residue |
+| head | between three straight-line stores (`func_80031BA4`) | **WIN** — 47/61 → 61/61 |
+| charlie | immediately before a cast-and-call statement (`DreamSys__InstanceEffectsOnJournal`) | inert, optimized away, zero effect |
+| charlie | at a branch/label boundary (`func_8005A9CC`) | regressed — suppressed unrelated scheduling, 136KB of drift |
+| alpha | first statement, ahead of a guard (`func_80031BA4`) | **regressed** — moved two stack-argument loads and manufactured the residue it then filed as a stall |
+
+**A barrier between straight-line statements in one basic block does what it
+says. A barrier at or across a block boundary does not** — it is either
+eliminated outright (nothing to reorder across a boundary the compiler already
+treats as a barrier) or it perturbs the delay-slot filling that spans the
+boundary. Round 20's discriminator says *what kind of residue* to use it on;
+this says *where it can physically act*. Both have to hold.
+
+### Levers do not commute — a residue that MOVES is a signal to subtract (round 22)
+
+Runner alpha filed `func_80031BA4` at 57/61 as a source-unreachable scheduling
+stall: "stack-passed argument loads sit outside ordinary scheduling-barrier
+reach." The naive body — no barriers, no named intermediates — reproduced
+retail's supposedly unreachable ordering **on the first try** through the
+pinned pipeline. The only real divergence was a missing empty 8-byte frame,
+which moves both stack-argument displacements from `0x10/0x14` to retail's
+`0x18/0x1C`: a displacement, not a reorder.
+
+Alpha owned every lever it needed (its own `s32 dead[2];` + `if (0)` frame
+idiom, plus two order-only barriers between the three stores) — that
+combination gives **61/61**. What broke it was the scaffolding stacked on top:
+a third barrier ahead of the guard, and named intermediates for `idx`, `p4`
+and `p5`. Those four lines moved the two `lhu`s, and the stall it filed was a
+description of damage done by its own earlier fixes.
+
+**The rule: add one lever, measure, and if the residue MOVES rather than
+SHRINKS, revert it before trying the next.** A body carrying three barriers
+and three named intermediates is no longer testing a hypothesis about the
+function; it is testing the interaction of six edits, and the residue it
+reports is attributable to none of them. Each lever here was individually
+sound and individually documented — the failure was purely additive.
+
+**Corollary, and the cheaper half: a "source-unreachable scheduling residue"
+verdict requires an isolation reproducer of the NAIVE body.** CLAUDE.md
+already demands this of a toolchain escalation ("never escalate a lead you
+have not tried and failed to reproduce in isolation"). Extend it to this
+verdict, because it closes a function to future rounds exactly the same way a
+blocker classification does. It costs under a second, and here it would have
+falsified the hypothesis before it was ever formed.
+
+### A delay-slot residue writing `$a0`-`$a3` is a CALL ARGUMENT until proven otherwise (round 22)
+
+Runner delta filed `func_80056BBC` at 86/87 as the documented "redundant move"
+class: an `ori $a1, $zero, 1` filling a branch delay slot, with — it argued —
+no reader on either path. That is right for the fallthrough (`$a1` is
+overwritten in the very next instruction) and **wrong for the branch-taken
+path**, which is the half that decides:
+
+```
+    bnez  $v0, .L80056C78
+     ori  $a1, $zero, 0x1     <- the residue
+.L80056C78:
+    lw    $s0, 0x88($s1)
+    nop
+    lw    $v0, 0x0($s0)
+    nop
+    lw    $v0, 0x64($v0)
+    nop
+    jalr  $v0                 <- slot64, and NOTHING wrote $a1 in between
+     addu $a0, $s0, $zero
+```
+
+The instruction is that call's second argument, hoisted into the delay slot in
+the ordinary way. The unit's local vtable view typed the slot
+`void (*slot64)(LinkNode *)` — one parameter — so no `li $a1, 1` existed
+anywhere in the C for the scheduler to hoist, and the slot came out a `nop`.
+Typed `(LinkNode *, s32)` and called `slot64(child, 1)`: **87/87**.
+
+Two rules out of it, and the second is the cheap one:
+
+- **Walk FORWARD from the residue along the branch-TAKEN path to the first
+  `jal`/`jalr`. If nothing writes the register in between and it is
+  `$a0`-`$a3`, it is an argument.** It is a dead store only if BOTH successors
+  redefine it before any call. A single-path liveness check is not a liveness
+  check.
+- **A function-pointer slot's arity is invisible at the call site** — `jalr` is
+  the same bytes either way — so a slot typed with too few parameters produces
+  exactly this signature and nothing else. **Cross-check arity against every
+  other unit that calls the slot before classifying such a residue**
+  (`grep -rn 'slotNN' src/`). Here six already-matched call sites in four
+  units all passed a second argument; this unit's one-argument view was the
+  outlier, and one grep would have said so. The project's
+  multiple-independent-local-views convention is what makes that disagreement
+  cheap to find, and is itself the evidence.
+
+### A same-size pointer cast in a FUNCTION-SCOPE local can cost a callee-saved register (round 22)
+
+`DreamSys__InstanceEffectsOnJournal` (charlie): a
+`DreamSysEntityObj *obj = (DreamSysEntityObj *)entity;` assigned once at the
+top and reused by five cases compiled to a **third** callee-saved register
+(`$s2`) where retail needs two — an 8-byte-larger frame that cascaded into
+85287 bytes of whole-image drift. Casting `entity` inline at each of the five
+use sites instead took the function from wildly wrong to 106/110 in one step.
+
+**The cost is about LIFETIME, not about the existence of a named local** — a
+*case-local* temp of the same type was byte-identical. Prefer casting inline at
+each use site; promote to a local only when removing it demonstrably changes
+nothing.
+
+**The head closed the third form of this axis, negatively:** retyping the
+PARAMETER itself to the view type and deleting every cast leaves the residue
+unchanged. Three forms are now tested (function-scope local, case-local,
+parameter retype) and the cast/typing axis is closed for that function — what
+`asm-differ` showed instead is that the `move a0,s1` / `lw v0,0(a0)` ordering
+is specific to its **case 4 alone**, the only site there passing a second
+argument. Recorded because a negative result nobody wrote down is one the next
+round pays for again.
+
+### Four narrower confirmations from round 22
+
+Each backed by a byte-exact match, one line each:
+
+- **A named local can change a load's SIGNEDNESS, not just its register.**
+  `s16 speed = e->unk44;` emitted `lhu` plus a re-sign-extend where retail has
+  a plain `lh`; reading the field directly at each use site fixed it
+  (`func_80033AB0`, bravo). Same family as the `sltiu`-vs-`slti` symptom
+  charlie hit — a wrong type shows up as an instruction choice, not only as a
+  register.
+- **Comparison operand ORDER, not just polarity, decides which side's load is
+  emitted first.** `if (a < b)` and `if (b > a)` are semantically identical and
+  compile differently (bravo).
+- **A masked-and-shifted extraction folds `sra` → `srl` when stored through a
+  named intermediate, and stays `sra` written inline at the use site** —
+  verified in isolation through the pinned pipeline before use
+  (`func_800305F4`, alpha).
+- **An empty stack frame SMALLER than 0x10 is evidence of a dead local-array
+  write, not a dead call** — a dead call forces 0x10 minimum for the outgoing
+  argument area, a dead local array does not (`func_80031CF0`, alpha; used by
+  the head to close `func_80031BA4`).
+
 ### `make extract` is match-status-aware — it deletes the `.s` for a function that is live C (round 20)
 
 Splat reads `src/*.c` to decide which functions still need a generated

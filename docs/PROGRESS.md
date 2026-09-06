@@ -6,6 +6,84 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-06 — round 22: 19 matches, two runner stalls adjudicated into matches, and a third honesty mechanism
+
+**971 -> 990 matched (71.61% -> 73.01% of game code). Build green in main
+after all four merges, zero merge conflicts — `headercontention.py` reported
+NO CONTENTION before provisioning, and the four assigned units shared no
+project header.**
+
+Gates 0 and 1 both passed clean, so no carve and no permuter round: `fresh`
+stood at 62 and the head's screen of all 69 report-less queued functions
+(both live blockers plus the BIOS-trampoline fourth screen) came back **69 of
+69 CLEAN**. Four runners on cheap models, six functions each.
+
+### Results
+
+| runner | unit | matched | words | stalled |
+| --- | --- | --- | --- | --- |
+| alpha | `code_179d8_j` | 3 | 70 | 3 |
+| bravo | `code_179d8_i` | 6 | 355 | 0 |
+| charlie | `DreamSys` | 3 | 143 | 3 |
+| delta | `class_3bb8c_s` | 5 | 176 | 1 |
+| **head** | (adjudication) | **2** | **148** | — |
+
+Bravo went 6 for 6, several on the first attempt, and confirmed
+`SsUtGetVabHdr` against `include/psyq/LIBSND.H:229` — a real SDK function, not
+an inherited guess.
+
+### The adjudications: two stalls became matches
+
+Both were classification errors, not measurement errors — every score and
+every permuter figure the runners reported was accurate.
+
+- **`func_80056BBC` (delta, 86/87 -> 87/87).** Filed as the documented
+  "redundant move" class: a `li $a1, 1` in a branch delay slot with no reader.
+  It has a reader — the branch-**taken** path runs seven instructions to a
+  `jalr` without writing `$a1`, so it is that call's second argument. The
+  unit's local vtable view typed `slot64` with one parameter, so the `1` had
+  no C to come from. Six matched call sites in four other units all pass a
+  second argument.
+- **`func_80031BA4` (alpha, 57/61 -> 61/61).** Filed as a source-unreachable
+  scheduling residue. The naive body reproduced the "unreachable" ordering on
+  the first try in isolation; the real gap was a missing empty 8-byte frame.
+  Alpha's own three levers on the naive body give 61/61 — what broke it was
+  four more lines of scaffolding stacked on top, which moved the residue alpha
+  then reported.
+
+Both are written up in full in their match reports, and both generalise; see
+DECOMPILATION_LEARNINGS' round-22 entries. The transferable half is that a
+**wrong CAUSE** on a near-miss is what closes a function to future rounds —
+neither of these would have been re-opened by anyone reading the reports as
+filed.
+
+One adjudication came back **negative and is recorded as such**:
+`DreamSys__InstanceEffectsOnJournal`'s cast/typing axis is now closed (three
+forms tested, all inert or worse), with the one-argument-vs-two-argument call
+shape identified as the remaining lead.
+
+### Tooling: the `REOPENED -- ASSIGNABLE` marker
+
+`progress.py` counts any queued function with a match-report file as a
+documented stall. When a blocker is RESOLVED, every report written while it
+was live keeps its function out of `fresh` permanently — nobody re-measures a
+function everybody believes is blocked. Round 21 resolved `addiu_at` and
+annotated five live reports with "BLOCKER RESOLVED — THIS FUNCTION IS NOW
+ASSIGNABLE" in prose no tool could read.
+
+Added an exact-phrase marker, the counterpart to `DELIBERATELY UNWORKED`, and
+applied it to those five (`fresh` 62 -> 67 before the round's own work). Gate 1
+in PARALLEL-RUNS now requires marking a blocker's reports as part of resolving
+it. `gp_rel` alone has 82 that will need it.
+
+### Next round
+
+Runners again — `fresh` is 50 with no carve needed. The five reopened
+functions are the sharpest ground: they are cold, blocker-clean, and were
+triaged as hard only under a blocker that no longer exists.
+
+---
+
 ## 2026-09-06 — round 21: 22 matches off fresh carve, an oracle defect fixed, and a three-round-old figure corrected
 
 **949 -> 971 matched (69.99% -> 71.61% of game code; 50.04% -> 51.54% of game
