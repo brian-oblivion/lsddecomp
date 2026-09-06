@@ -125,7 +125,44 @@ void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4)
     self->methods->slot48(self, 1, arg4);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_80056858);
+/* A rand()-free Vec3 accumulate/attach helper: for each of self's two
+ * arr7C slots, fold a table-driven contribution into a local Vec3 (either
+ * into .x, scaled by *self->unk68, or straight into .y, depending on
+ * self->unk6C), then either forward it to an existing child's slotB8 or
+ * spin up a brand new child via func_80056FE4/func_8001E770/func_800567D4. */
+extern void *func_80056FE4(void);        /* class_3bb8c_o.c, New_X allocator */
+extern void func_8001E770(void *self, s32 arg); /* established, code_55dd4.h */
+extern Vec3S D_800877EC;
+extern s32 D_800877F8[];
+
+void func_80056858(LinkNode *self, s32 reuse) {
+    Vec3S accum;
+    LinkNode **p;
+    s32 i;
+    s32 count = self->unk6C;
+
+    if (count == 0) {
+        return;
+    }
+    accum = D_800877EC;
+    p = self->arr7C;
+    for (i = 0; i < 2; i++, p++) {
+        if (count < 3) {
+            accum.x += *(s16 *)self->unk68 * D_800877F8[count];
+        } else {
+            accum.y += D_800877F8[count];
+        }
+        if (reuse) {
+            LinkNode *child = *p;
+            child->methods->slotB8(child, &accum);
+        } else {
+            LinkNode *child = func_80056FE4();
+            *p = child;
+            func_8001E770(child, self->unk20);
+            func_800567D4(*p, self, &accum, self->unk64, self->unk68);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800569A8);
 
