@@ -83,7 +83,10 @@ s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
     return func_8002FAC4(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_800303C8);
+s32 func_800303C8(s16 p0, s16 p1, u16 p2)
+{
+    return func_800300D0(0x21, p0, p1, p2);
+}
 
 void func_800303FC(void) {
 }
