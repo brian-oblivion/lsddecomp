@@ -382,6 +382,36 @@ segments:
       # heart of this monolith (of its 51 functions only ~12 are clean, and
       # they are scattered rather than in a window).
       - [0x1D508, asm, code_179d8_mid_c]
+      # code_179d8_j: TAIL slice of the old code_179d8_mid_c, functions
+      # 173..198 of the original monolith, 0x20ADC..0x2273C (26 functions,
+      # func_800302DC .. func_80031EE8).  Carved round 21 (2026-09-06).
+      #
+      # Cut by BLOCKER DENSITY, not by "next": the head of code_179d8_mid_c
+      # (0x1D508..0x20ADC, functions 149..172) is 5 clean of 24 and stays
+      # asm, while this window is 12 clean of 26.  Census at carve time,
+      # four screens per function, canonical shell forms:
+      #   12 CLEAN -- func_800302DC (59w), func_800303C8 (13w),
+      #   func_800303FC (2w), func_800307F0 (29w), func_80030864 (21w),
+      #   func_800308B8 (29w), func_8003092C (21w), func_800319B4 (36w),
+      #   func_80031C98 (22w), func_80031D6C (35w), func_80031E94 (21w),
+      #   func_80031EE8 (21w).
+      #   13 addiu-$at, 1 addiu-$at + nop_mflo_mfhi; zero gp_rel, zero
+      #   `jr $t2` trampolines.
+      #
+      # code_179d8_mid_c contains ZERO `jtbl_` references and zero
+      # `.word .L` -- measured over the whole monolith, not just this slice
+      # -- so neither this unit nor either remainder needs a rodata attach.
+      # Boundary checked on both sides: no function has more than one
+      # `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, and the
+      # frameless ones open on their own arguments, never on $sp.
+      #
+      # Expect this slice to span more than one class; identify each with
+      # tools/classtable.py rather than assuming the unit has one.
+      - [0x20ADC, c, code_179d8_j]
+      # code_179d8_mid_d: the one function left between the code_179d8_j
+      # carve above and code_179d8_c below -- func_80031F3C (131w), which is
+      # addiu-$at blocked.  A carve remainder, not a unit.
+      - [0x2273C, asm, code_179d8_mid_d]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
       - [0x22948, c, code_179d8_c]
       # code_179d8_tail: functions 220..255 of the original.  UNCARVED
@@ -391,7 +421,37 @@ segments:
       # tables, at func_80034690 and func_800357B0.  Carving it will need
       # the rodata attach/split dance from Gate 2; the _f slice below does
       # not, which is why the cut is here.
-      - [0x23500, asm, code_179d8_tail]
+      # code_179d8_i: FRONT slice of the old code_179d8_tail, functions
+      # 220..237 of the original monolith, 0x23500..0x24938 (18 functions,
+      # func_80032D00 .. func_8003410C).  Carved round 21 (2026-09-06).
+      #
+      # Blocker census at carve time, four screens per function, run with the
+      # canonical shell forms (grep -A2 FORWARD for nop_mflo_mfhi):
+      #   9 of 18 CLEAN -- func_80032D00 (13w), func_800334A0 (20w),
+      #   func_800336CC (16w), func_8003370C (11w), func_80033738 (157w),
+      #   func_800339AC (40w), func_80033A4C (25w), func_80033FB8 (26w),
+      #   func_8003410C (11w).
+      #   9 of 18 addiu-$at blocked; zero gp_rel, zero nop_mflo_mfhi, zero
+      #   `jr $t2` trampolines.
+      #
+      # The tail remainder keeps BOTH of this segment's switch jump tables
+      # (func_80034690 and func_800357B0), so this slice owns none and needs
+      # NO rodata attach -- which is why the cut is here and not later.
+      # Boundary checked on both sides: no function in the slice has more
+      # than one `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`,
+      # and the four frameless ones (SsUtGetVabHdr, func_80033A4C,
+      # func_80033AB0, func_80033FB8) open with `sll $aN, $aN, 16` -- leaf
+      # argument narrowing, not a caller-frame read.
+      #
+      # Expect this slice to span more than one class; identify each with
+      # tools/classtable.py rather than assuming the unit has one.
+      - [0x23500, c, code_179d8_i]
+      # code_179d8_tail: what is left after the code_179d8_i carve above --
+      # functions 238..255 of the original, 0x24938..0x2673C.  Still asm and
+      # deliberately so: 17 of its 18 functions are addiu-$at blocked, and it
+      # owns both switch jump tables (func_80034690, func_800357B0), so
+      # carving it needs the rodata attach/split dance from Gate 2.
+      - [0x24938, asm, code_179d8_tail]
       # code_179d8_f: functions 256..273 of the original, 0x2673C..0x272C8
       # (18 functions).  Census 2026-09-04, three-grep screen per function:
       # 16/18 clean, the two blocked are func_80036230 and func_80036528,
@@ -662,10 +722,24 @@ segments:
       # with tools/classtable.py rather than assuming.
       - [0x46288, c, class_3bb8c_r]
       # class_3bb8c_s: functions 44..53 of that remainder, 0x46D20..0x475F0.
-      # UNCARVED.  10 functions, 5 clean -- a poor unit on its own, but it
-      # adjoins class_3bb8c_o and could be folded in if that block is
-      # revisited.
-      - [0x46D20, asm, class_3bb8c_s]
+      # CARVED round 21 (2026-09-06) and BANKED -- see the DELIBERATELY
+      # UNWORKED note in src/class_3bb8c_s.c.  Carved rather than left asm
+      # because it is the only ground left outside the code_179d8 block that
+      # is not trampoline- or gp_rel-dense, so it gives the next round a
+      # header-disjoint unit without a carve.
+      #
+      # Census at carve time, four screens per function, canonical shell
+      # forms: 5 of 10 CLEAN -- func_80056718 (31w), func_80056794 (16w),
+      # func_800567D4 (33w), func_80056858 (84w), func_80056B8C (12w).
+      # 3 addiu-$at, 1 gp_rel, 1 gp_rel + addiu-$at; zero nop_mflo_mfhi,
+      # zero `jr $t2` trampolines.
+      #
+      # Zero `jtbl_` and zero `.word .L` in the segment, so no rodata
+      # attach.  Boundary checked on both sides: no function has more than
+      # one `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, and
+      # the single frameless function (func_80056794) opens on its own $a1,
+      # not on $sp.
+      - [0x46D20, c, class_3bb8c_s]
       # class_3bb8c_o: functions 54..73 of that remainder, 0x475F0..0x47CC4
       # (20 functions).  Census 2026-09-04, three-grep screen per function:
       # 19/20 clean, the one blocked is func_80056F5C (gp_rel).  Owns NO
