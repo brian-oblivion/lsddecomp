@@ -515,7 +515,29 @@ void func_80059E3C(DreamSys *this)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059E98);
+s32 func_80059E98(DreamSys *this, s32 arg1)
+{
+	s32 delta;
+	PlayerSpawnPoint *pos;
+
+	if (arg1 != 0) {
+		delta = D_80087E34[arg1] * D_80087E20[this->unk_0xAC];
+		this->vt->func_800595A0(this);
+		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
+		if (!this->vt->func_8005A9CC(this, pos)
+		 && !this->vt->func_8005A82C(this, pos)
+		 && !this->vt->func_8005A700(this, pos)) {
+			this->vt->func_8005B904(this);
+			D_80087E3C[arg1](this, delta, (void *)(this->unk_0x90C < 1));
+			if (this->currentStage == 0
+			 && this->unk_0x14->unk_0x1C < -0x7D0
+			 && this->unk_0x14->unk_0x18 >= -0x1F3) {
+				this->vt->LinkWall(this, this, 4);
+			}
+		}
+		this->unk_0x14->unk_0x0 = 0;
+	}
+}
 
 void func_8005A050(DreamSys *this)
 {

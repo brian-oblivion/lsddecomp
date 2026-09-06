@@ -28,6 +28,21 @@ extern s32 D_80087E5C[3];
 extern s32 D_80087E68[3];
 extern s32 D_80087E74[3];
 
+/* Consumed by func_80059E98 (round 2026-09-06), both indexed by that
+   function's own `arg1` (a mood/day-type selector, range implied by the
+   table sizes below): `D_80087E34[arg1] * D_80087E20[this->unk_0xAC]` forms
+   a signed delta, then `D_80087E3C[arg1]` is called with it. Index 0 is
+   unused/null in D_80087E3C (arg1 == 0 returns before reaching any of
+   these, per that function's own guard) -- consistent with D_80087E34[0]
+   being 0 too. D_80087E20 is indexed separately by DreamSys::unk_0xAC (its
+   own "Current" value, see that field), not by arg1. */
+extern s32 D_80087E20[5];
+extern s8 D_80087E34[8];
+/* Declared further down (after the real `DreamSys` typedef exists) as
+   `extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);` --
+   same element type as func_800575B0/func_800575E0 below, which this table
+   holds pointers to. */
+
 /* {value, flag} pair array; func_800598E8 always writes index 0's value and
    passes &D_80087E84[-1] (== &D_80087E80, a distinct label immediately
    before it) to func_8001CEB4. Still raw `nonmatching` data. */
@@ -141,7 +156,15 @@ typedef struct DreamSysUnk14Tail {
    0x48..0x50 are unconfirmed padding. */
 typedef struct DreamSysUnk14 {
 	s32 unk_0x0;
-	s32 unknown_values_0x4[0x34 / 4];
+	s32 unknown_values_0x4[(0x18 - 0x4) / 4];
+	/* Compared against -0x1F3 (-499) by func_80059E98 (round 2026-09-06):
+	   must be >= that, together with unk_0x1C's own bound below, to run a
+	   WallLink call -- only reached while DreamSys::currentStage is 0. */
+	s32 unk_0x18;
+	/* Compared against -0x7D0 (-2000) by func_80059E98 (round 2026-09-06):
+	   must be < that alongside unk_0x18 above. */
+	s32 unk_0x1C;
+	s32 unknown_values_0x20[(0x38 - 0x20) / 4];
 	s32 vec[3];
 	DreamSysUnk14Tail *unk_0x44;
 	s32 unknown_values_0x48[0x8 / 4];
@@ -730,7 +753,11 @@ typedef struct DreamSys {
 	DreamSysUnk14 unk14Snapshot;
 	DreamSysUnk14Tail unk14TailSnapshot;
 	s32 unk_0x908;
-	s32 unk_0x90C;
+	/* Compared with an UNSIGNED `< 1` (sltiu) by func_80059E98 (round
+	   2026-09-06) -- typed `u32` rather than `s32` to reproduce that,
+	   confirmed safe since its only two writers (round 2026-08-30) both
+	   set it to the literal 0. */
+	u32 unk_0x90C;
 	s32 unk_0x910;
 	/* A retry/attempt counter (round 2026-09-02, func_8005AD68): read as a
 	   whole word, compared against several literal bands, and incremented
@@ -744,6 +771,11 @@ typedef struct DreamSys {
 	s8 unknown_values_0x922[2];
 	s32 unk_0x924;
 } DreamSys;
+
+/* Dispatch table indexed by func_80059E98's `arg1`; see that table's own
+   comment near D_80087E20/D_80087E34 above. Same element signature as
+   func_800575B0/func_800575E0 below. */
+extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);
 
 struct vtable_DreamSys{
 	u32 unknown_int;
@@ -980,14 +1012,27 @@ struct vtable_DreamSys{
 	void (*DynamicLink)(DreamSys *this);
 	bool (*StaticWallLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	bool (*LoadNextFlashback)(DreamSys *this, bool unknown);
-	u32 unknown_functions_0x1d0[1];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D0) --
+	   func_8005A700 is already matched (`bool (DreamSys *this,
+	   PlayerSpawnPoint *currentPos)`, see its definition in DreamSys.c).
+	   Called by func_80059E98 (round 2026-09-06) as the third of three
+	   "link test" tries, same argument shape as func_8005A7A0/func_8005A82C/
+	   func_8005A9CC below. */
+	bool (*func_8005A700)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D4), this
 	   round. Tests this->unknwon_int_0x44, then a static-link-with-timer
 	   test (func_8005BE90) against this->linkCoordinates/currentStage/
 	   dreamTimer, then ExecuteLinks with literal type 0x10 on success --
 	   see func_8005A7A0.md. */
 	bool (*func_8005A7A0)(DreamSys *this, PlayerSpawnPoint *currentPos);
-	u32 unknown_functions_0x1d8[2];
+	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D8/+0x1DC).
+	   Both still INCLUDE_ASM. func_80059E98 (round 2026-09-06) calls
+	   func_8005A9CC (+0x1DC) first, then func_8005A82C (+0x1D8), then
+	   func_8005A700 above -- same "link test" signature as those, confirmed
+	   by this call site alone (neither function's own body has been read
+	   yet). */
+	bool (*func_8005A82C)(DreamSys *this, PlayerSpawnPoint *currentPos);
+	bool (*func_8005A9CC)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Getter for currentStage (round 2026-08-30-c). */
 	s32 (*func_8005AFD0)(DreamSys *this);
 	void (*ProcessChunkChange)(DreamSys *this, void *entity, s32 effect);
