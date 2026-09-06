@@ -198,3 +198,53 @@ and only promote it to a real local if removing it demonstrably changes
 nothing (verified here too -- the case-local `DreamSysEntityMethods *`
 temp made no difference at all, confirming the register cost is about
 LIFETIME/SCOPE, not the mere existence of a named local).
+
+---
+
+## Head adjudication, round 22: classification CONFIRMED, one hypothesis tested and rejected
+
+The head re-read both residues. **Charlie's classification stands** -- this is a
+genuine allocation/scheduling residue, honestly scored and honestly bounded,
+and the "read the asm-differ output, not funcdiff's raw count" caveat above is
+correct and important. Recorded here so the next round does not re-derive it.
+
+**Tested and REJECTED: retyping the parameter.** Charlie tried a function-scope
+cast local (regressed -- extra callee-saved register) and a case-local temp
+(byte-identical). It did not try the third form, which is the one a reader of
+this report reaches for next: **give the parameter the view type directly and
+delete every cast**, so no cast pseudo exists at all.
+
+```c
+void DreamSys__InstanceEffectsOnJournal(DreamSys *this, DreamSysEntityObj *entity, s32 effect)
+/* ... and `entity->methods->slotNN(entity, ...)` at all five sites */
+```
+
+Built green with the forward declaration updated to match; the residue is
+**unchanged**, both halves of it. Still one word short, still 132780 bytes of
+whole-image drift. Reverted.
+
+**What the experiment did establish**, from `tools/asm-differ/diff.py`: the
+`move a0, s1` / `lw v0, 0(a0)` ordering is specific to **case 4 alone**. Every
+other case in retail reads `lw v0, 0(s1)` and sets `a0` afterwards -- exactly
+the shape this C already produces:
+
+```
+  retail case 4      move a0,s1 ; lw v0,0(a0) ; nop ; lw v0,0x38(v0)
+  retail case 9      lw v0,0(s1) ; nop ; lw v0,0x14c(v0)   <- matches ours
+```
+
+So it is not a whole-function property of how `entity` is typed or cast --
+which is what all three cast experiments were implicitly testing, and why all
+three came back negative. Case 4 is also the only call site here that passes a
+SECOND argument (`this`, into `$a1`, in the `jalr`'s delay slot). That
+correlation is the remaining untested axis and the natural next lead: the
+difference is between a one-argument and a two-argument method call, not
+between a cast and a non-cast object expression.
+
+**Do not spend another round on the cast/typing axis.** Three forms are now
+tested (function-scope local, case-local, parameter retype) and all three are
+byte-identical or worse.
+
+Residue 1 (`v1` vs `a2` for the switch index) is likewise unmoved by the
+retype, consistent with charlie's finding that the switch-lowering register
+choice is invisible to source spelling.
