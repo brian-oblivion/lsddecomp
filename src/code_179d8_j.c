@@ -120,7 +120,16 @@ s32 func_80030584(s32 p0, s16 *out1, s16 *out2)
     return *cur;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_800305F4);
+s32 func_800305F4(s32 p0)
+{
+    s32 channel = p0 & 0xFF;
+    Entry90902E8 *tbl = D_800902E8[channel];
+    s32 recIdx = (p0 & 0xFF00) >> 8;
+
+    __asm__("");
+    D_8008EA22 = channel;
+    return tbl[recIdx].unk74;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030648);
 
