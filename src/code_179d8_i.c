@@ -35,7 +35,24 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_i", SsUtGetVabHdr);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033260);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800334A0);
+typedef struct {
+    s32 unk0;
+    s16 unk4;
+    s16 unk6;
+    u8 pad8[0x28 - 0x8];
+} UnkStruct_800334A0;
+
+extern void func_8003760C(UnkStruct_800334A0 *arg);
+
+void func_800334A0(s16 a0, s16 a1)
+{
+    UnkStruct_800334A0 s;
+
+    s.unk0 = 3;
+    s.unk4 = a0 * 129;
+    s.unk6 = a1 * 129;
+    func_8003760C(&s);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_800334F0);
 
