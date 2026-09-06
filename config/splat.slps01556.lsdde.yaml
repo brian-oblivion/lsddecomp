@@ -662,6 +662,35 @@ segments:
       # or a literal `.word` disposition, and an hasm segment touches
       # .gitignore and .claude/hooks/block-asm-edits.sh in the same step,
       # which makes it an operator-scale change rather than a head one.
+      #
+      # ROUND 21 (head): NOT BLOCKING ANYTHING, and the recommendation when it
+      # finally is, so the endgame head does not re-derive it.
+      #
+      # Nothing is staffed near these -- the segment exists precisely so carves
+      # start after it -- so this decision can wait until the trampolines are
+      # among the last things standing. They are 13 x 3 instructions = 156 of
+      # 232512 game bytes, i.e. 0.067%. There is no percentage argument for
+      # doing it sooner.
+      #
+      # When it is forced, use `hasm`, not `.word`. Two reasons, one of them
+      # measured this round:
+      #   - Each stub is `addiu $t2,$zero,0xB0 / jr $t2 / addiu $t1,$zero,N`,
+      #     i.e. it CONTAINS A REAL `jr`. The `.word` route therefore needs the
+      #     explicit tab-delimited .set noreorder/.set reorder bracket around
+      #     every one of them (CLAUDE.md HARD RULE 6's second trap), or maspsx's
+      #     defensive nop-after-branch insertion corrupts the delay slot. That
+      #     is 13 hand-bracketed asm blocks to get right, against one segment
+      #     type change.
+      #   - The disposition GENERALISES, which was not previously recorded:
+      #     `grep -c 'jr *\$t2'` over every segment finds 34 trampolines, not
+      #     13 -- the other 21 are in psyq_2258 (2), psyq_GsLinkObject4 (8),
+      #     psyq_memset (1), psyq_PadInit (3) and psyq_SpuSetMute (7). Those are
+      #     library and excluded from the game percentage, but they need the
+      #     same answer eventually, so deciding `hasm` once covers all 34 rather
+      #     than being a one-off for these 13.
+      #
+      # Doing it means updating THREE files in one step -- this yaml,
+      # .gitignore, and .claude/hooks/block-asm-edits.sh -- per HARD RULE 4.
       - [0x410E8, asm, class_3bb8c_h]
       # class_3bb8c_i: first slice after the trampolines, 0x413A8..0x41F84,
       # 20 functions. Carved round 14. Blocker profile: 2 of 20 --
