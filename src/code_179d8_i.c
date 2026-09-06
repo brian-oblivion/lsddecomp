@@ -58,7 +58,12 @@ void func_800336CC(u8 a0)
     func_80036AC8(mode);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_8003370C);
+extern s32 func_8003904C(s16 a0);
+
+s16 func_8003370C(s16 a0)
+{
+    return func_8003904C(a0);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033738);
 
