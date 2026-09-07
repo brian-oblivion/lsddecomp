@@ -81,6 +81,82 @@ typedef struct {
 } Entry90902E8;
 extern Entry90902E8 *D_800902E8[];
 
+/* Reentrancy lock, same identifier/type as the sibling reading in
+ * code_179d8_i.c's func_80033738 -- "if already busy, return/skip;
+ * set; ...; clear before returning" guarding a per-channel operation. */
+extern s32 D_8008E934;
+
+/* "Currently selected channel" scratch globals: written as a side
+ * effect and then re-read from the global (not from the parameter) by
+ * the same and sibling functions -- same idiom as this file's own
+ * D_8008EA22 above. */
+extern volatile u16 D_8008EA26;
+extern u8 D_8008EA18;
+
+/* Loop bound for a small table of active "objects" (screen/slot
+ * pairs); see code_179d8_i.c's D_80090B68/6C for the sibling reading of
+ * an analogous count. */
+extern u8 D_8008E9D0;
+
+/* A pair of 16-bit bitmasks split across a 0..0x1F channel space
+ * (low 16 channels in the first word, next 16 in the second), each
+ * paired with an "active mask" word that is cleared wherever the
+ * channel mask bit is set. */
+extern u16 D_80090C60;
+extern u16 D_80090C64;
+extern u16 D_8008E228;
+extern u16 D_8008E22C;
+
+/* 52 (0x34)-byte-stride channel-configuration record, referenced by
+ * several unrelated top-level symbols 2 bytes apart (D_8008D994,
+ * D_8008D996, D_8008D99A, D_8008D99C, D_8008D99E, ...) -- each function
+ * in this unit only touches the one or two fields it actually reads,
+ * per this project's reduced-local-view convention. Only the leading
+ * s16 is named; every array below shares this one shape. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34D994;
+extern Rec34D994 D_8008D994[];
+extern Rec34D994 D_8008D996[];
+extern Rec34D994 D_8008D99A[];
+extern Rec34D994 D_8008D99C[];
+extern Rec34D994 D_8008D99E[];
+
+/* Same 0x34 stride, byte-sized "in use" flag at offset 0 (retail always
+ * clears it with `sb`, never `sh`). */
+typedef struct {
+    u8 unk0; /* +0x0 */
+    u8 pad1[0x34 - 0x1];
+} Rec34Byte;
+extern Rec34Byte D_8008D9A3[];
+
+/* Same 0x34 stride, halfword field at offset 0 (retail always clears it
+ * with `sh`). Two independent arrays share this shape. */
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34Half;
+extern Rec34Half D_8008D988[];
+extern Rec34Half D_8008D98C[];
+
+/* 16 (0x10)-byte-stride record with two s16 fields 2 bytes apart --
+ * modeled as ONE struct here (not two independent arrays) because
+ * func_80030404 computes the second field's address as the first
+ * field's cached base register plus a compile-time +0x2, which only
+ * happens when the compiler knows both offsets belong to the same
+ * object. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    s16 unk2; /* +0x2 */
+    u8 pad4[0x10 - 0x4];
+} Rec16D7F0;
+extern Rec16D7F0 D_8008D7F0[];
+extern Rec16D7F0 D_8008D7F4[]; /* independent array, same shape */
+
+/* Per-slot flag byte, same 0..0x17 id as several of the tables above. */
+extern u8 D_8008D970[];
+
 s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
 {
     u16 outA;
@@ -193,25 +269,14 @@ s32 func_800319B4(s32 p0, s16 p1, s16 p2, s32 p3, u16 p4)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031A44);
 
-/* 52-byte-stride parallel tables; 16-byte-stride pair for the mutable
- * fields.  See func_80031CF0's report for why these are independent arrays
- * rather than fields of one struct (each access computes its own address). */
-typedef struct {
-    s16 unk0;
-    u8 pad2[0x34 - 0x2];
-} Rec34D994;
-
-typedef struct {
-    s16 unk0;
-    u8 pad2[0x10 - 0x2];
-} Rec16D7F0;
-
-extern Rec34D994 D_8008D994[];
-extern Rec34D994 D_8008D99A[];
-extern Rec34D994 D_8008D99E[];
+/* Rec34D994 (D_8008D994/99A/99E) and Rec16D7F0 (D_8008D7F8/D_8008D7FA
+ * below) are declared once, near the top of this file, and shared by
+ * every function in this unit that needs them -- see the comment there.
+ * See func_80031CF0's report for why D_8008D7F8/D_8008D7FA are modeled
+ * as independent arrays rather than fields of one struct (each access
+ * computes its own address), unlike D_8008D7F0/D_8008D7F4 above. */
 extern Rec16D7F0 D_8008D7F8[];
 extern Rec16D7F0 D_8008D7FA[];
-extern u8 D_8008D970[];
 
 /* `dead` is never read and the write is unreachable; it exists to make GCC
  * allocate retail's empty 8-byte frame, which is what puts the two
