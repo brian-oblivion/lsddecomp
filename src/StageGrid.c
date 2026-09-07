@@ -1,7 +1,12 @@
-/* 2 queued (GetStageChunkFromMood / GetMoodFromStageChunk).
- * DELIBERATELY UNWORKED in round 2026-08-29-a: a 2-function queue is too thin
- * to be worth a runner's provisioning cost. Both need the STAGE_CHUNK_MOODS
- * data slot understood first; that is head or warm-session work.
+/* COMPLETE as of round 23 (2026-09-07) -- no queue left in this unit.
+ *
+ * The last two functions (GetStageChunkFromMood / GetMoodFromStageChunk) were
+ * banked DELIBERATELY UNWORKED from round 2026-08-29-a on the grounds that both
+ * needed the STAGE_CHUNK_MOODS data slot understood first. That was correct: the
+ * slot is 14 pointers to per-stage row-major arrays of the 2-byte MoodGraphPoint
+ * union, dimensioned by STAGE_GRID_DIMENSIONS (14 x 8-byte entries, `bool` = int).
+ * Once read out of the executable both functions were shape-correct on the first
+ * attempt; see docs/match-reports/ for the two local-type residues that remained.
  */
 #include "common.h"
 #include "StageGrid.h"
@@ -25,7 +30,31 @@ StageGridDimensions *GetStageGridDimensions(s32 index) {
     return GetStageGridDimensionsTable(NULL) + index;
 }
 
-INCLUDE_ASM("asm/nonmatchings/StageGrid", GetStageChunkFromMood);
+s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
+    u32 stage;
+    s32 row;
+    s32 col;
+    MoodGraphPoint *p;
+    s32 rows;
+    s32 columns;
+
+    for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
+        p = STAGE_CHUNK_MOODS[stage];
+        rows = STAGE_GRID_DIMENSIONS[stage].rows;
+        columns = STAGE_GRID_DIMENSIONS[stage].columns;
+        for (row = 0; row < rows; row++) {
+            for (col = 0; col < columns; col++) {
+                if (mood->value == p->value) {
+                    ret->column = col;
+                    ret->row = row;
+                    return stage;
+                }
+                p++;
+            }
+        }
+    }
+    return -1;
+}
 
 MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
     return STAGE_CHUNK_MOODS[stage] + chunk->row * STAGE_GRID_DIMENSIONS[stage].columns + chunk->column;
