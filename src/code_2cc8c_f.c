@@ -273,4 +273,10 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80041020);
 
+/* func_8004109C -- STALL (register identity). See
+ * docs/match-reports/func_8004109C.md: the body is fully derived (two VLAs of
+ * `width + 1`, a zero-padded right-justify) and reaches 42/56 with the correct
+ * length, but four callee-saved registers come out permuted and the project
+ * bans fixing register identity. The preserved body and its declarations are
+ * inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_8004109C);
