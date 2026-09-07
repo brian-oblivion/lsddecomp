@@ -1437,6 +1437,25 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > purely by whether that file exists, so a stall with no report gets someone
 > staffed straight back onto it.
 >
+> **A STALL report's TITLE must carry THREE figures, not one** (round 23; the
+> next round ranks from title lines and from nothing else):
+>
+> 1. **LENGTH** — exact, or N words short/long.
+> 2. **RAW WORD-MATCH** — M/N.
+> 3. **WHERE THE FIRST REAL DIFF IS**, read off `tools/asm-differ/diff.py`
+>    (which realigns) — never inferred.
+>
+> "N words short" and "M/N words match" are DIFFERENT measurements that read
+> identically, and a single figure hides which state you are in. A missing word
+> SHIFTS everything after it, so a low word-match can be almost entirely
+> ripple from a one-word length gap — or genuine independent residue — and
+> those two send the next round to opposite places. Round 23 filed
+> `func_80031A44` as "51/88 ... one missing nop" (contradictory), and the
+> corrected title reads *"length 1 word SHORT at 87/88; 51/88 raw word-match,
+> but that 37-word gap is almost entirely the SHIFT from the one missing word"*
+> — a one-word near-miss and a prime permuter target that "51/88" buried
+> completely.
+>
 > **COMMIT EVERYTHING YOU PRODUCE, INCLUDING STALLS.** One commit per MATCHED
 > function (do not batch matches); stalls may be batched into a single "stall
 > reports" commit. Read that carefully — it is NOT "commit only on a match".
