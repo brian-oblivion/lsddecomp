@@ -1945,7 +1945,12 @@ three rounds.
 - **For a `switch`, GCC 2.6.3 lays out case bodies in TEXTUAL source order but
   picks its own comparison order** (binary-search pivot). Do not transcribe the
   observed comparison order as the case order. (`func_8005966C`,
-  `func_800596E8`)
+  `func_800596E8`) **PROMOTED round 23 to its own section — see "A `switch`'s
+  CASE ORDER is recoverable from the binary" above** for the recipe (sort arm
+  labels by address, map through the jump table, fall-through arm is last), the
+  four measured instances, and the INVERSE for a sparse non-table switch. Do
+  not act on this line alone; half of it was independently rediscovered twice
+  in one round because the recipe was missing.
 - **A delay slot after a `jalr` captures the PRECEDING call's return value, not
   the upcoming call's argument.** A real misread, easy to commit with two
   adjacent calls. (`func_80026170`, `func_8002677C`)
