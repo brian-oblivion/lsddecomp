@@ -6,6 +6,187 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-07 — round 23: 20 matches, three REOPENED functions closed, and a 99/100 near-miss recovered from a dead blocker
+
+**990 -> 1010 matched (73.01% -> 74.48% of game code). Build green in main
+after all six merges, ZERO merge conflicts.** `headercontention.py` reported
+NO CONTENTION before provisioning: the five assigned units shared no project
+header (three `code_179d8_*` slices include only `common.h`, plus one
+`Entity_*` and one `class_3bb8c_*`).
+
+Gates 0 and 1 passed clean — `fresh` stood at 50 with 47 blocker-clean
+report-less functions, so no carve and no permuter round. Five runners on
+cheap models; the head worked its own queue in parallel.
+
+### Results
+
+| runner | unit | matched | words | stalled |
+| --- | --- | --- | --- | --- |
+| alpha | `code_179d8_j` | 0 | 0 | 4 |
+| bravo | `code_179d8_c` | 2 | 28 | 2 |
+| charlie | `Entity` | 5 | 260 | 0 |
+| delta | `code_179d8_b` | 2 | 28 | 1 |
+| echo | `class_3bb8c_g` | 3 | 326 | 0 |
+| **head** | 6 units | **8** | **417** | 1 |
+
+Charlie and echo went 5-for-5 and 3-for-3. Alpha returned a zero-match pass
+with four characterised residues on the hardest remaining ground in the
+corpus — see below; that is a result, not a miss.
+
+### The REOPENED mechanism paid, and round 22's sweep was incomplete
+
+Round 22 added the `REOPENED -- ASSIGNABLE` marker so a resolved blocker
+returns its ground. **Measured this round: 3 of the 5 marked functions
+matched** — `func_8003C48C` (36w), `func_8003C63C` (100w) and `func_80049EB4`
+(107w), all previously filed `addiu_at`-blocked and never attempted. A fourth,
+`func_8004109C`, went from "NOT ATTEMPTED, predicted register saturation" to a
+fully-derived 42/56. The fifth (954w) was left as too large.
+
+**But the sweep missed the most valuable function in the queue, and the reason
+generalises.** `func_8005CBC8` (`code_4cd08`) is a long, twice-corrected report
+whose verdict read *"cannot be matched as C under the pinned toolchain
+regardless of source shape"* — a considered plateau, not a stub. Its blocker
+was `addiu_at`. Re-measured with the fix live: **the switch dispatch now
+reproduces exactly and the residue is ONE word — 99/100.** It is now the
+closest open near-miss in the corpus and a prime permuter target.
+
+A blocker's death invalidates every report that RELIED on it, not just the
+stubs that look like citations. There is a mechanical detector, now in Gate 1:
+**`nearmiss.py` screens from the ASM, so a function it lists as blocker-CLEAN
+whose report calls it blocked is a contradiction — and the report is the wrong
+half.**
+
+### Stale blocker claims in `src/*.c` COMMENTS — a class no tool can see
+
+The same sweep found false blockers in unit header comments, which are
+invisible to `progress.py` and read by every runner assigned to the unit.
+Worse than a stale count, they are DIRECTIVES:
+
+- `class_3bb8c_m` listed `func_800545FC` as `addiu-$at` blocked and said *"All
+  four have stub reports; do not attempt them."* **Matched this round, 25/25,
+  first attempt.** Three of that comment's four lines were still correct, which
+  is exactly why nobody re-read it.
+- `code_179d8_i` claimed 9 of 18 blocked with *"do not spend attempts on
+  them"*. All nine had in fact been matched in rounds 21-22; the comment was
+  stale but its ground already recovered.
+- `code_179d8_c` and `code_2cc8c` both carried stale "all addiu_at" claims.
+  Bravo spotted its own unit's and correctly did NOT edit it (parallel-mode
+  rules); the head fixed it.
+- **`code_179d8_j` still claims 13 `addiu_at`-blocked functions.** Fixed at
+  consolidation; the functions it names are alpha's queue and are not blocked.
+
+All corrected comments now name WHICH screen was run and when, so the next
+reader can age the verdict instead of re-deriving it.
+
+### One blocker attribution was wrong in the other direction
+
+`func_8005D864` (`Entity`) is filed as blocked with the cause attributed
+**entirely** to `addiu_at`. On the text it reads as newly assignable. It is
+not: re-screened, it hits `nop_mflo_mfhi` (`mflo` / `nop` / `div`), still open.
+Verdict right, cause wrong — and a mechanical reopen would have staffed a
+runner into a real wall. Charlie, which matched all five of its assigned
+functions, signed off calling it "the still-`addiu_at`-blocked function",
+inheriting the error rather than making it. Report corrected.
+
+### The round's biggest source-shape result: a switch's CASE ORDER is readable off the binary
+
+Four independent instances, three of them by different runners, worth 6+ words
+each. For a JUMP-TABLE switch GCC 2.6.3 lays the arm blocks out in **source**
+order, so: sort the arm labels by address, map them through the jump table, and
+**the arm that falls through into the shared tail is the LAST case in source.**
+
+| function | unit | cost |
+| --- | --- | --- |
+| `func_8003C48C` | `code_2cc8c` | 6 words |
+| `func_8004FBE4` | `class_3bb8c_g` | closed it |
+| `func_80032588` | `code_179d8_c` | took a 9/53-shaped structural mismatch to 48/53 |
+| `func_80049EB4` | `class_39e08` | confirmed off the labels |
+
+A fifth instance is the strongest evidence: `func_8003FB1C` (`code_2cc8c_e`,
+50w) had its case order **predicted before a line was written** and matched on
+attempt one. Used predictively the lever is free; used diagnostically it costs
+an attempt.
+
+Echo measured the INVERSE for a sparse non-table switch (GCC normalises the
+compare order to ascending value regardless of source), and bravo then **scoped
+the related switch-vs-`if` tell**: the balanced-tree `slti` signal needs at
+least THREE explicit case values — with two plus a default, `switch` and
+`if`-chain are byte-identical. The head had proposed that lever without the
+threshold; bravo's negative is the correction.
+
+### Other findings promoted to DECOMPILATION_LEARNINGS
+
+- **Cross-jump shape THREE: a declared RETURN TYPE can block a merge that
+  should happen.** Four identical-shaped calls merged 2+2 instead of 4, and the
+  grouping partitioned them exactly by `void`-vs-`s32`. **When N calls should
+  merge into one site and instead merge into groups, the grouping partitions
+  them by declared return type** — a type bug, not scheduling. And a slot
+  annotated `OBSERVED: <fn> (STALL, not attempted)` is a *hypothesis*: prefer
+  evidence from the slot's occupant, which may already be matched as C.
+- **Two VLAs, an `$fp` frame, and a rounding immediate that carries the array
+  bound.** `addiu <t>, <n>, 0xf` means `buf[n + 1]`; `0xe` means `buf[n]`. That
+  hex digit is the only place a `+ 1` on a VLA bound is visible.
+- **A struct returned BY VALUE reads as a call with its arguments shifted** —
+  hidden destination pointer in `$a0`, object in `$a1`. Size the destination
+  from the gap between the argument spill area and the first saved register.
+- **A local's declared WIDTH is a codegen decision; `s16` is the expensive
+  default** (re-sign-extension at each use, inside loops). Widen the LOCAL, never
+  the field. Two locals of the same declared type can come out differently.
+- **`&arr[i + j]` and `arr + i + j` are one instruction apart.**
+- **An allocated-but-unused stack frame is not a residue** — it reproduces
+  automatically on a leaf with enough live locals. Do not hunt for it.
+- **A wholly-unused STACK parameter, diagnosed from a fixed-offset
+  disagreement** against `frame_size + 0x10` (alpha). Its symptom is a handful
+  of low-nibble-only diffs on branch targets — easy to misread as instruction
+  selection — and the dead-local frame trick does NOT substitute for it.
+- **`volatile` for a genuine hardware register is correct source, not a lever.**
+  Bravo's IRQ-mask pair needed it (14/14 each) and bravo explicitly declined it
+  for a global with no MMIO evidence, measuring that negative too.
+- **A function's parameter LIST is not recoverable from its own body.**
+  `func_8005DF9C` has an unused second parameter that leaves no trace; the
+  natural one-argument signature is a `conflicting types` error against the
+  canonical declaration. Both signature mistakes hit this round produce **zero**
+  hits on `error:`/`parse error` and were caught only by the round-21
+  `*** [….o]` alternative — a compile-time argument for keeping it.
+
+### Negatives worth having
+
+- `func_8003ECD0` (71/73): two further groupings tried, both 68/73, same
+  regression point as attempts 2-5. **Nine attempts across two rounds now
+  converge**; the next lever is the permuter, not another hand-written grouping.
+- `func_80032588`: the nested-switch and typed-temp levers the head proposed
+  are both clean negatives (bravo). The tail-merge axis is narrowed, not closed.
+- `func_8004109C`: five reshapes, all 42/56 or worse. The two values whose live
+  ranges compete cannot both be short-lived, so the register identity is
+  structural rather than a spelling accident.
+
+### Next round
+
+**Carve, then runners.** `fresh` is down to 28 and what remains is large
+(135-274 words). The carve targets are measured, not guessed — per-function
+blocker census over the uncarved monoliths:
+
+| segment | funcs | CLEAN | gp_rel | nop_mflo_mfhi | trampolines |
+| --- | --- | --- | --- | --- | --- |
+| `code_179d8_tail` | 18 | **18** | 0 | 0 | 0 |
+| `code_179d8_mid_c` | 24 | **21** | 0 | 3 | 0 |
+| `code_179d8` | 43 | 9 | 34 | 0 | 0 |
+| `class_3bb8c_n` | 23 | 3 | 20 | 0 | 0 |
+| `class_3bb8c_h` | 17 | — | 0 | 0 | **13** |
+
+`code_179d8_tail` is 18-of-18 clean — the best carve left in the executable —
+and `code_179d8_mid_c` is 21-of-24. Together they refill `fresh` to ~67.
+`code_179d8` and `class_3bb8c_n` are gp_rel-dense and should be left.
+`class_3bb8c_h` remains the round-17 trap: 13 of its 17 are BIOS trampolines,
+so it screens clean on every blocker while being the least matchable segment
+in the file. Do not carve it.
+
+Also worth one runner: **the permuter on `func_8005CBC8` (99/100)**, which is
+the single closest function in the corpus and now has a one-word residue with a
+precisely described cause.
+
+---
+
 ## 2026-09-06 — round 22: 19 matches, two runner stalls adjudicated into matches, and a third honesty mechanism
 
 **971 -> 990 matched (71.61% -> 73.01% of game code). Build green in main
