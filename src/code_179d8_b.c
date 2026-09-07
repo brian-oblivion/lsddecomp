@@ -69,7 +69,23 @@ s32 func_80028CE0(s32 arg0)
     return old;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028CF8);
+/* String tables shared with code_179d8_g.c, which reads D_8006D620 as a
+ * plain s32[] for a different (blocked) accessor. This unit's own reading:
+ * both tables hold addresses of strings in the FD8 rodata block, so this
+ * file reads them as pointer-to-char arrays. Multiple local readings of the
+ * same global are fine as long as neither lives in a shared header. */
+extern const char *D_8006D620[]; /* string table, selector 0..0x1B */
+extern const char D_80010840[];  /* "none" -- out-of-range fallback string */
+
+const char *func_80028CF8(s32 arg0)
+{
+    u32 sel = arg0 & 0xFF;
+
+    if (sel >= 0x1C) {
+        return D_80010840;
+    }
+    return D_8006D620[sel];
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_b", func_80028D30);
 
