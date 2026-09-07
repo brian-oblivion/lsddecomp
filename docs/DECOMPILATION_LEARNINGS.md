@@ -1091,6 +1091,211 @@ Note also that `func_80061778`'s own report described its merge as flat; the
 retail bytes are the nested two-level structure above. That is the fourth
 inherited-prose correction of the round — see the entry on that above.
 
+### Cross-jump shape THREE: a declared RETURN TYPE can block a merge that should happen (round 23)
+
+The umbrella entry above names two shapes, both about what retail does
+differently from us (merge COUNT and merge DEPTH). Round 23 adds a third that is
+categorically different, because **the defect is in our HEADER, not in the
+compiler's decision.**
+
+`func_8003C63C` (`code_2cc8c`, matched) has four indirect calls that retail
+cross-jumps into ONE `jalr $v0` site. The first attempt merged them **2 + 2**,
+costing exactly 3 words, and the split fell precisely along the declared return
+types of the four vtable slots: `slot90`/`slot94` were `void`, `slot10C`/
+`slot110` were `s32`. **GCC 2.6.3 will not cross-jump a `void` call against a
+value-returning call whose result is discarded**, because the RTL differs
+(`(call …)` versus `(set (reg) (call …))`) even though the emitted instructions
+are byte-identical. Retyping the two `s32` slots to `void` merged all four and
+closed the function.
+
+**The discriminator, and it makes this diagnosable instead of a guessing game:
+when N identical-shaped calls should merge into one site and instead merge into
+GROUPS, the grouping PARTITIONS THEM BY DECLARED RETURN TYPE.** Count the
+groups, line them up against the slot declarations, and the odd one out is the
+wrong type. A 2+2 split is a TYPE mismatch; no barrier, reordering or nesting
+nudge will touch it.
+
+Two things that make this cheap to act on and easy to justify:
+
+- **A slot whose return type came from an UNATTEMPTED function's disassembly is
+  a hypothesis with no evidence behind it.** A discarded return value is
+  invisible in the bytes — the same reason the runner prompt says a one-line
+  wrapper's byte match tells you nothing about its return type. Both slots here
+  were annotated `OBSERVED: func_8003C63C (STALL, not attempted)`, i.e. read off
+  the disassembly of a function nobody had ever compiled. **Treat any slot
+  annotated that way as an open variable.**
+- **Prefer evidence from the slot's OCCUPANT over its call site.** `slot110`'s
+  occupant `func_8003DCAC` was already matched as
+  `void func_8003DCAC(Obj865C8 *self)` in a sibling unit — positive, independent
+  evidence for the retype. `tools/classtable.py` resolves the occupant; if it is
+  already C, its signature settles the question.
+
+Retyping a shared slot is still the round-7 hazard, so re-verify the whole image
+and every other caller individually (done here; also done for the `slot1B8`
+`void` -> `s32` retype in `func_80049EB4`, where the other caller discards the
+value — the configuration that cost round 7 four words — and which came back
+clean).
+
+### A `switch`'s CASE ORDER is recoverable from the binary — promoted from a one-liner on four instances in one round (round 23)
+
+The idioms list has carried this as a single line since round 11 ("GCC 2.6.3
+lays out case bodies in TEXTUAL source order but picks its own comparison
+order"). Round 23 hit it **four times in four different units, three of them
+independently**, and it was worth 6+ words each time — so here is the full
+recipe, plus the inverse case that makes it safe to apply.
+
+**For a JUMP-TABLE (dense) switch: block layout follows SOURCE order.** The jump
+table is indexed by case VALUE and does not care about layout, but the arm
+blocks are emitted in the order the `case` labels appear in the source. So:
+
+1. Read the arm labels out of the target's `.s` and sort them **by address**.
+2. Map each label back to its case value(s) through the jump table's words.
+3. Write the `case` clauses in that order — **not ascending numeric order.**
+4. **The arm that FALLS THROUGH into the shared tail (no `j` of its own) is the
+   LAST case in source order.** That is a free anchor available before you match
+   anything.
+
+Measured instances, all closed:
+
+| function | unit | what it cost |
+| --- | --- | --- |
+| `func_8003C48C` | `code_2cc8c` | 6 words; order was `0x12, 0x13, 0x21, 0x17, 0x19` |
+| `func_8004FBE4` | `class_3bb8c_g` | closed the function; ascending order was wrong |
+| `func_80032588` | `code_179d8_c` | order `4,1,3,2,5,0`; took a **9/53-shaped structural mismatch to a 48/53 near-miss** |
+| `func_80049EB4` | `class_39e08` | order `4, {5,6,7,8,0xA}, {0xC,0xD}` confirmed off the labels |
+
+**The tell that you are looking at this and not at scheduling: the diff shows
+whole ARM BODIES swapped — and their jump-table words permuted with them —
+rather than instructions changed.**
+
+**THE INVERSE, and you must keep the two straight because they point opposite
+ways.** For a SMALL, SPARSE switch that does NOT become a jump table, GCC
+lowers it to a balanced decision tree and **normalises the comparison order to
+ascending value regardless of source order** (echo measured this in
+`func_80050034`; a two-value nested switch had to become explicit `if`/`else if`
+to reproduce retail). So source order is recoverable from a dense switch's block
+layout and is NOT recoverable from a sparse switch's compare order. Round 11's
+one-liner said exactly this ("picks its own comparison order"); it is repeated
+here because two runners this round rediscovered half of it each.
+
+**Related, and the reason a sparse switch is worth identifying at all: a
+range-split compare in the middle of what looks like a compare chain means
+`switch`, not `if`.** A three-way `if / else if / else` on one variable emits
+three sequential `beq`s. A three-way `switch` on the same variable compares the
+MEDIAN first, then emits an `slti`/`sltiu` range split to choose which half to
+test. `func_8003C63C`'s nested three-way dispatch is `beq 0xF` -> `slti …,
+0x10` -> `beq 0xB` / `beq 0x11`; that `slti` is the whole signal, and it is what
+distinguishes two source constructs whose logic is identical.
+
+### Two VLAs, an `$fp` frame, and a rounding immediate that carries the array bound (round 23)
+
+`func_8004109C` (`code_2cc8c_f`) was filed round 13 as unattempted on a
+7-callee-saved-register census. **The `$fp` is not register pressure — it is a
+variable-length array**, and the function has two:
+
+```
+addiu $v0, $s2, 0xf     # ((n) + 15) & ~7  -- GCC's VLA size rounding
+srl   $v0, $v0, 3
+sll   $v0, $v0, 3
+subu  $sp, $sp, $v0     # the allocation
+addiu $s3, $sp, 0x10    #   -> the array's pointer
+lw    $v1, 0x0($sp)     #   dead load: part of the expansion, no source construct
+```
+
+Recognise it by: two or more `subu $sp, $sp, <reg>`, `move $fp, $sp` in the
+prologue, and `move $sp, $fp` restoring it. Each `subu` is one VLA; identical
+`$v0` for several means identical size expressions, CSE'd.
+
+**The rounding immediate is the array BOUND, and it is the only place a `+ 1` is
+visible.** GCC emits `addiu <t>, <n>, 0xf` for a VLA of `n` bytes, so the
+register holds the element count and the immediate is always 15: `0xf` against a
+register holding `width` means `char buf[width + 1]`; `0xe` means
+`char buf[width]`. Getting it wrong is a LENGTH mismatch, not anything that
+reads like a size bug. Here the `+ 1` is the NUL byte that `strcpy` writes past
+the `width` characters `memset` fills.
+
+### A struct RETURNED BY VALUE reads as a call with its arguments shifted (round 23)
+
+`func_80049EB4`'s call site looked like an argument-order anomaly — the object
+in `$a1` and a stack address in `$a0`:
+
+```
+lw    $a1, 0x38($s0)      # the OBJECT, in a1
+lw    $v0, 0x0($a1)
+lw    $v0, 0x1BC($v0)
+jalr  $v0
+ addiu $a0, $sp, 0x10     # a LOCAL's address, in a0
+```
+
+**GCC 2.6.3 returns every struct through a hidden pointer passed as the
+invisible FIRST argument**, so each real argument shifts one register right. The
+source is an ordinary assignment, `dest = obj->methods->slotNN(obj);`.
+
+Two things to establish before writing it that way:
+
+- **Recognise the pair**: an `addiu $aN, $sp, <local offset>` in the `jalr`'s
+  delay slot together with the object one register later.
+- **Size the destination from the FRAME.** The gap between the four-word
+  outgoing-argument spill area and the first saved register is the local area,
+  and it gives the returned struct's size directly. Here frame `0x28` with
+  `$s0`/`$s1`/`$ra` at `0x18`/`0x1C`/`0x20` leaves `0x10`-`0x17` — 8 bytes. A
+  4-byte local would have let `$s0` sit at `0x14`.
+
+Declaring the slot `void (*)(Dest *, Obj *)` instead matches the bytes at this
+call site and is WRONG about the type, which then propagates to every other
+caller.
+
+### A local's DECLARED WIDTH is a codegen decision, and `s16` is the expensive default (round 23)
+
+Two of `GetStageChunkFromMood`'s five excess words, and four of its five in
+total, were `s16` locals.
+
+An `s16`/`u16` local that is compared or used as an index gets
+**re-sign-extended at each use, inside loops included** — spurious
+`sll <r>, <r>, 0x10` / `sra <r>, <r>, 0x10` PAIRS the target does not have.
+Declaring the LOCAL `s32` folds the extension into the `lh` at the point of
+load. **The struct FIELD stays `s16`** — it really is 2 bytes in the data; only
+the local copy widens. (Widening the field would be the non-local struct edit
+that breaks an already-matched function elsewhere with a clean compile.)
+
+**The trap that delayed the diagnosis: two locals of the SAME declared type can
+come out differently.** `rows` and `columns` were both `s16`, both read from
+adjacent fields of one struct; `rows` compiled to a single clean `lh` and
+`columns` to `lhu` plus a sign-extend pair at each use. **One of them looking
+right does not clear the type.** Widen both.
+
+The tell is specifically the `sll 0x10` / `sra 0x10` pair. That is never a
+scheduling residue and no barrier will move it.
+
+Smaller sibling from the same function: **`sltiu` on a loop bound means an
+UNSIGNED counter.** Retail's `sltiu $v0, $t2, 0xE` against a signed counter's
+`slti` is a one-word residue with a one-token fix (`u32`), and it survives
+`return counter;` from an `s32` function unchanged (still a bare `move`).
+
+### `&arr[i + j]` and `arr + i + j` are one instruction apart (round 23)
+
+The subscript form builds ONE index expression, so GCC sums `i + j` as integers
+and scales the sum once. The pointer form scales **each addend separately**,
+because each `+` on a pointer is its own scaled addition rather than a term in
+one index.
+
+So a one-word-short residue on a pointer-returning accessor, with an `addu`
+sitting on the wrong side of an `sll`, is a SPELLING question and not a
+scheduling one — try the other form before reaching for anything else.
+Measured on `GetMoodFromStageChunk`: 19/20 with the subscript form, 20/20 with
+the pointer form, no other change.
+
+### An allocated-but-unused stack frame is not a residue (round 23)
+
+Retail brackets `GetStageChunkFromMood` — a 43-word LEAF function — with
+`addiu $sp, $sp, -0x10` / `addiu $sp, $sp, 0x10` and never touches the frame: no
+store, no load, no `$ra` save. **It reproduces automatically** from ordinary C
+with enough simultaneously-live locals.
+
+So an unused frame is not a signal that the original source declared an array
+that got optimised away, it is not something to reproduce deliberately, and it
+is not worth an attempt to explain. Do not go hunting for it.
+
 ### The two-independently-live-locals lever, and the discriminator that predicts it (round 20)
 
 Splitting a table-address computation into two independently-live locals —
