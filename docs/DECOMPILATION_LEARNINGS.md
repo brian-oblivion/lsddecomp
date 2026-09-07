@@ -3230,6 +3230,27 @@ project rule. Try all three before filing one.
   shows one load reused.** Writing the cache when retail reloads (or vice
   versa) is a whole-instruction difference.
 
+  **Round 23 adds that the answer tends to be constant PER CLASS, which makes
+  it worth checking once per unit rather than once per function.** In
+  `class_3bb8c_g`'s class (`D_80086DC4`, 44 slots — verified with
+  `tools/classtable.py --scan`) retail loads the vtable pointer ONCE into a
+  callee-saved register before every run of `->slotXX` calls, and echo needed
+  the cached-local form to close both `func_8004FE24` (71/71) and
+  `func_8004FBE4` (144/144). The head's `func_8003C48C`/`func_8003C63C` in
+  `Obj86B60` behaved the same way, matching the idiom the already-matched
+  sibling `func_8003C51C` had established. **So determine it once from any
+  already-matched function in the same class and carry it across the unit** —
+  but the rule stays conditional, because it is retail's disassembly that
+  decides, not the class's reputation.
+
+- **A call result that is BOTH stored into a struct field and reused later
+  needs a named local** (round 23, echo, `func_8004FE24`). Writing
+  `self->field = f(); ... use(self->field);` makes GCC re-read the field from
+  memory, where retail keeps the value register-resident across both uses.
+  This is the mirror image of the no-cache rule directly above, and the two
+  are not in tension: do not cache a field you only READ, and do cache a value
+  you WROTE and then use again.
+
 - **A `New_X` allocator's null check must use the proven idiom verbatim** —
   `if (self) { ctor(...); return self; } return NULL;`. Two plausible
   rephrasings compile to non-matching shapes (`func_80050BA8`). Relatedly, the
