@@ -205,7 +205,14 @@ s32 func_80032BF0(u16 which)
     return idx < 3;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032C28);
+s32 func_80032C28(u16 which)
+{
+    s32 idx = which;
+    IrqRegs *reg = D_8006DCAC;
+
+    reg->mask &= ~D_8006DCB4[idx];
+    return 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032C60);
 
