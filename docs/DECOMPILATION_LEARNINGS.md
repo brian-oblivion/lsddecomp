@@ -1132,6 +1132,49 @@ Note also that `func_80061778`'s own report described its merge as flat; the
 retail bytes are the nested two-level structure above. That is the fourth
 inherited-prose correction of the round — see the entry on that above.
 
+### A fresh local that only carries one branch's result to one later use is a register-identity risk — reuse a dead PARAMETER instead (round 23)
+
+Two confirmed instances in one unit, both closing a function that had a
+register swap and nothing else wrong (runner charlie, `Entity`):
+
+- `func_8005D560` (62/62): a fresh `s32 code` local produced an `$s0`/`$s1`
+  swap against retail. Reusing the function's own **semantically dead `arg2`
+  parameter** as the carrier closed it.
+- `func_8005D714` (58/58): same shape — mutating the `arg3` parameter in place
+  instead of declaring a fresh `dist` local, which additionally fixed a
+  speculative-hoist branch-shape mismatch.
+
+**The mechanism is the one already documented for `s16` widths and for
+`for`-loop status values: a named C variable gets one storage location, and a
+NEW name creates a NEW allocno competing for a callee-saved register.** A
+parameter that is already live on entry and never read again is free storage
+the allocator has already committed to — reusing it adds no allocno, so it
+cannot perturb the ranking.
+
+The discriminator, so this does not become "delete locals at random": it
+applies when the local exists **only** to carry one branch's result to a single
+later use, and there is a parameter in scope that is provably dead. Those two
+conditions together are what make the rewrite semantics-preserving and
+allocation-neutral. Contrast the existing entries on the opposite direction
+(round 20's "two levers that closed long-standing near-misses by DELETING a
+named value", and "one named C variable gets ONE storage location") — this is
+the same family, arriving as *substitute* rather than *delete*.
+
+Related, from the same unit and the same round: **branch-polarity residue
+recurs at multiple nesting levels INDEPENDENTLY in one function.** Fixing the
+outermost `if`/`else` polarity says nothing about an inner one;
+`func_8005D560` needed it applied twice, and the head's `func_80049EB4` needed
+it at two separate ternary sites. Five instances across three runners and the
+head this round. **The tell is that only the branch MNEMONIC and the two
+literal immediates differ, with everything else exact** — retail's
+`beq`/`bgez` means the source condition was `!=`/`< 0`, because GCC tests the
+NEGATION and falls through to the first arm. Never scheduling.
+
+And a triage caution charlie paid one attempt for: **a table read that
+resembles a neighbouring function's near-identical table read is not evidence
+of the same expression shape.** Check the actual instructions rather than
+pattern-matching from a function read minutes earlier (`func_8005D278`).
+
 ### Cross-jump shape THREE: a declared RETURN TYPE can block a merge that should happen (round 23)
 
 The umbrella entry above names two shapes, both about what retail does
