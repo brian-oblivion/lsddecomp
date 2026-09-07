@@ -106,7 +106,31 @@ void func_8005D480(Entity *this, s32 a1, s32 a2) {
     func_80066818()->slot98(this, a1, a2);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D560);
+void func_8005D560(Entity *this, s32 arg1, s32 arg2) {
+    s32 linkStage;
+
+    linkStage = D_80089EAB[this->moodIndex * 0x10];
+    if ((u32)(arg2 - 2) < 7) {
+        if (linkStage <= 0) {
+            return;
+        }
+    }
+    func_80066818()->slotDC(this, arg1, arg2);
+    if (arg2 != 4) {
+        return;
+    }
+    if (linkStage <= 0) {
+        return;
+    }
+    if (linkStage != 0x7F) {
+        arg2 = 0xA;
+    } else if (D_80089EAC[this->moodIndex * 0x10] != 0) {
+        arg2 = 0xB;
+    } else {
+        arg2 = 0xC;
+    }
+    this->methods->slot30(this, arg2);
+}
 
 void func_8005D658(Entity *this, s32 a1, s32 a2) {
     func_80066818()->slotE0(this, a1, a2);
