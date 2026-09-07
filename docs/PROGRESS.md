@@ -31,7 +31,47 @@ cheap models; the head worked its own queue in parallel.
 
 Charlie and echo went 5-for-5 and 3-for-3. Alpha returned a zero-match pass
 with four characterised residues on the hardest remaining ground in the
-corpus — see below; that is a result, not a miss.
+corpus — see below; that is a result, not a miss. (Its fifth assigned
+function, `func_80031280` 135w, was explicitly held back by the head so alpha
+could finish its bookkeeping; it is untouched and has no report.)
+
+### The head's most valuable single intervention was a MEASUREMENT correction
+
+Alpha filed `func_80031A44` as *"the function is 51/88, matches retail's exact
+instruction count is off by exactly one word, and the residue is precisely one
+missing `nop`"* — internally contradictory, since 51/88 means 37 words differ.
+Flagged to alpha (which held the unit and the build) rather than fixed by the
+head. Alpha re-measured, and the corrected title reads:
+
+> length 1 word SHORT at 87/88; 51/88 raw word-match, but that 37-word gap is
+> almost entirely the SHIFT from the one missing word, not independent residue
+
+**That is a one-word near-miss and a prime permuter target, and "51/88" hid it
+completely.** Alpha corrected all four of its titles the same way, and the
+range they now distinguish makes the case for the format: `func_80031890`
+(length EXACT 73/73, 51/73, first diff at word 37 — genuine scattered
+residue), `func_80031A44` (1 short, gap is ripple), `func_80030404` (5 short,
+21/96, first diff at word 0 — residue independent of the length gap). Three
+very different states that all render as "≈50%" under one figure.
+
+**A stall title must now carry three figures — length, raw word-match, and
+where the first real diff is** (from `asm-differ`, never inferred). Added to
+the runner prompt and to DECOMPILATION_LEARNINGS' round-20 entry, which had
+the principle but not the format requirement.
+
+### A cross-report contradiction, adjudicated
+
+Alpha flagged that `func_80031CF0`'s report models `D_8008D7F0`/`D_8008D7F2`
+as two independent 16-byte-stride arrays, contradicting what
+`func_80030404`'s disassembly shows. Verified against the `.s` and **alpha is
+right**: `addiu $t2, $a3, 0x2` folds the second base off the first symbol's
+materialised address, which cc1 can only do if the two are ONE object. The
+report's discriminator ("each field gets its own `lui`/`addiu`") measures
+whether GCC CHOSE to share a base register in that one function — a register-
+pressure question — not whether the symbols ARE one object, and in
+`func_80031CF0` both models emit identical bytes. Model corrected; the stall
+verdict stands. Left standing it would have made `func_80030404` unmatchable
+by construction.
 
 ### The REOPENED mechanism paid, and round 22's sweep was incomplete
 
