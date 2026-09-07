@@ -456,6 +456,75 @@ sits inside an `if` that also guards other retail-required control flow, try the
 nested form before concluding the fold is unavoidable.
 
 
+### A struct-layout claim must be settled CORPUS-WIDE — a shared-base `+2` is conclusive, counting address computations is not (round 23)
+
+`func_80031CF0`'s report modelled `D_8008D7F0`/`D_8008D7F2` as two INDEPENDENT
+16-byte-stride arrays, on the discriminator "retail computes each field's
+address through its OWN `lui`/`addiu` pair rather than one cached pointer with
+`+0`/`+2` displacements". Round 23's alpha found the counter-evidence in a
+SIBLING function, and the head verified it against the `.s`:
+
+```
+lui   $a3, %hi(D_8008D7F0)
+addiu $a3, $a3, %lo(D_8008D7F0)
+addiu $t2, $a3, 0x2          <- +2 off the FIRST symbol's base
+```
+
+**A compile-time `+2` off another symbol's materialised base is only emittable
+if the compiler knows the two are ONE object at a known offset.** Two separate
+`extern` arrays have, as far as cc1 is concerned, unrelated addresses; it cannot
+fold one into the other. So they are two fields of one struct.
+
+**Why the original discriminator failed, and this is the generalisable part:**
+"one address computation with two displacements" versus "two full address
+computations" measures whether GCC **chose** to share a base register in *that
+one function* — which register pressure and distance between the uses decide —
+not whether the symbols ARE one object. In `func_80031CF0` the two stores are
+far apart, GCC materialised each base separately, and **both models emit
+identical bytes there**, so the wrong one was locally indistinguishable and
+locally harmless.
+
+Two consequences:
+
+- **Settle a struct-layout question from the function that SHARES a base, not
+  from the one that does not.** A shared base with a small displacement is
+  positive evidence; separate materialisations are no evidence either way.
+  `grep` the corpus for the symbol pair before committing to a model.
+- **The cost lands on a DIFFERENT function.** Left standing, the two-arrays
+  model makes `func_80030404` unmatchable by construction — no pair of
+  independent arrays can produce that `addiu $t2, $a3, 0x2`. This is the same
+  shape as the shared-header prototype hazard: the author sees nothing wrong,
+  and the function that breaks is one that never touched the declaration.
+
+### Four narrower confirmations from round 23 (runner alpha, `code_179d8_j`)
+
+- **`__asm__("")` is an ORDER-only barrier and does not block VALUE
+  forwarding.** A store to a global immediately followed by a read of it, where
+  the stored value is still in a live register, gets fused by GCC 2.6.3 — and a
+  bare barrier does not stop that, because nothing is being reordered. Only
+  `volatile` on the global does. This is a real scope limit on the barrier and
+  it belongs next to the barrier's own entry: the test "does removing it change
+  which register holds a value" already says a barrier cannot move data, and
+  value-forwarding is a data question.
+- **Two early-return paths tail-merge into one shared fail block only via an
+  explicit `goto` to a hand-placed label**, not from naive sequential
+  `if (...) return X;` statements. Retail's shared-stub shape is authored, not
+  emergent. (Bravo reached the same conclusion independently in
+  `func_80032148`, where the LAST guard being phrased positively — `goto
+  success` — while earlier guards are plain early returns is what produced
+  retail's exact stub placement, and took a 9/53-shaped structural mismatch to
+  48/53.)
+- **A `(u8)` mask on a loop induction variable used as an ARRAY INDEX — not
+  just in the exit test — independently controls whether GCC strength-reduces
+  the per-iteration address multiply.** So the mask's placement is a codegen
+  lever, and masking only the comparison is a different program from masking
+  the index.
+- **Compute a value LAZILY, at the point retail's control flow first needs it,
+  rather than eagerly at its declaration.** Confirmed twice in one unit
+  (`func_8003069C`'s `key`, `func_80030404`'s `recIdx`/`key`). An eager
+  computation lengthens the value's live range, which is the same allocno-
+  ranking mechanism behind the `s16`-width and fresh-local entries above.
+
 ### A wholly-unused STACK parameter, diagnosed from a FIXED OFFSET rather than a register gap (round 23)
 
 The corpus already carries "silent ABI waste" for an unused REGISTER argument
