@@ -3,9 +3,20 @@
  * monolith, 0x22948..0x23500 (vram 0x80032148..0x80032D00).
  *
  * Carved round 16 by blocker DENSITY (see code_179d8_b's header for the
- * full window census). This window screened 16/20 clean. The four blocked
- * functions are already stubbed as match reports, all addiu_at:
- *   func_80032148, func_80032588, func_80032BF0, func_80032C28
+ * full window census). This window screened 16/20 clean.
+ *
+ * STALE CLAIM REMOVED, round 23 (2026-09-07): this comment listed
+ * func_80032148, func_80032588, func_80032BF0 and func_80032C28 as blocked,
+ * "all addiu_at". **`addiu_at` was resolved in round 21** (maspsx
+ * `--addiu-at`; docs/research/addiu-at-blocker.md), and round 23 MATCHED
+ * func_80032BF0 and func_80032C28 byte-exact and took the other two to
+ * 48/53 and ~90/96 with characterised non-toolchain residues. Nothing in
+ * this window is toolchain-blocked. The two live blockers are `gp_rel` and
+ * `nop_mflo_mfhi`; screen with `python3 tools/nearmiss.py`, never by
+ * re-implementing the greps, and never for `addiu_at`.
+ *
+ * Round 23's runner bravo spotted this line as stale and correctly did not
+ * edit it (parallel-mode rules); the head fixed it at consolidation.
  *
  * func_80032588 owns jtbl_80010CD8, whose sub-slot of the 0xFD8 rodata
  * region is ATTACHED to this unit in the splat yaml. Leave that alone.
