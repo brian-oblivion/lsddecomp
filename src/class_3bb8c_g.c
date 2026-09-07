@@ -82,7 +82,44 @@ void func_8004FFF4(Class86E00_3bb8c_g *self, s32 arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050034);
+void func_80050034(Class86E00_3bb8c_g *self)
+{
+    Class86E00Methods_3bb8c_g *methods = self->methods;
+
+    switch (self->unk28) {
+    case 2:
+    case 4:
+    case 0xA:
+    case 0xE:
+        methods->slot8C(self, 0);
+        if (self->unk28 == 0xE) {
+            strcpy((char *)self->unk40, self->unk30);
+            strcat((char *)self->unk40, ((char **)self->unk3C)[(s32)self->unk80]);
+            strcpy((char *)self->unk44, ((char **)self->unk38)[(s32)self->unk80]);
+        }
+        if (self->unk24 == 2) {
+            methods->slot78(self, self->unk40, self->unk44, self->unk48,
+                             self->unk4C, self->unk50, self->unk54, self->unk58);
+        } else if (self->unk24 == 1) {
+            methods->slot74(self, self->unk40, self->unk44, self->unk54, self->unk58);
+        }
+        break;
+    case 6:
+        methods->slot8C(self, 0);
+        methods->slot7C(self, 7);
+        break;
+    case 3:
+    case 5:
+    case 8:
+    case 9:
+    case 0xC:
+    case 0xD:
+    case 0x10:
+        methods->slot8C(self, 0x10);
+        methods->slot7C(self, 0x17);
+        break;
+    }
+}
 
 void func_800501F0(Class86E00_3bb8c_g *self)
 {

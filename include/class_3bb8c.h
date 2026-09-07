@@ -1486,7 +1486,12 @@ struct Class86E00Methods_3bb8c_g {
      * subObj)`, registering/attaching whichever of `unk78`/`unk7C` that
      * function owns. */
     void (*slot10)(Class86E00_3bb8c_g *self, Class86E00SubObj_3bb8c_g *arg1);
-    u8 pad014[0x078 - 0x014];
+    u8 pad014[0x074 - 0x014];
+    /* +0x074, func_80050034's own `self->unk24==1` case: 4 extra
+     * arguments (`unk40`, `unk44`, `unk54`, `unk58`), same shape as
+     * `slot78` just below but with only the last two of that call's
+     * trailing four. */
+    void (*slot74)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3, s32 a4);
     /* +0x078, func_800504D0's own call for its `arg2==2` case: 7 extra
      * arguments, the last four passed on the stack (`unk4C`, promoted
      * from its native `u8` to a full word, then `unk50`/`unk54`/`unk58`). */
@@ -1507,11 +1512,23 @@ struct Class86E00Methods_3bb8c_g {
 
 struct Class86E00_3bb8c_g {
     Class86E00Methods_3bb8c_g *methods; /* +0x000 */
-    u8 pad004[0x028 - 0x004];
+    u8 pad004[0x024 - 0x004];
+    /* +0x024, func_80050034's own secondary dispatch code (nested inside
+     * the `unk28`-driven switch's shared `2`/`4`/`0xA`/`0xE` case),
+     * tested against literals `2` and `1`. */
+    s32 unk24;
     s32 unk28;   /* +0x028, dispatch/state code tested by several functions */
-    u8 pad02C[0x038 - 0x02C];
+    u8 pad02C[0x030 - 0x02C];
+    /* +0x030, func_80050034's own `strcpy` source into `self->unk40`,
+     * in its `self->unk28==0xE` sub-case. */
+    char *unk30;
+    u8 pad034[0x038 - 0x034];
     void *unk38; /* +0x038, func_800505A8: forwarded opaquely to `func_80051A5C`'s arg0 */
-    u8 pad03C[0x040 - 0x03C];
+    /* +0x03C, func_80050034's own `self->unk28==0xE` sub-case: base of a
+     * pointer array indexed by `(s32)self->unk80`, `strcat`ed onto
+     * `self->unk40` -- same shape as `unk38` just below, indexed the
+     * same way for `self->unk44`'s own `strcpy`. */
+    void *unk3C;
     s32 unk40;   /* +0x040, func_80050340/func_800504D0 */
     s32 unk44;   /* +0x044, func_80050340/func_800504D0 */
     s32 unk48;   /* +0x048, func_80050340/func_800504D0 */
