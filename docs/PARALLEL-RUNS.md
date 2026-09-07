@@ -798,6 +798,40 @@ wrote down. Keep both honesty mechanisms fed:
   So when you resolve or retire a blocker, marking its reports is part of the
   same job, not a follow-up. `gp_rel` alone currently has 82 of them.
 
+  **ROUND 23 MEASURED THE MECHANISM AND IT WORKS — 3 of the 5 marked
+  functions matched, all three by the head, in one sitting.** `func_8003C48C`
+  (36 words), `func_8003C63C` (100 words) and `func_80049EB4` (107 words) were
+  all filed as `addiu_at`-blocked and never attempted; all three closed
+  byte-exact. A fourth (`func_8004109C`) went from "NOT ATTEMPTED, predicted
+  register saturation" to a 42/56 with its body fully derived, and the fifth
+  (`func_80018464`, 954 words) was left as too large for a head sitting. So the
+  marker returned real ground, not paperwork: **the reopened set is the
+  cheapest queue in the corpus and it should be worked before cold ground.**
+
+  **BUT MARKING IS NOT MECHANICAL — RE-SCREEN AGAINST THE ASM BEFORE YOU
+  REOPEN A REPORT.** Round 23 found `func_8005D864` (`Entity`) filed as
+  blocked with the cause attributed **entirely** to `addiu_at`. On the report's
+  text it reads as newly assignable. It is not: re-screened, it hits
+  `nop_mflo_mfhi` (`mflo $v0` / `nop` / `div $zero, $a0, $v0`), which is still
+  open. Its VERDICT was right and its CAUSE was wrong, and a mechanical sweep
+  of "reports naming a resolved blocker" would have staffed a runner into a
+  real wall.
+
+  This is CLAUDE.md's wrong-CAUSE hazard arriving from the other direction. The
+  usual failure is a report blaming a blocker for a residue that is really
+  ordinary code; this one blames the WRONG blocker while being genuinely
+  blocked. Both are fixed the same way: **run `python3 tools/nearmiss.py --all`
+  and read the tag.** It already prints
+  `[addiu_at(RESOLVED-not-a-blocker),nop_mflo_mfhi]` for exactly this function
+  — the marker exists so you can tell "this report's verdict predates the fix"
+  from "this is really blocked", and the two are not the same claim.
+
+  A runner will inherit the error rather than make it: round 23's charlie,
+  which matched all five of its assigned functions, signed off calling this
+  "the still-`addiu_at`-blocked function" — read off the report, not measured.
+  Correcting the report is the head's job, and it is worth doing at once,
+  because the next reader has no way to know the text is stale.
+
 **Screen the queue with TWO greps as of round 21 — it used to be three.**
 `addiu $at, $at, %lo` is NO LONGER A BLOCKER (resolved round 21; see
 `docs/research/addiu-at-blocker.md`), so screening for it now invents
