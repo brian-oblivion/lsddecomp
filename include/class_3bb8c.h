@@ -1451,6 +1451,12 @@ struct Class86E00Unk70ObjMethods_3bb8c_g {
     /* +0x004, func_8004FF40's own call: return value stored back into
      * `Class86E00_3bb8c_g::unk70` itself. */
     Class86E00Unk70Obj_3bb8c_g *(*slot4)(Class86E00Unk70Obj_3bb8c_g *self);
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, func_8004FE24's own call on a FRESH `unk70` right after
+     * assigning it: `(self, self->unk68, &D_8008AA94)`. `unk68` is
+     * forwarded verbatim -- kept as the owning struct's established
+     * bare `s32` reading of that field, not retyped to a pointer here. */
+    void (*slot4C)(Class86E00Unk70Obj_3bb8c_g *self, s32 arg1, void *arg2);
 };
 
 struct Class86E00Unk70Obj_3bb8c_g {
