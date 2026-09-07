@@ -456,6 +456,47 @@ sits inside an `if` that also guards other retail-required control flow, try the
 nested form before concluding the fold is unavoidable.
 
 
+### A wholly-unused STACK parameter, diagnosed from a FIXED OFFSET rather than a register gap (round 23)
+
+The corpus already carries "silent ABI waste" for an unused REGISTER argument
+(`func_800302DC`, `func_800319B4`) — diagnosed from the last USED argument's
+register number leaving a gap. Round 23's alpha found the **stack** form, and
+its diagnostic is different enough that treating them as one lever costs the
+attempt.
+
+`func_80031A44` (`code_179d8_j`) reads its two `u16` stack arguments from
+`0x3c($sp)` / `0x40($sp)` against a measured `-0x28` frame. The o32 formula for
+a four-register-argument function at that frame size puts the first stack
+argument at **`frame_size + 0x10` = `0x38($sp)`** — retail's is four bytes
+further out. The real source has a **fifth parameter, a plain 32-bit value
+between the last used register argument and the first used stack argument, never
+referenced in the body.** Adding it (pushing the two `u16`s to argument
+positions six and seven) reproduces retail's offsets exactly.
+
+**Three things make this worth its own entry:**
+
+- **The diagnostic is a fixed-offset disagreement, not a gap in a sequence.**
+  Compute `frame_size + 0x10` and compare it against the FIRST stack argument's
+  actual `$sp` offset. A register-argument gap is invisible here because all
+  four registers are used.
+- **The symptom is subtle and reads like something else entirely.** Before the
+  fix the function measured 49/88 with *five single-bit-different words*
+  scattered through the body — every embedded branch-target address off by one
+  nibble, because the two loads were being generated four bytes from retail's
+  positions. **A handful of low-nibble-only diffs on branch targets, rather
+  than missing or extra instructions, is what an argument-offset mismatch looks
+  like.** It is easy to misread as instruction selection.
+- **The dead-LOCAL trick does not substitute for it.** A scalar `s32 dead;` and
+  a one-element `s32 dead[1];` under `if (0) { ... }` — this project's
+  established idiom for forcing a frame onto an otherwise-frameless leaf — had
+  **zero effect** on the stack-argument offsets. The function already has a
+  real frame from five callee-saved registers plus `$ra`, and the dead-local
+  trick only sizes a frame that would otherwise be zero. **The fix was an extra
+  ARGUMENT, not an extra local.** So the entry below (an oversized outgoing-arg
+  area from a dead CALL) and this one are siblings, not the same lever: that one
+  is about the area a function reserves for calls it MAKES, this one about the
+  offsets at which it READS what it was passed.
+
 ### An oversized outgoing-arg frame is EVIDENCE OF DEAD CODE in the original source (round 19)
 
 **GCC 2.6.3 sizes the outgoing-argument area from every call expression's
