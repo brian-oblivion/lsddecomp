@@ -1187,6 +1187,25 @@ test. `func_8003C63C`'s nested three-way dispatch is `beq 0xF` -> `slti …,
 0x10` -> `beq 0xB` / `beq 0x11`; that `slti` is the whole signal, and it is what
 distinguishes two source constructs whose logic is identical.
 
+**SCOPE, measured — the tell needs at least THREE explicit case values, and
+below that `switch` and `if`-chain are the SAME codegen.** The head proposed
+this lever to round 23's bravo as a way to explain a `bne`-vs-`beq` divergence
+between two logically identical switch arms in `func_80032588`. Bravo tested
+both assignments (switch in one arm, if-chain in the other, and the reverse)
+and both rebuilt **byte-identical to the if-chain baseline** — same
+`beqz`/`li`/`bne`/`li`/`j`/`li` sequence either way, and no change in word
+count. Its inner dispatch has **two** explicit values plus a default, which is
+never enough for a balanced tree to beat sequential compares, so the two
+constructs converge and the `slti` never appears.
+
+So the boundary sits between 2 and 3: **3 explicit values produced a tree
+(`func_8003C63C`'s inner switch), 2 values plus a default did not
+(`func_80032588`).** Do not reach for this lever to explain a divergence
+between two- or one-value dispatches — there is nothing to distinguish, and
+`switch` there is a rewrite that changes no bytes. (`func_80032588`'s own
+report carries the negative and the reasoning; the head's original framing
+omitted the threshold, which is the correction.)
+
 ### Two VLAs, an `$fp` frame, and a rounding immediate that carries the array bound (round 23)
 
 `func_8004109C` (`code_2cc8c_f`) was filed round 13 as unattempted on a
