@@ -1,4 +1,44 @@
-# func_8005CBC8 -- STALL (addiu-at jump-table blocker, 2 words short)
+# func_8005CBC8 -- STALL (ONE word short; 99/100). Blocker GONE as of round 21.
+
+> **VERDICT CORRECTED, round 23 (2026-09-07), head. This report's own title
+> and its round-13 correction both said this function "cannot be matched as C
+> under the pinned toolchain". THAT IS NO LONGER TRUE.** The blocker it named
+> was `addiu_at`, resolved in round 21 (maspsx `--addiu-at`,
+> `docs/research/addiu-at-blocker.md`). The preserved body below was spliced
+> back in and re-measured with the fix live:
+>
+> - **The switch dispatch now reproduces EXACTLY** -- `lui $at` /
+>   `addiu $at, $at, %lo(jtbl_8001188C)` / `addu $at, $at, $v0` /
+>   `lw $v0, 0x0($at)`, all four words, byte for byte. That was one of the two
+>   residue words and it is gone.
+> - **The residue is ONE word**, on a 100-word function: 99/100. It is retail's
+>   redundant `j` over the switch-index join, described precisely below.
+>
+> So this is **the closest open near-miss in the corpus and a prime permuter
+> target**, not an unmatchable function. Two shapes were re-tried this round
+> with the blocker gone and both reproduce the round-13 result unchanged:
+>
+> | variant | result |
+> | --- | --- |
+> | plain `if/else` on `sel < 0`, no `goto` on the `sel >= 0` path | byte-identical to the `goto` form; **1 word short** |
+> | `sel >= 0` tested FIRST (retail's own block order) | **3 words short** -- GCC hoists `move $a1, $a0` into the `bgez` delay slot and drops both the `j` and its `nop`, exactly as round 13 measured |
+>
+> **Why this went unnoticed for two rounds, which is the transferable part.**
+> Round 22 swept the `addiu_at` reports and marked five with
+> `REOPENED -- ASSIGNABLE`. This one was missed because it does not present as
+> a stub: it is a long, detailed, twice-corrected report with a real attempt
+> history, and its verdict sentence ("cannot be matched ... regardless of
+> source shape") reads as a considered plateau rather than as a blocker
+> citation. **A blocker's death invalidates every report that RELIED on it, not
+> only the ones that look like stubs.** The cheap detector is
+> `python3 tools/nearmiss.py`, which lists this function in its
+> blocker-CLEAN section while the report says otherwise -- a report contradicting
+> the live screen is the signal.
+>
+> It is deliberately NOT marked `REOPENED -- ASSIGNABLE`: it is genuinely
+> worked ground with a characterised one-word residue, and `progress.py` should
+> keep counting it as a documented stall rather than returning it to `fresh`.
+
 
 > **HEAD CORRECTION, round 13 (2026-09-03).** This report was filed as
 > "extremely close: 1 word / 4 bytes short", cause attributed to an

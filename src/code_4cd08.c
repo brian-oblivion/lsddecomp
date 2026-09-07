@@ -168,14 +168,23 @@ fail:
 }
 
 #if 0
-/* STALL snapshot -- see docs/match-reports/func_8005CBC8.md. This body is
- * TWO words short, and one of those two words is the addiu-at jump-table
- * folding blocker (docs/research/addiu-at-blocker.md): retail's switch
- * dispatch is the UNFOLDED four, the pinned pipeline emits the FOLDED
- * three. So this function is UNMATCHABLE as C no matter how it is
- * reshaped. The remaining word is retail's redundant `j` over the
- * switch-index join, a GCC block-ordering preference; see the report.
+/* STALL snapshot -- see docs/match-reports/func_8005CBC8.md.
+ *
+ * VERDICT CORRECTED, round 23 (2026-09-07). This block previously said the
+ * function is "UNMATCHABLE as C no matter how it is reshaped", because one of
+ * its two residue words was the addiu-at jump-table fold. **That blocker was
+ * resolved in round 21** and this body was re-measured with it gone: the
+ * dispatch (`lui $at` / `addiu $at,$at,%lo(jtbl_8001188C)` / `addu` / `lw`)
+ * now reproduces EXACTLY, and the residue is ONE word.
+ *
+ * The one word is retail's redundant `j` over the switch-index join: retail
+ * places the `sel >= 0` arm BEFORE the `~sel + 1` arm, so it needs an explicit
+ * jump over it, while GCC places `sel >= 0` last and lets it fall through.
  * `~sel + 1` (NOT `-sel`) is what reproduces retail's `nor`+`addiu`.
+ *
+ * At 99/100 words this is now the closest open near-miss in the corpus and a
+ * prime permuter target -- NOT an unmatchable function. Do not re-derive the
+ * old verdict.
  */
 bool func_8005CBC8(s32 value, TriggerRecord *record)
 {
