@@ -1002,7 +1002,19 @@ struct Obj86B60Methods {
     u8 pad06C[0x070 - 0x06C];
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
                                                       func_8003C7B4 */
-    u8 pad074[0x090 - 0x074];
+    /* +0x074..+0x084: the five message handlers func_8003C48C dispatches to
+     * (round 23). Read off jtbl_80011090: message code 0x12 -> slot80,
+     * 0x13 -> slot84, 0x17 -> slot7C, 0x19 -> slot78, 0x21 -> slot74; every
+     * other code in [0x12,0x21] is a no-op. In the base table D_80086B60
+     * these are func_8003C7F4 / func_8003C858 / func_8003C8D0 /
+     * func_8003C944 / func_8003C9B0 respectively. Pad split is ADDITIVE and
+     * preserves the original 0x1C total (5 * 4 + 8). */
+    void (*slot74)(Obj86B60 *self, s32 a1);       /* +0x074, IS func_8003C9B0 */
+    void (*slot78)(Obj86B60 *self, s32 a1);       /* +0x078, IS func_8003C944 */
+    void (*slot7C)(Obj86B60 *self, s32 a1);       /* +0x07C, IS func_8003C8D0 */
+    void (*slot80)(Obj86B60 *self, s32 a1);       /* +0x080, IS func_8003C7F4 */
+    void (*slot84)(Obj86B60 *self, s32 a1);       /* +0x084, IS func_8003C858 */
+    u8 pad088[0x090 - 0x088];
     void (*slot90)(Obj86B60 *self);               /* +0x090, external
                                                       (func_8004D9D4);
                                                       OBSERVED: func_8003C63C

@@ -3,22 +3,23 @@
  *
  * Carved in round 10 on the belief that this block had the LOWEST
  * toolchain-blocker density of any uncarved segment. That belief was
- * WRONG for two of the 20: `func_8003C48C` and `func_8003C63C` both hit
- * the `addiu $at, $at, %lo` screening grep on their jump-table dispatch
- * (`%lo(jtbl_*)`), and a `jtbl_*` symbol there is NOT a safe exception --
- * measured through the pinned pipeline, maspsx folds a jump-table address
- * resolution exactly like an indexed data-global one, with no way to tell
- * them apart below cc1 (which emits the same generic pseudo-op for both:
- * `lw $2,$L13($2)` against `lbu $2,D_x($4)`). Both are genuinely
- * `addiu_at`-blocked; see docs/research/addiu-at-blocker.md and each
- * function's own docs/match-reports/*.md for the reproducer detail. Of the
- * OTHER 18, none hit either open blocker.
+ * retracted the same round for two of the 20 -- `func_8003C48C` and
+ * `func_8003C63C`, whose jump-table dispatch hits
+ * `addiu $at, $at, %lo(jtbl_*)`. The retraction was RIGHT: a `jtbl_*` symbol
+ * is not a safe exception to that screen, because cc1 emits the same generic
+ * pseudo-op for an indexed data global and a switch jump table and the fold
+ * happens in maspsx, below cc1, which cannot tell them apart.
  *
- * This comment originally asserted the opposite -- that the two were
- * ordinary switch dispatchers and the whole slice was clear. That was the
- * head's error, reasoned rather than measured, and it was retracted the
- * same round. Do not re-derive it; the note under "Open toolchain
- * blockers" in CLAUDE.md exists to stop exactly this.
+ * BOTH OF THOSE ARE NOW MATCHED (round 23). The analysis above stands; only
+ * the VERDICT expired, because round 21 resolved `addiu_at` itself -- maspsx
+ * gained a `--addiu-at` flag that emits retail's unfolded four-instruction
+ * indexed form directly (docs/research/addiu-at-blocker.md). `addiu_at` is
+ * no longer a blocker anywhere; do not screen for it and do not file a stall
+ * against it. The two remaining blockers are `gp_rel` and `nop_mflo_mfhi`.
+ *
+ * The history is kept rather than deleted because it is this unit that
+ * established the jtbl-is-not-an-exception discriminator, and that finding
+ * outlived the blocker it was about.
  *
  * Shape: this is class-framework code. Objects carry their method table at
  * offset 0 (`lw $v1, 0x0($a0)` then `lw $v0, 0xNN($v1)` then `jalr`), so
@@ -26,14 +27,37 @@
  * class is `Obj86B60` (include/code_2cc8c.h), named after its base method
  * table D_80086B60 (78 slots; a derived override table also exists at
  * D_80087AAC, 73 slots -- see the header's own comment). The first two
- * functions are switch dispatchers over a small event/message code -- both
- * blocked, see above.
+ * functions are switch dispatchers over a small event/message code.
  */
 
 #include "common.h"
 #include "code_2cc8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C48C);
+void func_8003C48C(Obj86B60 *self, s32 a1, s32 a2)
+{
+    Obj86B60Methods *methods;
+
+    methods = self->methods;
+    if (self->unk3C != 0) {
+        switch (a2) {
+        case 0x12:
+            methods->slot80(self, a1);
+            break;
+        case 0x13:
+            methods->slot84(self, a1);
+            break;
+        case 0x21:
+            methods->slot74(self, a1);
+            break;
+        case 0x17:
+            methods->slot7C(self, a1);
+            break;
+        case 0x19:
+            methods->slot78(self, a1);
+            break;
+        }
+    }
+}
 
 void func_8003C51C(Obj86B60 *self, s32 a1, s32 a2)
 {
