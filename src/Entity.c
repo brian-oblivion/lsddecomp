@@ -74,7 +74,16 @@ void func_8005D1EC(Entity *this) {
     func_80066818()->dtor(this);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D278);
+void func_8005D278(Entity *this) {
+    s32 kind;
+
+    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    if ((u32)(kind - 1) < 9) {
+        this->methods->slot70(this, 1);
+    }
+    this->methods->slot10C(this, 0x42);
+    this->methods->slot160(this);
+}
 
 INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D314);
 
