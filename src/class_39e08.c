@@ -163,7 +163,51 @@ void func_80049EA4(void) {
 void func_80049EAC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_80049EB4);
+/* Returned BY VALUE from SubObjDMethods::slot1BC. Kept LOCAL to this unit --
+ * it encodes only what func_80049EB4 establishes (8 bytes, an s16 at +2 whose
+ * sign selects between two unk28 codes), which is not enough for a sibling to
+ * reuse unchanged. */
+struct SubObjDPos {
+    s16 unk0;
+    s16 unk2;
+    s16 unk4;
+    s16 unk6;
+};
+
+void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
+    struct SubObjDPos pos;
+    s32 result;
+
+    switch (arg2) {
+    case 4:
+        self->unk4C->methods->slot48(self->unk4C);
+        self->unk4C->methods->slot4(self->unk4C);
+        result = self->unk38->methods->slot1B8(self->unk38, 0);
+        if (result == 0) {
+            pos = self->unk38->methods->slot1BC(self->unk38);
+            self->unk28 = pos.unk2 < 0 ? 1 : 2;
+        } else {
+            self->unk28 = 3;
+        }
+        self->methods->onEventArg(self, 3);
+        break;
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 0xA:
+        self->unk3C = 3;
+        break;
+    case 0xC:
+    case 0xD:
+        self->unk4C->methods->slot48(self->unk4C);
+        self->unk4C->methods->slot4(self->unk4C);
+        self->unk38->methods->slot1B8(self->unk38, arg2 != 0xC ? 2 : 1);
+        self->unk28 = 3;
+        self->methods->onEventArg(self, 3);
+        break;
+    }
+}
 
 Class865C8Methods *func_8004A060(void) {
     return &D_800865C8;
