@@ -89,7 +89,54 @@ void func_8003C51C(Obj86B60 *self, s32 a1, s32 a2)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c", func_8003C63C);
+void func_8003C63C(Obj86B60 *self, s32 a1)
+{
+    Obj86B60Methods *methods;
+
+    methods = self->methods;
+    func_8003E5C8()->slot60(self, a1);
+    switch (a1) {
+    case 5:
+        methods->slotE4(self, self->unk4C->unk10);
+        methods->slotF0(self, self->unk4C->unk8, 0);
+        self->unk1C = 0;
+        self->unk3C = 1;
+        break;
+    case 6:
+        self->unk38 = 1;
+        methods->slot94(self);
+        break;
+    case 4:
+    case 7:
+        self->unk1C = 0;
+        self->unk3C = 0;
+        break;
+    case 8:
+        self->unk1C = 0;
+        break;
+    case 9:
+    case 0xA:
+    case 0xB:
+    case 0xE:
+    case 0xF:
+    case 0x10:
+    case 0x11:
+        self->unk20 = 5;
+        self->unk1C = 0;
+        switch (a1) {
+        case 0xB:
+            methods->slot90(self);
+            break;
+        case 0xF:
+            methods->slot10C(self);
+            break;
+        case 0x11:
+            methods->slot110(self);
+            break;
+        }
+        break;
+    }
+}
 
 void func_8003C794(Obj86B60 *self, s32 a1)
 {

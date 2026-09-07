@@ -1074,16 +1074,33 @@ struct Obj86B60Methods {
     void (*slot108)(Obj86B60 *self);                /* +0x108, external
                                                        (func_8003DA10);
                                                        OBSERVED: func_8003CA1C */
-    s32 (*slot10C)(Obj86B60 *self);                 /* +0x10C, external
-                                                       (func_8003DAD4);
-                                                       OBSERVED:
-                                                       func_8003C63C (STALL,
-                                                       not attempted) */
-    s32 (*slot110)(Obj86B60 *self);                 /* +0x110, external
-                                                       (func_8003DCAC);
-                                                       OBSERVED:
-                                                       func_8003C63C (STALL,
-                                                       not attempted) */
+    void (*slot10C)(Obj86B60 *self);                /* +0x10C, external
+                                                       (func_8003DAD4).
+                                                       RETYPED s32 -> void,
+                                                       round 23: the s32 was
+                                                       read off func_8003C63C's
+                                                       disassembly while that
+                                                       function was UNATTEMPTED,
+                                                       and a discarded return
+                                                       value is invisible in
+                                                       the bytes. Matching
+                                                       func_8003C63C requires
+                                                       void -- see that
+                                                       report's tail-merge
+                                                       finding. OBSERVED:
+                                                       func_8003C63C */
+    void (*slot110)(Obj86B60 *self);                /* +0x110, external
+                                                       (func_8003DCAC).
+                                                       RETYPED s32 -> void,
+                                                       round 23, on positive
+                                                       evidence independent of
+                                                       that match: the occupant
+                                                       func_8003DCAC is ALREADY
+                                                       MATCHED in
+                                                       src/code_2cc8c_b.c as
+                                                       `void func_8003DCAC(
+                                                       Obj86B60 *self)`.
+                                                       OBSERVED: func_8003C63C */
     void (*slot114)(Obj86B60 *self);                /* +0x114, external
                                                        (func_8003DDC8);
                                                        OBSERVED: func_8003C9B0 */
