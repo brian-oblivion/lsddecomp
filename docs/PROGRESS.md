@@ -202,8 +202,9 @@ threshold; bravo's negative is the correction.
 
 ### Next round
 
-**Carve, then runners.** `fresh` is down to 28 and what remains is large
-(135-274 words). The carve targets are measured, not guessed — per-function
+**Carve, then runners.** `fresh` closed the round at **24** (down from 50) and
+what remains is large — 135 to 274 words, with the cheap seam of every staffed
+unit exhausted. That is below (5 runners x ~4 functions), so Gate 2 fires. The carve targets are measured, not guessed — per-function
 blocker census over the uncarved monoliths:
 
 | segment | funcs | CLEAN | gp_rel | nop_mflo_mfhi | trampolines |
