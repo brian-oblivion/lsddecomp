@@ -3304,6 +3304,31 @@ finding, seen in two runners independently.**
   needing `volatile` would put source in the tree that misrepresents what the
   game did, so prefer removing the thing being CSE'd.
 
+  **ROUND 23 CARVES OUT THE ONE CASE WHERE `volatile` IS NOT A LEVER BUT THE
+  CORRECT DECLARATION: a genuine hardware register.** Runner bravo matched
+  `func_80032BF0` and `func_80032C28` (14/14 each, `code_179d8_c`) — an
+  IRQ-mask set/clear pair over the `D_8006DCAC`/`D_8006DCB4` shadow
+  `I_STAT`/`I_MASK` globals — and `volatile` on those struct fields is what
+  closed them. Without it GCC hoisted the mask store into the `jr $ra` delay
+  slot, a one-word drift that misaligned everything after it.
+
+  **The discriminator is EVIDENCE that the location is memory-mapped I/O, not
+  whether `volatile` helps.** Bravo got this right in both directions in one
+  round: it declared the IRQ pair `volatile` (a documented PSX register pair,
+  written then read back), and it explicitly **declined** to declare
+  `D_8009024C` `volatile` in `func_80032588` — where it also would have been a
+  candidate — on the grounds that nothing shows that global is MMIO. It
+  measured the negative too: `volatile` there changed nothing.
+
+  So the rule is not "avoid `volatile`", it is: **`volatile` because the
+  hardware says so is source that describes the game; `volatile` because the
+  diff says so is a lever, and the existing caution above applies to that one
+  only.** Delta reached the same place from the other side the same round
+  ("a write-then-immediate-readback of the same global needs that global
+  `volatile`, or GCC's CSE elides the reload") — two independent
+  confirmations, and the shape to look for is a store followed by a load of
+  the same address with no intervening call.
+
 - **NEW, round 17, reproduced in isolation: GCC 2.6.3 `-O2` merges
   per-branch constant stores to one global into a SINGLE shared store.**
   Each arm materialises its constant into a register and one `lui`/`sw` pair
