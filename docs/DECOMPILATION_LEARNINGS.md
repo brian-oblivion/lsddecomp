@@ -874,6 +874,38 @@ and to rebuild any figure before putting it in an assignment. Round 20's head
 did the first and **not the second**, and it is worth recording because the
 sub-case is new.
 
+**ROUND 23 TURNS THIS INTO A REPORT-FORMAT REQUIREMENT, because it recurred
+and because fixing it recovered a near-miss that was being buried.** Alpha
+filed `func_80031A44` with the sentence *"the function is 51/88, matches
+retail's exact instruction count is off by exactly one word, and the residue is
+precisely one missing nop"* — internally contradictory, and 51/88 means 37
+words differ. The head flagged it rather than fixing it (the runner held the
+unit and the build); alpha re-measured and the corrected title reads:
+
+> length 1 word SHORT at 87/88; 51/88 raw word-match, but that 37-word gap is
+> almost entirely the SHIFT from the one missing word, not independent residue
+
+**That is a one-word near-miss and a prime permuter target, and "51/88" hides
+it completely.** The two possibilities — "mostly shift" versus "independent
+register residue" — send the next round to opposite places, which is why the
+ambiguity is not cosmetic.
+
+So a stall report's TITLE must carry three things, not one:
+
+1. **LENGTH**: exact, or N words short/long.
+2. **RAW WORD-MATCH**: M/N.
+3. **WHERE THE FIRST REAL DIFF IS**, read off `tools/asm-differ/diff.py`
+   (which realigns) — never inferred. If it sits at or just past the length
+   gap, the word-match deficit is mostly ripple; if it is early, there is
+   independent residue and the length gap is only half the story.
+
+Alpha's four corrected titles are the model to copy, and they show the range
+the format distinguishes: `func_80031890` (length EXACT 73/73, 51/73, first
+diff at word 37 — genuine scattered residue) versus `func_80031A44` (1 short,
+51/88, gap is ripple) versus `func_80030404` (5 short, 21/96, first diff at
+word 0 — residue independent of the length gap). Three very different states
+that all render as "≈50%" under a single figure.
+
 `func_8004F8A4`'s title read:
 
 > best 0x130 (1 word / 4 bytes short), zero logic/CFG miss
