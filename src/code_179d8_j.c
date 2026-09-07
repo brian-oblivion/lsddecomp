@@ -7,9 +7,23 @@
  * here owns rodata.
  *
  * Blocker census at carve time (four screens, canonical shell forms):
- * 12 of 26 clean, 13 addiu-$at, 1 addiu-$at + nop_mflo_mfhi.  Every blocked
- * function has a stub report in docs/match-reports/ -- do not re-screen
- * them and do not spend attempts on them.
+ * 12 of 26 clean, 13 addiu-$at, 1 addiu-$at + nop_mflo_mfhi.  It ended
+ * "do not re-screen them and do not spend attempts on them."
+ *
+ * THAT CENSUS IS STALE -- re-screened round 23 (2026-09-07).  `addiu_at` was
+ * resolved in round 21 (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md)
+ * and screening for it now INVENTS blockers.  The 13 it lists are NOT blocked;
+ * several have already been matched in the rounds since, and round 23's runner
+ * alpha worked four of the remainder to characterised non-toolchain residues
+ * (func_80031890 73/73 length with scattered register identity, func_8003069C
+ * 85/85 length, func_80031A44 one word short at 87/88 -- a strong permuter
+ * target -- and func_80030404 five short at 91/96).  The live screen is TWO
+ * greps, `gp_rel` and `nop_mflo_mfhi`; run `python3 tools/nearmiss.py` rather
+ * than trusting any transcribed census, this one included.
+ *
+ * The WORKABLE list below is likewise a carve-time snapshot and several of its
+ * entries are now matched.  Derive the live queue from the file's own
+ * INCLUDE_ASM entries, not from this comment.
  *
  * func_800303FC is a two-instruction `jr $ra; nop` leaf that splat emitted
  * as C itself.  It was never work; do not count it as one.
@@ -29,9 +43,10 @@
 
 /* ------------------------------------------------------------------------
  * Cross-unit calls, typed per-call-site from the registers loaded before
- * each `jal` -- none of these callees have an established prototype yet
- * (several are themselves addiu-$at blocked in their own units), so these
- * are local guesses, not authoritative.  See CLAUDE.md's note on this.
+ * each `jal` -- none of these callees have an established prototype yet, so
+ * these are local guesses, not authoritative.  (This note used to add "several
+ * are themselves addiu-$at blocked in their own units"; that is stale as of
+ * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
  * ------------------------------------------------------------------------ */
 extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);
