@@ -5,14 +5,23 @@
  * segment's switch jump tables, so this unit owns no rodata.
  *
  * Blocker census at carve time (four screens, canonical shell forms):
- * 9 of 18 clean, 9 addiu-$at.  Every blocked function has a stub report in
- * docs/match-reports/ -- do not re-screen them, and do not spend attempts
- * on them; they are the operator's call, not a matching problem.
+ * 9 of 18 clean, 9 addiu-$at.  That census said of the nine "do not spend
+ * attempts on them; they are the operator's call, not a matching problem."
  *
- * WORKABLE (all four screens clean):
- *   func_80032D00 13w   func_800334A0 20w   func_800336CC 16w
- *   func_8003370C 11w   func_80033738 157w  func_800339AC 40w
- *   func_80033A4C 25w   func_80033FB8 26w   func_8003410C 11w
+ * THAT IS STALE AND ITS GROUND HAS ALREADY BEEN RECOVERED -- re-screened
+ * round 23 (2026-09-07).  `addiu_at` was resolved in round 21 (maspsx
+ * `--addiu-at`; docs/research/addiu-at-blocker.md) and all nine were matched
+ * in the rounds that followed.  The unit's ONLY remaining queue is three
+ * blocker-clean, unreported functions -- func_80032D34 (274w),
+ * func_80033260 (144w), func_80033C90 (202w) -- which are ordinary large
+ * fresh ground, not blocked.  Verified with the two live screens (`gp_rel`
+ * and `nop_mflo_mfhi`): zero hits on any of the three.
+ *
+ * The lesson, kept because the comment cost nothing here only by luck:
+ * a carve-time census recorded as a DIRECTIVE ("do not spend attempts")
+ * outlives the blocker it was measured against, and no tool can see it.
+ * Screen with `python3 tools/nearmiss.py` rather than trusting any
+ * transcribed census, this one included.
  *
  * Expect this slice to span more than one class -- a ~20-function window cut
  * at ROM-address boundaries has no reason to align with class boundaries.
