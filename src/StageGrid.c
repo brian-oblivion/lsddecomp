@@ -27,4 +27,6 @@ StageGridDimensions *GetStageGridDimensions(s32 index) {
 
 INCLUDE_ASM("asm/nonmatchings/StageGrid", GetStageChunkFromMood);
 
-INCLUDE_ASM("asm/nonmatchings/StageGrid", GetMoodFromStageChunk);
+MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
+    return STAGE_CHUNK_MOODS[stage] + chunk->row * STAGE_GRID_DIMENSIONS[stage].columns + chunk->column;
+}
