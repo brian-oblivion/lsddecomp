@@ -74,9 +74,32 @@ void func_8005D1EC(Entity *this) {
     func_80066818()->dtor(this);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D278);
+void func_8005D278(Entity *this) {
+    s32 kind;
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D314);
+    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    if ((u32)(kind - 1) < 9) {
+        this->methods->slot70(this, 1);
+    }
+    this->methods->slot10C(this, 0x42);
+    this->methods->slot160(this);
+}
+
+void func_8005D314(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
+    if (this->unk0C != 0) {
+        return;
+    }
+    func_80066818()->slot4C(this, arg1, arg2, arg3, arg4);
+    this->unk4C = arg3;
+    if (D_80089EA7[this->moodIndex * 0x10] != 0) {
+        return;
+    }
+    this->methods->slot15C(this);
+    if (D_80089EAF[this->moodIndex * 0x10] != 0) {
+        return;
+    }
+    this->methods->slot168(this);
+}
 
 void func_8005D418(Entity *this) {
     if (this->unk0C != 0) {
@@ -97,7 +120,31 @@ void func_8005D480(Entity *this, s32 a1, s32 a2) {
     func_80066818()->slot98(this, a1, a2);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D560);
+void func_8005D560(Entity *this, s32 arg1, s32 arg2) {
+    s32 linkStage;
+
+    linkStage = D_80089EAB[this->moodIndex * 0x10];
+    if ((u32)(arg2 - 2) < 7) {
+        if (linkStage <= 0) {
+            return;
+        }
+    }
+    func_80066818()->slotDC(this, arg1, arg2);
+    if (arg2 != 4) {
+        return;
+    }
+    if (linkStage <= 0) {
+        return;
+    }
+    if (linkStage != 0x7F) {
+        arg2 = 0xA;
+    } else if (D_80089EAC[this->moodIndex * 0x10] != 0) {
+        arg2 = 0xB;
+    } else {
+        arg2 = 0xC;
+    }
+    this->methods->slot30(this, arg2);
+}
 
 void func_8005D658(Entity *this, s32 a1, s32 a2) {
     func_80066818()->slotE0(this, a1, a2);
@@ -111,7 +158,29 @@ void func_8005D6D4(Entity *this) {
     this->unkFC++;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D714);
+typedef struct EntityVec3 EntityVec3;
+struct EntityVec3 {
+    s32 x;
+    s32 y;
+    s32 z;
+};
+
+s32 func_8005D714(Entity *this, void *pos, s32 arg2, s32 arg3) {
+    EntityVec3 local;
+    s32 kind;
+
+    local = *(EntityVec3 *)pos;
+    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    if ((u32)((kind + 9) & 0xFF) < 9) {
+        local.y += (s8)kind * 1024;
+    }
+    if (arg3 < 0) {
+        arg3 = 0x800 / (~arg3 + 1);
+    } else {
+        arg3 <<= 11;
+    }
+    return this->unk94->methods->slot120(this->unk94, 0, arg2 << 11, &local, arg3);
+}
 
 s32 func_8005D7FC(Entity *this, EntityRegionRef *region) {
     EntityRegionSlot *range;
@@ -164,7 +233,22 @@ void func_8005DAAC(Entity *this, s32 arg1) {
     this->unkF4 = arg1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DAFC);
+typedef struct EntityMoodHandlerRow EntityMoodHandlerRow;
+struct EntityMoodHandlerRow {
+    void *handler; /* +0x00 */
+    u8 pad04[0x10 - 0x04];
+};
+extern EntityMoodHandlerRow D_80089EB0[];
+extern void func_8002CC34(s32 arg0, void *arg1, s32 arg2, Entity *arg3, void *arg4);
+
+void func_8005DAFC(Entity *this) {
+    func_8002CC34(this->unk58, &this->unk9C, this->moodIndex + 1, this,
+                  D_80089EB0[this->moodIndex].handler);
+    this->methods->slot12C(this);
+    this->methods->slot110(this);
+    this->unkFC = 0;
+    this->unkF8 = 1;
+}
 
 void func_8005DB8C(Entity *this) {
     func_8002CC84(this->unk58, &this->unk9C);

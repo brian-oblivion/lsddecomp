@@ -67,7 +67,9 @@ struct EntityMethods {
     /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E694 (result discarded) and func_8005EF20 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, func_8005EF20 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by func_8005D9F4, func_8005DA3C */
-    /* +0x64 */ u8 pad64[0xB8 - 0x64];
+    /* +0x64 */ u8 pad64[0x70 - 0x64];
+    /* +0x70 */ void (*slot70)(Entity *self, s32 arg1);   /* called by func_8005D278 as slot70(this, 1), gated on `D_80089EA6[this->moodIndex*0x10]-1` being unsigned-less-than 9 */
+    /* +0x74 */ u8 pad74[0xB8 - 0x74];
     /* +0xB8 */ void (*slotB8)(Entity *self, void *arg1);  /* called by func_8005F800 as slotB8(this, &this->unk94->unk14->x) -- a vector-pointer argument, same shape as func_8005D714's still-INCLUDE_ASM arg1 */
     /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
     /* +0xC0 */ u8 padC0[0xC4 - 0xC0];
@@ -75,7 +77,9 @@ struct EntityMethods {
     /* +0xC8 */ void (*slotC8)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005FC58 (discards the result); same (self,arg1,arg2) shape as slotC4/slotCC, no other caller yet so kept void by default like slotC4 */
     /* +0xCC */ s32 (*slotCC)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005E7F8 (discards the result) and func_8005FEC8 (a tail call that returns it) -- see CLAUDE.md's "one-line wrapper" rule, func_8005FEC8 has no positive evidence of void. Verified this retype does NOT perturb func_8005E7F8's own codegen (unlike slotC4 above, which does) */
     /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005ED30 as slotD0(this, -0x176, rand() % 2), and by func_8005E7F8 as slotD0(this, this->unk48, 0) */
-    /* +0xD4 */ u8 padD4[0x114 - 0xD4];
+    /* +0xD4 */ u8 padD4[0x10C - 0xD4];
+    /* +0x10C */ void (*slot10C)(Entity *self, s32 arg1);  /* called by func_8005D278 as slot10C(this, 0x42), unconditionally */
+    /* +0x110 */ void (*slot110)(Entity *self);            /* called by func_8005DAFC */
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by func_8005DB8C */
     /* +0x118 */ u8 pad118[0x128 - 0x118];
     /* +0x128 */ void (*slot128)(Entity *self, s32 arg1); /* called by func_80062A40 (Entity_e) as slot128(this, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
@@ -108,11 +112,13 @@ struct BasicClassMethods {
     /* +0x000 */ u8 pad00[0x08];
     /* +0x008 */ void *(*ctor)(void *self, s32 arg1, s32 arg2); /* Entity__Entity's base-class construction call */
     /* +0x00C */ void (*dtor)(void *self);                       /* called by func_8005D1EC */
-    /* +0x010 */ u8 pad10[0x50 - 0x10];
+    /* +0x010 */ u8 pad10[0x4C - 0x10];
+    /* +0x04C */ void (*slot4C)(void *self, s32 arg1, s32 arg2, void *arg3, s32 arg4); /* called by func_8005D314, forwarding (arg1, arg2, arg3, arg4) straight through; arg3 is also stored into this->unk4C by the caller right after, so it is Unk4CObj* at that call site even though this shared ancestor slot takes it opaquely */
     /* +0x050 */ void (*slot50)(void *self);                       /* called by func_8005D418 */
     /* +0x054 */ u8 pad54[0x98 - 0x54];
     /* +0x098 */ void (*slot98)(void *self, s32 arg1, s32 arg2);      /* called by func_8005D480 */
-    /* +0x09C */ u8 pad9C[0xE0 - 0x9C];
+    /* +0x09C */ u8 pad9C[0xDC - 0x9C];
+    /* +0x0DC */ void (*slotDC)(void *self, s32 arg1, s32 arg2);      /* called by func_8005D560, forwarding (arg1, arg2) straight through */
     /* +0x0E0 */ void (*slotE0)(void *self, s32 arg1, s32 arg2);        /* called by func_8005D658 */
 };
 
@@ -167,7 +173,9 @@ struct Unk94Methods {
     void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(unk94, -0x64, 0) and func_80061400 (Entity_d) as slotCC(unk94, -0x14, 0); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
     u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by func_8005E7F8, compared against 0 -- value-returning, not void */
-    u8 pad104[0x130 - 0x104];
+    u8 pad104[0x120 - 0x104];
+    s32 (*slot120)(Unk94Obj *self, s32 arg1, s32 arg2, void *arg3, s32 arg4); /* called by func_8005D714 as a TAIL CALL, `return this->unk94->methods->slot120(this->unk94, 0, arg2<<11, &localVec, distValue)` -- value-returning per CLAUDE.md's one-line-wrapper rule, no positive evidence of void */
+    u8 pad124[0x130 - 0x124];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 and func_80061400 (Entity_d), as slot130(unk94, 0), and by func_80061778 (Entity_d) as slot130(unk94, 1) */
     void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061778 (Entity_d) and func_80062730 (Entity_e), both as slot134(unk94, 1, 1); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     u8 pad138[0x1A0 - 0x138];
@@ -372,8 +380,10 @@ struct EntityMoodRow {
 
 extern EntityMoodRow D_80089EA4[];
 extern s8 D_80089EA6[];  /* GetUnlockEffect */
+extern s8 D_80089EA7[];  /* read by func_8005D314, own base symbol immediately after D_80089EA6, moodIndex*0x10-indexed like the rest of this family */
 extern s8 D_80089EAB[];  /* GetLinkStage */
 extern s8 D_80089EAC[];  /* GetEventVideo */
+extern s8 D_80089EAF[];  /* read by func_8005D314, own base symbol immediately after D_80089EAC, moodIndex*0x10-indexed like the rest of this family */
 
 void *Entity__GetMoodEffect(Entity *this);
 s32 Entity__GetEventVideo(Entity *this);
