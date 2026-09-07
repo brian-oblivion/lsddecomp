@@ -115,6 +115,41 @@ instructions swapped.
    — no improvfement in either position; the "prologue callee-save order"
    precedent's lever does not transfer to this residue.
 
+## Round 23 (head): two further attempts, both 68/73 — the verdict is firmer, not changed
+
+The baseline above was re-verified first: the preserved body splices in and
+builds clean, and reproduces **exactly 71/73 with no address drift**, so this
+report's inherited score is honest (round 19 measured roughly one preserved body
+in six carrying a false drift-free claim; this is not one of them).
+
+Two groupings not in the attempt list above were then tried:
+
+| # | attempt | result |
+| --- | --- | --- |
+| 8 | a separate `s32 area = self->unk48 * self->unk44 + 0x14;` local, declared FIRST, then `size = (4 << self->unk3C) + area;` | **68/73** |
+| 9 | `size = (4 << self->unk3C) + (0x14 + self->unk48 * self->unk44);` — the constant written on the LEFT inside the parens, so `fold`'s canonicalisation produces the `addiu` rather than the source | **68/73** |
+
+Both regress to **the same 68/73 and in the same place** as attempts 2–5: the
+`mult` / `unk3C`-reload / `sllv` scheduling at the HEAD of the expression breaks,
+not just the tail pairing. Attempt 8 matters because it is the one shape that
+should have decoupled the two halves — a distinct local with its own live range,
+computed in its own statement — and it does not. Attempt 9 matters because it
+rules out the remaining hypothesis that `addiu $v0, $v0, 0x14` came from a
+source-level `const + var` that `fold` canonicalised.
+
+**So the residue is now 9 attempts deep across two rounds, with every attempt
+except the naive left-to-right parse landing on 68 or below.** That is a
+converged negative, not an unfinished search: the two instructions cannot be
+re-paired by any expression shape tried without breaking four earlier ones.
+The next lever here is the permuter, not another hand-written grouping.
+
+The final `addu`'s operand ORDER is worth recording because it is what pins the
+target grouping and rules out the cheap readings: retail's `addu $s1, $v1, $v0`
+has the shift (`$v1`) as `rs` and the `product + 0x14` sum (`$v0`) as `rt`, so
+the shift is genuinely the LEFT operand of the outer `+` and the sum is a single
+right-hand operand. The best build inverts this into `addu $v0, <shift>, <product>`
+followed by `addiu $s1, $v0, 0x14`.
+
 **Every attempt other than #1 disturbs instructions BEFORE the residue
 even starts**, which is the real finding here: this isn't a case where the
 tail can be reshaped independently of the head. The `mult`/`mflo` pair's
