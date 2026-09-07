@@ -120,7 +120,29 @@ void func_8005D6D4(Entity *this) {
     this->unkFC++;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D714);
+typedef struct EntityVec3 EntityVec3;
+struct EntityVec3 {
+    s32 x;
+    s32 y;
+    s32 z;
+};
+
+s32 func_8005D714(Entity *this, void *pos, s32 arg2, s32 arg3) {
+    EntityVec3 local;
+    s32 kind;
+
+    local = *(EntityVec3 *)pos;
+    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    if ((u32)((kind + 9) & 0xFF) < 9) {
+        local.y += (s8)kind * 1024;
+    }
+    if (arg3 < 0) {
+        arg3 = 0x800 / (~arg3 + 1);
+    } else {
+        arg3 <<= 11;
+    }
+    return this->unk94->methods->slot120(this->unk94, 0, arg2 << 11, &local, arg3);
+}
 
 s32 func_8005D7FC(Entity *this, EntityRegionRef *region) {
     EntityRegionSlot *range;
