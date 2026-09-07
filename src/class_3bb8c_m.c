@@ -3,13 +3,19 @@
  * (0x44518..0x44F14, vram 0x80053D18..0x80054714), 20 functions.
  * Carved round 15.
  *
- * Blocker profile (head's Gate 1 three-grep screen at carve time):
- *   func_800544E4  gp_rel
- *   func_80054558  gp_rel AND addiu-$at -- blocked until both move
- *   func_800545FC  addiu-$at
- *   func_80054660  gp_rel
- * All four have stub reports; do not attempt them. They are the LAST four in
- * ROM order, so the workable run is contiguous from the top of the unit.
+ * Blocker profile -- RE-SCREENED round 23 (2026-09-07). The carve-time screen
+ * was a THREE-grep screen; `addiu_at` was resolved in round 21 (maspsx
+ * `--addiu-at`; docs/research/addiu-at-blocker.md) and screening for it now
+ * INVENTS blockers, so the live screen is TWO greps -- `gp_rel` and
+ * `nop_mflo_mfhi`. Current state:
+ *   func_800544E4  gp_rel                -- still blocked
+ *   func_80054558  gp_rel (+ addiu-$at)  -- still blocked, on gp_rel alone
+ *   func_800545FC  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
+ *   func_80054660  gp_rel                -- still blocked
+ * The old profile said "all four have stub reports; do not attempt them",
+ * which was true when written and became a false blocker on one of the four
+ * the moment `addiu_at` was fixed. Screen with `python3 tools/nearmiss.py`
+ * rather than trusting any transcribed profile, this one included.
  * This unit owns NO switch jump table.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
@@ -165,6 +171,36 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800544E4);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054558);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800545FC);
+/* func_800545FC's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
+ * are already established as unrelated object pointers by five other functions
+ * in this unit (`FieldM14 *`/`FieldM18 *`), whereas this function writes a
+ * colour-table POINTER to +0x018 and a plain sign-extended byte to +0x014. So
+ * this is a separate descriptor, and its view stays LOCAL rather than going
+ * into include/class_3bb8c.h -- which eleven units share, and where adding
+ * `unkC`/`unk1C` to `ObjM` on this evidence would be a claim the bytes do not
+ * support.
+ *
+ * D_800872C4 is a table of 24 three-byte entries (0x48 bytes; the first four
+ * are 00/00/00, 40/40/40, 80/80/80, FF/FF/FF -- a greyscale ramp, so RGB
+ * triples). Indexing it as `u8[][3]` is what produces retail's `i*2 + i + base`
+ * stride-3 address arithmetic. D_8008730C is six words, 0x6800 down to 0x0800. */
+struct StyleM {
+    u8 pad000[0x00C];
+    const u8 *unkC;                 /* +0x00C, a D_800872C4 entry */
+    u8 pad010[0x014 - 0x010];
+    s32 unk14;                      /* +0x014, cfg[0] sign-extended */
+    const u8 *unk18;                /* +0x018, a D_800872C4 entry */
+    s32 unk1C;                      /* +0x01C, a D_8008730C value */
+};
+
+extern u8 D_800872C4[][3];
+extern s32 D_8008730C[];
+
+void func_800545FC(struct StyleM *style, s8 *cfg) {
+    style->unkC = D_800872C4[cfg[3]];
+    style->unk18 = D_800872C4[cfg[2]];
+    style->unk1C = D_8008730C[cfg[1]];
+    style->unk14 = cfg[0];
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054660);
