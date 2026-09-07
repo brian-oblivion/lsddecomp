@@ -1,9 +1,117 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FBE4);
+void func_8004FBE4(Class86E00_3bb8c_g *self, s32 arg1)
+{
+    Class86E00Methods_3bb8c_g *methods = self->methods;
+    s32 ret;
+    s32 i;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FE24);
+    if (self->unk28 == arg1) {
+        arg1 = 0x17;
+    }
+
+    methods->slot30(self, arg1);
+    methods->slot84(self);
+    methods->slot80(self, arg1);
+
+    self->unk5C = 0;
+    switch (arg1) {
+    case 0x13:
+        arg1 = methods->slot50(self) ? 0x11 : 8;
+        methods->slot7C(self, arg1);
+        break;
+    case 0x14:
+        if (*(u8 *)self->unk40 == 0) {
+            methods->slot58(self, self->unk40, self->unk30, self->unk34);
+        }
+        ret = methods->slot68(self, self->unk40, self->unk44, self->unk4C,
+                              self->unk50, self->unk54, self->unk58);
+        arg1 = ret ? 0x16 : 0xC;
+        methods->slot7C(self, arg1);
+        break;
+    case 0x15:
+        ret = methods->slot64(self, self->unk40, self->unk54, self->unk58);
+        arg1 = ret ? 0x16 : 0x10;
+        methods->slot7C(self, arg1);
+        break;
+    case 0x11:
+        methods->slot9C(self);
+        break;
+    case 0x12:
+        methods->slotA8(self);
+        break;
+    }
+
+    if ((u32)(arg1 - 0x16) < 2) {
+        if (self->unk24 == 1 && self->unk38 != NULL) {
+            func_80017CFC(self->unk3C);
+            for (i = 0; i < self->unk2C; i++) {
+                func_80017CFC(((void **)self->unk38)[i]);
+            }
+            func_80017CFC(self->unk38);
+            self->unk38 = NULL;
+        }
+        self->unk28 = 0;
+        self->unk24 = 0;
+    } else {
+        self->unk28 = arg1;
+    }
+}
+
+/* Not this round's function (lives outside this unit's slice) -- a
+ * resource loader taking a path, returning a handle. Already typed at
+ * several other call sites in the project (`class_3bb8c_i.c`,
+ * `class_3bb8c_j.c`, `class_39e08.h`, `code_2cc8c.h`), each with its own
+ * local view per this project's established convention. */
+extern ChildObj86ED0 *func_8003B39C(char *path);
+/* Not this round's function -- consumes the short-lived handle above and
+ * produces the object stored into `self->unk70`. */
+extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
+
+/* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
+ * mostly `char *` string pointers into rodata, a few raw literal words at
+ * indices never reached from this call site. `asm/data/76DC8.data.s`. */
+extern char *D_80086E80[];
+extern const char D_8008AAB4[]; /* "CARD\\" */
+extern const char D_8008AABC[]; /* ".TIM" */
+/* 3-word opaque block, `func_80041C9C`'s arg1, address-only here. */
+extern s32 D_80086EC4;
+/* opaque block, the fresh `unk70`'s own `slot4C` arg2, address-only here. */
+extern s32 D_8008AA94;
+
+void func_8004FE24(Class86E00_3bb8c_g *self, s32 arg1)
+{
+    char path[0x20];
+    char *buf;
+    char *name;
+    ChildObj86ED0 *handle;
+    Class86E00Unk70Obj_3bb8c_g *newVal;
+
+    if (arg1 >= 0x11) {
+        return;
+    }
+    if (self->unk68 == 0) {
+        return;
+    }
+    if (self->unk70 != NULL) {
+        return;
+    }
+
+    buf = path;
+    name = D_80086E80[arg1];
+    buf[0] = '\0';
+    strcat(buf, D_8008AAB4);
+    strcat(buf, name);
+    strcat(buf, D_8008AABC);
+
+    handle = func_8003B39C(buf);
+    handle->methods->slot78(handle);
+    newVal = func_80041C9C(handle, (void *)&D_80086EC4, 0);
+    self->unk70 = newVal;
+    handle->methods->release(handle);
+    newVal->methods->slot4C(newVal, self->unk68, (void *)&D_8008AA94);
+}
 
 void func_8004FF40(Class86E00_3bb8c_g *self)
 {
@@ -30,7 +138,44 @@ void func_8004FFF4(Class86E00_3bb8c_g *self, s32 arg1)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_80050034);
+void func_80050034(Class86E00_3bb8c_g *self)
+{
+    Class86E00Methods_3bb8c_g *methods = self->methods;
+
+    switch (self->unk28) {
+    case 2:
+    case 4:
+    case 0xA:
+    case 0xE:
+        methods->slot8C(self, 0);
+        if (self->unk28 == 0xE) {
+            strcpy((char *)self->unk40, self->unk30);
+            strcat((char *)self->unk40, ((char **)self->unk3C)[(s32)self->unk80]);
+            strcpy((char *)self->unk44, ((char **)self->unk38)[(s32)self->unk80]);
+        }
+        if (self->unk24 == 2) {
+            methods->slot78(self, self->unk40, self->unk44, self->unk48,
+                             self->unk4C, self->unk50, self->unk54, self->unk58);
+        } else if (self->unk24 == 1) {
+            methods->slot74(self, self->unk40, self->unk44, self->unk54, self->unk58);
+        }
+        break;
+    case 6:
+        methods->slot8C(self, 0);
+        methods->slot7C(self, 7);
+        break;
+    case 3:
+    case 5:
+    case 8:
+    case 9:
+    case 0xC:
+    case 0xD:
+    case 0x10:
+        methods->slot8C(self, 0x10);
+        methods->slot7C(self, 0x17);
+        break;
+    }
+}
 
 void func_800501F0(Class86E00_3bb8c_g *self)
 {

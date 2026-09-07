@@ -1451,6 +1451,12 @@ struct Class86E00Unk70ObjMethods_3bb8c_g {
     /* +0x004, func_8004FF40's own call: return value stored back into
      * `Class86E00_3bb8c_g::unk70` itself. */
     Class86E00Unk70Obj_3bb8c_g *(*slot4)(Class86E00Unk70Obj_3bb8c_g *self);
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, func_8004FE24's own call on a FRESH `unk70` right after
+     * assigning it: `(self, self->unk68, &D_8008AA94)`. `unk68` is
+     * forwarded verbatim -- kept as the owning struct's established
+     * bare `s32` reading of that field, not retyped to a pointer here. */
+    void (*slot4C)(Class86E00Unk70Obj_3bb8c_g *self, s32 arg1, void *arg2);
 };
 
 struct Class86E00Unk70Obj_3bb8c_g {
@@ -1480,7 +1486,35 @@ struct Class86E00Methods_3bb8c_g {
      * subObj)`, registering/attaching whichever of `unk78`/`unk7C` that
      * function owns. */
     void (*slot10)(Class86E00_3bb8c_g *self, Class86E00SubObj_3bb8c_g *arg1);
-    u8 pad014[0x078 - 0x014];
+    u8 pad014[0x030 - 0x014];
+    /* +0x030, func_8004FBE4's own first call, every path: `(self,
+     * arg1)` where `arg1` may already have been forced to `0x17`. */
+    void (*slot30)(Class86E00_3bb8c_g *self, s32 arg1);
+    u8 pad034[0x050 - 0x034];
+    /* +0x050, func_8004FBE4's own `arg1==0x13` case: no extra arguments,
+     * return value picks between two literal replacement codes. */
+    s32 (*slot50)(Class86E00_3bb8c_g *self);
+    u8 pad054[0x058 - 0x054];
+    /* +0x058, func_8004FBE4's own `arg1==0x14` case, only when
+     * `*(u8 *)self->unk40 == 0`: `(self, unk40, unk30, unk34)`. */
+    void (*slot58)(Class86E00_3bb8c_g *self, s32 a1, char *a2, s32 a3);
+    u8 pad05C[0x064 - 0x05C];
+    /* +0x064, func_8004FBE4's own `arg1==0x15` case: `(self, unk40,
+     * unk54, unk58)`, return value picks between two literal
+     * replacement codes (same shape as `slot68` just below). */
+    s32 (*slot64)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3);
+    /* +0x068, func_8004FBE4's own `arg1==0x14` case, unconditional:
+     * `(self, unk40, unk44, unk4C, unk50, unk54, unk58)` -- the same
+     * six fields as `slot78` below MINUS `unk48`, not a subset call to
+     * that slot. Return value picks between two literal replacement
+     * codes, same shape as `slot64` above. */
+    s32 (*slot68)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6);
+    u8 pad06C[0x074 - 0x06C];
+    /* +0x074, func_80050034's own `self->unk24==1` case: 4 extra
+     * arguments (`unk40`, `unk44`, `unk54`, `unk58`), same shape as
+     * `slot78` just below but with only the last two of that call's
+     * trailing four. */
+    void (*slot74)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3, s32 a4);
     /* +0x078, func_800504D0's own call for its `arg2==2` case: 7 extra
      * arguments, the last four passed on the stack (`unk4C`, promoted
      * from its native `u8` to a full word, then `unk50`/`unk54`/`unk58`). */
@@ -1489,23 +1523,50 @@ struct Class86E00Methods_3bb8c_g {
     /* +0x07C, the shared tail call of func_800501F0/func_80050280/
      * func_800504D0/func_80050730: `(self, literal state code)`. */
     void (*slot7C)(Class86E00_3bb8c_g *self, s32 arg1);
-    u8 pad080[0x08C - 0x080];
+    /* +0x080, func_8004FBE4's own 3rd call, every path: `(self, arg1)`,
+     * same `arg1` value as `slot30` above. */
+    void (*slot80)(Class86E00_3bb8c_g *self, s32 arg1);
+    /* +0x084, func_8004FBE4's own 2nd call, every path: `(self)`. */
+    void (*slot84)(Class86E00_3bb8c_g *self);
+    u8 pad088[0x08C - 0x088];
     void (*slot8C)(Class86E00_3bb8c_g *self, s32 arg1); /* +0x08C, func_800501F0 */
     void (*slot90)(Class86E00_3bb8c_g *self); /* +0x090, func_8004FF90's `arg2==0x19` case */
     void (*slot94)(Class86E00_3bb8c_g *self); /* +0x094, func_8004FF90's `arg2==0x17` case */
-    u8 pad098[0x0A0 - 0x098];
+    u8 pad098[0x09C - 0x098];
+    /* +0x09C, func_8004FBE4's own `arg1==0x11` case: `(self)`, no
+     * return value read. */
+    void (*slot9C)(Class86E00_3bb8c_g *self);
     void (*slotA0)(Class86E00_3bb8c_g *self); /* +0x0A0, func_800504D0's own first call, both cases */
-    u8 pad0A4[0x0AC - 0x0A4];
+    u8 pad0A4[0x0A8 - 0x0A4];
+    /* +0x0A8, func_8004FBE4's own `arg1==0x12` case: `(self)`, same
+     * shape as `slot9C` above. */
+    void (*slotA8)(Class86E00_3bb8c_g *self);
     void (*slotAC)(Class86E00_3bb8c_g *self); /* +0x0AC, func_80050730's own 2nd call, both cases */
 };
 
 struct Class86E00_3bb8c_g {
     Class86E00Methods_3bb8c_g *methods; /* +0x000 */
-    u8 pad004[0x028 - 0x004];
+    u8 pad004[0x024 - 0x004];
+    /* +0x024, func_80050034's own secondary dispatch code (nested inside
+     * the `unk28`-driven switch's shared `2`/`4`/`0xA`/`0xE` case),
+     * tested against literals `2` and `1`. */
+    s32 unk24;
     s32 unk28;   /* +0x028, dispatch/state code tested by several functions */
-    u8 pad02C[0x038 - 0x02C];
+    /* +0x02C, func_8004FBE4's own loop bound: frees `self->unk38[0..
+     * unk2C)` when tearing down (see `unk38`'s own comment below). */
+    s32 unk2C;
+    /* +0x030, func_80050034's own `strcpy` source into `self->unk40`,
+     * in its `self->unk28==0xE` sub-case. */
+    char *unk30;
+    /* +0x034, func_8004FBE4's own `slot58` arg3, forwarded verbatim
+     * alongside `unk30` above. */
+    s32 unk34;
     void *unk38; /* +0x038, func_800505A8: forwarded opaquely to `func_80051A5C`'s arg0 */
-    u8 pad03C[0x040 - 0x03C];
+    /* +0x03C, func_80050034's own `self->unk28==0xE` sub-case: base of a
+     * pointer array indexed by `(s32)self->unk80`, `strcat`ed onto
+     * `self->unk40` -- same shape as `unk38` just below, indexed the
+     * same way for `self->unk44`'s own `strcpy`. */
+    void *unk3C;
     s32 unk40;   /* +0x040, func_80050340/func_800504D0 */
     s32 unk44;   /* +0x044, func_80050340/func_800504D0 */
     s32 unk48;   /* +0x048, func_80050340/func_800504D0 */
