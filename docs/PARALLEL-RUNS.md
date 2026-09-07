@@ -832,6 +832,61 @@ wrote down. Keep both honesty mechanisms fed:
   Correcting the report is the head's job, and it is worth doing at once,
   because the next reader has no way to know the text is stale.
 
+  **AND SWEEP THE OTHER DIRECTION TOO, because round 22's sweep missed a
+  99/100 near-miss.** Round 22 marked five `addiu_at` reports and stopped
+  there — they were all stubs. `func_8005CBC8` (`code_4cd08`) was missed, and
+  it is the most valuable function in the queue: with the blocker gone it
+  measures **99 of 100 words**, the closest open near-miss in the corpus.
+  It was missed because it does not LOOK like a stub. It is a long,
+  twice-corrected report with a real attempt history whose verdict sentence
+  — "cannot be matched as C under the pinned toolchain regardless of source
+  shape" — reads as a considered plateau rather than as a blocker citation.
+
+  **A blocker's death invalidates every report that RELIED on it, not only the
+  ones that look like stubs.** And there is a mechanical detector, so this does
+  not need judgement: **`nearmiss.py` screens from the ASM, so a function it
+  lists as blocker-CLEAN whose report calls it blocked is a contradiction, and
+  the report is the wrong half.** Run this at Gate 1 whenever a blocker has
+  been retired:
+
+  ```sh
+  python3 tools/nearmiss.py | awk '/ASSIGN FROM HERE/,0' \
+    | grep -oP '^\s+\d+w\s+\S+\s+\K\S+' > /tmp/clean.txt
+  while read fn; do f=docs/match-reports/$fn.md; [ -f "$f" ] || continue
+      grep -q 'REOPENED -- ASSIGNABLE' "$f" && continue
+      grep -qiE 'addiu_at|addiu-\$at' "$f" && grep -qiE 'BLOCKED|blocker' "$f" \
+        && echo "$fn"
+  done < /tmp/clean.txt
+  ```
+
+  It over-reports — a report saying "blocker screen clean, no `addiu_at`"
+  matches too — so read each hit's TITLE/verdict line, which is the only safe
+  place to read a figure from anyway. Round 23 got 24 hits and exactly one was
+  a genuine stale verdict; the other 23 mention the screen in passing. **24
+  titles to read is a cheap price for a 99/100 function.**
+
+  Note the correct disposition for such a function is a CORRECTED verdict, not
+  a `REOPENED` marker: it is genuinely worked ground with a characterised
+  residue, and `progress.py` should keep counting it as a documented stall
+  rather than returning it to `fresh` for a cold runner to re-derive.
+
+  **Also sweep `src/*.c` HEADER COMMENTS, which no tool can see and every
+  runner assigned to that unit reads.** Round 23 matched `func_800545FC`
+  (`class_3bb8c_m`, 25/25, first attempt) whose carve-time unit comment listed
+  it as `addiu-$at` blocked and ended *"All four have stub reports; do not
+  attempt them."* Three of that comment's four lines were still correct, which
+  is exactly why nobody re-read it — and a stale line in a comment is not
+  merely wrong, it is a DIRECTIVE. `grep -rn 'addiu' src/*.c` and read every
+  hit framed as a live blocker; round 23 found and fixed four such units
+  (`class_3bb8c_m`, `code_179d8_c`, plus `code_179d8_i` and `code_179d8_j`
+  whose comments still claim 9 and 13 `addiu_at`-blocked functions
+  respectively — those two are the NEXT round's first job, and the functions
+  they name may be free).
+
+  Record the method next to the verdict when you write one, or the verdict
+  outlives its method: the corrected comments now name the screen (two greps
+  as of round 21), the date, and `tools/nearmiss.py`.
+
 **Screen the queue with TWO greps as of round 21 — it used to be three.**
 `addiu $at, $at, %lo` is NO LONGER A BLOCKER (resolved round 21; see
 `docs/research/addiu-at-blocker.md`), so screening for it now invents
