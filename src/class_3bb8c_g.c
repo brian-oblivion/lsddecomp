@@ -1,7 +1,63 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_8004FBE4);
+void func_8004FBE4(Class86E00_3bb8c_g *self, s32 arg1)
+{
+    Class86E00Methods_3bb8c_g *methods = self->methods;
+    s32 ret;
+    s32 i;
+
+    if (self->unk28 == arg1) {
+        arg1 = 0x17;
+    }
+
+    methods->slot30(self, arg1);
+    methods->slot84(self);
+    methods->slot80(self, arg1);
+
+    self->unk5C = 0;
+    switch (arg1) {
+    case 0x13:
+        arg1 = methods->slot50(self) ? 0x11 : 8;
+        methods->slot7C(self, arg1);
+        break;
+    case 0x14:
+        if (*(u8 *)self->unk40 == 0) {
+            methods->slot58(self, self->unk40, self->unk30, self->unk34);
+        }
+        ret = methods->slot68(self, self->unk40, self->unk44, self->unk4C,
+                              self->unk50, self->unk54, self->unk58);
+        arg1 = ret ? 0x16 : 0xC;
+        methods->slot7C(self, arg1);
+        break;
+    case 0x15:
+        ret = methods->slot64(self, self->unk40, self->unk54, self->unk58);
+        arg1 = ret ? 0x16 : 0x10;
+        methods->slot7C(self, arg1);
+        break;
+    case 0x11:
+        methods->slot9C(self);
+        break;
+    case 0x12:
+        methods->slotA8(self);
+        break;
+    }
+
+    if ((u32)(arg1 - 0x16) < 2) {
+        if (self->unk24 == 1 && self->unk38 != NULL) {
+            func_80017CFC(self->unk3C);
+            for (i = 0; i < self->unk2C; i++) {
+                func_80017CFC(((void **)self->unk38)[i]);
+            }
+            func_80017CFC(self->unk38);
+            self->unk38 = NULL;
+        }
+        self->unk28 = 0;
+        self->unk24 = 0;
+    } else {
+        self->unk28 = arg1;
+    }
+}
 
 /* Not this round's function (lives outside this unit's slice) -- a
  * resource loader taking a path, returning a handle. Already typed at
