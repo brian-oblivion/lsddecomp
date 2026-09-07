@@ -164,7 +164,22 @@ void func_8005DAAC(Entity *this, s32 arg1) {
     this->unkF4 = arg1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DAFC);
+typedef struct EntityMoodHandlerRow EntityMoodHandlerRow;
+struct EntityMoodHandlerRow {
+    void *handler; /* +0x00 */
+    u8 pad04[0x10 - 0x04];
+};
+extern EntityMoodHandlerRow D_80089EB0[];
+extern void func_8002CC34(s32 arg0, void *arg1, s32 arg2, Entity *arg3, void *arg4);
+
+void func_8005DAFC(Entity *this) {
+    func_8002CC34(this->unk58, &this->unk9C, this->moodIndex + 1, this,
+                  D_80089EB0[this->moodIndex].handler);
+    this->methods->slot12C(this);
+    this->methods->slot110(this);
+    this->unkFC = 0;
+    this->unkF8 = 1;
+}
 
 void func_8005DB8C(Entity *this) {
     func_8002CC84(this->unk58, &this->unk9C);
