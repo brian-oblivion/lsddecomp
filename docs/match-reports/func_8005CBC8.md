@@ -105,10 +105,15 @@
 > corrections is itself the record of how a 100-word function took four
 > rounds.
 >
-> **One thing in the round-24 note is now resolved:** `tools/setup-permuter.sh`
-> already carries `--addiu-at` on `main` (line 75), matching `Makefile:44`.
-> The `sed -e '1,4d'` embedded-rodata bug it also reports is NOT fixed and is
-> still live for any future function that owns rodata ahead of itself.
+> **Both scaffold bugs the round-24 note reports are already FIXED on `main`,
+> in commit `434f396` — do not re-fix them.** `tools/setup-permuter.sh:75`
+> carries `--addiu-at`, matching `Makefile:44`; and `target.s` generation now
+> deletes splat's `.set noat`/`.set noreorder` **by content** rather than by
+> the old `sed -e '1,4d'` position, so a function owning embedded rodata keeps
+> its `.section .rodata` directive. Trap 6 in that script's header comment
+> records it. (This paragraph originally claimed the second bug was still
+> live; that was wrong, and it is corrected here rather than deleted because
+> a stale "still broken" note costs the next round a wasted fix.)
 
 
 > **ROUND 24 (2026-09-08), runner delta. Round 23's "99/100" figure was measured
