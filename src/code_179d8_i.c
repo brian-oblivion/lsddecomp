@@ -91,7 +91,81 @@ short SsUtGetVabHdr(short vabId, VabHdr *hdr)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033260);
+/* Field layout matches VagAtr in include/psyq/LIBSND.H, which declares
+ * `extern short SsUtGetVagAtr (short, short, short, VagAtr*);` -- same
+ * evidence pattern as SsUtGetVabHdr just above: this game-unit function
+ * copies exactly VagAtr's non-reserved fields (skips reserved1/reserved2
+ * at 0xE/0xF and reserved[4] at 0x18-0x1F) from a global VagAtr table.
+ * Not #include-d directly for the same reason as VabHdr above (LIBSND.H's
+ * own `#include <sys/types.h>` does not resolve here); local copy of the
+ * same 0x20-byte layout instead. The third parameter is NOT sign-extended
+ * on entry (unlike the first two) -- it is only ever used inside an
+ * expression that gets truncated to 16 bits by the later index scale, so
+ * the retail source evidently typed it wider than `short` despite the SDK
+ * prototype, and the compiler had no need to narrow it early.
+ *
+ * Kept as func_80033260, NOT renamed to SsUtGetVagAtr like SsUtGetVabHdr
+ * above it: unlike that function, this one has no `= 0x8003....;` alias in
+ * config/symbols.slps01556.lsdde.txt, so five still-INCLUDE_ASM'd callers
+ * in code_179d8_k.c and code_179d8_e.c carry a literal `jal func_80033260`
+ * in their own retail .s text. Renaming the C definition breaks the link
+ * for every one of them; config/ is not this unit's to edit. */
+typedef struct {
+    u8 prior;
+    u8 mode;
+    u8 vol;
+    u8 pan;
+    u8 center;
+    u8 shift;
+    u8 min;
+    u8 max;
+    u8 vibW;
+    u8 vibT;
+    u8 porW;
+    u8 porT;
+    u8 pbmin;
+    u8 pbmax;
+    u8 reserved1;
+    u8 reserved2;
+    u16 adsr1;
+    u16 adsr2;
+    s16 prog;
+    s16 vag;
+    s16 reserved[4];
+} VagAtr;
+
+extern VagAtr *D_8008E978;
+extern u8 D_8008EA13;
+
+short func_80033260(short vabId, short prog, s32 tone, VagAtr *vagatr)
+{
+    s16 idx;
+
+    if (D_8008EA2C[vabId] == 1) {
+        func_80032148(vabId, prog);
+        idx = tone + (D_8008EA13 << 4);
+        vagatr->prior = D_8008E978[idx].prior;
+        vagatr->mode = D_8008E978[idx].mode;
+        vagatr->vol = D_8008E978[idx].vol;
+        vagatr->pan = D_8008E978[idx].pan;
+        vagatr->center = D_8008E978[idx].center;
+        vagatr->shift = D_8008E978[idx].shift;
+        vagatr->max = D_8008E978[idx].max;
+        vagatr->min = D_8008E978[idx].min;
+        vagatr->vibW = D_8008E978[idx].vibW;
+        vagatr->vibT = D_8008E978[idx].vibT;
+        vagatr->porW = D_8008E978[idx].porW;
+        vagatr->porT = D_8008E978[idx].porT;
+        vagatr->pbmin = D_8008E978[idx].pbmin;
+        vagatr->pbmax = D_8008E978[idx].pbmax;
+        vagatr->adsr1 = D_8008E978[idx].adsr1;
+        vagatr->adsr2 = D_8008E978[idx].adsr2;
+        vagatr->prog = D_8008E978[idx].prog;
+        vagatr->vag = D_8008E978[idx].vag;
+        return 0;
+    }
+    return -1;
+}
 
 typedef struct {
     s32 unk0;
