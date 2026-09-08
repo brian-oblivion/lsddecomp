@@ -408,6 +408,61 @@ cases where retail's own layout is readable off the binary and must be
 reproduced rather than reasoned about; this one generalises them from
 `return` blocks and `switch` arms to ordinary if/else arms.
 
+#### Instance 2, a DIFFERENT shape: a duplicated assignment retail keeps and GCC merges
+
+**This is what makes the entry a rule rather than an anecdote, and it is the
+more COMMON of the two shapes.** `func_8005DBF0` (`Entity`) closed at 74/74
+after four rounds at 2 words short, through ELEVEN structural variants and a
+`__asm__("")` barrier. Not one character of its logic changed.
+
+Retail keeps two textually distinct `doDetach = 1;` writes reaching one merge
+point, and spends two extra instructions to keep them separate:
+
+```
+; the detachKind==2 arm
+bne  $v1, $v0, MERGE
+ nop
+j    MERGE
+ li  $s2, 0x1        ; its OWN write, in the delay slot of an otherwise-pointless j
+; ... the rand-check arm, elsewhere ...
+li   $s2, 0x1        ; a SECOND, textually distinct write
+MERGE:
+```
+
+The build instead lets the kind==2 arm fall through into the rand arm's `li`
+— fewer instructions, correct, not retail. In the stalled body the
+rand-check block was nested INSIDE an earlier arm, textually before the
+kind==2 write, so kind==2 was last and took the fallthrough. Lifting the
+rand-check block OUT of the nesting to the end of the gated block, behind an
+explicit `goto merge`, makes the rand write last and forces the kind==2 arm
+into retail's shape.
+
+So both shapes reduce to one fact: **GCC 2.6.3 gives the fallthrough to
+whichever candidate is LAST in source order.** Shape 1 is an if/else arm that
+must jump over a join; shape 2 is a duplicated assignment retail keeps in two
+copies. The fix in both is textual: make the block you want to JUMP not-last,
+using an explicit `goto` over the block you want to fall through. Moving a
+statement out of the nesting looks like it changes the meaning, which is why
+eleven variants that all permuted things INSIDE the nesting could not find it
+— it does not change the meaning once the `goto` is explicit.
+
+#### "A barrier had no effect" is positive evidence FOR this lever
+
+`func_8005DBF0`'s report had the mechanism right before the fix existed:
+*"a scheduling barrier placed both before and after the arm's `doDetach = 1;`
+— no effect, confirming this is a cross-basic-block CFG/tail-merge decision,
+not an intra-block scheduling one."* That reasoning is correct and the
+missing step is that a cross-basic-block decision has a SOURCE lever too — it
+is textual placement rather than a barrier. So when a report says a barrier
+did nothing, that is a positive indicator for block order, not a sign the
+function is exhausted. Two of the two functions closed by this lever had
+exactly that note in their history.
+
+Corollary for isolated reductions: a reduction usually has only ONE candidate
+for the fallthrough, so the merge does not arise and a barrier appears to fix
+it. The real function has two or more, and placement decides. That is the
+shape of "the barrier works in the reduction and transfers to nothing".
+
 #### Why the permuter cannot find this, which is the routing consequence
 
 The permuter mutates expressions, declarations and statement order WITHIN a
