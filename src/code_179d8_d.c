@@ -95,7 +95,37 @@ extern BaseTable6D940 *func_80026CAC(void);
  * this unit does not include either header. */
 extern void *func_80017B34(s32 size);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BC40);
+/* The 0x2C-stride table at D_8008B9F4, this unit's local view.  Both symbols
+ * the disassembly names are ONE array: D_8008B9FC is D_8008B9F4 + 8, and both
+ * advance by 0x2C per iteration in func_8002BC40 -- GCC builds one induction
+ * variable per accessed member, which is why the `.id` access re-materialises
+ * the base every iteration (indexed-global form, no live register needed)
+ * while the `.name` address is strength-reduced into $s2 (it has to be a real
+ * value, it gets passed as an argument).  Field at +4 is not read here. */
+typedef struct Entry8008B9F4 {
+    /* 0x00 */ s32 id;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ char name[0x24];
+} Entry8008B9F4; /* size 0x2C */
+
+extern Entry8008B9F4 D_8008B9F4[0x80];
+
+s32 func_8002BC40(s32 id, char *name)
+{
+    s32 i;
+
+    for (i = 0; i < 0x80; i++) {
+        if (D_8008B9F4[i].id == 0) {
+            break;
+        }
+        if (D_8008B9F4[i].id == id) {
+            if (func_8002C048(name, D_8008B9F4[i].name) == 0) {
+                return i + 1;
+            }
+        }
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
 
