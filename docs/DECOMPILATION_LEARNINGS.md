@@ -229,6 +229,39 @@ Three things worth keeping:
 
 ## Build hygiene (proven, the hard way)
 
+### Address drift's most convincing disguise is a PLAUSIBLE WRONG CONSTANT in the function you are editing (round 24)
+
+The existing entry below says drift "looks exactly like a broken symbol". Here
+is the sharpest instance measured so far, because the wrong value is not
+garbage -- it is off by a round number, in the one instruction a reader is most
+likely to trust.
+
+`func_80059814` (`DreamSys`) re-measured as:
+
+```
+retail:  addiu at,at,0x7e50        built:  addiu at,at,0x7e40
+retail:  addiu at,at,0x7e5c        built:  addiu at,at,0x7e4c
+```
+
+Both table bases exactly 0x10 low, on two independent symbols, alongside a
+101043-byte out-of-range diff. That reads as a symbol or a linker-script
+problem, and `D_80087E50` *is* a real symbol at a name-matching address.
+
+`build/lsdde.map` settles it in one grep: `D_80087E50` was linked at
+`0x80087e40`. **The function was 4 words (0x10 bytes) short, so its object's
+text was 0x10 small and every symbol after it -- including all of `.data` --
+slid down by 0x10.** The wrong-looking immediate IS the length bug, observed
+from the far end.
+
+Two things worth carrying:
+
+- **A uniform offset shared by several unrelated symbols is drift, not a
+  symbol bug.** One wrong symbol is a symbol bug; three wrong by the same
+  amount is your function's size.
+- **Check `build/lsdde.map` for the symbol's linked address before believing
+  any symbol-shaped diff**, and read funcdiff's out-of-range byte count in the
+  same breath -- it was printed by the same command that produced the score.
+
 - **Address drift looks exactly like a broken symbol, and TWO runners lost
   time to it independently in one round.** If your function is the wrong
   length, every symbol linked after it shifts, so an unrelated and already
@@ -310,6 +343,84 @@ lies list, seen from the other side: drift makes a good score untrustworthy,
 and it also makes a bad score uninformative.
 
 ## Source-shape idioms
+
+### A shared `return` block's PLACEMENT follows the FIRST return in source order (round 24)
+
+**N separate `return X;` statements and one `goto` with a trailing label are
+NOT equivalent, even though GCC merges the duplicates either way.** It puts
+the merged block where the FIRST one was. So a function whose failure paths
+all `return 0` gets that block early if the first `return 0` is early, and
+retail's shape -- failure block sitting immediately before the epilogue, with
+the success path `j`umping OVER it -- is the `goto`-with-trailing-label form:
+
+```c
+    if (early_bail) {
+        goto fail;
+    }
+    ...
+    for (...) {
+        if (nothing_found) {
+            goto fail;
+        }
+    }
+    /* success */
+    return 1;
+
+fail:
+    return 0;
+```
+
+Measured on `func_800585B4` (`class_3bb8c_t`): worth 2 words directly, and it
+took the function from **5/56 to 15/56** because it also re-shaped the entry
+branch -- every word of the prologue became exact.
+
+**The diagnostic is specific and cheap, and it is worth knowing because the
+symptom points at the wrong thing.** If the entry test's branch POLARITY is
+inverted against retail (`beqz` where retail has `bnez`) *and* there is a
+stray `j` + `move v0,zero` pair early in the function, the failure block is in
+the wrong PLACE. Do not go looking for a condition you spelled backwards --
+the condition is right and the block ordering is wrong.
+
+Related and separate: a loop counter's SIGNEDNESS is directly visible.
+Retail's `sltiu` against a small constant means the counter is unsigned;
+`slti` means signed. Worth 1 word on the same function, and it is invisible
+in any other part of the output. This is the signedness sibling of the
+round-23 finding that a local's declared WIDTH is a codegen decision.
+
+### Two globals a few bytes apart with a COMMON stride are one array; separate `lui`/`addiu` pairs prove nothing (round 24)
+
+`func_8002BC40` (`code_179d8_d`) reads `D_8008B9F4` and `D_8008B9FC`, each
+with its own `lui`/`addiu` materialisation, each advancing by 0x2C per
+iteration. They are **one** array: the delta is 8, which is the second
+member's offset, folded into the symbol at compile time. One `for` loop over
+one array of 0x2C-byte structs produced both.
+
+The split is explained by what each member is USED for, not by the source:
+
+- A member that is only **tested** gets the indexed-global form
+  (`lui $at` / `addiu $at` / `addu $at,$at,<idx>` / `lw`), needs no register
+  live across the loop, and so has its base **re-materialised inside the
+  loop**.
+- A member whose **address is passed to a call** must be a real register
+  value, so loop strength reduction turns it into an induction variable
+  initialised to `base + offset` and bumped by the stride.
+
+**Read the STRIDE first.** A common non-power-of-two stride on both symbols is
+the tell, because it means one `sizeof`.
+
+This is the converse half of round 23's `func_80031CF0` adjudication, which
+established that a SHARED base with a small positive fold (`addiu $t2, $a3, 2`)
+is conclusive FOR one object. The pair now covers both directions:
+
+| evidence | conclusion |
+| --- | --- |
+| shared base register, small positive fold | ONE object -- conclusive |
+| separate `lui`/`addiu` per symbol | **nothing either way** |
+
+The second row is the one that misleads, and round 23 already warned why: "each
+field gets its own `lui`/`addiu`" measures whether GCC CHOSE to share a base
+register in that one function -- a register-pressure question -- not whether
+the symbols ARE one object.
 
 ### A "register-identity" verdict is the least reliable class in this corpus (round 18)
 

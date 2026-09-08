@@ -865,6 +865,50 @@ wrote down. Keep both honesty mechanisms fed:
   a genuine stale verdict; the other 23 mention the screen in passing. **24
   titles to read is a cheap price for a 99/100 function.**
 
+  **ROUND 24: THE DETECTOR UNDER-REPORTS, AND WHAT ACTUALLY FOUND THE CHEAPEST
+  GROUND WAS A SHARED PREAMBLE ACROSS A CLASS FAMILY.** Round 24 ran this
+  contradiction sweep and got 7 hits. One of them, `Entity__GetEventVideo`
+  (**9 words** -- the smallest function in the queue), was a pure `addiu_at`
+  residue and matched first attempt with the C its own report had derived.
+  **Its two siblings, `Entity__GetUnlockEffect` (14w) and
+  `Entity__GetLinkStage` (15w), did NOT appear in the sweep's output at all**
+  -- their titles do not match the `^#.*BLOCK|Status:.*BLOCK` shape the grep
+  keys on. They were found by noticing that all three reports open with the
+  *same* **HEAD ADJUDICATION** box, and checking the whole family. All three
+  matched, 38 words for one sitting.
+
+  So: **when a contradiction hit turns out to be real, read every report that
+  shares its preamble, its unit, or its adjudicating round.** Blocked-function
+  reports are written in families -- one runner, one sitting, one shared
+  cause -- and a detector keyed on title text will find some members and miss
+  others. The family is the unit of staleness, not the report.
+
+  **And the hardest-to-see case is a report that is TOO well argued.** These
+  three survived round 22's sweep and round 23's follow-up because they open
+  by certifying that the head reproduced the diagnosis independently from
+  scratch and wrote it up project-wide with a 502-of-502 corpus census.
+  Nothing reads less like stale ground. Every word of it was also true: the
+  adjudication verified the MECHANISM, which never changed. What expired was
+  the premise that the mechanism was unfixable -- a premise the report states
+  explicitly ("maspsx exposes no `--addiu-at` flag"), and which round 21
+  falsified by adding exactly that flag.
+
+  **A blocker's death invalidates the strongest reports as thoroughly as the
+  weakest, and does so without touching a word of what they say.** Rank from
+  `nearmiss.py` and treat any contradiction with a report as the report being
+  the wrong half -- however good the argument, and *especially* when it is
+  good enough that nobody re-reads it.
+
+  One more round-24 refinement, on the other side: a report can have a dead
+  CAUSE and a live CONCLUSION, and the honest annotation says which half it
+  is correcting. `func_80059814`'s blocking residue was `addiu_at`; retiring
+  it moved the function 8/53 -> 14/53 and left it 4 words short on an
+  unrelated branch. Its companion `func_800598E8` defers its whole analysis
+  to that report, so its cause is equally dead -- but it was deliberately NOT
+  marked `REOPENED -- ASSIGNABLE`, because the sibling had just demonstrated
+  that the blocker was worth 6 words of ~45. Marking it reopened would send a
+  cold runner in expecting a free function.
+
   Note the correct disposition for such a function is a CORRECTED verdict, not
   a `REOPENED` marker: it is genuinely worked ground with a characterised
   residue, and `progress.py` should keep counting it as a documented stall
