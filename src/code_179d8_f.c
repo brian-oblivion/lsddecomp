@@ -168,7 +168,68 @@ void func_800361F0(s32 a0)
     func_80036B20(p);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036230);
+extern u8 D_8008EA2C[];
+extern u8 D_8008EA13;
+extern s32 func_80032148(s16 a0, s16 a1);
+
+/* A 0x20 (32)-byte-stride record; the same table code_179d8_l.c/_m.c's
+ * D8008E978Entry/Tbl32E978 name (local views). Source and destination here
+ * are both this same layout -- this function copies one instance's fields
+ * into a table slot. Only the fields this function touches are named. */
+typedef struct {
+    u8 unk0;
+    u8 unk1;
+    u8 unk2;
+    u8 unk3;
+    u8 unk4;
+    u8 unk5;
+    u8 unk6;
+    u8 unk7;
+    u8 unk8;
+    u8 unk9;
+    u8 unkA;
+    u8 unkB;
+    u8 unkC;
+    u8 unkD;
+    u8 padE[0x10 - 0xE];
+    s16 unk10;
+    s16 unk12;
+    s16 unk14;
+    s16 unk16;
+    u8 pad18[0x20 - 0x18];
+} Rec32E978;
+
+extern Rec32E978 *D_8008E978;
+
+s32 func_80036230(s32 a0, s32 a1, s32 a2, Rec32E978 *a3)
+{
+    s32 idx;
+
+    if (D_8008EA2C[(s16)a0] == 1) {
+        func_80032148((s16)a0, (s16)a1);
+        idx = (s16)(a2 + (D_8008EA13 << 4));
+        D_8008E978[idx].unk0 = a3->unk0;
+        D_8008E978[idx].unk1 = a3->unk1;
+        D_8008E978[idx].unk2 = a3->unk2;
+        D_8008E978[idx].unk3 = a3->unk3;
+        D_8008E978[idx].unk4 = a3->unk4;
+        D_8008E978[idx].unk5 = a3->unk5;
+        D_8008E978[idx].unk7 = a3->unk7;
+        D_8008E978[idx].unk6 = a3->unk6;
+        D_8008E978[idx].unk8 = a3->unk8;
+        D_8008E978[idx].unk9 = a3->unk9;
+        D_8008E978[idx].unkA = a3->unkA;
+        D_8008E978[idx].unkB = a3->unkB;
+        D_8008E978[idx].unkC = a3->unkC;
+        D_8008E978[idx].unkD = a3->unkD;
+        D_8008E978[idx].unk10 = a3->unk10;
+        D_8008E978[idx].unk12 = a3->unk12;
+        D_8008E978[idx].unk14 = a3->unk14;
+        D_8008E978[idx].unk16 = a3->unk16;
+        return 0;
+    }
+    return -1;
+}
 
 extern s16 D_8008E84C;
 
