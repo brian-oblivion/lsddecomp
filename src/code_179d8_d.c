@@ -10,8 +10,15 @@
  * Those five count as `matched` in tools/progress.py without having been
  * work, which is exactly the caveat CLAUDE.md attaches to that column.
  *
- * Two blocked functions have stub reports:
- *   func_8002BC40, func_8002BCEC  -- addiu_at
+ * NEITHER OF THIS UNIT'S TWO "BLOCKED" FUNCTIONS IS BLOCKED.  Both were
+ * filed as `addiu_at`, and `addiu_at` was RESOLVED in round 21 (maspsx
+ * `--addiu-at`; docs/research/addiu-at-blocker.md).  Re-screened with
+ * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   func_8002BC40 (43w)   MATCHED round 24, 43/43, first attempt.
+ *   func_8002BCEC (175w)  blocker-clean, FRESH, assignable.
+ * Their stub reports are gone.  The previous version of this comment listed
+ * both as "blocked, have stub reports", which by round 24 was a stale
+ * DIRECTIVE over free ground -- the fourth unit in two rounds to carry one.
  * func_8002C278 was originally screened as a third (nop_mflo_mfhi) but
  * that screen was inverted (checked mult/div BEFORE mflo/mfhi instead of
  * after) -- the head corrected it mid-round and deleted the stub report.
@@ -22,8 +29,8 @@
  * jump table -- all seven jtbl blocks in the 0xFD8 rodata slot fall outside
  * 0x8002BC40..0x8002C408 -- so no rodata sub-slot is attached to it.
  *
- * Sibling-slice finding worth having up front (runner charlie, this round,
- * code_179d8_b): this region is NOT class-framework code. tools/classtable.py
+ * Sibling-slice finding worth having up front (established in code_179d8_b,
+ * round 16): this region is NOT class-framework code. tools/classtable.py
  * --scan has no hit anywhere near these globals, and the neighbouring
  * functions read as a low-level serial/link driver poking raw control words
  * into a block of globals that look like hardware/SIO register staging. Do
@@ -129,9 +136,11 @@ s32 func_8002BC40(s32 id, char *name)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
 
-/* Cross-unit calls into the still-INCLUDE_ASM code_179d8_b (charlie's
- * unit, this round) -- declared LOCAL to this unit, per-call-site typed,
- * since none of them have an established prototype anywhere yet. */
+/* Cross-unit calls into code_179d8_b -- declared LOCAL to this unit,
+ * per-call-site typed, since none of them have an established prototype
+ * anywhere yet.  (This comment used to name which runner held code_179d8_b
+ * "this round"; a round-specific staffing fact does not belong in a durable
+ * file, because it is false from the next round onward.) */
 extern void func_800292F4(void *arg0, s32 *outBuf);
 extern void func_80028DF0(s32 arg0, s32 *buf, s32 arg2);
 extern void func_80029274(void *arg0, void *arg1, s32 arg2);
