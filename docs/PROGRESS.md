@@ -90,6 +90,24 @@ was `addiu_at`. Re-measured with the fix live: **the switch dispatch now
 reproduces exactly and the residue is ONE word — 99/100.** It is now the
 closest open near-miss in the corpus and a prime permuter target.
 
+> **CORRECTED, round 24: the "99/100" in the paragraph above was never
+> rebuilt from a build, and the body preserved alongside it measured
+> 108/100 — EIGHT WORDS LONG.** Round 24's runner delta rebuilt it, as its
+> assignment required, and found the discrepancy. Root cause: retail's jump
+> table points indices 6 AND 7 at the *same* handler label, so the source
+> needs `case 6: case 7:` as one merged arm with the index arithmetic
+> derived, not two separate arms with hardcoded constants. With that fixed
+> it IS a genuine, rebuilt 99/100 — the conclusion survived, the number was
+> unverified, and the preserved body would have cost the next reader eight
+> words of confusion.
+>
+> This is the THIRD consecutive round in which a figure was carried forward
+> without being re-derived, and the first in which the unverified figure was
+> the HEAD's own, propagated through this PROGRESS entry into round 24's
+> assignment as fact. The standing rule — rank from title lines, but rebuild
+> any figure before putting it in an assignment — is now also a rule about
+> what a head writes down.
+
 A blocker's death invalidates every report that RELIED on it, not just the
 stubs that look like citations. There is a mechanical detector, now in Gate 1:
 **`nearmiss.py` screens from the ASM, so a function it lists as blocker-CLEAN
