@@ -85,7 +85,10 @@ typedef struct {
     u8 unk29;   /* +0x29: a retrigger/step counter */
     u8 pad2A[0x4C - 0x2A];
     s16 unk4C;  /* +0x4C */
-    u8 pad4E[0x80 - 0x4E];
+    u8 pad4E[0x6E - 0x4E];
+    s16 unk6E;  /* +0x6E: a repeat/skip counter, decremented per catch-up tick */
+    s16 unk70;  /* +0x70: next scheduling threshold, compared against unk88 */
+    u8 pad72[0x80 - 0x72];
     s32 unk80;  /* +0x80: accumulated tick position */
     u8 pad84[0x88 - 0x84];
     s32 unk88;  /* +0x88: last-value scratch, overloaded per call site */
@@ -101,6 +104,67 @@ extern Entry90902E8 *D_800902E8[];
  * without touching rec->unk80 at all. */
 extern s32 func_80035E80(s16 channel, s16 slot);
 
+/* Forward declaration for a sibling function defined later in THIS unit
+ * (func_8003424C, still INCLUDE_ASM) -- called from func_80034138's
+ * catch-up loop below with the same (channel, slot) pair as every other
+ * helper in this file; its own return/side effects are not yet
+ * characterised since it has not been matched. */
+extern void func_8003424C(s16 channel, s16 slot);
+
+/* STALL -- see docs/match-reports/func_80034138.md. length exact 69/69,
+ * 66/69 raw word-match, first real diff at word 22: two pure scheduling
+ * residues (a load-pair order swap and one delay-slot filler choice),
+ * not a logic or CFG difference. */
+#if 0
+void func_80034138(s16 a0, s16 a1, s16 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    s32 dead[2];
+    s16 last = rec->unk70;
+    s32 elapsed = rec->unk88;
+    s32 delta = elapsed - last;
+    s16 remain;
+    s32 sum;
+    s32 step;
+    s16 last2;
+
+    if (0) {
+        dead[0] = 0;
+        dead[1] = 0;
+    }
+    if (delta > 0) {
+        remain = rec->unk6E;
+        if (remain > 0) {
+            rec->unk6E = remain - 1;
+            return;
+        }
+        if (remain == 0) {
+            rec->unk6E = a2;
+            rec->unk88 = rec->unk88 - 1;
+            return;
+        }
+        rec->unk88 = delta;
+        return;
+    }
+    if (last < elapsed) {
+        return;
+    }
+    sum = elapsed;
+    for (;;) {
+        func_8003424C(a0, a1);
+        step = rec->unk88;
+        if (step != 0) {
+            last2 = rec->unk70;
+            sum += step;
+            if (sum < last2) {
+                continue;
+            }
+            rec->unk88 = sum - last2;
+            break;
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
