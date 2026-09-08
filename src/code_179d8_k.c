@@ -141,7 +141,16 @@ void func_800350D8(s16 a0, s16 a1, u8 a2)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035154);
+void func_80035154(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 counter = rec->unk29;
+
+    rec->unk14 = a2;
+    counter = counter + 1;
+    rec->unk29 = counter;
+    rec->unk88 = func_80035E80(a0, a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
 
