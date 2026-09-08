@@ -79,13 +79,21 @@ extern void func_80036518(void);                              /* code_179d8_f, M
 typedef struct {
     u8 pad0[0x4];
     u8 *unk4;   /* +0x4: cursor into a byte-encoded (7-bit VLQ) event stream */
-    u8 pad8[0x12 - 0x8];
+    u8 pad8[0xC - 0x8];
+    u8 *unkC;   /* +0xC: a saved backup of unk4, restored into it on a "resume" path */
+    u8 unk10;   /* +0x10: one-shot latch, set once a "kind 1" retrigger fires */
+    u8 pad11[0x12 - 0x11];
     u8 unk12;   /* +0x12: byte offset to the active embedded state block */
     u8 unk13;   /* +0x13 */
     u8 unk14;   /* +0x14 */
-    u8 pad15[0x29 - 0x15];
+    u8 unk15;   /* +0x15: a cached byte, written from the "default kind" path */
+    u8 unk16;   /* +0x16: event-kind selector (compared against 0x14/0x1E/0x28) */
+    u8 pad17[0x27 - 0x17];
+    u8 unk27;   /* +0x27: dispatch-mode selector (compared against 1) */
+    u8 unk28;   /* +0x28: a cached byte, written from the "mode 1" latch path */
     u8 unk29;   /* +0x29: a retrigger/step counter */
-    u8 pad2A[0x4C - 0x2A];
+    u8 unk2A;   /* +0x2A: a second, independent retrigger/step counter */
+    u8 pad2B[0x4C - 0x2B];
     s16 unk4C;  /* +0x4C */
     u8 pad4E[0x6E - 0x4E];
     s16 unk6E;  /* +0x6E: a repeat/skip counter, decremented per catch-up tick */
@@ -221,8 +229,88 @@ void func_80034614(s16 a0, s16 a1, u8 a2)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
 
+/* A stack-local buffer this function passes to three cross-unit callees:
+ * `func_800334F0(ch, byte, out)` (established elsewhere as
+ * `s16 func_800334F0(s16, s16, Entry8E968 *)` in code_179d8_i.c, a
+ * different unit's own reduced view -- this unit's own view only needs
+ * `unk0`, an item count) fills the FIRST 0x10 bytes; `func_80033260` and
+ * `func_80036230` (both still unmatched, no established prototype
+ * anywhere) are then called once per item with a pointer to the NEXT 0x28
+ * bytes of the SAME object.  Modeled as one struct, not two separate
+ * locals, because the loop's exit test re-reads `unk0` from memory on
+ * every iteration even though nothing in this function's own source
+ * writes it after the first call -- the per-item pointer passed to the
+ * other two callees aliases the same object, so the compiler cannot prove
+ * `unk0` is unchanged and must reload it. */
+typedef struct {
+    u8 unk0;    /* +0x00: item count, written by func_800334F0 */
+    u8 pad1[0x10 - 0x1];
+} NoteList_800349B0;
+
+typedef struct {
+    u8 pad0[0x8];
+    u8 unk8;    /* +0x08: byte stamped between the two per-item calls */
+    u8 pad9[0x28 - 0x9];
+} Scratch_800349B0;
+
+extern s16 func_800334F0(s16 a0, s16 a1, void *out);
+extern void func_80033260(s16 a0, u8 a1, s16 a2, void *out);
+extern void func_80036230(s16 a0, u8 a1, s16 a2, void *out);
+
+/* STALL -- see docs/match-reports/func_800349B0.md. Compiled length ONE
+ * WORD SHORT (78/79); frame size also 8 bytes larger than retail's 0x70
+ * with this struct split (0x78) -- two related but distinct residues, both
+ * register/stack-allocation artifacts, not logic differences. */
+#if 0
+void func_800349B0(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 *p = (u8 *)rec + rec->unk12;
+    NoteList_800349B0 list;
+    Scratch_800349B0 scratch;
+    s32 i;
+
+    func_800334F0(rec->unk4C, p[0x2C], &list);
+    for (i = 0; i < list.unk0; i++) {
+        func_80033260(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        scratch.unk8 = a2;
+        func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
+    }
+    rec->unk88 = func_80035E80(a0, a1);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800349B0);
 
+/* Same shape as func_800349B0 -- see that function's own struct comment.
+ * Only the scratch byte's offset differs (0xB here vs 0x8 there). */
+typedef struct {
+    u8 pad0[0xB];
+    u8 unkB;    /* +0x0B: byte stamped between the two per-item calls */
+    u8 pad9[0x20 - 0xC];
+} Scratch_80034AEC;
+
+/* STALL -- see docs/match-reports/func_80034AEC.md (and func_800349B0.md,
+ * the identically-shaped sibling this one shares its whole residue class
+ * with). Compiled length ONE WORD SHORT (78/79); same register-rescue and
+ * stack-allocation residues as func_800349B0. */
+#if 0
+void func_80034AEC(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 *p = (u8 *)rec + rec->unk12;
+    NoteList_800349B0 list;
+    Scratch_80034AEC scratch;
+    s32 i;
+
+    func_800334F0(rec->unk4C, p[0x2C], &list);
+    for (i = 0; i < list.unk0; i++) {
+        func_80033260(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        scratch.unkB = a2;
+        func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
+    }
+    rec->unk88 = func_80035E80(a0, a1);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034AEC);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034C28);
@@ -246,8 +334,108 @@ void func_80034D90(s16 a0, s16 a1)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
+/* A per-(channel,slot) dispatch table of function pointers, row-major with
+ * a 0x40 (64)-byte stride (16 pointers per row) -- also referenced from
+ * code_179d8_c's func_8003221C. Not yet given a real element count; the
+ * outer dimension is left open. */
+typedef void (*Fn80090368)(s32 channel, u8 arg1);
+extern Fn80090368 D_80090368[][16];
+
+/* STALL -- see docs/match-reports/func_80034E5C.md. Compiled length ONE WORD
+ * SHORT (76/77), 54/77 raw word-match, first real content diff at word 55/56:
+ * GCC folds the "slot" array-index multiply into the sign-extension in one
+ * shift pair because the slot value is used exactly once, where retail
+ * materializes the sign-extended slot into its own register first and
+ * multiplies separately (the same two-instruction shape retail also uses for
+ * the "channel" index, which IS reused later and so never gets fused here
+ * either) -- a register/instruction-count residue, not a logic difference. */
+#if 0
+void func_80034E5C(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 kind;
+    Fn80090368 fn;
+
+    if (rec->unk27 == 1) {
+        if (rec->unk10 == 0) {
+            rec->unk28 = a2;
+            rec->unk10 = 1;
+            goto check;
+        }
+    }
+    kind = rec->unk16;
+    if (kind != 0x1E && kind != 0x14) {
+        rec->unk15 = a2;
+        rec->unk2A = rec->unk2A + 1;
+    }
+check:
+    if (rec->unk16 != 0x28) {
+        goto skip_call;
+    }
+    {
+        s16 ch = a0;
+        s16 sl = a1;
+        fn = D_80090368[ch][sl];
+        if (fn != NULL) {
+            fn(ch, a2 & 0xFF);
+        }
+    }
+skip_call:
+    rec->unk88 = func_80035E80(a0, a1);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034E5C);
 
+/* STALL -- see docs/match-reports/func_80034F90.md. Compiled length EXACT
+ * (82/82), 77/82 raw word-match, first real diff at word 40: a single
+ * independent instruction (`sltiu`) the compiler hoists into a branch
+ * delay slot one branch earlier than retail places it -- a pure
+ * instruction-scheduling residue, not a logic or CFG difference. */
+#if 0
+void func_80034F90(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 kind = a2;
+    s32 result;
+
+    switch (kind) {
+    case 0x14:
+        rec->unk16 = a2;
+        rec->unk27 = 1;
+        result = func_80035E80(a0, a1);
+        rec->unk88 = result;
+        rec->unkC = rec->unk4;
+        return;
+    case 0x1E:
+        if (rec->unk28 == 0) {
+            rec->unk16 = a2;
+            rec->unk10 = 0;
+            rec->unk88 = func_80035E80(a0, a1);
+            return;
+        }
+        if (rec->unk28 < 0x7F) {
+            rec->unk28--;
+            result = func_80035E80(a0, a1);
+            rec->unk88 = result;
+            if (rec->unk28 != 0) {
+                rec->unk4 = rec->unkC;
+            } else {
+                rec->unk10 = 0;
+            }
+            return;
+        }
+        func_80035E80(a0, a1);
+        rec->unk4 = rec->unkC;
+        rec->unk88 = 0;
+        return;
+    default:
+        rec->unk16 = a2;
+        rec->unk2A = rec->unk2A + 1;
+        rec->unk88 = func_80035E80(a0, a1);
+        return;
+    }
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034F90);
 
 void func_800350D8(s16 a0, s16 a1, u8 a2)
