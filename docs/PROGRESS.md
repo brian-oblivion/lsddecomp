@@ -6,6 +6,382 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-08 — round 24: a carve off two dead blocker verdicts, and a resolved blocker's third harvest
+
+**1010 -> 1029 matched (74.48% -> 75.88% of game code). Build green in main
+after every merge, ZERO merge conflicts** — `headercontention.py` reported NO
+CONTENTION before provisioning and again before both re-sends.
+
+Gate 0 green. §4a confirmed a single head. Gate 1's true fresh queue stood at
+**24**, every function 43-274 words with the cheap seam of every staffed unit
+exhausted, so Gate 2 fired.
+
+### The carve: two segments freed by a blocker that died three rounds ago
+
+Both had been left uncarved on censuses that measured `addiu_at`, RESOLVED in
+round 21. Re-censused per function with the four canonical screens, and the
+census reproduced round 23's table exactly:
+
+| new unit | funcs | CLEAN | note |
+| --- | --- | --- | --- |
+| `code_179d8_k` | 18 | **18** | was "17 of its 18 addiu-$at blocked" |
+| `code_179d8_l` | 12 | 9 | all 3 surviving nop_mflo_mfhi landed here |
+| `code_179d8_m` | 12 | **12** | no blocked function at all |
+
+`fresh` 24 -> 61; uncarved game code 133 -> 91. Two free matches (splat emitted
+the empty C bodies for `func_8002E2F8`/`func_8002E300` itself).
+
+`code_179d8_k` owns **THREE** jump tables, not the two its old comment claimed
+(`func_80034690` -> `jtbl_80010CF0`; `func_800357B0` -> `jtbl_80010ED8` AND
+`jtbl_80010F38`). The 0x14F0 rodata slot holds exactly those three and is
+referenced from nowhere else, checked per symbol, so it attached WHOLE — no
+split dance. The `mid_c` halves own no table and no rodata word in the image
+points into their range.
+
+**The carve hit both documented routine failures in one step**, worth recording
+because the fix order matters: splitting `mid_c` in two left
+`src/code_179d8_l.c` holding the 12 functions now owned by `_m`, whose `.s`
+files no longer existed under `code_179d8_l/` — splat does not rewrite an
+existing `.c`. Deleting the generated `.c` and re-extracting fixed it. The same
+step left the two stale monolithic `asm/*.s` behind (Gate 0's own scenario).
+
+### Stale blocker DIRECTIVES are systemic, and they are now swept mechanically
+
+Round 23 found four unit headers listing functions as `addiu_at`-blocked after
+round 21 resolved it. Round 24 found **six more**, which makes it a standing
+class rather than an anecdote: `code_179d8_f` (2 free functions),
+`code_179d8_g` (3), `class_3bb8c_l` (2), `code_179d8_d` (2, one of which the
+head then matched), `class_3bb8c_t` (1, the function the head then attempted),
+`code_179d8_b` (3, two already matched). Every one named functions the
+blocker's death had already freed, and every one was phrased as a DIRECTIVE
+("do NOT spend attempts on these").
+
+The sweep: cross-check every `func_XXXXXXXX` named on a `src/*.c` comment line
+framed as blocked against `nearmiss.py`'s ASM-derived verdict and against the
+set of functions already defined as C.
+
+**It must be read, not acted on — and it under-reports in one direction while
+over-reporting in the other.** Line-scoped, it returned 9 hits of which 8 were
+the corrected comments themselves (they contain "BLOCKED" while saying "NOT
+BLOCKED"). Widened to a 3-line window it returned 16, of which 14 were. And it
+MISSED two genuine ones whose blocker framing sat on a different line from the
+function name — including `class_3bb8c_t`'s, which named the very function the
+head went on to attempt.
+
+The same disease was in the splat yaml, where it hid four more clean functions:
+`code_179d8_mid` is **3 of 3 CLEAN** against "all three are addiu-$at blocked,
+so there is nothing to staff here", and `code_179d8_mid_d` is clean too. Both
+are carve candidates now.
+
+### The resolved blocker's third harvest, and why it kept hiding
+
+Round 22 built the `REOPENED -- ASSIGNABLE` marker and swept for reports citing
+`addiu_at`. Round 23 found that sweep had missed `func_8005CBC8` because its
+report "does not look like a stub". **Round 24 found four more, one step
+further along the same axis**, via Gate 1b's contradiction sweep:
+
+| function | unit | result |
+| --- | --- | --- |
+| `Entity__GetEventVideo` | Entity | **MATCHED 9/9**, first attempt |
+| `Entity__GetUnlockEffect` | Entity | **MATCHED 14/14**, first attempt |
+| `Entity__GetLinkStage` | Entity | **MATCHED 15/15**, first attempt |
+| `func_80059814` | DreamSys | 8/53 -> **14/53**, residue 1 retired |
+| `func_8005C508` | code_4cd08 | **MATCHED 56/56** (delta) — no source change at all |
+
+All five matched or improved with C their own reports had already derived.
+`Entity__GetEventVideo` is **9 words** — the smallest function in the queue.
+
+**They hid because their reports were TOO well argued.** All four Entity/
+DreamSys ones open with a **HEAD ADJUDICATION** box certifying that the head
+reproduced the diagnosis independently from scratch and wrote it up
+project-wide with a 502-of-502 corpus census. Nothing reads less like stale
+ground, and every word of it was true. The adjudication verified the
+MECHANISM, which never changed; what expired was the premise that the
+mechanism was unfixable — a premise the reports state explicitly ("maspsx
+exposes no `--addiu-at` flag"), and which round 21 falsified by adding exactly
+that flag.
+
+**So: a blocker's death invalidates the strongest reports as thoroughly as the
+weakest, and without touching a word of what they say.** And the detector
+under-reports: the sweep found `Entity__GetEventVideo` but MISSED both
+siblings, whose titles do not match its grep. What found them was noticing the
+shared preamble. **The FAMILY is the unit of staleness, not the report** —
+blocked reports are written in families, one runner, one sitting, one cause.
+
+The other direction was handled too: `func_800598E8` defers its whole analysis
+to `func_80059814`'s, so its cause is equally dead — but it was deliberately
+NOT marked `REOPENED`, because the sibling had just shown the blocker was
+worth 6 words of ~45. A report can have a dead CAUSE and a live CONCLUSION,
+and an honest annotation says which half it corrects.
+
+### The head was wrong about `nop_mflo_mfhi`, and the pipeline caught it
+
+CLAUDE.md defined the blocker as an `mflo`/`mfhi` followed within two
+instructions by a `mult`/`div`, *"with no `nop` between them in retail's own
+bytes"*. Reading that literally, the head "refined" the canonical grep with a
+nop test and concluded two flagged functions were assignable — one of them
+`func_8005D864`, which round 23 had just carefully re-adjudicated ONTO this
+blocker.
+
+One reproducer settled it: `int q = a / b; return q * c;` compiles to
+`mflo` / `nop` / `nop` / `mult`. **The pipeline inserts TWO nops**, so retail's
+single nop still leaves the sequence one word short. The refinement was
+discarded, all 12 flagged functions are genuinely blocked, and round 23's
+adjudication stands. Gate 1's wording is corrected; `DECOMPILATION_LEARNINGS`
+had it right all along and the two documents had silently disagreed.
+
+**This screen has now been broken in both directions available to it** —
+inverted window (rounds 15, 16) and false qualifier (round 24) — by four
+different heads, every one of whom had read the warning not to re-implement
+it. Treat "improve the mflo screen" as a smell, not a task. And prose in a doc
+is not a specification of a toolchain behaviour; the reproducer is.
+
+### Toolchain: the permuter had DIVERGED from the pinned build
+
+Runner delta found two bugs in `tools/setup-permuter.sh` and correctly fixed
+them only in its own worktree, since `tools/` is shared. Both are fidelity
+bugs — the script's job is to replicate the pinned pipeline:
+
+1. The generated `compile.sh` omitted **`--addiu-at`**, which the Makefile has
+   passed since round 21. The permuter was scoring candidates against a
+   pipeline that FOLDS where retail unfolds.
+2. `sed -e '1,4d'` deleted the `.s` prelude by POSITION. For an ordinary
+   function lines 1-4 are exactly the two `.set`s, a blank, and `nonmatching`.
+   But a function owning embedded rodata has `.section .rodata` on line 4, so
+   the delete silently assembled its jump table into `.text`.
+
+Verified rather than reasoned, on `func_8005CBC8`: old `.text` = 480 bytes with
+no `.rodata` section; fixed, `.text` = 400 bytes = exactly 100 words = retail's
+own length.
+
+**Blast radius on existing verdicts is effectively ZERO, and that is measured.**
+22 live functions carry a *permuter-exhausted* verdict — the verdict that
+removes a function permanently. Of those, exactly one (`func_8005CBC8`)
+contains the `addiu_at` construct, and exactly one owns embedded rodata: the
+same one, whose verdict is from this round with delta's fixed copy. So no
+existing verdict needs re-running. The Makefile was not touched.
+
+### A figure carried forward without re-derivation, for the third round running
+
+Delta rebuilt round 23's inherited "99/100" for `func_8005CBC8`, as its
+assignment required, and found the preserved body measured **108/100 — eight
+words LONG**. Round 23 asserted the number without deriving it from a build.
+The conclusion survived: retail's jump table points indices 6 AND 7 at the
+same handler, so the source needs one merged `case 6: case 7:` arm with the
+index arithmetic derived rather than two arms with hardcoded constants. With
+that fixed it is a genuine, rebuilt 99/100.
+
+**This is the first time the unverified figure was the HEAD's own**, propagated
+through a PROGRESS entry into the next round's assignment as fact. The standing
+rule — rebuild any figure before putting it in an assignment — had been read as
+a rule about reading reports. It is also a rule about writing summaries.
+
+### Results
+
+| runner | unit | matched | words | stalls | note |
+| --- | --- | --- | --- | --- | --- |
+| alpha | `code_179d8_k` | 3 | 93 | 5 | all five at EXACT compiled length |
+| bravo | `code_179d8_m` | 6 | 426 | 0 | 6 for 6, first pass; re-sent |
+| charlie | `code_179d8_l` | 2 | 111 | 3 | + a 3-for-3 unsolved residue class |
+| delta | `code_4cd08` | 1 | 56 | 1 | + the two permuter-script bugs |
+| echo | `code_55dd4` | 0 | 0 | 5 | all five re-verified, figures rebuilt |
+| **head** | 6 units | **5** | **132** | 2 | incl. one overturned runner stall |
+
+### The head's highest-yield intervention was overturning a SETTLED-class stall
+
+Alpha filed `func_80034D90` (49/51, exact length) under the project's
+**SETTLED** commutative-operand-order canonicalization class. The screen
+matched exactly, the citation was accurate, and the learnings doc does say not
+to spend attempts reordering commutative operands. Alpha even tested a reshape
+(`u8 *ptr = rec->unk12 + (u8*)rec;`), watched it regress to 34/51, and stopped
+— correct by the guidance as written.
+
+**It closed at 51/51 by REGROUPING, not reordering:**
+
+```c
+((u8 *)rec)[rec->unk12 + 0x2C] = ...    /* rec + (off + 0x2C)  -> 49/51 */
+*((u8 *)rec + rec->unk12 + 0x2C) = ...  /* (rec + off) + 0x2C  -> 51/51 */
+```
+
+That is round 23's own `&arr[i + j]` versus `arr + i + j` lever reaching the
+very `addu` the class calls unreachable. The class needed a SCOPE BOUNDARY,
+not another attempt:
+
+- **Symmetric addends: the class holds.** Round 20's decisive datum stands —
+  both C operand ORDERS gave the same wrong output.
+- **One addend is a base pointer and the expression can be re-associated: it
+  does not hold.** Grouping decides which value becomes `rs`, and grouping is
+  not order — which is exactly why alpha's reversed-order reshape regressed.
+
+**The boundary then predicted the sibling, which is what makes it a boundary
+and not an anecdote.** `func_80035E80` — same unit, same round, same runner,
+same class citation — has `addu a1,v0,v1` over two COMPUTED values with
+nothing to re-associate, and stays a stall. Charlie independently found a
+SECOND source-reachable axis (narrowing an addend to `u8` flips which operand
+becomes `rs`, closing `func_8002DF7C` at 47/47); it is genuinely distinct,
+because alpha's addend was already `u8`.
+
+Cheap tell now written down: **when a function disagrees with its own
+already-matched siblings' idiom, try the siblings' idiom before accepting a
+class verdict.** Three of `code_179d8_k`'s matches use `(u8 *)rec +
+rec->unk12` base-first; the stall used the subscript form.
+
+### Two levers BOUNDED by measured negatives
+
+- **The bare `__asm__("")` barrier.** Alpha's four scheduling-class reports
+  mention it zero times, and one of them explicitly says "no source-level
+  construct is known... not attempted". There is one, and the project permits
+  it for order-only residues; echo closed a two-word deferral with it this
+  same round. Tried by the head on `func_80034138`: **byte-identical output,
+  still 66/69**, load pair still swapped, delay slot still a `nop`. So the
+  lever closes a case where a value's computation is DEFERRED past where
+  retail computes it; it does NOT reorder an adjacent load pair and does NOT
+  install a dead computation into a delay slot. Worth bounding precisely,
+  because echo's success could otherwise read as general.
+- **Round 21's pointer-elimination lever** (echo): regressed
+  `func_80065E1C` catastrophically to 2/68 with 60KB of drift. It requires the
+  loop-carried pointer have no role beyond pairing with its scalar
+  counterpart, and fails when the same buffer is re-read later through a
+  different index expression.
+
+### Runner-process findings
+
+**`echo` returned zero matches and it was not a wasted pass.** Five reports
+re-verified from scratch, every figure rebuilt and every one agreeing with the
+prior number, all five titles converted to the three-figure format, two new
+axes tried, and the first permuter run ever on `func_800662BC`. Its
+drift-rate negative is worth keeping: round 19 measured roughly one inherited
+body in six carrying a false "clean/drift-free" claim, and echo found **zero
+drift in five**. One head adjudication on top: `func_80065A5C` (30/33, pure
+3-word prologue store permutation, 13 exhausted hand attempts, loop body
+byte-identical throughout) is a textbook permuter target that has never had a
+permuter run — next round runs it there first.
+
+**`charlie` flagged a standing unsolved class, 3-for-3 in one unit:**
+"redundant-raw-copy elision" — cc1 proves a preserve-the-raw-parameter
+register copy is bit-identical to a value computed elsewhere and elides it,
+where retail keeps a genuinely separate register. A scheduling barrier fixes
+it in small isolated reductions and did NOT transfer to any of the three real
+functions. That is a dedicated-investigation candidate, not more per-function
+attempts.
+
+**2c recurred, and a work order fixed it only once.** Round 18 concluded that
+an explicit numbered work order fixes a runner stopping to wait on a bounded
+search. Round 24: two runners ended turns that way with zero commits, an order
+fixed both, and delta then did it a SECOND time on its re-send despite having
+received one. So the work order is a repair, not an inoculation — budget for
+re-sending it, and check `git status --porcelain` per runner rather than
+trusting that a runner which committed once keeps committing.
+
+### Second passes: 2 of 5 runners re-sent, and they returned corrections rather than matches
+
+Round 19 measured re-sends as the head's highest-yield structural move (9 of
+17 matches). Round 24 re-sent the two runners whose first pass finished, into
+NO-CONTENTION ground, and got **zero further matches** — but three durable
+corrections and one salvage. That is worth recording as the other face of the
+same lever: a re-send buys whatever the ground has left, and bravo's and
+delta's remaining ground was 138-387 words apiece, not a cheap seam.
+
+- **bravo** (`code_179d8_m`, own unit): two stalls at 138w and 228w, plus
+  **a correction to one of its own first-pass reports** — `func_8002F3E8`'s
+  second parameter is `s16`, not `s32`, because the MIPS ABI widening
+  instructions that appeared to prove it wider do not distinguish the two.
+  It re-verified `func_8002F610` still matches (60/60) afterwards. Also
+  identified both of `func_8002EA44`'s magic divisors as **16129 = 127²** by
+  batching thousands of candidate divisors through the pinned toolchain in
+  ONE pass — a technique worth reusing whenever a magic constant needs
+  naming.
+- **delta** (`class_3bb8c`, unowned): one stall at correct length 63/63,
+  58/63, with real header work behind it — a `void` -> `s32` return-type
+  correction, an additive `Obj866E8` pad split, and two proven-size tables.
+  Its permuter run captured the exit code this time (39,940 iterations,
+  **124**, self-fired), and its one useful lead was a `do {} while (0);`
+  scheduling barrier — ordinary C, not asm — which closed one register
+  residue outright.
+
+**A shared-header retype needed the round-7 check, and passed it.** Delta
+retyped `func_8004BA40` from `void` to `s32` in a header ELEVEN units include.
+The head checked rather than merged: the only caller `func_8004B700` is still
+`INCLUDE_ASM` so it contributes retail's own bytes, no other unit declares or
+defines the symbol, and the two new data symbols exist nowhere else. Safe. But
+it leaves a **forward hazard now written into the report**: `func_8004B700` is
+a live 125/140 stall in the same unit and it DISCARDS the return value, which
+is exactly round 7's condition — a discarded call's declared return type
+controls GCC's tail-merge grouping. Whoever attempts it needs that fact, or it
+surfaces as an unexplained few-word residue.
+
+### A struct-layout correction WITHDRAWN, on a discriminator this round had just retired
+
+Bravo's `func_8002EA44` report filed an "important correction" that
+`D_8008D7F0`/`D_8008D7F2` are two independent 0x10-stride arrays rather than
+two fields of one record — contradicting `code_179d8_j.c`'s `Rec16D7F0` model
+and round 23's adjudication of the same two symbols.
+
+Its observation was accurate and its inference was not. The stated
+discriminator — "a separate `%hi`/`%lo` pair per symbol rather than a shared
+base with a `+2` fold" — is precisely the one established as NON-CONCLUSIVE
+earlier the same round by `func_8002BC40`. Re-measured by the head: both
+symbols get a full `lui`/`addiu` pair, each indexed by the same `a0 * 16`
+offset. That is the non-conclusive case, so it cannot overturn anything, and
+round 23's evidence (an `addiu $t2, $a3, 0x2` folding the second base off the
+first's materialised address, which cc1 can only emit for one object) is
+conclusive. **Conclusive evidence in one function beats non-conclusive
+evidence in another about the same symbols.** The one-record model stands.
+
+Two things this says about process, not about the symbols:
+
+- Bravo merged main before this pass and therefore HAD the non-conclusiveness
+  rule. So this is a runner applying a superseded discriminator, not one
+  lacking a rule — which means promoting a rule does not retire its
+  predecessor in anyone's head. Say in a re-send which rule a finding
+  SUPERSEDES, not only what the new rule is.
+- **Struct-layout claims are corpus-wide, so this is the class that most needs
+  the head to check rather than merge.** It cost one grep and one look at the
+  `.s`.
+
+### Next round
+
+**Runners, then a carve — not a carve first.** `fresh` closed at **37**, above
+the ~20 a five-runner round needs, and it is much better ground than round
+24 inherited: `code_179d8_k` alone has 15 fresh blocker-clean functions
+including several under 90 words, `code_179d8_m` has 4 (138-387w) and
+`code_179d8_l` has 7.
+
+Priorities, cheapest and best-posed first:
+
+1. **`func_80065A5C` (`code_55dd4`) on the permuter, before any hand
+   reshape.** 30/33, exact length, loop body byte-identical, thirteen hand
+   attempts all pinned at exactly 30/33, and it has NEVER had a permuter run.
+   Do not add a second `__asm__("")` — echo measured that at 7/33.
+2. **`func_8005CBC8` (`code_4cd08`)** stays the closest open function in the
+   corpus at a now-REBUILT 99/100, with `setup-permuter.sh` fixed under it.
+3. **`func_80058C58` (`DreamSys`, 79w) is pre-analysed and nearly free.** A
+   flat 13-arm jump-table switch of mostly single stores; its rodata slot is
+   already attached (`- [0x1F88, .rodata, DreamSys]`); the arm-to-case mapping
+   is decoded and the case order is confirmed by round 23's fall-through
+   lever. Its one cost is an ADDITIVE extension of `DreamSysBaseMethods`
+   (which stops at slot 0xE0) to slot0x184/slot0x188 — a shared-header struct
+   edit, so run the struct-edit check. Deliberately left with NO report file
+   so it stays in `fresh`; the analysis is in this entry.
+4. **`code_179d8_mid` (3 of 3 clean, 161/180/282w) and `code_179d8_mid_d`
+   (1 clean, 131w)** are the carve candidates when one is next needed — four
+   clean functions that were invisible behind stale yaml comments until this
+   round.
+5. **`charlie`'s "redundant-raw-copy elision" is the best-posed open
+   investigation**: 3-for-3 in one unit, a barrier fixes it in isolated
+   reductions and transfers to none of the three real functions. A dedicated
+   look beats more per-function attempts.
+
+Do NOT carve `class_3bb8c_h` (13 of 17 BIOS trampolines, the round-17 trap)
+and leave `code_179d8` / `class_3bb8c_n` (gp_rel-dense) alone.
+
+**Operator escalations, unchanged and both still open:** `gp_rel` (the larger)
+and `nop_mflo_mfhi`. The latter's remedy — a maspsx flag decoupling it from
+the aspsx version, exactly what round 21 did for `addiu_at` — remains
+untested and is not a head decision.
+
+---
+
 ## 2026-09-07 — round 23: 20 matches, three REOPENED functions closed, and a 99/100 near-miss recovered from a dead blocker
 
 **990 -> 1010 matched (73.01% -> 74.48% of game code). Build green in main

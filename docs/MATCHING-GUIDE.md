@@ -184,6 +184,27 @@ three are live rather than transcribed:
   shows many attempts along one axis, that is a reason to look for the axis
   nobody varied.
 
+  **Round 24 produced the strongest instance of this yet, and the shape is
+  worth carrying: the report was not sloppy, it was AUTHORITATIVE and stale.**
+  Three `Entity` getters (9, 14 and 15 words — the cheapest functions in the
+  corpus) each opened with a HEAD ADJUDICATION certifying that the head had
+  reproduced the diagnosis independently from scratch and written it up
+  project-wide with a 502-of-502 corpus census. All three matched on the first
+  attempt, with the C their own reports had already derived. Nothing in the
+  adjudication was wrong — it verified the MECHANISM, which never changed.
+  What expired was the premise that the mechanism was unfixable, stated
+  explicitly in each report as "maspsx exposes no `--addiu-at` flag", which
+  round 21 falsified by adding exactly that flag.
+
+  So: **a report's confidence is not evidence about its currency, and a
+  resolved blocker invalidates the best-argued reports as thoroughly as the
+  worst.** Two practical habits follow. Rank from `python3 tools/nearmiss.py`,
+  which screens from the ASM, and treat any disagreement between it and a
+  report's verdict as the report being the wrong half. And when one stale
+  report turns up, read every report that shares its preamble, its unit, or
+  its adjudicating round — these are written in families, and round 24's
+  detector found one of those three siblings and missed the other two.
+
   **Round 16 hit this twice in one round, which makes it a standing check
   rather than an anecdote: a long attempt list is not a broad one.**
 
