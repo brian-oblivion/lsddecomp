@@ -387,6 +387,48 @@ Retail's `sltiu` against a small constant means the counter is unsigned;
 in any other part of the output. This is the signedness sibling of the
 round-23 finding that a local's declared WIDTH is a codegen decision.
 
+### A symbol accessed at TWO WIDTHS by one function needs a pointer CAST, not a scalar truncation (round 24, bravo)
+
+Where one function writes a symbol with `sh` and reads the same address back
+with `lbu`, the reproducing source is a **plain pointer-cast dereference** --
+`*(u8 *)&sym` -- and NOT a scalar truncation cast of the loaded value. The
+truncation form widens back to a full-width load plus a mask, which costs
+words.
+
+Three related findings from the same runner, all from `code_179d8_m`:
+
+- **`volatile` on a POINTER TYPE and `volatile` on the OBJECT are different
+  levers with OPPOSITE effects.** A volatile-qualified pointer cast defeats
+  the compiler's address fold and ADDS instructions. A volatile OBJECT read
+  through a plain non-volatile pointer or cast still folds fine, and is what
+  stops this compiler proving a narrow-range store-then-reload redundant. The
+  existing caution about `volatile`-as-a-lever does not distinguish these, and
+  reaching for the wrong one looks like the lever failing.
+- **A recomputed-vs-reused array offset -- same index, different narrowing --
+  is diagnostic of two different WIDTH VIEWS of one variable at two source
+  sites.** Reproduced by casting the index at only the SECOND occurrence.
+  Complements round 23's "a local's declared WIDTH is a codegen decision":
+  the width can differ per USE, not just per declaration.
+- **When a cross-unit callee already has a documented prototype -- even a
+  guessed one -- type the CALLER's parameters so that prototype's implicit
+  conversions emit the exact per-call narrowing seen in the disassembly.** The
+  narrowing instructions belong to the call, so they are evidence about the
+  caller's declared parameter types, not about its body.
+
+### A block of stores far ahead of a branch may be entirely UNCONDITIONAL (round 24, bravo)
+
+A run of stores that precedes a branch by many instructions reads as though
+the branch gates it. Verify there is no branch BETWEEN the stores and the
+point you assume gates them, by reading the `.s` file's own label and branch
+structure -- not an earlier paraphrase of it, and not the shape m2c produced.
+
+Related, and a genuine addition to the register-identity toolkit: **a pure
+register-identity swap between two INDEPENDENT accumulator pairs (two
+OR/AND-NOT sequences) can be fixed by INTERLEAVING the writes** -- both ORs
+before either AND-NOT -- rather than by declaration-order or block-order
+reshaping, which is where the existing levers point. Worth trying before
+filing a register-identity stall on a function with two parallel accumulators.
+
 ### Two globals a few bytes apart with a COMMON stride are one array; separate `lui`/`addiu` pairs prove nothing (round 24)
 
 `func_8002BC40` (`code_179d8_d`) reads `D_8008B9F4` and `D_8008B9FC`, each
@@ -871,6 +913,34 @@ with the surrounding state named ("inert at 34/91, before the `D_8006D8F8`
 fix") than as a bare "tried, no effect".
 
 ### The permuter can produce a SEMANTICALLY WRONG candidate that scores 176/177 (round 20)
+
+**ROUND 24: two more instances, found INDEPENDENTLY by two runners in one
+round, and both were caught by HAND-CHECKING rather than by any tool.** The
+class below is not rare and is not specific to call hoisting.
+
+| runner | function | candidate | what was actually wrong |
+| --- | --- | --- | --- |
+| delta | `func_8005CBC8` | permuter score 330, best of 34,180 iterations | reordered one statement; translated to real C it **regressed to 98/100** |
+| delta | `func_8005CBC8` | permuter score 202, best of 43,084 iterations | a `volatile` dead-store trick; compiled and objdumped for real it **grew the stack frame** (`-0x20` vs retail's `-0x18`) |
+| echo | `func_800662BC` | permuter lead 625 -> 280, best of 41,561 iterations | **changed the loop's trip count** -- a real semantic bug, not a scheduling artifact |
+
+Echo's is the same shape as round 20's original: a control-flow change whose
+static word-count cost is near zero. **The generalisation both runners reached
+separately: a permuter score improvement is not evidence of a usable candidate
+until the candidate's control flow is traced by hand.** A candidate can compile
+with zero errors, score better, and silently change how many times a loop body
+executes.
+
+Delta's second instance adds an axis the round-20 entry does not cover: the
+candidate was not wrong about semantics at all, it was wrong about the
+**frame**. So the check is not only "does the control flow still match" but
+"does the prologue still match" -- compile the candidate and objdump it, do not
+score it and stop.
+
+And the practical rule both rounds now support: **translate every candidate to
+idiomatic C and re-measure with `funcdiff.py` before recording anything.** Two
+of the three above scored better and measured worse.
+
 
 The existing caution — *a permuter zero is a LEAD, not an answer* — implicitly
 puts the danger at zero. **The danger is not at zero.** Runner delta, working
