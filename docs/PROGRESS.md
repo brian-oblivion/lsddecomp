@@ -6,6 +6,200 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-08 — round 25: 7 matches, and a new source-shape lever that closed four of them
+
+**1029 -> 1036 matched in `main` (75.88% -> 76.40% of game code); 133532 code
+bytes matched (57.43% of game bytes). Build green in `main` after all seven
+merges, ZERO merge conflicts.** `headercontention.py` reported **NO
+CONTENTION** before provisioning: the five assigned units shared no project
+header at all (four include only `common.h`; `code_55dd4.h` and `DreamSys.h`
+have one other reader each, neither staffed).
+
+Gates 0-2 passed clean. Gate 0's re-extract cleared 17 stale
+`asm/nonmatchings` files. Gate 1 measured **39 blocker-clean fresh/reopened**
+functions, so no carve and no whole-round permuter. Five runners on cheap
+models; the head worked its own queue in parallel.
+
+### The round's result is a LEVER, not a count
+
+**`func_8005CBC8` (`code_4cd08`) closed at 100/100** after three rounds pinned
+at 99/100, thirteen hand attempts and ~77k permuter iterations. The residue
+was **basic-block ORDER**, and every one of those attempts had been searching
+the expression axis.
+
+**GCC 2.6.3 gives the if/else fallthrough to whichever candidate is LAST in
+source order.** So if retail's *jumping* block is the one your source puts
+last, no expression reshape and no `__asm__("")` will ever reach it — the fix
+is textual placement, an explicit `goto` over the block you want to fall
+through. Full entry in `DECOMPILATION_LEARNINGS.md` ("An arm that must JUMP
+has to be written NOT-LAST").
+
+It was broadcast mid-round to all five runners, twice, and that is where the
+round's yield came from — **four of the seven matches are attributable to
+it**, across three different units:
+
+| function | unit | who | note |
+| --- | --- | --- | --- |
+| `func_8005CBC8` 100/100 | `code_4cd08` | head | the lever's discovery |
+| `func_8005DBF0` 74/74 | `Entity` | head | 2nd shape: duplicated assignment |
+| `func_80036230` 115/115 | `code_179d8_f` | delta | 3rd variant: which side owns the `if` body |
+| `func_80035E80` 47/47 | `code_179d8_k` | alpha | duplicated-write shape, found independently |
+
+The other three matches are `func_80033260` (144/144, bravo),
+`func_80058C58` (79/79, echo) and `GenerateInitialSpawn` (107/107, echo).
+
+**The lever also produced four large NON-closing gains, which are not matches
+and are counted as stalls:** `func_8002AEE0` **61 -> 153/174** (charlie, found
+INDEPENDENTLY before the broadcast arrived — the strongest single piece of
+evidence for the mechanism), `func_80059814` **14/53 -> 49/53 and exact
+length**, `func_800598E8`'s **whole CFG now matching retail**, and
+`func_80034F90` down to a single delay-slot residue.
+
+*(This entry's first draft said "11 matches ... five of the eleven". Both
+figures were wrong: `progress.py` moved 1029 -> 1036, and the fifth
+"lever match" was `func_8002AEE0`, a 92-word GAIN on a function that is still
+a stall. Corrected before commit by counting the merge commits, which is what
+this document's own protocol says to do.)*
+
+### THE LEVER IS NOT STRICTLY DOMINANT — three runners corrected the broadcast
+
+This is the more valuable half, because the head's broadcast described one
+shape and one fix, and **runners who tested it rather than adopting it found
+its edges**:
+
+- **echo made `func_80059BE0` WORSE** by applying it to an entry guard that
+  already had its default living in the guard's own delay slot — a different,
+  already-correct idiom. Check which shape the disassembly ALREADY shows.
+- **charlie produced a twice-reproduced counter-example to the naive fix.**
+  "Retail keeps two materializations, so give the duplicate its own C
+  variable" regressed on `func_8002B4D4` in TWO separate rounds (to ~17/91,
+  and 60 -> 50/91), because that function's block order was already correct.
+  A second named variable changes allocation for the WHOLE function. **That
+  lever helps only while block order is wrong; after that it is harmful.**
+- **Four different placement fixes closed five functions**, so the
+  transferable content is the QUESTION (which block does retail place where,
+  and which candidate did my source make last), not any one fix. Delta said
+  it directly: per-instance discovery, not pattern-matching from a prior fix.
+
+### charlie decomposed the round's assigned investigation
+
+"A bare `__asm__("")` fixes the redundant-raw-copy elision in an isolated
+reduction and transfers to none of the real functions" is **not one
+mechanism**. In `code_179d8_g` it is three, and the block-order hypothesis
+explains exactly one: (1) block-order/shared-join fallthrough (confirmed,
+`func_8002AEE0`); (2) pure intra-block scheduling with **no second block at
+all** — confirmed via the permuter's `--debug` breakdown showing zero
+insertions/deletions/register-differences — where a barrier is the right
+instrument and no working position exists; (3) dead-code elimination removing
+the redundant check before scheduling ever runs. Diagnose from the `.s`'s
+block/label structure before reaching for a barrier.
+
+### Other findings worth carrying
+
+- **A dense `switch` must reproduce retail's jump-table WIDTH, not just its
+  arms** (echo, `func_80058C58` 79/79). Thirteen real arms give a 33-entry
+  table against retail's 48; a no-op high `case 47:` widened it and closed the
+  function. Diagnostic: check `funcdiff`'s first-diff offset against the
+  rodata table base before suspecting the body.
+- **An `mflo`/`mfhi` residue is a COUNTER-indication for the block-order
+  lever** (head, `func_8004CFB8`, variant 7 came out 5 words too long). cc1
+  expands a `mult`/`mflo` pair together during RTL expansion, before any
+  layout decision, so placement cannot move them apart.
+- **`progress.py` gained `DERIVATION ONLY -- ASSIGNABLE`.** Bravo did the
+  right thing on the 274-word `func_80032D34` — derived the algorithm,
+  declined to burn attempts, wrote it up, and stated in its own prose
+  "deliberately NOT filed as a STALL" — and the tool counted it as a stall
+  anyway, deleting blocker-clean ground from every future round. Same failure
+  `REOPENED -- ASSIGNABLE` was added for in round 22, from a direction that
+  marker cannot express: there is no stall verdict to invalidate because there
+  was never an attempt. Scoped explicitly to NEVER cover a body that was built
+  and scored.
+- **alpha found a 3-instance shared residue class** in `code_179d8_k`:
+  `func_800349B0`, `func_80034AEC` and `func_80034C28` are each ONE WORD SHORT
+  because retail computes a state-block pointer into one register and
+  explicitly rescues it into another before repurposing the first as a loop
+  counter, where this build's allocator picks the final register directly. 3
+  of 6, not all 6 — the other two residues are unrelated.
+- **Four more Sony SDK functions identified inside game-code segments**
+  (`func_80033260` = `SsUtGetVagAtr`, `func_80032D34` = `SsVabOpen`-family,
+  `func_8002B640` = `CdSearchFile`, `func_8002B94C` = `CD_newmedia`). This is
+  NOT new — `SsUtGetVabHdr` in `code_179d8_i` set the precedent in an earlier
+  round — but the count is now 5+, which bears on the game-code denominator.
+  Bravo correctly did NOT rename `func_80033260`, because five other units
+  carry a literal `jal func_80033260`; that constraint did not apply to
+  `SsUtGetVabHdr`.
+
+### Process notes
+
+- **Delta stopped to wait on a bounded search three times**, the third after a
+  numbered work order. The previous head warned "the work order is a repair,
+  not an inoculation" and that is confirmed. What ended it was reassigning
+  delta to cold ground in an unowned unit, where it immediately matched
+  `func_80036230`. **Consider re-assignment, not another correction, as the
+  second response to a waiting runner.**
+- **The head asserted a process state it had not measured.** I told delta its
+  `timeout 900` search "has reached its bound"; delta checked `ps`, found ~11
+  minutes elapsed, blocked on the process directly rather than trusting the
+  premise, and was right. Runners verifying the head is working as intended.
+- **Alpha reached ~50 minutes with three reports untracked and zero commits** —
+  round 18's failure mode. A direct commit-now order fixed it immediately and
+  alpha then committed steadily. Poll `git status --porcelain` per worktree
+  early, not at teardown.
+- **The head declined to ship a mechanical screen for the new lever.** A grep
+  for the tell (bare `j` to a nearby join, non-`nop` delay slot) flags **51**
+  of the queue's functions; one was tested and the hit sat in that function's
+  already-byte-exact half. Precision 1-tried/0-genuine is not enough to rank a
+  queue with, and this project has paid four times for screens whose scope was
+  reasoned instead of measured. Not in `tools/`, deliberately.
+
+### Next round
+
+**Carve first — `fresh` closed at 23 and, more importantly, the CHEAP SEAM IS
+GONE.** The round started with five blocker-clean functions under 90 words;
+the smallest now is 81w and most of the queue is 130-390w. A count of 23 reads
+healthier than the ground actually is.
+
+**And the uncarved reserve is nearly exhausted of clean ground. Measured this
+round, per-function, over every uncarved game segment:**
+
+```
+workable clean (>4w):   19
+trivial clean (<=4w):    3   (splat stubs)
+gp_rel blocked:         55
+nop_mflo_mfhi:           1
+BIOS trampolines:       13   (all in class_3bb8c_h -- the round-17 trap)
+```
+
+So **`gp_rel` now blocks 137 functions: 82 in the live queue plus 55
+uncarved.** That is the dominant obstruction in the project and it is the open
+operator escalation (`docs/research/gp-relative-blocker.md`; the `-G`
+experiment was authorised and REJECTED). `nop_mflo_mfhi` is 13 total (12
+queued + 1 uncarved), and its remedy — a maspsx flag decoupling it from the
+aspsx version, exactly what round 21 did for `addiu_at` — **remains untested
+and is not a head decision.**
+
+Carve candidates, derived this round rather than transcribed:
+
+1. **`code_179d8` front window `[0..19]`: 7 of 20 clean** (of 43 functions and
+   9 clean total). The cheap ones are `func_80027228` (19w),
+   `new_class_6d4e8` (20w), `func_80027274` (21w), `func_800282AC` (32w),
+   `func_80027FFC` (53w) — plus three trivial stubs. This is the only
+   remaining cheap seam in the executable.
+2. **`code_179d8_mid`: 3 of 3 clean** but big (161/180/282w). One unit.
+3. **`class_3bb8c_n`: 3 of 23 clean** (`func_80054B1C` 13w, `func_80055874`
+   31w, `func_80055258` 110w) — a poor carve, listed so nobody re-measures it.
+4. **Do NOT carve `class_3bb8c_h`** — 13 of 17 are BIOS trampolines, the
+   round-17 trap, and it screens as the cleanest ground left while being the
+   least matchable.
+
+Then runners. Best-posed open targets, all with fresh evidence:
+`func_80059814` (49/53, one register-identity residue), `func_800598E8` (CFG
+exact, 2 words), alpha's 3-instance register-rescue cluster in
+`code_179d8_k`, and `func_80036528` (227/240, frame-exact, delta's two new
+codegen levers under it).
+
+---
+
 ## 2026-09-08 — round 24: a carve off two dead blocker verdicts, and a resolved blocker's third harvest
 
 **1010 -> 1029 matched (74.48% -> 75.88% of game code). Build green in main

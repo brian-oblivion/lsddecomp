@@ -115,7 +115,11 @@ into one of these. This list is short because this project is young — add to i
   addressing mode comes from the toolchain's `-G` value. Check for it before
   spending attempts: `grep -l 'gp_rel' asm/nonmatchings/<unit>/*.s`. A hit
   means STOP and file the report; see `docs/research/gp-relative-blocker.md`.
-  Nine functions across two units burned attempts on this in one round.
+  It is by far the largest obstruction in the project — derive the current
+  figure with `python3 tools/nearmiss.py | head -2` rather than trusting any
+  number written here. (This line used to say "nine functions across two
+  units", which was one round's snapshot and understated it by more than an
+  order of magnitude by round 25.)
 
 - **Branch TARGETS disagree, not just delay slots.** This one is a
   discriminator, not a residue, and it outranks everything else in this list.
@@ -126,10 +130,53 @@ into one of these. This list is short because this project is young — add to i
   2026-08-30-a this turned a confidently-filed "unreachable compiler-internal"
   stall at 16/42 into 41/42 with a one-line source change, and a second runner
   credited it with closing a function outright (10/69 -> 69/69).
-- **One instruction short, everything after it shifted.** Suspect the
-  `addiu_at` blocker before suspecting your C. Check with
-  `grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s`;
-  a hit means STOP and file the stub (docs/research/addiu-at-blocker.md).
+- **One instruction short, everything after it shifted.** Suspect **BLOCK
+  ORDER** first — see the entry below. Do **NOT** screen for `addiu_at`: it
+  was RESOLVED in round 21 (maspsx `--addiu-at`,
+  `docs/research/addiu-at-blocker.md`), and screening for it now INVENTS a
+  blocker, which is the strictly worse failure — a false blocker becomes a
+  stub report, which `progress.py` counts as a documented stall, which
+  removes the function from `fresh` permanently.
+
+  *This bullet previously read "Suspect the `addiu_at` blocker before
+  suspecting your C ... a hit means STOP and file the stub", and it survived
+  four rounds after the blocker died. It is kept as a corrected bullet rather
+  than deleted because a stale line in a guide is not merely wrong, it is a
+  DIRECTIVE, and this one told runners to stop working matchable functions.
+  Screen with `python3 tools/nearmiss.py`, which runs the two live screens
+  (`gp_rel`, `nop_mflo_mfhi`) and reports the resolved construct WITHOUT
+  counting it.*
+
+- **BLOCK ORDER: retail has a bare unconditional `j` you do not, or keeps a
+  duplicated assignment you merged.** Round 25 closed four functions on this
+  across three units after they had absorbed 13 hand attempts, ~77k permuter
+  iterations, eleven structural variants and several barriers between them.
+
+  **GCC 2.6.3 gives the fallthrough to whichever candidate is LAST in source
+  order.** If retail's *jumping* block is the one your source puts last, no
+  expression reshape and no `__asm__("")` will reach it. The fix is textual:
+  make that block not-last, with an explicit `goto` over the block you want
+  to fall through.
+
+  The tell is a bare `j` (not a conditional branch) to a nearby join whose
+  delay slot carries REAL WORK. Two strong secondary indicators:
+  **you are SHORT by a small number of words**, and **a barrier had no
+  effect** — the latter is positive evidence FOR this class, not evidence of
+  exhaustion, because a barrier moves instructions within a block and this is
+  a cross-block decision.
+
+  Three cautions, all measured:
+  - **It is not strictly dominant.** Applied to a guard that already has the
+    correct idiom it makes things WORSE (`func_80059BE0`). Read which shape
+    the disassembly ALREADY shows first.
+  - **"Give the duplicate its own C variable" is NOT the fix** once block
+    order is already right — twice-reproduced regressions on
+    `func_8002B4D4`. A second named variable re-allocates the WHOLE function.
+  - **An `mflo`/`mfhi` residue is a counter-indication.** cc1 expands
+    `mult`/`mflo` together during RTL expansion, before any layout decision.
+
+  Full entry, with all four placement variants: `DECOMPILATION_LEARNINGS.md`,
+  "An arm that must JUMP has to be written NOT-LAST".
 - **Prologue callee-save stores in the wrong ORDER**, same registers and same
   offsets. Not reachable from C — six declaration-order permutations produce
   one identical score. A bare `__asm__("")` as the function's first statement is
