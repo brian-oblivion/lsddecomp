@@ -1,4 +1,112 @@
-# func_8005DBF0
+# func_8005DBF0 -- MATCHED (byte-exact, 74/74 words). Round 25, head.
+
+> **ROUND 25 (2026-09-08), head. CLOSED, and the fix is PURE BLOCK PLACEMENT
+> -- not one character of the logic below changed.** The eleven variants
+> recorded in this report were all searching the expression/CFG-shape axis.
+> The residue was on a third axis: WHERE the two `doDetach = 1;` writes sit
+> RELATIVE TO EACH OTHER in the source text.
+>
+> This report already had the mechanism exactly right -- "retail spends 2
+> EXTRA instructions to keep them separate ... this build's compiler lets the
+> `detachKind==2` case simply fall through into the SAME `li $s2,1`". What it
+> was missing is that **which write falls through is a source decision, and
+> the rule is that GCC 2.6.3 gives the fallthrough to whichever one is
+> LAST.**
+>
+> In the preserved body, `randCheck:` (with its `doDetach = 1;`) is nested
+> INSIDE the `func_8005D714 != 0` arm, textually BEFORE the
+> `else if (row->detachKind == 2)` arm. So the kind==2 write is last, it gets
+> the fallthrough, and the two writes merge into one. Retail has the opposite:
+> the kind==2 arm jumps (`j MERGE` with `li $s2, 0x1` in its own delay slot)
+> and the rand arm's write is the one sitting immediately before the merge.
+>
+> **The fix is to lift `randCheck:` out of the nested `if` to the END of the
+> gated block, after an explicit `goto merge`, so the rand write becomes the
+> last one and the kind==2 write is forced to jump:**
+>
+> ```c
+>         if (row->detachKind != 0) {
+>             if (row->detachKind == 4) {
+>                 goto randCheck;
+>             }
+>             if (row->unk5 != 0) {
+>                 if (func_8005D714(this, &this->unk14->x, row->unk5, row->unk9) != 0) {
+>                     if (row->detachKind == 1) {
+>                         doDetach = 1;
+>                     } else if (row->detachKind == 3) {
+>                         goto randCheck;
+>                     }
+>                 } else if (row->detachKind == 2) {
+>                     doDetach = 1;          /* now NOT last -> retail's `j` */
+>                 }
+>             }
+>         }
+>         goto merge;
+>
+>     randCheck:
+>         if ((rand() & 0x7F) == 0) {
+>             doDetach = 1;                  /* now last -> gets the fallthrough */
+>         }
+>
+>     merge:
+>         if (doDetach) {
+>             this->methods->slot15C(this);
+>         }
+> ```
+>
+> Every other line is byte-for-byte what this report already had, including
+> the `detachKind == 4` / `detachKind == 3` shared `goto randCheck` that
+> reaches retail's single `jal rand` from both arms. **74/74, whole-image
+> SHA1 green.**
+>
+> ### Why the eleven prior variants could not find it
+>
+> Read the list below and every one of them permutes something INSIDE the
+> nesting: switch versus if, which gate is tested first, which of
+> `detachKind==1`/`==3` comes first, and a `__asm__("")` barrier. None of
+> them moves a write OUT of the nesting, because the nesting is what encodes
+> the logic and moving a statement out of it looks like it would change the
+> meaning. It does not, once the `goto merge` is explicit -- and that is the
+> whole trick.
+>
+> The report's own barrier result was the clue and was correctly interpreted:
+> "no effect, confirming this is a cross-basic-block CFG/tail-merge decision,
+> not an intra-block scheduling one, and therefore not something the
+> permitted barrier can influence." That is right, and the missing next step
+> is that a cross-basic-block decision has a source lever too -- it is just
+> textual placement rather than a barrier.
+>
+> ### Proposed learning
+>
+> **This is the SECOND instance of round 25's block-order lever, in a
+> different unit and a different shape, which is what makes it a rule rather
+> than an anecdote.** `func_8005CBC8` (`code_4cd08`) was an if/else arm that
+> had to jump over a join; this is a DUPLICATED ASSIGNMENT where retail keeps
+> both copies and GCC wants to merge them. Same underlying fact in both:
+> **GCC 2.6.3 gives the fallthrough to the LAST candidate in source order, so
+> if retail's jumping block is the one your source puts last, no amount of
+> expression reshaping will fix it and no barrier will either.**
+>
+> The generalised tell, now confirmed twice: a bare unconditional `j` (not a
+> conditional branch) to a nearby join, with REAL WORK in its delay slot.
+> Retail's compiler had a block after that jump; your source has to put one
+> there too. The fix is always textual: make the block you want to jump
+> not-last, using an explicit `goto` over the block you want to fall through.
+>
+> **A twin worth re-reading:** this report notes `func_8005DD18` is
+> `func_8005DBF0`'s "near-identical twin", matched in the same earlier pass.
+> That one is already matched, so nothing to do -- but the pattern
+> generalises to any pair of sibling handlers where one matched and the other
+> stalled 2 words short.
+>
+> **One dead cause to correct while here:** the "What it does" section below
+> describes `func_8005D714` as "`addiu_at`-blocked". `addiu_at` was RESOLVED
+> in round 21 (`docs/research/addiu-at-blocker.md`); that parenthetical is a
+> dead cause. `func_8005D714` is matched C in this unit now.
+>
+> Everything below is the round-2026-09-01 derivation, kept because it is
+> correct and because it is what made this hour's fix a five-minute change.
+
 
 **Unit:** Entity · **Size:** 74 words · **Status:** STALL — 8 bytes / 2 words
 short of byte-exact, everything else matches. Restored to `INCLUDE_ASM`.

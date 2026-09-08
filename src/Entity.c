@@ -268,7 +268,43 @@ void func_8005DB8C(Entity *this) {
     this->unkF8 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005DBF0);
+s32 func_8005DBF0(Entity *this) {
+    EntityMoodRow *row;
+    s32 doDetach;
+
+    if (this->unkF0 == 0 && this->unk44 != 1) {
+        row = &D_80089EA4[this->moodIndex];
+        doDetach = 0;
+        if (row->detachKind != 0) {
+            if (row->detachKind == 4) {
+                goto randCheck;
+            }
+            if (row->unk5 != 0) {
+                if (func_8005D714(this, &this->unk14->x, row->unk5, row->unk9) != 0) {
+                    if (row->detachKind == 1) {
+                        doDetach = 1;
+                    } else if (row->detachKind == 3) {
+                        goto randCheck;
+                    }
+                } else if (row->detachKind == 2) {
+                    doDetach = 1;
+                }
+            }
+        }
+        goto merge;
+
+    randCheck:
+        if ((rand() & 0x7F) == 0) {
+            doDetach = 1;
+        }
+
+    merge:
+        if (doDetach) {
+            this->methods->slot15C(this);
+        }
+    }
+    return this->unkF0;
+}
 
 s32 func_8005DD18(Entity *this) {
     EntityMoodRow *row;
