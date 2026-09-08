@@ -72,7 +72,7 @@ CPP_FLAGS="-I\$REPO/include -I\$REPO/include/psyq -undef -Wall -lang-c -nostdinc
  -D_PSYQ -D__EXTENSIONS__ -D_MIPSEL -D_LANGUAGE_C -DLANGUAGE_C"
 CC_FLAGS="-mips1 -mcpu=3000 -quiet -Wall -fno-builtin -mno-abicalls
  -funsigned-char -G0 -O2"
-MASPSX_FLAGS="--aspsx-version=2.34 --dont-force-G0 --expand-div"
+MASPSX_FLAGS="--aspsx-version=2.34 --dont-force-G0 --expand-div --addiu-at"
 # -I\$REPO is trap 3: maspsx emits a repo-relative .include "include/labels.inc"
 AS_FLAGS="-I\$REPO -I\$REPO/include -I\$REPO/include/psyq -march=r3000
  -mtune=r3000 -EL -no-pad-sections -G0 -O2"
@@ -87,11 +87,20 @@ chmod +x "$dir/compile.sh"
 printf 'func_name = "%s"\ncompiler_type = "gcc"\n' "$func" > "$dir/settings.toml"
 
 # --- target.o: retail's own bytes -------------------------------------------
-# Trap 1: drop `.set gp=64`. Drop splat's leading .set/nonmatching lines too --
-# the prelude already supplies them, and `nonmatching` would be invoked before
-# its own macro definition.
+# Trap 1: drop `.set gp=64`. Drop splat's own `.set noat`/`.set noreorder`
+# too -- prelude.inc supplies both at its lines 1-2, so they are redundant.
+#
+# Trap 6 (found round 24): this used to be `sed -e '1,4d'`, deleting the first
+# FOUR lines by POSITION. For an ordinary function those are exactly
+# `.set noat`, `.set noreorder`, a blank, and `nonmatching <func>, 0xNN`, so it
+# looked right. But a function that OWNS EMBEDDED RODATA has `.section .rodata`
+# as its line 4 -- splat emits the jump table before the text -- and deleting
+# that line silently assembles the table into `.text`. target.o then does not
+# hold retail's bytes at all, and the permuter's objdump parser crashes on it.
+# Delete by CONTENT instead, and keep `nonmatching`: prelude.inc defines that
+# macro (line 43), so it is fine anywhere after the prelude.
 grep -v '^\.set gp=64' tools/decomp-permuter/prelude.inc > "$dir/target.s"
-sed -e '1,4d' "$asm" >> "$dir/target.s"
+sed -e '/^\.set noat/d' -e '/^\.set noreorder/d' "$asm" >> "$dir/target.s"
 tools/binutils/bin/mipsel-linux-gnu-as -march=r3000 -mtune=r3000 -EL \
     -no-pad-sections -G0 -O2 "$dir/target.s" -o "$dir/target.o"
 
