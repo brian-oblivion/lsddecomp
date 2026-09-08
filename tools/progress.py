@@ -16,15 +16,35 @@ them (docs/PARALLEL-RUNS.md, Gate 1):
   banked    queued, unattempted, in a unit whose header says DELIBERATELY
             UNWORKED -- carved to fix a boundary or bank the ground, but
             classified as senior work rather than cold-runner work.
-  reopened  queued AND has a report, but that report says REOPENED -- ASSIGNABLE
-            on a line of its own. Counted as FRESH, not as a stall. A report
-            written while a toolchain blocker was live outlives the blocker,
-            and a function everybody believes is blocked is one nobody
-            re-measures -- so when a blocker is resolved, the reports it
-            invalidated silently delete matchable ground from every future
-            round. `addiu_at` resolving in round 21 left five such reports.
-            This marker is the counterpart of DELIBERATELY UNWORKED: an exact
-            phrase, keyed on by this tool, that lets a report stay on disk (its
+  reopened  queued AND has a report, but that report carries one of the two
+            EXACT line-anchored markers below. Counted as FRESH, not as a
+            stall. Both exist for the same reason: this tool decides stall-vs-
+            fresh purely by whether a report FILE exists, so any report that is
+            not a stall verdict silently deletes matchable ground from every
+            future round.
+
+              REOPENED -- ASSIGNABLE
+                  The report's stall verdict has been INVALIDATED, almost
+                  always because the blocker it blamed was resolved. A report
+                  written while a blocker was live outlives the blocker, and a
+                  function everybody believes is blocked is one nobody
+                  re-measures. `addiu_at` resolving in round 21 left five such
+                  reports.
+
+              DERIVATION ONLY -- ASSIGNABLE
+                  No C was ever written or compiled: the report is a partial
+                  derivation of a body too large to attempt in one bounded
+                  session, which the project asks for rather than a heroic
+                  single attempt. There is no stall verdict to invalidate,
+                  because there was never an attempt. Added round 25, when
+                  runner bravo filed exactly this for func_80032D34 (274w) and
+                  wrote in its own prose "deliberately NOT filed as a STALL"
+                  -- prose this tool cannot read, so the function left `fresh`
+                  anyway. Do NOT use it for a body that WAS built and scored;
+                  that is a real stall however low the score.
+
+            Both are the counterpart of DELIBERATELY UNWORKED: an exact phrase,
+            keyed on by this tool, that lets a report stay on disk (its
             derivation is still worth reading) without still claiming the
             function is worked.
   fresh     queued - stalled - banked. THE ONLY COLUMN TO ASSIGN FROM. Raw
@@ -52,7 +72,8 @@ NM = ROOT / "tools/binutils/bin/mipsel-linux-gnu-nm"
 ELF = ROOT / "build/lsdde.elf"
 YAML = ROOT / "config/splat.slps01556.lsdde.yaml"
 REPORTS = ROOT / "docs/match-reports"
-REOPENED_RE = re.compile(r"^[\s>*_#-]*REOPENED -- ASSIGNABLE\b", re.M)
+REOPENED_RE = re.compile(
+    r"^[\s>*_#-]*(?:REOPENED|DERIVATION ONLY) -- ASSIGNABLE\b", re.M)
 
 VRAM_BASE = 0x80010000
 FILE_BASE = 0x800
@@ -155,10 +176,11 @@ def text_symbols():
 def main():
     info = text_symbols()
     sizes = {n: s for n, (_, s) in info.items()}
-    # A report marked REOPENED -- ASSIGNABLE is deliberately NOT a stall: see
-    # the `reopened` entry in the module docstring. The phrase must stand on
-    # its own line so that a report *discussing* the convention (this file's
-    # own docs, a learnings entry quoting it) cannot trip the marker.
+    # A report marked REOPENED -- ASSIGNABLE or DERIVATION ONLY -- ASSIGNABLE
+    # is deliberately NOT a stall: see the `reopened` entry in the module
+    # docstring. The phrase must stand on its own line so that a report
+    # *discussing* the convention (this file's own docs, a learnings entry
+    # quoting it) cannot trip the marker.
     all_reports = list(REPORTS.glob("*.md")) if REPORTS.exists() else []
     reopened = {p.stem for p in all_reports
                 if REOPENED_RE.search(p.read_text())}
@@ -308,7 +330,7 @@ def main():
     print(f"    fresh (runner-workable):  {fresh:5d}   <- ASSIGN FROM THIS")
     if reopened_live:
         print(f"      of which reopened:      {reopened_live:5d}   "
-              f"(report kept, marked REOPENED -- ASSIGNABLE)")
+              f"(report kept, marked REOPENED/DERIVATION ONLY -- ASSIGNABLE)")
     print(f"  uncarved game code:         {uncarved:5d}")
     if handwritten:
         print(f"  hand-written asm (DONE):    {handwritten:5d}"
