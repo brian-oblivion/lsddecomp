@@ -124,6 +124,26 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034AEC);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034C28);
 
+/* STALL -- see docs/match-reports/func_80034D90.md. length exact 51/51,
+ * 49/51 raw word-match, residue is the project's settled commutative-
+ * operand-order canonicalization class (2 words). Near-miss body preserved
+ * in the report; #if 0 body kept here too so it travels with this .c. */
+#if 0
+void func_80034D90(s16 a0, s16 a1)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+
+    func_80036044();
+    func_80036518();
+
+    ((u8 *)rec)[rec->unk12 + 0x2C] = rec->unk12;
+    rec->unk13 = 0;
+    rec->unk14 = 0;
+    *(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2) = 0x7F;
+    ((u8 *)rec)[rec->unk12 + 0x17] = 0x40;
+    rec->unk88 = func_80035E80(a0, a1);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034D90);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034E5C);
@@ -156,8 +176,60 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800357B0);
 
+/* STALL -- see docs/match-reports/func_80035A7C.md. length exact 44/44,
+ * 36/44 raw word-match, first real diff at word 23: a register/schedule
+ * choice across four field reads, not yet reduced to one axis. */
+#if 0
+void func_80035A7C(s16 a0, s16 a1)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 *cursor = rec->unk4;
+    u8 b;
+    u8 *p;
+
+    rec->unk4 = cursor + 1;
+    b = *cursor;
+    p = (u8 *)rec + rec->unk12;
+    func_8002F610((a1 << 8) | a0, rec->unk4C, p[0x2C], b);
+    rec->unk88 = func_80035E80(a0, a1);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035A7C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035B2C);
 
+/* STALL -- see docs/match-reports/func_80035E80.md. length exact 47/47,
+ * 44/47 raw word-match, first real diff at word 27: the settled
+ * commutative-operand-order class plus one downstream register choice. */
+#if 0
+s32 func_80035E80(s16 a0, s16 a1)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 *cursor = rec->unk4;
+    s32 acc;
+    s32 val;
+    s32 result;
+    u8 nb;
+
+    rec->unk4 = cursor + 1;
+    acc = *cursor;
+    if (acc == 0) {
+        return 0;
+    }
+    val = acc * 4;
+    if (acc & 0x80) {
+        acc &= 0x7F;
+        do {
+            cursor = rec->unk4;
+            rec->unk4 = cursor + 1;
+            nb = *cursor;
+            acc = (acc << 7) + (nb & 0x7F);
+        } while (nb & 0x80);
+        val = acc * 4;
+    }
+    result = (val + acc) * 2;
+    rec->unk80 += result;
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035E80);
