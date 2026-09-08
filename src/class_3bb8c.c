@@ -79,6 +79,60 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
     }
 }
 
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_8004BA40.md. Length CORRECT
+ * (63/63 words), raw word-match 58/63. The `do {} while (0);` scheduling
+ * barrier before `result = 1;` is load-bearing -- it fixed a genuine
+ * register-identity residue (v0 vs v1 for `result`) without changing which
+ * register anything else lands in, so it is the permitted kind per
+ * CLAUDE.md rule 6. A second, similar-looking register residue in the
+ * `entry->unk0 == 0` fallback branch (v1 in retail, v0 here) did NOT
+ * respond to the same trick at three different placements -- see the
+ * report. */
+s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
+{
+    s32 mask = D_8008688C[key];
+    s32 result;
+
+    if ((savedResult & mask) == 0) {
+        result = 0;
+        goto nullCase;
+    }
+
+    if (self->unk68->unk4 == 0) {
+        const Unk54Struct *entry = &D_800868A8[key];
+        s32 value;
+
+        if (entry->unk0 == 0) {
+            value = val + entry->unk4;
+        } else {
+            s32 lo = divisor * entry->unk0;
+
+            if (flag != 0) {
+                value = val + (lo + entry->unk4);
+            } else {
+                value = val + (lo + entry->unk8);
+            }
+        }
+        *(s32 *)((u8 *)arg1 + 4) = value;
+    } else {
+        *(s32 *)((u8 *)arg1 + 4) = val + key;
+    }
+
+    arg1->ptr0 = self->unk60(self->unk64, *(s32 *)((u8 *)arg1 + 4), 0, 0);
+    do {} while (0);
+    result = 1;
+    goto storeKey;
+
+nullCase:
+    arg1->ptr0 = NULL;
+
+storeKey:
+    arg1->id = key;
+    return result;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
 
 #if 0
