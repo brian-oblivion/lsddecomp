@@ -472,3 +472,206 @@ time it's copied" idiom (originally found for `D_8006D8F4` in
 this function's copy was missing it purely because the salvaged snapshot
 predated the discovery. Any future function that reuses this block
 should carry the barrier from the start.
+
+## Round 25 (runner charlie): the redundant-raw-copy-elision / block-order investigation
+
+Assigned question: **what distinguishes the isolated reduction where a bare
+`__asm__("")` barrier fixes the "redundant-raw-copy elision" class (round
+24, `code_179d8_l`: `func_8002DDBC`/`func_8002E138`/`func_8002E308`) from
+the real function, where it transfers to none of them?** Mid-investigation
+the head sent two broadcasts proposing a BLOCK-ORDER / tail-merge mechanism
+(measured on `func_8005CBC8` and `func_8005DBF0` in other units this same
+round): a bare `__asm__("")` only reorders instructions WITHIN a block; if
+what actually differs is which BASIC BLOCK a value's materialization lives
+in, or which of two candidate arms GCC gives the fallthrough to at a shared
+join, a barrier is the wrong instrument and its failure to transfer is
+*expected*, not mysterious. Tested that hypothesis directly against this
+unit's stalls, rather than adopting it.
+
+### The hypothesis is CONFIRMED for one specific, high-value case in this unit -- found independently before the second broadcast arrived
+
+This function's own round-20 entry (fix 3, above) already IS an instance of
+exactly this mechanism, discovered from `objdump` before either broadcast:
+retail's success/timeout join is not two early `return`s, it is a
+FLAG-and-single-join with the failure arm placed textually FIRST (falling
+through into it from both upstream checks) and the success arm placed
+SECOND, reached by an explicit branch and left to fall through into the
+shared check. This round applied the identical shape to `func_8002AEE0`
+(this pass's own fresh function, `docs/match-reports/func_8002AEE0.md`):
+an early `return -1;` written directly inside the timeout arm compiled
+SHORTER than retail (missing the "redundant" `move v0,zero`/`bnez
+v0,<epilogue>` pair retail keeps at the join) -- restructuring to
+diag-block-FIRST, success-label-SECOND, single shared `result` variable
+checked once, took that function from 61/174 to 153/174 in one fix, the
+single largest gain of this whole session. **This is a direct, positive
+confirmation of the head's mechanism**, and it predates the broadcast that
+named it -- the same shape, found twice independently in two different
+functions in this unit, is stronger evidence than either instance alone.
+
+### The hypothesis is CONFIRMED as the correct explanation for `func_8002B4D4`'s ALREADY-CLOSED delay-slot-sharing residue, and its remaining OPEN residue shows the naive fix does not always transfer
+
+`func_8002B4D4`'s round-20 fix (57->60/91, the `code=2`/`code=5` dispatch)
+is the SAME family: retail shares one `li $a0,0x5` via a delay slot across
+both branches, with the fallthrough path overwriting it -- a compiler
+choice about which value's write is shared vs duplicated, not a scheduling
+question a barrier could touch (round 19 confirmed a bare `__asm__("")`
+does nothing here; round 20 closed it by flipping the guard polarity
+instead, changing which arm falls through).
+
+Re-reading `func_8002B4D4`'s STILL-OPEN residue (the `elseBranch` pointer
+landing in `$s0` instead of `$v1`) against the raw `.s`
+(`asm/nonmatchings/code_179d8_g/func_8002B4D4.s`, lines 34-45) confirms the
+block-order PART of the mechanism is already satisfied here: the
+if-branch's own tail ends with an explicit `j .L8002B56C` (line 39, jumping
+OVER the elseBranch to the shared label), and `elseBranch` itself (line
+41-45) has NO trailing jump at all -- it simply falls through into the
+shared label. `elseBranch` is textually LAST in the current preserved C
+(`docs/match-reports/func_8002B4D4.md`'s round-20 body) and correctly gets
+the fallthrough; the if-branch is textually first and correctly carries the
+explicit jump. **The block order matches the rule exactly already.**
+
+What is LEFT (the `$s0`/`$v1` register split) is a downstream
+REGISTER-ALLOCATION consequence, not a block-order question: the current C
+reuses ONE pointer variable (`p`) for both the if-branch's
+long-lived-across-a-call address and the elseBranch's short-lived one,
+which drags the elseBranch's use into the SAME persistent callee-saved
+register the if-branch needs. **The head's general prescription --
+"give the duplicate its own separate copy" -- was tried here TWICE,
+independently, in two different rounds (round 19 and round 20, the second
+explicitly re-testing in case the first was a stale artifact), and BOTH
+times it regressed** (17/91-scale and 60->50/91 respectively): a second
+named pointer variable changes register allocation for the WHOLE function,
+not just the one store, because the allocator's overall pressure budget
+is shared across the entire body. **This is a clean, twice-reproduced
+counter-example to the naive form of the head's fix**, not a failure to
+try hard enough -- worth keeping next to the positive `func_8002AEE0`
+result, because both are true at once: the MECHANISM (retail keeps two
+independent materializations, block order decides which one earns the
+fallthrough) is real and worth checking first, but "split it into two C
+variables" is not itself the fix once the block order is already right --
+that lever only helps while the C's block order is WRONG.
+
+### The hypothesis does NOT explain this unit's remaining register-identity residues, and does not need to -- they are a different mechanism
+
+- **This function's own remaining residue** (address vs. value swapped
+  between `$a0`/`$v1` at the very first computed temporary, round 20's
+  "what's left" section above) involves NO branch, NO shared join, and NO
+  duplicated store -- it is a register-NAMING choice for the first two
+  SSA-like values in a straight-line prologue. Two reshapes (declaration
+  order, statement order) were tried and regressed, independent of this
+  round's investigation. The block-order hypothesis has nothing to say
+  about a residue with no candidate blocks to order.
+- **`func_8002B198`'s remaining residue** ("what's left is register
+  NUMBERING, not hoisting-or-not") and **this pass's own new instances in
+  `func_8002AEE0`** (the `p6A0`/`p8D9` register swap, four independent
+  reorder/rename attempts inert) **and `func_8002B640`** (the
+  `copySrc`/`rec`/`off` register-numbering swap in its table-search loop)
+  are all the SAME class: a straight-line or single-loop-body register
+  NAME choice, not a fallthrough/block-order decision. None involve two
+  competing arms at a merge point.
+
+### The hypothesis does not explain the confirmed-PURE-scheduling residues either, and this is a genuine boundary, not a gap in testing
+
+`func_8002A75C`'s round-20 permuter run measured its residue's `--debug`
+breakdown directly: **`Reorderings: 3` with `Register Differences: 0`,
+`Insertions: 0`, `Deletions: 0`** -- the permuter's own scorer, which can
+see block/CFG-shape mismatches as insertions or deletions, reports NONE.
+This residue (a `jal`/`move $a3,zero` pair retail schedules ~90 bytes/26
+instructions after where its arguments materialize, within a SINGLE
+extended stretch of straight-line code with no intervening branch) is
+confirmed pure intra-block scheduling, not a block-order question -- there
+is only one block here, not two competing ones. **A bare `__asm__("")`
+barrier was tried directly on this exact residue (round 19) and made no
+difference at all.** This is the useful boundary case for the head's
+hypothesis: it predicts a barrier fails BECAUSE the real difference is
+which block a value lives in; here there is no second block, and the
+barrier still fails. So barrier failure is not ALWAYS a symptom of a
+hidden block-order problem -- sometimes GCC's list scheduler simply picks
+a tie-break among orderings that a scheduling barrier, which only fixes
+relative order across itself, cannot force from any source-level
+phrasing tried (call/goto restructuring, named locals, `volatile`).
+
+`func_8002B3F4`'s open residue is a different boundary again: it is an
+address-FOLDING (selection) difference, not an ordering one, and its own
+report already states this explicitly ("a barrier does not affect
+instruction SELECTION... only ORDERING, and this residue is a selection
+difference, not an ordering one") -- confirmed independently this round by
+re-reading the same `.s`, not just trusted from the prior text.
+
+This round's own new function, `func_8002B94C.md`, adds a FOURTH boundary:
+a redundant-looking check retail keeps that this build's C could not even
+get GCC to EMIT, because the direct reproduction (`if (provably-true-by-
+construction)`) was dead-code-eliminated at compile time regardless of any
+barrier -- a barrier cannot rescue a branch the optimizer proves unreachable
+before scheduling ever runs.
+
+### Answer to the assigned question, mechanism-level
+
+**The barrier's failure to transfer from an isolated reduction to a real
+function has (at least) three distinct causes in this unit, and the
+block-order hypothesis correctly identifies exactly one of them:**
+
+1. **Block-order / shared-join fallthrough choice** (the head's
+   hypothesis, CONFIRMED): when retail's compiler had two candidate
+   materializations of a value converging on one join point, it gave the
+   fallthrough to whichever arm was TEXTUALLY LAST in the arm's own
+   source, and the other arm carries an explicit jump. An isolated
+   two-value reduction has only ONE natural pair of candidates and the
+   "wrong" one is easy to make last by construction; a real function
+   often has the SAME two candidates but embedded in a body with more
+   surrounding live values and control flow, where simply "put it last"
+   is not obviously available without restructuring the whole
+   surrounding shape (which is exactly what closed `func_8002AEE0`, and
+   exactly what does NOT further help `func_8002B4D4` once already
+   correct). A barrier cannot fix this because there is nothing to
+   reorder WITHIN a block -- the missing/extra instructions are a
+   consequence of which block executes at all along a given path.
+2. **Pure intra-block list-scheduling tie-breaks** (a genuine, DIFFERENT
+   failure mode from (1), confirmed via permuter debug output showing
+   zero insertions/deletions/register differences): GCC's scheduler picks
+   an instruction order among several equally-valid ones based on
+   internal heuristics (register-pressure estimates, pass ordering) that
+   are not expressible from source at all in the forms tried. A barrier
+   CAN in principle fix an ordering problem, and does, elsewhere in this
+   project (e.g. `func_8002ADE8`'s three-way case-store barrier) -- but
+   only when the barrier's position happens to coincide with where the
+   scheduler's tie-break needs breaking. When it does not (this
+   function's `a3`/`jal` split, this pass's `func_8002B640` constant-load
+   ordering), the barrier is the RIGHT category of instrument but the
+   WRONG position, and no position tried this round or in round 19/20
+   found the right one. This is why an isolated reduction (fewer
+   competing values, shallower scheduling graph) can differ from the real
+   function even with NO block-order difference at all.
+3. **Dead-code elimination proving a redundant check false before
+   scheduling runs** (this pass's `func_8002B94C`, a fourth, narrower
+   case): when the redundant-looking check is directly reproduced as a
+   literal-foldable condition, GCC's optimizer removes it outright,
+   which is not a scheduling outcome a barrier operates on at all.
+
+**None of the three explains why an isolated 2-4 value reduction of the
+"preserve raw copy, narrow in place" shape (round 24's `func_8002E308`)
+closes with a barrier while the real function does not** -- that specific
+class was not reproduced inside THIS unit's five assigned stalls (none of
+them is a preserve-then-narrow parameter shape), so this investigation
+cannot independently confirm or refute round 24's own characterization of
+it. What this round adds is that the SAME SURFACE SYMPTOM ("barrier works
+small, fails at scale") has at least three genuinely different underlying
+causes across the seven functions examined here, and telling them apart
+needs the SAME discipline in each case: read the real `.s`'s block/label
+structure and the permuter's own debug breakdown (insertions/deletions vs.
+reorderings vs. register differences) before deciding which of the three
+applies, rather than reaching for the barrier as a first move.
+
+### Proposed learning
+
+**"The barrier doesn't transfer" is a symptom with three distinct,
+independently-diagnosable causes, not one mechanism** -- block-order/
+fallthrough choice (fixable by restructuring which arm is textually last,
+confirmed twice this round), pure list-scheduling tie-break (a barrier is
+the right TOOL but this round found no position that worked, confirmed via
+permuter debug output showing zero insertion/deletion component), and
+dead-code elimination (no scheduling-level tool applies at all). Before
+spending an attempt on `__asm__("")` placement, check the permuter's own
+`--debug` breakdown if one exists, or the raw `.s`'s label structure for a
+duplicated store/two-candidate-join shape, to know which of the three is
+in play.
