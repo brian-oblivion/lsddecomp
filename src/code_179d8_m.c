@@ -41,7 +41,42 @@
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002E4D8);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002E874);
+/* Same 0x34-stride channel-configuration record family documented in
+ * code_179d8_j.c (Rec34D994/Rec34Byte/Rec34Half); this unit keeps its
+ * own local view rather than sharing that file's header-less types.
+ * Six independent 2-bytes-apart symbols share this one shape, same
+ * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34Half;
+extern Rec34Half D_8008D9B0[]; /* "interpolating" flag */
+extern Rec34Half D_8008D9B2[]; /* "interpolating" flag (companion pair) */
+extern Rec34Half D_8008D9B4[]; /* step/quotient */
+extern Rec34Half D_8008D9B6[]; /* step/quotient (companion pair) */
+extern Rec34Half D_8008D9B8[]; /* saved start value */
+extern Rec34Half D_8008D9BA[]; /* saved end value */
+
+void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3) {
+    s16 q;
+
+    if (a1 == a2) {
+        return;
+    }
+    D_8008D9B0[a0].unk0 = 1;
+    D_8008D9B8[a0].unk0 = a1;
+    D_8008D9BA[a0].unk0 = a2;
+    if ((a1 - a2 < 0 ? a2 - a1 : a1 - a2) < a3) {
+        q = a3 / (a1 - a2);
+        D_8008D9B2[a0].unk0 = 1;
+        D_8008D9B4[a0].unk0 = q;
+        D_8008D9B6[a0].unk0 = q;
+    } else {
+        q = (a1 - a2) / a3;
+        D_8008D9B4[a0].unk0 = 0;
+        D_8008D9B2[a0].unk0 = q;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
 
@@ -77,18 +112,15 @@ void func_8002F20C(s32 a0, s32 a1, s32 a2, s32 a3) {
 }
 
 /* Same 0x34-stride channel-configuration record family documented in
- * code_179d8_j.c (Rec34D994/Rec34Byte/Rec34Half); this unit keeps its
- * own local view rather than sharing that file's header-less types. */
+ * code_179d8_j.c (Rec34D994/Rec34Byte); this unit keeps its own local
+ * view rather than sharing that file's header-less types. Rec34Half
+ * itself is declared above, before its first user func_8002E874. */
 typedef struct {
     u8 unk0; /* +0x0 */
     u8 pad1[0x34 - 0x1];
 } Rec34Byte;
 extern Rec34Byte D_8008D9A3[];
 
-typedef struct {
-    u16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34Half;
 extern Rec34Half D_8008D98C[];
 
 /* Pointer to a "current object" whose only fields this function
