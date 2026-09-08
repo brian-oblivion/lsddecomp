@@ -136,6 +136,7 @@ typedef struct {
 
 extern VagAtr *D_8008E978;
 extern u8 D_8008EA13;
+extern s32 func_80032148(s16 a0, s16 a1);
 
 short func_80033260(short vabId, short prog, s32 tone, VagAtr *vagatr)
 {
@@ -203,7 +204,6 @@ typedef struct {
 } Entry8E968;
 
 extern Entry8E968 *D_8008E968;
-extern s32 func_80032148(s16 a0, s16 a1);
 
 s16 func_800334F0(s16 a0, s16 a1, Entry8E968 *out)
 {
@@ -280,16 +280,24 @@ s16 func_8003370C(s16 a0)
 typedef struct {
     u8 pad0[0x2B];
     u8 unk2B;
-    u8 pad2C[0x44 - 0x2C];
+    u8 pad2C[0x3E - 0x2C];
+    s16 unk3E;
+    u16 unk40;
+    s16 unk42;
     s16 unk44;
     u8 pad46[0x4A - 0x46];
     s16 unk4A;
     u8 pad4C[0x70 - 0x4C];
     s16 unk70;
-    u8 pad72[0x8C - 0x72];
+    u8 pad72[0x78 - 0x72];
+    s16 unk78;
+    s16 unk7A;
+    u8 pad7C[0x8C - 0x7C];
     u32 unk8C;
     s32 unk90;
-    u8 pad94[0xA0 - 0x94];
+    u8 pad94[0x98 - 0x94];
+    s32 unk98;
+    u8 pad9C[0xA0 - 0x9C];
     s32 unkA0;
     u32 unkA4;
     u8 padA8[0xAC - 0xA8];
@@ -379,7 +387,7 @@ void func_800339AC(s32 a0, s32 a1)
 
     func_8003069C((sa1 << 8) | sa0);
     p->unk2B = 0;
-    D_800902E8[sa0][sa1].unk90 &= ~2;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~2;
 }
 
 void func_80033A4C(s32 a0, s32 a1)
@@ -388,7 +396,7 @@ void func_80033A4C(s32 a0, s32 a1)
     s16 sa1 = (s16)a1;
 
     D_800902E8[sa0][sa1].unk2B = 0;
-    D_800902E8[sa0][sa1].unk90 &= ~0x100;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x100;
 }
 
 extern u32 D_8009024C;
@@ -440,6 +448,101 @@ void func_80033AB0(s16 a0, s16 a1)
     }
 }
 
+/* unk3E, unk40, unk42, unk78, unk7A, unk98 added to Entry90902E8 above,
+ * in place of existing padding -- no existing field's offset changed.
+ * unk40 is loaded with `lhu` (declared u16) but sign-checked via an
+ * explicit `(s16)` cast at every comparison site -- matches retail's
+ * `sll 16`/`bltz` idiom for checking a 16-bit value's sign without a
+ * plain `lh`.
+ *
+ * STALL -- see docs/match-reports/func_80033C90.md for the full
+ * algorithm derivation (correct, byte-verified block-by-block against
+ * the asm) and the best C body reached (18/202 words, first diff at
+ * word 1 -- the prologue's own `-0x40` vs `-0x38` frame size). The
+ * residue is register/stack allocation, not logic. */
+extern s32 func_80030404(s16 a0, u16 a1, u16 a2, s32 a3);
+extern s32 func_80030584(s32 p0, s16 *out1, s16 *out2);
+
+#if 0
+void func_80033C90(s32 a0, s32 a1)
+{
+    Entry90902E8 *p = &D_800902E8[(s16)a0][(s16)a1];
+    s16 c42 = p->unk42;
+    s32 newCnt = p->unk98 - 1;
+    s16 pk;
+    u16 sp10, sp12;
+    u16 a1arg;
+    s32 a2arg;
+
+    p->unk98 = newCnt;
+    if (c42 > 0) {
+        if ((u32)newCnt % (u32)c42 == 0) {
+            if (p->unk3E > 0) {
+                p->unk40 -= 1;
+                if ((s16)p->unk40 < 0) {
+                    goto negHandler;
+                }
+                pk = (s16)(a0 | (a1 << 8));
+                func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
+                if (sp10 == 0) {
+                    goto viaE60;
+                }
+                if (sp12 == 0) {
+                    goto viaE5C;
+                }
+                a1arg = sp10 + 0xFFFF;
+                a2arg = sp12 + 0xFFFF;
+                goto callReal;
+            }
+            goto tailCheck;
+        }
+        goto tailFinal;
+    } else {
+        if (p->unk3E > 0) {
+            p->unk40 += c42;
+            if ((s16)p->unk40 < 0) {
+                goto negHandler;
+            }
+            pk = (s16)(a0 | (a1 << 8));
+            func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
+            if ((s32)sp10 < -(s32)p->unk42) {
+                goto viaE60;
+            }
+            if ((s32)sp12 < -(s32)p->unk42) {
+                goto viaE64;
+            }
+            a1arg = sp10 + p->unk42;
+            a2arg = sp12 + p->unk42;
+            goto callReal;
+        }
+        goto tailCheck;
+    }
+
+negHandler:
+    func_80030404((s16)(a0 | (a1 << 8)), 0, 0, 0);
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x20;
+    goto tailCheck;
+
+callReal:
+    func_80030404(pk, a1arg, (u16)a2arg, 0);
+    goto tailFinal;
+
+viaE5C:
+viaE60:
+viaE64:
+    func_80030404((s16)(a0 | (a1 << 8)), 0, 0, 0);
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x20;
+
+tailCheck:
+    if (p->unk98 == 0 || (s16)p->unk40 == 0) {
+        D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x20;
+    }
+
+tailFinal:
+    func_80030584((s16)(a0 | (a1 << 8)), &p->unk78, &p->unk7A);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033C90);
 
 void func_80033FB8(s32 a0, s32 a1)
@@ -448,7 +551,7 @@ void func_80033FB8(s32 a0, s32 a1)
     s16 sa1 = (s16)a1;
 
     D_800902E8[sa0][sa1].unk2B = 1;
-    D_800902E8[sa0][sa1].unk90 &= ~8;
+    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~8;
 }
 
 extern void func_80038CD8(s32 a0);
