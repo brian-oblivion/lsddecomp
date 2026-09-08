@@ -231,7 +231,6 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034C28);
  * 49/51 raw word-match, residue is the project's settled commutative-
  * operand-order canonicalization class (2 words). Near-miss body preserved
  * in the report; #if 0 body kept here too so it travels with this .c. */
-#if 0
 void func_80034D90(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -239,15 +238,13 @@ void func_80034D90(s16 a0, s16 a1)
     func_80036044();
     func_80036518();
 
-    ((u8 *)rec)[rec->unk12 + 0x2C] = rec->unk12;
+    *((u8 *)rec + rec->unk12 + 0x2C) = rec->unk12;
     rec->unk13 = 0;
     rec->unk14 = 0;
     *(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2) = 0x7F;
-    ((u8 *)rec)[rec->unk12 + 0x17] = 0x40;
+    *((u8 *)rec + rec->unk12 + 0x17) = 0x40;
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034D90);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034E5C);
 
