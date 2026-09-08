@@ -904,9 +904,50 @@ done
 ```
 
 An `mflo`/`mfhi` **FOLLOWED WITHIN TWO INSTRUCTIONS BY** a
-`mult`/`multu`/`div`/`divu`, with no `nop` between them in retail's own bytes,
-is blocked exactly like `addiu_at`: the pinned pipeline inserts `nop`s retail
-does not have.
+`mult`/`multu`/`div`/`divu` is blocked exactly like `addiu_at`: the pinned
+pipeline inserts `nop`s retail does not have.
+
+**The insertion is exactly TWO nops, and that number is what makes the
+two-instruction window right rather than approximate.** Measured round 24
+through the pinned pipeline, which is the only way this should ever be
+settled:
+
+```c
+int probe(int a, int b, int c) { int q = a / b; return q * c; }
+```
+
+comes out as `mflo $a0` / `nop` / `nop` / `mult $a0, $a2`. So retail needs
+**two** filler slots between the result read and the next multiply to be
+reproducible, and a `mult`/`div` landing within two instructions of the
+`mflo`/`mfhi` is precisely the case where it has fewer.
+
+**This sentence used to end "with no `nop` between them in retail's own
+bytes", and that qualifier is FALSE — it cost round 24's head a wrong
+conclusion it nearly acted on.** Reading it literally, a retail sequence of
+`mflo` / `nop` / `mult` has "a nop between them" and so reads as NOT blocked;
+in fact the pipeline emits TWO nops there, so retail's single nop is still one
+word short and the function is blocked like any other. The head "refined" the
+canonical grep with that nop test, and it declared two genuinely-blocked
+functions assignable — including `func_8005D864`, the function round 23 had
+just carefully re-adjudicated onto this very blocker. One reproducer settled
+it in under a second and the refinement was discarded.
+
+Two lessons, and the second is the general one:
+
+- **The canonical grep is not a cheap pre-filter for a subtler test. It IS
+  the discriminator**, and adding a condition to it makes it wrong. This is
+  the fourth recorded attempt to improve this screen and the fourth to break
+  it — the previous three inverted the window direction (rounds 15, 16), this
+  one added a false qualifier. The screen has now failed in both directions
+  it can fail in.
+- The error direction differs from the classic one and is worth naming: a
+  false BLOCKER deletes matchable ground permanently, while this was a false
+  CLEARANCE, which staffs a runner into a real wall and burns an attempt
+  budget. Cheaper, but still paid by somebody who did nothing wrong. **Prose
+  in a doc is not a specification of a toolchain behaviour; the reproducer
+  is.** When a rule and a mechanism seem to disagree, run the pipeline
+  (§"Escalate, do not experiment" in CLAUDE.md) rather than reasoning from
+  the wording.
 
 **RUN THAT COMMAND. DO NOT RE-IMPLEMENT IT.** The direction is load-bearing
 and the shell form is right *by construction*, because `grep -A2` prints the

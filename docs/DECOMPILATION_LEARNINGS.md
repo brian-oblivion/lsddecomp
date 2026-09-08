@@ -187,6 +187,46 @@ measures, a wrong CAUSE is what the next round acts on. If you re-implement one
 of the three greps in another language, reproduce a known-positive and a
 known-negative through the pinned pipeline before believing its output.
 
+#### Round 24 addendum: the TWO in "two nops" is load-bearing, and Gate 1 contradicted this entry
+
+Re-measured independently 2026-09-08, same reproducer, same result: the pinned
+pipeline emits `mflo $a0` / `nop` / `nop` / `mult $a0, $a2`. **Exactly two.**
+That number is what makes the screen's two-instruction window a discriminator
+rather than a heuristic: a `mult`/`div` landing within two instructions of the
+`mflo`/`mfhi` is precisely the case where retail cannot absorb the insertion.
+
+**The entry above had this right and Gate 1 in `docs/PARALLEL-RUNS.md` had it
+wrong** — it defined the blocker as an `mflo`/`mfhi` followed within two
+instructions by a `mult`/`div` *"with no `nop` between them in retail's own
+bytes"*. That qualifier does not survive the reproducer: retail's single `nop`
+still leaves the sequence one word short, so `mflo` / `nop` / `mult` is
+blocked like any other. Gate 1 is corrected; this entry is the one that was
+already faithful.
+
+Round 24's head acted on the wrong half. Taking the qualifier literally, it
+"refined" the canonical grep with a nop test and concluded that two flagged
+functions were assignable — one of them `func_8005D864`, which round 23 had
+just carefully re-adjudicated *onto* this blocker. The reproducer overturned
+the refinement in under a second and it was discarded; the corpus count stands
+at **12 flagged, all 12 genuinely blocked** (253 queued functions,
+2026-09-08 — up from 7 of 285 because round 24's carve added three).
+
+Three things worth keeping:
+
+- **A doc's prose is not a specification of a toolchain behaviour.** Two
+  project documents described one mechanism and only one of them was right,
+  with nothing local to tell them apart. The pipeline is the tiebreaker and it
+  costs a second.
+- **This screen has now been broken in both directions it can break in** —
+  inverted window (rounds 15, 16) and false qualifier (round 24) — by four
+  different heads, every one of whom had read the warning not to re-implement
+  it. Treat "improve the mflo screen" as a smell, not a task.
+- The failure mode here is the MIRROR of the usual one: not a false blocker
+  (which deletes matchable ground permanently) but a false CLEARANCE, which
+  staffs a runner into a real wall on a function whose report correctly said
+  not to. Cheaper than a false blocker, and still paid by somebody who did
+  nothing wrong.
+
 ## Build hygiene (proven, the hard way)
 
 - **Address drift looks exactly like a broken symbol, and TWO runners lost
