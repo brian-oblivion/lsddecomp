@@ -465,6 +465,47 @@ void func_800597C0(DreamSys *this)
 	this->vt->func_800598E8(this);
 }
 
+#if 0
+/* best-reached body, round 2026-09-08 (runner echo): 49/53 words, exact
+   length, zero address drift. The remaining 4-word residue is a pure
+   register-identity swap (retail uses $a2 for `step`, this compiles to
+   $a1) confined to the decay branch -- see docs/match-reports/func_80059814.md. */
+void func_80059814(DreamSys *this)
+{
+	s32 idx;
+	s32 delta;
+	s32 threshold;
+	s32 sum;
+	s32 step;
+
+	idx = this->unk_0x88;
+	if (idx != 0) {
+		delta = D_80087E50[idx];
+		threshold = D_80087E5C[idx];
+		sum = delta + this->unk_0x8C;
+		if (sum >= 0) {
+			if (sum < threshold)
+				goto apply;
+			this->unk_0x88 = 0;
+			return;
+		}
+		if ((~sum + 1) >= threshold) {
+			this->unk_0x88 = 0;
+			return;
+		}
+	apply:
+		this->unk_0x5C->unk_0x24 += delta;
+		this->unk_0x8C = sum;
+		this->unk_0x88 = 0;
+		return;
+	}
+	if (this->unk_0x8C != 0) {
+		step = (this->unk_0x8C < 0) ? 0x258 : -0x258;
+		this->unk_0x5C->unk_0x24 += step;
+		this->unk_0x8C += step;
+	}
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059814);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800598E8);
