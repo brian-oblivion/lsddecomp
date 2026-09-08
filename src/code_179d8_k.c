@@ -500,20 +500,22 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800357B0);
 
 /* STALL -- see docs/match-reports/func_80035A7C.md. length exact 44/44,
- * 36/44 raw word-match, first real diff at word 23: a register/schedule
- * choice across four field reads, not yet reduced to one axis. */
+ * 36/44 raw word-match, first real diff at word 23: an independent value
+ * (rec->unk4C) the compiler schedules earlier than retail does, not a
+ * logic or CFG difference -- no if/else arm ordering applies here (see
+ * report for the round-25 head lever's explicit negative answer). */
 #if 0
 void func_80035A7C(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
     u8 b;
-    u8 *p;
+    u8 vol;
 
     rec->unk4 = cursor + 1;
+    vol = *((u8 *)rec + rec->unk12 + 0x2C);
     b = *cursor;
-    p = (u8 *)rec + rec->unk12;
-    func_8002F610((a1 << 8) | a0, rec->unk4C, p[0x2C], b);
+    func_8002F610((a1 << 8) | a0, rec->unk4C, vol, b);
     rec->unk88 = func_80035E80(a0, a1);
 }
 #endif
