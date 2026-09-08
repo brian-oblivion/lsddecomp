@@ -46,13 +46,75 @@
  */
 #include "common.h"
 
+/* Cross-unit calls, typed per-call-site from the registers loaded before
+ * each `jal` -- none of these callees have an established prototype from
+ * their own unit's side yet except where noted, so these are local
+ * guesses, not authoritative.  Per this project's convention, a prototype
+ * for a function ANOTHER unit defines stays in this .c, not in a shared
+ * header. */
+extern void func_8002F610(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
+extern s32 func_80036044(void);                              /* code_179d8_f, MATCHED: return func_80038D74(0); */
+extern void func_80036518(void);                              /* code_179d8_f, MATCHED: D_8008E84C = 0; */
+
+/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
+ * these, indexed [channel][slot]-style, same array documented from
+ * code_179d8_f/_i/_j's own independent local readings -- see those units'
+ * Entry90902E8 for a different reduced view of the same object; each unit
+ * keeps its own per project convention.
+ *
+ * This unit's own reading is a low-level per-channel "sequencer voice"
+ * playback record: unk4 is a cursor into a byte-encoded event stream,
+ * unk80 an accumulated tick position, unk88 a scratch slot every function
+ * in this file stores its own last computed value into (a pointer in one
+ * caller, an updated counter in others -- genuinely overloaded, not a
+ * misreading), and unk12 a BYTE OFFSET (already scaled, not an index) to
+ * whichever of several embedded state blocks is presently active; several
+ * functions here dereference `(u8 *)rec + rec->unk12` and then apply a
+ * further FIXED displacement (0x17, 0x2C) from that computed base, which
+ * is why those two fields are not named as fixed struct members below --
+ * their address is only known at runtime, exactly the case this project's
+ * pointer-arithmetic convention is for. */
+typedef struct {
+    u8 pad0[0x4];
+    u8 *unk4;   /* +0x4: cursor into a byte-encoded (7-bit VLQ) event stream */
+    u8 pad8[0x12 - 0x8];
+    u8 unk12;   /* +0x12: byte offset to the active embedded state block */
+    u8 unk13;   /* +0x13 */
+    u8 unk14;   /* +0x14 */
+    u8 pad15[0x29 - 0x15];
+    u8 unk29;   /* +0x29: a retrigger/step counter */
+    u8 pad2A[0x4C - 0x2A];
+    s16 unk4C;  /* +0x4C */
+    u8 pad4E[0x80 - 0x4E];
+    s32 unk80;  /* +0x80: accumulated tick position */
+    u8 pad84[0x88 - 0x84];
+    s32 unk88;  /* +0x88: last-value scratch, overloaded per call site */
+    u8 pad8C[0xAC - 0x8C];
+} Entry90902E8;
+extern Entry90902E8 *D_800902E8[];
+
+/* Shared VLQ-style delta-time decoder: reads a 7-bit-per-byte
+ * little-endian... no, MIDI-style BIG-endian continuation-bit-first
+ * encoding from rec->unk4 (advancing the cursor as it goes), scales the
+ * decoded magnitude by 10, adds it to rec->unk80, and returns the scaled
+ * delta.  A first byte of 0 is a sentinel for "no delta" -- returns 0
+ * without touching rec->unk80 at all. */
+extern s32 func_80035E80(s16 channel, s16 slot);
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800344FC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034614);
+void func_80034614(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 *p = (u8 *)rec + rec->unk12;
+
+    p[0x2C] = a2;
+    rec->unk88 = func_80035E80(a0, a1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
 
