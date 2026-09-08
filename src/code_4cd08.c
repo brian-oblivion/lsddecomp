@@ -155,26 +155,18 @@ fail:
     return false;
 }
 
-#if 0
-/* STALL snapshot -- see docs/match-reports/func_8005CBC8.md.
- *
- * ROUND 24 (runner delta). The `case 6`/`case 7` merge below (dynamic
- * `value % 3 != idx - 7`, matching retail's SHARED jump-table target for
- * indices 6 and 7 -- confirmed in the .s: both `jtbl_8001188C` slots point
- * at `.L8005CCC8`) was a genuine, previously-undiscovered fix: without it
- * this body compiled 8 WORDS TOO LONG (108/100), not "1 word short" as
- * round 23 claimed -- round 23's figure was measured with `nearmiss`'s
- * blocker-clean signal trusted but the actual REBUILD never done. With the
- * merge, the function is a real, clean 99/100: every instruction in the
- * body matches retail except ONE preamble word (the redundant `j` over the
- * switch-index join, exactly as documented below), confirmed via `nm` on
- * the linked ELF (built function is 0x18C bytes vs retail's 0x190) and via
- * `asm-differ` realigned on the function's own instruction stream (no other
- * divergence anywhere in the body). Two permuter searches (~34.2k +
- * further iterations) found no zero; the one improving lead (reordering the
- * `idx = ~sel + 1` computation earlier) regresses to 98/100 under the real
- * oracle -- see the match report for the full derivation.
+/* func_8005CBC8 -- MATCHED round 25.  The last word came from BASIC-BLOCK
+ * ORDER, not from the expression shapes.  Retail lays the `sel >= 0` arm
+ * out BETWEEN the `return false` path and the `~sel + 1` tail, so it needs
+ * an explicit `j` over the join; the obvious spelling
+ * (`if (sel < 0) { ...; idx = ~sel + 1; goto have_idx; } idx = sel;`) lets
+ * the `sel >= 0` arm fall through into the join instead and is one word
+ * short forever.  Writing the inner test as `if (unk0 == 0) goto negate;
+ * return false;`, with the `idx = sel; goto have_idx;` block placed
+ * textually BEFORE the `negate:` label, reproduces retail's block order
+ * exactly.  See docs/match-reports/func_8005CBC8.md.
  */
+
 bool func_8005CBC8(s32 value, TriggerRecord *record)
 {
     s8 sel = record->sel;
@@ -185,13 +177,16 @@ bool func_8005CBC8(s32 value, TriggerRecord *record)
     }
 
     if (sel < 0) {
-        if (record->unk0 != 0) {
-            return false;
+        if (record->unk0 == 0) {
+            goto negate;
         }
-        idx = ~sel + 1;
-        goto have_idx;
+        return false;
     }
     idx = sel;
+    goto have_idx;
+
+negate:
+    idx = ~sel + 1;
 
 have_idx:
 
@@ -247,9 +242,6 @@ success:
     record->unk0 = 1;
     return true;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CBC8);
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CD58);
 

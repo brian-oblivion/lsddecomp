@@ -1,4 +1,115 @@
-# func_8005CBC8 -- STALL. Length: 1 word short (99/100 built vs retail 100). Word-match: 99/100. First real diff: file 0x4D3FC / vram 0x8005CBFC (`beqz $v0, .L8005CC14`).
+# func_8005CBC8 -- MATCHED (byte-exact, 100/100 words). Round 25, head.
+
+> **ROUND 25 (2026-09-08), head. CLOSED. The last word was BASIC-BLOCK ORDER,
+> and every expression in round 24's 99/100 body was already right.**
+>
+> The residue three rounds of work had characterised as "retail's redundant
+> `j` over the switch-index join" was exactly that, and it is reachable from
+> C. It is not a scheduling artifact and it needed neither a barrier nor the
+> permuter: it is a consequence of WHICH BASIC BLOCK GCC PLACES WHERE, and
+> the source controls that.
+>
+> Retail's layout, read off `asm/nonmatchings/code_4cd08/func_8005CBC8.s`:
+>
+> ```
+>         bgez  $a0, .L8005CC0C     # sel >= 0 -> the "idx = sel" arm
+>          nop
+>         lb    $v0, 0x0($s0)       # record->unk0
+>         nop
+>         beqz  $v0, .L8005CC14     # unk0 == 0 -> the "~sel + 1" tail
+>          nor  $v0, $zero, $a0
+>         j     .L8005CD44          # return false
+>          addu $v0, $zero, $zero
+>   .L8005CC0C:
+>         j     .L8005CC18          # <- THE WORD. jumps over the tail below.
+>          addu $a1, $a0, $zero
+>   .L8005CC14:
+>         addiu $a1, $v0, 0x1
+>   .L8005CC18:
+> ```
+>
+> So retail's block order is: [`sel < 0` test] [`return false`] [`idx = sel`
+> arm, which must jump] [`idx = ~sel + 1` tail] [join]. The `idx = sel` arm
+> sits BETWEEN the fail path and the negate tail, which is the only reason it
+> needs a jump at all.
+>
+> Round 24's body wrote the preamble the obvious way:
+>
+> ```c
+>     if (sel < 0) {
+>         if (record->unk0 != 0) {
+>             return false;
+>         }
+>         idx = ~sel + 1;
+>         goto have_idx;
+>     }
+>     idx = sel;
+> have_idx:
+> ```
+>
+> which puts the `idx = sel` arm LAST, where it falls through into the join
+> and needs no jump. That body is one word short **for any expression-level
+> reshape**, which is why thirteen hand attempts and 77k permuter iterations
+> all sat at 99/100: they were all searching the wrong axis.
+>
+> **The fix is to place the blocks in retail's order, in the source.** Invert
+> the inner test so the negate arm becomes a forward `goto` and `return false`
+> becomes the fallthrough, then put the `idx = sel` block textually BEFORE the
+> label it jumps to:
+>
+> ```c
+>     if (sel < 0) {
+>         if (record->unk0 == 0) {
+>             goto negate;
+>         }
+>         return false;
+>     }
+>     idx = sel;
+>     goto have_idx;
+>
+> negate:
+>     idx = ~sel + 1;
+>
+> have_idx:
+> ```
+>
+> GCC 2.6.3 then emits exactly retail's five blocks in exactly retail's
+> order, `j` included, and `~sel` still lands in the `beqz` delay slot as
+> `nor $v0, $zero, $a0` without being asked to. **100/100, whole-image SHA1
+> green, no `__asm__`, no barrier, no operand constraint.**
+>
+> ### Proposed learning
+>
+> **A one-word residue that survives every expression reshape and every
+> permuter run is evidence about BLOCK ORDER, not about scheduling.** The
+> permuter mutates expressions, declarations and statement order within a
+> block; it does not restructure control flow into a different basic-block
+> LAYOUT, so a layout residue is invisible to it and reads as an exhausted
+> plateau. The tell in the disassembly is a `j` (not a conditional branch)
+> whose target is the next join and whose delay slot carries real work: that
+> jump exists because retail's compiler had a block after it, and the source
+> has to put a block there too.
+>
+> The lever is a forward `goto` plus TEXTUAL PLACEMENT: an if/else gives GCC
+> the choice of which arm falls through, and it always picks the last one. To
+> force an arm to jump, make it not-last -- invert the guarding test so the
+> other arm becomes the `goto`, and write the jumping arm above the label.
+> This is the block-order sibling of the already-documented "case order
+> follows the jump table" idiom: both are cases where retail's own layout is
+> readable off the binary and has to be reproduced rather than reasoned about.
+>
+> The round-24 note below (the `case 6`/`case 7` jump-table merge) stands
+> unchanged and was a necessary prerequisite -- without it the body is 8
+> words TOO LONG and this residue is invisible. Everything below is history,
+> kept because the derivation is worth reading and because the sequence of
+> corrections is itself the record of how a 100-word function took four
+> rounds.
+>
+> **One thing in the round-24 note is now resolved:** `tools/setup-permuter.sh`
+> already carries `--addiu-at` on `main` (line 75), matching `Makefile:44`.
+> The `sed -e '1,4d'` embedded-rodata bug it also reports is NOT fixed and is
+> still live for any future function that owns rodata ahead of itself.
+
 
 > **ROUND 24 (2026-09-08), runner delta. Round 23's "99/100" figure was measured
 > against an INCOMPLETE body and was itself wrong -- rebuilding it (as this
