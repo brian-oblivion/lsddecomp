@@ -521,10 +521,12 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035A7C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035B2C);
 
-/* STALL -- see docs/match-reports/func_80035E80.md. length exact 47/47,
- * 44/47 raw word-match, first real diff at word 27: the settled
- * commutative-operand-order class plus one downstream register choice. */
-#if 0
+/* MATCHED -- see docs/match-reports/func_80035E80.md. The `goto combine`
+ * is load-bearing: retail keeps the "single-byte" and "loop-exit" `val`
+ * writes as textually distinct arms reaching one merge point, and this
+ * exact shape (jump-arm written explicitly, fallthrough-arm last in
+ * source order) is what makes GCC 2.6.3 choose retail's own register for
+ * both. See the round-25 head broadcast on if/else arm ordering. */
 s32 func_80035E80(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -539,20 +541,20 @@ s32 func_80035E80(s16 a0, s16 a1)
     if (acc == 0) {
         return 0;
     }
-    val = acc * 4;
-    if (acc & 0x80) {
-        acc &= 0x7F;
-        do {
-            cursor = rec->unk4;
-            rec->unk4 = cursor + 1;
-            nb = *cursor;
-            acc = (acc << 7) + (nb & 0x7F);
-        } while (nb & 0x80);
+    if (!(acc & 0x80)) {
         val = acc * 4;
+        goto combine;
     }
+    acc &= 0x7F;
+    do {
+        cursor = rec->unk4;
+        rec->unk4 = cursor + 1;
+        nb = *cursor;
+        acc = (acc << 7) + (nb & 0x7F);
+    } while (nb & 0x80);
+    val = acc * 4;
+combine:
     result = (val + acc) * 2;
     rec->unk80 += result;
     return result;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035E80);
