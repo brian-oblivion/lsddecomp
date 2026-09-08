@@ -983,6 +983,52 @@ runners who never communicated, in unrelated units:
 POSITIONS swapped. File it under this class and do not spend attempts
 reordering commutative operands hoping to match.
 
+**SCOPE BOUNDARY, round 24 — the class holds for SYMMETRIC addends and NOT
+for a re-associable base pointer, and one round produced both cases side by
+side.** `func_80034D90` (`code_179d8_k`) was filed under this class with an
+accurate screen: retail `addu v0,s0,v0` against built `addu v0,v0,s0`, twice.
+It closed at **51/51** by REGROUPING, not reordering:
+
+```c
+((u8 *)rec)[rec->unk12 + 0x2C] = ...    /* rec + (off + 0x2C)  -> 49/51 */
+*((u8 *)rec + rec->unk12 + 0x2C) = ...  /* (rec + off) + 0x2C  -> 51/51 */
+```
+
+That is the already-documented `&arr[i + j]` versus `arr + i + j` lever
+reaching the very `addu` this class calls unreachable. The two only conflict
+if "operand order" and "grouping" are conflated:
+
+- **Symmetric addends: the class holds.** Round 20's decisive datum stands —
+  both C operand ORDERS produced the same wrong output. Nothing in source
+  reaches it.
+- **One addend is a base pointer and the expression can be re-associated:
+  the class does NOT hold.** Grouping decides which value becomes `rs`, and
+  grouping is not order. This is why the failing reshape on `func_80034D90`
+  (`u8 *ptr = rec->unk12 + (u8*)rec;`) regressed — it changed the ORDER,
+  the one axis the class correctly rules out.
+
+**The boundary then predicted the sibling correctly, which is why it is a
+boundary and not an anecdote.** `func_80035E80`, same unit, same round, same
+runner, also filed under this class: its commutative word is
+`addu a1,v0,v1` — two COMPUTED values, no base pointer, nothing to
+re-associate — and alpha had tested both C orderings. It stays a stall (and
+carries three register-identity words besides). Same class, same screen, two
+opposite dispositions, separated by whether an addend is a base.
+
+**Practical tell, cheaper than any of the above:** when a function disagrees
+with its own ALREADY-MATCHED siblings' idiom, try the siblings' idiom before
+accepting a class verdict. Three of `code_179d8_k`'s matched functions write
+`(u8 *)rec + rec->unk12` base-first and match; the stall used the subscript
+form.
+
+**And a second, independent source-reachable axis was found the same round**
+(charlie, `func_8002DF7C`, `code_179d8_l`): **a local's declared WIDTH can
+flip which operand becomes `rs`.** Narrowing a small clamp local from
+`s32`/`u32` to `u8` -- the narrowest width the value can hold -- flipped a
+commutative `addu` to retail's order and closed that function at 47/47. So
+before filing under this class, there are now TWO things to try that are not
+operand reordering: re-associate the grouping, and narrow an addend's type.
+
 **And the scope boundary, which is the more useful half.** echo then tested a
 third unrelated unit (`class_3ac78`, three functions) and found **no instance**
 — those residues are a load-delay-slot scheduling swap, a register-role
