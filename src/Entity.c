@@ -207,11 +207,22 @@ void *Entity__GetMoodEffect(Entity *this) {
     return &D_80089EA4[this->moodIndex];
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetUnlockEffect);
+s32 Entity__GetUnlockEffect(Entity *this) {
+    return D_80089EA6[this->moodIndex * 0x10] * 1000;
+}
 
-INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetLinkStage);
+s32 Entity__GetLinkStage(Entity *this) {
+    s32 linkStage = D_80089EAB[this->moodIndex * 0x10];
 
-INCLUDE_ASM("asm/nonmatchings/Entity", Entity__GetEventVideo);
+    if (linkStage < 0) {
+        return ~linkStage;
+    }
+    return linkStage - 1;
+}
+
+s32 Entity__GetEventVideo(Entity *this) {
+    return D_80089EAC[this->moodIndex * 0x10] - 1;
+}
 
 void func_8005D9F4(Entity *this) {
     this->methods->slot60(this, 1);

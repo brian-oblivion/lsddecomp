@@ -1,4 +1,58 @@
-# Entity__GetLinkStage
+# Entity__GetLinkStage -- MATCHED 15/15 words, round 24 (2026-09-08)
+
+> **VERDICT CORRECTED, round 24 (2026-09-08). THIS FUNCTION IS MATCHED.**
+> Everything below this box was RIGHT about the mechanism and WRONG about the
+> conclusion, for a reason that had nothing to do with its analysis: the
+> residue it characterises is the `addiu_at` folded-vs-unfolded form, and
+> **`addiu_at` was RESOLVED in round 21** (maspsx gained a `--addiu-at` flag,
+> `tools/patches/maspsx-addiu-at.patch`; see
+> `docs/research/addiu-at-blocker.md`). The report below even states the
+> blocker cannot be fixed because "maspsx exposes no `--addiu-at` flag" --
+> true when written, false since round 21.
+>
+> Matched 15/15 words on the first attempt with the C the report itself had
+> already derived, unchanged. Whole-image SHA1 green.
+>
+> **How it stayed hidden for three rounds is the part worth keeping.** Round
+> 22 built the `REOPENED -- ASSIGNABLE` marker and swept for reports citing
+> `addiu_at`; round 23 found it had missed `func_8005CBC8` (99/100) because
+> that report "does not look like a stub"; this one and its siblings were
+> missed for the same reason, one step further. They open with a **HEAD
+> ADJUDICATION** box certifying the diagnosis as independently reproduced and
+> written up project-wide with a 502-of-502 corpus census. Nothing reads as
+> less like stale ground than that -- and every word of it was true. The
+> adjudication verified the MECHANISM, which never changed; what expired was
+> the premise that the mechanism was unfixable.
+>
+> **A blocker's death invalidates the strongest reports as thoroughly as the
+> weakest ones, and it invalidates them WITHOUT touching anything they say.**
+> Rank by `tools/nearmiss.py`, which screens from the ASM, and treat any
+> contradiction between it and a report's verdict as the report being the
+> wrong half -- however well argued, and especially when the argument is
+> good enough that nobody re-reads it.
+
+
+## The matched C
+
+```c
+s32 Entity__GetLinkStage(Entity *this) {
+    s32 linkStage = D_80089EAB[this->moodIndex * 0x10];
+
+    if (linkStage < 0) {
+        return ~linkStage;
+    }
+    return linkStage - 1;
+}
+```
+
+The two arms are `abs(linkStage) - 1` in disguise -- for negative x, `~x` is
+`-x - 1` -- but they must be written as the explicit two-arm form, because
+the `nor` on the negative path is a literal `~`. An `abs()`-shaped source
+does not produce it.
+
+---
+
+## Original report, kept verbatim as the historical record
 
 > **HEAD ADJUDICATION, round 2026-08-30-a.** The diagnosis in this report is
 > CORRECT and the head reproduced it independently from scratch. It is now
