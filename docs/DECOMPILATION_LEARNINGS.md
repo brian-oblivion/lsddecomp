@@ -531,6 +531,57 @@ So the transferable content is the QUESTION, not any of the four fixes:
 last?* Answer it from the disassembly per function. Round 25 closed three
 functions with four different placement fixes, which is the ratio to expect.
 
+#### "A barrier does not transfer" has (at least) THREE causes; this lever explains ONE
+
+**Round 25's charlie tested the block-order hypothesis against a whole unit's
+stalls instead of adopting it, and decomposed the symptom.** `code_179d8_g`'s
+long-standing puzzle — a bare `__asm__("")` fixes the "redundant-raw-copy
+elision" in an isolated reduction and transfers to none of the real functions
+— is not one mechanism:
+
+1. **Block-order / shared-join fallthrough.** CONFIRMED, and found in
+   `func_8002AEE0` INDEPENDENTLY, before the head's broadcast naming it
+   arrived. An early `return -1;` written inside a timeout arm compiles
+   SHORTER than retail, which keeps a "redundant" `move $v0,$zero` /
+   `bnez $v0,<epilogue>` pair at the join. Restructuring to
+   diagnostic-block-FIRST, success-label-SECOND, one shared `result` checked
+   once took it **61/174 -> 153/174 in a single fix** — the largest single
+   gain of that session. The same shape found twice independently in two
+   functions is stronger evidence than either instance.
+2. **Pure intra-block scheduling tie-breaks.** `func_8002A75C`'s residue is
+   confirmed via the permuter's `--debug` breakdown (zero insertions, zero
+   deletions, zero register differences — pure reordering) to have no second
+   block at all, and a barrier STILL fails to move it: the right category of
+   instrument, no position found that works.
+3. **Dead-code elimination.** `func_8002B94C`'s redundant-looking check is
+   removed by the optimizer BEFORE scheduling runs, which no barrier
+   placement can rescue.
+
+So diagnose from the real `.s`'s block/label structure and, where available, a
+permuter `--debug` breakdown, before reaching for a barrier as a first move.
+
+#### The NAIVE form of the fix is wrong once block order is already right
+
+**This is a twice-reproduced counter-example and it corrects the way the lever
+was first broadcast.** "Retail keeps two materializations, so give the
+duplicate its own C variable" is NOT the fix. On `func_8002B4D4`, whose block
+order already matches retail exactly (its if-branch tail carries the explicit
+`j` and its else-branch correctly falls through — verified against the raw
+`.s`), splitting the shared pointer into a second named variable was tried
+independently in TWO rounds and **regressed both times** (to ~17/91, and
+60 -> 50/91). A second named pointer changes register allocation for the WHOLE
+function, because the allocator's pressure budget is shared across the entire
+body, not local to the one store.
+
+Both things are true at once, and the order matters:
+
+- The MECHANISM — retail keeps two independent materializations, and block
+  order decides which one earns the fallthrough — is real and worth checking
+  first.
+- "Split it into two C variables" only helps **while the block order is
+  WRONG**. Once it is right, that lever is actively harmful, and what remains
+  is ordinary register allocation.
+
 #### A negative that bounds it: the delay-slot-hoist family is NOT this
 
 Echo screened five `DreamSys` stalls against both shapes and found none:
