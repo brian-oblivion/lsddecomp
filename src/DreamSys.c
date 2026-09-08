@@ -118,7 +118,60 @@ neg2_mismatch:
 	this->vt->func_8005B990(this);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058C58);
+void func_80058C58(DreamSys *this, s32 arg1, s32 mode)
+{
+	if (this->unk_0x6c != 0)
+		return;
+	if (this->unk_0x70 != 0)
+		return;
+	if (this->unk_0x908 != 0)
+		return;
+
+	switch (mode - 2) {
+	case 0:
+		this->unk_0xA0 = 1;
+		break;
+	case 1:
+		this->unk_0xA0 = 2;
+		break;
+	case 2:
+		this->unk_0xA4 = 1;
+		break;
+	case 3:
+		this->unk_0xA4 = 2;
+		break;
+	case 4:
+		this->unk_0x88 = 1;
+		break;
+	case 5:
+		if (this->unk_0xA0 == 1)
+			this->vt->func_8005A184(this, 4);
+		break;
+	case 6:
+		this->unk_0x88 = 2;
+		break;
+	case 11:
+		this->unk_0x90 = 2;
+		break;
+	case 12:
+		this->unk_0xA0 = 4;
+		break;
+	case 13:
+		this->unk_0x90 = 1;
+		break;
+	case 14:
+		this->unk_0xA0 = 3;
+		break;
+	case 23:
+		this->unk_0x74 = 1;
+		break;
+	case 32:
+		this->vt->func_8005A1A4(this);
+		break;
+	case 47:
+		break;
+	}
+}
 
 void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
 {
@@ -412,6 +465,47 @@ void func_800597C0(DreamSys *this)
 	this->vt->func_800598E8(this);
 }
 
+#if 0
+/* best-reached body, round 2026-09-08 (runner echo): 49/53 words, exact
+   length, zero address drift. The remaining 4-word residue is a pure
+   register-identity swap (retail uses $a2 for `step`, this compiles to
+   $a1) confined to the decay branch -- see docs/match-reports/func_80059814.md. */
+void func_80059814(DreamSys *this)
+{
+	s32 idx;
+	s32 delta;
+	s32 threshold;
+	s32 sum;
+	s32 step;
+
+	idx = this->unk_0x88;
+	if (idx != 0) {
+		delta = D_80087E50[idx];
+		threshold = D_80087E5C[idx];
+		sum = delta + this->unk_0x8C;
+		if (sum >= 0) {
+			if (sum < threshold)
+				goto apply;
+			this->unk_0x88 = 0;
+			return;
+		}
+		if ((~sum + 1) >= threshold) {
+			this->unk_0x88 = 0;
+			return;
+		}
+	apply:
+		this->unk_0x5C->unk_0x24 += delta;
+		this->unk_0x8C = sum;
+		this->unk_0x88 = 0;
+		return;
+	}
+	if (this->unk_0x8C != 0) {
+		step = (this->unk_0x8C < 0) ? 0x258 : -0x258;
+		this->unk_0x5C->unk_0x24 += step;
+		this->unk_0x8C += step;
+	}
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059814);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800598E8);
@@ -1335,6 +1429,35 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C118);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", GetStaticSpawn);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", GenerateInitialSpawn);
+s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint *mood, s32 day)
+{
+	StageChunk chunk;
+	s32 stage;
+	s32 count;
+	s32 i;
+	StageSpawn *entry;
+
+	stage = GetStageChunkFromMood(&chunk, mood);
+	if (stage >= 0) {
+		*timeLimit = STAGE_TIME_LIMITS[stage];
+
+		count = LEN_STAGE_SPAWNPOINTS[stage];
+		entry = STAGE_SPAWNPOINTS[stage];
+		for (i = 0; i < count; i++, entry++) {
+			if (*(s16 *)&chunk == *(s16 *)&entry->chunk)
+				goto found;
+		}
+		entry = &STAGE_SPAWNPOINTS[stage][*(s16 *)&chunk % count];
+
+	found:
+		*(PlayerSpawnGridPos *)dest = *(PlayerSpawnGridPos *)entry;
+		dest->position = SPAWN_POS_ADJUST[entry->adjustment];
+		return stage;
+	}
+
+	stage = GetRandomSpawnFromStage(dest, stage, day);
+	*timeLimit = STAGE_TIME_LIMITS[stage];
+	return stage;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", IsDaySpecial);

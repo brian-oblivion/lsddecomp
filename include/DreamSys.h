@@ -1162,7 +1162,9 @@ typedef enum DreamColors{
 typedef struct StageSpawn{
 	struct MapChunk chunk;
 	struct MapTile tile;
-	s8 adjustment;
+	/* u8, not s8 (round 2026-09-08, GenerateInitialSpawn): retail reads it
+	   with `lbu` -- it indexes SPAWN_POS_ADJUST, so must zero-extend. */
+	u8 adjustment;
 	s8 extra;
 }StageSpawn;
 
@@ -1184,7 +1186,11 @@ extern s16 STAGE_TIME_LIMITS[];
 extern struct RelativePos SPAWN_POS_ADJUST[];
 
 extern StageSpawn* STAGE_SPAWNPOINTS[];
-extern s8 LEN_STAGE_SPAWNPOINTS[];
+/* Retyped u8 (round 2026-09-08, GenerateInitialSpawn): retail reads it with
+   `lbu`, and the surrounding loop guard (`count != 0` implying `count > 0`,
+   a single `beqz`) only holds if it can't be negative -- a signed `s8` here
+   forces GCC to add a second `blez` check that retail does not have. */
+extern u8 LEN_STAGE_SPAWNPOINTS[];
 
 extern StageSpawn* STAGE_PERMALINK_SPAWNS[];
 extern StaticLinkTrigger* STAGE_PERMALINK_TRIGGERS[];
