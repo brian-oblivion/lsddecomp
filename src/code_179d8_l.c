@@ -66,7 +66,33 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DDBC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DF7C);
+extern u8 D_8008EA0E;
+extern u8 D_8008EA1C;
+extern u8 D_8008EA1D;
+extern u16 D_8006DAD8[];
+
+s32 func_8002DF7C(void) {
+    s32 a0;
+    s32 q12;
+    s16 rem12;
+    u8 a2;
+    u16 v1;
+
+    a0 = (s16)(D_8008EA0E + 0x3C - D_8008EA1C);
+    q12 = a0 / 12;
+    a2 = D_8008EA1D >> 3;
+    rem12 = a0 - q12 * 12;
+    if (a2 >= 16) {
+        a2 = 15;
+    }
+    v1 = D_8006DAD8[a2 + rem12 * 16];
+    if ((s16)(q12 - 5) > 0) {
+        v1 <<= (s16)(q12 - 5);
+    } else if ((s16)(q12 - 5) < 0) {
+        v1 = (u16)v1 >> -(s16)(q12 - 5);
+    }
+    return v1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E038);
 
