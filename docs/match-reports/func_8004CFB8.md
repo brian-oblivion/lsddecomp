@@ -254,3 +254,67 @@ never moved into `src/` this round). Still open to a differently-seeded
 permuter run (e.g. seeded from a shape that varies the FIRST half's
 already-solved structure jointly with the second, rather than holding it
 fixed) or a fresh hand-written idea; not closed off.
+
+---
+
+## Variant 7 (round 25, head) — NEGATIVE, 5 words too long
+
+Tried because the round-25 block-order lever (see
+`docs/match-reports/func_8005CBC8.md`) suggested this function's deferred
+single `mflo` might be a CROSS-JUMPING result rather than an RTL-expansion
+one: if both arms end in an identical `mflo`/`sw` tail, GCC 2.6.3 can merge
+those tails and absorb the shorter arm's lone `mult` into the `bgez` delay
+slot, which is exactly retail's shape. The variant hoists `m` into a local
+(so `self->unk1E4` is loaded once, as retail does) and then assigns
+`self->unk1E0` **directly in both arms**, giving the two arms identical
+tails to merge:
+
+```c
+merge:
+    m = self->unk1E4->unk6;
+    if (rate < 0) {
+        self->unk1E0 = m * (~rate + 1);
+    } else {
+        self->unk1E0 = m * rate;
+    }
+```
+
+with the first half unchanged from the best-attempt body above.
+
+**Result: 5 words TOO LONG.** GCC did not merge the tails; it emitted an
+`mflo` and an `sw` in each arm. Measured from the linked image rather than
+from `funcdiff`'s in-range count, which is the point below.
+
+This is variant #4/#5's family (both also too long) with the `m` hoist
+added, which the earlier six did not try. So the hoist fixes the redundant
+reload those two suffered and does NOT buy the tail merge. **The report's
+existing conclusion stands: the eager `mflo` is a cc1 per-statement RTL
+expansion choice, not a missing cross-jump.**
+
+### Two methodological notes, both worth more than the negative
+
+1. **`funcdiff`'s in-range instruction diffs were unreadable here and I
+   nearly read them anyway.** The variant is 5 words long, so everything
+   after the length change is misaligned and the per-word `retail=… built=…`
+   lines compare instructions that are not counterparts. The guard fired
+   correctly (`the build differs OUTSIDE this range too (189873 bytes)`),
+   and the trustworthy number came from somewhere else entirely — see 2.
+2. **A shifted DATA symbol sizes a text-length change exactly.** All four
+   `%lo(D_80086*)` immediates came back a constant `+0x14` from retail's,
+   because a change in this object's text length moves everything after it
+   including `.data`. `0x14 = 5 words`, which is the length delta, read
+   straight off the relocation without needing `nm` or asm-differ. Any
+   function that references a data symbol by `%hi`/`%lo` gives you this for
+   free.
+
+### Proposed learning
+
+**A one-word residue that survives every expression reshape is evidence
+about block order (round 25's `func_8005CBC8`) — but a residue that
+survives reshaping AND is an `mflo`/HI-LO extraction is NOT, and this
+function is the measured counterexample.** The block-order lever applies to
+which BLOCK a computation lands in; it cannot move a `mult`/`mflo` pair
+apart, because cc1 expands that pair together during RTL expansion, before
+any block layout decision. So when screening for block-order candidates,
+a `mult`/`div`/`mflo`/`mfhi` residue is a *negative* indicator, not a
+neutral one.
