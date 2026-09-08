@@ -12,6 +12,10 @@
    strict ROM-address ordering of the definitions below. */
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+/* func_800598E8 (round 2026-09-08) calls this unit's own func_80059A1C,
+   defined immediately after it in ROM order -- same forward-declaration
+   need as the two above. */
+void func_80059A1C(DreamSys *this);
 
 DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 {
@@ -508,6 +512,53 @@ void func_80059814(DreamSys *this)
 #endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059814);
 
+#if 0
+/* best-reached body, round 2026-09-08 (runner echo): matches retail's
+   ENTIRE control-flow graph (every branch/jump target realigns exactly),
+   2 words SHORT (75/77) purely because `delta` does not get promoted to
+   a callee-saved register the way retail's does ($s2). See
+   docs/match-reports/func_800598E8.md. */
+void func_800598E8(DreamSys *this)
+{
+	s32 idx;
+	s32 delta;
+	s32 threshold;
+	s32 sum;
+	s32 step;
+
+	this->unk_0xA8 = (this->unk_0xA0 == 1);
+	idx = this->unk_0x90;
+	if (idx != 0) {
+		delta = D_80087E68[idx];
+		threshold = D_80087E74[idx];
+		sum = delta + this->unk_0x94;
+		if (sum >= 0) {
+			if (sum < threshold)
+				goto apply;
+			this->unk_0x90 = 0;
+			goto call_tail;
+		}
+		if ((~sum + 1) >= threshold) {
+			this->unk_0x90 = 0;
+			goto call_tail;
+		}
+	apply:
+		D_80087E84[0].value = delta;
+		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
+		this->unk_0x94 = sum;
+		this->unk_0x90 = 0;
+	} else if (this->unk_0x94 != 0) {
+		step = (this->unk_0x94 < 0) ? 0x2D : -0x2D;
+		D_80087E84[0].value = step;
+		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
+		this->unk_0x94 += step;
+	} else {
+		return;
+	}
+call_tail:
+	func_80059A1C(this);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800598E8);
 
 void func_80059A1C(DreamSys *this)
