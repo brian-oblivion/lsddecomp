@@ -1,18 +1,9 @@
 #include "common.h"
 #include "code_4cd08.h"
 
-#if 0
-/* STALL snapshot -- see docs/match-reports/func_8005C508.md. Best reached:
- * 40/56 words (0x4CD08-0x4CDE8). Everything matches byte-for-byte except one
- * extra retail instruction materializing &D_80088D28[i] as a full absolute
- * address (lui+addiu) before adding the running byte offset, where every
- * source shape tried here folds %lo(D_80088D28) into the store's own
- * displacement instead, making the function 4 bytes short and shifting
- * everything after it. If reused, this needs
- * const char D_8001186C[] = "ETC\\SYMSPY.MOM";
- * const char D_8001187C[] = "ETC\\SYMDOG.MOM";
- * defined ahead of it (see the report for why).
- */
+const char D_8001186C[] = "ETC\\SYMSPY.MOM";
+const char D_8001187C[] = "ETC\\SYMDOG.MOM";
+
 void func_8005C508(void)
 {
     DreamAuxLoadReq req;
@@ -32,9 +23,6 @@ void func_8005C508(void)
         req.name = D_8001187C;
     }
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C508);
 
 void func_8005C5E8(void)
 {
@@ -170,21 +158,20 @@ fail:
 #if 0
 /* STALL snapshot -- see docs/match-reports/func_8005CBC8.md.
  *
- * VERDICT CORRECTED, round 23 (2026-09-07). This block previously said the
- * function is "UNMATCHABLE as C no matter how it is reshaped", because one of
- * its two residue words was the addiu-at jump-table fold. **That blocker was
- * resolved in round 21** and this body was re-measured with it gone: the
- * dispatch (`lui $at` / `addiu $at,$at,%lo(jtbl_8001188C)` / `addu` / `lw`)
- * now reproduces EXACTLY, and the residue is ONE word.
- *
- * The one word is retail's redundant `j` over the switch-index join: retail
- * places the `sel >= 0` arm BEFORE the `~sel + 1` arm, so it needs an explicit
- * jump over it, while GCC places `sel >= 0` last and lets it fall through.
- * `~sel + 1` (NOT `-sel`) is what reproduces retail's `nor`+`addiu`.
- *
- * At 99/100 words this is now the closest open near-miss in the corpus and a
- * prime permuter target -- NOT an unmatchable function. Do not re-derive the
- * old verdict.
+ * ROUND 24 (runner delta). The `case 6`/`case 7` merge below (dynamic
+ * `value % 3 != idx - 7`, matching retail's SHARED jump-table target for
+ * indices 6 and 7 -- confirmed in the .s: both `jtbl_8001188C` slots point
+ * at `.L8005CCC8`) was a genuine, previously-undiscovered fix: without it
+ * this body compiled 8 WORDS TOO LONG (108/100), not "1 word short" as
+ * round 23 claimed -- round 23's figure was measured with `nearmiss`'s
+ * blocker-clean signal trusted but the actual REBUILD never done. With the
+ * merge, the function is a real, clean 99/100: every instruction in the
+ * body matches retail except ONE preamble word (the redundant `j` over the
+ * switch-index join, exactly as documented below), confirmed via `nm` on
+ * the linked ELF (built function is 0x18C bytes vs retail's 0x190) and via
+ * `asm-differ` realigned on the function's own instruction stream (no other
+ * divergence anywhere in the body). Permuter run against this exact body,
+ * see report for outcome.
  */
 bool func_8005CBC8(s32 value, TriggerRecord *record)
 {
@@ -230,12 +217,8 @@ have_idx:
         }
         break;
     case 6:
-        if (value % 3 != 1) {
-            return false;
-        }
-        break;
     case 7:
-        if (value % 3 != 2) {
+        if (value % 3 != idx - 7) {
             return false;
         }
         break;
