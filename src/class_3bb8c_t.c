@@ -7,8 +7,17 @@
  * Blocker census, three-grep screen run per function at carve time:
  * 16 of 17 clean.
  *
- * BLOCKED, stub report already filed, do NOT spend attempts on it:
- *   addiu_at: func_800585B4
+ * NOT BLOCKED.  This unit's one "blocked" function was blocked on `addiu_at`
+ * ALONE, and `addiu_at` was RESOLVED in round 21 (maspsx `--addiu-at`;
+ * docs/research/addiu-at-blocker.md).  Re-screened with
+ * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   func_800585B4 (56w)  blocker-clean.  ATTEMPTED round 24, stalled at
+ *                        55/56 words (1 short), 15/56 raw; see its match
+ *                        report for the characterised residue, the day-log
+ *                        struct it established, and three clean negatives.
+ * The previous version of this comment read "BLOCKED, stub report already
+ * filed, do NOT spend attempts on it" -- a stale DIRECTIVE over workable
+ * ground, and the fifth of its kind found in round 24.
  *
  * Four of the 17 are 2-instruction leaves that splat matched itself.
  *
@@ -165,12 +174,36 @@ struct D_80087AACUnk48Obj {
  * func_800580E0/func_80058404 (both still queued at slot +0x1B0). Only
  * that one slot is typed. */
 typedef struct D_80087AACUnkA4Obj D_80087AACUnkA4Obj;
-/* Return type of D_80087AACUnkA4Methods::slot1B0 -- only the two fields
- * this unit's own func_800580E0 reads are named. */
+/* Return type of D_80087AACUnkA4Methods::slot1B0.
+ *
+ * It is a DAY-LOG object, established by func_800585B4 (round 24): the two
+ * fields func_800580E0 reads at +0x4/+0x8 are a mode flag and a live day
+ * count, and +0x18 is a 365-entry halfword year ring whose length is fixed
+ * by func_800585B4's wrap constant (the index resets to 0x16C == 364 when
+ * it goes negative, so 365 entries).  Extended ADDITIVELY -- +0x4 and +0x8
+ * keep their offsets, so func_800580E0's codegen is unaffected.
+ *
+ * LEAD, not a claim: a 365-entry log of 2-byte points is the shape of
+ * `MoodGraphPoint moodPreviousDays[365]` in include/DreamSys.h, and the
+ * `lh` accesses here are consistent with MoodGraphPoint being 2 bytes.  But
+ * the OFFSETS do not line up -- DreamSys puts that array far deeper than
+ * +0x18 -- so this is a different object keeping its own year log, not
+ * DreamSys under another name.  Kept LOCAL to this unit; do not include
+ * DreamSys.h to chase the resemblance, it would create header contention
+ * this unit does not currently have. */
 typedef struct D_80087AACUnkA4Result {
     u8 pad00[0x4];
+    /* +0x004, nonzero means "scan the full 100-day window regardless of how
+     * many days are actually logged". */
     s32 unk_0x4;
+    /* +0x008, days logged so far; also the ring's write cursor. */
     s32 unk_0x8;
+    u8 pad0C[0x18 - 0xC];
+    /* +0x018, the year ring, walked backwards from unk_0x8 - 1. */
+    s16 days[365];
+    u8 pad2F2[0x467 - 0x2F2];
+    /* +0x467, set once func_800585B4's scan has succeeded. */
+    s8 scored;
 } D_80087AACUnkA4Result;
 typedef struct D_80087AACUnkA4Methods {
     u8 pad00[0x1B0];
@@ -383,6 +416,11 @@ void func_80058404(D_80087AACObj *self, void *arg1) {
         self->unk_0xA8[0]->methods->slotC4(self->unk_0xA8[0], arg1, (s32 *)&firstPoint, 0);
     }
 }
+
+/* Four halfword targets, 0x01FF/0x0101/0x0000/0xFD00 -- exactly the i < 4
+ * bound below, which is why the loop count is the table's length and not a
+ * coincidence. */
+extern s16 D_80087BD4[4];
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800585B4);
 

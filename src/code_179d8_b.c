@@ -5,8 +5,15 @@
  * Carved round 16 by blocker DENSITY, not by "next": code_179d8 is 44%
  * blocked in aggregate but the blockers CLUSTER, so the aggregate says
  * nothing about any particular window. This one screened 16/20 clean.
- * The three blocked functions are already stubbed as match reports:
- *   func_80028CF8, func_80028D30, func_80029478  -- addiu_at
+ * NONE OF THE THREE "BLOCKED" FUNCTIONS IS BLOCKED ANY MORE.  All three
+ * were blocked on `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21
+ * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md).  Re-screened
+ * with `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   func_80028CF8  MATCHED    func_80028D30  MATCHED
+ *   func_80029478  blocker-clean, still INCLUDE_ASM -- assignable
+ * The previous version of this comment said all three "are already stubbed
+ * as match reports", which by round 24 was a stale DIRECTIVE over free
+ * ground; their stubs are gone.
  * func_800292F4 was misclassified nop_mflo_mfhi by an inverted screen
  * (round 16 head correction) -- it is fresh ground, not blocked. It
  * contains mult->mfhi (the hazard-slot direction, not a blocker), retail's
