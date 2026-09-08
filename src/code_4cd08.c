@@ -170,8 +170,10 @@ fail:
  * switch-index join, exactly as documented below), confirmed via `nm` on
  * the linked ELF (built function is 0x18C bytes vs retail's 0x190) and via
  * `asm-differ` realigned on the function's own instruction stream (no other
- * divergence anywhere in the body). Permuter run against this exact body,
- * see report for outcome.
+ * divergence anywhere in the body). Two permuter searches (~34.2k +
+ * further iterations) found no zero; the one improving lead (reordering the
+ * `idx = ~sel + 1` computation earlier) regresses to 98/100 under the real
+ * oracle -- see the match report for the full derivation.
  */
 bool func_8005CBC8(s32 value, TriggerRecord *record)
 {

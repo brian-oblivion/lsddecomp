@@ -1,4 +1,113 @@
-# func_8005CBC8 -- STALL (ONE word short; 99/100). Blocker GONE as of round 21.
+# func_8005CBC8 -- STALL (ONE word short; 99/100, corrected). Blocker GONE as of round 21.
+
+> **ROUND 24 (2026-09-08), runner delta. Round 23's "99/100" figure was measured
+> against an INCOMPLETE body and was itself wrong -- rebuilding it (as this
+> round's assignment explicitly required) found a real, previously-undiscovered
+> structural bug that round 23 missed, not just a stale number.**
+>
+> Restoring round 23's exact preserved body and building it gave **108/100
+> words -- 8 WORDS TOO LONG**, not 99/100 (confirmed via `nm` on the linked
+> ELF: `func_8005CD58` landed at `+0x1B0` from this function's start, not
+> retail's `+0x190`). Round 23 never re-derived this number from a build; it
+> inherited round 13's asm-differ read and treated the dispatch fix as the
+> whole story.
+>
+> **The actual cause: retail MERGES switch cases 6 and 7 into ONE shared
+> handler, and the preserved C body had them as two separate `case` blocks.**
+> Proof is in the function's own jump table, still on disk in
+> `asm/nonmatchings/code_4cd08/func_8005CBC8.s`:
+>
+> ```
+>     /* 20A4 800118A4 C8CC0580 */ .word .L8005CCC8   <- index 6
+>     /* 20A8 800118A8 C8CC0580 */ .word .L8005CCC8   <- index 7, SAME label
+> ```
+>
+> Both slots point at the identical handler, which computes the modulo-3
+> remainder ONCE and compares it against `idx - 7` (`idx==8` for case 6 gives
+> `idx-7==1`; `idx==9` for case 7 gives `idx-7==2` -- exactly the two
+> constants the old separate-case bodies hardcoded). Writing this as
+> `case 6: case 7: if (value % 3 != idx - 7) return false; break;` collapses
+> the redundant second modulo-3 computation GCC otherwise emits for the two
+> separate arms, and drops the function straight to **99/100** -- confirmed
+> both via `nm` (built size now exactly `0x18C` vs retail's `0x190`, i.e. one
+> word short) and via `asm-differ` realigned on the function's own stream
+> (every instruction in the body matches retail except the one preamble word
+> below; no other divergence anywhere, including the case 6/7 block itself
+> which now reproduces byte-for-byte).
+>
+> This generalizes the existing "case order follows the jump table"
+> idiom (`docs/DECOMPILATION_LEARNINGS.md`, "case order recoverable from the
+> binary") one step further: **two (or more) jump-table SLOTS can point at
+> the SAME handler label**, meaning the source must write those case values
+> as a single shared `case A: case B:` arm with a computation that is
+> deliberately made to depend on which value dispatched into it (here,
+> `idx`), not as separate arms with the constant baked in. The tell is
+> identical jump-table words for different indices -- grep the `.s` file's
+> `.word` column for a repeated label before assuming every index has its
+> own arm.
+>
+> **Permuter, run against the corrected (99/100) body.** Two searches,
+> ~34,200 + iterations total under a 280s wall-clock budget each (`-j 6
+> --stack-diffs --stop-on-zero --best-only`), found **no zero**. The single
+> improving candidate saved by run 1 (permuter score 330 vs base 420,
+> iteration in the first ~34.2k) reorders the `idx = ~sel + 1;` computation
+> to BEFORE the `if (record->unk0 != 0) return false;` check instead of
+> after:
+>
+> ```c
+>     if (sel < 0) {
+>         idx = ~sel + 1;              /* moved up, was after the check */
+>         if (record->unk0 != 0) {
+>             return false;
+>         }
+>         goto have_idx;
+>     }
+> ```
+>
+> **Translated to real C and re-verified against the actual oracle, this
+> REGRESSES: 98/100 (2 words short), not an improvement** -- confirmed via
+> `nm` (`func_8005CD58` moved to `+0x188`, not `+0x190`). This is exactly the
+> documented caution that a permuter score is not the project's oracle
+> (MATCHING-GUIDE.md's "Permuter" section): the permuter's own weighted
+> penalty improved (fewer visible mismatched instructions in ITS diff) while
+> the real word-count got worse. The kept near-miss body reverts this
+> reorder.
+>
+> **A permuter setup bug found and fixed LOCALLY (not in the shared script,
+> per parallel-mode rules) -- worth escalating.** `tools/setup-permuter.sh`
+> generates `compile.sh` with
+> `MASPSX_FLAGS="--aspsx-version=2.34 --dont-force-G0 --expand-div"`, missing
+> the Makefile's `--addiu-at` (`Makefile:44`). For a function that does not
+> touch the `addiu_at` construct this is invisible; for THIS function (whose
+> whole point is a jump-table dispatch) it means the permuter's own compiled
+> candidates never get retail's unfolded dispatch, so no candidate could ever
+> reach zero on it -- the run would still have measured the preamble residue
+> correctly (dispatch mismatch dominates the score in one place, not both),
+> but the scaffold itself was stale relative to the pinned toolchain. Also
+> found: `sed -e '1,4d' "$asm"` (dropping the retail `.s`'s first four lines
+> to build `target.s`) assumes those four lines are always just the two
+> `.set` directives, a blank line, and `.section .text` -- true for an
+> ordinary function, but **false for a function that owns embedded rodata
+> ahead of itself** (this one: `.section .rodata` / the jump table / blank /
+> THEN `.section .text`). Dropping line 4 here deletes the `.section .rodata`
+> directive itself, so the jump table's bytes land in `.text` (prelude.inc's
+> default section) instead, which corrupted `target.o` enough that
+> `permuter.py`'s objdump-output parser crashed outright
+> (`IndexError: list index out of range` in `simplify_objdump`). Both were
+> patched only inside this run's gitignored `permuter-work/func_8005CBC8/`
+> (never in the shared `tools/setup-permuter.sh`, per this round's parallel-
+> mode constraint) -- fix: keep `--addiu-at` in `compile.sh`'s
+> `MASPSX_FLAGS`, and for `target.s` generation, drop only the TRUE
+> boilerplate lines (here, `sed -e '1,3d'`, keeping `.section .rodata`)
+> rather than a hardcoded `1,4d`. Whoever owns `tools/setup-permuter.sh`
+> should fix this for every future embedded-rodata function, not just this
+> one -- `func_8005C508` in this same unit shares the "indexed-global folds
+> through the same maspsx mechanism" trait, though it has no embedded rodata
+> of its own so it did not hit the second bug.
+>
+> **Verdict stands as STALL, corrected to a clean 99/100.** The kept
+> near-miss body below now has the case 6/7 merge; restored to `INCLUDE_ASM`,
+> no C left in `src/`.
 
 > **VERDICT CORRECTED, round 23 (2026-09-07), head. This report's own title
 > and its round-13 correction both said this function "cannot be matched as C
@@ -104,6 +213,99 @@ when `record->unk0` (offset `0x0`, signed byte) is nonzero, else
   delegate to `func_8005CD58(idx)`.
 
 On any success path, `record->unk0` is set to `1` before returning `true`.
+
+## Best body, ROUND 24 (compiles, builds green, 99/100 -- ONE word short, no blocker)
+
+Supersedes the "Best body" block immediately below it, which is 8 WORDS TOO
+LONG as written (missing the case 6/7 merge -- see the round-24 note at the
+top of this report). Kept for history since its per-case bodies and overall
+shape are otherwise identical and it is what round 13/23's attempt history
+below refers to.
+
+```c
+#include "common.h"
+#include "code_4cd08.h"
+
+bool func_8005CBC8(s32 value, TriggerRecord *record)
+{
+    s8 sel = record->sel;
+    s32 idx;
+
+    if (sel == 1) {
+        goto success;
+    }
+
+    if (sel < 0) {
+        if (record->unk0 != 0) {
+            return false;
+        }
+        idx = ~sel + 1;
+        goto have_idx;
+    }
+    idx = sel;
+
+have_idx:
+
+    switch (idx - 2) {
+    case 0:
+    case 1:
+    case 2:
+        if (!func_8005CDA8(value, idx - 1)) {
+            return false;
+        }
+        break;
+    case 3:
+        if (value % 3 != 0) {
+            return false;
+        }
+        break;
+    case 4:
+        if (value % 3 == 0) {
+            return false;
+        }
+        break;
+    case 5:
+        if (!func_8005630C()) {
+            return false;
+        }
+        break;
+    case 6:
+    case 7:
+        if (value % 3 != idx - 7) {
+            return false;
+        }
+        break;
+    case 18:
+        if ((value & 1) != 0) {
+            return false;
+        }
+        break;
+    case 19:
+        if ((value & 1) == 0) {
+            return false;
+        }
+        break;
+    default:
+        if (idx >= 10) {
+            if (!func_8005CD58(idx)) {
+                return false;
+            }
+        }
+        break;
+    }
+
+success:
+    record->unk0 = 1;
+    return true;
+}
+```
+
+The one remaining word is the same "redundant `j` over the switch-index
+join" residue documented below (retail places the `sel >= 0` arm BEFORE the
+`~sel + 1` arm and needs an explicit jump over it; GCC places `sel >= 0` last
+and falls through instead) -- unchanged by the case 6/7 fix, and still not
+closed by any hand attempt or by the round-24 permuter runs (see the note at
+the top of this report).
 
 ## Best body (compiles, builds green, 2 words short -- one of them the blocker)
 
@@ -348,3 +550,45 @@ is genuinely an instruction-selection/scheduling choice, not a wrong CFG.
   either "this is fixable" or "this is a scheduling stall" -- both
   conclusions need the same evidence, and this function is the
   counter-example to file next to `func_8005CAB4`'s.
+
+## Proposed learnings, round 24
+
+- **A jump table can point the SAME slot at two (or more) different case
+  values.** `switch` case-order recovery (documented above and in
+  `docs/DECOMPILATION_LEARNINGS.md`) assumed one arm per index; this
+  function's table has indices 6 and 7 both pointing at `.L8005CCC8`. The
+  tell is identical `.word` labels at different jump-table offsets in the
+  `.s` file -- when seen, the source must merge those case values into one
+  `case A: case B:` arm with a condition that depends on the dispatched
+  value (here `idx - 7`), not duplicate the arm with a hardcoded constant.
+  Failing to notice this cost 8 words (a wrong "108/100", read as "99/100"
+  by trusting an inherited figure instead of rebuilding it).
+
+- **Rebuild every inherited figure before trusting it, even ones with a
+  detailed derivation.** This report's round-23 "99/100, corrected" verdict
+  read as settled -- it had a derivation, a table of re-tried variants, and
+  an explicit instruction not to re-derive the old (worse) verdict. It was
+  still wrong, because the body it measured was incomplete. A confident
+  write-up is not evidence the underlying number was re-measured against
+  the CURRENT source; only an `nm`/`asm-differ` run against a freshly built
+  object is.
+
+- **The permuter setup script (`tools/setup-permuter.sh`) is stale against
+  the pinned Makefile for `addiu_at`-touching functions, and has a second,
+  independent bug for functions owning embedded rodata.** See the round-24
+  note at the top of this report for both fixes (applied locally to this
+  run's `permuter-work/`, not to the shared script, per parallel-mode
+  rules). Any function whose report recommends "reach for the permuter"
+  and which involves a jump table, or any indexed-global fold, should have
+  its `permuter-work/<func>/compile.sh` checked for `--addiu-at` before
+  trusting a "no improvement found" result -- an absent flag means the
+  scaffold was never capable of finding retail's unfolded form regardless
+  of how long the search runs.
+
+- **A permuter score improvement is not evidence of a smaller residue --
+  confirmed again.** The one improving candidate found (permuter score 330
+  vs base 420) reorders two independent statements; translated to real C it
+  is 98/100, two words worse than the 99/100 it started from. Consistent
+  with MATCHING-GUIDE.md's existing caution (three prior false leads in
+  round 18) -- this is the fourth measured instance, on a different
+  function, in a different round.
