@@ -53,6 +53,8 @@
  * for a function ANOTHER unit defines stays in this .c, not in a shared
  * header. */
 extern void func_8002F610(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
+extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
+extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
 extern s32 func_80036044(void);                              /* code_179d8_f, MATCHED: return func_80038D74(0); */
 extern void func_80036518(void);                              /* code_179d8_f, MATCHED: D_8008E84C = 0; */
 
@@ -88,11 +90,15 @@ typedef struct {
     u8 pad4E[0x6E - 0x4E];
     s16 unk6E;  /* +0x6E: a repeat/skip counter, decremented per catch-up tick */
     s16 unk70;  /* +0x70: next scheduling threshold, compared against unk88 */
-    u8 pad72[0x80 - 0x72];
+    u8 pad72[0x74 - 0x72];
+    u16 unk74;  /* +0x74: nonzero-gated dispatch enable flag */
+    u8 pad76[0x80 - 0x76];
     s32 unk80;  /* +0x80: accumulated tick position */
     u8 pad84[0x88 - 0x84];
     s32 unk88;  /* +0x88: last-value scratch, overloaded per call site */
-    u8 pad8C[0xAC - 0x8C];
+    u8 pad8C[0xA8 - 0x8C];
+    s16 unkA8;  /* +0xA8: a masked-byte parameter cached from a dispatch call */
+    u8 padAA[0xAC - 0xAA];
 } Entry90902E8;
 extern Entry90902E8 *D_800902E8[];
 
@@ -169,6 +175,39 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
 
+/* STALL -- see docs/match-reports/func_800344FC.md. length exact 70/70,
+ * 44/70 raw word-match, first real diff at word 1: a consistent
+ * register-identity rename ($t0<->$a2, $s0<->$s1, $t1/$t2/$t3 shifted by
+ * one), not a logic or CFG difference -- CLAUDE.md's register-identity
+ * STALL rule. */
+#if 0
+void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 offset = rec->unk12;
+    s16 speed = *(s16 *)((u8 *)rec + 0x4E + offset * 2);
+    s32 divided = ((u8)a3 * (s32)speed) / 127;
+    u8 *ptr = offset + (u8 *)rec;
+    u16 flag = rec->unk74;
+    u8 status = ptr[0x17];
+
+    if (flag == 0) {
+        return;
+    }
+    if ((u8)a3 != 0) {
+        s16 packed = (a1 << 8) | a0;
+        s16 note = rec->unk4C;
+        u8 vol = ptr[0x2C];
+        func_8002FAC4(packed, note, vol, (u8)a3, (u16)divided, status);
+        rec->unkA8 = (u8)a3;
+    } else {
+        s16 packed = (a1 << 8) | a0;
+        s16 note = rec->unk4C;
+        u8 vol = ptr[0x2C];
+        func_800300D0(packed, note, vol, (u8)a3);
+    }
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800344FC);
 
 void func_80034614(s16 a0, s16 a1, u8 a2)
