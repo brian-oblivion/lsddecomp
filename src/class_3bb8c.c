@@ -41,6 +41,76 @@ void func_8004B57C(Obj866E8 *self) {
     self->unk70 = 0;
 }
 
+/* func_8004B5BC (81w) -- FRESH, UNATTEMPTED. Never compiled, no score, no
+ * committed C. This is a hand-read-only structural note from round 24
+ * (runner delta), preserved so the derivation isn't lost -- NOT a match
+ * report (see docs/match-reports/ convention: a report file here would
+ * flip this function from `fresh` to `documented stall` in
+ * tools/progress.py's staffing count, which would be wrong since no real
+ * attempt was made). Treat everything below as a READING of the
+ * disassembly to re-verify from scratch, not as established fact -- none
+ * of it survived a build.
+ *
+ * Confidence-labeled, one item at a time:
+ *
+ * - MEDIUM CONFIDENCE: the function calls `self->methods->slot10C(self,
+ *   &localBuf, 0)` (`Obj866E8Methods::slot10C`, already typed in the
+ *   header as `s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2)`,
+ *   established from `func_8004CC74`) to fill a stack-local buffer at
+ *   `sp+0x10`. The header's existing `CC74QueryBuf` type was derived from
+ *   `func_8004CC74`'s OWN reading of a slot10C-filled buffer (reads at
+ *   +0x2 and +0x28 only) -- func_8004B5BC reads the SAME kind of buffer
+ *   differently (see the whole-struct-copy item below, and a raw
+ *   halfword read at +0x0, not +0x2), so `CC74QueryBuf` is NOT
+ *   necessarily this function's own view; it is evidence slot10C's
+ *   output shape is bigger/richer than either single caller alone shows.
+ *
+ * - MEDIUM-HIGH CONFIDENCE: after the slot10C call, retail copies exactly
+ *   0x2C (44) bytes from that same stack buffer into `self->unkBC` via a
+ *   4-words-at-a-time loop plus a 3-word tail (no remainder logic beyond
+ *   that, so the total is fixed at 0x2C, not computed). 44 bytes is
+ *   EXACTLY `sizeof(Descriptor10Ext)` (already in this header: a 10-byte
+ *   `Descriptor10 base` widened by alignment to +0xC, plus eight more
+ *   `s32`/`Elem*` fields through +0x28). This is a SIZE match, not a
+ *   proven identity -- nothing here confirms the FIELD MEANINGS at each
+ *   offset agree with `Descriptor10Ext`'s existing derivation (that type
+ *   came from `func_8004C1C0`'s output via a DIFFERENT method slot,
+ *   `slot110`, not `slot10C`). Treat the size agreement as a strong lead
+ *   toward reusing `Descriptor10Ext` for this copy, not as settled.
+ *
+ * - MEDIUM CONFIDENCE: after that copy, the function dispatches through
+ *   two more method slots not yet named in the header: one read as
+ *   `self->methods` then offset `+0x128` (called with just `self`), and
+ *   later one at `+0x30` (called with `self` and a literal `5` as a
+ *   second argument, only on one branch). Offsets read directly off the
+ *   disassembly; signatures beyond "takes self" are a guess.
+ *
+ * - HIGH CONFIDENCE (data file, not guessed): `D_800868FC` is an 8-byte
+ *   table (`asm/data/76DC8.data.s`: bytes `01 02 03 00 04 05 06 00`),
+ *   indexed by a halfword read out of the slot10C buffer, used as a
+ *   remap/lookup before the two further dispatches above. The 8-entry
+ *   bound comes directly from the data file (next symbol starts right
+ *   after byte 8), not from this function's own access pattern.
+ *
+ * - MEDIUM CONFIDENCE: the byte fetched from `D_800868FC` is then used
+ *   (times 4) to index `D_80086974`, a table of 7 pointers (first entry
+ *   NULL, per the data file) into six more 4-word tables
+ *   (`D_80086914`..`D_80086964`). The 7-entry bound is an INFERENCE from
+ *   `Obj866E8Methods::slotF8`'s EXISTING argument type
+ *   (`s32 *arg3` -- already in the header from another function's call
+ *   site) matching `D_80086974`'s own element type (pointer-to-4-word-
+ *   table), not from anything specific to func_8004B5BC's own access --
+ *   this function only ever reads ONE entry per call, so it cannot by
+ *   itself prove the table has 7 rather than some other count.
+ *
+ * Not investigated at all: the final `beq`-gated call through
+ * `self->methods->slot30`-adjacent block (the halfword compare against
+ * `self->unkBC`'s own first field), and the overall boolean-ish return
+ * value's exact derivation. Whoever picks this function up should
+ * re-read asm/nonmatchings/class_3bb8c/func_8004B5BC.s from scratch and
+ * verify or replace every item above via a real build, not carry this
+ * note forward as fact.
+ */
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B5BC);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B700);
@@ -78,6 +148,60 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
         return ~flags;
     }
 }
+
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_8004BA40.md. Length CORRECT
+ * (63/63 words), raw word-match 58/63. The `do {} while (0);` scheduling
+ * barrier before `result = 1;` is load-bearing -- it fixed a genuine
+ * register-identity residue (v0 vs v1 for `result`) without changing which
+ * register anything else lands in, so it is the permitted kind per
+ * CLAUDE.md rule 6. A second, similar-looking register residue in the
+ * `entry->unk0 == 0` fallback branch (v1 in retail, v0 here) did NOT
+ * respond to the same trick at three different placements -- see the
+ * report. */
+s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
+{
+    s32 mask = D_8008688C[key];
+    s32 result;
+
+    if ((savedResult & mask) == 0) {
+        result = 0;
+        goto nullCase;
+    }
+
+    if (self->unk68->unk4 == 0) {
+        const Unk54Struct *entry = &D_800868A8[key];
+        s32 value;
+
+        if (entry->unk0 == 0) {
+            value = val + entry->unk4;
+        } else {
+            s32 lo = divisor * entry->unk0;
+
+            if (flag != 0) {
+                value = val + (lo + entry->unk4);
+            } else {
+                value = val + (lo + entry->unk8);
+            }
+        }
+        *(s32 *)((u8 *)arg1 + 4) = value;
+    } else {
+        *(s32 *)((u8 *)arg1 + 4) = val + key;
+    }
+
+    arg1->ptr0 = self->unk60(self->unk64, *(s32 *)((u8 *)arg1 + 4), 0, 0);
+    do {} while (0);
+    result = 1;
+    goto storeKey;
+
+nullCase:
+    arg1->ptr0 = NULL;
+
+storeKey:
+    arg1->id = key;
+    return result;
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
 

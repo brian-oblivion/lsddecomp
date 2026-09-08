@@ -238,15 +238,34 @@ typedef struct TargetSpec866E8 {
  * caller), so left unsized. */
 extern Unk54Struct D_80086838[];
 
-/* Uncarved sibling in this same unit (asm/class_3bb8c.s past this slice),
- * called once per element from func_8004B700's outer loop (this round) with
- * seven arguments: `self`, the stack-buffer slot being filled
- * (`&stackBuf[count]`, a `SetupEntry866E8*`), `self->unk68->divisor`, the
- * `val / divisor` quotient's low bit, `val` itself, the earlier
- * `func_8004B930(self, val, flag)` result, and `arg3[i].key`. Not this
- * round's function to match -- the call site establishes only its
- * ARGUMENT shape, not its body. */
-extern void func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key);
+/* Called once per element from func_8004B700's outer loop with seven
+ * arguments: `self`, the stack-buffer slot being filled (`&stackBuf[count]`,
+ * a `SetupEntry866E8*`), `self->unk68->divisor`, the `val / divisor`
+ * quotient's low bit, `val` itself, the earlier
+ * `func_8004B930(self, val, flag)` result, and `arg3[i].key`. Matched this
+ * round -- see docs/match-reports/func_8004BA40.md. */
+extern s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key);
+/* NOTE: return type corrected this round from `void` to `s32` (0 or 1,
+ * whether the mask test at the top passed) -- retail explicitly sets
+ * $v0 to 0 or 1 on every path before returning, which a `void` function
+ * would never do. func_8004B700, the only caller, discards it. */
+
+/* `key`-indexed bitmask table, one bit per key (`1 << key`), tested against
+ * `savedResult` (func_8004B930's return, forwarded through func_8004B700) by
+ * func_8004BA40. Bound is PROVEN, not guessed: the data file places exactly
+ * 7 words here (0x8008688C-0800868A8) before D_800868A8 starts, and
+ * D_800868A8 below is independently proven to hold exactly 7 `Unk54Struct`
+ * entries (0x800868A8-0x800868FC) -- same key domain, consistent. */
+extern const s32 D_8008688C[7];
+
+/* `key`-indexed, reuses `Unk54Struct`'s 3-`s32` shape (same evidence as
+ * `D_80086838` above: offsets 0x0/0x4/0x8, plain words). Read by
+ * func_8004BA40 as: `unk0` gates a `divisor * unk0` multiply (its low 32
+ * bits used, `unk4` or `unk8` added depending on a caller-supplied `flag`);
+ * when `unk0 == 0` the multiply is skipped entirely and `unk4` alone is
+ * used. Sized at 7 (see D_8008688C's comment for why this one is provable
+ * where `D_80086838` above is not). */
+extern const Unk54Struct D_800868A8[7];
 
 /* Only the slots this unit's functions dispatch through (via
  * self->methods->slotNN) are typed; everything else stays opaque so the
@@ -663,7 +682,14 @@ struct Obj866E8 {
     s32 unk48;                     /* +0x048, func_80051784/func_800517EC/func_80051814/func_80051858 */
     u8 pad4C[0x54 - 0x4C];
     Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
-    u8 pad60[0x68 - 0x60];
+    /* +0x060/+0x064, func_8004BA40 (this round): a callback invoked as
+     * `unk60(unk64, value, 0, 0)`, whose result is stored into the
+     * SetupEntry866E8 slot being filled. `unk64` is never dereferenced in
+     * this unit, only forwarded -- opaque context pointer. Was undifferentiated
+     * padding (`pad60[0x68 - 0x60]`) before this round; the split is
+     * additive (same total size, same offsets), not a removal. */
+    void *(*unk60)(void *arg0, s32 arg1, s32 arg2, s32 arg3); /* +0x060 */
+    void *unk64;                                              /* +0x064 */
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
     Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
