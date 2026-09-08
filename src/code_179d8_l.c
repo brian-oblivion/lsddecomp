@@ -101,7 +101,10 @@ typedef struct {
     u8 unk0[4];
     u8 unk4;
     u8 unk5;
-    u8 unk6[26];
+    u8 unk6[6];
+    u8 unk12;
+    u8 unk13;
+    u8 unk14[18];
 } D8008E978Entry;
 
 extern D8008E978Entry *D_8008E978;
