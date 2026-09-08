@@ -344,6 +344,114 @@ and it also makes a bad score uninformative.
 
 ## Source-shape idioms
 
+### An arm that must JUMP has to be written NOT-LAST (round 25)
+
+**GCC 2.6.3 lets one arm of an if/else fall through into the join, and it
+always picks the LAST one. So retail's block ORDER is a source decision, and
+a residue caused by it does not respond to any amount of expression
+reshaping.** This closed `func_8005CBC8` (`code_4cd08`) at 100/100 after
+three rounds pinned at 99/100, thirteen hand attempts and ~77k permuter
+iterations — every one of which was searching the wrong axis.
+
+Retail's preamble there is laid out
+`[test] [return false] [idx = sel arm] [idx = ~sel + 1 tail] [join]`. The
+`idx = sel` arm sits BETWEEN the fail path and the negate tail, so it needs
+an explicit `j` over the join. The obvious C puts that arm last, where it
+falls through and no jump is emitted:
+
+```c
+    /* 1 word SHORT, forever, for every expression-level reshape */
+    if (sel < 0) {
+        if (record->unk0 != 0) {
+            return false;
+        }
+        idx = ~sel + 1;
+        goto have_idx;
+    }
+    idx = sel;
+have_idx:
+```
+
+The fix is to invert the inner guard so the negate arm becomes the forward
+`goto`, and then place the jumping arm textually ABOVE the label:
+
+```c
+    if (sel < 0) {
+        if (record->unk0 == 0) {
+            goto negate;
+        }
+        return false;
+    }
+    idx = sel;
+    goto have_idx;
+
+negate:
+    idx = ~sel + 1;
+
+have_idx:
+```
+
+cc1 then emits retail's five blocks in retail's order, `j` included, and
+`~sel` still lands in the `beqz` delay slot as `nor $v0, $zero, $a0` without
+being asked to. No `__asm__`, no barrier, no operand constraint.
+
+**The tell in the disassembly:** a lone unconditional `j` (not a conditional
+branch) whose target is the next join a few instructions below, and whose
+delay slot carries real work rather than a `nop`. That jump exists because
+retail's compiler had a block after it, so the source has to put a block
+there too.
+
+**This is the block-order sibling of the "shared `return` block's PLACEMENT
+follows the FIRST return in source order" entry immediately below, and of
+the "case order follows the jump table" entry further down.** All three are
+cases where retail's own layout is readable off the binary and must be
+reproduced rather than reasoned about; this one generalises them from
+`return` blocks and `switch` arms to ordinary if/else arms.
+
+#### Why the permuter cannot find this, which is the routing consequence
+
+The permuter mutates expressions, declarations and statement order WITHIN a
+control-flow shape. It does not restructure control flow into a different
+basic-block LAYOUT. So a layout residue is invisible to it and presents as a
+flat plateau — which is exactly how this one presented for two rounds
+(77,264 iterations, score never below base). **A residue that survives both
+hand reshaping and a long search is therefore evidence FOR block order, not
+evidence that the function is exhausted.**
+
+#### The mechanical screen for this has NO measured precision — do not build one
+
+The obvious next move is to grep the queue for the tell. That screen was
+written and run in round 25 over every blocker-clean live `INCLUDE_ASM`
+(bare `j`, target within ~8 entries below, non-`nop` delay slot): **51 of
+the queue's functions match it.** It was then tested on one candidate,
+`func_8004CFB8` (`class_3bb8c_b`), and the hit landed in that function's
+ALREADY-BYTE-EXACT half — the `j`-to-join shape there is one cc1 reproduces
+naturally from plain nested `if`/`else`, so it was a false lead.
+
+Precision on the sample actually tested is therefore **1 tried, 0 genuine**,
+and the screen is not in `tools/` deliberately. `j`-to-join is the *normal*
+if/else shape; the signature is not the jump, it is the jump PLUS a block
+after it that your natural C would place last, and nothing greppable
+distinguishes those. Use the tell when you are already reading a specific
+function's disassembly. Do not use it to rank the queue, and do not promote
+it to a standing screen without measuring precision first — this project has
+paid four times for screens whose scope was reasoned instead of measured
+(see PARALLEL-RUNS.md, Gate 1).
+
+#### One measured counter-indication: an `mflo`/`mfhi` residue is NOT this
+
+`func_8004CFB8`'s real residue is a deferred single `mflo` where cc1 extracts
+eagerly. Round 25 tried the cross-jumping reading of it — give both arms an
+identical `mflo`/`sw` tail so GCC merges them and absorbs the shorter arm's
+lone `mult` into the `bgez` delay slot, which is precisely retail's shape —
+and it came out **5 words too long**; GCC emitted an `mflo` and an `sw` in
+each arm and merged nothing. cc1 expands a `mult`/`mflo` pair together during
+RTL expansion, BEFORE any block-layout decision, so block order cannot move
+them apart. When you are weighing whether a residue is a layout one, a
+`mult`/`div`/`mflo`/`mfhi` in it is a negative indicator rather than a
+neutral one. (`docs/match-reports/func_8004CFB8.md`, variant 7.)
+
+
 ### A shared `return` block's PLACEMENT follows the FIRST return in source order (round 24)
 
 **N separate `return X;` statements and one `goto` with a trailing label are
