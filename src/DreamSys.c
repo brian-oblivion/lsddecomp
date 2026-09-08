@@ -118,7 +118,60 @@ neg2_mismatch:
 	this->vt->func_8005B990(this);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80058C58);
+void func_80058C58(DreamSys *this, s32 arg1, s32 mode)
+{
+	if (this->unk_0x6c != 0)
+		return;
+	if (this->unk_0x70 != 0)
+		return;
+	if (this->unk_0x908 != 0)
+		return;
+
+	switch (mode - 2) {
+	case 0:
+		this->unk_0xA0 = 1;
+		break;
+	case 1:
+		this->unk_0xA0 = 2;
+		break;
+	case 2:
+		this->unk_0xA4 = 1;
+		break;
+	case 3:
+		this->unk_0xA4 = 2;
+		break;
+	case 4:
+		this->unk_0x88 = 1;
+		break;
+	case 5:
+		if (this->unk_0xA0 == 1)
+			this->vt->func_8005A184(this, 4);
+		break;
+	case 6:
+		this->unk_0x88 = 2;
+		break;
+	case 11:
+		this->unk_0x90 = 2;
+		break;
+	case 12:
+		this->unk_0xA0 = 4;
+		break;
+	case 13:
+		this->unk_0x90 = 1;
+		break;
+	case 14:
+		this->unk_0xA0 = 3;
+		break;
+	case 23:
+		this->unk_0x74 = 1;
+		break;
+	case 32:
+		this->vt->func_8005A1A4(this);
+		break;
+	case 47:
+		break;
+	}
+}
 
 void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
 {
