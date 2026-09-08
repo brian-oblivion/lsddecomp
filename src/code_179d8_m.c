@@ -76,7 +76,45 @@ void func_8002F20C(s32 a0, s32 a1, s32 a2, s32 a3) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F2A4);
+/* Same 0x34-stride channel-configuration record family documented in
+ * code_179d8_j.c (Rec34D994/Rec34Byte/Rec34Half); this unit keeps its
+ * own local view rather than sharing that file's header-less types. */
+typedef struct {
+    u8 unk0; /* +0x0 */
+    u8 pad1[0x34 - 0x1];
+} Rec34Byte;
+extern Rec34Byte D_8008D9A3[];
+
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34Half;
+extern Rec34Half D_8008D98C[];
+
+/* Pointer to a "current object" whose only fields this function
+ * touches sit at a fixed byte offset from the base, not scaled by any
+ * index -- a different reading of the same D_8006DAD4 symbol from
+ * code_179d8_j.c's array-of-0x10-byte-records view, per this project's
+ * multiple-independent-local-views convention. */
+typedef struct {
+    u8 pad[0x194];
+    u16 unk194; /* +0x194 */
+    u16 unk196; /* +0x196 */
+} ObjDAD4;
+extern ObjDAD4 *D_8006DAD4;
+
+void func_8002F2A4(void) {
+    s16 i;
+
+    for (i = 0; i < D_8008E9D0; i++) {
+        if (D_8008D9A3[i].unk0 == 2) {
+            D_8008D9A3[(u8) i].unk0 = 0;
+            D_8008D98C[(u8) i].unk0 = 0;
+            D_8006DAD4->unk194 = 0;
+            D_8006DAD4->unk196 = 0;
+        }
+    }
+}
 
 void func_8002F368(s32 a0, s32 a1) {
     s32 v0;
