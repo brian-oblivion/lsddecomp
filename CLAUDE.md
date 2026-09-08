@@ -144,13 +144,24 @@ reports retired. Full evidence in `docs/research/addiu-at-blocker.md`.
 both are the operator's call, and neither is something to experiment with:
 
 - `docs/research/gp-relative-blocker.md` — the `-G` experiment was run with
-  authorisation and REJECTED. 82 functions.
+  authorisation and REJECTED. By far the larger of the two.
 - **`nop_mflo_mfhi`**, documented inside `addiu-at-blocker.md` rather than in
-  its own file. 9 functions. The census there argues it is the right MECHANISM
+  its own file. The census there argues it is the right MECHANISM
   at the wrong GRANULARITY — which is exactly what was true of `addiu_at`
   before round 21, so the same remedy (a flag decoupling it from the version)
   is the obvious candidate. **It has not been tested. That is an operator
   escalation, not a head decision.**
+
+**Do not read a COUNT for either from this file — derive it.** The line above
+used to say "82 functions" and "9 functions"; the second was stale within two
+rounds (round 24's carve alone moved it to 12) and a reader had no way to tell
+which figure they were holding. This file's own rule against numbers applies to
+blocker censuses exactly as it does to progress counts:
+
+```sh
+python3 tools/nearmiss.py | head -2      # queue size, blocker-clean, and the
+                                         # per-blocker split, all measured
+```
 
 So screen any candidate function against TWO greps, not three:
 
