@@ -165,6 +165,68 @@ void func_8002F368(s32 a0, s32 a1) {
     }
 }
 
+/* Same 0x34-stride channel-configuration record family, s16-field
+ * view -- matches code_179d8_j.c's own Rec34D994 shape (that unit's
+ * D_8008D994/D_8008D996/D_8008D99A/D_8008D99C/D_8008D99E family); this
+ * unit keeps its own independent view rather than sharing the header-
+ * less type. D_8008D988 shares the shape too (read here with `lh`, a
+ * signed load, unlike D_8008D98C's `lhu`-driven Rec34Half above). */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34S16;
+extern Rec34S16 D_8008D994[];
+extern Rec34S16 D_8008D996[];
+extern Rec34S16 D_8008D99A[];
+extern Rec34S16 D_8008D99E[];
+extern Rec34S16 D_8008D988[];
+
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D99C
+ * needs this width (`lhu`) here, and BOTH this width and a plain byte
+ * width (`lbu`, same offset) elsewhere in this same function; the byte
+ * view is reached via a plain pointer cast, same idiom as D_8008EA26's
+ * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
+ * here even though func_800300D0 (above) reads the SAME symbol signed
+ * (`lh`) -- reinterpreted through a cast rather than redeclared, since
+ * one extern symbol cannot carry two conflicting C types in one file. */
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34U16;
+extern Rec34U16 D_8008D99C[];
+
+/* Debug/selected-difficulty byte, read fresh each call. */
+extern u8 D_8008EA13;
+
+/* Pointer to a 0x20-byte-stride table; only the two trailing byte
+ * fields this function reads are named. */
+typedef struct {
+    u8 pad[0xC];
+    u8 unkC; /* +0xC */
+    u8 unkD; /* +0xD */
+    u8 padE[0x20 - 0xE];
+} Tbl32E978;
+extern Tbl32E978 *D_8008E978;
+
+/* Same 0x10-byte-stride record family code_179d8_j.c documents as
+ * Rec16D7F0 (that unit's D_8008D7F0/D_8008D7F4 pair); local view. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x10 - 0x2];
+} Rec16D7F4;
+extern Rec16D7F4 D_8008D7F4[];
+
+/* Plain byte-stride flags array (no per-record multiply in its own
+ * addressing -- unlike every 0x34/0x10-stride array above). */
+extern u8 D_8008D970[];
+
+/* Selected-channel debug byte, write-only here. */
+extern u8 D_8008EA18;
+
+extern s16 func_8002E038(u16 a0, u16 a1);
+
+/* STALL -- see docs/match-reports/func_8002F3E8.md. Best body reached
+ * (77/138 words, byte-exact length) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F3E8);
 
 /* "Currently selected channel" scratch global -- same idiom as
@@ -173,7 +235,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F3E8);
 extern u16 D_8008EA22;
 
 extern s32 func_80032148(s16 a0, s16 a1);
-extern s16 func_8002F3E8(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
+extern s16 func_8002F3E8(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
 
 s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
     s16 i;
@@ -191,22 +253,6 @@ s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F700);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002FAC4);
-
-/* Same 0x34-stride channel-configuration record family, s16-field
- * view -- matches code_179d8_j.c's own Rec34D994 shape (that unit's
- * D_8008D994/D_8008D996/D_8008D99A/D_8008D99C/D_8008D99E family); this
- * unit keeps its own independent view rather than sharing the header-
- * less type. D_8008D988 shares the shape too (read here with `lh`, a
- * signed load, unlike D_8008D98C's `lhu`-driven Rec34Half above). */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34S16;
-extern Rec34S16 D_8008D994[];
-extern Rec34S16 D_8008D996[];
-extern Rec34S16 D_8008D99A[];
-extern Rec34S16 D_8008D99E[];
-extern Rec34S16 D_8008D988[];
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
  * 16 channels in the first word, next 16 in the second), each paired
