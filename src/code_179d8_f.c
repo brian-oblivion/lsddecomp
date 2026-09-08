@@ -8,10 +8,16 @@
  * 16 of the 18 clean, and NONE of the 18 is a trivial leaf -- every one is a
  * real body.  This is the densest-in-real-work unit carved this round.
  *
- * BLOCKED, stub reports already filed, do NOT spend attempts on these:
- *   addiu_at: func_80036230 (115 insn), func_80036528 (240 insn)
- * Both are large, which is the point of screening at carve time rather than
- * discovering it after a derivation.
+ * NO LONGER BLOCKED -- both of this unit's blocked functions were blocked on
+ * `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21 (maspsx
+ * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
+ * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   func_80036230 (115w)  FRESH and assignable
+ *   func_80036528 (240w)  FRESH and assignable
+ * Their stub reports are already gone, so `progress.py` counts both as fresh.
+ * The previous version of this comment read "BLOCKED, stub reports already
+ * filed, do NOT spend attempts on these" -- a stale DIRECTIVE over free
+ * ground. Both are large, which is why nobody had reason to re-read it.
  *
  * Owns NO switch jump table.  Both of this segment's jump-table owners
  * (func_80034690, func_800357B0) sit in the `code_179d8_tail` remainder in

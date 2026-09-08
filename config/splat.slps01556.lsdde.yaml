@@ -83,7 +83,16 @@ segments:
       # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
       # same situation as 0x11F8 above.
       - [0x14D8, .rodata, code_179d8_c]
-      - [0x14F0, rodata]  # code_179d8_mid / _tail remainder
+      # 0x14F0 holds EXACTLY three jump tables and nothing else --
+      # jtbl_80010CF0 (func_80034690) and jtbl_80010ED8 + jtbl_80010F38
+      # (func_800357B0, a double switch), all three in the code_179d8_k
+      # slice below and referenced from NOWHERE else (checked per symbol
+      # with `grep -rl` over asm/ and src/, round 24).  So the slot is
+      # attached WHOLE: no ownership boundary runs through it and it needs
+      # none of the split dance that 0x1908 needs.  Its words are `.L`
+      # labels local to those two functions' own `.s` files, so leaving it
+      # standalone fails the link with `undefined reference to '.L800346..'`.
+      - [0x14F0, .rodata, code_179d8_k]
       - [0x1764, rodata]
       # 0x1890 holds three jump tables. jtbl_80011090 and jtbl_800110D0
       # belong to code_2cc8c's first 20-function slice (now a C unit), so
@@ -348,13 +357,24 @@ segments:
       # code_179d8_b: window [60..79], 0x194E0..0x1A1BC (20 functions).
       - [0x194E0, c, code_179d8_b]
       # code_179d8_mid: functions 80..82 of the original monolith. UNCARVED
-      # remainder after the code_179d8_g carve below -- all three are
-      # addiu-$at blocked, so there is nothing to staff here.
+      # remainder after the code_179d8_g carve below.
+      #
+      # It was left here as "all three are addiu-$at blocked, so there is
+      # nothing to staff here".  That is FALSE as of round 21: `addiu_at` was
+      # resolved (maspsx `--addiu-at`, docs/research/addiu-at-blocker.md) and
+      # it was the only obstruction on all three.  Re-censused round 24
+      # (2026-09-08), four screens per function, canonical shell forms:
+      #   3 of 3 CLEAN -- func_800299BC (161w), func_80029C40 (180w),
+      #   func_80029F10 (282w).  Zero gp_rel, zero nop_mflo_mfhi, zero
+      #   `jr $t2` trampolines.
+      # A CARVE CANDIDATE, not a dead end.  Three clean bodies, all large.
       - [0x1A1BC, asm, code_179d8_mid]
       # code_179d8_g: functions 83..99 of the original, 0x1AB78..0x1C440
       # (17 functions).  Census 2026-09-04 with the three-grep screen run
-      # over each function's own text: 14/17 clean; the three blocked are
-      # func_8002AEE0, func_8002B640, func_8002B94C, all addiu-$at.  No
+      # over each function's own text: 14/17 clean; the three blocked were
+      # func_8002AEE0, func_8002B640, func_8002B94C, all addiu-$at -- and
+      # all three are therefore FREE as of round 21's fix, re-screened
+      # round 24 (2026-09-08).  This unit is 17/17 clean now.  No
       # trivial `jr $ra` leaves at all and several large bodies (196, 223,
       # 186, 189 instructions), so this unit is smaller in count and larger
       # in work than its 17 suggests.  Owns NO switch jump table (zero
@@ -377,11 +397,67 @@ segments:
       # the real queue is ~11 bodies.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
       - [0x1CC08, c, code_179d8_e]
-      # code_179d8_mid_c: functions 149..199 of the original.  UNCARVED and
-      # not worth carving as it stands: 0x1D508.. is the addiu-$at dense
-      # heart of this monolith (of its 51 functions only ~12 are clean, and
-      # they are scattered rather than in a window).
-      - [0x1D508, asm, code_179d8_mid_c]
+      # code_179d8_l: FRONT half of what was the `code_179d8_mid_c`
+      # remainder -- functions 149..160 of the original,
+      # 0x1D508..0x1ECD8 (12 functions, func_8002CD08 .. func_8002E308).
+      # Carved round 24 (2026-09-08).
+      #
+      # The remainder sat uncarved on a census reading "the addiu-$at dense
+      # heart of this monolith".  `addiu_at` was RESOLVED in round 21
+      # (maspsx `--addiu-at`, docs/research/addiu-at-blocker.md), so that
+      # verdict died with it.  Re-censused round 24 over all 24 functions of
+      # the remainder, four screens per function, canonical shell forms
+      # (grep -A2 FORWARD for nop_mflo_mfhi): 21 of 24 CLEAN, zero gp_rel,
+      # zero `jr $t2` trampolines, 3 nop_mflo_mfhi -- and ALL THREE of those
+      # fall in this front half.  The remainder was split in two because it
+      # is uniform in density now, so the cut is a STAFFING cut (one unit
+      # per runner) rather than a density cut.
+      #
+      # This half: 9 CLEAN of 12 -- func_8002E2F8 (2w), func_8002E300 (2w),
+      # func_8002DF7C (47w), func_8002E038 (64w), func_8002DDBC (112w),
+      # func_8002E138 (112w), func_8002E308 (116w), func_8002D6A4 (143w),
+      # func_8002CF18 (167w).
+      # BLOCKED on nop_mflo_mfhi, which is STILL OPEN (see
+      # docs/research/addiu-at-blocker.md): func_8002CD08 (132w),
+      # func_8002D1B4 (316w), func_8002D8E0 (311w).
+      #
+      # Owns NO jump table: zero `jtbl_` references, and no rodata word
+      # anywhere in the image points into 0x8002CD08..0x800300D0 (checked
+      # round 24 both numerically and for symbolic `.word .L`), so neither
+      # half needs a rodata attach.
+      # Boundary checked on both sides: no function has more than one
+      # `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero
+      # `alabel`.  The frameless ones open on their own arguments or on a
+      # global, never on $sp.  func_8002E308's opening
+      # `addu $t3, $a0, $zero` is register pressure with s16 argument
+      # narrowing, NOT a BIOS trampoline -- checked by hand, because the
+      # `jr $t2` screen is blind to variants.
+      #
+      # Expect this slice to span more than one class; identify each with
+      # tools/classtable.py rather than assuming the unit has one.
+      - [0x1D508, c, code_179d8_l]
+      # code_179d8_m: BACK half of the old `code_179d8_mid_c` remainder --
+      # functions 161..172 of the original, 0x1ECD8..0x20ADC (12 functions,
+      # func_8002E4D8 .. func_800300D0).  Carved round 24 (2026-09-08),
+      # same re-census as code_179d8_l above.
+      #
+      # 12 CLEAN of 12 -- the whole nop_mflo_mfhi cluster is in the front
+      # half.  func_8002F368 (32w), func_8002F20C (38w), func_8002F2A4
+      # (49w), func_8002F610 (60w), func_800300D0 (131w), func_8002F3E8
+      # (138w), func_8002E874 (116w), func_8002EA44 (228w), func_8002E4D8
+      # (231w), func_8002F700 (241w), func_8002EDD4 (270w), func_8002FAC4
+      # (387w).
+      #
+      # func_8002E874 is a near-identical sibling of func_8002E308 in
+      # code_179d8_l -- same prologue, same s16-narrowing shape, same
+      # early-out branch -- so the two units' runners should expect to
+      # duplicate each other's reading of that shape.  Owns no jump table
+      # and needs no rodata attach; boundary and trampoline checks as for
+      # code_179d8_l.
+      #
+      # Expect this slice to span more than one class; identify each with
+      # tools/classtable.py rather than assuming the unit has one.
+      - [0x1ECD8, c, code_179d8_m]
       # code_179d8_j: TAIL slice of the old code_179d8_mid_c, functions
       # 173..198 of the original monolith, 0x20ADC..0x2273C (26 functions,
       # func_800302DC .. func_80031EE8).  Carved round 21 (2026-09-06).
@@ -409,8 +485,16 @@ segments:
       # tools/classtable.py rather than assuming the unit has one.
       - [0x20ADC, c, code_179d8_j]
       # code_179d8_mid_d: the one function left between the code_179d8_j
-      # carve above and code_179d8_c below -- func_80031F3C (131w), which is
-      # addiu-$at blocked.  A carve remainder, not a unit.
+      # carve above and code_179d8_c below -- func_80031F3C (131w).  A carve
+      # remainder, not a unit.
+      #
+      # It was left here as "addiu-$at blocked".  Re-censused round 24
+      # (2026-09-08), four screens, canonical shell forms: it is BLOCKER-CLEAN
+      # -- `addiu_at` was resolved in round 21 and was its only obstruction.
+      # One clean 131w function, uncarved.  A CARVE CANDIDATE: either its own
+      # unit or folded into code_179d8_j / code_179d8_c by moving a boundary
+      # (which perturbs a unit with matched functions, so verify per function
+      # if you do).
       - [0x2273C, asm, code_179d8_mid_d]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
       - [0x22948, c, code_179d8_c]
@@ -446,12 +530,41 @@ segments:
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
       - [0x23500, c, code_179d8_i]
-      # code_179d8_tail: what is left after the code_179d8_i carve above --
-      # functions 238..255 of the original, 0x24938..0x2673C.  Still asm and
-      # deliberately so: 17 of its 18 functions are addiu-$at blocked, and it
-      # owns both switch jump tables (func_80034690, func_800357B0), so
-      # carving it needs the rodata attach/split dance from Gate 2.
-      - [0x24938, asm, code_179d8_tail]
+      # code_179d8_k: what was the `code_179d8_tail` remainder after the
+      # code_179d8_i carve -- functions 238..255 of the original,
+      # 0x24938..0x2673C (18 functions, func_80034138 .. func_80035E80).
+      # Carved round 24 (2026-09-08).
+      #
+      # It sat uncarved for six rounds on the strength of a census reading
+      # "17 of its 18 functions are addiu-$at blocked".  `addiu_at` was
+      # RESOLVED in round 21 (maspsx `--addiu-at`, see
+      # docs/research/addiu-at-blocker.md), which makes this segment the
+      # single best carve left in the executable.  Re-censused round 24,
+      # four screens per function, canonical shell forms (grep -A2 FORWARD
+      # for nop_mflo_mfhi):
+      #   18 of 18 CLEAN.  Zero gp_rel, zero nop_mflo_mfhi, zero `jr $t2`
+      #   trampolines.
+      #   Sizes: func_80034614 (31w), func_800350D8 (31w), func_80035154
+      #   (31w), func_80035A7C (44w), func_80035E80 (47w), func_80034D90
+      #   (51w), func_80034138 (69w), func_800344FC (70w), func_80034E5C
+      #   (77w), func_800349B0 (79w), func_80034AEC (79w), func_80034F90
+      #   (82w), func_80034C28 (90w), func_8003424C (172w), func_800357B0
+      #   (179w), func_80034690 (200w), func_80035B2C (213w), func_800351D0
+      #   (376w).  Six functions at 31-51w is the cheap seam the `fresh`
+      #   queue had run out of.
+      #
+      # It owns THREE jump tables, not the two the old comment claimed:
+      # func_80034690 -> jtbl_80010CF0, func_800357B0 -> jtbl_80010ED8 AND
+      # jtbl_80010F38.  The 0x14F0 rodata slot is attached whole above.
+      # Boundary checked on both sides: no function has more than one
+      # `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero
+      # `alabel`, and the one frameless function (func_80035E80) opens on
+      # `sll $a0, $a0, 16` -- leaf argument narrowing, not a caller-frame
+      # read.
+      #
+      # Expect this slice to span more than one class; identify each with
+      # tools/classtable.py rather than assuming the unit has one.
+      - [0x24938, c, code_179d8_k]
       # code_179d8_f: functions 256..273 of the original, 0x2673C..0x272C8
       # (18 functions).  Census 2026-09-04, three-grep screen per function:
       # 16/18 clean, the two blocked are func_80036230 and func_80036528,

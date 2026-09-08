@@ -1,0 +1,81 @@
+/*
+ * code_179d8_l -- FRONT half of what was the `code_179d8_mid_c` asm
+ * remainder: functions 149..160 of the original 274-function code_179d8
+ * monolith, 0x1D508..0x1ECD8 (vram 0x8002CD08..0x8002E4D8), 12 functions.
+ * Carved round 24 (2026-09-08).  `code_179d8_m` is the back half; between
+ * them they consume the remainder whole.
+ *
+ * WHY IT WAS UNCARVED, AND WHY THAT VERDICT IS DEAD.  The splat comment on
+ * the old remainder called 0x1D508 "the addiu-$at dense heart of this
+ * monolith (of its 51 functions only ~12 are clean)".  `addiu_at` was
+ * RESOLVED in round 21 (maspsx `--addiu-at`;
+ * docs/research/addiu-at-blocker.md), so that census measured an
+ * obstruction that no longer exists.  Re-censused 2026-09-08 over all 24
+ * functions of the remainder with the four screens, canonical shell forms
+ * (`grep -A2` FORWARD for nop_mflo_mfhi): 21 of 24 CLEAN, zero gp_rel,
+ * zero `jr $t2` trampolines.
+ *
+ * The remainder is UNIFORM in density now, so the cut between _l and _m is
+ * a STAFFING cut (one unit per runner) and not a density cut.  All three
+ * surviving blocked functions landed in this half:
+ *
+ * BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:
+ *   func_8002CD08 (132w), func_8002D1B4 (316w), func_8002D8E0 (311w)
+ * That blocker is an `mflo`/`mfhi` FOLLOWED WITHIN TWO INSTRUCTIONS BY a
+ * `mult`/`div`; it is the one construct in docs/research/addiu-at-blocker.md
+ * that round 21 did not fix.  Each has a stub report.
+ *
+ * 9 CLEAN of 12, cheapest first:
+ *   func_8002E2F8    2w  <- already matched: splat emitted the empty C body
+ *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
+ *   func_8002DF7C   47w   func_8002E038   64w   func_8002DDBC  112w
+ *   func_8002E138  112w   func_8002E308  116w   func_8002D6A4  143w
+ *   func_8002CF18  167w
+ *
+ * func_8002E308's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
+ * s16 argument narrowing, NOT a BIOS trampoline -- checked by hand at carve
+ * time, because the `jr $t2` trampoline screen is blind to variants and a
+ * trampoline-dense segment reads as the cleanest ground in the file while
+ * being the least matchable (round 17, class_3bb8c_h).  It is also a
+ * near-identical sibling of func_8002E874 in code_179d8_m: same prologue,
+ * same narrowing shape, same early-out branch.  If you match one, say so in
+ * the report -- the other unit's runner is deriving the same shape.
+ *
+ * Owns NO jump table: zero `jtbl_` references, and no rodata word anywhere
+ * in the image points into 0x8002CD08..0x800300D0 (checked at carve time
+ * both numerically and for symbolic `.word .L`), so no rodata attach.
+ * Boundary checks both sides: no function has more than one
+ * `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero `alabel`,
+ * and the frameless ones open on their own arguments or on a global, never
+ * on $sp.
+ *
+ * Expect this slice to span more than one class; identify each with
+ * tools/classtable.py rather than assuming the unit has one.
+ */
+#include "common.h"
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CD08);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D1B4);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D6A4);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DDBC);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DF7C);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E038);
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E138);
+
+void func_8002E2F8(void) {
+}
+
+void func_8002E300(void) {
+}
+
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E308);

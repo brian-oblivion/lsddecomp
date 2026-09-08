@@ -2,8 +2,12 @@
  * code_179d8_g -- functions 83..99 of the original 274-function code_179d8
  * monolith, 0x1AB78..0x1C440 (vram 0x8002A378..0x8002BC40).  Carved round 17
  * (2026-09-04) off the back of `code_179d8_mid`, which keeps that name for
- * the three functions still in front of this slice (all three addiu-$at
- * blocked, so there is nothing left to staff there).
+ * the three functions still in front of this slice. Those three were left
+ * as "all addiu-$at blocked, so there is nothing left to staff there";
+ * re-censused round 24 (2026-09-08) that is FALSE -- func_800299BC (161w),
+ * func_80029C40 (180w) and func_80029F10 (282w) are ALL THREE blocker-clean
+ * now that `addiu_at` is resolved. `code_179d8_mid` is an uncarved segment
+ * holding three clean functions and is a carve candidate, not a dead end.
  *
  * Blocker census, three-grep screen run per function at carve time:
  * 14 of the 17 clean, zero trivial leaves.  These are BIG bodies -- 196,
@@ -11,9 +15,17 @@
  * count and considerably larger in work than 17 suggests.  Budget fewer
  * functions per pass here than in a leaf-heavy unit.
  *
- * BLOCKED, stub reports already filed, do NOT spend attempts on these:
- *   addiu_at: func_8002AEE0 (174 insn), func_8002B640 (186 insn),
- *             func_8002B94C (189 insn)
+ * NO LONGER BLOCKED -- all three of this unit's blocked functions were
+ * blocked on `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21
+ * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
+ * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   func_8002AEE0 (174w)  FRESH and assignable
+ *   func_8002B640 (186w)  FRESH and assignable
+ *   func_8002B94C (189w)  FRESH and assignable
+ * Their stub reports are already gone, so `progress.py` counts all three as
+ * fresh. The previous version of this comment read "BLOCKED, stub reports
+ * already filed, do NOT spend attempts on these" -- a stale DIRECTIVE over
+ * free ground.
  *
  * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
  * rodata sub-slot is attached to this unit.

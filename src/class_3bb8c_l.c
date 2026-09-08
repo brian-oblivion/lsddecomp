@@ -3,14 +3,22 @@
  * (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions.
  * Carved round 15.
  *
- * Blocker profile (head's Gate 1 three-grep screen at carve time):
- *   func_80052F10  addiu-$at
- *   func_800534C8  gp_rel
- *   func_80053984  addiu-$at, and it OWNS jtbl_8001174C -- the rodata slot
- *                  at 0x1F4C is attached to this unit for that reason
- * All three have stub reports; do not attempt them. The other 17 are clean
- * (func_80052DE0 and func_800534C0 are bare `jr $ra; nop` stubs splat
- * generated itself, so 15 are real work).
+ * Blocker profile. The carve-time census was a THREE-grep screen and one of
+ * its three blockers is DEAD: `addiu_at` was RESOLVED in round 21 (maspsx
+ * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
+ * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
+ *   func_800534C8  gp_rel        -- STILL BLOCKED, stub report stands.
+ *   func_80052F10  was addiu-$at ONLY -- NOT BLOCKED. 137w, FRESH, its stub
+ *                  report is already gone. Assignable.
+ *   func_80053984  was addiu-$at ONLY -- NOT BLOCKED. 82w, FRESH, assignable.
+ *                  It OWNS jtbl_8001174C; the rodata slot at 0x1F4C is
+ *                  attached to this unit for that reason, and a
+ *                  `%lo(jtbl_*)` load is ordinary matchable code now.
+ * The previous version of this comment ended "All three have stub reports;
+ * do not attempt them" -- a stale DIRECTIVE, which is worse than a stale
+ * count. Two of the three are free ground.
+ * The other 17 are clean (func_80052DE0 and func_800534C0 are bare
+ * `jr $ra; nop` stubs splat generated itself, so 15 are real work).
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
