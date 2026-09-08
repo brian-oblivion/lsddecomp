@@ -94,7 +94,56 @@ s32 func_8002DF7C(void) {
     return v1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E038);
+extern u8 D_8008EA13;
+extern u8 D_8008EA18;
+
+typedef struct {
+    u8 unk0[4];
+    u8 unk4;
+    u8 unk5;
+    u8 unk6[26];
+} D8008E978Entry;
+
+extern D8008E978Entry *D_8008E978;
+
+s32 func_8002E038(s32 a0, s32 a1) {
+    s32 origA0;
+    s32 idx;
+    s32 tblIdx;
+    D8008E978Entry *e;
+    s32 v0;
+    s32 div8;
+    u8 a2;
+    s16 a3;
+    s32 diff;
+    s32 q12;
+    s16 rem12;
+    u16 v1;
+
+    origA0 = a0;
+    idx = D_8008EA18 + (D_8008EA13 << 4);
+    e = &D_8008E978[idx];
+    v0 = (u16)a1 + e->unk5;
+    div8 = v0 / 8;
+    a3 = div8;
+    a2 = 0;
+    if (div8 >= 16) {
+        a2 = 1;
+        a3 = div8 - 16;
+    }
+    diff = (s16)(a2 + (origA0 + 0x3C - e->unk4));
+    q12 = diff / 12;
+    rem12 = diff - q12 * 12;
+    tblIdx = rem12 * 16;
+    tblIdx = tblIdx + a3;
+    v1 = D_8006DAD8[tblIdx];
+    if ((s16)(q12 - 5) > 0) {
+        v1 <<= (s16)(q12 - 5);
+    } else if ((s16)(q12 - 5) < 0) {
+        v1 = (u16)v1 >> -(s16)(q12 - 5);
+    }
+    return v1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E138);
 
