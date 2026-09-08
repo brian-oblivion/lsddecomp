@@ -82,14 +82,20 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EDD4);
 
-/* Scratch state byte: written here (as a u16 store -- upper byte is
- * always 0, the value is masked to 0xFF before the store) then
- * re-read as its low byte a few instructions later for a call
- * argument.  code_179d8_j.c documents this symbol (declared there
- * `volatile u16`) as a "currently selected channel" global written as
- * a side effect and re-read from the global rather than a cached
- * register -- same idiom here, hence the mixed sh-then-lbu widths. */
-extern u16 D_8008EA26;
+/* "Currently selected channel" scratch global: written as a side
+ * effect, then re-read from the global (not a cached register) a few
+ * instructions later -- same idiom, and same `volatile u16` type,
+ * code_179d8_j.c documents for this symbol.  Genuinely needs
+ * `volatile`: without it, this compiler proves (from the narrow range
+ * of the values stored here) that the re-read is redundant and elides
+ * it entirely, which retail's disassembly shows it does NOT do.
+ * `volatile` alone reproduces retail's separate store/reload exactly
+ * -- reading it back through `*(u8 *)&D_8008EA26` (a plain, NON-
+ * volatile-qualified pointer type) still folds to retail's compact
+ * `lui`+`lbu` two-instruction form; it is specifically a
+ * VOLATILE-QUALIFIED POINTER TYPE (`volatile u8 *`) that defeats the
+ * addressing fold, not the underlying object's volatility. */
+extern volatile u16 D_8008EA26;
 /* Loop bound / threshold, read fresh each call -- same symbol
  * code_179d8_j.c documents as "loop bound for a small table of active
  * objects". */
@@ -186,4 +192,77 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F700);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002FAC4);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_800300D0);
+/* Same 0x34-stride channel-configuration record family, s16-field
+ * view -- matches code_179d8_j.c's own Rec34D994 shape (that unit's
+ * D_8008D994/D_8008D996/D_8008D99A/D_8008D99C/D_8008D99E family); this
+ * unit keeps its own independent view rather than sharing the header-
+ * less type. D_8008D988 shares the shape too (read here with `lh`, a
+ * signed load, unlike D_8008D98C's `lhu`-driven Rec34Half above). */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34S16;
+extern Rec34S16 D_8008D994[];
+extern Rec34S16 D_8008D996[];
+extern Rec34S16 D_8008D99A[];
+extern Rec34S16 D_8008D99E[];
+extern Rec34S16 D_8008D988[];
+
+/* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
+ * 16 channels in the first word, next 16 in the second), each paired
+ * with an "active mask" word cleared wherever the channel mask bit is
+ * set -- same symbols and reading code_179d8_j.c already documents. */
+extern u16 D_80090C60;
+extern u16 D_80090C64;
+extern u16 D_8008E228;
+extern u16 D_8008E22C;
+
+u8 func_800300D0(s16 a0, s16 a1, s16 a2, u16 a3) {
+    u8 i;
+    u8 count;
+
+    count = 0;
+    for (i = 0; i < D_8008E9D0; i++) {
+        if (D_8008D994[i].unk0 != a3) {
+            continue;
+        }
+        if (D_8008D99A[i].unk0 != a2) {
+            continue;
+        }
+        if (D_8008D996[i].unk0 != a0) {
+            continue;
+        }
+        if (D_8008D99E[i].unk0 != a1) {
+            continue;
+        }
+        if (D_8008D988[i].unk0 == 0xFF) {
+            D_8008D9A3[i].unk0 = 0;
+            D_8008D98C[i].unk0 = 0;
+            D_8006DAD4->unk194 = 0;
+            D_8006DAD4->unk196 = 0;
+        } else {
+            u16 chan;
+            u16 lowMask;
+            u16 highMask;
+
+            D_8008EA26 = i;
+            chan = D_8008EA26;
+            if (chan < 0x10) {
+                lowMask = 1 << chan;
+                highMask = 0;
+            } else {
+                lowMask = 0;
+                highMask = 1 << (chan - 0x10);
+            }
+            D_8008D9A3[chan].unk0 = 0;
+            D_8008D98C[chan].unk0 = 0;
+            D_8008D988[chan].unk0 = 0;
+            D_80090C60 |= lowMask;
+            D_80090C64 |= highMask;
+            D_8008E228 &= ~D_80090C60;
+            D_8008E22C &= ~D_80090C64;
+        }
+        count++;
+    }
+    return count;
+}
