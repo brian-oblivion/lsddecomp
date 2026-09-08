@@ -51,7 +51,34 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F20C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F2A4);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F368);
+/* Scratch state byte: written here (as a u16 store -- upper byte is
+ * always 0, the value is masked to 0xFF before the store) then
+ * re-read as its low byte a few instructions later for a call
+ * argument.  code_179d8_j.c documents this symbol (declared there
+ * `volatile u16`) as a "currently selected channel" global written as
+ * a side effect and re-read from the global rather than a cached
+ * register -- same idiom here, hence the mixed sh-then-lbu widths. */
+extern u16 D_8008EA26;
+/* Loop bound / threshold, read fresh each call -- same symbol
+ * code_179d8_j.c documents as "loop bound for a small table of active
+ * objects". */
+extern u8 D_8008E9D0;
+/* Flag byte forced on unconditionally at entry. */
+extern u8 D_8008EA1B;
+
+extern s32 func_8002CF18(s32 a0);
+extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+
+void func_8002F368(s32 a0, s32 a1) {
+    s32 v0;
+
+    D_8008EA1B = 0x7F;
+    v0 = func_8002CF18(0xFF) & 0xFF;
+    D_8008EA26 = v0;
+    if (v0 < D_8008E9D0) {
+        func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F3E8);
 
