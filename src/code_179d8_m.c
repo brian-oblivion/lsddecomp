@@ -78,6 +78,54 @@ void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3) {
     }
 }
 
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9B2,
+ * D_8008D9B6 and D_8008D9B8 each need this width (`lhu`) at least once
+ * in this function, on top of the plain signed Rec34Half view
+ * declared above (which some of these same symbols also need, at a
+ * DIFFERENT read site in this same function). Reinterpreted through a
+ * cast rather than redeclared, per this project's rule that one
+ * extern symbol cannot carry two conflicting C types in one file. */
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34HalfU;
+
+/* Same 0x10-byte-stride record family code_179d8_j.c documents as
+ * Rec16D7F0 (that unit's own D_8008D7F0/D_8008D7F4 pair); local view. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x10 - 0x2];
+} Rec16D7F0;
+extern Rec16D7F0 D_8008D7F0[];
+extern Rec16D7F0 D_8008D7F2[];
+
+extern u8 D_8008D970[];
+
+/* Pointer to an object; only the byte field this function reads is
+ * named. */
+typedef struct {
+    u8 pad[0x18];
+    u8 unk18; /* +0x18 */
+} ObjE970;
+extern ObjE970 *D_8008E970;
+
+/* Scratch bytes for a chained percentage-of-percentage volume/pan
+ * calculation -- see the match report for how the two 16129 (=127*127)
+ * divisions were identified (brute-forced against the pinned
+ * toolchain's own magic-multiply constants). */
+extern u8 D_8008EA10;
+extern u8 D_8008EA11;
+extern u8 D_8008EA16;
+extern u8 D_8008EA17;
+extern u8 D_8008EA19;
+extern u8 D_8008EA1A;
+
+/* Mode flag: forces both output channels to the same (maximum) level
+ * when set to 1. */
+extern s16 D_8008E8C0;
+
+/* STALL -- see docs/match-reports/func_8002EA44.md. Best body
+ * reached (13/228 words, 5 words short) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EDD4);
