@@ -1388,6 +1388,35 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C118);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", GetStaticSpawn);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", GenerateInitialSpawn);
+s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint *mood, s32 day)
+{
+	StageChunk chunk;
+	s32 stage;
+	s32 count;
+	s32 i;
+	StageSpawn *entry;
+
+	stage = GetStageChunkFromMood(&chunk, mood);
+	if (stage >= 0) {
+		*timeLimit = STAGE_TIME_LIMITS[stage];
+
+		count = LEN_STAGE_SPAWNPOINTS[stage];
+		entry = STAGE_SPAWNPOINTS[stage];
+		for (i = 0; i < count; i++, entry++) {
+			if (*(s16 *)&chunk == *(s16 *)&entry->chunk)
+				goto found;
+		}
+		entry = &STAGE_SPAWNPOINTS[stage][*(s16 *)&chunk % count];
+
+	found:
+		*(PlayerSpawnGridPos *)dest = *(PlayerSpawnGridPos *)entry;
+		dest->position = SPAWN_POS_ADJUST[entry->adjustment];
+		return stage;
+	}
+
+	stage = GetRandomSpawnFromStage(dest, stage, day);
+	*timeLimit = STAGE_TIME_LIMITS[stage];
+	return stage;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", IsDaySpecial);
