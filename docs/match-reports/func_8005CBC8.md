@@ -1,4 +1,4 @@
-# func_8005CBC8 -- STALL (ONE word short; 99/100, corrected). Blocker GONE as of round 21.
+# func_8005CBC8 -- STALL. Length: 1 word short (99/100 built vs retail 100). Word-match: 99/100. First real diff: file 0x4D3FC / vram 0x8005CBFC (`beqz $v0, .L8005CC14`).
 
 > **ROUND 24 (2026-09-08), runner delta. Round 23's "99/100" figure was measured
 > against an INCOMPLETE body and was itself wrong -- rebuilding it (as this
@@ -46,13 +46,31 @@
 > `.word` column for a repeated label before assuming every index has its
 > own arm.
 >
-> **Permuter, run against the corrected (99/100) body.** Two searches,
-> ~34,200 + iterations total under a 280s wall-clock budget each (`-j 6
-> --stack-diffs --stop-on-zero --best-only`), found **no zero**. The single
-> improving candidate saved by run 1 (permuter score 330 vs base 420,
-> iteration in the first ~34.2k) reorders the `idx = ~sel + 1;` computation
-> to BEFORE the `if (record->unk0 != 0) return false;` check instead of
-> after:
+> **Permuter, run against the corrected (99/100) body. Two runs, 34,180 +
+> 43,084 = 77,264 iterations total, NOT CLOSED under this load** (`-j 6
+> --stack-diffs --stop-on-zero --best-only`, 280s wall-clock budget each).
+> Phrasing deliberately per this round's instruction: "not closed in N
+> iterations under load", not "permuter-exhausted" -- the machine had four
+> other runners on it (`ps` showed concurrent searches from worktrees `echo`
+> and others throughout), so these counts are weak evidence about the search
+> space and say nothing about whether a longer or uncontended run would
+> differ. **Run 1's exit status was not captured** -- it was launched
+> `nohup timeout 280 ... &` without recording `$?` on completion, a real gap
+> in this round's own discipline (CLAUDE.md's `timeout`/124-vs-137 recipe is
+> for exactly this and was not followed). Circumstantial evidence (continuous
+> iteration counts to 34,180 with no error/abort message, ending at
+> approximately the 280s mark) is consistent with the wall-clock bound firing
+> rather than an external kill, but this is inference, not a recorded exit
+> code. Run 2 was launched the same way and same gap applies; recommend
+> whoever resumes this function fix the launch to capture `$?` immediately.
+>
+> Two improving candidates found across the two runs, both verified against
+> the real oracle and both REJECTED -- neither is committable, and both
+> illustrate the same caution from opposite directions:
+>
+> **Run 1's candidate (permuter score 330 vs base 420)** reorders the
+> `idx = ~sel + 1;` computation to BEFORE the
+> `if (record->unk0 != 0) return false;` check instead of after:
 >
 > ```c
 >     if (sel < 0) {
@@ -73,8 +91,40 @@
 > the real word-count got worse. The kept near-miss body reverts this
 > reorder.
 >
-> **A permuter setup bug found and fixed LOCALLY (not in the shared script,
-> per parallel-mode rules) -- worth escalating.** `tools/setup-permuter.sh`
+> **Run 2's candidate (permuter score 202 vs base 420)** is a `volatile`
+> dead-store trick, not an idiomatic reshape:
+>
+> ```c
+> bool func_8005CBC8(s32 value, TriggerRecord *record)
+> {
+>     volatile unsigned int new_var;
+>     s8 sel = record->sel;
+>     s32 idx;
+>     if (sel == 1) {
+>         goto success;
+>     }
+>     if (sel < 0) {
+>         if (record->unk0 != 0) {
+>             return new_var = false;   /* forces a spurious store */
+>         }
+>         idx = (~sel) + 1;
+>         goto have_idx;
+>     }
+>     /* ... rest unchanged ... */
+> ```
+>
+> Compiled directly through this run's `permuter-work/func_8005CBC8/compile.sh`
+> and objdumped (not just read as permuter-internal score): it grows the
+> stack frame from retail's `addiu sp,sp,-0x18` to `addiu sp,sp,-0x20` and
+> inserts a real `sw zero,0x10(sp)` for the `volatile` write -- a frame-size
+> regression, worse in a more obvious way than run 1's candidate, and
+> exactly the "UB/duplicate-arm form reaches a low score, no idiomatic
+> translation matches it" case MATCHING-GUIDE.md's permuter section names as
+> the stopping condition for this class, not a lead worth iterating on
+> further by hand.
+>
+> **A permuter setup bug found and fixed LOCALLY** (not in the shared script,
+> per parallel-mode rules) -- worth escalating. `tools/setup-permuter.sh`
 > generates `compile.sh` with
 > `MASPSX_FLAGS="--aspsx-version=2.34 --dont-force-G0 --expand-div"`, missing
 > the Makefile's `--addiu-at` (`Makefile:44`). For a function that does not
