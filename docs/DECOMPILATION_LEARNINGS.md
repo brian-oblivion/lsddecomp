@@ -344,6 +344,29 @@ and it also makes a bad score uninformative.
 
 ## Source-shape idioms
 
+### A dense `switch` must reproduce retail's JUMP-TABLE WIDTH, not just its arms (round 25)
+
+**`func_80058C58` (`DreamSys`) matched at 79/79 once a no-op high `case` was
+added to widen GCC's jump table.** Its thirteen real arms compile to a
+**33-entry** table; retail's is **48 entries**. The arms were all correct and
+the body was not defective — the table was simply narrower than retail's, so
+everything after it shifted.
+
+GCC 2.6.3 sizes a dense-switch table from the span of the case values it can
+see. If retail's table is wider than yours, retail's source had a case label
+your source does not — most likely an empty or `break`-only arm that compiles
+to nothing but still extends the span. Adding `case 47:` (a no-op falling into
+the default behaviour) widened the table to retail's 48 and closed the
+function.
+
+**The diagnostic, which is the reusable part: check `funcdiff`'s first-diff
+offset against the RODATA TABLE BASE before assuming a body defect.** A first
+diff that lands at or just after the jump table's own address is a table-width
+problem, not a code problem, and reading it as a code problem sends you into
+the arms — which are fine. This is the third member of the "retail's own
+layout is readable off the binary" family, alongside the case-ORDER idiom
+below and the block-ORDER entry above: here it is the case *span*.
+
 ### An arm that must JUMP has to be written NOT-LAST (round 25)
 
 **GCC 2.6.3 lets one arm of an if/else fall through into the join, and it
@@ -472,6 +495,53 @@ flat plateau — which is exactly how this one presented for two rounds
 (77,264 iterations, score never below base). **A residue that survives both
 hand reshaping and a long search is therefore evidence FOR block order, not
 evidence that the function is exhausted.**
+
+#### THE LEVER IS NOT STRICTLY DOMINANT — diagnose per instance, do not pattern-match
+
+**Two runners reached this independently in round 25, from different units,
+and it is the correction to how the lever was first broadcast.** The head's
+mid-round broadcast described one shape and one fix; runners who
+pattern-matched it onto a superficially similar residue lost ground.
+
+- **`func_80059BE0` (`DreamSys`, echo): applying the lever made it WORSE.**
+  Its entry guard already had its default value living in the guard's own
+  delay slot — a *different* and already-correct idiom. Forcing the explicit
+  `goto` there reintroduced a tail-merge defect the function had previously
+  escaped. **Check which of the shapes the disassembly ALREADY shows before
+  applying anything.**
+- **`func_80036230` (`code_179d8_f`, delta) needed a THIRD variant**, not
+  either of the head's two. Its residue was a guard whose instruction order
+  was backwards; the fix was swapping *which side owns the `if` body* — put
+  the success case inside `if (success) { ... return 0; }` and demote
+  `return -1;` to a bare trailing statement. Closed on the first structural
+  variant tried after that reading, at 115/115.
+- **`func_80059814`/`func_800598E8` (`DreamSys`, echo) needed a fourth**: an
+  explicit `goto` to a SHARED label rather than if/else, applied whenever
+  retail shows one arm reaching a merge point via a real jump and the other
+  via fallthrough. That took `func_80059814` from 14/53 to 49/53 and exact
+  length, and made `func_800598E8`'s whole CFG match.
+- **`GenerateInitialSpawn` (`DreamSys`, echo) needed the OPPOSITE of a shared
+  merge:** giving each `if`/`else` arm its own `return stage;` instead of one
+  shared return is what cleared a register-identity cluster. So "share the
+  tail" and "duplicate the tail" are both levers, and which one applies is
+  read off retail, never assumed.
+
+So the transferable content is the QUESTION, not any of the four fixes:
+*which block does retail place where, and which candidate did my source make
+last?* Answer it from the disassembly per function. Round 25 closed three
+functions with four different placement fixes, which is the ratio to expect.
+
+#### A negative that bounds it: the delay-slot-hoist family is NOT this
+
+Echo screened five `DreamSys` stalls against both shapes and found none:
+`func_8005A82C`, `func_8005A9CC`, `DreamSys__InstanceEffectsOnJournal` and
+`func_80059BE0`'s remaining word are all the same *different* residue — the
+compiler schedules an independent instruction into a delay slot that retail
+leaves empty or fills differently. Delta likewise found **no bare `j`
+anywhere** in `func_80065A5C`, which confirms that function's residue is
+genuinely pure scheduling rather than a layout question the permuter is blind
+to (144,658 iterations, best score never moved). That family remains open and
+is worth its own investigation; do not spend block-order attempts on it.
 
 #### The mechanical screen for this has NO measured precision — do not build one
 
