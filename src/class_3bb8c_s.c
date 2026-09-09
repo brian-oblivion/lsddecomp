@@ -62,13 +62,21 @@ typedef struct LinkNodeMethods {
     void (*slot68)(LinkNode *self, s32 arg1);                         /* +0x068 */
     u8 pad6C[0xB8 - 0x6C];
     void (*slotB8)(LinkNode *self, void *arg1);                          /* +0x0B8 */
+    void (*slotBC)(LinkNode *self, void *arg1);                          /* +0x0BC, called on each
+                                                                             arr7C child by
+                                                                             func_800569A8 */
 } LinkNodeMethods;
 
 struct LinkNode {
     LinkNodeMethods *methods; /* +0x000 */
-    u8 pad4[0x20 - 0x4];         /* +0x004 .. +0x01F, unknown */
+    u8 pad4[0x14 - 0x4];         /* +0x004 .. +0x013, unknown */
+    s32 *unk14;                    /* +0x014, zeroed by func_800569A8 on
+                                       every exit path */
+    u8 pad18[0x20 - 0x18];           /* +0x018 .. +0x01F, unknown */
     s32 unk20;                     /* +0x020, forwarded to func_8001E770 */
-    u8 pad24[0x54 - 0x24];           /* +0x024 .. +0x053, unknown */
+    s32 unk24;                       /* +0x024, bounded < 0x1F5 and used as a
+                                         modulus dividend by func_800569A8 */
+    u8 pad28[0x54 - 0x28];              /* +0x028 .. +0x053, unknown */
     s32 unk54;                         /* +0x054, a dispatch "state" selector */
     u8 pad58[0x64 - 0x58];           /* +0x058 .. +0x063, unknown */
     s32 unk64;                         /* +0x064 */
@@ -183,6 +191,20 @@ void func_80056858(LinkNode *self, s32 reuse) {
         }
     }
 }
+
+/* Per-`unk70`-slot table (same index space `func_80056BBC` reads through
+ * D_80087844/D_8008785C/D_80087868/D_80087874); used both as a "channel
+ * active" guard (nonzero test) and as a divisor for the two modulus checks
+ * below. */
+extern s32 D_8008780C[];
+/* A Vec3S "base offset" constant, added (via its .z only) to a per-child
+ * accumulator before being forwarded to each arr7C child's slotB8. */
+extern Vec3S D_8008782C;
+/* Opaque table handle, forwarded unchanged to slot44 for self and for each
+ * arr7C child -- passed as a plain s32 per the slot's established
+ * signature (see func_800567D4's use of the same slot with an s32
+ * argument), not dereferenced anywhere in this function. */
+extern s32 D_80087838[];
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800569A8);
 
