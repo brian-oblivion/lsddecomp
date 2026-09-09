@@ -2164,7 +2164,9 @@ typedef struct DreamSysMethods_3bb8c_l {
 } DreamSysMethods_3bb8c_l;
 typedef struct DreamSysObj_3bb8c_l {
     DreamSysMethods_3bb8c_l *methods;
-    u8 pad04[0x164 - 0x004];
+    u8 pad04[0x044 - 0x004];
+    s32 unk44;               /* +0x044, func_80053984: cleared (only reached when self->unk20 != 0 and the event/code is >= 9) */
+    u8 pad48[0x164 - 0x048];
     s32 unk164;             /* +0x164, func_80053BE8: sign-checked gate */
 } DreamSysObj_3bb8c_l;
 
@@ -2198,9 +2200,15 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, func_80053134 */
     void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, func_800531CC */
     void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, func_800533F0 */
-    u8 pad90[0x09C - 0x090];
-    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, func_80053BE8 */
-    u8 padA0[0x0C0 - 0x0A0];
+    u8 pad90[0x094 - 0x090];
+    void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, func_80053984 (event/code 0xA, dense switch) */
+    void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, func_80053984 (event/code 0xC) */
+    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, func_80053BE8; ALSO func_80053984 (event/code 0xD) */
+    void (*slotA0)(Obj87034_3bb8c_l *self);                        /* +0x0A0, func_80053984 (event/code 0xE) */
+    void (*slotA4)(Obj87034_3bb8c_l *self);                        /* +0x0A4, func_80053984 (event/code 0xF) */
+    void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, func_80053984 (event/code 0x10) */
+    void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, func_80053984 (event/code 0x11) */
+    u8 padB0[0x0C0 - 0x0B0];
     void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, func_80053358 (event 0xC) */
     void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, func_80053358 (event 0x2C)/func_80053458 */
     void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, func_80053358 (event 0x16) */

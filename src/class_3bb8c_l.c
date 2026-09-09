@@ -242,7 +242,37 @@ void func_8005393C(Obj87034_3bb8c_l *self) {
     func_800558F0(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053984);
+void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+    if (self->unk20 == 0) {
+        switch (code - 0xA) {
+        case 0:
+            self->methods->slot94(self);
+            break;
+        case 1:
+            break;
+        case 2:
+            self->methods->slot98(self);
+            break;
+        case 3:
+            self->methods->slot9C(self);
+            break;
+        case 4:
+            self->methods->slotA0(self);
+            break;
+        case 5:
+            self->methods->slotA4(self);
+            break;
+        case 6:
+            self->methods->slotA8(self);
+            break;
+        case 7:
+            self->methods->slotAC(self);
+            break;
+        }
+    } else if (code >= 9) {
+        self->unk3C->unk44 = 0;
+    }
+}
 
 /* func_80053ACC's (and func_80053BE8's/func_80053C94's, further below) own
  * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
