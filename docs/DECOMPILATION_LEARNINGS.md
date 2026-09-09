@@ -229,6 +229,63 @@ Three things worth keeping:
 
 ## Build hygiene (proven, the hard way)
 
+### `make extract` while a function is LIVE C silently destroys its own `.s` stub (round 26)
+
+**splat only regenerates `asm/nonmatchings/<unit>/<func>.s` for a function
+that is currently `INCLUDE_ASM`'d in `src/`.** So running `make extract`
+mid-experiment — while your function is live C rather than wrapped — drops
+that function's stub, and with it your ability to put the function back.
+
+Runner alpha hit this on `func_80035B2C`, caught it on the very next build
+failure, and recovered by restoring `INCLUDE_ASM` and re-running
+`make extract`. The recovery is easy; noticing is the problem, because the
+failure arrives as a missing-include error that reads like a path typo rather
+than as "you deleted the thing you were going to restore".
+
+**Rule: restore `INCLUDE_ASM` BEFORE `make extract`, every time.** `extract`
+is one of the four make targets the project allows you to run directly, which
+makes it easy to reach for without thinking about what it regenerates from.
+
+### A STALE `.s` makes `funcdiff` report a bogus WINDOW, not just a bogus score (round 26)
+
+`progress.py` warns about stale `asm/` files and the warning reads like
+bookkeeping. It is not. `funcdiff.py` resolves a function's byte range from
+three sources in descending precision, the FIRST being the `.s` file's own
+`glabel`/`endlabel` block. After merging a runner's match, that `.s` is stale
+— the function is C now — and funcdiff can hand back a range that is not the
+function at all.
+
+Measured at round 26's merge of `func_80053984`, immediately after the merge
+and before re-extracting:
+
+```
+func_80053984: 67808/67808 words match (file 0x1F4C-0x442CC)
+```
+
+67808 words is obviously not an 82-word function, but note the shape of the
+lie: it says **match**, with a plausible-looking file range whose END
+(`0x442CC` = vram `0x80053ACC`) is genuinely the next function. Only the
+START is wrong. A reader skimming for the word "match" gets a green light.
+
+After `make extract`:
+
+```
+func_80053984: 82/82 words match (file 0x44184-0x442CC)
+```
+
+which agrees exactly with a direct byte comparison over the true range
+(`0x44184..0x442CC`, 328 bytes, identical). Note also that the sibling
+`func_80052F10`, merged in the same commit with an equally stale `.s`,
+reported correctly — so this does not fire reliably enough to be noticed by
+habit.
+
+**Rule: `make extract` after merging any branch that matched a function, then
+re-run funcdiff.** The whole-image SHA1 is unaffected by this and remains the
+authority — `build-and-verify.sh` being green already proves every byte,
+including the function whose window funcdiff mis-reported. When the two
+disagree, the SHA1 wins and funcdiff's range is what needs re-deriving.
+
+
 ### Address drift's most convincing disguise is a PLAUSIBLE WRONG CONSTANT in the function you are editing (round 24)
 
 The existing entry below says drift "looks exactly like a broken symbol". Here
@@ -344,6 +401,55 @@ and it also makes a bad score uninformative.
 
 ## Source-shape idioms
 
+### NARROW a `volatile` to the exact access that needs it — two independent confirmations (round 26)
+
+**`volatile` is a scalpel, and applying it to a whole struct or every
+participating field is what makes it look like it does not work.** Two
+functions in different units confirmed this independently in one round.
+
+**Case 1 — defeating GCC's div/mod fusion (`func_80035B2C`, `code_179d8_k`).**
+GCC 2.6.3 fuses `q = A/B` and `r = A%B` on provably identical operands into a
+single `div`, taking `mflo` and `mfhi`. Retail instead recomputes the whole
+dividend and issues **two** `divu`. Probed through the pinned pipeline, none
+of these break the fusion: a shared named temp, an intervening store, an
+intervening call, or two independent pointer copies. Declaring the
+participating fields `volatile` DOES break it — but applied to the sub-word
+field it turns retail's plain `lh` into `lhu` + widen, which is why it was
+first written off as unusable.
+
+Applying `volatile` to the **word-sized field alone** un-fuses the division
+*and* preserves the `lh`, because a `lw` has no load width to get wrong:
+
+```c
+volatile s32 *pbpm = &rec->unk8C;   /* only the lw-sized field */
+q = (rec->unk4A * *pbpm * 10) / d;  /* rec->unk4A stays an ordinary read */
+r = (rec->unk4A * *pbpm * 10) % d;
+```
+
+That single change took the function from 193/213 to **211/213**.
+
+**Case 2 — forcing a cross-branch reload (`func_80052F10`, `class_3bb8c_l`).**
+Retail keeps a reload that ordinary CSE elides. `*(void * volatile *)
+&self->unk38` forces it, and the function matched at 137/137. This is the
+already-documented fold-defeating idiom used in the OPPOSITE direction —
+forcing a reload rather than permitting a fold.
+
+**The transferable rule: when a qualifier-based lever "works but with a side
+effect", check whether the side effect is intrinsic to the LEVER or an
+artifact of WHERE it was applied.** Narrow the application before discarding
+it. Rejecting a lever because one application of it had a side effect is not
+the same as the lever failing — and the difference here was 18 words.
+
+**Corollary, and this is what keeps it honest: this is not a licence for an
+`__asm__` barrier.** The same round, a runner found that
+`__asm__ __volatile__("" ::: "memory")` also reproduces retail's un-fused
+shape, and correctly did not adopt it. It was refused: it is not the bare
+`__asm__("")` HARD RULE 6 authorizes, it fits neither side of that rule's
+register-identity-versus-order test (so authorizing it would be new policy,
+not applying existing policy), and "barrier away any fusion retail did not do"
+would become the standard answer to a whole class of residues. The plain-C
+lever above is what closed 18 of the 20 words, which is the argument.
+
 ### A dense `switch` must reproduce retail's JUMP-TABLE WIDTH, not just its arms (round 25)
 
 **`func_80058C58` (`DreamSys`) matched at 79/79 once a no-op high `case` was
@@ -366,6 +472,66 @@ problem, not a code problem, and reading it as a code problem sends you into
 the arms — which are fine. This is the third member of the "retail's own
 layout is readable off the binary" family, alongside the case-ORDER idiom
 below and the block-ORDER entry above: here it is the case *span*.
+
+### The block-order rule extends to `switch` CASE order — SOURCE order, not value order (round 26)
+
+**GCC 2.6.3 builds a `switch`'s compare tree from the SORTED case values, but
+lays out the case BODIES in SOURCE DECLARATION ORDER.** So a sparse or dense
+`switch` carries exactly the same block-order penalty as a misordered
+if/else chain, and it is easy to miss because the compare instructions —
+which most readers check first — can look identical between your build and
+retail. It is the downstream branch OFFSETS that diverge, so it presents as
+a mid-function word-match cliff rather than as a wrong instruction.
+
+Runner alpha found this in round 26 and it was worth ~43 words across two
+functions in `code_179d8_k`: `func_8003424C` went 92 -> 122/172 on it, and
+`func_80034690` closed 13 of an 18-word gap.
+
+**Read the rule carefully: SOURCE order, not ascending case-VALUE order.**
+Alpha's summary said value order and its report said source order; both fit
+alpha's data, because both its functions happened to be written in ascending
+order and so could not discriminate. The head ran the discriminating case
+through the pinned pipeline — cases written 30, 10, 20:
+
+```c
+switch (k) {
+case 30: s30(); return;
+case 10: s10(); return;
+case 20: s20(); return;
+}
+```
+
+Bodies come out `s30` @0x38, `s10` @0x48, `s20` @0x58 — **source order**. The
+compare tree is meanwhile a binary search over sorted values (`beq 0x14` /
+`slti 21` / `beq 0xa` / `bne 0x1e`), independent of how the cases are written.
+
+**And it does NOT follow that every jump table needs reordering.** Runner
+delta matched `func_80053984` (`class_3bb8c_l`) at 82/82 on the first attempt
+with a plainly ascending `switch`, because retail's table order already
+coincided with ascending case order there. Check retail's actual order before
+reaching for the lever; the negative is as much a part of the rule as the
+positive.
+
+### A two-return guard: write the SUCCESS return inside, the FAILURE return trailing (round 26)
+
+Same family, different shape, and the existing block-order entry does not
+cover it. `new_class_6d4e8` (`code_179d8_o`) compiled to the right LENGTH but
+the wrong delay-slot value — `move v0,s0` where retail has `move v0,zero`.
+The fix was purely which of the two logical returns is written first:
+
+```c
+/* matches: success return INSIDE the guard, failure return TRAILING */
+if (self != NULL) {
+    /* ... */
+    return self;
+}
+return NULL;
+```
+
+The reverse arrangement cost **two extra words**, because GCC's cross-jump
+pass would not merge that arrangement's epilogues. So on a guard with two
+returns the choice is not stylistic: one order lets the epilogues merge and
+the other does not.
 
 ### An arm that must JUMP has to be written NOT-LAST (round 25)
 
