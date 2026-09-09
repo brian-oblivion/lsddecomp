@@ -58,11 +58,11 @@ extern void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3);
 extern u16 D_8008EA22;
 
 /* Base pointer for a table of 0x10-byte slots, indexed by the small
- * (<0x10) channel id `func_80032148` validates/selects.  Only the two
+ * (<0x10) channel id `func_80032148` validates/selects.  Only the three
  * byte fields this unit's own accessors touch are named -- everything
  * else is opaque per this project's local-reading convention. */
 typedef struct SlotE968 {
-    u8 pad0[0x1];
+    u8 unk0; /* +0x0 */
     u8 unk1; /* +0x1 */
     u8 pad2[0x4 - 0x2];
     u8 unk4; /* +0x4 */
@@ -70,13 +70,34 @@ typedef struct SlotE968 {
 } SlotE968;
 extern SlotE968 *D_8008E968;
 
+/* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
+ * (func_80030E90's own computed index, not a channel id). Every field
+ * this unit's own accessor touches is named; offsets are exact (read
+ * from func_80030E90's own lbu/lhu immediates), field names are not. */
+typedef struct {
+    u8 unk0;  /* +0x0 */
+    u8 unk1;  /* +0x1 */
+    u8 unk2;  /* +0x2 */
+    u8 unk3;  /* +0x3 */
+    u8 unk4;  /* +0x4 */
+    u8 unk5;  /* +0x5 */
+    u8 unk6;  /* +0x6 */
+    u8 unk7;  /* +0x7 */
+    u8 pad8[0x16 - 0x8];
+    u16 unk16; /* +0x16 */
+    u8 pad18[0x20 - 0x18];
+} RecordE978;
+extern RecordE978 *D_8008E978;
+
 /* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
  * id.  Only the two leading s16 fields this unit's own accessors touch
  * are named. */
 typedef struct EntryDAD4 {
     s16 unk0; /* +0x0 */
     s16 unk2; /* +0x2 */
-    u8 pad4[0x10 - 0x4];
+    s16 unk4; /* +0x4 -- read by func_80031280, entry index 25 only */
+    s16 unk6; /* +0x6 -- read by func_80031280, entry index 25 only */
+    u8 pad8[0x10 - 0x8];
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
 
@@ -106,7 +127,37 @@ extern s32 D_8008E934;
  * the same and sibling functions -- same idiom as this file's own
  * D_8008EA22 above. */
 extern volatile u16 D_8008EA26;
-extern u8 D_8008EA18;
+extern volatile u8 D_8008EA18;
+
+/* func_80030E90's own scratch globals -- a "start channel" setup
+ * routine that stages its parameters and a couple of table lookups
+ * into a block of one/two-byte globals before registering a new
+ * active-channel record.  Offsets are exact (this unit's own field
+ * accesses); names are opaque placeholders per the reduced-local-view
+ * convention. */
+extern u8 D_8008EA0C;
+extern u8 D_8008EA0E;
+extern u8 D_8008EA0F;
+extern u8 D_8008EA10;
+extern u8 D_8008EA11;
+extern u8 D_8008EA13;
+extern u8 D_8008EA16;
+extern u8 D_8008EA17;
+extern u8 D_8008EA19;
+extern u8 D_8008EA1A;
+extern u8 D_8008EA1B;
+extern u8 D_8008EA1C;
+extern u8 D_8008EA1D;
+extern u8 D_8008EA1E;
+extern u8 D_8008EA1F;
+extern u8 D_8008EA20;
+extern u16 D_8008EA24;
+
+extern s32 func_8002CF18(void);
+extern void func_8002D6A4(void);
+extern void func_8002D8E0(s32 a0);
+extern s32 func_8002E038(u16 a0, u16 a1);
+extern void func_8002D1B4(s32 a0, u16 a1);
 
 /* Loop bound for a small table of active "objects" (screen/slot
  * pairs); see code_179d8_i.c's D_80090B68/6C for the sibling reading of
@@ -134,6 +185,7 @@ typedef struct {
 } Rec34D994;
 extern Rec34D994 D_8008D994[];
 extern Rec34D994 D_8008D996[];
+extern Rec34D994 D_8008D998[];
 extern Rec34D994 D_8008D99A[];
 extern Rec34D994 D_8008D99C[];
 extern Rec34D994 D_8008D99E[];
@@ -147,12 +199,17 @@ typedef struct {
 extern Rec34Byte D_8008D9A3[];
 
 /* Same 0x34 stride, halfword field at offset 0 (retail always clears it
- * with `sh`). Two independent arrays share this shape. */
+ * with `sh`). Three independent arrays share this shape (D_8008D988,
+ * D_8008D98A and D_8008D98C, each 2 bytes apart in the data section --
+ * same "several unrelated top-level symbols" convention as the
+ * Rec34D994 group above). D_8008D988's field is read signed
+ * (func_80031280 compares it against 0xFF with `lh`, not `lhu`). */
 typedef struct {
-    u16 unk0; /* +0x0 */
+    s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
 extern Rec34Half D_8008D988[];
+extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
 /* 16 (0x10)-byte-stride record with two s16 fields 2 bytes apart --
@@ -267,7 +324,56 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030980);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030E90);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031280);
+s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
+{
+    u16 chan;
+    u32 mask0;
+    u16 mask1;
+
+    if (D_8008E934 == 1) {
+        goto fail_nolock;
+    }
+    D_8008E934 = 1;
+    if ((u16) idx >= 0x18) {
+        goto fail;
+    }
+    if (D_8008D99E[idx].unk0 != p1
+     || D_8008D99A[idx].unk0 != p2
+     || D_8008D99C[idx].unk0 != p3
+     || D_8008D994[idx].unk0 != p4) {
+        goto fail;
+    }
+    if (D_8008D988[idx].unk0 == 0xFF) {
+        D_8008D9A3[(u8) idx].unk0 = 0;
+        D_8008D98C[(u8) idx].unk0 = 0;
+        D_8006DAD4[25].unk4 = 0;
+        D_8006DAD4[25].unk6 = 0;
+    } else {
+        D_8008EA26 = idx;
+        chan = D_8008EA26;
+        if (chan < 0x10) {
+            mask0 = 1 << chan;
+            mask1 = 0;
+        } else {
+            mask0 = 0;
+            mask1 = 1 << (chan - 0x10);
+        }
+        D_8008D9A3[chan].unk0 = 0;
+        D_8008D98C[chan].unk0 = 0;
+        D_8008D988[chan].unk0 = 0;
+        D_80090C60 = mask0 | D_80090C60;
+        D_80090C64 |= mask1;
+        D_8008E228 &= ~D_80090C60;
+        D_8008E22C &= ~D_80090C64;
+    }
+    D_8008E934 = 0;
+    return 0;
+
+fail:
+    D_8008E934 = 0;
+fail_nolock:
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_8003149C);
 
