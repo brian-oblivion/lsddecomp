@@ -1986,7 +1986,20 @@ The discriminator, so this does not become "delete locals at random": it
 applies when the local exists **only** to carry one branch's result to a single
 later use, and there is a parameter in scope that is provably dead. Those two
 conditions together are what make the rewrite semantics-preserving and
-allocation-neutral. Contrast the existing entries on the opposite direction
+allocation-neutral.
+
+**SCOPE, sharpened round 26: this is not a big-function effect.** The entries
+above were all found in large bodies, which left open the reading that adding
+or removing a named local only perturbs the ranking once a function is under
+real register pressure. Runner charlie hit the identical renumbering in
+`func_800569A8` (`class_3bb8c_s`) — **121 words**, far smaller than the
+functions where it was first characterised — having already hit it in
+`code_179d8_j`'s much larger bodies in the same round. Two confirmations at
+opposite ends of the size range make it a general property of GCC 2.6.3's
+allocator, not a symptom of pressure. So treat ANY change to the set of named
+locals as potentially renumbering every callee-saved register in the function,
+and re-measure total length after one — including in a function small enough
+that it feels safe. Contrast the existing entries on the opposite direction
 (round 20's "two levers that closed long-standing near-misses by DELETING a
 named value", and "one named C variable gets ONE storage location") — this is
 the same family, arriving as *substitute* rather than *delete*.
