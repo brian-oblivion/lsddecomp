@@ -401,6 +401,76 @@ and it also makes a bad score uninformative.
 
 ## Source-shape idioms
 
+### The "split scaled index": a mask on the PRODUCT means a HALFWORD array, not a struct array (round 26)
+
+**Symptom.** Retail computes a partial product early — `sll $a0, $v1, 3` for
+what is really a 0x10-stride record index — keeps it live across a long run of
+unrelated stores, masks it mid-block with `andi $a0, $a0, 0xffff`, and only
+then doubles it and adds a base pointer that is loaded LATE:
+
+```
+sll   a0, v1, 3          # idx*8, FIRST instruction of the loop body
+... twenty unrelated 0x34-stride stores ...
+andi  a0, a0, 0xffff     # the mask -- on the PRODUCT, not the index
+lui/lw  v0, D_8006DAD4   # base pointer, loaded LAST
+sll   a0, a0, 1          # *2
+addu  a0, a0, v0
+sh    ..., 6(a0) / 4(a0) / 8(a0) / 0(a0) / 2(a0) / 0xA(a0)
+```
+
+Round 26 met this in three functions of `code_179d8_m` and it had been filed
+across two rounds as a GCC scheduling mystery, with a recommendation to hunt
+for an unidentified statement using the un-doubled product. **It is neither.
+It is the wrong source idiom, and the tell is exactly which value gets
+truncated.**
+
+**A `(u16)` cast on the INDEX into a 0x10-stride struct array can never
+produce this** — the mask then applies to `idx` and the scale is a single
+`sll 4`. What produces it is a **`u16` holding `idx * 8`, used to index a
+HALFWORD pointer**: the `*2` is just `s16` scaling, and
+`(u16)(idx*8) * 2 == idx*16`, so the addressing is identical while the
+instruction sequence is not.
+
+```c
+u16 woff = (u16)i * 8;                    /* the truncated PRODUCT */
+...
+((s16 *)D_8006DAD4)[woff + 3] = 0x200;    /* +0x6 */
+((s16 *)D_8006DAD4)[woff + 2] = 0x1000;   /* +0x4 */
+((s16 *)D_8006DAD4)[woff + 0] = 0;
+```
+
+Side by side through the pinned pipeline, the struct-cast form emits one
+`sll 4`; the halfword form emits the early `sll 3`, the mid-block `andi`, the
+late base load and the `+N` displacements — instruction for instruction.
+
+**Do NOT hoist the base pointer.** It stays late on its own. Three separate
+attempts to front-load it (a `Rec *rec = &...[i]` at block top, an explicit
+scalar `idx8`, a raw pointer-arithmetic rewrite) all made the match WORSE,
+which is what made the residue look unreachable.
+
+**REFINEMENT — the correct spelling depends on whether the call site is a
+LOOP.** Confirmed by applying it to two functions in the same unit:
+
+- **Loop call site** (`func_8002EDD4`): `u16 woff = (u16)i * 8;` computed
+  eagerly as the loop body's first statement. Correct — the function went
+  from 1 word short to **exact 270-word length, 267/270**, with the remaining
+  3 words a single register-identity swap.
+- **NON-loop call site** (`func_8002E4D8`): the eager `u16` spelling triggers
+  a spurious zero-extension pair, because the parameter needs its own
+  sign-extension for an unrelated 0x34-stride chain elsewhere in the function
+  and the two extensions are not shared. There, keep `woff` typed **`s16`**
+  and defer the `(u16)` mask to the point of use.
+
+So the idiom is "truncated product indexing a halfword pointer" in both cases;
+what changes is whether the truncation is eager or deferred, and a loop is what
+makes eager correct.
+
+**The general lesson, which is the part worth carrying: when a residue is a
+MASK, look at WHICH VALUE is being truncated.** A mask on the index and a mask
+on the product are different source constructs that compute the same address,
+and reading one as the other sends you hunting for a missing statement that
+does not exist.
+
 ### NARROW a `volatile` to the exact access that needs it — two independent confirmations (round 26)
 
 **`volatile` is a scalpel, and applying it to a whole struct or every
