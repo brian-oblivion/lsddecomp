@@ -10,12 +10,12 @@ stale, prose elsewhere is not.
 
 **1036 -> 1044 matched in `main` (76.40% -> 76.99% of game code); 135472 code
 bytes matched (58.26% of game bytes). The project crossed 50% of ALL functions
-(1044/2080).** Build green in `main` after all **eleven** merges, **ZERO merge
+(1044/2080).** Build green in `main` after all **thirteen** merges, **ZERO merge
 conflicts**. `headercontention.py` reported NO CONTENTION before provisioning:
 all five assigned units include no project header at all.
 
-Five runners on cheap models, re-assigned as their queues emptied — eleven
-merges from five worktrees. The head worked adjudication and carving rather
+Five runners on cheap models, re-assigned as their queues emptied — thirteen
+merges from five worktrees (alpha 3, bravo 2, charlie 2, delta 3, echo 3). The head worked adjudication and carving rather
 than a queue of its own.
 
 ### The match count needs its composition, or it looks inflated
