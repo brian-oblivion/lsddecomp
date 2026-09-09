@@ -76,7 +76,9 @@ extern SlotE968 *D_8008E968;
 typedef struct EntryDAD4 {
     s16 unk0; /* +0x0 */
     s16 unk2; /* +0x2 */
-    u8 pad4[0x10 - 0x4];
+    s16 unk4; /* +0x4 -- read by func_80031280, entry index 25 only */
+    s16 unk6; /* +0x6 -- read by func_80031280, entry index 25 only */
+    u8 pad8[0x10 - 0x8];
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
 
@@ -147,12 +149,17 @@ typedef struct {
 extern Rec34Byte D_8008D9A3[];
 
 /* Same 0x34 stride, halfword field at offset 0 (retail always clears it
- * with `sh`). Two independent arrays share this shape. */
+ * with `sh`). Three independent arrays share this shape (D_8008D988,
+ * D_8008D98A and D_8008D98C, each 2 bytes apart in the data section --
+ * same "several unrelated top-level symbols" convention as the
+ * Rec34D994 group above). D_8008D988's field is read signed
+ * (func_80031280 compares it against 0xFF with `lh`, not `lhu`). */
 typedef struct {
-    u16 unk0; /* +0x0 */
+    s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
 extern Rec34Half D_8008D988[];
+extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
 /* 16 (0x10)-byte-stride record with two s16 fields 2 bytes apart --
@@ -267,7 +274,56 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030980);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030E90);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031280);
+s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
+{
+    u16 chan;
+    u32 mask0;
+    u16 mask1;
+
+    if (D_8008E934 == 1) {
+        goto fail_nolock;
+    }
+    D_8008E934 = 1;
+    if ((u16) idx >= 0x18) {
+        goto fail;
+    }
+    if (D_8008D99E[idx].unk0 != p1
+     || D_8008D99A[idx].unk0 != p2
+     || D_8008D99C[idx].unk0 != p3
+     || D_8008D994[idx].unk0 != p4) {
+        goto fail;
+    }
+    if (D_8008D988[idx].unk0 == 0xFF) {
+        D_8008D9A3[(u8) idx].unk0 = 0;
+        D_8008D98C[(u8) idx].unk0 = 0;
+        D_8006DAD4[25].unk4 = 0;
+        D_8006DAD4[25].unk6 = 0;
+    } else {
+        D_8008EA26 = idx;
+        chan = D_8008EA26;
+        if (chan < 0x10) {
+            mask0 = 1 << chan;
+            mask1 = 0;
+        } else {
+            mask0 = 0;
+            mask1 = 1 << (chan - 0x10);
+        }
+        D_8008D9A3[chan].unk0 = 0;
+        D_8008D98C[chan].unk0 = 0;
+        D_8008D988[chan].unk0 = 0;
+        D_80090C60 = mask0 | D_80090C60;
+        D_80090C64 |= mask1;
+        D_8008E228 &= ~D_80090C60;
+        D_8008E22C &= ~D_80090C64;
+    }
+    D_8008E934 = 0;
+    return 0;
+
+fail:
+    D_8008E934 = 0;
+fail_nolock:
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_8003149C);
 
