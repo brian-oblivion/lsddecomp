@@ -252,6 +252,37 @@ three are live rather than transcribed:
   its adjudicating round — these are written in families, and round 24's
   detector found one of those three siblings and missed the other two.
 
+  **Round 26 adds the case the two above do not cover: a report that was
+  never a verdict at all — a banked DERIVATION — and it was wrong in two
+  places.** `func_80032D34` carried a round-25 report marked
+  `DERIVATION ONLY -- ASSIGNABLE`: the head had derived the algorithm from the
+  disassembly but never written C. That is the most trustworthy-looking kind
+  of report, because it makes no claim about what is impossible and reads as
+  pure fact. Round 26's echo turned it into C at 271/274 and, having been
+  asked explicitly to flag errors rather than work around them, found two:
+
+  - The per-VAG shift test reads `hdr->ver` (offset 4) — the SAME field the
+    surrounding decision already uses. The derivation named `hdr->attr`, a
+    field that **does not exist in the struct**.
+  - The table advance is a FIXED `+ 0x200`, not `+ numVags*2` as derived. The
+    proof is delay-slot semantics: the increment sits in the loop-continuation
+    branch's own delay slot, so it executes on all 256 iterations regardless
+    of the inner cutoff.
+
+  Both are the kind of error that survives review indefinitely, because the
+  pseudocode is plausible and nobody re-reads the `.s` to check a field name.
+  The second one is the more instructive: **a derivation written by reading
+  instructions in source order will get delay-slot placement wrong**, and a
+  delay slot is precisely where an increment hides.
+
+  Two habits follow, and the first is an ASSIGNMENT habit rather than a
+  reading one. **When you staff someone onto a banked derivation, tell them
+  explicitly that finding the derivation wrong is a result you want** — echo
+  did this because it was asked to, and the default posture toward a report
+  from the head is deference. And **verify a derivation's field names and
+  offsets against the raw `.s`, not against its own prose**, before building
+  on them.
+
   **Round 16 hit this twice in one round, which makes it a standing check
   rather than an anecdote: a long attempt list is not a broad one.**
 
