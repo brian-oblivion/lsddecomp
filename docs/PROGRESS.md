@@ -6,6 +6,133 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-09 — round 26: 8 matches, three carves, and two runner "toolchain leads" that were not
+
+**1036 -> 1044 matched in `main` (76.40% -> 76.99% of game code); 135472 code
+bytes matched (58.26% of game bytes). The project crossed 50% of ALL functions
+(1044/2080).** Build green in `main` after all **eleven** merges, **ZERO merge
+conflicts**. `headercontention.py` reported NO CONTENTION before provisioning:
+all five assigned units include no project header at all.
+
+Five runners on cheap models, re-assigned as their queues emptied — eleven
+merges from five worktrees. The head worked adjudication and carving rather
+than a queue of its own.
+
+### The match count needs its composition, or it looks inflated
+
+`comm -23` over the `INCLUDE_ASM` lists before and after shows only **4**
+functions leaving the queue. The count is 8, and both are right:
+
+- **4 from the pre-existing queue** — `func_80031280` (charlie, 135/135),
+  `func_80053984` (delta, 82/82), `func_80052F10` (delta, 137/137),
+  `func_800522DC` (delta, 69/69).
+- **4 from ground carved DURING the round** — echo's clean 4/4 sweep of
+  `code_179d8_o` (`new_class_6d4e8` 20/20, `func_80027228` 19/19,
+  `func_80027274` 21/21, `func_800272C8` 2/2), which never appeared in the
+  round-start queue at all.
+
+Queue arithmetic: 229 start + 8 carved-in - 8 matched = 229.
+
+### Three carves, and the one deliberately NOT taken
+
+| unit | from | content |
+| --- | --- | --- |
+| `code_179d8_n` | `code_179d8_mid` | 3 clean bodies (161/180/282w), zero stub debt |
+| `code_179d8_o` | `code_179d8` front window `[0..3]` | 4 clean (20/19/21/2w) — emptied by echo within the round |
+| `code_179d8_p` | `code_179d8_mid_d` | 1 clean 131w body, frameless |
+
+All three were cut to avoid a rodata attach and to carry **zero
+blocked-function stub debt**. The fourth — `code_179d8` `[11..32]`, 4 clean
+against 18 gp_rel-blocked — was worked out and **left in the yaml, not taken**:
+head attention rather than ground was the binding constraint by then, and it
+costs 18 mandatory stub reports (without them `progress.py` counts blocked
+functions as FRESH and staffs the next runner into a wall).
+
+### Both "toolchain leads" this round were refuted by reproducing them
+
+Neither reached the operator, which is the point of the rule.
+
+- **charlie's guard branch-polarity.** Proposed as a size- or
+  context-sensitive REORG heuristic "not reachable from source shape", with a
+  corpus census recommended. Size does not move it (1..40 statements, 17..134
+  words, zero flips) and it IS source-reachable (a loop or a plain `if`/`else`
+  in the fallthrough flips `beq`-FAR to `bne`-NEAR). But the probe rule does
+  **not** reproduce charlie's function, whose fallthrough already has control
+  flow — so the toolchain is innocent, the trigger is contextual, and no
+  census is warranted.
+- **alpha's div/mod fusion.** An `__asm__ __volatile__("" ::: "memory")`
+  barrier reproduces retail's un-fused shape; alpha correctly flagged it and
+  did not adopt it. **Refused** — not the construct HARD RULE 6 authorizes, and
+  it fits neither side of that rule's register-identity-versus-order test, so
+  authorizing it would be new policy rather than applying existing policy.
+  Decisively, the premise was false: seven probes found that narrowing
+  `volatile` to the WORD-sized field alone un-fuses the division AND preserves
+  retail's `lh`. Alpha applied it and went **193/213 -> 211/213 in one change**.
+  Left as an operator-facing policy question with a recommendation to decline;
+  it blocks nothing.
+
+### Findings promoted to DECOMPILATION_LEARNINGS
+
+- **The "split scaled index" residue, diagnosed and closed.** Three functions
+  across two rounds had it filed as a GCC scheduling mystery. It is the wrong
+  source idiom: retail masks the **product** `idx*8`, not the index, which
+  means a halfword array indexed by a truncated product, not a struct array
+  indexed by a cast index. bravo confirmed it (`func_8002EDD4`: 1 word short ->
+  **exact 270-word length**, 267/270) and **refined it** — the spelling depends
+  on the call site, eager `u16` in a loop versus `s16` with the mask deferred
+  outside one.
+- **The block-order rule extends to `switch` CASE order**, in its SOURCE
+  DECLARATION form. alpha found it (~43 words across two functions); its own
+  summary and report disagreed on which rule it was and its data could not
+  discriminate, so it was settled with a reproducer. delta then produced BOTH
+  halves back to back — `func_80053984` where the lever was not needed and
+  `func_800522DC` where it was essential — which turns it into a measurable
+  discriminator rather than a thing to try.
+- **NARROW a `volatile` to the exact access that needs it**, confirmed twice
+  independently (alpha's div/mod fusion; delta's `*(void * volatile *)` forcing
+  a cross-branch reload at 137/137).
+- **A two-return guard** wants the success return inside and the failure return
+  trailing; the reverse costs two words (echo).
+- **The allocno-renumbering property is not size-dependent** — charlie
+  confirmed it in a 121-word function.
+- Two build-hygiene traps: **`make extract` while a function is live C
+  destroys its own `.s` stub**, and **a stale `.s` makes funcdiff report a
+  bogus WINDOW while saying "match"**.
+
+### Process, including the head's own errors
+
+- **`PARALLEL-RUNS` §2c gained a real gap.** charlie killed its permuter's root
+  PID and reported it "confirmed gone" — true for that PID. `permuter.py -j 6`
+  runs a forkserver, and six workers survived **reparented to init**, holding
+  six cores, `cwd`-ed into the worktree about to be deleted. The head's
+  pre-teardown sweep is load-bearing, not ceremonial.
+- **`MATCHING-GUIDE` gained a third stale-report shape: a banked DERIVATION.**
+  echo turned round 25's `DERIVATION ONLY` report into C and found two errors
+  in it — a field name absent from the struct, and a table advance that is a
+  fixed `+0x200` rather than `+ numVags*2`, provable from delay-slot semantics.
+  A derivation read in source order gets delay-slot placement wrong, and a
+  delay slot is where an increment hides.
+- **Head error 1:** an ad-hoc word census counted attached jump-table `.word`
+  lines, over-reporting two functions by 40%. `nearmiss.py` reads the size
+  header and was right throughout.
+- **Head error 2:** the `timeout` bound was in the spawn prompt and dropped
+  from re-assignments; charlie then parked a turn on an unbounded
+  `--stop-on-zero` search. §2c says put the bound in the ASSIGNMENT. Put it in
+  re-assignments too.
+- **Head error 3:** trusted a funcdiff "match" whose window was visibly wrong
+  (67808 words). Verified the bytes directly, then found the stale-`.s` cause.
+
+### Where it leaves the queue
+
+**fresh 7, and thin** — 81w/147w/175w/376w/387w plus a reopened. The cheap seam
+is gone again: `code_179d8_o` was the last of it and it is closed. Next round
+should CARVE before staffing more than two runners; `code_179d8` `[11..32]` is
+worked out in the yaml with its 18-stub cost stated. `class_3bb8c_h` remains
+the trap — 13 of 17 are BIOS trampolines and it screens cleanest while being
+least matchable.
+
+---
+
 ## 2026-09-08 — round 25: 7 matches, and a new source-shape lever that closed four of them
 
 **1029 -> 1036 matched in `main` (75.88% -> 76.40% of game code); 133532 code
