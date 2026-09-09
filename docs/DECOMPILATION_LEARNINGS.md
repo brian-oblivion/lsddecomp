@@ -505,12 +505,25 @@ Bodies come out `s30` @0x38, `s10` @0x48, `s20` @0x58 — **source order**. The
 compare tree is meanwhile a binary search over sorted values (`beq 0x14` /
 `slti 21` / `beq 0xa` / `bne 0x1e`), independent of how the cases are written.
 
-**And it does NOT follow that every jump table needs reordering.** Runner
-delta matched `func_80053984` (`class_3bb8c_l`) at 82/82 on the first attempt
-with a plainly ascending `switch`, because retail's table order already
-coincided with ascending case order there. Check retail's actual order before
-reaching for the lever; the negative is as much a part of the rule as the
-positive.
+**And it does NOT follow that every jump table needs reordering. Round 26
+produced BOTH cases, from one runner, back to back — which is what turns this
+from a lever into a checkable rule:**
+
+| function | retail's case-body order | lever |
+| --- | --- | --- |
+| `func_80053984` (`class_3bb8c_l`) | coincides with ascending case value | **not needed** — matched 82/82 with a plainly ascending `switch`, first attempt |
+| `func_800522DC` (`class_3bb8c_k`) | `25, 23, 5, 4, 18, 19` — neither ascending nor descending | **essential** — matched 69/69 first attempt once the cases were written in that exact order |
+
+**So the discriminator is concrete and must be MEASURED per function, never
+assumed in either direction: compare the jump table's own label order against
+sorted case-value order.** If they coincide, an ordinary ascending `switch` is
+correct and reordering buys nothing. If they do not, the file order of your
+`case` labels must reproduce retail's table order literally.
+
+Reading it the wrong way is expensive in both directions — assuming the lever
+is always needed makes you reorder a `switch` that was already right, and
+assuming it is never needed leaves a whole-function block-order residue that
+no expression reshaping will touch.
 
 ### A two-return guard: write the SUCCESS return inside, the FAILURE return trailing (round 26)
 
