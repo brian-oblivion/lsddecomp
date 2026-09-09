@@ -75,9 +75,21 @@ typedef struct {
     s16 unk28;                     /* +0x028, cleared by the constructor (a halfword store, `sh`) */
 } Obj6D4E8;
 
+/* A further-base class's ctor-dispatch table, shape confirmed only for the
+ * one slot this unit's constructor uses -- same "ctor at +0x008" convention
+ * as Obj6D4E8Methods above, mirroring class_3ac78.c's own local
+ * BaseCtorTable_3ac78 for the identical "further-base ctor first" idiom. */
+typedef struct {
+    u8 pad0[0x008];
+    void (*ctor)(void *self);      /* +0x008 */
+} BaseCtorTable6D4E8;
+
 extern void *func_80017B34(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
+extern BaseCtorTable6D4E8 *func_80026C9C(void *self); /* still INCLUDE_ASM in the code_179d8 remainder */
 extern Obj6D4E8Methods *func_80027E68(void);        /* still INCLUDE_ASM in the code_179d8 remainder;
                                                        returns this class's own table, &D_8006D4E8 */
+extern void func_80027E78(void);                    /* still INCLUDE_ASM in the code_179d8 remainder;
+                                                       confirmed zero-argument the same way slot74 is above */
 
 Obj6D4E8 *new_class_6d4e8(void)
 {
@@ -91,7 +103,13 @@ Obj6D4E8 *new_class_6d4e8(void)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_o", func_80027228);
+void func_80027228(Obj6D4E8 *self)
+{
+    func_80026C9C(self)->ctor(self);
+    self->methods = func_80027E68();
+    self->unk28 = 0;
+    func_80027E78();
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_o", func_80027274);
 
