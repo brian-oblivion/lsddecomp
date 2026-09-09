@@ -68,7 +68,90 @@ void func_80052EBC(Obj87034_3bb8c_l *self) {
     func_8004A4B8()->slot48(self);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80052F10);
+/* Cross-unit helpers with no established prototype elsewhere; declared
+ * K&R-free with the argument widths this call site's registers show.
+ * Return types are opaque (register-width values forwarded to further
+ * calls, never dereferenced here). */
+extern s32 func_80048F84(void *arg0, s32 arg1);
+extern s32 func_80048EA0(void *arg0, s32 arg1, s32 arg2);
+extern s32 func_80043008(s32 arg0);
+extern void func_8001EF60(s32 arg0);
+extern s32 func_800544E4(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
+
+/* Opaque data blobs, referenced only by address (never loaded here) and
+ * forwarded to method-table calls of unidentified classes. */
+extern s32 D_8008715C;
+extern s32 D_80087168;
+extern s32 D_80087118[];
+extern s32 D_80087150;
+
+void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
+    DreamSysObj_3bb8c_l *unk18 = self->unk18;
+    s32 ret1;
+    s32 flag;
+
+    unk18->methods->slot74(unk18);
+    self->unk60 = 1;
+    ret1 = func_80048F84(self->unk38, 0);
+    self->unk54->methods->slot5C(self->unk54, ret1);
+
+    ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    ret1 = func_80048EA0(self->unk38, 0, ret1);
+    self->unk58 = (Obj87034_3bb8c_l *) func_80043008(ret1);
+
+    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+
+    self->unk78 = unk18;
+    ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    self->unk50 = (Unk50Struct_3bb8c_l *) func_800544E4(self->unk14, self->unk38, &self->unk6C, ret1, 0);
+    if (arg2 != 0) {
+        self->unk50 = arg2;
+    }
+
+    self->unk4C = arg3;
+    if (self->unk38 != 0) {
+        s32 unk38val;
+        s32 three;
+
+        /* Retail reloads self->unk38 here even though the outer `if`
+         * just read it and nothing wrote it in between -- a volatile-
+         * qualified POINTER TYPE at the read site (not a volatile
+         * object) forces the reload without changing unk38's own
+         * declared type, the same idiom code_179d8_m.c documents for
+         * D_8008EA26's `*(u8 *)&sym`, used here in the opposite
+         * direction (forcing a reload instead of permitting a fold). */
+        unk38val = (s32) *(void * volatile *) &self->unk38;
+        self->unk40 = 0x10;
+        three = 3;
+        /* Order-only: without this barrier the scheduler moves `three`'s
+         * `li` past the `self->unk40` store; removing it does not change
+         * which register holds which value. */
+        __asm__("");
+        flag = (unk38val == 5);
+        if (unk38val == 6) {
+            flag = 1;
+        }
+        self->unk44 = three;
+        if (unk38val == three) {
+            flag = 1;
+        }
+        self->unk14->methods->slot134(self->unk14, 0);
+    } else {
+        self->unk40 = 0x10;
+        self->unk44 = 2;
+        flag = 1;
+        self->unk14->methods->slot134(self->unk14, &D_80087150);
+    }
+
+    self->unk48 = arg1;
+    if (arg1 == 0) {
+        self->unk48 = 0xA000;
+    }
+    func_8001EF60(flag);
+
+    self->unk3C->methods->slotEC(self->unk3C, D_80087118[(s32) self->unk38]);
+    self->unk20 = 5;
+}
 
 void func_80053134(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
@@ -242,7 +325,37 @@ void func_8005393C(Obj87034_3bb8c_l *self) {
     func_800558F0(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_80053984);
+void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+    if (self->unk20 == 0) {
+        switch (code - 0xA) {
+        case 0:
+            self->methods->slot94(self);
+            break;
+        case 1:
+            break;
+        case 2:
+            self->methods->slot98(self);
+            break;
+        case 3:
+            self->methods->slot9C(self);
+            break;
+        case 4:
+            self->methods->slotA0(self);
+            break;
+        case 5:
+            self->methods->slotA4(self);
+            break;
+        case 6:
+            self->methods->slotA8(self);
+            break;
+        case 7:
+            self->methods->slotAC(self);
+            break;
+        }
+    } else if (code >= 9) {
+        self->unk3C->unk44 = 0;
+    }
+}
 
 /* func_80053ACC's (and func_80053BE8's/func_80053C94's, further below) own
  * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
