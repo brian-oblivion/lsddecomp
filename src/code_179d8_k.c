@@ -82,7 +82,9 @@ typedef struct {
     u8 pad8[0xC - 0x8];
     u8 *unkC;   /* +0xC: a saved backup of unk4, restored into it on a "resume" path */
     u8 unk10;   /* +0x10: one-shot latch, set once a "kind 1" retrigger fires */
-    u8 pad11[0x12 - 0x11];
+    u8 unk11;   /* +0x11: cached MIDI-style running-status byte (0xFF standing
+                 * in for a 0xF0 "meta" status) -- read back to interpret a
+                 * later event byte that has its high bit clear */
     u8 unk12;   /* +0x12: byte offset to the active embedded state block */
     u8 unk13;   /* +0x13 */
     u8 unk14;   /* +0x14 */
@@ -181,6 +183,116 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
 
+/* Forward declarations for sibling functions defined later in THIS unit,
+ * needed because func_8003424C dispatches to them by MIDI-style status
+ * byte before they appear in ROM-address order below.  func_800344FC's
+ * signature is the one already established in its own (still-stalled) STALL
+ * comment above; func_80034690's and func_80035B2C's are this function's own
+ * reading, derived from the registers loaded before each call below. */
+extern void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3);
+extern void func_80034614(s16 a0, s16 a1, u8 a2);
+extern void func_80034690(s16 a0, s16 a1, u8 a2);
+extern void func_80035A7C(s16 a0, s16 a1);
+extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
+
+/* A per-channel/slot "sequencer voice" event-stream byte reader.  Reads one
+ * byte from rec->unk4 (advancing the cursor); if it has the high bit set it
+ * is a new MIDI-style status byte -- the low nibble becomes rec->unk12 (the
+ * active embedded-state-block offset) and the high nibble selects which
+ * kind of event follows, consuming however many further data bytes that
+ * kind needs and recording the high nibble into rec->unk11 as "running
+ * status" (0xFF standing in for the 0xF0 kind).  If the high bit is clear,
+ * the byte just read is itself the first DATA byte of a new event of
+ * whichever kind rec->unk11 last recorded (MIDI running status) -- same
+ * dispatch, one fewer byte consumed since this byte already stood in for
+ * the first data byte.
+ *
+ * STALL -- see docs/match-reports/func_8003424C.md. length exact 172/172,
+ * 122/172 raw word-match, first real diff at word 2: a pure register-identity
+ * swap (retail's widened "channel" lives in $s4 and its per-case data byte in
+ * $s3; this C's compiles the same roles into $s3/$s4 the other way around).
+ * CLAUDE.md's register-identity STALL rule -- reshaping tried and did not
+ * move it (see report for the full list of variants). */
+#if 0
+void func_8003424C(s16 a0, s16 a1)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 *p;
+    u8 raw;
+    u8 note, vel;
+
+    p = rec->unk4;
+    rec->unk4 = p + 1;
+    raw = *p;
+    if (raw & 0x80) {
+        rec->unk12 = raw & 0xF;
+        switch (raw & 0xF0) {
+        case 0x90:
+            p = rec->unk4;
+            rec->unk11 = 0x90;
+            rec->unk4 = p + 1;
+            note = *p;
+            rec->unk4 = p + 2;
+            vel = *(p + 1);
+            rec->unk88 = func_80035E80(a0, a1);
+            func_800344FC(a0, a1, note, vel);
+            return;
+        case 0xB0:
+            p = rec->unk4;
+            rec->unk11 = 0xB0;
+            rec->unk4 = p + 1;
+            note = *p;
+            func_80034690(a0, a1, note);
+            return;
+        case 0xC0:
+            p = rec->unk4;
+            rec->unk11 = 0xC0;
+            rec->unk4 = p + 1;
+            note = *p;
+            func_80034614(a0, a1, note);
+            return;
+        case 0xE0:
+            rec->unk11 = 0xE0;
+            rec->unk4 = rec->unk4 + 1;
+            func_80035A7C(a0, a1);
+            return;
+        case 0xF0:
+            p = rec->unk4;
+            rec->unk11 = 0xFF;
+            rec->unk12 = raw & 0xF;
+            rec->unk4 = p + 1;
+            note = *p;
+            func_80035B2C(a0, a1, note);
+            return;
+        default:
+            return;
+        }
+    } else {
+        switch (rec->unk11) {
+        case 0x90:
+            vel = *rec->unk4;
+            rec->unk4 = rec->unk4 + 1;
+            rec->unk88 = func_80035E80(a0, a1);
+            func_800344FC(a0, a1, raw, vel);
+            return;
+        case 0xB0:
+            func_80034690(a0, a1, raw);
+            return;
+        case 0xC0:
+            func_80034614(a0, a1, raw);
+            return;
+        case 0xE0:
+            func_80035A7C(a0, a1);
+            return;
+        case 0xFF:
+            func_80035B2C(a0, a1, raw);
+            return;
+        default:
+            return;
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
 
 /* STALL -- see docs/match-reports/func_800344FC.md. length exact 70/70,
@@ -227,6 +339,137 @@ void func_80034614(s16 a0, s16 a1, u8 a2)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
+/* Cross-unit calls, local guesses per this project's convention (a prototype
+ * for a function another unit defines stays in this .c). func_800363FC and
+ * func_80036118 are already matched in code_179d8_f.c; func_800307F0 is
+ * already matched in code_179d8_j.c; func_80030980 is still INCLUDE_ASM
+ * there, so its signature below is this call site's own reading -- a 5th
+ * argument (the one spilling to the stack at 0x10($sp)) alongside the usual
+ * "packed (slot<<8)|channel" first argument this file's siblings already
+ * use. */
+extern void func_800363FC(void);
+extern void func_80036118(s32 a0, s32 a1);
+extern s32 func_800307F0(s16 p0, s16 p1, s32 p2);
+extern void func_80030980(s16 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
+
+/* Forward declarations for sibling functions defined later in THIS unit's
+ * ROM-address order. func_800351D0's signature is this call site's own
+ * reading; the rest are already established (matched, or from their own
+ * STALL comments) elsewhere in this file. */
+extern void func_800351D0(s16 a0, s16 a1, u8 a2);
+extern void func_80034C28(s16 a0, s16 a1, s32 a2);
+extern void func_80034E5C(s16 a0, s16 a1, u8 a2);
+extern void func_80034F90(s16 a0, s16 a1, u8 a2);
+extern void func_800350D8(s16 a0, s16 a1, u8 a2);
+extern void func_80035154(s16 a0, s16 a1, u8 a2);
+extern void func_80034D90(s16 a0, s16 a1);
+
+/* Control-Change dispatcher: reads one data byte from the event stream
+ * (the CC value) and routes on `a2`, the CC NUMBER, through a dense 0..121
+ * switch that GCC lowers to the jump table this unit owns
+ * (jtbl_80010CF0). The controller numbers with dedicated handling below are
+ * exactly the standard MIDI CC assignments (0 bank-select MSB, 6 data-entry
+ * MSB, 7 volume, 10 pan, 11 expression, 64 sustain, 65 portamento, 91 reverb
+ * depth, 98/99 NRPN, 100/101 RPN, 121 reset-all-controllers), which is a
+ * strong confirmation this really is a MIDI CC handler and not a
+ * project-invented numbering. Every arm except 6/65/98/99/100/101/121 falls
+ * through into the shared tail that re-arms the next scheduling delta via
+ * func_80035E80; those seven `return` immediately instead.
+ *
+ * STALL -- see docs/match-reports/func_80034690.md. 5 words SHORT (195/200,
+ * compiled length measured directly off build/src/code_179d8_k.c.o, not
+ * from funcdiff which cannot read a meaningful word-match number once
+ * length drifts). Every other case body's word count matches retail's
+ * exactly (verified case by case); the two measured causes are (1) this
+ * build allocates one FEWER callee-saved register overall (6 vs retail's
+ * 7 -- "val" never gets its own persistent $s6), costing 2 words in the
+ * prologue/epilogue, and (2) case 11 (CC 11, Expression) reaches the
+ * shared combine-tail by JUMPING INTO retail's default-path widening
+ * (saving 3 words) instead of duplicating its own full widening and
+ * jumping straight to the call the way retail -- and this file's own
+ * cases 7 and 10, which DO match exactly -- do. Register-identity /
+ * tail-merge-choice residue, not a logic difference; see report for the
+ * reshapes tried. */
+#if 0
+void func_80034690(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 *p = rec->unk4;
+    u8 offset = rec->unk12;
+    u8 val;
+
+    rec->unk4 = p + 1;
+    val = *p;
+    switch (a2) {
+    case 0:
+        rec->unk4C = val;
+        rec->unk88 = func_80035E80(a0, a1);
+        return;
+    case 6:
+        func_800351D0(a0, a1, val);
+        return;
+    case 7: {
+        u8 *blk = (u8 *)rec + offset;
+        s16 packed = (a1 << 8) | a0;
+
+        func_80030980(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
+        *(s16 *)((u8 *)rec + offset * 2 + 0x4E) = val;
+        rec->unk88 = func_80035E80(a0, a1);
+        return;
+    }
+    case 10: {
+        u8 *blk = (u8 *)rec + offset;
+        s16 packed = (a1 << 8) | a0;
+        s16 wide = *(s16 *)((u8 *)rec + offset * 2 + 0x4E);
+
+        func_80030980(packed, rec->unk4C, blk[0x2C], wide, val);
+        blk[0x17] = val;
+        rec->unk88 = func_80035E80(a0, a1);
+        return;
+    }
+    case 11: {
+        u8 *blk = (u8 *)rec + offset;
+
+        func_800307F0(rec->unk4C, blk[0x2C], val);
+        func_80030980((a1 << 8) | a0, rec->unk4C, blk[0x2C],
+                      *(s16 *)((u8 *)rec + offset * 2 + 0x4E), blk[0x17]);
+        rec->unk88 = func_80035E80(a0, a1);
+        return;
+    }
+    case 64:
+        if (val < 0x40) {
+            func_80036518();
+        } else {
+            func_800363FC();
+        }
+        break;
+    case 65:
+        func_80034C28(a0, a1, val);
+        return;
+    case 91:
+        func_80036118(val, val);
+        break;
+    case 98:
+        func_80034E5C(a0, a1, val);
+        return;
+    case 99:
+        func_80034F90(a0, a1, val);
+        return;
+    case 100:
+        func_800350D8(a0, a1, val);
+        return;
+    case 101:
+        func_80035154(a0, a1, val);
+        return;
+    case 121:
+        func_80034D90(a0, a1);
+        return;
+    default:
+        break;
+    }
+    rec->unk88 = func_80035E80(a0, a1);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
 
 /* A stack-local buffer this function passes to three cross-unit callees:
