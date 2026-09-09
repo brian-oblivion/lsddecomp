@@ -79,7 +79,10 @@ segments:
       # the original 0xFD8..0x1764 slot, 179 are vram addresses inside
       # code_179d8's own text and the rest are ASCII.
       - [0x11F8, .rodata, code_179d8_b]
-      - [0x120C, rodata]  # code_179d8_mid remainder
+      - [0x120C, rodata]  # was 'code_179d8_mid remainder'; that text
+                          # segment is now the code_179d8_n C unit, which
+                          # owns no jump table, so this slot stays
+                          # STANDALONE and attaches to nothing.
       # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
       # same situation as 0x11F8 above.
       - [0x14D8, .rodata, code_179d8_c]
@@ -356,19 +359,33 @@ segments:
       - [0x19098, c, code_179d8_h]
       # code_179d8_b: window [60..79], 0x194E0..0x1A1BC (20 functions).
       - [0x194E0, c, code_179d8_b]
-      # code_179d8_mid: functions 80..82 of the original monolith. UNCARVED
-      # remainder after the code_179d8_g carve below.
+      # code_179d8_n: functions 80..82 of the original monolith, 0x1A1BC..
+      # 0x1AB78 (3 functions).  Carved round 26 (2026-09-09) out of what was
+      # the `code_179d8_mid` UNCARVED remainder -- renamed on carve because
+      # "mid" named a remainder and this slice is no longer one; the whole
+      # remainder was consumed, so no `code_179d8_mid` segment survives.
       #
-      # It was left here as "all three are addiu-$at blocked, so there is
-      # nothing to staff here".  That is FALSE as of round 21: `addiu_at` was
-      # resolved (maspsx `--addiu-at`, docs/research/addiu-at-blocker.md) and
-      # it was the only obstruction on all three.  Re-censused round 24
-      # (2026-09-08), four screens per function, canonical shell forms:
+      # It had been left uncarved as "all three are addiu-$at blocked, so
+      # there is nothing to staff here".  That was FALSE as of round 21:
+      # `addiu_at` was resolved (maspsx `--addiu-at`,
+      # docs/research/addiu-at-blocker.md) and it was the only obstruction on
+      # all three.  Re-censused round 24 (2026-09-08) and again at carve time
+      # round 26, four screens per function, canonical shell forms:
       #   3 of 3 CLEAN -- func_800299BC (161w), func_80029C40 (180w),
       #   func_80029F10 (282w).  Zero gp_rel, zero nop_mflo_mfhi, zero
       #   `jr $t2` trampolines.
-      # A CARVE CANDIDATE, not a dead end.  Three clean bodies, all large.
-      - [0x1A1BC, asm, code_179d8_mid]
+      # Boundary checks at carve time, both sides: predecessor code_179d8_b
+      # is already a C unit (so its exit boundary is proven by the build);
+      # func_800299BC opens on its own `addiu $sp, $sp, -0x38`; the slice
+      # closes on `jr $ra; nop` + `endlabel func_80029F10`.  Zero `alabel`,
+      # zero functions with more than one prologue.
+      # Owns NO switch jump table (zero `jtbl_` references in the slice), so
+      # NO rodata attach -- the 0x120C slot that used to be labelled
+      # "code_179d8_mid remainder" stays standalone.  The slice does
+      # reference plain rodata SYMBOLS (D_80010984/994, D_80010A0C/A14/A20/
+      # A28/A38); those resolve as externs and must be referenced by symbol,
+      # never re-typed as C string literals.
+      - [0x1A1BC, c, code_179d8_n]
       # code_179d8_g: functions 83..99 of the original, 0x1AB78..0x1C440
       # (17 functions).  Census 2026-09-04 with the three-grep screen run
       # over each function's own text: 14/17 clean; the three blocked were

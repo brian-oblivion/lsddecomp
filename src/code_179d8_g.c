@@ -1,13 +1,13 @@
 /*
  * code_179d8_g -- functions 83..99 of the original 274-function code_179d8
  * monolith, 0x1AB78..0x1C440 (vram 0x8002A378..0x8002BC40).  Carved round 17
- * (2026-09-04) off the back of `code_179d8_mid`, which keeps that name for
- * the three functions still in front of this slice. Those three were left
- * as "all addiu-$at blocked, so there is nothing left to staff there";
- * re-censused round 24 (2026-09-08) that is FALSE -- func_800299BC (161w),
- * func_80029C40 (180w) and func_80029F10 (282w) are ALL THREE blocker-clean
- * now that `addiu_at` is resolved. `code_179d8_mid` is an uncarved segment
- * holding three clean functions and is a carve candidate, not a dead end.
+ * (2026-09-04) off the back of what was then `code_179d8_mid`, the three
+ * functions in front of this slice. Those three were left as "all addiu-$at
+ * blocked, so there is nothing left to staff there"; re-censused round 24
+ * (2026-09-08) that is FALSE -- func_800299BC (161w), func_80029C40 (180w)
+ * and func_80029F10 (282w) are ALL THREE blocker-clean now that `addiu_at`
+ * is resolved. Round 26 (2026-09-09) acted on that and CARVED them as the
+ * C unit `code_179d8_n`; no `code_179d8_mid` segment exists any more.
  *
  * Blocker census, three-grep screen run per function at carve time:
  * 14 of the 17 clean, zero trivial leaves.  These are BIG bodies -- 196,
@@ -105,8 +105,8 @@ extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void); /* asm/psy
 extern s32 func_80025900(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void func_80025AE4(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void func_80012C20(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* asm/code_179d8_mid.s */
-extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* asm/code_179d8_mid.s, per code_179d8_b.c */
+extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
+extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
 extern s32 func_80029478(void);                                /* asm/nonmatchings/code_179d8_b;
                                                                    addiu_at RESOLVED round 21, no longer blocked */
 extern s32 func_8002C0AC(const char *arg0, const char *arg1, s32 arg2); /* asm/nonmatchings/code_179d8_d */
