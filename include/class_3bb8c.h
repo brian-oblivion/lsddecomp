@@ -2106,6 +2106,8 @@ typedef struct Obj14Methods_3bb8c_l {
     void (*slotEC)(void *self);                        /* +0x0EC, func_80053764 */
     u8 padF0[0x10C - 0x0F0];
     void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, func_8005393C */
+    u8 pad110[0x134 - 0x110];
+    void (*slot134)(void *self, void *arg1);           /* +0x134, func_80052F10 */
 } Obj14Methods_3bb8c_l;
 typedef struct Obj14_3bb8c_l {
     Obj14Methods_3bb8c_l *methods; /* +0x000 */
@@ -2135,7 +2137,7 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slot64)(void *self, void *arg1);        /* +0x064, func_80053764 */
     void (*slot68)(void *self, void *arg1);        /* +0x068, func_80053764 */
     void (*slot6C)(void *self, void *arg1);        /* +0x06C, func_80053764 */
-    u8 pad70[0x074 - 0x070];
+    void (*slot70)(void *self, void *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070, func_80052F10 */
     void (*slot74)(void *self);          /* +0x074, func_800536B0 */
     u8 pad78[0x0AC - 0x078];
     /* Returns another DreamSysObj_3bb8c_l* -- its return value is dispatched
@@ -2151,7 +2153,8 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slotB4)(void *self, s32 arg1);          /* +0x0B4, func_80053764 */
     u8 padB8[0x0D4 - 0x0B8];
     void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, func_80053764 */
-    u8 padD8[0x0F0 - 0x0D8];
+    u8 padD8[0x0EC - 0x0D8];
+    s32 (*slotEC)(void *self, s32 arg1);              /* +0x0EC, func_80052F10 */
     s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md). ALSO func_80053764, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
     u8 padF4[0x0F8 - 0x0F4];
     void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, func_80053764 */
@@ -2159,7 +2162,9 @@ typedef struct DreamSysMethods_3bb8c_l {
     u8 pad100[0x104 - 0x100];
     s32 (*slot104)(void *self, s32 arg1); /* +0x104, func_800531CC */
     s32 (*slot108)(void *self);           /* +0x108, func_800531CC */
-    u8 pad10C[0x200 - 0x10C];
+    u8 pad10C[0x1A0 - 0x10C];
+    s32 (*slot1A0)(void *self, s32 arg1); /* +0x1A0, func_80052F10 (return value forwarded opaquely to two other calls) */
+    u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(void *self);           /* +0x200, func_80053C94 */
 } DreamSysMethods_3bb8c_l;
 typedef struct DreamSysObj_3bb8c_l {
@@ -2192,7 +2197,9 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md) */
     u8 pad34[0x048 - 0x034];
     void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, func_80052EBC/func_80053134 (via self->unk54) */
-    u8 pad4C[0x074 - 0x04C];
+    u8 pad4C[0x05C - 0x04C];
+    void (*slot5C)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x05C, func_80052F10 (arg1 is func_80048F84's return value, forwarded opaquely) */
+    u8 pad60[0x074 - 0x060];
     void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, func_80053358 (event 0x21) */
     u8 pad78[0x07C - 0x078];
     void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, func_800531CC */
@@ -2231,7 +2238,8 @@ struct Obj87034_3bb8c_l {
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
     s32 unk40;                             /* +0x040, func_80053764 */
     s32 unk44;                              /* +0x044, func_80053764 */
-    u8 pad48[0x050 - 0x048];
+    s32 unk48;                               /* +0x048, func_80052F10: set from arg1, or 0xA000 if arg1==0 */
+    s32 unk4C;                                /* +0x04C, func_80052F10: set from arg3 (only when self->unk38 != 0) */
     Unk50Struct_3bb8c_l *unk50;             /* +0x050, func_800531CC */
     Obj87034_3bb8c_l *unk54;                 /* +0x054, func_80053134 */
     Obj87034_3bb8c_l *unk58;                  /* +0x058, func_800531A0: forwarded as func_800531CC's `other` */
@@ -2239,7 +2247,10 @@ struct Obj87034_3bb8c_l {
     s32 unk60;                                 /* +0x060, func_800531CC: has-a-target gate, cleared after detaching */
     s32 unk64;                                  /* +0x064, func_800531CC: set to 1 */
     s32 unk68;                                   /* +0x068, func_800531CC/func_80053358/func_800533F0: zero-checked gate */
-    u8 pad6C[0x080 - 0x06C];
+    s32 unk6C;                                    /* +0x06C, func_80052F10: out-parameter address passed to func_800544E4, own type unknown */
+    u8 pad70[0x078 - 0x070];
+    DreamSysObj_3bb8c_l *unk78;                    /* +0x078, func_80052F10: cached copy of self->unk18 */
+    u8 pad7C[0x080 - 0x07C];
     s32 unk80;                                    /* +0x080, func_800531CC (on `other`)/func_800533F0/func_80053458: zero-checked gate */
 };
 
