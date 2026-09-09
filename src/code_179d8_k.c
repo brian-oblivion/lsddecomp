@@ -77,9 +77,12 @@ extern void func_80036518(void);                              /* code_179d8_f, M
  * their address is only known at runtime, exactly the case this project's
  * pointer-arithmetic convention is for. */
 typedef struct {
-    u8 pad0[0x4];
+    u8 unk0;    /* +0x0: a byte passed alongside unk3C to func_80036410 on
+                 * end-of-track cleanup */
+    u8 pad1[0x4 - 0x1];
     u8 *unk4;   /* +0x4: cursor into a byte-encoded (7-bit VLQ) event stream */
-    u8 pad8[0xC - 0x8];
+    u8 *unk8;   /* +0x8: saved "track start" cursor, restored into unk4 (and
+                 * sometimes unkC) on end-of-track / repeat */
     u8 *unkC;   /* +0xC: a saved backup of unk4, restored into it on a "resume" path */
     u8 unk10;   /* +0x10: one-shot latch, set once a "kind 1" retrigger fires */
     u8 unk11;   /* +0x11: cached MIDI-style running-status byte (0xFF standing
@@ -95,7 +98,18 @@ typedef struct {
     u8 unk28;   /* +0x28: a cached byte, written from the "mode 1" latch path */
     u8 unk29;   /* +0x29: a retrigger/step counter */
     u8 unk2A;   /* +0x2A: a second, independent retrigger/step counter */
-    u8 pad2B[0x4C - 0x2B];
+    u8 unk2B;   /* +0x2B: cleared on end-of-track stop (redundant double store
+                 * in retail -- see func_80035B2C) */
+    u8 pad2C[0x3C - 0x2C];
+    u8 unk3C;   /* +0x3C: compared against 0xFF; a "track/channel select" byte
+                 * passed to func_80036410 on end-of-track stop */
+    u8 pad3D[0x46 - 0x3D];
+    s16 unk46;  /* +0x46: repeat-count LIMIT (0 = loop forever) */
+    u16 unk48;  /* +0x48: repeat COUNTER, incremented per end-of-track;
+                 * sign-checked via explicit (s16) cast at its compare site,
+                 * same idiom as code_179d8_i.c's unk40 */
+    s16 unk4A;  /* +0x4A: a per-tick scaling factor used in the tempo/rate
+                 * recompute on a Set-Tempo meta event */
     s16 unk4C;  /* +0x4C */
     u8 pad4E[0x6E - 0x4E];
     s16 unk6E;  /* +0x6E: a repeat/skip counter, decremented per catch-up tick */
@@ -106,7 +120,10 @@ typedef struct {
     s32 unk80;  /* +0x80: accumulated tick position */
     u8 pad84[0x88 - 0x84];
     s32 unk88;  /* +0x88: last-value scratch, overloaded per call site */
-    u8 pad8C[0xA8 - 0x8C];
+    s32 unk8C;  /* +0x8C: recomputed BPM (60000000 / microseconds-per-quarter),
+                 * cached from the last Set-Tempo meta event */
+    u32 unk90;  /* +0x90: playback state flags */
+    u8 pad94[0xA8 - 0x94];
     s16 unkA8;  /* +0xA8: a masked-byte parameter cached from a dispatch call */
     u8 padAA[0xAC - 0xAA];
 } Entry90902E8;
@@ -764,6 +781,132 @@ void func_80035A7C(s16 a0, s16 a1)
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035A7C);
 
+/* Cross-unit calls, local guesses per project convention. func_8003069C is
+ * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
+ * single-argument reading in both code_179d8_f.c and code_179d8_i.c;
+ * func_80036410 is matched in code_179d8_f.c with this signature. */
+extern s32 func_8003069C(s32 a0);
+extern void func_80036410(s32 a0, s32 a1);
+
+/* This unit's own reading of the same global code_179d8_i.c already reads
+ * as `D_8009024C` (a tick-rate/PPQN-style constant) -- independent local
+ * view, per project convention. */
+extern u32 D_8009024C;
+
+/* Meta-event handler, reached from func_8003424C's 0xFF ("running status
+ * for a 0xF0 event") and new-status 0xF0 dispatch arms with `a2` = the
+ * meta-event TYPE byte. Only two types are understood; everything else is
+ * silently ignored:
+ *
+ * STALL -- see docs/match-reports/func_80035B2C.md. 20 words SHORT
+ * (193/213, compiled length measured off build/src/code_179d8_k.c.o since
+ * funcdiff's word-match number is not trustworthy once length drifts).
+ * First real diff at word 59 (`tools/funcdiff.py func_80035B2C`), a
+ * register-identity difference downstream of the true cause: this build's
+ * two divisions in the Set-Tempo rate recompute share ONE `divu` (GCC
+ * fuses `A/B` and `A%B` on provably-identical operands, confirmed with an
+ * isolated pinned-pipeline reproducer), where retail recomputes the
+ * dividend from `rec->unk4A`/`rec->unk8C` via a FRESH struct read before
+ * EACH of its two `divu`s. Every other structural piece is confirmed
+ * correct -- see report for the block-order and unsigned-comparison fixes
+ * that got this far, and the reshapes (including an isolated toolchain
+ * finding on scheduling barriers) that did not close the remaining gap.
+ *
+ * 0x2F (End of Track): bumps the repeat counter (unk48). unk46 == 0 means
+ * "loop forever" -- rewind unk4 to the saved track start (unk8) and keep
+ * going. Otherwise, while the counter is still under the limit (unk46),
+ * rewind BOTH unk4 and unkC. Once the limit is reached, clear the
+ * playback-state flags (unk90), rewind unkC one more time, and run the
+ * stop-sequence callbacks (func_80036410 gated on unk3C != 0xFF, then an
+ * unconditional func_8003069C notify) before priming unk88 from unk70 for
+ * the next tick.
+ *
+ * 0x51 (Set Tempo): reads a 3-byte big-endian microseconds-per-quarter-note
+ * value, converts it to a BPM-like rate (60000000 / value -- the standard
+ * MIDI tempo formula) into unk8C, then recomputes the scheduling
+ * threshold (unk6E/unk70) against unk4A and the global tick-rate constant
+ * D_8009024C, in whichever of two regimes avoids losing precision to
+ * integer truncation (the `else` regime also derives a rounding bit from
+ * the division's remainder). unk6E doubles as a mode flag: -1 means
+ * "unk70 holds the reciprocal-regime value", any other value means
+ * "unk70 holds the same value unk6E does". */
+#if 0
+void func_80035B2C(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+
+    if (a2 != 0x2F) {
+        if (a2 != 0x51) {
+            return;
+        }
+        {
+            u8 *p = rec->unk4;
+            s32 tempo;
+            s32 bpm;
+            u32 base;
+            u32 divisor;
+
+            rec->unk4 = p + 1;
+            tempo = (s32)p[0] << 16;
+            rec->unk4 = p + 2;
+            tempo |= (s32)p[1] << 8;
+            rec->unk4 = p + 3;
+            tempo |= p[2];
+
+            bpm = 60000000 / tempo;
+            base = D_8009024C * 15;
+            divisor = base * 4;
+            rec->unk8C = bpm;
+            if (rec->unk4A * rec->unk8C * 10 < divisor) {
+                rec->unk6E = (D_8009024C * 600) / (rec->unk4A * rec->unk8C);
+                rec->unk70 = rec->unk6E;
+            } else {
+                s32 q = (rec->unk4A * rec->unk8C * 10) / divisor;
+                s32 r = (rec->unk4A * rec->unk8C * 10) % divisor;
+
+                rec->unk6E = -1;
+                rec->unk70 = (base * 2 < r) ? q + 1 : q;
+            }
+        }
+        rec->unk88 = func_80035E80(a0, a1);
+        return;
+    }
+    {
+        u16 newCount = rec->unk48 + 1;
+        s16 limit = rec->unk46;
+
+        rec->unk48 = newCount;
+        if (limit == 0) {
+            rec->unk80 = 0;
+            rec->unk27 = 0;
+            rec->unk88 = 0;
+            rec->unk4 = rec->unk8;
+            return;
+        }
+        if ((s16)newCount < limit) {
+            rec->unk80 = 0;
+            rec->unk27 = 0;
+            rec->unk88 = 0;
+            rec->unk4 = rec->unk8;
+            rec->unkC = rec->unk8;
+            return;
+        }
+        D_800902E8[a0][a1].unk90 &= ~1;
+        D_800902E8[a0][a1].unk90 &= ~8;
+        D_800902E8[a0][a1].unk90 &= ~2;
+        D_800902E8[a0][a1].unk90 |= 0x200;
+        D_800902E8[a0][a1].unk90 |= 0x4;
+        rec->unkC = rec->unk8;
+        rec->unk2B = 0;
+        if (rec->unk3C != 0xFF) {
+            func_80036410(rec->unk3C, rec->unk0);
+            rec->unk2B = 0;
+        }
+        func_8003069C((a1 << 8) | a0);
+        rec->unk88 = rec->unk70;
+    }
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035B2C);
 
 /* MATCHED -- see docs/match-reports/func_80035E80.md. The `goto combine`
