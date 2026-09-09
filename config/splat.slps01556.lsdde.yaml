@@ -371,7 +371,43 @@ segments:
       # one as FRESH, because its `fresh` column cannot see blockers).
       # A cut at index 0..3 avoids both and yields four clean bodies
       # (20w/19w/21w/2w) with no jump table and no stub debt.
-      - [0x179d8, asm, code_179d8]
+      # code_179d8_o: functions 0..3 of the original monolith, 0x179d8..
+      # 0x17AD0 (4 functions).  Carved round 26 (2026-09-09) -- the FRONT
+      # window of the head remainder, taken because it is the cheapest
+      # blocker-clean ground left in the executable and the fresh queue had
+      # nothing small in it.
+      #
+      # Census at carve time, four screens per function:
+      #   new_class_6d4e8 20w   func_80027228 19w
+      #   func_80027274   21w   func_800272C8  2w
+      # 4 of 4 CLEAN -- zero gp_rel, zero forward nop_mflo_mfhi, zero
+      # `jr $t2` trampolines, zero `jtbl_` references, zero `alabel`, and no
+      # function with more than one prologue.  So NO rodata attach and NO
+      # blocked-function stub-report debt -- which is exactly why the cut is
+      # here and not deeper.
+      #
+      # The window also references NO rodata or data symbol at all (zero
+      # `%hi`/`%lo` in the whole slice), so the 0xFD8 slot is untouched by
+      # this carve and stays with the remainder.  It calls out to
+      # func_80017B34, func_80026C9C, func_80027E68 and func_80027E78 --
+      # the last two are in the remainder below, so their prototypes belong
+      # in this unit's own .c, not a shared header.
+      #
+      # Boundaries checked both sides: func_800272C8 closes on `jr $ra; nop`
+      # + endlabel; func_800272D0 (the remainder's new first function) opens
+      # on a `lw %gp_rel(...)($gp)` scheduled ahead of its own
+      # `addiu $sp,$sp,-0x88` -- that is an ordinary hoisted global load, NOT
+      # the pre-prologue `$sp` touch Gate 2 warns about.
+      - [0x179d8, c, code_179d8_o]
+      # code_179d8: the head remainder, functions 4..42 of the original,
+      # 0x17AD0.. -- 39 functions, of which 5 are clean (func_800276C8 2w,
+      # func_80027D40 12w, func_80027E68 4w, func_80027FFC 53w,
+      # func_800282AC 32w) and 33 are gp_rel-blocked; 1 (func_80027A24) owns
+      # this segment's only jump table, in the 0xFD8 rodata slot.  Carving
+      # further therefore costs a rodata attach AND ~33 stub reports, which
+      # is why round 26 stopped at the window above.  See the census note
+      # further down this file.
+      - [0x17AD0, asm, code_179d8]
       # code_179d8_h: functions 43..59 of the original monolith's head,
       # 0x19098..0x194E0 (17 functions).  Carved MID-round 17 to re-staff a
       # runner whose own unit was exhausted.  Census 2026-09-04, three-grep
