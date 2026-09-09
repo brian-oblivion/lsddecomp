@@ -111,6 +111,10 @@ void func_80027228(Obj6D4E8 *self)
     func_80027E78();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_o", func_80027274);
+void func_80027274(Obj6D4E8 *self)
+{
+    self->methods->slot74();
+    self->methods->slot5C(self);
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_o", func_800272C8);
