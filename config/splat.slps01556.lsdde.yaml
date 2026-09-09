@@ -593,7 +593,25 @@ segments:
       # unit or folded into code_179d8_j / code_179d8_c by moving a boundary
       # (which perturbs a unit with matched functions, so verify per function
       # if you do).
-      - [0x2273C, asm, code_179d8_mid_d]
+      # CARVED round 26 (2026-09-09) as `code_179d8_p`, renamed off the
+      # remainder name for the same reason `code_179d8_mid` became
+      # `code_179d8_n`: "mid_d" named a leftover, and the leftover is now
+      # fully consumed.  Screened at carve time, four screens: BLOCKER-CLEAN
+      # (zero gp_rel, zero forward nop_mflo_mfhi, zero `jr $t2`), zero
+      # `jtbl_`, zero `alabel`, and the body is FRAMELESS (no
+      # `addiu $sp, $sp, -N` at all).  Boundaries are exact and needed no
+      # judgement: the span 0x2273C..0x22948 is bounded by two existing C
+      # units (code_179d8_j before, code_179d8_c after), it opens on
+      # `lui $v0, %hi(D_8008E9D0)` and closes on `jr $ra; nop` + endlabel.
+      # Its rodata references are all plain `D_` data symbols, no jump
+      # table, so NO rodata attach.
+      #
+      # NOTE for whoever takes it: func_80031F3C reaches the SAME global
+      # family as `code_179d8_m` (D_8008D988/98A/98C/98E/996/998/99A/99C/9A3
+      # and D_8006DAD4), so the "split scaled index" idiom and its
+      # loop-versus-non-loop refinement in DECOMPILATION_LEARNINGS are
+      # likely to apply directly.  Read that entry before starting.
+      - [0x2273C, c, code_179d8_p]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
       - [0x22948, c, code_179d8_c]
       # code_179d8_tail: functions 220..255 of the original.  UNCARVED
