@@ -798,19 +798,19 @@ extern u32 D_8009024C;
  * meta-event TYPE byte. Only two types are understood; everything else is
  * silently ignored:
  *
- * STALL -- see docs/match-reports/func_80035B2C.md. 20 words SHORT
- * (193/213, compiled length measured off build/src/code_179d8_k.c.o since
+ * STALL -- see docs/match-reports/func_80035B2C.md. 2 words SHORT
+ * (211/213, compiled length measured off build/src/code_179d8_k.c.o since
  * funcdiff's word-match number is not trustworthy once length drifts).
- * First real diff at word 59 (`tools/funcdiff.py func_80035B2C`), a
- * register-identity difference downstream of the true cause: this build's
- * two divisions in the Set-Tempo rate recompute share ONE `divu` (GCC
- * fuses `A/B` and `A%B` on provably-identical operands, confirmed with an
- * isolated pinned-pipeline reproducer), where retail recomputes the
- * dividend from `rec->unk4A`/`rec->unk8C` via a FRESH struct read before
- * EACH of its two `divu`s. Every other structural piece is confirmed
- * correct -- see report for the block-order and unsigned-comparison fixes
- * that got this far, and the reshapes (including an isolated toolchain
- * finding on scheduling barriers) that did not close the remaining gap.
+ * First real diff at word 56 (`tools/funcdiff.py func_80035B2C`), a
+ * register-identity symptom: retail re-reads `rec->unk4A` fresh (a plain
+ * `lh`) before EACH of the Set-Tempo rate recompute's two divisions; this
+ * body keeps the first read's value live in a register instead. The
+ * round-26 head's narrowed-`volatile` lever (only the WORD-sized
+ * `rec->unk8C` field marked `volatile`, not the sub-word `unk4A`) closed
+ * 18 of the 20 words this stalled at previously by defeating GCC's
+ * div/mod fusion without retail's plain `lh` turning into `lhu`+widen.
+ * The one remaining word resisted six further reshapes (see report) --
+ * every one of them either had no effect or regressed.
  *
  * 0x2F (End of Track): bumps the repeat counter (unk48). unk46 == 0 means
  * "loop forever" -- rewind unk4 to the saved track start (unk8) and keep
@@ -861,8 +861,14 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
                 rec->unk6E = (D_8009024C * 600) / (rec->unk4A * rec->unk8C);
                 rec->unk70 = rec->unk6E;
             } else {
-                s32 q = (rec->unk4A * rec->unk8C * 10) / divisor;
-                s32 r = (rec->unk4A * rec->unk8C * 10) % divisor;
+                /* Narrowed volatile lever (round 26 head ruling): only the
+                 * WORD-sized field needs to be volatile to defeat GCC's
+                 * div/mod fusion -- there is no load-width to get wrong for
+                 * a full-word read, so retail's plain `lh` for unk4A is
+                 * unaffected. See docs/match-reports/func_80035B2C.md. */
+                volatile s32 *pbpm = &rec->unk8C;
+                s32 q = (rec->unk4A * *pbpm * 10) / divisor;
+                s32 r = (rec->unk4A * *pbpm * 10) % divisor;
 
                 rec->unk6E = -1;
                 rec->unk70 = (base * 2 < r) ? q + 1 : q;
