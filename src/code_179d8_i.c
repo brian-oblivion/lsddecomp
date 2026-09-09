@@ -31,7 +31,7 @@
 
 #include "common.h"
 
-extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32 a3);
+extern s16 func_80032D34(void *a0, s16 a1, s16 a2, s32 a3);
 
 s16 func_80032D00(void *a0, s16 a1, s32 a2)
 {
