@@ -344,6 +344,33 @@ segments:
       # Expect a slice cut at ROM-address boundaries to span more than one
       # class; identify each with tools/classtable.py rather than assuming
       # the unit has one.
+      # CURRENT CENSUS OF THIS REMAINDER, round 26 (2026-09-09).  The
+      # 20-function-window table above describes the ORIGINAL 274-function
+      # monolith and indexes nothing that still exists -- the doc's own
+      # "do not work from a written list" lesson.  What is left under the
+      # name `code_179d8` is the HEAD REMAINDER, indices 0..42 of the
+      # original, and this is its per-function screen (gp_rel, forward
+      # nop_mflo_mfhi, `jr $t2`, `jtbl_`):
+      #
+      #   43 functions, **9 clean**, 33 gp_rel-blocked, 0 mflo, 0 trampolines.
+      #   clean, in address order:
+      #     new_class_6d4e8 20w   func_80027228   19w   func_80027274 21w
+      #     func_800272C8    2w   func_800276C8    2w   func_80027D40 12w
+      #     func_80027E68    4w   func_80027FFC   53w   func_800282AC 32w
+      #
+      # This is the LAST CHEAP SEAM in the executable -- nine bodies of
+      # 2..53 words, where the rest of the live fresh queue runs 81..390w.
+      # It is also gp_rel-saturated (33 of 43) and owns this segment's only
+      # jump table (func_80027A24, in the 0xFD8 rodata slot), which is why
+      # round 17 cut `code_179d8_h` AFTER it rather than through it.
+      #
+      # Carving it therefore costs two things a head must budget for BEFORE
+      # starting: a rodata attach decision for the func_80027A24 jump table
+      # if the slice includes index 10, and ~24-33 stub reports for the
+      # gp_rel-blocked functions (without them `progress.py` counts every
+      # one as FRESH, because its `fresh` column cannot see blockers).
+      # A cut at index 0..3 avoids both and yields four clean bodies
+      # (20w/19w/21w/2w) with no jump table and no stub debt.
       - [0x179d8, asm, code_179d8]
       # code_179d8_h: functions 43..59 of the original monolith's head,
       # 0x19098..0x194E0 (17 functions).  Carved MID-round 17 to re-staff a
@@ -867,8 +894,18 @@ segments:
       - [0x44518, c, class_3bb8c_m]
       # class_3bb8c_n: functions 0..22 of the old 113-function remainder,
       # 0x44F14..0x46288.  UNCARVED and left that way deliberately: this is
-      # the gp_rel-densest ground in the executable -- of these 23 functions
-      # exactly TWO are clean.  Not worth a runner until the gp-relative
+      # the gp_rel-densest ground in the executable.
+      #
+      # RE-CENSUSED round 26 (2026-09-09), four screens per function,
+      # canonical shell forms, over the live segment: **3 of 23 clean**, not
+      # the TWO this comment previously asserted.  The three are
+      # func_80054B1C (13w), func_80055258 (110w) and func_80055874 (31w);
+      # the other 20 are all gp_rel, with zero forward nop_mflo_mfhi, zero
+      # `jr $t2` trampolines, zero `alabel` and zero multi-prologue
+      # functions in the whole segment.  The correction does not change the
+      # disposition -- 3 of 23 still cannot staff a runner -- but the figure
+      # is what a future head ranks carves from, so it is corrected rather
+      # than left contradicted.  Not worth a runner until the gp-relative
       # blocker moves.
       - [0x44F14, asm, class_3bb8c_n]
       # class_3bb8c_r: functions 23..43 of that remainder, 0x46288..0x46D20
