@@ -486,6 +486,30 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
      cross-runner kill this document already forbids, and the head is no
      more exempt from it than a runner.
 
+     **ROUND 26: this check is not a formality, and "I killed it by PID" from
+     a runner is not the same as the search being gone.** Charlie captured its
+     permuter's root PID, killed it at its bound, and reported it "confirmed
+     gone" — accurately, for that PID. But `permuter.py -j 6` runs a
+     `multiprocessing` forkserver, and killing the root leaves **six worker
+     processes reparented to init** (`ppid=1`), still holding six cores, still
+     `cwd`-ed into that worktree. The runner's report was true and the machine
+     was still loaded.
+
+     So the head's sweep is what actually ends a search, and the attribution
+     step is what makes it safe:
+
+     ```sh
+     for p in $(pgrep -f 'decomp-permuter|permuter.py'); do
+         printf '%-8s %s\n' "$p" "$(readlink /proc/$p/cwd 2>/dev/null)"
+     done
+     ```
+
+     Kill only the PIDs whose `cwd` is the worktree you mean — guard the kill
+     on the `cwd` rather than trusting the list you printed a moment ago, since
+     PIDs are reused. Expect orphans to outlive the runner that started them,
+     and sweep before `git worktree remove --force`: those processes are
+     `cwd`-ed into the directory you are about to delete.
+
    The round-10 rule says a runner's negative permuter result may be
    fabricated by another runner's `pkill`. This is its sibling: a runner's
    permuter result may never arrive at all, and the tell is a summary that
