@@ -29,6 +29,16 @@
  * This unit's own extern declarations are kept LOCAL to this file per the
  * project's multiple-independent-local-views convention.  It shares no
  * project header with any other unit.
+ *
+ * Round 26 (echo): all three functions were worked to near-misses and
+ * STALLED -- see docs/match-reports/func_800299BC.md (162/161, 1 word LONG),
+ * func_80029C40.md (178/180, 2 words short) and func_80029F10.md (278/282,
+ * 4 words short).  Every residue is an already-characterized GCC 2.6.3
+ * quirk (a hoisted-constant register choice, dead-code-eliminated redundant
+ * masks, and delay-slot/addressing-mode scheduling) documented in
+ * docs/DECOMPILATION_LEARNINGS.md as not fixable by hand C restructuring --
+ * read the three reports before re-attempting; they carry the full
+ * near-miss bodies and the exact levers already tried.
  */
 #include "common.h"
 
