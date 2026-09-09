@@ -49,7 +49,20 @@ struct Class87034Methods_3bb8c_k {
     /* +0x040, func_80052C10's own dispatch, right after filling self's
      * fields -- a post-construct hook, self only. */
     void (*slot40)(void *self);
-    u8 pad044[0x090 - 0x044];
+    u8 pad044[0x054 - 0x044];
+    /* +0x054/+0x060, func_800522DC's own event/code dispatch (below) --
+     * both called with a constant second argument. */
+    void (*slot54)(void *self, s32 arg1);
+    u8 pad058[0x060 - 0x058];
+    void (*slot60)(void *self, s32 arg1);
+    u8 pad064[0x07C - 0x064];
+    /* +0x07C/+0x080/+0x084/+0x088, func_800522DC's own event/code
+     * dispatch (below) -- self only, no other arguments. */
+    void (*slot7C)(void *self);
+    void (*slot80)(void *self);
+    void (*slot84)(void *self);
+    void (*slot88)(void *self);
+    u8 pad08C[0x090 - 0x08C];
     /* +0x090/+0x0B0/+0x0B4, func_80052D10's own 3-way event-type dispatch
      * (self, the same EventArg* it was itself called with, and its own
      * arg2, forwarded verbatim to whichever slot the event's header tag
@@ -120,7 +133,30 @@ void func_8005227C(Class86F88 *self)
     self->methods->slot54(self, 4);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_800522DC);
+void func_800522DC(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
+    switch (code) {
+    case 25:
+        self->methods->slot60(self, 0x10);
+        self->methods->slot54(self, 2);
+        break;
+    case 23:
+        self->methods->slot60(self, 0x10);
+        self->methods->slot54(self, 3);
+        break;
+    case 5:
+        self->methods->slot7C(self);
+        break;
+    case 4:
+        self->methods->slot80(self);
+        break;
+    case 18:
+        self->methods->slot84(self);
+        break;
+    case 19:
+        self->methods->slot88(self);
+        break;
+    }
+}
 
 void func_800523F0(Class86F88 *self, s32 arg1)
 {
