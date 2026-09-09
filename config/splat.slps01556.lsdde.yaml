@@ -402,11 +402,29 @@ segments:
       # code_179d8: the head remainder, functions 4..42 of the original,
       # 0x17AD0.. -- 39 functions, of which 5 are clean (func_800276C8 2w,
       # func_80027D40 12w, func_80027E68 4w, func_80027FFC 53w,
-      # func_800282AC 32w) and 33 are gp_rel-blocked; 1 (func_80027A24) owns
-      # this segment's only jump table, in the 0xFD8 rodata slot.  Carving
-      # further therefore costs a rodata attach AND ~33 stub reports, which
-      # is why round 26 stopped at the window above.  See the census note
-      # further down this file.
+      # func_800282AC 32w) and 33 are gp_rel-blocked; 1 (func_80027A24, index
+      # 10 of the ORIGINAL numbering) owns this segment's only jump table, in
+      # the 0xFD8 rodata slot.
+      #
+      # NEXT CARVE, worked out round 26 but NOT taken -- head attention, not
+      # ground, was the binding constraint by then.  **Cut [11..32] of the
+      # original numbering** (i.e. starting AFTER func_80027A24, ending after
+      # func_800282AC).  22 functions: 4 clean -- func_80027D40 12w,
+      # func_80027E68 4w, func_80027FFC 53w, func_800282AC 32w -- and 18
+      # gp_rel-blocked.  Its virtue is that it contains NO jump table, so it
+      # needs NO rodata attach and avoids the one genuinely fiddly part of
+      # carving here.
+      #
+      # Budget 18 STUB REPORTS for the blocked functions when you take it.
+      # They are not optional bookkeeping: `progress.py`'s `fresh` column
+      # cannot see blockers, so a blocked function with no report counts as
+      # FRESH and the next round staffs someone into a wall.  They are
+      # mechanical and scriptable -- one honest "gp_rel, not attempted,
+      # screened <date>" body each.
+      #
+      # Cutting [4..10] instead yields only ONE clean function
+      # (func_800276C8, 2w) against 5 blocked, and pulls in the jump table.
+      # Not worth it.
       - [0x17AD0, asm, code_179d8]
       # code_179d8_h: functions 43..59 of the original monolith's head,
       # 0x19098..0x194E0 (17 functions).  Carved MID-round 17 to re-staff a
