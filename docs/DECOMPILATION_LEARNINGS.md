@@ -4438,15 +4438,31 @@ list against retail's:
   this lever applies, keep going.
 - retail saves the **SAME** set and merely uses different registers for the
   same values -> genuine register identity. Stop; it is banned to fix.
+- retail saves **NONE and neither do you** -> the lever cannot apply at all
+  and the residue is somewhere else entirely. Runner bravo added this third
+  outcome, which the two-way test above does not name: on `func_8002E4D8` it
+  grepped for `sw $s0`-`$s7`/`$fp` in both retail and its own standalone-built
+  body and found **zero in either**, so there was no promotion to undo. Check
+  for the instructions; do not infer them from a frame-size difference.
 
-**Three runners applied that discriminator this round and all three came back
-NEGATIVE, which is what makes the boundary trustworthy rather than merely
-stated:** delta disassembled `func_8004B700` (125/140) and `func_8004BB3C`
-(90/105) and found retail saving the identical set at identical offsets, which
-**upgraded both verdicts from plausible to checked**; alpha found the same on
-`func_800351D0` (same 10 callee-saved registers, residue really a
-`$s5` rematerialization). So the lever's real value in a round may be
-*confirming* register-identity verdicts rather than overturning them.
+**FOUR APPLICATIONS ACROSS THREE RUNNERS THIS ROUND, ALL NEGATIVE. Record that
+plainly: the lever is real -- it took `func_80050B28` from 2-words-long-with-
+drift to exact length -- and it transferred to NOTHING else in the round.** Its
+scope is narrower than the "compiled LONG" signature suggests.
+
+- delta, `func_8004B700` (125/140) and `func_8004BB3C` (90/105): retail saves
+  the identical set at identical offsets. **Both verdicts upgraded from
+  plausible to checked.**
+- alpha, `func_800351D0` (4 words long): same 10 callee-saved registers as
+  retail; residue is really a `$s5` rematerialization.
+- bravo, `func_8002E4D8` (6 words long): zero callee-saved saves on either
+  side; residue is a redundant sign-extension (`u16`-vs-`s16` accumulator
+  compare), unrelated to register pressure.
+
+So the lever's realistic value in a round is **confirming register-identity
+verdicts rather than overturning them** — which is worth having, because a
+confirmed verdict stops the next round re-litigating it, but it is not a source
+of matches. Do not staff a round on the expectation that it will be.
 
 **The sibling failure to avoid: a residue class is a property of the FUNCTION'S
 OWN SHAPE, not of its neighbourhood.** `func_80050B28`'s report predicted its
