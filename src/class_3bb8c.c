@@ -73,6 +73,64 @@ s32 func_8004B5BC(Obj866E8 *self) {
     return result;
 }
 
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_8004B700.md. 125/140 words,
+ * correct length, no drift. ROUND 27 (delta): re-verified per the head's
+ * callee-saved-registers broadcast -- compiled prologue saves the IDENTICAL
+ * set to retail (s0-s7, fp, ra, same stack slots), so the "extra
+ * callee-saved parameter" lever does NOT apply here. Verdict (pure register
+ * identity) CONFIRMED, not just plausible. */
+void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+    s32 divisor;
+    s32 flag;
+    s32 savedResult;
+    s32 count;
+    s32 i;
+    Elem *e;
+    Elem *e2;
+    Unk14Obj *u14;
+    Unk54Struct *tbl;
+    SetupEntry866E8 stackBuf[7];
+
+    if (arg3 != 0) {
+        divisor = self->unk68->divisor;
+        flag = (val / divisor) & 1;
+        savedResult = func_8004B930(self, val, flag);
+
+        count = 0;
+        for (i = 0; i < 7; i++) {
+            e = self->methods->slot118(self, i);
+            e->unk2 = arg3[i].key;
+            if (arg3[i].flag != 0) {
+                tbl = &D_80086838[arg3[i].key];
+                __asm__("");
+                u14 = e->unkC->unk14;
+                if (self->unk68->unk4 == 0) {
+                    u14->unk18.w = arg2->unk0 + tbl->unk0;
+                    u14->unk1C = arg2->unk4;
+                    u14->unk20.w = arg2->unk8 + tbl->unk8;
+                } else {
+                    u14->unk18.w = arg2->unk0 - 0x5000;
+                    u14->unk1C = arg2->unk4 + tbl->unk4;
+                    u14->unk20.w = arg2->unk8 - 0x5000;
+                }
+                u14 = e->unkC->unk14;
+                u14->unk0 = 0;
+                func_8004BA40(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                count++;
+            }
+        }
+
+        for (i = 0; i < 7; i++) {
+            e2 = &self->arr[i];
+            e2->unk4->unk32 = e2->unk2;
+        }
+
+        self->methods->slotFC(self, stackBuf, count);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B700);
 
 s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
@@ -184,6 +242,13 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
  * the same broadcast flagged as wrong. Not re-attempted further this
  * round -- the residue matches this round's independently-confirmed
  * "declaration order is inert" finding for this exact class.
+ *
+ * ROUND 27 (delta): re-verified per the head's callee-saved-registers
+ * broadcast -- compiled prologue saves the IDENTICAL set to retail (s0-s6,
+ * ra, no fp, same stack slots for every register), only the ORDER of the
+ * `sw` instructions and which C variable maps to which physical register
+ * differ. The "extra callee-saved parameter" lever does NOT apply.
+ * Verdict (pure register identity) CONFIRMED, not just plausible.
  */
 void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
     SetupEntry866E8 *ep = arr1;
