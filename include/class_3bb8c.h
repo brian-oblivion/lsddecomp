@@ -2454,8 +2454,28 @@ struct Obj86ED0Methods {
     u8 pad04C[0x054 - 0x04C];
     void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, func_80051370 -- this class's own slot, func_800512C8 */
     void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, func_80050E78's tag==5 case -- this class's own slot, func_80051370 */
-    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, func_80050E78's tag==2 case -- this class's own slot, func_800513D0 (STALLED, addiu-$at/jump-table blocked) */
-    u8 pad060[0x0A4 - 0x060];
+    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, func_80050E78's tag==2 case -- this class's own slot, func_800513D0 */
+    /* +0x060, func_800513D0's own `arg2 == 25`/`23` cases: `self->methods->
+     * slot60(self, 0x10)`, always with the same literal. */
+    void (*slot60)(Obj86ED0 *self, s32 arg1);            /* +0x060 */
+    u8 pad064[0x088 - 0x064];
+    /* +0x088..+0x0A0, func_800513D0's own dense `arg2` switch: each of
+     * these seven slots is resolved into a local function pointer then
+     * called as `fn(self)` (no other args) once, after the switch --
+     * `arg2 == 21`/`5` -> slot88, `20`/`4` -> slot8C, `18`/`2` -> slot90,
+     * `19`/`3` -> slot94 (the two cases per slot gate on `self->unk20`
+     * with OPPOSITE polarity, same idiom as func_8004BA40's mask test),
+     * `32` -> slotA0, `31` -> slot9C, `28` -> slot98 (these three
+     * ungated). All seven share the identical `(Obj86ED0 *self)` shape,
+     * confirmed directly off the call site (`jalr $v0; addu $a0,$s0,$zero`,
+     * no other register set). */
+    void (*slot88)(Obj86ED0 *self);                      /* +0x088 */
+    void (*slot8C)(Obj86ED0 *self);                      /* +0x08C */
+    void (*slot90)(Obj86ED0 *self);                      /* +0x090 */
+    void (*slot94)(Obj86ED0 *self);                      /* +0x094 */
+    void (*slot98)(Obj86ED0 *self);                      /* +0x098 */
+    void (*slot9C)(Obj86ED0 *self);                      /* +0x09C */
+    void (*slotA0)(Obj86ED0 *self);                      /* +0x0A0 */
     void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, func_8005165C/func_800516C0 -- func_800518F4, outside this unit's slice */
     /* +0x0A8, func_80051720. 3 args, not 2 -- retail's call sets $a1/$a3
      * (`self->unk18`, `1`) and leaves $a2 holding the just-computed

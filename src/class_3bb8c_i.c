@@ -250,7 +250,92 @@ void func_80051370(Obj86ED0 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_800513D0);
+/* func_800513D0's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
+ * still `INCLUDE_ASM`), typed purely from this call site's own register
+ * usage: `a0`/`a1` are `self->unk24`/`self->unk28` (both `char *`, the same
+ * pair `strcpy` is fed in the other arm), return value unused. Same
+ * declare-locally convention as `func_80040FC0` above (a different unit
+ * types this same-shaped function with a different signature from its own
+ * call site). */
+extern void func_80041020(char *dest, char *src);
+
+void func_800513D0(Obj86ED0 *self, void *arg1, s32 arg2)
+{
+    switch (arg2) {
+    default:
+        return;
+    case 25:
+        if (self->unkC == 1) {
+            func_80041020(self->unk24, self->unk28);
+        } else {
+            strcpy(self->unk24, self->unk28);
+        }
+        self->methods->slot60(self, 0x10);
+        self->methods->slot54(self, 2);
+        return;
+    case 23:
+        self->methods->slot60(self, 0x10);
+        self->methods->slot54(self, 3);
+        return;
+    case 32:
+        self->methods->slotA0(self);
+        return;
+    case 31:
+        self->methods->slot9C(self);
+        return;
+    case 28:
+        self->methods->slot98(self);
+        return;
+    case 21:
+        if (self->unk20 != 0) {
+            return;
+        }
+        self->methods->slot88(self);
+        return;
+    case 5:
+        if (self->unk20 == 0) {
+            return;
+        }
+        self->methods->slot88(self);
+        return;
+    case 20:
+        if (self->unk20 != 0) {
+            return;
+        }
+        self->methods->slot8C(self);
+        return;
+    case 4:
+        if (self->unk20 == 0) {
+            return;
+        }
+        self->methods->slot8C(self);
+        return;
+    case 18:
+        if (self->unk20 != 0) {
+            return;
+        }
+        self->methods->slot90(self);
+        return;
+    case 2:
+        if (self->unk20 == 0) {
+            return;
+        }
+        self->methods->slot90(self);
+        return;
+    case 19:
+        if (self->unk20 == 0) {
+            goto slot94Call;
+        }
+        return;
+    case 3:
+        if (self->unk20 == 0) {
+            return;
+        }
+slot94Call:
+        self->methods->slot94(self);
+        return;
+    }
+}
 
 void func_8005161C(Obj86ED0 *self, s32 arg1)
 {
