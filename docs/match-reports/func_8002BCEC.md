@@ -1,5 +1,19 @@
 # func_8002BCEC — STALL (best compiled 172/175, 3 words SHORT; raw word-match 49/175 under that drift; first real diff at vram 0x8002BDB8 / file 0x1C5B8)
 
+**Round 27 update (post head review):** residue 1's original verdict —
+filed below as "register-identity, not reachable" — was WRONG and has been
+corrected. A differing register COUNT is not register identity (same
+allocation, different names); it is allocation pressure, and the project
+has a documented lever for that (a fresh named local competing for a
+callee-saved register — `DECOMPILATION_LEARNINGS.md`, "a fresh local that
+only carries one branch's result... is a register-identity risk"). Six
+variants were tried post-review, including the head's own suggested
+inline-cast-expression form and a fully-dead-parameter check; none closes
+it, and the corrected finding is below under "Residue 1, corrected". The
+2-word gap is real and unresolved, but it is a REGISTER-COUNT/instruction-
+selection trade-off, not identity, and the next attempt should not be told
+"do not try" on this one.
+
 `code_179d8_d`, vram `0x8002BCEC`, file offset `0x1C4EC`, 175 instructions
 (0x2BC bytes). Blocker-clean per the carve census (no `gp_rel`, no forward
 `mflo`/`mfhi`-then-`mult`/`div`). FRESH ground, no report existed before this
@@ -281,13 +295,65 @@ immediates are `7`/`4` where retail has `3`/`0` — i.e. GCC bakes retail's
 *sizeField = (UWord*)(base+off+4)`, correct immediates, but the OLD 8-register
 problem returns), and bakes it into the STORE immediate when the pointer
 targets the STRUCT BASE (`entry->size`, correct 7-register count, wrong
-immediates). Every combination tried (association order `off+4` vs `4+off`,
-raw pointer arithmetic vs struct field access, with and without the
-block-scoping) reproduces exactly one of these two outcomes and never
-both-correct-at-once. This is a genuine two-word residue, register-identity
-class, not reachable by further reshaping in the time available — CLAUDE.md
-files this as a legitimate stall condition (same instructions/values,
-different encoding choice the compiler makes internally).
+immediates).
+
+### Residue 1, corrected (round 27, post head review): a register-COUNT trade-off, NOT register identity
+
+The head correctly rejected the paragraph above's classification: a
+DIFFERING REGISTER COUNT (7 vs 8) is allocation pressure, not identity
+(identity is the SAME allocation under different names, which is banned to
+fix; a count difference has a documented lever —
+`DECOMPILATION_LEARNINGS.md`'s "a fresh local... is a register-identity
+risk, reuse a dead PARAMETER instead"). Six variants were tried, all
+measured on the same build/diff pair:
+
+| destination spelling | source spelling | registers | `swl`/`swr` immediates |
+| --- | --- | --- | --- |
+| `entry->size` (new local, struct-base ptr) | `rec->dataLen` | 7 (matches) | `7`/`4` (wrong) |
+| `entry->size` (new local) | `*(UWord*)((u8*)rec+0xA)` (raw cast) | 7 (matches) | `7`/`4` (wrong) |
+| `*(UWord*)((u8*)D_8008B3F0+off+4)` — head's exact suggested inline-cast, NO named pointer anywhere | `*(UWord*)((u8*)rec+0xA)` (raw cast) | 8 (extra) | `3`/`0` (matches) |
+| `UWord *sizeField = ...; *sizeField = ...` (new local, field ptr) | `rec->dataLen` | 8 (extra) | `3`/`0` (matches) |
+| `slot->size` — REUSING the already-live `slot` (no new name at all) | `rec->dataLen` | 7 (matches) | `7`/`4` (wrong) |
+| `*(UWord*)((u8*)slot+4)` — same reused `slot`, raw-cast form | `rec->dataLen` | 7 (matches) | `7`/`4` (wrong) — **byte-identical output to the row above**, proving struct-field-access vs. raw-pointer-arithmetic syntax makes NO difference once the base is the same register |
+| `EntryB3F0 *base = D_8008B3F0;` (new UNCHANGING local, separate from `slot`) then `*(UWord*)((u8*)base+off+4)` | `rec->dataLen` | 8 (extra) | `3`/`0` (matches) |
+
+**The head's own suggested form (row 3) was tried exactly as specified and
+reproduces the SAME 8-register/correct-immediate outcome as the
+already-tried `sizeField` variant** — it is not the untried third
+combination it was hoped to be; the "no named pointer" property does not
+matter here (row 6 proves this directly: the SAME address computed through
+an EXISTING, already-live pointer variable, with zero new names, still
+gets the "wrong" 7/4 immediates — so introducing a name is not what causes
+the wrong immediates, and removing one is not what fixes them).
+
+**What the six rows actually show:** the register count and the
+`swl`/`swr` immediate split are the SAME axis, not two independent knobs.
+Whenever the compiled address for the store is "the base register (however
+obtained) plus a small constant, materialized fresh via one extra
+instruction" — matching retail's own `addiu v0,s5,4` / `addu v0,s1,v0` — no
+variant tried reaches this. Every spelling that keeps the register count
+at 7 does so by folding `+4` into the STORE's own immediate field
+(reusing an existing base register with no extra `addiu`), and every
+spelling that produces the correct `3`/`0` immediates does so by
+computing a genuinely new address value that needs its own register.
+Retail's shape — extra `addiu` instruction, no extra persistent register —
+was not reached by any of the six.
+
+**Dead-parameter lever checked and does not apply:** `func_8002BCEC` has
+exactly one parameter, `id`, and it is not dead — it is read at the very
+top (`id == D_8006D938`), used for the `D_8008B9CC[id]` lookup, and
+written back to `D_8006D938` at the end. There is no spare dead parameter
+to reuse as an allocation-neutral carrier, so that specific lever from
+`DECOMPILATION_LEARNINGS.md` does not have a target here.
+
+**Corrected verdict:** this is a genuine, well-measured 2-word residue in
+the register-COUNT/instruction-selection family — not register identity,
+and not something CLAUDE.md's identity ban applies to. It remains OPEN. A
+future attempt should look for a THIRD address-computation shape neither
+"new register, right immediate" nor "existing register, wrong immediate"
+produces — possibly by finding what makes retail's compiler choose the
+`addiu`-into-scratch-register form specifically, which none of the six
+tried source expressions triggered.
 
 ### Residue 2 (OPEN, matches an ALREADY-DOCUMENTED sibling stall): the missing 3-instruction "always-true" check
 
@@ -333,6 +399,44 @@ plain `if (constant-or-locally-known-value)` — something not staticly
 resolvable from the two adjacent lines the check sits between. That
 condition was not found in the time available here either.
 
+**Round 27 follow-up: the head's two suggested non-foldable sources
+(global, or call-result) tried and structurally ruled out.**
+
+- **Global-sourced condition, tested:** `if (D_8006D608 >= -1) { <loop> }`
+  (reading the already-in-scope verbosity global again, compared against a
+  constant GCC cannot fold since it does not know the global's runtime
+  value). This DOES survive — confirming the mechanism the sibling report
+  proposes genuinely prevents DCE — but it compiles to a REAL `lw` +
+  `slti` + `bnez` sequence, nothing like retail's `li`/`beqz`/`nop`. Reverted
+  (does not help; recorded as a checked negative).
+- **Call-sourced condition:** not tried, because there is no room for it.
+  Retail's own instructions between the "searching..." print and the loop
+  setup are EXACTLY three: `ori $v0,$zero,1` / `beqz $v0,<exit>` / `nop` —
+  no `lw`, no `lbu`/`lhu`, and no `jal` appears anywhere in that span. Any
+  source expression that reads a global or calls a function would need to
+  emit a LOAD or a CALL instruction somewhere in this exact 3-instruction
+  window, and none exists in retail's disassembly. **This rules out both
+  suggested levers structurally, not just empirically** — whatever retail's
+  source expression is, its compiled form contains no memory access and no
+  call, meaning the value tested is provably a compile-time literal to
+  RETAIL's OWN compiler too. The puzzle is not "what unfoldable expression
+  produces this" (nothing unfoldable fits in 3 instructions with no load);
+  it is "why did retail's compiler run its dead-branch-elimination pass at
+  a different point/not at all here", which per `func_8002B94C`'s own
+  report is a toolchain-behavior question, not a source-reshaping one.
+
+**Common structural feature of both confirmed instances (asked for by the
+head):** both `func_8002BCEC`'s and `func_8002B94C`'s dead checks sit
+immediately after a debug-print CALL that is ITSELF conditionally
+executed (`if (D_8006D608 >= N) print(...)`), i.e., right at a CONTROL-FLOW
+JOIN where two predecessor paths (print-taken, print-skipped) merge before
+falling into a loop setup. Neither instance's dead check is reachable from
+straight-line code alone — both are the first statement AFTER a branch
+merge point. That may be the actual trigger: this compiler's dead-branch
+elimination might not look back across a JOIN the way it does within a
+single straight-line block, independent of what the condition itself
+computes.
+
 ## Register-identity residue found and fixed along the way (worth recording)
 
 Two variables' declaration/initialization ORDER matters more than expected:
@@ -351,15 +455,22 @@ Two variables' declaration/initialization ORDER matters more than expected:
 
 ## Attempts
 
-Roughly 10 build/pipeline iterations (well under the 30-attempt cap).
-Axes varied: loop-guard spelling (bare `while(1)`, `if(ok==1)`,
-`while(ok==1)`, `for(;;)`), the size-write's pointer-vs-field spelling and
-association order, the debug-print's `+4` read decoupled into its own
-extern symbol (`D_8008B3F4`) to prevent an unwanted CSE with the write,
-and declaration/initialization order of `count`/`slot`/`name`. Both
-residues are now well-isolated and cheaply reproducible; a second pass
-should start from the two named residues above rather than re-deriving the
-algorithm (which is solid).
+Roughly 17 build/pipeline iterations across two sessions (well under the
+30-attempt cap). Axes varied: loop-guard spelling (bare `while(1)`,
+`if(ok==1)`, `while(ok==1)`, `for(;;)`, a global-sourced `if
+(D_8006D608>=-1)`), the size-write's pointer-vs-field spelling and
+association order (6 variants, see the table above — struct-base vs.
+field-pointer, new local vs. reused-existing `slot`, with and without an
+UNCHANGING `base` variable separate from the incrementing `slot`), the
+debug-print's `+4` read decoupled into its own extern symbol
+(`D_8008B3F4`) to prevent an unwanted CSE with the write, and
+declaration/initialization order of `count`/`slot`/`name`. Both residues
+are now VERY thoroughly isolated (six independent measurements on residue
+1 alone) and cheaply reproducible; a third pass should look for a genuinely
+new axis — see each residue's own "corrected verdict" / "common structural
+feature" for the concrete next things to try — rather than re-deriving the
+algorithm (which is solid) or re-trying a spelling already in the tables
+above.
 
 ### Proposed learning
 
