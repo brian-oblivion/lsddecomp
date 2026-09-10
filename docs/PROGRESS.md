@@ -6,6 +6,231 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-10 — round 27: 4 matches, ground rescued from a stale verdict, and three levers that all have counter-examples
+
+**1044 -> 1048 matched in `main` (76.99% -> 77.29% of game code).** Build green
+in `main` after all **thirteen** merges, **ZERO merge conflicts** —
+`headercontention.py` reported NO CONTENTION before provisioning and again
+before every re-send. Four runners on cheap models, re-assigned as their queues
+emptied. The head carved, built tooling, and took a small queue of its own.
+
+Merge composition, counted from `git log --merges` and not from memory (round
+26 had to correct this same figure): **alpha 4, bravo 3, charlie 3, delta 3.**
+The counts exceed the number of passes because interim merges were taken
+mid-round rather than saving them all for the end — merging twice is free, and
+it kept the end-of-round queue from becoming the bottleneck that round 15
+recorded. One of alpha's four is a single-file title fix, and one is the
+divergence resolution described below.
+
+### The four matches
+
+| function | words | who | note |
+| --- | --- | --- | --- |
+| `func_8004B5BC` | 81/81 | delta | first attempt; declined to retype `unkBC` to protect an already-matched sibling |
+| `func_800513D0` | 147/147 | delta | dense switch; the cross-jump lever below |
+| `func_80050AA4` | 25/25 | head | hex-digit value; the guard-inversion lever below |
+| `func_80050A84` | 8/8 | head | first attempt |
+
+**Two of the four came from ground the project had written off for four
+rounds** — see the carve below. The other two are delta's.
+
+### Gate 2 has changed permanently: carving can no longer refill the queue
+
+The gate has opened with *"most of the game is still uncarved, so this gate
+fires early and often"* since round 6. **Measured this round, that is false.**
+The whole uncarved remainder is **79 functions holding 10 blocker-clean ones**
+— 55 `gp_rel`, 13 BIOS trampolines no C compiles to, 1 `nop_mflo_mfhi`.
+
+Per this project's own rule the figures are not the deliverable, the tool is:
+**`tools/uncarved.py`** now screens uncarved segments per function with all
+four screens, ranked by clean yield. It is the Gate 2 companion to
+`nearmiss.py` and exists because the old `grep -c '^glabel'` one-liner counts
+FUNCTIONS where Gate 2 needs WORKABLE functions — `class_3bb8c_h` counted 17
+and held 4. Cross-checked against a hand census; they agree exactly.
+
+`gp_rel` is therefore **re-escalated on SCOPE** (not mechanism — nothing about
+the diagnosis or the rejected `-G` experiment changed). It blocks 82 of 229
+queued functions *and* has ended carving as a source of new work. Its
+unit-level concentration is in `docs/research/gp-relative-blocker.md`.
+
+**`fresh` finished the round at 1.** The queue is now almost entirely
+documented stalls, which is the single most important input to the next round.
+
+### The carve: ground everyone was told to avoid
+
+Round 17 screened `class_3bb8c_h` at **15 of 17 "clean"** and correctly called
+it the least matchable ground in the executable — 13 BIOS trampolines plus four
+`addiu_at`-blocked functions. **Round 21 resolved `addiu_at`, which silently
+made those four the densest blocker-clean ground left uncarved, and nobody
+re-measured for four rounds.** Two consecutive rounds' triage repeated "avoid
+`class_3bb8c_h`" on the strength of it.
+
+Every factual claim in that note was true and stayed true. What expired was its
+*premise*, and its operational advice outlived it — **a stale line in a carve
+note is not merely wrong, it is a directive.** The same note also carried an
+unchecked claim that the 13 trampolines occupied the span and "nothing else
+does"; four ordinary functions are interleaved among them in three clusters.
+
+Split into five segments so all 13 trampolines stay in `asm` with nothing else
+in them — the eventual `hasm` conversion stays an operator-scale change with no
+matchable code entangled in it:
+
+```
+0x410E8 asm class_3bb8c_h     6 trampolines (BIOS 0xB0)
+0x41148 c   class_3bb8c_u     func_80050948 79w / _A84 8w / _AA4 25w
+0x41308 asm class_3bb8c_h_b   2 trampolines (BIOS 0xA0)
+0x41328 c   class_3bb8c_v     func_80050B28 12w
+0x41358 asm class_3bb8c_h_c   5 trampolines
+```
+
+Two of its four functions matched in one head sitting; `func_80050948` reached
+78/79 and `func_80050B28` sits at exact length. The unit turned out to be PSX
+**memory-card and `strtol`** code, identified from BIOS call numbers
+(B(0x50) `_new_card`, B(0x4E) `_card_write`).
+
+### THE HEADLINE: three levers, three counter-examples
+
+The round produced three source levers. Each closed or advanced a real
+function. **Each was then measured making a different function worse.** The
+full table and what is known of each discriminator is in
+`DECOMPILATION_LEARNINGS.md` under "Round 27's HEADLINE".
+
+| lever | worked | regressed |
+| --- | --- | --- |
+| address-taken parameter -> home-slot spill | `func_80050B28` to exact length | **0 for 4** elsewhere |
+| invert the guard | `func_80050AA4` **25/25** | `func_8004EF6C` **188/240 -> 6/240** |
+| inline every call site | `func_800513D0` **147/147** | `func_8004F8A4` 4 words too long |
+
+The two most instructive are the ones where **the same person applied their own
+successful lever to a neighbouring function and it went backwards.** Proximity,
+family, size and residue *description* all failed to predict transfer — the
+same shape as round 7's two symmetric vtable slots needing opposite answers.
+
+**Mid-round broadcast is still right, but broadcast a lever as a HYPOTHESIS
+with an explicit request for the negative.** That is what produced every row in
+the right-hand column, within hours. Broadcast as rules, four runners would
+have been applying three coin flips.
+
+### Asking for negatives was the round's best-value instruction
+
+Zero-match passes were not wasted passes:
+
+- **alpha split the one-word-short cluster into TWO independent causes** —
+  `func_80034E5C` is a sign-extend/multiply fusion peephole; the other three
+  share a register-rescue residue. Four functions that looked like one cheap
+  fix are now correctly two problems.
+- **bravo proved `code_2cc8c_f`'s three stalls are ONE defect**, by noticing
+  that an *unmoved* score meant two symptoms trading places (widening a local
+  removes a spurious `andi` and exposes a missing cursor register). It also
+  took `func_80041020` from 7/31 at wrong length to **31/31 exact length**, and
+  found a formula error in that report.
+- **charlie disproved the head's mechanism** on `func_8002BCEC` with a six-row
+  table (below), and closed two axes of the DCE class.
+- **delta upgraded two register-identity verdicts from plausible to CHECKED**
+  by disassembling both prologues against retail's.
+
+### Three head errors, all caught the same day
+
+Recorded because the corrections are worth more than the claims were:
+
+1. **The `strtol` decode in the `class_3bb8c_u` unit comment was wrong** — it
+   wrote the base-prefix dispatch as an if/else-if chain, which compiles **four
+   words short**. Retail's tree splits on `*p < 'Y'`, which is what a `switch`
+   lowers to. Alpha found it and closed 4 of 5 words with that one change. The
+   comment now says explicitly that it must be a `switch`, and why.
+2. **The mechanism proposed for `func_8002BCEC` was wrong.** The head's
+   *verdict* correction was right and stands — a differing register COUNT (8 vs
+   7) is not register identity, so the identity ban does not apply. But the
+   head blamed a named pointer creating an allocno; charlie tried that exact
+   form and then settled it with six variants whose **row 3 computes the same
+   address through an already-live pointer, zero new names, and still gets the
+   wrong immediates.** The real finding: register count and the `swl`/`swr`
+   immediate split are ONE axis, not two knobs. It also bounds the allocno
+   entry's scope.
+3. **The corpus search for a third DCE instance was wrong.** It returned four
+   hits; the two extras are false positives because the search paired
+   *file-adjacent* instructions without respecting delay slots or label
+   boundaries — one `ori` is a return value in a `j`'s delay slot, the other is
+   one incoming edge of a phi. **Two confirmed instances, no third in the
+   corpus by this signature.** That is the trap this same round documented
+   twice, arriving on its author.
+
+### Tooling
+
+- **`tools/uncarved.py`** — new; Gate 2's census as a measurement.
+- **`funcdiff.py` FIXED — it was printing a precise-looking lie.** Its range
+  source took `min`/`max` over every instruction-comment offset in a `.s`, and
+  a jump-table-owning function has its rodata inlined there at a much *lower*
+  file offset. `func_800513D0` measured **`65533/65533 words match (file
+  0x1E28-0x41E1C)`** against a real 147 words. Worse than a wrong denominator:
+  with a ~262KB window **the drift guard can never fire**. Fixed by delimiting
+  on `glabel`/`endlabel`, which the same function's *other* range source
+  already did correctly.
+- **`nearmiss.py`** now flags **`[UNRANKABLE-TITLE]`** — measured that **45 of
+  139** blocker-clean reports state no figure in their title, so for a third of
+  its own corpus Gate 1b's rank-from-titles-only discipline had no way to tell
+  "ranked" from "could not be ranked".
+- **One root cause produced three bugs this round**: rodata inlined in a
+  function's own `.s` is indistinguishable from text by comment shape. It broke
+  `funcdiff`, over-counted `uncarved.py` (`main`'s `func_80011994` as 49w
+  against a real 2w), and put a wrong 178w figure in an assignment. **Never
+  size anything by counting instruction-comment lines.**
+
+### PARALLEL-RUNS §2c: the orphan sweep reports the head as an orphan
+
+The round-26 sweep uses `pgrep -f`, which matches whole command lines — so the
+sweeping shell matches its own pattern. With exactly one real permuter alive it
+returned **2** PIDs. That matters because the next line says to kill off the
+list guarded on `cwd`: run from `main` and the guard saves you by accident; run
+it after `cd`-ing into the worktree you are tearing down and **it matches your
+own shell.** No pattern fixes it. Replaced with a form that requires an
+*argument* that is a permuter script and excludes the caller's process
+ancestry, verified in both directions.
+
+### Also fixed
+
+- `src/class_3bb8c_k.c`'s carve comment said "do not attempt either" of two
+  functions; one had been matchable since round 21 (and was already matched).
+  Fifth such stale unit comment after round 23 found four.
+- `MATCHING-GUIDE` gained the surface its staleness entries did not cover: a
+  stale **directive** in a carve note or triage recommendation, which no tool
+  indexes and which is obeyed rather than re-checked.
+
+### A collision rule earned its keep, and the head caused it
+
+Runner alpha was told to `git merge main --ff-only` **and** to fix a report
+title in the same message, with no order specified. It committed the fix first,
+which diverged the branch, and `--ff-only` correctly refused. **Alpha stopped
+and reported rather than attempting `--no-ff` or a rebase** — which is exactly
+collision rule 4 ("only the head can adjudicate a divergence") working as
+intended. Resolved as an ordinary head merge.
+
+The fix is in the instruction, not the rule: **when a re-send asks for both a
+sync and a commit, say the fast-forward comes first.** Every later re-send this
+round said so explicitly, and two more fast-forwards ran clean. Runners also
+needed one `make extract` each after syncing onto the new carves — expected
+per-worktree behaviour, and worth stating at re-send time so it does not read
+as breakage.
+
+### Next round
+
+**Runners, not a carve, and not a permuter round.** Carving is exhausted as a
+refill mechanism (10 clean functions in the whole uncarved remainder), so the
+queue is the 139-strong blocker-clean near-miss corpus. Three specific cheap
+leads are banked and named:
+
+- `func_8002BCEC` — **3 words** from a 175-word match, verdict corrected to
+  open, and the target shape named (an extra `addiu` into a *scratch*
+  register).
+- `func_80050948` — **1 word** (78/79), a single delay-slot scheduling choice.
+- `func_80031F3C` — the **split-shift spelling** was specified and not reached;
+  all three prior eagerness-axis variants are recorded so it starts clean.
+
+A permuter round is the natural home for the several exact-length
+register-identity residues (`func_8002EDD4` at 267/270, `func_80050B28` at
+12/12), and no search was run this round — deliberately, there was no time to
+collect one.
+
 ## 2026-09-09 — round 26: 8 matches, three carves, and two runner "toolchain leads" that were not
 
 **1036 -> 1044 matched in `main` (76.40% -> 76.99% of game code); 135472 code
