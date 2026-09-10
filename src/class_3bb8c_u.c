@@ -58,6 +58,16 @@
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_u", func_80050948);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_u", func_80050A84);
+/* An argument-less wrapper: retail's delay slot is a bare `nop`, so no
+ * argument register is set up at the call at all.  Per CLAUDE.md, the byte
+ * match tells us NOTHING about the return type here -- a `void` wrapper around
+ * an `s32` tail call is byte-identical -- so this is written as a returning
+ * wrapper absent positive evidence of `void`.
+ */
+extern s32 func_80050948(void);
+
+s32 func_80050A84(void) {
+    return func_80050948();
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_u", func_80050AA4);
