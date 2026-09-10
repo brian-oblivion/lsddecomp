@@ -1,5 +1,21 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 27 (delta): callee-saved-register check per the head's broadcast.**
+> Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline
+> (90/105 confirmed, correct length) and disassembled the compiled `.o`'s
+> prologue directly: saves `s1,s3,s4,s2,s5,ra,s6,s0` at offsets
+> `0x1C,0x24,0x28,0x20,0x2C,0x34,0x30,0x18` off a `-0x38` frame. Retail's
+> own prologue (`asm/nonmatchings/class_3bb8c/func_8004BB3C.s`) saves
+> `s1,s4,s5,s2,ra,s6,s3,s0` at offsets `0x1C,0x28,0x2C,0x20,0x34,0x30,0x24,
+> 0x18` -- **the SAME seven registers (`s0`-`s6`) at the SAME per-register
+> stack slots, no `fp`, same `0x38` frame size, only the ORDER of the `sw`
+> instructions (i.e. which C variable got assigned to which physical
+> register) differs.** This is exactly the discriminator the broadcast
+> named for "genuine register identity, not this lever": same registers
+> saved, different roles. **The lever does NOT apply here either; the
+> register-identity verdict is CONFIRMED, not merely plausible.** Not
+> re-attempted further this round.
+
 > **ROUND 20 (charlie): re-verified, no new attempt.** Confirmed against
 > this round's build (header additions from `func_8004BE54` this same
 > round touch DIFFERENT structs -- `Elem::unk8`, `ElemTarget::field10`,

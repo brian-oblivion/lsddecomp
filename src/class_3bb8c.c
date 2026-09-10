@@ -41,77 +41,95 @@ void func_8004B57C(Obj866E8 *self) {
     self->unk70 = 0;
 }
 
-/* func_8004B5BC (81w) -- FRESH, UNATTEMPTED. Never compiled, no score, no
- * committed C. This is a hand-read-only structural note from round 24
- * (runner delta), preserved so the derivation isn't lost -- NOT a match
- * report (see docs/match-reports/ convention: a report file here would
- * flip this function from `fresh` to `documented stall` in
- * tools/progress.py's staffing count, which would be wrong since no real
- * attempt was made). Treat everything below as a READING of the
- * disassembly to re-verify from scratch, not as established fact -- none
- * of it survived a build.
- *
- * Confidence-labeled, one item at a time:
- *
- * - MEDIUM CONFIDENCE: the function calls `self->methods->slot10C(self,
- *   &localBuf, 0)` (`Obj866E8Methods::slot10C`, already typed in the
- *   header as `s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2)`,
- *   established from `func_8004CC74`) to fill a stack-local buffer at
- *   `sp+0x10`. The header's existing `CC74QueryBuf` type was derived from
- *   `func_8004CC74`'s OWN reading of a slot10C-filled buffer (reads at
- *   +0x2 and +0x28 only) -- func_8004B5BC reads the SAME kind of buffer
- *   differently (see the whole-struct-copy item below, and a raw
- *   halfword read at +0x0, not +0x2), so `CC74QueryBuf` is NOT
- *   necessarily this function's own view; it is evidence slot10C's
- *   output shape is bigger/richer than either single caller alone shows.
- *
- * - MEDIUM-HIGH CONFIDENCE: after the slot10C call, retail copies exactly
- *   0x2C (44) bytes from that same stack buffer into `self->unkBC` via a
- *   4-words-at-a-time loop plus a 3-word tail (no remainder logic beyond
- *   that, so the total is fixed at 0x2C, not computed). 44 bytes is
- *   EXACTLY `sizeof(Descriptor10Ext)` (already in this header: a 10-byte
- *   `Descriptor10 base` widened by alignment to +0xC, plus eight more
- *   `s32`/`Elem*` fields through +0x28). This is a SIZE match, not a
- *   proven identity -- nothing here confirms the FIELD MEANINGS at each
- *   offset agree with `Descriptor10Ext`'s existing derivation (that type
- *   came from `func_8004C1C0`'s output via a DIFFERENT method slot,
- *   `slot110`, not `slot10C`). Treat the size agreement as a strong lead
- *   toward reusing `Descriptor10Ext` for this copy, not as settled.
- *
- * - MEDIUM CONFIDENCE: after that copy, the function dispatches through
- *   two more method slots not yet named in the header: one read as
- *   `self->methods` then offset `+0x128` (called with just `self`), and
- *   later one at `+0x30` (called with `self` and a literal `5` as a
- *   second argument, only on one branch). Offsets read directly off the
- *   disassembly; signatures beyond "takes self" are a guess.
- *
- * - HIGH CONFIDENCE (data file, not guessed): `D_800868FC` is an 8-byte
- *   table (`asm/data/76DC8.data.s`: bytes `01 02 03 00 04 05 06 00`),
- *   indexed by a halfword read out of the slot10C buffer, used as a
- *   remap/lookup before the two further dispatches above. The 8-entry
- *   bound comes directly from the data file (next symbol starts right
- *   after byte 8), not from this function's own access pattern.
- *
- * - MEDIUM CONFIDENCE: the byte fetched from `D_800868FC` is then used
- *   (times 4) to index `D_80086974`, a table of 7 pointers (first entry
- *   NULL, per the data file) into six more 4-word tables
- *   (`D_80086914`..`D_80086964`). The 7-entry bound is an INFERENCE from
- *   `Obj866E8Methods::slotF8`'s EXISTING argument type
- *   (`s32 *arg3` -- already in the header from another function's call
- *   site) matching `D_80086974`'s own element type (pointer-to-4-word-
- *   table), not from anything specific to func_8004B5BC's own access --
- *   this function only ever reads ONE entry per call, so it cannot by
- *   itself prove the table has 7 rather than some other count.
- *
- * Not investigated at all: the final `beq`-gated call through
- * `self->methods->slot30`-adjacent block (the halfword compare against
- * `self->unkBC`'s own first field), and the overall boolean-ish return
- * value's exact derivation. Whoever picks this function up should
- * re-read asm/nonmatchings/class_3bb8c/func_8004B5BC.s from scratch and
- * verify or replace every item above via a real build, not carry this
- * note forward as fact.
- */
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B5BC);
+/* func_8004B5BC -- see docs/match-reports/func_8004B5BC.md. */
+s32 func_8004B5BC(Obj866E8 *self) {
+    Descriptor10Ext buf;
+    Elem *e;
+    s32 key;
+    s32 result;
+    u16 oldRaw;
+
+    if (self->methods->slot10C(self, &buf, 0) == 0) {
+        return 0;
+    }
+
+    e = buf.unk24;
+    key = e->unk4->unk32;
+    result = D_800868FC[key];
+
+    if (self->unk68->unk4 == 0) {
+        self->methods->slotF8(self, buf.unk28, &buf.unkC, D_80086974[result]);
+    }
+
+    self->methods->slot128(self);
+
+    oldRaw = *(u16 *)((u8 *)self + 0xBC);
+    *(Descriptor10Ext *)((u8 *)self + 0xBC) = buf;
+
+    if ((s16)oldRaw != *(s16 *)&buf) {
+        self->methods->slot30(self, 5);
+    }
+
+    return result;
+}
+
+#if 0
+/* STALL snapshot -- see docs/match-reports/func_8004B700.md. 125/140 words,
+ * correct length, no drift. ROUND 27 (delta): re-verified per the head's
+ * callee-saved-registers broadcast -- compiled prologue saves the IDENTICAL
+ * set to retail (s0-s7, fp, ra, same stack slots), so the "extra
+ * callee-saved parameter" lever does NOT apply here. Verdict (pure register
+ * identity) CONFIRMED, not just plausible. */
+void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+    s32 divisor;
+    s32 flag;
+    s32 savedResult;
+    s32 count;
+    s32 i;
+    Elem *e;
+    Elem *e2;
+    Unk14Obj *u14;
+    Unk54Struct *tbl;
+    SetupEntry866E8 stackBuf[7];
+
+    if (arg3 != 0) {
+        divisor = self->unk68->divisor;
+        flag = (val / divisor) & 1;
+        savedResult = func_8004B930(self, val, flag);
+
+        count = 0;
+        for (i = 0; i < 7; i++) {
+            e = self->methods->slot118(self, i);
+            e->unk2 = arg3[i].key;
+            if (arg3[i].flag != 0) {
+                tbl = &D_80086838[arg3[i].key];
+                __asm__("");
+                u14 = e->unkC->unk14;
+                if (self->unk68->unk4 == 0) {
+                    u14->unk18.w = arg2->unk0 + tbl->unk0;
+                    u14->unk1C = arg2->unk4;
+                    u14->unk20.w = arg2->unk8 + tbl->unk8;
+                } else {
+                    u14->unk18.w = arg2->unk0 - 0x5000;
+                    u14->unk1C = arg2->unk4 + tbl->unk4;
+                    u14->unk20.w = arg2->unk8 - 0x5000;
+                }
+                u14 = e->unkC->unk14;
+                u14->unk0 = 0;
+                func_8004BA40(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                count++;
+            }
+        }
+
+        for (i = 0; i < 7; i++) {
+            e2 = &self->arr[i];
+            e2->unk4->unk32 = e2->unk2;
+        }
+
+        self->methods->slotFC(self, stackBuf, count);
+    }
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B700);
 
@@ -151,14 +169,14 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
 
 #if 0
 /* STALL snapshot -- see docs/match-reports/func_8004BA40.md. Length CORRECT
- * (63/63 words), raw word-match 58/63. The `do {} while (0);` scheduling
- * barrier before `result = 1;` is load-bearing -- it fixed a genuine
- * register-identity residue (v0 vs v1 for `result`) without changing which
- * register anything else lands in, so it is the permitted kind per
- * CLAUDE.md rule 6. A second, similar-looking register residue in the
- * `entry->unk0 == 0` fallback branch (v1 in retail, v0 here) did NOT
- * respond to the same trick at three different placements -- see the
- * report. */
+ * (63/63 words), raw word-match 58/63. Round 27 (delta) tried three more
+ * structural variants (named `s32 e4 = entry->unk4;` local, operand-order
+ * swap `entry->unk4 + val`, and dropping the shared `value` local entirely
+ * in favor of storing straight into `*(s32*)(arg1+4)` per branch) -- first
+ * two: no change (still 58/63, identical residue). Third: MUCH worse
+ * (31/63, address drift) -- removing the shared `value` local changes
+ * register pressure across the whole if/else in the wrong direction.
+ * Confirms this is genuine register identity, not a source-shape issue. */
 s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = D_8008688C[key];
@@ -224,6 +242,13 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
  * the same broadcast flagged as wrong. Not re-attempted further this
  * round -- the residue matches this round's independently-confirmed
  * "declaration order is inert" finding for this exact class.
+ *
+ * ROUND 27 (delta): re-verified per the head's callee-saved-registers
+ * broadcast -- compiled prologue saves the IDENTICAL set to retail (s0-s6,
+ * ra, no fp, same stack slots for every register), only the ORDER of the
+ * `sw` instructions and which C variable maps to which physical register
+ * differ. The "extra callee-saved parameter" lever does NOT apply.
+ * Verdict (pure register identity) CONFIRMED, not just plausible.
  */
 void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
     SetupEntry866E8 *ep = arr1;
@@ -519,14 +544,16 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     return &self->unkBC;
 }
 
+#if 0
 /* STALLED at 72/106 words -- see docs/match-reports/func_8004C1C0.md for
  * the full analysis (two independent residue classes: an $a1-vs-$a3
  * register-identity choice for u14b, and a store-then-reread narrow-field
  * codegen sensitivity confirmed with an isolated toolchain reproducer).
- * Re-verified drift-free this round (72/106, compiled length 0x1A8
- * matching retail's own .s header exactly) per the head's mid-round
- * broadcast; not re-attempted further. Preserved here per convention. */
-#if 0
+ * ROUND 27 (delta): re-verified 72/106, no drift; two more attempts on
+ * class 2 (dropping the b2/b3 locals and re-reading `out->base.b2/b3`
+ * directly at the h4/h8 use sites) -- both REGRESSED (drift, extra saved
+ * register in the prologue), reverted. Not re-attempted further this
+ * round. Preserved here per convention. */
 s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
