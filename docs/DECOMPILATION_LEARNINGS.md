@@ -4379,6 +4379,132 @@ finding, seen in two runners independently.**
   charlie, `func_80035F3C` — the fix there was real and permuter-found; this
   corrects the mechanism it was filed under.)
 
+### Round 27: two source levers for a residue that looks like register identity
+
+Both were found by the head on 12-to-25-word functions in `class_3bb8c_u` /
+`class_3bb8c_v`, each backed by a byte-exact match or a measured length fix,
+and both were broadcast mid-round and answered with negatives by two runners.
+They are grouped because they share a failure mode: **each produces a diff that
+reads as register identity or as an unreachable encoding choice, and each is in
+fact reachable from the source.**
+
+#### 1. An incoming PARAMETER that survives a call has two retail shapes
+
+GCC 2.6.3 promotes such a parameter to a **callee-saved register**, costing a
+save/restore pair and 2 words of length:
+
+```
+addiu sp,sp,-0x18 / sw s0,0x10(sp) / sw ra,0x14(sp)
+jal callee1 + move s0,a0         <- parked in $s0
+move a0,s0 / ... / jal callee2
+lw ra,0x14(sp) / lw s0,0x10(sp) / addiu sp,sp,0x18
+```
+
+Retail sometimes instead spills it to **its own incoming home slot** and
+reloads it, using no callee-saved register at all:
+
+```
+addiu sp,sp,-0x20 / sw ra,0x1c(sp)
+jal callee1 + sw a0,0x20(sp)     <- spill to the HOME SLOT, in the delay slot
+lw a0,0x20(sp) / ... / jal callee2
+lw ra,0x1c(sp) / addiu sp,sp,0x20
+```
+
+**Taking the parameter's address forces memory residency and switches GCC to
+the home-slot form**, at retail's exact length:
+
+```c
+s32 f(s32 chan) {
+    s32 *p = &chan;
+    callee1();
+    return callee2(*p, 0x3F, 0);
+}
+```
+
+Measured on `func_80050B28` (12 words): default form 2 words LONG with drift;
+address-taken form **exact length, correct instruction sequence, 5/12 words**.
+A bare `__asm__("")` was **INERT** at both positions tried.
+
+**THE SIGNATURE, and it is narrow:** apply it when the build is **LONGER** than
+retail and the excess is a `sw`/`lw` pair on a callee-saved register **retail
+does not save at all**, around an incoming parameter. Two words per promoted
+parameter.
+
+**THE DISCRIMINATOR against genuine register identity — this is the part that
+matters, and it is one command.** Diff your compiled prologue's saved-register
+list against retail's:
+
+- retail saves **FEWER** callee-saved registers than your body -> structural,
+  this lever applies, keep going.
+- retail saves the **SAME** set and merely uses different registers for the
+  same values -> genuine register identity. Stop; it is banned to fix.
+
+**Three runners applied that discriminator this round and all three came back
+NEGATIVE, which is what makes the boundary trustworthy rather than merely
+stated:** delta disassembled `func_8004B700` (125/140) and `func_8004BB3C`
+(90/105) and found retail saving the identical set at identical offsets, which
+**upgraded both verdicts from plausible to checked**; alpha found the same on
+`func_800351D0` (same 10 callee-saved registers, residue really a
+`$s5` rematerialization). So the lever's real value in a round may be
+*confirming* register-identity verdicts rather than overturning them.
+
+**The sibling failure to avoid: a residue class is a property of the FUNCTION'S
+OWN SHAPE, not of its neighbourhood.** `func_80050B28`'s report predicted its
+8-word sibling `func_80050A84` would show the same residue, on the grounds of a
+shared call chain, unit and size. It has no parameter, so the mechanism cannot
+arise, and its delay-slot `nop` says so one grep away. Sharing a chain, a unit
+or a carve predicts nothing about sharing a residue.
+
+#### 2. When your arms come out swapped, invert the GUARD, not the structure
+
+This sharpens the existing "a two-armed `if`/`else`'s LAYOUT and its
+VALUE-PER-ARM are independently wrong-able" entry with the **source change that
+actually flips the layout**, plus two that do not.
+
+GCC 2.6.3 chooses which arm falls through partly on arm cost: it will inline a
+short constant-return arm as the fallthrough and branch to a call-bearing arm.
+Retail frequently does the reverse. Writing the **cheap arm as an early-return
+guard** and the **expensive arm as the fallthrough** flips it:
+
+```c
+    /* 11/25, and ONE WORD SHORT -- arms inverted vs retail */
+    if (flags & 3) { return (call(c) & 0xFF) - 0x57; }
+    return 0x98967F;
+
+    /* 25/25 byte-exact -- sentinel first, call path falls through */
+    if (!(flags & 3)) { return 0x98967F; }
+    return (call(c) & 0xFF) - 0x57;
+```
+
+Measured on `func_80050AA4`. **Two things one instinctively reaches for are
+INERT** — rewriting it as an explicit `else if`/`else` chain, and hoisting the
+arm's expression into a named local. Both left the layout exactly as it was.
+Only the guard's polarity moved it.
+
+**Corollary worth its own line: this presented as "1 word SHORT", and the
+missing word was a `nop` in a delay slot that the wrong layout let GCC fill.**
+So a one-word-short residue on a two-armed function is worth testing for arm
+polarity **before** anything else — the missing word may be a delay-slot `nop`
+only the correct layout leaves empty.
+
+#### 3. A bare `nop` in a call's delay slot is evidence about the callee's ARITY
+
+GCC fills a call's delay slot with argument setup whenever there is any to do,
+so a bare `nop` there means there was none. That distinguishes
+`return callee();` from `return callee(arg);` by inspection — and those two
+compile to *different bytes*, unlike the return-type question in the same
+position, which compiles to identical bytes and cannot be read off at all
+(CLAUDE.md's existing wrapper rule).
+
+**Caveat, hit immediately afterwards in the next function along:** it only
+proves that when the argument is **not already in the right register**. In
+`func_80050AA4` the delay slot is also a `nop` and the call *does* pass its
+argument — `$a0` already held it after an earlier `andi`, so GCC had nothing
+to emit. Check whether `$a0` is already live with the value before concluding
+the call is argument-less. Used correctly it settled `func_80050A84`'s
+signature (`void`, byte-exact first attempt); used carelessly it would have
+mis-typed `func_80050AA4`.
+
 ### Proposed learnings that did NOT earn promotion (round 17)
 
 Recorded because an unpromoted claim that leaves no trace gets re-derived,
