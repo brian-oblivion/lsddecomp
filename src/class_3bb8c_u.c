@@ -98,16 +98,92 @@
 
 #include "common.h"
 
+/* STALL -- see docs/match-reports/func_80050948.md. Compiled length ONE
+ * WORD SHORT (78/79); the whole remaining function is content-identical to
+ * retail once that one word is accounted for (confirmed via asm-differ).
+ * The residue is a single delay-slot scheduling choice: after loading *p,
+ * retail schedules a genuine nop before computing D_80066841's address,
+ * where this build hoists the independent `lui` into that slot instead --
+ * a pure instruction-scheduling preference, not a logic or register-
+ * identity difference. Six reshapes tried, all inert; see report. */
+#if 0
+extern const u8 D_80066841[];
+extern s32 func_80050AA4(s32 c);
+
+/* strtol -- see this unit's own header comment for the full decode (register
+ * roles, control flow, base-prefix logic) this transcribes verbatim.
+ *
+ * OLD-STYLE (K&R) parameter syntax is deliberate, not a stylistic choice:
+ * func_80050A84 below calls this function with ZERO arguments (retail's own
+ * delay slot there is a bare `nop` -- no argument register is ever set up),
+ * which only compiles if THIS definition does not act as a full ANSI
+ * prototype. An ordinary `s32 func_80050948(const char *p) { ... }`
+ * definition DOES establish one even for call sites appearing later in the
+ * same translation unit, and cc1 then correctly refuses func_80050A84's
+ * call as "too few arguments" -- confirmed by hitting that exact error
+ * first. A K&R-style definition does not carry prototype force, letting
+ * func_80050A84's argument-less call through exactly as retail's own build
+ * evidently allowed it (almost certainly because the two were originally
+ * separate translation units, not because the mismatch was intentional). */
+s32 func_80050948(p)
+const char *p;
+{
+    s32 sign = 1;
+    s32 base = 10;
+    s32 acc = 0;
+    s32 d;
+
+    if (!p) {
+        return 0;
+    }
+    while (D_80066841[(u8)*p] & 8) {
+        p++;
+    }
+    while (*p == '-') {
+        sign = -sign;
+        p++;
+    }
+    if (*p == '0') {
+        p++;
+        switch (*p) {
+        case 'X':
+        case 'x':
+            p++;
+            base = 16;
+            break;
+        case 'B':
+        case 'b':
+            p++;
+            base = 2;
+            break;
+        default:
+            base = 8;
+            break;
+        }
+    }
+    for (;;) {
+        d = func_80050AA4(*p++);
+        if ((u32)d >= (u32)base) {
+            break;
+        }
+        acc *= base;
+        acc += d;
+    }
+    return acc * sign;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_u", func_80050948);
+
+extern s32 func_80050948();
 
 /* An argument-less wrapper: retail's delay slot is a bare `nop`, so no
  * argument register is set up at the call at all.  Per CLAUDE.md, the byte
  * match tells us NOTHING about the return type here -- a `void` wrapper around
  * an `s32` tail call is byte-identical -- so this is written as a returning
- * wrapper absent positive evidence of `void`.
- */
-extern s32 func_80050948(void);
-
+ * wrapper absent positive evidence of `void`.  The empty-parens (K&R-style)
+ * extern above matches what func_80050948's own eventual real definition
+ * will need to be declared as (see docs/match-reports/func_80050948.md) so
+ * this call, which retail makes with zero arguments, keeps compiling. */
 s32 func_80050A84(void) {
     return func_80050948();
 }
