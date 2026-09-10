@@ -66,18 +66,36 @@ def uncarved_segments():
     return out
 
 
+# splat writes each function's true code size as `nonmatching <name>, 0xNNN`.
+# USE THAT, not a count of instruction-comment lines.  A function that owns a
+# jump table has its rodata inlined into its own `.s` as a `.section .rodata`
+# block whose data words carry the SAME `/* ofs vram word */` comment shape as
+# instructions -- so counting those lines silently over-counts by the table
+# size.  Measured: class_3bb8c_i/func_800513D0 counts 178 instruction-comment
+# lines against a declared 0x24C = 147 words, the 31-word difference being
+# jtbl_80011628.  The over-count inflates a size estimate that gets put into a
+# runner assignment, so it is worth not having.
+SIZE_RE = re.compile(r'^nonmatching (\w+), (0x[0-9A-Fa-f]+)')
+
+
 def split_functions(seg):
-    """[(name, [instruction-lines])] for one monolithic segment."""
+    """[(name, declared_words, [body-lines])] for one monolithic segment."""
     path = os.path.join(ROOT, 'asm', seg + '.s')
-    funcs, cur = [], None
+    sizes, funcs, cur = {}, [], None
     for ln in open(path, errors='replace'):
         ln = ln.rstrip('\n')
+        m = SIZE_RE.match(ln)
+        if m:
+            sizes[m.group(1)] = int(m.group(2), 16) // 4
+            continue
         m = re.match(r'^glabel (\w+)', ln)
         if m:
-            cur = (m.group(1), [])
+            cur = [m.group(1), None, []]
             funcs.append(cur)
         elif cur is not None:
-            cur[1].append(ln)
+            cur[2].append(ln)
+    for f in funcs:
+        f[1] = sizes.get(f[0])
     return funcs
 
 
@@ -107,7 +125,7 @@ def screen(seg):
     seg_has_mflo = canonical_mflo_screen(path)
 
     out = []
-    for name, lines in split_functions(seg):
+    for name, declared, lines in split_functions(seg):
         body = '\n'.join(lines)
         instr = [l for l in lines if INSTR.match(l)]
         tags = []
@@ -128,12 +146,26 @@ def screen(seg):
             tags.append('TRAMPOLINE')
         if re.search(r'addiu\s+\$at,\s*\$at,\s*%lo', body):
             tags.append('addiu_at(RESOLVED-not-a-blocker)')
-        out.append((name, len(instr), tags))
+        # Fall back to the line count only if splat emitted no size at all,
+        # and say so rather than quietly reporting a possibly-inflated number.
+        words = declared if declared is not None else len(instr)
+        if declared is not None and declared != len(instr):
+            # Report the discrepancy; do NOT assert its cause.  An inlined
+            # jump-table `.rodata` block explains the big ones (main's
+            # func_80011994 is 2 code words against 49 comment lines), but a
+            # trailing alignment `nop` explains the 13 one-word cases in the
+            # trampoline segments, and those are not rodata at all.  An
+            # earlier version of this tag said "rodata words inlined" for
+            # both and was wrong about twelve of the thirteen.
+            tags.append('note:%dw-declared-vs-%d-comment-lines'
+                        % (declared, len(instr)))
+        out.append((name, words, tags))
     return out
 
 
 def is_workable(tags):
-    return not [t for t in tags if not t.startswith('addiu_at(')]
+    return not [t for t in tags
+                if not t.startswith('addiu_at(') and not t.startswith('note:')]
 
 
 def main():
@@ -162,7 +194,10 @@ def main():
         tot_all += len(fns)
         for _, _, tags in fns:
             for t in tags:
-                if t.startswith('addiu_at('):
+                # addiu_at is resolved and `note:` is bookkeeping -- neither is
+                # a blocker, and listing either in the blocker tally makes the
+                # line unreadable and overstates how blocked the corpus is.
+                if t.startswith('addiu_at(') or t.startswith('note:'):
                     continue
                 blocked_by[t] = blocked_by.get(t, 0) + 1
         rows.append((seg, fns, clean))
