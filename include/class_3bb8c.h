@@ -267,12 +267,37 @@ extern const s32 D_8008688C[7];
  * where `D_80086838` above is not). */
 extern const Unk54Struct D_800868A8[7];
 
+/* `ElemTarget::unk32`-indexed remap table, read by func_8004B5BC as a
+ * signed byte (`lb`). 8-entry bound is PROVEN, not guessed: the data file
+ * (`asm/data/76DC8.data.s`) places exactly 8 bytes here (values
+ * `01 02 03 00 04 05 06 00`) before `D_80086904` starts. The fetched byte
+ * (range 0..6) doubles as func_8004B5BC's own return value and, scaled by
+ * 4, as the index into `D_80086974` below. */
+extern const s8 D_800868FC[8];
+
+/* 7-entry pointer table, first entry NULL, indexed by `D_800868FC`'s
+ * fetched byte in func_8004B5BC. Bound PROVEN by the data file: exactly 7
+ * words at `D_80086974` (one NULL, six pointers into the 4-word tables
+ * `D_80086914`..`D_80086964`) before the next symbol starts. Element type
+ * `s32 *` matches `Obj866E8Methods::slotF8`'s own `arg3` (already `s32 *`
+ * from `func_8004B38C`'s call site) -- func_8004B5BC forwards a
+ * `D_80086974` entry there unchanged. */
+extern s32 *D_80086974[7];
+
 /* Only the slots this unit's functions dispatch through (via
  * self->methods->slotNN) are typed; everything else stays opaque so the
  * struct keeps the right size/offsets without requiring every method to be
  * typed up front (same policy as include/class_39e08.h). */
 typedef struct Obj866E8Methods {
-    u8 pad000[0x88];
+    u8 pad000[0x30];
+    /* = BasicClass::onFinalize (`BasicClass__func_182cc`, classtable-
+     * verified against `D_800866E8`'s own +0x030 entry) -- this class
+     * inherits the base BasicClassMethods layout for its low slots (see
+     * `include/code_8220.h`). Called by func_8004B5BC as
+     * `self->methods->slot30(self, 5)` when the just-copied descriptor's
+     * leading raw halfword differs from what was there before. */
+    void (*slot30)(Obj866E8 *self, s32 arg1);  /* +0x030 */
+    u8 pad034[0x88 - 0x34];
     /* Called by func_8004BD14 with a literal 7, one of the object's own
      * Elem array slots, and the loop index. */
     void (*slot88)(Obj866E8 *self, s32 arg1, Elem *entry, s32 arg3); /* +0x088 */
@@ -352,6 +377,11 @@ typedef struct Obj866E8Methods {
      * value is stored into the first word of a freshly-copied 3-word
      * slot at self+0x8C+key*0xC (see func_8004CDA4). */
     s32 (*slot124)(Obj866E8 *self, s32 arg1);      /* +0x124 */
+    /* = func_8004C620 (class_3bb8c_b, already matched: `void
+     * func_8004C620(Obj866E8 *self)`). Called by func_8004B5BC as
+     * `self->methods->slot128(self)`, return unused. Classtable-verified
+     * (`D_800866E8`'s own +0x128 entry). */
+    void (*slot128)(Obj866E8 *self);               /* +0x128 */
 } Obj866E8Methods;
 
 /*
