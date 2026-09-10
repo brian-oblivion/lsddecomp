@@ -1,5 +1,31 @@
-# func_8004EF6C -- STALL, close (188/240 words; correct total length off by
-1, zero drift beyond that)
+# func_8004EF6C -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 188/240. First real diff: file 0x3F7A4 / vram 0x8004EFA4 (missing `sw $s0,0x30($sp)` -- see the register-permutation note below; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7F0 / vram 0x8004EFF0, an empty `nop` where retail fills the delay slot with `move $s7,$s4`).
+
+> **ROUND 27 (delta): re-verified, one new attempt, negative.** Rebuilt the
+> exact preserved body from a clean `INCLUDE_ASM` baseline: confirmed
+> 188/240, no drift beyond the documented 1-word gap. Per the head's
+> "arm polarity" lever (invert a guard so the expensive arm falls through,
+> which can leave the correct delay slot empty for a different reason),
+> tried rewriting the one guard adjacent to the residue --
+> `if (fileHandle == -1) { ... }` -> `if (fileHandle < 0) { ... }`
+> (semantically identical for an `s32` file handle where `-1` is the only
+> negative sentinel value) -- on the theory that a different comparison
+> might shift which register holds the `-1`/sentinel and free up the
+> source register for the needed delay-slot move. **Regressed
+> catastrophically to 6/240**: `< 0` compiles via a completely different
+> instruction sequence (sign-bit test, `slt`/shift family) rather than
+> retail's direct `bne reg,-1,target`, confirming the ORIGINAL `== -1`
+> form is already correct and this residue has nothing to do with HOW the
+> sentinel is tested. Reverted immediately. This function's guard was
+> already correctly polarized (`bne` on not-equal, matching retail's own
+> branch exactly) before this attempt -- the "arm polarity" lever named by
+> the coordinator does not apply here; the residue is purely which
+> independent register-materializing move (of two duplicate-parameter
+> locals already both required for the correct frame size) the compiler
+> schedules into a specific branch's delay slot, and it is DOWNSTREAM of a
+> register-allocation choice (which physical register holds the `-1`
+> literal, and whether that overlaps `a3`'s own home register) rather than
+> of source statement order at that point. Not re-attempted further this
+> round; restored to `INCLUDE_ASM` unchanged.
 
 Unit: `class_3bb8c_f`. Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` dispatch in

@@ -341,16 +341,22 @@ void func_8004F810(TaskObjF *self) {
     }
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004F8A4.md. Best
- * reached: 36/77 words, 0x130/0x134 (1 word / 4 bytes short, zero
- * address drift beyond that). This is the branch-polarity-corrected
- * variant of the report's own "function-pointer dispatch" lever --
- * confirmed via a fast isolated cpp|cc1|maspsx|as reproducer this
- * round that GCC 2.6.3's own block-layout choice for this exact
- * 3-fetch/1-call tail-merge shape does not respond to if/else vs
- * goto/label phrasing, or to reordering which block appears first
- * in source. Preserved here per convention -- not live C. */
 #if 0
+/* STALL snapshot -- see docs/match-reports/func_8004F8A4.md. Best reached
+ * this round (delta): 63/77 words, 0x140/0x134 (3 words / 12 bytes TOO
+ * LONG, address drift beyond that -- opposite direction from the previous
+ * 36/77-at-1-word-short best). Caching `self->methods` into a local
+ * `TaskObjFMethods *m` right where retail does (in the `slot60`-returned-
+ * nonzero tail, before its own 2-way `unk28` check) took this from 36/77
+ * to 63/77 -- reproduces retail's whole body byte-for-byte up through the
+ * final shared `jalr`. The residue is now isolated entirely to the
+ * function's OWN early-exit tail (see report): retail reuses
+ * `func_8004F9D8`'s own false(0) return value directly as the function's
+ * return with zero extra instructions, but this build always
+ * re-materializes an explicit `v0=0` plus a skip-jump around it,
+ * regardless of whether the C returns a literal `0` or a captured
+ * variable holding the same value. Preserved here per convention -- not
+ * live C. */
 s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     s32 (*dispatch)(TaskObjF *, s32);
@@ -384,11 +390,14 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
             dispatch = self->methods->slot7C;
             goto call_it;
         }
-        code = 0x11;
-        if (self->unk28 == code) {
-            code = 0xB;
+        {
+            TaskObjFMethods *m = self->methods;
+            code = 0x11;
+            if (self->unk28 == code) {
+                code = 0xB;
+            }
+            dispatch = m->slot7C;
         }
-        dispatch = self->methods->slot7C;
 
     call_it:
         return dispatch(self, code);
