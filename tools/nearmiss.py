@@ -96,6 +96,40 @@ def screens(path):
     return hits
 
 
+# A TITLE carries a figure if it states a length verdict or a word-match.  Round
+# 23 made three figures mandatory in a STALL title precisely because Gate 1b
+# ranks from title lines and from nothing else -- but that rule is not
+# retroactive, and a third of the queue predates it.  Flagging those is the
+# point: a head ranking from titles must be able to tell "this is ranked" from
+# "this could not be ranked", or it silently mis-ranks a third of the corpus
+# and reaches for the report BODY, which is the failure that burned rounds 18,
+# 19 and 20.
+_FIGURE = re.compile(
+    r"[0-9]+\s*(?:/|of)\s*[0-9]+"          # 58/63, 58 of 63
+    r"|[0-9]+\s+words?\s+(?:short|long)"   # 5 words short
+    r"|[0-9]+\s+instructions?\b", re.I)   # 53/53 instructions
+
+# "exact" counts as a length verdict ONLY alongside a number.  Bare /\bexact\b/i
+# was tried and rejected: it matches "instruction-exact" (arguably fine) but
+# equally "the exact cause", and that is the FLATTERING direction -- it tells a
+# head a title is rankable when it is not, which is the mis-ranking this flag
+# exists to prevent.  A flag like this should over-report, never under-report.
+_EXACT = re.compile(r"\bexact\b", re.I)
+_DIGIT = re.compile(r"[0-9]")
+
+
+def title_has_figure(func):
+    """False when the report exists but its TITLE states no length/word figure."""
+    path = os.path.join(ROOT, "docs", "match-reports", f"{func}.md")
+    if not os.path.exists(path):
+        return True                      # no report at all is a different state
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        title = next(fh, "")
+    if _FIGURE.search(title):
+        return True
+    return bool(_EXACT.search(title) and _DIGIT.search(title))
+
+
 def verdict(func):
     """The report's title/verdict region, verbatim. Never a figure from the body."""
     path = os.path.join(ROOT, "docs", "match-reports", f"{func}.md")
@@ -105,7 +139,10 @@ def verdict(func):
         head = [next(fh, "") for _ in range(8)]
     text = " ".join(l.strip() for l in head if l.strip())
     text = text.lstrip("# ").replace("**", "")
-    return re.sub(r"\s+", " ", text)[:110]
+    out = re.sub(r"\s+", " ", text)[:110]
+    if not title_has_figure(func):
+        out = "[UNRANKABLE-TITLE] " + out
+    return out
 
 
 def main():
@@ -161,6 +198,16 @@ def main():
     print("ASSIGN FROM HERE -- blocker-clean, smallest first.")
     print("Rank by reading the verdict text. Do NOT trust a figure you did not rebuild;")
     print("a title line is only as good as the last person who rebuilt it.")
+    unrankable = [r[2] for r in clean if not title_has_figure(r[2])]
+    if unrankable:
+        print()
+        print(f"[UNRANKABLE-TITLE] marks {len(unrankable)} of {len(clean)} whose report "
+              "TITLE states no length or")
+        print("word figure, so they CANNOT be ranked from the title. Round 23 made three")
+        print("figures mandatory in a STALL title; the rule is not retroactive. Do NOT")
+        print("recover a figure from the report BODY -- it is full of numbers describing")
+        print("variants that were thrown away (rounds 18, 19 and 20 each got caught).")
+        print("Re-measure the function instead, and rebuild its title while you are there.")
     print()
     for words, unit, func, _, v in sorted(clean):
         print(f"{words:5d}w  {unit:<16} {func:<16} {v}")
