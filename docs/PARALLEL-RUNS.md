@@ -510,6 +510,47 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
      and sweep before `git worktree remove --force`: those processes are
      `cwd`-ed into the directory you are about to delete.
 
+     **ROUND 27: THAT SWEEP SELF-MATCHES, AND IT REPORTS THE HEAD'S OWN SHELL
+     AS AN ORPHANED PERMUTER.** `pgrep -f` matches the whole command line, so
+     any process whose command line *mentions* the tool matches — including the
+     shell running the sweep itself, whose command line necessarily contains
+     the pattern. Measured here: with exactly one real permuter alive, the
+     pattern above returned **2** PIDs. The extra was the sweeping shell.
+
+     That is worse than a cosmetic false positive, because the next line tells
+     you to kill off this list guarded on `cwd` — and the self-match's `cwd` is
+     wherever you ran the sweep. Run it from the main checkout and the `cwd`
+     guard saves you by accident; run it after `cd`-ing into the worktree you
+     are cleaning and **the guard matches your own shell**.
+
+     **No cleverer pattern fixes it.** Bracketing one alternative
+     (`permuter[.]py`) still leaves the other (`decomp-permuter`) matching
+     literally, and bracketing both still matches any command line that quotes
+     the pattern — which the sweep's own does. The fix is to stop matching
+     substrings of a command line and instead (a) require an ARGUMENT that *is*
+     a permuter script, and (b) exclude your own process ancestry:
+
+     ```sh
+     self=$$; anc=""; p=$self
+     while [ -n "$p" ] && [ "$p" != 0 ] && [ "$p" != 1 ]; do
+         anc="$anc $p"; p=$(awk '{print $4}' /proc/$p/stat 2>/dev/null); done
+     for d in /proc/[0-9]*; do pid=${d#/proc/}
+         case " $anc " in *" $pid "*) continue;; esac
+         tr '\0' '\n' < "$d/cmdline" 2>/dev/null \
+           | grep -qE '(^|/)permuter\.py$|(^|/)decomp-permuter/.*\.py$' || continue
+         printf '%-8s %s\n' "$pid" "$(readlink "$d/cwd" 2>/dev/null)"
+     done
+     ```
+
+     Verified both directions with a real long-running process: this form
+     returns exactly the one live permuter and nothing else, and returns
+     nothing once it is killed.
+
+     The general shape is the one §2b already names for `pkill`: **a process
+     addressed by a global name rather than a path reaches things you did not
+     mean.** §2b caught it pointing outward at other runners; this is the same
+     error pointing inward at yourself.
+
    The round-10 rule says a runner's negative permuter result may be
    fabricated by another runner's `pkill`. This is its sibling: a runner's
    permuter result may never arrive at all, and the tell is a summary that
