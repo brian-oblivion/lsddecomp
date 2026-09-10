@@ -921,6 +921,70 @@ segments:
       # Doing it means updating THREE files in one step -- this yaml,
       # .gitignore, and .claude/hooks/block-asm-edits.sh -- per HARD RULE 4.
       - [0x410E8, asm, class_3bb8c_h]
+      #
+      # ROUND 27 (head): THE CLAIM ABOVE IS WRONG, AND THE SPAN IS NOW SPLIT.
+      # "All 13 `jr $t2` PSX BIOS trampolines live in exactly this span and
+      # nothing else does" is false: the span 0x410E8..0x413A8 holds the 13
+      # trampolines AND FOUR ORDINARY FUNCTIONS, interleaved in three
+      # clusters.  Measured off the segment's own disassembly:
+      #
+      #   0x410E8..0x41148   6 trampolines (BIOS vector 0xB0)
+      #   0x41148..0x41308   func_80050948 79w, func_80050A84 8w,
+      #                      func_80050AA4 25w   <- ORDINARY C, 3 functions
+      #   0x41308..0x41328   2 trampolines (BIOS vector 0xA0)
+      #   0x41328..0x41358   func_80050B28 12w   <- ORDINARY C, 1 function
+      #   0x41358..0x413A8   5 trampolines (0xB0 x4, 0xA0 x1)
+      #
+      # Round 17 screened this segment "15 of 17 clean" and concluded it was
+      # the least matchable ground in the executable -- correctly AT THE TIME,
+      # because the four non-trampoline functions were all `addiu_at`-blocked.
+      # `addiu_at` was RESOLVED in round 21, and that quietly converted this
+      # segment into the DENSEST BLOCKER-CLEAN GROUND left uncarved: 4 of 17
+      # workable with ZERO live blockers -- no `gp_rel`, no `nop_mflo_mfhi`.
+      # Re-screened round 27 with `tools/nearmiss.py`'s two live greps.
+      #
+      # This is the round-24 staleness pattern exactly: the note above is
+      # careful, measured and well argued, and what expired was not a word of
+      # what it says but the premise it relied on.  Its OPERATIONAL advice
+      # ("carves start after 0x41398") is what went stale, and that advice is
+      # a DIRECTIVE -- the last two rounds' triage notes repeated "avoid
+      # class_3bb8c_h" on the strength of it.
+      #
+      # THE hasm RECOMMENDATION BELOW STANDS UNCHANGED and is still the
+      # operator's call.  This carve deliberately does NOT touch it: the split
+      # is arranged so all 13 trampolines stay in `asm` segments with NOTHING
+      # ELSE IN THEM, so the eventual `hasm` conversion covers three whole
+      # segments and needs no function extracted from a C unit first.  That is
+      # why this is five segments rather than one C unit absorbing two
+      # trampolines as permanent INCLUDE_ASM -- fragmentation is cheap, and
+      # entangling matchable code with an operator-scale change is not.
+      #
+      # Boundary checks at carve time, both sides, all four Gate 2 screens:
+      #   - prologue census: each of the 4 real functions has EXACTLY ONE
+      #     `addiu $sp, $sp, -N` and exactly one `jr $ra`.  No under-split, no
+      #     missing epilogue, no fall-through orphan.
+      #   - no `alabel` anywhere in the segment; no function touches $sp
+      #     before its own prologue.
+      #   - NO jump table and NO `jtbl_` reference in the whole span, so
+      #     neither C unit needs a rodata attach.  `.L` labels (9 in
+      #     func_80050948, 2 in func_80050AA4) are internal branches, local to
+      #     their own function's `.s`.
+      #   - the segment's rodata (`D_80011610`/`D_8001161C`, in the standalone
+      #     0x1DD0 slot) is referenced BY SYMBOL, which resolves from a
+      #     standalone object -- only `.L` labels force an attach.
+      - [0x41148, c, class_3bb8c_u]
+      # class_3bb8c_h_b: 2 trampolines (BIOS vector 0xA0), 0x41308..0x41328.
+      # Same `hasm` disposition as class_3bb8c_h -- see that note above.
+      - [0x41308, asm, class_3bb8c_h_b]
+      # class_3bb8c_v: ONE function, func_80050B28 (12w), 0x41328..0x41358.
+      # A one-function unit is deliberate: it is wedged between two trampoline
+      # clusters, so the only way to make it assignable without putting
+      # trampolines in a C unit is to give it its own segment.  12 words -- it
+      # should close in one sitting and then this unit is finished.
+      - [0x41328, c, class_3bb8c_v]
+      # class_3bb8c_h_c: 5 trampolines (0xB0 x4 at 0x41358/68/78/98, 0xA0 x1 at
+      # 0x41388), 0x41358..0x413A8.  Same `hasm` disposition as class_3bb8c_h.
+      - [0x41358, asm, class_3bb8c_h_c]
       # class_3bb8c_i: first slice after the trampolines, 0x413A8..0x41F84,
       # 20 functions. Carved round 14. Blocker profile: 2 of 20 --
       # func_80050C14 (gp_rel) and func_800513D0 (addiu-$at, and it owns a
