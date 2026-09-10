@@ -1088,19 +1088,60 @@ acting on it costs one command.
 
 **Gate 2 — carve to refill.** If fresh-assignable functions are fewer than
 roughly (runners × per-runner target), carve new units BEFORE provisioning.
-Most of the game is still uncarved, so this gate fires early and often.
 
-List the candidates live, largest first. **Do not work from a written list** —
-carving renames things, and every list of these written down so far has ended
-up naming segments that no longer exist:
+**"Most of the game is still uncarved, so this gate fires early and often" was
+true for twenty-odd rounds and IS NO LONGER TRUE. Measure before you believe
+it — the tool is `tools/uncarved.py` and it exists because this gate's own
+one-liner answers the wrong question:**
+
+```sh
+python3 tools/uncarved.py                 # per-segment, screened, best first
+python3 tools/uncarved.py --functions     # every function with its screens
+python3 tools/uncarved.py --windows 20    # clean-density windows, for boundaries
+```
+
+`grep -c '^glabel'` counts FUNCTIONS. What Gate 2 needs is WORKABLE functions,
+and on this corpus those diverged a long time ago: `class_3bb8c_h` counted 17
+and held 4. `uncarved.py` runs all FOUR screens per function (`gp_rel`,
+`nop_mflo_mfhi` via the canonical FORWARD grep, BIOS trampolines, and
+`addiu_at` reported-but-not-counted) and ranks segments by clean yield. It is
+the Gate 2 companion to `nearmiss.py` and was built the same way, cross-checked
+against a hand census that agreed exactly.
+
+**Round 27's measurement, and it is a STANDING change to what this gate can
+do, not a snapshot: carving can no longer refill the queue at scale.** The
+whole uncarved remainder came to 79 functions holding **10 blocker-clean** ones
+— 55 `gp_rel`, 13 BIOS trampolines that no C compiles to, 1 `nop_mflo_mfhi`.
+Do not read those figures as current; re-run the tool. Read the SHAPE, which
+will not reverse without a toolchain change: **`gp_rel` is now the binding
+constraint on carveable ground, and the clean remainder is scattered a few
+functions at a time across segments that are otherwise blocked.** So:
+
+- **A thin `fresh` queue is no longer sufficient reason to carve.** Price the
+  carve against Gate 1b's near-miss corpus, which is far larger and already
+  screened. Round 27 had `fresh` at 7 and correctly ran runners rather than
+  carving, because the queue that mattered was 135 blocker-clean near-misses.
+- **Expect a carve to yield single-digit functions and to cost stub reports for
+  the blocked majority.** `code_179d8`'s worked-out next slice is 4 clean
+  functions against 18 mandatory stubs. That can still be worth taking — but it
+  is a different trade from the ~20-clean-function carves of rounds 14-16, and
+  budgeting for the old one will overrun.
+- **Prefer a carve that also corrects something.** Round 27's took
+  `class_3bb8c_h` — 4 functions — specifically because its round-17 "avoid this"
+  verdict had gone stale when `addiu_at` was resolved, so the carve retired a
+  false directive as well as adding ground.
+
+The `psyq_*` segments are Sony SDK code: excluded from the game-code
+denominator, and left for last. Matching them proves nothing about this game.
+`uncarved.py` excludes them for you.
+
+If you still want the raw function count (it is the right tool for "what
+segments exist right now", which is a different question):
 
 ```sh
 for f in asm/*.s; do b=$(basename "$f" .s); case "$b" in psyq_*|header) continue;; esac
     printf '%6d %s\n' "$(grep -c '^glabel' "$f")" "$b"; done | sort -rn
 ```
-
-The `psyq_*` segments are Sony SDK code: excluded from the game-code
-denominator, and left for last. Matching them proves nothing about this game.
 
 1. Pick a contiguous run of uncarved functions, ~20 per unit — but pick it by
    **blocker density, not by "next"**. Blockers CLUSTER, so the aggregate rate

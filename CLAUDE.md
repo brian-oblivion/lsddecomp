@@ -245,9 +245,21 @@ disassembly and in no way that matters to the tool doing the expanding.
 
 ## Carving new ground
 
-Uncarved code sits in monolithic top-level `asm/*.s` segments. List them
-biggest-first — the names change as carving proceeds, so derive them rather
-than trusting any list:
+Uncarved code sits in monolithic top-level `asm/*.s` segments. Rank them by
+what they actually hold — the names change as carving proceeds, so derive them
+rather than trusting any list:
+
+```sh
+python3 tools/uncarved.py            # screened per function, best yield first
+python3 tools/uncarved.py --windows 20   # clean-density windows, for boundaries
+```
+
+**Rank by WORKABLE functions, not by function count.** Those two diverged a
+long time ago on this corpus: `class_3bb8c_h` counted 17 `glabel`s and held 4
+matchable functions, the other 13 being BIOS trampolines no C compiles to.
+`uncarved.py` runs all four screens per function and excludes the `psyq_*` SDK
+segments; the raw count below answers "what segments exist right now", which is
+a different question:
 
 ```sh
 for f in asm/*.s; do b=$(basename "$f" .s); case "$b" in psyq_*|header) continue;; esac
@@ -609,6 +621,8 @@ toolchain change.
 make extract                       # regenerate asm/ from the executable
 python3 tools/progress.py          # where the project is
 python3 tools/funcdiff.py <func>   # per-function score
+python3 tools/uncarved.py          # uncarved ground, screened (Gate 2)
+python3 tools/nearmiss.py          # the near-miss queue, screened (Gate 1b)
 python3 tools/classtable.py --scan # the 60 class method tables
 python3 tools/classtable.py <t> --vs <base>   # what a subclass overrides
 python3 tools/headercontention.py  # which units would fight over a header

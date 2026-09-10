@@ -3,11 +3,22 @@
  * (0x429D4..0x435E0, vram 0x800521D4..0x80052DE0), 20 functions.
  * Carved round 15.
  *
- * Blocker profile (head's Gate 1 three-grep screen at carve time):
- *   func_800522DC  addiu-$at, and it OWNS jtbl_800116F4 -- the rodata slot
- *                  at 0x1EF4 is attached to this unit for that reason
- *   func_80052644  gp_rel
- * Both have stub reports; do not attempt either. The other 18 are clean.
+ * Blocker profile (head's Gate 1 THREE-grep screen at carve time -- the screen
+ * is TWO greps as of round 21, and screening for `addiu_at` now INVENTS
+ * blockers, which is the strictly worse failure). Corrected round 27
+ * (2026-09-10), re-screened with `python3 tools/nearmiss.py`:
+ *   func_800522DC  was addiu-$at ONLY -- NOT BLOCKED. `addiu_at` was RESOLVED
+ *                  in round 21 (maspsx `--addiu-at`;
+ *                  docs/research/addiu-at-blocker.md). ALREADY MATCHED, so
+ *                  this correction costs nothing -- but the directive below
+ *                  was live for six rounds and would have warned a runner off
+ *                  matchable ground. It still OWNS jtbl_800116F4, which is why
+ *                  the rodata slot at 0x1EF4 is attached to this unit.
+ *   func_80052644  gp_rel -- STILL BLOCKED, on gp_rel alone. Stub report
+ *                  filed; do not attempt.
+ * So: ONE blocked function, not two. The old line here read "Both have stub
+ * reports; do not attempt either" -- a stale DIRECTIVE, which is worse than a
+ * stale fact, because a reader acts on it without re-measuring.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
