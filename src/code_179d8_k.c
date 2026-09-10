@@ -755,6 +755,155 @@ void func_80035154(s16 a0, s16 a1, u8 a2)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
+/* func_800351D0's own construction of the scratch/argument blob that feeds
+ * func_800357B0 -- see docs/match-reports/func_800357B0.md, which stalled
+ * partly for lack of this derivation.  A single func_800334F0 fill at
+ * function entry writes a LARGER-than-usual record here (count at +0, then
+ * a 4-byte "header" pair of u16s and two more alignment-2 chunks used only
+ * by the unk2A==2 dispatch below); Blk1/Blk2 exist purely to be whole-
+ * struct-copied byte for byte into func_800357B0's outgoing stack args,
+ * per this project's confirmed alignment-2-struct-assignment idiom -- their
+ * internal field breakdown is unconstrained by anything observed so far. */
+#if 0
+typedef struct {
+    s16 raw[14];    /* 28 bytes, alignment 2: whole-struct-copied verbatim */
+} Blk1_800351D0;
+
+typedef struct {
+    s16 raw[9];     /* 18 bytes, alignment 2: whole-struct-copied verbatim */
+} Blk2_800351D0;
+
+typedef struct {
+    u8 count;             /* +0x00: item count, func_800334F0's usual field */
+    u8 pad1[0x10 - 0x1];
+    u16 hdrLo;            /* +0x10 */
+    u16 hdrHi;            /* +0x12 */
+    Blk1_800351D0 blk1;   /* +0x14 */
+    Blk2_800351D0 blk2;   /* +0x30 */
+} List_800351D0;
+
+/* Same per-item scratch role as NoteList_800349B0's sibling Scratch_* types
+ * (filled by func_80033260, consumed by func_80036230); this call site's
+ * own fields happen to share stack space with List_800351D0's tail fields
+ * above since the two never have overlapping lifetimes at runtime (mutually
+ * exclusive unk29==2 / unk2A==2 dispatch arms). */
+typedef struct {
+    u8 pad0[0x4];
+    u8 unk4;      /* +0x4: read back and stored unchanged in the unk13==2 loop -- see report */
+    u8 unk5;      /* +0x5: read back and stored unchanged in the unk13==1 loop -- see report */
+    u8 pad6[0xC - 0x6];
+    u8 unkC;      /* +0xC */
+    u8 unkD;      /* +0xD */
+    u8 pad0E[0x20 - 0xE];
+} Scratch800351D0;
+
+/* Local guess; see docs/match-reports/func_800357B0.md for the derivation
+ * this signature settles (the 4th argument's type, and the scratch struct's
+ * layout, were both left explicitly unresolved there). */
+extern void func_800357B0(s16 a0, s16 a1, s16 a2, u32 a3, Blk1_800351D0 blk1,
+                           Blk2_800351D0 blk2, s16 arg5, u8 arg6);
+
+/* STALL -- see docs/match-reports/func_800351D0.md. Compiled length 4 words
+ * LONG (380/376, measured directly off build/src/code_179d8_k.c.o since
+ * length has drifted). The whole 22-word RPN/NRPN dispatch skeleton, the
+ * three func_80033260/func_80036230 loops, and the func_800357B0 struct-
+ * marshaling (which also settles that function's own previously-unresolved
+ * 4th-argument/scratch-layout question, see func_800357B0.md) all come out
+ * byte-correct. The residue is two isolated dead-value computations
+ * (retail computes a masked/shifted byte into $s5 that is NEVER READ
+ * anywhere in the function, only restored as part of the ordinary
+ * callee-save epilogue) that a plain C dead local gets optimized away
+ * entirely and a `volatile` local keeps but wraps in real store+join
+ * control flow retail's register-only dead value never needed -- see
+ * report for the full derivation and the four things tried. CC6 (Data
+ * Entry MSB) handler for RPN/NRPN parameter writes. */
+void func_800351D0(s16 a0, s16 a1, u8 a2)
+{
+    s16 ch = a0;
+    s16 slot = a1;
+    Entry90902E8 *rec = &D_800902E8[ch][slot];
+    u8 *p = (u8 *)rec + rec->unk12;
+    List_800351D0 list;
+    Scratch800351D0 scratch;
+    s16 i;
+    u8 kind;
+
+    func_800334F0(rec->unk4C, p[0x2C], &list);
+
+    if (rec->unk27 == 1 && rec->unk10 == 0) {
+        rec->unk28 = a2;
+        rec->unk10 = 1;
+        goto combine;
+    }
+    if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
+        rec->unk15 = a2;
+        rec->unk2A = rec->unk2A + 1;
+        goto combine;
+    }
+    if (rec->unk29 == 2) {
+        if (rec->unk13 == 0 && rec->unk14 == 0) {
+            for (i = 0; i < list.count; i++) {
+                func_80033260(rec->unk4C, p[0x2C], i, &scratch);
+                scratch.unkC = a2 & 0x7F;
+                scratch.unkD = a2 & 0x7F;
+                func_80036230(rec->unk4C, p[0x2C], i, &scratch);
+            }
+        }
+        if (rec->unk13 == 1 && rec->unk14 == 0) {
+            volatile s32 unused;
+            if ((u8)(a2 - 0x41) < 0x3F) {
+                if (((a2 & 0xFF) * 100) >= 0) {
+                    unused = ((a2 & 0xFF) * 100) & 0xE000;
+                } else {
+                    unused = (((a2 & 0xFF) * 100) + 0x1FFF) & 0xE000;
+                }
+            } else {
+                unused = 0;
+            }
+            for (i = 0; i < list.count; i++) {
+                func_80033260(rec->unk4C, p[0x2C], i, &scratch);
+                scratch.unk5 = scratch.unk5;
+                func_80036230(rec->unk4C, p[0x2C], i, &scratch);
+            }
+        }
+        if (rec->unk13 == 2 && rec->unk14 == 0) {
+            volatile s32 unused;
+            if ((u8)(a2 - 0x40) < 0x40) {
+                unused = ((a2 & 0xFF) * 25) << 8;
+            } else {
+                unused = 0;
+            }
+            for (i = 0; i < list.count; i++) {
+                func_80033260(rec->unk4C, p[0x2C], i, &scratch);
+                scratch.unk4 = scratch.unk4;
+                func_80036230(rec->unk4C, p[0x2C], i, &scratch);
+            }
+        }
+        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk29 = 0;
+        return;
+    }
+    if (rec->unk2A == 2) {
+        kind = rec->unk16;
+        if (kind == 0x10) {
+            for (i = 0; i < list.count; i++) {
+                func_800357B0(rec->unk4C, p[0x2C], i,
+                              (u32)list.hdrLo | ((u32)list.hdrHi << 16),
+                              list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
+            }
+        } else {
+            func_800357B0(rec->unk4C, p[0x2C], (s16)kind,
+                          (u32)list.hdrLo | ((u32)list.hdrHi << 16),
+                          list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
+        }
+        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk2A = 0;
+        return;
+    }
+combine:
+    rec->unk88 = func_80035E80(ch, slot);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800357B0);
