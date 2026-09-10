@@ -111,14 +111,14 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
 
 #if 0
 /* STALL snapshot -- see docs/match-reports/func_8004BA40.md. Length CORRECT
- * (63/63 words), raw word-match 58/63. The `do {} while (0);` scheduling
- * barrier before `result = 1;` is load-bearing -- it fixed a genuine
- * register-identity residue (v0 vs v1 for `result`) without changing which
- * register anything else lands in, so it is the permitted kind per
- * CLAUDE.md rule 6. A second, similar-looking register residue in the
- * `entry->unk0 == 0` fallback branch (v1 in retail, v0 here) did NOT
- * respond to the same trick at three different placements -- see the
- * report. */
+ * (63/63 words), raw word-match 58/63. Round 27 (delta) tried three more
+ * structural variants (named `s32 e4 = entry->unk4;` local, operand-order
+ * swap `entry->unk4 + val`, and dropping the shared `value` local entirely
+ * in favor of storing straight into `*(s32*)(arg1+4)` per branch) -- first
+ * two: no change (still 58/63, identical residue). Third: MUCH worse
+ * (31/63, address drift) -- removing the shared `value` local changes
+ * register pressure across the whole if/else in the wrong direction.
+ * Confirms this is genuine register identity, not a source-shape issue. */
 s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = D_8008688C[key];
@@ -479,14 +479,16 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     return &self->unkBC;
 }
 
+#if 0
 /* STALLED at 72/106 words -- see docs/match-reports/func_8004C1C0.md for
  * the full analysis (two independent residue classes: an $a1-vs-$a3
  * register-identity choice for u14b, and a store-then-reread narrow-field
  * codegen sensitivity confirmed with an isolated toolchain reproducer).
- * Re-verified drift-free this round (72/106, compiled length 0x1A8
- * matching retail's own .s header exactly) per the head's mid-round
- * broadcast; not re-attempted further. Preserved here per convention. */
-#if 0
+ * ROUND 27 (delta): re-verified 72/106, no drift; two more attempts on
+ * class 2 (dropping the b2/b3 locals and re-reading `out->base.b2/b3`
+ * directly at the h4/h8 use sites) -- both REGRESSED (drift, extra saved
+ * register in the prologue), reverted. Not re-attempted further this
+ * round. Preserved here per convention. */
 s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
