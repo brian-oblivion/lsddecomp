@@ -4767,6 +4767,66 @@ rare, keeps the join hypothesis untestable for now, and means the next
 instance should be looked for by its STRUCTURE (a check surviving at a
 branch-merge join) rather than by this instruction pattern.
 
+### Round 27: an UNMOVED score can mean two symptoms of one defect traded places
+
+**This is the round's subtlest finding and it belongs next to "the four ways a
+score lies", because it is a fifth way a *change* lies rather than a way a
+score lies.** Runner bravo, `code_2cc8c_f`.
+
+`func_80040FC0` sat at 15/24 before and after a source change, which reads as
+"the change did nothing". It did not. Toggling the reused byte's local width
+between `u8` and `u32` **trades one word-cost for another**:
+
+- as `u8`, a spurious `andi` mask appears (one word wrong);
+- as `u32`, the mask goes away and a *different* word goes wrong — the same
+  missing "redundant cursor cache" register its sibling `func_80041020` hit.
+
+Net score identical, two different defects. The reading "inert lever, move on"
+would have discarded a correct change and left the axis unexplored.
+
+**Why it matters beyond this function: it is what proved the unit's three
+stalls are ONE defect, not three.** `func_80041020`, `func_80040FC0` and the
+cursor-register residue had been filed separately across rounds. Isolating the
+trade showed the same underlying cause behind all of them, which is worth far
+more than either individual score.
+
+**The habit: toggle one variable at a time and read the DIFF, not the score.**
+A word-count is a scalar summary of a vector; two changes of opposite sign
+cancel in it. When a change you have good reason to believe in leaves the score
+unmoved, run `tools/asm-differ/diff.py` and check whether the *set* of
+differing words changed. If it did, the lever worked and uncovered a second
+defect.
+
+### Round 27: a byte value reused across comparisons needs a WIDER local than the byte
+
+Two independent confirmations, both bravo, in two different units — so this is
+a lever rather than an anecdote.
+
+- First pass, `code_179d8_m`: `chan = call() & 0xFF` must stay `s32`, not `u8`,
+  to get retail's `slt` rather than `sltu` on a later comparison.
+- Second pass, `code_2cc8c_f`/`func_80041020`: a byte value reused across
+  several comparisons needs a `u32` local, not `u8`, or GCC emits a spurious
+  `andi` mask at each use.
+
+**The rule: declare a narrow value in a local as wide as the register it lives
+in, even when every value provably fits in a byte.** `-funsigned-char` means a
+`u8` local is a real narrowing GCC re-materialises at each use; retail's
+compiler was given a wider declared type. This is the same family as the
+existing `s16`-width entries, arriving from the comparison side.
+
+**And note it is NOT free** — see the entry above. On `func_80040FC0` widening
+the type removed the `andi` and exposed a different missing word, so the score
+did not move. Widen it *and* read the diff.
+
+### Round 27: two branches with the same result need a combined `&&`, not nested `if`s
+
+Also bravo, `func_80041020`, pipeline-isolated. Where two logically-distinct
+false outcomes share one output formula, retail reaches that formula as a
+**single fallthrough instruction**. Nested `if`s duplicate it behind a jump; a
+combined `&&` condition shares it. This was one of the two changes that took the
+function from the wrong length to exact length, so it is worth reaching for
+whenever a body is LONG by roughly the size of a duplicated tail.
+
 ### Proposed learnings that did NOT earn promotion (round 17)
 
 Recorded because an unpromoted claim that leaves no trace gets re-derived,
