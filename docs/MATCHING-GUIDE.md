@@ -283,6 +283,53 @@ three are live rather than transcribed:
   offsets against the raw `.s`, not against its own prose**, before building
   on them.
 
+  **Round 27 adds the surface none of the above covers, and it is the one no
+  tool can see: a note about where NOT to work.** Everything above concerns
+  match REPORTS, which `progress.py` and `nearmiss.py` both index. The
+  equivalent staleness in a splat carve comment, a `src/*.c` unit header, or
+  a previous round's triage recommendation is invisible to every tool — and
+  it is worse in kind, because those are phrased as **directives** rather
+  than findings.
+
+  `class_3bb8c_h` was screened in round 17 as **15 of 17 "clean"** and
+  correctly judged the least matchable ground in the executable: 13 of its
+  functions are PSX BIOS trampolines no C compiles to, and the other four
+  were `addiu_at`-blocked. The note concluded "the cheapest next slice
+  therefore starts AFTER the trampolines". Round 21 resolved `addiu_at`,
+  which silently made all four of those functions blocker-clean — the
+  **densest clean ground left uncarved**, on zero live blockers. Nobody
+  re-measured for four rounds, and two consecutive rounds' triage repeated
+  "avoid `class_3bb8c_h`" on the strength of it. Round 27 carved it and
+  matched two of the four functions in one head sitting (8/8 and 25/25,
+  first and fourth attempt).
+
+  Note what was and was not wrong, because it is the round-24 shape exactly:
+  every factual claim in the note was true and stayed true. The trampolines
+  are still trampolines. What expired was the **premise** that the other four
+  were unreachable — and the note's operational advice outlived it. The same
+  note also carried a claim nobody had checked, that all 13 trampolines
+  occupied the span and "nothing else does"; four ordinary functions are
+  interleaved among them in three clusters.
+
+  Three habits follow, and the first is the cheap one:
+
+  - **Rank uncarved ground with `python3 tools/uncarved.py`, not by reading
+    notes.** It screens per function from the ASM, the same way
+    `nearmiss.py` does for the queue, and it exists because this gate's
+    older `grep -c '^glabel'` one-liner counts FUNCTIONS where what matters
+    is WORKABLE functions — `class_3bb8c_h` counted 17 and held 4.
+  - **When a blocker is retired, sweep the DIRECTIVES too, not just the
+    reports.** `grep -rn 'addiu' src/*.c` and the splat yaml's carve
+    comments. Round 23 found four such units; round 27 found a fifth
+    (`class_3bb8c_k`, whose comment still said "do not attempt either" of two
+    functions, one of which had been matchable since round 21 and was in fact
+    already matched).
+  - **Treat a "do not work here" verdict as having a shelf life tied to the
+    blocker it rests on.** A note that says *why* it is closed can be
+    re-checked in seconds; one that only says *don't* cannot be, and will be
+    obeyed indefinitely. Record the method and the date next to any such
+    verdict you write.
+
   **Round 16 hit this twice in one round, which makes it a standing check
   rather than an anecdote: a long attempt list is not a broad one.**
 
