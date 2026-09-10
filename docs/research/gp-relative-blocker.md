@@ -4,6 +4,15 @@
 The pin remains `-G0` and the tree is unchanged. See "The experiment was run"
 below before proposing any `-G` change — the obvious test gives a false green.**
 
+**RE-ESCALATED 2026-09-10 (round 27) ON SCOPE, NOT ON MECHANISM. Nothing about
+the diagnosis or the rejected experiment has changed. What changed is the
+stake: `gp_rel` now blocks 82 of 233 queued functions AND 55 of the 79
+functions still uncarved, which leaves only 10 blocker-clean functions in the
+entire uncarved remainder of the game. It is no longer one blocker among
+several — it is the constraint that has ended carving as a source of new work.
+See "Scope" below. The three unexplored leads at the foot of this document are
+unchanged and remain the operator's call.**
+
 Found independently by two runners in two unrelated units during round
 2026-08-29-a, and adjudicated by the head. This is the first stall class on
 this project that survived head scrutiny as a genuine toolchain issue.
@@ -89,10 +98,46 @@ unit.
 
 ## Scope
 
-At minimum: 8 functions in `code_171e0` (runner/delta) and 1 in `class_16334`
-(runner/alpha). Almost certainly far more — any function touching a
-small-data global is affected, and `$gp` addressing is pervasive in retail.
-This likely gates a large fraction of the remaining 1300+ game functions.
+**As first written (2026-08-29):** at minimum 8 functions in `code_171e0`
+(runner/delta) and 1 in `class_16334` (runner/alpha). Almost certainly far
+more — any function touching a small-data global is affected, and `$gp`
+addressing is pervasive in retail. This likely gates a large fraction of the
+remaining 1300+ game functions.
+
+**REMEASURED 2026-09-10 (round 27), and the prediction held: this is now the
+single binding constraint on the project's remaining ground.** Two censuses,
+both tool-derived, both re-runnable:
+
+```sh
+python3 tools/nearmiss.py | head -2      # the live INCLUDE_ASM queue
+python3 tools/uncarved.py  | head -2      # the uncarved monoliths
+```
+
+| corpus | total | `gp_rel`-blocked |
+| --- | --- | --- |
+| live `INCLUDE_ASM` queue | 233 | **82** |
+| uncarved game code | 79 | **55** |
+
+That second row is the one that changed the project's shape, and it is why
+this is worth re-escalating rather than leaving as a standing note. **Of the
+79 game functions still sitting in uncarved monoliths, only 10 are
+blocker-clean.** The rest are 55 `gp_rel`, 13 BIOS trampolines that no C
+compiles to at all, and 1 `nop_mflo_mfhi`. So `gp_rel` does not merely block
+82 queued functions — **it has ended carving as a way to refill the work
+queue.** Round 27 rewrote Gate 2 in `docs/PARALLEL-RUNS.md` accordingly:
+"most of the game is still uncarved, so this gate fires early and often" was
+true for twenty rounds and is now false.
+
+The `gp_rel` load in the live queue also concentrates, which matters for
+judging what a fix would return: `code_171e0` (14), `DreamSys` (13),
+`code_4cd08` (8) and `code_179d8_e` (8) hold over half of it between them.
+`code_171e0` is 14 of its 27 queued functions and `code_4cd08` is 8 of 17 —
+two units a fix would roughly halve on its own.
+
+Do not read these figures as current; re-run the two commands. The SHAPE is
+what will not change without a toolchain move: the clean remainder is
+scattered a few functions at a time across segments that are otherwise
+`gp_rel`, so there is no window left to carve around it.
 
 ## What is NOT yet established
 
