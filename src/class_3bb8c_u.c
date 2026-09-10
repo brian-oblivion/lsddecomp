@@ -70,4 +70,18 @@ s32 func_80050A84(void) {
     return func_80050948();
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_u", func_80050AA4);
+extern const u8 D_80066841[];
+extern s32 func_800133AC(s32 c);
+
+s32 func_80050AA4(s32 c) {
+    u8 flags;
+    c &= 0xFF;
+    flags = D_80066841[c];
+    if (flags & 4) {
+        return c - 0x30;
+    }
+    if (!(flags & 3)) {
+        return 0x98967F;
+    }
+    return (func_800133AC(c) & 0xFF) - 0x57;
+}
