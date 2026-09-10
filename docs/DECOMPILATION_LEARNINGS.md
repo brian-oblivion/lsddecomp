@@ -4426,6 +4426,67 @@ finding, seen in two runners independently.**
   charlie, `func_80035F3C` — the fix there was real and permuter-found; this
   corrects the mechanism it was filed under.)
 
+### Round 27's HEADLINE: three levers were found, and ALL THREE have a measured counter-example
+
+**Read this before applying any lever from round 27.** The round produced three
+source levers, each of which closed or advanced a real function, and each of
+which was then measured to make a *different* function WORSE. None is a rule;
+all three are hypotheses to test per function. This is the same shape as round
+7's two superficially symmetric vtable slots that needed opposite answers, and
+it is the most useful thing the round established.
+
+| lever | where it WORKED | where it made things WORSE |
+| --- | --- | --- |
+| **address-taken parameter** forces retail's home-slot spill instead of `$s0` promotion | `func_80050B28`: 2-words-long-with-drift -> exact length | **0 for 4** on every other candidate (delta on `func_8004B700`, `func_8004BB3C`; alpha on `func_800351D0`; bravo on `func_8002E4D8`) |
+| **invert the guard** so the expensive arm falls through | `func_80050AA4`: 11/25 and one word short -> **25/25 byte-exact** | `func_8004EF6C`: **188/240 -> 6/240**, catastrophic. The guard was ALREADY correctly polarized; `slt`/shift replaced retail's `bne` |
+| **inline every call site** rather than factoring a shared tail | `func_800513D0`: 9-words-short-with-drift -> **147/147 byte-exact** | `func_8004F8A4`: **4 words too long**. Same runner, same header family, same round |
+
+**The two rows that matter most are the second and third, because in each the
+same person applied their own successful lever to a neighbouring function and
+it went backwards.** Delta found the inline-call lever on `func_800513D0` and
+had it fail on `func_8004F8A4`. The head found guard inversion on
+`func_80050AA4` and had delta measure it destroying `func_8004EF6C`. Proximity,
+family, size and residue *description* all failed to predict transfer.
+
+**So each lever needs its DISCRIMINATOR stated, or it is a coin flip.** What is
+known:
+
+- **Address-taken parameter** — has a real discriminator, and it is one
+  command: diff your compiled prologue's saved-register list against retail's.
+  Retail saves FEWER than you -> applies. SAME set -> genuine register
+  identity, stop. NONE on either side -> cannot apply, look elsewhere. Given
+  it went 0 for 4, its realistic value is **confirming** identity verdicts,
+  not producing matches.
+- **Invert the guard** — discriminator NOT established. What is known is the
+  failure mode: it destroyed a function whose guard was already correct, by
+  changing the *comparison* (`== -1` -> `< 0`) rather than only the arm order.
+  So **check first that the arms are actually swapped relative to retail**, and
+  invert the polarity WITHOUT changing the comparison operator. Do not reach
+  for it on a residue already attributed to register allocation or delay-slot
+  placement.
+- **Inline every call site** — discriminator NOT established, and this one has
+  the tightest counter-example of the three. Both functions are class-framework
+  dispatchers in the `class_3bb8c` family. The only visible difference is that
+  `func_800513D0`'s duplicated blocks are byte-identical *case bodies* GCC
+  cross-jump-merged, whereas `func_8004F8A4`'s shared tail is genuinely shared
+  in retail too. **Check whether retail duplicates the block before you
+  duplicate it** — read the `.s` for two copies, do not infer from being short.
+
+**The generalisable rule, and it is a process rule:** a lever discovered on one
+function is evidence about *that* function until a second function confirms it.
+Broadcasting one mid-round is still right — it is cheap and it found all three
+counter-examples above within hours — but **broadcast it as a hypothesis with a
+request for the negative**, which is what produced this table. A lever
+broadcast as a rule would have had four runners applying three coin flips.
+
+**And record the negatives in the reports, not just the positives.** Every row
+in the right-hand column above exists because a runner was told that a
+mechanised negative was a wanted result. `func_8004EF6C`'s report now says
+"arm polarity regressed this 188/240 -> 6/240, the guard was already correct,
+the residue is register-allocation-driven delay-slot placement" — which is
+worth more to the next round than another attempt would have been, because it
+removes an axis instead of adding an attempt.
+
 ### Round 27: two source levers for a residue that looks like register identity
 
 Both were found by the head on 12-to-25-word functions in `class_3bb8c_u` /
