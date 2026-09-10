@@ -79,7 +79,26 @@ def find_range(name):
          about a function after it has been MATCHED.
     """
     for p in srcpath.nm_find(name):
-        offs = [int(x, 16) for x in INSN_RE.findall(p.read_text())]
+        text = p.read_text()
+        # DELIMIT BY glabel/endlabel, exactly as source 2 below does -- do NOT
+        # min/max over the whole file.  A function that owns a jump table has
+        # its rodata emitted into its OWN `.s` as a leading
+        # `.section .rodata` block, and those data words carry the same
+        # `/* fileofs vram word */` comment shape as instructions.  Because the
+        # rodata slot sits at a much LOWER file offset than the text, a
+        # min/max over the file returned a window spanning the whole image:
+        # func_800513D0 measured `65533/65533 words match (file 0x1E28-0x41E1C)`
+        # against a real size of 147 words.
+        #
+        # That was worse than a cosmetic wrong denominator.  It also DISABLED
+        # THE DRIFT GUARD -- with a ~262KB window almost nothing is "outside
+        # this range", so the out-of-range byte count can no longer fire.  And
+        # for a near-miss it prints a precise-looking ratio in which 3 words
+        # off and 30 words off are indistinguishable.
+        m = re.search(rf"^glabel {re.escape(name)}$\n(.*?)^endlabel "
+                      rf"{re.escape(name)}$", text, re.S | re.M)
+        body = m.group(1) if m else text
+        offs = [int(x, 16) for x in INSN_RE.findall(body)]
         if offs:
             return min(offs), max(offs) + 4
 

@@ -2603,6 +2603,53 @@ iterations flat on `func_8004B100` says something different from 122K iterations
 that wandered.
 
 
+### Tooling defect found in round 27 (FIXED): funcdiff's window for a jump-table-owning function
+
+`funcdiff.py`'s most precise range source read `asm/nonmatchings/**/<name>.s`
+and took `min`/`max` over **every** instruction-comment offset in the file. A
+function that OWNS a jump table has its rodata emitted into its own `.s` as a
+leading `.section .rodata` block, and those data words carry the same
+`/* fileofs vram word */` comment shape as instructions. The rodata slot sits
+at a far LOWER file offset than the text, so the window spanned the gap:
+
+```
+func_800513D0: 65533/65533 words match (file 0x1E28-0x41E1C)   <- the bug
+func_800513D0: 147/147 words match     (file 0x41BD0-0x41E1C)  <- fixed
+```
+
+**Two things made this worse than a wrong denominator, and the second is why
+it is recorded here rather than shrugged off.**
+
+- **It disabled the drift guard.** With a ~262KB window almost nothing is
+  "outside this range", so the out-of-range byte count that
+  CLAUDE.md's third way-a-score-lies depends on can no longer fire.
+- **For a near-miss it prints a precise-looking ratio in which 3 words off and
+  30 words off are indistinguishable.** A runner iterating on such a function
+  reads a nonsense denominator with no indication anything is wrong.
+
+The fix is to delimit by `glabel`/`endlabel`, which the *second* range source
+in the same function was already doing correctly — so the bug was an
+inconsistency between two sources in one function, not a missing idea.
+
+**It is NOT a fifth way a score lies, and the reasoning matters.** CLAUDE.md's
+four are live hazards in the oracle chain. This was a tool bug with a fix, and
+it is fixed; adding it to that list would imply the reader must still guard
+against it by hand. It is filed the same way round 19's tooling defects were.
+
+**How it surfaced is the transferable part: nobody was misled, because the
+runner did not use the number.** Delta sized `func_800513D0` from its
+`nonmatching func_800513D0, 0x24C` header — the authoritative declared size —
+rather than from a comment-line count or a funcdiff denominator, because the
+assignment told it to. The head then noticed the absurd `65533/65533` while
+re-verifying the merge. **The same root cause (rodata inlined in a function's
+own `.s`, indistinguishable from text by comment shape) had already produced
+two other bugs the same round** — an over-count in `tools/uncarved.py`
+(`main`'s `func_80011994` reported as 49w against a real 2w) and a 178-vs-147
+size discrepancy in an assignment. So: **when a `.s` can contain data, never
+size or bound anything by counting its instruction-comment lines. Use the
+declared `nonmatching <name>, 0xNNN` size, or delimit by
+`glabel`/`endlabel`.**
+
 ### Tooling defects found in round 19 (two since FIXED, one is not a bug)
 
 - **FIXED.** `tools/setup-permuter.sh`'s scaffold validation ran the seed
