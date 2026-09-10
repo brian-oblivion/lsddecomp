@@ -54,9 +54,11 @@
  *                    while (*p == '-') { sign = -sign; p++; }
  *                    if (*p == '0') {                   // base prefix
  *                        p++;
- *                        if (*p=='X' || *p=='x') { p++; base = 16; }
- *                        else if (*p=='B' || *p=='b') { p++; base = 2; }
- *                        else base = 8;                 // bare leading 0
+ *                        switch (*p) {                  // MUST be a switch --
+ *                        case 'X': case 'x': p++; base = 16; break;
+ *                        case 'B': case 'b': p++; base =  2; break;
+ *                        default:                 base =  8; break;
+ *                        }
  *                    }
  *                    for (;;) {                         // digit loop
  *                        d = func_80050AA4(*p++);
@@ -71,6 +73,21 @@
  *                    terminate the loop for ANY base without a separate test.
  *                  - The '-' handling is a LOOP, not an `if`, so "--5" parses
  *                    as +5.  There is no '+' handling at all.
+ *                  - **THE BASE-PREFIX DISPATCH MUST BE A `switch`, NOT AN
+ *                    if/else-if CHAIN.  This comment had it wrong and it cost
+ *                    four words.**  An earlier version of this decode wrote
+ *                    `if (*p=='X' || *p=='x') ... else if (*p=='B' || ...)`,
+ *                    which compiles FOUR WORDS SHORT.  Retail's compare tree
+ *                    splits first on `*p < 'Y'` -- grouping uppercase against
+ *                    lowercase by ASCII value -- which is what a `switch` over
+ *                    the four case values lowers to and what an if/else chain
+ *                    over two `||` conditions does not.  Corrected round 27 by
+ *                    runner alpha, which closed 4 of 5 words with that one
+ *                    change (`docs/match-reports/func_80050948.md`).
+ *                  - Split the accumulate as `acc *= base; acc += d;` rather
+ *                    than `acc = acc*base + d;` -- the combined form leaves an
+ *                    `mflo` target register-identity residue that the split
+ *                    form fixes for free.  Also alpha's, same round.
  *                  - `base = 8` for a bare leading '0' arrives via a DELAY
  *                    SLOT (`ori $s1,$zero,0x8` under a `beq` that may not be
  *                    taken), so it executes on both paths.  Read the delay

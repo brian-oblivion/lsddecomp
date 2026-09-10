@@ -4669,6 +4669,43 @@ principle, since the question is whether a branch EXISTS); not reachable from a
 traceable local; not from a global (survives, wrong shape); not from a call (no
 room). What is untried is reproducing the **join** rather than the condition.
 
+**THE CLASS HAS TWO INSTANCES, NOT MORE -- a corpus search for a third came
+back EMPTY, and the head's first version of that search was WRONG in a way
+worth recording.** Charlie asked for a third instance to test the join
+hypothesis on. The head searched every `.s` for the signature -- an
+`ori $R, $zero, K` immediately followed by a branch testing `$R` -- and got
+four hits: the two known instances plus `func_80059BE0` (`DreamSys`) and
+`func_8001E110` (`code_d294_b`). **Both extras are false positives, and both
+for the same reason: the search paired FILE-ADJACENT instructions without
+respecting delay slots and label boundaries.**
+
+- `func_8001E110`: the `ori $v0, $zero, 0x1` sits in the **delay slot of a
+  `j`** to the epilogue -- it is a RETURN VALUE, not a condition. The branch
+  the search paired it with is at a label (`.L8001E178`) reached from an
+  earlier branch entirely. The two never execute in sequence.
+- `func_80059BE0`: the `ori $s1, $zero, 0x1` is the last instruction before a
+  join label, and `$s1` is set to `sltiu $v0, 0x1` on the *other* incoming
+  path. So `$s1` is a genuine **phi** -- 1 on one path, computed on the other
+  -- and the `beqz $s1` after the join is NOT an always-known branch. It only
+  looks like a constant feeding the next branch because of where the join
+  falls.
+
+**The lesson is the one this round had already written down twice, arriving on
+its author: a constant written just before a join label is a PHI INPUT, not a
+dead check, and an instruction in a delay slot does not precede the next line
+in execution order.** Any search for "branch on a just-materialised constant"
+must (a) exclude an `ori` sitting in a branch's delay slot and (b) confirm no
+label falls between the constant and the branch. Reading a disassembly in
+source order gets delay-slot placement wrong -- which is exactly what
+`docs/MATCHING-GUIDE.md` says about derivations, and it applies to corpus
+searches identically.
+
+So the honest state: **two confirmed instances, both in sibling CD functions,
+and no third exists in the corpus by this signature.** That makes the class
+rare, keeps the join hypothesis untestable for now, and means the next
+instance should be looked for by its STRUCTURE (a check surviving at a
+branch-merge join) rather than by this instruction pattern.
+
 ### Proposed learnings that did NOT earn promotion (round 17)
 
 Recorded because an unpromoted claim that leaves no trace gets re-derived,
