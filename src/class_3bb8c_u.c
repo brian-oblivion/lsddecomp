@@ -36,10 +36,52 @@
  *
  * PER-FUNCTION NOTES for whoever takes this unit:
  *
- *   func_80050948  79w.  The real body.  Called from
+ *   func_80050948  79w.  THE REAL BODY, and it is a `strtol`.  Fully decoded
+ *                  from the disassembly round 27 -- transcribe this rather
+ *                  than re-deriving it.  Called from
  *                  class_3bb8c_g/func_800507F8 (external) and from
- *                  func_80050A84.  9 internal `.L` branch labels, so expect
- *                  real control flow.
+ *                  func_80050A84.
+ *
+ *                  Register roles, read off the prologue:
+ *                    $s0 = the cursor (arg0, a `const char *`)
+ *                    $s3 = sign, initialised 1, negated per '-' seen
+ *                    $s1 = base, initialised 10
+ *                    $s2 = the accumulator, initialised 0
+ *
+ *                  Shape:
+ *                    if (!p) return 0;
+ *                    while (D_80066841[*p] & 8) p++;    // bit 8 == isspace
+ *                    while (*p == '-') { sign = -sign; p++; }
+ *                    if (*p == '0') {                   // base prefix
+ *                        p++;
+ *                        if (*p=='X' || *p=='x') { p++; base = 16; }
+ *                        else if (*p=='B' || *p=='b') { p++; base = 2; }
+ *                        else base = 8;                 // bare leading 0
+ *                    }
+ *                    for (;;) {                         // digit loop
+ *                        d = func_80050AA4(*p++);
+ *                        if ((u32)d >= (u32)base) break;
+ *                        acc = acc * base + d;
+ *                    }
+ *                    return acc * sign;
+ *
+ *                  Three details that are easy to get wrong:
+ *                  - The loop bound is an UNSIGNED compare (`sltu`), which is
+ *                    what makes func_80050AA4's 0x98967F (9999999) sentinel
+ *                    terminate the loop for ANY base without a separate test.
+ *                  - The '-' handling is a LOOP, not an `if`, so "--5" parses
+ *                    as +5.  There is no '+' handling at all.
+ *                  - `base = 8` for a bare leading '0' arrives via a DELAY
+ *                    SLOT (`ori $s1,$zero,0x8` under a `beq` that may not be
+ *                    taken), so it executes on both paths.  Read the delay
+ *                    slots, not just the branches.
+ *
+ *                  Blocker note: this function contains `mult`/`mflo` pairs,
+ *                  but they are all `mult` THEN `mflo` -- retail's ordinary
+ *                  idiom, and the SAFE direction.  `nop_mflo_mfhi` blocks the
+ *                  opposite order (an `mflo`/`mfhi` FOLLOWED within two
+ *                  instructions BY a `mult`/`div`).  Screened clean; do not
+ *                  re-file this as blocked.
  *
  *   func_80050A84  8w.  A wrapper whose only `jal` is func_80050948, with NO
  *                  callers anywhere -- no `jal` from any segment and no data
