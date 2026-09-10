@@ -101,10 +101,14 @@ extern Rec16D7F0 D_8008D7F2[];
 
 extern u8 D_8008D970[];
 
-/* Pointer to an object; only the byte field this function reads is
- * named. */
+/* Pointer to an object; only the fields this unit's functions read are
+ * named. func_8002FAC4 (below) additionally needs a u16 field at
+ * +0x12 (a "difficulty count" threshold, compared unsigned against
+ * D_8008EA13), on top of the existing +0x18 byte field. */
 typedef struct {
-    u8 pad[0x18];
+    u8 pad[0x12];
+    u16 unk12; /* +0x12 */
+    u8 pad14[0x18 - 0x14];
     u8 unk18; /* +0x18 */
 } ObjE970;
 extern ObjE970 *D_8008E970;
@@ -246,13 +250,27 @@ extern Rec34U16 D_8008D99C[];
 /* Debug/selected-difficulty byte, read fresh each call. */
 extern u8 D_8008EA13;
 
-/* Pointer to a 0x20-byte-stride table; only the two trailing byte
- * fields this function reads are named. */
+/* Pointer to a 0x20-byte-stride table. Originally only the two
+ * trailing byte fields func_8002F3E8 reads (unkC/unkD) were named;
+ * func_8002FAC4 (below) additionally needs unk0/unk1/unk2/unk3/unk4/
+ * unk5/unk6/unk7/unk16, all in the same struct (no offset conflicts,
+ * per this project's convention of extending rather than duplicating
+ * a local view when the fields don't overlap). */
 typedef struct {
-    u8 pad[0xC];
+    u8 unk0; /* +0x0 */
+    u8 unk1; /* +0x1 */
+    u8 unk2; /* +0x2 */
+    u8 unk3; /* +0x3 */
+    u8 unk4; /* +0x4 */
+    u8 unk5; /* +0x5 */
+    u8 unk6; /* +0x6 */
+    u8 unk7; /* +0x7 */
+    u8 pad8[0xC - 0x8];
     u8 unkC; /* +0xC */
     u8 unkD; /* +0xD */
-    u8 padE[0x20 - 0xE];
+    u8 pad0E[0x16 - 0xE];
+    u8 unk16; /* +0x16 */
+    u8 pad17[0x20 - 0x17];
 } Tbl32E978;
 extern Tbl32E978 *D_8008E978;
 

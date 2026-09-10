@@ -1,0 +1,411 @@
+# func_8002FAC4 -- STALL: 15 words LONG (402/387 built length), first real diff at vram 0x8002FAC4 (function entry, differing register-save set / frame size 0x140 vs retail's 0x148)
+
+Unit: `src/code_179d8_m.c`. Round 27, runner bravo. This is the ordered
+work-list's item 1 -- FRESH ground, no prior report existed for this
+function.
+
+## Screens (clean)
+
+```
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002FAC4.s            -> no hits
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_m/func_8002FAC4.s \
+  | grep -E '\b(mult|multu|div|divu)\b'                                   -> no hits
+```
+
+## Result
+
+`./build-and-verify.sh` GREEN with `INCLUDE_ASM` restored (self-tested by
+splicing the preserved body below back in and rebuilding). Best attempt
+compiled clean at **402 words against retail's 387** (`objdump -t
+build/src/code_179d8_m.c.o` on the linked object; the `funcdiff.py`
+in-range figure, 6/387, is **not trustworthy** given the length mismatch
+and its own drift warning -- see CLAUDE.md's four-ways-a-score-lies list).
+`tools/asm-differ/diff.py`, which realigns past the length gap, shows the
+function's **large-scale structure is already right**: the signature, all
+seven branch targets, the two loops, every struct field access and every
+call site line up with retail one-for-one, modulo register renames, for
+most of the function's length. Two specific, localized residues account
+for essentially the whole 15-word gap (see below); nothing else in the
+function showed a genuine content/order mismatch in this round's reading.
+
+## Signature -- corroborated independently by three sibling units, not just derived here
+
+```c
+s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+```
+
+Before writing any C, `grep -rn func_8002FAC4 src/*.c docs/match-reports/*.md`
+turned up this **exact** signature already guessed independently by
+`code_179d8_i.c`, `code_179d8_j.c` and `code_179d8_k.c` (each calls this
+function and typed it from its own call site), plus two live call sites
+with concrete argument roles:
+
+- `code_179d8_j.c`'s `func_800302DC` (matched): `return
+  func_8002FAC4(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
+  0x21` is a real sentinel value this function itself branches on (see
+  below).
+- `code_179d8_k.c`'s `func_800344FC` (its own report, STALL):
+  `func_8002FAC4(packed, note, vol, (u8)a3, (u16)divided, status)` where
+  `packed = (a1<<8)|a0` is a `[screen | slot<<8]` pair into the SAME
+  `D_800902E8[][]` array this function itself indexes with `a0`. This
+  confirms `a0`'s low byte is a `D_800902E8` row index and its next byte an
+  index into that row -- exactly what this function's own disassembly
+  does with `a0 & 0xFF` and `(a0<<16)>>>24`.
+
+This cross-corroboration also fixed a signature bug `m2c` could not have
+caught: the true 5th parameter (this report's `a4`) gates the function's
+main branch (`bnez s2,...` in retail, where `s2` is loaded from the 5th
+incoming stack slot). An early draft this round wrote `if (a5 != 0)`
+instead of `if (a4 != 0)` -- both compile, both build clean, and the bug
+was only caught by cross-checking which REGISTER retail's branch actually
+tests (`s2`, not `s6`) against `tools/asm-differ`'s realigned output. Worth
+flagging generally: a 5-argument-plus function with two stack-passed tail
+arguments is exactly the shape where this kind of off-by-one is invisible
+until you diff registers, not just word counts.
+
+## Struct/global knowledge derived this round
+
+- `SlotE968M` / `D_8008E968`: the SAME 0x10-stride table `code_179d8_j.c`
+  already documents as `SlotE968` (`unk0`/`unk1`/`unk4`) -- this function's
+  own local view, same shape, used here as `&D_8008E968[a2]` (a2 = this
+  function's own s16 parameter, NOT a channel id from `func_80032148`).
+- `Entry90902E8M` / `D_800902E8[]`: the SAME 172(0xAC)-byte
+  `[screen][slot]`-indexed record array `code_179d8_i/j/k.c` each already
+  document with their own reduced view. This function only needs
+  `unk12` (a byte OFFSET, per `code_179d8_k.c`'s fuller struct) and reads
+  a per-voice "speed" `s16` at `*(s16*)((u8*)rec + 0x4E + rec->unk12*2)` --
+  the SAME access shape `code_179d8_k.c`'s `func_800344FC` already uses on
+  the identical field, corroborating both units' independent readings.
+- `Tbl32E978` (already declared for `func_8002F3E8`'s stall) needed
+  EXTENDING, not a second conflicting type: this function additionally
+  touches `unk0`/`unk1`/`unk2`/`unk3`/`unk4`/`unk5`/`unk6`/`unk7` (a
+  per-channel byte-field block used in bulk) alongside the existing
+  `unkC`/`unkD`, none of which overlap.
+- `ObjE970` (already declared with a `+0x18` byte field for the stalled
+  `func_8002E4D8`/`func_8002EA44` bodies) needed a NEW `u16` field at
+  `+0x12` -- a "channel-count difficulty threshold" compared unsigned
+  against `D_8008EA13`. Since neither prior user of `ObjE970` is currently
+  compiled (both are `INCLUDE_ASM`), extending the struct in place was
+  safe; confirmed no active code referenced the old shape before editing.
+- Twelve NEW plain scratch globals in the `D_8008EA0C`-`D_8008EA20` /
+  `D_8008EA24` cluster this unit had not needed yet: `D_8008EA0C`,
+  `D_8008EA0D`, `D_8008EA0E`, `D_8008EA0F`, `D_8008EA1C`..`D_8008EA20`,
+  `D_8008EA24`. All plain `u8`/`u16` scratch, all already declared with
+  identical types in `code_179d8_j.c`'s own header block for the sibling
+  `func_80030E90` -- this was the single biggest time-saver this round
+  (see "Where this came from" below).
+
+## Where this came from: a sibling unit had already typed almost everything
+
+Before deriving anything by hand, `grep -rn func_8002FAC4 src/*.c` found
+this function's signature independently triple-corroborated (above), and
+`code_179d8_j.c`'s header comment for its OWN (still-`INCLUDE_ASM`)
+`func_80030E90` already named the exact same globals this function
+touches (`D_8008EA0C` through `D_8008EA20`, `D_8008EA24`) as "a `start
+channel` setup routine that stages its parameters and a couple of table
+lookups into a block of one/two-byte globals before registering a new
+active-channel record" -- which is precisely this function's own shape.
+Reusing that unit's already-typed externs (rather than re-deriving them
+from scratch) turned what would have been a multi-round struct-recovery
+exercise into a formatting exercise. **Grep the whole `src/` tree for a
+function's name and its likely globals before doing any asm archaeology
+by hand** -- for a function this deep into a shared record-family unit,
+someone touching an adjacent unit has usually already typed half of it.
+
+## The two residues that account for the 15-word gap
+
+### 1. An early value materializes too soon (byte1/`a0s16` split), ~2-3 words
+
+Retail's `a0` (this function's packed screen/slot id) needs THREE
+different views: its low byte (`a0 & 0xFF`, for the `D_800902E8` row
+index), a sign-extended 16-bit copy (`s1` in retail, used later as
+`func_800300D0`'s first argument), and a second byte (`(u8)((u16)s1 >>
+8)`, the row's slot index) -- and retail computes the LAST TWO from a
+SHARED intermediate (`v1 = a0 << 16`, materialized ONCE, then `sra v1,16`
+for the sign-extend and, SEPARATELY, `srl v1,24` reusing that SAME shifted
+value for the slot byte). Writing this as three independent C expressions
+(`byte0 = (u8)a0`, `shifted = a0<<16`, `a0s16 = (s16)(shifted>>16)`,
+`byte1 = (u32)shifted>>24`) reproduces the SHARED-INTERMEDIATE shape
+correctly (confirmed: `tools/asm-differ` shows the `srl`/multiply-by-172
+chain landing byte-for-byte identical to retail once phrased this way,
+where an earlier draft using `(u8)(a0>>8)` directly against the raw
+32-bit parameter compiled to a simple `srl 8` instead of retail's
+`sll 16`/`sra 16`/`srl 24` three-instruction dance).
+
+**What did NOT close: the exact program POINT where this triple gets
+materialized.** My C computes it immediately after `byte0`, at the very
+top of the function; retail computes it LATER, interleaved with the `s7 =
+a3` copy and the `sh a2,sp+0x110` original-parameter save. A bare
+`__asm__("")` inserted between `byte0`'s computation and this triple was
+tried as a scheduling barrier and made things dramatically WORSE (it
+disrupted the compiler's whole prologue scheduling, reordering the
+stack-argument loads ahead of the sign-extension code entirely --
+reverted immediately, recorded here so the next attempt does not re-try
+it at this exact position). Not resolved within this round's budget;
+worth a few words at most.
+
+### 2. Mid-loop re-reads of `D_8008EA26` cost 2-3x retail's addressing, ~10-12 words
+
+This is the larger and more interesting residue. Deep in the per-match
+loop, retail re-reads the "currently selected channel" scratch
+`D_8008EA26` **roughly ten times** (once before each of ten different
+0x34-stride record-family array stores: `D_8008D98A`, `D_8008D996`,
+`D_8008D99E`, `D_8008D998`, `D_8008D99A`, `D_8008D990`, `D_8008D992`,
+`D_8008D99C`, `D_8008D994`, `D_8008D9A0`, `D_8008D988`) -- and reaches
+`D_8008EA26`, plus several OTHER nearby scratch globals it needs in the
+same stretch (`D_8008EA0D`, `D_8008EA13`, `D_8008EA18`, `D_8008EA1B`),
+through ONE shared base pointer materialized once (`s0 = &D_8008EA24`,
+where `D_8008EA26` sits at `s0+2`), via a `lh v1,2(s0)` costing **ONE
+word per re-read**.
+
+My C reads `D_8008EA26` directly by its global symbol name at each of
+those ten sites (it is declared `volatile u16` file-wide, per this unit's
+own established idiom, specifically so each re-read is not elided). This
+compiles CORRECTLY in content but at 2-3 WORDS per re-read instead of
+retail's one (a fresh `lui`+`lhu` pair, sometimes plus a separate `andi`
+mask, rather than one small-offset load off an already-materialized base)
+-- this is the single largest contributor to the 15-word gap.
+
+**Two things were tried, both instructive, neither landing as-is:**
+
+- **A bare `__asm__("")` before each of the ten reads**, to try to force
+  retail's apparent "always reload, never cache" behavior explicitly:
+  this actually made the build WORSE (410 words, +8), because it forced
+  a FULL fresh `lui`+`lhu`+`andi` at every site rather than reusing even
+  the cheap parts of the address computation -- confirming the
+  redundant-reload SHAPE was already correct without the barrier; the
+  barrier only worsened the ADDRESSING cost. Reverted.
+- **An explicit shared base pointer**, `u8 *base = (u8*)&D_8008EA24;`,
+  with every mid-block read rewritten as `*(s16*)(base+2)` (for
+  `D_8008EA26`) and similar small-offset casts for the others (matching
+  retail's `s0`-relative offsets exactly, e.g. `D_8008EA13` at `base-0x11`,
+  `D_8008EA18` at `base-0xC`): this DID reproduce the cheap one-word
+  addressing, but overshot dramatically in the other direction -- **335
+  words (52 SHORT)**, because it let the compiler treat the pointer
+  dereferences as ordinary (non-volatile) memory reads and CSE the
+  repeated `idx*52` multiply-chain across MULTIPLE of the ten array
+  stores, which retail's disassembly shows it does NOT do (retail
+  recomputes the index and the full multiply-by-52 chain independently at
+  EVERY one of the ten sites, `sll`/`addu`/`sll`/`addu`/`sll`, even though
+  the index value provably cannot have changed between them). **This is
+  the opposite failure mode from #1 above and equally informative: the
+  cheap ADDRESSING and the redundant, un-cached RE-COMPUTATION are two
+  separate properties, and neither of the two mechanical levers tried
+  (direct volatile-symbol access, or a plain-pointer shared base) gets
+  BOTH right simultaneously.** Reverted to the direct-symbol form (the
+  402-word state) as the better-corroborated of the two, since it matches
+  retail in CONTENT and ORDER everywhere except addressing cost, while the
+  335-word pointer version dropped real content retail has.
+
+### Proposed learning
+
+**A scratch global read through a shared-base-pointer idiom (documented
+elsewhere in this project as "several globals a few bytes apart, reached
+via one materialized base register") needs BOTH properties reproduced
+together -- cheap addressing AND no cross-read CSE of the surrounding
+computation -- and this round found no single C-level lever that gets
+both at once.** Direct symbol access (declared `volatile`) reproduces the
+NO-CSE property but not the cheap addressing (retail folds the address
+compute into ONE base register that this project's C has no clean way to
+force without ALSO defeating the volatile-style non-caching, per this
+round's two tried levers). Suspect a `volatile`-qualified POINTER TYPE for
+the shared base (`volatile u8 *base = ...`) might thread this needle --
+NOT tried this round; the file's existing note on `D_8008EA26` says a
+plain (non-volatile) pointer type still preserves the fold for a
+single-read case, but this function's TEN-reads-in-a-row case may need
+the pointer itself volatile-qualified to also block the CSE. Worth the
+first attempt for whoever picks this back up.
+
+## Preserved body (best attempt, 402/387 built words -- 15 long, structurally correct throughout except the two residues above)
+
+```c
+#if 0
+/* Base pointer for a table of 0x10-byte slots, same shape as
+ * code_179d8_j.c's own SlotE968 local view of the same D_8008E968
+ * global -- only the three byte fields this function touches are
+ * named, per this project's reduced-local-view convention. */
+typedef struct {
+    u8 unk0; /* +0x0 */
+    u8 unk1; /* +0x1 */
+    u8 pad2[0x4 - 0x2];
+    u8 unk4; /* +0x4 */
+    u8 pad5[0x10 - 0x5];
+} SlotE968M;
+extern SlotE968M *D_8008E968;
+
+/* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to
+ * arrays of these, indexed [screen][slot]-style by a packed argument
+ * (slot in the high byte, screen in the low byte) -- same array
+ * code_179d8_j.c/_k.c/_i.c already document, each with its own reduced
+ * local view. This function only needs the `unk12` byte-offset field
+ * (see code_179d8_k.c's fuller Entry90902E8 for what it points at:
+ * `*(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2)` is a per-voice "speed"
+ * table this function also reads, same access shape as that unit's own
+ * func_800344FC). */
+typedef struct {
+    u8 pad0[0x12];
+    u8 unk12; /* +0x12 */
+    u8 pad13[0xAC - 0x13];
+} Entry90902E8M;
+extern Entry90902E8M *D_800902E8[];
+
+extern u8 D_8008EA0C;
+extern u8 D_8008EA0D;
+extern u8 D_8008EA0E;
+extern u8 D_8008EA0F;
+extern u8 D_8008EA1C;
+extern u8 D_8008EA1D;
+extern u8 D_8008EA1E;
+extern u8 D_8008EA1F;
+extern u8 D_8008EA20;
+extern u16 D_8008EA24;
+
+extern Rec34Half D_8008D98A[];
+extern Rec34Half D_8008D990[];
+extern Rec34Byte D_8008D992[];
+extern Rec34S16 D_8008D998[];
+extern Rec34Half D_8008D9A0[];
+
+extern void func_8002D6A4(void);
+extern void func_8002D8E0(s32 a0);
+extern s32 func_8002DF7C(void);
+extern void func_8002D1B4(s32 a0, u16 a1);
+extern u8 func_800300D0(s16 a0, s16 a1, s16 a2, u16 a3);
+
+/* Called as `func_8002FAC4(0x21, p0, p1, p2, outA, outB)` from
+ * code_179d8_j.c's func_800302DC and as
+ * `func_8002FAC4(packed, note, vol, (u8)a3, (u16)divided, status)` from
+ * code_179d8_k.c's func_800344FC -- signature confirmed independently
+ * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
+ * agree on this exact shape). `a0` is a packed [screen | slot<<8]
+ * dispatch id into `D_800902E8`; `a1`/`a2` are the "key" values
+ * `func_800300D0`'s own three-field match loop checks; `a4`/`a5` are
+ * 7-bit-percentage volume/pan bytes staged into the same
+ * D_8008EA10/D_8008EA11 scratch globals the interpolation-setup
+ * functions elsewhere in this unit use. */
+s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
+{
+    Entry90902E8M *s6;
+    SlotE968M *slot;
+    s32 s3;
+    s32 chan;
+    u8 matchCount;
+    u8 chanScan;
+    s16 origA2;
+    s32 shifted;
+    s16 a0s16;
+    u8 byte0;
+    u8 byte1;
+    u8 idBuf[0x80];
+    u8 chanBuf[0x80];
+
+    origA2 = a2;
+    byte0 = (u8) a0;
+    shifted = a0 << 16;
+    a0s16 = (s16) (shifted >> 16);
+    byte1 = (u32) shifted >> 24;
+    s6 = &D_800902E8[byte0][byte1];
+
+    if (func_80032148(a1, a2) != 0) {
+        return -1;
+    }
+
+    slot = &D_8008E968[a2];
+    D_8008EA22 = (s16) a0;
+    D_8008EA0E = (u8) a3;
+    D_8008EA0F = 0;
+    D_8008EA10 = (u8) a4;
+    D_8008EA11 = (u8) a5;
+    D_8008EA16 = slot->unk1;
+    D_8008EA17 = slot->unk4;
+    D_8008EA0C = slot->unk0;
+
+    if ((u32) D_8008EA13 >= D_8008E970->unk12) {
+        return -1;
+    }
+
+    s3 = 0;
+    if (a4 != 0) {
+        matchCount = 0;
+        for (chanScan = 0; chanScan < D_8008EA0C; chanScan++) {
+            Tbl32E978 *entry = &D_8008E978[D_8008EA13 * 16 + chanScan];
+
+            if (D_8008EA0E < entry->unkC) {
+                continue;
+            }
+            if (entry->unkD < D_8008EA0E) {
+                continue;
+            }
+            idBuf[matchCount] = entry->unk16;
+            chanBuf[matchCount] = chanScan;
+            matchCount++;
+        }
+
+        if (matchCount != 0) {
+            s32 s2;
+            u8 s1;
+
+            s2 = a4 * 127;
+            for (s1 = 0; s1 < matchCount; s1++) {
+                Tbl32E978 *entry2;
+
+                D_8008EA24 = idBuf[s1];
+                D_8008EA18 = chanBuf[s1];
+
+                entry2 = &D_8008E978[D_8008EA13 * 16 + D_8008EA18];
+                D_8008EA1B = entry2->unk0;
+                D_8008EA19 = entry2->unk2;
+                D_8008EA1A = entry2->unk3;
+                D_8008EA1C = entry2->unk4;
+                D_8008EA1D = entry2->unk5;
+                D_8008EA20 = entry2->unk1;
+                D_8008EA1E = entry2->unk6;
+                D_8008EA1F = entry2->unk7;
+
+                chan = func_8002CF18(0) & 0xFF;
+                D_8008EA26 = chan;
+                if (chan < D_8008E9D0) {
+                    D_8008D9A3[chan].unk0 = 1;
+                    D_8008D98A[D_8008EA26].unk0 = 0;
+                    D_8008D996[D_8008EA26].unk0 = (s16) a0;
+                    D_8008D99E[D_8008EA26].unk0 = D_8008EA0D;
+                    D_8008D998[D_8008EA26].unk0 = D_8008EA13;
+                    D_8008D99A[D_8008EA26].unk0 = origA2;
+
+                    if ((s16) a0 != 0x21) {
+                        s16 speed = *(s16 *) ((u8 *) s6 + 0x4E + s6->unk12 * 2);
+
+                        D_8008D990[D_8008EA26].unk0 = s2 / speed;
+                    }
+
+                    D_8008D992[D_8008EA26].unk0 = (u8) a5;
+                    D_8008D99C[D_8008EA26].unk0 = D_8008EA18;
+                    D_8008D994[D_8008EA26].unk0 = a3;
+                    D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
+                    D_8008D988[D_8008EA26].unk0 = D_8008EA24;
+
+                    func_8002D6A4();
+                    if (D_8008EA24 == 0xFF) {
+                        func_8002D8E0(*(u8 *) &D_8008EA26);
+                    } else {
+                        func_8002D1B4(matchCount, func_8002DF7C());
+                    }
+                    s3 = (s3 << 4) | D_8008EA26;
+                }
+            }
+        }
+    } else {
+        func_800300D0(a0s16, a1, a2, a3);
+    }
+
+    return s3;
+}
+#endif
+```
+
+Note: `ObjE970` gained a `+0x12` `u16` field for this attempt (see
+"Struct/global knowledge" above) -- that extension is left in place in
+`src/` (outside the `#if 0`) since it does not affect any currently
+compiled function and the next attempt at this function, or at
+`func_8002E4D8`/`func_8002EA44` (which also use `D_8008E970`), will need
+it again.
