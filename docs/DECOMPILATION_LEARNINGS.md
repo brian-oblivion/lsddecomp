@@ -4568,6 +4568,107 @@ the call is argument-less. Used correctly it settled `func_80050A84`'s
 signature (`void`, byte-exact first attempt); used carelessly it would have
 mis-typed `func_80050AA4`.
 
+### Round 27: the register COUNT and the addressing-mode IMMEDIATE are ONE axis -- and a named local is NOT the lever for it
+
+**This entry exists because the head proposed a mechanism, a runner tested it
+exactly as specified, and it was wrong.** The correction is more useful than
+the hypothesis was, and it bounds the SCOPE of the allocno entry above --
+which the head had over-generalised.
+
+`func_8002BCEC` (`code_179d8_d`, 175 words) came out 3 words short, with one
+struct-field write whose `swl`/`swr` immediates were `7`/`4` where retail has
+`3`/`0`. Runner charlie originally filed it as register identity. **The head
+overturned that verdict, correctly**: charlie's own description had one form
+using **8** callee-saved registers and the other **7**, and a differing
+register COUNT is not identity -- identity is the same allocation with
+different names. So CLAUDE.md's identity ban does not apply and the function
+must not be marked "do not try".
+
+**The head then proposed the wrong reason for it.** Reasoning from the allocno
+entry above, it argued the 8-register form came from `UWord *sizeField = ...`
+creating a new allocno, and that an inline cast expression with no named
+pointer would be the untried third combination that got both right.
+
+Charlie tried that exact form and then settled the question with six measured
+variants:
+
+| destination spelling | callee-saved regs | `swl`/`swr` immediates |
+| --- | --- | --- |
+| `*(UWord*)((u8*)base+off+4)` -- the head's suggested inline cast, **no named pointer anywhere** | 8 (extra) | `3`/`0` **(right)** |
+| `UWord *sizeField = ...; *sizeField = ...` (new named local) | 8 (extra) | `3`/`0` (right) |
+| `slot->size` -- reusing an **already-live** pointer, **zero new names** | 7 (right) | `7`/`4` (wrong) |
+| `*(UWord*)((u8*)slot+4)` -- same reused pointer, raw-cast spelling | 7 (right) | `7`/`4` (wrong) |
+| `EntryB3F0 *base = D_8008B3F0;` then `*(UWord*)((u8*)base+off+4)` | 8 (extra) | `3`/`0` (right) |
+
+**Row 1 and row 2 are the same outcome, so "no named pointer" was not a new
+combination. Row 3 is the decisive one: the same address computed through an
+ALREADY-LIVE pointer, introducing no name at all, still gets the WRONG
+immediates.** So introducing a name is not what causes the wrong immediates
+and removing one is not what fixes them.
+
+**What the rows do show, and it is sharper than either hypothesis: the
+register count and the immediate split are ONE axis, not two knobs.** Either
+the address is materialised fresh into its own register (right immediates, one
+extra register) or it is folded into the store's immediate (right count, wrong
+immediates). Retail's shape -- an extra `addiu` into a **scratch** register,
+costing no extra *persistent* register -- was reached by none of the six. That
+is the third shape a future attempt needs, and it is a real open residue.
+
+Two immediately reusable by-products:
+
+- **Rows 3 and 4 are byte-identical output.** Struct-field access and raw
+  pointer arithmetic compile the same once the base register is the same, so
+  **re-spelling one as the other is never a lever** -- it retires a whole
+  class of guesses that look like distinct attempts.
+- **The allocno entry's scope is now bounded.** "A new name creates a new
+  allocno competing for a callee-saved register" is real and has closed
+  functions. It does **not** govern how GCC materialises an address for a
+  store. Do not reach for it on an addressing-mode residue.
+
+**The generalisable process point, since this is the second time in one round
+a confident mechanism was wrong:** the head's verdict correction (not identity)
+was right and its mechanism (allocno) was wrong, and those are separable
+claims. A runner told "your class is wrong, and here is why" should test the
+*why* and report back when it fails -- charlie did, with a table, and the
+result is a bounded open residue instead of a false lead the next round would
+have re-run. Ask for the mechanism to be tested, not accepted.
+
+### Round 27: the DCE-eliminated always-true check gets a structural hypothesis (and two axes closed)
+
+The class -- retail keeps a check GCC's dead-code elimination removes -- now
+has **two confirmed instances in sibling CD functions**: `func_8002B94C`
+(`CD_newmedia`) and `func_8002BCEC` (`CD_cachefile`). Round 27 closed two of
+its axes and produced the first structural lead.
+
+`func_8002B94C`'s report already concluded the original source expression
+"must not have been immediately foldable to a literal by this compiler". The
+head pushed on that: charlie's three prior attempts (`while(1)`,
+`if(ok==1)`, `while(ok==1)`) all used a **local** whose value GCC can trace,
+so they were one attempt in three spellings, not three attempts.
+
+Two new axes, both measured, both negative:
+
+- **A global-sourced condition DOES survive DCE** -- confirmed, so the
+  premise is right -- but produces the **wrong instruction shape**: a real
+  `lw`+`slti`+`bnez` where retail has `ori`/`beqz`/`nop`.
+- **A call-sourced condition is ruled out structurally, without a build.**
+  Retail's window is exactly three instructions (`ori`/`beqz`/`nop`) and
+  there is no room in it for a load or a call. That is the right way to kill
+  an axis -- read the space available, rather than compiling a guess.
+
+**The structural lead, which is the round's actual contribution here:** in
+BOTH instances the dead check sits **immediately after a conditionally-executed
+debug print** -- i.e. at a **branch-merge join**, not in straight-line code.
+That makes a join-crossing DCE limitation a plausible trigger: GCC's
+elimination may be weaker across a join than within a basic block, so retail's
+compiler kept a check that any straight-line reproduction loses. Untested, and
+worth checking on a **third** instance before believing it.
+
+So the axes now stand: not a scheduling residue (barriers are inapplicable in
+principle, since the question is whether a branch EXISTS); not reachable from a
+traceable local; not from a global (survives, wrong shape); not from a call (no
+room). What is untried is reproducing the **join** rather than the condition.
+
 ### Proposed learnings that did NOT earn promotion (round 17)
 
 Recorded because an unpromoted claim that leaves no trace gets re-derived,
