@@ -204,6 +204,8 @@ GPU_cw = 0x80023898; // type:func  (Psy-Q libapi/c73, from the SDK object)
 // second copy at 0x8002C014; that object is not linked yet and only one of
 // the two can carry the name here.
 memcpy = 0x800238A8; // type:func  (Psy-Q libc2/memcpy, from the SDK object)
+GsDefDispBuff = 0x80024734; // type:func  (Psy-Q libgs/gs_103, from the SDK object)
+gte_init = 0x800247D4; // type:func  (Psy-Q libgs/gs_121, from the SDK object)
 new_class_6d3c8 = 0x80025F7C;
 strcat = 0x80027130;
 new_class_6d4e8 = 0x800271D8;

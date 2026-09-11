@@ -124,6 +124,17 @@
 3.3  libapi/c73     0x14098
 3.3  libc2/memcpy   0x140A8
 
+# psyq_GsLinkObject4 chunk D (0x14F34..0x15020): libgs/gs_103
+# (GsDefDispBuff) and libgs/gs_121 (gte_init). Text-only; `place` derives no
+# PROGBITS section for either, and their 0xA0 .bss blocks (no relocation
+# names them) go through the fragment, which reports no NOTE. They sit
+# between libgs/gs_003 (0x14E9C) and libgs/gs_002 (0x15020), both of which
+# are placed and both EXCLUDED for scattered static bss -- so the fragment
+# pins GsSetDrawBuffClip and GsSetDrawBuffOffset as externals and those two
+# addresses keep their func_ names.
+3.3  libgs/gs_103    0x14F34
+3.3  libgs/gs_121    0x14FD4
+
 # libetc/intr (the interrupt/callback core: ResetCallback, InterruptCallback,
 # DMACallback, VSyncCallback ...). Text and .data (the 0x109C callback tables
 # at 0x5CA70) are the 3.3 object's; its .rdata carries the RCS string

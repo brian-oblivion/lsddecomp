@@ -393,11 +393,20 @@ segments:
       - [0x10EE0, asm, psyq_10ee0]
       - [0x14098, o, libapi/c73]        # GPU_cw (Psy-Q 3.3)
       - [0x140A8, o, libc2/memcpy]      # memcpy
-      # 0x140DC..0x15510: the rest of the old psyq_GsLinkObject4, still asm.
-      # 0x140DC..0x14708 is the placed libgs/gs_001, EXCLUDED by head decision:
-      # its .bss holds statics Sony's linker scattered, and a static cannot be
-      # pinned by name, so the object cannot be linked unedited.
+      # 0x140DC..0x14E9C, still asm. 0x140DC..0x14708 is the placed
+      # libgs/gs_001, EXCLUDED by head decision: its .bss holds statics Sony's
+      # linker scattered, and a static cannot be pinned by name, so the object
+      # cannot be linked unedited.
       - [0x140DC, asm, psyq_140dc]
+      # 0x14E9C..0x14F34 is the placed libgs/gs_003, excluded for the same
+      # reason (scattered static bss). GsSetDrawBuffClip lives here.
+      - [0x14E9C, asm, psyq_14e9c]
+      - [0x14F34, o, libgs/gs_103]      # GsDefDispBuff (Psy-Q 3.3). bss via the fragment
+      - [0x14FD4, o, libgs/gs_121]      # gte_init. bss via the fragment
+      # 0x15020..0x1514C is the placed libgs/gs_002, excluded for the same
+      # reason (scattered static bss). GsSetDrawBuffOffset lives here.
+      # 0x1514C..0x15510 is still asm under the same name for now.
+      - [0x15020, asm, psyq_15020]
       # libetc/intr from the SDK object (Psy-Q 3.3): ResetCallback, InterruptCallback,
       # DMACallback, VSyncCallback(s), Stop/Restart/CheckCallback, Get/SetIntrMask,
       # startIntr, trapIntr, setIntr, stopIntr, restartIntr, memclr. .data at 0x5CA70;
