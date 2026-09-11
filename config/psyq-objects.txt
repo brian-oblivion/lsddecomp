@@ -102,6 +102,12 @@
 3.3  libgte/msc02    0x7D70
 3.3  libgte/smp_00   0x8010
 
+# psyq_GsLinkObject4 chunk A (0xF8C8..0xFA50): libgte/ratan -- ratan2 and
+# ratan. Data: .data 0x5BE9C (0x802, the arctan table, dlabel D_8006B69C),
+# confirmed by byte search. 0x802 is not 2-aligned, so the yaml needs a
+# 2-byte `pad` before D_8006BEA0 at 0x5C6A0.
+3.3  libgte/ratan   0xF8C8
+
 # libetc/intr (the interrupt/callback core: ResetCallback, InterruptCallback,
 # DMACallback, VSyncCallback ...). Text and .data (the 0x109C callback tables
 # at 0x5CA70) are the 3.3 object's; its .rdata carries the RCS string
