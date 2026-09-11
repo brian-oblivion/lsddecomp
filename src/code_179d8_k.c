@@ -572,33 +572,30 @@ typedef struct {
     u8 pad2[0x20 - 0x2];
 } Scratch_80034C28;
 
-/* STALL -- see docs/match-reports/func_80034C28.md. Compiled length ONE
- * WORD SHORT (89/90). Two distinct residues: the family's register-rescue
- * class (same as func_800349B0/func_80034AEC) plus a NEW immediate-
- * constant canonicalization difference. */
-#if 0
 void func_80034C28(s16 a0, s16 a1, s32 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
-    u8 *p = (u8 *)rec + rec->unk12;
+    u8 offset;
     NoteList_800349B0 list;
     Scratch_80034C28 scratch;
     s32 i;
+    s32 wrap;
 
-    func_800334F0(rec->unk4C, p[0x2C], &list);
+    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         if ((u8)a2 < 0x40) {
             scratch.unk1 = 2;
-        } else if ((u8)(a2 + 0xC0) < 0x40) {
-            scratch.unk1 = 0;
+        } else {
+            wrap = 0xC0;
+            if ((u8)(a2 + wrap) < 0x40) {
+                scratch.unk1 = 0;
+            }
         }
-        func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034C28);
 
 /* STALL -- see docs/match-reports/func_80034D90.md. length exact 51/51,
  * 49/51 raw word-match, residue is the project's settled commutative-
