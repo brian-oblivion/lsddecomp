@@ -5533,6 +5533,36 @@ in six carries a false "clean / drift-free" claim. Both say: **the report is
 evidence about a build that happened once, and the oracle is the build you run
 now.**
 
+### A permuter scaffold can silently score a DIFFERENT residue than the real build — sanity-check it before searching (round 32, second instance)
+
+`tools/setup-permuter.sh` builds an ISOLATED compile of one function. That
+compile can schedule differently from the same function inside its real
+translation unit, and when it does, the search optimises toward a residue the
+oracle does not have. A zero there would not transfer; a negative there proves
+nothing.
+
+Round 32's `func_8004C1C0` caught it the right way: `--debug` on the scaffold
+reported **9 insertions and 9 deletions**, while the real in-context build has
+**zero** of either (its 72/106 is register identity plus one reread choice, no
+missing or extra instructions). The scaffold was discarded unused rather than
+searched. This is the second recorded instance — `func_8004BB3C` hit the
+identical trap in round 17.
+
+**So the check is mandatory, not optional, and it is one command:** run
+`--debug` on the scaffold and compare its insertion/deletion/reordering profile
+against the residue `funcdiff.py` and `asm-differ` report for the REAL build,
+*before* spending a search. If the two disagree about the SHAPE of the residue,
+the scaffold is measuring a different function and the only correct move is to
+delete it.
+
+Note how this compounds with the two other permuter cautions this file
+carries. A search can fail to find a fix that exists (round 32's
+`func_8001E6F8`, closed by a two-line transposition after 34,825 iterations);
+a flat score can simply mean the sampled space missed it (round 32's
+`func_8002EDD4`, closed by a second independent run at iteration 66,199); and
+now the scaffold itself can be scoring the wrong target. **A permuter negative
+is evidence about one search against one scaffold, and nothing more.**
+
 ## Open questions
 
 - **What is the class-table header word at `+0x000`? PARTLY ANSWERED, and the
