@@ -121,3 +121,13 @@
 3.3  libspu/s_m_util 0x27D00
 3.3  libspu/s_snv    0x27DE8
 3.3  libspu/s_sca    0x27E0C
+
+# psyq_SpuSetMute chunk B (0x29318..0x29554 and 0x29574..0x29644): two short
+# runs either side of a 0x20-byte gap -- the SPU common read/write-area
+# helpers plus two libapi BIOS trampolines, and SpuSetReverb on its own.
+# Text-only; `place` derives no data section for any of the five.
+3.3  libapi/a07      0x29318
+3.3  libspu/s_crwa   0x29328
+3.3  libapi/a10      0x294C8
+3.3  libspu/s_m_f    0x294D8
+3.3  libspu/s_sr     0x29574

@@ -219,6 +219,14 @@ _SpuIsInAllocateArea = 0x80037500; // type:func  (Psy-Q libspu/s_m_util, from th
 _SpuIsInAllocateArea_ = 0x80037570; // type:func  (Psy-Q libspu/s_m_util, from the SDK object)
 SpuSetNoiseVoice = 0x800375E8; // type:func  (Psy-Q libspu/s_snv, from the SDK object)
 SpuSetCommonAttr = 0x8003760C; // type:func  (Psy-Q libspu/s_sca, from the SDK object)
+
+// psyq_SpuSetMute chunk B (0x29318..0x29554, 0x29574..0x29644): the SPU
+// reverb work-area helpers and two libapi BIOS trampolines.
+DeliverEvent = 0x80038B18; // type:func  (Psy-Q libapi/a07, from the SDK object)
+SpuClearReverbWorkArea = 0x80038B28; // type:func  (Psy-Q libspu/s_crwa, from the SDK object)
+WaitEvent = 0x80038CC8; // type:func  (Psy-Q libapi/a10, from the SDK object)
+SpuFree = 0x80038CD8; // type:func  (Psy-Q libspu/s_m_f, from the SDK object)
+SpuSetReverb = 0x80038D74; // type:func  (Psy-Q libspu/s_sr, from the SDK object)
 memset = 0x8004117C;
 rand = 0x80049480;
 srand = 0x800494A8;

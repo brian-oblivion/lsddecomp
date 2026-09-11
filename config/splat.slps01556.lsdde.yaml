@@ -782,7 +782,17 @@ segments:
       - [0x27d00, o, libspu/s_m_util]    # _SpuIsInAllocateArea, _SpuIsInAllocateArea_
       - [0x27de8, o, libspu/s_snv]       # SpuSetNoiseVoice
       - [0x27e0c, o, libspu/s_sca]       # SpuSetCommonAttr (owns the 0x1764 jump tables)
+      # Gap: 0x281A0..0x29318 is the game's own libspu build, which no SDK
+      # disc has. Stays asm; do not try to match it as C.
       - [0x281a0, asm, psyq_281a0]
+      # Chunk B: two short runs either side of a 0x20-byte gap.
+      - [0x29318, o, libapi/a07]         # DeliverEvent (BIOS trampoline)
+      - [0x29328, o, libspu/s_crwa]      # SpuClearReverbWorkArea
+      - [0x294c8, o, libapi/a10]         # WaitEvent (BIOS trampoline)
+      - [0x294d8, o, libspu/s_m_f]       # SpuFree
+      - [0x29554, asm, psyq_29554]       # one function, 0x20 bytes, unowned
+      - [0x29574, o, libspu/s_sr]        # SpuSetReverb
+      - [0x29644, asm, psyq_29644]
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as
