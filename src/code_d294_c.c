@@ -28,7 +28,17 @@ void func_8001E600(Class6B5CCObj *self, s32 *dst, s32 *src) {
     dst[2] = dst[2] + table[2];
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E6F8);
+void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out) {
+    Class6B5CCSub44 *src;
+
+    src = self->unk14->unk44;
+    out[0].whole = src->vec.x * 45 >> 9;
+    out[0].frac = 1;
+    out[1].whole = src->vec.y * 45 >> 9;
+    out[1].frac = 1;
+    out[2].whole = src->vec.z * 45 >> 9;
+    out[2].frac = 1;
+}
 
 void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other) {
     self->unk20 = other;
