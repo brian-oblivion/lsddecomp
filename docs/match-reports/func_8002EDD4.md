@@ -1,4 +1,17 @@
-# func_8002EDD4 -- STALL: EXACT length (270/270 built words), 267/270 raw word-match, first real diff at file 0x1F69C / vram 0x8002EE9C -- pure REGISTER-IDENTITY residue (a0 vs s0), same instructions, banned to fix by pinning
+# func_8002EDD4 -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
+
+**Round 32 update supersedes everything below except as a historical record
+of the residue's diagnosis, which was correct and is the reason this match
+was reachable at all.** The function is CLOSED, byte-exact, committed. What
+follows the "Round 32" heading is the current status; everything above it
+documents how the register-identity residue was diagnosed and is preserved
+because the diagnosis itself (not just the eventual fix) is the reusable
+finding.
+
+Original title: STALL: EXACT length (270/270 built words), 267/270 raw
+word-match, first real diff at file 0x1F69C / vram 0x8002EE9C -- pure
+REGISTER-IDENTITY residue (a0 vs s0), same instructions, banned to fix by
+pinning
 
 Unit: `src/code_179d8_m.c`. Round 26 (second pass), runner bravo, incorporating the
 HEAD's diagnosis of the "split scaled index" residue (see below).
@@ -549,3 +562,142 @@ the *premise* was wrong, and a `cwd` guard cannot protect against a wrong
 premise. The missing check was one command: `git -C <wt> log` and a re-read of
 `git status` before concluding a runner is gone, since a paused runner and a
 dead one look identical from outside.
+
+---
+
+## ROUND 32 (bravo): CLOSED -- 270/270, whole-image SHA1 verified
+
+This was this round's designated LEAD TASK, assigned specifically as "the
+closest large near-miss in the corpus" for a clean re-run. Re-verified the
+267/270 register-identity residue from scratch first (matches every prior
+figure exactly, no drift), then ran a fresh, cleanly-bounded permuter search.
+
+### Permuter run: clean exit, own bound never reached -- found zero instead
+
+```sh
+tools/setup-permuter.sh func_8002EDD4 <seed from this report's own preserved body>
+PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3 tools/decomp-permuter/permuter.py \
+  --debug --stack-diffs permuter-work/func_8002EDD4        # sanity check: base score 15
+PATH=$PWD/permuter-work/bin:$PATH nohup timeout 900 .venv/bin/python3 \
+  tools/decomp-permuter/permuter.py -j 6 --stack-diffs --stop-on-zero --best-only \
+  permuter-work/func_8002EDD4 > /tmp/bravo_permuter_8002EDD4.log 2>&1 &
+```
+
+Base score sanity-checked at **15** (3 register differences x 5, zero
+insertions/deletions/reorderings/stack/branch differences) -- matching this
+report's own classification exactly, same as round 30's sanity check.
+
+**Exit accounting, per this round's own instruction to state explicitly
+which of the three (own timeout, external kill, or harness wall-clock cap)
+ended the run: NONE of them. The search's own `--stop-on-zero` flag fired.**
+At iteration 66199 (roughly 10.5 minutes into the 15-minute / 900s `timeout`
+bound -- confirmed by `ps -o etime` immediately before the exit, and the log
+line itself), the permuter printed:
+
+```
+[func_8002EDD4] found new best score! (0 vs 15)
+wrote to permuter-work/func_8002EDD4/output-0-1
+iteration 66199, 0 errors, score = 0
+Found zero score! Exiting.
+```
+
+This is a fourth, distinct outcome from the two the assignment named
+(`timeout`'s 124 vs an external SIGKILL's 137): a **clean, self-terminated
+success exit**, well inside the bound, with no ambiguity about what ended
+it -- the tool's own log states it directly and the process was gone
+immediately after, verified via `ps -p <pid>` returning nothing. No
+"is the exit code recoverable" question applies here at all; this is not
+the round-30/31 ambiguous-kill situation, it is a different kind of ending
+entirely and should not be graded on the same rubric.
+
+### The candidate, and why it is NOT a false lead this time
+
+`permuter-work/func_8002EDD4/output-0-1/diff.txt` shows three related
+substitutions, all using ONE permuter-inserted `int new_var;`:
+
+1. `a0 = (u8) a0; new_var = a0; ... D_8008E9D0 = new_var;` in place of
+   `D_8008E9D0 = a0;` on the else-arm of the min-clamp -- this is exactly
+   this report's own **axis 4** ("named local instead of reassigning the
+   parameter"), which axis 4's isolated testing found WORSE (an extra
+   spurious `move`) when tried ALONE.
+2. `new_var = woff + 0; ... [new_var] = 0;` in place of the direct
+   `[woff + 0] = 0;` for the `D_8006DAD4` zero-store -- hoists the identical
+   arithmetic value into a temp, computed one statement earlier, textually
+   ahead of the intervening `+2`/`+4` stores.
+3. `woff = D_80090C60; D_8008E228 &= ~woff;` -- reuses the (by-then-dead)
+   per-iteration `woff` local as a scratch for `D_80090C60`'s value before
+   the AND-NOT, rather than reading the global twice.
+
+**Confirmed via direct rebuild that (1) and (2) sharing the SAME physical
+variable is what matters, not either substitution alone.** A first
+translation attempt gave (1) and (2) their own separately-named locals
+(`clampVal` for the min-clamp, `zeroOff` for the woff index) -- semantically
+identical to the permuter's single-variable version, and the OBVIOUS,
+more-readable C to write by hand. That attempt built clean but scored
+**47/270 with the whole function's register layout diverging almost
+immediately** -- far WORSE than the pre-existing 267/270 stall. Only when
+both substitutions were made to share **one** `s32` local (matching the
+permuter's own `new_var` reuse exactly) did the build reach **270/270,
+whole-image SHA1 verified**. Substitution (3) reuses an EXISTING loop-local
+(`woff`) and was carried over unchanged; it was not independently isolated
+this round, so whether it is load-bearing on its own is unmeasured -- the
+one axis measured directly is "one shared scratch variable across (1) and
+(2)" vs. "two separately-named locals", and that axis is the whole
+difference between 270/270 and 47/270.
+
+Final committed C keeps the shared variable but with a clearer name
+(`scratch` in place of the permuter's auto-generated `new_var`) and drops
+the semantically-inert `+ 0` from substitution (2) (`scratch = woff;`
+rather than `scratch = woff + 0;`) -- both cosmetic changes reverified
+byte-exact after each edit.
+
+### Verdict on the residue's actual cause (this round's assignment asked
+explicitly for this, given the round-31 handoff's "instruction-placement"
+characterization conflicted with this report's own "register-identity"
+title)
+
+**This report's original title was right, and the fix confirms rather than
+contradicts it: this was and is a genuine register-IDENTITY question, not
+an instruction-placement/scheduling one.** The three-instruction residue
+never changed shape, count, or order -- only which physical register held
+one value. What round 32 found is that the register identity is controlled
+by a SOURCE-LEVEL fact CLAUDE.md's own residue taxonomy does not
+enumerate: **whether a value is reused, via the SAME variable, at a later,
+textually-unrelated point in the same function.** Reusing one `s32` local
+for two disjoint purposes ~150 lines apart is not "instruction order" (the
+CLAUDE.md/`__asm__("")` category) and it is not a banned register pin (no
+`asm` operand constraint, no `register T v asm("$N")` anywhere) -- it is
+ordinary C whose only unusual feature is that the SAME declared variable
+gets written and read at two unrelated program points. That single fact
+was enough to make GCC 2.6.3's allocator choose `$a0` for the min-clamp
+value instead of `$s0`, matching retail exactly. **The lesson for future
+register-identity stalls: before accepting one as durable, check whether
+the source plausibly reuses ONE scratch variable across multiple unrelated
+purposes elsewhere in the same function** -- not just at the residue site
+itself. This was invisible from reading the residue's own three
+instructions in isolation; it only showed up because the permuter searches
+the whole function's mutation space, not just the neighbourhood of the
+diff.
+
+### Proposed learning (new, on top of the ones already in this report)
+
+**A register-identity residue that many hand-reshaping axes and even a
+prior 100k-iteration permuter run could not move is not necessarily a
+durable stall.** This function's own round-30 permuter run (documented
+above) sat flat at score 15 for ~100,458 iterations with no improvement --
+which, per this report's own prior verdict, was "weak evidence the
+mutation space this permuter explores does not reach retail's specific
+allocator choice." That verdict was WRONG, not because the evidence was
+misread, but because round 30's run happened not to sample the specific
+mutation (variable-reuse-across-distant-sites) that closes it, and round
+32's fresh run -- same seed, same search parameters, different RNG
+trajectory -- found it in 66199 iterations. **A flat, unmoving permuter
+score over many iterations is evidence the SAMPLED space doesn't reach the
+target; it is not evidence the FULL mutation space doesn't.** Where budget
+allows, a second independent permuter run (fresh RNG seed) on a
+register-identity stall that previously went 0-for-N is worth the ~15
+minutes before writing the class off as unreachable -- especially when, as
+here, the specific missing mutation (reusing one declared variable for two
+unrelated purposes) is not something a human reshaping by hand would
+naturally try, since it looks strictly worse (an extra, seemingly
+pointless assignment) by ordinary C style standards.
