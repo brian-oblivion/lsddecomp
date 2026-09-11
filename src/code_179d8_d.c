@@ -15,9 +15,13 @@
  * `--addiu-at`; docs/research/addiu-at-blocker.md).  Re-screened with
  * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
  *   func_8002BC40 (43w)   MATCHED round 24, 43/43, first attempt.
- *   func_8002BCEC (175w)  blocker-clean. ROUND 32 CORRECTION: no longer
- *                         cold -- attempted since, 3 words short at
- *                         172/175, full worked report on file. Read it.
+ *   func_8002BCEC (175w)  blocker-clean, and NOT GAME CODE. It lies fully
+ *                         inside `libcd/iso9660.o` (Psy-Q 3.3), an object
+ *                         already placed and verified against retail, so
+ *                         no C matches it -- convert per
+ *                         docs/SDK-OBJECTS-GUIDE.md, do not decompile.
+ *                         553 lines of derivation were spent before
+ *                         anyone asked. `tools/sdkstalls.py` asks.
  * Their stub reports are gone.  The previous version of this comment listed
  * both as "blocked, have stub reports", which by round 24 was a stale
  * DIRECTIVE over free ground -- the fourth unit in two rounds to carry one.

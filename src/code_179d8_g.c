@@ -35,6 +35,19 @@
  * by `tools/nearmiss.py` and by the presence of the report files, not by
  * reading this comment.
  *
+ * AND A SECOND ROUND-32 CORRECTION, made the same day as the one above:
+ * func_8002B640 and func_8002B94C are NOT GAME CODE AT ALL. Both lie fully
+ * inside `libcd/iso9660.o` (Psy-Q 3.3), an object already placed in
+ * config/psyq-objects.txt and verified against retail. No C matches them;
+ * the correct disposition is conversion per docs/SDK-OBJECTS-GUIDE.md.
+ * Only func_8002AEE0 of the three is real game ground.
+ *
+ * Note what happened here, because it is the reason this comment now
+ * carries three verdicts: round 24 reopened all three as free ground and
+ * round 32's first pass "corrected" that to near-misses -- both times
+ * without asking whether Sony owned them. `python3 tools/sdkstalls.py`
+ * answers that in one command and did not exist until round 32.
+ *
  * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
  * rodata sub-slot is attached to this unit.
  */

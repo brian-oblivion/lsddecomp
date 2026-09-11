@@ -1,5 +1,23 @@
 # func_8003FCFC -- STALL, MISFILED CLASS CORRECTED (return-type fix found, register residue narrower but not closed)
 
+> **ROUND 32 (2026-09-12), head. THIS FUNCTION IS SONY LIBRARY CODE AND
+> CANNOT BE MATCHED BY WRITING C. DO NOT STAFF A RUNNER ONTO IT.**
+>
+> `func_8003FCFC` (0x8003fcfc, 20 words) lies FULLY inside **`libgte/fgo_00.o`** (Psy-Q Psy-Q 3.3),
+> an object already placed in `config/psyq-objects.txt` and verified against
+> retail by relocation-masked exact match. Its bytes come from Sony's object,
+> not from anything cc1 will produce from a game source file, so no source
+> shape reaches a match and every attempt is spent for certain.
+>
+> The correct disposition is CONVERSION, not decompilation: see
+> `docs/SDK-OBJECTS-GUIDE.md`. Detect the whole class with
+> `python3 tools/sdkstalls.py`.
+>
+> **The analysis below is not wrong, it is aimed at the wrong target**, and
+> it is kept because the reading of what the routine DOES is still accurate
+> and still useful when the object is placed. Only the premise that it is
+> game code is retracted.
+
 ## Round 21 (runner delta): class re-verified fresh, one new attempt, negative
 
 Restored attempt 6's exact preserved body (`s16 *func_8003FCFC(s16*,s16*)`,
