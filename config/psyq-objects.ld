@@ -435,4 +435,5 @@ _snd_openflag = 0x8008EA00;
 _svm_cur = 0x8008EA0C;
 _svm_vab_used = 0x8008EA2C;
 _ss_score = 0x800902E8;
+_snd_seq_s_max = 0x80090B68;
 _snd_seq_t_max = 0x80090B6C;

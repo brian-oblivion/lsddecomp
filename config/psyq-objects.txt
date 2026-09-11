@@ -326,3 +326,10 @@
 # (func_80032148, 53w) that had a 248-line stall report and could never have
 # matched. Text-only; no data sections.
 3.3  libsnd/vm_vsu   0x22948
+
+# code_179d8_c middle (0x22BA8..0x22D88): libsnd/sstable, one function
+# (func_800323A8 / SsSetTableSize, 120w) with a 340-line stall report. Only the
+# 3.5 and 3.6 discs carry this module; 3.5 is taken. Text-only. Splitting the
+# slice around it created src/code_179d8_c_b.c and moved the 0x14D8 rodata
+# attach to that unit.
+3.5  libsnd/sstable  0x22BA8

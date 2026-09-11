@@ -103,7 +103,7 @@ segments:
                           # STANDALONE and attaches to nothing.
       # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
       # same situation as 0x11F8 above.
-      - [0x14D8, .rodata, code_179d8_c]
+      - [0x14D8, .rodata, code_179d8_c_b]
       # 0x14F0 holds EXACTLY three jump tables and nothing else --
       # jtbl_80010CF0 (func_80034690) and jtbl_80010ED8 + jtbl_80010F38
       # (func_800357B0, a double switch), all three in the code_179d8_k
@@ -758,6 +758,16 @@ segments:
       # its name, its remaining 19 functions and its 0x14D8 rodata attach.
       - [0x22948, o, libsnd/vm_vsu]
       - [0x22A1C, c, code_179d8_c]
+      # ROUND 33: func_800323A8 (120w) is Sony's `SsSetTableSize`
+      # (`libsnd/sstable`, Psy-Q 3.5 -- the 3.3 disc does not carry it).
+      # Text-only, 0x1E0 covering exactly that one function, and it sat in
+      # the MIDDLE of the slice, so the slice is now [c][o][c].  No matched C
+      # is reclassified.  The tail half is `code_179d8_c_b`, and the 0x14D8
+      # `.rodata` attach MOVED WITH IT -- jtbl_80010CD8 belongs to
+      # func_80032588, which is in the tail; left on code_179d8_c the link
+      # fails with `undefined reference to '.L800325xx'`.
+      - [0x22BA8, o, libsnd/sstable]
+      - [0x22D88, c, code_179d8_c_b]
       # code_179d8_tail: functions 220..255 of the original.  UNCARVED
       # remainder in front of the code_179d8_f carve below, and left that
       # way deliberately: 0x23500..0x2673C is addiu-$at dense (26 of its 36
