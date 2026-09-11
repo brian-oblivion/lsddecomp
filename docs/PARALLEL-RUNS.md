@@ -1757,6 +1757,23 @@ cannot check thirty bodies at Gate 1, but you can tell runners to check the
 ones they actually resume — which is what that round did, and it is how the
 three were found.
 
+**Round 33 found a WORSE variant of this, and it needs a different check: a
+preserved body whose recorded score was NEVER MEASURABLE.**
+`func_8002CF18`'s inherited body called `func_800375E8`, a symbol that does
+not exist under that name (it is `SpuSetNoiseVoice`). That body could never
+have linked, so nobody ever built it, so its figure measured nothing.
+
+Drift is a mismatch between two things that both exist, and you catch it by
+reading the report against `src/`. **A never-linked body is self-consistent
+everywhere it is written down** — the report is internally coherent, the C
+looks right, and no amount of static reading exposes it. The only thing that
+does is putting it through the compiler.
+
+So the instruction to runners is now BUILD the inherited body once before
+trusting its score, not merely read it. It costs one iteration and it is the
+only way to separate "measured, and I can reproduce it" from "never measured".
+Once corrected, `func_8002CF18` measures 163/167 and that figure is real.
+
 **AND SCREEN FOR A FIFTH: ATTEMPT HISTORY. THE SCORE YOU RANK ON IS ALSO THE
 REASON THE FUNCTION IS EXHAUSTED (round 33).** Round 33's alpha was staffed
 onto `code_55dd4` because its titles carried 252/258 and 33/40 — by the
