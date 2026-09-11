@@ -199,6 +199,49 @@ SquareRoot0 = 0x800205C0;
 SquareRoot12 = 0x80020644;
 new_class_6c078 = 0x800206E0;
 ResetGraph = 0x80020C74;
+GPU_cw = 0x80023898; // type:func  (Psy-Q libapi/c73, from the SDK object)
+// 0x800238A8 is libc2/memcpy's GLOBAL memcpy. libcd/iso9660 carries a WEAK
+// second copy at 0x8002C014; that object is not linked yet and only one of
+// the two can carry the name here.
+memcpy = 0x800238A8; // type:func  (Psy-Q libc2/memcpy, from the SDK object)
+GsDefDispBuff = 0x80024734; // type:func  (Psy-Q libgs/gs_103, from the SDK object)
+gte_init = 0x800247D4; // type:func  (Psy-Q libgs/gs_121, from the SDK object)
+GsSwapDispBuff = 0x8002494C; // type:func  (Psy-Q libgs/gs_010, from the SDK object)
+SetVertex0 = 0x80024A40; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetVertex1 = 0x80024A50; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetVertex2 = 0x80024A60; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetVertexTri = 0x80024A70; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetRGBfifo = 0x80024A90; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetIR123 = 0x80024AA4; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetIR0 = 0x80024AB8; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetBackColor = 0x80024AC4; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetFarColor = 0x80024AE4; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetSZfifo3 = 0x80024B04; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetSZfifo4 = 0x80024B18; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetSXSYfifo = 0x80024B30; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetRii = 0x80024B44; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetMAC123 = 0x80024B58; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetData32 = 0x80024B6C; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetGeomOffset = 0x80024B78; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetGeomScreen = 0x80024B90; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetDQA = 0x80024B9C; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+SetDQB = 0x80024BA8; // type:func  (Psy-Q libgte/reg03, from the SDK object)
+InitGeom = 0x80024BC0; // type:func  (Psy-Q libgte/msc00, from the SDK object)
+_patch_gte = 0x80024C40; // type:func  (Psy-Q libgte/patchgte, from the SDK object)
+EnterCriticalSection = 0x80024CE0; // type:func  (Psy-Q libapi/a36, from the SDK object)
+ExitCriticalSection = 0x80024CF0; // type:func  (Psy-Q libapi/a37, from the SDK object)
+FlushCache = 0x80024D00; // type:func  (Psy-Q libapi/c68, from the SDK object)
+// The six libapi trampolines below end in `jr $t2`, not `jr $ra`, so splat
+// had collapsed all six into one glabel func_80025424 in the old psyq_15c24;
+// the objects are what recovers their individual names.
+HookEntryInt = 0x80025424; // type:func  (Psy-Q libapi/a25, from the SDK object)
+ChangeClearPAD = 0x80025434; // type:func  (Psy-Q libapi/a91, from the SDK object)
+ResetEntryInt = 0x80025444; // type:func  (Psy-Q libapi/a24, from the SDK object)
+ChangeClearRCnt = 0x80025454; // type:func  (Psy-Q libapi/l10, from the SDK object)
+_96_remove = 0x80025464; // type:func  (Psy-Q libapi/c114, from the SDK object)
+ReturnFromException = 0x80025474; // type:func  (Psy-Q libapi/a23, from the SDK object)
+setjmp = 0x80025484; // type:func  (Psy-Q libc2/setjmp, from the SDK object)
+longjmp = 0x800254C0; // type:func  (Psy-Q libc2/setjmp, from the SDK object)
 new_class_6d3c8 = 0x80025F7C;
 strcat = 0x80027130;
 new_class_6d4e8 = 0x800271D8;

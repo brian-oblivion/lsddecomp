@@ -499,7 +499,7 @@ struct Class6B5CCObj {
      * target func_8001E770 (code_d294_b.s) stores its own 2nd argument into
      * this offset. RETYPED round 12 (code_d294_b, func_8001D600): that
      * function passes `self->unk20` straight through as func_8001F51C's own
-     * `void *` arg0 (psyq_GsLinkObject4.s; func_8001F51C forwards it
+     * `void *` arg0 (psyq_fa50.s; func_8001F51C forwards it
      * unmodified to func_8001F3B0, which dereferences it at +0x10) --
      * genuinely a pointer, not an always-zero s32. Still opaque: nothing
      * this unit's chosen functions dereference through it directly. */
@@ -581,7 +581,7 @@ extern void GsInitCoordinate2(s32 arg0, void *dest);
  * from this unit) rather than generically. */
 extern void func_800183A0(GenericObj_d294 **out, GenericObj_d294 **cursor);
 
-/* func_8001F51C (asm/psyq_GsLinkObject4.s, Psy-Q library, not game code):
+/* func_8001F51C (asm/psyq_fa50.s, Psy-Q library, not game code):
  * fills a caller-supplied struct (its own arg1) from a small on-stack
  * buffer via func_8001F3B0 (its own arg0 forwarded straight through). Its
  * own last write to $v0 is leftover from an unrelated `lhu` a few
@@ -591,14 +591,14 @@ extern void func_800183A0(GenericObj_d294 **out, GenericObj_d294 **cursor);
  * needs. */
 extern void func_8001F51C(void *arg0, void *dest);
 
-/* func_8001F3A4 (asm/psyq_GsLinkObject4.s, Psy-Q library, not game code): a
+/* func_8001F3A4 (asm/psyq_fa50.s, Psy-Q library, not game code): a
  * predicate over the same opaque `self->unk20` pointer func_8001D600 and
  * func_8001F51C above already treat as `void *` -- func_8001D568 (round 13,
  * this unit) tests its `$v0` result for non-zero, so declared `s32`
  * (boolean-ish) here. Not decompiled in this project. */
 extern s32 func_8001F3A4(void *arg0);
 
-/* func_8001F4E4/func_8001F50C (asm/psyq_GsLinkObject4.s, PsyQ library, not
+/* func_8001F4E4/func_8001F50C (asm/psyq_fa50.s, PsyQ library, not
  * game code): func_8001F4E4 fills a PsyQ-internal global
  * (D_8008B21C, via func_8001F3B0) from its own argument; func_8001F50C
  * IGNORES both its arguments and just returns `&D_8008B21C` -- MEASURED,

@@ -102,6 +102,57 @@
 3.3  libgte/msc02    0x7D70
 3.3  libgte/smp_00   0x8010
 
+# psyq_GsLinkObject4 chunk A (0xF8C8..0xFA50): libgte/ratan -- ratan2 and
+# ratan. Data: .data 0x5BE9C (0x802, the arctan table, dlabel D_8006B69C),
+# confirmed by byte search. 0x802 is not 2-aligned, so the yaml needs a
+# 2-byte `pad` before D_8006BEA0 at 0x5C6A0.
+3.3  libgte/ratan   0xF8C8
+
+# psyq_GsLinkObject4 chunk B (0x10D48..0x10EE0): libgs/gs_105
+# (GsMapModelingData) and libgte/msc01 (SquareRoot0, SquareRoot12). Data:
+# msc01 .data 0x5C6F0 (0x180, dlabel D_8006BEF0 -> D_8006C070), confirmed by
+# byte search. gs_105's 0xA0 .bss has no relocation naming it and goes in
+# the fragment, which reports no NOTE.
+3.3  libgs/gs_105   0x10D48
+3.3  libgte/msc01   0x10DC0
+
+# psyq_GsLinkObject4 chunk C (0x14098..0x140DC): libapi/c73 (GPU_cw, a BIOS
+# trampoline) and libc2/memcpy. Text-only; `place` derives no data section
+# for either. The placed libgs/gs_001 follows at 0x140DC and is deliberately
+# NOT here -- its .bss statics are scattered and unpinnable by name (see
+# docs/research/psyq-sdk-objects.md, round 29), so it stays as asm.
+3.3  libapi/c73     0x14098
+3.3  libc2/memcpy   0x140A8
+
+# psyq_GsLinkObject4 chunk D (0x14F34..0x15020): libgs/gs_103
+# (GsDefDispBuff) and libgs/gs_121 (gte_init). Text-only; `place` derives no
+# PROGBITS section for either, and their 0xA0 .bss blocks (no relocation
+# names them) go through the fragment, which reports no NOTE. They sit
+# between libgs/gs_003 (0x14E9C) and libgs/gs_002 (0x15020), both of which
+# are placed and both EXCLUDED for scattered static bss -- so the fragment
+# pins GsSetDrawBuffClip and GsSetDrawBuffOffset as externals and those two
+# addresses keep their func_ names.
+3.3  libgs/gs_103    0x14F34
+3.3  libgs/gs_121    0x14FD4
+
+# psyq_GsLinkObject4 chunk E (0x1514C..0x15510): the last run of the block --
+# GsSwapDispBuff, the whole libgte GTE-register accessor family, InitGeom,
+# the GTE patch routine and three libapi BIOS trampolines. It closes the
+# segment at libetc/intr's boundary. Data: msc00 .data 0x5CA60 (0x10). NO
+# relocation names that section and its bytes are found in several places, so
+# the DERIVED offset is the evidence -- it lands on the existing dlabel
+# D_8006C260 and tiles exactly into libetc/intr's .data at 0x5CA70.
+# gs_010's .bss (`relocations DISAGREE`, the informational kind -- references
+# to NAMED variables) and patchgte's 0x10 .sbss go through the fragment,
+# which reports no NOTE.
+3.3  libgs/gs_010    0x1514C
+3.3  libgte/reg03    0x15240
+3.3  libgte/msc00    0x153C0
+3.3  libgte/patchgte 0x15440
+3.3  libapi/a36      0x154E0
+3.3  libapi/a37      0x154F0
+3.3  libapi/c68      0x15500
+
 # libetc/intr (the interrupt/callback core: ResetCallback, InterruptCallback,
 # DMACallback, VSyncCallback ...). Text and .data (the 0x109C callback tables
 # at 0x5CA70) are the 3.3 object's; its .rdata carries the RCS string
@@ -109,6 +160,20 @@
 # SHADOWED: ldfrag maps it NOLOAD at 0x800106BC and the bytes stay in splat's
 # plain rodata slot. Byte-exact (docs/research/psyq-sdk-objects.md, round 29).
 3.3  libetc/intr    0x15510  shadow=.rdata
+
+# psyq_15c24 (0x15C24..0x15D04), retired WHOLE: six libapi BIOS trampolines
+# and libc2/setjmp. Text-only; `place` derives no data section for any of the
+# seven. Every one of these was pinned as an external by the fragment because
+# the already-linked libetc/intr calls it; linking the definitions retires
+# those pins. The six trampolines end in `jr $t2` and have no `jr $ra`, so
+# splat had merged all six into a single glabel.
+3.3  libapi/a25      0x15C24
+3.3  libapi/a91      0x15C34
+3.3  libapi/a24      0x15C44
+3.3  libapi/l10      0x15C54
+3.3  libapi/c114     0x15C64
+3.3  libapi/a23      0x15C74
+3.3  libc2/setjmp    0x15C84
 
 # psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
 # the SpuSetReverb* family, the malloc-style SPU RAM allocator (s_sca) and its

@@ -382,14 +382,52 @@ segments:
       # arguments are symmetric with `$a3` selecting direction (see
       # DECOMPILATION_LEARNINGS and docs/match-reports/func_80061778.md).
       - [0xED8C, c, code_d294_c]
+      # 0xF770..0xF8C8: head of the old psyq_GsLinkObject4, no placed object.
       - [0xF770, asm, psyq_GsLinkObject4]
+      - [0xF8C8, o, libgte/ratan]       # ratan2, ratan (Psy-Q 3.3). .data at 0x5BE9C
+      # 0xFA50..0x10D48: still asm.
+      - [0xFA50, asm, psyq_fa50]
+      - [0x10D48, o, libgs/gs_105]      # GsMapModelingData (Psy-Q 3.3). bss via the fragment
+      - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
+      # 0x10EE0..0x14098: still asm.
+      - [0x10EE0, asm, psyq_10ee0]
+      - [0x14098, o, libapi/c73]        # GPU_cw (Psy-Q 3.3)
+      - [0x140A8, o, libc2/memcpy]      # memcpy
+      # 0x140DC..0x14E9C, still asm. 0x140DC..0x14708 is the placed
+      # libgs/gs_001, EXCLUDED by head decision: its .bss holds statics Sony's
+      # linker scattered, and a static cannot be pinned by name, so the object
+      # cannot be linked unedited.
+      - [0x140DC, asm, psyq_140dc]
+      # 0x14E9C..0x14F34 is the placed libgs/gs_003, excluded for the same
+      # reason (scattered static bss). GsSetDrawBuffClip lives here.
+      - [0x14E9C, asm, psyq_14e9c]
+      - [0x14F34, o, libgs/gs_103]      # GsDefDispBuff (Psy-Q 3.3). bss via the fragment
+      - [0x14FD4, o, libgs/gs_121]      # gte_init. bss via the fragment
+      # 0x15020..0x1514C is the placed libgs/gs_002, excluded for the same
+      # reason (scattered static bss). GsSetDrawBuffOffset lives here.
+      - [0x15020, asm, psyq_15020]
+      - [0x1514C, o, libgs/gs_010]      # GsSwapDispBuff (Psy-Q 3.3). bss via the fragment
+      - [0x15240, o, libgte/reg03]      # the GTE register accessors, SetVertex0 ...
+      - [0x153C0, o, libgte/msc00]      # InitGeom. .data at 0x5CA60
+      - [0x15440, o, libgte/patchgte]   # _patch_gte. .sbss via the fragment
+      - [0x154E0, o, libapi/a36]        # EnterCriticalSection
+      - [0x154F0, o, libapi/a37]        # ExitCriticalSection
+      - [0x15500, o, libapi/c68]        # FlushCache
       # libetc/intr from the SDK object (Psy-Q 3.3): ResetCallback, InterruptCallback,
       # DMACallback, VSyncCallback(s), Stop/Restart/CheckCallback, Get/SetIntrMask,
       # startIntr, trapIntr, setIntr, stopIntr, restartIntr, memclr. .data at 0x5CA70;
       # .rdata (RCS string differs from the disc's) is shadowed by config/psyq-objects.ld.
       - [0x15510, o, libetc/intr]
-      # 0x15C24..0x15D04: the tail of the old psyq_GsLinkObject4, still asm.
-      - [0x15C24, asm, psyq_15c24]
+      # 0x15C24..0x15D04: the tail of the old psyq_GsLinkObject4, six libapi
+      # BIOS trampolines and libc2/setjmp. Every one of these is referenced by
+      # libetc/intr just above, which used to pin them as externals.
+      - [0x15C24, o, libapi/a25]        # HookEntryInt (Psy-Q 3.3)
+      - [0x15C34, o, libapi/a91]        # ChangeClearPAD
+      - [0x15C44, o, libapi/a24]        # ResetEntryInt
+      - [0x15C54, o, libapi/l10]        # ChangeClearRCnt
+      - [0x15C64, o, libapi/c114]       # _96_remove
+      - [0x15C74, o, libapi/a23]        # ReturnFromException
+      - [0x15C84, o, libc2/setjmp]      # setjmp, longjmp
       # libetc/libc2 block, linked from the SDK objects (see the pilot note
       # above). Data: .data at 0x5DB0C.., .rdata at 0xF28.., .sdata at 0x7B040.
       - [0x15D04, o, libetc/vmode]      # SetVideoMode, GetVideoMode   (Psy-Q 3.3)
@@ -1406,6 +1444,12 @@ segments:
       - [0x5BBE2, pad]                        # 2 bytes; 0x802 is not 2-aligned
       - [0x5BBE4, o, libgte/msc02, .data]     # 0x1A0
       - [0x5BD84, data]
+      - [0x5BE9C, o, libgte/ratan, .data]    # 0x802, the arctan table -> 0x5C69E
+      - [0x5C69E, pad]                       # 2 bytes; 0x802 is not 2-aligned
+      - [0x5C6A0, data]                      # D_8006BEA0.., no placed object owns it
+      - [0x5C6F0, o, libgte/msc01, .data]    # 0x180 -> 0x5C870 (dlabel D_8006C070)
+      - [0x5C870, data]
+      - [0x5CA60, o, libgte/msc00, .data]    # 0x10 -> 0x5CA70, exactly where intr's .data starts
       - [0x5CA70, o, libetc/intr, .data]     # 0x109C, the callback tables -> 0x5DB0C
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]

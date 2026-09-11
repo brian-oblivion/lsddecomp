@@ -189,15 +189,15 @@ void func_8004E5D4(Node3bb8cE *self, s32 val)
     self->unk10 = val << 4;
 }
 
-extern void func_80024CE0(void);
-extern void func_80024CF0(void);
+extern void EnterCriticalSection(void);
+extern void ExitCriticalSection(void);
 
 s32 func_8004E5E4(Node3bb8cE *self)
 {
     s32 i;
     Node3bb8cE *cur;
 
-    func_80024CE0();
+    EnterCriticalSection();
     i = 0;
     cur = self;
     do {
@@ -205,7 +205,7 @@ s32 func_8004E5E4(Node3bb8cE *self)
         i++;
         cur = (Node3bb8cE *)((u8 *)cur + 4);
     } while (i < 4);
-    func_80024CF0();
+    ExitCriticalSection();
     func_8004F394(self);
     return 1;
 }

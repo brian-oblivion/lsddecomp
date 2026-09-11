@@ -287,19 +287,23 @@ void func_8005278C(Class86F88 *self)
     } while (i < count);
 }
 
-/* Psy-Q strlen (libc2/strlen, linked from Sony's own SDK object) and a
- * strncpy-like helper (`func_800238A8`: if dest==NULL
- * return NULL, else copy `n` bytes from src to dest and return dest) --
- * declared LOCAL to this unit, not in a shared header, since this is a
- * cross-unit prototype for functions this unit does not define (see
- * CLAUDE.md's header-contention rule). strlen already has a
+/* Psy-Q strlen and memcpy (libc2/strlen and libc2/memcpy, linked from
+ * Sony's own SDK objects). libc2's memcpy guards a NULL dest, copies `n`
+ * bytes a byte at a time and returns dest -- which is why this call site
+ * was read as strncpy-like before the object gave it its name.
+ * Both are declared LOCAL to this unit, not in a shared header, since
+ * these are cross-unit prototypes for functions this unit does not define
+ * (see CLAUDE.md's header-contention rule). strlen already has a
  * differently-typed local declaration in class_3bb8c_j.c
  * (`s32 strlen(void *arg0)`); this unit's own call site reads its
  * argument as a byte pointer, so it is typed `char *` here instead --
  * per-call-site typing of an undefined function's argument, same
- * convention as func_80040FC0 (see include/class_3bb8c.h HEAD NOTE). */
+ * convention as func_80040FC0 (see include/class_3bb8c.h HEAD NOTE).
+ * memcpy's return type is `void *` to agree with include/psyq/MEMORY.H's
+ * unprototyped declaration should this unit ever include it; the result
+ * is discarded at the one call site either way. */
 extern s32 strlen(char *s);
-extern char *func_800238A8(char *dest, char *src, s32 n);
+extern void *memcpy(char *dest, char *src, s32 n);
 
 void func_8005281C(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 {
@@ -337,7 +341,7 @@ char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base
     if (len >= 0x1B) {
         len = 0x1A;
     }
-    func_800238A8(dest, base + self->unk18[idx], len);
+    memcpy(dest, base + self->unk18[idx], len);
     i = len;
     if (i < 0x1A) {
         for (; i < 0x1A; i++) {
