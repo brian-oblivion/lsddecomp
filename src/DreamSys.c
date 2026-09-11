@@ -610,11 +610,6 @@ s32 func_80059BD4(DreamSys *this)
 	return this->unk_0xA0 = 1;
 }
 
-#if 0
-/* Best-reached body, round 2026-09-08 (runner echo), reproducing round 20's
-   already-documented 1-word-drift state (80/79 words, 19/79 in-range) --
-   see docs/match-reports/func_80059BE0.md "Round 25" for what else was
-   tried and did not improve on it. */
 s32 func_80059BE0(DreamSys *this, s32 arg1)
 {
 	s32 doCallback = 0;
@@ -628,8 +623,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		count = this->unk_0xB4 + 1;
 		this->unk_0xB4 = count;
 		if (count < 4) {
-			if (this->unk_0xAC == 4)
-				doCallback = ((count & 1) == 0);
+			doCallback = (this->unk_0xAC == 4) && ((count & 1) == 0);
 		} else {
 			this->unk_0xA0 = 0;
 			doCallback = 1;
@@ -655,8 +649,6 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		this->vt->func_80059E3C(this);
 	return ret;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059BE0);
 
 #if 0
 /* Best-reached body, 55/72 words -- see docs/match-reports/func_80059D1C.md
