@@ -5508,6 +5508,31 @@ choice is unreachable. **Scope: exactly 1 of 220 live queued functions
 contains one, and it is one instruction** — a real gap, and a tiny one. Do not
 generalise it into a blocker class.
 
+### A report's own CODE BLOCK is a claim to verify, not a transcription to trust (round 32)
+
+The project already knows not to parse a FIGURE out of a report body (rounds
+18, 19, 20). Round 32 extends it to the source: `func_80059BE0`'s report listed
+a "best-reached C" containing a `bit` local, and what was actually banked in
+`src/DreamSys.c` had that inlined away — the two had silently diverged.
+
+The runner did the right thing and rebuilt BOTH forms before changing anything:
+the report's listed version scores **14/79**, the banked version was far
+better. So the prose was wrong and the code was right, but nothing local said
+which — and had it been the other way round, an attempt would have started from
+a body several words worse than the one already on disk, with its score
+attributed to the new idea being tried.
+
+**The check is one build and it is the same one the preserved-body drift rule
+already asks for:** splice in what the report says, build, and compare against
+what `src/` holds before you treat either as the baseline. A report and its
+unit drift apart the moment anyone edits one without the other, and git marks
+neither as wrong.
+
+This is the same shape as the round-19 finding that roughly one preserved body
+in six carries a false "clean / drift-free" claim. Both say: **the report is
+evidence about a build that happened once, and the oracle is the build you run
+now.**
+
 ## Open questions
 
 - **What is the class-table header word at `+0x000`? PARTLY ANSWERED, and the
