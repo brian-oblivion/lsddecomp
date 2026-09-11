@@ -82,7 +82,7 @@ segments:
       # psyq_2258 owns no plain rodata at all.
       - [0xA68, o, libgte/geo, .rdata]
       - [0xA8C, rodata]   # code_8220
-      - [0xABC, rodata]   # psyq_GsLinkObject4
+      - [0xABC, rodata]   # psyq_GsLinkObject4; 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
       - [0xF64, rodata]   # 16-word bit table; owner not placed yet (libetc intr?)
@@ -361,6 +361,13 @@ segments:
       # DECOMPILATION_LEARNINGS and docs/match-reports/func_80061778.md).
       - [0xED8C, c, code_d294_c]
       - [0xF770, asm, psyq_GsLinkObject4]
+      # libetc/intr from the SDK object (Psy-Q 3.3): ResetCallback, InterruptCallback,
+      # DMACallback, VSyncCallback(s), Stop/Restart/CheckCallback, Get/SetIntrMask,
+      # startIntr, trapIntr, setIntr, stopIntr, restartIntr, memclr. .data at 0x5CA70;
+      # .rdata (RCS string differs from the disc's) is shadowed by config/psyq-objects.ld.
+      - [0x15510, o, libetc/intr]
+      # 0x15C24..0x15D04: the tail of the old psyq_GsLinkObject4, still asm.
+      - [0x15C24, asm, psyq_15c24]
       # libetc/libc2 block, linked from the SDK objects (see the pilot note
       # above). Data: .data at 0x5DB0C.., .rdata at 0xF28.., .sdata at 0x7B040.
       - [0x15D04, o, libetc/vmode]      # SetVideoMode, GetVideoMode   (Psy-Q 3.3)
@@ -1278,6 +1285,7 @@ segments:
       - [0x5BBE2, pad]                        # 2 bytes; 0x802 is not 2-aligned
       - [0x5BBE4, o, libgte/msc02, .data]     # 0x1A0
       - [0x5BD84, data]
+      - [0x5CA70, o, libetc/intr, .data]     # 0x109C, the callback tables -> 0x5DB0C
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]
       - [0x5DB38, o, libetc/intr_vb, .data]

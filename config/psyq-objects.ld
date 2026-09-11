@@ -18,6 +18,7 @@ SECTIONS {
     .psyq_bss.libgs_gs_119_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_119.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_120_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_120.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_135_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_135.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
+    .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 PSDOFSX = 0x8008E240;   /* libgs/gs_013 */
 PSDOFSY = 0x8008E244;   /* libgs/gs_013 */
@@ -71,9 +72,14 @@ PSDGPU = 0x80090B80;   /* libgs/gs_013 */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
-ResetCallback = 0x80024D10;
-InterruptCallback = 0x80024D40;
+EnterCriticalSection = 0x80024CE0;
+ExitCriticalSection = 0x80024CF0;
+HookEntryInt = 0x80025424;
 ChangeClearPAD = 0x80025434;
+ResetEntryInt = 0x80025444;
 ChangeClearRCnt = 0x80025454;
+_96_remove = 0x80025464;
+ReturnFromException = 0x80025474;
+setjmp = 0x80025484;
 rcossin_tbl = 0x80066BE0;
 GsOUT_PACKET_P = 0x8008E794;

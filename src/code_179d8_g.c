@@ -100,8 +100,8 @@ extern volatile s32 *D_8006D930;
 extern volatile s32 *D_8006D934;
 
 /* Still INCLUDE_ASM elsewhere -- not this unit's to carve. */
-extern void func_80024D10(void);                              /* asm/psyq_GsLinkObject4.s */
-extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void); /* asm/psyq_GsLinkObject4.s, per code_179d8_c.c */
+extern void ResetCallback(void);                              /* lib/libetc/intr.o */
+extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib/libetc/intr.o, per code_179d8_c.c */
 extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
@@ -110,7 +110,7 @@ extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in co
 extern s32 func_80029478(void);                                /* asm/nonmatchings/code_179d8_b;
                                                                    addiu_at RESOLVED round 21, no longer blocked */
 extern s32 func_8002C0AC(const char *arg0, const char *arg1, s32 arg2); /* asm/nonmatchings/code_179d8_d */
-extern s32 func_80024E64(void);                                /* asm/psyq_GsLinkObject4.s -- trivial
+extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
 extern s32 func_8002BC40(s32 id, char *name);                  /* code_179d8_d.c, matched: looks up
                                                                    `name` under directory id `id` in
@@ -185,7 +185,7 @@ extern s32 func_8002B94C(void);
 
 /* Forward declarations: taken by address before their own ROM-order definition
  * further down this file (func_8002A6EC/func_8002A75C hand func_8002B3F4 to
- * func_80024D40 as a thread entry; func_8002AA6C hands func_8002B4D4 to
+ * InterruptCallback as a thread entry; func_8002AA6C hands func_8002B4D4 to
  * D_8006D600 as a callback). */
 void func_8002B3F4(void);
 void func_8002B4D4(s32 arg0, s32 arg1);
@@ -291,8 +291,8 @@ void func_8002A6EC(void)
         *p = 0;
         p++;
     }
-    func_80024D10();
-    func_80024D40(2, func_8002B3F4);
+    ResetCallback();
+    InterruptCallback(2, func_8002B3F4);
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A75C);

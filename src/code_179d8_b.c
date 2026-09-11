@@ -54,7 +54,7 @@ extern s32 func_800299BC(s32 arg0, s32 arg1);
 extern s32 func_80029C40(s32 arg0, s32 arg1);
 extern s32 func_8002A378(void *arg0);
 extern s32 func_8002B304(s32 arg0, s32 arg1);
-extern s32 func_80024D70(s32 arg0, s32 arg1); /* asm/psyq_GsLinkObject4.s */
+extern s32 DMACallback(s32 arg0, s32 arg1); /* lib/libetc/intr.o */
 extern s32 func_8002B198(s32 arg0);
 extern s32 func_8002AEE0(s32 arg0, s32 arg1);
 extern s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2);
@@ -155,7 +155,7 @@ s32 func_800291EC(s32 arg0, s32 arg1)
 
 s32 func_80029210(s32 arg0)
 {
-    return func_80024D70(3, arg0);
+    return DMACallback(3, arg0);
 }
 
 s32 func_80029234(s32 arg0)

@@ -101,3 +101,11 @@
 3.3  libgte/geo      0x6B40
 3.3  libgte/msc02    0x7D70
 3.3  libgte/smp_00   0x8010
+
+# libetc/intr (the interrupt/callback core: ResetCallback, InterruptCallback,
+# DMACallback, VSyncCallback ...). Text and .data (the 0x109C callback tables
+# at 0x5CA70) are the 3.3 object's; its .rdata carries the RCS string
+# `1.71 1995/08/29` where retail has `1.73 1995/11/10`, so that section is
+# SHADOWED: ldfrag maps it NOLOAD at 0x800106BC and the bytes stay in splat's
+# plain rodata slot. Byte-exact (docs/research/psyq-sdk-objects.md, round 29).
+3.3  libetc/intr    0x15510  shadow=.rdata
