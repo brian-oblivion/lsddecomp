@@ -900,22 +900,25 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800357B0);
  * (rec->unk4C) the compiler schedules earlier than retail does, not a
  * logic or CFG difference -- no if/else arm ordering applies here (see
  * report for the round-25 head lever's explicit negative answer). */
-#if 0
+#if 1
 void func_80035A7C(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
+    s32 packed;
     u8 b;
     u8 vol;
 
-    rec->unk4 = cursor + 1;
-    vol = *((u8 *)rec + rec->unk12 + 0x2C);
+    b = rec->unk12;
+    rec->unk4 = cursor;
+    packed = (a1 << 8) | a0;
+    rec->unk4 = rec->unk4 + 1;
+    vol = *((u8 *)rec + b + 0x2C);
     b = *cursor;
-    func_8002F610((a1 << 8) | a0, rec->unk4C, vol, b);
+    func_8002F610(packed, rec->unk4C, vol, b);
     rec->unk88 = func_80035E80(a0, a1);
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035A7C);
 
 /* Cross-unit calls, local guesses per project convention. func_8003069C is
  * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
