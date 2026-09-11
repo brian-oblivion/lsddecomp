@@ -509,37 +509,34 @@ typedef struct {
 
 typedef struct {
     u8 pad0[0x8];
-    u8 unk8;    /* +0x08: byte stamped between the two per-item calls */
-    u8 pad9[0x28 - 0x9];
+    u8 unk8;    /* +0x08: byte stamped between the two per-item calls -- the
+                 * struct's TOTAL size is 0x20, not the 0x28 that offset
+                 * alone would suggest; see func_800349B0.md's round-31
+                 * update for why the two are decoupled once the
+                 * register-rescue fix below is applied. */
+    u8 pad9[0x20 - 0x9];
 } Scratch_800349B0;
 
 extern s16 func_800334F0(s16 a0, s16 a1, void *out);
 extern void func_80033260(s16 a0, u8 a1, s16 a2, void *out);
 extern void func_80036230(s16 a0, u8 a1, s16 a2, void *out);
 
-/* STALL -- see docs/match-reports/func_800349B0.md. Compiled length ONE
- * WORD SHORT (78/79); frame size also 8 bytes larger than retail's 0x70
- * with this struct split (0x78) -- two related but distinct residues, both
- * register/stack-allocation artifacts, not logic differences. */
-#if 0
 void func_800349B0(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
-    u8 *p = (u8 *)rec + rec->unk12;
+    u8 offset;
     NoteList_800349B0 list;
     Scratch_800349B0 scratch;
     s32 i;
 
-    func_800334F0(rec->unk4C, p[0x2C], &list);
+    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         scratch.unk8 = a2;
-        func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800349B0);
 
 /* Same shape as func_800349B0 -- see that function's own struct comment.
  * Only the scratch byte's offset differs (0xB here vs 0x8 there). */
@@ -549,29 +546,22 @@ typedef struct {
     u8 pad9[0x20 - 0xC];
 } Scratch_80034AEC;
 
-/* STALL -- see docs/match-reports/func_80034AEC.md (and func_800349B0.md,
- * the identically-shaped sibling this one shares its whole residue class
- * with). Compiled length ONE WORD SHORT (78/79); same register-rescue and
- * stack-allocation residues as func_800349B0. */
-#if 0
 void func_80034AEC(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
-    u8 *p = (u8 *)rec + rec->unk12;
+    u8 offset;
     NoteList_800349B0 list;
     Scratch_80034AEC scratch;
     s32 i;
 
-    func_800334F0(rec->unk4C, p[0x2C], &list);
+    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         scratch.unkB = a2;
-        func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034AEC);
 
 /* Same NoteList/callee shape as func_800349B0/func_80034AEC, plus a
  * range check on this function's own third parameter that picks a
@@ -582,33 +572,30 @@ typedef struct {
     u8 pad2[0x20 - 0x2];
 } Scratch_80034C28;
 
-/* STALL -- see docs/match-reports/func_80034C28.md. Compiled length ONE
- * WORD SHORT (89/90). Two distinct residues: the family's register-rescue
- * class (same as func_800349B0/func_80034AEC) plus a NEW immediate-
- * constant canonicalization difference. */
-#if 0
 void func_80034C28(s16 a0, s16 a1, s32 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
-    u8 *p = (u8 *)rec + rec->unk12;
+    u8 offset;
     NoteList_800349B0 list;
     Scratch_80034C28 scratch;
     s32 i;
+    s32 wrap;
 
-    func_800334F0(rec->unk4C, p[0x2C], &list);
+    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         if ((u8)a2 < 0x40) {
             scratch.unk1 = 2;
-        } else if ((u8)(a2 + 0xC0) < 0x40) {
-            scratch.unk1 = 0;
+        } else {
+            wrap = 0xC0;
+            if ((u8)(a2 + wrap) < 0x40) {
+                scratch.unk1 = 0;
+            }
         }
-        func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034C28);
 
 /* STALL -- see docs/match-reports/func_80034D90.md. length exact 51/51,
  * 49/51 raw word-match, residue is the project's settled commutative-
@@ -686,7 +673,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034E5C);
  * independent instruction (`sltiu`) the compiler hoists into a branch
  * delay slot one branch earlier than retail places it -- a pure
  * instruction-scheduling residue, not a logic or CFG difference. */
-#if 0
+#if 1
 void func_80034F90(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -702,8 +689,8 @@ void func_80034F90(s16 a0, s16 a1, u8 a2)
         rec->unkC = rec->unk4;
         return;
     case 0x1E:
+        rec->unk16 = a2;
         if (rec->unk28 == 0) {
-            rec->unk16 = a2;
             rec->unk10 = 0;
             rec->unk88 = func_80035E80(a0, a1);
             return;
@@ -731,7 +718,6 @@ void func_80034F90(s16 a0, s16 a1, u8 a2)
     }
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034F90);
 
 void func_800350D8(s16 a0, s16 a1, u8 a2)
 {
@@ -913,22 +899,25 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800357B0);
  * (rec->unk4C) the compiler schedules earlier than retail does, not a
  * logic or CFG difference -- no if/else arm ordering applies here (see
  * report for the round-25 head lever's explicit negative answer). */
-#if 0
+#if 1
 void func_80035A7C(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
+    s32 packed;
     u8 b;
     u8 vol;
 
-    rec->unk4 = cursor + 1;
-    vol = *((u8 *)rec + rec->unk12 + 0x2C);
+    b = rec->unk12;
+    rec->unk4 = cursor;
+    packed = (a1 << 8) | a0;
+    rec->unk4 = rec->unk4 + 1;
+    vol = *((u8 *)rec + b + 0x2C);
     b = *cursor;
-    func_8002F610((a1 << 8) | a0, rec->unk4C, vol, b);
+    func_8002F610(packed, rec->unk4C, vol, b);
     rec->unk88 = func_80035E80(a0, a1);
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035A7C);
 
 /* Cross-unit calls, local guesses per project convention. func_8003069C is
  * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
