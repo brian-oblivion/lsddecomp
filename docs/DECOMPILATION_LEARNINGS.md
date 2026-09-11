@@ -5374,6 +5374,111 @@ Practical consequences:
   assuming all ~60 classes do. Do not re-derive the same 20+ manual attempts
   per class in the meantime.
 
+## Round 32 (2026-09-12) — `volatile` as a scheduling instrument, and a register-identity verdict that was not one
+
+### `volatile` is a legitimate, and much NARROWER, tool for the instruction-ORDER residue class
+
+`func_80032C60` (`code_179d8_c`) sat for three rounds as a one-instruction
+delay-slot residue: GCC filled an unconditional `j`'s delay slot with a
+`sh zero,0(v1)` store where retail leaves a genuine `nop`. Every register
+already matched. The project's sanctioned instrument for exactly this class is
+a bare `__asm__("")`, and **three placements were tried across two rounds and
+all three regressed** — the report concluded "barrier placement is now
+exhausted for this specific residue", which was true and was read as the
+stronger claim that the RESIDUE was exhausted.
+
+It closes with no change to the function body at all. `RCntEntry` shadows the
+PSX root-counter registers at `0x1F801100`/`0x1F801110`/`0x1F801120`; declaring
+its three hardware fields `volatile` forces retail's ordering and the function
+matches 14/14. The kept body is character-for-character round 16's "best C
+reached".
+
+**Why the narrower tool wins.** A bare `__asm__("")` is a blunt scheduling
+fence: it constrains *everything* crossing that one program point, which here
+meant the early `li $v0,1` and the CSE of the two return constants as well as
+the store — which is why every placement fixed the store and broke something
+else. `volatile` constrains only the ACCESS. Measured, all on a green
+whole-image SHA1:
+
+| form | result |
+| --- | --- |
+| plain `u16` + any of three barrier placements | all REGRESS past the 1-instruction residue |
+| plain `u16` + single-exit join variable | WORSE: 1 word short, adds trailing `move v0,a1` |
+| `*(volatile u16 *)&p->field = 0;` at the use site | **MATCH** |
+| `volatile` on the struct field(s) | **MATCH** — kept |
+
+It also **subsumes** the `__asm__("")` that `SetRCnt` carried for an analogous
+hoist: barrier removed, `SetRCnt` still 40/40. Leaving both would tell the next
+reader the barrier is doing work the type is doing.
+
+**It is not the banned construct.** HARD RULE 6's test is whether removing it
+changes WHICH REGISTER holds a value. A `volatile` qualifier names no register;
+it changes what may move across what, exactly like the sanctioned bare
+`__asm__("")`.
+
+**Scope, measured rather than assumed:** only two units in the corpus touch
+hardware addresses at all (`code_179d8_c`, `code_1677c`) and the second has an
+empty queue. So this is a real mechanism with a narrow footprint — a lever to
+reach for when the displaced instruction is a memory access the hardware
+observes, **not** a sweep to run. Do not scatter `volatile` over ordinary
+globals to nudge a schedule; use it where it is TRUE and the honest typing
+happens also to be the matching one.
+
+### A register-identity verdict is a HYPOTHESIS about a mechanism, and "the registers differ" does not establish it
+
+The same typing closed the sibling `func_80032BB8` first attempt, 14/14 — and
+that one had been filed for three rounds as **"register identity, not fixable
+by reshaping"**. Under HARD RULE 6 that is a *terminal* verdict: the only
+constructs that fix register identity are banned, so a function filed that way
+correctly stops attracting attempts. It was ordinary matchable C.
+
+The observation was accurate; the mechanism inferred from it was wrong.
+Registers differing is compatible with at least two causes:
+
+- GCC genuinely wanting a different ALLOCATION — terminal under HARD RULE 6;
+- GCC being free to SCHEDULE in an order retail was not, with the allocation
+  falling out of the order it picked — ordinary, and fixable from the source.
+
+**The discriminator is whether anything in the C constrains the ORDER.** Before
+filing register-identity, ask what forced the order in retail's build that does
+not force it in yours. If the answer is "an access the hardware makes
+observable", the fix is a type and the verdict is wrong.
+
+This is CLAUDE.md's wrong-CAUSE hazard in its expensive direction. A wrong
+SCORE is corrected the next time anyone measures, because measuring is the job.
+A wrong CAUSE is what the next round acts on — and when the wrong cause is one
+the project's own rules say to stop at, it does not merely mislead, it *closes
+the file*.
+
+### 14 stalled functions were Sony library code, and every blocker screen passed them
+
+`psyq_sdk.py coverage` has always printed a section headed "Placed objects that
+fall inside GAME-code segments (SDK code miscounted as game)". Nobody crossed
+it against the STALL QUEUE. Fourteen live `INCLUDE_ASM` functions — 1669 words,
+~4100 lines of accumulated derivation — lie FULLY inside objects already placed
+and verified against retail: `libcd/sys.o` (3), `libcd/iso9660.o` (3),
+`libsnd/vs_vh.o`, `libsnd/sstable.o`, `libsnd/vm_vsu.o`, `libsnd/adsr.o`,
+`libgs/gs_131.o` (2), `libgte/fgo_00.o`, `libc2/atoi.o`.
+
+**They pass every blocker screen** — no `gp_rel`, no `mflo`/`mfhi` hazard, not
+a trampoline — so they read as the cleanest ground in the queue while being
+unmatchable by construction. That is the Gate 2 trampoline lesson arriving in
+Gate 1b: *a screen measures the obstruction it was built for and says nothing
+about the ones it was not.*
+
+CLAUDE.md already carried the rule and already named the command. The gap was
+never the rule — it was that checking meant reading a 60-line object list
+against a 200-line queue by hand, per round, and spotting an overlap in hex.
+`python3 tools/sdkstalls.py` does it in one command, and `nearmiss.py` now
+excludes them from "ASSIGN FROM HERE" so the screen cannot be skipped.
+
+**One bug worth recording, because its wrong answer was plausible.** Taking a
+function's extent as min/max over its whole `.s` picks up trailing data and
+jump-table sections thousands of words away, and reported **143** overlaps
+against a true **14**. Anchor on the function's own `glabel`/`endlabel`. A
+census that over-reports by 10x is easy to catch; one that over-reports by 15%
+would not have been.
+
 ## Open questions
 
 - **What is the class-table header word at `+0x000`? PARTLY ANSWERED, and the
