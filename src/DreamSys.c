@@ -469,18 +469,12 @@ void func_800597C0(DreamSys *this)
 	this->vt->func_800598E8(this);
 }
 
-#if 0
-/* best-reached body, round 2026-09-08 (runner echo): 49/53 words, exact
-   length, zero address drift. The remaining 4-word residue is a pure
-   register-identity swap (retail uses $a2 for `step`, this compiles to
-   $a1) confined to the decay branch -- see docs/match-reports/func_80059814.md. */
 void func_80059814(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
 	s32 threshold;
 	s32 sum;
-	s32 step;
 
 	idx = this->unk_0x88;
 	if (idx != 0) {
@@ -504,27 +498,31 @@ void func_80059814(DreamSys *this)
 		return;
 	}
 	if (this->unk_0x8C != 0) {
-		step = (this->unk_0x8C < 0) ? 0x258 : -0x258;
-		this->unk_0x5C->unk_0x24 += step;
-		this->unk_0x8C += step;
+		delta = -0x258;
+		if (this->unk_0x8C < 0)
+			delta = 0x258;
+		this->unk_0x5C->unk_0x24 += delta;
+		this->unk_0x8C += delta;
 	}
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059814);
 
 #if 0
-/* best-reached body, round 2026-09-08 (runner echo): matches retail's
-   ENTIRE control-flow graph (every branch/jump target realigns exactly),
-   2 words SHORT (75/77) purely because `delta` does not get promoted to
-   a callee-saved register the way retail's does ($s2). See
-   docs/match-reports/func_800598E8.md. */
+/* best-reached body, round 32 (2026-09-12, runner alpha2): the delta/step
+   register-coalescing fix that closed func_80059814 (reusing the SAME `delta`
+   local across both mutually exclusive branches instead of a separate `step`)
+   applies here too and closes ONE of the two previously-missing words: 76/77
+   words, 1 word SHORT (was 75/77, 2 words short). See
+   docs/match-reports/func_800598E8.md for the residue that's left -- it is a
+   different, deeper mechanism (opportunistic delay-slot placement of the
+   `this` register setup across multiple converging paths into the shared
+   `func_80059A1C(this)` tail call), not reachable by the rename lever nor by
+   a scheduling barrier at the merge point (tried, no effect). */
 void func_800598E8(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
 	s32 threshold;
 	s32 sum;
-	s32 step;
 
 	this->unk_0xA8 = (this->unk_0xA0 == 1);
 	idx = this->unk_0x90;
@@ -548,10 +546,12 @@ void func_800598E8(DreamSys *this)
 		this->unk_0x94 = sum;
 		this->unk_0x90 = 0;
 	} else if (this->unk_0x94 != 0) {
-		step = (this->unk_0x94 < 0) ? 0x2D : -0x2D;
-		D_80087E84[0].value = step;
+		delta = -0x2D;
+		if (this->unk_0x94 < 0)
+			delta = 0x2D;
+		D_80087E84[0].value = delta;
 		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
-		this->unk_0x94 += step;
+		this->unk_0x94 += delta;
 	} else {
 		return;
 	}
@@ -610,11 +610,6 @@ s32 func_80059BD4(DreamSys *this)
 	return this->unk_0xA0 = 1;
 }
 
-#if 0
-/* Best-reached body, round 2026-09-08 (runner echo), reproducing round 20's
-   already-documented 1-word-drift state (80/79 words, 19/79 in-range) --
-   see docs/match-reports/func_80059BE0.md "Round 25" for what else was
-   tried and did not improve on it. */
 s32 func_80059BE0(DreamSys *this, s32 arg1)
 {
 	s32 doCallback = 0;
@@ -628,8 +623,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		count = this->unk_0xB4 + 1;
 		this->unk_0xB4 = count;
 		if (count < 4) {
-			if (this->unk_0xAC == 4)
-				doCallback = ((count & 1) == 0);
+			doCallback = (this->unk_0xAC == 4) && ((count & 1) == 0);
 		} else {
 			this->unk_0xA0 = 0;
 			doCallback = 1;
@@ -655,13 +649,13 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		this->vt->func_80059E3C(this);
 	return ret;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059BE0);
 
 #if 0
-/* Best-reached body, 55/72 words -- see docs/match-reports/func_80059D1C.md
-   for the residue analysis. Restored to INCLUDE_ASM below per project rule
-   (no score short of byte-exact stays in src/). */
+/* Best-reached body, 55/72 words, verified fresh round 32 (2026-09-12,
+   runner alpha2) -- see docs/match-reports/func_80059D1C.md for the
+   residue analysis (a whole-function this/heading register-identity swap)
+   and this round's two new negative attempts. Restored to INCLUDE_ASM below
+   per project rule (no score short of byte-exact stays in src/). */
 void func_80059D1C(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
@@ -692,7 +686,6 @@ void func_80059D1C(DreamSys *this)
 	}
 }
 #endif
-
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059D1C);
 
 void func_80059E3C(DreamSys *this)

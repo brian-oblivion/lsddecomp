@@ -1,4 +1,28 @@
-# CalcDreamColor — STALL
+# CalcDreamColor — STALL: exact length (35/35 instructions, zero address drift), 28/35 raw word-match, first real diff at 0x4BD78 (retail computes the table base address early; this build loads `upper` early instead -- the commutative-add operand-order class, sixth confirmed instance project-wide)
+
+> **TITLE REBUILT, round 32 (2026-09-12, runner alpha2).** The old title
+> carried no length figure at all, per this round's assignment to fix that.
+> Re-measured fresh (spliced the exact preserved body below back in and
+> rebuilt) rather than trusting the inherited "28/35 words" figure blind:
+> confirmed the compiled function is genuinely **35 words, matching retail's
+> length exactly (zero address drift)** -- `funcdiff.py` reports no
+> outside-range warning and a direct `objdump` word count confirms 35 words
+> compiled. First real diff located via `tools/asm-differ/diff.py`: `0x4BD78`,
+> where retail computes the `D_80087E14` table-base address (`lui a0,0x8008`)
+> immediately after reading `dynamic`, while this build instead loads `upper`
+> early (`lb a0,1(sp)`) — exactly the round-20-confirmed "commutative-add
+> operand-order" class this function was already filed under (sixth instance
+> project-wide, third unrelated unit). No new attempt made this round beyond
+> the re-measurement; the function remains genuinely **PERMUTER-EXHAUSTED**
+> per the twelve-thousand-plus-iteration search already on record below, and
+> nothing in this round's two findings (the `volatile` scheduling instrument,
+> the register-identity-as-hypothesis discriminator) applies here — this is
+> neither a hardware-observed access nor a case where any reshape (including
+> the operand-order reversal already tried in round 20) discriminates order
+> from allocation; both directions of the commutative add were tried and
+> produced the identical wrong result, which is the signature CLAUDE.md/
+> DECOMPILATION_LEARNINGS already classifies as this specific compiler-level
+> class, not a source-reachable one.
 
 **Unit:** DreamSys · **Size:** 35 instructions · **Best reached:** 28/35 words. **PERMUTER-EXHAUSTED** for the legitimate search space (round 2026-09-02, runner BRAVO) -- see "Permuter run" below; one untried legitimate lead is flagged there for a future attempt.
 
