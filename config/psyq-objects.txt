@@ -339,3 +339,9 @@
 # SsVabOpenHeadWithMode (274w), was the largest Sony-owned stall in the queue
 # with a 232-line report. Text-only.
 3.3  libsnd/vs_vh    0x23498
+
+# code_2cc8c_e prefix (0x2FAAC..0x3030C): libgs/gs_131 + libgs/gs_133, five
+# functions, two of which were INCLUDE_ASM stalls (GsSetRefView2 242w,
+# select_max_param 50w). Both .bss-only -- nothing goes in the yaml for data.
+3.3  libgs/gs_131   0x2FAAC
+3.3  libgs/gs_133   0x30048

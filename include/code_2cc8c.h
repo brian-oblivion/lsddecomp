@@ -610,7 +610,7 @@ struct Unk18Obj {
        its own arg1 -- RETYPED from an opaque byte span once
        func_8003EBC4's own store pattern (3 plain word stores at +0x14/
        +0x18/+0x1C) confirmed the shape; func_8003EACC's own use (only the
-       address, forwarded to func_8003F2AC) is unaffected by the retype. */
+       address, forwarded to GsSetRefView2) is unaffected by the retype. */
     Vec3_2cc8c unk14;
     /* +0x020, round 14: another Vec3, written wholesale by func_8003EBF8
        from its own arg1 -- same shape/evidence as unk14 just above. */
@@ -712,10 +712,13 @@ extern Unk18Obj *func_8003E5D8(void); /* this unit's own New_X allocator for
    for what each was OBSERVED from. */
 void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 
-/* func_8003F2AC (asm/code_2cc8c_e.s, the NEXT slice, still uncarved):
-   func_8003EACC (round 14, this unit) calls it with only `&self->unk14`
-   set up; declared here only with that call site's own shape. */
-extern void func_8003F2AC(void *arg0);
+/* GsSetRefView2 is NO LONGER DECLARED HERE, round 33. It is Sony's
+   (`libgs/gs_131.o`, linked from the SDK object) and will one day sit next to
+   `include/psyq/LIBGS.H`'s own prototype for it -- two declarations of one
+   Sony name in a header six units include is the `conflicting types` failure
+   that CLAUDE.md and the SDK guide both warn about, and it would surface in a
+   unit that never touched this line. Its one caller, func_8003EACC, now
+   declares it locally in src/code_2cc8c_d.c with that call site's own shape. */
 
 /* func_8003FC18 (code_2cc8c_e, round 14, now carved): func_8003ECD0 (this
    unit) calls it twice, always with its own 1st/2nd arguments literal 0

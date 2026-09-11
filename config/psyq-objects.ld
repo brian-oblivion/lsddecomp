@@ -41,6 +41,8 @@ SECTIONS {
     .psyq_bss.libcd_c_004_bss 0x8008E23C (NOLOAD) : SUBALIGN(2) { build/lib/libcd/c_004.o(.bss) }   /* 0x50 bytes; first symbol Stframe_no */
     .psyq_bss.libcd_c_007_bss 0x8008E23C (NOLOAD) : SUBALIGN(2) { build/lib/libcd/c_007.o(.bss) }   /* 0x50 bytes; first symbol Stframe_no */
     .psyq_bss.libc2_rand_sbss 0x8008AC68 (NOLOAD) : SUBALIGN(2) { build/lib/libc2/rand.o(.sbss) }   /* 0x4 bytes; section-relative refs */
+    .psyq_bss.libgs_gs_131_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_131.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
+    .psyq_bss.libgs_gs_133_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_133.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 dc_cr = 0x8008E224;   /* libpress/vlc2 */
@@ -110,6 +112,8 @@ StFunc2 = 0x8008E7A0;   /* libcd/c_004 */
 StFunc2 = 0x8008E7A0;   /* libcd/c_007 */
 GsWSMATRIX_ORG = 0x8008E7E4;   /* libgs/gs_134 */
 GsWSMATRIX_ORG = 0x8008E7E4;   /* libgs/gs_135 */
+GsWSMATRIX_ORG = 0x8008E7E4;   /* libgs/gs_131 */
+GsWSMATRIX_ORG = 0x8008E7E4;   /* libgs/gs_133 */
 StCdIntrFlag = 0x8008E808;   /* libcd/c_002 */
 StCdIntrFlag = 0x8008E808;   /* libcd/c_003 */
 StCdIntrFlag = 0x8008E808;   /* libcd/c_005 */
@@ -224,6 +228,8 @@ StFinalSector = 0x8008E9AC;   /* libcd/c_004 */
 StFinalSector = 0x8008E9AC;   /* libcd/c_007 */
 GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_134 */
 GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_135 */
+GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_131 */
+GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_133 */
 dec_used = 0x8008E9D4;   /* libpress/vlc2 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_127 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_119 */
@@ -396,6 +402,8 @@ _spu_t = 0x80038658;
 _spu_write = 0x80038900;
 _spu_FsetRXX = 0x800389F0;
 _spu_FsetRXXa = 0x80038A38;
+Gssub_make_matrix = 0x8003FB1C;
+TransposeMatrix = 0x8003FCFC;
 rcossin_tbl = 0x80066BE0;
 _spu_tsa = 0x8006DCC8;
 _spu_RXX = 0x8006DCCC;

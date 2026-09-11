@@ -367,6 +367,11 @@ SsVabOpenHead = 0x80032C98; // type:func  (Psy-Q libsnd/vs_vh, from the SDK obje
 SsVabOpenHeadSticky = 0x80032CCC; // type:func  (Psy-Q libsnd/vs_vh, from the SDK object)
 SsVabFakeHead = 0x80032D00; // type:func  (Psy-Q libsnd/vs_vh, from the SDK object)
 SsVabOpenHeadWithMode = 0x80032D34; // type:func  (Psy-Q libsnd/vs_vh, from the SDK object)
+GsSetRefView2 = 0x8003F2AC; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
+scale_view_param = 0x8003F674; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
+select_max_param = 0x8003F764; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
+len_param = 0x8003F82C; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
+GsGetLw = 0x8003F848; // type:func  (Psy-Q libgs/gs_133, from the SDK object)
 // class_3bb8c_u's three functions, converted to linked SDK objects in round
 // 33.  These are Sony's own exported names, read out of the object symbol
 // tables, not guesses -- see the PROVENANCE note at the top of this file.

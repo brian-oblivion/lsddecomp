@@ -68,10 +68,17 @@ void func_8003EAC4(Unk18Obj *self, s32 a1) {
     self->unk60 = a1;
 }
 
+/* GsSetRefView2 is Sony's (`libgs/gs_131.o`, linked from the SDK object).
+   Declared LOCALLY rather than in include/code_2cc8c.h, which six units
+   include: the real `LIBGS.H` prototype for this name will collide there.
+   This is only the shape THIS unit's call sites use -- the real one takes a
+   GsRVIEW2*. */
+extern void GsSetRefView2(void *arg0);
+
 /* One-time init, guarded by self->unk10: registers `a1` as a child (via
  * the inherited BasicClass "addChild" slot10), dispatches slot78/slot7C
  * with a2/a3, dispatches slot80 with arg5 (or a default, D_8008A8F4, when
- * arg5 is NULL), then hands &self->unk14 to func_8003F2AC. Does nothing at
+ * arg5 is NULL), then hands &self->unk14 to GsSetRefView2. Does nothing at
  * all once self->unk10 is already set. */
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
     Unk18ObjMethods *m = self->methods;
@@ -83,7 +90,7 @@ void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
     m->slot78(self, a2);
     m->slot7C(self, a3);
     m->slot80(self, arg5 != NULL ? arg5 : D_8008A8F4);
-    func_8003F2AC(&self->unk14);
+    GsSetRefView2(&self->unk14);
 }
 
 /* Teardown counterpart to func_8003EACC's init: removes self->unk10 as a
@@ -182,7 +189,7 @@ void func_8003EEC0(Unk18Obj *self) {
         func_8003FD4C(self->unk60, self->unk40);
     }
 
-    func_8003F2AC(&self->unk14);
+    GsSetRefView2(&self->unk14);
     *(s32 *)self->unk30 = 0;
 
     self->unk98 = (u32)(self->unk50 - self->unk4C) / (u32)(1 << self->unk3C) + 1;
