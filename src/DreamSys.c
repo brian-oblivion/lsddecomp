@@ -507,18 +507,22 @@ void func_80059814(DreamSys *this)
 }
 
 #if 0
-/* best-reached body, round 2026-09-08 (runner echo): matches retail's
-   ENTIRE control-flow graph (every branch/jump target realigns exactly),
-   2 words SHORT (75/77) purely because `delta` does not get promoted to
-   a callee-saved register the way retail's does ($s2). See
-   docs/match-reports/func_800598E8.md. */
+/* best-reached body, round 32 (2026-09-12, runner alpha2): the delta/step
+   register-coalescing fix that closed func_80059814 (reusing the SAME `delta`
+   local across both mutually exclusive branches instead of a separate `step`)
+   applies here too and closes ONE of the two previously-missing words: 76/77
+   words, 1 word SHORT (was 75/77, 2 words short). See
+   docs/match-reports/func_800598E8.md for the residue that's left -- it is a
+   different, deeper mechanism (opportunistic delay-slot placement of the
+   `this` register setup across multiple converging paths into the shared
+   `func_80059A1C(this)` tail call), not reachable by the rename lever nor by
+   a scheduling barrier at the merge point (tried, no effect). */
 void func_800598E8(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
 	s32 threshold;
 	s32 sum;
-	s32 step;
 
 	this->unk_0xA8 = (this->unk_0xA0 == 1);
 	idx = this->unk_0x90;
@@ -542,10 +546,12 @@ void func_800598E8(DreamSys *this)
 		this->unk_0x94 = sum;
 		this->unk_0x90 = 0;
 	} else if (this->unk_0x94 != 0) {
-		step = (this->unk_0x94 < 0) ? 0x2D : -0x2D;
-		D_80087E84[0].value = step;
+		delta = -0x2D;
+		if (this->unk_0x94 < 0)
+			delta = 0x2D;
+		D_80087E84[0].value = delta;
 		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
-		this->unk_0x94 += step;
+		this->unk_0x94 += delta;
 	} else {
 		return;
 	}
