@@ -1898,7 +1898,11 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 
 ## Runner subagent prompt (head fills in `<>`)
 
-> You are a matching runner for the LSD: Dream Emulator (PSX) decomp. Work ONLY
+> You are a matching runner for the LSD: Dream Emulator (PSX) decomp. **This is
+> round `<N>`** — use that number in every report, title and commit message you
+> write. (Two of round 33's five runner sessions guessed it wrong, one high and
+> one low, and the head had to relabel three files; the prompt had simply never
+> said.) Work ONLY
 > in the worktree `<path>` (cd there first) on branch `runner/<name>`. Read
 > CLAUDE.md, docs/MATCHING-GUIDE.md and docs/DECOMPILATION_LEARNINGS.md, then
 > decompile up to `<N>` functions from the `INCLUDE_ASM` entries in
