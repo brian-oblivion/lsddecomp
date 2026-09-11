@@ -18,12 +18,20 @@ You need your own copy of the game. Nothing here contains game data.
 ```sh
 git clone <this repo> lsddecomp2 && cd lsddecomp2
 cp ~/path/to/'LSD - Dream Emulator (Japan).bin' .   # or the extracted SLPS_015.56 into disk/
+cp ~/path/to/'Programmer Tool - Runtime Library Version 3.5 (Japan)_DTL-S2300_redump.zip' sdk/
 ./tools/setup.sh
 ```
 
+You also need the Psy-Q SDK disc(s), because the build **links Sony's own
+library objects** rather than re-deriving them as C — the same objects the
+game linked, placed where the game put them. `sdk/README.md` says which discs
+and where to find them; `setup.sh` tells you exactly which version is missing
+if one is.
+
 `setup.sh` extracts the executable from the disc image if it finds one, builds
 a `mipsel-linux-gnu` binutils, fetches the Psy-Q GCC 2.6.3, sets up a Python
-venv, runs the split, and **proves the result rebuilds byte-for-byte**. If that
+venv, converts the SDK libraries in `sdk/` into `lib/`, runs the split, and
+**proves the result rebuilds byte-for-byte**. If that
 last step fails it stops: a funcdiff score against a toolchain that cannot
 reproduce retail is meaningless, and starting anyway wastes a session.
 
@@ -95,6 +103,7 @@ expensive to notice:
 | `disk/SLPS_015.56` | the retail executable. Yours; never committed. |
 | `config/` | splat segmentation and symbol names |
 | `include/` | project headers and the Psy-Q SDK headers |
+| `sdk/`, `lib/` | your Psy-Q SDK disc(s), and the Sony objects converted from them. Never committed. |
 | `src/` | carved C units — where the work happens |
 | `asm/` | generated disassembly. Never edit, never commit. |
 | `tools/` | toolchain and workflow tools |

@@ -1,0 +1,22 @@
+# Psy-Q library objects linked into the build, one per splat `o` segment.
+#
+#   <sdk version>  <lib>/<module>  <file offset of its .text in SLPS_015.56>
+#
+# tools/psyq_sdk.py install reads this, converts the matching disc in sdk/
+# (bring your own -- see sdk/README.md), verifies each object's masked .text
+# against retail at the offset, and writes lib/<lib>/<module>.o. The yaml's
+# `o` segments must agree with this file: `tools/psyq_sdk.py check`.
+#
+# Which disc holds which build of a library is MEASURED by
+# `tools/psyq_sdk.py match`, not assumed -- the game mixed library versions
+# (libetc from the same build as the 3.5 disc, libgpu/libcd from an older one).
+
+# libgte: RCpoly* polygon-subdivision family. Text-only objects, no data.
+3.5  libgte/divf3a   0xAD64
+3.5  libgte/divf4a   0xB0D4
+3.5  libgte/divg3a   0xB554
+3.5  libgte/divg4a   0xB964
+3.5  libgte/divft3a  0xBEB4
+3.5  libgte/divft4a  0xC2B4
+3.5  libgte/divgt3a  0xC7D4
+3.5  libgte/divgt4a  0xCC74

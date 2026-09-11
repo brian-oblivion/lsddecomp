@@ -29,7 +29,7 @@ for arg in "$@"; do
 done
 
 STEP=0
-TOTAL=6
+TOTAL=7
 step() { STEP=$((STEP+1)); printf '\n\033[1m[%d/%d] %s\033[0m\n' "$STEP" "$TOTAL" "$1"; }
 skip() { printf '      already done (%s) — use --force to redo\n' "$1"; }
 ok()   { printf '      \033[32mOK\033[0m %s\n' "$1"; }
@@ -200,6 +200,38 @@ else
     ) || die "binutils $BUVER build failed (log tail above)"
     ok "tools/binutils"
 fi
+
+# ---------------------------------------------------------------------------
+step "Psy-Q library objects (sdk/ -> lib/)"
+# The build LINKS Sony's own library objects (splat `o` segments) instead of
+# carrying that code as disassembly. They come from the user's SDK disc in
+# sdk/ -- bring-your-own, exactly like disk/ -- converted from Sony's LNK
+# object format to ELF by pcsx-redux's psyq-obj-parser. The static Linux
+# binary is the one decompme/compilers publishes (also what lom-decomp uses).
+POP=tools/psyq-obj-parser/psyq-obj-parser
+POPURL='https://github.com/decompme/compilers/releases/download/compilers/psyq-obj-parser.tar.gz?2025-03-18'
+if [ "$FORCE" = 1 ]; then rm -rf tools/psyq-obj-parser lib; fi
+if [ -x "$POP" ]; then
+    skip "$POP"
+else
+    POPTMP=$(mktemp -d)
+    curl -sfL -o "$POPTMP/pop.tar.gz" "$POPURL" \
+        || { rm -rf "$POPTMP"; die "could not fetch psyq-obj-parser from $POPURL
+      Build it from https://github.com/grumpycoders/pcsx-redux (tools/psyq-obj-parser)
+      and place the binary at $POP."; }
+    mkdir -p tools/psyq-obj-parser
+    tar xzf "$POPTMP/pop.tar.gz" -C tools/psyq-obj-parser
+    rm -rf "$POPTMP"
+    chmod +x "$POP"
+    "$POP" -h >/dev/null 2>&1 || die "$POP does not run on this host"
+    ok "$POP"
+fi
+# Idempotent: re-extracts nothing that is already under sdk/work/, and dies
+# with the exact archive.org file name if a disc the manifest needs is absent.
+# The build cannot link without lib/, so this is not optional.
+.venv/bin/python3 tools/psyq_sdk.py install \
+    || die "could not produce lib/ from sdk/. See sdk/README.md."
+ok "lib/ ($(find lib -name '*.o' | wc -l) objects, verified against retail)"
 
 # ---------------------------------------------------------------------------
 step "Extracting asm/ and verifying the build"

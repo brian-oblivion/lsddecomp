@@ -203,14 +203,14 @@ extern void func_8001A380(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4
 
 /* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
  * func_800197C4 (code_8220_c) with (self, table). */
-extern void func_8001A564(void *self, void *table);
+extern void RCpolyF3(void *self, void *table);
 
 /* Opaque table, referenced only by ADDRESS (never dereferenced in this
- * unit) and handed to func_8001A380/func_8001A564. asm/data, not yet
+ * unit) and handed to func_8001A380/RCpolyF3. asm/data, not yet
  * carved -- real element type unknown. */
 extern u8 D_8008ACD0[];
 
-/* Quad-flavored sibling of D_8008ACD0/func_8001A380/func_8001A564,
+/* Quad-flavored sibling of D_8008ACD0/func_8001A380/RCpolyF3,
  * referenced the same way by func_80019B24 (code_8220_c, round 13). */
 extern u8 D_8008AEE8[];
 
@@ -223,36 +223,36 @@ extern void func_8001A4C0(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *u
 
 /* Psy-Q SDK (asm/psyq_rcpolyf4.s, not a carved C unit). Called by
  * func_80019B24 (code_8220_c) with (self, table) -- quad-flavored sibling
- * of func_8001A564. */
-extern void func_8001A8D4(void *self, void *table);
+ * of RCpolyF3. */
+extern void RCpolyF4(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolyg3.s, not a carved C unit). Called by
  * func_8001989C (code_8220_c) with (self, table) -- Gouraud-shaded
- * sibling of func_8001A564/func_8001A8D4. */
-extern void func_8001AD54(void *self, void *table);
+ * sibling of RCpolyF3/RCpolyF4. */
+extern void RCpolyG3(void *self, void *table);
 
-/* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as func_8001AD54, not a
+/* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as RCpolyG3, not a
  * carved C unit). Called by func_800199EC (code_8220_c) with
  * (self, table). */
-extern void func_8001B6B4(void *self, void *table);
+extern void RCpolyFT3(void *self, void *table);
 
-/* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as func_8001AD54/func_8001B6B4,
+/* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as RCpolyG3/RCpolyFT3,
  * not a carved C unit). Called by func_80019C04 (code_8220_c) with
  * (self, table) -- Gouraud-shaded quad, quad-flavored sibling of
- * func_8001AD54. */
-extern void func_8001B164(void *self, void *table);
+ * RCpolyG3. */
+extern void RCpolyG4(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolyft3.s, not a carved C unit). Called by
  * func_80019D84 (code_8220_c) with (self, table). */
-extern void func_8001BAB4(void *self, void *table);
+extern void RCpolyFT4(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolygt3.s, not a carved C unit). Called by
  * func_80019EE4 (code_8220_c) with (self, table). */
-extern void func_8001BFD4(void *self, void *table);
+extern void RCpolyGT3(void *self, void *table);
 
-/* Psy-Q SDK (asm/psyq_rcpolygt3.s, same file as func_8001BFD4, not a
+/* Psy-Q SDK (asm/psyq_rcpolygt3.s, same file as RCpolyGT3, not a
  * carved C unit). Called by func_8001A064 (code_8220_c) with (self,
- * table) -- Gouraud-shaded quad, quad-flavored sibling of func_8001BFD4. */
-extern void func_8001C474(void *self, void *table);
+ * table) -- Gouraud-shaded quad, quad-flavored sibling of RCpolyGT3. */
+extern void RCpolyGT4(void *self, void *table);
 
 #endif

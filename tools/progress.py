@@ -115,21 +115,27 @@ def library_ranges():
     percentage drifts for a reason that has nothing to do with the code. The
     yaml already records the fact; read it there.
 
-    The naming convention is the contract: a subsegment whose name starts with
-    `psyq_` is SDK code. Name a new one that way and it counts as library
-    everywhere, automatically.
+    Two things count as library, and both are read from the yaml:
+
+    - a subsegment whose name starts with `psyq_` -- SDK code still carried as
+      disassembly. Name a new one that way and it counts as library
+      everywhere, automatically;
+    - any subsegment of type `o` -- a prebuilt Sony object linked straight
+      from the SDK (see config/psyq-objects.txt). `o` segments are library
+      BY DEFINITION, whatever they are named, because the only objects the
+      build links that it did not compile are Sony's.
     """
     text = YAML.read_text()
     # Every subsegment start, in order, so a block's end is the next start.
     entries = []
     for m in re.finditer(r"^\s+- \[\s*(0x[0-9A-Fa-f]+)\s*,\s*([.\w]+)"
-                         r"(?:\s*,\s*(\w+))?\s*\]", text, re.M):
+                         r"(?:\s*,\s*([\w/]+))?\s*\]", text, re.M):
         off, kind, name = int(m.group(1), 16), m.group(2), m.group(3)
         entries.append((off, kind, name))
     entries.sort()
     ranges = []
     for i, (off, kind, name) in enumerate(entries):
-        if not (name or "").startswith("psyq_"):
+        if kind != "o" and not (name or "").startswith("psyq_"):
             continue
         end = entries[i + 1][0] if i + 1 < len(entries) else None
         if end is None:
@@ -337,6 +343,12 @@ def main():
               f"  (never was C — can never be matched)")
     print(f"  library (Psy-Q SDK):        {library:5d}  (excluded from game %)"
           f"  [{library_matched} matched, {library - library_matched} to go]")
+    # Functions inside `o` segments have no asm and are not counted above: the
+    # linker takes them straight from Sony's objects. Report the objects.
+    o_segs = len(re.findall(r"^\s+- \[\s*0x[0-9A-Fa-f]+\s*,\s*o\s*,", YAML.read_text(), re.M))
+    if o_segs:
+        print(f"    linked from SDK objects:  {o_segs:5d}  objects (lib/, per config/psyq-objects.txt;"
+              f" not in any count above)")
     print(f"  total functions:            {total:5d}  ({game} game)")
     if handwritten and game:
         # Keep hand-written asm inside the game denominator and report the

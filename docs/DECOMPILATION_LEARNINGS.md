@@ -229,6 +229,29 @@ Three things worth keeping:
 
 ## Build hygiene (proven, the hard way)
 
+### SDK code hides inside game segments — check `psyq_sdk.py coverage` before matching anything library-shaped (2026-09-11)
+
+The Psy-Q libraries are now LINKED from Sony's own objects (splat `o`
+segments; `docs/research/psyq-sdk-objects.md`). Placing every SDK object
+against retail found 45 of them inside segments the config calls game code:
+`libc2` string functions in `code_171e0`/`code_179d8_*`, nineteen `libsnd`
+driver internals across `code_179d8_*`, `libgs`/`libgte` helpers in
+`code_2cc8c_e`, and the thirteen 16-byte BIOS trampolines in `class_3bb8c_h*`
+that the yaml comments debate turning into `hasm`. `func_8003FC70`, closed as
+a 35/35 game match in round 20, is `libgs/gs_108.o`.
+
+Matching such a function is not wrong — the bytes match — but it is work on
+code that will be replaced by an `o` segment, and its report then documents a
+function that no longer exists in the game denominator. So: before working a
+function whose body looks like a string routine, a sound-driver step, a GTE
+helper or a BIOS stub, run
+
+```sh
+.venv/bin/python3 tools/psyq_sdk.py coverage    # "Placed objects that fall inside GAME-code segments"
+```
+
+and if it is listed, convert the segment instead of matching the function.
+
 ### `make extract` while a function is LIVE C silently destroys its own `.s` stub (round 26)
 
 **splat only regenerates `asm/nonmatchings/<unit>/<func>.s` for a function

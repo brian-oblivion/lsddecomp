@@ -17,6 +17,10 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    `extract`, `progress`, `format` and `clean`.
 3. **NEVER commit the executable or a disc image.** `disk/SLPS_015.56` and any
    `.bin`/`.cue`/`.iso` are gitignored and stay that way. Bring-your-own-disc.
+   The same goes for the Psy-Q SDK: `sdk/` (the user's SDK discs) and `lib/`
+   (Sony's library objects converted from them) are gitignored. What IS
+   committed is `config/psyq-objects.txt`, the manifest that regenerates
+   `lib/` from `sdk/`.
 4. **NEVER edit anything under `asm/`.** It is generated from the executable by
    splat and rewritten on every `make extract` — `make extract` deletes
    `asm/nonmatchings/` outright. To rename a symbol, edit
@@ -116,7 +120,10 @@ How to read `progress.py` correctly:
 
 - **The library split is derived, not hardcoded.** Any subsegment named
   `psyq_*` in the splat config counts as Psy-Q SDK everywhere, and is excluded
-  from the game-code percentage.
+  from the game-code percentage. So does every subsegment of type `o`: those
+  are Sony's own objects linked from the SDK, they have no asm and no C, and
+  `progress.py` reports them on a separate "linked from SDK objects" line
+  rather than in any function count.
 - **Not every matched function was work.** Some bodies are just `jr $ra; nop`
   and splat generated them itself.
 - **The `fresh` column cannot see toolchain blockers** — screen candidates
@@ -309,6 +316,28 @@ Gate 2.
   tables are data. Resolve a slot with `tools/classtable.py`, never by counting.
   **The suggestive symbol names are FirecatFG's hypotheses, not evidence** —
   they look like C++ because someone who suspected C++ chose them.
+- **The Psy-Q SDK is LINKED, not decompiled.** The libraries shipped on the
+  SDK discs as `.LIB` archives of `.OBJ` files with full symbol names, so the
+  build links those objects themselves through splat `o` segments, exactly as
+  the game did, and byte-exactly (proven 2026-09-11 with eight `libgte`
+  objects; `docs/research/psyq-sdk-objects.md`). Consequences:
+  - **Never write C for a function a Sony object owns.** Before working any
+    `psyq_*` function, or any game-segment function that smells like a
+    library (string ops, sound driver internals, BIOS stubs, GTE helpers), run
+    `.venv/bin/python3 tools/psyq_sdk.py coverage` — it lists the placed
+    objects that fall inside GAME segments. Round 20 matched `func_8003FC70`
+    as game code; it is `libgs/gs_108.o`.
+  - **The game mixed library builds.** `libetc` is the build on the 3.5 disc;
+    `libgpu`/`libcd` carry RCS ids from December 1995 and match neither the
+    3.5 nor the 3.6 disc. Which disc owns which object is MEASURED by
+    `tools/psyq_sdk.py match` against retail (relocation-masked exact match),
+    never inferred from a version number.
+  - An object goes into the yaml as `- [0xOFF, o, <lib>/<module>]` AND into
+    `config/psyq-objects.txt` with the same offset; `tools/psyq_sdk.py check`
+    verifies the two agree and `lib/` is complete. Objects with data sections
+    also need their `.rdata`/`.data`/`.sbss`/`.bss` placed (the `o` form with a
+    fourth field), which is where the effort goes — the eight pilot objects
+    were text-only.
 
 ## The decompilation loop
 
@@ -627,6 +656,10 @@ python3 tools/classtable.py --scan # the 60 class method tables
 python3 tools/classtable.py <t> --vs <base>   # what a subclass overrides
 python3 tools/headercontention.py  # which units would fight over a header
 tools/setup-worktree.sh <name>     # provision a parallel runner
+.venv/bin/python3 tools/psyq_sdk.py install    # sdk/ discs -> lib/ objects (setup.sh runs it)
+.venv/bin/python3 tools/psyq_sdk.py match      # place every SDK object in retail
+.venv/bin/python3 tools/psyq_sdk.py coverage   # which SDK functions are already owned by an object
+.venv/bin/python3 tools/psyq_sdk.py check      # manifest, yaml `o` segments and lib/ agree
 ```
 
 ## Layout
@@ -634,6 +667,9 @@ tools/setup-worktree.sh <name>     # provision a parallel runner
 | path | what |
 | --- | --- |
 | `disk/SLPS_015.56` | the retail executable. Yours, never committed. |
+| `sdk/` | your Psy-Q SDK disc image(s). Never committed; see `sdk/README.md`. |
+| `lib/` | Sony's library objects converted from `sdk/`, linked as splat `o` segments. Generated, never committed. |
+| `config/psyq-objects.txt` | the manifest: which object, from which disc, at which offset |
 | `config/` | splat segmentation + symbol names |
 | `include/` | project headers and the Psy-Q SDK headers |
 | `src/` | carved C units — where the work happens |
@@ -649,5 +685,8 @@ tools/setup-worktree.sh <name>     # provision a parallel runner
   a unit's real state instead of a transcribed one.
 - `docs/DECOMPILATION_LEARNINGS.md` — source-shape idioms and open questions.
 - `docs/PROGRESS.md` — the running session log.
+- `docs/research/psyq-sdk-objects.md` — how the SDK objects were placed, what
+  each disc covers, and what is still carried as disassembly.
 - `CREDITS.md` — this project stands on FirecatFG's lsddecomp for its
-  segmentation and symbol names. Read it.
+  segmentation and symbol names, and on parasite-eve-2-decomp for the
+  linked-SDK approach. Read it.

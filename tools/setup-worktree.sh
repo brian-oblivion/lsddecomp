@@ -35,11 +35,14 @@ fi
 # fail here, loudly, rather than as a confusing build error inside a runner
 # session an hour later.
 REQUIRED="binutils gcc263 maspsx asm-differ m2c"
-OPTIONAL="decomp-permuter"
+OPTIONAL="decomp-permuter psyq-obj-parser"
 
 missing=""
 [ -e "$MAIN/disk/SLPS_015.56" ] || missing="$missing disk/SLPS_015.56"
 [ -e "$MAIN/.venv" ]            || missing="$missing .venv"
+# lib/ holds the Sony objects the link needs (splat `o` segments); a worktree
+# cannot regenerate them any more than it can build binutils.
+[ -e "$MAIN/lib" ]              || missing="$missing lib (run tools/psyq_sdk.py install)"
 for t in $REQUIRED; do
     [ -e "$MAIN/tools/$t" ] || missing="$missing tools/$t"
 done
@@ -55,6 +58,7 @@ git worktree add -b "$branch" "$dest" main
 mkdir -p "$dest/disk"
 ln -s "$MAIN/disk/SLPS_015.56" "$dest/disk/SLPS_015.56"
 ln -s "$MAIN/.venv" "$dest/.venv"
+ln -s "$MAIN/lib" "$dest/lib"
 for t in $REQUIRED $OPTIONAL; do
     src="$MAIN/tools/$t"
     [ -e "$src" ] || continue          # only reachable for OPTIONAL entries

@@ -47,6 +47,7 @@ tools/m2c
 tools/maspsx
 tools/decomp-permuter
 tools/gcc263
+tools/psyq-obj-parser
 permuter-work
 # Seed scaffolds a runner hands the permuter. Generated working state, same
 # as permuter-work, and NOT the durable record: a preserved body belongs
@@ -74,3 +75,13 @@ scratchpad/
 # one. PARALLEL-RUNS.md has always described this file as gitignored; it
 # was not, until round 12 went to write it and found out.
 .claude/settings.local.json
+
+# ---------------------------------------------------------------------------
+# PSY-Q SDK. Bring your own disc, exactly like disk/. sdk/ holds the user's
+# SDK discs and everything unpacked from them; lib/ holds the converted Sony
+# objects the build links (splat `o` segments). config/psyq-objects.txt is the
+# committed manifest that regenerates lib/ from sdk/.
+# ---------------------------------------------------------------------------
+sdk/*
+!sdk/README.md
+lib/

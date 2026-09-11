@@ -57,8 +57,13 @@ CONFIG    := config
 # from it drops without a word.
 S_FILES  := $(shell find asm -name '*.s' -not -path 'asm/nonmatchings/*' 2>/dev/null)
 C_FILES  := $(shell find src -name '*.c' 2>/dev/null)
+# Prebuilt Psy-Q library objects (splat `o` segments). lib/ is produced from
+# the user's own SDK disc by tools/setup.sh and is gitignored; the linker
+# script names them under build/lib/, so they are mirrored there.
+LIB_FILES := $(shell find lib -name '*.o' 2>/dev/null)
 O_FILES  := $(foreach f,$(S_FILES),$(BUILD_DIR)/$(f).o) \
-            $(foreach f,$(C_FILES),$(BUILD_DIR)/$(f).o)
+            $(foreach f,$(C_FILES),$(BUILD_DIR)/$(f).o) \
+            $(foreach f,$(LIB_FILES),$(BUILD_DIR)/$(f))
 
 ELF      := $(BUILD_DIR)/$(GAME).elf
 EXE      := $(BUILD_DIR)/$(TARGET)
@@ -87,6 +92,10 @@ $(ELF): $(O_FILES) $(GAME).ld
 		$(LD_FLAGS)
 
 # --- compile ---------------------------------------------------------------
+$(BUILD_DIR)/lib/%.o: lib/%.o
+	@mkdir -p $(dir $@)
+	cp $< $@
+
 $(BUILD_DIR)/%.s.o: %.s
 	@mkdir -p $(dir $@)
 	$(AS) $(AS_FLAGS) -o $@ $<

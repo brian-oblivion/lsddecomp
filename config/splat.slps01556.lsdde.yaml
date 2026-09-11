@@ -26,6 +26,7 @@ options:
   asm_path:    asm/
   asset_path:  assets/
   src_path:    src/
+  o_path:      lib/        # prebuilt Psy-Q library objects (converted from the SDK by tools/setup.sh)
   symbol_addrs_path: config/symbols.slps01556.lsdde.txt
   undefined_funcs_auto_path:   config/undefined_funcs_auto.slps01556.lsdde.txt
   undefined_syms_auto_path:    config/undefined_syms_auto.slps01556.lsdde.txt
@@ -254,11 +255,20 @@ segments:
       # Blocker profile: 14 of 16 functions clean, only func_8001A380
       # (4 hits) and func_8001A54C (2 hits) are gp_rel-blocked.
       - [0x9F74, c, code_8220_c]
-      - [0xAD64, asm, psyq_rcpolyf3]
-      - [0xB0D4, asm, psyq_rcpolyf4]
-      - [0xB554, asm, psyq_rcpolyg3]
-      - [0xC2B4, asm, psyq_rcpolyft3]
-      - [0xC7D4, asm, psyq_rcpolygt3]
+      # Psy-Q library code LINKED FROM THE SDK'S OWN OBJECTS (type `o`): the
+      # bytes come from lib/<lib>/<module>.o, which tools/setup.sh converts
+      # from the user's Psy-Q disc with psyq-obj-parser. tools/match_obj.py
+      # placed each one here by a relocation-masked exact match against
+      # retail. Module names are Sony's own. Every `o` segment is library
+      # by definition, and tools/progress.py counts it as such.
+      - [0xAD64, o, libgte/divf3a]    # RCpolyF3, RCpolyF3A     (Psy-Q 3.5)
+      - [0xB0D4, o, libgte/divf4a]    # RCpolyF4, RCpolyF4A
+      - [0xB554, o, libgte/divg3a]    # RCpolyG3, RCpolyG3A
+      - [0xB964, o, libgte/divg4a]    # RCpolyG4, RCpolyG4A
+      - [0xBEB4, o, libgte/divft3a]   # RCpolyFT3, RCpolyFT3A
+      - [0xC2B4, o, libgte/divft4a]   # RCpolyFT4, RCpolyFT4A
+      - [0xC7D4, o, libgte/divgt3a]   # RCpolyGT3, RCpolyGT3A
+      - [0xCC74, o, libgte/divgt4a]   # RCpolyGT4, RCpolyGT4A
       # code_d294 is 55 functions. First 20-function slice, 0xD294..0xDC24,
       # carved to C in round 11; the remainder stays asm as code_d294_b.
       # 0xDC24 (func_8001D424) is a real boundary -- func_8001D3F8 closes

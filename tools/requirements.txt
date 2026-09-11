@@ -46,3 +46,4 @@ pypng==0.20220715.0
 RapidFuzz==3.14.5
 sortedcontainers==2.4.0
 tqdm==4.67.1
+pyelftools==0.33   # tools/match_obj.py: reads .text/.rel.text of converted Psy-Q objects

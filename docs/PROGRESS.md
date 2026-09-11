@@ -6,6 +6,50 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-11 — round 28 (head alone): the Psy-Q SDK is now LINKED from Sony's objects — pilot byte-exact
+
+**No matching this round; a direction change.** The project stops carrying
+the Psy-Q libraries as `psyq_*` disassembly (724 functions, 703 unnamed) and
+links the SDK's own `.OBJ` files through splat `o` segments, the way
+parasite-eve-2-decomp does. Full record in
+`docs/research/psyq-sdk-objects.md`; the short version:
+
+- **Discs.** The user supplied the 3.5 and 3.6 "Programmer Tool — Runtime
+  Library" redump discs into `sdk/` (gitignored, bring-your-own like
+  `disk/`). `tools/psyq_sdk.py` reads `PSX/LIB/*.LIB` straight out of the raw
+  sectors, unpacks the archives (`tools/psyqlib.py`, format read off the
+  bytes), converts with pcsx-redux's `psyq-obj-parser`, and places every
+  object in retail with a relocation-masked EXACT search
+  (`tools/match_obj.py`). 865 + 1042 objects converted; 160 + 156 placed.
+- **The game mixed library builds.** `libetc` is the 3.5 build. `libgpu` and
+  `libcd` carry December-1995 RCS ids and match neither disc — same opcode
+  shape as 3.5's `libgpu/sys`, different bytes. An older disc (3.3 or 3.0) is
+  needed for those; asked the user for it.
+- **Coverage.** The two discs own 190 of the 724 `psyq_*` functions, plus
+  **45 objects sitting inside GAME segments**: `libc2` string functions,
+  nineteen `libsnd` internals, `libgs`/`libgte` helpers, and the thirteen
+  `class_3bb8c_h` BIOS trampolines (which settles the `hasm` debate there —
+  they are Sony objects). `func_8003FC70`, matched in round 20, is
+  `libgs/gs_108.o`.
+- **Pilot.** The five `psyq_rcpoly*` segments (`0xAD64..0xD294`) became eight
+  `o` segments — `libgte/div{f3,f4,g3,g4,ft3,ft4,gt3,gt4}a` — with
+  `o_path: lib/`, a Makefile rule mirroring `lib/**/*.o` into `build/lib/`,
+  and the eight callers in `code_8220_c.c` renamed to `RCpolyF3`…`RCpolyGT4`.
+  **`./build-and-verify.sh`: OK on the first attempt.**
+- **Plumbing.** `config/psyq-objects.txt` is the committed manifest
+  (version, object, offset); `psyq_sdk.py install` verifies each object
+  against retail at its offset before copying it into `lib/`; `check`
+  cross-checks manifest, yaml and `lib/`. `setup.sh` gained a step (fetches
+  the static `psyq-obj-parser` decompme publishes, runs `install`);
+  `setup-worktree.sh` symlinks `lib/`; `progress.py` counts `o` segments as
+  library and reports them on their own line. `pyelftools` pinned in
+  requirements.
+
+**Next.** Convert the covered blocks (`psyq_PadInit`, the covered parts of
+`psyq_2258`, the 45 objects in game segments) — each object with data
+sections needs its `.rdata`/`.data`/`.sbss`/`.bss` placed, which is the real
+work. Then the older disc for `libgpu`/`libcd`/`libgte`/`libspu`.
+
 ## 2026-09-10 — round 27: 4 matches, ground rescued from a stale verdict, and three levers that all have counter-examples
 
 **1044 -> 1048 matched in `main` (76.99% -> 77.29% of game code).** Build green

@@ -60,7 +60,7 @@ void func_800197C4(void *arg0, void *arg1) {
         func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
                       (PolyUV4 *)((u8 *)arg0 + 0x10));
-        func_8001A564(arg0, D_8008ACD0);
+        RCpolyF3(arg0, D_8008ACD0);
     }
 }
 #endif
@@ -109,7 +109,7 @@ void func_8001989C(void *arg0, void *arg1) {
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        func_8001AD54(self, D_8008ACD0);
+        RCpolyG3(self, D_8008ACD0);
     }
 }
 #endif
@@ -141,7 +141,7 @@ void func_800199EC(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
 
-        func_8001B6B4(arg0, D_8008ACD0);
+        RCpolyFT3(arg0, D_8008ACD0);
     }
 }
 #endif
@@ -167,7 +167,7 @@ void func_80019B24(void *arg0, void *arg1) {
         func_8001A380(D_8008AEE8, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         func_8001A4C0((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
-        func_8001A8D4(arg0, D_8008AEE8);
+        RCpolyF4(arg0, D_8008AEE8);
     }
 }
 #endif
@@ -211,7 +211,7 @@ void func_80019C04(void *arg0, void *arg1) {
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        func_8001B164(self, D_8008AEE8);
+        RCpolyG4(self, D_8008AEE8);
     }
 }
 #endif
@@ -250,7 +250,7 @@ void func_80019D84(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x9C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0xA0) + 0x8) = *(u16 *)((u8 *)arg0 + 0x24);
 
-        func_8001BAB4(arg0, D_8008AEE8);
+        RCpolyFT4(arg0, D_8008AEE8);
     }
 }
 #endif
@@ -296,7 +296,7 @@ void func_80019EE4(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x18);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x24);
 
-        func_8001BFD4(self, D_8008ACD0);
+        RCpolyGT3(self, D_8008ACD0);
     }
 }
 #endif
@@ -344,7 +344,7 @@ void func_8001A064(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x24);
         *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x30);
 
-        func_8001C474(self, D_8008AEE8);
+        RCpolyGT4(self, D_8008AEE8);
     }
 }
 #endif

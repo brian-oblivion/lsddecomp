@@ -100,7 +100,7 @@ below, where a stale path is not a typo but a hazard. Read the real path off
 the script's own output, or off `git worktree list`.
 
 The script symlinks the gitignored essentials (the executable, the venv, the
-toolchain), runs `make extract`, and **proves the worktree byte-verifies before
+toolchain, and `lib/` — the Sony library objects the link needs), runs `make extract`, and **proves the worktree byte-verifies before
 handing it over**. That last step is not ceremony: a runner in a worktree that
 does not verify produces scores that mean nothing, and it has no way to notice.
 
