@@ -223,10 +223,10 @@ s16 func_800334F0(s16 a0, s16 a1, Entry8E968 *out)
     return -1;
 }
 
-extern void func_80039158(s32 a0);
-extern void func_8003918C(s32 a0);
-extern void func_800391C8(s32 a0, s32 a1);
-extern void func_80039228(s32 a0);
+extern void SpuSetTransferMode(s32 a0);
+extern void SpuSetTransferStartAddr(s32 a0);
+extern void SpuWrite(s32 a0, s32 a1);
+extern void _spu_setInTransfer(s32 a0);
 extern u8 D_8008EA2C[];
 extern s32 D_80090BD4[];
 extern s32 D_80090B90[];
@@ -237,13 +237,13 @@ s16 func_800335FC(s32 a0, s16 a1)
 
     if ((u16)a1 < 0x11 && D_8008EA2C[chan] == 2) {
         s32 t = D_80090BD4[chan];
-        func_80039158(0);
-        func_8003918C(t);
-        func_800391C8(a0, D_80090B90[chan]);
+        SpuSetTransferMode(0);
+        SpuSetTransferStartAddr(t);
+        SpuWrite(a0, D_80090B90[chan]);
         D_8008EA2C[chan] = 1;
         return chan;
     }
-    func_80039228(0);
+    _spu_setInTransfer(0);
     return -1;
 }
 
@@ -264,11 +264,11 @@ void func_800336CC(u8 a0)
     SpuSetMute(mode);
 }
 
-extern s32 func_8003904C(s16 a0);
+extern s32 SpuIsTransferCompleted(s16 a0);
 
 s16 func_8003370C(s16 a0)
 {
-    return func_8003904C(a0);
+    return SpuIsTransferCompleted(a0);
 }
 
 /* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of

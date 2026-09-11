@@ -792,7 +792,30 @@ segments:
       - [0x294d8, o, libspu/s_m_f]       # SpuFree
       - [0x29554, asm, psyq_29554]       # one function, 0x20 bytes, unowned
       - [0x29574, o, libspu/s_sr]        # SpuSetReverb
+      # Gap: 0x29644..0x2976C, the game's own libspu build.
       - [0x29644, asm, psyq_29644]
+      # Chunk C: one 16-object run, the SPU transfer/IRQ/malloc core
+      # interleaved with five libapi BIOS trampolines. All text-only.
+      - [0x2976c, o, libapi/a12]         # EnableEvent
+      - [0x2977c, o, libapi/a08]         # OpenEvent
+      - [0x2978c, o, libspu/s_dcb]       # _SpuDataCallback
+      - [0x297b0, o, libspu/s_q]         # SpuQuit
+      - [0x2982c, o, libapi/a09]         # CloseEvent
+      - [0x2983c, o, libapi/a13]         # DisableEvent
+      - [0x2984c, o, libspu/s_itc]       # SpuIsTransferCompleted
+      - [0x298f4, o, libapi/a11]         # TestEvent
+      - [0x29904, o, libspu/s_m_init]    # SpuInitMalloc
+      - [0x29958, o, libspu/s_stm]       # SpuSetTransferMode
+      - [0x2998c, o, libspu/s_stsa]      # SpuSetTransferStartAddr
+      # libspu/s_r has identical bytes and places here too. s_w is the right
+      # one: the placed libsnd/vs_vtb calls SpuWrite and its call resolves to
+      # 0x800391C8, this address.
+      - [0x299c8, o, libspu/s_w]         # SpuWrite
+      - [0x29a28, o, libspu/s_it]        # _spu_setInTransfer, _spu_getInTransfer
+      - [0x29a64, o, libspu/s_m_m]       # SpuMalloc
+      - [0x29d2c, o, libspu/s_m_int]     # _spu_gcSPU
+      - [0x2a02c, o, libspu/s_sav]       # _SpuSetAnyVoice
+      - [0x2a0e0, asm, psyq_2a0e0]
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as

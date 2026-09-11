@@ -211,16 +211,25 @@ char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix) {
     return (char *)dest;
 }
 
+/* Psy-Q kernel event queue, linked from libapi/a12, libapi/a13 and
+ * libapi/a11. Local view: these are Sony's, declared in the one unit that
+ * calls them rather than in include/class_3bb8c.h, which 21 units include.
+ * Each takes an event descriptor and returns a status word, which is what
+ * makes them usable as func_8004F40C's `s32 (*)(s32)` callback. */
+extern s32 EnableEvent(s32 event);
+extern s32 DisableEvent(s32 event);
+extern s32 TestEvent(s32 event);
+
 s32 func_8004F394(TaskObjF *self) {
-    return func_8004F40C(self, func_80038F6C, 1);
+    return func_8004F40C(self, EnableEvent, 1);
 }
 
 s32 func_8004F3BC(TaskObjF *self) {
-    return func_8004F40C(self, func_8003903C, 1);
+    return func_8004F40C(self, DisableEvent, 1);
 }
 
 s32 func_8004F3E4(TaskObjF *self) {
-    return func_8004F40C(self, func_800390F4, 0);
+    return func_8004F40C(self, TestEvent, 0);
 }
 
 s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
@@ -251,7 +260,7 @@ s32 func_8004F4C8(s32 *arr, s32 count) {
 
     for (;;) {
         for (i = 0; i < count; i++) {
-            if (func_800390F4(arr[i]) != 0) {
+            if (TestEvent(arr[i]) != 0) {
                 return D_80086E78[i];
             }
         }

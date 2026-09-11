@@ -131,3 +131,29 @@
 3.3  libapi/a10      0x294C8
 3.3  libspu/s_m_f    0x294D8
 3.3  libspu/s_sr     0x29574
+
+# psyq_SpuSetMute chunk C (0x2976C..0x2A0E0): one 16-object run -- the SPU
+# transfer/IRQ/malloc core interleaved with five libapi BIOS trampolines.
+# Text-only; `place` derives no data section for any of the sixteen.
+#
+# 0x299C8 is the segment's one ALTERNATE: libspu/s_r and libspu/s_w have
+# identical bytes and both place there. s_w is the right one -- the placed
+# libsnd/vs_vtb calls SpuWrite and its call resolves to 0x800391C8, this
+# function. (The function IT calls, 0x80038900, is in the unowned gap and
+# keeps its func_ name; ldfrag pins _spu_write to it as an external.)
+3.3  libapi/a12      0x2976C
+3.3  libapi/a08      0x2977C
+3.3  libspu/s_dcb    0x2978C
+3.3  libspu/s_q      0x297B0
+3.3  libapi/a09      0x2982C
+3.3  libapi/a13      0x2983C
+3.3  libspu/s_itc    0x2984C
+3.3  libapi/a11      0x298F4
+3.3  libspu/s_m_init 0x29904
+3.3  libspu/s_stm    0x29958
+3.3  libspu/s_stsa   0x2998C
+3.3  libspu/s_w      0x299C8
+3.3  libspu/s_it     0x29A28
+3.3  libspu/s_m_m    0x29A64
+3.3  libspu/s_m_int  0x29D2C
+3.3  libspu/s_sav    0x2A02C

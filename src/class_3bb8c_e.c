@@ -98,7 +98,7 @@ extern s32 func_8004F4A4(void *self);
  * plain lw at increasing offsets), never gp-relative, so unaffected by the
  * project's gp_rel blocker. */
 extern s32 D_80086E78[4];
-extern s32 func_80038F7C(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
 /* Two format-string-like globals selected by func_8004E940 on self->unkC's
  * truth value; passed opaquely (never dereferenced in this unit). */
@@ -201,7 +201,7 @@ s32 func_8004E5E4(Node3bb8cE *self)
     i = 0;
     cur = self;
     do {
-        cur->threads[0] = func_80038F7C(0xF4000001, D_80086E78[i], 0x2000, 0);
+        cur->threads[0] = OpenEvent(0xF4000001, D_80086E78[i], 0x2000, 0);
         i++;
         cur = (Node3bb8cE *)((u8 *)cur + 4);
     } while (i < 4);
@@ -210,12 +210,12 @@ s32 func_8004E5E4(Node3bb8cE *self)
     return 1;
 }
 
-extern void func_8003902C(void);
+extern void CloseEvent(void);
 
 s32 func_8004E678(Node3bb8cE *self)
 {
     func_8004F3BC(self);
-    func_8004F40C(self, func_8003902C, 1);
+    func_8004F40C(self, CloseEvent, 1);
     return 1;
 }
 

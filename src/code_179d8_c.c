@@ -110,11 +110,11 @@ void func_800329D8(void)
     func_80024CF0();
 }
 
-extern void func_80038FB0(void);
+extern void SpuQuit(void);
 
 void func_80032A7C(void)
 {
-    func_80038FB0();
+    SpuQuit();
 }
 
 extern void func_80033738(void);

@@ -227,6 +227,29 @@ SpuClearReverbWorkArea = 0x80038B28; // type:func  (Psy-Q libspu/s_crwa, from th
 WaitEvent = 0x80038CC8; // type:func  (Psy-Q libapi/a10, from the SDK object)
 SpuFree = 0x80038CD8; // type:func  (Psy-Q libspu/s_m_f, from the SDK object)
 SpuSetReverb = 0x80038D74; // type:func  (Psy-Q libspu/s_sr, from the SDK object)
+
+// psyq_SpuSetMute chunk C (0x2976C..0x2A0E0): the SPU transfer/IRQ/malloc
+// core interleaved with five libapi kernel-event trampolines. 0x800391C8 is
+// SpuWrite, not SpuRead: libspu/s_r and libspu/s_w have identical bytes and
+// both place there, and the placed libsnd/vs_vtb's call to SpuWrite resolves
+// to this address.
+EnableEvent = 0x80038F6C; // type:func  (Psy-Q libapi/a12, from the SDK object)
+OpenEvent = 0x80038F7C; // type:func  (Psy-Q libapi/a08, from the SDK object)
+_SpuDataCallback = 0x80038F8C; // type:func  (Psy-Q libspu/s_dcb, from the SDK object)
+SpuQuit = 0x80038FB0; // type:func  (Psy-Q libspu/s_q, from the SDK object)
+CloseEvent = 0x8003902C; // type:func  (Psy-Q libapi/a09, from the SDK object)
+DisableEvent = 0x8003903C; // type:func  (Psy-Q libapi/a13, from the SDK object)
+SpuIsTransferCompleted = 0x8003904C; // type:func  (Psy-Q libspu/s_itc, from the SDK object)
+TestEvent = 0x800390F4; // type:func  (Psy-Q libapi/a11, from the SDK object)
+SpuInitMalloc = 0x80039104; // type:func  (Psy-Q libspu/s_m_init, from the SDK object)
+SpuSetTransferMode = 0x80039158; // type:func  (Psy-Q libspu/s_stm, from the SDK object)
+SpuSetTransferStartAddr = 0x8003918C; // type:func  (Psy-Q libspu/s_stsa, from the SDK object)
+SpuWrite = 0x800391C8; // type:func  (Psy-Q libspu/s_w, from the SDK object)
+_spu_setInTransfer = 0x80039228; // type:func  (Psy-Q libspu/s_it, from the SDK object)
+_spu_getInTransfer = 0x80039254; // type:func  (Psy-Q libspu/s_it, from the SDK object)
+SpuMalloc = 0x80039264; // type:func  (Psy-Q libspu/s_m_m, from the SDK object)
+_spu_gcSPU = 0x8003952C; // type:func  (Psy-Q libspu/s_m_int, from the SDK object)
+_SpuSetAnyVoice = 0x8003982C; // type:func  (Psy-Q libspu/s_sav, from the SDK object)
 memset = 0x8004117C;
 rand = 0x80049480;
 srand = 0x800494A8;
