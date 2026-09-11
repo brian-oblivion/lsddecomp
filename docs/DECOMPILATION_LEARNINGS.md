@@ -5479,6 +5479,35 @@ against a true **14**. Anchor on the function's own `glabel`/`endlabel`. A
 census that over-reports by 10x is easy to catch; one that over-reports by 15%
 would not have been.
 
+### `asm-differ` and the permuter compare TEXT, so two different words can look identical (round 32)
+
+`objdump` renders both `0x2405003f` (`addiu a1,$zero,0x3f`) and `0x3405003f`
+(`ori a1,$zero,0x3f`) as the same string: **`li a1,0x3f`**. Anything that
+diffs disassembly TEXT is therefore blind to the difference — `asm-differ`
+and the permuter's own scorer both are. Only `funcdiff.py`'s raw word compare
+sees it.
+
+Two consequences, and the second is the sharp one:
+
+- A function can read as "one word short with no visible diff anywhere". That
+  is the signature. When the text diff looks clean but the count is wrong,
+  **compare the words, not the rendering.**
+- **A permuter cannot optimise toward a difference it cannot see.** A search
+  on such a function is not merely unlucky, it is scoring a target that
+  excludes the actual residue, so "the permuter found nothing" carries none of
+  its usual weight there. Round 32's `func_80050B28` had this sitting unseen
+  in every round's analysis since round 27, including a permuter run.
+
+The specific encoding rule behind it, measured over the retail image rather
+than reasoned: through the pinned pipeline a **positive** constant is ALWAYS
+`ori` and a **negative** constant is ALWAYS `addiu` (`ori` zero-extends, so a
+negative cannot be one). Of the 252 `addiu`-form `li`s inside functions we
+match byte-exact, 248 are negative and the other 4 are data misread as code.
+Retail chose per-context and sometimes used `addiu` for a positive value; that
+choice is unreachable. **Scope: exactly 1 of 220 live queued functions
+contains one, and it is one instruction** — a real gap, and a tiny one. Do not
+generalise it into a blocker class.
+
 ## Open questions
 
 - **What is the class-table header word at `+0x000`? PARTLY ANSWERED, and the
