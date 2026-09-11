@@ -770,6 +770,29 @@ def cmd_runs(_args):
             return {sec.name for sec in ELFFile(f).iter_sections()
                     if sec.name in (".data", ".rdata", ".sdata", ".bss", ".sbss")}
 
+    # A placement is SUSPECT when one of its calls (R_MIPS_26 to a named
+    # symbol) resolves, read out of retail, to an address DIFFERENT from where
+    # another placed object DEFINES that symbol. Masking hides call targets
+    # from the byte match, so a short prologue-call-call-epilogue body can
+    # place uniquely and still be the wrong function: libsnd/ssinit_c (12
+    # instructions, three masked jals) placed at 0x18540 while its
+    # ResetCallback call resolves to 0x800280D0 and libetc/intr defines
+    # ResetCallback at 0x80024D10. Found 2026-09-11 via `symbols` CONFLICT.
+    exe = EXE.read_bytes()
+    defs = {}
+    for name, (ver, toff, _size) in placed.items():
+        with open(WORK / ver / "elf" / f"{name}.o", "rb") as f:
+            elf = ELFFile(f)
+            tidx = [i for i, s in enumerate(elf.iter_sections()) if s.name == ".text"][0]
+            for sym in elf.get_section_by_name(".symtab").iter_symbols():
+                if sym["st_shndx"] == tidx and sym.name and sym["st_info"]["type"] != "STT_SECTION":
+                    defs.setdefault(sym.name, (toff - HDR + VRAM + sym["st_value"], name))
+    suspect = defaultdict(list)
+    for name, (ver, toff, _size) in placed.items():
+        for sname, addr in reloc_addresses(exe, WORK / ver / "elf" / f"{name}.o", toff):
+            if sname in defs and defs[sname][0] != addr and defs[sname][1] != name:
+                suspect[name].append(f"calls {sname} at 0x{addr:08X} but {defs[sname][1]} defines it at 0x{defs[sname][0]:08X}")
+
     total_runs = total_objs = 0
     for i, (off, kind, sname) in enumerate(segs):
         if kind == "o":
@@ -801,6 +824,10 @@ def cmd_runs(_args):
             print(f"  run 0x{r[0][0]:X}..0x{r[-1][1]:X}  {len(r):2d} obj  [{tag}]  {names[:110]}{'...' if len(names) > 110 else ''}")
             for fl in flags:
                 print(f"      {fl}")
+            for o in r:
+                for alt in o[2].split("|"):
+                    for why in sorted(set(suspect.get(alt, []))):
+                        print(f"      SUSPECT {alt}: {why} -- likely a false placement (a masked-call body); do not convert")
             total_runs += 1
             total_objs += len(r)
     print(f"\nTOTAL: {total_objs} objects in {total_runs} runs")
