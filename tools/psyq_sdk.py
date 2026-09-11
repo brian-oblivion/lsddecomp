@@ -73,6 +73,11 @@ def placed_objects():
     out = {}
     versions = sorted((m.parent.name for m in WORK.glob("*/match.txt")),
                       key=lambda v: PREFER.index(v) if v in PREFER else 99)
+    if not versions:
+        # A worktree without sdk/ linked used to get "TOTAL: 0 objects in 0
+        # runs", exit 0 -- which reads as "queue empty", not "corpus missing".
+        die(f"no {WORK.relative_to(ROOT)}/<ver>/match.txt -- sdk/ is empty or not linked into this checkout "
+            f"(tools/setup-worktree.sh links it; `psyq_sdk.py match` builds it)")
     for ver in versions:
         for line in (WORK / ver / "match.txt").read_text().splitlines():
             m = re.match(r"(\S+)\.o\s+text=0x([0-9a-f]+)\s+fileoff=0x([0-9a-f]+)", line)
@@ -519,7 +524,12 @@ def cmd_place(args):
                     mask = bytes(b"\xff" * len(data))
                     hits = list(find_all(exe, data, mask, min(8, len(data))))
                     bytes_hit = " bytes@" + ",".join(f"0x{h:X}" for h in hits[:4]) if hits else " bytes:not-found"
-                if len(bases) == 1:
+                if len(bases) == 1 and sec["sh_type"] == "SHT_NOBITS":
+                    # NOT a yaml line: bss is never placed in the yaml, the fragment
+                    # pins it. Printed in the same column as the real lines, this
+                    # was copied into the yaml by round 29's runner's first draft.
+                    print(f"# {nm}: vram 0x{bases[0]:08X} size 0x{size:X} -- NOBITS, handled by `ldfrag`, do NOT put it in the yaml")
+                elif len(bases) == 1:
                     b = bases[0]
                     fo = b - VRAM + HDR
                     print(f"      - [0x{fo:X}, o, {name}, {nm}]   # vram 0x{b:08X} size 0x{size:X}{bytes_hit}")

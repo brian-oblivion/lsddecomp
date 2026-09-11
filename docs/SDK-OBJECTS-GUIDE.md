@@ -90,7 +90,9 @@ search confirming the bytes are there. Read the output:
   Stop and report — this needs a head decision (parasite-eve-2 hand-edited
   objects for this).
 - `.bss`/`.sbss` lines are informational: bss is NOT placed in the yaml.
-  The fragment handles it (step 5). That includes a `.bss: relocations
+  The fragment handles it (step 5). `place` now prints them as `#` comments
+  for that reason -- its first version printed a ready-made `o` line for
+  `.sbss` in the same column as the lines you do take. That includes a `.bss: relocations
   DISAGREE` line -- `place` counts references to NAMED bss symbols, which
   the fragment pins individually, so the disagreement that matters is the
   one `ldfrag` reports as a `NOTE:` (section-relative references, i.e.
@@ -189,6 +191,20 @@ In `config/splat.slps01556.lsdde.yaml`:
   name (`grep -rn func_XXXXXXXX src include`). Weak duplicates (`memclr` is
   defined three times) cannot all carry one name in the symbols file; leave
   those as `func_*`.
+- **A rename into a SHARED header is a header-contention hazard, not a
+  `sed` job.** Round 29's runner found `include/code_8220.h` (included by
+  three units, reachable from five) declaring `func_80011D34`,
+  `func_80011F68` and `func_80012C20`. Renamed in place those become
+  `malloc`, `free` and a three-argument `printf` in a header that will one
+  day sit next to `include/psyq/MALLOC.H`'s real prototypes -- a
+  `conflicting types` failure in whichever sibling includes both first.
+  The correct move is CLAUDE.md's: a prototype for a function another unit
+  (here, a Sony object) defines belongs in the `.c` that calls it, as a
+  local view. Variadic `printf` ends up with one local declaration per
+  caller, each with that caller's argument shape; under `-fno-builtin` the
+  names `printf`/`malloc`/`strlen` as C identifiers cost nothing. And read
+  every hunk a bulk rename produces: `sed` over comments wrote `malloc =
+  malloc` and left four comments pointing at a deleted `asm/psyq_2258.s`.
 - `make extract`, then **delete the old `asm/psyq_xxx.s`** — extract does
   not remove top-level asm for a segment that no longer exists, and
   `progress.py` warns about it.
