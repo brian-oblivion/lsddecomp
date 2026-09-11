@@ -7,7 +7,7 @@
  * variable is pinned to its retail address (a script assignment overrides the
  * object's own definition). NOLOAD: none of this is in the executable image. */
 SECTIONS {
-    .psyq_bss.libetc_pad_bss 0x8008B3C8 (NOLOAD) : { build/lib/libetc/pad.o(.bss) }   /* 0x8 bytes; section-relative refs */
+    .psyq_bss.libetc_pad_bss 0x8008B3C8 (NOLOAD) : SUBALIGN(2) { build/lib/libetc/pad.o(.bss) }   /* 0x8 bytes; section-relative refs */
 }
 PadIdentifier = 0x8008E984;   /* libetc/pad */
 /* externals the linked objects reference and nothing in the link defines yet;

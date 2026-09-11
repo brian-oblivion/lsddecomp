@@ -250,17 +250,37 @@ def prepare(ver, src):
 # --- manifest ----------------------------------------------------------------
 
 def read_manifest():
-    """[(version, 'lib/module', file_offset)] from config/psyq-objects.txt."""
+    """[(version, 'lib/module', file_offset)] from config/psyq-objects.txt.
+    A line may carry a fourth token `shadow=.rdata[,.data]`; read_shadows()
+    returns those, this function ignores them."""
     rows = []
     for line in MANIFEST.read_text().splitlines():
         line = line.split("#", 1)[0].strip()
         if not line:
             continue
         parts = line.split()
-        if len(parts) != 3:
-            die(f"{MANIFEST.name}: bad line {line!r} (want: <version> <lib>/<module> <fileoff>)")
+        if len(parts) not in (3, 4) or (len(parts) == 4 and not parts[3].startswith("shadow=")):
+            die(f"{MANIFEST.name}: bad line {line!r} (want: <version> <lib>/<module> <fileoff> [shadow=.sec,...])")
         rows.append((parts[0], parts[1], int(parts[2], 0)))
     return rows
+
+
+def read_shadows():
+    """{'lib/module': ['.rdata', ...]}: sections the fragment maps NOLOAD at their
+    retail address instead of the yaml placing them. For an object whose TEXT is
+    the game's build but whose data section is not (libetc/intr on the 3.3 disc
+    carries the RCS string `1.71 1995/08/29`; retail has `1.73 1995/11/10`, and
+    the 3.5 disc that has the string has different text). The object's
+    relocations then resolve to the right address and the image bytes come from
+    splat's plain data slot, which still holds retail's. Byte-exact, measured
+    2026-09-11 (docs/research/psyq-sdk-objects.md)."""
+    out = {}
+    for line in MANIFEST.read_text().splitlines():
+        line = line.split("#", 1)[0].strip()
+        parts = line.split()
+        if len(parts) == 4 and parts[3].startswith("shadow="):
+            out[parts[1]] = [sec for sec in parts[3][len("shadow="):].split(",") if sec]
+    return out
 
 
 def verify_at(obj: Path, exe: bytes, off: int):
@@ -509,6 +529,50 @@ def cmd_place(args):
                     print(f"# {nm}: no relocation names it -- size 0x{size:X}{bytes_hit}")
 
 
+def section_bases(exe, opath, toff, gp=0x8008A808):
+    """{section_name: sorted retail base addresses} derived from the object's
+    text relocations against symbols IN that section (HI16/LO16 pairs,
+    R_MIPS_32 words, GPREL16), read out of retail at the placed offset --
+    the same derivation `place` prints."""
+    import struct as st
+    from elftools.elf.elffile import ELFFile
+    with open(opath, "rb") as f:
+        elf = ELFFile(f)
+        secs = {i: s for i, s in enumerate(elf.iter_sections())}
+        syms = list(elf.get_section_by_name(".symtab").iter_symbols())
+        text = elf.get_section_by_name(".text").data()
+        rel = elf.get_section_by_name(".rel.text")
+        derived = defaultdict(set)
+        pending_hi = None
+        for r in (rel.iter_relocations() if rel else []):
+            off, typ, si = r["r_offset"], r["r_info_type"], r["r_info_sym"]
+            sym = syms[si]
+            shndx = sym["st_shndx"]
+            if shndx in ("SHN_UNDEF", "SHN_ABS", "SHN_COMMON"):
+                pending_hi = None
+                continue
+            obj_word = st.unpack_from("<I", text, off)[0]
+            ret_word = st.unpack_from("<I", exe, toff + off)[0]
+            if typ == R_MIPS_HI16:
+                pending_hi = (shndx, sym["st_value"], obj_word & 0xFFFF, ret_word & 0xFFFF)
+                continue
+            if typ == R_MIPS_LO16 and pending_hi and pending_hi[0] == shndx:
+                _, sval, ohi, rhi = pending_hi
+                olo = st.unpack_from("<h", text, off)[0]
+                rlo = st.unpack_from("<h", exe, toff + off)[0]
+                derived[shndx].add(((rhi << 16) + rlo) - ((ohi << 16) + olo) - sval)
+                pending_hi = None
+            elif typ == R_MIPS_32:
+                derived[shndx].add(ret_word - obj_word - sym["st_value"])
+            elif typ == R_MIPS_GPREL16:
+                olo = st.unpack_from("<h", text, off)[0]
+                rlo = st.unpack_from("<h", exe, toff + off)[0]
+                derived[shndx].add((gp + rlo) - olo - sym["st_value"])
+            else:
+                pending_hi = None
+        return {secs[i].name: sorted(b) for i, b in derived.items() if i in secs}
+
+
 def reloc_addresses(exe, opath, toff, gp=0x8008A808):
     """Yield (symbol_name, retail_address) for every reference the placed object
     makes to a NAMED symbol (defined here or undefined), read out of retail."""
@@ -723,9 +787,26 @@ def cmd_ldfrag(args):
            " * variable is pinned to its retail address (a script assignment overrides the",
            " * object's own definition). NOLOAD: none of this is in the executable image. */",
            "SECTIONS {"]
+    # SUBALIGN(2) on every section here, as on splat's own output section: the
+    # converted objects claim alignment 8, and without it a section pinned to a
+    # 4-aligned retail address is silently moved up (the libetc/intr .rdata
+    # shadow at 0x800106BC landed at 0x800106C0 -- three bytes off, all the
+    # +4 in the references to it).
     for name, sec, base, size, how in sections:
         tag = f".psyq_bss.{name.replace('/', '_')}{sec.replace('.', '_')}"
-        out.append(f"    {tag} 0x{base:08X} (NOLOAD) : {{ build/lib/{name}.o({sec}) }}   /* 0x{size:X} bytes; {how} */")
+        out.append(f"    {tag} 0x{base:08X} (NOLOAD) : SUBALIGN(2) {{ build/lib/{name}.o({sec}) }}   /* 0x{size:X} bytes; {how} */")
+    # Shadowed PROGBITS sections: NOLOAD at the retail address the object's own
+    # relocations derive, so its references resolve there while the image bytes
+    # come from splat's plain slot (see read_shadows).
+    exe = EXE.read_bytes()
+    for name, path, toff in objects:
+        for sec in read_shadows().get(name, []):
+            bases = section_bases(exe, path, toff).get(sec, [])
+            if len(bases) != 1:
+                notes.append(f"{name} {sec}: shadow requested but relocations derive {[hex(b) for b in bases]}; not mapped, link will misplace it")
+                continue
+            tag = f".psyq_shadow.{name.replace('/', '_')}{sec.replace('.', '_')}"
+            out.append(f"    {tag} 0x{bases[0]:08X} (NOLOAD) : SUBALIGN(2) {{ build/lib/{name}.o({sec}) }}   /* shadow: bytes stay in splat's slot at 0x{bases[0] - VRAM + HDR:X} */")
     out.append("}")
     for n, a, name in sorted(pins, key=lambda p: p[1]):
         out.append(f"{n} = 0x{a:08X};   /* {name} */")
