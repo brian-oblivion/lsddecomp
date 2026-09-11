@@ -250,6 +250,33 @@ _spu_getInTransfer = 0x80039254; // type:func  (Psy-Q libspu/s_it, from the SDK 
 SpuMalloc = 0x80039264; // type:func  (Psy-Q libspu/s_m_m, from the SDK object)
 _spu_gcSPU = 0x8003952C; // type:func  (Psy-Q libspu/s_m_int, from the SDK object)
 _SpuSetAnyVoice = 0x8003982C; // type:func  (Psy-Q libspu/s_sav, from the SDK object)
+
+// psyq_SpuSetMute chunk D (0x2A878..0x2A918, 0x2A94C..0x2AE70,
+// 0x2B268..0x2B78C): three libsnd runs. 23 Sony names for six objects,
+// exactly the 23 glabels the ranges held.
+Snd_SetVol = 0x8003A078; // type:func  (Psy-Q libsnd/ssvol, from the SDK object)
+SsSeqSetVol = 0x8003A0B0; // type:func  (Psy-Q libsnd/ssvol, from the SDK object)
+SsSepSetVol = 0x8003A0E0; // type:func  (Psy-Q libsnd/ssvol, from the SDK object)
+Snd_SetReplayMode = 0x8003A14C; // type:func  (Psy-Q libsnd/ssreplay, from the SDK object)
+SsSeqReplay = 0x8003A1F0; // type:func  (Psy-Q libsnd/ssreplay, from the SDK object)
+SsSepReplay = 0x8003A218; // type:func  (Psy-Q libsnd/ssreplay, from the SDK object)
+Snd_setvol_data = 0x8003A244; // type:func  (Psy-Q libsnd/vol, from the SDK object)
+Snd_SetCres = 0x8003A318; // type:func  (Psy-Q libsnd/vol, from the SDK object)
+SsSeqSetCrescendo = 0x8003A45C; // type:func  (Psy-Q libsnd/vol, from the SDK object)
+SsSepSetCrescendo = 0x8003A490; // type:func  (Psy-Q libsnd/vol, from the SDK object)
+Snd_SetDecres = 0x8003A4C4; // type:func  (Psy-Q libsnd/vol, from the SDK object)
+SsSeqSetDecrescendo = 0x8003A608; // type:func  (Psy-Q libsnd/vol, from the SDK object)
+SsSepSetDecrescendo = 0x8003A63C; // type:func  (Psy-Q libsnd/vol, from the SDK object)
+Snd_SetPlayMode = 0x8003AA68; // type:func  (Psy-Q libsnd/ssplay, from the SDK object)
+SsSeqPlay = 0x8003AB68; // type:func  (Psy-Q libsnd/ssplay, from the SDK object)
+SsSepPlay = 0x8003ABA0; // type:func  (Psy-Q libsnd/ssplay, from the SDK object)
+SsPlayBack = 0x8003ABD8; // type:func  (Psy-Q libsnd/ssplay, from the SDK object)
+seq_close = 0x8003AC9C; // type:func  (Psy-Q libsnd/ssclose, from the SDK object)
+SsSeqClose = 0x8003AE18; // type:func  (Psy-Q libsnd/ssclose, from the SDK object)
+SsSepClose = 0x8003AE3C; // type:func  (Psy-Q libsnd/ssclose, from the SDK object)
+Snd_SetPauseMode = 0x8003AE60; // type:func  (Psy-Q libsnd/sspause, from the SDK object)
+SsSeqPause = 0x8003AF38; // type:func  (Psy-Q libsnd/sspause, from the SDK object)
+SsSepPause = 0x8003AF60; // type:func  (Psy-Q libsnd/sspause, from the SDK object)
 memset = 0x8004117C;
 rand = 0x80049480;
 srand = 0x800494A8;

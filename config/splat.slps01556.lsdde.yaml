@@ -815,7 +815,21 @@ segments:
       - [0x29a64, o, libspu/s_m_m]       # SpuMalloc
       - [0x29d2c, o, libspu/s_m_int]     # _spu_gcSPU
       - [0x2a02c, o, libspu/s_sav]       # _SpuSetAnyVoice
+      # Gap: 0x2A0E0..0x2A878, the game's own libspu build.
       - [0x2a0e0, asm, psyq_2a0e0]
+      # Chunk D: three libsnd runs, all text-only.
+      - [0x2a878, o, libsnd/ssvol]       # Snd_SetVol, SsSeqSetVol, SsSepSetVol
+      - [0x2a918, asm, psyq_2a918]       # 0x2A918..0x2A94C, unowned
+      - [0x2a94c, o, libsnd/ssreplay]    # Snd_SetReplayMode, SsSeqReplay, SsSepReplay
+      - [0x2aa44, o, libsnd/vol]         # the crescendo/decrescendo family
+      - [0x2ae70, asm, psyq_2ae70]       # 0x2AE70..0x2B268, unowned
+      # The COARSE 3.3 libsnd/ssplay (0x234). The 3.5 disc splits the same
+      # module into playmode/ssplay/ssplayb, which leave gaps -- `runs` drops
+      # those as finer-grained placements of this one.
+      - [0x2b268, o, libsnd/ssplay]      # Snd_SetPlayMode, SsSeqPlay, SsSepPlay, SsPlayBack
+      - [0x2b49c, o, libsnd/ssclose]     # seq_close, SsSeqClose, SsSepClose
+      - [0x2b660, o, libsnd/sspause]     # Snd_SetPauseMode, SsSeqPause, SsSepPause
+      - [0x2b78c, asm, psyq_2b78c]
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as

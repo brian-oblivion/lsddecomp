@@ -157,3 +157,15 @@
 3.3  libspu/s_m_m    0x29A64
 3.3  libspu/s_m_int  0x29D2C
 3.3  libspu/s_sav    0x2A02C
+
+# psyq_SpuSetMute chunk D (0x2A878..0x2A918, 0x2A94C..0x2AE70,
+# 0x2B268..0x2B78C): three libsnd runs -- SsSetSerialVol and friends, the
+# volume table, and the SEQ play/close/pause family. Text-only.
+# 0x2B268 takes the COARSE 3.3 libsnd/ssplay (0x234), not the 3.5 disc's
+# playmode/ssplay/ssplayb split, which leaves gaps.
+3.3  libsnd/ssvol     0x2A878
+3.3  libsnd/ssreplay  0x2A94C
+3.3  libsnd/vol       0x2AA44
+3.3  libsnd/ssplay    0x2B268
+3.3  libsnd/ssclose   0x2B49C
+3.3  libsnd/sspause   0x2B660
