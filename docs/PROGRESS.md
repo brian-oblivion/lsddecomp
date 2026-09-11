@@ -91,15 +91,49 @@ a half-applied one is a broken build for whoever merges next.
 
 ### Runner results
 
-No byte-exact matches this round. The largest movement was bravo's
-`func_800344FC`, **44/70 -> 61/70** (17 words), via the dead-value-reuse
-lever: `speed` goes dead after computing `divided`, and reusing its storage
-for `(u8)a3` instead of re-reading `a3` at the store site matched retail's
-register reuse. Its residue is now a narrow two-way register rotation.
+**No byte-exact matches this round**, and that is the headline. What the round
+bought instead was movement and mechanism:
 
-Alpha took all five of `code_55dd4`'s near-misses through the round-32 levers
-and got five negatives. Charlie advanced four `code_179d8_g` reports and made
-all four titles rankable.
+| function | unit | before -> after | who |
+| --- | --- | --- | --- |
+| `func_8002DDBC` | code_179d8_l | 98/112 -> 108/112 | alpha2 |
+| `func_800344FC` | code_179d8_k | 44/70 -> 61/70 | bravo |
+| `func_8002E138` | code_179d8_l | 108/112 -> 113/112 (4 short -> 1 long) | alpha2 |
+| `func_8002CF18` | code_179d8_l | 163/167, first REAL measurement | alpha2 |
+
+Bravo's gain came from the dead-value-reuse lever: `speed` goes dead after
+computing `divided`, and reusing its storage for `(u8)a3` rather than
+re-reading `a3` at the store site matched retail's register reuse. Its residue
+is now a narrow two-way register rotation.
+
+Alpha2's two came from generalising idioms that were already written down —
+the duplicate-in-both-arms idiom extending from a shared STATEMENT to a shared
+POINTER computation, and the narrow-cast-defeats-strength-reduction idiom
+turning out to be UNIT-wide. The second is the one to remember: `func_8002CF18`'s
+own report had named that fix, and nobody had tried it on its sibling in the
+same unit, where it was worth 10 words. **An idiom recorded in one report is a
+candidate for every sibling in its unit.**
+
+Alpha (first pass) took all five of `code_55dd4`'s near-misses through the
+round-32 levers and got five negatives. Charlie advanced four `code_179d8_g`
+reports and made all four titles rankable.
+
+**Two mechanism findings are worth as much as the movement.** A GCC value
+availability / GCSE hoist of a side-effect-free expression is immune to
+`__asm__("")` at every placement tried and is made worse by `volatile`
+(stack spill) — confirmed independently in two functions, and it matters
+because the residue looks exactly like ordering while being a decision made
+earlier. And narrow `volatile` failed in three distinct documented ways across
+bravo's unit (sub-word widening; forcing a register-resident value to memory),
+which bounds round 32's lever rather than retracting it.
+
+**A NEW way a preserved score lies**, and it is worse than round 19's drift:
+`func_8002CF18`'s inherited body called `func_800375E8`, a symbol that does
+not exist under that name. It could never have linked, so nobody ever built
+it, so its recorded score measured nothing. Drift is a mismatch between two
+things that both exist and static reading catches it; a never-linked body is
+self-consistent everywhere it is written down. Gate 1b's screen now says
+BUILD the bodies you resume, not read them.
 
 ### Gate finding: rank by residue, screen by ATTEMPT HISTORY
 
