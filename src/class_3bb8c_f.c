@@ -147,8 +147,8 @@ typedef struct StreamReq {
 } StreamReq;
 
 extern const char D_80011530[];  /* rodata string "File not create in WriteFile\n" */
-extern s32 func_80013488(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
-extern void func_80012C20(const char *fmt);  /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
+extern s32 write(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
+extern void printf(const char *fmt);  /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
 
 s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
     char pathBuf[0x20];
@@ -167,7 +167,7 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
     fileHandle = func_80050938(path, openMode);
     flagCopy = a3;
     if (fileHandle == -1) {
-        func_80012C20(D_80011530);
+        printf(D_80011530);
         return 0;
     }
     func_800508F8(fileHandle);
@@ -187,9 +187,9 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
     req->blkA = src->blkA;
     req->blkB = src->blkB;
     req->blkC = src->blkC;
-    func_80013488(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
+    write(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
     func_80017CFC(req);
-    func_80013488(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
+    write(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
     func_800508F8(fileHandle);
     return 1;
 }

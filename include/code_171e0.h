@@ -52,7 +52,7 @@ struct BasicClassMethods171e0 {
 extern BasicClassMethods171e0 *func_80018390(void);
 extern void *func_80017B34(s32 size); /* one arg confirmed by new_class_6d3c8.md (code_1677c) */
 extern void func_80017CFC(void *arg);
-extern s32 func_80013348(char *s);
+extern s32 strlen(char *s);
 
 /* D_8006D430's own vtable, laid out by the same convention BasicClass uses
  * (header, an own-class slot at +0x004, ctor at +0x008, dtor at +0x00C --

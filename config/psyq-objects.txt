@@ -43,3 +43,22 @@
 # reports `relocations DISAGREE` for the .bss precisely because Sony's linker
 # scattered its two variables (0x8008E284 and 0x8008E888).
 3.3  _obj/malloc    0x2258
+
+# psyq_2258 chunk B (0x2F68..0x3C98): libc2 formatted output and string/ctype
+# helpers, libgs matrix setup, two libapi BIOS stubs. Data sections:
+# matrix .rdata 0x800 (0x30), prnt .rdata 0x830 (0x20C), prnt .sdata 0x7B010,
+# ctype .data 0x57040 (the _ctype_ table, 0x81). prnt's .rdata is printf's
+# format-dispatch jump tables, so its bytes are relocated words and `place`
+# reports `bytes:not-found` -- the derived 0x830 lands exactly on the slot's
+# existing dlabel D_80010030, which is the confirmation. matrix .bss and
+# putchar .sbss go in the fragment.
+3.3  libapi/c159    0x2F68
+3.3  libc2/bcopy    0x2F78
+3.3  libgs/matrix   0x3038
+3.3  libc2/printf   0x3420
+3.3  libc2/prnt     0x345C
+3.3  libc2/memchr   0x3AF8
+3.3  libc2/strlen   0x3B48
+3.3  libc2/ctype    0x3B78
+3.3  libc2/putchar  0x3BE0
+3.3  libapi/a53     0x3C88

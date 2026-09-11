@@ -86,7 +86,7 @@ void func_8001CD60(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
 void func_8001CE30(Class6B5CCObj *self) {
     self->unk24 = 0;
     self->unk10 = 0;
-    func_80012838(0, self->unk14);
+    GsInitCoordinate2(0, self->unk14);
     self->methods->slot44(self, 1, D_8006B684);
     self->methods->slot48(self, 1, D_8006B690);
     self->unk14->unk0 = 1;

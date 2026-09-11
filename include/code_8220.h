@@ -100,8 +100,8 @@ extern void *func_80017CFC(void *ptr);
  * materialise a spurious `move a1,s1`, one word too many. */
 extern void func_80017AC8(BMemPMgr *pool);
 
-/* The Psy-Q declarations that used to sit here (func_80011D34 = malloc,
- * func_80011F68 = free, func_80012C20 = printf) moved into src/code_8220.c
+/* The Psy-Q declarations that used to sit here (func_80011D34 is malloc,
+ * func_80011F68 is free, func_80012C20 is printf) moved into src/code_8220.c
  * when the SDK objects were linked. They are deliberately NOT shared:
  * printf is variadic and five units each declare the argument shape their
  * own call site passes, and malloc/free now have Sony's real names, so a

@@ -17,8 +17,42 @@
 // Renaming a symbol here requires `make extract` afterwards, and the rename
 // must land BEFORE anything references the old name.
 
+// psyq_2258, chunks A and B: Sony's own exported names, read out of the SDK
+// objects the build now links (_obj/malloc, libapi/c159, libc2/bcopy,
+// libgs/matrix, libc2/printf, libc2/prnt, libc2/memchr, libc2/strlen,
+// libc2/ctype, libc2/putchar, libapi/a53). Unlike the rest of this file
+// these are NOT guesses -- they are the symbol table Sony shipped.
+// 0x800127D8 is `bcmp` in the 3.3 libc2/bcopy object; 3.5 split it out as
+// `memcmp`, and 3.3 is the build the game linked.
 _ExpAllocArea = 0x80011A58;
+_expand = 0x80011B4C; // type:func  (Psy-Q, from the SDK object)
+InitHeap = 0x80011CF4; // type:func  (Psy-Q, from the SDK object)
+malloc = 0x80011D34; // type:func  (Psy-Q, from the SDK object)
+free = 0x80011F68; // type:func  (Psy-Q, from the SDK object)
+realloc = 0x80011F7C; // type:func  (Psy-Q, from the SDK object)
+calloc = 0x8001200C; // type:func  (Psy-Q, from the SDK object)
+SetMem = 0x80012768; // type:func  (Psy-Q, from the SDK object)
 bcopy = 0x80012778;
+bzero = 0x800127AC; // type:func  (Psy-Q, from the SDK object)
+bcmp = 0x800127D8; // type:func  (Psy-Q, from the SDK object)
+GsInitCoordinate2 = 0x80012838; // type:func  (Psy-Q, from the SDK object)
+GsInitCoord2param = 0x800128B4; // type:func  (Psy-Q, from the SDK object)
+GsSetLsMatrix = 0x800128E0; // type:func  (Psy-Q, from the SDK object)
+GsSetLightMatrix = 0x80012910; // type:func  (Psy-Q, from the SDK object)
+GsSetLightMatrix2 = 0x800129AC; // type:func  (Psy-Q, from the SDK object)
+GsMulCoord0 = 0x800129E0; // type:func  (Psy-Q, from the SDK object)
+GsMulCoord2 = 0x80012A74; // type:func  (Psy-Q, from the SDK object)
+GsMulCoord3 = 0x80012AF8; // type:func  (Psy-Q, from the SDK object)
+print_matrix = 0x80012B7C; // type:func  (Psy-Q, from the SDK object)
+print_vector = 0x80012BEC; // type:func  (Psy-Q, from the SDK object)
+printf = 0x80012C20; // type:func  (Psy-Q, from the SDK object)
+prnt = 0x80012C5C; // type:func  (Psy-Q, from the SDK object)
+memchr = 0x800132F8; // type:func  (Psy-Q, from the SDK object)
+strlen = 0x80013348; // type:func  (Psy-Q, from the SDK object)
+toupper = 0x80013378; // type:func  (Psy-Q, from the SDK object)
+tolower = 0x800133AC; // type:func  (Psy-Q, from the SDK object)
+putchar = 0x800133E0; // type:func  (Psy-Q, from the SDK object)
+write = 0x80013488; // type:func  (Psy-Q, from the SDK object)
 GsGetLs = 0x80013498;
 VectorNormal = 0x80017610;
 BMemPMgrInit = 0x80017A20;

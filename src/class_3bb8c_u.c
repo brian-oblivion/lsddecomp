@@ -25,7 +25,7 @@
  * plain three-deep call chain, measured off the `jal` census:
  *
  *     func_80050A84 (8w)  -> func_80050948 (79w) -> func_80050AA4 (25w)
- *                                                     -> func_800133AC
+ *                                                     -> tolower
  *
  * The block sits among BIOS heap trampolines and its one external caller
  * chain treats these as resource/handle management -- `src/class_3bb8c_e.c`
@@ -109,7 +109,7 @@
  *                  Write `return func_80050948(...);` unless you find
  *                  positive evidence it is void.
  *
- *   func_80050AA4  25w.  Tail of the chain; calls func_800133AC.  2 internal
+ *   func_80050AA4  25w.  Tail of the chain; calls tolower.  2 internal
  *                  `.L` labels.
  */
 
@@ -206,7 +206,7 @@ s32 func_80050A84(void) {
 }
 
 extern const u8 D_80066841[];
-extern s32 func_800133AC(s32 c);
+extern s32 tolower(s32 c);
 
 s32 func_80050AA4(s32 c) {
     u8 flags;
@@ -218,5 +218,5 @@ s32 func_80050AA4(s32 c) {
     if (!(flags & 3)) {
         return 0x98967F;
     }
-    return (func_800133AC(c) & 0xFF) - 0x57;
+    return (tolower(c) & 0xFF) - 0x57;
 }

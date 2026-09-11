@@ -171,7 +171,7 @@ struct Unk4CObj {
                                 a NULL-terminated array of C strings, DISTINCT
                                 from unk18 at +0x018 (adjacent field, same
                                 shape, different slot). Walked with
-                                `func_80013348` (strlen) and passed to
+                                `strlen` and passed to
                                 `func_800408CC` to build each entry of
                                 Obj86B60->unk54[i]/unk64[i]. */
     u8 *unk20;               /* +0x020, OBSERVED: func_8003D194 (round 12) --
@@ -298,14 +298,13 @@ struct SrcDesc {
     s32 unk4;    /* +0x004, becomes self->unk60[idx] */
     u8 pad008[0x018 - 0x008];
     char **unk18; /* +0x018, NULL-terminated array of C strings -- each
-                      element is passed to func_80013348 (strlen, already
-                      typed `s32 func_80013348(char *s)` in
-                      code_171e0.h) and to func_800408CC */
+                      element is passed to strlen (already typed
+                      `s32 strlen(char *s)` in code_171e0.h) and to
+                      func_800408CC */
 };
 
-extern s32 func_80013348(char *s); /* already matched elsewhere
-                                        (code_171e0.c) as a strlen-shaped
-                                        helper; local view here */
+extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
+                                        own object; local view here */
 extern Unk64Elem *func_800408CC(void *ctx, s32 len, char *name); /* not
                                         yet seen elsewhere; typed from
                                         func_8003D5CC's own call site --

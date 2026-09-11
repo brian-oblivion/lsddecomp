@@ -169,7 +169,7 @@ char *strcat(char *dest, char *src) {
     if (src == NULL) {
         goto fail;
     }
-    if ((dest + func_80013348(dest)) == (src + func_80013348(src))) {
+    if ((dest + strlen(dest)) == (src + strlen(src))) {
         goto fail;
     }
     origDest = dest;

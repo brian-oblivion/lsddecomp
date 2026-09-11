@@ -559,16 +559,17 @@ extern u8 D_8006B684[0xC];
 extern u8 D_8006B690[0xC];
 
 /* func_8001E770/func_8001E7B0 -- now carved (round 14, src/code_d294_c.c),
- * and func_80012838 (asm/psyq_2258.s, Psy-Q library, not game code): three
+ * and GsInitCoordinate2 (Psy-Q libgs/matrix, linked from Sony's object,
+ * not game code): three
  * helpers this unit's own +0x010/+0x014/+0x018/+0x040 overrides forward
  * into. func_8001E7B0's whole body is `self->unk18 = 0; self->unk20 = 0;`
  * (MEASURED, two `sw $zero` stores, no branches) -- confirms unk18/unk20
- * above independently of the ctor. func_80012838 is NOT decompiled here
- * (Psy-Q, out of scope); declared only with the argument shape its call
- * site needs. */
+ * above independently of the ctor. GsInitCoordinate2 is NOT decompiled
+ * here (Psy-Q, linked as an object); declared only with the argument shape
+ * its call site needs. */
 extern void func_8001E7B0(Class6B5CCObj *self);
 extern void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other);
-extern void func_80012838(s32 arg0, void *dest);
+extern void GsInitCoordinate2(s32 arg0, void *dest);
 
 /* func_800183A0 (asm/code_8220_b.s, a DIFFERENT still-uncarved unit): a
  * generic intrusive-list "pop next" step. Given `out` and `cursor`

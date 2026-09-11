@@ -11,10 +11,10 @@
 extern void *malloc(unsigned int size);
 extern void free(void *ptr);
 
-/* Psy-Q printf. Still `func_*` -- libc2/printf is chunk B of the psyq_2258
- * conversion. Declared with the argument shape THIS call site passes; the
- * other four call sites in the project each declare their own. */
-extern void func_80012C20(const char *fmt, void *arg1, s32 arg2);
+/* Psy-Q printf (libc2/printf). Variadic, and declared here with the argument
+ * shape THIS call site passes -- the project's four other printf call sites
+ * each declare their own, which is why no single declaration is shared. */
+extern void printf(const char *fmt, void *arg1, s32 arg2);
 
 void *BMemPMgrInit(s32 poolSize)
 {
@@ -29,7 +29,7 @@ void *BMemPMgrInit(s32 poolSize)
         pool->poolSize = poolSize;
         func_80017AC8(pool);
     } else {
-        func_80012C20(D_8001028C, NULL, poolSize);
+        printf(D_8001028C, NULL, poolSize);
     }
     return pool;
 }

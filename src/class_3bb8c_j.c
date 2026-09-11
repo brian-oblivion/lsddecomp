@@ -226,12 +226,12 @@ fail:
  * (0 or 1) also stashed into self->unkC. First pass counts entries; then
  * allocates two parallel self->unk10-length arrays (self->unk18: one
  * individually-allocated buffer per entry; self->unk1C: one s32 length
- * per entry, computed by func_80013348 -- halved when arg2==1, via the
+ * per entry, computed by strlen -- halved when arg2==1, via the
  * standard truncating-division-by-2 idiom). Each buffer is filled either
  * via func_80040FC0 (arg2==1) or strcpy (otherwise), and self->unk14
  * tracks the running max of the computed lengths.
  */
-extern s32 func_80013348(void *arg0);
+extern s32 strlen(void *arg0);
 extern void func_80040FC0(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
@@ -266,7 +266,7 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
     if (count > 0) {
         self->unk14 = 0;
         for (index = 0; index < self->unk10; index++) {
-            len = func_80013348(*p);
+            len = strlen(*p);
             if (arg2 == 1) {
                 len = (s32)(len + ((u32)len >> 31)) >> 1;
             }

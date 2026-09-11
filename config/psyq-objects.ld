@@ -10,18 +10,28 @@ SECTIONS {
     .psyq_bss.libetc_pad_bss 0x8008B3C8 (NOLOAD) : { build/lib/libetc/pad.o(.bss) }   /* 0x8 bytes; section-relative refs */
     .psyq_bss._obj_malloc_sbss 0x8008AC28 (NOLOAD) : { build/lib/_obj/malloc.o(.sbss) }   /* 0x20 bytes; section-relative refs */
     .psyq_bss._obj_malloc_bss 0x8008E284 (NOLOAD) : { build/lib/_obj/malloc.o(.bss) }   /* 0x10 bytes; first symbol SearchPoint */
+    .psyq_bss.libgs_matrix_bss 0x80090260 (NOLOAD) : { build/lib/libgs/matrix.o(.bss) }   /* 0x80 bytes; first symbol DSTACK */
+    .psyq_bss.libc2_putchar_sbss 0x8008AC48 (NOLOAD) : { build/lib/libc2/putchar.o(.sbss) }   /* 0x4 bytes; section-relative refs */
 }
 SearchPoint = 0x8008E284;   /* _obj/malloc */
 TopAllocArea = 0x8008E890;   /* _obj/malloc */
 PadIdentifier = 0x8008E984;   /* libetc/pad */
+DSTACK = 0x80090260;   /* libgs/matrix */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
-bcopy = 0x80012778;
-bzero = 0x800127AC;
-printf = 0x80012C20;
-putchar = 0x800133E0;
+MulMatrix0 = 0x80015230;
+ApplyMatrixLV = 0x80015618;
+PushMatrix = 0x800158CC;
+PopMatrix = 0x8001596C;
+MulMatrix = 0x80015AF0;
+MulMatrix2 = 0x80015BFC;
+SetRotMatrix = 0x80015EFC;
+SetLightMatrix = 0x80015F2C;
+SetTransMatrix = 0x80015F8C;
 ResetCallback = 0x80024D10;
 InterruptCallback = 0x80024D40;
 ChangeClearPAD = 0x80025434;
 ChangeClearRCnt = 0x80025454;
+GsLIGHTWSMATRIX = 0x8008E898;
+GsIDMATRIX = 0x8008E98C;

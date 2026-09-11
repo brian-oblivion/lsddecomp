@@ -120,7 +120,7 @@ extern HistoryNode *D_80090260[0x64];
 extern HistoryNode *D_8009025C[];  /* splat's own symbol at D_80090260-4;
                                        indexed here starting at 1, never 0 */
 extern s32 D_80090B74;
-extern void func_80012AF8(HistorySnapshot *out, HistorySnapshot *a1);
+extern void GsMulCoord3(HistorySnapshot *out, HistorySnapshot *a1);
 
 void func_8003F848(HistoryNode *self, HistorySnapshot *out) {
     HistoryNode *cur;
@@ -165,7 +165,7 @@ void func_8003F848(HistoryNode *self, HistorySnapshot *out) {
 
     if (i > 0) {
         do {
-            func_80012AF8(out, &D_8009025C[i]->cur);
+            GsMulCoord3(out, &D_8009025C[i]->cur);
             D_8009025C[i]->backup = *out;
             D_8009025C[i]->unk0 = D_80090B74;
             i--;
@@ -252,7 +252,7 @@ void func_8003FC18(s32 a0, s32 a1, TexPageDesc *desc) {
 }
 
 extern s32 D_800902E0;
-extern void func_80012C20(const char *fmt, s32 arg1); /* asm/psyq_2258.s,
+extern void printf(const char *fmt, s32 arg1); /* asm/psyq_2258.s,
                                                            Psy-Q printf-like;
                                                            declared locally
                                                            with THIS call
@@ -289,7 +289,7 @@ set:
     D_800902E0 = mode;
     return;
 err:
-    func_80012C20(D_80011194, mode);
+    printf(D_80011194, mode);
 }
 
 
