@@ -233,14 +233,14 @@ void func_8003FBE4(void *a0) {
     D_8008E794 = a0;
 }
 
-extern void func_80021678(void *arg0); /* asm/psyq_GsLinkObject4.s, Psy-Q
+extern void func_80021678(void *arg0); /* asm/psyq_10ee0.s, Psy-Q
                                            library, not game code */
 
 void func_8003FBF4(Class6E99CObj *self) {
     func_80021678(self->unk10);
 }
 
-extern void func_80021580(s32 stride, s32 mask); /* asm/psyq_GsLinkObject4.s,
+extern void func_80021580(s32 stride, s32 mask); /* asm/psyq_10ee0.s,
                                                      Psy-Q library, not game
                                                      code */
 

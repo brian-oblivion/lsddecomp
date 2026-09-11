@@ -728,7 +728,7 @@ extern void func_8003F2AC(void *arg0);
    viewed through the more specific pointer type now. */
 extern void func_8003FC18(s32 a0, s32 a1, TexPageDesc *a2);
 
-/* func_80021114 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+/* func_80021114 (asm/psyq_10ee0.s, PsyQ library, not game code):
    func_8003EDF4 (round 14, this unit) calls it with a literal 0 and
    ignores the return; declared here only with that shape. */
 extern void func_80021114(s32 a0);
@@ -749,14 +749,14 @@ extern void func_8003FC70(s32 a0);
 extern void func_8003FD4C(s32 a0, s32 a1);
 extern void func_8003FBE4(void *a0);
 
-/* ResetGraph (asm/psyq_GsLinkObject4.s, PsyQ library, LIBGPU.H's own
+/* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
    declared signature is `extern int ResetGraph(int mode);` -- declared
    locally here rather than including the whole SDK header, matching this
    unit's existing PsyQ-declaration style). func_8003F04C calls it with a
    literal 1 and ignores the return. */
 extern s32 ResetGraph(s32 mode);
 
-/* func_80023DA0 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
+/* func_80023DA0 (asm/psyq_140dc.s, PsyQ library, not game code):
    func_8003F04C calls it with self->unk58's own three bytes (read
    unsigned, same "writer reads signed, this reader reads unsigned"
    situation as unk5B/func_8003EEC0) plus one more word; declared here

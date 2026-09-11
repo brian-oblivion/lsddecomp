@@ -58,7 +58,7 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
  * a1 passed through as func_8001D624's own a2. */
 void func_8001D568(Class6B5CCObj *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): func_8001D600's own
-     * target (func_8001F51C, PsyQ, asm/psyq_GsLinkObject4.s, not
+     * target (func_8001F51C, PsyQ, asm/psyq_fa50.s, not
      * decompiled here) fills fields out past +0x32 of its own `dest`
      * argument, so the true destination struct is bigger than the 8 bytes
      * GenericCountList_d294 alone would reserve -- not derived beyond its
@@ -84,7 +84,7 @@ void func_8001D568(Class6B5CCObj *self, s32 a1) {
 
 /* Forwards self->unk20 (still opaque, retyped `void *` this round -- see
  * include/code_d294.h) and its own 2nd argument straight through to
- * func_8001F51C, untouched. func_8001F51C's own body (psyq_GsLinkObject4.s)
+ * func_8001F51C, untouched. func_8001F51C's own body (psyq_fa50.s)
  * has no deliberate return value -- see the extern's own comment -- so this
  * wrapper is void, not `return func_8001F51C(...)`. */
 void func_8001D600(Class6B5CCObj *self, void *dest) {
