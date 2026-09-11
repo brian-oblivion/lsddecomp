@@ -92,3 +92,12 @@
 3.3  libgte/cmb_00   0x67B0
 3.3  libgte/reg01    0x6830
 3.3  libgte/fgo_01   0x68B0
+
+# psyq_2258 chunk E (0x6B40..0x8220): libgte rotation/normalisation, closing
+# the segment at code_8220's boundary. Data: geo .rdata 0xA68 (0x24) and
+# .data 0x5B3E0 (0x802), msc02 .data 0x5BBE4 (0x1A0). geo's .rdata is a jump
+# table of relocated words (jtbl_80010268), so `place` reports
+# `bytes:not-found`; the derived 0xA68 is the slot's existing dlabel.
+3.3  libgte/geo      0x6B40
+3.3  libgte/msc02    0x7D70
+3.3  libgte/smp_00   0x8010

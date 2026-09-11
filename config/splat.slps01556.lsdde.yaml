@@ -75,7 +75,12 @@ segments:
       # 4 (splat's own disassembly emits `.align 2` right here). 0xA66 is
       # already 2-aligned, so SUBALIGN(2) would NOT insert those two bytes.
       - [0xA66, pad]
-      - [0xA68, rodata]   # psyq_2258 remainder -- libgte/geo's .rdata (chunk E)
+      # jtbl_80010268: geo's own switch jump table, 9 relocated words. A raw
+      # byte search cannot find relocated words, so `place` says
+      # `bytes:not-found`; the derived 0xA68 landing on the slot's existing
+      # dlabel is the confirmation. The 0x800 slot is now tiled exactly and
+      # psyq_2258 owns no plain rodata at all.
+      - [0xA68, o, libgte/geo, .rdata]
       - [0xA8C, rodata]   # code_8220
       - [0xABC, rodata]   # psyq_GsLinkObject4
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
@@ -251,7 +256,9 @@ segments:
       - [0x67B0, o, libgte/cmb_00]    # RotTransPers4
       - [0x6830, o, libgte/reg01]     # ReadSZfifo3 .. ReadGeomScreen
       - [0x68B0, o, libgte/fgo_01]    # RotMatrix
-      - [0x6B40, asm, psyq_6b40]
+      - [0x6B40, o, libgte/geo]       # RotMatrixZYX_C .. MatrixNormal_2
+      - [0x7D70, o, libgte/msc02]     # InvSquareRoot .. MatrixNormal
+      - [0x8010, o, libgte/smp_00]    # LightColor .. Lzc -- ends at code_8220
       # code_8220 is 56 functions, and it is the BasicClass block -- most of
       # its symbols are already named (BasicClass__*), so it is the most
       # legible uncarved ground in the game. First 20-function slice,
@@ -1267,6 +1274,10 @@ segments:
       # stay here; libgte/fgo_01 and libgte/geo reference it and the fragment
       # pins it as an external.
       - [0x573E0, data]
+      - [0x5B3E0, o, libgte/geo, .data]       # 0x802, the sine/cosine tables
+      - [0x5BBE2, pad]                        # 2 bytes; 0x802 is not 2-aligned
+      - [0x5BBE4, o, libgte/msc02, .data]     # 0x1A0
+      - [0x5BD84, data]
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]
       - [0x5DB38, o, libetc/intr_vb, .data]

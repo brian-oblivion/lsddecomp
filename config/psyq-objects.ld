@@ -71,8 +71,6 @@ PSDGPU = 0x80090B80;   /* libgs/gs_013 */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
-rsin = 0x80016C0C;
-rcos = 0x80016CE8;
 ResetCallback = 0x80024D10;
 InterruptCallback = 0x80024D40;
 ChangeClearPAD = 0x80025434;
