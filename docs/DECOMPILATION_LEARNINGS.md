@@ -5638,6 +5638,62 @@ function "IS the SDK utility, not a coincidentally-named local". The finding
 was sitting in prose no tool could read for several rounds. `sdkstalls.py`
 exists so this is a command rather than a noticing; `nearmiss.py` runs it.
 
+### A preserved body can carry a score that was NEVER MEASURABLE
+
+Round 19 established that roughly one inherited body in six carries a false
+"clean / drift-free" claim — the report's listed C having diverged from what
+was banked in `src/`. Round 33 found a strictly worse case in
+`func_8002CF18` (`code_179d8_l`): the preserved body called `func_800375E8`,
+**a symbol that does not exist under that name** (it is `SpuSetNoiseVoice`).
+That body could never have linked, so nobody ever built it, so its recorded
+score was not a measurement of anything.
+
+**This is a different failure from drift and needs a different check.** Drift
+is a mismatch between two things that both exist, and you catch it by
+comparing the report against `src/`. A never-linked body is self-consistent
+everywhere it is written down; the only thing that exposes it is putting it
+through the compiler. So: **before you trust an inherited score, build the
+inherited body once.** It costs one iteration of the loop and it is the only
+way to tell "this was measured and I can reproduce it" from "this was never
+measured at all".
+
+Once corrected — the symbol plus two unsigned-compare type residues — the
+function measures 163/167, and that figure is now a real one.
+
+### Two idioms that generalise further than the report that found them
+
+- **The duplicate-in-both-arms idiom extends from a shared STATEMENT to a
+  shared POINTER/ADDRESS computation.** Hoisting `e = &D_8008E978[idxStruct];`
+  above an `if` is what a human writes; retail's compiler saw it written
+  inside each arm. Moving it into both arms closed 5 words on
+  `func_8002E138` (108/112 -> 113/112).
+- **The narrow-cast-defeats-strength-reduction idiom is UNIT-wide, not local
+  to the function that discovered it** — and **the cast width must match the
+  surrounding comparison's width** (`(u16)i`, not `(u8)i`). `func_8002CF18`'s
+  report had named the fix; nobody had tried it on `func_8002DDBC` in the
+  same unit, where it was worth 10 words (98/112 -> 108/112).
+
+The transferable half is the second clause of each: **an idiom recorded in one
+function's report is a candidate for every sibling in its unit**, and a report
+is not a place a lever goes to be finished with.
+
+### A GCSE / value-availability hoist is immune to `__asm__("")` at ANY placement
+
+Round 33 confirmed independently in two `code_179d8_l` functions
+(`func_8002CF18`, `func_8002E308`) that GCC's hoist of a side-effect-free
+redundant expression cannot be fenced by a bare barrier at any placement
+tried, and that `volatile` regresses it by forcing a stack spill. Note
+`func_8002E308`'s original report blamed copy-elision; the mechanism is the
+hoist.
+
+**This is a MECHANISM claim, not a "we have not found the right spot yet".**
+It matters because the barrier is the project's reflex for anything that looks
+like ordering, and this residue looks exactly like ordering while being a
+value-availability decision made earlier. Recognising the class saves the
+placements — and per round 33's scoping rule, it is still a claim about this
+mechanism under this pipeline, so re-test it if something else moves the
+residue first.
+
 ### Renaming a Sony function into a SHARED header is a latent `conflicting types`
 
 Converting `libgs/gs_131` renamed `func_8003F2AC` to `GsSetRefView2` — and one

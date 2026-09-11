@@ -6,6 +6,166 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-12 — round 33: five SDK conversions, 818 words of unmatchable queue retired, and a misdiagnosed runner
+
+**State at end: 1051 matched / 1342 game functions (78.32% of game code), up
+from 78.10% — while the matched COUNT fell 1059 -> 1051.** Both numbers are
+correct and the movement is the point: 14 functions left the game denominator
+because they are Sony's, 8 of them previously counted as our matched C. Queue
+212 live `INCLUDE_ASM`, 211 documented stalls, `fresh` 1. Build green,
+re-extract changes zero committed bytes, `srcpath` and `psyq_sdk.py check` OK.
+
+### Gates
+
+- **Gate 0** clean: no stale-asm warning, build green before any triage.
+- **Gate 1**: `fresh` was **1**, and it is `func_80018464` (954 words) — a
+  number that exists but cannot staff anybody. The round ran off Gate 1b.
+- **Gate 1b**: 111 blocker-clean near-misses of 218 live at the start.
+- **Gate 2 — carve DECLINED on measurement, fourth consecutive round.** 79
+  uncarved functions holding 10 blocker-clean, against a 111-function screened
+  near-miss queue. Round 27's standing finding holds.
+- **Gate 3 — permuter declined as a whole-round shape**, folded into
+  assignments. Two searches ran; neither found a zero.
+- **Header contention: ZERO** across all five units assigned.
+
+### Staffing — three concurrent, five runner-sessions, capped deliberately
+
+The operator capped the round at three runners. alpha `code_55dd4` -> alpha2
+`code_179d8_l` · bravo `code_179d8_k` · charlie `code_179d8_g` -> charlie2
+`class_3bb8c_b`. Bravo's worktree was left idle after merge rather than
+re-staffed, to finish at five sessions rather than six.
+
+### The head's work: five SDK-object conversions
+
+Phase 2 of `docs/SDK-OBJECTS-RUNS.md` — objects inside game units — is head
+work, and it is the only item on the board with a guaranteed outcome. Five
+runs converted, each verified byte-exact before the next was started:
+
+| run | segment effect | retires | reclassifies |
+| --- | --- | --- | --- |
+| `libc2/atoi` + `libc2/todigit` | `class_3bb8c_u` retired whole | 1 stall, 79w | 2 matched-C |
+| `libsnd/vm_vsu` | prefix trim of `code_179d8_c` | 1 stall, 53w | — |
+| `libsnd/sstable` | mid-split -> new `code_179d8_c_b` | 1 stall, 120w | — |
+| `libsnd/vs_vh` | across two units, both trim | 1 stall, 274w | 3 matched-C |
+| `libgs/gs_131` + `libgs/gs_133` | prefix trim of `code_2cc8c_e` | 2 stalls, 292w | 3 matched-C |
+
+**6 stalls and 818 words of permanently-unmatchable derivation retired**;
+Sony-owned functions in the live queue fell 14 -> 8. 131 objects now linked.
+
+Four things worth keeping from doing them:
+
+1. **The rodata attach follows the FUNCTION, not the unit name.** Splitting
+   `code_179d8_c` around `sstable` moved `func_80032588` into the new
+   `code_179d8_c_b`, and `jtbl_80010CD8` is its. Left on the old unit this is
+   the routine `undefined reference to '.L800325xx'` failure Gate 2 documents.
+   Both unit headers now say which half owns it.
+2. **A blocker screen cannot see OWNERSHIP, measured from the other
+   direction.** `code_179d8_i`'s carve-time header certified `func_80032D34`
+   as "ordinary large fresh ground, not blocked", verified against both live
+   screens with zero hits. The verification was correct and the conclusion was
+   wrong — it is `SsVabOpenHeadWithMode`, and round 26 spent 232 lines on it.
+   The same file had carried, since carve time, a note saying a neighbour "IS
+   the SDK utility, not a coincidentally-named local": the finding sat in
+   prose no tool could read for several rounds.
+3. **A bulk rename is how the shared-header rule gets broken silently.**
+   Renaming `func_8003F2AC` -> `GsSetRefView2` put a Sony prototype into
+   `include/code_2cc8c.h`, which six units include and which will one day sit
+   next to `LIBGS.H`'s own. Build stayed green; the failure would have
+   surfaced later in a unit that never touched the line. Moved to a local
+   extern in the single caller. A rename also rewrote two HISTORICAL comments
+   that quoted an old symbol name on purpose, and the first caller sweep
+   missed two units because the grep was scoped to files already read — the
+   link caught that one.
+4. **`place`'s `.bss: relocations DISAGREE` is not a blocker** and the yaml
+   now says so next to `gs_131`. The disagreement that blocks is an `ldfrag`
+   `NOTE:`, and there were none.
+
+**A sixth conversion was measured and deliberately NOT done**: `libc2/strcpy`
++ `libc2/strstr` + `libcd/sys` (0x19378..0x19C78, crossing `code_179d8_h` /
+`code_179d8_b`), which would retire three more stalls (246w) and give 28 Sony
+names. It is the first non-text-only run — two data slots need splitting, with
+the `SUBALIGN(2)` pad rule in play. The full measurement is banked in the
+splat yaml next to the segment it splits, not in a guide that outlives the
+segmentation. Head attention, not build cost, is what a conversion spends, and
+a half-applied one is a broken build for whoever merges next.
+
+### Runner results
+
+No byte-exact matches this round. The largest movement was bravo's
+`func_800344FC`, **44/70 -> 61/70** (17 words), via the dead-value-reuse
+lever: `speed` goes dead after computing `divided`, and reusing its storage
+for `(u8)a3` instead of re-reading `a3` at the store site matched retail's
+register reuse. Its residue is now a narrow two-way register rotation.
+
+Alpha took all five of `code_55dd4`'s near-misses through the round-32 levers
+and got five negatives. Charlie advanced four `code_179d8_g` reports and made
+all four titles rankable.
+
+### Gate finding: rank by residue, screen by ATTEMPT HISTORY
+
+Alpha was staffed onto `code_55dd4` because its titles carried 252/258 and
+33/40 — by the ranking Gate 1b prescribes, the best odds on the board. Every
+one of those five already had five or six rounds behind it and two had
+190,000+ permuter iterations against sanity-checked scaffolds.
+
+**The selection effect is structural, not bad luck:** a function reaches
+252/258 by being worked repeatedly by people who did not close it, so the
+figure that makes it rank first is itself evidence the cheap levers are spent.
+A title carries length, word-match and first diff *by design* (round 23) and
+carries nothing about cost. Gate 1b now has a fifth screen.
+
+The guard against over-correcting is in the same entry: a long report is NOT a
+reason to write a function off, because **a lever's negative is scoped to the
+state it was tested under**. Round 19 correctly found a guard flip inert in
+`func_8002B4D4`; the same flip closed three words this round once an unrelated
+fix had moved the residue.
+
+### Process: a stalled runner, and a runner that only looked stalled
+
+`SendMessage` was unavailable for the third round running. Charlie ended its
+session waiting for a "monitor" that never existed, with four modified reports
+and zero commits; the head recovered the worktree and committed on its branch.
+That is a failure the §3c substitute did not cover — there is no early
+finisher to re-send, and spawning a replacement would have destroyed the work.
+
+**The head then misdiagnosed bravo the same way, and that error is the more
+useful half.** Bravo's notification looked identical — five modified files,
+zero commits — but it was alive, waiting on a permuter it had bounded
+correctly with `timeout 400`. It resumed, finished and committed. The head had
+by then written to its branch underneath it. Harmless in the event; nothing
+guaranteed it.
+
+So: **a task notification is not evidence a runner is finished.** It fires
+whenever an agent stops with no live background children, and the agent can
+resume. Zero commits plus a notification fits both a dead runner and a live
+one mid-wait, and those call for opposite actions. The discriminator is to
+look for the runner's own bounded job by the function name it named. When in
+doubt, wait — recovery is forced only by teardown, and teardown is the head's
+own choice of moment.
+
+Two machine-level traps found the same way, both now written down:
+
+- **A `pgrep -f <pattern>` wait loop never terminates**, because the polling
+  shell's own command line contains the pattern. Sibling of the standing
+  "never `pkill -f` a tool name" rule: the pattern matches the matcher.
+- **Killing a permuter's parent orphans its `-j N` workers.** Five re-parented
+  to init and ran on for four more minutes. What found them was `uptime`:
+  a 15-minute load average of **8.76** against a 1-minute **0.91** after the
+  kill. A live runner competing with a dead session's orphans pays in wall
+  clock with nothing in its own transcript to explain why.
+
+### Next move
+
+**An SDK-conversion round, then runners.** Eight Sony-owned stalls remain,
+851 words, in four runs — `libcd/iso9660` (3 functions, 550w),
+`libcd/sys` (3, 246w, already measured and banked in the yaml),
+`libsnd/adsr` (1, 35w), `libgte/fgo_00` (1, 20w). Converting them retires the
+whole category and is the only work on the board with a guaranteed outcome.
+`libcd/iso9660` touches `code_179d8_g` and `code_179d8_d`, so no matching
+runner may hold either unit that round.
+
+---
+
 ## 2026-09-12 — round 32: six closes, and 14 queued functions that were Sony's all along
 
 **State at end: 1059 matched / 1356 game functions (78.10% of game code), up
