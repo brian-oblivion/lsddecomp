@@ -153,7 +153,7 @@ extern u8 D_80010CB8[]; /* "CD_cachefile: %d files found\n" */
 extern s32 func_8002BFA8(void *p0, void *p1, void *p2);        /* matched, this unit */
 extern void func_8002C014(char *dest, char *src, s32 count);   /* matched, this unit */
 extern void func_800292F4(void *arg0, s32 *outBuf);
-extern void func_80012C20(const char *fmt, ...); /* Psy-Q printf wrapper */
+extern void printf(const char *fmt, ...); /* Psy-Q printf wrapper */
 
 s32 func_8002BCEC(s32 id)
 {
@@ -176,14 +176,14 @@ s32 func_8002BCEC(s32 id)
 
     if (func_8002BFA8((void *)1, D_8008B9CC[id].handle, D_8008CFF0) != 1) {
         if (D_8006D608 > 0) {
-            func_80012C20(D_80010C58);
+            printf(D_80010C58);
         }
         return -1;
     }
 
     count = 0;
     if (D_8006D608 >= 2) {
-        func_80012C20(D_80010C78);
+        printf(D_80010C78);
     }
 
     slot = D_8008B3F0;
@@ -216,7 +216,7 @@ s32 func_8002BCEC(s32 id)
 
         slot++;
         if (D_8006D608 >= 2) {
-            func_80012C20(D_80010C9C, *((u8 *)D_8008B3F0 + off),
+            printf(D_80010C9C, *((u8 *)D_8008B3F0 + off),
                           *((u8 *)D_8008B3F0 + off + 1),
                           *((u8 *)D_8008B3F0 + off + 2),
                           *(s32 *)((u8 *)D_8008B3F4 + off), (char *)name);
@@ -236,7 +236,7 @@ s32 func_8002BCEC(s32 id)
         D_8008B3F0[count].name[0] = 0;
     }
     if (D_8006D608 >= 2) {
-        func_80012C20(D_80010CB8, count);
+        printf(D_80010CB8, count);
     }
     return 1;
 }
@@ -500,3 +500,54 @@ retail lacks, around an incoming PARAMETER) does NOT apply here** — this
 function's own length/register residues are both around DERIVED local
 values (`off`+4, and the derivation-order registers above), not around an
 incoming parameter's own storage. Negative result, reported as requested.
+
+## Round 30 update (runner echo) — figures rebuilt, a stale symbol name found and fixed, one more variant tried
+
+Rebuilt the preserved body by splicing it into `src/code_179d8_d.c` (via
+`#if 0`/`#endif`) and reproduced the title's figures exactly: `funcdiff.py`
+reports **49/175** raw word-match with the drift warning firing (~299428
+bytes outside range this round vs. the ~299450 quoted before — the small
+difference is consistent with unrelated SDK-linking work landing in between
+rounds, not a regression here). `tools/asm-differ/diff.py` confirms the
+SAME two residues at the SAME positions: the missing `li v0,1 / beqz
+v0,<exit> / nop` (residue 2) immediately before the loop setup, and the
+`swl v1,7(v0)`/`swr v1,4(v0)` vs retail's `swl v1,3(v0)`/`swr v1,0(v0)`
+size-field-store immediates (residue 1, the "7 registers, wrong immediates"
+row of the six-variant table). No new residue found; the report's own
+characterization stands.
+
+**Found and fixed: the preserved body's `func_80012C20` declaration is a
+STALE SYMBOL NAME that no longer links.** Splicing the report's C exactly
+as written now fails at link time —
+`undefined reference to 'func_80012C20'` — because the Psy-Q `printf`
+object was linked in the interim (rounds 29-30's SDK-objects work; see
+`include/code_8220.h`'s own note that the old `func_80012C20` declarations
+"moved into src/code_8220.c when the SDK objects were linked"). Every other
+unit that calls this function now declares it as `printf` directly (see
+`src/code_179d8_g.c`, `src/code_179d8_h.c`, `src/class_3bb8c_f.c`,
+`src/code_2cc8c_e.c`, each with the argument shape their own call site
+needs — per-unit local views, not a shared header, matching this project's
+convention). Fixed in `src/code_179d8_d.c` by declaring
+`extern void printf(const char *fmt, ...);` and renaming all four call
+sites in the preserved body from `func_80012C20(...)` to `printf(...)` —
+this is a pure symbol-name fix, not a codegen change, and the rebuilt score
+is otherwise identical. **The C block below is updated with this fix; any
+future attempt splicing this report's body should use `printf`, not
+`func_80012C20`, or it will not link.**
+
+**One new residue-1 variant tried, WORSE than the six already in the
+table:** indexing the destination via `EntryB3F0 *entry = &D_8008B3F0[count];`
+(array-subscript by the already-live `count` variable, distinct from the
+byte-offset `off` every other variant used) instead of
+`(EntryB3F0 *)((u8 *)D_8008B3F0 + off)`. This compiles clean but drops the
+raw word-match to **14/175** (from 49/175) — worse than every row in the
+existing table, including the worst-performing "8 registers" variants.
+Reverted immediately; not worth a table row of its own beyond this note,
+since it did not isolate anything new about the register-count/immediate
+trade-off — it just picked a worse overall allocation. The six-variant
+table's own conclusion (no variant reaches retail's "fresh `addiu`,
+7-register" combination) stands unchanged.
+
+**Verdict: still an open STALL, 49/175 raw match under a 3-word drift —
+unchanged in substance, with the stale-symbol fix now folded into the
+preserved body for the next attempt.** `INCLUDE_ASM` restored; build green.
