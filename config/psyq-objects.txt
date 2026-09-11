@@ -311,3 +311,13 @@
 # in the yaml; its 4-byte .sbss seed at 0x8008AC68 goes in the fragment and
 # the plain [0x7B468, sbss] slot is unchanged.
 3.3  libc2/rand     0x39C80
+
+# class_3bb8c_u (0x41148..0x41308), retired whole: libc2's atoi/atol and the
+# todigit helper they share. Text-only -- neither object has a .data/.rdata/
+# .sdata section, so `place` prints no yaml lines and the only data they touch
+# is `_ctype_` (0x80066840), which stays in its plain slot and is pinned by the
+# fragment. Converting this unit reclassifies TWO functions already matched as
+# C (atol, todigit) out of the game-code count; that is the correction, not a
+# regression. See docs/PROGRESS.md, round 33.
+3.3  libc2/atoi     0x41148
+3.3  libc2/todigit  0x412A4

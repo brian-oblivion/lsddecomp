@@ -361,6 +361,12 @@ GetStageGridDimensionsTable = 0x800494BC;
 GetStageGridDimensions = 0x800494D8;
 GetStageChunkFromMood = 0x8004950C;
 GetMoodFromStageChunk = 0x800495B8;
+// class_3bb8c_u's three functions, converted to linked SDK objects in round
+// 33.  These are Sony's own exported names, read out of the object symbol
+// tables, not guesses -- see the PROVENANCE note at the top of this file.
+atoi = 0x80050948; // type:func  (Psy-Q libc2/atoi, from the SDK object)
+atol = 0x80050A84; // type:func  (Psy-Q libc2/atoi, from the SDK object)
+todigit = 0x80050AA4; // type:func  (Psy-Q libc2/todigit, from the SDK object)
 New_DreamSys = 0x80058774;
 DreamSys__DreamSys = 0x800587F0;
 DreamSys__func_588ec = 0x800588EC;

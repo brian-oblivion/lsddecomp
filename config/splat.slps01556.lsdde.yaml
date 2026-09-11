@@ -1209,7 +1209,19 @@ segments:
       #   - the segment's rodata (`D_80011610`/`D_8001161C`, in the standalone
       #     0x1DD0 slot) is referenced BY SYMBOL, which resolves from a
       #     standalone object -- only `.L` labels force an attach.
-      - [0x41148, c, class_3bb8c_u]
+      # ROUND 33: class_3bb8c_u is RETIRED as a C unit -- all three of its
+      # functions are Sony's, and the run tiles the segment exactly.
+      # `libc2/atoi` (0x15C) owns atoi (0x80050948, the 79w INCLUDE_ASM this
+      # unit never matched) AND atol (0x80050A84); `libc2/todigit` (0x64) owns
+      # todigit (0x80050AA4).  atol and todigit had been matched as C and were
+      # counted as game code; reclassifying them is the correction CLAUDE.md
+      # asks for ("never write C for a function a Sony object owns"), not a
+      # regression.  Text-only: `psyq_sdk.py place` derives no data lines for
+      # either object, and the `_ctype_` table they index (0x80066840, read at
+      # +1 as the old C's `D_80066841`) stays in its plain data slot, pinned by
+      # config/psyq-objects.ld.
+      - [0x41148, o, libc2/atoi]
+      - [0x412A4, o, libc2/todigit]
       # class_3bb8c_h_b: 2 trampolines (BIOS vector 0xA0), 0x41308..0x41328.
       # Same `hasm` disposition as class_3bb8c_h -- see that note above.
       - [0x41308, asm, class_3bb8c_h_b]
