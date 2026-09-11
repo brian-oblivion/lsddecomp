@@ -61,7 +61,8 @@ void func_80035F3C(s32 a0, s32 a1, UnkStruct80035F3C *a2)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80035F98);
 
-/* func_80038D74 is defined in the uncarved psyq_SpuSetMute unit; a leading
+/* func_80038D74 is defined in the Psy-Q SPU/SND block at 0x272C8..0x2C054
+ * (being converted to linked SDK objects run by run); a leading
  * `beqz $a0` / `beq $a0,1` / else dispatch on a mode, and it returns a real
  * value read from D_8006DD2C right before its own jr $ra. */
 extern s32 func_80038D74(s32 a0);
@@ -76,10 +77,11 @@ s32 func_80036044(void)
     return func_80038D74(0);
 }
 
-/* Globals owned by the uncarved psyq_SpuSetMute unit, poked directly here. */
+/* Globals owned by the Psy-Q SPU/SND block at 0x272C8..0x2C054 (libspu bss),
+ * poked directly here. */
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
-extern void func_80036B20(s32 *a0);
+extern void SpuSetReverbModeParam(s32 *a0);
 
 s32 func_80036064(s32 a0)
 {
@@ -113,7 +115,7 @@ s32 func_80036064(s32 a0)
                 func_80038D74(0);
             }
         }
-        func_80036B20(&D_8008E258);
+        SpuSetReverbModeParam(&D_8008E258);
         result = s0;
     } else {
         result = -1;
@@ -143,7 +145,7 @@ void func_80036118(s32 a0, s32 a1)
     *p = 6;
     D_8008E260 = (s32)sa0 * 32767 / 127;
     D_8008E262 = (s32)sa1 * 32767 / 127;
-    func_80036B20(p);
+    SpuSetReverbModeParam(p);
 }
 
 extern s32 D_8008E268;
@@ -154,7 +156,7 @@ void func_800361B0(s32 a0)
 
     *p = 0x10;
     D_8008E268 = (s16)a0;
-    func_80036B20(p);
+    SpuSetReverbModeParam(p);
 }
 
 extern s32 D_8008E264;
@@ -165,7 +167,7 @@ void func_800361F0(s32 a0)
 
     *p = 8;
     D_8008E264 = (s16)a0;
-    func_80036B20(p);
+    SpuSetReverbModeParam(p);
 }
 
 extern u8 D_8008EA2C[];
@@ -452,7 +454,8 @@ void func_80036A7C(s32 a0, s32 a1)
     func_800368E8((s16)a0, (s16)a1);
 }
 
-/* func_80038E44 is defined in the uncarved psyq_SpuSetMute unit; its own
+/* func_80038E44 is defined in the Psy-Q SPU/SND block at 0x272C8..0x2C054
+ * (the game's own libspu build, which no SDK disc has); its own
  * body is a single straight-line path (no branches) ending in a chain of
  * global stores with $v0 never touched afterward -- genuinely void, not
  * just an unobserved return. */

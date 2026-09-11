@@ -109,3 +109,15 @@
 # SHADOWED: ldfrag maps it NOLOAD at 0x800106BC and the bytes stay in splat's
 # plain rodata slot. Byte-exact (docs/research/psyq-sdk-objects.md, round 29).
 3.3  libetc/intr    0x15510  shadow=.rdata
+
+# psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
+# the SpuSetReverb* family, the malloc-style SPU RAM allocator (s_sca) and its
+# helpers. Data: s_sca .rdata 0x1764 (0x40) = jtbl_80010F64 + jtbl_80010F84,
+# two switch tables of relocated words, so `place` reports `bytes:not-found`
+# and the derived offset lands on the slot's existing dlabels. bss via the
+# fragment.
+3.3  libspu/s_sm     0x272C8
+3.3  libspu/s_srmp   0x27320
+3.3  libspu/s_m_util 0x27D00
+3.3  libspu/s_snv    0x27DE8
+3.3  libspu/s_sca    0x27E0C

@@ -18,6 +18,7 @@ SECTIONS {
     .psyq_bss.libgs_gs_119_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_119.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_120_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_120.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_135_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_135.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
+    .psyq_bss.libspu_s_sca_bss 0x80100000 (NOLOAD) : SUBALIGN(2) { build/lib/libspu/s_sca.o(.bss) }   /* 0x4 bytes; unreferenced; spare NOLOAD area */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 PSDOFSX = 0x8008E240;   /* libgs/gs_013 */
@@ -81,5 +82,15 @@ ChangeClearRCnt = 0x80025454;
 _96_remove = 0x80025464;
 ReturnFromException = 0x80025474;
 setjmp = 0x80025484;
+_spu_FsetRXX = 0x800389F0;
+SpuClearReverbWorkArea = 0x80038B28;
+_SpuSetAnyVoice = 0x8003982C;
 rcossin_tbl = 0x80066BE0;
+_spu_RXX = 0x8006DCCC;
+_spu_mem_mode_plus = 0x8006DCF0;
+_spu_rev_attr = 0x8006DD34;
+_spu_rev_offsetaddr = 0x8006DD48;
+_spu_memList = 0x8006E190;
+_spu_rev_startaddr = 0x8006E194;
+_spu_rev_param = 0x8006E1E4;
 GsOUT_PACKET_P = 0x8008E794;

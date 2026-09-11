@@ -208,6 +208,17 @@ CdStatus = 0x80028C34;
 new_class_6d940 = 0x8002C12C;
 SetRCnt = 0x80032B18;
 SsUtGetVabHdr = 0x8003317C;
+
+// psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
+// the reverb-mode setter and the SPU RAM allocator's helpers. Sony's own
+// exported names, read out of the SDK objects the build now links.
+SpuSetMute = 0x80036AC8; // type:func  (Psy-Q libspu/s_sm, from the SDK object)
+SpuSetReverbModeParam = 0x80036B20; // type:func  (Psy-Q libspu/s_srmp, from the SDK object)
+_spu_setReverbAttr = 0x80037030; // type:func  (Psy-Q libspu/s_srmp, from the SDK object)
+_SpuIsInAllocateArea = 0x80037500; // type:func  (Psy-Q libspu/s_m_util, from the SDK object)
+_SpuIsInAllocateArea_ = 0x80037570; // type:func  (Psy-Q libspu/s_m_util, from the SDK object)
+SpuSetNoiseVoice = 0x800375E8; // type:func  (Psy-Q libspu/s_snv, from the SDK object)
+SpuSetCommonAttr = 0x8003760C; // type:func  (Psy-Q libspu/s_sca, from the SDK object)
 memset = 0x8004117C;
 rand = 0x80049480;
 srand = 0x800494A8;

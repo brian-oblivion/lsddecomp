@@ -1753,7 +1753,7 @@ struct TaskObjF {
 
 /* func_8004F394/func_8004F3BC/func_8004F3E4 forward `self` unchanged into
  * func_8004F40C with a distinct library callback each; func_80038F6C/
- * func_8003903C are Psy-Q SPU routines (asm/psyq_SpuSetMute.s, uncarved),
+ * func_8003903C are Psy-Q SPU routines (the block at 0x272C8..0x2C054),
  * func_800390F4 is the SAME validity check func_8004F4C8 (below) uses on
  * its own array argument. */
 extern s32 func_80038F6C(s32 arg);

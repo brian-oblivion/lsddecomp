@@ -114,7 +114,14 @@ segments:
       # labels local to those two functions' own `.s` files, so leaving it
       # standalone fails the link with `undefined reference to '.L800346..'`.
       - [0x14F0, .rodata, code_179d8_k]
-      - [0x1764, rodata]
+      # 0x1764..0x1890 was one plain slot serving psyq_SpuSetMute. Its first
+      # 0x40 bytes are EXACTLY jtbl_80010F64 + jtbl_80010F84, the two switch
+      # tables of libspu/s_sca's SpuSetCommonAttr: relocated words, so `place`
+      # reports `bytes:not-found` and the derived offset landing on the slot's
+      # own two dlabels is the evidence. The plain remainder below shrinks as
+      # later chunks of the segment land their pieces.
+      - [0x1764, o, libspu/s_sca, .rdata]
+      - [0x17A4, rodata]  # D_80010FA4 .. D_80011078; owners not placed yet
       # 0x1890 holds three jump tables. jtbl_80011090 and jtbl_800110D0
       # belong to code_2cc8c's first 20-function slice (now a C unit), so
       # that part of the slot must be ATTACHED to it -- a standalone rodata
@@ -765,7 +772,17 @@ segments:
       # both addiu-$at (and both large -- 115 and 240 instructions).  No
       # trivial leaves.  Owns NO switch jump table, so no rodata attach.
       - [0x2673C, c, code_179d8_f]
-      - [0x272c8, asm, psyq_SpuSetMute]
+      # psyq_SpuSetMute (0x272C8..0x2C054) is converted to linked Sony objects
+      # one run at a time. 35 objects tile nine runs exactly, all from the 3.3
+      # disc; the eight gaps between the runs are the game's own libspu/libsnd
+      # build, which no disc has, and stay as `asm` segments named
+      # psyq_<fileoff>. Chunk A is the first run.
+      - [0x272c8, o, libspu/s_sm]        # SpuSetMute
+      - [0x27320, o, libspu/s_srmp]      # SpuSetReverbModeParam, _spu_setReverbAttr
+      - [0x27d00, o, libspu/s_m_util]    # _SpuIsInAllocateArea, _SpuIsInAllocateArea_
+      - [0x27de8, o, libspu/s_snv]       # SpuSetNoiseVoice
+      - [0x27e0c, o, libspu/s_sca]       # SpuSetCommonAttr (owns the 0x1764 jump tables)
+      - [0x281a0, asm, psyq_281a0]
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as

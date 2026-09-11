@@ -175,7 +175,7 @@ typedef struct {
     u8 pad8[0x28 - 0x8];
 } UnkStruct_800334A0;
 
-extern void func_8003760C(UnkStruct_800334A0 *arg);
+extern void SpuSetCommonAttr(UnkStruct_800334A0 *arg);
 
 void func_800334A0(s16 a0, s16 a1)
 {
@@ -184,7 +184,7 @@ void func_800334A0(s16 a0, s16 a1)
     s.unk0 = 3;
     s.unk4 = a0 * 129;
     s.unk6 = a1 * 129;
-    func_8003760C(&s);
+    SpuSetCommonAttr(&s);
 }
 
 /* 0x10-byte-strided table shared with code_179d8_j.c's own SlotE968 local
@@ -247,7 +247,7 @@ s16 func_800335FC(s32 a0, s16 a1)
     return -1;
 }
 
-extern void func_80036AC8(s32 a0);
+extern void SpuSetMute(s32 a0);
 
 void func_800336CC(u8 a0)
 {
@@ -261,7 +261,7 @@ void func_800336CC(u8 a0)
     } else {
         mode = 0;
     }
-    func_80036AC8(mode);
+    SpuSetMute(mode);
 }
 
 extern s32 func_8003904C(s16 a0);
