@@ -388,6 +388,10 @@ s32 func_800319B4(s32 p0, s16 p1, s16 p2, s32 p3, u16 p4)
     return 0;
 }
 
+/* STALL -- see docs/match-reports/func_80031A44.md.  HEAD SALVAGE, round 31:
+ * a mid-attempt snapshot scoring 84/88 words (no drift) was recovered from
+ * the worktree and is preserved in that report as literal source.  No author
+ * applied a stop rule to it. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031A44);
 
 /* Rec34D994 (D_8008D994/99A/99E) and Rec16D7F0 (D_8008D7F8/D_8008D7FA
