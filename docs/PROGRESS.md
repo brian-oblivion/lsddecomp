@@ -6,6 +6,186 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-12 — round 32: six closes, and 14 queued functions that were Sony's all along
+
+**State at end: 1059 matched / 1356 game functions (78.10% of game code), up
+from 1053 (77.65%). Queue 218 live `INCLUDE_ASM`, 217 documented stalls,
+`fresh` 1.** Build green, tree clean, all five runner branches merged,
+re-extract changed zero committed bytes.
+
+### Gates
+
+- **Gate 0** clean. **Gate 4a**: no concurrent head, no stale worktrees, and
+  the five-name `additionalDirectories` grant verified present before
+  provisioning.
+- **Gate 1**: `fresh` was **1** — dry. The round ran off Gate 1b.
+- **Gate 1b**: 130 blocker-clean near-misses of 224 live at the start.
+- **Gate 2 — carve DECLINED on measurement**, third consecutive round. 79
+  uncarved functions holding 10 blocker-clean, against a 130-function screened
+  near-miss queue. Round 27's standing finding holds.
+- **Gate 3 — permuter declined as a whole-round shape**, folded into
+  assignments instead. It produced the round's largest close.
+- **Header contention: ZERO** across all six units assigned, all round. Third
+  consecutive round confirming contention is a property of what runners put in
+  a header, not of how many share one.
+
+### Staffing — three concurrent, five runner-sessions
+
+`SendMessage` was unavailable again (round 31 reported the same), so mid-round
+broadcasts remain impossible. **The substitute worked and should be the
+standing practice: when a runner finishes, merge it and spawn a FRESH agent
+into the same worktree on a different unit, folding the round's findings into
+its prompt.** Round 31 lost its re-send lever entirely and got no closes from
+it; this round's two re-staffed sessions produced 2 of the 6 matches, and the
+replacement runner reported that a mid-round finding in its prompt drove both.
+
+alpha `code_179d8_j` -> alpha2 `DreamSys` · bravo `code_179d8_m` -> bravo2
+`class_3bb8c` · charlie `code_8220_c` + `class_3bb8c_v`.
+
+Charlie's two-unit assignment was the deliberate round-31 departure repeated:
+`class_3bb8c_v` holds one function, no other runner held either file, and they
+share no header. No collision.
+
+### Matches — 6
+
+| function | unit | words | who |
+| --- | --- | --- | --- |
+| `func_80032BB8` | code_179d8_c | 14/14 | head |
+| `func_80032C60` | code_179d8_c | 14/14 | head |
+| `func_8001E6F8` | code_d294_c | 30/30 | head |
+| `func_8002EDD4` | code_179d8_m | 270/270 | bravo |
+| `func_80059814` | DreamSys | 53/53 | alpha2 |
+| `func_80059BE0` | DreamSys | 79/79 | alpha2 |
+
+Each verified individually in `main` as real C at full word match on a green
+whole-image SHA1. Every runner's commit count, report count and remaining
+`INCLUDE_ASM` corroborated its summary exactly.
+
+**Five of the six were behind a VERDICT, not a difficulty**, which is the
+round's theme. `func_80032BB8` was filed "register identity, not fixable by
+reshaping" — terminal under HARD RULE 6, so it had correctly stopped attracting
+attempts. `func_8001E6F8` had nine builds and a 34,825-iteration permuter run.
+`func_80059BE0` stood three rounds and 20+ attempts. `func_8002EDD4` was the
+corpus's closest large near-miss at 267/270.
+
+Improvements short of a close: `func_800598E8` 75/77 -> 76/77, `func_8004C470`
+63/70 -> 68/70, `func_80050B28` 5/12 -> 9/12.
+
+### Mechanisms, all now in DECOMPILATION_LEARNINGS.md
+
+1. **`volatile` is a legitimate and much NARROWER instrument for the
+   instruction-ORDER class than a bare `__asm__("")`.** A barrier fences every
+   value crossing one program point; `volatile` fences one access. Closed
+   `func_80032C60` with round 16's own body character-for-character unchanged,
+   after three barrier placements across two rounds had all regressed. It also
+   subsumes the barrier `SetRCnt` carried (removed; still 40/40). Not the
+   banned construct — HARD RULE 6's test is whether removing it changes which
+   REGISTER holds a value, and a qualifier names none. Scope measured, not
+   assumed: two units in the corpus touch hardware addresses and one has an
+   empty queue.
+2. **A register-identity verdict is a HYPOTHESIS about a mechanism; "the
+   registers differ" does not establish it.** The discriminator is whether
+   anything in the C constrains the ORDER. This drove `func_80032BB8` and both
+   of alpha2's matches. `func_8002EDD4` added a source-level determinant the
+   taxonomy never named: whether a scratch variable is REUSED at a distant
+   unrelated point (splitting it into two natural locals regressed 270/270 ->
+   47/270).
+3. **Do not derive source order from EMISSION order.** `func_8001E6F8` closed
+   by writing two statements in the order that looks wrong against the
+   disassembly.
+4. **A permuter negative is evidence about one search against one scaffold.**
+   Three independent confirmations this round: a 34,825-iteration search missed
+   a two-line transposition; a second independent run on a previously flat
+   search found a zero at iteration 66,199; and a scaffold was caught scoring a
+   different residue than the real build (9 ins/9 del vs 0) — the second such
+   instance after round 17, now a mandatory pre-search `--debug` check.
+5. **A report's own CODE BLOCK is a claim to verify, not a transcription.**
+   `func_80059BE0`'s listed best-reached C had diverged from what was banked in
+   `src/`; the listed version scores 14/79.
+6. **`asm-differ` and the permuter compare TEXT**, so `0x2405003f` (`addiu`)
+   and `0x3405003f` (`ori`) both render as `li a1,0x3f` and neither tool can
+   see the difference — a permuter cannot optimise toward a residue it cannot
+   score. Only `funcdiff.py`'s raw word compare catches it.
+
+### The finding that was not a match: 14 queued functions are Sony library code
+
+`func_8003FCFC` looked like a 3x3 matrix transpose, so the SDK ownership check
+CLAUDE.md asks for got run: it is `libgte/fgo_00.o`. Crossing the whole stall
+queue against placed objects found **14 live functions, 1669 words, ~4100 lines
+of accumulated derivation** spent on code no C can match — `libcd/sys.o` (3),
+`libcd/iso9660.o` (3), `libsnd/vs_vh.o`, `libsnd/sstable.o`, `libsnd/vm_vsu.o`,
+`libsnd/adsr.o`, `libgs/gs_131.o` (2), `libgte/fgo_00.o`, `libc2/atoi.o`. One
+is `atoi`.
+
+**They pass every blocker screen** — no `gp_rel`, no `mflo`/`mfhi` hazard, not
+trampolines — so they read as the cleanest ground in the queue. That is the
+Gate 2 BIOS-trampoline lesson arriving in Gate 1b.
+
+The rule was never missing; CLAUDE.md has carried it since round 28 and named
+the command, and `psyq_sdk.py coverage` prints the overlap under a heading that
+literally reads "SDK code miscounted as game". What was missing is that
+checking meant reading a 60-line object list against a 200-line queue by hand,
+per round, in hex — so it degraded to the judgement call the rule offered as a
+shortcut, "does this smell like a library". Now `python3 tools/sdkstalls.py`,
+with `nearmiss.py` excluding the hits from `ASSIGN FROM HERE` so the screen
+cannot be skipped. Blocker-clean fell 130 -> 111 as a result, and all 14 reports
+carry the retraction while keeping their analysis.
+
+### Toolchain leads — one new, adjudicated and NOT escalated as a flag
+
+Charlie found `func_80050B28`'s `li $a1,0x3F` assembling as `ori` where retail
+has `addiu`, invisible to every text-diffing tool. Reproduced independently:
+**confirmed.** But the stated mechanism ("maspsx hard-codes ORI for any
+positive value") needed scoping, and scoping changed the verdict: the pipeline
+emits `addiu`-form `li` **252 times inside functions we match byte-exact**. Split
+by sign, 248 are NEGATIVE constants (where `ori` would zero-extend and `addiu`
+is forced) and the 4 positives are data misread as code. So the rule is exact —
+positive -> `ori` always, negative -> `addiu` always — and retail's positive
+`addiu` here is genuinely unreachable.
+
+**Scope across all 218 live functions: 1 function, 1 instruction.** Far below
+the bar `addiu_at` cleared at 76, and a blanket flag would break the 2834 places
+retail and maspsx agree. Disposition: a documented permanent one-word stall, not
+a flag request. Charlie correctly escalated rather than experimenting.
+
+`gp_rel` (82) and `nop_mflo_mfhi` (11) remain the two open blockers, untouched.
+
+### Also corrected
+
+- Four unit header comments (`code_179d8_d/f/g`, `class_3bb8c_l`) carried
+  round-24 "FRESH and assignable / stub reports are already gone" directives
+  that had gone stale in the OPPOSITE direction — three of those functions are
+  now MATCHED and the rest carry 250-550-line worked reports. `code_179d8_g`
+  and `code_179d8_d` then needed a SECOND correction the same day when
+  `sdkstalls.py` showed three of the functions they named are `libcd/iso9660.o`.
+  Both round 24 and round 32's first pass re-adjudicated them without ever
+  asking whether Sony owned them.
+- The runner prompt's `timeout` 124/137 idiom was unusable as written: alpha
+  wrapped its search correctly, appended an unconditional `echo`, and the job's
+  reported status became the echo's. Fixed in both places the idiom appears —
+  capture `rc=$?` on the very next command.
+
+### Next move
+
+**Runners again, and the re-staffing lever is now proven — budget for it.**
+Five runner-sessions across three worktrees produced 3 matches; the head
+produced 3 more by adjudicating verdicts rather than attempting cold ground,
+which is what this document has claimed is the highest-yield head activity and
+is now measured at parity with the entire runner fleet.
+
+Do NOT carve — Gate 2 is measured out for the third round running. The
+assignable queue is 111 blocker-clean. Deepest unheld units next round:
+`code_179d8_k` (8), `code_179d8_g` (6, now 2 fewer after the SDK retraction),
+`code_55dd4` (5), `code_179d8_l` (5), `class_3bb8c_b` (5).
+
+**And there is a new kind of round available that is probably worth taking
+first: convert the 14 SDK-owned functions to `o` segments** per
+`docs/SDK-OBJECTS-GUIDE.md`. That is mechanical runner work, it retires 1669
+words of permanently-unmatchable queue, and it is the only item on the board
+with a guaranteed outcome.
+
+---
+
 ## 2026-09-11 — round 31: five closes in one unit, and the head killed three live runners' searches
 
 **State at end: 1053 matched / 1356 game functions (77.65% of game code), up
