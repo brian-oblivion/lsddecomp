@@ -105,6 +105,31 @@ void func_800659D0(Class65650 *self)
     }
 }
 
+/* STALL -- see docs/match-reports/func_80065A5C.md. Best reached: 30/33
+ * words in-range, no size drift, residue is a 3-way callee-save
+ * prologue store-order permutation ($s0/$ra/$s1). Restored to
+ * INCLUDE_ASM per project rule. */
+#if 0
+void func_80065A5C(Class65650 *self, void *arg)
+{
+    Unk70ElemObj **p;
+    u8 unused[8];
+    s32 i;
+
+    __asm__("");
+    p = self->unk70;
+    if (self->unk6C <= 0) {
+        return;
+    }
+    i = 0;
+    do {
+        (*p)->methods->slot60(*p, arg);
+        i++;
+        p++;
+    } while (i < self->unk6C);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
 
 /* STALL -- see docs/match-reports/func_80065AE0.md. Best reached: 33/40
