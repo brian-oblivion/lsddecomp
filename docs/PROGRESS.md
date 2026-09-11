@@ -6,6 +6,127 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-11 — round 31: five closes in one unit, and the head killed three live runners' searches
+
+**State at end: 1053 matched / 1356 game functions (77.65% of game code), up
+from 1048. Queue 224 live `INCLUDE_ASM`, 223 documented stalls, `fresh` 1.**
+Build green, tree clean, all five runner branches merged.
+
+### Gates
+
+- **Gate 0** clean: re-extract changed zero committed bytes, build green, all
+  five worktrees byte-verified before handover.
+- **Gate 4a**: no concurrent head.
+- **Gate 1**: `fresh` was **1** — dry. The round ran off Gate 1b.
+- **Gate 1b**: 135 blocker-clean near-misses of 229 live (82 `gp_rel`, 12
+  `nop_mflo_mfhi`).
+- **Gate 2 — carve DECLINED on measurement.** The whole uncarved remainder is
+  79 functions holding 10 blocker-clean ones, scattered over 7 segments,
+  against a 135-function screened near-miss queue. Round 27's standing finding
+  holds: carving can no longer refill the queue at scale.
+- **Gate 3 — permuter round declined as a whole-round shape**, folded into the
+  assignments instead.
+- **Header contention: ZERO.** All eight assigned units came from
+  `headercontention.py`'s no-shared-header set. No merge conflicted, on any
+  branch, all round. That is the second round to confirm contention is a
+  property of what runners put in a header, not of how many share one.
+
+### Staffing, and one deliberate departure
+
+alpha `code_55dd4` · bravo `code_179d8_k` · charlie `code_179d8_m` · delta
+`code_179d8_j` · echo FOUR singleton units (`class_3bb8c_u`, `class_3bb8c_v`,
+`code_179d8_p`, `code_179d8_d`).
+
+Echo's assignment breaks one-unit-per-runner deliberately: those units hold
+one or two functions each, cannot staff a runner apiece, no other runner held
+them, and they share no header with anything. It caused no collision. The
+rule's PURPOSE — no two runners in one file — was preserved.
+
+`func_80030980` was excluded from delta's list as genuinely `nop_mflo_mfhi`
+blocked. The head also re-audited all 12 `nop_mflo_mfhi` classifications with
+the canonical FORWARD grep: **all 12 confirm, zero false blockers.**
+
+### Matches — 5, all bravo, all in `code_179d8_k`
+
+`func_80035A7C` 44/44 · `func_80034AEC` 79/79 · `func_800349B0` 79/79 ·
+`func_80034C28` 90/90 · `func_80034F90` 82/82. Each verified individually in
+`main` as real C (not `INCLUDE_ASM`) at full word match, on a green
+whole-image SHA1. Bravo's commit count, report count and remaining
+`INCLUDE_ASM` (13 -> 8) all corroborate its summary exactly.
+
+Three mechanisms behind them, now in DECOMPILATION_LEARNINGS.md: the
+**pointer-caching artifact** (cache the scalar offset, recompute the pointer
+per use — closed three), **constant canonicalization defeated by routing
+through an assignment**, and a **delay-slot filler that was a write scoped
+wrong in the C** (which corrects a round-25 misdiagnosis, and whose
+discriminator is whether the filler has a memory effect).
+
+### The round's other real result: `func_80031A44` closed its length gap
+
+Delta found that swapping two independent adjacent global stores — against
+the order retail's instructions suggest — took it from one word short to
+**exact length**: 87/88 -> 88/88, raw 41/88 -> 84/88. The four remaining words
+are pure instruction placement, not register identity, so it is not in banned
+territory. It is now the best permuter target in the corpus and its report
+carries the body as literal source.
+
+### THE HEAD'S OWN ERROR — read §2d of PARALLEL-RUNS.md
+
+Three runners ended a turn waiting on bounded permuter searches (the §2c
+wait-loop). The orchestration reported each as a **completed task**, with
+uncommitted work in the worktree. **The head inferred death, applied §4c
+salvage, and `kill -9`-ed every permuter process in three worktrees.** All
+three runners then resumed on their own and reported normally.
+
+- **Cost:** charlie's `func_8002EDD4` negative permanently lost its exit
+  attribution. It had reasoned its `timeout` bound fired rather than an
+  external kill; the head's own sweep had seen those processes alive eleven
+  seconds before the head killed them, and no exit code was captured. Its
+  MAGNITUDE survives (~100,458 iterations over very nearly the full bound) but
+  it must not be read as cleanly bounded. Corrected in the report.
+- **Not affected:** alpha's two campaigns had completed on their own 600s
+  bounds ten minutes before the kill; the nine processes killed there were
+  orphaned workers. That independently extends round 26's finding — workers
+  outlive a NORMALLY COMPLETED run, not only a killed one.
+- **The kill was correctly `cwd`-guarded and it did not help.** A `cwd` guard
+  protects against the wrong target, not a wrong premise.
+- **The discriminator is time, not one observation.** A paused runner's
+  worktree keeps changing; sample `git -C <wt> status` and permuter mtimes
+  twice, minutes apart. Charlie's search directory had an mtime in the same
+  minute as the kill — the evidence was there and unread.
+- **Salvage is safe; the kill is not.** When one inference triggers both, do
+  the salvage and DEFER the kill. Delta endorsed the salvage of its own body.
+- **`SendMessage` was unavailable this session**, so the head could neither
+  wake a paused runner nor ask whether it was alive, and could not re-send any
+  early finisher (§3c). That removed the round's single highest-yield
+  structural lever and is the main reason four runners produced no closes.
+
+### Also corrected
+
+- Delta and echo labelled their round-31 addenda "round 30" across 14 reports;
+  round 30 was today's SDK round, which did no matching. Fixed.
+- The `code_8220_c` "maybe these are the legitimate GTE/COP2 exception"
+  hypothesis was re-screened by the head and is **already falsified
+  family-wide in round 20** by the same method. Reproduced, not news — noted
+  so a future head does not spend the greps again.
+
+### Next move
+
+**Runners again, and re-sends are the lever to restore.** The near-miss queue
+is 135 blocker-clean and the cheap end of it is now better posed than it was
+this morning. Three banked permuter targets, all exact-length, all
+instruction-placement rather than register identity: `func_80031A44` (4
+words, body preserved and ready to seed), `func_8002EDD4` (3 words, needs a
+clean bounded re-run since this round's was head-truncated), and
+`func_80050B28` (12w, gap isolated to one 4-byte frame slot).
+
+Do NOT carve — Gate 2 is measured out. If `SendMessage` is available next
+round, budget explicitly for re-sends: round 19 got 9 of 17 matches from
+second and later passes, and this round got none because that channel was
+closed.
+
+---
+
 ## 2026-09-11 — round 30: phase 1 of the SDK conversion complete — three more segments, three sequential Opus runners
 
 **State at end: 1048 matched / 1356 game functions (unchanged — no matching).

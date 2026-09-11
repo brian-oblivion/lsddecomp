@@ -5165,6 +5165,130 @@ Candidates from other GCC 2.x projects — treat each as a thing to test:
   different question and remains open. (head adjudication of `func_8004A130`,
   see `docs/research/epilogue-merge-residue.md`)
 
+## Round 31 (2026-09-11) — five closes, and the mechanisms behind them
+
+Five functions closed in `code_179d8_k` this round and four of the five came
+from three distinct source-shape levers. All were found against the pinned
+toolchain and verified by the whole-image SHA1, not by a per-function score.
+
+### Cache the SCALAR a pointer is built from, not the pointer — closed THREE
+
+A "one word short" residue in the register-rescue class is often a
+POINTER-CACHING artifact. The C holds a persistent pointer across several
+uses; retail recomputes the address expression at each use site from a cached
+byte OFFSET. Rewriting it that way — keep the raw offset in a local,
+recompute `base[offset]`-style at each of the use sites — closed
+`func_80034AEC`, and the same edit was a component of `func_800349B0` and
+`func_80034C28`.
+
+This is the highest-yield single lever found in several rounds, because the
+"one word short" shape is common and its raw word-match is usually wrecked by
+shift ripple, which makes it LOOK far away when it is one edit away. When you
+see one word short plus a low raw match, try this before anything expensive.
+
+`func_800349B0` needed one further separable fix: shrink the scratch struct's
+TRAILING padding to correct the frame size while keeping the field's own
+offset unchanged. Frame size and field offset are independent knobs; changing
+the field offset would have been the non-local struct edit that breaks
+already-matched siblings.
+
+### Defeat 2.6.3's constant canonicalization by routing the constant through an assignment
+
+GCC 2.6.3 strength-reduces some immediates — a `0xC0` became `-0x40`.
+Assigning the constant to a separate local first, then using that local,
+suppresses the canonicalization and emits retail's form. Closed the last word
+of `func_80034C28`.
+
+### A delay-slot filler that "looks dead" may be a WRITE scoped wrong in your C
+
+MIPS delay slots always execute. So a store sitting in retail's delay slot
+runs on BOTH branch outcomes, and if your C nests that assignment inside one
+arm of the conditional, you get a scheduling-shaped diff that is really a
+SCOPE bug. `func_80034F90` was misdiagnosed in round 25 as a scheduling
+residue on exactly this; hoisting `rec->unk16 = a2` out of the arm and up to
+the top of the whole `case` closed it at 82/82.
+
+**The discriminator is whether the delay-slot instruction has a MEMORY
+EFFECT.** A store or a `sb`/`sh`/`sw` can hide an unconditional write and is
+worth re-scoping. A bare register-to-register move cannot hide anything, so
+for that the scheduling explanation stands — which is what re-confirmed
+`func_80034138`'s verdict in the same unit and the same sitting. Two
+superficially identical "dead filler" residues, opposite answers, and the
+memory effect is what separates them.
+
+### Independent global stores are freely reordered — a reorder can close a LENGTH gap
+
+`func_80031A44` (`code_179d8_j`) had been one word short through its entire
+recorded history. Swapping two adjacent independent global stores — writing
+`D_8008EA26 = idx;` BEFORE `D_8008EA22 = 0x21;`, which is the opposite of the
+order retail's own instructions suggest — closed the length gap outright:
+87/88 -> **88/88 exact**, raw 41/88 -> 84/88.
+
+The general point: GCC 2.6.3 reorders stores to independent globals as it
+likes, so retail's instruction order is NOT evidence of the source order, and
+"my C already matches retail's apparent order" is not a reason to leave the
+pair alone. It is a cheap axis and it can move LENGTH, not just placement.
+
+## Permuter practice (round 31)
+
+### `--stack-diffs` is MANDATORY on a frame or offset residue, or you get a FALSE ZERO
+
+Without it the permuter's scorer normalizes stack-offset differences away, so
+a candidate that differs from retail only in where things sit in the frame
+scores ZERO while being wrong. Round 31's echo hit exactly this on
+`func_80050B28`, caught it, and re-ran correctly (~80k iterations, best score
+8, gap isolated to one 4-byte slot: `ra` at `0x18` against retail's `0x1c`).
+
+A false zero is the expensive kind of wrong: a zero is treated as a LEAD to
+translate into C, and translating a false one burns an attempt budget proving
+that the oracle disagrees with a search that was never measuring the right
+thing. Pass `--stack-diffs` whenever the residue touches the frame at all.
+
+### A permuter candidate's verification must match whether it changes BEHAVIOUR
+
+- Behaviour-CHANGING candidate (control flow, trip count): trace it by hand.
+  Inspection of the score cannot tell you it is invalid.
+- Behaviour-PRESERVING candidate: real-build-verify it. Inspection alone can
+  miss a length regression that `--stack-diffs` does not surface.
+
+Round 31 added a **third** confirmed instance of "permuter score improves, the
+real oracle regresses" (alpha, `func_800662BC`: a behaviour-preserving
+candidate that verified at 19/33 WITH drift against a 17/33 baseline). Treat a
+permuter improvement as a hypothesis until the whole-image build agrees.
+
+Round 31's echo also found a best-scoring candidate on `func_80050948` that
+was semantically INVALID, and flagged it in the report so a later round does
+not mistake the score for progress. Do that — an unflagged high-scoring
+invalid candidate reads exactly like banked progress.
+
+### A minimal reproducer for a SCHEDULING residue must reproduce the value's ARRIVAL
+
+Extracting a scheduling residue into a small probe only works if the probe
+reproduces HOW the value arrives — e.g. as a register-to-register move from a
+call return — not merely its type and its uses. Get that wrong and the probe
+silently drops the very instruction whose position is in question, and then
+agrees with you for the wrong reason (alpha, `func_80066340`).
+
+## A preserved body's `jal` targets can go STALE across an SDK-object round
+
+Two runners hit this independently in round 31, which makes it a standing
+hazard rather than an anecdote. A body preserved in an older report calls a
+function by a `func_ADDRESS` placeholder name; the Psy-Q SDK-linking rounds
+then gave that address its real Sony symbol, and the placeholder no longer
+resolves. Splicing the body back in now fails to LINK, and an
+`undefined reference` on a preserved body reads as though the body itself is
+broken.
+
+Measured instances: `func_80012C20` is now `printf` (echo, `func_8002BCEC`);
+`func_80039228`/`func_80039104`/`func_800375E8` are now
+`_spu_setInTransfer`/`SpuInitMalloc`/`SpuSetNoiseVoice` (charlie,
+`func_8002EDD4` and `func_8002F700`).
+
+**Before trusting an `undefined reference` from a spliced preserved body,
+grep the symbol.** If a real name now exists for that address, the body is
+fine and only its call spelling is stale. This will keep recurring for as
+long as SDK-object rounds keep naming addresses.
+
 ## The class framework (SETTLED — the game is plain C)
 
 **Proven 2026-08-28, full evidence and reproducer in

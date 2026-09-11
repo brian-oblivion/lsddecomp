@@ -614,6 +614,76 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    that verdict removes a function from `fresh` permanently, and under
    contention it would be wrong.
 
+2d. **A TASK NOTIFICATION MEANS THE AGENT STOPPED ITS TURN, NOT THAT IT DIED.
+   Never infer death from one, and never act destructively on that inference.**
+   Round 31's head did, and it is the clearest self-inflicted error in this
+   document.
+
+   What happened: three runners ended a turn waiting on a bounded permuter
+   search — the §2c wait-loop, exactly as predicted. The orchestration
+   reported each as a **completed task**. Their worktrees held modified
+   reports and zero commits. The head read "task completed, work
+   uncommitted" as "runner died", applied the §4c salvage rule, and
+   `kill -9`-ed every permuter process in all three worktrees to free cores.
+
+   **All three then resumed on their own and reported normally.** One of them
+   (delta) even re-derived the head's salvage measurements independently and
+   corrected the head's narrative — its session had never ended.
+
+   The cost was one runner's permuter negative losing its exit attribution
+   permanently: charlie had reasoned from elapsed time and a leaked-semaphore
+   warning that its `timeout` bound fired rather than an external kill, and
+   the head's own sweep had seen those processes **alive eleven seconds
+   before the head killed them**. The exit code was never captured, so the
+   124-vs-137 question §2b exists to make answerable now has no answer for
+   that search. §2b's whole point is that a fabricated negative is expensive;
+   this one was fabricated by the head.
+
+   **The kill was correctly `cwd`-guarded and that did not help.** It hit only
+   the three worktrees it was aimed at. A `cwd` guard protects against the
+   wrong TARGET; it cannot protect against a wrong PREMISE. Round 27 hardened
+   the sweep's pattern-matching and round 26 hardened its orphan-finding, and
+   both of those improvements were working perfectly while the head killed
+   live runners' searches.
+
+   **The discriminator is TIME, not a single observation: a paused runner's
+   worktree keeps changing; a dead one's does not.** Before concluding a
+   runner is gone, sample twice, minutes apart:
+
+   ```sh
+   git -C <wt> status --porcelain | wc -l          # and again, later
+   find <wt>/permuter-work -newermt '-3 minutes' | head   # is a search still writing?
+   ```
+
+   A worktree whose files are still being written, or a permuter directory
+   with fresh mtimes, belongs to a runner that is alive whatever the
+   orchestration said. Round 31's evidence was sitting right there: charlie's
+   search directory had an mtime in the same minute as the kill.
+
+   **And the salvage rule is not the dangerous half — the KILL is.** §4c
+   salvage is non-destructive: reading a worktree, scoring a body in `main`,
+   and writing a report costs nothing if the runner turns out to be alive
+   (round 31's salvage of `func_80031A44` was useful and delta endorsed it).
+   Killing processes is irreversible. So when the two are triggered by the
+   same inference, **do the salvage and DEFER the kill** — the cores are worth
+   less than the evidence.
+
+   **Corollary: the head may not be ABLE to ask.** Round 31 ran in a session
+   where `SendMessage` was unavailable, so the head could neither wake a
+   paused runner nor ask it whether it was alive. That is what made "paused"
+   and "dead" indistinguishable by the cheap method. If you cannot message
+   runners, say so in the PROGRESS entry, and treat every "dead runner"
+   judgement as provisional — because the move that would have settled it in
+   one message is not available to you.
+
+   One genuine finding did come out of the sweep, and it is worth keeping:
+   alpha's searches had **completed normally** on their own 600s bounds ten
+   minutes earlier, and nine worker processes were still alive in its
+   worktree. That independently confirms round 26's forkserver-orphan
+   behaviour and extends it — workers outlive a NORMALLY COMPLETED run, not
+   only a killed one. Sweeping for orphans is still right. Sweeping for
+   orphans on the assumption that their owner is dead is not.
+
 3c. **Send an early finisher back into its OWN unit** (message the same agent —
    same worktree, same branch, context intact) rather than letting it idle or
    spawning a cold replacement. This is the highest-yield *structural* move
