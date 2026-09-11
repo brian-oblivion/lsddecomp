@@ -233,15 +233,3 @@ s32 func_80032C60(s32 n)
     base[idx].count = 0;
     return 1;
 }
-
-extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32 a3);
-
-s16 func_80032C98(void *a0, s16 a1)
-{
-    return func_80032D34(a0, a1, 0, 0);
-}
-
-s16 func_80032CCC(void *a0, s16 a1, s32 a2)
-{
-    return func_80032D34(a0, a1, 1, a2);
-}

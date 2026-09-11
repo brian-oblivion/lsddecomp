@@ -1,8 +1,14 @@
 /*
  * code_179d8_i -- functions 220..237 of the original code_179d8 monolith,
- * 0x23500..0x24938 (18 functions).  Carved round 21 (2026-09-06) as the
- * FRONT slice of the old code_179d8_tail; the remainder keeps both of that
- * segment's switch jump tables, so this unit owns no rodata.
+ * now 0x2397C..0x24938.  Carved round 21 (2026-09-06) as the FRONT slice of
+ * the old code_179d8_tail; the remainder keeps both of that segment's switch
+ * jump tables, so this unit owns no rodata.
+ *
+ * ROUND 33: the unit's first two functions LEFT. `libsnd/vs_vh.o` (Psy-Q 3.3)
+ * straddles the old boundary at 0x23500 and owns SsVabFakeHead (0x80032D00,
+ * which had been matched as C) and SsVabOpenHeadWithMode (0x80032D34, the
+ * 274w INCLUDE_ASM), along with two functions that were in code_179d8_c_b.
+ * The segment now starts at 0x2397C.
  *
  * Blocker census at carve time (four screens, canonical shell forms):
  * 9 of 18 clean, 9 addiu-$at.  That census said of the nine "do not spend
@@ -11,17 +17,33 @@
  * THAT IS STALE AND ITS GROUND HAS ALREADY BEEN RECOVERED -- re-screened
  * round 23 (2026-09-07).  `addiu_at` was resolved in round 21 (maspsx
  * `--addiu-at`; docs/research/addiu-at-blocker.md) and all nine were matched
- * in the rounds that followed.  The unit's ONLY remaining queue is three
- * blocker-clean, unreported functions -- func_80032D34 (274w),
- * func_80033260 (144w), func_80033C90 (202w) -- which are ordinary large
- * fresh ground, not blocked.  Verified with the two live screens (`gp_rel`
- * and `nop_mflo_mfhi`): zero hits on any of the three.
+ * in the rounds that followed.  That round-23 note then said the unit's only
+ * remaining queue was three blocker-clean functions -- func_80032D34 (274w),
+ * func_80033260 (144w), func_80033C90 (202w) -- "ordinary large fresh ground,
+ * not blocked", verified against both live screens with zero hits.
  *
- * The lesson, kept because the comment cost nothing here only by luck:
- * a carve-time census recorded as a DIRECTIVE ("do not spend attempts")
- * outlives the blocker it was measured against, and no tool can see it.
- * Screen with `python3 tools/nearmiss.py` rather than trusting any
- * transcribed census, this one included.
+ * ROUND 33 CORRECTION, AND IT IS THE INTERESTING HALF: that verification was
+ * CORRECT and the conclusion was still wrong. func_80032D34 has no `gp_rel`
+ * and no `mflo`/`mfhi` hazard because it is Sony's `SsVabOpenHeadWithMode`,
+ * and a blocker screen cannot see ownership. It read as the cleanest and
+ * largest piece of fresh ground in the unit while being unmatchable by
+ * construction, and round 26 spent a 232-line derivation on it. Screen with
+ * `python3 tools/sdkstalls.py` as well as `nearmiss.py` -- the latter now
+ * runs the former for you.
+ *
+ * Two lessons, and the second is this comment about itself:
+ *   - A screen measures the obstruction it was built for and says nothing
+ *     about the ones it was not.
+ *   - A carve-time census recorded as a DIRECTIVE outlives the thing it was
+ *     measured against, and no tool can see it. This comment said so, about
+ *     `addiu_at`, and then certified a Sony function as fresh ground in the
+ *     very next sentence. Screen; do not trust a transcribed census, this
+ *     one included.
+ *
+ * Note also the `SsUtGetVabHdr` comment further down, which has said since
+ * carve time that a function here "IS the SDK utility, not a coincidentally-
+ * named local". That was the same finding, available for several rounds, in
+ * prose no tool could read.
  *
  * Expect this slice to span more than one class -- a ~20-function window cut
  * at ROM-address boundaries has no reason to align with class boundaries.
@@ -30,15 +52,6 @@
  */
 
 #include "common.h"
-
-extern s16 func_80032D34(void *a0, s16 a1, s16 a2, s32 a3);
-
-s16 func_80032D00(void *a0, s16 a1, s32 a2)
-{
-    return func_80032D34(a0, a1, 1, a2);
-}
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80032D34);
 
 /* Field layout matches VabHdr in include/psyq/LIBSND.H, which declares
  * `extern short SsUtGetVabHdr(short, VabHdr*);` -- strong evidence this
@@ -567,13 +580,13 @@ void func_80034020(s16 a0)
     }
 }
 
-extern s16 func_80032C98(void *a0, s16 a1);
+extern s16 SsVabOpenHead(void *a0, s16 a1);
 extern s16 func_800335FC(s32 a0, s16 a1);
 extern s32 D_80090C1C[];
 
 s16 func_800340B0(void *a0)
 {
-    s16 idx = func_80032C98(a0, -1);
+    s16 idx = SsVabOpenHead(a0, -1);
     s16 result = idx;
 
     if (idx != -1) {

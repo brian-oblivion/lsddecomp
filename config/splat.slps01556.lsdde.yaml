@@ -799,7 +799,21 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x23500, c, code_179d8_i]
+      # ROUND 33: `libsnd/vs_vh` (Psy-Q 3.3, 0x4E4) sits ACROSS the old
+      # code_179d8_c_b / code_179d8_i boundary at 0x23500, so both units trim
+      # and neither needs a new name.  The object defines four functions:
+      #   0x80032C98 SsVabOpenHead          (was matched C, in code_179d8_c_b)
+      #   0x80032CCC SsVabOpenHeadSticky    (was matched C, in code_179d8_c_b)
+      #   0x80032D00 SsVabFakeHead          (was matched C, in code_179d8_i)
+      #   0x80032D34 SsVabOpenHeadWithMode  (274w INCLUDE_ASM, the largest
+      #                                      Sony-owned stall in the queue)
+      # Reclassifying the three matched ones out of the game count is the
+      # correction, not a regression -- they were Sony's the whole time.
+      # Text-only; `place` derives no data lines.  code_179d8_c_b's 0x14D8
+      # rodata attach is NOT affected: it belongs to func_80032588, which is
+      # not in this run.
+      - [0x23498, o, libsnd/vs_vh]
+      - [0x2397C, c, code_179d8_i]
       # code_179d8_k: what was the `code_179d8_tail` remainder after the
       # code_179d8_i carve -- functions 238..255 of the original,
       # 0x24938..0x2673C (18 functions, func_80034138 .. func_80035E80).

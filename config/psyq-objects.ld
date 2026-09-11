@@ -437,3 +437,7 @@ _svm_vab_used = 0x8008EA2C;
 _ss_score = 0x800902E8;
 _snd_seq_s_max = 0x80090B68;
 _snd_seq_t_max = 0x80090B6C;
+_svm_vab_total = 0x80090B90;
+_svm_vab_count = 0x80090BD0;
+_svm_vab_start = 0x80090BD4;
+_svm_brr_start_addr = 0x80090C1C;

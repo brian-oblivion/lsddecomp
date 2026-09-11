@@ -1,4 +1,14 @@
-# func_80032CCC
+# func_80032CCC -- CONVERTED to a linked SDK object (round 33). NOT game code, NOT a stall.
+
+> **ROUND 33 (2026-09-12), head. THIS FUNCTION IS NOW LINKED FROM SONY'S OWN
+> OBJECT `libsnd/vs_vh.o` (Psy-Q 3.3) AND IS NAMED `SsVabOpenHeadSticky`.**
+> The object straddles the old code_179d8_c_b / code_179d8_i boundary at
+> 0x23500 and owns four functions; both units trimmed and neither needed a
+> new name. Every caller in `src/` carries the Sony name. Whole-image SHA1
+> green. Nothing here is assignable and there is no stall left to work.
+>
+> **Everything below is kept as the derivation it was, not as live guidance.**
+
 
 **Unit:** code_179d8_c · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
 

@@ -333,3 +333,9 @@
 # slice around it created src/code_179d8_c_b.c and moved the 0x14D8 rodata
 # attach to that unit.
 3.5  libsnd/sstable  0x22BA8
+
+# Across the code_179d8_c_b / code_179d8_i boundary (0x23498..0x2397C):
+# libsnd/vs_vh, four functions. Three were matched as C; the fourth,
+# SsVabOpenHeadWithMode (274w), was the largest Sony-owned stall in the queue
+# with a 232-line report. Text-only.
+3.3  libsnd/vs_vh    0x23498
