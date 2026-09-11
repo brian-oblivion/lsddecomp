@@ -389,8 +389,15 @@ segments:
       - [0xFA50, asm, psyq_fa50]
       - [0x10D48, o, libgs/gs_105]      # GsMapModelingData (Psy-Q 3.3). bss via the fragment
       - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
-      # 0x10EE0..0x15510: the rest of the old psyq_GsLinkObject4, still asm.
+      # 0x10EE0..0x14098: still asm.
       - [0x10EE0, asm, psyq_10ee0]
+      - [0x14098, o, libapi/c73]        # GPU_cw (Psy-Q 3.3)
+      - [0x140A8, o, libc2/memcpy]      # memcpy
+      # 0x140DC..0x15510: the rest of the old psyq_GsLinkObject4, still asm.
+      # 0x140DC..0x14708 is the placed libgs/gs_001, EXCLUDED by head decision:
+      # its .bss holds statics Sony's linker scattered, and a static cannot be
+      # pinned by name, so the object cannot be linked unedited.
+      - [0x140DC, asm, psyq_140dc]
       # libetc/intr from the SDK object (Psy-Q 3.3): ResetCallback, InterruptCallback,
       # DMACallback, VSyncCallback(s), Stop/Restart/CheckCallback, Get/SetIntrMask,
       # startIntr, trapIntr, setIntr, stopIntr, restartIntr, memclr. .data at 0x5CA70;

@@ -116,6 +116,14 @@
 3.3  libgs/gs_105   0x10D48
 3.3  libgte/msc01   0x10DC0
 
+# psyq_GsLinkObject4 chunk C (0x14098..0x140DC): libapi/c73 (GPU_cw, a BIOS
+# trampoline) and libc2/memcpy. Text-only; `place` derives no data section
+# for either. The placed libgs/gs_001 follows at 0x140DC and is deliberately
+# NOT here -- its .bss statics are scattered and unpinnable by name (see
+# docs/research/psyq-sdk-objects.md, round 29), so it stays as asm.
+3.3  libapi/c73     0x14098
+3.3  libc2/memcpy   0x140A8
+
 # libetc/intr (the interrupt/callback core: ResetCallback, InterruptCallback,
 # DMACallback, VSyncCallback ...). Text and .data (the 0x109C callback tables
 # at 0x5CA70) are the 3.3 object's; its .rdata carries the RCS string

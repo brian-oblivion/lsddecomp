@@ -199,6 +199,11 @@ SquareRoot0 = 0x800205C0;
 SquareRoot12 = 0x80020644;
 new_class_6c078 = 0x800206E0;
 ResetGraph = 0x80020C74;
+GPU_cw = 0x80023898; // type:func  (Psy-Q libapi/c73, from the SDK object)
+// 0x800238A8 is libc2/memcpy's GLOBAL memcpy. libcd/iso9660 carries a WEAK
+// second copy at 0x8002C014; that object is not linked yet and only one of
+// the two can carry the name here.
+memcpy = 0x800238A8; // type:func  (Psy-Q libc2/memcpy, from the SDK object)
 new_class_6d3c8 = 0x80025F7C;
 strcat = 0x80027130;
 new_class_6d4e8 = 0x800271D8;
