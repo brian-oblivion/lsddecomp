@@ -1671,6 +1671,44 @@ cannot check thirty bodies at Gate 1, but you can tell runners to check the
 ones they actually resume — which is what that round did, and it is how the
 three were found.
 
+**AND SCREEN FOR A FIFTH: ATTEMPT HISTORY. THE SCORE YOU RANK ON IS ALSO THE
+REASON THE FUNCTION IS EXHAUSTED (round 33).** Round 33's alpha was staffed
+onto `code_55dd4` because its titles carried 252/258 and 33/40 — by the
+ranking this gate prescribes, the best odds on the board. It produced five
+confirmatory negatives and no match. Every one of those five already had five
+or six rounds behind it, and two had 190,000+ permuter iterations against
+scaffolds that had been sanity-checked. A whole runner session bought
+re-confirmation of what the reports already said.
+
+**The selection effect is the point, and it is structural rather than bad
+luck.** A function reaches 252/258 by being worked, repeatedly, by people who
+did not close it. So the very figure that makes it rank first is evidence that
+the cheap levers are already spent — and a title line carries length,
+word-match and first diff *by design* (round 23) and carries nothing about
+cost. The two highest-ranked functions in a unit are, other things equal, the
+two most likely to be exhausted.
+
+This does not invert the ranking; a 252/258 is still worth more than cold
+ground, and round 32 closed a 267/270. It changes what you do before
+assigning:
+
+- **Skim each candidate report for prior attempt counts and permuter
+  iteration totals**, and prefer the smallest gap with the SHALLOWEST history
+  over the smallest gap outright.
+- **Do not staff a whole unit whose every entry is deeply worked.** Mix: a
+  couple of well-worked near-misses plus something with a short report.
+- **Tell the runner to skip and say so**, rather than re-running an exhausted
+  search. Round 33 put that in the runner prompt and asked for the skips in
+  the summary, so the next round can rank on cost rather than re-deriving it.
+
+Note this does NOT make a long report a reason to write a function off — see
+DECOMPILATION_LEARNINGS, round 33: a lever's negative is scoped to the state
+it was tested under, and a round-19 "this does nothing" closed three words in
+round 33 once an unrelated fix had moved the residue. A report full of
+ruled-out axes is not an exhausted function. It is a function whose next
+attempt should start from a CHANGED state, which is exactly what a cold runner
+re-deriving the same ground does not do.
+
 **Gate 3 — permuter round instead.** If the fresh queue is dry and carving is
 blocked, or the stall residue is worth more than cold ground (near-misses like
 88/90), run a permuter round. A zero is a LEAD, not an answer: translate it to
