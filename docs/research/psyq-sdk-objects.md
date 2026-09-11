@@ -265,9 +265,11 @@ worktree: first attempt three bytes off, all `+4`, because the fragment's
 section had no `SUBALIGN` and the object claims alignment 8; with
 `SUBALIGN(2)` zero bytes differ. `ldfrag` now emits shadows from a manifest
 annotation (`3.3 libetc/intr 0x15510 shadow=.rdata`) and puts `SUBALIGN(2)`
-on every fragment section. `psyq_GsLinkObject4`'s last run (13 objects,
-`0x153C0..0x15D04`) is therefore convertible in full; the shadow is the
-head's decision and is recorded here so the runner does not have to make it.
+on every fragment section. The head then landed `libetc/intr` on `main`
+during consolidation (16 functions named, callers in three `code_179d8_*`
+units renamed, byte-exact), leaving `0x15C24..0x15D04` as `psyq_15c24`. The
+rest of `psyq_GsLinkObject4`'s last run (`0x153C0..0x15510` and
+`0x15C24..0x15D04`) is ordinary runner work now.
 
 **`SUBALIGN(2)` is also why byte gaps need `pad` lines in the yaml.** Sony's
 linker aligned each object's data to (at least) 4; splat's script forces

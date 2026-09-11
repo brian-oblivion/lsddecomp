@@ -6,6 +6,74 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-11 — round 29: first SDK-object conversion round — `psyq_2258` retired, `libetc/intr` shadowed, one Opus runner
+
+**State at end: 1048 matched / 1356 game functions (unchanged — no matching
+this round). Library asm 681 → 556 functions; 48 Sony objects linked (was 17).
+Build verifies.**
+
+**Staffing.** One Opus runner (`alpha`) on `psyq_2258`, per the operator's
+cap; no game-unit carving. Phase 1 of `docs/SDK-OBJECTS-RUNS.md`.
+
+**What converted.**
+
+- **`psyq_2258` is gone.** 30 objects in five chunks, each byte-exact on its
+  first build: `_obj/malloc` (the libapi heap), `libapi/c159 a53`, `libc2/
+  bcopy matrix printf prnt memchr strlen ctype putchar`, eleven `libgs` 2D
+  objects, the `libgte` matrix stack (`mtx_00 mtx cmb_00 reg01 fgo_01`) and
+  `libgte/geo msc02 smp_00`. 103 functions took Sony's names; the one
+  function no disc owns, `func_80012064`, stays as `psyq_2864`. The runner
+  reported every pre-measurement in its prompt held, including three `pad`
+  lines and two expected `bytes:not-found`.
+- **`libetc/intr` (16 functions) landed by the head** during consolidation,
+  the first use of a new mechanism: its `.rdata` is SHADOWED (mapped NOLOAD
+  at the retail address by `ldfrag`) because the 3.3 disc's RCS string
+  differs from retail's while its text and `.data` are exact. Byte-exact.
+
+**Head-side findings, all turned into tooling or docs (details in
+`docs/research/psyq-sdk-objects.md`, round 29 section):**
+
+- Every `PARTIAL OVERLAP` in the corpus was a 3.3 module against its own
+  3.5/3.6 pieces (25 placements, 10 containers) or the one `gs_125` false
+  positive. `placed_objects()` drops contained placements; the queue is
+  overlap-free.
+- `runs` now prints `SUSPECT` for a placement whose calls resolve away from
+  another object's definition. `libsnd/ssinit_c` at `0x18540` is one: the
+  RUNS doc's "the game overrides `ResetCallback`" was this artefact.
+- `SUBALIGN(2)` in splat's script is why odd-sized data sections need `pad`
+  lines, and why the fragment's own sections now carry `SUBALIGN(2)` too
+  (the shadow landed 4 bytes high without it).
+- Two worktree defects, both caught by the worktree's verification build:
+  `find lib` did not follow the symlink (link failed), and `sdk/` was never
+  linked (`runs` said "0 objects", exit 0 — now it dies). Round 28 was
+  head-alone, so this was the first worktree since the objects landed.
+- From the runner: `place` printed a yaml-looking line for `.sbss` (now a
+  comment), and renaming callers in a shared header (`include/code_8220.h`)
+  would have collided with `MALLOC.H`'s prototypes — moved to local views.
+
+**Blocked on the operator.**
+
+- `libgs/gs_001 gs_002 gs_003` (`psyq_GsLinkObject4`): static bss scattered
+  by Sony's linker; the fragment's plan carries three `NOTE`s. Edit the
+  objects (one section per static) or leave them as asm remainders.
+- `libcd/iso9660`'s WEAK `memcpy` needs `objcopy -L` at install time before
+  it can link beside `libc2/memcpy` (phase 2).
+- The `nop_mflo_mfhi` and `gp_rel` escalations are unchanged.
+
+**Queue at end** (`psyq_sdk.py runs`): 134 objects in 43 runs; pure
+`psyq_*`: `psyq_GsLinkObject4` 17 objects, `psyq_15c24` 7, `psyq_SpuSetMute`
+35, `psyq_memset` 19, `psyq_rand` 1.
+
+**Next move.** Another conversion round: `psyq_SpuSetMute` (35 objects, 9
+runs, 0 fragment notes, mostly text-only) and `psyq_memset`+`psyq_rand` (20
+objects, 0 notes) are clean for two runners on disjoint segments;
+`psyq_GsLinkObject4` waits on the `gs_00x` decision but its other runs
+(`ratan`, `gs_105`+`msc01`, `reg03`, `msc00`+`patchgte`+libapi, `psyq_15c24`)
+are runnable now. Phase 2 (objects inside game units) stays folded into
+consolidation carving of a later matching round.
+
+---
+
 ## 2026-09-11 — round 28 (head alone): the Psy-Q SDK is now LINKED from Sony's objects — pilot byte-exact
 
 **No matching this round; a direction change.** The project stops carrying
