@@ -321,3 +321,8 @@
 # regression. See docs/PROGRESS.md, round 33.
 3.3  libc2/atoi     0x41148
 3.3  libc2/todigit  0x412A4
+
+# code_179d8_c prefix (0x22948..0x22A1C): libsnd/vm_vsu, one function
+# (func_80032148, 53w) that had a 248-line stall report and could never have
+# matched. Text-only; no data sections.
+3.3  libsnd/vm_vsu   0x22948

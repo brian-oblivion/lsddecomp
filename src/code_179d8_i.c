@@ -136,14 +136,14 @@ typedef struct {
 
 extern VagAtr *D_8008E978;
 extern u8 D_8008EA13;
-extern s32 func_80032148(s16 a0, s16 a1);
+extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 
 short func_80033260(short vabId, short prog, s32 tone, VagAtr *vagatr)
 {
     s16 idx;
 
     if (D_8008EA2C[vabId] == 1) {
-        func_80032148(vabId, prog);
+        SpuVmVSetUp(vabId, prog);
         idx = tone + (D_8008EA13 << 4);
         vagatr->prior = D_8008E978[idx].prior;
         vagatr->mode = D_8008E978[idx].mode;
@@ -211,7 +211,7 @@ s16 func_800334F0(s16 a0, s16 a1, Entry8E968 *out)
 
     if (D_8008EA2C[a0] == 1) {
         idx = a1;
-        func_80032148(a0, idx);
+        SpuVmVSetUp(a0, idx);
         out->unk0 = D_8008E968[idx].unk0;
         out->unk1 = D_8008E968[idx].unk1;
         out->unk2 = D_8008E968[idx].unk2;

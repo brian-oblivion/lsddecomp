@@ -50,7 +50,7 @@
  * ------------------------------------------------------------------------ */
 extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);
-extern s32 func_80032148(s16 a0, s16 a1);
+extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 extern s16 func_8002F3E8(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
 extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
 extern void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3);
@@ -58,7 +58,7 @@ extern void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3);
 extern u16 D_8008EA22;
 
 /* Base pointer for a table of 0x10-byte slots, indexed by the small
- * (<0x10) channel id `func_80032148` validates/selects.  Only the three
+ * (<0x10) channel id `SpuVmVSetUp` validates/selects.  Only the three
  * byte fields this unit's own accessors touch are named -- everything
  * else is opaque per this project's local-reading convention. */
 typedef struct SlotE968 {
@@ -292,7 +292,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_8003069C);
 
 s32 func_800307F0(s16 p0, s16 p1, s32 p2)
 {
-    if (func_80032148(p0, p1) != 0)
+    if (SpuVmVSetUp(p0, p1) != 0)
         return -1;
     D_8008E968[p1].unk1 = (u8) p2;
     return D_8008E968[p1].unk1;
@@ -300,14 +300,14 @@ s32 func_800307F0(s16 p0, s16 p1, s32 p2)
 
 s32 func_80030864(s16 p0, s16 p1)
 {
-    if (func_80032148(p0, p1) != 0)
+    if (SpuVmVSetUp(p0, p1) != 0)
         return -1;
     return D_8008E968[p1].unk1;
 }
 
 s32 func_800308B8(s16 p0, s16 p1, s32 p2)
 {
-    if (func_80032148(p0, p1) != 0)
+    if (SpuVmVSetUp(p0, p1) != 0)
         return -1;
     D_8008E968[p1].unk4 = (u8) p2;
     return D_8008E968[p1].unk4;
@@ -315,7 +315,7 @@ s32 func_800308B8(s16 p0, s16 p1, s32 p2)
 
 s32 func_8003092C(s16 p0, s16 p1)
 {
-    if (func_80032148(p0, p1) != 0)
+    if (SpuVmVSetUp(p0, p1) != 0)
         return -1;
     return D_8008E968[p1].unk4;
 }
@@ -381,7 +381,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80031890);
 
 s32 func_800319B4(s32 p0, s16 p1, s16 p2, s32 p3, u16 p4)
 {
-    func_80032148(p1, p2);
+    SpuVmVSetUp(p1, p2);
     D_8008EA22 = 0x21;
     if (func_8002F3E8((s16) p0, 0x21, p1, p2, p4) == 0)
         return -1;

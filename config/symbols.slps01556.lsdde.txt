@@ -361,6 +361,7 @@ GetStageGridDimensionsTable = 0x800494BC;
 GetStageGridDimensions = 0x800494D8;
 GetStageChunkFromMood = 0x8004950C;
 GetMoodFromStageChunk = 0x800495B8;
+SpuVmVSetUp = 0x80032148; // type:func  (Psy-Q libsnd/vm_vsu, from the SDK object)
 // class_3bb8c_u's three functions, converted to linked SDK objects in round
 // 33.  These are Sony's own exported names, read out of the object symbol
 // tables, not guesses -- see the PROVENANCE note at the top of this file.

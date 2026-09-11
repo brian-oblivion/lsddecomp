@@ -751,7 +751,13 @@ segments:
       # likely to apply directly.  Read that entry before starting.
       - [0x2273C, c, code_179d8_p]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
-      - [0x22948, c, code_179d8_c]
+      # ROUND 33: func_80032148 (53w), the first function of this slice, is
+      # Sony's `libsnd/vm_vsu` and is linked from the object.  Text-only, and
+      # the object covers EXACTLY that one function (0xD4 = 53 words), so this
+      # is a pure prefix trim: no matched C is reclassified and the unit keeps
+      # its name, its remaining 19 functions and its 0x14D8 rodata attach.
+      - [0x22948, o, libsnd/vm_vsu]
+      - [0x22A1C, c, code_179d8_c]
       # code_179d8_tail: functions 220..255 of the original.  UNCARVED
       # remainder in front of the code_179d8_f carve below, and left that
       # way deliberately: 0x23500..0x2673C is addiu-$at dense (26 of its 36

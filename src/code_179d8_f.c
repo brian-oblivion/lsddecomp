@@ -175,7 +175,7 @@ void func_800361F0(s32 a0)
 
 extern u8 D_8008EA2C[];
 extern u8 D_8008EA13;
-extern s32 func_80032148(s16 a0, s16 a1);
+extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 
 /* A 0x20 (32)-byte-stride record; the same table code_179d8_l.c/_m.c's
  * D8008E978Entry/Tbl32E978 name (local views). Source and destination here
@@ -211,7 +211,7 @@ s32 func_80036230(s32 a0, s32 a1, s32 a2, Rec32E978 *a3)
     s32 idx;
 
     if (D_8008EA2C[(s16)a0] == 1) {
-        func_80032148((s16)a0, (s16)a1);
+        SpuVmVSetUp((s16)a0, (s16)a1);
         idx = (s16)(a2 + (D_8008EA13 << 4));
         D_8008E978[idx].unk0 = a3->unk0;
         D_8008E978[idx].unk1 = a3->unk1;

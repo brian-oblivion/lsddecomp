@@ -484,14 +484,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F3E8);
  * of this symbol). */
 extern u16 D_8008EA22;
 
-extern s32 func_80032148(s16 a0, s16 a1);
+extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 extern s16 func_8002F3E8(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
 
 s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
     s16 i;
     s32 sum;
 
-    func_80032148(a1, a2);
+    SpuVmVSetUp(a1, a2);
     D_8008EA22 = a0;
     sum = 0;
     for (i = 0; i < D_8008E9D0; i++) {

@@ -1,6 +1,11 @@
 /*
  * code_179d8_c -- window [200..219] of the original 274-function code_179d8
- * monolith, 0x22948..0x23500 (vram 0x80032148..0x80032D00).
+ * monolith, now 0x22A1C..0x23500 (vram 0x8003221C..0x80032D00).
+ *
+ * ROUND 33: the slice's FIRST function, func_80032148, left this unit. It is
+ * Sony's `SpuVmVSetUp` (`libsnd/vm_vsu.o`, Psy-Q 3.3) and is now linked from
+ * the object, so the segment starts one function later. It was never
+ * matchable as C and its 248-line stall report is kept, re-titled CONVERTED.
  *
  * Carved round 16 by blocker DENSITY (see code_179d8_b's header for the
  * full window census). This window screened 16/20 clean.
@@ -10,7 +15,9 @@
  * "all addiu_at". **`addiu_at` was resolved in round 21** (maspsx
  * `--addiu-at`; docs/research/addiu-at-blocker.md), and round 23 MATCHED
  * func_80032BF0 and func_80032C28 byte-exact and took the other two to
- * 48/53 and ~90/96 with characterised non-toolchain residues. Nothing in
+ * 48/53 and ~90/96 with characterised non-toolchain residues. (The 48/53 was
+ * func_80032148 -- round 32 then found it is Sony's, so that effort was spent
+ * on library code; see docs/match-reports/func_80032148.md.) Nothing in
  * this window is toolchain-blocked. The two live blockers are `gp_rel` and
  * `nop_mflo_mfhi`; screen with `python3 tools/nearmiss.py`, never by
  * re-implementing the greps, and never for `addiu_at`.
@@ -37,7 +44,6 @@
  */
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032148);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_8003221C);
 
