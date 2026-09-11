@@ -19,13 +19,21 @@
  * blocked on `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21
  * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
  * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_8002AEE0 (174w)  FRESH and assignable
- *   func_8002B640 (186w)  FRESH and assignable
- *   func_8002B94C (189w)  FRESH and assignable
- * Their stub reports are already gone, so `progress.py` counts all three as
- * fresh. The previous version of this comment read "BLOCKED, stub reports
- * already filed, do NOT spend attempts on these" -- a stale DIRECTIVE over
- * free ground.
+ *   func_8002AEE0 (174w)  func_8002B640 (186w)  func_8002B94C (189w)
+ * The previous version of this comment read "BLOCKED, stub reports already
+ * filed, do NOT spend attempts on these" -- a stale DIRECTIVE over free
+ * ground.
+ *
+ * ROUND 32 (2026-09-12) CORRECTION -- that reopening WORKED, and the
+ * "FRESH and assignable / their stub reports are already gone" wording it
+ * left behind is now stale in the OPPOSITE direction. All three have since
+ * been attempted and all three carry full worked stall reports (174/174
+ * length-exact at 153 words; 3 words short; 2 words long respectively).
+ * They are near-misses, NOT cold ground: read
+ * docs/match-reports/<func>.md before spending an attempt, or you will
+ * re-derive several hundred lines of someone else's derivation. Verified
+ * by `tools/nearmiss.py` and by the presence of the report files, not by
+ * reading this comment.
  *
  * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
  * rodata sub-slot is attached to this unit.

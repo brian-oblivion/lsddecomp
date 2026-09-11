@@ -8,9 +8,10 @@
  * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
  * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
  *   func_800534C8  gp_rel        -- STILL BLOCKED, stub report stands.
- *   func_80052F10  was addiu-$at ONLY -- NOT BLOCKED. 137w, FRESH, its stub
- *                  report is already gone. Assignable.
- *   func_80053984  was addiu-$at ONLY -- NOT BLOCKED. 82w, FRESH, assignable.
+ *   func_80052F10  was addiu-$at ONLY -- NOT BLOCKED. 137w.
+ *                  ROUND 32: MATCHED, 137/137.
+ *   func_80053984  was addiu-$at ONLY -- NOT BLOCKED. 82w.
+ *                  ROUND 32: MATCHED, 82/82, first attempt.
  *                  It OWNS jtbl_8001174C; the rodata slot at 0x1F4C is
  *                  attached to this unit for that reason, and a
  *                  `%lo(jtbl_*)` load is ordinary matchable code now.

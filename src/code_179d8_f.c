@@ -12,12 +12,15 @@
  * `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21 (maspsx
  * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
  * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_80036230 (115w)  FRESH and assignable
- *   func_80036528 (240w)  FRESH and assignable
- * Their stub reports are already gone, so `progress.py` counts both as fresh.
+ *   func_80036230 (115w)  func_80036528 (240w)
  * The previous version of this comment read "BLOCKED, stub reports already
  * filed, do NOT spend attempts on these" -- a stale DIRECTIVE over free
  * ground. Both are large, which is why nobody had reason to re-read it.
+ *
+ * ROUND 32 (2026-09-12) CORRECTION -- the reopening worked and the "FRESH
+ * and assignable" wording is now stale the other way. func_80036230 is
+ * MATCHED (115/115). func_80036528 has been attempted and carries a full
+ * worked report. Neither is cold ground; read the report first.
  *
  * Owns NO switch jump table.  Both of this segment's jump-table owners
  * (func_80034690, func_800357B0) sit in the `code_179d8_tail` remainder in
