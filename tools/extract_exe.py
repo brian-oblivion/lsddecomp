@@ -28,9 +28,11 @@ EXPECTED_NAME = "SLPS_015.56"
 EXPECTED_SHA1 = "76322eeade5ebb22dca57fdeac7d68c30f06308d"
 EXPECTED_SIZE = 505856
 
-# (sector size, offset of user data within the sector). Mode 2 Form 1 puts the
-# 2048 data bytes at +24; a plain .iso has no sector framing at all.
-LAYOUTS = [(2352, 24), (2048, 0)]
+# (sector size, offset of user data within the sector). Mode 2 Form 1 (every
+# PlayStation game disc) puts the 2048 data bytes at +24; Mode 1 (some of the
+# Psy-Q SDK discs, e.g. Runtime Library 3.0) at +16; a plain .iso has no sector
+# framing at all.
+LAYOUTS = [(2352, 24), (2352, 16), (2048, 0)]
 
 
 class Disc:
@@ -60,7 +62,7 @@ def open_disc(path):
         disc.f.close()
     sys.exit(f"{path}: no ISO 9660 volume descriptor at LBA 16.\n"
              "  Not a disc image, or a layout this tool does not know "
-             "(only 2352-byte raw and 2048-byte iso are handled).")
+             "(only 2352-byte raw Mode 1/Mode 2 and 2048-byte iso are handled).")
 
 
 def root_entries(disc):

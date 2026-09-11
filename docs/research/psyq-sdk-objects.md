@@ -137,6 +137,41 @@ still assembled (harmlessly — the linker script no longer named them).
 `progress.py` warns about exactly this; delete them by hand after a segment
 type change.
 
+## Update, same day: the 3.3 and 3.0 discs
+
+The user supplied the 3.3 (DTL-S2190) and 3.0 (DTL-S2180) discs. 3.0 is a
+**Mode 1** disc (user data at +16 in each 2352-byte sector, not +24), which
+`tools/extract_exe.py` now recognises; the game discs and the other three
+SDK discs are Mode 2.
+
+| disc | mastered | libgpu `sys.c` | libetc `intr.c` | objects placed |
+| --- | --- | --- | --- | --- |
+| 3.0 | 1995 | `1.67 1995/03/13` | (`pad.c 1.33 1995/03`) | 53 |
+| 3.3 | 1995-late | `1.107 1995/10/18` | `1.71 1995/08/29` | **183** |
+| **game** | 1998 | **`1.116 1995/12/01`** | **`1.73 1995/11/10`** | |
+| 3.5 | 1996-06 | `1.120 1996/05/01` | `1.73` | 160 |
+| 3.6 | 1996-10 | `1.126 1996/09/13` | `1.73` | 156 |
+
+Coverage of the 700 `psyq_*` functions rose from 190 to **273**: `psyq_2258`
+is now 103/104, `psyq_15d04` and `psyq_rand` are complete, `psyq_GsLinkObject4`
+66/201, `psyq_SpuSetMute` 58/114, `psyq_memset` 25/260. Objects placed inside
+game segments rose from 45 to **60**. 3.0 placed nothing the other discs had
+not.
+
+**The remaining gap is one library build that is on none of the discs.** The
+game's `libgpu` (`sys.c 1.116`, December 1995) and `libcd` (`bios.c 1.71`,
+December 1995) sit BETWEEN the 3.3 disc (October 1995) and the 3.5 disc (May
+1996). Sony shipped library updates between disc releases, and this game was
+built against one of those. By shape attribution the uncovered remainder is
+roughly: libgpu ~110 functions, libcd ~35, libspu ~15, libpress ~11, plus
+~175 that no object resembles at the 0.5 threshold (mostly short BIOS/kernel
+glue and data-heavy helpers). Unless an interim 1995-12 library archive turns
+up, those stay as `psyq_*` disassembly — which costs nothing beyond names,
+and the names can still be recovered: the shape match identifies the MODULE,
+and a module's exported symbols and their order are stable between adjacent
+builds, so the functions can be named from the 3.3/3.5 object even where the
+bytes cannot be linked. That is a symbol pass, not a matching problem.
+
 ## What is next
 
 1. **Text-only, fully covered blocks first**: `psyq_PadInit` (libetc `pad`),

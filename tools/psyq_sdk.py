@@ -50,7 +50,7 @@ VRAM, HDR = 0x80010000, 0x800
 
 ARCHIVE = "https://archive.org/download/ps1_sdks"
 DISC_NAMES = {  # version -> the redump zip on archive.org, for the error message
-    "3.0": "Programmer Tool - Runtime Library Version 3.0 (Japan)",
+    "3.0": "Programmer Tool - Runtime Library Version 3.0 (Japan) (En,Ja)_DTL-S2180_redump.zip",
     "3.3": "Programmer Tool - Runtime Library Version 3.3 (Japan)_DTL-S2190_redump.zip",
     "3.5": "Programmer Tool - Runtime Library Version 3.5 (Japan)_DTL-S2300_redump.zip",
     "3.6": "Programmer Tool - Runtime Library Version 3.6 (Japan)_DTL-S2310_redump.zip",

@@ -45,8 +45,16 @@ parasite-eve-2-decomp does. Full record in
   library and reports them on their own line. `pyelftools` pinned in
   requirements.
 
+- **Later the same day: 3.3 and 3.0 discs.** 3.3 lifts coverage to **273 of
+  700** (`psyq_2258` 103/104, `psyq_15d04` and `psyq_rand` complete) and the
+  game-segment objects to **60**; 3.0 adds nothing. The game's `libgpu`/`libcd`
+  are a December-1995 interim build that sits between the 3.3 and 3.5 discs
+  and is on neither — see the research doc for the fallback (name from the
+  shape-matched module, keep the bytes as asm). `extract_exe.py` learned
+  Mode 1 discs (3.0 is one).
+
 **Next.** Convert the covered blocks (`psyq_PadInit`, the covered parts of
-`psyq_2258`, the 45 objects in game segments) — each object with data
+`psyq_2258`, the 60 objects in game segments) — each object with data
 sections needs its `.rdata`/`.data`/`.sbss`/`.bss` placed, which is the real
 work. Then the older disc for `libgpu`/`libcd`/`libgte`/`libspu`.
 
