@@ -651,9 +651,11 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 }
 
 #if 0
-/* Best-reached body, 55/72 words -- see docs/match-reports/func_80059D1C.md
-   for the residue analysis. Restored to INCLUDE_ASM below per project rule
-   (no score short of byte-exact stays in src/). */
+/* Best-reached body, 55/72 words, verified fresh round 32 (2026-09-12,
+   runner alpha2) -- see docs/match-reports/func_80059D1C.md for the
+   residue analysis (a whole-function this/heading register-identity swap)
+   and this round's two new negative attempts. Restored to INCLUDE_ASM below
+   per project rule (no score short of byte-exact stays in src/). */
 void func_80059D1C(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
@@ -684,7 +686,6 @@ void func_80059D1C(DreamSys *this)
 	}
 }
 #endif
-
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059D1C);
 
 void func_80059E3C(DreamSys *this)
