@@ -56,7 +56,20 @@ PREFER = ["3.3", "3.5", "3.6", "3.0"]
 
 
 def placed_objects():
-    """{'lib/module': (version, text_fileoff, text_size)} over every disc's match.txt."""
+    """{'lib/module': (version, text_fileoff, text_size)} over every disc's match.txt.
+
+    A placement whose span lies strictly INSIDE another placement's span is a
+    finer-grained module of the same bytes -- the 3.5/3.6 discs split several
+    3.3 modules (libgte/mtx_00 -> mtx_003 + mtx_00b + ...; libc2/bcopy ->
+    bcopy + bzero + memcmp; libsnd/ssplay -> playmode + ssplay + ssplayb) --
+    or a false positive whose tiny body equals a piece of a real object
+    (libgs/gs_125 inside libetc/vmode). Either way the coarse object is the
+    one to link: its bytes tile the range exactly, the fine ones leave gaps or
+    overlap. Such placements are dropped here, so `runs`, `coverage`,
+    `symbols` and the bss plan all see one object per byte. Two objects with
+    IDENTICAL spans (libc/a56 == libc2/exit) are both kept; `runs` shows them
+    as `a|b` alternates. Every PARTIAL OVERLAP `runs` reported on 2026-09-11
+    was this pattern and every one resolved to the 3.3 object."""
     out = {}
     versions = sorted((m.parent.name for m in WORK.glob("*/match.txt")),
                       key=lambda v: PREFER.index(v) if v in PREFER else 99)
@@ -65,7 +78,32 @@ def placed_objects():
             m = re.match(r"(\S+)\.o\s+text=0x([0-9a-f]+)\s+fileoff=0x([0-9a-f]+)", line)
             if m:
                 out.setdefault(m.group(1), (ver, int(m.group(3), 16), int(m.group(2), 16)))
-    return out
+    spans = [(off, off + size, name) for name, (_v, off, size) in out.items()]
+    superseded = {n for a, b, n in spans
+                  if any((a2 <= a and b <= b2) and (a2, b2) != (a, b) for a2, b2, _n2 in spans)}
+    return {n: v for n, v in out.items() if n not in superseded}
+
+
+def superseded_objects():
+    """The placements placed_objects() dropped, as {'lib/module': 'container'}."""
+    out = {}
+    versions = sorted((m.parent.name for m in WORK.glob("*/match.txt")),
+                      key=lambda v: PREFER.index(v) if v in PREFER else 99)
+    for ver in versions:
+        for line in (WORK / ver / "match.txt").read_text().splitlines():
+            m = re.match(r"(\S+)\.o\s+text=0x([0-9a-f]+)\s+fileoff=0x([0-9a-f]+)", line)
+            if m:
+                out.setdefault(m.group(1), (ver, int(m.group(3), 16), int(m.group(2), 16)))
+    kept = placed_objects()
+    res = {}
+    for name, (_v, off, size) in out.items():
+        if name in kept:
+            continue
+        for k, (_kv, koff, ksize) in kept.items():
+            if koff <= off and off + size <= koff + ksize:
+                res[name] = k
+                break
+    return res
 
 ARCHIVE = "https://archive.org/download/ps1_sdks"
 DISC_NAMES = {  # version -> the redump zip on archive.org, for the error message
@@ -766,6 +804,14 @@ def cmd_runs(_args):
             total_runs += 1
             total_objs += len(r)
     print(f"\nTOTAL: {total_objs} objects in {total_runs} runs")
+    sup = superseded_objects()
+    if sup:
+        print(f"\n{len(sup)} placements dropped as finer-grained modules (or false positives) of a coarser object -- link the coarse one:")
+        by = defaultdict(list)
+        for fine, coarse in sorted(sup.items()):
+            by[coarse].append(fine)
+        for coarse in sorted(by):
+            print(f"  {coarse:18s} supersedes {' '.join(by[coarse])}")
 
 
 def cmd_check(_args):
