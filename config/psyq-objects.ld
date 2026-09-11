@@ -21,6 +21,7 @@ SECTIONS {
     .psyq_bss.libspu_s_sca_bss 0x80100000 (NOLOAD) : SUBALIGN(2) { build/lib/libspu/s_sca.o(.bss) }   /* 0x4 bytes; unreferenced; spare NOLOAD area */
     .psyq_bss.libgs_gs_104_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_104.o(.bss) }   /* 0x98 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_122_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_122.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libc2_itoa_bss 0x8008E090 (NOLOAD) : SUBALIGN(2) { build/lib/libc2/itoa.o(.bss) }   /* 0x10 bytes; section-relative refs */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 PSDOFSX = 0x8008E240;   /* libgs/gs_013 */

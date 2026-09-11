@@ -181,3 +181,17 @@
 3.3  libgs/gs_104    0x2BA1C
 3.3  libcd/event     0x2BA94
 3.3  libgs/gs_122    0x2BF70
+
+# psyq_memset chunk A (0x3197C..0x322B4): libc2 memory and formatted-output
+# helpers -- memset, itoa, sprintf/vsprintf, memmove. Data: itoa .sdata
+# 0x7B128 (the 3-byte "%d", dlabel D_8008A928; `libc/itoa` has the same bytes
+# but calls the section .rdata, which is not where retail keeps them, so the
+# libc2 alternate is the right one), sprintf .data 0x5F468 (0xC, dlabel
+# D_8006EC68) and sprintf .rdata 0x19B4 (0xDC). sprintf's .rdata is a
+# relocated jump table (D_800111B4/D_800111C8), so `place` reports
+# `bytes:not-found` and the derived offset landing on the slot's existing
+# dlabels is the confirmation. itoa's 0x10 .bss goes in the fragment.
+3.3  libc2/memset   0x3197C
+3.3  libc2/itoa     0x319A8
+3.3  libc2/sprintf  0x319E8
+3.3  libc2/memmove  0x32248
