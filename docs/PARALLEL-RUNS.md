@@ -320,6 +320,30 @@ a lost one. Check them by hand, every time.
    another runner, and it fails silently because the other runner has no way
    to distinguish sabotage from a normal negative result.
 
+   **And capture the exit code on the VERY NEXT COMMAND, or the recorded
+   answer is the shell's and not the search's (round 32).** The 124-vs-137
+   test above only works if you actually read `timeout`'s status:
+
+   ```sh
+   timeout 600 <search>; rc=$?; echo "permuter rc=$rc"     # right
+   timeout 600 <search>; echo "search finished"            # WRONG -- rc lost
+   ```
+
+   Round 32's alpha wrapped its search in `timeout` exactly as instructed,
+   appended an unconditional `echo` after it, and the background job's own
+   completion signal then reported the ECHO's exit status (0) rather than
+   `timeout`'s. Its report says plainly that it could not distinguish
+   "wall-clock bound fired" from "the search ended on its own" — which is
+   the honest disposition, and is also the whole question this idiom exists
+   to answer. The runner did nothing wrong; the instruction told it to wrap
+   in `timeout` without telling it that anything appended with `;` destroys
+   the status.
+
+   Alpha recovered a partial answer the right way — `ps` showed no surviving
+   search process, so nothing was left consuming the host — but that
+   establishes the run ENDED, not WHO ended it, and those are the two claims
+   the 124/137 test separates.
+
    Kill by PID you captured yourself, or scope the match to your own worktree
    path:
 
@@ -1719,6 +1743,13 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > or scope the pattern to your own worktree path
 > (`pkill -f "…-wt-<name>.*decomp-permuter"`). `/tmp`, the process table
 > and ports are all shared; only files and git state are yours.
+>
+> **Bound every long search with `timeout`, and capture its status on the
+> very next command:** `timeout 600 <search>; rc=$?; echo "permuter rc=$rc"`.
+> `124` means your own bound fired; `137` means something killed it from
+> outside. Anything appended with `;` before you read `$?` reports ITS exit
+> status instead, which is how round 32's alpha lost the answer it had been
+> asked for.
 > — the ONLY line that decides whether the number is meaningful is `build
 > exit=`. funcdiff also guards this itself and exits 2 when it cannot trust the
 > number; read its warnings. A failed COMPILE and a failed LINK both leave the
