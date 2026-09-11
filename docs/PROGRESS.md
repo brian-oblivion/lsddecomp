@@ -6,6 +6,61 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-11 — round 30: phase 1 of the SDK conversion complete — three more segments, three sequential Opus runners
+
+**State at end: 1048 matched / 1356 game functions (unchanged — no matching).
+Library asm 556 → 436 functions; 124 Sony objects linked (was 48). 22
+`psyq_*` asm segments remain, holding 427 functions no disc owns plus the
+three excluded `gs_00x` objects. Build verifies.**
+
+**Staffing.** One Opus runner at a time, per the operator's cap: `bravo` on
+`psyq_SpuSetMute`, then `charlie` on `psyq_memset`+`psyq_rand`, then `delta`
+on `psyq_GsLinkObject4`+`psyq_15c24`. Sixteen chunks, 76 objects, every chunk
+byte-exact on its first build except one (delta's E, four ungrepped callers
+caught by the link). Every head pre-measurement in the three prompts held;
+the runners' corrections were all cosmetic counts.
+
+**What converted.** `psyq_SpuSetMute` (35 objects: the libspu core, libsnd
+`SsPlay`/`SsClose`/`SsPause`/volume, the libapi event calls, `libgs/gs_104
+gs_122`, `libcd/event`), `psyq_memset`+`psyq_rand` (20: `memset itoa sprintf
+memmove exit rand`, `libgs/gs_107 gs_110`, `libpress/vlc vlc2`, ten libcd
+objects), `psyq_GsLinkObject4`+`psyq_15c24` (21: `ratan`, `msc00 msc01`,
+`reg03`, `patchgte`, `memcpy`, `setjmp`, eleven libapi stubs, `libgs/gs_010
+gs_103 gs_105 gs_121`). 143 more Sony names in the symbols file.
+
+**Head decisions made this round** (recorded in the research doc):
+
+- `libspu/s_r|s_w`: link `s_w` — a placed libsnd object calls `SpuWrite`
+  and it resolves there. `libc/*|libc2/*` alternates: always `libc2`.
+- `libgs/gs_001 gs_002 gs_003` EXCLUDED, kept as asm remainders
+  (`psyq_140dc`, `psyq_14e9c`, `psyq_15020`): scattered static bss, the
+  object-editing case. Reversible; operator's call.
+- Nine libcd objects carry an identical unreferenced 0x10-byte `.data`; only
+  `c_003`'s derives, the other eight are left out and `/DISCARD/`ed.
+
+**Runner observations worth keeping** (guide updated): splat merges a
+`jr $t2` BIOS trampoline into its neighbour's `glabel` when the segment
+around it shrinks (bravo: one pair; delta: six trampolines under one label
+in `psyq_15c24`) — the objects recover the names; an object's data section
+can span several existing slot lines (`sprintf` `.rdata` took two); grep
+EVERY address of a chunk for shared-header callers, not a sample.
+
+**Blocked on the operator.** Unchanged: `gs_001/002/003` (edit the objects
+or leave as asm — 8 functions); `libcd/iso9660`'s WEAK `memcpy` for phase 2;
+`gp_rel` and `nop_mflo_mfhi`.
+
+**Queue at end** (`psyq_sdk.py runs`): 58 objects in 24 runs — the three
+`gs_00x` runs and 55 objects inside game units (phase 2), two of which are
+the `SUSPECT` `ssinit_c|ssinit_h` false placement.
+
+**Next move.** Phase 1 is done. Phase 2 (objects inside game units) is
+consolidation carving for a matching round; phase 3 (names for the 427
+functions no disc owns, from shape-matched modules) is one cheap runner.
+The matching queue itself is unchanged: 229 stalled, 1 fresh — a matching
+round needs a carve first, or the permuter.
+
+---
+
 ## 2026-09-11 — round 29: first SDK-object conversion round — `psyq_2258` retired, `libetc/intr` shadowed, one Opus runner
 
 **State at end: 1048 matched / 1356 game functions (unchanged — no matching

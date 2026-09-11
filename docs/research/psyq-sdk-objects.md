@@ -306,6 +306,45 @@ symlink showed as untracked. And `setup-worktree.sh` never linked `sdk/`, so
 linked the zips and `sdk/work` by hand; the script now does). Round 28 was
 head-alone, so this was the first worktree since the SDK objects landed.
 
+## Round 30 (2026-09-11): phase 1 complete
+
+Three more sequential runner sessions converted `psyq_SpuSetMute`,
+`psyq_memset`+`psyq_rand` and `psyq_GsLinkObject4`+`psyq_15c24`: 76 objects
+in 16 chunks, 15 byte-exact on the first build. With round 29's 31 that is
+124 linked objects; the `psyq_*` asm that remains is 436 functions, of which
+427 have no object on any disc and 8 are the three `gs_00x` objects held
+back. Decisions and measurements made on the way:
+
+- **`SpuRead`/`SpuWrite` (`libspu/s_r`/`s_w`) are byte-identical objects**;
+  retail holds one copy at `0x800391C8`. The placed `libsnd/vs_vtb` calls
+  `SpuWrite` and its call resolves there, so `s_w` is the one the game
+  linked. The `_spu_read = 0x80038900` line `symbols` prints comes from the
+  wrong alternate reading retail's `jal` and is an artefact. General rule:
+  when identical objects differ only in name, a placed CALLER decides.
+- **`libc/*` vs `libc2/*` alternates**: the game linked libc2 (`itoa`'s
+  3-byte `"%d"` is `.sdata` in libc2 and `.rdata` in libc; retail has it in
+  sdata).
+- **Nine libcd objects (`c_002 c_003 c_004 c_005 c_007 c_008 c_009 c_010
+  cdrom`) each carry the same unreferenced 0x10-byte `.data`.** Retail has
+  four copies. Only `c_003`'s is placeable (one relocation names it); the
+  rest are left out of the yaml and `/DISCARD/`ed — byte-exact, because
+  nothing in the objects' text reads them.
+- **`libgs/gs_001 gs_002 gs_003` stay asm** (`psyq_140dc`, `psyq_14e9c`,
+  `psyq_15020`) for scattered static bss; `GsSetDrawBuffClip` and
+  `GsSetDrawBuffOffset` therefore stay `func_*`, pinned as externals.
+- **splat merges labels when a segment shrinks.** A `jr $t2` BIOS
+  trampoline has no `jr $ra`, so once its segment boundary moves splat folds
+  it into the preceding function's `glabel` (`libapi/a07` in bravo's round;
+  six trampolines under one `glabel func_80025424` in `psyq_15c24`). The
+  linked objects recover the names; a carve that KEEPS such a range as asm
+  would lose them silently.
+- **The fragment scales with libcd**: 34 NOLOAD sections, 333 pinned bss
+  symbols, 48 externals, 0 notes. `libcd/c_011` alone pins 16 scattered
+  statics by name.
+- Delta counted 26 splat `glabel`s against 25 exported functions in
+  `0x1514C..0x15510` and could not localise the extra one after the range
+  converted; oracle green, every Sony name applied. Recorded, not resolved.
+
 ## What is next
 
 1. **Text-only, fully covered blocks first**: `psyq_PadInit` (libetc `pad`),

@@ -75,8 +75,8 @@ in 44 runs (alternates with identical bytes counted once), no overlaps.
 110 objects / 23 runs are in pure `psyq_*` segments (`psyq_2258`,
 `psyq_GsLinkObject4`, `psyq_SpuSetMute`, `psyq_memset`, `psyq_rand`);
 55 objects / 21 runs sit inside game units and need the unit split. Re-derive
-these with `runs` rather than trusting them; round 29 assigned `psyq_2258`
-(30 objects) to its runner, so the next measurement will be smaller.
+these with `runs` rather than trusting them. After round 30 the queue is
+58 objects / 24 runs: the three `gs_00x` runs and the game-unit objects.
 
 The two blocks already converted took one iteration (text-only) and two
 (data + bss) once the tooling existed. A runner that has the guide open should
@@ -86,7 +86,7 @@ figure:
 
 | phase | what | who | rounds |
 | --- | --- | --- | --- |
-| 1 | the four pure `psyq_*` segments | one Opus runner, or two on disjoint segments | 3–4 sequential, or 2 with two runners |
+| 1 | the pure `psyq_*` segments — **DONE 2026-09-11 (rounds 29–30)** except `libgs/gs_001 gs_002 gs_003`, held for the operator | four Opus runners, one at a time | 2 |
 | 2 | the 60-odd objects inside game units | head (Fable) carving, or a runner who is assigned that unit for the round | 3–4, interleaved with matching rounds |
 | 3 | naming pass for the 426 functions no disc places (name from the shape-matched module, bytes stay asm) | one cheap runner with `psyq_sdk.py symbols` | 1 |
 
