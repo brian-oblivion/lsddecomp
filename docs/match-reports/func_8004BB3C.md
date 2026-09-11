@@ -1,5 +1,14 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 32 (bravo2): re-verified, no new attempt.** Rebuilt the exact
+> preserved body from a clean `INCLUDE_ASM` baseline: confirmed 90/105, no
+> drift, identical `$s3`<->`$s4` whole-function register-identity swap.
+> Given the depth of prior confirmation (rounds 13, 17, 19, 20, 27 --
+> including a callee-saved-register-order check and a permuter run whose
+> scaffold was found to score a different residue than the real build), no
+> new structural variant was attempted this round; time went to
+> `func_8004C470` (matched, 63/70 -> 68/70) instead.
+
 > **ROUND 27 (delta): callee-saved-register check per the head's broadcast.**
 > Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline
 > (90/105 confirmed, correct length) and disassembled the compiled `.o`'s

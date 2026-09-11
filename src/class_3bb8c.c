@@ -30,6 +30,61 @@ s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
     return func_8004B44C(arg1, outBuf, self->unk68, &self->unk54, arg2);
 }
 
+#if 0
+/* STALL, round 32 (bravo2): re-verified at 58/73, no drift, IDENTICAL
+ * residue to the inherited report. Two new variants tried this round,
+ * both targeting the report's own suggested next lever (cache `outBuf[0]`'s
+ * reload into a named local positioned close to retail's actual reload
+ * point, rather than hoisting it before the whole outBuf[2]/outBuf[1]
+ * block as round 20's attempt 5 did):
+ *   - naming BOTH outBuf[2]'s value and the outBuf[0] reload as locals,
+ *     computed before either store -- regressed hard (44/73, 186603 bytes
+ *     of drift: introduces an extra spurious instruction, one whole word
+ *     longer than retail).
+ *   - naming ONLY the outBuf[0] reload (`ob0 = outBuf[0];`), placed
+ *     immediately after the outBuf[2] assignment statement (closer to
+ *     retail's actual reload point than attempt 5's placement) -- no
+ *     drift, but IDENTICAL 58/73, same residue. The reload's exact
+ *     register choice is insensitive to where in the statement stream its
+ *     C-level access sits, as long as outBuf[2]/outBuf[1] are already
+ *     stored as direct statements (not further-cached locals). Confirms
+ *     the round 20 diagnosis: retail's store-vs-load scheduling here is a
+ *     GCC 2.6.3 list-scheduler choice, not reachable through source
+ *     reordering or reload caching. See docs/match-reports/func_8004B44C.md
+ *     for the full history. */
+s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+    s32 idx;
+    s32 factor;
+    s32 sum;
+    s32 v1;
+    s32 a0v;
+
+    if (arg2->unk4 == 0) {
+        idx = arg4->b1;
+        factor = arg2->count;
+        sum = arg4->b0 + arg2->divisor * idx;
+    } else {
+        factor = 1;
+        idx = 0;
+        sum = 0;
+    }
+    v1 = (arg3->unk0 - arg2->divisor * 0x5000) + arg4->b0 * 0xA000;
+    a0v = arg3->unk8 - factor * 0x5000;
+    outBuf[0] = v1;
+    if (idx & 1) {
+        outBuf[0] = v1 - 0x5000;
+    }
+    outBuf[1] = arg3->unk4;
+    outBuf[2] = a0v + idx * 0xA000;
+    arg0[0] = (arg4->b2 << 11) + outBuf[0] + (arg4->h4 + 0x400);
+    arg0[1] = arg4->h6 + outBuf[1];
+    arg0[2] = (arg4->b3 << 11) + outBuf[2] + (arg4->h8 + 0x400);
+    outBuf[0] += 0x5000;
+    outBuf[2] = outBuf[2] + 0x5000;
+    return sum;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B44C);
 
 void func_8004B570(Obj866E8 *self) {
@@ -73,13 +128,19 @@ s32 func_8004B5BC(Obj866E8 *self) {
     return result;
 }
 
-#if 0
 /* STALL snapshot -- see docs/match-reports/func_8004B700.md. 125/140 words,
  * correct length, no drift. ROUND 27 (delta): re-verified per the head's
  * callee-saved-registers broadcast -- compiled prologue saves the IDENTICAL
  * set to retail (s0-s7, fp, ra, same stack slots), so the "extra
  * callee-saved parameter" lever does NOT apply here. Verdict (pure register
- * identity) CONFIRMED, not just plausible. */
+ * identity) CONFIRMED, not just plausible.
+ *
+ * ROUND 32 (bravo2): re-verified, 125/140, no drift, identical residue
+ * (tbl/u14/second-loop-row-pointer register swaps, no instruction shape
+ * differences). Not re-attempted -- three prior rounds' worth of
+ * confirmation (register-identity verdict, callee-saved order match) left
+ * nothing untried within this round's budget worth spending on. */
+#if 0
 void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
     s32 divisor;
     s32 flag;
@@ -168,15 +229,14 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
 }
 
 #if 0
-/* STALL snapshot -- see docs/match-reports/func_8004BA40.md. Length CORRECT
- * (63/63 words), raw word-match 58/63. Round 27 (delta) tried three more
- * structural variants (named `s32 e4 = entry->unk4;` local, operand-order
- * swap `entry->unk4 + val`, and dropping the shared `value` local entirely
- * in favor of storing straight into `*(s32*)(arg1+4)` per branch) -- first
- * two: no change (still 58/63, identical residue). Third: MUCH worse
- * (31/63, address drift) -- removing the shared `value` local changes
- * register pressure across the whole if/else in the wrong direction.
- * Confirms this is genuine register identity, not a source-shape issue. */
+/* STALL, round 32 (bravo2): re-verified 58/63, no drift, identical
+ * residue. See docs/match-reports/func_8004BA40.md for the full history.
+ * This round: separating `fieldVal`/`sum` temps from `value` (to mirror
+ * retail's v1-running-sum/v0-final-result split) -- IDENTICAL 58/63, no
+ * change. A fresh 144,370-iteration permuter run (independent RNG, own
+ * scaffold `--debug`-verified to score the same residue as the real
+ * build) also never beat the base score of 25. Genuine negative, not
+ * inconclusive; not attempted further this round. */
 s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = D_8008688C[key];
@@ -192,15 +252,18 @@ s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, 
         s32 value;
 
         if (entry->unk0 == 0) {
-            value = val + entry->unk4;
+            s32 fieldVal = entry->unk4;
+            value = val + fieldVal;
         } else {
             s32 lo = divisor * entry->unk0;
+            s32 sum;
 
             if (flag != 0) {
-                value = val + (lo + entry->unk4);
+                sum = lo + entry->unk4;
             } else {
-                value = val + (lo + entry->unk8);
+                sum = lo + entry->unk8;
             }
+            value = val + sum;
         }
         *(s32 *)((u8 *)arg1 + 4) = value;
     } else {
@@ -337,7 +400,8 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
  * a1 here; a handful of others) and commutative-op operand-order
  * canonicalization (`or`/`addu` reversed regardless of C source order,
  * same phenomenon independently confirmed in func_8004C470's report).
- * Preserved here per convention -- not live C. */
+ * Preserved here per convention -- not live C.
+ * ROUND 32 (bravo2): re-verified, 130/150, no drift, identical residue. */
 #if 0
 /* func_8004BE54 (Obj866E8Methods::slot104) -- own local view of several
  * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
@@ -544,7 +608,6 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     return &self->unkBC;
 }
 
-#if 0
 /* STALLED at 72/106 words -- see docs/match-reports/func_8004C1C0.md for
  * the full analysis (two independent residue classes: an $a1-vs-$a3
  * register-identity choice for u14b, and a store-then-reread narrow-field
@@ -553,7 +616,18 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
  * class 2 (dropping the b2/b3 locals and re-reading `out->base.b2/b3`
  * directly at the h4/h8 use sites) -- both REGRESSED (drift, extra saved
  * register in the prologue), reverted. Not re-attempted further this
- * round. Preserved here per convention. */
+ * round. Preserved here per convention.
+ *
+ * ROUND 32 (bravo2): re-verified, 72/106, no drift, identical residue.
+ * Set up an isolated permuter scaffold to probe the store-then-reread
+ * class-2 residue -- its own `--debug` base score showed 9 INSERTIONS and
+ * 9 DELETIONS versus the real in-context build's zero, i.e. the isolated
+ * scaffold compiles to a structurally DIFFERENT function than the real
+ * build (the same scaffold-context-mismatch trap documented for
+ * func_8004BB3C in round 17). Not run further -- a search against a
+ * scaffold provably scoring a different residue would not transfer.
+ * Scaffold deleted; not attempted further this round. */
+#if 0
 s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
@@ -606,6 +680,7 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C1C0);
 
+
 void func_8004C368(Obj866E8 *self, u8 *out, s32 val) {
     out[0] = val % self->unk68->divisor;
     out[1] = val / self->unk68->divisor;
@@ -627,5 +702,47 @@ Elem *func_8004C434(Obj866E8 *self, s32 key) {
         }
     }
 }
+
+#if 0
+/* STALL, round 32 (bravo2): 68/70, CORRECT length (0x118). Up from 63/70 --
+ * see docs/match-reports/func_8004C470.md for the full history this builds
+ * on. Fix this round: moved `threshold -= 0x800` into the for-loop's own
+ * increment-expression (alongside `i++`) instead of a trailing body
+ * statement, so that `continue` on the deep-threshold path applies it too.
+ * This closed "Residue 2" (the increment/decrement scheduling residue)
+ * completely. Remaining residue is ONLY "Residue 1": a commutative `addu`
+ * whose register-operand order the report already confirmed (twice, both
+ * operand-textual-orders tried) is immune to source reordering -- a
+ * project-wide confirmed class, not re-attempted this round. */
+Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
+    s32 i;
+    s32 tol;
+    s32 threshold;
+    Elem *candidate;
+    Unk14Obj *r;
+
+    i = 0;
+    tol = 0xA000;
+    threshold = 0;
+    for (; i < 7; i++, threshold -= 0x800) {
+        candidate = self->methods->slot118(self, i);
+        r = candidate->unkC->unk14;
+        if (arg1->unk0 >= r->unk18.w && arg1->unk0 < tol + r->unk18.w) {
+            if (arg1->unk8 >= r->unk20.w && arg1->unk8 < tol + r->unk20.w) {
+                if (self->unk68->unk4 == 0) {
+                    return candidate;
+                }
+                if (threshold >= arg1->unk4) {
+                    if (threshold - 0x800 >= arg1->unk4) {
+                        continue;
+                    }
+                    return candidate;
+                }
+            }
+        }
+    }
+    return 0;
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C470);
