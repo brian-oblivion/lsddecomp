@@ -59,6 +59,125 @@ void func_8004C620(Obj866E8 *self) {
     func_8004CE24(self, 1);
 }
 
+/* Forward declaration: defined later in this file (in ROM order, after
+ * func_8004CAF0), but tail-called here before its own definition appears. */
+extern void func_8004C93C(Obj866E8 *self);
+
+/* STALLED at 85/165 words (round 34) -- see docs/match-reports/func_8004C6A8.md.
+ * Every branch TARGET in the raw-range dispatch now agrees with retail
+ * (previously 60/165 with a different, wrong-polarity CFG shape); compiled
+ * length is still 3 words (12 bytes) short of retail's 165. The residue is a
+ * register-class choice: retail promotes a value that is never live across a
+ * CALL (the RotMatrix pointer argument, `(u8 *)sub + 0x10`) into its own
+ * callee-saved register anyway, which saturates all nine $s/$fp slots and
+ * forces `flag` to spill to the stack (an extra sw/lw pair retail has and
+ * this body does not); nothing tried reproduces that promotion. Restored
+ * here per project convention. */
+#if 0
+void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
+    Unk6C14SubObj *sub;
+    CC74QueryBuf buf;
+    s32 point0;
+    s32 point1;
+    s32 raw;
+    QueryTemplate866E8 desc;
+    s32 v1;
+    s32 v2;
+    s32 v3;
+    s32 s3;
+    s32 v;
+    s32 flag;
+
+    sub = self->unk6C->unk14->unk44;
+    self->methods->slot10C(self, &buf, 0);
+    point0 = buf.point[0];
+    point1 = buf.point[1];
+    raw = sub->unk12;
+    if ((s16)sub->unk12 < 0) {
+        raw += 0x1000;
+    }
+
+    desc = D_8008E98C;
+    desc.unk14 = 0;
+    desc.unk18 = 0;
+    desc.unk1C = self->unk74;
+    RotMatrix((u8 *)sub + 0x10, &desc);
+    ApplyMatrixLV(&desc, &desc.unk14, &desc.unk14);
+
+    v1 = raw - 0x200;
+    if ((u16)v1 < 0x400) {
+        goto block1;
+    }
+    v2 = raw - 0xA00;
+    if ((u16)v2 >= 0x400) {
+        goto continue_dispatch;
+    }
+
+block1:
+    s3 = desc.unk1C;
+    self->unk80 = arg2;
+    self->unk84 = arg1;
+    if (desc.unk14 > 0) {
+        v = point0;
+    } else {
+        v = point0 - arg1 + 1;
+    }
+    self->unk7C = (s16)v;
+    if (desc.unk1C > 0) {
+        v = point1 - (u16)self->unk78 - 1;
+    } else {
+        v = point1 - (u16)self->unk78 + 1;
+    }
+    self->unk7E = (s16)v;
+    flag = 0;
+    goto shared;
+
+continue_dispatch:
+    v3 = raw - 0x600;
+    if ((u16)v3 < 0x400) {
+        goto block2;
+    }
+    if ((u16)v1 < 0xC00) {
+        goto shared;
+    }
+
+block2:
+    s3 = desc.unk14;
+    self->unk80 = arg1;
+    self->unk84 = arg2;
+    if (desc.unk14 > 0) {
+        v = point0 - (u16)self->unk78 - 1;
+    } else {
+        v = point0 - (u16)self->unk78 + 1;
+    }
+    self->unk7C = (s16)v;
+    if (desc.unk1C > 0) {
+        v = point1;
+    } else {
+        v = point1 - arg2 + 1;
+    }
+    self->unk7E = (s16)v;
+    flag = 1;
+
+shared:
+    v = self->unk78;
+    s3 >>= 11;
+    if (s3 >= v) {
+        s3 = v - 1;
+    }
+    v = -v;
+    if (v >= s3) {
+        s3 = v + 1;
+    }
+    if (flag) {
+        self->unk7C = (u16)self->unk7C + s3;
+    } else {
+        self->unk7E = (u16)self->unk7E + s3;
+    }
+    func_8004C93C(self);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
 
 /* STALLED at 45/109 words -- see docs/match-reports/func_8004C93C.md for
