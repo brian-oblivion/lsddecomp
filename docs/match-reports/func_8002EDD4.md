@@ -503,3 +503,49 @@ rule (`register T v asm("$N")` / operand constraints), and the function
 should be considered a genuine, durable STALL at 267/270 rather than a
 live search target for a future round, absent a new idea about what
 actually determines retail's `a0`-vs-`s0` choice here.
+
+
+---
+
+## HEAD CORRECTION, round 31 (2026-09-11) -- THE EXIT ATTRIBUTION ABOVE IS WRONG
+
+**The head killed this search.** At 21:29:29 the head ran the orphaned-permuter
+sweep from docs/PARALLEL-RUNS.md 2c and it listed **11 live permuter processes
+cwd-ed into this worktree**, PID 994862 (the `timeout` wrapper) among them. At
+roughly 21:29:40 the head `kill -9`-ed all of them.
+
+The head did this believing this runner was dead. It was not: the runner had
+ended a turn waiting on the search (the 2c wait-loop), the orchestration
+reported that as a completed task, and the head read "task completed with work
+uncommitted" as "runner died" and applied the 4c salvage rule. The runner then
+resumed on its own and reported normally. **A task notification means the agent
+stopped its turn, not that it died.**
+
+So the exit reasoning in the section above -- elapsed time matching the 1500s
+bound, the `resource_tracker` leaked-semaphore warning, iterations still
+climbing -- is equally consistent with an external SIGKILL, which is what
+actually happened. A leaked semaphore is if anything more characteristic of
+SIGKILL than of `timeout`'s SIGTERM. The exit code was not captured, so **this
+cannot be settled after the fact and the 124-vs-137 question has no answer
+here.**
+
+**What this does and does not change:**
+
+- It does NOT materially change the magnitude of the negative. The sweep proves
+  the search was alive at 21:29:29, and it began at roughly 21:04, so it ran
+  very nearly the full 1500s bound. The ~100,458 iterations stand as a real
+  count, and the best score was flat at the sanity-checked base of 15 throughout.
+- It DOES invalidate the claim that the bound fired cleanly. Phrase this result
+  as **"not closed in ~100,458 iterations under load; run externally terminated
+  at or near its bound, exit code unrecoverable."**
+- The standing instruction not to upgrade this to *permuter-exhausted* is
+  unchanged and now doubly warranted.
+
+**The process lesson is the head's, not this runner's.** PARALLEL-RUNS.md 2b
+and 2c say a search addressed by a global name reaches runners you did not mean,
+and that the head "is no more exempt from it than a runner." The head's kill was
+correctly guarded on `cwd` -- it hit only the three worktrees it intended -- but
+the *premise* was wrong, and a `cwd` guard cannot protect against a wrong
+premise. The missing check was one command: `git -C <wt> log` and a re-read of
+`git status` before concluding a runner is gone, since a paused runner and a
+dead one look identical from outside.
