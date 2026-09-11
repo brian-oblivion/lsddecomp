@@ -62,3 +62,21 @@
 3.3  libc2/ctype    0x3B78
 3.3  libc2/putchar  0x3BE0
 3.3  libapi/a53     0x3C88
+
+# psyq_2258 chunk C (0x3C98..0x58D0): libgs 2D sorting and coordinate helpers.
+# Data: 2d_com1 .rdata 0xA3C (the "z resolution overflow" string, 0x2A), and
+# 2d_bg0 .data 0x570CC (4 bytes). Every .bss here goes in the fragment --
+# gs_134 and gs_135 both carry a WEAK 0x40 block at 0x8008E9B0
+# (GsWSMATRIX/GsWSMATRIX_ORG), and gs_127/gs_119/gs_120 share the libgs
+# HWD0..._LC WEAK block, so ldfrag emits one NOLOAD section per object.
+3.3  libgs/gs_134    0x3C98
+3.3  libgs/gs_127    0x3F6C
+3.3  libgs/gs_013    0x3FEC
+3.3  libgs/2d_sp0    0x4004
+3.3  libgs/2d_com1   0x4500
+3.3  libgs/2d_bg0    0x4594
+3.3  libgs/gs_119    0x4D8C
+3.3  libgs/gs_120    0x4E44
+3.3  libgs/gs_135    0x4F68
+3.3  libgs/2d_box0   0x5288
+3.3  libgs/2d_com0   0x5360

@@ -70,7 +70,12 @@ segments:
       # lands its piece and disappears when libgte/geo takes 0xA68.
       - [0x800, o, libgs/matrix, .rdata]      # print_matrix/print_vector formats
       - [0x830, o, libc2/prnt, .rdata]        # printf's format-dispatch jump tables
-      - [0xA3C, rodata]   # psyq_2258 remainder
+      - [0xA3C, o, libgs/2d_com1, .rdata]     # "z resolution overflow", 0x2A
+      # The string ends at 0xA66 and retail aligns the jump table after it to
+      # 4 (splat's own disassembly emits `.align 2` right here). 0xA66 is
+      # already 2-aligned, so SUBALIGN(2) would NOT insert those two bytes.
+      - [0xA66, pad]
+      - [0xA68, rodata]   # psyq_2258 remainder -- libgte/geo's .rdata (chunk E)
       - [0xA8C, rodata]   # code_8220
       - [0xABC, rodata]   # psyq_GsLinkObject4
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
@@ -230,7 +235,18 @@ segments:
       - [0x3B78, o, libc2/ctype]      # toupper, tolower
       - [0x3BE0, o, libc2/putchar]    # putchar
       - [0x3C88, o, libapi/a53]       # write
-      - [0x3C98, asm, psyq_3c98]
+      - [0x3C98, o, libgs/gs_134]     # GsGetLs
+      - [0x3F6C, o, libgs/gs_127]     # GsDefDispBuff2
+      - [0x3FEC, o, libgs/gs_013]     # GsSetOrign
+      - [0x4004, o, libgs/2d_sp0]     # GsSortSprite
+      - [0x4500, o, libgs/2d_com1]    # _make_packet
+      - [0x4594, o, libgs/2d_bg0]     # GsSortBg
+      - [0x4D8C, o, libgs/gs_119]     # gte_rotate_z_matrix
+      - [0x4E44, o, libgs/gs_120]     # gte_scale_matrix
+      - [0x4F68, o, libgs/gs_135]     # GsGetLws
+      - [0x5288, o, libgs/2d_box0]    # GsSortBoxFill
+      - [0x5360, o, libgs/2d_com0]    # _mk_spr_packet, _mk_xpndsp, _mk_normsp
+      - [0x58D0, asm, psyq_58d0]
       # code_8220 is 56 functions, and it is the BasicClass block -- most of
       # its symbols are already named (BasicClass__*), so it is the most
       # legible uncarved ground in the game. First 20-function slice,
@@ -1238,7 +1254,9 @@ segments:
       # object's data would land early: a clean link and an SHA1 mismatch.
       # `pad` emits `. += N;` and restores the 3 bytes after the 0x81 table.
       - [0x570C1, pad]
-      - [0x570C4, data]
+      - [0x570C4, data]                       # 8 bytes no placed object owns
+      - [0x570CC, o, libgs/2d_bg0, .data]     # 4 bytes
+      - [0x570D0, data]
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]
       - [0x5DB38, o, libetc/intr_vb, .data]

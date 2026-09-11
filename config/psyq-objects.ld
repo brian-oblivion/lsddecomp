@@ -12,11 +12,62 @@ SECTIONS {
     .psyq_bss._obj_malloc_bss 0x8008E284 (NOLOAD) : { build/lib/_obj/malloc.o(.bss) }   /* 0x10 bytes; first symbol SearchPoint */
     .psyq_bss.libgs_matrix_bss 0x80090260 (NOLOAD) : { build/lib/libgs/matrix.o(.bss) }   /* 0x80 bytes; first symbol DSTACK */
     .psyq_bss.libc2_putchar_sbss 0x8008AC48 (NOLOAD) : { build/lib/libc2/putchar.o(.sbss) }   /* 0x4 bytes; section-relative refs */
+    .psyq_bss.libgs_gs_134_bss 0x8008E9B0 (NOLOAD) : { build/lib/libgs/gs_134.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
+    .psyq_bss.libgs_gs_127_bss 0x8008E980 (NOLOAD) : { build/lib/libgs/gs_127.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_013_bss 0x8008E278 (NOLOAD) : { build/lib/libgs/gs_013.o(.bss) }   /* 0x5A2 bytes; section-relative refs */
+    .psyq_bss.libgs_gs_119_bss 0x8008E980 (NOLOAD) : { build/lib/libgs/gs_119.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_120_bss 0x8008E980 (NOLOAD) : { build/lib/libgs/gs_120.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_135_bss 0x8008E9B0 (NOLOAD) : { build/lib/libgs/gs_135.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
 }
+PSDOFSX = 0x8008E240;   /* libgs/gs_013 */
+PSDOFSY = 0x8008E244;   /* libgs/gs_013 */
+PSDBASEX = 0x8008E27C;   /* libgs/gs_013 */
+PSDBASEY = 0x8008E280;   /* libgs/gs_013 */
 SearchPoint = 0x8008E284;   /* _obj/malloc */
+GsDSTACK = 0x8008E290;   /* libgs/gs_013 */
+POSITION = 0x8008E790;   /* libgs/gs_013 */
+GsWSMATRIX_ORG = 0x8008E7E4;   /* libgs/gs_134 */
+GsWSMATRIX_ORG = 0x8008E7E4;   /* libgs/gs_135 */
 TopAllocArea = 0x8008E890;   /* _obj/malloc */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_127 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_119 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_120 */
+GsDRAWENV = 0x8008E8C4;   /* libgs/gs_013 */
+GsDISPENV = 0x8008E920;   /* libgs/gs_013 */
+GsORGOFSX = 0x8008E93C;   /* libgs/gs_013 */
+GsORGOFSY = 0x8008E940;   /* libgs/gs_013 */
+_LC = 0x8008E948;   /* libgs/gs_127 */
+_LC = 0x8008E948;   /* libgs/gs_119 */
+_LC = 0x8008E948;   /* libgs/gs_120 */
+HWD0 = 0x8008E980;   /* libgs/gs_127 */
+HWD0 = 0x8008E980;   /* libgs/gs_119 */
+HWD0 = 0x8008E980;   /* libgs/gs_120 */
 PadIdentifier = 0x8008E984;   /* libetc/pad */
+VWD0 = 0x8008E988;   /* libgs/gs_127 */
+VWD0 = 0x8008E988;   /* libgs/gs_119 */
+VWD0 = 0x8008E988;   /* libgs/gs_120 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_127 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_119 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_120 */
+GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_134 */
+GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_135 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_127 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_119 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_120 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_127 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_119 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_120 */
+CLIP2 = 0x8008EA04;   /* libgs/gs_013 */
 DSTACK = 0x80090260;   /* libgs/matrix */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_127 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_119 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_120 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_127 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_119 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_120 */
+PSDCNT = 0x80090B74;   /* libgs/gs_013 */
+PSDIDX = 0x80090B78;   /* libgs/gs_013 */
+PSDGPU = 0x80090B80;   /* libgs/gs_013 */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
@@ -26,12 +77,19 @@ PushMatrix = 0x800158CC;
 PopMatrix = 0x8001596C;
 MulMatrix = 0x80015AF0;
 MulMatrix2 = 0x80015BFC;
+ApplyMatrix = 0x80015D08;
+TransMatrix = 0x80015DB4;
+ScaleMatrix = 0x80015DD8;
 SetRotMatrix = 0x80015EFC;
 SetLightMatrix = 0x80015F2C;
 SetTransMatrix = 0x80015F8C;
+RotTransPers4 = 0x80015FB0;
+ReadGeomScreen = 0x800160A4;
+RotMatrix = 0x800160B0;
+rsin = 0x80016C0C;
+rcos = 0x80016CE8;
 ResetCallback = 0x80024D10;
 InterruptCallback = 0x80024D40;
 ChangeClearPAD = 0x80025434;
 ChangeClearRCnt = 0x80025454;
-GsLIGHTWSMATRIX = 0x8008E898;
-GsIDMATRIX = 0x8008E98C;
+GsOUT_PACKET_P = 0x8008E794;
