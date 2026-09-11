@@ -725,6 +725,54 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    hit. What you keep is the whole point of §3c: a provisioned, byte-verified
    worktree and a runner slot that would otherwise sit idle.
 
+   **A THIRD ROUND WITHOUT THE CHANNEL (33), AND A DIFFERENT FAILURE THAT THE
+   SAME ABSENCE MAKES UNFIXABLE: A RUNNER THAT STALLS OUT RATHER THAN
+   FINISHING.** Two of round 33's three runners ended their sessions
+   mid-work, having committed NOTHING — one waiting on a background permuter
+   it had correctly bounded with `timeout`, one waiting on a "monitor" that
+   did not exist. Between them they held nine modified files, including a
+   17-word improvement on `func_800344FC` (44/70 -> 61/70) and four rebuilt
+   report titles. The §3c substitute does not cover this: there is no early
+   finisher to re-send, and spawning a fresh agent into the worktree would
+   have DESTROYED the uncommitted work rather than continuing it.
+
+   **So the head's move is to recover the worktree itself, BEFORE any
+   re-staffing decision:**
+
+   ```sh
+   git -C ../<checkout>-wt-<name> status --porcelain      # what is unsaved
+   grep -c '^INCLUDE_ASM' ../<checkout>-wt-<name>/src/<unit>.c   # vs the start count
+   cd ../<checkout>-wt-<name> && ./build-and-verify.sh; echo "build exit=$?"
+   ```
+
+   If `src/` is byte-correct and the build is green, nothing is at risk except
+   the reports — commit them on the runner's branch yourself, attribute the
+   work to the runner and the COMMIT to the head, and merge normally. Round 33
+   did this twice and both branches merged clean. **Teardown is what destroys
+   the work, so recover before you tear down, not after** — and that ordering
+   is the whole reason this is written next to the re-send rather than in a
+   troubleshooting appendix.
+
+   Two things worth fixing in the runner prompt while you are here, both
+   measured this round: tell the runner explicitly that **nothing runs on its
+   behalf and no notification is coming to it**, and that it must **commit as
+   it goes rather than at the end**. Both stalls were a runner waiting
+   politely for an event that the harness was never going to deliver.
+
+   **And do not write the wait loop the obvious way.** The head's own attempt
+   to wait out one of those searches was
+   `until ! pgrep -f "…-wt-bravo.*permuter.py"; do sleep 5; done` — which
+   never terminates, because the polling shell's OWN command line contains the
+   pattern and `pgrep` matches it. This is the sibling of the existing
+   "never `pkill -f` a tool name" rule: **a `pgrep`/`pkill` pattern matches
+   every process whose command line contains it, and that includes the
+   process doing the matching.** Match on something structural instead — the
+   permuter's own `permuter-work/<func>` argument, or a PID you captured — and
+   note that the same check is what distinguishes a live search from an
+   ORPHAN left by a dead agent. Round 33's really-running processes turned out
+   to belong to a session that had been merged half an hour earlier, on a
+   function in a different unit than the one the live runner held.
+
    **Carry the round's findings forward IN THE PROMPT — that is what replaces
    the broadcast.** Round 32's replacement runners were handed the three
    mechanisms found earlier that day, and one reported that a finding in its
