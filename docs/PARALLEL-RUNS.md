@@ -727,14 +727,39 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 
    **A THIRD ROUND WITHOUT THE CHANNEL (33), AND A DIFFERENT FAILURE THAT THE
    SAME ABSENCE MAKES UNFIXABLE: A RUNNER THAT STALLS OUT RATHER THAN
-   FINISHING.** Two of round 33's three runners ended their sessions
-   mid-work, having committed NOTHING — one waiting on a background permuter
-   it had correctly bounded with `timeout`, one waiting on a "monitor" that
-   did not exist. Between them they held nine modified files, including a
-   17-word improvement on `func_800344FC` (44/70 -> 61/70) and four rebuilt
-   report titles. The §3c substitute does not cover this: there is no early
-   finisher to re-send, and spawning a fresh agent into the worktree would
-   have DESTROYED the uncommitted work rather than continuing it.
+   FINISHING.** One of round 33's three runners ended its session mid-work
+   having committed NOTHING, waiting for a "monitor" that did not exist. It
+   held four modified reports. The §3c substitute does not cover this: there
+   is no early finisher to re-send, and spawning a fresh agent into the
+   worktree would have DESTROYED the uncommitted work rather than continuing
+   it.
+
+   **BUT THE HEAD ALSO MISDIAGNOSED A SECOND RUNNER AS STALLED WHEN IT WAS
+   MERELY WAITING, AND THAT ERROR IS THE MORE USEFUL HALF.** Bravo's
+   notification arrived with five modified files and zero commits, reading
+   exactly like charlie's. It was not dead: it was waiting on a permuter it
+   had bounded correctly with `timeout 400`, and when that search ended it
+   resumed on its own, wrote its final report and committed. The head had by
+   then already committed bravo's in-progress work on its branch — a write
+   underneath a LIVE agent. It happened to be harmless (bravo noticed, said
+   so in its summary, and carried the head's own round-label correction into
+   its last commit), but nothing about the situation guaranteed that.
+
+   **So a task notification is NOT evidence that a runner is finished.** It
+   fires whenever an agent stops with no live background children, and an
+   agent can resume afterwards. Zero commits plus a notification is therefore
+   consistent with BOTH a dead runner and a live one mid-wait, and the two
+   call for opposite actions. The discriminator is cheap and structural:
+
+   ```sh
+   ps -eo pid=,cmd= | grep -F decomp-permuter | grep -F '<func the runner named>'
+   ```
+
+   A bounded job of the runner's own still running means the runner is
+   probably alive and will come back — **wait for it.** Nothing running, and a
+   summary that names no pending work, means recover. When in doubt, wait:
+   recovery is only forced by teardown, and teardown is the head's own choice
+   of moment.
 
    **So the head's move is to recover the worktree itself, BEFORE any
    re-staffing decision:**
