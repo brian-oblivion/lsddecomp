@@ -509,37 +509,34 @@ typedef struct {
 
 typedef struct {
     u8 pad0[0x8];
-    u8 unk8;    /* +0x08: byte stamped between the two per-item calls */
-    u8 pad9[0x28 - 0x9];
+    u8 unk8;    /* +0x08: byte stamped between the two per-item calls -- the
+                 * struct's TOTAL size is 0x20, not the 0x28 that offset
+                 * alone would suggest; see func_800349B0.md's round-31
+                 * update for why the two are decoupled once the
+                 * register-rescue fix below is applied. */
+    u8 pad9[0x20 - 0x9];
 } Scratch_800349B0;
 
 extern s16 func_800334F0(s16 a0, s16 a1, void *out);
 extern void func_80033260(s16 a0, u8 a1, s16 a2, void *out);
 extern void func_80036230(s16 a0, u8 a1, s16 a2, void *out);
 
-/* STALL -- see docs/match-reports/func_800349B0.md. Compiled length ONE
- * WORD SHORT (78/79); frame size also 8 bytes larger than retail's 0x70
- * with this struct split (0x78) -- two related but distinct residues, both
- * register/stack-allocation artifacts, not logic differences. */
-#if 0
 void func_800349B0(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
-    u8 *p = (u8 *)rec + rec->unk12;
+    u8 offset;
     NoteList_800349B0 list;
     Scratch_800349B0 scratch;
     s32 i;
 
-    func_800334F0(rec->unk4C, p[0x2C], &list);
+    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         scratch.unk8 = a2;
-        func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
+        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800349B0);
 
 /* Same shape as func_800349B0 -- see that function's own struct comment.
  * Only the scratch byte's offset differs (0xB here vs 0x8 there). */
