@@ -39,6 +39,8 @@
  */
 #include "common.h"
 
+/* STALL -- see docs/match-reports/func_8002E4D8.md. Best body reached
+ * (237/231 built words, 6 words LONG) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002E4D8);
 
 /* Same 0x34-stride channel-configuration record family documented in
@@ -128,10 +130,15 @@ extern u8 D_8008EA1A;
  * when set to 1. */
 extern s16 D_8008E8C0;
 
-/* STALL -- see docs/match-reports/func_8002EA44.md. Best body
- * reached (13/228 words, 5 words short) preserved there in #if 0. */
+/* STALL -- see docs/match-reports/func_8002EA44.md. Best body reached
+ * (223/228 built words, 5 words short; 13/228 raw word-match, drift-
+ * affected so not itself a distance measure) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
 
+/* STALL -- see docs/match-reports/func_8002EDD4.md. EXACT length
+ * (270/270 built words), 267/270 raw word-match -- pure REGISTER-
+ * IDENTITY residue (a0 vs s0, banned to fix by pinning). Best body
+ * preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EDD4);
 
 /* "Currently selected channel" scratch global: written as a side
@@ -316,8 +323,12 @@ s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
     return sum;
 }
 
+/* STALL -- see docs/match-reports/func_8002F700.md. Best body reached
+ * (237/241 built words, 4 words short) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F700);
 
+/* STALL -- see docs/match-reports/func_8002FAC4.md. Best body reached
+ * (402/387 built words, 15 words LONG) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002FAC4);
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
