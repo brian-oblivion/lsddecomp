@@ -761,6 +761,37 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    recovery is only forced by teardown, and teardown is the head's own choice
    of moment.
 
+   **AND THE CONSEQUENCE FOR §3c ITSELF, WHICH ROUND 33 GOT WRONG: DO NOT
+   SPAWN THE REPLACEMENT INTO THE OLD AGENT'S WORKTREE. GIVE IT A FRESH
+   WORKTREE NAME.** The substitute written above says to fast-forward the
+   finished runner's worktree and spawn a fresh agent into it. That is safe
+   only if the previous agent can never resume, and **this harness gives no
+   such guarantee** — a notification is not a death certificate, and round 33
+   had two agents live in `…-wt-charlie` at the same time, which is the exact
+   collision the whole worktree discipline exists to prevent.
+
+   What it cost, and what it did not: the two agents held DIFFERENT units
+   (`code_179d8_g` and `class_3bb8c_b`), so they touched disjoint files, all
+   three commits landed on one branch and nothing was lost. **That was the
+   assignment being disjoint, not the procedure being safe.** Two agents on
+   one unit would have interleaved edits to one `.c` under one branch with no
+   conflict marker anywhere — a corrupted unit that builds.
+
+   It also cost a real measurement. The head saw permuter processes on
+   `func_8002A75C`, reasoned that the session owning that function had been
+   merged half an hour earlier, and killed them as orphans. They belonged to
+   the still-live original runner, and the kill truncated a 1800s search at
+   roughly 1342s. The report's "full 30 minutes" claim had to be corrected in
+   place, because a permuter negative's weight IS the extent of its search.
+
+   **So the ordering is:** recover the worktree's uncommitted work only when
+   the checks above say the agent is really done; then, if you want a
+   replacement, `tools/setup-worktree.sh <a fresh name>` — the grant covers
+   five names (alpha, bravo, charlie, delta, echo) and a round using three
+   has two spare. Leave the old worktree alone until teardown. A worktree
+   costs a second to provision and the whole point of it is that nobody else
+   is in it.
+
    **So the head's move is to recover the worktree itself, BEFORE any
    re-staffing decision:**
 
