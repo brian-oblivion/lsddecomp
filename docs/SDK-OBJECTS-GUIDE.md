@@ -141,6 +141,14 @@ In `config/splat.slps01556.lsdde.yaml`:
 - **rodata**: the slot `- [0xF28, rodata]   # psyq_xxx` becomes
   `- [0xF28, o, <lib>/<module>, .rdata]` lines plus a trailing `rodata`
   entry for whatever is left in the slot (check `asm/data/<OFF>.rodata.s`).
+  One object's section can span SEVERAL existing slot lines — `libc2/
+  sprintf`'s `.rdata` (`0x19B4`, 0xDC) covered both `[0x19B4, rodata]` and
+  `[0x19DC, rodata]` (its own `switch` jump table, split off by an earlier
+  round). Delete every line inside `start..start+size`, not just the first.
+  A `dlabel` that straddles the END of an object's data section is not
+  necessarily a problem either: check whether the references to it come
+  from the object's own text (`libcd/c_003`'s `D_8008187C` is its `.data`
+  at `+0xC`) before concluding the split strands a symbol.
 - **data / sdata**: split the enclosing `- [0x57070, data]`-style slot at
   the object boundaries from step 2, and re-open a plain slot after the last
   object. Object data sections are consecutive in retail when they were
