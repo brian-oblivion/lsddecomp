@@ -181,3 +181,68 @@
 3.3  libgs/gs_104    0x2BA1C
 3.3  libcd/event     0x2BA94
 3.3  libgs/gs_122    0x2BF70
+
+# psyq_memset chunk A (0x3197C..0x322B4): libc2 memory and formatted-output
+# helpers -- memset, itoa, sprintf/vsprintf, memmove. Data: itoa .sdata
+# 0x7B128 (the 3-byte "%d", dlabel D_8008A928; `libc/itoa` has the same bytes
+# but calls the section .rdata, which is not where retail keeps them, so the
+# libc2 alternate is the right one), sprintf .data 0x5F468 (0xC, dlabel
+# D_8006EC68) and sprintf .rdata 0x19B4 (0xDC). sprintf's .rdata is a
+# relocated jump table (D_800111B4/D_800111C8), so `place` reports
+# `bytes:not-found` and the derived offset landing on the slot's existing
+# dlabels is the confirmation. itoa's 0x10 .bss goes in the fragment.
+3.3  libc2/memset   0x3197C
+3.3  libc2/itoa     0x319A8
+3.3  libc2/sprintf  0x319E8
+3.3  libc2/memmove  0x32248
+
+# psyq_memset chunk B (0x330F4..0x3311C, 0x3328C..0x33808, 0x36D38..0x36D48):
+# three short runs in the libgs/libcd remainder -- two libgs helpers and
+# libc2's exit. Text-only in the yaml; `place` derives no PROGBITS section
+# for any of the three. gs_110's 0xA0 .bss has no relocation naming it and
+# gs_107's reports the informational `relocations DISAGREE` (references to
+# NAMED variables, pinned one by one); both go through the fragment, which
+# reports no NOTE. `libc/a56` has the same bytes as `libc2/exit`; the libc2
+# alternate is taken for consistency with the rest of the block.
+3.3  libgs/gs_110   0x330F4
+3.3  libgs/gs_107   0x3328C
+3.3  libc2/exit     0x36D38
+
+# psyq_memset chunk C (0x36DB8..0x3770C): libpress, the MDEC variable-length
+# code decoder. Data: vlc .data 0x5FFC8 (0x18, dlabel D_8006F7C8 ->
+# D_8006F7E0) and vlc2 .rdata 0x1B50 (0x1B, "MDEC_vlec: invalid VLC ID\n"),
+# both confirmed by byte search. vlc2's .rdata ends at 0x1B6B and retail's
+# next string starts at 0x1B6C, which is exactly where SUBALIGN(2) puts it,
+# so no pad. The 0x1C .bss goes in the fragment.
+3.3  libpress/vlc    0x36DB8
+3.3  libpress/vlc2   0x3711C
+
+# psyq_memset chunk D (0x38110..0x381C8, 0x3825C..0x39094): the libcd BIOS
+# command core. Data:
+#   c_003 .data  0x72070 (0x10, dlabel D_80081870; derived from c_003's own
+#         relocations -- its text reads the table at +0 and +0xC)
+#   c_011 .data  0x720A0 (0x50, dlabel D_800818A0)
+#   c_011 .rdata 0x1B6C  (0x15, "DMA STATUS ERROR %x\n") -> 0x1B81, and the
+#         next string is at 0x1B84, so the yaml needs a 3-byte `pad`
+# EIGHT of these objects (c_002 c_005 c_008 c_010 cdrom c_009 c_004 c_007)
+# carry an identical 0x10-byte .data that NO relocation of their own names;
+# the bytes appear four times in retail (0x5E0C0 0x72060 0x72070 0x72080), so
+# only c_003's is placeable. The other eight are deliberately left OUT of the
+# yaml: the splat script's /DISCARD/ drops an unreferenced input section and
+# retail's bytes stay in the plain data slot. All the .bss goes in the
+# fragment; ldfrag reports no NOTE.
+3.3  libcd/c_002    0x38110
+3.3  libcd/c_003    0x38170
+3.3  libcd/c_005    0x3825C
+3.3  libcd/c_008    0x382E4
+3.3  libcd/c_011    0x38324
+3.3  libcd/c_010    0x38E5C
+3.3  libcd/cdrom    0x38E7C
+3.3  libcd/c_009    0x38EAC
+3.3  libcd/c_004    0x38F70
+3.3  libcd/c_007    0x38FD8
+
+# psyq_rand (0x39C80..0x39CB4), retired whole: libc2's rand/srand. Text-only
+# in the yaml; its 4-byte .sbss seed at 0x8008AC68 goes in the fragment and
+# the plain [0x7B468, sbss] slot is unchanged.
+3.3  libc2/rand     0x39C80
