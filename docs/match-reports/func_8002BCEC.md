@@ -501,7 +501,7 @@ function's own length/register residues are both around DERIVED local
 values (`off`+4, and the derivation-order registers above), not around an
 incoming parameter's own storage. Negative result, reported as requested.
 
-## Round 30 update (runner echo) — figures rebuilt, a stale symbol name found and fixed, one more variant tried
+## Round 31 update (runner echo) — figures rebuilt, a stale symbol name found and fixed, one more variant tried
 
 Rebuilt the preserved body by splicing it into `src/code_179d8_d.c` (via
 `#if 0`/`#endif`) and reproduced the title's figures exactly: `funcdiff.py`
