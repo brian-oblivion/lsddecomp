@@ -114,9 +114,14 @@ own report had named that fix, and nobody had tried it on its sibling in the
 same unit, where it was worth 10 words. **An idiom recorded in one report is a
 candidate for every sibling in its unit.**
 
+Charlie2's `func_8004C6A8` went **60/165 -> 85/165**, the single largest gain
+of the round at 25 words.
+
 Alpha (first pass) took all five of `code_55dd4`'s near-misses through the
-round-32 levers and got five negatives. Charlie advanced four `code_179d8_g`
-reports and made all four titles rankable.
+round-32 levers and got five negatives. Charlie advanced five `code_179d8_g`
+reports, made every title rankable, and pushed `func_8002A75C`'s permuter
+negative from round 20's 300s/~31k iterations to ~1342s/~156k -- a materially
+stronger negative, though not the 1800s its own title claimed (see below).
 
 **Two mechanism findings are worth as much as the movement.** A GCC value
 availability / GCSE hoist of a side-effect-free expression is immune to
@@ -188,6 +193,43 @@ Two machine-level traps found the same way, both now written down:
   kill. A live runner competing with a dead session's orphans pays in wall
   clock with nothing in its own transcript to explain why.
 
+### The head's own error, and it is the round's most important finding
+
+**Two agents were live in one worktree at the same time, because the head
+treated a task notification as proof a runner was finished.** The chain:
+charlie's notification arrived with modified files and zero commits; the head
+recovered and merged its work; the head then spawned a replacement into the
+same worktree per §3c. Charlie was not dead -- it was waiting, and it resumed.
+Bravo did the same thing and was misdiagnosed the same way.
+
+A notification fires whenever an agent stops with no live background children.
+It is not a death certificate, and the head took two irreversible actions on
+the belief that it was.
+
+**What it cost, and what it did not.** The two agents held different units, so
+they touched disjoint files; all three commits landed on one branch and
+nothing was lost. That is the assignment being disjoint, not the procedure
+being safe -- two agents on one unit would have interleaved edits to a single
+`.c` under one branch with no conflict marker anywhere, producing a corrupted
+unit that builds.
+
+It did cost a measurement. The head saw permuter processes on `func_8002A75C`,
+reasoned that the session owning that function had been merged half an hour
+earlier, and killed them as orphans. They belonged to the still-live original
+runner, and the kill truncated an 1800s search at roughly 1342s. The report's
+"full 30 minutes" claim is corrected in place, because a permuter negative's
+weight IS the extent of its search.
+
+Both rules are now in `docs/PARALLEL-RUNS.md` §3c, and the second is a
+correction to that section's own advice: **do not spawn a replacement into the
+old agent's worktree -- provision a fresh one.** The grant covers five names
+and a three-runner round has two spare. A worktree costs a second, and nobody
+else being in it is the entire point.
+
+The head also wrote an `until ! pgrep -f <pattern>` wait loop that could never
+terminate, because the polling shell's own command line contains the pattern --
+the sibling of the standing "never `pkill -f` a tool name" rule.
+
 ### Next move
 
 **An SDK-conversion round, then runners.** Eight Sony-owned stalls remain,
@@ -199,7 +241,6 @@ whole category and is the only work on the board with a guaranteed outcome.
 runner may hold either unit that round.
 
 ---
-
 ## 2026-09-12 — round 32: six closes, and 14 queued functions that were Sony's all along
 
 **State at end: 1059 matched / 1356 game functions (78.10% of game code), up
