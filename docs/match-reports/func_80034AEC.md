@@ -1,7 +1,87 @@
-# func_80034AEC -- STALL: length ONE WORD SHORT (78/79); 38/79 raw word-match; first real diff at word 33 (vram 0x80034B70, register rescue)
+# func_80034AEC -- MATCHED: 79/79, byte-exact
 
 `asm/nonmatchings/code_179d8_k/func_80034AEC.s`, vram `0x80034AEC`, unit
-`code_179d8_k`. Round 25, runner alpha.
+`code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
+(closed).
+
+## Round 31 update (runner bravo): closed via decomp-permuter, register-rescue class cracked
+
+Re-verified round 25's baseline reproduces exactly before touching
+anything: 38/79 raw word-match, compiled length 78/79 (one short), with the
+correct-offset 0x20-sized `Scratch_80034AEC` struct.
+
+Set up `tools/decomp-permuter` against this function (`tools/setup-permuter.sh`,
+base score 110 confirmed against `--debug --stack-diffs` -- 1 deletion + 2
+register differences, matching the report's own residue exactly). A
+16-way `-j 12` search (`--stop-on-zero --best-only`) found a **score-0
+candidate at iteration 36291** (~793 induced errors along the way, none
+fatal to the search):
+
+```c
+u8 new_var;
+...
+func_800334F0(rec->unk4C, (((u8 *) rec) + (new_var = rec->unk12))[0x2C], &list);
+for (i = 0; i < list.unk0; i++) {
+    func_80033260(rec->unk4C, (((u8 *) rec) + new_var)[0x2C], (s16) i, &scratch);
+    ...
+    func_80036230(rec->unk4C, (((u8 *) rec) + new_var)[0x2C], (s16) i, &scratch);
+}
+```
+
+**The fix is not caching `p` as a pointer at all.** The stalled body cached
+`u8 *p = (u8 *)rec + rec->unk12;` once and reused the pointer at all three
+call sites -- the natural C reading, and exactly what forces the allocator
+to keep a live pointer register across the loop (needing the `$s0`->`$s4`
+rescue retail's compile performs and this one didn't). Caching the raw
+BYTE OFFSET instead (`u8 offset = rec->unk12;`) and recomputing
+`((u8 *)rec + offset)[0x2C]` at each of the three use sites gives the
+allocator a cheap-to-recompute scalar instead of a persistent pointer, and
+it stops trying to keep a dedicated register alive across the loop --
+which is exactly the condition under which retail's own compile needed
+(and got) the rescue `move`. Translated to idiomatic C and verified through
+the full pipeline:
+
+```c
+void func_80034AEC(s16 a0, s16 a1, u8 a2)
+{
+    Entry90902E8 *rec = &D_800902E8[a0][a1];
+    u8 offset;
+    NoteList_800349B0 list;
+    Scratch_80034AEC scratch;
+    s32 i;
+
+    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
+    for (i = 0; i < list.unk0; i++) {
+        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        scratch.unkB = a2;
+        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+    }
+    rec->unk88 = func_80035E80(a0, a1);
+}
+```
+
+Byte-exact, 79/79, no drift; `./build-and-verify.sh` whole-image SHA1
+green. This SAME fix (same `offset`-not-`p` idiom) also closed the two
+sibling functions sharing this residue class this round --
+`func_800349B0` (which additionally needed a struct-size fix, see that
+report) and `func_80034C28` (which additionally needed an
+immediate-canonicalization fix, see that report).
+
+### Proposed learning
+
+When a report's residue is "a rescue `move` retail has and this build
+elides, one word short," the fix is not to coerce the ALLOCATOR into
+keeping the same value alive across the same span (declaration reordering,
+named temporaries at various positions -- all tried and inert per this
+report's round-25/27 history) -- it is to stop asking it to keep a
+PERSISTENT POINTER alive across the span at all. Caching the narrower
+scalar the pointer is built from (here, a `u8` byte offset) and
+recomputing the pointer expression at each use site changes what has to
+survive the loop, which is a source-level lever distinct from every
+"where do I declare this variable" axis this residue class's reports had
+already exhausted.
+
+## Original stall report (round 25, runner alpha), preserved below
 
 ## What it is
 
