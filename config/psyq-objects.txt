@@ -216,3 +216,28 @@
 # so no pad. The 0x1C .bss goes in the fragment.
 3.3  libpress/vlc    0x36DB8
 3.3  libpress/vlc2   0x3711C
+
+# psyq_memset chunk D (0x38110..0x381C8, 0x3825C..0x39094): the libcd BIOS
+# command core. Data:
+#   c_003 .data  0x72070 (0x10, dlabel D_80081870; derived from c_003's own
+#         relocations -- its text reads the table at +0 and +0xC)
+#   c_011 .data  0x720A0 (0x50, dlabel D_800818A0)
+#   c_011 .rdata 0x1B6C  (0x15, "DMA STATUS ERROR %x\n") -> 0x1B81, and the
+#         next string is at 0x1B84, so the yaml needs a 3-byte `pad`
+# EIGHT of these objects (c_002 c_005 c_008 c_010 cdrom c_009 c_004 c_007)
+# carry an identical 0x10-byte .data that NO relocation of their own names;
+# the bytes appear four times in retail (0x5E0C0 0x72060 0x72070 0x72080), so
+# only c_003's is placeable. The other eight are deliberately left OUT of the
+# yaml: the splat script's /DISCARD/ drops an unreferenced input section and
+# retail's bytes stay in the plain data slot. All the .bss goes in the
+# fragment; ldfrag reports no NOTE.
+3.3  libcd/c_002    0x38110
+3.3  libcd/c_003    0x38170
+3.3  libcd/c_005    0x3825C
+3.3  libcd/c_008    0x382E4
+3.3  libcd/c_011    0x38324
+3.3  libcd/c_010    0x38E5C
+3.3  libcd/cdrom    0x38E7C
+3.3  libcd/c_009    0x38EAC
+3.3  libcd/c_004    0x38F70
+3.3  libcd/c_007    0x38FD8

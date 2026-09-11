@@ -181,7 +181,9 @@ segments:
       # 0x1B -> 0x1B6B; retail's next string is at 0x1B6C, which is exactly
       # where SUBALIGN(2) puts it, so no pad line is needed.
       - [0x1B50, o, libpress/vlc2, .rdata]
-      - [0x1B6C, rodata]
+      - [0x1B6C, o, libcd/c_011, .rdata]      # 0x15, "DMA STATUS ERROR %x\n" -> 0x1B81
+      - [0x1B81, pad]                         # 3 bytes; the next string ("SND\STANDERD") is at 0x1B84
+      - [0x1B84, rodata]
       # jtbl_8001140C -- 10 words, all targets inside func_80049EB4, which
       # the class_39e08 carve moved into C. Attached with the dot form so
       # migrate_rodata_to_functions puts the table in that function's own
@@ -954,6 +956,23 @@ segments:
       - [0x36DB8, o, libpress/vlc]     # MDEC_vlc_brk, MDEC_vlc
       - [0x3711C, o, libpress/vlc2]    # MDEC_vlc2, ivlc_dct_dc_size
       - [0x3770c, asm, psyq_3770c]
+      # psyq_memset chunk D: the libcd streaming/BIOS-command core. Eight of
+      # these objects carry an identical, unreferenced 0x10-byte .data; only
+      # c_003's is placeable, and the other eight are left out of the yaml on
+      # purpose so /DISCARD/ drops them and retail's bytes stay in the plain
+      # data slot.
+      - [0x38110, o, libcd/c_002]      # StClearRing
+      - [0x38170, o, libcd/c_003]      # StUnSetRing
+      - [0x381c8, asm, psyq_381c8]
+      - [0x3825C, o, libcd/c_005]      # StSetStream
+      - [0x382E4, o, libcd/c_008]      # init_ring_status
+      - [0x38324, o, libcd/c_011]      # StCdInterrupt, mem2mem, dma_execute
+      - [0x38E5C, o, libcd/c_010]      # StSetMask
+      - [0x38E7C, o, libcd/cdrom]      # StSetRing
+      - [0x38EAC, o, libcd/c_009]      # StGetNext
+      - [0x38F70, o, libcd/c_004]      # data_ready_callback
+      - [0x38FD8, o, libcd/c_007]      # StFreeRing
+      - [0x39094, asm, psyq_39094]
       - [0x39c80, asm, psyq_rand]
 
       # ---- carved C units --------------------------------------------------
@@ -1394,6 +1413,10 @@ segments:
       - [0x5F474, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)
       - [0x5FFE0, data]
+      - [0x72070, o, libcd/c_003, .data]      # 0x10 -> 0x72080 (dlabel D_80081870)
+      - [0x72080, data]
+      - [0x720A0, o, libcd/c_011, .data]      # 0x50 -> 0x720F0 (dlabel D_800818A0)
+      - [0x720F0, data]
       - [0x769D4, data]               # StageGrid's data slot
       - [0x76DC8, data]              # class_39e08
       - [0x783dc, data]               # DreamSys's data slot
