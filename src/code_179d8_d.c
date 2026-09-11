@@ -134,6 +134,185 @@ s32 func_8002BC40(s32 id, char *name)
     return -1;
 }
 
+/*
+ * A 4-byte, alignment-1 view used only to force the unaligned lwl/lwr +
+ * swl/swr load/store shape two of IsoDirRecord's fields need -- the same
+ * idiom code_179d8_g.c's own `UWord` type uses for the identical purpose
+ * (all-u8 members so the struct's own alignment is 1, forcing GCC to use
+ * an unaligned move rather than assuming a 4-byte-aligned `lw`/`sw`). */
+typedef struct UWord {
+    u8 b0, b1, b2, b3;
+} UWord;
+
+/* One ISO9660 directory record from the D_8008CFF0 buffer. Only the
+ * fields func_8002BCEC itself reads are named. */
+typedef struct IsoDirRecord {
+    u8 len;          /* +0x00, length of directory record -- also this
+                      * function's own "next record" advance and its
+                      * end-of-listing test (0 means no more records) */
+    u8 extAttrLen;   /* +0x01, unused here */
+    UWord extentLBA; /* +0x02, location of extent (LE), unaligned --
+                      * handed to func_800292F4 for conversion */
+    u8 pad06[0x0A - 0x06];
+    UWord dataLen;   /* +0x0A, data length (LE), unaligned -- copied
+                      * verbatim into the cache entry's own size field */
+    u8 pad0E[0x20 - 0x0E];
+    u8 nameLen;      /* +0x20, length of file identifier */
+    char name[1];    /* +0x21, file identifier, nameLen bytes, not
+                      * NUL-terminated in the record itself */
+} IsoDirRecord;
+
+/* The 0x18-stride cache entry this function builds, one per IsoDirRecord,
+ * up to 0x40 of them. Only the fields this function itself touches are
+ * named. */
+typedef struct EntryB3F0 {
+    u8 msf[3];   /* +0x00, filled by func_800292F4 from extentLBA, not
+                  * written directly here */
+    u8 pad3;
+    UWord size;  /* +0x04, copied verbatim from IsoDirRecord::dataLen */
+    char name[0x18 - 0x08]; /* +0x08 */
+} EntryB3F0;
+
+extern EntryB3F0 D_8008B3F0[0x40];
+
+/* An INDEPENDENT extern for D_8008B3F0's own +0x4 field (D_8008B3F0 == this
+ * symbol - 4), used ONLY by the per-iteration diagnostic print's byte-offset
+ * read below. Retail computes that read via a FRESH lui/addiu of this exact
+ * symbol, not by adding 4 to the live D_8008B3F0 base register the write two
+ * lines above also uses -- if the read is written through the same
+ * `(u8*)D_8008B3F0 + off + 4` expression as the write, GCC hoists a THIRD
+ * induction register shared between them (confirmed: without this split the
+ * build saves 8 callee registers instead of retail's 7). Declaring the
+ * read's target as its own symbol denies the compiler the syntactic link. */
+extern s32 D_8008B3F4[];
+
+extern u8 D_8008CFF0[]; /* PVD/dir-listing buffer -- code_179d8_g.c's own
+                         * comment on this symbol */
+extern u8 D_8008D7F0[]; /* upper-bound sentinel on the scan cursor --
+                         * address-only use, per code_179d8_g.c's comment */
+
+/* This function's own "id -> handle" lookup, a DIFFERENT 0x2C-stride table
+ * from this file's own Entry8008B9F4 -- D_8008B9CC is not a multiple of
+ * 0x2C away from D_8008B9F4, so it is not the same array under a different
+ * index origin. Only the field this function reads is named. */
+typedef struct EntryB9CC {
+    void *handle;
+    u8 pad4[0x2C - 4];
+} EntryB9CC;
+extern EntryB9CC D_8008B9CC[];
+
+extern s32 D_8006D608;
+extern s32 D_8006D938;
+
+/* CD_cachefile diagnostics (confirmed via asm/data/120C.rodata.s) */
+extern u8 D_80010C58[]; /* "CD_cachefile: dir not found\n" */
+extern u8 D_80010C78[]; /* "CD_cachefile: searching...\n" */
+extern u16 D_80010C94;  /* 0x002E -- ".", NUL-terminated, packed as a u16 */
+extern s16 D_80010C98;  /* 0x2E2E -- "..", first two chars packed as a s16 */
+extern s8 D_80010C9A;   /* 0x00 -- "..", NUL terminator */
+extern u8 D_80010C9C[]; /* "\t(%02x:%02x:%02x) %8d %s\n" */
+extern u8 D_80010CB8[]; /* "CD_cachefile: %d files found\n" */
+
+extern s32 func_8002BFA8(void *p0, void *p1, void *p2);        /* matched, this unit */
+extern void func_8002C014(char *dest, char *src, s32 count);   /* matched, this unit */
+extern void func_800292F4(void *arg0, s32 *outBuf);
+extern void printf(const char *fmt, ...); /* Psy-Q printf wrapper */
+
+/* STALL -- see docs/match-reports/func_8002BCEC.md.  Best-derived body
+ * compiles to 172/175 words (3 SHORT); raw word-match 49/175 under that
+ * drift; first real diff at vram 0x8002BDB8 (file 0x1C5B8).  Two residues:
+ * (1) the size-field write's own address-computation encoding (register
+ * count vs. store-immediate trade-off, six variants tried, none matches),
+ * (2) a missing 3-instruction "always-true" check GCC's own dead-code
+ * elimination removes from every C form tried.  Preserved for the next
+ * attempt. */
+#if 0
+s32 func_8002BCEC(s32 id)
+{
+    IsoDirRecord *rec;
+    EntryB3F0 *slot; /* the current cache entry -- only ever used as a
+                      * pointer VALUE (func_800292F4's outBuf argument), so
+                      * it earns its own strength-reduced register rather
+                      * than being re-derived from `off` each time. */
+    u8 *name;         /* &current entry's name[0] -- likewise only ever used
+                      * as a pointer value (func_8002C014's dest, the %s
+                      * argument, and the direct index/index-1 writes). */
+    s32 off;           /* running BYTE offset of the current entry within
+                      * D_8008B3F0, used for every access that is NOT
+                      * itself passed on as a pointer value. */
+    s32 count;
+
+    if (id == D_8006D938) {
+        return 1;
+    }
+
+    if (func_8002BFA8((void *)1, D_8008B9CC[id].handle, D_8008CFF0) != 1) {
+        if (D_8006D608 > 0) {
+            printf(D_80010C58);
+        }
+        return -1;
+    }
+
+    count = 0;
+    if (D_8006D608 >= 2) {
+        printf(D_80010C78);
+    }
+
+    slot = D_8008B3F0;
+    name = (u8 *)slot + 8;
+    off = 0;
+    rec = (IsoDirRecord *)D_8008CFF0;
+    for (;;) {
+        if (rec->len == 0) {
+            break;
+        }
+
+        {
+            UWord tmp = rec->extentLBA;
+            func_800292F4(*(void **)&tmp, (s32 *)slot);
+        }
+        {
+            EntryB3F0 *entry = (EntryB3F0 *)((u8 *)D_8008B3F0 + off);
+            entry->size = rec->dataLen;
+        }
+
+        if (count == 0) {
+            *(u16 *)D_8008B3F0[0].name = D_80010C94;
+        } else if (count == 1) {
+            *(s16 *)D_8008B3F0[1].name = D_80010C98;
+            D_8008B3F0[1].name[2] = D_80010C9A;
+        } else {
+            func_8002C014((char *)name, rec->name, rec->nameLen);
+            name[rec->nameLen] = 0;
+        }
+
+        slot++;
+        if (D_8006D608 >= 2) {
+            printf(D_80010C9C, *((u8 *)D_8008B3F0 + off),
+                          *((u8 *)D_8008B3F0 + off + 1),
+                          *((u8 *)D_8008B3F0 + off + 2),
+                          *(s32 *)((u8 *)D_8008B3F4 + off), (char *)name);
+        }
+
+        name += 0x18;
+        count++;
+        rec = (IsoDirRecord *)((u8 *)rec + rec->len);
+        off += 0x18;
+        if (count >= 0x40 || (u8 *)rec >= D_8008D7F0) {
+            break;
+        }
+    }
+
+    D_8006D938 = id;
+    if (count < 0x40) {
+        D_8008B3F0[count].name[0] = 0;
+    }
+    if (D_8006D608 >= 2) {
+        printf(D_80010CB8, count);
+    }
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
 
 /* Cross-unit calls into code_179d8_b -- declared LOCAL to this unit,
