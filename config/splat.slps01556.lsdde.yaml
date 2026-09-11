@@ -121,7 +121,12 @@ segments:
       # own two dlabels is the evidence. The plain remainder below shrinks as
       # later chunks of the segment land their pieces.
       - [0x1764, o, libspu/s_sca, .rdata]
-      - [0x17A4, rodata]  # D_80010FA4 .. D_80011078; owners not placed yet
+      - [0x17A4, rodata]  # D_80010FA4 .. D_80011054; owners not placed
+      - [0x1878, o, libcd/event, .rdata]  # "CdInit: Init failed\n", 0x15
+      # 0x1878 + 0x15 = 0x188D, and the next slot starts at 0x1890. Under the
+      # splat script's SUBALIGN(2) the following section would land at 0x188E,
+      # three bytes early, so retail's 3-byte hole needs an explicit `pad`.
+      - [0x188D, pad]
       # 0x1890 holds three jump tables. jtbl_80011090 and jtbl_800110D0
       # belong to code_2cc8c's first 20-function slice (now a C unit), so
       # that part of the slot must be ATTACHED to it -- a standalone rodata
@@ -829,7 +834,13 @@ segments:
       - [0x2b268, o, libsnd/ssplay]      # Snd_SetPlayMode, SsSeqPlay, SsSepPlay, SsPlayBack
       - [0x2b49c, o, libsnd/ssclose]     # seq_close, SsSeqClose, SsSepClose
       - [0x2b660, o, libsnd/sspause]     # Snd_SetPauseMode, SsSeqPause, SsSepPause
+      # Gap: 0x2B78C..0x2BA1C, the game's own libsnd build.
       - [0x2b78c, asm, psyq_2b78c]
+      # Chunk E: the block's last two runs.
+      - [0x2ba1c, o, libgs/gs_104]       # GsInit3D
+      - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread
+      - [0x2bb9c, asm, psyq_2bb9c]       # 0x2BB9C..0x2BF70, unowned
+      - [0x2bf70, o, libgs/gs_122]       # GsGetTimInfo, closing the block at 0x2C054
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as

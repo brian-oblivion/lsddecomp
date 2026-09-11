@@ -169,3 +169,15 @@
 3.3  libsnd/ssplay    0x2B268
 3.3  libsnd/ssclose   0x2B49C
 3.3  libsnd/sspause   0x2B660
+
+# psyq_SpuSetMute chunk E (0x2BA1C..0x2BB9C, 0x2BF70..0x2C054): the last two
+# runs of the block -- two libgs helpers and libcd's event/CdInit core.
+# Data: event .rdata 0x1878 (0x15, "CdInit: Init failed\n"), confirmed by
+# byte search, and it needs a 3-byte `pad` after it because SUBALIGN(2)
+# would otherwise put code_2cc8c's attached rodata at 0x188E instead of
+# 0x1890. gs_104's and gs_122's bss go through the fragment; gs_104's
+# `.bss: relocations DISAGREE` is the informational kind (references to
+# NAMED variables, pinned one by one), and ldfrag reports no NOTE for it.
+3.3  libgs/gs_104    0x2BA1C
+3.3  libcd/event     0x2BA94
+3.3  libgs/gs_122    0x2BF70

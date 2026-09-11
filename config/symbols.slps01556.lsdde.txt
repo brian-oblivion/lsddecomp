@@ -277,6 +277,16 @@ SsSepClose = 0x8003AE3C; // type:func  (Psy-Q libsnd/ssclose, from the SDK objec
 Snd_SetPauseMode = 0x8003AE60; // type:func  (Psy-Q libsnd/sspause, from the SDK object)
 SsSeqPause = 0x8003AF38; // type:func  (Psy-Q libsnd/sspause, from the SDK object)
 SsSepPause = 0x8003AF60; // type:func  (Psy-Q libsnd/sspause, from the SDK object)
+
+// psyq_SpuSetMute chunk E (0x2BA1C..0x2BB9C, 0x2BF70..0x2C054): the block's
+// last two runs -- two libgs helpers and libcd's CdInit with its three
+// default callbacks.
+GsInit3D = 0x8003B21C; // type:func  (Psy-Q libgs/gs_104, from the SDK object)
+CdInit = 0x8003B294; // type:func  (Psy-Q libcd/event, from the SDK object)
+def_cbsync = 0x8003B324; // type:func  (Psy-Q libcd/event, from the SDK object)
+def_cbready = 0x8003B34C; // type:func  (Psy-Q libcd/event, from the SDK object)
+def_cbread = 0x8003B374; // type:func  (Psy-Q libcd/event, from the SDK object)
+GsGetTimInfo = 0x8003B770; // type:func  (Psy-Q libgs/gs_122, from the SDK object)
 memset = 0x8004117C;
 rand = 0x80049480;
 srand = 0x800494A8;
