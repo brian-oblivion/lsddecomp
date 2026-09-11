@@ -1751,14 +1751,16 @@ struct TaskObjF {
     s32 unk70;                                                /* +0x070, func_8004F55C (cleared) */
 };
 
-/* func_8004F394/func_8004F3BC/func_8004F3E4 forward `self` unchanged into
- * func_8004F40C with a distinct library callback each; func_80038F6C/
- * func_8003903C are Psy-Q SPU routines (asm/psyq_SpuSetMute.s, uncarved),
- * func_800390F4 is the SAME validity check func_8004F4C8 (below) uses on
- * its own array argument. */
-extern s32 func_80038F6C(s32 arg);
-extern s32 func_8003903C(s32 arg);
-extern s32 func_800390F4(s32 arg);
+/* The three library callbacks func_8004F394/func_8004F3BC/func_8004F3E4
+ * forward into func_8004F40C are EnableEvent/DisableEvent/TestEvent, now
+ * linked from the Psy-Q objects libapi/a12, libapi/a13 and libapi/a11.
+ * Their declarations live in src/class_3bb8c_f.c, the only unit that uses
+ * them: a prototype for a function a Sony object defines does not belong in
+ * a header 21 units include, where it would one day collide with the real
+ * KERNEL.H. (The old comment here called them "SPU routines" -- they are
+ * kernel event-queue calls; only their neighbours in the block are libspu.)
+ * TestEvent is also the validity check func_8004F4C8 uses on its own array
+ * argument. */
 
 /* Generic "find the first of up to `count` entries for which
  * func_800390F4 accepts it, retrying the whole array forever if none

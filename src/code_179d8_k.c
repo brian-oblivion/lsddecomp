@@ -55,7 +55,7 @@
 extern void func_8002F610(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
 extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
 extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
-extern s32 func_80036044(void);                              /* code_179d8_f, MATCHED: return func_80038D74(0); */
+extern s32 func_80036044(void);                              /* code_179d8_f, MATCHED: return SpuSetReverb(0); */
 extern void func_80036518(void);                              /* code_179d8_f, MATCHED: D_8008E84C = 0; */
 
 /* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of

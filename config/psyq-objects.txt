@@ -109,3 +109,75 @@
 # SHADOWED: ldfrag maps it NOLOAD at 0x800106BC and the bytes stay in splat's
 # plain rodata slot. Byte-exact (docs/research/psyq-sdk-objects.md, round 29).
 3.3  libetc/intr    0x15510  shadow=.rdata
+
+# psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
+# the SpuSetReverb* family, the malloc-style SPU RAM allocator (s_sca) and its
+# helpers. Data: s_sca .rdata 0x1764 (0x40) = jtbl_80010F64 + jtbl_80010F84,
+# two switch tables of relocated words, so `place` reports `bytes:not-found`
+# and the derived offset lands on the slot's existing dlabels. bss via the
+# fragment.
+3.3  libspu/s_sm     0x272C8
+3.3  libspu/s_srmp   0x27320
+3.3  libspu/s_m_util 0x27D00
+3.3  libspu/s_snv    0x27DE8
+3.3  libspu/s_sca    0x27E0C
+
+# psyq_SpuSetMute chunk B (0x29318..0x29554 and 0x29574..0x29644): two short
+# runs either side of a 0x20-byte gap -- the SPU common read/write-area
+# helpers plus two libapi BIOS trampolines, and SpuSetReverb on its own.
+# Text-only; `place` derives no data section for any of the five.
+3.3  libapi/a07      0x29318
+3.3  libspu/s_crwa   0x29328
+3.3  libapi/a10      0x294C8
+3.3  libspu/s_m_f    0x294D8
+3.3  libspu/s_sr     0x29574
+
+# psyq_SpuSetMute chunk C (0x2976C..0x2A0E0): one 16-object run -- the SPU
+# transfer/IRQ/malloc core interleaved with five libapi BIOS trampolines.
+# Text-only; `place` derives no data section for any of the sixteen.
+#
+# 0x299C8 is the segment's one ALTERNATE: libspu/s_r and libspu/s_w have
+# identical bytes and both place there. s_w is the right one -- the placed
+# libsnd/vs_vtb calls SpuWrite and its call resolves to 0x800391C8, this
+# function. (The function IT calls, 0x80038900, is in the unowned gap and
+# keeps its func_ name; ldfrag pins _spu_write to it as an external.)
+3.3  libapi/a12      0x2976C
+3.3  libapi/a08      0x2977C
+3.3  libspu/s_dcb    0x2978C
+3.3  libspu/s_q      0x297B0
+3.3  libapi/a09      0x2982C
+3.3  libapi/a13      0x2983C
+3.3  libspu/s_itc    0x2984C
+3.3  libapi/a11      0x298F4
+3.3  libspu/s_m_init 0x29904
+3.3  libspu/s_stm    0x29958
+3.3  libspu/s_stsa   0x2998C
+3.3  libspu/s_w      0x299C8
+3.3  libspu/s_it     0x29A28
+3.3  libspu/s_m_m    0x29A64
+3.3  libspu/s_m_int  0x29D2C
+3.3  libspu/s_sav    0x2A02C
+
+# psyq_SpuSetMute chunk D (0x2A878..0x2A918, 0x2A94C..0x2AE70,
+# 0x2B268..0x2B78C): three libsnd runs -- SsSetSerialVol and friends, the
+# volume table, and the SEQ play/close/pause family. Text-only.
+# 0x2B268 takes the COARSE 3.3 libsnd/ssplay (0x234), not the 3.5 disc's
+# playmode/ssplay/ssplayb split, which leaves gaps.
+3.3  libsnd/ssvol     0x2A878
+3.3  libsnd/ssreplay  0x2A94C
+3.3  libsnd/vol       0x2AA44
+3.3  libsnd/ssplay    0x2B268
+3.3  libsnd/ssclose   0x2B49C
+3.3  libsnd/sspause   0x2B660
+
+# psyq_SpuSetMute chunk E (0x2BA1C..0x2BB9C, 0x2BF70..0x2C054): the last two
+# runs of the block -- two libgs helpers and libcd's event/CdInit core.
+# Data: event .rdata 0x1878 (0x15, "CdInit: Init failed\n"), confirmed by
+# byte search, and it needs a 3-byte `pad` after it because SUBALIGN(2)
+# would otherwise put code_2cc8c's attached rodata at 0x188E instead of
+# 0x1890. gs_104's and gs_122's bss go through the fragment; gs_104's
+# `.bss: relocations DISAGREE` is the informational kind (references to
+# NAMED variables, pinned one by one), and ldfrag reports no NOTE for it.
+3.3  libgs/gs_104    0x2BA1C
+3.3  libcd/event     0x2BA94
+3.3  libgs/gs_122    0x2BF70
