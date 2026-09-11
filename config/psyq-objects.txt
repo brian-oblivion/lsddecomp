@@ -108,6 +108,14 @@
 # 2-byte `pad` before D_8006BEA0 at 0x5C6A0.
 3.3  libgte/ratan   0xF8C8
 
+# psyq_GsLinkObject4 chunk B (0x10D48..0x10EE0): libgs/gs_105
+# (GsMapModelingData) and libgte/msc01 (SquareRoot0, SquareRoot12). Data:
+# msc01 .data 0x5C6F0 (0x180, dlabel D_8006BEF0 -> D_8006C070), confirmed by
+# byte search. gs_105's 0xA0 .bss has no relocation naming it and goes in
+# the fragment, which reports no NOTE.
+3.3  libgs/gs_105   0x10D48
+3.3  libgte/msc01   0x10DC0
+
 # libetc/intr (the interrupt/callback core: ResetCallback, InterruptCallback,
 # DMACallback, VSyncCallback ...). Text and .data (the 0x109C callback tables
 # at 0x5CA70) are the 3.3 object's; its .rdata carries the RCS string

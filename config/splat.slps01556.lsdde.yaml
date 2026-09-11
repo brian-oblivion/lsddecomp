@@ -385,8 +385,12 @@ segments:
       # 0xF770..0xF8C8: head of the old psyq_GsLinkObject4, no placed object.
       - [0xF770, asm, psyq_GsLinkObject4]
       - [0xF8C8, o, libgte/ratan]       # ratan2, ratan (Psy-Q 3.3). .data at 0x5BE9C
-      # 0xFA50..0x15510: the rest of the old psyq_GsLinkObject4, still asm.
+      # 0xFA50..0x10D48: still asm.
       - [0xFA50, asm, psyq_fa50]
+      - [0x10D48, o, libgs/gs_105]      # GsMapModelingData (Psy-Q 3.3). bss via the fragment
+      - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
+      # 0x10EE0..0x15510: the rest of the old psyq_GsLinkObject4, still asm.
+      - [0x10EE0, asm, psyq_10ee0]
       # libetc/intr from the SDK object (Psy-Q 3.3): ResetCallback, InterruptCallback,
       # DMACallback, VSyncCallback(s), Stop/Restart/CheckCallback, Get/SetIntrMask,
       # startIntr, trapIntr, setIntr, stopIntr, restartIntr, memclr. .data at 0x5CA70;
@@ -1413,6 +1417,8 @@ segments:
       - [0x5BE9C, o, libgte/ratan, .data]    # 0x802, the arctan table -> 0x5C69E
       - [0x5C69E, pad]                       # 2 bytes; 0x802 is not 2-aligned
       - [0x5C6A0, data]                      # D_8006BEA0.., no placed object owns it
+      - [0x5C6F0, o, libgte/msc01, .data]    # 0x180 -> 0x5C870 (dlabel D_8006C070)
+      - [0x5C870, data]
       - [0x5CA70, o, libetc/intr, .data]     # 0x109C, the callback tables -> 0x5DB0C
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]
