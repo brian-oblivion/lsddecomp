@@ -145,6 +145,35 @@ def verdict(func):
     return out
 
 
+def sdk_owned():
+    """Functions a placed Sony object owns -- they can never match as C.
+
+    Delegated to tools/sdkstalls.py rather than re-expressed here, for the
+    same reason this file shells out to the canonical blocker greps: every
+    re-implementation of a screen in this project so far has got it wrong
+    (the nop_mflo_mfhi window was inverted three times, and sdkstalls' own
+    extent calculation was wrong on its first run).  One implementation, one
+    place to fix.
+
+    Returns an empty mapping if the SDK tooling cannot run -- lib/ is generated
+    and gitignored, so a fresh clone legitimately has no objects placed yet.
+    Failing open is right here: it degrades to the pre-round-32 behaviour
+    instead of hiding assignable ground.
+    """
+    try:
+        out = subprocess.run([sys.executable, os.path.join(ROOT, "tools",
+                                                           "sdkstalls.py")],
+                             capture_output=True, text=True, cwd=ROOT,
+                             timeout=180)
+    except Exception:
+        return {}
+    owned = {}
+    for m in re.finditer(r"^\s+(?:FULLY|PARTIAL)\s+(\S+)\s+\S+\s+\S+\s+"
+                         r"\d+w\s+<- (\S+)", out.stdout, re.M):
+        owned[m.group(1)] = m.group(2)
+    return owned
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true",
@@ -182,11 +211,25 @@ def main():
     def real_blockers(hits):
         return [h for h in hits if not h.endswith("(RESOLVED-not-a-blocker)")]
 
-    clean = [r for r in rows if not real_blockers(r[3])]
-    blocked = [r for r in rows if real_blockers(r[3])]
+    # Sony library code is a THIRD partition, and it must come out before
+    # "blocker-clean" is computed.  A function inside a placed SDK object
+    # passes every blocker screen -- there is no gp_rel, no mflo/mfhi hazard,
+    # nothing -- so it reads as the cleanest possible ground while being
+    # unmatchable by construction.  Exactly the failure mode the BIOS
+    # trampoline screen was added to Gate 2 for, arriving in Gate 1b.
+    owned = sdk_owned()
+    sdk = [r for r in rows if r[2] in owned]
+    rest = [r for r in rows if r[2] not in owned]
+    clean = [r for r in rest if not real_blockers(r[3])]
+    blocked = [r for r in rest if real_blockers(r[3])]
 
     print(f"live INCLUDE_ASM queue: {len(rows)}   "
-          f"blocker-clean: {len(clean)}   blocked: {len(blocked)}")
+          f"blocker-clean: {len(clean)}   blocked: {len(blocked)}   "
+          f"Sony library code: {len(sdk)}")
+    if sdk:
+        print(f"  {len(sdk)} function(s) lie inside a placed Sony object and can NEVER")
+        print("  match as C -- excluded from the assignable list below. Convert them")
+        print("  per docs/SDK-OBJECTS-GUIDE.md; see `python3 tools/sdkstalls.py`.")
     if blocked:
         tally = {}
         for r in blocked:
