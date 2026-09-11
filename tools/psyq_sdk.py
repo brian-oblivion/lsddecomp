@@ -448,7 +448,9 @@ def cmd_coverage(_args):
     print("\nPlaced objects that fall inside GAME-code segments (SDK code miscounted as game):")
     for off, (ver, name, size) in sorted(placed.items()):
         s = seg_of(off)
-        if s and not s.startswith("psyq_") and not s.startswith("lib"):
+        # an `o` segment is named after its object (`libgs/gs_105`, `_obj/malloc`):
+        # already linked, not miscounted -- the slash is the tell
+        if s and not s.startswith("psyq_") and "/" not in s:
             print(f"  {name:<26} size=0x{size:<5x} vram=0x{off-HDR+VRAM:08x}  {s}  (Psy-Q {ver})")
 
 

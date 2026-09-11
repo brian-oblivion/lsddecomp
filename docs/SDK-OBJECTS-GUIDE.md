@@ -208,6 +208,14 @@ In `config/splat.slps01556.lsdde.yaml`:
 - `make extract`, then **delete the old `asm/psyq_xxx.s`** — extract does
   not remove top-level asm for a segment that no longer exists, and
   `progress.py` warns about it.
+- **splat can silently merge two functions into one `glabel` when the
+  segment around them shrinks.** After `psyq_SpuSetMute`'s first chunk,
+  `func_80038B18` (`libapi/a07`, four instructions ending `jr $t2` — a BIOS
+  trampoline with no `jr $ra`) and `func_80038B28` became one
+  `glabel func_80038B18, 0x1B0` in the new remainder file. Harmless when the
+  next chunk converts both, but if such a pair ever straddles a boundary you
+  keep, the second function loses its label and its name; check the new
+  remainder's `glabel` count against the old segment's over that range.
 - `./build-and-verify.sh`. An `undefined reference` from a `lib/` object
   means the fragment is stale (re-run `ldfrag`) or the referenced symbol is
   resolved at two different addresses by different objects (the fragment

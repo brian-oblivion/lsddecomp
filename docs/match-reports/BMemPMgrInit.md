@@ -6,7 +6,7 @@
 
 Creates a `BMemPMgr` memory pool: clamps `poolSize` up to a minimum of
 `0x400`, allocates `poolSize + 0x20` bytes from the game's generic heap
-(`func_80011D34`, Psy-Q SDK, `asm/psyq_2258.s`), and if that succeeds,
+(`func_80011D34`, Psy-Q SDK, `the 0x2258..0x8220 Psy-Q block (now linked from lib/, formerly asm/psyq_2258.s)`), and if that succeeds,
 initializes the pool header (`freeListHead = pool + 0x1C`, `poolSize`) and
 hands off to `func_80017AC8` (gp_rel-blocked, see its own report) to build
 the initial single free block covering the rest of the allocation. On

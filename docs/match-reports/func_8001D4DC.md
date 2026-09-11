@@ -23,7 +23,7 @@ build a local copy of that quad:
 - `a2 == 0`: copy the whole quad verbatim.
 
 The result (plus `a1`, forwarded unexamined) is passed to
-`func_800160B0` (`asm/psyq_2258.s`, PsyQ library, not decompiled in this
+`func_800160B0` (`the 0x2258..0x8220 Psy-Q block (now linked from lib/, formerly asm/psyq_2258.s)`, PsyQ library, not decompiled in this
 project).
 
 ## Source
