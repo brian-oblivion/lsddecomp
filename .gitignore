@@ -23,6 +23,9 @@ asm/
 build/
 expected/
 *.ld
+# ...except the GENERATED-but-committed Psy-Q fragment: the link needs it and a
+# clone without the SDK discs cannot regenerate it (psyq_sdk.py ldfrag).
+!config/psyq-objects.ld
 config/undefined_funcs_auto.*.txt
 config/undefined_syms_auto.*.txt
 ctx.c

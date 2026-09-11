@@ -53,8 +53,19 @@ parasite-eve-2-decomp does. Full record in
   shape-matched module, keep the bytes as asm). `extract_exe.py` learned
   Mode 1 discs (3.0 is one).
 
-**Next.** Convert the covered blocks (`psyq_PadInit`, the covered parts of
-`psyq_2258`, the 60 objects in game segments) — each object with data
+- **Second conversion, with data sections: `psyq_15d04` + `psyq_PadInit`
+  -> nine objects, byte-exact.** `.data`/`.rdata`/`.sdata` place cleanly
+  (`psyq_sdk.py place` derives the yaml lines from the object's relocations).
+  bss does not: Sony's linker scattered library variables across objects
+  (`pad_buf 0x8008B3C8`, `PadIdentifier 0x8008E984` from one 8-byte
+  `.bss`), so `psyq_sdk.py ldfrag` generates `config/psyq-objects.ld` —
+  NOLOAD placement plus per-symbol pins, and pins for the externals the
+  objects call. `libgs/gs_125` was a FALSE placement (its 4-instruction
+  getter is `vmode`'s `GetVideoMode`); `match`/`install` now catch
+  overlaps. Recipe for runners: `docs/SDK-OBJECTS-GUIDE.md`.
+
+**Next.** Convert the covered blocks (the covered parts of `psyq_2258` and
+`psyq_SpuSetMute`, the 60 objects in game segments) — each object with data
 sections needs its `.rdata`/`.data`/`.sbss`/`.bss` placed, which is the real
 work. Then the older disc for `libgpu`/`libcd`/`libgte`/`libspu`.
 

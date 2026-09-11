@@ -345,10 +345,29 @@ def main():
           f"  [{library_matched} matched, {library - library_matched} to go]")
     # Functions inside `o` segments have no asm and are not counted above: the
     # linker takes them straight from Sony's objects. Report the objects.
-    o_segs = len(re.findall(r"^\s+- \[\s*0x[0-9A-Fa-f]+\s*,\s*o\s*,", YAML.read_text(), re.M))
-    if o_segs:
-        print(f"    linked from SDK objects:  {o_segs:5d}  objects (lib/, per config/psyq-objects.txt;"
+    o_text = len(re.findall(r"^\s+- \[\s*0x[0-9A-Fa-f]+\s*,\s*o\s*,\s*[\w/]+\s*\]", YAML.read_text(), re.M))
+    if o_text:
+        print(f"    linked from SDK objects:  {o_text:5d}  objects (lib/, per config/psyq-objects.txt;"
               f" not in any count above)")
+    # What the remaining psyq_* disassembly could become. sdk/work/*/match.txt
+    # is the discovery corpus `tools/psyq_sdk.py match` writes; absent on a
+    # checkout without the SDK discs, in which case this line is skipped.
+    placed = []
+    for mfile in (ROOT / "sdk/work").glob("*/match.txt"):
+        for line in mfile.read_text().splitlines():
+            m = re.match(r"\S+\s+text=0x([0-9a-f]+)\s+fileoff=0x([0-9a-f]+)", line)
+            if m:
+                off = int(m.group(2), 16)
+                placed.append((off - FILE_BASE + VRAM_BASE, off + int(m.group(1), 16) - FILE_BASE + VRAM_BASE))
+    if placed and library:
+        owned = 0
+        for f in sorted(ROOT.glob("asm/psyq_*.s")):
+            for fm in re.finditer(r"^glabel \w+\n\s+/\* [0-9A-F]+ ([0-9A-F]{8}) ", f.read_text(), re.M):
+                a = int(fm.group(1), 16)
+                if any(lo <= a < hi for lo, hi in placed):
+                    owned += 1
+        print(f"      convertible now:        {owned:5d}  still-asm SDK functions a placed object owns"
+              f"  ({library - owned} have no object on any disc in sdk/)")
     print(f"  total functions:            {total:5d}  ({game} game)")
     if handwritten and game:
         # Keep hand-written asm inside the game denominator and report the

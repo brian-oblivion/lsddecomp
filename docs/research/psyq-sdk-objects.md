@@ -172,6 +172,51 @@ and a module's exported symbols and their order are stable between adjacent
 builds, so the functions can be named from the 3.3/3.5 object even where the
 bytes cannot be linked. That is a symbol pass, not a matching problem.
 
+## Second conversion: a block WITH data sections, and what bss really looks like
+
+`psyq_15d04` + `psyq_PadInit` (`0x15D04..0x16334`, `0x166AC..0x1677C`)
+became nine objects: `libetc/vmode intr_dma intr_vb vsync`, `libc2/puts`,
+`libetc/pad`, `libapi/a20 a21 a22`. Byte-exact after two iterations.
+
+**Data sections place cleanly.** `psyq_sdk.py place` derives each section's
+retail address from the object's own HI16/LO16, `R_MIPS_32` and `GPREL16`
+relocations read against retail, and confirms with a byte search. The four
+libetc `.data` sections are consecutive (`0x5DB0C`, `+4`, `+0x28`, `+0x28`)
+exactly as the linker laid them; `intr_dma`/`vsync` `.rdata` are the two
+strings at `0xF28`/`0xF54` that the old rodata slot held; `puts` `.sdata` is
+the 7-byte `"<NULL>"` at `0x7B040`.
+
+**bss does NOT.** `libetc/pad`'s `.bss` is 8 bytes — `pad_buf` at +0,
+`PadIdentifier` at +4 — and retail has them at `0x8008B3C8` and
+`0x8008E984`. `libgs` variables interleave the same way (`HWD0 0x8008E980`,
+`PadIdentifier 0x8008E984`, `GsIDMATRIX 0x8008E98C`). Sony's linker
+allocated uninitialised variables one at a time across all objects. So an
+object's NOBITS section cannot be placed as a unit, and the yaml never tries:
+`psyq_sdk.py ldfrag` generates `config/psyq-objects.ld`, linked BEFORE the
+splat script, which (a) places each NOBITS section `(NOLOAD)` where its
+section-relative references demand, and (b) pins every bss variable by name.
+GNU ld lets a linker-script assignment override an object's own definition
+— tested on `pad.o`'s WEAK `PadIdentifier` and `vsync.o`'s GLOBAL `Hcount`,
+and the object's own `lui`/`sw` then use the pinned address. (c) The same
+fragment pins the externals the linked objects call and nothing yet defines
+(`printf`, `putchar`, `InterruptCallback`, `ResetCallback`, `ChangeClearPAD`,
+`ChangeClearRCnt`), each to the address retail's code calls. A wrong pin
+changes an instruction, so it cannot pass the SHA1.
+
+**A false placement, caught by the glabels.** `libgs/gs_125` (`GsGetWorkBase`,
+four instructions) "matched" at `0x15D1C` — which is `GetVideoMode`, the
+second function of `libetc/vmode`, whose masked bytes are identical. The
+corpus has seven such overlaps (`bcopy`/`memcmp`, `s_r`/`s_w`, `gs_111`/
+`gs_112`, `libapi/c112`/`libcard/c112`, ...). `match` now prints them and
+`install` refuses an overlapping manifest; the tie-break is the segment's own
+function list.
+
+**Tooling added for this**: `psyq_sdk.py place`, `symbols` (retail address of
+every SDK symbol the corpus defines or references — 548 names, 4 conflicts,
+which is also the raw material for the naming pass), `ldfrag`, disc
+preference `3.3 > 3.5 > 3.6 > 3.0`, and `check` verifying the fragment is
+current. The runner-facing recipe is `docs/SDK-OBJECTS-GUIDE.md`.
+
 ## What is next
 
 1. **Text-only, fully covered blocks first**: `psyq_PadInit` (libetc `pad`),
