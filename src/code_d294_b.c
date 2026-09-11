@@ -34,7 +34,7 @@ s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
  * into a local copy (the 4th short left uninitialised, exactly as retail's
  * own negate path never stores to it) or copying the quad verbatim, then
  * forwards the result -- plus a1, passed straight through -- to the PsyQ
- * helper func_800160B0. */
+ * helper RotMatrix. */
 void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
     S16Quad_d294 buf;
     S16Quad_d294 *src = &self->unk14->unk44->vec;
@@ -46,7 +46,7 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
     } else {
         buf = *src;
     }
-    func_800160B0(&buf, a1);
+    RotMatrix(&buf, a1);
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->unk20 is set and
@@ -220,7 +220,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
  * self->unkC list (each node's own +0x84 slot combined into buf1 via
- * func_80015BFC) before using buf1 as func_8001EE04's own "out" argument,
+ * MulMatrix2) before using buf1 as func_8001EE04's own "out" argument,
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
 void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
@@ -234,7 +234,7 @@ void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 
     if (node != NULL) {
         do {
             node->methods->slot84(node, buf2, 1);
-            func_80015BFC(buf2, buf1);
+            MulMatrix2(buf2, buf1);
             node = node->next;
         } while (node != NULL);
     }

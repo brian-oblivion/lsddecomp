@@ -104,7 +104,7 @@ extern void func_80024D10(void);                              /* asm/psyq_GsLink
 extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void); /* asm/psyq_GsLinkObject4.s, per code_179d8_c.c */
 extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
-extern void func_80012C20(const char *fmt, ...);                /* Psy-Q printf wrapper */
+extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
 extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
 extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
 extern s32 func_80029478(void);                                /* asm/nonmatchings/code_179d8_b;

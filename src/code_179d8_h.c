@@ -100,7 +100,7 @@ typedef struct StatBuf179D8H {
  * func_8002B640 blocker-clean and assignable (re-screened with
  * `python3 tools/nearmiss.py`, 2026-09-08). */
 extern s32 func_8002B640(StatBuf179D8H *statBuf, char *path);
-extern void func_80012C20(const char *fmt, void *arg1);
+extern void printf(const char *fmt, void *arg1);
 extern char D_800107F4[];
 
 /* Forward declaration: func_800289CC is defined later in this file (ROM

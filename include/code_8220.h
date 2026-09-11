@@ -100,10 +100,14 @@ extern void *func_80017CFC(void *ptr);
  * materialise a spurious `move a1,s1`, one word too many. */
 extern void func_80017AC8(BMemPMgr *pool);
 
-/* Psy-Q SDK (asm/psyq_2258.s, not a carved C unit). */
-extern void *func_80011D34(s32 size);                              /* heap allocator behind BMemPMgrInit's fallback error path */
-extern void func_80012C20(const char *fmt, void *arg1, s32 arg2);  /* Psy-Q printf wrapper; BMemPMgrInit's only caller passes exactly 2 variadic args */
-extern s32 func_80011F68(void *ptr);                                /* marks the block header at ptr-4's low bit; func_80017AA8's sole callee */
+/* The Psy-Q declarations that used to sit here (func_80011D34 is malloc,
+ * func_80011F68 is free, func_80012C20 is printf) moved into src/code_8220.c
+ * when the SDK objects were linked. They are deliberately NOT shared:
+ * printf is variadic and five units each declare the argument shape their
+ * own call site passes, and malloc/free now have Sony's real names, so a
+ * copy in this header would collide with <malloc.h> in whichever sibling
+ * unit includes the SDK header first. See CLAUDE.md, "To include/ has one
+ * exception". */
 
 /* BasicClass list primitives, this unit. func_800181AC/func_80018208
  * stay INCLUDE_ASM this round; calling into a still-INCLUDE_ASM function

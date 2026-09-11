@@ -1,6 +1,21 @@
 #include "common.h"
 #include "code_8220.h"
 
+/* Psy-Q heap, linked from Sony's own object (`_obj/malloc`) rather than
+ * decompiled, so these carry Sony's exported names. The real prototypes are
+ * in <malloc.h>; they are restated here rather than included because no unit
+ * in this project pulls in the SDK headers yet. Local and not in
+ * code_8220.h deliberately -- that header is shared with five other units,
+ * and a second `free`/`malloc` declaration there would collide with
+ * <malloc.h> in whichever of them includes it first. */
+extern void *malloc(unsigned int size);
+extern void free(void *ptr);
+
+/* Psy-Q printf (libc2/printf). Variadic, and declared here with the argument
+ * shape THIS call site passes -- the project's four other printf call sites
+ * each declare their own, which is why no single declaration is shared. */
+extern void printf(const char *fmt, void *arg1, s32 arg2);
+
 void *BMemPMgrInit(s32 poolSize)
 {
     BMemPMgr *pool;
@@ -8,22 +23,22 @@ void *BMemPMgrInit(s32 poolSize)
     if ((u32)poolSize < 0x400) {
         poolSize = 0x400;
     }
-    pool = func_80011D34(poolSize + 0x20);
+    pool = malloc(poolSize + 0x20);
     if (pool != NULL) {
         pool->freeListHead = (u8 *)pool + 0x1C;
         pool->poolSize = poolSize;
         func_80017AC8(pool);
     } else {
-        func_80012C20(D_8001028C, NULL, poolSize);
+        printf(D_8001028C, NULL, poolSize);
     }
     return pool;
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017A9C);
 
-s32 func_80017AA8(void *ptr)
+void func_80017AA8(void *ptr)
 {
-    return func_80011F68(ptr);
+    free(ptr);
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017AC8);

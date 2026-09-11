@@ -65,7 +65,22 @@ segments:
     align: 4
     subsegments:
       # ---- rodata slots, paired by hand to the text blocks below ----------
-      - [0x800, rodata]   # psyq_2258
+      # The 0x800 slot is tiled exactly by four SDK objects as psyq_2258 is
+      # converted; the trailing plain `rodata` line shrinks each time a chunk
+      # lands its piece and disappears when libgte/geo takes 0xA68.
+      - [0x800, o, libgs/matrix, .rdata]      # print_matrix/print_vector formats
+      - [0x830, o, libc2/prnt, .rdata]        # printf's format-dispatch jump tables
+      - [0xA3C, o, libgs/2d_com1, .rdata]     # "z resolution overflow", 0x2A
+      # The string ends at 0xA66 and retail aligns the jump table after it to
+      # 4 (splat's own disassembly emits `.align 2` right here). 0xA66 is
+      # already 2-aligned, so SUBALIGN(2) would NOT insert those two bytes.
+      - [0xA66, pad]
+      # jtbl_80010268: geo's own switch jump table, 9 relocated words. A raw
+      # byte search cannot find relocated words, so `place` says
+      # `bytes:not-found`; the derived 0xA68 landing on the slot's existing
+      # dlabel is the confirmation. The 0x800 slot is now tiled exactly and
+      # psyq_2258 owns no plain rodata at all.
+      - [0xA68, o, libgte/geo, .rdata]
       - [0xA8C, rodata]   # code_8220
       - [0xABC, rodata]   # psyq_GsLinkObject4
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
@@ -208,7 +223,42 @@ segments:
       # (tools/progress.py LIBRARY_RANGES) and off the runner queues until the
       # game's own code is done.
       - [0x20DC, asm, main]
-      - [0x2258, asm, psyq_2258]
+      # psyq_2258 (0x2258..0x8220) is being converted to linked SDK objects a
+      # chunk at a time; the unconverted tail keeps a smaller `asm` segment
+      # named for its own start offset.
+      - [0x2258, o, _obj/malloc]      # _ExpAllocArea .. calloc (the heap)
+      # 0x2864..0x2F68 is func_80012064 ALONE, and no SDK disc places it, so
+      # it stays disassembly permanently rather than as a conversion tail.
+      - [0x2864, asm, psyq_2864]
+      - [0x2F68, o, libapi/c159]      # SetMem
+      - [0x2F78, o, libc2/bcopy]      # bcopy, bzero, bcmp
+      - [0x3038, o, libgs/matrix]     # GsInitCoordinate2 .. print_vector
+      - [0x3420, o, libc2/printf]     # printf
+      - [0x345C, o, libc2/prnt]       # prnt -- the formatter proper
+      - [0x3AF8, o, libc2/memchr]     # memchr
+      - [0x3B48, o, libc2/strlen]     # strlen
+      - [0x3B78, o, libc2/ctype]      # toupper, tolower
+      - [0x3BE0, o, libc2/putchar]    # putchar
+      - [0x3C88, o, libapi/a53]       # write
+      - [0x3C98, o, libgs/gs_134]     # GsGetLs
+      - [0x3F6C, o, libgs/gs_127]     # GsDefDispBuff2
+      - [0x3FEC, o, libgs/gs_013]     # GsSetOrign
+      - [0x4004, o, libgs/2d_sp0]     # GsSortSprite
+      - [0x4500, o, libgs/2d_com1]    # _make_packet
+      - [0x4594, o, libgs/2d_bg0]     # GsSortBg
+      - [0x4D8C, o, libgs/gs_119]     # gte_rotate_z_matrix
+      - [0x4E44, o, libgs/gs_120]     # gte_scale_matrix
+      - [0x4F68, o, libgs/gs_135]     # GsGetLws
+      - [0x5288, o, libgs/2d_box0]    # GsSortBoxFill
+      - [0x5360, o, libgs/2d_com0]    # _mk_spr_packet, _mk_xpndsp, _mk_normsp
+      - [0x58D0, o, libgte/mtx_00]    # CompMatrix .. ReadColorMatrix
+      - [0x62F0, o, libgte/mtx]       # MulMatrix .. SetTransMatrix
+      - [0x67B0, o, libgte/cmb_00]    # RotTransPers4
+      - [0x6830, o, libgte/reg01]     # ReadSZfifo3 .. ReadGeomScreen
+      - [0x68B0, o, libgte/fgo_01]    # RotMatrix
+      - [0x6B40, o, libgte/geo]       # RotMatrixZYX_C .. MatrixNormal_2
+      - [0x7D70, o, libgte/msc02]     # InvSquareRoot .. MatrixNormal
+      - [0x8010, o, libgte/smp_00]    # LightColor .. Lzc -- ends at code_8220
       # code_8220 is 56 functions, and it is the BasicClass block -- most of
       # its symbols are already named (BasicClass__*), so it is the most
       # legible uncarved ground in the game. First 20-function slice,
@@ -1203,8 +1253,31 @@ segments:
       # D_80066828. Declared `data` rather than `rodata` deliberately:
       # section_order puts .rodata FIRST, which would have relocated these
       # bytes to the top of the image.
+      # code_55dd4's own data is only the 0x18 bytes 0x57028..0x57040; what
+      # followed was libc2/ctype's `_ctype_` table, and the old 0x57070 split
+      # point was the MIDDLE of it, never a real boundary. The table's first
+      # byte is at 0x57040 and the `_ctype_` symbol itself at 0x57041, one
+      # past the start, because the table is indexed from EOF = -1.
       - [0x57028, data]
-      - [0x57070, data]
+      - [0x57040, o, libc2/ctype, .data]      # _ctype_, 0x81 bytes
+      # The splat script puts the whole image in ONE output section with
+      # SUBALIGN(2), which overrides each input section's own alignment. Where
+      # Sony's linker left an odd-sized hole GNU ld will not, so the next
+      # object's data would land early: a clean link and an SHA1 mismatch.
+      # `pad` emits `. += N;` and restores the 3 bytes after the 0x81 table.
+      - [0x570C1, pad]
+      - [0x570C4, data]                       # 8 bytes no placed object owns
+      - [0x570CC, o, libgs/2d_bg0, .data]     # 4 bytes
+      - [0x570D0, o, libgte/mtx_00, .data]    # 0x310, ends exactly at 0x573E0
+      # 0x573E0 is rcossin_tbl (vram 0x80066BE0), a DATA-ONLY libgte object:
+      # no .text, so no disc can place it and it is not convertible. Its bytes
+      # stay here; libgte/fgo_01 and libgte/geo reference it and the fragment
+      # pins it as an external.
+      - [0x573E0, data]
+      - [0x5B3E0, o, libgte/geo, .data]       # 0x802, the sine/cosine tables
+      - [0x5BBE2, pad]                        # 2 bytes; 0x802 is not 2-aligned
+      - [0x5BBE4, o, libgte/msc02, .data]     # 0x1A0
+      - [0x5BD84, data]
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]
       - [0x5DB38, o, libetc/intr_vb, .data]
@@ -1214,7 +1287,9 @@ segments:
       - [0x76DC8, data]              # class_39e08
       - [0x783dc, data]               # DreamSys's data slot
       - [0x79528, data]
-      - [0x7b008, sdata]
+      - [0x7B008, sdata]
+      - [0x7B010, o, libc2/prnt, .sdata]      # "(null)", 7 bytes
+      - [0x7B018, sdata]
       - [0x7B040, o, libc2/puts, .sdata]      # "<NULL>"
       - [0x7B048, sdata]
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
