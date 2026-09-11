@@ -30,7 +30,7 @@ still say the image matches retail after every step.
 | `PARTIAL OVERLAP` in `runs` output | decides which object is real (the segment's glabels) | reports it, skips the run |
 | `relocations DISAGREE` from `place` | decides (edit the object, or leave the run as asm) | reports, skips |
 | `NOTE:` lines from `ldfrag` (an extern resolved at two addresses) | decides | reports, skips |
-| a symbol name already taken in the symbols file, or a Sony name the game overrides (`ResetCallback`) | decides the name | reports, uses `func_*` meanwhile |
+| a symbol name already taken in the symbols file, or a `SUSPECT` placement in `runs` (a masked-call body that placed on the wrong function; `libsnd/ssinit_c`) | decides the name / rejects the placement | reports, uses `func_*` meanwhile, skips the run |
 | merge, regenerate `config/psyq-objects.ld` after merge, verify `main`, update `docs/PROGRESS.md` and the research doc | yes | — |
 
 Everything in the runner column is mechanical once the head has handed over a
@@ -69,12 +69,14 @@ merges next.
 
 ## Order, and how long
 
-Measured queue (`tools/psyq_sdk.py runs`, 2026-09-11): 189 objects in
-52 runs (alternates with identical bytes counted once). About 134 objects / 44 runs are in pure `psyq_*` segments
-(`psyq_2258`, `psyq_GsLinkObject4`, `psyq_SpuSetMute`, `psyq_memset`,
-`psyq_rand`); about 65 objects / 29 runs sit inside game units and need the
-unit split. Some runs are alternates of one another (identical bytes, shown as
-`a|b`) and a few are false positives, so the real count is a little lower.
+Measured queue (`tools/psyq_sdk.py runs`, 2026-09-11, after round 29's
+containment rule dropped the 25 finer-grained 3.5/3.6 pieces): 165 objects
+in 44 runs (alternates with identical bytes counted once), no overlaps.
+110 objects / 23 runs are in pure `psyq_*` segments (`psyq_2258`,
+`psyq_GsLinkObject4`, `psyq_SpuSetMute`, `psyq_memset`, `psyq_rand`);
+55 objects / 21 runs sit inside game units and need the unit split. Re-derive
+these with `runs` rather than trusting them; round 29 assigned `psyq_2258`
+(30 objects) to its runner, so the next measurement will be smaller.
 
 The two blocks already converted took one iteration (text-only) and two
 (data + bss) once the tooling existed. A runner that has the guide open should
@@ -120,15 +122,24 @@ owner. Phase 3 is whenever — it only adds names.
 > yours to convert. Entries written `a|b` are two objects with identical bytes:
 > link either, prefer the 3.3 disc. A `PARTIAL OVERLAP` line means one of the
 > two placements is a false positive — **do not guess; skip the run and put it
-> in your report.** Functions of the segment that no run covers stay as asm:
+> in your report.** A `SUSPECT` line means the object placed on the wrong
+> function (its calls resolve away from another object's definition): skip
+> that run too, and report it. The footer lists finer-grained placements
+> `runs` dropped in favour of a coarser object; link the coarse one, never the
+> pieces. Functions of the segment that no run covers stay as asm:
 > keep a smaller `asm` segment for them under a new `psyq_*` name and do NOT
-> try to match them as C.
+> try to match them as C. Convert a run of more than about ten objects in
+> chunks at object boundaries, one commit each, with the unconverted tail as
+> a temporary `psyq_<fileoff>` asm segment.
 >
 > **Per run, in this order — the guide has the details and the exact
 > commands.** (1) `psyq_sdk.py place <objects>` for the data sections; take
 > the lines whose byte search agrees, stop on `relocations DISAGREE`.
 > (2) append the manifest lines, `psyq_sdk.py install`. (3) yaml: text `o`
-> lines, rodata/data/sdata slot splits; never place `.bss`/`.sbss`.
+> lines, rodata/data/sdata slot splits; never place `.bss`/`.sbss`. Do the
+> `start + size` arithmetic for every data section first: the script's
+> `SUBALIGN(2)` means a 2- or 3-byte hole before the next object needs a
+> `- [0xOFF, pad]` line (guide, step 4) or the next section lands early.
 > (4) `psyq_sdk.py ldfrag`. (5) symbol names from `psyq_sdk.py symbols`
 > (`:def` lines in your range) into the symbols file; rename callers
 > (`grep -rn func_XXXXXXXX src include`). Weak duplicates such as `memclr`
