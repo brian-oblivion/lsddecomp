@@ -53,6 +53,28 @@ overlapping manifest.
 Prefer the 3.3 disc when several discs place the same object (identical bytes;
 3.3 is the build closest to the game's).
 
+**`runs` already does the tiling check for you, and two things it prints
+are decisions, not information** (both added 2026-09-11, round 29):
+
+- Its footer lists placements it DROPPED because they lie strictly inside a
+  coarser object's span. Every `PARTIAL OVERLAP` the corpus ever produced
+  was this: the 3.5/3.6 discs split one 3.3 module into several
+  (`libgte/mtx_00` -> `mtx_003 mtx_004 mtx_005 mtx_006 mtx_008 mtx_00b`;
+  `libc2/bcopy` -> `bcopy bzero memcmp`; `libsnd/ssplay` -> `playmode ssplay
+  ssplayb`), or a four-instruction false positive equals a piece of a real
+  object (`libgs/gs_125` inside `libetc/vmode`). The coarse object tiles the
+  range exactly and the fine ones leave gaps, so link the coarse one and
+  never the pieces. The `awk` loop above still shows the pieces; `runs`
+  does not.
+- A `SUSPECT` line under a run means one of that object's CALLS, read out
+  of retail, resolves to an address where no placed object defines the
+  callee while another placed object defines it somewhere else. Masking
+  hides call targets from the byte match, so a prologue/three-`jal`/epilogue
+  body places uniquely and can still be the wrong function
+  (`libsnd/ssinit_c` at `0x18540`: its `ResetCallback` call lands on a
+  four-instruction flag setter in game code). Do not convert a `SUSPECT`
+  run; report it.
+
 ## Step 2 — data sections
 
 ```sh
@@ -68,7 +90,35 @@ search confirming the bytes are there. Read the output:
   Stop and report — this needs a head decision (parasite-eve-2 hand-edited
   objects for this).
 - `.bss`/`.sbss` lines are informational: bss is NOT placed in the yaml.
-  The fragment handles it (step 5).
+  The fragment handles it (step 5). That includes a `.bss: relocations
+  DISAGREE` line -- `place` counts references to NAMED bss symbols, which
+  the fragment pins individually, so the disagreement that matters is the
+  one `ldfrag` reports as a `NOTE:` (section-relative references, i.e.
+  static variables, scattered by Sony's linker; `libgs/gs_001 gs_002 gs_003`
+  are the known cases).
+- `bytes:not-found` on a `.rdata`/`.data` section whose object has a
+  `.rel.rdata`/`.rel.data` section (`readelf -SW lib/<x>.o`) is EXPECTED:
+  the section holds relocated words (a `switch` jump table, a pointer
+  table, the libetc interrupt callback tables) and a raw byte search cannot
+  see through them. The derived offset is the evidence -- it lands on the
+  slot's existing `dlabel` (`libc2/prnt` `.rdata` at `0x830` =
+  `jtbl_80010058`). Take the line.
+- `no relocation names it` on a PROGBITS section means nothing in the
+  object's own text reads it. If the byte search finds it exactly once
+  (`libgs/2d_bg0` `.data`, 4 bytes at `0x570CC`) place it; if it finds it
+  several times or not at all (`libcd/c_00x` `.data`, 0x10 bytes, four
+  hits) leave it OUT of the yaml -- the splat script's trailing `/DISCARD/`
+  drops the unreferenced input section and retail's bytes stay in the plain
+  data slot. Either way the image is byte-exact.
+- **A section can be right by derivation and WRONG by bytes because the
+  disc's build differs from the game's in that section only.** `libetc/intr`
+  (3.3): text places, `.data` derives, but `.rdata` holds the RCS string
+  `intr.c,v 1.71 1995/08/29` where retail has `1.73 1995/11/10` -- and the
+  3.5 disc, whose string matches, has different TEXT. Neither object links
+  whole. The remedy is a NOLOAD *shadow* of the object's section at its
+  retail address in the fragment (so the object's relocations resolve there)
+  while the bytes stay in splat's plain slot; see the research doc for the
+  measurement. That is a head decision, not a runner step.
 
 ## Step 3 — manifest and objects
 
@@ -94,6 +144,37 @@ In `config/splat.slps01556.lsdde.yaml`:
   object. Object data sections are consecutive in retail when they were
   linked consecutively, so the run usually has no gaps.
 - Never place `.bss`/`.sbss` in the yaml.
+- **Byte gaps need a `pad` line, because `SUBALIGN(2)` is in charge.** The
+  splat script puts the whole image in one output section with
+  `SUBALIGN(2)`, which overrides every input section's own alignment
+  (the converted objects all claim 8). So an object whose section ends on
+  an odd or 2-mod-4 address is followed by the next section at the next
+  EVEN address, wherever Sony's linker actually put it. Where retail has a
+  2- or 3-byte hole (`libc2/ctype` `.data` is 0x81 bytes, `libgs/2d_com1`
+  `.rdata` 0x2A, `libgte/geo` `.data` 0x802) add splat's `pad` subsegment,
+  which emits `. += N;`:
+
+  ```yaml
+      - [0x570C1, pad]                          # 3 bytes after ctype's table
+      - [0x570C4, data]
+  ```
+
+  Measured on the live build: without the pad the next section lands
+  early, the link is clean and the SHA1 fails; with it the image is exact.
+  Do the arithmetic (`start + size`, then the next object's start) for
+  every data section in the run before the first build.
+- **A data-only object cannot be placed and is not yours to convert.**
+  `libgte`'s `rcossin_tbl` (`0x573E0`, vram `0x80066BE0`) has no `.text`,
+  so no disc places it; its bytes stay in the plain `data` slot and
+  `ldfrag` pins the name as an external because placed objects reference
+  it. Do not go looking for the object.
+- **Convert a long run in chunks, one commit each.** A 29-object run
+  (`psyq_2258`) is too much yaml to debug at once. Split at object
+  boundaries; the unconverted tail stays as a temporary `asm` segment named
+  `psyq_<fileoff>`, and the rodata/data slots keep a plain remainder line
+  until the chunk that owns those bytes lands. `make extract` emits a
+  top-level `asm/psyq_<fileoff>.s` for each temporary name; delete it when
+  the next chunk retires the name.
 
 ## Step 5 — the fragment, names, and the oracle
 

@@ -217,6 +217,93 @@ which is also the raw material for the naming pass), `ldfrag`, disc
 preference `3.3 > 3.5 > 3.6 > 3.0`, and `check` verifying the fragment is
 current. The runner-facing recipe is `docs/SDK-OBJECTS-GUIDE.md`.
 
+## Round 29 (2026-09-11): the corpus's overlaps are one pattern, and three placement failure classes have remedies
+
+Head-side measurements made while the first conversion runner worked
+`psyq_2258`. Each was either turned into tooling or recorded as a decision.
+
+**Every `PARTIAL OVERLAP` was a coarse 3.3 module against its own 3.5/3.6
+pieces.** Ten containers, twenty-five contained placements, zero exceptions:
+`libgte/mtx_00` (0xA20 bytes) against `mtx_003 mtx_004 mtx_005 mtx_006
+mtx_008 mtx_00b`; `libgte/mtx` against `mtx_05 mtx_09 mtx_10 mtx_11 mtx_12`;
+`libgte/geo` against `cor_00 geo_03`; `libc2/bcopy` (bcopy+bzero+bcmp, 0xC0)
+against `bzero memcmp`; `libsnd/ssplay` against `playmode ssplayb`;
+`libsnd/ut_rev` against `ut_rdel ut_rdep ut_rfb`; `libsnd/pause` against
+`npause`; `reg01`/`reg08`, `reg03`/`reg10 reg11`; and the one true false
+positive, `libgs/gs_125` inside `libetc/vmode`. In each case the coarse
+object's span tiles the range exactly and the pieces leave gaps (3.5's
+`ut_rev` split starts 0x40 bytes after 3.3's `ut_rev`). `placed_objects()`
+now drops any placement strictly contained in another; `runs` lists what it
+dropped. Coverage is unchanged by construction (254/681), the
+`GsOUT_PACKET_P` symbol conflict vanished with `gs_125`, and the queue went
+from 189 objects / 52 runs to 165 / 44 with no overlap lines.
+
+**A masked-call body can place uniquely and still be the wrong function.**
+`libsnd/ssinit_c` (3.5; `ssinit_h` has identical bytes) is twelve
+instructions: prologue, three `jal`s, epilogue. It placed once, at `0x18540`
+in `code_179d8`. But `symbols` reported `ResetCallback` at two addresses:
+`libetc/intr` DEFINES it at `0x80024D10` (and the already-linked `libetc/pad`
+calls it there), while `ssinit_c`'s first `jal` resolves to `0x800280D0`,
+which is a four-instruction function that stores 1 to a `$gp`-relative flag.
+So the placement is a false positive by shape, and the RUNS doc's "a Sony
+name the game overrides (`ResetCallback`)" was this artefact, not an
+override. `runs` now prints `SUSPECT` under any run whose object's call
+resolves away from another placed object's definition. `func_80027D40` and
+its neighbours (`func_80028218` calls the same flag setter first) are the
+game's libsnd build, which no disc has.
+
+**An object can be right in text and wrong in one data section, and a
+NOLOAD shadow fixes it byte-exactly.** `libetc/intr`: the 3.3 object's text
+places at `0x15510` and its `.data` (0x109C, the callback tables) derives to
+`0x5CA70`, but its `.rdata` holds `$Id: intr.c,v 1.71 1995/08/29` where
+retail has `1.73 1995/11/10` — the 3.5 disc has that string and different
+text. Neither object links whole. Mapping the 3.3 object's `.rdata` as a
+NOLOAD section at `0x800106BC` (the address its own relocations derive)
+makes its references resolve there while the image bytes come from splat's
+plain rodata slot, which still holds retail's. Measured in a throwaway
+worktree: first attempt three bytes off, all `+4`, because the fragment's
+section had no `SUBALIGN` and the object claims alignment 8; with
+`SUBALIGN(2)` zero bytes differ. `ldfrag` now emits shadows from a manifest
+annotation (`3.3 libetc/intr 0x15510 shadow=.rdata`) and puts `SUBALIGN(2)`
+on every fragment section. `psyq_GsLinkObject4`'s last run (13 objects,
+`0x153C0..0x15D04`) is therefore convertible in full; the shadow is the
+head's decision and is recorded here so the runner does not have to make it.
+
+**`SUBALIGN(2)` is also why byte gaps need `pad` lines in the yaml.** Sony's
+linker aligned each object's data to (at least) 4; splat's script forces
+input alignment to 2, so after a section of size 0x81 (`libc2/ctype`
+`.data`), 0x2A (`libgs/2d_com1` `.rdata`) or 0x802 (`libgte/geo` `.data`)
+the next object lands 2–3 bytes early. splat's `pad` subsegment emits
+`. += N;`; verified on the live build at the pilot's own `0xF53..0xF54`
+boundary. The guide's step 4 has the three `psyq_2258` instances.
+
+**Three `libgs` objects need editing, or stay asm.** The fragment's plan
+for `psyq_GsLinkObject4` carries three `NOTE`s: `gs_001`, `gs_002` and
+`gs_003` each have a `.bss` whose SECTION-RELATIVE references (static
+variables) derive to several addresses — Sony's linker scattered the
+statics too, and a static cannot be pinned by name. This is exactly the
+case parasite-eve-2 hand-edited objects for. Options: split each `.bss`
+into one section per static (an install-time object rewrite), or leave the
+three objects as asm remainders inside their runs. Operator's call; nothing
+else in the four segments carries a NOTE (`psyq_2258` 0, `psyq_SpuSetMute`
+0, `psyq_memset`+`psyq_rand` 0).
+
+**`libcd/iso9660` carries a WEAK `memcpy`.** `symbols` reports `memcpy`
+defined at `0x800238A8` (`libc2/memcpy`, GLOBAL) and `0x8002C014`
+(`iso9660`, WEAK). Linking both as-is makes iso9660's internal calls resolve
+to libc2's copy — a clean link and wrong bytes. An install-time
+`objcopy -L memcpy` on iso9660 (localise the symbol) is the mechanical fix;
+phase 2, since iso9660 sits in a game unit.
+
+**Two worktree defects, both found by the worktree's own verification
+build.** `find lib` does not descend into a symlinked directory, so
+`LIB_FILES` was empty in every worktree and the link failed on the first
+`build/lib/*.o`; `.gitignore`'s `lib/` matched only a directory, so the
+symlink showed as untracked. And `setup-worktree.sh` never linked `sdk/`, so
+`install`/`place`/`runs`/`symbols` saw an empty corpus there (the runner
+linked the zips and `sdk/work` by hand; the script now does). Round 28 was
+head-alone, so this was the first worktree since the SDK objects landed.
+
 ## What is next
 
 1. **Text-only, fully covered blocks first**: `psyq_PadInit` (libetc `pad`),
