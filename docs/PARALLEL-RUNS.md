@@ -1551,6 +1551,40 @@ Round 17 found **72** non-blocker scored near-misses this way, only 4 of them
 already permuter-exhausted — a bigger and better-posed queue than the cold
 ground remaining in the whole executable.
 
+**AND SCREEN THEM FOR SONY OWNERSHIP, which no blocker grep can see (round
+32).** Fourteen functions in this queue — 1669 words, ~4100 lines of
+accumulated derivation between them — lay FULLY inside Psy-Q objects already
+placed and verified against retail. They are not blocked; they are not game
+code. No source shape reaches a match, so every attempt on one is spent for
+certain.
+
+```sh
+python3 tools/sdkstalls.py           # stall queue crossed against placed objects
+```
+
+`nearmiss.py` now runs this itself and excludes the hits from `ASSIGN FROM
+HERE`, so an assignment taken straight off that list is safe. Run the tool
+directly when you CARVE, or when you are adjudicating one report's verdict
+rather than picking from the ranked list.
+
+**Why this class is worth its own screen: it passes all the others, and in the
+flattering direction.** An SDK-owned function has no `gp_rel`, no `mflo`/`mfhi`
+hazard and no `jr $t2` trampoline, so it reads as the cleanest ground in the
+queue. That is precisely the BIOS-trampoline finding from Gate 2 (`class_3bb8c_h`
+screening 15-of-17 clean while holding two workable functions), arriving in
+Gate 1b — and the general shape this document keeps rediscovering: **a screen
+measures the obstruction it was built for, and says nothing about the ones it
+was not.**
+
+The rule itself was never missing. CLAUDE.md has said "never write C for a
+function a Sony object owns" since round 28 and named the command;
+`psyq_sdk.py coverage` has been printing the overlap under a heading that
+literally reads "SDK code miscounted as game". What was missing was that
+checking meant reading a 60-line object list against a 200-line queue by hand,
+per round, and noticing an overlap in hex — so it degraded to a judgement call
+about whether a function "smells like a library". One of the fourteen is a 3×3
+matrix transpose and one is `atoi`.
+
 **Screen those candidates against the ASM before assigning them, even though
 they already have reports.** Filtering on the report's own prose is not the
 same check and it is weaker: round 17's first pass keyed on words like

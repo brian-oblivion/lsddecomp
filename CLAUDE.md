@@ -321,12 +321,38 @@ Gate 2.
   build links those objects themselves through splat `o` segments, exactly as
   the game did, and byte-exactly (proven 2026-09-11 with eight `libgte`
   objects; `docs/research/psyq-sdk-objects.md`). Consequences:
-  - **Never write C for a function a Sony object owns.** Before working any
-    `psyq_*` function, or any game-segment function that smells like a
-    library (string ops, sound driver internals, BIOS stubs, GTE helpers), run
-    `.venv/bin/python3 tools/psyq_sdk.py coverage` — it lists the placed
-    objects that fall inside GAME segments. Round 20 matched `func_8003FC70`
-    as game code; it is `libgs/gs_108.o`.
+  - **Never write C for a function a Sony object owns.** Round 20 matched
+    `func_8003FC70` as game code; it is `libgs/gs_108.o`.
+
+    **Do not screen for this by smell — run the tool.** This rule used to say
+    to check "any game-segment function that smells like a library (string
+    ops, sound driver internals, BIOS stubs, GTE helpers)", which is a
+    judgement call made before you know what the function does, and round 32
+    measured what it costs: **14 live stalled functions, 1669 words, ~4100
+    lines of accumulated derivation**, every one lying FULLY inside an object
+    already placed and verified against retail. One of them was a 3×3 matrix
+    transpose (`libgte/fgo_00.o`) and one was `atoi`.
+
+    ```sh
+    python3 tools/sdkstalls.py     # the stall queue crossed against placed objects
+    ```
+
+    `nearmiss.py` runs it for you and excludes the hits from `ASSIGN FROM
+    HERE`, so a Gate 1b assignment is safe without thinking about it. Run
+    `sdkstalls.py` directly when you carve, or before believing any single
+    report's verdict.
+
+    **These pass every blocker screen** — no `gp_rel`, no `mflo`/`mfhi`
+    hazard, not a trampoline — so they read as the CLEANEST ground in the
+    queue while being unmatchable by construction. That is the BIOS-trampoline
+    lesson from Gate 2 arriving in Gate 1b: a screen measures the obstruction
+    it was built for and says nothing about the ones it was not.
+
+    `.venv/bin/python3 tools/psyq_sdk.py coverage` remains the underlying
+    source of truth and prints the same overlap under the heading "Placed
+    objects that fall inside GAME-code segments (SDK code miscounted as
+    game)". It had been printing it correctly the whole time; nobody crossed
+    it against the queue.
   - **The game mixed library builds.** `libetc` is the build on the 3.5 disc;
     `libgpu`/`libcd` carry RCS ids from December 1995 and match neither the
     3.5 nor the 3.6 disc. Which disc owns which object is MEASURED by
@@ -662,6 +688,7 @@ tools/setup-worktree.sh <name>     # provision a parallel runner
 .venv/bin/python3 tools/psyq_sdk.py install    # sdk/ discs -> lib/ objects (setup.sh runs it)
 .venv/bin/python3 tools/psyq_sdk.py match      # place every SDK object in retail
 .venv/bin/python3 tools/psyq_sdk.py coverage   # which SDK functions are already owned by an object
+python3 tools/sdkstalls.py         # stalled functions that are really Sony library code
 .venv/bin/python3 tools/psyq_sdk.py check      # manifest, yaml `o` segments and lib/ agree
 ```
 
