@@ -35,3 +35,11 @@
 3.3  libapi/a22      0x1674C
 3.3  libapi/a20      0x1675C
 3.3  libapi/a21      0x1676C
+
+# psyq_2258 (0x2258..0x8220), converted chunk by chunk.
+# Chunk A: the libapi heap allocator. `_obj/` is a loose .OBJ on the disc that
+# is not a member of any .LIB. Its .sbss (0x20 at 0x8008AC28) and its 0x10
+# .bss are placed by config/psyq-objects.ld, never in the yaml -- `place`
+# reports `relocations DISAGREE` for the .bss precisely because Sony's linker
+# scattered its two variables (0x8008E284 and 0x8008E888).
+3.3  _obj/malloc    0x2258

@@ -8,11 +8,17 @@
  * object's own definition). NOLOAD: none of this is in the executable image. */
 SECTIONS {
     .psyq_bss.libetc_pad_bss 0x8008B3C8 (NOLOAD) : { build/lib/libetc/pad.o(.bss) }   /* 0x8 bytes; section-relative refs */
+    .psyq_bss._obj_malloc_sbss 0x8008AC28 (NOLOAD) : { build/lib/_obj/malloc.o(.sbss) }   /* 0x20 bytes; section-relative refs */
+    .psyq_bss._obj_malloc_bss 0x8008E284 (NOLOAD) : { build/lib/_obj/malloc.o(.bss) }   /* 0x10 bytes; first symbol SearchPoint */
 }
+SearchPoint = 0x8008E284;   /* _obj/malloc */
+TopAllocArea = 0x8008E890;   /* _obj/malloc */
 PadIdentifier = 0x8008E984;   /* libetc/pad */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
+bcopy = 0x80012778;
+bzero = 0x800127AC;
 printf = 0x80012C20;
 putchar = 0x800133E0;
 ResetCallback = 0x80024D10;

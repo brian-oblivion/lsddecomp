@@ -208,7 +208,13 @@ segments:
       # (tools/progress.py LIBRARY_RANGES) and off the runner queues until the
       # game's own code is done.
       - [0x20DC, asm, main]
-      - [0x2258, asm, psyq_2258]
+      # psyq_2258 (0x2258..0x8220) is being converted to linked SDK objects a
+      # chunk at a time; the unconverted tail keeps a smaller `asm` segment
+      # named for its own start offset.
+      - [0x2258, o, _obj/malloc]      # _ExpAllocArea .. calloc (the heap)
+      # 0x2864..0x2F68 is func_80012064 ALONE, and no SDK disc places it, so
+      # it stays disassembly permanently rather than as a conversion tail.
+      - [0x2864, asm, psyq_2864]
       # code_8220 is 56 functions, and it is the BasicClass block -- most of
       # its symbols are already named (BasicClass__*), so it is the most
       # legible uncarved ground in the game. First 20-function slice,
