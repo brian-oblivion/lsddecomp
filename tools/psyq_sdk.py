@@ -712,6 +712,62 @@ def cmd_ldfrag(args):
         print("  NOTE:", note)
 
 
+def cmd_runs(_args):
+    """The conversion work queue: for every segment that still holds placed
+    objects, the contiguous RUNS of objects (one run = one conversion step),
+    with data/bss flags and overlapping (false-positive) placements marked."""
+    from elftools.elf.elffile import ELFFile
+    segs = yaml_segments()
+    placed = placed_objects()
+    # Objects with IDENTICAL spans have identical bytes (libc/a56 == libc2/exit):
+    # either links; show them as one entry "a|b" and let the converter pick.
+    by_span = defaultdict(list)
+    for name, (ver, off, size) in placed.items():
+        by_span[(off, off + size)].append((name, ver))
+    objs = sorted((a, b, "|".join(n for n, _ in sorted(v)), v[0][1]) for (a, b), v in by_span.items())
+
+    def secs(name, ver):
+        name = name.split("|")[0]
+        with open(WORK / ver / "elf" / f"{name}.o", "rb") as f:
+            return {sec.name for sec in ELFFile(f).iter_sections()
+                    if sec.name in (".data", ".rdata", ".sdata", ".bss", ".sbss")}
+
+    total_runs = total_objs = 0
+    for i, (off, kind, sname) in enumerate(segs):
+        if kind == "o":
+            continue
+        end = segs[i + 1][0] if i + 1 < len(segs) else 0x7B800
+        inside = [o for o in objs if o[0] >= off and o[0] < end]
+        if not inside:
+            continue
+        where = "SDK asm" if sname.startswith("psyq_") else f"GAME unit ({kind})"
+        print(f"\n{sname}  0x{off:X}..0x{end:X}  [{where}]  {len(inside)} placed objects")
+        run = []
+        runs = []
+        for o in inside:
+            if run and o[0] > run[-1][1]:      # a gap; an overlap (o[0] < end) stays in the run and is flagged
+                runs.append(run)
+                run = []
+            run.append(o)
+        runs.append(run)
+        for r in runs:
+            flags = []
+            for a, b in zip(r, r[1:]):
+                if b[0] < a[1]:
+                    flags.append(f"PARTIAL OVERLAP {a[2]} vs {b[2]} -- a false positive; the segment's glabels decide")
+            secflags = set()
+            for o in r:
+                secflags |= secs(o[2], o[3])
+            tag = " ".join(sorted(secflags)) or "text-only"
+            names = " ".join(o[2] for o in r)
+            print(f"  run 0x{r[0][0]:X}..0x{r[-1][1]:X}  {len(r):2d} obj  [{tag}]  {names[:110]}{'...' if len(names) > 110 else ''}")
+            for fl in flags:
+                print(f"      {fl}")
+            total_runs += 1
+            total_objs += len(r)
+    print(f"\nTOTAL: {total_objs} objects in {total_runs} runs")
+
+
 def cmd_check(_args):
     rows = read_manifest()
     by_off = {off: (ver, name) for ver, name, off in rows}
@@ -746,6 +802,7 @@ def main():
     m = sub.add_parser("match")
     m.add_argument("--version")
     sub.add_parser("coverage")
+    sub.add_parser("runs", help="the conversion work queue: contiguous runs of placed objects per segment")
     sub.add_parser("check")
     lf = sub.add_parser("ldfrag", help="write config/psyq-objects.ld (bss placement + symbol pins)")
     lf.add_argument("--check", action="store_true")
@@ -755,7 +812,7 @@ def main():
     pl.add_argument("--version")
     args = ap.parse_args()
     {"install": cmd_install, "match": cmd_match, "coverage": cmd_coverage,
-     "check": cmd_check, "place": cmd_place, "symbols": cmd_symbols, "ldfrag": cmd_ldfrag, None: cmd_install}[args.cmd](args)
+     "check": cmd_check, "place": cmd_place, "symbols": cmd_symbols, "ldfrag": cmd_ldfrag, "runs": cmd_runs, None: cmd_install}[args.cmd](args)
 
 
 if __name__ == "__main__":

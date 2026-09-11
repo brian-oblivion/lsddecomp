@@ -689,6 +689,9 @@ tools/setup-worktree.sh <name>     # provision a parallel runner
   a unit's real state instead of a transcribed one.
 - `docs/DECOMPILATION_LEARNINGS.md` — source-shape idioms and open questions.
 - `docs/PROGRESS.md` — the running session log.
+- `docs/SDK-OBJECTS-RUNS.md` — running SDK-object conversion rounds: the
+  head/runner split, collision rules for the shared config files, order and
+  estimate, and the two paste-able prompts.
 - `docs/SDK-OBJECTS-GUIDE.md` — the step-by-step recipe for converting a
   `psyq_*` block to linked SDK objects. Runner work.
 - `docs/research/psyq-sdk-objects.md` — how the SDK objects were placed, what

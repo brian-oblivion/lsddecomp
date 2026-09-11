@@ -10,6 +10,11 @@ kept next to the rules deliberately: a rule without its reason gets "helpfully"
 undone by the next session. Where a rule has not yet been tested *on this
 project*, it says so.
 
+> **A different kind of round exists now:** converting Psy-Q library
+> disassembly to Sony's linked objects. Same worktree machinery, different
+> collision rules (the edited files are shared config, not per-unit C) and
+> different prompts — see `docs/SDK-OBJECTS-RUNS.md`.
+
 ## Why worktrees are required
 
 Two sessions in one checkout share `build/`. Concurrent `build-and-verify.sh`
