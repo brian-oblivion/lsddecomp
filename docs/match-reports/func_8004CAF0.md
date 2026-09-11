@@ -1,4 +1,4 @@
-# func_8004CAF0 — STALL, now 55/97 with frame/registers/CFG all matching (round 19)
+# func_8004CAF0 — STALL, 97 words (exact length, zero drift), 55/97 raw word-match, first diff at the prologue register saves (`self`/`slot` register-number swap; re-confirmed round 34)
 
 > **ROUND 19 (bravo) UPDATE: the round-9 "reconstruction problem, frame off
 > by 8 bytes" diagnosis is SUPERSEDED.** Acting directly on the round-9 head
@@ -402,3 +402,37 @@ NOT apply here.** Every `GridSlot866E8` field written in this function is
 a freshly computed value (`slot->elemIdx = self->methods->slot120(...)`,
 `slot->h4 = h4;`, etc.), never a verbatim copy of several adjacent fields
 from one existing struct instance into another. The shape does not occur.
+
+---
+
+## Round 34 (charlie) — re-derived from the raw asm by hand, register rotation confirmed genuine; permuter scaffold mismatch re-checked, still unusable
+
+Traced every instruction in `asm/nonmatchings/class_3bb8c_b/func_8004CAF0.s`
+fresh against the round-19 preserved body, line by line, specifically hunting
+for anything the earlier rounds might have missed (in the spirit of this
+round's other stall on this unit, `func_8004C6A8`, where the same exercise
+found two real fixes). Found none here: every field write, every branch
+target, every delay-slot placement, and every value's SOURCE POSITION
+(including the `hSpan2 = hSpan;` copy sitting in the `p5<10` guard's own
+delay slot, and the `slot->h4` re-load from memory rather than reuse of the
+local right after storing it) already matches the round-19 body exactly.
+The one asymmetry worth recording for whoever looks next: retail assigns
+`self` to `$s1` and `slot` (the incoming `$a1`) to `$s0` in the PROLOGUE,
+before either has a real use later in the function — i.e., this is not a
+first-use-order effect reachable by moving a statement, it is a prologue-time
+register-number choice.
+
+**Re-ran the permuter scaffold's `--debug` against the CURRENT round-19 body**
+(not an old snapshot): identical to what the round-19 entry already reported,
+869 base score, 24 stack diffs, 3 insertions/3 deletions — still disagreeing
+with the real build's 55/97-with-zero-drift state. The mismatch is not stale;
+it reproduces on a fresh scaffold build from the exact preserved source. Not
+investigated further (would require comparing the scaffold's own expanded
+`base.c` against the real in-context compile unit's preprocessed output,
+which is head-scale work, not a bounded runner attempt) — flagging so the
+next round does not re-spend a scaffold-setup cycle rediscovering the same
+disagreement before doing that comparison.
+
+**Disposition: unchanged, still `INCLUDE_ASM`, still a pure register-identity
+rotation with no new lever found.** Not a permuter target until the scaffold
+mismatch itself is root-caused.
