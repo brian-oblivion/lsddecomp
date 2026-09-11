@@ -405,7 +405,7 @@ from one existing struct instance into another. The shape does not occur.
 
 ---
 
-## Round 34 (charlie) — re-derived from the raw asm by hand, register rotation confirmed genuine; permuter scaffold mismatch re-checked, still unusable
+## Round 33 (charlie) — re-derived from the raw asm by hand, register rotation confirmed genuine; permuter scaffold mismatch re-checked, still unusable
 
 Traced every instruction in `asm/nonmatchings/class_3bb8c_b/func_8004CAF0.s`
 fresh against the round-19 preserved body, line by line, specifically hunting
