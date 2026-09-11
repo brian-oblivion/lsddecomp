@@ -102,8 +102,8 @@ extern volatile s32 *D_8006D934;
 /* Still INCLUDE_ASM elsewhere -- not this unit's to carve. */
 extern void func_80024D10(void);                              /* asm/psyq_GsLinkObject4.s */
 extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void); /* asm/psyq_GsLinkObject4.s, per code_179d8_c.c */
-extern s32 func_80025900(s32 arg0);                            /* asm/psyq_15d04.s */
-extern void func_80025AE4(const char *arg0);                   /* asm/psyq_15d04.s */
+extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
+extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void func_80012C20(const char *fmt, ...);                /* Psy-Q printf wrapper */
 extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
 extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
@@ -213,7 +213,7 @@ void func_8002A400(void)
 
         while (D_8006D60C & 0x10) {
             if ((u8)counter == 0) {
-                func_80025AE4(D_80010A40);
+                puts(D_80010A40);
             }
             counter++;
             func_80029F10(1, 0, 0, 0);
@@ -221,7 +221,7 @@ void func_8002A400(void)
 
         while (func_80029F10(0x16, D_8006D908, 0, 0)) {
             func_80029F10(1, 0, 0, 0);
-            func_80025AE4(D_80010A50);
+            puts(D_80010A50);
         }
 
         D_8006D5FC = saved;

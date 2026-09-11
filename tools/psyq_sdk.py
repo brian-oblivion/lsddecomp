@@ -34,6 +34,8 @@ import zipfile
 from collections import defaultdict
 from pathlib import Path
 
+R_MIPS_32, R_MIPS_HI16, R_MIPS_LO16, R_MIPS_GPREL16 = 2, 5, 6, 7
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import extract_exe  # noqa: E402  (Disc / open_disc: raw-sector ISO 9660 reader)
@@ -47,6 +49,23 @@ YAML = ROOT / "config/splat.slps01556.lsdde.yaml"
 EXE = ROOT / "disk/SLPS_015.56"
 PARSER = ROOT / "tools/psyq-obj-parser/psyq-obj-parser"
 VRAM, HDR = 0x80010000, 0x800
+# When several discs place an object at the same offset the bytes are identical
+# and it does not matter which one the manifest names; prefer the disc whose
+# library builds are closest to the game's (measured: 3.3 places the most).
+PREFER = ["3.3", "3.5", "3.6", "3.0"]
+
+
+def placed_objects():
+    """{'lib/module': (version, text_fileoff, text_size)} over every disc's match.txt."""
+    out = {}
+    versions = sorted((m.parent.name for m in WORK.glob("*/match.txt")),
+                      key=lambda v: PREFER.index(v) if v in PREFER else 99)
+    for ver in versions:
+        for line in (WORK / ver / "match.txt").read_text().splitlines():
+            m = re.match(r"(\S+)\.o\s+text=0x([0-9a-f]+)\s+fileoff=0x([0-9a-f]+)", line)
+            if m:
+                out.setdefault(m.group(1), (ver, int(m.group(3), 16), int(m.group(2), 16)))
+    return out
 
 ARCHIVE = "https://archive.org/download/ps1_sdks"
 DISC_NAMES = {  # version -> the redump zip on archive.org, for the error message
@@ -234,6 +253,19 @@ def cmd_install(_args):
     exe = EXE.read_bytes() if EXE.exists() else None
     for ver in need:
         prepare(ver, have[ver])
+    from match_obj import masked_text
+    spans = []
+    for ver, name, off in rows:
+        src = WORK / ver / "elf" / f"{name}.o"
+        if src.exists():
+            data, _ = masked_text(src)
+            spans.append((off, off + len(data or b""), name))
+    spans.sort()
+    for (a0, a1, n0), (b0, b1, n1) in zip(spans, spans[1:]):
+        if b0 < a1:
+            die(f"manifest objects overlap in retail: {n0} 0x{a0:X}..0x{a1:X} and {n1} 0x{b0:X}..0x{b1:X}.\n"
+                f"  Two objects of identical shape can both match one spot (a 4-instruction getter is a\n"
+                f"  4-instruction getter); only one of them is really there. Check the segment's glabels.")
     installed = 0
     for ver, name, off in rows:
         src = WORK / ver / "elf" / f"{name}.o"
@@ -276,6 +308,11 @@ def cmd_match(args):
                 rows.append((hits[0], f"{rel}  text=0x{len(data):x}  AMBIGUOUS x{len(hits)}: " + " ".join(f"0x{h:x}" for h in hits[:6])))
         out = WORK / ver / "match.txt"
         out.write_text("\n".join(l for _, l in sorted(rows)) + "\n")
+        spans = sorted((off, off + int(m.group(1), 16), l.split()[0]) for off, l in rows
+                       for m in [re.search(r"text=0x([0-9a-f]+)", l)] if "fileoff" in l)
+        for (a0, a1, n0), (b0, b1, n1) in zip(spans, spans[1:]):
+            if b0 < a1:
+                print(f"  OVERLAP: {n0} 0x{a0:x}..0x{a1:x} and {n1} 0x{b0:x}..0x{b1:x} -- at most one is real")
         print(f"\nPsy-Q {ver}: {sum(t[0] for t in tally.values())} objects placed exactly -> {out.relative_to(ROOT)}")
         print(f"  {'library':<10}{'exact':>6}{'ambig':>6}{'total':>6}")
         for lib in sorted(tally):
@@ -352,6 +389,329 @@ def cmd_coverage(_args):
             print(f"  {name:<26} size=0x{size:<5x} vram=0x{off-HDR+VRAM:08x}  {s}  (Psy-Q {ver})")
 
 
+def cmd_place(args):
+    """For each object, derive where retail put its DATA sections from the
+    relocations in its (already placed) .text: a HI16/LO16 pair, a R_MIPS_32
+    word or a GPREL16 against a symbol in section S, read out of retail at the
+    placed offset, gives S's retail address once the in-place addend is
+    removed. Data sections are also confirmed by a masked byte search. Prints
+    the yaml lines to add."""
+    import struct as st
+    from elftools.elf.elffile import ELFFile
+    from match_obj import masked_text, find_all
+    exe = EXE.read_bytes()
+    gp = 0x8008A808
+    placed = {k: (v[0], v[1]) for k, v in placed_objects().items()}
+    for name in args.objects:
+        if name not in placed:
+            print(f"# {name}: not placed by any disc (run `match`)")
+            continue
+        ver, toff = placed[name]
+        if args.version:
+            ver = args.version
+        opath = WORK / ver / "elf" / f"{name}.o"
+        print(f"# {name}  (Psy-Q {ver})  .text at 0x{toff:X} / vram 0x{toff-HDR+VRAM:08X}")
+        with open(opath, "rb") as f:
+            elf = ELFFile(f)
+            secs = {i: s for i, s in enumerate(elf.iter_sections())}
+            symtab = elf.get_section_by_name(".symtab")
+            syms = list(symtab.iter_symbols())
+            text = elf.get_section_by_name(".text").data()
+            rel = elf.get_section_by_name(".rel.text")
+            # section index -> list of derived retail base addresses
+            derived = defaultdict(list)
+            pending_hi = None
+            for r in (rel.iter_relocations() if rel else []):
+                off, typ, si = r["r_offset"], r["r_info_type"], r["r_info_sym"]
+                sym = syms[si]
+                shndx = sym["st_shndx"]
+                if shndx in ("SHN_UNDEF", "SHN_ABS", "SHN_COMMON"):
+                    pending_hi = None
+                    continue
+                obj_word = st.unpack_from("<I", text, off)[0]
+                ret_word = st.unpack_from("<I", exe, toff + off)[0]
+                if typ == R_MIPS_HI16:
+                    pending_hi = (shndx, sym["st_value"], obj_word & 0xFFFF, ret_word & 0xFFFF)
+                    continue
+                if typ == R_MIPS_LO16 and pending_hi and pending_hi[0] == shndx:
+                    _, sval, ohi, rhi = pending_hi
+                    olo = st.unpack_from("<h", text, off)[0]
+                    rlo = st.unpack_from("<h", exe, toff + off)[0]
+                    inplace = (ohi << 16) + olo
+                    retail = (rhi << 16) + rlo
+                    derived[shndx].append(retail - inplace - sval)
+                    pending_hi = None
+                elif typ == R_MIPS_32:
+                    derived[shndx].append(ret_word - obj_word - sym["st_value"])
+                elif typ == R_MIPS_GPREL16:
+                    olo = st.unpack_from("<h", text, off)[0]
+                    rlo = st.unpack_from("<h", exe, toff + off)[0]
+                    derived[shndx].append((gp + rlo) - olo - sym["st_value"])
+                else:
+                    pending_hi = None
+            for idx, sec in secs.items():
+                nm = sec.name
+                if nm in (".text", "") or nm.startswith((".rel", ".sym", ".str", ".shstr", ".note")):
+                    continue
+                size = sec["sh_size"]
+                bases = sorted(set(derived.get(idx, [])))
+                bytes_hit = ""
+                if sec["sh_type"] != "SHT_NOBITS" and size >= 4:
+                    data = sec.data()
+                    mask = bytes(b"\xff" * len(data))
+                    hits = list(find_all(exe, data, mask, min(8, len(data))))
+                    bytes_hit = " bytes@" + ",".join(f"0x{h:X}" for h in hits[:4]) if hits else " bytes:not-found"
+                if len(bases) == 1:
+                    b = bases[0]
+                    fo = b - VRAM + HDR
+                    print(f"      - [0x{fo:X}, o, {name}, {nm}]   # vram 0x{b:08X} size 0x{size:X}{bytes_hit}")
+                elif bases:
+                    print(f"# {nm}: relocations DISAGREE {[hex(b) for b in bases]} size 0x{size:X}{bytes_hit}")
+                else:
+                    print(f"# {nm}: no relocation names it -- size 0x{size:X}{bytes_hit}")
+
+
+def reloc_addresses(exe, opath, toff, gp=0x8008A808):
+    """Yield (symbol_name, retail_address) for every reference the placed object
+    makes to a NAMED symbol (defined here or undefined), read out of retail."""
+    import struct as st
+    from elftools.elf.elffile import ELFFile
+    with open(opath, "rb") as f:
+        elf = ELFFile(f)
+        syms = list(elf.get_section_by_name(".symtab").iter_symbols())
+        text = elf.get_section_by_name(".text").data()
+        rel = elf.get_section_by_name(".rel.text")
+        if rel is None:
+            return
+        pending = None
+        for r in rel.iter_relocations():
+            off, typ, si = r["r_offset"], r["r_info_type"], r["r_info_sym"]
+            sym = syms[si]
+            name = sym.name
+            if not name or sym["st_info"]["type"] == "STT_SECTION":
+                pending = None
+                continue
+            oword = st.unpack_from("<I", text, off)[0]
+            rword = st.unpack_from("<I", exe, toff + off)[0]
+            if typ == R_MIPS_HI16:
+                pending = (name, oword & 0xFFFF, rword & 0xFFFF)
+            elif typ == R_MIPS_LO16 and pending and pending[0] == name:
+                _, ohi, rhi = pending
+                olo = st.unpack_from("<h", text, off)[0]
+                rlo = st.unpack_from("<h", exe, toff + off)[0]
+                yield name, ((rhi << 16) + rlo) - ((ohi << 16) + olo)
+                pending = None
+            elif typ == R_MIPS_32:
+                yield name, rword - oword
+            elif typ == R_MIPS_GPREL16:
+                olo = st.unpack_from("<h", text, off)[0]
+                rlo = st.unpack_from("<h", exe, toff + off)[0]
+                yield name, (gp + rlo) - olo
+            elif typ == 4:  # R_MIPS_26: target = (pc & 0xF0000000) | (imm << 2)
+                pc = toff - HDR + VRAM + off
+                yield name, ((pc & 0xF0000000) | ((rword & 0x03FFFFFF) << 2)) - ((oword & 0x03FFFFFF) << 2)
+            else:
+                pending = None
+
+
+def cmd_symbols(_args):
+    """Retail address of every Psy-Q symbol the placed objects reference, in
+    symbols-file syntax. Two sources: an object's own exports (text symbols
+    at .text base + st_value) and relocations from placed text to named
+    symbols (which is how bss/sbss variables and other objects' globals get
+    their addresses). Conflicts are reported, never silently resolved."""
+    from elftools.elf.elffile import ELFFile
+    exe = EXE.read_bytes()
+    addrs = defaultdict(set)   # name -> {addr}
+    origin = defaultdict(set)
+    for name, (ver, toff, _size) in placed_objects().items():
+        opath = WORK / ver / "elf" / f"{name}.o"
+        with open(opath, "rb") as f:
+            elf = ELFFile(f)
+            text_idx = [i for i, s in enumerate(elf.iter_sections()) if s.name == ".text"][0]
+            for sym in elf.get_section_by_name(".symtab").iter_symbols():
+                if sym["st_shndx"] == text_idx and sym.name and sym["st_info"]["type"] != "STT_SECTION":
+                    addrs[sym.name].add(toff - HDR + VRAM + sym["st_value"])
+                    origin[sym.name].add(f"{name}:def")
+        for sname, addr in reloc_addresses(exe, opath, toff):
+            addrs[sname].add(addr)
+            origin[sname].add(f"{name}:ref")
+    conflicts = 0
+    for sname in sorted(addrs, key=lambda n: min(addrs[n])):
+        a = sorted(addrs[sname])
+        if len(a) == 1:
+            print(f"{sname} = 0x{a[0]:08X}; // {' '.join(sorted(origin[sname]))[:80]}")
+        else:
+            conflicts += 1
+            print(f"// CONFLICT {sname}: {[hex(x) for x in a]}  ({' '.join(sorted(origin[sname]))[:100]})")
+    print(f"// {len(addrs)} symbols, {conflicts} conflicts", file=sys.stderr)
+
+
+LDFRAG = ROOT / "config/psyq-objects.ld"
+
+
+def bss_plan(objects):
+    """For each (name, path, text_fileoff): where its NOBITS sections must sit and
+    which of its symbols get pinned. Returns (sections, pins, notes).
+
+    Sony's linker allocated uninitialised variables individually, across
+    objects, so an object's .bss is NOT contiguous in retail (libetc/pad:
+    pad_buf at 0x8008B3C8, PadIdentifier at 0x8008E984). Two rules therefore:
+    a NOBITS section is placed where its SECTION-RELATIVE references demand
+    (or at its first symbol's retail address, or in a spare NOLOAD area if
+    nothing references it); and EVERY named symbol it defines is pinned to its
+    retail address by a linker-script assignment, which ld lets override the
+    object's own definition (verified for WEAK and GLOBAL alike).
+    """
+    import struct as st
+    from elftools.elf.elffile import ELFFile
+    exe = EXE.read_bytes()
+    gp = 0x8008A808
+    # Retail addresses of named symbols, from every placed object's references.
+    # The discovery corpus (sdk/work, every object every disc placed) knows far
+    # more than the handful of objects in lib/, so use it when it is present.
+    known = defaultdict(set)
+    corpus = [(n, WORK / v / "elf" / f"{n}.o", off) for n, (v, off, _sz) in placed_objects().items()]
+    for name, path, toff in (corpus or objects):
+        for sname, addr in reloc_addresses(exe, path, toff, gp):
+            known[sname].add(addr)
+    sections, pins, notes = [], [], []
+    # Externals: a linked object calls SDK (or game) symbols nothing in the link
+    # defines yet -- InterruptCallback, printf, putchar ... Pin each to the
+    # address RETAIL'S OWN CODE uses, read from the referencing object's
+    # relocations against the executable. A wrong pin cannot pass silently:
+    # it changes a jal/lui/addiu and the whole-image SHA1 fails.
+    defined = set()
+    undefined = defaultdict(set)          # name -> {retail addr} from OUR objects' refs
+    for name, path, toff in objects:
+        with open(path, "rb") as f:
+            elf = ELFFile(f)
+            for sym in elf.get_section_by_name(".symtab").iter_symbols():
+                if sym.name and sym["st_shndx"] != "SHN_UNDEF" and sym["st_info"]["type"] != "STT_SECTION":
+                    defined.add(sym.name)
+        for sname, addr in reloc_addresses(exe, path, toff, gp):
+            undefined[sname].add(addr)
+    externs = []
+    for sname in sorted(undefined):
+        if sname in defined:
+            continue
+        addrs = undefined[sname]
+        if len(addrs) == 1:
+            externs.append((sname, next(iter(addrs))))
+        else:
+            notes.append(f"extern {sname} referenced at several addresses {[hex(a) for a in addrs]}; not pinned, link will fail")
+    spare = 0x80100000   # well past the game's bss; only for sections nothing addresses
+    for name, path, toff in objects:
+        with open(path, "rb") as f:
+            elf = ELFFile(f)
+            secs = list(elf.iter_sections())
+            syms = list(elf.get_section_by_name(".symtab").iter_symbols())
+            text = elf.get_section_by_name(".text").data()
+            rel = elf.get_section_by_name(".rel.text")
+            derived = defaultdict(set)
+            pending = None
+            for r in (rel.iter_relocations() if rel else []):
+                off, typ, si = r["r_offset"], r["r_info_type"], r["r_info_sym"]
+                sym = syms[si]
+                if sym["st_info"]["type"] != "STT_SECTION":
+                    pending = None
+                    continue
+                shndx = sym["st_shndx"]
+                oword = st.unpack_from("<I", text, off)[0]
+                rword = st.unpack_from("<I", exe, toff + off)[0]
+                if typ == R_MIPS_HI16:
+                    pending = (shndx, oword & 0xFFFF, rword & 0xFFFF)
+                elif typ == R_MIPS_LO16 and pending and pending[0] == shndx:
+                    olo = st.unpack_from("<h", text, off)[0]
+                    rlo = st.unpack_from("<h", exe, toff + off)[0]
+                    derived[shndx].add(((pending[2] << 16) + rlo) - ((pending[1] << 16) + olo))
+                    pending = None
+                elif typ == R_MIPS_32:
+                    derived[shndx].add(rword - oword)
+                elif typ == R_MIPS_GPREL16:
+                    olo = st.unpack_from("<h", text, off)[0]
+                    rlo = st.unpack_from("<h", exe, toff + off)[0]
+                    derived[shndx].add((gp + rlo) - olo)
+                else:
+                    pending = None
+            for idx, sec in enumerate(secs):
+                if sec["sh_type"] != "SHT_NOBITS" or sec["sh_size"] == 0:
+                    continue
+                members = [(sym["st_value"], sym.name) for sym in syms
+                           if sym["st_shndx"] == idx and sym.name and sym["st_info"]["type"] != "STT_SECTION"]
+                bases = sorted(derived.get(idx, set()))
+                if len(bases) > 1:
+                    notes.append(f"{name} {sec.name}: section-relative references disagree {[hex(b) for b in bases]} -- object needs editing (parasite-eve-2 hit this too)")
+                if bases:
+                    base, how = bases[0], "section-relative refs"
+                else:
+                    anchored = [(v, n) for v, n in members if len(known.get(n, ())) == 1]
+                    if anchored:
+                        v, n = sorted(anchored)[0]
+                        base, how = next(iter(known[n])) - v, f"first symbol {n}"
+                    else:
+                        base, how = spare, "unreferenced; spare NOLOAD area"
+                        spare += (sec["sh_size"] + 15) & ~15
+                sections.append((name, sec.name, base, sec["sh_size"], how))
+                for v, n in sorted(members):
+                    addrs = known.get(n, set())
+                    if len(addrs) == 1:
+                        pins.append((n, next(iter(addrs)), name))
+                    elif len(addrs) > 1:
+                        notes.append(f"{name}: {n} referenced at several addresses {[hex(a) for a in addrs]}; not pinned")
+                    elif base != spare:
+                        pass  # falls where the section puts it; nothing references it by name
+    return sections, pins, externs, notes
+
+
+def cmd_ldfrag(args):
+    """Write config/psyq-objects.ld: NOLOAD placement of every lib/ object's
+    bss/sbss section and a pin for every bss symbol. Passed to ld BEFORE the
+    splat script (Makefile), so the sections are claimed before /DISCARD/."""
+    rows = read_manifest()
+    objects = []
+    for ver, name, off in rows:
+        path = LIB_DIR / f"{name}.o"
+        if not path.exists():
+            die(f"lib/{name}.o missing -- run `psyq_sdk.py install`")
+        objects.append((name, path, off))
+    sections, pins, externs, notes = bss_plan(objects)
+    out = ["/* GENERATED by `tools/psyq_sdk.py ldfrag` from config/psyq-objects.txt and",
+           " * the objects in lib/ -- do not edit; `psyq_sdk.py check` verifies it is current.",
+           " *",
+           " * Sony's linker allocated uninitialised library variables one by one across",
+           " * objects, so a Psy-Q object's .bss is not contiguous in retail. Each NOBITS",
+           " * section is placed where its section-relative references demand, and every",
+           " * variable is pinned to its retail address (a script assignment overrides the",
+           " * object's own definition). NOLOAD: none of this is in the executable image. */",
+           "SECTIONS {"]
+    for name, sec, base, size, how in sections:
+        tag = f".psyq_bss.{name.replace('/', '_')}{sec.replace('.', '_')}"
+        out.append(f"    {tag} 0x{base:08X} (NOLOAD) : {{ build/lib/{name}.o({sec}) }}   /* 0x{size:X} bytes; {how} */")
+    out.append("}")
+    for n, a, name in sorted(pins, key=lambda p: p[1]):
+        out.append(f"{n} = 0x{a:08X};   /* {name} */")
+    out.append("/* externals the linked objects reference and nothing in the link defines yet;")
+    out.append(" * each is the address retail's own code calls. Once the defining object is")
+    out.append(" * linked the pin still holds (a script assignment wins) and must agree. */")
+    for n, a in sorted(externs, key=lambda e: e[1]):
+        out.append(f"{n} = 0x{a:08X};")
+    for note in notes:
+        out.append(f"/* NOTE: {note} */")
+    text = "\n".join(out) + "\n"
+    if args.check:
+        if not LDFRAG.exists() or LDFRAG.read_text() != text:
+            print(f"{LDFRAG.relative_to(ROOT)} is out of date -- run `tools/psyq_sdk.py ldfrag`")
+            sys.exit(1)
+        print(f"OK: {LDFRAG.relative_to(ROOT)} is current")
+        return
+    LDFRAG.write_text(text)
+    print(f"wrote {LDFRAG.relative_to(ROOT)}: {len(sections)} NOLOAD sections, {len(pins)} pinned bss symbols, "
+          f"{len(externs)} pinned externals, {len(notes)} notes")
+    for note in notes:
+        print("  NOTE:", note)
+
+
 def cmd_check(_args):
     rows = read_manifest()
     by_off = {off: (ver, name) for ver, name, off in rows}
@@ -372,6 +732,9 @@ def cmd_check(_args):
         if not (LIB_DIR / f"{name}.o").exists():
             print(f"lib/{name}.o missing -- run `psyq_sdk.py install`")
             ok = False
+    if ok and any(WORK.glob("*/match.txt")):
+        class A: check = True
+        cmd_ldfrag(A())
     print("OK: manifest, yaml and lib/ agree" if ok else "FAILED")
     sys.exit(0 if ok else 1)
 
@@ -384,9 +747,15 @@ def main():
     m.add_argument("--version")
     sub.add_parser("coverage")
     sub.add_parser("check")
+    lf = sub.add_parser("ldfrag", help="write config/psyq-objects.ld (bss placement + symbol pins)")
+    lf.add_argument("--check", action="store_true")
+    sub.add_parser("symbols", help="retail address of every Psy-Q symbol the placed objects define or reference")
+    pl = sub.add_parser("place", help="derive yaml lines for an object's data sections")
+    pl.add_argument("objects", nargs="+", help="lib/module, e.g. libetc/intr_dma")
+    pl.add_argument("--version")
     args = ap.parse_args()
     {"install": cmd_install, "match": cmd_match, "coverage": cmd_coverage,
-     "check": cmd_check, None: cmd_install}[args.cmd](args)
+     "check": cmd_check, "place": cmd_place, "symbols": cmd_symbols, "ldfrag": cmd_ldfrag, None: cmd_install}[args.cmd](args)
 
 
 if __name__ == "__main__":

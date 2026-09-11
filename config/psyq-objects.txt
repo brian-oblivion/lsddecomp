@@ -20,3 +20,18 @@
 3.5  libgte/divft4a  0xC2B4
 3.5  libgte/divgt3a  0xC7D4
 3.5  libgte/divgt4a  0xCC74
+
+# libetc/libgs/libc2/libapi block formerly asm psyq_15d04 + psyq_PadInit.
+# Data sections: vmode/intr_dma/intr_vb/vsync .data are consecutive at
+# 0x5DB0C..0x5DB70, intr_dma/vsync .rdata at 0xF28/0xF54, puts .sdata at
+# 0x7B040. pad .bss and gs_125 .sbss are scattered by Sony's linker and are
+# pinned per symbol in config/psyq-objects.ld.
+3.3  libetc/vmode    0x15D04
+3.3  libetc/intr_dma 0x15D2C
+3.3  libetc/intr_vb  0x15FD4
+3.3  libetc/vsync    0x16100
+3.3  libc2/puts      0x162E4
+3.5  libetc/pad      0x166AC
+3.3  libapi/a22      0x1674C
+3.3  libapi/a20      0x1675C
+3.3  libapi/a21      0x1676C

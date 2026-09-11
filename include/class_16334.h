@@ -9,8 +9,8 @@
  * ctor, +0x0C dtor, +0x40.. new virtuals).
  *
  * Working hypothesis (see docs/match-reports for the evidence trail): this
- * class is a thin C wrapper around the Psy-Q Pad library. func_80025EAC/
- * func_80025EFC/func_80025F2C -- called from this unit's ctor/dtor/updater --
+ * class is a thin C wrapper around the Psy-Q Pad library. PadInit/
+ * PadRead/PadStop -- called from this unit's ctor/dtor/updater --
  * disassemble as part of the `psyq_PadInit` segment (config/splat...yaml,
  * file offset 0x166ac), and func_80025E1C copies its default button-mask
  * table from `D_80010764`, which itself sits inside the `psyq_15d04` rodata
@@ -74,9 +74,9 @@ extern BasicClassMethods *func_80018390(void);
 extern void *func_80017B34(s32 size);
 
 /* Psy-Q Pad library helpers (asm/psyq_PadInit.s, uncarved). */
-extern void func_80025EAC(void *arg1);
-extern u32 func_80025EFC(s32 port);
-extern void func_80025F2C(void);
+extern void PadInit(void *arg1);
+extern u32 PadRead(s32 port);
+extern void PadStop(void);
 
 extern PadMethods D_8006D370;
 extern s32 D_8008A848;          /* live-instance counter; the first ctor registers the Pad ISR, the last dtor tears it down */

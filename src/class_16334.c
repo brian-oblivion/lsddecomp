@@ -31,7 +31,7 @@ u32 func_80025CC4(Pad *self) {
     u32 oldMask;
     u32 changed;
 
-    newMask = func_80025EFC(self->port);
+    newMask = PadRead(self->port);
     oldMask = self->heldMask;
     self->heldMask = newMask;
     changed = newMask ^ oldMask;

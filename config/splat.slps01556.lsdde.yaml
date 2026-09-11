@@ -68,7 +68,9 @@ segments:
       - [0x800, rodata]   # psyq_2258
       - [0xA8C, rodata]   # code_8220
       - [0xABC, rodata]   # psyq_GsLinkObject4
-      - [0xF28, rodata]   # psyq_15d04
+      - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
+      - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
+      - [0xF64, rodata]   # 16-word bit table; owner not placed yet (libetc intr?)
       - [0xFA4, rodata]   # code_1677c
       - [0xFD8, rodata]   # code_179d8 (head remainder, still asm)
       # jtbl_800109F8 belongs to func_80029478, which lives in the
@@ -309,9 +311,18 @@ segments:
       # DECOMPILATION_LEARNINGS and docs/match-reports/func_80061778.md).
       - [0xED8C, c, code_d294_c]
       - [0xF770, asm, psyq_GsLinkObject4]
-      - [0x15D04, asm, psyq_15d04]
+      # libetc/libc2 block, linked from the SDK objects (see the pilot note
+      # above). Data: .data at 0x5DB0C.., .rdata at 0xF28.., .sdata at 0x7B040.
+      - [0x15D04, o, libetc/vmode]      # SetVideoMode, GetVideoMode   (Psy-Q 3.3)
+      - [0x15D2C, o, libetc/intr_dma]   # startIntrDMA, trapIntrDMA, setIntrDMA, memclr
+      - [0x15FD4, o, libetc/intr_vb]    # startIntrVSync ...
+      - [0x16100, o, libetc/vsync]      # VSync, v_wait
+      - [0x162E4, o, libc2/puts]        # puts
       - [0x16334, c, class_16334]
-      - [0x166ac, asm, psyq_PadInit]
+      - [0x166AC, o, libetc/pad]        # PadInit, PadRead, PadStop   (Psy-Q 3.5 build)
+      - [0x1674C, o, libapi/a22]        # BIOS A-function stubs
+      - [0x1675C, o, libapi/a20]
+      - [0x1676C, o, libapi/a21]
       - [0x1677c, c, code_1677c]
       - [0x171e0, c, code_171e0]
       # code_179d8 was 274 functions and 44% blocker-dense in aggregate, but
@@ -1194,11 +1205,18 @@ segments:
       # bytes to the top of the image.
       - [0x57028, data]
       - [0x57070, data]
+      - [0x5DB0C, o, libetc/vmode, .data]
+      - [0x5DB10, o, libetc/intr_dma, .data]
+      - [0x5DB38, o, libetc/intr_vb, .data]
+      - [0x5DB60, o, libetc/vsync, .data]
+      - [0x5DB70, data]
       - [0x769D4, data]               # StageGrid's data slot
       - [0x76DC8, data]              # class_39e08
       - [0x783dc, data]               # DreamSys's data slot
       - [0x79528, data]
       - [0x7b008, sdata]
+      - [0x7B040, o, libc2/puts, .sdata]      # "<NULL>"
+      - [0x7B048, sdata]
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
       - [0x7b420, sbss]
