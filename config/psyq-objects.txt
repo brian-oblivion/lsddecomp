@@ -241,3 +241,8 @@
 3.3  libcd/c_009    0x38EAC
 3.3  libcd/c_004    0x38F70
 3.3  libcd/c_007    0x38FD8
+
+# psyq_rand (0x39C80..0x39CB4), retired whole: libc2's rand/srand. Text-only
+# in the yaml; its 4-byte .sbss seed at 0x8008AC68 goes in the fragment and
+# the plain [0x7B468, sbss] slot is unchanged.
+3.3  libc2/rand     0x39C80

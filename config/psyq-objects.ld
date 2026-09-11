@@ -35,6 +35,7 @@ SECTIONS {
     .psyq_bss.libcd_c_009_bss 0x8008E23C (NOLOAD) : SUBALIGN(2) { build/lib/libcd/c_009.o(.bss) }   /* 0x50 bytes; first symbol Stframe_no */
     .psyq_bss.libcd_c_004_bss 0x8008E23C (NOLOAD) : SUBALIGN(2) { build/lib/libcd/c_004.o(.bss) }   /* 0x50 bytes; first symbol Stframe_no */
     .psyq_bss.libcd_c_007_bss 0x8008E23C (NOLOAD) : SUBALIGN(2) { build/lib/libcd/c_007.o(.bss) }   /* 0x50 bytes; first symbol Stframe_no */
+    .psyq_bss.libc2_rand_sbss 0x8008AC68 (NOLOAD) : SUBALIGN(2) { build/lib/libc2/rand.o(.sbss) }   /* 0x4 bytes; section-relative refs */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 dc_cr = 0x8008E224;   /* libpress/vlc2 */

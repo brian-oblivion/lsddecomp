@@ -973,7 +973,10 @@ segments:
       - [0x38F70, o, libcd/c_004]      # data_ready_callback
       - [0x38FD8, o, libcd/c_007]      # StFreeRing
       - [0x39094, asm, psyq_39094]
-      - [0x39c80, asm, psyq_rand]
+      # psyq_rand, retired whole. Its 4-byte .sbss seed is placed NOLOAD by
+      # config/psyq-objects.ld at 0x8008AC68; the plain sbss slot below is
+      # unchanged.
+      - [0x39C80, o, libc2/rand]       # rand, srand
 
       # ---- carved C units --------------------------------------------------
       # These are the units runners work in. Everything else is still a
@@ -1432,7 +1435,7 @@ segments:
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
       - [0x7b420, sbss]
-      - [0x7B468, sbss]              # psyq_rand
+      - [0x7B468, sbss]              # libc2/rand's seed (NOLOAD in config/psyq-objects.ld)
       - [0x7B46C, sbss]
       - [0x7b4b4, sbss]               # DreamSys's sbss slot
       - [0x7b4cc, sbss]
