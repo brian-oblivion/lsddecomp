@@ -135,11 +135,188 @@ extern s16 D_8008E8C0;
  * affected so not itself a distance measure) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
 
-/* STALL -- see docs/match-reports/func_8002EDD4.md. EXACT length
- * (270/270 built words), 267/270 raw word-match -- pure REGISTER-
- * IDENTITY residue (a0 vs s0, banned to fix by pinning). Best body
- * preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EDD4);
+extern void _spu_setInTransfer(s32 a0);
+extern void SpuInitMalloc(s32 a0, void *a1);
+extern void func_8002F700(void);
+
+extern u8 D_8008DEB0[];
+extern s16 D_8008E9FC;
+extern s16 D_8008E84C;
+extern s16 D_8008E260;
+extern s16 D_8008E262;
+extern s16 D_8008E230;
+extern s16 D_8008E234;
+extern s32 D_8008E258;
+extern s32 D_8008E25C;
+extern u8 D_8008EA40;
+extern s16 D_8008E938;
+
+extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
+
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34S16Edd4;
+extern Rec34S16Edd4 D_8008D988Edd4[] __asm__("D_8008D988");
+extern Rec34S16Edd4 D_8008D996Edd4[] __asm__("D_8008D996");
+extern Rec34S16Edd4 D_8008D99AEdd4[] __asm__("D_8008D99A");
+
+extern Rec34Half D_8008D990[];
+extern Rec34Half D_8008D98C[];
+extern Rec34Half D_8008D98E[];
+extern Rec34Half D_8008D998[];
+extern Rec34Half D_8008D9A6[];
+extern Rec34Half D_8008D9A8[];
+extern Rec34Half D_8008D9AA[];
+extern Rec34Half D_8008D9AC[];
+
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34U16Edd4;
+extern Rec34U16Edd4 D_8008D99CEdd4[] __asm__("D_8008D99C");
+
+typedef struct {
+    u8 unk0; /* +0x0 */
+    u8 pad1[0x34 - 0x1];
+} Rec34ByteEdd4;
+extern Rec34ByteEdd4 D_8008D992[]; /* byte field, forced to 0x40 at init */
+extern Rec34ByteEdd4 D_8008D9A3Edd4[] __asm__("D_8008D9A3");
+extern Rec34Half D_8008D9A4[];
+
+extern volatile u16 D_8008EA26;
+extern u8 D_8008E9D0;
+extern s16 D_80090BD0;
+extern u8 D_8008EA2C[];
+extern u16 D_80090C60;
+extern u16 D_80090C64;
+extern u16 D_8008E228;
+extern u16 D_8008E22C;
+
+typedef struct {
+    u8 pad[0x194];
+    u16 unk194; /* +0x194 */
+    u16 unk196; /* +0x196 */
+} ObjDAD4Edd4;
+extern ObjDAD4Edd4 *D_8006DAD4Edd4 __asm__("D_8006DAD4");
+
+/* MATCHED round 32 (bravo), 270/270 -- closes the register-identity stall
+ * every prior round's hand-reshaping (10 axes) and one earlier permuter
+ * run (100k+ iterations) could not move.  Permuter-found: a SINGLE scratch
+ * variable (`scratch`, `s32`), reused for TWO textually unrelated
+ * purposes -- once to break the `a0`-vs-`s0` min-clamp tie, and again
+ * ~150 lines later as the `D_8006DAD4[woff]` store's index -- is what
+ * reproduces retail's exact register allocation.  Splitting these into
+ * two separately-named locals (the natural, more readable choice) gives a
+ * WORSE result than either leaving `a0` alone or this single-variable
+ * reuse; the reuse itself is load-bearing, not cosmetic.  See
+ * docs/match-reports/func_8002EDD4.md for the full derivation, the
+ * permuter trace, and why the naive two-variable translation regresses
+ * sharply (47/270) despite being semantically identical. */
+void func_8002EDD4(s32 a0) {
+    s16 i;
+    s32 scratch;
+
+    _spu_setInTransfer(0);
+    D_8008E9FC = 0;
+    D_8008E84C = 0;
+    SpuInitMalloc(0x20, D_8008DEB0);
+
+    for (i = 0; (u16) i < 0xC0; i++) {
+        ((u16 *) D_8008D7F0)[(u16) i] = 0;
+    }
+
+    for (i = 0; (u16) i < 0x18; i++) {
+        D_8008D970[(u16) i] = 0;
+    }
+
+    D_80090BD0 = 0;
+
+    for (i = 0; (u16) i < 0x10; i++) {
+        D_8008EA2C[(u16) i] = 0;
+    }
+
+    a0 = (u8) a0;
+    scratch = a0;
+    if ((u32) a0 >= 0x18) {
+        D_8008E9D0 = 0x18;
+    } else {
+        D_8008E9D0 = scratch;
+    }
+
+    for (i = 0; (u16) i < D_8008E9D0; i++) {
+        u16 woff;
+        u16 chan;
+        u16 lowMask;
+        u16 highMask;
+
+        woff = (u16) i * 8;
+
+        D_8008D98A[(u16) i].unk0 = 0x18;
+        D_8008D996Edd4[(u16) i].unk0 = -1;
+        D_8008D988Edd4[(u16) i].unk0 = 0xFF;
+        D_8008D9A3Edd4[(u16) i].unk0 = 0;
+        D_8008D98C[(u16) i].unk0 = 0;
+        D_8008D98E[(u16) i].unk0 = 0;
+        D_8008D998[(u16) i].unk0 = 0;
+        D_8008D99AEdd4[(u16) i].unk0 = 0;
+        D_8008D99CEdd4[(u16) i].unk0 = 0xFF;
+        D_8008D990[(u16) i].unk0 = 0;
+        D_8008D992[(u16) i].unk0 = 0x40;
+        D_8008D9A4[(u16) i].unk0 = 0;
+        D_8008D9A6[(u16) i].unk0 = 0;
+        D_8008D9A8[(u16) i].unk0 = 0;
+        D_8008D9AA[(u16) i].unk0 = 0;
+        D_8008D9B0[(u16) i].unk0 = 0;
+        D_8008D9B2[(u16) i].unk0 = 0;
+        D_8008D9B4[(u16) i].unk0 = 0;
+        D_8008D9B6[(u16) i].unk0 = 0;
+        D_8008D9B8[(u16) i].unk0 = 0;
+        D_8008D9AC[(u16) i].unk0 = 0;
+
+        ((s16 *) D_8006DAD4Edd4)[woff + 3] = 0x200;   /* +0x6 */
+        scratch = woff;
+        ((s16 *) D_8006DAD4Edd4)[woff + 2] = 0x1000;  /* +0x4 */
+        ((u16 *) D_8006DAD4Edd4)[woff + 4] = 0x80FF;  /* +0x8 */
+        ((s16 *) D_8006DAD4Edd4)[scratch] = 0;         /* +0x0 */
+        ((s16 *) D_8006DAD4Edd4)[woff + 1] = 0;       /* +0x2 */
+        ((s16 *) D_8006DAD4Edd4)[woff + 5] = 0x4000;  /* +0xA */
+
+        __asm__("");
+        D_8008EA26 = i;
+        chan = D_8008EA26;
+        if (chan < 0x10) {
+            lowMask = 1 << chan;
+            highMask = 0;
+        } else {
+            lowMask = 0;
+            highMask = 1 << (chan - 0x10);
+        }
+
+        D_8008D9A3Edd4[chan].unk0 = 0;
+        D_8008D98C[chan].unk0 = 0;
+        D_8008D988Edd4[chan].unk0 = 0;
+        D_80090C60 |= lowMask;
+        D_80090C64 |= highMask;
+        woff = D_80090C60;
+        D_8008E228 &= ~woff;
+        D_8008E22C &= ~D_80090C64;
+    }
+
+    D_8008E260 = 0x3FFF;
+    D_8008E262 = 0x3FFF;
+    D_8008E228 = 0;
+    D_8008E22C = 0;
+    D_80090C60 = 0;
+    D_8008E230 = 0;
+    D_8008E234 = 0;
+    D_8008E258 = 0;
+    D_8008E25C = 0;
+    D_8008EA40 = 0;
+    D_8008E8C0 = 0;
+    D_8008E938 = 0x80;
+    func_8002F700();
+}
 
 /* "Currently selected channel" scratch global: written as a side
  * effect, then re-read from the global (not a cached register) a few
