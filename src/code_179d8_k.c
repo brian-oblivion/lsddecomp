@@ -673,7 +673,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034E5C);
  * independent instruction (`sltiu`) the compiler hoists into a branch
  * delay slot one branch earlier than retail places it -- a pure
  * instruction-scheduling residue, not a logic or CFG difference. */
-#if 0
+#if 1
 void func_80034F90(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -689,8 +689,8 @@ void func_80034F90(s16 a0, s16 a1, u8 a2)
         rec->unkC = rec->unk4;
         return;
     case 0x1E:
+        rec->unk16 = a2;
         if (rec->unk28 == 0) {
-            rec->unk16 = a2;
             rec->unk10 = 0;
             rec->unk88 = func_80035E80(a0, a1);
             return;
@@ -718,7 +718,6 @@ void func_80034F90(s16 a0, s16 a1, u8 a2)
     }
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034F90);
 
 void func_800350D8(s16 a0, s16 a1, u8 a2)
 {
