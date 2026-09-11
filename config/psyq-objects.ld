@@ -22,6 +22,8 @@ SECTIONS {
     .psyq_bss.libgs_gs_104_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_104.o(.bss) }   /* 0x98 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_122_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_122.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libc2_itoa_bss 0x8008E090 (NOLOAD) : SUBALIGN(2) { build/lib/libc2/itoa.o(.bss) }   /* 0x10 bytes; section-relative refs */
+    .psyq_bss.libgs_gs_110_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_110.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_107_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_107.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 PSDOFSX = 0x8008E240;   /* libgs/gs_013 */
@@ -39,6 +41,8 @@ GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_119 */
 GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_120 */
 GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_104 */
 GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_122 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_110 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_107 */
 GsDRAWENV = 0x8008E8C4;   /* libgs/gs_013 */
 GsDISPENV = 0x8008E920;   /* libgs/gs_013 */
 GsORGOFSX = 0x8008E93C;   /* libgs/gs_013 */
@@ -48,22 +52,30 @@ _LC = 0x8008E948;   /* libgs/gs_119 */
 _LC = 0x8008E948;   /* libgs/gs_120 */
 _LC = 0x8008E948;   /* libgs/gs_104 */
 _LC = 0x8008E948;   /* libgs/gs_122 */
+_LC = 0x8008E948;   /* libgs/gs_110 */
+_LC = 0x8008E948;   /* libgs/gs_107 */
 HWD0 = 0x8008E980;   /* libgs/gs_127 */
 HWD0 = 0x8008E980;   /* libgs/gs_119 */
 HWD0 = 0x8008E980;   /* libgs/gs_120 */
 HWD0 = 0x8008E980;   /* libgs/gs_104 */
 HWD0 = 0x8008E980;   /* libgs/gs_122 */
+HWD0 = 0x8008E980;   /* libgs/gs_110 */
+HWD0 = 0x8008E980;   /* libgs/gs_107 */
 PadIdentifier = 0x8008E984;   /* libetc/pad */
 VWD0 = 0x8008E988;   /* libgs/gs_127 */
 VWD0 = 0x8008E988;   /* libgs/gs_119 */
 VWD0 = 0x8008E988;   /* libgs/gs_120 */
 VWD0 = 0x8008E988;   /* libgs/gs_104 */
 VWD0 = 0x8008E988;   /* libgs/gs_122 */
+VWD0 = 0x8008E988;   /* libgs/gs_110 */
+VWD0 = 0x8008E988;   /* libgs/gs_107 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_127 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_119 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_120 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_104 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_122 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_110 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_107 */
 GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_134 */
 GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_135 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_127 */
@@ -71,11 +83,15 @@ GsCLIP3far = 0x8008E9D8;   /* libgs/gs_119 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_120 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_104 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_122 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_110 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_107 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_127 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_119 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_120 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_104 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_122 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_110 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_107 */
 CLIP2 = 0x8008EA04;   /* libgs/gs_013 */
 DSTACK = 0x80090260;   /* libgs/matrix */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_127 */
@@ -83,18 +99,24 @@ GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_119 */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_120 */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_104 */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_122 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_110 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_107 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_127 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_119 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_120 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_104 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_122 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_110 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_107 */
 PSDCNT = 0x80090B74;   /* libgs/gs_013 */
 PSDIDX = 0x80090B78;   /* libgs/gs_013 */
 PSDGPU = 0x80090B80;   /* libgs/gs_013 */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
+SquareRoot0 = 0x800205C0;
 GsSetDrawBuffOffset = 0x80024830;
+SetBackColor = 0x80024AC4;
 EnterCriticalSection = 0x80024CE0;
 ExitCriticalSection = 0x80024CF0;
 HookEntryInt = 0x80025424;

@@ -939,6 +939,13 @@ segments:
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
       - [0x322b4, asm, psyq_322b4]
+      # psyq_memset chunk B: three short runs in the libgs/libcd remainder.
+      - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
+      - [0x3311c, asm, psyq_3311c]
+      - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
+      - [0x33808, asm, psyq_33808]
+      - [0x36D38, o, libc2/exit]       # exit
+      - [0x36d48, asm, psyq_36d48]
       - [0x39c80, asm, psyq_rand]
 
       # ---- carved C units --------------------------------------------------

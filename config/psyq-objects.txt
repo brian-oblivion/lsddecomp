@@ -195,3 +195,15 @@
 3.3  libc2/itoa     0x319A8
 3.3  libc2/sprintf  0x319E8
 3.3  libc2/memmove  0x32248
+
+# psyq_memset chunk B (0x330F4..0x3311C, 0x3328C..0x33808, 0x36D38..0x36D48):
+# three short runs in the libgs/libcd remainder -- two libgs helpers and
+# libc2's exit. Text-only in the yaml; `place` derives no PROGBITS section
+# for any of the three. gs_110's 0xA0 .bss has no relocation naming it and
+# gs_107's reports the informational `relocations DISAGREE` (references to
+# NAMED variables, pinned one by one); both go through the fragment, which
+# reports no NOTE. `libc/a56` has the same bytes as `libc2/exit`; the libc2
+# alternate is taken for consistency with the rest of the block.
+3.3  libgs/gs_110   0x330F4
+3.3  libgs/gs_107   0x3328C
+3.3  libc2/exit     0x36D38
