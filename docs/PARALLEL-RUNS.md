@@ -773,6 +773,19 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    to belong to a session that had been merged half an hour earlier, on a
    function in a different unit than the one the live runner held.
 
+   **And killing a permuter's PARENT orphans its `-j N` workers.** Round 33
+   killed the `permuter.py` process and its forkserver by PID; five worker
+   processes re-parented to init and kept running for another four minutes,
+   on six cores, invisible to a `pgrep` for the parent's own command line.
+   The machine's 15-minute load average was **8.76** against a 1-minute
+   figure of **0.91** once they were gone — which is the measurement that
+   found them, and is worth more than any process listing. So after killing a
+   search, confirm the WORKERS are gone (`ps -eo pid=,cmd= | grep -F
+   decomp-permuter`, which matches structurally rather than by your own
+   pattern), and check `uptime` if a round feels slow: a runner whose builds
+   are competing with a dead session's orphans pays for it in wall clock
+   without anything in its own transcript explaining why.
+
    **Carry the round's findings forward IN THE PROMPT — that is what replaces
    the broadcast.** Round 32's replacement runners were handed the three
    mechanisms found earlier that day, and one reported that a finding in its
