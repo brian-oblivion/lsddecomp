@@ -1,4 +1,4 @@
-# func_8002DDBC — STALL
+# func_8002DDBC — STALL (round 33 update: 98/112 -> 108/112, 4 words short, down from 14 — see below)
 
 **14 words short** (best derivation compiled to 98 words against retail's
 112); raw word-match is not meaningful under that drift (funcdiff reports
@@ -188,3 +188,147 @@ may stay in `src/`.
   structural tell worth naming (parallel to the sra/srl and copy-elision
   levers already documented for `func_8002E038`), not yet reduced to a
   known trigger.
+
+## Round 33 update (runner alpha): the loop-strength-reduction lever WAS known — this unit's own `func_8002CF18` report already named the exact fix
+
+Re-verified the inherited 98/112 body first — reproduces exactly (compiled
+length 0x188 = 98 words), residues 1 and 2 confirmed at the exact positions
+this report already names.
+
+**The "not yet reduced to a known trigger" note above undersold it: this
+same unit's `func_8002CF18` report (also round 26) had already identified
+the discriminator — a `(u8)`/narrow cast on an array index defeats GCC
+2.6.3's strength reduction of `idx*stride` into `idx+=stride`.** The
+`do`/`while` loop's index `i` was declared and used as a plain `s32` with
+no narrowing cast anywhere in the multiply
+(`li = i * 52;`). Changing it to `li = (u8)i * 52;` reproduced retail's
+full 5-instruction recompute (`sll`/`addu`/`sll`/`addu`/`sll`) every
+iteration and moved the function from **98/112 (14 short) to 108/112 (4
+short)** in one change — a 10-word swing, the largest single fix of this
+round across all five of this unit's queued functions.
+
+**A second, smaller fix found by reading the realigned diff further:**
+with the `(u8)` cast, one instruction differed in MASK WIDTH — retail's
+loop-condition/index-use sequence masks with `0xffff` (`andi v1,a1,0xffff`)
+at a specific point the `(u8)`-cast version instead masked with `0xff`.
+Changing the cast in the multiply from `(u8)i` to `(u16)i` (the loop bound
+comparison `while ((u16)i < D_8008E9D0)` already used `u16`; the multiply
+itself had not) reproduced the `0xffff` mask exactly, with the compiled
+length unchanged (still 108/112 — a byte-correctness fix, not a
+word-count one). **Lesson: when applying the "narrow-cast defeats strength
+reduction" idiom, match the cast WIDTH to what the surrounding code
+already uses for the same index, not just any narrower-than-`s32` type —
+`(u8)` and `(u16)` both suppress the reduction, but only one of them
+reproduces the correct mask instruction.**
+
+**What remains (read off the realigned diff, not inferred) is entirely
+downstream of this report's already-documented, already-tried-three-ways
+register-identity residue (1):** the opening `move a3,a0` retail has and
+the compiled body doesn't (retail preserves the raw channel in `$a3` and
+narrows `$a0` in place; the compiled body does the reverse), plus a
+missing `addiu sp,sp,-8`/`+8` frame retail allocates (residue 4 from the
+original report) and several downstream register-choice differences in
+the tail (`D_8008E228`/`D_8008E22C`/`D_80090C60`/`D_80090C64` update
+sequence) that read as cascading consequences of the same root register
+allocation difference rather than independent residues — the tail's LOAD/
+OP/STORE statement order in the preserved C already matches retail's
+interleaving one-for-one; only the specific physical registers chosen
+differ, which HARD RULE 6 explicitly puts out of reach of C-level
+reshaping. Not re-attempted this round, consistent with the original
+report's own conclusion after direct testing ("variable identifier choice
+in C has no influence on which physical register GCC 2.6.3's allocator
+assigns").
+
+**Disposition: restored to `INCLUDE_ASM`.** This is a real 10-word
+improvement banked for the next attempt; the remaining 4-word gap is
+believed entirely attributable to the pre-existing register-identity
+stall, not a new independent residue.
+
+```c
+extern u8 D_8008D7F0[];
+extern u8 D_8008D7F2[];
+extern u8 D_8008D970[];
+extern u8 D_8008E9D0;
+
+extern u8 D_8008D98A[];
+extern u8 D_8008D98C[];
+extern u8 D_8008D9A3[];
+
+extern u16 D_8008E228;
+extern u16 D_8008E22C;
+extern u16 D_80090C60;
+extern u16 D_80090C64;
+extern u16 *D_8006DAD4;
+
+void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+    s32 a3;
+    s32 off16;
+    s32 v1;
+    s32 lowBit;
+    s32 highBit;
+    s32 idx52;
+    s32 li;
+    s32 i;
+    u16 e228;
+    u16 e22c;
+    u16 c60;
+    u16 c64;
+
+    a3 = a0;
+    a0 = (u8)a0;
+    off16 = a0 << 4;
+    *(u16 *)(D_8008D7F2 + off16) = a2;
+    __asm__("");
+    v1 = D_8008D970[a0];
+    *(u16 *)(D_8008D7F0 + off16) = a1;
+    v1 |= 3;
+    D_8008D970[a0] = v1;
+    if (a0 < 16) {
+        lowBit = 1 << a0;
+        highBit = 0;
+    } else {
+        lowBit = 0;
+        highBit = 1 << (a0 - 16);
+    }
+
+    idx52 = (u8)a3 * 52;
+    *(u16 *)(D_8008D98C + idx52) = 10;
+    if (D_8008E9D0 != 0) {
+        i = 0;
+        do {
+            li = (u16)i * 52;
+            *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
+            i++;
+        } while ((u16)i < D_8008E9D0);
+    }
+    idx52 = (u8)a3 * 52;
+    *(u8 *)(D_8008D9A3 + idx52) = 2;
+
+    e228 = D_8008E228;
+    e22c = D_8008E22C;
+    *(u16 *)(D_8008D98A + idx52) = 0;
+    c60 = D_80090C60;
+    e228 = lowBit | e228;
+    e22c = highBit | e22c;
+    D_8008E228 = e228;
+    c60 = c60 & ~e228;
+    D_8008E22C = e22c;
+    c64 = D_80090C64;
+    D_80090C60 = c60;
+    c64 = c64 & ~e22c;
+    D_80090C64 = c64;
+    D_8006DAD4[0xCA] = lowBit;
+    D_8006DAD4[0xCB] = highBit;
+}
+```
+
+### Proposed learning (round 33)
+
+**The "narrow-cast defeats loop strength reduction" idiom
+(`func_8002CF18`'s report) is unit-wide, not local to the function that
+found it** — it closed 10 of 14 missing words here, in a different
+function, the very next round. Any function in `code_179d8_l`/`_m` with a
+"my loop is N words short and retail recomputes a multiply I don't" shape
+should try this FIRST, before barriers or permuter time, and should match
+the cast width to whatever the surrounding comparison already uses for
+the same variable rather than picking the narrowest type that compiles.
