@@ -575,6 +575,33 @@ segments:
       # this segment's only jump table (func_80027A24), so the cut is placed
       # here to leave both debts behind.  This slice owns NO jump table and
       # needs no rodata attach.
+      # NEXT SDK CONVERSION, MEASURED ROUND 33 AND DELIBERATELY NOT DONE.
+      # `libc2/strcpy` + `libc2/strstr` + `libcd/sys` tile 0x19378..0x19C78
+      # exactly and cross the code_179d8_h / code_179d8_b boundary at
+      # 0x194E0, so BOTH units trim and neither needs a new name --
+      # the same shape as round 33's `libsnd/vs_vh` conversion:
+      #   libc2/strcpy  0x19378  0x044  strcpy
+      #   libc2/strstr  0x193BC  0x078  strstr
+      #   libcd/sys     0x19434  0x844  CdStatus..CdPosToInt, 25 functions
+      # Retires THREE stalls -- CdControlB (0x80029074, 85w), CdControl
+      # (0x80028DF0, 82w) and CdControlF (0x80028F38, 79w), 246 words with
+      # ~1200 lines of reports between them -- and gives 28 Sony names.
+      # The run ends immediately before func_80029478, which stays game code.
+      #
+      # Unlike round 33's five conversions this one is NOT text-only.
+      # `psyq_sdk.py place libc2/strcpy libc2/strstr libcd/sys` derives two
+      # data lines, both with the byte search AGREEING, so both are takeable:
+      #   - [0x1040, o, libcd/sys, .rdata]    # vram 0x80010840, 0x5 bytes
+      #   - [0x5DD7C, o, libcd/sys, .data]    # vram 0x8006D57C, 0x80 bytes
+      # Their enclosing slots must be split around them: 0x1040 sits inside
+      # `[0xFD8, rodata]` (the code_179d8 head remainder) and 0x5DD7C inside
+      # `[0x5DB70, data]`.  Mind the SUBALIGN(2) `pad` rule in
+      # docs/SDK-OBJECTS-GUIDE.md for the 5-byte .rdata: do the
+      # start+size arithmetic for BOTH sections before the first build.
+      #
+      # Left for the next round because head attention, not build cost, is
+      # what a conversion spends, and a half-applied one is a broken build
+      # for whoever merges next.
       - [0x19098, c, code_179d8_h]
       # code_179d8_b: window [60..79], 0x194E0..0x1A1BC (20 functions).
       - [0x194E0, c, code_179d8_b]
