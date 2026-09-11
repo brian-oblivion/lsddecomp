@@ -60,7 +60,12 @@ C_FILES  := $(shell find src -name '*.c' 2>/dev/null)
 # Prebuilt Psy-Q library objects (splat `o` segments). lib/ is produced from
 # the user's own SDK disc by tools/setup.sh and is gitignored; the linker
 # script names them under build/lib/, so they are mirrored there.
-LIB_FILES := $(shell find lib -name '*.o' 2>/dev/null)
+# `-L`: in a runner worktree lib/ is a SYMLINK to the main checkout's (see
+# tools/setup-worktree.sh), and plain `find lib` does not descend into a
+# symlinked directory -- it returned nothing, build/lib/ stayed empty and the
+# link failed on every `build/lib/<x>.o` the script names (first worktree
+# provisioned after the SDK objects landed, 2026-09-11).
+LIB_FILES := $(shell find -L lib -name '*.o' 2>/dev/null)
 O_FILES  := $(foreach f,$(S_FILES),$(BUILD_DIR)/$(f).o) \
             $(foreach f,$(C_FILES),$(BUILD_DIR)/$(f).o) \
             $(foreach f,$(LIB_FILES),$(BUILD_DIR)/$(f))

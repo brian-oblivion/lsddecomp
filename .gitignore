@@ -84,7 +84,11 @@ scratchpad/
 # SDK discs and everything unpacked from them; lib/ holds the converted Sony
 # objects the build links (splat `o` segments). config/psyq-objects.txt is the
 # committed manifest that regenerates lib/ from sdk/.
+# `lib` with NO trailing slash, for the same reason as the toolchain entries
+# above: a worktree gets a symlink named lib, and `lib/` matches only a
+# directory, so every runner worktree showed `?? lib` and could never report
+# a clean tree.
 # ---------------------------------------------------------------------------
 sdk/*
 !sdk/README.md
-lib/
+lib
