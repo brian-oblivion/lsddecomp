@@ -135,6 +135,24 @@
 3.3  libgs/gs_103    0x14F34
 3.3  libgs/gs_121    0x14FD4
 
+# psyq_GsLinkObject4 chunk E (0x1514C..0x15510): the last run of the block --
+# GsSwapDispBuff, the whole libgte GTE-register accessor family, InitGeom,
+# the GTE patch routine and three libapi BIOS trampolines. It closes the
+# segment at libetc/intr's boundary. Data: msc00 .data 0x5CA60 (0x10). NO
+# relocation names that section and its bytes are found in several places, so
+# the DERIVED offset is the evidence -- it lands on the existing dlabel
+# D_8006C260 and tiles exactly into libetc/intr's .data at 0x5CA70.
+# gs_010's .bss (`relocations DISAGREE`, the informational kind -- references
+# to NAMED variables) and patchgte's 0x10 .sbss go through the fragment,
+# which reports no NOTE.
+3.3  libgs/gs_010    0x1514C
+3.3  libgte/reg03    0x15240
+3.3  libgte/msc00    0x153C0
+3.3  libgte/patchgte 0x15440
+3.3  libapi/a36      0x154E0
+3.3  libapi/a37      0x154F0
+3.3  libapi/c68      0x15500
+
 # libetc/intr (the interrupt/callback core: ResetCallback, InterruptCallback,
 # DMACallback, VSyncCallback ...). Text and .data (the 0x109C callback tables
 # at 0x5CA70) are the 3.3 object's; its .rdata carries the RCS string

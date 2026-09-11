@@ -1777,13 +1777,6 @@ extern s32 func_8004F4C8(s32 *arr, s32 count);
 /* func_80017B34/func_80017CFC already declared above in this header. */
 extern void *func_80017CFC(void *ptr);
 
-/* Psy-Q semaphore-ish lock/unlock pair, called (with no arguments) around
- * func_8004F40C's own scan loop when its `flag` argument is set. Not this
- * unit's own functions -- typed purely from this call site's own register
- * usage (no return value read, no argument set up). */
-extern void func_80024CE0(void);
-extern void func_80024CF0(void);
-
 /* A fixed 6-byte memory-card device-name template ("bu00:"/"bu10:", PS-X
  * BIOS device names -- asm/data/7B008.sdata.s). An all-`s8` struct
  * (natural alignment 1) so the whole-struct assignment in func_8004F32C

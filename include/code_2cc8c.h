@@ -749,14 +749,6 @@ extern void func_8003FC70(s32 a0);
 extern void func_8003FD4C(s32 a0, s32 a1);
 extern void func_8003FBE4(void *a0);
 
-/* func_80024AE4 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
-   func_8003EEC0 calls it with self->unk5B's own three bytes reinterpreted
-   as UNSIGNED (`lbu`, not `lb` -- despite `unk5B` itself being written as
-   signed bytes by func_8003EAA4, this call site reads them unsigned; kept
-   as a local cast rather than retyping the field, since the two readings
-   disagree). */
-extern void func_80024AE4(u8 a0, u8 a1, u8 a2);
-
 /* ResetGraph (asm/psyq_GsLinkObject4.s, PsyQ library, LIBGPU.H's own
    declared signature is `extern int ResetGraph(int mode);` -- declared
    locally here rather than including the whole SDK header, matching this
@@ -803,11 +795,6 @@ void func_8003F23C(Unk18Obj *self, s32 a1);
 void func_8003F244(Unk18Obj *self, s32 a1);
 Unk18Obj *func_8003F25C(Unk18Obj *self);
 
-/* func_80024B90 (asm/psyq_GsLinkObject4.s, PsyQ library, not game code):
-   func_8003F28C (round 13, code_2cc8c_d) calls it with `self` forwarded
-   unexamined and ignores the return; declared here only with that
-   call site's own shape. */
-extern void func_80024B90(Unk18Obj *self);
 void func_8003F28C(Unk18Obj *self);
 
 extern void *func_80042400(void); /* external, no args; local view returns

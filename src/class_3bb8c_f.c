@@ -232,12 +232,23 @@ s32 func_8004F3E4(TaskObjF *self) {
     return func_8004F40C(self, TestEvent, 0);
 }
 
+/* Psy-Q's kernel critical-section pair (libapi/a36, libapi/a37, linked from
+ * Sony's own SDK objects), called with no arguments around this unit's scan
+ * loop when its `flag` argument is set. These belong to another translation
+ * unit, so they are declared LOCAL here rather than in class_3bb8c.h, which
+ * twenty units include (CLAUDE.md's header-contention rule). Sony's
+ * EnterCriticalSection returns int; no call site here reads it, so the local
+ * view stays `void` -- per-call-site typing, the convention this block of
+ * units already uses. */
+extern void EnterCriticalSection(void);
+extern void ExitCriticalSection(void);
+
 s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
     s32 i;
     s32 result;
 
     if (flag) {
-        func_80024CE0();
+        EnterCriticalSection();
     }
     for (i = 0; i < 4; i++) {
         result = callback(self->field14[i]);
@@ -246,7 +257,7 @@ s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
         }
     }
     if (flag) {
-        func_80024CF0();
+        ExitCriticalSection();
     }
     return result;
 }

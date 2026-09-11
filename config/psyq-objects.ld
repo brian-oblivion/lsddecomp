@@ -21,6 +21,8 @@ SECTIONS {
     .psyq_bss.libgs_gs_105_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_105.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_103_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_103.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_121_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_121.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_010_bss 0x8008E398 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_010.o(.bss) }   /* 0x5A2 bytes; section-relative refs */
+    .psyq_bss.libgte_patchgte_sbss 0x8008AC50 (NOLOAD) : SUBALIGN(2) { build/lib/libgte/patchgte.o(.sbss) }   /* 0x10 bytes; section-relative refs */
     .psyq_bss.libspu_s_sca_bss 0x80100000 (NOLOAD) : SUBALIGN(2) { build/lib/libspu/s_sca.o(.bss) }   /* 0x4 bytes; unreferenced; spare NOLOAD area */
     .psyq_bss.libgs_gs_104_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_104.o(.bss) }   /* 0x98 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_122_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_122.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
@@ -53,7 +55,9 @@ Stframe_no = 0x8008E23C;   /* libcd/c_009 */
 Stframe_no = 0x8008E23C;   /* libcd/c_004 */
 Stframe_no = 0x8008E23C;   /* libcd/c_007 */
 PSDOFSX = 0x8008E240;   /* libgs/gs_013 */
+PSDOFSX = 0x8008E240;   /* libgs/gs_010 */
 PSDOFSY = 0x8008E244;   /* libgs/gs_013 */
+PSDOFSY = 0x8008E244;   /* libgs/gs_010 */
 Stsector_offset = 0x8008E26C;   /* libcd/c_002 */
 Stsector_offset = 0x8008E26C;   /* libcd/c_003 */
 Stsector_offset = 0x8008E26C;   /* libcd/c_005 */
@@ -75,11 +79,15 @@ StRgb24 = 0x8008E270;   /* libcd/c_009 */
 StRgb24 = 0x8008E270;   /* libcd/c_004 */
 StRgb24 = 0x8008E270;   /* libcd/c_007 */
 PSDBASEX = 0x8008E27C;   /* libgs/gs_013 */
+PSDBASEX = 0x8008E27C;   /* libgs/gs_010 */
 PSDBASEY = 0x8008E280;   /* libgs/gs_013 */
+PSDBASEY = 0x8008E280;   /* libgs/gs_010 */
 SearchPoint = 0x8008E284;   /* _obj/malloc */
 dec_pt = 0x8008E28C;   /* libpress/vlc2 */
 GsDSTACK = 0x8008E290;   /* libgs/gs_013 */
+GsDSTACK = 0x8008E290;   /* libgs/gs_010 */
 POSITION = 0x8008E790;   /* libgs/gs_013 */
+POSITION = 0x8008E790;   /* libgs/gs_010 */
 StFunc1 = 0x8008E798;   /* libcd/c_002 */
 StFunc1 = 0x8008E798;   /* libcd/c_003 */
 StFunc1 = 0x8008E798;   /* libcd/c_005 */
@@ -144,9 +152,13 @@ StStartFrame = 0x8008E8BC;   /* libcd/c_009 */
 StStartFrame = 0x8008E8BC;   /* libcd/c_004 */
 StStartFrame = 0x8008E8BC;   /* libcd/c_007 */
 GsDRAWENV = 0x8008E8C4;   /* libgs/gs_013 */
+GsDRAWENV = 0x8008E8C4;   /* libgs/gs_010 */
 GsDISPENV = 0x8008E920;   /* libgs/gs_013 */
+GsDISPENV = 0x8008E920;   /* libgs/gs_010 */
 GsORGOFSX = 0x8008E93C;   /* libgs/gs_013 */
+GsORGOFSX = 0x8008E93C;   /* libgs/gs_010 */
 GsORGOFSY = 0x8008E940;   /* libgs/gs_013 */
+GsORGOFSY = 0x8008E940;   /* libgs/gs_010 */
 dc_type = 0x8008E944;   /* libpress/vlc2 */
 _LC = 0x8008E948;   /* libgs/gs_127 */
 _LC = 0x8008E948;   /* libgs/gs_119 */
@@ -234,6 +246,7 @@ GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_122 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_110 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_107 */
 CLIP2 = 0x8008EA04;   /* libgs/gs_013 */
+CLIP2 = 0x8008EA04;   /* libgs/gs_010 */
 StEmu_Idx = 0x8008EA3C;   /* libcd/c_002 */
 StEmu_Idx = 0x8008EA3C;   /* libcd/c_003 */
 StEmu_Idx = 0x8008EA3C;   /* libcd/c_005 */
@@ -307,7 +320,9 @@ StEmu_Addr = 0x80090B70;   /* libcd/c_009 */
 StEmu_Addr = 0x80090B70;   /* libcd/c_004 */
 StEmu_Addr = 0x80090B70;   /* libcd/c_007 */
 PSDCNT = 0x80090B74;   /* libgs/gs_013 */
+PSDCNT = 0x80090B74;   /* libgs/gs_010 */
 PSDIDX = 0x80090B78;   /* libgs/gs_013 */
+PSDIDX = 0x80090B78;   /* libgs/gs_010 */
 StEndFrame = 0x80090B7C;   /* libcd/c_002 */
 StEndFrame = 0x80090B7C;   /* libcd/c_003 */
 StEndFrame = 0x80090B7C;   /* libcd/c_005 */
@@ -319,6 +334,7 @@ StEndFrame = 0x80090B7C;   /* libcd/c_009 */
 StEndFrame = 0x80090B7C;   /* libcd/c_004 */
 StEndFrame = 0x80090B7C;   /* libcd/c_007 */
 PSDGPU = 0x80090B80;   /* libgs/gs_013 */
+PSDGPU = 0x80090B80;   /* libgs/gs_010 */
 StSTART_FLAG = 0x80090B84;   /* libcd/c_002 */
 StSTART_FLAG = 0x80090B84;   /* libcd/c_003 */
 StSTART_FLAG = 0x80090B84;   /* libcd/c_005 */
@@ -363,14 +379,10 @@ StRingSize = 0x80090C5C;   /* libcd/c_007 */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
+SetDispMask = 0x80021078;
+PutDispEnv = 0x800217E8;
 GsSetDrawBuffClip = 0x8002469C;
 GsSetDrawBuffOffset = 0x80024830;
-SetBackColor = 0x80024AC4;
-SetFarColor = 0x80024AE4;
-SetGeomOffset = 0x80024B78;
-InitGeom = 0x80024BC0;
-EnterCriticalSection = 0x80024CE0;
-ExitCriticalSection = 0x80024CF0;
 HookEntryInt = 0x80025424;
 ChangeClearPAD = 0x80025434;
 ResetEntryInt = 0x80025444;

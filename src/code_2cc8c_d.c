@@ -152,6 +152,14 @@ void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
  * slotA0 again with self->unkAC, and finally -- if self->unk10 is set --
  * walks it to its list tail and dispatches slotA0 a third time with that
  * tail. */
+/* Psy-Q's GTE far-colour register writer (libgte/reg03, linked from Sony's
+ * own SDK object). LOCAL to this unit, not code_2cc8c.h -- see the note on
+ * SetGeomScreen below. This call site reads self->unk5B's own three bytes
+ * UNSIGNED (`lbu`, not `lb`) even though func_8003EAA4 writes them as signed
+ * bytes; the disagreement is kept as a local cast rather than a retype of the
+ * field. Sony's own argument type is `long` for each. */
+extern void SetFarColor(u8 a0, u8 a1, u8 a2);
+
 void func_8003EEC0(Unk18Obj *self) {
     s32 idx;
     Unk18Obj *tail;
@@ -170,7 +178,7 @@ void func_8003EEC0(Unk18Obj *self) {
 
     if (self->unk54 == 1 || self->unk54 == 3) {
         u8 *rawBytes = (u8 *)&self->unk5B;
-        func_80024AE4(rawBytes[0], rawBytes[1], rawBytes[2]);
+        SetFarColor(rawBytes[0], rawBytes[1], rawBytes[2]);
         func_8003FD4C(self->unk60, self->unk40);
     }
 
@@ -282,6 +290,15 @@ Unk18Obj *func_8003F25C(Unk18Obj *self) {
     return self;
 }
 
+/* Psy-Q's GTE far-colour and geometric-screen-distance register writers
+ * (libgte/reg03, linked from Sony's own SDK object). Declared LOCAL to this
+ * unit rather than in code_2cc8c.h, which nine units include, since they
+ * belong to another translation unit (CLAUDE.md's header-contention rule).
+ * Sony types SetGeomScreen's argument `long`; func_8003F28C forwards `self`
+ * unexamined and ignores the return, so the local view keeps that call
+ * site's own shape -- ABI-identical either way. */
+extern void SetGeomScreen(Unk18Obj *self);
+
 void func_8003F28C(Unk18Obj *self) {
-    func_80024B90(self);
+    SetGeomScreen(self);
 }

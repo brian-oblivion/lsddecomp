@@ -405,8 +405,14 @@ segments:
       - [0x14FD4, o, libgs/gs_121]      # gte_init. bss via the fragment
       # 0x15020..0x1514C is the placed libgs/gs_002, excluded for the same
       # reason (scattered static bss). GsSetDrawBuffOffset lives here.
-      # 0x1514C..0x15510 is still asm under the same name for now.
       - [0x15020, asm, psyq_15020]
+      - [0x1514C, o, libgs/gs_010]      # GsSwapDispBuff (Psy-Q 3.3). bss via the fragment
+      - [0x15240, o, libgte/reg03]      # the GTE register accessors, SetVertex0 ...
+      - [0x153C0, o, libgte/msc00]      # InitGeom. .data at 0x5CA60
+      - [0x15440, o, libgte/patchgte]   # _patch_gte. .sbss via the fragment
+      - [0x154E0, o, libapi/a36]        # EnterCriticalSection
+      - [0x154F0, o, libapi/a37]        # ExitCriticalSection
+      - [0x15500, o, libapi/c68]        # FlushCache
       # libetc/intr from the SDK object (Psy-Q 3.3): ResetCallback, InterruptCallback,
       # DMACallback, VSyncCallback(s), Stop/Restart/CheckCallback, Get/SetIntrMask,
       # startIntr, trapIntr, setIntr, stopIntr, restartIntr, memclr. .data at 0x5CA70;
@@ -1435,6 +1441,7 @@ segments:
       - [0x5C6A0, data]                      # D_8006BEA0.., no placed object owns it
       - [0x5C6F0, o, libgte/msc01, .data]    # 0x180 -> 0x5C870 (dlabel D_8006C070)
       - [0x5C870, data]
+      - [0x5CA60, o, libgte/msc00, .data]    # 0x10 -> 0x5CA70, exactly where intr's .data starts
       - [0x5CA70, o, libetc/intr, .data]     # 0x109C, the callback tables -> 0x5DB0C
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]

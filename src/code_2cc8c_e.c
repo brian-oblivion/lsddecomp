@@ -321,12 +321,12 @@ s16 *func_8003FCFC(s16 *src, s16 *dst) {
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FCFC);
 
-extern void func_80024B9C(s32 a0);
-extern void func_80024BA8(s32 a0);
+extern void SetDQA(s32 a0);
+extern void SetDQB(s32 a0);
 
 void func_8003FD4C(s32 a0, s32 a1) {
-    func_80024B9C((-(a0 * 5 * 64)) / a1);
-    func_80024BA8(0x1400000);
+    SetDQA((-(a0 * 5 * 64)) / a1);
+    SetDQB(0x1400000);
 }
 
 Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {

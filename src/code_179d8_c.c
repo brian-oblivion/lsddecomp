@@ -71,10 +71,10 @@ void func_800329B8(void)
     func_80032708(0);
 }
 
-extern void func_80024CE0(void);
+extern void EnterCriticalSection(void);
 extern void VSyncCallback(void (*cb)(void));
 extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void);
-extern void func_80024CF0(void);
+extern void ExitCriticalSection(void);
 extern s32 D_8006DCA8;
 extern s32 D_8006DC94;
 extern s32 D_8006DC8C;
@@ -90,7 +90,7 @@ void func_800329D8(void)
     }
 
     D_8006DC94 = 0;
-    func_80024CE0();
+    EnterCriticalSection();
 
     if (D_8006DC8C != 0) {
         VSyncCallback(0);
@@ -107,7 +107,7 @@ void func_800329D8(void)
         }
     }
 
-    func_80024CF0();
+    ExitCriticalSection();
 }
 
 extern void SpuQuit(void);
