@@ -313,10 +313,11 @@ void func_8003424C(s16 a0, s16 a1)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
 
 /* STALL -- see docs/match-reports/func_800344FC.md. length exact 70/70,
- * 44/70 raw word-match, first real diff at word 1: a consistent
- * register-identity rename ($t0<->$a2, $s0<->$s1, $t1/$t2/$t3 shifted by
- * one), not a logic or CFG difference -- CLAUDE.md's register-identity
- * STALL rule. */
+ * 61/70 raw word-match (round 33, runner bravo -- up from 44/70), first
+ * real diff at word 1: a register-identity rename ($t0<->$a2 for the a0
+ * copy kept live across the two calls, $s1<->$t0 for the masked-a3 copy),
+ * not a logic or CFG difference -- CLAUDE.md's register-identity STALL
+ * rule. */
 #if 0
 void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 {
@@ -328,6 +329,7 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
     u16 flag = rec->unk74;
     u8 status = ptr[0x17];
 
+    speed = a3;
     if (flag == 0) {
         return;
     }
@@ -336,7 +338,7 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
         func_8002FAC4(packed, note, vol, (u8)a3, (u16)divided, status);
-        rec->unkA8 = (u8)a3;
+        rec->unkA8 = (u8)speed;
     } else {
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
