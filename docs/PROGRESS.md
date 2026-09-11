@@ -230,6 +230,34 @@ The head also wrote an `until ! pgrep -f <pattern>` wait loop that could never
 terminate, because the polling shell's own command line contains the pattern --
 the sibling of the standing "never `pkill -f` a tool name" rule.
 
+**And it happened a THIRD time, at teardown.** The head removed all three
+worktrees while charlie2 was still live and mid-investigation on its third
+function. That runner came back afterwards to find its worktree and branch
+gone; its committed work had all been merged, but it had lost the ability to
+test its most promising lead. The pattern across all three instances is the
+same: **the head repeatedly treated "I have what I need from this agent" as
+"this agent is finished", and those are different claims.** Teardown is as
+irreversible as a kill, and it belongs after the last agent has actually
+reported, not after the last result the head happened to want.
+
+What rescued it this time is that the runner reported the lead in prose
+precisely enough to test without a worktree: `h6 += 0x14;` is nested under
+`if (flag == 0)` in `func_8004C93C`'s preserved body, while retail's
+`beqz $v0` at `0x8004C99C` carries `addiu $s5,$s5,0x14` in its delay slot and
+so runs on both paths. **The head verified the delay-slot reading (correct) and
+tested the inference (negative).** Hoisting the increment gives 15/109 and one
+word LONG; duplicating it into both arms gives 9/109, against a 45/109
+baseline. A delay-slot instruction executes unconditionally, but that is a fact
+about SCHEDULING, not about where the statement sat in the source -- "do not
+derive source order from emission order", one level down. The lever is now
+spent rather than untried, and the report says so.
+
+The round's Gate 1b addition also worked in the direction it was meant to:
+charlie2 skipped `func_8004CFB8` and `func_8004CD38` on attempt-history
+grounds, citing a 36,023-iteration and a 71,363-iteration permuter run
+respectively, and spent the time on `func_8004C6A8` instead -- which is where
+the round's largest gain came from.
+
 ### Next move
 
 **An SDK-conversion round, then runners.** Eight Sony-owned stalls remain,
@@ -240,8 +268,7 @@ whole category and is the only work on the board with a guaranteed outcome.
 `libcd/iso9660` touches `code_179d8_g` and `code_179d8_d`, so no matching
 runner may hold either unit that round.
 
----
-## 2026-09-12 — round 32: six closes, and 14 queued functions that were Sony's all along
+---## 2026-09-12 — round 32: six closes, and 14 queued functions that were Sony's all along
 
 **State at end: 1059 matched / 1356 game functions (78.10% of game code), up
 from 1053 (77.65%). Queue 218 live `INCLUDE_ASM`, 217 documented stalls,
