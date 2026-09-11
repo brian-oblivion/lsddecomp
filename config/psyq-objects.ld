@@ -71,25 +71,11 @@ PSDGPU = 0x80090B80;   /* libgs/gs_013 */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
-MulMatrix0 = 0x80015230;
-ApplyMatrixLV = 0x80015618;
-PushMatrix = 0x800158CC;
-PopMatrix = 0x8001596C;
-MulMatrix = 0x80015AF0;
-MulMatrix2 = 0x80015BFC;
-ApplyMatrix = 0x80015D08;
-TransMatrix = 0x80015DB4;
-ScaleMatrix = 0x80015DD8;
-SetRotMatrix = 0x80015EFC;
-SetLightMatrix = 0x80015F2C;
-SetTransMatrix = 0x80015F8C;
-RotTransPers4 = 0x80015FB0;
-ReadGeomScreen = 0x800160A4;
-RotMatrix = 0x800160B0;
 rsin = 0x80016C0C;
 rcos = 0x80016CE8;
 ResetCallback = 0x80024D10;
 InterruptCallback = 0x80024D40;
 ChangeClearPAD = 0x80025434;
 ChangeClearRCnt = 0x80025454;
+rcossin_tbl = 0x80066BE0;
 GsOUT_PACKET_P = 0x8008E794;

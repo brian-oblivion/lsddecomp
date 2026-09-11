@@ -252,7 +252,7 @@ void func_8003FC18(s32 a0, s32 a1, TexPageDesc *desc) {
 }
 
 extern s32 D_800902E0;
-extern void printf(const char *fmt, s32 arg1); /* asm/psyq_2258.s,
+extern void printf(const char *fmt, s32 arg1); /* libc2/printf,
                                                            Psy-Q printf-like;
                                                            declared locally
                                                            with THIS call

@@ -279,7 +279,7 @@ struct UnkOwnerMethods_d294 {
     void (*slot10)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x010, "attach" */
     void (*slot14)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x014, "detach" */
     /* +0x084, func_8001D950's own call target on each list node (round 13).
-     * `out` is a 0x20-byte buffer (MATRIX-shaped -- func_80015BFC, this
+     * `out` is a 0x20-byte buffer (MATRIX-shaped -- MulMatrix2, this
      * call site's own consumer, loads it into GTE control regs 0-4 via
      * `ctc2`, PsyQ, not decompiled). */
     u8 pad018[0x084 - 0x018];
@@ -624,14 +624,14 @@ extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
  * the name): each iteration reads a 6-byte `Rec6_d294` record OUT OF
  * `dest` into a stack-local copy, then forwards that copy AND `src`
  * (unchanged, raw pointer, never dereferenced by this function itself) to
- * `func_80015D58(out, &buf, src)`. `func_8001D624` (this unit, round 12)
+ * `ApplyMatrixSV(out, &buf, src)`. `func_8001D624` (this unit, round 12)
  * calls it with `src` and `dest` (its own arg0/arg1) equal to the SAME
  * address, which is why this asymmetry was invisible until this function
  * was actually matched. Declared only with the opaque shape its callers
  * need. */
 extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
 
-/* func_80015618 (still uncarved, a different/earlier segment): called once
+/* ApplyMatrixLV (still uncarved, a different/earlier segment): called once
  * per iteration by func_8001EE98 below as `(fixed, b, a)`; not decompiled
  * here, declared only with the opaque shape that call site needs.
  *
@@ -641,7 +641,7 @@ extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
  * 24 bytes (six words), not the 16-byte/three-word minimum its one LIVE
  * call site needs. An isolated reproducer under the pinned toolchain
  * confirmed retail's exact bytes -- frame size, live call site, AND the
- * unreachable-code source shape -- only when `func_80015618` is called
+ * unreachable-code source shape -- only when `ApplyMatrixLV` is called
  * BOTH with 3 live arguments (this unit's real call, inside the loop) AND
  * with 6 arguments inside a `if (0) { ... }` dead branch elsewhere in the
  * SAME function (GCC 2.6.3 sizes the outgoing-arg area from every call
@@ -649,13 +649,13 @@ extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
  * eliminated -- so the frame remembers an arg count the emitted code
  * never uses). A K&R/unprototyped declaration is required for this: an
  * ANSI prototype would make the mismatched-arity calls a compile error. */
-extern void func_80015618();
+extern void ApplyMatrixLV();
 
 /* func_8001EE98 (this unit, round 14; MATCHED round 19, echo -- see
  * docs/match-reports/func_8001EE98.md): a paired-array iteration sibling
  * to func_8001EE04 above -- `count` iterations, 0xC bytes/element (no
  * unaligned-load complication this time, both `a`/`b` are read directly),
- * calling `func_80015618(fixed, b, a)` once per element and advancing both
+ * calling `ApplyMatrixLV(fixed, b, a)` once per element and advancing both
  * `a`/`b` by 0xC each time while `fixed` stays constant across every call.
  * func_8001E58C (this unit, round 14) calls it as `func_8001EE98(dst, dst,
  * 1, &buf)` where `dst` is func_8001E58C's own 2nd argument and `buf` is a
@@ -707,21 +707,23 @@ s32 func_8001D450(Class6B5CCObj *self, s32 a1);
 u32 func_8001D480(Class6B5CCObj *self, u32 a1);
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
 
-/* func_800160B0 (asm/psyq_2258.s, PsyQ library, not game code): takes an
+/* RotMatrix (Psy-Q libgte/fgo_01, linked from Sony's object, not game
+ * code): takes an
  * s16-quad-shaped pointer (this call site's own S16Quad_d294) and a 2nd
  * argument this unit's own caller passes straight through, unexamined.
  * $v0 is never read after this call site's own `jal`, so declared void
  * here -- other units may see a different arity/return, same per-call-site
  * precedent as func_8001E57C above. */
-extern void func_800160B0(S16Quad_d294 *vec, s32 a1);
+extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
 
-/* func_80015BFC (asm/psyq_2258.s, PsyQ library, not game code): loads its
+/* MulMatrix2 (Psy-Q libgte/mtx, linked from Sony's object, not game
+ * code): loads its
  * own arg0 into GTE control regs 0-4 via `ctc2` (5 words, the packed
  * MATRIX rotation part) then combines it with arg1 -- a matrix-compose
  * primitive (PsyQ's `CompMatrix` family). func_8001D950 (round 13, this
- * unit) calls it as `func_80015BFC(buf2, buf1)`, both 0x20-byte opaque
+ * unit) calls it as `MulMatrix2(buf2, buf1)`, both 0x20-byte opaque
  * local buffers; declared only with that shape. */
-extern void func_80015BFC(void *arg0, void *arg1);
+extern void MulMatrix2(void *arg0, void *arg1);
 
 /* BasicClass__func_1816c (src/code_8220.c, code_8220 unit, already matched
  * there as `void BasicClass__func_1816c(BasicClass *self, BasicClass

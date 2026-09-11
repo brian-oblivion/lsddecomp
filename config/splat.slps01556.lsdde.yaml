@@ -246,7 +246,12 @@ segments:
       - [0x4F68, o, libgs/gs_135]     # GsGetLws
       - [0x5288, o, libgs/2d_box0]    # GsSortBoxFill
       - [0x5360, o, libgs/2d_com0]    # _mk_spr_packet, _mk_xpndsp, _mk_normsp
-      - [0x58D0, asm, psyq_58d0]
+      - [0x58D0, o, libgte/mtx_00]    # CompMatrix .. ReadColorMatrix
+      - [0x62F0, o, libgte/mtx]       # MulMatrix .. SetTransMatrix
+      - [0x67B0, o, libgte/cmb_00]    # RotTransPers4
+      - [0x6830, o, libgte/reg01]     # ReadSZfifo3 .. ReadGeomScreen
+      - [0x68B0, o, libgte/fgo_01]    # RotMatrix
+      - [0x6B40, asm, psyq_6b40]
       # code_8220 is 56 functions, and it is the BasicClass block -- most of
       # its symbols are already named (BasicClass__*), so it is the most
       # legible uncarved ground in the game. First 20-function slice,
@@ -1256,7 +1261,12 @@ segments:
       - [0x570C1, pad]
       - [0x570C4, data]                       # 8 bytes no placed object owns
       - [0x570CC, o, libgs/2d_bg0, .data]     # 4 bytes
-      - [0x570D0, data]
+      - [0x570D0, o, libgte/mtx_00, .data]    # 0x310, ends exactly at 0x573E0
+      # 0x573E0 is rcossin_tbl (vram 0x80066BE0), a DATA-ONLY libgte object:
+      # no .text, so no disc can place it and it is not convertible. Its bytes
+      # stay here; libgte/fgo_01 and libgte/geo reference it and the fragment
+      # pins it as an external.
+      - [0x573E0, data]
       - [0x5DB0C, o, libetc/vmode, .data]
       - [0x5DB10, o, libetc/intr_dma, .data]
       - [0x5DB38, o, libetc/intr_vb, .data]

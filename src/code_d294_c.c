@@ -221,7 +221,7 @@ typedef struct Rec6_d294 {
     s16 h;
 } Rec6_d294;
 
-extern void func_80015D58(void *out, void *buf, void *src);
+extern void ApplyMatrixSV(void *out, void *buf, void *src);
 
 void func_8001EE04(void *src, void *dest, s32 count, void *out) {
     u8 *end;
@@ -231,7 +231,7 @@ void func_8001EE04(void *src, void *dest, s32 count, void *out) {
         Rec6_d294 buf;
 
         buf = *(Rec6_d294 *)dest;
-        func_80015D58(out, &buf, src);
+        ApplyMatrixSV(out, &buf, src);
         dest = (u8 *)dest + 6;
         src = (u8 *)src + 6;
     }
@@ -242,12 +242,12 @@ void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
 
     end = (u8 *)a + count * 0xC;
     while ((u8 *)a < end) {
-        func_80015618(fixed, b, a);
+        ApplyMatrixLV(fixed, b, a);
         a = (u8 *)a + 0xC;
         b = (u8 *)b + 0xC;
     }
     if (0) {
-        func_80015618(fixed, b, a, 0, 0, 0);
+        ApplyMatrixLV(fixed, b, a, 0, 0, 0);
     }
 }
 

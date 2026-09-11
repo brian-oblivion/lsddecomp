@@ -80,3 +80,15 @@
 3.3  libgs/gs_135    0x4F68
 3.3  libgs/2d_box0   0x5288
 3.3  libgs/2d_com0   0x5360
+
+# psyq_2258 chunk D (0x58D0..0x6B40): the libgte matrix stack and register
+# accessors. One data section: mtx_00 .data 0x570D0 (0x310), which ends
+# exactly at 0x573E0 where rcossin_tbl begins. rcossin_tbl is a DATA-ONLY
+# libgte object -- no .text, so no disc can place it -- and stays in the
+# plain data slot; libgte/fgo_01 and libgte/geo reference it and ldfrag pins
+# it as an external.
+3.3  libgte/mtx_00   0x58D0
+3.3  libgte/mtx      0x62F0
+3.3  libgte/cmb_00   0x67B0
+3.3  libgte/reg01    0x6830
+3.3  libgte/fgo_01   0x68B0

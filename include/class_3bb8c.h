@@ -552,7 +552,7 @@ struct Unk6C14Obj {
 
 /*
  * Unk6C14Obj::unk44's pointee. `+0x010` is only ever address-taken
- * (forwarded raw to func_800160B0, never dereferenced in this unit);
+ * (forwarded raw to RotMatrix, never dereferenced in this unit);
  * `+0x012` is read BOTH as a signed halfword (to test its sign, adding
  * 0x1000 to the unsigned reading when negative -- a 12-bit two's
  * complement unpack) and, separately, as the resulting unsigned value
@@ -586,13 +586,13 @@ struct Unk6CObj {
  * global `D_8008E98C` into a stack-local descriptor, then partially
  * overwritten (`unk14`/`unk18` zeroed, `unk1C` set from `self->unk74`)
  * before being handed to two uncarved library helpers
- * (`func_800160B0`/`func_80015618`) as an in/out parameter block. Field
+ * (`RotMatrix`/`ApplyMatrixLV`) as an in/out parameter block. Field
  * meaning beyond "8 words, offsets 0x00-0x1C" is unestablished; the first
  * five words are read/written only as the opaque whole-struct copy.
  */
 struct QueryTemplate866E8 {
     s32 unk0[5];                    /* +0x000..+0x010, opaque (untouched by func_8004C6A8) */
-    s32 unk14;                      /* +0x014, func_8004C6A8: zeroed before the call, then an in/out arg to func_80015618 */
+    s32 unk14;                      /* +0x014, func_8004C6A8: zeroed before the call, then an in/out arg to ApplyMatrixLV */
     s32 unk18;                      /* +0x018, func_8004C6A8: zeroed before the call */
     s32 unk1C;                      /* +0x01C, func_8004C6A8: set to self->unk74 before the call */
 };
@@ -600,15 +600,15 @@ struct QueryTemplate866E8 {
 extern QueryTemplate866E8 D_8008E98C;
 
 /* Uncarved library helpers (round 13, func_8004C6A8's only known call
- * site). `func_800160B0`'s first argument is `(u8 *)sub + 0x10` where
+ * site). `RotMatrix`'s first argument is `(u8 *)sub + 0x10` where
  * `sub` is a `Unk6C14SubObj *` -- never dereferenced in this unit, so
  * typed as a raw pointer rather than claiming a struct shape for it.
- * `func_80015618` is called with its 2nd and 3rd arguments pointing at
+ * `ApplyMatrixLV` is called with its 2nd and 3rd arguments pointing at
  * the SAME address (`&desc.unk14` passed twice) -- confirmed against the
  * raw disassembly (`$a1`/`$a2` both `sp+0x54`), not a transcription
  * shortcut. */
-extern void func_800160B0(void *arg0, QueryTemplate866E8 *arg1);
-extern void func_80015618(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2);
+extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
+extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2);
 
 /*
  * Opaque target of Obj866E8::unk1DC (func_8004CFB0 stores it raw;
@@ -723,7 +723,7 @@ struct Obj866E8 {
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
     Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
-    s32 unk74;                     /* +0x074, func_8004C6A8: copied into its stack-local QueryTemplate866E8's unk1C before calling func_800160B0 */
+    s32 unk74;                     /* +0x074, func_8004C6A8: copied into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
     s16 unk78;                     /* +0x078, func_8004C620 (halfword, doubled into an index) */
     s16 unk7A;                     /* +0x07A, func_8004C620 (halfword, passed on as an arg) */
     s16 unk7C;                     /* +0x07C, func_8004C93C: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with unk80 to decide whether the grid footprint spans one or two 20-unit cells; also written directly by func_8004C6A8 */
