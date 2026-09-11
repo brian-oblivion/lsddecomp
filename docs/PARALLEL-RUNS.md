@@ -1939,14 +1939,16 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > DESTROYED at the end of the round. Never push.
 >
 > **NOTHING RUNS ON YOUR BEHALF AND NO NOTIFICATION IS COMING TO YOU. Do not
-> end your turn waiting for one.** Two of round 33's three runners did exactly
-> that — one waiting on a background permuter it had correctly bounded with
-> `timeout`, one waiting on a "monitor" that never existed — and both ended
-> their sessions with modified files and ZERO commits. Nine files between
-> them, including a 17-word improvement, survived only because the head
-> recovered the worktrees by hand before teardown. If you started something in
-> the background, poll it yourself and then finish; if you are unsure whether
-> to keep going, COMMIT FIRST and then decide.
+> end your turn waiting for one.** A round-33 runner did exactly that, waiting
+> on a "monitor" that never existed, and ended its session with four modified
+> reports and ZERO commits; they survived only because the head recovered the
+> worktree by hand before teardown. A second runner that same round ended a
+> turn waiting on a permuter it HAD bounded correctly — it did resume and
+> finish, but in the meantime it looked identical to the dead one, and the
+> head committed underneath it. **Both problems are solved by the same
+> habit: if you started something in the background, poll it yourself and
+> then finish; and COMMIT BEFORE you wait, not after.** An uncommitted file
+> is indistinguishable from a lost one from the outside.
 >
 > **Keep every function and INCLUDE_ASM in your unit in STRICT ROM-ADDRESS
 > ORDER.** Writing a definition out of order miscompiles the whole image — the
