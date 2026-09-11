@@ -143,13 +143,23 @@ void func_80032AD0(void)
 /* Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
  * TARGET, each a hardware halfword, 0x10 apart -- matches the real
  * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
- * pointer to this table, not the table itself. */
+ * pointer to this table, not the table itself.
+ *
+ * The three hardware fields are `volatile` because they ARE memory-mapped
+ * registers, and that is load-bearing for matching as well as correct:
+ * without it GCC reorders the table load against the index arithmetic and
+ * hoists stores into unconditional-jump delay slots retail leaves as `nop`.
+ * It closed func_80032BB8 and func_80032C60 in round 32 -- the first of
+ * which had been filed for three rounds as an unfixable register-identity
+ * residue -- and it SUBSUMES the `__asm__("")` barrier SetRCnt used to
+ * carry (removed in the same round; SetRCnt still verifies 40/40).
+ * See docs/match-reports/func_80032C60.md for the mechanism. */
 typedef struct {
-    u16 count;              /* 0x0 */
+    volatile u16 count;              /* 0x0 */
     u8  pad2[0x4 - 0x2];
-    u16 mode;                /* 0x4 */
+    volatile u16 mode;                /* 0x4 */
     u8  pad6[0x8 - 0x6];
-    u16 target;               /* 0x8 */
+    volatile u16 target;               /* 0x8 */
     u8  padA[0x10 - 0xA];
 } RCntEntry;
 
@@ -168,7 +178,6 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     isLow = (u32)idx < 2;
     D_8006DCB0[idx].mode = 0;
     D_8006DCB0[idx].target = target;
-    __asm__("");
 
     if (isLow) {
         if (mode & 0x10) {
@@ -191,7 +200,17 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032BB8);
+s32 func_80032BB8(s32 n)
+{
+    s32 idx = (u16)n;
+    RCntEntry *base;
+
+    if (idx >= 3) {
+        return 0;
+    }
+    base = D_8006DCB0;
+    return base[idx].count;
+}
 
 /* Shadow of the PSX interrupt controller pair at 0x1F801070/0x1F801074
  * (I_STAT/I_MASK). D_8006DCAC is a pointer to this pair, not the pair
@@ -225,7 +244,18 @@ s32 func_80032C28(u16 which)
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_80032C60);
+s32 func_80032C60(s32 n)
+{
+    s32 idx = (u16)n;
+    RCntEntry *base;
+
+    if (idx >= 3) {
+        return 0;
+    }
+    base = D_8006DCB0;
+    base[idx].count = 0;
+    return 1;
+}
 
 extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32 a3);
 
