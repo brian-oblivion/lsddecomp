@@ -24,13 +24,16 @@ SECTIONS {
     .psyq_bss.libc2_itoa_bss 0x8008E090 (NOLOAD) : SUBALIGN(2) { build/lib/libc2/itoa.o(.bss) }   /* 0x10 bytes; section-relative refs */
     .psyq_bss.libgs_gs_110_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_110.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_bss.libgs_gs_107_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_107.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libpress_vlc2_bss 0x8008E960 (NOLOAD) : SUBALIGN(2) { build/lib/libpress/vlc2.o(.bss) }   /* 0x1C bytes; section-relative refs */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
+dc_cr = 0x8008E224;   /* libpress/vlc2 */
 PSDOFSX = 0x8008E240;   /* libgs/gs_013 */
 PSDOFSY = 0x8008E244;   /* libgs/gs_013 */
 PSDBASEX = 0x8008E27C;   /* libgs/gs_013 */
 PSDBASEY = 0x8008E280;   /* libgs/gs_013 */
 SearchPoint = 0x8008E284;   /* _obj/malloc */
+dec_pt = 0x8008E28C;   /* libpress/vlc2 */
 GsDSTACK = 0x8008E290;   /* libgs/gs_013 */
 POSITION = 0x8008E790;   /* libgs/gs_013 */
 GsWSMATRIX_ORG = 0x8008E7E4;   /* libgs/gs_134 */
@@ -47,6 +50,7 @@ GsDRAWENV = 0x8008E8C4;   /* libgs/gs_013 */
 GsDISPENV = 0x8008E920;   /* libgs/gs_013 */
 GsORGOFSX = 0x8008E93C;   /* libgs/gs_013 */
 GsORGOFSY = 0x8008E940;   /* libgs/gs_013 */
+dc_type = 0x8008E944;   /* libpress/vlc2 */
 _LC = 0x8008E948;   /* libgs/gs_127 */
 _LC = 0x8008E948;   /* libgs/gs_119 */
 _LC = 0x8008E948;   /* libgs/gs_120 */
@@ -54,6 +58,7 @@ _LC = 0x8008E948;   /* libgs/gs_104 */
 _LC = 0x8008E948;   /* libgs/gs_122 */
 _LC = 0x8008E948;   /* libgs/gs_110 */
 _LC = 0x8008E948;   /* libgs/gs_107 */
+bs_curt = 0x8008E974;   /* libpress/vlc2 */
 HWD0 = 0x8008E980;   /* libgs/gs_127 */
 HWD0 = 0x8008E980;   /* libgs/gs_119 */
 HWD0 = 0x8008E980;   /* libgs/gs_120 */
@@ -78,6 +83,7 @@ GsIDMATRIX = 0x8008E98C;   /* libgs/gs_110 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_107 */
 GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_134 */
 GsWSMATRIX = 0x8008E9B0;   /* libgs/gs_135 */
+dec_used = 0x8008E9D4;   /* libpress/vlc2 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_127 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_119 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_120 */
@@ -93,6 +99,7 @@ GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_122 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_110 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_107 */
 CLIP2 = 0x8008EA04;   /* libgs/gs_013 */
+dc_y = 0x8008EA44;   /* libpress/vlc2 */
 DSTACK = 0x80090260;   /* libgs/matrix */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_127 */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_119 */
@@ -111,6 +118,7 @@ GsCLIP3near = 0x800902E4;   /* libgs/gs_107 */
 PSDCNT = 0x80090B74;   /* libgs/gs_013 */
 PSDIDX = 0x80090B78;   /* libgs/gs_013 */
 PSDGPU = 0x80090B80;   /* libgs/gs_013 */
+dc_cb = 0x80090C14;   /* libpress/vlc2 */
 /* externals the linked objects reference and nothing in the link defines yet;
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
@@ -159,6 +167,10 @@ _spu_AllocLastNum = 0x8006E18C;
 _spu_memList = 0x8006E190;
 _spu_rev_startaddr = 0x8006E194;
 _spu_rev_param = 0x8006E1E4;
+DCL_DVLC = 0x8006F7E0;
+DCC_DVLC = 0x8006FFE0;
+CF_DVLC = 0x800707E0;
+CF2_DVLC = 0x800807E0;
 GsOUT_PACKET_P = 0x8008E794;
 _snd_openflag = 0x8008EA00;
 _ss_score = 0x800902E8;

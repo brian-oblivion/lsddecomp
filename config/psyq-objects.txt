@@ -207,3 +207,12 @@
 3.3  libgs/gs_110   0x330F4
 3.3  libgs/gs_107   0x3328C
 3.3  libc2/exit     0x36D38
+
+# psyq_memset chunk C (0x36DB8..0x3770C): libpress, the MDEC variable-length
+# code decoder. Data: vlc .data 0x5FFC8 (0x18, dlabel D_8006F7C8 ->
+# D_8006F7E0) and vlc2 .rdata 0x1B50 (0x1B, "MDEC_vlec: invalid VLC ID\n"),
+# both confirmed by byte search. vlc2's .rdata ends at 0x1B6B and retail's
+# next string starts at 0x1B6C, which is exactly where SUBALIGN(2) puts it,
+# so no pad. The 0x1C .bss goes in the fragment.
+3.3  libpress/vlc    0x36DB8
+3.3  libpress/vlc2   0x3711C
