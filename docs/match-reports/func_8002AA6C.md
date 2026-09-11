@@ -1,4 +1,4 @@
-# func_8002AA6C -- STALL (202/223 words, compiled length EXACT at 223/223 -- improved from 119/223 in round 20, see below)
+# func_8002AA6C -- STALL (length EXACT 223/223, 202/223 words match, first real diff at vram 0x8002AA70)
 
 Unit `code_179d8_g`. Runner delta, round 17. 223 instructions.
 
@@ -675,3 +675,69 @@ spending an attempt on `__asm__("")` placement, check the permuter's own
 `--debug` breakdown if one exists, or the raw `.s`'s label structure for a
 duplicated store/two-candidate-join shape, to know which of the three is
 in play.
+
+## Round 33 (runner charlie): re-verified 202/223, title rebuilt with the three required figures -- unchanged
+
+Read this report per the round-32 "check inherited bodies" rule before trusting
+its title. Re-compiled the round-20 body verbatim (with symbol names updated
+to what this unit now calls the same functions -- see note below) and
+confirmed it independently: `build exit=2`, no compile errors, `funcdiff.py`
+reports **202/223 words, no staleness warning, compiled length exact at
+223/223** (0x37C bytes, matches retail's own `nonmatching func_8002AA6C, 0x37C`
+header). This matches the round-20 report's own claim exactly -- the
+preserved body was NOT one of the "one in six" false claims this round.
+
+**First real diff, read off `tools/asm-differ/diff.py func_8002AA6C` on a
+clean isolated build: file offset `0x1B270`, vram `0x8002AA70`** -- the very
+first instruction after the prologue's `addiu sp,sp,-0x40`. This is exactly
+the address/value register swap round 20's "what's left" section already
+named (retail: address in `$a0`, value in `$v1`; this build: the reverse),
+not a new residue. The title above had no location figure before this round;
+it now carries all three required figures.
+
+**Symbol-name note for the next attempt**: this report's preserved body and
+round-17/19/20's prose both use the raw `func_80025AE4`/`func_80012C20`/
+`func_80025900` names for the three external calls. This unit has since
+renamed all three (matched siblings now call them by name): `func_80025AE4`
+-> `puts`, `func_80012C20` -> `printf`, `func_80025900` -> `VSync`. The raw
+names no longer have externs in this file and do not resolve -- translate
+them before compiling, do not add a second stale extern.
+
+**No new attempt made on the entry-point register swap.** Per HARD RULE 6 and
+this project's own residue taxonomy, a register-IDENTITY mismatch (which
+value ends up in which register, not merely instruction order) is explicitly
+out of scope for source-level fixing once two independent reshapes have
+already been tried and both regressed severely (round 20: declaration-order
+swap, no change; statement-order swap, catastrophic regression to 9/223).
+Re-deriving a third guess with no new idea would just spend attempt budget
+confirming what is already established. Restored to `INCLUDE_ASM` (no score
+short of byte-exact stays in `src/`); build re-verified clean after revert
+(`./build-and-verify.sh` exit 0).
+
+### Round-32 lever checklist
+1. `volatile`-as-narrower-instrument: N/A -- residue is register identity, not
+   an ordering question a qualifier of any granularity touches.
+2. Register-identity verdict as hypothesis, not fact: re-examined: the
+   residue provably constrains WHICH REGISTER a value lands in (address vs.
+   value swapped, not merely renamed), matching the test in HARD RULE 6
+   exactly. Verdict stands.
+3. Emission-order vs. source-order: not applicable here -- no new reorder
+   attempted this round.
+4. Permuter negative is evidence about one search, not the function: not run
+   here this round (budget went to `func_8002A75C`'s extended search
+   instead, which has a permuter-confirmed pure-scheduling residue --
+   AA6C's is a confirmed register-identity one and is not a comparable
+   target).
+5. asm-differ/permuter compare text, `addiu`/`ori` render identically:
+   checked the raw encoding at the diff site directly (`0780043c`/`dcd88424`
+   vs `0780013c`/...) -- these are genuinely different registers encoded,
+   not an `addiu`-vs-`ori` rendering artifact.
+
+### Proposed learning
+This unit's C source has, since these reports were first written, renamed
+`func_80025AE4`/`func_80012C20`/`func_80025900` to `puts`/`printf`/`VSync`
+respectively (matched sibling functions in this same file now call them by
+name). Any preserved report body predating that rename needs its call sites
+translated before it will compile -- worth checking for ALL of this unit's
+still-open stalls, not just this one, since the rename evidently happened
+unit-wide and no single report flagged it.

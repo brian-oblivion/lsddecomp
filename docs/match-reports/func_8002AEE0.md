@@ -306,3 +306,72 @@ stalls read for the question.
   under this pinned toolchain (different sentinel register usage), and
   this project already has one confirmed instance (`func_8002A6EC`) plus
   this one.
+
+## Round 33 (runner charlie): re-verified 153/174, one new negative, title already had all three figures
+
+Re-compiled the preserved 153/174 body verbatim (symbol names translated --
+see note below) and confirmed independently: `build exit=2`, no compile
+errors, `funcdiff.py` reports **153/174 words, no staleness warning,
+compiled length exact at 174/174**. Matches this report's own claim; not one
+of the "one in six" false-claim bodies.
+
+This report's title already carried all three required figures (length,
+word-match, first-diff vram) from when it was written -- unchanged.
+
+**New attempt on residue 2 (the redundant reload of `p8D8[0]` before the
+`p6A0[idx0]` access): swapped the `idx0`/`idx1` assignment order** (`idx1 =
+p8D9[0]; idx0 = p8D8[0];` instead of the reverse), on the theory that
+retail's own instruction stream computes `idx1`'s shifted address before
+`idx0`'s (confirmed by re-reading the raw `.s` directly, not inferred from
+prose per this round's own general caution about trusting descriptions over
+disassembly). **No change: still 153/174, byte-identical output to the
+un-swapped order.** cc1 evaluates these two independent loads the same way
+regardless of which is written first in source -- consistent with the
+report's four already-tried levers (named-local pointer at various scopes,
+anonymous cast) all landing on the same re-load shape. Reverted (no reason to
+keep a no-op change). This closes off a fifth axis without touching a new
+one; the residue's mechanism (register-pressure-driven rematerialization
+choice, not a source-expressible ordering or addressing-mode question) looks
+genuinely settled.
+
+**No re-attempt on residue 1 (the `p6A0`/`p8D9` `$s4`/`$s5` register-number
+swap)** -- four prior attempts (declaration order, assignment order,
+first-use order, spelling) are all already confirmed inert; a fifth guess
+with no new mechanism would just re-spend budget confirming that.
+
+**Symbol-name note (same finding as `func_8002AA6C.md` this round)**: this
+report's preserved body already used the current names (`puts`, `printf`,
+`VSync`, `CheckCallback`) -- unlike `func_8002AA6C`/`func_8002A75C`'s
+reports, whoever wrote this one had already picked up the rename. Worth
+flagging the inconsistency across this unit's reports rather than assuming
+any one of them reflects current symbol names.
+
+### Round-32 lever checklist
+1. `volatile`-as-narrower-instrument: not newly tried this round; the
+   existing bare `__asm__("")` barrier already gives a measured partial
+   improvement (150->153) and residue 2 is a rematerialization/register-
+   pressure choice, not purely an ordering one a narrower fence would
+   plausibly close further.
+2. Register-identity verdict as hypothesis: residue 1 re-examined against
+   the test in HARD RULE 6 -- four attempts changed neither WHICH register
+   holds which value nor the score, consistent with genuine register
+   identity, not merely under-tested.
+3. Emission-order vs. source-order: the new idx0/idx1 swap was deliberately
+   checked against the RAW `.s`'s actual instruction sequence (not a prose
+   paraphrase) before being tried -- still negative.
+4. Permuter negative is one search, not a verdict on the function: not run
+   here this round (budget went to `func_8002A75C` instead, which has a
+   cleaner permuter debug signature -- pure reordering, no register/
+   insertion/deletion component -- making it the stronger candidate for an
+   extended search).
+5. asm-differ/permuter text-vs-encoding gap: not implicated here; residue 2
+   is a genuine extra `lbu` (a real byte, not a rendering artifact of
+   `addiu`/`ori`).
+
+### Proposed learning
+A source-level evaluation-order swap of two independent scalar loads
+feeding into the SAME call's arguments is inert here, matching this unit's
+broader finding (`func_8002A75C.md`) that cc1 2.6.3's argument-evaluation
+order for a call is not steered by which local is assigned first in source.
+Worth treating as a low-probability lever generally in this codebase rather
+than re-trying it by default on the next redundant-load residue.
