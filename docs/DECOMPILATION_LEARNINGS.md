@@ -5563,6 +5563,98 @@ a flat score can simply mean the sampled space missed it (round 32's
 now the scaffold itself can be scoring the wrong target. **A permuter negative
 is evidence about one search against one scaffold, and nothing more.**
 
+## Round 33 (2026-09-12) — `volatile`'s two effects, lever scoping, and a screen that cannot see ownership
+
+### `volatile` has TWO independent effects and conflating them wastes the lever
+
+Round 32 established `volatile` as the narrow instrument for the
+instruction-ORDER class. Round 33's charlie (`code_179d8_g`) reports a
+refinement that matters when the first spelling does nothing:
+
+- Qualifying a **global's declaration** controls whether repeat reads/writes
+  of it can be optimised away or reordered.
+- Routing an access through a local **`volatile T *` pointer** ALSO controls
+  whether the ADDRESS COMPUTATION gets folded into the memory instruction.
+
+Those produce different residues. "I tried `volatile` and it did nothing" is
+therefore not one measurement but at most one of two, and the second spelling
+is the one that moves an unfolded-store residue. **Try both before concluding
+the lever is dead.** Reported by charlie against `D_8006D8F8`/`D_8006D8F4` in
+`code_179d8_g`; not independently re-derived by the head, so treat the
+mechanism as reported-and-plausible rather than settled, and say which you
+observed when you use it.
+
+### A lever's NEGATIVE result is scoped to the state it was tested under
+
+Round 19 recorded, correctly, that flipping a particular guard's polarity in
+`func_8002B4D4` did nothing. Round 33 flipped the same guard and it closed
+three words — because an unrelated earlier fix had landed in between and moved
+the residue.
+
+**So a recorded negative is a fact about a (function, lever, STATE) triple,
+not about the function.** Re-try the cheap levers after any change that moves
+the diff, and do not read an old negative in a report as settled. This is the
+same shape as the permuter lesson one section up — a negative is evidence
+about one search against one scaffold — arriving in the manual levers, and it
+is the reason a long report full of ruled-out axes is not the same thing as an
+exhausted function.
+
+The corollary is a ranking rule, not a matching one: **budget a session by
+ATTEMPT HISTORY, not by score.** Round 33's alpha was staffed onto `code_55dd4`
+because its titles showed 252/258 and 33/40, the best-looking odds on the
+board, and produced five confirmatory negatives — every one of those functions
+already had five or six rounds behind it and two had 190,000+ permuter
+iterations against confirmed scaffolds. A title line carries length,
+word-match and first diff; it says nothing about what has been spent. See
+Gate 1b in docs/PARALLEL-RUNS.md.
+
+### Two negatives worth having
+
+- **cc1 2.6.3's argument-evaluation order for a call is NOT steered by which
+  local is assigned first in source.** Swapping two independent scalar loads
+  feeding the same call's arguments is inert. Reported twice in
+  `code_179d8_g` (`func_8002A75C`, `func_8002AEE0`). Treat it as a
+  low-probability lever rather than a default first move on a
+  redundant-load residue.
+- **An early `return` inside one arm of a diagnostic block does not reproduce
+  a retail join of the shape `move v0,zero` / `bnez v0,<target>`**, even
+  though it is logically equivalent and shorter. Retail's source had the
+  redundant-looking flag-then-branch, so write that.
+
+### A blocker screen cannot see OWNERSHIP, and this is now measured twice
+
+Round 32 found 14 stalled functions lying inside placed Sony objects. Round 33
+converted five runs of them and hit the same shape from the other direction:
+`code_179d8_i`'s carve-time header had certified `func_80032D34` as "ordinary
+large fresh ground, not blocked", verified against both live screens with zero
+hits. **The verification was correct and the conclusion was still wrong** — the
+function is `SsVabOpenHeadWithMode` (`libsnd/vs_vh.o`), and a screen that
+measures toolchain obstructions says nothing about who wrote the code. It read
+as the cleanest and largest ground in the unit while being unmatchable by
+construction, and round 26 spent a 232-line derivation on it.
+
+The same unit had carried, since carve time, a comment saying a nearby
+function "IS the SDK utility, not a coincidentally-named local". The finding
+was sitting in prose no tool could read for several rounds. `sdkstalls.py`
+exists so this is a command rather than a noticing; `nearmiss.py` runs it.
+
+### Renaming a Sony function into a SHARED header is a latent `conflicting types`
+
+Converting `libgs/gs_131` renamed `func_8003F2AC` to `GsSetRefView2` — and one
+of the hits was `include/code_2cc8c.h`, which six units include. The build
+stayed green. But that header will one day sit next to `include/psyq/LIBGS.H`'s
+own prototype for the same name, and the failure would then appear in whichever
+unit includes both first — a unit that never touched the declaration.
+
+A prototype for a function ANOTHER translation unit defines — a linked Sony
+object emphatically included — belongs in the `.c` that calls it. The SDK
+guide already says this; what round 33 adds is that **a bulk rename is how the
+rule gets broken silently**, because `sed` does not know which of its hits is
+a shared header. Read every hunk a rename produces. In the same round a rename
+also rewrote two HISTORICAL comments that were quoting an old symbol name on
+purpose.
+
+
 ## Open questions
 
 - **What is the class-table header word at `+0x000`? PARTLY ANSWERED, and the
