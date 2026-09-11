@@ -28,6 +28,19 @@ most of the function's length. Two specific, localized residues account
 for essentially the whole 15-word gap (see below); nothing else in the
 function showed a genuine content/order mismatch in this round's reading.
 
+## Round 30 (charlie) update: rebuilt, confirmed accurate
+
+Re-spliced this exact preserved body and rebuilt from scratch. **All title
+figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
+`func_8002FAC4` at `0x648` bytes = **402 words**, retail 387 (15 long,
+exactly as titled), and `funcdiff.py`'s in-range figure is **6/387** with
+its drift warning firing, matching this report's own caution. No new axis
+attempted this round: this is fresh ground from the immediately preceding
+round with a thorough two-residue diagnosis already in place (the
+early-materialization split and the `D_8008EA26`-cluster addressing cost),
+lowest priority of the six assigned functions, and the largest/hardest —
+correctly triaged as such by the work order.
+
 ## Signature -- corroborated independently by three sibling units, not just derived here
 
 ```c

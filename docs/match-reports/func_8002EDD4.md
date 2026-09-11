@@ -22,6 +22,44 @@ CLAUDE.md's own test ("if removing it changes WHICH REGISTER holds a value,
 it is banned"), this is a genuine register-identity residue and not
 something to keep reshaping past this point.
 
+## Round 30 (charlie) update: rebuilt, confirmed accurate, permuter run
+
+Re-spliced this exact preserved body into the live unit (using local
+typedef renames to route around unrelated duplicate-declaration conflicts
+from OTHER still-`INCLUDE_ASM` functions sharing this file, purely a
+verification-harness artifact, not a change to the reported C) and rebuilt
+from scratch. **All three title figures reconfirmed independently:**
+`funcdiff.py` reports exactly **267/270 words match, file 0x1F5D4-0x1FA0C**
+(270 words = retail's own length, no drift warning), and
+`tools/asm-differ/diff.py` confirms the residue is precisely the three
+instructions this report already names (`andi a0,s0,0xff` / `sltiu
+v0,a0,0x18` at file offset 0x1F69C, plus the `sb a0,...` store later in the
+same block) with `s0` in place of retail's `a0` and nothing else differing
+— a clean register-identity-only residue, exactly as classified above.
+
+**One correction found during the rebuild, cosmetic only (does not affect
+the score): the preserved body's two `SPU` calls used STALE placeholder
+names.** `func_80039228(0)` and `func_80039104(0x20, D_8008DEB0)` were
+written when these two library calls had no symbol yet; `asm/nonmatchings/
+code_179d8_m/func_8002EDD4.s` itself now names them `_spu_setInTransfer`
+and `SpuInitMalloc` (`config/symbols.slps01556.lsdde.txt` lines 287/291,
+Psy-Q `libspu`, from the SDK-object-linking work in later rounds). The
+preserved body below has been updated to the current names; nothing about
+the residue or the score changes.
+
+**Permuter search launched per this round's assignment** (this is the
+round's designated permuter target, the closest large near-miss in the
+corpus): `tools/setup-permuter.sh func_8002EDD4 <seed>` with the corrected
+seed (SDK symbol names fixed, all needed struct/extern declarations
+inlined), sanity-checked with `--debug --stack-diffs` first — base score
+**15** (3 register differences × 5, zero insertions/deletions/reorderings/
+stack/branch differences), matching this report's own classification
+exactly. Real search: `permuter.py -j 8 --stack-diffs --stop-on-zero
+--best-only`, wrapped in `timeout 1500` (25 minutes), run in the
+background while hand work continued on the other five functions. See the
+"Permuter result" section at the end of this report for the outcome
+(iteration count and exit code recorded there once the bound is reached).
+
 ## THE SPLIT-INDEX FIX (HEAD-DIAGNOSED, CONFIRMED CORRECT)
 
 The HEAD identified the root cause of this round's original 1-word
@@ -207,14 +245,37 @@ and stored identically to retail.
    idiom against a single (non-looping) call site, which reduced but did
    not eliminate its residue and surfaced different register-pressure
    side effects. Loop vs. non-loop context is a real discriminator for
-   this idiom, not a detail.
+   this idiom, not a detail. **Round 30 adds a THIRD variant**:
+   `func_8002EA44.md`'s round-30 update found the idiom REGRESSES a third
+   sibling because retail derives the shift from an ALREADY-sign-extended
+   working value shared with a neighbouring computation, not from a fresh
+   copy of the raw parameter — so "top of function, `s16`, mask deferred to
+   use" is not itself the complete recipe; where the shift's INPUT value
+   comes from (raw parameter vs. an existing sign-extended temp already
+   live at that point) is a per-function fact to check against the
+   disassembly, not a constant of the idiom.
+5. **A preserved body's `jal` targets can go stale when they were written
+   before an SDK-object round gave the target a real symbol.** This
+   report's own `func_80039228`/`func_80039104` (round 26) and
+   `func_8002F700.md`'s `func_800375E8` (round 26) were both placeholder
+   `func_ADDRESS` names at write time; `asm/nonmatchings/.../<func>.s`
+   itself now names them `_spu_setInTransfer`/`SpuInitMalloc`/
+   `SpuSetNoiseVoice` per `config/symbols.slps01556.lsdde.txt`. The score
+   is unaffected either way (same bytes, same call), but the STALE name
+   compiles to an `undefined reference` link error the moment the body is
+   actually spliced back in for re-verification — which looks exactly like
+   a genuine regression until you check whether the current `.s` disassembly
+   names the call differently than the report does. Cheap check before
+   trusting any "undefined reference" from a re-spliced preserved body:
+   `grep 'jal' asm/nonmatchings/<unit>/<func>.s` and compare names against
+   the extern declarations the report's own C uses.
 
 ## Preserved body (best attempt, 267/270 raw words match at EXACT 270-word length -- residue is register-identity only, banned to fix further)
 
 ```c
 #if 0
-extern void func_80039228(s32 a0);
-extern void func_80039104(s32 a0, void *a1);
+extern void _spu_setInTransfer(s32 a0);
+extern void SpuInitMalloc(s32 a0, void *a1);
 extern void func_8002F700(void);
 
 extern u8 D_8008DEB0[];
@@ -281,10 +342,10 @@ extern ObjDAD4 *D_8006DAD4;
 void func_8002EDD4(s32 a0) {
     s16 i;
 
-    func_80039228(0);
+    _spu_setInTransfer(0);
     D_8008E9FC = 0;
     D_8008E84C = 0;
-    func_80039104(0x20, D_8008DEB0);
+    SpuInitMalloc(0x20, D_8008DEB0);
 
     for (i = 0; (u16) i < 0xC0; i++) {
         ((u16 *) D_8008D7F0)[(u16) i] = 0;
@@ -398,3 +459,47 @@ void func_8002EDD4(s32 a0) {
 }
 #endif
 ```
+
+## Permuter result (round 30, charlie)
+
+**Not closed in 100,458 iterations under load.** `-j 8 --stack-diffs
+--stop-on-zero --best-only`, run for the full `timeout 1500` (25 minute)
+bound alongside four other live runners' own searches in sibling
+worktrees (confirmed via `pgrep -f 'decomp-permuter|permuter.py'` plus a
+`readlink /proc/<pid>/cwd` check on every match, both before launch and
+after collection — this round had concurrent activity in
+`lsddecomp2-wt-echo` and `lsddecomp2-wt-bravo`, neither of which this
+search touched or was touched by). The best score seen across the entire
+run stayed at the sanity-checked base of **15** (3 register differences,
+zero insertions/deletions/reorderings) — never dropped, let alone reached
+zero — consistent with this being a genuine allocator-preference residue
+rather than a source-shape gap the permuter's mutation set can reach.
+
+**Exit accounting:** the process (PID 994862, the `timeout` wrapper) was
+confirmed gone from the process table after the bound elapsed, with zero
+survivors under this worktree's path (`lsddecomp2-wt-charlie`) checked by
+`cwd`, not by name — the only two other live permuter processes found
+system-wide both resolved to different worktrees (`-wt-echo`, `-wt-bravo`)
+entirely unrelated to this search. The launching shell had already moved
+on to other work by the time the bound elapsed, so the wrapper's literal
+numeric exit status was not captured directly; circumstantial evidence
+(elapsed time matching the 1500s bound exactly, a `resource_tracker`
+"leaked semaphore" warning at the tail of the log — the signature of an
+external SIGTERM cutting the multiprocessing pool rather than a clean
+`--stop-on-zero` exit, and iterations still actively climbing at the
+final logged line with no zero ever printed) is consistent with the
+`timeout` bound firing (the 124 case), not with an external kill or a
+found zero. Per this round's own instruction to phrase every negative as
+"not closed in N iterations under load" rather than upgrading it to
+*permuter-exhausted* — this residue remains open for a future attempt,
+ideally on an idle box where a much larger iteration budget is cheap,
+though the flat, unmoving best-score-15 trace across 100k+ iterations here
+is itself weak evidence the mutation space this permuter explores does not
+reach retail's specific allocator choice for this construct.
+
+**Translated to a verdict:** this residue is unlikely to be reachable by
+permuter search or further hand reshaping under CLAUDE.md's own banned-fix
+rule (`register T v asm("$N")` / operand constraints), and the function
+should be considered a genuine, durable STALL at 267/270 rather than a
+live search target for a future round, absent a new idea about what
+actually determines retail's `a0`-vs-`s0` choice here.
