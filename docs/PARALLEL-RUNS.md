@@ -710,7 +710,27 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 
 3c. **Send an early finisher back into its OWN unit** (message the same agent —
    same worktree, same branch, context intact) rather than letting it idle or
-   spawning a cold replacement. This is the highest-yield *structural* move
+   spawning a cold replacement.
+
+   **IF `SendMessage` IS UNAVAILABLE, DO NOT SKIP THE RE-SEND — SUBSTITUTE
+   FOR IT. Merge the finished runner, fast-forward its worktree onto `main`,
+   and spawn a FRESH agent into that same worktree on a DIFFERENT unit.**
+   Rounds 31 and 32 both found the channel missing; round 31 concluded it had
+   lost the lever and took no closes from it, round 32 substituted and got
+   **2 of its 6 matches** from two re-staffed sessions.
+
+   What you lose is the agent's accumulated context, which is real — so this
+   is a worse re-send, not an equal one, and it argues for sending the
+   replacement to FRESH ground rather than back into the wall the first pass
+   hit. What you keep is the whole point of §3c: a provisioned, byte-verified
+   worktree and a runner slot that would otherwise sit idle.
+
+   **Carry the round's findings forward IN THE PROMPT — that is what replaces
+   the broadcast.** Round 32's replacement runners were handed the three
+   mechanisms found earlier that day, and one reported that a finding in its
+   prompt drove both of its matches. Ask explicitly for the negative too:
+   the same runner reported that the `volatile` lever did NOT apply to its
+   unit, which is what stops the next round re-litigating it. This is the highest-yield *structural* move
    available: every derivation is already in that agent's context, and a
    zero-match first pass is not a wasted pass — its reports are what prove a
    stall class has several instances. Hand it the lever explicitly, name the
