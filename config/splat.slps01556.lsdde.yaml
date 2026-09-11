@@ -418,8 +418,16 @@ segments:
       # startIntr, trapIntr, setIntr, stopIntr, restartIntr, memclr. .data at 0x5CA70;
       # .rdata (RCS string differs from the disc's) is shadowed by config/psyq-objects.ld.
       - [0x15510, o, libetc/intr]
-      # 0x15C24..0x15D04: the tail of the old psyq_GsLinkObject4, still asm.
-      - [0x15C24, asm, psyq_15c24]
+      # 0x15C24..0x15D04: the tail of the old psyq_GsLinkObject4, six libapi
+      # BIOS trampolines and libc2/setjmp. Every one of these is referenced by
+      # libetc/intr just above, which used to pin them as externals.
+      - [0x15C24, o, libapi/a25]        # HookEntryInt (Psy-Q 3.3)
+      - [0x15C34, o, libapi/a91]        # ChangeClearPAD
+      - [0x15C44, o, libapi/a24]        # ResetEntryInt
+      - [0x15C54, o, libapi/l10]        # ChangeClearRCnt
+      - [0x15C64, o, libapi/c114]       # _96_remove
+      - [0x15C74, o, libapi/a23]        # ReturnFromException
+      - [0x15C84, o, libc2/setjmp]      # setjmp, longjmp
       # libetc/libc2 block, linked from the SDK objects (see the pilot note
       # above). Data: .data at 0x5DB0C.., .rdata at 0xF28.., .sdata at 0x7B040.
       - [0x15D04, o, libetc/vmode]      # SetVideoMode, GetVideoMode   (Psy-Q 3.3)

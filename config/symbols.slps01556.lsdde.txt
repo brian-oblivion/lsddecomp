@@ -231,6 +231,17 @@ _patch_gte = 0x80024C40; // type:func  (Psy-Q libgte/patchgte, from the SDK obje
 EnterCriticalSection = 0x80024CE0; // type:func  (Psy-Q libapi/a36, from the SDK object)
 ExitCriticalSection = 0x80024CF0; // type:func  (Psy-Q libapi/a37, from the SDK object)
 FlushCache = 0x80024D00; // type:func  (Psy-Q libapi/c68, from the SDK object)
+// The six libapi trampolines below end in `jr $t2`, not `jr $ra`, so splat
+// had collapsed all six into one glabel func_80025424 in the old psyq_15c24;
+// the objects are what recovers their individual names.
+HookEntryInt = 0x80025424; // type:func  (Psy-Q libapi/a25, from the SDK object)
+ChangeClearPAD = 0x80025434; // type:func  (Psy-Q libapi/a91, from the SDK object)
+ResetEntryInt = 0x80025444; // type:func  (Psy-Q libapi/a24, from the SDK object)
+ChangeClearRCnt = 0x80025454; // type:func  (Psy-Q libapi/l10, from the SDK object)
+_96_remove = 0x80025464; // type:func  (Psy-Q libapi/c114, from the SDK object)
+ReturnFromException = 0x80025474; // type:func  (Psy-Q libapi/a23, from the SDK object)
+setjmp = 0x80025484; // type:func  (Psy-Q libc2/setjmp, from the SDK object)
+longjmp = 0x800254C0; // type:func  (Psy-Q libc2/setjmp, from the SDK object)
 new_class_6d3c8 = 0x80025F7C;
 strcat = 0x80027130;
 new_class_6d4e8 = 0x800271D8;

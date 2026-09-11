@@ -161,6 +161,20 @@
 # plain rodata slot. Byte-exact (docs/research/psyq-sdk-objects.md, round 29).
 3.3  libetc/intr    0x15510  shadow=.rdata
 
+# psyq_15c24 (0x15C24..0x15D04), retired WHOLE: six libapi BIOS trampolines
+# and libc2/setjmp. Text-only; `place` derives no data section for any of the
+# seven. Every one of these was pinned as an external by the fragment because
+# the already-linked libetc/intr calls it; linking the definitions retires
+# those pins. The six trampolines end in `jr $t2` and have no `jr $ra`, so
+# splat had merged all six into a single glabel.
+3.3  libapi/a25      0x15C24
+3.3  libapi/a91      0x15C34
+3.3  libapi/a24      0x15C44
+3.3  libapi/l10      0x15C54
+3.3  libapi/c114     0x15C64
+3.3  libapi/a23      0x15C74
+3.3  libc2/setjmp    0x15C84
+
 # psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
 # the SpuSetReverb* family, the malloc-style SPU RAM allocator (s_sca) and its
 # helpers. Data: s_sca .rdata 0x1764 (0x40) = jtbl_80010F64 + jtbl_80010F84,
