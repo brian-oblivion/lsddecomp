@@ -1893,11 +1893,22 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > — a one-word near-miss and a prime permuter target that "51/88" buried
 > completely.
 >
-> **COMMIT EVERYTHING YOU PRODUCE, INCLUDING STALLS.** One commit per MATCHED
-> function (do not batch matches); stalls may be batched into a single "stall
-> reports" commit. Read that carefully — it is NOT "commit only on a match".
-> An uncommitted file does not exist: `git status --porcelain` must be empty
-> when you report. Never push.
+> **COMMIT EVERYTHING YOU PRODUCE, INCLUDING STALLS. COMMIT AS YOU GO, NOT AT
+> THE END.** One commit per MATCHED function (do not batch matches); stalls
+> may be batched into a single "stall reports" commit. Read that carefully —
+> it is NOT "commit only on a match". An uncommitted file does not exist:
+> `git status --porcelain` must be empty when you report, and the worktree is
+> DESTROYED at the end of the round. Never push.
+>
+> **NOTHING RUNS ON YOUR BEHALF AND NO NOTIFICATION IS COMING TO YOU. Do not
+> end your turn waiting for one.** Two of round 33's three runners did exactly
+> that — one waiting on a background permuter it had correctly bounded with
+> `timeout`, one waiting on a "monitor" that never existed — and both ended
+> their sessions with modified files and ZERO commits. Nine files between
+> them, including a 17-word improvement, survived only because the head
+> recovered the worktrees by hand before teardown. If you started something in
+> the background, poll it yourself and then finish; if you are unsure whether
+> to keep going, COMMIT FIRST and then decide.
 >
 > **Keep every function and INCLUDE_ASM in your unit in STRICT ROM-ADDRESS
 > ORDER.** Writing a definition out of order miscompiles the whole image — the
