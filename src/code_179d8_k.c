@@ -374,7 +374,7 @@ void func_80034614(s16 a0, s16 a1, u8 a2)
  * "packed (slot<<8)|channel" first argument this file's siblings already
  * use. */
 extern void SpuVmDamperOn(void);
-extern void SsUtSetReverbDepth(s32 a0, s32 a1);
+extern void SsUtSetReverbDepth(s16 a0, s16 a1);
 extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
 extern void func_80030980(s16 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
@@ -531,8 +531,8 @@ typedef struct {
 } Scratch_800349B0;
 
 extern s16 SsUtGetProgAtr(s16 a0, s16 a1, void *out);
-extern void SsUtGetVagAtr(s16 a0, u8 a1, s16 a2, void *out);
-extern void SsUtSetVagAtr(s16 a0, u8 a1, s16 a2, void *out);
+extern void SsUtGetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
+extern void SsUtSetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
 
 void func_800349B0(s16 a0, s16 a1, u8 a2)
 {
@@ -905,6 +905,198 @@ combine:
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
 
+/* STALL (round 35): 163/179 words match, zero out-of-range drift, length
+ * EXACT (179/179 words). Every remaining diff is the SAME register-identity
+ * swap (this build keeps `channel` in $s2 and the cached `arg5` in $s3;
+ * retail has them the other way around) -- CLAUDE.md's register-identity
+ * STALL class, not a banned-fix target. See docs/match-reports/func_800357B0.md
+ * for the full derivation (now unblocked: every cross-unit call below is a
+ * real Psy-Q SDK symbol, not a local guess) and the preserved near-miss body. */
+#if 0
+/* This unit's own reduced view of the VagAtr SsUtGetVagAtr/SsUtSetVagAtr
+ * fill (round 35): only the 8 fields this function actually touches, at
+ * their real include/psyq/LIBSND.H VagAtr offsets. Total size (0x20) is
+ * load-bearing -- func_800357B0 receives it as a BY-VALUE 4th parameter
+ * (its first word arrives in $a3, the rest already spilled to the stack by
+ * the caller), and its own incoming value is immediately discarded: every
+ * byte is refilled by the unconditional SsUtGetVagAtr call at function
+ * entry before any case reads it. */
+typedef struct {
+    u8 prior;    /* +0x0 */
+    u8 mode;     /* +0x1 */
+    u8 pad2[0x6 - 0x2];
+    u8 min;      /* +0x6 */
+    u8 max;      /* +0x7 */
+    u8 pad8[0x9 - 0x8];
+    u8 vibT;     /* +0x9 */
+    u8 porW;     /* +0xA */
+    u8 padB[0x10 - 0xB];
+    u16 adsr1;   /* +0x10 */
+    u16 adsr2;   /* +0x12 */
+    u8 pad14[0x20 - 0x14];
+} Scratch_800357B0;
+
+/* Same 9-halfword ADSR-decode layout as code_179d8_f.c's independent,
+ * already-matched `UnkStruct80035F3C` (docs/match-reports/func_80035F3C.md)
+ * -- a fresh LOCAL (uninitialized), filled by `_SsUtResolveADSR` from
+ * `scratch.adsr1`/`adsr2` and consumed by `_SsUtBuildADSR`, never by the
+ * caller. Renamed per-unit per project convention, not shared. */
+typedef struct {
+    s16 unk0;
+    s16 unk2;
+    s16 unk4;
+    s16 unk6;
+    s16 unk8;
+    s16 unkA;
+    s16 unkC;
+    s16 unkE;
+    s16 unk10;
+} AdsrRaw_800357B0;
+
+/* Both linked from Sony's `libsnd/adsr.o` (round 34) -- see
+ * func_80035F3C.md / func_80035F98.md for the derivation of this shape,
+ * fixed as those units' independent local views: */
+extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrRaw_800357B0 *out);
+extern void _SsUtBuildADSR(AdsrRaw_800357B0 *in, u16 *adsr1, u16 *adsr2);
+extern void SsUtReverbOn(void);
+extern s16 SsUtSetReverbType(s16 a0);
+extern void SsUtSetReverbFeedback(s16 a0);
+extern void SsUtSetReverbDelay(s16 a0);
+
+/* MIDI CC91 (Reverb Depth)/98/99/100/101 (NRPN/RPN LSB/MSB) and friends'
+ * per-parameter handler, reached only from func_800351D0 (still a stall;
+ * see its own report) via a double jump-table dispatch this unit owns
+ * (jtbl_80010ED8 outer, jtbl_80010F38 inner). `kind` selects which VagAtr
+ * (per program-tone) is fetched/stored; `arg5` is the outer parameter
+ * selector (0..22), `arg6` the value byte nearly every arm uses. */
+void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
+                    AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6)
+{
+    SsUtGetVagAtr(channel, slot, kind, &scratch);
+
+    switch (arg5) {
+    case 0:
+        scratch.prior = arg6;
+        goto tailA;
+    case 1:
+        scratch.mode = arg6;
+        SsUtSetVagAtr(channel, slot, kind, &scratch);
+        if (arg6 == 0) {
+            SsUtReverbOff();
+            return;
+        }
+        if (arg6 == 1) {
+            return;
+        }
+        if (arg6 == 2) {
+            return;
+        }
+        if (arg6 == 3) {
+            return;
+        }
+        if (arg6 != 4) {
+            return;
+        }
+        SsUtReverbOn();
+        return;
+    case 2:
+        scratch.min = arg6;
+        goto tailA;
+    case 3:
+        scratch.max = arg6;
+tailA:
+        SsUtSetVagAtr(channel, slot, kind, &scratch);
+        return;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    {
+        _SsUtResolveADSR(scratch.adsr1, scratch.adsr2, &resolved);
+        switch (arg5) {
+        case 4:
+            resolved.unkA = 0;
+            resolved.unk0 = arg6;
+            break;
+        case 5:
+            resolved.unkA = 1;
+            resolved.unk0 = arg6;
+            break;
+        case 6:
+            resolved.unk2 = arg6;
+            break;
+        case 7:
+            resolved.unk4 = arg6;
+            break;
+        case 8:
+            resolved.unkC = 0;
+            resolved.unk6 = arg6;
+            break;
+        case 9:
+            resolved.unkC = 1;
+            resolved.unk6 = arg6;
+            break;
+        case 10:
+            resolved.unkE = 0;
+            resolved.unk8 = arg6;
+            break;
+        case 11:
+            resolved.unkE = 1;
+            resolved.unk8 = arg6;
+            break;
+        case 12: {
+            s32 t = arg6 - 0x40;
+
+            if (arg6 == 0) {
+                /* nothing -- falls to the shared check below */
+            } else if (arg6 < 0x40) {
+                resolved.unk10 = 0;
+                break;
+            }
+            if ((u32)t < 0x40) {
+                resolved.unk10 = 1;
+            }
+            break;
+        }
+        case 13:
+            scratch.vibT = arg6;
+            break;
+        case 14:
+            scratch.porW = arg6;
+            break;
+        }
+        _SsUtBuildADSR(&resolved, &scratch.adsr1, &scratch.adsr2);
+        SsUtSetVagAtr(channel, slot, kind, &scratch);
+        return;
+    }
+    case 15:
+        SsUtSetReverbType(arg6);
+        return;
+    case 16:
+        SsUtSetReverbDepth(arg6, arg6);
+        return;
+    case 17:
+        SsUtSetReverbFeedback(arg6);
+        return;
+    case 18:
+    case 19:
+        SsUtSetReverbDelay(arg6);
+        return;
+    case 20:
+    case 21:
+    case 22:
+    default:
+        return;
+    }
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800357B0);
 
 /* STALL -- see docs/match-reports/func_80035A7C.md. length exact 44/44,
