@@ -367,3 +367,11 @@
 3.3  libsnd/vm_don   0x26BFC
 3.5  libsnd/next     0x26C10
 3.3  libsnd/vm_doff  0x26D18
+
+# ROUND 34 -- code_179d8_f MIDDLE (0x270E8..0x272A8): libsnd/stop, three
+# functions (Snd_stop, SsSeqStop, SsSepStop), all three previously matched as
+# C. It sits in the MIDDLE of what was left of code_179d8_f after the prefix
+# run above, so the slice became [c][o][c] and the tail half is the
+# one-function unit src/code_179d8_f_b.c (func_80036AA8). Text-only; the unit
+# owns no jump table, so no rodata attach moved.
+3.3  libsnd/stop     0x270E8

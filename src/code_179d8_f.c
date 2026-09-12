@@ -1,7 +1,8 @@
 /*
  * code_179d8_f -- what is LEFT of functions 256..273 of the original
- * 274-function code_179d8 monolith after round 34 gave its first thirteen
- * functions back to Sony.  Now 0x26D28..0x272A8 (vram 0x80036528..0x800368E8).
+ * 274-function code_179d8 monolith after round 34 gave sixteen of its
+ * eighteen functions back to Sony.  Now 0x26D28..0x270E8
+ * (vram 0x80036528..0x800368E8), a ONE-function unit.
  *
  * ROUND 34 (2026-09-12): the unit's whole PREFIX, 0x2673C..0x26D28, is six
  * linked `libsnd` objects -- `adsr` (3.3), `ut_rev` (3.3), `ut_sva` (3.3),
@@ -27,8 +28,17 @@
  * `.venv/bin/python3 tools/psyq_sdk.py coverage` are the evidence.
  *
  * That was a pure PREFIX trim, so this unit kept its name and its `c` line
- * simply moved to 0x26D28.  There is a SECOND run inside what is left
- * (`libsnd/stop` at 0x270E8), which splits this unit again -- see the yaml.
+ * simply moved to 0x26D28.
+ *
+ * A SECOND RUN in the same round then took the other end.  `libsnd/stop`
+ * (3.3, 0x270E8..0x272A8) is `Snd_stop`, `SsSeqStop` and `SsSepStop` --
+ * func_800368E8/A54/A7C, all three previously MATCHED as C and all three now
+ * deleted from here.  It sat in the MIDDLE of what the prefix trim had left,
+ * so the slice became [c][o][c] and the tail half became the one-function
+ * unit `src/code_179d8_f_b.c` (func_80036AA8).  Nothing moved with it: this
+ * unit never owned a rodata attach.
+ *
+ * WHAT IS LEFT OF THIS UNIT IS ONE FUNCTION, func_80036528.
  *
  * Owns NO switch jump table (zero `jtbl_` in its disassembly, and the splat
  * yaml's rodata slot list names no `.rodata, code_179d8_f` line), so no
@@ -36,7 +46,7 @@
  *
  * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
  * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * func_80036528 (240w) is the one INCLUDE_ASM left here; it has been attempted
+ * func_80036528 (240w) is now this unit's ONLY function; it has been attempted
  * and carries a full worked report (docs/match-reports/func_80036528.md) with
  * its 227/240 near-miss body preserved below.  It is not cold ground.
  *
@@ -169,83 +179,3 @@ end:
 #endif
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036528);
-
-extern s32 func_8003069C(s32 a0);
-
-void func_800368E8(s32 a0, s32 a1)
-{
-    s16 sa0 = (s16)a0;
-    s16 sa1 = (s16)a1;
-    Entry90902E8 *s0 = &D_800902E8[sa0][sa1];
-    s32 v7c, v84, v8, vC;
-    s16 v72;
-    s32 i;
-
-    s0->unk90 &= ~1;
-    D_800902E8[sa0][sa1].unk90 &= ~2;
-    D_800902E8[sa0][sa1].unk90 &= ~8;
-    D_800902E8[sa0][sa1].unk90 |= 4;
-    func_8003069C((sa1 << 8) | sa0);
-
-    v7c = s0->unk7C;
-    v84 = s0->unk84;
-    v72 = s0->unk72;
-    v8 = s0->unk8;
-    /* Retail reloads +0x8 a second time here rather than reusing v8's
-     * value; a plain re-read gets CSE'd back into one load. A volatile
-     * read of the same address forces the second `lw` without acting as
-     * a general scheduling fence. */
-    vC = *(volatile s32 *)&s0->unk8;
-
-    s0->unk2B = 0;
-    s0->unk80 = 0;
-    s0->unk27 = 0;
-    s0->unk13 = 0;
-    s0->unk14 = 0;
-    s0->unk29 = 0;
-    s0->unk15 = 0;
-    s0->unk16 = 0;
-    s0->unk2A = 0;
-    s0->unk12 = 0;
-    s0->unk48 = 0;
-    s0->unk27 = 0;
-    s0->unk28 = 0;
-    s0->unk10 = 0;
-    s0->unk11 = 0;
-    s0->unk88 = v7c;
-    s0->unk8C = v84;
-    s0->unk70 = v72;
-    s0->unk4 = v8;
-    s0->unkC = vC;
-
-    for (i = 0; i < 16; i++) {
-        s0->unk2C[i] = i;
-        s0->unk17[i] = 0x40;
-        s0->unk4E[i] = 0x7F;
-    }
-
-    s0->unk78 = 0x7F;
-    s0->unk7A = 0x7F;
-}
-
-void func_80036A54(s32 a0)
-{
-    func_800368E8((s16)a0, 0);
-}
-
-void func_80036A7C(s32 a0, s32 a1)
-{
-    func_800368E8((s16)a0, (s16)a1);
-}
-
-/* func_80038E44 is defined in the Psy-Q SPU/SND block at 0x272C8..0x2C054
- * (the game's own libspu build, which no SDK disc has); its own
- * body is a single straight-line path (no branches) ending in a chain of
- * global stores with $v0 never touched afterward -- genuinely void, not
- * just an unobserved return. */
-extern void func_80038E44(s32 a0);
-
-void func_80036AA8(void)
-{
-    func_80038E44(1);
-}

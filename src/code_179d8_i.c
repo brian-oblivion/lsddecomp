@@ -330,7 +330,10 @@ extern void func_80033AB0(s16 a0, s16 a1);
 extern void func_80033C90(s32 a0, s32 a1);
 extern void func_800339AC(s32 a0, s32 a1);
 extern void func_80033FB8(s32 a0, s32 a1);
-extern void func_800368E8(s32 a0, s32 a1);
+/* Sony's `Snd_stop` (`libsnd/stop`, Psy-Q 3.3), linked from the SDK object
+ * since round 34. A local view: a Psy-Q prototype must never go into a header
+ * this unit's siblings share. */
+extern void Snd_stop(s32 a0, s32 a1);
 
 void func_80033738(void)
 {
@@ -382,7 +385,7 @@ void func_80033738(void)
             }
             flags = D_800902E8[screen][slot].unk90;
             if (flags & 4) {
-                func_800368E8(screen, slot);
+                Snd_stop(screen, slot);
                 D_800902E8[screen][slot].unk90 = 0;
             }
         }

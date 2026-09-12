@@ -269,6 +269,12 @@ SpuVmDamperOn = 0x800363FC; // type:func  (Psy-Q libsnd/vm_don, from the SDK obj
 _SsSndNextSep = 0x80036410; // type:func  (Psy-Q libsnd/next, from the SDK object)
 SpuVmDamperOff = 0x80036518; // type:func  (Psy-Q libsnd/vm_doff, from the SDK object)
 
+// ROUND 34 -- code_179d8_f middle (0x270E8..0x272A8): libsnd/stop, the
+// sequence/SEP stop trio. The tail of that unit became code_179d8_f_b.
+Snd_stop = 0x800368E8; // type:func  (Psy-Q libsnd/stop, from the SDK object)
+SsSeqStop = 0x80036A54; // type:func  (Psy-Q libsnd/stop, from the SDK object)
+SsSepStop = 0x80036A7C; // type:func  (Psy-Q libsnd/stop, from the SDK object)
+
 // psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
 // the reverb-mode setter and the SPU RAM allocator's helpers. Sony's own
 // exported names, read out of the SDK objects the build now links.

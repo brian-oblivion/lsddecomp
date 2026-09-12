@@ -904,6 +904,16 @@ segments:
       - [0x26C10, o, libsnd/next]       # _SsSndNextSep
       - [0x26D18, o, libsnd/vm_doff]    # SpuVmDamperOff
       - [0x26D28, c, code_179d8_f]
+      # ROUND 34, second run in the same unit: `libsnd/stop` (3.3, 0x1C0)
+      # covers func_800368E8/A54/A7C = `Snd_stop`, `SsSeqStop`, `SsSepStop`,
+      # all three previously MATCHED as C.  This one sits in the MIDDLE of
+      # what the prefix trim left, so the slice is [c][o][c] and the tail
+      # needed a new name: `code_179d8_f_b`, one function (func_80036AA8).
+      # A one-function unit is fine and has precedent (class_3bb8c_v).
+      # Text-only; the unit owns no jump table, so NO rodata attach moved --
+      # the 0xFD8 rodata slot list names no `code_179d8_f` line at all.
+      - [0x270E8, o, libsnd/stop]       # Snd_stop, SsSeqStop, SsSepStop
+      - [0x272A8, c, code_179d8_f_b]
       # psyq_SpuSetMute (0x272C8..0x2C054) is converted to linked Sony objects
       # one run at a time. 35 objects tile nine runs exactly, all from the 3.3
       # disc; the eight gaps between the runs are the game's own libspu/libsnd
