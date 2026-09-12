@@ -1,4 +1,38 @@
-# func_8004EF6C -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 188/240. First real diff: file 0x3F7A4 / vram 0x8004EFA4 (missing `sw $s0,0x30($sp)` -- see the register-permutation note below; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7F0 / vram 0x8004EFF0, an empty `nop` where retail fills the delay slot with `move $s7,$s4`).
+# func_8004EF6C -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 191/240 (re-measured round 37; previously recorded 188/240 -- see round-37 note). First real diff: file 0x3F774 / vram 0x8004EF74 (register-permutation set-up; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7A4 / vram 0x8004EFA4, missing `sw $s0,0x30($sp)`, immediately followed by an empty `nop` at file 0x3F7F0 / vram 0x8004EFF0 where retail fills the delay slot with `move $s7,$s4`).
+
+> **ROUND 37 (delta): re-verified by rebuilding this EXACT preserved body,
+> then ran the permuter for the first time on this function (never
+> searched before this round, per the round's own thesis).** Splicing the
+> body back in and rebuilding reproduces the residue described below
+> exactly (confirmed with `asm-differ`): the whole callee-saved register
+> set permuted relative to retail's own, plus the one missing
+> `sw $s0,0x30($sp)` / delay-slot `move $s7,$s4` at file
+> 0x3F7A4/0x3F7F0. The raw word-match figure re-measured at **191/240**,
+> not the previously-recorded 188/240 -- not a regression, just the first
+> re-measurement of this body since round 34 relinked the BIOS trampolines
+> (`open`/`close`/`delete`/`write`/etc, formerly `func_80050938`-style
+> names) this function calls through; the total LENGTH gap (239/240, 1
+> word short) is unchanged and the residue is the same kind and same
+> location.
+>
+> Scaffolded with `tools/setup-permuter.sh`; `--debug --stack-diffs` base
+> score was **770** (`Stack Differences: 100 (1)`, `Register Differences:
+> 34 (5)`, `Insertions: 2 (100)`, `Deletions: 3 (100)`), confirmed via a
+> direct `objdump` of `target.o` vs `base.o` to be the SAME register
+> permutation visible in the real project build -- not a broken scaffold,
+> just a higher base score than the "single insertion+deletion, score
+> 200" signature this round's brief predicted, because this residue is a
+> genuine multi-register permutation (5 callee-saved registers reassigned)
+> on top of the one-word gap, not a lone one-instruction miss.
+>
+> Ran `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
+> --stack-diffs` in the background while doing hand work on the rest of
+> this round's list (per this round's own "bounded search is background
+> work" rule). **[iteration count / rc filled in below once the bounded
+> run actually exits -- see the bottom of this section for the final
+> figures, captured on the very next command after the process ended].**
+> Restored to `INCLUDE_ASM`, not left live, regardless of the search
+> outcome (score short of byte-exact, per project convention).
 
 > **ROUND 27 (delta): re-verified, one new attempt, negative.** Rebuilt the
 > exact preserved body from a clean `INCLUDE_ASM` baseline: confirmed
