@@ -269,14 +269,30 @@ Obj6EAC0Methods *func_80040FB0(void) {
     return &D_8006EB90;
 }
 
+/* func_80040FC0 -- STALL (redundant cursor cache). See
+ * docs/match-reports/func_80040FC0.md: best 15/24 at correct length; the
+ * branch/arithmetic shape is byte-identical to retail, but retail spends a
+ * SEPARATE register on the store cursor (kept in lockstep with the return
+ * pointer) that every C form tried collapses into one register. Preserved
+ * body and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
 
+/* func_80041020 -- STALL (redundant cursor cache), same class as
+ * func_80040FC0 above. See docs/match-reports/func_80041020.md: best 19/31
+ * at exact length; the only remaining residue is WHEN a lagging cursor
+ * register gets re-synced to the advancing dst pointer -- a second register
+ * every C form tried (including a bare __asm__("") barrier, round 35)
+ * collapses into one. Preserved body and its declarations are inlined in
+ * that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80041020);
 
-/* func_8004109C -- STALL (register identity). See
- * docs/match-reports/func_8004109C.md: the body is fully derived (two VLAs of
- * `width + 1`, a zero-padded right-justify) and reaches 42/56 with the correct
- * length, but four callee-saved registers come out permuted and the project
- * bans fixing register identity. The preserved body and its declarations are
- * inlined in that report. */
+/* func_8004109C -- STALL (register identity), best 49/56, correct length.
+ * See docs/match-reports/func_8004109C.md: round 35 caught the round-23/27
+ * preserved body calling two symbols (func_80013348, func_800411A8) that no
+ * longer exist post round-34 SDK-object renaming (they are strlen/itoa now)
+ * -- it could never have linked, so the recorded 42/56 was never actually
+ * measured. Fixing the names and reordering the two VLA declarations
+ * (padded before text) gets two of the four permuted registers exactly
+ * right; only fill/text remain swapped relative to retail. Preserved body
+ * and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_8004109C);
