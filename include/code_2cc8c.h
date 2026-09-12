@@ -720,36 +720,39 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    unit that never touched this line. Its one caller, func_8003EACC, now
    declares it locally in src/code_2cc8c_d.c with that call site's own shape. */
 
-/* func_8003FC18 (code_2cc8c_e, round 14, now carved): func_8003ECD0 (this
-   unit) calls it twice, always with its own 1st/2nd arguments literal 0
-   and its own 3rd argument one of the two buffer addresses it just built.
-   Retyped once code_2cc8c_e's own body was matched: the 3rd argument is a
-   `TexPageDesc *` (code_2cc8c_e.c's own local view of a small
-   shift/stride/width/height descriptor) -- ABI-identical to the original
-   `s32 a2` (both a plain word), so this does not change this call site's
-   own compiled bytes; the buffer address it already passes is simply
-   viewed through the more specific pointer type now. */
-extern void func_8003FC18(s32 a0, s32 a1, TexPageDesc *a2);
+/* func_8003FC18 is NO LONGER DECLARED HERE, round 34 -- exactly the
+   GsSetRefView2 case above. It is Sony's `GsClearOt` (`libgs/gs_113.o`,
+   linked from the SDK object), and a second declaration of that name in a
+   header six units include is the `conflicting types` failure CLAUDE.md and
+   the SDK guide both warn about. Its callers declare it locally under Sony's
+   name, with their own call sites' shapes, in src/code_2cc8c_d.c.
+   The `TexPageDesc *` view that used to hang off this prototype was
+   code_2cc8c_e.c's reading of a Psy-Q `GsOT`; the struct stays in this header
+   because other code uses it, and no byte depends on the naming. */
 
 /* func_80021114 (asm/psyq_10ee0.s, PsyQ library, not game code):
    func_8003EDF4 (round 14, this unit) calls it with a literal 0 and
    ignores the return; declared here only with that shape. */
 extern void func_80021114(s32 a0);
 
-/* The following (code_2cc8c_e, round 14, now carved) are all called only
-   from func_8003EEC0 (this unit). Retyped once code_2cc8c_e's own bodies
-   were matched -- func_8003FB0C/func_8003FBE4 are plain `void *` global
-   setters (this call site happens to pass an already-`s32`-shaped value,
-   which is an ordinary int-to-pointer conversion with identical codegen,
-   same precedent as func_8001D6B4/func_8001D714 in code_d294.h), and
-   func_8003FC70 is a `s32` mode selector. Only the ORIGINAL 3 signatures
-   (s32-only) are the ones from this call site's own shape; the retypes are
-   from func_8003FB0C.c/func_8003FBE4.c's own definitions, ABI-identical
-   (word-sized values either way) so this does not change this call site's
-   own compiled bytes. */
+/* The following are called only from func_8003EEC0 (this unit). They are
+   plain `void *` global setters (this call site happens to pass an
+   already-`s32`-shaped value, which is an ordinary int-to-pointer conversion
+   with identical codegen, same precedent as func_8001D6B4/func_8001D714 in
+   code_d294.h); the retypes come from the functions' own definitions and are
+   ABI-identical (word-sized values either way), so they do not change this
+   call site's own compiled bytes.
+   ROUND 34: both are still GAME CODE, but neither lives in code_2cc8c_e any
+   more -- they are the two one-function units src/code_2cc8c_e0.c and
+   src/code_2cc8c_e1.c, wedged between Sony objects. Those files do NOT
+   include this header, so these two declarations are not checked against
+   their definitions by the compiler; they agree today and must be kept in
+   step by hand.
+   Their two former neighbours, func_8003FC70 and func_8003FD4C, are gone from
+   here: they are Sony's `GsSetLightMode` (libgs/gs_108) and `SetFogNear`
+   (libgte/fog_01), declared locally in src/code_2cc8c_d.c under those names
+   for the same collision reason as GsSetRefView2 and GsClearOt above. */
 extern void func_8003FB0C(void *a0);
-extern void func_8003FC70(s32 a0);
-extern void func_8003FD4C(s32 a0, s32 a1);
 extern void func_8003FBE4(void *a0);
 
 /* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
@@ -766,12 +769,11 @@ extern s32 ResetGraph(s32 mode);
    only with that call site's own shape. */
 extern void func_80023DA0(u8 a0, u8 a1, u8 a2, s32 a3);
 
-/* func_8003FBF4 (code_2cc8c_e, round 14, now carved): func_8003F04C calls
-   it with one of the same unk74-indexed slots used just above. Retyped
-   once code_2cc8c_e's own body was matched: `self` is a `Class6E99CObj *`
-   (its own field access is `self->unk10`), ABI-identical to the original
-   `s32 a0` so this does not change this call site's own compiled bytes. */
-extern void func_8003FBF4(Class6E99CObj *self);
+/* func_8003FBF4 is NO LONGER DECLARED HERE, round 34. It is Sony's
+   `GsDrawOt` (`libgs/gs_111.o`, linked from the SDK object) -- same
+   collision reason as GsSetRefView2/GsClearOt above. Its one caller,
+   func_8003F04C, declares it locally in src/code_2cc8c_d.c with that call
+   site's own shape. */
 
 void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 void func_8003EB84(Unk18Obj *self);

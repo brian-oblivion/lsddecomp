@@ -394,3 +394,25 @@
 # existing dlabel. Splitting the unit around it created src/code_2cc8c_e0.c
 # for func_8003FB0C, the one function in front of it.
 3.3  libgs/gs_123   0x3031C
+
+# code_2cc8c_e, functions #3..#7 (0x303F4..0x305B0): five objects tiling the
+# run exactly. ALL FOUR of the libgs/libgte functions that had been matched as
+# C are reclassified out of the game count, and one 20-word stall with a
+# 393-line report is retired:
+#   libgs/gs_111  (0x24)  GsDrawOt        (func_8003FBF4, matched C)
+#   libgs/gs_113  (0x58)  GsClearOt       (func_8003FC18, matched C)
+#   libgs/gs_108  (0x8C)  GsSetLightMode  (func_8003FC70, matched C) + .rdata
+#   libgte/fgo_00 (0x50)  TransposeMatrix (func_8003FCFC, 20w INCLUDE_ASM)
+#   libgte/fog_01 (0x64)  SetFogNear      (func_8003FD4C, matched C)
+# gs_111 and gs_112 are BYTE-IDENTICAL (GsDrawOt / GsDrawOtIO); the head chose
+# gs_111, the standard entry point. gs_108's `.rdata` is the string
+# D_80011194 ("not supported light mode %d\n"), 0x1D at 0x1994, byte search
+# agrees; it ends at 0x19B1 and the next slot starts at 0x19B4, so SUBALIGN(2)
+# needs a 3-byte `pad`. gs_111/gs_113 each carry a 0xA0 `.bss` that no
+# relocation names -- informational, the fragment handles bss.
+# Splitting the unit here created src/code_2cc8c_e1.c for func_8003FBE4.
+3.3  libgs/gs_111    0x303F4
+3.3  libgs/gs_113    0x30418
+3.3  libgs/gs_108    0x30470
+3.3  libgte/fgo_00   0x304FC
+3.3  libgte/fog_01   0x3054C

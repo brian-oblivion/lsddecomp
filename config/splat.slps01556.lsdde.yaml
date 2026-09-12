@@ -181,7 +181,21 @@ segments:
       # LITERAL and C that spells the string out emits a SECOND copy. The
       # split is necessary; referencing `extern const char D_80011194[]` is
       # the other half. Both together -> func_8003FC70 matches 35/35.
-      - [0x1994, rodata]   # D_80011194 "not supported light mode %d\n"
+      # ROUND 34: D_80011194 is Sony's too. func_8003FC70 is `GsSetLightMode`
+      # (libgs/gs_108), and this string is that object's own `.rdata` -- 0x1D
+      # bytes at 0x1994, byte search agrees with the derived offset. The
+      # round-20 note above is now HISTORICAL for this slot: its two findings
+      # (split the slot at the ownership boundary; reference a rodata string
+      # by SYMBOL, never retype the literal, or you emit a second copy and
+      # shift the whole image) are both still true and still general -- what
+      # expired is only the conclusion that this particular slot needs to be
+      # standalone.
+      # 0x1994 + 0x1D = 0x19B1, and the next slot (libc2/sprintf's .rdata)
+      # starts at 0x19B4. Under the splat script's SUBALIGN(2) the next
+      # section would land at 0x19B2, two bytes early, so retail's 3-byte
+      # hole needs an explicit `pad`.
+      - [0x1994, o, libgs/gs_108, .rdata]   # D_80011194 "not supported light mode %d\n"
+      - [0x19B1, pad]                       # 3 bytes; libc2/sprintf's .rdata is at 0x19B4
       # 0xDC -> 0x1A90 exactly: the old D_800111B4/D_800111C8 slot AND the
       # jtbl_800111DC slot together are libc2/sprintf's own .rdata. Its
       # words are relocated, so `place` reports `bytes:not-found`; the
@@ -1079,9 +1093,31 @@ segments:
       # now arrives from the object; the yaml line at 0x1908 is an `o` entry
       # and NOT an attach any more. D_80011194 (func_8003FC70) is a separate
       # standalone slot at 0x1994 and is unaffected by this run.
+      # ROUND 34, second run: the five functions after func_8003FBE4 are Sony's
+      # as well, in five objects that tile 0x303F4..0x305B0 exactly. So the
+      # unit ends up SPLIT THREE WAYS, with two one-function heads and the
+      # tail keeping the name:
+      #   [c e0][o gs_123][c e1][o gs_111][o gs_113][o gs_108][o fgo_00]
+      #   [o fog_01][c code_2cc8c_e]
+      # The TAIL keeps `code_2cc8c_e` and src/code_2cc8c_e.c on purpose --
+      # it holds ~20 functions including the unit's three remaining
+      # INCLUDE_ASM stubs and its class, so its `asm/nonmatchings/code_2cc8c_e`
+      # paths and its match reports stay valid. Only the two one-function
+      # heads needed new names.
+      # gs_111 and gs_112 are byte-identical (GsDrawOt / GsDrawOtIO); gs_111
+      # is taken, the standard entry point. gs_111 and gs_113 each carry a
+      # 0xA0 `.bss` that "no relocation names" -- informational only, bss is
+      # never placed in this yaml. gs_108's `.rdata` is the 0x1994 string
+      # slot, split out above with its `pad`.
       - [0x3030C, c, code_2cc8c_e0]     # func_8003FB0C
       - [0x3031C, o, libgs/gs_123]      # Gssub_make_matrix (was func_8003FB1C)
-      - [0x303E4, c, code_2cc8c_e]
+      - [0x303E4, c, code_2cc8c_e1]     # func_8003FBE4
+      - [0x303F4, o, libgs/gs_111]      # GsDrawOt        (was func_8003FBF4)
+      - [0x30418, o, libgs/gs_113]      # GsClearOt       (was func_8003FC18)
+      - [0x30470, o, libgs/gs_108]      # GsSetLightMode  (was func_8003FC70)
+      - [0x304FC, o, libgte/fgo_00]     # TransposeMatrix (was func_8003FCFC)
+      - [0x3054C, o, libgte/fog_01]     # SetFogNear      (was func_8003FD4C)
+      - [0x305B0, c, code_2cc8c_e]
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
       - [0x30E64, c, code_2cc8c_f]

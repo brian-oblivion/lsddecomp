@@ -167,6 +167,23 @@ void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
  * field. Sony's own argument type is `long` for each. */
 extern void SetFarColor(u8 a0, u8 a1, u8 a2);
 
+/* Three more of Sony's, linked from the SDK objects since round 34 and
+ * declared LOCALLY for the same reason as GsSetRefView2 above: they used to
+ * sit in include/code_2cc8c.h as `func_8003Fxxx`, and under their real names
+ * a header six units include is exactly where LIBGS.H's own prototypes will
+ * one day collide. These are only the shapes THIS unit's call sites use.
+ *   GsSetLightMode  libgs/gs_108   was func_8003FC70
+ *   SetFogNear      libgte/fog_01  was func_8003FD4C
+ *   GsClearOt       libgs/gs_113   was func_8003FC18
+ * GsClearOt's real third argument is a `GsOT *` (its first two are Sony's
+ * `offset` and `point`). This call site already passed it as a plain word, so
+ * it is left that way -- the shape the header carried before round 14 retyped
+ * it to a `TexPageDesc *`, which was code_2cc8c_e.c's reading of that same
+ * GsOT. */
+extern void GsSetLightMode(s32 a0);
+extern void SetFogNear(s32 a0, s32 a1);
+extern void GsClearOt(s32 a0, s32 a1, s32 a2);
+
 void func_8003EEC0(Unk18Obj *self) {
     s32 idx;
     Unk18Obj *tail;
@@ -181,12 +198,12 @@ void func_8003EEC0(Unk18Obj *self) {
 
     func_8003F28C((Unk18Obj *)self->unk40);
     func_8003FB0C(self->unk4C);
-    func_8003FC70(self->unk54);
+    GsSetLightMode(self->unk54);
 
     if (self->unk54 == 1 || self->unk54 == 3) {
         u8 *rawBytes = (u8 *)&self->unk5B;
         SetFarColor(rawBytes[0], rawBytes[1], rawBytes[2]);
-        func_8003FD4C(self->unk60, self->unk40);
+        SetFogNear(self->unk60, self->unk40);
     }
 
     GsSetRefView2(&self->unk14);
@@ -198,7 +215,7 @@ void func_8003EEC0(Unk18Obj *self) {
     func_8003FBE4(*(s32 *)((u8 *)self + 0x88 + idx * 4));
 
     idx = self->unk74;
-    func_8003FC18(0, 0, *(s32 *)((u8 *)self + 0x78 + idx * 4));
+    GsClearOt(0, 0, *(s32 *)((u8 *)self + 0x78 + idx * 4));
 
     ((void (*)(Unk18Obj *, void *))self->methods->slotA0)(self, self->unkAC);
 
@@ -207,6 +224,15 @@ void func_8003EEC0(Unk18Obj *self) {
         ((void (*)(Unk18Obj *, Unk18Obj *))self->methods->slotA0)(self, tail);
     }
 }
+
+/* Sony's `GsDrawOt` (libgs/gs_111, linked from the SDK object since round
+ * 34; was func_8003FBF4, and was declared in include/code_2cc8c.h until this
+ * round). Local for the same collision reason as the three above. Sony's own
+ * argument is a `GsOT *`; this call site passes the same unk74-indexed slot
+ * it hands GsClearOt, as a plain word, and is left that way.
+ * gs_111 and gs_112 are byte-identical objects defining GsDrawOt and
+ * GsDrawOtIO at this one address -- gs_111/GsDrawOt is what the build links. */
+extern void GsDrawOt(s32 a0);
 
 /* Recomputes self->unk74 from self->unkC->methods->slot54, optionally
  * resets the graphics context and re-notifies self->unkC->methods->slot50
@@ -241,7 +267,7 @@ void func_8003F04C(Unk18Obj *self) {
                   *(s32 *)((u8 *)self + 0x78 + idx * 4));
 
     idx = self->unk74;
-    func_8003FBF4(*(s32 *)((u8 *)self + 0x78 + idx * 4));
+    GsDrawOt(*(s32 *)((u8 *)self + 0x78 + idx * 4));
 
     if (self->unkB4 != 0 && self->unk74 == 0) {
         self->unkC->methods->slot50(self->unkC);

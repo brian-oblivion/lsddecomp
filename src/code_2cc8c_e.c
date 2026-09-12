@@ -1,127 +1,37 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-/* ROUND 34: THIS UNIT LOST ITS FIRST TWO FUNCTIONS, in opposite directions.
+/* ROUND 34: THIS UNIT LOST ITS FIRST EIGHT FUNCTIONS -- six of them to Sony,
+ * two to files of their own -- and now begins at 0x305B0 / func_8003FDB0.
+ * The segment it used to be is split three ways:
  *
- *  - func_8003FB0C (4w) is still game code, but it now lives alone in
- *    src/code_2cc8c_e0.c, because the function that follows it is Sony's and
- *    a `c` segment cannot straddle an `o` one.
- *  - func_8003FB1C is `Gssub_make_matrix` (libgs/gs_123.o, Psy-Q 3.3) and is
- *    LINKED FROM THE OBJECT. It had been matched as C; reclassifying it is
- *    the correction CLAUDE.md asks for, not a regression, and its match
- *    report is kept, retitled CONVERTED.
+ *   [c code_2cc8c_e0]  func_8003FB0C          game code, own file
+ *   [o libgs/gs_123]   Gssub_make_matrix      was func_8003FB1C, matched C
+ *   [c code_2cc8c_e1]  func_8003FBE4          game code, own file
+ *   [o libgs/gs_111]   GsDrawOt               was func_8003FBF4, matched C
+ *   [o libgs/gs_113]   GsClearOt              was func_8003FC18, matched C
+ *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
+ *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
+ *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
+ *   [c code_2cc8c_e]   func_8003FDB0 onward   <- this file
  *
- * THE 0x1908 RODATA ATTACH IS NO LONGER OURS AND MUST NOT COME BACK.
- * jtbl_80011108 was func_8003FB1C's own jump table; it is gs_123's `.rdata`
- * section and arrives from the object now, so the yaml line at 0x1908 is an
- * `o` entry, not `- [0x1908, .rodata, code_2cc8c_e]`. Restoring the attach
- * would hand this unit a slot it owns nothing in.
+ * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
+ * INCLUDE_ASM stubs and its class, so every
+ * `INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", ...)` path below and every
+ * match report naming this unit stays valid. Only the two one-function heads
+ * needed new names.
  *
- * D_80011194 (0x1994) is a DIFFERENT slot and is still standalone -- see
- * func_8003FC70 below, and the round-20 note in the yaml.
+ * NEITHER RODATA SLOT IS OURS ANY MORE. jtbl_80011108 (0x1908) went with
+ * Gssub_make_matrix and D_80011194 (0x1994, "not supported light mode %d\n")
+ * went with GsSetLightMode -- both are their own object's `.rdata` section
+ * now. This unit needs no `.rodata` attach at all; if a future carve of it
+ * hits Gate 2's `undefined reference to '.LXXXXXXXX'`, that is a NEW jump
+ * table, not these.
+ *
+ * The six Sony bodies are gone from this file, not lost -- five matched C
+ * bodies and one INCLUDE_ASM stub. Each one's match report is kept and
+ * retitled CONVERTED, and carries its derivation verbatim.
  */
-
-extern void *D_8008E794;
-
-void func_8003FBE4(void *a0) {
-    D_8008E794 = a0;
-}
-
-extern void func_80021678(void *arg0); /* asm/psyq_10ee0.s, Psy-Q
-                                           library, not game code */
-
-void func_8003FBF4(Class6E99CObj *self) {
-    func_80021678(self->unk10);
-}
-
-extern void func_80021580(s32 stride, s32 mask); /* asm/psyq_10ee0.s,
-                                                     Psy-Q library, not game
-                                                     code */
-
-void func_8003FC18(s32 a0, s32 a1, TexPageDesc *desc) {
-    desc->width = a0 & 0xFFFF;
-    desc->height = a1 & 0xFFFF;
-    desc->size = (4 << desc->shift) + desc->stride - 4;
-    func_80021580(desc->stride, 1 << desc->shift);
-}
-
-extern s32 D_800902E0;
-extern void printf(const char *fmt, s32 arg1); /* libc2/printf,
-                                                           Psy-Q printf-like;
-                                                           declared locally
-                                                           with THIS call
-                                                           site's own arity
-                                                           (fmt + 1 vararg),
-                                                           same convention as
-                                                           code_8220.h's own
-                                                           independent
-                                                           extern for it */
-
-extern const char D_80011194[];
-
-void func_8003FC70(s32 mode) {
-    if (mode == 1) {
-        goto set;
-    }
-    if (mode < 2) {
-        if (mode == 0) {
-            goto zero;
-        }
-        goto err;
-    }
-    if (mode == 2) {
-        goto set;
-    }
-    if (mode == 3) {
-        goto set;
-    }
-    goto err;
-zero:
-    D_800902E0 = 0;
-    return;
-set:
-    D_800902E0 = mode;
-    return;
-err:
-    printf(D_80011194, mode);
-}
-
-
-
-#if 0
-s16 *func_8003FCFC(s16 *src, s16 *dst) {
-    s32 t1, t2, t3;
-
-    t1 = src[0];
-    dst[0] = t1;
-    t2 = src[3];
-    t1 = src[6];
-    dst[1] = t2;
-    t3 = src[1];
-    dst[2] = t1;
-    t2 = src[4];
-    dst[3] = t3;
-    t1 = src[7];
-    dst[4] = t2;
-    t3 = src[2];
-    dst[5] = t1;
-    t2 = src[5];
-    dst[6] = t3;
-    t1 = src[8];
-    dst[7] = t2;
-    dst[8] = t1;
-    return dst;
-}
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FCFC);
-
-extern void SetDQA(s32 a0);
-extern void SetDQB(s32 a0);
-
-void func_8003FD4C(s32 a0, s32 a1) {
-    SetDQA((-(a0 * 5 * 64)) / a1);
-    SetDQB(0x1400000);
-}
 
 Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
     Class6E99CObj *self;
