@@ -124,6 +124,18 @@ void func_8003ECC0(void) {
 void func_8003ECC8(void) {
 }
 
+/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 14/23: 71/73
+ * words, a 2-word instruction-order residue, converged negative across 9
+ * hand reshapes. Round 36: rebuilt with GsClearOt's real name (was
+ * func_8003FC18 -- round 34's SDK conversion renamed the callee, and the
+ * report's preserved body was never corrected). Measured 71/73 exactly,
+ * matching the prior figure. A ~40,000-iteration bounded permuter search
+ * (`timeout 400`, `-j 4`, `--stack-diffs`) found no zero and no genuine
+ * improvement below the base score of 215 -- the two sub-215 candidates it
+ * did produce are BOTH spurious (one moves the `+0x14` term into an
+ * unreachable dead branch, changing the LIVE value of `size` used
+ * downstream; the other narrows `size` to `unsigned char`), fingerprinted
+ * and not adopted. See the report's round-36 addendum. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003ECD0);
 
 /* Teardown counterpart to func_8003ECD0's init. */
