@@ -103,10 +103,15 @@ extern Rec16D7F0 D_8008D7F4[]; /* independent array, same shape */
 /* Per-slot flag byte, same 0..0x17 id as several of the tables above. */
 extern u8 D_8008D970[];
 
-/* STALL -- see docs/match-reports/func_80031A44.md.  HEAD SALVAGE, round 31:
- * a mid-attempt snapshot scoring 84/88 words (no drift) was recovered from
- * the worktree and is preserved in that report as literal source.  No author
- * applied a stop rule to it. */
+/* STALL -- see docs/match-reports/func_80031A44.md.  HEAD SALVAGE, round 31,
+ * confirmed round 32 (permuter, ~54k iterations, not closed). Round 36:
+ * rebuilt with SpuVmVSetUp's real name (was func_80032148 in the report's
+ * preserved body -- round 34's SDK conversion renamed the callee, and the
+ * report's body was never corrected). Measured 84/88 words, exact length,
+ * matching the prior figure exactly; a barrier between the D_8008EA26/
+ * D_8008EA22 stores (the one untested lever the report flagged) blows the
+ * function up drastically instead of fixing the swap -- see this round's
+ * report update. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031A44);
 
 /* Rec34D994 (D_8008D994/99A/99E) and Rec16D7F0 (D_8008D7F8/D_8008D7FA
