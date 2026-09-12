@@ -442,6 +442,13 @@ segments:
       - [0x1676C, o, libapi/a21]
       - [0x1677c, c, code_1677c]
       - [0x171e0, c, code_171e0]
+      # ROUND 34: the unit's LAST function, `strcat` (0x80027130, 42w), is
+      # Sony's -- libc2/strcat, Psy-Q 3.3, 0xA8 covering exactly it. It had
+      # been matched as C since round 8 and counted as game code; linking the
+      # object reclassifies it. Text-only, no data sections, and nothing else
+      # in the unit moves: strcat was already at the end, so this is a pure
+      # suffix split with no new unit name and no rodata attach to move.
+      - [0x17930, o, libc2/strcat]
       # code_179d8 was 274 functions and 44% blocker-dense in aggregate, but
       # the density is CLUSTERED, so the aggregate is a bad carve guide. A
       # three-grep screen over non-overlapping 20-function windows, run

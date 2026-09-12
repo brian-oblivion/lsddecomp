@@ -376,3 +376,11 @@
 3.3  libcard/a75    0x41378
 3.3  libcard/c112   0x41388
 3.3  libcard/a80    0x41398
+
+# code_171e0 SUFFIX (0x17930..0x179D8): libc2/strcat, the unit's LAST function
+# (strcat, 42w). It had been MATCHED AS C since round 8 and counted as game
+# code; it is Sony's, so this reclassifies one matched function out of the
+# game count. That is the correction CLAUDE.md asks for, not a regression --
+# and the round-8 report had already noticed the body reads as library
+# defensive code. Text-only; `place` derives no data line.
+3.3  libc2/strcat   0x17930

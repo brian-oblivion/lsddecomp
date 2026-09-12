@@ -1,7 +1,30 @@
-# strcat
+# strcat -- CONVERTED to a linked SDK object (round 34). NOT game code.
 
-**Unit:** code_171e0 · **Size:** 42 instructions (0xA8 bytes) ·
-**Status: MATCHED 42/42**, whole-image SHA1 green. Closed by the head in
+> **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
+> SONY'S OWN OBJECT `libc2/strcat.o` (Psy-Q 3.3), WHOSE 0xA8 OF TEXT COVERS
+> EXACTLY IT.** It was `code_171e0`'s LAST function, so the conversion is a
+> pure suffix split -- `[c code_171e0 0x171E0][o libc2/strcat 0x17930]` -- with
+> no new unit name, no function reordering and no rodata attach to move. The C
+> body is deleted from `src/code_171e0.c`; callers keep spelling it `strcat`
+> and now resolve to the object. Whole-image SHA1 green.
+>
+> **This RECLASSIFIES a matched function out of the game-code count, and that
+> is the correction, not a regression** (CLAUDE.md: never write C for a
+> function a Sony object owns). It is also the case round 32's `sdkstalls.py`
+> lesson predicts and does not catch: that tool crosses the STALL queue
+> against placed objects, and this function was not stalled, it was closed.
+>
+> **The round-8 work below called it.** Its opening paragraph says the body
+> "carries a guard textbook `strcat` has no reason to" and reads as "Psy-Q
+> library defensive code rather than game code" -- a correct classification,
+> three rounds before the project had a way to act on one. Everything below is
+> kept as the derivation it was, not as live guidance: the C shown no longer
+> compiles into the image, but the two load-bearing source shapes it found (the
+> post-increment scan worth 25 words, `return dest` over `return NULL` worth
+> one) are the durable finding and generalise past this function.
+
+**Unit:** code_171e0 (until round 34) · **Size:** 42 instructions (0xA8 bytes) ·
+**Status: was MATCHED 42/42**, whole-image SHA1 green. Closed by the head in
 round 8 (2026-09-02) with the project's second permuter run.
 
 > **Kept in full.** Everything below the RESOLUTION section is the state of
