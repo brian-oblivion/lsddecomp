@@ -6,6 +6,183 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-12 — round 36: four runners, zero matches, two real word gains, and a tool that was flagging its own repairs
+
+**State at end: 983 matched / 1253 game functions (78.45% of game code) —
+IDENTICAL to rounds 34 and 35.** No function closed byte-exact. Queue 204 live
+`INCLUDE_ASM`, 203 documented stalls, `fresh` 1. Build green after all four
+merges; working tree clean.
+
+**Two consecutive zero-match rounds is now a pattern, not noise, and the
+round's product is a corrected understanding of why.**
+
+### Gates
+
+Gate 0 green (no stale-asm warning, `build exit=0`). Gate 1: `fresh` = 1, and
+it is not a work order — the single fresh function is `func_80018464` at 954
+words, the one round 23 left as too large for a head sitting. Gate 2: carve
+REJECTED on measurement, independently re-derived — 66 uncarved functions in 4
+segments, 10 blocker-clean, `gp_rel` blocking 55, best rolling 20-function
+window **3/20**. Same verdict as round 35. Gate 1b was the round's queue: 111
+blocker-clean, 0 Sony-owned. Gate 3 folded into the runners.
+
+### The staffing thesis, and the measurement that corrects it
+
+Round 35 recommended "runners, on the stale bodies first" and reported 288
+stale references across 158 reports, concluding that most recorded near-miss
+figures in the corpus are attached to bodies that will not link.
+
+**The mechanism was right and the queue figure was four to seven times too
+large.** Measured at Gate 1: of the 158 reports, **121 belong to functions that
+are already MATCHED**, where `src/` is the source of truth and the report's
+code fence is a historical record that gates nothing. Only **37** were still
+`INCLUDE_ASM`. After this round's tool fixes the honest figure is **33**.
+`stalesyms.py` now prints the LIVE/ARCHIVAL split in its headline.
+
+Four runners covered 20 of the actionable set. **Fifteen bodies were corrected
+and rebuilt. Thirteen reproduced their recorded figure exactly; two improved.**
+
+| runner | unit(s) | result |
+| --- | --- | --- |
+| alpha | `code_8220_c` | all 8 RCpoly figures reproduced exactly; no closing attempts spent |
+| bravo | `code_179d8_g` | 4 of 6 exact; **`func_8002AEE0` 153 -> 165**, **`func_8002B198` 45 -> 49** |
+| charlie | `code_179d8_h`, `class_3bb8c_v` | all 3 reproduced exactly |
+| delta | `code_2cc8c_d`, `code_179d8_j_c`, `code_179d8_j_b` | all 4 reproduced (two within 1 word) |
+
+Both of bravo's gains were head-verified independently by splicing the
+preserved body and rebuilding: 49/91 and 165/174, clean compile, no drift.
+
+**So the stale-symbol correction converts an UNVERIFIED figure into a MEASURED
+one, and that is all it does.** It is not a discount. Round 35's delta got +7
+words from one, which is what made it look like a lever; across fifteen
+functions the rename itself moved nothing. Both of this round's gains came from
+**fresh permuter searches**, and the discriminator was not staleness —
+`func_8002AEE0` had simply never been permuter-searched before.
+
+### The next round's queue, measured
+
+Of the 111 blocker-clean near-misses, **73 have a permuter search in their
+report and 38 do not**. That 38 is the cheapest well-posed queue in the corpus
+and it is what round 37 should be staffed on — ranked by "never searched"
+first and size second, which is the order that produced this round's only
+forward movement. Round 33's warning stands and now has a positive form: the
+figure that makes a function rank first is also evidence its cheap levers are
+spent, so rank by COST, and "no permuter history" is the one cost signal that
+is mechanically readable.
+
+### The tool was flagging its own repairs
+
+`stalesyms.py` shipped in round 35 with one headline number. This round it
+re-flagged all three bodies runner charlie had just corrected, the same
+afternoon, by three distinct self-referential routes:
+
+1. `#if 0` written in PROSE backticks — which is exactly how a report explains
+   that it fixed a stale body — opened a bogus region running to the next real
+   `#endif` and swallowing the explanation, old names included.
+2. The corrected body's own `/* CdControl/... (was func_80028DF0/...) */`
+   note was scanned as code. A name in a comment cannot fail to link, and the
+   project REQUIRES that note to be there.
+3. A round-18 "here is what I tried" fenced block was read as a resume-from
+   body.
+
+**A screen whose hit survives the fix never converges.** The count never falls,
+the report reads as untouched while being correct, and the next round re-staffs
+finished work — the same expensive direction as a false blocker, arriving
+through documentation rather than through a grep. All three fixed.
+
+### A false clearance, added and removed in the same session
+
+A fourth change was made and then REVERTED, and the reversal is the more
+useful record. To stop flagging repaired reports, the tool briefly cleared a
+stale name once the NEW name also appeared in some preserved region. **The
+first report it was tested against proved it wrong.**
+
+`func_80031A44.md` holds TWO preserved bodies: a superseded 87/88 attempt in
+the `#if 0` block, and the authoritative 84/88 round-31 HEAD SALVAGE body —
+the figure in its title — in a fenced block six sections lower, under a heading
+reading "THIS SUPERSEDES THE TITLE FIGURES ABOVE". Correcting the superseded
+block cleared the whole report while the live body stayed un-linkable.
+
+Positional rules fail identically and were also tried: alpha put its corrected
+snapshot immediately after the report title, charlie appended theirs at the
+end, and here the live body is neither first nor last. **Which body supersedes
+which is stated in PROSE, and no lexical rule follows prose.** Note also that
+the project's MANDATED preservation form points at the wrong body in this
+report — the `#if 0` block is the superseded one.
+
+So the tool no longer chooses. It reports every stale preserved block WITH ITS
+LINE NUMBER and how many blocks the report has (`in preserved block at L41 of
+2`), and leaves the choice to the reader.
+
+### A third failure mode for an inherited body
+
+Correcting `func_80031A44`'s names still does not make it splice. It dies on
+`conflicting types for 'D_8008D99C'` and `for 'SpuVmVSetUp'`: the body travels
+with its own `extern` preamble, as CLAUDE.md requires, and round 34's carve
+plus delta's own round-36 recovery have since added declarations for the same
+symbols to the unit at different types.
+
+| failure | symptom | fix |
+| --- | --- | --- |
+| stale name | `undefined reference` | rename to the current symbol |
+| missing declaration | `'D_8008EA22' undeclared` | carry the declaration in |
+| preamble duplicates the unit's | `conflicting types` | RECONCILE — drop or retype |
+
+Only the first produces a hit on `error:`/`parse error`. The other two are
+fatal and textually silent, caught solely by the `*** [….o]` pattern — the
+round-21 table in CLAUDE.md arriving in practice, three times in one round.
+
+### Two runner findings worth keeping
+
+**A length-short sibling shifts `.bss` for the WHOLE image, not just later
+text in its unit** (bravo). Reading `func_8002A75C` with the 1-word-short
+`func_8002B3F4` simultaneously live gives **146/196** against its true
+**171/196**. Reproduced by the head exactly. **This is NOT a fifth way a score
+lies** — funcdiff's guard fired correctly and loudly (294582 bytes differing
+out of range, "NOT trustworthy"), so it is an instance of documented way 3,
+address drift, with a mechanism note attached: the project links one contiguous
+`.main` section, which is why the out-of-range count is image-sized rather than
+unit-sized. The practice it justifies is real: read every score with the unit's
+other siblings reverted to `INCLUDE_ASM`.
+
+**A permuter improvement needs real-oracle verification in BOTH directions**
+(bravo). `func_8002B4D4`'s search found a LOWER penalty score (620 -> 240) that
+rebuilt as an actual regression — 90 instructions against retail's 91. A
+permuter number is in permuter units, and lower is not a synonym for closer.
+
+**Round 34's carve deleted declarations a live stall still needed** (delta).
+`D_8008EA22` and a typedef were dropped on the reasoning that "only the
+reclassified functions read this", without checking whether a still-
+`INCLUDE_ASM` stall in the same file used them. Two did. Nothing failed to
+link, because both were `INCLUDE_ASM`, so it sat unnoticed for two rounds. A
+carve's "nothing else needs it" claim has to be checked against preserved
+bodies, not only against currently-compiled `src/`.
+
+### Head repairs
+
+Delta corrected its four functions' names in its working tree to take the
+measurements and did not carry them into the reports — round 35's trap,
+committed by a runner briefed on it with a worked example. All four repaired at
+head level; `func_8003ECD0`'s corrected body was inlined and VERIFIED by
+splicing and rebuilding (71/73, no out-of-range drift, exactly delta's figure).
+
+### Next move
+
+**Runners, on the never-permuter-searched 38.** Not a carve — the best window
+in the uncarved remainder is 3/20, measured independently in two consecutive
+rounds, and `gp_rel` blocks 55 of 66. Not a pure permuter round either: this
+round shows the search pays where it has never been run and does not pay where
+it has, so the selection matters more than the technique.
+
+One caution for whoever runs it. Alpha spent a whole runner on eight functions
+and made zero closing attempts, on the (defensible) grounds that the family was
+permuter-exhausted. That is a correct reading of cost and a poor use of a
+runner — if a unit is genuinely exhausted, it should not be staffed at all.
+Screen for permuter history at ASSIGNMENT time, not by the runner after it
+arrives.
+
+---
+
 ## 2026-09-12 — round 35: five runners, ZERO matches, and a corpus-wide discovery that most preserved bodies no longer link
 
 **State at end: 983 matched / 1253 game functions (78.45% of game code) —

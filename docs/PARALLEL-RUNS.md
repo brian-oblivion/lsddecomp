@@ -1843,6 +1843,42 @@ ruled-out axes is not an exhausted function. It is a function whose next
 attempt should start from a CHANGED state, which is exactly what a cold runner
 re-deriving the same ground does not do.
 
+**AND SCREEN FOR A SIXTH, WHICH IS THE ONE MECHANICALLY-READABLE COST SIGNAL:
+HAS THIS FUNCTION EVER BEEN PERMUTER-SEARCHED (round 36).** The fifth screen
+above says to prefer the shallowest history and gives no way to measure it.
+There is one, it is a grep, and round 36 measured that it is the discriminator
+that actually paid:
+
+```sh
+python3 tools/nearmiss.py | awk '/ASSIGN FROM HERE/,0' \
+  | grep -oP '^\s+\d+w\s+\S+\s+\K\S+' | while read fn; do
+      f=docs/match-reports/$fn.md
+      [ -f "$f" ] && grep -qi permuter "$f" || echo "$fn"
+  done
+```
+
+Round 36 ran four runners over fifteen inherited bodies and closed nothing. It
+produced exactly two forward movements — `func_8002AEE0` 153/174 -> 165/174 and
+`func_8002B198` 45/91 -> 49/91 — and **both came from fresh permuter searches,
+one of them on a function that had never been searched at all.** Every other
+function that round either reproduced its recorded figure exactly or, where a
+search was re-run on already-searched ground, returned nothing. At the time of
+writing the split over the blocker-clean queue is 73 searched against 38 never
+searched; re-derive it rather than trusting those figures.
+
+This does not make an unsearched function easy, and it is not a ranking by
+promise — it is a ranking by whether the cheapest available lever has been
+pulled yet. Read it together with the fifth screen: prefer the smallest gap
+with NO permuter history, and treat a deeply-searched near-miss as needing a
+CHANGED state rather than another attempt.
+
+**And do the screening at ASSIGNMENT time, not in the runner.** Round 36's
+alpha was staffed onto an eight-function family, correctly determined it was
+permuter-exhausted, and spent zero closing attempts on any of it. That was a
+sound reading of cost and a wasted runner: the unit should not have been
+staffed. A whole runner reporting "this was exhausted before I arrived" is a
+Gate 1b failure, not a runner failure.
+
 **Gate 3 — permuter round instead.** If the fresh queue is dry and carving is
 blocked, or the stall residue is worth more than cold ground (near-misses like
 88/90), run a permuter round. A zero is a LEAD, not an answer: translate it to

@@ -5852,3 +5852,108 @@ which makes the search meaningless and the rejection uninterpretable.
 A nonzero-stack-difference rejection is worth re-testing once with a minimal
 seed before trusting it -- but when a minimal and a larger seed agree, the
 rejection is real and the residue is genuinely not a permuter target.
+
+
+## An inherited body fails THREE ways, not one, and two are textually silent (round 36)
+
+Round 35 found that a preserved body's symbols go stale across an SDK-object
+round. Round 36 corrected fifteen such bodies and rebuilt every one, and
+"correct the names and rebuild" turned out to be necessary and not sufficient.
+Three distinct things can be wrong with a body you inherit:
+
+| failure | compile message | fix |
+| --- | --- | --- |
+| stale name | `undefined reference to 'func_XXXXXXXX'` | rename to the current symbol |
+| missing declaration | `` `D_8008EA22' undeclared `` | carry the declaration in |
+| preamble duplicates the unit's | `conflicting types for 'D_8008D99C'` | RECONCILE — drop or retype the preamble |
+
+The third is the new one and it is not a runner's sloppiness: the body travels
+with its own `extern` preamble precisely because CLAUDE.md requires it to
+("with every declaration it needs, positioned where it would compile"). What
+changed is the UNIT. A later carve, or a later runner recovering declarations
+that an earlier carve dropped, adds declarations for the same symbols at
+different types — and the preamble that made the body self-sufficient becomes a
+duplicate-at-conflicting-type against the file it belongs to.
+`func_80031A44`'s round-31 salvage body is the worked example.
+
+**Only the first row produces a hit on `error:` or `parse error`.** The other
+two are fatal (`cc1` exits 33) and textually silent, caught solely by the
+`*** [….o]` pattern — CLAUDE.md's round-21 table arriving in practice three
+times in a single round. If you trimmed that pattern you would read all three
+as "clean build, does not match yet".
+
+## A report's MANDATED preservation form can point at the WRONG body (round 36)
+
+CLAUDE.md mandates `#if 0 ... #endif` for a preserved body, so it is natural —
+for a reader or a tool — to treat the `#if 0` block as the authoritative one.
+`func_80031A44.md` is the counterexample: its `#if 0` block holds a SUPERSEDED
+87/88 attempt, and the authoritative 84/88 body (the figure in its own title)
+sits in a fenced block six sections lower, under a heading reading "THIS
+SUPERSEDES THE TITLE FIGURES ABOVE".
+
+Positional rules fail the same way. In round 36 one runner put its corrected
+snapshot immediately after the report title and another appended it at the end,
+both reasonably; here the live body is neither first nor last.
+
+**Which body supersedes which is stated in PROSE, and no lexical rule follows
+prose.** So do not build one. `stalesyms.py` had such a rule for part of one
+session — clear a report once the new name appears in any preserved region —
+and it produced a FALSE CLEARANCE on the first report it met, hiding a stale
+live body. It now reports every stale block with its line number and how many
+blocks the report has, and leaves the choice to the reader.
+
+The general form, which this project keeps rediscovering: **a screen that
+resolves an ambiguity on the reader's behalf will resolve it wrongly somewhere,
+and silently.** Surfacing the ambiguity costs a line of output.
+
+## A screen that keeps flagging its own repairs never converges (round 36)
+
+`stalesyms.py` re-flagged all three bodies one runner had just corrected, the
+same afternoon, by three self-referential routes:
+
+- a prose sentence writing `` `#if 0` `` in backticks — which is how a report
+  explains that it fixed a stale body — opened a bogus region that ran to the
+  next real `#endif` and swallowed the explanation;
+- the corrected body's own `/* CdControl/... (was func_80028DF0/...) */` note
+  was scanned as code, though a name in a comment cannot fail to link and the
+  project requires the note to be there;
+- an old "here is what I tried" fenced block was read as a resume-from body.
+
+The count therefore could not fall no matter how much work was done. A repaired
+report reads as untouched, and the next round re-staffs it. **This is the same
+expensive direction as a false blocker — it deletes finished work from view —
+but it arrives through DOCUMENTATION rather than through a grep, so it is
+invisible to the usual check of re-running the screen.** The tell is a screen
+whose number does not move in a round that demonstrably fixed instances of what
+it measures.
+
+## A length-short function shifts `.bss` for the WHOLE IMAGE (round 36)
+
+The project links one contiguous `.main` section, so a function compiled one
+word short does not merely shift later text in its own unit — it shifts every
+later `.bss` symbol in the executable. Reading a sibling's score with such a
+function simultaneously live gives numbers tens of words off:
+`func_8002A75C` reads **146/196** against its true **171/196** with
+`func_8002B3F4` (one word short) also spliced in.
+
+**This is NOT a new way a score lies.** It is documented way 3, address drift,
+and funcdiff's guard fires correctly and loudly — 294582 bytes differing out of
+range, "this per-function read is NOT trustworthy". What the mechanism explains
+is why that out-of-range count is IMAGE-sized rather than unit-sized, which is
+otherwise startling enough to be mistaken for a broken tree.
+
+The practice: **read every score with the unit's other siblings reverted to
+`INCLUDE_ASM`.** One in-progress edit at a time.
+
+## A permuter number is in permuter units — and LOWER is not a synonym for CLOSER (round 36)
+
+The existing entry on this warns against reading a permuter penalty as a retail
+word count. Round 36 adds the other direction: a permuter search on
+`func_8002B4D4` found a candidate scoring 620 -> 240, a large apparent
+improvement, which rebuilt as an actual REGRESSION — 90 instructions against
+retail's 91.
+
+So a permuter result is a LEAD in both directions. Verify every candidate
+against the real oracle before recording it, including — especially — the ones
+whose metric moved the way you hoped.
+
