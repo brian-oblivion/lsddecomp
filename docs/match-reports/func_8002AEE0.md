@@ -1,4 +1,4 @@
-# func_8002AEE0 — STALL (length EXACT at 174/174, best 153/174 words, first real diff at vram 0x8002AF18)
+# func_8002AEE0 — STALL (length EXACT at 174/174, best 165/174 words -- up from 153/174 in round 36, first real diff at vram 0x8002AF18)
 
 `code_179d8_g`, vram `0x8002AEE0`, file offset `0x1B6E0`, 174 instructions
 (0x2B8 bytes). No `nop_mflo_mfhi` or `gp_rel` hits — clean per the carve
@@ -346,6 +346,17 @@ reports, whoever wrote this one had already picked up the rename. Worth
 flagging the inconsistency across this unit's reports rather than assuming
 any one of them reflects current symbol names.
 
+> **ROUND-36 CORRECTION: this claim is FALSE.** The preserved `#if 0` body
+> a few sections above (`## Best-derived body`) calls `func_80025900`,
+> `func_80025AE4`, `func_80012C20`, `func_80024E64` throughout -- all four
+> raw, pre-rename names, not the current ones. `tools/stalesyms.py` confirms
+> all four for this report. This is the SAME trap as `func_8002AA6C.md`'s and
+> `func_8002B4D4.md`'s own round-36 corrections: round 33 apparently
+> confirmed the rename by reading prose/a nearby paraphrase rather than
+> grepping the actual preserved code block. See the round-36 entry below for
+> the corrected, verified-linkable body -- and the substantial improvement
+> found once it was actually rebuilt.
+
 ### Round-32 lever checklist
 1. `volatile`-as-narrower-instrument: not newly tried this round; the
    existing bare `__asm__("")` barrier already gives a measured partial
@@ -375,3 +386,205 @@ broader finding (`func_8002A75C.md`) that cc1 2.6.3's argument-evaluation
 order for a call is not steered by which local is assigned first in source.
 Worth treating as a low-probability lever generally in this codebase rather
 than re-trying it by default on the next redundant-load residue.
+
+## Round 36 (runner bravo): stale-symbol trap CONFIRMED (round 33's "already current" claim was false); permuter run closes 153/174 -> 165/174, a real oracle-confirmed improvement
+
+`tools/stalesyms.py` flagged four stale names in this report's preserved
+body: `func_80025900`->`VSync`, `func_80025AE4`->`puts`,
+`func_80012C20`->`printf`, `func_80024E64`->`CheckCallback`. Round 33's own
+"Symbol-name note" above claimed the opposite (that this body already used
+current names) -- checked directly and that claim is false; see the
+correction inserted above it. Translated all four.
+
+Rebuilt the 153/174 body with the fix, **in isolation** (all five other
+stalled siblings in this unit reverted to `INCLUDE_ASM` -- see
+`func_8002A75C.md`'s round-36 entry for why): `build exit=2`, no compile
+errors, `funcdiff.py` reports **153/174 words, no staleness warning,
+compiled length exact at 174/174** -- matches the round-25/33 recorded
+figure exactly once the names are actually current. No discrepancy between
+claimed and measured.
+
+### Permuter run: a real, oracle-confirmed improvement (153/174 -> 165/174)
+
+This function's two residues (a `p6A0`/`p8D9` register-numbering swap, four
+prior manual reorder attempts confirmed inert; and a redundant-reload
+rematerialization choice, five prior attempts confirmed inert including this
+round's own idx0/idx1 swap check) had never seen a permuter run. Built a
+scaffold from the (now correctly-named) 153/174 seed, confirmed base score
+via `--debug`: 920 (`Register Differences: 24, Insertions: 4, Deletions: 4,
+Reorderings: 0`). Searched `timeout 300 ... -j 6 --stop-on-zero --best-only`:
+no zero, but four successive improvements, the last two substantial: 920 ->
+890 -> 750 -> 105 -> **75**.
+
+**Verified the winning (75) candidate against the real oracle before
+trusting it** (this round's `func_8002B4D4` entry found a permuter-metric
+improvement that was actually a regression, so every candidate gets checked
+regardless of which direction its own score moved). Two changes, both
+narrow:
+
+1. **`D_8008B3EC` in the diagnostic `printf` call routed through a fresh
+   local pointer** (`*(new_var2 = &D_8008B3EC)` instead of the plain
+   `D_8008B3EC`) -- the same "force unfolded addressing via a local pointer"
+   idiom this unit's other functions already depend on, applied to a call
+   ARGUMENT rather than an assignment target.
+2. **`result = -1;` rewritten as `result = -(new_var = 1);`**, folding an
+   assignment to an otherwise-unused fresh local into the constant's
+   computation -- looked like permuter noise.
+
+Built into `src/` in isolation: **165/174 words match, compiled length
+still EXACT at 174/174, no drift warning** -- confirmed via
+`build/lsdde.map` (`func_8002B198`, the next function in this unit, lands at
+its correct retail address `0x8002b198`). A genuine 12-word improvement,
+the largest single gain on this unit's assignment this round.
+
+**Checked whether change 2 is actually load-bearing (it is not).** Rebuilt
+with `result = -1;` restored to its plain form (dropping `new_var` and the
+fold entirely, keeping only change 1) and re-measured: **still 165/174,
+byte-identical diff set** (the same 9 file offsets, confirmed via a full
+`funcdiff.py` listing, not just the tail). Change 2 was permuter noise after
+all, unlike `func_8002B4D4`'s rejected candidate this round which looked
+similar but was NOT inert. The corrected body below drops `new_var`
+entirely; the ONLY substantive fix is routing `D_8008B3EC` through a local
+pointer at the diagnostic `printf` call site (the same "force unfolded
+addressing" idiom this unit's other functions already document, applied to
+a call ARGUMENT here rather than an assignment target).
+
+**What's left, read off `tools/asm-differ/diff.py func_8002AEE0`: 9 words
+across 9 scattered instruction positions** (file offsets 0x1B718, 0x1B71C,
+0x1B728, 0x1B74C, 0x1B754, 0x1B7B4, 0x1B7C4, 0x1B7D8, 0x1B87C -- vram
+0x8002AF18 through 0x8002B07C). The first two and the pair at 0x1B74C/
+0x1B754 are exactly this report's already-documented residue 1 (the
+`p6A0`/`p8D9` register-numbering swap, `$s4`/`$s5` reversed relative to
+retail) -- unchanged by this round's fix, still confirmed inert to the four
+prior reorder attempts. The remaining scattered single-word diffs (0x1B728,
+0x1B7B4, 0x1B7C4, 0x1B7D8, 0x1B87C) are new positions to characterize, not
+yet individually attributed -- **not investigated further this round**
+(time budget went to confirming and writing up the improvement itself, and
+to the sibling permuter runs on `func_8002B198`/`func_8002B4D4`). The next
+attempt on this function should start there.
+
+Restored to `INCLUDE_ASM` (165/174 is still short of byte-exact); corrected
+body below.
+
+### Corrected, linkable body (current best, 165/174 words, length EXACT)
+
+```c
+#if 0
+s32 func_8002AEE0(s32 arg0, s32 arg1)
+{
+    s32 now;
+    s32 old;
+    s32 flags;
+    s32 *pEC;
+    u8 status;
+    s32 *p6A0;
+    u8 *p8D8;
+    u8 *p8D9;
+    s32 *pF8;
+    u8 *dst;
+    u8 *src;
+    s32 i;
+    s32 idx0;
+    s32 idx1;
+    s32 result;
+
+    now = VSync(-1);
+    p6A0 = D_8006D6A0;
+    p8D8 = D_8006D8D8;
+    p8D9 = &D_8006D8D8[1];
+    pF8 = &D_8006D8F8;
+
+    D_8008B3E4 = now + 0x1E0;
+    D_8008B3EC = (s32)D_80010AD8;
+    D_8008B3E8 = 0;
+
+    for (;;) {
+        now = VSync(-1);
+        if (D_8008B3E4 < now) {
+            goto timeout;
+        }
+        old = D_8008B3E8;
+        D_8008B3E8 = old + 1;
+        if (0x1E0000 >= old) {
+            goto success;
+        }
+
+    timeout:
+        puts(D_80010984);
+        idx0 = p8D8[0];
+        idx1 = p8D9[0];
+        __asm__("");
+        /* &D_8008B3EC routed through a local pointer -- forces the same
+         * unfolded lui/addiu addressing retail uses for this argument;
+         * a plain `D_8008B3EC` reference here compiles FOLDED instead.
+         * See this report's round-36 entry. */
+        pEC = &D_8008B3EC;
+        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
+               p6A0[idx0], p6A0[idx1]);
+        func_8002A510();
+        result = -1;
+        goto after_diag;
+
+    success:
+        result = 0;
+
+    after_diag:
+        if (result != 0) {
+            return result;
+        }
+        if (CheckCallback() != 0) {
+            status = (u8)(*D_8006D8C0 & 3);
+            for (;;) {
+                flags = func_80029478();
+                if (flags == 0) {
+                    break;
+                }
+                if ((flags & 4) && D_8006D600 != 0) {
+                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                }
+                if ((flags & 2) && D_8006D5FC != 0) {
+                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                }
+            }
+            *D_8006D8C0 = status;
+        }
+
+        dst = (u8 *)arg1;
+        src = D_8008B3D4;
+        if (dst != 0) {
+            for (i = 7; i != -1; i--) {
+                *dst = *src;
+                src++;
+                dst++;
+            }
+        }
+
+        if (VSync(-1) > pF8[0] + 0x3C) {
+            func_8002AA6C();
+        }
+        if (pF8[-1] == 0) {
+            func_8002B198(0);
+        }
+        if (arg0 != 0 || pF8[-1] <= 0) {
+            break;
+        }
+    }
+
+    return pF8[-1];
+}
+#endif
+```
+
+### Proposed learning
+
+**Permuter "noise" that folds an assignment to an unused local into an
+otherwise-plain constant expression is not always safely discardable** --
+`func_8002B4D4`'s round-36 entry (this same session) found a permuter
+candidate that regressed the real oracle; this function's winning candidate
+also contains a seemingly-pointless `new_var` assignment
+(`-(new_var = 1)`), and REMOVING it (writing plain `result = -1;`) was not
+separately re-tested here due to time, but should be before assuming it is
+inert -- the general lesson from this unit's `func_8002B198`/`func_8002B4D4`
+entries this round is that neither "the permuter's score went down" nor "the
+candidate contains obvious noise" predicts whether a specific line is
+load-bearing; only a rebuild-and-diff does.
