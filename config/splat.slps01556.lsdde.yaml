@@ -764,6 +764,15 @@ segments:
       - [0x20ADC, c, code_179d8_j]
       - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
       - [0x21180, c, code_179d8_j_b]
+      # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`
+      # (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244 = `SsUtPitchBend`, which
+      # was func_800319B4 and had been MATCHED as C.  It sits in the MIDDLE of
+      # code_179d8_j_b, so that unit is now [c][o][c] too and its own tail
+      # became `code_179d8_j_c` -- `_b` was already taken by the vm_prog split
+      # above, which is what the `_c` suffix records.  Text-only; still no
+      # rodata attach anywhere in this family.
+      - [0x221B4, o, libsnd/ut_pb]      # SsUtPitchBend
+      - [0x22244, c, code_179d8_j_c]
       # code_179d8_mid_d: the one function left between the code_179d8_j
       # carve above and code_179d8_c below -- func_80031F3C (131w).  A carve
       # remainder, not a unit.

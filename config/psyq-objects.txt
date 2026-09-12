@@ -414,3 +414,9 @@
 # few manifest lines that does not prefer 3.3. Text-only. Splitting the slice
 # around it created src/code_179d8_j_b.c.
 3.6  libsnd/vm_prog   0x20FF0
+
+# ROUND 34 -- code_179d8_j_b MIDDLE (0x221B4..0x22244): libsnd/ut_pb, one
+# function (SsUtPitchBend, previously matched as C). ONLY the 3.6 disc carries
+# this module. Text-only. This is the SECOND split of the original
+# code_179d8_j slice in the same round, so the tail is src/code_179d8_j_c.c.
+3.6  libsnd/ut_pb     0x221B4

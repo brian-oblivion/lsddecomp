@@ -395,6 +395,7 @@ CdSyncCallback = 0x80028DA8;
 CdReadyCallback = 0x80028DC0;
 CdReadCallback = 0x80028DD8;
 CdDataCallback = 0x80029210;
+SpuVmPBVoice = 0x8002F3E8;
 SpuVmFlush = 0x8002F700;
 SpuVmSetSeqVol = 0x80030404;
 SpuVmGetSeqVol = 0x80030584;

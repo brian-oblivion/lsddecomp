@@ -1,39 +1,48 @@
 /*
- * code_179d8_j_b -- the TAIL of the old code_179d8_j slice, split off in round
- * 34 (2026-09-12) when Sony's `libsnd/vm_prog.o` was linked into the middle of
- * it.  Now 0x21180..0x2273C (vram 0x80030980..0x80031F3C).
+ * code_179d8_j_b -- the MIDDLE third of the old code_179d8_j slice, after
+ * round 34 (2026-09-12) linked TWO Sony objects into what used to be one unit.
+ * Now 0x21180..0x221B4 (vram 0x80030980..0x800319B4), five functions
+ * (func_80030980 .. func_80031890).
  *
- * WHY THE SPLIT EXISTS.  `func_800307F0`, `func_80030864`, `func_800308B8` and
- * `func_8003092C` are Sony's `SpuVmSetProgVol`, `SpuVmGetProgVol`,
- * `SpuVmSetProgPan` and `SpuVmGetProgPan` (`libsnd/vm_prog`, Psy-Q 3.6 -- the
- * only disc that carries the module).  All four had been MATCHED as C;
- * reclassifying them out of the game count is the correction CLAUDE.md asks
- * for, not a regression.  A placed object cannot live inside a `c` segment, so
- * the slice had to become [c][o][c] and this half needed its own name.  The
- * front half kept `code_179d8_j`.
+ * WHY THIS UNIT EXISTS, IN TWO STEPS, BOTH IN ROUND 34.
+ *   1. `libsnd/vm_prog.o` (Psy-Q 3.6 -- the only disc carrying the module)
+ *      covers 0x20FF0..0x21180: SpuVmSetProgVol, SpuVmGetProgVol,
+ *      SpuVmSetProgPan, SpuVmGetProgPan, all four previously MATCHED as C.
+ *      That split the old code_179d8_j into [c][o][c] and created this file.
+ *   2. `libsnd/ut_pb.o` (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244:
+ *      `SsUtPitchBend`, which was `func_800319B4`, also previously MATCHED.
+ *      That split THIS file again into [c][o][c], and everything from
+ *      func_80031A44 on moved to `src/code_179d8_j_c.c`.
+ * Reclassifying five matched functions out of the game count across the two
+ * steps is the correction CLAUDE.md asks for, not a regression; their C is
+ * DELETED, not commented out.
  *
- * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed: the
- * old code_179d8_mid_c monolith contains zero `jtbl_` and zero `.word .L`, so
- * no unit in this family owns one, and the splat yaml's rodata slot list names
- * none of them.  Unlike round 33's code_179d8_c_b there was nothing to move,
- * and a link failure of the form `undefined reference to '.L8003....'` would
- * mean something else.
+ * `D_8008EA22` LEFT WITH `SsUtPitchBend`: that function and the deleted
+ * func_80030648 were its only readers in this family, so the extern went with
+ * the deletion rather than being kept as a dead declaration.
  *
- * DECLARATIONS: this file carries its own copy of the declarations its
- * functions use, split out of the old shared block.  Keep it that way -- do
- * NOT create a shared code_179d8*.h.  The sibling slices are staffed
- * independently and a shared header is what makes their merges collide; see
- * `python3 tools/headercontention.py`.  Several of the externs below are read
- * only by functions still carried as INCLUDE_ASM (the `func_80030E90` scratch
- * globals in particular); they are knowledge about those functions, not dead
- * code, and were re-homed here deliberately rather than dropped.
+ * NO RODATA ATTACH IS OWNED BY ANY UNIT IN THIS FAMILY, and that is measured,
+ * not assumed: the old code_179d8_mid_c monolith contains zero `jtbl_` and
+ * zero `.word .L` across its whole extent, and the splat yaml's rodata slot
+ * list names none of `code_179d8_j`, `_j_b` or `_j_c`.  Unlike round 33's
+ * code_179d8_c_b there was nothing to move, and a link failure of the form
+ * `undefined reference to '.L8003....'` would mean something else.
+ *
+ * DECLARATIONS: this file carries its own copy of what its functions use,
+ * split out of the old shared block.  Keep it that way -- do NOT create a
+ * shared code_179d8*.h.  The sibling slices are staffed independently and a
+ * shared header is what makes their merges collide; see
+ * `python3 tools/headercontention.py`.  Several externs below are read only by
+ * functions still carried as INCLUDE_ASM (the `func_80030E90` scratch globals
+ * in particular); they are knowledge about those functions, not dead code, and
+ * were re-homed here deliberately rather than dropped.
  *
  * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
  * re-implementing the greps and never for `addiu_at` (resolved round 21).
  * `nearmiss.py` runs `tools/sdkstalls.py` for you, and round 34 is why that
- * matters here: the four functions this split gave back to Sony were on the
- * old unit's carve-time WORKABLE list, screened clean on every blocker, and
- * were unmatchable by construction.
+ * matters here: all five functions the two splits gave back to Sony were on
+ * the old unit's carve-time WORKABLE list, screened clean on every blocker,
+ * and were unmatchable by construction.
  *
  * Expect this slice to span more than one class; identify each with
  * tools/classtable.py rather than assuming the unit has one.  Keep every
@@ -41,22 +50,6 @@
  */
 
 #include "common.h"
-
-/* ------------------------------------------------------------------------
- * Cross-unit calls, typed per-call-site from the registers loaded before
- * each `jal` -- none of these callees have an established prototype yet, so
- * these are local guesses, not authoritative.  (This note used to add "several
- * are themselves addiu-$at blocked in their own units"; that is stale as of
- * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
- * ------------------------------------------------------------------------ */
-extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
-extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);
-extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 func_8002F3E8(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
-extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
-extern void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3);
-
-extern u16 D_8008EA22;
 
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
  * (func_80030E90's own computed index, not a channel id). Every field
@@ -185,23 +178,6 @@ extern Rec34Half D_8008D988[];
 extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
-/* 16 (0x10)-byte-stride record with two s16 fields 2 bytes apart --
- * modeled as ONE struct here (not two independent arrays) because
- * func_80030404 computes the second field's address as the first
- * field's cached base register plus a compile-time +0x2, which only
- * happens when the compiler knows both offsets belong to the same
- * object. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    s16 unk2; /* +0x2 */
-    u8 pad4[0x10 - 0x4];
-} Rec16D7F0;
-extern Rec16D7F0 D_8008D7F0[];
-extern Rec16D7F0 D_8008D7F4[]; /* independent array, same shape */
-
-/* Per-slot flag byte, same 0..0x17 id as several of the tables above. */
-extern u8 D_8008D970[];
-
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030E90);
@@ -260,92 +236,3 @@ fail_nolock:
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031890);
-
-s32 func_800319B4(s32 p0, s16 p1, s16 p2, s32 p3, u16 p4)
-{
-    SpuVmVSetUp(p1, p2);
-    D_8008EA22 = 0x21;
-    if (func_8002F3E8((s16) p0, 0x21, p1, p2, p4) == 0)
-        return -1;
-    return 0;
-}
-
-/* STALL -- see docs/match-reports/func_80031A44.md.  HEAD SALVAGE, round 31:
- * a mid-attempt snapshot scoring 84/88 words (no drift) was recovered from
- * the worktree and is preserved in that report as literal source.  No author
- * applied a stop rule to it. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031A44);
-
-/* Rec34D994 (D_8008D994/99A/99E) and Rec16D7F0 (D_8008D7F8/D_8008D7FA
- * below) are declared once, near the top of this file, and shared by
- * every function in this unit that needs them -- see the comment there.
- * See func_80031CF0's report for why D_8008D7F8/D_8008D7FA are modeled
- * as independent arrays rather than fields of one struct (each access
- * computes its own address), unlike D_8008D7F0/D_8008D7F4 above. */
-extern Rec16D7F0 D_8008D7F8[];
-extern Rec16D7F0 D_8008D7FA[];
-
-/* `dead` is never read and the write is unreachable; it exists to make GCC
- * allocate retail's empty 8-byte frame, which is what puts the two
- * stack-passed arguments at 0x18/0x1C($sp) instead of 0x10/0x14.  See this
- * function's match report -- the frame is the ONLY thing the idiom is for,
- * and adding anything else on top of it breaks the scheduling. */
-s32 func_80031BA4(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
-    s32 dead[2];
-
-    if ((u16)idx < 0x18) {
-        if (D_8008D99E[idx].unk0 != p1) {
-            return -1;
-        }
-        if (D_8008D99A[idx].unk0 != p2) {
-            return -1;
-        }
-        if (D_8008D994[idx].unk0 != p3) {
-            return -1;
-        }
-        D_8008D7F8[idx].unk0 = p4;
-        __asm__("");
-        D_8008D7FA[idx].unk0 = p5;
-        __asm__("");
-        D_8008D970[idx] |= 0x30;
-        return 0;
-    }
-    if (0) {
-        dead[0] = 1;
-    }
-    return -1;
-}
-
-s32 func_80031C98(s16 idx, s16 *out1, s16 *out2)
-{
-    if ((u16) idx < 0x18) {
-        *out1 = D_8006DAD4[idx].unk0;
-        *out2 = D_8006DAD4[idx].unk2;
-        return 0;
-    }
-    return -1;
-}
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031CF0);
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031D6C);
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031DF8);
-
-s32 func_80031E94(s16 p0, s16 p1, s16 p2, s16 p3)
-{
-    if ((u16) p0 < 0x18) {
-        func_8002E308(p0, p1, p2, p3);
-        return 0;
-    }
-    return -1;
-}
-
-s32 func_80031EE8(s16 p0, s16 p1, s16 p2, s16 p3)
-{
-    if ((u16) p0 < 0x18) {
-        func_8002E874(p0, p1, p2, p3);
-        return 0;
-    }
-    return -1;
-}
