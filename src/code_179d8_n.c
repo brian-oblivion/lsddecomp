@@ -227,13 +227,17 @@ ret1:
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_n", func_80029C40);
 
-/* Round 37 (echo): STALL, now 281/282 (1 word short) -- up from 278/282,
- * a real 3-word gain from a permuter-found lever: declaring D_8006D8D8
- * (and the two local pointers into it, `state`/`state1`) `volatile`
- * closed two of the three previously-characterized residues. See
- * docs/match-reports/func_80029F10.md for the full derivation and the
- * one remaining residue (a load-delay `nop` scheduling choice, already
- * characterized and already tried unsuccessfully before this round).
+/* Round 37 (echo): STALL, now 282/282 (LENGTH exact, no drift into
+ * anything downstream) -- up from 278/282, via two stacked permuter-found
+ * levers: (1) declaring D_8006D8D8 (and the two local pointers into it,
+ * `state`/`state1`) `volatile` closed 3 of the original 4 missing words
+ * (278->281/282); (2) a second search from that improved body found that
+ * materializing `table[state[1]]` into `src` as its own statement just
+ * before the timeout printf call (a dead store -- `src` is unconditionally
+ * overwritten before its value is ever read) closes the last word
+ * (281->282/282). Raw word-match went DOWN in the process (132/282 ->
+ * 98/282) even as length became exact -- see the match report's honest
+ * discussion of why LENGTH is still the right thing to have adopted here.
  * Restored to INCLUDE_ASM per project rule. */
 #if 0
 extern s32 D_8006D608;
@@ -348,8 +352,9 @@ s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
             }
 timeout3:
             puts(D_80010984);
+            src = table[state[1]];
             printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
-                          table[state[0]], table[state[1]]);
+                          table[state[0]], src);
             func_8002A510();
             result = -1;
             goto skip_timeout3;
