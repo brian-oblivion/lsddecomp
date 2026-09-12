@@ -1,10 +1,14 @@
-# DreamSys__InstanceEffectsOnJournal
+# DreamSys__InstanceEffectsOnJournal -- STALL: 1 word short (109 instructions built vs retail's 110), 106/110 words truly correct after `asm-differ` realignment (funcdiff's own raw in-range count reads 15/110 -- a missing-word size-shift trap, not the true residue, see "Reading the score" below), first real diff at 0x4B860 (the switch-index bounds check: retail computes `addiu v1,a2,-4`/`sltiu v0,v1,9`/`sll v0,v1,0x2` into `$v1`, this build computes the identical three ops in place on `$a2`)
 
 **Unit:** DreamSys · **Size:** 110 words · **Status:** STALL, 106/110 words
-truly correct with no address drift (see "Reading the score" below for why
-`funcdiff.py`'s own raw number reads far lower). Attempted round 2026-09-06
-(charlie). Screened clean against both remaining blockers (`gp_rel`,
-`nop_mflo_mfhi`) by the head before assignment.
+truly correct (see "Reading the score" below for why `funcdiff.py`'s own raw
+number reads far lower; there IS one real word missing, hence the address
+drift funcdiff also reports). Attempted round 2026-09-06 (charlie). Screened
+clean against both remaining blockers (`gp_rel`, `nop_mflo_mfhi`) by the head
+before assignment. **Title rebuilt round 37 (2026-09-12, charlie)** to carry
+the three required figures -- this report previously had none in its title
+line; re-measured fresh, byte-identical to what follows (see "Round 37"
+below).
 
 ## What it does
 
@@ -307,3 +311,130 @@ live-range are different axes; only the second one drives this register-cost
 class. Worth stating plainly since "scope it more tightly" is the obvious
 next lever a reader reaches for after seeing "function-scope local costs a
 register", and it is a dead end here.
+
+---
+
+## Round 37 (2026-09-12, runner charlie): title rebuilt, permuter search launched
+
+This report predated round 23's three-figure title rule and carried no
+length/word-match/first-diff figures in its title line at all -- round 37's
+brief named it explicitly as one of two functions in this unit needing that
+repair, since `tools/progress.py`/the next round's staffing reads the title,
+not the body.
+
+Re-measured before touching anything: rebuilt the exact preserved body above
+and reproduced the identical residue --  `./build-and-verify.sh` gives
+`build exit=2` with zero compile-error grep hits (a fresh, non-matching
+build, exactly as expected), and `tools/asm-differ/diff.py` confirms:
+
+- **Length: one word short.** This build assembles to 109 instructions
+  (0x4B83C-0x4B9F0 realigned) against retail's 110 (0x4B83C-0x4B9F4); the
+  `j 5b1dc` branch target itself is one word earlier throughout the realigned
+  stream (`5b1d8` vs retail's `5b1dc`), which is the direct symptom of the
+  missing word, not a separate issue.
+- **Raw word-match**: `funcdiff.py`'s own in-range count reads 15/110 with an
+  explicit "differs OUTSIDE this range too (134342 bytes)" warning --
+  confirmed this is the `func_8004BB3C`-shaped trap the report already
+  documents, not a regression. Reading `asm-differ`'s realigned output
+  instead: **106/110 words truly correct**, same two residues as every
+  earlier round (switch-index register choice, case-4 vtable-dereference
+  delay-slot fill), unchanged.
+- **First real diff, read off `asm-differ`**: **file offset 0x4B860**
+  (`vram 0x8005B060`) -- retail's `addiu v1,a2,-4` (copying the bounds-check
+  input into `$v1` before using it) against this build's `addiu a2,a2,-4`
+  (same computation, done in place on `$a2`, the parameter's own register).
+  This is Residue 1 from the existing analysis above; nothing new to add to
+  its cause, which was already exhaustively covered (declaration form is
+  invisible to this register choice).
+
+No new C axis was tried this round -- the existing report already closes out
+four forms of the cast/typing axis (round 22, round 35) and this round's
+brief prioritizes a fresh permuter search over re-deriving hand analysis on a
+function already argued this thoroughly. A permuter scaffold was set up
+(`permuter-work/DreamSys__InstanceEffectsOnJournal`) from this exact
+preserved body; see the runner's final summary for the search's outcome
+(iteration count and `rc`), since the project's parallel-run discipline
+requires exactly one search running at a time and this function's search was
+queued behind `func_80059D1C`'s and `func_8005A9CC`'s.
+
+`INCLUDE_ASM` restored immediately after measuring; whole-image SHA1 verified
+green; `git diff --stat` empty against `main` for this unit's non-report
+files at the point of this write-up.
+
+### Proposed learning (round 37)
+
+A report can carry a fully worked-out residue analysis in its body while
+still having no title figures at all, if it predates the three-figure title
+rule -- `tools/progress.py` and next-round staffing read titles, so an
+old-format title with a well-documented body is invisible to automated
+ranking in exactly the same way an undocumented stall is. Worth a one-time
+sweep of the whole `docs/match-reports/` corpus for titles missing the three
+figures, independent of this unit -- this round only touched the two the
+brief already named, but the trap is generic to any report older than round
+23.
+
+---
+
+## Round 37 continued: permuter search run, one candidate examined and rejected as a real regression
+
+**Search** (`-j 6 --stop-on-zero --best-only --stack-diffs`, `timeout 900`):
+ran 92452 iterations. No zero was reached. (`rc` could not be captured this
+run -- the `echo "permuter rc=$?" | tee -a` tail never landed in the log
+despite the background task reporting a clean exit; the iteration count and
+absence of an `output-0-*` directory are otherwise fully confirmed, and the
+total iteration count is consistent with the same ~900s bound as the other
+three searches this round, so this is read as `rc=124` by inference, not
+measurement -- flagged rather than asserted.)
+
+`--best-only` saved two local-best candidates (scores 80 and 120, both
+better than the base 180). **Both were examined; both are false leads, for
+two different reasons:**
+
+- **Score 120** relies on undefined behavior in the same shape
+  `func_8005A9CC.md` already found this round: it declares `new_var = entity`
+  inside `case 7:`'s fallthrough into `case 8:`, then reads `new_var` in
+  cases 9-12 -- separate switch targets reached via the jump table, NOT via
+  fallthrough from 7/8, so `new_var` is uninitialized on every path that
+  actually reaches those cases. Rejected on inspection, not tested.
+- **Score 80** targets exactly Residue 2 (case 4's vtable-dereference
+  ordering) with a permuter-native form of the same lever that closed
+  `func_80059D1C` this round: `new_var = entity;` unconditionally before the
+  switch, then `slot0x38(new_var, this)` instead of `slot0x38(entity, this)`
+  at case 4. **Translated and run through the full oracle -- and this is the
+  interesting negative result.** `funcdiff.py`'s outside-range drift
+  collapsed from 134342 bytes to **1 byte** (the function is now the full
+  110 words long, closing the length gap entirely), but the realigned
+  `asm-differ` view shows this did NOT reduce the true residue count. GCC
+  hoisted the now-unconditional `new_var = entity` assignment into the empty
+  delay slot after the earlier `beqz` (the switch bounds check) rather than
+  leaving it where case 4's block needs it -- a real instruction retail does
+  not have, immediately followed by the ORIGINAL orphan `move a0,s1` at
+  0x4b88c now being gone (netting the same total instruction count) but at
+  the cost of a NEW register mismatch at 0x4b890 (`lw v0,0(a0)` vs
+  `lw v0,0(s1)`). Counting every diff marker in the realigned output: this
+  candidate has residue 1 (3 words, unchanged) PLUS one insertion, one
+  deletion, and one new register mismatch at the case-4 boundary -- net
+  **worse** than the established 106/110, even though `funcdiff`'s raw
+  in-range count (98/110) and near-zero outside-range drift both look like
+  improvements at a glance. Reverted; `INCLUDE_ASM` restored; whole-image
+  SHA1 verified green.
+
+**Status: still STALL, 106/110 (via asm-differ), residue unchanged.**
+
+### Proposed learning (round 37, continued)
+
+**Eliminating a function's LENGTH mismatch (the address-drift trap this
+report itself is built around) is not the same axis as eliminating its
+WORD-count residue, and a permuter candidate can improve one while making
+the other worse.** This candidate looked like a clear win by two different
+proxies at once -- `funcdiff`'s drift warning nearly vanished, and its raw
+in-range count went from a misleadingly-low 15/110 to a much healthier-
+looking 98/110 -- and was still a net regression once counted against the
+real oracle via `asm-differ`'s realignment. The lesson from the existing
+"four ways a score lies" list generalizes one step further: a permuter
+candidate can look better on BOTH of funcdiff's own signals (drift AND raw
+count) simultaneously while being worse on the metric that actually matters
+(total instructions that differ from retail). `asm-differ`'s realigned
+count, not `funcdiff`'s raw window, remains the only trustworthy read for
+any function with a length mismatch -- true before this round's permuter
+search and still true of its output.

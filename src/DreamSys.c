@@ -516,7 +516,10 @@ void func_80059814(DreamSys *this)
    different, deeper mechanism (opportunistic delay-slot placement of the
    `this` register setup across multiple converging paths into the shared
    `func_80059A1C(this)` tail call), not reachable by the rename lever nor by
-   a scheduling barrier at the merge point (tried, no effect). */
+   a scheduling barrier at the merge point (tried, no effect). Re-verified
+   fresh round 37 (2026-09-12, runner charlie); a permuter search was run
+   this round and found no improvement -- see the report's round 37
+   addendum. */
 void func_800598E8(DreamSys *this)
 {
 	s32 idx;
@@ -650,18 +653,25 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 	return ret;
 }
 
-#if 0
-/* Best-reached body, 55/72 words, verified fresh round 32 (2026-09-12,
-   runner alpha2) -- see docs/match-reports/func_80059D1C.md for the
-   residue analysis (a whole-function this/heading register-identity swap)
-   and this round's two new negative attempts. Restored to INCLUDE_ASM below
-   per project rule (no score short of byte-exact stays in src/). */
+/* `headingArg` and `scratch` are not superfluous: they were found by a
+   permuter search (round 37, 2026-09-12, runner charlie) after 20+ hand
+   attempts across three rounds failed to reproduce retail's whole-function
+   this/obj/vt/heading register allocation. Both are ordinary, valid C89 --
+   `headingArg` is a second copy of `heading` used at its two call sites,
+   giving the two logical uses disjoint live ranges so GCC 2.6.3's
+   allocator lands them in the SAME register retail does; `scratch` plays
+   the same role for the raw `D_80087EB0[idx]` read and, independently, for
+   the literal `0x90` argument at the very end. Removing either variable
+   (rebuilding the "obvious" simpler form) reproduces a real, measured
+   regression -- see docs/match-reports/func_80059D1C.md. */
 void func_80059D1C(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 	s32 idx;
 	DreamSysUnk58Vtable *vt;
 	s32 heading;
+	s32 headingArg;
+	s32 scratch;
 
 	obj = (DreamSysUnk58 *)this->unk_0x58;
 	vt = obj->vt;
@@ -670,23 +680,23 @@ void func_80059D1C(DreamSys *this)
 		return;
 	}
 
-	heading = D_80087EB0[idx];
-	heading <<= 4;
+	scratch = D_80087EB0[idx];
+	heading = scratch << 4;
+	headingArg = heading;
 	vt->slot0x9C(obj, D_80087EC8[idx]);
-	this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
+	this->unk_0xBC = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
 	if (this->unk_0xB8 != 0x16) {
 		this->unk_0xBC = -1;
 	}
 
 	if (this->unk_0xB8 == 0xB) {
 		vt->slot0x9C(obj, 1);
-		vt->slot0x80(obj, heading, 0x6E, 0x6E);
+		vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
 		vt->slot0x9C(obj, 2);
-		vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+		scratch = 0x90;
+		vt->slot0x80(obj, scratch, 0x6E, 0x6E);
 	}
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059D1C);
 
 void func_80059E3C(DreamSys *this)
 {
@@ -1016,7 +1026,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 /* Best-reached body, 57/88 words, no address drift -- see
    docs/match-reports/func_8005A9CC.md for the residue analysis. Restored to
    INCLUDE_ASM below per project rule (no score short of byte-exact stays in
-   src/). */
+   src/). Re-verified fresh round 37 (2026-09-12, runner charlie). */
 bool func_8005A9CC(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
@@ -1205,11 +1215,13 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
 }
 
 #if 0
-/* Best-reached body, 106/110 words truly correct (see the match report for
-   why funcdiff's own count reads far lower) -- see
+/* Best-reached body, 1 word short (109/110 instructions), 106/110 words
+   truly correct after asm-differ realignment (see the match report for why
+   funcdiff's own raw count reads far lower) -- see
    docs/match-reports/DreamSys__InstanceEffectsOnJournal.md for the residue
    analysis. Restored to INCLUDE_ASM below per project rule (no score short
-   of byte-exact stays in src/). */
+   of byte-exact stays in src/). Re-verified fresh round 37 (2026-09-12,
+   runner charlie). */
 void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
 {
 	if (this->unknwon_int_0x44 != 0) {
