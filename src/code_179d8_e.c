@@ -103,8 +103,14 @@ extern s16 func_80030E90(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 a
 extern void func_80031E94(s16 a0, s16 a1, s16 a2, s32 a3);
 extern void func_80031890(s16 index);
 extern void func_80031F3C(s32 arg0);
-extern void func_8003370C(s32 arg0);
-extern s32 func_800336CC(s32 arg0);
+/* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`
+ * (`libsnd/scsmute`), linked from the SDK objects since round 34.  The two
+ * signatures are this call site's own reading and disagree with the sibling
+ * reading in code_179d8_i.c about the return types -- that is the project's
+ * independent-local-view convention, and it is exactly why a Psy-Q prototype
+ * must never go into a header these units share. */
+extern void SsVabTransCompleted(s32 arg0);
+extern s32 SsSetMute(s32 arg0);
 
 /* func_8002CC34's own "obj" (its `arg1`) -- a small slot-table object,
  * unrelated to ObjDA34 (this function is NOT a D_8006DA34 vtable slot; its
@@ -183,7 +189,7 @@ s32 func_8002C824(ObjDA34 *self, s32 arg1) {
     result = 0;
     if (self->unk5A != 0) {
         if (arg1 != 0) {
-            func_8003370C(1);
+            SsVabTransCompleted(1);
             self->unk5A = 0;
             self->unk58 = 1;
             self->methods->slot7C(self);
@@ -211,7 +217,7 @@ s32 func_8002CB58(ObjDA34 *self) {
 
     flag = self->unk56;
     if (flag == 0) {
-        func_800336CC(1);
+        SsSetMute(1);
         flag = 1;
         self->unk56 = flag;
     }
@@ -223,7 +229,7 @@ s32 func_8002CB9C(ObjDA34 *self) {
 
     flag = self->unk56;
     if (flag != 0) {
-        flag = func_800336CC(0);
+        flag = SsSetMute(0);
         self->unk56 = 0;
     }
     return flag;

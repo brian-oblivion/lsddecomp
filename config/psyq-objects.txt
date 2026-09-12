@@ -368,3 +368,77 @@
 3.3  libcd/iso9660  0x1BE40  localize=memcpy
 3.3  libc2/strcmp   0x1C848
 3.3  libc2/strncmp  0x1C8AC
+# ROUND 34 -- code_179d8_f PREFIX (0x2673C..0x26D28): six libsnd objects
+# covering thirteen functions, twelve of which had been matched as C and one
+# (func_80035F98 / _SsUtBuildADSR, 35w) was an INCLUDE_ASM stall with a
+# 255-line report. Text-only; `place` derives no data lines. The run tiles
+# exactly: adsr 0xE8 + ut_rev 0x20C + ut_sva 0x1CC + vm_don 0x14 + next 0x108
+# + vm_doff 0x10 = 0x5EC.
+#
+# Two disc choices are NOT the usual "prefer 3.3":
+#   - `ut_rev` is taken from 3.3 because the 3.5/3.6 build of that module is a
+#     DIFFERENT SPLIT (0xB4 text at 0x26864, with ut_rdep/ut_rfb/ut_rdel as
+#     separate objects) which leaves a 0x40 gap at 0x26824 and does not tile.
+#     `runs` reports the same thing as "libsnd/ut_rev supersedes libsnd/ut_rdel
+#     ut_rdep ut_rfb".
+#   - `next` is on the 3.5 and 3.6 discs only; 3.5 is taken.
+# `adsr` is byte-identical to 3.6's `ccadsr`; the 3.3 `adsr` is taken.
+3.3  libsnd/adsr     0x2673C
+3.3  libsnd/ut_rev   0x26824
+3.3  libsnd/ut_sva   0x26A30
+3.3  libsnd/vm_don   0x26BFC
+3.5  libsnd/next     0x26C10
+3.3  libsnd/vm_doff  0x26D18
+
+# ROUND 34 -- code_179d8_f MIDDLE (0x270E8..0x272A8): libsnd/stop, three
+# functions (Snd_stop, SsSeqStop, SsSepStop), all three previously matched as
+# C. It sits in the MIDDLE of what was left of code_179d8_f after the prefix
+# run above, so the slice became [c][o][c] and the tail half is the
+# one-function unit src/code_179d8_f_b.c (func_80036AA8). Text-only; the unit
+# owns no jump table, so no rodata attach moved.
+3.3  libsnd/stop     0x270E8
+
+# ROUND 34 -- code_179d8_i PREFIX (0x2397C..0x24490): ten libsnd objects
+# covering eleven functions, EVERY ONE of which had been matched as C. No
+# stall is retired here; the whole run is a reclassification. Text-only;
+# `place` derives no data lines. The run tiles exactly: ut_gvh 0xE4 + ut_gva
+# 0x240 + scsmvol 0x50 + ut_gpa 0x10C + vs_vtb 0xD0 + scsmute 0x40 + vs_vtc
+# 0x2C + sscall 0x274 + pause 0x104 + tempo 0x1E0 = 0xB14.
+#
+# `pause` is the 3.3 build ON PURPOSE: the 3.5/3.6 discs split that module
+# into `pause` (0xA0) + `npause` (0x64) -- the same two functions, but two
+# objects where retail linked one. `runs` reports this as "libsnd/pause
+# supersedes libsnd/npause". `scsmvol` and `scsmute` are byte-identical to
+# 3.6's `sssmv` and `sssm`; the 3.3 spellings are taken.
+3.3  libsnd/ut_gvh    0x2397C
+3.3  libsnd/ut_gva    0x23A60
+3.3  libsnd/scsmvol   0x23CA0
+3.3  libsnd/ut_gpa    0x23CF0
+3.3  libsnd/vs_vtb    0x23DFC
+3.3  libsnd/scsmute   0x23ECC
+3.3  libsnd/vs_vtc    0x23F0C
+3.3  libsnd/sscall    0x23F38
+3.3  libsnd/pause     0x241AC
+3.3  libsnd/tempo     0x242B0
+
+# ROUND 34 -- code_179d8_i MIDDLE (0x247B8..0x2490C): libsnd/replay (Snd_replay)
+# and libsnd/vs_vab (SsVabClose, SsVabOpen), three functions, all three
+# previously matched as C. The run sits in the MIDDLE of what the prefix trim
+# above left, so the slice became [c][o][o][c] and the tail half is the
+# one-function unit src/code_179d8_i_b.c (func_8003410C). Text-only.
+3.3  libsnd/replay    0x247B8
+3.3  libsnd/vs_vab    0x24820
+
+# ROUND 34 -- code_179d8_j MIDDLE (0x20FF0..0x21180): libsnd/vm_prog, four
+# functions (SpuVmSetProgVol, SpuVmGetProgVol, SpuVmSetProgPan,
+# SpuVmGetProgPan), all four previously matched as C. ONLY the 3.6 disc carries
+# this module -- 3.3, 3.5 and 3.0 place nothing here -- so this is one of the
+# few manifest lines that does not prefer 3.3. Text-only. Splitting the slice
+# around it created src/code_179d8_j_b.c.
+3.6  libsnd/vm_prog   0x20FF0
+
+# ROUND 34 -- code_179d8_j_b MIDDLE (0x221B4..0x22244): libsnd/ut_pb, one
+# function (SsUtPitchBend, previously matched as C). ONLY the 3.6 disc carries
+# this module. Text-only. This is the SECOND split of the original
+# code_179d8_j slice in the same round, so the tail is src/code_179d8_j_c.c.
+3.6  libsnd/ut_pb     0x221B4

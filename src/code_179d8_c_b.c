@@ -94,7 +94,9 @@ void func_80032A7C(void)
     SpuQuit();
 }
 
-extern void func_80033738(void);
+/* Sony's `SsSeqCalledTbyT` (`libsnd/sscall`), linked from the SDK object
+ * since round 34. Local view, never a shared header. */
+extern void SsSeqCalledTbyT(void);
 extern void (*D_8006DC9C)(void);
 
 void func_80032A9C(void)
@@ -102,7 +104,7 @@ void func_80032A9C(void)
     if (D_8006DC9C != NULL) {
         D_8006DC9C();
     }
-    func_80033738();
+    SsSeqCalledTbyT();
 }
 
 extern s32 D_8006DCA0;
@@ -113,7 +115,7 @@ void func_80032AD0(void)
         D_8006DCA0 = 1;
     } else {
         D_8006DCA0 = 0;
-        func_80033738();
+        SsSeqCalledTbyT();
     }
 }
 

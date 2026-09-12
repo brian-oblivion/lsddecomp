@@ -786,7 +786,33 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
+      #
+      # ROUND 34: `libsnd/vm_prog` (Psy-Q 3.6 -- the ONLY disc that carries
+      # this module; 3.0, 3.3 and 3.5 place nothing here) covers
+      # 0x20FF0..0x21180, four functions that had ALL been MATCHED as C:
+      # func_800307F0/864/8B8/92C = SpuVmSetProgVol, SpuVmGetProgVol,
+      # SpuVmSetProgPan, SpuVmGetProgPan.  Reclassifying them out of the game
+      # count is the correction, not a regression.  It sits in the MIDDLE of
+      # the slice, so the slice is now [c][o][c] and everything from
+      # func_80030980 on lives in `src/code_179d8_j_b.c`.  Text-only.
+      #
+      # NO RODATA ATTACH MOVED, and that is measured: the old code_179d8_mid_c
+      # monolith contains zero `jtbl_` and zero `.word .L`, so no unit in this
+      # family owns one and the rodata slot list above names none of them.
+      # This is the one respect in which the split differs from round 33's
+      # code_179d8_c_b, which DID have to carry its attach across.
       - [0x20ADC, c, code_179d8_j]
+      - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
+      - [0x21180, c, code_179d8_j_b]
+      # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`
+      # (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244 = `SsUtPitchBend`, which
+      # was func_800319B4 and had been MATCHED as C.  It sits in the MIDDLE of
+      # code_179d8_j_b, so that unit is now [c][o][c] too and its own tail
+      # became `code_179d8_j_c` -- `_b` was already taken by the vm_prog split
+      # above, which is what the `_c` suffix records.  Text-only; still no
+      # rodata attach anywhere in this family.
+      - [0x221B4, o, libsnd/ut_pb]      # SsUtPitchBend
+      - [0x22244, c, code_179d8_j_c]
       # code_179d8_mid_d: the one function left between the code_179d8_j
       # carve above and code_179d8_c below -- func_80031F3C (131w).  A carve
       # remainder, not a unit.
@@ -880,7 +906,46 @@ segments:
       # rodata attach is NOT affected: it belongs to func_80032588, which is
       # not in this run.
       - [0x23498, o, libsnd/vs_vh]
-      - [0x2397C, c, code_179d8_i]
+      #
+      # ROUND 34: the unit's whole PREFIX, 0x2397C..0x24490, is TEN linked
+      # `libsnd` objects (all Psy-Q 3.3) covering ELEVEN functions -- EVERY one
+      # of which had been MATCHED as C.  Reclassifying them out of the game
+      # count is the correction, not a regression; no stall is retired here
+      # because there was no stall left in the run.  Text-only, and the unit
+      # still owns no rodata attach.  A pure prefix trim: the `c` line just
+      # moves to 0x24490 and the unit keeps its name.
+      #
+      # This run is the round-33 lesson four paragraphs up, at eleven times the
+      # scale: all eleven passed every blocker screen and all eleven were
+      # unmatchable by construction.  `tools/sdkstalls.py` is the screen that
+      # sees this one.
+      #
+      # `pause` is the 3.3 build ON PURPOSE -- 3.5/3.6 split that module into
+      # `pause` (0xA0) + `npause` (0x64), two objects where retail linked one,
+      # which is what `runs` means by "libsnd/pause supersedes libsnd/npause".
+      # `scsmvol`/`scsmute` are byte-identical to 3.6's `sssmv`/`sssm`.
+      - [0x2397C, o, libsnd/ut_gvh]     # SsUtGetVabHdr
+      - [0x23A60, o, libsnd/ut_gva]     # SsUtGetVagAtr
+      - [0x23CA0, o, libsnd/scsmvol]    # SsSetMVol
+      - [0x23CF0, o, libsnd/ut_gpa]     # SsUtGetProgAtr
+      - [0x23DFC, o, libsnd/vs_vtb]     # SsVabTransBody
+      - [0x23ECC, o, libsnd/scsmute]    # SsSetMute
+      - [0x23F0C, o, libsnd/vs_vtc]     # SsVabTransCompleted
+      - [0x23F38, o, libsnd/sscall]     # SsSeqCalledTbyT
+      - [0x241AC, o, libsnd/pause]      # Snd_pause, Snd_nextpause
+      - [0x242B0, o, libsnd/tempo]      # Snd_tempo
+      - [0x24490, c, code_179d8_i]
+      # ROUND 34, second run in the same unit: `libsnd/replay` (Snd_replay) and
+      # `libsnd/vs_vab` (SsVabClose, SsVabOpen) -- func_80033FB8, func_80034020
+      # and func_800340B0, all three previously MATCHED as C.  This run sits in
+      # the MIDDLE of what the prefix trim left, so the slice is [c][o][o][c]
+      # and the tail needed a new name: `code_179d8_i_b`, one function
+      # (func_8003410C).  A one-function unit is fine and has precedent
+      # (class_3bb8c_v, and code_179d8_f_b earlier this round).  Text-only; the
+      # unit owns no jump table, so NO rodata attach moved.
+      - [0x247B8, o, libsnd/replay]     # Snd_replay
+      - [0x24820, o, libsnd/vs_vab]     # SsVabClose, SsVabOpen
+      - [0x2490C, c, code_179d8_i_b]
       # code_179d8_k: what was the `code_179d8_tail` remainder after the
       # code_179d8_i carve -- functions 238..255 of the original,
       # 0x24938..0x2673C (18 functions, func_80034138 .. func_80035E80).
@@ -921,7 +986,39 @@ segments:
       # 16/18 clean, the two blocked are func_80036230 and func_80036528,
       # both addiu-$at (and both large -- 115 and 240 instructions).  No
       # trivial leaves.  Owns NO switch jump table, so no rodata attach.
-      - [0x2673C, c, code_179d8_f]
+      #
+      # ROUND 34: the unit's first THIRTEEN functions are Sony's `libsnd`, six
+      # objects that tile 0x2673C..0x26D28 exactly, so this is a pure PREFIX
+      # trim -- the `c` line just moves to 0x26D28 and the unit keeps its name.
+      # Twelve of the thirteen had been MATCHED as C; reclassifying them out of
+      # the game count is the correction, not a regression.  The thirteenth,
+      # func_80035F98 / `_SsUtBuildADSR` (35w), was an INCLUDE_ASM stall with a
+      # 255-line report and could never have matched.  Text-only; `place`
+      # derives no data lines and the unit still needs no rodata attach.
+      #
+      # `ut_rev` is the 3.3 build ON PURPOSE: the 3.5/3.6 discs split that
+      # module differently (0xB4 at 0x26864 plus separate ut_rdep/ut_rfb/
+      # ut_rdel), which leaves a 0x40 gap at 0x26824 and does not tile.
+      # `next` exists only on 3.5/3.6.  3.6's `ccadsr` is byte-identical to
+      # 3.3's `adsr`.
+      - [0x2673C, o, libsnd/adsr]       # _SsUtResolveADSR, _SsUtBuildADSR
+      - [0x26824, o, libsnd/ut_rev]     # SsUtReverbOn/Off, SsUtSet/GetReverbType,
+                                        # SsUtSetReverbDepth/Feedback/Delay
+      - [0x26A30, o, libsnd/ut_sva]     # SsUtSetVagAtr
+      - [0x26BFC, o, libsnd/vm_don]     # SpuVmDamperOn
+      - [0x26C10, o, libsnd/next]       # _SsSndNextSep
+      - [0x26D18, o, libsnd/vm_doff]    # SpuVmDamperOff
+      - [0x26D28, c, code_179d8_f]
+      # ROUND 34, second run in the same unit: `libsnd/stop` (3.3, 0x1C0)
+      # covers func_800368E8/A54/A7C = `Snd_stop`, `SsSeqStop`, `SsSepStop`,
+      # all three previously MATCHED as C.  This one sits in the MIDDLE of
+      # what the prefix trim left, so the slice is [c][o][c] and the tail
+      # needed a new name: `code_179d8_f_b`, one function (func_80036AA8).
+      # A one-function unit is fine and has precedent (class_3bb8c_v).
+      # Text-only; the unit owns no jump table, so NO rodata attach moved --
+      # the 0xFD8 rodata slot list names no `code_179d8_f` line at all.
+      - [0x270E8, o, libsnd/stop]       # Snd_stop, SsSeqStop, SsSepStop
+      - [0x272A8, c, code_179d8_f_b]
       # psyq_SpuSetMute (0x272C8..0x2C054) is converted to linked Sony objects
       # one run at a time. 35 objects tile nine runs exactly, all from the 3.3
       # disc; the eight gaps between the runs are the game's own libspu/libsnd

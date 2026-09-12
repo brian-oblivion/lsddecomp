@@ -283,8 +283,66 @@ cd_read = 0x8002BFA8; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
 strcmp = 0x8002C048; // type:func  (Psy-Q libc2/strcmp, from the SDK object)
 strncmp = 0x8002C0AC; // type:func  (Psy-Q libc2/strncmp, from the SDK object)
 new_class_6d940 = 0x8002C12C;
+
+// ROUND 34 -- code_179d8_j middle (0x20FF0..0x21180): libsnd/vm_prog, the four
+// SPU-voice-manager program volume/pan accessors. Psy-Q 3.6 is the only disc
+// that carries this module. The tail of that unit became code_179d8_j_b.
+SpuVmSetProgVol = 0x800307F0; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
+SpuVmGetProgVol = 0x80030864; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
+SpuVmSetProgPan = 0x800308B8; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
+SpuVmGetProgPan = 0x8003092C; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
+
+// ROUND 34 -- code_179d8_j_b middle (0x221B4..0x22244): libsnd/ut_pb. Psy-Q
+// 3.6 only. The tail of that unit became code_179d8_j_c.
+SsUtPitchBend = 0x800319B4; // type:func  (Psy-Q libsnd/ut_pb, from the SDK object)
 SetRCnt = 0x80032B18;
-SsUtGetVabHdr = 0x8003317C;
+
+// ROUND 34 -- code_179d8_i prefix (0x2397C..0x24490): ten libsnd objects, the
+// VAB header/attribute getters, the master volume and mute setters, the VAB
+// transfer pair, the tick callback and the pause/tempo trio. Sony's own
+// exported names. `SsUtGetVabHdr` was already in this file as a hypothesis
+// (its only pre-round-34 entry in this address range); the object CONFIRMS it
+// at the same address, so the line is kept and merely annotated.
+SsUtGetVabHdr = 0x8003317C; // type:func  (Psy-Q libsnd/ut_gvh, from the SDK object)
+SsUtGetVagAtr = 0x80033260; // type:func  (Psy-Q libsnd/ut_gva, from the SDK object)
+SsSetMVol = 0x800334A0; // type:func  (Psy-Q libsnd/scsmvol, from the SDK object)
+SsUtGetProgAtr = 0x800334F0; // type:func  (Psy-Q libsnd/ut_gpa, from the SDK object)
+SsVabTransBody = 0x800335FC; // type:func  (Psy-Q libsnd/vs_vtb, from the SDK object)
+SsSetMute = 0x800336CC; // type:func  (Psy-Q libsnd/scsmute, from the SDK object)
+SsVabTransCompleted = 0x8003370C; // type:func  (Psy-Q libsnd/vs_vtc, from the SDK object)
+SsSeqCalledTbyT = 0x80033738; // type:func  (Psy-Q libsnd/sscall, from the SDK object)
+Snd_pause = 0x800339AC; // type:func  (Psy-Q libsnd/pause, from the SDK object)
+Snd_nextpause = 0x80033A4C; // type:func  (Psy-Q libsnd/pause, from the SDK object)
+Snd_tempo = 0x80033AB0; // type:func  (Psy-Q libsnd/tempo, from the SDK object)
+
+// ROUND 34 -- code_179d8_i middle (0x247B8..0x2490C): libsnd/replay and
+// libsnd/vs_vab. The tail of that unit became code_179d8_i_b.
+Snd_replay = 0x80033FB8; // type:func  (Psy-Q libsnd/replay, from the SDK object)
+SsVabClose = 0x80034020; // type:func  (Psy-Q libsnd/vs_vab, from the SDK object)
+SsVabOpen = 0x800340B0; // type:func  (Psy-Q libsnd/vs_vab, from the SDK object)
+
+// ROUND 34 -- code_179d8_f prefix (0x2673C..0x26D28): six libsnd objects, the
+// ADSR packer/unpacker, the SsUtSetReverb* family, SsUtSetVagAtr, the two
+// SpuVmDamper stubs and _SsSndNextSep. Sony's own exported names.
+_SsUtResolveADSR = 0x80035F3C; // type:func  (Psy-Q libsnd/adsr, from the SDK object)
+_SsUtBuildADSR = 0x80035F98; // type:func  (Psy-Q libsnd/adsr, from the SDK object)
+SsUtReverbOn = 0x80036024; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtReverbOff = 0x80036044; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbType = 0x80036064; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtGetReverbType = 0x80036108; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbDepth = 0x80036118; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbFeedback = 0x800361B0; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbDelay = 0x800361F0; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetVagAtr = 0x80036230; // type:func  (Psy-Q libsnd/ut_sva, from the SDK object)
+SpuVmDamperOn = 0x800363FC; // type:func  (Psy-Q libsnd/vm_don, from the SDK object)
+_SsSndNextSep = 0x80036410; // type:func  (Psy-Q libsnd/next, from the SDK object)
+SpuVmDamperOff = 0x80036518; // type:func  (Psy-Q libsnd/vm_doff, from the SDK object)
+
+// ROUND 34 -- code_179d8_f middle (0x270E8..0x272A8): libsnd/stop, the
+// sequence/SEP stop trio. The tail of that unit became code_179d8_f_b.
+Snd_stop = 0x800368E8; // type:func  (Psy-Q libsnd/stop, from the SDK object)
+SsSeqStop = 0x80036A54; // type:func  (Psy-Q libsnd/stop, from the SDK object)
+SsSepStop = 0x80036A7C; // type:func  (Psy-Q libsnd/stop, from the SDK object)
 
 // psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
 // the reverb-mode setter and the SPU RAM allocator's helpers. Sony's own
