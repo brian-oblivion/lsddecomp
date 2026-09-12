@@ -41,8 +41,9 @@ the two data-bearing, cross-unit `libcd` runs itself on `main`:
 | alpha | 21 `libsnd` objects in `code_179d8_f/_i/_j`, 6 runs | 21 | 34 | 1 (`_SsUtBuildADSR`) | `_f_b` `_i_b` `_j_b` `_j_c` |
 | bravo | 13 trampolines (`class_3bb8c_h/_h_b/_h_c` retired whole); `strcat`; `code_2cc8c_e`'s six `libgs`/`libgte` objects, 6 runs | 15 | 6 | 1 (`TransposeMatrix`) | `code_2cc8c_e0` `_e1` |
 
-Both runners converted every assigned run, one commit each, first build
-byte-exact on all but one; neither hit a `PARTIAL OVERLAP`, `SUSPECT`,
+Both runners converted every assigned run, one commit each, oracle green
+before every commit (the head's `libcd/sys` run took three builds: a `;` in
+a symbols-file comment, then four un-renamed callers); neither hit a `PARTIAL OVERLAP`, `SUSPECT`,
 `DISAGREE` or `NOTE:`. The only merge conflicts were the manifest appends,
 resolved by keeping both blocks as the RUNS doc says. Both worktrees were
 torn down after both had reported AND `git log main..runner/<name>` was
