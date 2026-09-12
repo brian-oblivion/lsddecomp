@@ -227,11 +227,13 @@ ret1:
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_n", func_80029C40);
 
-/* Round 37 (echo): re-splice of the round-35 rebuild, verbatim, to confirm
- * the recorded 278/282 score before a permuter search -- see
- * docs/match-reports/func_80029F10.md. STALL, three independent
- * already-characterized residues (delay-slot fill choice, a load-delay
- * `nop` scheduling choice, and an addressing-mode fold), 4 words short.
+/* Round 37 (echo): STALL, now 281/282 (1 word short) -- up from 278/282,
+ * a real 3-word gain from a permuter-found lever: declaring D_8006D8D8
+ * (and the two local pointers into it, `state`/`state1`) `volatile`
+ * closed two of the three previously-characterized residues. See
+ * docs/match-reports/func_80029F10.md for the full derivation and the
+ * one remaining residue (a load-delay `nop` scheduling choice, already
+ * characterized and already tried unsuccessfully before this round).
  * Restored to INCLUDE_ASM per project rule. */
 #if 0
 extern s32 D_8006D608;
@@ -249,7 +251,8 @@ extern s32 D_8006D840[];               /* "does this command need a param" flag 
 extern volatile u8 *D_8006D8C0;
 extern volatile u8 *D_8006D8C4;
 extern volatile u8 *D_8006D8C8;
-extern u8 D_8006D8D8[3];
+extern volatile u8 D_8006D8D8[3];      /* round 37: permuter-found lever, see match report -- volatile here
+                                         * (and on state/state1 below) closes 3 of the 4 missing words */
 extern u8 D_8006D8D9;
 
 extern s32 D_8008B3E4;
@@ -274,8 +277,8 @@ extern const char D_80010A38[];        /* "CD_cw" */
 s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
 {
     const char **table;
-    u8 *state;
-    u8 *state1;
+    volatile u8 *state;
+    volatile u8 *state1;
     s32 counter;
     s32 result;
     s32 flags;
