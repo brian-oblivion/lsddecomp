@@ -391,7 +391,15 @@ extern s32 close(s32 arg0);
  * redundant register move; every semantic value and branch is right.
  * Preserved body below, restored to INCLUDE_ASM so this correct-length
  * placeholder doesn't cascade drift into every function after it in this
- * unit. */
+ * unit.
+ *
+ * ROUND 37 (delta): rebuilt this EXACT preserved body before trusting its
+ * score -- reproduces 1/41 in-range, 40 vs 41 words (missing redundant
+ * move), exactly as recorded. Lowest priority on this round's list (an
+ * already-permuter-searched function, twice: round 14 ~4600 iterations
+ * and round 19 ~130,167 iterations, both converging on the same floor of
+ * 5 with no zero); not re-searched this round in favour of the two
+ * never-searched functions this round's own thesis prioritized. */
 #if 0
 s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 {
