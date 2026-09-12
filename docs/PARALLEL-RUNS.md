@@ -1849,13 +1849,51 @@ above says to prefer the shallowest history and gives no way to measure it.
 There is one, it is a grep, and round 36 measured that it is the discriminator
 that actually paid:
 
+**ROUND 37 CORRECTED THIS GREP. THE ORIGINAL FORM IS BELOW AND IS WRONG --
+DO NOT USE IT.** It tested whether the WORD "permuter" appears in the report,
+not whether a SEARCH WAS RUN, so a report saying *"this is exactly the kind
+of residue the permuter is for"*, *"worth a permuter run before the next hand
+attempt"*, or even *"never permuter-searched"* matched it and was classified
+as ALREADY SEARCHED. It therefore inverted on precisely the functions the
+screen exists to find, and failed in the EXPENSIVE direction -- silently
+deleting the best ground from the queue, exactly like a false blocker.
+
 ```sh
+# WRONG -- round 36's form, kept only so it is recognisable. Do not run it.
+#     [ -f "$f" ] && grep -qi permuter "$f" || echo "$fn"
+
+# RIGHT -- key on EVIDENCE OF AN ACTUAL RUN, not on the word.
 python3 tools/nearmiss.py | awk '/ASSIGN FROM HERE/,0' \
   | grep -oP '^\s+\d+w\s+\S+\s+\K\S+' | while read fn; do
       f=docs/match-reports/$fn.md
-      [ -f "$f" ] && grep -qi permuter "$f" || echo "$fn"
+      [ -f "$f" ] || { echo "$fn"; continue; }
+      grep -qiE '[0-9]{3,}[, ]*(iteration|iters)|rc=(124|137|0)|base score|permuter-exhausted|score=0|--stop-on-zero' \
+        "$f" || echo "$fn"
   done
 ```
+
+**Measured, both directions, round 37.** Over the same 110-function
+blocker-clean queue the loose form reports **18** never-searched and the
+corrected form reports **39**. Six of the disagreements were opened by hand
+and *all six* were recommendations rather than runs (`func_80031CF0` "a
+permuter target"; `func_8004B030` "needs a real permuter pass";
+`func_80028920` "still flagged for permuter per the existing report's own
+suggestion"; and so on). **Two of them were found the expensive way, by
+runners who had been staffed as though the ground were spent:** charlie's
+`func_800598E8` (which carried only *"worth a permuter run"*) and echo's
+`func_800299BC` (*"exactly the kind of residue the permuter is for"*). Both
+ran the first-ever search on ground the head had written off, and echo spent
+its remaining budget there instead of on two genuinely-searched functions --
+the right trade, made in spite of the brief.
+
+So round 36's "38 never searched" was itself an undercount, and any figure
+derived from the loose grep is too small. Re-derive with the corrected form.
+
+The general shape is one this document already names for blocker screens and
+is here again: **a screen measures the obstruction it was built for.** This
+one was built to measure *cost* and accidentally measured *vocabulary* --
+and a report's vocabulary is richest exactly when its author was recommending
+the lever that was never pulled.
 
 Round 36 ran four runners over fifteen inherited bodies and closed nothing. It
 produced exactly two forward movements — `func_8002AEE0` 153/174 -> 165/174 and
@@ -1863,8 +1901,10 @@ produced exactly two forward movements — `func_8002AEE0` 153/174 -> 165/174 an
 one of them on a function that had never been searched at all.** Every other
 function that round either reproduced its recorded figure exactly or, where a
 search was re-run on already-searched ground, returned nothing. At the time of
-writing the split over the blocker-clean queue is 73 searched against 38 never
-searched; re-derive it rather than trusting those figures.
+writing the split over the blocker-clean queue was reported as 73 searched
+against 38 never searched -- **both figures came from the loose grep above and
+are wrong; round 37 re-measured 39 never-searched out of 110 AFTER a round of
+searching.** Re-derive with the corrected form, never with those numbers.
 
 This does not make an unsearched function easy, and it is not a ranking by
 promise — it is a ranking by whether the cheapest available lever has been

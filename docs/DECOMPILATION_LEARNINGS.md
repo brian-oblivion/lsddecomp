@@ -5957,3 +5957,144 @@ So a permuter result is a LEAD in both directions. Verify every candidate
 against the real oracle before recording it, including — especially — the ones
 whose metric moved the way you hoped.
 
+
+## A "the compiler will not spend a second register" residue is a claim about the SOURCE (round 37)
+
+**Three rounds filed `func_80040FC0` and `func_80041020` as one "redundant
+cursor cache" toolchain class**, on the shared evidence that retail keeps a
+separate destination register and *"every C form tried collapses it into
+one"*. Every one of those forms had a SINGLE destination pointer in it.
+
+Retail's source has **two**, and writing two produces two:
+
+```c
+d = dst;      /* move a2,a0  -- the pre-increment value */
+dst++;        /* addiu a0,a0,1 */
+*d = lead;    /* sb v1,0(a2)  -- stores through the COPY, not the parameter */
+```
+
+That is the **longhand of `*dst++ = x`, and the two are not equivalent in
+codegen**: the post-increment spelling collapses to one register and stores
+through the parameter. With the longhand, GCC 2.6.3 reproduced retail's
+sequence exactly on both functions — correct length, correct CFG, every
+opcode and immediate in retail's own slot (`func_80040FC0` 15/24 -> 22/24
+with a lone two-word transposition left; `func_80041020` 19/31 -> 20/31 with
+nothing left but a 3-way register renaming).
+
+**SCOPE, measured rather than assumed — both variables must be MUTATED.**
+`func_8004042C` looks identical in shape (retail copies both parameters into
+fresh registers at entry) and its round-14 **attempt 2** had already tried
+explicit local copies, recording *"no change at all"*. The discriminator:
+
+- two pointers **incremented every iteration** = two live induction
+  variables = two registers. The idiom works.
+- a copy that is **never modified** is a pure alias, and copy propagation
+  collapses it however it is spelled. The idiom cannot work, and that
+  residue really is register identity.
+
+So when screening for more instances, look for **a loop in which two
+pointers advance**, not for a report that says retail spends a register this
+build will not. A candidate pool built on the latter phrasing is mostly
+false — two of the first entries opened from one died on inspection.
+
+**And the class had TWO members, not the three its cross-references claimed.**
+`func_800407F8` was carried as an "analogous stall" from round 18 onward; it
+was MATCHED 11/11 in round 19 by an unrelated lever. **A class assembled by
+CROSS-REFERENCE keeps counting a member after that member is closed**,
+because the closing round updates the function's own report and not the
+reports pointing at it.
+
+## A permuter improvement is a LEAD unconditionally, and the size of the drop means nothing (round 37)
+
+MATCHING-GUIDE scoped round 18's "0-for-3 trusting a permuter improvement"
+to register-shaped residues. **Round 37 reproduced it across three functions
+and three different residue classes in one runner session** (alpha): every
+best candidate either gained nothing, relocated the residue, or regressed
+when spliced into the real build. Treat the rule as unconditional.
+
+**And the magnitude of a score drop is not a reliability signal — it is
+closer to the opposite.** The round's largest relative drop (`func_8002E308`,
+6315 -> 2175) was the most dramatically wrong once verified. There is no
+cheap proxy; splice it in and run the oracle.
+
+Three corollaries, all measured the same round:
+
+- **Not every part of a multi-change candidate is load-bearing.** On
+  `func_8002CF18` the candidate bundled four changes and only two did
+  anything; the pointer-indirection and declaration-reorder parts were
+  INERT, proven by direct testing. Isolate the minimal fix before writing it
+  up, or the report teaches three cargo-cult changes alongside the real one.
+- **A local-best deserves MORE skepticism than a zero, not less** (charlie).
+  One candidate eliminated an address-drift trap entirely (134342 -> 1 byte)
+  and improved funcdiff's raw count, yet was a net REGRESSION once counted
+  through `asm-differ`'s realignment.
+- **A base score far above 200 does not mean the scaffold is broken**
+  (delta). "One insertion + one deletion = 200" is the signature of ONE
+  class, not a validity test. Scaffolds scoring 770 / 760 / 1279 were each
+  confirmed faithful by direct objdump of target vs base; distrusting them
+  would have thrown away three valid searches.
+
+**`do { ... } while (0);` around a statement group is a real C-level length
+lever** — fully idiomatic, not an asm hack. It closed a 4-word length gap on
+`func_8002CF18` where barriers, aliasing and algebraic rewrites had all
+failed, and did nothing for `func_8002E138` in the same round.
+
+## The permitted `__asm__("")` barrier is inert against every pass that is not the scheduler (round 37)
+
+Two independent measurements, different passes, same conclusion:
+
+- it does **not** affect GCC's cross-jump / tail-merge RTL pass, which
+  decides over whole basic blocks rather than instruction order (delta,
+  confirmed in an isolated `cpp|cc1|maspsx|as` reproducer);
+- it does **not** affect loop-preheader EMISSION order — neither position,
+  before or after the statement, moved a two-word transposition on
+  `func_80040FC0` (head).
+
+The permitted barrier moves SCHEDULING. Before reaching for it, ask which
+pass produced the residue; if the answer is not the scheduler, it will do
+nothing and the negative is predictable rather than informative.
+
+## "Rebuild the inherited body" must extend to the report's STRUCTURAL claims (round 37)
+
+Round 33 established that a preserved body can carry a score that was never
+measurable (it called a symbol that did not exist, so it never linked).
+Round 37 found the next form along, and it is textually silent in a way the
+first was not.
+
+`func_8004E6B8`'s body **links, compiles, and reproduces the recorded LENGTH
+exactly** (1 word short, 48/49). Its recorded *internal structure* is false:
+the report credits an attempt-4 goto/if-split rewrite with eliminating a
+cross-jump merge of two call sites, and `objdump` of the rebuilt body shows
+ONE `jal` — still merged. Confirmed in an isolated reproducer with zero
+project headers, and **not** toolchain drift: `addiu_at` is a maspsx flag
+and maspsx runs AFTER cc1, so it cannot touch cc1's cross-jump decision.
+
+So a length figure can be correct while the mechanism it is attributed to is
+wrong, and only reading the disassembly against the report's prose catches
+it. The same round found two more of the round-33 kind by the same rebuild
+discipline (`func_8002FAC4`'s body did not link — `func_80032148` is now
+`SpuVmVSetUp` and `D_8008EA0D` was never a real linker symbol) and one plain
+arithmetic slip that had stood since round 26 (`func_8002EA44` is 222 words
+built, 6 short, not the recorded 223/5-short — every round since ranked it
+on a figure off by one).
+
+## Two figures measured at different LENGTHS are not comparable (round 37)
+
+`func_80029F10` went 278/282 -> **282/282, length exact**, and its raw
+word-match FELL, 132/282 -> 98/282. Adopting it was still right, and the
+reasoning generalises: the old 132 was measured with a 4-word length gap and
+was inflated by shift ripple, while the 98 is measured at exact length and
+counts true independent residues. Deletion-only lines fell 6 -> 4, so no new
+structural gaps. Exact length also ends the drift that made every prior
+reading of that function untrustworthy.
+
+**A raw word-match may therefore legitimately DROP as a function gets
+closer**, and comparing it against a figure recorded at a different length is
+meaningless. This is the round-23 "three figures in the title" rule showing
+its teeth: length and word-match are different measurements, and only the
+first is comparable across states.
+
+Note the lever that got there was `volatile` on a global array's extern
+declaration (plus its aliasing locals) — a distinct form from the
+single-pointer-cast already documented, and principled here rather than a
+hack, since that array is mutated by a callback.

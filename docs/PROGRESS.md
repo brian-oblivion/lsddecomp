@@ -6,6 +6,178 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-12 — round 37: five runners on never-searched ground, one match, and the screen that selected them was broken
+
+**State at end: 984 matched / 1253 game functions (78.53% of game code)**, up
+one from rounds 34-36's identical 983. Queue 203 live `INCLUDE_ASM`, 202
+documented stalls, `fresh` 1. Build green after all five merges and after a
+clean `make extract`; working tree clean.
+
+**The two-round zero-match streak is broken, and the thing that broke it is
+the round-36 selection screen — which then turned out to be wrong in a way
+that had been hiding more than half the queue.**
+
+### Gates
+
+Gate 0 green (no stale-asm warning at start, `build exit=0`, and all five
+worktrees byte-verified against retail before handover). Gate 1: `fresh` = 1,
+a 954-word function, not a work order; the contradiction sweep returned 3 hits
+and **all 3 were over-reports** ("Blocker screen clean", "register-identity
+residue is the remaining blocker", "previously blocked ... both retired") --
+zero genuine stale verdicts. Gate 2: carve REJECTED on fresh measurement --
+66 uncarved, 10 blocker-clean, best segment 5-of-39; third consecutive round
+with that verdict. Gate 1b was the round's queue: 111 blocker-clean, 0
+Sony-owned. Gate 3 folded into the runners.
+
+**Staffing: 5 runners, 7 units, ZERO header contention** (`headercontention.py`
+at assignment time, per collision rule 1). One correction caught before
+spawning: the draft assignment included `code_179d8_j_b`, which round 36's
+delta had already worked -- exactly the Gate 1b failure round 36 warned about.
+Swapped out.
+
+### The match
+
+**`func_80059D1C` -- 72/72 byte-exact** (charlie), independently re-verified in
+`main` after merge. It closed a whole-function `this`/`obj`/`vt`/`heading`
+register-identity swap that had survived **20+ hand attempts across three
+rounds** (2026-09-06, 32, 35). Two chained permuter searches: the first ever
+run on the function found a `new_var = heading;` register-forcing lever
+(55/72 -> 68/72); a second, seeded from that body, reached score 0. Charlie
+then did the part that matters -- 8 individually-verified simplification
+steps, 2 of them reverted when the oracle showed them to be genuine
+regressions rather than permuter noise -- and landed idiomatic C, not a
+transcribed candidate.
+
+### Word gains (no match, but real movement)
+
+| function | runner | before | after |
+| --- | --- | --- | --- |
+| `func_80029F10` | echo | 278/282 | **282/282, LENGTH EXACT** |
+| `func_8002CF18` | alpha | 163/167, drifting | **167/167, drift GONE** |
+| `func_80040FC0` | head | 15/24 | **22/24** |
+| `func_80041020` | head | 19/31 | **20/31**, structure exact |
+
+### THE SCREEN THAT SELECTED THIS ROUND WAS BROKEN, AND TWO RUNNERS FOUND IT
+
+Round 36's sixth screen -- "has this function ever been permuter-searched" --
+greps each report for the word `permuter`. **It tests VOCABULARY, not whether
+a search was RUN.** A report saying *"worth a permuter run before the next
+hand attempt"*, *"exactly the kind of residue the permuter is for"*, or even
+*"never permuter-searched"* matches it and is classified ALREADY SEARCHED.
+
+It therefore inverts on precisely the functions it exists to find, and fails
+in the **expensive** direction -- silently deleting the best ground from every
+future round, exactly like a false blocker.
+
+Found the expensive way, twice, by runners staffed as though the ground were
+spent: charlie's `func_800598E8` and echo's `func_800299BC`. Both ran the
+first-ever search on a function the head had written off; echo spent its
+remaining budget there rather than on two genuinely-searched functions, which
+was the right trade made *in spite of* the brief.
+
+**Re-measured over the same 110-function blocker-clean queue: the loose form
+reports 18 never-searched, the corrected form reports 39.** Six disagreements
+were opened by hand and all six were recommendations, not runs. So round 36's
+"38 never searched" was itself an undercount. `docs/PARALLEL-RUNS.md`'s sixth
+screen now carries the corrected grep, keyed on evidence of an actual run
+(iteration counts, `rc=`, base score, `permuter-exhausted`), with the broken
+form kept alongside it so it stays recognisable.
+
+### The "redundant cursor cache" class dissolves (head)
+
+Three rounds filed `func_80040FC0` and `func_80041020` as one toolchain class
+on the evidence that *"every C form tried collapses the two registers into
+one"*. Every such form had a single destination pointer. Retail's source has
+two, and the fix is ordinary C: `d = dst; dst++; *d = x;` -- the **longhand of
+`*dst++ = x`, which is not equivalent in codegen**. Both functions then
+reproduce retail's instruction sequence exactly.
+
+Bounded the same day, using a negative already on record: `func_8004042C`'s
+round-14 attempt 2 had tried explicit local copies and got *"no change at
+all"*. The discriminator is **mutation** -- two pointers advancing per
+iteration are two live induction variables; an unmodified copy is a pure
+alias and propagates away. Screen for *a loop where two pointers advance*,
+not for a report that says retail spends an extra register.
+
+Also corrected: the class had **two** members, not three. `func_800407F8` was
+carried as an "analogous stall" from round 18 and was MATCHED in round 19.
+The head propagated that stale cross-reference itself before checking, which
+is why it is written down: **a class assembled by cross-reference keeps
+counting a member after it is closed**, because the closing round updates the
+function's own report, not the reports pointing at it.
+
+### Other findings promoted to DECOMPILATION_LEARNINGS
+
+- **A permuter improvement is a LEAD unconditionally** -- alpha reproduced
+  round 18's 0-for-3 across three functions and three residue classes, so the
+  rule is no longer scoped to register-shaped residues. **And the size of the
+  drop means nothing**: the round's largest (6315 -> 2175) was the most wrong.
+- **Rebuild-before-trusting extends to a report's STRUCTURAL claims.**
+  `func_8004E6B8` links, compiles and reproduces its recorded length while its
+  documented internal structure is false (the cross-jump merge it claims to
+  have eliminated is still there -- `objdump` shows one `jal`, confirmed in
+  isolation). Same discipline also caught `func_8002FAC4`'s body failing to
+  link and `func_8002EA44`'s length being mis-recorded **since round 26**.
+- **The permitted `__asm__("")` is inert against every pass that is not the
+  scheduler** -- measured independently against the cross-jump RTL pass and
+  against loop-preheader emission order.
+- **Two figures measured at different LENGTHS are not comparable.**
+  `func_80029F10`'s raw word-match FELL 132 -> 98 as it reached exact length,
+  and adopting it was still correct.
+
+### Process findings
+
+- **Five runners x permuter `-j 6` = 45 processes, load peaked ~47 on 32
+  cores.** The "4-6 runners comfortable" sizing guidance was derived from a
+  BUILD-bound round (builds here are under a second); a permuter round is
+  CORE-bound. Every negative this round is correctly qualified "under load".
+  **Next permuter round: 3 runners, or `-j 3`.**
+- **`rc` capture defeated three runners, and bravo solved it.** The runner
+  prompt asked for searches to be backgrounded AND for `rc` on the very next
+  command -- mutually exclusive under a detached launch. Alpha proved even a
+  wrapper appending `echo rc=$?` fails, because the permuter's multiprocessing
+  workers hold the log open past the parent's exit. Bravo switched to the
+  harness's own background-command support and got a clean `rc` every time.
+  **All three refused to fabricate `rc=124`.** Fix the prompt, not the runners.
+- **A task notification is not a death certificate, and "nothing running" is
+  not either.** Bravo sat 8 minutes with ZERO live processes, zero commits and
+  6 dirty files, then resumed on its own. Three runners notified mid-wait and
+  all three came back. §3c's "nothing running ... means recover" is too
+  strong; only teardown forces the decision, and teardown is the head's own
+  choice of moment.
+- **File mtime is useless as a liveness signal during a permuter round** -- at
+  one sample no worktree had been written in 5 minutes while three held live
+  searches. The permuter works in memory and writes only on improvement. Use
+  the process check.
+- **`SendMessage` was unavailable for the fourth consecutive round** (31, 32,
+  33, 37), and this time the §3c substitute was unavailable too: it requires
+  spawning into a FRESH worktree name, and the permission grant covers exactly
+  five, all in use. Delta finished with ground left and could not be
+  re-staffed. **A sixth allowlisted worktree name would restore a lever that
+  produced 2 of 6 matches in round 32** -- operator call.
+
+### Next round
+
+**Runners, 3 not 5, on the corrected never-searched queue (39, not 18).**
+Rank smallest-gap-first among functions with no evidence of an actual run.
+Known-good targets already measured: `func_800357B0` (179w, exact length,
+163/179), `func_80041020` (31w, exact structure, pure register renaming),
+`func_80040FC0` (24w, one two-word transposition). Three is the number
+because the host is core-bound during searches, not because the queue is
+thin.
+
+Not a carve -- 66 uncarved, 10 blocker-clean, best window 5-of-39, three
+rounds running. Not a pure permuter round either: the round's two biggest
+structural results (the cursor-class dissolution, the broken screen) came
+from hand analysis and from auditing the queue, not from search.
+
+Second queue, new this round and narrower: the **two-cursor candidates** --
+live near-misses whose residue is a same-valued duplicated register *in a
+loop where two pointers advance*. Screen on the mutation property, not on
+report phrasing; a pool built the loose way was mostly false.
+
+---
+
 ## 2026-09-12 — round 36: four runners, zero matches, two real word gains, and a tool that was flagging its own repairs
 
 **State at end: 983 matched / 1253 game functions (78.45% of game code) —
