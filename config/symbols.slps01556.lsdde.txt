@@ -249,6 +249,14 @@ strcpy = 0x80028B78;
 strstr = 0x80028BBC;
 CdStatus = 0x80028C34;
 new_class_6d940 = 0x8002C12C;
+
+// ROUND 34 -- code_179d8_j middle (0x20FF0..0x21180): libsnd/vm_prog, the four
+// SPU-voice-manager program volume/pan accessors. Psy-Q 3.6 is the only disc
+// that carries this module. The tail of that unit became code_179d8_j_b.
+SpuVmSetProgVol = 0x800307F0; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
+SpuVmGetProgVol = 0x80030864; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
+SpuVmSetProgPan = 0x800308B8; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
+SpuVmGetProgPan = 0x8003092C; // type:func  (Psy-Q libsnd/vm_prog, from the SDK object)
 SetRCnt = 0x80032B18;
 
 // ROUND 34 -- code_179d8_i prefix (0x2397C..0x24490): ten libsnd objects, the

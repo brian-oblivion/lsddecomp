@@ -365,15 +365,17 @@ void func_80034614(s16 a0, s16 a1, u8 a2)
 /* Cross-unit calls, local guesses per this project's convention (a prototype
  * for a function another unit defines stays in this .c). SpuVmDamperOn and
  * SsUtSetReverbDepth are Psy-Q libsnd (`vm_don`, `ut_rev`), linked from the
- * SDK objects since round 34 -- never write C for them; func_800307F0 is
- * already matched in code_179d8_j.c; func_80030980 is still INCLUDE_ASM
+ * SDK objects since round 34 -- never write C for them.  So is
+ * `SpuVmSetProgVol` (`libsnd/vm_prog`, 3.6), which was code_179d8_j.c's
+ * matched func_800307F0 until the same round; func_80030980 is still
+ * INCLUDE_ASM
  * there, so its signature below is this call site's own reading -- a 5th
  * argument (the one spilling to the stack at 0x10($sp)) alongside the usual
  * "packed (slot<<8)|channel" first argument this file's siblings already
  * use. */
 extern void SpuVmDamperOn(void);
 extern void SsUtSetReverbDepth(s32 a0, s32 a1);
-extern s32 func_800307F0(s16 p0, s16 p1, s32 p2);
+extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
 extern void func_80030980(s16 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
 /* Forward declarations for sibling functions defined later in THIS unit's
@@ -454,7 +456,7 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     case 11: {
         u8 *blk = (u8 *)rec + offset;
 
-        func_800307F0(rec->unk4C, blk[0x2C], val);
+        SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
         func_80030980((a1 << 8) | a0, rec->unk4C, blk[0x2C],
                       *(s16 *)((u8 *)rec + offset * 2 + 0x4E), blk[0x17]);
         rec->unk88 = func_80035E80(a0, a1);

@@ -746,7 +746,24 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
+      #
+      # ROUND 34: `libsnd/vm_prog` (Psy-Q 3.6 -- the ONLY disc that carries
+      # this module; 3.0, 3.3 and 3.5 place nothing here) covers
+      # 0x20FF0..0x21180, four functions that had ALL been MATCHED as C:
+      # func_800307F0/864/8B8/92C = SpuVmSetProgVol, SpuVmGetProgVol,
+      # SpuVmSetProgPan, SpuVmGetProgPan.  Reclassifying them out of the game
+      # count is the correction, not a regression.  It sits in the MIDDLE of
+      # the slice, so the slice is now [c][o][c] and everything from
+      # func_80030980 on lives in `src/code_179d8_j_b.c`.  Text-only.
+      #
+      # NO RODATA ATTACH MOVED, and that is measured: the old code_179d8_mid_c
+      # monolith contains zero `jtbl_` and zero `.word .L`, so no unit in this
+      # family owns one and the rodata slot list above names none of them.
+      # This is the one respect in which the split differs from round 33's
+      # code_179d8_c_b, which DID have to carry its attach across.
       - [0x20ADC, c, code_179d8_j]
+      - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
+      - [0x21180, c, code_179d8_j_b]
       # code_179d8_mid_d: the one function left between the code_179d8_j
       # carve above and code_179d8_c below -- func_80031F3C (131w).  A carve
       # remainder, not a unit.

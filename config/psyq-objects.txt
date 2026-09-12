@@ -406,3 +406,11 @@
 # one-function unit src/code_179d8_i_b.c (func_8003410C). Text-only.
 3.3  libsnd/replay    0x247B8
 3.3  libsnd/vs_vab    0x24820
+
+# ROUND 34 -- code_179d8_j MIDDLE (0x20FF0..0x21180): libsnd/vm_prog, four
+# functions (SpuVmSetProgVol, SpuVmGetProgVol, SpuVmSetProgPan,
+# SpuVmGetProgPan), all four previously matched as C. ONLY the 3.6 disc carries
+# this module -- 3.3, 3.5 and 3.0 place nothing here -- so this is one of the
+# few manifest lines that does not prefer 3.3. Text-only. Splitting the slice
+# around it created src/code_179d8_j_b.c.
+3.6  libsnd/vm_prog   0x20FF0
