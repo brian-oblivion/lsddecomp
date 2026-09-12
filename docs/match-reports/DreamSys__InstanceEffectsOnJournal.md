@@ -248,3 +248,62 @@ byte-identical or worse.
 Residue 1 (`v1` vs `a2` for the switch index) is likewise unmoved by the
 retype, consistent with charlie's finding that the switch-lowering register
 choice is invisible to source spelling.
+
+---
+
+## Round 35 (2026-09-12, runner charlie): re-verified fresh, one new axis tried, still rejected
+
+Re-measured before touching anything: rebuilt the exact preserved body and
+reproduced the same residue. **Note for the next reader**: at this
+function's actual length (one word short of retail's 110), `funcdiff.py`'s
+own raw in-range count reads as low as 15/110 with a "differs OUTSIDE this
+range too" drift warning -- this is NOT a regression, it is the exact
+`func_8004BB3C`-shaped trap this report already documents. Reading
+`tools/asm-differ/diff.py`'s realigned output instead confirms **106/110
+words correct, same two residues, unchanged.**
+
+**One new axis tried**, prompted by round 22's head adjudication naming the
+untested lead (a case-4-scoped, rather than function-scoped or
+whole-parameter, cast local):
+
+```c
+case 4: {
+    DreamSysEntityObj *obj = (DreamSysEntityObj *)entity;
+    obj->methods->slot0x38(obj, this);
+    break;
+}
+```
+
+**Regressed hard** -- same failure signature as the original function-scope
+cast local charlie tried in round 2026-09-06 (an extra callee-saved register
+persists across the call), even though this cast is scoped to a single
+`case` block rather than the whole function. Confirms the register cost is
+about the local's *live range crossing the call*, not its lexical scope --
+scoping the declaration more tightly does not help when the value still has
+to survive from its assignment to its one use across an indirect call.
+Reverted immediately.
+
+**All four plausible forms of the cast/typing axis are now tested and
+rejected**: function-scope local (regressed), case-local *methods* pointer
+temp (byte-identical, round 2026-09-06), whole-parameter retype (unchanged,
+round 22), and case-local *entity-object* temp (regressed, this round). Do
+not spend a further round on this axis; the residue is a genuine
+scheduler/allocator choice tied to the two-argument (`entity`, `this`) call
+shape at case 4 specifically (every other, single-argument call site in
+this function already matches retail exactly), not to how `entity` is
+spelled or scoped in C.
+
+No further attempts made. `INCLUDE_ASM` restored, whole-image SHA1 verified
+green, `git diff --stat` empty against `main`.
+
+### Proposed learning (round 35)
+
+When a report finds that a function-scope temporary costs an extra
+callee-saved register, narrowing the temporary's *lexical scope* (to one
+`switch` case, say) is a natural next thing to try -- and this function is a
+clean confirmation that it does not help when the *live range* is unchanged
+(assignment, then a single use across an intervening call). Scope and
+live-range are different axes; only the second one drives this register-cost
+class. Worth stating plainly since "scope it more tightly" is the obvious
+next lever a reader reaches for after seeing "function-scope local costs a
+register", and it is a dead end here.

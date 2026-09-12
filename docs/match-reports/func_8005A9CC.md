@@ -178,3 +178,79 @@ remains its original one: as the function's very first statement, fixing
 PROLOGUE callee-save STORE ORDER specifically (see
 `DECOMPILATION_LEARNINGS.md`'s existing entry) -- not general delay-slot
 hoisting later in a function's body.
+
+---
+
+## Round 35 (2026-09-12, runner charlie): re-verified fresh, mechanism named precisely, one new axis tried and still negative
+
+Re-measured before touching anything, per the standing discipline: rebuilt
+the exact preserved body above and reproduced **57/88 words, zero address
+drift**, byte-identical to what this report already describes.
+
+**The residue's mechanism, read directly off `tools/asm-differ/diff.py`
+rather than inferred:** this is GCC's classic `fill_eager_delay_slots`
+transformation -- retail leaves the delay slot after `beqz v0,.L8005AA44`
+(the `this->unk_0x910 == 0` test) as a genuine `nop`, and separately leaves
+the delay slot after the following `jalr v0` (calling
+`this->unk_0x910(this)`) as a genuine `nop` too. My build instead
+**duplicates the branch target's first real instruction**
+(`addiu a0,s0,0x16c`, i.e. `&this->linkCoordinates`) into the branch's own
+delay slot, and re-targets the label one instruction later; on the
+not-taken (fallthrough) path this duplication is harmless because the
+following `jalr`'s own delay slot is then forced to hold a corrective
+`move a0,s0` restoring `this` before the call executes -- and since a
+`jalr`'s delay-slot instruction always completes before the call takes
+effect, this is semantically safe either way. Same total instruction count
+both ways (confirmed: zero drift), just one instruction earlier than
+retail. Nothing in the C source controls this -- it is a scheduler-internal
+decision about whether hoist-and-shift is profitable, made independently of
+statement order, consistent with the existing report's `if`/`else`-vs-`goto`
+experiment (byte-identical either spelling).
+
+**One new axis tried this round:** a real (non-empty) `__asm__ __volatile__`
+with a clobber, rather than the previously-tried bare `__asm__("")`, placed
+at the same position (immediately after the `goto staircase` branch,
+before the `this->unk_0x910(this)` call):
+
+```c
+if (this->unk_0x910 == 0) {
+    goto staircase;
+}
+__asm__ __volatile__("" ::: "$4");
+if (!this->unk_0x910(this)) {
+```
+
+**No effect whatsoever** -- byte-identical to the unmodified 57/88 build,
+confirmed via `asm-differ`. GCC 2.6.3 discards a clobber-only asm statement
+with no memory side effect entirely once it determines the clobbered
+register is about to be redefined regardless, so it does not survive to
+constrain the delay-slot scheduler. This is a genuinely new data point (the
+existing report only tried the empty, clobber-less form at this position)
+and it closes the same door from a different angle: neither an empty nor a
+clobber-bearing inline-asm barrier at this position perturbs the
+scheduler's decision.
+
+**Not attempted, and not recommended:** pinning `$a0` via a real operand
+constraint. That would be exactly the register-identity fix CLAUDE.md bans
+here -- this residue is an instruction-*order* choice (same registers used
+throughout, just one instruction moved one slot earlier), so the rule's own
+test ("does removing it change which register holds a value, or only
+order") says a scheduling barrier would be the licensed tool if any were --
+and two different forms of that tool have now both come back inert.
+
+No further attempts made. `INCLUDE_ASM` restored, whole-image SHA1 verified
+green, `git diff --stat` empty against `main`.
+
+### Proposed learning (round 35)
+
+Naming the actual GCC transformation involved (`fill_eager_delay_slots`
+duplicating a conditional branch's target's first instruction into its own
+delay slot, then advancing the target label) is more useful to the next
+attempt than describing the symptom ("addiu ends up one instruction
+earlier") -- it tells you *which* GCC internals decision is in play, and
+that a per-call-site `__asm__` barrier (empty or clobbering) has now been
+tried twice at the one spot that could plausibly interrupt it, with the
+same null result both times. Further attempts on this specific residue
+should assume the lever space of "reorder statements" and "local asm
+barriers" is exhausted and either escalate as a genuine toolchain-scheduling
+question or move on.
