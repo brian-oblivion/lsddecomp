@@ -116,7 +116,7 @@ def preserved_regions(text):
     Two region kinds count: `#if 0 ... #endif` preservation blocks (the
     project's mandated form) and fenced ```c code blocks.
     """
-    out = []
+    out = []   # list of (1-based start line, source text)
     # `#if 0` must open a LINE. A prose sentence that mentions "`#if 0`" in
     # backticks -- which is exactly how a report explains that it corrected a
     # stale body -- otherwise opens a bogus region that runs to the next real
@@ -124,7 +124,7 @@ def preserved_regions(text):
     # Measured round 36 on func_80050B28.md, whose round-36 fix paragraph was
     # captured this way and re-flagged the report it had just repaired.
     for m in re.finditer(r'^[ \t]*#if\s+0\b(.*?)^[ \t]*#endif', text, re.S | re.M):
-        out.append(m.group(1))
+        out.append((text.count("\n", 0, m.start()) + 1, m.group(1)))
     # A `#if 0` block is the project's MANDATED preservation form (CLAUDE.md:
     # "Preserve a stalled body in `#if 0 ... #endif`, never in a `/* */` block
     # comment"), so when a report has one it IS the resume-from body and the
@@ -137,10 +137,9 @@ def preserved_regions(text):
     # best available candidate for a resume-from body. That case is itself a
     # finding -- the report is not in the mandated form -- so main() counts it
     # separately rather than quietly folding it in.
-    if not out:
-        for m in re.finditer(r'```+\s*c\b(.*?)```+', text, re.S):
-            out.append(m.group(1))
-    return strip_comments("\n".join(out))
+    for m in re.finditer(r'```+\s*c\b(.*?)```+', text, re.S):
+        out.append((text.count("\n", 0, m.start()) + 1, m.group(1)))
+    return [(ln, strip_comments(t)) for ln, t in sorted(out)]
 
 
 def has_if0(text):
@@ -181,6 +180,7 @@ def main():
     syms = load_symbols(SYMS)
     ref = re.compile(r'\bfunc_([0-9A-Fa-f]{8})\b')
     findings = {}
+    blockinfo = {}
 
     for name in sorted(os.listdir(reports)):
         if not name.endswith(".md"):
@@ -188,29 +188,47 @@ def main():
         path = os.path.join(reports, name)
         with open(path, errors="replace") as fh:
             text = fh.read()
-        text = preserved_regions(text)
+        regions = preserved_regions(text)
+        nblocks = len(regions)
         stale = {}
-        for hexaddr in set(ref.findall(text)):
-            addr = int(hexaddr, 16)
-            current = syms.get(addr)
-            # Only a RENAME is stale. An address absent from the table is not
-            # evidence of anything -- plenty of names are never listed.
-            if current and current.lower() != ("func_" + hexaddr).lower():
-                stale["func_" + hexaddr] = current
-        # A REPAIRED report still contains its old bodies -- correcting one
-        # does not mean deleting the attempt history that used the old names,
-        # and it should not. So a stale spelling somewhere in the report is not
-        # the question. The question a runner actually asks is "is there a body
-        # here I can splice in and build", and that is answered by whether the
-        # NEW name appears in a preserved body too.
+        where = {}
+        for lineno, body in regions:
+            for hexaddr in set(ref.findall(body)):
+                addr = int(hexaddr, 16)
+                current = syms.get(addr)
+                # Only a RENAME is stale. An address absent from the table is
+                # not evidence of anything -- plenty of names are never listed.
+                if current and current.lower() != ("func_" + hexaddr).lower():
+                    stale["func_" + hexaddr] = current
+                    where.setdefault("func_" + hexaddr, []).append(lineno)
+        blockinfo[name] = (nblocks, where)
+        # NO "THIS REPORT LOOKS REPAIRED" FILTER. One was written in round 36
+        # and REMOVED the same afternoon, because it produced a false clearance
+        # on the first report it was tested against -- which is the expensive
+        # direction, the same shape as a false blocker.
         #
-        # Do NOT try to answer it positionally. Round 36 had one runner put its
-        # corrected snapshot immediately after the title and another append it
-        # at the end of the report, both perfectly reasonably -- so "the last
-        # `#if 0` block is the live one" is wrong about whichever runner did it
-        # the other way, and wrong silently.
-        stale = {old: new_ for old, new_ in stale.items()
-                 if not re.search(r'\b' + re.escape(new_) + r'\b', text)}
+        # The idea was: a repaired report keeps its old bodies (correctly --
+        # deleting attempt history to satisfy a grep would be worse), so clear
+        # it once the NEW name also appears in some preserved region. On
+        # func_80031A44.md that cleared a report whose live body is still
+        # stale. That report holds TWO preserved bodies: a superseded 87/88 one
+        # in the `#if 0` block, and the round-31 HEAD SALVAGE body -- the
+        # authoritative 84/88 one, the figure in the title -- in a ```c fence
+        # six sections further down, under a heading that says "THIS SUPERSEDES
+        # THE TITLE FIGURES ABOVE". Correcting the superseded block cleared the
+        # whole report while the body anyone would actually resume from stayed
+        # un-linkable.
+        #
+        # Positional rules fail the same way and were also tried: one round-36
+        # runner put its corrected snapshot immediately after the title,
+        # another appended it at the end, and here the live body is neither
+        # first nor last. Which body supersedes which is stated in PROSE, and
+        # no lexical rule follows prose.
+        #
+        # So the tool does not choose. It reports every preserved block that is
+        # stale, WITH ITS LINE NUMBER, and the reader decides which one they
+        # mean to resume from. A report with one clean and one stale block is a
+        # real state that deserves to be seen, not resolved away.
         if stale:
             findings[name] = stale
 
@@ -256,8 +274,11 @@ def main():
     print(f"LIVE -- {len(live_hits)} report(s), correct and rebuild these:")
     for name in sorted(live_hits):
         print(f"  {name}")
+        nb, where = blockinfo[name]
         for old, new in sorted(live_hits[name].items()):
-            print(f"      {old}  ->  {new}")
+            at = ", ".join(f"L{n}" for n in where.get(old, []))
+            print(f"      {old}  ->  {new}   (in preserved block at {at}"
+                  f" of {nb})")
 
     if arch_hits:
         print(f"\nARCHIVAL -- {len(arch_hits)} report(s) for matched functions.")
