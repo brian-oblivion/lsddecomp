@@ -741,3 +741,155 @@ name). Any preserved report body predating that rename needs its call sites
 translated before it will compile -- worth checking for ALL of this unit's
 still-open stalls, not just this one, since the rename evidently happened
 unit-wide and no single report flagged it.
+
+## Round 36 (runner bravo): re-verified 202/223 in ISOLATION with the rename actually applied -- confirms round 33's figure, no new attempt
+
+Round 33's own entry above already correctly documented the rename
+(`func_80025AE4`->`puts`, `func_80012C20`->`printf`, `func_80025900`->`VSync`)
+in PROSE and translated its own build -- this report was NOT an instance of
+this round's assigned trap (contrast `func_8002AEE0.md` and
+`func_8002B4D4.md` in this same unit, both of which claimed "already
+current" while their preserved code blocks still called the raw names).
+
+Rebuilt the round-20 202/223 body verbatim (names already correct per round
+33), **in isolation** (all five other stalled siblings in this unit reverted
+to `INCLUDE_ASM` -- see `func_8002A75C.md`'s round-36 entry: this unit's
+known 1-word-short sibling, `func_8002B3F4`, shifts every later `.bss`
+address project-wide when left live alongside anything else, which pollutes
+a non-isolated `funcdiff.py` read even though the target function's own code
+is unaffected). Confirmed: `build exit=2`, no compile errors, `funcdiff.py`
+reports **202/223 words, no staleness warning, compiled length exact at
+223/223** -- matches round 20/33's recorded figure exactly, no discrepancy
+between claimed and measured.
+
+**No new attempt.** This function's one remaining residue (the
+address-vs-value register swap at the very first computed temporary, `$a0`
+vs `$v1`) has been tried and rejected twice (round 20: declaration-order
+swap, no change; statement-order swap, catastrophic regression to 9/223) and
+is a confirmed register-IDENTITY question per HARD RULE 6's own test (WHICH
+register holds a value, not merely instruction order). **SKIPPING as
+exhausted for manual attempts**; this round's remaining permuter budget went
+to `func_8002AEE0` (also in this unit, a much cleaner permuter debug
+signature -- see that report) instead, per the same reasoning round 33 gave
+for making the same choice.
+
+### Corrected, linkable body (current best, 202/223 words, length EXACT -- unchanged, re-verified with names confirmed current)
+
+```c
+#if 0
+s32 func_8002AA6C(void)
+{
+    s32 n;
+    s32 *tmp;
+    s32 *pRetry;
+    volatile s32 *p2;
+    s32 saved;
+    s32 counter;
+    volatile u8 *q;
+    u8 buf;
+
+    tmp = &D_8006D8DC;
+    n = *tmp;
+    D_8006D600 = 0;
+    D_8006D5FC = 0;
+    *tmp = n - 1;
+    __asm__("");
+
+    if (n > 0) {
+        pRetry = tmp;
+        p2 = pRetry + 4;
+        do {
+            if (*pRetry < 7) {
+                counter = 0;
+                puts(D_80010AAC);
+                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+
+                if (D_8006D904 < D_8006D614) {
+                    saved = D_8006D5FC;
+                    D_8006D5FC = 0;
+
+                    while (D_8006D60C & 0x10) {
+                        if ((u8)counter == 0) {
+                            puts(D_80010A40);
+                        }
+                        counter++;
+                        func_80029F10(1, 0, 0, 0);
+                    }
+
+                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
+                        func_80029F10(1, 0, 0, 0);
+                        puts(D_80010A50);
+                    }
+
+                    D_8006D5FC = saved;
+                    D_8006D904 = D_8006D614;
+                }
+
+                if (func_80029F10(9, 0, 0, 0) != 0) {
+                    goto tail;
+                }
+                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                    goto tail;
+                }
+            }
+
+            *D_8006D8C0 = 1;
+            while (*D_8006D8CC & 7) {
+                *D_8006D8C0 = 1;
+                *D_8006D8CC = 7;
+                *D_8006D8C8 = 7;
+            }
+
+            D_8006D8DA = 0;
+            q = &D_8006D8D9;
+            D_8006D61C = 0;
+            *q = D_8006D8DA;
+            __asm__("");
+            D_8006D8D8[0] = 2;
+            *D_8006D8C0 = 0;
+            *D_8006D8CC = 0;
+            *D_8006D8D0 = 0x1325;
+
+            {
+                s32 v0 = p2[0];
+                buf = (u8)v0;
+                if ((u8)v0 != D_8006D61C) {
+                    if (func_80029F10(0xE, (s32)&buf, 0, 0) != 0) {
+                        goto tail;
+                    }
+                }
+            }
+
+            D_8006D600 = (s32)func_8002B4D4;
+            p2[-1] = p2[-2];
+            func_80029F10(6, 0, 0, 1);
+            p2[2] = p2[-3];
+            p2[3] = VSync(-1) + 0x1E0;
+            return p2[2];
+
+        tail:
+            tmp = &D_8006D8DC;
+            n = *tmp;
+            *tmp = n - 1;
+            __asm__("");
+        } while (n > 0);
+    }
+
+    {
+        volatile s32 *pF4 = &D_8006D8F4;
+        *pF4 = -1;
+        return *pF4;
+    }
+}
+#endif
+```
+
+### Proposed learning
+This unit's own `func_8002A75C.md` round-36 entry has the full mechanism,
+but the short version worth repeating here: `funcdiff.py` scores for ANY
+stalled function in this unit are only trustworthy when EVERY OTHER stalled
+sibling is also reverted to `INCLUDE_ASM` -- the unit's confirmed
+1-word-short function (`func_8002B3F4`) shifts `.bss` addresses project-wide
+whenever it is left live, and this shows up as spurious word-mismatch noise
+in an unrelated function's own diff with no hint that the cause lies
+elsewhere in the same file.
