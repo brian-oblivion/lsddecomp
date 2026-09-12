@@ -280,6 +280,8 @@ Obj6EAC0Methods *func_80040FB0(void) {
  * both keeps both. A bare __asm__("") barrier does NOT move the
  * transposition (tried both positions); this is preheader emission
  * order, not scheduling. Prime permuter target -- never searched.
+ * The class had exactly TWO members, not three: func_800407F8 was
+ * MATCHED in round 19 and the cross-reference to it was stale.
  * Preserved body and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
 
@@ -291,8 +293,10 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
  * whole remaining residue is ONE 3-way register renaming (d: a2<->a3,
  * the 0x20 constant: a3<->t0, lead: v1<->a2), which is a banned thing to
  * fix by pinning and therefore a stall. Prime permuter target -- never
- * searched. func_800407F8 is the third member of the dissolved class and
- * has still NOT been retried this way.
+ * searched. (NOTE: func_800407F8, long cross-filed as a third member of
+ * this class, is NOT one -- it was MATCHED 11/11 in round 19 by an
+ * unrelated whole-struct-assignment lever. The cross-reference predates
+ * that match and was stale; corrected round 37.)
  * Preserved body and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80041020);
 
