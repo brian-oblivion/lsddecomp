@@ -69,7 +69,7 @@ struct Node3bb8cE {
     SelfMethods3bb8cE *methods;   /* +0x000, func_8004EADC */
     u8 pad04[0x00C - 0x004];
     s32 unkC;              /* +0x00C, func_8004E5D4 sets it (caller value); func_8004E940 nonzero-tests it; func_8004EA38/func_8004ECCC forward it as func_8004F32C's arg1 */
-    s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to func_80050B18/func_80050B08/func_80050B28 */
+    s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to _card_info/_card_load/func_80050B28 */
     s32 threads[4];        /* +0x014..+0x020, func_8004E5E4: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
     u8 pad24[0x060 - 0x024];
     Res3bb8cE *unk60;      /* +0x060, tag 2 */
@@ -272,7 +272,7 @@ s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
     }
 }
 
-extern s32 func_80050B18(s32 arg0);
+extern s32 _card_info(s32 arg0);
 extern s32 func_80050B28(s32 arg0);
 
 s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
@@ -283,7 +283,7 @@ s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
     status = 1;
     *p2 = *p1 = 0;
     func_8004F3E4(self);
-    while (func_80050B18(self->unk10) == 0)
+    while (_card_info(self->unk10) == 0)
         ;
     code = func_8004F4A4(self);
     if (code == 0x100) {
@@ -298,7 +298,7 @@ s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
     return status;
 }
 
-extern s32 func_80050B08(s32 arg0);
+extern s32 _card_load(s32 arg0);
 
 s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
 {
@@ -308,7 +308,7 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
     status = 1;
     *p2 = (*p1 = 0, status);
     func_8004F3E4(self);
-    while (func_80050B08(self->unk10) == 0)
+    while (_card_load(self->unk10) == 0)
         ;
     code = func_8004F4A4(self);
     if (code == 0x100) {

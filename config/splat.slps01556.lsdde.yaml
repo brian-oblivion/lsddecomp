@@ -1314,9 +1314,12 @@ segments:
       # config/psyq-objects.ld.
       - [0x41148, o, libc2/atoi]
       - [0x412A4, o, libc2/todigit]
-      # class_3bb8c_h_b: 2 trampolines (BIOS vector 0xA0), 0x41308..0x41328.
-      # Same `hasm` disposition as class_3bb8c_h -- see that note above.
-      - [0x41308, asm, class_3bb8c_h_b]
+      # class_3bb8c_h_b WAS 2 trampolines (BIOS vector 0xA0), 0x41308..0x41328.
+      # ROUND 34: both are Sony's, one libcard object each, tiling the segment
+      # exactly -- the `asm` segment is retired and the `hasm` question with
+      # it (see the ROUND 34 note above class_3bb8c_h).
+      - [0x41308, o, libcard/c172]      # _card_load (A(0xAC), was func_80050B08)
+      - [0x41318, o, libcard/c171]      # _card_info (A(0xAB), was func_80050B18)
       # class_3bb8c_v: ONE function, func_80050B28 (12w), 0x41328..0x41358.
       # A one-function unit is deliberate: it is wedged between two trampoline
       # clusters, so the only way to make it assignable without putting

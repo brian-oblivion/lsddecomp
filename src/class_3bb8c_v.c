@@ -26,7 +26,7 @@
  *     func_80050B28(self->unk10);                // class_3bb8c_e.c:296
  *
  * and documents `unk10` (+0x010) as "a resource handle passed to
- * func_80050B18 / func_80050B08 / func_80050B28" -- the other two being the
+ * _card_info / _card_load / func_80050B28" -- the other two being the
  * 0xA0 BIOS trampolines either side of this function.  So this is a small
  * resource/handle call returning `s32`.  MATCH THAT DECLARATION rather than
  * writing a second one: a competing prototype for a function another unit

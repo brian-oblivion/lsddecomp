@@ -389,6 +389,10 @@ open = 0x80050938; // type:func  (Psy-Q libapi/a50, from the SDK object)
 atoi = 0x80050948; // type:func  (Psy-Q libc2/atoi, from the SDK object)
 atol = 0x80050A84; // type:func  (Psy-Q libc2/atoi, from the SDK object)
 todigit = 0x80050AA4; // type:func  (Psy-Q libc2/todigit, from the SDK object)
+// class_3bb8c_h_b's two BIOS-vector-0xA0 memory-card trampolines, converted to
+// linked SDK objects in round 34.  One libcard object each.
+_card_load = 0x80050B08; // type:func  (Psy-Q libcard/c172, from the SDK object)
+_card_info = 0x80050B18; // type:func  (Psy-Q libcard/c171, from the SDK object)
 New_DreamSys = 0x80058774;
 DreamSys__DreamSys = 0x800587F0;
 DreamSys__func_588ec = 0x800588EC;

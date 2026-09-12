@@ -358,3 +358,9 @@
 3.3  libapi/a65     0x41118
 3.3  libapi/a52     0x41128
 3.3  libapi/a50     0x41138
+
+# ROUND 34 -- class_3bb8c_h_b (0x41308..0x41328): the two BIOS-vector-0xA0
+# memory-card trampolines. One libcard object each, tiling the segment
+# exactly, so the `asm` segment retires. Text-only.
+3.3  libcard/c172   0x41308
+3.3  libcard/c171   0x41318
