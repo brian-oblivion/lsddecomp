@@ -27,12 +27,23 @@
 >
 > Ran `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 > --stack-diffs` in the background while doing hand work on the rest of
-> this round's list (per this round's own "bounded search is background
-> work" rule). **[iteration count / rc filled in below once the bounded
-> run actually exits -- see the bottom of this section for the final
-> figures, captured on the very next command after the process ended].**
-> Restored to `INCLUDE_ASM`, not left live, regardless of the search
-> outcome (score short of byte-exact, per project convention).
+> this round's list. **65,379 iterations**, floor reached was **112**
+> (down from base 770, seen 55 times, never lower), **no zero found**.
+> Compile-error noise grew steadily through the run (0 errors early,
+> 794 errors per generation by the end) -- the mutator increasingly
+> proposing non-compiling variants, not evidence of a converged search.
+> The run was launched detached (`nohup ... &`, not this shell's direct
+> child), so its own exit code could not be read back with `wait`; the
+> log's abrupt mid-line cutoff (score printing truncated mid-number at
+> iteration 65379, immediately followed by the interpreter's own
+> multiprocessing shutdown warning) lands almost exactly at the 900s
+> bound measured against the log file's mtime relative to launch time,
+> consistent with the `timeout` bound firing rather than an external
+> kill -- but this is circumstantial, not a captured `rc`, and is
+> reported as such rather than asserted as `rc=124`. Not closed in this
+> budget. Not upgraded to "permuter-exhausted" -- one run at one
+> iteration count is not sufficient for that verdict per this project's
+> own standing rule. Restored to `INCLUDE_ASM`, not left live.
 
 > **ROUND 27 (delta): re-verified, one new attempt, negative.** Rebuilt the
 > exact preserved body from a clean `INCLUDE_ASM` baseline: confirmed
