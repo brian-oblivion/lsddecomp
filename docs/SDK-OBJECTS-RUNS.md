@@ -26,7 +26,7 @@ still say the image matches retail after every step.
 | --- | --- | --- |
 | queue | derives it (`psyq_sdk.py runs`), decides order, assigns segments | works the assigned segment's runs in address order |
 | pure `psyq_*` runs | — | **all of them**: text-only and data-bearing alike, per the guide |
-| runs inside GAME units (`c` segments) | splits the C unit around the object (Gate 2 carve), or assigns it to a runner who owns that unit anyway | only when the head assigned that unit |
+| runs inside GAME units (`c` segments) | does the data-bearing / cross-unit ones itself (Gate 2 carve); assigns text-only ones to a runner, with the unit-split addendum below | only the units the head assigned, split per the addendum and the guide's last section |
 | `PARTIAL OVERLAP` in `runs` output | decides which object is real (the segment's glabels) | reports it, skips the run |
 | `relocations DISAGREE` from `place` | decides (edit the object, or leave the run as asm) | reports, skips |
 | `NOTE:` lines from `ldfrag` (an extern resolved at two addresses) | decides | reports, skips |
@@ -90,12 +90,60 @@ figure:
 | 2 | the 60-odd objects inside game units | head (Fable) carving, or a runner who is assigned that unit for the round | 3–4, interleaved with matching rounds |
 | 3 | naming pass for the 426 functions no disc places (name from the shape-matched module, bytes stay asm) | one cheap runner with `psyq_sdk.py symbols` | 1 |
 
+**Phase 2 status, round 34 (2026-09-12): DONE except two items.** The head
+converted the two data-bearing `libcd` runs (`sys`, `iso9660`) and two runners
+converted every text-only game-unit run -- 21 `libsnd` objects across
+`code_179d8_f/_i/_j`, the 13 BIOS trampolines (`class_3bb8c_h/_h_b/_h_c`
+retired whole, which also retires the `hasm` question for them), `strcat`,
+and the six `libgs`/`libgte` objects in `code_2cc8c_e` with its attached
+jump-table slot. What `runs` still lists inside game units is the `SUSPECT`
+`libsnd/ssinit_c` placement (a false positive; never convert it) and nothing
+else; the three `gs_00x` objects remain the operator's call. Re-derive with
+`runs`; do not trust this paragraph's tense next round.
+
 **Do phase 1 before the next big matching round**, or alongside a small one.
 It is independent of the game code, it touches no unit a matching runner
 needs, and it retires names and stalls that game work would otherwise keep
 tripping over. Phase 2 is best folded into the head's normal consolidation
 carving, one or two units per round, because that is when a unit has no
 owner. Phase 3 is whenever — it only adds names.
+
+## Assigning a game-unit run to a runner (the round-34 addendum)
+
+The runner prompt below is written for a pure `psyq_*` segment. A run inside
+a `c` unit is the same mechanical work plus a Gate 2 unit split, and round 34
+showed a runner does it reliably when the head pre-measures and the prompt
+carries these extra paragraphs. Paste them after "What you are doing":
+
+- **The units, by name, and the units it must NOT touch** (whoever else holds
+  them this round). One runner per unit, as in a matching round.
+- **Each run's position in its unit and the resulting yaml shape**: prefix
+  trim, suffix trim, or a `[c][o][c]` mid split with the tail's new name
+  (`<unit>_b`, `_c`). Say which functions leave -- matched C and `INCLUDE_ASM`
+  alike -- and that deleting matched C for a Sony-owned function is the
+  correction, not a regression, to be listed in the commit message.
+- **The precedent to read first**: `git show 2d38345` and `git log --oneline
+  --grep='SDK objects'`.
+- **Move, do not retype**: functions after a mid split go verbatim, in ROM
+  order, into the new `src/<unit>_b.c` with local declarations;
+  `INCLUDE_ASM` paths take the new name.
+- **Rodata**: whether the unit owns an attach, and where it goes (with the
+  function; or, if the owner is Sony's, it becomes the object's `.rdata` line
+  -- pre-derive the `place` lines and any `pad`).
+- **Reports**: prepend the CONVERTED banner to every report in the run.
+- **Shared headers**: a Sony prototype declared in an `include/` header shared
+  by several units is REMOVED from the header and re-declared as a local
+  `extern` in each caller (`GsSetRefView2`, round 33; `GsDrawOt` &c., round
+  34).
+- **Disc tie-breaks the head has already decided** (identical `a|b` objects,
+  3.3-vs-3.5 splits that do not tile), so the runner does not re-derive them.
+- **Manifest**: append under a comment block naming the unit and the round;
+  the head keeps every block when the appends conflict on merge (they always
+  do -- it is the one conflict this kind of round produces).
+
+The head still does the runs that need a decision mid-run: data sections in
+attached slots it has not pre-measured, `localize=`, shadows, anything
+`ldfrag` `NOTE`s.
 
 ## Runner prompt (head fills in `<>`; paste to an Opus agent)
 
@@ -104,6 +152,8 @@ owner. Phase 3 is whenever — it only adds names.
 > `runner/<name>`. Read CLAUDE.md, then docs/SDK-OBJECTS-GUIDE.md end to end,
 > then docs/research/psyq-sdk-objects.md. Your assignment is the `psyq_*`
 > segment `<segment>` (`0x<start>..0x<end>` in file offsets) and nothing else.
+> (For a run inside a game unit, add the addendum paragraphs from the section
+> above here.)
 >
 > **What you are doing.** Replacing Sony library disassembly with Sony's own
 > objects from the SDK discs, one contiguous run of placed objects at a time,
@@ -177,9 +227,11 @@ owner. Phase 3 is whenever — it only adds names.
 
 > Act as the head for an SDK-object conversion round per
 > docs/SDK-OBJECTS-RUNS.md. First measure: `python3 tools/progress.py`,
-> `.venv/bin/python3 tools/psyq_sdk.py runs`, `psyq_sdk.py check`. Decide which
-> `psyq_*` segments go to runners this round (at most two, disjoint) and which
-> game-unit splits, if any, you will carve yourself during consolidation.
+> `.venv/bin/python3 tools/psyq_sdk.py runs`, `python3 tools/sdkstalls.py`,
+> `psyq_sdk.py check`. Decide which segments or game units go to runners this
+> round (at most two runners, disjoint units; text-only game-unit runs are
+> runner work with the addendum) and which data-bearing or cross-unit splits
+> you will carve yourself while they run.
 > Provision one worktree per runner (`tools/setup-worktree.sh <name>`), fill
 > in and paste the runner prompt from the RUNS doc, run them in the background.
 > While they run, resolve any `PARTIAL OVERLAP`, `DISAGREE` or `NOTE:` items
