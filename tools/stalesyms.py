@@ -197,6 +197,20 @@ def main():
             # evidence of anything -- plenty of names are never listed.
             if current and current.lower() != ("func_" + hexaddr).lower():
                 stale["func_" + hexaddr] = current
+        # A REPAIRED report still contains its old bodies -- correcting one
+        # does not mean deleting the attempt history that used the old names,
+        # and it should not. So a stale spelling somewhere in the report is not
+        # the question. The question a runner actually asks is "is there a body
+        # here I can splice in and build", and that is answered by whether the
+        # NEW name appears in a preserved body too.
+        #
+        # Do NOT try to answer it positionally. Round 36 had one runner put its
+        # corrected snapshot immediately after the title and another append it
+        # at the end of the report, both perfectly reasonably -- so "the last
+        # `#if 0` block is the live one" is wrong about whichever runner did it
+        # the other way, and wrong silently.
+        stale = {old: new_ for old, new_ in stale.items()
+                 if not re.search(r'\b' + re.escape(new_) + r'\b', text)}
         if stale:
             findings[name] = stale
 
