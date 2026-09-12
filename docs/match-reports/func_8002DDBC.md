@@ -332,3 +332,61 @@ function, the very next round. Any function in `code_179d8_l`/`_m` with a
 should try this FIRST, before barriers or permuter time, and should match
 the cast width to whatever the surrounding comparison already uses for
 the same variable rather than picking the narrowest type that compiles.
+
+## Round 35 update (runner bravo): inherited body re-verified real; frame-allocation lever tried, negative; confirmed the remaining gap is entirely the register-identity residue
+
+Re-verified the inherited 108/112 body first: `objdump -t` on
+`build/src/code_179d8_l.c.o` confirms `func_8002DDBC` compiles to `0x1b0`
+bytes = 108 words, matching round 33's figure exactly. Realigned
+`asm-differ` diff confirms residues 1 (the `a3`/`a0` register swap) and 4
+(the missing `addiu sp,sp,-8`/`+8` frame) at the exact positions this
+report already names.
+
+**Read the raw `.s` directly to characterize the frame precisely, since the
+original report only described it as "no visible spill":** the
+`addiu $sp,$sp,-0x8` sits in the DELAY SLOT of the function's first branch
+(`beqz $v0,.L8002DE28`), which means it executes unconditionally
+regardless of which arm is taken — it is not a per-branch allocation, it
+is the function's one and only frame adjustment, just scheduled into a
+delay slot instead of a leading prologue. There is no `sw`/`lw` to any
+`$sp`-relative address anywhere in the whole function — the 8 bytes are
+allocated and freed (`addiu $sp,$sp,0x8` right before the trailing
+`jr $ra`) without ever being touched. This confirms residue 4 is a pure
+"GCC decided this function's estimated register pressure needs a stack
+frame" artifact, unrelated to any actual spill.
+
+**Tried: forcing a frame via a dummy local (`s32 dummy;`, unused).**
+Theory: if GCC's frame-size heuristic responds to live-range pressure
+rather than the register-identity swap itself, adding one more local might
+tip it into allocating the frame independent of the swap. Result: **no
+change, still 108/112** — GCC 2.6.3 dead-code-eliminates an unused local
+entirely at `-O2` before the register allocator ever sees it, so it can't
+influence frame-size decisions. Confirms this specific lever needs a local
+that is actually LIVE across some span, not merely declared; not attempted
+further since any live dummy would need a plausible reason to exist in the
+transcription (this project's C is meant to read as an honest
+reconstruction of what the retail source did, not an obfuscated lever), and
+the original report's own conclusion — that the frame is downstream of the
+register-identity residue, not an independent lever — still holds. Reverted
+(`git diff --stat` clean against the pre-session state).
+
+**Disposition: unchanged at 108/112 (4 short).** No new lever moved this
+function this round. The remaining gap continues to be attributable
+entirely to the register-identity swap this report already tried three
+ways in round 26 and confirmed unmovable — consistent with HARD RULE 6
+("if reshaping does not move it, it is a stall") — plus the frame it likely
+drags along once that swap resolves, which is not itself independently
+reachable from C.
+
+### Proposed learning (round 35)
+
+**A dummy/unused local cannot be used to nudge GCC 2.6.3's frame-allocation
+decision** — the dead-store elimination pass at `-O2` removes it before
+register allocation runs, so "add an inert local to change register
+pressure" is not a viable lever in this toolchain (as opposed to a
+`volatile` local, which IS live but changes the mechanism entirely by
+forcing a real memory access — a different, already-documented-elsewhere
+trade-off with its own regressions). Worth noting alongside the existing
+"variable identifier choice has no influence on register assignment"
+learning: neither naming nor adding-and-not-using a local is a technique
+that works on this compiler's allocator.
