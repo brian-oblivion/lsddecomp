@@ -158,7 +158,7 @@ typedef struct IsoDirRecord {
                       * end-of-listing test (0 means no more records) */
     u8 extAttrLen;   /* +0x01, unused here */
     UWord extentLBA; /* +0x02, location of extent (LE), unaligned --
-                      * handed to func_800292F4 for conversion */
+                      * handed to CdIntToPos for conversion */
     u8 pad06[0x0A - 0x06];
     UWord dataLen;   /* +0x0A, data length (LE), unaligned -- copied
                       * verbatim into the cache entry's own size field */
@@ -172,7 +172,7 @@ typedef struct IsoDirRecord {
  * up to 0x40 of them. Only the fields this function itself touches are
  * named. */
 typedef struct EntryB3F0 {
-    u8 msf[3];   /* +0x00, filled by func_800292F4 from extentLBA, not
+    u8 msf[3];   /* +0x00, filled by CdIntToPos from extentLBA, not
                   * written directly here */
     u8 pad3;
     UWord size;  /* +0x04, copied verbatim from IsoDirRecord::dataLen */
@@ -221,7 +221,7 @@ extern u8 D_80010CB8[]; /* "CD_cachefile: %d files found\n" */
 
 extern s32 func_8002BFA8(void *p0, void *p1, void *p2);        /* matched, this unit */
 extern void func_8002C014(char *dest, char *src, s32 count);   /* matched, this unit */
-extern void func_800292F4(void *arg0, s32 *outBuf);
+extern void CdIntToPos(void *arg0, s32 *outBuf);
 extern void printf(const char *fmt, ...); /* Psy-Q printf wrapper */
 
 /* STALL -- see docs/match-reports/func_8002BCEC.md.  Best-derived body
@@ -237,7 +237,7 @@ s32 func_8002BCEC(s32 id)
 {
     IsoDirRecord *rec;
     EntryB3F0 *slot; /* the current cache entry -- only ever used as a
-                      * pointer VALUE (func_800292F4's outBuf argument), so
+                      * pointer VALUE (CdIntToPos's outBuf argument), so
                       * it earns its own strength-reduced register rather
                       * than being re-derived from `off` each time. */
     u8 *name;         /* &current entry's name[0] -- likewise only ever used
@@ -275,7 +275,7 @@ s32 func_8002BCEC(s32 id)
 
         {
             UWord tmp = rec->extentLBA;
-            func_800292F4(*(void **)&tmp, (s32 *)slot);
+            CdIntToPos(*(void **)&tmp, (s32 *)slot);
         }
         {
             EntryB3F0 *entry = (EntryB3F0 *)((u8 *)D_8008B3F0 + off);
@@ -326,19 +326,19 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002BCEC);
  * anywhere yet.  (This comment used to name which runner held code_179d8_b
  * "this round"; a round-specific staffing fact does not belong in a durable
  * file, because it is false from the next round onward.) */
-extern void func_800292F4(void *arg0, s32 *outBuf);
-extern void func_80028DF0(s32 arg0, s32 *buf, s32 arg2);
-extern void func_80029274(void *arg0, void *arg1, s32 arg2);
-extern s32 func_80029254(s32 arg0, s32 arg1);
+extern void CdIntToPos(void *arg0, s32 *outBuf);
+extern void CdControl(s32 arg0, s32 *buf, s32 arg2);
+extern void CdRead(void *arg0, void *arg1, s32 arg2);
+extern s32 CdReadSync(s32 arg0, s32 arg1);
 
 s32 func_8002BFA8(void *p0, void *p1, void *p2)
 {
     s32 buf[2];
 
-    func_800292F4(p1, buf);
-    func_80028DF0(2, buf, 0);
-    func_80029274(p0, p2, 0x80);
-    return (u32)func_80029254(0, 0) < 1;
+    CdIntToPos(p1, buf);
+    CdControl(2, buf, 0);
+    CdRead(p0, p2, 0x80);
+    return (u32)CdReadSync(0, 0) < 1;
 }
 
 void func_8002C014(char *dest, char *src, s32 count)

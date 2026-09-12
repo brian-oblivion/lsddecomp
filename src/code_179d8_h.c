@@ -1,7 +1,17 @@
 /*
  * code_179d8_h -- functions 43..59 of the original code_179d8 monolith's head,
- * 0x19098..0x194E0 (vram 0x80028898..0x800294E0).  Carved MID-round 17
- * (2026-09-04) to re-staff a runner whose own unit was exhausted.
+ * originally 0x19098..0x194E0 (vram 0x80028898..0x800294E0).  Carved
+ * MID-round 17 (2026-09-04) to re-staff a runner whose own unit was exhausted.
+ *
+ * ROUND 34 (head): the unit's LAST SIX functions left it.  strcpy (0x80028B78)
+ * and strstr (0x80028BBC) are `libc2/strcpy.o` / `libc2/strstr.o`, and
+ * CdStatus, CdLastCom (func_80028C44), CdReset (func_80028C54) and CdFlush
+ * (func_80028CC0) are the first four functions of `libcd/sys.o` (Psy-Q 3.3),
+ * which runs on through the whole front of code_179d8_b.  All six had been
+ * matched as C; they were Sony's the whole time, and reclassifying them out of
+ * the game count is the correction CLAUDE.md asks for, not a regression.  The
+ * unit is now 0x19098..0x19378 (11 functions).  The "three carry real names
+ * inherited from FirecatFG" note below is now three CONFIRMED names.
  *
  * Blocker census, three-grep screen run per function at carve time:
  * 16 of 17 clean.
@@ -157,10 +167,12 @@ s32 func_80028A50(ObjA34_179D8H *self) {
 void func_80028A7C(void) {
 }
 
-extern void func_80028DF0(s32 arg0, Pair16_179D8H *buf, s32 arg2);
-extern s32 func_80028D68(s32 arg0, void *buf);
-extern s32 func_80029274(s32 arg0, void *arg1, s32 arg2);
-extern s32 func_80029254(s32 arg0, s32 arg1);
+/* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) -- this
+ * unit's own per-call-site typing for func_80028A84's calls, kept local. */
+extern void CdControl(s32 arg0, Pair16_179D8H *buf, s32 arg2);
+extern s32 CdSync(s32 arg0, void *buf);
+extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
+extern s32 CdReadSync(s32 arg0, s32 arg1);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A84);
 
@@ -168,96 +180,3 @@ void func_80028B64(void) {
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028B6C);
-
-char *strcpy(char *dest, char *src) {
-    char *newVar;
-    char *result;
-    char c;
-    char c2;
-
-    result = NULL;
-    if (dest != NULL && src != NULL) {
-        newVar = dest;
-        c = *src;
-        src = src + 1;
-        dest = dest + 1;
-        *newVar = c;
-        if (c != 0) {
-            do {
-                c2 = *src;
-                src++;
-                *dest = c2;
-                dest++;
-            } while (c2 != 0);
-        }
-        result = newVar;
-    }
-    return result;
-}
-
-char *strstr(char *haystack, char *needle) {
-    char *cursor;
-    char *matchStart;
-    s32 matching;
-
-    matching = 0;
-    cursor = needle;
-    matchStart = haystack;
-    if (*haystack != 0) {
-        do {
-            if (*haystack == *cursor) {
-                cursor++;
-                if (*cursor == 0) {
-                    return matchStart;
-                }
-                if (matching == 0) {
-                    matchStart = haystack;
-                    matching = 1;
-                }
-            } else {
-                cursor = needle;
-                matching = 0;
-            }
-            haystack++;
-        } while (*haystack != 0);
-    }
-    return NULL;
-}
-
-extern u8 D_8006D60C;
-
-u8 CdStatus(void) {
-    return D_8006D60C;
-}
-
-extern u8 D_8006D61D;
-
-u8 func_80028C44(void) {
-    return D_8006D61D;
-}
-
-extern s32 func_8002A6EC(void);
-extern s32 func_8002A75C(void);
-extern s32 func_8002A5F8(void);
-
-s32 func_80028C54(s32 mode) {
-    if (mode == 2) {
-        func_8002A6EC();
-        return 1;
-    }
-    if (func_8002A75C() != 0) {
-        return 0;
-    }
-    if (mode == 1) {
-        if (func_8002A5F8() != 0) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-extern void func_8002A510(void);
-
-void func_80028CC0(void) {
-    func_8002A510();
-}

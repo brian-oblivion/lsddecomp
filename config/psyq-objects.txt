@@ -345,3 +345,14 @@
 # select_max_param 50w). Both .bss-only -- nothing goes in the yaml for data.
 3.3  libgs/gs_131   0x2FAAC
 3.3  libgs/gs_133   0x30048
+
+# Across the code_179d8_h / code_179d8_b boundary (0x19378..0x19C78): libc2's
+# strcpy and strstr (both had been matched as C) and libcd/sys, 25 functions of
+# which CdControl, CdControlF and CdControlB were INCLUDE_ASM stalls with ~1200
+# lines of reports between them and the other 22 were matched C. Measured round
+# 33, converted round 34 (head). NOT text-only: sys's 5-byte .rdata ("none") is
+# at 0x1040 and its 0x80-byte .data at 0x5DD7C; both enclosing slots are split
+# in the yaml, the .rdata with a 3-byte pad. See docs/PROGRESS.md, round 34.
+3.3  libc2/strcpy   0x19378
+3.3  libc2/strstr   0x193BC
+3.3  libcd/sys      0x19434

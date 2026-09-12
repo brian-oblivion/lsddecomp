@@ -88,6 +88,14 @@ segments:
       - [0xF64, rodata]   # 16-word bit table; owner not placed yet (libetc intr?)
       - [0xFA4, rodata]   # code_1677c
       - [0xFD8, rodata]   # code_179d8 (head remainder, still asm)
+      # ROUND 34 (head): libcd/sys's .rdata is the 5-byte "none" at 0x1040
+      # (vram 0x80010840, D_80010840 -- referenced only from sys's own text).
+      # It ends at 0x1045; retail has three zero bytes and the plain
+      # remainder resumes at 0x1048, so the SUBALIGN(2) `pad` rule applies
+      # (docs/SDK-OBJECTS-GUIDE.md step 4) or the remainder lands at 0x1046.
+      - [0x1040, o, libcd/sys, .rdata]
+      - [0x1045, pad]
+      - [0x1048, rodata]  # code_179d8 head remainder continues ("CdlReadS"... strings)
       # jtbl_800109F8 belongs to func_80029478, which lives in the
       # code_179d8_b slice. Its words are `.L` labels LOCAL to that
       # function's own `.s`, so this sub-slot must be ATTACHED to the unit or
@@ -575,7 +583,8 @@ segments:
       # this segment's only jump table (func_80027A24), so the cut is placed
       # here to leave both debts behind.  This slice owns NO jump table and
       # needs no rodata attach.
-      # NEXT SDK CONVERSION, MEASURED ROUND 33 AND DELIBERATELY NOT DONE.
+      # SDK CONVERSION MEASURED ROUND 33, DONE ROUND 34 (head). The measurement
+      # is kept because it is what the lines below were built from:
       # `libc2/strcpy` + `libc2/strstr` + `libcd/sys` tile 0x19378..0x19C78
       # exactly and cross the code_179d8_h / code_179d8_b boundary at
       # 0x194E0, so BOTH units trim and neither needs a new name --
@@ -599,12 +608,17 @@ segments:
       # docs/SDK-OBJECTS-GUIDE.md for the 5-byte .rdata: do the
       # start+size arithmetic for BOTH sections before the first build.
       #
-      # Left for the next round because head attention, not build cost, is
-      # what a conversion spends, and a half-applied one is a broken build
-      # for whoever merges next.
-      - [0x19098, c, code_179d8_h]
-      # code_179d8_b: window [60..79], 0x194E0..0x1A1BC (20 functions).
-      - [0x194E0, c, code_179d8_b]
+      # Both splits are made below (0x1040 in the rodata list, 0x5DD7C in
+      # the data list); the 5-byte .rdata needed the pad, the 0x80 .data
+      # ends 4-aligned and needed none.
+      - [0x19098, c, code_179d8_h]     # now 0x19098..0x19378, 11 functions
+      - [0x19378, o, libc2/strcpy]     # strcpy
+      - [0x193BC, o, libc2/strstr]     # strstr
+      - [0x19434, o, libcd/sys]        # CdStatus .. CdPosToInt, 25 functions (CdControl/F/B were stalls)
+      # code_179d8_b: what is left of window [60..79] after libcd/sys took its
+      # first 19 functions -- 0x19C78..0x1A1BC, ONE function (func_80029478),
+      # which still owns jtbl_800109F8 and therefore the 0x11F8 rodata attach.
+      - [0x19C78, c, code_179d8_b]
       # code_179d8_n: functions 80..82 of the original monolith, 0x1A1BC..
       # 0x1AB78 (3 functions).  Carved round 26 (2026-09-09) out of what was
       # the `code_179d8_mid` UNCARVED remainder -- renamed on carve because
@@ -1543,6 +1557,8 @@ segments:
       - [0x5DB38, o, libetc/intr_vb, .data]
       - [0x5DB60, o, libetc/vsync, .data]
       - [0x5DB70, data]
+      - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
+      - [0x5DDFC, data]
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
       - [0x5F474, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)
