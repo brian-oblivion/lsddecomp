@@ -47,6 +47,7 @@ LIB_DIR = ROOT / "lib"
 MANIFEST = ROOT / "config/psyq-objects.txt"
 YAML = ROOT / "config/splat.slps01556.lsdde.yaml"
 EXE = ROOT / "disk/SLPS_015.56"
+OBJCOPY = ROOT / "tools/binutils/bin/mipsel-linux-gnu-objcopy"
 PARSER = ROOT / "tools/psyq-obj-parser/psyq-obj-parser"
 VRAM, HDR = 0x80010000, 0x800
 # When several discs place an object at the same offset the bytes are identical
@@ -254,20 +255,36 @@ def prepare(ver, src):
 
 # --- manifest ----------------------------------------------------------------
 
-def read_manifest():
-    """[(version, 'lib/module', file_offset)] from config/psyq-objects.txt.
-    A line may carry a fourth token `shadow=.rdata[,.data]`; read_shadows()
-    returns those, this function ignores them."""
+MANIFEST_KEYS = ("shadow", "localize")
+
+
+def _manifest_lines():
+    """Parsed manifest lines: (version, 'lib/module', fileoff, {key: [values]}).
+    Tokens after the third are `key=v1[,v2...]` annotations; the keys are
+    MANIFEST_KEYS and each is read by its own helper below."""
     rows = []
     for line in MANIFEST.read_text().splitlines():
         line = line.split("#", 1)[0].strip()
         if not line:
             continue
         parts = line.split()
-        if len(parts) not in (3, 4) or (len(parts) == 4 and not parts[3].startswith("shadow=")):
-            die(f"{MANIFEST.name}: bad line {line!r} (want: <version> <lib>/<module> <fileoff> [shadow=.sec,...])")
-        rows.append((parts[0], parts[1], int(parts[2], 0)))
+        if len(parts) < 3:
+            die(f"{MANIFEST.name}: bad line {line!r} (want: <version> <lib>/<module> <fileoff> [key=v,...]...)")
+        ann = {}
+        for tok in parts[3:]:
+            key, eq, val = tok.partition("=")
+            if not eq or key not in MANIFEST_KEYS:
+                die(f"{MANIFEST.name}: bad annotation {tok!r} on {parts[1]} (known: {', '.join(k + '=' for k in MANIFEST_KEYS)})")
+            ann[key] = [v for v in val.split(",") if v]
+        rows.append((parts[0], parts[1], int(parts[2], 0), ann))
     return rows
+
+
+def read_manifest():
+    """[(version, 'lib/module', file_offset)] from config/psyq-objects.txt.
+    Annotations (`shadow=`, `localize=`) are read by read_shadows() and
+    read_localize(); this function ignores them."""
+    return [(v, n, off) for v, n, off, _ in _manifest_lines()]
 
 
 def read_shadows():
@@ -279,13 +296,20 @@ def read_shadows():
     relocations then resolve to the right address and the image bytes come from
     splat's plain data slot, which still holds retail's. Byte-exact, measured
     2026-09-11 (docs/research/psyq-sdk-objects.md)."""
-    out = {}
-    for line in MANIFEST.read_text().splitlines():
-        line = line.split("#", 1)[0].strip()
-        parts = line.split()
-        if len(parts) == 4 and parts[3].startswith("shadow="):
-            out[parts[1]] = [sec for sec in parts[3][len("shadow="):].split(",") if sec]
-    return out
+    return {n: ann["shadow"] for _, n, _, ann in _manifest_lines() if "shadow" in ann}
+
+
+def read_localize():
+    """{'lib/module': ['memcpy', ...]}: symbols `install` turns LOCAL in the copied
+    object (`objcopy -L`). For an object that defines a WEAK function another
+    linked object defines GLOBAL at a different address, with BOTH copies in
+    retail: libcd/iso9660 carries its own `memcpy` (0x8002C014) and libc2/memcpy
+    is at 0x800238A8. GNU ld binds every reference to the GLOBAL definition, so
+    linked as shipped iso9660's own calls would resolve to libc2's copy -- a
+    clean link and wrong bytes. Localising the symbol makes the object's own
+    references bind to its own definition, exactly as Sony's linker did.
+    Round 34 (docs/research/psyq-sdk-objects.md)."""
+    return {n: ann["localize"] for _, n, _, ann in _manifest_lines() if "localize" in ann}
 
 
 def verify_at(obj: Path, exe: bytes, off: int):
@@ -330,6 +354,7 @@ def cmd_install(_args):
                 f"  Two objects of identical shape can both match one spot (a 4-instruction getter is a\n"
                 f"  4-instruction getter); only one of them is really there. Check the segment's glabels.")
     installed = 0
+    localize = read_localize()
     for ver, name, off in rows:
         src = WORK / ver / "elf" / f"{name}.o"
         if not src.exists():
@@ -340,8 +365,15 @@ def cmd_install(_args):
         dst = LIB_DIR / f"{name}.o"
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, dst)
+        for sym in localize.get(name, []):
+            # see read_localize(); the text bytes are untouched, only the
+            # symbol's binding changes, so verify_at above still applies.
+            r = subprocess.run([str(OBJCOPY), "-L", sym, str(dst)], capture_output=True, text=True)
+            if r.returncode != 0:
+                die(f"objcopy -L {sym} {dst}: {r.stderr.strip()}")
         installed += 1
-    print(f"lib/: {installed} objects installed and verified against retail")
+    print(f"lib/: {installed} objects installed and verified against retail"
+          + (f", {sum(len(v) for v in localize.values())} symbol(s) localised" if localize else ""))
 
 
 def cmd_match(args):
@@ -638,6 +670,7 @@ def cmd_symbols(_args):
     exe = EXE.read_bytes()
     addrs = defaultdict(set)   # name -> {addr}
     origin = defaultdict(set)
+    localize = read_localize()
     for name, (ver, toff, _size) in placed_objects().items():
         opath = WORK / ver / "elf" / f"{name}.o"
         with open(opath, "rb") as f:
@@ -645,6 +678,11 @@ def cmd_symbols(_args):
             text_idx = [i for i, s in enumerate(elf.iter_sections()) if s.name == ".text"][0]
             for sym in elf.get_section_by_name(".symtab").iter_symbols():
                 if sym["st_shndx"] == text_idx and sym.name and sym["st_info"]["type"] != "STT_SECTION":
+                    if sym.name in localize.get(name, []):
+                        # install makes this definition LOCAL to its object (read_localize);
+                        # it is a second copy of a name, not a conflict about one.
+                        print(f"// LOCALIZED {sym.name} in {name} at 0x{toff - HDR + VRAM + sym['st_value']:08X} (objcopy -L at install; no symbols-file entry)")
+                        continue
                     addrs[sym.name].add(toff - HDR + VRAM + sym["st_value"])
                     origin[sym.name].add(f"{name}:def")
         for sname, addr in reloc_addresses(exe, opath, toff):

@@ -109,6 +109,13 @@ segments:
                           # segment is now the code_179d8_n C unit, which
                           # owns no jump table, so this slot stays
                           # STANDALONE and attaches to nothing.
+      # ROUND 34 (head): libcd/iso9660's .rdata -- its CdSearchFile /
+      # CD_newmedia / CD_cachefile diagnostic strings, 0x1EA bytes, no
+      # relocations -- is 0x12EC..0x14D6 (vram 0x80010AEC..).  Retail has two
+      # zero bytes before code_179d8_c_b's jump table at 0x14D8, hence the pad
+      # (SUBALIGN(2); docs/SDK-OBJECTS-GUIDE.md step 4).
+      - [0x12EC, o, libcd/iso9660, .rdata]
+      - [0x14D6, pad]
       # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
       # same situation as 0x11F8 above.
       - [0x14D8, .rodata, code_179d8_c_b]
@@ -656,7 +663,26 @@ segments:
       # 186, 189 instructions), so this unit is smaller in count and larger
       # in work than its 17 suggests.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
-      - [0x1AB78, c, code_179d8_g]
+      - [0x1AB78, c, code_179d8_g]     # now 0x1AB78..0x1BE40, 14 functions
+      # ROUND 34 (head): libcd/iso9660 (Psy-Q 3.3, 0xA08) + libc2/strcmp +
+      # libc2/strncmp tile 0x1BE40..0x1C92C exactly and cross the
+      # code_179d8_g / code_179d8_d boundary at 0x1C440, so both units trim
+      # and neither needs a new name.  iso9660 owns CdSearchFile (0x8002B640,
+      # 186w INCLUDE_ASM), _cmp (0x8002B928, matched C), CD_newmedia
+      # (0x8002B94C, 189w INCLUDE_ASM), CD_searchdir (0x8002BC40, matched C),
+      # CD_cachefile (0x8002BCEC, 175w INCLUDE_ASM), cd_read (0x8002BFA8,
+      # matched C) and a WEAK `memcpy` (0x8002C014, matched C as
+      # func_8002C014) that libc2/memcpy also defines GLOBAL at 0x800238A8;
+      # the manifest's `localize=memcpy` makes `install` run
+      # `objcopy -L memcpy` on the copied object so iso9660's own calls bind
+      # to its own copy (GNU ld would otherwise pick the GLOBAL one: clean
+      # link, wrong bytes).  Data: .rdata at 0x12EC (rodata list, with pad),
+      # .data 8 bytes at 0x5E138 (data list); .bss 0x2400 at 0x8008B3F0 is
+      # the fragment's (D_8008B3F0.., the CD directory cache the game's own
+      # asm also names -- splat's bss labels still resolve those).
+      - [0x1BE40, o, libcd/iso9660]    # CdSearchFile .. memcpy, 7 functions
+      - [0x1C848, o, libc2/strcmp]     # strcmp
+      - [0x1C8AC, o, libc2/strncmp]    # strncmp
       # code_179d8_d: window [100..119], 0x1C440..0x1CC08 (20 functions),
       # carved mid-round 16 to re-staff a runner whose own unit was
       # exhausted. 17/20 clean on the three-grep screen -- the highest of
@@ -665,7 +691,7 @@ segments:
       # Owns NO jump table (the 0xFD8 slot's seven jtbl blocks all fall
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
-      - [0x1C440, c, code_179d8_d]
+      - [0x1C92C, c, code_179d8_d]     # now 0x1C92C..0x1CC08 (new_class_6d940 onward, 14 functions)
       # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
       # (29 functions).  Census 2026-09-04, three-grep screen per function:
       # 21/29 clean, the eight blocked all gp_rel (func_8002C448/C468/C4E0/
@@ -1559,6 +1585,8 @@ segments:
       - [0x5DB70, data]
       - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
       - [0x5DDFC, data]
+      - [0x5E138, o, libcd/iso9660, .data]   # 8 bytes (two 0x1F8010xx DMA register addresses) -> 0x5E140
+      - [0x5E140, data]
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
       - [0x5F474, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)

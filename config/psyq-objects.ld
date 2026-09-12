@@ -43,6 +43,7 @@ SECTIONS {
     .psyq_bss.libc2_rand_sbss 0x8008AC68 (NOLOAD) : SUBALIGN(2) { build/lib/libc2/rand.o(.sbss) }   /* 0x4 bytes; section-relative refs */
     .psyq_bss.libgs_gs_131_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_131.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
     .psyq_bss.libgs_gs_133_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_133.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
+    .psyq_bss.libcd_iso9660_bss 0x8008B3F0 (NOLOAD) : SUBALIGN(2) { build/lib/libcd/iso9660.o(.bss) }   /* 0x2400 bytes; section-relative refs */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 dc_cr = 0x8008E224;   /* libpress/vlc2 */
@@ -417,6 +418,7 @@ CD_cbready = 0x8006D600;
 CD_cbread = 0x8006D604;
 CD_debug = 0x8006D608;
 CD_status = 0x8006D60C;
+CD_nopen = 0x8006D614;
 CD_com = 0x8006D61D;
 CD_comstr = 0x8006D620;
 CD_intstr = 0x8006D6A0;

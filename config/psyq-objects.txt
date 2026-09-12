@@ -356,3 +356,15 @@
 3.3  libc2/strcpy   0x19378
 3.3  libc2/strstr   0x193BC
 3.3  libcd/sys      0x19434
+
+# Across the code_179d8_g / code_179d8_d boundary (0x1BE40..0x1C92C):
+# libcd/iso9660 (CdSearchFile and the CD_* directory cache, 7 functions -- three
+# were INCLUDE_ASM stalls with ~1300 report lines, four matched C) and libc2's
+# strcmp/strncmp (both matched C). Round 34 (head). iso9660 defines a WEAK
+# `memcpy` that libc2/memcpy also defines GLOBAL at another address, and both
+# copies exist in retail; `localize=memcpy` makes `install` run
+# `objcopy -L memcpy` on the copied object so iso9660's own calls bind to its
+# own copy. Data: .rdata 0x1EA at 0x12EC (+2-byte pad), .data 8 at 0x5E138.
+3.3  libcd/iso9660  0x1BE40  localize=memcpy
+3.3  libc2/strcmp   0x1C848
+3.3  libc2/strncmp  0x1C8AC

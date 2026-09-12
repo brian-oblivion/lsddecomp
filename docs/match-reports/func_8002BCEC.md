@@ -1,3 +1,17 @@
+# func_8002BCEC -- CONVERTED to a linked SDK object (round 34). NOT game code, NOT a stall.
+
+> **ROUND 34 (2026-09-12), head. THIS FUNCTION IS NOW LINKED FROM SONY'S OWN
+> OBJECT `libcd/iso9660.o` (Psy-Q 3.3) AND IS `CD_cachefile`.** It was
+> an INCLUDE_ASM stall; the object owns its bytes, so the C is gone from
+> `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
+> for, not a regression. The run `libcd/iso9660` + `libc2/strcmp` +
+> `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the code_179d8_g /
+> code_179d8_d boundary; both units trimmed. Whole-image SHA1 green. Nothing
+> here is assignable and there is no stall left to work. The text below is the
+> pre-conversion record.
+
+## Original report
+
 # func_8002BCEC — STALL (best compiled 172/175, 3 words SHORT; raw word-match 49/175 under that drift; first real diff at vram 0x8002BDB8 / file 0x1C5B8)
 
 > **ROUND 32 (2026-09-12), head. THIS FUNCTION IS SONY LIBRARY CODE AND

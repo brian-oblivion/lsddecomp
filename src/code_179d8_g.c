@@ -42,6 +42,14 @@
  * the correct disposition is conversion per docs/SDK-OBJECTS-GUIDE.md.
  * Only func_8002AEE0 of the three is real game ground.
  *
+ * ROUND 34 (head): CONVERTED. The unit's last three functions -- CdSearchFile
+ * (func_8002B640), _cmp (func_8002B928, which had been matched as C) and
+ * CD_newmedia (func_8002B94C) -- are linked from `lib/libcd/iso9660.o`, which
+ * runs on into code_179d8_d (CD_searchdir, CD_cachefile, cd_read and a WEAK
+ * memcpy). The unit is now 0x1AB78..0x1BE40 (vram 0x8002A378..0x8002B640),
+ * 14 functions. The iso9660-only declarations that used to sit below (the
+ * CD_* diagnostic strings, the directory-cache views, UWord) went with them.
+ *
  * Note what happened here, because it is the reason this comment now
  * carries three verdicts: round 24 reopened all three as free ground and
  * round 32's first pass "corrected" that to near-misses -- both times
@@ -130,79 +138,12 @@ extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in 
 extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
 extern s32 func_80029478(void);                                /* asm/nonmatchings/code_179d8_b;
                                                                    addiu_at RESOLVED round 21, no longer blocked */
-extern s32 func_8002C0AC(const char *arg0, const char *arg1, s32 arg2); /* asm/nonmatchings/code_179d8_d */
 extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
-extern s32 func_8002BC40(s32 id, char *name);                  /* code_179d8_d.c, matched: looks up
-                                                                   `name` under directory id `id` in
-                                                                   D_8008B9F4[], returns 1-based index
-                                                                   or -1 */
-extern s32 func_8002BCEC(s32 id);                               /* asm/nonmatchings/code_179d8_d, still
-                                                                   INCLUDE_ASM there; signature inferred
-                                                                   from this function's call site only */
-
-/* CdSearchFile diagnostics (confirmed via asm/data/120C.rodata.s) */
-extern u8 D_80010AEC[];   /* "%s: path level (%d) error\n" */
-extern u8 D_80010B08[];   /* "%s: dir was not found\n" */
-extern u8 D_80010B20[];   /* "CdSearchFile: disc error\n" */
-extern u8 D_80010B3C[];   /* "CdSearchFile: searching %s...\n" */
-extern u8 D_80010B5C[];   /* "%s:  found\n" */
-extern u8 D_80010B68[];   /* "%s: not found\n" */
-
-extern s32 D_8006D93C;
-extern s32 D_8006D608;
-extern u8 D_8008B3F8[];   /* CD directory-entry table; the copy in func_8002B640 reads from
-                            * (D_8008B3F8 - 8) for the matched record while the flag byte and
-                            * name compare read D_8008B3F8 itself at the same stride (0x18) --
-                            * see that function's report for why the two views are offset. */
-
-extern s32 func_8002BFA8(void *p0, void *p1, void *p2);        /* code_179d8_d.c, matched */
-extern void func_8002C014(char *dest, char *src, s32 count);   /* code_179d8_d.c, matched */
-extern u8 D_8008CFF0[];   /* PVD (primary volume descriptor) read buffer, this function's own scratch */
-extern u8 D_8008D07C[];   /* byte-packed field inside the PVD -- root dir record, read unaligned */
-extern s32 D_8006D938;
-
-/* This unit's own local view of code_179d8_d.c's Entry8008B9F4 (id/unk4/name,
- * stride 0x2C) -- kept LOCAL per the project's multiple-independent-local-
- * views convention, not shared via a header. func_8002BC40 (code_179d8_d.c)
- * only ever READS `.id`; this function is the one that WRITES `.id`/`.unk4`/
- * `.name` in the first place, from CD directory-record data. */
-typedef struct {
-    s32 id;
-    s32 unk4;
-    char name[0x24];
-} Entry8008B9F4View;
-extern Entry8008B9F4View D_8008B9F4[0x80];
-extern s32 D_8008B9F0[];  /* a SEPARATE table immediately before D_8008B9F4, same 0x2C stride --
-                            * NOT part of Entry8008B9F4 (func_8002BC40's established, matched
-                            * reading puts the struct's own first field, `.id`, AT D_8008B9F4
-                            * itself); holds this function's own 1-based record ordinal. */
-extern u8 D_8008D7F0[];   /* address-only use here (an upper-bound check on the scan cursor);
-                            * code_179d8_j.c/_m.c have their own typed local views of this
-                            * symbol for their own purposes -- not shared, per convention. */
-
-/* A 4-byte, alignment-1 view used only to force the unaligned lwl/lwr +
- * swl/swr load/store shape this function's two misaligned-word accesses
- * need -- same idiom CLAUDE.md documents for an all-byte struct whose
- * computed alignment is less than a word's. */
-typedef struct {
-    u8 b0, b1, b2, b3;
-} UWord;
-
-/* CD_newmedia diagnostics (confirmed via asm/data/120C.rodata.s) */
-extern u8 D_80010B78[];   /* "CD_newmedia: Read error in cd_read(PVD)\n" */
-extern u8 D_80010BA4[];   /* "CD001" -- ISO9660 standard identifier */
-extern u8 D_80010BAC[];   /* "CD_newmedia: Disc format error in cd_read(PVD)\n" */
-extern u8 D_80010BDC[];   /* "CD_newmedia: Read error (PT:%08x)\n" */
-extern u8 D_80010C00[];   /* "CD_newmedia: sarching dir..\n" [sic] */
-extern u8 D_80010C20[];   /* "\t%08x,%04x,%04x,%s\n" */
-extern u8 D_80010C34[];   /* "CD_newmedia: %d dir entries found\n" */
-
 /* Still INCLUDE_ASM in THIS unit (not yet converted) -- INCLUDE_ASM leaves no
  * C-level prototype of its own, so callers within this file need one. */
 extern s32 func_8002AA6C(void);
 extern s32 func_8002B198(s32 arg0);
-extern s32 func_8002B94C(void);
 
 /* Forward declarations: taken by address before their own ROM-order definition
  * further down this file (func_8002A6EC/func_8002A75C hand func_8002B3F4 to
@@ -406,12 +347,3 @@ void func_8002B3E4(s32 arg0)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3F4);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B4D4);
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B640);
-
-s32 func_8002B928(const char *arg0, const char *arg1)
-{
-    return func_8002C0AC(arg0, arg1, 0xC) == 0;
-}
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B94C);

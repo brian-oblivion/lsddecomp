@@ -100,7 +100,7 @@ typedef struct StatBuf179D8H {
     u8 pad8[0x18 - 0x8];
 } StatBuf179D8H;
 
-/* func_8002B640: lives in code_179d8_g, still INCLUDE_ASM there -- declared
+/* CdSearchFile (was func_8002B640): Sony's, lib/libcd/iso9660.o since round 34 -- declared
  * LOCAL here, per-call-site typed.
  *
  * This comment used to read "still uncarved in its own unit (code_179d8_g,
@@ -109,7 +109,7 @@ typedef struct StatBuf179D8H {
  * 21 (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md), which leaves
  * func_8002B640 blocker-clean and assignable (re-screened with
  * `python3 tools/nearmiss.py`, 2026-09-08). */
-extern s32 func_8002B640(StatBuf179D8H *statBuf, char *path);
+extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path);   /* lib/libcd/iso9660.o (round 34) */
 extern void printf(const char *fmt, void *arg1);
 extern char D_800107F4[];
 

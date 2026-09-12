@@ -270,6 +270,18 @@ CdReadSync = 0x80029254; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdRead = 0x80029274; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdIntToPos = 0x800292F4; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdPosToInt = 0x800293F8; // type:func  (Psy-Q libcd/sys, from the SDK object)
+CdSearchFile = 0x8002B640; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
+_cmp = 0x8002B928; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
+CD_newmedia = 0x8002B94C; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
+CD_searchdir = 0x8002BC40; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
+CD_cachefile = 0x8002BCEC; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
+cd_read = 0x8002BFA8; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
+// 0x8002C014 is libcd/iso9660's own WEAK `memcpy` -- a second copy of the name
+// libc2/memcpy defines at 0x800238A8. One name cannot label two addresses
+// here, and the object is localised at install (`localize=memcpy` in
+// config/psyq-objects.txt), so it keeps no entry.
+strcmp = 0x8002C048; // type:func  (Psy-Q libc2/strcmp, from the SDK object)
+strncmp = 0x8002C0AC; // type:func  (Psy-Q libc2/strncmp, from the SDK object)
 new_class_6d940 = 0x8002C12C;
 SetRCnt = 0x80032B18;
 SsUtGetVabHdr = 0x8003317C;
