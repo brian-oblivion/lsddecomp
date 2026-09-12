@@ -141,44 +141,20 @@ char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
     return dest;
 }
 
-/* Not the textbook libc `strcat`. It carries a guard textbook `strcat` has
- * no reason to: after taking both lengths it bails if the two strings' END
- * pointers coincide. That, plus returning NULL rather than `dest` on a NULL
- * input, reads as Psy-Q-library defensive code rather than game code.
+/* ROUND 34: `strcat` (0x80027130, this unit's last function, 42 words) LEFT
+ * THIS FILE. It is Sony's -- `libc2/strcat.o`, Psy-Q 3.3, 0xA8 of text
+ * covering exactly it -- and the unit's segment now ends at 0x17930 with an
+ * `o` entry after it. It had been matched as C since round 8, and the head
+ * had noticed at the time that it reads as library code rather than game
+ * code ("carries a guard textbook strcat has no reason to"); it was right,
+ * and the reclassification is the correction CLAUDE.md asks for, not a
+ * regression.
  *
- * Two source shapes here are load-bearing and both look like free choices:
+ * The C body and the two load-bearing source shapes it turned on (the
+ * post-increment scan, worth 25 words; `return dest` rather than
+ * `return NULL` on the NULL-dest path, worth one) are preserved in full in
+ * docs/match-reports/strcat.md. Nothing is lost by deleting them here.
  *
- *  - `while (*dest++) {} dest--;` -- the POST-increment scan, which walks
- *    unconditionally and backs up at the merge. The pre-test spelling
- *    `while (*dest) dest++;` is different code: retail's guard branch
- *    targets the `addiu` fixup, which only the post-increment form emits.
- *    Worth 25 words.
- *  - `return dest;` on the NULL-dest path, NOT `return NULL`. The two are
- *    the same value -- dest IS null there -- but returning `dest` USES it,
- *    which keeps it live and produces retail's `move a0,s1` in the first
- *    call's delay slot. Spelling it `NULL` costs exactly that instruction.
- *    The other two exits genuinely do return NULL and share one tail.
- *
- * See docs/match-reports/strcat.md. */
-char *strcat(char *dest, char *src) {
-    char *origDest;
-
-    if (dest == NULL) {
-        return dest;
-    }
-    if (src == NULL) {
-        goto fail;
-    }
-    if ((dest + strlen(dest)) == (src + strlen(src))) {
-        goto fail;
-    }
-    origDest = dest;
-    while (*dest++) {
-    }
-    dest--;
-    while ((*dest++ = *src++) != 0) {
-    }
-    return origDest;
-fail:
-    return NULL;
-}
+ * Callers in this unit (func_800270C4, just above) keep calling `strcat`
+ * under that name -- the declaration in include/code_171e0.h still serves,
+ * and now resolves to the linked object. */

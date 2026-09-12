@@ -442,3 +442,73 @@
 # this module. Text-only. This is the SECOND split of the original
 # code_179d8_j slice in the same round, so the tail is src/code_179d8_j_c.c.
 3.6  libsnd/ut_pb     0x221B4
+# ROUND 34 -- class_3bb8c_h (0x410E8..0x41148): the six BIOS-vector-0xB0 file
+# trampolines, `addiu $t2,$zero,0xB0 / jr $t2 / addiu $t1,$zero,N`. Each is its
+# own 0x10-byte libapi object and the six tile the segment exactly, so the
+# whole `asm` segment retires. Text-only, no data sections. This also retires
+# the long-standing `hasm`-vs-`.word` question for these six: no C had to
+# compile to a `jr $t2`, because Sony shipped the object.
+3.3  libapi/a51     0x410E8
+3.3  libapi/a54     0x410F8
+3.3  libapi/a69     0x41108
+3.3  libapi/a65     0x41118
+3.3  libapi/a52     0x41128
+3.3  libapi/a50     0x41138
+
+# ROUND 34 -- class_3bb8c_h_b (0x41308..0x41328): the two BIOS-vector-0xA0
+# memory-card trampolines. One libcard object each, tiling the segment
+# exactly, so the `asm` segment retires. Text-only.
+3.3  libcard/c172   0x41308
+3.3  libcard/c171   0x41318
+
+# ROUND 34 -- class_3bb8c_h_c (0x41358..0x413A8): the last five trampolines,
+# four on BIOS vector 0xB0 and one on 0xA0. One libcard object each, tiling
+# the segment exactly, so the `asm` segment retires and with it the last of
+# the 13 `jr $t2` stubs that were counted as game code. Text-only.
+# `libapi/c112` and `libcard/c112` are BYTE-IDENTICAL _bu_init objects; the
+# head chose libcard/c112 because every one of its neighbours here is libcard.
+3.3  libcard/a78    0x41358
+3.3  libcard/a74    0x41368
+3.3  libcard/a75    0x41378
+3.3  libcard/c112   0x41388
+3.3  libcard/a80    0x41398
+
+# code_171e0 SUFFIX (0x17930..0x179D8): libc2/strcat, the unit's LAST function
+# (strcat, 42w). It had been MATCHED AS C since round 8 and counted as game
+# code; it is Sony's, so this reclassifies one matched function out of the
+# game count. That is the correction CLAUDE.md asks for, not a regression --
+# and the round-8 report had already noticed the body reads as library
+# defensive code. Text-only; `place` derives no data line.
+3.3  libc2/strcat   0x17930
+
+# code_2cc8c_e, function #1 (0x3031C..0x303E4): libgs/gs_123, one function --
+# Gssub_make_matrix, the axis/sin/cos rotation-matrix builder, MATCHED AS C in
+# an earlier round and counted as game code. Reclassified, not regressed.
+# It owns jtbl_80011108, so its `.rdata` (0x1908, 0x8C) is the jump table
+# itself: `place` reports `bytes:not-found` for it, which is the expected
+# relocated-words case, and the derived offset lands exactly on the slot's
+# existing dlabel. Splitting the unit around it created src/code_2cc8c_e0.c
+# for func_8003FB0C, the one function in front of it.
+3.3  libgs/gs_123   0x3031C
+
+# code_2cc8c_e, functions #3..#7 (0x303F4..0x305B0): five objects tiling the
+# run exactly. ALL FOUR of the libgs/libgte functions that had been matched as
+# C are reclassified out of the game count, and one 20-word stall with a
+# 393-line report is retired:
+#   libgs/gs_111  (0x24)  GsDrawOt        (func_8003FBF4, matched C)
+#   libgs/gs_113  (0x58)  GsClearOt       (func_8003FC18, matched C)
+#   libgs/gs_108  (0x8C)  GsSetLightMode  (func_8003FC70, matched C) + .rdata
+#   libgte/fgo_00 (0x50)  TransposeMatrix (func_8003FCFC, 20w INCLUDE_ASM)
+#   libgte/fog_01 (0x64)  SetFogNear      (func_8003FD4C, matched C)
+# gs_111 and gs_112 are BYTE-IDENTICAL (GsDrawOt / GsDrawOtIO); the head chose
+# gs_111, the standard entry point. gs_108's `.rdata` is the string
+# D_80011194 ("not supported light mode %d\n"), 0x1D at 0x1994, byte search
+# agrees; it ends at 0x19B1 and the next slot starts at 0x19B4, so SUBALIGN(2)
+# needs a 3-byte `pad`. gs_111/gs_113 each carry a 0xA0 `.bss` that no
+# relocation names -- informational, the fragment handles bss.
+# Splitting the unit here created src/code_2cc8c_e1.c for func_8003FBE4.
+3.3  libgs/gs_111    0x303F4
+3.3  libgs/gs_113    0x30418
+3.3  libgs/gs_108    0x30470
+3.3  libgte/fgo_00   0x304FC
+3.3  libgte/fog_01   0x3054C

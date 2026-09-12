@@ -44,6 +44,10 @@ SECTIONS {
     .psyq_bss.libgs_gs_131_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_131.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
     .psyq_bss.libgs_gs_133_bss 0x8008E9B0 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_133.o(.bss) }   /* 0x40 bytes; first symbol GsWSMATRIX */
     .psyq_bss.libcd_iso9660_bss 0x8008B3F0 (NOLOAD) : SUBALIGN(2) { build/lib/libcd/iso9660.o(.bss) }   /* 0x2400 bytes; section-relative refs */
+    .psyq_bss.libgs_gs_123_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_123.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_111_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_111.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_113_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_113.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
+    .psyq_bss.libgs_gs_108_bss 0x8008E980 (NOLOAD) : SUBALIGN(2) { build/lib/libgs/gs_108.o(.bss) }   /* 0xA0 bytes; first symbol HWD0 */
     .psyq_shadow.libetc_intr_rdata 0x800106BC (NOLOAD) : SUBALIGN(2) { build/lib/libetc/intr.o(.rdata) }   /* shadow: bytes stay in splat's slot at 0xEBC */
 }
 dc_cr = 0x8008E224;   /* libpress/vlc2 */
@@ -136,6 +140,10 @@ GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_104 */
 GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_122 */
 GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_110 */
 GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_107 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_123 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_111 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_113 */
+GsLIGHTWSMATRIX = 0x8008E898;   /* libgs/gs_108 */
 StCHANNEL = 0x8008E8B8;   /* libcd/c_002 */
 StCHANNEL = 0x8008E8B8;   /* libcd/c_003 */
 StCHANNEL = 0x8008E8B8;   /* libcd/c_005 */
@@ -175,6 +183,10 @@ _LC = 0x8008E948;   /* libgs/gs_104 */
 _LC = 0x8008E948;   /* libgs/gs_122 */
 _LC = 0x8008E948;   /* libgs/gs_110 */
 _LC = 0x8008E948;   /* libgs/gs_107 */
+_LC = 0x8008E948;   /* libgs/gs_123 */
+_LC = 0x8008E948;   /* libgs/gs_111 */
+_LC = 0x8008E948;   /* libgs/gs_113 */
+_LC = 0x8008E948;   /* libgs/gs_108 */
 bs_curt = 0x8008E974;   /* libpress/vlc2 */
 CChannel = 0x8008E97C;   /* libcd/c_002 */
 CChannel = 0x8008E97C;   /* libcd/c_003 */
@@ -196,6 +208,10 @@ HWD0 = 0x8008E980;   /* libgs/gs_104 */
 HWD0 = 0x8008E980;   /* libgs/gs_122 */
 HWD0 = 0x8008E980;   /* libgs/gs_110 */
 HWD0 = 0x8008E980;   /* libgs/gs_107 */
+HWD0 = 0x8008E980;   /* libgs/gs_123 */
+HWD0 = 0x8008E980;   /* libgs/gs_111 */
+HWD0 = 0x8008E980;   /* libgs/gs_113 */
+HWD0 = 0x8008E980;   /* libgs/gs_108 */
 PadIdentifier = 0x8008E984;   /* libetc/pad */
 VWD0 = 0x8008E988;   /* libgs/gs_127 */
 VWD0 = 0x8008E988;   /* libgs/gs_119 */
@@ -207,6 +223,10 @@ VWD0 = 0x8008E988;   /* libgs/gs_104 */
 VWD0 = 0x8008E988;   /* libgs/gs_122 */
 VWD0 = 0x8008E988;   /* libgs/gs_110 */
 VWD0 = 0x8008E988;   /* libgs/gs_107 */
+VWD0 = 0x8008E988;   /* libgs/gs_123 */
+VWD0 = 0x8008E988;   /* libgs/gs_111 */
+VWD0 = 0x8008E988;   /* libgs/gs_113 */
+VWD0 = 0x8008E988;   /* libgs/gs_108 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_127 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_119 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_120 */
@@ -217,6 +237,10 @@ GsIDMATRIX = 0x8008E98C;   /* libgs/gs_104 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_122 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_110 */
 GsIDMATRIX = 0x8008E98C;   /* libgs/gs_107 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_123 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_111 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_113 */
+GsIDMATRIX = 0x8008E98C;   /* libgs/gs_108 */
 StFinalSector = 0x8008E9AC;   /* libcd/c_002 */
 StFinalSector = 0x8008E9AC;   /* libcd/c_003 */
 StFinalSector = 0x8008E9AC;   /* libcd/c_005 */
@@ -242,6 +266,10 @@ GsCLIP3far = 0x8008E9D8;   /* libgs/gs_104 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_122 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_110 */
 GsCLIP3far = 0x8008E9D8;   /* libgs/gs_107 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_123 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_111 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_113 */
+GsCLIP3far = 0x8008E9D8;   /* libgs/gs_108 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_127 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_119 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_120 */
@@ -252,6 +280,10 @@ GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_104 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_122 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_110 */
 GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_107 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_123 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_111 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_113 */
+GsIDMATRIX2 = 0x8008E9DC;   /* libgs/gs_108 */
 CLIP2 = 0x8008EA04;   /* libgs/gs_013 */
 CLIP2 = 0x8008EA04;   /* libgs/gs_010 */
 StEmu_Idx = 0x8008EA3C;   /* libcd/c_002 */
@@ -306,6 +338,10 @@ GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_104 */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_122 */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_110 */
 GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_107 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_123 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_111 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_113 */
+GsLIGHT_MODE = 0x800902E0;   /* libgs/gs_108 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_127 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_119 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_120 */
@@ -316,6 +352,10 @@ GsCLIP3near = 0x800902E4;   /* libgs/gs_104 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_122 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_110 */
 GsCLIP3near = 0x800902E4;   /* libgs/gs_107 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_123 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_111 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_113 */
+GsCLIP3near = 0x800902E4;   /* libgs/gs_108 */
 StEmu_Addr = 0x80090B70;   /* libcd/c_002 */
 StEmu_Addr = 0x80090B70;   /* libcd/c_003 */
 StEmu_Addr = 0x80090B70;   /* libcd/c_005 */
@@ -387,6 +427,8 @@ StRingSize = 0x80090C5C;   /* libcd/c_007 */
  * each is the address retail's own code calls. Once the defining object is
  * linked the pin still holds (a script assignment wins) and must agree. */
 SetDispMask = 0x80021078;
+ClearOTagR = 0x80021580;
+DrawOTag = 0x80021678;
 PutDispEnv = 0x800217E8;
 GsSetDrawBuffClip = 0x8002469C;
 GsSetDrawBuffOffset = 0x80024830;
@@ -415,8 +457,6 @@ _spu_t = 0x80038658;
 _spu_write = 0x80038900;
 _spu_FsetRXX = 0x800389F0;
 _spu_FsetRXXa = 0x80038A38;
-Gssub_make_matrix = 0x8003FB1C;
-TransposeMatrix = 0x8003FCFC;
 rcossin_tbl = 0x80066BE0;
 CD_cbsync = 0x8006D5FC;
 CD_cbready = 0x8006D600;

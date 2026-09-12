@@ -69,7 +69,7 @@ struct Node3bb8cE {
     SelfMethods3bb8cE *methods;   /* +0x000, func_8004EADC */
     u8 pad04[0x00C - 0x004];
     s32 unkC;              /* +0x00C, func_8004E5D4 sets it (caller value); func_8004E940 nonzero-tests it; func_8004EA38/func_8004ECCC forward it as func_8004F32C's arg1 */
-    s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to func_80050B18/func_80050B08/func_80050B28 */
+    s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to _card_info/_card_load/func_80050B28 */
     s32 threads[4];        /* +0x014..+0x020, func_8004E5E4: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
     u8 pad24[0x060 - 0x024];
     Res3bb8cE *unk60;      /* +0x060, tag 2 */
@@ -272,7 +272,7 @@ s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
     }
 }
 
-extern s32 func_80050B18(s32 arg0);
+extern s32 _card_info(s32 arg0);
 extern s32 func_80050B28(s32 arg0);
 
 s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
@@ -283,7 +283,7 @@ s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
     status = 1;
     *p2 = *p1 = 0;
     func_8004F3E4(self);
-    while (func_80050B18(self->unk10) == 0)
+    while (_card_info(self->unk10) == 0)
         ;
     code = func_8004F4A4(self);
     if (code == 0x100) {
@@ -298,7 +298,7 @@ s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
     return status;
 }
 
-extern s32 func_80050B08(s32 arg0);
+extern s32 _card_load(s32 arg0);
 
 s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
 {
@@ -308,7 +308,7 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
     status = 1;
     *p2 = (*p1 = 0, status);
     func_8004F3E4(self);
-    while (func_80050B08(self->unk10) == 0)
+    while (_card_load(self->unk10) == 0)
         ;
     code = func_8004F4A4(self);
     if (code == 0x100) {
@@ -322,7 +322,7 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
     return status;
 }
 
-extern s32 func_80050918(s32 *arg0);
+extern s32 format(s32 *arg0);
 
 s32 func_8004E940(Node3bb8cE *self)
 {
@@ -333,7 +333,7 @@ s32 func_8004E940(Node3bb8cE *self)
     retries = 10;
     do {
         path = self->unkC != 0 ? &D_8008AA9C : &D_8008AAA4;
-        result = func_80050918(path);
+        result = format(path);
     } while (result == 0 && retries-- != 0);
     return result;
 }
@@ -361,9 +361,9 @@ s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 }
 
 extern void *func_8004F32C();
-extern s32 func_80050938(void *arg0, s32 arg1);
-extern s32 func_80050928(s32 arg0, void *arg1, s32 arg2);
-extern s32 func_800508F8(s32 arg0);
+extern s32 open(void *arg0, s32 arg1);
+extern s32 read(s32 arg0, void *arg1, s32 arg2);
+extern s32 close(s32 arg0);
 
 /* STALL -- see docs/match-reports/func_8004EA38.md. Best reached: 1/41
  * words in-range, but with ZERO instruction-count drift (40 vs retail's
@@ -381,17 +381,17 @@ s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
     void *buf;
 
     path = func_8004F32C(pathBuf, self->unkC);
-    handle = func_80050938(path, 1);
+    handle = open(path, 1);
     if (handle == -1) {
         return 0;
     }
     if (destBuf != NULL) {
         buf = func_80017B34(0x80);
-        func_80050928(handle, buf, 0x80);
+        read(handle, buf, 0x80);
         strcpy((char *)destBuf, (char *)buf + 4);
         func_80017CFC(buf);
     }
-    func_800508F8(handle);
+    close(handle);
     return 1;
 }
 #endif
@@ -445,7 +445,7 @@ s32 func_8004EC5C(Node3bb8cE *self, u8 id, s32 sizeArg)
     return result;
 }
 
-extern s32 func_80050908(void *arg0);
+extern s32 delete(void *arg0);
 
 s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)
 {
@@ -456,11 +456,11 @@ s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)
 
     sectors = (u32)(sizeArg + 0x21FF) >> 13;
     path = func_8004F32C(pathBuf, self->unkC, &D_8008AAAC);
-    handle = func_80050938(path, (sectors << 16) | 0x200);
+    handle = open(path, (sectors << 16) | 0x200);
     if (handle == -1) {
         return 0;
     }
-    func_800508F8(handle);
-    func_80050908(pathBuf);
+    close(handle);
+    delete(pathBuf);
     return 1;
 }

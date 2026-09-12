@@ -1,4 +1,25 @@
-# func_8003FCFC -- STALL, MISFILED CLASS CORRECTED (return-type fix found, register residue narrower but not closed)
+# func_8003FCFC -- CONVERTED to a linked SDK object (round 34). NOT game code, NOT a stall.
+
+> **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
+> SONY'S OWN OBJECT `libgte/fgo_00.o` (Psy-Q 3.3) AND IS NAMED
+> `TransposeMatrix`.** Its 0x50 of text covers exactly these 20 words. The
+> `INCLUDE_ASM` is gone from `src/code_2cc8c_e.c`, the object sits in the yaml
+> at 0x304FC, and the whole image is byte-exact. **There is no stall left to
+> work and nothing here is assignable.**
+>
+> Round 32's head adjudication below called this correctly and named the
+> object; this round is only the mechanical conversion it prescribed.
+> `libgs/gs_131`, linked since round 33, already REFERENCED `TransposeMatrix`
+> by name -- `fgo_00` is what defines it, so the fragment loses a pinned
+> external and gains the real definition.
+>
+> **Everything below is kept as the derivation it was, not as live guidance.**
+> The reading of what the routine does -- a 3x3 transpose -- is accurate, and
+> round 32's own line that the analysis "is not wrong, it is aimed at the
+> wrong target" is the durable lesson: a screen measures the obstruction it
+> was built for and says nothing about the ones it was not.
+
+_Previously: func_8003FCFC -- STALL, MISFILED CLASS CORRECTED (return-type fix found, register residue narrower but not closed)_
 
 > **ROUND 32 (2026-09-12), head. THIS FUNCTION IS SONY LIBRARY CODE AND
 > CANNOT BE MATCHED BY WRITING C. DO NOT STAFF A RUNNER ONTO IT.**

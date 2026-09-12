@@ -1,161 +1,37 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-extern void *D_800902E4;
-
-void func_8003FB0C(void *a0) {
-    D_800902E4 = a0;
-}
-
-/* The PSX Psy-Q `MATRIX` -- `short m[3][3]; long t[3];`, 0x20 bytes (the 3x3
- * is 18 bytes, `t` lands at +0x14 on its own 4-alignment). The project's
- * include/psyq/ set does not DEFINE it (LIBGS.H uses the name without a
- * definition being present), so this is a unit-local view, kept next to the
- * code per the multiple-independent-local-views convention.
+/* ROUND 34: THIS UNIT LOST ITS FIRST EIGHT FUNCTIONS -- six of them to Sony,
+ * two to files of their own -- and now begins at 0x305B0 / func_8003FDB0.
+ * The segment it used to be is split three ways:
  *
- * `D_8008E98C` is the identity matrix this function copies as its base.
- * NOTE: include/class_3bb8c.h declares the SAME symbol as an unrelated
- * `QueryTemplate866E8` ("8 words, offsets 0x00-0x1C, first five opaque") for
- * func_8004C6A8's own reading. The two views agree on the bytes and are
- * consistent: that reading's opaque `unk0[5]` is this one's `m[3][3]` plus its
- * tail pad, and its `unk14`/`unk18`/`unk1C` are `t[0]`/`t[1]`/`t[2]`. Neither
- * declaration belongs in the other unit's header -- code_2cc8c_e does not
- * include class_3bb8c.h and must not start. */
-typedef struct Matrix2cc8c {
-    s16 m[3][3];
-    s32 t[3];
-} Matrix2cc8c;
-
-extern Matrix2cc8c D_8008E98C;
-
-void func_8003FB1C(Matrix2cc8c *dst, s16 sin, s16 cos, u8 axis) {
-    *dst = D_8008E98C;
-    switch (axis) {
-    case 'X':
-    case 'x':
-        dst->m[1][1] = cos;
-        dst->m[2][2] = cos;
-        dst->m[1][2] = -sin;
-        dst->m[2][1] = sin;
-        break;
-    case 'Y':
-    case 'y':
-        dst->m[0][0] = cos;
-        dst->m[2][2] = cos;
-        dst->m[0][2] = sin;
-        dst->m[2][0] = -sin;
-        break;
-    case 'Z':
-    case 'z':
-        dst->m[0][0] = cos;
-        dst->m[1][1] = cos;
-        dst->m[0][1] = -sin;
-        dst->m[1][0] = sin;
-        break;
-    }
-}
-
-extern void *D_8008E794;
-
-void func_8003FBE4(void *a0) {
-    D_8008E794 = a0;
-}
-
-extern void func_80021678(void *arg0); /* asm/psyq_10ee0.s, Psy-Q
-                                           library, not game code */
-
-void func_8003FBF4(Class6E99CObj *self) {
-    func_80021678(self->unk10);
-}
-
-extern void func_80021580(s32 stride, s32 mask); /* asm/psyq_10ee0.s,
-                                                     Psy-Q library, not game
-                                                     code */
-
-void func_8003FC18(s32 a0, s32 a1, TexPageDesc *desc) {
-    desc->width = a0 & 0xFFFF;
-    desc->height = a1 & 0xFFFF;
-    desc->size = (4 << desc->shift) + desc->stride - 4;
-    func_80021580(desc->stride, 1 << desc->shift);
-}
-
-extern s32 D_800902E0;
-extern void printf(const char *fmt, s32 arg1); /* libc2/printf,
-                                                           Psy-Q printf-like;
-                                                           declared locally
-                                                           with THIS call
-                                                           site's own arity
-                                                           (fmt + 1 vararg),
-                                                           same convention as
-                                                           code_8220.h's own
-                                                           independent
-                                                           extern for it */
-
-extern const char D_80011194[];
-
-void func_8003FC70(s32 mode) {
-    if (mode == 1) {
-        goto set;
-    }
-    if (mode < 2) {
-        if (mode == 0) {
-            goto zero;
-        }
-        goto err;
-    }
-    if (mode == 2) {
-        goto set;
-    }
-    if (mode == 3) {
-        goto set;
-    }
-    goto err;
-zero:
-    D_800902E0 = 0;
-    return;
-set:
-    D_800902E0 = mode;
-    return;
-err:
-    printf(D_80011194, mode);
-}
-
-
-
-#if 0
-s16 *func_8003FCFC(s16 *src, s16 *dst) {
-    s32 t1, t2, t3;
-
-    t1 = src[0];
-    dst[0] = t1;
-    t2 = src[3];
-    t1 = src[6];
-    dst[1] = t2;
-    t3 = src[1];
-    dst[2] = t1;
-    t2 = src[4];
-    dst[3] = t3;
-    t1 = src[7];
-    dst[4] = t2;
-    t3 = src[2];
-    dst[5] = t1;
-    t2 = src[5];
-    dst[6] = t3;
-    t1 = src[8];
-    dst[7] = t2;
-    dst[8] = t1;
-    return dst;
-}
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8003FCFC);
-
-extern void SetDQA(s32 a0);
-extern void SetDQB(s32 a0);
-
-void func_8003FD4C(s32 a0, s32 a1) {
-    SetDQA((-(a0 * 5 * 64)) / a1);
-    SetDQB(0x1400000);
-}
+ *   [c code_2cc8c_e0]  func_8003FB0C          game code, own file
+ *   [o libgs/gs_123]   Gssub_make_matrix      was func_8003FB1C, matched C
+ *   [c code_2cc8c_e1]  func_8003FBE4          game code, own file
+ *   [o libgs/gs_111]   GsDrawOt               was func_8003FBF4, matched C
+ *   [o libgs/gs_113]   GsClearOt              was func_8003FC18, matched C
+ *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
+ *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
+ *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
+ *   [c code_2cc8c_e]   func_8003FDB0 onward   <- this file
+ *
+ * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
+ * INCLUDE_ASM stubs and its class, so every
+ * `INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", ...)` path below and every
+ * match report naming this unit stays valid. Only the two one-function heads
+ * needed new names.
+ *
+ * NEITHER RODATA SLOT IS OURS ANY MORE. jtbl_80011108 (0x1908) went with
+ * Gssub_make_matrix and D_80011194 (0x1994, "not supported light mode %d\n")
+ * went with GsSetLightMode -- both are their own object's `.rdata` section
+ * now. This unit needs no `.rodata` attach at all; if a future carve of it
+ * hits Gate 2's `undefined reference to '.LXXXXXXXX'`, that is a NEW jump
+ * table, not these.
+ *
+ * The six Sony bodies are gone from this file, not lost -- five matched C
+ * bodies and one INCLUDE_ASM stub. Each one's match report is kept and
+ * retitled CONVERTED, and carries its derivation verbatim.
+ */
 
 Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
     Class6E99CObj *self;
