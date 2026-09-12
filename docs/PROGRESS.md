@@ -6,6 +6,155 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-12 — round 35: five runners, ZERO matches, and a corpus-wide discovery that most preserved bodies no longer link
+
+**State at end: 983 matched / 1253 game functions (78.45% of game code) —
+IDENTICAL to round 34.** No function closed byte-exact. Queue 204 live
+`INCLUDE_ASM`, 203 documented stalls, `fresh` 1, blocker-clean near-misses 111
+(`gp_rel` 82, `nop_mflo_mfhi` 11). Build green after all five merges;
+re-extract changes zero committed bytes.
+
+**Read this entry for the findings, not the score.** A zero-match round is a
+real outcome and it is recorded as one — but the round's actual product was a
+measurement nobody had taken, plus one function moved out of a false blocker.
+
+### Gates
+
+Gate 0 green. Gate 1: `fresh` = 1. Two hygiene sweeps run and both came back
+CLEAN, which is itself worth recording so the next head does not re-run them
+blind: the `addiu_at` directive sweep over `src/*.c` found every hit already
+corrected (rounds 23-24 converged), and the contradiction sweep returned **0
+genuine stale verdicts in 25 hits** — every hit was a report *documenting that
+the screen is clean*. Gate 2: carve REJECTED on measurement — the best
+20-function window in the whole uncarved remainder is 3/20 clean, below the
+threshold the doc calls "a unit that cannot staff a runner"; `gp_rel` blocks 55
+of 66. Gate 3 folded into the runners rather than run separately.
+
+Five runners, all units with DISJOINT headers (`headercontention.py` clean), so
+all five merges were conflict-free.
+
+### The staffing call that did not pay, and the one that did
+
+`code_8220_c` was DROPPED despite ranking well — 9 functions at a uniform
+8-word residue with one shared cause. Every entry carries five rounds and heavy
+permuter history, the exhaustion pattern round 33 paid for on `code_55dd4`.
+That call looks right in hindsight for a different reason than it was made: the
+four units that WERE staffed on shallow history also produced no matches, so
+depth was not the discriminator this round. **Do not read this round as
+evidence that shallow-history ranking works; read it as evidence that the
+blocker-clean near-miss queue is harder than its titles suggest.**
+
+### The finding: preserved bodies go stale across SDK-object rounds, at scale
+
+Three runners hit this class independently, and one MEASURED it:
+
+- **delta** found `func_8004109C`'s recorded 42/56 had **never been measured**.
+  Its preserved body called `func_80013348`/`func_800411A8`, renamed to
+  `strlen`/`itoa` by round 34; it could not link, and funcdiff's staleness
+  guard fired. Corrected, it is a real 42/56 — then **49/56** with a new lever.
+- **echo** found four renames in one unit's three bodies (`func_80025900` ->
+  `VSync`, `puts`, `CheckCallback`, `printf`). All three reproduced their
+  round-26 scores exactly once corrected: the names were stale, the residues
+  were not.
+- **bravo** checked all five of its inherited bodies and found none stale — the
+  negative answer, which is what makes the positives above a class rather than
+  a coincidence.
+
+This is round 33's `SpuSetNoiseVoice` discovery recurring twice more, so it got
+a detector instead of another warning: **`python3 tools/stalesyms.py`**. It
+scans only `#if 0` blocks and ```c fences (whole-report scanning over-reports
+by roughly an order of magnitude, since a prose mention of an old name is
+harmless and usually accurate).
+
+**It reports 288 stale references across 158 reports.** Most recorded near-miss
+figures in this corpus are attached to bodies that will not link as written.
+
+Two calibrations, both measured, both in the tool's docstring:
+
+- A stale name does **not** invalidate the recorded residue. It means the
+  figure is UNVERIFIED until someone compiles it — not that it is wrong.
+- **A hit does not mean nobody noticed, and that is the trap.** Of the 158, 32
+  already document the rename in PROSE and still leave the BODY on the old
+  names. Both echo's and delta's own round-35 reports are in that group: they
+  fixed the names in the working tree to measure and the durable artifact kept
+  the un-linkable version. Such a report reads as though it were handled.
+
+The bodies were deliberately NOT bulk-fixed. Each correction needs a rebuild to
+confirm, and renaming 158 of them unverified would manufacture exactly the
+unverified-figure problem the tool exists to catch. That is next-round work,
+per function, with the tool in hand.
+
+### alpha: a blocker that retired for free
+
+`func_800357B0` had been stalled on "no independent corroboration" for nine
+cross-unit calls and an unresolved argument type. **Round 34's SDK conversion
+retired that blocker without touching the function** — every one of those calls
+is now a real `libsnd` symbol (`SsUtGetVagAtr`, `SsUtReverbOn`,
+`_SsUtBuildADSR`, …). Rewritten from the disassembly against the real
+signatures it reaches **163/179, length exact, zero drift**, residue a single
+`channel`/`arg5` register-identity swap.
+
+This is the mirror image of the staleness finding above and belongs next to it:
+**an SDK-object round can UNBLOCK a report as silently as it breaks a body.**
+Neither direction is visible to any screen, and neither announces itself in the
+report that is now wrong.
+
+alpha also corrected its local `SsUt*` externs toward Sony's own `LIBSND.H`
+signatures (`SsUtSetReverbDepth` `s32` -> `s16`; `Get/SetVagAtr` arg2 `u8` ->
+`s16`). The unit does not include `LIBSND.H` — the references to it are
+comments — so there is no conflicting-types risk, and the green build confirms
+it.
+
+### Negative levers, worth their cost
+
+Eighteen documented negatives across the five units. The ones that generalise:
+
+- Plain C89 `register` (the LEGAL form, no `asm("$N")`) is a **no-op** for
+  allocation on this pipeline — inert, not untried (charlie).
+- A clobber-bearing `__asm__` barrier is no better than an empty one at
+  suppressing `fill_eager_delay_slots`; GCC discards both before the scheduler
+  runs (charlie).
+- `__asm__("")`'s effect is **not consistent across siblings in one residue
+  class** — regressive on one, inert on another. Re-measure per function (delta).
+- A dummy unused local cannot nudge frame allocation: dead-code-eliminated
+  before register allocation sees it (bravo).
+- A same-valued alias is collapsed by copy-propagation before value-numbering
+  runs; an algebraic identity rewrite (`-(b-a)` vs `a-b`) is transparent to it
+  (bravo).
+- Narrowing a cast-local's lexical SCOPE does not help when its LIVE RANGE
+  still crosses a call — different axes (charlie).
+
+### The one positive lever
+
+**Relative declaration order of sibling VLAs shifts `global_alloc`'s register
+priority for unrelated NON-VLA locals**, without changing any source-level ref
+count. Declaring `padded` before `text` put two of four permuted registers onto
+retail's choice and moved `func_8004109C` 42 -> 49/56 (delta). Worth trying on
+any VLA-bearing register-identity stall before accepting the verdict.
+
+Also: a permuter scaffold seeded from a WHOLE FILE pulls in sibling functions'
+live `INCLUDE_ASM` bodies and inflates the base score by orders of magnitude.
+Seed minimally. A nonzero-stack-diff rejection is worth re-testing with a
+minimal seed — but agreement between minimal and large seeds means the
+rejection is real (alpha, on `func_800351D0` and `func_80034690`).
+
+### Next move
+
+**Runners again, on the near-miss queue — but the first job is the 158 stale
+bodies.** Carving is measurably off (3/20 best window). The queue is 111
+blocker-clean, and `stalesyms.py` says a large share of their recorded figures
+are unverified, so the cheapest available work is: correct a body's symbols,
+rebuild, and record a figure that is real. Round 35 shows what that is worth —
+delta did it for one function and gained 7 words.
+
+**The escalation that would actually change the slope remains `gp_rel`** (82 of
+93 blocked queue functions, 55 of 66 uncarved). It is the operator's call and
+the `-G` experiment was already run and rejected; `nop_mflo_mfhi` (11) is the
+smaller one, and `addiu-at-blocker.md` argues it is the right mechanism at the
+wrong granularity — the same shape `addiu_at` had before round 21 fixed it with
+a decoupling flag. Untested. Operator escalation, not a head decision.
+
+
 ## 2026-09-12 — round 34: SDK conversion round — phase 2 done, 42 objects, 8 stalls retired, 68 "matched" functions were Sony's
 
 **State at end: 983 matched / 1253 game functions (78.45% of game code), up

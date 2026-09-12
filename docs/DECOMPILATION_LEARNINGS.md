@@ -5780,3 +5780,75 @@ Two calibrations, both measured rather than assumed:
 Do not bulk-fix the flagged bodies. Each correction needs a rebuild to confirm,
 and renaming them unverified would manufacture exactly the unverified-figure
 problem the tool exists to catch.
+
+## An SDK-object round can UNBLOCK a report as silently as it breaks a body (round 35)
+
+The section above records SDK renames breaking preserved bodies. The same
+rounds move the other way too, and that direction has no detector at all.
+
+`func_800357B0` was stalled on "no independent corroboration" for nine
+cross-unit calls and an unresolved argument type. Round 34's SDK conversion
+retired that blocker **without touching the function**: every one of those calls
+became a real `libsnd` symbol (`SsUtGetVagAtr`, `SsUtReverbOn`,
+`_SsUtBuildADSR`, ...). Rewritten from the disassembly against the real
+signatures it reaches 163/179, length exact, zero drift.
+
+Neither direction announces itself in the report that is now wrong, and neither
+is visible to any blocker screen. So after an SDK-object round, a stall whose
+verdict rests on "unknown callee" or "uncorroborated signature" is worth
+re-reading even though nothing in its own unit changed. This is the same
+staleness shape as `PARALLEL-RUNS.md`'s "a blocker's death invalidates every
+report that relied on it" -- the blocker here is just an SDK symbol rather than
+a toolchain construct.
+
+## Levers measured INERT on this pipeline (round 35)
+
+Eighteen documented negatives came out of round 35's five units. These six
+generalise past the function that produced them, and belong in the "already
+tried, do not re-derive" bucket rather than the "untried" one:
+
+- **Plain C89 `register`** (the LEGAL form -- no `asm("$N")`, so not the banned
+  lever) is a **no-op for allocation**. GCC 2.6.3 at `-O2` already treats
+  optimizable locals as implicit register candidates.
+- **A clobber-bearing `__asm__` barrier is no better than an empty one** at
+  suppressing `fill_eager_delay_slots`. GCC discards both before the delay-slot
+  scheduler runs.
+- **`__asm__("")`'s effect is NOT consistent across siblings in one residue
+  class** -- sharply regressive on one function, completely inert on its
+  neighbour in the same unit and the same class. Re-measure per function; do
+  not infer it from a sibling.
+- **A dummy unused local cannot nudge frame allocation** -- dead-code-eliminated
+  before register allocation sees it.
+- **A same-valued alias variable is collapsed by copy-propagation** before
+  value-numbering runs, so it is not an anti-CSE lever. Likewise an **algebraic
+  identity rewrite** (`-(b-a)` for `a-b`) is transparent to GCC 2.6.3's value
+  numbering.
+- **Narrowing a cast-local's lexical SCOPE does not help when its LIVE RANGE
+  still crosses a call.** Scope and live range are different axes and only the
+  second one drives the register cost.
+
+Note this does NOT make any of them permanently dead: a lever's negative is
+scoped to the state it was tested under, and round 33 closed three words with a
+lever a round-19 report had called inert, once an unrelated fix had moved the
+residue.
+
+## Sibling VLA declaration ORDER is a real register-allocation lever (round 35)
+
+The one POSITIVE lever of round 35. The relative declaration order of two
+sibling VLAs shifts `global_alloc`'s register priority for **unrelated,
+non-VLA** locals -- even though it changes no local's source-level reference
+count. Declaring `padded` before `text` put two of four permuted registers onto
+retail's choice and moved `func_8004109C` from 42/56 to 49/56.
+
+Worth trying on any VLA-bearing function whose residue is register identity,
+BEFORE accepting that verdict.
+
+## Seed the permuter MINIMALLY (round 35)
+
+A permuter scaffold seeded from a whole unit file pulls in sibling functions'
+live `INCLUDE_ASM` bodies and inflates the base score by orders of magnitude,
+which makes the search meaningless and the rejection uninterpretable.
+
+A nonzero-stack-difference rejection is worth re-testing once with a minimal
+seed before trusting it -- but when a minimal and a larger seed agree, the
+rejection is real and the residue is genuinely not a permuter target.
