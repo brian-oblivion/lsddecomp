@@ -257,3 +257,71 @@ same null result both times. Further attempts on this specific residue
 should assume the lever space of "reorder statements" and "local asm
 barriers" is exhausted and either escalate as a genuine toolchain-scheduling
 question or move on.
+
+---
+
+## Round 37 (2026-09-12, runner charlie): first-ever permuter search, two false leads, residue still open
+
+Re-measured before touching anything: rebuilt the exact preserved body above
+and reproduced **57/88 words, zero address drift**, byte-identical to rounds
+35 and earlier. This function was screened by the round's brief as
+never-searched (per-function permuter shape: exact length, high word-match,
+zero drift), so a scaffold was set up and sanity-checked (`--debug
+--stack-diffs`, base score 470 -- 6 register-diff, 4 reordering, 1 insertion,
+1 deletion penalty points, consistent with the delay-slot-hoist residue
+already on record).
+
+**Search** (`-j 6 --stop-on-zero --best-only --stack-diffs`, `timeout 900`):
+ran 66479 iterations before the bound expired (`rc=124`, captured on the very
+next command). No zero was reached. `--best-only` saved three local-best
+candidates (scores 268, 310, 311, all better than the base 470); **all three
+were tested through the full oracle and all three are false leads**:
+
+- **Score 268** wrapped the whole first branch in `do { ... } while (0);` --
+  semantically inert (the `goto staircase` still jumps out of the loop to
+  the same label), but it changed the compiled STACK FRAME (a different
+  register saved at a different prologue offset) and **regressed to 40/88
+  with 135807 bytes of real whole-image drift**. This is exactly the
+  "permuter score improvement that is really a wrong size" trap
+  CLAUDE.md/DECOMPILATION_LEARNINGS.md warn about -- the permuter's own
+  scorer does not see the frame-size change the way the real oracle does.
+- **Score 310** is not even semantically valid: it moved the `goto
+  staircase;` into the WRONG branch (the `unknwon_int_0x44 != 0` check,
+  making the following `return false;` dead code) and left the SECOND
+  branch's body empty, silently deleting the real `goto staircase` the
+  function depends on. Not tested through the oracle -- rejected on
+  inspection as a structurally invalid mutation, not a candidate at all.
+- **Score 311** introduced a second pointer, `new_var = this;`, assigned
+  only on the fallthrough path, then used `new_var` (not `this`) at every
+  site from that point through the `staircase:` label onward -- including on
+  the path that reaches `staircase:` via the EARLIER `goto`, which never
+  executes `new_var = this;` at all. This reads `new_var` uninitialized on
+  that path: a genuine undefined-behavior form, not the legitimate
+  register-forcing idiom that closed `func_80059D1C` this same round (there,
+  the duplicate local was assigned on EVERY path before use). Tested anyway
+  out of thoroughness: **regressed to 30/88**, confirming it is not a useful
+  lever even ignoring the UB.
+
+Per this project's own rule ("a permuter zero is a lead, not an answer" --
+and, a fortiori, a non-zero local-best is an even weaker one), all three were
+translated and verified rather than trusted from the permuter's own score,
+and none held up. `INCLUDE_ASM` restored; whole-image SHA1 verified green;
+`git diff --stat` empty against `main` at the point of this write-up.
+
+**Status: still STALL, 57/88, residue unchanged from round 35.** The
+`fill_eager_delay_slots` branch-target-duplication residue named in round 35
+remains open; this round's search did not find a form that avoids it.
+
+### Proposed learning (round 37)
+
+**A permuter local-best that is not zero deserves the SAME skepticism as a
+zero, and arguably more**, since by definition it hasn't reached the target
+and the permuter's scorer is measuring an already-imperfect proxy on top of
+an already-imperfect candidate. This round found three "improvements" over
+the base score and all three were either a real regression once measured
+through the full oracle (frame-size change invisible to the permuter's own
+metric) or not even a valid semantic transformation (a `goto` moved to the
+wrong branch, silently changing control flow) or relied on reading an
+uninitialized variable. None of this is visible from the permuter's score
+number alone -- only from reading the actual diff and, for anything that
+looks plausible, running it through `./build-and-verify.sh`.
