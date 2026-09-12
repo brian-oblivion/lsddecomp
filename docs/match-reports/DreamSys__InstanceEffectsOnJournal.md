@@ -372,3 +372,69 @@ sweep of the whole `docs/match-reports/` corpus for titles missing the three
 figures, independent of this unit -- this round only touched the two the
 brief already named, but the trap is generic to any report older than round
 23.
+
+---
+
+## Round 37 continued: permuter search run, one candidate examined and rejected as a real regression
+
+**Search** (`-j 6 --stop-on-zero --best-only --stack-diffs`, `timeout 900`):
+ran 92452 iterations. No zero was reached. (`rc` could not be captured this
+run -- the `echo "permuter rc=$?" | tee -a` tail never landed in the log
+despite the background task reporting a clean exit; the iteration count and
+absence of an `output-0-*` directory are otherwise fully confirmed, and the
+total iteration count is consistent with the same ~900s bound as the other
+three searches this round, so this is read as `rc=124` by inference, not
+measurement -- flagged rather than asserted.)
+
+`--best-only` saved two local-best candidates (scores 80 and 120, both
+better than the base 180). **Both were examined; both are false leads, for
+two different reasons:**
+
+- **Score 120** relies on undefined behavior in the same shape
+  `func_8005A9CC.md` already found this round: it declares `new_var = entity`
+  inside `case 7:`'s fallthrough into `case 8:`, then reads `new_var` in
+  cases 9-12 -- separate switch targets reached via the jump table, NOT via
+  fallthrough from 7/8, so `new_var` is uninitialized on every path that
+  actually reaches those cases. Rejected on inspection, not tested.
+- **Score 80** targets exactly Residue 2 (case 4's vtable-dereference
+  ordering) with a permuter-native form of the same lever that closed
+  `func_80059D1C` this round: `new_var = entity;` unconditionally before the
+  switch, then `slot0x38(new_var, this)` instead of `slot0x38(entity, this)`
+  at case 4. **Translated and run through the full oracle -- and this is the
+  interesting negative result.** `funcdiff.py`'s outside-range drift
+  collapsed from 134342 bytes to **1 byte** (the function is now the full
+  110 words long, closing the length gap entirely), but the realigned
+  `asm-differ` view shows this did NOT reduce the true residue count. GCC
+  hoisted the now-unconditional `new_var = entity` assignment into the empty
+  delay slot after the earlier `beqz` (the switch bounds check) rather than
+  leaving it where case 4's block needs it -- a real instruction retail does
+  not have, immediately followed by the ORIGINAL orphan `move a0,s1` at
+  0x4b88c now being gone (netting the same total instruction count) but at
+  the cost of a NEW register mismatch at 0x4b890 (`lw v0,0(a0)` vs
+  `lw v0,0(s1)`). Counting every diff marker in the realigned output: this
+  candidate has residue 1 (3 words, unchanged) PLUS one insertion, one
+  deletion, and one new register mismatch at the case-4 boundary -- net
+  **worse** than the established 106/110, even though `funcdiff`'s raw
+  in-range count (98/110) and near-zero outside-range drift both look like
+  improvements at a glance. Reverted; `INCLUDE_ASM` restored; whole-image
+  SHA1 verified green.
+
+**Status: still STALL, 106/110 (via asm-differ), residue unchanged.**
+
+### Proposed learning (round 37, continued)
+
+**Eliminating a function's LENGTH mismatch (the address-drift trap this
+report itself is built around) is not the same axis as eliminating its
+WORD-count residue, and a permuter candidate can improve one while making
+the other worse.** This candidate looked like a clear win by two different
+proxies at once -- `funcdiff`'s drift warning nearly vanished, and its raw
+in-range count went from a misleadingly-low 15/110 to a much healthier-
+looking 98/110 -- and was still a net regression once counted against the
+real oracle via `asm-differ`'s realignment. The lesson from the existing
+"four ways a score lies" list generalizes one step further: a permuter
+candidate can look better on BOTH of funcdiff's own signals (drift AND raw
+count) simultaneously while being worse on the metric that actually matters
+(total instructions that differ from retail). `asm-differ`'s realigned
+count, not `funcdiff`'s raw window, remains the only trustworthy read for
+any function with a length mismatch -- true before this round's permuter
+search and still true of its output.
