@@ -38,4 +38,13 @@
 
 #include "common.h"
 
+/* ROUND 36 (runner charlie): re-verified round 32's preserved 9/12 body
+ * after round 34's SDK-object rename retargeted its two callees.  The old
+ * names (func_80050B98/func_80050B58) no longer exist in this tree;
+ * corrected to `_new_card`/`_card_write` (config/symbols.slps01556.lsdde.txt)
+ * and rebuilt -- measured 9/12, exact length, no drift, identical to round
+ * 32's recorded figure.  Confirmed genuinely stalled (li-encoding residue is
+ * toolchain-unreachable, frame-offset residue resists all tried levers, see
+ * the match report). Restored to INCLUDE_ASM per the no-score-short-of-
+ * byte-exact rule; the corrected, linkable body is preserved in the report. */
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_v", func_80050B28);
