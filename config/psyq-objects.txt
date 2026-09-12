@@ -345,3 +345,16 @@
 # select_max_param 50w). Both .bss-only -- nothing goes in the yaml for data.
 3.3  libgs/gs_131   0x2FAAC
 3.3  libgs/gs_133   0x30048
+
+# ROUND 34 -- class_3bb8c_h (0x410E8..0x41148): the six BIOS-vector-0xB0 file
+# trampolines, `addiu $t2,$zero,0xB0 / jr $t2 / addiu $t1,$zero,N`. Each is its
+# own 0x10-byte libapi object and the six tile the segment exactly, so the
+# whole `asm` segment retires. Text-only, no data sections. This also retires
+# the long-standing `hasm`-vs-`.word` question for these six: no C had to
+# compile to a `jr $t2`, because Sony shipped the object.
+3.3  libapi/a51     0x410E8
+3.3  libapi/a54     0x410F8
+3.3  libapi/a69     0x41108
+3.3  libapi/a65     0x41118
+3.3  libapi/a52     0x41128
+3.3  libapi/a50     0x41138

@@ -1829,15 +1829,22 @@ struct BasicMethods866E8F {
 };
 extern BasicMethods866E8F *func_80018390(void);
 
-/* Uncarved library helpers reached by func_8004EDC0/func_8004EEA0/
- * func_8004EF6C (a CD-stream open/read/seek/close family) -- typed purely
- * from these call sites' own register usage, no other unit's evidence. */
-extern s32 func_80050938(char *path, s32 mode);          /* open by path, returns a handle or -1 */
-extern s32 func_80050928(s32 handle, void *buf, s32 size); /* read `size` bytes into `buf` */
-extern s32 func_800508E8(s32 handle, s32 pos, s32 whence); /* seek */
-extern s32 func_800508F8(s32 handle);                       /* close */
+/* ROUND 34: five of the six prototypes that used to sit here were the PSX
+ * BIOS file trampolines, and they are Sony's -- `open`/`read`/`lseek`/
+ * `close`/`delete`, now linked from libapi/a50,a52,a51,a54,a69. They are gone
+ * from this SHARED header deliberately, not lost. CLAUDE.md's rule: a
+ * prototype for a function ANOTHER unit defines -- here, a Sony object --
+ * belongs in the `.c` that calls it. Under Sony's names that matters more,
+ * not less: `open`/`read`/`close` are generic enough that a future
+ * include/psyq prototype (measured 2026-09-12: none of the shipped headers
+ * declares them today, only comments and O_* macros) would collide in
+ * whichever of the eleven including units pulled both in first, and the two
+ * real callers already disagree about the first argument's type.
+ * Each caller now carries its own local `extern` with its own argument shape
+ * -- see src/class_3bb8c_f.c and src/class_3bb8c_e.c.
+ *
+ * func_800507F8 stays: it is game code (gp_rel-blocked), not a trampoline. */
 extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
-extern s32 func_80050908(void *arg0);                          /* func_8004EF6C */
 
 /* -------------------------------------------------------------------
  * class_3bb8c_m additions below (fourth 20-function slice of the tail,

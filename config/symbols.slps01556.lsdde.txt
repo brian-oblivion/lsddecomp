@@ -372,6 +372,17 @@ scale_view_param = 0x8003F674; // type:func  (Psy-Q libgs/gs_131, from the SDK o
 select_max_param = 0x8003F764; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
 len_param = 0x8003F82C; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
 GsGetLw = 0x8003F848; // type:func  (Psy-Q libgs/gs_133, from the SDK object)
+// class_3bb8c_h's six BIOS-vector-0xB0 file trampolines, converted to linked
+// SDK objects in round 34.  One libapi object each; Sony's own exported names,
+// read out of the object symbol tables.  `open`/`read`/`close`/`delete`/
+// `format`/`lseek` are ordinary C identifiers here -- this is C89 under
+// -fno-builtin, and nothing else in the corpus claims them.
+lseek = 0x800508E8; // type:func  (Psy-Q libapi/a51, from the SDK object)
+close = 0x800508F8; // type:func  (Psy-Q libapi/a54, from the SDK object)
+delete = 0x80050908; // type:func  (Psy-Q libapi/a69, from the SDK object)
+format = 0x80050918; // type:func  (Psy-Q libapi/a65, from the SDK object)
+read = 0x80050928; // type:func  (Psy-Q libapi/a52, from the SDK object)
+open = 0x80050938; // type:func  (Psy-Q libapi/a50, from the SDK object)
 // class_3bb8c_u's three functions, converted to linked SDK objects in round
 // 33.  These are Sony's own exported names, read out of the object symbol
 // tables, not guesses -- see the PROVENANCE note at the top of this file.

@@ -1232,7 +1232,24 @@ segments:
       #
       # Doing it means updating THREE files in one step -- this yaml,
       # .gitignore, and .claude/hooks/block-asm-edits.sh -- per HARD RULE 4.
-      - [0x410E8, asm, class_3bb8c_h]
+      #
+      # ROUND 34 (2026-09-12): EVERYTHING ABOVE IS HISTORICAL FOR THESE 13.
+      # The `hasm`-vs-`.word` question is RETIRED for all three trampoline
+      # segments (class_3bb8c_h, _h_b, _h_c) -- retired, not answered. The
+      # trampolines are SONY'S: each one is a whole libapi/libcard object in
+      # its own right, and they now link from the SDK objects like any other
+      # library code, so no C and no authored asm ever had to compile to a
+      # `jr $t2`. The reasoning above (use `hasm`, not `.word`; the
+      # disposition generalises to 34 trampolines) still stands for the other
+      # 21, which sit in `psyq_*` segments -- but they are library code by
+      # construction too, so the same remedy is the first thing to try there.
+      # Six objects, 0x10 bytes each, tiling 0x410E8..0x41148 exactly:
+      - [0x410E8, o, libapi/a51]        # lseek   (was func_800508E8)
+      - [0x410F8, o, libapi/a54]        # close   (was func_800508F8)
+      - [0x41108, o, libapi/a69]        # delete  (was func_80050908)
+      - [0x41118, o, libapi/a65]        # format  (was func_80050918)
+      - [0x41128, o, libapi/a52]        # read    (was func_80050928)
+      - [0x41138, o, libapi/a50]        # open    (was func_80050938)
       #
       # ROUND 27 (head): THE CLAIM ABOVE IS WRONG, AND THE SPAN IS NOW SPLIT.
       # "All 13 `jr $t2` PSX BIOS trampolines live in exactly this span and

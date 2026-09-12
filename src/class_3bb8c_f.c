@@ -13,6 +13,20 @@ s32 func_8004F4C8(s32 *arr, s32 count);
 s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
 s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7);
 
+/* PSX BIOS file trampolines, linked from Sony's own objects since round 34
+ * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
+ * to live as `func_8005xxxx` prototypes in include/class_3bb8c.h; they are
+ * LOCAL here on purpose, because a shared header eleven units include is the
+ * wrong place for names this generic, and because class_3bb8c_e.c's view of
+ * `open` takes a `void *` where this unit's takes a `char *`. Two local
+ * views are legitimate; one shared declaration would not be.
+ * These are C89 identifiers under -fno-builtin, nothing else claims them. */
+extern s32 open(char *path, s32 mode);            /* B(0x32) */
+extern s32 read(s32 handle, void *buf, s32 size); /* B(0x34) */
+extern s32 lseek(s32 handle, s32 pos, s32 whence);/* B(0x33) */
+extern s32 close(s32 handle);                     /* B(0x36) */
+extern s32 delete(void *path);                    /* B(0x45) */
+
 s32 func_8004ED40(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     s32 count;
     s32 result;
@@ -36,18 +50,18 @@ s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     u8 raw;
 
     path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, suffix);
-    handle = func_80050938(path, 1);
+    handle = open(path, 1);
     if (handle == -1) {
         return 0;
     }
     hdr = func_80017B34(0x80);
-    func_80050928(handle, hdr, 0x80);
+    read(handle, hdr, 0x80);
     raw = ((u8 *)hdr)[2];
     seekPos = (raw << 7) - 0x780;
     func_80017CFC(hdr);
-    func_800508E8(handle, seekPos, 0);
-    func_80050928(handle, outBuf, outSize);
-    func_800508F8(handle);
+    lseek(handle, seekPos, 0);
+    read(handle, outBuf, outSize);
+    close(handle);
     return 1;
 }
 
@@ -162,16 +176,16 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
 
     payload = arg6;
     path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, (char *)a1);
-    func_80050908(path);
+    delete(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
-    fileHandle = func_80050938(path, openMode);
+    fileHandle = open(path, openMode);
     flagCopy = a3;
     if (fileHandle == -1) {
         printf(D_80011530);
         return 0;
     }
-    func_800508F8(fileHandle);
-    fileHandle = func_80050938(path, 2);
+    close(fileHandle);
+    fileHandle = open(path, 2);
     if (fileHandle == -1) {
         return 0;
     }
@@ -190,7 +204,7 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
     write(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
     func_80017CFC(req);
     write(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
-    func_800508F8(fileHandle);
+    close(fileHandle);
     return 1;
 }
 #endif
