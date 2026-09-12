@@ -6,6 +6,112 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-12 — round 34: SDK conversion round — phase 2 done, 42 objects, 8 stalls retired, 68 "matched" functions were Sony's
+
+**State at end: 983 matched / 1253 game functions (78.45% of game code), up
+from 78.32% — while the matched COUNT fell 1051 -> 983 and the game
+denominator 1342 -> 1253.** Every one of the 89 functions that left the game
+count is now linked from a Sony object: 68 had been matched as C, 8 were
+INCLUDE_ASM stalls (851 words, ~3800 report lines), 13 were the uncarved BIOS
+trampolines. Queue 204 live `INCLUDE_ASM`, 203 documented stalls, `fresh` 1.
+Build green after every one of 14 conversion commits and both merges;
+re-extract changes zero committed bytes; `srcpath` (69 units), `psyq_sdk.py
+check` (178 objects) and `progress.py` (no stale-asm warning) all OK.
+
+### What this round was
+
+`docs/SDK-OBJECTS-RUNS.md` phase 2 — the placed objects inside GAME units.
+The queue at the start was 51 objects in 19 runs; at the end `runs` lists 4
+objects in 4 runs, all previously decided: the three `gs_00x` objects held for
+the operator (scattered static bss) and the `SUSPECT` `libsnd/ssinit_c` false
+placement. `python3 tools/sdkstalls.py` reports **no live stalled function
+overlaps a placed Sony object** — the category that round 32 discovered
+(14 stalls, 1669 words) and round 33 halved is closed.
+
+### Staffing — two runners plus the head, all conversion, no matching
+
+The RUNS doc's runner prompt is for pure `psyq_*` segments and none remained,
+so the head wrote a unit-split addendum (now in the RUNS doc) and handed the
+TEXT-ONLY game-unit runs to two Opus runners, one unit-set each, while doing
+the two data-bearing, cross-unit `libcd` runs itself on `main`:
+
+| who | runs | objects | reclassified matched C | stalls retired | new units |
+| --- | --- | --- | --- | --- | --- |
+| head | `strcpy`+`strstr`+`libcd/sys` (h/b); `libcd/iso9660`+`strcmp`+`strncmp` (g/d) | 6 | 28 | 6 (`CdControl` `CdControlF` `CdControlB` `CdSearchFile` `CD_newmedia` `CD_cachefile`) | — |
+| alpha | 21 `libsnd` objects in `code_179d8_f/_i/_j`, 6 runs | 21 | 34 | 1 (`_SsUtBuildADSR`) | `_f_b` `_i_b` `_j_b` `_j_c` |
+| bravo | 13 trampolines (`class_3bb8c_h/_h_b/_h_c` retired whole); `strcat`; `code_2cc8c_e`'s six `libgs`/`libgte` objects, 6 runs | 15 | 6 | 1 (`TransposeMatrix`) | `code_2cc8c_e0` `_e1` |
+
+Both runners converted every assigned run, one commit each, first build
+byte-exact on all but one; neither hit a `PARTIAL OVERLAP`, `SUSPECT`,
+`DISAGREE` or `NOTE:`. The only merge conflicts were the manifest appends,
+resolved by keeping both blocks as the RUNS doc says. Both worktrees were
+torn down after both had reported AND `git log main..runner/<name>` was
+empty — the round-33 error was not repeated.
+
+### The head's two runs, and what they needed
+
+1. **The first data-bearing game-unit conversion** (`libcd/sys`): a 5-byte
+   `.rdata` ("none") inside the `0xFD8` rodata slot needed a 3-byte `pad`
+   before the plain remainder; a 0x80 `.data` ended exactly where game data
+   begins. `code_179d8_b` is left with ONE function (`func_80029478`, which
+   still owns the `0x11F8` attach).
+2. **A WEAK duplicate definition, resolved with tooling** (`libcd/iso9660`):
+   the object defines its own `memcpy` and `libc2/memcpy` defines it GLOBAL;
+   retail has both. GNU ld binds to the GLOBAL, so linked as shipped the
+   object's own calls would go to the wrong copy — clean link, wrong bytes.
+   New manifest annotation `localize=memcpy` makes `install` run `objcopy -L`
+   on the copied object; `symbols` reports `LOCALIZED` instead of `CONFLICT`.
+   First build byte-exact. The manifest parser now takes any number of
+   `key=` tokens (`shadow=`, `localize=`).
+
+### Findings
+
+- **68 functions counted as matched game C were Sony's, and every one passed
+  every blocker screen.** Alpha's 34 alone included four from a carve-time
+  "WORKABLE (all four screens clean)" list. Round 33's lesson (a screen
+  measures the obstruction it was built for) holds at scale: `sdkstalls.py`
+  sees stalls, `runs` sees everything, and nothing else does.
+- **An attached rodata slot can stop existing rather than move.** The
+  `0x1908` jump table attached to `code_2cc8c_e` since round 14 is
+  `gs_123.o`'s own `.rdata`; table and code arrive in one object.
+- **The `hasm` question is retired, not answered**: all 13 game-side `jr $t2`
+  trampolines are `libapi`/`libcard` objects. The yaml note's reasoning
+  still applies to the 21 inside `psyq_*` remainders.
+- **Three disc choices are not "prefer 3.3"**: `ut_rev`/`pause` are 3.3
+  because 3.5/3.6's finer pieces do not tile; `next` is 3.5-only;
+  `vm_prog`/`ut_pb` are 3.6-only.
+- **Two splat traps**: a `;` inside a symbols-file COMMENT aborts `make
+  extract`; and `asm/data/<slot>.rodata.s` survives when a plain slot becomes
+  an object's section, where `progress.py` does not look.
+- **`lib/` is one symlinked directory shared by every worktree**; a
+  concurrent `install` can hand another runner's `ldfrag` a half-written
+  object (transient `ELFParseError`; re-run).
+- **Not reproduced**: alpha's claim that `symbols` only reports installed
+  objects. It reads every placed object from `match.txt`; the guide's step
+  order stands as written.
+
+### Process
+
+Both runner reports were checked against `git log`, the worktree status and
+`progress.py` before anything was merged; each summary's commit count matched
+its branch. The head's worktree-collision error from round 33 was avoided by
+the simplest means: nothing was written into a runner's worktree, and
+teardown waited for both reports. `main` is **84 commits ahead of
+`origin/main`** — no head has pushed since round 22 or so; PARALLEL-RUNS step
+7 says the head pushes. Left for the operator to say.
+
+### Next move
+
+**A matching round.** Conversion is finished as far as the discs allow: the
+remaining `runs` entries are the operator's (`gs_00x`) or false (`ssinit_c`),
+and phase 3 (naming the 427 functions no disc places from their shape-matched
+modules) only adds names. Gate 1b's near-miss corpus is intact and is now free
+of Sony code; `code_179d8_b` (one function), `class_3bb8c_v` (one function)
+and the new one-function units are assignable as single functions or folded
+into a neighbour's assignment. Uncarved game code is 66 functions.
+
+---
+
 ## 2026-09-12 — round 33: five SDK conversions, 818 words of unmatchable queue retired, and a misdiagnosed runner
 
 **State at end: 1051 matched / 1342 game functions (78.32% of game code), up

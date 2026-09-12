@@ -108,7 +108,8 @@ typedef struct StatBuf179D8H {
  * been a carved C unit since round 17, and `addiu_at` was RESOLVED in round
  * 21 (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md), which leaves
  * func_8002B640 blocker-clean and assignable (re-screened with
- * `python3 tools/nearmiss.py`, 2026-09-08). */
+ * `python3 tools/nearmiss.py`, 2026-09-08).  And THAT went stale in round
+ * 34: it is Sony's CdSearchFile, linked from the object, never matchable. */
 extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path);   /* lib/libcd/iso9660.o (round 34) */
 extern void printf(const char *fmt, void *arg1);
 extern char D_800107F4[];
@@ -117,8 +118,9 @@ extern char D_800107F4[];
  * order), but func_80028920 (earlier in ROM order) calls it. */
 char *func_800289CC(char *dest, char *suffix);
 
-/* func_800270B8, strcpy, strcat: still uncarved (code_171e0.c / this unit's
- * own later entries respectively) -- declared LOCAL, per-call-site typed. */
+/* func_800270B8 is code_171e0.c's; strcpy and strcat are Sony's
+ * (lib/libc2/strcpy.o, lib/libc2/strcat.o, linked since round 34) --
+ * declared LOCAL, per-call-site typed, never via a shared header. */
 extern char *func_800270B8(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);

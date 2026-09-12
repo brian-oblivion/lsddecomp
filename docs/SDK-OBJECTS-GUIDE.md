@@ -221,6 +221,16 @@ In `config/splat.slps01556.lsdde.yaml`:
 - `make extract`, then **delete the old `asm/psyq_xxx.s`** — extract does
   not remove top-level asm for a segment that no longer exists, and
   `progress.py` warns about it.
+  **The same happens under `asm/data/`** when a plain `rodata`/`data` slot
+  becomes an object's section: `asm/data/1994.rodata.s` survived the
+  `gs_108` conversion, and `progress.py` does NOT warn about that directory
+  (round 34). Harmless to the image, but delete it so the tree is honest.
+- **`lib/` in a runner worktree is a SYMLINK to the main checkout's `lib/`**,
+  shared by every worktree. `install` is additive (one `copyfile` per manifest
+  row, no sweep), so runners cannot remove each other's objects, but a
+  concurrent `install` can hand another runner's `ldfrag` a half-written
+  `.o` (`ELFParseError: expected 4, found 0`). Re-run; it is transient, not
+  corruption (bravo, round 34).
 - **splat can silently merge two functions into one `glabel` when the
   segment around them shrinks.** After `psyq_SpuSetMute`'s first chunk,
   `func_80038B18` (`libapi/a07`, four instructions ending `jr $t2` — a BIOS

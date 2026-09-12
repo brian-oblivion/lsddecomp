@@ -390,7 +390,31 @@ to span the object's bytes and the remainder (`D_80010840` covered 0x1040..
 referenced it; check with `grep -rn D_XXXXXXXX src asm/nonmatchings` first.
 
 After the head's two runs the Sony-owned share of the live stall queue was
-8 -> 2, both in the runners' hands. 137 objects linked.
+8 -> 2, both in the runners' hands; after theirs, `sdkstalls.py` reports **no
+live stalled function overlaps a placed Sony object**, and `runs` lists one
+placed object inside a game unit -- the `SUSPECT` `ssinit_c` false positive.
+178 objects linked. Runner findings worth keeping:
+
+- **Three disc choices that are not "prefer 3.3"**, all measured: `ut_rev` and
+  `pause` are the 3.3 objects because 3.5/3.6 split those modules finer and
+  the pieces do not tile; `libsnd/next` is 3.5-only; `libsnd/vm_prog` and
+  `libsnd/ut_pb` are **3.6-only**.
+- **An attached rodata slot can stop existing rather than move.**
+  `jtbl_80011108` (`0x1908`) was attached to `code_2cc8c_e` since round 14
+  because its `.L` words are local to `Gssub_make_matrix`'s `.s`. That table is
+  `libgs/gs_123.o`'s own `.rdata`, so table and indexing code now arrive in
+  one object and no label crosses a boundary in either direction; the tail
+  unit needs no attach at all.
+- **The trampolines' `hasm` question is retired, not answered.** All 13 `jr
+  $t2` stubs in `class_3bb8c_h/_h_b/_h_c` are `libapi`/`libcard` objects and
+  link as `o`; no C ever had to compile to one. The reasoning in the yaml
+  still applies to the 21 trampolines inside `psyq_*` remainders no disc
+  owns.
+- **Ownership at scale.** Of the 34 functions alpha's runs covered, 33 were
+  already MATCHED game code and every one passed every blocker screen;
+  bravo's `strcat` had been closed in round 8 by a report whose first
+  paragraph already called it library code. A blocker screen cannot see
+  ownership; `sdkstalls.py` (stalls) and `runs` (everything) can.
 
 ## What is next
 
