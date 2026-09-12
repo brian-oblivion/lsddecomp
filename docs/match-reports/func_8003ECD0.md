@@ -196,6 +196,59 @@ drift when this is the only in-progress edit** -- exactly reproducing the
 title figure. The residue is unchanged from the description above (the
 same 2-word `addiu`/`addu` pairing).
 
+### The corrected, LINKABLE body (head, round 36) — measured 71/73 in the current tree
+
+The prose above describes this rebuild; it did not carry the source, so the
+report still preserved only the pre-rename copies and `stalesyms.py` still
+flagged it. That is round 35's trap exactly — the names get fixed in the
+working tree to take the measurement, and the durable artifact keeps the
+version that cannot link. Spliced in place of the `INCLUDE_ASM` below, this
+builds and measures **71/73, no out-of-range drift**; the two differing words
+are the documented instruction-order residue at vram `0x8003ED18`/`0x8003ED1C`.
+
+```c
+#if 0
+extern void GsClearOt(s32 a0, s32 a1, s32 a2);
+extern void *func_80017B34(s32 size);
+
+void func_8003ECD0(Unk18Obj *self) {
+    s32 size;
+    s32 buf;
+
+    if (self->unk70 != 0) {
+        return;
+    }
+
+    size = self->unk48 * self->unk44 + (4 << self->unk3C) + 0x14;
+
+    buf = (s32)func_80017B34(size * 2);
+    if (buf == 0) {
+        return;
+    }
+
+    self->unk78 = buf;
+    self->unk80 = buf + 0x14;
+    self->unk88 = (4 << self->unk3C) + self->unk80;
+
+    self->unk7C = size + self->unk78;
+    self->unk84 = size + self->unk80;
+    self->unk8C = size + self->unk88;
+
+    *(s32 *)self->unk78 = self->unk3C;
+    *(s32 *)(self->unk78 + 4) = self->unk80;
+
+    *(s32 *)self->unk7C = self->unk3C;
+    *(s32 *)(self->unk7C + 4) = self->unk84;
+
+    GsClearOt(0, 0, self->unk78);
+    GsClearOt(0, 0, self->unk7C);
+
+    self->unk70 = 1;
+    self->unk74 = 0;
+}
+#endif
+```
+
 ### Permuter search: ~40,000 iterations, no zero, two spurious leads
 
 Per round 23's own verdict ("the next lever here is the permuter, not
