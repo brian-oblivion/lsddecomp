@@ -229,6 +229,107 @@ single-read case, but this function's TEN-reads-in-a-row case may need
 the pointer itself volatile-qualified to also block the CSE. Worth the
 first attempt for whoever picks this back up.
 
+## Round 37 (bravo) update: rebuilt, TWO STALE-SYMBOL BUGS FOUND AND FIXED, permuter searched for the first time
+
+Round 37's designated permuter-priority item 5, lowest priority per the
+round's own ordering (largest gap). Per the round's "build the inherited
+body before you trust its score" instruction, this exact preserved body
+was re-spliced into the live unit and rebuilt -- and this is the round-33
+lesson landing for real: **the splice did NOT link clean as written.**
+
+Two undefined references, both stale-symbol bugs, neither previously
+caught because this body had apparently never actually been linked since
+it was written:
+
+1. **`func_80032148` does not exist under that name any more.** It is
+   Sony's own `SpuVmVSetUp` (`code_179d8_c.c`'s own header comment: "round
+   32 then found it is Sony's ... see docs/match-reports/func_80032148.md"),
+   already declared and called with this exact signature
+   (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `func_8002F610` earlier in this
+   same file. Fixed by calling `SpuVmVSetUp(a1, a2)` instead.
+2. **`D_8008EA0D` is not a real symbol.** The disassembly reads it as
+   `lbu $v1, -0x17($s0)` where `$s0 = &D_8008EA24` -- a raw negative
+   offset off an already-materialized base, never a `%hi`/`%lo` pair of
+   its own, and it is referenced by name in NO other `asm/` file in the
+   project (unlike its neighbors `D_8008EA0C`, `D_8008EA1C`..`D_8008EA20`,
+   each of which IS referenced elsewhere and so already has a splat-
+   generated symbol). Consequently splat never created a linker symbol at
+   that address, and `extern u8 D_8008EA0D;` is an undefined reference at
+   link time, not a compile error -- so it would never have shown up in
+   the round's own compile-error grep, only in the linker-error grep
+   (`undefined reference`), which is exactly why this project's build
+   recipe checks for that pattern explicitly. Fixed by reading the same
+   address through the already-linkable `D_8008EA24` base pointer instead
+   of inventing a symbol for it: `*((u8 *) &D_8008EA24 - 0x17)`.
+
+**Neither bug is a regression in the DERIVATION -- the C's structural
+content, control flow and field accesses are unaffected -- both are
+symbol-naming bugs that could only be caught by actually linking the
+body**, which is precisely round 33's lesson this round's brief called out
+by name. With both fixed, **the title's length figure reconfirms exactly**:
+`objdump -t build/src/code_179d8_m.c.o` shows `func_8002FAC4` at `0x648`
+bytes = **402 words** (retail 387, 15 words LONG, exactly as titled).
+
+### Permuter search
+
+`tools/setup-permuter.sh func_8002FAC4 <seed>` -- seed built from this
+report's preserved body with both fixes above applied. See the Permuter
+result subsection for the base `--debug --stack-diffs` score and the real
+search's outcome (iteration count and `rc`). Lowest priority of the five
+per this round's own ordering (largest gap, 15 words), so the search here
+may be run with a shorter bound than the others if the round's time budget
+is tight by the time this function is reached.
+
+#### Permuter result
+
+`--debug --stack-diffs` base score: **15053** (Stack Differences 168 x
+weight 1 = 168 -- this one DOES show up, unlike the other four functions
+in this unit, consistent with this function's own report identifying a
+genuine differing register-SAVE SET at entry, not just an unaddressed
+reserved-space gap; Register Differences 117 x 5 = 585; Reorderings 10 x
+60 = 600; Insertions 76 x 100 = 7600; Deletions 61 x 100 = 6100; zero
+Branch differences) -- by far the largest base score of the unit's five
+functions, consistent with this being both the largest word-count gap (15)
+and the function with the most struct/global derivation.
+
+Given this is the round's lowest-priority target (largest gap, reached
+last) and the time already spent on the other four searches, this one ran
+with a **reduced `timeout 600`** (10 minutes) rather than the full 900,
+per this report's own note that a shorter bound is acceptable here if the
+round's budget is tight. **Completed cleanly, `rc=124`** (own bound) after
+**51,596 iterations**. Best score: **12471** (from base 15053), saved at
+`permuter-work/func_8002FAC4/output-12471-1/`; no zero reached. Given the
+base score's scale (15053, an order of magnitude above the other four
+functions' bases) and the modest fractional improvement in 51k iterations,
+this reads as consistent with the report's own "two residues, ~10-12 words
+plus ~2-3 words" diagnosis rather than a single tractable defect -- **not
+closed, and a deeper search would need a materially longer bound than this
+one to be informative given how little ground 51k iterations covered
+relative to the base score's scale.**
+
+### Proposed learning
+
+**A preserved near-miss body's own extern declarations can go stale in TWO
+different ways that this project's existing checks catch at different
+points, and only one of them is a compile error.** A renamed function
+(`func_80032148` -> `SpuVmVSetUp`) still compiles fine (implicit
+declaration) but fails at LINK time with `undefined reference` -- exactly
+what `tools/stalesyms.py` is for, and exactly the failure class this
+round's build-oracle recipe's `undefined reference` grep exists to catch
+rather than miss silently. A symbol that was never a real linker label at
+all (`D_8008EA0D`, reached in the real disassembly only as a raw offset
+from an already-named base pointer, never independently referenced
+anywhere else in `asm/`) fails the SAME way (`undefined reference`) for a
+different underlying reason -- no other `asm/` file happens to need a name
+for that exact address, so splat never minted one. Both present
+identically at the build oracle (a clean compile, then a linker error);
+distinguishing "renamed" from "never named" only matters for the fix
+(reuse a sibling unit's current name, vs. re-derive the byte offset from
+a neighboring symbol that IS real) -- and either way, this confirms
+`tools/stalesyms.py` (or an equivalent build-before-trust check) needs to
+run on EVERY preserved body before permuter time is spent on it, not just
+ones that look old.
+
 ## Preserved body (best attempt, 402/387 built words -- 15 long, structurally correct throughout except the two residues above)
 
 ```c
