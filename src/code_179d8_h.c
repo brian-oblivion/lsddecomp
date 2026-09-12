@@ -139,6 +139,16 @@ void *func_800288E0(UnkFlagsObj_171e0 *self) {
 void func_80028918(void) {
 }
 
+/* ROUND 36 (runner charlie): the round-17 preserved body (best 12/43,
+ * structural -- path-address CSE across the loop's calls, plus a
+ * register-role rotation, per docs/match-reports/func_80028920.md) spelled
+ * its two callees func_8002B640/func_80012C20, which round 34's SDK-object
+ * conversion retargeted to CdSearchFile/printf (already declared above,
+ * per-call-site typed for this unit). Corrected and rebuilt: reproduces the
+ * IDENTICAL structural residue (one extra cached-address instruction,
+ * confirmed via asm-differ) -- the previously recorded figure is now
+ * measured, not carried forward. Still genuinely stalled; restored to
+ * INCLUDE_ASM. The report carries the corrected, linkable body. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028920);
 
 char *func_800289CC(char *dest, char *suffix) {
@@ -176,6 +186,21 @@ extern s32 CdSync(s32 arg0, void *buf);
 extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
 extern s32 CdReadSync(s32 arg0, s32 arg1);
 
+/* ROUND 36 (runner charlie): the round-17 preserved body (best 8/56
+ * structural, via asm-differ realignment -- block-placement + a
+ * register-role rotation, per docs/match-reports/func_80028A84.md) spelled
+ * its four callees func_80028DF0/func_80028D68/func_80029274/func_80029254,
+ * which round 34's SDK-object conversion retargeted to
+ * CdControl/CdSync/CdRead/CdReadSync (already declared above, per-call-site
+ * typed for this unit). Corrected and rebuilt: reproduces the IDENTICAL
+ * structural residue (one extra word, same block-placement/register-role
+ * shape, confirmed via asm-differ) -- the previously recorded figure is now
+ * measured, not carried forward. Tried one additional, previously-untested
+ * reshape within budget -- writing the cold path as a single
+ * `return self->methods->slot48(self), 0;` expression instead of two
+ * statements -- identical compiled length and shape, no improvement.
+ * Still genuinely stalled; restored to INCLUDE_ASM. The report carries the
+ * corrected, linkable body. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A84);
 
 void func_80028B64(void) {
