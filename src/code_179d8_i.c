@@ -1,288 +1,66 @@
 /*
- * code_179d8_i -- functions 220..237 of the original code_179d8 monolith,
- * now 0x2397C..0x24938.  Carved round 21 (2026-09-06) as the FRONT slice of
- * the old code_179d8_tail; the remainder keeps both of that segment's switch
- * jump tables, so this unit owns no rodata.
+ * code_179d8_i -- what is LEFT of functions 220..237 of the original
+ * code_179d8 monolith after round 34 gave its whole PREFIX back to Sony.
+ * Now 0x24490..0x24938 (vram 0x80033C90..0x80034138).
  *
- * ROUND 33: the unit's first two functions LEFT. `libsnd/vs_vh.o` (Psy-Q 3.3)
- * straddles the old boundary at 0x23500 and owns SsVabFakeHead (0x80032D00,
- * which had been matched as C) and SsVabOpenHeadWithMode (0x80032D34, the
- * 274w INCLUDE_ASM), along with two functions that were in code_179d8_c_b.
- * The segment now starts at 0x2397C.
+ * ROUND 34 (2026-09-12): 0x2397C..0x24490 is TEN linked `libsnd` objects
+ * (all Psy-Q 3.3) covering ELEVEN functions, every one of which had been
+ * MATCHED as C:
+ *   0x8003317C SsUtGetVabHdr         libsnd/ut_gvh    (already carried Sony's name)
+ *   0x80033260 SsUtGetVagAtr         libsnd/ut_gva    (was func_80033260)
+ *   0x800334A0 SsSetMVol             libsnd/scsmvol
+ *   0x800334F0 SsUtGetProgAtr        libsnd/ut_gpa    (was func_800334F0)
+ *   0x800335FC SsVabTransBody        libsnd/vs_vtb
+ *   0x800336CC SsSetMute             libsnd/scsmute
+ *   0x8003370C SsVabTransCompleted   libsnd/vs_vtc
+ *   0x80033738 SsSeqCalledTbyT       libsnd/sscall    (157w)
+ *   0x800339AC Snd_pause             libsnd/pause
+ *   0x80033A4C Snd_nextpause         libsnd/pause
+ *   0x80033AB0 Snd_tempo             libsnd/tempo     (120w)
+ * Their C is DELETED, not commented out.  Reclassifying eleven matched
+ * functions out of the game count is the correction CLAUDE.md asks for, not a
+ * regression -- they were Sony library code the whole time.  Do not write C
+ * for any of them again; `python3 tools/sdkstalls.py` and
+ * `.venv/bin/python3 tools/psyq_sdk.py coverage` are the evidence.
  *
- * Blocker census at carve time (four screens, canonical shell forms):
- * 9 of 18 clean, 9 addiu-$at.  That census said of the nine "do not spend
- * attempts on them; they are the operator's call, not a matching problem."
+ * A pure PREFIX trim, so the unit kept its name and the `c` line simply moved
+ * to 0x24490.  There is a SECOND run inside what is left (`libsnd/replay` +
+ * `libsnd/vs_vab` at 0x247B8) -- see the yaml.
  *
- * THAT IS STALE AND ITS GROUND HAS ALREADY BEEN RECOVERED -- re-screened
- * round 23 (2026-09-07).  `addiu_at` was resolved in round 21 (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md) and all nine were matched
- * in the rounds that followed.  That round-23 note then said the unit's only
- * remaining queue was three blocker-clean functions -- func_80032D34 (274w),
- * func_80033260 (144w), func_80033C90 (202w) -- "ordinary large fresh ground,
- * not blocked", verified against both live screens with zero hits.
+ * `libsnd/pause` is taken from the 3.3 disc ON PURPOSE: 3.5/3.6 split that
+ * module into `pause` (0xA0) + `npause` (0x64), which is the same two
+ * functions but does not tile as one object.  `runs` says the same thing as
+ * "libsnd/pause supersedes libsnd/npause".
  *
- * ROUND 33 CORRECTION, AND IT IS THE INTERESTING HALF: that verification was
- * CORRECT and the conclusion was still wrong. func_80032D34 has no `gp_rel`
- * and no `mflo`/`mfhi` hazard because it is Sony's `SsVabOpenHeadWithMode`,
- * and a blocker screen cannot see ownership. It read as the cleanest and
- * largest piece of fresh ground in the unit while being unmatchable by
- * construction, and round 26 spent a 232-line derivation on it. Screen with
- * `python3 tools/sdkstalls.py` as well as `nearmiss.py` -- the latter now
- * runs the former for you.
+ * A STANDING NOTE THIS FILE CARRIED FOR SEVERAL ROUNDS IS NOW RESOLVED.  The
+ * func_80033260 comment said it could not be renamed to `SsUtGetVagAtr`
+ * because the name had no `= 0x8003....;` alias in
+ * config/symbols.slps01556.lsdde.txt, so INCLUDE_ASM'd callers in
+ * code_179d8_k.c and code_179d8_e.c carried a literal `jal func_80033260`,
+ * and "config/ is not this unit's to edit".  An SDK-object conversion edits
+ * exactly that file: Sony's names for all eleven are now in the symbols file
+ * and `make extract` rewrote every caller's `.s`.  The rename was mechanical.
  *
- * Two lessons, and the second is this comment about itself:
- *   - A screen measures the obstruction it was built for and says nothing
- *     about the ones it was not.
- *   - A carve-time census recorded as a DIRECTIVE outlives the thing it was
- *     measured against, and no tool can see it. This comment said so, about
- *     `addiu_at`, and then certified a Sony function as fresh ground in the
- *     very next sentence. Screen; do not trust a transcribed census, this
- *     one included.
+ * ROUND 33 CORRECTION, KEPT BECAUSE THE LESSON OUTLIVES ITS EXAMPLE.  This
+ * file's carve-time census certified func_80032D34 as "ordinary large fresh
+ * ground, not blocked" -- correctly, against both live blocker screens -- and
+ * it was Sony's `SsVabOpenHeadWithMode` all along; a 232-line derivation went
+ * into it.  A screen measures the obstruction it was built for and says
+ * nothing about the ones it was not, and a carve-time census recorded as a
+ * DIRECTIVE outlives the thing it was measured against.  Round 34 is the same
+ * finding at eleven times the scale: every function above passed every blocker
+ * screen and every one was unmatchable by construction.  Screen with
+ * `python3 tools/nearmiss.py` (which runs `sdkstalls.py` for you); do not
+ * trust a transcribed census, this comment included.
  *
- * Note also the `SsUtGetVabHdr` comment further down, which has said since
- * carve time that a function here "IS the SDK utility, not a coincidentally-
- * named local". That was the same finding, available for several rounds, in
- * prose no tool could read.
+ * Owns no rodata: zero `jtbl_` in its disassembly, and the yaml's rodata slot
+ * list names no `.rodata, code_179d8_i` line.  Both of the old
+ * code_179d8_tail's jump tables went to code_179d8_k.
  *
- * Expect this slice to span more than one class -- a ~20-function window cut
- * at ROM-address boundaries has no reason to align with class boundaries.
- * Identify each with tools/classtable.py rather than assuming the unit has
- * one.  Keep every function in strict ROM-address order.
+ * Keep every function in strict ROM-address order.
  */
 
 #include "common.h"
-
-/* Field layout matches VabHdr in include/psyq/LIBSND.H, which declares
- * `extern short SsUtGetVabHdr(short, VabHdr*);` -- strong evidence this
- * game-unit function IS the SDK utility, not a coincidentally-named local
- * one. Not #include-d directly: LIBSND.H's own `#include <sys/types.h>`
- * does not resolve under this pinned include path on a case-sensitive
- * filesystem (only uppercase SYS/TYPES.H exists), confirmed with cpp
- * (exit 33, "sys/types.h: No such file or directory"). Local copy of the
- * same 0x20-byte layout instead, per this project's independent-local-view
- * convention. */
-typedef struct {
-    s32 form;
-    s32 ver;
-    s32 id;
-    u32 fsize;
-    u16 reserved0;
-    u16 ps;
-    u16 ts;
-    u16 vs;
-    u8 mvol;
-    u8 pan;
-    u8 attr1;
-    u8 attr2;
-    u32 reserved1;
-} VabHdr;
-
-extern u8 D_8008EA2C[];
-extern VabHdr *D_8008E80C[];
-extern VabHdr *D_8008E970;
-
-short SsUtGetVabHdr(short vabId, VabHdr *hdr)
-{
-    VabHdr *vab;
-
-    if (D_8008EA2C[vabId] != 1) {
-        return -1;
-    }
-    vab = D_8008E80C[vabId];
-    hdr->form = vab->form;
-    hdr->id = vab->id;
-    hdr->ver = vab->ver;
-    hdr->ps = vab->ps;
-    hdr->ts = vab->ts;
-    D_8008E970 = vab;
-    hdr->vs = vab->vs;
-    hdr->mvol = vab->mvol;
-    hdr->pan = D_8008E970->pan;
-    hdr->attr1 = D_8008E970->attr1;
-    hdr->attr2 = D_8008E970->attr2;
-    return 0;
-}
-
-/* Field layout matches VagAtr in include/psyq/LIBSND.H, which declares
- * `extern short SsUtGetVagAtr (short, short, short, VagAtr*);` -- same
- * evidence pattern as SsUtGetVabHdr just above: this game-unit function
- * copies exactly VagAtr's non-reserved fields (skips reserved1/reserved2
- * at 0xE/0xF and reserved[4] at 0x18-0x1F) from a global VagAtr table.
- * Not #include-d directly for the same reason as VabHdr above (LIBSND.H's
- * own `#include <sys/types.h>` does not resolve here); local copy of the
- * same 0x20-byte layout instead. The third parameter is NOT sign-extended
- * on entry (unlike the first two) -- it is only ever used inside an
- * expression that gets truncated to 16 bits by the later index scale, so
- * the retail source evidently typed it wider than `short` despite the SDK
- * prototype, and the compiler had no need to narrow it early.
- *
- * Kept as func_80033260, NOT renamed to SsUtGetVagAtr like SsUtGetVabHdr
- * above it: unlike that function, this one has no `= 0x8003....;` alias in
- * config/symbols.slps01556.lsdde.txt, so five still-INCLUDE_ASM'd callers
- * in code_179d8_k.c and code_179d8_e.c carry a literal `jal func_80033260`
- * in their own retail .s text. Renaming the C definition breaks the link
- * for every one of them; config/ is not this unit's to edit. */
-typedef struct {
-    u8 prior;
-    u8 mode;
-    u8 vol;
-    u8 pan;
-    u8 center;
-    u8 shift;
-    u8 min;
-    u8 max;
-    u8 vibW;
-    u8 vibT;
-    u8 porW;
-    u8 porT;
-    u8 pbmin;
-    u8 pbmax;
-    u8 reserved1;
-    u8 reserved2;
-    u16 adsr1;
-    u16 adsr2;
-    s16 prog;
-    s16 vag;
-    s16 reserved[4];
-} VagAtr;
-
-extern VagAtr *D_8008E978;
-extern u8 D_8008EA13;
-extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-
-short func_80033260(short vabId, short prog, s32 tone, VagAtr *vagatr)
-{
-    s16 idx;
-
-    if (D_8008EA2C[vabId] == 1) {
-        SpuVmVSetUp(vabId, prog);
-        idx = tone + (D_8008EA13 << 4);
-        vagatr->prior = D_8008E978[idx].prior;
-        vagatr->mode = D_8008E978[idx].mode;
-        vagatr->vol = D_8008E978[idx].vol;
-        vagatr->pan = D_8008E978[idx].pan;
-        vagatr->center = D_8008E978[idx].center;
-        vagatr->shift = D_8008E978[idx].shift;
-        vagatr->max = D_8008E978[idx].max;
-        vagatr->min = D_8008E978[idx].min;
-        vagatr->vibW = D_8008E978[idx].vibW;
-        vagatr->vibT = D_8008E978[idx].vibT;
-        vagatr->porW = D_8008E978[idx].porW;
-        vagatr->porT = D_8008E978[idx].porT;
-        vagatr->pbmin = D_8008E978[idx].pbmin;
-        vagatr->pbmax = D_8008E978[idx].pbmax;
-        vagatr->adsr1 = D_8008E978[idx].adsr1;
-        vagatr->adsr2 = D_8008E978[idx].adsr2;
-        vagatr->prog = D_8008E978[idx].prog;
-        vagatr->vag = D_8008E978[idx].vag;
-        return 0;
-    }
-    return -1;
-}
-
-typedef struct {
-    s32 unk0;
-    s16 unk4;
-    s16 unk6;
-    u8 pad8[0x28 - 0x8];
-} UnkStruct_800334A0;
-
-extern void SpuSetCommonAttr(UnkStruct_800334A0 *arg);
-
-void func_800334A0(s16 a0, s16 a1)
-{
-    UnkStruct_800334A0 s;
-
-    s.unk0 = 3;
-    s.unk4 = a0 * 129;
-    s.unk6 = a1 * 129;
-    SpuSetCommonAttr(&s);
-}
-
-/* 0x10-byte-strided table shared with code_179d8_j.c's own SlotE968 local
- * view of the same D_8008E968 global (a pointer variable, not an array
- * symbol -- confirmed by the `lw` of its VALUE here, matching that file's
- * own `extern SlotE968 *D_8008E968;`). This unit's own reduced view names
- * only the fields this function touches. */
-typedef struct {
-    u8 unk0;
-    u8 unk1;
-    u8 unk2;
-    u8 unk3;
-    u8 unk4;
-    u8 pad5[0x6 - 0x5];
-    u16 unk6;
-    u8 pad8[0x10 - 0x8];
-} Entry8E968;
-
-extern Entry8E968 *D_8008E968;
-
-s16 func_800334F0(s16 a0, s16 a1, Entry8E968 *out)
-{
-    s16 idx;
-
-    if (D_8008EA2C[a0] == 1) {
-        idx = a1;
-        SpuVmVSetUp(a0, idx);
-        out->unk0 = D_8008E968[idx].unk0;
-        out->unk1 = D_8008E968[idx].unk1;
-        out->unk2 = D_8008E968[idx].unk2;
-        out->unk3 = D_8008E968[idx].unk3;
-        out->unk4 = D_8008E968[idx].unk4;
-        out->unk6 = D_8008E968[idx].unk6;
-        return 0;
-    }
-    return -1;
-}
-
-extern void SpuSetTransferMode(s32 a0);
-extern void SpuSetTransferStartAddr(s32 a0);
-extern void SpuWrite(s32 a0, s32 a1);
-extern void _spu_setInTransfer(s32 a0);
-extern u8 D_8008EA2C[];
-extern s32 D_80090BD4[];
-extern s32 D_80090B90[];
-
-s16 func_800335FC(s32 a0, s16 a1)
-{
-    s16 chan = a1;
-
-    if ((u16)a1 < 0x11 && D_8008EA2C[chan] == 2) {
-        s32 t = D_80090BD4[chan];
-        SpuSetTransferMode(0);
-        SpuSetTransferStartAddr(t);
-        SpuWrite(a0, D_80090B90[chan]);
-        D_8008EA2C[chan] = 1;
-        return chan;
-    }
-    _spu_setInTransfer(0);
-    return -1;
-}
-
-extern void SpuSetMute(s32 a0);
-
-void func_800336CC(u8 a0)
-{
-    s32 mode;
-
-    if (a0 != 0) {
-        if (a0 != 1) {
-            return;
-        }
-        mode = 1;
-    } else {
-        mode = 0;
-    }
-    SpuSetMute(mode);
-}
-
-extern s32 SpuIsTransferCompleted(s16 a0);
-
-s16 func_8003370C(s16 a0)
-{
-    return SpuIsTransferCompleted(a0);
-}
 
 /* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by two signed 16-bit indices. This is
@@ -317,152 +95,6 @@ typedef struct {
 } Entry90902E8;
 
 extern Entry90902E8 *D_800902E8[];
-
-extern s32 D_8008E934;
-extern s16 D_80090B68;
-extern s16 D_80090B6C;
-extern s32 D_8008EA00;
-
-extern void func_8002F700(void);
-extern s32 func_8003410C(s16 a0, s16 a1);
-extern void func_80036528(s32 a0, s32 a1);
-extern void func_80033AB0(s16 a0, s16 a1);
-extern void func_80033C90(s32 a0, s32 a1);
-extern void func_800339AC(s32 a0, s32 a1);
-extern void func_80033FB8(s32 a0, s32 a1);
-/* Sony's `Snd_stop` (`libsnd/stop`, Psy-Q 3.3), linked from the SDK object
- * since round 34. A local view: a Psy-Q prototype must never go into a header
- * this unit's siblings share. */
-extern void Snd_stop(s32 a0, s32 a1);
-
-void func_80033738(void)
-{
-    s32 screen;
-    s32 slot;
-    s32 flags;
-    s16 screen16;
-    s16 slot16;
-
-    if (D_8008E934 == 1) {
-        return;
-    }
-    D_8008E934 = 1;
-    func_8002F700();
-    for (screen = 0; screen < D_80090B68; screen++) {
-        if (!((1 << screen) & D_8008EA00)) {
-            continue;
-        }
-        for (slot = 0; slot < D_80090B6C; slot++) {
-            flags = D_800902E8[screen][slot].unk90;
-            if (flags & 1) {
-                screen16 = screen;
-                slot16 = slot;
-                func_8003410C(screen16, slot16);
-                flags = D_800902E8[screen][slot].unk90;
-                if (flags & 0x10) {
-                    func_80036528(screen16, slot16);
-                }
-                flags = D_800902E8[screen][slot].unk90;
-                if (flags & 0x20) {
-                    func_80033C90(screen16, slot16);
-                }
-                flags = D_800902E8[screen][slot].unk90;
-                if (flags & 0x40) {
-                    func_80033AB0(screen16, slot16);
-                }
-                flags = D_800902E8[screen][slot].unk90;
-                if (flags & 0x80) {
-                    func_80033AB0(screen16, slot16);
-                }
-            }
-            flags = D_800902E8[screen][slot].unk90;
-            if (flags & 2) {
-                func_800339AC((s16)screen, (s16)slot);
-            }
-            flags = D_800902E8[screen][slot].unk90;
-            if (flags & 8) {
-                func_80033FB8((s16)screen, (s16)slot);
-            }
-            flags = D_800902E8[screen][slot].unk90;
-            if (flags & 4) {
-                Snd_stop(screen, slot);
-                D_800902E8[screen][slot].unk90 = 0;
-            }
-        }
-    }
-    D_8008E934 = 0;
-}
-
-extern s32 func_8003069C(s32 a0);
-
-void func_800339AC(s32 a0, s32 a1)
-{
-    s16 sa0 = (s16)a0;
-    s16 sa1 = (s16)a1;
-    Entry90902E8 *p = &D_800902E8[sa0][sa1];
-
-    func_8003069C((sa1 << 8) | sa0);
-    p->unk2B = 0;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~2;
-}
-
-void func_80033A4C(s32 a0, s32 a1)
-{
-    s16 sa0 = (s16)a0;
-    s16 sa1 = (s16)a1;
-
-    D_800902E8[sa0][sa1].unk2B = 0;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x100;
-}
-
-extern u32 D_8009024C;
-
-void func_80033AB0(s16 a0, s16 a1)
-{
-    Entry90902E8 *e = &D_800902E8[a0][a1];
-
-    e->unkA0 -= 1;
-    if (e->unk44 > 0) {
-        if ((u32)e->unkA0 % (u32)e->unk44 != 0) {
-            return;
-        }
-        {
-            u32 new8C;
-
-            if (e->unk8C > e->unkA4) {
-                new8C = e->unk8C - 1;
-            } else if (e->unk8C < e->unkA4) {
-                new8C = e->unk8C + 1;
-            } else {
-                goto skip1;
-            }
-            e->unk8C = new8C;
-        skip1:;
-        }
-    } else {
-        if (e->unk8C > e->unkA4) {
-            e->unk8C += e->unk44;
-            if (e->unk8C < e->unkA4) {
-                e->unk8C = e->unkA4;
-            }
-        } else if (e->unk8C < e->unkA4) {
-            e->unk8C -= e->unk44;
-            if (e->unkA4 < e->unk8C) {
-                e->unk8C = e->unkA4;
-            }
-        }
-    }
-
-    e->unk70 = e->unk4A * (s32)e->unk8C * 10 / (D_8009024C * 60);
-    if (e->unk70 <= 0) {
-        e->unk70 = 1;
-    }
-
-    if (e->unkA0 == 0 || e->unk8C == e->unkA4) {
-        D_800902E8[a0][a1].unk90 &= ~0x40;
-        D_800902E8[a0][a1].unk90 &= ~0x80;
-    }
-}
 
 /* unk3E, unk40, unk42, unk78, unk7A, unk98 added to Entry90902E8 above,
  * in place of existing padding -- no existing field's offset changed.
@@ -573,6 +205,10 @@ void func_80033FB8(s32 a0, s32 a1)
 extern void SpuFree(s32 a0);
 extern s32 D_80090BD4[];
 extern s16 D_80090BD0;
+/* The per-VAB state byte table.  Its declaration used to ride along with
+ * SsUtGetVabHdr at the top of this file; that function is Sony's and left in
+ * round 34, so the declaration lives here now, at its only remaining user. */
+extern u8 D_8008EA2C[];
 
 void func_80034020(s16 a0)
 {
@@ -584,7 +220,7 @@ void func_80034020(s16 a0)
 }
 
 extern s16 SsVabOpenHead(void *a0, s16 a1);
-extern s16 func_800335FC(s32 a0, s16 a1);
+extern s16 SsVabTransBody(s32 a0, s16 a1);
 extern s32 D_80090C1C[];
 
 s16 func_800340B0(void *a0)
@@ -593,7 +229,7 @@ s16 func_800340B0(void *a0)
     s16 result = idx;
 
     if (idx != -1) {
-        result = func_800335FC(D_80090C1C[idx], idx);
+        result = SsVabTransBody(D_80090C1C[idx], idx);
     }
     return result;
 }

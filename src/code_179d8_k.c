@@ -497,22 +497,24 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
 
 /* A stack-local buffer this function passes to three cross-unit callees:
- * `func_800334F0(ch, byte, out)` (established elsewhere as
- * `s16 func_800334F0(s16, s16, Entry8E968 *)` in code_179d8_i.c, a
+ * `SsUtGetProgAtr(ch, byte, out)` (established elsewhere as
+ * `s16 SsUtGetProgAtr(s16, s16, Entry8E968 *)` in code_179d8_i.c, a
  * different unit's own reduced view -- this unit's own view only needs
- * `unk0`, an item count) fills the FIRST 0x10 bytes; `func_80033260` and
- * `SsUtSetVagAtr` (the former still unmatched with no established
- * prototype anywhere, the latter Sony's `libsnd/ut_sva`, linked from the
- * SDK object since round 34) are then called once per item with a pointer
- * to the NEXT 0x28
- * bytes of the SAME object.  Modeled as one struct, not two separate
+ * `unk0`, an item count) fills the FIRST 0x10 bytes; `SsUtGetVagAtr` and
+ * `SsUtSetVagAtr` are then called once per item with a pointer to the NEXT
+ * 0x28 bytes of the SAME object.  ALL THREE ARE SONY'S, linked from the SDK
+ * objects since round 34 -- `libsnd/ut_gpa`, `libsnd/ut_gva` and
+ * `libsnd/ut_sva`.  The signatures below stay as this call site's own reading
+ * (the return types and the second argument's width are what retail's code
+ * here uses); they are LOCAL views and must never move into a shared header
+ * next to include/psyq/LIBSND.H's real prototypes.  Modeled as one struct, not two separate
  * locals, because the loop's exit test re-reads `unk0` from memory on
  * every iteration even though nothing in this function's own source
  * writes it after the first call -- the per-item pointer passed to the
  * other two callees aliases the same object, so the compiler cannot prove
  * `unk0` is unchanged and must reload it. */
 typedef struct {
-    u8 unk0;    /* +0x00: item count, written by func_800334F0 */
+    u8 unk0;    /* +0x00: item count, written by SsUtGetProgAtr */
     u8 pad1[0x10 - 0x1];
 } NoteList_800349B0;
 
@@ -526,8 +528,8 @@ typedef struct {
     u8 pad9[0x20 - 0x9];
 } Scratch_800349B0;
 
-extern s16 func_800334F0(s16 a0, s16 a1, void *out);
-extern void func_80033260(s16 a0, u8 a1, s16 a2, void *out);
+extern s16 SsUtGetProgAtr(s16 a0, s16 a1, void *out);
+extern void SsUtGetVagAtr(s16 a0, u8 a1, s16 a2, void *out);
 extern void SsUtSetVagAtr(s16 a0, u8 a1, s16 a2, void *out);
 
 void func_800349B0(s16 a0, s16 a1, u8 a2)
@@ -538,9 +540,9 @@ void func_800349B0(s16 a0, s16 a1, u8 a2)
     Scratch_800349B0 scratch;
     s32 i;
 
-    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         scratch.unk8 = a2;
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
@@ -563,9 +565,9 @@ void func_80034AEC(s16 a0, s16 a1, u8 a2)
     Scratch_80034AEC scratch;
     s32 i;
 
-    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         scratch.unkB = a2;
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
@@ -590,9 +592,9 @@ void func_80034C28(s16 a0, s16 a1, s32 a2)
     s32 i;
     s32 wrap;
 
-    func_800334F0(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + (offset = rec->unk12))[0x2C], &list);
     for (i = 0; i < list.unk0; i++) {
-        func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         if ((u8)a2 < 0x40) {
             scratch.unk1 = 2;
         } else {
@@ -752,7 +754,7 @@ void func_80035154(s16 a0, s16 a1, u8 a2)
 
 /* func_800351D0's own construction of the scratch/argument blob that feeds
  * func_800357B0 -- see docs/match-reports/func_800357B0.md, which stalled
- * partly for lack of this derivation.  A single func_800334F0 fill at
+ * partly for lack of this derivation.  A single SsUtGetProgAtr fill at
  * function entry writes a LARGER-than-usual record here (count at +0, then
  * a 4-byte "header" pair of u16s and two more alignment-2 chunks used only
  * by the unk2A==2 dispatch below); Blk1/Blk2 exist purely to be whole-
@@ -769,7 +771,7 @@ typedef struct {
 } Blk2_800351D0;
 
 typedef struct {
-    u8 count;             /* +0x00: item count, func_800334F0's usual field */
+    u8 count;             /* +0x00: item count, SsUtGetProgAtr's usual field */
     u8 pad1[0x10 - 0x1];
     u16 hdrLo;            /* +0x10 */
     u16 hdrHi;            /* +0x12 */
@@ -778,7 +780,7 @@ typedef struct {
 } List_800351D0;
 
 /* Same per-item scratch role as NoteList_800349B0's sibling Scratch_* types
- * (filled by func_80033260, consumed by SsUtSetVagAtr); this call site's
+ * (filled by SsUtGetVagAtr, consumed by SsUtSetVagAtr); this call site's
  * own fields happen to share stack space with List_800351D0's tail fields
  * above since the two never have overlapping lifetimes at runtime (mutually
  * exclusive unk29==2 / unk2A==2 dispatch arms). */
@@ -801,7 +803,7 @@ extern void func_800357B0(s16 a0, s16 a1, s16 a2, u32 a3, Blk1_800351D0 blk1,
 /* STALL -- see docs/match-reports/func_800351D0.md. Compiled length 4 words
  * LONG (380/376, measured directly off build/src/code_179d8_k.c.o since
  * length has drifted). The whole 22-word RPN/NRPN dispatch skeleton, the
- * three func_80033260/SsUtSetVagAtr loops, and the func_800357B0 struct-
+ * three SsUtGetVagAtr/SsUtSetVagAtr loops, and the func_800357B0 struct-
  * marshaling (which also settles that function's own previously-unresolved
  * 4th-argument/scratch-layout question, see func_800357B0.md) all come out
  * byte-correct. The residue is two isolated dead-value computations
@@ -823,7 +825,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
     s16 i;
     u8 kind;
 
-    func_800334F0(rec->unk4C, p[0x2C], &list);
+    SsUtGetProgAtr(rec->unk4C, p[0x2C], &list);
 
     if (rec->unk27 == 1 && rec->unk10 == 0) {
         rec->unk28 = a2;
@@ -838,7 +840,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
     if (rec->unk29 == 2) {
         if (rec->unk13 == 0 && rec->unk14 == 0) {
             for (i = 0; i < list.count; i++) {
-                func_80033260(rec->unk4C, p[0x2C], i, &scratch);
+                SsUtGetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
                 scratch.unkC = a2 & 0x7F;
                 scratch.unkD = a2 & 0x7F;
                 SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
@@ -856,7 +858,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
                 unused = 0;
             }
             for (i = 0; i < list.count; i++) {
-                func_80033260(rec->unk4C, p[0x2C], i, &scratch);
+                SsUtGetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
                 scratch.unk5 = scratch.unk5;
                 SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
             }
@@ -869,7 +871,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
                 unused = 0;
             }
             for (i = 0; i < list.count; i++) {
-                func_80033260(rec->unk4C, p[0x2C], i, &scratch);
+                SsUtGetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
                 scratch.unk4 = scratch.unk4;
                 SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
             }

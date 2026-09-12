@@ -250,7 +250,24 @@ strstr = 0x80028BBC;
 CdStatus = 0x80028C34;
 new_class_6d940 = 0x8002C12C;
 SetRCnt = 0x80032B18;
-SsUtGetVabHdr = 0x8003317C;
+
+// ROUND 34 -- code_179d8_i prefix (0x2397C..0x24490): ten libsnd objects, the
+// VAB header/attribute getters, the master volume and mute setters, the VAB
+// transfer pair, the tick callback and the pause/tempo trio. Sony's own
+// exported names. `SsUtGetVabHdr` was already in this file as a hypothesis
+// (its only pre-round-34 entry in this address range); the object CONFIRMS it
+// at the same address, so the line is kept and merely annotated.
+SsUtGetVabHdr = 0x8003317C; // type:func  (Psy-Q libsnd/ut_gvh, from the SDK object)
+SsUtGetVagAtr = 0x80033260; // type:func  (Psy-Q libsnd/ut_gva, from the SDK object)
+SsSetMVol = 0x800334A0; // type:func  (Psy-Q libsnd/scsmvol, from the SDK object)
+SsUtGetProgAtr = 0x800334F0; // type:func  (Psy-Q libsnd/ut_gpa, from the SDK object)
+SsVabTransBody = 0x800335FC; // type:func  (Psy-Q libsnd/vs_vtb, from the SDK object)
+SsSetMute = 0x800336CC; // type:func  (Psy-Q libsnd/scsmute, from the SDK object)
+SsVabTransCompleted = 0x8003370C; // type:func  (Psy-Q libsnd/vs_vtc, from the SDK object)
+SsSeqCalledTbyT = 0x80033738; // type:func  (Psy-Q libsnd/sscall, from the SDK object)
+Snd_pause = 0x800339AC; // type:func  (Psy-Q libsnd/pause, from the SDK object)
+Snd_nextpause = 0x80033A4C; // type:func  (Psy-Q libsnd/pause, from the SDK object)
+Snd_tempo = 0x80033AB0; // type:func  (Psy-Q libsnd/tempo, from the SDK object)
 
 // ROUND 34 -- code_179d8_f prefix (0x2673C..0x26D28): six libsnd objects, the
 // ADSR packer/unpacker, the SsUtSetReverb* family, SsUtSetVagAtr, the two

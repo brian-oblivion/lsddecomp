@@ -103,8 +103,9 @@ extern EntryDAD4 *D_8006DAD4;
 
 /* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by a packed argument (slot in the
- * high byte, screen in the low byte) -- see code_179d8_i.c's own
- * func_800339AC, which builds exactly this packing before calling into
+ * high byte, screen in the low byte) -- see Sony's `Snd_pause`
+ * (`libsnd/pause`, linked since round 34; it was code_179d8_i.c's matched
+ * func_800339AC), which builds exactly this packing before calling into
  * this unit's func_8003069C. Reduced local view: only the two leading s16
  * fields this unit's own accessors touch are named. See code_179d8_f.c /
  * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
@@ -118,7 +119,8 @@ typedef struct {
 extern Entry90902E8 *D_800902E8[];
 
 /* Reentrancy lock, same identifier/type as the sibling reading in
- * code_179d8_i.c's func_80033738 -- "if already busy, return/skip;
+ * Sony's `SsSeqCalledTbyT` (`libsnd/sscall`, linked since round 34; it was
+ * code_179d8_i.c's matched func_80033738) -- "if already busy, return/skip;
  * set; ...; clear before returning" guarding a per-channel operation. */
 extern s32 D_8008E934;
 

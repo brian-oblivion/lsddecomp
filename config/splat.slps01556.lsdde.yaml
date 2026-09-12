@@ -840,7 +840,35 @@ segments:
       # rodata attach is NOT affected: it belongs to func_80032588, which is
       # not in this run.
       - [0x23498, o, libsnd/vs_vh]
-      - [0x2397C, c, code_179d8_i]
+      #
+      # ROUND 34: the unit's whole PREFIX, 0x2397C..0x24490, is TEN linked
+      # `libsnd` objects (all Psy-Q 3.3) covering ELEVEN functions -- EVERY one
+      # of which had been MATCHED as C.  Reclassifying them out of the game
+      # count is the correction, not a regression; no stall is retired here
+      # because there was no stall left in the run.  Text-only, and the unit
+      # still owns no rodata attach.  A pure prefix trim: the `c` line just
+      # moves to 0x24490 and the unit keeps its name.
+      #
+      # This run is the round-33 lesson four paragraphs up, at eleven times the
+      # scale: all eleven passed every blocker screen and all eleven were
+      # unmatchable by construction.  `tools/sdkstalls.py` is the screen that
+      # sees this one.
+      #
+      # `pause` is the 3.3 build ON PURPOSE -- 3.5/3.6 split that module into
+      # `pause` (0xA0) + `npause` (0x64), two objects where retail linked one,
+      # which is what `runs` means by "libsnd/pause supersedes libsnd/npause".
+      # `scsmvol`/`scsmute` are byte-identical to 3.6's `sssmv`/`sssm`.
+      - [0x2397C, o, libsnd/ut_gvh]     # SsUtGetVabHdr
+      - [0x23A60, o, libsnd/ut_gva]     # SsUtGetVagAtr
+      - [0x23CA0, o, libsnd/scsmvol]    # SsSetMVol
+      - [0x23CF0, o, libsnd/ut_gpa]     # SsUtGetProgAtr
+      - [0x23DFC, o, libsnd/vs_vtb]     # SsVabTransBody
+      - [0x23ECC, o, libsnd/scsmute]    # SsSetMute
+      - [0x23F0C, o, libsnd/vs_vtc]     # SsVabTransCompleted
+      - [0x23F38, o, libsnd/sscall]     # SsSeqCalledTbyT
+      - [0x241AC, o, libsnd/pause]      # Snd_pause, Snd_nextpause
+      - [0x242B0, o, libsnd/tempo]      # Snd_tempo
+      - [0x24490, c, code_179d8_i]
       # code_179d8_k: what was the `code_179d8_tail` remainder after the
       # code_179d8_i carve -- functions 238..255 of the original,
       # 0x24938..0x2673C (18 functions, func_80034138 .. func_80035E80).
