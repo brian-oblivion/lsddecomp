@@ -55,8 +55,12 @@
 extern void func_8002F610(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
 extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
 extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
-extern s32 func_80036044(void);                              /* code_179d8_f, MATCHED: return SpuSetReverb(0); */
-extern void func_80036518(void);                              /* code_179d8_f, MATCHED: D_8008E84C = 0; */
+/* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
+ * `vm_doff`. Both were carried as matched C in code_179d8_f.c until that
+ * unit's prefix was given back to Sony; these are local views, as a Psy-Q
+ * prototype must never go into a header this unit's siblings share. */
+extern s32 SsUtReverbOff(void);
+extern void SpuVmDamperOff(void);
 
 /* A 172 (0xAC)-byte record; D_800902E8 is an array of pointers to arrays of
  * these, indexed [channel][slot]-style, same array documented from
@@ -77,7 +81,7 @@ extern void func_80036518(void);                              /* code_179d8_f, M
  * their address is only known at runtime, exactly the case this project's
  * pointer-arithmetic convention is for. */
 typedef struct {
-    u8 unk0;    /* +0x0: a byte passed alongside unk3C to func_80036410 on
+    u8 unk0;    /* +0x0: a byte passed alongside unk3C to _SsSndNextSep on
                  * end-of-track cleanup */
     u8 pad1[0x4 - 0x1];
     u8 *unk4;   /* +0x4: cursor into a byte-encoded (7-bit VLQ) event stream */
@@ -102,7 +106,7 @@ typedef struct {
                  * in retail -- see func_80035B2C) */
     u8 pad2C[0x3C - 0x2C];
     u8 unk3C;   /* +0x3C: compared against 0xFF; a "track/channel select" byte
-                 * passed to func_80036410 on end-of-track stop */
+                 * passed to _SsSndNextSep on end-of-track stop */
     u8 pad3D[0x46 - 0x3D];
     s16 unk46;  /* +0x46: repeat-count LIMIT (0 = loop forever) */
     u16 unk48;  /* +0x48: repeat COUNTER, incremented per end-of-track;
@@ -359,15 +363,16 @@ void func_80034614(s16 a0, s16 a1, u8 a2)
 }
 
 /* Cross-unit calls, local guesses per this project's convention (a prototype
- * for a function another unit defines stays in this .c). func_800363FC and
- * func_80036118 are already matched in code_179d8_f.c; func_800307F0 is
+ * for a function another unit defines stays in this .c). SpuVmDamperOn and
+ * SsUtSetReverbDepth are Psy-Q libsnd (`vm_don`, `ut_rev`), linked from the
+ * SDK objects since round 34 -- never write C for them; func_800307F0 is
  * already matched in code_179d8_j.c; func_80030980 is still INCLUDE_ASM
  * there, so its signature below is this call site's own reading -- a 5th
  * argument (the one spilling to the stack at 0x10($sp)) alongside the usual
  * "packed (slot<<8)|channel" first argument this file's siblings already
  * use. */
-extern void func_800363FC(void);
-extern void func_80036118(s32 a0, s32 a1);
+extern void SpuVmDamperOn(void);
+extern void SsUtSetReverbDepth(s32 a0, s32 a1);
 extern s32 func_800307F0(s16 p0, s16 p1, s32 p2);
 extern void func_80030980(s16 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
@@ -457,16 +462,16 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     }
     case 64:
         if (val < 0x40) {
-            func_80036518();
+            SpuVmDamperOff();
         } else {
-            func_800363FC();
+            SpuVmDamperOn();
         }
         break;
     case 65:
         func_80034C28(a0, a1, val);
         return;
     case 91:
-        func_80036118(val, val);
+        SsUtSetReverbDepth(val, val);
         break;
     case 98:
         func_80034E5C(a0, a1, val);
@@ -496,8 +501,10 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
  * `s16 func_800334F0(s16, s16, Entry8E968 *)` in code_179d8_i.c, a
  * different unit's own reduced view -- this unit's own view only needs
  * `unk0`, an item count) fills the FIRST 0x10 bytes; `func_80033260` and
- * `func_80036230` (both still unmatched, no established prototype
- * anywhere) are then called once per item with a pointer to the NEXT 0x28
+ * `SsUtSetVagAtr` (the former still unmatched with no established
+ * prototype anywhere, the latter Sony's `libsnd/ut_sva`, linked from the
+ * SDK object since round 34) are then called once per item with a pointer
+ * to the NEXT 0x28
  * bytes of the SAME object.  Modeled as one struct, not two separate
  * locals, because the loop's exit test re-reads `unk0` from memory on
  * every iteration even though nothing in this function's own source
@@ -521,7 +528,7 @@ typedef struct {
 
 extern s16 func_800334F0(s16 a0, s16 a1, void *out);
 extern void func_80033260(s16 a0, u8 a1, s16 a2, void *out);
-extern void func_80036230(s16 a0, u8 a1, s16 a2, void *out);
+extern void SsUtSetVagAtr(s16 a0, u8 a1, s16 a2, void *out);
 
 void func_800349B0(s16 a0, s16 a1, u8 a2)
 {
@@ -535,7 +542,7 @@ void func_800349B0(s16 a0, s16 a1, u8 a2)
     for (i = 0; i < list.unk0; i++) {
         func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         scratch.unk8 = a2;
-        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
@@ -560,7 +567,7 @@ void func_80034AEC(s16 a0, s16 a1, u8 a2)
     for (i = 0; i < list.unk0; i++) {
         func_80033260(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
         scratch.unkB = a2;
-        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
@@ -594,7 +601,7 @@ void func_80034C28(s16 a0, s16 a1, s32 a2)
                 scratch.unk1 = 0;
             }
         }
-        func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
@@ -607,8 +614,8 @@ void func_80034D90(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
-    func_80036044();
-    func_80036518();
+    SsUtReverbOff();
+    SpuVmDamperOff();
 
     *((u8 *)rec + rec->unk12 + 0x2C) = rec->unk12;
     rec->unk13 = 0;
@@ -771,7 +778,7 @@ typedef struct {
 } List_800351D0;
 
 /* Same per-item scratch role as NoteList_800349B0's sibling Scratch_* types
- * (filled by func_80033260, consumed by func_80036230); this call site's
+ * (filled by func_80033260, consumed by SsUtSetVagAtr); this call site's
  * own fields happen to share stack space with List_800351D0's tail fields
  * above since the two never have overlapping lifetimes at runtime (mutually
  * exclusive unk29==2 / unk2A==2 dispatch arms). */
@@ -794,7 +801,7 @@ extern void func_800357B0(s16 a0, s16 a1, s16 a2, u32 a3, Blk1_800351D0 blk1,
 /* STALL -- see docs/match-reports/func_800351D0.md. Compiled length 4 words
  * LONG (380/376, measured directly off build/src/code_179d8_k.c.o since
  * length has drifted). The whole 22-word RPN/NRPN dispatch skeleton, the
- * three func_80033260/func_80036230 loops, and the func_800357B0 struct-
+ * three func_80033260/SsUtSetVagAtr loops, and the func_800357B0 struct-
  * marshaling (which also settles that function's own previously-unresolved
  * 4th-argument/scratch-layout question, see func_800357B0.md) all come out
  * byte-correct. The residue is two isolated dead-value computations
@@ -834,7 +841,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
                 func_80033260(rec->unk4C, p[0x2C], i, &scratch);
                 scratch.unkC = a2 & 0x7F;
                 scratch.unkD = a2 & 0x7F;
-                func_80036230(rec->unk4C, p[0x2C], i, &scratch);
+                SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
             }
         }
         if (rec->unk13 == 1 && rec->unk14 == 0) {
@@ -851,7 +858,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
             for (i = 0; i < list.count; i++) {
                 func_80033260(rec->unk4C, p[0x2C], i, &scratch);
                 scratch.unk5 = scratch.unk5;
-                func_80036230(rec->unk4C, p[0x2C], i, &scratch);
+                SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
             }
         }
         if (rec->unk13 == 2 && rec->unk14 == 0) {
@@ -864,7 +871,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
             for (i = 0; i < list.count; i++) {
                 func_80033260(rec->unk4C, p[0x2C], i, &scratch);
                 scratch.unk4 = scratch.unk4;
-                func_80036230(rec->unk4C, p[0x2C], i, &scratch);
+                SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
             }
         }
         rec->unk88 = func_80035E80(ch, slot);
@@ -924,9 +931,11 @@ void func_80035A7C(s16 a0, s16 a1)
 /* Cross-unit calls, local guesses per project convention. func_8003069C is
  * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
  * single-argument reading in both code_179d8_f.c and code_179d8_i.c;
- * func_80036410 is matched in code_179d8_f.c with this signature. */
+ * _SsSndNextSep is Sony's `libsnd/next`, linked from the SDK object since
+ * round 34; this signature is the one code_179d8_f.c's matched C used
+ * before the conversion. */
 extern s32 func_8003069C(s32 a0);
-extern void func_80036410(s32 a0, s32 a1);
+extern void _SsSndNextSep(s32 a0, s32 a1);
 
 /* This unit's own reading of the same global code_179d8_i.c already reads
  * as `D_8009024C` (a tick-rate/PPQN-style constant) -- independent local
@@ -957,7 +966,7 @@ extern u32 D_8009024C;
  * going. Otherwise, while the counter is still under the limit (unk46),
  * rewind BOTH unk4 and unkC. Once the limit is reached, clear the
  * playback-state flags (unk90), rewind unkC one more time, and run the
- * stop-sequence callbacks (func_80036410 gated on unk3C != 0xFF, then an
+ * stop-sequence callbacks (_SsSndNextSep gated on unk3C != 0xFF, then an
  * unconditional func_8003069C notify) before priming unk88 from unk70 for
  * the next tick.
  *
@@ -1045,7 +1054,7 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
         rec->unkC = rec->unk8;
         rec->unk2B = 0;
         if (rec->unk3C != 0xFF) {
-            func_80036410(rec->unk3C, rec->unk0);
+            _SsSndNextSep(rec->unk3C, rec->unk0);
             rec->unk2B = 0;
         }
         func_8003069C((a1 << 8) | a0);

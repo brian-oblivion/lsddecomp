@@ -252,6 +252,23 @@ new_class_6d940 = 0x8002C12C;
 SetRCnt = 0x80032B18;
 SsUtGetVabHdr = 0x8003317C;
 
+// ROUND 34 -- code_179d8_f prefix (0x2673C..0x26D28): six libsnd objects, the
+// ADSR packer/unpacker, the SsUtSetReverb* family, SsUtSetVagAtr, the two
+// SpuVmDamper stubs and _SsSndNextSep. Sony's own exported names.
+_SsUtResolveADSR = 0x80035F3C; // type:func  (Psy-Q libsnd/adsr, from the SDK object)
+_SsUtBuildADSR = 0x80035F98; // type:func  (Psy-Q libsnd/adsr, from the SDK object)
+SsUtReverbOn = 0x80036024; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtReverbOff = 0x80036044; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbType = 0x80036064; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtGetReverbType = 0x80036108; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbDepth = 0x80036118; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbFeedback = 0x800361B0; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetReverbDelay = 0x800361F0; // type:func  (Psy-Q libsnd/ut_rev, from the SDK object)
+SsUtSetVagAtr = 0x80036230; // type:func  (Psy-Q libsnd/ut_sva, from the SDK object)
+SpuVmDamperOn = 0x800363FC; // type:func  (Psy-Q libsnd/vm_don, from the SDK object)
+_SsSndNextSep = 0x80036410; // type:func  (Psy-Q libsnd/next, from the SDK object)
+SpuVmDamperOff = 0x80036518; // type:func  (Psy-Q libsnd/vm_doff, from the SDK object)
+
 // psyq_SpuSetMute chunk A (0x272C8..0x281A0): the libspu core -- SpuSetMute,
 // the reverb-mode setter and the SPU RAM allocator's helpers. Sony's own
 // exported names, read out of the SDK objects the build now links.

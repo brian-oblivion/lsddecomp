@@ -345,3 +345,25 @@
 # select_max_param 50w). Both .bss-only -- nothing goes in the yaml for data.
 3.3  libgs/gs_131   0x2FAAC
 3.3  libgs/gs_133   0x30048
+
+# ROUND 34 -- code_179d8_f PREFIX (0x2673C..0x26D28): six libsnd objects
+# covering thirteen functions, twelve of which had been matched as C and one
+# (func_80035F98 / _SsUtBuildADSR, 35w) was an INCLUDE_ASM stall with a
+# 255-line report. Text-only; `place` derives no data lines. The run tiles
+# exactly: adsr 0xE8 + ut_rev 0x20C + ut_sva 0x1CC + vm_don 0x14 + next 0x108
+# + vm_doff 0x10 = 0x5EC.
+#
+# Two disc choices are NOT the usual "prefer 3.3":
+#   - `ut_rev` is taken from 3.3 because the 3.5/3.6 build of that module is a
+#     DIFFERENT SPLIT (0xB4 text at 0x26864, with ut_rdep/ut_rfb/ut_rdel as
+#     separate objects) which leaves a 0x40 gap at 0x26824 and does not tile.
+#     `runs` reports the same thing as "libsnd/ut_rev supersedes libsnd/ut_rdel
+#     ut_rdep ut_rfb".
+#   - `next` is on the 3.5 and 3.6 discs only; 3.5 is taken.
+# `adsr` is byte-identical to 3.6's `ccadsr`; the 3.3 `adsr` is taken.
+3.3  libsnd/adsr     0x2673C
+3.3  libsnd/ut_rev   0x26824
+3.3  libsnd/ut_sva   0x26A30
+3.3  libsnd/vm_don   0x26BFC
+3.5  libsnd/next     0x26C10
+3.3  libsnd/vm_doff  0x26D18

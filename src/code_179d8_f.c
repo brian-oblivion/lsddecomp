@@ -1,247 +1,49 @@
 /*
- * code_179d8_f -- functions 256..273 of the original 274-function code_179d8
- * monolith, 0x2673C..0x272C8 (vram 0x80035F3C..0x80036AC8), i.e. its very
- * tail.  Carved round 17 (2026-09-04) off the front of `code_179d8_tail`,
- * which keeps that name for the 36 functions still in front of this slice.
+ * code_179d8_f -- what is LEFT of functions 256..273 of the original
+ * 274-function code_179d8 monolith after round 34 gave its first thirteen
+ * functions back to Sony.  Now 0x26D28..0x272A8 (vram 0x80036528..0x800368E8).
  *
- * Blocker census, three-grep screen run per function at carve time:
- * 16 of the 18 clean, and NONE of the 18 is a trivial leaf -- every one is a
- * real body.  This is the densest-in-real-work unit carved this round.
+ * ROUND 34 (2026-09-12): the unit's whole PREFIX, 0x2673C..0x26D28, is six
+ * linked `libsnd` objects -- `adsr` (3.3), `ut_rev` (3.3), `ut_sva` (3.3),
+ * `vm_don` (3.3), `next` (3.5), `vm_doff` (3.3) -- covering thirteen
+ * functions:
+ *   0x80035F3C _SsUtResolveADSR       (was matched C)
+ *   0x80035F98 _SsUtBuildADSR         (was a 35w INCLUDE_ASM stall)
+ *   0x80036024 SsUtReverbOn           (was matched C)
+ *   0x80036044 SsUtReverbOff          (was matched C)
+ *   0x80036064 SsUtSetReverbType      (was matched C)
+ *   0x80036108 SsUtGetReverbType      (was matched C)
+ *   0x80036118 SsUtSetReverbDepth     (was matched C)
+ *   0x800361B0 SsUtSetReverbFeedback  (was matched C)
+ *   0x800361F0 SsUtSetReverbDelay     (was matched C)
+ *   0x80036230 SsUtSetVagAtr          (was matched C, 115w)
+ *   0x800363FC SpuVmDamperOn          (was matched C)
+ *   0x80036410 _SsSndNextSep          (was matched C)
+ *   0x80036518 SpuVmDamperOff         (was matched C)
+ * Their C is DELETED, not commented out.  Twelve of them were matched as game
+ * code and were Sony's the whole time; reclassifying them is the correction
+ * CLAUDE.md asks for, not a regression.  Do not write C for any of them again
+ * -- `python3 tools/sdkstalls.py` and
+ * `.venv/bin/python3 tools/psyq_sdk.py coverage` are the evidence.
  *
- * NO LONGER BLOCKED -- both of this unit's blocked functions were blocked on
- * `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21 (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
- * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_80036230 (115w)  func_80036528 (240w)
- * The previous version of this comment read "BLOCKED, stub reports already
- * filed, do NOT spend attempts on these" -- a stale DIRECTIVE over free
- * ground. Both are large, which is why nobody had reason to re-read it.
+ * That was a pure PREFIX trim, so this unit kept its name and its `c` line
+ * simply moved to 0x26D28.  There is a SECOND run inside what is left
+ * (`libsnd/stop` at 0x270E8), which splits this unit again -- see the yaml.
  *
- * ROUND 32 (2026-09-12) CORRECTION -- the reopening worked and the "FRESH
- * and assignable" wording is now stale the other way. func_80036230 is
- * MATCHED (115/115). func_80036528 has been attempted and carries a full
- * worked report. Neither is cold ground; read the report first.
+ * Owns NO switch jump table (zero `jtbl_` in its disassembly, and the splat
+ * yaml's rodata slot list names no `.rodata, code_179d8_f` line), so no
+ * rodata attach, before or after the split.
  *
- * Owns NO switch jump table.  Both of this segment's jump-table owners
- * (func_80034690, func_800357B0) sit in the `code_179d8_tail` remainder in
- * FRONT of this slice -- that is where the cut was chosen, so that this unit
- * needs no rodata attach and the remainder carries that debt instead.
+ * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
+ * re-implementing the greps and never for `addiu_at` (resolved round 21).
+ * func_80036528 (240w) is the one INCLUDE_ASM left here; it has been attempted
+ * and carries a full worked report (docs/match-reports/func_80036528.md) with
+ * its 227/240 near-miss body preserved below.  It is not cold ground.
  *
  * Expect low-level driver-shaped code rather than class-framework code, as
  * elsewhere in code_179d8; confirm with tools/classtable.py, do not assume.
  */
 #include "common.h"
-
-/* 9 packed halfword fields, unpacked from two 16-bit-ish words (a0, a1).
- * Field semantics unknown -- named by offset per project convention. */
-typedef struct {
-    s16 unk0;  /* +0x0 */
-    s16 unk2;  /* +0x2 */
-    s16 unk4;  /* +0x4 */
-    s16 unk6;  /* +0x6 */
-    s16 unk8;  /* +0x8 */
-    s16 unkA;  /* +0xA */
-    s16 unkC;  /* +0xC */
-    s16 unkE;  /* +0xE */
-    s16 unk10; /* +0x10 */
-} UnkStruct80035F3C;
-
-void func_80035F3C(s32 a0, s32 a1, UnkStruct80035F3C *a2)
-{
-    int t;
-
-    a2->unkA = a0 & 0x8000;
-    t = a1 & 0x8000;
-    a2->unkC = t;
-    a2->unk10 = a1 & 0x4000;
-    a2->unkE = a1 & 0x20;
-    a2->unk0 = ((u16)a0 >> 8) & 0x7F;
-    a2->unk2 = ((u16)a0 >> 4) & 0xF;
-    a2->unk4 = a0 & 0xF;
-    a2->unk6 = ((u32)a1 >> 6) & 0x7F;
-    a2->unk8 = a1 & 0x1F;
-}
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80035F98);
-
-/* Psy-Q libspu/s_sr, linked from the SDK object. It returns a real value
- * (read from D_8006DD2C right before its own jr $ra), which is why the two
- * wrappers below are s32-returning rather than void. Local view: this unit's
- * own declaration, not a shared header's. */
-extern s32 SpuSetReverb(s32 a0);
-
-s32 func_80036024(void)
-{
-    return SpuSetReverb(1);
-}
-
-s32 func_80036044(void)
-{
-    return SpuSetReverb(0);
-}
-
-/* Globals owned by the Psy-Q SPU/SND block at 0x272C8..0x2C054 (libspu bss),
- * poked directly here. */
-extern s32 D_8008E258;
-extern s32 D_8008E25C;
-extern void SpuSetReverbModeParam(s32 *a0);
-
-s32 func_80036064(s32 a0)
-{
-    s32 neg = 0;
-    u32 v1 = a0;
-    s32 s0;
-    s32 result;
-
-    if ((s16)a0 < 0) {
-        neg = 1;
-        v1 = -a0;
-    }
-    if ((v1 & 0xFFFF) < 10) {
-        D_8008E258 = 1;
-        if (neg) {
-            D_8008E25C = (s16)(v1 | 0x100);
-        } else {
-            D_8008E25C = (s16)v1;
-        }
-        s0 = (s16)v1;
-        if (s0 == 0) {
-            /* Both arms are the same call. Found by permuter search: a
-             * plain `if (s0 == 0) SpuSetReverb(0);` merges a0's register
-             * into v1's, dropping retail's extra `move v1,a0`. Keeping a0
-             * referenced here (even in dead-equal branches) keeps the
-             * allocator from reusing its register for v1, matching retail's
-             * register footprint exactly. */
-            if (a0) {
-                SpuSetReverb(0);
-            } else {
-                SpuSetReverb(0);
-            }
-        }
-        SpuSetReverbModeParam(&D_8008E258);
-        result = s0;
-    } else {
-        result = -1;
-    }
-    return result;
-}
-
-/* D_8008E25C is stored as a full 32-bit sign-extended s16 value (see
- * func_80036064 above) but read back here through a 16-bit view. */
-s32 func_80036108(void)
-{
-    return *(s16 *)&D_8008E25C;
-}
-
-extern s16 D_8008E260;
-extern s16 D_8008E262;
-
-/* a0, a1 are treated as signed 16-bit inputs (0..127-ish range going by the
- * /127 below) and rescaled to a signed 15-bit-ish range (*32767/127) before
- * being poked into the same SPU-ish struct func_80036064 above writes. */
-void func_80036118(s32 a0, s32 a1)
-{
-    s16 sa0 = (s16)a0;
-    s16 sa1 = (s16)a1;
-    s32 *p = &D_8008E258;
-
-    *p = 6;
-    D_8008E260 = (s32)sa0 * 32767 / 127;
-    D_8008E262 = (s32)sa1 * 32767 / 127;
-    SpuSetReverbModeParam(p);
-}
-
-extern s32 D_8008E268;
-
-void func_800361B0(s32 a0)
-{
-    s32 *p = &D_8008E258;
-
-    *p = 0x10;
-    D_8008E268 = (s16)a0;
-    SpuSetReverbModeParam(p);
-}
-
-extern s32 D_8008E264;
-
-void func_800361F0(s32 a0)
-{
-    s32 *p = &D_8008E258;
-
-    *p = 8;
-    D_8008E264 = (s16)a0;
-    SpuSetReverbModeParam(p);
-}
-
-extern u8 D_8008EA2C[];
-extern u8 D_8008EA13;
-extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-
-/* A 0x20 (32)-byte-stride record; the same table code_179d8_l.c/_m.c's
- * D8008E978Entry/Tbl32E978 name (local views). Source and destination here
- * are both this same layout -- this function copies one instance's fields
- * into a table slot. Only the fields this function touches are named. */
-typedef struct {
-    u8 unk0;
-    u8 unk1;
-    u8 unk2;
-    u8 unk3;
-    u8 unk4;
-    u8 unk5;
-    u8 unk6;
-    u8 unk7;
-    u8 unk8;
-    u8 unk9;
-    u8 unkA;
-    u8 unkB;
-    u8 unkC;
-    u8 unkD;
-    u8 padE[0x10 - 0xE];
-    s16 unk10;
-    s16 unk12;
-    s16 unk14;
-    s16 unk16;
-    u8 pad18[0x20 - 0x18];
-} Rec32E978;
-
-extern Rec32E978 *D_8008E978;
-
-s32 func_80036230(s32 a0, s32 a1, s32 a2, Rec32E978 *a3)
-{
-    s32 idx;
-
-    if (D_8008EA2C[(s16)a0] == 1) {
-        SpuVmVSetUp((s16)a0, (s16)a1);
-        idx = (s16)(a2 + (D_8008EA13 << 4));
-        D_8008E978[idx].unk0 = a3->unk0;
-        D_8008E978[idx].unk1 = a3->unk1;
-        D_8008E978[idx].unk2 = a3->unk2;
-        D_8008E978[idx].unk3 = a3->unk3;
-        D_8008E978[idx].unk4 = a3->unk4;
-        D_8008E978[idx].unk5 = a3->unk5;
-        D_8008E978[idx].unk7 = a3->unk7;
-        D_8008E978[idx].unk6 = a3->unk6;
-        D_8008E978[idx].unk8 = a3->unk8;
-        D_8008E978[idx].unk9 = a3->unk9;
-        D_8008E978[idx].unkA = a3->unkA;
-        D_8008E978[idx].unkB = a3->unkB;
-        D_8008E978[idx].unkC = a3->unkC;
-        D_8008E978[idx].unkD = a3->unkD;
-        D_8008E978[idx].unk10 = a3->unk10;
-        D_8008E978[idx].unk12 = a3->unk12;
-        D_8008E978[idx].unk14 = a3->unk14;
-        D_8008E978[idx].unk16 = a3->unk16;
-        return 0;
-    }
-    return -1;
-}
-
-extern s16 D_8008E84C;
-
-void func_800363FC(void)
-{
-    D_8008E84C = 2;
-}
 
 /* A 172 (0xAC)-byte record; only the fields functions in this unit touch
  * are named. D_800902E8 is an array of pointers to arrays of these, indexed
@@ -292,27 +94,6 @@ typedef struct {
 } Entry90902E8;
 
 extern Entry90902E8 *D_800902E8[];
-
-void func_80036410(s32 a0, s32 a1)
-{
-    Entry90902E8 *p = &D_800902E8[(s16)a0][(s16)a1];
-
-    p->unk46 = 1;
-    p->unk48 = 0;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x100;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x8;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x2;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x4;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x200;
-    p->unk4 = p->unk8;
-    p->unk2B = 1;
-    D_800902E8[(s16)a0][(s16)a1].unk90 |= 1;
-}
-
-void func_80036518(void)
-{
-    D_8008E84C = 0;
-}
 
 /* STALL -- see docs/match-reports/func_80036528.md. Best reached: 227/240
  * words compiled (13 words SHORT of retail's length; whole-image red).

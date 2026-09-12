@@ -881,7 +881,29 @@ segments:
       # 16/18 clean, the two blocked are func_80036230 and func_80036528,
       # both addiu-$at (and both large -- 115 and 240 instructions).  No
       # trivial leaves.  Owns NO switch jump table, so no rodata attach.
-      - [0x2673C, c, code_179d8_f]
+      #
+      # ROUND 34: the unit's first THIRTEEN functions are Sony's `libsnd`, six
+      # objects that tile 0x2673C..0x26D28 exactly, so this is a pure PREFIX
+      # trim -- the `c` line just moves to 0x26D28 and the unit keeps its name.
+      # Twelve of the thirteen had been MATCHED as C; reclassifying them out of
+      # the game count is the correction, not a regression.  The thirteenth,
+      # func_80035F98 / `_SsUtBuildADSR` (35w), was an INCLUDE_ASM stall with a
+      # 255-line report and could never have matched.  Text-only; `place`
+      # derives no data lines and the unit still needs no rodata attach.
+      #
+      # `ut_rev` is the 3.3 build ON PURPOSE: the 3.5/3.6 discs split that
+      # module differently (0xB4 at 0x26864 plus separate ut_rdep/ut_rfb/
+      # ut_rdel), which leaves a 0x40 gap at 0x26824 and does not tile.
+      # `next` exists only on 3.5/3.6.  3.6's `ccadsr` is byte-identical to
+      # 3.3's `adsr`.
+      - [0x2673C, o, libsnd/adsr]       # _SsUtResolveADSR, _SsUtBuildADSR
+      - [0x26824, o, libsnd/ut_rev]     # SsUtReverbOn/Off, SsUtSet/GetReverbType,
+                                        # SsUtSetReverbDepth/Feedback/Delay
+      - [0x26A30, o, libsnd/ut_sva]     # SsUtSetVagAtr
+      - [0x26BFC, o, libsnd/vm_don]     # SpuVmDamperOn
+      - [0x26C10, o, libsnd/next]       # _SsSndNextSep
+      - [0x26D18, o, libsnd/vm_doff]    # SpuVmDamperOff
+      - [0x26D28, c, code_179d8_f]
       # psyq_SpuSetMute (0x272C8..0x2C054) is converted to linked Sony objects
       # one run at a time. 35 objects tile nine runs exactly, all from the 3.3
       # disc; the eight gaps between the runs are the game's own libspu/libsnd
