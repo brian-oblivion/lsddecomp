@@ -517,9 +517,9 @@ void func_80059814(DreamSys *this)
    `this` register setup across multiple converging paths into the shared
    `func_80059A1C(this)` tail call), not reachable by the rename lever nor by
    a scheduling barrier at the merge point (tried, no effect). Re-verified
-   fresh round 37 (2026-09-12, runner charlie); a permuter search was queued
-   for this function (see the report's round 37 addendum) since the round's
-   own report already flagged it as untried. */
+   fresh round 37 (2026-09-12, runner charlie); a permuter search was run
+   this round and found no improvement -- see the report's round 37
+   addendum. */
 void func_800598E8(DreamSys *this)
 {
 	s32 idx;
