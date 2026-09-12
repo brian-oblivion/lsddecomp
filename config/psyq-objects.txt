@@ -384,3 +384,13 @@
 # and the round-8 report had already noticed the body reads as library
 # defensive code. Text-only; `place` derives no data line.
 3.3  libc2/strcat   0x17930
+
+# code_2cc8c_e, function #1 (0x3031C..0x303E4): libgs/gs_123, one function --
+# Gssub_make_matrix, the axis/sin/cos rotation-matrix builder, MATCHED AS C in
+# an earlier round and counted as game code. Reclassified, not regressed.
+# It owns jtbl_80011108, so its `.rdata` (0x1908, 0x8C) is the jump table
+# itself: `place` reports `bytes:not-found` for it, which is the expected
+# relocated-words case, and the derived offset lands exactly on the slot's
+# existing dlabel. Splitting the unit around it created src/code_2cc8c_e0.c
+# for func_8003FB0C, the one function in front of it.
+3.3  libgs/gs_123   0x3031C

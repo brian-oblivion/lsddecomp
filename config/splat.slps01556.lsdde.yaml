@@ -160,7 +160,18 @@ segments:
       # the OWNING unit's functions, and a symbol referenced only from
       # another segment has nowhere to migrate to and drops out of the link.
       # So the slot is split at the ownership boundary.
-      - [0x1908, .rodata, code_2cc8c_e]
+      # ROUND 34: the attach is GONE, and with it the whole Gate 2 problem the
+      # two paragraphs above describe. jtbl_80011108 is func_8003FB1C's jump
+      # table, func_8003FB1C is Sony's `Gssub_make_matrix` (libgs/gs_123), and
+      # this 0x8C IS that object's own `.rdata` section -- so the table now
+      # arrives from the object together with the code that indexes it, and no
+      # `.L` label crosses a segment boundary in either direction. `place`
+      # reports `bytes:not-found` here, which is the EXPECTED relocated-words
+      # case (readelf shows gs_123.o carrying 0x118 bytes of `.rel.rdata` for
+      # this 0x8C section); the derived offset landing exactly on the slot's
+      # existing dlabel is the confirmation, per the guide's step 2.
+      # 0x1908 + 0x8C = 0x1994 exactly, so no `pad` is needed here.
+      - [0x1908, o, libgs/gs_123, .rdata]
       # ROUND 20: split at 0x1994 so D_80011194 leaves the ATTACHED part of
       # the slot. While attached, migrate_rodata_to_functions placed it in
       # func_8003FC70's generated .s, so that function could never be C.
@@ -1053,9 +1064,24 @@ segments:
       # The 0x1908 `.rodata` attach STAYS on code_2cc8c_e: jtbl_80011108
       # (func_8003FB1C) and D_80011194 (func_8003FC70) are both still in the
       # unit, which now starts at 0x3030C / func_8003FB0C.
+      #   ^ ROUND 34: the first half of that is no longer true -- see below.
       - [0x2FAAC, o, libgs/gs_131]
       - [0x30048, o, libgs/gs_133]
-      - [0x3030C, c, code_2cc8c_e]
+      # ROUND 34: func_8003FB1C is Sony's `Gssub_make_matrix` (libgs/gs_123,
+      # Psy-Q 3.3, 0xC8 covering exactly it). It had been MATCHED AS C and
+      # counted as game code; reclassifying it is the correction, not a
+      # regression. It sits one function INTO the unit, so the unit is split
+      # [c][o][c] and the one function in front of it gets its own unit --
+      # `code_2cc8c_e0`, src/code_2cc8c_e0.c, func_8003FB0C (4 words).
+      #
+      # THE 0x1908 `.rodata` ATTACH LEAVES WITH IT. jtbl_80011108 is this
+      # function's own jump table and is gs_123's own `.rdata` section, so it
+      # now arrives from the object; the yaml line at 0x1908 is an `o` entry
+      # and NOT an attach any more. D_80011194 (func_8003FC70) is a separate
+      # standalone slot at 0x1994 and is unaffected by this run.
+      - [0x3030C, c, code_2cc8c_e0]     # func_8003FB0C
+      - [0x3031C, o, libgs/gs_123]      # Gssub_make_matrix (was func_8003FB1C)
+      - [0x303E4, c, code_2cc8c_e]
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
       - [0x30E64, c, code_2cc8c_f]

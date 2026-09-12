@@ -1,59 +1,25 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-extern void *D_800902E4;
-
-void func_8003FB0C(void *a0) {
-    D_800902E4 = a0;
-}
-
-/* The PSX Psy-Q `MATRIX` -- `short m[3][3]; long t[3];`, 0x20 bytes (the 3x3
- * is 18 bytes, `t` lands at +0x14 on its own 4-alignment). The project's
- * include/psyq/ set does not DEFINE it (LIBGS.H uses the name without a
- * definition being present), so this is a unit-local view, kept next to the
- * code per the multiple-independent-local-views convention.
+/* ROUND 34: THIS UNIT LOST ITS FIRST TWO FUNCTIONS, in opposite directions.
  *
- * `D_8008E98C` is the identity matrix this function copies as its base.
- * NOTE: include/class_3bb8c.h declares the SAME symbol as an unrelated
- * `QueryTemplate866E8` ("8 words, offsets 0x00-0x1C, first five opaque") for
- * func_8004C6A8's own reading. The two views agree on the bytes and are
- * consistent: that reading's opaque `unk0[5]` is this one's `m[3][3]` plus its
- * tail pad, and its `unk14`/`unk18`/`unk1C` are `t[0]`/`t[1]`/`t[2]`. Neither
- * declaration belongs in the other unit's header -- code_2cc8c_e does not
- * include class_3bb8c.h and must not start. */
-typedef struct Matrix2cc8c {
-    s16 m[3][3];
-    s32 t[3];
-} Matrix2cc8c;
-
-extern Matrix2cc8c D_8008E98C;
-
-void func_8003FB1C(Matrix2cc8c *dst, s16 sin, s16 cos, u8 axis) {
-    *dst = D_8008E98C;
-    switch (axis) {
-    case 'X':
-    case 'x':
-        dst->m[1][1] = cos;
-        dst->m[2][2] = cos;
-        dst->m[1][2] = -sin;
-        dst->m[2][1] = sin;
-        break;
-    case 'Y':
-    case 'y':
-        dst->m[0][0] = cos;
-        dst->m[2][2] = cos;
-        dst->m[0][2] = sin;
-        dst->m[2][0] = -sin;
-        break;
-    case 'Z':
-    case 'z':
-        dst->m[0][0] = cos;
-        dst->m[1][1] = cos;
-        dst->m[0][1] = -sin;
-        dst->m[1][0] = sin;
-        break;
-    }
-}
+ *  - func_8003FB0C (4w) is still game code, but it now lives alone in
+ *    src/code_2cc8c_e0.c, because the function that follows it is Sony's and
+ *    a `c` segment cannot straddle an `o` one.
+ *  - func_8003FB1C is `Gssub_make_matrix` (libgs/gs_123.o, Psy-Q 3.3) and is
+ *    LINKED FROM THE OBJECT. It had been matched as C; reclassifying it is
+ *    the correction CLAUDE.md asks for, not a regression, and its match
+ *    report is kept, retitled CONVERTED.
+ *
+ * THE 0x1908 RODATA ATTACH IS NO LONGER OURS AND MUST NOT COME BACK.
+ * jtbl_80011108 was func_8003FB1C's own jump table; it is gs_123's `.rdata`
+ * section and arrives from the object now, so the yaml line at 0x1908 is an
+ * `o` entry, not `- [0x1908, .rodata, code_2cc8c_e]`. Restoring the attach
+ * would hand this unit a slot it owns nothing in.
+ *
+ * D_80011194 (0x1994) is a DIFFERENT slot and is still standalone -- see
+ * func_8003FC70 below, and the round-20 note in the yaml.
+ */
 
 extern void *D_8008E794;
 

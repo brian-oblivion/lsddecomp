@@ -372,6 +372,9 @@ scale_view_param = 0x8003F674; // type:func  (Psy-Q libgs/gs_131, from the SDK o
 select_max_param = 0x8003F764; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
 len_param = 0x8003F82C; // type:func  (Psy-Q libgs/gs_131, from the SDK object)
 GsGetLw = 0x8003F848; // type:func  (Psy-Q libgs/gs_133, from the SDK object)
+// code_2cc8c_e's second function, converted to a linked SDK object in round
+// 34.  libgs/gs_131 already REFERENCED this name; gs_123 DEFINES it.
+Gssub_make_matrix = 0x8003FB1C; // type:func  (Psy-Q libgs/gs_123, from the SDK object)
 // class_3bb8c_h's six BIOS-vector-0xB0 file trampolines, converted to linked
 // SDK objects in round 34.  One libapi object each; Sony's own exported names,
 // read out of the object symbol tables.  `open`/`read`/`close`/`delete`/

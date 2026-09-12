@@ -1,6 +1,31 @@
-# func_8003FB1C — MATCHED (byte-exact, whole-image `build exit=0`)
+# func_8003FB1C -- CONVERTED to a linked SDK object (round 34). NOT game code.
 
-Unit: `code_2cc8c_e` · Size: 50 words · Round 23 (2026-09-07), head.
+> **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
+> SONY'S OWN OBJECT `libgs/gs_123.o` (Psy-Q 3.3) AND IS NAMED
+> `Gssub_make_matrix`.** The object's 0xC8 of text covers exactly it. It sat
+> one function INTO `code_2cc8c_e`, so that unit is split
+> `[c code_2cc8c_e0][o libgs/gs_123][c code_2cc8c_e]` and func_8003FB0C, the
+> single function in front, moved to `src/code_2cc8c_e0.c`.
+>
+> **This RECLASSIFIES a matched function out of the game-code count, which is
+> the correction CLAUDE.md asks for, not a regression.** `libgs/gs_131`, linked
+> since round 33, already REFERENCED this symbol by name; `gs_123` defines it.
+>
+> **The 0x1908 rodata attach left with it, and that is the interesting part.**
+> jtbl_80011108 is this function's own jump table, and it is `gs_123.o`'s own
+> `.rdata` section -- so the table now arrives from the object alongside the
+> code that indexes it, and the `.L`-labels-cannot-cross-a-segment problem
+> that forced the attach in round 14 (and the split in round 20) simply stops
+> existing. `place` reports `bytes:not-found` for that section, which is the
+> expected relocated-words case: readelf shows 0x118 bytes of `.rel.rdata` for
+> 0x8C of data.
+>
+> **Everything below is kept as the derivation it was, not as live guidance.**
+> The `Matrix2cc8c` struct view it establishes is still correct and still
+> used -- it is the PSX `MATRIX`, and round 33's own note about two units
+> holding independent views of `D_8008E98C` is unaffected.
+
+Unit: `code_2cc8c_e` (until round 34) · Size: 50 words · Round 23 (2026-09-07), head.
 **Matched on the FIRST attempt**, fresh ground (no prior report).
 
 ## What it is
