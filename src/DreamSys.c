@@ -654,18 +654,22 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 }
 
 #if 0
-/* Best-reached body, 55/72 words, verified fresh round 32 (2026-09-12,
-   runner alpha2) and round 37 (2026-09-12, runner charlie) -- see
-   docs/match-reports/func_80059D1C.md for the residue analysis (a
-   whole-function this/heading register-identity swap) and this round's
-   permuter search. Restored to INCLUDE_ASM below per project rule (no
-   score short of byte-exact stays in src/). */
+/* Best-reached body, 68/72 words, verified fresh round 37 (2026-09-12,
+   runner charlie) -- see docs/match-reports/func_80059D1C.md for the
+   residue analysis. The `new_var` copy of `heading` (a permuter-found
+   lever, translated to idiomatic C) fully closes the whole-function
+   this/obj/vt/heading register-identity swap that stalled rounds 2-35;
+   the ONLY remaining residue is a two-instruction load-order swap between
+   the two byte-table reads (D_80087EB0/D_80087EC8), unmoved by any
+   statement-order variant tried (see report). Restored to INCLUDE_ASM
+   below per project rule (no score short of byte-exact stays in src/). */
 void func_80059D1C(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 	s32 idx;
 	DreamSysUnk58Vtable *vt;
 	s32 heading;
+	s32 new_var;
 
 	obj = (DreamSysUnk58 *)this->unk_0x58;
 	vt = obj->vt;
@@ -676,15 +680,16 @@ void func_80059D1C(DreamSys *this)
 
 	heading = D_80087EB0[idx];
 	heading <<= 4;
+	new_var = heading;
 	vt->slot0x9C(obj, D_80087EC8[idx]);
-	this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
+	this->unk_0xBC = vt->slot0x80(obj, new_var, 0x6E, 0x6E);
 	if (this->unk_0xB8 != 0x16) {
 		this->unk_0xBC = -1;
 	}
 
 	if (this->unk_0xB8 == 0xB) {
 		vt->slot0x9C(obj, 1);
-		vt->slot0x80(obj, heading, 0x6E, 0x6E);
+		vt->slot0x80(obj, new_var, 0x6E, 0x6E);
 		vt->slot0x9C(obj, 2);
 		vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
 	}
