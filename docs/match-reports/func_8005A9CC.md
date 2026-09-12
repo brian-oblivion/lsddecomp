@@ -1,9 +1,12 @@
-# func_8005A9CC
+# func_8005A9CC -- STALL: exact length (88/88 instructions, zero address drift), 57/88 raw word-match, first real diff at 0x4B1FC (retail's delay-slot `nop` after `beqz v0,.L8005AA44` vs a hoisted `addiu a0,s0,0x16c` -- `fill_eager_delay_slots` branch-target duplication, one instruction early)
 
 **Unit:** DreamSys · **Size:** 88 words · **Status:** STALL, best-reached
 57/88, no address drift. Attempted round 2026-09-06 (charlie). Screened
 clean against both remaining blockers (`gp_rel`, `nop_mflo_mfhi`) by the
-head before assignment.
+head before assignment. **Title rebuilt round 37 (2026-09-12, charlie)** to
+carry the three required figures -- this report previously had none in its
+title line; re-measured fresh, byte-identical to what follows (see "Round 37"
+below).
 
 ## What it does
 

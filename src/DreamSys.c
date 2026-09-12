@@ -652,10 +652,11 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 
 #if 0
 /* Best-reached body, 55/72 words, verified fresh round 32 (2026-09-12,
-   runner alpha2) -- see docs/match-reports/func_80059D1C.md for the
-   residue analysis (a whole-function this/heading register-identity swap)
-   and this round's two new negative attempts. Restored to INCLUDE_ASM below
-   per project rule (no score short of byte-exact stays in src/). */
+   runner alpha2) and round 37 (2026-09-12, runner charlie) -- see
+   docs/match-reports/func_80059D1C.md for the residue analysis (a
+   whole-function this/heading register-identity swap) and this round's
+   permuter search. Restored to INCLUDE_ASM below per project rule (no
+   score short of byte-exact stays in src/). */
 void func_80059D1C(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
@@ -1016,7 +1017,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 /* Best-reached body, 57/88 words, no address drift -- see
    docs/match-reports/func_8005A9CC.md for the residue analysis. Restored to
    INCLUDE_ASM below per project rule (no score short of byte-exact stays in
-   src/). */
+   src/). Re-verified fresh round 37 (2026-09-12, runner charlie). */
 bool func_8005A9CC(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
@@ -1205,11 +1206,13 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
 }
 
 #if 0
-/* Best-reached body, 106/110 words truly correct (see the match report for
-   why funcdiff's own count reads far lower) -- see
+/* Best-reached body, 1 word short (109/110 instructions), 106/110 words
+   truly correct after asm-differ realignment (see the match report for why
+   funcdiff's own raw count reads far lower) -- see
    docs/match-reports/DreamSys__InstanceEffectsOnJournal.md for the residue
    analysis. Restored to INCLUDE_ASM below per project rule (no score short
-   of byte-exact stays in src/). */
+   of byte-exact stays in src/). Re-verified fresh round 37 (2026-09-12,
+   runner charlie). */
 void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
 {
 	if (this->unknwon_int_0x44 != 0) {

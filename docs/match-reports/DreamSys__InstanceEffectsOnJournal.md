@@ -1,10 +1,14 @@
-# DreamSys__InstanceEffectsOnJournal
+# DreamSys__InstanceEffectsOnJournal -- STALL: 1 word short (109 instructions built vs retail's 110), 106/110 words truly correct after `asm-differ` realignment (funcdiff's own raw in-range count reads 15/110 -- a missing-word size-shift trap, not the true residue, see "Reading the score" below), first real diff at 0x4B860 (the switch-index bounds check: retail computes `addiu v1,a2,-4`/`sltiu v0,v1,9`/`sll v0,v1,0x2` into `$v1`, this build computes the identical three ops in place on `$a2`)
 
 **Unit:** DreamSys · **Size:** 110 words · **Status:** STALL, 106/110 words
-truly correct with no address drift (see "Reading the score" below for why
-`funcdiff.py`'s own raw number reads far lower). Attempted round 2026-09-06
-(charlie). Screened clean against both remaining blockers (`gp_rel`,
-`nop_mflo_mfhi`) by the head before assignment.
+truly correct (see "Reading the score" below for why `funcdiff.py`'s own raw
+number reads far lower; there IS one real word missing, hence the address
+drift funcdiff also reports). Attempted round 2026-09-06 (charlie). Screened
+clean against both remaining blockers (`gp_rel`, `nop_mflo_mfhi`) by the head
+before assignment. **Title rebuilt round 37 (2026-09-12, charlie)** to carry
+the three required figures -- this report previously had none in its title
+line; re-measured fresh, byte-identical to what follows (see "Round 37"
+below).
 
 ## What it does
 
@@ -307,3 +311,64 @@ live-range are different axes; only the second one drives this register-cost
 class. Worth stating plainly since "scope it more tightly" is the obvious
 next lever a reader reaches for after seeing "function-scope local costs a
 register", and it is a dead end here.
+
+---
+
+## Round 37 (2026-09-12, runner charlie): title rebuilt, permuter search launched
+
+This report predated round 23's three-figure title rule and carried no
+length/word-match/first-diff figures in its title line at all -- round 37's
+brief named it explicitly as one of two functions in this unit needing that
+repair, since `tools/progress.py`/the next round's staffing reads the title,
+not the body.
+
+Re-measured before touching anything: rebuilt the exact preserved body above
+and reproduced the identical residue --  `./build-and-verify.sh` gives
+`build exit=2` with zero compile-error grep hits (a fresh, non-matching
+build, exactly as expected), and `tools/asm-differ/diff.py` confirms:
+
+- **Length: one word short.** This build assembles to 109 instructions
+  (0x4B83C-0x4B9F0 realigned) against retail's 110 (0x4B83C-0x4B9F4); the
+  `j 5b1dc` branch target itself is one word earlier throughout the realigned
+  stream (`5b1d8` vs retail's `5b1dc`), which is the direct symptom of the
+  missing word, not a separate issue.
+- **Raw word-match**: `funcdiff.py`'s own in-range count reads 15/110 with an
+  explicit "differs OUTSIDE this range too (134342 bytes)" warning --
+  confirmed this is the `func_8004BB3C`-shaped trap the report already
+  documents, not a regression. Reading `asm-differ`'s realigned output
+  instead: **106/110 words truly correct**, same two residues as every
+  earlier round (switch-index register choice, case-4 vtable-dereference
+  delay-slot fill), unchanged.
+- **First real diff, read off `asm-differ`**: **file offset 0x4B860**
+  (`vram 0x8005B060`) -- retail's `addiu v1,a2,-4` (copying the bounds-check
+  input into `$v1` before using it) against this build's `addiu a2,a2,-4`
+  (same computation, done in place on `$a2`, the parameter's own register).
+  This is Residue 1 from the existing analysis above; nothing new to add to
+  its cause, which was already exhaustively covered (declaration form is
+  invisible to this register choice).
+
+No new C axis was tried this round -- the existing report already closes out
+four forms of the cast/typing axis (round 22, round 35) and this round's
+brief prioritizes a fresh permuter search over re-deriving hand analysis on a
+function already argued this thoroughly. A permuter scaffold was set up
+(`permuter-work/DreamSys__InstanceEffectsOnJournal`) from this exact
+preserved body; see the runner's final summary for the search's outcome
+(iteration count and `rc`), since the project's parallel-run discipline
+requires exactly one search running at a time and this function's search was
+queued behind `func_80059D1C`'s and `func_8005A9CC`'s.
+
+`INCLUDE_ASM` restored immediately after measuring; whole-image SHA1 verified
+green; `git diff --stat` empty against `main` for this unit's non-report
+files at the point of this write-up.
+
+### Proposed learning (round 37)
+
+A report can carry a fully worked-out residue analysis in its body while
+still having no title figures at all, if it predates the three-figure title
+rule -- `tools/progress.py` and next-round staffing read titles, so an
+old-format title with a well-documented body is invisible to automated
+ranking in exactly the same way an undocumented stall is. Worth a one-time
+sweep of the whole `docs/match-reports/` corpus for titles missing the three
+figures, independent of this unit -- this round only touched the two the
+brief already named, but the trap is generic to any report older than round
+23.
