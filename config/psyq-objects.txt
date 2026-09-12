@@ -398,3 +398,11 @@
 3.3  libsnd/sscall    0x23F38
 3.3  libsnd/pause     0x241AC
 3.3  libsnd/tempo     0x242B0
+
+# ROUND 34 -- code_179d8_i MIDDLE (0x247B8..0x2490C): libsnd/replay (Snd_replay)
+# and libsnd/vs_vab (SsVabClose, SsVabOpen), three functions, all three
+# previously matched as C. The run sits in the MIDDLE of what the prefix trim
+# above left, so the slice became [c][o][o][c] and the tail half is the
+# one-function unit src/code_179d8_i_b.c (func_8003410C). Text-only.
+3.3  libsnd/replay    0x247B8
+3.3  libsnd/vs_vab    0x24820

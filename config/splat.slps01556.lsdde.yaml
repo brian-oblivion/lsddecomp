@@ -869,6 +869,17 @@ segments:
       - [0x241AC, o, libsnd/pause]      # Snd_pause, Snd_nextpause
       - [0x242B0, o, libsnd/tempo]      # Snd_tempo
       - [0x24490, c, code_179d8_i]
+      # ROUND 34, second run in the same unit: `libsnd/replay` (Snd_replay) and
+      # `libsnd/vs_vab` (SsVabClose, SsVabOpen) -- func_80033FB8, func_80034020
+      # and func_800340B0, all three previously MATCHED as C.  This run sits in
+      # the MIDDLE of what the prefix trim left, so the slice is [c][o][o][c]
+      # and the tail needed a new name: `code_179d8_i_b`, one function
+      # (func_8003410C).  A one-function unit is fine and has precedent
+      # (class_3bb8c_v, and code_179d8_f_b earlier this round).  Text-only; the
+      # unit owns no jump table, so NO rodata attach moved.
+      - [0x247B8, o, libsnd/replay]     # Snd_replay
+      - [0x24820, o, libsnd/vs_vab]     # SsVabClose, SsVabOpen
+      - [0x2490C, c, code_179d8_i_b]
       # code_179d8_k: what was the `code_179d8_tail` remainder after the
       # code_179d8_i carve -- functions 238..255 of the original,
       # 0x24938..0x2673C (18 functions, func_80034138 .. func_80035E80).

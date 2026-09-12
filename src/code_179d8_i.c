@@ -1,7 +1,8 @@
 /*
  * code_179d8_i -- what is LEFT of functions 220..237 of the original
- * code_179d8 monolith after round 34 gave its whole PREFIX back to Sony.
- * Now 0x24490..0x24938 (vram 0x80033C90..0x80034138).
+ * code_179d8 monolith after round 34 gave fourteen of its sixteen functions
+ * back to Sony.  Now 0x24490..0x247B8 (vram 0x80033C90..0x80033FB8), a
+ * ONE-function unit holding func_80033C90 alone.
  *
  * ROUND 34 (2026-09-12): 0x2397C..0x24490 is TEN linked `libsnd` objects
  * (all Psy-Q 3.3) covering ELEVEN functions, every one of which had been
@@ -24,8 +25,16 @@
  * `.venv/bin/python3 tools/psyq_sdk.py coverage` are the evidence.
  *
  * A pure PREFIX trim, so the unit kept its name and the `c` line simply moved
- * to 0x24490.  There is a SECOND run inside what is left (`libsnd/replay` +
- * `libsnd/vs_vab` at 0x247B8) -- see the yaml.
+ * to 0x24490.
+ *
+ * A SECOND RUN in the same round then took the other end.  `libsnd/replay` and
+ * `libsnd/vs_vab` (0x247B8..0x2490C) are `Snd_replay`, `SsVabClose` and
+ * `SsVabOpen` -- func_80033FB8, func_80034020 and func_800340B0, all three
+ * previously MATCHED as C and all three now deleted from here.  That run sat
+ * in the MIDDLE of what the prefix trim had left, so the slice became
+ * [c][o][o][c] and the tail half became the one-function unit
+ * `src/code_179d8_i_b.c` (func_8003410C).  Nothing moved with it: this unit
+ * never owned a rodata attach.
  *
  * `libsnd/pause` is taken from the 3.3 disc ON PURPOSE: 3.5/3.6 split that
  * module into `pause` (0xA0) + `npause` (0x64), which is the same two
@@ -192,51 +201,3 @@ tailFinal:
 #endif
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033C90);
-
-void func_80033FB8(s32 a0, s32 a1)
-{
-    s16 sa0 = (s16)a0;
-    s16 sa1 = (s16)a1;
-
-    D_800902E8[sa0][sa1].unk2B = 1;
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~8;
-}
-
-extern void SpuFree(s32 a0);
-extern s32 D_80090BD4[];
-extern s16 D_80090BD0;
-/* The per-VAB state byte table.  Its declaration used to ride along with
- * SsUtGetVabHdr at the top of this file; that function is Sony's and left in
- * round 34, so the declaration lives here now, at its only remaining user. */
-extern u8 D_8008EA2C[];
-
-void func_80034020(s16 a0)
-{
-    if ((u16)a0 < 0x10 && D_8008EA2C[a0] == 1) {
-        SpuFree(D_80090BD4[a0]);
-        D_8008EA2C[a0] = 0;
-        D_80090BD0--;
-    }
-}
-
-extern s16 SsVabOpenHead(void *a0, s16 a1);
-extern s16 SsVabTransBody(s32 a0, s16 a1);
-extern s32 D_80090C1C[];
-
-s16 func_800340B0(void *a0)
-{
-    s16 idx = SsVabOpenHead(a0, -1);
-    s16 result = idx;
-
-    if (idx != -1) {
-        result = SsVabTransBody(D_80090C1C[idx], idx);
-    }
-    return result;
-}
-
-extern s32 func_80034138(s16 a0, s16 a1);
-
-s32 func_8003410C(s16 a0, s16 a1)
-{
-    return func_80034138(a0, a1);
-}

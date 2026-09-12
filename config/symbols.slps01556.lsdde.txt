@@ -269,6 +269,12 @@ Snd_pause = 0x800339AC; // type:func  (Psy-Q libsnd/pause, from the SDK object)
 Snd_nextpause = 0x80033A4C; // type:func  (Psy-Q libsnd/pause, from the SDK object)
 Snd_tempo = 0x80033AB0; // type:func  (Psy-Q libsnd/tempo, from the SDK object)
 
+// ROUND 34 -- code_179d8_i middle (0x247B8..0x2490C): libsnd/replay and
+// libsnd/vs_vab. The tail of that unit became code_179d8_i_b.
+Snd_replay = 0x80033FB8; // type:func  (Psy-Q libsnd/replay, from the SDK object)
+SsVabClose = 0x80034020; // type:func  (Psy-Q libsnd/vs_vab, from the SDK object)
+SsVabOpen = 0x800340B0; // type:func  (Psy-Q libsnd/vs_vab, from the SDK object)
+
 // ROUND 34 -- code_179d8_f prefix (0x2673C..0x26D28): six libsnd objects, the
 // ADSR packer/unpacker, the SsUtSetReverb* family, SsUtSetVagAtr, the two
 // SpuVmDamper stubs and _SsSndNextSep. Sony's own exported names.

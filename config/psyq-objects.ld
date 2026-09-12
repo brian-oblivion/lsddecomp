@@ -400,7 +400,6 @@ SpuVmSetSeqVol = 0x80030404;
 SpuVmGetSeqVol = 0x80030584;
 SpuVmSeqKeyOff = 0x8003069C;
 Snd_decrescendo = 0x80033C90;
-Snd_replay = 0x80033FB8;
 Snd_play = 0x8003410C;
 Snd_crescendo = 0x80036528;
 _spu_t = 0x80038658;
