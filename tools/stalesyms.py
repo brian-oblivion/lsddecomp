@@ -34,13 +34,25 @@ TWO THINGS THIS TOOL DOES NOT CLAIM, both measured rather than assumed:
   corrected the names in its working tree to measure, and the durable artifact
   kept the un-linkable version. Those are the cheapest to fix and the easiest
   to miss, because the report reads as though it were already handled.
+- **A hit on an ALREADY-MATCHED function is archival, not actionable**, and
+  round 36 measured the split: of 158 flagged reports, **121 belong to
+  functions already matched** and only **37 are still `INCLUDE_ASM`**. For a
+  matched function `src/` is the source of truth and the report's code fence is
+  a historical record -- its stale name gates nothing and rebuilding it buys
+  nothing. For a live one the body IS the next runner's starting point and its
+  recorded figure is unverified until someone compiles it. Round 35's headline
+  ("most recorded near-miss figures in this corpus are attached to bodies that
+  will not link") was right about the mechanism and four times too large about
+  the queue, because the tool did not know which half it was looking at. It
+  does now: read the LIVE section, and treat ARCHIVAL as cleanup.
 
 Scanning whole reports instead of just the preserved regions over-reports by
 roughly an order of magnitude: a prose mention of an old name is harmless and
 usually historically accurate. Only `#if 0 ... #endif` blocks and ```c fences
 are scanned, which is where linkage actually matters.
 
-Usage:  python3 tools/stalesyms.py [--reports DIR] [--quiet]
+Usage:  python3 tools/stalesyms.py [--reports DIR] [--quiet] [--all]
+        --all also lists the ARCHIVAL (already-matched) reports in full.
 Exit 1 if any stale reference is found, so it can gate a round.
 """
 import os, re, sys
@@ -58,6 +70,24 @@ def load_symbols(path):
             if m:
                 table[int(m.group(2), 16)] = m.group(1)
     return table
+
+def live_include_asm(srcdir="src"):
+    """Symbols still carried as INCLUDE_ASM -- the ones whose BODY still matters.
+
+    A report's preserved body is only load-bearing while the function is
+    unmatched: it is what the next runner splices back in, and the figure
+    recorded next to it is unverified until that body compiles. Once the
+    function is MATCHED, `src/` is the truth and the report is a record, so a
+    stale name in it costs nothing and fixing it proves nothing.
+    """
+    pat = re.compile(r'INCLUDE_ASM\("[^"]*",\s*(\w+)\)')
+    live = set()
+    for name in os.listdir(srcdir):
+        if name.endswith(".c"):
+            with open(os.path.join(srcdir, name), errors="replace") as fh:
+                live.update(pat.findall(fh.read()))
+    return live
+
 
 def preserved_regions(text):
     """Only the parts of a report that are SOURCE meant to be spliced back in.
@@ -114,15 +144,43 @@ def main():
             print("No match report references a renamed symbol.")
         return 0
 
+    live = live_include_asm()
+    is_live = lambda n: n[:-3] in live      # report file is <func>.md
+    live_hits = {k: v for k, v in findings.items() if is_live(k)}
+    arch_hits = {k: v for k, v in findings.items() if not is_live(k)}
+
     total = sum(len(v) for v in findings.values())
+    ltotal = sum(len(v) for v in live_hits.values())
     print(f"STALE SYMBOL REFERENCES: {total} in {len(findings)} report(s).")
+    print(f"  LIVE (function still INCLUDE_ASM -- the body gates a figure): "
+          f"{ltotal} in {len(live_hits)}")
+    print(f"  ARCHIVAL (function already matched -- src/ is the truth):     "
+          f"{total - ltotal} in {len(arch_hits)}")
+    print()
     print("A preserved body using these names WILL NOT LINK as written.")
     print("Correct the names and REBUILD before trusting any score attached")
-    print("to that body -- the name is stale, the residue usually is not.\n")
-    for name in sorted(findings):
+    print("to that body -- the name is stale, the residue usually is not.")
+    print()
+    print("Work the LIVE list. An ARCHIVAL hit is a record of how a matched")
+    print("function was written before a rename; it gates nothing, and")
+    print("rebuilding it proves nothing. --all lists those too.")
+    print()
+
+    print(f"LIVE -- {len(live_hits)} report(s), correct and rebuild these:")
+    for name in sorted(live_hits):
         print(f"  {name}")
-        for old, new in sorted(findings[name].items()):
+        for old, new in sorted(live_hits[name].items()):
             print(f"      {old}  ->  {new}")
+
+    if arch_hits:
+        print(f"\nARCHIVAL -- {len(arch_hits)} report(s) for matched functions.")
+        if "--all" in args:
+            for name in sorted(arch_hits):
+                print(f"  {name}")
+                for old, new in sorted(arch_hits[name].items()):
+                    print(f"      {old}  ->  {new}")
+        else:
+            print("  (pass --all to list them)")
     return 1
 
 if __name__ == "__main__":
