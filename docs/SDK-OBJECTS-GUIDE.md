@@ -105,6 +105,11 @@ search confirming the bytes are there. Read the output:
   see through them. The derived offset is the evidence -- it lands on the
   slot's existing `dlabel` (`libc2/prnt` `.rdata` at `0x830` =
   `jtbl_80010058`). Take the line.
+- `bytes@0xA,0xB,0xC,0xD` -- the derived offset FIRST, then other places the
+  same bytes occur -- is fine: the relocation derivation is the evidence and
+  the extra hits are the same constant elsewhere (`libcd/iso9660` `.data` is
+  two DMA register addresses that retail holds four times). Take the line at
+  the derived offset.
 - `no relocation names it` on a PROGBITS section means nothing in the
   object's own text reads it. If the byte search finds it exactly once
   (`libgs/2d_bg0` `.data`, 4 bytes at `0x570CC`) place it; if it finds it
@@ -249,9 +254,75 @@ instruction and the whole-image SHA1 fails.
 
 ## Objects inside game segments
 
-`coverage` also lists placed objects that sit inside `c` segments. Converting
-one means splitting the C unit's segment around it and deleting the
-corresponding `INCLUDE_ASM` (and its match report, with a note in
-`docs/PROGRESS.md`). Do these after the pure `psyq_*` blocks; the recipe is
-the same but the unit's function order and its rodata attachment need care —
-read Gate 2 in `docs/PARALLEL-RUNS.md` first.
+`coverage` also lists placed objects that sit inside `c` segments (`runs`
+tags them `GAME unit (c)`; `python3 tools/sdkstalls.py` lists the ones that
+are live stalls). Converting one means splitting the C unit's segment around
+it and deleting the C -- `INCLUDE_ASM` stubs AND matched bodies alike, because
+Sony's object owns those bytes now (CLAUDE.md: never write C for a function a
+Sony object owns). The game-code count shrinks by exactly those functions;
+that is the correction, not a regression, and the commit message should list
+them. Rounds 33 and 34 did twelve of these; `git log --grep='SDK objects'`
+shows every one, and `git show 2d38345` (a mid-unit split) is the canonical
+diff. The recipe on top of steps 1-5:
+
+- **Position decides the yaml shape.** A run at the unit's START is a prefix
+  trim (the `c` line moves to the run's end); at the END a suffix trim (add
+  the `o` lines after the `c` line); in the MIDDLE it is `[c unit][o ...][c
+  unit_b]` and the tail needs a new name. A run may cross a unit boundary
+  (`libsnd/vs_vh`, `libcd/sys`, `libcd/iso9660` all did): then BOTH units
+  trim and nobody needs a new name. A one-function remainder is fine
+  (`class_3bb8c_v`, `code_179d8_b` after round 34).
+- **Move, do not retype.** Everything after a mid-unit run goes verbatim, in
+  ROM order, into the new `src/<unit>_b.c` with its own `#include "common.h"`
+  and the local declarations those functions use; `INCLUDE_ASM` paths of
+  moved stubs take the new unit name. Declarations that only served the
+  deleted functions go with them (round 34 dropped iso9660's directory-record
+  views and diagnostic-string externs from two units).
+- **The rodata attach follows the FUNCTION.** A `.rodata, <unit>` slot whose
+  jump table belongs to a function that moved to the tail is re-attached to
+  the tail unit (`sstable`); one whose owner became Sony's stops being an
+  attach and becomes the object's `.rdata` line (`gs_123`'s `jtbl_80011108`).
+  Left wrong it is Gate 2's `undefined reference to '.L8003....'`.
+- **Callers.** Every deleted body that other C called by `func_XXXXXXXX` now
+  needs the caller's `extern` under Sony's name -- LOCAL to the calling `.c`,
+  never a shared header (`GsSetRefView2`, round 33). A stub's callers in
+  asm are renamed by the symbols file alone; `make extract` rewrites them.
+- **Reports are kept, retitled.** Prepend the CONVERTED banner
+  (`head -12 docs/match-reports/func_800323A8.md`) to EVERY report in the
+  run, matched-C ones included -- `progress.py` no longer counts them, but
+  the next reader of a report needs to know its subject is Sony's.
+- **A `;` inside a symbols-file COMMENT aborts `make extract`** with splat's
+  `Line must contain a single semi-colon`. The comment after `//` is still
+  scanned. Round 34 hit it with "...from the SDK object; FirecatFG had the
+  name)". Use a comma.
+
+Read Gate 2 in `docs/PARALLEL-RUNS.md` for the boundary checks; a unit split
+is a carve, and the same under-split / orphaned-jump-table hazards apply.
+
+## An object that defines a name another object also defines
+
+`symbols` prints `CONFLICT <name>` when two placed objects DEFINE one text
+symbol at two addresses. Two cases, decided differently:
+
+- **Identical objects that differ only in name** (`libspu/s_r`/`s_w`,
+  `libgs/gs_111`/`gs_112`): only one is really there. A placed CALLER decides
+  (round 30); failing that the head picks the standard entry point and says so.
+- **Two REAL copies in retail, one WEAK.** `libcd/iso9660` carries its own
+  `memcpy` (WEAK, 0x8002C014) and `libc2/memcpy` defines it GLOBAL at
+  0x800238A8; Sony's linker kept both. GNU ld binds every reference to the
+  GLOBAL definition, so linked as shipped iso9660's own calls resolve to
+  libc2's copy -- a clean link and wrong bytes. Annotate the manifest line:
+
+  ```
+  3.3  libcd/iso9660  0x1BE40  localize=memcpy
+  ```
+
+  `install` then runs `objcopy -L memcpy` on the COPIED object (the text bytes
+  are untouched, only the binding), the object's own references bind to its
+  own definition, and `symbols` reports the definition as `LOCALIZED` instead
+  of `CONFLICT`. Byte-exact on the first build (round 34). The localised copy
+  keeps NO entry in the symbols file -- one name cannot label two addresses
+  there -- and the symbols file says so next to the gap. `memclr` (defined
+  WEAK three times by libetc's own objects, all linked) is the same shape and
+  is harmless only because nothing outside those objects calls it; it has
+  never needed the annotation.

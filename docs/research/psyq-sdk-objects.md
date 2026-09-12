@@ -345,6 +345,53 @@ back. Decisions and measurements made on the way:
   `0x1514C..0x15510` and could not localise the extra one after the range
   converted; oracle green, every Sony name applied. Recorded, not resolved.
 
+## Round 34 (2026-09-12): the first data-bearing game-unit conversions, and a WEAK duplicate
+
+Head work while two runners converted the text-only game-unit runs
+(`libsnd` in `code_179d8_i/_j/_f`; the 13 BIOS trampolines, `strcat`, and
+the `libgs`/`libgte` objects in `code_2cc8c_e`).
+
+**`libc2/strcpy` + `libc2/strstr` + `libcd/sys`** (0x19378..0x19C78, crossing
+`code_179d8_h` / `code_179d8_b`): 27 functions, 22 of them matched C and three
+INCLUDE_ASM stalls (`CdControl`, `CdControlF`, `CdControlB`, ~1200 report
+lines). `sys` has a 5-byte `.rdata` ("none", 0x1040) and a 0x80-byte `.data`
+(0x5DD7C, a table of 0/1 words); both slots split at the derived offsets, the
+`.rdata` with a 3-byte `pad`. `code_179d8_b` is left with ONE function.
+
+**`libcd/iso9660` + `libc2/strcmp` + `libc2/strncmp`** (0x1BE40..0x1C92C,
+crossing `code_179d8_g` / `code_179d8_d`): nine functions, three stalls
+(`CdSearchFile`, `CD_newmedia`, `CD_cachefile`, ~1300 lines). `.rdata` 0x1EA
+at 0x12EC with a 2-byte pad before `code_179d8_c_b`'s jump table; `.data`
+8 bytes at 0x5E138 (a byte search finds the same two DMA register addresses
+four times -- the relocation derivation picks the right one); `.bss` 0x2400 at
+0x8008B3F0 is the CD directory cache the game's own asm names as `D_8008B3F0`
+and friends, placed NOLOAD by the fragment with 0 notes while splat's own bss
+labels keep resolving the game's references.
+
+**The WEAK `memcpy`, resolved.** Round 29 recorded that `iso9660` defines
+`memcpy` WEAK at 0x8002C014 while `libc2/memcpy` defines it GLOBAL at
+0x800238A8, and that linking both as-is would bind iso9660's internal calls to
+libc2's copy. Measured now: the remedy is `objcopy -L memcpy` on the copied
+object at install time, driven by a manifest annotation (`localize=memcpy`);
+the text bytes are untouched, the binding becomes LOCAL, the object's own
+`R_MIPS_26` references bind to its own definition, and the first build was
+byte-exact. `symbols` now reports the definition as `LOCALIZED` rather than
+`CONFLICT`, leaving two conflicts in the corpus: `ResetCallback` (the
+`ssinit_c` false placement, already `SUSPECT`) and `memclr` (three WEAK copies
+inside libetc, all linked, nothing external calls them). The manifest parser
+takes any number of `key=` tokens now; `shadow=` and `localize=` are the two.
+
+**Two splat facts found on the way.** A `;` inside a symbols-file COMMENT
+aborts `make extract` (splat asserts one semicolon per line, comment
+included). And when a slot is split around an object's `.rdata` the plain
+remainder gets a fresh `dlabel` at the new start, so a `D_XXXXXXXX` that used
+to span the object's bytes and the remainder (`D_80010840` covered 0x1040..
+0x10B4) simply shrinks -- harmless when, as here, nothing outside the object
+referenced it; check with `grep -rn D_XXXXXXXX src asm/nonmatchings` first.
+
+After the head's two runs the Sony-owned share of the live stall queue was
+8 -> 2, both in the runners' hands. 137 objects linked.
+
 ## What is next
 
 1. **Text-only, fully covered blocks first**: `psyq_PadInit` (libetc `pad`),
