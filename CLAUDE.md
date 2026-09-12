@@ -689,6 +689,7 @@ tools/setup-worktree.sh <name>     # provision a parallel runner
 .venv/bin/python3 tools/psyq_sdk.py match      # place every SDK object in retail
 .venv/bin/python3 tools/psyq_sdk.py coverage   # which SDK functions are already owned by an object
 python3 tools/sdkstalls.py         # stalled functions that are really Sony library code
+python3 tools/stalesyms.py         # preserved bodies calling symbols since renamed
 .venv/bin/python3 tools/psyq_sdk.py check      # manifest, yaml `o` segments and lib/ agree
 ```
 

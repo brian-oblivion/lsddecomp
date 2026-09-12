@@ -5745,3 +5745,38 @@ purpose.
   `psyq_memset` (260 functions) and game code at `0x39c80` in particular is a
   big claim resting on one name. Worth a spot check before anyone relies on the
   game-code percentage.
+
+## A preserved body's symbols go stale across an SDK-object round (round 35)
+
+A match report's preserved body is meant to be spliceable: CLAUDE.md requires it
+inlined "with every declaration it needs, positioned where it would compile".
+An SDK-object round breaks that wholesale, by renaming placeholder
+`func_XXXXXXXX` symbols to their real Sony names (`func_80025900` -> `VSync`,
+`func_80013348` -> `strlen`). The body still reads correctly and is internally
+consistent; it simply no longer links.
+
+**Three independent instances across three rounds** make this a class rather
+than an anecdote: round 33 found `func_800375E8` (really `SpuSetNoiseVoice`) by
+hand; round 35's echo found four renames in one unit; round 35's delta found
+`func_8004109C`'s recorded 42/56 had **never been measured at all** -- funcdiff's
+staleness guard fired, and the real figure was 42/56 only after the names were
+fixed, then 49/56 with a new lever.
+
+```sh
+python3 tools/stalesyms.py      # preserved bodies referencing renamed symbols
+```
+
+Two calibrations, both measured rather than assumed:
+
+- **A stale name does not invalidate the RESIDUE.** Echo corrected all three of
+  its bodies and reproduced the recorded scores exactly. A hit means "this
+  figure is unverified until someone compiles it", not "this figure is wrong".
+- **A hit does not mean nobody noticed, and this is the trap.** Both echo's and
+  delta's reports document the rename in PROSE while leaving the BODY on the
+  old names -- the runner fixed the names in its working tree to measure, and
+  the durable artifact kept the un-linkable version. Such a report reads as
+  though it were already handled.
+
+Do not bulk-fix the flagged bodies. Each correction needs a rebuild to confirm,
+and renaming them unverified would manufacture exactly the unverified-figure
+problem the tool exists to catch.
