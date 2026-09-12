@@ -653,23 +653,25 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 	return ret;
 }
 
-#if 0
-/* Best-reached body, 68/72 words, verified fresh round 37 (2026-09-12,
-   runner charlie) -- see docs/match-reports/func_80059D1C.md for the
-   residue analysis. The `new_var` copy of `heading` (a permuter-found
-   lever, translated to idiomatic C) fully closes the whole-function
-   this/obj/vt/heading register-identity swap that stalled rounds 2-35;
-   the ONLY remaining residue is a two-instruction load-order swap between
-   the two byte-table reads (D_80087EB0/D_80087EC8), unmoved by any
-   statement-order variant tried (see report). Restored to INCLUDE_ASM
-   below per project rule (no score short of byte-exact stays in src/). */
+/* `headingArg` and `scratch` are not superfluous: they were found by a
+   permuter search (round 37, 2026-09-12, runner charlie) after 20+ hand
+   attempts across three rounds failed to reproduce retail's whole-function
+   this/obj/vt/heading register allocation. Both are ordinary, valid C89 --
+   `headingArg` is a second copy of `heading` used at its two call sites,
+   giving the two logical uses disjoint live ranges so GCC 2.6.3's
+   allocator lands them in the SAME register retail does; `scratch` plays
+   the same role for the raw `D_80087EB0[idx]` read and, independently, for
+   the literal `0x90` argument at the very end. Removing either variable
+   (rebuilding the "obvious" simpler form) reproduces a real, measured
+   regression -- see docs/match-reports/func_80059D1C.md. */
 void func_80059D1C(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 	s32 idx;
 	DreamSysUnk58Vtable *vt;
 	s32 heading;
-	s32 new_var;
+	s32 headingArg;
+	s32 scratch;
 
 	obj = (DreamSysUnk58 *)this->unk_0x58;
 	vt = obj->vt;
@@ -678,24 +680,23 @@ void func_80059D1C(DreamSys *this)
 		return;
 	}
 
-	heading = D_80087EB0[idx];
-	heading <<= 4;
-	new_var = heading;
+	scratch = D_80087EB0[idx];
+	heading = scratch << 4;
+	headingArg = heading;
 	vt->slot0x9C(obj, D_80087EC8[idx]);
-	this->unk_0xBC = vt->slot0x80(obj, new_var, 0x6E, 0x6E);
+	this->unk_0xBC = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
 	if (this->unk_0xB8 != 0x16) {
 		this->unk_0xBC = -1;
 	}
 
 	if (this->unk_0xB8 == 0xB) {
 		vt->slot0x9C(obj, 1);
-		vt->slot0x80(obj, new_var, 0x6E, 0x6E);
+		vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
 		vt->slot0x9C(obj, 2);
-		vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+		scratch = 0x90;
+		vt->slot0x80(obj, scratch, 0x6E, 0x6E);
 	}
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_80059D1C);
 
 void func_80059E3C(DreamSys *this)
 {
