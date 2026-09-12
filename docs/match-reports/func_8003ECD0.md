@@ -1,4 +1,4 @@
-# func_8003ECD0 — STALL (near-miss, 71/73, instruction-order residue)
+# func_8003ECD0 — STALL (near-miss, 71/73, instruction-order residue; reconfirmed round 36 after a stale-symbol rebuild and a ~40k-iteration permuter search)
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. Best score: 71/73 words
 in-range, build clean at that score. ~14 real attempts, all on the SAME
@@ -173,6 +173,87 @@ the stall:
   reproduce cleanly).
 - New extern `func_8003FC18(s32 a0, s32 a1, s32 a2)` (next slice,
   uncarved).
+
+## ROUND 36 (runner delta): stale-symbol rebuild confirms 71/73 exactly; bounded permuter search finds no zero, two spurious sub-baseline candidates fingerprinted
+
+Round 34's SDK-object conversion linked `libgs/gs_113.o` and renamed this
+function's callee from `func_8003FC18` to `GsClearOt` (`config/symbols.
+slps01556.lsdde.txt:476`). This report's preserved body (both copies above)
+still used the old name, so per this round's stale-symbol trap it had never
+actually been rebuilt in its current form since that rename — the 71/73
+figure was correct but unverified against the current tree.
+
+**Rebuilt with the corrected name.** `extern void GsClearOt(s32, s32, s32);`
+already existed in `src/code_2cc8c_d.c` (added when round 34 retyped this
+unit's other Sony calls), just declared after this function's own call
+sites; added a second, identical declaration ahead of `func_8003ECD0`
+itself (same pattern this unit already uses for its other local externs)
+rather than hoisting the existing one. `func_80017B34` also needed its own
+extern (not previously declared in this unit). Build: clean compile
+(`build exit=2`, zero grep hits on the compile-error patterns, ordinary
+SHA1 mismatch). **`funcdiff.py` reports 71/73 words, no out-of-range
+drift when this is the only in-progress edit** -- exactly reproducing the
+title figure. The residue is unchanged from the description above (the
+same 2-word `addiu`/`addu` pairing).
+
+### Permuter search: ~40,000 iterations, no zero, two spurious leads
+
+Per round 23's own verdict ("the next lever here is the permuter, not
+another hand-written grouping"), seeded `tools/setup-permuter.sh` from this
+exact 71/73 body (with `GsClearOt`) and ran `-j 4 --stack-diffs
+--stop-on-zero --best-only` under `timeout 400`. Base score (via `--debug
+--stack-diffs`) reproduced as **215**. The search reached **iteration
+~40,005** before the wall clock ended it (no leaked process afterward).
+**No candidate reached score 0, and the search found no legitimate
+improvement.**
+
+Two candidate directories scored below the 215 baseline (120 and 175,
+the latter appearing twice) but both are spurious, confirmed by diffing
+each `source.c` against the seed:
+
+- **Score 120 is a semantic bug, not a fix.** It moves the `+ 0x14` term
+  out of the live `size` computation and into an unreachable dead branch
+  (`if (buf == 0) { size = size + 0x14; if (1) { return; } }`) that always
+  returns before the modified `size` is ever read. The SURVIVING path's
+  `size` therefore never gets `+0x14` added at all, which changes the
+  value handed to `self->unk7C`/`unk84`/`unk8C` and to the `func_80017B34`
+  allocation call relative to the confirmed-correct semantics (the leading
+  4 instructions of the 71/73 body already reproduce retail's own
+  `mult`/reload/`sllv`/`mflo` sequence exactly, which only happens when
+  `+0x14` is folded into `size` before the allocation, not after). The
+  permuter's textual/instruction-diff heuristic scored this lower anyway
+  because dead code still gets compiled and can coincidentally resemble
+  retail's instruction stream in places the heuristic weights, without the
+  candidate being behaviorally equivalent. **Not adopted.**
+- **Score 175 (x2) narrows `size` to `unsigned char`.** A real
+  truncation bug for a buffer-size computation that is very plausibly
+  >255 in general (this specific call site's actual runtime values are
+  unknown, so nothing here proves it safe). Same class of permuter
+  artifact as the fingerprinted 130-scored candidate in
+  `func_80031A44.md`'s round 31/32 addenda: a mutation that scores better
+  on the tool's own heuristic without being a real candidate.
+
+**Verdict: unchanged.** 71/73 remains the best HONEST score; the residue
+is the same 2-word `mult`/`mflo`-adjacent instruction-order pairing
+documented above, now reconfirmed against the current tree and against a
+~40k-iteration search that found nothing better. Restored to
+`INCLUDE_ASM`. Classification unchanged: STALL, not register-identity, not
+banned-lever territory.
+
+### Proposed learning
+
+**A permuter score below the baseline is not evidence of progress by
+itself -- diff the candidate's source against the seed before trusting the
+number.** Both sub-baseline candidates found here were real bugs (a value
+computed differently, silently, in a way the assembled bytes partially
+disguise) rather than closer matches, mirroring the pattern
+`func_80031A44`'s reports already document for a different function. A
+scoring heuristic built on instruction/textual distance to the target has
+no way to know the source changed what the function COMPUTES, only that
+the resulting bytes moved closer on some weighted metric; that gap is
+exactly where a permuter can manufacture a plausible-looking false lead,
+and it is cheap to catch (one `diff` against the seed) but easy to skip
+under time pressure.
 
 ## Proposed learning
 

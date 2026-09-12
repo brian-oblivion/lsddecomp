@@ -17,9 +17,13 @@
  * steps is the correction CLAUDE.md asks for, not a regression; their C is
  * DELETED, not commented out.
  *
- * `D_8008EA22` LEFT WITH `SsUtPitchBend`: that function and the deleted
- * func_80030648 were its only readers in this family, so the extern went with
- * the deletion rather than being kept as a dead declaration.
+ * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
+ * used to claim `SsUtPitchBend` and the deleted `func_80030648` were its
+ * only readers in this family, and dropped the extern on that basis. That
+ * was never true of this file's own two remaining stalls -- func_80030E90
+ * and func_8003149C both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
+ * unnoticed because both were still INCLUDE_ASM and nothing failed to
+ * link. Declared again below.
  *
  * NO RODATA ATTACH IS OWNED BY ANY UNIT IN THIS FAMILY, and that is measured,
  * not assumed: the old code_179d8_mid_c monolith contains zero `jtbl_` and
@@ -94,6 +98,24 @@ extern s32 D_8008E934;
  * D_8008EA22 above. */
 extern volatile u16 D_8008EA26;
 extern volatile u8 D_8008EA18;
+extern u16 D_8008EA22;
+
+/* Base pointer for a table of 0x10-byte slots, indexed by the same <0x18
+ * channel space func_80030E90 validates via SpuVmVSetUp. This unit's own
+ * reduced view: only the fields func_80030E90 itself touches are named.
+ * The sibling accessors that used to share this typedef (SpuVmSetProgVol
+ * and friends, code_179d8_j.c's old `SlotE968`) are Sony's own object as
+ * of round 34's split and never touched offset 0; func_80030E90 does, so
+ * this unit's own copy of the type names it (see func_80030864.md, the
+ * matched sibling's report, for the +0x1/+0x4 fields' provenance). */
+typedef struct SlotE968 {
+    u8 unk0; /* +0x0 */
+    u8 unk1; /* +0x1 */
+    u8 pad2[0x4 - 0x2];
+    u8 unk4; /* +0x4 */
+    u8 pad5[0x10 - 0x5];
+} SlotE968;
+extern SlotE968 *D_8008E968;
 
 /* func_80030E90's own scratch globals -- a "start channel" setup
  * routine that stages its parameters and a couple of table lookups
@@ -180,6 +202,22 @@ extern Rec34Half D_8008D98C[];
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
 
+/* STALL -- see docs/match-reports/func_80030E90.md. Round 26: 239/252 words
+ * (13 short). Round 31: 240/252 (12 short), the `s32 result` axis. Round 36:
+ * rebuilt with SpuVmVSetUp's real name (was func_80032148 -- round 34's SDK
+ * conversion renamed the callee, and the report's preserved body was never
+ * corrected) plus the SlotE968/D_8008EA22 declarations round 34's carve
+ * deleted from this family (see this file's header note above). Measured
+ * 241/252 words this round (11 short) -- close to but not an exact
+ * reproduction of round 31's 240/252, consistent with that round's own
+ * caveat that its barrier placement could not be fully recovered from
+ * prose. Three residues persist per the report: busy-lock guard polarity
+ * (confirmed non-source-derivable by a round-26 head reproducer), missing
+ * field-copy load-delay nops (confirmed not barrier-reachable), and the
+ * func_8002CF18() return value's register identity -- all three exhausted
+ * per this report's own extensive history (14+ hand reshapes across two
+ * rounds plus a 9-probe head investigation). Not reattempted this round;
+ * see docs/match-reports/func_80030E90.md's round-36 addendum. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030E90);
 
 s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
@@ -233,6 +271,18 @@ fail_nolock:
     return -1;
 }
 
+/* STALL -- see docs/match-reports/func_8003149C.md. func_80030E90's near
+ * twin. Round 26: 236/253 words (17 short). Round 36: rebuilt with
+ * SpuVmVSetUp's real name (was func_80032148 -- round 34's SDK conversion
+ * renamed the callee, report's preserved body never corrected). Measured
+ * 237/253 words this round (16 short), raw match 33/253 -- close to but
+ * not an exact reproduction of round 26's 236/253, same barrier-placement
+ * recovery caveat as func_80030E90's round-36 note. Same three residue
+ * classes as func_80030E90 plus two more this function's own report
+ * documents (a second, independent guard-polarity flip on the "note == 0"
+ * check; a one-statement-shifted D_8008EA13 fresh-read position), all
+ * confirmed non-source-derivable by the sibling report's exhaustive
+ * investigation. Not reattempted this round; see this round's summary. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031890);
