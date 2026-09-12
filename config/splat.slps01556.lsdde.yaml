@@ -1326,9 +1326,18 @@ segments:
       # trampolines in a C unit is to give it its own segment.  12 words -- it
       # should close in one sitting and then this unit is finished.
       - [0x41328, c, class_3bb8c_v]
-      # class_3bb8c_h_c: 5 trampolines (0xB0 x4 at 0x41358/68/78/98, 0xA0 x1 at
-      # 0x41388), 0x41358..0x413A8.  Same `hasm` disposition as class_3bb8c_h.
-      - [0x41358, asm, class_3bb8c_h_c]
+      # class_3bb8c_h_c WAS 5 trampolines (0xB0 x4 at 0x41358/68/78/98, 0xA0 x1
+      # at 0x41388), 0x41358..0x413A8.
+      # ROUND 34: all five are Sony's, one libcard object each, tiling the
+      # segment exactly -- the last of the three trampoline `asm` segments
+      # retires (see the ROUND 34 note above class_3bb8c_h).  `libapi/c112`
+      # and `libcard/c112` are byte-identical _bu_init objects; libcard is
+      # taken because every neighbour in this run is libcard.
+      - [0x41358, o, libcard/a78]       # _card_write (B(0x4E), was func_80050B58)
+      - [0x41368, o, libcard/a74]       # InitCARD    (B(0x4A), was func_80050B68)
+      - [0x41378, o, libcard/a75]       # StartCARD   (B(0x4B), was func_80050B78)
+      - [0x41388, o, libcard/c112]      # _bu_init    (A(0x70), was func_80050B88)
+      - [0x41398, o, libcard/a80]       # _new_card   (B(0x50), was func_80050B98)
       # class_3bb8c_i: first slice after the trampolines, 0x413A8..0x41F84,
       # 20 functions. Carved round 14. Blocker profile: 2 of 20 --
       # func_80050C14 (gp_rel) and func_800513D0 (addiu-$at, and it owns a

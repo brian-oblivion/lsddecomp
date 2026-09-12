@@ -393,6 +393,13 @@ todigit = 0x80050AA4; // type:func  (Psy-Q libc2/todigit, from the SDK object)
 // linked SDK objects in round 34.  One libcard object each.
 _card_load = 0x80050B08; // type:func  (Psy-Q libcard/c172, from the SDK object)
 _card_info = 0x80050B18; // type:func  (Psy-Q libcard/c171, from the SDK object)
+// class_3bb8c_h_c's five trampolines, converted to linked SDK objects in
+// round 34 -- the last of the 13 that were counted as game code.
+_card_write = 0x80050B58; // type:func  (Psy-Q libcard/a78, from the SDK object)
+InitCARD = 0x80050B68; // type:func  (Psy-Q libcard/a74, from the SDK object)
+StartCARD = 0x80050B78; // type:func  (Psy-Q libcard/a75, from the SDK object)
+_bu_init = 0x80050B88; // type:func  (Psy-Q libcard/c112, from the SDK object)
+_new_card = 0x80050B98; // type:func  (Psy-Q libcard/a80, from the SDK object)
 New_DreamSys = 0x80058774;
 DreamSys__DreamSys = 0x800587F0;
 DreamSys__func_588ec = 0x800588EC;

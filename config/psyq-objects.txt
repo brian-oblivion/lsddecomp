@@ -364,3 +364,15 @@
 # exactly, so the `asm` segment retires. Text-only.
 3.3  libcard/c172   0x41308
 3.3  libcard/c171   0x41318
+
+# ROUND 34 -- class_3bb8c_h_c (0x41358..0x413A8): the last five trampolines,
+# four on BIOS vector 0xB0 and one on 0xA0. One libcard object each, tiling
+# the segment exactly, so the `asm` segment retires and with it the last of
+# the 13 `jr $t2` stubs that were counted as game code. Text-only.
+# `libapi/c112` and `libcard/c112` are BYTE-IDENTICAL _bu_init objects; the
+# head chose libcard/c112 because every one of its neighbours here is libcard.
+3.3  libcard/a78    0x41358
+3.3  libcard/a74    0x41368
+3.3  libcard/a75    0x41378
+3.3  libcard/c112   0x41388
+3.3  libcard/a80    0x41398
