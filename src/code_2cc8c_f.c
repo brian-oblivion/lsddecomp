@@ -269,21 +269,28 @@ Obj6EAC0Methods *func_80040FB0(void) {
     return &D_8006EB90;
 }
 
-/* func_80040FC0 -- STALL (redundant cursor cache). See
- * docs/match-reports/func_80040FC0.md: best 15/24 at correct length; the
- * branch/arithmetic shape is byte-identical to retail, but retail spends a
- * SEPARATE register on the store cursor (kept in lockstep with the return
- * pointer) that every C form tried collapses into one register. Preserved
- * body and its declarations are inlined in that report. */
+/* func_80040FC0 -- STALL, but MUCH closer as of round 37: 22/24 at exact
+ * length, and the ONLY residue is two TRANSPOSED preheader words
+ * (`ori $a3,$zero,0x40` / `addu $a2,$a0,$zero` at vram 0x80040FD0).
+ * The "redundant cursor cache" class this comment used to describe is
+ * SOLVED and the old claim -- that every C form collapses the two
+ * registers into one -- was FALSE: it measured one idiom, not the
+ * compiler. Retail's source simply has TWO destination pointers that
+ * carry equal values (`d` stored through, `dst` returned), and writing
+ * both keeps both. A bare __asm__("") barrier does NOT move the
+ * transposition (tried both positions); this is preheader emission
+ * order, not scheduling. Prime permuter target -- never searched.
+ * Preserved body and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
 
-/* func_80041020 -- STALL (redundant cursor cache), same class as
- * func_80040FC0 above. See docs/match-reports/func_80041020.md: best 19/31
- * at exact length; the only remaining residue is WHEN a lagging cursor
- * register gets re-synced to the advancing dst pointer -- a second register
- * every C form tried (including a bare __asm__("") barrier, round 35)
- * collapses into one. Preserved body and its declarations are inlined in
- * that report. */
+/* func_80041020 -- STALL, best 19/31 at exact length. See
+ * docs/match-reports/func_80041020.md. This was filed as the same
+ * "redundant cursor cache" class as func_80040FC0 above -- and that
+ * class was DISSOLVED in round 37 by writing two destination pointers
+ * in the source instead of trying to make the compiler invent the
+ * second. THIS FUNCTION HAS NOT YET BEEN RETRIED THAT WAY; it is the
+ * obvious next application of the fix, together with func_800407F8.
+ * Preserved body and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80041020);
 
 /* func_8004109C -- STALL (register identity), best 49/56, correct length.
