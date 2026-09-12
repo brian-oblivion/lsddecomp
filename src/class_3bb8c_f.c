@@ -98,7 +98,6 @@ s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg
  * moves fills a branch's delay slot) that did not respond to any
  * position/type/declaration-order variant tried. Preserved here per
  * convention -- not live C. */
-#if 0
 /* func_8004EF6C's own local types -- none shared elsewhere in this unit. */
 
 /* A small opaque sub-record, read/written as a whole -- all s16 members
@@ -164,6 +163,18 @@ extern const char D_80011530[];  /* rodata string "File not create in WriteFile\
 extern s32 write(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
 extern void printf(const char *fmt);  /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
 
+#if 0
+/* ROUND 37 (delta): re-verified 239/240 (1 word short, 0x3BC/0x3C0), then
+ * re-measured raw word-match at 191/240 (previously recorded as 188/240 --
+ * the 3-word difference is not a regression, just the first re-measurement
+ * since round 34 relinked the BIOS trampolines this body calls through;
+ * `asm-differ` confirms the residue is IDENTICAL in kind and location to
+ * the one this report already documents: the whole callee-saved register
+ * set permuted relative to retail's own, plus the single missing
+ * `sw $s0,0x30($sp)` / delay-slot `move $s7,$s4` at file 0x3F7A4/0x3F7F0).
+ * Seeded a permuter search (never run before this round) -- see the report
+ * for iteration count and result. Restored here, not left live -- see the
+ * report. */
 s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
     char pathBuf[0x20];
     char *path;
@@ -390,7 +401,14 @@ void func_8004F810(TaskObjF *self) {
  * re-materializes an explicit `v0=0` plus a skip-jump around it,
  * regardless of whether the C returns a literal `0` or a captured
  * variable holding the same value. Preserved here per convention -- not
- * live C. */
+ * live C.
+ *
+ * ROUND 37 (delta): re-verified by splicing this exact body back in --
+ * rebuilds to 63/77 words at 0x140/0x134 (3 words too long), first real
+ * diff at file 0x40158 / vram 0x8004F958 (delay-slot fill: retail
+ * `move $a0,$s0`, built `nop`), matching this report exactly. Seeded a
+ * permuter search (never run before this round) -- see the report for
+ * iteration count and result. Restored here, not left live. */
 s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     s32 (*dispatch)(TaskObjF *, s32);

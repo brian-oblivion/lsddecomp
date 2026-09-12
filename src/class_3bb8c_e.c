@@ -226,7 +226,27 @@ extern s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3);
  * disassembly), but the compiled body is one word short with different
  * callee-saved register numbering and a different call-argument delay-slot
  * split. Restored to INCLUDE_ASM so the correct-length placeholder doesn't
- * cascade drift into func_8004E77C and everything after it in this unit. */
+ * cascade drift into func_8004E77C and everything after it in this unit.
+ *
+ * ROUND 37 (delta): rebuilt this EXACT preserved body against today's
+ * pinned toolchain before trusting its recorded score, per this round's
+ * own directive -- and it does NOT reproduce the claim above. Confirmed
+ * with an isolated cpp|cc1|maspsx|as reproducer (no project headers, just
+ * this function and a stub `Node3bb8cE`/`func_8004E77C` declaration) that
+ * this exact source, unchanged, compiles with the two `func_8004E77C`
+ * call sites CROSS-JUMP MERGED into a single shared `jal` -- the same
+ * pathology the report's own attempts 1/2/3 hit and attempt 4 (this body)
+ * was written up as having eliminated ("the cross-jump merge disappeared
+ * entirely"). It has not: only one `jal` appears in the compiled object,
+ * reached by two different paths that set up its argument registers
+ * differently beforehand, exactly like the merge the report describes
+ * for the REJECTED attempts. This is not a toolchain drift -- the
+ * addiu_at flag (round 21) that landed after this stall was written only
+ * touches maspsx, never cc1, and the isolated repro used today's cc1 in
+ * total isolation from the rest of this file. The report's claim was
+ * simply never true of this exact source, or stopped being tested before
+ * being written down. See the match report for the corrected residue and
+ * this round's re-measurement. */
 #if 0
 s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
@@ -371,7 +391,15 @@ extern s32 close(s32 arg0);
  * redundant register move; every semantic value and branch is right.
  * Preserved body below, restored to INCLUDE_ASM so this correct-length
  * placeholder doesn't cascade drift into every function after it in this
- * unit. */
+ * unit.
+ *
+ * ROUND 37 (delta): rebuilt this EXACT preserved body before trusting its
+ * score -- reproduces 1/41 in-range, 40 vs 41 words (missing redundant
+ * move), exactly as recorded. Lowest priority on this round's list (an
+ * already-permuter-searched function, twice: round 14 ~4600 iterations
+ * and round 19 ~130,167 iterations, both converging on the same floor of
+ * 5 with no zero); not re-searched this round in favour of the two
+ * never-searched functions this round's own thesis prioritized. */
 #if 0
 s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 {
