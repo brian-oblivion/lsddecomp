@@ -283,13 +283,16 @@ Obj6EAC0Methods *func_80040FB0(void) {
  * Preserved body and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
 
-/* func_80041020 -- STALL, best 19/31 at exact length. See
- * docs/match-reports/func_80041020.md. This was filed as the same
- * "redundant cursor cache" class as func_80040FC0 above -- and that
- * class was DISSOLVED in round 37 by writing two destination pointers
- * in the source instead of trying to make the compiler invent the
- * second. THIS FUNCTION HAS NOT YET BEEN RETRIED THAT WAY; it is the
- * obvious next application of the fix, together with func_800407F8.
+/* func_80041020 -- STALL (register identity), best 20/31 at EXACT length.
+ * See docs/match-reports/func_80041020.md. Round 37 applied the two-cursor
+ * fix that dissolved the old "redundant cursor cache" class on
+ * func_80040FC0 above, and it works here too: every instruction now sits
+ * in retail's exact slot with retail's exact opcode and immediate. The
+ * whole remaining residue is ONE 3-way register renaming (d: a2<->a3,
+ * the 0x20 constant: a3<->t0, lead: v1<->a2), which is a banned thing to
+ * fix by pinning and therefore a stall. Prime permuter target -- never
+ * searched. func_800407F8 is the third member of the dissolved class and
+ * has still NOT been retried this way.
  * Preserved body and its declarations are inlined in that report. */
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80041020);
 
