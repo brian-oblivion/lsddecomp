@@ -2126,6 +2126,61 @@ Failing a gate is allowed. If one cannot be satisfied confidently — ambiguous
 carve boundary, contradictory unit state — report the specifics and stop, rather
 than burning a runner round on a bad premise.
 
+## A runner that stops "waiting on background work" MAY RESUME ITSELF — do not hand-recover until you have confirmed it is dead (round 40)
+
+Round 40's bravo and charlie both ended a turn waiting for a notification,
+which this document has called the round-33 failure since round 33. The head
+applied the documented remedy — recover the worktree by hand before teardown —
+and **both runners then woke up and finished their own work.**
+
+**The mechanism, which nobody had written down:** a runner's completion
+notification fires each time it stops *with no live background children of its
+own*. A runner that backgrounds a permuter and then stops therefore notifies
+the head **while still being resumable**, and when its search finishes it can
+be re-invoked and continue. "Notified" is not "finished", and it is certainly
+not "dead".
+
+**What the premature recovery cost, measured:**
+
+- charlie's live `src/` was reverted under it; it detected this afterwards via
+  `git reflog`, reconciled the duplicate report sections the head's commit had
+  created, and reported the head's own intervention as an anomaly — correctly.
+- bravo's report was written twice, by the head and then by bravo, producing
+  the round's **only merge conflict**.
+- The head published a verdict (`func_8004BE54`'s lever is "UNTESTED") that
+  bravo falsified within the hour by testing it (142/150). That verdict had to
+  be marked SUPERSEDED in the report.
+
+None of it lost work, and the duplicated effort did buy one real thing — an
+**independent reproduction** of `func_8004B700`'s 137/140 from the same saved
+candidate, arrived at without access to bravo's reasoning. That is worth
+having, but it is not worth engineering on purpose.
+
+**So, before recovering a stalled runner by hand:**
+
+```sh
+pgrep -af "wt-<name>.*decomp-permuter"     # its OWN worktree path, never a bare tool name
+git -C ../<checkout>-wt-<name> status --porcelain
+git -C ../<checkout>-wt-<name> log --oneline <merge-base>..runner/<name>
+```
+
+**If any of its processes are alive, it is not stalled — it is waiting, and it
+will come back. Leave it.** Recover only when the process table is clear AND
+the tree still holds uncommitted work AND you are about to tear down. Teardown
+is the real deadline; a runner between turns is not.
+
+**The old rule was not wrong, it was under-specified**, and this is the same
+decay shape this document keeps naming: the round-33 remedy was written from a
+case where the runner genuinely never came back, and it was applied to a case
+that looked identical from the outside. The distinguishing evidence is the
+process table, and checking it costs one command.
+
+**What still holds unchanged, and is the half that did the work:** bravo had
+committed everything before it waited, so its stall cost nothing and its match
+was never at risk. charlie had not, so its stall left a red build and two
+non-matching bodies live in `src/`. **"COMMIT BEFORE you wait" is the rule
+that made the difference**, and it is the one to keep pressing on runners.
+
 ## Sizing guidance
 
 This project is **much cheaper per build than the N64 sister project**: a clean
