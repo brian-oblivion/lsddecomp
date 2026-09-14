@@ -2115,8 +2115,59 @@ on Sony's code — and nothing in it reads as stale.
 **Gate 3 — permuter round instead.** If the fresh queue is dry and carving is
 blocked, or the stall residue is worth more than cold ground (near-misses like
 88/90), run a permuter round. A zero is a LEAD, not an answer: translate it to
-idiomatic C and re-verify with funcdiff. If only UB or duplicate-arm forms reach
-zero, mark the class permuter-exhausted in the report and move on.
+idiomatic C and re-verify with funcdiff.
+
+**The discriminator is WHOSE ORACLE BELIEVED IT, not what the C looks like
+(round 41).** This paragraph used to end *"if only UB or duplicate-arm forms
+reach zero, mark the class permuter-exhausted in the report and move on"*, and
+that sentence was wrong in a way that forbade work the project has now adopted
+**twice, deliberately, with the whole-image SHA1 green both times** — round
+39's `func_8002AEE0` and round 41's `func_8001E110`. A rule nobody can follow
+is worse than no rule, because the runner who obeys it throws away a match and
+the runner who does not feels obliged to apologise for one.
+
+Two errors were packed into that sentence:
+
+- **It brackets "UB or duplicate-arm" as one class. They are not.** UB is
+  disqualifying on its own terms: a candidate that branches on a value read
+  before its first assignment is exploiting the scorer, and round 41's
+  `func_8001DA28` search produced several. A duplicate-arm form is merely
+  *ugly* — `if (mid.y) return 0; else return 0;` is semantically identical to
+  the `return 0;` it replaces, and round 41's bravo checked explicitly that
+  `mid.y` was already computed, so it is a redundant TEST and not an
+  uninitialized read.
+- **It stops at the permuter's own scorer.** That is the real question, and
+  the old wording never names it: **a scorer zero is a LEAD; an
+  `OK: build matches retail` is an ANSWER.** A form that survives translation
+  into the project's C, rebuilds through the real pipeline, and turns the
+  whole-image SHA1 green has achieved the project's stated goal — byte-exact
+  bytes — whatever it looks like on the page.
+
+So: reject UB. Reject anything only the permuter's scorer believes. **Adopt a
+form the real oracle verifies**, and comment it AT THE SITE saying it is inert
+and why it is there — both adopted instances do exactly that. Mark a class
+permuter-exhausted when nothing survives translation, not when what survives
+is unattractive.
+
+**And translation is not optional in either direction (round 41, delta).**
+Round 40 established that a sub-base candidate is worth translating even with
+no zero, and it was worth twelve words there. Delta translated exactly such a
+candidate — score 2735 against a base of 3735, a large early improvement — and
+rebuilding it through the real pipeline gave **14/164 with drift**, far worse
+than the 65/164 it started from. Both results stand, and together they say:
+**translate AND measure.** A permuter score is in permuter units and is not a
+proxy for a funcdiff word-match, in either direction.
+
+**Cheapest triage available before you spend a search at all (round 41,
+bravo):** the `--debug --stack-diffs` insertion/deletion count predicts
+whether a bounded search is worth running. Two searches that round were a
+controlled comparison — `func_8001E110` scored **0 insertions / 0 deletions**
+and found a zero at iteration 2642; `func_8001DA28` scored **23/44** and
+burned 73273 iterations (rc=124) on candidates that were all noise or UB.
+Round 40 introduced the scaffold check as a CORRECTNESS test (is this search
+capable of succeeding); this makes it a COST test (is it worth starting), and
+it composes with the sixth screen — prefer a never-searched function whose
+scaffold is near 0/0.
 
 **Never authorized — always an operator escalation, evidence attached:**
 toolchain or flag changes of any kind; editing the protected verification files;
