@@ -1,4 +1,42 @@
 /*
+ * ===================================================================
+ * ROUND 39 (head): func_80050B28 IS NOT GAME CODE.  DO NOT STAFF IT.
+ * ===================================================================
+ *
+ * It is Psy-Q **libcard**.  Its object is simply not on the discs in `sdk/`,
+ * which is why no placed object covers it and why `tools/sdkstalls.py`
+ * correctly reports no overlap -- that tool answers "is this owned by an
+ * object we HAVE", not "is this Sony's".  Three independent lines of
+ * evidence, all re-measurable in seconds:
+ *
+ *  1. It is bracketed on BOTH sides by placed libcard objects and tiles
+ *     their run exactly:  c172 _card_load @0x41308, c171 _card_info
+ *     @0x41318, [this, 0x41328..0x41358], a78 _card_write @0x41358,
+ *     a74 InitCARD, a75 StartCARD, c112 _bu_init, a80 _new_card.
+ *  2. Its only two callees are `_new_card` and `_card_write` -- both libcard.
+ *  3. Its word 5 is `addiu $a1,$zero,0x3F`, and that form appears EXACTLY
+ *     ONCE in the whole executable's disassembly against 1089 `ori`:
+ *         grep -rcE '\b(addiu|ori) +\$[a-z0-9]+, \$zero, 0x' asm/
+ *     Sony's own objects in `lib/` carry both forms (226 addiu / 386 ori,
+ *     because the game mixed library builds) and **libcard is 100% addiu,
+ *     14 of 14**.  Our pipeline cannot emit that form at all: maspsx's
+ *     `expand_load_immediate()` picks `ori` for every 0 < K < 0x10000 under
+ *     the pinned `--aspsx-version=2.34`.
+ *
+ * So the round-32 "li-encoding residue is toolchain-unreachable" mechanism
+ * is CORRECT and its conclusion was not: a rule that is wrong for 1
+ * instruction in 1090 is not wrong, and the instruction came from Sony's
+ * assembler.  Full evidence in docs/match-reports/func_80050B28.md.
+ *
+ * Everything below this banner predates that finding.  It is kept because
+ * the derivation is sound and because the comment's own history is the
+ * point: every blocker screen passes this function (the BLOCKER PROFILE
+ * line below is accurate), and at 12 words it sorts FIRST in
+ * `nearmiss.py`'s ASSIGN FROM HERE.  It has been the most attractive
+ * target in the queue for four rounds and is unmatchable by construction.
+ */
+
+/*
  * class_3bb8c_v -- carved round 27 (2026-09-10).  ONE function,
  * func_80050B28 (12 words), file 0x41328..0x41358, vram 0x80050B28.
  *
@@ -34,6 +72,9 @@
  * round 15 four times.  Keep any declaration you need in THIS `.c`.
  *
  * 12 words -- this should close in one sitting, and then the unit is done.
+ *   ^^^ WRONG, see the round-39 banner at the top of this file.  This is
+ *       the sentence that made it attractive; it is kept so the next
+ *       reader can see what a confident stale directive looks like.
  */
 
 #include "common.h"
