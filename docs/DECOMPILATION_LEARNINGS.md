@@ -6683,3 +6683,136 @@ it mixes real searches whose iteration counts are phrased outside the pattern
 with scaffold checks where no search ran. The two screens bracket the truth
 and neither is exact. The **6** are hand-verified and unambiguous; they are
 the only figure here worth carrying forward.
+
+## A plain-global-to-ARRAY retype silently invalidates a SIBLING's preserved body, via pointer decay, and it still compiles clean (round 41)
+
+The round's most dangerous finding, because every existing guard passed it.
+
+Round 40 retyped a global in `code_179d8_g` from a bare `D_8006D8DC` to
+`s32 D_8006D8DC[10]`. `func_8002B4D4`'s preserved `#if 0` body, written
+earlier, still spelled it bare -- and a bare array name **decays to a
+pointer**, so the body's `D_8006D8DC > 0` quietly stopped meaning *"is the
+retry counter positive"* and started meaning *"is this address nonzero"*
+(always true). Corrected to `D_8006D8DC[0]`, the function moved **60/91 ->
+84/91**, and a fresh search against the corrected seed resurrected a
+candidate round 36 had rejected as unsafe -- it was only unsafe against the
+broken base.
+
+**Why this is a new class and not an instance of the struct-edit hazard.**
+The struct-edit rule (round 13) is about an edit that breaks an
+ALREADY-MATCHED function, and it is caught loudly: the whole-image SHA1 goes
+red. This breaks a PRESERVED BODY, which is not in the build at all, so:
+
+- nothing fails, ever -- there is no oracle for text inside `#if 0`;
+- it **compiles clean** when resumed, because the decayed form is valid C;
+- it **survives "rebuilt verbatim"**. Rounds 39 and 40 both re-derived this
+  body and both reported reproducing the figure. They did -- the figure was
+  reproducible and wrong, because seed and build were consistently broken
+  together.
+
+That last point is what makes it worse than round 33's never-linked body. A
+never-linked body fails loudly the first time anyone compiles it. This one
+links, runs the search, and yields a *measured, reproducible, wrong* number.
+
+**So when you retype a global (bare -> array, or any change that alters what
+a bare mention MEANS), grep every preserved body in the unit for the bare
+symbol**, exactly as the struct-edit rule says to grep every caller:
+
+```sh
+grep -ln 'D_XXXXXXXX' docs/match-reports/*.md     # then read each in context
+```
+
+Address-of contexts are safe (`&D_X` and `D_X` are numerically identical for
+an array); VALUE contexts are not. Charlie checked its unit's other four
+reports and found one more bare use, in an address-of context, correctly
+left alone.
+
+## A permuter improvement can be oracle-confirmed and still be UNSOUND C (round 41)
+
+`func_8002AA6C`'s best candidate scored **208/223** against a base of 202 --
+a real improvement by the project's own oracle, in range, no drift. It was
+**rejected anyway**, and correctly: `objdump` showed it hoists a string-
+literal address into a **caller-saved** register outside a loop that makes
+calls, so the value is clobbered on every iteration after the first. The
+concern was verified rather than asserted -- moving the reassignment back
+inside the loop lost the entire gain, which is what a genuine
+loop-invariance bug looks like.
+
+The runner took the next-best candidate (215/223) instead, which reuses two
+already-dead locals as sinks and is sound.
+
+**The general point: byte-match in range is not a soundness proof.** The
+oracle compares OUR bytes against RETAIL's over one function; it cannot tell
+you that the C you wrote has the same meaning as the C Sony wrote, only that
+this compiler turned yours into those bytes. A permuter candidate is machine-
+generated C nobody has read, so read it -- especially any value hoisted out
+of a loop, and especially across a call boundary.
+
+## Two more independent demonstrations that a permuter score is not a word count (round 41)
+
+DECOMPILATION_LEARNINGS already carries *"a permuter number is in PERMUTER
+units, not retail words"*. Round 41 produced the two starkest instances yet,
+in opposite directions, which together fix the rule's shape:
+
+- **delta, `func_80032708`:** best candidate scored **2735 against a base of
+  3735** -- a large, early, never-beaten improvement. Rebuilt through the
+  real pipeline: **14/164 with drift**, against the 65/164 it started from.
+- **charlie, `func_8002B198`:** a second 900s search produced **four**
+  candidates that improved the permuter's metric. Rebuilt, **every one was a
+  regression** (27-39/91, several with genuine length drift).
+- **charlie, `func_8002AA6C` and `func_8002B4D4`, the other direction:**
+  sub-base candidates that never reached zero translated to **+13** and
+  **+24** real words.
+
+So neither "sub-base means nothing" nor "sub-base means progress" is right.
+**Translate AND measure** -- the score tells you where to look, never what
+you found.
+
+## What a value is NAMED and how many times it is LOADED: the axis has TWO directions, and neither is the lever (round 41)
+
+Round 40 found that REMOVING a dead reload was worth 12 and 10 words.
+Round 41 tested both directions in one round:
+
+- **alpha** screened `class_3bb8c`'s two register-identity stalls for dead
+  reloads and found the PRECONDITION absent -- neither function ever caches
+  the value it repeatedly dereferences, so there is nothing to remove. Five
+  cache/inline variants tried anyway all produced **wrong-LENGTH** compiles.
+- **echo** closed `func_800585B4` (56/56) by doing the OPPOSITE: caching an
+  array base into a **local pointer** and controlling its reassignment, which
+  was the only thing that stopped cc1 2.6.3's loop optimizer strength-reducing
+  the access into a hoisted induction variable. No rewrite of the *access
+  expression* could -- round 24 had already exhausted three of those.
+
+Together with round 39's *"dropping a name and recomputing inline"*, the
+statement is now: **naming and load-count are two knobs, 2.6.3's allocator is
+sensitive to both, and the direction that helps is function-specific.** The
+useful discriminator, from alpha: **if a cache/inline variant changes the
+function's LENGTH, you are looking at a true register-identity wall and the
+axis has nothing to offer; if it only moves registers, keep pulling.**
+
+## The scaffold's insertion/deletion count is a COST predictor, not just a validity check (round 41)
+
+Round 40 introduced `--debug --stack-diffs` validation as a CORRECTNESS test
+(*is this search capable of succeeding*). Bravo ran the two halves of a
+controlled comparison in one session:
+
+| function | scaffold | outcome |
+| --- | --- | --- |
+| `func_8001E110` | **0 insertions / 0 deletions**, base 105 | zero at **iteration 2642**, MATCHED |
+| `func_8001DA28` | **23 insertions / 44 deletions**, base 7735 | **73273 iterations**, rc=124, every candidate noise or UB |
+
+A near-0/0 scaffold means the residue is a small register/scheduling
+perturbation the permuter is well-suited to; a large insertion/deletion count
+means the divergence is structural and a bounded search will wander. Bravo
+predicted the second negative BEFORE running it, from the scaffold alone, and
+ran it anyway to record the measurement -- which is the right call for a
+first-ever search and would be the wrong call for a repeat.
+
+**Compose this with Gate 1b's sixth screen:** prefer a never-searched function
+whose scaffold is near 0/0. That ranks *which* unsearched function to search
+first, which the sixth screen alone cannot do.
+
+**And a corollary for the dead-reload lever specifically:** a 0/0 scaffold
+means there is no instruction to REMOVE, so the lever has nothing to act on.
+Bravo reached that conclusion mechanically on `func_8001E4A4`; alpha reached
+the same conclusion by hand on two other functions. Same answer, two routes.

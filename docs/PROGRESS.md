@@ -6,6 +6,112 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-14 — round 41: three matches, all three from never-permuter-searched ground, and a latent-bug class that defeats "rebuilt verbatim"
+
+**State at end: 995 matched / 1253 game functions (79.41%)**, up three from
+round 40's 992. Queue 192 live `INCLUDE_ASM`, 191 documented stalls, `fresh` 1.
+Build green after all seven merges and after a clean `make extract` (zero
+committed bytes changed); working tree clean.
+
+### Gates
+
+Gate 0 green, no stale-asm warning at the start. **Gate 1: `fresh` = 1** — the
+954-word `func_80018464`, adjudicated not a work order since round 39. **Gate 2:
+carve REJECTED on fresh measurement — 66 uncarved, 10 blocker-clean, best
+segment 5-of-39; SEVENTH consecutive round with that verdict.** Gate 1b was the
+round: 101 blocker-clean, 0 Sony-owned, **26 never permuter-searched** under
+round 37's corrected grep. Gate 3 folded into every runner as a permuter-first
+brief. Contradiction sweep 10 hits, **all over-reports**. Seventh screen (stale
+cross-references) **clean for the first time** — all four hits already corrected
+in rounds 39/40. Zero header contention across all five units, priced before
+each provisioning.
+
+**`SendMessage` unavailable for the SEVENTH consecutive round.** Every finding
+went into spawn prompts; alpha finished early and was replaced by the §3c
+substitute — a FRESH worktree (`echo`), a DIFFERENT unit — which produced the
+round's third match.
+
+### The matches — all three from the sixth screen's never-searched set
+
+- **`func_8001E110`** (`code_d294_b`, 118/118, bravo) — first-ever search, zero
+  at iteration 2642. Three prior rounds (13, 19, 20) had all targeted the
+  result handling AT the recursive call sites; the fix is inert code at the
+  function TAIL, after both calls.
+- **`func_80032588`** (`code_179d8_c_b`, 96/96, delta) — **no permuter needed.**
+  Round 23 filed it as a 6-word stall blamed on a switch tail-merge; the actual
+  first diff was the function's FIRST branch, two outer bound checks whose
+  polarity was wrong. A cold read of `asm-differ` beat four rounds of trusting
+  the written residue. CLAUDE.md's wrong-CAUSE hazard, paying out.
+- **`func_800585B4`** (`class_3bb8c_t`, 56/56, echo) — one word short at 55/56,
+  never searched. Closed by caching an array base into a local pointer, the only
+  thing that stopped cc1 2.6.3 strength-reducing the access into a hoisted
+  induction variable; round 24 had already exhausted three rewrites of the
+  access EXPRESSION.
+
+**Plus 37 words of gains on ground nobody had searched**: charlie took
+`func_8002AA6C` 202/223 → 215/223 and `func_8002B4D4` 60/91 → 84/91.
+
+### The round's most dangerous finding
+
+**A plain-global-to-array retype silently invalidated a SIBLING's preserved
+body via pointer decay.** Round 40 retyped `D_8006D8DC` to `s32 [10]`;
+`func_8002B4D4`'s `#if 0` body still spelled it bare, so `D_8006D8DC > 0`
+stopped meaning "is the counter positive" and started meaning "is this address
+nonzero". Fixed, the function moved 24 words, and a candidate round 36 had
+rejected as unsafe turned out to be sound against the corrected base.
+
+It is not an instance of the struct-edit hazard: that one breaks a MATCHED
+function and the SHA1 goes red. This breaks a body that is not in the build, so
+nothing fails, it compiles clean when resumed, and — the part that matters — it
+**survives "rebuilt verbatim"**. Rounds 39 and 40 both re-derived this body and
+both reproduced the figure. The figure was reproducible and wrong.
+
+### Head passes
+
+- **Gate 3 CORRECTED.** Its rule — *"if only UB or duplicate-arm forms reach
+  zero, mark the class permuter-exhausted"* — forbade work the project has now
+  adopted twice with the whole-image SHA1 green (round 39's `func_8002AEE0`,
+  round 41's `func_8001E110`). It packed two errors: it brackets UB and
+  duplicate-arm as one class when only UB is disqualifying on its own terms,
+  and it stops at the permuter's scorer without naming the real test. **A
+  scorer zero is a LEAD; an `OK: build matches retail` is an ANSWER.**
+- **Gate 1b's sixth screen fails THREE ways, measured over all 101
+  blocker-clean functions.** It counts a SIBLING's run as this function's (6
+  `code_8220_c` RCpoly siblings, whose author honestly headed its sections
+  "cross-reference only" — *honesty in a report is indistinguishable from
+  provenance to a grep*); it counts a scaffold CHECK as a run, which INVERTS
+  the ninth screen, so four reports saying "no search was run" in plain text
+  read as spent; and it misses real runs phrased outside its pattern
+  (*"~94,000 unguided iterations"* scores zero hits). The six are annotated.
+  The tempting 42-vs-26 gap was deliberately NOT claimed — all sixteen were
+  hand-checked and the set is mixed.
+- **The dead-reload lever's stale UNTESTED status corrected** — written while
+  the search ran, left standing after bravo tested it within the hour.
+
+### Process
+
+**Four of five runners ended turns waiting on notifications that do not
+exist**, despite explicit warnings in their prompts; echo did it four times and
+also ran two concurrent searches on ONE function against an explicit "one search
+at a time". **Every one resumed and finished its own work**, and round 40's rule
+held perfectly: the process table is the discriminator, and no runner was
+recovered by hand. The head's one salvage (scoring echo's uncommitted body in
+`main`, then reverting) was non-destructive, read 55/56, and was superseded
+minutes later when echo closed the function itself — which is exactly the
+outcome round 40 predicts for a premature recovery, this time costing nothing
+because nothing was written to echo's tree.
+
+**The standing lesson is unchanged and was again the whole difference:** every
+runner that committed as it went paid nothing for stalling.
+
+### Next move
+
+Permuter-first again, on never-searched ground, ranked by scaffold
+insertion/deletion count. See the round-41 recommendation at the end of the
+session report.
+
+---
+
 ## 2026-09-14 — round 40: one match, one 12-word gain from a translated permuter lead, and a new register-allocation lever that surfaced twice independently
 
 **State at end: 992 matched / 1253 game functions (79.17%)**, up one from round
