@@ -6256,6 +6256,125 @@ So when a report says a residue is immune, read what was actually tried. Two
 inert levers are weak evidence about their conjunction, and the conjunction is
 cheap to test.
 
+## The hoist-both lever is LOCATED: it addresses load SCHEDULING, not register allocation (round 39, five independent measurements)
+
+Round 38 named "hoist BOTH values before EITHER is consumed" from five
+functions it closed, and it read as a general answer to register-identity
+residues. Round 39 put it in front of five units chosen for variety and it
+came back negative in four of them, with a mechanism each time. Taken
+together those negatives locate the lever rather than weakening it.
+
+| where | precondition | result |
+| --- | --- | --- |
+| head, `func_8003DAD4` | holds; hoist already applied | **required and insufficient** -- removing it costs 90 words and 2 instructions, and 10 further variants are inert |
+| bravo, `code_8220_c` | fails -- a single already-atomic macro expansion, not two producible values | forcing it **regressed** 46/54 -> 44/54 |
+| alpha, `code_179d8_k` | fails in all 8, six distinct ways | inert |
+| charlie, `class_3bb8c` | fails 3 ways; holds in 1 | in the one case it holds, applied since round 13 and insufficient alone |
+| echo, `DreamSys` | fails in all 5 | inert |
+
+**The three ways charlie found the precondition failing are worth memorising,
+because each looks like the shape from a distance:** the second value's load
+is **branch-gated** rather than adjacent (`func_8004C470`); the two loads are
+**34 bytes apart with the first fully consumed between them**
+(`func_8004C1C0`); the "two values" are a pair of **induction variables
+already live throughout**, so there is no staggered consumption to create
+(`func_8004BB3C`). Echo adds a fourth: four of its five residues are
+**delay-slot FILL CHOICES between two already-independent instructions** --
+there is no dependency chain for a hoist to shorten, so the lever has nothing
+to attach to.
+
+**So: check the precondition against the `.s` before reshaping. A forced hoist
+is not a neutral experiment** -- bravo's cost two words and echo's cost a
+callee-saved register. And per `func_8003DAD4`, "the hoist is already in this
+body" is *not* evidence the lever was tried and failed; it may be evidence the
+lever already paid and the remainder is a different class.
+
+## The combination corollary, refined twice in one round -- it has a PRECONDITION too
+
+Round 38's corollary ("a residue that survives two levers independently has
+not been shown to survive their combination") is real and paid again in round
+39, but it was being read as "always try the conjunction". Two runners bounded
+it from opposite sides.
+
+**Charlie, positively: the combination helps a COMPOUND ASSIGNMENT's implicit
+re-dereference, because there is something for the hoist to eliminate.**
+`func_8004BE54`'s two `(*slot)->unk10 |= flagBit` sites closed (130/150 ->
+132/150) by hoisting the reloaded field into a local before the `|=`, combined
+with an operand order that was inert alone. **The analogous `addu` site in the
+same function did not respond** -- it is read once and never re-dereferenced,
+so a plain single-use commutative operand has nothing for the hoist to remove.
+
+**Echo, negatively and more sharply: combining two levers is only a NEW
+EXPERIMENT if they target INDEPENDENT compiler decisions, not the same one
+twice.** On `CalcDreamColor`, hoist alone, operand-order reversal alone, and
+both together produced **byte-identical** output, because both levers act on
+the same single fused address expression. That is the precondition charlie's
+case satisfied and this one does not.
+
+**And a head-side trap the same round: a conjunction's score says nothing
+until each component has been measured alone.** On `func_8003ECD0` the
+attempt-6 x attempt-7 conjunction scored 16/73 against a 71/73 baseline, which
+looks like "conjunctions can combine destructively". It is not: attempt 6's
+own reuse half scores 16/73 by itself, so the conjunction is fully
+attributable to one component and the barrier contributes nothing. This is the
+project's attribution discipline (CLAUDE.md's wrong-CAUSE hazard) applied to a
+lever instead of a blocker.
+
+## Dropping a name and recomputing inline -- a lever, and the same fact as a constraint (round 39)
+
+**As a lever (alpha, `func_800357B0`, 163/179 -> 171/179):** where retail
+recomputes a value fresh on each converging path rather than keeping it live,
+a named local that hoists it **over-commits a register-allocation decision
+retail never made**. Dropping the name and recomputing the expression inline
+at its one real use closed 8 words.
+
+**As a constraint (head, `func_8003ECD0`):** the same fact read backwards.
+Retail recomputes `4 << self->unk3C` at its second site; naming it once and
+reusing it at both sites scores **16/73 against a 71/73 baseline, with
+whole-image drift**. Naming it but letting the second site recompute is inert
+at 71/73.
+
+So before hoisting a re-derivable expression into a local, check whether
+retail recomputes it. If it does, the name is the bug.
+
+**Echo confirms the pointer case, third instance this round: function-scope
+hoisting of a re-derivable POINTER or ADDRESS reliably costs a callee-saved
+register** (`func_8005A9CC`, 18/88 with 135807 bytes of drift).
+
+## A reshape that fixes one named sub-residue can still be a NET regression (round 39)
+
+`func_800598E8` is 1 word SHORT. Echo duplicated its tail call at only the
+decay branch's exit -- narrower than round 32's already-rejected full
+duplication -- and it **does** fix the `$a0`-vs-`$s0` register-identity half.
+But GCC does not cross-jump-merge the duplicated call site back down, so the
+function grows to 78 words: **1 word LONG instead of 1 word short.** It trades
+one real residue for another rather than closing either.
+
+Record such a result as a trade, not as a wash and not as an improvement --
+the word count is identical in magnitude and the function is no closer.
+
+## The duplicate-arm register trick: real, oracle-confirmable, and strictly context-dependent (round 39)
+
+Delta closed `func_8002AEE0` (174/174) partly with
+`if (alwaysTrue) { X; } else { X; }` -- identical arms, which GCC cross-jumps
+back into one instruction, so the construct emits nothing and only perturbs
+register allocation. It is worth **12 words** there (162/174 without it).
+
+**It does not generalise, and delta scoped it rather than promoting it:**
+neutral on `func_8002B198`'s three permuter candidates and on
+`func_8002B4D4`, and it **regressed `func_8002AA6C` from 202/223 to 17/223**
+when applied at the very top of a function, where there is no pre-existing
+register pressure for it to redirect.
+
+**Treat it as a diagnostic, not a fix.** `docs/PARALLEL-RUNS.md` Gate 3 names
+duplicate-arm forms alongside UB as the signature of an exhausted class, and
+the head's eleven attempts to replace this one with idiomatic C all failed.
+The useful question about a construct that compiles to nothing is **"what is
+it standing in for?"** -- and a tautological null check is what a MIS-MODELLED
+global looks like. Both operands there are spelled address-of; if either is
+really a pointer global in retail's source, the check is genuine and the
+duplication disappears. See `docs/match-reports/func_8002AEE0.md`.
+
 ## A reproduced toolchain mechanism is not a blocker until its CORPUS FREQUENCY is measured (round 39)
 
 `func_80050B28`'s report established, correctly and in isolation through the

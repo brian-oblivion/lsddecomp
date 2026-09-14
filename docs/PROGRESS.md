@@ -6,6 +6,170 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-14 — round 39: one match, three word gains, and the queue's most attractive function removed from it
+
+**State at end: 991 matched / 1253 game functions (79.09%)**, up one from
+round 38's 990. Queue 196 live `INCLUDE_ASM`, 195 documented stalls, `fresh`
+1. Build green after all five merges and after a clean `make extract` (zero
+committed bytes changed); working tree clean.
+
+**Read this as a queue-quality round, not a match-count round.** Five runners
+across five units returned one byte-exact match and a large amount of
+correctly-argued negative evidence; the head's own passes removed a function
+from the queue that no C could ever have matched and corrected three verdicts
+that were quietly wrong.
+
+### Gates
+
+Gate 0 green. Gate 1: `fresh` = 1 (a 954-word function, not a work order);
+contradiction sweep 12 hits, **all over-reports**, same as round 38. **Gate 2:
+carve REJECTED on fresh measurement — 66 uncarved, 10 blocker-clean, best
+segment 5-of-39; FIFTH consecutive round with that verdict.** Gate 1b was the
+round: 104 blocker-clean at the start, 0 Sony-owned by the placed-object
+screen. Gate 3 folded into the runners.
+
+**`SendMessage` unavailable for the FIFTH consecutive round** (31, 32, 33, 38,
+39). Every finding went into spawn prompts; both early finishers were replaced
+with the §3c substitute — fresh worktree, *different* unit — rather than
+re-sent. Five runners ran in three waves and all five worktree names are now
+spent, so a sixth substitute was not available. **Zero header contention
+across all five**, checked before each provisioning.
+
+### The match, and the defect attached to it
+
+`func_8002AEE0` (`code_179d8_g`, 174/174, runner delta) from round 36's
+165/174, in three steps. **Step 2 is a duplicate-arm construct** —
+`if (p6A0 || pF8) { *D = status; } else { *D = status; }` over two
+addresses-of-globals, which GCC cross-jumps back into the single `sb` retail
+has. It emits nothing and exists only to force `status` into `$s1`. Worth 12
+words: 162/174 without it.
+
+Gate 3 names duplicate-arm forms alongside UB as the signature of an exhausted
+class rather than a solution. **The head tried eleven idiomatic translations
+and none reached 174/174** — every declaration- and assignment-order
+permutation of the four pointer locals, `status` retyped, an explicit
+live-range extension, a real guard, a re-masked store. All tabulated in the
+report.
+
+**Kept rather than reverted, deliberately**, with the defect named on the
+construct itself in `src/`. Reverting discards a byte-verified match on a style
+rule; keeping it silently plants something that reads as a bug and invites
+copying. **Whether a duplicate-arm form may stand in `src/` at all is a
+project-policy question for the operator.** The lead that would dissolve it:
+a tautological null check is what a MIS-MODELLED global looks like — if either
+operand is really a pointer global rather than an array, the check is genuine
+and the duplication disappears. Untested, cheap, and the first thing to try.
+
+### Word gains (all three re-verified by the head, independently)
+
+| function | unit | before | after |
+| --- | --- | --- | --- |
+| `func_800357B0` | `code_179d8_k` | 163/179 | **171/179** |
+| `func_8004BE54` | `class_3bb8c` | 130/150 | **132/150** |
+| `func_8004C470` | `class_3bb8c` | 68/70 | 69/70 (round 38) |
+
+### The round's principal result: the hoist lever is LOCATED
+
+Round 38 named "hoist BOTH values before EITHER is consumed" from five closes,
+and it read as a general answer to register-identity residues. Five
+independent measurements this round say otherwise, and each came with a
+mechanism rather than a shrug: it addresses load **SCHEDULING**, not register
+**ALLOCATION**. The head's `func_8003DAD4` is the decisive case — the hoist is
+*required* there (removing it costs 90 words) and the function still stalls
+after ten further variants.
+
+Charlie found three distinct ways the precondition fails while looking like
+the shape: branch-gated second load, 34-byte separation with full consumption
+between, and induction variables already live throughout. Echo added a fourth
+(delay-slot fill choices between already-independent instructions). Bravo
+measured that forcing it where the precondition fails **regresses**.
+
+### The combination corollary now has a precondition too
+
+Bounded from both sides in one round. **Charlie, positively:** it helps a
+compound assignment's implicit re-dereference, because there is something for
+the hoist to eliminate; the analogous single-use operand in the same function
+did not respond. **Echo, negatively and more sharply:** combining two levers
+is only a new experiment if they target **independent** compiler decisions —
+on `CalcDreamColor` both levers act on one fused address expression and the
+combination is byte-identical to either alone.
+
+**And a head-side trap:** on `func_8003ECD0` the conjunction scored 16/73 and
+looked like "conjunctions can combine destructively". It is not — one
+component scores 16/73 alone, so the conjunction is fully attributable to it.
+A combined result says nothing until each component is measured alone.
+
+### Head passes: five verdicts corrected
+
+- **`func_80050B28` is Psy-Q libcard, not game code.** The 12-word function
+  that has sorted FIRST in `nearmiss.py`'s assign-from-here list for four
+  rounds, carrying 634 lines of derivation, is unmatchable by construction.
+  Round 32 reproduced its `li`-expansion mechanism impeccably and concluded
+  from a sample of one: there is **1** `addiu $rX,$zero,K` in the entire
+  executable against **1089** `ori`, and it is that function's word 5. Sony's
+  objects carry both forms and **`libcard` is 100% `addiu`, 14 of 14**; the
+  function tiles libcard's own object run and calls only libcard functions.
+  New Gate 1b screen (the eighth) with two mechanical detectors.
+- **`func_80018464`, the only `fresh` function**, carried an approach section
+  telling its runner to write raw `.word` GTE blocks — the technique HARD RULE
+  6 was narrowed to stop two days earlier, on the strength of the very
+  function it cites as precedent.
+- **Four stale cross-references** round 38 measured and left standing; two
+  reports were holding up `strcmp`/`strncmp` and `TransposeMatrix` as residue
+  and permuter precedent. One hit was checked and left standing — it cites a
+  property of the permuter tooling, not of whose code it was pointed at.
+- **`func_8003ECD0`'s attempt 6** was one figure standing for two spellings
+  that differ by 55 words.
+- **11 preserved bodies marked as non-linkable**, on the blocks themselves.
+  `stalesyms.py` reports 70 live stale references; the dangerous subset is the
+  20 sitting under a heading that quotes a score, which is the block a runner
+  reaches for first.
+
+### Process
+
+- **A false positive I caught in my own tooling, worth recording because the
+  fix direction is the lesson.** The first stale-body pass scanned block text
+  raw and marked a *correct* body whose comment merely documented the rename.
+  Marking a good body "will not link" is a wrong directive of exactly the kind
+  this project keeps paying for. Reverted and redone with comments stripped:
+  19 warnings became 11.
+- **An assignment rationale of mine was wrong, and bravo's negative is what
+  proved it.** I picked `code_8220_c` because `include/gte.h` had just landed
+  in that unit. Zero of its nine queued functions contain a COP2 instruction;
+  the unit's four `gte_*` call sites are all in already-matched code. Verified
+  by the head after the claim, not before the assignment.
+- Five runners peaked around load 11 on 32 cores. Comfortable.
+- All five branches merged clean — no conflicts of any kind, header or report.
+
+### Next round
+
+**Runners, three, and NOT on the general near-miss queue.** This round put
+five runners on five different units of it and got one match; the residues are
+dominated by register-identity and allocation-choice classes that the whole
+source-lever catalogue does not reach, and four units returned that verdict
+independently. Grinding the same queue harder is the move with the measured
+worst return.
+
+Three better-posed targets exist, in order:
+
+1. **The `func_8002AEE0` mis-modelling lead** — if a global spelled as an
+   array is really a pointer, a duplicate-arm hack becomes an honest null
+   test. That question generalises past one function and nobody has asked it.
+2. **The `stalesyms.py` LIVE list** — 70 references across 32 reports, 20 of
+   them under score-quoting headings. Correcting a name and rebuilding is
+   cheap, mechanical runner work, and every one of those figures is currently
+   unverifiable.
+3. **`gp_rel`** — 82 of 93 blocked functions, unchanged for many rounds and
+   by far the largest single lever available. It is an operator escalation
+   and remains one.
+
+Not a carve (fifth consecutive rejection). Not a pure permuter round: the
+permuter produced this round's match and its best word gain, but it did so
+inside runner sessions that were also doing hand analysis, which is the
+arrangement that worked.
+
+---
+
 ## 2026-09-14 — between rounds 38 and 39 (head): the GTE macro layer, and func_800195EC rewritten as C
 
 **Counts unchanged: 990 matched / 1253 game functions.** Nothing new was
