@@ -1,5 +1,27 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 39 (charlie): re-verified, no new attempt.** Rebuilt the exact
+> preserved body from a clean `INCLUDE_ASM` baseline: confirmed 90/105, no
+> drift, identical `$s3`<->`$s4` whole-function register-identity swap
+> (diff sites unchanged: prologue `sw` scheduling at `0x8004BB48`-`0x8004BB80`
+> plus two later reload sites at `0x8004BBB8`/`0x8004BBFC`/`0x8004BC14`).
+> Checked whether this round's headline lever ("hoist both values before
+> either is consumed") applies: it does not, and not for lack of an
+> instruction-adjacency hit -- the pre-screen's 11 adjacent load/mult pairs
+> here are the walker-pointer dereferences (`sp->id`, `sp->rate`, `ep->ptr0`)
+> that the identity swap already touches, not two independently-computed
+> VALUES feeding one later shared consumer the way `func_8004C470`'s two
+> field reads did. The residue here is a swap between the two INDUCTION
+> VARIABLES themselves (`ep`/`sp`), both already live across the whole loop
+> body by construction -- there is no "consume A late, consume B later
+> still" shape to restructure. Six rounds deep (13, 17, 19, 20, 27, 32) of
+> confirmation via independent angles (callee-saved order, saturated-register
+> check, aggregate-assignment check, a permuter run whose scaffold was
+> proven to score a different residue) with nothing left un-checked; not
+> re-attempted further this round. Time went to the higher-yield queue
+> entries instead (`func_8004C470`, `func_8004B44C`, and the two large
+> multi-load functions with higher pre-screen hit counts).
+
 > **ROUND 32 (bravo2): re-verified, no new attempt.** Rebuilt the exact
 > preserved body from a clean `INCLUDE_ASM` baseline: confirmed 90/105, no
 > drift, identical `$s3`<->`$s4` whole-function register-identity swap.
