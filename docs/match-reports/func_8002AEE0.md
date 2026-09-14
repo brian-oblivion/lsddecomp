@@ -1,4 +1,4 @@
-# func_8002AEE0 — STALL (length EXACT at 174/174, best 165/174 words -- up from 153/174 in round 36, first real diff at vram 0x8002AF18)
+# func_8002AEE0 — MATCHED (174/174, 174/174 words -- round 39, up from 165/174 in round 36)
 
 `code_179d8_g`, vram `0x8002AEE0`, file offset `0x1B6E0`, 174 instructions
 (0x2B8 bytes). No `nop_mflo_mfhi` or `gp_rel` hits — clean per the carve
@@ -588,3 +588,219 @@ inert -- the general lesson from this unit's `func_8002B198`/`func_8002B4D4`
 entries this round is that neither "the permuter's score went down" nor "the
 candidate contains obvious noise" predicts whether a specific line is
 load-bearing; only a rebuild-and-diff does.
+
+## Round 39 (runner delta): MATCHED -- 165/174 -> 174/174, byte-exact
+
+Started from round 36's 165/174 body (rebuilt and reconfirmed first,
+byte-identical to that round's recorded diff set -- 9 residues at file
+offsets 0x1B718/0x1B71C/0x1B728 (the `p6A0`/`p8D9` `$s4`/`$s5` swap),
+0x1B74C/0x1B754, 0x1B7B4/0x1B7C4/0x1B7D8, and 0x1B87C).
+
+### Fix 1: store-emission order for the two prologue globals (165 -> 167/174)
+
+Retail's own instruction stream stores `D_8008B3E8 = 0` BEFORE
+`D_8008B3EC = (s32)D_80010AD8` (confirmed directly off
+`asm/nonmatchings/code_179d8_g/func_8002AEE0.s`, offsets 0x1B748-0x1B754);
+the round-36 body assigned them in the opposite order
+(`D_8008B3EC` then `D_8008B3E8`). Swapping the two assignment statements to
+match retail's order closed exactly the 0x1B74C/0x1B754 pair with no other
+change. This is a plain emission-order-follows-source-order fix, not a
+register-identity one -- worth checking on any adjacent pair of unrelated
+global stores before assuming a swapped pair is register-shaped.
+
+### Fix 2: the permuter's own "always-true either-branch" trick, applied directly against the real oracle (167 -> 173/174)
+
+Before this fix, two manual reorder attempts on the `p6A0`/`p8D9` register
+pairing were tried and both regressed (declaration-order swap: 165->165;
+assignment-order swap `p8D8;p8D9;p6A0`: 167->165) -- consistent with round
+36's four already-documented inert reorder axes for this exact residue
+class.
+
+Ran the permuter instead (`tools/setup-permuter.sh func_8002AEE0 <seed>`
+from the fix-1 167/174 body; base score 45, `Register Differences: 9` per
+`--debug`, confirming this is purely the register-numbering residue with
+nothing else hiding under it). Searched `timeout 600 ... -j 6 --stack-diffs
+--stop-on-zero --best-only`; found a real improvement to permuter score 10
+in the first few minutes (`output-10-1/`). **Verified directly against the
+real oracle before trusting it** (per this project's own standing caution
+that a permuter score move is a lead, not a result, in EITHER direction):
+
+```c
+if (p6A0 || pF8) {
+    *D_8006D8C0 = status;
+} else {
+    *D_8006D8C0 = status;
+}
+```
+
+Both arms are the identical statement -- a no-op semantically, and the
+condition (`p6A0 || pF8`) is always true at this point (both are addresses
+of file-scope globals, never null) -- but forcing `p6A0` and `pF8` to be
+read (and therefore live in registers) at this specific point in the
+function changed the register allocator's pressure/numbering enough to fix
+the ENTIRE `p6A0`/`p8D9` `$s4`/`$s5` swap: 167 -> 173/174, closing 6 of the
+7 words this residue class accounted for (0x1B718, 0x1B71C, 0x1B728,
+0x1B7C4, 0x1B7D8, 0x1B87C all closed at once; only 0x1B7B4 remained).
+
+This is the same phenomenon `func_8002B198.md`'s round-36 entry documents
+(a permuter candidate reusing an already-hot register/variable as a
+throwaway sink), but the FORM here is different and worth recording
+separately: not a reused-variable write, but a duplicated-arm branch on an
+always-true condition referencing the two contested pointer variables by
+name. Read literally the branch looks like dead-weight the permuter left
+behind; it is retail's own register-pressure shape made visible from C.
+
+### Fix 3: the redundant reload, re-tried after fix 2 changed the context (173 -> 174/174, MATCH)
+
+The one remaining residue (0x1B7B4) was the same "redundant reload of
+`p8D8[0]`/`p8D8[1]`" class this report's original investigation already
+named: retail loads `idx1` directly as `lbu $v0, 0x1($s3)` (an offset off
+`p8D8`'s own base register), NOT through the separately-hoisted `p8D9`
+pointer, even though `p8D9` (`$s4` in the now-fixed mapping) is genuinely
+used later in the button-dispatch loop. This exact rewrite
+(`idx1 = p8D8[1];` instead of `idx1 = p8D9[0];`) had been tried once before
+this round, at the fix-1-only (167/174) checkpoint, and regressed badly
+(167 -> 162/174) -- filed at the time as inert. **Re-tried it here, after
+fix 2 changed the surrounding register allocation, and this time it closed
+the function outright: 173 -> 174/174, BYTE-EXACT.**
+
+Confirmed via the strongest available check, not just `funcdiff.py`'s
+in-range read: reverted every other stalled sibling in this unit
+(`func_8002AA6C`, `func_8002A75C`, `func_8002B198`, `func_8002B3F4`,
+`func_8002B4D4`) to `INCLUDE_ASM`, rebuilt, and `./build-and-verify.sh`
+reports **`OK: build matches retail SLPS_015.56`, exit 0** -- the whole-image
+SHA1, not a per-function window.
+
+### Proposed learnings
+
+- **A negative result for a specific reshape is conditioned on the register
+  state it was tested under, not permanent** -- this is the SAME lesson
+  `func_8002B4D4.md`'s round-20 entry already drew for a guard-polarity flip,
+  now confirmed a second time in this same unit for a completely different
+  lever (redirecting a load's source pointer). When an earlier, unrelated
+  fix changes a function's register allocation, re-check a previously-inert
+  lever before ruling the residue permanently resistant.
+- **The permuter's random mutator can find a "duplicate both arms of an
+  always-true branch, referencing the contested variables" shape that no
+  reasonable manual reorder attempt would try, and it can be genuinely
+  load-bearing** -- add this to `func_8002B198.md`'s "reuse an already-hot
+  register as a sink" finding as a second, structurally different form of
+  the same underlying phenomenon (force a value's liveness at a specific
+  program point by making the source visibly reference it there). Both
+  require real-oracle verification regardless of which direction the
+  permuter's own score moved; this one held up, `func_8002B4D4`'s round-36
+  candidate did not.
+
+### Final body (174/174, MATCHED)
+
+```c
+s32 func_8002AEE0(s32 arg0, s32 arg1)
+{
+    s32 now;
+    s32 old;
+    s32 flags;
+    s32 *pEC;
+    u8 status;
+    s32 *p6A0;
+    u8 *p8D8;
+    u8 *p8D9;
+    s32 *pF8;
+    u8 *dst;
+    u8 *src;
+    s32 i;
+    s32 idx0;
+    s32 idx1;
+    s32 result;
+
+    now = VSync(-1);
+    p6A0 = D_8006D6A0;
+    p8D8 = D_8006D8D8;
+    p8D9 = &D_8006D8D8[1];
+    pF8 = &D_8006D8F8;
+
+    D_8008B3E4 = now + 0x1E0;
+    D_8008B3E8 = 0;
+    D_8008B3EC = (s32)D_80010AD8;
+
+    for (;;) {
+        now = VSync(-1);
+        if (D_8008B3E4 < now) {
+            goto timeout;
+        }
+        old = D_8008B3E8;
+        D_8008B3E8 = old + 1;
+        if (0x1E0000 >= old) {
+            goto success;
+        }
+
+    timeout:
+        puts(D_80010984);
+        idx0 = p8D8[0];
+        idx1 = p8D8[1];
+        __asm__("");
+        /* &D_8008B3EC routed through a local pointer -- forces the same
+         * unfolded lui/addiu addressing retail uses for this argument;
+         * a plain `D_8008B3EC` reference here compiles FOLDED instead. */
+        pEC = &D_8008B3EC;
+        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
+               p6A0[idx0], p6A0[idx1]);
+        func_8002A510();
+        result = -1;
+        goto after_diag;
+
+    success:
+        result = 0;
+
+    after_diag:
+        if (result != 0) {
+            return result;
+        }
+        if (CheckCallback() != 0) {
+            status = (u8)(*D_8006D8C0 & 3);
+            for (;;) {
+                flags = func_80029478();
+                if (flags == 0) {
+                    break;
+                }
+                if ((flags & 4) && D_8006D600 != 0) {
+                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                }
+                if ((flags & 2) && D_8006D5FC != 0) {
+                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                }
+            }
+            /* permuter-found: forcing p6A0/pF8 to be read here (both arms
+             * are identical) fixes the p6A0/p8D9 register-numbering swap
+             * that otherwise cascades through the rest of the function --
+             * see this report's round-39 fix 2. */
+            if (p6A0 || pF8) {
+                *D_8006D8C0 = status;
+            } else {
+                *D_8006D8C0 = status;
+            }
+        }
+
+        dst = (u8 *)arg1;
+        src = D_8008B3D4;
+        if (dst != 0) {
+            for (i = 7; i != -1; i--) {
+                *dst = *src;
+                src++;
+                dst++;
+            }
+        }
+
+        if (VSync(-1) > pF8[0] + 0x3C) {
+            func_8002AA6C();
+        }
+        if (pF8[-1] == 0) {
+            func_8002B198(0);
+        }
+        if (arg0 != 0 || pF8[-1] <= 0) {
+            break;
+        }
+    }
+
+    return pF8[-1];
+}
+```

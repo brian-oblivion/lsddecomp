@@ -317,7 +317,112 @@ join:
     return -(func_8002AA6C() < 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AEE0);
+s32 func_8002AEE0(s32 arg0, s32 arg1)
+{
+    s32 now;
+    s32 old;
+    s32 flags;
+    s32 *pEC;
+    u8 status;
+    s32 *p6A0;
+    u8 *p8D8;
+    u8 *p8D9;
+    s32 *pF8;
+    u8 *dst;
+    u8 *src;
+    s32 i;
+    s32 idx0;
+    s32 idx1;
+    s32 result;
+
+    now = VSync(-1);
+    p6A0 = D_8006D6A0;
+    p8D8 = D_8006D8D8;
+    p8D9 = &D_8006D8D8[1];
+    pF8 = &D_8006D8F8;
+
+    D_8008B3E4 = now + 0x1E0;
+    D_8008B3E8 = 0;
+    D_8008B3EC = (s32)D_80010AD8;
+
+    for (;;) {
+        now = VSync(-1);
+        if (D_8008B3E4 < now) {
+            goto timeout;
+        }
+        old = D_8008B3E8;
+        D_8008B3E8 = old + 1;
+        if (0x1E0000 >= old) {
+            goto success;
+        }
+
+    timeout:
+        puts(D_80010984);
+        idx0 = p8D8[0];
+        idx1 = p8D8[1];
+        __asm__("");
+        /* &D_8008B3EC routed through a local pointer -- forces the same
+         * unfolded lui/addiu addressing retail uses for this argument;
+         * a plain `D_8008B3EC` reference here compiles FOLDED instead.
+         * See docs/match-reports/func_8002AEE0.md's round-36 entry. */
+        pEC = &D_8008B3EC;
+        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
+               p6A0[idx0], p6A0[idx1]);
+        func_8002A510();
+        result = -1;
+        goto after_diag;
+
+    success:
+        result = 0;
+
+    after_diag:
+        if (result != 0) {
+            return result;
+        }
+        if (CheckCallback() != 0) {
+            status = (u8)(*D_8006D8C0 & 3);
+            for (;;) {
+                flags = func_80029478();
+                if (flags == 0) {
+                    break;
+                }
+                if ((flags & 4) && D_8006D600 != 0) {
+                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                }
+                if ((flags & 2) && D_8006D5FC != 0) {
+                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                }
+            }
+            if (p6A0 || pF8) {
+                *D_8006D8C0 = status;
+            } else {
+                *D_8006D8C0 = status;
+            }
+        }
+
+        dst = (u8 *)arg1;
+        src = D_8008B3D4;
+        if (dst != 0) {
+            for (i = 7; i != -1; i--) {
+                *dst = *src;
+                src++;
+                dst++;
+            }
+        }
+
+        if (VSync(-1) > pF8[0] + 0x3C) {
+            func_8002AA6C();
+        }
+        if (pF8[-1] == 0) {
+            func_8002B198(0);
+        }
+        if (arg0 != 0 || pF8[-1] <= 0) {
+            break;
+        }
+    }
+
+    return pF8[-1];
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B198);
 
