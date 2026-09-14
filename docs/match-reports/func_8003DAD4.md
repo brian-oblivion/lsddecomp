@@ -1,4 +1,116 @@
-# func_8003DAD4 — STALL (register-identity, 114/118 words on the best body)
+# func_8003DAD4 -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
+
+## ROUND 39 (head): baseline re-verified from scratch, ten source-shape variants, all negative -- but the round-38 hoist lever is CONFIRMED REQUIRED here, and the barrier is a LENGTH lever, not a scheduling one
+
+The preserved body below was spliced fresh against `main` at dc88d61 and
+**rebuilds to exactly 114/118 with zero outside-range drift** -- this
+report's inherited figure is honest and was re-measured, not carried.
+
+### The four differing words are TWO residues, not four
+
+| word | file | retail | built | residue |
+| --- | --- | --- | --- | --- |
+| 11 | 0x2E304 | `nop` | `addu $s1,$zero,$zero` | **A: `i = 0` placement** |
+| 23 | 0x2E330 | `lw $a1, 0x14($v0)` | `lw $v0, 0x14($v0)` | **B: register identity** |
+| 25 | 0x2E338 | `sw $a1, 0x14($sp)` | `sw $v0, 0x14($sp)` | B (same value) |
+| 39 | 0x2E370 | `addu $s1,$zero,$zero` | `nop` | A (same instruction) |
+
+**Residue A is ONE instruction in two places, not two diffs.** Retail's
+delay-slot pass (`reorg`) fills the loop guard's `blez $s3` slot with the
+counter zero-init and leaves the early-return `bne` slot a `nop`; our build
+does the opposite. Counting these as two words overstates the gap -- the
+function is **two instructions from matching, not four**.
+
+Residue B is the second hoisted temp landing in `$v0` (reusing the dying
+base pointer) where retail takes `$a1`. At that point `$a0` holds `idx*4`
+and is live later, so `$a1` is simply the next free caller-saved register
+-- retail's allocator declined to reuse the base, ours did.
+
+### The round-38 hoist lever is ALREADY APPLIED here, and it is REQUIRED
+
+Retail loads both fields back-to-back with the consumers after:
+
+```
+lw $v1, 0x10($v0)     # t0 = target->unk10
+lw $a1, 0x14($v0)     # t1 = target->unk14   <- ADJACENT
+sw $v1, 0x10($sp)     # local[0] = t0
+sw $a1, 0x14($sp)     # local[1] = t1        <- consumers LATER
+```
+
+That is exactly the diagnostic in DECOMPILATION_LEARNINGS' "Hoist BOTH
+values before EITHER is consumed", and the preserved body already does it.
+**Measured here, which is what makes it a datapoint rather than a
+restatement: dropping the second temp alone** (`local[1] = target->unk14;`
+in place of `s32 t1 = ...; local[1] = t1;`) **collapses the function from
+114/118 to 24/118 and makes it SHORTER.** So this function is a positive
+instance of the lever, reached by hand in round 12 before the lever had a
+name -- and the lever is *necessary but not sufficient*: it buys the whole
+body and leaves residues A and B.
+
+**This is the useful shape of the result for the next round.** Round 38
+named the lever from five functions it CLOSED. This is the first measured
+case where it is required and still leaves residue, which bounds the
+lever's claim: it reproduces the load/store *scheduling*, not necessarily
+the *register identity* of the values it hoists.
+
+### The `__asm__("" ::: "memory")` barrier is a LENGTH lever
+
+Removing it drops the function to **27/118 and two words SHORT**, with
+outside-range drift. Without it GCC keeps `t1` live in a register and
+elides retail's reload of `local[1]` from the stack
+(`lw $v1, 0x14($sp)` at 0x2E344). The barrier is what forces the reload,
+i.e. it buys two *instructions*, not a schedule.
+
+That distinction matters against this report's own round-20 finding that
+barriers here are "presumptively harmful on a hoist-distance residue".
+Both are true and they are about different barriers: a barrier placed to
+move a schedule regressed; this one exists to defeat a load elision. It is
+a memory clobber, not a register constraint, so it is within CLAUDE.md
+rule 6 (removing it changes which INSTRUCTIONS exist, not which register
+holds a value -- verified by the measurement above).
+
+### Ten variants, all inert or worse
+
+Each was spliced, built through the full oracle (`build exit=`, zero
+compile-error hits) and scored:
+
+| variant | score |
+| --- | --- |
+| baseline (preserved body as filed) | 114/118 |
+| `i` declared FIRST among locals | 114/118 |
+| `for (i = 0; count > i; i++)` (comparison operands swapped) | 114/118 |
+| `i = 0;` as its own statement, `for (; i < count; i++)` | 114/118 |
+| no `target` local -- chain spelled out twice | 114/118 |
+| `target`/`t0`/`t1` declared at function top, no inner block | 114/118 |
+| bare `__asm__("")` as the FIRST statement (the documented prologue lever) | 114/118 |
+| `count` assigned before `arr` | **110/118** |
+| bare `__asm__("")` immediately before the `for` | **1/118** |
+| second temp dropped (`local[1] = target->unk14;`) | **24/118**, 2 words short |
+| memory barrier removed | **27/118**, 2 words short |
+
+**Six independent declaration- and statement-order permutations produce one
+identical score.** Combined with rounds 12, 19 and 20, residue B has now
+survived every source-level lever in the project's catalogue, which is the
+definition of a register-identity stall. Residue A has survived every
+scheduling lever including both barrier positions.
+
+### Proposed learning (round 39)
+
+**A function can REQUIRE the hoist-both-before-either lever and still not
+match.** Round 38 named the lever from five closes; this is the first
+measured instance where it is load-bearing (removing it costs 90 words and
+two instructions) and the function still stalls. The lever reproduces
+retail's load/store *scheduling*; it does not by itself settle which
+register each hoisted value lands in. When a report says "the hoist is
+already there", that is not evidence the lever was tried and failed -- it
+may be evidence the lever already paid and the remaining residue is a
+different class.
+
+**And: count an instruction that MOVED as one residue, not two.** Residue A
+shows as two differing words at opposite ends of the function because one
+`addu $s1,$zero,$zero` swapped delay slots with a `nop`. A raw word-match
+figure charges it twice. This function's honest distance is two
+instructions; "114/118" reads as four.
 
 ## Round 20 (runner delta): two more attempts, both negative; residues confirmed identical to round 19's description
 
