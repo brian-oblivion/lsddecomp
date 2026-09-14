@@ -713,13 +713,22 @@ Elem *func_8004C434(Obj866E8 *self, s32 key) {
  * completely. Remaining residue is ONLY "Residue 1": a commutative `addu`
  * whose register-operand order the report already confirmed (twice, both
  * operand-textual-orders tried) is immune to source reordering -- a
- * project-wide confirmed class, not re-attempted this round. */
+ * project-wide confirmed class, not re-attempted this round.
+ * ROUND 38 (alpha + head): 68/70 -> 69/70. The "immune to source reordering"
+ * claim above is WRONG as stated -- it was tested by flipping operand order
+ * alone, which is indeed inert (measured again: 68/70). What moves it is
+ * HOISTING the field into a local AND writing `w + tol`: both together, and
+ * only on the FIRST comparison. Hoisting the second as well REGRESSES to
+ * 68/70 (67/70 if its operand order is left as `tol + h`). One word remains,
+ * at vram 0x8004C500 -- the mirror `addu` in the second comparison.
+ * See docs/match-reports/func_8004C470.md. */
 Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
     Elem *candidate;
     Unk14Obj *r;
+    s32 w;
 
     i = 0;
     tol = 0xA000;
@@ -727,7 +736,8 @@ Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     for (; i < 7; i++, threshold -= 0x800) {
         candidate = self->methods->slot118(self, i);
         r = candidate->unkC->unk14;
-        if (arg1->unk0 >= r->unk18.w && arg1->unk0 < tol + r->unk18.w) {
+        w = r->unk18.w;
+        if (arg1->unk0 >= w && arg1->unk0 < w + tol) {
             if (arg1->unk8 >= r->unk20.w && arg1->unk8 < tol + r->unk20.w) {
                 if (self->unk68->unk4 == 0) {
                     return candidate;
