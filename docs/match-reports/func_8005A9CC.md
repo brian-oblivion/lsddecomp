@@ -325,3 +325,41 @@ wrong branch, silently changing control flow) or relied on reading an
 uninitialized variable. None of this is visible from the permuter's score
 number alone -- only from reading the actual diff and, for anything that
 looks plausible, running it through `./build-and-verify.sh`.
+
+## ROUND 39 (runner echo): hoist-lever precondition doesn't hold; one new reshape tried, regressed hard
+
+Re-verified fresh (spliced the preserved body back in): confirmed
+byte-identical **57/88, zero address drift**, same single residue
+(`fill_eager_delay_slots` duplicating `.L8005AA44`'s first instruction into
+the `beqz`'s delay slot) as every prior round. Checked the hoist-both
+precondition: the residue is not a load/mult pair at all -- it is which of
+two independent, already-computable instructions (`addiu $a0,$s0,0x16c` vs.
+a genuine `nop`) fills a branch's delay slot, structurally identical to
+`func_8005A82C`'s residue this same round. The lever has nothing to attach
+to here either.
+
+**One new reshape tried:** hoisting `&this->linkCoordinates` into a
+function-top local (`PlayerSpawnPoint *coords = &this->linkCoordinates;`,
+used at the `staircase:` call site instead of re-deriving it there) --
+**regressed hard to 18/88 with 135807 bytes of whole-image drift**, an
+extra callee-saved register persisting across the whole function (same
+"function-scope pointer cast/hoist costs a register" class already
+documented for `DreamSys__InstanceEffectsOnJournal` and, this round,
+confirmed a second time here). Reverted immediately.
+
+**Verdict unchanged: STALL at 57/88, residue unchanged.** No source
+changes retained; `INCLUDE_ASM` restored, whole-image SHA1 verified green.
+
+### Proposed learning (round 39)
+
+A THIRD independent function this round (after `DreamSys__InstanceEffectsOnJournal`
+and, in spirit, `func_8005A82C`'s attempt-5 `pLocal`) confirms: hoisting a
+pointer/address value that is naturally re-derivable at each of its use
+sites into a function-scope local, even when the value itself is
+loop-invariant and "obviously" the same everywhere, tends to cost an extra
+callee-saved register rather than help scheduling -- because the register
+now has to survive across every intervening branch and call, not just the
+one call it was meant to feed. This is the same lesson as the
+`DreamSys__InstanceEffectsOnJournal` cast-local finding, generalized past
+"cast of a `void *` parameter" to "any repeatedly-recomputed address
+expression."

@@ -341,3 +341,44 @@ rounds' 40400-iteration search already covers this exact residue).
 `INCLUDE_ASM` restored; the operand-order-reversal test was reverted
 immediately after confirming the identical result (`git diff --stat`
 empty before continuing).
+
+## ROUND 39 (runner echo): the combination corollary tested explicitly -- both levers, alone and combined, are inert
+
+Per this round's flagship question (does the hoist-both-before-either lever,
+or its combination with an already-tried lever, reach residues elsewhere
+immune to each alone), re-verified fresh (28/35, byte-identical) and ran
+two additional experiments on top of round 20's already-confirmed
+operand-order-reversal negative:
+
+1. **Hoist both bytes (`dynamic`, `upper`) into named locals, read before
+   either is consumed**, i.e. `s8 dynamic = local.axis.dynamic; s8 upper =
+   local.axis.upper;` before computing `index`/`entry` -- **byte-identical
+   to the kept 28/35 form.** Confirms this residue is not the
+   "value-computed-early-consumed-late" shape the lever targets: it is
+   already a single fused index expression, not two independently
+   producible values with divergent consumption timing.
+2. **The SAME hoist combined with the operand-order reversal**
+   (`return *(upper + entry);` instead of `entry[upper]`, on top of the
+   hoisted locals) -- **also byte-identical.** The combination corollary
+   (two individually-inert levers reaching a residue together, as with
+   `func_8004C470`) does NOT hold here: both together produce the exact
+   same wrong register assignment as either alone or as the baseline.
+
+**This is a genuine, doubly-confirmed clean negative for both this round's
+levers on a register-identity/commutative-add residue** (the sixth
+confirmed instance of that project-wide class, per round 20) -- consistent
+with the three other negatives reported this round on register-identity
+ground elsewhere in the project. `INCLUDE_ASM` restored; whole-image SHA1
+verified green; both experiments reverted immediately after measuring.
+
+### Proposed learning (round 39)
+
+The combination corollary (`func_8004C470`: two inert levers together
+reaching 0) is real but not universal -- it depends on the two levers
+actually touching independent DEGREES OF FREEDOM in the scheduler/allocator
+decision. Here, hoisting the two byte reads and reversing the addition
+operand order are both attempts to influence the SAME single fused
+address computation, so combining them tests the same thing twice rather
+than two different axes. Worth checking, before combining two levers, that
+each targets a distinct choice the compiler makes -- otherwise the
+combination is not a new experiment.
