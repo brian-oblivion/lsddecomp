@@ -893,3 +893,63 @@ sibling is also reverted to `INCLUDE_ASM` -- the unit's confirmed
 whenever it is left live, and this shows up as spurious word-mismatch noise
 in an unrelated function's own diff with no hint that the cause lies
 elsewhere in the same file.
+
+## Round 39 (runner delta): re-verified 202/223, one new lever tried and reverted -- unchanged
+
+Rebuilt the round-20/33/36 202/223 body verbatim (names already current):
+`build exit=2`, no compile errors, `funcdiff.py` reports **202/223 words, no
+staleness warning, compiled length exact at 223/223** -- matches every prior
+round's recorded figure exactly.
+
+**Tried this round's `func_8002AEE0`-style "always-true either-branch"
+trick** (which closed a register-numbering residue in this same unit's
+`func_8002AEE0` after manual reorders had failed) against the one open
+residue here (the `tmp`/`n` address-vs-value swap at the function's first
+computed temporary). Wrapped the `D_8006D600 = 0;` statement immediately
+after the load in a duplicated `if (tmp || n) {...} else {...}` referencing
+both contested values:
+
+```c
+tmp = &D_8006D8DC;
+n = *tmp;
+if (tmp || n) {
+    D_8006D600 = 0;
+} else {
+    D_8006D600 = 0;
+}
+D_8006D5FC = 0;
+*tmp = n - 1;
+__asm__("");
+```
+
+**Regressed catastrophically: 202/223 -> 17/223, with 296037 bytes of
+outside-range drift** (the compiled length grew substantially). Reverted
+immediately. Unlike `func_8002AEE0`'s case, this residue sits in the
+function's very FIRST two instructions, before any other value has been
+computed and before any register pressure has built up -- there is no
+"downstream pressure" for a duplicated branch to influence, so forcing an
+extra read of `tmp`/`n` at this specific point just adds real cost instead of
+reshaping an existing allocation decision. This is consistent with HARD
+RULE 6 and this report's own three prior verdicts (round 20 two reshapes,
+round 33/36 no new attempts): this is confirmed register-IDENTITY, and nothing
+tried across four rounds now (naming order, statement order, and this
+round's forced-liveness trick) has been anything but inert-or-worse.
+
+**No further attempt.** This function's remaining budget this round went to
+the two closer siblings this unit's assignment specifically flagged
+(`func_8002AEE0`, matched; `func_8002B198`, improved). Restored to
+`INCLUDE_ASM`; body unchanged from round 36's preserved best.
+
+### Proposed learning
+
+The permuter-found "always-true either-branch" trick that closed two
+residues elsewhere in this unit this round (`func_8002AEE0`, `func_8002B198`)
+needs EXISTING register pressure/pipeline depth to redirect -- it works by
+nudging an allocator's decision among several live candidates, not by
+creating pressure from nothing. Applied to a residue at a function's very
+first instructions, before any competing pressure exists, it has no lever to
+pull and can make the allocator's job measurably harder instead (here: it
+grew the frame and regressed the score by an order of magnitude). Screen a
+candidate placement for "is there already meaningful register pressure at
+this point" before trying this specific trick, rather than applying it
+uniformly to every register-identity residue in a unit.
