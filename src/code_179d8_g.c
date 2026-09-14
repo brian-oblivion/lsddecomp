@@ -393,6 +393,39 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
                     ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
                 }
             }
+            /* ------------------------------------------------------------
+             * KNOWN-BAD CONSTRUCT, KEPT ONLY BECAUSE IT IS BYTE-EXACT.
+             * DO NOT COPY THIS SHAPE INTO ANOTHER FUNCTION.
+             *
+             * `p6A0` and `pF8` are both addresses of globals, so the
+             * condition is a TAUTOLOGY and both arms are IDENTICAL. GCC
+             * 2.6.3 cross-jumps the two arms back into the single `sb`
+             * retail has, so this compiles to no extra instruction -- its
+             * whole effect is to perturb register allocation, forcing
+             * `status` into $s1 across the inner loop. Worth 12 words:
+             * 162/174 without it, 174/174 with it.
+             *
+             * docs/PARALLEL-RUNS.md Gate 3 names duplicate-arm forms
+             * alongside UB as the signature of an EXHAUSTED class rather
+             * than a solution, and says a permuter zero is a LEAD to be
+             * translated into idiomatic C and re-verified. Round 39's head
+             * tried eleven such translations and none reached 174/174 --
+             * every declaration- and assignment-order permutation of the
+             * four pointer locals, `status` retyped to s32, a real
+             * (non-tautological) guard, a re-masked store, and an explicit
+             * live-range extension. All tabulated in the match report.
+             *
+             * THE LEAD WORTH FOLLOWING, and the reason this is flagged
+             * rather than merely apologised for: a tautological null check
+             * is exactly what a MIS-MODELLED global looks like. Both
+             * operands are spelled here as address-of (`s32 D_8006D6A0[]`,
+             * `&D_8006D8F8`). If either is really a POINTER global in
+             * retail's source (`extern s32 *D_8006D6A0;`), this becomes an
+             * ordinary null test that happens to be true at runtime, the
+             * construct stops being a hack, and it stops being duplicated.
+             * That is a data-modelling question, it is cheap to test, and
+             * nobody has tested it.
+             * ------------------------------------------------------------ */
             if (p6A0 || pF8) {
                 *D_8006D8C0 = status;
             } else {

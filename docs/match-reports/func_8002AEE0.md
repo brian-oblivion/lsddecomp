@@ -1,4 +1,99 @@
-# func_8002AEE0 — MATCHED (174/174, 174/174 words -- round 39, up from 165/174 in round 36)
+# func_8002AEE0 -- MATCHED 174/174 (round 39, runner delta), BUT ONE CONSTRUCT IS KNOWN-BAD AND IS FLAGGED BELOW
+
+## ROUND 39 (head): the match is real and verified; the duplicate-arm construct is not idiomatic, and eleven attempts to replace it failed
+
+**The bytes are right.** Re-verified in `main` after merge: `funcdiff` reports
+174/174 with no drift, and the whole-image SHA1 is green. Delta's three-step
+derivation (prologue store order 165->167; the duplicate-arm construct
+167->173; a previously-inert redundant-reload fix 173->174) reproduces exactly.
+
+**The problem is step 2, and it is a source-quality problem, not a correctness
+one:**
+
+```c
+if (p6A0 || pF8) {
+    *D_8006D8C0 = status;
+} else {
+    *D_8006D8C0 = status;
+}
+```
+
+`p6A0` is `D_8006D6A0` (an array) and `pF8` is `&D_8006D8F8`, so **the
+condition is a tautology and both arms are identical.** GCC 2.6.3 cross-jumps
+the arms back into the single `sb $s1, 0($v0)` retail has, so the construct
+emits no instruction of its own. Its entire effect is to perturb register
+allocation -- it forces `status` into `$s1` across the inner loop.
+
+`docs/PARALLEL-RUNS.md` Gate 3 names duplicate-arm forms alongside UB as the
+signature of an **exhausted class rather than a solution**, and says a permuter
+zero is *"a LEAD, not an answer: translate it to idiomatic C and re-verify"*.
+Delta did the first half.
+
+### The eleven translations tried by the head, all negative
+
+Baseline for all rows: the construct replaced by a plain
+`*D_8006D8C0 = status;`, which alone scores **162/174**. So the construct is
+worth **12 words**, not a marginal one or two.
+
+| variant | score |
+| --- | --- |
+| duplicate-arm construct as committed | **174/174** |
+| plain store, nothing else changed | 162/174 |
+| declaration order of the four pointer locals permuted (`p8D8`/`p8D9` before `p6A0`) | 162/174 |
+| assignment order permuted (`p6A0` assigned third) | 160/174 |
+| declaration AND assignment order both permuted | 160/174 |
+| `pF8` assigned first | 160/174 |
+| `p6A0` assigned last | 160/174 |
+| `status` retyped `u8` -> `s32` | 162/174 |
+| explicit live-range extension (`keep = (s32)p6A0 \| (s32)pF8;`) | 162/174 |
+| a real, non-tautological guard (`if (p6A0[0] >= 0 \|\| pF8[0] >= 0)`) | 118/182, drift |
+| store re-masked (`*D_8006D8C0 = (u8)(status & 3);`) | 158/174 |
+
+Every ordinary declaration- and statement-order lever in the project's
+catalogue is in that table, and none of them reaches it.
+
+### The lead worth following, and why this is flagged rather than apologised for
+
+**A tautological null check is exactly what a MIS-MODELLED global looks like.**
+Both operands are spelled in this unit as address-of:
+
+```c
+extern s32 D_8006D6A0[];      /* p6A0 = D_8006D6A0;   */
+extern s32 D_8006D8F8;        /* pF8  = &D_8006D8F8;  */
+```
+
+If either is really a **pointer global** in retail's source
+(`extern s32 *D_8006D6A0;`), then `if (p6A0 || pF8)` is an ordinary null test
+that happens to be true at runtime -- the construct stops being a hack, stops
+needing duplicated arms, and the function becomes an honest match. That is a
+data-modelling question, it is cheap to test, and **nobody has tested it.**
+It is the first thing the next round should try on this function.
+
+### Disposition
+
+**Kept, not reverted, and the choice is deliberate.** Reverting would discard a
+byte-verified match on the strength of a style rule; keeping it silently would
+plant a construct that reads as a bug and invites copying. So it stays, with
+the defect named on the construct itself in `src/code_179d8_g.c`, the eleven
+dead ends recorded here so they are not re-run, and the mis-modelling lead
+written down. **Whether a duplicate-arm form may stand in `src/` at all is a
+project-policy question for the operator, not the head's to settle** -- this
+report is the evidence for that decision either way.
+
+### Proposed learning (round 39)
+
+**A permuter lead that survives translation is not automatically idiomatic
+C -- and "I could not find an idiomatic form" is a finding that belongs in the
+report as a TABLE, not as a sentence.** The eleven rows above are what stop
+the next reader from assuming the obvious levers went untried. The
+distinguishing question for a construct like this is not "is it ugly" but
+**"does it compile to nothing, and if so what is it standing in for?"** Here it
+compiles to nothing and is standing in for a null test, which points straight
+at the data model rather than at the code shape.
+
+---
+
+## (original report follows) func_8002AEE0 — MATCHED (174/174, 174/174 words -- round 39, up from 165/174 in round 36)
 
 `code_179d8_g`, vram `0x8002AEE0`, file offset `0x1B6E0`, 174 instructions
 (0x2B8 bytes). No `nop_mflo_mfhi` or `gp_rel` hits — clean per the carve
