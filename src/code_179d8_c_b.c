@@ -103,23 +103,7 @@ void func_80032588(s32 a0)
     D_8009024C = cmd;
 }
 
-extern s32 D_8006DC90;
-extern s32 D_8006DC94;
-extern s32 D_8006DC8C;
-extern void (*D_8006DC9C)(void);
-extern void EnterCriticalSection(void);
-extern void ExitCriticalSection(void);
-extern void VSyncCallback(void (*cb)(void));
-extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void);
-extern void func_80032A9C(void);
-extern void func_80032AD0(void);
-extern void SsSeqCalledTbyT(void);
-extern s32 func_80032C60(s32 n);
-extern s32 func_80032BF0(u16 which);
-extern s32 SetRCnt(s32 n, s16 target, u32 mode);
-
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", func_80032708);
-
 
 extern void func_80032708(s32 arg0);
 
