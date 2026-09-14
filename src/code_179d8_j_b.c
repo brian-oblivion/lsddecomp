@@ -217,8 +217,11 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
  * field-copy load-delay nops (confirmed not barrier-reachable), and the
  * func_8002CF18() return value's register identity -- all three exhausted
  * per this report's own extensive history (14+ hand reshapes across two
- * rounds plus a 9-probe head investigation). Not reattempted this round;
- * see docs/match-reports/func_80030E90.md's round-36 addendum. */
+ * rounds plus a 9-probe head investigation). Round 40: rebuild confirms
+ * 241/252 exactly (isolated from the sibling stall's own shortfall); first
+ * real permuter search (70k+ iterations), one sub-base lead found and
+ * confirmed NOT to reproduce on the real oracle -- see
+ * docs/match-reports/func_80030E90.md's round-40 addendum. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030E90);
 
 s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
@@ -283,7 +286,11 @@ fail_nolock:
  * documents (a second, independent guard-polarity flip on the "note == 0"
  * check; a one-statement-shifted D_8008EA13 fresh-read position), all
  * confirmed non-source-derivable by the sibling report's exhaustive
- * investigation. Not reattempted this round; see this round's summary. */
+ * investigation. Round 40: rebuild confirms 237/253 (33/253 raw) exactly,
+ * isolated from the sibling stall's own shortfall; first real permuter
+ * search (48k+ iterations), three sub-base leads found and all confirmed
+ * NOT to reproduce on the real oracle -- see
+ * docs/match-reports/func_8003149C.md's round-40 addendum. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031890);
