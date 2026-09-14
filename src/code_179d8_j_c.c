@@ -164,7 +164,21 @@ s32 func_80031C98(s16 idx, s16 *out1, s16 *out2)
     return -1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031CF0);
+s32 func_80031CF0(s16 idx, s16 p1, s16 p2)
+{
+    /* Retail reserves an 8-byte frame it never touches. Only an unused local
+     * ARRAY of that size reproduces it -- a scalar is register-allocated and
+     * eliminated, and a 4-byte array reserves the wrong amount. */
+    s32 unused[2];
+
+    if ((u16) idx < 0x18) {
+        D_8008D7F0[idx].unk2 = p2;
+        D_8008D970[idx] |= 3;
+        D_8008D7F0[idx].unk0 = p1;
+        return 0;
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031D6C);
 
