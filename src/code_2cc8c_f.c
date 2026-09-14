@@ -269,21 +269,40 @@ Obj6EAC0Methods *func_80040FB0(void) {
     return &D_8006EB90;
 }
 
-/* func_80040FC0 -- STALL, but MUCH closer as of round 37: 22/24 at exact
- * length, and the ONLY residue is two TRANSPOSED preheader words
- * (`ori $a3,$zero,0x40` / `addu $a2,$a0,$zero` at vram 0x80040FD0).
- * The "redundant cursor cache" class this comment used to describe is
- * SOLVED and the old claim -- that every C form collapses the two
- * registers into one -- was FALSE: it measured one idiom, not the
- * compiler. Retail's source simply has TWO destination pointers that
- * carry equal values (`d` stored through, `dst` returned), and writing
- * both keeps both. A bare __asm__("") barrier does NOT move the
- * transposition (tried both positions); this is preheader emission
- * order, not scheduling. Prime permuter target -- never searched.
- * The class had exactly TWO members, not three: func_800407F8 was
- * MATCHED in round 19 and the cross-reference to it was stale.
- * Preserved body and its declarations are inlined in that report. */
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
+/* func_80040FC0 -- MATCHED round 38 (24/24). A permuter search (208
+ * iterations, rc=0) closed the last residue: retail materializes the
+ * 0x40 comparison constant into its own register BEFORE copying `dst`
+ * into `d`, and GCC 2.6.3 only reproduces that emission order when the
+ * constant is named by a separate local assigned first. See
+ * docs/match-reports/func_80040FC0.md. */
+u8 *func_80040FC0(u8 *dst, u8 *src) {
+    u8 *d;
+    u32 special;
+    u32 c;
+    u32 v;
+    u32 peek;
+
+    if (*src++ != 0) {
+        special = 0x40;
+        d = dst;
+        do {
+            d++;
+            c = *src;
+            dst++;
+            if (c < 0x80 && c != special) {
+                v = c - 0x1F;
+            } else {
+                v = c - 0x20;
+            }
+            src++;
+            d[-1] = v;
+            peek = *src;
+            src++;
+        } while (peek != 0);
+    }
+    *dst = 0;
+    return dst;
+}
 
 /* func_80041020 -- STALL (register identity), best 20/31 at EXACT length.
  * See docs/match-reports/func_80041020.md. Round 37 applied the two-cursor
