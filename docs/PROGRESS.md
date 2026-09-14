@@ -129,6 +129,38 @@ detectors.
   correction sat 500 lines below. Warning moved onto the block itself.
 - Three runners × `-j 6` peaked around load 12 on 32 cores — comfortable, and
   confirms round 37's sizing call.
+- **TEARDOWN DID NOT HOLD THE FIRST TIME, AND THE HEAD DECLARED IT COMPLETE
+  BEFORE IT WAS.** `git worktree remove --force` + `git branch -d` reported
+  success for all three, `git worktree list` showed only `main`, and the head
+  wrote up the round. **The stopped runner then woke up, re-provisioned its own
+  worktree AND its branch, and launched two concurrent permuter searches** —
+  23 processes, ~12 cores, on a base a whole round out of date.
+
+  Nothing was lost: re-checked, `main..runner/alpha` was 0 commits, the tree
+  was clean, and the head's salvage commit was already in `main`. But the
+  head's own summary had asserted a clean teardown and a quiet machine, and
+  both were false within minutes.
+
+  **The mechanism is the §4b precondition list measuring the wrong thing.** All
+  four preconditions are about the WORKTREE (reports exist, branch merged, tree
+  clean, mapping right). None of them asks whether the AGENT is still running.
+  A runner that stopped its turn is not stopped — it can wake, and
+  `setup-worktree.sh` is idempotent enough to rebuild everything the head just
+  deleted, branch included. Teardown races a live agent and loses silently.
+
+  **So there is a fifth precondition: STOP THE AGENT, THEN TEAR DOWN.** Use the
+  orchestration's own stop (`TaskStop`) on the runner before `--force`, rather
+  than only killing its processes — killing searches leaves the agent free to
+  launch more, which is exactly what happened here. Order that works: verify
+  nothing unmerged and nothing uncommitted → **stop the agent** → sweep its
+  processes `cwd`-guarded → `worktree remove --force` → confirm the directory
+  is gone.
+
+  Note this is NOT a §2d violation. §2d forbids inferring death and killing on
+  that inference; here the runner was demonstrably ALIVE, the head had measured
+  that its branch held nothing unmerged, and the kill followed a verified
+  premise rather than an assumed one. The §2d ordering still applied — salvage
+  first, kill second.
 
 ### Next round
 
