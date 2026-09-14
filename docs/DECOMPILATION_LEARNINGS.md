@@ -6505,11 +6505,18 @@ register identity should be read for dead reloads before it is read for
 anything else -- they are cheap to spot (a local assigned a field chain, then
 that chain re-read) and cheap to test.
 
-Not a universal: `func_8004BE54`'s instance is still UNTESTED (see below), and
-on `func_8004B700` the *other* two shapes tried at the residue site both went
-backwards (107/140 dropping the local entirely, 136/140 adding a value temp).
-The lever is "remove a load that is already dead", not "rewrite pointer
-chains".
+**Both instances are now TESTED and both paid** (round 40, continuation):
+`func_8004B700` 125/140 -> 137/140 and `func_8004BE54` 132/150 -> 142/150.
+This paragraph read *"`func_8004BE54`'s instance is still UNTESTED"* until
+round 41 -- written while the search was still running, and left standing
+after bravo tested it within the hour. A lever's status line is exactly the
+sentence a later round reads to decide whether to pull it, so a stale
+UNTESTED here is a lever nobody pulls twice.
+
+Still not a universal, and the scope is the useful half: on `func_8004B700`
+the *other* two shapes tried at the residue site both went BACKWARDS (107/140
+dropping the local entirely, 136/140 adding a value temp). The lever is
+"remove a load that is already dead", not "rewrite pointer chains".
 
 ## A sub-base permuter candidate is worth translating even when the search never reached ZERO (round 40)
 
