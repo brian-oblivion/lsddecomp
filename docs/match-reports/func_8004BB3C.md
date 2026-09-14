@@ -1,5 +1,52 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 41 (alpha): Gate 1b re-verified 90/105, no drift; dead-reload
+> lever read BY HAND per this round's staffing instruction, one new
+> structural variant tried, REGRESSED hard.** Rebuilt the exact preserved
+> body from a clean `INCLUDE_ASM` baseline first: confirmed 90/105, exact
+> length, identical `$s3`<->`$s4` residue -- unchanged from round 39.
+>
+> **Read the body for the dead-reload shape before touching anything, per
+> this round's brief.** The lever closed on `func_8004B700`/`func_8004BE54`
+> this same unit last round is "a value already held in a local gets
+> reloaded via the same expression a second time, into the same local, for
+> a second single use" -- a same-block RELOAD of an already-computed value.
+> This function's `e->unk4` is dereferenced up to five times per loop
+> iteration (`unk2C`, `unk30`, `methods->slot78`'s receiver, `unk2A`,
+> `methods->slot74`'s receiver) but **never through a local that already
+> holds it** -- there is no `p = x->y; ...; q = x->y;` pair anywhere in
+> this body, only repeated `e->unk4->field` dereferences with no prior
+> caching at all. That is a different shape: introducing a cache is adding
+> a computation, not removing a redundant one, so this is NOT the
+> documented lever, it is its mirror image.
+>
+> Tried it anyway as the closest analogue, in case caching `e->unk4`
+> resembled the win seen elsewhere: `ElemTarget *et = e->unk4;` assigned
+> once right after `slot88`, with every subsequent `e->unk4->X` rewritten
+> to `et->X`. **Regressed hard: 12/105, with the compiled length itself
+> shrinking (142607 bytes of drift outside the function's own range,
+> confirming an address shift, not just a worse register choice).**
+> Reverted immediately. This confirms the shape difference is real: unlike
+> the reload-removal lever (which deletes an instruction retail's own
+> disassembly never had), caching `e->unk4` here removes instructions
+> retail actually DOES perform as separate dereferences, so it can only
+> ever produce a shorter, wrong-length function.
+>
+> **Verdict unchanged: this residue is the two-independently-based-walker
+> register swap (`ep`/`sp`, i.e. `$s3`/`$s4`) documented across 6 prior
+> rounds (13, 17, 19, 20, 27, 32, 39), not a dead-reload instance.** The
+> dead-reload lever's precondition (a local already holding a value, reread
+> via the same expression into the same local) simply does not occur in
+> this body anywhere -- confirmed by direct inspection, not inferred. Per
+> project rule 6 this remains a register-identity stall, not to be forced
+> with a register pin. No permuter run this round (time went to
+> `func_8004C470` instead, per this round's own closer-target priority);
+> the existing round-17/40 finding that this function's isolated-compile
+> scaffold provably scores a DIFFERENT residue than the real build (0
+> insertions/deletions in context vs 2/2 isolated) still stands and still
+> blocks a trustworthy search without more surrounding-file context than
+> `setup-permuter.sh` currently provides.
+
 > **ROUND 40 (bravo): Gate 1b re-verified 90/105, no drift; fresh permuter
 > scaffold built and independently RE-CONFIRMS round 17's scaffold-mismatch
 > finding, no search run.** Rebuilt the exact preserved body per Gate 1b:
