@@ -1,5 +1,40 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 40 (bravo): Gate 1b re-verified 90/105, no drift; fresh permuter
+> scaffold built and independently RE-CONFIRMS round 17's scaffold-mismatch
+> finding, no search run.** Rebuilt the exact preserved body per Gate 1b:
+> confirmed 90/105, no drift, identical `$s3`<->`$s4` residue.
+>
+> This round's assignment table listed this function as "searched", but
+> round 17's own search ran against a scaffold it explicitly documented as
+> scoring a DIFFERENT residue than the real build (2 insertions/2 deletions
+> in isolation vs 0/0 in context) -- a permuter-inconclusive result, not an
+> exhausted one. Built a brand-new scaffold from scratch this round
+> (`tools/setup-permuter.sh func_8004BB3C <seed>`, seed = this report's own
+> 90/105 body verbatim) and ran `--debug --stack-diffs` BEFORE searching,
+> per the script's own advice: **base score 480, with 20 stack differences
+> and 2 insertions / 2 deletions** -- the real build has ZERO stack
+> difference and ZERO insertions/deletions (90/105 is pure register
+> identity, correct frame, correct length). This is round 17's exact
+> mismatch, independently reproduced with a fresh scaffold four rounds
+> later -- not a fluke of that one attempt, but a STRUCTURAL property of
+> isolating this function: the `sp = (SetupSub866E8*)((u8*)arr1+4)`
+> computation's scheduling (and evidently now the frame size too) depends
+> on surrounding-file register pressure that a single-function compile unit
+> cannot reproduce.
+>
+> **No search was run against this scaffold** -- a result against a
+> provably-mismatched scaffold does not transfer, per the project's own
+> documented rule, and running one anyway would only waste the round's
+> budget on a number nobody could trust. This function's residue remains
+> genuinely permuter-untested in the sense that matters (a scaffold that
+> scores the SAME thing the real build does), six rounds of manual
+> confirmation deep, with the permuter route requiring more than
+> `setup-permuter.sh` can currently provide -- likely more surrounding
+> file context, not a different seed shape. Not attempted further this
+> round; time went to the three never-searched functions elsewhere in this
+> unit instead, per this round's staffing priority.
+
 > **ROUND 39 (charlie): re-verified, no new attempt.** Rebuilt the exact
 > preserved body from a clean `INCLUDE_ASM` baseline: confirmed 90/105, no
 > drift, identical `$s3`<->`$s4` whole-function register-identity swap
