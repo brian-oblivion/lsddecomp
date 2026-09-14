@@ -2074,6 +2074,31 @@ objects hold 226 `addiu` and 386 `ori`, with **`libapi` and `libcard` at 100%
 `asm-differ`; only the raw word distinguishes them, which is why four rounds
 of instruction-text analysis never saw it.
 
+**ROUND 40: THE VERDICT IS NOW MECHANICAL. `NOT GAME CODE` IS THE FOURTH
+HONESTY MARKER.** Round 39 proved the function was libcard, wrote it in the
+report title -- and `nearmiss.py` went on ranking it FIRST in `ASSIGN FROM
+HERE`, because nothing read the title. A verdict no tool can read is a verdict
+the next round pays for again, which is the exact failure `DELIBERATELY
+UNWORKED` and `REOPENED -- ASSIGNABLE` were each added to stop.
+
+So: **put the exact phrase `NOT GAME CODE` in the report's TITLE/VERDICT
+REGION** (the first 8 lines -- the same window `verdict()` reads, and for the
+same reason: only the title is safe to key on). `nearmiss.py` then partitions
+it out of `ASSIGN FROM HERE` and prints it under its own heading, alongside
+the placed-object partition it cannot otherwise join.
+
+Three things this deliberately does NOT do:
+
+- It does not touch `progress.py`. The function keeps its report and stays a
+  documented STALL, which is correct -- it IS documented. The error was only
+  ever paid at assignment, so that is the only place it is fixed.
+- It does not delete the derivation. 634 lines of it survive, as a record of
+  how the ownership question was eventually settled.
+- It is not a runner's call. Marking one is a HEAD decision backed by the two
+  mechanical detectors above (segment topology, and the `addiu`/`ori`
+  assembler fingerprint), never a judgement about whether something "smells
+  like a library" -- that judgement is what round 32 cost the project.
+
 **The generalisable rule, and it is the one that actually failed here: A
 REPRODUCED TOOLCHAIN MECHANISM IS NOT A BLOCKER UNTIL ITS CORPUS FREQUENCY IS
 MEASURED.** Round 32 traced this residue to the exact lines of maspsx that

@@ -174,6 +174,52 @@ def sdk_owned():
     return owned
 
 
+def not_game_code():
+    """Functions a REPORT certifies are Sony's, with no placed object to prove it.
+
+    The fourth honesty mechanism, and it closes the one gap the other three
+    cannot see.  `sdk_owned()` crosses the queue against PLACED objects, so it
+    answers "is this owned by an object we HAVE" -- it cannot answer "is this
+    Sony's".  progress.py reports hundreds of SDK functions with no object on
+    any disc in sdk/, and a function in that gap passes every screen the
+    project owns (no gp_rel, no nop_mflo_mfhi, not a trampoline, no
+    placed-object overlap) while being unmatchable by construction.
+
+    Round 39 found one the expensive way: func_80050B28, the SMALLEST function
+    in the queue and therefore FIRST in this list for four rounds, carrying 634
+    lines of derivation across four of them.  It is Psy-Q libcard.  Round 39
+    proved it and wrote it in the report title, and this list went on ranking
+    it first anyway, because nothing read the title.
+
+    The marker is the exact phrase NOT GAME CODE in the report's TITLE/VERDICT
+    REGION -- the same first-8-lines window verdict() reads, and for the same
+    reason: the body is full of claims that were tried and thrown away, and
+    only the title is safe to key on.  A function so marked keeps its report
+    and stays a documented stall to progress.py (it IS documented); it is only
+    removed from ASSIGN FROM HERE, which is the one place the error was paid.
+
+    Marking one is a HEAD decision backed by the two mechanical detectors in
+    Gate 1b's eighth screen (segment topology, and the addiu/ori assembler
+    fingerprint), never a runner's judgement call.
+    """
+    marked = {}
+    d = os.path.join(ROOT, "docs", "match-reports")
+    if not os.path.isdir(d):
+        return marked
+    for name in os.listdir(d):
+        if not name.endswith(".md"):
+            continue
+        try:
+            with open(os.path.join(d, name), encoding="utf-8",
+                      errors="replace") as fh:
+                head = " ".join(next(fh, "") for _ in range(8))
+        except OSError:
+            continue
+        if "NOT GAME CODE" in head:
+            marked[name[:-3]] = True
+    return marked
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true",
@@ -220,16 +266,30 @@ def main():
     owned = sdk_owned()
     sdk = [r for r in rows if r[2] in owned]
     rest = [r for r in rows if r[2] not in owned]
+
+    # ...and a FOURTH partition, for Sony code with no object to prove it.
+    # See not_game_code() for why this cannot be folded into the screen above.
+    nogame = not_game_code()
+    notgame = [r for r in rest if r[2] in nogame]
+    rest = [r for r in rest if r[2] not in nogame]
+
     clean = [r for r in rest if not real_blockers(r[3])]
     blocked = [r for r in rest if real_blockers(r[3])]
 
     print(f"live INCLUDE_ASM queue: {len(rows)}   "
           f"blocker-clean: {len(clean)}   blocked: {len(blocked)}   "
-          f"Sony library code: {len(sdk)}")
+          f"Sony library code: {len(sdk)}   marked NOT GAME CODE: {len(notgame)}")
     if sdk:
         print(f"  {len(sdk)} function(s) lie inside a placed Sony object and can NEVER")
         print("  match as C -- excluded from the assignable list below. Convert them")
         print("  per docs/SDK-OBJECTS-GUIDE.md; see `python3 tools/sdkstalls.py`.")
+    if notgame:
+        print(f"  {len(notgame)} function(s) are marked NOT GAME CODE by their own report --")
+        print("  Sony library code with no object on any disc in sdk/, so no placed")
+        print("  object can prove it and no source shape can ever reach those bytes.")
+        print("  Excluded from the assignable list below. See Gate 1b's eighth screen.")
+        for words, unit, func, _, v in sorted(notgame):
+            print(f"    {words:5d}w  {unit:<16} {func:<16} {v[:70]}")
     if blocked:
         tally = {}
         for r in blocked:
