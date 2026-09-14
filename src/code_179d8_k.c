@@ -905,13 +905,18 @@ combine:
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
 
-/* STALL (round 35): 163/179 words match, zero out-of-range drift, length
- * EXACT (179/179 words). Every remaining diff is the SAME register-identity
- * swap (this build keeps `channel` in $s2 and the cached `arg5` in $s3;
- * retail has them the other way around) -- CLAUDE.md's register-identity
- * STALL class, not a banned-fix target. See docs/match-reports/func_800357B0.md
- * for the full derivation (now unblocked: every cross-unit call below is a
- * real Psy-Q SDK symbol, not a local guess) and the preserved near-miss body. */
+/* STALL (round 39, up from round 35's 163/179): 171/179 words match, zero
+ * out-of-range drift, length EXACT (179/179 words). A permuter-found
+ * simplification of case 12 (drop the named `s32 t = arg6 - 0x40;` local
+ * entirely and recompute `arg6 - 0x40` inline at its one real use) closed
+ * 8 of the 16 words round 35 left open -- see docs/match-reports/func_800357B0.md's
+ * round 39 update. Every remaining diff (8 words) is the SAME register-
+ * identity swap round 35 already found (this build keeps `channel` in $s2
+ * and the cached `arg5` in $s3; retail has them the other way around) --
+ * CLAUDE.md's register-identity STALL class, not a banned-fix target. Both
+ * directions of "hoist through a fresh local" (channel, round 35; arg5,
+ * round 39) are confirmed inert against it. See the match report for the
+ * full derivation and the preserved near-miss body. */
 #if 0
 /* This unit's own reduced view of the VagAtr SsUtGetVagAtr/SsUtSetVagAtr
  * fill (round 35): only the 8 fields this function actually touches, at
@@ -1052,15 +1057,13 @@ tailA:
             resolved.unk8 = arg6;
             break;
         case 12: {
-            s32 t = arg6 - 0x40;
-
             if (arg6 == 0) {
                 /* nothing -- falls to the shared check below */
             } else if (arg6 < 0x40) {
                 resolved.unk10 = 0;
                 break;
             }
-            if ((u32)t < 0x40) {
+            if ((u32)(arg6 - 0x40) < 0x40) {
                 resolved.unk10 = 1;
             }
             break;
