@@ -393,7 +393,7 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
     }
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004BE54.md. 130/150 words
+/* STALL snapshot -- see docs/match-reports/func_8004BE54.md. 132/150 words
  * at CORRECT total length (no address drift): every instruction present,
  * none missing or extra. The residue is two well-documented classes only --
  * plain register identity (info/hdr's ResInfo866E8* lives in v0 in retail,
@@ -401,7 +401,14 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
  * canonicalization (`or`/`addu` reversed regardless of C source order,
  * same phenomenon independently confirmed in func_8004C470's report).
  * Preserved here per convention -- not live C.
- * ROUND 32 (bravo2): re-verified, 130/150, no drift, identical residue. */
+ * ROUND 32 (bravo2): re-verified, 130/150, no drift, identical residue.
+ * ROUND 39 (charlie): 130/150 -> 132/150. Both `(*slot)->unk10 |= flagBit;`
+ * sites closed by hoisting the reloaded field into its own named local
+ * BEFORE the `|=` (`s32 t = (*slot)->unk10; (*slot)->unk10 = t | flagBit;`)
+ * -- operand-order-alone was already confirmed inert (round 32); the hoist
+ * is what moves it, same combinatorial shape as func_8004C470's fix. The
+ * `addu`-for-found-tail site and the `info` register-identity chain did NOT
+ * yield to the same lever (see match report). */
 #if 0
 /* func_8004BE54 (Obj866E8Methods::slot104) -- own local view of several
  * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
@@ -532,8 +539,10 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
             return;
         }
         if (idxVal == -1) {
+            s32 flags10a;
             slot = (EntryChildObj **)((u8 *)entry->unk10 + off1);
-            (*slot)->unk10 |= flagBit;
+            flags10a = (*slot)->unk10;
+            (*slot)->unk10 = flags10a | flagBit;
             (*slot)->unk20 = 0;
             (*slot)->unk18 = 0;
         } else {
@@ -563,7 +572,10 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
             (*slot)->unk36 = outBuf.h2;
             gpu = (*slot)->unk14;
             gpu->unk0 = 0;
-            (*slot)->unk10 |= flagBit;
+            {
+                s32 flags10 = (*slot)->unk10;
+                (*slot)->unk10 = flags10 | flagBit;
+            }
         }
         if (outBuf.found) {
             (*slot)->unk38 = *(EntryChildObj **)((u8 *)entry->unk10 + off2);
