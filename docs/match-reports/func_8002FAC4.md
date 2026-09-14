@@ -333,6 +333,18 @@ ones that look old.
 ## Preserved body (best attempt, 402/387 built words -- 15 long, structurally correct throughout except the two residues above)
 
 ```c
+> **ROUND 39 (head): THIS PRESERVED BODY WILL NOT LINK AS WRITTEN.**
+> Rename(s) needed before it builds: `func_80032148` -> `SpuVmVSetUp`.
+> The symbol was retargeted when that function became a linked Psy-Q
+> SDK object, so the old name no longer exists in this tree. The NAME
+> is stale; the residue this body demonstrates usually is not. Correct
+> the name and REBUILD before trusting any figure attached to this
+> block -- including one quoted in its own heading.
+>
+> Found by `python3 tools/stalesyms.py`. Note this warning is placed only
+> where the stale name appears in CODE: a block whose prose merely
+> discusses the rename is fine and is deliberately not marked.
+
 #if 0
 /* Base pointer for a table of 0x10-byte slots, same shape as
  * code_179d8_j.c's own SlotE968 local view of the same D_8008E968
