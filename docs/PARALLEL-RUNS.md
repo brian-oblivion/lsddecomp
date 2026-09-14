@@ -1919,6 +1919,99 @@ sound reading of cost and a wasted runner: the unit should not have been
 staffed. A whole runner reporting "this was exhausted before I arrived" is a
 Gate 1b failure, not a runner failure.
 
+**AND A SEVENTH, BECAUSE A CROSS-REFERENCE DECAYS TOO AND IT DECAYS SILENTLY
+(round 38).** Round 37's head owned this as an anecdote about one function —
+`func_800407F8`, carried as a "pending class member" since round 18 and matched
+in round 19, still being counted by the reports pointing at it. It is not an
+anecdote. It is a STANDING, MECHANICALLY-DETECTABLE class, and round 38
+measured it across the whole corpus.
+
+**The mechanism:** the round that closes a function updates THAT function's own
+report. It does not update the reports pointing at it. So every "same class as
+`func_X`'s stall", "analogous to `func_X`", "what made `func_X` a good permuter
+candidate" keeps asserting a live stall that is gone — and the next runner
+reads it as a live wall or a live precedent.
+
+**The detector is a set difference.** A function with a match report that is no
+longer a live `INCLUDE_ASM` has LEFT the queue; cross that against
+stall-language lines in the reports of functions still IN the queue:
+
+```sh
+grep -hoP '^INCLUDE_ASM\("[^"]*", \K[^,)]*' src/*.c | sort -u > /tmp/live.txt
+ls docs/match-reports/ | sed 's/\.md$//' | sort -u > /tmp/reported.txt
+comm -13 /tmp/live.txt /tmp/reported.txt > /tmp/closed.txt     # left the queue
+while read fn; do f=docs/match-reports/$fn.md; [ -f "$f" ] || continue
+    grep -no "func_[0-9A-F]\{8\}" "$f" | while IFS=: read -r ln ref; do
+        [ "$ref" = "$fn" ] && continue
+        grep -qx "$ref" /tmp/closed.txt && \
+          sed -n "${ln}p" "$f" | grep -qiE 'stall|blocked|analogous|same class|permuter' \
+          && echo "$fn -> $ref"
+    done
+done < /tmp/live.txt | sort -u
+```
+
+**BUT THE SET DIFFERENCE HAS THREE EXITS, NOT ONE, AND THEY MEAN OPPOSITE
+THINGS. This is the part that matters and the part the naive detector gets
+wrong.** "Has a report, is not a live `INCLUDE_ASM`" resolves three ways, and
+round 38 measured all three over 1011 closed functions:
+
+| exit | how to tell | what a citation of it is worth |
+| --- | --- | --- |
+| **matched as game C** | defined in `src/*.c` | precedent is REAL and complete — go read the matched C |
+| **reclassified as a Sony SDK object** | no definition in `src/`, **and no symbol in `build/lsdde.map`** | precedent **NEVER EXISTED** |
+| **renamed** | no `func_XXXXXXXX` definition, but the symbol IS in the map | precedent is real, findable only under the new name |
+
+Splitting them is one more command — a function that left the queue into a
+Sony object keeps neither a C definition nor a map symbol, because it now
+lives under Sony's own name:
+
+```sh
+while read f; do grep -qE "(^|[ *])${f}\(" src/*.c && continue
+    grep -q "\b$f\b" build/lsdde.map && echo "RENAMED  $f" || echo "SDK      $f"
+done < /tmp/closed.txt
+```
+
+**Round 38's census: 89 of 1011 closed functions have a report but no C
+definition — 86 SDK-reclassified, 3 renamed — and 31 live stall reports cite at
+least one of them, 10 of those as an explicit PRECEDENT claim.** Do not read
+those figures as current; re-run the commands.
+
+**The SDK exit is the expensive one, and it is expensive in a specific way: it
+invalidates a precedent RETROACTIVELY AND TOTALLY.** A closed-by-matching
+sibling is a *better* lead than the report claims — the C exists, go read it. A
+sibling that turned out to be Sony's was never game code, so **no source shape
+ever reached those bytes**, and any residue class, permuter-suitability verdict
+or HARD-RULE adjudication derived from it is derived from nothing. The worked
+example: `func_8002C278`'s report cites `func_8002C048`/`func_8002C0AC` twice —
+once as *"the same class of residue ... in this unit"* and once as *"the 1-2
+instruction swaps that made them good permuter candidates"*. They are `strcmp`
+and `strncmp` (`libc2/strcmp.o`, `libc2/strncmp.o`), reclassified in round 34,
+and `src/code_179d8_d.c`'s own header comment records that they *"had been
+matched as C — they were Sony's the whole time"*. So the citing report holds up
+as precedent a pair of stalls that were never game stalls, in support of a
+permuter recommendation for a third function.
+
+**One report already handles this correctly, which is the model to copy.**
+`func_80030E90.md` line 532 writes *"a MATCHED sibling, now Sony's object"* —
+it names both the exit and the reclassification in five words. That is all a
+corrected cross-reference needs.
+
+**And note which screen this is NOT.** `sdkstalls.py` answers "is the function
+I am about to be ASSIGNED owned by Sony?" and `nearmiss.py` excludes its hits
+from `ASSIGN FROM HERE`, so assignment is already safe. This screen answers a
+different question — "is the EVIDENCE this report reasons from still valid?" —
+and nothing was checking it. Same shape this document keeps rediscovering: **a
+screen measures the obstruction it was built for, and says nothing about the
+ones it was not.**
+
+**Whose job:** correcting a cross-reference is the HEAD's, at Gate 1b or at
+consolidation, because the runner who would inherit the error has no way to
+know the text is stale — round 23's charlie matched all five of its functions
+and still signed off calling one "the still-`addiu_at`-blocked function",
+read off a report rather than measured. When you close a function, grep for
+who points at it before you move on; that is the cheap half of this, and it is
+the half that stops the class regenerating.
+
 **Gate 3 — permuter round instead.** If the fresh queue is dry and carving is
 blocked, or the stall residue is worth more than cold ground (near-misses like
 88/90), run a permuter round. A zero is a LEAD, not an answer: translate it to

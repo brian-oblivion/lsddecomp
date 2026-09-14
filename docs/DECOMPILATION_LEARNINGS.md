@@ -6098,3 +6098,51 @@ Note the lever that got there was `volatile` on a global array's extern
 declaration (plus its aliasing locals) — a distinct form from the
 single-pointer-cast already documented, and principled here rather than a
 hack, since that array is mutated by a callback.
+
+## An unused stack frame is reserved by an unused local ARRAY, never by a scalar (round 38)
+
+**Closed `func_80031CF0` (31/31).** Retail opens `addiu $sp, $sp, -0x8`, closes
+`addiu $sp, $sp, 0x8`, and **never stores to the frame**. Nothing in the
+function's visible behaviour needs one.
+
+The reflex is to treat that as a toolchain residue, or to reach for a
+dead-code hack to force the allocation. Neither is right. Six variants,
+measured one per build against the whole-image oracle:
+
+| variant | bytes | whole-image build |
+| --- | --- | --- |
+| `s32 unused[2];` | 8 | **green, 31/31** |
+| `s16 unused[4];` | 8 | **green, 31/31** |
+| `s32 dead[2];` + `if (0) { dead[0] = 1; }` | 8 | green, 31/31 |
+| `s32 unused[1];` | 4 | RED |
+| `s32 unused;` (scalar) | 4 | RED |
+| `s32 d0; s32 d1;` (two scalars) | 8 | RED |
+| no local at all | 0 | RED |
+
+**The discriminator is ARRAY-vs-SCALAR, and then SIZE — not usedness.** An
+unused local *array* reserves stack frame space equal to its own size under
+GCC 2.6.3 at `-O2`. An unused *scalar* does not, however many you declare:
+it is register-allocated and then eliminated. The two-scalar row is the
+control — same 8 bytes as the array form, still red.
+
+**The `if (0)` guard is inert.** It does not rescue a scalar and an array does
+not need it. It appeared in this function's first matching body and was
+removed with no change to the bytes. Left standing it would have become the
+project's precedent for the next unused frame, which is why it is worth
+recording that it was measured rather than merely disliked.
+
+**So an unused-frame residue is a SIZE MEASUREMENT, not a wall.** Read the
+`addiu $sp, $sp, -N` off the prologue and declare an unused local array of
+exactly N bytes. Getting N wrong fails the whole-image build outright rather
+than scoring low, so the oracle answers immediately and the search space is
+one number.
+
+**This QUALIFIES a claim already written down here unconditionally.** Round
+35's update in `docs/match-reports/func_8002DDBC.md` reports that *"GCC 2.6.3
+dead-code-eliminates an unused local"* — reached from a scalar experiment and
+stated without the qualifier. That is true of scalars and **false of arrays**,
+and the difference is the whole lever. A negative measured on one storage
+class is not a negative for the other.
+
+Untried against this lever at time of writing: `func_8001A268` (`code_8220_c`),
+filed as *"unused-frame placement residue, 53/70 words"*.
