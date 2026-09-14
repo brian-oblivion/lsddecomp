@@ -6474,3 +6474,150 @@ target. Say which when it applies.
    the same round made the declaration a `conflicting types` error. This is
    the round-33 stale-symbol class arriving from inside a single unit — check
    for it before reading a rebuild failure as evidence about the body.
+
+## Eliminating a DEAD RELOAD is a register-allocation lever, and it surfaced twice in one round (round 40)
+
+The construct, in full:
+
+```c
+/* before */                      /* after */
+p = x->y;                         x->y->z = 0;
+p->z = 0;
+```
+
+where `p` **already holds `x->y`** from earlier in the same block, so the
+reload is semantically dead. It is not a readability change: on
+`func_8004B700` it took the function from **125/140 to 137/140** -- twelve
+words, none of them at the reload's own site. Removing the redundant load
+re-shaped allocation across the whole enclosing loop.
+
+**Why it is worth writing down rather than filing as one function's trivia:
+the identical mutation was the best saved candidate on `func_8004BE54` in the
+same round**, from a search that had no knowledge of the other. Two different
+functions, two independent searches, one construct. That is the signature of a
+real lever rather than a local accident.
+
+It is the mirror image of the round-39 *"dropping a name and recomputing
+inline"* entry, and the pair together are the general statement: **what a
+value is NAMED and how many times it is LOADED are separate axes, and GCC
+2.6.3's allocator is sensitive to both.** A near-miss whose residue is
+register identity should be read for dead reloads before it is read for
+anything else -- they are cheap to spot (a local assigned a field chain, then
+that chain re-read) and cheap to test.
+
+Not a universal: `func_8004BE54`'s instance is still UNTESTED (see below), and
+on `func_8004B700` the *other* two shapes tried at the residue site both went
+backwards (107/140 dropping the local entirely, 136/140 adding a value temp).
+The lever is "remove a load that is already dead", not "rewrite pointer
+chains".
+
+## A sub-base permuter candidate is worth translating even when the search never reached ZERO (round 40)
+
+Gate 3 is written around zeros, and that phrasing is load-bearing enough that
+it reads as "no zero, nothing to translate". Measured otherwise:
+`func_8004B700`'s search ran 37155 iterations, **never reached zero**, and its
+best candidate scored **15 against a base of 75** -- and translating that
+candidate was worth twelve words.
+
+**And the screening question is not "how good is the score" but "reduced to
+STATEMENTS, what did it actually change?"** The raw diff of that candidate is
+enormous and almost entirely the permuter's own reformatting: brace style,
+added parentheses, `asm` for `__asm__`, whitespace collapse. Anyone reading it
+raw would reasonably conclude there was nothing there. Reduce both sides
+first, then read:
+
+```sh
+awk '/<func>\(/,0' <file> | tr -d '\n' \
+  | sed 's/[[:space:]]\+/ /g; s/{/;/g; s/}/;/g' | tr ';' '\n' \
+  | sed 's/^ *//; s/ *$//; /^$/d' > /tmp/<tag>.stmt
+# ...for base.c and for output-N-1/source.c, then diff -u the two.
+```
+
+On `func_8004B700` that collapsed the entire diff to **one statement pair**.
+The cost of finding out is one command.
+
+## A permuter scaffold's `base.c` is NOT the project's C (round 40)
+
+Round 33 established that a preserved body calling a symbol that no longer
+exists could never have linked, so its recorded figure measured nothing. **The
+same trap sits one step earlier and is easier to fall into**, because the
+scaffold body looks exactly like project source and is right there next to a
+score.
+
+`tools/setup-permuter.sh` produces a FLATTENED translation unit: the
+function plus its own inlined preamble of typedefs. Pasting that body into the
+real unit fails -- measured this round on `func_8004BE54` with
+``LinkResource' undeclared`` -- because the function's local types live in its
+match report's `#if 0` block, not in the unit. The failure here was loud and
+cost a minute. **The dangerous version is when it is quiet**: a scaffold body
+that happens to compile in the unit while binding a DIFFERENT type of the same
+name would produce a real-looking figure for the wrong code.
+
+So: bring the declarations across with the body, build, *then* believe the
+number. Same discipline as round 33, one layer down.
+
+## A recorded permuter search is only evidence of COST if its SCAFFOLD was validated (round 40)
+
+Gate 1b's sixth screen ranks on whether a function has ever been
+permuter-searched, on the reasoning that an unsearched function has its
+cheapest lever untried. Round 40 found the screen's blind spot, twice,
+independently, in one runner session.
+
+Two functions listed as "searched" in that round's own assignment table had
+their searches run against scaffolds their reports **explicitly documented as
+scoring a different residue than the real build** -- `func_8004BB3C` (round
+17: 2 insertions / 2 deletions in isolation against 0/0 in context) and
+`func_8004C1C0` (round 32: 9 and 9 against 0 and 0). The runner rebuilt both
+scaffolds from scratch and reproduced both mismatch figures exactly, four and
+fifteen rounds later respectively.
+
+**A search against a scaffold that does not reproduce the residue is
+permuter-INCONCLUSIVE, not permuter-exhausted**, and the distinction is
+invisible to a grep for iteration counts. So run `--debug --stack-diffs` and
+compare the base score's composition against the real in-context residue
+BEFORE searching -- which the setup script already advises -- and record the
+comparison, because that record is the only thing that tells a later round
+whether the iteration count it is ranking on meant anything.
+
+The general shape is this project's most-repeated one, arriving at the screen
+that was built to price cost: **a screen measures the obstruction it was built
+for.** The sixth screen measures whether a search RAN. It says nothing about
+whether the search could have SUCCEEDED.
+
+## A data-modelling hypothesis is settled by reading the DATA SECTION, not by compiling variants (round 40)
+
+`func_8002AEE0` carried a tautological `if (p6A0 || pF8)` with identical arms,
+kept because it is worth twelve words, and round 39 flagged the obvious
+hypothesis: a tautological null check is what a MIS-MODELLED global looks
+like, so is either operand really a pointer global?
+
+Both halves were settled with **two greps and no builds**:
+
+- `D_8006D6A0` is a fixed **8-element table of rodata string addresses**
+  (`asm/data/5DDFC.data.s`) -- an array, so the decay is tautologically
+  non-null.
+- `D_8006D8F8` is **one zero word** that a sibling function stores
+  `VSync(-1)`'s return into -- an `s32` timestamp. A pointer global holds an
+  address; this holds a frame count.
+
+**A different mis-modelling was real, and the tell was not the tautology at
+all.** `pF8[-1]`, four lines below and used four times, is an index nobody
+writes by hand: negative-indexing off a named global only means anything if
+the neighbouring word is part of the same object. The ten consecutive words
+are one array, which the unit's own zeroing walk had implied for rounds.
+Declared and indexed as one: **byte-identical, whole image green.**
+
+And the result that matters: **it does not dissolve the construct.** Under the
+corrected model the tautology is still worth the same twelve words, and every
+residual diff is a pure register swap. The twelve words are register
+ALLOCATION, not data modelling.
+
+Two transferable points:
+
+- **Read the data before compiling variants.** Round 39 spent eleven builds on
+  source-shape permutations of this construct; the ownership question took two
+  greps and was conclusive in a way an attempt count never is.
+- **Commit a corrected model even when it turns out not to be the cause.** It
+  was byte-identical, so it costs nothing, the next reader does not
+  re-discover it -- and the negative result is only trustworthy *because* it
+  was measured against the corrected model.

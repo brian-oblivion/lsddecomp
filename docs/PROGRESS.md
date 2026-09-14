@@ -6,6 +6,153 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-14 — round 40: one match, one 12-word gain from a translated permuter lead, and a new register-allocation lever that surfaced twice independently
+
+**State at end: 992 matched / 1253 game functions (79.17%)**, up one from round
+39's 991. Queue 195 live `INCLUDE_ASM`, 194 documented stalls, `fresh` 1. Build
+green after all three merges and after a clean `make extract` (zero committed
+bytes changed); working tree clean.
+
+### Gates
+
+Gate 0 green, no stale-asm warning at the start. **Gate 1: `fresh` = 1** — the
+954-word `func_80018464`, which round 39 already adjudicated as not a work
+order. **Gate 2: carve REJECTED on fresh measurement — 66 uncarved, 10
+blocker-clean, best segment 5-of-39; SIXTH consecutive round with that
+verdict.** Gate 1b was the round: 103 blocker-clean at the start, 0 Sony-owned
+by the placed-object screen, and **32 never permuter-searched** under round
+37's corrected grep. Gate 3 folded into the runners as a permuter-first brief.
+Zero header contention across all three units, checked before provisioning.
+
+Before staffing `code_8220_c` its eight `RCpoly*` siblings were run through
+Gate 1b's eighth screen — a sibling family named after the eight GPU
+primitives is exactly the "Sony's with no object to prove it" shape. **Both
+detectors negative**: not bracketed by `o` segments, and 0 `addiu` against all
+`ori`, matching our pinned pipeline. Game code. The `RCpoly*` callees are
+Sony's; the wrappers are ours.
+
+### The match, and the lever behind it
+
+**`func_8004B44C` (`class_3bb8c`, 73/73, runner bravo)** — a five-round,
+~15-attempt stall that had plateaued at 58/73. The **first-ever permuter
+search** on it found a zero at **iteration 1838**, `rc=0`.
+
+Every prior attempt had targeted where the store sat relative to the loads.
+The permuter changed something nobody had: it hoisted a **repeated literal
+constant** (`0x400`, appearing in two tail addends) into a named local. That
+changed register selection and **closed all fifteen remaining words at once**
+— not just the constant's own two uses. Translated as found; the candidate was
+already idiomatic C.
+
+### The round's principal result: a dead-reload lever, found twice independently
+
+**`func_8004B700` 125/140 → 137/140**, from a permuter candidate that **never
+reached zero** (best 15 against base 75, 37155 iterations). Reduced to
+statements, the candidate's huge-looking diff changed exactly one thing:
+
+```c
+u14 = e->unkC->unk14;   ->   e->unkC->unk14->unk0 = 0;
+u14->unk0 = 0;
+```
+
+a reload of a pointer the local already held. Twelve words, none at the
+reload's own site.
+
+**The same mutation was the best saved candidate on `func_8004BE54`**, from an
+independent search that knew nothing of the other. Two functions, two
+searches, one construct — the signature of a real lever rather than a local
+accident. The `func_8004BE54` instance is recorded as **UNTESTED** and is the
+cheapest next step in the corpus.
+
+Three things follow, all in DECOMPILATION_LEARNINGS:
+
+- **A sub-base candidate is worth translating even with no zero.** Gate 3's
+  wording is built around zeros and reads as "no zero, nothing to translate".
+- **Reduce a permuter diff to STATEMENTS before reading it.** These diffs are
+  swamped by the permuter's own reformatting; raw, this one looked like
+  nothing was there.
+- **A permuter scaffold's `base.c` is not the project's C.** Applying the
+  `func_8004BE54` candidate failed with ``LinkResource' undeclared``: the
+  scaffold is a flattened TU and the function's types live in its report. This
+  is round 33's never-linked-body hazard one layer down, and it failed loudly
+  here only by luck.
+
+### A ninth screen, found twice independently by one runner
+
+Two functions listed as "searched" in this round's own assignment table had
+their searches run against scaffolds their reports documented as scoring a
+**different residue than the real build**. Bravo rebuilt both from scratch and
+reproduced round 17's and round 32's mismatch figures exactly (2/2 and 9/9
+insertions-deletions against 0/0 in context). **A search against an unvalidated
+scaffold is permuter-INCONCLUSIVE, not exhausted**, and Gate 1b's sixth screen
+cannot tell the two apart — it measures whether a search RAN, not whether it
+could have succeeded.
+
+### Head passes
+
+- **`func_8002AEE0`'s mis-modelling lead, round 39's top-ranked question,
+  tested and split three ways.** The stated half (is either operand a pointer
+  global?) is **falsified from the data with no builds** — one is an 8-element
+  rodata string table, the other an `s32` timestamp a sibling writes with
+  `VSync()`'s return. A *different* mis-modelling was real (`pF8[-1]`, used
+  four times, proves ten consecutive words are one array) and is corrected
+  **byte-identically**. But it does not dissolve the construct: still 162/174
+  without it, every residual diff a pure register swap. The data-modelling axis
+  is measured and closed.
+- **`NOT GAME CODE` is now a mechanical marker.** Round 39 proved
+  `func_80050B28` is libcard and wrote it in the title; `nearmiss.py` went on
+  ranking it FIRST in `ASSIGN FROM HERE` for another round because nothing read
+  the title. Fourth honesty marker; `progress.py` deliberately untouched.
+- **`stalesyms.py` now separates adjudicated from outstanding.** Alpha declined
+  to "fix" its remaining flags, arguing they point at historical bodies round 39
+  had already annotated. Verified, then measured: **11 of 31 LIVE reports are
+  already adjudicated**, so the raw figure overstates the work by about a third
+  — and the previous round's recommendation to staff a runner onto that list was
+  priced off it.
+- **Stale cross-references:** 30 hits over 20 targets, 15 matched-as-C and 5
+  SDK-reclassified. Round 39's corrections all hold; one genuinely uncorrected
+  (`func_80029C40` citing `func_8002B94C`, which is Sony's `CD_newmedia`).
+
+### Runner alpha: a clean negative round
+
+All eight `RCpoly` figures **reproduced on a third independent rebuild**, and
+every title was rebuilt to the mandated three figures. One hypothesis killed:
+the family's filler offsets **scale per sibling** (0x14/0x18/…/0x34), ruling
+out a fixed compile-time struct size — and by the cross-sibling argument that
+negative covers all eight.
+
+### Process: both runners stalled, and the difference in cost is the lesson
+
+**Bravo and charlie both ended their turns waiting for notifications that do
+not exist**, despite an explicit warning in their prompts. `SendMessage` is
+disabled for the **sixth consecutive round** (`ListAgents` works; `SendMessage`
+does not), so neither could be resumed and the head recovered both by hand.
+
+The costs were very different, and the difference is exactly the rule:
+
+- **Bravo had committed everything first.** `git status` was clean, its match
+  was safe, and recovery was reading two saved candidates — which is where the
+  round's 12-word gain came from.
+- **Charlie had ZERO commits**, two non-matching bodies live in `src/`, and a
+  **red build**. Recovery meant measuring each body in isolation (with the
+  sibling restored, so neither carried the other's drift), preserving both,
+  restoring the `INCLUDE_ASM`s, and writing two reports from artifacts rather
+  than from its reasoning.
+
+Nothing was lost either time, but only because teardown had not run.
+**"COMMIT BEFORE you wait" is what made bravo's stall cheap**; it is the half
+of that rule that actually does the work.
+
+### Next move
+
+See the recommendation at the end of round 40's session report: the untested
+`func_8004BE54` lever first, then the dead-reload sweep across
+register-identity near-misses, then re-screening the "searched" set for
+scaffold validity. `gp_rel` remains the largest lever in the corpus (82 of 93
+blocked functions) and remains an operator escalation.
+
+---
+
 ## 2026-09-14 — round 39: one match, three word gains, and the queue's most attractive function removed from it
 
 **State at end: 991 matched / 1253 game functions (79.09%)**, up one from
