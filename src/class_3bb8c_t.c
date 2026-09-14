@@ -9,12 +9,14 @@
  *
  * NOT BLOCKED.  This unit's one "blocked" function was blocked on `addiu_at`
  * ALONE, and `addiu_at` was RESOLVED in round 21 (maspsx `--addiu-at`;
- * docs/research/addiu-at-blocker.md).  Re-screened with
- * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_800585B4 (56w)  blocker-clean.  ATTEMPTED round 24, stalled at
- *                        55/56 words (1 short), 15/56 raw; see its match
- *                        report for the characterised residue, the day-log
- *                        struct it established, and three clean negatives.
+ * docs/research/addiu-at-blocker.md).
+ *   func_800585B4 (56w)  MATCHED round 41 (2026-09-14) from a first-ever
+ *                        permuter search seeded on round 24's stall (was
+ *                        55/56 words, 1 short, 15/56 raw).  See its match
+ *                        report for the derivation -- the fix was a pair
+ *                        of local pointer caches that change how cc1
+ *                        strength-reduces the D_80087BD4[i] access; the
+ *                        day-log struct round 24 established is unchanged.
  * The previous version of this comment read "BLOCKED, stub report already
  * filed, do NOT spend attempts on it" -- a stale DIRECTIVE over workable
  * ground, and the fifth of its kind found in round 24.
@@ -422,7 +424,71 @@ void func_80058404(D_80087AACObj *self, void *arg1) {
  * coincidence. */
 extern s16 D_80087BD4[4];
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_t", func_800585B4);
+/* Round 41 (2026-09-14): matched from a permuter-found lead. `p` and `days`
+ * are LOCAL pointer caches of D_80087BD4 and log->days respectively -- not
+ * because retail's semantics need them (both globals are re-derivable
+ * without a temporary), but because caching them THIS WAY is what makes
+ * cc1 2.6.3 stop strength-reducing D_80087BD4[i] into a pointer induction
+ * variable hoisted across the outer loop (see the match report for the
+ * full derivation). The `else { p = D_80087BD4; }` branch below and the
+ * `p = (days = D_80087BD4);` chained assignment are BOTH semantically
+ * inert -- p is unconditionally overwritten with the same value either
+ * way -- but removing either one measurably regresses the codegen (round
+ * 41 confirmed both empirically, byte-exact with them, off by dozens of
+ * words without). Do not "simplify" this without re-running
+ * ./build-and-verify.sh. */
+s32 func_800585B4(D_80087AACObj *self, D_80087AACUnkA4Result *log)
+{
+    u32 i;
+    s16 *days;
+    s32 j;
+    s16 *p;
+    s32 idx;
+    s32 found;
+    s32 limit;
+
+    if (log->scored != 0) {
+        goto fail;
+    }
+
+    if (log->unk_0x4 != 0) {
+        limit = 100;
+    } else {
+        limit = log->unk_0x8;
+        if (limit > 100) {
+            limit = 100;
+        }
+    }
+
+    for (i = 0; i < 4; i++) {
+        found = 0;
+        idx = log->unk_0x8 - 1;
+        for (j = 0; j < limit; j++) {
+            if (idx < 0) {
+                idx = 0x16C;
+            } else {
+                p = D_80087BD4;
+            }
+            p = (days = D_80087BD4);
+            days = log->days;
+            if (p[i] == days[idx]) {
+                self->unk_0x240[i] = j;
+                found++;
+            }
+            idx--;
+        }
+        if (found == 0) {
+            goto fail;
+        }
+    }
+
+    log->scored = 1;
+    self->unk_0x23C = 0;
+    return 1;
+
+fail:
+    return 0;
+}
 
 extern s32 D_8008ABBC;
 
