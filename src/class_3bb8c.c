@@ -114,12 +114,26 @@ s32 func_8004B5BC(Obj866E8 *self) {
     return result;
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004B700.md. 125/140 words,
- * correct length, no drift. ROUND 27 (delta): re-verified per the head's
- * callee-saved-registers broadcast -- compiled prologue saves the IDENTICAL
- * set to retail (s0-s7, fp, ra, same stack slots), so the "extra
- * callee-saved parameter" lever does NOT apply here. Verdict (pure register
- * identity) CONFIRMED, not just plausible.
+/* STALL snapshot -- see docs/match-reports/func_8004B700.md. 137/140 words,
+ * correct length, no drift (round 40 permuter-found improvement, up from
+ * 125/140). ROUND 40 (bravo): first-ever permuter search on this function
+ * (37155 iterations, no rc captured -- the wrapping shell was torn down
+ * before the trailing echo ran, same trap documented for func_8004BB3C in
+ * round 17). Best candidate dropped the permuter score 75 -> 15 and never
+ * improved further across the remaining ~36,900 iterations. The lead:
+ * replace the second `u14 = e->unkC->unk14; u14->unk0 = 0;` reload with a
+ * direct `e->unkC->unk14->unk0 = 0;` (no named-local reassignment) --
+ * closed 12 of the 15 remaining words. Remaining 3-word residue (second
+ * loop's row pointer, retail `$a2` vs built `$v0`) is the SAME pure
+ * register-identity class this report already documented and is untouched
+ * by this fix -- confirmed via asm-differ, no instruction-shape difference
+ * anywhere in that loop, just the one register substitution.
+ *
+ * ROUND 27 (delta): re-verified per the head's callee-saved-registers
+ * broadcast -- compiled prologue saves the IDENTICAL set to retail (s0-s7,
+ * fp, ra, same stack slots), so the "extra callee-saved parameter" lever
+ * does NOT apply here. Verdict (pure register identity) CONFIRMED, not
+ * just plausible.
  *
  * ROUND 32 (bravo2): re-verified, 125/140, no drift, identical residue
  * (tbl/u14/second-loop-row-pointer register swaps, no instruction shape
@@ -161,8 +175,7 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
                     u14->unk1C = arg2->unk4 + tbl->unk4;
                     u14->unk20.w = arg2->unk8 - 0x5000;
                 }
-                u14 = e->unkC->unk14;
-                u14->unk0 = 0;
+                e->unkC->unk14->unk0 = 0;
                 func_8004BA40(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
                 count++;
             }
@@ -379,22 +392,33 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
     }
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004BE54.md. 132/150 words
- * at CORRECT total length (no address drift): every instruction present,
- * none missing or extra. The residue is two well-documented classes only --
- * plain register identity (info/hdr's ResInfo866E8* lives in v0 in retail,
- * a1 here; a handful of others) and commutative-op operand-order
- * canonicalization (`or`/`addu` reversed regardless of C source order,
- * same phenomenon independently confirmed in func_8004C470's report).
+/* STALL snapshot -- see docs/match-reports/func_8004BE54.md. 142/150 words
+ * at CORRECT total length (no address drift), up from 132/150 this round.
  * Preserved here per convention -- not live C.
+ *
+ * ROUND 40 (bravo): first-ever permuter search on this function (34293
+ * iterations, no rc captured -- same "wrapping shell torn down before the
+ * trailing echo" trap as func_8004B700 this same round). Best candidate
+ * dropped the permuter score 135 -> 65 across four improving steps
+ * (135->85->75->70->65) and never reached 0. Two changes, both applied:
+ * (1) the `gpu = (*slot)->unk14; gpu->unk0 = 0;` reload replaced with a
+ * direct `(*slot)->unk14->unk0 = 0;` (the exact same lever that closed
+ * func_8004B700's own residue this round); (2) the `found`-path tail's
+ * pointer cast hoisted into a named local (`EntryChildObj **next = ...;
+ * (*slot)->unk38 = *next;`) instead of one combined expression. Together
+ * these closed 10 of the 18 remaining words. Everything from
+ * `0x8004BEE0` through the epilogue now matches retail byte-for-byte
+ * (confirmed via asm-differ) -- the entire remaining 8-word residue is
+ * the ALREADY-DOCUMENTED `info`/`hdr` register-identity chain at the very
+ * top of the function (`0x8004BE84`-`0x8004BEDC`), untouched by this
+ * round's fix and unchanged from prior rounds' description.
+ *
  * ROUND 32 (bravo2): re-verified, 130/150, no drift, identical residue.
  * ROUND 39 (charlie): 130/150 -> 132/150. Both `(*slot)->unk10 |= flagBit;`
  * sites closed by hoisting the reloaded field into its own named local
  * BEFORE the `|=` (`s32 t = (*slot)->unk10; (*slot)->unk10 = t | flagBit;`)
  * -- operand-order-alone was already confirmed inert (round 32); the hoist
- * is what moves it, same combinatorial shape as func_8004C470's fix. The
- * `addu`-for-found-tail site and the `info` register-identity chain did NOT
- * yield to the same lever (see match report). */
+ * is what moves it, same combinatorial shape as func_8004C470's fix. */
 #if 0
 /* func_8004BE54 (Obj866E8Methods::slot104) -- own local view of several
  * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
@@ -556,15 +580,15 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
             vec->unk14 = 0;
             vec->unk12 = h1;
             (*slot)->unk36 = outBuf.h2;
-            gpu = (*slot)->unk14;
-            gpu->unk0 = 0;
+            (*slot)->unk14->unk0 = 0;
             {
                 s32 flags10 = (*slot)->unk10;
                 (*slot)->unk10 = flags10 | flagBit;
             }
         }
         if (outBuf.found) {
-            (*slot)->unk38 = *(EntryChildObj **)((u8 *)entry->unk10 + off2);
+            EntryChildObj **next = (EntryChildObj **)((u8 *)entry->unk10 + off2);
+            (*slot)->unk38 = *next;
             continue;
         }
         off1 += 4;
