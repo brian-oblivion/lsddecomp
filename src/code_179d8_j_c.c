@@ -180,7 +180,21 @@ s32 func_80031CF0(s16 idx, s16 p1, s16 p2)
     return -1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031D6C);
+s32 func_80031D6C(s16 idx, s16 *out1, s16 *out2)
+{
+    EntryDAD4 *e;
+    s16 f0, f2;
+
+    if ((u16) idx < 0x18) {
+        e = &D_8006DAD4[idx];
+        f0 = e->unk0;
+        f2 = e->unk2;
+        *out1 = f0 / 129;
+        *out2 = f2 / 129;
+        return 0;
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031DF8);
 
