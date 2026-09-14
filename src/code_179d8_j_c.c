@@ -196,7 +196,23 @@ s32 func_80031D6C(s16 idx, s16 *out1, s16 *out2)
     return -1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031DF8);
+s32 func_80031DF8(s16 idx, s16 p1, s16 p2)
+{
+    /* Retail reserves an 8-byte frame it never touches, same idiom as
+     * func_80031CF0. */
+    s32 unused[2];
+    s16 t1, t2;
+
+    if ((u16) idx < 0x18) {
+        t1 = p1 * 129;
+        t2 = p2 * 129;
+        D_8008D7F0[idx].unk2 = t2;
+        D_8008D970[idx] |= 3;
+        D_8008D7F0[idx].unk0 = t1;
+        return 0;
+    }
+    return -1;
+}
 
 s32 func_80031E94(s16 p0, s16 p1, s16 p2, s16 p3)
 {
