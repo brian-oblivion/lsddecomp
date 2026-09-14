@@ -1,4 +1,4 @@
-# func_8002AA6C -- STALL (length EXACT 223/223, 202/223 words match, first real diff at vram 0x8002AA70)
+# func_8002AA6C -- STALL (length EXACT 223/223, 215/223 words match, first real diff at vram 0x8002AABC)
 
 Unit `code_179d8_g`. Runner delta, round 17. 223 instructions.
 
@@ -953,3 +953,303 @@ grew the frame and regressed the score by an order of magnitude). Screen a
 candidate placement for "is there already meaningful register pressure at
 this point" before trying this specific trick, rather than applying it
 uniformly to every register-identity residue in a unit.
+
+## Round 41 (runner charlie): FIRST-EVER permuter search on this function, 202/223 -> 215/223 -- STALL, better
+
+This function was assigned as "the queue's best never-searched function":
+223 words, length exact, 202/223 matching since round 17, and -- confirmed
+by grepping every prior round's own text -- **no permuter search had ever
+run against it**. Every prior round's work here (17, 19, 20, 24, 32, 33, 36,
+39) was manual reordering against the one register-identity residue at the
+function's first computed temporary (`$a0`/`$v1`); the permuter itself was
+always spent on a sibling instead.
+
+### Scaffold validated before trusting it
+
+Rebuilt round 36's 202/223 body verbatim into `src/` in isolation (all other
+stalled siblings reverted): `build exit=2`, no compile errors, `funcdiff.py`
+confirms **202/223, no staleness warning, compiled length exact at
+223/223** -- matches every prior round's recorded figure exactly, no
+discrepancy.
+
+Set up `tools/setup-permuter.sh func_8002AA6C <seed>` from that body (seed
+kept in `permuter-seeds/func_8002AA6C.c` in this worktree; not committed,
+mirrors this report's body). One adjustment was needed relative to the
+literal round-36 text: `D_8006D8DC` is now (since round 40's data-model
+correction elsewhere in this unit) declared `extern s32 D_8006D8DC[10];`,
+not a scalar, so `tmp = &D_8006D8DC;` no longer type-checks as intended --
+changed to `tmp = D_8006D8DC;` (array decay), which is address-identical
+and preserves the 202/223 score exactly.
+
+`permuter.py --debug --stack-diffs` on the scaffold: **base score 320**
+(`Register Differences: 24, Reorderings: 0, Insertions: 1, Deletions: 1`,
+Stack/Branch Differences both 0) -- a clean, almost-pure register-identity
+residue, consistent with this report's own characterization across four
+prior rounds. Scaffold trusted.
+
+### Search: 1800s bound, ~194,000 iterations, rc=0 (ran to its own timeout, not killed)
+
+```
+timeout 1800 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_8002AA6C
+```
+
+Ran the full 1800s to completion (the process's own timeout fired; verified
+via the trailing `permuter rc=` line and iteration count in
+`/tmp/charlie_permuter_aa6c.log`, not inferred). **No zero found** --
+194,339 iterations, error rate climbed to ~3600/194339 (~1.9%, i.e. ~98%
+of mutations still compiled) by the end. `--best-only` saved four
+successive improvements over the 320 base: 320 -> 240 -> 240 -> 235 -> 215.
+This is a genuine, non-trivial improvement queue, not a flat search.
+
+### The winning candidates, read as STATEMENTS not as permuter diff noise, and checked for correctness before adoption
+
+**`output-215-1` (permuter score 215) is UNSOUND and was rejected despite
+scoring lower than the candidate actually adopted.** Its single mutation:
+hoist `tmp = D_80010AAC;` to ONCE, immediately after `pRetry = tmp;`,
+outside the `do {} while` loop, then call `puts(tmp)` inside the loop
+instead of `puts(D_80010AAC)` directly. Verified against the real oracle:
+**202 -> 208/223**, no drift, so the improvement is real. But `objdump -d`
+on the resulting object shows GCC materializes `D_80010AAC`'s address into
+`$a0` ONCE, before the loop label, and the loop body's `jal puts` relies on
+`$a0` STILL holding it -- while retail's own disassembly
+(`asm/nonmatchings/code_179d8_g/func_8002AA6C.s`, `.L8002AAC8:`) recomputes
+the same `lui`/`addiu` pair FRESH INSIDE the loop, every iteration. Because
+`$a0` is caller-saved and every iteration of this loop makes several calls
+(`printf`, `func_80029F10` more than once) that clobber it, **the hoisted
+form is a real correctness bug**: on any iteration after the first where
+the retry counter (`D_8006D8DC[0]`) is still `< 7` (a condition the loop
+itself is built to make happen -- that is the entire point of the retry
+counter), `puts()` would be called with whatever garbage was last left in
+`$a0` by an intervening call, not the intended string. Confirmed by
+re-placing the same assignment INSIDE the loop (each iteration, right
+before the call, preserving correctness) -- this drops straight back to
+202/223, proving the byte-improvement is entirely contingent on the unsound
+one-time hoist, not on reusing `tmp`'s dead slot as such. **This is why a
+permuter improvement must be read as a set of STATEMENTS and checked for
+whether they remain correct across every path the C allows, not just typed
+back in because the real oracle liked the resulting bytes** -- funcdiff and
+`build-and-verify.sh` can only ever check compiled-byte identity for the
+INPUTS the pinned toolchain happens to choose at compile time; they cannot
+see that a hoisted register load stops being valid data on a second loop
+iteration, because that is a runtime property, not a static one.
+
+**`output-235-1` (permuter score 235) IS sound and is this round's adopted
+fix.** Its mutation reuses two variables that are provably dead at that
+exact program point for a completely different purpose, in the same
+"already-hot register as sink" idiom this unit's `func_8002B198.md`
+(round 36) and `func_8002AEE0.md` (round 39/40) already established:
+
+```c
+s32 v0 = p2[0];
+buf = (u8)v0;
+n = ((u8)v0 != D_8006D61C);      /* was: if ((u8)v0 != D_8006D61C) */
+if (n) {
+    saved = (s32)&buf;            /* was: func_80029F10(0xE, (s32)&buf, 0, 0) */
+    if (func_80029F10(0xE, saved, 0, 0) != 0) {
+        goto tail;
+    }
+}
+```
+
+`n` (the retry counter) is not read again until `tail:` overwrites it
+outright; `saved` (used earlier to stash `D_8006D5FC` around the timeout
+retry loop) is already restored and consumed by this point. Reusing both
+as throwaway sinks for a boolean and a pointer is legal, has no
+observable effect on ANY execution path, and unlike the `output-215-1`
+candidate does not persist a stale value across a loop boundary --
+`n` and `saved` are both freshly written on every pass through this code
+before being read. Verified alone (without the `tmp` hoist):
+**202 -> 215/223, length still exact, no drift** -- a bigger real
+improvement than the unsound candidate, and free of its correctness
+problem.
+
+**Combining both candidates does not stack -- it REGRESSES to 208/223,
+i.e. to the unsound candidate's own score.** Tried once, out of curiosity
+given `func_8002AEE0`'s history of stacking independent fixes; reverted
+immediately once the real-oracle score came back lower than the `n`/`saved`
+fix alone. Two additional manual variations on the surviving fix's
+neighbourhood, both negative and both cheap to rule out:
+
+- Reordering `p2 = tmp + 4;` before `pRetry = tmp;` (matching a
+  scheduling difference visible in the OTHER, discarded residue at
+  `0x8002AABC`-`0x8002AAC4` -- retail computes that block's `$s2` from
+  `$a0` before moving `$a0` into `$s5`) -- regressed by one word (215 ->
+  214). Reverted.
+- Replacing the final block's local `volatile s32 *pF4` idiom with a
+  direct `D_8006D8F4 = -1; return D_8006D8F4;` (D_8006D8F4 is already
+  `volatile` at file scope) -- catastrophic regression (215 -> 173/223)
+  with 296022 bytes of outside-range drift, i.e. it re-folds the address
+  and shortens the function. Confirms this unit's established
+  "`volatile` on the global alone is not enough; a local `volatile T *`
+  pointer is what forces retail's unfolded addressing mode" idiom
+  (`func_8002ADE8.md`, `func_8002A510.md`) applies here too. Reverted.
+
+### What's left at 215/223: two small, apparently unrelated register/scheduling clusters
+
+Read off `funcdiff.py`'s own DIFF lines (isolated build, all siblings
+`INCLUDE_ASM`), not inferred:
+
+1. **`vram=0x8002AABC`-`0x8002AAC4` (3 words)**: a scheduling difference in
+   the loop-setup prologue. Retail computes `$s2 = $a0 + 0x10` (i.e. `p2`
+   from `tmp`) BEFORE moving `$a0` into `$s5` (`pRetry`); this build
+   computes it from `$s5` (i.e. from `pRetry`) AFTER the move. The C
+   currently reads `pRetry = tmp; p2 = pRetry + 4;` -- tried the source-order
+   swap (`p2 = tmp + 4;` before `pRetry = tmp;`) per the above, regressed
+   by one word rather than fixing it, so this is not a simple statement-order
+   question; not investigated further this round.
+2. **`vram=0x8002ADAC`-`0x8002ADBC` (5 words)**: a register-identity swap
+   (consistent pattern across all 5 words, `v0`/`v1`-shaped) in the final
+   `D_8006D8F4 = -1; return ...;` block. The `volatile s32 *pF4` local is
+   confirmed load-bearing (removing it costs the whole unfolded-addressing
+   shape, see above); no reorder or spelling variant of this 3-line block
+   was found this round that touches the remaining swap without also
+   losing the unfolded form.
+
+Both are now genuinely SMALL, isolated residues on an otherwise
+byte-identical 223-instruction function -- a considerably better jumping-off
+point for the next round than the single big register-identity block this
+report described for four rounds running.
+
+**Restored to `INCLUDE_ASM`** (215/223 is short of byte-exact; full
+`./build-and-verify.sh` re-confirmed `OK: build matches retail SLPS_015.56`,
+exit 0, after reverting). Corrected, linkable 215/223 body below.
+
+### Corrected, linkable body (current best, 215/223 words, length EXACT)
+
+```c
+#if 0
+s32 func_8002AA6C(void)
+{
+    s32 n;
+    s32 *tmp;
+    s32 *pRetry;
+    volatile s32 *p2;
+    s32 saved;
+    s32 counter;
+    volatile u8 *q;
+    u8 buf;
+
+    tmp = D_8006D8DC;
+    n = *tmp;
+    D_8006D600 = 0;
+    D_8006D5FC = 0;
+    *tmp = n - 1;
+    __asm__("");
+
+    if (n > 0) {
+        pRetry = tmp;
+        p2 = pRetry + 4;
+        do {
+            if (*pRetry < 7) {
+                counter = 0;
+                puts(D_80010AAC);
+                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+
+                if (D_8006D904 < D_8006D614) {
+                    saved = D_8006D5FC;
+                    D_8006D5FC = 0;
+
+                    while (D_8006D60C & 0x10) {
+                        if ((u8)counter == 0) {
+                            puts(D_80010A40);
+                        }
+                        counter++;
+                        func_80029F10(1, 0, 0, 0);
+                    }
+
+                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
+                        func_80029F10(1, 0, 0, 0);
+                        puts(D_80010A50);
+                    }
+
+                    D_8006D5FC = saved;
+                    D_8006D904 = D_8006D614;
+                }
+
+                if (func_80029F10(9, 0, 0, 0) != 0) {
+                    goto tail;
+                }
+                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                    goto tail;
+                }
+            }
+
+            *D_8006D8C0 = 1;
+            while (*D_8006D8CC & 7) {
+                *D_8006D8C0 = 1;
+                *D_8006D8CC = 7;
+                *D_8006D8C8 = 7;
+            }
+
+            D_8006D8DA = 0;
+            q = &D_8006D8D9;
+            D_8006D61C = 0;
+            *q = D_8006D8DA;
+            __asm__("");
+            D_8006D8D8[0] = 2;
+            *D_8006D8C0 = 0;
+            *D_8006D8CC = 0;
+            *D_8006D8D0 = 0x1325;
+
+            {
+                s32 v0 = p2[0];
+                buf = (u8)v0;
+                n = ((u8)v0 != D_8006D61C);
+                if (n) {
+                    saved = (s32)&buf;
+                    if (func_80029F10(0xE, saved, 0, 0) != 0) {
+                        goto tail;
+                    }
+                }
+            }
+
+            D_8006D600 = (s32)func_8002B4D4;
+            p2[-1] = p2[-2];
+            func_80029F10(6, 0, 0, 1);
+            p2[2] = p2[-3];
+            p2[3] = VSync(-1) + 0x1E0;
+            return p2[2];
+
+        tail:
+            tmp = D_8006D8DC;
+            n = *tmp;
+            *tmp = n - 1;
+            __asm__("");
+        } while (n > 0);
+    }
+
+    {
+        volatile s32 *pF4 = &D_8006D8F4;
+        *pF4 = -1;
+        return *pF4;
+    }
+}
+#endif
+```
+
+### Proposed learning
+
+- **A permuter improvement can be real (oracle-confirmed, byte-for-byte)
+  and still be an unsound C program.** `funcdiff.py`/`build-and-verify.sh`
+  only ever compile ONE path through the source once; they cannot detect
+  that a hoisted load of an address into a caller-saved register stops
+  being valid the moment a loop that contains function calls repeats.
+  Before adopting ANY permuter candidate that hoists a value out of a
+  loop, check by hand whether anything between the hoist point and every
+  use of it (including on a SECOND pass through the loop) can clobber it
+  -- "does this still compile to the claimed bytes" and "is this still
+  the same program" are different questions, and only the second one
+  determines whether a candidate belongs in `src/` even provisionally.
+- **When a permuter search yields multiple independent single-mutation
+  improvements from the same base, they do not necessarily stack** -- here
+  the two candidates scoring lower individually on the permuter's own
+  metric (208 and 215) combined to LAND BACK on the worse one (208), not
+  on something better than either. Check every combination against the
+  real oracle before assuming "two good candidates together must be at
+  least as good as the better one alone."
+- This function joins `func_8002B198`/`func_8002AEE0` in confirming the
+  "reuse an already-dead variable's slot as a throwaway sink for an
+  unrelated value at the same program point" idiom as a real, repeatable
+  register-allocation lever in this unit -- three independent instances
+  now, always found by the permuter first and never by manual reasoning
+  about the source.
