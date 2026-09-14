@@ -30,34 +30,22 @@ s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
     return func_8004B44C(arg1, outBuf, self->unk68, &self->unk54, arg2);
 }
 
-#if 0
-/* STALL, round 32 (bravo2): re-verified at 58/73, no drift, IDENTICAL
- * residue to the inherited report. Two new variants tried this round,
- * both targeting the report's own suggested next lever (cache `outBuf[0]`'s
- * reload into a named local positioned close to retail's actual reload
- * point, rather than hoisting it before the whole outBuf[2]/outBuf[1]
- * block as round 20's attempt 5 did):
- *   - naming BOTH outBuf[2]'s value and the outBuf[0] reload as locals,
- *     computed before either store -- regressed hard (44/73, 186603 bytes
- *     of drift: introduces an extra spurious instruction, one whole word
- *     longer than retail).
- *   - naming ONLY the outBuf[0] reload (`ob0 = outBuf[0];`), placed
- *     immediately after the outBuf[2] assignment statement (closer to
- *     retail's actual reload point than attempt 5's placement) -- no
- *     drift, but IDENTICAL 58/73, same residue. The reload's exact
- *     register choice is insensitive to where in the statement stream its
- *     C-level access sits, as long as outBuf[2]/outBuf[1] are already
- *     stored as direct statements (not further-cached locals). Confirms
- *     the round 20 diagnosis: retail's store-vs-load scheduling here is a
- *     GCC 2.6.3 list-scheduler choice, not reachable through source
- *     reordering or reload caching. See docs/match-reports/func_8004B44C.md
- *     for the full history. */
+/* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this
+ * function (1838 iterations, rc=0). The lead: hoist the shared `0x400`
+ * constant used by BOTH `arg0[0]`/`arg0[2]`'s tail addend into a named
+ * local, declared between the `outBuf[1]` and `outBuf[2]` assignment
+ * statements -- the exact position retail's own constant-load sits,
+ * confirmed by the score dropping straight to 0. Every prior round's
+ * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
+ * directly and never touched this constant; the permuter found a
+ * completely different axis. See docs/match-reports/func_8004B44C.md. */
 s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
     s32 v1;
     s32 a0v;
+    s32 off;
 
     if (arg2->unk4 == 0) {
         idx = arg4->b1;
@@ -75,17 +63,15 @@ s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, 
         outBuf[0] = v1 - 0x5000;
     }
     outBuf[1] = arg3->unk4;
+    off = 0x400;
     outBuf[2] = a0v + idx * 0xA000;
-    arg0[0] = (arg4->b2 << 11) + outBuf[0] + (arg4->h4 + 0x400);
+    arg0[0] = (arg4->b2 << 11) + outBuf[0] + (arg4->h4 + off);
     arg0[1] = arg4->h6 + outBuf[1];
-    arg0[2] = (arg4->b3 << 11) + outBuf[2] + (arg4->h8 + 0x400);
+    arg0[2] = (arg4->b3 << 11) + outBuf[2] + (arg4->h8 + off);
     outBuf[0] += 0x5000;
     outBuf[2] = outBuf[2] + 0x5000;
     return sum;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B44C);
 
 void func_8004B570(Obj866E8 *self) {
     self->unk70 = 1;
