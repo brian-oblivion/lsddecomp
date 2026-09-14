@@ -6628,3 +6628,58 @@ Two transferable points:
   was byte-identical, so it costs nothing, the next reader does not
   re-discover it -- and the negative result is only trustworthy *because* it
   was measured against the corrected model.
+
+## Gate 1b's sixth screen is neither SOUND nor COMPLETE, and it fails in three separate directions (round 41)
+
+The sixth screen asks *"has this function ever been permuter-searched"* and
+keys on **evidence that a search RAN** -- iteration counts, `rc=`, `base
+score`, `permuter-exhausted`, `--stop-on-zero`. Round 37 already corrected it
+once, from keying on the WORD "permuter" (which matched reports merely
+*recommending* a search) to keying on run evidence. Measured again in round 41
+over the 101-function blocker-clean queue, it is still wrong three ways, and
+they do not all point the same direction:
+
+| direction | mechanism | measured instances |
+| --- | --- | --- |
+| **counts a sibling's run as this function's** | an honest cross-reference QUOTES the evidence | **6** (`code_8220_c` RCpoly siblings) |
+| **counts a scaffold CHECK as a run** | `base score` is in the evidence set, but building and checking a scaffold is not searching with it | **4** say *"no search was run"* / *"REJECTED, not searched"* in plain text |
+| **misses a real run** | the iteration pattern `[0-9]{3,}[, ]*(iteration\|iters)` cannot span an adjective | `func_800400B0`'s *"~94,000 unguided iterations"* scores **0** hits |
+
+**The cross-reference direction is the one worth internalising, because
+nobody did anything wrong to produce it.** Round 40's alpha searched the
+RCpoly family's root case (`func_800197C4`) deeply, confirmed each sibling's
+scaffold scored identically, and wrote *"base confirmed, cross-reference
+only"* as its own section heading. That is exactly the honest disposition.
+But a faithful citation of a sibling's search reproduces the sibling's
+iteration count verbatim, so the screen reads six unsearched functions as
+spent. **Honesty in a report is indistinguishable from provenance to a grep.**
+
+**And the scaffold-check direction matters because it inverts the ninth
+screen.** Round 40 established that a search against an unvalidated scaffold
+is permuter-INCONCLUSIVE. The correct response -- build the scaffold, check
+it with `--debug --stack-diffs`, find it unrepresentative, and decline to
+spend search budget -- leaves `base score` in the report and nothing else.
+So **doing the right thing makes the function read as searched**, and four
+reports that state outright that no search was run are counted as spent
+ground.
+
+The general shape is this document's most-repeated one, arriving on a screen
+built to measure COST rather than an obstruction: **a screen measures the
+thing it was built for, and a report is prose about a search, not the search.**
+Two practical consequences:
+
+- **Do not rank on the sixth screen alone.** When it says SEARCHED, check
+  whether the figure is this function's own before treating the ground as
+  spent -- a figure that appears next to another `func_XXXXXXXX` on the same
+  line is the tell, and it is one grep.
+- **When you cite a sibling's search, say so in the VERDICT REGION**, not
+  only in the section body. The six RCpoly reports now carry a `SEARCH
+  PROVENANCE CORRECTED` note in their first lines for exactly this reason.
+
+**What is NOT claimed here.** A tightened screen counting only iteration/`rc`
+figures returns 42 functions with no run evidence against round 37's 26, and
+that 16-function gap is **not** a finding -- hand-checking all sixteen shows
+it mixes real searches whose iteration counts are phrased outside the pattern
+with scaffold checks where no search ran. The two screens bracket the truth
+and neither is exact. The **6** are hand-verified and unambiguous; they are
+the only figure here worth carrying forward.
