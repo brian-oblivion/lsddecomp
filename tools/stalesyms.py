@@ -271,9 +271,40 @@ def main():
             print(f"    {k}")
         print()
 
-    print(f"LIVE -- {len(live_hits)} report(s), correct and rebuild these:")
+    # A hit on a block a HEAD has already adjudicated is not outstanding work.
+    # Round 39 annotated eleven preserved bodies with an explicit "WILL NOT
+    # LINK AS WRITTEN" warning and deliberately did NOT retrofit the names,
+    # because CLAUDE.md says a preserved body is a record of what was tried,
+    # not a thing to keep current.  This tool could not see that decision, so
+    # it kept reporting those eleven as work to do -- and round 40's head very
+    # nearly staffed a runner onto them on the strength of the LIVE count.
+    #
+    # Same shape as nearmiss.py's NOT GAME CODE marker: a verdict no tool can
+    # read is a verdict the next round pays for again.  The marker here is the
+    # phrase the annotation already uses, so nothing had to be re-annotated.
+    def annotated(name):
+        try:
+            with open(os.path.join(reports, name), errors="replace") as fh:
+                return "WILL NOT LINK AS WRITTEN" in fh.read()
+        except OSError:
+            return False
+
+    done = sorted(k for k in live_hits if annotated(k))
+    todo = sorted(k for k in live_hits if not annotated(k))
+    if done:
+        print(f"OF THE {len(live_hits)} LIVE REPORTS, {len(done)} ARE ALREADY ANNOTATED")
+        print('by a head with "WILL NOT LINK AS WRITTEN" and were deliberately left')
+        print("uncorrected -- a preserved body records what was tried, and retrofitting")
+        print("names into history is not this tool's job either. They are NOT work.")
+        print(f"The outstanding list is the {len(todo)} below them.")
+        for k in done:
+            print(f"    (annotated) {k}")
+        print()
+
+    print(f"LIVE -- {len(live_hits)} report(s), {len(todo)} outstanding:")
     for name in sorted(live_hits):
-        print(f"  {name}")
+        mark = "  (annotated) " if annotated(name) else "  "
+        print(f"{mark}{name}" if annotated(name) else f"  {name}")
         nb, where = blockinfo[name]
         for old, new in sorted(live_hits[name].items()):
             at = ", ".join(f"L{n}" for n in where.get(old, []))
