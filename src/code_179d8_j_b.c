@@ -146,6 +146,7 @@ extern void func_8002D6A4(void);
 extern void func_8002D8E0(s32 a0);
 extern s32 func_8002E038(u16 a0, u16 a1);
 extern void func_8002D1B4(s32 a0, u16 a1);
+extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 
 /* Loop bound for a small table of active "objects" (screen/slot
  * pairs); see code_179d8_i.c's D_80090B68/6C for the sibling reading of
