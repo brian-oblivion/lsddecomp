@@ -386,14 +386,20 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
 
-/* STALL -- see docs/match-reports/func_8001E110.md. Round 20: the
- * "register rotation" diagnosis was WRONG -- re-derivation from retail's
- * exact tail-merge/shared-block CFG closed the register mapping
- * completely and reached 95/118 words in-range (up from 16/118), WITH
- * drift (1 word overshoot: an extra `move v1,v0` before the SECOND
- * recursive call's result test, where retail tests $v0 directly).
- * Restored to INCLUDE_ASM per project rule. */
-#if 0
+/* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
+ * tail-merge/shared-block dispatch, see the git history for the full
+ * derivation) and the register mapping exactly right, leaving one
+ * standalone residue: an extra `move v1,v0` before the SECOND recursive
+ * call's result test, where retail tests $v0 directly. Closed by a
+ * first-ever permuter search (`docs/match-reports/func_8001E110.md`,
+ * "Round 41"): the tautological trailing `if (mid.y) return 0; else
+ * return 0;` below is not meaningful control flow -- both arms return 0,
+ * exactly like the plain `return 0;` it replaces -- but it changes
+ * register pressure enough at the tail of the function that GCC 2.6.3
+ * drops the otherwise-unavoidable `move v1,v0` and tests $v0 directly,
+ * matching retail exactly. Kept because it is what's needed for
+ * byte-exactness, not because it means anything; see the report for the
+ * hand-lever history this replaced. */
 s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
     u8 r1;
     u8 r2;
@@ -453,11 +459,12 @@ combined:
             return result;
         }
     }
-    return 0;
+    if (mid.y) {
+        return 0;
+    } else {
+        return 0;
+    }
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E110);
 
 /* Bisects the segment [near, far] against `box` until the midpoint exactly
  * equals one endpoint, writing the running midpoint into `out` every
