@@ -1,5 +1,6 @@
 #include "common.h"
 #include "code_8220.h"
+#include "gte.h"
 
 void func_80018288(BasicClassListNode **head)
 {
@@ -89,15 +90,8 @@ s32 func_800193C0(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*cal
     *(void **)(prim + 0xa8) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx1 * 8;
     *(void **)(prim + 0xac) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx2 * 8;
 
-    __asm__ volatile (
-        "lwc2 $0, 0x0(%0)\n\t"
-        "lwc2 $1, 0x4(%0)\n\t"
-        "lwc2 $2, 0x0(%1)\n\t"
-        "lwc2 $3, 0x4(%1)\n\t"
-        "lwc2 $4, 0x0(%2)\n\t"
-        "lwc2 $5, 0x4(%2)\n\t"
-        :
-        : "r" (*(void **)(prim + 0xa4)), "r" (*(void **)(prim + 0xa8)), "r" (*(void **)(prim + 0xac)));
+    gte_ldv3(*(void **)(prim + 0xa4), *(void **)(prim + 0xa8),
+             *(void **)(prim + 0xac));
 
     if (func_800195EC(arg0, prim) != 0) {
         goto fail;
@@ -108,13 +102,7 @@ s32 func_800193C0(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*cal
         u8 *p1 = *(u8 **)(prim + 0x8c) + 0x14;
         u8 *p2 = *(u8 **)(prim + 0x90) + 0x14;
 
-        __asm__ volatile (
-            "swc2 $17, 0x0(%0)\n\t"
-            "swc2 $18, 0x0(%1)\n\t"
-            "swc2 $19, 0x0(%2)\n\t"
-            :
-            : "r" (p0), "r" (p1), "r" (p2)
-            : "memory");
+        gte_stsz3(p0, p1, p2);
     }
     callback(arg0);
     func_8001A268(prim, 3);
@@ -132,15 +120,8 @@ s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, 
     *(void **)(prim + 0xac) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx2 * 8;
     *(void **)(prim + 0xb0) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx3 * 8;
 
-    __asm__ volatile (
-        "lwc2 $0, 0x0(%0)\n\t"
-        "lwc2 $1, 0x4(%0)\n\t"
-        "lwc2 $2, 0x0(%1)\n\t"
-        "lwc2 $3, 0x4(%1)\n\t"
-        "lwc2 $4, 0x0(%2)\n\t"
-        "lwc2 $5, 0x4(%2)\n\t"
-        :
-        : "r" (*(void **)(vtxSlot + 0x0)), "r" (*(void **)(vtxSlot + 0x4)), "r" (*(void **)(vtxSlot + 0x8)));
+    gte_ldv3(*(void **)(vtxSlot + 0x0), *(void **)(vtxSlot + 0x4),
+             *(void **)(vtxSlot + 0x8));
 
     if (func_800195EC(arg0, prim) != 0) {
         goto fail;
@@ -148,14 +129,8 @@ s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, 
 
     callback(arg0, 1);
 
-    __asm__ volatile (
-        "lwc2 $0, 0x0(%0)\n\t"
-        "lwc2 $1, 0x4(%0)\n\t"
-        "nop\n\t"
-        "nop\n\t"
-        ".word 0x4A180001\n\t"     /* rtps */
-        :
-        : "r" (*(void **)(vtxSlot + 0xc)));
+    gte_ldv0(*(void **)(vtxSlot + 0xc));
+    gte_rtps();
 
     {
         u8 *p0 = *(u8 **)(prim + 0x94) + 0x14;
@@ -163,23 +138,12 @@ s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, 
         u8 *p2 = *(u8 **)(prim + 0x9c) + 0x14;
         u8 *p3 = *(u8 **)(prim + 0xa0) + 0x14;
 
-        __asm__ volatile (
-            "swc2 $16, 0x0(%0)\n\t"
-            "swc2 $17, 0x0(%1)\n\t"
-            "swc2 $18, 0x0(%2)\n\t"
-            "swc2 $19, 0x0(%3)\n\t"
-            :
-            : "r" (p0), "r" (p1), "r" (p2), "r" (p3)
-            : "memory");
+        gte_stsz4(p0, p1, p2, p3);
     }
 
     callback(arg0, 0);
 
-    __asm__ volatile (
-        "swc2 $14, 0x0(%0)\n\t"
-        :
-        : "r" (prim + 0x6c)
-        : "memory");
+    gte_stsxy2(prim + 0x6c);
 
     func_8001A268(prim, 4);
     return 0;
@@ -188,123 +152,100 @@ fail:
 }
 
 /*
- * GTE-heavy "handwritten function" per splat's own extraction (asm comment).
- * rtpt/nclip/avsz3 have no mnemonic support in this pinned binutils (it
- * knows swc2/lwc2/cfc2 generically but not the GTE "cofun" ops), so they
- * are emitted as raw .word encodings taken directly from retail's own
- * instruction bytes. There is no C form for this sequence at all -- see
- * docs/DECOMPILATION_LEARNINGS.md's GTE-store-leaf entries, of which this
- * is a larger, branching cousin. $a0/$a1 are used via their natural
- * calling-convention registers rather than asm operands (this is the
- * function's only statement, so they still hold the incoming parameters
- * unmodified when it starts); the trailing `jr $ra`/`nop` is deliberately
- * OMITTED from the asm text and left for GCC's own implicit epilogue to
- * generate, which is byte-identical to retail's and avoids a doubled
- * return sequence.
+ * This unit's local view of the per-primitive GTE context that
+ * func_800195EC works on (the `prim` its callers hand it). Only the fields
+ * this function touches are typed; the callers still address the rest by
+ * offset. The three SXY words are deliberately separate fields rather than
+ * an array: retail stores them through three independently computed
+ * addresses, which is gte_stsxy3()'s three-pointer form.
+ */
+typedef struct GteCullCtx {
+    /* +0x000 */ u32 *otBase;        /* ordering table, 4-byte entries */
+    /* +0x004 */ s32 otShift;        /* otz >> otShift indexes otBase */
+    u8 pad008[0x014 - 0x008];
+    /* +0x014 */ u8 unk14;           /* copied to the owner's byte at +0x3 */
+    u8 pad015[0x020 - 0x015];
+    /* +0x020 */ s32 otz;            /* avsz3 result */
+    /* +0x024 */ s32 dp;             /* IR0, the depth-cue factor */
+    /* +0x028 */ s32 opz;            /* nclip result (MAC0) */
+    u8 pad02C[0x030 - 0x02C];
+    /* +0x030 */ u32 *otSlot;        /* &otBase[otz >> otShift] */
+    u8 pad034[0x05C - 0x034];
+    /* +0x05C */ s32 flag;           /* GTE FLAG & 0x40000 */
+    /* +0x060 */ s32 sxy0;
+    /* +0x064 */ s32 sxy1;
+    /* +0x068 */ s32 sxy2;
+    u8 pad06C[0x078 - 0x06C];
+    /* +0x078 */ s32 saturated;      /* set when the transform saturated */
+} GteCullCtx;
+
+/* The owner object: only its byte at +0x3 is written here. */
+typedef struct GteCullOwner {
+    u8 pad000[3];
+    /* +0x003 */ u8 unk3;
+} GteCullOwner;
+
+/*
+ * Perspective-transform the three vertices the caller already loaded into
+ * the GTE (gte_ldv3), then cull: bail if the FLAG register shows anything
+ * other than clean or SZ3-saturated, if the polygon is back-facing
+ * (nclip <= 0), or if the depth-cue factor says it is too close. Otherwise
+ * average the Z, cache the screen coordinates and compute the OT bucket.
+ * Returns 0 on success, 1 when culled.
+ *
+ * Splat tagged this "handwritten"; it is ordinary C over the Psy-Q gte_*
+ * macros (include/gte.h), and every one of retail's raw words is one of
+ * those macros. Earlier rounds carried it as a whole-function __asm__.
  */
 s32 func_800195EC(void *arg0, void *arg1)
 {
-    (void)arg0;
-    (void)arg1;
-    __asm__ volatile (
-        ".set\tnoreorder\n\t"
-        "sw $zero, 0x78($5)\n\t"
-        "nop\n\t"
-        "nop\n\t"
-        ".word 0x4A280030\n\t"     /* rtpt */
-        "lbu $2, 0x14($5)\n\t"
-        "nop\n\t"
-        "sb $2, 0x3($4)\n\t"
-        "addiu $2, $5, 0x5c\n\t"
-        "cfc2 $12, $31\n\t"
-        "addi $13, $zero, 0x4\n\t"
-        "sll $13, $13, 16\n\t"
-        "and $12, $12, $13\n\t"
-        "sw $12, 0x0($2)\n\t"
-        "lw $3, 0x5c($5)\n\t"
-        "nop\n\t"
-        "beqz $3, 1f\n\t"
-        " lui $2, 0x4\n\t"
-        "bne $3, $2, 3f\n\t"
-        " ori $2, $zero, 0x1\n\t"
-        "sw $2, 0x78($5)\n\t"
-        "1:\n\t"
-        "nop\n\t"
-        "nop\n\t"
-        ".word 0x4B400006\n\t"     /* nclip */
-        "addiu $2, $5, 0x28\n\t"
-        "swc2 $24, 0x0($2)\n\t"
-        "lw $2, 0x28($5)\n\t"
-        "nop\n\t"
-        "blez $2, 2f\n\t"
-        " addiu $2, $5, 0x24\n\t"
-        "swc2 $8, 0x0($2)\n\t"
-        "lw $2, 0x24($5)\n\t"
-        "nop\n\t"
-        "slti $2, $2, 0x1000\n\t"
-        "beqz $2, 3f\n\t"
-        " ori $2, $zero, 0x1\n\t"
-        "nop\n\t"
-        "nop\n\t"
-        ".word 0x4B58002D\n\t"     /* avsz3 */
-        "addiu $2, $5, 0x20\n\t"
-        "swc2 $7, 0x0($2)\n\t"
-        "addiu $4, $5, 0x60\n\t"
-        "addiu $3, $5, 0x64\n\t"
-        "addiu $2, $5, 0x68\n\t"
-        "swc2 $12, 0x0($4)\n\t"
-        "swc2 $13, 0x0($3)\n\t"
-        "swc2 $14, 0x0($2)\n\t"
-        "lw $3, 0x20($5)\n\t"
-        "lw $4, 0x4($5)\n\t"
-        "addu $2, $zero, $zero\n\t"
-        "srav $3, $3, $4\n\t"
-        "lw $4, 0x0($5)\n\t"
-        "sll $3, $3, 2\n\t"
-        "addu $3, $3, $4\n\t"
-        "j 3f\n\t"
-        " sw $3, 0x30($5)\n\t"
-        "2:\n\t"
-        "ori $2, $zero, 0x1\n\t"
-        "3:\n\t"
-        ".set\treorder\n\t"
-        : : : "$2", "$3", "$4", "$5", "$12", "$13", "memory");
+    GteCullOwner *owner = arg0;
+    GteCullCtx *ctx = arg1;
+
+    ctx->saturated = 0;
+    gte_rtpt();
+    owner->unk3 = ctx->unk14;
+    gte_stflg(&ctx->flag);
+    if (ctx->flag != 0) {
+        if (ctx->flag != 0x40000) {
+            return 1;
+        }
+        ctx->saturated = 1;
+    }
+    gte_nclip();
+    gte_stopz(&ctx->opz);
+    if (ctx->opz <= 0) {
+        return 1;
+    }
+    gte_stdp(&ctx->dp);
+    if (ctx->dp >= 0x1000) {
+        return 1;
+    }
+    gte_avsz3();
+    gte_stotz(&ctx->otz);
+    gte_stsxy3(&ctx->sxy0, &ctx->sxy1, &ctx->sxy2);
+    ctx->otSlot = &ctx->otBase[ctx->otz >> ctx->otShift];
+    return 0;
 }
 
 void func_800196D4(void *dst)
 {
-    __asm__ volatile (
-        "swc2 $12, 0x8(%0)\n\t"
-        "swc2 $13, 0xc(%0)\n\t"
-        "swc2 $14, 0x10(%0)"
-        : : "r" (dst) : "memory");
+    gte_stsxy3_f3(dst);
 }
 
 void func_800196E8(void *dst)
 {
-    __asm__ volatile (
-        "swc2 $12, 0x8(%0)\n\t"
-        "swc2 $13, 0x10(%0)\n\t"
-        "swc2 $14, 0x18(%0)"
-        : : "r" (dst) : "memory");
+    gte_stsxy3_g3(dst);
 }
 
 void func_800196FC(void *dst)
 {
-    __asm__ volatile (
-        "swc2 $12, 0x8(%0)\n\t"
-        "swc2 $13, 0x10(%0)\n\t"
-        "swc2 $14, 0x18(%0)"
-        : : "r" (dst) : "memory");
+    gte_stsxy3_ft3(dst);
 }
 
 void func_80019710(void *dst)
 {
-    __asm__ volatile (
-        "swc2 $12, 0x8(%0)\n\t"
-        "swc2 $13, 0x14(%0)\n\t"
-        "swc2 $14, 0x20(%0)"
-        : : "r" (dst) : "memory");
+    gte_stsxy3_gt3(dst);
 }
 
 void func_80019724(void *dst, s32 flag)
@@ -312,15 +253,9 @@ void func_80019724(void *dst, s32 flag)
     char *p = (char *)dst + 0x14;
 
     if (flag) {
-        __asm__ volatile (
-            "swc2 $12, 0x8(%0)\n\t"
-            "swc2 $13, 0xc(%0)\n\t"
-            "swc2 $14, 0x10(%0)"
-            : : "r" (dst) : "memory");
+        gte_stsxy3_f4(dst);
     } else {
-        __asm__ volatile (
-            "swc2 $14, 0x0(%0)"
-            : : "r" (p) : "memory");
+        gte_stsxy2(p);
     }
 }
 
@@ -329,14 +264,8 @@ void func_8001974C(void *dst, s32 flag)
     char *p = (char *)dst + 0x20;
 
     if (flag) {
-        __asm__ volatile (
-            "swc2 $12, 0x8(%0)\n\t"
-            "swc2 $13, 0x10(%0)\n\t"
-            "swc2 $14, 0x18(%0)"
-            : : "r" (dst) : "memory");
+        gte_stsxy3_g4(dst);
     } else {
-        __asm__ volatile (
-            "swc2 $14, 0x0(%0)"
-            : : "r" (p) : "memory");
+        gte_stsxy2(p);
     }
 }

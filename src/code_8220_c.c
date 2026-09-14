@@ -1,37 +1,26 @@
 #include "common.h"
 #include "code_8220.h"
+#include "gte.h"
 
 void func_80019774(void *dst, s32 flag)
 {
     if (flag) {
-        __asm__ volatile (
-            "swc2 $12, 0x8(%0)\n\t"
-            "swc2 $13, 0x10(%0)\n\t"
-            "swc2 $14, 0x18(%0)"
-            : : "r" (dst) : "memory");
+        gte_stsxy3_ft4(dst);
     } else {
         char *p = (char *)dst + 0x20;
 
-        __asm__ volatile (
-            "swc2 $14, 0x0(%0)"
-            : : "r" (p) : "memory");
+        gte_stsxy2(p);
     }
 }
 
 void func_8001979C(void *dst, s32 flag)
 {
     if (flag) {
-        __asm__ volatile (
-            "swc2 $12, 0x8(%0)\n\t"
-            "swc2 $13, 0x14(%0)\n\t"
-            "swc2 $14, 0x20(%0)"
-            : : "r" (dst) : "memory");
+        gte_stsxy3_gt4(dst);
     } else {
         char *p = (char *)dst + 0x2c;
 
-        __asm__ volatile (
-            "swc2 $14, 0x0(%0)"
-            : : "r" (p) : "memory");
+        gte_stsxy2(p);
     }
 }
 
@@ -371,15 +360,17 @@ INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A268);
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A380);
 
 /*
- * Copies three unaligned 8-byte fields (arg1[0]/[4]/[8] -> arg0[0]/[4]/[8])
- * and three unaligned 4-byte fields (arg2/arg3/arg4 -> arg0[i]+0x10) via
- * lwl/lwr+swl/swr. No prologue/frame in retail (frameless leaf), and the
- * whole body is straight-line with no branches, so this is written as one
- * raw-register __asm__ block (same technique as func_800195EC in
- * code_8220_b, minus the noreorder bracket that function needed for its
- * internal branches -- none needed here). arg4 arrives on the stack per
- * the o32-ish calling convention (5th integer arg) and is read directly
- * from 0x10($sp) rather than through a C-level operand.
+ * Copies three unaligned 8-byte fields (src[i]->xy -> dst[i]->xy) and three
+ * unaligned 4-byte fields (*uv0/*uv1/*uv2 -> dst[i]->uv). Retail does each
+ * with lwl/lwr + swl/swr, and the idiom that reproduces that is the struct
+ * types themselves: PolyXY8 and PolyUV4 are ALL-s16, so their alignment is
+ * 2, and a whole-struct assignment of an alignment-2 type is what GCC 2.6.3
+ * emits as the unaligned pair. One stray s32 member and the copy becomes
+ * aligned lw/sw and stops matching (DECOMPILATION_LEARNINGS, "A struct
+ * whose members are all s8/s16 has alignment 2"). Round 13 first matched
+ * this as a whole-function __asm__ transcription; the head reworked it into
+ * these six assignments, byte-exact, and CLAUDE.md HARD RULE 6 cites it as
+ * the example of "hard to type" not being "no C form".
  */
 void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
                    PolyUV4 *uv2) {

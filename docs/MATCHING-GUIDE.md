@@ -29,6 +29,18 @@ worth noticing on the first pass, all of which change how you write the C:
 - **Soft float.** There is no FPU. Float arithmetic becomes calls into the
   libgcc-style helpers; a `jal` to something like `__adddf3` is `a + b` on
   doubles, not a function the game wrote.
+- **GTE.** Any `lwc2`, `swc2`, `cfc2`, `ctc2`, `mfc2`, `mtc2`, or a bare
+  `.word 0x4Axxxxxx`/`0x4Bxxxxxx` (a COP2 "cofun" op that this binutils has
+  no mnemonic for) means the source called a Psy-Q `gte_*` macro. Look it up
+  in `include/gte.h` before writing anything, and if the macro is not there
+  yet, add it there under the SDK's name (`include/psyq/INLINE.H` has the
+  names, `GTENOM.H` the COP2 register map) rather than open-coding the
+  instruction at the call site. A run of `nop; nop; .word` is a transform
+  macro; a `cfc2 $12,$31; addi $13,$zero,4; sll; and; sw` run is
+  `gte_stflg`. The rest of the function is ordinary C and is written as
+  such — do NOT transcribe it as a whole-function `__asm__` (CLAUDE.md HARD
+  RULE 6). Same reflex as grepping `asm/data/*.rodata.s` before writing a
+  string literal: the bytes already have a name, use it.
 
 ### 3. Seed with m2c (optional, but pass `--sig`)
 

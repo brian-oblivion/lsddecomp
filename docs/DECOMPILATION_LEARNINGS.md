@@ -35,25 +35,49 @@ with fifty unverified claims teaches sessions to skim it.
   4 in `LIBGS.H`) therefore expand to `{\ ;` — an empty block plus a null
   statement. **That is valid C: it compiles clean, warns nothing, and emits
   nothing.** So a call to `gte_stsxy3(...)` silently does NOTHING and the
-  function scores a mismatch with the stores simply absent. There are zero
-  `gte_*` call sites in `src/` today, so nothing is broken yet; it is a
-  landmine. Census, reproducer and disposition:
-  `docs/research/psyq-header-crlf-blocker.md`. **Escalated, not fixed** —
-  un-breaking 1134 macros in pinned vendored headers is an operator call.
-- **A COP2/GTE store leaf has no plain-C form, and hand-rolled inline asm for
-  it is NOT banned by the register rule (round 12).** There is no C expression
-  that emits `swc2`. The form that reproduces retail is
-  `__asm__ volatile("swc2 $12, 0x8(%0)" : : "r"(ptr) : "memory")`, and it
-  passes CLAUDE.md's test: `"r"` leaves the GPR to the allocator, and
-  `$12`/`$13`/`$14` are COP2 *data* registers named in the instruction text
-  with no GPR identity to pin. Sony's own `INLINE.H` is built out of exactly
-  this construct. Do carry the SDK's fuller clobber list
-  (`"$12","$13","$14","$15","memory"`) rather than the `"memory"`-only form:
-  the thin version matches for a standalone leaf whose whole body is the asm,
-  but does not tell GCC the COP2 registers are live inputs and would break if
-  anyone made it `static inline`.
+  function scores a mismatch with the stores simply absent. Census,
+  reproducer and disposition: `docs/research/psyq-header-crlf-blocker.md`.
+  **Escalated, not fixed** — un-breaking 1134 macros in pinned vendored
+  headers is an operator call. **The `gte_*` call sites that DO exist in
+  `src/` (2026-09-14) come from `include/gte.h`, not from `INLINE.H`** — a
+  project-owned, LF-terminated reimplementation of the macros the game
+  used, in the GNU flavour (base pointer as an `"r"` operand) rather than
+  `INLINE.H`'s ASPSX flavour (`move $12,%0` plus Sony macro-call words that
+  gas emits as literal bytes). Include `gte.h`, never `INLINE.H`.
+- **A COP2/GTE instruction's C form is the Psy-Q `gte_*` macro, and
+  `include/gte.h` holds the GNU-syntax versions that this pipeline can
+  assemble (round 12, restated 2026-09-14).** There is no C expression that
+  emits `swc2`/`lwc2`/`cfc2` or a GTE cofun; the game's source called Sony's
+  macros, and retail's bytes are those macros' expansions with GCC's own
+  allocation around them. The construct inside each macro is
+  `__asm__ volatile("swc2 $12, 0x8(%0)" : : "r"(ptr) : "memory")`, which
+  passes CLAUDE.md HARD RULE 6's test: `"r"` leaves the GPR to the
+  allocator, and `$12`/`$13`/`$14` are COP2 *data* registers named in the
+  instruction text with no GPR identity to pin. Write `gte_stsxy3_g3(prim)`,
+  not the `swc2` lines, and add a missing macro to `gte.h` following the
+  SDK's name for it (`INLINE.H` for the names, `GTENOM.H` for the COP2
+  register assignments) rather than open-coding it at the call site.
+
+  Clobbers: name what the block actually writes, and nothing else. The
+  store leaves need only `"memory"`; `gte_stflg` uses GPRs `$12`/`$13` as
+  scratch and names exactly those. Round 12 recommended carrying the SDK's
+  `"$12","$13","$14","$15"` list on every block "in case it goes `static
+  inline`"; that list is a GPR clobber that does not describe what a
+  COP2-only block does, and the later "wrong clobber cascades" entry is what
+  it costs when GCC believes it.
+
+  A store leaf is a one-line macro call; the larger lesson is
+  `func_800195EC`, which was carried from round 13 as a 58-word
+  whole-function `__asm__` with a hand-managed `noreorder` bracket because
+  `rtpt`/`nclip`/`avsz3`/`cfc2` "have no C form". They have macros. Written
+  as branching C over `gte_rtpt`/`gte_stflg`/`gte_nclip`/`gte_stopz`/
+  `gte_stdp`/`gte_avsz3`/`gte_stotz`/`gte_stsxy3` it matched on the first
+  build. The tell was in the disassembly the whole time: retail's flag test
+  (`cfc2 $12,$31; addi $13,$zero,4; sll $13,$13,16; and; sw`) is the
+  `gte_stflg` macro body verbatim, and the `addiu $2, $5, 0x5c` in front of
+  it is GCC materialising `&ctx->flag` for the macro's `%0`.
   (`func_800196D4`, `func_800196E8`, `func_800196FC`, `func_80019710`,
-  `func_80019724`, `func_8001974C`)
+  `func_80019724`, `func_8001974C`, `func_800195EC`)
 - **A negative result about a MACRO is only evidence once you have proved the
   macro EXPANDED (round 12).** Testing whether the SDK could express retail's
   GTE sequence produced an objdump with the macro emitting nothing at all,
@@ -3972,11 +3996,15 @@ of a documented stall, not of a match.
   "dead `addiu`" — it is a lead about the source. (`func_800197C4`.)
 
 - **A whole-function `__asm__` is for constructs with NO C form, not for
-  constructs that are hard to type.** See CLAUDE.md HARD RULE 6. GTE
-  `rtpt`/`nclip`/`cfc2` and COP2 `swc2`/`lwc2` qualify; an awkward unaligned
-  struct copy does not, and one was reworked into six lines of C this round
-  after being matched as a transcription. If you cannot name the instruction
-  that has no C spelling, it is not the exception.
+  constructs that are hard to type.** See CLAUDE.md HARD RULE 6. An awkward
+  unaligned struct copy does not qualify, and one was reworked into six lines
+  of C this round after being matched as a transcription. If you cannot name
+  the instruction that has no C spelling, it is not the exception. (Round 13
+  named GTE `rtpt`/`nclip`/`cfc2` and COP2 `swc2`/`lwc2` as qualifying
+  instructions; 2026-09-14 narrowed that further — each of those has a
+  `gte_*` macro in `include/gte.h`, the macro is its C form, and the one
+  function that had relied on them was rewritten as C. See the store-leaf
+  entry near the top of this file.)
 
 - **Two register-saturation residues that look alike need opposite fixes**, and
   neither responds to the other's: a full register-identity PERMUTATION at

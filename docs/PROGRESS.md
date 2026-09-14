@@ -6,6 +6,49 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-14 — between rounds 38 and 39 (head): the GTE macro layer, and func_800195EC rewritten as C
+
+**Counts unchanged: 990 matched / 1253 game functions.** Nothing new was
+matched; one already-matched function changed FORM, and the change is what
+matters. Build byte-exact before and after every step.
+
+**`include/gte.h` now holds GNU-syntax reimplementations of the Psy-Q `gte_*`
+inline macros** the game's source actually called — named exactly as in
+`include/psyq/INLINE.H`, COP2 registers cross-checked against `GTENOM.H`.
+The SDK's own header is unusable through this pipeline (ASPSX flavour: `move
+$12,%0` plus Sony macro-call words that gas emits as literal bytes; and CRLF,
+see the round-12 landmine in DECOMPILATION_LEARNINGS). Retail's bytes show the
+game was built with the GCC-flavour set — base pointer as an operand, no `move
+$12`. `src/code_8220_b.c` and `src/code_8220_c.c` call the macros instead of
+spelling out `swc2`/`lwc2` offsets: **raw COP2 lines in `src/` went from 57 to
+0**, with zero bytes changed.
+
+**`func_800195EC` — carried since round 13 as a 58-word whole-function
+`__asm__`** with a hand-managed `.set noreorder` bracket, raw `$2`-`$5`, and
+three GTE ops as `.word` — **is ordinary branching C over eight macros, and
+matched 58/58 on the first build.** Round 13's report said "no C form is
+possible for `rtpt`/`nclip`/`avsz3`/`cfc2`"; true of the instructions, false
+of the function, and the disassembly said so the whole time: retail's flag
+test is the `gte_stflg` macro body verbatim with GCC's `addiu $2,$5,0x5c`
+computing the operand in front of it. Every delay-slot fill and load-delay
+nop the round-13 body managed by hand is reorder-mode gas doing its job.
+Report rewritten; the noreorder-bracket and wrong-clobber lessons from the
+old body are kept there as mechanism notes, no longer needed by anything in
+`src/`.
+
+**Docs.** CLAUDE.md HARD RULE 6 narrowed: if the SDK ships a macro for the
+instruction, the macro IS the C form. `docs/MATCHING-GUIDE.md` step 2 gained
+the screen — a `lwc2`/`swc2`/`cfc2`/cop2 `.word` in the asm means look up
+`gte.h` first, same reflex as grepping rodata before writing a string
+literal. DECOMPILATION_LEARNINGS' store-leaf entry restated in those terms
+(and its round-12 advice to carry the SDK's `$12`-`$15` GPR clobber list on
+COP2-only blocks withdrawn: that is exactly the "wrong clobber cascades"
+trap). The stale `func_8001A3EC` comment that still described a
+raw-register `__asm__` now describes the all-`s16` alignment-2 idiom that
+actually makes it work.
+
+---
+
 ## 2026-09-14 — round 38: six matches, one unit closed outright, and one lever behind five of them
 
 **State at end: 990 matched / 1253 game functions (79.01% of game code)**, up

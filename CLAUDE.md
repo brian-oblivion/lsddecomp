@@ -51,7 +51,9 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    reference the pointer. `src/code_8220_b.c` has carried eight such
    constraints, byte-verified, since before this rule was written down —
    `func_800196D4` and its five siblings — and round 13 matched three more
-   functions the same way.
+   functions the same way. Those constraints now live inside the `gte_*`
+   macros in `include/gte.h`, which is where the exception is spelled out
+   once instead of at every call site.
 
    **This paragraph exists because the categorical wording above was, on its
    own, false about this repository**, and "not judgement calls" forecloses
@@ -78,7 +80,15 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    So: **"there is no C form" is a claim, and it earns the same standard as
    a toolchain lead — try the documented idiom, fail, and say so.** If you
    do write a whole-function `__asm__`, name the instruction that has no C
-   spelling. If you cannot name one, it is not this exception.
+   spelling — **and look it up in `include/gte.h` first, because if the SDK
+   ships a `gte_*` macro for that instruction, the macro IS the C form and
+   the instruction does not qualify.** `func_800195EC` was carried from
+   round 13 to 2026-09-14 as a whole-function `__asm__` with a hand-managed
+   `noreorder` bracket, on the grounds that `rtpt`/`nclip`/`avsz3`/`cfc2`
+   have no C spelling. Every one of them is a Psy-Q macro, and the body is
+   ordinary branching C over seven of them, byte-exact on the first build.
+   If you cannot name an instruction that has neither a C spelling nor a
+   macro, it is not this exception.
 
    Two traps inside the exception, both measured in round 13, both cheap to
    hit and expensive to diagnose:
