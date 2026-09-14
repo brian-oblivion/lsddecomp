@@ -438,3 +438,50 @@ count) simultaneously while being worse on the metric that actually matters
 count, not `funcdiff`'s raw window, remains the only trustworthy read for
 any function with a length mismatch -- true before this round's permuter
 search and still true of its output.
+
+---
+
+## Round 39 (2026-09-14, runner echo): two more forms tried on both established axes, both inert; hoist-lever precondition doesn't hold
+
+Re-verified fresh (spliced the preserved body back in): confirmed
+byte-identical **109/110 built, 106/110 truly correct via asm-differ**, same
+two residues as every prior round (switch-index register choice at case
+dispatch; case 4's vtable-dereference delay-slot-fill ordering). Checked
+this round's hoist-both-before-either precondition: neither residue is an
+adjacent-load/mult pair with a later consumer -- residue 1 is a single
+`addiu`-derived bounds check invisible to source spelling, residue 2 is a
+delay-slot-fill choice between an independent register move and a load,
+the same shape as `func_8005A82C`/`func_8005A9CC`'s residues this round.
+The lever does not apply to either.
+
+Two new forms tried on the already-documented axes, both rebuilt and
+measured, both byte-identical to the kept 106/110 body (no change to
+either residue):
+
+1. **Residue 2 (case 4):** an UNCAST alias local, `void *e = entity;` then
+   `((DreamSysEntityObj *)e)->methods->slot0x38(e, this);` -- a fifth form
+   on the "cast/typing axis" round 22/35 already closed with four other
+   forms (function-scope cast, case-local methods pointer, whole-parameter
+   retype, case-local entity-object temp). Byte-identical; the axis stays
+   closed.
+2. **Residue 1 (switch index):** `s32 idx; idx = effect; switch (idx) {...}`
+   -- a third form beyond the two already tried (`switch (effect - 4)` with
+   shifted case labels; a named `s32 idx = effect - 4;`). Byte-identical;
+   GCC re-derives the identical `a2`-only codegen regardless.
+
+**Status: still STALL, 106/110 (via asm-differ), both residues unchanged.**
+`INCLUDE_ASM` restored; whole-image SHA1 verified green; both experiments
+reverted immediately after measuring.
+
+### Proposed learning (round 39)
+
+Both of this function's residues, and both of `func_8005A82C`'s/
+`func_8005A9CC`'s this round, share a common shape worth naming explicitly:
+**a delay-slot-fill or register-class choice between two ALREADY-INDEPENDENT,
+already-schedulable instructions, with no data dependency chain for a
+source-level hoist to shorten.** The hoist-both-before-either lever targets
+a different, specific shape (two values computed via load/mult, one
+consumed early and one late, that the natural C fails to make simultaneously
+live) and simply has nothing to attach to on this class of residue. This
+unit contributed three of round 39's clearest confirmations that the lever's
+precondition is a real filter, not just a label to check after the fact.

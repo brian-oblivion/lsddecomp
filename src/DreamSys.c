@@ -519,7 +519,14 @@ void func_80059814(DreamSys *this)
    a scheduling barrier at the merge point (tried, no effect). Re-verified
    fresh round 37 (2026-09-12, runner charlie); a permuter search was run
    this round and found no improvement -- see the report's round 37
-   addendum. */
+   addendum. Re-verified fresh again round 39 (2026-09-14, runner echo); one
+   new reshape tried (duplicating the tail call at just the decay branch's
+   own exit, rather than at all three converging paths as round 32 already
+   tried and rejected) -- this DOES fix the a0-vs-s0 register mismatch at the
+   store immediately before the call, but GCC does not cross-jump-merge the
+   duplicated call site back down, so the function grows to 78 words (1 word
+   LONG) instead of 76 (1 word SHORT): trades one residue for a different,
+   equally-real one rather than closing it. Reverted immediately. */
 void func_800598E8(DreamSys *this)
 {
 	s32 idx;
@@ -1000,6 +1007,37 @@ bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
+#if 0
+/* Best-reached body, 58/63 words, exact length (zero address drift) -- see
+   docs/match-reports/func_8005A82C.md for the residue analysis (delay-slot
+   fillers around the constant "return true" materialization;
+   PERMUTER-EXHAUSTED, ~49300 iterations). Restored to INCLUDE_ASM below per
+   project rule (no score short of byte-exact stays in src/). Re-verified
+   fresh round 39 (2026-09-14, runner echo); two new reshapes tried, neither
+   moved it -- see the round 39 note in the report. */
+bool func_8005A82C(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 result;
+	s32 saved;
+	s32 local[4];
+
+	result = Test4InstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
+	if (result < 0)
+		return false;
+	saved = func_8005BFC4();
+	if (!ExecuteLink(this, result, 0x11, 0))
+		return true;
+	this->unknwon_int_0x44 = 0;
+	this->unk_0x4C->methods->slot0xE8(this->unk_0x4C, local, &this->linkCoordinates);
+	this->vt->func_80057384(this, local);
+	if (saved == 0)
+		return true;
+	if (this->isFlashbackSession)
+		return true;
+	this->vt->GetSetDreamTimeLimit(this, this->vt->func_80059360(this) + saved);
+	return true;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A82C);
 
 bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
@@ -1026,7 +1064,14 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 /* Best-reached body, 57/88 words, no address drift -- see
    docs/match-reports/func_8005A9CC.md for the residue analysis. Restored to
    INCLUDE_ASM below per project rule (no score short of byte-exact stays in
-   src/). Re-verified fresh round 37 (2026-09-12, runner charlie). */
+   src/). Re-verified fresh round 39 (2026-09-14, runner echo); one new
+   reshape tried (hoisting `&this->linkCoordinates` into a function-top local
+   named `coords`, on the theory that computing it once outside both branches
+   might suppress the `fill_eager_delay_slots` duplication into the branch
+   target) -- regressed hard (18/88, 135807 bytes of whole-image drift, an
+   extra callee-saved register), confirming the same "cast/hoist to a
+   function-scope local costs a register" class already documented for
+   `DreamSys__InstanceEffectsOnJournal`. Reverted immediately. */
 bool func_8005A9CC(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
@@ -1075,7 +1120,6 @@ staircase:
 	return false;
 }
 #endif
-
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 
 s32 func_8005AB2C(DreamSys *this)
@@ -1221,7 +1265,13 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
    docs/match-reports/DreamSys__InstanceEffectsOnJournal.md for the residue
    analysis. Restored to INCLUDE_ASM below per project rule (no score short
    of byte-exact stays in src/). Re-verified fresh round 37 (2026-09-12,
-   runner charlie). */
+   runner charlie). Re-verified fresh again round 39 (2026-09-14, runner
+   echo); two new reshapes tried on the two established residues (an
+   uncast `void *e = entity;` alias local at case 4 -- a fifth form on the
+   already-closed "cast/typing axis", byte-identical; and a named `s32 idx
+   = effect; switch (idx)` for the switch-index register choice -- also
+   byte-identical). Both axes remain confirmed compiler-level, invisible to
+   source spelling. */
 void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
 {
 	if (this->unknwon_int_0x44 != 0) {
@@ -1271,7 +1321,6 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 	}
 }
 #endif
-
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
@@ -1321,6 +1370,48 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
 	return CalcDreamColor(&local);
 }
 
+#if 0
+/* Best-reached body, 28/35 words, exact length (zero address drift) -- see
+   docs/match-reports/CalcDreamColor.md. Residue is the sixth confirmed
+   instance of the project-wide commutative-add operand-order/register-
+   identity class (round 20): retail computes the table-base address early,
+   this build loads `upper` early instead, both `addu`s register-swapped.
+   PERMUTER-EXHAUSTED (~40400 iterations). Restored to INCLUDE_ASM below per
+   project rule. Re-verified fresh round 39 (2026-09-14, runner echo);
+   round 39 also tried the hoist-both-values-before-either-is-consumed lever
+   (explicit `dynamic`/`upper` locals read before either is used) alone and
+   combined with the operand-order reversal -- both byte-identical to this
+   kept form, confirming the residue is compiler-level register allocation,
+   not reachable by either lever alone or combined. */
+DreamColors CalcDreamColor(MoodGraphPoint *mood)
+{
+	MoodGraphPoint local;
+	s8 *p;
+	s32 i;
+	s8 val;
+
+	local.value = mood->value;
+	p = (s8 *)&local;
+	for (i = 0; i < 2; i++, p++) {
+		val = *p;
+		if (val >= 4) {
+			*p = 2;
+		} else if (val < -3) {
+			*p = 0;
+		} else {
+			*p = 1;
+		}
+	}
+	{
+		s32 index;
+		s8 *entry;
+
+		index = local.axis.dynamic * 3;
+		entry = &D_80087E14[index];
+		return entry[local.axis.upper];
+	}
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcDreamColor);
 
 void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
