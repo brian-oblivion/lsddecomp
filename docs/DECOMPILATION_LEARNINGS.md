@@ -6144,5 +6144,43 @@ stated without the qualifier. That is true of scalars and **false of arrays**,
 and the difference is the whole lever. A negative measured on one storage
 class is not a negative for the other.
 
-Untried against this lever at time of writing: `func_8001A268` (`code_8220_c`),
-filed as *"unused-frame placement residue, 53/70 words"*.
+### SCOPE — measured, and it is narrower than the paragraph above implies
+
+This entry originally closed by naming `func_8001A268` (`code_8220_c`, filed as
+*"unused-frame placement residue, 53/70 words"*) as the obvious next
+application. **That was wrong, it was written without checking, and it was
+caught by measuring rather than by reasoning — so the correction is kept here
+rather than quietly deleted.**
+
+The lever answers *"retail reserves a frame and my build reserves NONE."*
+`func_8001A268` is the other situation entirely: **the build already reserves
+`0x20`**, with no local asking for it, and retail reserves the same `0x20`. The
+residue is purely WHERE the adjustment sits — retail schedules
+`addiu $sp,$sp,-0x20` into the delay slot of the loop-skipping branch at word
+17, the build emits it as an ordinary prologue at word 0. Measured:
+
+| body | frame emitted | score |
+| --- | --- | --- |
+| preserved body as filed | `-0x20` at word 0 | 53/70 |
+| same body + `s32 unused[8];` | **`-0x40`** at word 0 | **52/70** |
+
+The declared array did not *relocate* the reservation, it **stacked on top of
+one that was already there** — 0x20 became 0x40 — and the score got worse.
+
+**So the discriminator for reaching for this lever is "does my build emit NO
+`addiu $sp` at all", not "does retail have an unused frame".** Check the built
+object before you reach for it:
+
+```sh
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/<unit>.c.o \
+  | awk '/<func_XXXXXXXX>:/,/^$/' | grep 'addiu.*sp,sp'
+```
+
+No line means the lever applies and the array size is the number to solve for.
+A line already matching retail's size means the residue is PLACEMENT, this
+lever is inert, and adding a local actively regresses it.
+
+That GCC 2.6.3 reserves a baseline frame for some frameless leaf functions and
+not others is unexplained and is not needed to use the rule — the objdump check
+settles it per function in one second, which is the same discipline CLAUDE.md
+states for blockers: **a lever's SCOPE is measured, not reasoned.**
