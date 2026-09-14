@@ -269,44 +269,111 @@ Obj6EAC0Methods *func_80040FB0(void) {
     return &D_8006EB90;
 }
 
-/* func_80040FC0 -- STALL, but MUCH closer as of round 37: 22/24 at exact
- * length, and the ONLY residue is two TRANSPOSED preheader words
- * (`ori $a3,$zero,0x40` / `addu $a2,$a0,$zero` at vram 0x80040FD0).
- * The "redundant cursor cache" class this comment used to describe is
- * SOLVED and the old claim -- that every C form collapses the two
- * registers into one -- was FALSE: it measured one idiom, not the
- * compiler. Retail's source simply has TWO destination pointers that
- * carry equal values (`d` stored through, `dst` returned), and writing
- * both keeps both. A bare __asm__("") barrier does NOT move the
- * transposition (tried both positions); this is preheader emission
- * order, not scheduling. Prime permuter target -- never searched.
- * The class had exactly TWO members, not three: func_800407F8 was
- * MATCHED in round 19 and the cross-reference to it was stale.
- * Preserved body and its declarations are inlined in that report. */
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80040FC0);
+/* func_80040FC0 -- MATCHED round 38 (24/24). A permuter search (208
+ * iterations, rc=0) closed the last residue: retail materializes the
+ * 0x40 comparison constant into its own register BEFORE copying `dst`
+ * into `d`, and GCC 2.6.3 only reproduces that emission order when the
+ * constant is named by a separate local assigned first. See
+ * docs/match-reports/func_80040FC0.md. */
+u8 *func_80040FC0(u8 *dst, u8 *src) {
+    u8 *d;
+    u32 special;
+    u32 c;
+    u32 v;
+    u32 peek;
 
-/* func_80041020 -- STALL (register identity), best 20/31 at EXACT length.
- * See docs/match-reports/func_80041020.md. Round 37 applied the two-cursor
- * fix that dissolved the old "redundant cursor cache" class on
- * func_80040FC0 above, and it works here too: every instruction now sits
- * in retail's exact slot with retail's exact opcode and immediate. The
- * whole remaining residue is ONE 3-way register renaming (d: a2<->a3,
- * the 0x20 constant: a3<->t0, lead: v1<->a2), which is a banned thing to
- * fix by pinning and therefore a stall. Prime permuter target -- never
- * searched. (NOTE: func_800407F8, long cross-filed as a third member of
- * this class, is NOT one -- it was MATCHED 11/11 in round 19 by an
- * unrelated whole-struct-assignment lever. The cross-reference predates
- * that match and was stale; corrected round 37.)
- * Preserved body and its declarations are inlined in that report. */
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80041020);
+    if (*src++ != 0) {
+        special = 0x40;
+        d = dst;
+        do {
+            d++;
+            c = *src;
+            dst++;
+            if (c < 0x80 && c != special) {
+                v = c - 0x1F;
+            } else {
+                v = c - 0x20;
+            }
+            src++;
+            d[-1] = v;
+            peek = *src;
+            src++;
+        } while (peek != 0);
+    }
+    *dst = 0;
+    return dst;
+}
 
-/* func_8004109C -- STALL (register identity), best 49/56, correct length.
- * See docs/match-reports/func_8004109C.md: round 35 caught the round-23/27
- * preserved body calling two symbols (func_80013348, func_800411A8) that no
- * longer exist post round-34 SDK-object renaming (they are strlen/itoa now)
- * -- it could never have linked, so the recorded 42/56 was never actually
- * measured. Fixing the names and reordering the two VLA declarations
- * (padded before text) gets two of the four permuted registers exactly
- * right; only fill/text remain swapped relative to retail. Preserved body
- * and its declarations are inlined in that report. */
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_8004109C);
+/* func_80041020 -- MATCHED round 38 (31/31). Round 37 got structure and
+ * length exact via the two-cursor idiom (`d = dst; dst++; *d = x;`),
+ * leaving a pure 3-way register-identity residue. A permuter search
+ * (158 iterations, rc=0) closed it: copying the second byte's value
+ * into its own local (`trail`) before using it in the comparisons and
+ * arithmetic, instead of reusing `c` directly, changes GCC 2.6.3's
+ * register allocation to match retail's exactly. See
+ * docs/match-reports/func_80041020.md. */
+u8 *func_80041020(u8 *dst, u8 *src) {
+    u8 *d;
+    u32 c;
+    u32 v;
+    u32 lead;
+    u32 trail;
+
+    if (*src != 0) {
+        do {
+            d = dst;
+            dst++;
+            c = *src;
+            if (c >= 0x30) {
+                lead = 0x82;
+            } else {
+                lead = 0x81;
+            }
+            *d = lead;
+            d = dst;
+            dst++;
+            c = *src;
+            trail = c;
+            if (trail < 0x60 && trail != 0x20) {
+                v = trail + 0x1F;
+            } else {
+                v = trail + 0x20;
+            }
+            src++;
+            *d = v;
+        } while (*src != 0);
+    }
+    *dst = 0;
+    return dst;
+}
+
+/* func_8004109C -- MATCHED round 38 (56/56). Round 35 got structure and
+ * length exact (padded/text VLAs, strlen/itoa naming fixed post-SDK-object
+ * renaming) leaving a 4-value register-identity residue (fill/text
+ * swapped relative to retail). A permuter search (733 iterations, rc=0)
+ * closed it: declaration order text/fill/padded (not round 35's
+ * padded/text) PLUS splitting `fill = width - strlen(...)` into two
+ * statements (`fill = strlen(...); fill = width - fill;`) together
+ * reproduce retail's exact register assignment. Also fixed a stale
+ * prototype: the preserved body's forward declaration of func_80041020
+ * as `(Obj6EAC0 *, char *)` predates that function's own round-38 match
+ * as `u8 *func_80041020(u8 *, u8 *)` -- calling it now needs `self` cast
+ * to `u8 *`. See docs/match-reports/func_8004109C.md. */
+extern char *strcpy(char *dst, char *src);
+extern void *memset(unsigned char *dst, unsigned char c, int n);
+extern int strlen(char *s);
+extern char *itoa(int n);
+
+void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
+    char text[width + 1];
+    s32 fill;
+    char padded[width + 1];
+
+    fill = strlen(strcpy(text, itoa(a1)));
+    fill = width - fill;
+    if (unpadded == 0) {
+        memset((unsigned char *)padded, '0', width);
+        strcpy(&padded[fill], text);
+    }
+    func_80041020((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
+}
