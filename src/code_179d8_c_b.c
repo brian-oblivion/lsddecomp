@@ -32,7 +32,76 @@
  */
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", func_80032588);
+extern s32 D_8006DCA8;
+extern s32 D_8006DCA4;
+extern s32 D_8006DC98;
+extern u32 D_8009024C;
+
+void func_80032588(s32 a0)
+{
+    s32 cmd;
+
+    if (a0 & 0x1000) {
+        D_8006DCA8 = 1;
+        D_8006DCA4 = a0 & 0xFFF;
+    } else {
+        D_8006DCA8 = 0;
+        D_8006DCA4 = a0;
+    }
+
+    cmd = D_8006DCA4;
+
+    if (cmd < 6) {
+        if ((u32)cmd < 6) {
+            switch (cmd) {
+            case 4:
+                D_8009024C = 0x32;
+                if (D_8006DC98 == 1) {
+                    D_8006DCA4 = 5;
+                } else {
+                    D_8006DCA4 = 0x32;
+                }
+                return;
+            case 1:
+                D_8009024C = 0x3c;
+                if (D_8006DC98 == 0) {
+                    D_8006DCA4 = 5;
+                } else {
+                    D_8006DCA4 = 0x3c;
+                }
+                return;
+            case 3:
+                D_8009024C = 0x78;
+                return;
+            case 2:
+                D_8009024C = 0xf0;
+                return;
+            case 5:
+                if (D_8006DC98 == 0) {
+                    D_8009024C = 0x3c;
+                } else if (D_8006DC98 == 1) {
+                    D_8009024C = 0x32;
+                } else {
+                    D_8009024C = 0x3c;
+                }
+                return;
+            case 0:
+                if (D_8006DC98 == 0) {
+                    D_8009024C = 0x3c;
+                } else if (D_8006DC98 == 1) {
+                    D_8009024C = 0x32;
+                } else {
+                    D_8009024C = 0x3c;
+                }
+                return;
+            }
+        } else {
+            D_8009024C = 0x3c;
+            return;
+        }
+    }
+    D_8009024C = cmd;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", func_80032708);
 
