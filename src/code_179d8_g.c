@@ -92,7 +92,7 @@ extern volatile u16 *D_8006D8D4;   /* HW register block; offsets are byte offset
 extern u8 D_8006D8D8[2];
 extern u8 D_8006D8D9;
 extern volatile u8 D_8006D8DA;
-extern s32 D_8006D8DC;   /* first of 10 consecutive words zeroed by a pointer walk;
+extern s32 D_8006D8DC[10];   /* first of 10 consecutive words zeroed by a pointer walk;
                           * D_8006D8E0..D_8006D900 are the other nine, each
                           * already individually named -- not a real array. */
 extern s32 D_8006D8E0;
@@ -248,7 +248,7 @@ void func_8002A6EC(void)
     D_8006D5FC = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
-    p = &D_8006D8DC;
+    p = D_8006D8DC;
     for (i = 9; i != -1; i--) {
         *p = 0;
         p++;
@@ -306,7 +306,7 @@ join:
         *q4 = arg0;
     }
     D_8006D8E0 = arg1;
-    D_8006D8DC = 8;
+    D_8006D8DC[0] = 8;
     D_8006D8FC = D_8006D5FC;
     D_8006D900 = D_8006D600;
 
@@ -339,7 +339,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
     p6A0 = D_8006D6A0;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
-    pF8 = &D_8006D8F8;
+    pF8 = &D_8006D8DC[7];
 
     D_8008B3E4 = now + 0x1E0;
     D_8008B3E8 = 0;
@@ -415,16 +415,36 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
              * (non-tautological) guard, a re-masked store, and an explicit
              * live-range extension. All tabulated in the match report.
              *
-             * THE LEAD WORTH FOLLOWING, and the reason this is flagged
-             * rather than merely apologised for: a tautological null check
-             * is exactly what a MIS-MODELLED global looks like. Both
-             * operands are spelled here as address-of (`s32 D_8006D6A0[]`,
-             * `&D_8006D8F8`). If either is really a POINTER global in
-             * retail's source (`extern s32 *D_8006D6A0;`), this becomes an
-             * ordinary null test that happens to be true at runtime, the
-             * construct stops being a hack, and it stops being duplicated.
-             * That is a data-modelling question, it is cheap to test, and
-             * nobody has tested it.
+             * THE MIS-MODELLING LEAD IS TESTED AND THE ANSWER IS SPLIT
+             * (round 40, head). The round-39 form of this comment said a
+             * tautological null check is what a mis-modelled global looks
+             * like, and asked whether either operand is really a POINTER
+             * global. Measured from the DATA, not from attempts:
+             *
+             *   - D_8006D6A0 is a fixed 8-element table of rodata string
+             *     addresses (asm/data/5DDFC.data.s:121). An array.
+             *   - D_8006D8F8 is one zero word that the sibling
+             *     func_8002B4D4 stores VSync()'s return into
+             *     (func_8002B4D4.s:49-51). An s32 timestamp.
+             *
+             * Neither is a pointer global, so the condition CANNOT become
+             * an honest null test by that route. That half is closed.
+             *
+             * A DIFFERENT mis-modelling was real and IS now corrected:
+             * `pF8[-1]` (used four times below) reaches D_8006D8F4 by
+             * negative indexing off D_8006D8F8, which nobody writes -- the
+             * ten consecutive words ARE one array, as the zeroing walk in
+             * func_8002ADE8 already implied. They are now declared
+             * `s32 D_8006D8DC[10]` and indexed, and that model is
+             * BYTE-IDENTICAL (174/174, whole image green).
+             *
+             * BUT IT DOES NOT DISSOLVE THIS CONSTRUCT. Under the corrected
+             * model, removing the construct still scores 162/174 -- the
+             * same figure as before -- and every residual diff is a pure
+             * register swap ($s2/$s3, $a0/$a2, $v0/$v1). So the 12 words
+             * are REGISTER ALLOCATION, not data modelling, and the data
+             * model was never what this construct was standing in for.
+             * Do not re-run the data-modelling axis; it is measured.
              * ------------------------------------------------------------ */
             if (p6A0 || pF8) {
                 *D_8006D8C0 = status;

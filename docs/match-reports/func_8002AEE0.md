@@ -69,6 +69,87 @@ needing duplicated arms, and the function becomes an honest match. That is a
 data-modelling question, it is cheap to test, and **nobody has tested it.**
 It is the first thing the next round should try on this function.
 
+## ROUND 40 (head): the mis-modelling lead is TESTED. One half falsified from the data, the other half real, corrected, and NOT the cause.
+
+Round 39 named this the first thing the next round should try. It was tried.
+The answer is in three parts and the third is the one that matters.
+
+### Part 1 -- the stated lead ("is either operand really a POINTER global?") is FALSIFIED, from the DATA rather than from attempts
+
+Neither operand can become an honest null test by that route, and no build was
+needed to establish it:
+
+| operand | what the data says | where |
+| --- | --- | --- |
+| `D_8006D6A0` | a fixed **8-element table of rodata string addresses** (`0x8001097C`, `0x80010970`, ...) -- an array, so the decay is tautologically non-null | `asm/data/5DDFC.data.s:121-130` |
+| `D_8006D8F8` | **one zero word** that the sibling `func_8002B4D4` stores `VSync(-1)`'s return into (`lui`/`addiu`/`sw $v0`) -- an `s32` timestamp | `asm/nonmatchings/code_179d8_g/func_8002B4D4.s:49-51` |
+
+A pointer global would be a word holding an address; this one holds a frame
+count written by `VSync`. That half of the lead is closed and should not be
+re-run.
+
+### Part 2 -- a DIFFERENT mis-modelling was real, and is now corrected
+
+`pF8[-1]` appears **four times** in this function (and `pF8[0]` once). Nobody
+writes `(&D_8006D8F8)[-1]`: negative indexing off a named global is only
+meaningful if the neighbouring word is part of the same object. The ten
+consecutive words `D_8006D8DC..D_8006D900` are therefore ONE ARRAY -- which
+`func_8002ADE8`'s zeroing walk (`p = &D_8006D8DC; for (i = 9; ...)`) had
+already implied in the same unit without anyone drawing the conclusion.
+
+They are now declared and indexed as one:
+
+```c
+extern s32 D_8006D8DC[10];
+...
+    p   = D_8006D8DC;        /* was &D_8006D8DC, in func_8002ADE8 */
+    pF8 = &D_8006D8DC[7];    /* was &D_8006D8F8                   */
+```
+
+**This is byte-identical: 174/174, whole-image SHA1 green.** It is a free
+correctness improvement to the data model and it is committed.
+
+### Part 3 -- and it does NOT dissolve the construct, which is the actual result
+
+Under the corrected array model, with the duplicate-arm construct removed:
+
+| variant | score |
+| --- | --- |
+| corrected array model + construct | **174/174** (image green) |
+| corrected array model, plain store | 162/174 |
+| (round 39) old model, plain store | 162/174 |
+
+**The same 162/174.** And every residual diff is a pure register swap --
+`$s3`/`$s2` at words 16-20, `$a0`/`$a2` at 52/53/116, `$v0`/`$v1` at
+141/149/157/161 -- with no length change and no structural difference.
+
+So the construct's 12 words are **REGISTER ALLOCATION, not data modelling**,
+and the data model was never what it was standing in for. That is worth
+stating plainly because the round-39 lead was a good hypothesis for a good
+reason -- a tautology usually *is* a modelling smell -- and it happened to be
+wrong here. **The data-modelling axis on this function is now measured; do not
+re-run it.** What remains is a register-identity residue, which is the class
+HARD RULE 6 forbids fixing directly and which the project treats as a stall.
+
+### Proposed learning (round 40)
+
+**A data-modelling hypothesis is settled by reading the DATA SECTION, not by
+compiling variants.** Both halves here were decided by two greps of
+`asm/data/` and one sibling's `.s` -- cheaper than any of round 39's eleven
+builds, and conclusive in a way an attempt count is not. The tell that
+something was genuinely mis-modelled was not the tautology at all; it was
+`pF8[-1]`, an index nobody writes by hand, sitting four lines below it and
+visible the whole time.
+
+And the corollary, which is why Part 2 is committed even though Part 3 is
+negative: **correcting a model that turns out not to be the cause is still
+worth committing when it is byte-identical.** The next reader of this function
+should not have to re-discover that the ten words are one array, and the
+negative result is only trustworthy *because* it was measured against the
+corrected model.
+
+---
+
 ### Disposition
 
 **Kept, not reverted, and the choice is deliberate.** Reverting would discard a
