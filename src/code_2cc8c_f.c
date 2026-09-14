@@ -304,20 +304,48 @@ u8 *func_80040FC0(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* func_80041020 -- STALL (register identity), best 20/31 at EXACT length.
- * See docs/match-reports/func_80041020.md. Round 37 applied the two-cursor
- * fix that dissolved the old "redundant cursor cache" class on
- * func_80040FC0 above, and it works here too: every instruction now sits
- * in retail's exact slot with retail's exact opcode and immediate. The
- * whole remaining residue is ONE 3-way register renaming (d: a2<->a3,
- * the 0x20 constant: a3<->t0, lead: v1<->a2), which is a banned thing to
- * fix by pinning and therefore a stall. Prime permuter target -- never
- * searched. (NOTE: func_800407F8, long cross-filed as a third member of
- * this class, is NOT one -- it was MATCHED 11/11 in round 19 by an
- * unrelated whole-struct-assignment lever. The cross-reference predates
- * that match and was stale; corrected round 37.)
- * Preserved body and its declarations are inlined in that report. */
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_f", func_80041020);
+/* func_80041020 -- MATCHED round 38 (31/31). Round 37 got structure and
+ * length exact via the two-cursor idiom (`d = dst; dst++; *d = x;`),
+ * leaving a pure 3-way register-identity residue. A permuter search
+ * (158 iterations, rc=0) closed it: copying the second byte's value
+ * into its own local (`trail`) before using it in the comparisons and
+ * arithmetic, instead of reusing `c` directly, changes GCC 2.6.3's
+ * register allocation to match retail's exactly. See
+ * docs/match-reports/func_80041020.md. */
+u8 *func_80041020(u8 *dst, u8 *src) {
+    u8 *d;
+    u32 c;
+    u32 v;
+    u32 lead;
+    u32 trail;
+
+    if (*src != 0) {
+        do {
+            d = dst;
+            dst++;
+            c = *src;
+            if (c >= 0x30) {
+                lead = 0x82;
+            } else {
+                lead = 0x81;
+            }
+            *d = lead;
+            d = dst;
+            dst++;
+            c = *src;
+            trail = c;
+            if (trail < 0x60 && trail != 0x20) {
+                v = trail + 0x1F;
+            } else {
+                v = trail + 0x20;
+            }
+            src++;
+            *d = v;
+        } while (*src != 0);
+    }
+    *dst = 0;
+    return dst;
+}
 
 /* func_8004109C -- STALL (register identity), best 49/56, correct length.
  * See docs/match-reports/func_8004109C.md: round 35 caught the round-23/27
