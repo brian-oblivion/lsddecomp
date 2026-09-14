@@ -2012,6 +2012,81 @@ read off a report rather than measured. When you close a function, grep for
 who points at it before you move on; that is the cheap half of this, and it is
 the half that stops the class regenerating.
 
+**AND AN EIGHTH (round 39): A FUNCTION CAN BE SONY'S WITH NO OBJECT ANYWHERE
+TO PROVE IT, AND `sdkstalls.py` CANNOT SEE THAT CASE BY CONSTRUCTION.**
+
+`sdkstalls.py` crosses the stall queue against **PLACED** objects, so it
+answers *"is this owned by an object we HAVE"*. It cannot answer *"is this
+Sony's"*, and `progress.py` reports hundreds of SDK functions with no object
+on any disc in `sdk/`. A function in that gap passes every screen the project
+owns — no `gp_rel`, no `nop_mflo_mfhi`, not a trampoline, no placed-object
+overlap — while being unmatchable by construction.
+
+Round 39 found one, and it was **the smallest function in the whole queue**
+(`func_80050B28`, 12 words), therefore first in `nearmiss.py`'s `ASSIGN FROM
+HERE` for four rounds, carrying 634 lines of derivation across four rounds.
+It is Psy-Q **libcard**.
+
+**Two mechanical detectors, both seconds to run. Neither needs judgement.**
+
+*Detector 1 — segment topology.* A `c` segment bracketed by `o` segments of
+ONE library, small enough to be a single module, is probably that library's:
+
+```sh
+python3 - <<'EOF'
+import re
+segs=[]
+for ln in open('config/splat.slps01556.lsdde.yaml'):
+    m=re.match(r'\s*-\s*\[\s*(0x[0-9A-Fa-f]+)\s*,\s*(\w+)\s*,\s*([\w/\.]+)\s*\]',ln)
+    if m: segs.append((int(m.group(1),16),m.group(2),m.group(3)))
+segs.sort()
+for i,(off,ty,name) in enumerate(segs):
+    if ty!='c' or i==0 or i+1>=len(segs): continue
+    p,n=segs[i-1],segs[i+1]
+    if p[1]=='o' and n[1]=='o':
+        print(f"0x{off:06X} {name:<20} {n[0]-off:5d}B  after {p[2]:<20} before {n[2]}")
+EOF
+```
+
+Ten hits when round 39 ran it; **only one had a live `INCLUDE_ASM`**, and that
+one was the libcard function. The large multi-function units in the list are
+ordinary game code that merely happens to abut library blocks — size is what
+discriminates, so read the byte count, not the bracketing alone.
+
+*Detector 2 — the assembler fingerprint, where the library is a "pure" one.*
+Sony's libraries were built with different ASPSX versions, and the `li`
+expansion for a positive 16-bit constant differs between them: `addiu
+$rX,$zero,K` versus `ori $rX,$zero,K`. Our pinned pipeline
+(`--aspsx-version=2.34`) emits **only** `ori` for `0 < K < 0x10000`
+(`maspsx.expand_load_immediate()`), so any `addiu` form in retail came from
+a different assembler:
+
+```sh
+grep -rcE '\b(addiu|ori) +\$[a-z0-9]+, \$zero, 0x' asm/     # game disassembly
+for o in lib/*/*.o; do tools/binutils/bin/mipsel-linux-gnu-objdump -d "$o"; done \
+  | grep -P '\t(24|34)[0-9a-f]{6} \tli\t' | grep -oP '\t\K(24|34)' | sort | uniq -c
+```
+
+Round 39's census: **1 `addiu` against 1089 `ori` in the entire game
+disassembly** — the one being that function's word 5 — while Sony's own 178
+objects hold 226 `addiu` and 386 `ori`, with **`libapi` and `libcard` at 100%
+`addiu`**. Note `objdump` prints BOTH encodings as `li`, and so does
+`asm-differ`; only the raw word distinguishes them, which is why four rounds
+of instruction-text analysis never saw it.
+
+**The generalisable rule, and it is the one that actually failed here: A
+REPRODUCED TOOLCHAIN MECHANISM IS NOT A BLOCKER UNTIL ITS CORPUS FREQUENCY IS
+MEASURED.** Round 32 traced this residue to the exact lines of maspsx that
+produce it, in isolation, through the pinned pipeline — and concluded the
+function was toolchain-blocked from a sample of one. CLAUDE.md's *"a blocker's
+SCOPE is measured, not reasoned"* was applied to the mechanism and not to the
+verdict. A rule that is wrong for 1 instruction in 1090 is not wrong.
+
+The error direction is the expensive one named throughout this document, with
+a twist: the CAUSE was right and the OWNERSHIP was wrong. That produces a
+clean, internally consistent, well-argued report recommending permuter budget
+on Sony's code — and nothing in it reads as stale.
+
 **Gate 3 — permuter round instead.** If the fresh queue is dry and carving is
 blocked, or the stall residue is worth more than cold ground (near-misses like
 88/90), run a permuter round. A zero is a LEAD, not an answer: translate it to

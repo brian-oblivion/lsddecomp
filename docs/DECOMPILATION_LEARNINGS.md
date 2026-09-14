@@ -6256,6 +6256,79 @@ So when a report says a residue is immune, read what was actually tried. Two
 inert levers are weak evidence about their conjunction, and the conjunction is
 cheap to test.
 
+## A reproduced toolchain mechanism is not a blocker until its CORPUS FREQUENCY is measured (round 39)
+
+`func_80050B28`'s report established, correctly and in isolation through the
+pinned pipeline, that retail's word 5 is `addiu $a1,$zero,0x3F` where our
+build emits `ori`; that `objdump` and `asm-differ` print BOTH as `li a1,0x3f`
+and cannot see the difference; and that the choice is made entirely by
+`maspsx.expand_load_immediate()`, which picks `ori` for every
+`0 < K < 0x10000` under the pinned `--aspsx-version=2.34`. Every word of that
+reproduces. The conclusion drawn from it — that the function was toolchain-
+blocked — did not survive one more command:
+
+```sh
+grep -rcE '\b(addiu|ori) +\$[a-z0-9]+, \$zero, 0x' asm/
+```
+
+**One `addiu` in the entire executable's disassembly, against 1089 `ori`** —
+and the one is that function's word 5. A rule wrong for 1 instruction in 1090
+is not wrong; the instruction came from a different assembler. Sony's own 178
+objects in `lib/` carry both forms (226 `addiu`, 386 `ori`) because the game
+mixed library builds, and **`libapi` and `libcard` are 100% `addiu`**. The
+function tiles libcard's own object run and calls only libcard functions: it
+is libcard code whose object is not on the user's discs.
+
+**The lesson is about which claim the scope rule attaches to.** CLAUDE.md
+already says a blocker's SCOPE is measured and not reasoned, and that rule was
+applied — to the MECHANISM. Reproducing a mechanism in isolation tells you the
+tool behaves that way; it tells you nothing about whether retail ever depended
+on the other behaviour. Those are two measurements and only one of them was
+taken.
+
+**Corollary for reading reports: a report can have a right CAUSE and a wrong
+OWNERSHIP, and that combination is harder to spot than either alone.** It
+produces a document that is internally consistent, carefully argued, and
+recommending permuter budget on code no C was ever compiled to. Nothing in it
+reads as stale. See `docs/PARALLEL-RUNS.md`, the eighth Gate 1b screen, for
+the two mechanical detectors.
+
+## A function can REQUIRE the hoist-both lever and still not match (round 39)
+
+Round 38 named "hoist BOTH values before EITHER is consumed" from five
+functions it CLOSED. `func_8003DAD4` is the first measured case where the
+lever is **load-bearing and insufficient**: the preserved body already hoists
+both fields, and dropping the second temp alone collapses it from 114/118 to
+24/118 and makes the function two words shorter. Ten further source-shape
+variants — six declaration/statement-order permutations, two barrier
+positions, a no-base-local spelling, a temps-at-top spelling — all land on the
+identical 114/118 or worse.
+
+**So the lever reproduces retail's load/store SCHEDULING; it does not by
+itself settle which REGISTER each hoisted value lands in.** Two consequences:
+
+- *"The hoist is already in this body"* is **not** evidence the lever was
+  tried and failed. It may be evidence the lever already paid, and that what
+  remains is a different class.
+- The precondition is real and worth checking before reshaping: runner bravo
+  measured a clean negative the same round on `code_8220_c`, where the residue
+  is a single already-atomic macro expansion rather than two independently
+  producible values. Forcing a hoisted form there **regressed** 46/54 → 44/54.
+  A forced hoist is not a neutral experiment.
+
+## Count an instruction that MOVED as ONE residue, not two (round 39)
+
+`func_8003DAD4` reports four differing words and is two instructions from
+matching. Two of the four are a single `addu $s1,$zero,$zero` that swapped
+delay slots with a `nop` — retail fills the loop guard's `blez` slot with the
+counter zero-init and leaves the early-return branch a `nop`; our build does
+the opposite. A raw word-match charges the move at both ends.
+
+This matters because the next round ranks from title figures. "114/118" reads
+as four independent residues and prices the function accordingly; "two
+instructions, one of them a delay-slot swap" is a different and much better
+target. Say which when it applies.
+
 ## Four smaller levers, measured in round 38
 
 1. **A "wrong preheader order" residue can be a source NAMING-ORDER problem,
