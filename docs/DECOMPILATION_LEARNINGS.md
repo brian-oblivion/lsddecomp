@@ -6184,3 +6184,73 @@ That GCC 2.6.3 reserves a baseline frame for some frameless leaf functions and
 not others is unexplained and is not needed to use the rule — the objdump check
 settles it per function in one second, which is the same discipline CLAUDE.md
 states for blockers: **a lever's SCOPE is measured, not reasoned.**
+
+## Hoist BOTH values before EITHER is consumed — the lever that four "register identity" verdicts were hiding (round 38)
+
+Round 38 closed five functions across two units on one shape, after three
+prior rounds had filed them as register-identity or scheduling residues that
+source reordering could not reach.
+
+**The shape:** retail computes the value for field 2 **before consuming** the
+value for field 1. Every prior attempt wrote the natural C — finish field 1
+(load, transform, store), then start field 2 — which gives GCC 2.6.3 no reason
+to keep both live at once, so its allocator never reaches retail's assignment.
+Hoisting both into explicit temporaries *before either is used* reproduces
+retail's scheduling and every register role at once.
+
+| function | what retail does first | result |
+| --- | --- | --- |
+| `func_80031D6C` | loads **both** `s16` fields before dividing **either** | 35/35 |
+| `func_80031DF8` | computes `p1*129` **and** `p2*129` back-to-back before any table indexing | 39/39 |
+| `func_80041020` | copies the second byte into its own value before the first's arithmetic | 31/31 |
+| `func_8004109C` | (same family; 4-value variant) | 56/56 |
+
+`func_80031D6C` had been filed since round 21 as *pure register identity* after
+four exhaustive declaration- and statement-reorder attempts. The lever was
+never tried because reordering *statements* and hoisting *values* look like the
+same move and are not: reordering leaves each value consumed where it was
+produced; hoisting separates production from consumption.
+
+**The diagnostic is in the disassembly and takes one read:** if retail's two
+loads (or two multiplies) are ADJACENT and their consumers come later, the
+source hoisted both. If load/use alternates, it did not.
+
+### And the corollary that generalises past this shape
+
+**A residue that survives each of two levers independently has NOT been shown
+to survive their combination, and that combinatorial gap is where these hide.**
+`func_8004C470` had twice been filed with its `addu` operand order *"confirmed
+(twice, both operand-textual-orders tried) immune to source reordering"*. That
+is true: flipping operand order alone is inert, reconfirmed at 68/70. Hoisting
+the field into a local alone is also inert. **Both together reach 69/70.**
+
+So when a report says a residue is immune, read what was actually tried. Two
+inert levers are weak evidence about their conjunction, and the conjunction is
+cheap to test.
+
+## Four smaller levers, measured in round 38
+
+1. **A "wrong preheader order" residue can be a source NAMING-ORDER problem,
+   not a scheduling one.** `func_80040FC0`'s last residue was two transposed
+   preheader words; `__asm__("")` could not reach it (consistent with the
+   barrier being inert outside the scheduler). Naming the comparison constant
+   in its own local, *assigned before* the pointer copy, reproduced retail's
+   emission order. Preheader emission follows the order values are named.
+
+2. **A register-identity residue that permutes several unrelated-looking
+   values can have ONE shared trigger.** `func_80041020`'s 3-way and
+   `func_8004109C`'s 4-value permutations each collapsed to a single change:
+   reading a reused value through a **fresh local** rather than through the
+   variable that already held it.
+
+3. **Splitting a combined expression into two statements, so the statement
+   count matches retail's instruction count, is a distinct lever** and
+   combines with declaration-order tricks rather than substituting for them
+   (`fill = width - strlen(...)` split in two, in `func_8004109C`).
+
+4. **A preserved body's forward declaration of a SIBLING in its own unit goes
+   stale the moment that sibling is matched.** `func_8004109C`'s body declared
+   `func_80041020` with a guessed signature; matching that sibling earlier in
+   the same round made the declaration a `conflicting types` error. This is
+   the round-33 stale-symbol class arriving from inside a single unit — check
+   for it before reading a rebuild failure as evidence about the body.
