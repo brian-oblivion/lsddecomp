@@ -6,6 +6,144 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-14 — round 38: six matches, one unit closed outright, and one lever behind five of them
+
+**State at end: 990 matched / 1253 game functions (79.01% of game code)**, up
+six from round 37's 984. Queue 197 live `INCLUDE_ASM`, 196 documented stalls,
+`fresh` 1. Build green after all three merges and after a clean `make extract`
+(zero committed bytes changed); working tree clean.
+
+Best round since the streak broke, and **`code_2cc8c_f` is now fully closed —
+zero `INCLUDE_ASM` remaining in the unit.**
+
+### Gates
+
+Gate 0 green (no stale-asm warning at start, `build exit=0`, all three
+worktrees byte-verified before handover). Gate 1: `fresh` = 1 (a 954-word
+function, not a work order); the contradiction sweep returned 13 hits and **all
+13 were over-reports** — every one mentions `addiu_at` only to say it is not
+the cause, is resolved, or screened clean. Zero genuine stale verdicts. Gate 2:
+carve **REJECTED** on fresh measurement — 66 uncarved, 10 blocker-clean, best
+segment 5-of-39; **fourth consecutive round with that verdict.** Gate 1b was
+the round: 110 blocker-clean, 0 Sony-owned, **39 never-searched** under round
+37's corrected screen. Gate 3 folded into the runners.
+
+**Staffing: 3 runners, 3 units, ZERO header contention** (`headercontention.py`
+at assignment time). Three, not five, because round 37 measured a permuter
+round to be core-bound. All three merges were clean — no conflicts of any kind.
+
+### The infrastructure failure, and what it cost
+
+**All three runners died mid-flight to an org-level API 403**, with **zero
+commits and one modified file each**. One had already derived a byte-exact
+match. The head salvaged all three worktrees (§4c), committed the work, and
+respawned fresh runners into the same worktrees from the committed state.
+
+**`SendMessage` was unavailable to the head for this entire round** — round
+31's corollary. Two mid-round corrections had to be deferred to the spawn
+prompts of the second wave instead of sent to the live first wave, and one
+runner's wait-loop could not be broken at all (below). Recording it per that
+corollary.
+
+### The matches
+
+| function | unit | words | how |
+| --- | --- | --- | --- |
+| `func_80031CF0` | `code_179d8_j_c` | 31/31 | unused-frame array lever (head rework) |
+| `func_80031D6C` | `code_179d8_j_c` | 35/35 | hoist both loads before either division |
+| `func_80031DF8` | `code_179d8_j_c` | 39/39 | both levers together |
+| `func_80040FC0` | `code_2cc8c_f` | 24/24 | permuter, 208 iters, `rc=0` |
+| `func_80041020` | `code_2cc8c_f` | 31/31 | permuter, 158 iters, `rc=0` |
+| `func_8004109C` | `code_2cc8c_f` | 56/56 | permuter, 733 iters, `rc=0` |
+
+All six re-verified individually in `main` after merge, plus whole-image SHA1.
+
+**Five of the six are one shape** — retail computes field 2's value *before
+consuming* field 1's, and hoisting both into temporaries before either is used
+reproduces the allocation. `func_80031D6C` had been filed since round 21 as
+pure register identity after four exhaustive reorder attempts; reordering
+*statements* and hoisting *values* look like the same move and are not.
+Promoted to DECOMPILATION_LEARNINGS with the one-read disassembly diagnostic.
+
+### Word gains
+
+| function | before | after |
+| --- | --- | --- |
+| `func_8004C470` | 68/70 | **69/70** |
+
+### Two verdicts corrected, both by combination rather than by a new lever
+
+- **`func_8004C470`'s `addu` operand order was filed twice as "immune to
+  source reordering".** Accurate about each half: flipping operand order alone
+  is inert (reconfirmed 68/70), and hoisting alone is inert. **Both together
+  reach 69/70.** Generalised: *a residue that survives two levers
+  independently has not been shown to survive their combination.*
+- **The "redundant cursor cache" class had ZERO remaining members by the
+  evidence it cited.** Round 37 removed `func_800407F8` (matched round 19);
+  this round removed `func_80040790`, also matched, and bravo then read its
+  actual C and found it has no loop and no induction variables — it was never
+  a class member at all.
+
+### The head's own error, kept visible
+
+The head closed the new unused-frame learning by naming `func_8001A268` as the
+obvious next application **without checking it**. Measured: that function's
+build already reserves `0x20` with no local asking for it, so its residue is
+*placement*, not reservation, and adding an array stacked on top — frame
+`0x20` → `0x40`, score 53/70 → 52/70. The entry now carries the one-second
+`objdump` check that settles scope per function, and the wrong version is kept
+rather than deleted. This is CLAUDE.md's wrong-CAUSE hazard, committed by the
+head, in the same commit that added the lever.
+
+### A seventh Gate 1b screen: cross-reference staleness is measurable
+
+Round 37's head owned this as an anecdote about one function. It is a standing
+class with a mechanical detector, and the census is large. **The key
+correction: "has a report, is no longer `INCLUDE_ASM`" has THREE exits, not
+one, and they mean opposite things** — matched as game C (precedent real, go
+read it), reclassified as a Sony object (**precedent never existed**), or
+renamed. Measured: **89 of 1011 closed functions have no C definition — 86
+SDK-reclassified, 3 renamed — and 31 live reports cite one, 10 as an explicit
+precedent claim.** Worked example: `func_8002C278` cites `func_8002C048` and
+`func_8002C0AC` as a residue class *and* as permuter precedent; they are
+`strcmp` and `strncmp`. Written into `docs/PARALLEL-RUNS.md` with both
+detectors.
+
+### Process findings
+
+- **A runner stopped its turn on a bounded permuter search and, with
+  `SendMessage` unavailable, could not be restarted.** Its search was real
+  (89,374 iterations, base 20 → best 10, no zero) and it had correctly
+  computed the base score. **Its exit code was never captured and is
+  unrecoverable** — recorded as unknown rather than reasoned from elapsed
+  time, and explicitly NOT as permuter-exhausted. The head collected and
+  translated the lead, which is where the 68/70 → 69/70 came from. §2c's
+  second failure mode (the runner stops working while the search runs) is
+  still unsolved when the head cannot message.
+- **The round-36 wrong-body trap fired again on `func_80031A44`.** A runner
+  explicitly briefed to rebuild every inherited figure spliced the report's
+  **first** `#if 0` block — the superseded one — and compared the result
+  against a figure in that block's own heading. It reverted at once, correctly.
+  The cause is structural: `#if 0` is the mandated preservation form, so the
+  first such block in a long report is what anyone reaches first, and the
+  correction sat 500 lines below. Warning moved onto the block itself.
+- Three runners × `-j 6` peaked around load 12 on 32 cores — comfortable, and
+  confirms round 37's sizing call.
+
+### Next round
+
+**Runners, three, on never-searched near-misses — and screen for the hoist
+shape first.** Measured at end of round: **104 blocker-clean, 33
+never-searched**, `fresh` 1, uncarved 66 with 10 blocker-clean (carve still
+rejected). The hoist lever is new, is measured, and closed four functions
+across two unrelated units in one round, so the highest-value selection screen
+available now is *retail's two loads or two multiplies adjacent, consumers
+later* — read straight off the `.s`. Not a carve. Not a pure permuter round:
+three of six matches came from search, three from hand analysis, and both
+corrected verdicts came from hand work.
+
+---
+
 ## 2026-09-12 — round 37: five runners on never-searched ground, one match, and the screen that selected them was broken
 
 **State at end: 984 matched / 1253 game functions (78.53% of game code)**, up
