@@ -1,4 +1,80 @@
-# func_8003ECD0 — STALL (near-miss, 71/73, instruction-order residue; reconfirmed round 36 after a stale-symbol rebuild and a ~40k-iteration permuter search)
+# func_8003ECD0 -- STALL: length EXACT (73/73 words, no drift); 71/73 raw word-match; first real diff at vram 0x8003ED18 (the `addu`/`addiu` pairing). ATTEMPT 6'S VERDICT IS CORRECTED BELOW.
+
+## ROUND 39 (head): baseline re-verified, five more variants, and ATTEMPT 6 WAS MEASURING THE WRONG HALF OF ITSELF
+
+Baseline re-spliced against `main` and rebuilt: **exactly 71/73, zero
+outside-range drift.** The inherited figure is honest.
+
+### The correction, and it is the useful part of this pass
+
+Attempt 6 reads:
+
+> A named `s32 shiftVal = 4 << self->unk3C;` local, **reused at both call
+> sites** (this and `unk88`'s own computation, which ALSO computes
+> `4 << self->unk3C`) -- **no change from attempt 1's score either way**;
+> ruled out as the lever.
+
+**"Either way" collapses two variants that differ by 55 words.** Measured
+here, separately, each spliced and built through the full oracle:
+
+| variant | score |
+| --- | --- |
+| `shiftVal` named, used ONLY in the `size` computation; `unk88` recomputes `4 << self->unk3C` | **71/73** (inert -- this is the half attempt 6 measured) |
+| `shiftVal` named, **reused at BOTH sites** as attempt 6's own text describes | **16/73, with whole-image drift** |
+
+So the reuse is not inert, it is catastrophic, and attempt 6 recorded it as
+inert. The verdict "ruled out as the lever" happens to survive -- naming the
+local does not close the residue -- but the reasoning under it did not measure
+what it says it measured.
+
+**Why the reuse is destructive is the part worth carrying forward: retail
+RECOMPUTES `4 << self->unk3C` at the `unk88` site rather than keeping one
+value live.** Naming it once and reusing it forces GCC to hold it across the
+allocation and rewrites the whole function. This is round 39's alpha lever
+arriving as a CONSTRAINT rather than an opportunity -- alpha closed 8 words on
+`func_800357B0` by *dropping* a named local and recomputing inline at its one
+real use, on the same principle. Here the recomputation is already correct and
+naming it is what breaks.
+
+### The other four variants (all negative)
+
+| variant | score |
+| --- | --- |
+| baseline (attempt 1) | 71/73 |
+| multiply operand order flipped (`unk44 * unk48`) -- **not in the prior attempt list** | 69/73 |
+| flipped multiply + bare `__asm__("")` first statement | 67/73 |
+| flipped multiply + `shiftVal` at both sites | 14/73, drift |
+| `__asm__("")` + `shiftVal` at both sites (the attempt-6 x attempt-7 conjunction) | 16/73, drift |
+
+**And a note on how NOT to read that last row.** Charlie measured this round
+that two individually-inert levers can combine productively
+(`func_8004BE54`, 130/150 -> 132/150), so the attempt-6 x attempt-7
+conjunction looked like the prescribed next move here. It scored 16/73, and
+the tempting conclusion -- "conjunctions can also combine destructively" --
+**is not supported by this data.** Once attempt 6's reuse half is measured
+alone at 16/73, the conjunction's score is fully attributable to that single
+component, and the barrier contributes nothing. The conjunction was never
+tested against two genuinely inert levers, because one of them was not inert.
+
+That is the project's own attribution discipline applied to a lever rather
+than to a blocker: a combined result says nothing until each component has
+been measured alone.
+
+### Standing
+
+The residue itself is unchanged and is now **14 attempts deep across four
+rounds**, plus a ~40k-iteration permuter search. Every restructuring of the
+`size` expression regresses the HEAD of it (the `mult` / `unk3C`-reload /
+`sllv` scheduling), not merely the tail pairing. The multiply operand order,
+tried here for the first time, joins that pattern.
+
+### Proposed learning (round 39)
+
+**An attempt log entry that says "either way" or "in both positions" is a
+single figure standing for two measurements, and the project has no way to
+tell which one was actually run.** This one hid a 55-word difference under
+"no change either way" for four rounds, and the next reader inherits it as a
+closed axis. When an attempt has two spellings, record two rows.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. Best score: 71/73 words
 in-range, build clean at that score. ~14 real attempts, all on the SAME
