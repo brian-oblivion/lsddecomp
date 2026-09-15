@@ -156,6 +156,58 @@ struct Arg1DCD0_3bb8c_d {
     s8 b2;
 };
 
+#if 0
+/* STALL, round 43 -- see docs/match-reports/func_8004DCD0.md.
+ * 2 words short (76/78), register-class residue on the shared local
+ * pointer ("base"): retail keeps it in a THIRD callee-saved register
+ * ($s1, alongside self=$s2/arg1=$s0) across the whole function; every
+ * structural variant tried here (with or without an explicit `goto` to
+ * the shared store, with or without a named "base"/"p" pointer, folding
+ * the offset into "base" itself) gets GCC 2.6.3 -O2 to allocate the same
+ * value into a caller-saved temp ($a0/$a1) instead, 8 bytes short.
+ * Preserved verbatim below -- it is the closest candidate found (only
+ * this one register-class difference plus the two words it costs), not
+ * a working match. */
+void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
+{
+    u8 buf[3];
+    u8 *base;
+    u8 v;
+
+    func_8003DFBC()->slotE4(self, arg1);
+    base = buf;
+    if (self->unk3C != 0) {
+        base[0] = 0;
+        base[1] = 0;
+        base[2] = 0;
+        base += D_8008AA28;
+        v = 0x80;
+        goto store;
+    }
+    base[0] = arg1->b0;
+    base[1] = arg1->b1;
+    base[2] = arg1->b2;
+    if (D_8008AA2C < 0x80) {
+        base[0] = base[0] + 0x80;
+        goto skip;
+    }
+    base += D_8008AA28;
+    v = *base + 0x80;
+store:
+    *base = v;
+skip:
+    D_8008AA28++;
+    if (D_8008AA28 >= 3) {
+        D_8008AA28 = 0;
+    }
+    D_8008AA2C++;
+    if (D_8008AA2C >= 0x101) {
+        D_8008AA2C = 0;
+    }
+    self->unkB0->methods->slotB8(self->unkB0, buf);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DCD0);
 
 /* func_8004D678 is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
