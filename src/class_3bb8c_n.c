@@ -75,7 +75,54 @@ void func_80054714(void) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054758);
+extern s32 D_8008AC74;
+extern s32 D_8008AC6C;
+extern s8 D_800873DC[];
+extern s32 D_8008AC80;
+extern s8 D_800873D8[];
+extern s32 D_8008AC84;
+extern s32 D_800873C8[];
+extern s32 D_8008AC90;
+extern u8 D_8008726C[];
+extern u8 D_800872C4[];
+extern s32 D_8008AC8C;
+extern u8 D_80087234[];
+extern s32 D_8008AB50;
+
+void *func_80054758(void) {
+    s32 sum;
+    s32 kind;
+    s32 divisor;
+    s32 remainder;
+    s8 *result;
+    s32 b3;
+    s32 b2;
+    u8 *tab;
+
+    sum = D_8008AC74 + D_8008AC6C;
+    kind = D_800873DC[sum & 0xF];
+    D_8008AC80 = kind;
+    divisor = D_800873D8[kind];
+    remainder = sum % divisor;
+    D_8008AC84 = remainder;
+    result = (s8 *) D_800873C8[kind] + remainder * 4;
+    if (kind == 0) {
+        b3 = result[3];
+        D_8008AC90 = (s32) (D_800872C4 + b3 * 3);
+        b2 = result[2];
+        tab = D_8008726C;
+        if (b2 != 0x12) {
+            tab = D_80087234;
+        }
+        D_8008AC8C = (s32) tab;
+        if (remainder < 4) {
+            D_8008AB50 = 1;
+        } else if (remainder < 6) {
+            D_8008AB50 = 2;
+        }
+    }
+    return result;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
 
