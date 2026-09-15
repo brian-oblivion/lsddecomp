@@ -1470,6 +1470,13 @@ extern s32 D_8008A9B4;
 extern void *D_8008AA10;
 extern void *D_8008AA18;
 
+/* Same VALUE-of `%gp_rel` pattern, read (and its buffer formatted into via
+ * func_8004109C) by round 45's `func_8004D6AC` (src/class_3bb8c_c.c). Holds
+ * `D_8008AA1C` in the ROM image -- the "7654321" placeholder string
+ * (`asm/data/7B12C.sdata.s`) -- so, like `D_8008AA18` above, this is a
+ * writable-buffer placeholder rather than the real runtime value. */
+extern void *D_8008AA24;
+
 /* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DB18`
  * as `strcpy`'s SOURCE argument. Holds `0x80011474` in the ROM image
  * (immediately past `D_8008AA10`'s own "BISLPS-01556xxx" string, i.e. the
