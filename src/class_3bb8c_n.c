@@ -112,7 +112,44 @@ void func_80054CFC(void) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054D30);
+/* Local view only: `func_800557DC` (defined later in this unit, in strict
+ * ROM order) takes one of these two per-slot objects. `unk0` is address-
+ * taken then chased for a single byte at +0x6 (toggled there); `unk14` is
+ * only ever address-taken, as an embedded sub-object handed to
+ * `func_8002CC84`/`func_8002CD08` (same discard-return caveat as
+ * `include/Entity.h`'s `unk9C` -- a field only ever address-taken carries
+ * no evidence about its own declared type). */
+typedef struct ObjN14Sub ObjN14Sub;
+struct ObjN14Sub {
+    u8 pad0[0x6];
+    s8 unk6; /* +0x006 */
+};
+
+typedef struct ObjN14 ObjN14;
+struct ObjN14 {
+    ObjN14Sub *unk0; /* +0x000 */
+    u8 pad4[0x14 - 0x4];
+    s32 unk14; /* +0x014 */
+};
+
+extern s32 func_800557DC(ObjN14 *arg0);
+
+extern s32 D_8008AB4C;
+extern ObjN14 *D_8008AC9C[2];
+
+void func_80054D30(void) {
+    s32 i;
+
+    func_80054714();
+    func_80054B50();
+    func_80054CFC();
+    for (i = 0; i < 2; i++) {
+        D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+    }
+    if (D_8008AB4C != 0) {
+        D_8008AB4C = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054DA4);
 
