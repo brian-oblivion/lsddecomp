@@ -1652,7 +1652,10 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C02C);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C118);
+s32 func_8005C118(void)
+{
+	return D_80088BA4[D_8008ACC4][D_8008ACC8].extra;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", GetStaticSpawn);
 
