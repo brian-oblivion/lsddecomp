@@ -88,7 +88,7 @@ struct EntityMethods {
     /* +0x134 */ s32 (*slot134)(Entity *self, s32 arg1, s32 arg2); /* called by func_80063ED4 and func_80064078 (both Entity_f) in an identical loop, `this->unk88 = slot134(this, this->unk88, 0)` while `this->unk84++ < 0x18` -- value-returning, not void */
     /* +0x138 */ u8 pad138[0x144 - 0x138];
     /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by func_8005E02C, as slot144(this, this->unk94) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->unk94 in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
-    /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds func_8005D864 (still addiu_at-blocked in Entity.c) */
+    /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds func_8005D864 (this unit, MATCHED round 44) */
     /* +0x14C */ u8 pad14C[0x15C - 0x14C];
     /* +0x15C */ void (*slot15C)(Entity *self);            /* called by func_8005DBF0 */
     /* +0x160 */ void (*slot160)(Entity *self);             /* called by func_8005D418, func_8005D658, func_8005DD18 */
@@ -317,7 +317,9 @@ struct Entity {
     /* +0x94 */ Unk94Obj *unk94;         /* passed as func_8001EACC's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
     /* +0x9C */ s32 unk9C;             /* zeroed by Entity__Entity; address-taken by func_8005D6D4/func_8005DB8C */
-    /* +0xA0 */ u8 padA0[0xF0 - 0xA0];
+    /* +0xA0 */ u8 padA0[0xB0 - 0xA0];
+    /* +0xB0 */ s32 unkB0;             /* divisor in func_8005D864's (slot148) computation, this unit */
+    /* +0xB4 */ u8 padB4[0xF0 - 0xB4];
     /* +0xF0 */ s32 unkF0;             /* set to 1 by func_8005D9F4; gate flag for func_8005DBF0/func_8005DD18 */
     /* +0xF4 */ s32 unkF4;             /* set from func_8005DAAC's arg1 */
     /* +0xF8 */ s32 unkF8;             /* cleared by func_8005DB8C */
@@ -383,6 +385,7 @@ extern s8 D_80089EA6[];  /* GetUnlockEffect */
 extern s8 D_80089EA7[];  /* read by func_8005D314, own base symbol immediately after D_80089EA6, moodIndex*0x10-indexed like the rest of this family */
 extern s8 D_80089EAB[];  /* GetLinkStage */
 extern s8 D_80089EAC[];  /* GetEventVideo */
+extern s8 D_80089EAE[];  /* read by func_8005D864 (slot148), own base symbol immediately before D_80089EAF, moodIndex*0x10-indexed like the rest of this family */
 extern s8 D_80089EAF[];  /* read by func_8005D314, own base symbol immediately after D_80089EAC, moodIndex*0x10-indexed like the rest of this family */
 
 void *Entity__GetMoodEffect(Entity *this);

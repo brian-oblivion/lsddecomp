@@ -19,10 +19,10 @@
  * `--addiu-at`; docs/research/addiu-at-blocker.md) and screening for it now
  * INVENTS blockers, so the live screen is TWO greps -- `gp_rel` and
  * `nop_mflo_mfhi`. Current state:
- *   func_800544E4  gp_rel                -- still blocked
- *   func_80054558  gp_rel (+ addiu-$at)  -- still blocked, on gp_rel alone
+ *   func_800544E4  was gp_rel            -- MATCHED round 44, 29/29.
+ *   func_80054558  was gp_rel (+ addiu-$at) -- MATCHED round 44, 41/41.
  *   func_800545FC  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
- *   func_80054660  gp_rel                -- still blocked
+ *   func_80054660  was gp_rel            -- MATCHED round 44, 45/45.
  * The old profile said "all four have stub reports; do not attempt them",
  * which was true when written and became a false blocker on one of the four
  * the moment `addiu_at` was fixed. Screen with `python3 tools/nearmiss.py`
@@ -178,9 +178,62 @@ void *func_800544D4(void) {
     return &D_80087034;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800544E4);
+struct StyleM;
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054558);
+extern s32 D_8008AB4C;
+extern s32 D_8008AC6C;
+extern s32 D_8008AC70;
+extern s32 D_8008AC74;
+extern s32 D_8008AC78;
+extern s32 D_8008AC7C;
+extern s32 D_8008AC80;
+extern s32 D_8008ACA0;
+
+extern void *func_80054558(void);
+
+s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
+    s32 *p;
+    s32 i;
+
+    if (D_8008AB4C == 0) {
+        i = 1;
+        p = &D_8008ACA0;
+        D_8008AB4C = a0;
+        D_8008AC6C = a1;
+        D_8008AC7C = a2;
+        D_8008AC80 = -1;
+        D_8008AC74 = a3;
+        D_8008AC78 = arg4;
+        D_8008AC70 = 0;
+        do {
+            *p = 0;
+            i--;
+            p--;
+        } while (i >= 0);
+        return func_80054558();
+    }
+    return 0;
+}
+
+extern s32 D_80087424;
+extern s8 *D_800873EC[];
+extern s8 *func_80054758(void);
+extern void func_800545FC(struct StyleM *style, s8 *cfg);
+extern u8 D_800872C4[][3];
+extern const u8 *D_8008AB54;
+
+void *func_80054558(void) {
+    s8 *cfg = D_800873EC[D_8008AC6C];
+
+    if (cfg == 0) {
+        cfg = func_80054758();
+    }
+    func_800545FC((struct StyleM *) &D_80087424, cfg);
+    if (cfg[1] >= 4) {
+        D_8008AB54 = D_800872C4[cfg[2]];
+    }
+    return &D_80087424;
+}
 
 /* func_800545FC's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
  * are already established as unrelated object pointers by five other functions
@@ -214,4 +267,57 @@ void func_800545FC(struct StyleM *style, s8 *cfg) {
     style->unk14 = cfg[0];
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054660);
+/* Local view only -- func_800404D0 is already declared elsewhere
+ * (include/code_2cc8c.h) returning `ClassEAC0Obj *`, a header this unit
+ * does not own. This unit only ever reaches slots 0x4C/0x64/0x68 on the
+ * returned object, so it gets its own minimal local type rather than
+ * pulling in that header (multiple-independent-local-views convention). */
+typedef struct LocalM4D0Obj LocalM4D0Obj;
+typedef struct LocalM4D0Methods LocalM4D0Methods;
+struct LocalM4D0Methods {
+    u8 pad00[0x4C];
+    void (*slot4C)(LocalM4D0Obj *self, s32 arg1, void *arg2); /* +0x04C */
+    u8 pad50[0x64 - 0x50];
+    void (*slot64)(LocalM4D0Obj *self, s32 arg1);              /* +0x064 */
+    void (*slot68)(LocalM4D0Obj *self, s32 arg1);              /* +0x068 */
+};
+struct LocalM4D0Obj {
+    LocalM4D0Methods *methods;
+};
+
+/* D_8008AC7C's own local reading here: only its +0xC field (a "self"
+ * pointer into a THIRD object, dispatched only through +0xAC) is ever
+ * touched by this function. */
+typedef struct LocalSubObj LocalSubObj;
+typedef struct LocalSubMethods LocalSubMethods;
+struct LocalSubMethods {
+    u8 pad00[0xAC];
+    s32 (*slotAC)(LocalSubObj *self);                          /* +0x0AC */
+};
+struct LocalSubObj {
+    LocalSubMethods *methods;
+};
+typedef struct FieldAC7CHolder {
+    u8 pad0[0xC];
+    LocalSubObj *unkC;
+} FieldAC7CHolder;
+
+extern s32 D_8008AC94;
+extern s32 D_8008AB60;
+extern s32 D_8008AB58;
+extern LocalM4D0Obj *func_800404D0(void *a0, void *a1, s32 a2);
+
+void func_80054660(void) {
+    s32 tmp;
+
+    if (D_8008AB54 != 0) {
+        D_8008AC94 = (s32) func_800404D0(&D_8008AB60, (void *) D_8008AB54, 0);
+        ((LocalM4D0Obj *) D_8008AC94)->methods->slot64((LocalM4D0Obj *) D_8008AC94, 1);
+        ((LocalM4D0Obj *) D_8008AC94)->methods->slot68((LocalM4D0Obj *) D_8008AC94, 0);
+
+        tmp = ((FieldAC7CHolder *) D_8008AC7C)->unkC->methods->slotAC(
+                ((FieldAC7CHolder *) D_8008AC7C)->unkC);
+
+        ((LocalM4D0Obj *) D_8008AC94)->methods->slot4C((LocalM4D0Obj *) D_8008AC94, tmp, &D_8008AB58);
+    }
+}
