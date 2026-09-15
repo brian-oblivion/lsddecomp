@@ -1674,7 +1674,92 @@ three instances across two units. It is recorded here as an OPEN observation,
 not a promoted class: nobody has yet found its discriminating test, and the
 lesson directly above says that is what would settle it.
 
-### A `for`-loop keeps a status value register-resident where `goto`/labels folds it away (round 20)
+### The SDK-exit census, re-run over this document (round 45) -- and the one case where an SDK exit does NOT void the precedent
+
+Round 43 ran Gate 1b's seventh screen over the shared docs for the first time
+and withdrew one named learning. Round 45 re-ran it and found **four more
+affected entries in this file, two of them named levers in the repertoire**.
+They are corrected in place below; this entry records the METHOD and the one
+refinement, because the class regenerates every time a batch of functions is
+reclassified.
+
+**The census, 2026-09-15.** 1089 functions have a match report and are no
+longer a live `INCLUDE_ASM`. Splitting them by round 38's three exits:
+
+```sh
+grep -hoP '^INCLUDE_ASM\("[^"]*", \K[^,)]*' src/*.c | sort -u > /tmp/live.txt
+ls docs/match-reports/ | sed 's/\.md$//' | sort -u > /tmp/reported.txt
+comm -13 /tmp/live.txt /tmp/reported.txt > /tmp/closed.txt
+while read f; do grep -qE "(^|[ *])${f}\(" src/*.c && continue
+    grep -q "\b$f\b" build/lsdde.map && echo "RENAMED $f" || echo "SDK $f"
+done < /tmp/closed.txt
+```
+
+**Do not stop at that split — resolve each SDK hit to its OWNING OBJECT by
+ADDRESS**, which the name-based check cannot do and which is what makes a
+correction citable:
+
+```sh
+# .text <addr> <size> build/lib/<lib>/<module>.o  -> bisect func_XXXXXXXX's vram into it
+```
+
+85 SDK exits, every one resolved: **libsnd 40, libcd 29, libgs 9, libc2 5,
+libgte 2.** That concentration is itself worth knowing — `libsnd` and `libcd`
+between them own 69 of 85, so a learning drawn from the sound driver or the CD
+code is the one most likely to be citing Sony.
+
+**THE REFINEMENT, and it is the reason to resolve by address rather than
+trusting the rule: round 38's "no source shape ever reached those bytes" is
+true for 84 of the 85, and measurably FALSE for one.** `func_8003FC70`
+(`libgs/gs_108.o`) was matched **byte-exact as C** in round 20 and only
+converted to a linked object in round 34. So for that one function the
+whole-image oracle really did go green on real bytes, and the learning it
+carries — the duplicated-rodata-string signature, in CLAUDE.md — stands on
+that evidence rather than in spite of it.
+
+So the disposition is three-way, not two-way, and the third case is rare
+enough to be worth naming rather than screening for:
+
+| what the SDK exit's report says | what a citation of it is worth |
+| --- | --- |
+| never matched (84 of 85) | **voided**, per round 38 — and doubly so for any "retail does X, our compiler does Y" claim, since those bytes came from Sony's ASPSX build and not our pinned pipeline |
+| matched byte-exact, then converted (1 of 85) | **stands** — the oracle went green with real bytes; provenance is irrelevant to a mechanism the build system exhibits on its own |
+| a mechanism confirmed by a standalone reproducer through the pinned pipeline | **stands regardless of the instance** — the reproducer does not care who wrote retail (round 43) |
+
+**What round 45's pass actually cost the repertoire.** Two of the three
+round-27 levers turned out to have zero game-code positives, and the round-20
+`for`-loop idiom turned out to have zero game-code instances at all. None of
+those was a weak entry: each was written up carefully, each carried measured
+score deltas, and one was promoted specifically BECAUSE it transferred cleanly
+to a sibling — a sibling in the same Sony object. **A clean transfer between
+two functions is not evidence they are game code, and "it transferred" is
+exactly the observation that makes a reader stop checking.**
+
+### A `for`-loop keeps a status value register-resident where `goto`/labels folds it away (round 20) -- INSTANCE-LEVEL VERDICT WITHDRAWN (round 45)
+
+> **ROUND 45 CORRECTION -- READ BEFORE APPLYING THIS.** Both functions this
+> idiom was found and "confirmed" on are **Sony's**: `func_80028DF0` and
+> `func_80028F38` are `lib/libcd/sys.o`, reclassified in round 34. So is
+> `func_80029074`, cited two entries below. **This idiom has ZERO game-code
+> instances**, and the "clean transfer" that promoted it from a one-function
+> accident to a named idiom was a transfer between two modules of one Sony
+> object.
+>
+> Two independent reasons the evidence does not carry, per round 43's rule:
+> no source shape ever reached those bytes, so the derivation was never
+> validated against anything; and the claim is of the form *"retail keeps the
+> value register-resident and our compiler does not"*, which here compares
+> GCC 2.6.3 against **Sony's own ASPSX build** rather than against our pinned
+> pipeline. A negative rules out nothing and a positive proves nothing.
+>
+> **What survives:** "try the other loop spelling before concluding a residue
+> is allocation" is a cheap thing to try and costs one iteration, so it stays
+> in the repertoire below -- as an UNTESTED suggestion, not a confirmed idiom.
+> **What is withdrawn:** the claim that GCC 2.6.3 behaves this way, the two
+> score deltas, and the "confirmed by clean transfer" promotion. The first
+> game-code instance is still unmeasured. This is the same class round 43
+> withdrew the "DCE-eliminated always-true check" for, and it was found the
+> same way -- by re-running the SDK-exit census over this document.
 
 **Spelling a retry loop as a genuine `for` loop rather than `goto`/labels
 changes whether GCC 2.6.3 keeps a loop-carried status value in a register.**
@@ -1703,7 +1788,11 @@ misleads, and they need different defences. Both were caught by runners who
 verified against the real oracle rather than the permuter's own scorer.
 
 **1. An isolated-scorer improvement that REGRESSES the real build.** bravo, on
-`func_80029074`: a candidate scored 835 against a base of 1170 — a large
+`func_80029074` (**Sony's `lib/libcd/sys.o`, reclassified round 34** -- the
+caution stands, since it is a claim about the PERMUTER's scorer and not about
+retail's provenance, but a search against bytes no source shape can reach was
+guaranteed to produce exactly this, so treat the instance as an illustration
+rather than as a measurement): a candidate scored 835 against a base of 1170 — a large
 apparent gain — and verified *worse* against the real build, at 2/85 words with
 the length grown from 85 to 89. bravo caught two more of these in the same
 pass. The permuter scores in isolation and cannot see what the linked image
@@ -1711,7 +1800,9 @@ does; a score improvement is a hypothesis, and the real oracle is the only
 test.
 
 **2. A candidate that is SEMANTICALLY WRONG yet scores almost perfectly.**
-delta, on `func_8003F848`: 176/177 words, and incorrect C — it hoisted a call
+delta, on `func_8003F848` (**Sony's `lib/libgs/gs_133.o`** -- but the MECHANISM
+here is a fact about MIPS encoding, not about whose assembler wrote retail, and
+it holds independently): 176/177 words, and incorrect C — it hoisted a call
 out of a loop. See that entry above for the mechanism; the short version is
 that moving code across an un-unrolled loop's back-edge changes only the branch
 target immediate, a one-word effect.
@@ -1729,7 +1820,11 @@ bravo's load-bearing proposed learning, and it is the practical form of the
 "re-check cheap levers after a structural fix" entry above. After closing one
 defect, **test whether the adjacent residue moves under the same structural
 lever before assuming it needs its own fix.** On `func_80028F38` the sibling's
-entire fix transferred with no tuning at all.
+entire fix transferred with no tuning at all -- though see the round-45
+correction above: `func_80028DF0` and `func_80028F38` are two modules of one
+Sony object (`lib/libcd/sys.o`), so this is a transfer WITHIN Sony's code and
+is not evidence about game code. The counterweight below, echo's Entity pair,
+IS game code and is the half of this entry that carries weight.
 
 The counterweight, so this does not become over-applied: echo established the
 opposite result on the Entity tail-merge pair, where two residues under one
@@ -4556,7 +4651,43 @@ finding, seen in two runners independently.**
 > saved-register list against retail's) is a mechanical test that survives
 > independently of the instance it was found on -- use the test, not the claim.
 
-**Read this before applying any lever from round 27.** The round produced three
+**Read this before applying any lever from round 27.**
+
+> **ROUND 45 CORRECTION: TWO OF THE THREE POSITIVES IN THE TABLE BELOW WERE
+> NEVER GAME CODE, SO TWO OF THE THREE LEVERS HAVE ZERO GAME-CODE POSITIVES.**
+>
+> - **Address-taken parameter.** Its only positive, `func_80050B28`, is Psy-Q
+>   **libcard** -- marked `NOT GAME CODE` in its own report since round 39,
+>   proved by segment topology and the `addiu`/`ori` assembler fingerprint.
+>   Its four negatives are all genuine game code. So the row reads **0 for 4**,
+>   not 1 for 5.
+> - **Invert the guard.** Its only positive, `func_80050AA4`, is
+>   `lib/libc2/todigit.o`, reclassified round 34. Its negative,
+>   `func_8004EF6C`, is game code. So this row reads **0 for 1**.
+> - **Inline every call site** is INTACT: `func_800513D0` and `func_8004F8A4`
+>   are both game code, and the row stands exactly as written.
+>
+> Why an SDK positive is worth less than nothing here rather than merely
+> unproven: those bytes came out of **Sony's ASPSX build**, not our pinned
+> pipeline, so "reshaping the C made our output match retail" was never a
+> statement about GCC 2.6.3 -- and no source shape could ever have reached
+> them anyway. A lever whose every positive is Sony's has not been shown to
+> work on this project at all.
+>
+> **What this does NOT do is retire the levers.** The discriminators stated
+> below the table are mechanical tests (diff your prologue's saved-register
+> list against retail's; check the arms are actually swapped before inverting
+> polarity) and a mechanical test survives the instance it was found on --
+> that is this document's own rule, stated two paragraphs above the table.
+> Use the tests. Do not cite the positives.
+>
+> And note what the correction does to the round-27 lesson itself. The lesson
+> was *"each of these closed a real function and then made a different one
+> worse, so none is a rule"*. The truer version is sharper: **two of them never
+> closed a game function in the first place**, and their apparent successes
+> were measured against an assembler we do not run.
+
+The round produced three
 source levers, each of which closed or advanced a real function, and each of
 which was then measured to make a *different* function WORSE. None is a rule;
 all three are hypotheses to test per function. This is the same shape as round

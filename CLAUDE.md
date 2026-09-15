@@ -570,7 +570,19 @@ follow, and both are worth having.
   differing byte lands in rodata, thousands of bytes AHEAD of the code you
   edited. Round 20 closed `func_8003FC70` (35/35) on this after round 14 had
   measured 339541 bytes off and attributed it to a rodata alignment
-  constraint that does not exist. Before writing any string literal, grep
+  constraint that does not exist.
+
+  **That worked example is a function round 34 reclassified as Sony's
+  `libgs/gs_108.o` — and it is the ONE citation in this corpus where that
+  does not invalidate anything.** Round 38's rule is that an SDK exit voids a
+  precedent because no source shape ever reached those bytes. Measured round
+  45 across all 85 SDK-exit functions that have reports: 84 of them never
+  matched, and `func_8003FC70` is the single one that DID reach byte-exact as
+  C before it was converted. So the whole-image oracle went green on this
+  mechanism, with real bytes, and the finding stands on that rather than on
+  who wrote retail. Cite it knowing which half is load-bearing: the
+  **mechanism** (splat already emitted those bytes; a literal emits a second
+  copy) is a fact about this build system, checkable without retail at all. Before writing any string literal, grep
   `asm/data/*.rodata.s` for the symbol; if it is there,
   `extern const char D_XXXXXXXX[];` is the only correct spelling. Details in
   `docs/DECOMPILATION_LEARNINGS.md`.
