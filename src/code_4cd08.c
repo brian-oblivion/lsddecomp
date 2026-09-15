@@ -40,7 +40,34 @@ void func_8005C5E8(void)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C650);
+extern void *New_Entity(void *arg0, void *arg1, void *arg2);
+extern s32 D_8008ABF8;
+extern s32 D_8008ABFC;
+extern s32 D_8008AC00;
+extern s32 D_8008AC04;
+extern s32 D_8008AC08;
+
+void SetTeleportsEnabled(s32 triggerType);
+
+void func_8005C650(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+{
+    DreamAuxSlot *slot = D_80088D28;
+    u32 i;
+
+    D_8008ABF8 = a0;
+    D_8008ABFC = a1;
+    D_8008AC00 = a2;
+    D_8008AC04 = a3;
+    D_8008AC08 = a4;
+
+    for (i = 0; i < 1; i++) {
+        s32 buf[4];
+        buf[3] = (s32)slot->obj;
+        slot->entity = New_Entity((void *)(i + 0x62), buf, (void *)D_8008AC04);
+        slot++;
+    }
+    SetTeleportsEnabled(a0);
+}
 
 extern void func_8005BF68(bool value);
 

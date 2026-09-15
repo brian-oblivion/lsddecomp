@@ -21,13 +21,14 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
 
 /* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
  * (ticked once per call by calling obj->vtable[1](obj) and storing the
- * result back into the same slot) plus 0x10 bytes not yet accessed by any
- * function in this unit. Stride is 0x14 (confirmed: func_8005C650, off-limits
- * here per the gp-relative blocker, walks D_80088D28 with the same stride
- * and also writes a second field at +0x4 with a `New_Entity` result). */
+ * result back into the same slot) plus a second field at +0x4 that
+ * func_8005C650 (MATCHED round 43) sets to the result of a `New_Entity`
+ * call, and 0xC bytes past that not yet accessed by any function in this
+ * unit. Stride is 0x14, confirmed by func_8005C650's walk over D_80088D28. */
 typedef struct DreamAuxSlot {
     void *obj;
-    u8 unk4[0x10];
+    void *entity;
+    u8 unkC[0xC];
 } DreamAuxSlot;
 
 extern DreamAuxSlot D_80088D28[14];
