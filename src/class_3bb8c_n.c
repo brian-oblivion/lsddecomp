@@ -49,7 +49,31 @@
 
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054714);
+/* Local view only, not the shared header: `D_8008AC94` is already established
+ * as a `LocalM4D0Obj *` in `src/class_3bb8c_m.c` (round 15, own local type),
+ * with named slots at +0x04C/+0x064/+0x068.  This function dispatches +0x004
+ * instead, a slot that unit never names -- kept as its own minimal local
+ * view rather than importing that unit's type (multiple-independent-local-
+ * views convention; class_3bb8c_m.c is not this unit's to edit). */
+typedef struct ObjAB54 ObjAB54;
+typedef struct ObjAB54Methods ObjAB54Methods;
+struct ObjAB54Methods {
+    u8 pad0[0x4];
+    void (*slot4)(ObjAB54 *self); /* +0x004 */
+};
+struct ObjAB54 {
+    ObjAB54Methods *methods; /* +0x000 */
+};
+
+extern const u8 *D_8008AB54;
+extern s32 D_8008AC94;
+
+void func_80054714(void) {
+    if (D_8008AB54 != 0) {
+        ((ObjAB54 *) D_8008AC94)->methods->slot4((ObjAB54 *) D_8008AC94);
+        D_8008AB54 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054758);
 
