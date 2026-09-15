@@ -4838,6 +4838,65 @@ shared call chain, unit and size. It has no parameter, so the mechanism cannot
 arise, and its delay-slot `nop` says so one grep away. Sharing a chain, a unit
 or a carve predicts nothing about sharing a residue.
 
+> **ROUND 46 CORRECTION: SECTIONS 2 AND 3 BELOW REST ENTIRELY ON SDK-EXIT
+> INSTANCES, AND ROUND 45'S SWEEP DID NOT REACH THEM.** Round 45 corrected the
+> lever TABLE above and stopped at the table. Everything from here to the end
+> of section 3 is measured on `func_80050AA4` (`lib/libc2/todigit.o`,
+> reclassified round 34) and `func_80050A84` (`atol`, same library) -- both
+> Sony's, neither ever game code. That is the round-43 finding arriving one
+> subsection later than anyone swept: **the family is the unit of staleness,
+> and a correction box is not a fence.**
+>
+> Rather than annotate and move on, the head put both claims through the
+> pinned pipeline on **game-neutral code that mentions retail nowhere**. That
+> is the test round 43 prescribes -- a mechanism verified by reproducer
+> survives an SDK exit, because the reproducer does not care who wrote
+> retail's bytes; an instance-level verdict does not. Results, one row per
+> claim:
+>
+> | claim | verdict |
+> | --- | --- |
+> | guard polarity flips WHICH ARM FALLS THROUGH (section 2's headline) | **CONFIRMED** |
+> | the flip also costs/saves a word, so a 1-word-short two-armed function should be tested for arm polarity FIRST (section 2's corollary) | **WITHDRAWN** |
+> | a bare `nop` in a call's delay slot means the callee took no argument (section 3's headline) | **FALSE AS STATED** |
+> | ...unless the argument was already live in `$a0` (section 3's caveat) | **CONFIRMED, and it is the whole rule** |
+>
+> **Section 2's headline holds.** Two forms of the same two-armed function,
+> differing only in guard polarity, put opposite arms in the fallthrough
+> position: the constant-return arm falls through when the guard tests the
+> expensive condition, and the call path falls through when the guard is
+> inverted to an early return of the constant. Use it.
+>
+> **Section 2's COROLLARY does not, and it is the half most likely to be acted
+> on.** Both forms came out at **15 words**. The layout flip is length-neutral
+> here, so "the missing word may be a delay-slot `nop` only the correct layout
+> leaves empty" does not follow from the flip -- it was a fact about that one
+> libc2 function's surroundings. Inverting a guard to chase a one-word length
+> gap is not supported; invert it when your ARMS are demonstrably swapped,
+> which is what the section title already says.
+>
+> **Section 3's headline is false without its caveat, and the caveat is not a
+> footnote to it -- it is the rule.** Three calls through the pinned pipeline:
+> an argument the callee does not already hold puts the setup in the delay
+> slot (`move a0,a1`); an argument **already live in `$a0`** emits a bare
+> `nop`; a genuinely argument-less call emits a bare `nop`. The last two are
+> **byte-identical**, so a bare `nop` does not distinguish them and cannot on
+> its own establish arity. Always check whether `$a0` already holds the value
+> first. Section 3 states this as a caveat "hit immediately afterwards"; it is
+> the discriminator, and without it the lever mis-types functions in exactly
+> the way its own last sentence warns.
+>
+> Reproducers are three and six lines; re-run them rather than trusting this
+> box. **And note the recipe in CLAUDE.md's "Escalate, do not experiment" does
+> not work as written in this environment's shell:** it word-splits
+> `$(sed -n 's/^MASPSX_FLAGS...' Makefile)` into maspsx's argv, which `sh` and
+> `bash` do and **zsh does not** -- under zsh the whole flag list arrives as
+> one argument and maspsx dies parsing `--aspsx-version=2.34 --dont-force-G0
+> ...` as a version number. The failure is loud, so it costs a minute rather
+> than a wrong result; run the recipe under `bash -c`, and keep reading the
+> flags from the Makefile rather than retyping them (round 43).
+
+
 #### 2. When your arms come out swapped, invert the GUARD, not the structure
 
 This sharpens the existing "a two-armed `if`/`else`'s LAYOUT and its
