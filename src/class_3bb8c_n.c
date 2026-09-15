@@ -102,7 +102,15 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B84);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054C74);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054CFC);
+extern s32 D_8008AC80;
+extern s32 D_8008AC88;
+extern void *D_8008E0C8[];
+
+void func_80054CFC(void) {
+    if (D_8008AC80 >= 0) {
+        func_800183DC(D_8008E0C8, D_8008AC88);
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054D30);
 
