@@ -1602,21 +1602,35 @@ segments:
       # switch jump table.
       - [0x44518, c, class_3bb8c_m]
       # class_3bb8c_n: functions 0..22 of the old 113-function remainder,
-      # 0x44F14..0x46288.  UNCARVED and left that way deliberately: this is
-      # the gp_rel-densest ground in the executable.
+      # 0x44F14..0x46288 (23 functions, 1245 words).  CARVED round 45
+      # (2026-09-15) and BANKED -- see the DELIBERATELY UNWORKED note in
+      # src/class_3bb8c_n.c.
       #
-      # RE-CENSUSED round 26 (2026-09-09), four screens per function,
-      # canonical shell forms, over the live segment: **3 of 23 clean**, not
-      # the TWO this comment previously asserted.  The three are
-      # func_80054B1C (13w), func_80055258 (110w) and func_80055874 (31w);
-      # the other 20 are all gp_rel, with zero forward nop_mflo_mfhi, zero
-      # `jr $t2` trampolines, zero `alabel` and zero multi-prologue
-      # functions in the whole segment.  The correction does not change the
-      # disposition -- 3 of 23 still cannot staff a runner -- but the figure
-      # is what a future head ranks carves from, so it is corrected rather
-      # than left contradicted.  Not worth a runner until the gp-relative
-      # blocker moves.
-      - [0x44F14, asm, class_3bb8c_n]
+      # WHAT WAS STALE HERE, and it was a DIRECTIVE rather than a figure:
+      # this comment said "the gp_rel-densest ground in the executable",
+      # "3 of 23 clean" and "Not worth a runner until the gp-relative
+      # blocker moves."  The blocker MOVED in round 42 -- maspsx
+      # `--gp-symbols`, pinned in the Makefile -- and `tools/uncarved.py`
+      # now measures **23 of 23 blocker-clean**.  The condition that
+      # directive named is satisfied, so the directive is RETRACTED.  Its
+      # round-26 census was honest and careful and is simply about a world
+      # that no longer exists; that is why it was carved rather than left
+      # to be re-read as live guidance by a fourth head.
+      #
+      # Census at carve time, four screens per function over the live
+      # segment: 23 of 23 CLEAN -- zero gp_rel-as-a-blocker, zero forward
+      # nop_mflo_mfhi, zero `jr $t2` trampolines, zero `jtbl_` references,
+      # zero `alabel`, zero non-`.L` alt-entry labels, zero `.word .L`, and
+      # no function with more than one `addiu $sp, $sp, -N` prologue.  So
+      # NO rodata attach.  Its `%hi` references are all named dlabels in
+      # the D_80087xxx class-table region, which standalone data segments
+      # resolve.  Tail boundary: func_80055A24 closes on its own epilogue
+      # and `endlabel` at 0x46284, immediately before class_3bb8c_r.
+      #
+      # Sizes run 13w..111w with no trivial leaves -- every one is a real
+      # body.  Expect this slice to span more than one class; identify each
+      # with `tools/classtable.py` rather than assuming the unit has one.
+      - [0x44F14, c, class_3bb8c_n]
       # class_3bb8c_r: functions 23..43 of that remainder, 0x46288..0x46D20
       # (21 functions).  Carved MID-round 17 to re-staff a runner whose own
       # unit was exhausted.  Census 2026-09-04, three-grep screen per
