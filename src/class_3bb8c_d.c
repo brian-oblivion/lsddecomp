@@ -149,7 +149,25 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DCD0);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DE08);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DF64);
+/* This unit's own local view of func_8003B39C (already matched elsewhere,
+ * many independent-arity views project-wide -- see e.g.
+ * src/class_3bb8c_g.c, src/class_3bb8c_i.c). Return type matches what
+ * this call site actually stores it into (`self->unkA8`). */
+extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
+
+void func_8004DF64(Class86B60 *self)
+{
+    if (self->unkAC == NULL) {
+        self->unkA8 = func_8003B39C(D_800114F8);
+        self->unkAC = func_8004E2E0((void *)1, NULL);
+    }
+    self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
+                                  self->unkC->unk4, self->unk10, self->unk14,
+                                  self->unk48);
+    self->methods->slot10(self, self->unkAC);
+    self->methods->slot14(self, self->unkC->unk4);
+    self->methods->slot14(self, self->unk10);
+}
 
 void func_8004E054(Class86B60 *self)
 {

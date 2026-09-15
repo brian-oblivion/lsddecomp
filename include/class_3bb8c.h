@@ -1086,7 +1086,14 @@ typedef struct Class86B60UnkACObj_3bb8c_d Class86B60UnkACObj_3bb8c_d;
 struct Class86B60UnkACObjMethods_3bb8c_d {
     u8 pad000[0x004];
     void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, func_8004D704 */
-    u8 pad008[0x070 - 0x008];
+    u8 pad008[0x06C - 0x008];
+    /* +0x06C, func_8004DF64's own call: `(self, D_8008A9D0, &D_80086D6C,
+     * self->unkC->unk4, self->unk10, self->unk14, self->unk48)` -- 7
+     * arguments, the last three on the stack. Every pointer beyond `self`
+     * is forwarded opaquely (never dereferenced by this slot's own
+     * caller), so all stay `void *`/`s32 *` placeholders. */
+    void (*slot6C)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, s32 *arg2,
+                   void *arg3, void *arg4, void *arg5, void *arg6); /* +0x06C */
     void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, func_8004E054 */
     /* +0x074, func_8004E1C4's own 2nd call: `(self, D_8008AA10, D_8008AA18,
      * self->unkBC, self->unkC0)` -- the two middle arguments are the
@@ -1182,7 +1189,8 @@ struct Class86B60 {
     u8 pad004[0x00C - 0x004];
     Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, func_8004D898/func_8004E054 */
     void *unk10;                     /* +0x010, func_8004E054: opaque, forwarded verbatim */
-    u8 pad014[0x02C - 0x014];
+    void *unk14;                     /* +0x014, func_8004DF64: opaque, forwarded verbatim to unkAC->methods->slot6C */
+    u8 pad018[0x02C - 0x018];
     s32 unk2C;                      /* +0x02C, func_8004D814: set to 0x190 */
     u8 pad030[0x034 - 0x030];
     s32 unk34;                      /* +0x034, func_8004D814: zeroed */
@@ -1385,6 +1393,12 @@ extern s32 D_800114DC;
  * address is taken here. */
 extern s32 D_800114E8;
 
+/* func_8004DF64's own path string, passed to func_8003B39C -- a real
+ * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
+ * ONLY correct spelling (CLAUDE.md: never re-write a string splat has
+ * already emitted as a symbol). */
+extern const char D_800114F8[];
+
 /* Address-of only in this unit -- func_8004D898 walks it with an
  * explicit 0xC-byte stride, passing each entry's address on to
  * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
@@ -1420,6 +1434,20 @@ extern void *D_8008AA18;
  * placeholder for the same reason `D_8008AA18` is, since a font-glyph
  * table is not plausible `strcpy` input. */
 extern void *D_8008AA14;
+
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DF64`
+ * as `Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg1`. Holds
+ * `0x80011454` in the ROM image -- the "BISLPS-01556" string in
+ * `D_80011434`, again with no `dlabel` of its own. */
+extern void *D_8008A9D0;
+
+/* Address-of only, round 43's `func_8004DF64`
+ * (`Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg2`) -- a real
+ * 16-entry pointer table (`asm/data/76DC8.data.s`, `D_8008AA0C` down to
+ * `D_8008A9D4` then a NULL terminator), reached only by its own address
+ * here, never walked. Placeholder `s32` type since only the address is
+ * taken. */
+extern s32 D_80086D6C;
 
 /* func_8004E34C's own one-shot init guard: read, then unconditionally
  * incremented, before its own body's InitCARD/StartCARD/_bu_init calls
