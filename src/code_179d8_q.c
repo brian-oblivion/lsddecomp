@@ -186,7 +186,22 @@ s32 func_800280EC(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800281B0);
+extern s32 D_8008A89C;
+
+void func_800281B0(void)
+{
+    func_800280D0();
+
+    if (D_8008A89C == 0) {
+        if (D_8008A8A4 != 0) {
+            VSyncCallback((void (*)(void))func_800280EC);
+        }
+        D_8008A89C = 1;
+    }
+
+    D_8008A890 = 1;
+    func_800280E0();
+}
 
 extern s32 D_8008A898;
 extern s32 D_8008A89C;
