@@ -1,5 +1,78 @@
 # func_8003DAD4 -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
 
+## ROUND 46 (runner delta): FIRST PERMUTER SEARCH on this function -- 130 base score, ~68,672 iterations under a 600s bound, no zero, verdict unchanged
+
+This function had never been permuter-searched despite 27 rounds of hand
+attempts (per this round's own assignment brief, which flagged it as the
+best-posed never-searched target in the whole brief). Ran all three
+mandated checks before spending the search:
+
+1. **Correctness:** the preserved body below (byte-identical to the copy
+   already on file) was spliced into `src/code_2cc8c_b.c` in place of the
+   `INCLUDE_ASM` and rebuilt through the full oracle in isolation (every
+   other INCLUDE_ASM in all four of this runner's units confirmed still
+   wrapped first). Reproduces **exactly 114/118, zero outside-range
+   drift** -- matches this report's own inherited figure precisely, so
+   the body is not stale and links cleanly.
+2. **Cost (`--debug --stack-diffs`):** base score **130** = 0 stack
+   differences, 0 branch differences, 2 register differences (5 each),
+   2 reorderings (60 each), 0 insertions, 0 deletions. This is NOT the
+   0/0-insertion/deletion signature that round 45's `func_8002CD08`
+   correctly flagged as outside a source-mutation search's reach --
+   there ARE two real reorderings in the score, meaning at least part of
+   the residue (residue A, the `i = 0` delay-slot placement this report
+   already names) is in principle addressable by a source-level
+   mutation, even though 27 rounds of hand attempts have not found the
+   mutation. The two register differences correspond to residue B
+   (the `target->unk14` temp landing in `$v0` vs retail's `$a1`), which
+   this report's own catalogue already treats as a hard register-identity
+   stall.
+3. **Base-score agreement with the real build:** the scaffold's 130 score
+   decomposes exactly into this report's own two named residues (A: one
+   moved `addu $s1,$zero,$zero`; B: one register-choice pair) with no
+   extra insertion/deletion noise, i.e. the isolated scaffold is scoring
+   the SAME thing the in-tree build measures as 114/118. No disagreement
+   -- proceeded to search.
+
+**Search:** `-j 6 --stack-diffs --stop-on-zero --best-only`, bounded with
+`timeout 600`. Ran the full 600-second wall-clock bound (the process
+ended via the timeout, not `--stop-on-zero`) for **~68,672 iterations**.
+**No candidate ever beat the 130 base score** -- the log shows the
+search repeatedly rediscovering 130 itself (i.e. semantically-equivalent
+rewrites of the baseline) alongside a wide scatter of worse scores, never
+anything lower.
+
+**Phrased precisely per this round's search-hygiene rule: not closed in
+~68,672 iterations under load (600s bound), NOT permuter-exhausted** --
+one bounded run at `-j 6` is not an exhaustive search of the space, only
+a negative data point. Given residue A has already resisted 27 rounds of
+targeted hand mutation (documented in the "Ten variants, all inert or
+worse" table above) AND a broad unguided ~68k-iteration randomized
+search, and residue B is a register-identity mismatch outside any
+C-source lever's reach by CLAUDE.md's own test, a further unguided
+search is unlikely to add information without a `PERM_LINESWAP`- or
+`PERM_VAR`-guided macro specifically targeting the `i = 0` hoist
+placement -- flagging that as the concrete next lever rather than a
+repeat of this round's unguided run.
+
+Restored to `INCLUDE_ASM` (the preserved body below, unchanged); full
+oracle re-confirmed green (`build exit=0`, `OK: build matches retail`)
+before moving on.
+
+### Proposed learning (round 46)
+
+**A base score with nonzero reorderings but zero insertions/deletions is
+a different animal from round 45's `func_8002CD08` (0/0, pure register
+identity, correctly unsearchable) even though both eventually resist a
+search** -- the PRESENCE of addressable reordering penalty in the base
+score is what justifies spending the search budget at all (check 2 is
+about whether there is anything for a source mutation to reach, not
+merely whether the search succeeds). This function is the useful negative
+case: check 2 said "worth searching," the search ran a real 68k
+iterations, and it still came back empty -- which is meaningfully
+different evidence than a search that was never justified in the first
+place.
+
 ## ROUND 39 (head): baseline re-verified from scratch, ten source-shape variants, all negative -- but the round-38 hoist lever is CONFIRMED REQUIRED here, and the barrier is a LENGTH lever, not a scheduling one
 
 The preserved body below was spliced fresh against `main` at dc88d61 and

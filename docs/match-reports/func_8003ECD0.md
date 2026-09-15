@@ -1,5 +1,50 @@
 # func_8003ECD0 -- STALL: length EXACT (73/73 words, no drift); 71/73 raw word-match; first real diff at vram 0x8003ED18 (the `addu`/`addiu` pairing). ATTEMPT 6'S VERDICT IS CORRECTED BELOW.
 
+## ROUND 46 (runner delta): drift-checked fresh, no new lever -- DELIBERATE SKIP, plus a self-caught cross-contamination scare worth recording
+
+Re-spliced the round-36 body (with `GsClearOt`) into `src/code_2cc8c_d.c`
+and rebuilt. **First attempt showed a spurious `WARNING: differs OUTSIDE
+this range too (22 bytes)`** that had nothing to do with this function --
+`cmp -l build/SLPS_015.56 disk/SLPS_015.56` plus
+`vram = (N-1) - 0x800 + 0x80010000` pointed at `0x8003e4bc`, which is
+`func_8003E4B8` (a DIFFERENT function in a DIFFERENT unit,
+`code_2cc8c_c`) -- I had left that function's own stall body live from an
+earlier hand-lever test in this same round instead of restoring its
+`INCLUDE_ASM` before moving on. Restored it (`grep -c '^INCLUDE_ASM'`
+checked across all four of this runner's units to confirm exactly one
+function live at a time) and rebuilt again: **71/73, zero outside-range
+drift** -- the figure this report already documents, honest and
+reproducible in isolation.
+
+Posted this as a general caution to the round's broadcast channel: with
+four units live in one worktree, a drift warning on the function you're
+CURRENTLY testing can come from a sibling you forgot to revert two
+functions ago, and `build/lsdde.map` will point straight at the real
+culprit if you check it rather than assuming the function in front of
+you is at fault.
+
+**Deliberate skip, no new attempt.** This residue is now 14 hand
+attempts plus one ~40,000-iteration permuter search deep across four
+prior rounds (23, 36, 44), converged on the same 2-word `addu`/`addiu`
+operand-pairing swap with every reshape other than the naive
+left-to-right parse regressing the HEAD of the expression too (see the
+round-39/44 sections below). No new source-level grouping occurred to me
+that isn't already in that table, and per this round's own guidance not
+to re-run an already-negative unguided search without a new angle, I am
+not repeating the 40k-iteration search. Restored to `INCLUDE_ASM`; full
+oracle re-confirmed green.
+
+### Proposed learning (round 46)
+
+Restates and reinforces the standing CLAUDE.md guidance rather than
+adding new content: **with four INCLUDE_ASM units in one runner's brief,
+`grep -c '^INCLUDE_ASM' src/<unit>.c` against the count you started with
+is cheap enough to run before EVERY build once you've touched more than
+one function this session, not only when a diff already looks
+structurally wrong.** The 22-byte drift here looked small enough to be a
+real, narrow residue rather than an obvious whole-image corruption,
+which is exactly the case where skipping the check costs the most time.
+
 ## ROUND 39 (head): baseline re-verified, five more variants, and ATTEMPT 6 WAS MEASURING THE WRONG HALF OF ITSELF
 
 Baseline re-spliced against `main` and rebuilt: **exactly 71/73, zero
