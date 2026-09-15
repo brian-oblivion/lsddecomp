@@ -1850,7 +1850,33 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 	return -1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C02C);
+/* Same role as D_800889B8/D_80088858 for func_8005BD3C above, but for this
+   function's own "link test" (indexed the same way: D_8008ACBC/D_8008ACC0
+   for the heading lookup, D_8008ACC4/D_8008ACC8 for the second table). */
+extern u8 *D_80088C84[];
+extern u8 *D_80088BDC[];
+
+s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2)
+{
+	u8 heading;
+	s32 idx;
+	s32 result;
+
+	heading = D_80088C84[D_8008ACBC][D_8008ACC0];
+	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+		if (arg1 != NULL)
+			*arg1 = (s32)&D_80088758[heading];
+
+		if (arg0 != NULL) {
+			idx = D_80088BDC[D_8008ACC4][D_8008ACC8];
+			*arg0 = (s32)&D_80088758[idx];
+		}
+		result = 1;
+	} else {
+		result = 0;
+	}
+	return result;
+}
 
 s32 func_8005C118(void)
 {
