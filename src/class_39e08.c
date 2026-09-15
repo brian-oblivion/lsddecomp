@@ -213,7 +213,50 @@ Class865C8Methods *func_8004A060(void) {
     return &D_800865C8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_39e08", func_8004A070);
+/* Sony's, from the still-uncarved psyq_39094 SDK segment
+ * (asm/psyq_39094.s): `if (out != NULL) *out = 0x230; return &D_80081A04;`
+ * -- an unconditional out-param write (the address passed here is always a
+ * stack address, never NULL) plus a fixed .data address, unrelated to the
+ * write. Declared locally per CLAUDE.md's rule against writing C for
+ * SDK-owned code. */
+extern void *func_80048D48(s32 *out);
+extern s32 func_80027024(void *arg0, s32 arg1);
+
+extern s32 D_8008A978;
+extern s32 D_8008A97C;
+
+s32 func_8004A070(s32 arg0)
+{
+    s32 local;
+    void *obj;
+    s32 prev;
+    s32 result;
+
+    obj = func_80048D48(&local);
+    prev = D_8008A978;
+    D_8008A978 = prev + 1;
+
+    switch (prev + 1) {
+    case 1:
+        if (arg0 != 0) {
+            D_8008A978 = prev + 2;
+        } else {
+            local = local / 2;
+            D_8008A97C = local;
+        }
+        break;
+    case 2:
+        local = local - D_8008A97C;
+        break;
+    default:
+        local = 0;
+        break;
+    }
+
+    while ((result = func_80027024(obj, local)) == 0) {
+    }
+    return result;
+}
 
 Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
 {
