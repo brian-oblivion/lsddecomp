@@ -124,6 +124,76 @@ void *func_80054758(void) {
     return result;
 }
 
+extern s32 D_8008AB68;
+extern s32 D_8008AB6C;
+extern s32 D_8008AB70;
+extern s32 D_8008AB74;
+extern void *func_800404D0(void *a0, void *a1, s32 a2);
+extern void *D_8008E10C[];
+extern s32 D_8008AC7C;
+
+typedef struct ObjSlot4C ObjSlot4C;
+typedef struct ObjSlot4CMethods ObjSlot4CMethods;
+struct ObjSlot4CMethods {
+    u8 pad4C[0x4C];
+    void (*slot4C)(ObjSlot4C *self, void *arg1, void *arg2); /* +0x04C */
+};
+struct ObjSlot4C {
+    ObjSlot4CMethods *methods; /* +0x000 */
+};
+
+typedef struct ObjSlotAC ObjSlotAC;
+typedef struct ObjSlotACMethods ObjSlotACMethods;
+struct ObjSlotACMethods {
+    u8 padAC[0xAC];
+    void *(*slotAC)(ObjSlotAC *self); /* +0x0AC */
+};
+struct ObjSlotAC {
+    ObjSlotACMethods *methods; /* +0x000 */
+};
+
+/* STALL, 12/86 words, 6 words short (out-of-range drift present) -- see
+ * docs/match-reports/func_80054850.md. Preserved near-miss body: */
+#if 0
+void func_80054850(void) {
+    s32 paramA[2];
+    s32 paramB[2];
+    s32 i;
+    s32 s1;
+    void **arr;
+    void *obj;
+    ObjSlotAC *self2;
+    void *result;
+
+    if (D_8008AB50 == 0) {
+        return;
+    }
+    paramA[0] = D_8008AB68;
+    paramA[1] = D_8008AB6C;
+    if (D_8008AB50 == 2) {
+        paramA[1] += 0x1E;
+    }
+    paramB[0] = D_8008AB70;
+    paramB[1] = D_8008AB74;
+
+    obj = func_800404D0(paramB, (void *) D_8008AC8C, 0x1FFF);
+    s1 = 3;
+    arr = D_8008E10C;
+    arr[0] = obj;
+    for (i = 1; i < 0x12; i++) {
+        obj = func_800404D0(paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
+        arr[i] = obj;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], paramA);
+        s1 += 3;
+        paramA[1] += 3;
+        paramB[1] -= 7;
+    }
+
+    self2 = *(ObjSlotAC **) (D_8008AC7C + 0xC);
+    result = self2->methods->slotAC(self2);
+    ((ObjSlot4C *) arr[0])->methods->slot4C(arr[0], result, paramA);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800549A8);
