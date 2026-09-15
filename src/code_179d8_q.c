@@ -13,7 +13,66 @@ void func_80027D40(void)
     func_800280E0();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027D70);
+/* The pending-list node type func_8002832C (code_179d8_r) allocates and
+ * func_800283C4 (code_179d8_r) unlinks/frees -- only the fields this call
+ * site itself reads are typed here. */
+typedef struct QueueEntryD70 QueueEntryD70;
+struct QueueEntryD70 {
+    /* +0x00 */ s32 unk00;
+    u8 pad04[0x0C - 0x04];
+    /* +0x0C */ s32 owner;
+    u8 pad10[0x20 - 0x10];
+    /* +0x20 */ QueueEntryD70 *next;
+};
+
+typedef struct SelfD70 SelfD70;
+struct SelfD70 {
+    u8 pad00[0x22];
+    /* +0x22 */ u16 unk22;
+    /* +0x24 */ s32 unk24;
+};
+
+extern s32 D_8008A894;
+extern s32 D_8008A870;
+extern s32 D_8008A888;
+extern s32 D_8008A87C;
+extern void CdFlush(void);
+extern void func_80028864(void); /* code_179d8_r */
+extern void func_800283C4(QueueEntryD70 *arg0); /* code_179d8_r */
+
+void func_80027D70(SelfD70 *self)
+{
+    QueueEntryD70 *entry;
+    QueueEntryD70 *node;
+    QueueEntryD70 *next;
+    s32 saved;
+
+    func_800280D0();
+
+    entry = (QueueEntryD70 *)D_8008A894;
+
+    if (entry != NULL && self->unk22 != 0) {
+        self->unk24 = 0;
+
+        if (entry->owner == (s32)self && entry->unk00 != 0 && D_8008A870 == 0) {
+            CdFlush();
+            func_80028864();
+            saved = D_8008A888;
+            D_8008A888 = 0;
+            D_8008A87C = saved;
+        }
+
+        for (node = (QueueEntryD70 *)D_8008A894; node != NULL; node = next) {
+            next = node->next;
+            if (node->owner == (s32)self) {
+                func_800283C4(node);
+                self->unk22--;
+            }
+        }
+    }
+
+    func_800280E0();
+}
 
 /* D_8006D4E8's own method table, 29 slots per tools/classtable.py (header
  * 0x13 at +0x000, func_800269F0 at +0x004/own-slot, func_80027228 at
