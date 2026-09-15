@@ -46,6 +46,21 @@ typedef struct DreamAuxGroupRecord {
 extern s8 D_80089A7C[];
 extern DreamAuxGroupRecord *D_80089A44[];
 
+/* A second parallel-group family, same "count + pointer to array" shape as
+ * DreamAuxGroupRecord above but a different stride and a different index
+ * space: 14 (0xE) groups selected by `D_8008ABF8` (not a loop index),
+ * D_80089AC4[i] a signed count, D_80089A8C[i] a pointer to an array of
+ * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
+ * only field func_8005C8AC accesses. The remaining 4 bytes are undiscovered
+ * from this unit alone. */
+typedef struct DreamAuxTriggerEntry {
+    s16 key;
+    u8 unk2[4];
+} DreamAuxTriggerEntry;
+
+extern s8 D_80089AC4[];
+extern DreamAuxTriggerEntry *D_80089A8C[];
+
 /* A small signed-byte lookup table read by func_8005CD58, indexed by its
  * `idx` parameter. Layout beyond "one signed byte per entry" is not known
  * from this unit alone. */

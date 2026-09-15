@@ -118,7 +118,23 @@ void func_8005C76C(void)
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C7D4);
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C8AC);
+s32 func_8005C930(s32 a0, s32 a1);
+
+s32 func_8005C8AC(s16 *a0)
+{
+    s32 idx = D_8008ABF8;
+    s32 count = D_80089AC4[idx];
+    DreamAuxTriggerEntry *entry = D_80089A8C[idx];
+    s32 i;
+
+    for (i = 0; i < count; i++) {
+        if (*a0 == entry->key) {
+            return func_8005C930((s32)entry, i);
+        }
+        entry++;
+    }
+    return 0;
+}
 
 s32 func_8005C930(s32 a0, s32 a1)
 {
