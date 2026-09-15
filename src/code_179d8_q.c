@@ -57,7 +57,12 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027EF8);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027F18);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027FD8);
+extern s32 D_8008A868;
+
+void func_80027FD8(s32 a0)
+{
+    D_8008A868 = a0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027FE4);
 
