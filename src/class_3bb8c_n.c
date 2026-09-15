@@ -75,10 +75,197 @@ void func_80054714(void) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054758);
+extern s32 D_8008AC74;
+extern s32 D_8008AC6C;
+extern s8 D_800873DC[];
+extern s32 D_8008AC80;
+extern s8 D_800873D8[];
+extern s32 D_8008AC84;
+extern s32 D_800873C8[];
+extern s32 D_8008AC90;
+extern u8 D_8008726C[];
+extern u8 D_800872C4[];
+extern s32 D_8008AC8C;
+extern u8 D_80087234[];
+extern s32 D_8008AB50;
 
+void *func_80054758(void) {
+    s32 sum;
+    s32 kind;
+    s32 divisor;
+    s32 remainder;
+    s8 *result;
+    s32 b3;
+    s32 b2;
+    u8 *tab;
+
+    sum = D_8008AC74 + D_8008AC6C;
+    kind = D_800873DC[sum & 0xF];
+    D_8008AC80 = kind;
+    divisor = D_800873D8[kind];
+    remainder = sum % divisor;
+    D_8008AC84 = remainder;
+    result = (s8 *) D_800873C8[kind] + remainder * 4;
+    if (kind == 0) {
+        b3 = result[3];
+        D_8008AC90 = (s32) (D_800872C4 + b3 * 3);
+        b2 = result[2];
+        tab = D_8008726C;
+        if (b2 != 0x12) {
+            tab = D_80087234;
+        }
+        D_8008AC8C = (s32) tab;
+        if (remainder < 4) {
+            D_8008AB50 = 1;
+        } else if (remainder < 6) {
+            D_8008AB50 = 2;
+        }
+    }
+    return result;
+}
+
+extern s32 D_8008AB68;
+extern s32 D_8008AB6C;
+extern s32 D_8008AB70;
+extern s32 D_8008AB74;
+extern void *func_800404D0(void *a0, void *a1, s32 a2);
+extern void *D_8008E10C[];
+extern s32 D_8008AC7C;
+
+typedef struct ObjSlot4C ObjSlot4C;
+typedef struct ObjSlot4CMethods ObjSlot4CMethods;
+struct ObjSlot4CMethods {
+    u8 pad4C[0x4C];
+    void (*slot4C)(ObjSlot4C *self, void *arg1, void *arg2); /* +0x04C */
+};
+struct ObjSlot4C {
+    ObjSlot4CMethods *methods; /* +0x000 */
+};
+
+typedef struct ObjSlotAC ObjSlotAC;
+typedef struct ObjSlotACMethods ObjSlotACMethods;
+struct ObjSlotACMethods {
+    u8 padAC[0xAC];
+    void *(*slotAC)(ObjSlotAC *self); /* +0x0AC */
+};
+struct ObjSlotAC {
+    ObjSlotACMethods *methods; /* +0x000 */
+};
+
+/* STALL, 12/86 words, 6 words short (out-of-range drift present) -- see
+ * docs/match-reports/func_80054850.md. Preserved near-miss body: */
+#if 0
+void func_80054850(void) {
+    s32 paramA[2];
+    s32 paramB[2];
+    s32 i;
+    s32 s1;
+    void **arr;
+    void *obj;
+    ObjSlotAC *self2;
+    void *result;
+
+    if (D_8008AB50 == 0) {
+        return;
+    }
+    paramA[0] = D_8008AB68;
+    paramA[1] = D_8008AB6C;
+    if (D_8008AB50 == 2) {
+        paramA[1] += 0x1E;
+    }
+    paramB[0] = D_8008AB70;
+    paramB[1] = D_8008AB74;
+
+    obj = func_800404D0(paramB, (void *) D_8008AC8C, 0x1FFF);
+    s1 = 3;
+    arr = D_8008E10C;
+    arr[0] = obj;
+    for (i = 1; i < 0x12; i++) {
+        obj = func_800404D0(paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
+        arr[i] = obj;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], paramA);
+        s1 += 3;
+        paramA[1] += 3;
+        paramB[1] -= 7;
+    }
+
+    self2 = *(ObjSlotAC **) (D_8008AC7C + 0xC);
+    result = self2->methods->slotAC(self2);
+    ((ObjSlot4C *) arr[0])->methods->slot4C(arr[0], result, paramA);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
 
+typedef struct ObjAC7CSub ObjAC7CSub;
+typedef struct ObjAC7CSubMethods ObjAC7CSubMethods;
+struct ObjAC7CSubMethods {
+    u8 pad64[0x64];
+    void (*slot64)(ObjAC7CSub *self, void *arg1); /* +0x064 */
+};
+struct ObjAC7CSub {
+    ObjAC7CSubMethods *methods; /* +0x000 */
+    u8 pad4[0x18 - 0x4];
+    s32 field18; /* +0x018 */
+    u8 pad1C[0x24 - 0x1C];
+    s32 field24; /* +0x024 */
+};
+
+typedef struct ObjSlotB8B8 ObjSlotB8B8;
+typedef struct ObjSlotB8B8Methods ObjSlotB8B8Methods;
+struct ObjSlotB8B8Methods {
+    u8 padB8[0xB8];
+    void (*slotB8)(ObjSlotB8B8 *self, s32 arg1, void *arg2); /* +0x0B8 */
+    void (*slotBC)(ObjSlotB8B8 *self, void *arg1); /* +0x0BC */
+};
+struct ObjSlotB8B8 {
+    ObjSlotB8B8Methods *methods; /* +0x000 */
+};
+
+/* STALL, 24/93 words, 3 words short (out-of-range drift present) -- see
+ * docs/match-reports/func_800549A8.md. Preserved near-miss body: */
+#if 0
+void func_800549A8(void) {
+    ObjAC7CSub *self;
+    s32 delta;
+    s32 s3;
+    s32 paramA[2];
+    s32 paramB[2];
+    s32 s1;
+    s32 i;
+    void **arr;
+    void *obj;
+
+    if (D_8008AB50 == 0) {
+        return;
+    }
+    self = *(ObjAC7CSub **) (D_8008AC7C + 0xC);
+    delta = self->field18 - self->field24;
+    s3 = (delta / 600) * 3;
+    if (s3 <= 0) {
+        return;
+    }
+    paramB[0] = D_8008AB68;
+    paramB[1] = D_8008AB6C;
+    i = 0;
+    if (D_8008AB50 == 2) {
+        paramB[1] += 0x1E;
+    }
+    arr = D_8008E10C;
+    s1 = 0;
+    paramB[1] = paramB[1] + s3 * 3;
+    for (; i < 0x12; i++) {
+        func_80054B1C((u8 *) paramA, (u8 *) (s1 + D_8008AC8C), s3);
+        obj = arr[i];
+        ((ObjSlotB8B8 *) obj)->methods->slotB8(obj, 1, paramA);
+        obj = arr[i];
+        s1 += 3;
+        ((ObjSlotB8B8 *) obj)->methods->slotBC(obj, paramB);
+        paramB[1] += 3;
+    }
+    func_80054B1C((u8 *) paramA, (u8 *) D_8008AC90, s3);
+    self->methods->slot64(self, paramA);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800549A8);
 
 void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
@@ -98,9 +285,73 @@ void func_80054B50(void) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B84);
+extern s32 D_8008AC80;
+extern s32 D_8008AC7C;
+extern void func_80056F5C(s32 arg0, void *arg1, s32 arg2, s32 arg3);
+extern s32 rand(void);
+extern s8 D_80087324[];
+extern s32 D_8008AC88;
+extern void *D_8008E0C8[];
+extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
+extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);
+extern void *func_80054FD8(void *arg0, void *arg1);
+extern void *func_8005511C(void *arg0, void *arg1);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054C74);
+void func_80054B84(void *arg0) {
+    s32 base;
+    s32 val;
+    s32 count;
+    void **filled;
+
+    if (D_8008AC80 < 0) {
+        return;
+    }
+    base = D_8008AC7C;
+    func_80056F5C(D_8008AC80, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
+    val = D_80087324[rand() & 3];
+    count = (D_8008AC80 == 2) ? 0x10 - val : 0;
+    D_8008AC88 = val + count;
+    filled = (void **) func_80054DA4(D_8008E0C8, val, arg0);
+    filled = func_80054F30(filled, count, arg0);
+    if (D_8008AC80 == 0) {
+        func_80054FD8(filled, arg0);
+    } else if (D_8008AC80 == 2) {
+        func_8005511C(filled, arg0);
+    } else {
+        return;
+    }
+    D_8008AC88 = D_8008AC88 + 1;
+}
+
+/* Local view: array elements at D_8008E0C8 are objects with a method table
+ * pointer at offset 0, dispatched here through slot +0xEC as
+ * slotEC(self, arg1) -- mirrors the ObjAB54 pattern above. */
+typedef struct ObjE0C8 ObjE0C8;
+typedef struct ObjE0C8Methods ObjE0C8Methods;
+struct ObjE0C8Methods {
+    u8 padEC[0xEC];
+    void (*slotEC)(ObjE0C8 *self, void *arg1); /* +0x0EC */
+};
+struct ObjE0C8 {
+    ObjE0C8Methods *methods; /* +0x000 */
+};
+
+extern s32 D_8008AC80;
+extern s32 D_8008AC88;
+extern void *D_8008E0C8[];
+
+void func_80054C74(void *arg0) {
+    s32 i;
+    ObjE0C8 *obj;
+
+    if (D_8008AC80 < 0) {
+        return;
+    }
+    for (i = 0; i < D_8008AC88; i++) {
+        obj = (ObjE0C8 *) D_8008E0C8[i];
+        obj->methods->slotEC(obj, arg0);
+    }
+}
 
 extern s32 D_8008AC80;
 extern s32 D_8008AC88;
@@ -128,7 +379,10 @@ struct ObjN14Sub {
 typedef struct ObjN14 ObjN14;
 struct ObjN14 {
     ObjN14Sub *unk0; /* +0x000 */
-    u8 pad4[0x14 - 0x4];
+    s32 unk4; /* +0x004 */
+    u8 pad8[0x4];
+    s32 unkC; /* +0x00C */
+    s32 unk10; /* +0x010 */
     s32 unk14; /* +0x014 */
 };
 
@@ -153,17 +407,152 @@ void func_80054D30(void) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054DA4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054F30);
+extern s32 D_80087330;
+extern u8 D_80087204[];
+extern u8 D_8008E0A4[];
+extern u8 *D_8008E0B4;
+extern void *func_80055258(void *arg0, void *arg1);
+extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
+void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
+    s32 i;
+    s32 val;
+
+    val = D_80087330;
+    D_8008E0B4 = D_80087204;
+    for (i = 0; i < arg1; i++) {
+        func_80055258(arg2, (void *) val);
+        *arg0 = func_80056320((void *) 1, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        arg0++;
+    }
+    return arg0;
+}
+
+extern s32 D_80087330;
+extern void *func_80055258(void *arg0, void *arg1);
+extern s32 D_8008E0C0[];
+extern u8 *D_8008E0B0;
+extern u8 D_80087174[];
+extern s32 D_8008E0A8;
+extern s32 D_8008E0AC;
+extern u8 D_8008721C[];
+
+/* STALL, 38/81 words, length matches (no drift) -- see
+ * docs/match-reports/func_80054FD8.md. Preserved near-miss body: */
+#if 0
+void *func_80054FD8(void *arg0, void *arg1) {
+    s32 idx;
+
+    func_80055258(arg1, (void *) D_80087330);
+    if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
+        *(s32 *) D_8008E0A4 = 0xFFFF5000;
+        D_8008E0A8 = -0x2000;
+        D_8008E0AC = 0;
+        D_8008E0C0[0] = (s32) (D_8008721C + 3);
+    } else {
+        if (D_8008E0AC > 0) {
+            D_8008E0AC = -D_8008E0AC;
+        }
+        if (D_8008E0AC < -0x7800) {
+            D_8008E0AC = -0x7800;
+        }
+        idx = (u32) rand() % 3;
+        D_8008E0C0[0] = (s32) (D_8008721C + idx * 3);
+    }
+    D_8008E0B0 = D_80087174;
+    *(void **) arg0 = func_80056320((void *) 3, (u8 *) &D_8008E0B0 - 0xC, (void *) D_8008AB4C, arg1);
+    return (u8 *) arg0 + 4;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054FD8);
 
+extern s32 D_80087430;
+extern u8 D_80087228[];
+extern s32 D_8008E0C0[];
+extern u8 *D_8008E0B0;
+extern u8 D_80087174[];
+extern s32 D_8008E0BC;
+
+/* STALL, 16/79 words, length off by 1 word (out-of-range drift present) --
+ * see docs/match-reports/func_8005511C.md. Preserved near-miss body: */
+#if 0
+void *func_8005511C(void *arg0, void *arg1) {
+    s32 idx;
+    s32 randval;
+    s32 v0;
+    s32 *slot;
+
+    idx = (u32) rand() % 3;
+    slot = D_8008E0C0;
+    *slot = (s32) (D_80087228 + idx * 3);
+    slot++;
+    if (D_8008AC74 % 20 == 0) {
+        v0 = 0;
+    } else {
+        v0 = D_80087430;
+    }
+    *slot = v0;
+    func_80055258(arg1, (void *) D_80087330);
+    D_8008E0B0 = D_80087174;
+    randval = rand();
+    D_8008E0BC = randval - (randval / 3) * 6;
+    *(void **) arg0 = func_80056320((void *) 2, (u8 *) &D_8008E0B0 - 0xC, (void *) D_8008AB4C, arg1);
+    return (u8 *) arg0 + 4;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005511C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055258);
 
+extern s32 D_8008732C;
+extern s32 D_8008E0B8;
+
+/* STALL, 25/87 words, 2 words long (out-of-range drift present) -- see
+ * docs/match-reports/func_80055410.md. Preserved near-miss body: */
+#if 0
+void func_80055410(void) {
+    s32 r;
+    s32 mod3;
+
+    rand();
+    D_8008E0A8 = D_8008732C;
+    r = rand();
+    *(s32 *) D_8008E0A4 = (r % 20) << 11;
+    mod3 = D_8008AC74 % 3;
+    D_8008E0AC = 0xA000;
+    if (mod3 == 1) {
+        D_8008E0AC = -0xA000;
+    } else if (mod3 == 2) {
+        D_8008E0AC = 0x800;
+    }
+    r = rand();
+    D_8008E0B0 = D_80087174 + ((u32) r % 7) * 12;
+    r = rand();
+    D_8008E0B8 = r % 5;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055410);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005556C);
+extern s32 D_8008AC7C;
+extern void *func_80055620(s32 *arg0, s32 *arg1);
+extern s32 D_800874B0[];
+extern s32 func_8002CC34(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
+
+ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
+    ObjN14Sub *sub;
+
+    sub = (ObjN14Sub *) func_80055620(&arg0->unk4, &arg0->unk10);
+    if (sub != 0) {
+        arg0->unk0 = sub;
+        func_8002CC34(*(s32 *) D_8008AC7C, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
+        if (sub->unk6 == *arg1) {
+            *arg1 = -sub->unk6;
+        }
+        sub->unk6 = -sub->unk6;
+        return arg0;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055620);
 
@@ -179,7 +568,7 @@ s32 func_800557DC(ObjN14 *arg0) {
 extern s32 func_80055874(ObjN14 *arg0, void *arg1);
 extern void func_8002CD08(s32 arg0, void *arg1);
 
-s32 func_8005582C(ObjN14 *arg0, void *arg1) {
+s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2) {
     if (func_80055874(arg0, arg1) != 0) {
         func_8002CD08(*(s32 *) D_8008AC7C, &arg0->unk14);
         return 1;
@@ -187,8 +576,90 @@ s32 func_8005582C(ObjN14 *arg0, void *arg1) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055874);
+extern s32 D_80087474[];
 
+s32 func_80055874(ObjN14 *arg0, void *arg1) {
+    s32 dx, dy, dist;
+    s8 idx;
+
+    if (arg1 == 0) {
+        return 0;
+    }
+    dx = arg0->unk4 - *(s32 *) arg1;
+    if (dx < 0) {
+        dx = ~dx + 1;
+    }
+    dy = arg0->unkC - *(s32 *) ((u8 *) arg1 + 0x8);
+    if (dy >= 0) {
+        dist = dx + dy;
+    } else {
+        dist = dx - dy;
+    }
+    arg0->unk10 = dist;
+    idx = arg0->unk0->unk6;
+    if (dist < D_80087474[-idx]) {
+        dist = 1;
+        return dist;
+    }
+    return 0;
+}
+
+/* Local view only: `D_8008AB4C`'s value is another `pointer stored as a
+ * plain s32` (same idiom as `D_8008AC7C`), here treated as a "self" object
+ * with a method table at offset 0, dispatched through slot +0x0E8. */
+typedef struct ObjAB4C ObjAB4C;
+typedef struct ObjAB4CMethods ObjAB4CMethods;
+struct ObjAB4CMethods {
+    u8 padE8[0xE8];
+    void (*slotE8)(ObjAB4C *self, void *arg1, void *arg2); /* +0x0E8 */
+};
+struct ObjAB4C {
+    ObjAB4CMethods *methods; /* +0x000 */
+};
+
+extern void func_80054850(void);
+extern void func_800549A8(void);
+extern void func_80055A24(void);
+extern s32 D_8008AC70;
+extern s32 D_8008AC98;
+extern u8 D_8008E154[];
+extern ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
+extern s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2);
+
+/* STALL, 63/77 words -- register-identity swap (ctx/i colour), see
+ * docs/match-reports/func_800558F0.md. Preserved near-miss body: */
+#if 0
+s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
+    void *ctx;
+    u8 buf[0x10];
+    s32 i;
+
+    ctx = 0;
+    if (arg0 != 0) {
+        ctx = buf;
+        ((ObjAB4C *) D_8008AB4C)->methods->slotE8((ObjAB4C *) D_8008AB4C, ctx, arg0);
+    }
+    if (D_8008AC70++ == 0) {
+        func_80054660();
+        func_80054850();
+        func_80054B84(ctx);
+    }
+    func_800549A8();
+    func_80054C74(ctx);
+    func_80055A24();
+    D_8008AC98 = 0;
+    for (i = 0; i < 2; i++) {
+        if (D_8008AC9C[i] != 0) {
+            if (func_8005582C(D_8008AC9C[i], ctx, arg1) == 0) {
+                D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+            }
+        } else {
+            D_8008AC9C[i] = func_8005556C((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
+        }
+    }
+    return arg2;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800558F0);
 
 extern s32 D_8008AC6C;
