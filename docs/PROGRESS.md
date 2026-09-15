@@ -111,6 +111,25 @@ returned 6 hits, **all already annotated** — that screen is clean.
    maspsx's argv, which zsh does not do. Fails loudly, so it costs a minute
    rather than a wrong result. Run it under `bash -c`.
 
+### Post-teardown addendum: a runner re-notified after the round was pushed
+
+`bravo`'s original session sent a second, late summary after the round was
+merged, torn down and pushed (subagent task-ids can notify more than once). It
+named a source-shape lever the head's consolidation had missed — a per-`if`
+field-pair hoist, with a measured negative bounding its scope — which was in
+its merged report all along and is now promoted to DECOMPILATION_LEARNINGS.
+
+It also reported an anomaly that did not happen: that its worktree was
+*"destroyed mid-round while my bounded permuter search was still running."*
+The search had already terminated on its own 1500s bound; the head's
+self-excluding process sweep showed **zero** live permuters before anything was
+touched; the worktree was clean with nothing uncommitted; and the re-staffing
+*recovered* the output bravo had left uncollected, for +5 words. A late-waking
+agent reconstructs the round from `git log` and narrates it in the first
+person, producing an account that is plausible, self-consistent and wrong —
+the reason §3 says to count from the branch, never the summary. **Read a late
+summary for its LEVERS; verify its NARRATIVE.**
+
 **Next move: another runner round, not a carve and not a permuter round.**
 `fresh` is 5 and `class_3bb8c_n` still holds 9 cold functions with 6 fully
 derived stalls beside them — the only genuinely fresh ground left, and it

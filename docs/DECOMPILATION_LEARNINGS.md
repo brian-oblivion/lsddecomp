@@ -7657,3 +7657,53 @@ test per function, and several have measured negatives attached.
   reappearing from the runner's own edits rather than an inherited sibling's —
   `grep -c '^INCLUDE_ASM' src/<unit>.c` against your starting count is the
   check, and it costs nothing.
+
+### Late addendum — a twelfth lever, arriving after consolidation
+
+`bravo`'s original session re-notified **after** the round was merged, torn
+down and pushed, and its summary named a lever the head's consolidation had
+missed. It was in the merged report the whole time (`func_80017B34.md`,
+"Lever 3"), so nothing was lost — but it was not promoted, and the report's
+version is sharper than the summary's:
+
+- **Hoist a "used on every path" field pair into locals PER `if`-statement —
+  not across `if`s, and not merged into one shared hoist point.** GCC 2.6.3
+  does **not** CSE a struct field read across the *condition* and the *body of
+  the same arm*, so spelling `cursor->prev`/`cursor->next` out fresh in each
+  arm reloads each operand a second time relative to retail, which schedules
+  ONE combined load of both fields immediately before each `if`. A scoped
+  block per `if` took `func_80017B34` from 37/114 with 5 words of drift to
+  **92/114 with zero drift**.
+- **Its discriminator, measured rather than reasoned:** fully hoisting both
+  checks to ONE shared pair of locals, read once and reused by both `if`s, is
+  a *different and wrong* shape — it also removes retail's second, genuinely
+  repeated pair of loads and **undershoots to 105 words, 9 short**. Retail
+  re-reads the fields fresh for the SECOND `if`; it just does not re-read
+  within a single `if`'s own condition-versus-body. **Scope the hoist to
+  exactly one `if` at a time.**
+
+And the general point bravo drew from it, which pairs with this round's
+search-tail finding:
+
+- **"N hand rephrasings failed" bounds the rephrasings TRIED, not the
+  residue's REACHABILITY.** A bounded permuter pass is still worth running
+  after the hand axes are exhausted, provided the `--debug` cost check shows a
+  real (non-zero) insertion/deletion count. Four hand rephrasings of the
+  expression had all failed to move this residue; hoisting it unconditionally
+  — a different axis, not a further rephrasing — is what moved it.
+
+**Two process notes, because the re-notification itself is evidence.**
+
+- **A subagent can re-notify long after its worktree is gone, and it will
+  reconstruct the round from `git log` and narrate it as its own.** bravo's
+  late report claimed its worktree was *"destroyed mid-round while my bounded
+  permuter search was still running."* It was not: the search had already
+  terminated on its own 1500s bound, the head's self-excluding sweep showed
+  **zero** live permuter processes before anything was touched, and the
+  worktree was clean with nothing uncommitted. The re-staffing then *recovered*
+  the search output bravo had left uncollected, for +5 words. The account is
+  plausible, self-consistent and wrong — which is exactly why
+  PARALLEL-RUNS says to count from the branch rather than the summary.
+- **A late summary is still worth reading for LEVERS even when its narrative
+  is wrong.** This one was wrong about the teardown and right about the
+  compiler, and the second half was worth promoting.
