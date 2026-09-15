@@ -184,6 +184,7 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34D994;
 extern Rec34D994 D_8008D994[];
+extern Rec34D994 D_8008D990[];
 extern Rec34D994 D_8008D996[];
 extern Rec34D994 D_8008D998[];
 extern Rec34D994 D_8008D99A[];
@@ -212,6 +213,8 @@ extern Rec34Half D_8008D988[];
 extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
+/* STALL -- see docs/match-reports/func_80030980.md. Best body reached
+ * (292/324 built words, 32 words SHORT) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
 
 /* STALL -- see docs/match-reports/func_80030E90.md. Round 26: 239/252 words

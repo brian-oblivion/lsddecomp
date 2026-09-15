@@ -69,6 +69,8 @@
  */
 #include "common.h"
 
+/* STALL -- see docs/match-reports/func_8002CD08.md. Best body reached
+ * (110/132 built words, length EXACT at 132/132) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CD08);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
