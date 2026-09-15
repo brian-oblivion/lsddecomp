@@ -100,6 +100,12 @@ extern void *func_80017CFC(void *ptr);
  * materialise a spurious `move a1,s1`, one word too many. */
 extern void func_80017AC8(BMemPMgr *pool);
 
+/* The default-pool global itself (see the comment above). Setter is
+ * func_80017A9C(BMemPMgr *pool), a one-line `D_8008A818 = pool;`. Not yet
+ * called from any carved C -- BMemPMgrInit never calls it, so whoever
+ * establishes the game's one default pool is still asm. */
+extern BMemPMgr *D_8008A818;
+
 /* The Psy-Q declarations that used to sit here (func_80011D34 is malloc,
  * func_80011F68 is free, func_80012C20 is printf) moved into src/code_8220.c
  * when the SDK objects were linked. They are deliberately NOT shared:
