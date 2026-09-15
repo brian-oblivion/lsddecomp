@@ -42,7 +42,43 @@ void *func_80050BA8(s32 arg0, s32 arg1)
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_i", func_80050C14);
+/* Sony's, from libc2 (already declared above via class_3bb8c_j's own
+ * convention -- but not yet in this unit; local view). */
+extern s32 strlen(char *s);
+
+/* VALUE-of `%gp_rel`, round 45's own local view -- same global as
+ * class_3bb8c_j's `D_8008AAE4` (a byte lookup table whose length this
+ * function counts by hand rather than via `strlen`, since GCC 2.6.3 with
+ * `-fno-builtin` never turns a `strlen` CALL into inline code -- the
+ * inline loop below has to be literal source, not a call). */
+extern u8 *D_8008AAE4;
+
+/* Defined later in this file (ROM order); forward-declared here since
+ * func_80050C14 calls it, same convention as func_80049E20 in
+ * src/class_39e08.c. */
+extern void func_80050CD8(Obj86ED0 *self);
+
+void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
+{
+    u8 *p;
+    s32 count;
+
+    func_80018390()->ctor(self);
+    self->methods = func_80051A4C();
+    self->unk10 = strlen(arg1);
+    self->unk28 = func_80017B34(self->unk10 + 4);
+
+    p = D_8008AAE4;
+    count = 0;
+    while (*p != 0) {
+        p++;
+        count++;
+    }
+    self->unk14 = count;
+
+    func_80050CD8(self);
+    self->methods->slot40(self, arg1, arg2);
+}
 
 void func_80050CD8(Obj86ED0 *self)
 {

@@ -2623,11 +2623,12 @@ struct Obj86ED0Methods {
     u8 pad000[0x008];
     /* +0x008, func_80050BA8's own dispatch target -- this class's own
      * ctor, OVERRIDING BasicClass's no-arg ctor with a 2-arg one.
-     * func_80050C14 itself, STALLED (gp_rel-blocked), see its match
-     * report; the signature below reflects that stalled function's own
-     * register usage (self, arg1, arg2), which IS how func_80050BA8
-     * calls it, and is what the header already declared for
-     * func_80050BA8 before this round. */
+     * func_80050C14 itself, MATCHED round 45; the signature below is
+     * the vtable slot's own type (self, arg1, arg2), matching how
+     * func_80050BA8 calls it -- func_80050C14's own DEFINITION is typed
+     * more precisely (`char *arg1`, since it calls `strlen` on it), which
+     * is fine: a data-table vtable slot's declared field type need not
+     * match the defining function's own prototype exactly. */
     void (*ctor)(Obj86ED0 *self, s32 arg1, s32 arg2);
     u8 pad00C[0x010 - 0x00C];
     void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, func_80051200 (OVERRIDES BasicClass's addChild: func_80050D30) */
@@ -2637,7 +2638,12 @@ struct Obj86ED0Methods {
      * onFinalize (BasicClass__func_182cc, code_8220_b), reached through
      * self's own table this one time instead of `func_80018390()`. */
     void (*onFinalize)(Obj86ED0 *self, s32 arg1);
-    u8 pad034[0x048 - 0x034];
+    u8 pad034[0x040 - 0x034];
+    /* +0x040, round 45's func_80050C14 -- its own tail dispatch,
+     * `self->methods->slot40(self, arg1, arg2)`, forwarding the ctor's
+     * own two arguments unchanged. */
+    void (*slot40)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040 */
+    u8 pad044[0x048 - 0x044];
     void (*slot48)(Obj86ED0 *self);                      /* +0x048, func_800512C8 -- this class's own slot, func_80051174 */
     u8 pad04C[0x054 - 0x04C];
     void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, func_80051370 -- this class's own slot, func_800512C8 */
