@@ -177,7 +177,16 @@ void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EC84);
+s32 func_8001EC84(void *pair) {
+    WholeFrac_d294 *p;
+    s32 q1, r1, q2;
+
+    p = (WholeFrac_d294 *)pair;
+    q1 = p->whole / p->frac;
+    r1 = p->whole % p->frac;
+    q2 = (r1 << 12) / p->frac;
+    return (q1 << 12) + q2;
+}
 
 s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point) {
     s32 flags;
