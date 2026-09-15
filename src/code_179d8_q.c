@@ -92,7 +92,12 @@ void func_800280D0(void)
     D_8008A88C = 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800280E0);
+extern s32 D_8008A88C;
+
+void func_800280E0(void)
+{
+    D_8008A88C = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800280EC);
 
