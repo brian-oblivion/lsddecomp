@@ -84,6 +84,15 @@ is ~200 words of ordinary work concealed in ONE unit by one stale paragraph.
 
 ### TOOLCHAIN LEAD — operator escalation, NOT acted on
 
+> **RESOLVED 2026-09-15 (operator, post-round).** `tools/setup-permuter.sh` now
+> reads `MASPSX_FLAGS` from the Makefile at scaffold time (repo-relative
+> `config/` paths made absolute) instead of carrying its own copy, and the
+> CLAUDE.md reproducer snippet does the same. Verified: a scaffold for the
+> queued `gp_rel` function `func_8001844C` assembles `sw a0,0(gp)` with an
+> `R_MIPS_GPREL16` reloc and the permuter reports **base score = 0**. Every
+> permuter negative recorded in round 43 against a `gp_rel`- or `mflo`-touching
+> function should be re-run before it is believed.
+
 **`tools/setup-permuter.sh` hardcodes `MASPSX_FLAGS` independently of the
 Makefile and omits round 42's two flags:**
 

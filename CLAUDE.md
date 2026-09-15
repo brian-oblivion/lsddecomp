@@ -618,12 +618,20 @@ construct into a self-contained `.c` and run it through the pinned pipeline:
 ```sh
 tools/gcc263/cpp -Iinclude -Iinclude/psyq -undef -lang-c -nostdinc -Dmips -D__GNUC__=2 /tmp/t.c \
   | tools/gcc263/cc1 -mips1 -mcpu=3000 -quiet -G0 -O2 \
-  | .venv/bin/python3 tools/maspsx/maspsx.py --aspsx-version=2.34 --dont-force-G0 --expand-div \
+  | .venv/bin/python3 tools/maspsx/maspsx.py $(sed -n 's/^MASPSX_FLAGS *:= *//p' Makefile) \
   | tools/binutils/bin/mipsel-linux-gnu-as -march=r3000 -EL -no-pad-sections -G0 -o /tmp/t.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d /tmp/t.o
 ```
 
-Under a second per variant. **A minimal reproducer that FAILS to reproduce is
+Under a second per variant. **The maspsx flags are read from the Makefile on
+purpose — never retype them.** Round 43 found `tools/setup-permuter.sh` carrying
+its own copy of the list, two flags behind the Makefile since round 42, so
+every permuter base for a `gp_rel`- or `mflo`-touching function was scored
+against a pipeline that was not the pinned one. It now reads the Makefile too.
+A reproducer or scaffold that spells the flags itself is not the pinned
+pipeline, whatever it says in the comment above it.
+
+**A minimal reproducer that FAILS to reproduce is
 itself the result** — it proves the toolchain innocent and the trigger
 contextual, which is usually the more useful finding.
 
