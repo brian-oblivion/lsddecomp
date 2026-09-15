@@ -21,18 +21,32 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
 
 /* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
  * (ticked once per call by calling obj->vtable[1](obj) and storing the
- * result back into the same slot) plus a second field at +0x4 that
+ * result back into the same slot); a second field at +0x4 that
  * func_8005C650 (MATCHED round 43) sets to the result of a `New_Entity`
- * call, and 0xC bytes past that not yet accessed by any function in this
- * unit. Stride is 0x14, confirmed by func_8005C650's walk over D_80088D28. */
+ * call and func_8005CF34 (MATCHED round 43) dispatches through its vtable;
+ * and a 3-word position vector at +0x8 that func_8005CF34 passes as
+ * `func_8001E600`'s `src` (that function's own signature, `code_d294.h`,
+ * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
+ * confirmed by func_8005C650's walk over D_80088D28. */
 typedef struct DreamAuxSlot {
     void *obj;
-    void *entity;
-    u8 unkC[0xC];
+    DreamAuxObj *entity;
+    s32 pos[3];
 } DreamAuxSlot;
 
 extern DreamAuxSlot D_80088D28[14];
 extern DreamAuxSlot D_80088D2C[14];
+
+/* Two more vtable slots on the DreamAuxObj family (see func_8005CF34):
+ * slot 0x14 (byte offset 0x50) takes only self, slot 0x13 (byte offset
+ * 0x4C) takes self plus four opaque values. This is the SAME slot-0x4C
+ * shared-ancestor entry `include/Entity.h` documents on `EntityMethods`'
+ * base (`void (*slot4C)(void *self, s32, s32, void *, s32)`) -- but that
+ * call site's 4th argument is a scalar where func_8005CF34's is a pointer
+ * to a locally-filled 3-word vector, so this unit keeps its own local
+ * view rather than importing Entity.h's. */
+typedef void (*DreamAuxObjFn14)(DreamAuxObj *self);
+typedef void (*DreamAuxObjFn13)(DreamAuxObj *self, s32 arg1, s32 arg2, void *arg3, void *arg4);
 
 /* A tiny fixed-size record family read by func_8005C508: 14 (0xE) parallel
  * groups, D_80089A7C[i] a signed count and D_80089A44[i] a pointer to an
