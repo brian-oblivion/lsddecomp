@@ -1,4 +1,4 @@
-# func_8001E7BC -- STALL (structural analysis only, no C attempted)
+# func_8001E7BC -- STALL: length EXACT (180/180 words, no drift); 136/180 raw word-match; first real diff at vram 0x8001E810 (register identity, `node` in $a1 vs retail's $a3). SEE ROUND 44 AT THE BOTTOM FOR THE CURRENT BEST -- everything below this point is superseded history kept for its derivation value.
 
 Unit: `code_d294_c` (round 14). By far the largest function in this
 round's queue (200 asm lines, 0x2D0 bytes / 180 words -- more than 60%
@@ -309,3 +309,151 @@ an entire guarded block with no error, check whether one of its OWN
 condition's operands is a shared field whose established type doesn't
 match what this new read site needs signedness-wise, before assuming a
 scheduling or optimization mystery.
+
+## ROUND 44 (echo): 29/180-with-drift -> 136/180, EXACT LENGTH -- two structural levers, both now closed off as dead ends for the remaining residue
+
+Picked this up from round 19's preserved 29/180 body (the `(s32)self->unk10 < 0`
+signed-comparison fix was already correct and is unchanged here). Rebuilt it
+first to confirm the inherited figure: **29/180, WITH drift (351899 bytes
+outside range)** -- honest, matching the report's own history.
+
+### Lever 1: the accumulation loop's "table" ternary needs to be written TWICE per axis, not cached in a variable
+
+The loop backs up `self->unk14->unk38[i] += cur->unk14->{unk18,unk1C,unk20}`
+for each axis, gated by `self->unkC != 0` (a "backup owner" ternary this
+unit's `func_8001E600`/`func_8001EACC` also use, both matched). Retail's
+disassembly shows the ternary's `lui`/reload-and-branch sequence computed
+**TWICE per axis** -- once for the STORE address, once for the LOAD value --
+with **NOTHING cached across them**. My first attempt cached it in a named
+`table` variable (`table = ternary; table[i] = table[i] + x;`), which GCC
+computes ONCE (address reused for both read and write of the same
+expression) -- 2 fewer instructions per axis than retail, hence the 29/180
+w/drift score (the function comes out systematically SHORTER).
+
+**Fix: write the ternary literally twice, with no variable to (mis)cache it
+in** -- `EXPR[0] = EXPR[0] + x;` where `EXPR` is the full ternary written out
+both times. This alone took the score from 29/180 (drift) to **132/180
+(exact length, no drift)** -- confirming the loop's shape was the dominant
+piece of the residue, not the guards or the tail.
+
+**Levers tried and REJECTED for reproducing the double evaluation without
+writing it out literally, all measured, none matched retail's own timing:**
+- A bare `__asm__ __volatile__("" ::: "memory")` between per-axis
+  assignments of a named `table` -- irrelevant here (see func_8003E968's
+  report this same round: a memory clobber does not force recomputation of
+  a pure address constant).
+- Two SEPARATE named variables (`dst`/`src`), each independently assigned
+  the identical ternary, one used for the store address and one for the
+  load value -- **worse** (37/180, drift). GCC still recognizes the
+  redundant pair and partially folds it, just not exactly as retail did.
+- An explicit intermediate (`sum = table[i] + x; table = ternary (again);
+  table[i] = sum;`) to force a SECOND assignment between the read and the
+  write -- **worse** (31/180, drift). Same story.
+- Declaration order of `table`/`node`/`cur` (several permutations) --
+  **completely inert** on this residue, consistent with round 44's other
+  finding on this exact axis (`func_8003ECD0`'s report, same round):
+  declaration order is not a reliable lever for a CSE/materialization
+  residue, only for certain register-preference ones.
+
+**The ONLY shape that reproduced retail's double computation is writing the
+ternary expression out twice, verbatim, at the SOURCE level.** This project
+already has one documented precedent for "write it twice, don't cache it"
+(round 19's own note on this same function, and `func_8001EACC`/
+`func_8001E600`'s per-axis-but-not-per-read/write reassignment) -- this
+round establishes that the "twice" can mean twice **per statement**, not
+just once per axis, when the ternary is used as both an l-value and an
+r-value target within one update.
+
+### Lever 2: don't index a ternary with a non-zero constant -- it silently folds the offset into the NULL branch too
+
+The first attempt at lever 1 used a single macro,
+`UNK38_TABLE(self)[i]` (`(self->unkC != 0 ? self->unk14->unk38 : (s32*)0)[i]`),
+applied per-axis with `i` = 0, 1, 2. This reached 132/180 but produced a
+CONCRETE SEMANTIC difference from retail for axes 1 and 2: GCC distributes
+the constant index into BOTH ternary branches, i.e. rewrites
+`(cond ? base : NULL)[i]` as `cond ? base[i] : NULL[i]`. For axis 1
+this makes the `unkC == 0` fallback address `(s32*)0 + 1` = a LITERAL `0x4`,
+not zero -- retail's own `unkC == 0` fallback is `addu $a0, $zero, $zero`
+(a real zero) for every axis, confirmed at vram 0x8001E8AC. Concretely: `li
+a0, 0x4` in my build vs `move a0, zero` in retail.
+
+**Fix: give each axis its OWN macro that takes `&unk38[i]` INSIDE the
+ternary's true branch**, so the NULL branch stays a bare `(s32*)0`
+regardless of axis:
+```c
+#define UNK38_X(self) ((self)->unkC != 0 ? &(self)->unk14->unk38[0] : (s32 *)0)
+#define UNK38_Y(self) ((self)->unkC != 0 ? &(self)->unk14->unk38[1] : (s32 *)0)
+#define UNK38_Z(self) ((self)->unkC != 0 ? &(self)->unk14->unk38[2] : (s32 *)0)
+```
+This closed the false-branch bug (3 more words) but introduced a SECOND,
+smaller effect: the TRUE branch's address now folds `0x38 + i*4` into ONE
+`addiu` (e.g. `0x3C` for axis 1), whereas retail keeps the `addiu` at a
+CONSTANT `0x38` for every axis and applies the per-axis offset only in the
+load/store instruction's own displacement (`0x4(a0)`, `0x8(a0)`). Net: 132
+-> 136/180. **This second-order difference (constant-folded combined
+offset vs. base-plus-instruction-displacement) was NOT closed** -- every
+variant tried (materializing the base in a real variable, indexing that
+variable instead of the ternary) reopened the WORSE lever-1 problem
+(single evaluation instead of two). The two properties -- "correct NULL
+fallback" and "un-folded 0x38 base with instruction-level indexing" --
+could not be obtained SIMULTANEOUSLY with anything tried this round.
+
+### Remaining residue, precisely
+
+1. **Register identity: `node` (`self->unk14`, used transiently for the
+   backup-copy block) is $a1 in my build, $a3 in retail** -- FIRST real
+   diff, vram 0x8001E810, and it propagates through every instruction in
+   the backup-copy block (vram 0x8001E810-0x8001E838, 8 words). Declaration
+   order (multiple permutations, including merging `node` and `table` into
+   one variable) did not move it; merging them outright regressed hard (to
+   91/180 with drift) because the merge changes semantics of the loop's own
+   guard checks downstream, not just the register.
+2. **The 0x38-vs-0x38+i "combined ADDIU vs base+displacement" difference**
+   for Y and Z axes in the loop (vram 0x8001E8B8, 0x8001E8D4, 0x8001E90C,
+   0x8001E928, and their paired load-side instructions) -- described above.
+3. **A 4-register permutation in the tail**: retail assigns
+   `$s3`=`&delta`, `$s4`=`&buf30`, `$s2`=`&buf28`, `$s1`=`&buf18` (in THAT
+   order of first address-taken use); my build assigns the same FOUR
+   addresses to `$s1`/`$s3`/`$s4`/`$s2` respectively -- a full permutation,
+   not a simple pair swap. Every instruction in the `slotA4`/`func_8001F8B8`
+   x2/`func_8001EA8C` call sequence (vram 0x8001E994 onward) that touches
+   one of these four addresses shows the SAME register substituted for its
+   retail counterpart, consistently. Tried reordering the four buffer
+   declarations to match retail's OWN first-use order (`delta, buf30,
+   buf28, buf18`) -- **regressed** to 129/180, so declaration order is
+   AGAIN not the lever here.
+
+All three residues are the SAME class (register/materialization identity,
+not a missing feature or wrong value) and none responded to the levers this
+project has documented for other register residues (declaration order,
+`__asm__` barriers, merging/splitting variables). This may need either a
+permuter search (not yet run for this function -- it is large, 180 words,
+so a search will be slow) or a head-level read.
+
+### Header/struct state
+
+No NEW struct knowledge this round -- everything used
+(`Class6B5CCObj::unk20/unk10/unkC/unk14`, `Class6B5CCSub14::unk18/1C/20/38`,
+`UnkOwner_d294::next/unk14`) was already committed by round 19 or earlier
+in this unit. This round is pure codegen-shape derivation.
+
+### Proposed learning
+
+**A residue where retail computes the SAME conditional expression twice
+(once as an l-value target, once as an r-value source) needs to be written
+out twice at the SOURCE level -- caching it in one variable, however
+plausible-looking, reliably comes out 2 fewer instructions per occurrence
+and desyncs the whole function's length.** This is the same family as
+func_8003E968's CSE finding this round (GCC not merging what looks
+mergeable) but the INVERSE direction: there, GCC merged what retail did NOT;
+here, GCC would happily merge what retail also did NOT, and the fix in both
+cases is to give the compiler no plausible-looking single value to (fail
+to, or successfully) cache -- write the redundant computation out by hand.
+
+**A constant array index applied to a ternary distributes into BOTH
+branches, and a NULL/zero fallback branch is not immune** -- `(cond ? ptr :
+NULL)[i]` is `cond ? ptr[i] : NULL[i]`, and `NULL[i]` for `i != 0` is a
+non-zero literal address, not "still null, offset". Any future ternary
+written as an array base with a non-zero constant index should take the
+index INSIDE the true branch (`&ptr[i]`) and leave the false branch a bare
+NULL, never index the ternary as a whole.
