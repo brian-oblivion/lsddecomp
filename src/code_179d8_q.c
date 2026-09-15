@@ -80,7 +80,17 @@ s32 func_80027FF0(void)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027FFC);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800280D0);
+/* Paired with func_800280E0 just below -- a 1/0 flag toggle on D_8008A88C,
+ * called from func_80027C80 (this table's slot +0x06C) as the first thing
+ * it does, and from func_80028280 which clears it right back. Reads as a
+ * "some subsystem is active" latch; nothing in this unit's own bodies
+ * dereferences D_8008A88C, so its consumer lives elsewhere. */
+extern s32 D_8008A88C;
+
+void func_800280D0(void)
+{
+    D_8008A88C = 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800280E0);
 
