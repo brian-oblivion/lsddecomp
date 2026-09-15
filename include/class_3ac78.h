@@ -168,7 +168,7 @@ struct Class866E8Methods {
     /* +0x034 */ u8 pad034[0x038 - 0x034];
     /* +0x038 */ void (*slot38)(Class866E8 *self);                              /* func_8004A984; called by func_8004B2D4 */
     /* +0x03C */ u8 pad03C[0x040 - 0x03C];
-    /* +0x040 */ void (*slot40)(Class866E8 *self);                              /* func_8004AA10 (gp_rel-blocked, docs/research/gp-relative-blocker.md); called by func_8004B344 */
+    /* +0x040 */ void (*slot40)(Class866E8 *self);                              /* func_8004AA10; called by func_8004B344 */
     /* +0x044 */ u8 pad044[0x080 - 0x044];
     /* +0x080 */ void (*slot80)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* func_8001D4AC; called by func_8004A478 through Class86668::unk34 */
     /* +0x084 */ u8 pad084[0x088 - 0x084];
@@ -177,7 +177,9 @@ struct Class866E8Methods {
     /* +0x0B8 */ UnkChildObj_3ac78 *(*slotB8)(Class866E8 *self, s32 index);      /* func_80042828; called by func_8004ACF8 */
     /* +0x0BC */ u8 pad0BC[0x0D0 - 0x0BC];
     /* +0x0D0 */ void (*slotD0)(Class866E8 *self, void *list, s32 count);        /* func_8004ADD8; called by func_8004AB88 */
-    /* +0x0D4 */ u8 pad0D4[0x0F4 - 0x0D4];
+    /* +0x0D4 */ u8 pad0D4[0x0DC - 0x0D4];
+    /* +0x0DC */ void (*slotDC)(Class866E8 *self, s32 arg1);                    /* func_8004AA10; called with self and the loaded value of D_8008A980 (a lone .word, 0x0000A000, no other reference in the image) */
+    /* +0x0E0 */ u8 pad0E0[0x0F4 - 0x0E0];
     /* +0x0F4 */ void (*slotF4)(Class866E8 *self);                              /* func_8004B5BC; called by func_8004AB24 */
     /* +0x0F8 */ u8 pad0F8[0x100 - 0x0F8];
     /* +0x100 */ void (*slot100)(Class866E8 *self, void *arg1, s32 arg2);        /* func_8004BD14; called by func_8004A984 */
@@ -237,7 +239,12 @@ struct Class866E8 {
     /* +0x1C0 */ u16 unk1C0;                 /* func_8004B100: set to self->unkBC on every grid cell visited */
     /* +0x1C2 */ u8 unk1C2;                  /* func_8004B100: current grid column (entry->col + loop offset), truncated to a byte */
     /* +0x1C3 */ u8 unk1C3;                  /* func_8004B100: current grid row (entry->row + loop offset), truncated to a byte */
-    /* +0x1C4 */ u8 pad1C4[0x1E0 - 0x1C4];   /* func_8004B31C still only takes the address of the block as a whole; real extent of further fields unknown */
+    /* +0x1C4 */ u8 pad1C4[0x1CC - 0x1C4];   /* func_8004B31C still only takes the address of the block as a whole; real extent of further fields unknown */
+    /* +0x1CC */ s32 unk1CC;                 /* func_8004AA10: set to -1 */
+    /* +0x1D0 */ s32 unk1D0;                 /* func_8004AA10: set to -1 */
+    /* +0x1D4 */ s32 unk1D4;                 /* func_8004AA10: set to -1 */
+    /* +0x1D8 */ s32 unk1D8;                 /* func_8004AA10: set to -1 */
+    /* +0x1DC */ u8 pad1DC[0x1E0 - 0x1DC];
     /* +0x1E0 */ s32 unk1E0;                 /* func_8004A534 (ctor): zeroed */
     /* +0x1E4 */ u8 pad1E4[0x1E8 - 0x1E4];
 };
