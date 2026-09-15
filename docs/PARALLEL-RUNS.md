@@ -1386,6 +1386,34 @@ mitigations; the point here is that **this is a Gate 1 decision, not a
 merge-time surprise** — it is the cheapest possible moment to act on it, and
 acting on it costs one command.
 
+> **ROUND 46: THE HONESTY MARKERS ARE ANCHORED INCONSISTENTLY, AND BOTH
+> DIRECTIONS BIT IN ONE SITTING.** The three Gate-1 markers are read by
+> `progress.py` in two different ways, and neither way is written down next to
+> the marker it governs:
+>
+> | marker | how `progress.py` reads it | failure found |
+> | --- | --- | --- |
+> | `REOPENED -- ASSIGNABLE` / `DERIVATION ONLY -- ASSIGNABLE` | `^[\s>*_#-]*(?:REOPENED\|DERIVATION ONLY) -- ASSIGNABLE` — **start of line** | too TIGHT |
+> | `DELIBERATELY UNWORKED` | `"<phrase>" in text` — **bare substring, whole file** | too LOOSE |
+>
+> - **Too tight.** Round 45 put `DERIVATION ONLY -- ASSIGNABLE` in
+>   `func_8001DDF4`'s TITLE, as `# func_8001DDF4 -- DERIVATION ONLY --
+>   ASSIGNABLE, round 45`. The `func_8001DDF4 -- ` in front means the regex
+>   never matched, so the function kept counting as a documented STALL — the
+>   exact permanent-deletion failure the marker exists to stop, reintroduced by
+>   WHERE the marker sat rather than by whether it was there. **`nearmiss.py`
+>   reads a wider title window and DID show it, so the two tools disagreeing is
+>   the tell.** Put the phrase on a line of its own.
+> - **Too loose.** Un-banking `class_3bb8c_n` by rewriting its header comment
+>   to *say* the banked marker had been removed left the phrase in the file, so
+>   `banked` did not move. A sentence ABOUT the marker re-banks the unit exactly
+>   as the marker would. **Do not write that phrase out in full anywhere except
+>   where you mean it to fire** — refer to it, do not quote it.
+>
+> Caught only by re-reading the column instead of assuming the edit took. **A
+> marker edit is not done until the count moves; check the number, not the
+> diff.**
+
 **Gate 2 — carve to refill.** If fresh-assignable functions are fewer than
 roughly (runners × per-runner target), carve new units BEFORE provisioning.
 
@@ -2337,6 +2365,38 @@ scaffold is near 0/0.
 > one level deeper — a search that genuinely ran, and still measured nothing.
 > Ask a runner to record WHICH of the three checks it ran, not just the
 > iteration count and rc.
+
+> **ROUND 46: A GATE-3 SCAFFOLD MISMATCH CAN BE STRUCTURAL TO A WHOLE CLASS
+> FAMILY, WHICH VOIDS THAT FAMILY'S RECORDED NEGATIVES WHOLESALE.** Round 45
+> added check 3 (does the scaffold's base score agree with the same body in
+> the REAL build). Round 46 ran it on freshly-built scaffolds across the
+> `class_3bb8c` / `Obj866E8` family and found it failing every time:
+>
+> | function | scaffold | real build |
+> | --- | --- | --- |
+> | `func_8004C93C` | base 2153, **8 ins / 8 del** | 0/0 |
+> | `func_8004CD38` | base 2900, **14 ins / 14 del** | 0/0 |
+>
+> With earlier confirmations that is **five functions of one family**, which is
+> a pattern and not five coincidences — plausibly structural to the family's
+> heavy `self->methods->slotNN` call-chain shape.
+>
+> **The consequence is retroactive and it is the expensive kind.**
+> `func_8004CD38`'s report asked for a LONGER search because a 71k-iteration
+> search had found nothing. Under check 3 that negative was never evidence
+> about the function — it measured a program nobody is building. So **for a
+> family with a demonstrated scaffold mismatch, every recorded "permuter
+> tried, negative" reverts to UNKNOWN** until someone re-runs check 3 on it.
+> This is the same shape as round 37's permuter-history screen counting the
+> WORD rather than a run, one level deeper: a search that genuinely ran, on a
+> program that was not ours.
+>
+> Two rules follow. **Run check 3 on a fresh scaffold before believing any
+> inherited negative in that family** — it is one rebuild and it stopped two
+> wasted searches in its first round. And **why the generated scaffold diverges
+> from the real translation unit for call-chain-heavy functions is a TOOLING
+> question**: measure it, decline the search, write it down, escalate. Do not
+> fix or work around the scaffold mid-round.
 
 **Never authorized — always an operator escalation, evidence attached:**
 toolchain or flag changes of any kind; editing the protected verification files;
