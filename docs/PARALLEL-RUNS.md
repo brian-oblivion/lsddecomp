@@ -2007,6 +2007,61 @@ matched as C — they were Sony's the whole time"*. So the citing report holds u
 as precedent a pair of stalls that were never game stalls, in support of a
 permuter recommendation for a third function.
 
+**ROUND 43: THE SCREEN ONLY EVER LOOKED AT REPORTS, AND THE SAME STALE
+PRECEDENTS LIVE IN THE SHARED LEARNINGS DOC -- WHICH IS THE ONE FILE EVERY
+RUNNER IS TOLD TO READ.** The detector above crosses closed functions against
+other match REPORTS. `docs/DECOMPILATION_LEARNINGS.md` cites roughly thirty
+SDK-exit function names and nothing was checking it, so a precedent corrected
+in a report kept standing, uncorrected, in the document that taught it.
+
+Round 43 measured the damage and it is not cosmetic. An entire named learning
+-- *"the DCE-eliminated always-true check"* -- rested on **"two confirmed
+instances in sibling CD functions"**, and BOTH are Sony's (`func_8002B94C` is
+`CD_newmedia`, `func_8002BCEC` is `CD_cachefile`, `lib/libcd/iso9660.o`,
+reclassified round 34). The class had **zero game-code instances**. Round 40
+had already adjudicated exactly this in `func_80029C40.md` -- *"there is no
+'documented `func_8002B94C` cause' to match against"* -- and the learnings doc
+went on asserting the cause as a general category for three more rounds.
+
+**And the invalidation is SHARPER for a toolchain claim than round 38 stated.**
+Round 38's rule is that an SDK exit voids a precedent because no source shape
+ever reached those bytes. For a claim of the form *"retail does X here and our
+compiler does Y"*, there is a second, independent reason: those bytes came out
+of **Sony's own ASPSX build**, not our pinned pipeline. So the comparison is
+our compiler against a different assembler's output, and a negative result
+rules out nothing about GCC 2.6.3 while a positive one would prove nothing
+either. That distinction is what separates the half to keep from the half to
+withdraw: **a claim verified with a standalone reproducer through the pinned
+pipeline survives, because the reproducer does not care who wrote retail's
+bytes. An instance-level verdict does not.**
+
+Run it over the shared docs, not just the reports:
+
+```sh
+python3 - <<'EOF'
+import re
+sdk=set(open('/tmp/sdk.txt').read().split())        # the SDK column of the exits census
+for doc in ['docs/DECOMPILATION_LEARNINGS.md','docs/MATCHING-GUIDE.md','CLAUDE.md']:
+    lines=open(doc).read().split('\n')
+    for i,l in enumerate(lines):
+        for f in re.findall(r'func_[0-9A-F]{8}',l):
+            if f not in sdk: continue
+            ctx='\n'.join(lines[max(0,i-12):i+13])
+            if re.search(r"Sony|SDK|libc2|libgs|libgte|libcd|libapi|reclassif|NOT GAME CODE",ctx,re.I):
+                continue
+            print(f"{doc}:{i+1}  {f}\n    {l.strip()[:150]}")
+EOF
+```
+
+**It over-reports badly and that is the correct trade -- do not tighten it.**
+A twelve-line context window cannot tell a live precedent from a citation that
+is already corrected two paragraphs down, and every attempt in this document's
+history to make a screen more precise has broken it in the expensive
+direction. Read the hits; most are fine. The ones that matter are citations
+that carry a COUNT of instances (*"two confirmed instances"*, *"the same class
+as"*) or that name a function as the worked example FOR a category, because
+those are the ones a runner will act on.
+
 **One report already handles this correctly, which is the model to copy.**
 `func_80030E90.md` line 532 writes *"a MATCHED sibling, now Sony's object"* —
 it names both the exit and the reclassification in five words. That is all a

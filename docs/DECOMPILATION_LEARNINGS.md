@@ -864,9 +864,16 @@ elision" in an isolated reduction and transfers to none of the real functions
    deletions, zero register differences — pure reordering) to have no second
    block at all, and a barrier STILL fails to move it: the right category of
    instrument, no position found that works.
-3. **Dead-code elimination.** `func_8002B94C`'s redundant-looking check is
+3. **Dead-code elimination.** ~~`func_8002B94C`'s redundant-looking check is
    removed by the optimizer BEFORE scheduling runs, which no barrier
-   placement can rescue.
+   placement can rescue.~~ **WITHDRAWN (round 43): the cited instance is
+   Sony's `CD_newmedia`** (`lib/libcd/iso9660.o`, reclassified round 34), so
+   no source shape of ours ever produced those bytes and this category has no
+   surviving worked example. The general point that DCE runs BEFORE scheduling
+   and is therefore barrier-proof is still true of GCC 2.6.3 -- and
+   `func_80029C40` measured an instance of it independently, on game code, in
+   round 35 (an `andi` mask after an already-zero-extending `lbu`). **Cite
+   that one.**
 
 So diagnose from the real `.s`'s block/label structure and, where available, a
 permuter `--debug` breakdown, before reaching for a barrier as a first move.
@@ -4761,6 +4768,32 @@ result is a bounded open residue instead of a false lead the next round would
 have re-run. Ask for the mechanism to be tested, not accepted.
 
 ### Round 27: the DCE-eliminated always-true check gets a structural hypothesis (and two axes closed)
+
+> **VOID AS A GAME-CODE CLASS -- round 43, head. Read this before the section
+> below.** Both of the "two confirmed instances" are **Sony's**:
+> `func_8002B94C` is `CD_newmedia` and `func_8002BCEC` is `CD_cachefile`, both
+> linked from `lib/libcd/iso9660.o` and reclassified in round 34. The class
+> therefore has **zero game-code instances**, and every structural hypothesis
+> below is a hypothesis about what SOURCE EXPRESSION produced bytes that were
+> never compiled from our source at all -- they came out of Sony's own ASPSX
+> build. "Retail keeps a check our compiler removes" is not even the right
+> comparison here: it compares our pinned pipeline against a different
+> assembler's output, so a negative result below rules out nothing about GCC
+> 2.6.3 and a positive one would prove nothing either.
+>
+> **What survives is the METHOD, not the finding.** Round 27's reasoning --
+> that three spellings sharing one local are one attempt, not three; that a
+> global-sourced condition survives DCE where a local-sourced one does not --
+> was sound, and the global-vs-local observation was verified with a
+> standalone reproducer through the pinned pipeline, which is what makes that
+> half independent of who wrote the bytes. Keep the reproducer-backed claim;
+> do not carry any instance-level verdict forward, and do not treat this
+> section as precedent for a residue you meet in game code.
+>
+> This is round 38's SDK-exit rule applied to a SHARED DOC rather than to a
+> match report, which is the gap round 43 found: the seventh screen in
+> `docs/PARALLEL-RUNS.md` crosses closed functions against other REPORTS and
+> never looked at this file -- the one file every runner is told to read.
 
 The class -- retail keeps a check GCC's dead-code elimination removes -- now
 has **two confirmed instances in sibling CD functions**: `func_8002B94C`
