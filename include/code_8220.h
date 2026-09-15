@@ -70,26 +70,63 @@ struct BasicClass {
 };
 
 /*
- * bMemPMgr -- BMemPMgrInit's own pool-header object. Only the two fields
- * BMemPMgrInit itself writes are typed; the rest of the allocation
- * (poolSize + 0x20 bytes total) is an opaque free-list area owned by
- * func_80017AC8/func_80017B34/func_80017CFC (all gp_rel-blocked, see
- * docs/research/gp-relative-blocker.md), manipulated as a packed
- * size+flags word per node -- never as this struct's own fields.
+ * BMemBlockHdr -- a single free-list node inside a BMemPMgr's pool area.
+ * `sizeAndFlags` packs the block's byte size into the low 28 bits and
+ * flag bits into the high 4 (0x40000000 = free); `prev`/`next` link the
+ * pool's doubly-linked free list. Derived from func_80017AC8 (round 45)
+ * and reused by func_80017B34/func_80017CFC's still-undecoded bodies,
+ * which walk this same list via BMemPMgr's freeListStart/freeListEnd.
+ */
+typedef struct BMemBlockHdr BMemBlockHdr;
+struct BMemBlockHdr {
+    /* +0x000 */ u32 sizeAndFlags;
+    /* +0x004 */ BMemBlockHdr *prev;
+    /* +0x008 */ BMemBlockHdr *next;
+};
+
+/*
+ * bMemPMgr -- BMemPMgrInit's own pool-header object. `freeListHead`/
+ * `poolSize` are the two fields BMemPMgrInit itself writes; the three
+ * below them (round 45, func_80017AC8) round out the pool's free-list
+ * bookkeeping. What remains opaque is the pool AREA itself (poolSize +
+ * 0x20 bytes total, starting at `freeListHead`), walked as a chain of
+ * BMemBlockHdr nodes rather than through any field of this struct.
  */
 typedef struct BMemPMgr BMemPMgr;
 struct BMemPMgr {
-    /* +0x000 */ void *freeListHead;  /* set to `self + 0x1C` by BMemPMgrInit; a free-block header immediately after this struct */
+    /* +0x000 */ void *freeListHead;   /* set to `self + 0x1C` by BMemPMgrInit; the pool's first free-list node */
     /* +0x004 */ s32 poolSize;
+    /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, func_80017AC8/B34/CFC */
+    /* +0x00C */ BMemBlockHdr *freeListEnd;   /* free list tail, same trio */
+    /* +0x010 */ s32 unk10;            /* set to 1 by func_80017AC8; not yet read by any decoded function */
 };
 
 /* The generic pool allocator/free pair, established already by
  * include/class_3ac78.h, include/DreamSys.h, include/Entity.h etc. --
- * both single-argument; see the BasicClass doc comment above for why
- * the pool-pointer second parameter these two functions' own bodies
- * read is not a real argument in practice. */
-extern void *func_80017B34(s32 size);
-extern void *func_80017CFC(void *ptr);
+ * all single-argument, and every one of those ~15 headers declares its
+ * own full ANSI prototype (`s32 size` / `void *ptr`), per this project's
+ * multiple-independent-local-views convention -- none of them get their
+ * declaration from this header.
+ *
+ * THIS header, uniquely, declares both with UNSPECIFIED parameters
+ * (empty parens). Round 45 (func_80017B34/func_80017CFC, matched): each
+ * function's own BODY genuinely reads a second argument ($a1, a fallback
+ * pool pointer used only when the global default pool D_8008A818 is
+ * unset -- dead in practice at every decoded call site, confirmed by
+ * func_80017AC8/A9C setting that global before either is ever called).
+ * Both are therefore DEFINED in code_8220.c with an old-style
+ * (K&R identifier-list) parameter list, which is the only way to expose
+ * that second parameter to their own bodies without contradicting the
+ * ~15 external single-argument prototypes OR this same unit's own
+ * single-argument call sites (func_800181AC's `func_80017B34(0x8)`,
+ * func_80018208's `func_80017CFC(node)`) that appear LATER in
+ * code_8220.c. A K&R-style definition does not install a prototype, so
+ * those later 1-argument calls stay uncheck-and-compile clean; an
+ * unspecified-parameter declaration here does the same for everything
+ * before the definition. Do not "fix" this back to a full prototype --
+ * that reintroduces the conflict this was written to route around. */
+extern void *func_80017B34();
+extern void *func_80017CFC();
 
 /* BMemPMgr setup, gp_rel-blocked (docs/research/gp-relative-blocker.md).
  * Called only by BMemPMgrInit in this unit. Genuinely ONE argument: its
@@ -99,6 +136,21 @@ extern void *func_80017CFC(void *ptr);
  * by objdump: declaring a second parameter here forces the caller to
  * materialise a spurious `move a1,s1`, one word too many. */
 extern void func_80017AC8(BMemPMgr *pool);
+
+/* The default-pool global itself (see the comment above). Setter is
+ * func_80017A9C(BMemPMgr *pool), a one-line `D_8008A818 = pool;`. Not yet
+ * called from any carved C -- BMemPMgrInit never calls it, so whoever
+ * establishes the game's one default pool is still asm. */
+extern BMemPMgr *D_8008A818;
+
+/* Pool allocator/free critical-section flag, code_8220_b (setter
+ * func_8001844C, getter func_80018458). func_80017B34/func_80017CFC in
+ * THIS unit bracket their free-list walk with func_8001844C(1) on entry
+ * and func_8001844C(0) on exit -- an enter/exit pair, not a real lock
+ * (no busy-wait or check on entry visible in either caller). */
+extern s32 D_8008A820;
+extern void func_8001844C(s32 val);
+extern s32 func_80018458(void);
 
 /* The Psy-Q declarations that used to sit here (func_80011D34 is malloc,
  * func_80011F68 is free, func_80012C20 is printf) moved into src/code_8220.c

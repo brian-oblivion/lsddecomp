@@ -34,14 +34,37 @@ void *BMemPMgrInit(s32 poolSize)
     return pool;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017A9C);
+void func_80017A9C(BMemPMgr *pool)
+{
+    D_8008A818 = pool;
+}
 
 void func_80017AA8(void *ptr)
 {
     free(ptr);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017AC8);
+void func_80017AC8(BMemPMgr *pool)
+{
+    BMemPMgr *mgr;
+    BMemBlockHdr *header;
+    u8 *end;
+
+    mgr = D_8008A818;
+    if (mgr == NULL) {
+        mgr = pool;
+    }
+    mgr->unk10 = 1;
+    header = mgr->freeListHead;
+    mgr->freeListStart = header;
+    mgr->freeListEnd = header;
+    header->sizeAndFlags = mgr->poolSize | 0x40000000;
+    mgr->freeListStart->prev = NULL;
+    mgr->freeListEnd->next = NULL;
+    end = (u8 *)header + (header->sizeAndFlags & 0xFFFFFFF);
+    *(BMemBlockHdr **)(end - 4) = header;
+    *(u32 *)end = 0x80000000;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017B34);
 

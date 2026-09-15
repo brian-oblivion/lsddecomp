@@ -58,9 +58,15 @@ void func_800183DC(BasicClass **array, s32 count)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_8001844C);
+void func_8001844C(s32 val)
+{
+    D_8008A820 = val;
+}
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018458);
+s32 func_80018458(void)
+{
+    return D_8008A820;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018464);
 
