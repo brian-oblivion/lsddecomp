@@ -504,6 +504,33 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005511C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055258);
 
+extern s32 D_8008732C;
+extern s32 D_8008E0B8;
+
+/* STALL, 25/87 words, 2 words long (out-of-range drift present) -- see
+ * docs/match-reports/func_80055410.md. Preserved near-miss body: */
+#if 0
+void func_80055410(void) {
+    s32 r;
+    s32 mod3;
+
+    rand();
+    D_8008E0A8 = D_8008732C;
+    r = rand();
+    *(s32 *) D_8008E0A4 = (r % 20) << 11;
+    mod3 = D_8008AC74 % 3;
+    D_8008E0AC = 0xA000;
+    if (mod3 == 1) {
+        D_8008E0AC = -0xA000;
+    } else if (mod3 == 2) {
+        D_8008E0AC = 0x800;
+    }
+    r = rand();
+    D_8008E0B0 = D_80087174 + ((u32) r % 7) * 12;
+    r = rand();
+    D_8008E0B8 = r % 5;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055410);
 
 extern s32 D_8008AC7C;
