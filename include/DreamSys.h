@@ -821,10 +821,13 @@ extern s32 (*D_80087EEC[4])(DreamSys *this);
 /* Called by func_8005A9CC with NO explicit argument setup (the disassembly's
    call site leaves `$a0` holding an unrelated leftover value from the
    preceding statement, same "empty delay slot, no a0-a3 setup" shape as
-   func_8005BF48 above); return value used as D_80087EEC's index. Blocked by
-   both the gp-relative and addiu_at blockers -- see
-   docs/match-reports/func_8005C118.md -- so it stays INCLUDE_ASM; this
-   prototype only types the call site. */
+   func_8005BF48 above); return value used as D_80087EEC's index. MATCHED
+   round 43 (2026-09-15) -- both the gp-relative and addiu_at blockers it was
+   filed under are resolved (see docs/research/gp-relative-blocker.md and
+   docs/research/addiu-at-blocker.md), and the one-line body
+   `D_80088BA4[D_8008ACC4][D_8008ACC8].extra` matched on the first rebuild
+   (docs/match-reports/func_8005C118.md). Still declared here to type
+   func_8005A9CC's call site, which remains INCLUDE_ASM in this unit. */
 extern s32 func_8005C118(void);
 
 struct vtable_DreamSys{

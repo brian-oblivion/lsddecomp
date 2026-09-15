@@ -362,7 +362,7 @@ void func_800593D8(DreamSys *this)
  * arg4 on func_8001E600 is unused by its own body but IS set (to 0) by this
  * call site's own disassembly, so it is declared here to reproduce that. */
 extern void func_8001E600(void *self, s32 *dst, s32 *src, s32 arg4);
-extern s32 func_8005950C(void *a, void *b, s32 day);
+extern s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
 extern s32 func_8001EF14(s32 *a, s32 range, s32 *b);
 
 s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
@@ -391,7 +391,20 @@ s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 toleran
 	return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005950C);
+s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
+{
+	s32 scaledArg2;
+	s32 dt;
+	s32 dv;
+
+	scaledArg2 = arg2;
+	scaledArg2 = scaledArg2 / 0x400;
+	dt = (b->position - a->position) / 0x400;
+	if (dt == 0)
+		dt = 1;
+	dv = b->value - a->value;
+	return (dv * scaledArg2) / dt + a->value;
+}
 
 void func_80059590(DreamSys *this)
 {
@@ -830,7 +843,33 @@ void func_8005A1F4(void *arg0, Func8005A1F4Arg *arg1)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitNewGame);
+/* Also declared in code_2cc8c_f.c with the same signature (that unit's own
+   local view of the same libc-style function). */
+extern void *memset(unsigned char *dst, unsigned char c, int n);
+
+/* A constant read out of .sdata and copied whole into
+   this->unknown_sdata_0x178 -- naming convention matches (the field's own
+   name already flags it as sdata-sourced). Not dereferenced by this
+   function or any other in this unit's queue. */
+extern s32 D_8008ABE0;
+
+void DreamSys__InitNewGame(DreamSys *this)
+{
+	this->unknown_sdata_0x178 = D_8008ABE0;
+	this->currentYear = 0;
+	this->currentDay = 0;
+	this->totalFlasbackUnlockScore = 0;
+	this->navigationFlasbackUnlockScore = 0;
+	this->instanceFlasbackUnlockScore = 0;
+	this->amountFlashbacksAvailable = 0;
+	this->unknown_values_0x5d8[7] = 0;
+	this->unknown_values_0x5d8[0] = 0;
+	this->screenShakeOn = 1;
+	this->unknown_word_0x67c = 0;
+	this->unknown_word_0x680 = 0;
+	InitNavChallengesArray(&this->navChallengesArray, &this->amountDynamicLinksDone);
+	memset((unsigned char *)&this->unknown_values_0x684, 0, 0x1F4);
+}
 
 void DreamSys__GetSetScreenShake(DreamSys *this, bool *value)
 {
@@ -1323,7 +1362,45 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 #endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
+void DreamSys__GetPreviousDayMood(DreamSys *this, MoodGraphPoint *target, bool unknown)
+{
+	s32 upper = 0;
+	s32 dynamic = 0;
+
+	if (unknown) {
+		if (this->currentYear != 0 || this->currentDay != 0) {
+			s32 idx;
+
+			idx = this->currentDay - 1;
+			dynamic = this->moodPreviousDays[idx].axis.dynamic;
+			upper = this->moodPreviousDays[idx].axis.upper;
+		}
+	} else {
+		s32 count;
+		count = 0x16D;
+		if (this->currentYear == 0)
+			count = this->currentDay;
+		if (count != 0) {
+			MoodGraphPoint *p;
+			s32 i;
+
+			p = this->moodPreviousDays;
+			i = 0;
+			if (upper < count) {
+				do {
+					i++;
+					dynamic += p->axis.dynamic;
+					upper += p->axis.upper;
+					p++;
+				} while (i < count);
+			}
+			dynamic /= count;
+			upper /= count;
+		}
+	}
+	target->axis.dynamic = dynamic;
+	target->axis.upper = upper;
+}
 
 void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
 {
@@ -1534,16 +1611,70 @@ struct vtable_DreamSys *Get_vtable_DreamSys(void)
 	return &DREAMSYS_METHODS;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", InitNavChallengesArray);
+void InitNavChallengesArray(s8 (*arrayMem)[30], s32 *linkCounter)
+{
+	s32 i;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcNavigationScore);
+	for (i = 29; i >= 0; i--)
+		(*arrayMem)[i] = 0;
+	gpNavChallengesComplete = arrayMem;
+	*linkCounter = 0;
+	gpDinamicLinkPenalty = linkCounter;
+}
+
+s32 CalcNavigationScore(void)
+{
+	s32 sum;
+	s8 *p;
+	s32 i;
+
+	sum = 0;
+	p = *gpNavChallengesComplete;
+	i = 0;
+	do {
+		if (p[i] != 0)
+			sum += 1000000;
+		i++;
+	} while (i < 30);
+	if (sum > 29999999)
+		sum = 50000000;
+	sum -= *gpDinamicLinkPenalty * 11024;
+	if (sum < 0)
+		sum = 0;
+	return sum;
+}
 
 s32 func_8005BB14(s32 stage)
 {
 	return STAGE_TIME_LIMITS[stage];
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", GetRandomSpawnFromStage);
+s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused)
+{
+	s32 stage;
+	s32 index;
+	StageSpawn *entry;
+	s32 six;
+
+	six = 6;
+	if (stg >= 0) {
+		stage = rand() % six;
+		if (stage == stg) {
+			stage++;
+			if (stage >= 6)
+				stage = 0;
+		}
+	} else {
+		stage = -stg;
+	}
+
+	index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
+	entry = &STAGE_SPAWNPOINTS[stage][index];
+	*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
+	target->position = SPAWN_POS_ADJUST[entry->adjustment];
+	(*gpDinamicLinkPenalty)++;
+	return stage;
+}
 
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
@@ -1557,15 +1688,15 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 	                       D_80088980, D_80088820, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BD3C);
-
 /* Unit-local reading of the second parameter: the caller (func_8005BD3C)
    passes down a `s32 local[4]` buffer that func_8001E6F8 (code_d294_c) fills
    with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
    that table's `out[1].whole` (a degrees value, per func_8001E6F8's own
    report). This function reads it unsigned (`lhu`), independent of
    WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
-   bytes, so it is kept local rather than folded into that shared struct. */
+   bytes, so it is kept local rather than folded into that shared struct.
+   Moved above func_8005BD3C (round 43) because that function's own arg2 is
+   cast to this type before being forwarded to func_8005BE28 below. */
 typedef struct DirectionCheckArg {
 	s8 unk0[4];
 	u16 heading;
@@ -1585,6 +1716,51 @@ typedef struct DirectionTableEntry {
 
 extern DirectionTableEntry D_8008875C[];
 
+/* Forward declaration: defined below in ROM order, called by func_8005BD3C
+   just above it. */
+extern s32 func_8005BE28(DirectionCheckArg *a0, u8 a1);
+
+/* D_800889B8: a per-stage table of pointers to byte arrays (4-byte stride,
+   indexed by D_8008ACBC), each further indexed by D_8008ACC0 to read the
+   "heading" byte passed to func_8005BE28. D_80088858 is the analogous
+   table for D_8008ACC4/D_8008ACC8. Neither array's own element type is
+   dereferenced beyond a single `u8` here. */
+extern u8 *D_800889B8[];
+extern u8 *D_80088858[];
+
+/* A `DirectionTableEntry`-STRIDED (12-byte) table whose first element
+   happens to sit 4 bytes before the separately-referenced `D_8008875C`
+   (the angle table `func_8005BE28` indexes) -- splat drew the boundary
+   there because `D_8008875C` is independently referenced, not because the
+   underlying data is two different tables. This function only ever
+   ADDRESS-TAKES an element (`&D_80088758[i]`), never dereferences one, so
+   the element type only needs to fix the STRIDE; reusing
+   `DirectionTableEntry` for that is exact and avoids inventing a third
+   local type for one call site. */
+extern DirectionTableEntry D_80088758[];
+
+s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2)
+{
+	u8 heading;
+	s32 idx;
+	s32 result;
+
+	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
+	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+		if (arg1 != NULL)
+			*arg1 = (s32)&D_80088758[heading];
+
+		if (arg0 != NULL) {
+			idx = D_80088858[D_8008ACC4][D_8008ACC8];
+			*arg0 = (s32)&D_80088758[idx];
+		}
+		result = 1;
+	} else {
+		result = 0;
+	}
+	return result;
+}
+
 s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
 {
 	s16 diff;
@@ -1598,15 +1774,98 @@ s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
 	return (u16)(diff + 44) < 89;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE90);
+/* Compared against the leading 4 bytes (chunk+tile) of `currentPos` as a
+   raw word; only ever compared here, never dereferenced field-by-field. */
+extern s32 D_8008ABE8;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BF48);
+s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
+{
+	s32 result;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BF68);
+	if (stage == 3)
+		goto shared;
+	if (stage == 1)
+		goto shared;
+	if (stage == 5)
+		goto case5;
+	if (stage == 9)
+		goto shared;
+	if (stage != 0xC)
+		return -1;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4InstantTeleporters);
+shared:
+	if (stage != 5)
+		goto case9check;
+case5:
+	if (currentPos->position.y < -0xFFF)
+		goto merge;
+	if (*(s32 *)currentPos == D_8008ABE8)
+		goto merge;
+	return -1;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BFC4);
+case9check:
+	if (stage != 9)
+		goto merge;
+	if (currentPos->position.y < 0x800)
+		return -1;
+
+merge:
+	if (timer & 1)
+		stage = -0xC;
+	result = GetRandomSpawnFromStage(target, stage, timer);
+	D_8008ACC4 = result;
+	return result;
+}
+
+/* Set (whole word) into `this->unk_0x880` by func_8005A7A0 just before an
+   ExecuteLink; only ever address-taken here, never dereferenced by this
+   unit's queued functions. */
+extern s32 D_8008ABF0;
+
+s32 func_8005BF48(void)
+{
+	s32 result;
+
+	result = 0;
+	if (D_8008ACC4 != 0xC)
+		result = (s32)&D_8008ABF0;
+	return result;
+}
+
+/* Flag set here, tested by Test4InstantTeleporters right below; local to
+   this unit -- code_4cd08.c calls the setter through its own extern
+   (`extern void func_8005BF68(bool value);`), never touches the flag
+   directly. */
+extern s32 D_8008ABE4;
+
+void func_8005BF68(bool value)
+{
+	D_8008ABE4 = value;
+}
+
+/* Table triple for Test4InstantTeleporters, same roles as the
+   D_800889F0/D_80088CBC triples above but for instant-teleporter links. */
+extern s8 D_80088B5C[];
+extern StaticLinkTrigger* D_80088B24[];
+extern StageSpawn* D_80088A80[];
+
+s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
+{
+	s32 result;
+
+	if (D_8008ABE4 == 0) {
+		result = -1;
+	} else {
+		result = GetStaticSpawn(target, currentPos, stage, D_80088B5C,
+		                         D_80088B24, D_80088A80, 0);
+	}
+	return result;
+}
+
+s32 func_8005BFC4(void)
+{
+	return (D_8008ACBC == 0) ? 0xA : 0;
+}
 
 s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
 {
@@ -1616,11 +1875,75 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 	return -1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C02C);
+/* Same role as D_800889B8/D_80088858 for func_8005BD3C above, but for this
+   function's own "link test" (indexed the same way: D_8008ACBC/D_8008ACC0
+   for the heading lookup, D_8008ACC4/D_8008ACC8 for the second table). */
+extern u8 *D_80088C84[];
+extern u8 *D_80088BDC[];
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005C118);
+s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2)
+{
+	u8 heading;
+	s32 idx;
+	s32 result;
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", GetStaticSpawn);
+	heading = D_80088C84[D_8008ACBC][D_8008ACC0];
+	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+		if (arg1 != NULL)
+			*arg1 = (s32)&D_80088758[heading];
+
+		if (arg0 != NULL) {
+			idx = D_80088BDC[D_8008ACC4][D_8008ACC8];
+			*arg0 = (s32)&D_80088758[idx];
+		}
+		result = 1;
+	} else {
+		result = 0;
+	}
+	return result;
+}
+
+s32 func_8005C118(void)
+{
+	return D_80088BA4[D_8008ACC4][D_8008ACC8].extra;
+}
+
+s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
+                    s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag)
+{
+	s32 count;
+	StaticLinkTrigger *trig;
+	s32 i;
+	StageSpawn *entry;
+	s32 triggerStage;
+	u32 spawnIndex;
+
+	count = *(u8 *)&triggerLens[stage];
+	if (count == 0)
+		return -1;
+
+	trig = triggers[stage];
+	for (i = 0; i < count; i++, trig++) {
+		if (*(s16 *)&currentPos->chunk != *(s16 *)&trig->chunk)
+			continue;
+		if (*(s16 *)&currentPos->tile != trig->tile.value && trig->tile.value >= 0)
+			continue;
+
+		D_8008ACBC = stage;
+		D_8008ACC0 = i;
+		triggerStage = trig->stage;
+		D_8008ACC4 = triggerStage;
+		spawnIndex = *(u8 *)&trig->spawnpointIndex;
+		entry = &spawns[triggerStage][spawnIndex];
+		D_8008ACC8 = spawnIndex;
+		*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
+		target->position = SPAWN_POS_ADJUST[entry->adjustment];
+		if (flag != 0)
+			(*gpNavChallengesComplete)[entry->extra] = 1;
+		return D_8008ACC4;
+	}
+	return -1;
+}
 
 s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint *mood, s32 day)
 {

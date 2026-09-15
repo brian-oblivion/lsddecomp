@@ -1,18 +1,22 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `nop_mflo_mfhi`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
+# DreamSys__GetPreviousDayMood — MATCHED 64/64
 
-# DreamSys__GetPreviousDayMood
+**Unit:** DreamSys · **Size:** 64 words (0x100 bytes) · **Status:** MATCHED,
+round 43.
 
-**Unit:** DreamSys · **Size:** 64 words (0x100 bytes) · **Status:** STALL —
-**solved at the C level**; blocked only by the already-documented
-`nop_mflo_mfhi` toolchain issue. Restored to `INCLUDE_ASM`, `build exit=0`,
-whole-image SHA1 green.
+## Round 43 update
+
+This function was filed as a STALL, solved at the C level, blocked only by
+`nop_mflo_mfhi`. Round 42 (2026-09-15) RESOLVED that blocker with maspsx's
+`--no-nop-mflo-mfhi` flag (`docs/research/gp-relative-blocker.md`,
+"RESOLVED" addendum). Round 43 spliced the preserved body below back in
+verbatim (zero changes) and it matched on the very first rebuild -- exactly
+as expected, since the report already established every instruction,
+register and branch target matched except for the two now-removed `nop`s.
+`./build-and-verify.sh` -> `build exit=0`. `tools/funcdiff.py
+DreamSys__GetPreviousDayMood` -> `64/64 words match`.
+
+Everything below is preserved from the original stall report as the
+historical derivation record.
 
 ## The body. It is correct — all 64 instructions.
 

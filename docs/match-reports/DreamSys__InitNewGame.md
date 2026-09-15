@@ -1,40 +1,68 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
+# DreamSys__InitNewGame — MATCHED 30/30
 
-# DreamSys__InitNewGame
+**Unit:** DreamSys · **Size:** 30 words · **Status:** MATCHED, round 43.
 
-**Unit:** DreamSys · **Size:** 30 words · **Status:** BLOCKED, not attempted ·
-Classified by the head in round 2026-08-30-a.
+## History
 
-This is a **stub report**, filed so `tools/progress.py` stops counting this
-function as fresh ground and staffing a runner onto it. It records a routing
-decision, not an attempt.
+Filed round 2026-08-30-a as BLOCKED on `gp_rel` (`D_8008ABE0`). Round 42
+RESOLVED that blocker. Rebuilt fresh this round and matched on the first
+attempt.
 
-## Why it is blocked — gp-relative
+## What it does
 
-1 `%gp_rel` reference(s), the first to `D_8008ABE0`.
-That is the **gp-relative addressing blocker**,
-`docs/research/gp-relative-blocker.md`: the pinned `-G0` pipeline emits the
-two-instruction absolute (`lui`+`lw`) form where retail has the one-instruction
-`$gp`-relative form. The `-G` experiment was run on 2026-08-29 with operator
-authorisation and REJECTED — a clean non-zero-`-G` rebuild damages 19148 bytes,
-and `-G4`/`-G8` damage identically, ruling out the size threshold as the
-mechanism. The pin stays at `-G0`.
+Resets a "new game" batch of `DreamSys` fields to zero, seeds
+`unknown_sdata_0x178` from a `.sdata` constant, sets `screenShakeOn = 1`,
+calls `InitNavChallengesArray` (matched earlier this round) on
+`&this->navChallengesArray`/`&this->amountDynamicLinksDone`, and `memset`s a
+500-byte tail region (`unknown_values_0x684`) to zero.
 
-## Do not re-derive this
+Field offsets were verified against the struct layout with a host-side
+`offsetof()` probe compiled `-m32` (matching the target's 4-byte pointers;
+compiling without `-m32` gives 8-byte-pointer offsets that do NOT match the
+struct's own offset-encoding names) -- every field touched here
+(`currentYear`, `currentDay`, `totalFlasbackUnlockScore`,
+`navigationFlasbackUnlockScore`, `instanceFlasbackUnlockScore`,
+`amountFlashbacksAvailable`, `unknown_values_0x5d8`, `screenShakeOn`,
+`unknown_word_0x67c`, `unknown_word_0x680`, `unknown_values_0x684`) landed
+exactly at the byte offset its name already encodes, confirming the
+project's `_0xNNN` naming convention is reliable for this struct.
 
-Both blockers are already escalated with reproducers and corpus censuses attached.
-Do not spend attempts here, do not propose a toolchain change, and do not classify
-a residue from this construct as a scheduling or delay-slot choice. Check cheaply
-before attempting any function:
+## Final body
 
-```sh
-grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
-grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+```c
+extern void *memset(unsigned char *dst, unsigned char c, int n);
+extern s32 D_8008ABE0;
+
+void DreamSys__InitNewGame(DreamSys *this)
+{
+	this->unknown_sdata_0x178 = D_8008ABE0;
+	this->currentYear = 0;
+	this->currentDay = 0;
+	this->totalFlasbackUnlockScore = 0;
+	this->navigationFlasbackUnlockScore = 0;
+	this->instanceFlasbackUnlockScore = 0;
+	this->amountFlashbacksAvailable = 0;
+	this->unknown_values_0x5d8[7] = 0;
+	this->unknown_values_0x5d8[0] = 0;
+	this->screenShakeOn = 1;
+	this->unknown_word_0x67c = 0;
+	this->unknown_word_0x680 = 0;
+	InitNavChallengesArray(&this->navChallengesArray, &this->amountDynamicLinksDone);
+	memset((unsigned char *)&this->unknown_values_0x684, 0, 0x1F4);
+}
 ```
+
+`memset`'s extern declaration copies `code_2cc8c_f.c`'s own local view
+verbatim (`extern void *memset(unsigned char *dst, unsigned char c, int
+n);`) -- it is a Psy-Q/libc function, uncarved (`psyq_memset.s`), so per
+project convention this is a unit-local prototype, not something added to a
+shared header.
+
+## Verification
+
+`./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
+`tools/funcdiff.py DreamSys__InitNewGame` -> `30/30 words match`.
+
+## Provenance
+
+round 43, runner ALPHA, unit DreamSys.
