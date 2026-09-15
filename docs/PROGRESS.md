@@ -6,6 +6,122 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-15 — round 46: five runners plus three re-sends, 17 matches, a HARD RULE that fails its own test, and a permuter candidate lost by writing up on time
+
+**State at end: 1123 matched / 1252 game functions (89.70%)**, up **17** from
+round 45's 1107. Game bytes 68.20% → **69.28%**. Queue 135 → **118** live
+`INCLUDE_ASM`; `fresh` 2 → **5**; stalled 110 → 113; banked 23 → **0** (the
+round-45 carve was staffed and emptied of its banked status); uncarved
+**11 → 11** (no carve — see Gate 2). Build green after all **eight** merges and
+after the final `make extract`; tree clean, all five worktrees and branches
+removed. **Zero merge conflicts, fourth round running.**
+
+`code_179d8_r` is **COMPLETE** (2 of 2). `code_8220` is down to one remaining.
+`class_3bb8c_n` — carved and banked in round 45, never worked before — gave
+**14 matches** across two sittings and is the round's whole match surplus.
+
+**Gates.** Gate 0 green. Gate 1: `fresh` was 2, and two honesty-marker repairs
+took it to 26 before staffing (below). Gate 2: **did not carve** — 11 uncarved
+functions remain in the entire executable and the banked unit already covered
+staffing. Gate 3: no standalone permuter round; searches were run inside
+runner sittings under round 45's three checks, which is where they paid.
+
+**Staffing shape that produced zero conflicts.** Five unit-groups chosen so
+every header-contending pair sat INSIDE one runner's own assignment —
+`headercontention.py` reported 8 contending pairs and all 8 were internal.
+Cross-runner header exposure was therefore nil by construction rather than by
+luck.
+
+### The round's most important finding: HARD RULE 6 fails its own test
+
+CLAUDE.md permits a bare `__asm__("")` by name and then gives a behavioural
+test that construct can fail. Measured through the pinned pipeline on
+game-neutral code, **removing a bare `__asm__("")` swaps which physical
+register holds each value** — verbatim what the rule calls banned. And
+`__asm__("" ::: "memory")` came out **byte-identical** to the bare form, so the
+memory clobber is not the risky half.
+
+The distinction that survives is **directedness**: pinning names the register
+you want and gets it; a barrier only perturbs and you take what comes out. The
+literal test over-fires on undirected constructs. **This is an operator
+escalation — a HARD RULE is not the head's to rewrite** — and the working
+discipline recorded meanwhile is: barriers stay allowed, say in the report what
+one DID, and adding barriers one at a time until a register lands where you
+want it is directed by construction and out of bounds whatever the syntax.
+
+Found by adjudicating a runner's stall classification rather than by looking
+for it, which is the protocol's claim about where head time pays.
+
+### Committing before you wait protects your work, not your SEARCH
+
+Round 18 fixed "runner ends its turn waiting, has zero commits". Round 46 found
+the variant that survives that fix. `bravo` committed its improvement
+(`func_80017B34` 92→96/114), wrote its report recording candidate score 250,
+reported clean — then ended its turn. The search kept running and produced a
+**score-220** candidate in no report and no commit, in an untracked directory
+teardown destroys. Re-staffed to recover it, it translated to a **real +5
+words (96→101/114)** — worth more than everything that sitting recorded.
+After a bound fires, read every `output-*/score.txt`, not just the one you
+noticed.
+
+### Re-sends, again, without a channel
+
+`SendMessage` is still absent (verified, not assumed). Three worktrees were
+re-staffed with fresh agents after their runners finished. Those re-sends
+produced `func_80017CFC` **107/107** (a first-ever permuter search, zero at
+iteration 373), the +5-word recovery above, and 6 of the 14 `class_3bb8c_n`
+matches. Fourth consecutive round the §3c substitute has paid.
+
+### Two gate-level repairs, both found by re-reading a COUNT
+
+- `func_8001DDF4`'s `DERIVATION ONLY -- ASSIGNABLE` marker was inside its
+  title, and `progress.py` anchors that regex at start-of-line — so it never
+  fired and the function counted as a documented stall. `nearmiss.py` reads a
+  wider window and DID show it; **the two tools disagreeing is the tell.**
+- Un-banking `class_3bb8c_n` by writing a sentence SAYING its banked marker was
+  removed left the phrase in the file, and `progress.py` matches it as a bare
+  whole-file substring — so `banked` did not move. The markers are anchored
+  inconsistently in opposite directions; a marker edit is not done until the
+  count moves.
+
+### Stale-precedent sweep, one subsection past where round 45 stopped
+
+Round 45 corrected the round-27 lever TABLE after two of its three positives
+turned out to be Sony's. The two subsections immediately below it rest on the
+same SDK-exit functions and were never swept. Rather than annotate, both claims
+went through the pinned pipeline on game-neutral code: **"invert the guard"
+headline CONFIRMED but its length corollary WITHDRAWN** (both forms 15 words),
+and **"a bare `nop` proves the callee took no argument" FALSE AS STATED** (an
+argument already live in `$a0` and a genuinely argument-less call emit
+byte-identical `nop`s). The round-38 cross-reference detector over live reports
+returned 6 hits, **all already annotated** — that screen is clean.
+
+### Toolchain leads — NOT acted on, carried to the operator
+
+1. **HARD RULE 6's wording** (above). A rule-interpretation call, not a code change.
+2. **A Gate-3 permuter scaffold mismatch that is structural to a class family.**
+   Fresh scaffolds for `func_8004C93C` (8 ins/8 del) and `func_8004CD38`
+   (14/14) disagree with the real build's 0/0; with earlier confirmations that
+   is five functions of the `class_3bb8c`/`Obj866E8` family, plausibly from its
+   heavy `self->methods->slotNN` call-chain shape. This **retroactively voids
+   that family's recorded permuter negatives**, including a 71k-iteration
+   negative whose own report asked for a longer search.
+3. **CLAUDE.md's reproducer recipe does not work as written under zsh** (this
+   environment's shell): it relies on `$(sed ... Makefile)` word-splitting into
+   maspsx's argv, which zsh does not do. Fails loudly, so it costs a minute
+   rather than a wrong result. Run it under `bash -c`.
+
+**Next move: another runner round, not a carve and not a permuter round.**
+`fresh` is 5 and `class_3bb8c_n` still holds 9 cold functions with 6 fully
+derived stalls beside them — the only genuinely fresh ground left, and it
+returned 14 matches this round. Do NOT carve: 11 uncarved functions remain in
+the whole executable. Do NOT run a standalone permuter round: this round's
+searches paid precisely because they ran inside sittings under the three
+checks, and the `class_3bb8c` family just demonstrated that a scaffold can
+measure the wrong program entirely.
+
+---
+
 ## 2026-09-15 — round 45: six runners and 45 matches, two carves that each retired a stale directive, and three named levers whose positives were never game code
 
 **State at end: 1107 matched / 1253 game functions (88.35%)**, up **45** from
