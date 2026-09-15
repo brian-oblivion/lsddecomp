@@ -169,10 +169,15 @@ TableD9BC *func_8002C438(void) {
     return &D_8006D9BC;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C448);
-
 extern s32 D_8008A8B0;
 extern s32 D_8008A8B4;
+
+s32 func_8002C448(s32 *arg0) {
+    if (arg0 != NULL) {
+        *arg0 = D_8008A8B4;
+    }
+    return D_8008A8B0;
+}
 
 s32 func_8002C468(s32 a, s32 b)
 {
@@ -271,9 +276,17 @@ TableDA34 *func_8002CC0C(void) {
     return &D_8006DA34;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC1C);
+extern s32 D_8008A8C4;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC28);
+s32 func_8002CC1C(void) {
+    return D_8008A8C4;
+}
+
+extern s32 D_8008A8CC;
+
+s32 func_8002CC28(void) {
+    return D_8008A8CC;
+}
 
 s32 func_8002CC34(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
     Slot179D8ECC34 *slot;
