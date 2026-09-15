@@ -18,8 +18,9 @@
  * 20 of 21 clean, and ZERO trivial leaves -- every one is a real body, several
  * in the 40-70 instruction range.
  *
- * BLOCKED, stub report already filed, do NOT spend attempts on it:
- *   gp_rel: func_8005630C (only 5 instructions, so nothing is lost)
+ * func_8005630C: MATCHED round 44 (was filed BLOCKED/gp_rel; reopened and
+ * closed 5/5 on the first build after the fix -- see
+ * docs/match-reports/func_8005630C.md).
  *
  * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
  * rodata sub-slot is attached to this unit.
@@ -336,7 +337,11 @@ s32 func_8005627C(ParamObj *ctx) {
     return ctx->unk10 / q;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_r", func_8005630C);
+extern s32 D_8008AC80;
+
+s32 func_8005630C(void) {
+    return (D_8008AC80 & 1) ^ 1;
+}
 
 /* ------------------------------------------------------------------ *
  * D_800876FC's own slots (ctor/dtor/slot40), plus its `New_X` allocator.
