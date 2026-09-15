@@ -1,4 +1,4 @@
-# func_8001E7BC -- STALL: length EXACT (180/180 words, no drift); 136/180 raw word-match; first real diff at vram 0x8001E810 (register identity, `node` in $a1 vs retail's $a3). SEE ROUND 44 AT THE BOTTOM FOR THE CURRENT BEST -- everything below this point is superseded history kept for its derivation value.
+# func_8001E7BC -- STALL: length EXACT (180/180 words, no drift); 142/180 raw word-match; first real diff at vram 0x8001E810 (register identity, `node` in $a1 vs retail's $a3). SEE ROUND 46 AT THE BOTTOM FOR THE CURRENT BEST -- everything below this point is superseded history kept for its derivation value.
 
 Unit: `code_d294_c` (round 14). By far the largest function in this
 round's queue (200 asm lines, 0x2D0 bytes / 180 words -- more than 60%
@@ -457,3 +457,135 @@ non-zero literal address, not "still null, offset". Any future ternary
 written as an array base with a non-zero constant index should take the
 index INSIDE the true branch (`&ptr[i]`) and leave the false branch a bare
 NULL, never index the ternary as a whole.
+
+## Round 46 (echo): first-ever permuter search, one real lever found (136 -> 142/180)
+
+Per this round's assignment, `func_8001E7BC` was flagged NEVER SEARCHED
+despite three prior hand-lever rounds (19, 44). Re-verified 136/180 live
+first (rebuilt the round-44 preserved body, `funcdiff.py` confirmed
+136/180 exactly, no drift -- check 3, base score agrees with the real
+in-tree build).
+
+**Scaffold validation (`--debug --stack-diffs`):** base score **1503**
+(stack differences 8, branch differences 0, register differences 35,
+reorderings 2, insertions 6, deletions 6) -- NOT a 0/0 scaffold, so
+(per this round's cost-test guidance) worth spending a bounded search on.
+
+**Search:** `-j 4 --stop-on-zero --best-only`, bounded at 900s (PATH scoped
+to this worktree, `permuter-work/bin`). Ran to completion under load
+(other runners' own concurrent searches active in their own worktrees, not
+in this one): 56437 iterations, one improvement found and saved
+(`output-875-1`, permuter score 875 down from base ~1495-1503 -- the
+permuter's own internal base score fluctuates slightly run to run, a
+known internal-scoring-mode artifact per round 41's own note, not a
+discrepancy in the residue), never beaten again across the remaining
+~56000 iterations.
+
+**Per CLAUDE.md's "a permuter score drop is a LEAD, not a RESULT":**
+read the actual diff rather than trusting the permuter's own score.
+
+```diff
+   delta[0] = buf18[0];
++  delta[1] = ((u16) buf18[1]) - 0x400;
+   delta[2] = buf18[2];
+-  delta[1] = ((u16) buf18[1]) - 0x400;
+```
+
+A pure SOURCE-ORDER swap: writing `delta[1]` before `delta[2]` (instead of
+after) right after the `slotA4` call, no expression change at all.
+Translated into the real `src/code_d294_c.c` and verified against the real
+oracle (not the permuter's isolated scaffold): **136 -> 142/180, no drift,
+`build exit=2`, no compile errors.** A genuine, oracle-confirmed 6-word
+improvement from a one-line statement reorder.
+
+**The three residues round 44 named are UNCHANGED** -- confirmed by
+re-reading the new diff: the first real difference is still at vram
+`0x8001E810` (`node`'s register identity, $a1 vs retail's $a3), and the
+0x38-vs-0x38+i combined-ADDIU pair and the tail's 4-register permutation
+both still appear at their same addresses. The permuter's search, run to
+completion (56437 iterations), never found anything touching any of the
+three -- consistent with round 41's own finding on a DIFFERENT function in
+this unit's neighborhood (`func_8001E4A4`) that a pure register-identity
+residue lies outside what a bounded source-mutation search can reach.
+
+**Verdict: the search closed one real, independent lever (statement
+order) and is otherwise a clean negative on the three named
+register-identity residues** -- not "not closed in N iterations," but
+"closed what it could reach, the rest needs a different kind of fix."
+Filing as STALL at the new figure (142/180), `INCLUDE_ASM` restored,
+preserved body updated below.
+
+### Proposed learning
+
+**A permuter's `--debug` scaffold showing non-zero insertions/deletions
+(here: 6/6) does NOT mean the eventual improvement will itself be an
+insertion or deletion** -- the one real lever this search found was a
+pure STATEMENT-ORDER swap (a "reordering," which the scaffold already
+separately reported as 2), not a change to instruction count at all. The
+insertion/deletion count is a go/no-go signal for whether to spend the
+search budget (round 45's own framing), not a prediction of what SHAPE
+the eventual lever will take.
+
+## Preserved body (round 46 best, 142/180, no drift)
+
+```c
+#if 0
+extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
+extern void func_8001EA8C(s32 *dest, s16 *b, s16 *a);
+
+s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
+    s32 *table;
+    s16 buf18[4];
+    s16 delta[4];
+    s16 buf28[4];
+    s16 buf30[4];
+    Class6B5CCSub14 *node;
+    UnkOwner_d294 *cur;
+
+    if (self->unk20 == NULL) {
+        return 0;
+    }
+    if ((s32)self->unk10 < 0 && self->unkC != NULL) {
+        node = self->unk14;
+        if ((u8 *)node + 0x38 != NULL) {
+            node->unk38[0] = node->unk18;
+            node->unk38[1] = node->unk1C;
+            node->unk38[2] = node->unk20;
+
+            cur = self->unkC;
+            if (cur != NULL) {
+                do {
+                    (self->unkC != 0 ? &self->unk14->unk38[0] : (s32 *)0)[0] =
+                        (self->unkC != 0 ? &self->unk14->unk38[0] : (s32 *)0)[0] + cur->unk14->unk18;
+                    (self->unkC != 0 ? &self->unk14->unk38[1] : (s32 *)0)[0] =
+                        (self->unkC != 0 ? &self->unk14->unk38[1] : (s32 *)0)[0] + cur->unk14->unk1C;
+                    (self->unkC != 0 ? &self->unk14->unk38[2] : (s32 *)0)[0] =
+                        (self->unkC != 0 ? &self->unk14->unk38[2] : (s32 *)0)[0] + cur->unk14->unk20;
+
+                    cur = cur->next;
+                } while (cur != NULL);
+            }
+        }
+    }
+
+    table = self->unkC != 0 ? self->unk14->unk38 : 0;
+    delta[0] = (u16)arg2[0] - (u16)table[0];
+    delta[1] = (u16)arg2[1] - (u16)table[1];
+    delta[2] = (u16)arg2[2] - (u16)table[2];
+
+    self->methods->slotA4(self, 0, buf18, delta, 1);
+
+    delta[0] = buf18[0];
+    delta[1] = (u16)buf18[1] - 0x400;
+    delta[2] = buf18[2];
+    if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+        delta[1] = (u16)buf18[1] + 0x400;
+        if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+            return 0;
+        }
+    }
+    func_8001EA8C(arg1, buf18, buf28);
+    return 1;
+}
+#endif
+```

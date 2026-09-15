@@ -54,15 +54,17 @@ void func_8001E7B0(Class6B5CCObj *self) {
 extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void func_8001EA8C(s32 *dest, s16 *b, s16 *a);
 
-/* STALL -- see docs/match-reports/func_8001E7BC.md. Round 44 (echo): 136/180
- * words, EXACT length (no drift), first real diff at vram 0x8001E810 (a
- * register-identity residue, node in $a1 vs retail's $a3). Huge jump from
- * round 19's 29/180-with-drift baseline -- see the report for the two
- * levers that got here (a per-axis double-ternary-evaluation macro shape,
- * and keeping each axis's NULL fallback a literal 0 rather than folding the
- * axis offset into it) and for what was tried and failed on the remaining
- * residue. Restored to INCLUDE_ASM per project rule. */
 #if 0
+/* STALL -- see docs/match-reports/func_8001E7BC.md. Round 46 (echo): 142/180
+ * words, EXACT length (no drift), first real diff at vram 0x8001E810 (a
+ * register-identity residue, node in $a1 vs retail's $a3, unchanged).
+ * First-ever permuter search this round found ONE real lever: swapping the
+ * source order of the `delta[1]`/`delta[2]` assignments right after the
+ * `slotA4` call (136 -> 142/180) -- everything else in the search's
+ * best-scoring candidate was noise. Round 44's three named residues
+ * (node's register identity, the 0x38-vs-0x38+i combined ADDIU, and the
+ * tail's 4-register permutation) are otherwise UNCHANGED. Restored to
+ * INCLUDE_ASM per project rule. */
 s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     s32 *table;
     s16 buf18[4];
@@ -106,8 +108,8 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     self->methods->slotA4(self, 0, buf18, delta, 1);
 
     delta[0] = buf18[0];
-    delta[2] = buf18[2];
     delta[1] = (u16)buf18[1] - 0x400;
+    delta[2] = buf18[2];
     if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
         delta[1] = (u16)buf18[1] + 0x400;
         if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
