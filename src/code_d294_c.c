@@ -275,4 +275,12 @@ s32 func_8001EF14(s32 *a, s32 range, s32 *b) {
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EF60);
+extern s32 D_8008A838;
+
+s32 func_8001EF60(s32 value) {
+    s32 old;
+
+    old = D_8008A838;
+    D_8008A838 = value;
+    return old;
+}
