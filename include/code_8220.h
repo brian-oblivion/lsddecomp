@@ -106,6 +106,15 @@ extern void func_80017AC8(BMemPMgr *pool);
  * establishes the game's one default pool is still asm. */
 extern BMemPMgr *D_8008A818;
 
+/* Pool allocator/free critical-section flag, code_8220_b (setter
+ * func_8001844C, getter func_80018458). func_80017B34/func_80017CFC in
+ * THIS unit bracket their free-list walk with func_8001844C(1) on entry
+ * and func_8001844C(0) on exit -- an enter/exit pair, not a real lock
+ * (no busy-wait or check on entry visible in either caller). */
+extern s32 D_8008A820;
+extern void func_8001844C(s32 val);
+extern s32 func_80018458(void);
+
 /* The Psy-Q declarations that used to sit here (func_80011D34 is malloc,
  * func_80011F68 is free, func_80012C20 is printf) moved into src/code_8220.c
  * when the SDK objects were linked. They are deliberately NOT shared:
