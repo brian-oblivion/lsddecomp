@@ -92,7 +92,35 @@ void func_8001CE30(Class6B5CCObj *self) {
     self->unk14->unk0 = 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294", func_8001CEB4);
+void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
+    s32 vals[3];
+    Class6B5CCSub44 *dst;
+    s16 *field;
+
+    vals[0] = func_8001EC84(data);
+    vals[1] = func_8001EC84((u8 *)data + 4);
+    vals[2] = func_8001EC84((u8 *)data + 8);
+    vals[0] /= 360;
+    vals[1] /= 360;
+    vals[2] /= 360;
+    dst = self->unk14->unk44;
+    field = &dst->vec.x;
+    if (flag) {
+        dst->vec.x = vals[0];
+        dst->vec.y = vals[1];
+        dst->vec.z = vals[2];
+    } else {
+        s32 i;
+        s16 *cur;
+
+        for (i = 0; i < 3; i++) {
+            cur = field;
+            field++;
+            *cur = (*cur + vals[i]) % 4096;
+        }
+    }
+    self->unk14->unk0 = 0;
+}
 
 void func_8001D008(Class6B5CCObj *self, s32 flag, void *data) {
     s32 r0, r1, r2;

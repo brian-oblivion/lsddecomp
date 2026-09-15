@@ -194,7 +194,19 @@ void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004AA10);
+extern s32 D_8008A980;
+
+void func_8004AA10(Class866E8 *self)
+{
+    self->unk68 = NULL;
+    self->unkE8 = 0;
+    self->unk88 = 0;
+    self->methods->slotDC(self, D_8008A980);
+    self->unk1CC = -1;
+    self->unk1D0 = -1;
+    self->unk1D4 = -1;
+    self->unk1D8 = -1;
+}
 
 void func_8004AA6C(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
 {
