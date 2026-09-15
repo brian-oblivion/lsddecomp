@@ -76,6 +76,7 @@ void *func_80017B34(size, pool)
     BMemBlockHdr *result;
     BMemBlockHdr *remainder;
     u32 *next;
+    BMemBlockHdr *unused;
     u32 blockSize;
     u32 word;
 
@@ -114,8 +115,9 @@ void *func_80017B34(size, pool)
                     }
                     {
                         BMemBlockHdr *n = cursor->next;
-                        BMemBlockHdr *p = cursor->prev;
+                        BMemBlockHdr *p;
 
+                        p = unused = cursor->prev;
                         if (n != NULL) {
                             n->prev = p;
                         } else {
