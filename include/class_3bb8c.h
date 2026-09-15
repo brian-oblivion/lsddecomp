@@ -2798,8 +2798,8 @@ struct Class86F88Methods {
      * contradict func_80052498's own narrower body. */
     void (*slot80)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
     u8 pad084[0x094 - 0x084];
-    /* +0x094 = func_8005281C itself (this unit, still INCLUDE_ASM as of
-     * this round). Signature fixed by three independent callers in this
+    /* +0x094 = func_8005281C itself (this unit, MATCHED). Signature fixed
+     * by three independent callers in this
      * unit (func_80052430, func_80052498, func_800524F8, func_80052598),
      * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
     void (*slot94)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
@@ -2819,7 +2819,17 @@ struct Class86F88Methods {
 struct Class86F88ElemMethods {
     u8 pad000[0x004];
     void (*release)(Class86F88Elem *self); /* +0x004 */
-    u8 pad008[0x0B8 - 0x008];
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, round 45's func_80052644 -- called once per freshly-created
+     * element right after `func_800408CC` returns it, before the same
+     * element's own `slotB8` call. `arg2` points at a 2-word stack-local
+     * (`D_8008AB00`'s value, then a running `D_8008AB04`-seeded
+     * accumulator incremented by 0xA per loop iteration) -- kept opaque
+     * `void *` here since only that one call site gives it any shape;
+     * see `Elem4CArg_3bb8c_k` in src/class_3bb8c_k.c for the concrete
+     * local reading. */
+    void (*slot4C)(Class86F88Elem *self, s32 arg1, void *arg2); /* +0x04C */
+    u8 pad050[0x0B8 - 0x050];
     void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, func_8005281C: called once per active window element with a
