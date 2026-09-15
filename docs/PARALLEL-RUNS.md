@@ -1401,6 +1401,29 @@ against a hand census that agreed exactly.
 > `uncarved.py` measures every uncarved game function as blocker-clean. Gate 2
 > is a live source of work again; price a carve on its own merits.
 
+> **ROUND 43 (2026-09-15) REVERSES ROUND 27's STANDING VERDICT BELOW.** That
+> paragraph names its own escape clause -- *"the SHAPE, which will not reverse
+> without a toolchain change"* -- and round 42 was exactly that toolchain
+> change. Re-measured on 2026-09-15 with `uncarved.py`: **66 uncarved game
+> functions in 4 segments, 66 of 66 blocker-clean, and ZERO BIOS trampolines
+> in any of them.** The front 20-function window of BOTH large segments is
+> 20/20 clean (`code_179d8` 840w, `class_3bb8c_n` 1112w) -- where round 27
+> measured 10 clean out of 79 and the old window table had `code_179d8`'s
+> front at 6/20.
+>
+> So the two specific warnings below are now FALSE and must not be acted on:
+> "expect a carve to yield single-digit functions" (it yields ~20) and "the
+> clean remainder is scattered a few functions at a time across segments that
+> are otherwise blocked" (it is contiguous and complete). `gp_rel` was the
+> binding constraint on carveable ground and it is gone.
+>
+> What still stands from round 27 is the part that was never about blockers:
+> **price the carve against Gate 1b's near-miss corpus rather than carving
+> reflexively**, and **prefer a carve that also corrects something**. Round 43
+> itself declined to carve for that reason -- `fresh` was 86, which already
+> exceeded five runners' capacity, so carving would have bought ground nobody
+> could staff.
+
 **Round 27's measurement, and it is a STANDING change to what this gate can
 do, not a snapshot: carving can no longer refill the queue at scale.** The
 whole uncarved remainder came to 79 functions holding **10 blocker-clean** ones
