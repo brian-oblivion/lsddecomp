@@ -1,15 +1,13 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
-
 # func_80026ECC
 
-**Unit:** code_171e0 · **Size:** 13 instructions · **Status:** STALLED, class TOOLCHAIN
+**Unit:** code_171e0 · **Size:** 13 words · **Status:** MATCHED, round 43
+(2026-09-15, runner bravo). 13/13 words, byte-exact whole-image build.
+
+## History
+
+Stalled round 2026-08-29-a as class TOOLCHAIN (`gp_rel`), same mechanism as
+`func_80026E0C`. Round 42 resolved `gp_rel` project-wide. Round 43 rebuilt
+the preserved body verbatim; matched on the first build.
 
 ## What it does
 
@@ -17,16 +15,9 @@
 — same shape as `func_80026E64`, forwarding to a different still-uncarved
 function (`func_80027EE0`, in `asm/code_179d8.s`).
 
-## Residue
-
-Same root cause as `func_80026E0C`: `D_8008A84C` is a real `.sdata` global
-this project's pinned `-G0` cannot address as `%gp_rel` from C. See
-`docs/match-reports/func_80026E0C.md` for the isolated reproducer.
-
-## Preserved body
+## Final body
 
 ```c
-extern s32 D_8008A84C;
 extern s32 func_80027EE0(void);
 
 s32 func_80026ECC(void) {
@@ -39,4 +30,4 @@ s32 func_80026ECC(void) {
 
 ## Proposed learning
 
-See `func_80026E0C.md`.
+See `func_80026E0C.md` — same family.

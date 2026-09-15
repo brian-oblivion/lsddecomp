@@ -1,49 +1,49 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
-
 # func_80026FAC
 
-**Unit:** code_171e0 · **Size:** 15 words · **Status:** BLOCKED, not attempted ·
-Classified by the head in round 2026-08-30-a.
+**Unit:** code_171e0 · **Size:** 15 words · **Status:** MATCHED, round 43
+(2026-09-15, runner bravo). 15/15 words, byte-exact whole-image build.
 
-This is a **stub report**, filed so `tools/progress.py` stops counting this
-function as fresh ground and staffing a runner onto it. It records a routing
-decision, not an attempt.
+## History
 
-## Why it is blocked
+Never attempted (round-2026-08-29-a/30-a stub, `gp_rel`-blocked before any
+derivation). Round 42 resolved `gp_rel`. Round 43 derived this fresh from
+`asm/nonmatchings/code_171e0/func_80026FAC.s`; matched on the first build.
 
-1 `%gp_rel` reference(s), the first to `D_8008A84C`. That is the
-**gp-relative addressing blocker**, `docs/research/gp-relative-blocker.md`: the
-project's pinned `-G0` pipeline emits the two-instruction absolute
-(`lui`+`lw`) form for a small-data global access where retail has the
-one-instruction `$gp`-relative form. The instruction count differs, so the
-mismatch is not contained — every function after it in the unit shifts by a word.
+## What it does
 
-No source-level reshaping reaches this. Confirm cheaply on any candidate with
-`grep -l 'gp_rel' asm/nonmatchings/<unit>/<func>.s` before spending attempts.
+Same `if`/`else` tail-call shape as `func_80026CAC` (see that report for the
+full residue analysis), mode `0x13` this time:
 
-## Status of the escalation
+```
+beq $v1, $v0(0x13), .L80026FD0   # equal -> func_80027EF8
+  jal func_8002C448               # fallthrough (not equal)
+  j .L80026FD8
+.L80026FD0:
+  jal func_80027EF8
+.L80026FD8:
+```
 
-Already escalated, already tested, already rejected. The `-G` experiment was run
-on 2026-08-29 **with operator authorisation**; a clean non-zero-`-G` rebuild
-damages 19148 bytes across 3203 runs, and `-G4` and `-G8` produce byte-identical
-damage, which rules out the small-data size threshold as the mechanism. The pin
-stays at `-G0`.
+Both callees (`func_80027EF8`, `func_8002C448`) are still uncarved
+(`asm/code_179d8.s` / `asm/nonmatchings/code_179d8_e/func_8002C448.s`).
+Treated as `s32`-returning per CLAUDE.md's tail-call caution (no positive
+void evidence, so default to non-void).
 
-Do not re-derive this and do not propose a `-G` change. The three unexplored
-directions are listed at the end of the research document and are the operator's
-call, not a runner's or the head's.
+## Final body
 
-## Unit context
+```c
+extern s32 func_80027EF8(void);
+extern s32 func_8002C448(void);
 
-`code_171e0` now has **no runner-workable ground left**. Of its 15 remaining
-queued functions, 14 are gp-relative blocked (8 stalled in round 2026-08-29-a
-plus the 6 stubbed this round) and the 15th is `strcat`, stalled at 41/42 on a
-one-instruction residue. Do not staff this unit again until the blocker is
-resolved or a permuter round is run against `strcat`.
+s32 func_80026FAC(void) {
+    if (D_8008A84C == 0x13) {
+        return func_80027EF8();
+    } else {
+        return func_8002C448();
+    }
+}
+```
+
+## Proposed learning
+
+See `func_80026CAC.md` — third instance of the "if/else, both arms tail-call"
+family in this unit.
