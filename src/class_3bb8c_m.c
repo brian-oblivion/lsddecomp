@@ -20,7 +20,7 @@
  * INVENTS blockers, so the live screen is TWO greps -- `gp_rel` and
  * `nop_mflo_mfhi`. Current state:
  *   func_800544E4  was gp_rel            -- MATCHED round 44, 29/29.
- *   func_80054558  was gp_rel (+ addiu-$at) -- see docs/match-reports/ for round 44 disposition.
+ *   func_80054558  was gp_rel (+ addiu-$at) -- MATCHED round 44, 41/41.
  *   func_800545FC  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
  *   func_80054660  was gp_rel            -- see docs/match-reports/ for round 44 disposition.
  * The old profile said "all four have stub reports; do not attempt them",
@@ -178,6 +178,8 @@ void *func_800544D4(void) {
     return &D_80087034;
 }
 
+struct StyleM;
+
 extern s32 D_8008AB4C;
 extern s32 D_8008AC6C;
 extern s32 D_8008AC70;
@@ -187,7 +189,7 @@ extern s32 D_8008AC7C;
 extern s32 D_8008AC80;
 extern s32 D_8008ACA0;
 
-extern s32 func_80054558(void);
+extern void *func_80054558(void);
 
 s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
@@ -213,7 +215,25 @@ s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054558);
+extern s32 D_80087424;
+extern s8 *D_800873EC[];
+extern s8 *func_80054758(void);
+extern void func_800545FC(struct StyleM *style, s8 *cfg);
+extern u8 D_800872C4[][3];
+extern const u8 *D_8008AB54;
+
+void *func_80054558(void) {
+    s8 *cfg = D_800873EC[D_8008AC6C];
+
+    if (cfg == 0) {
+        cfg = func_80054758();
+    }
+    func_800545FC((struct StyleM *) &D_80087424, cfg);
+    if (cfg[1] >= 4) {
+        D_8008AB54 = D_800872C4[cfg[2]];
+    }
+    return &D_80087424;
+}
 
 /* func_800545FC's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
  * are already established as unrelated object pointers by five other functions
