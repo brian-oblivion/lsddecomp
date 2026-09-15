@@ -1812,7 +1812,42 @@ s32 func_8005C118(void)
 	return D_80088BA4[D_8008ACC4][D_8008ACC8].extra;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", GetStaticSpawn);
+s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
+                    s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag)
+{
+	s32 count;
+	StaticLinkTrigger *trig;
+	s32 i;
+	StageSpawn *entry;
+	s32 triggerStage;
+	u32 spawnIndex;
+
+	count = *(u8 *)&triggerLens[stage];
+	if (count == 0)
+		return -1;
+
+	trig = triggers[stage];
+	for (i = 0; i < count; i++, trig++) {
+		if (*(s16 *)&currentPos->chunk != *(s16 *)&trig->chunk)
+			continue;
+		if (*(s16 *)&currentPos->tile != trig->tile.value && trig->tile.value >= 0)
+			continue;
+
+		D_8008ACBC = stage;
+		D_8008ACC0 = i;
+		triggerStage = trig->stage;
+		D_8008ACC4 = triggerStage;
+		spawnIndex = *(u8 *)&trig->spawnpointIndex;
+		entry = &spawns[triggerStage][spawnIndex];
+		D_8008ACC8 = spawnIndex;
+		*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
+		target->position = SPAWN_POS_ADJUST[entry->adjustment];
+		if (flag != 0)
+			(*gpNavChallengesComplete)[entry->extra] = 1;
+		return D_8008ACC4;
+	}
+	return -1;
+}
 
 s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint *mood, s32 day)
 {
