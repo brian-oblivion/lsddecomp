@@ -201,7 +201,24 @@ s32 func_8005D7FC(Entity *this, EntityRegionRef *region) {
     return (dz >= 0) ? (dx + dz) : (dx - dz);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity", func_8005D864);
+s32 func_8005D864(Entity *this) {
+    s32 result;
+    Entity *self;
+    s32 threshold;
+
+    do {
+        if (this->unk94 == NULL) {
+            return -1;
+        }
+    } while (0);
+    self = this;
+    result = this->methods->slot144(this, self->unk94);
+    threshold = D_80089EAE[self->moodIndex * 0x10] << 11;
+    if (threshold < result) {
+        return -1;
+    }
+    return result / (threshold / self->unkB0);
+}
 
 void *Entity__GetMoodEffect(Entity *this) {
     return &D_80089EA4[this->moodIndex];
