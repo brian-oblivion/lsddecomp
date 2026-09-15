@@ -81,7 +81,11 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800549A8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B1C);
+void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
+    dst[0] = src[0] - delta;
+    dst[1] = src[1] - delta;
+    dst[2] = src[2] + delta;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B50);
 
