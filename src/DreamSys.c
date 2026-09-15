@@ -1635,7 +1635,24 @@ void func_8005BF68(bool value)
 	D_8008ABE4 = value;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4InstantTeleporters);
+/* Table triple for Test4InstantTeleporters, same roles as the
+   D_800889F0/D_80088CBC triples above but for instant-teleporter links. */
+extern s8 D_80088B5C[];
+extern StaticLinkTrigger* D_80088B24[];
+extern StageSpawn* D_80088A80[];
+
+s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
+{
+	s32 result;
+
+	if (D_8008ABE4 == 0) {
+		result = -1;
+	} else {
+		result = GetStaticSpawn(target, currentPos, stage, D_80088B5C,
+		                         D_80088B24, D_80088A80, 0);
+	}
+	return result;
+}
 
 s32 func_8005BFC4(void)
 {

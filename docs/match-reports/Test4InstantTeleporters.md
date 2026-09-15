@@ -1,40 +1,119 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
+# Test4InstantTeleporters — MATCHED 20/20
 
-# Test4InstantTeleporters
+**Unit:** DreamSys · **Size:** 20 words · **Status:** MATCHED, round 43.
 
-**Unit:** DreamSys · **Size:** 20 words · **Status:** BLOCKED, not attempted ·
-Classified by the head in round 2026-08-30-a.
+## History
 
-This is a **stub report**, filed so `tools/progress.py` stops counting this
-function as fresh ground and staffing a runner onto it. It records a routing
-decision, not an attempt.
+Filed round 2026-08-30-a as BLOCKED on `gp_rel` (`D_8008ABE4`). Round 42
+RESOLVED that blocker. Rebuilt fresh this round; took three attempts to
+recover retail's exact if/else block ORDER (values were right from the
+first attempt, layout was not).
 
-## Why it is blocked — gp-relative
+## What it does
 
-1 `%gp_rel` reference(s), the first to `D_8008ABE4`.
-That is the **gp-relative addressing blocker**,
-`docs/research/gp-relative-blocker.md`: the pinned `-G0` pipeline emits the
-two-instruction absolute (`lui`+`lw`) form where retail has the one-instruction
-`$gp`-relative form. The `-G` experiment was run on 2026-08-29 with operator
-authorisation and REJECTED — a clean non-zero-`-G` rebuild damages 19148 bytes,
-and `-G4`/`-G8` damage identically, ruling out the size threshold as the
-mechanism. The pin stays at `-G0`.
+`if (D_8008ABE4 == 0) return -1; else return GetStaticSpawn(target,
+currentPos, stage, D_80088B5C, D_80088B24, D_80088A80, 0);` -- same
+forwarding shape as `TestForStaticLink`/`Test4TunnelLinks`/
+`Test4StaircaseNodes` a few hundred lines above/below in this unit, using a
+dedicated table triple (`D_80088B5C`/`D_80088B24`/`D_80088A80`) and trailing
+flag `0` instead of `1`.
 
-## Do not re-derive this
+## Attempts 1-2: right values, wrong block order (2/20, then 0/20, both with 131461 bytes of whole-image drift)
 
-Both blockers are already escalated with reproducers and corpus censuses attached.
-Do not spend attempts here, do not propose a toolchain change, and do not classify
-a residue from this construct as a scheduling or delay-slot choice. Check cheaply
-before attempting any function:
+```c
+/* attempt 1 */
+if (D_8008ABE4 == 0)
+	return -1;
+return GetStaticSpawn(target, currentPos, stage, D_80088B5C, D_80088B24, D_80088A80, 0);
 
-```sh
-grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
-grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+/* attempt 2 (same compiled result as attempt 1 -- -O2 normalizes early-return
+   to if/else) */
+s32 result;
+if (D_8008ABE4 != 0) {
+	result = GetStaticSpawn(...);
+} else {
+	result = -1;
+}
+return result;
+
+/* attempt 2b: hoisting the default before the branch, still wrong order */
+result = -1;
+if (D_8008ABE4 != 0) {
+	result = GetStaticSpawn(...);
+}
+return result;
 ```
+
+All three compile the CALL block first (immediately after the branch) and
+the `-1` case second, which forces an extra unconditional `j`+delay-`nop`
+pair after the call to skip over the `-1` case and reach the shared
+epilogue -- retail has no such pair. That extra pair is exactly one word,
+which is why every one of these attempts is 21 words long (0x54 bytes)
+instead of retail's 20 (0x50) and reports 131461 bytes of drift across the
+rest of the image (`build/lsdde.map` confirms: built `func_8005BFC4` lands
+at `0x8005BFC8`, four bytes past retail's `0x8005BFC4`).
+
+Retail's OWN layout is the opposite: the `-1` case comes FIRST in memory
+(right after the initial `bnez`, itself in the branch's own fallthrough),
+and the CALL case comes LAST, immediately before the epilogue -- so the
+`-1` path needs the jump-over instead, and the call path falls straight
+into the epilogue with no jump at all. Net instruction count: identical
+either way, but only ONE of the two shapes reproduces retail's SPECIFIC
+20-word total (the other needs an extra pair because in that arrangement
+neither path can reach the shared tail for free).
+
+## Final body: condition written as `== 0` first, `else` second (20/20)
+
+```c
+s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
+{
+	s32 result;
+
+	if (D_8008ABE4 == 0) {
+		result = -1;
+	} else {
+		result = GetStaticSpawn(target, currentPos, stage, D_80088B5C,
+		                         D_80088B24, D_80088A80, 0);
+	}
+	return result;
+}
+```
+
+Writing the zero-check as the `if` (not the `else`) put GCC's `bnez`-to-else
+layout in the SAME order as retail: test, branch-if-nonzero to the call
+block (placed last), fall through when zero to set `result = -1` and jump
+to the shared tail. Byte-exact.
+
+Added the table triple as new externs (same pattern as the two existing
+triples for `Test4TunnelLinks`/`Test4StaircaseNodes`):
+
+```c
+extern s8 D_80088B5C[];
+extern StaticLinkTrigger* D_80088B24[];
+extern StageSpawn* D_80088A80[];
+```
+
+## Verification
+
+`./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
+`tools/funcdiff.py Test4InstantTeleporters` -> `20/20 words match`.
+
+### Proposed learning
+
+For an `if (cond) A; else B;` where retail's disassembly shows the SECOND
+source block (`B`/`else`) falling straight into the function's shared
+epilogue/tail with no jump, and the FIRST block instead carrying the
+jump-over -- that is backwards from GCC's default placement (which keeps
+source order: `A` first with a jump-over, `B` last falling through). Writing
+the condition on whichever branch should compile FIRST-with-jump-over (i.e.
+possibly negating the natural-reading condition) recovers retail's word
+count; the "obvious" condition polarity can cost exactly one word (an extra
+`j`/`nop` pair) with byte-identical VALUES but wrong LAYOUT, and this is
+invisible from the values alone -- only the address-drift warning
+(`build-and-verify.sh` / `funcdiff.py`'s out-of-range byte count) catches it,
+since a length mismatch inside a single function still passes a naive
+"does the value match" check on every earlier function.
+
+## Provenance
+
+round 43, runner ALPHA, unit DreamSys.
