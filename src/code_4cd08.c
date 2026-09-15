@@ -120,7 +120,20 @@ INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C7D4);
 
 INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C8AC);
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C930);
+s32 func_8005C930(s32 a0, s32 a1)
+{
+    s32 val = D_8008ABF8;
+
+    if (val == 4 && a1 == 0x10) {
+        TriggerWorld *w = (TriggerWorld *)D_8008AC00;
+        s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
+
+        if (result == val) {
+            a0 += 0x1E;
+        }
+    }
+    return a0;
+}
 
 /* True when `entry`'s side/parity byte (offset 0x2) disagrees with
  * `coordParity`'s own parity. `entry` is a candidate spawn/link record from
@@ -270,14 +283,8 @@ success:
     return true;
 }
 
-/* vtable slot 0x80 (byte offset 0x200) of `*D_8008AC00`: takes only `self`,
- * returns a value compared against a per-idx signed byte from D_80088D16.
- * Distinct from `TriggerWorldFn` (vtable slot 0x22 / offset 0x88, which
- * takes a `parity` second argument) -- this is a different slot on
- * (evidently) the same class of object, so it gets its own local typedef
- * rather than overloading TriggerWorldFn's shape. */
-typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
-
+/* Compares the vtable-slot-0x80 result of `*D_8008AC00` (TriggerWorldFn80,
+ * include/code_4cd08.h) against a per-idx signed byte from D_80088D16. */
 bool func_8005CD58(s32 idx)
 {
     TriggerWorld *w = (TriggerWorld *)D_8008AC00;

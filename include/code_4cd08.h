@@ -109,6 +109,13 @@ typedef struct TriggerWorld {
 
 typedef void *(*TriggerWorldFn)(TriggerWorld *self, s8 parity);
 
+/* vtable slot 0x80 (byte offset 0x200) of a TriggerWorld-shaped object:
+ * takes only `self`, returns a value compared against a caller value.
+ * Distinct arity/slot from TriggerWorldFn above -- same object family
+ * (per D_8008AC00, the only TriggerWorld-typed global known so far),
+ * different vtable entry. Used by func_8005CD58 and func_8005C930. */
+typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
+
 extern bool func_8005CBC8(s32 value, TriggerRecord *record);
 /* `out` is a 4-word (0x10-byte) caller stack scratch buffer, reused across
  * every call in func_8005CAB4's loop. Its LAST word is pre-populated by the
