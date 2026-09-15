@@ -25,9 +25,11 @@
  *                  was live for six rounds and would have warned a runner off
  *                  matchable ground. It still OWNS jtbl_800116F4, which is why
  *                  the rodata slot at 0x1EF4 is attached to this unit.
- *   func_80052644  gp_rel -- STILL BLOCKED, on gp_rel alone. Stub report
- *                  filed; do not attempt.
- * So: ONE blocked function, not two. The old line here read "Both have stub
+ *   func_80052644  gp_rel -- MATCHED round 45 (82/82 words). The `gp_rel`
+ *                  blocker itself was RESOLVED round 42; see the file-top
+ *                  banner above.
+ * So: ONE blocked function, not two, and even that one is resolved now. The
+ * old line here read "Both have stub
  * reports; do not attempt either" -- a stale DIRECTIVE, which is worse than a
  * stale fact, because a reader acts on it without re-measuring.
  *
@@ -272,7 +274,61 @@ void func_80052598(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_k", func_80052644);
+/* Defined later in this file (ROM order); forward-declared here since
+ * func_80052644 calls both, same convention as func_80049E20 in
+ * src/class_39e08.c. Signatures must match their real definitions below
+ * exactly. */
+extern char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
+extern void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
+
+/* VALUE-of `%gp_rel`, round 45's own local view -- two plain s32
+ * constants (`D_8008AB00`=-0x5C, `D_8008AB04`=-0xF in the ROM image,
+ * `asm/data/7B12C.sdata.s`) seeding a 2-word stack-local this function
+ * builds and passes to each freshly-created element's own `slot4C`. */
+extern s32 D_8008AB00;
+extern s32 D_8008AB04;
+
+/* func_80052644's own stack-local argument to Class86F88ElemMethods::
+ * slot4C -- `a` is D_8008AB00's value, set once; `b` starts at
+ * D_8008AB04's value and accumulates by 0xA per loop iteration. Kept
+ * local to this unit (see the shared header's own `void *arg2` for that
+ * slot) since nothing else gives this argument any shape. */
+typedef struct {
+    s32 a;
+    s32 b;
+} Elem4CArg_3bb8c_k;
+
+void func_80052644(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+{
+    char buf[0x20];
+    Elem4CArg_3bb8c_k local;
+    Class86F88Elem **p;
+    s32 count;
+    s32 i;
+
+    if (!self->unk50) {
+        return;
+    }
+
+    local.a = D_8008AB00;
+    local.b = D_8008AB04;
+    count = self->unk10;
+    p = &self->unk40[0];
+    if (count >= 5) {
+        count = 4;
+    }
+
+    for (i = 0; i < count; i++) {
+        func_8005292C(self, buf, i, arg3, (char *)arg4);
+        *p = (Class86F88Elem *)func_800408CC((void *)arg2, 0x1A, buf);
+        (*p)->methods->slot4C(*p, arg1, &local);
+        (*p)->methods->slotB8(*p, &D_8008AB0C);
+        local.b += 0xA;
+        p++;
+    }
+
+    func_800529FC(self, arg3, arg4, arg5, 1);
+}
 
 void func_8005278C(Class86F88 *self)
 {

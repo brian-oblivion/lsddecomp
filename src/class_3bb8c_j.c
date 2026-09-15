@@ -15,8 +15,8 @@
  * Carved round 15 out of the 193-function class_3bb8c_j remainder.
  *
  * Blocker profile (head's Gate 1 three-grep screen at carve time):
- *   func_800518F4  gp_rel     -- stub report filed, do not attempt
- *   func_80051998  gp_rel     -- stub report filed, do not attempt
+ *   func_800518F4  gp_rel     -- MATCHED round 45 (41/41 words)
+ *   func_80051998  gp_rel     -- MATCHED round 45 (45/45 words)
  * The other 18 are clean. This unit owns NO switch jump table.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
@@ -95,9 +95,80 @@ void func_80051858(Obj866E8 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_800518F4);
+/* round 45 -- func_800518F4's own opaque handle at self->unk40, dispatched
+ * only through this unit; not the same type as class_3bb8c_i's
+ * ChildObj86ED0 despite the coincidental D_8008AADC overlap (that unit
+ * reads D_8008AADC's ADDRESS as an opaque arg2, this one reads its VALUE
+ * arithmetically -- independent local readings of the same global, per
+ * the project's convention). */
+typedef struct Unk40Obj866E8 Unk40Obj866E8;
+typedef struct Unk40Obj866E8Methods Unk40Obj866E8Methods;
+struct Unk40Obj866E8Methods {
+    u8 pad000[0x0BC];
+    void (*slotBC)(Unk40Obj866E8 *self, void *arg1); /* +0x0BC */
+};
+struct Unk40Obj866E8 {
+    Unk40Obj866E8Methods *methods; /* +0x000 */
+};
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051998);
+/* func_800518F4's own stack-local argument to slotBC -- a 2-word block
+ * (D_8008AADC-derived value at +0x0, the D_8008AAE0 constant at +0x4). */
+typedef struct {
+    s32 unk0;
+    s32 unk4;
+} SlotBCArg866E8_3bb8c_j;
+
+extern s32 D_8008AADC; /* VALUE-of here (round 45): see the type comment above */
+extern s32 D_8008AAE0; /* VALUE-of, round 45's func_800518F4 only */
+
+void func_800518F4(Obj866E8 *self, s32 arg1, s32 arg2)
+{
+    SlotBCArg866E8_3bb8c_j local;
+    Unk40Obj866E8 *obj;
+
+    if (self->unk48) {
+        local.unk4 = D_8008AAE0;
+        local.unk0 = arg1 * 7 + D_8008AADC;
+        obj = (Unk40Obj866E8 *)self->unk40;
+        obj->methods->slotBC(obj, &local);
+        self->unk18 = arg1;
+        if (arg2) {
+            self->methods->slot60(self, 0);
+        }
+    }
+}
+
+/* round 45 -- func_80051998's own opaque handle at self->unk44, dispatched
+ * only through this unit. */
+typedef struct Unk44Obj866E8 Unk44Obj866E8;
+typedef struct Unk44Obj866E8Methods Unk44Obj866E8Methods;
+struct Unk44Obj866E8Methods {
+    u8 pad000[0x0C4];
+    void (*slotC4)(Unk44Obj866E8 *self, s32 arg1, s32 arg2); /* +0x0C4 */
+};
+struct Unk44Obj866E8 {
+    Unk44Obj866E8Methods *methods; /* +0x000 */
+};
+
+/* VALUE-of `%gp_rel`, round 45's func_80051998 only -- a byte lookup table
+ * (ROM image initialises it to D_800115D0, still-uncarved rodata). */
+extern u8 *D_8008AAE4;
+
+void func_80051998(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3)
+{
+    Unk44Obj866E8 *obj;
+
+    if (self->unk48) {
+        self->unk28[arg1] = D_8008AAE4[arg2];
+        obj = (Unk44Obj866E8 *)self->unk44;
+        obj->methods->slotC4(obj, D_8008AAE4[arg2], arg1);
+        self->unk18 = arg1;
+        self->unk1C = arg2;
+        if (arg3) {
+            self->methods->slot60(self, 0);
+        }
+    }
+}
 
 /*
  * Class86ED0 -- a small BasicClass-derived sibling class, LOCAL to this

@@ -297,7 +297,13 @@ typedef struct Obj866E8Methods {
      * `self->methods->slot30(self, 5)` when the just-copied descriptor's
      * leading raw halfword differs from what was there before. */
     void (*slot30)(Obj866E8 *self, s32 arg1);  /* +0x030 */
-    u8 pad034[0x88 - 0x34];
+    u8 pad034[0x60 - 0x34];
+    /* Called by round 45's func_800518F4/func_80051998 as
+     * `self->methods->slot60(self, 0)`, tail of the countdown/flush
+     * "record + notify" path, when their own trailing flag argument is
+     * set. Return unused. */
+    void (*slot60)(Obj866E8 *self, s32 arg1);  /* +0x060 */
+    u8 pad064[0x88 - 0x64];
     /* Called by func_8004BD14 with a literal 7, one of the object's own
      * Elem array slots, and the loop index. */
     void (*slot88)(Obj866E8 *self, s32 arg1, Elem *entry, s32 arg3); /* +0x088 */
@@ -708,7 +714,16 @@ struct Obj866E8 {
     s32 unk18;                     /* +0x018, func_80051784/func_80051814/func_80051858 */
     s32 unk1C;                     /* +0x01C, func_80051784/func_80051814/func_80051858 */
     s32 unk20;                     /* +0x020, func_800517EC (xor-toggled) */
-    u8 pad24[0x48 - 0x24];
+    u8 pad24[0x28 - 0x24];
+    u8 *unk28;                     /* +0x028, round 45's func_80051998: a per-index byte buffer, `unk28[arg1] = table[idx]` */
+    u8 pad2C[0x40 - 0x2C];
+    /* +0x040/+0x044, round 45's func_800518F4/func_80051998: opaque
+     * resource-handle objects, dispatched only through this unit's own
+     * local method-table views (Unk40Obj866E8Methods/Unk44Obj866E8Methods
+     * in class_3bb8c_j.c) -- kept `void *` here since nothing outside that
+     * unit touches them yet. */
+    void *unk40;                   /* +0x040 */
+    void *unk44;                   /* +0x044 */
     s32 unk48;                     /* +0x048, func_80051784/func_800517EC/func_80051814/func_80051858 */
     u8 pad4C[0x54 - 0x4C];
     Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
@@ -1470,6 +1485,13 @@ extern s32 D_8008A9B4;
 extern void *D_8008AA10;
 extern void *D_8008AA18;
 
+/* Same VALUE-of `%gp_rel` pattern, read (and its buffer formatted into via
+ * func_8004109C) by round 45's `func_8004D6AC` (src/class_3bb8c_c.c). Holds
+ * `D_8008AA1C` in the ROM image -- the "7654321" placeholder string
+ * (`asm/data/7B12C.sdata.s`) -- so, like `D_8008AA18` above, this is a
+ * writable-buffer placeholder rather than the real runtime value. */
+extern void *D_8008AA24;
+
 /* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DB18`
  * as `strcpy`'s SOURCE argument. Holds `0x80011474` in the ROM image
  * (immediately past `D_8008AA10`'s own "BISLPS-01556xxx" string, i.e. the
@@ -2007,7 +2029,8 @@ extern BasicMethods866E8F *func_80018390(void);
  * Each caller now carries its own local `extern` with its own argument shape
  * -- see src/class_3bb8c_f.c and src/class_3bb8c_e.c.
  *
- * func_800507F8 stays: it is game code (gp_rel-blocked), not a trampoline. */
+ * func_800507F8 stays: it is game code, defined in src/class_3bb8c_g.c
+ * (MATCHED round 45, 60/60 words -- was gp_rel-blocked, resolved round 42). */
 extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 
 /* -------------------------------------------------------------------
@@ -2282,7 +2305,9 @@ typedef struct Obj87034_3bb8c_l Obj87034_3bb8c_l;
  * pointer -- so it is NOT another Obj87034_3bb8c_l, just an opaque
  * 3-field descriptor. */
 typedef struct Unk50Struct_3bb8c_l {
-    u8 pad00[0x0C];
+    s32 unk0;      /* +0x000, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg2 */
+    s32 unk4;      /* +0x004, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg3 */
+    s32 unk8;      /* +0x008, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotBC's arg1 */
     void *unkC;   /* +0x00C, func_800531CC (address taken, forwarded opaquely) */
     u8 pad10[0x014 - 0x010];
     s32 unk14;    /* +0x014, func_800531CC: discriminant compared against 2; also func_80053764: discriminant compared against 1 */
@@ -2298,7 +2323,24 @@ typedef struct Unk50Struct_3bb8c_l {
  * one s32 argument while this call site passes two -- different arities,
  * so this is a different class, not DreamSys; left unnamed. */
 typedef struct Obj14Methods_3bb8c_l {
-    u8 pad00[0x0EC];
+    u8 pad000[0x0BC];
+    /* +0x0BC, round 45's func_800534C8: `(self, self->unk50->unk8, 0)`. */
+    void (*slotBC)(void *self, s32 arg1, s32 arg2); /* +0x0BC */
+    u8 pad0C0[0x0C4 - 0x0C0];
+    /* +0x0C4, round 45's func_800534C8: `(self, 3, self->unk50->unk0,
+     * self->unk50->unk4)`. */
+    void (*slotC4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0C4 */
+    u8 pad0C8[0x0CC - 0x0C8];
+    /* +0x0CC, round 45's func_800534C8: `(self, &D_8008710C)`. */
+    void (*slotCC)(void *self, void *arg1); /* +0x0CC */
+    u8 pad0D0[0x0DC - 0x0D0];
+    /* +0x0DC, round 45's func_800534C8: `(self, self->unk48)` on the
+     * OWNING Obj87034_3bb8c_l. */
+    void (*slotDC)(void *self, s32 arg1); /* +0x0DC */
+    /* +0x0E0, round 45's func_800534C8: `(self, GetStageGridDimensions(
+     * self->unk38))`. */
+    void (*slotE0)(void *self, void *arg1); /* +0x0E0 */
+    u8 pad0E4[0x0EC - 0x0E4];
     void (*slotEC)(void *self);                        /* +0x0EC, func_80053764 */
     u8 padF0[0x10C - 0x0F0];
     void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, func_8005393C */
@@ -2326,9 +2368,18 @@ typedef struct Obj14_3bb8c_l {
  * `unknown_functions_0x..` padding arrays) and DreamSys.h is a different
  * unit's header, not this one's to extend. */
 typedef struct DreamSysMethods_3bb8c_l {
-    u8 pad00[0x050];
+    u8 pad00[0x04C];
+    /* +0x04C, round 45's func_800534C8: `(self, self->unk14)`, dispatched
+     * on the OWNING Obj87034_3bb8c_l's own `unk3C` (a DIFFERENT
+     * DreamSysObj_3bb8c_l instance from the `self->unk18` this function
+     * dispatches every other slot through). */
+    void (*slot4C)(void *self, void *arg1); /* +0x04C */
     void (*slot50)(void *self);          /* +0x050, func_800536B0 */
-    u8 pad54[0x060 - 0x054];
+    /* +0x054, round 45's func_800534C8: `(self, val)`, `val` a small
+     * derived integer (`(*obj->methods->slot7C(obj, 0)) / 2 * 5 / 3 +
+     * D_8008AB34`, `obj` being `*(void **)self->unkC`). */
+    void (*slot54)(void *self, s32 arg1); /* +0x054 */
+    u8 pad58[0x060 - 0x058];
     void (*slot60)(void *self, s32 arg1);          /* +0x060, func_80053764 */
     void (*slot64)(void *self, void *arg1);        /* +0x064, func_80053764 */
     void (*slot68)(void *self, void *arg1);        /* +0x068, func_80053764 */
@@ -2429,7 +2480,8 @@ struct Obj87034_3bb8c_l {
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
     s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
-    u8 pad24[0x038 - 0x024];
+    u8 pad24[0x034 - 0x024];
+    s32 unk34;                            /* +0x034, round 45's func_800534C8: forwarded opaquely to func_8005C650's own arg3 */
     void *unk38;                          /* +0x038, func_80052E7C: forwarded opaquely to func_80049060/func_80049098 */
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
     s32 unk40;                             /* +0x040, func_80053764 */
@@ -2601,11 +2653,12 @@ struct Obj86ED0Methods {
     u8 pad000[0x008];
     /* +0x008, func_80050BA8's own dispatch target -- this class's own
      * ctor, OVERRIDING BasicClass's no-arg ctor with a 2-arg one.
-     * func_80050C14 itself, STALLED (gp_rel-blocked), see its match
-     * report; the signature below reflects that stalled function's own
-     * register usage (self, arg1, arg2), which IS how func_80050BA8
-     * calls it, and is what the header already declared for
-     * func_80050BA8 before this round. */
+     * func_80050C14 itself, MATCHED round 45; the signature below is
+     * the vtable slot's own type (self, arg1, arg2), matching how
+     * func_80050BA8 calls it -- func_80050C14's own DEFINITION is typed
+     * more precisely (`char *arg1`, since it calls `strlen` on it), which
+     * is fine: a data-table vtable slot's declared field type need not
+     * match the defining function's own prototype exactly. */
     void (*ctor)(Obj86ED0 *self, s32 arg1, s32 arg2);
     u8 pad00C[0x010 - 0x00C];
     void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, func_80051200 (OVERRIDES BasicClass's addChild: func_80050D30) */
@@ -2615,7 +2668,12 @@ struct Obj86ED0Methods {
      * onFinalize (BasicClass__func_182cc, code_8220_b), reached through
      * self's own table this one time instead of `func_80018390()`. */
     void (*onFinalize)(Obj86ED0 *self, s32 arg1);
-    u8 pad034[0x048 - 0x034];
+    u8 pad034[0x040 - 0x034];
+    /* +0x040, round 45's func_80050C14 -- its own tail dispatch,
+     * `self->methods->slot40(self, arg1, arg2)`, forwarding the ctor's
+     * own two arguments unchanged. */
+    void (*slot40)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040 */
+    u8 pad044[0x048 - 0x044];
     void (*slot48)(Obj86ED0 *self);                      /* +0x048, func_800512C8 -- this class's own slot, func_80051174 */
     u8 pad04C[0x054 - 0x04C];
     void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, func_80051370 -- this class's own slot, func_800512C8 */
@@ -2769,8 +2827,8 @@ struct Class86F88Methods {
      * contradict func_80052498's own narrower body. */
     void (*slot80)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
     u8 pad084[0x094 - 0x084];
-    /* +0x094 = func_8005281C itself (this unit, still INCLUDE_ASM as of
-     * this round). Signature fixed by three independent callers in this
+    /* +0x094 = func_8005281C itself (this unit, MATCHED). Signature fixed
+     * by three independent callers in this
      * unit (func_80052430, func_80052498, func_800524F8, func_80052598),
      * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
     void (*slot94)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
@@ -2790,7 +2848,17 @@ struct Class86F88Methods {
 struct Class86F88ElemMethods {
     u8 pad000[0x004];
     void (*release)(Class86F88Elem *self); /* +0x004 */
-    u8 pad008[0x0B8 - 0x008];
+    u8 pad008[0x04C - 0x008];
+    /* +0x04C, round 45's func_80052644 -- called once per freshly-created
+     * element right after `func_800408CC` returns it, before the same
+     * element's own `slotB8` call. `arg2` points at a 2-word stack-local
+     * (`D_8008AB00`'s value, then a running `D_8008AB04`-seeded
+     * accumulator incremented by 0xA per loop iteration) -- kept opaque
+     * `void *` here since only that one call site gives it any shape;
+     * see `Elem4CArg_3bb8c_k` in src/class_3bb8c_k.c for the concrete
+     * local reading. */
+    void (*slot4C)(Class86F88Elem *self, s32 arg1, void *arg2); /* +0x04C */
+    u8 pad050[0x0B8 - 0x050];
     void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, func_8005281C: called once per active window element with a
