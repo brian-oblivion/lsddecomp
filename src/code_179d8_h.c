@@ -217,4 +217,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A84);
 void func_80028B64(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028B6C);
+extern s32 D_8008A8A4;
+
+s32 func_80028B6C(void) {
+    return D_8008A8A4;
+}
