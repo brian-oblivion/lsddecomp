@@ -269,7 +269,11 @@ three are live rather than transcribed:
 
   **Round 26 adds the case the two above do not cover: a report that was
   never a verdict at all — a banked DERIVATION — and it was wrong in two
-  places.** `func_80032D34` carried a round-25 report marked
+  places.** `func_80032D34` (**Sony's `lib/libsnd/vs_vh.o`**, reclassified
+  round 34 — the lesson is about how much a banked derivation can be trusted,
+  which does not depend on who wrote the bytes, but the 271/274 figure below
+  was measured against an unreachable target and is not a score anyone can
+  reproduce) carried a round-25 report marked
   `DERIVATION ONLY -- ASSIGNABLE`: the head had derived the algorithm from the
   disassembly but never written C. That is the most trustworthy-looking kind
   of report, because it makes no claim about what is impossible and reads as
@@ -354,6 +358,14 @@ three are live rather than transcribed:
   - `func_8002C048` — twenty-five variations, every one keeping the cached
     `c1`/`c2` locals. None tested whether those locals should exist, which is
     exactly where the already-documented no-cache idiom points.
+    (**It is `strcmp`, `lib/libc2/strcmp.o`, reclassified round 34.** Round 45
+    notes this cuts the example both ways and is worth keeping for the second
+    edge: twenty-five variations were spent on bytes no source shape could
+    ever reach, and the narrowness of the axis is exactly what stopped anyone
+    asking the prior question — whether this was game code at all. A long
+    attempt list is not a broad one, and it is not evidence the target is
+    real either. `tools/sdkstalls.py` answers the second question in a
+    second; `nearmiss.py` runs it for you.)
 
   Both were sent back on the untested axis. One improved into a cleaner stall
   (dropping a `volatile` that had been fighting a CSE, and the spurious mask
