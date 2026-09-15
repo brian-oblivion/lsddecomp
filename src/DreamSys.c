@@ -1663,15 +1663,15 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 	                       D_80088980, D_80088820, 1);
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BD3C);
-
 /* Unit-local reading of the second parameter: the caller (func_8005BD3C)
    passes down a `s32 local[4]` buffer that func_8001E6F8 (code_d294_c) fills
    with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
    that table's `out[1].whole` (a degrees value, per func_8001E6F8's own
    report). This function reads it unsigned (`lhu`), independent of
    WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
-   bytes, so it is kept local rather than folded into that shared struct. */
+   bytes, so it is kept local rather than folded into that shared struct.
+   Moved above func_8005BD3C (round 43) because that function's own arg2 is
+   cast to this type before being forwarded to func_8005BE28 below. */
 typedef struct DirectionCheckArg {
 	s8 unk0[4];
 	u16 heading;
@@ -1690,6 +1690,51 @@ typedef struct DirectionTableEntry {
 } DirectionTableEntry;
 
 extern DirectionTableEntry D_8008875C[];
+
+/* Forward declaration: defined below in ROM order, called by func_8005BD3C
+   just above it. */
+extern s32 func_8005BE28(DirectionCheckArg *a0, u8 a1);
+
+/* D_800889B8: a per-stage table of pointers to byte arrays (4-byte stride,
+   indexed by D_8008ACBC), each further indexed by D_8008ACC0 to read the
+   "heading" byte passed to func_8005BE28. D_80088858 is the analogous
+   table for D_8008ACC4/D_8008ACC8. Neither array's own element type is
+   dereferenced beyond a single `u8` here. */
+extern u8 *D_800889B8[];
+extern u8 *D_80088858[];
+
+/* A `DirectionTableEntry`-STRIDED (12-byte) table whose first element
+   happens to sit 4 bytes before the separately-referenced `D_8008875C`
+   (the angle table `func_8005BE28` indexes) -- splat drew the boundary
+   there because `D_8008875C` is independently referenced, not because the
+   underlying data is two different tables. This function only ever
+   ADDRESS-TAKES an element (`&D_80088758[i]`), never dereferences one, so
+   the element type only needs to fix the STRIDE; reusing
+   `DirectionTableEntry` for that is exact and avoids inventing a third
+   local type for one call site. */
+extern DirectionTableEntry D_80088758[];
+
+s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2)
+{
+	u8 heading;
+	s32 idx;
+	s32 result;
+
+	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
+	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+		if (arg1 != NULL)
+			*arg1 = (s32)&D_80088758[heading];
+
+		if (arg0 != NULL) {
+			idx = D_80088858[D_8008ACC4][D_8008ACC8];
+			*arg0 = (s32)&D_80088758[idx];
+		}
+		result = 1;
+	} else {
+		result = 0;
+	}
+	return result;
+}
 
 s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
 {
