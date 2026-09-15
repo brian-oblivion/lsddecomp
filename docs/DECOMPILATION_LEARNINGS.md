@@ -4501,6 +4501,39 @@ finding, seen in two runners independently.**
 
 ### Round 27's HEADLINE: three levers were found, and ALL THREE have a measured counter-example
 
+> **ROUND 44 CORRECTION -- TWO OF THESE THREE LEVERS HAVE NO GAME-CODE EVIDENCE
+> AT ALL, AND THE TABLE BELOW DOES NOT SHOW IT.** Crossing this section against
+> the SDK-exit census (Gate 1b's seventh screen, run over the shared docs rather
+> than only over reports):
+>
+> - **address-taken parameter** -- its sole positive, `func_80050B28`, is Psy-Q
+>   **libcard** and is marked `NOT GAME CODE` (round 39). Against game code the
+>   table's own right-hand column records it **0 for 4**. Net game-code evidence:
+>   zero successes, four failures.
+> - **invert the guard** -- its sole positive, `func_80050AA4`, was **converted to
+>   a linked Sony object in round 33**. Its only game-code test is the failure
+>   already in the table (`func_8004EF6C`, 188/240 -> 6/240). Net game-code
+>   evidence: zero successes, one catastrophic failure.
+> - **inline every call site** -- **this row STANDS.** `func_800513D0` is genuine
+>   game C, matched byte-exact at 147/147, and is still defined in
+>   `src/class_3bb8c_i.c`.
+>
+> **Why an SDK positive is worth less than nothing here, rather than merely
+> unproven.** Both levers are claims of the form *"retail does X and our compiler
+> does Y"*. Sony's objects were built by **ASPSX, not by our pinned GCC 2.6.3 +
+> maspsx pipeline**, so a lever that "worked" on those bytes was reconciling our
+> compiler against a different assembler's output. It cannot be evidence about
+> what our compiler needs, in either direction -- which is exactly why the two
+> levers transfer so badly to the game functions people then tried them on.
+>
+> **Disposition:** the two rows are WITHDRAWN as levers. They are kept below
+> because the section's CONCLUSION -- that a lever needs a stated discriminator
+> or it is a coin flip -- is not only still right, it is now much better
+> supported than when it was written. Do not spend attempts reproducing the two
+> withdrawn positives. The address-taken discriminator (diff your prologue's
+> saved-register list against retail's) is a mechanical test that survives
+> independently of the instance it was found on -- use the test, not the claim.
+
 **Read this before applying any lever from round 27.** The round produced three
 source levers, each of which closed or advanced a real function, and each of
 which was then measured to make a *different* function WORSE. None is a rule;
