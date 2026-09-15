@@ -2305,7 +2305,9 @@ typedef struct Obj87034_3bb8c_l Obj87034_3bb8c_l;
  * pointer -- so it is NOT another Obj87034_3bb8c_l, just an opaque
  * 3-field descriptor. */
 typedef struct Unk50Struct_3bb8c_l {
-    u8 pad00[0x0C];
+    s32 unk0;      /* +0x000, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg2 */
+    s32 unk4;      /* +0x004, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg3 */
+    s32 unk8;      /* +0x008, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotBC's arg1 */
     void *unkC;   /* +0x00C, func_800531CC (address taken, forwarded opaquely) */
     u8 pad10[0x014 - 0x010];
     s32 unk14;    /* +0x014, func_800531CC: discriminant compared against 2; also func_80053764: discriminant compared against 1 */
@@ -2321,7 +2323,24 @@ typedef struct Unk50Struct_3bb8c_l {
  * one s32 argument while this call site passes two -- different arities,
  * so this is a different class, not DreamSys; left unnamed. */
 typedef struct Obj14Methods_3bb8c_l {
-    u8 pad00[0x0EC];
+    u8 pad000[0x0BC];
+    /* +0x0BC, round 45's func_800534C8: `(self, self->unk50->unk8, 0)`. */
+    void (*slotBC)(void *self, s32 arg1, s32 arg2); /* +0x0BC */
+    u8 pad0C0[0x0C4 - 0x0C0];
+    /* +0x0C4, round 45's func_800534C8: `(self, 3, self->unk50->unk0,
+     * self->unk50->unk4)`. */
+    void (*slotC4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0C4 */
+    u8 pad0C8[0x0CC - 0x0C8];
+    /* +0x0CC, round 45's func_800534C8: `(self, &D_8008710C)`. */
+    void (*slotCC)(void *self, void *arg1); /* +0x0CC */
+    u8 pad0D0[0x0DC - 0x0D0];
+    /* +0x0DC, round 45's func_800534C8: `(self, self->unk48)` on the
+     * OWNING Obj87034_3bb8c_l. */
+    void (*slotDC)(void *self, s32 arg1); /* +0x0DC */
+    /* +0x0E0, round 45's func_800534C8: `(self, GetStageGridDimensions(
+     * self->unk38))`. */
+    void (*slotE0)(void *self, void *arg1); /* +0x0E0 */
+    u8 pad0E4[0x0EC - 0x0E4];
     void (*slotEC)(void *self);                        /* +0x0EC, func_80053764 */
     u8 padF0[0x10C - 0x0F0];
     void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, func_8005393C */
@@ -2349,9 +2368,18 @@ typedef struct Obj14_3bb8c_l {
  * `unknown_functions_0x..` padding arrays) and DreamSys.h is a different
  * unit's header, not this one's to extend. */
 typedef struct DreamSysMethods_3bb8c_l {
-    u8 pad00[0x050];
+    u8 pad00[0x04C];
+    /* +0x04C, round 45's func_800534C8: `(self, self->unk14)`, dispatched
+     * on the OWNING Obj87034_3bb8c_l's own `unk3C` (a DIFFERENT
+     * DreamSysObj_3bb8c_l instance from the `self->unk18` this function
+     * dispatches every other slot through). */
+    void (*slot4C)(void *self, void *arg1); /* +0x04C */
     void (*slot50)(void *self);          /* +0x050, func_800536B0 */
-    u8 pad54[0x060 - 0x054];
+    /* +0x054, round 45's func_800534C8: `(self, val)`, `val` a small
+     * derived integer (`(*obj->methods->slot7C(obj, 0)) / 2 * 5 / 3 +
+     * D_8008AB34`, `obj` being `*(void **)self->unkC`). */
+    void (*slot54)(void *self, s32 arg1); /* +0x054 */
+    u8 pad58[0x060 - 0x058];
     void (*slot60)(void *self, s32 arg1);          /* +0x060, func_80053764 */
     void (*slot64)(void *self, void *arg1);        /* +0x064, func_80053764 */
     void (*slot68)(void *self, void *arg1);        /* +0x068, func_80053764 */
@@ -2452,7 +2480,8 @@ struct Obj87034_3bb8c_l {
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
     s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
-    u8 pad24[0x038 - 0x024];
+    u8 pad24[0x034 - 0x024];
+    s32 unk34;                            /* +0x034, round 45's func_800534C8: forwarded opaquely to func_8005C650's own arg3 */
     void *unk38;                          /* +0x038, func_80052E7C: forwarded opaquely to func_80049060/func_80049098 */
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
     s32 unk40;                             /* +0x040, func_80053764 */

@@ -18,7 +18,9 @@
  * its three blockers is DEAD: `addiu_at` was RESOLVED in round 21 (maspsx
  * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
  * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_800534C8  gp_rel        -- STILL BLOCKED, stub report stands.
+ *   func_800534C8  gp_rel        -- MATCHED round 45 (122/122 words). The
+ *                  `gp_rel` blocker itself was RESOLVED round 42; see the
+ *                  file-top banner above.
  *   func_80052F10  was addiu-$at ONLY -- NOT BLOCKED. 137w.
  *                  ROUND 32: MATCHED, 137/137.
  *   func_80053984  was addiu-$at ONLY -- NOT BLOCKED. 82w.
@@ -279,7 +281,73 @@ void func_80053458(Obj87034_3bb8c_l *self) {
 void func_800534C0(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_l", func_800534C8);
+/* self->unkC's real pointee for THIS function -- a DIFFERENT reading from
+ * `RegistrantObj_3bb8c_l` (func_80052DE8's own local view of the same
+ * field): here `*(self->unkC)` (one dereference through unkC's own first
+ * word) yields an object with its OWN methods pointer at +0x000, matching
+ * `RegistrantObj_3bb8c_l`'s own layout (a single `methods` field) exactly
+ * -- so no field-type change is needed, just a same-shape reinterpret at
+ * this call site, per the project's independent-arities convention. */
+typedef struct UnkCObj_3bb8c_l UnkCObj_3bb8c_l;
+typedef struct UnkCObjMethods_3bb8c_l UnkCObjMethods_3bb8c_l;
+struct UnkCObjMethods_3bb8c_l {
+    u8 pad000[0x07C];
+    /* +0x07C, round 45's func_800534C8: `(self, 0)`, returning a pointer
+     * to a single `s32` this function dereferences immediately. */
+    s32 *(*slot7C)(UnkCObj_3bb8c_l *self, s32 arg1); /* +0x07C */
+};
+struct UnkCObj_3bb8c_l {
+    UnkCObjMethods_3bb8c_l *methods; /* +0x000 */
+};
+
+/* Uncarved cross-unit helper (code_4cd08.c, MATCHED round 43) -- no header
+ * declares it, so this unit's own call-site typing is local, all-`s32`
+ * per that function's own definition. */
+extern void func_8005C650(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+
+/* This unit's own local reading of the already-matched `GetStageGridDimensions`
+ * (include/StageGrid.h, `(s32 index)` -> `StageGridDimensions *`) -- kept
+ * opaque `void *` here since the return value is only forwarded, never
+ * dereferenced, and this unit does not otherwise include that header. */
+extern void *GetStageGridDimensions(s32 index);
+
+/* VALUE-of `%gp_rel`, round 45's own local view -- a plain `s32` bias
+ * added to the derived value passed to `DreamSysMethods_3bb8c_l::slot54`. */
+extern s32 D_8008AB34;
+
+/* VALUE-of `%gp_rel`... actually address-of only here (`&D_8008710C`),
+ * round 45's own local view -- an opaque .data block (asm/data/76DC8.data.s),
+ * same convention as D_8008715C/D_80087168 above, forwarded to
+ * `Obj14Methods_3bb8c_l::slotCC`. */
+extern s32 D_8008710C;
+
+void func_800534C8(Obj87034_3bb8c_l *self) {
+    DreamSysObj_3bb8c_l *unk18 = self->unk18;
+    Unk50Struct_3bb8c_l *unk50 = self->unk50;
+    UnkCObj_3bb8c_l *obj;
+    s32 val;
+    Obj14_3bb8c_l *unk14;
+
+    unk18->methods->slot74(unk18);
+
+    obj = *(UnkCObj_3bb8c_l **)self->unkC;
+    val = *obj->methods->slot7C(obj, 0);
+    unk18->methods->slot54(unk18, val / 2 * 5 / 3 + D_8008AB34);
+
+    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+
+    func_8005C650((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
+
+    unk14 = self->unk14;
+    self->methods->slot10(self, (s32)unk14);
+
+    unk14->methods->slotBC(unk14, unk50->unk8, 0);
+    unk14->methods->slotC4(unk14, 3, unk50->unk0, unk50->unk4);
+    unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
+    self->unk3C->methods->slot4C(self->unk3C, unk14);
+    unk14->methods->slotDC(unk14, self->unk48);
+    unk14->methods->slotCC(unk14, &D_8008710C);
+}
 
 void func_800536B0(Obj87034_3bb8c_l *self) {
     self->methods->slotD4(self);
