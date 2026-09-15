@@ -1,32 +1,23 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * ROUND 43 UPDATE (2026-09-15): the round-17 `gp_rel` cluster named below is
+ * now FULLY MATCHED.  All eight functions (`func_8002C448`, `func_8002C468`,
+ * `func_8002C4E0`, `func_8002C638`, `func_8002C6FC`, `func_8002C890`,
+ * `func_8002CC1C`, `func_8002CC28`) closed byte-exact once round 42's
+ * `--gp-symbols`/`--no-nop-mflo-mfhi` maspsx flags resolved the blocker --
+ * see each function's own `docs/match-reports/<func>.md` for the derivation.
+ * `func_8002CA3C` is this unit's one remaining `INCLUDE_ASM` as of round 43
+ * -- it was never part of the retracted gp_rel cluster and was out of this
+ * round's assigned work list.
+ *
+ * The retracted "BLOCKED, do NOT spend attempts" directive that used to sit
+ * here is gone; keeping it around after every function it named was matched
+ * would only mislead the next reader.  The classification and provenance
+ * notes below (carve history, class-framework correction) still stand.
  *
  * code_179d8_e -- functions 120..148 of the original 274-function code_179d8
  * monolith, 0x1CC08..0x1D508 (vram 0x8002C408..0x8002CD08).  Carved round 17
  * (2026-09-04) out of what the yaml called `code_179d8_mid_b`; the remainder
  * behind it is now `code_179d8_mid_c`.
- *
- * Blocker census, three-grep screen run per function at carve time:
- * 21 of the 29 clean.  READ THAT WITH CARE -- ten of the 29 are two-word
- * `jr $ra; nop` leaves and splat matched eight of them itself, so the real
- * queue is the 21 INCLUDE_ASMs below, of which eight are blocked.
- *
- * BLOCKED, stub reports already filed, do NOT spend attempts on these:
- *   gp_rel: func_8002C448, func_8002C468, func_8002C4E0, func_8002C638,
- *           func_8002C6FC, func_8002C890, func_8002CC1C, func_8002CC28
- * That is a cluster, not a scatter: these functions are the accessors for
- * one band of small-data globals (D_8008A8B0..D_8008A8CC), which is exactly
- * the shape the gp-relative blocker takes.  The bodies AROUND them that do
- * not touch that band are clean.
  *
  * Owns NO switch jump table -- zero `jtbl_` references anywhere in the slice
  * -- so no rodata sub-slot is attached to this unit.
@@ -42,9 +33,13 @@
  * confirmation this is genuine self->methods->slotN(self, ...) dispatch, not
  * driver code.  D_8006D9BC and D_8006DA34 share the same BasicClass tail
  * (slots +0x10..+0x38), so they are two related classes off the same base --
- * plausibly a PS1 SPU/VAB sound-streaming object (func_8002C4E0, blocked,
- * calls SsUtGetVabHdr on `self`).  Do expect a `this` pointer in this slice;
- * the sibling slices' finding is neighbourhood-scoped, not monolith-wide.
+ * confirmed round 43 as a PS1 SPU/VAB sound-streaming object: `func_8002C4E0`
+ * is its constructor, `func_8002C638` its close, `func_8002C6FC` its
+ * per-frame poll (header/body transfer state machine), and `func_8002C890`
+ * its post-load VAB attribute-table fetch.  `D_8006DA34`'s whole vtable was
+ * read straight out of `asm/data/5E140.data.s` while matching this cluster
+ * -- see `docs/match-reports/func_8002C4E0.md` for the full slot table,
+ * including two slots (+0x58, +0x6C) that are null in retail's own data.
  */
 #include "common.h"
 
@@ -137,7 +132,7 @@ struct ObjDA34 {
     Chunk179D8E **unk50;             /* +0x050, array of unk2C.ts pointers into unk4C's pool */
     s16 unk54;                        /* +0x054 */
     s16 unk56;                         /* +0x056, boolean-ish flag */
-    s16 unk58;                          /* +0x058 */
+    u16 unk58;                          /* +0x058, unsigned (retail loads it lhu in func_8002C890) */
     u16 unk5A;                           /* +0x05A */
     void *unk5C;                          /* +0x05C, malloc'd copy of the base filename */
     s32 unk60;                             /* +0x060 */
@@ -394,7 +389,65 @@ s32 func_8002C824(ObjDA34 *self, s32 arg1) {
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C890);
+/* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/LIBSND.H,
+ * 16 bytes) -- only the one field func_8002C890 itself reads is named,
+ * per the same local-struct convention used for VabHdr179D8E above (and
+ * matching code_179d8_k.c's own reduced `ProgAtr` reading). */
+typedef struct ProgAtr179D8E {
+    u8 tones; /* +0x00, program's tone count, written by SsUtGetProgAtr */
+    u8 pad1[0x10 - 0x1];
+} ProgAtr179D8E;
+
+/* func_80026C20 -- uncarved, cross-unit; reached only through
+ * D_8006DA34's own +0x5C slot (declared above as `slot5C`), never called
+ * directly by name here. */
+
+void func_8002C890(ObjDA34 *self)
+{
+    ProgAtr179D8E prog;
+    Chunk179D8E *pool;
+    s32 i;
+    s32 j;
+    s16 result;
+
+    if (self->unk58 == 0) {
+        return;
+    }
+    self->methods->slot5C(self);
+    self->unk10 = D_8008A8C8;
+    result = SsUtGetVabHdr(self->unk54, &self->unk2C);
+    if (result == -1) {
+        return;
+    }
+    self->unk4C = func_80017B34(self->unk2C.vs << 5);
+    if (self->unk4C == NULL) {
+        return;
+    }
+    self->unk50 = func_80017B34(self->unk2C.ts << 2);
+    if (self->unk50 == NULL) {
+        return;
+    }
+    pool = self->unk4C;
+    for (i = 0; i < self->unk2C.ts; i++) {
+        self->unk50[i] = pool;
+        result = SsUtGetProgAtr(self->unk54, i, &prog);
+        if (result == -1) {
+            return;
+        }
+        for (j = 0; j < prog.tones; j++) {
+            result = SsUtGetVagAtr(self->unk54, i, j, pool);
+            if (result == -1) {
+                return;
+            }
+            pool++;
+        }
+    }
+    if (D_8008A8C0 == 0) {
+        func_80032998();
+        SsSetMVol(0x78, 0x78);
+        D_8008A8C0 = 1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CA3C);
 
