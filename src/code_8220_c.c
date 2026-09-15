@@ -357,7 +357,40 @@ void func_8001A224(void *arg0, void *arg1, s32 kind)
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A268);
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A380);
+extern s32 D_8008A824;
+extern s32 D_8008A828;
+extern s32 D_80090C18;
+extern s32 D_8008A830;
+extern s32 D_8008A834;
+
+void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5)
+{
+    u8 *dst = (u8 *)arg0;
+    u8 *prim = (u8 *)arg1;
+    s32 val;
+    s32 code;
+    s32 code2;
+
+    if (D_8008A830) {
+        val = D_8008A834;
+    } else {
+        val = D_80090C18;
+    }
+    code = D_8008A824;
+    code2 = D_8008A828;
+
+    *(s32 *)dst = val;
+    *(s32 *)(dst + 0x4) = code;
+    *(s32 *)(dst + 0x8) = code2;
+
+    if (arg3 != 0) {
+        *(u16 *)(dst + 0xC) = arg4;
+        *(u16 *)(dst + 0xE) = arg5;
+    }
+
+    *(PolyUV4 *)(dst + 0x10) = *arg2;
+    *(s32 *)(dst + 0x14) = *(s32 *)(prim + 0x30);
+}
 
 /*
  * Copies three unaligned 8-byte fields (src[i]->xy -> dst[i]->xy) and three
@@ -390,4 +423,13 @@ void func_8001A4C0(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
     dst[3]->uv = *uv3;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A54C);
+extern s32 D_8008A830;
+extern s32 D_8008A834;
+
+void func_8001A54C(s32 arg0, s32 arg1)
+{
+    D_8008A830 = arg0;
+    if (arg0) {
+        D_8008A834 = arg1;
+    }
+}
