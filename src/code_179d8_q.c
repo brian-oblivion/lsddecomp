@@ -1,6 +1,63 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027C80);
+/* This class's own +0x058 slot. The sibling class D_8006D430 (see
+ * include/code_171e0.h's UnkFlagsObjMethods_171e0) has the identical slot
+ * unnamed as "func_80026B08's own slot, unused here" -- kept as an
+ * independent local view here, per the project's multiple-local-views
+ * convention, rather than editing that shared header (code_179d8_h.c and
+ * code_171e0.c also include it this round). */
+typedef struct SelfC80Methods SelfC80Methods;
+struct SelfC80Methods {
+    u8 pad00[0x58];
+    /* +0x58 */ void (*slot58)(void *self, char *arg1);
+};
+
+typedef struct SelfC80 SelfC80;
+struct SelfC80 {
+    /* +0x00 */ SelfC80Methods *methods;
+    u8 pad04[0x22 - 0x04];
+    /* +0x22 */ u16 unk22;
+    /* +0x24 */ s32 unk24;
+};
+
+/* +0x04 slot of whatever object a still-uninitialized local $s2 points at
+ * on this path -- see the func_80027C80 report for why that local is never
+ * assigned; only the one field this store touches is typed. */
+typedef struct UnkC80 UnkC80;
+struct UnkC80 {
+    u8 pad00[0x04];
+    /* +0x04 */ s32 unk04;
+};
+
+struct Self800282AC;
+extern void func_800282AC(struct Self800282AC *arg0, s32 arg1, s32 arg2,
+                           s32 arg3, s32 arg4);
+extern s32 func_800284C4(char *arg0); /* code_179d8_r */
+extern s32 D_8008A85C;
+
+void func_80027C80(SelfC80 *self, char *arg1)
+{
+    UnkC80 *s2;
+    s32 idx;
+
+    func_800280D0();
+
+    if (arg1 != NULL) {
+        if (D_8008A85C != 0) {
+            s2->unk04 = 1;
+            idx = func_800284C4(arg1);
+            func_800282AC((struct Self800282AC *)self, idx, 7, 0, 0);
+        } else {
+            self->methods->slot58(self, arg1);
+
+            if (self->unk22 == 0) {
+                self->unk24 |= 4;
+            }
+        }
+    }
+
+    func_800280E0();
+}
 
 extern void func_800280D0(void);
 extern void func_800280E0(void);
