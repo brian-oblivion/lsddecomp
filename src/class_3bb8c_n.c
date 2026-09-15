@@ -128,7 +128,10 @@ struct ObjN14Sub {
 typedef struct ObjN14 ObjN14;
 struct ObjN14 {
     ObjN14Sub *unk0; /* +0x000 */
-    u8 pad4[0x14 - 0x4];
+    s32 unk4; /* +0x004 */
+    u8 pad8[0x4];
+    s32 unkC; /* +0x00C */
+    s32 unk10; /* +0x010 */
     s32 unk14; /* +0x014 */
 };
 
@@ -187,7 +190,33 @@ s32 func_8005582C(ObjN14 *arg0, void *arg1) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055874);
+extern s32 D_80087474[];
+
+s32 func_80055874(ObjN14 *arg0, void *arg1) {
+    s32 dx, dy, dist;
+    s8 idx;
+
+    if (arg1 == 0) {
+        return 0;
+    }
+    dx = arg0->unk4 - *(s32 *) arg1;
+    if (dx < 0) {
+        dx = ~dx + 1;
+    }
+    dy = arg0->unkC - *(s32 *) ((u8 *) arg1 + 0x8);
+    if (dy >= 0) {
+        dist = dx + dy;
+    } else {
+        dist = dx - dy;
+    }
+    arg0->unk10 = dist;
+    idx = arg0->unk0->unk6;
+    if (dist < D_80087474[-idx]) {
+        dist = 1;
+        return dist;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800558F0);
 
