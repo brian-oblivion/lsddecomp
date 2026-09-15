@@ -19,8 +19,7 @@
  * Blocker census, three-grep screen run per function at carve time:
  * 19 of the 20 clean.
  *
- * BLOCKED, stub report already filed, do NOT spend attempts on it:
- *   gp_rel: func_80056F5C
+ * func_80056F5C: was gp_rel. MATCHED round 44, 34/34, first build.
  *
  * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
  * rodata sub-slot is attached to this unit.
@@ -213,7 +212,9 @@ struct BaseObjOMethods {
     void (*slot18)(BaseObjO *self);                                 /* +0x018 func_800571A8 (this unit) */
     u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
     void (*slot40)(BaseObjO *self);                                     /* +0x040, called by func_80057044's own ctor; occupant outside this unit */
-    u8 pad44[0x8C - 0x44];                                                /* +0x044 .. +0x08B */
+    u8 pad44[0x80 - 0x44];                                                /* +0x044 .. +0x07F */
+    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by func_80056F5C (this unit); occupant outside this unit (D_800876FC's slot80 is func_8001D4AC, a BasicClass-range function) */
+    u8 pad84[0x8C - 0x84];                                                /* +0x084 .. +0x08B */
     void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by func_800571F8 */
     void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by func_800571F8 */
     u8 pad94[0xBC - 0x94];                                                       /* +0x094 .. +0x0BB */
@@ -243,7 +244,28 @@ BaseObjOMethods *func_80056F4C(void) {
     return &D_800876FC;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_o", func_80056F5C);
+extern s32 D_8008ACA4;
+extern s32 D_8008ACA8;
+extern s32 D_8008ACAC;
+extern s32 D_8008AB98[3];
+extern s32 D_8008AB94;
+
+extern void func_80020510(void *arg0, void *arg1);
+
+void func_80056F5C(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
+    s32 i;
+    void *ret;
+
+    D_8008ACA4 = (s32) self;
+    D_8008ACA8 = arg2;
+    D_8008ACAC = arg3;
+    i = 0;
+    do {
+        ret = self->methods->slot80(self, D_8008AB98[i]);
+        func_80020510(ret, &D_8008AB94);
+        i++;
+    } while (i < 2);
+}
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
