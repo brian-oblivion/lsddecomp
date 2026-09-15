@@ -107,7 +107,14 @@ void func_80026D88(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
     dst->unk74 = src->unk74;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026E0C);
+extern s32 D_8008A84C;
+extern s32 func_800280D0(void);
+
+void func_80026E0C(void) {
+    if (D_8008A84C == 0x13) {
+        func_800280D0();
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026E38);
 
