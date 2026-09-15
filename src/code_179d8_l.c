@@ -30,8 +30,12 @@
  * a STAFFING cut (one unit per runner) and not a density cut.  All three
  * surviving blocked functions landed in this half:
  *
- * BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:
+ * ROUND 44: THE THREE BELOW ARE ASSIGNABLE AND ARE THIS UNIT'S FRESH GROUND.
+ * ~~BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:~~
  *   func_8002CD08 (132w), func_8002D1B4 (316w), func_8002D8E0 (311w)
+ * nop_mflo_mfhi was RESOLVED in round 42 (`--no-nop-mflo-mfhi`), so the
+ * "do NOT spend attempts" directive above is WITHDRAWN.  All three are
+ * never-attempted cold ground whose reports were marked REOPENED in round 44.
  * That blocker is an `mflo`/`mfhi` FOLLOWED WITHIN TWO INSTRUCTIONS BY a
  * `mult`/`div`; it is the one construct in docs/research/addiu-at-blocker.md
  * that round 21 did not fix.  Each has a stub report.
