@@ -176,7 +176,16 @@ s32 func_800557DC(ObjN14 *arg0) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005582C);
+extern s32 func_80055874(ObjN14 *arg0, void *arg1);
+extern void func_8002CD08(s32 arg0, void *arg1);
+
+s32 func_8005582C(ObjN14 *arg0, void *arg1) {
+    if (func_80055874(arg0, arg1) != 0) {
+        func_8002CD08(*(s32 *) D_8008AC7C, &arg0->unk14);
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055874);
 
