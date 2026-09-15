@@ -116,7 +116,16 @@ void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003EC2C);
+void func_8003EC2C(Unk18Obj *self, s16 *pair) {
+    s32 q1, r1, q2;
+
+    if (self->unk10 != NULL) {
+        q1 = pair[0] / pair[1];
+        r1 = pair[0] % pair[1];
+        q2 = (r1 << 12) / pair[1];
+        self->unk2C = (q1 << 12) + q2;
+    }
+}
 
 void func_8003ECC0(void) {
 }

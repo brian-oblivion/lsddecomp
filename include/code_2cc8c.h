@@ -615,7 +615,14 @@ struct Unk18Obj {
     /* +0x020, round 14: another Vec3, written wholesale by func_8003EBF8
        from its own arg1 -- same shape/evidence as unk14 just above. */
     Vec3_2cc8c unk20;
-    u8 pad2C[0x030 - 0x02C];
+    /* +0x02C, round 44 (func_8003EC2C): a 20.12 fixed-point value, set from
+       a caller-supplied `{s16 whole; s16 frac;}` pair via the same
+       split-division idiom as code_d294_c's func_8001EC84 (divide once for
+       quotient+remainder, then divide the shifted remainder again for the
+       fractional part), guarded by `self->unk10 != 0`. Read as raw `s16*`
+       rather than reusing code_d294.h's `WholeFrac_d294` -- a different
+       unit's own local view of the same shape, not a shared type. */
+    s32 unk2C;
     s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
