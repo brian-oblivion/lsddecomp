@@ -297,7 +297,13 @@ typedef struct Obj866E8Methods {
      * `self->methods->slot30(self, 5)` when the just-copied descriptor's
      * leading raw halfword differs from what was there before. */
     void (*slot30)(Obj866E8 *self, s32 arg1);  /* +0x030 */
-    u8 pad034[0x88 - 0x34];
+    u8 pad034[0x60 - 0x34];
+    /* Called by round 45's func_800518F4/func_80051998 as
+     * `self->methods->slot60(self, 0)`, tail of the countdown/flush
+     * "record + notify" path, when their own trailing flag argument is
+     * set. Return unused. */
+    void (*slot60)(Obj866E8 *self, s32 arg1);  /* +0x060 */
+    u8 pad064[0x88 - 0x64];
     /* Called by func_8004BD14 with a literal 7, one of the object's own
      * Elem array slots, and the loop index. */
     void (*slot88)(Obj866E8 *self, s32 arg1, Elem *entry, s32 arg3); /* +0x088 */
@@ -708,7 +714,16 @@ struct Obj866E8 {
     s32 unk18;                     /* +0x018, func_80051784/func_80051814/func_80051858 */
     s32 unk1C;                     /* +0x01C, func_80051784/func_80051814/func_80051858 */
     s32 unk20;                     /* +0x020, func_800517EC (xor-toggled) */
-    u8 pad24[0x48 - 0x24];
+    u8 pad24[0x28 - 0x24];
+    u8 *unk28;                     /* +0x028, round 45's func_80051998: a per-index byte buffer, `unk28[arg1] = table[idx]` */
+    u8 pad2C[0x40 - 0x2C];
+    /* +0x040/+0x044, round 45's func_800518F4/func_80051998: opaque
+     * resource-handle objects, dispatched only through this unit's own
+     * local method-table views (Unk40Obj866E8Methods/Unk44Obj866E8Methods
+     * in class_3bb8c_j.c) -- kept `void *` here since nothing outside that
+     * unit touches them yet. */
+    void *unk40;                   /* +0x040 */
+    void *unk44;                   /* +0x044 */
     s32 unk48;                     /* +0x048, func_80051784/func_800517EC/func_80051814/func_80051858 */
     u8 pad4C[0x54 - 0x4C];
     Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
