@@ -170,7 +170,20 @@ s32 func_80026F00(void) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026F34);
+typedef s32 (*Func80026F34Fn)(s32, s32, s32);
+extern s32 func_8002C468(s32 arg0, s32 arg1, s32 arg2);
+extern s32 func_80027F18(s32 arg0, s32 arg1, s32 arg2);
+
+void func_80026F34(s32 arg0, s32 arg1, s32 arg2) {
+    Func80026F34Fn fn;
+
+    fn = func_8002C468;
+    if (D_8008A84C == 0x13) {
+        fn = func_80027F18;
+    }
+    do {
+    } while (fn(arg0, arg1, arg2) == 0);
+}
 
 extern s32 func_80027EF8(void);
 extern s32 func_8002C448(void);
