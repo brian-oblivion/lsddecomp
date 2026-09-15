@@ -279,7 +279,79 @@ s32 func_80027FF0(void)
     return D_8008A86C;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027FFC);
+/* A 4-byte, alignment-2 pair -- the idiom CLAUDE.md/code_179d8_h.c document
+ * for a struct whose whole-struct assignment compiles to lwl/lwr + swl/swr
+ * instead of a plain lw/sw. Kept as this unit's own local view (per-call-site
+ * typed, same shape as code_179d8_h.c's Pair16_179D8H, different name so
+ * nothing is shared across units). */
+typedef struct Pair16Q Pair16Q;
+struct Pair16Q {
+    s16 unk0;
+    s16 unk2;
+};
+
+/* CdSearchFile's own output buffer. Only the first two fields this call
+ * site copies out are named; sized to 0x18 bytes total because that is
+ * exactly the span between this local's stack slot (sp+0x50) and the next
+ * saved register (sp+0x68) -- independently confirms the same 0x18-byte
+ * figure code_179d8_h.c's func_80028920 derived for the same Sony
+ * function's output struct (StatBuf179D8H). */
+typedef struct CdStatBufQ CdStatBufQ;
+struct CdStatBufQ {
+    Pair16Q unk0;
+    u32 unk4;
+    u8 pad8[0x18 - 0x8];
+};
+
+/* This class's per-entry array element, 0x1C bytes: `name` is passed
+ * directly (as its own address, offset 0) to func_800289CC as the path
+ * suffix; unk14/unk18 are filled from a CdSearchFile lookup on that path.
+ * D_8008A868 (this unit's own func_80027FD8/set) and D_8008A86C (func_8002
+ * 7FE4/FF0) are this array's base pointer and element count -- func_800284C4
+ * (code_179d8_r) walks the identical 0x1C stride over D_8008A868 doing
+ * strstr() against `name`, confirming the layout independently. */
+typedef struct FileEntryQ FileEntryQ;
+struct FileEntryQ {
+    /* +0x00 */ char name[0x14];
+    /* +0x14 */ Pair16Q unk14;
+    /* +0x18 */ u32 unk18;
+};
+
+extern const char D_800107D8[]; /* "File not found. file = %s\n" */
+extern s32 CdSearchFile(CdStatBufQ *statBuf, char *path); /* lib/libcd/iso9660.o */
+extern void printf(const char *fmt, void *arg1);
+extern char *func_800289CC(char *dest, char *suffix);
+extern void func_80027E78(void);
+
+s32 func_80027FFC(FileEntryQ *arg0, s32 count)
+{
+    FileEntryQ *end;
+    char path[0x40];
+    CdStatBufQ buf;
+    s32 tries;
+
+    end = arg0 + count;
+
+    func_80027E78();
+
+    for (; arg0 < end; arg0++) {
+        func_800289CC(path, arg0->name);
+
+        for (tries = 0; tries < 0x65; tries++) {
+            if (CdSearchFile(&buf, path) != 0) {
+                goto found;
+            }
+        }
+
+        printf(D_800107D8, path);
+
+    found:
+        arg0->unk14 = buf.unk0;
+        arg0->unk18 = buf.unk4;
+    }
+
+    return 1;
+}
 
 /* Paired with func_800280E0 just below -- a 1/0 flag toggle on D_8008A88C,
  * called from func_80027C80 (this table's slot +0x06C) as the first thing
