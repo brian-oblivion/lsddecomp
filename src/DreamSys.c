@@ -1602,7 +1602,16 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE90);
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BF48);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BF68);
+/* Flag set here, tested by Test4InstantTeleporters right below; local to
+   this unit -- code_4cd08.c calls the setter through its own extern
+   (`extern void func_8005BF68(bool value);`), never touches the flag
+   directly. */
+extern s32 D_8008ABE4;
+
+void func_8005BF68(bool value)
+{
+	D_8008ABE4 = value;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4InstantTeleporters);
 
