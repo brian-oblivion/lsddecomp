@@ -1232,6 +1232,17 @@ wrote down. Keep both honesty mechanisms fed:
   outlives its method: the corrected comments now name the screen (two greps
   as of round 21), the date, and `tools/nearmiss.py`.
 
+> **Round 42 (2026-09-15): there are ZERO blocker greps.** `gp_rel` and
+> `nop_mflo_mfhi` are RESOLVED the way `addiu_at` was — maspsx flags
+> `--gp-symbols` and `--no-nop-mflo-mfhi` in `tools/patches/maspsx-lsd-flags.patch`,
+> byte-exact whole image, blocked functions matching on the first build (see
+> CLAUDE.md "Open toolchain blockers"). `nearmiss.py` reports all three
+> constructs tagged `(RESOLVED-not-a-blocker)` and counts none. The 89 stall
+> reports that blamed them carry a `REOPENED -- ASSIGNABLE` box and are
+> `fresh` in `progress.py`; their derivations are often right and their
+> verdicts are not. The paragraph below is kept for the FORWARD/backward
+> lesson, which still applies to reading the tag.
+
 **Screen the queue with TWO greps as of round 21 — it used to be three.**
 `addiu $at, $at, %lo` is NO LONGER A BLOCKER (resolved round 21; see
 `docs/research/addiu-at-blocker.md`), so screening for it now invents
@@ -1384,6 +1395,11 @@ and held 4. `uncarved.py` runs all FOUR screens per function (`gp_rel`,
 `addiu_at` reported-but-not-counted) and ranks segments by clean yield. It is
 the Gate 2 companion to `nearmiss.py` and was built the same way, cross-checked
 against a hand census that agreed exactly.
+
+> **Round 42 (2026-09-15) REVERSES the paragraph below.** The toolchain change
+> it said would be needed has happened: `gp_rel` no longer blocks, and
+> `uncarved.py` measures every uncarved game function as blocker-clean. Gate 2
+> is a live source of work again; price a carve on its own merits.
 
 **Round 27's measurement, and it is a STANDING change to what this gate can
 do, not a snapshot: carving can no longer refill the queue at scale.** The

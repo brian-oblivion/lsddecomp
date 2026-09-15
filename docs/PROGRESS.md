@@ -6,6 +6,71 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-15 — round 42: research round, operator-authorised — BOTH remaining toolchain blockers RESOLVED, 137 functions unblocked
+
+**State at end: 999 matched / 1253 game functions (79.73%)**, up four from
+round 41's 995 — all four were blocked functions used as live tests. Queue 188
+live `INCLUDE_ASM`, 102 documented stalls, **`fresh` 86** (up from 1), **blocked
+0** (down from 93). Uncarved 66, **66 blocker-clean** (up from 10). Build green
+after a clean `rm -rf build` rebuild on `main` with the patched maspsx.
+
+### What was decided and why
+
+The operator authorised a research round after the head's "toolchain leads"
+line had read the same for thirteen rounds. Brief: one round, one question per
+lead, `rm -rf build` before every flag variant, exit criterion a byte-exact
+image or a doc update, `main` untouched until then. No runners were spawned:
+each experiment was one clean rebuild, so the head ran both itself in two
+worktrees.
+
+### `nop_mflo_mfhi` — resolved in one build
+
+`--no-nop-mflo-mfhi` added to a private maspsx copy, `rm -rf build`, full
+rebuild with no C change: **0 differing bytes.** The census's "up to 65 sites
+that want a nop" all lie outside matched C. `IsDaySpecial`'s preserved body,
+unchanged, **52/52 on the first build.** `func_8005950C` 17/33 → 30/33 with a
+register-allocation residue left; `func_8001CEB4`'s preserved body is NOT a
+match (one word long, `$s2`/`$s3`) and its report is corrected. 11 queued + 1
+uncarved unblocked.
+
+### `gp_rel` — the diagnosis was wrong for fourteen rounds
+
+Lead 1 as briefed: rebuild clean at `-G8`. With 992 matched functions it no
+longer produces damage, it fails to link — `relocation truncated to fit:
+R_MIPS_GPREL16 against D_8006DCA8`, a `.data` symbol 0x1CB60 from `$gp`. That
+is the mechanism: a non-zero `-G` size-hints EVERY small-typed extern, and this
+project's scalar declarations of splat data say nothing about retail's small
+data. Measured retail instead: 113 `%gp_rel` targets, all defined in the
+yaml's sdata/sbss segments; every absolute reference into that window is an
+`la`. That is maspsx 2.34's own model exactly, gated on a same-file table
+splat-owned data can never fill. `--gp-symbols=config/gp-symbols.txt` fills
+it; `-G` is unchanged everywhere. Inert (0 bytes), then `func_800270AC` 3/3,
+`func_800270B8` 3/3, `func_8002C468` 4/4 on first build. 82 queued + 55
+uncarved unblocked.
+
+### Consequences applied
+
+- `tools/patches/maspsx-lsd-flags.patch` (both flags), applied by `setup.sh`
+  and to the shared `tools/maspsx` on `main`. Makefile passes both.
+- `tools/gpsyms.py` generates `config/gp-symbols.txt` (217 symbols) and
+  `--check`s it.
+- `nearmiss.py`/`uncarved.py` tag both constructs `(RESOLVED-not-a-blocker)`;
+  `uncarved.py`'s workable filter generalised to the tag.
+- 89 stall reports boxed `REOPENED -- ASSIGNABLE`; 4 rewritten as MATCHED.
+- CLAUDE.md "Open toolchain blockers" rewritten (none open; lessons kept);
+  both research docs, DECOMPILATION_LEARNINGS, MATCHING-GUIDE, PARALLEL-RUNS
+  Gates 1 and 2 carry dated RESOLVED notes. The `grep -l gp_rel` → STOP
+  routing rule is retired.
+
+### For round 43
+
+`fresh` is 86 and every uncarved function is clean, so Gate 1 assigns and
+Gate 2 carves again. The reopened reports' derivations are usually right on
+mechanism; rebuild before trusting any score in them. `code_171e0` and
+`code_4cd08` were the most gp_rel-heavy units and should roughly halve.
+
+---
+
 ## 2026-09-14 — round 41: three matches, all three from never-permuter-searched ground, and a latent-bug class that defeats "rebuilt verbatim"
 
 **State at end: 995 matched / 1253 game functions (79.41%)**, up three from

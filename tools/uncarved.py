@@ -130,7 +130,7 @@ def screen(seg):
         instr = [l for l in lines if INSTR.match(l)]
         tags = []
         if 'gp_rel' in body:
-            tags.append('gp_rel')
+            tags.append('gp_rel(RESOLVED-not-a-blocker)')
         if seg_has_mflo:
             # Same window, restricted to this function's own instructions.
             # Tag ONCE however many sites hit: a function with three mflo/div
@@ -140,7 +140,7 @@ def screen(seg):
                 if re.search(r'\b(mflo|mfhi)\b', l):
                     if any(re.search(r'\b(mult|multu|div|divu)\b', k)
                            for k in instr[j + 1:j + 3]):
-                        tags.append('nop_mflo_mfhi')
+                        tags.append('nop_mflo_mfhi(RESOLVED-not-a-blocker)')
                         break
         if re.search(r'jr\s+\$t2', body):
             tags.append('TRAMPOLINE')
@@ -164,8 +164,10 @@ def screen(seg):
 
 
 def is_workable(tags):
+    # A screen whose construct the pipeline can now emit is reported but does
+    # not block (round 21 addiu_at; round 42 gp_rel and nop_mflo_mfhi).
     return not [t for t in tags
-                if not t.startswith('addiu_at(') and not t.startswith('note:')]
+                if '(RESOLVED-not-a-blocker)' not in t and not t.startswith('note:')]
 
 
 def main():

@@ -64,7 +64,7 @@ def screens(path):
     hits = []
 
     if subprocess.run(["grep", "-q", "gp_rel", path]).returncode == 0:
-        hits.append("gp_rel")
+        hits.append("gp_rel(RESOLVED-not-a-blocker)")
 
     # addiu_at is NO LONGER A BLOCKER as of round 21 (2026-09-06).  maspsx
     # gained a --addiu-at flag (tools/patches/maspsx-addiu-at.patch, applied
@@ -88,7 +88,7 @@ def screens(path):
         f"grep -A2 -nE '\\b(mflo|mfhi)\\b' {path!r} | grep -qE '\\b(mult|multu|div|divu)\\b'",
         shell=True,
     ).returncode == 0:
-        hits.append("nop_mflo_mfhi")
+        hits.append("nop_mflo_mfhi(RESOLVED-not-a-blocker)")
 
     if subprocess.run(["grep", "-qE", r"jr *\$t2", path]).returncode == 0:
         hits.append("trampoline")

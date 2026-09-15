@@ -131,6 +131,26 @@ if [ -f tools/maspsx/maspsx.py ]; then
     fi
 fi
 
+# Round 42 (2026-09-15): two more flags of the same shape, in one patch.
+#   --gp-symbols=FILE    seed maspsx's small-data table from config/gp-symbols.txt
+#                        (the symbols retail's link placed in .sdata/.sbss), so
+#                        loads/stores of them come out %gp_rel($gp) as retail has
+#                        them. Resolves the gp_rel blocker WITHOUT touching -G.
+#   --no-nop-mflo-mfhi   leave cc1's "#nop" hints between an mflo/mfhi and a
+#                        following mult/div commented out, as retail does.
+# Both byte-exact across the whole image; both required by the Makefile.
+# See docs/research/gp-relative-blocker.md and addiu-at-blocker.md.
+if [ -f tools/maspsx/maspsx.py ]; then
+    if grep -q -- '--gp-symbols' tools/maspsx/maspsx.py; then
+        skip "maspsx lsd-flags patch (already applied)"
+    elif git -C tools/maspsx apply --check ../../tools/patches/maspsx-lsd-flags.patch 2>/dev/null; then
+        git -C tools/maspsx apply ../../tools/patches/maspsx-lsd-flags.patch \
+            && ok "maspsx lsd-flags patch"
+    else
+        die "tools/patches/maspsx-lsd-flags.patch does not apply to this maspsx checkout -- upstream has moved. The build WILL NOT match until this is resolved; see docs/research/gp-relative-blocker.md."
+    fi
+fi
+
 # ---------------------------------------------------------------------------
 step "Psy-Q compiler (GCC 2.6.3) and mipsel binutils"
 

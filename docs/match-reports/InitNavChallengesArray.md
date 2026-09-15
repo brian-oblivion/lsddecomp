@@ -1,3 +1,12 @@
+> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
+> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
+> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
+> passed by the Makefile), the whole image stays byte-exact, and previously
+> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
+> "RESOLVED"). Everything below is evidence from before the fix: its
+> derivation may still be right, its VERDICT is not. Rebuild before believing
+> any score in it.
+
 # InitNavChallengesArray
 
 **Unit:** DreamSys · **Size:** 11 words · **Status:** BLOCKED, not attempted ·

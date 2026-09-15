@@ -1,3 +1,21 @@
+# IsDaySpecial -- MATCHED 52/52 words, round 42 (2026-09-15)
+
+> **VERDICT CORRECTED, round 42 (2026-09-15). THIS FUNCTION IS MATCHED.**
+> It was blocked by `nop_mflo_mfhi`, which is RESOLVED this round: maspsx gained
+> `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
+> the whole image is byte-exact with the flags on, and this function was one of
+> the live tests -- the body preserved below, unchanged except for dropping a redundant `extern` that DreamSys.h already declares. The C is in `src/DreamSys.c`. Everything below is the
+> pre-fix record and is kept as evidence.
+
+> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
+> screened as blocked by `nop_mflo_mfhi`. **That blocker is RESOLVED**: maspsx gained
+> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
+> passed by the Makefile), the whole image stays byte-exact, and previously
+> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
+> "RESOLVED"). Everything below is evidence from before the fix: its
+> derivation may still be right, its VERDICT is not. Rebuild before believing
+> any score in it.
+
 # IsDaySpecial
 
 **Unit:** DreamSys · **Size:** 52 instructions · **Status:** STALL — but
