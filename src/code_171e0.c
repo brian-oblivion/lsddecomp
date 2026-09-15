@@ -82,7 +82,17 @@ void *func_80026C9C(void) {
     return D_8006D430;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CAC);
+extern s32 D_8008A84C;
+extern void *func_8002C438(void);
+extern void *func_80027E68(void);
+
+void *func_80026CAC(void) {
+    if (D_8008A84C == 0x23) {
+        return func_8002C438();
+    } else {
+        return func_80027E68();
+    }
+}
 
 Vec3_171e0 *func_80026CE8(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
     this->x = x;

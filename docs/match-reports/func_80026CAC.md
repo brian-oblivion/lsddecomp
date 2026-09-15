@@ -1,53 +1,74 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
-
 # func_80026CAC
 
-**Unit:** code_171e0 · **Size:** 15 words · **Status:** BLOCKED, not attempted ·
-Classified by the head in round 2026-08-30-a.
+**Unit:** code_171e0 · **Size:** 15 words · **Status:** MATCHED, round 43
+(2026-09-15, runner bravo). 15/15 words, byte-exact whole-image build.
 
-This is a **stub report**, filed so `tools/progress.py` stops counting this
-function as fresh ground and staffing a runner onto it. It records a routing
-decision, not an attempt.
+## History
 
-## Why it is blocked
+The round-2026-08-29-a/2026-08-30-a stub report never attempted this
+function (it was routed straight to a `gp_rel`-blocked stub, no derivation).
+Round 42 resolved `gp_rel` project-wide. Round 43 derived the body fresh
+from `asm/nonmatchings/code_171e0/func_80026CAC.s` and matched on the first
+build.
 
-1 `%gp_rel` reference(s), the first to `D_8008A84C`. That is the
-**gp-relative addressing blocker**, `docs/research/gp-relative-blocker.md`: the
-project's pinned `-G0` pipeline emits the two-instruction absolute
-(`lui`+`lw`) form for a small-data global access where retail has the
-one-instruction `$gp`-relative form. The instruction count differs, so the
-mismatch is not contained — every function after it in the unit shifts by a word.
+## What it does
 
-No source-level reshaping reaches this. Confirm cheaply on any candidate with
-`grep -l 'gp_rel' asm/nonmatchings/<unit>/<func>.s` before spending attempts.
+An `if`/`else` mode dispatch, both arms tail-calling a function and
+returning its result:
 
-## Status of the escalation
+```
+lw    $v1, %gp_rel(D_8008A84C)($gp)
+ori   $v0, $zero, 0x23
+beq   $v1, $v0, .L80026CD0     # D_8008A84C == 0x23 -> the "then" arm
+  jal func_80027E68             # fallthrough (not equal) -- called first in ROM order
+  j .L80026CD8
+.L80026CD0:
+  jal func_8002C438             # equal-to-0x23 arm
+.L80026CD8:
+  <epilogue, returns whatever $v0 holds>
+```
 
-Already escalated, already tested, already rejected. The `-G` experiment was run
-on 2026-08-29 **with operator authorisation**; a clean non-zero-`-G` rebuild
-damages 19148 bytes across 3203 runs, and `-G4` and `-G8` produce byte-identical
-damage, which rules out the small-data size threshold as the mechanism. The pin
-stays at `-G0`.
+The `beq` branches to the **equal** case directly (no negation), so the
+direct reading `if (cond) A(); else B();` is the right mapping (not the
+inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
+try, with the straightforward `if`/`else` written in source order.
 
-Do not re-derive this and do not propose a `-G` change. The three unexplored
-directions are listed at the end of the research document and are the operator's
-call, not a runner's or the head's.
+`func_8002C438` is confirmed elsewhere in the repo
+(`src/code_179d8_e.c`: `TableD9BC *func_8002C438(void) { return &D_8006D9BC; }`)
+to return a pointer, not void -- direct positive evidence this whole function
+is non-void per CLAUDE.md's tail-call caution. `func_80027E68` is still
+uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
+(`code_179d8_h.c`, `code_179d8_o.c`) as returning a table pointer too, under
+each unit's own independent local type -- this report follows the same
+"multiple independent local views" convention and declares it `void *` here.
 
-## Unit context
+## Final body
 
-`code_171e0` has **no runner-workable ground left**, and as of round 8 that is
-now unconditional. Of the 15 functions queued when this stub was written, 14
-are gp-relative blocked (8 stalled in round 2026-08-29-a plus the 6 stubbed
-that round). The 15th was `strcat`, stalled at 41/42 — **that one is now
-MATCHED** (round 8, 2026-09-02; the guard returns `dest` rather than `NULL`,
-see `docs/match-reports/strcat.md`). So the permuter recommendation this
-paragraph used to carry has been discharged, and what is left in the unit is
-entirely blocker-bound. Do not staff this unit again until the gp-relative
-blocker is resolved.
+```c
+extern s32 D_8008A84C;
+extern void *func_8002C438(void);
+extern void *func_80027E68(void);
+
+void *func_80026CAC(void) {
+    if (D_8008A84C == 0x23) {
+        return func_8002C438();
+    } else {
+        return func_80027E68();
+    }
+}
+```
+
+## Proposed learning
+
+**A second shared idiom in this unit, alongside the six-function
+`if (D_8008A84C == 0x13) return func(); return N;` family
+(`func_80026E0C.md`):** an `if`/`else` mode dispatch where BOTH arms
+tail-call a function and neither sets an explicit constant. Three functions
+in this unit share this exact shape --  `func_80026CAC` (mode `0x23`),
+`func_80026FAC` and `func_80026FE8` (both mode `0x13`, different callees).
+Per CLAUDE.md's caution, a byte match here proves nothing about void-ness on
+its own, but `func_8002C478` (the `func_80026FE8` else-arm) is independently
+confirmed non-void (`s32 func_8002C478(void) { return 0; }` in
+`code_179d8_e.c`), so treating all three as `s32`/`void *`-returning tail
+calls is not a guess -- it is the only reading consistent with a callee whose
+real return type is already known.
