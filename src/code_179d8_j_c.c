@@ -1,4 +1,15 @@
 /*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
  * code_179d8_j_c -- the TAIL of the old code_179d8_j slice, split off in round
  * 34 (2026-09-12) when Sony's `libsnd/ut_pb.o` was linked into the middle of
  * `code_179d8_j_b`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight

@@ -1,4 +1,15 @@
 /*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
  * class_3bb8c_o -- functions 54..73 of the 113-function `class_3bb8c_n`
  * remainder, 0x475F0..0x47CC4 (vram 0x80056DF0..0x800574C4).  Carved round 17
  * (2026-09-04); `class_3bb8c_n` keeps its name for the 54 functions in front

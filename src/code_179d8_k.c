@@ -1,4 +1,15 @@
 /*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
  * code_179d8_k -- functions 238..255 of the original 274-function code_179d8
  * monolith, 0x24938..0x2673C (vram 0x80034138..0x80035F3C).  Carved round 24
  * (2026-09-08) out of what had been the `code_179d8_tail` asm remainder,
