@@ -1,40 +1,39 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
+# func_8002CC1C -- MATCHED 3/3 (round 43)
 
-# func_8002CC1C -- STALL (gp-relative blocker, not attempted)
+Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17); reopened
+round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi` resolved that blocker for the
+whole project (see `docs/research/gp-relative-blocker.md`, "RESOLVED").
 
-Unit `code_179d8_e`, carved round 17 (2026-09-04). **Not attempted.**
+## Derivation
 
-## Classification
+The prior stall's classification was correct on mechanism: retail is a single
+`lw $v0, %gp_rel(D_8008A8C4)($gp)` then `jr $ra`. With the gp-relative flags
+now passed by the Makefile, an ordinary C accessor compiles straight to that
+same form -- no special handling needed.
 
-```sh
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_e/func_8002CC1C.s
+```c
+extern s32 D_8008A8C4;
+
+s32 func_8002CC1C(void) {
+    return D_8008A8C4;
+}
 ```
 
-Hit:
+## Result
+
+First build, byte-exact:
 
 ```
-lw $v0, %gp_rel(D_8008A8C4)($gp)
+func_8002CC1C: 3/3 words match (file 0x1D41C-0x1D428)
 ```
 
-Retail reaches this small-data global in ONE instruction off `$gp`. The
-pinned pipeline (`-G0` at both cc1 and `as`) cannot emit that form from C --
-it emits the two-instruction absolute `lui`/`lw` pair instead, so the
-mismatch is not contained: every function after it in the same translation
-unit shifts by a word.
+Whole-image `./build-and-verify.sh` also green (`OK: build matches retail
+SLPS_015.56`).
 
-`docs/research/gp-relative-blocker.md` records the reproducer and the
-measured `-G` matrix: the gp-relative form needs a non-zero `-G` at BOTH
-stages, and the `-G` experiment was run in 2026-08-29 WITH operator
-authorisation and REJECTED. The pin stands. This is the operator's call, not
-something to experiment with mid-round.
+### Proposed learning
 
-No C was written and no score was measured. The screen ran at carve time,
-before the unit was offered to a runner, so no attempt budget was spent
-discovering this.
+The round-17 `gp_rel` stalls in this unit were correctly diagnosed on
+mechanism and needed zero C changes once the toolchain flags landed in round
+42 -- an ordinary declared `extern` plus `return` was sufficient. Nothing
+about the C shape needed to change for `--gp-symbols` to kick in; it is purely
+a maspsx-side fix.

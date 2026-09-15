@@ -1,32 +1,23 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * ROUND 43 UPDATE (2026-09-15): the round-17 `gp_rel` cluster named below is
+ * now FULLY MATCHED.  All eight functions (`func_8002C448`, `func_8002C468`,
+ * `func_8002C4E0`, `func_8002C638`, `func_8002C6FC`, `func_8002C890`,
+ * `func_8002CC1C`, `func_8002CC28`) closed byte-exact once round 42's
+ * `--gp-symbols`/`--no-nop-mflo-mfhi` maspsx flags resolved the blocker --
+ * see each function's own `docs/match-reports/<func>.md` for the derivation.
+ * `func_8002CA3C` is this unit's one remaining `INCLUDE_ASM` as of round 43
+ * -- it was never part of the retracted gp_rel cluster and was out of this
+ * round's assigned work list.
+ *
+ * The retracted "BLOCKED, do NOT spend attempts" directive that used to sit
+ * here is gone; keeping it around after every function it named was matched
+ * would only mislead the next reader.  The classification and provenance
+ * notes below (carve history, class-framework correction) still stand.
  *
  * code_179d8_e -- functions 120..148 of the original 274-function code_179d8
  * monolith, 0x1CC08..0x1D508 (vram 0x8002C408..0x8002CD08).  Carved round 17
  * (2026-09-04) out of what the yaml called `code_179d8_mid_b`; the remainder
  * behind it is now `code_179d8_mid_c`.
- *
- * Blocker census, three-grep screen run per function at carve time:
- * 21 of the 29 clean.  READ THAT WITH CARE -- ten of the 29 are two-word
- * `jr $ra; nop` leaves and splat matched eight of them itself, so the real
- * queue is the 21 INCLUDE_ASMs below, of which eight are blocked.
- *
- * BLOCKED, stub reports already filed, do NOT spend attempts on these:
- *   gp_rel: func_8002C448, func_8002C468, func_8002C4E0, func_8002C638,
- *           func_8002C6FC, func_8002C890, func_8002CC1C, func_8002CC28
- * That is a cluster, not a scatter: these functions are the accessors for
- * one band of small-data globals (D_8008A8B0..D_8008A8CC), which is exactly
- * the shape the gp-relative blocker takes.  The bodies AROUND them that do
- * not touch that band are clean.
  *
  * Owns NO switch jump table -- zero `jtbl_` references anywhere in the slice
  * -- so no rodata sub-slot is attached to this unit.
@@ -42,9 +33,13 @@
  * confirmation this is genuine self->methods->slotN(self, ...) dispatch, not
  * driver code.  D_8006D9BC and D_8006DA34 share the same BasicClass tail
  * (slots +0x10..+0x38), so they are two related classes off the same base --
- * plausibly a PS1 SPU/VAB sound-streaming object (func_8002C4E0, blocked,
- * calls SsUtGetVabHdr on `self`).  Do expect a `this` pointer in this slice;
- * the sibling slices' finding is neighbourhood-scoped, not monolith-wide.
+ * confirmed round 43 as a PS1 SPU/VAB sound-streaming object: `func_8002C4E0`
+ * is its constructor, `func_8002C638` its close, `func_8002C6FC` its
+ * per-frame poll (header/body transfer state machine), and `func_8002C890`
+ * its post-load VAB attribute-table fetch.  `D_8006DA34`'s whole vtable was
+ * read straight out of `asm/data/5E140.data.s` while matching this cluster
+ * -- see `docs/match-reports/func_8002C4E0.md` for the full slot table,
+ * including two slots (+0x58, +0x6C) that are null in retail's own data.
  */
 #include "common.h"
 
@@ -69,21 +64,40 @@ extern TableD9BC D_8006D9BC;
 
 /* D_8006DA34's own methods table -- the class ObjDA34 below dispatches
  * through.  Only the slots this unit's own functions call or are assigned to
- * are named. */
+ * are named.  round 43 added slot58/slot5C/slot6C/slot9C once func_8002C4E0,
+ * func_8002C6FC and func_8002C890 (all round-17 gp_rel stalls, resolved
+ * round 42) were actually worked. */
 typedef struct TableDA34 {
     u8 pad000[0x008];
-    void (*slot08)(void *self, s32 arg1); /* func_8002C4E0, BLOCKED (gp_rel) -- this unit's own new_class_da34 dispatch */
-    u8 pad00C[0x078 - 0x00C];
-    s32 (*slot78)(ObjDA34 *self, s32 arg1); /* func_8002C824 */
-    s32 (*slot7C)(ObjDA34 *self);           /* func_8002C890, BLOCKED (gp_rel) */
+    void (*slot08)(void *self, char *arg1); /* func_8002C4E0 -- this unit's own new_class_da34 dispatch; arg1 is a base filename, not a plain s32 */
+    s32 (*slot0C)(ObjDA34 *self);           /* func_8002C638, confirmed against D_8006DA34's own rodata (+0x0C) */
+    u8 pad010[0x058 - 0x010];
+    /* +0x058 and +0x06C are BOTH null in retail's own D_8006DA34 (confirmed
+     * against asm/data/5E140.data.s) -- func_8002C6FC and func_8002C4E0 each
+     * dispatch through one of them anyway, on a path that is apparently
+     * never actually taken for an object built with this exact base table.
+     * That is retail's own behaviour, not a derivation error: the dispatch
+     * still has to compile, whatever sits at the address at runtime. */
+    void (*slot58)(void *self, char *path); /* func_8002C6FC's own dispatch -- begins the VAB body transfer once the ".VB" path is built; null in retail */
+    void (*slot5C)(void *self);             /* func_80026C20 (uncarved, cross-unit) -- func_8002C890's own dispatch, called before it re-fetches the VAB header */
+    u8 pad060[0x06C - 0x060];
+    void (*slot6C)(void *self, char *path); /* func_8002C4E0's own dispatch -- begins the VAB header transfer for the ".VH" path; null in retail */
+    u8 pad070[0x078 - 0x070];
+    s32 (*slot78)(ObjDA34 *self, s32 arg1); /* func_8002C824, and func_8002C6FC's own body-complete notify */
+    s32 (*slot7C)(ObjDA34 *self);           /* func_8002C890 */
     u8 pad080[0x084 - 0x080];
     s32 (*slot84)(ObjDA34 *self, s32 arg1); /* func_8002CB18, arg1 is s16-truncated by the callee */
     u8 pad088[0x09C - 0x088];
+    void (*slot9C)(void *self, s32 arg1);   /* func_8002CBF4 -- func_8002C4E0's own dispatch, called with arg1 == 0 right after construction */
 } TableDA34;
 extern TableDA34 D_8006DA34;
 
-/* One "chunk" entry inside a self->unk50 sub-array, stride 0x20.  Only the
- * two bytes func_8002CA3C itself reads are named. */
+/* One "chunk" entry inside a self->unk50 sub-array, stride 0x20.  This is
+ * Sony's own `VagAtr` (include/psyq/LIBSND.H, 32 bytes) -- unk4/unk5 land
+ * exactly on VagAtr's `center`/`shift` bytes -- but kept under this unit's
+ * own local name per the project's independent-local-view convention rather
+ * than pulling in the real header (see code_179d8_k.c for the same choice).
+ * Only the two bytes func_8002CA3C itself reads are named. */
 typedef struct Chunk179D8E {
     u8 pad0[0x4];
     u8 unk4;
@@ -91,19 +105,37 @@ typedef struct Chunk179D8E {
     u8 pad6[0x20 - 0x6];
 } Chunk179D8E;
 
+/* This unit's own reduced view of Sony's `VabHdr` (include/psyq/LIBSND.H,
+ * 32 bytes) -- only the two fields func_8002C890 itself reads are named:
+ * `ts` (program count) and `vs` (vag count), at the real struct's own
+ * offsets +0x12/+0x14. */
+typedef struct VabHdr179D8E {
+    u8 pad0[0x12];
+    u16 ts;  /* +0x12, program count */
+    u16 vs;  /* +0x14, vag count */
+    u8 pad16[0x20 - 0x16];
+} VabHdr179D8E;
+
 /* self for the D_8006DA34-dispatched methods in this unit.  Only fields this
  * unit's own functions touch are named -- see the header-comment correction
  * above for how this was established. */
 struct ObjDA34 {
     TableDA34 *methods;    /* +0x000 */
-    u8 pad004[0x050 - 0x004];
-    Chunk179D8E **unk50;   /* +0x050, array of per-`hi` pointers into unk4C's pool */
-    s16 unk54;             /* +0x054 */
-    s16 unk56;              /* +0x056, boolean-ish flag */
-    s16 unk58;              /* +0x058 */
-    u16 unk5A;               /* +0x05A */
-    u8 pad05C[0x060 - 0x05C];
-    s32 unk60;               /* +0x060 */
+    u8 pad004[0x010 - 0x004];
+    u8 *unk10;              /* +0x010, streaming file buffer -- passed to SsVabOpenHead/SsVabTransBody */
+    u8 pad014[0x024 - 0x014];
+    u32 unk24;               /* +0x024, flag word; bit 0x200 gates the header/body transfer steps */
+    u8 pad028[0x02A - 0x028];
+    u16 unk2A;                 /* +0x02A, load state: 0 idle, 1 header pending, 6 body pending -- unsigned (retail loads it lhu) */
+    VabHdr179D8E unk2C;          /* +0x02C, filled by SsUtGetVabHdr; 32 bytes, ends exactly at +0x04C */
+    Chunk179D8E *unk4C;            /* +0x04C, VagAtr pool, unk2C.vs entries */
+    Chunk179D8E **unk50;             /* +0x050, array of unk2C.ts pointers into unk4C's pool */
+    s16 unk54;                        /* +0x054 */
+    s16 unk56;                         /* +0x056, boolean-ish flag */
+    u16 unk58;                          /* +0x058, unsigned (retail loads it lhu in func_8002C890) */
+    u16 unk5A;                           /* +0x05A */
+    void *unk5C;                          /* +0x05C, malloc'd copy of the base filename */
+    s32 unk60;                             /* +0x060 */
 };
 
 /* Cross-unit calls into the still-uncarved code_179d8_tail monolith --
@@ -169,10 +201,15 @@ TableD9BC *func_8002C438(void) {
     return &D_8006D9BC;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C448);
-
 extern s32 D_8008A8B0;
 extern s32 D_8008A8B4;
+
+s32 func_8002C448(s32 *arg0) {
+    if (arg0 != NULL) {
+        *arg0 = D_8008A8B4;
+    }
+    return D_8008A8B0;
+}
 
 s32 func_8002C468(s32 a, s32 b)
 {
@@ -196,11 +233,145 @@ void *func_8002C480(s32 arg0) {
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C4E0);
+/* Base-class table reached via the uncarved accessor `func_80026CAC()` --
+ * not this unit's function to define.  Only the two slots this unit's own
+ * functions dispatch through are typed, per the same convention as
+ * code_179d8_d.c's own independent reading of the same physical table. */
+typedef struct BaseTable179D8E {
+    u8 pad000[0x008];
+    void (*slot08)(void *self);  /* func_8002C4E0's own base-chain call */
+    /* func_8002C638's own base-chain call -- its own return is likewise a
+     * bare tail call with nothing after it, so per CLAUDE.md's rule this
+     * defaults to s32 absent positive void evidence. */
+    s32 (*slot0C)(void *self);
+} BaseTable179D8E;
+extern BaseTable179D8E *func_80026CAC(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C638);
+/* Sony's own VAB streaming calls (include/psyq/LIBSND.H), declared locally
+ * per this project's convention of not sharing Psy-Q prototypes across
+ * units (see the SsVabTransCompleted/SsSetMute comment above). */
+extern void SsVabClose(s16 vabId);
+extern s16 SsVabOpenHead(u8 *addr, s16 arg1);
+extern s16 SsVabTransBody(u8 *addr, s16 vabId);
+extern s16 SsUtGetVabHdr(s16 vabId, void *out);
+extern s16 SsUtGetProgAtr(s16 vabId, s16 prog, void *out);
+extern s16 SsUtGetVagAtr(s16 vabId, s16 prog, s16 tone, void *out);
+extern void SsSetMVol(s16 a0, s16 a1);
+extern void SsSetTableSize(char *a0, s16 a1, s16 a2);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C6FC);
+/* Uncarved code_179d8_tail helpers this cluster calls. */
+extern s32 func_80032368(void);
+extern char *func_8003A068(void);
+extern s32 func_8003A05C(void);
+extern void func_800329D8(void);
+extern void func_80032A7C(void);
+extern void func_80032588(s32 a0);
+extern void func_80032998(void);
+extern void *func_80017CFC(void *ptr);
+extern char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3);
+extern s32 strlen(char *s);
+extern char *strcpy(char *dest, char *src);
+
+/* ".VH"/".VB" -- already emitted by splat in .sdata, referenced not
+ * retyped (a literal here would duplicate the bytes and shift the image). */
+extern const char D_8008A8D0[];
+extern const char D_8008A8D4[];
+
+extern s32 D_8008A8B8;
+extern s32 D_8008A8BC;
+extern s32 D_8008A8C0;
+extern s32 D_8008A8C4;
+extern s32 D_8008A8CC;
+extern void *D_8008A8C8;
+
+void func_8002C4E0(ObjDA34 *self, char *arg1) {
+    void *buf;
+    char path[0x20];
+
+    func_80026CAC()->slot08(self);
+    self->methods = func_8002CC0C();
+    self->unk4C = NULL;
+    self->unk50 = NULL;
+    self->unk54 = 0;
+    self->unk56 = 0;
+    self->methods->slot9C(self, 0);
+    self->unk58 = 0;
+    self->unk5A = 0;
+    self->unk5C = NULL;
+    if (D_8008A8B8 == 0) {
+        func_80032368();
+        D_8008A8B8 = 1;
+        SsSetTableSize(func_8003A068(), 2, 1);
+    }
+    if (D_8008A8BC == 0) {
+        D_8008A8CC = 0x3C;
+        func_80032588(1);
+        D_8008A8BC = 1;
+    }
+    D_8008A8C4++;
+    if (arg1 != NULL) {
+        buf = func_80017B34(strlen(arg1) + 1);
+        if (buf != NULL) {
+            self->unk5C = buf;
+            strcpy(buf, arg1);
+            func_800270C4(path, buf, NULL, D_8008A8D0);
+            self->unk2A = 1;
+            self->methods->slot6C(self, path);
+        }
+    }
+}
+
+s32 func_8002C638(ObjDA34 *self) {
+    SsVabClose(self->unk54);
+    if (--D_8008A8C4 < 0) {
+        D_8008A8C4 = 0;
+    }
+    if (D_8008A8C4 == 0 && func_8003A05C() == 0) {
+        D_8008A8B8 = 0;
+        D_8008A8C0 = 0;
+        D_8008A8BC = 0;
+        func_800329D8();
+        func_80032A7C();
+    }
+    func_80017CFC(self->unk4C);
+    func_80017CFC(self->unk50);
+    func_80017CFC(self->unk5C);
+    return func_80026CAC()->slot0C(self);
+}
+
+void func_8002C6FC(ObjDA34 *self) {
+    char path[0x20];
+
+    switch (self->unk2A) {
+    case 0:
+        break;
+    case 1:
+        if (self->unk24 & 0x200) {
+            self->unk54 = SsVabOpenHead(self->unk10, -1);
+            func_800270C4(path, self->unk5C, NULL, D_8008A8D4);
+            D_8008A8C8 = self->unk10;
+            self->unk2A = 6;
+            self->unk10 = NULL;
+            self->methods->slot58(self, path);
+            if (self->unk5C != NULL) {
+                func_80017CFC(self->unk5C);
+                self->unk5C = NULL;
+            }
+        }
+        break;
+    case 6:
+        if (self->unk24 & 0x200) {
+            self->unk54 = SsVabTransBody(self->unk10, self->unk54);
+            if (self->unk54 != -1) {
+                self->unk5A = 1;
+                self->methods->slot78(self, 1);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
 
 s32 func_8002C824(ObjDA34 *self, s32 arg1) {
     s32 result;
@@ -218,7 +389,65 @@ s32 func_8002C824(ObjDA34 *self, s32 arg1) {
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C890);
+/* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/LIBSND.H,
+ * 16 bytes) -- only the one field func_8002C890 itself reads is named,
+ * per the same local-struct convention used for VabHdr179D8E above (and
+ * matching code_179d8_k.c's own reduced `ProgAtr` reading). */
+typedef struct ProgAtr179D8E {
+    u8 tones; /* +0x00, program's tone count, written by SsUtGetProgAtr */
+    u8 pad1[0x10 - 0x1];
+} ProgAtr179D8E;
+
+/* func_80026C20 -- uncarved, cross-unit; reached only through
+ * D_8006DA34's own +0x5C slot (declared above as `slot5C`), never called
+ * directly by name here. */
+
+void func_8002C890(ObjDA34 *self)
+{
+    ProgAtr179D8E prog;
+    Chunk179D8E *pool;
+    s32 i;
+    s32 j;
+    s16 result;
+
+    if (self->unk58 == 0) {
+        return;
+    }
+    self->methods->slot5C(self);
+    self->unk10 = D_8008A8C8;
+    result = SsUtGetVabHdr(self->unk54, &self->unk2C);
+    if (result == -1) {
+        return;
+    }
+    self->unk4C = func_80017B34(self->unk2C.vs << 5);
+    if (self->unk4C == NULL) {
+        return;
+    }
+    self->unk50 = func_80017B34(self->unk2C.ts << 2);
+    if (self->unk50 == NULL) {
+        return;
+    }
+    pool = self->unk4C;
+    for (i = 0; i < self->unk2C.ts; i++) {
+        self->unk50[i] = pool;
+        result = SsUtGetProgAtr(self->unk54, i, &prog);
+        if (result == -1) {
+            return;
+        }
+        for (j = 0; j < prog.tones; j++) {
+            result = SsUtGetVagAtr(self->unk54, i, j, pool);
+            if (result == -1) {
+                return;
+            }
+            pool++;
+        }
+    }
+    if (D_8008A8C0 == 0) {
+        func_80032998();
+        SsSetMVol(0x78, 0x78);
+        D_8008A8C0 = 1;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CA3C);
 
@@ -271,9 +500,17 @@ TableDA34 *func_8002CC0C(void) {
     return &D_8006DA34;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC1C);
+extern s32 D_8008A8C4;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CC28);
+s32 func_8002CC1C(void) {
+    return D_8008A8C4;
+}
+
+extern s32 D_8008A8CC;
+
+s32 func_8002CC28(void) {
+    return D_8008A8CC;
+}
 
 s32 func_8002CC34(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
     Slot179D8ECC34 *slot;
