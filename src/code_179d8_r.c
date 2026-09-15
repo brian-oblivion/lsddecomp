@@ -157,7 +157,17 @@ s32 func_800284C4(char *arg0)
     return i;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_r", func_80028540);
+void *func_80028540(s32 index)
+{
+    void *result;
+    char *base;
+
+    base = D_8008A868;
+    func_800280D0();
+    result = base + index * 0x1C;
+    func_800280E0();
+    return result;
+}
 
 /* forward decls -- both defined later in this unit; ROM order keeps the
  * definitions below. */
@@ -241,7 +251,86 @@ L_end:
     func_800280E0();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_r", func_800286E4);
+void func_800286E4(void)
+{
+    s32 state;
+    s32 v1;
+    s32 newstate;
+    void *tmp;
+
+    func_800280D0();
+    state = D_8008A878;
+
+    if (state == 2)
+        goto L_state2;
+    if (state < 3) {
+        if (state == 1)
+            goto L_state1;
+        goto L_end;
+    }
+    if (state == 7)
+        goto L_state7;
+    if (state == 8)
+        goto L_state8;
+    goto L_end;
+
+L_state1:
+    if (CdControlF(2, (u8 *)D_8008A87C + 0x14) == 0)
+        goto L_end;
+    newstate = 2;
+    goto L_set;
+
+L_state2:
+    v1 = CdSync(1, NULL);
+    if (v1 == state)
+        goto L_busy;
+    if (v1 < 3) {
+        if (v1 == 0)
+            goto L_count;
+        goto L_end;
+    }
+    newstate = 1;
+    if (v1 == 5)
+        goto L_set;
+    goto L_end;
+
+L_busy:
+    newstate = 7;
+    goto L_set;
+
+L_count:
+    D_8008A8A0++;
+    if (D_8008A8A0 < 0x259)
+        goto L_end;
+    newstate = 1;
+    goto L_set;
+
+L_state7:
+    if (CdRead(D_8008A880, D_8008A884, 0x80) == 0)
+        goto L_end;
+    newstate = 8;
+    goto L_set;
+
+L_state8:
+    v1 = CdReadSync(1, 0);
+    if (v1 == -1) {
+        newstate = 1;
+        goto L_set;
+    }
+    if (v1 != 0)
+        goto L_end;
+    func_80028864();
+    tmp = D_8008A888;
+    D_8008A888 = NULL;
+    D_8008A87C = tmp;
+    goto L_end;
+
+L_set:
+    func_80028888(newstate);
+
+L_end:
+    func_800280E0();
+}
 
 void func_80028844(s32 arg0, s32 arg1)
 {
