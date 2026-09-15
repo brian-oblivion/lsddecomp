@@ -76,6 +76,7 @@ void *func_80017B34(size, pool)
     BMemBlockHdr *result;
     BMemBlockHdr *remainder;
     u32 *next;
+    BMemBlockHdr *unused;
     u32 blockSize;
     u32 word;
 
@@ -114,8 +115,9 @@ void *func_80017B34(size, pool)
                     }
                     {
                         BMemBlockHdr *n = cursor->next;
-                        BMemBlockHdr *p = cursor->prev;
+                        BMemBlockHdr *p;
 
+                        p = unused = cursor->prev;
                         if (n != NULL) {
                             n->prev = p;
                         } else {
@@ -161,7 +163,6 @@ void *func_80017B34(size, pool)
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017B34);
 
-#if 0
 void *func_80017CFC(ptr, pool)
     void *ptr;
     void *pool;
@@ -225,7 +226,13 @@ void *func_80017CFC(ptr, pool)
                 BMemBlockHdr *p = next->prev;
                 BMemBlockHdr *n = next->next;
 
-                if (n != NULL) {
+                /* nextSize is dead by this point (its one real use, the
+                 * sizeAndFlags fold above, already happened); reusing it
+                 * to hold the branch condition here -- instead of a fresh
+                 * anonymous temporary -- is what puts this comparison in
+                 * the register retail uses. Found by permuter search. */
+                nextSize = n != NULL;
+                if (nextSize) {
                     n->prev = p;
                 } else {
                     mgr->freeListStart = p;
@@ -248,9 +255,6 @@ void *func_80017CFC(ptr, pool)
     func_8001844C(0);
     return NULL;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017CFC);
 
 void func_80017EA8(void) {
 }

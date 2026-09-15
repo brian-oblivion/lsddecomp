@@ -1,4 +1,94 @@
-# func_80017CFC — STALL (round 45): length exact (107/107 words), 99/107 words match, first real diff at 0x80017DBC
+# func_80017CFC — MATCHED (round 46): 107/107 words, byte-exact
+
+## ROUND 46 (bravo, second sitting): first-ever permuter search, MATCHED 99 -> 107/107
+
+Picked up per this round's assignment as "never permuter-searched" despite
+99/107 raw word-match and ~10 prior hand attempts (round 45, see below). Ran
+all three of this round's mandated Gate-3 checks before searching, all
+recorded:
+
+1. **Correctness.** `tools/setup-permuter.sh func_80017CFC
+   permuter-work/func_80017CFC_seed.c` (seed checked byte-for-byte identical
+   to the current in-tree preserved body first) built a scaffold cleanly:
+   "base compiles, target assembled."
+2. **Cost (`--debug --stack-diffs`).** Base score = **495** = 0 (stack) + 0
+   (branch) + 7×5=35 (register differences) + 1×60 (reordering) + 2×100=200
+   (insertions) + 2×100=200 (deletions). NOT 0/0 — real insertions/deletions,
+   in principle reachable by source mutation.
+3. **Scaffold-vs-in-tree agreement.** Rebuilt the 99/107 seed body live in
+   `src/code_8220.c`, confirmed `funcdiff.py` reproduces the round-45 99/107
+   figure exactly with zero out-of-range drift. Then objdumped the
+   permuter's `base.o` and diffed it mnemonic-by-mnemonic against
+   `build/lsdde.elf`'s linked disassembly for this function: **identical
+   opcodes and registers throughout** — every one of the 20 diff lines was
+   either a branch/jump target or the `lw t0,N(gp)` immediate (both expected:
+   unlinked scaffold vs. linked build). No disagreement — safe to search.
+
+**Search: blind, no PERM macros, `-j 6`, bounded `timeout 1500` (backgrounded
+while `func_80017B34`'s recovered-candidate work above was written up and
+committed).** Found a **zero score at iteration 373** —
+`permuter-work/func_80017CFC/output-0-1/`.
+
+**The permuter's own diff carried two changes; only one was legitimate, and
+they were tested separately before either was trusted:**
+
+1. Retyping the shared `extern void func_8001844C(s32 val);` declaration in
+   this file's copy to `extern volatile unsigned long long func_8001844C(s32
+   val);` — a fabricated, incompatible prototype against the function's real
+   definition (`void func_8001844C(s32 val)` in `src/code_8220_b.c`). This
+   is exactly the class of scorer exploitation this round's instructions say
+   to reject, so it was **not adopted and not even needed** — see below.
+2. In the second (coalesce-with-next) free-list unlink block, replacing
+   `if (n != NULL)` with reusing the already-dead `nextSize` local (its one
+   real use, the `sizeAndFlags` fold two statements earlier, had already
+   happened) to hold the comparison's boolean result: `nextSize = n !=
+   NULL; if (nextSize) { ... }`. This is ordinary, well-defined C — no UB,
+   no branch on an unassigned value, just a dead local repurposed as the
+   condition's temporary instead of an anonymous one.
+
+**Translated and measured, both halves, separately:**
+
+- Applied ONLY change 2 (the `nextSize` reuse) on top of the committed
+  99/107 body, leaving `func_8001844C`'s real single declaration untouched.
+  `./build-and-verify.sh`: **`build exit=0`, `OK: build matches retail
+  SLPS_015.56`.** `tools/funcdiff.py func_80017CFC`: **107/107 words,
+  byte-exact.** The fabricated-prototype mutation was pure permuter noise
+  that happened to ride along in the diff without being load-bearing — the
+  real fix is entirely the dead-variable reuse.
+- (Change 1 was therefore never applied to the tree at all — recorded here
+  only because it appeared in the permuter's raw output and is worth naming
+  as the "reject this" example the Gate-3 discipline calls for: a return-type
+  fabrication against a real, differently-typed definition elsewhere in the
+  project is not a legitimate translation, whatever the scorer says.)
+
+**Adopted. `func_80017CFC` is MATCHED, 107/107 words, byte-exact against
+retail.** A short comment was added at the `nextSize` reuse site explaining
+why the dead variable is repurposed, since the idiom is unusual on its own
+and was found by search rather than derivation. Whole-image oracle re-run
+after the comment addition: still `OK: build matches retail`.
+
+**Unit:** `code_8220` — with this function's match, `code_8220` has exactly
+one remaining `INCLUDE_ASM` (`func_80017B34`, see its own report).
+
+### Proposed learning
+
+**A local variable that is provably dead by a given point in its own scope
+(all real uses already executed) can be legally repurposed as the holder of
+an unrelated boolean/temporary a few lines later, and doing so can be
+exactly what nudges GCC 2.6.3 -O2 into retail's register choice for that
+temporary.** This is the read/no-branch-on-garbage-safe cousin of this
+round's `func_80017B34` finding (`p = unused = expr;`, a local declared
+*only* to receive a dead store): here the local already existed for a real
+purpose, and the trick is reusing it a second time after its first job is
+done, rather than declaring a fresh anonymous one. Both are ordinary C, both
+are outside HARD RULE 6 (no `asm` anywhere), and both were found by the
+permuter rather than by hand — worth trying by hand on similar
+same-length residues where a hand-written body already got the value and
+timing right and only the register is wrong.
+
+## Round 45 investigation (preserved below for the derivation this round built on)
+
+
 
 **Unit:** `code_8220` · **Size:** 107 words, EXACT. **Status:** STALL after
 ~10 attempts, restored to `INCLUDE_ASM`. Best raw score 99/107 words (92.5%);
@@ -210,14 +300,14 @@ void *func_80017CFC(ptr, pool)
 #endif
 ```
 
-## Next steps for whoever reopens this
+## Next steps (round 45; resolved round 46 — see top of report)
 
-- The single remaining residue is a strong permuter candidate: length is
-  exact, the residue is confined to one 8-word cluster (`0x85BC`-`0x85E4`),
-  and four independent hand-attempts at reordering all failed the same way.
-- Do not re-attempt the `gp_rel` framing.
+- The single remaining residue was a strong permuter candidate: length was
+  exact, the residue confined to one 8-word cluster (`0x85BC`-`0x85E4`), and
+  four independent hand-attempts at reordering all failed the same way. This
+  is exactly what round 46's search closed — see the top of this report.
 
-### Proposed learning
+### Proposed learning (round 45)
 
 - **`func_80017B34`'s three levers generalize.** All three transferred to
   this sibling function with no modification needed beyond the obvious
