@@ -2,9 +2,77 @@
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027C80);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027D40);
+extern void func_800280D0(void);
+extern void func_800280E0(void);
+extern void func_80028218(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027D70);
+void func_80027D40(void)
+{
+    func_800280D0();
+    func_80028218();
+    func_800280E0();
+}
+
+/* The pending-list node type func_8002832C (code_179d8_r) allocates and
+ * func_800283C4 (code_179d8_r) unlinks/frees -- only the fields this call
+ * site itself reads are typed here. */
+typedef struct QueueEntryD70 QueueEntryD70;
+struct QueueEntryD70 {
+    /* +0x00 */ s32 unk00;
+    u8 pad04[0x0C - 0x04];
+    /* +0x0C */ s32 owner;
+    u8 pad10[0x20 - 0x10];
+    /* +0x20 */ QueueEntryD70 *next;
+};
+
+typedef struct SelfD70 SelfD70;
+struct SelfD70 {
+    u8 pad00[0x22];
+    /* +0x22 */ u16 unk22;
+    /* +0x24 */ s32 unk24;
+};
+
+extern s32 D_8008A894;
+extern s32 D_8008A870;
+extern s32 D_8008A888;
+extern s32 D_8008A87C;
+extern void CdFlush(void);
+extern void func_80028864(void); /* code_179d8_r */
+extern void func_800283C4(QueueEntryD70 *arg0); /* code_179d8_r */
+
+void func_80027D70(SelfD70 *self)
+{
+    QueueEntryD70 *entry;
+    QueueEntryD70 *node;
+    QueueEntryD70 *next;
+    s32 saved;
+
+    func_800280D0();
+
+    entry = (QueueEntryD70 *)D_8008A894;
+
+    if (entry != NULL && self->unk22 != 0) {
+        self->unk24 = 0;
+
+        if (entry->owner == (s32)self && entry->unk00 != 0 && D_8008A870 == 0) {
+            CdFlush();
+            func_80028864();
+            saved = D_8008A888;
+            D_8008A888 = 0;
+            D_8008A87C = saved;
+        }
+
+        for (node = (QueueEntryD70 *)D_8008A894; node != NULL; node = next) {
+            next = node->next;
+            if (node->owner == (s32)self) {
+                func_800283C4(node);
+                self->unk22--;
+            }
+        }
+    }
+
+    func_800280E0();
+}
 
 /* D_8006D4E8's own method table, 29 slots per tools/classtable.py (header
  * 0x13 at +0x000, func_800269F0 at +0x004/own-slot, func_80027228 at
@@ -23,7 +91,27 @@ s32 *func_80027E68(void)
     return D_8006D4E8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027E78);
+/* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
+ * per-call-site typed for this unit, per the code_179d8_h.c convention. */
+extern s32 CdSetDebug(s32 arg0);
+extern s32 CdControlB(u_char com, void *param, void *result);
+
+extern s32 D_8008A858;
+
+void func_80027E78(void)
+{
+    u8 mode;
+
+    if (D_8008A858 != 0) {
+        return;
+    }
+
+    CdSetDebug(0);
+    mode = 0x80;
+    while (CdControlB(0xE, &mode, 0) == 0) {
+    }
+    D_8008A858 = 1;
+}
 
 extern s32 D_8008A864;
 
@@ -53,9 +141,65 @@ s32 func_80027EEC(void)
     return D_8008A878;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027EF8);
+extern s32 D_8008A860;
+extern s32 D_8008A85C;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027F18);
+s32 func_80027EF8(s32 *a0)
+{
+    if (a0 != NULL) {
+        *a0 = D_8008A860;
+    }
+    return D_8008A85C;
+}
+
+extern s32 func_80020C5C(void); /* class_3ac78, returns a pointer cast to s32 */
+extern s32 func_800280EC(void);
+extern s32 D_8008A864;
+extern s32 D_8008A85C;
+extern s32 D_8008A860;
+extern s32 D_8008A8A4;
+
+/* Object returned by func_80020C5C; only the slot this call site dispatches
+ * (+0x84 of its method table) is typed here. */
+typedef struct ObjF18Methods ObjF18Methods;
+struct ObjF18Methods {
+    u8 pad00[0x84];
+    void (*slot84)(void *self, void *arg);
+};
+
+typedef struct ObjF18 ObjF18;
+struct ObjF18 {
+    ObjF18Methods *methods;
+};
+
+s32 func_80027F18(s32 arg0, s32 arg1, s32 arg2)
+{
+    ObjF18 *obj;
+
+    if (D_8008A864 == 0) {
+        if (arg2 == 0) {
+            obj = (ObjF18 *)func_80020C5C();
+
+            if (D_8008A85C == 0) {
+                if (arg0 != 0) {
+                    obj->methods->slot84(obj, (void *)func_800280EC);
+                }
+            } else {
+                if (arg0 == 0) {
+                    obj->methods->slot84(obj, 0);
+                }
+            }
+        }
+
+        D_8008A8A4 = arg2;
+        D_8008A85C = arg0;
+        D_8008A860 = arg1;
+
+        return 1;
+    }
+
+    return 0;
+}
 
 extern s32 D_8008A868;
 
@@ -99,12 +243,134 @@ void func_800280E0(void)
     D_8008A88C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800280EC);
+extern s32 func_80018458(void); /* code_8220_b */
+extern s32 D_8008A8A4;
+extern s32 D_8008A898;
+extern void func_8002858C(void); /* code_179d8_r */
+extern void func_800286E4(void); /* code_179d8_r */
+extern s32 D_8008A890;
+extern void VSyncCallback(void (*cb)(void));
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800281B0);
+/* This unit's own slot at +0x068 of D_8006D4E8's table (see func_80027E68's
+ * class-map comment above); only the one slot this call site dispatches is
+ * typed here, following the pad-to-offset convention include/code_171e0.h
+ * uses for D_8006D430's own table. */
+typedef struct D_8006D4E8Methods D_8006D4E8Methods;
+struct D_8006D4E8Methods {
+    u8 pad00[0x68];
+    void (*slot68)(void);
+};
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80028218);
+s32 func_800280EC(void)
+{
+    if (D_8008A88C != 0) {
+        return 0;
+    }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80028280);
+    if (func_80018458() != 0) {
+        return 0;
+    }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800282AC);
+    if (D_8008A8A4 != 0) {
+        VSyncCallback(0);
+    }
+
+    if (D_8008A898 == 1) {
+        func_8002858C();
+    } else if (D_8008A898 == 2) {
+        func_800286E4();
+    }
+
+    if (D_8008A890 != 0) {
+        ((D_8006D4E8Methods *)func_80027E68())->slot68();
+    }
+
+    if (D_8008A8A4 != 0) {
+        VSyncCallback((void (*)(void))func_800280EC);
+    }
+
+    return 0;
+}
+
+extern s32 D_8008A89C;
+
+void func_800281B0(void)
+{
+    func_800280D0();
+
+    if (D_8008A89C == 0) {
+        if (D_8008A8A4 != 0) {
+            VSyncCallback((void (*)(void))func_800280EC);
+        }
+        D_8008A89C = 1;
+    }
+
+    D_8008A890 = 1;
+    func_800280E0();
+}
+
+extern s32 D_8008A898;
+extern s32 D_8008A89C;
+extern s32 D_8008A8A4;
+extern s32 D_8008A890;
+extern void VSyncCallback(void (*cb)(void));
+
+void func_80028218(void)
+{
+    func_800280D0();
+
+    if (D_8008A898 == 0 && D_8008A89C != 0) {
+        if (D_8008A8A4 != 0) {
+            VSyncCallback(0);
+        }
+        D_8008A89C = 0;
+        D_8008A890 = 0;
+    }
+
+    func_800280E0();
+}
+
+extern s32 D_8008A890;
+
+void func_80028280(void)
+{
+    func_800280D0();
+    D_8008A890 = 0;
+    func_800280E0();
+}
+
+/* func_8002832C (code_179d8_r) allocates and links a 0x24-byte list node;
+ * only the fields this call site writes are typed here (padded to their
+ * offsets, per this unit's convention). */
+typedef struct Entry800282AC Entry800282AC;
+struct Entry800282AC {
+    u8 pad00[0x08];
+    s32 unk08;
+    s32 unk0C;
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
+};
+extern Entry800282AC *func_8002832C(void); /* code_179d8_r */
+
+typedef struct Self800282AC Self800282AC;
+struct Self800282AC {
+    u8 pad00[0x22];
+    u16 unk22;
+    s32 unk24;
+};
+
+void func_800282AC(Self800282AC *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+    Entry800282AC *entry = func_8002832C();
+
+    entry->unk08 = arg2;
+    entry->unk14 = arg3;
+    entry->unk0C = (s32)arg0;
+    entry->unk10 = arg1;
+    entry->unk18 = arg4;
+
+    arg0->unk22++;
+    arg0->unk24 = 0;
+    func_800281B0();
+}
