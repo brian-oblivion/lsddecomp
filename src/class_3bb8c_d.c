@@ -117,7 +117,19 @@ void func_8004E054(Class86B60 *self)
     self->unkAC->methods->slot70(self->unkAC);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E0E4);
+void func_8004E0E4(Class86B60 *self)
+{
+    s32 buf;
+
+    buf = self->unk60->unk14;
+    self->unkA4->methods->slot19C(self->unkA4, &buf);
+    self->methods->slot128(self);
+    if (self->unkA4->methods->slot1AC(self->unkA4)) {
+        *(u8 *)D_8008AA10 = 0;
+    }
+    self->unkAC->methods->slot78(self->unkAC, D_8008AA10, D_8008AA18, 0xD, 3,
+                                  self->unkA8, self->unkBC, self->unkC0);
+}
 
 void func_8004E1C4(Class86B60 *self)
 {

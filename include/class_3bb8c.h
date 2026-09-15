@@ -1085,6 +1085,13 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
      * dlabel exists at either byte offset, so they cannot be referenced by
      * name and are forwarded as opaque `void *`). */
     void (*slot74)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, void *arg2, s32 arg3, s32 arg4); /* +0x074 */
+    /* +0x078, func_8004E0E4's own call: `(self, D_8008AA10, D_8008AA18,
+     * 0xD, 3, self->unkA8, self->unkBC, self->unkC0)` -- eight arguments,
+     * the last four on the stack. `arg5` is `Class86B60::unkA8`, forwarded
+     * opaquely (never dereferenced by this slot's own caller), so kept
+     * `void *` rather than its fuller `GenericReleaseObj_3bb8c_d *` type. */
+    void (*slot78)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, void *arg2,
+                   s32 arg3, s32 arg4, void *arg5, s32 arg6, s32 arg7); /* +0x078 */
 };
 
 struct Class86B60UnkACObj_3bb8c_d {
@@ -1286,7 +1293,11 @@ struct DreamSysViewMethods_3bb8c_c {
     u8 pad1A4[0x1A8 - 0x1A4];
     /* +0x1A8, func_8004E230's own call, `self` only. */
     void (*slot1A8)(DreamSysView_3bb8c_c *self);
-    u8 pad1AC[0x1B0 - 0x1AC];
+    /* +0x1AC, func_8004E0E4's own call: `self->unkA4->methods->slot1AC(
+     * self->unkA4)`. Nonzero return gates a one-byte-zero write into
+     * `*D_8008AA10` (return type therefore `s32`, not `void` -- the
+     * caller's `beqz` on `$v0` tests it directly). */
+    s32 (*slot1AC)(DreamSysView_3bb8c_c *self);
     /* Return value stored into Class86B60::unkBC; arg1 is the address of
      * Class86B60::unkC0 (an output buffer this slot presumably fills). */
     s32 (*slot1B0)(DreamSysView_3bb8c_c *self, void *arg1);     /* +0x1B0 */
