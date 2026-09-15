@@ -93,7 +93,54 @@ s32 func_80027EF8(s32 *a0)
     return D_8008A85C;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027F18);
+extern s32 func_80020C5C(void); /* class_3ac78, returns a pointer cast to s32 */
+extern s32 func_800280EC(void);
+extern s32 D_8008A864;
+extern s32 D_8008A85C;
+extern s32 D_8008A860;
+extern s32 D_8008A8A4;
+
+/* Object returned by func_80020C5C; only the slot this call site dispatches
+ * (+0x84 of its method table) is typed here. */
+typedef struct ObjF18Methods ObjF18Methods;
+struct ObjF18Methods {
+    u8 pad00[0x84];
+    void (*slot84)(void *self, void *arg);
+};
+
+typedef struct ObjF18 ObjF18;
+struct ObjF18 {
+    ObjF18Methods *methods;
+};
+
+s32 func_80027F18(s32 arg0, s32 arg1, s32 arg2)
+{
+    ObjF18 *obj;
+
+    if (D_8008A864 == 0) {
+        if (arg2 == 0) {
+            obj = (ObjF18 *)func_80020C5C();
+
+            if (D_8008A85C == 0) {
+                if (arg0 != 0) {
+                    obj->methods->slot84(obj, (void *)func_800280EC);
+                }
+            } else {
+                if (arg0 == 0) {
+                    obj->methods->slot84(obj, 0);
+                }
+            }
+        }
+
+        D_8008A8A4 = arg2;
+        D_8008A85C = arg0;
+        D_8008A860 = arg1;
+
+        return 1;
+    }
+
+    return 0;
+}
 
 extern s32 D_8008A868;
 
