@@ -73,6 +73,38 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CD08);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
 
+/* Shared with func_8002D8E0 below (same two-level entry table, same
+ * blend-cascade shape); declared once here since func_8002D1B4 is
+ * ROM-earlier, reused there rather than redeclared. */
+typedef struct {
+    u8 pad0[0x74];
+    u16 unk74;
+    u16 unk76;
+    u8 pad78[0xAC - 0x78];
+} D800902E8Entry;
+extern D800902E8Entry *D_800902E8[];
+
+extern u8 D_8008EA16;
+extern u8 D_8008EA19;
+extern u8 D_8008EA17;
+extern u8 D_8008EA11;
+extern u8 D_8008EA1A;
+extern s16 D_8008E8C0;
+extern u16 D_8008EA22;
+extern u8 D_8008EA20;
+extern u8 D_8008D970[];
+extern u8 D_8008D98C[];
+extern u8 D_8008D9A3[];
+extern u16 D_8008E228;
+extern u16 D_8008E22C;
+extern u16 D_80090C60;
+extern u16 D_80090C64;
+extern u16 D_8008E230;
+extern u16 D_8008E234;
+
+/* STALL -- see docs/match-reports/func_8002D1B4.md. Best body reached
+ * (332/316 built words, 16 words LONG; 33/316 raw word-match, drift-
+ * affected) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D1B4);
 
 extern u8 D_8008EA13;
@@ -98,6 +130,19 @@ extern D8008E978Entry *D_8008E978;
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D6A4);
 
+/* D800902E8Entry, D_800902E8 and the blend-cascade globals
+ * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
+ * D_8008E230/234, D_8008D970/98C/9A3) are already declared above, before
+ * func_8002D1B4 (ROM-earlier, same shapes) -- reused here, not redeclared. */
+extern u8 D_8008EA0E;
+extern u8 D_8008EA1C;
+extern u16 *D_8006DAD4;
+extern u8 D_8008D7F0[];
+extern u8 D_8008D7F2[];
+extern u8 D_8008E9D0;
+
+/* STALL -- see docs/match-reports/func_8002D8E0.md. Best body reached
+ * (309/311 built words, 2 words SHORT) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DDBC);
