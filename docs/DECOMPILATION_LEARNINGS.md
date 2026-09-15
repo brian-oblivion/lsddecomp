@@ -87,6 +87,15 @@ with fifty unverified claims teaches sessions to skim it.
 
 ### BLOCKED: no C function can reach a small-data global (2026-08-29)
 
+> **RESOLVED, round 42 (2026-09-15).** maspsx `--gp-symbols=config/gp-symbols.txt`
+> (`tools/patches/maspsx-lsd-flags.patch`) emits retail's `%gp_rel($gp)` form
+> for exactly the symbols defined in the sdata/sbss segments; `-G` is
+> unchanged at every stage. Byte-exact whole image, three blocked functions
+> matched on the first build. **The `grep -l gp_rel` routing rule below is
+> RETIRED** — a `%gp_rel` reference is an ordinary global access. The
+> diagnosis below ("needs a non-zero `-G`") was wrong; see the RESOLVED
+> section of `docs/research/gp-relative-blocker.md` for what it actually was.
+
 **Full evidence and reproducer: `docs/research/gp-relative-blocker.md`. This is
 an open operator escalation; do not attempt a toolchain change yourself.**
 
@@ -158,6 +167,12 @@ A hit means blocked: file a stub report citing the research doc and move on.
 through it. Only the load is exposed.
 
 ### BLOCKED: the `nop_mflo_mfhi` screen runs FORWARD, and the backward reading is not a blocker (2026-09-04)
+
+> **RESOLVED, round 42 (2026-09-15).** maspsx `--no-nop-mflo-mfhi`
+> (`tools/patches/maspsx-lsd-flags.patch`) leaves cc1's `#nop` hints commented,
+> as retail does at every site. Byte-exact whole image; `IsDaySpecial` 52/52 on
+> the first build. The construct no longer blocks; the FORWARD/backward lesson
+> below stands, because `nearmiss.py` still reports the (resolved) screen.
 
 **Measured this round with two reproducers through the pinned pipeline.** The
 third blocker grep (Gate 1 in `docs/PARALLEL-RUNS.md`, evidence in

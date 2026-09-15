@@ -122,11 +122,14 @@ into one of these. This list is short because this project is young — add to i
   instruction sequence with a zero check. If your division differs structurally
   from retail's, check whether retail divided at all — a shift may be the
   source form.
-- **A `lui`+`lw` pair where retail has a single `lw ..($gp)`.** This is the
-  gp-relative blocker, and **no source-level reshaping will move it** — the
-  addressing mode comes from the toolchain's `-G` value. Check for it before
-  spending attempts: `grep -l 'gp_rel' asm/nonmatchings/<unit>/*.s`. A hit
-  means STOP and file the report; see `docs/research/gp-relative-blocker.md`.
+- **A `lui`+`lw` pair where retail has a single `lw ..($gp)`.** *RESOLVED in
+  round 42 (2026-09-15) — this bullet used to say STOP and file a report; that
+  directive is RETIRED.* The addressing comes from `config/gp-symbols.txt`
+  via maspsx `--gp-symbols`: a symbol defined in a sdata/sbss segment is
+  addressed off `$gp` for loads and stores, absolutely for `la`. If you see
+  the pair where retail has `($gp)`, the symbol is missing from the list —
+  `python3 tools/gpsyms.py --check` — or you are referencing it under a name
+  the list does not carry. See `docs/research/gp-relative-blocker.md`.
   It is by far the largest obstruction in the project — derive the current
   figure with `python3 tools/nearmiss.py | head -2` rather than trusting any
   number written here. (This line used to say "nine functions across two

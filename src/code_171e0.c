@@ -127,9 +127,17 @@ INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026FE8);
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80027024);
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270AC);
+extern void *D_8008A854;
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_800270B8);
+void func_800270AC(void *value)
+{
+	D_8008A854 = value;
+}
+
+void *func_800270B8(void)
+{
+	return D_8008A854;
+}
 
 char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
     dest[0] = '\0';

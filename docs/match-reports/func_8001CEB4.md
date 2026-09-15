@@ -1,3 +1,12 @@
+> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
+> screened as blocked by `nop_mflo_mfhi`. **That blocker is RESOLVED**: maspsx gained
+> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
+> passed by the Makefile), the whole image stays byte-exact, and previously
+> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
+> "RESOLVED"). Everything below is evidence from before the fix: its
+> derivation may still be right, its VERDICT is not. Rebuild before believing
+> any score in it. The preserved body was rebuilt this round with the flag on and is NOT a match: it is one word longer than retail and differs in register identity (`$s2` where retail has `$s3`), so the report's "nop is the only residue" claim was wrong. Re-derive from asm-differ, not from the body.
+
 # func_8001CEB4 -- TOOLCHAIN BLOCKED (`nop_mflo_mfhi`, sibling of the `addiu_at` blocker)
 
 Unit: `code_d294` (round 14). Occupies `Class6B5CCMethods` vtable slot

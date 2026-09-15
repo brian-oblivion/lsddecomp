@@ -160,7 +160,15 @@ TableD9BC *func_8002C438(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C448);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002C468);
+extern s32 D_8008A8B0;
+extern s32 D_8008A8B4;
+
+s32 func_8002C468(s32 a, s32 b)
+{
+	D_8008A8B0 = a;
+	D_8008A8B4 = b;
+	return 1;
+}
 
 s32 func_8002C478(void) {
     return 0;

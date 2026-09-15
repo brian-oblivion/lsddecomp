@@ -1,5 +1,23 @@
 # The `addiu_at` indexed-addressing blocker
 
+**`nop_mflo_mfhi` is RESOLVED as of round 42 (2026-09-15), by exactly the
+remedy the addendum below predicted: a flag decoupling it from the version.**
+maspsx gained `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
+which sets `version_config.nop_mflo_mfhi = False` and nothing else, so cc1's
+`#nop` hints between an `mflo`/`mfhi` and a following `mult`/`div` stay
+commented out — retail's shape at all 180 no-nop sites. Measured before
+adoption: `rm -rf build`, full rebuild with the flag and no C change, **0
+differing bytes** across 995 matched functions, so the "up to 65 sites that
+want a nop" the census worried about are all either INCLUDE_ASM bytes or load
+delay slots — none is a matched-C `mflo` hazard. Then `IsDaySpecial`'s
+preserved body, unchanged, **52/52 on the first build**. `func_8005950C`'s
+preserved body went 17/33 → 30/33 (the nops gone; a register-allocation
+residue in the `/ 0x400` preamble remains); `func_8001CEB4`'s preserved body
+is NOT a match and its report is corrected. Eleven queued functions and one
+uncarved function are unblocked. The `nop_mflo_mfhi` screen in
+`tools/nearmiss.py`/`tools/uncarved.py` is kept and tagged
+`(RESOLVED-not-a-blocker)`, like `addiu_at`.
+
 **STATUS: RESOLVED, round 21 (2026-09-06). This is no longer a blocker.**
 
 Option 1 from "Options, in rough order of promise" below — *patch `addiu_at`

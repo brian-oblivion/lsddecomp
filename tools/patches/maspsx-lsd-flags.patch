@@ -1,0 +1,87 @@
+--- a/maspsx.py
++++ b/maspsx.py
+@@ -59,6 +59,8 @@
+     parser.add_argument("--macro-inc", action="store_true")
+     parser.add_argument("--dont-expand-li", action="store_true")
+     parser.add_argument("--addiu-at", action="store_true")
++    parser.add_argument("--gp-symbols", type=str, default=None)
++    parser.add_argument("--no-nop-mflo-mfhi", action="store_true")
+     parser.add_argument("--force-stdin", action="store_true")
+     parser.add_argument("--passthrough", action="store_true")
+     parser.add_argument("--use-comm-section", action="store_true")
+@@ -129,6 +131,19 @@
+ 
+         filtered_as_args.append(arg)
+ 
++    # Symbols the retail link placed in .sdata/.sbss and therefore reaches
++    # gp-relatively. With -G0 cc1 emits no size hints and the project's data
++    # is defined in splat asm, not C, so maspsx's own sdata_entries table
++    # (same-file .sdata/.comm only) can never learn them. Seed it explicitly.
++    # See docs/research/gp-relative-blocker.md.
++    gp_symbols: set = set()
++    if args.gp_symbols:
++        with open(args.gp_symbols) as f:
++            for l in f:
++                l = l.split("#", 1)[0].strip()
++                if l:
++                    gp_symbols.add(l)
++
+     if args.passthrough:
+         processor = PassthroughProcessor(in_lines)
+ 
+@@ -146,10 +161,18 @@
+         # docs/research/addiu-at-blocker.md, "Options", option 1.
+         if args.addiu_at:
+             version_config.addiu_at = True
++        # Same decoupling for nop_mflo_mfhi: config_for_aspsx_version turns it
++        # OFF only below 2.30. Retail never takes the hazard nops between an
++        # mflo/mfhi and a following mult/div; cc1 emits them as commented
++        # "#nop" hints and this flag leaves them commented. Byte-exact across
++        # the whole image. See docs/research/addiu-at-blocker.md.
++        if args.no_nop_mflo_mfhi:
++            version_config.nop_mflo_mfhi = False
+ 
+         processor = MaspsxProcessor(
+             in_lines,
+             sdata_limit=sdata_limit,
++            gp_symbols=gp_symbols,
+             expand_div=args.expand_div,
+             expand_li=version_config.expand_li,
+             nop_at_expansion=version_config.nop_at_expansion,
+--- a/maspsx/__init__.py
++++ b/maspsx/__init__.py
+@@ -423,6 +423,7 @@
+         self,
+         lines: List[str],
+         sdata_limit=0,
++        gp_symbols=None,
+         expand_div=False,
+         expand_li=False,
+         nop_at_expansion=False,
+@@ -439,6 +440,7 @@
+         self.lines = [x.strip() for x in lines]
+ 
+         self.sdata_limit = sdata_limit
++        self.gp_symbols: set = set(gp_symbols or ())
+ 
+         self.expand_div = expand_div
+         self.expand_li = expand_li
+@@ -568,6 +570,9 @@
+         self.sdata_entries = {}
+ 
+         self.preprocess_lines()
++        # Externally-known small data (--gp-symbols); size is not used.
++        for sym in self.gp_symbols:
++            self.sdata_entries.setdefault(sym, 4)
+ 
+         res = []
+         in_include_asm_hack = False
+@@ -649,7 +654,7 @@
+         return ""  # warn user?
+ 
+     def _uses_gp(self, line: str) -> bool:
+-        if self.sdata_limit == 0:
++        if self.sdata_limit == 0 and not self.gp_symbols:
+             return False
+ 
+         line = strip_comments(line)

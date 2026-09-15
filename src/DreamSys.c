@@ -1653,4 +1653,20 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 	return stage;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", IsDaySpecial);
+/* rand() is not declared by any header this unit includes; Entity.h's own
+   local view is s32 rand(void). */
+extern s32 rand(void);
+
+MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day)
+{
+	s32 i;
+
+	for (i = 0; (u32)i < 42; i++) {
+		if (day == SPECIAL_DAYS[i]) {
+			cinematic->entry = rand() % 6;
+			cinematic->bank = i % 12;
+			return &D_8008ABF4;
+		}
+	}
+	return NULL;
+}
