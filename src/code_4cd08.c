@@ -270,7 +270,22 @@ success:
     return true;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CD58);
+/* vtable slot 0x80 (byte offset 0x200) of `*D_8008AC00`: takes only `self`,
+ * returns a value compared against a per-idx signed byte from D_80088D16.
+ * Distinct from `TriggerWorldFn` (vtable slot 0x22 / offset 0x88, which
+ * takes a `parity` second argument) -- this is a different slot on
+ * (evidently) the same class of object, so it gets its own local typedef
+ * rather than overloading TriggerWorldFn's shape. */
+typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
+
+bool func_8005CD58(s32 idx)
+{
+    TriggerWorld *w = (TriggerWorld *)D_8008AC00;
+    s32 val = D_80088D16[idx];
+    s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
+
+    return val == result;
+}
 
 bool func_8005CDA8(s32 a0, s32 a1)
 {

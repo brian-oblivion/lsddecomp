@@ -46,6 +46,11 @@ typedef struct DreamAuxGroupRecord {
 extern s8 D_80089A7C[];
 extern DreamAuxGroupRecord *D_80089A44[];
 
+/* A small signed-byte lookup table read by func_8005CD58, indexed by its
+ * `idx` parameter. Layout beyond "one signed byte per entry" is not known
+ * from this unit alone. */
+extern s8 D_80088D16[];
+
 /* "ETC\\SYMSPY.MOM" / "ETC\\SYMDOG.MOM" -- MOM = this game's audio-stream
  * format (per lsddecomp naming elsewhere in the project). Defined in
  * code_4cd08.c, right before func_8005C508 which is their only reader. */
