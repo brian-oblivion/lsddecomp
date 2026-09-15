@@ -830,7 +830,33 @@ void func_8005A1F4(void *arg0, Func8005A1F4Arg *arg1)
 	}
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InitNewGame);
+/* Also declared in code_2cc8c_f.c with the same signature (that unit's own
+   local view of the same libc-style function). */
+extern void *memset(unsigned char *dst, unsigned char c, int n);
+
+/* A constant read out of .sdata and copied whole into
+   this->unknown_sdata_0x178 -- naming convention matches (the field's own
+   name already flags it as sdata-sourced). Not dereferenced by this
+   function or any other in this unit's queue. */
+extern s32 D_8008ABE0;
+
+void DreamSys__InitNewGame(DreamSys *this)
+{
+	this->unknown_sdata_0x178 = D_8008ABE0;
+	this->currentYear = 0;
+	this->currentDay = 0;
+	this->totalFlasbackUnlockScore = 0;
+	this->navigationFlasbackUnlockScore = 0;
+	this->instanceFlasbackUnlockScore = 0;
+	this->amountFlashbacksAvailable = 0;
+	this->unknown_values_0x5d8[7] = 0;
+	this->unknown_values_0x5d8[0] = 0;
+	this->screenShakeOn = 1;
+	this->unknown_word_0x67c = 0;
+	this->unknown_word_0x680 = 0;
+	InitNavChallengesArray(&this->navChallengesArray, &this->amountDynamicLinksDone);
+	memset((unsigned char *)&this->unknown_values_0x684, 0, 0x1F4);
+}
 
 void DreamSys__GetSetScreenShake(DreamSys *this, bool *value)
 {
