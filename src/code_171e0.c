@@ -183,7 +183,16 @@ s32 func_80026FAC(void) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026FE8);
+extern s32 func_80028B6C(void);
+extern s32 func_8002C478(void);
+
+s32 func_80026FE8(void) {
+    if (D_8008A84C == 0x13) {
+        return func_80028B6C();
+    } else {
+        return func_8002C478();
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80027024);
 
