@@ -309,4 +309,61 @@ GenericCtorTable_3bb8c_d *func_800507E8(void)
     return &D_80086DC4;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_g", func_800507F8);
+/* Sony's, from libc2 (round 45's own local view -- this unit's first use). */
+extern s32 atoi(char *s);
+
+/* VALUE-of `%gp_rel`, round 45's own local view -- a fixed rodata template
+ * (ROM image still-uncarved, `asm/data/1C34.rodata.s` region) this
+ * function copies raw byte ranges out of; also read by
+ * `class_3bb8c_d.c`'s own (differently-typed) local view. */
+extern u8 *D_8008AAC4;
+
+/* Struct-copy helper types for round 45's func_800507F8, all deliberately
+ * all-`s8` (alignment 1) per this round's func_8004D6AC lever: retail
+ * copies these ranges as one unaligned `lwl`/`lwr` word chunk per 4 bytes,
+ * with any non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores,
+ * never merged into a halfword -- alignment 2 would let GCC trust a
+ * halfword move retail does not have. */
+typedef struct {
+    s8 raw[6];
+} Buf6_3bb8c_g;
+typedef struct {
+    s8 raw[12];
+} Buf12_3bb8c_g;
+typedef struct {
+    s8 a, b;
+} Pair2_3bb8c_g;
+
+/* Signature is `include/class_3bb8c.h`'s ALREADY-shared
+ * `extern s32 func_800507F8(s32 arg0, s32 arg1);` (class_3bb8c_m's own
+ * caller, func_8004EEA0), matched exactly -- this unit's own definition
+ * must agree with that declaration since both are visible in this
+ * translation unit. Cast to `u8 *` internally; retail's own register
+ * content at exit (`$v0` left holding a pointer into the `D_8008AAC4`
+ * template in every path) confirms the real return type is a pointer,
+ * loosely read as `s32` by the caller that never dereferences it. */
+s32 func_800507F8(s32 arg0, s32 arg1)
+{
+    u8 *self = (u8 *)arg0;
+    u8 *src = (u8 *)arg1;
+    s32 t0;
+    s32 idx;
+    u8 *p;
+
+    if (src != NULL) {
+        t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
+
+        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(D_8008AAC4 + 0x1E);
+        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(D_8008AAC4 + 0x1E);
+
+        idx = atoi((char *)(src + t0)) - 1;
+        p = D_8008AAC4 + idx * 2;
+        *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
+        return (s32)p;
+    } else {
+        u8 *q = D_8008AAC4;
+
+        *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
+        return (s32)q;
+    }
+}

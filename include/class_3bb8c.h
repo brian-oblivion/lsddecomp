@@ -2029,7 +2029,8 @@ extern BasicMethods866E8F *func_80018390(void);
  * Each caller now carries its own local `extern` with its own argument shape
  * -- see src/class_3bb8c_f.c and src/class_3bb8c_e.c.
  *
- * func_800507F8 stays: it is game code (gp_rel-blocked), not a trampoline. */
+ * func_800507F8 stays: it is game code, defined in src/class_3bb8c_g.c
+ * (MATCHED round 45, 60/60 words -- was gp_rel-blocked, resolved round 42). */
 extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 
 /* -------------------------------------------------------------------
