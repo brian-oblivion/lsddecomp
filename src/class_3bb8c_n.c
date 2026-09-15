@@ -301,7 +301,7 @@ extern void *func_80055620(s32 *arg0, s32 *arg1);
 extern s32 D_800874B0[];
 extern s32 func_8002CC34(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 
-ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1) {
+ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     ObjN14Sub *sub;
 
     sub = (ObjN14Sub *) func_80055620(&arg0->unk4, &arg0->unk10);
@@ -331,7 +331,7 @@ s32 func_800557DC(ObjN14 *arg0) {
 extern s32 func_80055874(ObjN14 *arg0, void *arg1);
 extern void func_8002CD08(s32 arg0, void *arg1);
 
-s32 func_8005582C(ObjN14 *arg0, void *arg1) {
+s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2) {
     if (func_80055874(arg0, arg1) != 0) {
         func_8002CD08(*(s32 *) D_8008AC7C, &arg0->unk14);
         return 1;
@@ -367,6 +367,62 @@ s32 func_80055874(ObjN14 *arg0, void *arg1) {
     return 0;
 }
 
+/* Local view only: `D_8008AB4C`'s value is another `pointer stored as a
+ * plain s32` (same idiom as `D_8008AC7C`), here treated as a "self" object
+ * with a method table at offset 0, dispatched through slot +0x0E8. */
+typedef struct ObjAB4C ObjAB4C;
+typedef struct ObjAB4CMethods ObjAB4CMethods;
+struct ObjAB4CMethods {
+    u8 padE8[0xE8];
+    void (*slotE8)(ObjAB4C *self, void *arg1, void *arg2); /* +0x0E8 */
+};
+struct ObjAB4C {
+    ObjAB4CMethods *methods; /* +0x000 */
+};
+
+extern void func_80054850(void);
+extern void func_800549A8(void);
+extern void func_80055A24(void);
+extern s32 D_8008AC70;
+extern s32 D_8008AC98;
+extern u8 D_8008E154[];
+extern ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
+extern s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2);
+
+/* STALL, 63/77 words -- register-identity swap (ctx/i colour), see
+ * docs/match-reports/func_800558F0.md. Preserved near-miss body: */
+#if 0
+s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
+    void *ctx;
+    u8 buf[0x10];
+    s32 i;
+
+    ctx = 0;
+    if (arg0 != 0) {
+        ctx = buf;
+        ((ObjAB4C *) D_8008AB4C)->methods->slotE8((ObjAB4C *) D_8008AB4C, ctx, arg0);
+    }
+    if (D_8008AC70++ == 0) {
+        func_80054660();
+        func_80054850();
+        func_80054B84(ctx);
+    }
+    func_800549A8();
+    func_80054C74(ctx);
+    func_80055A24();
+    D_8008AC98 = 0;
+    for (i = 0; i < 2; i++) {
+        if (D_8008AC9C[i] != 0) {
+            if (func_8005582C(D_8008AC9C[i], ctx, arg1) == 0) {
+                D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+            }
+        } else {
+            D_8008AC9C[i] = func_8005556C((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
+        }
+    }
+    return arg2;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800558F0);
 
 extern s32 D_8008AC6C;
