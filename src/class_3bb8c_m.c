@@ -22,7 +22,7 @@
  *   func_800544E4  was gp_rel            -- MATCHED round 44, 29/29.
  *   func_80054558  was gp_rel (+ addiu-$at) -- MATCHED round 44, 41/41.
  *   func_800545FC  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
- *   func_80054660  was gp_rel            -- see docs/match-reports/ for round 44 disposition.
+ *   func_80054660  was gp_rel            -- MATCHED round 44, 45/45.
  * The old profile said "all four have stub reports; do not attempt them",
  * which was true when written and became a false blocker on one of the four
  * the moment `addiu_at` was fixed. Screen with `python3 tools/nearmiss.py`
@@ -267,4 +267,57 @@ void func_800545FC(struct StyleM *style, s8 *cfg) {
     style->unk14 = cfg[0];
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054660);
+/* Local view only -- func_800404D0 is already declared elsewhere
+ * (include/code_2cc8c.h) returning `ClassEAC0Obj *`, a header this unit
+ * does not own. This unit only ever reaches slots 0x4C/0x64/0x68 on the
+ * returned object, so it gets its own minimal local type rather than
+ * pulling in that header (multiple-independent-local-views convention). */
+typedef struct LocalM4D0Obj LocalM4D0Obj;
+typedef struct LocalM4D0Methods LocalM4D0Methods;
+struct LocalM4D0Methods {
+    u8 pad00[0x4C];
+    void (*slot4C)(LocalM4D0Obj *self, s32 arg1, void *arg2); /* +0x04C */
+    u8 pad50[0x64 - 0x50];
+    void (*slot64)(LocalM4D0Obj *self, s32 arg1);              /* +0x064 */
+    void (*slot68)(LocalM4D0Obj *self, s32 arg1);              /* +0x068 */
+};
+struct LocalM4D0Obj {
+    LocalM4D0Methods *methods;
+};
+
+/* D_8008AC7C's own local reading here: only its +0xC field (a "self"
+ * pointer into a THIRD object, dispatched only through +0xAC) is ever
+ * touched by this function. */
+typedef struct LocalSubObj LocalSubObj;
+typedef struct LocalSubMethods LocalSubMethods;
+struct LocalSubMethods {
+    u8 pad00[0xAC];
+    s32 (*slotAC)(LocalSubObj *self);                          /* +0x0AC */
+};
+struct LocalSubObj {
+    LocalSubMethods *methods;
+};
+typedef struct FieldAC7CHolder {
+    u8 pad0[0xC];
+    LocalSubObj *unkC;
+} FieldAC7CHolder;
+
+extern s32 D_8008AC94;
+extern s32 D_8008AB60;
+extern s32 D_8008AB58;
+extern LocalM4D0Obj *func_800404D0(void *a0, void *a1, s32 a2);
+
+void func_80054660(void) {
+    s32 tmp;
+
+    if (D_8008AB54 != 0) {
+        D_8008AC94 = (s32) func_800404D0(&D_8008AB60, (void *) D_8008AB54, 0);
+        ((LocalM4D0Obj *) D_8008AC94)->methods->slot64((LocalM4D0Obj *) D_8008AC94, 1);
+        ((LocalM4D0Obj *) D_8008AC94)->methods->slot68((LocalM4D0Obj *) D_8008AC94, 0);
+
+        tmp = ((FieldAC7CHolder *) D_8008AC7C)->unkC->methods->slotAC(
+                ((FieldAC7CHolder *) D_8008AC7C)->unkC);
+
+        ((LocalM4D0Obj *) D_8008AC94)->methods->slot4C((LocalM4D0Obj *) D_8008AC94, tmp, &D_8008AB58);
+    }
+}
