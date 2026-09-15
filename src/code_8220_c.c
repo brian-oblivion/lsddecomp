@@ -390,4 +390,13 @@ void func_8001A4C0(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
     dst[3]->uv = *uv3;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A54C);
+extern s32 D_8008A830;
+extern s32 D_8008A834;
+
+void func_8001A54C(s32 arg0, s32 arg1)
+{
+    D_8008A830 = arg0;
+    if (arg0) {
+        D_8008A834 = arg1;
+    }
+}
