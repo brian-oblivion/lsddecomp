@@ -1362,7 +1362,45 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 #endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__GetPreviousDayMood);
+void DreamSys__GetPreviousDayMood(DreamSys *this, MoodGraphPoint *target, bool unknown)
+{
+	s32 upper = 0;
+	s32 dynamic = 0;
+
+	if (unknown) {
+		if (this->currentYear != 0 || this->currentDay != 0) {
+			s32 idx;
+
+			idx = this->currentDay - 1;
+			dynamic = this->moodPreviousDays[idx].axis.dynamic;
+			upper = this->moodPreviousDays[idx].axis.upper;
+		}
+	} else {
+		s32 count;
+		count = 0x16D;
+		if (this->currentYear == 0)
+			count = this->currentDay;
+		if (count != 0) {
+			MoodGraphPoint *p;
+			s32 i;
+
+			p = this->moodPreviousDays;
+			i = 0;
+			if (upper < count) {
+				do {
+					i++;
+					dynamic += p->axis.dynamic;
+					upper += p->axis.upper;
+					p++;
+				} while (i < count);
+			}
+			dynamic /= count;
+			upper /= count;
+		}
+	}
+	target->axis.dynamic = dynamic;
+	target->axis.upper = upper;
+}
 
 void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
 {
