@@ -2,7 +2,16 @@
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027C80);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027D40);
+extern void func_800280D0(void);
+extern void func_800280E0(void);
+extern void func_80028218(void);
+
+void func_80027D40(void)
+{
+    func_800280D0();
+    func_80028218();
+    func_800280E0();
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027D70);
 
@@ -112,7 +121,26 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800280EC);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800281B0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80028218);
+extern s32 D_8008A898;
+extern s32 D_8008A89C;
+extern s32 D_8008A8A4;
+extern s32 D_8008A890;
+extern void VSyncCallback(void (*cb)(void));
+
+void func_80028218(void)
+{
+    func_800280D0();
+
+    if (D_8008A898 == 0 && D_8008A89C != 0) {
+        if (D_8008A8A4 != 0) {
+            VSyncCallback(0);
+        }
+        D_8008A89C = 0;
+        D_8008A890 = 0;
+    }
+
+    func_800280E0();
+}
 
 extern s32 D_8008A890;
 
