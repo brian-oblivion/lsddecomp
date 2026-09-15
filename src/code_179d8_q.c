@@ -32,7 +32,27 @@ s32 *func_80027E68(void)
     return D_8006D4E8;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027E78);
+/* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
+ * per-call-site typed for this unit, per the code_179d8_h.c convention. */
+extern s32 CdSetDebug(s32 arg0);
+extern s32 CdControlB(u_char com, void *param, void *result);
+
+extern s32 D_8008A858;
+
+void func_80027E78(void)
+{
+    u8 mode;
+
+    if (D_8008A858 != 0) {
+        return;
+    }
+
+    CdSetDebug(0);
+    mode = 0x80;
+    while (CdControlB(0xE, &mode, 0) == 0) {
+    }
+    D_8008A858 = 1;
+}
 
 extern s32 D_8008A864;
 
