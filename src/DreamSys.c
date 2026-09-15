@@ -1615,7 +1615,10 @@ void func_8005BF68(bool value)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", Test4InstantTeleporters);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BFC4);
+s32 func_8005BFC4(void)
+{
+	return (D_8008ACBC == 0) ? 0xA : 0;
+}
 
 s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
 {
