@@ -103,11 +103,30 @@ struct BMemPMgr {
 
 /* The generic pool allocator/free pair, established already by
  * include/class_3ac78.h, include/DreamSys.h, include/Entity.h etc. --
- * both single-argument; see the BasicClass doc comment above for why
- * the pool-pointer second parameter these two functions' own bodies
- * read is not a real argument in practice. */
-extern void *func_80017B34(s32 size);
-extern void *func_80017CFC(void *ptr);
+ * all single-argument, and every one of those ~15 headers declares its
+ * own full ANSI prototype (`s32 size` / `void *ptr`), per this project's
+ * multiple-independent-local-views convention -- none of them get their
+ * declaration from this header.
+ *
+ * THIS header, uniquely, declares both with UNSPECIFIED parameters
+ * (empty parens). Round 45 (func_80017B34/func_80017CFC, matched): each
+ * function's own BODY genuinely reads a second argument ($a1, a fallback
+ * pool pointer used only when the global default pool D_8008A818 is
+ * unset -- dead in practice at every decoded call site, confirmed by
+ * func_80017AC8/A9C setting that global before either is ever called).
+ * Both are therefore DEFINED in code_8220.c with an old-style
+ * (K&R identifier-list) parameter list, which is the only way to expose
+ * that second parameter to their own bodies without contradicting the
+ * ~15 external single-argument prototypes OR this same unit's own
+ * single-argument call sites (func_800181AC's `func_80017B34(0x8)`,
+ * func_80018208's `func_80017CFC(node)`) that appear LATER in
+ * code_8220.c. A K&R-style definition does not install a prototype, so
+ * those later 1-argument calls stay uncheck-and-compile clean; an
+ * unspecified-parameter declaration here does the same for everything
+ * before the definition. Do not "fix" this back to a full prototype --
+ * that reintroduces the conflict this was written to route around. */
+extern void *func_80017B34();
+extern void *func_80017CFC();
 
 /* BMemPMgr setup, gp_rel-blocked (docs/research/gp-relative-blocker.md).
  * Called only by BMemPMgrInit in this unit. Genuinely ONE argument: its
