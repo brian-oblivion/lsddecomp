@@ -18,6 +18,48 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     }
 }
 
+/* STALL -- see docs/match-reports/func_8003E968.md. Best reached: 39/41
+ * instructions (2 words SHORT, with drift): every field write and constant
+ * matches retail's own values and offsets, but GCC 2.6.3 CSEs the
+ * lui/addiu address computation for the twice-copied `D_8008A8F8` (a
+ * whole-struct `SByte3_d294` source) into ONE shared computation, while
+ * retail's own build computes it TWICE (once per copy) and additionally
+ * schedules several independent zero-inits much earlier than this build
+ * does. Neither a bare `__asm__` memory-clobber barrier (does not force
+ * recomputation of a pure address constant) nor `volatile` (forces a
+ * completely different, WORSE codegen shape with its own stack frame) nor
+ * per-field byte copies (changes signed `lb` to unsigned `lbu` loads,
+ * diverging further) nor a chained assignment reading the SECOND copy from
+ * `self->unk5B` instead of the global (confirmed via disassembly: reads
+ * from `self`+0x5B, not the global's address at all -- semantically valid
+ * since both sides are zero, but structurally wrong; retail's own two
+ * `lui %hi(D_8008A8F8)` computations prove it re-reads the GLOBAL both
+ * times, not `self`) closed it. Restored to INCLUDE_ASM per project rule. */
+#if 0
+extern s32 D_8008A8FC;
+extern s32 D_8008A900;
+extern SByte3_d294 D_8008A8F8;
+
+void func_8003E968(Unk18Obj *self) {
+    self->unk90 = 0;
+    self->unk70 = 0;
+    self->unk34.a = D_8008A8FC;
+    self->unk34.b = D_8008A900;
+    self->unk3C = 0xD;
+    self->unk44 = 0x7D0;
+    self->unk48 = 0x40;
+    self->unk40 = 0x100;
+    self->unk4C = 0xA;
+    self->unk50 = 0x10000;
+    self->unk54 = 0;
+    self->unk60 = 0x4E20;
+    self->unk5B = D_8008A8F8;
+    self->unk58 = D_8008A8F8;
+    self->unkB4 = 0;
+    self->unkB8 = 1;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E968);
 
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair) {
@@ -133,18 +175,52 @@ void func_8003ECC0(void) {
 void func_8003ECC8(void) {
 }
 
-/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 14/23: 71/73
- * words, a 2-word instruction-order residue, converged negative across 9
- * hand reshapes. Round 36: rebuilt with GsClearOt's real name (was
- * func_8003FC18 -- round 34's SDK conversion renamed the callee, and the
- * report's preserved body was never corrected). Measured 71/73 exactly,
- * matching the prior figure. A ~40,000-iteration bounded permuter search
- * (`timeout 400`, `-j 4`, `--stack-diffs`) found no zero and no genuine
- * improvement below the base score of 215 -- the two sub-215 candidates it
- * did produce are BOTH spurious (one moves the `+0x14` term into an
- * unreachable dead branch, changing the LIVE value of `size` used
- * downstream; the other narrows `size` to `unsigned char`), fingerprinted
- * and not adopted. See the report's round-36 addendum. */
+/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 44 (echo):
+ * re-verified 71/73 exactly, no drift; two more negative attempts (local
+ * declaration order swapped, and the shift value computed in its OWN
+ * statement ahead of the product) neither helped -- the second regressed
+ * to 69/73, same pattern as every other tried grouping. Still the same
+ * 2-word instruction-order residue at vram 0x8003ED18/0x8003ED1C. */
+#if 0
+extern void GsClearOt(s32 a0, s32 a1, s32 a2);
+
+void func_8003ECD0(Unk18Obj *self) {
+    s32 size;
+    s32 buf;
+
+    if (self->unk70 != 0) {
+        return;
+    }
+
+    size = self->unk48 * self->unk44 + (4 << self->unk3C) + 0x14;
+
+    buf = (s32)func_80017B34(size * 2);
+    if (buf == 0) {
+        return;
+    }
+
+    self->unk78 = buf;
+    self->unk80 = buf + 0x14;
+    self->unk88 = (4 << self->unk3C) + self->unk80;
+
+    self->unk7C = size + self->unk78;
+    self->unk84 = size + self->unk80;
+    self->unk8C = size + self->unk88;
+
+    *(s32 *)self->unk78 = self->unk3C;
+    *(s32 *)(self->unk78 + 4) = self->unk80;
+
+    *(s32 *)self->unk7C = self->unk3C;
+    *(s32 *)(self->unk7C + 4) = self->unk84;
+
+    GsClearOt(0, 0, self->unk78);
+    GsClearOt(0, 0, self->unk7C);
+
+    self->unk70 = 1;
+    self->unk74 = 0;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003ECD0);
 
 /* Teardown counterpart to func_8003ECD0's init. */
