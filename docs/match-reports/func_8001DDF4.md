@@ -1,4 +1,26 @@
-# func_8001DDF4 -- STALL, round 45 (2026-09-15)
+# func_8001DDF4 -- DERIVATION ONLY -- ASSIGNABLE, round 45 (2026-09-15)
+
+> **HEAD CORRECTION at merge, round 45.** Delta filed this as a STALL and it is
+> not one: its own Status line says **no C was written or built**, so there is
+> no length figure, no word-match and no first-diff -- the three figures a
+> STALL title is required to carry, and which cannot exist for a function that
+> was never compiled. `progress.py` keys STALL-vs-FRESH purely on the report
+> FILE existing, so left titled STALL this would have been counted as
+> documented, dropped out of `fresh`, and never re-measured -- the exact
+> permanent-deletion failure mode that `REOPENED -- ASSIGNABLE` and
+> `DERIVATION ONLY -- ASSIGNABLE` were both added to stop.
+>
+> The marker above returns it to `fresh` WITHOUT discarding the derivation
+> below, which is the point of having it. **Delta's judgement to spend the
+> time on structure rather than on blind build-and-iterate was correct** --
+> its sibling `func_8001DA28` sat at 14/243 after two dedicated rounds, and
+> round 33's fifth screen says exactly this: prefer a changed state over
+> another cold pass. What needed fixing was the disposition, not the work.
+>
+> So the next runner here inherits a two-thirds-derived 199-word function and
+> should BUILD the derivation before trusting any part of it (round 33: a
+> preserved body is self-consistent everywhere it is written down until it
+> goes through the compiler).
 
 **Unit:** `code_d294_b` · **Size:** 199 words. **Status:** structural
 derivation only -- **no C was written or built this round.**
