@@ -53,7 +53,16 @@ s32 func_80027EEC(void)
     return D_8008A878;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027EF8);
+extern s32 D_8008A860;
+extern s32 D_8008A85C;
+
+s32 func_80027EF8(s32 *a0)
+{
+    if (a0 != NULL) {
+        *a0 = D_8008A860;
+    }
+    return D_8008A85C;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_80027F18);
 
