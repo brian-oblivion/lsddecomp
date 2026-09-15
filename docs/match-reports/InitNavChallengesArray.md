@@ -1,40 +1,45 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
+# InitNavChallengesArray — MATCHED 11/11
 
-# InitNavChallengesArray
+**Unit:** DreamSys · **Size:** 11 words · **Status:** MATCHED, round 43.
 
-**Unit:** DreamSys · **Size:** 11 words · **Status:** BLOCKED, not attempted ·
-Classified by the head in round 2026-08-30-a.
+## History
 
-This is a **stub report**, filed so `tools/progress.py` stops counting this
-function as fresh ground and staffing a runner onto it. It records a routing
-decision, not an attempt.
+Filed round 2026-08-30-a as BLOCKED on `gp_rel` (`gpNavChallengesComplete`,
+via `%gp_rel`). Round 42 RESOLVED that blocker. Rebuilt fresh this round and
+matched on the first attempt.
 
-## Why it is blocked — gp-relative
+## What it does
 
-2 `%gp_rel` reference(s), the first to `gpNavChallengesComplete`.
-That is the **gp-relative addressing blocker**,
-`docs/research/gp-relative-blocker.md`: the pinned `-G0` pipeline emits the
-two-instruction absolute (`lui`+`lw`) form where retail has the one-instruction
-`$gp`-relative form. The `-G` experiment was run on 2026-08-29 with operator
-authorisation and REJECTED — a clean non-zero-`-G` rebuild damages 19148 bytes,
-and `-G4`/`-G8` damage identically, ruling out the size threshold as the
-mechanism. The pin stays at `-G0`.
+Zeroes the 30-byte navigation-challenges array (backwards, index 29 down to
+0 -- a `bgez`-terminated countdown loop, matching a `for (i = 29; i >= 0;
+i--)` written in that exact direction rather than a forward loop or a
+`memset` call), then publishes the array pointer and a link-penalty counter
+into two global pointers, zeroing the counter first.
 
-## Do not re-derive this
+## Final body
 
-Both blockers are already escalated with reproducers and corpus censuses attached.
-Do not spend attempts here, do not propose a toolchain change, and do not classify
-a residue from this construct as a scheduling or delay-slot choice. Check cheaply
-before attempting any function:
+```c
+void InitNavChallengesArray(s8 (*arrayMem)[30], s32 *linkCounter)
+{
+	s32 i;
 
-```sh
-grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
-grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+	for (i = 29; i >= 0; i--)
+		(*arrayMem)[i] = 0;
+	gpNavChallengesComplete = arrayMem;
+	*linkCounter = 0;
+	gpDinamicLinkPenalty = linkCounter;
+}
 ```
+
+All types (`arrayMem`, `linkCounter`, `gpNavChallengesComplete`,
+`gpDinamicLinkPenalty`) were already declared in `include/DreamSys.h` from
+earlier rounds' call-site analysis; nothing new to declare.
+
+## Verification
+
+`./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
+`tools/funcdiff.py InitNavChallengesArray` -> `11/11 words match`.
+
+## Provenance
+
+round 43, runner ALPHA, unit DreamSys.

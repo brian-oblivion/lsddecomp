@@ -1534,7 +1534,16 @@ struct vtable_DreamSys *Get_vtable_DreamSys(void)
 	return &DREAMSYS_METHODS;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", InitNavChallengesArray);
+void InitNavChallengesArray(s8 (*arrayMem)[30], s32 *linkCounter)
+{
+	s32 i;
+
+	for (i = 29; i >= 0; i--)
+		(*arrayMem)[i] = 0;
+	gpNavChallengesComplete = arrayMem;
+	*linkCounter = 0;
+	gpDinamicLinkPenalty = linkCounter;
+}
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcNavigationScore);
 
