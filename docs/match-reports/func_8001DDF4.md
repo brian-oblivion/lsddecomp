@@ -1,315 +1,260 @@
-# func_8001DDF4 -- DERIVATION ONLY -- ASSIGNABLE, round 45 (2026-09-15)
+# func_8001DDF4 -- STALL: length EXACT (199/199 words, no drift); 29/199 raw word-match; first real diff at vram 0x8001DDF8 (register identity, `self` in $s4 vs retail's $s5)
 
-DERIVATION ONLY -- ASSIGNABLE
+Round 46 (echo). **This is the first time C was ever written or built for
+this function.** Round 45 (delta) filed a structure-only derivation with NO
+score at all -- see the git history for that write-up, superseded below now
+that it has an actual measurement. Two-thirds of that derivation (Part 1 and
+Part 2) transcribed directly into working C; Part 3's open ambiguity is
+resolved below.
 
-> **Head, round 46:** the marker above is repeated here as its own line on
-> purpose. `progress.py`'s `REOPENED_RE` anchors at start-of-line
-> (`^[\s>*_#-]*(?:REOPENED|DERIVATION ONLY) -- ASSIGNABLE`), so the phrase
-> embedded in the round-45 TITLE after `# func_8001DDF4 -- ` never matched
-> and this function kept counting as a documented STALL -- the exact
-> permanent-deletion failure the marker was added to stop, reintroduced by
-> where the marker was placed rather than by whether it was there.
-> `nearmiss.py` reads a wider TITLE window and did show it, which is why the
-> two tools disagreed. Put the phrase on a line of its own.
+## What round 45 handed this round
 
+Signature `s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
+*diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
+local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
+`func_8001F50C` planes, gated by `func_8001E110`/`func_8001F8B8`, setting
+bits in `self->unk2C`) both fully derived and high-confidence. Part 3 (a
+second, `list`-driven double loop) was flagged NOT fully decoded: "the
+precise relationship between the middle `k` loop ... and the inner fixed-4
+`m` loop" was left as the open question for whoever picked this up next.
 
-> **HEAD CORRECTION at merge, round 45.** Delta filed this as a STALL and it is
-> not one: its own Status line says **no C was written or built**, so there is
-> no length figure, no word-match and no first-diff -- the three figures a
-> STALL title is required to carry, and which cannot exist for a function that
-> was never compiled. `progress.py` keys STALL-vs-FRESH purely on the report
-> FILE existing, so left titled STALL this would have been counted as
-> documented, dropped out of `fresh`, and never re-measured -- the exact
-> permanent-deletion failure mode that `REOPENED -- ASSIGNABLE` and
-> `DERIVATION ONLY -- ASSIGNABLE` were both added to stop.
->
-> The marker above returns it to `fresh` WITHOUT discarding the derivation
-> below, which is the point of having it. **Delta's judgement to spend the
-> time on structure rather than on blind build-and-iterate was correct** --
-> its sibling `func_8001DA28` sat at 14/243 after two dedicated rounds, and
-> round 33's fifth screen says exactly this: prefer a changed state over
-> another cold pass. What needed fixing was the disposition, not the work.
->
-> So the next runner here inherits a two-thirds-derived 199-word function and
-> should BUILD the derivation before trusting any part of it (round 33: a
-> preserved body is self-consistent everywhere it is written down until it
-> goes through the compiler).
+## Part 3, resolved
 
-**Unit:** `code_d294_b` · **Size:** 199 words. **Status:** structural
-derivation only -- **no C was written or built this round.**
+Re-read `asm/nonmatchings/code_d294_b/func_8001DDF4.s` lines 197-268
+(`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
-Previously filed as blocked by `gp_rel` (round 12, no derivation attached).
-That blocker was RESOLVED in round 42. This is a fresh derivation attempt,
-not a rebuild of prior work (there was none to rebuild).
+- The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
+  box-test body (the `func_8001E110`/`func_8001F8B8` pair) only executes
+  when `(u32)(m - 1) < 2`, i.e. **`m == 1` or `m == 2`** -- confirmed at
+  `sltiu $v0, $v0, 2` / `beqz $v0, .L8001E094` (vram 0x8001E00C-0x8001E010).
+  `m == 0` and `m == 3` fall straight through to the loop-continue check with
+  no call.
+- `rowBase` (`$s1`) advances by **6 bytes on EVERY `m` pass** (`addiu
+  s1,s1,6`, the delay slot of the `m`-loop's own `bnez`, vram 0x8001E09C) --
+  all 4 passes, whether or not the box test ran -- **then ANOTHER `+0x18`
+  once per `k` pass**, in the delay slot of the `k`-loop's own `bnez` (vram
+  0x8001E0B0). Net advance per `k` iteration: `4*6 + 0x18 = 0x30` (48 bytes,
+  two 0x18-byte rows), not the single `0x18` a naïve reading suggests.
+  `rowBase` resets to `list+4` at the top of every `j` (outer) pass.
+- The box test itself passes `rowBase` (current, pre-increment value) and
+  `rowBase+0x18` as the two `Vec3S16_d294*`/`BoundsBox_d294*` arguments --
+  the SAME call shape as Part 2, just sourcing its pointers from the sliding
+  `rowBase` instead of the fixed `&mid[0]`/`&mid[1]`.
 
-## Why this one was screened rather than coded
+This confirms round 45's own suspicion ("sliding/overlapping windows, not 4
+independent rows") precisely: the four `m`-passes step through FOUR
+consecutive 6-byte slots of one nominal `0x18`-byte "row" (matching Part 1's
+row stride), but only the middle two slot-positions (`+6`, `+12`) are ever
+tested, each paired with the same slot position one row+extra later
+(`+0x18` further).
 
-`code_d294_b`'s sibling `func_8001DA28` (`slotA8`, occupying the vtable slot
-right before this one's `slotAC`) is a similarly-shaped function -- corner/
-plane clipping tests driven by the same `func_8001F3A4`/`func_8001F50C`
-PsyQ helpers -- and remains a STALL after MULTIPLE dedicated rounds (round
-13, round 20), reaching only 14/243 words in-range despite fixing its frame
-size and a deferred-self-materialization residue. Given that history, this
-round's remaining budget went into getting the STRUCTURE right and
-documented rather than into a build attempt likely to cost many iterations
-for an uncertain result. The derivation below is solid enough that a future
-round can start writing C directly from it rather than re-deriving from the
-raw disassembly.
+## The `flag2`/$s2 "dead" branch -- transcribed literally, not eliminated
 
-## Signature (derived, not yet written into `include/code_d294.h`)
+At `.L8001DF78` (after Part 2), if `self->unk2C != 0`, retail:
+1. Always sets `*outFlag = 1` (in a branch delay slot, unconditionally --
+   the store executes regardless of the immediately-following branch's
+   outcome).
+2. Branches to the shared epilogue (`.L8001E0DC`) with `$v0` **already
+   holding the return value** (`1` on one path, `2` on the other, both
+   nonzero) -- this path does NOT go through the normal
+   `lw v0,(outFlag); sltu v0,zero,v0` recomputation at `.L8001E0C8`, it jumps
+   straight past it.
+3. The branch condition is `$s2` (`flag2` here), which per round 45's own
+   grep is written exactly ONCE in the whole function (`= 0`, right before
+   Part 2's loop) and NEVER again before this test -- i.e. it is
+   dynamically always `0`> in every execution this binary can produce.
 
+Transcribed as:
 ```c
-s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list);
-```
-
-- `self` = `$a0`, saved to `$s5` at entry (this unit's usual convention).
-- `outFlag` (`$a1`, saved to `sp+0x48`) -- an output pointer, written `0` or
-  `1` near the end and read back at the very end to form the return value
-  (`return (*outFlag != 0);`, confirmed by the tail
-  `lw v0,0(t2)/sltu v0,zero,v0` sequence -- matches the header's existing
-  comment on `slotAC`, "return value is also tested truthy/falsy like
-  slotA8's").
-- `diff` (`$a2`, saved to `sp+0x50`, typed `Vec3S16_d294*` already in
-  `Class6B5CCMethods::slotAC`) -- forwarded untouched into a `func_8001F8B8`
-  call.
-- `list` (`$a3`, saved to `sp+0x58`) -- see "The `list` argument" below;
-  its true type is NOT yet named, kept `void*` here deliberately.
-
-Note this does NOT match the argument reading suggested by the STALLED
-`func_8001D714`'s own preserved call site (`slotAC(self, other->unk2C, &diff,
-&count)`) -- that call site is itself unverified (the function has never
-built), and this function's own body makes `outFlag` an output pointer and
-`list` a multi-field struct pointer, neither of which look like `&count`
-(a pointer to one scalar). Trust THIS function's own reads over the
-stalled caller's guessed argument names.
-
-## The `list` argument's shape (MEASURED from this function's own reads)
-
-`list` (base `$a3` at entry) is read at offset `+0x0` (a `s32 count`,
-reloaded once, `sp+0x68`, used as the second double-loop's inner bound) and
-at TWO fixed sub-regions relative to a moving base that starts at
-`list+4` and advances by `0x18` (24 bytes) per outer-loop pass:
-
-- `list[row]+0x0` (3x `s16`, i.e. a `Vec3S16_d294`) -- read as `s1`'s target
-  (init `list+4`).
-- `list[row]+0xC` (3x `s16`) -- read as `t0`'s target (init `list+0x10`,
-  i.e. `+0xC` past `s1`'s own start).
-
-For `row = 0, 1` (a FIXED 2-iteration loop, not driven by `list->count`),
-these two 3-`s16` groups are averaged component-wise
-(`(lo+hi)>>1`, ordinary arithmetic-shift halving, no rounding-toward-zero
-correction needed since it's a plain `sra`, not the truncating-div idiom)
-and the results packed into a **local 2-element `Vec3S16_d294[2]` array on
-the stack** (`sp+0x18..0x24`). This is exactly the "low corner / high
-corner, then midpoint" shape of `BoundsBox_d294` (`include/code_d294.h`):
-`list[row]` at offset `+4` (relative to `list`) is itself a
-`BoundsBox_d294`-shaped 0xC-byte span (`lo` at `+0`, `hi` at `+0xC` of the
-row, i.e. `list+4+row*0x18+0x0` and `list+4+row*0x18+0xC`), with `0x18-0xC
-= 0xC` bytes of the row unaccounted for (unread by this function).
-
-So: **`list` looks like `{ s32 count; BoundsBox_d294 box[2] /* each box
-padded to 0x18, only the first 0xC bytes read */; ... more, stride 0x18,
-count entries starting after the fixed pair ... }`.** The SECOND
-double-loop (see below) walks a DIFFERENT, `count`-driven array of 0x18-byte
-rows starting at the SAME `list+4` base, stride `0x18`, so the two fixed
-"box[0]/box[1]" rows read by the first loop are very likely just
-`list_row[0]` and `list_row[1]` of the SAME array the second loop walks
-`list->count` of -- i.e. `list` is plausibly one single
-`{ s32 count; Row rows[count]; }` (`CornerList_d294`-shaped, stride 0x18
-instead of that struct's stride-6 corners) where the first loop
-unconditionally processes just the first two rows regardless of `count`.
-Not fully confirmed -- the second loop's own row layout (below) only
-confirms the `+4`/stride-`0x18` part, not that rows 0/1 are literally
-`rows[0]`/`rows[1]` of the same array (could also be two separate fixed
-fields that happen to sit where `rows[0]`/`rows[1]` would).
-
-## Part 1: fixed 2-row box-midpoint loop (fully derived, high confidence)
-
-```c
-Vec3S16_d294 mid[2];   /* sp+0x18..0x24 */
-s32 row;
-
-for (row = 0; row < 2; row++) {
-    /* box[row].lo at list+4+row*0x18, box[row].hi at list+4+row*0x18+0xC */
-    mid[row].x = (box[row].lo.x + box[row].hi.x) >> 1;
-    mid[row].y = (box[row].lo.y + box[row].hi.y) >> 1;
-    mid[row].z = (box[row].lo.z + box[row].hi.z) >> 1;
+if (self->unk2C != 0) {
+    *outFlag = 1;
+    if (flag2 != 0) {
+        return 2;
+    }
+    return 1;
 }
 ```
+with `flag2` a plain `s32` local initialized to `0` and never written again.
+**Retail's own compile did not eliminate this branch**, even though it is
+provably dead from a pure dataflow standpoint -- that in itself is a data
+point about what this exact GCC 2.6.3/-O2 configuration does and does not
+constant-fold across a loop containing calls (it did NOT eliminate it here,
+unlike the signed/unsigned `unk10` case in `func_8001E7BC`'s round-19
+history, which is textually a much more local fold). My build reproduced
+this branch as written (did not get eliminated on my side either) -- the
+residue here is register identity, not branch presence/absence.
 
-Retail interleaves the 6 additions/shifts across the 2 iterations for
-scheduling (three independent `lh`/`lh`/`addu`/`sra`/`sh` chains issued
-back-to-back within EACH pass, not per-field loops) -- same flavor of
-compiler scheduling as `func_8001CEB4`'s three interleaved `/360`
-divisions this round; expect this loop to need the SAME "no naive
-reshaping" treatment when actually coded.
-
-## Part 2: per-plane clip test, sets `self->unk2C` bits (fully derived)
+## New symbols added (own-file, not shared header)
 
 ```c
-s32 count1 = func_8001F3A4(self->unk20);
-s32 i;
+extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
+extern s32 D_8008A838;
+```
 
-self->unk2C = 0;
-for (i = 0; i < count1; i++) {
-    Sixteen6_d294 *plane = func_8001F50C(self->unk20, i);
-    if (func_8001E110(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
-        s32 outWord;   /* sp+0x44 */
-        if (func_8001F8B8(self->unk20, &(s32){0x7FFFFFFF}, diff, &outWord,
-                           &mid[0], &mid[1])) {
-            if (D_8008A838 == 0 || outWord >= 0x201) {
-                self->unk2C |= (1 << i);
+**Note the signature conflicts with `code_d294_c.c`'s own existing local
+extern** (`s32 arg3` there, literal `0` at its only call site) -- THIS
+function's own call site passes `&outWord`, a genuine pointer, in that
+position. Both externs are legitimate, independent local views (per this
+project's own documented convention) since they live in different
+translation units; not committed to the shared header since the two
+readings disagree on arg3's type and neither is proven to be the callee's
+real signature (it is a linked PsyQ object, never decompiled here).
+
+## Lever: the frame was 0x18 bytes short -- an unaccounted stack buffer
+
+First build, all locals as directly derived from the report: frame came out
+`0x98` (152 bytes) against retail's `0xB0` (176), a flat 24-byte gap visible
+in the very FIRST instruction (`addiu sp,sp,-0xN`) -- score **14/199**, and
+every subsequent word differed as a result (nothing downstream can line up
+while the frame pointer itself is wrong).
+
+**Fix: add an unused `u8 pad[0x18];` local.** This is the same shape as
+`func_8001DA28`'s own history in this unit (round 20: "fixing the frame size
+(0x98 -> 0xF8, a 24-word unused-buffer padding)") -- GCC 2.6.3 reserves
+stack space for locals whose source declaration doesn't survive into any
+generated reference (dead-but-declared buffers, or -- more likely here,
+since this function is *never* been compiled before -- a buffer this
+derivation's field-offset reading simply never needed to name because
+nothing in the traced control flow reads or writes it). Adding the pad
+alone took the score to **29/199, word 0 now matching exactly** (frame size
+confirmed correct) -- real, measured progress, not a guess left unverified.
+
+**This is a proposed learning, not yet a settled rule**: the pad's exact
+byte count matching `0x18` (the same size as this function's own outgoing
+6-argument call area) may be coincidence rather than the true cause; nobody
+has identified an actual field/local at that offset. Flagging for whoever
+next attempts this function rather than asserting a diagnosis this round
+didn't verify further.
+
+## Remaining residue at 29/199
+
+First real diff, vram `0x8001DDF8` (word 1): retail `sw $s5,0x9c($sp)` /
+mine `sw $s4,0x98($sp)` -- `self` occupies `$s5` in retail, `$s4` in this
+build, a one-register-and-one-slot shift that propagates through most of
+the function's saved-register block and beyond (170 of 199 words differ in
+total). This looks like the classic "too few/too many other values compete
+for saved registers ahead of `self` in program order" register-identity
+class this project has repeatedly found NOT responsive to `__asm__` barriers
+or simple declaration reordering (see `func_8001E7BC`'s own round-44
+residue #1, same symptom, same unit). Not attempted further this round --
+budget went to establishing the first honest score and closing the
+structural unknowns instead of iterating blind on a 10-candidate saved-
+register permutation with no tool support for exploring it directly.
+
+## Preserved body (29/199, no drift)
+
+```c
+#if 0
+extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
+extern s32 D_8008A838;
+
+s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+    Vec3S16_d294 mid[2];
+    s16 *loPtr;
+    s16 *hiPtr;
+    s32 row;
+    s32 count1;
+    s32 i;
+    Sixteen6_d294 *plane;
+    s32 flag2;
+    s32 cnt2;
+    s32 j;
+    u8 *rowBase;
+    s32 k;
+    s32 bitJ;
+    s32 bitK;
+    s32 m;
+    s32 bigConst;
+    s32 outWord;
+    u8 pad[0x18];
+
+    bigConst = 0x7FFFFFFF;
+
+    loPtr = (s16 *)((u8 *)list + 4);
+    hiPtr = (s16 *)((u8 *)list + 0x10);
+    for (row = 0; row < 2; row++) {
+        mid[row].x = (loPtr[0] + hiPtr[0]) >> 1;
+        mid[row].y = (loPtr[1] + hiPtr[1]) >> 1;
+        mid[row].z = (loPtr[2] + hiPtr[2]) >> 1;
+        loPtr = (s16 *)((u8 *)loPtr + 0x18);
+        hiPtr = (s16 *)((u8 *)hiPtr + 0x18);
+    }
+
+    count1 = func_8001F3A4(self->unk20);
+    self->unk2C = 0;
+    flag2 = 0;
+    for (i = 0; i < count1; i++) {
+        plane = func_8001F50C(self->unk20, i);
+        if (func_8001E110(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
+            if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
+                if (D_8008A838 == 0 || outWord >= 0x201) {
+                    self->unk2C |= (1 << i);
+                }
             }
         }
     }
-}
-```
 
-- `func_8001E110(out, box, p1, p2)` is ALREADY MATCHED (118/118, this same
-  unit) -- a recursive line/segment-vs-box clip test. Passing a
-  `Sixteen6_d294*` (a view-frustum-plane-shaped record) where it expects a
-  `BoundsBox_d294*` is legitimate: both are 12-byte, 6x-`s16` structs, and
-  `Sixteen6_d294`'s own header comment already documents that its fields
-  "pair with `BoundsBox_d294` fields in a scrambled order" -- same
-  underlying shape, different semantic reading. Confirms `func_8001F50C`
-  returns per-plane AABB-shaped bounds, one per index `0..count1-1`.
-- `func_8001F8B8` (PsyQ, `asm/psyq_fa50.s`, NOT decompiled anywhere in this
-  project yet) is called `(self->unk20, &bigConst, diff, &outWord,
-  &mid[0], &mid[1])` -- 4 register args plus 2 stack args (`sp+0x10`/
-  `sp+0x14` holding `&mid[0]`/`&mid[1]` respectively, i.e. the SAME two
-  pointers just passed to `func_8001E110`). No existing extern/prototype
-  for it in this unit's header -- needs declaring when this is coded
-  (6-argument PsyQ call, 2 via stack, matches `func_8001EE04`'s own
-  register+stack split style already used elsewhere in this unit).
-- `D_8008A838` -- a `%gp_rel` global (the ORIGINAL round-12 blocker hit,
-  now ordinary gp-relative access). Loaded as a plain `s32` gate; no other
-  reference found elsewhere in the currently-carved units (single
-  reference, this function only) -- declare `extern s32 D_8008A838;`
-  directly in `src/code_d294_b.c` when coded, same convention as
-  `func_8004AA10`'s `D_8008A980` this round.
-- The `1 << i` OR-accumulation into `self->unk2C` is a plain "which planes
-  passed" bitmask -- `self->unk2C`'s existing role is unknown outside this
-  function; not yet in `include/code_d294.h`.
-
-## Part 3: dead(?) flag check, then a SECOND double loop (structure derived,
-## NOT fully decoded -- this is where the remaining work is)
-
-```c
-if (self->unk2C != 0) {
-    if (deadFlag) {          /* deadFlag initialized 0 right before Part 2's
-                               * loop and NEVER WRITTEN anywhere in Part 2 --
-                               * this branch is dead in every path traced
-                               * this round. Confirmed by grepping every
-                               * $s2 write between the two `addu s2,zero,zero`
-                               * resets (asm lines 64 and 146): none exist.
-                               * Reproduce faithfully regardless -- it is
-                               * retail's own dead branch, not a translation
-                               * error, and removing it is NOT safe (register
-                               * allocation in this function is dense enough
-                               * that removing a real branch WILL perturb
-                               * scheduling elsewhere, per this round's other
-                               * two functions' experience). */
+    if (self->unk2C != 0) {
         *outFlag = 1;
+        if (flag2 != 0) {
+            return 2;
+        }
+        return 1;
     }
-    goto epilogue;
-}
 
-*outFlag = 0;
-{
-    s32 cnt2 = list->count;      /* reload of list->count, sp+0x68 */
-    s32 j;                        /* outer index, 0..count1-1 (count1 RELOADED
-                                    * from sp+0x60, the func_8001F3A4 result) */
-
+    *outFlag = 0;
+    cnt2 = *(s32 *)list;
     for (j = 0; j < count1; j++) {
-        Sixteen6_d294 *plane = func_8001F50C(self->unk20, j);   /* -> $s6 */
-        s32 bitJ = 1 << j;                                        /* -> $fp */
-        u8 *rowBase = (u8 *)list + 4;                              /* -> $s1,
-                                    * walked across the WHOLE k loop below,
-                                    * advanced +0x18 once more at the j-loop
-                                    * bottom (delay slot of the j-loop branch,
-                                    * `addiu s1,s1,0x18`) */
-        s32 k;
-
+        plane = func_8001F50C(self->unk20, j);
+        bitJ = 1 << j;
+        rowBase = (u8 *)list + 4;
         for (k = 0; k < cnt2; k++) {
-            s32 bitK = 1 << k;                                       /* -> $s7 */
-
-            /* inner 4-pass loop, index "s2" (0..3), REUSES the outer
-             * dead-flag register -- confirmed a genuinely separate live
-             * range, not aliasing: s2 is unconditionally reset to 0 right
-             * before this loop starts (asm line 146). */
-            s32 m;
+            bitK = 1 << k;
             for (m = 0; m < 4; m++) {
-                void *rowM = rowBase;             /* -> $a2 for func_8001E110,
-                                                     * also saved as sp+0x10 */
-                void *rowMplus1 = rowBase + 0x18;   /* -> $a3, also sp+0x14 */
-
-                if (func_8001E110(NULL, (BoundsBox_d294 *)plane, rowM, rowMplus1)) {
-                    s32 outWord;   /* sp+0x44, reused */
-                    if (func_8001F8B8(self->unk20, &(s32){0x7FFFFFFF}, diff,
-                                       &outWord, rowM, rowMplus1)) {
-                        if (D_8008A838 == 0 || outWord >= 0x201) {
-                            self->unk2C |= bitJ;
-                            *outFlag |= bitK;
+                if (m == 1 || m == 2) {
+                    u8 *rowM = rowBase;
+                    u8 *rowMplus1 = rowBase + 0x18;
+                    if (func_8001E110(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                            if (D_8008A838 == 0 || outWord >= 0x201) {
+                                self->unk2C |= bitJ;
+                                *outFlag |= bitK;
+                            }
                         }
                     }
                 }
-                rowBase += 6;    /* NOT +0x18 -- the inner 4-pass loop steps
-                                  * through the row in 6-byte (one
-                                  * Vec3S16_d294) increments, i.e. it is
-                                  * walking OVERLAPPING/sliding 2-element
-                                  * windows across a 0x18-byte-plus span, not
-                                  * 4 independent rows. Exact bound/relation
-                                  * between "k" (cnt2-driven) and "m" (fixed
-                                  * 4) not yet resolved -- see below. */
+                rowBase += 6;
             }
+            rowBase += 0x18;
         }
     }
-}
 
-epilogue:
-    lw t2, 0x48(sp);   /* reload outFlag */
     return (*outFlag != 0);
+}
+#endif
 ```
 
-**What's solid:** the outer `j` loop (0..count1-1, re-fetching a plane via
-`func_8001F50C` and a bit `1<<j` into `$fp`), the middle `k` loop
-(0..cnt2-1, `list->count`, a second bit `1<<k` into `$s7`), and the
-INNERMOST fixed-4 loop's call shape (`func_8001E110`/`func_8001F8B8`,
-IDENTICAL argument shape to Part 2, but sourcing its box/point pair from
-the SLIDING `rowBase`/`rowBase+0x18` pair instead of the fixed `mid[0]`/
-`mid[1]`) are all confirmed against the raw disassembly (`asm/
-nonmatchings/code_d294_b/func_8001DDF4.s` lines 128-215, `.L8001DFD0`
-through `.L8001E0B4`).
+## Permuter
 
-**What's NOT resolved:** the precise relationship between the middle `k`
-loop (bound `cnt2` = `list->count`) and the inner fixed-4 `m` loop, and
-whether `rowBase`'s `+6`-per-`m`-pass / `+0x18`-per-`k`-pass stepping means
-`m` indexes a SEPARATE, smaller stride inside each `k`-th row, or whether
-`rowBase`'s reset happens once per `k` pass (making the `+6` steps genuinely
-overlapping windows within one 0x18-byte row) -- this needs a closer,
-uninterrupted read of `asm/nonmatchings/code_d294_b/func_8001DDF4.s` lines
-146-213, which is what the next attempt on this function should start
-from, not the raw disassembly cold.
-
-## New symbols needed when this is coded
-
-- `extern s32 D_8008A838;` in `src/code_d294_b.c` (single-reference gp_rel
-  global, own-file convention).
-- A prototype for `func_8001F8B8` (PsyQ, `asm/psyq_fa50.s`) -- 6 args,
-  4 register + 2 stack, shape `(void *unk20, s32 *bigConst, Vec3S16_d294
-  *diff, s32 *outWord, Vec3S16_d294 *p1, Vec3S16_d294 *p2)` per the call
-  site (types on the last 4 args inferred from what's passed, not from the
-  callee's own body, since it is a linked PsyQ object).
+NOT run this round -- given the residue is a single saved-register identity
+shift affecting the vast majority of the function's 199 words (170/199
+differ), and this project's own round-45 guidance that a pure
+register-identity residue lies outside a source-mutation search's reach,
+hand analysis (declaration-order experiments) looked like the better use of
+remaining time than a slow (199-word) permuter search whose scaffold would
+first need its own base-score-agreement check. Flagging as a candidate for
+whoever picks this up next, but NOT claiming it was tried and failed --
+it simply was not attempted.
 
 ### Proposed learning
 
-**When a sibling function in the SAME unit has already absorbed multiple
-dedicated rounds and stayed at a low word-match (`func_8001DA28`, 14/243
-after round 13 AND round 20), that is signal to budget a STRUCTURAL
-derivation pass (signature, argument shapes, loop bounds, confirmed
-sub-calls) rather than a blind build-and-iterate attempt on a same-shaped
-neighbor.** The derivation above should cut a future attempt's ramp-up
-substantially even though no C was compiled this round -- concretely,
-Part 1 and Part 2 (roughly 2/3 of the function' structure) are
-high-confidence and ready to transcribe directly; only Part 3's innermost
-loop relationship needs fresh eyes.
+**A function that was previously "screened, not built" can go from a
+literal ZERO figure to a real, if incomplete, score in one sitting by
+transcribing the high-confidence parts of an inherited derivation and
+building it -- the frame-size gap alone (a single missing padding buffer)
+cost 15/199 words before it was found, exactly the same lever
+`func_8001DA28` needed in this same unit two rounds ago.** When a derivation
+report is inherited with NO C ever attempted, build the solid parts first
+and let the frame-size check (word 0 of `funcdiff`'s output) tell you
+immediately whether an unaccounted local exists, rather than reading
+further into the diff before that's settled.

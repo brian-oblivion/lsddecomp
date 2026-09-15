@@ -384,6 +384,105 @@ s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
 
+/* STALL -- see docs/match-reports/func_8001DDF4.md. Round 46 (echo):
+ * FIRST-EVER build/score for this function -- inherited round 45's
+ * structure-only derivation with no C ever attempted. Length EXACT
+ * (199/199 words in-range, no drift), 29/199 raw word-match, first real
+ * diff at vram 0x8001DDF8 (register identity: `self` lands in $s4 here,
+ * $s5 in retail). Two levers found this round: an unaccounted 0x18-byte
+ * stack buffer (same "unused padding" shape as func_8001DA28's own
+ * history -- fixed the frame size, which was originally 0x18 short) and
+ * a resolution of round 45's open Part-3 ambiguity (see the report).
+ * Restored to INCLUDE_ASM per project rule. */
+#if 0
+extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
+extern s32 D_8008A838;
+
+s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+    Vec3S16_d294 mid[2];
+    s16 *loPtr;
+    s16 *hiPtr;
+    s32 row;
+    s32 count1;
+    s32 i;
+    Sixteen6_d294 *plane;
+    s32 flag2;
+    s32 cnt2;
+    s32 j;
+    u8 *rowBase;
+    s32 k;
+    s32 bitJ;
+    s32 bitK;
+    s32 m;
+    s32 bigConst;
+    s32 outWord;
+    u8 pad[0x18];
+
+    bigConst = 0x7FFFFFFF;
+
+    loPtr = (s16 *)((u8 *)list + 4);
+    hiPtr = (s16 *)((u8 *)list + 0x10);
+    for (row = 0; row < 2; row++) {
+        mid[row].x = (loPtr[0] + hiPtr[0]) >> 1;
+        mid[row].y = (loPtr[1] + hiPtr[1]) >> 1;
+        mid[row].z = (loPtr[2] + hiPtr[2]) >> 1;
+        loPtr = (s16 *)((u8 *)loPtr + 0x18);
+        hiPtr = (s16 *)((u8 *)hiPtr + 0x18);
+    }
+
+    count1 = func_8001F3A4(self->unk20);
+    self->unk2C = 0;
+    flag2 = 0;
+    for (i = 0; i < count1; i++) {
+        plane = func_8001F50C(self->unk20, i);
+        if (func_8001E110(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
+            if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
+                if (D_8008A838 == 0 || outWord >= 0x201) {
+                    self->unk2C |= (1 << i);
+                }
+            }
+        }
+    }
+
+    if (self->unk2C != 0) {
+        *outFlag = 1;
+        if (flag2 != 0) {
+            return 2;
+        }
+        return 1;
+    }
+
+    *outFlag = 0;
+    cnt2 = *(s32 *)list;
+    for (j = 0; j < count1; j++) {
+        plane = func_8001F50C(self->unk20, j);
+        bitJ = 1 << j;
+        rowBase = (u8 *)list + 4;
+        for (k = 0; k < cnt2; k++) {
+            bitK = 1 << k;
+            for (m = 0; m < 4; m++) {
+                if (m == 1 || m == 2) {
+                    u8 *rowM = rowBase;
+                    u8 *rowMplus1 = rowBase + 0x18;
+                    if (func_8001E110(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                            if (D_8008A838 == 0 || outWord >= 0x201) {
+                                self->unk2C |= bitJ;
+                                *outFlag |= bitK;
+                            }
+                        }
+                    }
+                }
+                rowBase += 6;
+            }
+            rowBase += 0x18;
+        }
+    }
+
+    return (*outFlag != 0);
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
 
 /* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
