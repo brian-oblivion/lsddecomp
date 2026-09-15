@@ -157,7 +157,17 @@ s32 func_800284C4(char *arg0)
     return i;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_r", func_80028540);
+void *func_80028540(s32 index)
+{
+    void *result;
+    char *base;
+
+    base = D_8008A868;
+    func_800280D0();
+    result = base + index * 0x1C;
+    func_800280E0();
+    return result;
+}
 
 /* forward decls -- both defined later in this unit; ROM order keeps the
  * definitions below. */
