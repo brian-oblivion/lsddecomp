@@ -100,7 +100,35 @@ void func_80054B50(void) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B84);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054C74);
+/* Local view: array elements at D_8008E0C8 are objects with a method table
+ * pointer at offset 0, dispatched here through slot +0xEC as
+ * slotEC(self, arg1) -- mirrors the ObjAB54 pattern above. */
+typedef struct ObjE0C8 ObjE0C8;
+typedef struct ObjE0C8Methods ObjE0C8Methods;
+struct ObjE0C8Methods {
+    u8 padEC[0xEC];
+    void (*slotEC)(ObjE0C8 *self, void *arg1); /* +0x0EC */
+};
+struct ObjE0C8 {
+    ObjE0C8Methods *methods; /* +0x000 */
+};
+
+extern s32 D_8008AC80;
+extern s32 D_8008AC88;
+extern void *D_8008E0C8[];
+
+void func_80054C74(void *arg0) {
+    s32 i;
+    ObjE0C8 *obj;
+
+    if (D_8008AC80 < 0) {
+        return;
+    }
+    for (i = 0; i < D_8008AC88; i++) {
+        obj = (ObjE0C8 *) D_8008E0C8[i];
+        obj->methods->slotEC(obj, arg0);
+    }
+}
 
 extern s32 D_8008AC80;
 extern s32 D_8008AC88;
