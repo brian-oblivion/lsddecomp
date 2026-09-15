@@ -4435,6 +4435,28 @@ finding, seen in two runners independently.**
   points straight at. **Before filing a stall, list the axes you varied, not
   the number of attempts.** If one axis has all the entries, that is the tell.
 - **A `volatile` cast is a codegen lever, not a statement about the program.**
+
+  > **ROUND 44: THIS BULLET'S WORKED EXAMPLE IS SONY'S CODE.** `func_8002C048`
+  > is `strcmp` (`lib/libc2/strcmp.o`), reclassified round 34. Retail's bytes
+  > there came out of Sony's ASPSX build, not our pinned GCC 2.6.3 + maspsx, so
+  > the specific mechanism claimed below -- that the lever "worked" and that the
+  > defensive `andi` re-mask is its symptom -- is an INSTANCE-LEVEL verdict
+  > derived from a comparison that was never our compiler against our compiler.
+  > It is WITHDRAWN as evidence. Two halves survive untouched, and they are the
+  > halves worth having: the PRINCIPLE *"prefer removing the thing being CSE'd
+  > rather than reaching for `volatile`"*, which is a source-hygiene argument
+  > that does not depend on any instance; and the round-23 carve-out below,
+  > whose functions (`func_80032BF0`, `func_80032C28`) are genuine game code.
+  >
+  > **And note the direction, because round 44 found the opposite residue.**
+  > This bullet is about our compiler CSE-ing away a reload retail KEEPS. Echo's
+  > `func_8003E968` is the mirror: retail recomputes a `lui`/`addiu` address
+  > pair TWICE, independently, back to back, and our GCC CSEs it to once --
+  > coming out 2 words SHORT. `volatile` is not the tool for that direction and
+  > neither is removing a cache; what is needed is to stop the two reads being
+  > recognisable as the same object. That is an OPEN question on game code, and
+  > it is the first instance of this class with a game-code stall attached.
+
   It "worked" on `func_8002C048` (fixing a CSE'd-away reload) and paid for it
   with a defensive `andi` re-mask, because a volatile-qualified load's value
   is not trusted already-zero-extended for the following comparison, whereas
