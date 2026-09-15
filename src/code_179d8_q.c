@@ -137,7 +137,54 @@ void func_800280E0(void)
     D_8008A88C = 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800280EC);
+extern s32 func_80018458(void); /* code_8220_b */
+extern s32 D_8008A8A4;
+extern s32 D_8008A898;
+extern void func_8002858C(void); /* code_179d8_r */
+extern void func_800286E4(void); /* code_179d8_r */
+extern s32 D_8008A890;
+extern void VSyncCallback(void (*cb)(void));
+
+/* This unit's own slot at +0x068 of D_8006D4E8's table (see func_80027E68's
+ * class-map comment above); only the one slot this call site dispatches is
+ * typed here, following the pad-to-offset convention include/code_171e0.h
+ * uses for D_8006D430's own table. */
+typedef struct D_8006D4E8Methods D_8006D4E8Methods;
+struct D_8006D4E8Methods {
+    u8 pad00[0x68];
+    void (*slot68)(void);
+};
+
+s32 func_800280EC(void)
+{
+    if (D_8008A88C != 0) {
+        return 0;
+    }
+
+    if (func_80018458() != 0) {
+        return 0;
+    }
+
+    if (D_8008A8A4 != 0) {
+        VSyncCallback(0);
+    }
+
+    if (D_8008A898 == 1) {
+        func_8002858C();
+    } else if (D_8008A898 == 2) {
+        func_800286E4();
+    }
+
+    if (D_8008A890 != 0) {
+        ((D_8006D4E8Methods *)func_80027E68())->slot68();
+    }
+
+    if (D_8008A8A4 != 0) {
+        VSyncCallback((void (*)(void))func_800280EC);
+    }
+
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800281B0);
 
