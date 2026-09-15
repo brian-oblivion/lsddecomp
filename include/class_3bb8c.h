@@ -1077,6 +1077,14 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
     void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, func_8004D704 */
     u8 pad008[0x070 - 0x008];
     void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, func_8004E054 */
+    /* +0x074, func_8004E1C4's own 2nd call: `(self, D_8008AA10, D_8008AA18,
+     * self->unkBC, self->unkC0)` -- the two middle arguments are the
+     * VALUES of two `.sdata` globals loaded via `%gp_rel` (not their
+     * addresses), each holding a pointer into the still-uncarved rodata
+     * block at `D_80011434` (verified in `asm/data/1C34.rodata.s`: no
+     * dlabel exists at either byte offset, so they cannot be referenced by
+     * name and are forwarded as opaque `void *`). */
+    void (*slot74)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, void *arg2, s32 arg3, s32 arg4); /* +0x074 */
 };
 
 struct Class86B60UnkACObj_3bb8c_d {
@@ -1140,7 +1148,8 @@ struct Class86B60Methods {
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
     u8 pad0F4[0x124 - 0x0F4];
     void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, func_8004D90C (arg1=0)/func_8004E230 (arg1=0x16) */
-    u8 pad128[0x12C - 0x128];
+    /* +0x128, func_8004E1C4's own first call, `self` only. Return unused. */
+    void (*slot128)(Class86B60 *self);
     void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
     void (*slot130)(Class86B60 *self); /* +0x130, func_8004D9D4's `unk58==2` tail target */
     void (*slot134)(Class86B60 *self); /* +0x134, func_8004D9D4's `unk58==3` tail target */
@@ -1364,6 +1373,16 @@ extern s32 D_80086DAC;
  * `Class86B60UnkB0ObjMethods_3bb8c_d::slot4C`). Placeholder s32 type
  * since only the address is taken here. */
 extern s32 D_8008A9B4;
+
+/* VALUE-of, not address-of, in this unit -- func_8004E1C4 reaches these
+ * through `%gp_rel` loads of the .sdata globals themselves, forwarding
+ * whatever they hold. Each holds a pointer into the still-uncarved rodata
+ * block at `D_80011434` (`asm/data/1C34.rodata.s`: 0x80011464 and
+ * 0x8001149C respectively, neither with its own dlabel), so they cannot
+ * be spelled by the address they point to and are typed opaque `void *`
+ * instead. */
+extern void *D_8008AA10;
+extern void *D_8008AA18;
 
 /* Still raw asm in this unit (gp-relative-blocked, see
  * docs/match-reports/func_8004D6AC.md) -- not this round's function, but
