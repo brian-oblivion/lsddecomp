@@ -3,13 +3,20 @@
  * remainder, 0x44F14..0x46288.  23 functions, 1245 words.
  * Carved round 45 (2026-09-15) by the head.
  *
- * STAFFED IN ROUND 46.  This unit was carved in round 45 to BANK ground and
- * carried the exact phrase `DELIBERATELY UNWORKED`, which is what
- * `tools/progress.py` keys on to count its functions in the `banked` column
- * instead of `fresh`.  The round-46 head removed it when staffing a runner
- * here, as that header instructed.  If this unit is ever un-staffed with
- * functions left over, the phrase goes back -- `banked` and `fresh` are
+ * STAFFED IN ROUND 46.  Carved round 45 to BANK ground, carrying the banked
+ * marker `progress.py` keys on; the round-46 head removed it when staffing a
+ * runner here, as that header instructed.  If this unit is ever un-staffed
+ * with functions left over, put the marker back -- `banked` and `fresh` are
  * different claims and only the marker distinguishes them.
+ *
+ * DO NOT WRITE THAT MARKER PHRASE OUT IN FULL ANYWHERE IN THIS FILE, even to
+ * quote it or to say it was removed.  `progress.py` tests
+ * `"<phrase>" in text` over the whole unit source -- a bare substring, with
+ * no line anchor and no notion of quoting -- so a sentence ABOUT the marker
+ * re-banks the unit exactly as the marker itself would.  The round-46 head
+ * did this on its first edit and the `banked` column did not move; the
+ * phrase is spelled out in `tools/progress.py` and in docs/PARALLEL-RUNS.md,
+ * which is where to go read it.
  *
  * WHY IT WAS UNCARVED UNTIL NOW, and why that reason is dead.  The splat
  * yaml called this segment "the gp_rel-densest ground in the executable",
