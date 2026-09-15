@@ -7006,3 +7006,117 @@ immediately after a clean manual build scored well, suspect the generated
 Delta correctly did NOT patch the shared tool: a flag change is an operator
 escalation (CLAUDE.md, "Escalate, do not experiment"), even when the change
 would merely bring a helper back into agreement with the Makefile.
+
+## Round 44 (2026-09-15) — five runners, 16 matches, and the reopened vein measured against the near-miss corpus
+
+**The round's structural result, stated once: the round-42 blocker resolutions
+reopened COLD ground and did NOT unstick WORKED ground. Those are two different
+queues and they should be staffed differently.** Both halves were measured this
+round rather than argued:
+
+- Every one of the round's 16 matches came from the REOPENED set, and almost all
+  landed on the FIRST build.
+- alpha rebuilt all seven `code_8220_c` near-misses in isolation and every score
+  was **identical to the historical record** — no drift, no movement. Its residue
+  is register-identity plus a computed-but-unused address, which has nothing to
+  do with `gp_rel`/`nop_mflo_mfhi` and gained nothing from their resolution.
+
+So a reopened stub is worth staffing ahead of a near-miss with a better-looking
+number, and a near-miss that predates the fixes should not be expected to move
+just because the blockers died.
+
+### Length-gap levers: a matched pair covering both directions
+
+Found by bravo on two functions in one unit, and they are opposites — do not mix
+them up. Both present as "one word off with an otherwise clean CFG".
+
+| symptom | cause | fix |
+| --- | --- | --- |
+| **1 word SHORT**, only diff a missing `move` before the epilogue | register allocation reacting to EARLY-RETURN PHRASING | collapse two return points into a single join point |
+| **1 word LONG**, an extra `move $an,$vN` landing BEFORE a load instead of filling its delay slot, with a stray `nop` later | register PROMOTION from giving a call's return value its own named local | store the result straight to its eventual home and re-derive by cast at each use, so local CSE reuses the raw `$v0` |
+
+**The corollary is what pays, and it is a ranking rule: a one-word LENGTH gap
+SHIFTS everything after it, so a low raw word-match on a 1-word-short function is
+mostly RIPPLE, not independent residue.** charlie's `func_800569A8` went
+**23/121 → 117/121** purely by closing the length. Do not rank 1-word-short
+functions by raw word-match; it measures the gap, not the work.
+
+### Read the delay slot before modelling the branch (alpha, correctness)
+
+A store that appears textually INSIDE a `beqz` block may be that branch's own
+delay-slot filler and therefore execute UNCONDITIONALLY; only instructions
+genuinely after the delay slot are gated. Modelling it as conditional C produces
+wrong code that COMPILES CLEANLY, so nothing catches it but the byte count.
+Hoisting one such store out of an `if` closed alpha's last 8 words in a single
+attempt.
+
+### Write the division; do not hand-derive the magic multiply (delta)
+
+**Verified through the PINNED PIPELINE**, which is why this survives regardless of
+whose code the instance was: plain `u32 x / 127` and `x / 63` compile EXACTLY to
+retail's magic-multiply + correction sequences. There is no need to reconstruct
+the `(hi + (x - hi) >> 1) >> N` form by hand — write the division.
+
+### Other confirmed shapes
+
+- **A short zero-fill of 2+ ADJACENT `.sbss`/`.sdata` words is a pointer-decrement
+  `do`/`while` loop**, not per-symbol scalar stores (those emit `gp_rel` stores
+  with the wrong shape AND length). `m2ctx.py --run` recovers the loop directly.
+  Disproportionately relevant while the queue is `gp_rel` functions, which touch
+  small data by construction. (bravo)
+- **A conditional expression retail evaluates TWICE inside one statement must be
+  WRITTEN twice**; caching it in a variable makes GCC compute it once and the
+  function comes up short. (echo)
+- **Indexing a ternary with a nonzero constant DISTRIBUTES the index into both
+  branches**, corrupting the NULL/zero fallback arm. (echo)
+- **`(x & 1) ^ 1` and `!(x & 1)` are semantically identical and schedule
+  oppositely**; only the explicit mask-then-flip matches retail's `andi`/`xori`
+  order. (bravo)
+- **`tools/classtable.py` names the occupant of a slot your unit does not own** —
+  enough to type a return/arg shape without guessing, when a struct pad covers an
+  offset a new call reaches through. (bravo)
+- **"Two pointers in the asm" does NOT imply "two pointers in C".** A single
+  struct pointer often already matches; forcing two cost delta 7 words. (delta)
+
+### Negatives worth their own entries
+
+- **A memory barrier does not affect pure ADDRESS CSE.** (echo, `func_8003E968`)
+- **`volatile` as an anti-optimization lever is NON-MONOTONIC.** delta's correct
+  4-variable set beat every 2-of-4 subset, and two MORE variables regressed
+  sharply. Do not add it incrementally and assume improvement.
+- **The narrow-cast/loop-strength-reduction idiom does not transfer on shape
+  alone** — it regressed `func_8002D8E0` 295 → 320. Discriminator: check whether
+  the narrowing serves the MULTIPLY or only the COMPARISON. (delta)
+- **Array vs pointer-arithmetic vs explicit-shift spellings of `&table[idx]` are
+  byte-identical**, confirmed across two rounds. Not a lever. (charlie)
+
+### A lever's polarity verdict is scoped to the state it was tested in (charlie)
+
+The same if/else arm-order swap that REGRESSED a function in an earlier round was
+the single biggest fix here, once two other levers had landed first. An
+"X made it worse" note is a finding about a STATE, not a fact about a branch.
+This is the round-33 principle arriving on a new axis, and it argues for
+re-testing a ruled-out axis after any unrelated fix moves the residue.
+
+### NEW STALL CLASS: retail recomputes an address our GCC CSEs away
+
+`func_8003E968` (echo, 39/41, 2 words SHORT). Every field, global and constant is
+correct. Retail computes the SAME `lui`/`addiu %hi/%lo` pair TWICE, independently
+and back to back; our GCC 2.6.3 CSEs it to once. Tried and inert or worse: memory
+barrier, `volatile`, per-field copies, a permuter-suggested chained assignment.
+
+**Note the DIRECTION, because the `volatile` bullet above covers only the other
+one.** That bullet is about our compiler CSE-ing away a reload retail KEEPS; this
+is the mirror. Its worked example (`func_8002C048`) was withdrawn this round as
+Sony's `strcmp`, so **`func_8003E968` is the first GAME-CODE instance of this
+class in either direction**, and the open question is what source shape stops two
+reads being recognisable as the same object.
+
+### A preserved body can carry a wrong READING, not merely a stale figure (charlie)
+
+Round 26 recorded `self->unk24` as an entry guard "bounded `< 0x1F5`". Retail's
+`sltiu` + `bnez`-to-EXIT means the block runs only when `unk24 >= 0x1F5` — the
+other side of the threshold. Flipping it closed a word outright with no other
+effect. This extends round 33's "build the inherited body before trusting its
+score": **building also re-tests the READING.** A polarity error is invisible in
+prose because the prose is self-consistent, and it survives indefinitely.

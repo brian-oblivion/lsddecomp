@@ -6,6 +6,138 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-15 — round 44: five runners, 16 matches, five units emptied — and three never-attempted functions that the queue said not to touch
+
+**State at end: 1062 matched / 1253 game functions (84.76%)**, up **16** from
+round 43's 1046. Game bytes 64.63% → **65.62%**. Queue 141 → **125** live
+`INCLUDE_ASM`; `fresh` 37 → **24**; stalled 104 → 101. Uncarved unchanged at 66.
+Build green after all five merges and after a clean `make extract` (zero
+committed bytes changed); tree clean, all five worktrees and branches removed.
+
+**ZERO merge conflicts, second round running.** Header sets were priced with
+`headercontention.py` BEFORE provisioning and came back `NO CONTENTION`; every
+runner stayed strictly inside its own units and no protected file was touched by
+anyone.
+
+### Gates
+
+Gate 0 green. **Gate 1b returned four functions the sweeps had missed** — see
+below. **Gate 2: carve REJECTED on measurement** (41 fresh met five runners'
+capacity; carving would have bought ground nobody could staff) — but it is live
+and is this round's recommendation. **Gate 3: rejected**, the queue was fresh.
+
+### The head's Gate 1b work, and what it was worth
+
+**Four reports still blamed `nop_mflo_mfhi` as their SOLE cause and nobody had
+marked them, so they were invisible to `fresh`.** All four re-screened against
+the ASM with the canonical FORWARD grep before reopening: every one genuinely
+hits the construct, so their MECHANISM was right and only the PREMISE that it is
+unfixable expired. `fresh` 37 → 41. What they returned:
+
+| function | was | round 44 result |
+| --- | --- | --- |
+| `func_8005D864` (56w) | BLOCKED, never attempted since 2026-08-30 | **MATCHED 56/56** |
+| `func_8002D8E0` (311w) | BLOCKED, never attempted | **0 → 309/311** |
+| `func_8002CD08` (132w) | BLOCKED, never attempted | **0 → 110/132** |
+| `func_8002D1B4` (316w) | BLOCKED, never attempted | not reached (budget) |
+
+`func_8005D864` is the round-24 lesson demonstrated end to end. Its report was
+**better** argued than most, and said explicitly *"This function is NOT
+`REOPENED -- ASSIGNABLE`, and it must not be marked so"* — which was TRUE when
+written in round 23, guarding against an `addiu_at` sweep reopening it while
+`nop_mflo_mfhi` was still live. Round 42 resolved the second blocker and the
+directive became false **without a word of it changing**. A blocker's death
+invalidates the strongest reports as thoroughly as the weakest.
+
+**Screen 7 was run over the SHARED DOCS, not just reports, and it cost three doc
+claims.** `DECOMPILATION_LEARNINGS.md`'s most-read lever table ("Round 27's
+HEADLINE: three levers") had **two of three levers whose sole positive instance
+is Sony's code**: `func_80050B28` (libcard, already marked `NOT GAME CODE`, and
+0-for-4 on game code) and `func_80050AA4` (converted to an SDK object in round
+33, its one game-code test catastrophic at 188/240 → 6/240). The third row
+(`func_800513D0`, inline-every-call-site) is genuine game C and STANDS. Separately,
+the `volatile`-as-CSE-lever bullet rests on `func_8002C048` = Sony's `strcmp`.
+Round 43's rule applied: a claim of the form *"retail does X and our compiler does
+Y"* is voided twice over by an SDK instance, because those bytes came out of
+ASPSX and the comparison was never our compiler against our compiler. Principles
+and reproducer-verified claims kept; instance-level verdicts withdrawn.
+
+### Runners
+
+| runner | units | result |
+| --- | --- | --- |
+| alpha | `code_8220_c` | 2 MATCHED (6/6, 27/27); 7 near-misses reconfirmed at UNCHANGED scores |
+| bravo | `class_3bb8c_m/_r/_o`, `Entity` | **6 of 6 MATCHED, zero stalls**; four units emptied; 5 reusable levers |
+| charlie | `class_3bb8c_s`, `class_16334` | 5 MATCHED; `class_16334` fully decompiled; `func_800569A8` 23/121 → **117/121 exact length** |
+| delta | `code_179d8_l` | 0 matched; **0 → 309/311** and **0 → 110/132** on never-attempted functions; 5 stalls re-verified |
+| echo | `code_d294_c`, `code_2cc8c_d` | 3 MATCHED; `func_8001E7BC` 29/180-with-drift → **136/180 exact length** |
+
+Units now at zero `INCLUDE_ASM`: `class_16334`, `class_3bb8c_m`, `class_3bb8c_r`,
+`class_3bb8c_o`, `Entity`.
+
+### THE BROADCAST CHANNEL PAID, AND IT IS MEASURABLE
+
+Round 43 introduced `tools/broadcast.sh` after losing two levers for want of it.
+Round 44 is the measurement: bravo found the 1-word-SHORT lever on
+`func_80054558`; the head relayed it **and cross-referenced it against the live
+queue**, naming `func_800569A8` as charlie's best candidate; charlie applied it
+and moved that function 23/121 → 117/121. The lever crossed between two runners,
+mid-round, through a file.
+
+**The cross-referencing is the part that mattered, not the forwarding.** Naming
+the specific live function is what made it actionable; a bare relay would not
+have. 29 posts, 5 from the head.
+
+### Head errors, both self-caught
+
+- **A REOPENED marker that left the title lying.** The head inserted the box at
+  line 2 of four reports and did not rewrite line 1. `progress.py` was satisfied
+  (it scans the whole file), but `nearmiss.py` prints the TITLE, and Gate 1b says
+  to rank from title lines **and from nothing else** — so the count was fixed
+  while the line the next round ranks from still asserted a dead blocker. The
+  exact stale-title failure this project documents, introduced by the commit
+  correcting stale titles. Runners rebuilt three titles; the head rebuilt the
+  fourth. **RULE: marking a report REOPENED means REWRITING ITS TITLE, not
+  prepending a box.**
+- **A liveness column that measured nothing.** A `find -newermt '-4 minutes'`
+  check returned 0 for every worktree including files written 15 seconds earlier.
+  Caught only because it contradicted the adjacent timestamp column. Reporting
+  "all five runners quiet" off it would have been self-consistent and wrong.
+
+### Anomalies
+
+- delta self-reported running **two concurrent permuter searches for ~12 minutes**
+  before catching the one-at-a-time rule. Its negatives are recorded "under load"
+  accordingly. Self-reporting is the only reason it is auditable.
+- delta preserved its two big bodies in ```` ```c ```` fences rather than the
+  mandated `#if 0 ... #endif`. Nothing lost, but they are less directly
+  spliceable; `stalesyms.py` already flags 10 live reports in this weaker form.
+- charlie hit a whole-image SHA1 failure with a clean compile, caused by a
+  one-line `LinkNode *sn = self;` readability alias that added a callee-saved
+  register, grew the function 12 bytes and shifted the link — surfacing as a
+  rodata change in `DreamSys.c.o`, a unit it never touched. Found with `cmp -l`
+  plus the map in under a minute. **This widens the documented struct-edit hazard:
+  the trigger need not be a struct edit at all — anything that changes a
+  function's saved-register footprint changes its byte length.**
+- The head flagged delta's shared-struct edit as changing alignment 1 → 2 (`u8`-only
+  → contains `u16`) in a unit holding already-matched C. Verified after merge:
+  `func_8002E038` still 64/64. Concern legitimate, answer negative.
+
+### Next round
+
+**Runners again, but CARVE FIRST — Gate 2 is live and the fresh queue is nearly
+spent.** `fresh` is 24 and the reopened vein that carried rounds 43 and 44 is
+almost exhausted. Measured this round: **66 uncarved functions in 4 segments, 66
+of 66 blocker-clean**, and BOTH large segments have a 20/20-clean front window
+(`code_179d8` 840w, `class_3bb8c_n` 1112w). They sit in DIFFERENT blocks, so
+carving one slice from each buys another conflict-free round rather than a
+contended one.
+
+Do NOT staff the near-miss corpus expecting the round-42 fixes to help — alpha
+measured that they do not.
+
+---
+
 ## 2026-09-15 — round 43: five runners, 47 matches, ZERO merge conflicts — the largest round in the project's history, and it was mostly paperwork that was blocking it
 
 **State at end: 1046 matched / 1253 game functions (83.48%)**, up **47** from
