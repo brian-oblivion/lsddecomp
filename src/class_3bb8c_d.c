@@ -89,7 +89,49 @@ void func_8004DABC(Class86B60 *self)
     self->unkA4->methods->slot19C(self->unkA4, &buf);
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DB18);
+/* func_8004DB18's own `arg1`: only its own +0x004 field is read, forwarded
+ * opaquely as func_800408CC's `ctx` argument. */
+typedef struct Arg1DB18_3bb8c_d Arg1DB18_3bb8c_d;
+struct Arg1DB18_3bb8c_d {
+    u8 pad0[0x004];
+    void *unk4; /* +0x004 */
+};
+
+/* Sony's, linked from libc2 (config/psyq-objects.txt: libc2/strcpy,
+ * libc2/strlen); declared locally per this project's established
+ * per-unit convention for these two (see e.g. src/class_3bb8c_i.c,
+ * src/class_3bb8c_j.c). */
+extern char *strcpy(char *dest, char *src);
+extern s32 strlen(char *s);
+
+/* This unit's own view of func_80040FC0 (already matched,
+ * src/code_2cc8c_f.c) -- return value unused at this call site, unlike
+ * that unit's own `u8 *` view, so kept minimal per the project's
+ * independent-arities convention. */
+extern void func_80040FC0(void *dst, void *src);
+
+void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
+{
+    u32 size;
+    char *buf;
+
+    if (arg1 == NULL) {
+        return;
+    }
+    if (self->unkA4->methods->slot1AC(self->unkA4)) {
+        strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14);
+        func_800507F8((s32)D_8008AA18, 0);
+    }
+    size = strlen((char *)D_8008AA18);
+    size = (size >> 1) + 4;
+    buf = func_80017B34(size);
+    func_80040FC0(buf, D_8008AA18);
+    self->unkB0 = (Class86B60UnkB0Obj_3bb8c_d *)func_800408CC(arg1->unk4, size, buf);
+    self->unkB0->unkAB = 8;
+    self->unkB0->unkAC = 4;
+    self->unkB0->unkAA = 9;
+    func_80017CFC(buf);
+}
 
 void func_8004DC08(Class86B60 *self)
 {

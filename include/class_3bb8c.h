@@ -1059,6 +1059,17 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
 
 struct Class86B60UnkB0Obj_3bb8c_d {
     Class86B60UnkB0ObjMethods_3bb8c_d *methods; /* +0x000 */
+    u8 pad004[0x0AA - 0x004];
+    /* +0x0AA/+0x0AB/+0x0AC, func_8004DB18: three literal byte fields
+     * (9/8/4) set right after allocation via `func_800408CC` -- this is
+     * the SAME real object as `code_2cc8c.h`'s `Unk64Elem` (matching
+     * slot offsets 0x004/0x04C/0x0B8, see that header's own note), so
+     * these three bytes are almost certainly flags/type-tag data on that
+     * class; kept opaque byte fields since this unit never reads them
+     * back. */
+    u8 unkAA;
+    u8 unkAB;
+    u8 unkAC;
 };
 
 /*
@@ -1391,9 +1402,24 @@ extern s32 D_8008A9B4;
  * block at `D_80011434` (`asm/data/1C34.rodata.s`: 0x80011464 and
  * 0x8001149C respectively, neither with its own dlabel), so they cannot
  * be spelled by the address they point to and are typed opaque `void *`
- * instead. */
+ * instead.
+ *
+ * `D_8008AA18` is also read by round 43's `func_8004DB18`, which
+ * `strcpy`s INTO `(char *)D_8008AA18 + 0x18` and reads it with `strlen` --
+ * both require the RUNTIME value to be a writable buffer, not the .rodata
+ * address the ROM image happens to initialise it to. Nothing in this unit
+ * ever reassigns it, so whatever sets the real (writable) value is outside
+ * this unit's own ground; the ROM-image value above is a placeholder only. */
 extern void *D_8008AA10;
 extern void *D_8008AA18;
+
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DB18`
+ * as `strcpy`'s SOURCE argument. Holds `0x80011474` in the ROM image
+ * (immediately past `D_8008AA10`'s own "BISLPS-01556xxx" string, i.e. the
+ * start of the font-glyph word table in `D_80011434`) -- likely also a
+ * placeholder for the same reason `D_8008AA18` is, since a font-glyph
+ * table is not plausible `strcpy` input. */
+extern void *D_8008AA14;
 
 /* func_8004E34C's own one-shot init guard: read, then unconditionally
  * incremented, before its own body's InitCARD/StartCARD/_bu_init calls
