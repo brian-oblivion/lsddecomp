@@ -120,7 +120,7 @@ extern s32 rand(void);
 
 s32 func_8005C8AC(s16 *a0);
 bool func_8005C9A4(s32 coordParity, s8 *entry);
-s32 func_8005C9DC(s32 a0, s32 a1, s32 a2);
+s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2);
 void func_8005CF34(DreamAuxSlot *a0);
 
 s32 func_8005C7D4(s32 a0, s16 *a1, s32 a2)
@@ -129,7 +129,7 @@ s32 func_8005C7D4(s32 a0, s16 *a1, s32 a2)
 
     if (record != 0) {
         if (func_8005C9A4(a2, (s8 *)record)) {
-            return func_8005C9DC(a2, record, a0);
+            return func_8005C9DC(a2, (s8 *)record, a0);
         }
         if (D_8008ABF8 != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
             func_8005CF34(D_80088D28);
@@ -188,7 +188,35 @@ bool func_8005C9A4(s32 coordParity, s8 *entry)
     return result;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C9DC);
+extern TriggerWorld *func_80044A0C(s32 *ctx);
+bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
+
+s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
+{
+    s32 ctxArg[4];
+    TriggerWorld *world;
+
+    ctxArg[0] = a2;
+    world = func_80044A0C(ctxArg);
+
+    if (world != NULL) {
+        DreamAuxGroupRecord *base = D_80089A44[D_8008ABF8];
+        s8 *p = a1 + 3;
+        s8 *end = a1 + 6;
+
+        while (p < end) {
+            s8 entry = *p;
+
+            if (entry == -1) {
+                break;
+            }
+            func_8005CAB4(a0, a1, (TriggerRecord *)((u8 *)base + entry * 8), world);
+            p++;
+        }
+        return (s32)world;
+    }
+    return 0;
+}
 
 bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world)
 {
