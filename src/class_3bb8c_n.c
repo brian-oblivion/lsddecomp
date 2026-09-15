@@ -3,13 +3,13 @@
  * remainder, 0x44F14..0x46288.  23 functions, 1245 words.
  * Carved round 45 (2026-09-15) by the head.
  *
- * DELIBERATELY UNWORKED.  This unit was carved to BANK ground for a future
- * round, not to be worked in round 45 -- it was cut while six runners were
- * already live on other units and nobody was free to take it.  That exact
- * phrase is what `tools/progress.py` keys on to count these 23 functions in
- * the `banked` column instead of `fresh`; without it the carve would inflate
- * `fresh` by its whole size and the next head would mis-triage.  Delete the
- * phrase when you staff someone here.
+ * STAFFED IN ROUND 46.  This unit was carved in round 45 to BANK ground and
+ * carried the exact phrase `DELIBERATELY UNWORKED`, which is what
+ * `tools/progress.py` keys on to count its functions in the `banked` column
+ * instead of `fresh`.  The round-46 head removed it when staffing a runner
+ * here, as that header instructed.  If this unit is ever un-staffed with
+ * functions left over, the phrase goes back -- `banked` and `fresh` are
+ * different claims and only the marker distinguishes them.
  *
  * WHY IT WAS UNCARVED UNTIL NOW, and why that reason is dead.  The splat
  * yaml called this segment "the gp_rel-densest ground in the executable",

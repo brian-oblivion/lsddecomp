@@ -1,5 +1,18 @@
 # func_8001DDF4 -- DERIVATION ONLY -- ASSIGNABLE, round 45 (2026-09-15)
 
+DERIVATION ONLY -- ASSIGNABLE
+
+> **Head, round 46:** the marker above is repeated here as its own line on
+> purpose. `progress.py`'s `REOPENED_RE` anchors at start-of-line
+> (`^[\s>*_#-]*(?:REOPENED|DERIVATION ONLY) -- ASSIGNABLE`), so the phrase
+> embedded in the round-45 TITLE after `# func_8001DDF4 -- ` never matched
+> and this function kept counting as a documented STALL -- the exact
+> permanent-deletion failure the marker was added to stop, reintroduced by
+> where the marker was placed rather than by whether it was there.
+> `nearmiss.py` reads a wider TITLE window and did show it, which is why the
+> two tools disagreed. Put the phrase on a line of its own.
+
+
 > **HEAD CORRECTION at merge, round 45.** Delta filed this as a STALL and it is
 > not one: its own Status line says **no C was written or built**, so there is
 > no length figure, no word-match and no first-diff -- the three figures a
