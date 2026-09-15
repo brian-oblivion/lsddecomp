@@ -19,10 +19,10 @@
  * `--addiu-at`; docs/research/addiu-at-blocker.md) and screening for it now
  * INVENTS blockers, so the live screen is TWO greps -- `gp_rel` and
  * `nop_mflo_mfhi`. Current state:
- *   func_800544E4  gp_rel                -- still blocked
- *   func_80054558  gp_rel (+ addiu-$at)  -- still blocked, on gp_rel alone
+ *   func_800544E4  was gp_rel            -- MATCHED round 44, 29/29.
+ *   func_80054558  was gp_rel (+ addiu-$at) -- see docs/match-reports/ for round 44 disposition.
  *   func_800545FC  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
- *   func_80054660  gp_rel                -- still blocked
+ *   func_80054660  was gp_rel            -- see docs/match-reports/ for round 44 disposition.
  * The old profile said "all four have stub reports; do not attempt them",
  * which was true when written and became a false blocker on one of the four
  * the moment `addiu_at` was fixed. Screen with `python3 tools/nearmiss.py`
@@ -178,7 +178,40 @@ void *func_800544D4(void) {
     return &D_80087034;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_800544E4);
+extern s32 D_8008AB4C;
+extern s32 D_8008AC6C;
+extern s32 D_8008AC70;
+extern s32 D_8008AC74;
+extern s32 D_8008AC78;
+extern s32 D_8008AC7C;
+extern s32 D_8008AC80;
+extern s32 D_8008ACA0;
+
+extern s32 func_80054558(void);
+
+s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
+    s32 *p;
+    s32 i;
+
+    if (D_8008AB4C == 0) {
+        i = 1;
+        p = &D_8008ACA0;
+        D_8008AB4C = a0;
+        D_8008AC6C = a1;
+        D_8008AC7C = a2;
+        D_8008AC80 = -1;
+        D_8008AC74 = a3;
+        D_8008AC78 = arg4;
+        D_8008AC70 = 0;
+        do {
+            *p = 0;
+            i--;
+            p--;
+        } while (i >= 0);
+        return func_80054558();
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_m", func_80054558);
 
