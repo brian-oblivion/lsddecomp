@@ -2314,6 +2314,47 @@ will come back. Leave it.** Recover only when the process table is clear AND
 the tree still holds uncommitted work AND you are about to tear down. Teardown
 is the real deadline; a runner between turns is not.
 
+**ROUND 43: AN EMPTY PROCESS TABLE IS NOT EVIDENCE THE RUNNER IS DONE, AND
+THE HEAD PROVED IT ON ITSELF.** Round 40 gives a sufficient condition for
+ALIVE -- processes running means leave it alone. The converse does not follow,
+and round 43's head assumed it did.
+
+What happened: bravo hit the §2c wait-loop exactly as predicted, notifying
+with a status line (*"I'll wait for the monitor notification"*) and 11 matches
+committed. The head checked the process table, found bravo's permuter workers
+**gone**, and correctly concluded the SEARCH had ended. It then salvaged: read
+the leftover `permuter-work/` candidates, spliced bravo's base scaffold into
+`main`, and built it to recover title figures.
+
+**bravo then resumed on its own and wrote a better report than the salvage
+could have** -- 150582 iterations, base score 1643 -> 900, three-figure title,
+and the same UB verdict on the near-best candidates that the head had reached
+independently. The salvage bought nothing.
+
+**The distinction the head missed: the process table tells you about the
+SEARCH, not about the RUNNER.** Round 40's own mechanism says why -- a runner
+that backgrounds a search notifies while still resumable, and *"when its search
+finishes it can be re-invoked and continue"*. So the search ENDING is precisely
+the moment the runner becomes most likely to come back, which is the worst
+possible moment to conclude it is gone.
+
+**Cost, and why it is worth writing down even though it was cheap.** The
+salvage was non-destructive and was reverted, so no work was lost -- round
+31's "do the salvage and DEFER the kill" held, and nothing was killed. But it
+left a non-matching body live in `main` while the head measured it, and a red
+whole-image build in the shared checkout is the round-20 attribution hazard
+pointed at everyone else: any other reader of `main` in that window sees a red
+oracle with no compile error and no obvious cause. **If you must measure a
+salvaged body, do it in a worktree, never in `main`** -- the main checkout is
+single-occupancy for the head's MERGES, which is not the same as a licence to
+run experiments in it.
+
+**The operational rule: teardown is the deadline, and nothing else is.** Do
+not salvage on "its processes are gone", do not salvage on a completion
+notification, and do not salvage on both together -- round 43 had both and was
+still wrong. Salvage when you are about to run `git worktree remove`, and not
+before.
+
 **The old rule was not wrong, it was under-specified**, and this is the same
 decay shape this document keeps naming: the round-33 remedy was written from a
 case where the runner genuinely never came back, and it was applied to a case
