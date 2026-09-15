@@ -397,3 +397,41 @@ local effect" and is worth flagging for any future multiply-latency-
 adjacent residue: verify the WHOLE instruction range after every attempt,
 not just the words immediately around the change, because a fix attempt at
 the tail can regress the head silently.
+
+## ROUND 44 (echo): re-verified 71/73 exactly; two more negative variants, neither a new direction that helps
+
+Re-spliced the round-36 body (with `GsClearOt`) in place of the
+`INCLUDE_ASM` and rebuilt clean before touching anything: **71/73 words,
+no out-of-range drift**, first real diff at vram `0x8003ED18`/`0x8003ED1C`
+-- identical to every prior measurement. The inherited score is honest.
+
+Per this round's instruction to prefer a CHANGED approach over re-running
+a search, tried two variants not in the existing attempt list (11 attempts
+across three prior rounds, one ~40k-iteration permuter search):
+
+| # | attempt | result |
+| --- | --- | --- |
+| 12 | swap the two local declarations (`buf` before `size`, reversing attempt 1's order) | **71/73, unchanged** -- declaration order is not the lever |
+| 13 | shift value computed in its OWN statement, assigned to `size` FIRST, then the product added in a second statement (`size = 4 << self->unk3C; size = size + (self->unk48 * self->unk44 + 0x14);`) -- a shape not tried by attempt 5's two-statement splits, all of which put the MULTIPLY first | **69/73**, same regression pattern as attempts 2-5/8-9: the `mult`/reload/`sllv` head breaks, not just the tail |
+
+**Verdict unchanged: 71/73 remains the best reached.** Fourteen hand
+attempts and one large permuter search across four rounds have now
+converged on the same two instructions (`addu`/`addiu` operand pairing)
+as the sole residue, with every attempted reshape either reproducing
+attempt 1's score exactly or regressing the HEAD of the expression too.
+Restored to `INCLUDE_ASM`. No new lever found this round; not escalating
+the permuter search again per this round's guidance to change approach
+rather than re-run one that already ran ~40k iterations.
+
+### Proposed learning
+
+**Declaration order for two SCALAR locals with no aliasing relationship
+(here, `size`/`buf`, never both live across a call in a way that would
+make order matter) is not a lever worth trying by default** -- it is a
+zero-cost check (one swap, one build) but this is the second function this
+project's reports show it being fully inert on (the "prologue callee-save"
+class is different: THAT residue is about STORE order in the prologue
+itself, not general local declaration order). Worth demoting from "try
+early" to "cheap dead end" for this specific residue shape (multiply/shift
+combined into one word-sized outer sum) unless a future case shows
+otherwise.

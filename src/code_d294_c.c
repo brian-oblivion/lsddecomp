@@ -54,14 +54,14 @@ void func_8001E7B0(Class6B5CCObj *self) {
 extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void func_8001EA8C(s32 *dest, s16 *b, s16 *a);
 
-/* STALL -- see docs/match-reports/func_8001E7BC.md. First real C attempt
- * this round (echo): 29/180 words in-range, WITH address drift -- not
- * yet a trustworthy score, but the overall block shape (guards, backup
- * copy, accumulation loop, both func_8001F8B8 calls) is present and
- * roughly in the right place; residue includes at least a register
- * identity difference in the backup-copy/loop section and likely
- * buffer-layout details not yet nailed down. Restored to INCLUDE_ASM
- * per project rule. */
+/* STALL -- see docs/match-reports/func_8001E7BC.md. Round 44 (echo): 136/180
+ * words, EXACT length (no drift), first real diff at vram 0x8001E810 (a
+ * register-identity residue, node in $a1 vs retail's $a3). Huge jump from
+ * round 19's 29/180-with-drift baseline -- see the report for the two
+ * levers that got here (a per-axis double-ternary-evaluation macro shape,
+ * and keeping each axis's NULL fallback a literal 0 rather than folding the
+ * axis offset into it) and for what was tried and failed on the remaining
+ * residue. Restored to INCLUDE_ASM per project rule. */
 #if 0
 s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     s32 *table;
@@ -85,14 +85,12 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
             cur = self->unkC;
             if (cur != NULL) {
                 do {
-                    table = self->unkC != 0 ? self->unk14->unk38 : 0;
-                    table[0] = table[0] + cur->unk14->unk18;
-
-                    table = self->unkC != 0 ? self->unk14->unk38 : 0;
-                    table[1] = table[1] + cur->unk14->unk1C;
-
-                    table = self->unkC != 0 ? self->unk14->unk38 : 0;
-                    table[2] = table[2] + cur->unk14->unk20;
+                    (self->unkC != 0 ? &self->unk14->unk38[0] : (s32 *)0)[0] =
+                        (self->unkC != 0 ? &self->unk14->unk38[0] : (s32 *)0)[0] + cur->unk14->unk18;
+                    (self->unkC != 0 ? &self->unk14->unk38[1] : (s32 *)0)[0] =
+                        (self->unkC != 0 ? &self->unk14->unk38[1] : (s32 *)0)[0] + cur->unk14->unk1C;
+                    (self->unkC != 0 ? &self->unk14->unk38[2] : (s32 *)0)[0] =
+                        (self->unkC != 0 ? &self->unk14->unk38[2] : (s32 *)0)[0] + cur->unk14->unk20;
 
                     cur = cur->next;
                 } while (cur != NULL);
@@ -177,7 +175,16 @@ void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EC84);
+s32 func_8001EC84(void *pair) {
+    WholeFrac_d294 *p;
+    s32 q1, r1, q2;
+
+    p = (WholeFrac_d294 *)pair;
+    q1 = p->whole / p->frac;
+    r1 = p->whole % p->frac;
+    q2 = (r1 << 12) / p->frac;
+    return (q1 << 12) + q2;
+}
 
 s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point) {
     s32 flags;
@@ -275,4 +282,12 @@ s32 func_8001EF14(s32 *a, s32 range, s32 *b) {
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001EF60);
+extern s32 D_8008A838;
+
+s32 func_8001EF60(s32 value) {
+    s32 old;
+
+    old = D_8008A838;
+    D_8008A838 = value;
+    return old;
+}

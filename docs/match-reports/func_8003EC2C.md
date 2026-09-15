@@ -1,48 +1,56 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `nop_mflo_mfhi`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
+# func_8003EC2C -- MATCHED 37/37 words
 
-# func_8003EC2C -- STALL (nop_mflo_mfhi toolchain blocker, not attempted)
+Unit `code_2cc8c_d`, carved round 13. Reopened round 42 as
+`nop_mflo_mfhi`-blocked (the blocker is RESOLVED, see CLAUDE.md); the stub
+above was never actually attempted until now.
 
-Unit `code_2cc8c_d`, carved round 13. **Not attempted.**
+## Round 44 (echo)
 
-## Classification
+Guarded 20.12 fixed-point division: if `self->unk10 != NULL`, computes the
+same split-division idiom as `code_d294_c`'s `func_8001EC84` on a caller-
+supplied `{s16 whole; s16 frac;}` pair and stores the result to a
+NEW field, `Unk18Obj::unk2C` (previously undiscovered padding, +0x02C --
+exactly the 4 bytes between `unk20` (`Vec3_2cc8c`, ending at +0x02C) and the
+already-known `unk30`).
 
-Classified by the head at carve time (round 13, 2026-09-03), with the THIRD
-blocker screen -- the one that is not in CLAUDE.md's two-grep list, lives in
-`docs/research/addiu-at-blocker.md`, and was added to `docs/PARALLEL-RUNS.md`'s
-Gate 1 this round after runner bravo's `func_8001CEB4` exposed its absence:
+```c
+void func_8003EC2C(Unk18Obj *self, s16 *pair) {
+    s32 q1, r1, q2;
 
-```sh
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_2cc8c_d/func_8003EC2C.s \
-  | grep -E '\b(mult|multu|div|divu)\b'
+    if (self->unk10 != NULL) {
+        q1 = pair[0] / pair[1];
+        r1 = pair[0] % pair[1];
+        q2 = (r1 << 12) / pair[1];
+        self->unk2C = (q1 << 12) + q2;
+    }
+}
 ```
 
-Retail reads a multiply/divide result and feeds it into another
-`mult`/`multu`/`div`/`divu` with **no `nop` between them**; the pinned pipeline
-inserts `nop`s there (maspsx's `nop_mflo_mfhi`), so the function comes out
-longer than retail regardless of how the C is written. Blocked exactly like
-`addiu_at`, and part of the same flag group -- not something to experiment with
-per-function.
+Read the input pair as raw `s16 *` rather than reusing `code_d294.h`'s
+`WholeFrac_d294` -- this unit has its own local view of the shape and does
+not include that header; a shared struct across units is a shared-header
+hazard per CLAUDE.md's "one exception" note, and there is no reuse benefit
+here since nothing in this unit dereferences the pair as anything but two
+adjacent halfwords.
 
-## Why this one matters beyond itself
+## Header change
 
-It is the **second** of `addiu-at-blocker.md`'s 7 uncarved `nop_mflo_mfhi` hits
-to become a queued one, and the second to be caught BEFORE a runner was
-assigned to it. That document's round-13 addendum re-measured the queued count
-at 2 -> 4 and predicted the uncarved row would keep draining into the queued
-row as carving proceeds; this is that happening, twice in one round, which is
-the evidence that the Gate 1 placement was the right call rather than the
-per-runner screen that was correctly rejected on cost.
+`include/code_2cc8c.h`: `Unk18Obj`'s `pad2C[4]` retyped to `s32 unk2C`
+(same offset, same size -- no other field moves). Verified safe: this is
+the FIRST function in the project to touch `+0x02C` of `Unk18Obj`, so there
+is no sibling already-matched function reading/writing that offset to
+regress. Confirmed via the full oracle after the edit, not assumed.
 
-Whoever re-measures next should expect the uncarved row below 7 and the queued
-row above 4.
+Matched on the first build: **37/37 words**, whole-image SHA1 clean (`build
+exit=0`). Zero attempts beyond this one.
 
-## What is known
+## Proposed learning
 
-Nothing beyond the screen. No C was written and no score was measured.
+Second confirmation this round (after `func_8001EC84`, `code_d294_c`) that
+the split-division idiom for 20.12 fixed-point (`q,r = a/b, a%b; return (q
+<< 12) + ((r << 12) / b);`) is a recognizable retail shape wherever a
+`nop_mflo_mfhi`-flagged function's disassembly shows two adjacent
+`div`-then-`mflo`/`mfhi`-then-`div` blocks. Two independent units, two
+independent occupants of unrelated class hierarchies, same idiom -- this
+reads like a shared runtime helper pattern the original codebase used
+often, not a coincidence.
