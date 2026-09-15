@@ -1055,10 +1055,38 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     u8 pad008[0x04C - 0x008];
     /* +0x04C, func_8004DC64's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
     void (*slot4C)(Class86B60UnkB0Obj_3bb8c_d *self, s32 arg1, void *arg2);
+    u8 pad050[0x0B8 - 0x050];
+    /* +0x0B8, func_8004DCD0's own last call: `(self, buf)` where `buf` is
+     * that function's own 3-byte stack buffer. Lands at the SAME offset
+     * as `include/class_3bb8c.h`'s own `FieldM7CMethods::slotB8` (a
+     * different unit's independent view) and `code_2cc8c.h`'s
+     * `Unk64ElemMethods` -- further confirmation (on top of `release`
+     * +0x004 and `slot4C` +0x04C already matching both) that `unkB0` is
+     * that same real class. */
+    void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
+    u8 pad0BC[0x0CC - 0x0BC];
+    /* +0x0CC, func_8004DE08's own call: `(self, buf)` where `buf` is a
+     * pool-allocated string this function fills with `func_80040FC0`
+     * before the call and frees right after. */
+    void (*slotCC)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
 };
 
 struct Class86B60UnkB0Obj_3bb8c_d {
     Class86B60UnkB0ObjMethods_3bb8c_d *methods; /* +0x000 */
+    u8 pad004[0x0A9 - 0x004];
+    /* +0x0A9, func_8004DE08: read as an unsigned byte and used directly as
+     * an allocation SIZE (`func_80017B34`'s own argument). */
+    u8 unkA9;
+    /* +0x0AA/+0x0AB/+0x0AC, func_8004DB18: three literal byte fields
+     * (9/8/4) set right after allocation via `func_800408CC` -- this is
+     * the SAME real object as `code_2cc8c.h`'s `Unk64Elem` (matching
+     * slot offsets 0x004/0x04C/0x0B8, see that header's own note), so
+     * these three bytes are almost certainly flags/type-tag data on that
+     * class; kept opaque byte fields since this unit never reads them
+     * back. */
+    u8 unkAA;
+    u8 unkAB;
+    u8 unkAC;
 };
 
 /*
@@ -1075,8 +1103,30 @@ typedef struct Class86B60UnkACObj_3bb8c_d Class86B60UnkACObj_3bb8c_d;
 struct Class86B60UnkACObjMethods_3bb8c_d {
     u8 pad000[0x004];
     void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, func_8004D704 */
-    u8 pad008[0x070 - 0x008];
+    u8 pad008[0x06C - 0x008];
+    /* +0x06C, func_8004DF64's own call: `(self, D_8008A9D0, &D_80086D6C,
+     * self->unkC->unk4, self->unk10, self->unk14, self->unk48)` -- 7
+     * arguments, the last three on the stack. Every pointer beyond `self`
+     * is forwarded opaquely (never dereferenced by this slot's own
+     * caller), so all stay `void *`/`s32 *` placeholders. */
+    void (*slot6C)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, s32 *arg2,
+                   void *arg3, void *arg4, void *arg5, void *arg6); /* +0x06C */
     void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, func_8004E054 */
+    /* +0x074, func_8004E1C4's own 2nd call: `(self, D_8008AA10, D_8008AA18,
+     * self->unkBC, self->unkC0)` -- the two middle arguments are the
+     * VALUES of two `.sdata` globals loaded via `%gp_rel` (not their
+     * addresses), each holding a pointer into the still-uncarved rodata
+     * block at `D_80011434` (verified in `asm/data/1C34.rodata.s`: no
+     * dlabel exists at either byte offset, so they cannot be referenced by
+     * name and are forwarded as opaque `void *`). */
+    void (*slot74)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, void *arg2, s32 arg3, s32 arg4); /* +0x074 */
+    /* +0x078, func_8004E0E4's own call: `(self, D_8008AA10, D_8008AA18,
+     * 0xD, 3, self->unkA8, self->unkBC, self->unkC0)` -- eight arguments,
+     * the last four on the stack. `arg5` is `Class86B60::unkA8`, forwarded
+     * opaquely (never dereferenced by this slot's own caller), so kept
+     * `void *` rather than its fuller `GenericReleaseObj_3bb8c_d *` type. */
+    void (*slot78)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, void *arg2,
+                   s32 arg3, s32 arg4, void *arg5, s32 arg6, s32 arg7); /* +0x078 */
 };
 
 struct Class86B60UnkACObj_3bb8c_d {
@@ -1117,7 +1167,12 @@ struct Class86B60Methods {
     void (*slot14)(Class86B60 *self, void *arg1);
     u8 pad018[0x040 - 0x018];
     void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, func_8004D578's own last call */
-    u8 pad044[0x06C - 0x044];
+    u8 pad044[0x060 - 0x044];
+    /* +0x060, func_8004DE08's own two calls, both `(self, literal)` --
+     * once with `0xB` right after `self->unk58 = 5`, once with `0xF`
+     * later in the same function. */
+    void (*slot60)(Class86B60 *self, s32 arg1);
+    u8 pad064[0x06C - 0x064];
     void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, func_8004D814's own 2nd call, arg1 = 0xA */
     u8 pad070[0x078 - 0x070];
     void (*slot78)(Class86B60 *self); /* +0x078, func_8004D90C's own last call, `self` only */
@@ -1133,14 +1188,29 @@ struct Class86B60Methods {
     /* +0x0D4, func_8004D814's own first call, arg1 = &D_800114E8, arg2 = 0. */
     void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, func_8004D578's own call, arg1 = &D_80086D44 */
-    u8 pad0DC[0x0F0 - 0x0DC];
+    u8 pad0DC[0x0E0 - 0x0DC];
+    /* +0x0E0, func_8004DE08's own call: `(self, self->unk14)`, arg1
+     * forwarded opaquely. */
+    void (*slotE0)(Class86B60 *self, void *arg1);
+    u8 pad0E4[0x0F0 - 0x0E4];
     /* +0x0F0, func_8004D90C's own 3rd call: `(self, self->unk4C->unk8,
      * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
-     * func_8004D814's report) -- same offset number, unrelated table. */
+     * func_8004D814's report) -- same offset number, unrelated table.
+     * func_8004DE08 (this round) also reaches this slot, forwarding an
+     * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
+     * the SAME `void *arg1` parameter, cast at that call site rather than
+     * retyping the slot -- the bit pattern is unchanged either way, and
+     * `func_8004D90C`'s own call already established the pointer type. */
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
-    u8 pad0F4[0x124 - 0x0F4];
+    u8 pad0F4[0x11C - 0x0F4];
+    /* +0x11C, func_8004DE08's own call: `(self, buf, 1)` where `buf` is
+     * the value `DreamSysViewMethods_3bb8c_c::slot19C` (via `self->unkA4`)
+     * just filled through a stack out-parameter. */
+    void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
+    u8 pad120[0x124 - 0x120];
     void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, func_8004D90C (arg1=0)/func_8004E230 (arg1=0x16) */
-    u8 pad128[0x12C - 0x128];
+    /* +0x128, func_8004E1C4's own first call, `self` only. Return unused. */
+    void (*slot128)(Class86B60 *self);
     void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
     void (*slot130)(Class86B60 *self); /* +0x130, func_8004D9D4's `unk58==2` tail target */
     void (*slot134)(Class86B60 *self); /* +0x134, func_8004D9D4's `unk58==3` tail target */
@@ -1155,7 +1225,8 @@ struct Class86B60 {
     u8 pad004[0x00C - 0x004];
     Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, func_8004D898/func_8004E054 */
     void *unk10;                     /* +0x010, func_8004E054: opaque, forwarded verbatim */
-    u8 pad014[0x02C - 0x014];
+    void *unk14;                     /* +0x014, func_8004DF64: opaque, forwarded verbatim to unkAC->methods->slot6C */
+    u8 pad018[0x02C - 0x018];
     s32 unk2C;                      /* +0x02C, func_8004D814: set to 0x190 */
     u8 pad030[0x034 - 0x030];
     s32 unk34;                      /* +0x034, func_8004D814: zeroed */
@@ -1168,7 +1239,11 @@ struct Class86B60 {
      * and not (as a first reading of the raw asm suggested) `self`
      * re-stored through a leftover register. */
     s32 unk38;
-    u8 pad03C[0x048 - 0x03C];
+    /* +0x03C, func_8004DCD0: a flag tested `!= 0`, gating whether that
+     * function fills its own local 3-byte buffer from `arg1`'s bytes or
+     * zeroes it instead. No setter in this unit. */
+    s32 unk3C;
+    u8 pad040[0x048 - 0x040];
     /* Set up by the base ctor chain (func_8003DFBC()->slot08 below), read
      * (never written) by func_8004D578 right after. Same offset/shape as
      * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
@@ -1277,7 +1352,11 @@ struct DreamSysViewMethods_3bb8c_c {
     u8 pad1A4[0x1A8 - 0x1A4];
     /* +0x1A8, func_8004E230's own call, `self` only. */
     void (*slot1A8)(DreamSysView_3bb8c_c *self);
-    u8 pad1AC[0x1B0 - 0x1AC];
+    /* +0x1AC, func_8004E0E4's own call: `self->unkA4->methods->slot1AC(
+     * self->unkA4)`. Nonzero return gates a one-byte-zero write into
+     * `*D_8008AA10` (return type therefore `s32`, not `void` -- the
+     * caller's `beqz` on `$v0` tests it directly). */
+    s32 (*slot1AC)(DreamSysView_3bb8c_c *self);
     /* Return value stored into Class86B60::unkBC; arg1 is the address of
      * Class86B60::unkC0 (an output buffer this slot presumably fills). */
     s32 (*slot1B0)(DreamSysView_3bb8c_c *self, void *arg1);     /* +0x1B0 */
@@ -1335,6 +1414,9 @@ struct BaseTaskCtorTable_3bb8c_c {
     /* +0x0E0, func_8004DC64's own first call: `(self, arg1)`, arg1 its
      * own forwarded 2nd parameter. */
     void (*slotE0)(void *self, s32 arg1);
+    /* +0x0E4, func_8004DCD0's own first, unconditional call: `(self,
+     * arg1)`, arg1 its own forwarded 2nd parameter (opaque here). */
+    void (*slotE4)(void *self, void *arg1);
 };
 
 extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
@@ -1354,6 +1436,12 @@ extern s32 D_800114DC;
  * address is taken here. */
 extern s32 D_800114E8;
 
+/* func_8004DF64's own path string, passed to func_8003B39C -- a real
+ * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
+ * ONLY correct spelling (CLAUDE.md: never re-write a string splat has
+ * already emitted as a symbol). */
+extern const char D_800114F8[];
+
 /* Address-of only in this unit -- func_8004D898 walks it with an
  * explicit 0xC-byte stride, passing each entry's address on to
  * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
@@ -1364,6 +1452,61 @@ extern s32 D_80086DAC;
  * `Class86B60UnkB0ObjMethods_3bb8c_d::slot4C`). Placeholder s32 type
  * since only the address is taken here. */
 extern s32 D_8008A9B4;
+
+/* VALUE-of, not address-of, in this unit -- func_8004E1C4 reaches these
+ * through `%gp_rel` loads of the .sdata globals themselves, forwarding
+ * whatever they hold. Each holds a pointer into the still-uncarved rodata
+ * block at `D_80011434` (`asm/data/1C34.rodata.s`: 0x80011464 and
+ * 0x8001149C respectively, neither with its own dlabel), so they cannot
+ * be spelled by the address they point to and are typed opaque `void *`
+ * instead.
+ *
+ * `D_8008AA18` is also read by round 43's `func_8004DB18`, which
+ * `strcpy`s INTO `(char *)D_8008AA18 + 0x18` and reads it with `strlen` --
+ * both require the RUNTIME value to be a writable buffer, not the .rodata
+ * address the ROM image happens to initialise it to. Nothing in this unit
+ * ever reassigns it, so whatever sets the real (writable) value is outside
+ * this unit's own ground; the ROM-image value above is a placeholder only. */
+extern void *D_8008AA10;
+extern void *D_8008AA18;
+
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DB18`
+ * as `strcpy`'s SOURCE argument. Holds `0x80011474` in the ROM image
+ * (immediately past `D_8008AA10`'s own "BISLPS-01556xxx" string, i.e. the
+ * start of the font-glyph word table in `D_80011434`) -- likely also a
+ * placeholder for the same reason `D_8008AA18` is, since a font-glyph
+ * table is not plausible `strcpy` input. */
+extern void *D_8008AA14;
+
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DF64`
+ * as `Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg1`. Holds
+ * `0x80011454` in the ROM image -- the "BISLPS-01556" string in
+ * `D_80011434`, again with no `dlabel` of its own. */
+extern void *D_8008A9D0;
+
+/* Address-of only, round 43's `func_8004DF64`
+ * (`Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg2`) -- a real
+ * 16-entry pointer table (`asm/data/76DC8.data.s`, `D_8008AA0C` down to
+ * `D_8008A9D4` then a NULL terminator), reached only by its own address
+ * here, never walked. Placeholder `s32` type since only the address is
+ * taken. */
+extern s32 D_80086D6C;
+
+/* func_8004DCD0's own rolling byte index (0/1/2, wraps to 0 at 3) into
+ * that function's own 3-byte stack buffer -- declared in the ROM image
+ * as a full `.word` (`asm/data/7B12C.sdata.s`), but accessed only via
+ * `lbu`/`sb` here, so `u8` is the correct C type for this unit's own
+ * reference regardless of the underlying storage's full width. */
+extern u8 D_8008AA28;
+
+/* func_8004DCD0's own rolling word counter (wraps to 0 at 0x101). */
+extern s32 D_8008AA2C;
+
+/* func_8004E34C's own one-shot init guard: read, then unconditionally
+ * incremented, before its own body's InitCARD/StartCARD/_bu_init calls
+ * run only when the PRE-increment value was 0 (i.e. only on the very
+ * first construction of this class). */
+extern s32 D_8008AA30;
 
 /* Still raw asm in this unit (gp-relative-blocked, see
  * docs/match-reports/func_8004D6AC.md) -- not this round's function, but
@@ -1405,11 +1548,32 @@ typedef struct Result678_3bb8c_c {
 typedef struct GenericCtorTable_3bb8c_d GenericCtorTable_3bb8c_d;
 struct GenericCtorTable_3bb8c_d {
     u8 pad000[0x008];
-    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call */
+    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call; IS func_8004E34C -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/func_8003DFBC) since nothing here type-checks the two against each other */
+    u8 pad00C[0x040 - 0x00C];
+    /* +0x040, func_8004E34C's own last call, forwarding its own 3rd
+     * parameter verbatim; class_3bb8c_e's independent view (round 14,
+     * this same real object) names the concrete function `func_8004E5D4`,
+     * still uncarved there. */
+    void (*slot40)(void *self, s32 arg1);
 };
 
 extern GenericCtorTable_3bb8c_d D_80086DC4;
 extern GenericCtorTable_3bb8c_d *func_800507E8(void); /* returns &D_80086DC4; matched in class_3bb8c_g */
+
+/*
+ * The object instance itself -- established this round by func_8004E34C,
+ * which IS this class's own constructor (verified: `tools/classtable.py
+ * 0x80086DC4` places it at the table's own +0x008 ctor slot). Kept
+ * minimal (only the one field this unit's ctor writes) since nothing else
+ * here dereferences it -- the fuller shape belongs to class_3bb8c_e's own
+ * independent view of the SAME real object (`Node3bb8cE`,
+ * src/class_3bb8c_e.c), which this unit does not include (per this
+ * project's established multiple-independent-local-views convention).
+ */
+typedef struct GenericCtorObj_3bb8c_d GenericCtorObj_3bb8c_d;
+struct GenericCtorObj_3bb8c_d {
+    GenericCtorTable_3bb8c_d *methods; /* +0x000, func_8004E34C: self->methods = func_800507E8() -- the base-ctor-chain "sets self->methods directly to this table's own pointer" pattern already seen for Class86B60/func_8004D578 */
+};
 
 /*
  * Class86E00 -- a large NEW class table, `D_80086E00` (29 slots + header,
