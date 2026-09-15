@@ -116,7 +116,27 @@ void func_8005C76C(void)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005C7D4);
+extern s32 rand(void);
+
+s32 func_8005C8AC(s16 *a0);
+bool func_8005C9A4(s32 coordParity, s8 *entry);
+s32 func_8005C9DC(s32 a0, s32 a1, s32 a2);
+void func_8005CF34(DreamAuxSlot *a0);
+
+s32 func_8005C7D4(s32 a0, s16 *a1, s32 a2)
+{
+    s32 record = func_8005C8AC(a1);
+
+    if (record != 0) {
+        if (func_8005C9A4(a2, (s8 *)record)) {
+            return func_8005C9DC(a2, record, a0);
+        }
+        if (D_8008ABF8 != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
+            func_8005CF34(D_80088D28);
+        }
+    }
+    return 0;
+}
 
 s32 func_8005C930(s32 a0, s32 a1);
 
