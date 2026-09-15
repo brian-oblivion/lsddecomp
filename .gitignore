@@ -92,3 +92,8 @@ scratchpad/
 sdk/*
 !sdk/README.md
 lib
+# ---------------------------------------------------------------------------
+# The mid-round broadcast file (tools/broadcast.sh). Round state, not record:
+# anything worth keeping is in a match report or PROGRESS.md by round end.
+# No trailing slash: worktrees hold a SYMLINK named .round.
+.round

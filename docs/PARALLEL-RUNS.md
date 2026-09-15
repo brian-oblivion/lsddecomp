@@ -413,7 +413,8 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
    <name>` per runner and decide unit assignments (`python3 tools/progress.py`).
 
 2. **Spawn** one subagent per worktree, cheap model, in background, with the
-   runner prompt at the end of this file. **Write down the agent-ID-to-runner
+   runner prompt at the end of this file. Run `tools/broadcast.sh clear`
+   first, so no runner reads last round's levers as this round's. **Write down the agent-ID-to-runner
    mapping and name the unit in every message** — a misaddressed wrap-up
    instruction is otherwise undetectable by its recipient.
 
@@ -711,6 +712,17 @@ The head runs in the MAIN checkout on an expensive model. Its loop:
 3c. **Send an early finisher back into its OWN unit** (message the same agent —
    same worktree, same branch, context intact) rather than letting it idle or
    spawning a cold replacement.
+
+   > **Post-round 43 (2026-09-15): `SendMessage` is not exposed in this
+   > environment at all, and it will not appear next round. It went missing
+   > in rounds 31, 32, 33 and 43 and the four write-ups each reported it as
+   > an anomaly. It is the environment. The BROADCAST half of what it did is
+   > now `tools/broadcast.sh` — a dated, append-only file in `$MAIN/.round`,
+   > symlinked into every worktree by `setup-worktree.sh`, which runners
+   > `read` before each function and `post --from <name>` to the moment they
+   > have a lever, a negative or a question. The WAKE half (re-sending an
+   > idle agent into its own context) has no substitute; the paragraph below
+   > is still the remedy for that.**
 
    **IF `SendMessage` IS UNAVAILABLE, DO NOT SKIP THE RE-SEND — SUBSTITUTE
    FOR IT. Merge the finished runner, fast-forward its worktree onto `main`,
@@ -2406,6 +2418,14 @@ write-up. Push it to every live runner immediately, and **ask explicitly for the
 negative answer** — "does this apply to your unit?" A runner reporting that it
 does NOT apply is cheap, and it stops the next head re-litigating the question.
 
+**The mechanism is `tools/broadcast.sh`, not `SendMessage`** (which this
+environment does not expose — see §3c). `tools/broadcast.sh post "..."` from
+the head or `post --from <name> "..."` from a runner appends a dated entry to
+`.round/BROADCAST.md`, shared by every worktree; runners `read` it before each
+function. Round 43 lost two broadcasts for want of this: alpha's lever never
+reached the other four, and bravo ran a search the head already knew was
+invalid.
+
 ## Runner subagent prompt (head fills in `<>`)
 
 > You are a matching runner for the LSD: Dream Emulator (PSX) decomp. **This is
@@ -2417,6 +2437,17 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > CLAUDE.md, docs/MATCHING-GUIDE.md and docs/DECOMPILATION_LEARNINGS.md, then
 > decompile up to `<N>` functions from the `INCLUDE_ASM` entries in
 > `src/<unit>.c` ONLY.
+>
+> **The broadcast channel is a file, not a tool.** Nobody can message you
+> mid-round and you cannot message anyone: `SendMessage` is not exposed in
+> this environment. Instead, **before you start each function, run
+> `tools/broadcast.sh read`** and act on anything there — a lever another
+> runner found, a warning from the head, a correction to your brief. And the
+> moment YOU have something the others should know — a lever that closed
+> real residue, a negative ("the X lever does not apply to my unit"), a
+> toolchain smell, a question for the head — **post it at once with
+> `tools/broadcast.sh post --from <name> "..."`**, not in your final summary.
+> A lever banked for the write-up reaches nobody until the next round.
 >
 > **The oracle.** `./build-and-verify.sh` plus `tools/funcdiff.py`. Chain them
 > so you cannot read a score from a failed build:
@@ -2588,3 +2619,10 @@ does NOT apply is cheap, and it stops the next head re-litigating the question.
 > the worktrees, and report: matches, new stall classes, toolchain leads (never
 > act on these yourself), and whether the next round should be runners, a carve,
 > or permuter.
+>
+> **`SendMessage` is not exposed in this environment — do not report its
+> absence as an anomaly, and do not lose the broadcast because of it.** The
+> channel is `tools/broadcast.sh`: `clear` it before spawning, `post` every
+> lever, warning or brief correction the moment you have it, and `read` it at
+> every triage for the runners' own posts and questions. Runners are told to
+> read it before each function and to post levers and negatives immediately.

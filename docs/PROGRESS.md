@@ -92,6 +92,11 @@ is ~200 words of ordinary work concealed in ONE unit by one stale paragraph.
 > `R_MIPS_GPREL16` reloc and the permuter reports **base score = 0**. Every
 > permuter negative recorded in round 43 against a `gp_rel`- or `mflo`-touching
 > function should be re-run before it is believed.
+>
+> **Also post-round: the missing `SendMessage` channel is replaced by
+> `tools/broadcast.sh`** (a dated file in `$MAIN/.round`, symlinked into every
+> worktree). Rounds 31, 32, 33 and 43 each reported the tool's absence as an
+> anomaly; it is the environment, and the head and runner prompts now say so.
 
 **`tools/setup-permuter.sh` hardcodes `MASPSX_FLAGS` independently of the
 Makefile and omits round 42's two flags:**
