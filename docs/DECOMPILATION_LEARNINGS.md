@@ -7474,3 +7474,73 @@ partial results behind it, not a lever. It is legal C89 and it is NOT a banned
 construct — it pins no register and names no operand — but nothing has yet
 closed on it. Recorded so the next attempt starts from it rather than
 rediscovering it; do not cite it as established.
+
+## A BARE `__asm__("")` CAN CHANGE REGISTER ALLOCATION, WHICH IS WHAT HARD RULE 6's OWN TEST CALLS BANNED (round 46)
+
+CLAUDE.md HARD RULE 6 permits one construct by name and then supplies a
+behavioural test that the named construct can fail:
+
+> *"A bare `__asm__("")` scheduling barrier is allowed. The test: if removing
+> it changes WHICH REGISTER holds a value, it is banned; if it only changes
+> instruction ORDER, it is allowed."*
+
+Measured through the pinned pipeline on game-neutral code that mentions retail
+nowhere — three variants of one function, differing only in the barrier:
+
+```c
+extern int G;
+int sink(int);
+int noBarrier(int a, int b) { int t = G;                          sink(a); return t + G + b; }
+int bareBar  (int a, int b) { int t = G; __asm__("");             sink(a); return t + G + b; }
+int memBar   (int a, int b) { int t = G; __asm__("" ::: "memory"); sink(a); return t + G + b; }
+```
+
+| variant | `t` | `b` |
+| --- | --- | --- |
+| `noBarrier` | `$s1` | `$s0` |
+| `bareBar` | **`$s0`** | **`$s1`** |
+| `memBar` | `$s0` | `$s1` — **byte-identical to `bareBar`** |
+
+**Removing the bare barrier swaps which physical register holds each value.**
+By the rule's literal test that makes the permitted construct banned.
+
+Two consequences, and the second is the useful one:
+
+- **The memory clobber is not the risky half.** `__asm__("" ::: "memory")` and
+  the bare form were byte-identical here. A runner avoiding the clobber on
+  rule grounds is avoiding the wrong thing; the barrier itself is what moves
+  allocation. (This came up adjudicating round 46's `func_8003E4B8`, where
+  delta used the clobber form. That adjudication was upheld on other grounds
+  — see below.)
+- **The distinction that survives the measurement is DIRECTEDNESS, not the
+  construct's name.** `register T v asm("$N")` and an extended-asm operand
+  constraint are **directed**: you name the register you want and you get it.
+  A barrier is **undirected**: you cannot choose what the allocator does, only
+  perturb it, and you take whatever comes out. The rule's intent is plainly to
+  ban pinning — and the literal test over-fires on undirected constructs,
+  because *any* perturbation of allocation trips it.
+
+**Working discipline until the wording is settled** (this is a HARD RULE, so
+the rewrite is an operator decision, not a head one — escalated round 46):
+
+- A barrier stays allowed, but **say in the report what it did**. If a barrier
+  moved the register MAPPING rather than only instruction ORDER, state that
+  explicitly rather than leaning on "bare barrier is allowed" as blanket cover.
+- **Adding barriers one at a time until a register lands where you want it is
+  DIRECTED by construction**, whatever the syntax looks like, and has left the
+  allowed category. Stop and file the stall.
+
+**Why this was not caught for forty-five rounds is itself the pattern.** The
+rule pairs a *name* with a *test*, and every previous reader took the name as
+settling the case for that construct and applied the test only to the two
+banned forms. Nobody ran the test on the thing the rule permits. That is the
+same shape as this project's screen failures — **a rule states the obstruction
+it was written for, and says nothing about whether its own exemptions satisfy
+it** — arriving on a HARD RULE instead of on a grep.
+
+**And note what this does NOT do: it does not retire the barrier or reopen any
+stall closed with one.** `func_8003E4B8`'s round-46 verdict stands on its own
+evidence — a whole-function parameter-colour swap, correctly distinguished
+from the prologue-callee-save-store-order class (same final mapping, different
+store order) — and the function remains `INCLUDE_ASM`, so its barrier lives in
+a preserved body and reaches no build.
