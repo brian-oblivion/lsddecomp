@@ -21,17 +21,32 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
 
 /* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
  * (ticked once per call by calling obj->vtable[1](obj) and storing the
- * result back into the same slot) plus 0x10 bytes not yet accessed by any
- * function in this unit. Stride is 0x14 (confirmed: func_8005C650, off-limits
- * here per the gp-relative blocker, walks D_80088D28 with the same stride
- * and also writes a second field at +0x4 with a `New_Entity` result). */
+ * result back into the same slot); a second field at +0x4 that
+ * func_8005C650 (MATCHED round 43) sets to the result of a `New_Entity`
+ * call and func_8005CF34 (MATCHED round 43) dispatches through its vtable;
+ * and a 3-word position vector at +0x8 that func_8005CF34 passes as
+ * `func_8001E600`'s `src` (that function's own signature, `code_d294.h`,
+ * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
+ * confirmed by func_8005C650's walk over D_80088D28. */
 typedef struct DreamAuxSlot {
     void *obj;
-    u8 unk4[0x10];
+    DreamAuxObj *entity;
+    s32 pos[3];
 } DreamAuxSlot;
 
 extern DreamAuxSlot D_80088D28[14];
 extern DreamAuxSlot D_80088D2C[14];
+
+/* Two more vtable slots on the DreamAuxObj family (see func_8005CF34):
+ * slot 0x14 (byte offset 0x50) takes only self, slot 0x13 (byte offset
+ * 0x4C) takes self plus four opaque values. This is the SAME slot-0x4C
+ * shared-ancestor entry `include/Entity.h` documents on `EntityMethods`'
+ * base (`void (*slot4C)(void *self, s32, s32, void *, s32)`) -- but that
+ * call site's 4th argument is a scalar where func_8005CF34's is a pointer
+ * to a locally-filled 3-word vector, so this unit keeps its own local
+ * view rather than importing Entity.h's. */
+typedef void (*DreamAuxObjFn14)(DreamAuxObj *self);
+typedef void (*DreamAuxObjFn13)(DreamAuxObj *self, s32 arg1, s32 arg2, void *arg3, void *arg4);
 
 /* A tiny fixed-size record family read by func_8005C508: 14 (0xE) parallel
  * groups, D_80089A7C[i] a signed count and D_80089A44[i] a pointer to an
@@ -44,6 +59,26 @@ typedef struct DreamAuxGroupRecord {
 
 extern s8 D_80089A7C[];
 extern DreamAuxGroupRecord *D_80089A44[];
+
+/* A second parallel-group family, same "count + pointer to array" shape as
+ * DreamAuxGroupRecord above but a different stride and a different index
+ * space: 14 (0xE) groups selected by `D_8008ABF8` (not a loop index),
+ * D_80089AC4[i] a signed count, D_80089A8C[i] a pointer to an array of
+ * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
+ * only field func_8005C8AC accesses. The remaining 4 bytes are undiscovered
+ * from this unit alone. */
+typedef struct DreamAuxTriggerEntry {
+    s16 key;
+    u8 unk2[4];
+} DreamAuxTriggerEntry;
+
+extern s8 D_80089AC4[];
+extern DreamAuxTriggerEntry *D_80089A8C[];
+
+/* A small signed-byte lookup table read by func_8005CD58, indexed by its
+ * `idx` parameter. Layout beyond "one signed byte per entry" is not known
+ * from this unit alone. */
+extern s8 D_80088D16[];
 
 /* "ETC\\SYMSPY.MOM" / "ETC\\SYMDOG.MOM" -- MOM = this game's audio-stream
  * format (per lsddecomp naming elsewhere in the project). Defined in
@@ -103,6 +138,13 @@ typedef struct TriggerWorld {
 
 typedef void *(*TriggerWorldFn)(TriggerWorld *self, s8 parity);
 
+/* vtable slot 0x80 (byte offset 0x200) of a TriggerWorld-shaped object:
+ * takes only `self`, returns a value compared against a caller value.
+ * Distinct arity/slot from TriggerWorldFn above -- same object family
+ * (per D_8008AC00, the only TriggerWorld-typed global known so far),
+ * different vtable entry. Used by func_8005CD58 and func_8005C930. */
+typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
+
 extern bool func_8005CBC8(s32 value, TriggerRecord *record);
 /* `out` is a 4-word (0x10-byte) caller stack scratch buffer, reused across
  * every call in func_8005CAB4's loop. Its LAST word is pre-populated by the
@@ -112,7 +154,7 @@ extern bool func_8005CBC8(s32 value, TriggerRecord *record);
  * other change. func_8005CDF8 is still INCLUDE_ASM (gp-relative-blocked,
  * see docs/research/gp-relative-blocker.md), so its own use of that word is
  * not derived here. */
-extern bool func_8005CDF8(u8 kind, void *out, void *ctx, u8 entry);
+extern bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry);
 extern void func_8005C714(s32 triggerType);
 extern bool func_8005630C(void);
 extern bool func_8005CD58(s32 idx);

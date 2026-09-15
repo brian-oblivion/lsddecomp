@@ -1,49 +1,118 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
-> screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
-> `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
-> passed by the Makefile), the whole image stays byte-exact, and previously
-> blocked functions now match (see `docs/research/gp-relative-blocker.md`,
-> "RESOLVED"). Everything below is evidence from before the fix: its
-> derivation may still be right, its VERDICT is not. Rebuild before believing
-> any score in it.
-
 # func_8005C9DC
 
-**Unit:** code_4cd08 · **Size:** 54 words · **Status:** BLOCKED, not attempted ·
-Classified by the head in round 2026-08-30-a.
+**Unit:** code_4cd08 · **Size:** 54 words · **Status:** MATCHED round 43
+(54/54, byte-exact whole-image build).
 
-This is a **stub report**, filed so `tools/progress.py` stops counting this
-function as fresh ground and staffing a runner onto it. It records a routing
-decision, not an attempt.
+## History
 
-## Why it is blocked — gp-relative + addiu_at indexed-load
+Filed BLOCKED in round 2026-08-30-a on one `%gp_rel` reference (to
+`D_8008ABF8`) plus one `addiu_at` indexed-load. Round 42 resolved both.
+Never actually attempted -- the stub carried no derivation. Round 43 derived
+and matched it.
 
-1 `%gp_rel` reference(s), the first to `D_8008ABF8`.
-That is the **gp-relative addressing blocker**,
-`docs/research/gp-relative-blocker.md`: the pinned `-G0` pipeline emits the
-two-instruction absolute (`lui`+`lw`) form where retail has the one-instruction
-`$gp`-relative form. The `-G` experiment was run on 2026-08-29 with operator
-authorisation and REJECTED — a clean non-zero-`-G` rebuild damages 19148 bytes,
-and `-G4`/`-G8` damage identically, ruling out the size threshold as the
-mechanism. The pin stays at `-G0`.
+## What it does
 
-1 runtime-indexed global load(s) using the fully-resolved `$at` form.
-That is the **`addiu_at` blocker**, `docs/research/addiu-at-blocker.md`: maspsx
-at the pinned `--aspsx-version=2.34` folds `%lo` into the load's displacement
-(three instructions) where retail resolves the symbol first (four). Retail uses
-the unfolded form 502 times across 39 files and the folded form zero times.
-The remedy is NOT a version bump — below 2.30 four flags flip together, three
-of them nop-insertion rules affecting already-matched code, and maspsx exposes
-no per-flag override. Open operator escalation.
+Construct a `TriggerWorld` via `func_80044A0C`; if construction succeeds,
+walk 3 candidate bytes (`a1[3..5]`, terminated early by a `-1` sentinel) and
+fire `func_8005CAB4` once per non-sentinel byte against the SAME
+`D_80089A44`/`D_8008ABF8` parallel-group table `func_8005C508` clears
+(8-byte stride, confirmed there and reused here identically); the loop's
+`func_8005CAB4` results are discarded (called for side effects only). The
+return value is just whether construction succeeded:
 
-## Do not re-derive this
+```c
+extern TriggerWorld *func_80044A0C(s32 *ctx);
+bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
 
-Both blockers are already escalated with reproducers and corpus censuses attached.
-Do not spend attempts here, do not propose a toolchain change, and do not classify
-a residue from this construct as a scheduling or delay-slot choice. Check cheaply
-before attempting any function:
+s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
+{
+    s32 ctxArg[4];
+    TriggerWorld *world;
 
-```sh
-grep -n 'gp_rel' asm/nonmatchings/<unit>/<func>.s
-grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
+    ctxArg[0] = a2;
+    world = func_80044A0C(ctxArg);
+
+    if (world != NULL) {
+        DreamAuxGroupRecord *base = D_80089A44[D_8008ABF8];
+        s8 *p = a1 + 3;
+        s8 *end = a1 + 6;
+
+        while (p < end) {
+            s8 entry = *p;
+
+            if (entry == -1) {
+                break;
+            }
+            func_8005CAB4(a0, a1, (TriggerRecord *)((u8 *)base + entry * 8), world);
+            p++;
+        }
+        return (s32)world;
+    }
+    return 0;
+}
 ```
+
+`func_8005CAB4`'s `record` parameter here is a `DreamAuxGroupRecord *`
+(8-byte stride, `D_80089A44`) reinterpret-cast to `TriggerRecord *` (0x38-byte
+stride, `func_8005CAB4`'s own already-matched typed view). Both sizes are
+independently confirmed correct for their own already-matched call sites
+(`func_8005C508`'s pointer scaling for the first, `func_8005CAB4`'s own
+`record + 1` recursion for the second) -- this call site legitimately hands
+a small 8-byte slot to a function that privately treats it as a much larger
+struct, which is safe here only because the recursive (`kind == 2`) arm of
+`func_8005CAB4` is never taken for these particular records. This is the
+same kind of cross-type reinterpretation CLAUDE.md documents for
+`func_8005CD58`/`func_8005C930`'s shared `D_8008AC00` global, just at a
+struct-pointer level instead of a scalar.
+
+`func_80044A0C` is a new symbol, not owned by this unit and not previously
+declared anywhere in the tree; declared here with a minimal local prototype
+(`TriggerWorld *func_80044A0C(s32 *ctx)`).
+
+## Derivation notes
+
+Two attempts short of byte-exact, both frame-shape mismatches rather than
+logic errors -- the CALL sequence and branch structure were right from the
+first build, but the STACK FRAME size was wrong twice:
+
+1. **First pass (7/54, one word of frame missing, 81797 bytes of drift):**
+   used `for (i = 3; i < 6; i++)` with `a1[i]` (integer indexing over two
+   LITERAL bounds). GCC can statically prove `3 < 6` and unconditionally
+   enters the loop, generating a do-while with no guard sltu -- retail's own
+   asm has an explicit `sltu $v1, $s0, $s1` BEFORE the loop even starts. That
+   only happens when the bound is a runtime POINTER COMPARISON the compiler
+   cannot fold, i.e. retail's C walks `s8 *p`/`s8 *end` pointers, not integer
+   indices, the same idiom `func_8005CAB4` (already matched, same unit) uses
+   for its own `entries` scan. Switching to `s8 *p = a1+3; s8 *end = a1+6;
+   while (p < end) { ...; p++; }` reproduced the guard (36/54, no more
+   out-of-range drift).
+2. **Second pass (36/54, frame still 8 bytes/2 words short):** with
+   `s32 ctxArg = a2;` passed as `&ctxArg` to `func_80044A0C`, every
+   instruction inside the function matched except the FRAME SIZE itself
+   (`addiu $sp,$sp,-0x38` vs retail's `-0x40`) and the consequent save-slot
+   offsets. Retail reserves 0x10 bytes (4 words) at the bottom of its frame
+   for this local, not 4 bytes for one word -- the same "caller hands the
+   callee a stack buffer wider than what gets explicitly written" shape as
+   `func_8005C650`'s `New_Entity` call (a 4-word buffer with only the last
+   word set) documented earlier this round. Widening `ctxArg` from a scalar
+   to `s32 ctxArg[4]` (only `ctxArg[0]` ever written) matched the frame size
+   exactly and reached byte-exact.
+
+## Proposed learning
+
+Two entries, both reinforcing patterns already on file rather than new
+mechanisms:
+
+- Confirms the round-43 `func_8005CF34`/`func_8005C650` observation that a
+  scratch buffer handed to an external call can be WIDER than what the
+  caller itself writes -- a THIRD instance in this same unit
+  (`func_8005C650`'s `New_Entity` buffer, `func_8005CF34`'s implicit
+  `localPos`, now `func_8005C9DC`'s `ctxArg[4]`). When a local's frame
+  footprint comes up short by a clean multiple of 4 bytes with every
+  instruction otherwise matching, suspect an under-sized scratch buffer
+  before anything else.
+- Confirms (does not add) the existing "pointer-walk over two runtime
+  bounds needs actual pointers, not integer indices over literal bounds" --
+  already implicit in `func_8005CAB4`'s own body, now independently
+  reproduced by matching a second, unrelated function against the same
+  idiom.
