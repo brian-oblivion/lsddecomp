@@ -196,6 +196,76 @@ void func_80054850(void) {
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
 
+typedef struct ObjAC7CSub ObjAC7CSub;
+typedef struct ObjAC7CSubMethods ObjAC7CSubMethods;
+struct ObjAC7CSubMethods {
+    u8 pad64[0x64];
+    void (*slot64)(ObjAC7CSub *self, void *arg1); /* +0x064 */
+};
+struct ObjAC7CSub {
+    ObjAC7CSubMethods *methods; /* +0x000 */
+    u8 pad4[0x18 - 0x4];
+    s32 field18; /* +0x018 */
+    u8 pad1C[0x24 - 0x1C];
+    s32 field24; /* +0x024 */
+};
+
+typedef struct ObjSlotB8B8 ObjSlotB8B8;
+typedef struct ObjSlotB8B8Methods ObjSlotB8B8Methods;
+struct ObjSlotB8B8Methods {
+    u8 padB8[0xB8];
+    void (*slotB8)(ObjSlotB8B8 *self, s32 arg1, void *arg2); /* +0x0B8 */
+    void (*slotBC)(ObjSlotB8B8 *self, void *arg1); /* +0x0BC */
+};
+struct ObjSlotB8B8 {
+    ObjSlotB8B8Methods *methods; /* +0x000 */
+};
+
+/* STALL, 24/93 words, 3 words short (out-of-range drift present) -- see
+ * docs/match-reports/func_800549A8.md. Preserved near-miss body: */
+#if 0
+void func_800549A8(void) {
+    ObjAC7CSub *self;
+    s32 delta;
+    s32 s3;
+    s32 paramA[2];
+    s32 paramB[2];
+    s32 s1;
+    s32 i;
+    void **arr;
+    void *obj;
+
+    if (D_8008AB50 == 0) {
+        return;
+    }
+    self = *(ObjAC7CSub **) (D_8008AC7C + 0xC);
+    delta = self->field18 - self->field24;
+    s3 = (delta / 600) * 3;
+    if (s3 <= 0) {
+        return;
+    }
+    paramB[0] = D_8008AB68;
+    paramB[1] = D_8008AB6C;
+    i = 0;
+    if (D_8008AB50 == 2) {
+        paramB[1] += 0x1E;
+    }
+    arr = D_8008E10C;
+    s1 = 0;
+    paramB[1] = paramB[1] + s3 * 3;
+    for (; i < 0x12; i++) {
+        func_80054B1C((u8 *) paramA, (u8 *) (s1 + D_8008AC8C), s3);
+        obj = arr[i];
+        ((ObjSlotB8B8 *) obj)->methods->slotB8(obj, 1, paramA);
+        obj = arr[i];
+        s1 += 3;
+        ((ObjSlotB8B8 *) obj)->methods->slotBC(obj, paramB);
+        paramB[1] += 3;
+    }
+    func_80054B1C((u8 *) paramA, (u8 *) D_8008AC90, s3);
+    self->methods->slot64(self, paramA);
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800549A8);
 
 void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
