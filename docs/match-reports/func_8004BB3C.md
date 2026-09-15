@@ -1,5 +1,51 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 46 (charlie): Gate 1b re-verified 90/105, no drift; this round's
+> split-combined-declaration lever tried on `ep`/`sp`, INERT; the
+> beq/bne-polarity lever checked and does not apply -- SKIPPING.** Rebuilt
+> the committed 90/105 body from a clean `INCLUDE_ASM` baseline: confirmed
+> 90/105, exact length, identical whole-function `$s3`<->`$s4` register-
+> identity swap.
+>
+> **Beq/bne delay-slot-polarity lever: does not apply.** Every branch
+> target in the function already agrees with retail (established since
+> round 13); the residue is a register-COLORING choice, not a branch
+> polarity or delay-slot-assignment issue.
+>
+> **Split-combined-declaration lever, tried directly:** `ep`/`sp` (the two
+> differently-based walking pointers whose introduction in round 13 is
+> what got this function to 90/105 in the first place) are declared with
+> combined initializers (`SetupEntry866E8 *ep = arr1;` / `SetupSub866E8
+> *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);`) -- exactly the shape the
+> lever targets. Split into separate declaration and assignment
+> statements, rebuilt: **90/105, IDENTICAL diff, no drift -- fully
+> inert.** Reverted (`git checkout -- src/class_3bb8c.c`; clean
+> `OK: build matches retail` confirmed after).
+>
+> This is a THIRD confirmed instance of the scope limitation this round's
+> own broadcast already established on two other functions
+> (`func_800357B0`, `func_800344FC`, both in `code_179d8_k`): the
+> split-declare lever closes a register-CLASS residue for a value crossing
+> a CALL boundary with independently-confirmed-correct timing
+> (`func_80028540`'s case), and does nothing for a whole-function
+> parameter/induction-variable register-COLORING residue. `ep`/`sp` here
+> are exactly the latter shape -- two loop-local walking pointers seeded
+> once before the loop and never crossing a call boundary in a way their
+> registers depend on -- so the negative result was expected and is now
+> measured, not assumed.
+>
+> **Disposition unchanged: 90/105, `INCLUDE_ASM` restored, `git diff`
+> against the round-13 commit for this function's C is empty.** This
+> residue remains blocked on the same axis it has been blocked on since
+> round 13 (six prior rounds' worth of confirmation: 17, 19, 20, 27, 32,
+> 39, 40, 41), the isolated permuter scaffold provably scores a different
+> residue than the real build (round 17/40, and this class recurs
+> elsewhere in this unit this round -- see `func_8004CAF0`,
+> `func_8004C1C0`, `func_8004C93C`, `func_8004CD38`), and neither of this
+> round's two new levers applies. **SKIPPING further attempts this
+> round** per this round's own guidance on functions whose cheap levers
+> are spent.
+
 > **ROUND 41 (alpha): Gate 1b re-verified 90/105, no drift; dead-reload
 > lever read BY HAND per this round's staffing instruction, one new
 > structural variant tried, REGRESSED hard.** Rebuilt the exact preserved
