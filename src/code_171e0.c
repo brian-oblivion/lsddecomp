@@ -172,7 +172,16 @@ s32 func_80026F00(void) {
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026F34);
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026FAC);
+extern s32 func_80027EF8(void);
+extern s32 func_8002C448(void);
+
+s32 func_80026FAC(void) {
+    if (D_8008A84C == 0x13) {
+        return func_80027EF8();
+    } else {
+        return func_8002C448();
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026FE8);
 
