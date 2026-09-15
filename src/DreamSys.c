@@ -1649,7 +1649,32 @@ s32 func_8005BB14(s32 stage)
 	return STAGE_TIME_LIMITS[stage];
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", GetRandomSpawnFromStage);
+s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused)
+{
+	s32 stage;
+	s32 index;
+	StageSpawn *entry;
+	s32 six;
+
+	six = 6;
+	if (stg >= 0) {
+		stage = rand() % six;
+		if (stage == stg) {
+			stage++;
+			if (stage >= 6)
+				stage = 0;
+		}
+	} else {
+		stage = -stg;
+	}
+
+	index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
+	entry = &STAGE_SPAWNPOINTS[stage][index];
+	*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
+	target->position = SPAWN_POS_ADJUST[entry->adjustment];
+	(*gpDinamicLinkPenalty)++;
+	return stage;
+}
 
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
