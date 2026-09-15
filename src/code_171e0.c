@@ -133,7 +133,14 @@ s32 func_80026E64(void) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026E98);
+extern s32 func_80027ED4(void);
+
+s32 func_80026E98(void) {
+    if (D_8008A84C == 0x13) {
+        return func_80027ED4();
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026ECC);
 
