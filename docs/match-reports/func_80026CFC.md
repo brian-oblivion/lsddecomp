@@ -1,5 +1,40 @@
 # func_80026CFC -- 3 words long (38 vs 35) -- 1/35 raw word match -- first real diff at vram 0x80026D00
 
+> **HEAD CORRECTION, round 43 (2026-09-15): THE PERMUTER NEGATIVE IN THIS
+> REPORT IS AN ARTIFACT AND MUST NOT BE READ AS EVIDENCE.** The
+> "150582 iterations, best score 1643 -> 900, never zero" result was produced
+> by `tools/setup-permuter.sh`'s generated `compile.sh`, which hardcodes
+> `MASPSX_FLAGS` independently of the Makefile and **omits round 42's
+> `--gp-symbols=config/gp-symbols.txt` and `--no-nop-mflo-mfhi`**.
+>
+> That matters for THIS function specifically: its body reads `D_8008A84C`,
+> which **is** in `config/gp-symbols.txt`, and its retail asm carries one
+> `%gp_rel` reference. Without `--gp-symbols` the permuter's baseline emits an
+> absolute access where retail has a gp-relative one, so **at least one word
+> could never match no matter what C the permuter produced.** The search could
+> not have reached zero; it was not testing the register-allocation
+> hypothesis at all. Base score, candidate scores and the iteration count are
+> all measured against an unreachable target and none of them is informative.
+>
+> **The REGISTER-ALLOCATION class itself is NOT withdrawn** -- it rests on the
+> hand-built variants and the 3-words-long / 1-of-35 funcdiff figures, which
+> came from the real pinned build through `build-and-verify.sh` and are
+> unaffected. What is withdrawn is only the claim that a permuter search has
+> been tried and failed. **This function has, in effect, never been
+> permuter-searched**, so it belongs in Gate 1b's sixth screen as
+> never-searched ground rather than as exhausted ground.
+>
+> Independently confirmed: runner delta hit the same gap the same round on
+> `func_8004DCD0`, diagnosed it, and hand-patched its own gitignored
+> `compile.sh` -- so delta's 26500-iteration negative IS valid while this one
+> is not. Two searches in one round, one trustworthy and one not, separated
+> only by whether the runner happened to notice.
+>
+> The tool is NOT fixed here: changing `MASPSX_FLAGS` is a flag change and
+> therefore an operator escalation (CLAUDE.md, "Escalate, do not experiment").
+> Escalated in round 43's write-up.
+
+
 **Unit:** code_171e0 · **Size:** 35 words (retail) · **Status:** STALLED,
 class REGISTER-ALLOCATION (round 43, 2026-09-15, runner bravo).
 
