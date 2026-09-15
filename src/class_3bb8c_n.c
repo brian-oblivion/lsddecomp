@@ -184,7 +184,26 @@ void func_80054D30(void) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054DA4);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054F30);
+extern s32 D_80087330;
+extern u8 D_80087204[];
+extern u8 D_8008E0A4[];
+extern u8 *D_8008E0B4;
+extern void *func_80055258(void *arg0, void *arg1);
+extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
+
+void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
+    s32 i;
+    s32 val;
+
+    val = D_80087330;
+    D_8008E0B4 = D_80087204;
+    for (i = 0; i < arg1; i++) {
+        func_80055258(arg2, (void *) val);
+        *arg0 = func_80056320((void *) 1, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        arg0++;
+    }
+    return arg0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054FD8);
 
