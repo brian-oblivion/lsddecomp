@@ -390,3 +390,44 @@ trade-off with its own regressions). Worth noting alongside the existing
 "variable identifier choice has no influence on register assignment"
 learning: neither naming nor adding-and-not-using a local is a technique
 that works on this compiler's allocator.
+
+## Round 44 update (runner delta): inherited body re-verified real; first permuter search, negative
+
+Re-verified the inherited 108/112 body first: `objdump -t` on
+`build/src/code_179d8_l.c.o` confirms `func_8002DDBC` compiles to `0x1b0`
+bytes = 108 words, matching rounds 26/33/35's figure exactly. Realigned
+`asm-differ` confirms the same residues (the `a3`/`a0` register swap, the
+missing `addiu sp,sp,-8`/`+8` frame) at the exact positions already named.
+
+**First-ever permuter search on this function: bounded to 900s, `-j 6`,
+base score 3100 (`--debug --stack-diffs`).** Best score reached: **1800**,
+down from 3100, at iteration count in the hundred-thousands range (this
+worktree's own single search, no other concurrent search in THIS
+worktree this round -- see the process-hygiene note below). Zero
+`score = 0` hits.
+
+**The best candidate is a negative result once verified directly.** Its
+only structural change from the seed: wrapping the tail's
+`e22c = highBit | e22c; D_8008E228 = e228; c60 = c60 & ~e228;` triple in a
+`do { ... } while (0);` block. Spliced into the real unit and rebuilt:
+**still 108/112 (0x1b0), no length change** -- the isolated scaffold's
+score improvement (3100 -> 1800) did not translate, consistent with this
+unit's other three same-round instances of this exact divergence
+(`func_8002CF18`, `func_8002E138`, `func_8002D6A4`, all round 37) EXCEPT
+for `func_8002CD08` this round, where the identical construct DID
+translate -- confirming again that a `do-while(0)` candidate must be
+verified by direct rebuild every time, in both directions, never assumed
+from the isolated score alone.
+
+**Process-hygiene note, for the record:** this search and `func_8002CD08`'s
+were launched concurrently (both running for roughly 12 minutes) before
+the "one search at a time" rule was caught and corrected; flagged in the
+round's broadcast. Neither search's result is believed compromised by the
+overlap (both ran to their own bound independently), but it is noted here
+in case a future round needs to discount timing-sensitive iteration counts.
+
+**Disposition: unchanged at 108/112 (4 short).** Consistent with rounds
+26/33/35's conclusion: the remaining gap is the register-identity swap
+this report already tried multiple ways and confirmed unmovable from C,
+now also confirmed immune to a bounded permuter search. Restored to
+`INCLUDE_ASM` (no change from the pre-session state).
