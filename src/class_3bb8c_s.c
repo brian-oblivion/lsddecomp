@@ -312,6 +312,59 @@ extern Vec3S D_8008782C;
  * argument), not dereferenced anywhere in this function. */
 extern s32 D_80087838[];
 
+#if 0
+/* round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
+ * See docs/match-reports/func_800569A8.md for the residue and what was
+ * tried. Kept here per the hard rule -- restore this ahead of any future
+ * attempt rather than re-deriving from scratch. */
+void func_800569A8(LinkNode *self)
+{
+    s32 idx;
+    s32 *tab70;
+    s32 *tab70b;
+    s32 accumOffset;
+    s32 divq;
+    s32 modend;
+    LinkNode **p;
+    s32 i;
+
+    idx = self->unk70;
+    if (self->unk6C != 0) {
+        tab70 = &D_8008780C[idx];
+        if (*tab70 != 0 && (u32) self->unk24 >= 0x1F5) {
+            p = self->arr7C;
+            self->methods->slot44(self, 0, (s32) D_80087838);
+
+            i = 0;
+            tab70b = tab70;
+            accumOffset = 0;
+            for (; i < 2; i++) {
+                Vec3S local = D_8008782C;
+                local.z += accumOffset + *tab70b;
+                (*p)->methods->slotBC(*p, &local);
+                accumOffset += 3;
+                (*p)->methods->slot44(*p, 0, (s32) D_80087838);
+                p++;
+            }
+
+            divq = 24500 / D_8008780C[idx];
+            modend = self->unk24;
+            if (divq >= 0) {
+                if ((u32) modend % (u32) divq == 0) {
+                    func_80056858(self, 1);
+                }
+            } else {
+                u32 adivq = ~divq + 1;
+                if ((u32) modend % adivq == 0) {
+                    func_80056858(self, 1);
+                }
+            }
+        }
+    }
+    *self->unk14 = 0;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800569A8);
 
 extern void func_800183DC(void **array, s32 count);
