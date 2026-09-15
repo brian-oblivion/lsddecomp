@@ -75,6 +75,27 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D1B4);
 
+extern u8 D_8008EA13;
+extern u8 D_8008EA18;
+
+/* Shared with func_8002E038 below (same base pointer, same table); this
+ * function needs the +0x10/+0x12 halfwords too, so the struct is declared
+ * once here (ROM-address order: func_8002D6A4 precedes func_8002E038) and
+ * reused there rather than redeclared -- see docs/match-reports/func_8002D6A4.md. */
+typedef struct {
+    u8 unk0[4];
+    u8 unk4;
+    u8 unk5;
+    u8 unk6[6];
+    u8 unk12;
+    u8 unk13;
+    u8 pad14[2];
+    u16 unk16; /* +0x10 */
+    u16 unk18; /* +0x12 */
+    u8 pad20[0x20 - 20];
+} D8008E978Entry;
+extern D8008E978Entry *D_8008E978;
+
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D6A4);
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
@@ -111,18 +132,6 @@ s32 func_8002DF7C(void) {
 
 extern u8 D_8008EA13;
 extern u8 D_8008EA18;
-
-typedef struct {
-    u8 unk0[4];
-    u8 unk4;
-    u8 unk5;
-    u8 unk6[6];
-    u8 unk12;
-    u8 unk13;
-    u8 unk14[18];
-} D8008E978Entry;
-
-extern D8008E978Entry *D_8008E978;
 
 s32 func_8002E038(s32 a0, s32 a1) {
     s32 origA0;
