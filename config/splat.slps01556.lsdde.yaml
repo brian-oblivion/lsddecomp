@@ -584,33 +584,47 @@ segments:
       # `addiu $sp,$sp,-0x88` -- that is an ordinary hoisted global load, NOT
       # the pre-prologue `$sp` touch Gate 2 warns about.
       - [0x179d8, c, code_179d8_o]
-      # code_179d8: the head remainder, functions 4..42 of the original,
-      # 0x17AD0.. -- 39 functions, of which 5 are clean (func_800276C8 2w,
-      # func_80027D40 12w, func_80027E68 4w, func_80027FFC 53w,
-      # func_800282AC 32w) and 33 are gp_rel-blocked; 1 (func_80027A24, index
-      # 10 of the ORIGINAL numbering) owns this segment's only jump table, in
-      # the 0xFD8 rodata slot.
+      # code_179d8: the head remainder.  ROUND 45 (2026-09-15) SPLIT IT IN
+      # THREE and corrected the census below it, which had gone stale in the
+      # expensive direction.
       #
-      # NEXT CARVE, worked out round 26 but NOT taken -- head attention, not
-      # ground, was the binding constraint by then.  **Cut [11..32] of the
-      # original numbering** (i.e. starting AFTER func_80027A24, ending after
-      # func_800282AC).  22 functions: 4 clean -- func_80027D40 12w,
-      # func_80027E68 4w, func_80027FFC 53w, func_800282AC 32w -- and 18
-      # gp_rel-blocked.  Its virtue is that it contains NO jump table, so it
-      # needs NO rodata attach and avoids the one genuinely fiddly part of
-      # carving here.
+      # WHAT WAS STALE: the round-26 note here budgeted "18 STUB REPORTS for
+      # the blocked functions" and called 33 of 39 `gp_rel`-blocked.  `gp_rel`
+      # was RESOLVED in round 42 by maspsx's `--gp-symbols` (CLAUDE.md, "Open
+      # toolchain blockers"), so that debt is ZERO and the segment measures
+      # 39 of 39 blocker-clean under `tools/uncarved.py`.  The note also
+      # framed nine small bodies as "the LAST CHEAP SEAM in the executable";
+      # that was true only while the other 33 were believed unreachable.
+      # WHAT STILL STANDS from it: func_80027A24 owns this segment's only
+      # jump table (0xFD8 rodata slot), so a cut must not cross it -- which
+      # is why the remainder below keeps it and neither new unit contains one.
       #
-      # Budget 18 STUB REPORTS for the blocked functions when you take it.
-      # They are not optional bookkeeping: `progress.py`'s `fresh` column
-      # cannot see blockers, so a blocked function with no report counts as
-      # FRESH and the next round staffs someone into a wall.  They are
-      # mechanical and scriptable -- one honest "gp_rel, not attempted,
-      # screened <date>" body each.
+      # The three-way split, in address order:
+      #   [0x17AD0..0x18480)  code_179d8 (still asm) -- 7 functions, 620w,
+      #        func_800272D0 108w .. func_80027A24 151w.  Holds the jump
+      #        table; left uncarved so the rodata-attach decision stays a
+      #        deliberate act rather than a side effect of this split.
+      #   [0x18480..0x18B2C)  code_179d8_q -- 22 functions, 427w.
+      #   [0x18B2C..0x19098)  code_179d8_r -- 10 functions, 347w.
       #
-      # Cutting [4..10] instead yields only ONE clean function
-      # (func_800276C8, 2w) against 5 blocked, and pulls in the jump table.
-      # Not worth it.
+      # Carve-time screens, run per function over both new slices
+      # (`tools/uncarved.py --functions`, plus the Gate 2 boundary checks):
+      #   32 of 32 blocker-clean; zero `jr $t2` trampolines; zero `jtbl_`
+      #   references; zero `alabel`; zero non-`.L` alt-entry labels; no
+      #   function with more than one `addiu $sp, $sp, -N` prologue.
+      # Rodata: slice q takes `%hi` address-takes of D_800107D8 (the 0xFD8
+      # rodata slot) and D_8006D4E8 -- both are named `dlabel` symbols, which
+      # a STANDALONE rodata object resolves, so NEITHER slot is attached.
+      # Only `.L` labels local to a unit's own function `.s` force an attach.
+      # Boundaries checked both sides: func_80027A24 and func_800282AC each
+      # close on `endlabel`, and func_80027C80 / func_8002832C each open on
+      # their own `addiu $sp, $sp, -N`.
+      #
+      # Expect each slice to span more than one class; identify each with
+      # `tools/classtable.py` rather than assuming the unit has one.
       - [0x17AD0, asm, code_179d8]
+      - [0x18480, c, code_179d8_q]
+      - [0x18B2C, c, code_179d8_r]
       # code_179d8_h: functions 43..59 of the original monolith's head,
       # 0x19098..0x194E0 (17 functions).  Carved MID-round 17 to re-staff a
       # runner whose own unit was exhausted.  Census 2026-09-04, three-grep
