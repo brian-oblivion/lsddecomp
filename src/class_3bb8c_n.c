@@ -87,7 +87,16 @@ void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
     dst[2] = src[2] + delta;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B50);
+extern void func_800183DC(void **array, s32 count);
+extern s32 D_8008AB50;
+extern void *D_8008E10C[];
+
+void func_80054B50(void) {
+    if (D_8008AB50 != 0) {
+        func_800183DC(D_8008E10C, 0x12);
+        D_8008AB50 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B84);
 
