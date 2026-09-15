@@ -1666,7 +1666,48 @@ s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
 	return (u16)(diff + 44) < 89;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE90);
+/* Compared against the leading 4 bytes (chunk+tile) of `currentPos` as a
+   raw word; only ever compared here, never dereferenced field-by-field. */
+extern s32 D_8008ABE8;
+
+s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
+{
+	s32 result;
+
+	if (stage == 3)
+		goto shared;
+	if (stage == 1)
+		goto shared;
+	if (stage == 5)
+		goto case5;
+	if (stage == 9)
+		goto shared;
+	if (stage != 0xC)
+		return -1;
+
+shared:
+	if (stage != 5)
+		goto case9check;
+case5:
+	if (currentPos->position.y < -0xFFF)
+		goto merge;
+	if (*(s32 *)currentPos == D_8008ABE8)
+		goto merge;
+	return -1;
+
+case9check:
+	if (stage != 9)
+		goto merge;
+	if (currentPos->position.y < 0x800)
+		return -1;
+
+merge:
+	if (timer & 1)
+		stage = -0xC;
+	result = GetRandomSpawnFromStage(target, stage, timer);
+	D_8008ACC4 = result;
+	return result;
+}
 
 /* Set (whole word) into `this->unk_0x880` by func_8005A7A0 just before an
    ExecuteLink; only ever address-taken here, never dereferenced by this
