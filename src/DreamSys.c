@@ -1600,7 +1600,20 @@ s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
 
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BE90);
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005BF48);
+/* Set (whole word) into `this->unk_0x880` by func_8005A7A0 just before an
+   ExecuteLink; only ever address-taken here, never dereferenced by this
+   unit's queued functions. */
+extern s32 D_8008ABF0;
+
+s32 func_8005BF48(void)
+{
+	s32 result;
+
+	result = 0;
+	if (D_8008ACC4 != 0xC)
+		result = (s32)&D_8008ABF0;
+	return result;
+}
 
 /* Flag set here, tested by Test4InstantTeleporters right below; local to
    this unit -- code_4cd08.c calls the setter through its own extern
