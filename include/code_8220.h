@@ -70,17 +70,35 @@ struct BasicClass {
 };
 
 /*
- * bMemPMgr -- BMemPMgrInit's own pool-header object. Only the two fields
- * BMemPMgrInit itself writes are typed; the rest of the allocation
- * (poolSize + 0x20 bytes total) is an opaque free-list area owned by
- * func_80017AC8/func_80017B34/func_80017CFC (all gp_rel-blocked, see
- * docs/research/gp-relative-blocker.md), manipulated as a packed
- * size+flags word per node -- never as this struct's own fields.
+ * BMemBlockHdr -- a single free-list node inside a BMemPMgr's pool area.
+ * `sizeAndFlags` packs the block's byte size into the low 28 bits and
+ * flag bits into the high 4 (0x40000000 = free); `prev`/`next` link the
+ * pool's doubly-linked free list. Derived from func_80017AC8 (round 45)
+ * and reused by func_80017B34/func_80017CFC's still-undecoded bodies,
+ * which walk this same list via BMemPMgr's freeListStart/freeListEnd.
+ */
+typedef struct BMemBlockHdr BMemBlockHdr;
+struct BMemBlockHdr {
+    /* +0x000 */ u32 sizeAndFlags;
+    /* +0x004 */ BMemBlockHdr *prev;
+    /* +0x008 */ BMemBlockHdr *next;
+};
+
+/*
+ * bMemPMgr -- BMemPMgrInit's own pool-header object. `freeListHead`/
+ * `poolSize` are the two fields BMemPMgrInit itself writes; the three
+ * below them (round 45, func_80017AC8) round out the pool's free-list
+ * bookkeeping. What remains opaque is the pool AREA itself (poolSize +
+ * 0x20 bytes total, starting at `freeListHead`), walked as a chain of
+ * BMemBlockHdr nodes rather than through any field of this struct.
  */
 typedef struct BMemPMgr BMemPMgr;
 struct BMemPMgr {
-    /* +0x000 */ void *freeListHead;  /* set to `self + 0x1C` by BMemPMgrInit; a free-block header immediately after this struct */
+    /* +0x000 */ void *freeListHead;   /* set to `self + 0x1C` by BMemPMgrInit; the pool's first free-list node */
     /* +0x004 */ s32 poolSize;
+    /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, func_80017AC8/B34/CFC */
+    /* +0x00C */ BMemBlockHdr *freeListEnd;   /* free list tail, same trio */
+    /* +0x010 */ s32 unk10;            /* set to 1 by func_80017AC8; not yet read by any decoded function */
 };
 
 /* The generic pool allocator/free pair, established already by
