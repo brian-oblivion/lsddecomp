@@ -7359,3 +7359,59 @@ Foxtrot also spent significant time on an apparent "gp_rel address shift" that
 was ordinary address drift from two functions compiling to the wrong length —
 which is the attribution hazard round 20 documented, arriving in a fresh carve.
 Check the length before reaching for a linker explanation.
+
+### Round 45 addendum — alpha and echo's late findings
+
+**Reproduce retail's bug; do not work around it** (echo, `func_80027C80`
+48/48). The function stores through `$s2` and `$s2` is never assigned on any
+path — a genuine uninitialised-local-pointer bug in the shipped game. A local
+pointer declared with no initialiser and stored through exactly once, at
+retail's own point, matched byte-exact on the first build. GCC put it in `$s2`
+because `$s0`/`$s1` were already claimed by the two parameters, so the
+uninitialised local landed on the next free callee-saved register — retail's
+own allocation, for retail's own reason. **No `volatile`, no fake initialiser,
+no inline asm.**
+
+Note the distinction from the permuter's UB problem, because they look alike
+and are not: a permuter candidate that BRANCHES on an uninitialised read is
+exploiting the scorer and is disqualified (round 41). Reproducing an
+uninitialised STORE that retail demonstrably performs is just matching the code
+that shipped. The discriminator is whether the uninitialised value affects
+control flow in your C, not whether it is uninitialised.
+
+**`break` + a post-loop `if` cannot express "jump PAST a fall-through tail"**
+(echo, `func_80027FFC` 53/53, third attempt). A bounded retry loop whose
+exhaustion path falls into a `printf` and whose success path must skip that
+`printf` needs an explicit `goto`: GCC 2.6.3 does not fold the post-loop check
+away and compiles a real extra `bne`. This is the same family as the
+already-documented `do { } while (0)` and nested-guard entries — the loop-exit
+SHAPE is a source-level choice the compiler does not normalise.
+
+**Mutate the parameter in place when retail keeps the walking pointer in one
+register** (alpha's lever, applied by echo to close the above). Introducing a
+separate loop-cursor local costs a register and desyncs the allocation. This is
+the same finding as delta's scratch-then-advance entry approached from the
+other side, and the two together say: **match the NUMBER of live pointer
+variables retail has, not just the arithmetic.**
+
+*This lever reached echo through `tools/broadcast.sh`, from a runner in a
+different unit, and closed a function the same round it was posted. That is the
+channel doing the job it was added for — and worth recording, because the
+alternative history is that it sat in alpha's write-up until the next round.*
+
+**A uniform register-slot shift across a whole function signals ONE EXTRA
+PERSISTENT LOCAL** (alpha). Not a scheduling problem and not a per-site
+allocation accident: if every register number is displaced by the same amount,
+look for a local you introduced that retail does not have.
+
+**Adding a local that only changes READ TIMING is safe; touching an
+expression's OUTER OPERAND ORDER cascades hard** (alpha). Useful for choosing
+which rephrasing to try first when a residue could be attacked either way.
+
+**K&R (old-style) definitions as an escape hatch for a dead-but-real
+parameter** (alpha, PROPOSED AND NOT CONFIRMED). Both functions alpha reached
+it on remain STALLS (92/114 and 99/107), so this is a hypothesis with two
+partial results behind it, not a lever. It is legal C89 and it is NOT a banned
+construct — it pins no register and names no operand — but nothing has yet
+closed on it. Recorded so the next attempt starts from it rather than
+rediscovering it; do not cite it as established.
