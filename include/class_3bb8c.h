@@ -1055,11 +1055,28 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     u8 pad008[0x04C - 0x008];
     /* +0x04C, func_8004DC64's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
     void (*slot4C)(Class86B60UnkB0Obj_3bb8c_d *self, s32 arg1, void *arg2);
+    u8 pad050[0x0B8 - 0x050];
+    /* +0x0B8, func_8004DCD0's own last call: `(self, buf)` where `buf` is
+     * that function's own 3-byte stack buffer. Lands at the SAME offset
+     * as `include/class_3bb8c.h`'s own `FieldM7CMethods::slotB8` (a
+     * different unit's independent view) and `code_2cc8c.h`'s
+     * `Unk64ElemMethods` -- further confirmation (on top of `release`
+     * +0x004 and `slot4C` +0x04C already matching both) that `unkB0` is
+     * that same real class. */
+    void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
+    u8 pad0BC[0x0CC - 0x0BC];
+    /* +0x0CC, func_8004DE08's own call: `(self, buf)` where `buf` is a
+     * pool-allocated string this function fills with `func_80040FC0`
+     * before the call and frees right after. */
+    void (*slotCC)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
 };
 
 struct Class86B60UnkB0Obj_3bb8c_d {
     Class86B60UnkB0ObjMethods_3bb8c_d *methods; /* +0x000 */
-    u8 pad004[0x0AA - 0x004];
+    u8 pad004[0x0A9 - 0x004];
+    /* +0x0A9, func_8004DE08: read as an unsigned byte and used directly as
+     * an allocation SIZE (`func_80017B34`'s own argument). */
+    u8 unkA9;
     /* +0x0AA/+0x0AB/+0x0AC, func_8004DB18: three literal byte fields
      * (9/8/4) set right after allocation via `func_800408CC` -- this is
      * the SAME real object as `code_2cc8c.h`'s `Unk64Elem` (matching
@@ -1150,7 +1167,12 @@ struct Class86B60Methods {
     void (*slot14)(Class86B60 *self, void *arg1);
     u8 pad018[0x040 - 0x018];
     void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, func_8004D578's own last call */
-    u8 pad044[0x06C - 0x044];
+    u8 pad044[0x060 - 0x044];
+    /* +0x060, func_8004DE08's own two calls, both `(self, literal)` --
+     * once with `0xB` right after `self->unk58 = 5`, once with `0xF`
+     * later in the same function. */
+    void (*slot60)(Class86B60 *self, s32 arg1);
+    u8 pad064[0x06C - 0x064];
     void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, func_8004D814's own 2nd call, arg1 = 0xA */
     u8 pad070[0x078 - 0x070];
     void (*slot78)(Class86B60 *self); /* +0x078, func_8004D90C's own last call, `self` only */
@@ -1166,12 +1188,26 @@ struct Class86B60Methods {
     /* +0x0D4, func_8004D814's own first call, arg1 = &D_800114E8, arg2 = 0. */
     void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, func_8004D578's own call, arg1 = &D_80086D44 */
-    u8 pad0DC[0x0F0 - 0x0DC];
+    u8 pad0DC[0x0E0 - 0x0DC];
+    /* +0x0E0, func_8004DE08's own call: `(self, self->unk14)`, arg1
+     * forwarded opaquely. */
+    void (*slotE0)(Class86B60 *self, void *arg1);
+    u8 pad0E4[0x0F0 - 0x0E4];
     /* +0x0F0, func_8004D90C's own 3rd call: `(self, self->unk4C->unk8,
      * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
-     * func_8004D814's report) -- same offset number, unrelated table. */
+     * func_8004D814's report) -- same offset number, unrelated table.
+     * func_8004DE08 (this round) also reaches this slot, forwarding an
+     * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
+     * the SAME `void *arg1` parameter, cast at that call site rather than
+     * retyping the slot -- the bit pattern is unchanged either way, and
+     * `func_8004D90C`'s own call already established the pointer type. */
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
-    u8 pad0F4[0x124 - 0x0F4];
+    u8 pad0F4[0x11C - 0x0F4];
+    /* +0x11C, func_8004DE08's own call: `(self, buf, 1)` where `buf` is
+     * the value `DreamSysViewMethods_3bb8c_c::slot19C` (via `self->unkA4`)
+     * just filled through a stack out-parameter. */
+    void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
+    u8 pad120[0x124 - 0x120];
     void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, func_8004D90C (arg1=0)/func_8004E230 (arg1=0x16) */
     /* +0x128, func_8004E1C4's own first call, `self` only. Return unused. */
     void (*slot128)(Class86B60 *self);
@@ -1203,7 +1239,11 @@ struct Class86B60 {
      * and not (as a first reading of the raw asm suggested) `self`
      * re-stored through a leftover register. */
     s32 unk38;
-    u8 pad03C[0x048 - 0x03C];
+    /* +0x03C, func_8004DCD0: a flag tested `!= 0`, gating whether that
+     * function fills its own local 3-byte buffer from `arg1`'s bytes or
+     * zeroes it instead. No setter in this unit. */
+    s32 unk3C;
+    u8 pad040[0x048 - 0x040];
     /* Set up by the base ctor chain (func_8003DFBC()->slot08 below), read
      * (never written) by func_8004D578 right after. Same offset/shape as
      * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
@@ -1374,6 +1414,9 @@ struct BaseTaskCtorTable_3bb8c_c {
     /* +0x0E0, func_8004DC64's own first call: `(self, arg1)`, arg1 its
      * own forwarded 2nd parameter. */
     void (*slotE0)(void *self, s32 arg1);
+    /* +0x0E4, func_8004DCD0's own first, unconditional call: `(self,
+     * arg1)`, arg1 its own forwarded 2nd parameter (opaque here). */
+    void (*slotE4)(void *self, void *arg1);
 };
 
 extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
@@ -1448,6 +1491,16 @@ extern void *D_8008A9D0;
  * here, never walked. Placeholder `s32` type since only the address is
  * taken. */
 extern s32 D_80086D6C;
+
+/* func_8004DCD0's own rolling byte index (0/1/2, wraps to 0 at 3) into
+ * that function's own 3-byte stack buffer -- declared in the ROM image
+ * as a full `.word` (`asm/data/7B12C.sdata.s`), but accessed only via
+ * `lbu`/`sb` here, so `u8` is the correct C type for this unit's own
+ * reference regardless of the underlying storage's full width. */
+extern u8 D_8008AA28;
+
+/* func_8004DCD0's own rolling word counter (wraps to 0 at 0x101). */
+extern s32 D_8008AA2C;
 
 /* func_8004E34C's own one-shot init guard: read, then unconditionally
  * incremented, before its own body's InitCARD/StartCARD/_bu_init calls

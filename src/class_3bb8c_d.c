@@ -145,9 +145,50 @@ void func_8004DC64(Class86B60 *self, s32 arg1)
     self->unkB0->methods->slot4C(self->unkB0, arg1, &D_8008A9B4);
 }
 
+/* func_8004DCD0's own `arg1`: only the first three signed bytes are read.
+ * Kept a minimal, distinct local type rather than reusing this header's
+ * broader `Descriptor10` (same 3-byte shape, but an unrelated context --
+ * nothing here shows a 4th byte or the two trailing halfwords). */
+typedef struct Arg1DCD0_3bb8c_d Arg1DCD0_3bb8c_d;
+struct Arg1DCD0_3bb8c_d {
+    s8 b0;
+    s8 b1;
+    s8 b2;
+};
+
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DCD0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DE08);
+/* func_8004D678 is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
+ * 2-argument function -- but THIS call site sets up a 3rd argument
+ * (self->unkA4, in $a2) that the other unit's own 2-parameter view never
+ * receives. Same independent-arities situation already documented for
+ * func_8003DFBC/BaseTaskCtorTable_3bb8c_c: this unit's own local view
+ * matches what THIS call site needs. */
+extern void func_8004D678(void *arg0, void *arg1, void *arg2);
+
+void func_8004DE08(Class86B60 *self)
+{
+    s32 size;
+    s32 origUnk58;
+    void *buf1;
+    s32 buf2;
+
+    size = self->unkB0->unkA9;
+    origUnk58 = self->unk58;
+    buf1 = func_80017B34(size);
+    func_80040FC0(buf1, D_8008AA18);
+    self->unkB0->methods->slotCC(self->unkB0, buf1);
+    func_80017CFC(buf1);
+    func_8004D678(self, self->unk4C, self->unkA4);
+    self->methods->slotE0(self, self->unk14);
+    self->unkA4->methods->slot19C(self->unkA4, &buf2);
+    self->unk58 = 5;
+    self->methods->slot60(self, 0xB);
+    self->methods->slot11C(self, buf2, 1);
+    self->methods->slot60(self, 0xF);
+    self->methods->slotF0(self, (void *)origUnk58, 0);
+    self->unkA4->methods->slot19C(self->unkA4, &buf2);
+}
 
 /* This unit's own local view of func_8003B39C (already matched elsewhere,
  * many independent-arity views project-wide -- see e.g.
