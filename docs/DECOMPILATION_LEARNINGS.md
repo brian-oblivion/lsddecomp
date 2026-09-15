@@ -7251,3 +7251,111 @@ other side of the threshold. Flipping it closed a word outright with no other
 effect. This extends round 33's "build the inherited body before trusting its
 score": **building also re-tests the READING.** A polarity error is invisible in
 prose because the prose is self-consistent, and it survives indefinitely.
+
+## Round 45 (2026-09-15) — six runners, 39 matches, and a permuter scaffold that was measuring the wrong program
+
+### The permuter finding, which is the round's most load-bearing result
+
+**Round 41 established `--debug --stack-diffs` as a COST test — 0 insertions /
+0 deletions predicts a cheap search. Round 45 ran two bounded searches and
+broke that claim in both directions at once.** Charlie, on `code_179d8_l`:
+
+| function | stack-diffs | iterations | result |
+| --- | --- | --- | --- |
+| `func_8002D8E0` | 49 ins / 51 del | 51435, rc=124 | negative — **and the base score was an artifact** |
+| `func_8002CD08` | **0 / 0** | ~63000, rc=124 | negative — **never beat its own seed once** |
+
+The second row is the direct refutation: a 0/0 scaffold predicted a cheap
+search and bought nothing at all. **A 0/0 scaffold is NECESSARY, not
+SUFFICIENT.** Where the residue is pure register identity, no source-mutation
+search can reach it however clean the scaffold is, and the scaffold check
+cannot see that — it measures frame-layout fidelity, not whether the residue
+lies inside the search space.
+
+**The first row is worse and is a new check, not a refinement of an old one.
+The permuter's isolated single-function scaffold can produce MATERIALLY
+DIFFERENT REGISTER ALLOCATION than the real translation unit, for the
+IDENTICAL source.** So its base score is a measurement of a different program,
+every candidate is scored against that different program, and a search that
+"found nothing" never tested what you thought it tested. Charlie caught it by
+rebuilding the same body in-tree and diffing against retail directly — the two
+disagreed.
+
+So the scaffold now needs a third check, and it is the cheapest of the three:
+
+1. *(round 40)* does the scaffold compile and score at all — a CORRECTNESS test;
+2. *(round 41)* what are its insertion/deletion penalties — a COST test, now
+   known to be necessary and not sufficient;
+3. **(round 45) does the scaffold's BASE SCORE agree with the same body's score
+   in the real build?** If not, stop: the search would be scoring a program you
+   are not building. One rebuild answers it.
+
+**And note what this does to a recorded negative.** "Permuter tried, negative"
+is not evidence about the function unless check 3 passed — it may be evidence
+that the search was invalid. Round 37 already found the queue's permuter
+history over-counted searches by keying on the WORD; this is the same error one
+level deeper, where a search genuinely ran and still measured nothing. When you
+record a negative, record which of the three checks you ran.
+
+### Source-shape levers found this round
+
+All were found on GAME CODE and verified against the whole-image SHA1 — stated
+explicitly because this round also withdrew three older levers whose positives
+turned out to be Sony's (see the SDK-exit census entry above).
+
+- **Alignment is a TWO-WAY lever and the direction is read off retail's
+  instruction WIDTH** (bravo, `func_8004D6AC` 22/22). The documented idiom is
+  all-`s8`/`s16` -> alignment 2 -> whole-struct assignment compiles to
+  `lwl`/`lwr` + `swl`/`swr`. The inverse is now confirmed too: if retail's tail
+  is byte-by-byte (`lb`/`sb` pairs) where yours merges into a halfword, declare
+  the struct **all-`s8` so its alignment is 1** — alignment 2 is enough for GCC
+  2.6.3 to trust an `lh`/`sh` halfword move for a 2-byte remainder that happens
+  to land 2-aligned, silently merging two retail instructions into one and
+  shifting the whole image. Neither direction is the default; look at the width.
+- **An accumulate-in-place pointer loop wants an explicit scratch-then-advance**
+  (delta, `func_8001CEB4` 85/85): `cur = p; p++; *cur = ...;`, NOT `p[i] = ...`
+  and NOT `*p++ = ...`. Array indexing cost one extra word (a spurious setup
+  move) and desynced the allocation from there on.
+- **`switch` and a logically-equivalent if/else-if chain are not interchangeable**
+  (bravo, `func_8004A070` 48/48). A 2-3-way dispatch compiling to retail's
+  direct-`beq`-to-case shape, with no skip-branches, is a `switch` signature.
+- **GCC 2.6.3 re-associates constant multiplies across a whole expression tree
+  regardless of source parenthesization** (charlie, needed twice). Only a
+  STATEMENT BOUNDARY — a separate intermediate variable — stops it. Parentheses
+  are not a barrier here and writing more of them does nothing.
+- **A constant set in a branch's DELAY SLOT applies on BOTH paths** (echo).
+  Reading it as a conditional value invents a branch retail does not have.
+- **An early exit that jumps to a `return CONST` block already sitting at the
+  function's tail must be written as `if (cond == 0) { body; return X; }
+  return Y;`** (echo) — not as a duplicated early return, which emits a second
+  copy of the tail.
+- **Two textually identical global reads with non-overlapping live ranges can
+  legitimately want DIFFERENT registers** (echo). Forcing them into one reused
+  C local manufactures a register-identity residue that was not there.
+
+### Two negatives worth as much as the levers
+
+- **A frame-size lever that fixes one function can REGRESS a structurally
+  near-identical sibling** (charlie): `func_8002D8E0`'s `volatile` intermediates
+  helped there and hurt `func_8002D1B4`. Same shape as round 27's three levers
+  and round 7's two symmetric vtable slots — **measure the transfer, never
+  assume it**, in either direction.
+- **A "free" value can be scheduled into an UNRELATED SIBLING BRANCH's delay
+  slot, arbitrarily far from its use** (delta, `func_80062C58`). Plain local
+  statement reordering does not reproduce that, so a residue of this shape is
+  not a reordering problem and should not be attacked as one.
+
+### An operational trap: `make extract` while C is spliced in
+
+Foxtrot ran `make extract` with its C live in the unit, and **splat then skipped
+generating the nonmatching `.s` files for exactly those functions** — the files
+it needed to keep working. Recovery is mechanical (restore the `INCLUDE_ASM`
+stubs, re-extract) but the failure is quiet and reads like the disassembly
+having gone missing. **Re-extract only from a unit whose functions are all
+`INCLUDE_ASM`.** This is the same family as the four ways a score lies: a tool
+answering truthfully about a tree that is not in the state you assumed.
+
+Foxtrot also spent significant time on an apparent "gp_rel address shift" that
+was ordinary address drift from two functions compiling to the wrong length —
+which is the attribution hazard round 20 documented, arriving in a fresh carve.
+Check the length before reaching for a linker explanation.

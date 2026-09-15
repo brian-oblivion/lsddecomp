@@ -2275,6 +2275,39 @@ capable of succeeding); this makes it a COST test (is it worth starting), and
 it composes with the sixth screen — prefer a never-searched function whose
 scaffold is near 0/0.
 
+> **ROUND 45 BROKE THE COST TEST IN BOTH DIRECTIONS AND ADDS A THIRD CHECK.**
+> Charlie ran two bounded searches on `code_179d8_l`. `func_8002CD08` scored
+> **0 insertions / 0 deletions** — the cheap-search prediction — and burned
+> ~63000 iterations **without once beating its own seed**, because the residue
+> is pure register identity and lies outside what a source-mutation search can
+> reach at all. So **0/0 is NECESSARY, NOT SUFFICIENT**: the scaffold check
+> measures frame-layout fidelity, not whether the residue is in the search
+> space.
+>
+> The other search found something worse and it is a NEW check rather than a
+> refinement: **the permuter's isolated single-function scaffold can produce
+> materially different REGISTER ALLOCATION than the real translation unit, for
+> the identical source.** `func_8002D8E0`'s base score turned out to be an
+> artifact of that — so every candidate was scored against a program nobody
+> is building, and "51435 iterations, nothing found" is evidence about the
+> scaffold rather than about the function. Charlie caught it by rebuilding the
+> same body in-tree and diffing against retail directly.
+>
+> **So check three things before spending a search, cheapest last:**
+> 1. *(round 40)* does the scaffold compile and score — CORRECTNESS;
+> 2. *(round 41)* insertion/deletion penalties — COST, necessary not sufficient;
+> 3. **(round 45) does the scaffold's BASE SCORE agree with the same body's
+>    score in the REAL build?** One rebuild answers it, and a disagreement
+>    means stop.
+>
+> **And this changes how to read a recorded negative at Gate 1b.** "Permuter
+> tried, negative" is not evidence about the function unless check 3 passed.
+> Round 37 found the permuter-history screen over-counting searches because it
+> keyed on the WORD rather than on evidence of a run; this is the same error
+> one level deeper — a search that genuinely ran, and still measured nothing.
+> Ask a runner to record WHICH of the three checks it ran, not just the
+> iteration count and rc.
+
 **Never authorized — always an operator escalation, evidence attached:**
 toolchain or flag changes of any kind; editing the protected verification files;
 bypassing build-and-verify.
