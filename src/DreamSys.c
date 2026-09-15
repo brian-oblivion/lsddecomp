@@ -362,7 +362,7 @@ void func_800593D8(DreamSys *this)
  * arg4 on func_8001E600 is unused by its own body but IS set (to 0) by this
  * call site's own disassembly, so it is declared here to reproduce that. */
 extern void func_8001E600(void *self, s32 *dst, s32 *src, s32 arg4);
-extern s32 func_8005950C(void *a, void *b, s32 day);
+extern s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
 extern s32 func_8001EF14(s32 *a, s32 range, s32 *b);
 
 s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
@@ -391,7 +391,20 @@ s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 toleran
 	return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005950C);
+s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
+{
+	s32 scaledArg2;
+	s32 dt;
+	s32 dv;
+
+	scaledArg2 = arg2;
+	scaledArg2 = scaledArg2 / 0x400;
+	dt = (b->position - a->position) / 0x400;
+	if (dt == 0)
+		dt = 1;
+	dv = b->value - a->value;
+	return (dv * scaledArg2) / dt + a->value;
+}
 
 void func_80059590(DreamSys *this)
 {
@@ -1571,7 +1584,27 @@ void InitNavChallengesArray(s8 (*arrayMem)[30], s32 *linkCounter)
 	gpDinamicLinkPenalty = linkCounter;
 }
 
-INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcNavigationScore);
+s32 CalcNavigationScore(void)
+{
+	s32 sum;
+	s8 *p;
+	s32 i;
+
+	sum = 0;
+	p = *gpNavChallengesComplete;
+	i = 0;
+	do {
+		if (p[i] != 0)
+			sum += 1000000;
+		i++;
+	} while (i < 30);
+	if (sum > 29999999)
+		sum = 50000000;
+	sum -= *gpDinamicLinkPenalty * 11024;
+	if (sum < 0)
+		sum = 0;
+	return sum;
+}
 
 s32 func_8005BB14(s32 stage)
 {
