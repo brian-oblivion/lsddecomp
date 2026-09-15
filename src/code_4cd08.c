@@ -372,7 +372,65 @@ bool func_8005CDA8(s32 a0, s32 a1)
     return false;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_4cd08", func_8005CDF8);
+/* A 4-byte record indexed by `entry` (this function's own last parameter):
+ * a u16 followed by two signed bytes. `val2` indexes D_80088F18 (stride
+ * 0xC, element type undiscovered -- only its address is ever taken here)
+ * and `val3` indexes D_80088D3C (stride 6, see DreamAuxPos6 below). */
+typedef struct {
+    u16 val0;
+    s8 val2;
+    s8 val3;
+} DreamAuxSpawnInfo;
+
+extern DreamAuxSpawnInfo D_80088F48[];
+
+/* A 6-byte position record: a 4-byte (x,y) pair copied as ONE unaligned
+ * whole-struct assignment (the idiom CLAUDE.md documents: an all-s8/s16
+ * struct at alignment 2 compiles a whole-struct copy to lwl/lwr), plus a
+ * separate z half-word. Indexed by DreamAuxSpawnInfo.val3. */
+typedef struct {
+    s16 x;
+    s16 y;
+} DreamAuxPosXY;
+
+typedef struct {
+    DreamAuxPosXY xy;
+    s16 z;
+} DreamAuxPos6;
+
+extern DreamAuxPos6 D_80088D3C[];
+extern u8 D_80088F18[];
+
+typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
+typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
+
+bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry)
+{
+    DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)D_8008AC04);
+
+    if (entity != NULL) {
+        DreamAuxSpawnInfo *rec;
+        struct {
+            u16 ctxVal;
+            u16 recordVal0;
+            DreamAuxPos6 pos;
+        } coords;
+        s32 outBuf[4];
+        DreamAuxObj *obj;
+
+        coords.ctxVal = *(u16 *)ctx;
+        rec = &D_80088F48[entry];
+        coords.recordVal0 = rec->val0;
+        coords.pos = D_80088D3C[rec->val3];
+
+        obj = (DreamAuxObj *)D_8008ABFC;
+        ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
+        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, D_80088F18 + rec->val2 * 12);
+        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, D_8008AC00, D_8008AC08, (void *)D_8008ABFC, outBuf);
+        return false;
+    }
+    return true;
+}
 
 /* Local view of func_8001E600/func_8001EACC (both already matched in
  * code_d294_c.c, a different unit): their own headers type `self`/`target`

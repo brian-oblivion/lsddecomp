@@ -154,7 +154,7 @@ extern bool func_8005CBC8(s32 value, TriggerRecord *record);
  * other change. func_8005CDF8 is still INCLUDE_ASM (gp-relative-blocked,
  * see docs/research/gp-relative-blocker.md), so its own use of that word is
  * not derived here. */
-extern bool func_8005CDF8(u8 kind, void *out, void *ctx, u8 entry);
+extern bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry);
 extern void func_8005C714(s32 triggerType);
 extern bool func_8005630C(void);
 extern bool func_8005CD58(s32 idx);
