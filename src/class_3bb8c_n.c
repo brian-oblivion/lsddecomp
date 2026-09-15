@@ -155,7 +155,7 @@ extern void *D_8008E0C8[];
 extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
 extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);
 extern void func_80054FD8(void *arg0, void *arg1);
-extern void func_8005511C(void *arg0, void *arg1);
+extern void *func_8005511C(void *arg0, void *arg1);
 
 void func_80054B84(void *arg0) {
     s32 base;
@@ -290,6 +290,40 @@ void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054FD8);
 
+extern s32 D_80087430;
+extern u8 D_80087228[];
+extern s32 D_8008E0C0[];
+extern u8 *D_8008E0B0;
+extern u8 D_80087174[];
+extern s32 D_8008E0BC;
+
+/* STALL, 16/79 words, length off by 1 word (out-of-range drift present) --
+ * see docs/match-reports/func_8005511C.md. Preserved near-miss body: */
+#if 0
+void *func_8005511C(void *arg0, void *arg1) {
+    s32 idx;
+    s32 randval;
+    s32 v0;
+    s32 *slot;
+
+    idx = (u32) rand() % 3;
+    slot = D_8008E0C0;
+    *slot = (s32) (D_80087228 + idx * 3);
+    slot++;
+    if (D_8008AC74 % 20 == 0) {
+        v0 = 0;
+    } else {
+        v0 = D_80087430;
+    }
+    *slot = v0;
+    func_80055258(arg1, (void *) D_80087330);
+    D_8008E0B0 = D_80087174;
+    randval = rand();
+    D_8008E0BC = randval - (randval / 3) * 6;
+    *(void **) arg0 = func_80056320((void *) 2, (u8 *) &D_8008E0B0 - 0xC, (void *) D_8008AB4C, arg1);
+    return (u8 *) arg0 + 4;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005511C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055258);
