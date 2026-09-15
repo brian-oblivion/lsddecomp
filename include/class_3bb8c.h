@@ -1384,6 +1384,12 @@ extern s32 D_8008A9B4;
 extern void *D_8008AA10;
 extern void *D_8008AA18;
 
+/* func_8004E34C's own one-shot init guard: read, then unconditionally
+ * incremented, before its own body's InitCARD/StartCARD/_bu_init calls
+ * run only when the PRE-increment value was 0 (i.e. only on the very
+ * first construction of this class). */
+extern s32 D_8008AA30;
+
 /* Still raw asm in this unit (gp-relative-blocked, see
  * docs/match-reports/func_8004D6AC.md) -- not this round's function, but
  * func_8004D578 calls it with one forwarded s32 argument (the return
@@ -1424,11 +1430,32 @@ typedef struct Result678_3bb8c_c {
 typedef struct GenericCtorTable_3bb8c_d GenericCtorTable_3bb8c_d;
 struct GenericCtorTable_3bb8c_d {
     u8 pad000[0x008];
-    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call */
+    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call; IS func_8004E34C -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/func_8003DFBC) since nothing here type-checks the two against each other */
+    u8 pad00C[0x040 - 0x00C];
+    /* +0x040, func_8004E34C's own last call, forwarding its own 3rd
+     * parameter verbatim; class_3bb8c_e's independent view (round 14,
+     * this same real object) names the concrete function `func_8004E5D4`,
+     * still uncarved there. */
+    void (*slot40)(void *self, s32 arg1);
 };
 
 extern GenericCtorTable_3bb8c_d D_80086DC4;
 extern GenericCtorTable_3bb8c_d *func_800507E8(void); /* returns &D_80086DC4; matched in class_3bb8c_g */
+
+/*
+ * The object instance itself -- established this round by func_8004E34C,
+ * which IS this class's own constructor (verified: `tools/classtable.py
+ * 0x80086DC4` places it at the table's own +0x008 ctor slot). Kept
+ * minimal (only the one field this unit's ctor writes) since nothing else
+ * here dereferences it -- the fuller shape belongs to class_3bb8c_e's own
+ * independent view of the SAME real object (`Node3bb8cE`,
+ * src/class_3bb8c_e.c), which this unit does not include (per this
+ * project's established multiple-independent-local-views convention).
+ */
+typedef struct GenericCtorObj_3bb8c_d GenericCtorObj_3bb8c_d;
+struct GenericCtorObj_3bb8c_d {
+    GenericCtorTable_3bb8c_d *methods; /* +0x000, func_8004E34C: self->methods = func_800507E8() -- the base-ctor-chain "sets self->methods directly to this table's own pointer" pattern already seen for Class86B60/func_8004D578 */
+};
 
 /*
  * Class86E00 -- a large NEW class table, `D_80086E00` (29 slots + header,

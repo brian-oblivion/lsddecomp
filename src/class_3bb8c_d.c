@@ -158,4 +158,33 @@ fail:
     return NULL;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004E34C);
+/* func_8004E3F4 is ALREADY MATCHED, but in class_3bb8c_e.c under its own
+ * local type (`Node3bb8cE *`) -- this unit's own independent local view
+ * of the same real object per the project's convention; only `self` is
+ * ever forwarded here, never dereferenced. */
+extern void func_8004E3F4(void *self);
+
+/* libcard, linked SDK objects (config/psyq-objects.txt: libcard/a74,
+ * libcard/a75, libcard/c112 -- see docs/match-reports/func_8004E34C.md).
+ * Declared locally rather than in the shared header, same policy as
+ * malloc/free/printf (CLAUDE.md, "To include/ has one exception"). */
+extern void InitCARD(s32 padEnable);
+extern void StartCARD(void);
+extern void _bu_init(void);
+
+void func_8004E34C(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
+{
+    s32 count;
+
+    func_80018390()->ctor(self);
+    self->methods = func_800507E8();
+    count = D_8008AA30;
+    D_8008AA30 = count + 1;
+    if (count == 0) {
+        InitCARD(arg1);
+        StartCARD();
+        _bu_init();
+    }
+    func_8004E3F4(self);
+    self->methods->slot40(self, arg2);
+}
