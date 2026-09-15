@@ -1436,6 +1436,36 @@ against a hand census that agreed exactly.
 > exceeded five runners' capacity, so carving would have bought ground nobody
 > could staff.
 
+> **ROUND 45: WHEN A BLOCKER DIES, SWEEP THE CARVE NOTES TOO -- THE REPORT
+> SWEEP DOES NOT REACH THEM.** Gate 1's honesty mechanisms
+> (`REOPENED -- ASSIGNABLE` and the contradiction detector) operate on match
+> REPORTS. A yaml carve note is neither a report nor a `src/` header comment,
+> so nothing was checking it, and round 45 found both remaining uncarved
+> segments priced under a blocker that died in round 42:
+>
+> | segment | the note | measured 2026-09-15 |
+> | --- | --- | --- |
+> | `code_179d8` | 33 of 39 `gp_rel`-blocked; *"budget 18 STUB REPORTS"* | 39 of 39 clean, stub debt **zero** |
+> | `class_3bb8c_n` | *"the gp_rel-densest ground in the executable"*, 3 of 23 clean, **"Not worth a runner until the gp-relative blocker moves"** | **23 of 23 clean** |
+>
+> `class_3bb8c_n`'s is the one to learn from, because **it names its own expiry
+> condition and was still obeyed three rounds after the condition was met.**
+> Its round-26 census was honest, careful, and about a world that no longer
+> exists -- and a segment everybody believes is blocked is one nobody
+> re-measures, which is this document's own most expensive failure mode
+> arriving at Gate 2 instead of Gate 1.
+>
+> Two consequences, both cheap:
+>
+> - **`uncarved.py` is the authority on a segment's blocker state, not the
+>   yaml comment next to it.** Run it before reading any carve note. The note
+>   is provenance; the tool is the measurement.
+> - **A carve note that ends in a DIRECTIVE ("not worth a runner until X")
+>   must be re-read whenever X changes, and the cheapest way to retire one is
+>   to CARVE the segment** -- which converts a standing instruction nobody
+>   re-reads into a unit header a runner will actually be handed. Round 45
+>   carved `class_3bb8c_n` and banked it for exactly that reason.
+
 **Round 27's measurement, and it is a STANDING change to what this gate can
 do, not a snapshot: carving can no longer refill the queue at scale.** The
 whole uncarved remainder came to 79 functions holding **10 blocker-clean** ones

@@ -6,6 +6,149 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-15 — round 45: six runners and 45 matches, two carves that each retired a stale directive, and three named levers whose positives were never game code
+
+**State at end: 1107 matched / 1253 game functions (88.35%)**, up **45** from
+round 44's 1062 — the largest round so far. Game bytes 65.62% → **68.20%**.
+Queue 125 → **135** live `INCLUDE_ASM` (it went UP because the round carved 55
+new functions into units while matching 45); `fresh` 24 → **2**; stalled
+101 → 110; banked 0 → **23**; uncarved **66 → 11**. Build green after all eight
+merges and after every `make extract`; tree clean, all six worktrees and
+branches removed.
+
+**ZERO merge conflicts, third round running.** Header sets were priced with
+`headercontention.py` before provisioning. The map shows heavy pairwise
+contention (`class_3bb8c.h` is shared by eleven units) but **every shared
+header fell inside a single runner's assignment**, so cross-runner contention
+was zero by construction rather than by luck.
+
+| runner | units | matched | notes |
+| --- | --- | --- | --- |
+| echo | `code_179d8_q` (fresh carve) | **22** | **unit COMPLETE, 22/22**, across three sittings |
+| bravo | six `class_3bb8c_*` + `class_39e08` | **8** | 8 of 8 assigned, **zero stalls** |
+| foxtrot | `code_179d8_r` (fresh carve) | **8** | 8 of 10, 2 stalls length-exact |
+| alpha | `code_8220`, `code_8220_b` | 4 | plus two length-exact near-misses (99/107, 92/114) |
+| delta | `code_d294`, `code_d294_b`, `Entity_e`, `class_3ac78` | 2 | 2 documented |
+| charlie | `code_179d8_l`, `_h`, `_j_b` | 1 | 4 stalls + two bounded permuter negatives |
+
+Eight units emptied: `class_39e08`, `class_3bb8c_c`/`_g`/`_i`/`_k`/`_l`,
+`code_179d8_q`, `code_d294`.
+
+### Gates
+
+Gate 0 green. **Gate 1 found two lies in a queue of 24**: round 44 had already
+worked `func_8002CD08` (110/132) and `func_8002D8E0` (309/311), but both still
+carried `REOPENED -- ASSIGNABLE`, so `progress.py` was offering two measured
+near-misses as cold ground. Markers spent; true fresh 22. **Gate 2: carved
+TWICE. Gate 3: rejected**, the queue was not dry.
+
+### Both carve notes were wrong in the same way, and one was a directive
+
+Both segments had been priced under `gp_rel`, and round 42 killed that blocker:
+
+| segment | what the note said | what it measures now |
+| --- | --- | --- |
+| `code_179d8` | 33 of 39 `gp_rel`-blocked; *"budget 18 STUB REPORTS"* | 39 of 39 clean; stub debt **zero** |
+| `class_3bb8c_n` | *"the gp_rel-densest ground in the executable"*, 3 of 23 clean, **"Not worth a runner until the gp-relative blocker moves"** | **23 of 23 clean** |
+
+`class_3bb8c_n` is the instructive one: **it named its own expiry condition,
+the condition was met three rounds earlier, and nobody re-read it** — because a
+segment everybody believes is blocked is one nobody re-measures. That is
+exactly the `REOPENED -- ASSIGNABLE` failure mode arriving at Gate 2 instead of
+Gate 1, and it is worth a standing note: when a blocker dies, sweep the CARVE
+NOTES as well as the match reports.
+
+`code_179d8` was split three ways, keeping its only jump table in the still-asm
+remainder so neither new unit needed a rodata attach. `class_3bb8c_n` was
+carved and **banked** (`DELIBERATELY UNWORKED`) because six runners were
+already live — so round 46 can staff without carving first.
+
+### The head's consolidation: three named levers lost their positives
+
+Gate 1b's seventh screen, run over the SHARED DOCS rather than the reports.
+**The report-level screen is fully discharged** — all six hits carry round 39's
+own inline corrections. The docs level was not, and round 43 had only corrected
+one entry there.
+
+| lever | positives | reality |
+| --- | --- | --- |
+| round-20 `for`-loop keeps a value register-resident | 2 | both `libcd/sys.o` — **zero game-code instances** |
+| round-27 address-taken parameter | 1 | it is the libcard function; row is **0 for 4** |
+| round-27 invert the guard | 1 | it is `libc2/todigit.o`; row is **0 for 1** |
+
+Round 27's *inline every call site* row is intact and was left alone. The
+mechanical discriminators survive the instances they were found on — that is
+the section's own rule — but the positives do not.
+
+**One refinement to round 38's rule, and it needed resolving each SDK exit to
+its owning object BY ADDRESS rather than by name.** 85 SDK exits have reports
+(`libsnd` 40, `libcd` 29, `libgs` 9, `libc2` 5, `libgte` 2 — so a learning drawn
+from the sound driver or the CD code is the one most likely to be citing Sony).
+*"No source shape ever reached those bytes"* is true for 84 and **measurably
+false for one**: `func_8003FC70` matched byte-exact as C in round 20 and was
+only converted in round 34, which is why CLAUDE.md's duplicated-rodata-string
+learning stands **on** that citation rather than in spite of it.
+
+### The round's most load-bearing runner result: a permuter scaffold measuring a different program
+
+Charlie ran two bounded searches and broke round 41's cost test in both
+directions. `func_8002CD08` scored **0 insertions / 0 deletions** — the
+cheap-search prediction — and burned ~63000 iterations without once beating its
+own seed, because the residue is pure register identity and lies outside a
+source-mutation search entirely. **0/0 is necessary, not sufficient.** Worse,
+`func_8002D8E0`'s base score was an **artifact**: the permuter's isolated
+single-function scaffold produced materially different register allocation than
+the real translation unit for identical source, so every candidate was scored
+against a program nobody is building. The scaffold now needs a third and
+cheapest check — **does its base score agree with the same body's score in the
+real build?** — and a recorded "permuter tried, negative" is not evidence about
+a function unless that check passed.
+
+### Levers that closed real game code
+
+Alignment is a **two-way** lever, read off retail's instruction WIDTH (bravo);
+an accumulate-in-place pointer loop wants explicit scratch-then-advance
+(delta); `switch` and if/else-if are not interchangeable (bravo); GCC 2.6.3
+re-associates constant multiplies across the whole expression tree and only a
+statement boundary stops it (charlie); a constant in a branch's delay slot
+applies on **both** paths (echo); an early exit to a tail `return CONST` block
+must not be a duplicated early return (echo); two identical global reads with
+non-overlapping live ranges can legitimately want different registers (echo).
+
+**And one bug reproduced rather than worked around**: `func_80027C80` stores
+through `$s2`, which is never assigned on any path — a real uninitialised-local
+bug in the shipped game. An uninitialised local pointer, stored through once at
+retail's own point, matched on the first build with no `volatile`, no fake
+initialiser and no inline asm. This is NOT the permuter's UB problem; the
+discriminator is whether the uninitialised value reaches control flow.
+
+### The broadcast channel paid for itself, measurably
+
+Alpha's parameter-mutation lever reached echo through `tools/broadcast.sh`,
+from a different unit, and **closed a function the same round it was posted**.
+The head also used it to stop echo at 10 uncommitted matches, to warn foxtrot
+holding ten uncommitted functions, and to correct bravo's comment calling game
+code Sony's — which bravo fixed same-round, so the error never became a
+precedent. The alternative history for each is the next round paying for it.
+
+### Head corrections at merge
+
+Delta filed `func_8001DDF4` as a STALL having never compiled it, which would
+have counted it as documented and removed it from `fresh` permanently. Re-marked
+`DERIVATION ONLY -- ASSIGNABLE`: its judgement to spend the budget on structure
+rather than blind iteration was right, only the disposition was wrong.
+
+### Next move
+
+**`fresh` is 2 — round 46 must open from `banked`.** `class_3bb8c_n` is carved,
+screened 23 of 23 clean and ready; it shares `class_3bb8c.h` with eleven units,
+so whoever takes it should be the only runner in that block. Beyond it: 11
+uncarved functions left in the whole executable, and a 110-deep stall queue
+whose ranking should now be read through the corrected permuter-negative rule
+above.
+
+---
+
 ## 2026-09-15 — round 44: five runners, 16 matches, five units emptied — and three never-attempted functions that the queue said not to touch
 
 **State at end: 1062 matched / 1253 game functions (84.76%)**, up **16** from
