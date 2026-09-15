@@ -7544,3 +7544,116 @@ evidence — a whole-function parameter-colour swap, correctly distinguished
 from the prologue-callee-save-store-order class (same final mapping, different
 store order) — and the function remains `INCLUDE_ASM`, so its barrier lives in
 a preserved body and reaches no build.
+
+## Round 46 (2026-09-15) — five runners plus three re-sends, 17 matches, and a permuter candidate that was lost by writing up too early
+
+Staffing: five units-groups chosen so that **every header-contending pair sat
+inside ONE runner's own assignment** (`headercontention.py` reported 8
+contending pairs and all 8 were internal), giving zero cross-runner header
+exposure. Three worktrees were re-staffed after their runners finished —
+`SendMessage` does not exist in this environment, so a re-send is a fresh
+agent into the freed worktree, which loses context but keeps a provisioned,
+byte-verified tree. **Two of the round's 17 matches and its single best
+recovery came out of those re-sends**, which is the third round running that
+the §3c substitute has paid.
+
+Matches: `class_3bb8c_n` 8 + 6 (cold carve, first ever worked), `code_179d8_r`
+2 (**COMPLETE**), `code_8220` 1. Improved stalls: `func_80017B34`
+92→**101**/114, `func_8001E7BC` 136→142/180, `func_8001DDF4` 0→29/199 (first
+ever BUILD of a derivation-only report), `func_8003E4B8` 21→23/32.
+
+### A search's TAIL is not protected by committing before you wait (round 46)
+
+Round 18 established that a runner must not end its turn to wait on a bounded
+search, because it ends up with zero commits. Round 46 found the variant that
+survives that fix, and it cost real words.
+
+`bravo`'s first sitting did everything the commit discipline asks: it ran the
+first-ever permuter search on `func_80017B34`, **committed** the improvement it
+had (92→96/114), wrote its report recording candidate `output-250-1` (score
+250, base 385), reported clean — and then ended its turn to wait. The search
+kept running and produced **`output-220-1`, score 220**, in no report and no
+commit, in an untracked `permuter-work/` directory that teardown destroys.
+
+Re-staffed to recover it, the candidate **translated to a real +5 words
+(96→101/114, zero drift)** — worth more than everything that sitting did
+record.
+
+- **Committing before you wait protects YOUR work. It does not protect the
+  SEARCH's.** These are different objects and only the first has ever been
+  covered by the rule.
+- **After a bounded search's timeout fires, read every
+  `permuter-work/<fn>/output-*/score.txt`**, not only the candidate you
+  happened to notice while it ran. Then translate and measure the best one.
+- The permuter-score ordering agreed with the funcdiff ordering *here*
+  (220 beat 250), but that is not a law — rounds 40 and 41 have it going both
+  ways, so **translate AND measure** regardless.
+
+### Source-shape levers found this round
+
+Each closed or advanced a real function. None is a rule; all are hypotheses to
+test per function, and several have measured negatives attached.
+
+- **Same-length `beq`/`bne`-only residue: read what retail sets UNCONDITIONALLY
+  in the branch's own delay slot.** If the same value is assigned on *both*
+  branch outcomes, the assignment belongs ABOVE the `if`, not inside either
+  arm — and no rephrasing of the condition (including its De Morgan mirror)
+  can reach it. Closed `func_800286E4` 88/88 on the first build after round 45
+  had tried both arm-internal phrasings.
+- **Split a combined declaration: `T x = expr;` vs `T x; x = expr;`.** C89
+  treats these identically; GCC 2.6.3's allocator does not. Closed
+  `func_80028540` 19/19 (moved a value from a spurious extra saved register
+  into `$s0`). **Scope, with FOUR independent negatives measured the same
+  round** (`func_800357B0` regressed 171→161, `func_800344FC` inert,
+  `func_8004BB3C` inert, `func_8004BA40` inert): it applies to **a value
+  crossing a call boundary whose timing is already confirmed correct**, NOT to
+  whole-function parameter register-colour swaps. This is an ordinary
+  statement split — no asm, no constraint, nowhere near HARD RULE 6.
+- **A call argument that is the same literal on every branch is not evidence it
+  is passed as a literal at the call site.** Where each branch schedules its
+  own `ori` independently, assign a per-branch local instead
+  (`func_80055A24`).
+- **`~x + 1` instead of `-x`** lets the delay-slot filler hoist a safe negate
+  (`func_80055874`).
+- **Defeat GCC's store-flag collapse of `if (cond) return 1; return 0;`** by
+  writing `flag = 1; return flag;` (`func_80055874`, same function, second
+  lever).
+- **Hoist a global read across a call boundary into a local before a loop** —
+  and its negative: inert when there is no call in between (`func_80054F30`).
+  Note this is the same call-boundary scoping the declaration-split lever has.
+- **Put the longer continuation in the `if` body and the trivial early return
+  as the fall-through**, to avoid an extra jump (`func_8005556C`).
+- **A ternary's default/override order is not guaranteed** — rewrite as
+  explicit imperative assignment (`func_80054758`).
+- **Reuse an already-dead local to hold a comparison's boolean** rather than
+  declaring a fresh temporary. This was the load-bearing half of the permuter
+  zero that closed `func_80017CFC` 107/107.
+- **A barrier's POSITION is a separate axis from its presence.** Placing one
+  *before* the store that consumes a value forces eager materialisation where
+  every prior round had only ever tried *after* (`func_8003E4B8`, 21→23). Read
+  this together with the barrier finding above: **state what a barrier did.**
+- **Brute-force an unrecognised magic-number divisor through the pinned
+  pipeline** rather than trying to recognise it by eye (`func_800549A8`, `/600`).
+- **An already-matched callee's signature can be too NARROW**, and the caller
+  is where that surfaces. A match does not certify a signature — the wrapper
+  rule already says a byte match cannot see a return type, and this is the
+  argument-side counterpart.
+
+### Two diagnostic findings worth as much as the levers
+
+- **Frame-size first, on a never-built derivation.** `func_8001DDF4` had a
+  structure-only report and no score at all; the first thing that moved it was
+  a missing `0x18`-byte stack buffer, not any expression-level work. When a
+  body has never been compiled, get the frame right before reading any
+  instruction diff — everything downstream is shifted until you do.
+- **"The cheapest phrasing still OVERSHOOTS" is a distinct outcome from "no
+  lever found".** `func_8001D714` is 2 words short at 141/143; two new
+  phrasings came out at 147 and 146. That brackets the gap rather than failing
+  to close it, and it tells the next attempt to look between 141 and 146
+  instead of re-searching the same space.
+- **Leaving another function's stall body live in your unit produces a
+  spurious DRIFT warning on the function you are actually measuring.** Delta
+  caught this on itself mid-round. It is round 20's attribution hazard
+  reappearing from the runner's own edits rather than an inherited sibling's —
+  `grep -c '^INCLUDE_ASM' src/<unit>.c` against your starting count is the
+  check, and it costs nothing.
