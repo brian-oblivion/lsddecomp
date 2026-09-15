@@ -66,7 +66,189 @@ void func_80017AC8(BMemPMgr *pool)
     *(u32 *)end = 0x80000000;
 }
 
+#if 0
+void *func_80017B34(size, pool)
+    s32 size;
+    void *pool;
+{
+    BMemPMgr *mgr;
+    BMemBlockHdr *cursor;
+    BMemBlockHdr *result;
+    BMemBlockHdr *remainder;
+    u32 *next;
+    u32 blockSize;
+    u32 word;
+
+    func_8001844C(1);
+    result = NULL;
+    mgr = D_8008A818;
+    if (mgr == NULL) {
+        mgr = pool;
+    }
+    if (size != 0) {
+        if (size & 0x3) {
+            size = size + 4 - (size & 0x3);
+        }
+        if ((u32)size < 0xC) {
+            size = 0xC;
+        }
+        cursor = mgr->freeListStart;
+        size += 4;
+        while (cursor != NULL) {
+            blockSize = cursor->sizeAndFlags & 0xFFFFFFF;
+            if (blockSize >= (u32)size) {
+                cursor->sizeAndFlags &= 0xBFFFFFFF;
+                result = (BMemBlockHdr *)((u8 *)cursor + 4);
+                next = (u32 *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
+                if (blockSize < (u32)size + 0x10) {
+                    *next &= 0x7FFFFFFF;
+                    {
+                        BMemBlockHdr *n = cursor->next;
+                        BMemBlockHdr *p = cursor->prev;
+
+                        if (p != NULL) {
+                            p->next = n;
+                        } else {
+                            mgr->freeListEnd = n;
+                        }
+                    }
+                    {
+                        BMemBlockHdr *n = cursor->next;
+                        BMemBlockHdr *p = cursor->prev;
+
+                        if (n != NULL) {
+                            n->prev = p;
+                        } else {
+                            mgr->freeListStart = p;
+                        }
+                    }
+                } else {
+                    word = (cursor->sizeAndFlags & 0xF0000000) | (u32)size;
+                    remainder = (BMemBlockHdr *)((u8 *)cursor + (word & 0xFFFFFFF));
+                    cursor->sizeAndFlags = word;
+                    remainder->sizeAndFlags = (blockSize - (u32)size) | 0x40000000;
+                    remainder->prev = cursor->prev;
+                    remainder->next = cursor->next;
+                    {
+                        BMemBlockHdr *p = cursor->prev;
+
+                        if (p != NULL) {
+                            p->next = remainder;
+                        } else {
+                            mgr->freeListEnd = remainder;
+                        }
+                    }
+                    {
+                        BMemBlockHdr *n = cursor->next;
+
+                        if (n != NULL) {
+                            n->prev = remainder;
+                        } else {
+                            mgr->freeListStart = remainder;
+                        }
+                    }
+                    *(BMemBlockHdr **)((u8 *)remainder + (remainder->sizeAndFlags & 0xFFFFFFF) - 4) = remainder;
+                }
+                break;
+            }
+            cursor = cursor->prev;
+        }
+    }
+    func_8001844C(0);
+    return result;
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017B34);
+
+#if 0
+void *func_80017CFC(ptr, pool)
+    void *ptr;
+    void *pool;
+{
+    BMemPMgr *mgr;
+    BMemBlockHdr *header;
+    BMemBlockHdr *next;
+    u32 nextFree;
+
+    func_8001844C(1);
+    mgr = D_8008A818;
+    if (mgr == NULL) {
+        mgr = pool;
+    }
+    if (ptr != NULL) {
+        header = (BMemBlockHdr *)((u8 *)ptr - 4);
+        next = (BMemBlockHdr *)((u8 *)header + (header->sizeAndFlags & 0xFFFFFFF));
+        nextFree = next->sizeAndFlags & 0x40000000;
+        if ((s32)header->sizeAndFlags < 0) {
+            u32 freedSize = header->sizeAndFlags & 0xFFFFFFF;
+
+            header = *(BMemBlockHdr **)((u8 *)ptr - 8);
+            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000)
+                | (freedSize + (header->sizeAndFlags & 0xFFFFFFF));
+            {
+                BMemBlockHdr *n = header->next;
+                BMemBlockHdr *p = header->prev;
+
+                if (p != NULL) {
+                    p->next = n;
+                } else {
+                    mgr->freeListEnd = n;
+                }
+            }
+            {
+                BMemBlockHdr *p = header->prev;
+                BMemBlockHdr *n = header->next;
+
+                if (n != NULL) {
+                    n->prev = p;
+                } else {
+                    mgr->freeListStart = p;
+                }
+            }
+        }
+        if (nextFree) {
+            u32 nextSize = next->sizeAndFlags & 0xFFFFFFF;
+
+            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) | (nextSize + (header->sizeAndFlags & 0xFFFFFFF));
+            {
+                BMemBlockHdr *n = next->next;
+                BMemBlockHdr *p = next->prev;
+
+                if (p != NULL) {
+                    p->next = n;
+                } else {
+                    mgr->freeListEnd = n;
+                }
+            }
+            {
+                BMemBlockHdr *p = next->prev;
+                BMemBlockHdr *n = next->next;
+
+                if (n != NULL) {
+                    n->prev = p;
+                } else {
+                    mgr->freeListStart = p;
+                }
+            }
+            next = (BMemBlockHdr *)((u8 *)header + (header->sizeAndFlags & 0xFFFFFFF));
+        }
+        header->prev = mgr->freeListStart;
+        mgr->freeListStart = header;
+        header->next = NULL;
+        if (header->prev != NULL) {
+            header->prev->next = header;
+        } else {
+            mgr->freeListEnd = header;
+        }
+        *(BMemBlockHdr **)((u8 *)next - 4) = header;
+        header->sizeAndFlags |= 0x40000000;
+        next->sizeAndFlags |= 0x80000000;
+    }
+    func_8001844C(0);
+    return NULL;
+}
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017CFC);
 
