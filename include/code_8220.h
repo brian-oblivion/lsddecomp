@@ -198,13 +198,19 @@ typedef struct PolyVtx {
 extern void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
                           PolyUV4 *uv1, PolyUV4 *uv2);
 
-/* gp_rel-blocked (docs/research/gp-relative-blocker.md), code_8220_c
- * round 13 -- see docs/match-reports/func_8001A380.md. Declared here only
- * so its ONE caller in this unit (func_800197C4) can compile; the extra
- * two args arrive on the stack in retail as plain 32-bit zero words (its
- * own body happens to read them with `lhu`, but that is internal to a
- * function that will never be matched under this toolchain). */
-extern void func_8001A380(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4, s32 arg5);
+/* Populates a GPU primitive header at `arg0` (D_8008ACD0/D_8008AEE8):
+ * +0x00 an OT/code word (D_8008A834 when D_8008A830 is set, else
+ * D_80090C18), +0x04 D_8008A824, +0x08 D_8008A828 -- these three are
+ * UNCONDITIONAL (the third rides in the branch's own delay slot in
+ * retail); only the two u16 stack args at +0x0C/+0x0E are actually
+ * gated on `arg3 != 0`. +0x10 is an unaligned PolyUV4 copied from
+ * `*arg2` (same lwl/lwr idiom as func_8001A3EC, forced by PolyUV4's
+ * alignment-2 all-s16 layout); +0x14 is the plain word at
+ * `arg1 + 0x30`. MATCHED round 44 after the gp_rel blocker that
+ * stalled it at carve time (round 13) was resolved -- see
+ * docs/match-reports/func_8001A380.md. Declared here so its caller in
+ * this unit, func_800197C4, can compile (still INCLUDE_ASM). */
+extern void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
  * func_800197C4 (code_8220_c) with (self, table). */
