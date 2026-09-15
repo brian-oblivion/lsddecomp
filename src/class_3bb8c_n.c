@@ -49,7 +49,31 @@
 
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054714);
+/* Local view only, not the shared header: `D_8008AC94` is already established
+ * as a `LocalM4D0Obj *` in `src/class_3bb8c_m.c` (round 15, own local type),
+ * with named slots at +0x04C/+0x064/+0x068.  This function dispatches +0x004
+ * instead, a slot that unit never names -- kept as its own minimal local
+ * view rather than importing that unit's type (multiple-independent-local-
+ * views convention; class_3bb8c_m.c is not this unit's to edit). */
+typedef struct ObjAB54 ObjAB54;
+typedef struct ObjAB54Methods ObjAB54Methods;
+struct ObjAB54Methods {
+    u8 pad0[0x4];
+    void (*slot4)(ObjAB54 *self); /* +0x004 */
+};
+struct ObjAB54 {
+    ObjAB54Methods *methods; /* +0x000 */
+};
+
+extern const u8 *D_8008AB54;
+extern s32 D_8008AC94;
+
+void func_80054714(void) {
+    if (D_8008AB54 != 0) {
+        ((ObjAB54 *) D_8008AC94)->methods->slot4((ObjAB54 *) D_8008AC94);
+        D_8008AB54 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054758);
 
@@ -57,17 +81,75 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800549A8);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B1C);
+void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
+    dst[0] = src[0] - delta;
+    dst[1] = src[1] - delta;
+    dst[2] = src[2] + delta;
+}
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B50);
+extern void func_800183DC(void **array, s32 count);
+extern s32 D_8008AB50;
+extern void *D_8008E10C[];
+
+void func_80054B50(void) {
+    if (D_8008AB50 != 0) {
+        func_800183DC(D_8008E10C, 0x12);
+        D_8008AB50 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054B84);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054C74);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054CFC);
+extern s32 D_8008AC80;
+extern s32 D_8008AC88;
+extern void *D_8008E0C8[];
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054D30);
+void func_80054CFC(void) {
+    if (D_8008AC80 >= 0) {
+        func_800183DC(D_8008E0C8, D_8008AC88);
+    }
+}
+
+/* Local view only: `func_800557DC` (defined later in this unit, in strict
+ * ROM order) takes one of these two per-slot objects. `unk0` is address-
+ * taken then chased for a single byte at +0x6 (toggled there); `unk14` is
+ * only ever address-taken, as an embedded sub-object handed to
+ * `func_8002CC84`/`func_8002CD08` (same discard-return caveat as
+ * `include/Entity.h`'s `unk9C` -- a field only ever address-taken carries
+ * no evidence about its own declared type). */
+typedef struct ObjN14Sub ObjN14Sub;
+struct ObjN14Sub {
+    u8 pad0[0x6];
+    s8 unk6; /* +0x006 */
+};
+
+typedef struct ObjN14 ObjN14;
+struct ObjN14 {
+    ObjN14Sub *unk0; /* +0x000 */
+    u8 pad4[0x14 - 0x4];
+    s32 unk14; /* +0x014 */
+};
+
+extern s32 func_800557DC(ObjN14 *arg0);
+
+extern s32 D_8008AB4C;
+extern ObjN14 *D_8008AC9C[2];
+
+void func_80054D30(void) {
+    s32 i;
+
+    func_80054714();
+    func_80054B50();
+    func_80054CFC();
+    for (i = 0; i < 2; i++) {
+        D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+    }
+    if (D_8008AB4C != 0) {
+        D_8008AB4C = 0;
+    }
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054DA4);
 
@@ -85,12 +167,51 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005556C);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055620);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800557DC);
+extern s32 D_8008AC7C;
+extern void func_8002CC84(s32 arg0, void *arg1);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005582C);
+s32 func_800557DC(ObjN14 *arg0) {
+    func_8002CC84(*(s32 *) D_8008AC7C, &arg0->unk14);
+    arg0->unk0->unk6 = -arg0->unk0->unk6;
+    return 0;
+}
+
+extern s32 func_80055874(ObjN14 *arg0, void *arg1);
+extern void func_8002CD08(s32 arg0, void *arg1);
+
+s32 func_8005582C(ObjN14 *arg0, void *arg1) {
+    if (func_80055874(arg0, arg1) != 0) {
+        func_8002CD08(*(s32 *) D_8008AC7C, &arg0->unk14);
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055874);
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800558F0);
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055A24);
+extern s32 D_8008AC6C;
+extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
+extern s32 D_80087444[];
+extern s32 D_80087450[];
+extern s32 D_8008745C[];
+extern s32 D_80087468[];
+
+void func_80055A24(void) {
+    void *a0, *a2;
+    s32 a1;
+
+    if (D_8008AC6C == 2) {
+        a0 = D_80087444;
+        a2 = D_80087450;
+        a1 = 1;
+    } else if ((u32) (D_8008AC6C - 3) < 3) {
+        a1 = 1;
+        a0 = D_8008745C;
+        a2 = D_80087468;
+    } else {
+        return;
+    }
+    func_8003B624(a0, a1, a2);
+}
