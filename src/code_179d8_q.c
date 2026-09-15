@@ -233,4 +233,38 @@ void func_80028280(void)
     func_800280E0();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_q", func_800282AC);
+/* func_8002832C (code_179d8_r) allocates and links a 0x24-byte list node;
+ * only the fields this call site writes are typed here (padded to their
+ * offsets, per this unit's convention). */
+typedef struct Entry800282AC Entry800282AC;
+struct Entry800282AC {
+    u8 pad00[0x08];
+    s32 unk08;
+    s32 unk0C;
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
+};
+extern Entry800282AC *func_8002832C(void); /* code_179d8_r */
+
+typedef struct Self800282AC Self800282AC;
+struct Self800282AC {
+    u8 pad00[0x22];
+    u16 unk22;
+    s32 unk24;
+};
+
+void func_800282AC(Self800282AC *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+    Entry800282AC *entry = func_8002832C();
+
+    entry->unk08 = arg2;
+    entry->unk14 = arg3;
+    entry->unk0C = (s32)arg0;
+    entry->unk10 = arg1;
+    entry->unk18 = arg4;
+
+    arg0->unk22++;
+    arg0->unk24 = 0;
+    func_800281B0();
+}
