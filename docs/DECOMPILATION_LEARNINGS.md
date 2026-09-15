@@ -6864,3 +6864,90 @@ first, which the sixth screen alone cannot do.
 means there is no instruction to REMOVE, so the lever has nothing to act on.
 Bravo reached that conclusion mechanically on `func_8001E4A4`; alpha reached
 the same conclusion by hand on two other functions. Same answer, two routes.
+
+## Default-then-override vs two `return` statements — and the bound that keeps it honest (round 43)
+
+Alpha closed three functions with one reshape, and the mechanism is about
+retail's REGISTER PLAN rather than its semantics. Two `return` statements
+produce the right VALUES and the wrong plan:
+
+```c
+/* 1/8 words. Right values, wrong registers: GCC puts the loaded global in
+ * $v0 and the constant in $v1 where retail has them swapped, and retail
+ * computes the "0" result unconditionally in a branch DELAY SLOT
+ * (`addu $a0,$zero,$zero`) -- which two return paths cannot express. */
+s32 func_8005BF48(void) {
+    if (D_8008ACC4 == 0xC) return 0;
+    return (s32)&D_8008ABF0;
+}
+
+/* 8/8 byte-exact. One result variable, initialised to the default, then
+ * conditionally overridden. */
+s32 func_8005BF48(void) {
+    s32 result;
+    result = 0;
+    if (D_8008ACC4 != 0xC) result = (s32)&D_8008ABF0;
+    return result;
+}
+```
+
+Confirmed three times independently in one unit (`func_8005BF48`,
+`Test4InstantTeleporters`, `func_8005BD3C`), and then `func_8005C02C` matched
+**first try** by reusing `func_8005BD3C`'s shape — which is the transfer test,
+and it passed.
+
+**THE BOUND, AND IT ARRIVED IN THE SAME ROUND FROM A DIFFERENT RUNNER.** It
+would be easy to write this up as "reopened `gp_rel` functions need a source
+reshape". That is false. bravo's `code_171e0` family — seven functions,
+11w–15w — compiled byte-exact from ordinary C on the FIRST build every time,
+and its own commit for `func_80026CAC` says "no source-shape derivation
+needed". Round 43's overall hit rate (47 of 49 attempted) is driven by exactly
+that: most reopened functions just compile.
+
+**The discriminator is whether the function CHOOSES BETWEEN TWO RESULTS**, not
+whether it was ever blocked. A pure accessor or a straight-line dispatch has no
+choice to express and no register plan to get wrong. Filing the lever without
+this bound would send the next runner hunting a shape residue in functions that
+do not have one — the same error shape as a false blocker, pointed at source
+form instead of the toolchain.
+
+Related, same round, same character: `if`/`else` BLOCK ORDER and PHYSICAL block
+layout had to mirror retail's (`Test4InstantTeleporters`, `func_8005BE90` —
+five attempts, switch and `||`-chain both rejected before a `goto` chain in
+retail's exact interleaved order landed). And bravo's `func_80027024` came out
+one word long from an early-return guard, because GCC placed the larger arm
+first and needed a trailing jump; flipping the test to match the `beq` polarity
+directly fixed it.
+
+## A permuter negative is only as good as the flags its scaffold was built with (round 43)
+
+`tools/setup-permuter.sh` hardcodes `MASPSX_FLAGS` independently of the
+Makefile's. When round 42 added `--gp-symbols` and `--no-nop-mflo-mfhi` to the
+build, the permuter's generated `compile.sh` did not follow, so **every search
+since on a function touching `gp_rel` or `mflo`/`mfhi` has been scored against
+a baseline that cannot reach zero** — at least one word differs no matter what
+C the permuter emits.
+
+Two searches in round 43, one round apart in nothing but attention:
+
+| function | iterations | verdict |
+| --- | --- | --- |
+| `func_8004DCD0` (delta) | 26500 | **valid** — delta spotted the gap and hand-patched its own gitignored `compile.sh` |
+| `func_80026CFC` (bravo) | 150582 | **artifact** — reads `D_8008A84C`, which IS in `config/gp-symbols.txt` |
+
+**The asymmetry is what makes this survivable: a stale flag list can
+manufacture a false NEGATIVE but never a false MATCH**, because a match is
+confirmed by the whole-image SHA1 and a scorer never is. So no matched function
+is in doubt; only search negatives are. That is also why the failure is
+expensive in the usual direction — a false negative removes a function from
+future rounds, and nobody re-searches ground believed exhausted.
+
+**The generalisable rule: a scaffold is part of the measurement, and a
+measurement's tooling can go stale without anything failing loudly.** Delta's
+own tell is the one to copy — *if a permuter base score looks absurd
+immediately after a clean manual build scored well, suspect the generated
+`compile.sh` before suspecting the candidate.*
+
+Delta correctly did NOT patch the shared tool: a flag change is an operator
+escalation (CLAUDE.md, "Escalate, do not experiment"), even when the change
+would merely bring a helper back into agreement with the Makefile.

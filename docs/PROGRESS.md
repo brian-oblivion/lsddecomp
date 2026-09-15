@@ -6,6 +6,151 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-15 — round 43: five runners, 47 matches, ZERO merge conflicts — the largest round in the project's history, and it was mostly paperwork that was blocking it
+
+**State at end: 1046 matched / 1253 game functions (83.48%)**, up **47** from
+round 42's 999 — against +3 in round 41 and +4 in round 42. Game bytes
+61.48% → 64.63%. Queue 188 → **141** live `INCLUDE_ASM`; `fresh` 86 → **37**;
+stalled 102 → 104. Uncarved unchanged at 66. Build green after all six merges
+and after a clean `make extract` (zero committed bytes changed); tree clean,
+all five worktrees and branches removed.
+
+### Gates
+
+Gate 0 green. **Gate 1: `fresh` 86, every one of them `REOPENED -- ASSIGNABLE`
+from round 42** — the whole round was spent on ground that round 42 unblocked
+and nobody had touched. **Gate 2: carve REJECTED on measurement** (86 fresh
+already exceeded five runners' capacity), though it is live again — see below.
+**Gate 3: rejected**, the queue was fresh rather than exhausted.
+
+### Runners — five units with DISJOINT header sets, and it showed
+
+| runner | unit | result |
+| --- | --- | --- |
+| alpha | `DreamSys` | **15/15**, zero stalls (10 assigned + the entire stretch list) |
+| bravo | `code_171e0` | 11/12, 1 stall |
+| charlie | `code_4cd08` | **8/8 — unit now has ZERO `INCLUDE_ASM`** |
+| delta | `class_3bb8c_d` | 6/7, 1 stall |
+| echo | `code_179d8_e` | **7/7** |
+
+**Six merges, ZERO conflicts.** `headercontention.py` predicted it at
+assignment time and was exactly right. Round 15 (five runners on one block)
+got six conflicting merges of seven; round 43 spread five runners across five
+header sets and got none. This is the cheapest lever in the document and it
+costs one command.
+
+### The round's biggest finding is not a match — it is what was hiding the work
+
+**31 `src/*.c` unit header comments still told runners which functions were
+BLOCKED, and several said "do NOT spend attempts on these."** Every tool —
+`progress.py`, `nearmiss.py`, `uncarved.py` — reported those same functions as
+clean and assignable. A unit comment is the one place a blocking verdict can
+live where **no tool can read it**, which is exactly why it outlives its
+evidence. Retracted with a dated banner BEFORE provisioning.
+
+**The payoff is measured, not inferred.** `code_179d8_e`'s comment named eight
+functions and forbade attempts on them. Round 42 had already matched one.
+Round 43's echo closed **six of the seven it was assigned**, including three
+the comment forbade — `func_8002C4E0` (86w), `func_8002C638` (49w),
+`func_8002C6FC` (74w) — all byte-exact, no toolchain issue, no permuter. That
+is ~200 words of ordinary work concealed in ONE unit by one stale paragraph.
+
+### Levers, with their SCOPE attached
+
+- **Default-then-override beats two `return` statements** (alpha, three
+  independent confirmations). Two returns give the right VALUES and the wrong
+  REGISTER PLAN; retail computes the default unconditionally in a branch delay
+  slot, which two return paths cannot express. `func_8005C02C` then matched
+  **first try** by reusing `func_8005BD3C`'s shape.
+- **BUT IT IS NOT GENERAL, and bravo supplied the negative in the same round.**
+  bravo's own commit records "no source-shape derivation needed" — its
+  accessor/dispatch family compiled from ordinary C on the first build, seven
+  times running. **The discriminator is whether the function CHOOSES between
+  two results, not whether it was `gp_rel`-blocked.** Filing the lever without
+  that bound would send the next runner hunting a shape residue in functions
+  that do not have one.
+- **A function whose residue MOVED after a toolchain fix deserves a FRESH
+  search, not its inherited verdict.** Round 42 left `func_8005950C` at 30/33;
+  alpha's permuter found a split-assignment form and closed it 33/33.
+
+### Stalls (2)
+
+- `func_80026CFC` (bravo) — register-allocation, 3 words long (38 vs 35), 1/35,
+  first diff vram `0x80026D00`. **Its permuter negative is an ARTIFACT — see
+  the toolchain lead.**
+- `func_8004DCD0` (delta) — register-CLASS on one local pointer, **2 words
+  short (76/78)**, first real diff vram `0x8004DCE0` (a missing `move $s0,$a1`;
+  the rest is cascade, not 75 residues). Its 26500-iteration negative IS valid.
+
+### TOOLCHAIN LEAD — operator escalation, NOT acted on
+
+**`tools/setup-permuter.sh` hardcodes `MASPSX_FLAGS` independently of the
+Makefile and omits round 42's two flags:**
+
+```
+Makefile:           --aspsx-version=2.34 --dont-force-G0 --expand-div --addiu-at --gp-symbols=config/gp-symbols.txt --no-nop-mflo-mfhi
+setup-permuter.sh:  --aspsx-version=2.34 --dont-force-G0 --expand-div --addiu-at
+```
+
+So **every permuter search since round 42 on a function touching `gp_rel` or
+`mflo`/`mfhi` has been scored against a baseline that cannot reach zero.** The
+asymmetry that matters: this can manufacture a **false NEGATIVE** but never a
+false match, because every match here is confirmed by the whole-image SHA1 —
+so the round's 47 matches are safe and only search negatives are in question.
+
+Found by delta, which diagnosed it, hand-patched its own gitignored
+`compile.sh`, and correctly did **not** commit a fix. bravo never noticed, so
+`func_80026CFC`'s 150582-iteration negative was annotated as an artifact and
+the function returned to Gate 1b's sixth screen as **never-searched** — the
+expensive direction, since nobody re-searches a function believed exhausted.
+Two searches, one round, separated only by whether the runner happened to look.
+
+### Consolidation corrections (head)
+
+- **The seventh screen never looked at the SHARED DOCS.** It crosses closed
+  functions against other *reports*; `DECOMPILATION_LEARNINGS.md` cites ~30
+  SDK-exit functions. An entire named learning — "the DCE-eliminated
+  always-true check" — rested on "two confirmed instances", and both are Sony's
+  (`CD_newmedia`, `CD_cachefile`). **Zero game-code instances.** Round 40 had
+  adjudicated this in a report while the doc taught it for three more rounds.
+  Also sharpened: for a TOOLCHAIN claim, those bytes came from Sony's ASPSX
+  build, so a reproducer-backed claim survives and an instance-level verdict
+  does not.
+- **Round 27's standing "carving can no longer refill the queue" verdict is
+  REVERSED**, by its own escape clause. 66 uncarved, **66 blocker-clean, zero
+  BIOS trampolines**, and the front 20-function window of BOTH large segments
+  is 20/20 clean (`code_179d8` 840w, `class_3bb8c_n` 1112w).
+- **An empty process table is NOT evidence a runner is done — the head proved
+  it on itself.** It salvaged bravo's abandoned search after confirming the
+  permuter workers were gone; bravo then resumed and filed a better report.
+  The process table describes the SEARCH, not the RUNNER. Added: measure
+  salvaged bodies in a worktree, never in `main` (this one briefly left a red
+  build in the shared checkout), and **teardown is the only deadline that
+  licenses salvage**.
+- `func_8004DCD0` kept round 42's `REOPENED` banner above delta's new stall
+  verdict, so `progress.py` counted a fully-worked function as FRESH and
+  `nearmiss.py` would have ranked it on stale banner text. Marker retired.
+  **When a runner works a reopened function and does not close it, retiring
+  the marker is part of the merge.**
+
+### Anomaly: no mid-round broadcast was possible
+
+`SendMessage` was unavailable this session, so alpha's lever — found at roughly
+hour one — could not be pushed to the other four, and bravo could not be told
+about the permuter flag gap that invalidated its search. The only other channel
+(editing a live runner's file on `main`) is forbidden by collision rule 6. This
+is round 31's "the head may not be ABLE to ask" corollary, and its cost here
+was concrete rather than theoretical.
+
+### For round 44
+
+`fresh` is 37 and Gate 2 is live for the first time in eight rounds. Either is
+defensible; **a mixed round is better than either alone** — 37 fresh staffs
+three runners comfortably, and a carve of `code_179d8`'s or `class_3bb8c_n`'s
+20/20-clean front window adds ~20 more for a fourth. Settle the permuter flag
+escalation first: 109 of 187 queue functions had never been searched at the
+start of this round, and that lever is mis-calibrated until the flags agree.
+
 ## 2026-09-15 — round 42: research round, operator-authorised — BOTH remaining toolchain blockers RESOLVED, 137 functions unblocked
 
 **State at end: 999 matched / 1253 game functions (79.73%)**, up four from

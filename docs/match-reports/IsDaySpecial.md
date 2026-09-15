@@ -7,7 +7,7 @@
 > the live tests -- the body preserved below, unchanged except for dropping a redundant `extern` that DreamSys.h already declares. The C is in `src/DreamSys.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
+> **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
 > screened as blocked by `nop_mflo_mfhi`. **That blocker is RESOLVED**: maspsx gained
 > `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
 > passed by the Makefile), the whole image stays byte-exact, and previously

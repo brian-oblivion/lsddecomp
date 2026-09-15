@@ -1,4 +1,6 @@
-> **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
+> **REOPENED by round 42, AND SINCE WORKED -- marker spent (head, round 43).**
+> This is now a DOCUMENTED STALL, not fresh ground: see the three-figure
+> verdict below. The round-42 reopening text is kept for history. This function was
 > screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
 > `--gp-symbols` and `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`,
 > passed by the Makefile), the whole image stays byte-exact, and previously
