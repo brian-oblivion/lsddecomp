@@ -7917,6 +7917,39 @@ third round to measure that, and it is why re-sends keep being worth the slot.
   measurements; zero-ness is merely its commonest form. See `PARALLEL-RUNS.md`
   Gate 3, where the head's own table had to be corrected for exactly this.
 
+### Three more levers from the cold-ground runner, and one refinement
+
+- **A twice-evaluated field read must appear INLINE AT EACH USE; two
+  separately-named locals still get CSE'd.** This refines round 46's
+  field-pair hoist from the opposite side — that lever is about *where* you
+  hoist, this is about hoisting failing to stick at all when you name the
+  values.
+- **A `volatile`-read + plain-write split can defeat a CSE+constant-fold while
+  preserving delay-slot scheduling.** Read this together with the `volatile`
+  negative above (it does NOT stop an address being cached across a call): the
+  two together scope `volatile` usefully — it works on the *value* CSE, not on
+  the *address* CSE.
+- **If/else-if versus nested-`if` determines which arm is the compiler's
+  physical fall-through**, confirmed **five times in one unit**, which is
+  enough to state as a rule of thumb: whichever arm is textually LONGER needs
+  to be the fall-through — and read that off the `.s` rather than guessing it
+  from which branch you wrote as `if`.
+
+### A perfect permuter scaffold score can be the bad news
+
+`func_80027A24` stalled at **150/151** with its isolated scaffold scoring a
+**perfect 0**. The residue is a GCC cross-jump/tail-merge artifact that is a
+**whole-translation-unit** effect: the switch's out-of-range fallback branch
+targets the wrong — but byte-identical — case body. No mutation of that
+function's own source can reach it, and the scaffold cannot see it at all.
+
+**So a scaffold that scores perfectly on a function that does not match tells
+you the cause is OUTSIDE the function**, and the correct response is to stop
+searching inside it. Combined with the two other outcomes measured this round,
+check 3's discriminator is AGREEMENT between scaffold and real build, in which
+**zero is the good sign in one case and the bad sign in another** — see
+`PARALLEL-RUNS.md` Gate 3 for the full three-row table.
+
 ### Distinguishing "spent" from "hard", and saying which
 
 The re-send re-confirmed five `code_179d8_g` and `class_3ac78` near-misses as
