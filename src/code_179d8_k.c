@@ -807,11 +807,24 @@ typedef struct {
     u8 pad0E[0x20 - 0xE];
 } Scratch800351D0;
 
-/* Local guess; see docs/match-reports/func_800357B0.md for the derivation
- * this signature settles (the 4th argument's type, and the scratch struct's
- * layout, were both left explicitly unresolved there). */
-extern void func_800357B0(s16 a0, s16 a1, s16 a2, u32 a3, Blk1_800351D0 blk1,
-                           Blk2_800351D0 blk2, s16 arg5, u8 arg6);
+/* Round 49 (runner charlie): func_800357B0's OWN definition, later in this
+ * same file, settles this signature for real as (channel, slot, kind,
+ * Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved, arg5, arg6) -- the
+ * 0x20-byte scratch blob and the 18-byte ADSR scratch passed by value as
+ * TWO params, not this function's own earlier three-way slice (a3/blk1/
+ * blk2) of the same 50 total bytes. Two conflicting extern declarations of
+ * the same identifier in one translation unit is a hard C constraint, not
+ * a per-file "independent local view" case (that convention is for
+ * readings split across DIFFERENT files/units), so the stale guess is
+ * removed here rather than left to conflict -- `Scratch_800357B0`/
+ * `AdsrRaw_800357B0` are declared later in this file (next to
+ * func_800357B0's own definition), after this point, so a same-shaped
+ * forward declaration cannot be written here without moving those
+ * typedefs earlier. func_800351D0's still-stalled preserved body (below)
+ * will need its own call site reshaped to the real signature, and a
+ * forward declaration re-added above it, when it is next attempted; not
+ * done here since that body is currently inert (#if 0) and calls nothing
+ * live. */
 
 /* STALL -- see docs/match-reports/func_800351D0.md. Round 48 (runner
  * charlie): SOLVED the 13-round-standing frame-size mystery (a `u8
@@ -931,7 +944,6 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
  * directions of "hoist through a fresh local" (channel, round 35; arg5,
  * round 39) are confirmed inert against it. See the match report for the
  * full derivation and the preserved near-miss body. */
-#if 0
 /* This unit's own reduced view of the VagAtr SsUtGetVagAtr/SsUtSetVagAtr
  * fill (round 35): only the 8 fields this function actually touches, at
  * their real include/psyq/LIBSND.H VagAtr offsets. Total size (0x20) is
@@ -1038,7 +1050,10 @@ tailA:
     case 13:
     case 14:
     {
+        s16 new_var;
+
         _SsUtResolveADSR(scratch.adsr1, scratch.adsr2, &resolved);
+        new_var = channel;
         switch (arg5) {
         case 4:
             resolved.unkA = 0;
@@ -1090,7 +1105,7 @@ tailA:
             break;
         }
         _SsUtBuildADSR(&resolved, &scratch.adsr1, &scratch.adsr2);
-        SsUtSetVagAtr(channel, slot, kind, &scratch);
+        SsUtSetVagAtr(new_var, slot, kind, &scratch);
         return;
     }
     case 15:
@@ -1113,8 +1128,6 @@ tailA:
         return;
     }
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800357B0);
 
 /* STALL -- see docs/match-reports/func_80035A7C.md. length exact 44/44,
  * 36/44 raw word-match, first real diff at word 23: an independent value
