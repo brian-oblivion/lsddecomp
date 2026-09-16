@@ -775,7 +775,6 @@ void func_80035154(s16 a0, s16 a1, u8 a2)
  * struct-copied byte for byte into func_800357B0's outgoing stack args,
  * per this project's confirmed alignment-2-struct-assignment idiom -- their
  * internal field breakdown is unconstrained by anything observed so far. */
-#if 0
 typedef struct {
     s16 raw[14];    /* 28 bytes, alignment 2: whole-struct-copied verbatim */
 } Blk1_800351D0;
@@ -814,20 +813,18 @@ typedef struct {
 extern void func_800357B0(s16 a0, s16 a1, s16 a2, u32 a3, Blk1_800351D0 blk1,
                            Blk2_800351D0 blk2, s16 arg5, u8 arg6);
 
-/* STALL -- see docs/match-reports/func_800351D0.md. Compiled length 4 words
- * LONG (380/376, measured directly off build/src/code_179d8_k.c.o since
- * length has drifted). The whole 22-word RPN/NRPN dispatch skeleton, the
- * three SsUtGetVagAtr/SsUtSetVagAtr loops, and the func_800357B0 struct-
- * marshaling (which also settles that function's own previously-unresolved
- * 4th-argument/scratch-layout question, see func_800357B0.md) all come out
- * byte-correct. The residue is two isolated dead-value computations
- * (retail computes a masked/shifted byte into $s5 that is NEVER READ
- * anywhere in the function, only restored as part of the ordinary
- * callee-save epilogue) that a plain C dead local gets optimized away
- * entirely and a `volatile` local keeps but wraps in real store+join
- * control flow retail's register-only dead value never needed -- see
- * report for the full derivation and the four things tried. CC6 (Data
- * Entry MSB) handler for RPN/NRPN parameter writes. */
+/* STALL -- see docs/match-reports/func_800351D0.md. Round 48 (runner
+ * charlie): SOLVED the 13-round-standing frame-size mystery (a `u8
+ * dead[40]` under `if (0)`, this project's established frame-padding
+ * idiom, recovers retail's exact -0x108 frame -- was -0xE0, a 40-byte/
+ * 10-word gap round 35 measured but never chased down) and replaced the
+ * shared `goto combine;` tail with two independently-duplicated
+ * `rec->unk88 = func_80035E80(ch, slot); return;` copies (matching this
+ * project's documented tail-duplication idiom). Together: 18/376 -> 48/376
+ * raw word-match, with the frame now byte-exact. Still NOT byte-exact
+ * (compiled length 386/376, 10 words over) -- do not trust the raw
+ * word-match figure alone, see report for the residue that remains. */
+#if 0
 void func_800351D0(s16 a0, s16 a1, u8 a2)
 {
     s16 ch = a0;
@@ -838,18 +835,24 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
     Scratch800351D0 scratch;
     s16 i;
     u8 kind;
+    u8 dead[40];
 
+    if (0) {
+        dead[0] = 0;
+    }
     SsUtGetProgAtr(rec->unk4C, p[0x2C], &list);
 
     if (rec->unk27 == 1 && rec->unk10 == 0) {
         rec->unk28 = a2;
         rec->unk10 = 1;
-        goto combine;
+        rec->unk88 = func_80035E80(ch, slot);
+        return;
     }
     if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
         rec->unk15 = a2;
         rec->unk2A = rec->unk2A + 1;
-        goto combine;
+        rec->unk88 = func_80035E80(ch, slot);
+        return;
     }
     if (rec->unk29 == 2) {
         if (rec->unk13 == 0 && rec->unk14 == 0) {
@@ -911,7 +914,6 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
         rec->unk2A = 0;
         return;
     }
-combine:
     rec->unk88 = func_80035E80(ch, slot);
 }
 #endif
