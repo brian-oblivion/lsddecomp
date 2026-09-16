@@ -4725,9 +4725,41 @@ it is the most useful thing the round established.
 
 | lever | where it WORKED | where it made things WORSE |
 | --- | --- | --- |
-| **address-taken parameter** forces retail's home-slot spill instead of `$s0` promotion | `func_80050B28`: 2-words-long-with-drift -> exact length | **0 for 4** on every other candidate (delta on `func_8004B700`, `func_8004BB3C`; alpha on `func_800351D0`; bravo on `func_8002E4D8`) |
+| **address-taken parameter** forces retail's home-slot spill instead of `$s0` promotion | ~~`func_80050B28`: 2-words-long-with-drift -> exact length~~ **VOID -- see the round-48 box below** | **0 for 4** on every other candidate (delta on `func_8004B700`, `func_8004BB3C`; alpha on `func_800351D0`; bravo on `func_8002E4D8`) |
 | **invert the guard** so the expensive arm falls through | `func_80050AA4`: 11/25 and one word short -> **25/25 byte-exact** | `func_8004EF6C`: **188/240 -> 6/240**, catastrophic. The guard was ALREADY correctly polarized; `slt`/shift replaced retail's `bne` |
 | **inline every call site** rather than factoring a shared tail | `func_800513D0`: 9-words-short-with-drift -> **147/147 byte-exact** | `func_8004F8A4`: **4 words too long**. Same runner, same header family, same round |
+
+> **ROUND 48 (head): ROW 1's POSITIVE EVIDENCE IS VOID. THE OTHER TWO ROWS
+> STAND, AND THE DIFFERENCE BETWEEN THEM IS THE LESSON.**
+>
+> Running round 43's SDK-exit screen over this document (not just over match
+> reports) put all three of the "where it WORKED" cells in question. Checking
+> each one individually -- rather than sweeping them -- splits them cleanly:
+>
+> | row | positive cited | its real exit | verdict |
+> | --- | --- | --- | --- |
+> | address-taken parameter | `func_80050B28` | Psy-Q **libcard**, marked `NOT GAME CODE` (round 39/40), **never matched** -- best 5/12 kept body, 9/12 measured, exact length | **VOID** |
+> | invert the guard | `func_80050AA4` | converted to `libc2/todigit.o` in round 33, **but round 27 took it to 25/25 byte-exact as C with `build exit=0`, whole-image SHA1 green** | **STANDS** |
+> | inline every call site | `func_800513D0` | matched game C, 147/147, `src/class_3bb8c_i.c` | **STANDS** |
+>
+> **The discriminator is not "was it reclassified" -- it is "did our oracle
+> ever go green on it as C".** Round 38's rule voids an SDK-exit precedent
+> because no source shape ever reached those bytes; that reasoning does not
+> apply when the whole-image SHA1 *did* go green on a C body before the
+> reclassification, which is exactly the adjudication CLAUDE.md already makes
+> for `func_8003FC70`. Row 2 is a second such case. **Sweeping on the screen
+> alone would have discarded two valid mechanisms.**
+>
+> **What row 1 now says, and it is a different instruction from the table's:**
+> the address-taken-parameter lever has **zero valid positive evidence on game
+> code** and **four measured game-code failures**. Its whole "it WORKED here"
+> half was an improvement in LENGTH on Sony's library code that never reached
+> byte-exact. Read the row as **0-for-4**, not as a balanced coin flip -- and
+> note that its negatives are the only part of it that was ever game code.
+>
+> This is the seventh-screen class arriving in the document that TEACHES the
+> levers rather than in a report: a precedent corrected in a report kept
+> standing, uncorrected, in the file every runner is told to read.
 
 **The two rows that matter most are the second and third, because in each the
 same person applied their own successful lever to a neighbouring function and
