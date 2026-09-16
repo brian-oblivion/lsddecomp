@@ -125,6 +125,32 @@ first), which argues for the fallback rather than a fourth refinement.
   each (`func_8002F3E8` was reviewed only). Work sound, count off — count from
   the branch, as ever. Nothing dropped: that function has a prior report.
 
+### TEARDOWN DEFERRED FOR ONE WORKTREE — `../lsddecomp2-wt-bravo` IS STILL STANDING
+
+`alpha`, `charlie`, `delta` and `echo` were removed normally (all four gave a
+final structured summary, all merged, all clean). **`runner/bravo`'s worktree
+and branch were deliberately LEFT IN PLACE**, and the next head needs to know
+why rather than inheriting a surprise (round 6 → 7's lesson).
+
+- **Everything bravo committed is merged into `main`** — 5 commits, 7 reports,
+  no `src/` change. `git log main..runner/bravo` is empty and its tree is clean,
+  so **there is nothing to salvage and nothing at risk.**
+- What is missing is only bravo's **final structured summary**, which it never
+  issued, and a **write-up of one last search on `func_8001989C`** that it ran
+  after its merge and had not committed when the machine went quiet. That result
+  exists only in that session's context; if bravo never resumes it is simply
+  lost, and the function keeps its prior report either way.
+- Teardown was held back at the four-precondition check for exactly this reason:
+  three preconditions were green (branch merged, reports present, tree clean) and
+  the fourth — *has REPORTED, not merely gone quiet* — was not. **That is the
+  precondition that cannot be checked from git**, and on this round it was the
+  only one that would have caught a live runner mid-search.
+
+**Next head: remove it once you are satisfied bravo is gone** —
+`git worktree remove --force ../lsddecomp2-wt-bravo && git branch -d runner/bravo`
+— after confirming `git log main..runner/bravo` is still empty. Do NOT recycle
+the name `bravo` for a new runner until you have.
+
 ---
 
 ## 2026-09-16 — round 47: the executable finishes carving, 9 matches, and two head over-generalisations caught by runners
