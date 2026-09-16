@@ -24,7 +24,46 @@
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_800272D0);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027480);
+/* Local view of the object func_80027480/func_800282AC/func_80028A34 read
+ * through -- the real struct is ObjA34_179D8H (src/code_179d8_h.c), but that
+ * type is that unit's own local reading, not a shared header, so this unit
+ * carries its own minimal view of the two offsets it actually touches. */
+typedef struct Obj80027480 {
+    u8 pad0[0xC];
+    s32 unk0C;
+    u8 pad10[0x28 - 0x10];
+    u16 unk28;
+} Obj80027480;
+
+extern s32 D_8008A85C;
+extern s32 D_8008A860;
+extern s32 D_8008A864;
+
+extern void func_80028A34(Obj80027480 *self);
+extern void func_800280D0(void);
+extern void func_80028844(s32 arg0, s32 arg1);
+extern void func_80028864(void);
+extern void func_800282AC(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
+                           s32 arg4);
+extern void func_800280E0(void);
+
+void func_80027480(Obj80027480 *self) {
+    if (D_8008A85C == 0 && D_8008A860 == 0) {
+        func_80028A34(self);
+        return;
+    }
+    func_800280D0();
+    if (self->unk28 != 0) {
+        if (D_8008A864 == 0) {
+            func_80028844(0, 0);
+            self->unk0C = 0;
+            func_80028864();
+        }
+    } else {
+        func_800282AC(self, 0, 3, 0, 0);
+    }
+    func_800280E0();
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027528);
 
