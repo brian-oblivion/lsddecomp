@@ -70,7 +70,48 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027528);
 void func_800276C8(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_800276D0);
+extern s32 D_8008A880; /* CdRead sector count */
+extern void *D_8008A884; /* CdRead target buffer */
+extern s32 D_8008A898;
+
+extern void func_80028A84(Obj80027480 *self, void *arg1, s32 arg2);
+extern s32 CdRead(s32 sectors, void *buf, s32 mode);
+extern s32 CdReadSync(s32 mode, s32 result);
+extern void func_80028864(void);
+
+s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
+    s32 v1;
+
+    if (D_8008A85C == 0 && D_8008A860 == 0) {
+        func_80028A84(self, buf, size);
+        return 0;
+    }
+    func_800280D0();
+    if (self->unk28 != 0) {
+        if (D_8008A864 == 0 && self->unk0C != 0) {
+            func_80028844(3, 7);
+            if (D_8008A85C != 0) {
+                D_8008A880 = size >> 11;
+                D_8008A884 = buf;
+                D_8008A898 = 1;
+            } else {
+            retry:
+                CdRead(size >> 11, buf, 0x80);
+                do {
+                    v1 = CdReadSync(0, 0);
+                } while (v1 > 0);
+                if (v1 == -1) {
+                    goto retry;
+                }
+                func_80028864();
+            }
+        }
+    } else {
+        func_800282AC(self, 0, 5, (s32)buf, size);
+    }
+    func_800280E0();
+    return 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027800);
 
