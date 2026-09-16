@@ -50,8 +50,77 @@
  */
 #include "common.h"
 
-/* STALL -- see docs/match-reports/func_8002E4D8.md. Best body reached
- * (237/231 built words, 6 words LONG) preserved there in #if 0. */
+/* Round 48 (echo): testing charlie's func_800351D0 frame-padding lever on
+ * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
+ * saves ZERO callee-saved registers and addresses NOTHING via $sp beyond
+ * the prologue/epilogue immediate itself, confirmed via grep -- textbook
+ * pure-padding shape). See docs/match-reports/func_8002E4D8.md for the
+ * full derivation this body is otherwise unchanged from.
+ *
+ * This function sits FIRST in ROM order in this unit, so the shared
+ * record-family types its sibling stalls also use (Rec34Half, Rec34HalfU,
+ * Rec16D7F0, ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
+ * defined HERE instead of duplicated -- their old definitions further
+ * down this file (originally written for func_8002EA44's isolated splice)
+ * are removed; the plain externs that used to accompany them there are
+ * left in place and now just reference these same, earlier-defined types
+ * (a harmless duplicate extern declaration, not a redefinition). Same
+ * "move the shared prelude up, do not duplicate" fix round 37 already
+ * used here; declaration order carries no code. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34Half;
+extern Rec34Half D_8008D9A4[];
+extern Rec34Half D_8008D9A6[];
+extern Rec34Half D_8008D9A8[];
+extern Rec34Half D_8008D9AA[];
+extern Rec34Half D_8008D9AC[];
+extern Rec34Half D_8008D9AE[];
+
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34HalfU;
+
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x10 - 0x2];
+} Rec16D7F0;
+extern Rec16D7F0 D_8008D7F0[];
+extern Rec16D7F0 D_8008D7F2[];
+
+extern u8 D_8008D970[];
+
+typedef struct {
+    u8 pad[0x12];
+    u16 unk12; /* +0x12 */
+    u8 pad14[0x18 - 0x14];
+    u8 unk18; /* +0x18 */
+} ObjE970;
+extern ObjE970 *D_8008E970;
+
+extern u8 D_8008EA10;
+extern u8 D_8008EA11;
+extern u8 D_8008EA16;
+extern u8 D_8008EA17;
+extern u8 D_8008EA19;
+extern u8 D_8008EA1A;
+
+extern s16 D_8008E8C0;
+
+/* STALL -- see docs/match-reports/func_8002E4D8.md. Round 48 (echo):
+ * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
+ * frame gap: -0x10 -> -0x18, byte-exact vs retail; retail addresses
+ * NOTHING via $sp beyond the prologue/epilogue immediate itself and
+ * saves zero callee-saved registers on either side, textbook pure
+ * padding). FOURTH confirmed negative for length closure this round --
+ * built length UNCHANGED (237/231, still 6 words LONG). Frame realignment
+ * reproduced the same already-diagnosed "woff computed too early, before
+ * the sign-extension chain" residue this report's own "Axes tried"
+ * section already explored from three placements; no new residue
+ * surfaced. Best body (237/231 built words, 6 words LONG) preserved there
+ * in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002E4D8);
 
 /* Same 0x34-stride channel-configuration record family documented in
@@ -59,10 +128,6 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002E4D8);
  * own local view rather than sharing that file's header-less types.
  * Six independent 2-bytes-apart symbols share this one shape, same
  * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34Half;
 extern Rec34Half D_8008D9B0[]; /* "interpolating" flag */
 extern Rec34Half D_8008D9B2[]; /* "interpolating" flag (companion pair) */
 extern Rec34Half D_8008D9B4[]; /* step/quotient */
@@ -91,59 +156,16 @@ void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3) {
     }
 }
 
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9B2,
- * D_8008D9B6 and D_8008D9B8 each need this width (`lhu`) at least once
- * in this function, on top of the plain signed Rec34Half view
- * declared above (which some of these same symbols also need, at a
- * DIFFERENT read site in this same function). Reinterpreted through a
- * cast rather than redeclared, per this project's rule that one
- * extern symbol cannot carry two conflicting C types in one file. */
-typedef struct {
-    u16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34HalfU;
 
-/* Same 0x10-byte-stride record family code_179d8_j.c documents as
- * Rec16D7F0 (that unit's own D_8008D7F0/D_8008D7F4 pair); local view. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x10 - 0x2];
-} Rec16D7F0;
-extern Rec16D7F0 D_8008D7F0[];
-extern Rec16D7F0 D_8008D7F2[];
-
-extern u8 D_8008D970[];
-
-/* Pointer to an object; only the fields this unit's functions read are
- * named. func_8002FAC4 (below) additionally needs a u16 field at
- * +0x12 (a "difficulty count" threshold, compared unsigned against
- * D_8008EA13), on top of the existing +0x18 byte field. */
-typedef struct {
-    u8 pad[0x12];
-    u16 unk12; /* +0x12 */
-    u8 pad14[0x18 - 0x14];
-    u8 unk18; /* +0x18 */
-} ObjE970;
-extern ObjE970 *D_8008E970;
-
-/* Scratch bytes for a chained percentage-of-percentage volume/pan
- * calculation -- see the match report for how the two 16129 (=127*127)
- * divisions were identified (brute-forced against the pinned
- * toolchain's own magic-multiply constants). */
-extern u8 D_8008EA10;
-extern u8 D_8008EA11;
-extern u8 D_8008EA16;
-extern u8 D_8008EA17;
-extern u8 D_8008EA19;
-extern u8 D_8008EA1A;
-
-/* Mode flag: forces both output channels to the same (maximum) level
- * when set to 1. */
-extern s16 D_8008E8C0;
-
-/* STALL -- see docs/match-reports/func_8002EA44.md. Best body reached
- * (223/228 built words, 5 words short; 13/228 raw word-match, drift-
- * affected so not itself a distance measure) preserved there in #if 0. */
+/* STALL -- see docs/match-reports/func_8002EA44.md. Round 48 (echo):
+ * tested charlie's frame-padding lever (u8 dead[8], sized to the current
+ * build's frame gap: -0x10 -> -0x18, byte-exact vs retail). Frame realigns
+ * exactly but built length is UNCHANGED (222/228, still 6 words short) --
+ * same negative-for-length-closure result as func_8002F700. The
+ * already-diagnosed missing early-persisted value ($t1 = idx<<3, held live
+ * across the whole function) is still the real gap; frame padding does not
+ * touch it. Best body (222/228 built words, 6 words short) preserved there
+ * in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
 
 extern void _spu_setInTransfer(s32 a0);
@@ -511,12 +533,29 @@ s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
     return sum;
 }
 
-/* STALL -- see docs/match-reports/func_8002F700.md. Best body reached
- * (237/241 built words, 4 words short) preserved there in #if 0. */
+/* STALL -- see docs/match-reports/func_8002F700.md. Round 48 (echo):
+ * tested charlie's func_800351D0 frame-padding lever (u8 dead[8], sized to
+ * the CURRENT BUILD's frame gap: -0x30 -> -0x38, byte-exact vs retail) plus
+ * an "s32 count" fix (avoid a spurious `andi 0xff` mask GCC inserted for a
+ * u8 local). Result: raw word-match improved 49/241 -> 93/241, but total
+ * length moved to 236/241 (5 words short, was 4) -- the frame padding
+ * recovers BYTE-OFFSET alignment exactly but adds no instructions (an
+ * addiu immediate costs the same one word regardless of value), so it
+ * does not by itself close a missing-CONTENT gap the way it did for
+ * func_800351D0 (which also gained words from tail duplication). Best
+ * body (236/241 built words, 5 words short) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F700);
 
-/* STALL -- see docs/match-reports/func_8002FAC4.md. Best body reached
- * (402/387 built words, 15 words LONG) preserved there in #if 0. */
+/* STALL -- see docs/match-reports/func_8002FAC4.md. Round 48 (echo):
+ * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
+ * frame gap: 0x140 -> 0x148, byte-exact vs retail). THIRD confirmed
+ * negative for length closure this round (same as func_8002F700 and
+ * func_8002EA44 above) -- built length UNCHANGED (402/387, still 15
+ * words LONG). This function's own report already diagnoses its gap as
+ * two unrelated residues (an early-materialization scheduling point, and
+ * a mid-loop addressing-cost difference for D_8008EA26 and neighbors) --
+ * frame padding does not touch either. Best body (402/387 built words,
+ * 15 words LONG) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002FAC4);
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low

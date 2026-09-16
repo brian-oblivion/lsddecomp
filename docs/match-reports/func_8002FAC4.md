@@ -330,6 +330,57 @@ a neighboring symbol that IS real) -- and either way, this confirms
 run on EVERY preserved body before permuter time is spent on it, not just
 ones that look old.
 
+## Round 48 update (runner echo): tested charlie's frame-padding lever -- THIRD confirmed negative for length closure
+
+Round 48's designated test of charlie's `func_800351D0` frame-padding
+discovery, applied here since this function's own title already recorded
+an explicit frame-size gap (`0x140` built vs retail's `0x148`). Rebuilt the
+round-37 preserved body first (with both its stale-symbol fixes:
+`func_80032148` -> `SpuVmVSetUp`, `D_8008EA0D` read through the
+`D_8008EA24` base pointer), confirming it still links and reproduces
+**402/387 built words**, matching every prior round's figure exactly.
+
+Applied `u8 dead[8];` under the established `if (0) { dead[0] = 0; }`
+guard, sized to the measured 8-byte gap (`-0x140` built vs `-0x148`
+retail). **Result: frame realigns byte-exactly** (`addiu sp,sp,-0x148`,
+confirmed via objdump) **but built length is UNCHANGED at 402/387 (still
+15 words LONG).**
+
+This is the THIRD function on this unit this round where the lever
+produces the identical shape: exact frame-byte recovery, zero effect on
+word count. Unlike `func_8002F700` (where the same fix's realignment
+surfaced a fresh, fixable `andi` mask), realigning this function's frame
+did not surface anything new beyond what this report's own two residues
+already diagnose -- the early-materialization scheduling point (~2-3
+words) and the `D_8008EA26`-cluster addressing cost (~10-12 words), both
+already tried multiple ways and confirmed not to respond to simple
+mechanical levers (see "The two residues" above). Given this function
+already carries a 51,596-iteration permuter search (round 37, not closed)
+on top of that diagnosis, no further manual attempt was made this round --
+the frame padding data point was the target, and it reproduces this
+round's now-consistent verdict. Reverted to `INCLUDE_ASM`; whole-image
+SHA1 reconfirmed green.
+
+### Proposed learning (third data point, same unit)
+
+**Three for three on `code_179d8_m` this round: charlie's `dead[N]`/`if(0)`
+frame-padding idiom recovers frame byte-alignment exactly every time it is
+applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
+gap ZERO of three times on this unit** (`func_8002F700`, `func_8002EA44`,
+`func_8002FAC4`) -- including on a function that is overall LONG (this one,
+15 words over) as readily as on the two that are SHORT. The common thread
+across the unit's three tests: every one of this unit's frame gaps is pure
+unaddressed register-save-area padding, with whatever content residue the
+function actually has (a redundant mask, a persisted early value, an
+addressing-cost difference) living entirely independently of the frame
+size. `func_800351D0`'s original length recovery came from a SEPARATE,
+coincidentally-discovered tail-duplication fix, not from the padding move
+itself -- this unit's evidence says that pairing is not the common case.
+**Treat the padding fix as a diagnostic-alignment step to apply cheaply
+before reading a diff, not as a length-closing lever in its own right,
+unless a SEPARATE piece of evidence (like a duplicated tail) is also
+found.**
+
 ## Preserved body (best attempt, 402/387 built words -- 15 long, structurally correct throughout except the two residues above)
 
 ```c
