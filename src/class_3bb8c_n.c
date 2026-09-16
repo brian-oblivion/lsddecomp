@@ -512,7 +512,10 @@ extern u8 D_80087174[];
 extern s32 D_8008E0BC;
 
 /* STALL, 16/79 words, 1 word short (78/79 built) -- see
- * docs/match-reports/func_8005511C.md. Preserved near-miss body: */
+ * docs/match-reports/func_8005511C.md. Round 48: check 3 confirms AGREE
+ * (scaffold Insertions 12, Deletions 13, Reorderings 3 vs in-tree
+ * rebuild's identical 16/79 with expected out-of-range drift from the
+ * 1-word-short size). Preserved near-miss body: */
 #if 0
 void *func_8005511C(void *arg0, void *arg1) {
     s32 idx;
@@ -586,7 +589,13 @@ extern s32 D_8008E0B8;
  * slot is call-site-determined, not body-determined -- see CLAUDE.md's
  * "already-matched signature can be too narrow" lesson. Dead params cost
  * zero instructions in the callee, so the round-46 body is otherwise
- * untouched. Preserved near-miss body: */
+ * untouched. Round 48: check 3 confirms AGREE (scaffold Insertions 3,
+ * Deletions 1, Register 90 vs in-tree rebuild's identical 25/87 with
+ * expected out-of-range drift from the 2-extra-word size). Round 48:
+ * searched (not closed, 900s/136367 iterations, best score 100/850 base);
+ * the score-100 candidate's literal transcription regressed to 5/87
+ * in-tree (worse than 25/87) rather than the isolated scaffold's
+ * improvement -- not applied. Preserved near-miss body: */
 #if 0
 void func_80055410(void *arg0, void *arg1) {
     s32 r;
