@@ -2503,6 +2503,31 @@ scaffold is near 0/0.
 > > check is whether two measurements agree, and any proxy for "agree" that is
 > > cheaper than measuring both will be wrong somewhere.**
 > >
+> > **ROUND 47, THIRD AND LAST FORM — AND IT IS THE ONE THAT PROVES THE RULE:
+> > A SCAFFOLD SCORING A PERFECT ZERO ON A BODY THAT DOES NOT MATCH IN THE REAL
+> > BUILD IS ALSO A DISAGREEMENT.** Alpha hit this on `func_80027A24` (150/151).
+> > Its isolated scaffold scores **0 — a perfect match — for a body the real
+> > build gets one word wrong.** The residue is a GCC cross-jump/tail-merge
+> > artifact that is a **whole-translation-unit** effect, so it is not
+> > reachable by mutating that function's own source at all, and the scaffold
+> > cannot see it by construction.
+> >
+> > That is diagnostic, not disappointing: **a perfect scaffold score on a
+> > non-matching function tells you the cause lies outside the function**, and
+> > it says stop searching rather than search harder.
+> >
+> > So check 3 has three outcomes, and only one of them is "search":
+> >
+> > | scaffold | real build | verdict |
+> > | --- | --- | --- |
+> > | any signature | **the same signature** | AGREE — search is meaningful |
+> > | dirtier than the real build | zero drift | MISMATCH — scaffold artifact, decline |
+> > | **perfect zero** | **does not match** | WHOLE-FILE effect — decline, and stop looking inside the function |
+> >
+> > **Zero is the good sign in one row and the bad sign in another**, which is
+> > the cleanest possible demonstration that zero-ness was never the
+> > discriminator. Agreement is.
+> >
 > > Confirmed mismatched so far, and no others: `func_8004BB3C`,
 > > `func_8004C1C0`, `func_8004CAF0`, `func_8004C93C`, `func_8004CD38`, and
 > > **`func_80054FD8`** (round 47, bravo: 1 reordering / 6 insertions / 6
