@@ -2477,6 +2477,31 @@ scaffold is near 0/0.
 > > | --- | --- | --- |
 > > | pure register differences, ZERO ins/del/reorder | pure register identity at exact length | **AGREE** — the negative is real evidence |
 > > | NONZERO insertions/deletions | zero drift | **MISMATCH** — the search scored a program nobody is building |
+> > | NONZERO ins/del | **the SAME nonzero signature in the real build** | **AGREE** — see round 47's refinement below |
+> >
+> > **ROUND 47 REFINEMENT (echo), and it closes the half the table above got
+> > wrong.** The first two rows read as "zero is good, nonzero is bad", and
+> > that is not the rule — **the rule is AGREEMENT, and zero-ness is only its
+> > commonest form.** `func_8004B030`'s scaffold failed check (b) at 6
+> > insertions / 6 deletions. Echo then ran check (c) properly, by dropping the
+> > same body into `src/` and rebuilding: the real in-tree build showed the
+> > **identical** insertions (an extra `move s4,zero`, an extra `sll`/`sra`
+> > sign-extend pair) and the **identical** deletion (a missing `move s4,s1`),
+> > at the same 19/52. Scaffold and real build AGREE, so the harness is
+> > representative and the residue is a genuine frame-layout gap rather than a
+> > scaffold artifact. Echo searched on that basis and got **19/52 → 22/52**,
+> > oracle-verified.
+> >
+> > So a nonzero check-(b) signature is a reason to RUN check (c), not a reason
+> > to decline. Declining on (b) alone throws away searches that can pay.
+> >
+> > **Note the symmetry, because it is the round's repeated lesson arriving
+> > twice in one gate.** The head over-generalised a five-function measurement
+> > into a family label, and charlie narrowed it. The head then wrote a table
+> > whose rows over-generalised *zero-ness* into the discriminator, and echo
+> > narrowed that. Same error, same fix, same direction of traffic: **the
+> > check is whether two measurements agree, and any proxy for "agree" that is
+> > cheaper than measuring both will be wrong somewhere.**
 > >
 > > Confirmed mismatched so far, and no others: `func_8004BB3C`,
 > > `func_8004C1C0`, `func_8004CAF0`, `func_8004C93C`, `func_8004CD38`, and
