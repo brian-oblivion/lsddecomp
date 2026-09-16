@@ -275,3 +275,22 @@ revisits this residue: the scheduler's choice of WHICH instruction fills
 `slot74`'s delay slot does not depend on how the later-consumed value is
 named or cached, only on its (in this case, real) independence from
 everything between its natural position and the earlier call.
+
+## ROUND 48 (runner delta): re-verified, no new work
+
+Rebuilt the preserved 9/74 body in-tree before touching anything (per this
+round's "rebuild every recorded figure before you trust it" instruction):
+`build exit=2` (no compile-error grep hits — clean compile, SHA1 mismatch as
+expected), `funcdiff.py` reports **9/74 words, correct size, no address
+drift** — matches the report exactly. `INCLUDE_ASM` restored immediately
+after, `git diff --stat` confirmed clean.
+
+Not re-searched or re-attempted this round: this round's assignment staffed
+`func_8004B030` as the priority (a proven-representative permuter target,
+per its own report), and this function's own history — 8 manual attempts
+across 3 prior rounds plus a 140,928-iteration permuter search that
+improved on its own score but never reached zero — already exhausts every
+axis this round's runner could identify without a genuinely new idea.
+Flagged on the broadcast that this round's staffing table understated the
+prior search depth ("~928 iters" reads like a truncation of "140,928").
+Disposition unchanged: STALL at 9/74, `INCLUDE_ASM` in place.
