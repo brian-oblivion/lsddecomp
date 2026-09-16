@@ -1,5 +1,37 @@
 # func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
+> **ROUND 47 (charlie): Gate 1b re-verified 90/105, no drift** (rebuild via
+> `make clean && make extract` then the standard `#if 0`->`#if 1` swap,
+> after fixing a regex bug in the batch script that had briefly corrupted
+> an unrelated block -- caught before anything was committed). Identical
+> whole-function `$s3`<->`$s4` register-identity residue, unchanged from
+> round 46.
+>
+> **This function is one of the FIVE `class_3bb8c`/`Obj866E8`-family
+> members round 46 confirmed have a scaffold-vs-real-build MISMATCH**
+> (round 17's own search: 2 insertions/2 deletions isolated vs 0/0 in
+> context; round 40 rebuilt an independent scaffold and got the SAME 2/2
+> mismatch). No search has ever been trusted for this function -- both
+> rounds that touched a scaffold here correctly DECLINED to search rather
+> than running one against a program not being built. There is therefore
+> no inherited "permuter tried, negative" to revert to UNKNOWN: the
+> correct prior disposition was already "not searched, scaffold
+> untrustworthy", and it still is. Not re-attempted; the family-wide
+> pattern is now 5 confirmed instances (`func_8004BB3C`, `func_8004C1C0`,
+> `func_8004CAF0`, `func_8004C93C`, `func_8004CD38`), reinforcing round
+> 46's own read that this is structural to the family's
+> `self->methods->slotNN` call-chain shape, not a per-function fluke --
+> still a tooling question for the operator, not something to fix
+> mid-round.
+>
+> Checked the 12th lever (hoist a field pair used on every path into
+> locals PER `if`) against this residue: does not apply -- confirmed
+> again this round (as in round 41) that the body has no
+> already-cached-then-reread field anywhere, and the residue itself is a
+> pure register-coloring choice with no branch or field-pair shape nearby.
+> **Disposition unchanged: 90/105.** No new attempt made; `INCLUDE_ASM`
+> untouched throughout.
+
 > **ROUND 46 (charlie): Gate 1b re-verified 90/105, no drift; this round's
 > split-combined-declaration lever tried on `ep`/`sp`, INERT; the
 > beq/bne-polarity lever checked and does not apply -- SKIPPING.** Rebuilt
