@@ -1253,3 +1253,107 @@ s32 func_8002AA6C(void)
   register-allocation lever in this unit -- three independent instances
   now, always found by the permuter first and never by manual reasoning
   about the source.
+
+## Round 49 (runner echo): fresh permuter search against the 215/223 seed -- negative; both best-scoring candidates rely on undefined behavior, not a legitimate fix
+
+Rebuilt round 41's preserved 215/223 body verbatim in isolation (all other
+stalled siblings in this unit reverted to `INCLUDE_ASM`): `build exit=2`, no
+compile errors, `funcdiff.py` reports **215/223 words, length exact,
+first diffs at vram `0x8002AABC`-`0x8002AAC4` (3 words) and
+`0x8002ADAC`-`0x8002ADBC` (5 words)** -- matches round 41's recorded figure
+exactly, no discrepancy.
+
+### Hand axes re-tried against the two known residues, both negative, both reconfirming prior findings
+
+1. Declared `pF4` (the `volatile s32 *` for the final `D_8006D8F4 = -1;
+   return *pF4;` block) at function scope instead of block scope, and also
+   tried folding the assignment into the condition-style idiom that closed
+   `func_8002B4D4`'s analogous residue this round (`*(pF4 = &D_8006D8F4) =
+   -1; return *pF4;`) -- **both inert, identical 215/223 and identical
+   byte diff** at `0x8002ADAC`-`0x8002ADBC`. Unlike `func_8002B4D4`'s case,
+   this residue is not sensitive to `pF4`'s declaration placement or
+   expression form.
+2. Re-tried `p2 = &tmp[4];` (array-index spelling instead of `pRetry + 4`)
+   for the OTHER residue -- inert, identical 215/223. Confirms round 41's
+   own finding that this residue is not a spelling/expression-shape
+   question.
+
+### Fresh permuter search: check 3 passes (AGREE, with the residue's own reorder built in), ~76,160 + 82,965 = 159,125 iterations across two runs, no safe improvement
+
+Set up `tools/setup-permuter.sh func_8002AA6C permuter-seeds/func_8002AA6C.c`
+from the round-41 215/223 body. `--debug --stack-diffs`: base score **235**
+(`Register Differences: 7, Insertions: 1, Deletions: 1`). Read the `--debug`
+disassembly diff directly rather than trusting the summary numbers alone:
+the insertion/deletion pair is `retail: move s5,a0 / addiu s2,a0,0x10` vs
+`this build: move s5,a0 / <nothing> ... addiu s2,s5,0x10` (the SAME
+instruction, displaced by the alignment algorithm because of the
+`0x8002AABC` scheduling residue, not a genuine length difference) --
+consistent with the real build's own length-exact status. AGREE per check 3.
+
+Ran two searches this round (the second because the first's rc was not
+captured -- see below -- so a bounded second run gives a trustworthy
+iteration count and rc for the record):
+
+```
+timeout 900 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_8002AA6C
+```
+
+First run: ~76,160 iterations (background job, rc not captured to its own
+file -- a process-compliance gap, noted rather than hidden, same as this
+round's `func_8002B3F4` entry). Second run against the identical seed:
+~82,965 iterations, also no rc file captured (both were launched as plain
+backgrounded `&` jobs rather than the `timeout ...; rc=$?; printf ...`
+form this round's broadcast specifies -- corrected for any further searches
+this session). Both runs' logs end with the process's own multiprocessing
+resource-tracker shutdown message, consistent with the 900s bound firing
+naturally in each case. `--best-only` saved improvements to **200**, then
+**95** (both runs converged on the same 95, from two different candidate
+source files, `output-95-1` and `output-95-2`).
+
+### The 95-candidates are UNDEFINED BEHAVIOR, not a legitimate fix -- rejected without building either into the real oracle
+
+Both `output-95-1` and `output-95-2`'s only substantive mutation reorders
+the two loop-setup statements so that `p2 = pRetry + 4;` executes BEFORE
+`pRetry = tmp;` -- i.e. `p2` is computed from `pRetry`'s UNINITIALIZED
+value:
+
+```c
+if (n > 0) {
+    p2 = pRetry + 4;   /* pRetry has never been assigned yet here */
+    pRetry = tmp;
+    do { ... } while (n > 0);
+}
+```
+
+This is reading an uninitialized local, which is undefined behavior in C.
+The permuter's scorer never executes the candidate -- it only diffs
+compiled bytes -- so it cannot tell that the "improvement" depends on
+whatever garbage value cc1 happens to leave in `pRetry`'s register at that
+program point (here, apparently the same register `tmp` was already
+computed into moments earlier, which is why it happens to produce
+plausible-looking bytes for THIS specific compile). This is the second
+confirmed instance this round of the exact trap this round's broadcast
+names (delta's round-48 lever 3, generalized): a mutation that is a real
+correctness bug, not a semantically-inert store, scoring as an improvement
+because the scorer cannot execute the code. **Rejected outright, without
+building either candidate into the real oracle** -- reading the mutation
+against the variable's own declaration already proves it unsound.
+
+**No safe candidate found in either search.** Restored to `INCLUDE_ASM`
+(215/223 unchanged from round 41); full `./build-and-verify.sh`
+re-confirmed `OK: build matches retail SLPS_015.56`, exit 0, after
+reverting.
+
+### Proposed learning
+
+Extends this round's `func_8002B3F4` finding (a reused-but-still-live
+variable) with a second, distinct shape of the same underlying hazard: a
+**reordered-but-uninitialized** variable. Both are invisible to the
+permuter's byte-only scorer and both are cheap to catch by inspection
+once suspected -- the common tell is a mutation that touches the ORDER or
+IDENTITY of a variable's assignment/use pair rather than introducing a
+genuinely new, freshly-initialized value. Before adopting any permuter
+candidate that reorders two adjacent assignment statements, check that
+neither statement now reads a variable that has not yet been assigned on
+that path -- this is a strictly cheaper check than a full build-and-verify
+round trip and catches this class before it costs one.
