@@ -31,7 +31,10 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_800272D0);
 typedef struct Obj80027480 {
     u8 pad0[0xC];
     s32 unk0C;
-    u8 pad10[0x28 - 0x10];
+    u8 pad10[0x18 - 0x10];
+    u8 unk18[4]; /* CdlLOC-shaped position; only its address is taken here */
+    u32 unk1C;
+    u8 pad20[0x28 - 0x20];
     u16 unk28;
 } Obj80027480;
 
@@ -65,7 +68,61 @@ void func_80027480(Obj80027480 *self) {
     func_800280E0();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027528);
+extern u8 D_8006D574[8];
+extern void *D_8008A87C;
+extern s32 D_8008A898;
+
+extern s32 func_80028A50(Obj80027480 *self);
+extern s32 CdPosToInt(void *pos);
+extern void CdIntToPos(s32 i, void *pos);
+extern void CdControl(s32 arg0, void *buf, s32 arg2);
+extern s32 CdSync(s32 mode, void *result);
+
+s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
+    s32 v0;
+    u32 s0tmp;
+
+    if (D_8008A85C == 0 && D_8008A860 == 0) {
+        return func_80028A50(self);
+    }
+    func_800280D0();
+    if (self->unk28 != 0) {
+        if (D_8008A864 == 0 && self->unk0C != 0) {
+            func_80028844(2, 1);
+            s0tmp = arg1 >> 11;
+            if ((arg1 & 0x7FF) != 0) {
+                s0tmp = s0tmp + 1;
+            }
+            v0 = CdPosToInt(self->unk18);
+            CdIntToPos(v0 + s0tmp, D_8006D574);
+            if (arg2 == 0) {
+                if (D_8008A85C != 0) {
+                    D_8008A87C = D_8006D574 - 0x14;
+                    D_8008A898 = 1;
+                } else {
+                    do {
+                        CdControl(2, D_8006D574, 0);
+                        do {
+                            v0 = CdSync(0, 0);
+                        } while (v0 == 0);
+                    } while (v0 == 5);
+                    func_80028864();
+                }
+            } else {
+                func_80028864();
+                func_800280E0();
+                if ((self->unk1C & 0x7FF) != 0) {
+                    return ((self->unk1C >> 11) + 1) << 11;
+                }
+                return self->unk1C;
+            }
+        }
+    } else {
+        func_800282AC(self, 0, 4, (s32)arg1, arg2);
+    }
+    func_800280E0();
+    return 0;
+}
 
 void func_800276C8(void) {
 }
