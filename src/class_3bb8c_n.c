@@ -152,8 +152,8 @@ struct ObjSlotAC {
     ObjSlotACMethods *methods; /* +0x000 */
 };
 
-/* STALL, 12/86 words, 6 words short (out-of-range drift present) -- see
- * docs/match-reports/func_80054850.md. Preserved near-miss body: */
+/* STALL, 80/86 words (6 short) -- see docs/match-reports/func_80054850.md.
+ * Preserved near-miss body: */
 #if 0
 void func_80054850(void) {
     s32 paramA[2];
@@ -221,7 +221,7 @@ struct ObjSlotB8B8 {
     ObjSlotB8B8Methods *methods; /* +0x000 */
 };
 
-/* STALL, 24/93 words, 3 words short (out-of-range drift present) -- see
+/* STALL, 24/93 words match, ~4 words short -- see
  * docs/match-reports/func_800549A8.md. Preserved near-miss body: */
 #if 0
 void func_800549A8(void) {
@@ -405,14 +405,48 @@ void func_80054D30(void) {
     }
 }
 
+extern u8 D_800871C8[];
+extern s32 D_80087328[];
+extern u8 *D_8008E0B4;
+extern s32 D_8008E0BC;
+extern u8 D_8008E0A4[];
+extern void func_80055258(void *arg0, void *arg1);
+extern void func_80055410(void *arg0, void *arg1);
+extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
+
+/* STALL, 87/99 words (length matches, 0x18C), whole-function
+ * arg0/arg1/arg2 register-colour swap (s2/s5/s4) -- see
+ * docs/match-reports/func_80054DA4.md. Preserved near-miss body: */
+#if 0
+void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
+    void **arr;
+    s32 i;
+    s32 t3;
+    void (*fp)(void *, void *);
+
+    arr = (void **) arg0;
+    D_8008E0BC = rand() % 7;
+    D_8008E0B4 = (u8 *) D_800871C8 + ((u32) rand() % 5) * 12;
+    t3 = (u32) rand() % 5;
+    if (t3 != 0) {
+        t3 = D_80087328[t3];
+    }
+    fp = func_80055410;
+    if (D_8008AC74 % 7 != 0) {
+        fp = func_80055258;
+    }
+    for (i = 0; i < arg1; i++) {
+        fp(arg2, (void *) t3);
+        *arr = func_80056320((void *) 0, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        arr++;
+    }
+    return (void *) arr;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054DA4);
 
 extern s32 D_80087330;
 extern u8 D_80087204[];
-extern u8 D_8008E0A4[];
-extern u8 *D_8008E0B4;
-extern void *func_80055258(void *arg0, void *arg1);
-extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
     s32 i;
@@ -429,7 +463,7 @@ void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
 }
 
 extern s32 D_80087330;
-extern void *func_80055258(void *arg0, void *arg1);
+extern void func_80055258(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
@@ -473,8 +507,8 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0BC;
 
-/* STALL, 16/79 words, length off by 1 word (out-of-range drift present) --
- * see docs/match-reports/func_8005511C.md. Preserved near-miss body: */
+/* STALL, 16/79 words, 1 word short (78/79 built) -- see
+ * docs/match-reports/func_8005511C.md. Preserved near-miss body: */
 #if 0
 void *func_8005511C(void *arg0, void *arg1) {
     s32 idx;
@@ -502,15 +536,50 @@ void *func_8005511C(void *arg0, void *arg1) {
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005511C);
 
+extern s32 D_8008E0A8;
+extern s32 D_8008E0AC;
+extern u8 *D_8008E0B0;
+extern u8 D_80087174[];
+extern s32 D_8008E0B8;
+
+/* STALL, 8/110 words (length matches, 0x1B8) -- retail recomputes
+ * D_8008E0A4's lui/addiu address fresh at each of 3 accesses, my build
+ * caches it in an extra saved register ($s0), shifting every later
+ * register by one colour. See docs/match-reports/func_80055258.md.
+ * Preserved near-miss body: */
+#if 0
+void func_80055258(void *arg0, void *arg1) {
+    if (arg1 == 0) {
+        arg1 = (void *) D_80087328[rand() & 3];
+    }
+    D_8008E0A8 = (s32) arg1;
+    *(s32 *) D_8008E0A4 = (rand() % 23) << 11;
+    if (rand() & 1) {
+        *(s32 *) D_8008E0A4 = -*(s32 *) D_8008E0A4;
+    }
+    D_8008E0AC = (rand() % 23) << 11;
+    if (rand() & 1) {
+        D_8008E0AC = -D_8008E0AC;
+    }
+    D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
+    D_8008E0B8 = rand() % 5;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055258);
 
 extern s32 D_8008732C;
 extern s32 D_8008E0B8;
 
-/* STALL, 25/87 words, 2 words long (out-of-range drift present) -- see
- * docs/match-reports/func_80055410.md. Preserved near-miss body: */
+/* STALL, 25/87 words, 2 words long -- see docs/match-reports/func_80055410.md.
+ * Signature widened from `void func_80055410(void)` (round 46) to two dead
+ * void* params: func_80054DA4 dispatches this through a function pointer
+ * shared with func_80055258 (which genuinely takes two args), and the ABI
+ * slot is call-site-determined, not body-determined -- see CLAUDE.md's
+ * "already-matched signature can be too narrow" lesson. Dead params cost
+ * zero instructions in the callee, so the round-46 body is otherwise
+ * untouched. Preserved near-miss body: */
 #if 0
-void func_80055410(void) {
+void func_80055410(void *arg0, void *arg1) {
     s32 r;
     s32 mod3;
 
@@ -534,14 +603,14 @@ void func_80055410(void) {
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055410);
 
 extern s32 D_8008AC7C;
-extern void *func_80055620(s32 *arg0, s32 *arg1);
+extern void *func_80055620(void *arg0, s32 *arg1, void *arg2);
 extern s32 D_800874B0[];
 extern s32 func_8002CC34(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 
 ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     ObjN14Sub *sub;
 
-    sub = (ObjN14Sub *) func_80055620(&arg0->unk4, &arg0->unk10);
+    sub = (ObjN14Sub *) func_80055620(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
         func_8002CC34(*(s32 *) D_8008AC7C, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
@@ -554,6 +623,102 @@ ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     return 0;
 }
 
+extern s32 D_8008AC6C;
+extern s32 D_8008AC98;
+extern u8 *D_800876B4[];
+extern u8 D_800876EC[];
+extern u8 D_800874EC[];
+extern s32 D_80087474[];
+
+/* Local view only: `D_8008AB4C`'s value is another "pointer stored as a
+ * plain s32" (same idiom as `D_8008AC7C`), here treated as a "self" object
+ * with a method table at offset 0, dispatched through slot +0x0E8. Moved
+ * ahead of its original spot (just before func_800558F0) because
+ * func_80055620, ROM-earlier, also dispatches through it. */
+typedef struct ObjAB4C ObjAB4C;
+typedef struct ObjAB4CMethods ObjAB4CMethods;
+struct ObjAB4CMethods {
+    u8 padE8[0xE8];
+    void (*slotE8)(ObjAB4C *self, void *arg1, void *arg2); /* +0x0E8 */
+};
+struct ObjAB4C {
+    ObjAB4CMethods *methods; /* +0x000 */
+};
+
+typedef struct Pos4 Pos4;
+struct Pos4 {
+    s16 hi;
+    s16 lo;
+};
+
+typedef struct TabEntry TabEntry;
+struct TabEntry {
+    Pos4 head;
+    s16 tail;
+};
+
+typedef struct EntrySlot EntrySlot;
+struct EntrySlot {
+    Pos4 pos;  /* +0x0 */
+    u8 idx;    /* +0x4 */
+    u8 pad5;   /* +0x5 */
+    s8 count;  /* +0x6 */
+    u8 pad7;   /* +0x7 */
+};
+
+typedef struct LocalBuf LocalBuf;
+struct LocalBuf {
+    Pos4 pos;
+    TabEntry tab;
+};
+
+/* STALL, 95/111 words (length matches, 0x1BC) -- see
+ * docs/match-reports/func_80055620.md. Preserved near-miss body: */
+#if 0
+void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
+    s32 j, n;
+    u8 *base;
+    EntrySlot *entry;
+    LocalBuf buf;
+    s32 d1, d2, dist;
+    void *self;
+
+    if (arg2 == 0) {
+        goto fail;
+    }
+    base = D_800876B4[D_8008AC6C];
+    n = D_800876EC[D_8008AC6C] - D_8008AC98;
+    if (n <= 0) {
+        goto fail;
+    }
+    entry = (EntrySlot *) (base + D_8008AC98 * 8);
+    for (j = 0; j < n; j++, entry++) {
+        D_8008AC98++;
+        if (entry->count > 0) {
+            buf.pos = entry->pos;
+            buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
+            self = (void *) D_8008AB4C;
+            ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
+            d1 = *(s32 *) arg0 - *(s32 *) arg2;
+            if (d1 < 0) {
+                d1 = ~d1 + 1;
+            }
+            d2 = *(s32 *) ((u8 *) arg0 + 8) - *(s32 *) ((u8 *) arg2 + 8);
+            if (d2 >= 0) {
+                dist = d1 + d2;
+            } else {
+                dist = d1 - d2;
+            }
+            *arg1 = dist;
+            if (dist < D_80087474[entry->count]) {
+                return entry;
+            }
+        }
+    }
+fail:
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055620);
 
 extern s32 D_8008AC7C;
@@ -604,19 +769,6 @@ s32 func_80055874(ObjN14 *arg0, void *arg1) {
     return 0;
 }
 
-/* Local view only: `D_8008AB4C`'s value is another `pointer stored as a
- * plain s32` (same idiom as `D_8008AC7C`), here treated as a "self" object
- * with a method table at offset 0, dispatched through slot +0x0E8. */
-typedef struct ObjAB4C ObjAB4C;
-typedef struct ObjAB4CMethods ObjAB4CMethods;
-struct ObjAB4CMethods {
-    u8 padE8[0xE8];
-    void (*slotE8)(ObjAB4C *self, void *arg1, void *arg2); /* +0x0E8 */
-};
-struct ObjAB4C {
-    ObjAB4CMethods *methods; /* +0x000 */
-};
-
 extern void func_80054850(void);
 extern void func_800549A8(void);
 extern void func_80055A24(void);
@@ -626,9 +778,6 @@ extern u8 D_8008E154[];
 extern ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
 extern s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2);
 
-/* STALL, 63/77 words -- register-identity swap (ctx/i colour), see
- * docs/match-reports/func_800558F0.md. Preserved near-miss body: */
-#if 0
 s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
     void *ctx;
     u8 buf[0x10];
@@ -653,14 +802,14 @@ s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
             if (func_8005582C(D_8008AC9C[i], ctx, arg1) == 0) {
                 D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
             }
+            i++;
+            i--;
         } else {
             D_8008AC9C[i] = func_8005556C((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800558F0);
 
 extern s32 D_8008AC6C;
 extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
