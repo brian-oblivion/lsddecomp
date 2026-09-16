@@ -2680,6 +2680,35 @@ was never at risk. charlie had not, so its stall left a red build and two
 non-matching bodies live in `src/`. **"COMMIT BEFORE you wait" is the rule
 that made the difference**, and it is the one to keep pressing on runners.
 
+**ROUND 49: A THIRD INSTANCE, BY A HEAD THAT HAD THE RULE IN FRONT OF IT.**
+The head recovered an uncommitted report from alpha's worktree on the test
+*"alpha has stopped AND has zero live permuter processes"* — the exact
+conjunction round 43 rules out, two paragraphs above, in bold. Alpha then
+resumed itself and finished normally. The recovery was harmless (alpha's own
+later commit was byte-identical and git reconciled with zero duplication, and
+alpha flagged the head's commit as an anomaly in its summary, correctly), but
+it should not have happened.
+
+**The one thing round 49 adds is a sharper reason, and it is worth having
+because "check the process table" evidently does not stick.** The test is not
+merely weak — it is the notification's own precondition. A runner notifies the
+head *each time it stops with no live background children of its own*. So
+"stopped, and no children" is not a test that happens to give false positives;
+it is a restatement of the event that summoned you. It cannot ever be evidence
+of death, in the same way that "the doorbell rang" is not evidence nobody is
+at the door.
+
+**There is no cheap liveness test. A runner is dead when its SESSION has
+ended, and nothing observable from the head's side distinguishes that from a
+runner between turns.** Which is why the operational rule is the one above —
+teardown is the deadline — and why the durable fix is on the runner's side:
+COMMIT BEFORE YOU WAIT. Round 49's runners did, which is why three of them
+stopping mid-round cost nothing at all.
+
+A corollary for the runner prompt, learned from alpha's reaction: **tell
+runners that a commit they did not make on their own branch is the head, not
+corruption.** Alpha spent effort verifying it had not duplicated work.
+
 ## Sizing guidance
 
 This project is **much cheaper per build than the N64 sister project**: a clean
