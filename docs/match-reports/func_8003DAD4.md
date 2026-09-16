@@ -1,5 +1,50 @@
 # func_8003DAD4 -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
 
+## ROUND 49 (runner delta): confirmed negative -- the named-temp+barrier lever that closed a scheduling swap in the sibling `func_8003D73C` does NOT transfer here
+
+`func_8003D73C` (same unit, same `Unk24Elem` struct, textually IDENTICAL
+`local[1] -= counter * 10;` line) had a `sll`/`lw` scheduling swap
+(product-vs-reload instruction order) that survived 5 hand attempts and
+a 27k-iteration permuter search until this round found that naming the
+multiply's result AND adding a bare `__asm__("")` barrier immediately
+after the declaration together (neither alone) fixes it. Since this
+function shares the identical line, tried the identical change here on
+the baseline preserved body:
+
+```c
+__asm__("" ::: "memory");
+{
+    s32 delta = counter * 10;
+    __asm__("");
+    local[1] -= delta;
+}
+```
+
+**Result: regresses sharply, 14/118 with ~232KB outside-range drift.**
+Reverted immediately; baseline 114/118 re-confirmed byte-identical
+before moving on. This is not a contradiction of the sibling result --
+this function's compiled form was never doing the swap in the first
+place (its own two residues are the unrelated `i = 0` delay-slot
+placement and the shared `target->unk14` register choice), so the extra
+barrier here just injects an unwanted ordering constraint into an
+already-correctly-scheduled pair. **A lever verified against one
+residue's specific compiled shape is not evidence it transfers to a
+textually identical line in a sibling function whose compiled shape
+differs** -- confirmed per-function, not assumed per-idiom.
+
+### Proposed learning (round 49)
+
+Companion negative to `func_8003D73C.md`'s round-49 positive: the same
+two functions, the same struct, the same literal C statement, and the
+lever helps one and badly hurts the other. The discriminator is not
+visible in the SOURCE (both start from identical text) -- it is in
+which of the two THIS function's compiler already schedules correctly.
+Before trying a lever "because it worked on the textually identical line
+in a sibling," check whether the sibling's PROBLEM (a specific wrong
+instruction order) is actually present here; if the baseline doesn't
+exhibit the symptom the lever targets, the lever has nothing to fix and
+only adds constraint.
+
 ## ROUND 46 (runner delta): FIRST PERMUTER SEARCH on this function -- 130 base score, ~68,672 iterations under a 600s bound, no zero, verdict unchanged
 
 This function had never been permuter-searched despite 27 rounds of hand

@@ -285,6 +285,91 @@ void func_8003D6D4(Obj86B60 *self)
     func_80017CFC(self->unk64[self->unk58]);
 }
 
+/* STALL -- see docs/match-reports/func_8003D73C.md. Round 49 (delta):
+ * a bare __asm__("") barrier between a NAMED `delta = counter * 10;` and
+ * the reload-and-subtract fixed the long-standing sll/lw scheduling swap
+ * outright (retail's own mult-before-reload order now reproduced
+ * exactly) -- length now EXACT (145/145 total, no drift), raw 136/145.
+ * The remaining 9 words are the SAME target->unk14 register-identity
+ * residue this unit shares with func_8003DAD4 (2 words) plus a
+ * register-role swap that appears tied to it (6 words) plus one
+ * early-materialization delay-slot filler (`addiu $a2,sp,0x10` vs a
+ * `nop`, the same class already carried permuter-exhausted elsewhere in
+ * this project). Restored to INCLUDE_ASM per project rule. */
+#if 0
+void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
+{
+    s32 idx;
+    Unk64Elem **arr;
+    s32 count;
+    s32 counter;
+    s32 local[2];
+
+    idx = self->unk58;
+    arr = (Unk64Elem **)self->unk64[idx];
+    {
+        Unk24Elem *target = (Unk24Elem *)self->unk4C->unk24[idx];
+
+        count = self->unk5C[idx];
+        counter = target->unk4;
+    }
+
+    {
+        s32 i;
+
+        for (i = 0; i < count; i++) {
+            (*arr)->methods->slot50(*arr);
+            arr++;
+        }
+    }
+
+    {
+        Unk24Elem *target = (Unk24Elem *)self->unk4C->unk24[idx];
+        s32 t0 = target->unk10;
+        s32 t1 = target->unk14;
+
+        local[0] = t0;
+        local[1] = t1;
+    }
+    __asm__("" ::: "memory");
+    {
+        s32 delta = counter * 10;
+        __asm__("");
+        local[1] -= delta;
+    }
+
+    if (a2 != 0) {
+        s32 local2[2];
+
+        self->unk68->methods->slot4C(self->unk68, self->unk14);
+        local2[0] = 0x28;
+        local2[1] = count * 12;
+        self->unk68->methods->slotC0(self->unk68, local2);
+    } else {
+        self->unk68->methods->slot50(self->unk68);
+    }
+
+    arr = (Unk64Elem **)self->unk64[idx];
+    {
+        s32 i;
+
+        for (i = 0; i < count; i++) {
+            (*arr)->methods->slot4C(*arr, a1, local);
+            (*arr)->methods->slot60(*arr, a2);
+            local[1] += 10;
+            arr++;
+        }
+    }
+
+    arr = (Unk64Elem **)self->unk64[idx];
+    {
+        Unk64Elem *elem = arr[counter];
+
+        elem->methods->slot60(elem, 1);
+    }
+}
+#endif
+
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D73C);
 
 void func_8003D980(Obj86B60 *self, void *a1)
