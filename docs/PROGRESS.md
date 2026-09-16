@@ -93,9 +93,25 @@ first), which argues for the fallback rather than a fourth refinement.
 
 ### Negatives worth not re-deriving
 
-- `code_8220_c` (bravo): **five** per-function searches, ~412,000 iterations,
-  all rc=124, none closed — on a unit whose prior history was a uniform, shallow
-  40k batch. Depth was not the missing ingredient there.
+- `code_8220_c` (bravo): **six** first-ever per-function searches —
+  `func_80019C04` (74,830), `func_80019EE4` (102,364), `func_80019D84` (78,126),
+  `func_800199EC` (76,458), `func_80019B24` (80,126), `func_8001A064` (59,969),
+  **471,873 iterations combined**, all rc=124, all Check-3 AGREE beforehand.
+  **Every one converged on the identical pair of sub-260 attractors already
+  known-false from the family root's round-13 search** (OT-pointer caching →
+  address drift; pointer-truncating cast → wrong value). Bravo promotes that as
+  an exhaustive characterisation of this residue class's local search space, and
+  it is the right reading: six independent searches finding the same two false
+  bottoms is a property of the residue, not of any one seed.
+- **A provenance correction that cuts the OTHER way from the head's.** The head's
+  brief described `code_8220_c` as uniformly searched at 40k iterations each.
+  Bravo found that only the family root and `func_8001A268` had ever had a REAL
+  search — the other six carried only cross-referenced scaffold checks, so this
+  round's six were the first ever run on them. The head's error was reading
+  "evidence of a search" as "a search was run"; round 37 recorded the same
+  confusion in the opposite direction (counting the WORD "permuter" as a run).
+  **The screen tests for the presence of evidence and cannot tell a run from a
+  citation of one.**
 - `class_3ac78` (delta): `func_8004B030` not closed in **442,179** iterations
   across two searches. Six local-best candidates hand-translated and traced
   semantically: four had genuine correctness bugs, one regressed through the
@@ -125,31 +141,38 @@ first), which argues for the fallback rather than a fourth refinement.
   each (`func_8002F3E8` was reviewed only). Work sound, count off — count from
   the branch, as ever. Nothing dropped: that function has a prior report.
 
-### TEARDOWN DEFERRED FOR ONE WORKTREE — `../lsddecomp2-wt-bravo` IS STILL STANDING
+### One real gain beyond the match
 
-`alpha`, `charlie`, `delta` and `echo` were removed normally (all four gave a
-final structured summary, all merged, all clean). **`runner/bravo`'s worktree
-and branch were deliberately LEFT IN PLACE**, and the next head needs to know
-why rather than inheriting a surprise (round 6 → 7's lesson).
+- **`func_8001989C`** (`code_8220_c`, bravo): **48/84 → 76/84**,
+  oracle-verified, still stalled. A 156,329-iteration search (rc=124) surfaced a
+  lead that closes the function's own self/prim register-swap residue outright:
+  wrap the OtTag-splice branch in `do { ... } while (0)` and cache one pointer
+  into a local **for only the FIRST of three otherwise-identical stores**.
+  **Caching all three symmetrically regresses straight back to 48/84** — the
+  asymmetry is the lever, which is the kind of detail that is invisible unless
+  someone tries both. Preserved as a `#if 0` snapshot with `INCLUDE_ASM` still
+  in effect; whole-image green.
 
-- **Everything bravo committed is merged into `main`** — 5 commits, 7 reports,
-  no `src/` change. `git log main..runner/bravo` is empty and its tree is clean,
-  so **there is nothing to salvage and nothing at risk.**
-- What is missing is only bravo's **final structured summary**, which it never
-  issued, and a **write-up of one last search on `func_8001989C`** that it ran
-  after its merge and had not committed when the machine went quiet. That result
-  exists only in that session's context; if bravo never resumes it is simply
-  lost, and the function keeps its prior report either way.
-- Teardown was held back at the four-precondition check for exactly this reason:
-  three preconditions were green (branch merged, reports present, tree clean) and
-  the fourth — *has REPORTED, not merely gone quiet* — was not. **That is the
-  precondition that cannot be checked from git**, and on this round it was the
-  only one that would have caught a live runner mid-search.
+### The deferred teardown resolved itself, and holding it was right
 
-**Next head: remove it once you are satisfied bravo is gone** —
-`git worktree remove --force ../lsddecomp2-wt-bravo && git branch -d runner/bravo`
-— after confirming `git log main..runner/bravo` is still empty. Do NOT recycle
-the name `bravo` for a new runner until you have.
+Teardown was held on `wt-bravo` because three preconditions were green (branch
+merged, reports present, tree clean) while the fourth — *has REPORTED, not
+merely gone quiet* — was not. At that moment `git log main..runner/bravo` was
+empty and its tree was clean, so by every mechanical check there was nothing
+left to lose.
+
+**There was.** Bravo resumed afterwards and committed three more commits,
+including the `func_8001989C` gain above and the provenance correction. Had the
+four-precondition check been treated as a formality — or had "nothing
+uncommitted, nothing running" been read as "finished" — `--force` would have
+destroyed a live session mid-write-up and the round would have lost a 28-word
+improvement and six first-ever searches.
+
+**The transferable point:** the git-visible preconditions answer *is anything at
+risk right now*, which is not the same question as *is this runner done*. Only
+the runner's own report answers the second, and this round is the case where the
+two gave opposite answers. All five worktrees were removed normally once bravo
+reported.
 
 ---
 
