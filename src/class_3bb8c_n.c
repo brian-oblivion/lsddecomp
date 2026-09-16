@@ -414,9 +414,13 @@ extern void func_80055258(void *arg0, void *arg1);
 extern void func_80055410(void *arg0, void *arg1);
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
-/* STALL, 87/99 words (length matches, 0x18C), whole-function
- * arg0/arg1/arg2 register-colour swap (s2/s5/s4) -- see
- * docs/match-reports/func_80054DA4.md. Preserved near-miss body: */
+/* STALL, 93/99 words (length matches, 0x18C, re-measured round 48; earlier
+ * round 47 report recorded 87/99), whole-function arg0/arg1/arg2
+ * register-colour rotation (s2/s5/s4) -- see
+ * docs/match-reports/func_80054DA4.md. Round 48: check 3 confirms AGREE
+ * (permuter scaffold: Insertions 0, Deletions 0, Reorderings 0, pure
+ * Stack/Register-field residue -- matches the in-tree rebuild's pure
+ * word-level register-field diffs). Preserved near-miss body: */
 #if 0
 void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
     void **arr;
@@ -546,6 +550,11 @@ extern s32 D_8008E0B8;
  * D_8008E0A4's lui/addiu address fresh at each of 3 accesses, my build
  * caches it in an extra saved register ($s0), shifting every later
  * register by one colour. See docs/match-reports/func_80055258.md.
+ * Round 48: check 3 confirms AGREE -- scaffold (Insertions 5, Deletions 6,
+ * frame -0x18 -> -0x20, extra `$s1` save) matches the in-tree rebuild
+ * exactly, same frame growth and same extra saved register. The in-tree
+ * rebuild's out-of-range funcdiff warning is the expected consequence of
+ * this near-miss being 8 bytes longer than retail, not a new finding.
  * Preserved near-miss body: */
 #if 0
 void func_80055258(void *arg0, void *arg1) {
