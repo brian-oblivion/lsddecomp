@@ -328,11 +328,12 @@ void func_8003424C(s16 a0, s16 a1)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
 
 /* STALL -- see docs/match-reports/func_800344FC.md. length exact 70/70,
- * 61/70 raw word-match (round 33, runner bravo -- up from 44/70), first
- * real diff at word 1: a register-identity rename ($t0<->$a2 for the a0
- * copy kept live across the two calls, $s1<->$t0 for the masked-a3 copy),
- * not a logic or CFG difference -- CLAUDE.md's register-identity STALL
- * rule. */
+ * 62/70 raw word-match (round 47, runner echo -- up from 61/70 via a
+ * permuter-found `do { return; } while (0)` rewrite of the early return),
+ * first real diff at word 1: a register-identity rename ($t0<->$a2 for
+ * the a0 copy kept live across the two calls, $a3/$s1<->$t0 for the
+ * masked-a3 copy), not a logic or CFG difference -- CLAUDE.md's
+ * register-identity STALL rule. */
 #if 0
 void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 {
@@ -346,7 +347,7 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 
     speed = a3;
     if (flag == 0) {
-        return;
+        do { return; } while (0);
     }
     if ((u8)a3 != 0) {
         s16 packed = (a1 << 8) | a0;
