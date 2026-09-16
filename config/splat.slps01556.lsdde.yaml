@@ -87,7 +87,16 @@ segments:
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
       - [0xF64, rodata]   # 16-word bit table; owner not placed yet (libetc intr?)
       - [0xFA4, rodata]   # code_1677c
-      - [0xFD8, rodata]   # code_179d8 (head remainder, still asm)
+      # 0xFD8 slot, SPLIT at 0x1010 by ownership (round 47 carve of
+      # code_179d8_s).  The two strings belong to OTHER units --
+      # D_800107D8 is %hi-taken by code_179d8_q, D_800107F4 by
+      # code_179d8_h -- so they stay STANDALONE; a dlabel symbol resolves
+      # from a standalone rodata object.  The two jump tables hold `.L`
+      # labels local to func_80027A24's own `.s`, which only an ATTACHED
+      # slot can see, so they are attached to the unit that owns them.
+      # (Round 14's shared-slot dance, docs/PARALLEL-RUNS.md Gate 2.)
+      - [0xFD8, rodata]   # D_800107D8, D_800107F4 -> code_179d8_q / _h, NOT ours
+      - [0x1010, .rodata, code_179d8_s]   # jtbl_80010810, jtbl_80010828
       # ROUND 34 (head): libcd/sys's .rdata is the 5-byte "none" at 0x1040
       # (vram 0x80010840, D_80010840 -- referenced only from sys's own text).
       # It ends at 0x1045; retail has three zero bytes and the plain
@@ -284,7 +293,26 @@ segments:
       # They are NOT game code: keep them out of the progress denominator
       # (tools/progress.py LIBRARY_RANGES) and off the runner queues until the
       # game's own code is done.
-      - [0x20DC, asm, main]
+      # main: the game's own `main()` (func_800118DC) plus a two-word stub.
+      # Carved round 47 (2026-09-16).
+      #
+      # THE TAIL IS SPLIT OFF DELIBERATELY AND THE CARVE DOES NOT WORK
+      # WITHOUT IT.  0x219C..0x2258 is the C-runtime startup: it clears bss,
+      # sets $gp to 0x8008A808, and `jal`s func_800118DC.  spimdisasm labels
+      # it `dlabel` (it ends in four literal non-instruction words), and a
+      # `dlabel` inside a `c` segment is emitted to NO file -- so the first
+      # attempt at this carve built green once and then failed on the NEXT
+      # `make extract` with `can't open asm/nonmatchings/main/func_8001199C.s`.
+      # A runner in a fresh worktree would have hit exactly that.  Keeping the
+      # tail as its own `asm` segment is what makes the unit reproducible.
+      #
+      # `crt0` is Sony's, not the game's: word 0x21C0 is `0x24020004` =
+      # `addiu $v0, $zero, 4`, and the pinned pipeline emits ONLY the `ori`
+      # form for 0 < K < 0x10000 (maspsx --aspsx-version=2.34).  That is the
+      # round-39 assembler fingerprint (docs/PARALLEL-RUNS.md Gate 1b, eighth
+      # screen).  There is no C that produces it and none should be written.
+      - [0x20DC, c, main]
+      - [0x219C, asm, crt0]
       # psyq_2258 (0x2258..0x8220) is being converted to linked SDK objects a
       # chunk at a time; the unconverted tail keeps a smaller `asm` segment
       # named for its own start offset.
@@ -622,7 +650,22 @@ segments:
       #
       # Expect each slice to span more than one class; identify each with
       # `tools/classtable.py` rather than assuming the unit has one.
-      - [0x17AD0, asm, code_179d8]
+      # code_179d8_s: the last 7 functions of the original monolith's head,
+      # 0x17AD0..0x18480, 620w.  Carved round 47 (2026-09-16) -- this and
+      # class_3bb8c_q were the last uncarved game code in the executable.
+      # Census 2026-09-16 with `tools/uncarved.py --functions`: 7 of 7
+      # blocker-clean (the gp_rel tags it prints are RESOLVED-not-a-blocker,
+      # maspsx --gp-symbols, round 42).  Gate 2 boundary checks, all zero:
+      # no `jr $t2` trampoline, no `alabel`, no non-`.L` alt-entry label, no
+      # function with more than one `addiu $sp, $sp, -N` prologue, and the
+      # segment closes on func_80027A24's own `endlabel` + epilogue.
+      # func_800276C8 is a bare `jr $ra; nop` leaf, not an orphan.
+      # RODATA: func_80027A24 owns jtbl_80010810/jtbl_80010828 -- see the
+      # 0x1010 attach above, and why the two strings in the same slot are
+      # NOT attached.
+      # Expect this slice to span more than one class; identify each with
+      # `tools/classtable.py` rather than assuming the unit has one.
+      - [0x17AD0, c, code_179d8_s]
       - [0x18480, c, code_179d8_q]
       - [0x18B2C, c, code_179d8_r]
       # code_179d8_h: functions 43..59 of the original monolith's head,
@@ -1674,9 +1717,19 @@ segments:
       # attach.  Same multi-class caveat as _o above.
       - [0x47CC4, c, class_3bb8c_p]
       # class_3bb8c_q: functions 94..95 of that remainder, 0x485BC..0x48738.
-      # UNCARVED, and both are blocked -- func_80057DBC on addiu-$at and
-      # func_80057DF4 on nop_mflo_mfhi -- so there is nothing to staff here.
-      - [0x485BC, asm, class_3bb8c_q]
+      # CARVED round 47 (2026-09-16).  The note this replaces said "both are
+      # blocked -- func_80057DBC on addiu-$at and func_80057DF4 on
+      # nop_mflo_mfhi -- so there is nothing to staff here", and it was
+      # obeyed for 26 rounds after `addiu_at` died (round 21) and 5 after
+      # `nop_mflo_mfhi` died (round 42).  `tools/uncarved.py` measures both
+      # functions blocker-clean; the tool is the measurement and the note was
+      # provenance (docs/PARALLEL-RUNS.md, Gate 2, round 45).
+      # Gate 2 boundary checks 2026-09-16, all zero: no `jr $t2`, no
+      # `alabel`, no non-`.L` alt-entry label, no data tail.  Both functions
+      # are frameless leaves (zero `addiu $sp, $sp, -N`), which is why the
+      # prologue census reads 0 rather than 1.  Owns no jump table, so no
+      # rodata attach.  Same multi-class caveat as _o/_p above.
+      - [0x485BC, c, class_3bb8c_q]
       # class_3bb8c_t: functions 96..112 of that remainder, 0x48738..0x48F74
       # (17 functions).  Carved MID-round 17 to re-staff a runner whose own
       # unit was exhausted.  Census 2026-09-04, three-grep screen per
