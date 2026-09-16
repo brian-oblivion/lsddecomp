@@ -8038,3 +8038,122 @@ build emits **111 warnings**, including 9 implicit function declarations and 6
 hides every one of them**, so nobody iterating on one function ever sees them.
 They are latent rather than urgent — the image is byte-exact — but an implicit
 declaration means the compiler is not checking that call at all.
+
+---
+
+## Round 48 (2026-09-16): the frame-padding lever, correctly scoped — and a UB screen that was too narrow
+
+Round 48 closed **zero** functions. It is recorded here anyway because the
+round's output was *mechanisms*, and two of them correct claims that were
+already circulating — one of which the head itself had put into every runner's
+hands within the hour.
+
+### The frame-padding idiom recovers frame ALIGNMENT, not word COUNT
+
+Runner charlie solved a mystery on `func_800351D0` that had stood 13 rounds.
+Retail allocates stack bytes that **no instruction in the function ever
+addresses** — its frame was `-0x108` (264B) against the build's `-0xE0` (224B),
+a 40-byte gap of pure unaddressed padding. The project's existing padding idiom
+— `u8 dead[40];` referenced only under `if (0) { dead[0] = 0; }` — recovered the
+frame exactly, and the function went **18/376 → 48/376**.
+
+**The head then relayed that as "if your residue is a frame-SIZE gap, try this
+before anything else", and that was wrong.** Runner echo was staffed on
+`code_179d8_m` specifically to test it, because all five of that unit's stalls
+are length gaps and one had a pre-recorded frame gap. Echo measured every gap by
+hand first and got the same answer four times:
+
+| function | frame gap | padding recovered frame? | word count moved? |
+| --- | --- | --- | --- |
+| `func_8002F700` | `-0x30` vs `-0x38` (8B) | yes | **no** |
+| `func_8002EA44` | `-0x10` vs `-0x18` (8B) | yes | **no** |
+| `func_8002FAC4` | `0x140` vs `0x148` (8B) | yes, exactly | **no** (402/387 unchanged) |
+| `func_8002E4D8` | `-0x10` vs `-0x18` (8B) | yes, exactly | **no** |
+
+All four were textbook candidates — echo grep-confirmed zero `$sp` accesses
+beyond prologue/epilogue and zero callee-saved registers on either side. **The
+idiom recovered alignment 4 of 4 and closed a word gap 0 of 4.**
+
+**The decomposition is the finding.** Charlie's 18 → 48 came from a *separate,
+coincidentally-paired* tail-duplication fix — retail duplicates an early-return
+tail where the C had `goto combine;`, each copy with its own register-widening
+sequence — not from the padding move. Two changes landed together and the
+combined number was attributed to one of them. Charlie's own write-up listed
+them separately; the conflation was introduced in the relay.
+
+**Correct use, adopt this version:**
+
+- The padding idiom is a **cheap diagnostic realignment step**. Apply it FIRST,
+  because it makes the rest of the diff readable and can surface fresh residues.
+- Then look for a **separate companion fix** — a duplicated tail, extra content,
+  a redundant mask — before expecting the word count to move.
+- Size the padding to the gap between **your build's** frame and retail's, not
+  to retail's raw count of unaddressed bytes. That part held 4 of 4.
+- The non-effect is **not** specific to short functions: `func_8002FAC4` is 15
+  words *long* and behaved identically.
+
+### The lever the diagnostic step actually surfaced: a spurious `andi 0xff`
+
+Used as echo reframed it, the padding step paid immediately. With
+`func_8002F700`'s frame aligned, the remaining diff became readable and exposed
+a mask retail does not emit: **a `u8`/`s16` local compared `> 0` picks up an
+`andi 0xff` where retail emits a direct `blez`.** Widening the local to `s32`
+drops it — **49/241 → 93/241, +44 raw words.**
+
+So the idiom earned its keep precisely as the diagnostic it was narrowed to,
+rather than as the length-closer it was advertised as.
+
+### The permuter UB screen was too narrow, because the scorer never RUNS anything
+
+Gate 3 says to reject a permuter candidate that "branches on a value read before
+its first assignment". Runner delta ran 442,179 iterations against
+`func_8004B030` across two 1800s searches, hand-translated **six** local-best
+candidates and traced them semantically rather than only scoring them. Four had
+genuine correctness bugs — and **not all of them were reads-before-assignment**:
+one moved an assignment so a rare-input path left `row` unset; another reassigned
+a variable and then read it later *under its old meaning*, which is not an
+uninitialized read at all and passes the existing screen cleanly.
+
+> **The permuter's scorer never executes a candidate — it only diffs compiled
+> bytes.** So "reject reads before first assignment" is too narrow. **Trace every
+> variable the candidate touches FORWARD to its next use**, and reject a changed
+> meaning as firmly as an uninitialized read.
+
+Delta also confirmed, on a candidate it had proved semantically clean, that **a
+permuter-unit score improvement carries no directional information about the real
+funcdiff score**: the one clean lead scored better in permuter units and
+regressed to 7/52 with 187KB of drift through the real oracle. This is round 41's
+"translate AND measure" arriving from the correctness side — a candidate being
+*correct* is not evidence it is *closer*.
+
+### Negatives worth not re-deriving
+
+- `class_3ac78`: `func_8004B030` not closed in 442,179 iterations under load;
+  both searches converged on the same handful of scorer-exploitable-but-wrong
+  mutations. It remains the best-conditioned target in that unit but needs a
+  **structurally different seed**, not another bound on the same one.
+- `code_179d8_k`: `func_800344FC` not closed in 81,231 iterations under load
+  (rc=124), check 3 AGREE (base 45, 0/0). `func_80034E5C` check 3 AGREE but
+  spent (36k prior iterations + 5 manual axes).
+- A `volatile` cast is the **wrong instrument for a loop-invariant-hoist (LICM)
+  residue**, as opposed to a within-expression fold — charlie measured it
+  regressing `func_800351D0` from 48/376 to 6/376.
+- Check 3 AGREED on every function measured this round (delta 3/3 both sides,
+  alpha 0/0 twice, charlie twice, echo via direct in-tree rebuilds). After round
+  46's family-wide mismatch scare, the harness is scoring the program we are
+  actually building, so these negatives are real evidence.
+
+### The meta-lesson, which is the same one twice
+
+Charlie found a mechanism; the head over-generalised it into a rule; echo
+measured it back down to its true scope. Separately, the head's staffing table
+reported two exhausted functions (140,928 and 122,037 iterations) as "~928
+iters" and "shallow", because the extraction regex did not strip thousands
+separators and "no number found" was then printed as though it meant "never
+searched"; delta caught that and posted it before doing any work.
+
+**Both corrections travelled UPWARD, from cheap-model runners to the head, via
+`tools/broadcast.sh`.** That is the channel working as designed, and it is the
+second consecutive round in which it has done so (round 47: charlie narrowed a
+family-wide scaffold claim, echo narrowed a zero-ness rule). Post levers to it,
+and read the replies as evidence rather than as compliance.

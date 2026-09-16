@@ -329,6 +329,38 @@ a lost one. Check them by hand, every time.
    timeout 600 <search>; echo "search finished"            # WRONG -- rc lost
    ```
 
+   **ROUND 48: THE "right" FORM ABOVE STILL LOSES THE ANSWER WHEN THE SEARCH'S
+   OUTPUT IS REDIRECTED TO A LOG, AND IT LOST IT TWICE IN ONE SESSION.** Runner
+   delta captured `rc` exactly as prescribed on both of its 1800s searches and
+   ended up with neither exit code. The mechanism is not a shell mistake:
+   `permuter.py -j N` runs a `multiprocessing` forkserver, and Python's
+   `resource_tracker` writes its own shutdown warnings to the SAME INHERITED
+   FILE DESCRIPTOR **after** the main process has exited. That write races the
+   `echo`, and the marker is interleaved or clobbered in the log.
+
+   So the rule is now about WHERE the marker goes, not only about when it is
+   captured — **write it to its own file, which nothing else inherits**:
+
+   ```sh
+   timeout 600 <search> > search.log 2>&1; rc=$?; printf '%s\n' "$rc" > rc.txt
+   ```
+
+   **And keep a content-level fallback, because it is what rescued this round.**
+   Delta recovered an unambiguous verdict from the search's own output — total
+   iteration count plus the absence of any score-0 hit — which distinguishes
+   "ran to the bound" from "stopped early on a zero" without the exit code at
+   all. Record the iteration count in every negative for this reason, not just
+   as colour.
+
+   Note this is the THIRD distinct way this one question has been lost (round
+   32: an appended command ate `$?`; round 31: the head killed the search before
+   anyone read it; round 48: a logging race). The question — *did my own bound
+   fire, or did something kill it?* — is evidently harder to record than to ask,
+   which is the argument for the content-level fallback rather than for a fourth
+   refinement of the capture idiom. **Whether `resource_tracker` should be
+   writing there at all is a TOOLING question: measure it, note it, escalate —
+   do not patch the permuter mid-round.**
+
    Round 32's alpha wrapped its search in `timeout` exactly as instructed,
    appended an unconditional `echo` after it, and the background job's own
    completion signal then reported the ECHO's exit status (0) rather than
