@@ -1,5 +1,96 @@
 # func_8003ECD0 -- STALL: length EXACT (73/73 words, no drift); 71/73 raw word-match; first real diff at vram 0x8003ED18 (the `addu`/`addiu` pairing). ATTEMPT 6'S VERDICT IS CORRECTED BELOW.
 
+## ROUND 49 (runner delta): a bigger permuter search (~49k more iterations) and the sibling's new lever, both negative -- residue class confirmed to be REGROUPING, not ordering
+
+Re-verified the inherited stall first: the round-36 body (with
+`GsClearOt`) reproduces exactly **71/73, zero outside-range drift** --
+honest, matching this report's figure precisely.
+
+### A bigger permuter search: same spurious leads, no zero, ~89k combined iterations now
+
+This function was flagged this round as the most lightly-searched
+residue relative to its closeness (only ~40,005 iterations on file from
+round 36). Re-ran `check 3` first: `--debug --stack-diffs` reproduces
+base score **215**, decomposing into 0 stack diffs / 0 branch diffs / 3
+register diffs / 0 reorderings / 1 insertion / 1 deletion -- identical
+to round 36's own recorded signature, and it agrees with the real
+build's residue (verified by splicing and rebuilding in isolation: the
+same 71/73, same two words at vram `0x8003ED18`/`0x8003ED1C`). **AGREE
+-- search is meaningful.**
+
+Ran `-j 8 --stack-diffs --stop-on-zero --best-only` under `timeout 900`.
+The bound fired (`rc=124`, confirmed via its own `rc.txt` file, not the
+log). **49,430 iterations** this run (combined with round 36's 40,005:
+~89,400 iterations total across two rounds). **No candidate reached
+zero.** The only two candidates saved below the 215 baseline (both
+scoring 175) are the SAME spurious integer-truncation bug class round 36
+already fingerprinted -- diffed against the seed: one narrows `size` to
+`unsigned char`, the other to `unsigned short`. Both are real truncation
+bugs for a buffer-size computation with no proof the runtime value stays
+small, not closer matches; the permuter's heuristic scores them lower
+because dead-code-adjacent instruction shuffling happens to resemble
+retail's bytes in places the heuristic weights, exactly as round 36's
+addendum already documents for this same function. **Not adopted; no new
+information from the larger search.**
+
+### The sibling's new lever (named-temp + barrier) does NOT transfer here either
+
+This round's `func_8003D73C` (same runner, sibling unit `code_2cc8c_b`)
+closed a long-standing `sll`/`lw` INSTRUCTION-ORDERING swap by naming an
+independent sub-computation and adding a bare `__asm__("")` barrier
+immediately after its declaration. Tried the analogous shape here,
+since this residue is also described as "two instructions
+paired/ordered differently":
+
+```c
+{
+    s32 product = self->unk48 * self->unk44;
+    __asm__("");
+    size = (4 << self->unk3C) + (product + 0x14);
+}
+```
+
+**Result: 67/73, WORSE than the 71/73 baseline** (no outside-range
+drift; a real, length-correct regression). This confirms the two
+residues are mechanically different classes even though both LOOK like
+"two instructions need reordering, one word out of place": D73C's
+residue was the compiler choosing to interleave two independent
+computations' SCHEDULE (order-only, no change to what gets computed
+first structurally); this residue is an arithmetic REGROUPING (`(a+b)+c`
+vs `a+(b+c)`) that changes the shape of the expression tree feeding the
+SAME `mult`/`mflo` pair, which is exactly why round 39 already found
+every non-naive grouping disturbs the HEAD of the expression (the
+`mult`/reload/`sllv` sequence), not just the tail pairing. A barrier
+between two named sub-expressions can pin their relative SCHEDULE, but
+it cannot change which parenthesization the compiler's constant-folding
+and associativity rules already committed to before scheduling ever
+runs.
+
+Reverted immediately; baseline 71/73 re-confirmed byte-identical.
+
+### Proposed learning (round 49)
+
+**A lever that closes an instruction-SCHEDULING residue does not
+generalize to an instruction-GROUPING residue, even when both present
+identically as "two adjacent instructions swapped."** The discriminator
+is where in the compiler's pipeline the difference originates:
+scheduling residues are decided AFTER the expression tree is fixed (a
+barrier can constrain that later pass); regrouping residues ARE the
+expression tree (a barrier has nothing to act on, because there is only
+one shape being scheduled, just the wrong one). Before trying a
+newly-discovered barrier lever on a "looks similar" residue elsewhere,
+check which of the two classes it actually is -- round 39's own history
+of "every reshape regresses the head, not just the tail" was already the
+signature of a regrouping problem, not a scheduling one, and this
+round's negative confirms that diagnosis rather than contradicting it.
+
+**And: a permuter search's absolute iteration count is a weaker signal
+than whether it is reproducing the SAME spurious leads across
+independent runs.** ~89k combined iterations (40k + 49k, different
+random seeds) converging on the identical two truncation-bug candidates
+is stronger evidence of a converged negative than either run alone,
+even though neither run is "exhaustive" in any formal sense.
+
 ## ROUND 46 (runner delta): drift-checked fresh, no new lever -- DELIBERATE SKIP, plus a self-caught cross-contamination scare worth recording
 
 Re-spliced the round-36 body (with `GsClearOt`) into `src/code_2cc8c_d.c`

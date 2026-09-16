@@ -168,12 +168,16 @@ void func_8003ECC0(void) {
 void func_8003ECC8(void) {
 }
 
-/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 44 (echo):
- * re-verified 71/73 exactly, no drift; two more negative attempts (local
- * declaration order swapped, and the shift value computed in its OWN
- * statement ahead of the product) neither helped -- the second regressed
- * to 69/73, same pattern as every other tried grouping. Still the same
- * 2-word instruction-order residue at vram 0x8003ED18/0x8003ED1C. */
+/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 49 (delta):
+ * re-verified 71/73 exactly, no drift; a ~49k-iteration permuter search
+ * (49,430 iterations, timeout rc=124, base score 215 agreeing with the
+ * real build's signature) found nothing below baseline besides the same
+ * spurious integer-truncation candidates already fingerprinted round 36.
+ * The named-temp+barrier lever that closed a sibling scheduling swap in
+ * this unit's own func_8003D73C this round does NOT transfer here either
+ * (regresses to 67/73) -- this residue is an arithmetic REGROUPING, not
+ * an independent-computation ordering swap. Still the same 2-word
+ * instruction-order residue at vram 0x8003ED18/0x8003ED1C. */
 #if 0
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
 
