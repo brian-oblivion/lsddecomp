@@ -1,5 +1,44 @@
 # DreamSys__InstanceEffectsOnJournal -- STALL: 1 word short (109 instructions built vs retail's 110), 106/110 words truly correct after `asm-differ` realignment (funcdiff's own raw in-range count reads 15/110 -- a missing-word size-shift trap, not the true residue, see "Reading the score" below), first real diff at 0x4B860 (the switch-index bounds check: retail computes `addiu v1,a2,-4`/`sltiu v0,v1,9`/`sll v0,v1,0x2` into `$v1`, this build computes the identical three ops in place on `$a2`)
 
+> **ROUND 49 (2026-09-16, runner bravo): re-verified fresh, one new axis
+> tried on residue 2, clean negative.** This unit had not been touched
+> since round 39. Spliced the exact preserved body back in and rebuilt:
+> byte-identical **109/110 built, 106/110 truly correct via `asm-differ`**,
+> same two residues (switch-index register choice at case dispatch; case
+> 4's vtable-dereference delay-slot-fill ordering) as every prior round.
+>
+> **New axis tried**, on residue 2 (case 4's `move a0,s1` vs. `lw v0,0(s1)`
+> ordering): wrapped case 9's `if (this->isFlashbackSession != 0) { return;
+> }` early return in `do {...} while(0)` -- round 47's lever, untried on
+> this function, and tried here specifically to see whether it perturbs the
+> case-4 delay-slot choice the way it perturbed an unrelated struct copy in
+> `func_8005A9CC` this same round. **Byte-identical to the kept 106/110
+> body -- no effect anywhere**, confirmed via `asm-differ` across the whole
+> function, not just the two named residue sites. Reverted immediately;
+> `INCLUDE_ASM` restored, whole-image SHA1 verified green.
+>
+> This is a clean negative and, combined with `func_8005A82C`'s two clean
+> negatives and `func_8005A9CC`'s one destructive positive-that-regresses
+> (all three this round), completes a small but instructive matrix: the
+> do-while lever's effect (none / cascading-elsewhere) does not correlate
+> with residue class, function size, or which statement is wrapped -- it is
+> a per-function, per-position fact that must be measured, not inferred.
+>
+> No further attempts this round; the four-forms-tested cast/typing axis
+> (rounds 22, 35, 39) and the three-forms-tested switch-index axis (rounds
+> 2026-09-06, 39) both remain closed. Not re-attempted.
+>
+> ### Proposed learning (round 49)
+>
+> A `do{...}while(0)` wrap around one early-return case in a `switch` can
+> leave a COMPLETELY UNRELATED case's delay-slot-fill choice (case 4, three
+> cases away) untouched, even in the same function -- unlike
+> `func_8005A9CC` this round, where the exact same lever, applied to a
+> `goto` rather than a `return`, corrupted an unrelated struct-copy dozens
+> of instructions later. The two functions share a unit and a residue class
+> but not the lever's blast radius; see `func_8005A9CC.md`'s round-49 entry
+> for the contrasting case.
+
 **Unit:** DreamSys · **Size:** 110 words · **Status:** STALL, 106/110 words
 truly correct (see "Reading the score" below for why `funcdiff.py`'s own raw
 number reads far lower; there IS one real word missing, hence the address

@@ -1,5 +1,70 @@
 # func_8005A9CC -- STALL: exact length (88/88 instructions, zero address drift), 57/88 raw word-match, first real diff at 0x4B1FC (retail's delay-slot `nop` after `beqz v0,.L8005AA44` vs a hoisted `addiu a0,s0,0x16c` -- `fill_eager_delay_slots` branch-target duplication, one instruction early)
 
+> **ROUND 49 (2026-09-16, runner bravo): re-verified fresh, one new axis
+> tried and REJECTED as a regression -- and it teaches something about how
+> fragile this function's downstream codegen is.** This unit had not been
+> touched since round 39. Spliced the exact preserved body back in and
+> rebuilt: byte-identical **57/88, zero address drift**, same single
+> residue (`fill_eager_delay_slots` duplicating `.L8005AA44`'s first
+> instruction into the `beqz`'s delay slot) as every prior round.
+>
+> **New axis tried:** round 47's re-send lever, `do { goto staircase; }
+> while(0);` wrapped around the existing `if (this->unk_0x910 == 0) { goto
+> staircase; }` -- a form not previously tried here (the existing report
+> only tried plain `if`/`else` vs. `goto`, never a `do`-`while` wrapper
+> around the `goto` itself).
+>
+> **Result: this is NOT a no-op here, and it makes things WORSE in a
+> completely different part of the function.** The wrapper adds a spurious
+> leading instruction to the prologue region and, far more importantly,
+> **restructures the ALREADY-MATCHED `PlayerSpawnGridPos`/`RelativePos`
+> struct-copy sequence** (the `lwl`/`lwr`/`swl`/`swr` unaligned-copy idiom
+> this report's own "residue, precisely" section already flags as "a
+> genuine (if minor) register choice difference riding on top of the
+> shift"): instead of retail's shape (load BOTH halves, then store both),
+> the do-while variant makes GCC interleave load/store per half (load first
+> half, store it immediately, THEN load the second half), which is a
+> different -- and wrong -- schedule, confirmed via `asm-differ`:
+>
+> ```
+> retail/kept-body:  lwl v0,3(s1); lwr v0,0(s1); lwl v1,7(s1); lwr v1,4(s1); lh a0,8(s1); swl v0,...; swr v0,...; swl v1,...; swr v1,...; sh a0,...
+> do-while variant:  lwl v0,3(s1); lwr v0,0(s1); nop; swl v0,...; swr v0,...; lwl v0,7(s1); lwr v0,4(s1); lh v1,8(s1); swl v0,...; swr v0,...; sh v1,...
+> ```
+>
+> **Tested anyway through the full oracle, per project discipline to verify
+> rather than assume from the diff shape**: `funcdiff.py`/`asm-differ` both
+> confirm this is strictly worse (more diverging words, the same
+> fill_eager_delay_slots residue at the top UNCHANGED, plus a brand-new
+> register-churn residue in the struct copy that was previously
+> byte-correct except for the one already-documented `v1`-vs-`v0` riding
+> effect). Reverted immediately; `INCLUDE_ASM` restored, whole-image SHA1
+> verified green.
+>
+> **Why this is worth recording rather than discarding as "just another
+> negative": it demonstrates the do-while lever perturbs GLOBAL scheduling
+> state, not a local block**, on a function where a sibling function in the
+> SAME unit (`func_8005A82C`, this same round) showed the exact opposite --
+> two do-while wraps at two different sites, both **completely inert**,
+> zero observable effect anywhere. The two functions have superficially
+> identical residue classes (a delay-slot-fill choice at exact length) and
+> the SAME lever produces opposite behavior: total inertness on one,
+> function-wide cascading disruption on the other. Nothing about either
+> function's `.s` predicts which outcome you get before you try it.
+>
+> ### Proposed learning (round 49)
+>
+> **A `do{...}while(0)` wrapper's blast radius cannot be predicted from the
+> residue's local shape alone -- it must be measured per function, even
+> among functions in the same unit with the same residue CLASS.** Round
+> 47's finding that the lever "changes basic-block shape enough to alter
+> register allocation elsewhere in the function" is confirmed here in its
+> most disruptive form (corrupting an already-matched, unrelated struct-copy
+> sequence dozens of instructions downstream), while the sibling function
+> `func_8005A82C` in the identical unit, tested the same round, showed zero
+> effect from the same lever at two different sites. Treat every do-while
+> trial as its own experiment requiring full-oracle verification, never as
+> a lever whose safety a sibling's result can vouch for.
+
 **Unit:** DreamSys · **Size:** 88 words · **Status:** STALL, best-reached
 57/88, no address drift. Attempted round 2026-09-06 (charlie). Screened
 clean against both remaining blockers (`gp_rel`, `nop_mflo_mfhi`) by the

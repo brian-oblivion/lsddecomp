@@ -1,5 +1,22 @@
 # CalcDreamColor — STALL: exact length (35/35 instructions, zero address drift), 28/35 raw word-match, first real diff at 0x4BD78 (retail computes the table base address early; this build loads `upper` early instead -- the commutative-add operand-order class, sixth confirmed instance project-wide)
 
+> **ROUND 49 (2026-09-16, runner bravo): re-verified fresh, no new attempt.**
+> This unit had not been touched since round 39. Spliced the exact preserved
+> body back in and rebuilt: byte-identical **28/35, zero address drift**,
+> same two swapped `addu` operands as every prior round. No new axis
+> attempted -- this residue is a confirmed instance (the sixth, project-wide)
+> of the commutative-add operand-order/register-identity class, and round 39
+> already tested both the hoist-both-values lever and its combination with
+> the operand-order reversal, both byte-identical. Per CLAUDE.md/
+> `DECOMPILATION_LEARNINGS.md`, a register-identity/class residue confirmed
+> across six independent instances project-wide (three unrelated units) is
+> not something a further hand rephrasing on THIS instance is likely to move
+> that the other five instances' attempts have not already ruled out for the
+> class in general; no permuter re-run either, since the existing ~40400-
+> iteration search already covers this exact residue and this round found no
+> new seed idea to justify repeating it. `INCLUDE_ASM` restored, whole-image
+> SHA1 verified green, `git diff --stat` empty against `main`.
+
 > **TITLE REBUILT, round 32 (2026-09-12, runner alpha2).** The old title
 > carried no length figure at all, per this round's assignment to fix that.
 > Re-measured fresh (spliced the exact preserved body below back in and
