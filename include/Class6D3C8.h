@@ -81,7 +81,7 @@ typedef struct Class6D3C8Methods {
     void (*slot40)(Class6D3C8 *self);                       /* +0x040 func_800260A4 (ignores self) */
     void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 func_80026108 */
     void *unk48;                                            /* +0x048 func_8003B108 */
-    void *unk4C;                                            /* +0x04C func_8003B110 */
+    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by func_800118DC (src/main.c) */
     void (*slot50)(Class6D3C8 *self);                       /* +0x050 func_80026170 */
     void (*slot54)(Class6D3C8 *self);                       /* +0x054 func_80026348 */
     s32 (*slot58)(Class6D3C8 *self);                        /* +0x058 func_80026410 */
