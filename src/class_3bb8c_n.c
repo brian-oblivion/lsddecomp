@@ -414,9 +414,13 @@ extern void func_80055258(void *arg0, void *arg1);
 extern void func_80055410(void *arg0, void *arg1);
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
-/* STALL, 87/99 words (length matches, 0x18C), whole-function
- * arg0/arg1/arg2 register-colour swap (s2/s5/s4) -- see
- * docs/match-reports/func_80054DA4.md. Preserved near-miss body: */
+/* STALL, 93/99 words (length matches, 0x18C, re-measured round 48; earlier
+ * round 47 report recorded 87/99), whole-function arg0/arg1/arg2
+ * register-colour rotation (s2/s5/s4) -- see
+ * docs/match-reports/func_80054DA4.md. Round 48: check 3 confirms AGREE
+ * (permuter scaffold: Insertions 0, Deletions 0, Reorderings 0, pure
+ * Stack/Register-field residue -- matches the in-tree rebuild's pure
+ * word-level register-field diffs). Preserved near-miss body: */
 #if 0
 void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
     void **arr;
@@ -508,7 +512,10 @@ extern u8 D_80087174[];
 extern s32 D_8008E0BC;
 
 /* STALL, 16/79 words, 1 word short (78/79 built) -- see
- * docs/match-reports/func_8005511C.md. Preserved near-miss body: */
+ * docs/match-reports/func_8005511C.md. Round 48: check 3 confirms AGREE
+ * (scaffold Insertions 12, Deletions 13, Reorderings 3 vs in-tree
+ * rebuild's identical 16/79 with expected out-of-range drift from the
+ * 1-word-short size). Preserved near-miss body: */
 #if 0
 void *func_8005511C(void *arg0, void *arg1) {
     s32 idx;
@@ -546,6 +553,11 @@ extern s32 D_8008E0B8;
  * D_8008E0A4's lui/addiu address fresh at each of 3 accesses, my build
  * caches it in an extra saved register ($s0), shifting every later
  * register by one colour. See docs/match-reports/func_80055258.md.
+ * Round 48: check 3 confirms AGREE -- scaffold (Insertions 5, Deletions 6,
+ * frame -0x18 -> -0x20, extra `$s1` save) matches the in-tree rebuild
+ * exactly, same frame growth and same extra saved register. The in-tree
+ * rebuild's out-of-range funcdiff warning is the expected consequence of
+ * this near-miss being 8 bytes longer than retail, not a new finding.
  * Preserved near-miss body: */
 #if 0
 void func_80055258(void *arg0, void *arg1) {
@@ -577,7 +589,13 @@ extern s32 D_8008E0B8;
  * slot is call-site-determined, not body-determined -- see CLAUDE.md's
  * "already-matched signature can be too narrow" lesson. Dead params cost
  * zero instructions in the callee, so the round-46 body is otherwise
- * untouched. Preserved near-miss body: */
+ * untouched. Round 48: check 3 confirms AGREE (scaffold Insertions 3,
+ * Deletions 1, Register 90 vs in-tree rebuild's identical 25/87 with
+ * expected out-of-range drift from the 2-extra-word size). Round 48:
+ * searched (not closed, 900s/136367 iterations, best score 100/850 base);
+ * the score-100 candidate's literal transcription regressed to 5/87
+ * in-tree (worse than 25/87) rather than the isolated scaffold's
+ * improvement -- not applied. Preserved near-miss body: */
 #if 0
 void func_80055410(void *arg0, void *arg1) {
     s32 r;
@@ -672,9 +690,14 @@ struct LocalBuf {
     TabEntry tab;
 };
 
-/* STALL, 95/111 words (length matches, 0x1BC) -- see
- * docs/match-reports/func_80055620.md. Preserved near-miss body: */
-#if 0
+/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/func_80055620.md
+ * for the round 47 (bravo) recovery and the round 48 permuter lead that
+ * closed it: the `if (n <= 0) goto fail;` early exit is redundant (the
+ * `for (j = 0; j < n; ...)` loop already falls through to the same
+ * `fail: return 0;` when n <= 0) and dropping it, plus writing the
+ * `entry` pointer's address computation as `offset + (s32) base` instead
+ * of `base + offset`, closed the last word (a pure commutative-operand
+ * encoding-order residue in the `addu`). */
 void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
@@ -688,10 +711,7 @@ void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
     }
     base = D_800876B4[D_8008AC6C];
     n = D_800876EC[D_8008AC6C] - D_8008AC98;
-    if (n <= 0) {
-        goto fail;
-    }
-    entry = (EntrySlot *) (base + D_8008AC98 * 8);
+    entry = (EntrySlot *) (D_8008AC98 * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
         D_8008AC98++;
         if (entry->count > 0) {
@@ -718,8 +738,6 @@ void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
 fail:
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055620);
 
 extern s32 D_8008AC7C;
 extern void func_8002CC84(s32 arg0, void *arg1);
