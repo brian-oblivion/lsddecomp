@@ -6,6 +6,127 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-16 — round 48: the first post-carve round; 1 match, and two head claims measured down by runners
+
+**State at end: 1135 matched / 1252 game functions (90.65%)**, up **1** from
+round 47's 1134. Game bytes 70.52% → **70.72%**. Queue 118 → **117**;
+`fresh` **2** (unchanged — both the oversized reopened pair); stalled 116 →
+**115**; banked 0; uncarved **0**. Build green after all five merges and after
+the final `make extract`; tree clean. **Zero merge conflicts, sixth round
+running** — five runners, four header-disjoint units plus one re-staffed.
+
+This is the first round with **no carving available at all**, and it is a fair
+first data point on what the near-miss corpus yields: **one byte-exact close out
+of five runners**, against a great deal of mechanism. Read the ratio before
+staffing the next one.
+
+### The match
+
+- **`func_80055620`** (`class_3bb8c_n`, 111/111, alpha) — the round's only
+  close, and it came off the **sixth screen**: `class_3bb8c_n` was staffed
+  because all 8 of its stalls had **never been permuter-searched**, the
+  cheapest unpulled lever in the corpus. The search never hit a literal zero;
+  alpha read a **score-10** candidate by hand and extracted the structural
+  insight from it (a provably redundant `if (n <= 0) goto fail;`, the following
+  loop already falling through to the same `fail:`), then closed a commutative
+  operand-order residue with an explicit `(s32)` cast that four C reorderings
+  could not flip.
+
+### Two head claims that runners measured down — both travelled UP the channel
+
+1. **The frame-padding lever does not close length gaps.** Charlie solved a
+   13-round mystery on `func_800351D0` (retail allocates 80 bytes no
+   instruction addresses; `u8 dead[40]` under `if (0)` recovers the frame
+   exactly) and took it 18/376 → 48/376. **The head relayed that as "if your
+   residue is a frame-SIZE gap, try this first", which was wrong** — the word
+   gain came from a separately-paired tail-duplication fix. Echo, staffed
+   deliberately to test it, measured **4/4 alignment recovered, 0/4 length
+   closed** on hand-verified textbook candidates. Correctly scoped it is a
+   *diagnostic realignment step*; used that way it immediately surfaced a
+   spurious `andi 0xff` on `func_8002F700` (a `u8`/`s16` local compared `> 0`
+   where retail emits a direct `blez`), and widening to `s32` gave
+   **49/241 → 93/241**.
+2. **The head's staffing table understated two functions' search depth by three
+   orders of magnitude.** `func_8004ABD0` and `func_8004B100` were listed as
+   "~928 iters" and "shallow"; they carry **140,928** and **122,037**-iteration
+   exhausted negatives. Cause: the extraction regex did not strip thousands
+   separators, and "no number found" was then printed as though it meant "never
+   searched". Delta caught it and posted before doing any work. The
+   never-searched SCREEN was never affected — it tests for the *presence* of
+   evidence — only the derived depth column was.
+
+Both corrections came from cheap-model runners via `tools/broadcast.sh`, the
+second consecutive round in which that has happened (round 47: charlie narrowed
+a family-wide scaffold claim, echo narrowed a zero-ness rule). **The channel's
+value is as much upward as downward.**
+
+### Gate work the head did before staffing
+
+- **The previous round's top permuter recommendation was wrong**, and checking
+  it cost one report read. `func_80027A24` (150/151) was proposed as the round's
+  best target; it is the exact function round 47 proved must NOT be searched —
+  its isolated scaffold scores a **perfect zero** for a body the real build gets
+  one word wrong, i.e. check 3's third outcome, a whole-translation-unit
+  cross-jump artifact. Of the three proposed targets only `func_8004B030`
+  survived screening (`func_8004C470` has ~183k iterations that never beat base).
+- **The SDK-exit screen was run over the shared docs and flagged all three rows
+  of the three-lever table.** Checking each individually rather than sweeping
+  split them: "address-taken parameter" is **VOID** (its only success,
+  `func_80050B28`, is Psy-Q libcard, `NOT GAME CODE`, never matched — so the
+  lever is **0-for-4** on game code, not a balanced row), while "invert the
+  guard" and "inline every call site" **stand**. The discriminator is not *was
+  it reclassified* but **did our oracle ever go green on it as C** —
+  `func_80050AA4` reached 25/25 byte-exact in round 27 before its round-33
+  conversion. A blanket sweep would have discarded two valid mechanisms.
+
+### A defect in an idiom this protocol MANDATES
+
+Delta captured `rc=$?` exactly as `PARALLEL-RUNS.md` prescribes on both its
+1800s searches and got **neither exit code**. `permuter.py -j N` runs a
+`multiprocessing` forkserver, and Python's `resource_tracker` writes to the
+**same inherited fd after the main process exits**, racing the marker. Fix
+recorded: write the marker to its own file, and keep the content-level fallback
+(iteration count plus absence of any score-0), which is what rescued the round.
+This is the **third** distinct way this project has lost the same measurement
+(round 32: an appended command ate `$?`; round 31: the head killed the search
+first), which argues for the fallback rather than a fourth refinement.
+
+### Negatives worth not re-deriving
+
+- `code_8220_c` (bravo): **five** per-function searches, ~412,000 iterations,
+  all rc=124, none closed — on a unit whose prior history was a uniform, shallow
+  40k batch. Depth was not the missing ingredient there.
+- `class_3ac78` (delta): `func_8004B030` not closed in **442,179** iterations
+  across two searches. Six local-best candidates hand-translated and traced
+  semantically: four had genuine correctness bugs, one regressed through the
+  real oracle despite being clean and better-scoring. Needs a *structurally
+  different seed*, not another bound on the same one.
+- **The permuter UB screen is too narrow.** The scorer never executes a
+  candidate, so "reject reads before first assignment" misses a variable
+  reassigned and later read under its old meaning. Trace every touched variable
+  forward to its next use.
+- A `volatile` cast is the wrong instrument for a **loop-invariant-hoist**
+  residue (charlie: 48/376 → 6/376), as opposed to a within-expression fold.
+- **Check 3 AGREED on every function measured this round** (delta 3/3 both
+  sides, alpha 0/0 twice, charlie twice, echo by direct in-tree rebuild). After
+  round 46's family-wide mismatch scare, the harness is scoring the program we
+  actually build, so this round's negatives are real evidence.
+
+### Process notes
+
+- **`SendMessage` is still not exposed** (confirmed by lookup, not inferred).
+  The wake half of §3c has no substitute; the broadcast carried everything else.
+- All five runners ended turns on status lines while bounded searches ran — the
+  documented wait pattern. **Every one resumed on its own**; nothing was
+  salvaged, killed, or written underneath a live agent. Two runners sat at zero
+  commits for a stretch, and an explicit numbered WORK ORDER (commit → record rc
+  → launch → hand work) moved both, where the earlier prohibition had not.
+- Echo's summary claimed 5 commits and 5 updated reports; the branch had 4 of
+  each (`func_8002F3E8` was reviewed only). Work sound, count off — count from
+  the branch, as ever. Nothing dropped: that function has a prior report.
+
+---
+
 ## 2026-09-16 — round 47: the executable finishes carving, 9 matches, and two head over-generalisations caught by runners
 
 **State at end: 1134 matched / 1252 game functions (90.58%)**, up **11** from
