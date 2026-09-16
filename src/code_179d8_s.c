@@ -22,17 +22,20 @@
 
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_800272D0);
-
 /* Local view of the object func_80027480/func_800282AC/func_80028A34 read
  * through -- the real struct is ObjA34_179D8H (src/code_179d8_h.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
+typedef struct Pos18 {
+    s16 unk0;
+    s16 unk2;
+} Pos18; /* alignment 2, matches the project's lwl/lwr+swl/swr idiom */
+
 typedef struct Obj80027480 {
     u8 pad0[0xC];
     s32 unk0C;
     u8 pad10[0x18 - 0x10];
-    u8 unk18[4]; /* CdlLOC-shaped position; only its address is taken here */
+    Pos18 unk18; /* CdlLOC-shaped position */
     u32 unk1C;
     u8 pad20[0x28 - 0x20];
     u16 unk28;
@@ -49,6 +52,80 @@ extern void func_80028864(void);
 extern void func_800282AC(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
                            s32 arg4);
 extern void func_800280E0(void);
+
+/* Linear-scan table lookups over the 0x1C-byte string records at
+ * D_8008A868 (src/code_179d8_r.c). Declared LOCAL here (own reading of the
+ * trailing fields this function reads), not via a shared header. */
+typedef struct Rec80028448 {
+    u8 pad0[0x14];
+    Pos18 unk14;
+    u32 unk18;
+} Rec80028448;
+
+extern void *func_80028448(char *arg0);
+extern s32 func_800284C4(char *arg0);
+extern void *D_8008A87C;
+extern s32 D_8008A898;
+
+extern void func_80028920(Obj80027480 *self, char *suffix);
+extern char *func_800289CC(char *dest, char *suffix);
+extern s32 CdSearchFile(void *statBuf, char *path);
+extern void CdControl(s32 arg0, void *buf, s32 arg2);
+extern s32 CdSync(s32 mode, void *result);
+
+typedef struct StatBuf80027 {
+    Pos18 unk0;
+    u32 unk4;
+    u8 pad8[0x18 - 8];
+} StatBuf80027;
+
+void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
+    char path[0x40];
+    StatBuf80027 statBuf;
+    Rec80028448 *rec;
+    s32 temp;
+    s32 v0;
+
+    if (D_8008A85C == 0 && D_8008A860 == 0) {
+        func_80028920(self, suffix);
+        return;
+    }
+    func_800280D0();
+    if (self->unk28 != 0) {
+        if (D_8008A864 == 0 && self->unk0C == 0) {
+            func_80028844(1, 1);
+            if (D_8008A85C != 0) {
+                rec = func_80028448(suffix);
+                D_8008A87C = rec;
+                if (rec == NULL) {
+                    return;
+                }
+                self->unk18 = rec->unk14;
+                temp = ((Rec80028448 *)D_8008A87C)->unk18;
+                D_8008A898 = 1;
+                self->unk0C = 1;
+                self->unk1C = temp;
+            } else {
+                func_800289CC(path, suffix);
+                do {
+                } while (CdSearchFile(&statBuf, path) == 0);
+                self->unk18 = statBuf.unk0;
+                self->unk1C = statBuf.unk4;
+                do {
+                    CdControl(2, &self->unk18, 0);
+                    do {
+                        v0 = CdSync(0, 0);
+                    } while (v0 == 0);
+                } while (v0 == 5);
+                self->unk0C = 1;
+                func_80028864();
+            }
+        }
+    } else {
+        func_800282AC(self, func_800284C4(suffix), 2, arg2, arg3);
+    }
+    func_800280E0();
+}
 
 void func_80027480(Obj80027480 *self) {
     if (D_8008A85C == 0 && D_8008A860 == 0) {
@@ -93,7 +170,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
             if ((arg1 & 0x7FF) != 0) {
                 s0tmp = s0tmp + 1;
             }
-            v0 = CdPosToInt(self->unk18);
+            v0 = CdPosToInt(&self->unk18);
             CdIntToPos(v0 + s0tmp, D_8006D574);
             if (arg2 == 0) {
                 if (D_8008A85C != 0) {
