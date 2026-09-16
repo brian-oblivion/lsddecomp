@@ -31,15 +31,30 @@ typedef struct Pos18 {
     s16 unk2;
 } Pos18; /* alignment 2, matches the project's lwl/lwr+swl/swr idiom */
 
-typedef struct Obj80027480 {
-    u8 pad0[0xC];
+typedef struct Obj80027480 Obj80027480;
+
+/* This class's own methods table -- only the two slots func_80027800 reads
+ * through are named (offsets 0x48/0x64). */
+typedef struct Methods80027480 {
+    u8 pad0[0x48];
+    s32 (*slot48)(Obj80027480 *self);
+    u8 pad4C[0x64 - 0x4C];
+    s32 (*slot64)(Obj80027480 *self);
+} Methods80027480;
+
+struct Obj80027480 {
+    Methods80027480 *methods;
+    u8 pad4[0xC - 0x4];
     s32 unk0C;
-    u8 pad10[0x18 - 0x10];
+    void *unk10; /* CdRead target buffer */
+    u32 unk14;
     Pos18 unk18; /* CdlLOC-shaped position */
     u32 unk1C;
-    u8 pad20[0x28 - 0x20];
+    u16 unk20;
+    u8 pad22[0x24 - 0x22];
+    s32 unk24;
     u16 unk28;
-} Obj80027480;
+};
 
 extern s32 D_8008A85C;
 extern s32 D_8008A860;
@@ -247,6 +262,88 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027800);
+extern void func_80026B08(void);
+extern void *D_8008A888;
+
+/* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
+ * reading); only offset 0x0 is touched here -- declared LOCAL, per the
+ * project's multiple-local-views convention. */
+typedef struct Node8008A894 {
+    s32 unk0;
+} Node8008A894;
+
+extern Node8008A894 *D_8008A894;
+extern void *func_80017B34(s32 size);
+
+void func_80027800(Obj80027480 *self, char *arg1) {
+    Rec80028448 *rec;
+    s32 sectorCount;
+    s32 pos;
+    void *ret;
+    s32 v1;
+
+    if (D_8008A85C == 0 && D_8008A860 == 0) {
+        func_80026B08();
+        self->unk24 |= 0x200;
+        self->methods->slot64(self);
+        return;
+    }
+    func_800280D0();
+    if (self->unk28 != 0) {
+        if (D_8008A864 == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
+            func_80028844(4, 1);
+            D_8008A888 = D_8008A87C;
+            rec = func_80028448(arg1);
+            D_8008A87C = rec;
+            if (rec == NULL) {
+                return;
+            }
+            {
+                sectorCount = rec->unk18 >> 11;
+                D_8008A880 = sectorCount;
+                if ((rec->unk18 & 0x7FF) != 0) {
+                    D_8008A880 = sectorCount + 1;
+                }
+                pos = D_8008A880 << 11;
+                if (self->unk10 == NULL) {
+                    ret = func_80017B34(pos);
+                    if (ret == NULL) {
+                        self->methods->slot48(self);
+                        return;
+                    }
+                    D_8008A884 = ret;
+                    self->unk10 = ret;
+                } else {
+                    D_8008A884 = self->unk10;
+                }
+                if (D_8008A85C != 0) {
+                    self->unk14 = pos;
+                    D_8008A898 = 2;
+                } else {
+                retry:
+                    do {
+                        CdControl(2, (u8 *)D_8008A87C + 0x14, 0);
+                        do {
+                            v1 = CdSync(0, 0);
+                        } while (v1 == 0);
+                    } while (v1 == 5);
+                    CdRead(D_8008A880, self->unk10, 0x80);
+                    do {
+                        v1 = CdReadSync(0, 0);
+                    } while (v1 > 0);
+                    if (v1 == -1) {
+                        goto retry;
+                    }
+                    self->unk14 = pos;
+                    D_8008A894->unk0 = 1;
+                    func_80028864();
+                }
+            }
+        }
+    } else {
+        func_800282AC(self, func_800284C4(arg1), 7, 0, 0);
+    }
+    func_800280E0();
+}
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027A24);
