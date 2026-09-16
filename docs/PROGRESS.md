@@ -6,6 +6,129 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-16 — round 49: staffed on STALE VERDICTS rather than cold ground; 3 matches, four new levers, and the head's screen corrected by a runner
+
+**State at end: 1138 matched / 1252 game functions (90.89%)**, up **3** from
+round 48's 1135. Game bytes 70.72% → **72.41%**. Queue 117 → **114**; `fresh`
+**2** (unchanged — still the oversized reopened pair); stalled 115 → **112**;
+banked 0; uncarved **0**. Build green after all five merges and after the final
+`make extract`, which changed zero committed bytes; tree clean.
+**Zero merge conflicts, seventh round running** — five runners,
+`headercontention.py` verified fully header-disjoint before provisioning.
+
+Gate 1 was effectively dry and Gate 2 is permanently closed, so this was a Gate
+3 round. The staffing premise was deliberate and is the thing to evaluate:
+**stale verdicts, not cold ground.** `code_55dd4` had not been touched since
+round 33 and `DreamSys` since round 39, so ten to sixteen rounds of levers had
+never been applied to them. The premise paid where residues were *structural*
+and did not pay where they were pure register identity — both of those units
+returned zero matches while the three structurally-residued units returned one
+each. That is the ratio to price the next round on, not the headline.
+
+### The matches
+
+- **`func_800357B0`** (`code_179d8_k`, 171/179 → **179/179**, charlie) — the
+  round's best lever. Rounds 35, 39 and 46 all failed to move a whole-function
+  register-colour swap by hoisting a value into a named local **at function
+  entry**; declaring it **inside the `case 4..14` block**, where the value must
+  survive exactly one call, closed it. A block-scoped local competes for a
+  register across one call, a function-scoped one across the whole function.
+- **`func_8002B4D4`** (`code_179d8_g`, 84/91 → **91/91**, echo) — a safe
+  `volatile` retype (address stability checked in `lsdde.map`) removed enough
+  register pressure that a fix **rounds 19 and 20 had rejected twice** closed on
+  the third try.
+- **`func_8003E968`** (`code_2cc8c_d`, **41/41**, delta) — two stacked residues.
+  A repeated global-address CSE, defeated with a GNU asm-label alias; closing
+  the length then exposed a separate store-scheduling residue, closed with two
+  bare `__asm__("")` barriers.
+
+Plus one major non-match: **`func_8003D73C`** went from 1-word-short (drift
+-poisoned 50/145) to **145/145 exact, 136/145 raw** — the first exact length in
+that function's history.
+
+### Four levers, all in DECOMPILATION_LEARNINGS
+
+1. **asm-label alias defeats a repeated-global-address CSE.** Rounds 44 and 46
+   both filed this as a possible toolchain escalation; it is not one. Confirmed
+   established precedent by grep (six byte-verified uses already in
+   `code_179d8_m.c`) and confirmed it is not the HARD RULE 6 construct — an
+   asm-label renames a *linker symbol* and cannot name a register.
+2. **"Name it, THEN barrier it."** Neither half alone does anything; named-temp
+   -only reproduces the old baseline byte-for-byte.
+3. **Block scope, not function scope,** for a named local (above).
+4. **`do{...}while(0)` is a REGISTER-PRESSURE lever, not a scheduling one** —
+   inert across four delay-slot-fill-choice sites in `DreamSys`, and where it
+   did move codegen it regressed an unrelated already-matched function.
+
+Every one of 2, 3 and 4 came with a measured counter-negative in the same round:
+the same lever on a *textually identical* line in a sibling regressed it
+114/118 → 14/118. **A lever does not transfer across a shared idiom.**
+
+### Three head errors, all caught, all recorded
+
+- **A false `IDENTICAL` from a comparison where both sides failed.** The first
+  run of the `--no-nop-mflo-mfhi` measurement crashed maspsx on both sides (zsh
+  does not word-split `$1`), so `as` assembled empty input twice and the objects
+  compared equal. A comparison is evidence only if each side independently
+  succeeded.
+- **A conclusion drawn from a FILTERED diff.** Reading a permuter candidate as
+  semantically identical, having grepped the difference away. Compiling both
+  showed 1196 vs 1212 bytes. The decisive test is comparing objects.
+- **Premature hand-recovery of a live runner**, on the test "stopped and no live
+  processes" — the exact conjunction round 43 rules out in bold. Harmless
+  (git reconciled byte-identically) but it should not have happened. Round 49's
+  addition is the sharper reason: that conjunction is the *notification's own
+  precondition*, so it can never be evidence of death.
+
+### The correction that travelled upward — third consecutive round
+
+The head briefed three functions as "never permuter-searched", ranked by a regex
+for a 4+-digit number followed by `iterations`. Charlie verified instead of
+believing it and **all three labels were wrong or misleading**: one was searched
+(the report writes `15862+`, and the author's plus sign — meaning "at least" —
+defeats the pattern), and two had scaffolds **REJECTED at the sanity gate**.
+
+The deeper error outlives the regex: **a scaffold rejected at the sanity gate is
+a real attempt yielding a strong negative, while leaving no iteration count in
+the text at all.** So a numeric screen ranks the *least*-searchable functions to
+the TOP of a fresh-work queue. This is round 37's "counted the WORD" error one
+turn on — the head counted a *number format*. **A screen over prose reports is a
+hint to verify, never a fact to brief.**
+
+### Measured, and recorded so nobody re-derives it
+
+A plausible re-search, rejected before it cost a runner-round: pre-round-42
+permuter negatives are **not** void for functions using `mflo`/`mfhi`. The
+mechanism is real (dropping `--no-nop-mflo-mfhi` turns 42 instructions into 44
+through the pinned pipeline), but the hazard form is `mflo`/`mfhi` followed
+within ~1–2 instructions by `mult`/`div`, and across all seven candidates the
+nearest `mult`/`div` is **8 to 107 instructions away — zero hazard pairs.**
+
+### On stochastic search, in both directions
+
+`func_800357B0`'s zero came at **iteration 149** where round 39's **33,480**
+iterations had found nothing. In the same unit the same round, `func_8003424C`'s
+**163,644** iterations reproduced the identical score-150 floor from rounds 31
+and 33. A big iteration count is not proof of an empty space, and a fresh seed
+is not reliably productive. Rank on alpha's stronger signal — **did a search
+EVER beat base** — and spend a fresh seed where it did but never zeroed. Where
+192,610 iterations never once went below base, the space really is empty.
+
+### Next move
+
+**Runners again, 4–5, same premise.** Round 48 returned 1 match from 5 runners
+and round 49 returned 3 plus a length closure, and the difference was staffing
+on structural residues rather than register-identity ones. Screen for that
+before assigning: prefer units whose stall titles describe scheduling, CSE,
+length gaps or code motion, and deprioritise ones whose residues are described
+as register identity or colour rotation — those absorbed two whole runners this
+round for zero matches, exactly as their reports predicted.
+
+Also worth one runner: **`tools/stalesyms.py` reports 274 stale references in
+152 reports, 64 of them LIVE**, and nine LIVE reports lack the mandated
+`#if 0` preservation form. Charlie fixed three; the rest are cheap hygiene that
+makes every future resume-from-body attempt trustworthy.
+
 ## 2026-09-16 — round 48: the first post-carve round; 1 match, and two head claims measured down by runners
 
 **State at end: 1135 matched / 1252 game functions (90.65%)**, up **1** from
