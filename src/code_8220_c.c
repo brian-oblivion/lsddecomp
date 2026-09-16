@@ -63,34 +63,37 @@ typedef struct {
 } Vec2s16_98;
 
 #if 0
-/* STALL snapshot round 2 -- see docs/match-reports/func_8001989C.md.
- * Instruction-exact (asm-differ: zero inserted, zero deleted -- ONE
- * differing line, the delay-slot filler below). TWO residues stack here,
- * both already documented: (a) the shared family residue ($a2 vs $a1 for
- * the OT mask, plus missing `addiu $v0,$s1,0x1c` = self+0x1c, matching
- * the cross-sibling formula -- last touched self field is +0x18, a
- * PolyUV4, width 4, end 0x1c); (b) this function's OWN pre-existing
- * self/prim register swap ($s1=prim, $s2=self, opposite of retail and
- * every OTHER sibling), already investigated exhaustively in this
- * report's round-1 attempts -- re-tried swapping the local declaration
- * order here too (prim before self) and got the SAME regression as
- * round 1 (address drift), confirming it's not fixed by the bitfield
- * rewrite either. Not cracked.
+/* STALL snapshot round 48 -- see docs/match-reports/func_8001989C.md.
+ * 76/84 words, no drift. This function's OWN residue (a pre-existing
+ * self/prim register swap) is CLOSED by a permuter-found lead: wrapping
+ * the OtTag-splice branch in `do { ... } while (0)` and caching
+ * *(u8 **)(prim + 0x88) into `vtx0` for the FIRST +0xA store only (NOT
+ * all three -- making it symmetric regresses to 48/84). Remaining residue
+ * is the family-shared class documented in func_8001A064.md: register-
+ * identity ($a2 vs $a1, duplicated OT mask) plus a missing delay-slot
+ * filler `addiu $v0,$s1,0x1c`. That residue was searched exhaustively
+ * (6/6 siblings, 471873 combined iterations, round 48) with no fix found
+ * -- do not re-search this function's remaining gap without a genuinely
+ * new axis not already tried on the other six.
  */
 void func_8001989C(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
+    u8 *vtx0;
 
     if (*(s32 *)(prim + 0x78) == 0) {
-        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
-        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+        do {
+            ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+            (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+        } while (0);
     } else {
         func_8001A380(D_8008ACD0, prim, self + 0x4, 0, 0, 0);
         func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
 
-        *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);
+        vtx0 = *(u8 **)(prim + 0x88);
+        *(u16 *)(vtx0 + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0xA) = *(u8 *)(self + 0x17);
 
