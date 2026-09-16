@@ -18,33 +18,29 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     }
 }
 
-/* STALL -- see docs/match-reports/func_8003E968.md. Best reached: 39/41
- * instructions (2 words SHORT, with drift): every field write and constant
- * matches retail's own values and offsets, but GCC 2.6.3 CSEs the
- * lui/addiu address computation for the twice-copied `D_8008A8F8` (a
- * whole-struct `SByte3_d294` source) into ONE shared computation, while
- * retail's own build computes it TWICE (once per copy) and additionally
- * schedules several independent zero-inits much earlier than this build
- * does. Neither a bare `__asm__` memory-clobber barrier (does not force
- * recomputation of a pure address constant) nor `volatile` (forces a
- * completely different, WORSE codegen shape with its own stack frame) nor
- * per-field byte copies (changes signed `lb` to unsigned `lbu` loads,
- * diverging further) nor a chained assignment reading the SECOND copy from
- * `self->unk5B` instead of the global (confirmed via disassembly: reads
- * from `self`+0x5B, not the global's address at all -- semantically valid
- * since both sides are zero, but structurally wrong; retail's own two
- * `lui %hi(D_8008A8F8)` computations prove it re-reads the GLOBAL both
- * times, not `self`) closed it. Restored to INCLUDE_ASM per project rule. */
-#if 0
+/* MATCHED round 49. Two levers were needed, see docs/match-reports/func_8003E968.md:
+ * (1) retail reloads the address of `D_8008A8F8` INDEPENDENTLY for each of
+ * the two whole-struct copies (two separate lui/addiu pairs); GCC 2.6.3
+ * otherwise CSEs that into one shared computation. Declaring a second
+ * extern name aliased to the same symbol via `__asm__("D_8008A8F8")` (the
+ * same alternate-name idiom `code_179d8_m.c` already uses) gives the
+ * second copy a textually distinct symbol, defeating the CSE without
+ * `volatile`'s much worse codegen. (2) Two bare `__asm__("")` scheduling
+ * barriers pin the two independent zero-inits and the two global-loaded
+ * stores to retail's own early positions instead of letting the scheduler
+ * defer them to just before the byte copies. */
 extern s32 D_8008A8FC;
 extern s32 D_8008A900;
 extern SByte3_d294 D_8008A8F8;
+extern SByte3_d294 D_8008A8F8_b __asm__("D_8008A8F8");
 
 void func_8003E968(Unk18Obj *self) {
     self->unk90 = 0;
     self->unk70 = 0;
+    __asm__("");
     self->unk34.a = D_8008A8FC;
     self->unk34.b = D_8008A900;
+    __asm__("");
     self->unk3C = 0xD;
     self->unk44 = 0x7D0;
     self->unk48 = 0x40;
@@ -54,13 +50,10 @@ void func_8003E968(Unk18Obj *self) {
     self->unk54 = 0;
     self->unk60 = 0x4E20;
     self->unk5B = D_8008A8F8;
-    self->unk58 = D_8008A8F8;
+    self->unk58 = D_8008A8F8_b;
     self->unkB4 = 0;
     self->unkB8 = 1;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003E968);
 
 void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair) {
     self->unk34 = *pair;
@@ -175,12 +168,16 @@ void func_8003ECC0(void) {
 void func_8003ECC8(void) {
 }
 
-/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 44 (echo):
- * re-verified 71/73 exactly, no drift; two more negative attempts (local
- * declaration order swapped, and the shift value computed in its OWN
- * statement ahead of the product) neither helped -- the second regressed
- * to 69/73, same pattern as every other tried grouping. Still the same
- * 2-word instruction-order residue at vram 0x8003ED18/0x8003ED1C. */
+/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 49 (delta):
+ * re-verified 71/73 exactly, no drift; a ~49k-iteration permuter search
+ * (49,430 iterations, timeout rc=124, base score 215 agreeing with the
+ * real build's signature) found nothing below baseline besides the same
+ * spurious integer-truncation candidates already fingerprinted round 36.
+ * The named-temp+barrier lever that closed a sibling scheduling swap in
+ * this unit's own func_8003D73C this round does NOT transfer here either
+ * (regresses to 67/73) -- this residue is an arithmetic REGROUPING, not
+ * an independent-computation ordering swap. Still the same 2-word
+ * instruction-order residue at vram 0x8003ED18/0x8003ED1C. */
 #if 0
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
 
