@@ -108,7 +108,7 @@ extern s32 D_8006D8DC[10];   /* first of 10 consecutive words zeroed by a pointe
                           * already individually named -- not a real array. */
 extern s32 D_8006D8E0;
 extern s32 D_8006D8E4;
-extern s32 D_8006D8E8;
+extern volatile s32 D_8006D8E8;
 extern volatile s32 D_8006D8EC;
 extern volatile s32 D_8006D8F0;
 extern volatile s32 D_8006D8F4;
@@ -515,4 +515,52 @@ void func_8002B3E4(s32 arg0)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3F4);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B4D4);
+void func_8002B4D4(s32 arg0, s32 arg1)
+{
+    volatile s32 *p;
+    s32 code;
+    s32 dummy;
+    volatile s32 *new_var;
+
+    if (arg0 != 1) {
+        goto elseBranch;
+    }
+    p = &D_8006D8F4;
+    if (*p <= 0) {
+        goto shared;
+    }
+    func_8002B304(D_8006D8E8, D_8006D8F0);
+    D_8006D8E8 = D_8006D8E8 + D_8006D8F0 * 4;
+    *p = *p - 1;
+    dummy = *p;
+    (void)dummy;
+    goto shared;
+elseBranch:
+    {
+        volatile s32 *p2 = &D_8006D8F4;
+        *p2 = -1;
+    }
+shared:
+    {
+        volatile s32 *pF8 = &D_8006D8F8;
+        *pF8 = VSync(-1);
+    }
+
+    if (D_8006D8F4 < 0 && D_8006D8DC[0] > 0) {
+        func_8002AA6C();
+    }
+
+    if ((*(new_var = &D_8006D8F4)) <= 0) {
+        D_8006D5FC = D_8006D8FC;
+        D_8006D600 = D_8006D900;
+        func_80029F10(9, 0, 0, 0);
+        if (D_8006D604 != 0) {
+            if ((*new_var) == 0) {
+                code = 2;
+            } else {
+                code = 5;
+            }
+            ((void (*)(s32, s32))D_8006D604)(code, arg1);
+        }
+    }
+}
