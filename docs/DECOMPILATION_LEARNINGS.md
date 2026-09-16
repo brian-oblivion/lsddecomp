@@ -8333,3 +8333,98 @@ permuter's own `compile.sh` gave **1196 vs 1212 bytes, objects DIFFER.** The
 change was real and the filter had removed it. **The decisive test for "is this
 candidate really different" is compiling both and comparing the objects**, which
 costs a second; reading source is not a substitute.
+
+### The SCOPE of a named local is the lever, not the name (round 49)
+
+`func_800357B0`'s whole-function `channel`/`arg5` register-colour swap survived
+rounds 35, 39 and 46. All three failed the same way: they hoisted one side or
+the other into a named local **at the top of the function**. What closed it
+(179/179, byte-exact) was declaring the local **inside the `case 4..14` block**,
+right where the value is re-read after an `_SsUtResolveADSR` round-trip:
+
+```c
+case 4 ... 14: {
+    s16 new_var;
+    ...
+    new_var = channel;              /* scoped to the ONE call it must survive */
+    SsUtSetVagAtr(..., new_var, ...);
+}
+```
+
+The reason is the generalizable half: **a block-scoped local competes for a
+register across one call; a function-scoped one competes across the whole
+function.** Hoisting to function entry is the form everyone reaches for first
+and it is the form that adds pressure everywhere it is not needed.
+
+Together with round 49's "name it, THEN barrier it", the naming axis now has at
+least three distinct forms — function-entry local, block-scoped local, and
+name-plus-barrier — and **a report recording "tried a named local" does not say
+which of the three was tried.** Treat the phrase as under-specified whenever you
+meet it.
+
+### A permuter negative is ONE SAMPLE of a stochastic process, and round 49 has both directions
+
+`func_800357B0`'s zero arrived at **iteration 149** on the same scaffold where
+round 39's **33,480-iteration** search had plateaued at score 48 and found
+nothing. A fresh seed found in 149 iterations what a run two hundred times
+longer had missed.
+
+The counterexample landed in the same unit, the same round: `func_8003424C`'s
+163,644 iterations reproduced the **identical score-150 floor** recorded in
+rounds 31 and 33, finding nothing new.
+
+So a large iteration count is not proof the space is empty, and a fresh seed is
+not reliably productive either. Both compose with alpha's stronger screen:
+**rank on whether a search EVER beat base**, and spend a fresh seed where it did
+but never zeroed. Where 192,610 iterations never once went below base, the space
+really is empty and a new seed buys nothing.
+
+### The forward-trace UB screen needs two explicit extensions (round 49)
+
+Round 48 established that the permuter's scorer never executes candidates, so
+"reject reads before first assignment" is too narrow. Round 49 found two further
+shapes, both caught by inspection and rejected **without ever being built**:
+
+- **Staleness across a LOOP BACK-EDGE.** A candidate reused an already-hot
+  pointer as a throwaway sink in one branch. It looks exactly like the unit's
+  established "reuse a hot register" idiom, but the pointer is read again on a
+  *later loop iteration* under its old meaning. Tracing to the next textual use
+  is not enough — trace across the back-edge.
+- **Use-before-init from a reordered pair.** A candidate moved `p2 = pRetry + 4;`
+  ahead of `pRetry = tmp;`, reading `pRetry` uninitialized.
+
+Both score as improvements because the scorer only diffs compiled bytes. The
+screen is therefore: **trace every touched variable forward to its next use on
+every reachable path, loop back-edges included, and check for use-before-init.**
+
+### "Was it searched" is not a text-mining question (round 49)
+
+The head briefed three functions as "never permuter-searched", ranked by a regex
+for a four-or-more-digit number followed by `iterations`. A runner checked
+instead of believing it, and **all three labels were wrong or misleading**:
+
+- `func_80035B2C` **was** searched (round 35, `15862+ iterations`, rc=0, verdict
+  permuter-resistant — div/mod fusion outside the mutation set). The screen
+  missed it because the report writes **`15862+`**: the author's plus sign,
+  meaning "at least", sits between the digits and the word, across a line wrap.
+  One punctuation mark scored a searched function as virgin ground.
+- `func_80034690`'s scaffold was **REJECTED at the sanity gate** in round 32 and
+  reconfirmed in round 35 (a genuine MISMATCH — missing callee-saved register).
+- `func_800351D0`'s scaffold was **also rejected** (frame 40 bytes off).
+
+**The deeper error is worse than the regex, and it is the one to carry.** A
+scaffold rejected at the sanity gate is a real attempt that yields a STRONG
+negative — the function is unsearchable as scaffolded — while leaving **no
+iteration count in the text at all.** So any numeric screen scores the
+*least*-searchable functions identically to the most attractive ones and ranks
+them to the TOP of a fresh-work queue. That is the expensive direction of error.
+
+This is round 37's finding one turn further on: round 37 caught the
+permuter-history screen counting the **word**; round 49's head counted a
+**number format**. Both are the same mistake. **A screen over prose reports is a
+hint to verify, never a fact to brief** — and the head briefed it as a fact.
+
+Third consecutive round in which a correction travelled UPWARD from a
+cheap-model runner (round 47: a family-wide scaffold claim narrowed, and a
+zero-ness rule narrowed; round 48: provenance corrections). The channel is doing
+the job it was built for; read the replies as evidence, not as compliance.
