@@ -802,6 +802,15 @@ s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
             if (func_8005582C(D_8008AC9C[i], ctx, arg1) == 0) {
                 D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
             }
+            /* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
+             * no-op (`i` is the initialized loop counter, so nothing here is
+             * an uninitialized read), and it exists solely because it
+             * perturbs GCC 2.6.3's allocator back into retail's register
+             * colours for `ctx`/`i`. Found by the permuter at iteration 4
+             * and kept because the WHOLE-IMAGE SHA1 verifies with it, not
+             * because the permuter's own scorer liked it (round 41: a
+             * scorer zero is a lead, an `OK: build matches retail` is an
+             * answer). Removing these two lines re-breaks func_800558F0. */
             i++;
             i--;
         } else {

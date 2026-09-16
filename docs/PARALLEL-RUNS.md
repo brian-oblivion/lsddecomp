@@ -2479,7 +2479,12 @@ scaffold is near 0/0.
 > > | NONZERO insertions/deletions | zero drift | **MISMATCH** — the search scored a program nobody is building |
 > >
 > > Confirmed mismatched so far, and no others: `func_8004BB3C`,
-> > `func_8004C1C0`, `func_8004CAF0`, `func_8004C93C`, `func_8004CD38`.
+> > `func_8004C1C0`, `func_8004CAF0`, `func_8004C93C`, `func_8004CD38`, and
+> > **`func_80054FD8`** (round 47, bravo: 1 reordering / 6 insertions / 6
+> > deletions against a real build with zero drift -- search declined). That
+> > sixth one is in `class_3bb8c_n`, a DIFFERENT unit from the other five, so
+> > the phenomenon is not confined to one carve slice; the signature test is
+> > what travels, not the unit name.
 > >
 > > Two lessons, and the second is the general one. **A family is not the right
 > > granularity for this verdict; the per-function signature is** — which is
