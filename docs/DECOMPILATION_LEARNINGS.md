@@ -7762,3 +7762,174 @@ search-tail finding:
 - **A late summary is still worth reading for LEVERS even when its narrative
   is wrong.** This one was wrong about the teardown and right about the
   compiler, and the second half was worth promoting.
+
+## Round 47 (2026-09-16) — the executable finishes carving, and a runner corrects the head
+
+**Round 47's structural result is that Gate 2 is over**: `uncarved.py` reports
+zero uncarved game functions. Everything from here is near-miss and stall work.
+See `docs/PARALLEL-RUNS.md` Gate 2 for the two new carve hazards found taking
+the last three segments.
+
+### The round's most important finding, and it travelled UPWARD
+
+The head's opening broadcast generalised round 46's **five-function**
+scaffold-mismatch measurement into *"every recorded permuter negative in the
+`class_3bb8c`/`Obj866E8` family is void"*. Runner charlie measured it instead
+of obeying it and found **2 of 6, not 6 of 6** — four genuine negatives (183k,
+184k, 37k, 34k iterations) that the blanket claim would have discarded.
+
+The head checked charlie's reasoning before adopting it, because the obvious
+objection is that charlie read HISTORICAL scaffold records while round 46's
+finding came from FRESH ones. **The objection fails on the evidence:** the
+confirmed mismatches were already dirty in their historical records too
+(`func_8004CD38`: 4 insertions / 5 deletions; `func_8004C93C`: 11/11, noted at
+the time as not the clean register-diffs-only signature). The record
+discriminates, so the historical read is sound.
+
+**The usable form is a SIGNATURE comparison, not a family label** — scaffold
+`--debug --stack-diffs` showing pure register differences with zero
+ins/del/reorder, against a real-build residue that is also pure register
+identity at exact length, AGREE; nonzero ins/del against zero drift is a
+MISMATCH. A sixth mismatch (`func_80054FD8`) then turned up in a *different
+unit*, which is what proves the signature travels and the family label does
+not. Full write-up in `PARALLEL-RUNS.md`'s Gate 3 box.
+
+Two generalisations worth keeping separately from the permuter question:
+
+- **"The right mechanism at the wrong granularity"** is this project's most
+  repeated error shape, and this is its Gate-3 instance. The mechanism was
+  real and measured; the granularity was invented.
+- **A cheap-model runner disagreeing with the head, with numbers, is the
+  protocol working.** The broadcast exists so corrections travel; nothing said
+  they only travel downward. Post levers to it and read the replies as
+  evidence rather than as compliance.
+
+### Source-shape levers found this round
+
+Each closed or advanced a real function. None is a rule; all are hypotheses to
+test per function, and the measured negatives are part of the finding.
+
+- **A `move $sN,$v0` sitting in a `jal`'s OWN delay slot reads the value `$v0`
+  held BEFORE that call, never that call's return** — the delay slot executes
+  before the jump is taken. Misreading it as "this call's return used twice"
+  is unfixable by any amount of local-variable restructuring, because the C
+  then describes the wrong value's **lifetime** rather than the wrong shape.
+  Closed `func_800118DC` — the game's own `main()` — immediately once
+  corrected (delta).
+- **GCC 2.6.3's loop optimisations are SYNTAX-GATED, not CFG-gated** (alpha,
+  confirmed with five isolated pinned-pipeline variants). Its LICM hoists a
+  loop-carried literal comparison into a spare callee-saved register, coming
+  out one word SHORTER than retail's recompute-every-iteration shape;
+  rewriting only the outer loop as `label: ...; if (cond) goto label;` defeats
+  the hoist. **Register pressure is not the knob** — the hoist happened with
+  0, 2 and 3 real parameters live. Diagnostic signature: an extra
+  `li $sN,<const>` outside the loop paired with a missing `move` inside it.
+  Second confirmed instance of syntax-gating after round 45's
+  break-past-fall-through finding.
+- **…and its own limit, which is the more useful half: the answer does not
+  generalise across loops even within ONE function** (alpha). Whether retail
+  hoists a retry loop's constant is a per-loop fact you read off that loop's
+  own `.s` — look for `li $sN,<const>` above the retry label. A sibling retry
+  loop in the same unit matched as a plain `do`/`while`. A second axis showed
+  up too: loop **size/complexity**, where an outer loop wrapping two nested
+  retry constructs needed the `goto` form while a simpler sibling did not.
+- **A local reused across two MUTUALLY EXCLUSIVE branches still perturbs
+  register allocation in the branch you did not touch** (alpha, three isolated
+  variants). Symptom: an unexplained extra `move $vN,$v0` around a call's
+  return in one branch, with nothing wrong-looking in that branch's own code —
+  the cause is a *different* sibling branch assigning into a same-named local.
+  Give each branch's value its own name even though they are never live
+  together.
+- **Try REORDERING before `volatile` or a barrier** for round 44's "retail
+  re-reads a global our GCC CSEs into an already-live register" class (alpha):
+  moving the redundant read to immediately after the assignment that makes the
+  two reads provably equal can defeat it, where round 44 measured
+  `volatile`/barriers inert for its own instance. Cheaper and non-invasive.
+- **`volatile` is the WRONG TOOL for an unwanted address-CSE** (bravo). It
+  blocks reordering and elision of the *access*; it does not stop GCC 2.6.3
+  caching a global's **address** across a call. A bare `__asm__("")` did not
+  move it either (`func_80055258`).
+- **Two early exits returning the SAME value still need an explicit
+  `goto`-to-shared-label** (bravo). Without it GCC 2.6.3 can tail-duplicate
+  the second one into its own inline stub — which presents as a SIZE drift,
+  not a near-miss, so it is easy to misattribute.
+- **A value only ONE branch consumes may still need computing
+  UNCONDITIONALLY**, right after it is derived and before the `if` (charlie).
+  Writing it only in the consuming arm drops a `move` retail always emits.
+  Sibling of round 46's "value set on both outcomes belongs above the `if`",
+  but note the asymmetry: here the *other* branch recomputes its own narrower
+  view inline.
+- **Whichever arm is textually LONGER needs to be the fall-through** (alpha,
+  fifth confirmed instance in one unit). Read it off the `.s`; do not guess it
+  from which is written as `if` and which as `else`. Related diagnostic: **a
+  DUPLICATED call pair in the diff is worth checking as a branch-polarity bug
+  before assuming two independent residues.**
+- **An already-matched function's CALL SITE can under-declare what it silently
+  forwards** (bravo) — an argument already resident in the right register
+  needs no explicit move, so the call site compiles and matches while omitting
+  a parameter. This is the argument-side counterpart to round 46's
+  callee-side "a matched signature can be too narrow".
+
+### A permuter form adopted on the real oracle, and the comment that keeps it alive
+
+`func_800558F0` (77/77) closed on a permuter candidate that inserts a dead
+`i++; i--;` pair to perturb the allocator back into retail's register colours.
+It clears round 41's bar: `i` is the initialized loop counter, so this is an
+**inert pair and not the uninitialized read round 41 says to reject**, and it
+was kept because the whole-image SHA1 verifies — not because the permuter's
+scorer liked it. It is also nowhere near HARD RULE 6, which bans forcing
+register identity via asm or operand constraints, not ordinary C statements.
+
+**Round 41's requirement to comment such a form AT THE SITE is not decoration,
+and it was missed here and added at merge time.** Two obviously-dead lines with
+no explanation are what a later reader deletes as cleanup — and the image then
+goes red with nothing in the diff explaining why. If you adopt an inert form,
+the comment is part of the change.
+
+**Its scope, measured in the same unit and the same round:** the trick is NOT a
+blanket answer to register-colour stalls. `func_80054FD8` has the same residue
+shape and its scaffold DISAGREES with the real build (1 reordering, 6
+insertions, 6 deletions against zero drift), so its search was correctly
+declined. Check the signature first.
+
+### Negatives worth as much as the levers
+
+- **Four `code_179d8_h`/`code_179d8_j` near-misses fail permuter check (b)
+  hard** — insertion/deletion pairs of 4/3, 5/4, 5/5 and 17/22 (the last being
+  ~40% of its own instruction count) — and all four searches were declined on
+  that evidence (delta). These are control-flow-shape and
+  register-allocation-strategy gaps, not expression-tree rewrites a
+  source-mutation search is built to close. **The permuter's own `--debug`
+  diff independently named the same residues five prior hand attempts had
+  converged on**, which makes check (b) a diagnostic and not only a gate.
+- **Round 46's twelfth lever (field-pair-per-`if` hoist) is inapplicable to
+  all six `class_3bb8c` residues** (charlie) — none has that shape. Recorded so
+  the next round does not re-litigate it.
+
+### A report can claim a preserved body that does not exist
+
+`func_8005511C.md` and `func_80054FD8.md` both described a body preserved in
+`#if 0` that **was never actually inlined as compilable source**. This is the
+failure CLAUDE.md warns about — a body that lives only as a description — and
+it is invisible to every static reading, because the report is internally
+coherent. **Only the instruction to BUILD every inherited body once catches
+it** (round 33's rule, earning its keep again). Both fixed this round.
+
+### An operational hazard: `make clean` deletes `asm/`
+
+The head ran `make clean` in the main checkout to get a warning census off a
+from-scratch build. `clean` is `rm -rf $(BUILD_DIR) asm $(GAME).ld`, so it
+takes the generated disassembly with it and the next build dies on
+`can't open asm/nonmatchings/<unit>/<fn>.s`. It reads exactly like somebody
+broke the tree and is attributable to no commit — the same signature Gate 0
+documents for a stale `asm/` after a pull. **`make extract` restores it**, and
+`clean` is one of the four hook-permitted targets precisely because this is
+recoverable, but do not run it in the shared checkout without expecting the
+red build that follows.
+
+What the census bought, which is worth knowing independently: a genuinely clean
+build emits **111 warnings**, including 9 implicit function declarations and 6
+`type mismatch with previous implicit declaration`. **The incremental build
+hides every one of them**, so nobody iterating on one function ever sees them.
+They are latent rather than urgent — the image is byte-exact — but an implicit
+declaration means the compiler is not checking that call at all.
