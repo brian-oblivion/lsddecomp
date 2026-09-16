@@ -672,9 +672,14 @@ struct LocalBuf {
     TabEntry tab;
 };
 
-/* STALL, 95/111 words (length matches, 0x1BC) -- see
- * docs/match-reports/func_80055620.md. Preserved near-miss body: */
-#if 0
+/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/func_80055620.md
+ * for the round 47 (bravo) recovery and the round 48 permuter lead that
+ * closed it: the `if (n <= 0) goto fail;` early exit is redundant (the
+ * `for (j = 0; j < n; ...)` loop already falls through to the same
+ * `fail: return 0;` when n <= 0) and dropping it, plus writing the
+ * `entry` pointer's address computation as `offset + (s32) base` instead
+ * of `base + offset`, closed the last word (a pure commutative-operand
+ * encoding-order residue in the `addu`). */
 void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
@@ -688,10 +693,7 @@ void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
     }
     base = D_800876B4[D_8008AC6C];
     n = D_800876EC[D_8008AC6C] - D_8008AC98;
-    if (n <= 0) {
-        goto fail;
-    }
-    entry = (EntrySlot *) (base + D_8008AC98 * 8);
+    entry = (EntrySlot *) (D_8008AC98 * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
         D_8008AC98++;
         if (entry->count > 0) {
@@ -718,8 +720,6 @@ void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
 fail:
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055620);
 
 extern s32 D_8008AC7C;
 extern void func_8002CC84(s32 arg0, void *arg1);
