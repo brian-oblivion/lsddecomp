@@ -6,6 +6,137 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-16 — round 47: the executable finishes carving, 9 matches, and two head over-generalisations caught by runners
+
+**State at end: 1134 matched / 1252 game functions (90.58%)**, up **11** from
+round 46's 1123 — of which **9 were runner work** and 2 are `jr $ra; nop`
+stubs splat matched itself at carve time. Game bytes 69.28% → **70.52%**.
+Queue 118 → **118** (11 matched out, 11 carved in); `fresh` 5 → **2**;
+stalled 113 → **116**; banked 0; **uncarved 11 → 0**. Build green after all
+seven merges and after the final `make extract`; tree clean, all five
+worktrees and branches removed. **Zero merge conflicts, fifth round running.**
+
+`class_3bb8c_q` is **COMPLETE** (2 of 2) and `src/main.c` is **COMPLETE** —
+including the game's own `main()`. `code_179d8_s` is 5 of 6.
+
+### Gate 2 is over: there is nothing left to carve
+
+Round 47 carved the last three segments — `code_179d8_s` (7 functions, 620w),
+`class_3bb8c_q` (2) and `main` (2) — each verified byte-exact on its own before
+the next. **`uncarved.py` now reports zero uncarved game functions**, so this
+gate has no source of work any more and every later round's queue is entirely
+near-miss and stall work. A round that finds `fresh` thin must now choose
+between re-sends and a permuter round; "carve if thin" is off the menu.
+
+`class_3bb8c_q`'s carve note had said *"nothing to staff here"* on two blockers
+that died in rounds 21 and 42, and was obeyed for 26 and 5 rounds after —
+round 45's stale-directive lesson, paid once more. Both its functions matched.
+
+**Two new carve hazards, both from `main`:**
+
+- **A `dlabel` in a `.text` `c` segment is emitted to NO FILE, and the carve
+  builds green ONCE before failing on the next `make extract`.** `main`'s tail
+  is the C-runtime startup, which spimdisasm labels `dlabel` because it ends in
+  four literal non-instruction words. The first attempt linked and verified
+  byte-exact, then the next extraction died on `can't open
+  asm/nonmatchings/main/func_8001199C.s`. A runner in a fresh worktree would
+  have met that with nothing explaining it. Fixed by splitting the tail into
+  its own `asm` segment.
+- **Verify a carve by extracting TWICE.** That is the general form: one green
+  build proves the segmentation assembles, not that it regenerates.
+
+That crt0 is Sony's, by round 39's assembler fingerprint — word 0x21C0 is
+`0x24020004` (`addiu $v0, $zero, 4`), a form the pinned pipeline never emits.
+
+### The round's most important results both came from runners correcting the head
+
+**Twice, in one gate, by the same mechanism.**
+
+1. The opening broadcast generalised round 46's **five-function**
+   scaffold-mismatch measurement into *"every recorded permuter negative in the
+   `class_3bb8c`/`Obj866E8` family is void"*. Charlie measured instead of
+   obeying: **2 of 6, not 6 of 6**, preserving four genuine negatives (183k,
+   184k, 37k, 34k iterations). The head verified charlie's reasoning before
+   adopting it — the objection being that charlie read historical scaffold
+   records where round 46 built fresh ones — and the objection FAILS, because
+   the confirmed mismatches were already dirty historically (4 ins/5 del;
+   11/11).
+2. The head then wrote a replacement table whose rows made **zero-ness** the
+   discriminator. Echo falsified that too: `func_8004B030`'s scaffold showed
+   6 insertions / 6 deletions, the real build showed the **identical**
+   signature, so they AGREE — and searching on that basis paid **19/52 →
+   22/52**.
+3. Alpha supplied the third outcome and the proof: `func_80027A24`'s scaffold
+   scores a **perfect 0** for a body the real build gets one word wrong,
+   because the residue is a whole-translation-unit cross-jump artifact the
+   scaffold cannot see. **Zero is the good sign in one row and the bad sign in
+   another.**
+
+**Check 3's discriminator is AGREEMENT between scaffold and real build, never
+zero-ness**, and it has three outcomes of which only one says "search". Full
+table in `PARALLEL-RUNS.md` Gate 3.
+
+The transferable lesson is not about the permuter: **any proxy for "these two
+measurements agree" that is cheaper than measuring both will be wrong
+somewhere** — and a cheap-model runner disagreeing with the head, with numbers,
+is the protocol working. The broadcast exists so corrections travel; nothing
+said they only travel downward.
+
+### Gate 1b: four named learnings rested on Sony's code
+
+The round-38 detector over match REPORTS came back clean (31 hits, all already
+annotated). The round-43 sweep over the SHARED DOCS did not — 38 unannotated
+hits, four of them load-bearing and now corrected in place: the `sltiu`
+third-escape (one instance, Sony's), the **"retry-loop driver cluster — three
+instances of ONE shape"** (all three Sony's, so **zero game-code instances**,
+after ~90 attempts and ~70k permuter iterations), the commutative-`addu`-slot
+class (one instance, Sony's, and a toolchain claim measured against a different
+assembler), and the framed-forwarding-wrapper rule (PROMOTED on a negative
+check whose four functions are all Sony's). Two levers citing SDK-exit
+functions were KEPT and merely labelled, because both rest on standalone
+reproducers — round 43's split doing exactly the work it was written for.
+
+### Operational findings
+
+- **`make clean` deletes `asm/`.** The head ran it in the main checkout for a
+  warning census; the next build went red on missing `.s` files, reading
+  exactly like a broken tree and attributable to no commit. `make extract`
+  restores it. The census itself: a genuinely clean build emits **111
+  warnings**, including 9 implicit function declarations — and the incremental
+  build hides every one, so nobody iterating ever sees them.
+- **The five-name worktree grant became binding.** Re-sends consumed
+  alpha…echo, so when bravo and delta finished there was no sixth name to
+  provision and no more unstaffed fresh ground worth one. Not a problem this
+  round; worth knowing before planning a round that leans on re-sends.
+- **A report can claim a preserved body that does not exist.** Two did
+  (`func_8005511C`, `func_80054FD8`) — caught only by the "build every
+  inherited body once" rule, since the reports are internally coherent.
+- **An adopted inert permuter form needs its at-site comment**, and bravo's did
+  not have one. Added at merge time: two dead-looking lines with no explanation
+  are what the next reader deletes as cleanup, and the image then goes red with
+  nothing in the diff saying why.
+
+### Toolchain leads — NOT acted on, carried to the operator
+
+1. **Why the permuter scaffold diverges from the real translation unit** is
+   still open and now has a sixth confirmed instance (`func_80054FD8`) in a
+   DIFFERENT unit from the other five, plus alpha's inverse case where the
+   scaffold is perfect and the real build is not. Tooling question; measure,
+   decline, record — do not fix mid-round.
+2. **HARD RULE 6's wording** (carried from round 46, unchanged): a bare
+   `__asm__("")` can change register allocation, which the rule's own
+   behavioural test calls banned. A rule-interpretation call, not a code change.
+
+### Next round
+
+**Runners are no longer the obvious default.** `fresh` is 2, and both are the
+oversized reopened pair (954w and 324w) nobody has wanted for several rounds.
+With carving finished, the honest choice is between a permuter round targeting
+the three one-word near-misses (`func_80027A24` 150/151, `func_8004C470` 69/70,
+`func_800558F0`'s siblings) and re-sends into the near-miss corpus under the
+corrected check-3 rule — which is now sharp enough to say in advance which
+searches are worth starting.
+
 ## 2026-09-15 — round 46: five runners plus three re-sends, 17 matches, a HARD RULE that fails its own test, and a permuter candidate lost by writing up on time
 
 **State at end: 1123 matched / 1252 game functions (89.70%)**, up **17** from
