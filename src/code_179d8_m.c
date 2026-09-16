@@ -530,8 +530,16 @@ s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
  * body (236/241 built words, 5 words short) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F700);
 
-/* STALL -- see docs/match-reports/func_8002FAC4.md. Best body reached
- * (402/387 built words, 15 words LONG) preserved there in #if 0. */
+/* STALL -- see docs/match-reports/func_8002FAC4.md. Round 48 (echo):
+ * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
+ * frame gap: 0x140 -> 0x148, byte-exact vs retail). THIRD confirmed
+ * negative for length closure this round (same as func_8002F700 and
+ * func_8002EA44 above) -- built length UNCHANGED (402/387, still 15
+ * words LONG). This function's own report already diagnoses its gap as
+ * two unrelated residues (an early-materialization scheduling point, and
+ * a mid-loop addressing-cost difference for D_8008EA26 and neighbors) --
+ * frame padding does not touch either. Best body (402/387 built words,
+ * 15 words LONG) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002FAC4);
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
