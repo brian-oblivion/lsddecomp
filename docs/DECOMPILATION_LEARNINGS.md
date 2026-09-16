@@ -8157,3 +8157,179 @@ searched"; delta caught that and posted it before doing any work.
 second consecutive round in which it has done so (round 47: charlie narrowed a
 family-wide scaffold claim, echo narrowed a zero-ness rule). Post levers to it,
 and read the replies as evidence rather than as compliance.
+
+## Round 49 (2026-09-16): two new source-shape levers, and a negative that is scoped rather than general
+
+Five runners, Gate 3 (the fresh queue was two oversized reopened functions and
+`uncarved.py` reports **0** uncarved game code — carving is permanently gone,
+not merely thin this round). The round was staffed on a deliberate premise:
+**stale verdicts, not cold ground.** `code_55dd4` had not been touched since
+round 33 and `DreamSys` since round 39, so every lever found in the intervening
+ten to sixteen rounds had never been applied to them. That premise paid in the
+units where the residues were *structural* and did not pay where they were pure
+register identity — which is itself the round's sharpest result, below.
+
+### A repeated-global-address CSE is defeatable from C89 — use the asm-label alias
+
+Rounds 44 and 46 both filed the same residue as possibly needing a toolchain
+escalation: **retail computes a global's address twice (two `lui`/`addiu`
+pairs), and GCC 2.6.3 common-subexpression-eliminates our two reads into one
+shared computation.** It does not need an escalation. Declare a SECOND extern
+name bound to the same linker symbol with the GNU asm-label extension, and read
+the second occurrence through the alias:
+
+```c
+extern SByte3_d294 D_8008A8F8_b __asm__("D_8008A8F8");   /* alias of D_8008A8F8 */
+```
+
+The two reads are now textually distinct symbols, so there is nothing for CSE
+to fold, and the linker resolves both to the same address. This closed
+`func_8003E968` (41/41, whole-image byte-exact).
+
+**This is established precedent, not a new liberty, and it was confirmed by
+grep rather than by reasoning about intent** — `grep -rn '__asm__("[A-Za-z_]' src/`
+finds six byte-verified uses already in `src/code_179d8_m.c` (`D_8008D988Edd4`,
+`D_8008D996Edd4`, `D_8008D99AEdd4`, `D_8008D99CEdd4`, `D_8008D9A3Edd4`,
+`D_8006DAD4Edd4`), all predating this round.
+
+**And it is NOT the construct HARD RULE 6 bans.** The ban is on fixing REGISTER
+IDENTITY via `register T v asm("$N")` or an operand constraint. An asm-label on
+an extern DECLARATION renames a *linker symbol*; it cannot name a register and
+cannot change which register holds anything. (Confirmed at the same time: zero
+operand-constraint forms anywhere in `src/` — the eight legitimate ones live
+inside `include/gte.h`'s macros, exactly where CLAUDE.md says they do.)
+
+`volatile` also defeats the CSE and is the wrong tool: measured the same round,
+it produces a far worse shape — its own stack frame plus a runtime `memcpy`
+call. The alias costs nothing extra.
+
+### "Name it, THEN barrier it" is a two-part lever, and neither half works alone
+
+`func_8003D73C`'s `sll`/`lw` scheduling swap survived five hand attempts and a
+27,000-iteration permuter search across rounds 12-46. What closed the length gap
+was declaring the independent sub-computation as a named local **and** placing a
+bare `__asm__("")` barrier immediately after that declaration, before it is
+consumed:
+
+```c
+s32 delta = counter * 10;
+__asm__("");                /* pin the multiply before the reload */
+```
+
+**Neither half alone does anything** — named-temp-only reproduces the old
+baseline byte-for-byte, which matters because "I already tried naming a temp" is
+a commonly recorded axis and is *not* a test of this lever. Length went exact
+(145/145, zero drift) for the first time in that function's history, from a
+4-round-old 1-word-short state whose 50/145 raw figure was drift-poisoned.
+
+**The counter-negative arrived in the same round and is as important as the
+lever.** The identical lever applied to `func_8003DAD4`'s *textually identical*
+line regresses it 114/118 → 14/118 with ~232KB of drift: that function's
+compiled form was never exhibiting the swap the lever fixes. And applied to
+`func_8003ECD0` it regressed 71/73 → 67/73, because that residue is an
+arithmetic regrouping rather than a scheduling swap. **A lever does not transfer
+across a shared idiom. Verify per function.**
+
+### `do{...}while(0)` is a REGISTER-PRESSURE lever, not a scheduling lever
+
+Round 47 found `do{...}while(0)` narrowing a register-rotation residue, and
+round 48 used it (with an asymmetric pointer cache) to close 28 words. Round 49
+measured what it does to a *pure delay-slot-fill-choice* class, across four
+sites in two functions of `DreamSys`: **every one byte-identical, none
+regressed** — completely inert. And where it did move codegen, on
+`func_8005A9CC`, it moved it for the worse: it left the targeted
+`fill_eager_delay_slots` residue untouched and regressed an unrelated,
+already-matched `PlayerSpawnGridPos` struct-copy sequence through `v0`/`v1`
+register churn.
+
+So the wrapper perturbs *global* scheduling state via register pressure rather
+than acting on the local block. Stop reaching for it on residues that are a
+delay-slot CHOICE; its blast radius is not predictable from residue class or
+function size even among siblings with identical residue shapes.
+
+### A recorded negative is scoped to the STATE it was measured in
+
+Three independent confirmations this round, which promotes this from anecdote to
+standing practice. `func_8002B4D4` closed byte-exact on a fix that rounds **19
+and 20 had rejected twice** — it worked the third time only because an unrelated
+residue had been cleared first, changing the register-pressure state the earlier
+negatives were measured under. Round 48's bravo made the same point from the
+axis direction ("investigated exhaustively" is a claim about which axes were
+tried). Delta's two counter-negatives above are the same rule seen from the
+other side: a *positive* is scoped too.
+
+Practical form: **if you have changed anything else in the function since a
+lever was rejected, the rejection has expired.** Re-try it.
+
+### "Never re-searched" and "never went below base" are DIFFERENT signals
+
+Alpha's screening finding, and it should govern how fresh search budget is
+ranked. `func_80065A5C` has 192,610 prior iterations that **never once went
+below base score 15** — a genuinely empty search space. `func_800662BC` has a
+small number of known, already-closed candidates that every new campaign
+re-finds (round 49's 48,607 fresh iterations reproduced exactly the two
+candidates already disqualified in rounds 24 and 31). Both read as "heavily
+searched, nothing found" in a report title; only the second is worth another
+campaign, and only if a new axis exists.
+
+Related, same runner: **round 18's manual `PERM_GENERAL` combinatorial
+enumeration (24 concrete combinations) is not the same coverage as an open
+random search.** Track the two separately when judging whether a function "has
+been permuter-searched" — several of this unit's reports conflated them.
+
+### Check 3's AGREEMENT verdict is about the SCAFFOLD, not about every candidate
+
+Round 47 established the three-outcome signature table for deciding whether a
+search is meaningful. Round 49 adds the boundary: a scaffold whose starting
+signature AGREES with the real build's residue still emits individual candidates
+that are whole-file or frame-size effects invisible to the linear penalty model.
+Alpha hit this twice — a `--stack-diffs` score of exactly **0** on
+`func_80065AE0` translated to 28/40 with an 8-byte frame overshoot in the real
+build, and a 220 on `func_80065E1C` translated to 35/68 with drift.
+
+**So check 3 licenses the SEARCH, not its output. Translate and measure every
+candidate you intend to act on — especially a zero.**
+
+### The `--no-nop-mflo-mfhi` re-search that looks obviously worth running, and is not
+
+A plausible-looking claim, measured and rejected before it cost a runner-round:
+*permuter negatives recorded before round 42 are void for any function using
+`mflo`/`mfhi`, because `--no-nop-mflo-mfhi` did not exist yet.*
+
+The **mechanism is real.** Through the pinned pipeline, on a reproducer with
+`div`/`mult` pairs, dropping the flag makes maspsx insert padding and turns 42
+instructions into 44.
+
+The **scope is not.** The hazard form is specifically `mflo`/`mfhi` followed
+**within one or two instructions** by `mult`/`div`. Screened across all seven
+candidate functions with a pre-round-42 negative and an `mflo`/`mfhi` anywhere
+in the body (`func_80066340`, `func_8003149C`, `func_80030E90`, `func_80063144`,
+`func_80032708`, `func_8004B700`, `func_8004CFB8`), the nearest `mult`/`div`
+after any `mflo`/`mfhi` is **8 to 107 instructions away — zero hazard pairs.**
+Those negatives stand as real evidence.
+
+This is CLAUDE.md's *"a blocker's SCOPE is measured, not reasoned"* applied to a
+blocker's **death** rather than its life, and it is recorded here because the
+re-search is exactly the kind of tidy-looking inference a future round will
+re-derive and act on.
+
+### Two method errors by the head, both caught, both worth copying the fix from
+
+**A false `IDENTICAL` from a comparison where both sides failed.** The first run
+of the flag measurement above printed `IDENTICAL` — because zsh does not
+word-split `$1`, so maspsx received the entire flag string as one argument and
+crashed on *both* sides, leaving `as` to assemble empty input twice. Two objects
+produced by the same failure compare equal. **A comparison is only evidence if
+each side is independently known to have succeeded** — check exit status and
+output size per side before comparing, and prefer `bash -c` for a pipeline whose
+flags come from `$(...)`.
+
+**Never conclude from a filtered diff that something is absent.** Trying to
+recover an unreported search result, the head diffed a candidate against its
+base, passed the diff through a keyword `grep`, saw only brace reflow and
+`asm`/`__asm__` spelling, and concluded the candidate was semantically identical
+— i.e. that a 625→280 score move came from nothing. Compiling both through the
+permuter's own `compile.sh` gave **1196 vs 1212 bytes, objects DIFFER.** The
+change was real and the filter had removed it. **The decisive test for "is this
+candidate really different" is compiling both and comparing the objects**, which
+costs a second; reading source is not a substitute.
