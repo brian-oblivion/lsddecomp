@@ -7892,6 +7892,46 @@ shape and its scaffold DISAGREES with the real build (1 reordering, 6
 insertions, 6 deletions against zero drift), so its search was correctly
 declined. Check the signature first.
 
+### Two levers from the re-send, both oracle-verified, neither a match
+
+The re-sent runner closed nothing and still produced the round's two most
+transferable findings. **A zero-match pass is not a wasted pass** — this is the
+third round to measure that, and it is why re-sends keep being worth the slot.
+
+- **`do { return; } while (0)` around a single-statement early return is NOT a
+  no-op for GCC 2.6.3.** It changes basic-block shape enough to alter register
+  allocation elsewhere in the function: `func_800344FC` went 61/70 → 62/70,
+  narrowing a register-rotation residue from 9 words to 8. It looks like
+  syntactic noise and was verified through the real oracle, not the permuter's
+  scorer.
+  **Its scope, measured the same round:** applying it wholesale to all four
+  returns of `func_80034138` regressed that function catastrophically (66/69 →
+  1/69, 210365 bytes of drift). So it is a per-return experiment, never a
+  whole-function rewrite.
+- **A scaffold whose insertion/deletion count is far from 0/0 is a reason to
+  RUN check (c), not a reason to decline the search.** `func_8004B030`'s
+  scaffold showed 6 insertions / 6 deletions; the real in-tree build showed the
+  identical insertions and deletion at the identical score, so scaffold and
+  real build AGREE and the harness is representative. Searching on that basis
+  gave **19/52 → 22/52**. The discriminator is AGREEMENT between the two
+  measurements; zero-ness is merely its commonest form. See `PARALLEL-RUNS.md`
+  Gate 3, where the head's own table had to be corrected for exactly this.
+
+### Distinguishing "spent" from "hard", and saying which
+
+The re-send re-confirmed five `code_179d8_g` and `class_3ac78` near-misses as
+**already spent** rather than re-litigating them — reading 600-to-1255-line
+reports and reporting which routes were dead, including one
+(`func_8002B3F4`) where the permuter HAD found a genuine zero in round 19 that
+was rejected because it corrupts a sibling's `.bss` address. It also caught
+itself re-deriving a negative round 39 had already recorded, with the same
+260994-byte drift figure, and **said so instead of padding the report**.
+
+That is the disposition round 33 asked for and it is worth naming as a skill:
+**"this was exhausted before I arrived, and here is the evidence" is a
+result.** It lets the next round rank on COST rather than re-deriving it, which
+is the one thing a title line cannot carry.
+
 ### Negatives worth as much as the levers
 
 - **Four `code_179d8_h`/`code_179d8_j` near-misses fail permuter check (b)
