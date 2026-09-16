@@ -511,8 +511,17 @@ s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
     return sum;
 }
 
-/* STALL -- see docs/match-reports/func_8002F700.md. Best body reached
- * (237/241 built words, 4 words short) preserved there in #if 0. */
+/* STALL -- see docs/match-reports/func_8002F700.md. Round 48 (echo):
+ * tested charlie's func_800351D0 frame-padding lever (u8 dead[8], sized to
+ * the CURRENT BUILD's frame gap: -0x30 -> -0x38, byte-exact vs retail) plus
+ * an "s32 count" fix (avoid a spurious `andi 0xff` mask GCC inserted for a
+ * u8 local). Result: raw word-match improved 49/241 -> 93/241, but total
+ * length moved to 236/241 (5 words short, was 4) -- the frame padding
+ * recovers BYTE-OFFSET alignment exactly but adds no instructions (an
+ * addiu immediate costs the same one word regardless of value), so it
+ * does not by itself close a missing-CONTENT gap the way it did for
+ * func_800351D0 (which also gained words from tail duplication). Best
+ * body (236/241 built words, 5 words short) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F700);
 
 /* STALL -- see docs/match-reports/func_8002FAC4.md. Best body reached
