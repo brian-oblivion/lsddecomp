@@ -33,13 +33,21 @@ typedef struct Pos18 {
 
 typedef struct Obj80027480 Obj80027480;
 
-/* This class's own methods table -- only the two slots func_80027800 reads
- * through are named (offsets 0x48/0x64). */
+/* This class's own methods table -- the slots func_80027800 and
+ * func_80027A24 dispatch through (offsets 0x44/0x48/0x4C/0x54/0x58/0x64/
+ * 0x70). */
 typedef struct Methods80027480 {
-    u8 pad0[0x48];
+    u8 pad0[0x44];
+    s32 (*slot44)(Obj80027480 *self, void *arg1, s32 arg2, s32 arg3);
     s32 (*slot48)(Obj80027480 *self);
-    u8 pad4C[0x64 - 0x4C];
+    s32 (*slot4C)(Obj80027480 *self, s32 arg1, s32 arg2);
+    u8 pad50[0x54 - 0x50];
+    s32 (*slot54)(Obj80027480 *self, s32 arg1, s32 arg2);
+    s32 (*slot58)(Obj80027480 *self, void *arg1);
+    u8 pad5C[0x64 - 0x5C];
     s32 (*slot64)(Obj80027480 *self);
+    u8 pad68[0x70 - 0x68];
+    s32 (*slot70)(Obj80027480 *self);
 } Methods80027480;
 
 struct Obj80027480 {
@@ -51,7 +59,7 @@ struct Obj80027480 {
     Pos18 unk18; /* CdlLOC-shaped position */
     u32 unk1C;
     u16 unk20;
-    u8 pad22[0x24 - 0x22];
+    u16 unk22;
     s32 unk24;
     u16 unk28;
 };
@@ -266,10 +274,17 @@ extern void func_80026B08(void);
 extern void *D_8008A888;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
- * reading); only offset 0x0 is touched here -- declared LOCAL, per the
- * project's multiple-local-views convention. */
+ * reading) -- declared LOCAL, per the project's multiple-local-views
+ * convention. func_80027800 only touches unk0; func_80027A24 (below) reads
+ * the rest of this unit's own fields, up through unk18. */
 typedef struct Node8008A894 {
     s32 unk0;
+    s32 unk4;
+    s32 unk8;
+    Obj80027480 *unkC;
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
 } Node8008A894;
 
 extern Node8008A894 *D_8008A894;
