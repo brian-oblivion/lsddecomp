@@ -1417,6 +1417,55 @@ acting on it costs one command.
 **Gate 2 — carve to refill.** If fresh-assignable functions are fewer than
 roughly (runners × per-runner target), carve new units BEFORE provisioning.
 
+> **ROUND 47 (2026-09-16): THERE IS NOTHING LEFT TO CARVE. `uncarved.py`
+> reports ZERO uncarved game functions, and this gate has no source of work
+> any more.** Round 47 took the last three segments — `code_179d8_s` (7
+> functions, 620w), `class_3bb8c_q` (2) and `main` (2) — each verified
+> byte-exact on its own before the next.
+>
+> **Re-run the tool; do not believe this paragraph either.** It is written as
+> a standing change rather than a snapshot because the only way it reverses is
+> a re-segmentation, which would be somebody's deliberate act. But that is an
+> argument about *likelihood*, and this document's own most expensive failures
+> are all notes that were true when written. `python3 tools/uncarved.py` costs
+> a second.
+>
+> **What this changes for every later round:** the queue is now *entirely*
+> near-miss and stall work, so Gate 1b is the only queue there is and Gate 2
+> can no longer rescue a thin `fresh` column. A round that finds `fresh` low
+> must choose between re-sends into the near-miss corpus (round 19: 9 of 17
+> matches came from second, third and fourth passes) and a permuter round —
+> carving is off the menu. Staffing plans that assumed "carve if thin" need
+> the other branch.
+>
+> **Two carve hazards found taking the last three, both new:**
+>
+> - **A `dlabel` in a `.text` `c` segment is emitted to NO FILE, and the carve
+>   builds green ONCE before failing on the next `make extract`.** `main`'s
+>   tail is the C-runtime startup, which spimdisasm labels `dlabel` because it
+>   ends in four literal non-instruction words. The first attempt produced
+>   `src/main.c` with an `INCLUDE_ASM` for it, linked, and verified byte-exact
+>   — then the next extraction did not regenerate
+>   `asm/nonmatchings/main/func_8001199C.s` and the build went red with
+>   `can't open ... for reading`. A runner in a fresh worktree would have met
+>   that with nothing in its own transcript explaining it. **The fix is to
+>   split the data tail into its own `asm` segment**, after which the carve
+>   survives repeated extraction. Gate 2's existing "the segment's tail is
+>   DATA" failure describes a red LINK; this one is a red EXTRACT, one step
+>   earlier, and it is only visible if you extract TWICE.
+> - **Verify a carve by extracting twice, not once.** That is the general form
+>   of the above and it costs two seconds. A single green build after a carve
+>   proves the segmentation assembles; it does not prove it REGENERATES.
+>
+> And one that was documented and worked exactly as written: `code_179d8_s`
+> needed round 14's shared-rodata-slot split. The 0xFD8 slot holds two strings
+> and two jump tables; the tables' words are `.L` labels local to
+> `func_80027A24`'s own `.s` (attach required), while the strings are
+> `%hi`-taken by `code_179d8_q` and `code_179d8_h` (attach would break them).
+> Split at 0x1010 by ownership, established with one `grep -rl` per symbol.
+> Doing it at CARVE time rather than discovering it as a link error is what
+> the recipe is for.
+
 **"Most of the game is still uncarved, so this gate fires early and often" was
 true for twenty-odd rounds and IS NO LONGER TRUE. Measure before you believe
 it — the tool is `tools/uncarved.py` and it exists because this gate's own
