@@ -141,9 +141,15 @@ extern u8 D_8008EA1A;
  * when set to 1. */
 extern s16 D_8008E8C0;
 
-/* STALL -- see docs/match-reports/func_8002EA44.md. Best body reached
- * (223/228 built words, 5 words short; 13/228 raw word-match, drift-
- * affected so not itself a distance measure) preserved there in #if 0. */
+/* STALL -- see docs/match-reports/func_8002EA44.md. Round 48 (echo):
+ * tested charlie's frame-padding lever (u8 dead[8], sized to the current
+ * build's frame gap: -0x10 -> -0x18, byte-exact vs retail). Frame realigns
+ * exactly but built length is UNCHANGED (222/228, still 6 words short) --
+ * same negative-for-length-closure result as func_8002F700. The
+ * already-diagnosed missing early-persisted value ($t1 = idx<<3, held live
+ * across the whole function) is still the real gap; frame padding does not
+ * touch it. Best body (222/228 built words, 6 words short) preserved there
+ * in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
 
 extern void _spu_setInTransfer(s32 a0);
