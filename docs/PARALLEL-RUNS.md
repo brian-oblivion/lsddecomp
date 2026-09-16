@@ -2446,6 +2446,48 @@ scaffold is near 0/0.
 > from the real translation unit for call-chain-heavy functions is a TOOLING
 > question**: measure it, decline the search, write it down, escalate. Do not
 > fix or work around the scaffold mid-round.
+>
+> > **ROUND 47 NARROWS THIS, AND THE HEAD IS WHO GOT IT WRONG.** The sentence
+> > above — *"for a family with a demonstrated scaffold mismatch, every
+> > recorded 'permuter tried, negative' reverts to UNKNOWN"* — went into round
+> > 47's opening broadcast as "every recorded permuter negative in the
+> > `class_3bb8c`/`Obj866E8` family is void". That is a family-wide claim built
+> > from a five-function measurement: CLAUDE.md's *"a blocker's SCOPE is
+> > measured, not reasoned"*, committed by the head, in the one message every
+> > runner was told to act on.
+> >
+> > Runner charlie ran check 3 across all six `class_3bb8c` stalls instead of
+> > believing it, and measured **2 of 6 mismatched, not 6 of 6**. The four
+> > others carry genuine negatives (183k, 184k, 37k and 34k iterations) that
+> > the blanket claim would have thrown away.
+> >
+> > **The obvious objection fails, which is what makes the narrowing safe to
+> > adopt.** Charlie read HISTORICAL scaffold records rather than building
+> > fresh ones, and round 46's finding came from freshly-built scaffolds — so
+> > the worry is that a historically-clean record proves nothing. Checked
+> > against the five CONFIRMED mismatches: they were **already dirty in their
+> > historical records too** (`func_8004CD38`'s round-18 scaffold: 4
+> > insertions / 5 deletions; `func_8004C93C`'s: 11/11, noted AT THE TIME as
+> > not the clean register-diffs-only signature). The historical record
+> > discriminates.
+> >
+> > **So check 3's usable form is a SIGNATURE COMPARISON, not a family label:**
+> >
+> > | scaffold `--debug --stack-diffs` | real build's residue | verdict |
+> > | --- | --- | --- |
+> > | pure register differences, ZERO ins/del/reorder | pure register identity at exact length | **AGREE** — the negative is real evidence |
+> > | NONZERO insertions/deletions | zero drift | **MISMATCH** — the search scored a program nobody is building |
+> >
+> > Confirmed mismatched so far, and no others: `func_8004BB3C`,
+> > `func_8004C1C0`, `func_8004CAF0`, `func_8004C93C`, `func_8004CD38`.
+> >
+> > Two lessons, and the second is the general one. **A family is not the right
+> > granularity for this verdict; the per-function signature is** — which is
+> > round 10's *"the right MECHANISM at the wrong GRANULARITY"* arriving at
+> > Gate 3. And **a cheap-model runner measuring the head's claim instead of
+> > obeying it is the protocol working**: the broadcast exists so corrections
+> > travel, and it carried one UPWARD. Post levers to it, and read the replies
+> > as evidence rather than as compliance.
 
 **Never authorized — always an operator escalation, evidence attached:**
 toolchain or flag changes of any kind; editing the protected verification files;
