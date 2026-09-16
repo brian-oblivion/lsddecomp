@@ -388,12 +388,13 @@ void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
     func_8004C93C(self);
 }
 
-/* STALL -- see docs/match-reports/func_8004B030.md. Best reached: 19/52
- * words in-range, correct size, no address drift. Restored to
- * INCLUDE_ASM per project rule. Field names below use the CURRENT
- * HistoryEntry_3ac78 layout (round 19, echo -- was unk90/92/94/96 in the
- * report's own preserved body, before func_8004B100's field-shape
- * correction). */
+/* STALL -- see docs/match-reports/func_8004B030.md. Best reached: 22/52
+ * words in-range, correct size, no address drift (round 47, echo --
+ * up from 19/52, via a permuter-found lead translated and oracle-
+ * verified). Restored to INCLUDE_ASM per project rule. Field names below
+ * use the CURRENT HistoryEntry_3ac78 layout (round 19, echo -- was
+ * unk90/92/94/96 in the report's own preserved body, before
+ * func_8004B100's field-shape correction). */
 #if 0
 void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
 {
@@ -408,19 +409,17 @@ void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
     b2 = arg1->unk2;
     b3 = arg1->unk3;
     raw3 = b3;
-    width = count;
+    width = (height = count);
 
     if (b2 != 0) {
         col = b2 - 1;
     } else {
-        col = b2;
         width = count - 1;
     }
     if (b2 == 0x13) {
         width -= 1;
     }
 
-    height = count;
     if (raw3 != 0) {
         row = raw3 - 1;
     } else {
@@ -437,6 +436,7 @@ void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
     self->unk8C.e[0].row = row;
     self->unk8C.e[0].width = width;
     self->unk8C.e[0].height = height;
+    col = b2;
 }
 #endif
 
