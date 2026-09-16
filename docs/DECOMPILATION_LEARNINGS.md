@@ -1237,6 +1237,16 @@ worth reading for its axis — that is what closed `strcpy`.
 
 ### A third escape from the `sltiu` boolean-materialization fold (round 18)
 
+> **INSTANCE WITHDRAWN (round 47, head). `func_80028C54` IS SONY'S** --
+> converted to a linked SDK object in round 34, so it was never game code and
+> the "matched 27/27" below was never a match of ours. Round 38's rule: an SDK
+> exit voids a precedent retroactively and totally, because no source shape of
+> ours ever reached those bytes. **What survives is the SHAPE as a hypothesis
+> to test**, since the two escapes it extends are round 17's and are
+> independent of this instance; what does NOT survive is any claim that this
+> form was confirmed against retail by our pipeline. Nobody has demonstrated
+> the third escape on a game function. Treat it as untested.
+
 Round 17 established two ways out of GCC 2.6.3's branchless `sltiu`
 materialization (a side effect in an arm; return values that are not a bare
 0/1 pair). `func_80028C54` (matched 27/27) adds a third, and it is the one that
@@ -4444,13 +4454,17 @@ wrong and the distinguishing factor is elsewhere.
   identical — you get a redundant duplicate bounds check retail does not have.
   Recurred twice in one round in unrelated units (`func_8005281C`,
   `func_8002C014`). Its inverse is also a real fix: where retail HAS only one
-  check, `guard + do-while` is what expresses that (`func_800323A8`, verified
-  with a standalone toolchain reproducer).
+  check, `guard + do-while` is what expresses that (`func_800323A8` -- **a
+  SONY object since round 33, so do not go read it as a worked example; the
+  claim stands anyway because it was verified with a standalone toolchain
+  reproducer through the pinned pipeline, which does not care who wrote
+  retail's bytes**).
 - **A loop-carried multiplicand must be recomputed from the loop counter, not
   accumulated with `+=`.** cc1 strength-reduces a constant multiply over an
   induction variable, so a `+=`-accumulated value produces the wrong shape;
   recomputing it by multiplication each iteration reproduces retail.
-  (`func_800323A8`, verified with a standalone reproducer.)
+  (`func_800323A8` -- **a Sony object since round 33; the claim stands on its
+  standalone reproducer, not on that instance**.)
 - **A genuine C `switch` is not interchangeable with an if/else chain**, and
   the difference is worth attempts: switching `func_80032708` from if/else to
   a real `switch` moved it 24 -> 65/164. This is a DISTINCT finding from the
@@ -4465,6 +4479,21 @@ wrong and the distinguishing factor is elsewhere.
   pays for the frame. Read it that way and type it from whether the callee
   sets `$v0`, not from the presence of a frame.
 
+  > **THE PROMOTING NEGATIVE CHECK IS ENTIRELY SONY'S CODE (round 47, head).**
+  > All four functions it names were converted to linked SDK objects in round
+  > 34. Apply round 43's split rather than throwing the entry away, because
+  > the two halves land differently:
+  > - **The READING HEURISTIC survives** — "a framed, `$ra`-saving,
+  >   one-call-and-return body in retail is still `return callee(fwd-args);`"
+  >   is a claim about how to read retail's bytes, and it does not care which
+  >   assembler produced them.
+  > - **The CODEGEN claim does not** — *"GCC 2.6.3 here always pays for the
+  >   frame"* is a claim about OUR compiler, and every instance offered in
+  >   support of it came out of Sony's ASPSX build. That is not a negative
+  >   check of our pipeline; it is a survey of somebody else's. **The entry is
+  >   promoted on evidence it does not have.** Re-earning it costs one
+  >   standalone reproducer through the pinned pipeline, which nobody has run.
+  >
   **Promoted because the negative was checked, on request:** every
   single-call forwarding wrapper across two passes of `code_179d8_b`
   (`func_80028D68`, `func_80028D88`, `func_80029234`, `func_80029254`) pays
@@ -5203,7 +5232,21 @@ compiler behaviour that was only ever tested along one axis.**
 
 ### New residue classes opened this round (not yet closed)
 
-- **NEW, round 16: the "retry-loop driver" cluster — three instances of ONE
+- > **CLASS WITHDRAWN (round 47, head). ALL THREE INSTANCES ARE SONY'S** --
+  > `func_80028DF0`, `func_80028F38` and `func_80029074` were all converted to
+  > linked SDK objects in round 34. This named class therefore has **zero
+  > game-code instances**, which is exactly the failure round 43 found in the
+  > "DCE-eliminated always-true check" learning. The ~90 manual attempts and
+  > ~70k permuter iterations recorded below were spent on Sony's code.
+  > **The keep/withdraw split (round 43):** residue 1's *reproducer* survives
+  > — it was run through the pinned pipeline on a from-scratch shape and does
+  > not care who wrote retail's bytes, and its finding ("the divergence is not
+  > a toolchain defect") still stands. Residue 2's prologue register-mapping
+  > puzzle does NOT: it compares our output against **Sony's ASPSX build**,
+  > not against our compiler's target, so it rules out nothing about GCC
+  > 2.6.3. Do not cite this cluster as precedent for a game function.
+  >
+  **NEW, round 16: the "retry-loop driver" cluster — three instances of ONE
   shape, stalled on two cross-confirmed residues.** `func_80028DF0`,
   `func_80028F38` and `func_80029074` (`code_179d8_b`) are the same
   retry-loop driver, fully reverse-engineered (control flow, the
@@ -5232,7 +5275,19 @@ compiler behaviour that was only ever tested along one axis.**
   same two residues is what turns "a hard function" into a named class, and
   it is why a zero-match pass that files reports is not a wasted pass.
 
-- **NEW, round 16: commutative-operand SLOT order in `addu`, not reachable
+- > **CLASS WITHDRAWN (round 47, head). ITS ONLY INSTANCE IS SONY'S** --
+  > `func_800323A8` was converted to a linked SDK object in round 33. This is
+  > round 43's SHARPER case, and the sharpness is the point: the claim is
+  > *"retail encodes `addu $v0,$a0,$v0` where our build encodes
+  > `addu $v0,$v0,$a0`"*, which compares our pinned pipeline against **a
+  > different assembler's output**. A negative there rules out nothing about
+  > GCC 2.6.3 and a positive would have proved nothing either. "Sixteen
+  > confirmed instances" is sixteen instances inside one Sony function, not
+  > sixteen functions. **No game function has ever exhibited this.** If you
+  > meet an `rs`/`rt` slot swap in game code, it is a new finding and needs
+  > its own standalone reproducer — not a citation of this entry.
+  >
+  **NEW, round 16: commutative-operand SLOT order in `addu`, not reachable
   from C.** In `func_800323A8` every one of sixteen field accesses has retail
   encoding `addu $v0,$a0,$v0` where the build encodes `addu $v0,$v0,$a0` —
   same two registers, same values, same order, confirmed identical at every
