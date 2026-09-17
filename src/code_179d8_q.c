@@ -1,3 +1,31 @@
+/*
+ * code_179d8_q -- the CD-ROM read driver.
+ *
+ * This unit is the module-level half of the class whose method table is
+ * D_8006D4E8 (header word 0x13; the object itself and its read/seek/close
+ * methods are code_179d8_s, its constructor code_179d8_o). It owns four
+ * things, all of them singleton state in .sdata:
+ *
+ *   - the file table: an array of 0x1C-byte CdFileEntry records (name, disc
+ *     position, size) at gFileTable/gFileTableCount, whose positions
+ *     ResolveFileEntries fills in with CdSearchFile;
+ *   - the driver mode: gCdAsyncEnabled and gCdUseVSyncCallback, set through
+ *     SetCdDriverMode, which decide whether a request is queued and serviced
+ *     in the background or performed by a blocking CdSync spin;
+ *   - the request queue's front door: EnqueueCdRequest appends a node to the
+ *     D_8008A894 list (code_179d8_r owns the list itself) and starts the
+ *     service;
+ *   - the service pump: ServiceCdDriver, installed as a VSyncCallback (or as
+ *     a callback on the singleton func_80020C5C returns), which ticks
+ *     code_179d8_r's CD state machine and drains the request queue, plus
+ *     LockCd/UnlockCd, the latch that keeps that tick out of a half-updated
+ *     queue.
+ *
+ * code_171e0.c reaches all of this through wrappers gated on
+ * `D_8008A84C == 0x13`, this class's header word; the other value that gate
+ * takes, 0x23, selects the SPU/VAB streamer in code_179d8_e.c. So the two
+ * are interchangeable data sources behind one small dispatch layer.
+ */
 #include "common.h"
 
 /* --- local views of the D_8006D4E8 class ---------------------------------
