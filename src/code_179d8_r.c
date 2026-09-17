@@ -6,15 +6,15 @@
  * attempted before this round.
  *
  * This slice and the adjacent code_179d8_q (runner echo) share callees
- * func_800280D0 (lock: D_8008A88C = 1) and func_800280E0 (unlock:
- * D_8008A88C = 0), both defined in code_179d8_q.c. Declared locally here,
+ * LockCd (lock: gCdLock = 1) and UnlockCd (unlock:
+ * gCdLock = 0), both defined in code_179d8_q.c. Declared locally here,
  * never in a shared header -- see CLAUDE.md on per-unit local views.
  *
  * The slice implements a small CD-read state machine:
- *   - D_8008A878 holds the current state/phase.
+ *   - gCdState holds the current state/phase.
  *   - D_8008A8A0 is a timeout counter, reset by func_80028888.
  *   - func_8002858C / func_800286E4 are near-identical per-tick state
- *     machine steps (driven from func_800280EC in code_179d8_q via
+ *     machine steps (driven from ServiceCdDriver in code_179d8_q via
  *     D_8008A898 == 1 / == 2), differing only in their state==2 and
  *     state==8-success handling.
  *   - func_80028844 / func_80028864 are the "start" / "reset" bookends of
@@ -23,12 +23,12 @@
  *     append/remove+free pair over 0x24-byte nodes, list head D_8008A894.
  *   - func_80028448 / func_800284C4 / func_80028540 are linear-scan /
  *     index helpers over a flat table of 0x1C-byte string records based at
- *     D_8008A868, count D_8008A86C.
+ *     gFileTable, count gFileTableCount.
  */
 
 /* lock/unlock, defined in code_179d8_q.c (runner echo's unit). */
-extern void func_800280D0(void);
-extern void func_800280E0(void);
+extern void LockCd(void);
+extern void UnlockCd(void);
 
 /* Psy-Q CD-ROM library, linked from lib/libcd/sys.o. Locally typed the same
  * way code_179d8_h.c already types this unit's own call sites. */
@@ -57,12 +57,12 @@ typedef struct Node8008A894 {
 
 extern Node8008A894 *D_8008A894; /* list head */
 
-extern s32 D_8008A864; /* "busy" flag, 0/1 */
-extern char *D_8008A868; /* base of a table of 0x1C-byte string records */
-extern s32 D_8008A86C;   /* record count */
-extern s32 D_8008A870;   /* "idle"/"ready" flag, 0/1 */
-extern s32 D_8008A874;   /* context value stashed by func_80028844 */
-extern s32 D_8008A878;   /* CD state-machine phase */
+extern s32 gCdBusy; /* "busy" flag, 0/1 */
+extern char *gFileTable; /* base of a table of 0x1C-byte string records */
+extern s32 gFileTableCount;   /* record count */
+extern s32 gCdIdle;   /* "idle"/"ready" flag, 0/1 */
+extern s32 gCdOperation;   /* context value stashed by func_80028844 */
+extern s32 gCdState;   /* CD state-machine phase */
 extern void *D_8008A87C; /* CdControlF param pointer */
 extern s32 D_8008A880;   /* CdRead sector count */
 extern void *D_8008A884; /* CdRead target buffer */
@@ -76,7 +76,7 @@ Node8008A894 *func_8002832C(void)
     Node8008A894 *head;
     Node8008A894 *cur;
 
-    func_800280D0();
+    LockCd();
     node = func_80017B34(0x24);
     if (node != NULL) {
         head = D_8008A894;
@@ -97,7 +97,7 @@ Node8008A894 *func_8002832C(void)
             D_8008A894 = node;
         }
     }
-    func_800280E0();
+    UnlockCd();
     return node;
 }
 
@@ -106,7 +106,7 @@ void func_800283C4(Node8008A894 *node)
     Node8008A894 *prev;
     Node8008A894 *next;
 
-    func_800280D0();
+    LockCd();
     if (node != NULL) {
         prev = node->prev;
         if (prev != NULL) {
@@ -120,40 +120,40 @@ void func_800283C4(Node8008A894 *node)
         }
         func_80017CFC(node);
     }
-    func_800280E0();
+    UnlockCd();
 }
 
 void *func_80028448(char *arg0)
 {
-    char *cur = D_8008A868;
+    char *cur = gFileTable;
     s32 i = 0;
 
-    func_800280D0();
+    LockCd();
     do {
         if (strstr(cur, arg0) != NULL) {
-            func_800280E0();
+            UnlockCd();
             return cur;
         }
         i++;
         cur += 0x1C;
-    } while (i < D_8008A86C);
+    } while (i < gFileTableCount);
     return NULL;
 }
 
 s32 func_800284C4(char *arg0)
 {
-    char *cur = D_8008A868;
+    char *cur = gFileTable;
     s32 i = 0;
 
-    func_800280D0();
+    LockCd();
     while (strstr(cur, arg0) == NULL) {
         i++;
-        if (i >= D_8008A86C) {
+        if (i >= gFileTableCount) {
             return -1;
         }
         cur += 0x1C;
     }
-    func_800280E0();
+    UnlockCd();
     return i;
 }
 
@@ -162,10 +162,10 @@ void *func_80028540(s32 index)
     void *result;
     char *base;
 
-    base = D_8008A868;
-    func_800280D0();
+    base = gFileTable;
+    LockCd();
     result = base + index * 0x1C;
-    func_800280E0();
+    UnlockCd();
     return result;
 }
 
@@ -180,8 +180,8 @@ void func_8002858C(void)
     s32 v1;
     s32 newstate;
 
-    func_800280D0();
-    state = D_8008A878;
+    LockCd();
+    state = gCdState;
 
     if (state == 2)
         goto L_state2;
@@ -248,7 +248,7 @@ L_set:
     func_80028888(newstate);
 
 L_end:
-    func_800280E0();
+    UnlockCd();
 }
 
 void func_800286E4(void)
@@ -258,8 +258,8 @@ void func_800286E4(void)
     s32 newstate;
     void *tmp;
 
-    func_800280D0();
-    state = D_8008A878;
+    LockCd();
+    state = gCdState;
 
     if (state == 2)
         goto L_state2;
@@ -329,30 +329,30 @@ L_set:
     func_80028888(newstate);
 
 L_end:
-    func_800280E0();
+    UnlockCd();
 }
 
 void func_80028844(s32 arg0, s32 arg1)
 {
-    D_8008A864 = 1;
-    D_8008A874 = arg0;
-    D_8008A878 = arg1;
-    D_8008A870 = 0;
+    gCdBusy = 1;
+    gCdOperation = arg0;
+    gCdState = arg1;
+    gCdIdle = 0;
     D_8008A894->unk0 = 1;
 }
 
 void func_80028864(void)
 {
-    D_8008A874 = 0;
-    D_8008A878 = 0;
+    gCdOperation = 0;
+    gCdState = 0;
     D_8008A898 = 0;
-    D_8008A870 = 1;
+    gCdIdle = 1;
     D_8008A8A0 = 0;
-    D_8008A864 = 0;
+    gCdBusy = 0;
 }
 
 void func_80028888(s32 arg0)
 {
-    D_8008A878 = arg0;
+    gCdState = arg0;
     D_8008A8A0 = 0;
 }

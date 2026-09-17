@@ -56,13 +56,13 @@ assignment (undefined behavior), not a legitimate reshape.
 ## What it does
 
 Dispatches on `D_8008A84C` to pick one of two "ret" objects
-(`func_80027E68()` if `arg0 == 0x13`, else `func_8002C438()`), stores `arg0`
+(`GetClass6D4E8Methods()` if `arg0 == 0x13`, else `func_8002C438()`), stores `arg0`
 into `D_8008A84C`, then walks the function-pointer table `D_8006D4AC`
 (14 entries + a NULL sentinel, confirmed in `asm/data/5DB70.data.s`),
 calling `func_80026D88(val, ret)` before EVERY table read (including the
 first, before any table entry is even inspected), and — for every NON-NULL
 entry — calling that entry as `val = entry(val)` before advancing to the
-next slot and repeating. All 4 callees are cross-unit: `func_80027E68` /
+next slot and repeating. All 4 callees are cross-unit: `GetClass6D4E8Methods` /
 `func_8002C438` are shared with `func_80026CAC` (see that report), and the
 14 table entries are ordinary game functions elsewhere in the image.
 
@@ -151,7 +151,7 @@ void func_80026CFC(s32 arg0) {
 
     D_8008A84C = arg0;
     if (arg0 == 0x13) {
-        ret = func_80027E68();
+        ret = GetClass6D4E8Methods();
     } else {
         ret = func_8002C438();
     }
@@ -168,7 +168,7 @@ void func_80026CFC(s32 arg0) {
 ```
 
 (`extern s32 D_8008A84C;`, `extern void *func_8002C438(void);` and
-`extern void *func_80027E68(void);` are declared once earlier in this file,
+`extern void *GetClass6D4E8Methods(void);` are declared once earlier in this file,
 above `func_80026CAC`.)
 
 ## Proposed learning

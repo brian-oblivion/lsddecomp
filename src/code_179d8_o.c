@@ -29,7 +29,7 @@
  * why the cut is here: this window carries neither a jump table nor any
  * blocked-function stub-report debt.
  *
- * This unit calls out to func_80027E68 and func_80027E78, which are still
+ * This unit calls out to GetClass6D4E8Methods and InitCdDrive, which are still
  * INCLUDE_ASM in that remainder -- their prototypes belong in THIS file, not
  * in a shared header (this unit has none and should not acquire one).
  *
@@ -52,7 +52,7 @@
  * "allocate + construct" pair, and its constructor IS this same unit's
  * `func_80027228`, dispatched back through the class's own table (the
  * generic `new` doesn't call func_80027228 by name -- it fetches
- * func_80027E68()'s table and calls whatever sits at the ctor slot, which
+ * GetClass6D4E8Methods()'s table and calls whatever sits at the ctor slot, which
  * happens to resolve to func_80027228 for this class).
  *
  * This unit's own local view of the class-table framework it participates
@@ -80,7 +80,7 @@ struct Obj6D4E8Methods {
 
 typedef struct {
     Obj6D4E8Methods *methods;      /* +0x000, set by the constructor to this class's own table
-                                     * (func_80027E68()'s return value) -- the table-pointer-at-offset-0
+                                     * (GetClass6D4E8Methods()'s return value) -- the table-pointer-at-offset-0
                                      * convention CLAUDE.md documents for this project's class framework */
     u8 pad004[0x028 - 0x004];
     s16 unk28;                     /* +0x028, cleared by the constructor (a halfword store, `sh`) */
@@ -97,9 +97,9 @@ typedef struct {
 
 extern void *func_80017B34(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
 extern BaseCtorTable6D4E8 *func_80026C9C(void *self); /* still INCLUDE_ASM in the code_179d8 remainder */
-extern Obj6D4E8Methods *func_80027E68(void);        /* still INCLUDE_ASM in the code_179d8 remainder;
+extern Obj6D4E8Methods *GetClass6D4E8Methods(void);        /* still INCLUDE_ASM in the code_179d8 remainder;
                                                        returns this class's own table, &D_8006D4E8 */
-extern void func_80027E78(void);                    /* still INCLUDE_ASM in the code_179d8 remainder;
+extern void InitCdDrive(void);                    /* still INCLUDE_ASM in the code_179d8 remainder;
                                                        confirmed zero-argument the same way slot74 is above */
 
 Obj6D4E8 *new_class_6d4e8(void)
@@ -108,7 +108,7 @@ Obj6D4E8 *new_class_6d4e8(void)
 
     self = func_80017B34(0x2C);
     if (self != NULL) {
-        func_80027E68()->ctor(self);
+        GetClass6D4E8Methods()->ctor(self);
         return self;
     }
     return NULL;
@@ -117,9 +117,9 @@ Obj6D4E8 *new_class_6d4e8(void)
 void func_80027228(Obj6D4E8 *self)
 {
     func_80026C9C(self)->ctor(self);
-    self->methods = func_80027E68();
+    self->methods = GetClass6D4E8Methods();
     self->unk28 = 0;
-    func_80027E78();
+    InitCdDrive();
 }
 
 void func_80027274(Obj6D4E8 *self)

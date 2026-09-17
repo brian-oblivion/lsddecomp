@@ -15,15 +15,15 @@ Same `if`/`else` tail-call shape as `func_80026CAC` (see that report for the
 full residue analysis), mode `0x13` this time:
 
 ```
-beq $v1, $v0(0x13), .L80026FD0   # equal -> func_80027EF8
+beq $v1, $v0(0x13), .L80026FD0   # equal -> GetCdDriverMode
   jal func_8002C448               # fallthrough (not equal)
   j .L80026FD8
 .L80026FD0:
-  jal func_80027EF8
+  jal GetCdDriverMode
 .L80026FD8:
 ```
 
-Both callees (`func_80027EF8`, `func_8002C448`) are still uncarved
+Both callees (`GetCdDriverMode`, `func_8002C448`) are still uncarved
 (`asm/code_179d8.s` / `asm/nonmatchings/code_179d8_e/func_8002C448.s`).
 Treated as `s32`-returning per CLAUDE.md's tail-call caution (no positive
 void evidence, so default to non-void).
@@ -31,12 +31,12 @@ void evidence, so default to non-void).
 ## Final body
 
 ```c
-extern s32 func_80027EF8(void);
+extern s32 GetCdDriverMode(void);
 extern s32 func_8002C448(void);
 
 s32 func_80026FAC(void) {
     if (D_8008A84C == 0x13) {
-        return func_80027EF8();
+        return GetCdDriverMode();
     } else {
         return func_8002C448();
     }

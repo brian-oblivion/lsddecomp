@@ -20,7 +20,7 @@ returning its result:
 lw    $v1, %gp_rel(D_8008A84C)($gp)
 ori   $v0, $zero, 0x23
 beq   $v1, $v0, .L80026CD0     # D_8008A84C == 0x23 -> the "then" arm
-  jal func_80027E68             # fallthrough (not equal) -- called first in ROM order
+  jal GetClass6D4E8Methods             # fallthrough (not equal) -- called first in ROM order
   j .L80026CD8
 .L80026CD0:
   jal func_8002C438             # equal-to-0x23 arm
@@ -36,7 +36,7 @@ try, with the straightforward `if`/`else` written in source order.
 `func_8002C438` is confirmed elsewhere in the repo
 (`src/code_179d8_e.c`: `TableD9BC *func_8002C438(void) { return &D_8006D9BC; }`)
 to return a pointer, not void -- direct positive evidence this whole function
-is non-void per CLAUDE.md's tail-call caution. `func_80027E68` is still
+is non-void per CLAUDE.md's tail-call caution. `GetClass6D4E8Methods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
 (`code_179d8_h.c`, `code_179d8_o.c`) as returning a table pointer too, under
 each unit's own independent local type -- this report follows the same
@@ -47,13 +47,13 @@ each unit's own independent local type -- this report follows the same
 ```c
 extern s32 D_8008A84C;
 extern void *func_8002C438(void);
-extern void *func_80027E68(void);
+extern void *GetClass6D4E8Methods(void);
 
 void *func_80026CAC(void) {
     if (D_8008A84C == 0x23) {
         return func_8002C438();
     } else {
-        return func_80027E68();
+        return GetClass6D4E8Methods();
     }
 }
 ```
