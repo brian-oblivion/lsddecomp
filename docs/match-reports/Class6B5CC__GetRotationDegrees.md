@@ -318,3 +318,19 @@ the allocator a new temporary to shuffle without addressing the actual
 ordering constraint. Classify the residue's own shape (order vs.
 identity vs. pair-swap) before reaching for an axis that closed a
 *different* residue in the same source file.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001E6F8` -> `Class6B5CC__GetRotationDegrees`. Tier A.** Every
+  term is measured, none inferred: the source is `self->unk14->unk44->vec`,
+  which the PSY-Q IDENTIFICATION note in include/code_d294.h pins as
+  `GsCOORDINATE2.param->rotate`, Sony's own SVECTOR of Euler angles; the
+  conversion `* 45 >> 9` is exactly `* 360 / 4096`, i.e. PSX 4096-per-turn
+  units to degrees; and the three outputs are written as a
+  `WholeFrac_d294[3]`, the same {value, 1} ratio shape
+  `Class6B5CC__FaceTarget` builds and `slot44` consumes.
+- The 4096-per-turn reading was already independently established in this
+  header by `func_8001CEB4`'s full-turn wrap (modulo 4096) on the same
+  field, before the Sony identification existed.
+- No parameter retyped. The statement-order finding above (`.whole` before
+  `.frac`) is unaffected by the rename.
