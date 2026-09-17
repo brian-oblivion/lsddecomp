@@ -58,9 +58,9 @@ struct BasicClassMethods {
     /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls func_80018208, which is void (see below) */
     /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
     /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */
-    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, arg1) */
-    /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b */
-    /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__OnNotify; code_8220_b */
+    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, event). PROPOSED RENAME (round 51, tier A): onFinalize -> notifyParents -- it is the EMITTER, not a handler, and it is not finalize-specific: `arg1` is a general event code the base only ever sees as 1. Cross-unit field (class_3bb8c_i.c, code_8220.c), so the head applies it. */
+    /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b. No name: measured round 51 across all 60 method tables, 58 carry this exact address here and the 2 that differ are not BasicClass-derived, so nothing in the game overrides it and nothing establishes its purpose OR its real signature -- `void (*)(void)` is what the empty base body permits, not what a caller was seen to pass. No accessor anywhere in src/. */
+    /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__OnNotify; code_8220_b. Receiving half of +0x030: arg1 is the SENDER, arg2 an event code (base acts only on 1; func_8001CD60/code_d294 and func_80065790/code_55dd4 forward to the base then branch on the sender's class tag). PROPOSED RENAME (round 51, tier B): slot38 -> onNotify, arg1 -> sender, arg2 -> event. Cross-unit field, 13 units access it, so the head applies it. */
 };
 
 struct BasicClass {
@@ -174,6 +174,11 @@ extern void FreeBasicClassList(BasicClassListNode **head);                      
 /* BasicClass's own method table (BASICCLASS_METHODS), asm/data/57070.data.s.
  * 14 slots per BasicClassMethods, matching Get_vtable_BasicClass (code_8220_b, round
  * 12) which returns its address. */
+/* PROPOSED RENAME (round 51, tier A): BASICCLASS_METHODS, the name
+ * docs/research/class-framework.md already uses for it and the same shape as
+ * DREAMSYS_METHODS. tools/rename.py refuses it -- its "NEW already appears"
+ * guard fires on the six files whose PROSE already calls this symbol
+ * BASICCLASS_METHODS -- so the head applies it. */
 extern BasicClassMethods D_8006B58C;
 extern BasicClassMethods *Get_vtable_BasicClass(void);                                 /* returns &D_8006B58C */
 
@@ -182,25 +187,37 @@ extern BasicClassMethods *Get_vtable_BasicClass(void);                          
 extern const char D_8001028C[];
 
 /* Global boolean flag read by SetupPrimCode, asm/data (bss/data, not yet
- * carved). Read-only from this unit; nothing here writes it. */
+ * carved). Read by SetupPrimCode, written by func_80018464 (both code_8220_b)
+ * from bit 6 of the drawn object's flags word; SetupPrimCode ORs it into bit
+ * 0x1 of the GPU command byte, which is the shade-texture bit Psy-Q's
+ * SetShadeTex() sets. PROPOSED RENAME (round 51, tier B): gShadeTex.
+ * tools/rename.py cannot do it -- "resolves to 0x8008e248, outside the
+ * image", because it is bss past the image end -- so the head applies it. */
 extern s32 D_8008E248;
 
 /* GTE transform/clip/OT-bucket routine, this unit (code_8220_b; ordinary C
  * over the include/gte.h macros -- see docs/match-reports/TransformAndCullPoly.md;
- * the .c holds its local struct view of arg1). arg1 is a per-primitive
- * scratch/context struct (OT base +0x0, OT shift +0x4, culled-flag +0x78,
+ * the .c holds its local struct views of both arguments). arg1 is the
+ * per-object draw context (OT base +0x0, OT shift +0x4, culled-flag +0x78,
  * SXY0-2 cache +0x60/0x64/0x68, computed OT bucket pointer +0x30, ...);
- * arg0's only touched field is a single output byte at +0x3, copied from
- * arg1->0x14. Returns 0 on success (OT bucket computed and stored), 1 if
- * the primitive was culled/degenerate. Declared here because its two
- * callers in this unit (ProjectTriFace, ProjectQuadFace) are earlier in ROM
- * order and so precede its own definition in the .c file. */
+ * arg0 is the Psy-Q GPU primitive being filled in, and its only touched
+ * field is the P_TAG length byte at +0x3, re-stamped from the copy
+ * SetupPrimCode cached at arg1->0x14. Returns 0 on success (OT bucket
+ * computed and stored), 1 if the primitive was culled/degenerate. Declared
+ * here because its two callers in this unit (ProjectTriFace,
+ * ProjectQuadFace) are earlier in ROM order and so precede its own
+ * definition in the .c file. */
 extern s32 TransformAndCullPoly(void *arg0, void *arg1);
 
-/* Called by ProjectTriFace/ProjectQuadFace after a successful OT insertion,
- * with a small literal "primitive kind" code (3 = triangle, 4 = quad).
- * code_8220_c, round 13. */
-extern void func_8001A268(void *prim, s32 code);
+/* Called by ProjectTriFace/ProjectQuadFace at the end of a face that was not
+ * culled. `count` is the face's VERTEX COUNT (3 or 4), not a primitive-kind
+ * code: docs/match-reports/func_8001A268.md derives the body, which walks
+ * `count` screen-XY pairs from arg0+0x64 to arg0 + 0x5C + count*4, tracks the
+ * 2D bounding box in +0x70../+0x76 and sets the culled flag at +0x78 when
+ * either span reaches 0x101. The older "3 = triangle, 4 = quad" wording here
+ * read the right numbers off the call sites for the wrong reason; corrected
+ * round 51. code_8220_c, round 13. */
+extern void func_8001A268(void *prim, s32 count);
 
 /* Round 13: this unit's own minimal, local view of the Psy-Q GPU primitive
  * tag word -- the same shape as `P_TAG` in include/psyq/LIBGPU.H, declared
