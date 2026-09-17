@@ -25,7 +25,7 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
  * func_8005C650 (MATCHED round 43) sets to the result of a `New_Entity`
  * call and func_8005CF34 (MATCHED round 43) dispatches through its vtable;
  * and a 3-word position vector at +0x8 that func_8005CF34 passes as
- * `func_8001E600`'s `src` (that function's own signature, `code_d294.h`,
+ * `Class6B5CC__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
  * confirmed by func_8005C650's walk over D_80088D28. */
 typedef struct DreamAuxSlot {

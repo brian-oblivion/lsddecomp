@@ -76,7 +76,7 @@ void func_80065830(Class65650 *self)
     self->methods->slot130(self);
     self->methods->slot128(self, 0);
     if (self->unk68 != NULL) {
-        func_8001E770(self, self->unk68->unk20);
+        Class6B5CC__LinkModel(self, self->unk68->unk20);
     }
 }
 
@@ -602,7 +602,7 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
             s32 v;
 
             v = self->unk5C->unk2C->methods->slot80(self->unk5C->unk2C, count - 1);
-            func_8001E770(elem, v);
+            Class6B5CC__LinkModel(elem, v);
         }
         break;
     }

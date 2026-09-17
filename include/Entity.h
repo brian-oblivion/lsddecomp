@@ -152,7 +152,7 @@ extern Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3
 
 /* Object pointed to by `Entity::unk94`. NOT another `Entity`, despite +0x14
  * also holding an `EntityPos *` (same convention as `Entity::unk14`):
- * `func_8001EACC` (still INCLUDE_ASM, code_d294.s) dereferences this object
+ * `Class6B5CC__FaceTarget` (still INCLUDE_ASM, code_d294.s) dereferences this object
  * at +0xC, and Entity's OWN +0xC (`Entity::unk0C`) is a plain `s32` flag,
  * not a pointer -- that mismatch rules Entity itself out. Its vtable slot
  * +0x130 takes an extra `s32` argument at the one call site reached so far
@@ -315,7 +315,7 @@ struct Entity {
     /* +0x88 */ s32 unk88;             /* func_80063ED4/func_80064078 (Entity_f): threaded through the slot134 loop as its own running arg1/return value */
     /* +0x8C */ u8 pad8C[0x90 - 0x8C];
     /* +0x90 */ s32 unk90;             /* func_80062C58 (Entity_e): nonzero gates `out->unk1C = 0x1C` when `out->unk4 & 3` is also 0 */
-    /* +0x94 */ Unk94Obj *unk94;         /* passed as func_8001EACC's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
+    /* +0x94 */ Unk94Obj *unk94;         /* passed as Class6B5CC__FaceTarget's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
     /* +0x9C */ s32 unk9C;             /* zeroed by Entity__Entity; address-taken by func_8005D6D4/func_8005DB8C */
     /* +0xA0 */ u8 padA0[0xB0 - 0xA0];
@@ -373,7 +373,7 @@ struct EntityMoodRow {
     s8 detachKind;   /* +0x03, read by func_8005DBF0 */
     u8 linkKind;      /* +0x04, read by func_8005DD18 (unsigned load) */
     s8 unk5;           /* +0x05 */
-    s8 unk6;            /* +0x06, read by func_8005DE18: sign selects whether func_8001EACC also fires, magnitude (after abs) is func_8005D714's distance arg */
+    s8 unk6;            /* +0x06, read by func_8005DE18: sign selects whether Class6B5CC__FaceTarget also fires, magnitude (after abs) is func_8005D714's distance arg */
     u8 pad07[0x02];
     s8 unk9;              /* +0x09, distance-fixup byte shared by func_8005DE18/func_8005DEE0/func_8005E0B0 */
     u8 pad0A[0x01];
@@ -406,7 +406,7 @@ extern EntityMethods D_80089AD4;
  * pointer, not a plain word. Return value unused at this call site, so void
  * is a safe read regardless of the real return type (same caveat as
  * func_8002CD08/func_8002CC84 above). */
-extern void func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
+extern void Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
 
 /* Already matched in Entity_b.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- func_80061778 (Entity_d) is its first cross-unit

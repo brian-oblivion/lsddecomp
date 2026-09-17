@@ -1,4 +1,6 @@
-# func_8001E6F8 -- MATCHED (byte-exact, 30/30 words). Round 32, head.
+> Renamed from `func_8001E6F8` on 2026-09-17 (tools/rename.py). Address 0x8001e6f8.
+
+# Class6B5CC__GetRotationDegrees -- MATCHED (byte-exact, 30/30 words). Round 32, head.
 
 > **ROUND 32 (2026-09-12), head. CLOSED by reversing two statements.**
 >
@@ -14,7 +16,7 @@
 ## The match
 
 ```c
-void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out) {
+void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
     Class6B5CCSub44 *src;
 
     src = self->unk14->unk44;
@@ -69,7 +71,7 @@ Unit: `code_d294_c` (round 14). Converts `self->unk14->unk44`'s three
 4096-per-circle angle fields (`Class6B5CCSub44::unk10/unk12/unk14`) into a
 3-entry `WholeFrac_d294` table: `whole = field * 45 >> 9` (== `field *
 360/4096`, i.e. angle units to degrees) and a constant `frac = 1` for
-every entry. `void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294
+every entry. `void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294
 *out)`.
 
 Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
@@ -80,7 +82,7 @@ Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
 ## `INCLUDE_ASM` per project rule)
 
 ```c
-void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out) {
+void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
     Class6B5CCSub44 *src;
 
     src = self->unk14->unk44;
@@ -98,7 +100,7 @@ Preserved inline (`#if 0`, positioned where it would compile back into
 
 ```c
 #if 0
-void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out) {
+void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
     Class6B5CCSub44 *src;
 
     src = self->unk14->unk44;
@@ -115,9 +117,9 @@ void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out) {
 ## New struct/extern knowledge already committed alongside this report
 
 `include/code_d294.h` gains a proper named type for the `{s16 whole; s16
-frac;}` pair `func_8001EC84` reads and this function produces --
+frac;}` pair `RatioToFixed12` reads and this function produces --
 `WholeFrac_d294`, replacing the previous prose-only description. This is
-purely additive (a new typedef/struct; `func_8001EC84`'s own `void *pair`
+purely additive (a new typedef/struct; `RatioToFixed12`'s own `void *pair`
 parameter type is unchanged, since its callers only ever forward the
 pointer). See the header's own comment for the derivation.
 
@@ -203,7 +205,7 @@ kill). 34,825 iterations. Best score reached: **10** (down from the base
 170 -> 30 -> 15 -> 10 -- but **no zero**. The score-10 candidate:
 
 ```c
-void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out)
+void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out)
 {
   int new_var2;
   int new_var;
@@ -277,8 +279,8 @@ harness sanity only).
 
 Tried the one axis this report had not explicitly attempted: the
 **"split one combined expression into two statements"** lever that
-closed the sibling `func_8001EDAC` (22/22, same unit, round 18,
-`docs/match-reports/func_8001EDAC.md`). Applied it to the
+closed the sibling `GetSetBitField` (22/22, same unit, round 18,
+`docs/match-reports/GetSetBitField.md`). Applied it to the
 multiply-then-shift expression per entry:
 
 ```c
@@ -289,7 +291,7 @@ out[N].whole = tmp >> 9;
 
 Result: **10/30, clean compile, no address drift** -- i.e. WORSE than
 the 24/30 baseline. Reverted immediately (confirmed the revert rebuilds
-green, `build exit=0`, whole-image SHA1 OK). Unlike `func_8001EDAC` (a
+green, `build exit=0`, whole-image SHA1 OK). Unlike `GetSetBitField` (a
 register-PAIR-swap residue), this function's residue is a genuine
 store-ORDER residue (a `frac = 1` store executing one instruction
 earlier than retail, relative to the neighbouring entry's fields) --
@@ -308,7 +310,7 @@ at 24/30, `INCLUDE_ASM` restored.
 
 **"Split a combined expression into two statements" is scoped to
 register-PAIR-swap residues (per-value cross-allocation, as in
-`func_8001EDAC`), not to store-ORDER residues (a statement executing one
+`GetSetBitField`), not to store-ORDER residues (a statement executing one
 position early/late relative to a neighbouring iteration, as here).**
 Applying it to the wrong residue class does not merely fail to help --
 it measurably worsened the score here (24/30 -> 10/30), because it hands
@@ -316,3 +318,19 @@ the allocator a new temporary to shuffle without addressing the actual
 ordering constraint. Classify the residue's own shape (order vs.
 identity vs. pair-swap) before reaching for an axis that closed a
 *different* residue in the same source file.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001E6F8` -> `Class6B5CC__GetRotationDegrees`. Tier A.** Every
+  term is measured, none inferred: the source is `self->unk14->unk44->vec`,
+  which the PSY-Q IDENTIFICATION note in include/code_d294.h pins as
+  `GsCOORDINATE2.param->rotate`, Sony's own SVECTOR of Euler angles; the
+  conversion `* 45 >> 9` is exactly `* 360 / 4096`, i.e. PSX 4096-per-turn
+  units to degrees; and the three outputs are written as a
+  `WholeFrac_d294[3]`, the same {value, 1} ratio shape
+  `Class6B5CC__FaceTarget` builds and `slot44` consumes.
+- The 4096-per-turn reading was already independently established in this
+  header by `func_8001CEB4`'s full-turn wrap (modulo 4096) on the same
+  field, before the Sony identification existed.
+- No parameter retyped. The statement-order finding above (`.whole` before
+  `.frac`) is unaffected by the rename.

@@ -36,7 +36,7 @@ void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = -2;
     }
     if (this->unkFC >= 0x65) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     }
     this->methods->slotC4(this, -5, 0);
     if (this->unkFC == 0x12C && this->methods->slot144(this, this->unk94) < 0x1000) {
@@ -115,7 +115,7 @@ void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0xB) {
         if (this->unkFC == 0x1F6) {
             this->methods->slotCC(this, 0x800, 0);
-            func_8001EACC(this, this->unk94, 1, 0, 0);
+            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         }
         if (this->unkFC >= 0x1F5) {
             this->methods->slotC4(this, -0x200, 0);
@@ -151,7 +151,7 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
                 out->unk1C = 0x12;
             }
         }
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->unk44 == 0xA) {
         if (this->unkFC < 8) {
@@ -214,7 +214,7 @@ void func_80062570(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC8(this, r * 51200, 0);
     }
     if (this->unkFC >= 0x961) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     }
     this->methods->slotC4(this, -0x1E, 0);
 }
@@ -270,7 +270,7 @@ void func_800628D4(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0x19;
         out->unk30 = 0x19;
         out->unk44 = 0x19;
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     }
     if (this->unkFC == this->unk80) {
         this->methods->slot130(this);
@@ -460,7 +460,7 @@ void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot130(this);
         this->methods->slotBC(this, D_80089D54);
     }
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
 }
 
 INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80063144);

@@ -432,16 +432,16 @@ bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry)
     return true;
 }
 
-/* Local view of func_8001E600/func_8001EACC (both already matched in
+/* Local view of Class6B5CC__LocalOffsetToWorldPos/Class6B5CC__FaceTarget (both already matched in
  * code_d294_c.c, a different unit): their own headers type `self`/`target`
  * as this game's class-framework specifics (Class6B5CCObj*, Entity*), which
- * this unit has no reason to pull in for two calls. `func_8001E600`'s own
+ * this unit has no reason to pull in for two calls. `Class6B5CC__LocalOffsetToWorldPos`'s own
  * disassembly at every known call site (see DreamSys.c) sets a 4th argument
  * register to 0 even though its 3-parameter C signature never reads it --
  * declared here to reproduce that register content, same as DreamSys.c's
  * own local prototype. */
-extern void func_8001E600(void *self, s32 *dst, s32 *src, s32 arg4);
-extern void func_8001EACC(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
+extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
+extern void Class6B5CC__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
 void func_8005CF34(DreamAuxSlot *a0)
 {
@@ -449,8 +449,8 @@ void func_8005CF34(DreamAuxSlot *a0)
         s32 localPos[3];
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
-        func_8001E600((void *)D_8008AC00, localPos, a0->pos, 0);
+        Class6B5CC__LocalOffsetToWorldPos((void *)D_8008AC00, localPos, a0->pos, 0);
         ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, D_8008AC00, D_8008AC08, (void *)D_8008ABFC, localPos);
-        func_8001EACC(a0->entity, (void *)D_8008AC00, 1, 0, 0);
+        Class6B5CC__FaceTarget(a0->entity, (void *)D_8008AC00, 1, 0, 0);
     }
 }

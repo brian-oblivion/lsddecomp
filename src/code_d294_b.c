@@ -2,11 +2,11 @@
 #include "code_d294.h"
 
 /* Sibling of func_8001D344/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
- * wrapper around func_8001EDAC over &self->unk10, shift 0 width 3. Raw
+ * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
  * func_8001D374/D3A0/D3F8 (no `== 0` on either side). */
 u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
-    return func_8001EDAC(&self->unk10, 0, 3, a1);
+    return GetSetBitField(&self->unk10, 0, 3, a1);
 }
 
 /* Sibling of func_8001D344 (the ONLY one of the five already-matched
@@ -16,17 +16,17 @@ u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
  * return type as func_8001D344 rather than the plain `u32` of the other
  * three siblings. */
 s32 func_8001D450(Class6B5CCObj *self, s32 a1) {
-    return func_8001EDAC(&self->unk10, 7, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->unk10, 7, 1, a1 == 0) == 0;
 }
 
 /* Same family as func_8001D424, shift 9 width 3. Raw pass-through. */
 u32 func_8001D480(Class6B5CCObj *self, u32 a1) {
-    return func_8001EDAC(&self->unk10, 9, 3, a1);
+    return GetSetBitField(&self->unk10, 9, 3, a1);
 }
 
 /* Same family as func_8001D450: double-inversion shape, shift 8 width 1. */
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
-    return func_8001EDAC(&self->unk10, 8, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->unk10, 8, 1, a1 == 0) == 0;
 }
 
 /* self->unk14->unk44 is a 0x28-byte heap block whose +0x10 holds an
@@ -92,13 +92,13 @@ void func_8001D600(Class6B5CCObj *self, void *dest) {
 }
 
 /* Copies a1's own count*8 elements into self->unk14->unk24 (via
- * func_8001EE04, both its src and dest args are &a1->unk4 -- computed once,
+ * ApplyMatrixToSVArray, both its src and dest args are &a1->unk4 -- computed once,
  * copied, per the disassembly), zeroes unk28/unk2C, stashes a1 into unk30
  * for the duration of a single self->methods->slot30(self, a2) dispatch
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
 void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
-    func_8001EE04(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
+    ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
     self->unk28 = 0;
     self->unk2C = 0;
     self->unk30 = a1;
@@ -220,7 +220,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
  * self->unkC list (each node's own +0x84 slot combined into buf1 via
- * MulMatrix2) before using buf1 as func_8001EE04's own "out" argument,
+ * MulMatrix2) before using buf1 as ApplyMatrixToSVArray's own "out" argument,
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
 void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
@@ -239,9 +239,9 @@ void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 
         } while (node != NULL);
     }
 
-    func_8001EE04(arg2, arg3, count, buf1);
+    ApplyMatrixToSVArray(arg2, arg3, count, buf1);
     if (arg1 != NULL) {
-        func_8001EE04(arg1, arg1, 1, buf1);
+        ApplyMatrixToSVArray(arg1, arg1, 1, buf1);
     }
 }
 
@@ -504,8 +504,8 @@ s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3
     u8 r2;
     Vec3S16_d294 mid;
 
-    r1 = func_8001ECFC(box, p1);
-    r2 = func_8001ECFC(box, p2);
+    r1 = CalcBoxOutcode(box, p1);
+    r2 = CalcBoxOutcode(box, p2);
 
     if (r1 == 0) {
         if (r2 != 0) {

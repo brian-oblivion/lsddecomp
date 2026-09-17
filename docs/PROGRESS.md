@@ -2670,7 +2670,7 @@ share no header. No collision.
 | --- | --- | --- | --- |
 | `func_80032BB8` | code_179d8_c | 14/14 | head |
 | `func_80032C60` | code_179d8_c | 14/14 | head |
-| `func_8001E6F8` | code_d294_c | 30/30 | head |
+| `Class6B5CC__GetRotationDegrees` | code_d294_c | 30/30 | head |
 | `func_8002EDD4` | code_179d8_m | 270/270 | bravo |
 | `func_80059814` | DreamSys | 53/53 | alpha2 |
 | `func_80059BE0` | DreamSys | 79/79 | alpha2 |
@@ -2682,7 +2682,7 @@ whole-image SHA1. Every runner's commit count, report count and remaining
 **Five of the six were behind a VERDICT, not a difficulty**, which is the
 round's theme. `func_80032BB8` was filed "register identity, not fixable by
 reshaping" — terminal under HARD RULE 6, so it had correctly stopped attracting
-attempts. `func_8001E6F8` had nine builds and a 34,825-iteration permuter run.
+attempts. `Class6B5CC__GetRotationDegrees` had nine builds and a 34,825-iteration permuter run.
 `func_80059BE0` stood three rounds and 20+ attempts. `func_8002EDD4` was the
 corpus's closest large near-miss at 267/270.
 
@@ -2708,7 +2708,7 @@ Improvements short of a close: `func_800598E8` 75/77 -> 76/77, `func_8004C470`
    taxonomy never named: whether a scratch variable is REUSED at a distant
    unrelated point (splitting it into two natural locals regressed 270/270 ->
    47/270).
-3. **Do not derive source order from EMISSION order.** `func_8001E6F8` closed
+3. **Do not derive source order from EMISSION order.** `Class6B5CC__GetRotationDegrees` closed
    by writing two statements in the order that looks wrong against the
    disassembly.
 4. **A permuter negative is evidence about one search against one scaffold.**
@@ -4685,7 +4685,7 @@ cannot invert.
 argument count during RTL expansion — BEFORE dead-code elimination.** A call
 inside `if (0)` emits zero instructions and still enlarges the frame.
 
-Echo closed `func_8001EE98` (**31/31**) on this. Retail reserved `0x18` (six
+Echo closed `ApplyMatrixToLVArray` (**31/31**) on this. Retail reserved `0x18` (six
 words) against an o32 minimum of `0x10`, with one surviving `jal` to a callee
 using only `a0`/`a1`/`a2`, and nothing ever written or read in those 24 bytes.
 The reproducing source is an unprototyped `func_80015618()` called with three
@@ -5009,7 +5009,7 @@ owner, and none of the ~20 merges conflicted.
 
 Matches: `strstr` 30/30, `func_80028C54` 27/27, `strcpy` 17/17, `func_8004EEA0`
 51/51 (echo); `DreamSys__LogMood` 14/14, `func_80064FBC` 70/70 (delta);
-`func_8001EDAC` 22/22 (charlie); `func_800402F0` 66/66, `func_80040D74` 40/40
+`GetSetBitField` 22/22 (charlie); `func_800402F0` 66/66, `func_80040D74` 40/40
 (bravo).
 
 ### The round's finding: "register-identity" is the least reliable verdict in the corpus
@@ -5048,7 +5048,7 @@ a SCREENING list, not a verdict: `func_80066340` sits on it and has
 
 Axes that did close register-shaped residues, all ordinary C: retype a
 parameter to its real width; whole-struct assignment instead of a field-copy
-pair; **split one combined expression into two statements** (`func_8001EDAC`,
+pair; **split one combined expression into two statements** (`GetSetBitField`,
 after seven failed manual attempts); `return dst;` on a wrongly-`void`
 function. Confirmed INERT across 3 functions and 9 attempts: declaration and
 introduction ORDER.
@@ -5115,8 +5115,8 @@ caveat on negatives.
   existed precisely to catch that. Print raw status with an end-marker.
 - **Gate 1b scores must not be parsed from report PROSE.** The head's queue
   ranking pulled `func_8004042C`'s "25/25" out of a *correction preamble*
-  describing the number being retracted, and conflated `func_8001EE98`'s 19/31
-  with a 29/29 belonging to `func_8001E58C`, an already-matched **caller**. A
+  describing the number being retracted, and conflated `ApplyMatrixToLVArray`'s 19/31
+  with a 29/29 belonging to `Class6B5CC__RotateLocalVector`, an already-matched **caller**. A
   `jal` encodes only a symbol address, so a caller's score can never validate a
   callee. Parse only a report's title/verdict line, and treat any figure near
   "correction"/"earlier version"/"superseded" as retracted.
@@ -5893,7 +5893,7 @@ both runners' explicit existing-declaration notes made it one pass.
 `code_d294.h` between delta and bravo: a REAL collision — the same field given
 two different type NAMES, resolved on the sibling struct's naming and on which
 name matched code already referenced. Then the one worth remembering:
-`func_8001ECFC` was DECLARED typed by delta and MATCHED with raw `s16 *` by
+`CalcBoxOutcode` was DECLARED typed by delta and MATCHED with raw `s16 *` by
 bravo, and **git auto-merged both without a conflict marker**; only the build
 caught it, on `conflicting types`. Resolved toward the typed signature after
 testing that it still matches 44/44 — better than either runner's own version.

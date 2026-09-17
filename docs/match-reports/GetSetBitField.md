@@ -1,4 +1,6 @@
-# func_8001EDAC -- MATCHED (22/22, round 18 permuter pass)
+> Renamed from `func_8001EDAC` on 2026-09-17 (tools/rename.py). Address 0x8001edac.
+
+# GetSetBitField -- MATCHED (22/22, round 18 permuter pass)
 
 Unit: `code_d294_c` (round 14). The generic packed-bitfield accessor
 already MEASURED and documented (before this carve existed) in
@@ -6,7 +8,7 @@ already MEASURED and documented (before this carve existed) in
 offset `shift` in `*word`, ORs in `value << shift`, and returns the
 PREVIOUS contents of that bitfield shifted back to bit 0. Five (now more)
 sibling functions in this class of unit are thin wrappers around it, all
-over `&self->unk10`. `u32 func_8001EDAC(u32 *word, s32 shift, s32 width,
+over `&self->unk10`. `u32 GetSetBitField(u32 *word, s32 shift, s32 width,
 u32 value)`.
 
 Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
@@ -16,7 +18,7 @@ Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
 ## restored to `INCLUDE_ASM` per project rule)
 
 ```c
-u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value) {
+u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
     u32 mask;
     s32 i;
     u32 old;
@@ -39,7 +41,7 @@ would compile back into `src/code_d294_c.c` in place of the current
 
 ```c
 #if 0
-u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value) {
+u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
     u32 mask;
     s32 i;
     u32 old;
@@ -157,7 +159,7 @@ oracle** (not just the permuter's own scorer):
 
 ```
 build exit=0
-func_8001EDAC: 22/22 words match (file 0xF5AC-0xF604)
+GetSetBitField: 22/22 words match (file 0xF5AC-0xF604)
 OK: build matches retail SLPS_015.56
 ```
 
@@ -178,3 +180,21 @@ inert rewrite the permuter's random statement-level mutation finds fast
 attempts. Worth trying this specific split early on any future
 "register pair swapped, both semantically-transparent reshapes exhausted"
 residue, before spending a permuter budget on it.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EDAC` -> `GetSetBitField`. Tier A.** Free function, complete
+  semantics: it replaces the `width` bits at bit offset `shift` of `*word`
+  with `value` and returns that field's PREVIOUS contents shifted down to
+  bit 0. The `GetSet` prefix is this project's own established spelling for
+  the swap shape (`DreamSys__GetSetScreenShake`,
+  `DreamSys__GetSetDreamTimeLimit` in the symbols file) and is load-bearing
+  here: several callers use the return value
+  (`return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;`).
+- Corroborated at scale: thirteen one-line wrappers across `code_d294.c`,
+  `code_d294_b.c` and `code_2cc8c_f.c` call it at fixed, non-overlapping
+  (shift, width) pairs over one word -- the per-field setters of a packed
+  register. That word is `Class6B5CCObj::unk10`, which the PSY-Q
+  IDENTIFICATION note in include/code_d294.h pins as `GsDOBJ2.attribute`.
+- The mask is built by a loop rather than `(1 << width) - 1`; that is
+  retail's own source shape and the name does not assert otherwise.

@@ -5,14 +5,14 @@
 ## What it does
 
 `Class6B5CC` vtable slot `+0x06C`. Sets bit 6 (a 1-bit field) of
-`self->unk10` to `(a1 == 0)`, tail-returning `func_8001EDAC`'s result. See
-`func_8001D344.md` for the shared `func_8001EDAC` background.
+`self->unk10` to `(a1 == 0)`, tail-returning `GetSetBitField`'s result. See
+`func_8001D344.md` for the shared `GetSetBitField` background.
 
 ## The C
 
 ```c
 u32 func_8001D3CC(Class6B5CCObj *self, s32 a1) {
-    return func_8001EDAC(&self->unk10, 6, 1, a1 == 0);
+    return GetSetBitField(&self->unk10, 6, 1, a1 == 0);
 }
 ```
 

@@ -1,4 +1,6 @@
-# func_8001EC84 -- MATCHED 30/30 words
+> Renamed from `func_8001EC84` on 2026-09-17 (tools/rename.py). Address 0x8001ec84.
+
+# RatioToFixed12 -- MATCHED 30/30 words
 
 Unit `code_d294_c`, carved round 13. Reopened round 42 as `nop_mflo_mfhi`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
@@ -8,7 +10,7 @@ attempted until now.
 
 20.12 fixed-point division, matching the header's own prediction
 (`include/code_d294.h`, the `WholeFrac_d294`-adjacent comment above the
-`func_8001EC84` prototype): `whole << 12 | frac`'s own division-derived low
+`RatioToFixed12` prototype): `whole << 12 | frac`'s own division-derived low
 bits, via the classic split-division idiom (divide once for
 quotient+remainder, then divide the shifted remainder again for the
 fractional part). Signature kept as the header already declares it
@@ -16,7 +18,7 @@ fractional part). Signature kept as the header already declares it
 sibling unit outside this runner's scope this round.
 
 ```c
-s32 func_8001EC84(void *pair) {
+s32 RatioToFixed12(void *pair) {
     WholeFrac_d294 *p;
     s32 q1, r1, q2;
 
@@ -45,3 +47,21 @@ similar) fixed-point division on this soft-float target, and GCC 2.6.3 -O2
 reliably fuses the `/`+`%` pair sharing operands into one `div`. Worth
 recognizing on sight in any future `nop_mflo_mfhi`-reopened function that
 shows the same two-`div`-block disassembly pattern.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EC84` -> `RatioToFixed12`. Tier A.** Free function, complete
+  and visible semantics: it returns `(pair->whole << 12) / pair->frac` in
+  20.12 fixed point, computed as a split division (one divide for quotient
+  and remainder, a second for the shifted remainder) so the shift cannot
+  overflow. Nothing about the name is inferred from context.
+- **A finding the name exposes: the pair is a RATIO.** The inherited field
+  names `whole`/`frac` on `WholeFrac_d294` (include/code_d294.h) describe a
+  mixed number; this body divides the first field BY the second, so they are
+  numerator and denominator. Every producer in this unit
+  (`Class6B5CC__GetRotationDegrees`, `Class6B5CC__FaceTarget`) writes a
+  degrees value and a constant 1, which is consistent with both readings and
+  is why the weaker one survived. Renaming the type and its two fields is
+  left to track 4: `WholeFrac_d294` is also used by `src/DreamSys.c` and
+  named in `include/code_2cc8c.h`, outside this runner's unit.
+- Signature kept as `void *pair`, as the shared header already declares it.

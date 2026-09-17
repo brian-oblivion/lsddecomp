@@ -1,14 +1,16 @@
-# func_8001EA8C -- MATCHED (16/16 words)
+> Renamed from `func_8001EA8C` on 2026-09-17 (tools/rename.py). Address 0x8001ea8c.
+
+# SubVec3S16 -- MATCHED (16/16 words)
 
 Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- three-element vector subtraction between
 two `s16` arrays, widening the result into an `s32` array.
-`void func_8001EA8C(s32 *dest, s16 *b, s16 *a)`.
+`void SubVec3S16(s32 *dest, s16 *b, s16 *a)`.
 
 ## Final source
 
 ```c
-void func_8001EA8C(s32 *dest, s16 *b, s16 *a) {
+void SubVec3S16(s32 *dest, s16 *b, s16 *a) {
     dest[0] = a[0] - b[0];
     dest[1] = a[1] - b[1];
     dest[2] = a[2] - b[2];
@@ -33,3 +35,16 @@ matching element count and halfword source width, but that is a guess,
 not evidence -- left unstated).
 
 No new struct or vtable-slot knowledge.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EA8C` -> `SubVec3S16`. Tier B.** Free function (no receiver),
+  so `VerbNoun`. The operation is complete and visible -- three-component
+  subtraction of `s16` inputs widened into an `s32` output -- but WHAT the
+  two vectors are is not established, which is what keeps it at B: its only
+  known caller is `func_8001E7BC`, still `INCLUDE_ASM`, where they are the
+  two outputs of a `func_8001F8B8` call that is itself unidentified Psy-Q.
+- **Parameters renamed `(dest, b, a)` -> `(dest, from, to)`** and the body
+  rewritten to `dest[i] = to[i] - from[i]`, same expression, so that the
+  operand order is readable at the call site: the subtrahend is the 2nd
+  argument and the minuend the 3rd. Byte-identical.

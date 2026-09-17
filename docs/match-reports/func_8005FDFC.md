@@ -18,7 +18,7 @@ void func_8005FDFC(Entity *this) {
         this->methods->slot48(this, 1, arg2);
         this->unk44 = 0xB;
     }
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     if (this->methods->slot144(this, this->unk94) < 0x7000) {
         this->methods->slotC4(this, 0x100, 0);
     }
@@ -42,7 +42,7 @@ void func_8005FDFC(Entity *this) {
   between the call and its one use. Reordering the two statements (call
   first, pointer setup second) fixed the frame and matched first try after
   the fix.
-- `func_8001EACC(this, this->unk94, 1, 0, 0)` is the established
+- `Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0)` is the established
   five-argument call shape already used throughout `Entity_b.c`.
 - `this->methods->slot144(this, this->unk94)` matches the two-argument
   `slot144` signature already established in `include/Entity.h`

@@ -61,13 +61,13 @@ void func_8005F0D8(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void func_8005F1A8(Entity *this) {
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
 }
 
 void func_8005F1D4(Entity *this) {
     s32 arg1;
 
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
 
     if (this->unkF4 != 0) {
         if (this->unkFC >= 0x41) {
@@ -202,7 +202,7 @@ void func_8005F800(Entity *this) {
         this->methods->slot48(this, 1, D_80089DF0);
         this->methods->slotCC(this, -0x1E, 0);
     } else {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unk44 == 0xB) {
             this->methods->slotC4(this, -0x64, 0);
             if ((u32)(this->unkFC - 0x55) < 0x1E) {
@@ -218,7 +218,7 @@ void func_8005F800(Entity *this) {
 }
 
 void func_8005F970(Entity *this, EntityMoodHandlerArg *out) {
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     this->unk94->methods->slot130(this->unk94, 1);
     if ((out->unk4 % 10) < 3) {
         out->unk10 = 0;
@@ -325,7 +325,7 @@ void func_8005FDFC(Entity *this) {
         this->methods->slot48(this, 1, arg2);
         this->unk44 = 0xB;
     }
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     if (this->methods->slot144(this, this->unk94) < 0x7000) {
         this->methods->slotC4(this, 0x100, 0);
     }

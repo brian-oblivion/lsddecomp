@@ -1,15 +1,17 @@
-# func_8001E770 -- MATCHED (16/16 words)
+> Renamed from `func_8001E770` on 2026-09-17 (tools/rename.py). Address 0x8001e770.
+
+# Class6B5CC__LinkModel -- MATCHED (16/16 words)
 
 Unit: `code_d294_c` (round 14). Called by `func_8001CC48` (`code_d294.c`)
 as its conditional forward target when `other`'s vtable-header tag is 9.
 Stores `other` into `self->unk20`, copies one field out of it, then calls
 the Psy-Q `GsLinkObject4` through a pointer computed off `other->unkC`.
-`void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other)`.
+`void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other)`.
 
 ## Final source
 
 ```c
-void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other) {
     self->unk20 = other;
     self->unk18 = other->unk10;
     GsLinkObject4((u8 *)((GenericObj_d294 *)self->unk20)->unkC + 0xC, &self->unk10, 0);
@@ -27,7 +29,7 @@ void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other) {
   previously given its own prototype (only its wrapper `func_8001F51C`
   was declared). Declared with only the shape this one call site needs.
 
-No existing field was retyped or renamed; `func_8001E7B0`'s comment in the
+No existing field was retyped or renamed; `Class6B5CC__UnlinkModel`'s comment in the
 header was also updated (round 14) to drop "still uncarved" now that both
 functions have moved into this unit -- prototype/type unchanged.
 
@@ -62,3 +64,23 @@ the parameter -- write the SOURCE the way retail's disassembly reads
 (through the field), not the way that looks most natural (through the
 still-in-scope parameter), when the two are interchangeable in value but
 not in registers.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001E770` -> `Class6B5CC__LinkModel`. Tier A**, and the evidence
+  is Sony's own API rather than a reading of this body. `&self->unk10` is
+  passed to `GsLinkObject4` as its GsDOBJ2 argument; `GsLinkObject4(tmd,
+  objp, n)` links object `n` of a TMD to `objp`. That only type-checks if
+  Class6B5CCObj has a GsDOBJ2 at +0x10, and it does, field for field:
+  +0x10 attribute (the packed flags word the `GetSetBitField` wrapper family
+  sets), +0x14 coord2 (the GsCOORDINATE2 this class allocates in its ctor
+  and initialises with `GsInitCoordinate2`), +0x18 tmd -- which is precisely
+  the field this function writes, one line before the call.
+- The `+ 0xC` on the first argument is the TMD file header skip (id, flags,
+  nobj), which is what makes the "model data" reading concrete rather than
+  generic.
+- **`other` is not narrowed.** Other units call this symbol with a different
+  class as the receiver and a plain `s32` second argument
+  (`include/code_55dd4.h`, `src/class_3bb8c_s.c`); the `Class6B5CC__` prefix
+  is still right, because any caller must carry the GsDOBJ2 layout this body
+  dereferences.

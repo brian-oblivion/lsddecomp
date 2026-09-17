@@ -85,7 +85,7 @@ typedef struct Unk68Methods {
 typedef struct Unk68Obj {
     Unk68Methods *methods;   /* +0x00 */
     u8 pad04[0x1C];            /* +0x04 .. +0x1F, unknown */
-    s32 unk20;                  /* +0x20 -- read directly (not via ->methods) by func_80065830, passed as func_8001E770's second argument */
+    s32 unk20;                  /* +0x20 -- read directly (not via ->methods) by func_80065830, passed as Class6B5CC__LinkModel's second argument */
 } Unk68Obj;
 
 /* Whatever class each self->unk70[i] (below) points at: unidentified,
@@ -274,7 +274,7 @@ extern Class65650Methods *func_80066818(void);
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
-extern void func_8001E770(void *self, s32 arg); /* first param confirmed generic: func_80065830 passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
+extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: func_80065830 passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
 extern void *func_80056FE4(void);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).

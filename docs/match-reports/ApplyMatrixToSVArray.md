@@ -1,4 +1,6 @@
-# func_8001EE04 -- MATCHED (37/37, round 19)
+> Renamed from `func_8001EE04` on 2026-09-17 (tools/rename.py). Address 0x8001ee04.
+
+# ApplyMatrixToSVArray -- MATCHED (37/37, round 19)
 
 **Status: MATCHED, whole-image green.** See "Round 19 (echo): MATCHED --
 the all-s16 whole-struct-copy idiom" at the end of this report for the
@@ -9,10 +11,10 @@ struct with a native `s32` member), not of the alignment idiom itself.
 
 **Historical status (kept for context): STALL (unaligned-load instruction-selection residue, 15/37 words best)
 
-Unit: `code_d294_c` (round 14). A sibling to `func_8001EE98` (matched this
+Unit: `code_d294_c` (round 14). A sibling to `ApplyMatrixToLVArray` (matched this
 round): `count` iterations, 6 bytes/element, copying each element through
 a stack-local buffer before forwarding it to `func_80015D58`. `void
-func_8001EE04(void *src, void *dest, s32 count, void *fixed)`.
+ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *fixed)`.
 
 Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
 `mfhi`/`mflo`-adjacent-`mult`/`div` hit.
@@ -70,8 +72,8 @@ DIFFERENT source-level construct than a byte-strided struct-pointer walk
 project's C89 rewrite cannot directly express (a genuinely 6-byte-packed
 struct type, which this toolchain has no visible packing attribute for,
 per every other struct in this project being naturally aligned to its own
-stride). This is the same FAMILY of problem as `func_8001E6F8`'s
-"redundant move" residue and `func_8001EE98`'s frame-size gap in this
+stride). This is the same FAMILY of problem as `Class6B5CC__GetRotationDegrees`'s
+"redundant move" residue and `ApplyMatrixToLVArray`'s frame-size gap in this
 same unit's queue -- three residues in one round where the pinned
 toolchain's actual instruction-selection behavior diverged from a
 plausible-but-wrong working theory, only discoverable by testing against
@@ -98,7 +100,7 @@ triggered merely by a non-multiple-of-the-target's-alignment stride.**
 This refutes the natural first hypothesis for any future "packed record
 in a byte-strided array" construct in this codebase. Test the ACTUAL
 `cc1` behavior for a minimal `struct {s32; s16;}` walked at a non-4
-stride before spending a derivation budget on it (as `func_8001EE04`'s
+stride before spending a derivation budget on it (as `ApplyMatrixToSVArray`'s
 own two failed attempts now demonstrate concretely) -- the real trigger
 for retail's unaligned form here remains unidentified.
 
@@ -145,7 +147,7 @@ uses `swl`/`swr` because `Rec6_d294`'s declared alignment is 2, not
 because of anything about the source pointer) plus a plain `lh`/`sh` for
 the trailing 2 bytes, matching retail opcode-for-opcode.
 
-Translating this into the real function (`void func_8001EE04(void *src,
+Translating this into the real function (`void ApplyMatrixToSVArray(void *src,
 void *dest, s32 count, void *out)`) reached **29/37 immediately**, with
 the unaligned load/store instructions themselves now present and
 correctly opcoded -- the only remaining residue was a clean 2-register
@@ -184,7 +186,7 @@ typedef struct Rec6_d294 {
 
 extern void func_80015D58(void *out, void *buf, void *src);
 
-void func_8001EE04(void *src, void *dest, s32 count, void *out) {
+void ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *out) {
     u8 *end;
 
     end = (u8 *)src + count * 6;
@@ -204,7 +206,7 @@ comment**, invisible until this function was actually matched: the
 matched code reads FROM `dest` into the stack buffer and forwards `src`
 raw (unchanged) to `func_80015D58` -- the OPPOSITE of the header's
 earlier prose ("reading from `src`... into `dest`"). This asymmetry was
-undetectable from `func_8001EE04`'s one known caller (`func_8001D624`),
+undetectable from `ApplyMatrixToSVArray`'s one known caller (`func_8001D624`),
 which always passes `src == dest`. The header comment is updated; the
 declared C signature (`void *src, void *dest, ...`) is UNCHANGED, only
 the prose describing which parameter plays which role.
@@ -236,3 +238,25 @@ register for whichever pointer is referenced FIRST in the compiled
 control flow, and the loop guard's own construction is an easy, cheap
 thing to swap when a register-identity residue looks like a two-value
 swap between a function's own parameters.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EE04` -> `ApplyMatrixToSVArray`. Tier A.** Free function,
+  complete semantics: `count` iterations of Sony's `ApplyMatrixSV(m, v0,
+  v1)` (`v1 = m * v0`, SVECTOR in and out) over 6-byte elements.
+- **Spelled `ApplyMatrixTo...`, not `ApplyMatrixSVArray`, on purpose.** This
+  is game code, and a name one token away from a real SDK export would read
+  as an SDK symbol in the symbols file and in `plan.py`'s track-2 accounting.
+  Sony's names are Sony's; this one says what it does without borrowing one.
+- **Parameters corrected to `(dst, src, count, m)`.** The previous names had
+  destination and source the wrong way round: the loop copies an element out
+  of the 2nd argument and calls `ApplyMatrixSV(m, &buf, dst)`, so the 1st
+  argument is written. Both call sites (`func_8001D624`, `func_8001D950`,
+  code_d294_b) pass the same address for both, which is why it was
+  invisible. Names only -- no type, arity or order change; byte-identical.
+- **The local `Rec6_d294` typedef is gone**, replaced by the existing
+  `Vec3S16_d294`. Same layout and the same all-`s16` alignment-2 property
+  the unaligned `lwl`/`lwr` copy depends on (that derivation, above, is
+  unaffected), but the correct reading: `ApplyMatrixSV` consumes SVECTORs,
+  so the 6 bytes are three `s16` components, not the "32-bit value plus a
+  trailing s16" the typedef guessed. Byte-identical.

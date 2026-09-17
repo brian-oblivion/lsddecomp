@@ -298,7 +298,7 @@ void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
 	this->unk_0x90C = 0;
 	this->unk_0x910 = 0;
 	this->unk_0x78 = 0;
-	func_8001E6F8(this, &local);
+	Class6B5CC__GetRotationDegrees(this, &local);
 
 	local.field_0x8 = 0;
 	local.field_0xA = 1;
@@ -355,15 +355,15 @@ void func_800593D8(DreamSys *this)
 	if (this->callback_0x98 != NULL)
 		this->callback_0x98(this);
 }
-/* Local prototypes, own local view (func_8001E600 is a different unit's
+/* Local prototypes, own local view (Class6B5CC__LocalOffsetToWorldPos is a different unit's
  * already-matched function taking an unrelated class as arg0; func_8005950C
  * is this unit's own next-in-queue function, forward-declared per
  * CLAUDE.md's convention for calling into a not-yet-preceding definition).
- * arg4 on func_8001E600 is unused by its own body but IS set (to 0) by this
+ * arg4 on Class6B5CC__LocalOffsetToWorldPos is unused by its own body but IS set (to 0) by this
  * call site's own disassembly, so it is declared here to reproduce that. */
-extern void func_8001E600(void *self, s32 *dst, s32 *src, s32 arg4);
+extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
 extern s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
-extern s32 func_8001EF14(s32 *a, s32 range, s32 *b);
+extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
 s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
 {
@@ -374,7 +374,7 @@ s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 toleran
 
 	p = &D_80087EE8;
 	*p = day;
-	func_8001E600(this, local, p - 2, 0);
+	Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
 	ret = func_8005950C((void *)((u8 *)this->unk_0x5C + 0x14),
 	                     (void *)((u8 *)this->unk_0x5C + 0x20), day);
@@ -387,7 +387,7 @@ s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 toleran
 	}
 
 	if (reference != NULL)
-		return func_8001EF14(local, tolerance, reference);
+		return IsVec3WithinRange(local, tolerance, reference);
 	return 0;
 }
 
@@ -1021,7 +1021,7 @@ bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
 	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
 		return false;
-	func_8001E6F8(this, local);
+	Class6B5CC__GetRotationDegrees(this, local);
 	if (!func_8005BD3C(&this->unk_0x888, &this->unk_0x884, local))
 		return false;
 	if (this->unk_0xA8 == 0)
@@ -1140,7 +1140,7 @@ staircase:
 	if (result < 0) {
 		return false;
 	}
-	func_8001E6F8(this, local);
+	Class6B5CC__GetRotationDegrees(this, local);
 	if (!func_8005C02C(&this->unk_0x888, &this->unk_0x884, local)) {
 		return false;
 	}
@@ -1566,7 +1566,7 @@ void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2)
 
 	if (this->unk_0x4C != NULL && rand() % 3 == 0) {
 		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
-		func_8001E6F8(this, local);
+		Class6B5CC__GetRotationDegrees(this, local);
 		this->vt->AddFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
 	}
 }
@@ -1689,9 +1689,9 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 }
 
 /* Unit-local reading of the second parameter: the caller (func_8005BD3C)
-   passes down a `s32 local[4]` buffer that func_8001E6F8 (code_d294_c) fills
+   passes down a `s32 local[4]` buffer that Class6B5CC__GetRotationDegrees (code_d294_c) fills
    with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
-   that table's `out[1].whole` (a degrees value, per func_8001E6F8's own
+   that table's `out[1].whole` (a degrees value, per Class6B5CC__GetRotationDegrees's own
    report). This function reads it unsigned (`lhu`), independent of
    WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
    bytes, so it is kept local rather than folded into that shared struct.
