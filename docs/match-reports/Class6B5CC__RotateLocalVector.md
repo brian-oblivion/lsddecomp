@@ -63,3 +63,23 @@ caller's OWN subsequent code reads back.** A buffer sized to just the
 bytes actually consumed compiles to a smaller, wrong-sized frame; the
 frame's total size is direct evidence of the buffer's real (possibly
 larger, partially-opaque) extent.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001E58C` -> `Class6B5CC__RotateLocalVector`. Tier B.** It calls
+  `slot84(self, buf, 0)`, whose occupant is `func_8001D4DC` (code_d294_b,
+  matched: `RotMatrix(&param->rotate, buf)` with the angles NOT negated when
+  the 3rd argument is 0), then applies that matrix to a widened copy of its
+  own 3-element `s16` argument. So "Rotate" is the operation and "Local" is
+  the frame the input is in -- inferred from the flag-0 (un-negated) branch
+  of `func_8001D4DC`, which is why this is B and not A.
+- **Method prefix `Class6B5CC__`:** the first parameter is a
+  `Class6B5CCObj *` and the body dispatches through its method table. The
+  function is NOT itself a vtable slot (`tools/classtable.py D_8006B5CC`
+  ends at `func_8001E4A4`); the prefix records the receiver, matching
+  `BasicClass__*` and `DreamSys__*` already in the symbols file.
+- **Parameter `dst` retyped `Class6B5CCSub44 *` -> `Vec3_d294 *`.** Evidence:
+  only three words at +0/+4/+8 are ever written, and `class_3bb8c_o`'s
+  `func_80057444` -- the one external call site -- passes the address of a
+  bare 3-word local (`Vec3O buf`). The old typing matched by offset
+  coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
