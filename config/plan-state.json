@@ -24,7 +24,9 @@
     "3": {
       "reason": "",
       "status": "open",
-      "units_done": {}
+      "units_done": {
+        "code_d294_c": "2026-09-17"
+      }
     },
     "4": {
       "reason": "",

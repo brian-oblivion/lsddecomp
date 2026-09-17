@@ -329,6 +329,20 @@ way a score lies). Resolve first, verify after. Expect `modify/delete`
 conflicts on report files the head stubbed and a runner then wrote; take the
 runner's.
 
+**`make extract` again after merging any branch that changed the symbols
+file** — i.e. every track 3 naming merge. `asm/` is untracked, so the runner's
+`rename.py` re-extract happened in ITS worktree and `main`'s disassembly still
+carries the old names; the link then fails on `undefined reference to
+func_OLD` from whichever unit has an `INCLUDE_ASM` calling the renamed
+function. Gate 0 covers this at the START of a round, not at merge (round 50,
+merging `runner/charlie`: `src/code_55dd4.c` against `func_8001E770`).
+
+**Do not pipe `build-and-verify.sh` into `tail`/`head` to read its tail.**
+`$?` is then the PIPE's last command and is always 0, which is the "necessary
+but not sufficient" hazard reinstalled by hand. Redirect to your own log and
+echo `$?` before grepping it (round 50, the head did this and read `build
+exit=0` off a failed link).
+
 After all merges: grep the tree for every symbol a shared-header resolution
 declares; promote `Proposed learning` entries into DECOMPILATION_LEARNINGS.md
 (one idiom, at most 12 lines, story to PROGRESS.md); write the PROGRESS.md

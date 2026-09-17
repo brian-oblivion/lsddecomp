@@ -491,6 +491,18 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   whether the ADDRESS COMPUTATION is folded into the memory instruction, so "I tried
   `volatile`" is at most one of two measurements. (a §"`volatile` has TWO independent
   effects", §"A symbol accessed at TWO WIDTHS")
+- **A sibling's `volatile` set is a HYPOTHESIS to sweep outward from, never a set to
+  copy** — and it is not confined to arithmetic locals. `func_80030980` closed to
+  LENGTH-EXACT (324/324, zero drift, from 292/324) on six divisor-chain locals PLUS
+  `off16`, a pure address-arithmetic local with no division in it, where its sibling
+  `func_8002D8E0` had named four. Process: start from the sibling's named set, add ONE
+  variable at a time, and switch the acceptance test to whole-image byte count once you
+  are close — **exact length is a qualitatively different state from "closest so far"**,
+  because every figure after it measures the same real residue instead of an
+  address-shifted approximation. Two systematic sweeps (drop-one, add-one, 15 builds)
+  found nothing better either side of the discovered set, so once an outward sweep lands
+  length-exact, further single-variable perturbation is not worth budgeting again without
+  a new hypothesis. (round 50, alpha; `docs/match-reports/func_80030980.md`)
 - **`volatile` is the WRONG tool for an ADDRESS CSE, and it is NON-MONOTONIC** — it acts
   on the VALUE CSE and regresses a LICM residue (48/376 -> 6/376). **The address CSE
   yields to the asm-label alias**: `extern T D_8008A8F8_b __asm__("D_8008A8F8");` leaves
