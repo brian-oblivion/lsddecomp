@@ -9,59 +9,75 @@ slot +0x06C of `D_8006D4E8`.
 
 Byte-exact, first attempt.
 
+The body below is the round-51 source, after track-3 naming. The
+derivation notes that follow were written in round 45 against the same
+code under its `unk` names; only names changed, the image is
+byte-identical, and the `## Naming` section at the end of this report
+carries the evidence for each one.
+
 ```c
-/* This class's own +0x058 slot. The sibling class D_8006D430 (see
- * include/code_171e0.h's UnkFlagsObjMethods_171e0) has the identical slot
- * unnamed as "func_80026B08's own slot, unused here" -- kept as an
- * independent local view here, per the project's multiple-local-views
- * convention, rather than editing that shared header (code_179d8_h.c and
- * code_171e0.c also include it this round). */
-typedef struct SelfC80Methods SelfC80Methods;
-struct SelfC80Methods {
+/* The class's method table down to +0x058: the one slot
+ * Class6D4E8__RequestLoadFile dispatches. `tools/classtable.py D_8006D4E8`
+ * resolves that slot to func_80027800 (code_179d8_s), which loads a named
+ * file off the disc, so the slot is named for the method it dispatches to.
+ * The sibling class D_8006D430 (include/code_171e0.h's
+ * UnkFlagsObjMethods_171e0) leaves the identical offset unnamed -- this
+ * stays an independent local view, per the project's multiple-local-views
+ * convention, rather than an edit to that shared header. */
+typedef struct Methods6D4E8_C80 Methods6D4E8_C80;
+struct Methods6D4E8_C80 {
     u8 pad00[0x58];
-    /* +0x58 */ void (*slot58)(void *self, char *arg1);
+    /* +0x58 */ void (*loadFile)(void *self, char *name);
 };
 
-typedef struct SelfC80 SelfC80;
-struct SelfC80 {
-    /* +0x00 */ SelfC80Methods *methods;
+typedef struct Obj6D4E8_C80 Obj6D4E8_C80;
+struct Obj6D4E8_C80 {
+    /* +0x00 */ Methods6D4E8_C80 *methods;
     u8 pad04[0x22 - 0x04];
-    /* +0x22 */ u16 unk22;
-    /* +0x24 */ s32 unk24;
+    /* +0x22 */ u16 pendingRequests; /* ++ per queued request, -- per cancel */
+    /* +0x24 */ s32 flags;           /* OR-ed bit set; no bit is read here */
 };
 
-/* +0x04 slot of whatever object a still-uninitialized local $s2 points at
- * on this path -- see below for why that local is never assigned; only the
- * one field this store touches is typed. */
+/* +0x04 of whatever object a still-uninitialized local $s2 points at on this
+ * path -- see the Class6D4E8__RequestLoadFile report for why that local is
+ * never assigned. Only the one field this store touches is typed, and the
+ * object's identity is unknowable from here, so the name stays a
+ * placeholder. */
 typedef struct UnkC80 UnkC80;
 struct UnkC80 {
     u8 pad00[0x04];
     /* +0x04 */ s32 unk04;
 };
 
-struct Self800282AC;
-extern void EnqueueCdRequest(struct Self800282AC *arg0, s32 arg1, s32 arg2,
-                           s32 arg3, s32 arg4);
-extern s32 func_800284C4(char *arg0); /* code_179d8_r */
+/* The request op codes are a small enumeration shared with code_179d8_s,
+ * which enqueues 2 (open by name), 3 (close), 4 (seek) and 5 (read) from the
+ * class's other slots. Only the one this unit itself uses is named. */
+#define CD_OP_LOAD_FILE 7
+
+struct Obj6D4E8_282AC;
+extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
+                             s32 op, s32 param0, s32 param1);
+extern s32 func_800284C4(char *name); /* code_179d8_r: name -> table index */
 extern s32 gCdAsyncEnabled;
 
-void Class6D4E8__RequestLoadFile(SelfC80 *self, char *arg1)
+void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
 {
     UnkC80 *s2;
     s32 idx;
 
     LockCd();
 
-    if (arg1 != NULL) {
+    if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
-            idx = func_800284C4(arg1);
-            EnqueueCdRequest((struct Self800282AC *)self, idx, 7, 0, 0);
+            idx = func_800284C4(name);
+            EnqueueCdRequest((struct Obj6D4E8_282AC *)self, idx,
+                             CD_OP_LOAD_FILE, 0, 0);
         } else {
-            self->methods->slot58(self, arg1);
+            self->methods->loadFile(self, name);
 
-            if (self->unk22 == 0) {
-                self->unk24 |= 4;
+            if (self->pendingRequests == 0) {
+                self->flags |= 4;
             }
         }
     }
@@ -123,21 +139,21 @@ allows.
   the needle — read from its own disassembly, not guessed — hence `char
   *arg0` here rather than `void *`. `arg1` of `Class6D4E8__RequestLoadFile` is typed the
   same way, since it flows unchanged into both `func_800284C4` and
-  `self->methods->slot58`.
+  `self->methods->loadFile` (spelled `slot58` when this was written).
 - `EnqueueCdRequest` (already matched this round, later in this file) takes its
-  first parameter as a distinct locally-typed `Self800282AC *`. Rather than
+  first parameter as a distinct locally-typed `Obj6D4E8_282AC *` (`Self800282AC` when this was written). Rather than
   editing its existing declaration or pulling that type earlier in the file
   out of ROM order, this function forward-declares an opaque `struct
-  Self800282AC;` and casts `self` to `struct Self800282AC *` at the call
+  Obj6D4E8_282AC;` and casts `self` to `struct Obj6D4E8_282AC *` at the call
   site — the tag is the same one `EnqueueCdRequest`'s own definition later
-  completes with `typedef struct Self800282AC Self800282AC;`, so the
+  completes with `typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;`, so the
   prototypes are identical types and nothing conflicts.
 - `self`'s own `+0x58` method-table slot is the identical offset the sibling
   class `D_8006D430` leaves as an unnamed pad in
   `include/code_171e0.h`'s `UnkFlagsObjMethods_171e0` ("func_80026B08's own
   slot, unused here"). Rather than editing that shared header — which
-  `code_179d8_h.c` (charlie, this round) and `code_171e0.c` also include —
-  this unit keeps its own local view (`SelfC80Methods`/`SelfC80`), per the
+  `code_179d8_h.c` and `code_171e0.c` also include —
+  this unit keeps its own local view (`Methods6D4E8_C80`/`Obj6D4E8_C80`), per the
   project's multiple-independent-local-views convention.
 
 ### Proposed learning

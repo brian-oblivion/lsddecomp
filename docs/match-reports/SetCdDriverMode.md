@@ -8,20 +8,29 @@ Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
 Byte-exact, second attempt (one intermediate near-miss, see below).
 
+The body below is the round-51 source, after track-3 naming. The
+derivation notes that follow were written in round 45 against the same
+code under its `unk` names; only names changed, the image is
+byte-identical, and the `## Naming` section at the end of this report
+carries the evidence for each one.
+
 ```c
-extern s32 func_80020C5C(void); /* class_3ac78, returns a pointer cast to s32 */
+extern s32 func_80020C5C(void); /* returns D_8008A83C, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 gCdBusy;
 extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
 extern s32 gCdUseVSyncCallback;
 
-/* Object returned by func_80020C5C; only the slot this call site dispatches
- * (+0x84 of its method table) is typed here. */
+/* The singleton func_80020C5C returns; only the slot this call site
+ * dispatches (+0x84 of its method table) is typed here. That slot is handed
+ * either ServiceCdDriver or 0, so it installs and clears a callback -- named
+ * for what this one call site does with it, which is all the evidence
+ * there is. */
 typedef struct ObjF18Methods ObjF18Methods;
 struct ObjF18Methods {
     u8 pad00[0x84];
-    void (*slot84)(void *self, void *arg);
+    void (*setCallback)(void *self, void *cb);
 };
 
 typedef struct ObjF18 ObjF18;
@@ -29,28 +38,28 @@ struct ObjF18 {
     ObjF18Methods *methods;
 };
 
-s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
+s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 {
     ObjF18 *obj;
 
     if (gCdBusy == 0) {
-        if (arg2 == 0) {
+        if (useVSyncCallback == 0) {
             obj = (ObjF18 *)func_80020C5C();
 
             if (gCdAsyncEnabled == 0) {
-                if (arg0 != 0) {
-                    obj->methods->slot84(obj, (void *)ServiceCdDriver);
+                if (async != 0) {
+                    obj->methods->setCallback(obj, (void *)ServiceCdDriver);
                 }
             } else {
-                if (arg0 == 0) {
-                    obj->methods->slot84(obj, 0);
+                if (async == 0) {
+                    obj->methods->setCallback(obj, 0);
                 }
             }
         }
 
-        gCdUseVSyncCallback = arg2;
-        gCdAsyncEnabled = arg0;
-        D_8008A860 = arg1;
+        gCdUseVSyncCallback = useVSyncCallback;
+        gCdAsyncEnabled = async;
+        D_8008A860 = mode2;
 
         return 1;
     }
@@ -75,10 +84,10 @@ drift) and corrected on the second:
    of the function in `if (gCdBusy == 0) { ...; return 1; }` followed by
    a single trailing `return 0;` reproduces retail's single physical copy.
 2. **The virtual dispatch takes an explicit `self` argument, not just the
-   callback.** `obj->methods->slot84(callback)` compiles the callback into
+   callback.** `obj->methods->setCallback(callback)` (`slot84` when this was written) compiles the callback into
    `$a0` (the sole argument register for a one-arg call); retail sets
    `$a0 = obj` and `$a1 = callback` — i.e. the slot's real signature is
-   `slot84(self, arg)`, consistent with CLAUDE.md's "explicit `this` first
+   `setCallback(self, cb)`, consistent with CLAUDE.md's "explicit `this` first
    parameter" convention for this codebase's hand-rolled method tables. The
    near-miss diff showed `a0`/`a1` register roles and the materialized
    `&ServiceCdDriver` address swapped between them, which was the tell.

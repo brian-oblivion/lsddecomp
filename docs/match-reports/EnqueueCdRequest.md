@@ -8,40 +8,55 @@ Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
 Byte-exact on the first attempt.
 
+The body below is the round-51 source, after track-3 naming. The
+derivation notes that follow were written in round 45 against the same
+code under its `unk` names; only names changed, the image is
+byte-identical, and the `## Naming` section at the end of this report
+carries the evidence for each one.
+
 ```c
-/* func_8002832C (code_179d8_r) allocates and links a 0x24-byte list node;
- * only the fields this call site writes are typed here (padded to their
- * offsets, per this unit's convention). */
-typedef struct Entry800282AC Entry800282AC;
-struct Entry800282AC {
+/* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
+ * writing side: func_8002832C (code_179d8_r) allocates one and links it onto
+ * D_8008A894, and only the fields this call site writes are typed here
+ * (padded to their offsets, per this unit's convention). `op` takes the
+ * CD_OP_* values, `fileIndex` is func_800284C4's index into gFileTable (0
+ * when the op does not name a file), and param0/param1 are the two per-op
+ * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
+ * buffer and a size for op 5. */
+typedef struct CdRequest_282AC CdRequest_282AC;
+struct CdRequest_282AC {
     u8 pad00[0x08];
-    s32 unk08;
-    s32 unk0C;
-    s32 unk10;
-    s32 unk14;
-    s32 unk18;
+    /* +0x08 */ s32 op;
+    /* +0x0C */ s32 owner;
+    /* +0x10 */ s32 fileIndex;
+    /* +0x14 */ s32 param0;
+    /* +0x18 */ s32 param1;
 };
-extern Entry800282AC *func_8002832C(void); /* code_179d8_r */
+extern CdRequest_282AC *func_8002832C(void); /* code_179d8_r: alloc + link */
 
-typedef struct Self800282AC Self800282AC;
-struct Self800282AC {
+typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;
+struct Obj6D4E8_282AC {
     u8 pad00[0x22];
-    u16 unk22;
-    s32 unk24;
+    /* +0x22 */ u16 pendingRequests;
+    /* +0x24 */ s32 flags;
 };
 
-void EnqueueCdRequest(Self800282AC *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+/* The store order below is retail's own (+0x08, +0x14, +0x0C, +0x10, +0x18),
+ * not ascending offset -- see the match report: this compiler keeps
+ * statement order for these, so the statements are in retail's order. */
+void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
+                      s32 param0, s32 param1)
 {
-    Entry800282AC *entry = func_8002832C();
+    CdRequest_282AC *entry = func_8002832C();
 
-    entry->unk08 = arg2;
-    entry->unk14 = arg3;
-    entry->unk0C = (s32)arg0;
-    entry->unk10 = arg1;
-    entry->unk18 = arg4;
+    entry->op = op;
+    entry->param0 = param0;
+    entry->owner = (s32)owner;
+    entry->fileIndex = fileIndex;
+    entry->param1 = param1;
 
-    arg0->unk22++;
-    arg0->unk24 = 0;
+    owner->pendingRequests++;
+    owner->flags = 0;
     StartCdService();
 }
 ```
@@ -63,7 +78,7 @@ struct-field writes here rather than reordering them by offset. Then
 increments a `u16` counter on `arg0` at `+0x22` and clears a `s32` at
 `+0x24`, then tail-calls the already-matched `StartCdService` (void, no
 args). GCC scheduled the counter's store-back into `StartCdService`'s call
-delay slot on its own; writing the natural `arg0->unk22++; arg0->unk24 = 0;
+delay slot on its own; writing the natural `owner->pendingRequests++; owner->flags = 0;
 StartCdService();` statement order was sufficient — no manual reordering
 needed to reproduce that scheduling choice.
 

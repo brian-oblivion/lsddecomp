@@ -10,23 +10,32 @@ taken 3x elsewhere in the slice (this function itself, twice as a
 
 Byte-exact, second attempt (one intermediate near-miss, see below).
 
+The body below is the round-51 source, after track-3 naming. The
+derivation notes that follow were written in round 45 against the same
+code under its `unk` names; only names changed, the image is
+byte-identical, and the `## Naming` section at the end of this report
+carries the evidence for each one.
+
 ```c
 extern s32 func_80018458(void); /* code_8220_b */
 extern s32 gCdUseVSyncCallback;
 extern s32 D_8008A898;
-extern void func_8002858C(void); /* code_179d8_r */
-extern void func_800286E4(void); /* code_179d8_r */
+extern void func_8002858C(void); /* code_179d8_r: state-machine step 1 */
+extern void func_800286E4(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
-/* This unit's own slot at +0x068 of D_8006D4E8's table (see GetClass6D4E8Methods's
+/* The class's method table down to +0x068 (see GetClass6D4E8Methods's
  * class-map comment above); only the one slot this call site dispatches is
- * typed here, following the pad-to-offset convention include/code_171e0.h
- * uses for D_8006D430's own table. */
-typedef struct D_8006D4E8Methods D_8006D4E8Methods;
-struct D_8006D4E8Methods {
+ * typed, following the pad-to-offset convention include/code_171e0.h uses
+ * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
+ * func_80027A24 (code_179d8_s), which walks the D_8008A894 request list,
+ * dispatches each request through its owner's own slots and frees it with
+ * func_800283C4 -- so the slot is named for what that method does. */
+typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
+struct Methods6D4E8_80EC {
     u8 pad00[0x68];
-    void (*slot68)(void);
+    void (*runRequestQueue)(void);
 };
 
 s32 ServiceCdDriver(void)
@@ -50,7 +59,7 @@ s32 ServiceCdDriver(void)
     }
 
     if (gCdQueueEnabled != 0) {
-        ((D_8006D4E8Methods *)GetClass6D4E8Methods())->slot68();
+        ((Methods6D4E8_80EC *)GetClass6D4E8Methods())->runRequestQueue();
     }
 
     if (gCdUseVSyncCallback != 0) {

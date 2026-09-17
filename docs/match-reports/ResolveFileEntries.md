@@ -9,67 +9,79 @@ function in this unit.
 
 Byte-exact, third attempt (two intermediate near-misses, see below).
 
+The body below is the round-51 source, after track-3 naming. The derivation
+notes that follow were written in round 45 against the same code under its
+`unk` names (`Pair16Q`, `CdStatBufQ`, `FileEntryQ`, `arg0`); only names
+changed, the image is byte-identical, and the `## Naming` section at the end
+carries the evidence for each one.
+
 ```c
-/* A 4-byte, alignment-2 pair -- the idiom CLAUDE.md/code_179d8_h.c document
- * for a struct whose whole-struct assignment compiles to lwl/lwr + swl/swr
- * instead of a plain lw/sw. Kept as this unit's own local view (per-call-site
- * typed, same shape as code_179d8_h.c's Pair16_179D8H, different name so
- * nothing is shared across units). */
-typedef struct Pair16Q Pair16Q;
-struct Pair16Q {
+/* A disc position in the shape Psy-Q's CdlLOC has (minute/second/sector/
+ * track), but declared as two s16 rather than four u8: the game's own struct
+ * is 2-aligned, which is why a whole-struct assignment of it compiles to
+ * lwl/lwr + swl/swr instead of a plain lw/sw (the idiom CLAUDE.md and
+ * code_179d8_h.c document). The two halves are never read apart here, so
+ * they keep placeholder names. Kept as this unit's own local view, the same
+ * shape as code_179d8_h.c's Pair16_179D8H under a different name. */
+typedef struct CdLoc16 CdLoc16;
+struct CdLoc16 {
     s16 unk0;
     s16 unk2;
 };
 
-/* CdSearchFile's own output buffer. Only the first two fields this call
- * site copies out are named; sized to 0x18 bytes total because that is
- * exactly the span between this local's stack slot (sp+0x50) and the next
- * saved register (sp+0x68) -- independently confirms the same 0x18-byte
- * figure code_179d8_h.c's func_80028920 derived for the same Sony
- * function's output struct (StatBuf179D8H). */
-typedef struct CdStatBufQ CdStatBufQ;
-struct CdStatBufQ {
-    Pair16Q unk0;
-    u32 unk4;
+/* CdSearchFile's output buffer, which is Sony's CdlFILE: pos, size, name[16]
+ * = 0x18 bytes (include/psyq/LIBCD.H). The 0x18 was derived here
+ * independently, from the span between this local's stack slot (sp+0x50) and
+ * the next saved register (sp+0x68), and it is the same figure
+ * code_179d8_h.c's func_80028920 derived for the same Sony function. Only
+ * the two fields this call site copies out are typed. */
+typedef struct CdFileInfo CdFileInfo;
+struct CdFileInfo {
+    CdLoc16 pos;
+    u32 size;
     u8 pad8[0x18 - 0x8];
 };
 
-/* This class's per-entry array element, 0x1C bytes: `name` is passed
- * directly (as its own address, offset 0) to func_800289CC as the path
- * suffix; unk14/unk18 are filled from a CdSearchFile lookup on that path.
- * gFileTable (this unit's own SetFileTable/set) and gFileTableCount (func_8002
- * 7FE4/FF0) are this array's base pointer and element count -- func_800284C4
- * (code_179d8_r) walks the identical 0x1C stride over gFileTable doing
- * strstr() against `name`, confirming the layout independently. */
-typedef struct FileEntryQ FileEntryQ;
-struct FileEntryQ {
+/* One element of the file table: 0x1C bytes of {name, disc position, size}.
+ * `name` is passed by its own address (offset 0) to func_800289CC, which
+ * builds the full path from it; `pos` and `size` are then filled in from a
+ * CdSearchFile lookup on that path, so an entry is a name resolved once and
+ * reused as a seek target. gFileTable and gFileTableCount (this unit's
+ * SetFileTable / SetFileTableCount) are the array's base and length --
+ * func_800284C4 (code_179d8_r) walks the identical 0x1C stride over
+ * gFileTable doing strstr() against `name`, confirming the layout
+ * independently. */
+typedef struct CdFileEntry CdFileEntry;
+struct CdFileEntry {
     /* +0x00 */ char name[0x14];
-    /* +0x14 */ Pair16Q unk14;
-    /* +0x18 */ u32 unk18;
+    /* +0x14 */ CdLoc16 pos;
+    /* +0x18 */ u32 size;
 };
 
 extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
-extern s32 CdSearchFile(CdStatBufQ *statBuf, char *path); /* lib/libcd/iso9660.o */
+extern s32 CdSearchFile(CdFileInfo *fileInfo, char *path); /* libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
-extern char *func_800289CC(char *dest, char *suffix);
+extern char *func_800289CC(char *dest, char *suffix); /* code_179d8_r */
 extern void InitCdDrive(void);
 
-s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
+#define CD_SEARCH_RETRIES 0x65
+
+s32 ResolveFileEntries(CdFileEntry *entries, s32 count)
 {
-    FileEntryQ *end;
+    CdFileEntry *end;
     char path[0x40];
-    CdStatBufQ buf;
+    CdFileInfo info;
     s32 tries;
 
-    end = arg0 + count;
+    end = entries + count;
 
     InitCdDrive();
 
-    for (; arg0 < end; arg0++) {
-        func_800289CC(path, arg0->name);
+    for (; entries < end; entries++) {
+        func_800289CC(path, entries->name);
 
-        for (tries = 0; tries < 0x65; tries++) {
-            if (CdSearchFile(&buf, path) != 0) {
+        for (tries = 0; tries < CD_SEARCH_RETRIES; tries++) {
+            if (CdSearchFile(&info, path) != 0) {
                 goto found;
             }
         }
@@ -77,8 +89,8 @@ s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
         printf(sFileNotFoundMsg, path);
 
     found:
-        arg0->unk14 = buf.unk0;
-        arg0->unk18 = buf.unk4;
+        entries->pos = info.pos;
+        entries->size = info.size;
     }
 
     return 1;

@@ -10,24 +10,32 @@ own method-table slot **+0x074** (see the class-map comment above
 
 Byte-exact, third attempt (two intermediate near-misses, see below).
 
+The body below is the round-51 source, after track-3 naming. The
+derivation notes that follow were written in round 45 against the same
+code under its `unk` names; only names changed, the image is
+byte-identical, and the `## Naming` section at the end of this report
+carries the evidence for each one.
+
 ```c
-/* The pending-list node type func_8002832C (code_179d8_r) allocates and
- * func_800283C4 (code_179d8_r) unlinks/frees -- only the fields this call
- * site itself reads are typed here. */
-typedef struct QueueEntryD70 QueueEntryD70;
-struct QueueEntryD70 {
-    /* +0x00 */ s32 unk00;
+/* The queued-request node func_8002832C (code_179d8_r) allocates and
+ * func_800283C4 (code_179d8_r) unlinks and frees -- only the fields this
+ * call site itself reads are typed here. `active` is the flag func_80028844
+ * (code_179d8_r) sets on the head node when it starts an operation on it;
+ * func_8002832C clears it at allocation. The list head is D_8008A894. */
+typedef struct CdRequest_D70 CdRequest_D70;
+struct CdRequest_D70 {
+    /* +0x00 */ s32 active;
     u8 pad04[0x0C - 0x04];
     /* +0x0C */ s32 owner;
     u8 pad10[0x20 - 0x10];
-    /* +0x20 */ QueueEntryD70 *next;
+    /* +0x20 */ CdRequest_D70 *next;
 };
 
-typedef struct SelfD70 SelfD70;
-struct SelfD70 {
+typedef struct Obj6D4E8_D70 Obj6D4E8_D70;
+struct Obj6D4E8_D70 {
     u8 pad00[0x22];
-    /* +0x22 */ u16 unk22;
-    /* +0x24 */ s32 unk24;
+    /* +0x22 */ u16 pendingRequests;
+    /* +0x24 */ s32 flags;
 };
 
 extern s32 D_8008A894;
@@ -35,24 +43,24 @@ extern s32 gCdIdle;
 extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
-extern void func_80028864(void); /* code_179d8_r */
-extern void func_800283C4(QueueEntryD70 *arg0); /* code_179d8_r */
+extern void func_80028864(void); /* code_179d8_r: reset the state machine */
+extern void func_800283C4(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
-void Class6D4E8__CancelRequests(SelfD70 *self)
+void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 {
-    QueueEntryD70 *entry;
-    QueueEntryD70 *node;
-    QueueEntryD70 *next;
+    CdRequest_D70 *entry;
+    CdRequest_D70 *node;
+    CdRequest_D70 *next;
     s32 saved;
 
     LockCd();
 
-    entry = (QueueEntryD70 *)D_8008A894;
+    entry = (CdRequest_D70 *)D_8008A894;
 
-    if (entry != NULL && self->unk22 != 0) {
-        self->unk24 = 0;
+    if (entry != NULL && self->pendingRequests != 0) {
+        self->flags = 0;
 
-        if (entry->owner == (s32)self && entry->unk00 != 0 && gCdIdle == 0) {
+        if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
             func_80028864();
             saved = D_8008A888;
@@ -60,11 +68,11 @@ void Class6D4E8__CancelRequests(SelfD70 *self)
             D_8008A87C = saved;
         }
 
-        for (node = (QueueEntryD70 *)D_8008A894; node != NULL; node = next) {
+        for (node = (CdRequest_D70 *)D_8008A894; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
                 func_800283C4(node);
-                self->unk22--;
+                self->pendingRequests--;
             }
         }
     }
@@ -78,9 +86,9 @@ void Class6D4E8__CancelRequests(SelfD70 *self)
 Reads as "flush a pending CD queue's entries belonging to `self`, then
 unlink and free them." Two guards gate the ENTIRE body (not just the
 `CdFlush` block): the pending-list head (`D_8008A894`) must be non-NULL and
-`self->unk22` (a pending-count) must be non-zero — if either fails, the
+`self->pendingRequests` (spelled `unk22` when this was written) must be non-zero — if either fails, the
 function does nothing but the latch dance. Inside that, an inner
-three-condition guard (head node's owner is `self`, head node's `unk00`
+three-condition guard (head node's owner is `self`, head node's `active` flag (`unk00` when this was written)
 flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
 `func_80028864()` (both cross-unit — `func_80028864` from foxtrot's
 `code_179d8_r`) and a load-clear-store handoff between `D_8008A888` and
@@ -89,7 +97,7 @@ cleared BEFORE the old value lands in `D_8008A87C`, not the natural-looking
 `D_8008A87C = D_8008A888; D_8008A888 = 0;`, which would store in the
 opposite order). Then, regardless of that inner guard, a loop walks the
 whole list unlinking every node whose `owner == self` via
-`func_800283C4` (also `code_179d8_r`) and decrementing `self->unk22` per
+`func_800283C4` (also `code_179d8_r`) and decrementing `self->pendingRequests` per
 node removed.
 
 Two register-allocation traps, both giving clean length-matching near-misses
