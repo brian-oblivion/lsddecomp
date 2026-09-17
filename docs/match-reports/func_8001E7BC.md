@@ -589,3 +589,33 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
 }
 #endif
 ```
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **KEPT as `func_8001E7BC`. Tier C.** What IS known, written down so the
+  next reader does not re-derive it:
+  - It is a **method of Class6B5CC** (first parameter `Class6B5CCObj *`,
+    dispatches `slotA4`), and it is the function that MAINTAINS the world
+    position: its first block rewrites `unk14->unk38` (== Sony's
+    `GsCOORDINATE2.workm.t`, see the PSY-Q IDENTIFICATION note in
+    include/code_d294.h) as `coord.t` plus every owner's `coord.t`, walking
+    the `self->unkC` list. `Class6B5CC__LocalOffsetToWorldPos` and
+    `Class6B5CC__FaceTarget` are both consumers of that field.
+  - The rest computes the target point `arg2` relative to that world
+    position, rotates the delta into the object's own frame via `slotA4`
+    (func_8001D950, the inverse-chain matrix: `slot84` with the NEGATED
+    angle flag, composed down the owner list with `MulMatrix2`), then calls
+    `func_8001F8B8` twice -- once with the Y component minus 0x400 and, on
+    failure, once plus 0x400, i.e. +/- 90 degrees -- and finally returns
+    `SubVec3S16(arg1, buf18, buf28)`.
+  - **Why no name.** `func_8001F8B8` lives in the Psy-Q block
+    (`psyq_fa50`), is not decompiled, and is the whole point of the second
+    half; without it, any verb for this function ("probe", "trace", "clip",
+    "aim") is a guess about what the two +/-90-degree attempts are FOR. The
+    first half alone would justify something like
+    `Class6B5CC__UpdateWorldPos`, but that would name a third of the body
+    and mislead about the return value, which is the second half's result.
+  - Reopening it is cheap once `func_8001F8B8` is identified (track 2).
+- Naming touched nothing in this function's preserved `#if 0` body except
+  the callee names `rename.py` rewrote (`SubVec3S16`). It is still
+  `INCLUDE_ASM`; the stall verdict above is unchanged.
