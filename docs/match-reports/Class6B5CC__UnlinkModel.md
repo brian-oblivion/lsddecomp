@@ -27,3 +27,16 @@ Comment in the header updated (round 14) to say "now carved" instead of
 no type or prototype changed.
 
 No new struct or vtable-slot knowledge.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001E7B0` -> `Class6B5CC__UnlinkModel`. Tier B.** It zeroes
+  exactly the two fields `Class6B5CC__LinkModel` sets, and only those: the
+  GsDOBJ2's `tmd` pointer at +0x18 and the source object at +0x20. The name
+  is the inverse of its pair BY CONSTRUCTION, not because any Sony call
+  pins it -- there is no GS call here at all, which is why this is B where
+  `Class6B5CC__LinkModel` is A.
+- Its one dispatch path supports the pairing: `func_8001CD20` (code_d294.c)
+  forwards `Class6B5CCMethods::slot18` straight into it, while
+  `func_8001CC48` -- the +0x010 slot -- is what forwards into
+  `Class6B5CC__LinkModel`.
