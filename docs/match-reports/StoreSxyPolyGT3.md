@@ -1,15 +1,17 @@
-# func_80019710
+> Renamed from `func_80019710` on 2026-09-17 (tools/rename.py). Address 0x80019710.
+
+# StoreSxyPolyGT3
 
 **Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 Third distinct offset pattern in the GTE-store family (see
-`func_800196D4.md` for the family overview and reproducer methodology):
+`StoreSxyPolyF3.md` for the family overview and reproducer methodology):
 stride-12 this time (`0x8`, `0x14`, `0x20`).
 
 ## The C
 
 ```c
-void func_80019710(void *dst)
+void StoreSxyPolyGT3(void *dst)
 {
     __asm__ volatile (
         "swc2 $12, 0x8(%0)\n\t"

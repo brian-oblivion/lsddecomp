@@ -234,27 +234,27 @@ s32 TransformAndCullPoly(void *arg0, void *arg1)
     return 0;
 }
 
-void func_800196D4(void *dst)
+void StoreSxyPolyF3(void *dst)
 {
     gte_stsxy3_f3(dst);
 }
 
-void func_800196E8(void *dst)
+void StoreSxyPolyG3(void *dst)
 {
     gte_stsxy3_g3(dst);
 }
 
-void func_800196FC(void *dst)
+void StoreSxyPolyFT3(void *dst)
 {
     gte_stsxy3_ft3(dst);
 }
 
-void func_80019710(void *dst)
+void StoreSxyPolyGT3(void *dst)
 {
     gte_stsxy3_gt3(dst);
 }
 
-void func_80019724(void *dst, s32 flag)
+void StoreSxyPolyF4(void *dst, s32 flag)
 {
     char *p = (char *)dst + 0x14;
 
@@ -265,7 +265,7 @@ void func_80019724(void *dst, s32 flag)
     }
 }
 
-void func_8001974C(void *dst, s32 flag)
+void StoreSxyPolyG4(void *dst, s32 flag)
 {
     char *p = (char *)dst + 0x20;
 

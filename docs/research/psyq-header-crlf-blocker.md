@@ -142,7 +142,7 @@ The CRLF is an artifact of how these headers reached *this repo*, not of the
 
 ## The open question this raises, which is the valuable one
 
-Retail's `func_800196D4` is:
+Retail's `StoreSxyPolyF3` is:
 
 ```
 swc2 $12, 0x8($a0)
@@ -157,8 +157,8 @@ no `move`. Every `gte_stsxy*` macro in this `INLINE.H` begins
 `move $12,%0` and then emits `.word` constants — which cannot produce that
 sequence even once the CRLF is fixed.
 
-So the six GTE leaves matched in round 12 (`func_800196D4`, `func_800196E8`,
-`func_800196FC`, `func_80019710`, `func_80019724`, `func_8001974C`) are
+So the six GTE leaves matched in round 12 (`StoreSxyPolyF3`, `StoreSxyPolyG3`,
+`StoreSxyPolyFT3`, `StoreSxyPolyGT3`, `StoreSxyPolyF4`, `StoreSxyPolyG4`) are
 **not** `gte_stsxy*` call sites. They are either game-local inline asm or a
 game-local macro. That is a statement about the *game's* source, and it stands
 independently of the CRLF bug — but it could only be established after ruling

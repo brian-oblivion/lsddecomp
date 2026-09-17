@@ -1,16 +1,18 @@
-# func_80019724
+> Renamed from `func_80019724` on 2026-09-17 (tools/rename.py). Address 0x80019724.
+
+# StoreSxyPolyF4
 
 **Unit:** code_8220_b · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
 
-Conditional variant of the GTE-store family (see `func_800196D4.md` for the
+Conditional variant of the GTE-store family (see `StoreSxyPolyF3.md` for the
 family overview). `flag` selects between a full 3-register store (same
-stride-4 layout as `func_800196D4`) and a single-register store of just IR3
+stride-4 layout as `StoreSxyPolyF3`) and a single-register store of just IR3
 to a different, unrelated struct field.
 
 ## What it does
 
 ```c
-void func_80019724(void *dst, s32 flag)
+void StoreSxyPolyF4(void *dst, s32 flag)
 {
     char *p = (char *)dst + 0x14;
 

@@ -140,7 +140,7 @@ alone, like an unrelated structural mismatch. When a `swc2`/`lwc2`/`cfc2`
 asm block's residue looks like "half my registers are just off by a
 constant offset, and there's one extra instruction I can't place," check
 the clobber list for GPR names before reshaping the surrounding C — the
-project's own store-leaf precedents (`func_800196D4` etc., same unit)
+project's own store-leaf precedents (`StoreSxyPolyF3` etc., same unit)
 clobber ONLY `"memory"`, never a GPR number, and that omission is
 load-bearing, not incidental style. (`ProjectTriFace`, 8/57 -> 33/57 from
 this one fix alone.)

@@ -1,9 +1,11 @@
-# func_800196E8
+> Renamed from `func_800196E8` on 2026-09-17 (tools/rename.py). Address 0x800196e8.
+
+# StoreSxyPolyG3
 
 **Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
-Sibling of `func_800196D4` (see that report for the GTE-store family
-overview and the reproducer methodology). This one and `func_800196FC`
+Sibling of `StoreSxyPolyF3` (see that report for the GTE-store family
+overview and the reproducer methodology). This one and `StoreSxyPolyFT3`
 (next function, byte-identical body) store to a stride-8 layout instead of
 the tightly-packed stride-4 layout.
 
@@ -18,7 +20,7 @@ translated arithmetic.
 ## What it does
 
 ```c
-void func_800196E8(void *dst)
+void StoreSxyPolyG3(void *dst)
 {
     __asm__ volatile (
         "swc2 $12, 0x8(%0)\n\t"

@@ -1,10 +1,12 @@
-# func_800196D4
+> Renamed from `func_800196D4` on 2026-09-17 (tools/rename.py). Address 0x800196d4.
+
+# StoreSxyPolyF3
 
 **Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 First of a family of GTE-register-store leaves in this unit
-(`func_800196D4`/`E8`/`FC`/`80019710`, plus the two conditional siblings
-`func_80019724`/`8001974C`). See `func_800196E8.md` for the shared GTE
+(`StoreSxyPolyF3`/`E8`/`FC`/`80019710`, plus the two conditional siblings
+`StoreSxyPolyF4`/`8001974C`). See `StoreSxyPolyG3.md` for the shared GTE
 background; this report covers what's specific to this one.
 
 ## What it does
@@ -12,13 +14,13 @@ background; this report covers what's specific to this one.
 Stores COP2 data registers `$12`/`$13`/`$14` (GTE `IR1`/`IR2`/`IR3` per the
 nocash PSX GTE register map) into three consecutive 4-byte fields of the
 struct pointed to by `$a0`, at offsets `0x8`, `0xC`, `0x10` — a tightly
-packed 3-`long` vector (no padding word, unlike `func_800196E8`'s stride-8
+packed 3-`long` vector (no padding word, unlike `StoreSxyPolyG3`'s stride-8
 layout).
 
 ## The C
 
 ```c
-void func_800196D4(void *dst)
+void StoreSxyPolyF3(void *dst)
 {
     __asm__ volatile (
         "swc2 $12, 0x8(%0)\n\t"
@@ -58,7 +60,7 @@ choice being taken away from GCC — only the base-pointer input operand is
 under `-r` constraint, same as any other inline-asm memory access. Verify
 matches for these with the CLAUDE.md reproducer pipeline in isolation before
 touching `src/`, since a wrong base-register vs. precomputed-pointer choice
-(see `func_80019724.md`) changes emitted bytes even when the resulting
+(see `StoreSxyPolyF4.md`) changes emitted bytes even when the resulting
 memory address is identical.
 
 ### Head note (round 12) — accepted, with two corrections

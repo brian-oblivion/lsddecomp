@@ -52,7 +52,7 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    `: : "r" (dst) : "memory"` is not register pinning, it is the only way to
    reference the pointer. `src/code_8220_b.c` has carried eight such
    constraints, byte-verified, since before this rule was written down —
-   `func_800196D4` and its five siblings — and round 13 matched three more
+   `StoreSxyPolyF3` and its five siblings — and round 13 matched three more
    functions the same way. Those constraints now live inside the `gte_*`
    macros in `include/gte.h`, which is where the exception is spelled out
    once instead of at every call site.
