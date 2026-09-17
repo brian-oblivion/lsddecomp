@@ -409,3 +409,22 @@ variant) that would have supported an escalation had hypothesis (2) also
 failed instead FOUND the real fix -- the recipe is symmetric, useful for
 confirming a real toolchain lead and for falsifying one into a genuine
 source-level answer.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EE98` -> `ApplyMatrixToLVArray`. Tier A.** Free function,
+  complete semantics: `count` iterations of Sony's `ApplyMatrixLV(m, v0,
+  v1)` (`v1 = m * v0`, VECTOR in and out) over 0xC-byte elements -- the
+  long-vector sibling of `ApplyMatrixToSVArray`. Same reason for the
+  `ApplyMatrixTo...` spelling: it must not read as an SDK export.
+- **Parameters corrected to `(dst, src, count, m)`** from `(a, b, count,
+  fixed)`, per the byte-exact call `ApplyMatrixLV(m, src, dst)` inside the
+  loop: the 1st argument is written. Names only; byte-identical. The
+  declaration in include/code_d294.h was updated to match, and that is an
+  edit to an EXISTING declaration in a shared header -- flagged as such in
+  the round summary.
+- **The `if (0)` branch is untouched and must stay.** It is what sizes
+  retail's 24-byte outgoing-argument area; the derivation is in the MATCHED
+  section above and is the reason `ApplyMatrixLV` is declared unprototyped.
+  A reader deleting it as dead code breaks the match, so the unit now says
+  so at the site as well as here.
