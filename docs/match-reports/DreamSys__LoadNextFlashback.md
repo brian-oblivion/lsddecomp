@@ -54,7 +54,7 @@ fail:
   reproduces retail's block-move codegen" idiom
   (`DECOMPILATION_LEARNINGS.md`), here at a non-power-of-2 size instead of
   the previously-seen 4-word-aligned case.
-- `this->vt->slot30`: reuses the `BasicClass__func_182cc` slot established
+- `this->vt->slot30`: reuses the `BasicClass__NotifyParents` slot established
   by `ExecuteLink` earlier this round -- same table, same signature
   (`this`, literal `0xE`).
 

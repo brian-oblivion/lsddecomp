@@ -290,7 +290,7 @@ extern s32 *D_80086974[7];
  * typed up front (same policy as include/class_39e08.h). */
 typedef struct Obj866E8Methods {
     u8 pad000[0x30];
-    /* = BasicClass::onFinalize (`BasicClass__func_182cc`, classtable-
+    /* = BasicClass::onFinalize (`BasicClass__NotifyParents`, classtable-
      * verified against `D_800866E8`'s own +0x030 entry) -- this class
      * inherits the base BasicClassMethods layout for its low slots (see
      * `include/code_8220.h`). Called by func_8004B5BC as
@@ -2665,7 +2665,7 @@ struct Obj86ED0Methods {
     void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, func_80051270/func_800512C8 (OVERRIDES BasicClass's removeChild: func_80050DB4) */
     u8 pad018[0x030 - 0x018];
     /* +0x030, func_800512C8's own dispatch -- UNMODIFIED BasicClass
-     * onFinalize (BasicClass__func_182cc, code_8220_b), reached through
+     * onFinalize (BasicClass__NotifyParents, code_8220_b), reached through
      * self's own table this one time instead of `Get_vtable_BasicClass()`. */
     void (*onFinalize)(Obj86ED0 *self, s32 arg1);
     u8 pad034[0x040 - 0x034];

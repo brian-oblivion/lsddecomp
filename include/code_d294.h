@@ -422,7 +422,7 @@ struct Class6B5CCMethods {
     void *(*ctor)(void *self);                /* +0x008, func_8001CAF4 (this unit) */
     void  (*dtor)(void *self);                /* +0x00C, func_8001CBA4 (this unit) */
     u8 pad010[0x030 - 0x010];
-    /* +0x030, BasicClass__func_182cc, inherited verbatim (per the file
+    /* +0x030, BasicClass__NotifyParents, inherited verbatim (per the file
      * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
      * is a different unit's own ancestor code. func_8001D624 (round 12,
      * this unit) dispatches through it as `(self, s32 arg1)`. */

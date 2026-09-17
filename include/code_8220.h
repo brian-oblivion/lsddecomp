@@ -58,9 +58,9 @@ struct BasicClassMethods {
     /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls func_80018208, which is void (see below) */
     /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
     /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */
-    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__func_182cc; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, arg1) */
+    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, arg1) */
     /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b */
-    /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__func_18358; code_8220_b */
+    /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__OnNotify; code_8220_b */
 };
 
 struct BasicClass {
@@ -144,13 +144,13 @@ extern void func_80017AC8(BMemPMgr *pool);
 extern BMemPMgr *D_8008A818;
 
 /* Pool allocator/free critical-section flag, code_8220_b (setter
- * func_8001844C, getter func_80018458). func_80017B34/func_80017CFC in
- * THIS unit bracket their free-list walk with func_8001844C(1) on entry
- * and func_8001844C(0) on exit -- an enter/exit pair, not a real lock
+ * SetBMemPMgrBusy, getter GetBMemPMgrBusy). func_80017B34/func_80017CFC in
+ * THIS unit bracket their free-list walk with SetBMemPMgrBusy(1) on entry
+ * and SetBMemPMgrBusy(0) on exit -- an enter/exit pair, not a real lock
  * (no busy-wait or check on entry visible in either caller). */
-extern s32 D_8008A820;
-extern void func_8001844C(s32 val);
-extern s32 func_80018458(void);
+extern s32 gBMemPMgrBusy;
+extern void SetBMemPMgrBusy(s32 val);
+extern s32 GetBMemPMgrBusy(void);
 
 /* The Psy-Q declarations that used to sit here (func_80011D34 is malloc,
  * func_80011F68 is free, func_80012C20 is printf) moved into src/code_8220.c

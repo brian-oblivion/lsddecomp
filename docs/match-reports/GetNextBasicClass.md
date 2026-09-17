@@ -27,6 +27,6 @@ Byte-exact on the first attempt. Retail reloads `*cursor` from memory twice
 (once for `->value`, once for `->next`) rather than caching it in a register
 across the two field reads — writing the source the same way, dereferencing
 `*cursor` at each use site instead of caching it in a local `node` variable,
-reproduced that directly. This is the callee `BasicClass__func_182cc` uses to
-walk `parentRefs`/`children` lists (see `docs/match-reports/BasicClass__func_182cc.md`
+reproduced that directly. This is the callee `BasicClass__NotifyParents` uses to
+walk `parentRefs`/`children` lists (see `docs/match-reports/BasicClass__NotifyParents.md`
 if present, and the class comment in `include/code_8220.h`).

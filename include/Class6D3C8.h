@@ -74,9 +74,9 @@ typedef struct Class6D3C8Methods {
     void *unk24;                                            /* +0x024 BasicClass__func_1811c */
     void *unk28;                                            /* +0x028 BasicClass__func_1813c */
     void *unk2C;                                            /* +0x02C BasicClass__func_1816c */
-    void *unk30;                                            /* +0x030 BasicClass__func_182cc */
+    void *unk30;                                            /* +0x030 BasicClass__NotifyParents */
     void *unk34;                                            /* +0x034 BasicClass__func_18350 */
-    void *unk38;                                            /* +0x038 BasicClass__func_18358 */
+    void *unk38;                                            /* +0x038 BasicClass__OnNotify */
     void *unk3C;                                            /* +0x03C null slot */
     void (*slot40)(Class6D3C8 *self);                       /* +0x040 func_800260A4 (ignores self) */
     void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 func_80026108 */

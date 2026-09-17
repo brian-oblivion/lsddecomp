@@ -80,7 +80,7 @@ void *func_80017B34(size, pool)
     u32 blockSize;
     u32 word;
 
-    func_8001844C(1);
+    SetBMemPMgrBusy(1);
     result = NULL;
     mgr = D_8008A818;
     if (mgr == NULL) {
@@ -156,7 +156,7 @@ void *func_80017B34(size, pool)
             cursor = cursor->prev;
         }
     }
-    func_8001844C(0);
+    SetBMemPMgrBusy(0);
     return result;
 }
 #endif
@@ -172,7 +172,7 @@ void *func_80017CFC(ptr, pool)
     BMemBlockHdr *next;
     u32 nextFree;
 
-    func_8001844C(1);
+    SetBMemPMgrBusy(1);
     mgr = D_8008A818;
     if (mgr == NULL) {
         mgr = pool;
@@ -252,7 +252,7 @@ void *func_80017CFC(ptr, pool)
         header->sizeAndFlags |= 0x40000000;
         next->sizeAndFlags |= 0x80000000;
     }
-    func_8001844C(0);
+    SetBMemPMgrBusy(0);
     return NULL;
 }
 

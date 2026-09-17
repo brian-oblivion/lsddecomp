@@ -1,16 +1,18 @@
-# BasicClass__func_18358
+> Renamed from `BasicClass__func_18358` on 2026-09-17 (tools/rename.py). Address 0x80018358.
+
+# BasicClass__OnNotify
 
 **Unit:** code_8220_b · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 
 BasicClass vtable slot `+0x038` (`slot38` in `BasicClassMethods`). Called by
-`BasicClass__func_182cc` (slot `+0x030`, `onFinalize`, still `INCLUDE_ASM`
+`BasicClass__NotifyParents` (slot `+0x030`, `onFinalize`, still `INCLUDE_ASM`
 this round) once per entry in `self->parentRefs`, as
 `parent->methods->slot38(parent, childBeingFinalized, 1)`.
 
 ## What it does
 
 ```c
-void BasicClass__func_18358(BasicClass *self, void *arg1, s32 arg2)
+void BasicClass__OnNotify(BasicClass *self, void *arg1, s32 arg2)
 {
     if (arg2 == 1) {
         self->methods->removeChild(self, (BasicClass *)arg1);

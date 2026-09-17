@@ -13,7 +13,7 @@ void FreeBasicClassList(BasicClassListNode **head)
     }
 }
 
-void BasicClass__func_182cc(BasicClass *self, s32 arg1)
+void BasicClass__NotifyParents(BasicClass *self, s32 arg1)
 {
     BasicClassListNode *cursor = self->parentRefs;
     BasicClass *value;
@@ -26,7 +26,7 @@ void BasicClass__func_182cc(BasicClass *self, s32 arg1)
 void BasicClass__func_18350(void) {
 }
 
-void BasicClass__func_18358(BasicClass *self, void *arg1, s32 arg2)
+void BasicClass__OnNotify(BasicClass *self, void *arg1, s32 arg2)
 {
     if (arg2 == 1) {
         self->methods->removeChild(self, (BasicClass *)arg1);
@@ -58,14 +58,14 @@ void ReleaseBasicClassArray(BasicClass **array, s32 count)
     }
 }
 
-void func_8001844C(s32 val)
+void SetBMemPMgrBusy(s32 val)
 {
-    D_8008A820 = val;
+    gBMemPMgrBusy = val;
 }
 
-s32 func_80018458(void)
+s32 GetBMemPMgrBusy(void)
 {
-    return D_8008A820;
+    return gBMemPMgrBusy;
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018464);

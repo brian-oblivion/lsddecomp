@@ -1,9 +1,11 @@
-# BasicClass__func_182cc — MATCHED (33/33 words)
+> Renamed from `BasicClass__func_182cc` on 2026-09-17 (tools/rename.py). Address 0x800182cc.
+
+# BasicClass__NotifyParents — MATCHED (33/33 words)
 
 Unit: `src/code_8220_b.c`. This is `BasicClassMethods` vtable slot `+0x030`,
 `onFinalize(self, s32 flag)` (already documented in
 `include/code_8220.h`'s struct comment). Walks `self->parentRefs` and, for
-each parent, calls that parent's own `slot38` (`BasicClass__func_18358`,
+each parent, calls that parent's own `slot38` (`BasicClass__OnNotify`,
 already matched in this unit) with `self` as its `arg1` and `flag` passed
 through as `arg2`. Since `slot38` only acts `if (arg2 == 1)`, calling
 `onFinalize(self, 1)` (as `BasicClass__func_17f2c`'s finalize path does)
@@ -13,7 +15,7 @@ own child.
 ## Final source
 
 ```c
-void BasicClass__func_182cc(BasicClass *self, s32 arg1)
+void BasicClass__NotifyParents(BasicClass *self, s32 arg1)
 {
     BasicClassListNode *cursor = self->parentRefs;
     BasicClass *value;

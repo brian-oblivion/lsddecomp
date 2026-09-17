@@ -954,7 +954,7 @@ struct Obj86B60Methods {
     u8 pad018[0x030 - 0x018];
     void (*slot30)(Obj86B60 *self);               /* +0x030, inherited
                                                       BasicClass slot
-                                                      (BasicClass__func_182cc);
+                                                      (BasicClass__NotifyParents);
                                                       OBSERVED: func_8003E4B8
                                                       (round 13) */
     u8 pad034[0x040 - 0x034];
@@ -1374,7 +1374,7 @@ struct BasicClassMethodsCC8C {
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
-                                  BasicClass__func_18358 (code_8220_b);
+                                  BasicClass__OnNotify (code_8220_b);
                                   OBSERVED: func_8003E030 */
 };
 

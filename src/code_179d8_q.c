@@ -372,7 +372,7 @@ void func_800280E0(void)
     D_8008A88C = 0;
 }
 
-extern s32 func_80018458(void); /* code_8220_b */
+extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
 extern s32 D_8008A8A4;
 extern s32 D_8008A898;
 extern void func_8002858C(void); /* code_179d8_r */
@@ -396,7 +396,7 @@ s32 func_800280EC(void)
         return 0;
     }
 
-    if (func_80018458() != 0) {
+    if (GetBMemPMgrBusy() != 0) {
         return 0;
     }
 

@@ -39,7 +39,7 @@ struct PadMethods {
     /* +0x2C */ void *unk2C;
     /* +0x30 */ void (*onButtonEvent)(Pad *self, s32 event); /* per-instance overridable; base impl lives outside this unit */
     /* +0x34 */ void *unk34;
-    /* +0x38 */ void *unk38;  /* == BasicClass__func_18358, inherited, unused by this unit */
+    /* +0x38 */ void *unk38;  /* == BasicClass__OnNotify, inherited, unused by this unit */
     /* +0x3C */ void *unk3C;  /* null slot in the base table */
     /* +0x40 */ void (*init)(Pad *self, s32 port);
     /* +0x44 */ u32 (*updateMasks)(Pad *self);
