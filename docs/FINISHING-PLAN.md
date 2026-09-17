@@ -19,8 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 1 (2026-09-16). Changing the plan is a Fable head task; record
-the change in `docs/PROGRESS.md` and bump this line.
+Plan revision: 2 (2026-09-17, after round 50's four escalated gaps). Changing
+the plan is a Fable head task; record the change in `docs/PROGRESS.md` and
+bump this line.
 
 ## 1. What done means
 
@@ -49,7 +50,7 @@ the SDK" is a goal. Done is all five of:
 
 | role | default | switch, and to what |
 | --- | --- | --- |
-| **head** | Opus | **Fable** when the round will WRITE a new procedure, tool or doc (including the first run of any track, and any change to this plan), or must adjudicate a HARD RULE tension or a toolchain lead. A round that repeats a documented procedure is Opus. |
+| **head** | Opus | **Fable** when the round will WRITE a new procedure, tool or doc (any change to this plan included), must adjudicate a HARD RULE tension or a toolchain lead, or follows a round that ESCALATED procedure gaps. An Opus head may take a track's first run: it executes what is written and escalates every gap in its report instead of writing procedure, which is what round 50 did correctly. |
 | **matching runner** (tracks 1, revisit) | decided by calibration: `plan.py` says which | round A Sonnet, round B Opus, on comparably ranked stalls; thereafter whichever produced more matches per runner-session. The head may override with `plan.py set-model`, with a reason in PROGRESS.md. |
 | **naming runner** (track 3) | Opus | **Sonnet** once the head has reviewed two Opus-named units and found no wrong tier-A name. Back to Opus if a Sonnet unit fails review. |
 | **mechanical runner** (track 2 identification, track 1b promotion, report hygiene) | Sonnet | never higher |
@@ -85,11 +86,17 @@ function whose report marks its levers spent unless the brief names a changed
 state.
 
 **Calibration and stop rule.** Two rounds, round A Sonnet runners, round B
-Opus runners, on comparably ranked stalls. After each round the head records:
+Opus runners. A calibration round takes **at least four assignments from the
+top of `nearmiss.py`'s ranked stall list**, so the two models are measured on
+the same band. Fresh giants and revisits are jobs too, but a round that worked
+only those is recorded with `--not-calibration` and does not count toward the
+stop rule (round 50 measured two runners on a 324w and a 954w fresh body and
+was re-flagged this way). After each round the head records:
 
 ```sh
 python3 tools/plan.py record-round --track 1 --round <N> --model <sonnet|opus> \
-    --runners <R> --attempts <functions attempted> --matches <byte-exact matches> --note "..."
+    --runners <R> --attempts <functions attempted> --matches <byte-exact matches> --note "..." \
+    [--not-calibration]
 ```
 
 If the two rounds together produce fewer than 3 matches, `plan.py` parks the
@@ -158,13 +165,18 @@ BODY: <reason>` line in its report title region and is done.
 segment carries Sony's name. `plan.py --json` lists the unnamed ones under
 `tracks.2.unnamed_list`. Nothing else in the SDK is a goal.
 
-**First job, head, Fable (new tool):** `tools/sdkname.py`, which scores each
-unnamed SDK function against every function in every object on every disc in
-`sdk/` by relocation-masked instruction similarity, and prints ranked
-candidates with the disc and module. `tools/psyq_sdk.py match` requires an
-exact placement; a function from an older library build the discs do not
-carry still identifies at high similarity. Cross-check the tool on ten
-already-placed functions before believing it on an unplaced one.
+**The tool:** `.venv/bin/python3 tools/sdkname.py <func>...` (or `--all`)
+scores each unnamed SDK function against every function in every object on
+every disc in `sdk/` by relocation-masked comparison and a shape ratio, and
+prints ranked candidates with disc and module, plus the placed objects on
+either side of the function as position evidence. `--selfcheck 10` recovers
+placed functions exactly (9 of 9 at revision 2); rerun it whenever the corpus
+changes. Read its three flags: `EXACT` is the same build; `TINY` means a body
+of six words or fewer matched a stub shape that many functions share, which is
+not identification without position evidence; `AMBIGUOUS` means several names
+match exactly and position decides. A top candidate with `masked` under about
+0.6 and no `EXACT` is a function from a library build the discs do not carry,
+and only position plus header prototype can name it.
 
 **Evidence, strongest first**, and a name needs two independent kinds or one
 fingerprint above the threshold the tool's self-check established:
@@ -184,8 +196,10 @@ header; a signature conflict is a finding, not a nuisance. Byte-exact after
 every rename. A function with no evidence keeps `func_` and gets a comment
 naming the library block it sits in.
 
-**Runner** (Sonnet), prompt in §4.4, after the tool exists. **Done** when
-`plan.py` reports zero unnamed.
+**Runner** (Sonnet), prompt in §4.4. **Done** when `plan.py` reports zero
+unnamed. **Park rule:** a function whose best candidate is below the bar and
+whose position is ambiguous keeps `func_` with a `// <library>, unidentified:`
+comment naming the best candidate and score; it is done for this track.
 
 ### Track 3: readability, one unit at a time
 
@@ -203,10 +217,19 @@ propagates everywhere.
    comment and reports.
 2. Name functions with `tools/rename.py` (one command: symbols file, sources,
    report file, extract, verify). Never by hand.
-3. Name struct fields and vtable slots in the header the unit owns. A slot
-   rename in a SHARED vtable struct is a header edit other live runners see:
-   post it to the broadcast the moment it lands, keep edits additive, never
-   move an offset (CLAUDE.md, the shared-struct hazard).
+3. Name struct fields and vtable slots. Ownership is decided per FIELD, not
+   per header, by who accesses it (`grep -rn -- '->oldName\b\|\.oldName\b' src/`):
+   - accessed only from your unit: rename it yourself, in the header and in
+     your unit, whatever header it lives in;
+   - accessed from other units too: do NOT rename. Put the proposed name, its
+     tier and its evidence under `## Proposed field names` in the report of
+     the function that established it, and post it to the broadcast. The HEAD
+     applies cross-unit field renames at merge time, one at a time, as a
+     whole-tree textual replace followed by the oracle: a hit on a same-named
+     field of a DIFFERENT struct fails to compile, so the compiler flags every
+     mis-hit and the head reverts just those.
+   Never move an offset or change a type in a shared header (CLAUDE.md, the
+   shared-struct hazard); a rename is the only edit this step makes.
 4. Name globals with `tools/rename.py`. Replace magic constants with named
    constants or enums where the meaning is established.
 5. Write the unit's header comment: what the unit IS (which class or
@@ -221,10 +244,16 @@ propagates everywhere.
 - **Name what the code does, never what you guess it is for.**
   `DreamSys__ResetLinkState` is evidence-based even when nobody knows why;
   `PlayNightmareSound` is a guess when all you see is a sound call.
-- **Tiers, recorded in the report:** A, purpose known from unambiguous
-  evidence; B, mechanics described; C, placeholder kept (`func_`), with what
-  IS known written down. A wrong tier-A name is worse than a `func_`. A tier-B
-  name is expected to be sharpened later; renames are cheap now.
+- **Tiers, recorded in the report:** A, purpose known: evident from the body
+  alone, or from two or more callers that agree, and a pure leaf whose
+  mechanics ARE its purpose (a getter, a clamp, a list push) is tier A by
+  definition; B, mechanics described but purpose in the game not established;
+  C, placeholder kept, with what IS known written down. The tier-C form for a
+  method whose CLASS is known is `Class__func_xxxxx` (the existing
+  `BasicClass__func_17eb0` convention), and bare `func_800xxxxx` otherwise;
+  `plan.py` counts both as unnamed. A wrong tier-A name is worse than a
+  placeholder. A tier-B name is expected to be sharpened later; renames are
+  cheap now.
 - **Conventions, from the code as it stands:** methods `Class__Method`
   (`DreamSys__AdvanceDay`), where `Class` is the struct's type name;
   free functions `VerbNoun` (`CalcDreamColor`); constructors `New_Class` and
@@ -234,6 +263,10 @@ propagates everywhere.
 - **Every inherited name (FirecatFG's, `CREDITS.md`) is a tier-B hypothesis.**
   Confirm it with evidence or rename it; either way, record it.
 - **Do not rename a Sony symbol.** Those names are Sony's.
+
+**Head at merge.** Apply the runner's proposed cross-unit field names one at
+a time (whole-tree replace, build, revert the compiler's mis-hits, build
+again), then `make extract` (the symbols file changed) and the oracle.
 
 **Head review before `mark-unit`.** Sample five names per unit against their
 evidence. A tier-A name without evidence, or a name that asserts purpose
@@ -313,10 +346,11 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 >
 > Do the pass in §3 track 3 in order, for every function in the unit including
 > `NON_MATCHING` bodies. Use `python3 tools/rename.py OLD NEW` for every
-> function and global rename; never rename by hand. Field and slot names are
-> header edits: additive, no offset moves, and post every SHARED vtable slot
-> rename to `tools/broadcast.sh post --from <name>` at once; read the
-> broadcast before each function. After every rename and every header edit:
+> function and global rename; never rename by hand. Fields and slots follow
+> step 3's ownership rule: rename what only your unit accesses; PROPOSE the
+> rest in the report under `## Proposed field names` and on the broadcast, and
+> leave the header alone. Read the broadcast before each function. After every
+> rename and every header edit:
 >
 > ```sh
 > ./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; \
@@ -332,14 +366,16 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > tier-A name is worse than `func_`. When unsure, keep `func_` and write down
 > what you know.
 >
-> Commit after each function's names land (one commit per function, or per
-> header edit). `git status --porcelain` empty when you report. Never push,
-> never edit shared docs or the splat yaml, never edit the symbols file
-> except through `rename.py`.
+> Commit per logical step: one commit per `rename.py` run or per batch of
+> renames in this unit, one commit per header edit, one for the unit header
+> comment. `git status --porcelain` empty when you report. Never push, never
+> edit shared docs or the splat yaml, never edit the symbols file except
+> through `rename.py`.
 >
 > Final summary: a table of every function in the unit: old name, new name,
-> tier, one-line evidence; the header comment you wrote; every shared-header
-> edit; anything you could not name and why.
+> tier, one-line evidence; the header comment you wrote; every header edit
+> you made and every field name you PROPOSED for the head to apply; anything
+> you could not name and why.
 
 ### 4.3 NON_MATCHING promotion prompt (track 1b; Sonnet)
 

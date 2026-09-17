@@ -8,7 +8,7 @@ and on which model.
     python3 tools/plan.py units                # per-unit readability table
 
     python3 tools/plan.py record-round --track 1 --round N --model sonnet|opus \\
-                          --runners R --attempts A --matches M [--note "..."]
+                          --runners R --attempts A --matches M [--note "..."] [--not-calibration]
     python3 tools/plan.py mark-unit --unit <unit> [--undo]        # track 3 pass done
     python3 tools/plan.py set-track --track N --status open|parked|done --reason "..."
     python3 tools/plan.py check --item <id> [--undo]              # track 5 checklist
@@ -91,7 +91,9 @@ DEFAULT_STATE = {
     },
 }
 
-FUNC_PH = re.compile(r"\bfunc_800[0-9A-F]{5}\b")
+# A splat placeholder, or the tier-C method form `Class__func_xxxxx` that keeps
+# the address in the name: both count as NOT YET NAMED (FINISHING-PLAN track 3).
+FUNC_PH = re.compile(r"^(?:\w+__)?func_(?:800)?[0-9A-Fa-f]{5}$")
 DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.M)
 NOT_DEF = {"if", "while", "for", "switch", "do", "return", "sizeof"}
 
@@ -236,12 +238,26 @@ def git_date(path):
     return out or None
 
 
+MIN_CALIBRATION_ATTEMPTS = 4
+
+
+def calibration_rounds(st):
+    """The rounds that COUNT toward calibration and the stop rule: recorded
+    without --not-calibration, on the ranked stall band, with at least
+    MIN_CALIBRATION_ATTEMPTS assignments. Round 50 measured two runners on a
+    324w and a 954w FRESH body and was recorded as calibration round A; the
+    stop rule would then have parked the track on evidence that never touched
+    the small stalls (FINISHING-PLAN track 1, revision 2)."""
+    return [r for r in st["tracks"]["1"]["rounds"]
+            if r.get("calibration", True) and r.get("attempts", 0) >= MIN_CALIBRATION_ATTEMPTS]
+
+
 def match_model(st):
     """Which model matching runners use next: alternate through calibration,
     then whichever won on matches per runner-session."""
     if st["models"].get("match_runner"):
         return st["models"]["match_runner"], "set by head"
-    rounds = st["tracks"]["1"]["rounds"]
+    rounds = calibration_rounds(st)
     k = st["stop_rule"]["calibration_rounds"]
     if len(rounds) < k:
         order = ["sonnet", "opus"]
@@ -262,7 +278,7 @@ def track1_status(st, fresh, stalled):
         return t["status"], t.get("reason", "")
     if fresh == 0 and stalled == 0:
         return "done", "queue empty"
-    rounds = t["rounds"]
+    rounds = calibration_rounds(st)
     k = st["stop_rule"]["calibration_rounds"]
     need = st["stop_rule"]["min_matches"]
     if len(rounds) >= k:
@@ -417,7 +433,7 @@ def jobs(d, n):
     return out[:n]
 
 
-def print_status(d, n):
+def print_status(d, n, st):
     p = d["progress"]
     t = d["tracks"]
     print("LSD: Dream Emulator finishing plan (docs/FINISHING-PLAN.md), measured now")
@@ -428,8 +444,10 @@ def print_status(d, n):
     print()
     print("  track  status     measured")
     t1 = t["1"]
+    ncal = len(calibration_rounds(st))
     print(f"  1      {t1['status']:<10} stall matching: {t1['fresh']} fresh, {t1['stalled']} stalled; "
-          f"{len(t1['rounds'])} round(s) recorded; next runner model {t1['next_match_model']} ({t1['why']})")
+          f"{len(t1['rounds'])} round(s) recorded, {ncal} count for calibration; "
+          f"next runner model {t1['next_match_model']} ({t1['why']})")
     if t1["reason"]:
         print(f"                    {t1['reason']}")
     if t1["revisit"]:
@@ -484,6 +502,10 @@ def main():
     r.add_argument("--attempts", type=int, required=True)
     r.add_argument("--matches", type=int, required=True)
     r.add_argument("--note", default="")
+    r.add_argument("--not-calibration", action="store_true",
+                   help="this round did not take >=4 assignments from the ranked stall band "
+                        "(e.g. it worked fresh giants); it is recorded but does not count "
+                        "toward calibration or the stop rule")
     m = sub.add_parser("mark-unit")
     m.add_argument("--unit", required=True)
     m.add_argument("--undo", action="store_true")
@@ -508,8 +530,12 @@ def main():
         st["tracks"].setdefault(a.track, {"status": "open", "reason": "", "rounds": []})
         st["tracks"][a.track].setdefault("rounds", []).append({
             "round": a.round, "date": today, "model": a.model, "runners": a.runners,
-            "attempts": a.attempts, "matches": a.matches, "note": a.note})
+            "attempts": a.attempts, "matches": a.matches, "note": a.note,
+            "calibration": not a.not_calibration})
         save_state(st)
+        if not a.not_calibration and a.attempts < MIN_CALIBRATION_ATTEMPTS:
+            print(f"NOTE: {a.attempts} attempt(s) is below {MIN_CALIBRATION_ATTEMPTS}; this round "
+                  f"is recorded but does not count toward calibration or the stop rule.")
         print(f"recorded round {a.round} on track {a.track}: {a.matches} match(es) from "
               f"{a.attempts} attempt(s) by {a.runners} {a.model} runner(s)")
         return
@@ -555,7 +581,7 @@ def main():
     elif a.cmd == "units":
         print_units(d)
     else:
-        print_status(d, a.n)
+        print_status(d, a.n, st)
 
 
 if __name__ == "__main__":

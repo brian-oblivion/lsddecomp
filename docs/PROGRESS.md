@@ -164,6 +164,24 @@ express them:**
 - Stale cross-references in MATCHING-GUIDE, SDK-OBJECTS-GUIDE and
   setup-worktree.sh repointed.
 
+**Revision 2 (2026-09-17, after round 50).** Round 50's Opus head ran the
+plan as written and escalated four track-3 gaps and a rename.py defect rather
+than writing procedure; all applied here. `rename.py` no longer rewrites
+`docs/PROGRESS.md`. A calibration round must take at least four assignments
+from the ranked stall band, and `record-round --not-calibration` marks one
+that did not; round 50 (two fresh giants) was re-flagged, so round B is
+calibration round 1 again, on Sonnet. Track 3: field ownership is per FIELD
+by accessor (rename what only your unit touches, PROPOSE the rest for the
+head to apply at merge, where a mis-hit on a same-named field fails to
+compile and is reverted); a pure leaf is tier A; tier C for a method is
+`Class__func_xxxxx` and `plan.py` counts it as unnamed; commits per logical
+step. The model table's "first run of any track needs Fable" clause was too
+strict and now says an Opus head may run a first pass and escalate gaps.
+`tools/sdkname.py` built and self-checked (9/9 placed functions recovered);
+its first `--all` pass names 13 of the 46 game-called SDK functions exactly
+and shows the rest come from library builds the discs do not carry, where
+position evidence has to decide.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

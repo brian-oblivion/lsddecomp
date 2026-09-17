@@ -21,7 +21,8 @@ WHAT IT DOES, in order:
      splat placeholder spelling;
   3. rewrites the symbols file (replaces OLD's line, or appends a line for a
      placeholder that had none) and every whole-word OLD in src/, include/,
-     docs/ (not the archive), and the report files;
+     the report files and the live docs -- NOT docs/PROGRESS.md and NOT
+     docs/archive/, which are narrative frozen at the time of writing;
   4. renames docs/match-reports/OLD.md to NEW.md and prepends a note so the
      old name stays greppable;
   5. `make extract` (asm/ is generated from the symbols file), then
@@ -60,6 +61,12 @@ def text_files():
                 "docs/*.md", "docs/match-reports/*.md", "docs/research/*.md",
                 "CLAUDE.md", "config/gp-symbols.txt"):
         out.extend(ROOT.glob(pat))
+    # docs/PROGRESS.md is the append-only NARRATIVE: a past round's entry
+    # describes what was observed under the name in use at the time, and
+    # rewriting it makes round 46 talk about a name invented in round 50
+    # (found by runner charlie, round 50). docs/archive/ is frozen for the
+    # same reason and is not in the globs above.
+    out = [p for p in out if p.name != "PROGRESS.md"]
     return sorted(set(out))
 
 
