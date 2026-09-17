@@ -53,3 +53,18 @@ s32 CalcBoxOutcode(s16 *box, s16 *point) {
 
 No new struct or vtable-slot knowledge; this function stands alone in the
 current derivation.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001ECFC` -> `CalcBoxOutcode`. Tier A.** Free function, complete
+  semantics visible in the body: three independent axis tests against a
+  bounding box's low and high corners, each contributing one of two bits
+  (x -> 8 past max / 4 before min, y -> 2 / 1, z -> 0x20 / 0x10), returned
+  as a 6-bit word. "Outcode" is the standard name for exactly this
+  Cohen-Sutherland region code, and the original report already identified
+  the shape.
+- Corroborated by its caller: `func_8001E110` (code_d294_b) computes it for
+  two points and masks each result with `0xFF`, which is the classic
+  outcode segment-vs-box trivial-accept/reject test.
+- Parameters already carry the derived types `BoundsBox_d294 *` /
+  `Vec3S16_d294 *` from an earlier round; unchanged.
