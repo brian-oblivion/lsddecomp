@@ -17,7 +17,7 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-extern s32 func_80018458(void); /* code_8220_b */
+extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
 extern s32 gCdUseVSyncCallback;
 extern s32 D_8008A898;
 extern void func_8002858C(void); /* code_179d8_r: state-machine step 1 */
@@ -44,7 +44,7 @@ s32 ServiceCdDriver(void)
         return 0;
     }
 
-    if (func_80018458() != 0) {
+    if (GetBMemPMgrBusy() != 0) {
         return 0;
     }
 
@@ -72,10 +72,10 @@ s32 ServiceCdDriver(void)
 
 ## Derivation
 
-Two early-return guards (the `gCdLock` latch, then `func_80018458()`
+Two early-return guards (the `gCdLock` latch, then `GetBMemPMgrBusy()`
 gp_rel getter from `code_8220_b`) both return literal `0` — **not** the
-callee's own return value, even for the `func_80018458()` guard. This was
-the one wrinkle: an intermediate attempt captured `func_80018458()`'s result
+callee's own return value, even for the `GetBMemPMgrBusy()` guard. This was
+the one wrinkle: an intermediate attempt captured `GetBMemPMgrBusy()`'s result
 in a local and did `return result;`, reasoning that the branch target skips
 straight to the epilogue with the call's return value still live in `$v0`
 and therefore needing no extra move. That built clean (49/49 minus one word)
@@ -127,7 +127,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 `VSyncCallback`, and `SetCdDriverMode` passes the same address to the
 singleton's `+0x84` callback slot when the VSync path is off. One call does
 all the periodic work there is -- skip if `gCdLock` is held or
-`func_80018458` says no; step `code_179d8_r`'s CD state machine
+`GetBMemPMgrBusy` says no; step `code_179d8_r`'s CD state machine
 (`func_8002858C` for `D_8008A898 == 1`, `func_800286E4` for 2); drain the
 request queue through the class's own `+0x068` slot; re-arm itself. "Service"
 is the one word that covers a tick that both advances a state machine and
