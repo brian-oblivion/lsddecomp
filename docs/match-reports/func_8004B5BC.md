@@ -132,7 +132,7 @@ a pointer-cast read, deliberately, to avoid introducing a union into
   of `pad000[0x88]`; split into `pad000[0x30]` + `slot30` +
   `pad034[0x88-0x34]` (0x30 + 4 + 0x54 = 0x88, total preserved). Resolved
   via `tools/classtable.py 0x800866E8`'s own `+0x030` entry to
-  `BasicClass__func_182cc` (`BasicClass::onFinalize`, already typed in
+  `BasicClass__NotifyParents` (`BasicClass::onFinalize`, already typed in
   `include/code_8220.h` as `void (*onFinalize)(BasicClass *self, s32
   arg1)`) -- this class's low vtable slots are inherited straight from
   `BasicClassMethods` (classtable confirms slots +0x004 through +0x038 all

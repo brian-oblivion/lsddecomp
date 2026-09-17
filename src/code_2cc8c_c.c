@@ -27,7 +27,7 @@ void *func_8003DFCC(void)
 
 void func_8003DFDC(Obj86B60 *self)
 {
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = (Obj86B60Methods *)func_8003E5C8();
     self->methods->slot40(self);
 }
@@ -36,7 +36,7 @@ void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
-    func_80018390()->slot38(self, arg1, arg2);
+    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
     header = arg1->target->header & 0xF;
     if (header == 1) {
         self->methods->slot54(self, arg1, arg2);
@@ -175,7 +175,7 @@ void func_8003E628(Unk18Obj *self)
 {
     SubHandleObj *obj;
 
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = func_8003F24C();
     self->unkC = 0;
     self->unk10 = 0;
@@ -192,14 +192,14 @@ void func_8003E6CC(Unk18Obj *self)
     self->methods->slot74(self);
     self->unkAC->methods->slot4(self->unkAC);
     self->methods->slotA8(self, 0);
-    func_80018390()->slot0C(self);
+    Get_vtable_BasicClass()->slot0C(self);
 }
 
 void func_8003E770(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
-    func_80018390()->slot10(self, arg1);
+    Get_vtable_BasicClass()->slot10(self, arg1);
     header = arg1->methods->header & 0xF;
     if (header == 4) {
         self->unk10 = arg1;
@@ -220,7 +220,7 @@ void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
     } else if (header == 1) {
         self->unkC = NULL;
     }
-    func_80018390()->slot14(self, arg1);
+    Get_vtable_BasicClass()->slot14(self, arg1);
 }
 
 void func_8003E874(Obj86B60 *self)
@@ -228,5 +228,5 @@ void func_8003E874(Obj86B60 *self)
     self->unk30 = 0;
     self->unk10 = 0;
     self->unkC = NULL;
-    func_80018390()->slot18(self);
+    Get_vtable_BasicClass()->slot18(self);
 }

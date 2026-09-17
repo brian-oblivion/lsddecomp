@@ -8,7 +8,7 @@
 `func_8003E628`'s ctor: dispatches `slot90`, `slot74`, releases `self->unkAC`
 (inherited BasicClass "release", corroborating and extending
 `func_8003E628`'s earlier discovery of that field), dispatches `slotA8`
-with a literal `0`, then runs `func_80018390()->slot0C` (BasicClass's own
+with a literal `0`, then runs `Get_vtable_BasicClass()->slot0C` (BasicClass's own
 `finalize`, `BasicClass__func_17f2c`).
 
 ## The C
@@ -20,7 +20,7 @@ void func_8003E6CC(Unk18Obj *self)
     self->methods->slot74(self);
     self->unkAC->methods->slot4(self->unkAC);
     self->methods->slotA8(self, 0);
-    func_80018390()->slot0C(self);
+    Get_vtable_BasicClass()->slot0C(self);
 }
 ```
 

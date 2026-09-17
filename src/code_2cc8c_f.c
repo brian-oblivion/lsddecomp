@@ -119,7 +119,7 @@ void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 }
 
 void func_80040A30(Obj6EAC0 *self) {
-    func_800183DC(self->unkB4, self->unkA9);
+    ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = func_80017CFC(self->unkB4);
     func_80041C3C()->slot0C(self);
 }

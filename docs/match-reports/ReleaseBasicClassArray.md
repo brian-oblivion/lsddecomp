@@ -1,6 +1,8 @@
-# func_800183DC — MATCHED (28/28 words)
+> Renamed from `func_800183DC` on 2026-09-17 (tools/rename.py). Address 0x800183dc.
 
-Unit: `src/code_8220_b.c`. `void func_800183DC(BasicClass **array, s32 count)`
+# ReleaseBasicClassArray — MATCHED (28/28 words)
+
+Unit: `src/code_8220_b.c`. `void ReleaseBasicClassArray(BasicClass **array, s32 count)`
 — releases every element of a `BasicClass*` array (calling each element's
 vtable slot `+0x004`, `release`, and storing the result back into the slot)
 and advances a pointer walk over `count` elements.
@@ -8,7 +10,7 @@ and advances a pointer walk over `count` elements.
 ## Final source
 
 ```c
-void func_800183DC(BasicClass **array, s32 count)
+void ReleaseBasicClassArray(BasicClass **array, s32 count)
 {
     if (count-- > 0) {
         do {
@@ -60,4 +62,17 @@ the SAME saved register both times. `while(count-->0)` inside an
 `if(count-->0)` do-while wrapper reproduces this exactly; a fresh
 `remaining` local (even initialized identically) puts the decrement in a
 different register than the one being tested and drifts the function's
-length. (`func_800183DC`, 4/28 -> 28/28.)
+length. (`ReleaseBasicClassArray`, 4/28 -> 28/28.)
+
+## Naming (round 51, bravo)
+
+`func_800183DC` -> `ReleaseBasicClassArray`. **Tier A** -- pure leaf,
+mechanics are its purpose.
+
+Evidence: walks `count` entries of a `BasicClass *` array, calls each
+element's vtable slot `+0x004` (`release`) and stores the returned pointer
+back into the slot. Every one of the six call sites outside this unit
+(`class_3bb8c_n.c`, `class_3bb8c_o.c`, `class_3bb8c_s.c`, `code_2cc8c_b.c`,
+`code_2cc8c_f.c`, plus `include/code_2cc8c.h`'s declaration) passes a
+contiguous array of object pointers and an element count. "Release" is the
+slot's own established name in `BasicClassMethods`, not a new word.

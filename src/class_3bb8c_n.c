@@ -274,13 +274,13 @@ void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
     dst[2] = src[2] + delta;
 }
 
-extern void func_800183DC(void **array, s32 count);
+extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 D_8008AB50;
 extern void *D_8008E10C[];
 
 void func_80054B50(void) {
     if (D_8008AB50 != 0) {
-        func_800183DC(D_8008E10C, 0x12);
+        ReleaseBasicClassArray(D_8008E10C, 0x12);
         D_8008AB50 = 0;
     }
 }
@@ -359,7 +359,7 @@ extern void *D_8008E0C8[];
 
 void func_80054CFC(void) {
     if (D_8008AC80 >= 0) {
-        func_800183DC(D_8008E0C8, D_8008AC88);
+        ReleaseBasicClassArray(D_8008E0C8, D_8008AC88);
     }
 }
 

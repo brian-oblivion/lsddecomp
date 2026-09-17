@@ -1,13 +1,15 @@
-# func_80018288 — MATCHED (17/17 words)
+> Renamed from `func_80018288` on 2026-09-17 (tools/rename.py). Address 0x80018288.
+
+# FreeBasicClassList — MATCHED (17/17 words)
 
 Unit: `src/code_8220_b.c`. Signature (already in `include/code_8220.h`):
-`void func_80018288(BasicClassListNode **head);` — free every node in a
+`void FreeBasicClassList(BasicClassListNode **head);` — free every node in a
 `BasicClassListNode` singly-linked list, without clearing `*head` itself.
 
 ## Final source
 
 ```c
-void func_80018288(BasicClassListNode **head)
+void FreeBasicClassList(BasicClassListNode **head)
 {
     BasicClassListNode *node = *head;
 
@@ -50,4 +52,18 @@ freed pointer are the SAME logical value at different points in time, write
 name). Both are semantically identical and equally "obvious" C, but only the
 first reproduces GCC 2.6.3's choice to test the advanced pointer directly in
 the loop condition register rather than moving it to a second register first.
-Confirmed once (`func_80018288`, 6/17 -> 17/17 words).
+Confirmed once (`FreeBasicClassList`, 6/17 -> 17/17 words).
+
+## Naming (round 51, bravo)
+
+`func_80018288` -> `FreeBasicClassList`. **Tier A** -- a pure leaf whose
+mechanics are its purpose.
+
+Evidence: the body frees every node of a `BasicClassListNode` chain through
+the pool allocator and nothing else. Its two callers in `code_8220.c` are
+`BasicClass__func_18040` (removeAllChildren) and `BasicClass__func_1813c`
+(clearParentRefs), and both do `FreeBasicClassList(&self->list);
+self->list = NULL;` -- i.e. the caller, not this function, clears the head
+pointer. The name says "free the list", and the "does not clear `*head`"
+caveat stays in the declaration comment in `include/code_8220.h` because
+it is the one thing the name cannot carry.

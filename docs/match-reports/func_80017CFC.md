@@ -32,10 +32,10 @@ committed).** Found a **zero score at iteration 373** —
 **The permuter's own diff carried two changes; only one was legitimate, and
 they were tested separately before either was trusted:**
 
-1. Retyping the shared `extern void func_8001844C(s32 val);` declaration in
-   this file's copy to `extern volatile unsigned long long func_8001844C(s32
+1. Retyping the shared `extern void SetBMemPMgrBusy(s32 val);` declaration in
+   this file's copy to `extern volatile unsigned long long SetBMemPMgrBusy(s32
    val);` — a fabricated, incompatible prototype against the function's real
-   definition (`void func_8001844C(s32 val)` in `src/code_8220_b.c`). This
+   definition (`void SetBMemPMgrBusy(s32 val)` in `src/code_8220_b.c`). This
    is exactly the class of scorer exploitation this round's instructions say
    to reject, so it was **not adopted and not even needed** — see below.
 2. In the second (coalesce-with-next) free-list unlink block, replacing
@@ -49,7 +49,7 @@ they were tested separately before either was trusted:**
 **Translated and measured, both halves, separately:**
 
 - Applied ONLY change 2 (the `nextSize` reuse) on top of the committed
-  99/107 body, leaving `func_8001844C`'s real single declaration untouched.
+  99/107 body, leaving `SetBMemPMgrBusy`'s real single declaration untouched.
   `./build-and-verify.sh`: **`build exit=0`, `OK: build matches retail
   SLPS_015.56`.** `tools/funcdiff.py func_80017CFC`: **107/107 words,
   byte-exact.** The fabricated-prototype mutation was pure permuter noise
@@ -220,7 +220,7 @@ void *func_80017CFC(ptr, pool)
     BMemBlockHdr *next;
     u32 nextFree;
 
-    func_8001844C(1);
+    SetBMemPMgrBusy(1);
     mgr = D_8008A818;
     if (mgr == NULL) {
         mgr = pool;
@@ -294,7 +294,7 @@ void *func_80017CFC(ptr, pool)
         header->sizeAndFlags |= 0x40000000;
         next->sizeAndFlags |= 0x80000000;
     }
-    func_8001844C(0);
+    SetBMemPMgrBusy(0);
     return NULL;
 }
 #endif

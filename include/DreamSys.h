@@ -854,7 +854,7 @@ struct vtable_DreamSys{
 	   outside this unit/runner's range. */
 	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
 	u32 unknown_functions_0x18[6];
-	/* +0x030, BasicClass__func_182cc -- shared base-class slot, same one
+	/* +0x030, BasicClass__NotifyParents -- shared base-class slot, same one
 	   `class_3ac78.h`/`Class6D3C8.h` name (see their comments); called by
 	   ExecuteLink as (this, unk1) with its return discarded
 	   (round 2026-09-02). */

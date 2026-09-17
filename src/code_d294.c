@@ -28,7 +28,7 @@ void *func_8001CAF4(Class6B5CCObj *self) {
         func_80017CFC(self->unk14);
         return NULL;
     }
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = func_8001E57C();
     self->unk20 = 0;
     self->unk18 = 0;
@@ -47,11 +47,11 @@ void func_8001CBA4(Class6B5CCObj *self) {
     sub = self->unk14;
     func_80017CFC(sub->unk44);
     func_80017CFC(self->unk14);
-    func_80018390()->dtor(self);
+    Get_vtable_BasicClass()->dtor(self);
 }
 
 void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other) {
-    func_80018390()->slot10(self, other);
+    Get_vtable_BasicClass()->slot10(self, other);
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__LinkModel(self, other);
     }
@@ -61,18 +61,18 @@ void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__UnlinkModel(self);
     }
-    func_80018390()->slot14(self, other);
+    Get_vtable_BasicClass()->slot14(self, other);
 }
 
 void func_8001CD20(Class6B5CCObj *self) {
     Class6B5CC__UnlinkModel(self);
-    func_80018390()->slot18(self);
+    Get_vtable_BasicClass()->slot18(self);
 }
 
 void func_8001CD60(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
     s32 tag;
 
-    func_80018390()->slot38(self, other, arg2);
+    Get_vtable_BasicClass()->slot38(self, other, arg2);
     tag = other->methods->header & 0xF;
     if (tag == 2) {
         self->methods->slot94(self, other, arg2);
@@ -197,7 +197,7 @@ void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294
         if (*entry == NULL) {
             *cursor = self->unk4;
         }
-        func_800183A0(entry, cursor);
+        GetNextBasicClass(entry, cursor);
         if (*entry != NULL) {
             if ((((*entry)->methods->header) & 0xF) == tag) {
                 if ((*entry)->unkC == self) {

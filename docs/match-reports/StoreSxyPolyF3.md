@@ -1,10 +1,12 @@
-# func_800196D4
+> Renamed from `func_800196D4` on 2026-09-17 (tools/rename.py). Address 0x800196d4.
+
+# StoreSxyPolyF3
 
 **Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 First of a family of GTE-register-store leaves in this unit
-(`func_800196D4`/`E8`/`FC`/`80019710`, plus the two conditional siblings
-`func_80019724`/`8001974C`). See `func_800196E8.md` for the shared GTE
+(`StoreSxyPolyF3`/`E8`/`FC`/`80019710`, plus the two conditional siblings
+`StoreSxyPolyF4`/`8001974C`). See `StoreSxyPolyG3.md` for the shared GTE
 background; this report covers what's specific to this one.
 
 ## What it does
@@ -12,13 +14,13 @@ background; this report covers what's specific to this one.
 Stores COP2 data registers `$12`/`$13`/`$14` (GTE `IR1`/`IR2`/`IR3` per the
 nocash PSX GTE register map) into three consecutive 4-byte fields of the
 struct pointed to by `$a0`, at offsets `0x8`, `0xC`, `0x10` — a tightly
-packed 3-`long` vector (no padding word, unlike `func_800196E8`'s stride-8
+packed 3-`long` vector (no padding word, unlike `StoreSxyPolyG3`'s stride-8
 layout).
 
 ## The C
 
 ```c
-void func_800196D4(void *dst)
+void StoreSxyPolyF3(void *dst)
 {
     __asm__ volatile (
         "swc2 $12, 0x8(%0)\n\t"
@@ -58,7 +60,7 @@ choice being taken away from GCC — only the base-pointer input operand is
 under `-r` constraint, same as any other inline-asm memory access. Verify
 matches for these with the CLAUDE.md reproducer pipeline in isolation before
 touching `src/`, since a wrong base-register vs. precomputed-pointer choice
-(see `func_80019724.md`) changes emitted bytes even when the resulting
+(see `StoreSxyPolyF4.md`) changes emitted bytes even when the resulting
 memory address is identical.
 
 ### Head note (round 12) — accepted, with two corrections
@@ -100,3 +102,26 @@ Two corrections to the claim as written:
    a standalone non-inlined leaf whose whole body is the asm — which is why it
    matches — but it would matter the moment anyone makes one of these
    `static inline`, and the omission should not be copied as a template.
+
+## Naming (round 51, bravo)
+
+`func_800196D4` -> `StoreSxyPolyF3`. **Tier A** -- a pure leaf whose
+mechanics are its purpose, and the primitive type is pinned by two
+independent measurements.
+
+1. **Layout.** The `swc2` offsets `+0x8`/`+0xC`/`+0x10` are POLY_F3's
+   `xy0`/`xy1`/`xy2` (tag, then one colour/code word, then three packed
+   screen-XY words).
+2. **Call site.** In `asm/nonmatchings/code_8220_b/func_80018464.s`, the
+   two cases that pass this function as `ProjectTriFace`'s callback (at
+   0x8001889C and 0x80018A28) write `len = 4`, `code = 0x20` into the
+   primitive first -- POLY_F3's length and GPU command byte exactly.
+
+The second source is not redundant. `StoreSxyPolyG3` and `StoreSxyPolyFT3`
+have **byte-identical bodies**, because POLY_G3's per-vertex RGB and
+POLY_FT3's per-vertex UV are both 4 bytes wide, so offsets alone cannot
+tell those two apart; the `(len, code)` pair can, and does. The full
+eight-primitive table is in `docs/match-reports/SetupPrimCode.md`.
+
+Naming style: `StoreSxy` mirrors the `gte_stsxy3_*` macro each of these
+wraps (`include/gte.h`, Sony's macro names, never renamed).

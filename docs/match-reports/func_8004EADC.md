@@ -45,7 +45,7 @@ char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
 `Node3bb8cE`'s offset 0 was previously undifferentiated padding
 (`pad00[0x00C]`); this function proves it's a real vtable pointer (the
 object's OWN methods table, distinct from the base-class table obtained
-via `func_80018390()`). Added `SelfMethods3bb8cE` (local to
+via `Get_vtable_BasicClass()`). Added `SelfMethods3bb8cE` (local to
 `src/class_3bb8c_e.c`) with only the one reached slot, `+0x054`.
 
 ### Proposed learning

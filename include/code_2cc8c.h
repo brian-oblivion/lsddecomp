@@ -282,7 +282,7 @@ extern void *func_80017CFC(void *ptr);  /* matching free/release. Its own
                                             result too, so this is a
                                             zero-byte-cost retype -- full
                                             build reconfirmed green. */
-extern void func_800183DC(void *a0, void *a1); /* not yet seen elsewhere in
+extern void ReleaseBasicClassArray(void *a0, void *a1); /* not yet seen elsewhere in
                                                     this project; typed from
                                                     func_8003D6D4's own call
                                                     site only */
@@ -954,7 +954,7 @@ struct Obj86B60Methods {
     u8 pad018[0x030 - 0x018];
     void (*slot30)(Obj86B60 *self);               /* +0x030, inherited
                                                       BasicClass slot
-                                                      (BasicClass__func_182cc);
+                                                      (BasicClass__NotifyParents);
                                                       OBSERVED: func_8003E4B8
                                                       (round 13) */
     u8 pad034[0x040 - 0x034];
@@ -1267,7 +1267,7 @@ struct Obj86B60 {
     s32 *unk5C;                  /* +0x05C, array indexed by unk58: a
                                      per-slot capacity/bound.
                                      func_8003D6D4 passes unk5C[unk58] as
-                                     func_800183DC's 2nd arg (raw register,
+                                     ReleaseBasicClassArray's 2nd arg (raw register,
                                      type doesn't affect those bytes);
                                      func_8003DDC8/func_8003DE30 use it as
                                      an explicit upper bound compared
@@ -1280,7 +1280,7 @@ struct Obj86B60 {
                                      (wrapping to unk5C[unk58]-1 below 0) by
                                      func_8003DE30 -- a ring-buffer index */
     void **unk64;                /* +0x064, func_8003D6D4: array indexed by
-                                     unk58, giving func_800183DC's 1st arg
+                                     unk58, giving ReleaseBasicClassArray's 1st arg
                                      and func_80017CFC's arg */
     Unk68Obj *unk68;             /* +0x068, OBSERVED: func_8003D050,
                                      func_8003DAD4, func_8003D73C (round 12)
@@ -1347,7 +1347,7 @@ extern IntermediateBaseMethods D_8006E878; /* the table itself, so
 
 /*
  * This unit's own local view of the shared BasicClass ancestor table
- * (returned by func_80018390, a no-argument getter -- same "ctor at
+ * (returned by Get_vtable_BasicClass, a no-argument getter -- same "ctor at
  * +0x008, dtor at +0x00C, self typed void* universally" idiom already
  * established independently in include/class_16334.h, include/code_171e0.h
  * and include/code_d294.h. Declared again here, under a unit-local name,
@@ -1374,11 +1374,11 @@ struct BasicClassMethodsCC8C {
     void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
-                                  BasicClass__func_18358 (code_8220_b);
+                                  BasicClass__OnNotify (code_8220_b);
                                   OBSERVED: func_8003E030 */
 };
 
-extern BasicClassMethodsCC8C *func_80018390(void);
+extern BasicClassMethodsCC8C *Get_vtable_BasicClass(void);
 
 /*
 /*
@@ -1538,7 +1538,7 @@ struct Obj6EAC0 {
                                   a `(1 << a1) - 1` bitmask) */
     u8 pad06C[0x0A9 - 0x06C];
     u8 unkA9;                  /* +0x0A9, OBSERVED: func_80040A30 (passed
-                                  as func_800183DC's count arg),
+                                  as ReleaseBasicClassArray's count arg),
                                   func_80040E14 (loop bound) */
     u8 unkAA;                  /* +0x0AA, OBSERVED: func_80040AE8 -- a
                                   one-shot "extra offset" gate compared

@@ -164,7 +164,7 @@ struct Class866E8Methods {
     /* +0x010 */ void (*slot10)(Class866E8 *self, s32 arg1);                    /* func_8004A534 (ctor); called with func_80020C5C()'s return, after the 7-entry unkEC[] init loop */
     /* +0x014 */ void (*slot14)(Class866E8 *self, void *arg1);                  /* func_8001CCB4; called by func_8004A7C0 */
     /* +0x018 */ u8 pad018[0x030 - 0x018];
-    /* +0x030 */ void (*slot30)(Class866E8 *self, s32 arg1);                    /* BasicClass__func_182cc; called by func_8004AA6C */
+    /* +0x030 */ void (*slot30)(Class866E8 *self, s32 arg1);                    /* BasicClass__NotifyParents; called by func_8004AA6C */
     /* +0x034 */ u8 pad034[0x038 - 0x034];
     /* +0x038 */ void (*slot38)(Class866E8 *self);                              /* func_8004A984; called by func_8004B2D4 */
     /* +0x03C */ u8 pad03C[0x040 - 0x03C];

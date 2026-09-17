@@ -11,7 +11,7 @@ virtual teardown hooks in order (`slot50` = `func_8001D1A4`, `slot54` =
 for `func_8001D33C`, already a matched no-op stub elsewhere), frees the two
 sub-blocks the constructor allocated (`self->unk14->unk44`, then
 `self->unk14` itself), then tail-calls the BasicClass base destructor
-(`func_80018390()->dtor(self)`).
+(`Get_vtable_BasicClass()->dtor(self)`).
 
 ## The C
 
@@ -22,7 +22,7 @@ void func_8001CBA4(Class6B5CCObj *self) {
     self->methods->slot5C(self, 0);
     func_80017CFC(self->unk14->unk44);
     func_80017CFC(self->unk14);
-    func_80018390()->dtor(self);
+    Get_vtable_BasicClass()->dtor(self);
 }
 ```
 

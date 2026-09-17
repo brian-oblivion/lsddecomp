@@ -341,7 +341,7 @@ void func_8004E34C(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
 {
     s32 count;
 
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = func_800507E8();
     count = D_8008AA30;
     D_8008AA30 = count + 1;

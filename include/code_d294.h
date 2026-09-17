@@ -269,7 +269,7 @@ struct CornerList_d294 {
 };
 
 /* This unit's own minimal, local view of the shared BasicClass ancestor
- * table (D_8006B58C, returned by func_80018390, which lives in the
+ * table (D_8006B58C, returned by Get_vtable_BasicClass, which lives in the
  * still-uncarved code_8220 segment) -- same shape and same "ctor at +0x008,
  * dtor at +0x00C universally" convention already established independently
  * in include/class_16334.h and include/code_171e0.h. Declared again here,
@@ -298,7 +298,7 @@ struct BasicClassMethodsD294 {
     void (*slot38)(void *self, void *other, s32 arg2);
 };
 
-extern BasicClassMethodsD294 *func_80018390(void);
+extern BasicClassMethodsD294 *Get_vtable_BasicClass(void);
 extern void *func_80017B34(s32 size);
 extern void func_80017CFC(void *arg);
 
@@ -422,7 +422,7 @@ struct Class6B5CCMethods {
     void *(*ctor)(void *self);                /* +0x008, func_8001CAF4 (this unit) */
     void  (*dtor)(void *self);                /* +0x00C, func_8001CBA4 (this unit) */
     u8 pad010[0x030 - 0x010];
-    /* +0x030, BasicClass__func_182cc, inherited verbatim (per the file
+    /* +0x030, BasicClass__NotifyParents, inherited verbatim (per the file
      * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
      * is a different unit's own ancestor code. func_8001D624 (round 12,
      * this unit) dispatches through it as `(self, s32 arg1)`. */
@@ -618,7 +618,7 @@ extern void Class6B5CC__UnlinkModel(Class6B5CCObj *self);
 extern void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other);
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
-/* func_800183A0 (asm/code_8220_b.s, a DIFFERENT still-uncarved unit): a
+/* GetNextBasicClass (asm/code_8220_b.s, a DIFFERENT still-uncarved unit): a
  * generic intrusive-list "pop next" step. Given `out` and `cursor`
  * (both `T **`), if `*cursor` is non-NULL: `*out = (*cursor)->unk4`
  * (the node's own "next" field) and `*cursor = (*cursor)->unk0` (some
@@ -626,7 +626,7 @@ extern void GsInitCoordinate2(s32 arg0, void *dest);
  * its own disassembly). If `*cursor` is NULL, `*out = NULL`. Declared
  * here typed to func_8001D280's own call site (the only caller reachable
  * from this unit) rather than generically. */
-extern void func_800183A0(GenericObj_d294 **out, GenericObj_d294 **cursor);
+extern void GetNextBasicClass(GenericObj_d294 **out, GenericObj_d294 **cursor);
 
 /* func_8001F51C (asm/psyq_fa50.s, Psy-Q library, not game code):
  * fills a caller-supplied struct (its own arg1) from a small on-stack
@@ -781,7 +781,7 @@ extern void MulMatrix2(void *arg0, void *arg1);
  * there as `void BasicClass__func_1816c(BasicClass *self, BasicClass
  * **outParent, BasicClassListNode **cursor)` -- "getNextParentRef": on the
  * first call for a given walk (`*outParent == NULL`), seeds `*cursor` from
- * `self->parentRefs`; every call pops one entry via `func_800183A0`.
+ * `self->parentRefs`; every call pops one entry via `GetNextBasicClass`.
  * Redeclared here with this unit's own opaque/local types rather than
  * `#include "code_8220.h"`, per this project's per-unit-local-view
  * convention (same precedent as BasicClassMethodsD294 above) -- pointer

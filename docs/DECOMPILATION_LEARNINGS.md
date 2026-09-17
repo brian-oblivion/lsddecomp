@@ -519,7 +519,7 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   "memory")` passes HARD RULE 6's test: `"r"` leaves the GPR to the allocator and
   `$12`-`$14` are COP2 data registers with no GPR identity to pin. (a §"Toolchain facts")
 - **A whole-function `__asm__` is for instructions with NO C form, not constructs that are
-  hard to type — and look in `gte.h` FIRST.** `func_800195EC` was carried as a 58-word
+  hard to type — and look in `gte.h` FIRST.** `TransformAndCullPoly` was carried as a 58-word
   `__asm__` because `rtpt`/`nclip`/`avsz3`/`cfc2` "have no C form"; every one is a macro
   and the body is ordinary branching C over seven of them, byte-exact first build. (a
   §"Round 13, second batch", §"Toolchain facts")

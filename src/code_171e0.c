@@ -8,13 +8,13 @@ void *func_800269E0(void) {
 void *func_800269F0(UnkFlagsObj_171e0 *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
-    func_80018390()->dtor(this);
+    Get_vtable_BasicClass()->dtor(this);
     func_80017CFC(this);
     return NULL;
 }
 
 void func_80026A50(UnkFlagsObj_171e0 *this) {
-    func_80018390()->ctor(this);
+    Get_vtable_BasicClass()->ctor(this);
     this->methods = (UnkFlagsObjMethods_171e0 *) func_80026C9C();
     this->unk0C = 0;
     this->unk10 = NULL;
