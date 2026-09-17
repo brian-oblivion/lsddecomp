@@ -56,3 +56,19 @@ reordered which pointer bump landed in the branch's delay slot. Explicit
 walks in the increment clause let the SOURCE dictate the grouping
 directly, matching this project's existing preference for reproducing
 retail's literal shape over the "cleaner" idiomatic form.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EF14` -> `IsVec3WithinRange`. Tier A.** Free function,
+  complete semantics: returns 1 when every component of `b` lies within
+  +/- `range` of the matching component of `a`, 0 on the first component
+  that does not. `Is...` marks the predicate; the two early returns and the
+  trailing `return 1` are the whole body.
+- Corroborated by its one caller: `DreamSys.c`'s `func_8005942C` calls it
+  as `IsVec3WithinRange(local, tolerance, reference)`, where `local` is a
+  position it has just computed via `Class6B5CC__LocalOffsetToWorldPos` --
+  a tolerance test between two positions, which is what the name says.
+- Parameters left as `(a, range, b)`: the test is symmetric in `a` and `b`,
+  so naming one "actual" and the other "expected" would assert a direction
+  the code does not have. The explicit pointer walks in the `for`
+  increment clause are load-bearing (see the derivation above) and unchanged.
