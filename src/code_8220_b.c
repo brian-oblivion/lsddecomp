@@ -70,7 +70,7 @@ s32 GetBMemPMgrBusy(void)
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_b", func_80018464);
 
-void func_8001934C(void *arg0, void *arg1)
+void SetupPrimCode(void *arg0, void *arg1)
 {
     u8 *a = (u8 *)arg0;
 
@@ -90,7 +90,7 @@ void func_8001934C(void *arg0, void *arg1)
     *((u8 *)arg1 + 0x15) = a[7];
 }
 
-s32 func_800193C0(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *))
+s32 ProjectTriFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *))
 {
     *(void **)(prim + 0xa4) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx0 * 8;
     *(void **)(prim + 0xa8) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx1 * 8;
@@ -99,7 +99,7 @@ s32 func_800193C0(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*cal
     gte_ldv3(*(void **)(prim + 0xa4), *(void **)(prim + 0xa8),
              *(void **)(prim + 0xac));
 
-    if (func_800195EC(arg0, prim) != 0) {
+    if (TransformAndCullPoly(arg0, prim) != 0) {
         goto fail;
     }
 
@@ -117,7 +117,7 @@ fail:
     return 1;
 }
 
-s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, void (*callback)(void *, s32))
+s32 ProjectQuadFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, void (*callback)(void *, s32))
 {
     u8 *vtxSlot = prim + 0xa4;
 
@@ -129,7 +129,7 @@ s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, 
     gte_ldv3(*(void **)(vtxSlot + 0x0), *(void **)(vtxSlot + 0x4),
              *(void **)(vtxSlot + 0x8));
 
-    if (func_800195EC(arg0, prim) != 0) {
+    if (TransformAndCullPoly(arg0, prim) != 0) {
         goto fail;
     }
 
@@ -159,7 +159,7 @@ fail:
 
 /*
  * This unit's local view of the per-primitive GTE context that
- * func_800195EC works on (the `prim` its callers hand it). Only the fields
+ * TransformAndCullPoly works on (the `prim` its callers hand it). Only the fields
  * this function touches are typed; the callers still address the rest by
  * offset. The three SXY words are deliberately separate fields rather than
  * an array: retail stores them through three independently computed
@@ -203,7 +203,7 @@ typedef struct GteCullOwner {
  * macros (include/gte.h), and every one of retail's raw words is one of
  * those macros. Earlier rounds carried it as a whole-function __asm__.
  */
-s32 func_800195EC(void *arg0, void *arg1)
+s32 TransformAndCullPoly(void *arg0, void *arg1)
 {
     GteCullOwner *owner = arg0;
     GteCullCtx *ctx = arg1;

@@ -313,7 +313,7 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 | --- | --- |
 | `readme` | a reader-facing README.md: what the game's code is, how it is organised (classes, subsystems, units), how to build, where the SDK comes from |
 | `credits` | CREDITS.md names every inherited name, tool and reference |
-| `asm-sites` | every live `__asm__` justified at the site or retired; the deferred questions from 2026-09-12 (`func_800195EC` as C or `INCLUDE_ASM`; the bare barriers) answered |
+| `asm-sites` | every live `__asm__` justified at the site or retired; the deferred questions from 2026-09-12 (`TransformAndCullPoly` as C or `INCLUDE_ASM`; the bare barriers) answered |
 | `docs-budget` | every doc within its `plan.py` budget |
 | `nonmatching-clean` | `tools/check-nonmatching.sh` green; every stall has a `NON_MATCHING` body or a written reason |
 

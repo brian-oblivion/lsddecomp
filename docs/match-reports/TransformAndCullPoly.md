@@ -1,4 +1,6 @@
-# func_800195EC — MATCHED (58/58 words), as C over the GTE macros
+> Renamed from `func_800195EC` on 2026-09-17 (tools/rename.py). Address 0x800195ec.
+
+# TransformAndCullPoly — MATCHED (58/58 words), as C over the GTE macros
 
 Unit: `src/code_8220_b.c`. GTE transform/clip/OT-bucket routine: runs `rtpt`
 on the three vertices the caller loaded with `gte_ldv3`, checks the FLAG
@@ -7,8 +9,8 @@ ordering table), and on success caches the three screen coordinates and
 stores `&otBase[otz >> otShift]` into the context. Returns `0` on success,
 `1` when culled.
 
-Two callers, both in this unit: `func_800193C0` (triangles) and
-`func_800194A4` (quads, which then transform the fourth vertex with
+Two callers, both in this unit: `ProjectTriFace` (triangles) and
+`ProjectQuadFace` (quads, which then transform the fourth vertex with
 `gte_ldv0`/`gte_rtps`).
 
 ## Status history
@@ -64,7 +66,7 @@ typedef struct GteCullOwner {
     /* +0x003 */ u8 unk3;
 } GteCullOwner;
 
-s32 func_800195EC(void *arg0, void *arg1)
+s32 TransformAndCullPoly(void *arg0, void *arg1)
 {
     GteCullOwner *owner = arg0;
     GteCullCtx *ctx = arg1;

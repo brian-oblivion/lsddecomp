@@ -24,7 +24,7 @@
  * manual can look one up. When retail shows a GTE instruction this file does
  * not cover yet, add the macro here under the SDK's name rather than
  * open-coding the instruction at the call site (docs/MATCHING-GUIDE.md,
- * step 2). Everything around the macros is ordinary C: func_800195EC in
+ * step 2). Everything around the macros is ordinary C: TransformAndCullPoly in
  * src/code_8220_b.c is the worked example of a branching function over
  * eight of them, and it was carried as a whole-function __asm__ for twenty
  * rounds before anyone checked.

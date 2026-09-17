@@ -1,4 +1,6 @@
-# func_8001934C — MATCHED (29/29 words)
+> Renamed from `func_8001934C` on 2026-09-17 (tools/rename.py). Address 0x8001934c.
+
+# SetupPrimCode — MATCHED (29/29 words)
 
 Unit: `src/code_8220_b.c`. Not previously declared in `include/code_8220.h`;
 called only from the still-`INCLUDE_ASM` giant `func_80018464` (13 call
@@ -12,7 +14,7 @@ outputs at `+0x14`/`+0x15`.
 ## Final source
 
 ```c
-void func_8001934C(void *arg0, void *arg1)
+void SetupPrimCode(void *arg0, void *arg1)
 {
     u8 *a = (u8 *)arg0;
 
@@ -58,5 +60,5 @@ source, each of the form `x->flags = x->flags | BIT;` /
 that holds "the flags byte's new value" across both updates. Retail reloads
 the field from memory at the start of each one rather than carrying the
 previous statement's result forward in a register/variable, even though the
-two updates are adjacent and touch the same byte. (`func_8001934C`, 12/29 ->
+two updates are adjacent and touch the same byte. (`SetupPrimCode`, 12/29 ->
 29/29.)

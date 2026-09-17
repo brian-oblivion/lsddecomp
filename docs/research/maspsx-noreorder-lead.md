@@ -3,7 +3,7 @@
 **Status: OPEN toolchain lead. Operator's call. NOT blocking any work — the
 source-level workaround is known, safe and already used in matched code.**
 
-Found by round 13's runner charlie while matching `func_800195EC` (a GTE
+Found by round 13's runner charlie while matching `TransformAndCullPoly` (a GTE
 hand-written function). **Independently reproduced in isolation by the head
 before escalating**, per CLAUDE.md's rule that a lead reaches the operator only
 with a reproducer attached. Both halves below reproduce in under a second
@@ -102,8 +102,8 @@ reason the closing bracket is not optional.
 ## Why this is a lead and not a rule change
 
 The workaround is entirely source-level: bracket the block. That is a source
-construct, available to any runner, and `func_800195EC`, `func_800193C0` and
-`func_800194A4` are byte-exact with it. **Nothing is blocked**, so this does
+construct, available to any runner, and `TransformAndCullPoly`, `ProjectTriFace` and
+`ProjectQuadFace` are byte-exact with it. **Nothing is blocked**, so this does
 not join the two open blockers in urgency.
 
 What is worth the operator's attention is the shape of the failure, because it

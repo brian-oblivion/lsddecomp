@@ -1,23 +1,25 @@
-# func_800194A4 — MATCHED (82/82 words)
+> Renamed from `func_800194A4` on 2026-09-17 (tools/rename.py). Address 0x800194a4.
+
+# ProjectQuadFace — MATCHED (82/82 words)
 
 Unit: `src/code_8220_b.c`. Quad submission routine — the four-vertex sibling
-of `func_800193C0` (triangle submission, same unit). Computes four vertex
+of `ProjectTriFace` (triangle submission, same unit). Computes four vertex
 pointers (vs. three), transforms the first three as a triangle through
-`func_800195EC` (shared with `func_800193C0`), then does a SEPARATE single-
+`TransformAndCullPoly` (shared with `ProjectTriFace`), then does a SEPARATE single-
 vertex `rtps` transform for the fourth vertex, writes four Z outputs (vs.
 three) via `swc2 $16`-`$19` into `prim->0x94/0x98/0x9c/0xa0`, stores the
 fourth vertex's transformed screen XY into `prim->0x6c`, and calls
-`func_8001A268(prim, 4)` (code `4` = "quad", vs. `func_800193C0`'s `3` =
+`func_8001A268(prim, 4)` (code `4` = "quad", vs. `ProjectTriFace`'s `3` =
 "triangle"). Also confirms `callback`'s real signature: this function makes
 TWO calls to it with explicit different second arguments (`callback(self,
 1)` before the fourth-vertex work, `callback(self, 0)` after) — so it is
-`void (*)(void *, s32)`, not the single-arg guess `func_800193C0`'s lone
+`void (*)(void *, s32)`, not the single-arg guess `ProjectTriFace`'s lone
 call site couldn't distinguish from a genuinely-unused second parameter.
 
 ## Final source
 
 ```c
-s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, void (*callback)(void *, s32))
+s32 ProjectQuadFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, void (*callback)(void *, s32))
 {
     u8 *vtxSlot = prim + 0xa4;
 
@@ -36,7 +38,7 @@ s32 func_800194A4(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, u16 idx3, 
         :
         : "r" (*(void **)(vtxSlot + 0x0)), "r" (*(void **)(vtxSlot + 0x4)), "r" (*(void **)(vtxSlot + 0x8)));
 
-    if (func_800195EC(arg0, prim) != 0) {
+    if (TransformAndCullPoly(arg0, prim) != 0) {
         goto fail;
     }
 
@@ -83,12 +85,12 @@ fail:
 ```
 
 `rtps` (single-vertex perspective transform) is, like `rtpt`/`nclip`/`avsz3`
-in `func_800195EC`, unsupported as a mnemonic by this pinned binutils —
+in `TransformAndCullPoly`, unsupported as a mnemonic by this pinned binutils —
 emitted as `.word 0x4A180001` (its raw retail bytes).
 
 ## How it was built (2 real attempts)
 
-Went in almost directly on the strength of `func_800193C0`'s lessons (explicit
+Went in almost directly on the strength of `ProjectTriFace`'s lessons (explicit
 intermediate element pointer for the offset-`0x14` stores, `goto`+labeled
 `return` for the differing-value early exit, no bogus GPR clobbers on the
 `lwc2`/`swc2`/`rtps` blocks, reload struct fields rather than caching), with
@@ -96,8 +98,8 @@ one new wrinkle this function surfaced:
 
 - **First attempt (9/82, badly drifted):** dereferenced `prim + 0xa4` /
   `0xa8` / `0xac` / `0xb0` directly (absolute offsets) everywhere, exactly
-  as `func_800193C0` did successfully for ITS three vertex slots. This
-  function's frame differs from `func_800193C0`'s by ONE more callee-saved
+  as `ProjectTriFace` did successfully for ITS three vertex slots. This
+  function's frame differs from `ProjectTriFace`'s by ONE more callee-saved
   register in retail (`$s0`-`$s3`, not `$s0`-`$s2`) precisely because retail
   computes `s1 = prim + 0xA4` ONCE and reuses that pointer — both for the
   post-transform reload (`lw $t0, 0x0($s1)` / `0x4($s1)` / `0x8($s1)`, SMALL
@@ -110,7 +112,7 @@ one new wrinkle this function surfaced:
 - **Fix:** introduce `u8 *vtxSlot = prim + 0xa4;` once, and address the later
   reloads as `vtxSlot + 0x0/0x4/0x8/0xc` instead of `prim + 0xa4/0xa8/0xac/
   0xb0`. GCC promoted `vtxSlot` to its own callee-saved register (matching
-  retail's 4-register frame) since it's live across the `func_800195EC`
+  retail's 4-register frame) since it's live across the `TransformAndCullPoly`
   call. 9/82 -> 82/82 in one step.
 
 ### Proposed learning
@@ -127,5 +129,5 @@ that the `lw`/`sw` immediates in the reload sequence are small
 offsets (`0xa4`/`0xa8`/`0xac`/`0xb0`) — an absolute-offset dereference
 cannot produce that encoding no matter how the surrounding C is reshaped,
 because the immediate itself is wrong, not just which register holds the
-address. (`func_800194A4`, 9/82 -> 82/82 from introducing one intermediate
+address. (`ProjectQuadFace`, 9/82 -> 82/82 from introducing one intermediate
 pointer local.)

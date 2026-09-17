@@ -1,20 +1,22 @@
-# func_800193C0 — MATCHED (57/57 words)
+> Renamed from `func_800193C0` on 2026-09-17 (tools/rename.py). Address 0x800193c0.
+
+# ProjectTriFace — MATCHED (57/57 words)
 
 Unit: `src/code_8220_b.c`. Triangle submission routine: computes three
 vertex-array pointers from a shared base and three `u16` indices, stores
 them into the primitive/context struct (`prim`, same struct
-`func_800195EC` operates on — see that report), loads them into the GTE
-via `lwc2`, calls `func_800195EC` to transform/clip/OT-bucket, and — on
+`TransformAndCullPoly` operates on — see that report), loads them into the GTE
+via `lwc2`, calls `TransformAndCullPoly` to transform/clip/OT-bucket, and — on
 success — writes the resulting screen Z into three separate output arrays
 (`prim->0x88/0x8c/0x90`, each element's `+0x14` field) via `swc2`, invokes
 a caller-supplied callback, and calls `func_8001A268(prim, 3)` (the literal
 `3` looks like a "this is a triangle" primitive-kind tag, paired with `4` in
-`func_800194A4`'s equivalent call).
+`ProjectQuadFace`'s equivalent call).
 
 ## Final source
 
 ```c
-s32 func_800193C0(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *))
+s32 ProjectTriFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *))
 {
     *(void **)(prim + 0xa4) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx0 * 8;
     *(void **)(prim + 0xa8) = (u8 *)(*(void **)(prim + 0xc)) + (s32)idx1 * 8;
@@ -30,7 +32,7 @@ s32 func_800193C0(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*cal
         :
         : "r" (*(void **)(prim + 0xa4)), "r" (*(void **)(prim + 0xa8)), "r" (*(void **)(prim + 0xac)));
 
-    if (func_800195EC(arg0, prim) != 0) {
+    if (TransformAndCullPoly(arg0, prim) != 0) {
         goto fail;
     }
 
@@ -59,7 +61,7 @@ Types: `idx0`/`idx1`/`idx2` are `u16` (retail's `andi $rN,$rN,0xffff` on the
 register-passed ones is the truncation GCC emits for a 16-bit parameter, and
 the stack-passed third index needs no such mask because `lhu` already
 zero-extends on load). `prim`'s real struct type is unknown outside this
-file (see `func_800195EC`'s report for the fields established so far);
+file (see `TransformAndCullPoly`'s report for the fields established so far);
 treated as `u8 *` with raw offsets, matching that function's approach.
 
 ## How it was built (7 attempts to full match)
@@ -75,7 +77,7 @@ treated as `u8 *` with raw offsets, matching that function's approach.
    fresh for each of the three vertex-address computations (retail's own
    `lw $v1, 0xc($s0)` appears three times, once per vertex, not once cached)
    — 24/57. This is the same "reload, don't cache" idiom already documented
-   for `GetNextBasicClass`/`func_8001934C` in this unit, now confirmed a third
+   for `GetNextBasicClass`/`SetupPrimCode` in this unit, now confirmed a third
    time on a different construct (a struct field read feeding three
    independent computations, not a linked-list walk or a same-byte bit op).
 4. Tried several variants of how the third vertex pointer reaches the `lwc2`
@@ -109,7 +111,7 @@ treated as `u8 *` with raw offsets, matching that function's approach.
    the project's established "take an explicit intermediate element pointer"
    idiom, just applied to raw offsets rather than an array element. 33/57
    -> 45/57.
-7. Final residue: the early-exit `if (func_800195EC(...) != 0) { return 1;
+7. Final residue: the early-exit `if (TransformAndCullPoly(...) != 0) { return 1;
    }` compiled to a `bnez` with an EMPTY delay slot and a separate `li
    $v0,1` later, one word longer than retail's version (which puts `ori
    $v0,$zero,1` directly in the branch's delay slot). Retyping the early
@@ -140,7 +142,7 @@ constant offset, and there's one extra instruction I can't place," check
 the clobber list for GPR names before reshaping the surrounding C — the
 project's own store-leaf precedents (`func_800196D4` etc., same unit)
 clobber ONLY `"memory"`, never a GPR number, and that omission is
-load-bearing, not incidental style. (`func_800193C0`, 8/57 -> 33/57 from
+load-bearing, not incidental style. (`ProjectTriFace`, 8/57 -> 33/57 from
 this one fix alone.)
 
 Also reconfirms two entries already in DECOMPILATION_LEARNINGS on new

@@ -84,7 +84,7 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    do write a whole-function `__asm__`, name the instruction that has no C
    spelling — **and look it up in `include/gte.h` first, because if the SDK
    ships a `gte_*` macro for that instruction, the macro IS the C form and
-   the instruction does not qualify.** `func_800195EC` was carried from
+   the instruction does not qualify.** `TransformAndCullPoly` was carried from
    round 13 to 2026-09-14 as a whole-function `__asm__` with a hand-managed
    `noreorder` bracket, on the grounds that `rtpt`/`nclip`/`avsz3`/`cfc2`
    have no C spelling. Every one of them is a Psy-Q macro, and the body is

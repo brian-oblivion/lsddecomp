@@ -622,3 +622,7 @@ Get_vtable_BasicClass = 0x80018390; // type:func
 SetBMemPMgrBusy = 0x8001844C; // type:func
 GetBMemPMgrBusy = 0x80018458; // type:func
 gBMemPMgrBusy = 0x8008A820; // type:func
+SetupPrimCode = 0x8001934C; // type:func
+ProjectTriFace = 0x800193C0; // type:func
+ProjectQuadFace = 0x800194A4; // type:func
+TransformAndCullPoly = 0x800195EC; // type:func
