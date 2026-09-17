@@ -190,8 +190,10 @@ into one of these. This list is short because this project is young — add to i
   - **An `mflo`/`mfhi` residue is a counter-indication.** cc1 expands
     `mult`/`mflo` together during RTL expansion, before any layout decision.
 
-  Full entry, with all four placement variants: `DECOMPILATION_LEARNINGS.md`,
-  "An arm that must JUMP has to be written NOT-LAST".
+  Full entry, with all four placement variants:
+  `docs/archive/DECOMPILATION_LEARNINGS-full-2026-09-16.md`, "An arm that must
+  JUMP has to be written NOT-LAST"; the rule itself is in
+  `DECOMPILATION_LEARNINGS.md` section 3a.
 - **Prologue callee-save stores in the wrong ORDER**, same registers and same
   offsets. Not reachable from C — six declaration-order permutations produce
   one identical score. A bare `__asm__("")` as the function's first statement is
@@ -444,8 +446,8 @@ three are live rather than transcribed:
   fixed by re-reading four instructions; the third by noticing that a delay
   slot had changed a register before the branch target read it. Before you
   believe any "compiler-internal" verdict, re-read the residue's immediate
-  neighbourhood and ask the two questions in DECOMPILATION_LEARNINGS' "How to
-  read a one-instruction residue": did a delay slot move a value, and did the
+  neighbourhood and ask the two questions in DECOMPILATION_LEARNINGS section
+  3g (full entry: archive, "How to read a one-instruction residue"): did a delay slot move a value, and did the
   author transcribe a lowering instead of the expression behind it?
 
   **Round 10 retired a fourth, and the variant is different enough to name.**
@@ -462,8 +464,8 @@ three are live rather than transcribed:
   incrementally and re-measure after each change rather than looking for the
   single explanation that covers the whole gap, and do not revert a change
   with independent evidence behind it just because the score did not move
-  (see DECOMPILATION_LEARNINGS on entangled residues, where a fix that scored
-  *worse* alone was the key unlock in combination).
+  (see the archive's DECOMPILATION_LEARNINGS entry on entangled residues, where
+  a fix that scored *worse* alone was the key unlock in combination).
 
   **And a low score is not evidence of a distant shape.** `func_8004BB3C`
   scores 14/105 while being structurally 104 of 105 instructions identical to
@@ -496,8 +498,10 @@ three are live rather than transcribed:
   both described as "register" problems, measure before believing they are one
   class**, because the shared label is doing the grouping, not the evidence.
 
-For uncarved ground, see Gate 2 in `docs/PARALLEL-RUNS.md`, which lists the
-segments live and records the carve hazards found so far.
+There is no uncarved ground left (`python3 tools/uncarved.py` is the check).
+If a re-segmentation ever creates some, the carve recipe and its hazards are
+`docs/archive/PARALLEL-RUNS-full-2026-09-16.md`, Gate 2, summarised in
+`docs/PARALLEL-RUNS.md` section 3.4.
 
 ## Writing a class method
 

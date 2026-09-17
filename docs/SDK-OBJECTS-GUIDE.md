@@ -306,7 +306,7 @@ diff. The recipe on top of steps 1-5:
   scanned. Round 34 hit it with "...from the SDK object; FirecatFG had the
   name)". Use a comma.
 
-Read Gate 2 in `docs/PARALLEL-RUNS.md` for the boundary checks; a unit split
+Read Gate 2 in `docs/archive/PARALLEL-RUNS-full-2026-09-16.md` for the boundary checks; a unit split
 is a carve, and the same under-split / orphaned-jump-table hazards apply.
 
 ## An object that defines a name another object also defines

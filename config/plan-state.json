@@ -1,0 +1,39 @@
+{
+  "models": {
+    "match_runner": null,
+    "naming_runner": null
+  },
+  "stop_rule": {
+    "calibration_rounds": 2,
+    "min_matches": 3
+  },
+  "tracks": {
+    "1": {
+      "reason": "",
+      "rounds": [],
+      "status": "open"
+    },
+    "1b": {
+      "reason": "",
+      "status": "auto"
+    },
+    "2": {
+      "reason": "",
+      "status": "open"
+    },
+    "3": {
+      "reason": "",
+      "status": "open",
+      "units_done": {}
+    },
+    "4": {
+      "reason": "",
+      "status": "auto"
+    },
+    "5": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    }
+  }
+}

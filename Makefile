@@ -130,6 +130,24 @@ $(BUILD_DIR)/%.c.o: %.c $(HEADERS) $$(wildcard asm/nonmatchings/$$(notdir $$*)/*
 	$(CPP) $(CPP_FLAGS) $< | $(CC1) $(CC_FLAGS) | $(MASPSX) $(MASPSX_FLAGS) | \
 		$(AS) $(AS_FLAGS) -o $@
 
+# --- NON_MATCHING check ----------------------------------------------------
+# Compiles every unit a SECOND time with -DNON_MATCHING into its own tree, so
+# the readable bodies kept under `#ifdef NON_MATCHING` (FINISHING-PLAN.md,
+# track 1b) are proven to at least compile. Nothing here is linked, verified
+# or read by funcdiff: build/nonmatching/ is not the oracle and never becomes
+# it. Drive it through tools/check-nonmatching.sh, which also checks that the
+# bodies reference only symbols the real link defines.
+NM_DIR   := $(BUILD_DIR)/nonmatching
+NM_OBJS  := $(foreach f,$(C_FILES),$(NM_DIR)/$(f).o)
+
+.PHONY: nonmatching
+nonmatching: $(NM_OBJS)
+
+$(NM_DIR)/%.c.o: %.c $(HEADERS) $$(wildcard asm/nonmatchings/$$(notdir $$*)/*.s)
+	@mkdir -p $(dir $@)
+	$(CPP) $(CPP_FLAGS) -DNON_MATCHING $< | $(CC1) $(CC_FLAGS) | $(MASPSX) $(MASPSX_FLAGS) | \
+		$(AS) $(AS_FLAGS) -o $@
+
 # --- extract ---------------------------------------------------------------
 # splat NEVER deletes what it stops generating, and asm/ is gitignored, so
 # orphaned .s files accumulate in a working checkout forever. They corrupt

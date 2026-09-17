@@ -14,7 +14,9 @@ byte-for-byte to the retail `SLPS_015.56` executable.
 2. **All builds go through `./build-and-verify.sh`.** A bare `make` produces
    bytes and says nothing about whether they are the right ones; every score
    read after one is unanchored. A hook blocks in-repo `make` for anything but
-   `extract`, `progress`, `format` and `clean`.
+   `extract`, `progress`, `format`, `clean` and `nonmatching` (the last
+   compiles the readable `#ifdef NON_MATCHING` bodies into `build/nonmatching/`
+   and links nothing; drive it through `tools/check-nonmatching.sh`).
 3. **NEVER commit the executable or a disc image.** `disk/SLPS_015.56` and any
    `.bin`/`.cue`/`.iso` are gitignored and stay that way. Bring-your-own-disc.
    The same goes for the Psy-Q SDK: `sdk/` (the user's SDK discs) and `lib/`
@@ -113,8 +115,14 @@ byte-for-byte to the retail `SLPS_015.56` executable.
 change every round, so this file deliberately quotes none of them:
 
 ```sh
-python3 tools/progress.py
+python3 tools/progress.py          # matched / queued / stalled / fresh, per unit
+python3 tools/plan.py              # the finishing plan: track status and the ranked ready-jobs list
 ```
+
+**The plan for finishing the project is `docs/FINISHING-PLAN.md`**: what
+done means, the tracks, which model runs what, and the one head prompt the
+operator pastes. `plan.py` is its measurement. Read it before deciding what a
+round should do.
 
 **No number about project state belongs in this file.** A count written here is
 correct for one round and quietly wrong for every round after, and the reader
@@ -420,8 +428,15 @@ Gate 2.
    To *read* a diff rather than score it, use asm-differ:
    `.venv/bin/python3 tools/asm-differ/diff.py <func>`.
 5. Iterate. On a stall, restore the `INCLUDE_ASM` and write the match report
-   (see below). **No score short of byte-exact justifies leaving C in `src/`** —
-   it fails the whole-file SHA1 the moment it is merged.
+   (see below). **No score short of byte-exact justifies leaving C in `src/`
+   as live code** — it fails the whole-file SHA1 the moment it is merged.
+
+   The one sanctioned home for a near-miss body in `src/` is an
+   `#ifdef NON_MATCHING` block with the `INCLUDE_ASM` in its `#else`
+   (`docs/FINISHING-PLAN.md`, track 1b, which also says when a stall
+   qualifies). The verified build never compiles that block, `progress.py`
+   strips it before counting, and `tools/check-nonmatching.sh` proves it
+   builds. It exists so the code is READABLE, not so the score looks better.
 6. On a match: keep the C idiomatic, name things sensibly, add new struct
    knowledge to `include/`, write the report, commit.
 
@@ -604,7 +619,10 @@ python3 tools/srcpath.py           # unit names unique, layout sane
 ## Match reports
 
 `docs/match-reports/<func>.md`, **one file per function you touch — matched
-ones included, not just stalls.** `tools/progress.py` decides whether a queued
+ones included, not just stalls.** The file is keyed by the function's NAME,
+so renaming a function means renaming its report: `tools/rename.py` does
+both, plus the symbols file and every reference, and re-verifies. Never
+rename by hand. `tools/progress.py` decides whether a queued
 function is a documented STALL or untouched FRESH ground purely by whether that
 file exists. A stall with no report is counted as unworked, and the next round
 staffs someone straight back onto it to re-derive what you already established.
@@ -657,6 +675,9 @@ toolchain change.
 ./build-and-verify.sh              # THE canonical build + verify
 make extract                       # regenerate asm/ from the executable
 python3 tools/progress.py          # where the project is
+python3 tools/plan.py              # the finishing plan, measured: tracks, ready jobs, models
+python3 tools/rename.py OLD NEW    # rename a symbol everywhere, re-extract, re-verify
+tools/check-nonmatching.sh         # the #ifdef NON_MATCHING bodies still compile and link-resolve
 python3 tools/funcdiff.py <func>   # per-function score
 python3 tools/uncarved.py          # uncarved ground, screened (Gate 2)
 python3 tools/nearmiss.py          # the near-miss queue, screened (Gate 1b)
@@ -686,15 +707,22 @@ python3 tools/stalesyms.py         # preserved bodies calling symbols since rena
 | `src/` | carved C units — where the work happens |
 | `asm/` | generated disassembly. Never edit, never commit. |
 | `tools/` | the toolchain and the workflow tools |
-| `docs/` | the guides; `docs/match-reports/` is the durable record |
+| `docs/` | the guides; `docs/match-reports/` is the durable record; `docs/archive/` holds the full-length history the lean guides were distilled from |
+| `config/plan-state.json` | the finishing plan's ledger of decisions, written only through `tools/plan.py` |
 
 ## Workflow references
 
-- `docs/PARALLEL-RUNS.md` — running several matching sessions at once under a
-  head agent. **Read this before spawning anything.**
+- `docs/FINISHING-PLAN.md` — **what to work on, in what order, on which
+  model, and the one head prompt.** Start here for any round.
+- `docs/PARALLEL-RUNS.md` — running several sessions at once under a head
+  agent: worktrees, collision rules, gates, merging, liveness. Read this
+  before spawning anything. The full history it was distilled from is
+  `docs/archive/PARALLEL-RUNS-full-2026-09-16.md`.
 - `docs/MATCHING-GUIDE.md` — the per-function loop in detail, and how to read
   a unit's real state instead of a transcribed one.
-- `docs/DECOMPILATION_LEARNINGS.md` — source-shape idioms and open questions.
+- `docs/DECOMPILATION_LEARNINGS.md` — source-shape idioms, one entry each,
+  with the discriminator and a pointer to the round. The full narrative is
+  `docs/archive/DECOMPILATION_LEARNINGS-full-2026-09-16.md`.
 - `docs/PROGRESS.md` — the running session log.
 - `docs/SDK-OBJECTS-RUNS.md` — running SDK-object conversion rounds: the
   head/runner split, collision rules for the shared config files, order and

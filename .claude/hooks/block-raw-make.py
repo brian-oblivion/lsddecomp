@@ -48,7 +48,10 @@ DENY = (
 MENTIONS_MAKE = re.compile(r"\bmake\b")
 
 # Non-build targets that are the documented way to drive this repo's Makefile.
-ALLOWED_TARGETS = frozenset({"extract", "progress", "format", "clean"})
+# `nonmatching` compiles the #ifdef NON_MATCHING bodies into build/nonmatching/
+# and links nothing; funcdiff never reads that tree, so it cannot fake a score.
+# Drive it through tools/check-nonmatching.sh.
+ALLOWED_TARGETS = frozenset({"extract", "progress", "format", "clean", "nonmatching"})
 
 # Commands that run another command, so `make` behind them is still a build.
 WRAPPERS = frozenset({

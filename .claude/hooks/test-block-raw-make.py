@@ -77,6 +77,7 @@ ALLOW = [
     # The documented non-build targets.
     "make extract",
     "make progress",
+    "make nonmatching",
     "make clean",
     "make format",
     "make clean extract",

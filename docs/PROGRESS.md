@@ -6,6 +6,67 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-16/17 — the finishing plan: one doc, one tool, one prompt (head, Fable)
+
+**No matching this session.** The operator asked for an executable plan to
+finish the project as readable source, runnable from one pasted prompt, with
+the model per role stated in black and white, and without the doc sprawl the
+southpark sister project grew. Measured state at the start: `python3
+tools/progress.py` (game code past 90% of functions matched, queue entirely
+documented stalls plus two large fresh bodies, nothing left to carve) and
+`python3 tools/plan.py` (readability essentially unstarted: nearly every
+matched definition still `func_`-named; 46 SDK functions that game code
+calls still unnamed).
+
+**Decisions taken with the operator, recorded here because the tree cannot
+express them:**
+
+- Done means readable names with evidence, the SDK CALL SURFACE named (the
+  rest of the SDK is not a goal), stalls characterised under a measured stop
+  rule, types unified, docs within budget. Matching 100% is not a goal.
+- `#ifdef NON_MATCHING` bodies are sanctioned for stalls (the sm64/oot
+  convention): verified build unchanged, `progress.py` strips them,
+  `tools/check-nonmatching.sh` proves they compile and link-resolve.
+  CLAUDE.md step 5 says so; HARD RULE 2 allows `make nonmatching`.
+- Track 1 stall matching is CALIBRATED: round A Sonnet, round B Opus, stop
+  rule fewer than 3 matches over the two rounds parks the track. Per runner:
+  at most 3 functions, 30 builds without improvement, one bounded search.
+  Stalls get one REVISIT after their unit's naming pass.
+- Naming: name what the code does, never what you guess it is for; tiers
+  A/B/C in the report; a wrong tier-A name is worse than `func_`.
+- Models: head Opus, Fable for new procedures/tools/docs and adjudication;
+  naming runner Opus until two reviewed-clean units, then Sonnet; mechanical
+  work Sonnet; Fable never a runner.
+
+**What landed:**
+
+- `docs/FINISHING-PLAN.md`: definition of done, model table, tracks 1, 1b,
+  2, 3, 4, 5 with exit and park rules, the head prompt and three runner
+  prompts, doc hygiene rules, when to reconsider.
+- `tools/plan.py`: derives every track's status and a ranked ready-jobs list
+  with a model per job; `config/plan-state.json` is its ledger of decisions
+  (`record-round`, `mark-unit`, `set-track`, `check`, `set-model`). Doc line
+  budgets are enforced as warnings.
+- `tools/rename.py`: one-command symbol rename across the symbols file,
+  sources, headers, docs and the report FILE (progress.py keys STALL vs FRESH
+  on that filename), then extract and verify. Round-tripped byte-identical on
+  `func_80058A94` and reverted.
+- `tools/check-nonmatching.sh` and the Makefile `nonmatching` target.
+- `docs/PARALLEL-RUNS.md` rewritten as the lean procedure (432 lines from
+  2897) and `docs/DECOMPILATION_LEARNINGS.md` distilled to an idiom sheet
+  (from 8040 lines); the originals are `docs/archive/*-full-2026-09-16.md`,
+  and every rule in the lean versions points at the archive section or
+  PROGRESS round that holds its story.
+- `progress.py` no longer prints the SDK as "N to go": it is not a goal.
+- Stale cross-references in MATCHING-GUIDE, SDK-OBJECTS-GUIDE and
+  setup-worktree.sh repointed.
+
+**Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
+will put the two fresh bodies and the first naming units at the top; the
+first track 2 job is the head building `tools/sdkname.py` (Fable).
+
+---
+
 ## 2026-09-16 — round 49: staffed on STALE VERDICTS rather than cold ground; 3 matches, four new levers, and the head's screen corrected by a runner
 
 **State at end: 1138 matched / 1252 game functions (90.89%)**, up **3** from
@@ -296,6 +357,8 @@ risk right now*, which is not the same question as *is this runner done*. Only
 the runner's own report answers the second, and this round is the case where the
 two gave opposite answers. All five worktrees were removed normally once bravo
 reported.
+
+---
 
 ---
 

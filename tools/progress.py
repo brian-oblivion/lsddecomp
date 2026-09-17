@@ -101,7 +101,16 @@ def strip_dead_code(text):
     because the DELIBERATELY UNWORKED marker lives in a header comment and
     stripping comments in place silently zeroes the banked column.
     """
-    code = re.sub(r"^#if 0\b.*?^#endif\b[^\n]*\n", "", text, flags=re.M | re.S)
+    # A readable body kept under `#ifdef NON_MATCHING` (FINISHING-PLAN.md,
+    # track 1b) is compiled only by `make nonmatching`, never by the verified
+    # build, so it is NOT a match. Drop the #ifdef half and keep the #else
+    # half, where the live INCLUDE_ASM sits. Without this the function would
+    # count as matched AND queued at once.
+    code = re.sub(r"^#ifdef NON_MATCHING\b.*?^#else\b[^\n]*\n", "", text,
+                  flags=re.M | re.S)
+    code = re.sub(r"^#ifdef NON_MATCHING\b.*?^#endif\b[^\n]*\n", "", code,
+                  flags=re.M | re.S)
+    code = re.sub(r"^#if 0\b.*?^#endif\b[^\n]*\n", "", code, flags=re.M | re.S)
     return re.sub(r"/\*.*?\*/", "", code, flags=re.S)
 
 
@@ -341,8 +350,14 @@ def main():
     if handwritten:
         print(f"  hand-written asm (DONE):    {handwritten:5d}"
               f"  (never was C — can never be matched)")
-    print(f"  library (Psy-Q SDK):        {library:5d}  (excluded from game %)"
-          f"  [{library_matched} matched, {library - library_matched} to go]")
+    # NOT A GOAL. The SDK is linked from Sony's objects where a disc has
+    # them and otherwise left as disassembly; matching it proves nothing
+    # about this game (FINISHING-PLAN.md). What the plan does want from it
+    # is NAMES for the functions game code calls, which tools/plan.py counts.
+    print(f"  library (Psy-Q SDK):        {library:5d}  still disassembly"
+          f"  (excluded from game %; NOT a matching goal, see FINISHING-PLAN.md)")
+    if library_matched:
+        print(f"    of which written as C:    {library_matched:5d}  (counted as library, not game)")
     # Functions inside `o` segments have no asm and are not counted above: the
     # linker takes them straight from Sony's objects. Report the objects.
     o_text = len(re.findall(r"^\s+- \[\s*0x[0-9A-Fa-f]+\s*,\s*o\s*,\s*[\w/]+\s*\]", YAML.read_text(), re.M))
@@ -367,7 +382,7 @@ def main():
                 if any(lo <= a < hi for lo, hi in placed):
                     owned += 1
         print(f"      convertible now:        {owned:5d}  still-asm SDK functions a placed object owns"
-              f"  ({library - owned} have no object on any disc in sdk/)")
+              f"  ({library - owned} have no object on any disc in sdk/ and stay as disassembly)")
     print(f"  total functions:            {total:5d}  ({game} game)")
     if handwritten and game:
         # Keep hand-written asm inside the game denominator and report the
