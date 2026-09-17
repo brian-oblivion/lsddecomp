@@ -64,7 +64,7 @@ DOC_BUDGETS = {
     "CLAUDE.md": 800,
     "docs/FINISHING-PLAN.md": 600,
     "docs/PARALLEL-RUNS.md": 500,
-    "docs/DECOMPILATION_LEARNINGS.md": 1100,
+    "docs/DECOMPILATION_LEARNINGS.md": 800,
     "docs/MATCHING-GUIDE.md": 700,
     "docs/SDK-OBJECTS-GUIDE.md": 400,
     "docs/SDK-OBJECTS-RUNS.md": 300,
