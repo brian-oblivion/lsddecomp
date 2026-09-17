@@ -33,3 +33,17 @@ round 45 (2026-09-15), runner alpha. `./build-and-verify.sh` green,
 
 None beyond the standing one: a stale `gp_rel`-blocked one-line accessor
 needs zero new work once rebuilt under the round-42 `--gp-symbols` pin.
+
+## Naming (round 51, bravo)
+
+`func_80018458` -> `GetBMemPMgrBusy`. **Tier A** -- a one-line getter,
+mechanics are its purpose. The evidence for the "Busy" reading of the
+global it returns is written up once, in
+`docs/match-reports/SetBMemPMgrBusy.md`.
+
+The one thing specific to this half: **this function is what pins the
+semantics**, and it does so from outside this unit. `func_800280EC`
+(`src/code_179d8_q.c`) calls it and returns early when it is non-zero,
+before touching `VSyncCallback` -- interrupt-time code declining to run
+while the pool allocator is walking its free list. The setter's two call
+sites alone would only have shown a flag being raised and lowered.

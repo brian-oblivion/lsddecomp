@@ -46,3 +46,33 @@ value popped off the cursor (`this` for the `slot38` call), `a1` = `self`
 `arg1` (the finalize flag, passed straight through as `slot38`'s `arg2`) —
 matching `BasicClassMethods.slot38`'s signature
 `void (*)(BasicClass *self, void *arg1, s32 arg2)` already in the header.
+
+## Naming (round 51, bravo)
+
+`BasicClass__func_182cc` -> `BasicClass__NotifyParents`. **Tier A** -- the
+body is a dispatch loop and the loop IS the purpose.
+
+Evidence: walks `self->parentRefs` with `GetNextBasicClass` and calls each
+parent's own `+0x038` slot as `slot38(parent, self, event)`. That is
+"tell everything holding a reference to me that `event` happened", stated
+directly by the code. `tools/classtable.py` across all 60 method tables:
+57 carry this exact address in slot `+0x030`, and the three that do not
+(`func_800560E4`, `func_80042550`, `func_80022D0C`) are overrides, so the
+slot is genuinely BasicClass's.
+
+`arg1` renamed to `event`: it is passed straight through to `slot38`'s
+third parameter, and the base `slot38` acts only on the value 1 while the
+overrides forward the same value onward (see
+`docs/match-reports/BasicClass__OnNotify.md`). Nothing treats it as a
+boolean.
+
+### Proposed field name for the head
+
+`BasicClassMethods::onFinalize` (slot `+0x030`) -> `notifyParents`.
+**Tier A**, by the vtable-slot convention (name the slot after the method
+it dispatches to). The inherited `onFinalize` is wrong twice: this is the
+EMITTER, not an `on*` handler, and it is not finalize-specific --
+`BasicClass__func_17f2c` (finalize) happens to be the only caller in carved
+C, which is a fact about how much is carved, not about the slot.
+Cross-unit: accessed from `src/class_3bb8c_i.c` and `src/code_8220.c`, so
+not mine to rename.

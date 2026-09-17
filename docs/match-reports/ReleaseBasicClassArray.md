@@ -63,3 +63,16 @@ the SAME saved register both times. `while(count-->0)` inside an
 `remaining` local (even initialized identically) puts the decrement in a
 different register than the one being tested and drifts the function's
 length. (`ReleaseBasicClassArray`, 4/28 -> 28/28.)
+
+## Naming (round 51, bravo)
+
+`func_800183DC` -> `ReleaseBasicClassArray`. **Tier A** -- pure leaf,
+mechanics are its purpose.
+
+Evidence: walks `count` entries of a `BasicClass *` array, calls each
+element's vtable slot `+0x004` (`release`) and stores the returned pointer
+back into the slot. Every one of the six call sites outside this unit
+(`class_3bb8c_n.c`, `class_3bb8c_o.c`, `class_3bb8c_s.c`, `code_2cc8c_b.c`,
+`code_2cc8c_f.c`, plus `include/code_2cc8c.h`'s declaration) passes a
+contiguous array of object pointers and an element count. "Release" is the
+slot's own established name in `BasicClassMethods`, not a new word.

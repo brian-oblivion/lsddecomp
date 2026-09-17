@@ -71,3 +71,21 @@ into the same delay slot. Two byte-identical *addresses* reached via two
 different *instruction sequences* is exactly the kind of thing "close
 enough" reasoning misses; only the reproducer pipeline or `funcdiff`/
 asm-differ catches it.
+
+## Naming (round 51, bravo)
+
+`func_80019724` -> `StoreSxyPolyF4`, parameter `flag` -> `storeFirst3`.
+**Tier A**; family evidence in `docs/match-reports/StoreSxyPolyF3.md`.
+
+1. **Layout.** The true branch stores `+0x8`/`+0xC`/`+0x10` (POLY_F4's
+   `xy0`/`xy1`/`xy2`, the same as POLY_F3's, since a POLY_F4 is a POLY_F3
+   with a fourth vertex appended) and the false branch stores a single SXY2
+   at `+0x14`, which is POLY_F4's `xy3`.
+2. **Call site.** The two cases that pass it to `ProjectQuadFace`
+   (0x80018C88 and 0x80018D3C) write `len = 5`, `code = 0x28` -- POLY_F4
+   exactly.
+
+`flag` -> `storeFirst3` because `ProjectQuadFace` calls the callback twice,
+`1` before the fourth vertex's own `gte_rtps()` and `0` after: the flag
+selects "the three vertices the shared transform produced" versus "the
+fourth vertex's result", not an on/off.

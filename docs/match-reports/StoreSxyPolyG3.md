@@ -40,3 +40,20 @@ caller lives in this unit.
 round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
 Matched first attempt; verified byte-exact in isolation via the CLAUDE.md
 reproducer pipeline before writing to `src/`.
+
+## Naming (round 51, bravo)
+
+`func_800196E8` -> `StoreSxyPolyG3`. **Tier A**; the family's evidence and
+the two-independent-sources argument are in
+`docs/match-reports/StoreSxyPolyF3.md`.
+
+Specific to this one:
+
+1. **Layout.** `+0x8`/`+0x10`/`+0x18` -- stride 8, POLY_G3's `xy0`/`xy1`/
+   `xy2` with a per-vertex RGB word between each.
+2. **Call site.** `func_80018464` hoists this function's address into `$s6`
+   once at 0x80018758 and passes it as the callback for the two cases that
+   write `len = 6`, `code = 0x30` -- POLY_G3 exactly.
+
+Point 2 is what separates this function from `StoreSxyPolyFT3`, whose body
+is byte-identical.

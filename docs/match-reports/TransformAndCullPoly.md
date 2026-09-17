@@ -150,3 +150,40 @@ The lesson that REPLACES round 13's conclusion: **"this instruction has no C
 form" is a claim about an instruction; whether a FUNCTION has a C form is
 decided by whether the SDK ships a macro for that instruction.** Every GTE
 op does. See `docs/MATCHING-GUIDE.md` step 2 for the screen.
+
+## Naming (round 51, bravo)
+
+`func_800195EC` -> `TransformAndCullPoly`. **Tier A** -- the body is a
+transform followed by three reject tests, and that is the whole of it.
+Local types: `GteCullCtx` -> `PolyDrawCtx`, `GteCullOwner` -> `GpuPrim`,
+both defined in `src/code_8220_b.c` and used nowhere else.
+
+Evidence for the function name: `gte_rtpt()` transforms the three vertices
+the caller loaded, then the function returns 1 on any of three conditions
+-- the FLAG register showing anything but clean or SZ3-saturated, `nclip`
+<= 0 (back-facing), or the depth-cue factor at or above 0x1000 -- and
+otherwise averages Z, caches the screen XYs and computes the OT bucket.
+Transform, then cull. Both callers use the return value for exactly that.
+
+**`GteCullOwner` -> `GpuPrim`, and why the old name had to go.** The old
+name asserted that `arg0` is "the owner object" of the cull, which is not
+what it is. It is the Psy-Q GPU primitive being filled in: `func_80018464`
+writes a `(len, code)` pair into its bytes `+0x3` and `+0x7` before every
+face, and all eight pairs it uses are Sony's POLY_xx values exactly (the
+table is in `docs/match-reports/SetupPrimCode.md`). So the field this
+function writes, `unk3`, is `P_TAG`'s length byte, renamed `tagLen`; the
+value it copies in, `ctx->unk14`, is `SetupPrimCode`'s cached copy of that
+same byte, also renamed `tagLen`. The line now reads
+`prim->tagLen = ctx->tagLen;`, which says what it does: re-stamp the tag
+length on this face's primitive.
+
+**`GteCullCtx` -> `PolyDrawCtx`** for the same reason at the other end: it
+is not cull scratch, it is the per-object draw context that both
+`ProjectTriFace` and `ProjectQuadFace` thread through everything -- vertex
+array at `+0x0C`, semi-transparency flag at `+0x1C`, cached tag/code at
+`+0x14`/`+0x15`, per-vertex sort records at `+0x88..0xA0`, vertex slots at
+`+0xA4..0xB0`. `func_80018464`'s own caller puts it in the PS1 scratchpad
+(`lui $a3, 0x1F80` at 0x80012368 in `asm/psyq_2864.s`).
+
+No offsets moved and no types changed -- both structs keep the exact layout
+that byte-matched; `tagLen` is `unk3`/`unk14` renamed in place.

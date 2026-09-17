@@ -30,3 +30,18 @@ across the two field reads — writing the source the same way, dereferencing
 reproduced that directly. This is the callee `BasicClass__NotifyParents` uses to
 walk `parentRefs`/`children` lists (see `docs/match-reports/BasicClass__NotifyParents.md`
 if present, and the class comment in `include/code_8220.h`).
+
+## Naming (round 51, bravo)
+
+`func_800183A0` -> `GetNextBasicClass`. **Tier A** -- pure leaf, mechanics
+are its purpose.
+
+Evidence: pops the `BasicClass *` out of the node `*cursor` points at,
+advances `*cursor` to that node's `next`, and writes `NULL` when the cursor
+is exhausted -- one iterator step, nothing else. It is what both of
+BasicClass's public iteration slots are built from: `+0x01C` getNextChild
+(`BasicClass__func_180bc`) and `+0x02C` getNextParentRef
+(`BasicClass__func_1816c`), and it is called directly by
+`BasicClass__NotifyParents` in this unit. The name is `BasicClass`, not
+`BasicClassListNode`, because the value it yields is the `BasicClass *`;
+the node is the cursor's business.

@@ -151,3 +151,38 @@ field feeding three independent downstream computations (not just a linked-
 list walk), and "`goto`+labeled `return` vs. inline `return`" now covers an
 early exit whose return value differs from the function's normal-path
 value, not only the shape the entry was originally derived from.
+
+## Naming (round 51, bravo)
+
+`func_800193C0` -> `ProjectTriFace`, `arg0` -> `prim`, `prim` -> `ctx`,
+`callback` -> `storeSxy`. **Tier B** -- the mechanics are fully established
+and the caller's use is clear, but "Face" is read off the caller's data
+shape rather than from a name in the game.
+
+Evidence for the name: the function takes three `u16` indices into the
+8-byte vertex array the context holds at `+0x0C`, loads those vertices into
+the GTE, delegates the transform and the cull decision to
+`TransformAndCullPoly`, writes each vertex's screen Z into a sort slot, has
+the caller's callback write the screen XY into the primitive, computes the
+screen bounding box, and returns 0 drawn / 1 culled. That is "project one
+triangle and say whether it survived". Its caller `func_80018464` iterates
+a list of records each carrying three or four vertex indices, which is a
+face list.
+
+**The parameter names were backwards and that is worth stating plainly.**
+The round-13 signature called the second parameter `prim`. It is not the
+primitive -- it is the per-object draw context (`ctx+0x0C` vertex array,
+`ctx+0x88..0x90` per-vertex sort records, `ctx+0xA4..0xAC` vertex slots).
+The GPU primitive is `arg0`, the argument that was unnamed: it is the same
+pointer `SetupPrimCode` stamps the `(len, code)` pair into, and it is what
+`storeSxy` writes screen XYs into at that primitive type's own POLY_xx
+offsets. See `docs/match-reports/SetupPrimCode.md` for the eight-for-eight
+`(len, code)` identification. Zero bytes changed; the swap is a naming fix,
+not a semantic one.
+
+`func_8001A268(ctx, 3)`'s literal `3` is a VERTEX COUNT, not a
+"primitive kind" tag -- that function walks `count` screen-XY pairs and
+computes their 2D bounding box (`docs/match-reports/func_8001A268.md`
+derives the body). The old "3 = triangle, 4 = quad" gloss in this report
+and in `include/code_8220.h` had the right numbers for the wrong reason
+and is corrected in both places.

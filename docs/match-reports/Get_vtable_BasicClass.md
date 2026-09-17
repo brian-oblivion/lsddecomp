@@ -40,3 +40,45 @@ declared fields.
 
 round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
 Matched first attempt — simple `lui`/`addiu` address-of, no ambiguity.
+
+## Naming (round 51, bravo)
+
+`func_80018390` -> `Get_vtable_BasicClass`. **Tier A** -- pure leaf
+returning one known address.
+
+Evidence: the whole body is `return &D_8006B58C;`, and `D_8006B58C` is
+BasicClass's own 14-slot method table (`tools/classtable.py D_8006B58C`).
+The spelling is the house convention rather than an invention:
+`Get_vtable_DreamSys` (`src/DreamSys.c`) and `Get_vtable_Entity`
+(`src/Entity_b.c`) are the two existing vtable accessors in the tree and
+both are `Get_vtable_<Class>`. 62 files reference this function, which is
+what makes matching the existing convention worth more than a tidier one.
+
+### Proposed field/global name for the head
+
+`D_8006B58C` -> `BASICCLASS_METHODS`. **Tier A.** It is the name
+`docs/research/class-framework.md` already uses for this exact table, and
+it matches `DREAMSYS_METHODS`, the one method table in the tree that is
+already named. **`tools/rename.py` refuses it** and I did not work around
+it: its "NEW already appears" guard fires because six files
+(`docs/match-reports/BasicClass__BasicClass.md`, this report,
+`func_80025E1C.md`, `func_80025E9C.md`, `include/class_16334.h`,
+`include/class_3bb8c.h`) already contain the string `BASICCLASS_METHODS` as
+PROSE describing this very symbol. The guard is correct in general and
+wrong in this instance; see `### Proposed learning` below.
+
+### Proposed learning
+
+**`tools/rename.py`'s "NEW already appears" guard has a systematic false
+positive on exactly the names track 3 most wants to use.** The guard exists
+to stop a rename creating two symbols with one name, so it greps for the
+new name as a whole word anywhere in `src/`, `include/` and the reports.
+But the best candidate name for a placeholder symbol is very often the name
+the project's own PROSE has been using for that symbol all along -- that is
+what makes it the right name -- and prose hits fire the guard just as hard
+as a real symbol would. Measured twice this round on one symbol
+(`D_8006B58C`, six prose hits, zero symbol hits). A prose-only hit is
+distinguishable from a real one: a real collision appears in a
+DECLARATION or the symbols file, and the tool already parses the symbols
+file. This is a tooling escalation, not something to route around by
+editing the docs first.

@@ -37,3 +37,19 @@ void StoreSxyPolyG4(void *dst, s32 flag)
 round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
 Matched first attempt (same construction as `StoreSxyPolyF4`, applied with
 this function's own offsets and verified independently).
+
+## Naming (round 51, bravo)
+
+`func_8001974C` -> `StoreSxyPolyG4`, parameter `flag` -> `storeFirst3`.
+**Tier A**; family evidence in `docs/match-reports/StoreSxyPolyF3.md`, and
+the `storeFirst3` protocol in `docs/match-reports/StoreSxyPolyF4.md`.
+
+1. **Layout.** True branch `+0x8`/`+0x10`/`+0x18`, false branch a single
+   SXY2 at `+0x20` -- POLY_G4's `xy0`..`xy3`. Note this layout is shared
+   with POLY_FT4, exactly as the tri-flavoured G3/FT3 pair is shared.
+2. **Call site, the discriminator.** The case that passes it (0x8001915C)
+   writes `len = 8`, `code = 0x38` -- POLY_G4. The POLY_FT4 cases
+   (`len = 9`, `code = 0x2C`) pass `func_80019774` instead, which lives in
+   `code_8220_c` and is not this unit's to name; the same two-source
+   argument will name it, and `func_8001979C` as POLY_GT4 (`len = 12`,
+   `code = 0x3C`), whenever that unit is worked.

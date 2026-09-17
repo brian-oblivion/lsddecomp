@@ -131,3 +131,22 @@ cannot produce that encoding no matter how the surrounding C is reshaped,
 because the immediate itself is wrong, not just which register holds the
 address. (`ProjectQuadFace`, 9/82 -> 82/82 from introducing one intermediate
 pointer local.)
+
+## Naming (round 51, bravo)
+
+`func_800194A4` -> `ProjectQuadFace`, `arg0` -> `prim`, `prim` -> `ctx`,
+`callback` -> `storeSxy`. **Tier B**, same evidence and the same parameter
+swap as `docs/match-reports/ProjectTriFace.md` -- read that one first; only
+what is specific to the four-vertex form is below.
+
+- The first three vertices go through the identical shared
+  `TransformAndCullPoly`; the fourth is transformed on its own afterwards
+  with a single `gte_rtps()`. That is why `storeSxy` takes a second
+  argument and is called twice, `1` before the fourth vertex's transform
+  (store the first three screen XYs) and `0` after (store the fourth).
+  Hence the callback parameter name `storeFirst3` on the two quad store
+  leaves, `StoreSxyPolyF4` and `StoreSxyPolyG4`.
+- `func_8001A268(ctx, 4)` -- again a vertex count, not a kind code.
+- This function is what already established `storeSxy`'s real two-argument
+  signature; the triangle form's single call site could not distinguish it
+  from an unused second parameter.
