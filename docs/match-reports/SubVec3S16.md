@@ -35,3 +35,16 @@ matching element count and halfword source width, but that is a guess,
 not evidence -- left unstated).
 
 No new struct or vtable-slot knowledge.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EA8C` -> `SubVec3S16`. Tier B.** Free function (no receiver),
+  so `VerbNoun`. The operation is complete and visible -- three-component
+  subtraction of `s16` inputs widened into an `s32` output -- but WHAT the
+  two vectors are is not established, which is what keeps it at B: its only
+  known caller is `func_8001E7BC`, still `INCLUDE_ASM`, where they are the
+  two outputs of a `func_8001F8B8` call that is itself unidentified Psy-Q.
+- **Parameters renamed `(dest, b, a)` -> `(dest, from, to)`** and the body
+  rewritten to `dest[i] = to[i] - from[i]`, same expression, so that the
+  operand order is readable at the call site: the subtrahend is the 2nd
+  argument and the minuend the 3rd. Byte-identical.
