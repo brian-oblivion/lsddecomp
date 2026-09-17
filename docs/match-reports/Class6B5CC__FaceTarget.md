@@ -204,3 +204,27 @@ here exactly as already declared.
    case) can flip a compiler-optimized MERGE into retail's own
    duplicated-but-simpler shape, even when the two source forms are
    logically identical.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EACC` -> `Class6B5CC__FaceTarget`. Tier A.** The purpose is
+  pinned end to end by the body, not inferred: `ratan2` over `target`'s
+  world position minus `self`'s own coord translation gives two angles;
+  both are converted to degrees by the same `* 360 / 4096` this unit's
+  `Class6B5CC__GetRotationDegrees` uses; they are packed as a
+  `WholeFrac_d294[3]` and dispatched to `slot44`, whose occupant is
+  `func_8001CEB4` (code_d294.c, matched) -- the setter that writes
+  `GsCOORD2PARAM.rotate`, i.e. the object's own rotation. Compute an
+  orientation from self toward a target and install it as the object's
+  rotation is the whole function.
+- **The argument-swap section above survives the rename and explains the
+  name's one soft spot:** `self` and `target` are used symmetrically and
+  `arg3 == 0` adds the half-turn that compensates a caller which already
+  swapped them. "FaceTarget" therefore names the `arg3 == 1` reading of the
+  parameters; every one of the ~30 `Entity_*.c` call sites passes
+  `(this, this->unk94, 1, 0, 0)`, so the common case is "this faces its
+  unk94", which the name states correctly.
+- `arg2`/`arg3`/`arg4` are NOT renamed: `arg2` forces the pitch entry to 0
+  and `arg3` selects the half-turn, but whether those are "yaw only" and
+  "already swapped" as modes, or something narrower, is a reading of two
+  branches, not evidence.
