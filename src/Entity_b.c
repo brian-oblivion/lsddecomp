@@ -34,7 +34,7 @@ s32 func_8005DE18(Entity *this) {
             }
         }
         if (row->unk6 < 0) {
-            func_8001EACC(this, this->unk94, 1, 0, 0);
+            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         }
     }
     return this->unkF4;
@@ -168,7 +168,7 @@ void func_8005E3C4(Entity *this, EntityMoodHandlerArg *out) {
         out->unk44 = 0x14;
         this->unk94->methods->slot130(this->unk94, 1);
     }
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     this->methods->slotC4(this, -0x5A, 0);
     if (this->unkFC == 0x1E) {
         this->methods->slot30(this, 0xA);
@@ -201,10 +201,10 @@ void func_8005E4D0(Entity *this, EntityMoodHandlerArg *out) {
                func_8005D714(this, &this->unk14->x, 1, 1) != 0) {
         this->methods->slotBC(this, D_80089D78);
     } else if (this->unkFC >= 0xA) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         this->methods->slotC4(this, -0x100, 0);
     } else {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     }
 }
 
@@ -263,7 +263,7 @@ void func_8005E7F8(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xD) {
         this->unk48 = -0x78;
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         this->methods->slot48(this, 1, D_80089DD8);
         if (this->methods->slot144(this, this->unk94) < 0x400) {
             this->methods->slot30(this, 0xB);
@@ -301,7 +301,7 @@ void func_8005EA94(Entity *this) {
     }
     y = this->unk14->y;
     if (y < 0x7D0) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     }
     if (this->unk44 == 0xB) {
         result = this->methods->slot144(this, this->unk94);

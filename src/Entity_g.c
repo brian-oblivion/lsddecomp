@@ -57,7 +57,7 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot44(this, 0, D_80089CAC);
     }
     if (this->unkFC >= 0x30D) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC >= 0x790) {
             a2 = D_80089E14;
         } else if (this->unkFC >= 0x78B) {
@@ -287,7 +287,7 @@ merge:
 }
 
 void func_800654A0(Entity *this, EntityMoodHandlerArg *out) {
-    func_8001EACC(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     this->methods->slot48(this, 1, D_80089E80);
     this->methods->slotC4(this, -0x1E, 1);
 }
@@ -298,7 +298,7 @@ void func_80065514(Entity *this, EntityMoodHandlerArg *out) {
     }
     this->methods->slot130(this);
     if (this->unkFC >= 0xC9) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unk44 == 0xA) {
             this->methods->slotD0(this, -0x200, 0);
         }

@@ -30,7 +30,7 @@ void func_800634A8(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (this->unk44 == 0xC) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC == 0x14) {
             out->unk1C = 0x12;
             out->unk10 = 0;
@@ -121,7 +121,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
             this->unkFC = -1;
         }
     } else if (this->unk44 == 0xB) {
-        func_8001EACC(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC < 0x1E) {
             this->methods->slotC4(this, -0xA, 0);
         } else {
@@ -265,7 +265,7 @@ void func_80063ED4(Entity *this, EntityMoodHandlerArg *out) {
 void func_80064078(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk7C == 0) {
         if (this->unkF4 != 0) {
-            func_8001EACC(this, this->unk94, 1, 0, 0);
+            Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
             this->methods->slot128(this, 1);
             this->unk94->methods->slot130(this->unk94, 1);
         } else if (this->unk84 == 0) {

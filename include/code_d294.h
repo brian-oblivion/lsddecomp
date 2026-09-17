@@ -106,7 +106,7 @@ struct Class6B5CCSub14 {
     s32 unk1C;                   /* +0x01C, Vec3.y */
     s32 unk20;                   /* +0x020, Vec3.z */
     /* +0x024, round 12 (code_d294_b, func_8001D624): only its ADDRESS is
-     * taken (`&self->unk14->unk24`, forwarded to func_8001EE04 as a
+     * taken (`&self->unk14->unk24`, forwarded to ApplyMatrixToSVArray as a
      * write-destination base) -- nothing dereferences through it in this
      * unit's chosen functions, so it stays an opaque byte span rather than
      * a typed field. Renamed from `pad24` now that something references it
@@ -118,7 +118,7 @@ struct Class6B5CCSub14 {
      *   - code_d294_b's func_8001D714 (STALLED) subtracts
      *     `other->unk14`'s +0x038 from `self->unk14`'s to get a relative
      *     offset and range-checks each axis -- read as a position.
-     *   - code_d294_c's func_8001E600 and func_8001EACC (both MATCHED) take
+     *   - code_d294_c's Class6B5CC__LocalOffsetToWorldPos and Class6B5CC__FaceTarget (both MATCHED) take
      *     its ADDRESS and walk it as `[i]` for `i` in 0..2, adding each word
      *     into a caller-supplied vector as a per-axis delta.
      * The head kept the INDEXABLE array form, because matched code requires
@@ -152,7 +152,7 @@ struct Class6B5CCSub14 {
  * still opaque. Exactly one name per field, deliberately: two names for one
  * field inside a single header is a trap for the next reader.
  *
- * func_8001D008 and func_8001CEB4 both apply `func_8001EC84` three times to
+ * func_8001D008 and func_8001CEB4 both apply `RatioToFixed12` three times to
  * a 3-entry `{s16,s16}` table (their own 3rd argument, `data`) and write the
  * three s32 results into this block -- func_8001D008 into
  * +0x000/+0x004/+0x008 (either overwriting or accumulating, per its own
@@ -336,7 +336,7 @@ struct GenericObj_d294 {
     GenericMethods_d294 *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
     void *unkC;                    /* +0x00C, func_8001D280 (still queued) compares this to a Class6B5CCObj* */
-    s32 unk10;                     /* +0x010, round 13 (code_d294_c, func_8001E770): read into self->unk18 */
+    s32 unk10;                     /* +0x010, round 13 (code_d294_c, Class6B5CC__LinkModel): read into self->unk18 */
     /* +0x014, round 13 (func_8001D714): same role as Class6B5CCObj's own
      * `unk14` -- `other->unk14`'s +0x038 is subtracted from
      * `self->unk14`'s. MEASURED, not a name unification guess: both call
@@ -357,12 +357,12 @@ struct GenericObj_d294 {
 
 /* A third small "count + data" shape, seen only through func_8001D624's own
  * 2nd argument (round 12): `unk0` is read once and multiplied by 8 to form
- * func_8001EE04's own iteration count, and `&unk4` (the address only, never
- * dereferenced here) is func_8001EE04's own source/dest base pointer. Real
+ * ApplyMatrixToSVArray's own iteration count, and `&unk4` (the address only, never
+ * dereferenced here) is ApplyMatrixToSVArray's own source/dest base pointer. Real
  * class identity unknown -- opaque past `unk4`'s own address, so `unk4` is
  * left a single byte rather than a guessed element type. */
 struct GenericCountList_d294 {
-    s32 unk0;  /* +0x000, multiplied by 8 to form func_8001EE04's count arg */
+    s32 unk0;  /* +0x000, multiplied by 8 to form ApplyMatrixToSVArray's count arg */
     u8 unk4;   /* +0x004, address-only */
 };
 
@@ -386,7 +386,7 @@ struct Class6B5CCMethods {
      * calls both with flag=1 and `data` pointing at a 3-entry table of
      * {s16,s16} pairs (D_8006B684/D_8006B690, 0xC bytes each). func_8001D008
      * (slot +0x048's own occupant, still queued) confirms the `data` shape:
-     * it reads three such pairs via func_8001EC84. */
+     * it reads three such pairs via RatioToFixed12. */
     void (*slot44)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, func_8001CEB4 -- still queued */
     void (*slot48)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, func_8001D008 -- still queued */
     u8 pad04C[0x050 - 0x04C];
@@ -408,13 +408,13 @@ struct Class6B5CCMethods {
      * every call site invokes them directly by symbol name. */
     u8 pad060[0x084 - 0x060];
     /* +0x084, occupant `func_8001D4DC` per `tools/classtable.py
-     * D_8006B5CC` (it lives in code_d294_b). func_8001E58C (code_d294_c)
+     * D_8006B5CC` (it lives in code_d294_b). Class6B5CC__RotateLocalVector (code_d294_c)
      * dispatches to it as `slot84(self, out, 0)`, `out` pointing at a
      * 0x20-byte stack buffer -- MEASURED from the caller's own frame size:
-     * func_8001E58C's stack layout only closes if `out` is a full 0x20
+     * Class6B5CC__RotateLocalVector's stack layout only closes if `out` is a full 0x20
      * bytes, not the 0xC that would fit just the leading vector its own
      * caller reads back. Only those leading 0xC bytes are read back, by
-     * func_8001E58C's `func_8001EE98` call a few lines later; the rest is
+     * Class6B5CC__RotateLocalVector's `ApplyMatrixToLVArray` call a few lines later; the rest is
      * opaque callback output that call site never touches. func_8001D950
      * (code_d294_b) calls the same slot on `self` itself, and
      * UnkOwnerMethods_d294's own +0x084 has the same number and shape --
@@ -491,12 +491,12 @@ struct Class6B5CCObj {
      * just a plausible guess -- the two call sites agree byte-for-byte on
      * what lives at +0x010/+0x014 of whatever this points to. */
     UnkOwner_d294 *unkC;
-    u32 unk10;                  /* +0x010, a packed bit-flags word -- see func_8001EDAC below */
+    u32 unk10;                  /* +0x010, a packed bit-flags word -- see GetSetBitField below */
     Class6B5CCSub14 *unk14;     /* +0x014, the ctor's 0x50-byte allocation */
     s32 unk18;                  /* +0x018, zeroed by the ctor */
     u8 unk1C[0x020 - 0x01C];    /* unknown; not touched by this unit's chosen functions */
     /* +0x020, zeroed by the ctor. func_8001CC48's still-queued forward
-     * target func_8001E770 (code_d294_b.s) stores its own 2nd argument into
+     * target Class6B5CC__LinkModel (code_d294_b.s) stores its own 2nd argument into
      * this offset. RETYPED round 12 (code_d294_b, func_8001D600): that
      * function passes `self->unk20` straight through as func_8001F51C's own
      * `void *` arg0 (psyq_fa50.s; func_8001F51C forwards it
@@ -523,13 +523,13 @@ struct Class6B5CCObj {
     GenericCountList_d294 *unk30;
 };
 
-/* The `{s16 whole; s16 frac;}` pair `func_8001EC84` (below) reads and
- * `func_8001E6F8` (round 14, code_d294_c) writes, three-in-a-row, at
+/* The `{s16 whole; s16 frac;}` pair `RatioToFixed12` (below) reads and
+ * `Class6B5CC__GetRotationDegrees` (round 14, code_d294_c) writes, three-in-a-row, at
  * +0x0/+0x4/+0x8 of a 3-entry table (an angle-like x/y/z triple,
  * degrees-and-fraction each -- `D_8006B684`/`D_8006B690` are exactly this
- * shape). `func_8001E6F8` writes `frac` as a constant `1` in every entry
+ * shape). `Class6B5CC__GetRotationDegrees` writes `frac` as a constant `1` in every entry
  * it produces; real per-field meaning of `frac` beyond that one producer
- * is still only inferred from `func_8001EC84`'s own `div`-by-`frac` body,
+ * is still only inferred from `RatioToFixed12`'s own `div`-by-`frac` body,
  * not independently confirmed. */
 typedef struct WholeFrac_d294 WholeFrac_d294;
 struct WholeFrac_d294 {
@@ -537,9 +537,9 @@ struct WholeFrac_d294 {
     s16 frac;
 };
 
-/* func_8001EC84 (asm/code_d294_b.s, still uncarved -- and separately
+/* RatioToFixed12 (asm/code_d294_b.s, still uncarved -- and separately
  * BLOCKED by the nop_mflo_mfhi toolchain flag once it IS carved, per
- * docs/match-reports/func_8001EC84.md): reads a `WholeFrac_d294` at the
+ * docs/match-reports/RatioToFixed12.md): reads a `WholeFrac_d294` at the
  * given pointer and returns a 20.12 fixed-point value (`whole << 12 |
  * frac`'s own division-derived low bits) -- read off its own
  * disassembly (a `div` by the pair's own two fields, not decompiled
@@ -548,27 +548,27 @@ struct WholeFrac_d294 {
  * argument. Declared here with a `void *` argument since this unit's
  * chosen functions only ever pass the pointer through, never dereference
  * the pair themselves. */
-extern s32 func_8001EC84(void *pair);
+extern s32 RatioToFixed12(void *pair);
 
 /* D_8006B684/D_8006B690 (rodata): two 3-entry, 0xC-byte tables in the shape
- * func_8001EC84 reads (see above) -- func_8001CE30's own literal `data`
+ * RatioToFixed12 reads (see above) -- func_8001CE30's own literal `data`
  * arguments to slot +0x044/+0x048. Declared as opaque byte blobs since
  * nothing this unit's chosen functions read out of them directly (only
  * their address is taken and forwarded). */
 extern u8 D_8006B684[0xC];
 extern u8 D_8006B690[0xC];
 
-/* func_8001E770/func_8001E7B0 -- now carved (round 14, src/code_d294_c.c),
+/* Class6B5CC__LinkModel/Class6B5CC__UnlinkModel -- now carved (round 14, src/code_d294_c.c),
  * and GsInitCoordinate2 (Psy-Q libgs/matrix, linked from Sony's object,
  * not game code): three
  * helpers this unit's own +0x010/+0x014/+0x018/+0x040 overrides forward
- * into. func_8001E7B0's whole body is `self->unk18 = 0; self->unk20 = 0;`
+ * into. Class6B5CC__UnlinkModel's whole body is `self->unk18 = 0; self->unk20 = 0;`
  * (MEASURED, two `sw $zero` stores, no branches) -- confirms unk18/unk20
  * above independently of the ctor. GsInitCoordinate2 is NOT decompiled
  * here (Psy-Q, linked as an object); declared only with the argument shape
  * its call site needs. */
-extern void func_8001E7B0(Class6B5CCObj *self);
-extern void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other);
+extern void Class6B5CC__UnlinkModel(Class6B5CCObj *self);
+extern void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other);
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
 /* func_800183A0 (asm/code_8220_b.s, a DIFFERENT still-uncarved unit): a
@@ -612,13 +612,13 @@ extern Sixteen6_d294 *func_8001F50C(void *arg0, s32 arg1);
 /* GsLinkObject4 (psyq_GsLinkObject4.s, Psy-Q library, not game code; symbol
  * address per config/symbols.slps01556.lsdde.txt, 0x8001EF70 -- the first
  * function of that segment, immediately after code_d294_c's own tail).
- * func_8001E770 (code_d294_c) calls it as
+ * Class6B5CC__LinkModel (code_d294_c) calls it as
  * `GsLinkObject4((u8 *)other->unkC + 0xC, &self->unk10, 0)`; declared only
  * with the opaque `void *`/`s32` shape that call site needs. */
 extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
 
-/* func_8001EE04 (this unit; MATCHED round 19, echo -- see
- * docs/match-reports/func_8001EE04.md): an element-copy loop -- `count`
+/* ApplyMatrixToSVArray (this unit; MATCHED round 19, echo -- see
+ * docs/match-reports/ApplyMatrixToSVArray.md): an element-copy loop -- `count`
  * iterations, 6 bytes/element. CORRECTED naming vs. the original guess
  * below (confirmed against the byte-exact disassembly, not reasoned from
  * the name): each iteration reads a 6-byte `Rec6_d294` record OUT OF
@@ -629,15 +629,15 @@ extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
  * address, which is why this asymmetry was invisible until this function
  * was actually matched. Declared only with the opaque shape its callers
  * need. */
-extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
+extern void ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *out);
 
 /* ApplyMatrixLV (still uncarved, a different/earlier segment): called once
- * per iteration by func_8001EE98 below as `(fixed, b, a)`; not decompiled
+ * per iteration by ApplyMatrixToLVArray below as `(fixed, b, a)`; not decompiled
  * here, declared only with the opaque shape that call site needs.
  *
  * DELIBERATELY UNPROTOTYPED (round 19, echo -- see
- * docs/match-reports/func_8001EE98.md's "MATCHED" section for the full
- * derivation): func_8001EE98's own outgoing-argument stack reservation is
+ * docs/match-reports/ApplyMatrixToLVArray.md's "MATCHED" section for the full
+ * derivation): ApplyMatrixToLVArray's own outgoing-argument stack reservation is
  * 24 bytes (six words), not the 16-byte/three-word minimum its one LIVE
  * call site needs. An isolated reproducer under the pinned toolchain
  * confirmed retail's exact bytes -- frame size, live call site, AND the
@@ -651,18 +651,18 @@ extern void func_8001EE04(void *src, void *dest, s32 count, void *out);
  * ANSI prototype would make the mismatched-arity calls a compile error. */
 extern void ApplyMatrixLV();
 
-/* func_8001EE98 (this unit, round 14; MATCHED round 19, echo -- see
- * docs/match-reports/func_8001EE98.md): a paired-array iteration sibling
- * to func_8001EE04 above -- `count` iterations, 0xC bytes/element (no
+/* ApplyMatrixToLVArray (this unit, round 14; MATCHED round 19, echo -- see
+ * docs/match-reports/ApplyMatrixToLVArray.md): a paired-array iteration sibling
+ * to ApplyMatrixToSVArray above -- `count` iterations, 0xC bytes/element (no
  * unaligned-load complication this time, both `a`/`b` are read directly),
  * calling `ApplyMatrixLV(fixed, b, a)` once per element and advancing both
  * `a`/`b` by 0xC each time while `fixed` stays constant across every call.
- * func_8001E58C (this unit, round 14) calls it as `func_8001EE98(dst, dst,
- * 1, &buf)` where `dst` is func_8001E58C's own 2nd argument and `buf` is a
+ * Class6B5CC__RotateLocalVector (this unit, round 14) calls it as `ApplyMatrixToLVArray(dst, dst,
+ * 1, &buf)` where `dst` is Class6B5CC__RotateLocalVector's own 2nd argument and `buf` is a
  * 0xC-byte stack vector `self->methods`'s own `slot84` just filled in --
  * i.e. `a`/`b` here are the SAME pointer at that one call site, so it does
  * not by itself distinguish their roles. */
-void func_8001EE98(void *a, void *b, s32 count, void *fixed);
+void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed);
 
 extern Class6B5CCObj *func_8001CA94(void);
 void *func_8001CAF4(Class6B5CCObj *self);
@@ -676,12 +676,12 @@ Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self);
 void func_8001D204(Class6B5CCObj *self);
 void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor);
 
-/* func_8001EDAC (asm/code_d294_b.s, the NEXT slice, still uncarved): a
+/* GetSetBitField (asm/code_d294_b.s, the NEXT slice, still uncarved): a
  * generic packed-bitfield accessor. Given a word pointer, a bit SHIFT, a
  * bit WIDTH and a VALUE, it clears WIDTH bits at bit-offset SHIFT in *word,
  * ORs in (value << shift), and returns the PREVIOUS contents of that
  * bitfield (shifted back down to bit 0). MEASURED from its own disassembly
- * (asm/code_d294_b.s @ func_8001EDAC): a `while` loop builds `(1 << width)
+ * (asm/code_d294_b.s @ GetSetBitField): a `while` loop builds `(1 << width)
  * - 1` one bit at a time (i.e. computes a WIDTH-bit mask, not a
  * `(1<<width)-1` closed form -- retail's own source apparently spelled it
  * as the loop), then shifts that mask into position, clears/sets, and
@@ -691,7 +691,7 @@ void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294
  * (shift 3 width 3, shift 6 width 1, shift 28 width 2, shift 30 width 1,
  * shift 31 width 1) -- i.e. self->unk10 is a packed flags/small-fields
  * register and these five functions are its per-field setters. */
-extern u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value);
+extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 s32 func_8001D344(Class6B5CCObj *self, s32 a1);
 u32 func_8001D374(Class6B5CCObj *self, s32 a1);
@@ -746,14 +746,14 @@ void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 
 void func_8001E4A4(Class6B5CCObj *self, void *node);
 void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 
-/* func_8001ECFC (asm/code_d294_c.s, the NEXT slice, still uncarved):
+/* CalcBoxOutcode (asm/code_d294_c.s, the NEXT slice, still uncarved):
  * computes the SAME 6-bit box-vs-point outcode func_8001E2E8's own `flags`
  * computation does (bit-for-bit identical comparison chain against the
  * same 6 field offsets) -- MEASURED, not guessed; this is the shared
  * primitive both functions build on. Returns the accumulated flags in
  * `$v0` unmasked (the mask is the CALLER's job, per func_8001E110's own
  * repeated `andi ...,0xFF` every time it re-reads a stored result). */
-extern s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point);
+extern s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point);
 
 s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
 s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
@@ -762,21 +762,21 @@ s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
  * config/symbols.slps01556.lsdde.txt, 0x8001F0C8): arctangent of
  * (dy, dx) in PSX-native 4096-per-circle BAM units, matching every other
  * angle representation this unit's own functions already use (see
- * `WholeFrac_d294` above and `func_8001E6F8`'s degree conversion). Real
- * argument order confirmed from func_8001EACC's own two call sites,
+ * `WholeFrac_d294` above and `Class6B5CC__GetRotationDegrees`'s degree conversion). Real
+ * argument order confirmed from Class6B5CC__FaceTarget's own two call sites,
  * below. */
 extern s32 ratan2(s32 dy, s32 dx);
 
-/* func_8001EACC (round 14, this unit -- the SAME external symbol
+/* Class6B5CC__FaceTarget (round 14, this unit -- the SAME external symbol
  * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,
- * `func_8001EACC(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
+ * `Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
  * arg4)`; same "per-call-site signature, not a callee property"
  * precedent as `func_8001E57C`/`func_8001D33C` above -- this unit's own
  * view differs in the first two parameters' types only, see below).
  *
  * A "face target" orientation setter: computes yaw/pitch from `self` to
  * `target` via two `ratan2` calls, converts both to degrees (see
- * `func_8001E6F8`'s same `x*360>>12` idiom -- pitch gets an EXTRA `+
+ * `Class6B5CC__GetRotationDegrees`'s same `x*360>>12` idiom -- pitch gets an EXTRA `+
  * 0x400` [90 degrees] added before conversion, yaw does not), builds a
  * `WholeFrac_d294[3]` {pitch, yaw, 0} table (each `.frac = 1`), and
  * dispatches it to `slot44`. `arg2 != 0` forces the pitch entry to 0
@@ -808,6 +808,6 @@ extern s32 ratan2(s32 dy, s32 dx);
  * the real vtable type), and `target`'s `->unkC`/`->unk14->unk38` shape
  * matches `Class6B5CCObj` exactly, with no evidence in this call site
  * alone for anything narrower or wider. */
-void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4);
+void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4);
 
 #endif

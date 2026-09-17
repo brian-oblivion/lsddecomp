@@ -110,7 +110,7 @@ staircase:
 	if (result < 0) {
 		return false;
 	}
-	func_8001E6F8(this, local);
+	Class6B5CC__GetRotationDegrees(this, local);
 	if (!func_8005C02C(&this->unk_0x888, &this->unk_0x884, local)) {
 		return false;
 	}

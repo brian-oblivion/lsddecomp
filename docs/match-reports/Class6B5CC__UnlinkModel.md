@@ -1,13 +1,15 @@
-# func_8001E7B0 -- MATCHED (3/3 words)
+> Renamed from `func_8001E7B0` on 2026-09-17 (tools/rename.py). Address 0x8001e7b0.
+
+# Class6B5CC__UnlinkModel -- MATCHED (3/3 words)
 
 Unit: `code_d294_c` (round 14, first slice-3 carve). Called by
 `func_8001CD20` (`code_d294.c`) as its forward target for
-`Class6B5CCMethods::slot18`. `void func_8001E7B0(Class6B5CCObj *self)`.
+`Class6B5CCMethods::slot18`. `void Class6B5CC__UnlinkModel(Class6B5CCObj *self)`.
 
 ## Final source
 
 ```c
-void func_8001E7B0(Class6B5CCObj *self) {
+void Class6B5CC__UnlinkModel(Class6B5CCObj *self) {
     self->unk18 = 0;
     self->unk20 = 0;
 }
@@ -16,7 +18,7 @@ void func_8001E7B0(Class6B5CCObj *self) {
 ## Derivation notes
 
 Already MEASURED and documented verbatim in `include/code_d294.h`'s own
-standing comment before this carve existed ("func_8001E7B0's whole body is
+standing comment before this carve existed ("Class6B5CC__UnlinkModel's whole body is
 `self->unk18 = 0; self->unk20 = 0;`") -- this round only had to move the
 body from documentation into `src/code_d294_c.c` and confirm it still
 matches now that the function has its own real address. No residue.

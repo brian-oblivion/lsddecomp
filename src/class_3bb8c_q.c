@@ -63,7 +63,7 @@ void func_80057DBC(D_800879C4Obj_q *self, s32 arg1) {
  * `pair` is a caller-supplied `{s16 whole; s16 frac;}` pair, twice over
  * (axis 0 at +0x0/+0x2, axis 1 at +0x4/+0x6) -- same 20.12 fixed-point
  * split-division idiom as code_2cc8c_d.c's func_8003EC2C and
- * code_d294_c.c's func_8001EC84 (divide once for quotient+remainder, then
+ * code_d294_c.c's RatioToFixed12 (divide once for quotient+remainder, then
  * divide the shifted remainder again for the fractional part), read as a
  * raw `s16 *` rather than a named struct per those units' own precedent
  * for this exact shape (code_2cc8c.h's note on WholeFrac_d294: "a

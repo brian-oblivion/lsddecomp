@@ -19,9 +19,9 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
     Class6B5CCSub44 *dst;
     s16 *field;
 
-    vals[0] = func_8001EC84(data);
-    vals[1] = func_8001EC84((u8 *)data + 4);
-    vals[2] = func_8001EC84((u8 *)data + 8);
+    vals[0] = RatioToFixed12(data);
+    vals[1] = RatioToFixed12((u8 *)data + 4);
+    vals[2] = RatioToFixed12((u8 *)data + 8);
     vals[0] /= 360;
     vals[1] /= 360;
     vals[2] /= 360;
@@ -47,7 +47,7 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
 
 ## What changed from the round-13/round-42 preserved body
 
-The round-13 derivation (three `func_8001EC84` reads divided by 360, an
+The round-13 derivation (three `RatioToFixed12` reads divided by 360, an
 `if(flag)` overwrite vs. a wrap-accumulate `else`, unconditional
 `field = &dst->vec.x` before the branch) was already correct in full --
 confirmed by rebuilding it as-is first this round: **71/85 words match, zero
@@ -75,7 +75,7 @@ drift outside the function**, once the toolchain flag was on. The remaining
 
 ## Derivation notes (carried over, still accurate)
 
-- Three `func_8001EC84` reads (`data+0`/`+4`/`+8`), each divided by 360
+- Three `RatioToFixed12` reads (`data+0`/`+4`/`+8`), each divided by 360
   (magic `0xB60B60B7`, shift 8) -- the three divisions are scheduled
   back-to-back by the compiler (each `mult` issued before the previous
   one's `mfhi` is consumed), which is why the raw disassembly interleaves

@@ -9,15 +9,15 @@ void func_80040664(Obj6EAC0 *self, s32 a1, void *a2) {
 }
 
 s32 func_800406E4(Obj6EAC0 *self, s32 a1) {
-    return func_8001EDAC(&self->unk58, 0x1F, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->unk58, 0x1F, 1, a1 == 0) == 0;
 }
 
 s32 func_80040714(Obj6EAC0 *self, s32 a1) {
-    return func_8001EDAC(&self->unk58, 0x1E, 1, a1 != 0);
+    return GetSetBitField(&self->unk58, 0x1E, 1, a1 != 0);
 }
 
 s32 func_80040740(Obj6EAC0 *self, s32 a1) {
-    return func_8001EDAC(&self->unk58, 0x1C, 2, a1);
+    return GetSetBitField(&self->unk58, 0x1C, 2, a1);
 }
 
 void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);

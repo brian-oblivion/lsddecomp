@@ -1,4 +1,6 @@
-# func_8001EE98 -- MATCHED (31/31, round 19)
+> Renamed from `func_8001EE98` on 2026-09-17 (tools/rename.py). Address 0x8001ee98.
+
+# ApplyMatrixToLVArray -- MATCHED (31/31, round 19)
 
 **Status: MATCHED, whole-image green.** See "Round 19 (echo): MATCHED --
 the six-argument dead-code reproducer" at the end of this report for the
@@ -12,19 +14,19 @@ the wrong hypothesis.
 Unit: `code_d294_c` (round 14). A paired-array iteration: `count`
 iterations, 0xC bytes/element, calling `func_80015618(fixed, b, a)` once
 per element and advancing both `a`/`b` by 0xC each time while `fixed`
-stays constant. Called by `func_8001E58C` (this unit, matched this
-round) as `func_8001EE98(dst, dst, 1, buf)`.
-`void func_8001EE98(void *a, void *b, s32 count, void *fixed)`.
+stays constant. Called by `Class6B5CC__RotateLocalVector` (this unit, matched this
+round) as `ApplyMatrixToLVArray(dst, dst, 1, buf)`.
+`void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed)`.
 
 Blocker screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no
 `mfhi`/`mflo`-adjacent-`mult`/`div` hit.
 
 ## Best-reached source (compiles, builds green; restored to `INCLUDE_ASM`
-## per project rule -- `func_8001E58C`'s own call site still resolves and
+## per project rule -- `Class6B5CC__RotateLocalVector`'s own call site still resolves and
 ## scores 29/29 against this function's retail bytes regardless)
 
 ```c
-void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
+void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed) {
     u8 *end;
 
     end = (u8 *)a + count * 0xC;
@@ -41,7 +43,7 @@ Preserved inline (`#if 0`, positioned where it would compile back into
 
 ```c
 #if 0
-void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
+void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed) {
     u8 *end;
 
     end = (u8 *)a + count * 0xC;
@@ -127,7 +129,7 @@ the `INCLUDE_ASM`, and `./build-and-verify.sh` + `funcdiff.py` gave
 
 ```
 build exit=2   (whole-image check FAILS, as expected for a stall)
-func_8001EE98: 19/31 words match (file 0xF698-0xF714)
+ApplyMatrixToLVArray: 19/31 words match (file 0xF698-0xF714)
 ```
 
 with the diff confirming exactly the report's own analysis: every DIFF line
@@ -136,12 +138,12 @@ is a stack-relative immediate off by a uniform 8 (`d0ffbd27`/`d8ffbd27` =
 bytes). Restored to `INCLUDE_ASM` immediately after (build re-verified
 green).
 
-**The "29/29" in the prior write-up is `func_8001E58C` (the CALLER,
+**The "29/29" in the prior write-up is `Class6B5CC__RotateLocalVector` (the CALLER,
 already matched, a different, unrelated function) -- not a claim about
-this function at all.** A `jal func_8001EE98` instruction encodes only the
-callee's symbol address, never its internal bytes, so `func_8001E58C`
-reads as a full match regardless of whether `func_8001EE98` itself is
-right, wrong, or still `INCLUDE_ASM`. Running `funcdiff.py func_8001E58C`
+this function at all.** A `jal ApplyMatrixToLVArray` instruction encodes only the
+callee's symbol address, never its internal bytes, so `Class6B5CC__RotateLocalVector`
+reads as a full match regardless of whether `ApplyMatrixToLVArray` itself is
+right, wrong, or still `INCLUDE_ASM`. Running `funcdiff.py Class6B5CC__RotateLocalVector`
 to sanity-check this function's fix would be a category error -- it is
 CLAUDE.md's "still-`INCLUDE_ASM`"/stale-signal trap wearing a different
 mask: not a stale build and not literal `INCLUDE_ASM`-vs-`INCLUDE_ASM`,
@@ -186,7 +188,7 @@ now with its score independently reconfirmed rather than merely asserted.
 Per this round's brief ("a report's contamination/exhaustion claim is
 about a previous session's attempts, not the function -- verify before
 inheriting"), re-ran the real oracle first: `INCLUDE_ASM` still in place,
-fresh full build green, `funcdiff.py func_8001EE98` reconfirms **19/31**,
+fresh full build green, `funcdiff.py ApplyMatrixToLVArray` reconfirms **19/31**,
 matching this report's title exactly -- no contamination this round.
 
 `func_80015618` is **not actually uncarved** as the prior write-up
@@ -233,7 +235,7 @@ under the pinned compiler, in complete isolation, computes the SAME
 16-byte minimum this unit's own build already produces. This is not a
 new residue; it is independent confirmation, from a from-scratch
 reproducer rather than this file's own build, that no reshaping of
-`func_8001EE98`'s SOURCE can reach retail's 24-byte reservation while the
+`ApplyMatrixToLVArray`'s SOURCE can reach retail's 24-byte reservation while the
 callee is genuinely a 3-argument call -- the caller's own bytes already
 match perfectly aside from this uniform offset, so there is no remaining
 degree of freedom on the caller side.
@@ -257,7 +259,7 @@ This narrows the space rather than closing it: the 8-byte gap is real,
 uniform, and NOT reproducible by any 3-argument call under the pinned
 toolchain in isolation, which means it is either (a) an artifact of
 `current_function_outgoing_args_size` computation in GCC 2.6.3's mips.c
-that depends on something in `func_8001EE98`'s own source shape we have
+that depends on something in `ApplyMatrixToLVArray`'s own source shape we have
 not yet tried (declaration style, a param count/type quirk, or an
 alignment rule triggered by something not present in this minimal
 reproducer), or (b) a property of the ORIGINAL call site's visible
@@ -348,7 +350,7 @@ changed to match this project's own convention -- `end`/`a`/`b`/`fixed`
 already matched):
 
 ```c
-void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
+void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed) {
     u8 *end;
 
     end = (u8 *)a + count * 0xC;

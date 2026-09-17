@@ -1,4 +1,6 @@
-# func_8001EC84 -- MATCHED 30/30 words
+> Renamed from `func_8001EC84` on 2026-09-17 (tools/rename.py). Address 0x8001ec84.
+
+# RatioToFixed12 -- MATCHED 30/30 words
 
 Unit `code_d294_c`, carved round 13. Reopened round 42 as `nop_mflo_mfhi`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
@@ -8,7 +10,7 @@ attempted until now.
 
 20.12 fixed-point division, matching the header's own prediction
 (`include/code_d294.h`, the `WholeFrac_d294`-adjacent comment above the
-`func_8001EC84` prototype): `whole << 12 | frac`'s own division-derived low
+`RatioToFixed12` prototype): `whole << 12 | frac`'s own division-derived low
 bits, via the classic split-division idiom (divide once for
 quotient+remainder, then divide the shifted remainder again for the
 fractional part). Signature kept as the header already declares it
@@ -16,7 +18,7 @@ fractional part). Signature kept as the header already declares it
 sibling unit outside this runner's scope this round.
 
 ```c
-s32 func_8001EC84(void *pair) {
+s32 RatioToFixed12(void *pair) {
     WholeFrac_d294 *p;
     s32 q1, r1, q2;
 

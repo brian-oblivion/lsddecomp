@@ -88,7 +88,7 @@ struct LinkNode {
     s32 *unk14;                    /* +0x014, zeroed by func_800569A8 on
                                        every exit path */
     u8 pad18[0x20 - 0x18];           /* +0x018 .. +0x01F, unknown */
-    s32 unk20;                     /* +0x020, forwarded to func_8001E770 */
+    s32 unk20;                     /* +0x020, forwarded to Class6B5CC__LinkModel */
     s32 unk24;                       /* +0x024, bounded < 0x1F5 and used as a
                                          modulus dividend by func_800569A8 */
     u8 pad28[0x54 - 0x28];              /* +0x028 .. +0x053, unknown */
@@ -126,7 +126,7 @@ void func_80056B8C(LinkNode *self);
 void func_80056858(LinkNode *self, s32 reuse);
 void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b);
 void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4);
-extern void func_8001E770(void *self, s32 arg); /* established, code_55dd4.h */
+extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 
 /* func_80056DF0/func_80056E1C/func_80056E44 are defined in class_3bb8c_o.c
  * (own their addresses, own local view "LinkOwnerObj"/"LinkElemObj") with
@@ -180,7 +180,7 @@ void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
     state = self->unk54;
     if (state < 2) {
         s32 ret = D_8008ACA4->methods->slot80(D_8008ACA4, D_8008AB98[state]);
-        func_8001E770(self, ret);
+        Class6B5CC__LinkModel(self, ret);
         state = self->unk54;
     }
 
@@ -263,9 +263,9 @@ void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4)
  * arr7C slots, fold a table-driven contribution into a local Vec3 (either
  * into .x, scaled by *self->unk68, or straight into .y, depending on
  * self->unk6C), then either forward it to an existing child's slotB8 or
- * spin up a brand new child via func_80056FE4/func_8001E770/func_800567D4. */
+ * spin up a brand new child via func_80056FE4/Class6B5CC__LinkModel/func_800567D4. */
 extern void *func_80056FE4(void);        /* class_3bb8c_o.c, New_X allocator */
-extern void func_8001E770(void *self, s32 arg); /* established, code_55dd4.h */
+extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 extern Vec3S D_800877EC;
 extern s32 D_800877F8[];
 
@@ -292,7 +292,7 @@ void func_80056858(LinkNode *self, s32 reuse) {
         } else {
             LinkNode *child = func_80056FE4();
             *p = child;
-            func_8001E770(child, self->unk20);
+            Class6B5CC__LinkModel(child, self->unk20);
             func_800567D4(*p, self, &accum, self->unk64, self->unk68);
         }
     }

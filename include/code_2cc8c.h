@@ -617,7 +617,7 @@ struct Unk18Obj {
     Vec3_2cc8c unk20;
     /* +0x02C, round 44 (func_8003EC2C): a 20.12 fixed-point value, set from
        a caller-supplied `{s16 whole; s16 frac;}` pair via the same
-       split-division idiom as code_d294_c's func_8001EC84 (divide once for
+       split-division idiom as code_d294_c's RatioToFixed12 (divide once for
        quotient+remainder, then divide the shifted remainder again for the
        fractional part), guarded by `self->unk10 != 0`. Read as raw `s16*`
        rather than reusing code_d294.h's `WholeFrac_d294` -- a different
@@ -1522,7 +1522,7 @@ struct Obj6EAC0 {
                                   from their own `a1` argument */
     s32 unk54;                 /* +0x054, OBSERVED: ditto, second word */
     u32 unk58;                 /* +0x058, OBSERVED: a packed-bitfield word,
-                                  passed as `func_8001EDAC(&self->unk58, ...)`
+                                  passed as `GetSetBitField(&self->unk58, ...)`
                                   -- same generic accessor as
                                   include/code_d294.h's `unk10` */
     u8 pad05C[0x060 - 0x05C];
@@ -1561,11 +1561,11 @@ struct Obj6EAC0 {
 };
 
 /* Same generic packed-bitfield-word accessor documented in
- * include/code_d294.h (`u32 func_8001EDAC(u32 *word, s32 shift, s32
+ * include/code_d294.h (`u32 GetSetBitField(u32 *word, s32 shift, s32
  * width, u32 value)`), reached here over `&self->unk58` instead of
  * `&self->unk10`. Declared again here under this unit's own local view
  * per the established multiple-independent-local-views convention. */
-extern u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value);
+extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 extern Obj6EAC0Methods D_8006EAC0; /* the base table itself, so
                                        func_800408BC's own definition

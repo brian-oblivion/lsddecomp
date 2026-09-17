@@ -1,22 +1,22 @@
 #include "common.h"
 #include "code_d294.h"
 
-void func_8001E58C(Class6B5CCObj *self, Class6B5CCSub44 *dst, s16 *src) {
+void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Class6B5CCSub44 *dst, s16 *src) {
     u8 buf[0x20];
 
     self->methods->slot84(self, buf, 0);
     dst->unk0 = src[0];
     dst->unk4 = src[1];
     dst->unk8 = src[2];
-    func_8001EE98(dst, dst, 1, buf);
+    ApplyMatrixToLVArray(dst, dst, 1, buf);
 }
 
-void func_8001E600(Class6B5CCObj *self, s32 *dst, s32 *src) {
+void Class6B5CC__LocalOffsetToWorldPos(Class6B5CCObj *self, s32 *dst, s32 *src) {
     u8 buf[0x20];
     s32 *table;
 
     self->methods->slot84(self, buf, 0);
-    func_8001EE98(dst, src, 1, buf);
+    ApplyMatrixToLVArray(dst, src, 1, buf);
 
     table = self->unkC != 0 ? self->unk14->unk38 : 0;
     dst[0] = dst[0] + table[0];
@@ -28,7 +28,7 @@ void func_8001E600(Class6B5CCObj *self, s32 *dst, s32 *src) {
     dst[2] = dst[2] + table[2];
 }
 
-void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out) {
+void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
     Class6B5CCSub44 *src;
 
     src = self->unk14->unk44;
@@ -40,19 +40,19 @@ void func_8001E6F8(Class6B5CCObj *self, WholeFrac_d294 *out) {
     out[2].frac = 1;
 }
 
-void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other) {
     self->unk20 = other;
     self->unk18 = other->unk10;
     GsLinkObject4((u8 *)((GenericObj_d294 *)self->unk20)->unkC + 0xC, &self->unk10, 0);
 }
 
-void func_8001E7B0(Class6B5CCObj *self) {
+void Class6B5CC__UnlinkModel(Class6B5CCObj *self) {
     self->unk18 = 0;
     self->unk20 = 0;
 }
 
 extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
-extern void func_8001EA8C(s32 *dest, s16 *b, s16 *a);
+extern void SubVec3S16(s32 *dest, s16 *b, s16 *a);
 
 #if 0
 /* STALL -- see docs/match-reports/func_8001E7BC.md. Round 46 (echo): 142/180
@@ -116,20 +116,20 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
             return 0;
         }
     }
-    func_8001EA8C(arg1, buf18, buf28);
+    SubVec3S16(arg1, buf18, buf28);
     return 1;
 }
 #endif
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E7BC);
 
-void func_8001EA8C(s32 *dest, s16 *b, s16 *a) {
+void SubVec3S16(s32 *dest, s16 *b, s16 *a) {
     dest[0] = a[0] - b[0];
     dest[1] = a[1] - b[1];
     dest[2] = a[2] - b[2];
 }
 
-void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4) {
+void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4) {
     s32 *pos;
     s32 *table;
     s32 dx;
@@ -177,7 +177,7 @@ void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg
     }
 }
 
-s32 func_8001EC84(void *pair) {
+s32 RatioToFixed12(void *pair) {
     WholeFrac_d294 *p;
     s32 q1, r1, q2;
 
@@ -188,7 +188,7 @@ s32 func_8001EC84(void *pair) {
     return (q1 << 12) + q2;
 }
 
-s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point) {
+s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point) {
     s32 flags;
 
     flags = 0;
@@ -210,7 +210,7 @@ s32 func_8001ECFC(BoundsBox_d294 *box, Vec3S16_d294 *point) {
     return flags;
 }
 
-u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value) {
+u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
     u32 mask;
     s32 i;
     u32 old;
@@ -227,7 +227,7 @@ u32 func_8001EDAC(u32 *word, s32 shift, s32 width, u32 value) {
     return old;
 }
 
-/* Element type for func_8001EE04's own per-record copy: 6 bytes, a 32-bit
+/* Element type for ApplyMatrixToSVArray's own per-record copy: 6 bytes, a 32-bit
  * value (as two s16 halves, never accessed as a native s32 -- keeping the
  * struct's OWN members all s16 is what gives it alignment 2, the same
  * "all-s8/s16 struct -> alignment 2 -> whole-struct copy compiles to
@@ -242,7 +242,7 @@ typedef struct Rec6_d294 {
 
 extern void ApplyMatrixSV(void *out, void *buf, void *src);
 
-void func_8001EE04(void *src, void *dest, s32 count, void *out) {
+void ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *out) {
     u8 *end;
 
     end = (u8 *)src + count * 6;
@@ -256,7 +256,7 @@ void func_8001EE04(void *src, void *dest, s32 count, void *out) {
     }
 }
 
-void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
+void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed) {
     u8 *end;
 
     end = (u8 *)a + count * 0xC;
@@ -270,7 +270,7 @@ void func_8001EE98(void *a, void *b, s32 count, void *fixed) {
     }
 }
 
-s32 func_8001EF14(s32 *a, s32 range, s32 *b) {
+s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
     s32 i;
 
     for (i = 0; i < 3; i++, a++, b++) {

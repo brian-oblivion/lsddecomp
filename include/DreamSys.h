@@ -161,7 +161,7 @@ typedef struct DreamSysUnk14Tail {
 /* Struct pointed to by DreamSys::unk_0x14. Confirmed fields, all from
    func_8005B904/func_8005B990 (round 2026-09-02): +0x0 is a word cleared to
    0 by func_8005B990 (restore) after the rest of the struct is overwritten;
-   +0x38 is the pre-existing 3-word vector (func_8001E600/func_8005942C,
+   +0x38 is the pre-existing 3-word vector (Class6B5CC__LocalOffsetToWorldPos/func_8005942C,
    still INCLUDE_ASM); +0x44 is a pointer to a DreamSysUnk14Tail, itself
    block-copied (not just followed) by the same two functions. The whole
    0x50-byte struct (this field included, raw) is block-copied to/from
@@ -471,8 +471,8 @@ extern DreamSysVec3 D_80087EA4;
      exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
      bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
      never reached by that indexed access and belong to something else.
-   - `func_8001E600` (code_d294_c, already matched) forwards its own `src`
-     parameter to `func_8001EE98(dst, src, 1, buf)`, and `func_8001EE98`'s
+   - `Class6B5CC__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
+     parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
      own doc comment (include/code_d294.h) confirms it treats both
      pointers as 0xC-byte (3-word) elements. `func_8005942C` passes
      `(s32 *)&D_80087EE8 - 2` as that exact `src` argument, which only
@@ -564,7 +564,7 @@ typedef struct DreamSys {
 	struct vtable_DreamSys *vt;
 	s8 unknown_values_0x4[8];
 
-	/* Gate observed by func_8001E600 and func_8005942C: when nonzero,
+	/* Gate observed by Class6B5CC__LocalOffsetToWorldPos and func_8005942C: when nonzero,
 	   unk_0x14 is treated as valid and its "+0x38" vector is used;
 	   otherwise a zero vector is used instead. Meaning of the pointed-to
 	   struct is unidentified. */
@@ -573,7 +573,7 @@ typedef struct DreamSys {
 
 	/* Pointer to DreamSysUnk14 (see that type for confirmed fields); a
 	   3-word vector lives at +0x38 of what this points to (read by
-	   func_8001E600 / func_8005942C, guarded by unk_0xC above). The whole
+	   Class6B5CC__LocalOffsetToWorldPos / func_8005942C, guarded by unk_0xC above). The whole
 	   struct is saved/restored to/from unk14Snapshot below by
 	   func_8005B904/func_8005B990 (round 2026-09-02). */
 	DreamSysUnk14 *unk_0x14;
@@ -951,7 +951,7 @@ struct vtable_DreamSys{
 	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:
 	   calls LogChunkMood/func_8005966C/func_800596E8/func_8005A168/
 	   func_8005A1B0/func_8005A1EC in sequence, then zeroes a large block of
-	   per-dream state, ending with a func_8001E6F8/func_8001CEB4 pair over a
+	   per-dream state, ending with a Class6B5CC__GetRotationDegrees/func_8001CEB4 pair over a
 	   small local buffer (round 2026-09-02). */
 	void (*func_800591B4)(DreamSys *this, s32 arg1, s32 arg2);
 	void (*func_80059310)(DreamSys *this);
@@ -1244,10 +1244,10 @@ extern s32 func_8005BF48(void);
    (DECOMPILATION_LEARNINGS.md). A discarded return is not evidence of
    `void` (same doc); kept `void` here only because nothing at this call
    site constrains it further. */
-extern void func_8001E6F8(DreamSys *this, void *arg1);
+extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
 
 /* Called by func_8005A700 as (&this->unk_0x888, &this->unk_0x884, &local) --
-   same `local` buffer func_8001E6F8 fills above; result used as a truth
+   same `local` buffer Class6B5CC__GetRotationDegrees fills above; result used as a truth
    value (`beqz`), so s32 (round 2026-09-02). Blocked by both the
    gp-relative and addiu_at blockers -- see
    docs/match-reports/func_8005BD3C.md -- so it stays INCLUDE_ASM; this

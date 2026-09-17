@@ -1,15 +1,17 @@
-# func_8001E770 -- MATCHED (16/16 words)
+> Renamed from `func_8001E770` on 2026-09-17 (tools/rename.py). Address 0x8001e770.
+
+# Class6B5CC__LinkModel -- MATCHED (16/16 words)
 
 Unit: `code_d294_c` (round 14). Called by `func_8001CC48` (`code_d294.c`)
 as its conditional forward target when `other`'s vtable-header tag is 9.
 Stores `other` into `self->unk20`, copies one field out of it, then calls
 the Psy-Q `GsLinkObject4` through a pointer computed off `other->unkC`.
-`void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other)`.
+`void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other)`.
 
 ## Final source
 
 ```c
-void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other) {
     self->unk20 = other;
     self->unk18 = other->unk10;
     GsLinkObject4((u8 *)((GenericObj_d294 *)self->unk20)->unkC + 0xC, &self->unk10, 0);
@@ -27,7 +29,7 @@ void func_8001E770(Class6B5CCObj *self, GenericObj_d294 *other) {
   previously given its own prototype (only its wrapper `func_8001F51C`
   was declared). Declared with only the shape this one call site needs.
 
-No existing field was retyped or renamed; `func_8001E7B0`'s comment in the
+No existing field was retyped or renamed; `Class6B5CC__UnlinkModel`'s comment in the
 header was also updated (round 14) to drop "still uncarved" now that both
 functions have moved into this unit -- prototype/type unchanged.
 

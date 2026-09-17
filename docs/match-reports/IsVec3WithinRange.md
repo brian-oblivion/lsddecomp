@@ -1,14 +1,16 @@
-# func_8001EF14 -- MATCHED (19/19 words)
+> Renamed from `func_8001EF14` on 2026-09-17 (tools/rename.py). Address 0x8001ef14.
+
+# IsVec3WithinRange -- MATCHED (19/19 words)
 
 Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- a 3-element range check: returns 1 if
 every `b[i]` is within `[a[i]-range, a[i]+range]`, 0 as soon as one isn't.
-`s32 func_8001EF14(s32 *a, s32 range, s32 *b)`.
+`s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b)`.
 
 ## Final source
 
 ```c
-s32 func_8001EF14(s32 *a, s32 range, s32 *b) {
+s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
     s32 i;
 
     for (i = 0; i < 3; i++, a++, b++) {
@@ -36,7 +38,7 @@ s32 func_8001EF14(s32 *a, s32 range, s32 *b) {
   together, `b` deferred to the branch delay slot as the one truly
   independent-of-the-test increment) reproduced the exact order.
 - No named struct fits either `a`/`b` array -- same situation as
-  `func_8001EA8C` (a 3-element `s32` vector pair), and plausibly related
+  `SubVec3S16` (a 3-element `s32` vector pair), and plausibly related
   to it (a range/tolerance check against the SAME kind of 3-axis data),
   but that connection is not asserted, only noted, since no caller in
   this round's queue reaches this function to confirm it.

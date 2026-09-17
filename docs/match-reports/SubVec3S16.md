@@ -1,14 +1,16 @@
-# func_8001EA8C -- MATCHED (16/16 words)
+> Renamed from `func_8001EA8C` on 2026-09-17 (tools/rename.py). Address 0x8001ea8c.
+
+# SubVec3S16 -- MATCHED (16/16 words)
 
 Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- three-element vector subtraction between
 two `s16` arrays, widening the result into an `s32` array.
-`void func_8001EA8C(s32 *dest, s16 *b, s16 *a)`.
+`void SubVec3S16(s32 *dest, s16 *b, s16 *a)`.
 
 ## Final source
 
 ```c
-void func_8001EA8C(s32 *dest, s16 *b, s16 *a) {
+void SubVec3S16(s32 *dest, s16 *b, s16 *a) {
     dest[0] = a[0] - b[0];
     dest[1] = a[1] - b[1];
     dest[2] = a[2] - b[2];

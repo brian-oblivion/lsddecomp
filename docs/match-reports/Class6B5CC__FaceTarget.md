@@ -1,4 +1,6 @@
-# func_8001EACC -- MATCHED (110/110 words)
+> Renamed from `func_8001EACC` on 2026-09-17 (tools/rename.py). Address 0x8001eacc.
+
+# Class6B5CC__FaceTarget -- MATCHED (110/110 words)
 
 Unit: `code_d294_c` (round 14). **The function two runners independently
 flagged for its argument-swap oddity** (see `docs/match-reports/
@@ -8,13 +10,13 @@ computes yaw/pitch from `self` toward `target` via two `ratan2` calls,
 converts both to degrees, builds a 3-entry `WholeFrac_d294` table, and
 dispatches it to `slot44` -- with an optional second `slot44` call
 forwarding a caller-supplied table verbatim.
-`void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2,
+`void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2,
 s32 arg3, void *arg4)`.
 
 ## Final source
 
 ```c
-void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4) {
+void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4) {
     s32 *pos;
     s32 *table;
     s32 dx;
@@ -66,7 +68,7 @@ void func_8001EACC(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg
 ## THE ARGUMENT-SWAP FINDING -- resolved, not just corroborated
 
 Two runners in earlier rounds independently hit the same oddity from the
-CALLER side: `func_8001EACC`'s first two arguments appear reversed at
+CALLER side: `Class6B5CC__FaceTarget`'s first two arguments appear reversed at
 some call sites (`(this, this->unk94)` at `a3==0` sites,
 `(this->unk94, this)` at `a3==1` sites, confirmed across all 9 `asm` call
 sites and all matched C call sites at the time). The open question,
@@ -81,7 +83,7 @@ same base class?**
    (matching `Class6B5CCObj::unkC`'s own existing type, `UnkOwner_d294
    *`), and `target->unk14->unk38` is read as a 3-word table (matching
    `Class6B5CCObj::unk14`'s own existing type, `Class6B5CCSub14 *`, and
-   its `unk38` field -- the SAME field `func_8001E600` established this
+   its `unk38` field -- the SAME field `Class6B5CC__LocalOffsetToWorldPos` established this
    same round). `self`'s own position comes from the identical
    `unk14->unk18` path. Nothing in this function's body prefers one
    parameter over the other structurally.
@@ -114,15 +116,15 @@ same base class?**
 - **`ratan2`** (Psy-Q library, `s32 ratan2(s32 dy, s32 dx)`): arctangent
   in PSX-native 4096-per-circle BAM units -- confirmed by this function's
   own subsequent `x * 360 / 4096` degree conversion, the same unit
-  convention `func_8001E6F8` already established for the SAME kind of
+  convention `Class6B5CC__GetRotationDegrees` already established for the SAME kind of
   angle field.
-- `func_8001EACC` itself gets its own local prototype in this unit's
+- `Class6B5CC__FaceTarget` itself gets its own local prototype in this unit's
   header (first declaration here; `Entity.h`'s separate, differently-typed
   declaration for the same external symbol is untouched, out of scope,
   and deliberately not unified -- see the header's own comment).
 
 No existing field was retyped; `Class6B5CCObj::unkC`/`unk14` and
-`Class6B5CCSub14::unk38` (added this round by `func_8001E600`) are used
+`Class6B5CCSub14::unk38` (added this round by `Class6B5CC__LocalOffsetToWorldPos`) are used
 here exactly as already declared.
 
 ## Derivation notes

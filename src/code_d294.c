@@ -53,19 +53,19 @@ void func_8001CBA4(Class6B5CCObj *self) {
 void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other) {
     func_80018390()->slot10(self, other);
     if ((other->methods->header & 0xF) == 9) {
-        func_8001E770(self, other);
+        Class6B5CC__LinkModel(self, other);
     }
 }
 
 void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
-        func_8001E7B0(self);
+        Class6B5CC__UnlinkModel(self);
     }
     func_80018390()->slot14(self, other);
 }
 
 void func_8001CD20(Class6B5CCObj *self) {
-    func_8001E7B0(self);
+    Class6B5CC__UnlinkModel(self);
     func_80018390()->slot18(self);
 }
 
@@ -97,9 +97,9 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
     Class6B5CCSub44 *dst;
     s16 *field;
 
-    vals[0] = func_8001EC84(data);
-    vals[1] = func_8001EC84((u8 *)data + 4);
-    vals[2] = func_8001EC84((u8 *)data + 8);
+    vals[0] = RatioToFixed12(data);
+    vals[1] = RatioToFixed12((u8 *)data + 4);
+    vals[2] = RatioToFixed12((u8 *)data + 8);
     vals[0] /= 360;
     vals[1] /= 360;
     vals[2] /= 360;
@@ -126,9 +126,9 @@ void func_8001D008(Class6B5CCObj *self, s32 flag, void *data) {
     s32 r0, r1, r2;
     Class6B5CCSub44 *dst;
 
-    r0 = func_8001EC84(data);
-    r1 = func_8001EC84((u8 *)data + 4);
-    r2 = func_8001EC84((u8 *)data + 8);
+    r0 = RatioToFixed12(data);
+    r1 = RatioToFixed12((u8 *)data + 4);
+    r2 = RatioToFixed12((u8 *)data + 8);
     dst = self->unk14->unk44;
     if (flag) {
         dst->unk0 = (s16)r0;
@@ -213,21 +213,21 @@ void func_8001D33C(void) {
 }
 
 s32 func_8001D344(Class6B5CCObj *self, s32 a1) {
-    return func_8001EDAC(&self->unk10, 0x1F, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;
 }
 
 u32 func_8001D374(Class6B5CCObj *self, s32 a1) {
-    return func_8001EDAC(&self->unk10, 0x1E, 1, a1 != 0);
+    return GetSetBitField(&self->unk10, 0x1E, 1, a1 != 0);
 }
 
 u32 func_8001D3A0(Class6B5CCObj *self, u32 a1) {
-    return func_8001EDAC(&self->unk10, 0x1C, 2, a1);
+    return GetSetBitField(&self->unk10, 0x1C, 2, a1);
 }
 
 u32 func_8001D3CC(Class6B5CCObj *self, s32 a1) {
-    return func_8001EDAC(&self->unk10, 6, 1, a1 == 0);
+    return GetSetBitField(&self->unk10, 6, 1, a1 == 0);
 }
 
 u32 func_8001D3F8(Class6B5CCObj *self, u32 a1) {
-    return func_8001EDAC(&self->unk10, 3, 3, a1);
+    return GetSetBitField(&self->unk10, 3, 3, a1);
 }

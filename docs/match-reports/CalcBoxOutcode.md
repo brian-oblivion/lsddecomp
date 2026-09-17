@@ -1,14 +1,16 @@
-# func_8001ECFC -- MATCHED (44/44 words)
+> Renamed from `func_8001ECFC` on 2026-09-17 (tools/rename.py). Address 0x8001ecfc.
+
+# CalcBoxOutcode -- MATCHED (44/44 words)
 
 Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- a Cohen-Sutherland-style "outcode"
 computation: tests a point's x/y/z against a box's min/max per axis and
-returns a 6-bit flag word. `s32 func_8001ECFC(s16 *box, s16 *point)`.
+returns a 6-bit flag word. `s32 CalcBoxOutcode(s16 *box, s16 *point)`.
 
 ## Final source
 
 ```c
-s32 func_8001ECFC(s16 *box, s16 *point) {
+s32 CalcBoxOutcode(s16 *box, s16 *point) {
     s32 flags;
 
     flags = 0;

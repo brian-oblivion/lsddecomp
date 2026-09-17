@@ -2,7 +2,7 @@
 
 Unit: `code_d294_c` (round 14). By far the largest function in this
 round's queue (200 asm lines, 0x2D0 bytes / 180 words -- more than 60%
-bigger than the next-largest, `func_8001EACC` at 110 words). Blocker
+bigger than the next-largest, `Class6B5CC__FaceTarget` at 110 words). Blocker
 screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no `mfhi`/`mflo`-
 adjacent-`mult`/`div` hit.
 
@@ -20,7 +20,7 @@ writing C directly instead of re-deriving the shape from scratch.
 `s32 func_8001E7BC(Class6B5CCObj *self, void *arg1, void *arg2)`
 (return value is 0 or 1; `arg1`/`arg2` types not yet pinned down --
 `arg2` is read as a 3-entry `u16`-ish table, `arg1` is forwarded whole
-into `func_8001EA8C`'s own `dest` parameter, already `s32*` per that
+into `SubVec3S16`'s own `dest` parameter, already `s32*` per that
 function's own signature).
 
 ```
@@ -35,7 +35,7 @@ if (!func_8001F8B8(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_minus_
         return 0;
     }
 }
-func_8001EA8C(arg1, &scratch3, &scratch2);   /* already matched, this unit */
+SubVec3S16(arg1, &scratch3, &scratch2);   /* already matched, this unit */
 return 1;
 ```
 
@@ -57,7 +57,7 @@ return 1;
     `func_8001D1A4` in `code_d294.c`). This function's OWN use --
     null-checked, then (when non-null) `self->unk14` is read and treated
     as the base for a `+0x38` sub-table, exactly the SAME
-    `Class6B5CCSub14::unk38` field `func_8001E600`/`func_8001EACC`
+    `Class6B5CCSub14::unk38` field `Class6B5CC__LocalOffsetToWorldPos`/`Class6B5CC__FaceTarget`
     already established this round -- is CONSISTENT with `unkC` staying
     a simple null/non-null gate (its own POINTER value is never
     dereferenced here, only tested against 0), so this is likely NOT a
@@ -76,7 +76,7 @@ return 1;
   pointer at `+0x14`" convention seen throughout this project. This
   needs its own type, not yet named.
 - **`Class6B5CCSub14::unk38`'s element type needs reconciling across TWO
-  different access widths.** `func_8001E600` (matched, this round) reads
+  different access widths.** `Class6B5CC__LocalOffsetToWorldPos` (matched, this round) reads
   and writes it as `s32[3]` (full-word arithmetic, `dst[i] += table[i]`).
   THIS function reads the SAME field via `lhu` (unsigned HALFWORD) at the
   same stride-4 offsets (0, 4, 8) -- i.e., only the LOW 16 bits of each
@@ -119,11 +119,11 @@ return 1;
   as a single repeated statement with only the 6th argument's
   construction differing (`-0x400` vs `+0x400` on one axis), similar in
   spirit to this unit's other "manually unrolled 3x/2x repetition"
-  functions this round (`func_8001E6F8`, `func_8001E600`).
+  functions this round (`Class6B5CC__GetRotationDegrees`, `Class6B5CC__LocalOffsetToWorldPos`).
 - The delta-table construction before `slotA4` (`out[i] = arg2[i] -
   table[i]`, `u16` reads, `s16` stores) is structurally identical to
-  `func_8001EA8C`'s OWN body (already matched, this unit) -- worth
-  checking whether the SOURCE literally calls `func_8001EA8C` here too
+  `SubVec3S16`'s OWN body (already matched, this unit) -- worth
+  checking whether the SOURCE literally calls `SubVec3S16` here too
   (with `s16`-truncated inputs) rather than reproducing its logic inline;
   the disassembly doesn't show a `jal` for this specific 3-word diff
   (matching an INLINED/duplicated computation, not a call), but this is
@@ -178,7 +178,7 @@ backup-copy + loop, not the whole block** -- `if ((u8 *)self->unk14 + 0x38
 **Closed: the ternary `(self->unkC != 0) ? self->unk14->unk38 : NULL`
 (the "backup" pointer, ALREADY a committed `s32 unk38[3]` field on
 `Class6B5CCSub14` per this unit's own header, established independently
-by `func_8001E600`/`func_8001EACC` this same round) is recomputed FRESH,
+by `Class6B5CC__LocalOffsetToWorldPos`/`Class6B5CC__FaceTarget` this same round) is recomputed FRESH,
 inline, at FOUR separate points**: once per axis (x/y/z) inside the
 accumulation loop, plus once more after the loop for the final delta
 computation -- never cached in a named local, each occurrence re-testing
@@ -209,7 +209,7 @@ an output-only buffer for `func_8001F8B8`), `sp+0x30` (`buf30`, likewise)
 (`0x38`..`0x54`, seven registers `s0`-`s5`+`ra`), and the outgoing-arg
 area (`sp+0x00`..`sp+0x18`, 24 bytes/6 words, sized by `func_8001F8B8`'s
 own 6-argument arity, 4 in registers + 2 on the stack -- consistent with
-this round's `func_8001EE98` finding that outgoing-arg sizing reflects
+this round's `ApplyMatrixToLVArray` finding that outgoing-arg sizing reflects
 the WIDEST call in the function, though here the wide call is genuinely
 live, not dead code).
 
@@ -285,7 +285,7 @@ function's FIRST-EVER inline preserved body -- there was none before
 this round). Stopped here rather than continuing to iterate the
 register-identity/buffer-layout residue: this function's remaining
 distance to a match is still substantial (the four-buffer stack layout,
-the two `func_8001F8B8` calls, and `func_8001EA8C`'s argument buffers are
+the two `func_8001F8B8` calls, and `SubVec3S16`'s argument buffers are
 all unverified against the real oracle beyond "compiles and produces a
 plausible partial score"), and this round's remaining time was better
 spent finishing verification of the rest of this runner's work list.
@@ -321,7 +321,7 @@ outside range)** -- honest, matching the report's own history.
 
 The loop backs up `self->unk14->unk38[i] += cur->unk14->{unk18,unk1C,unk20}`
 for each axis, gated by `self->unkC != 0` (a "backup owner" ternary this
-unit's `func_8001E600`/`func_8001EACC` also use, both matched). Retail's
+unit's `Class6B5CC__LocalOffsetToWorldPos`/`Class6B5CC__FaceTarget` also use, both matched). Retail's
 disassembly shows the ternary's `lui`/reload-and-branch sequence computed
 **TWICE per axis** -- once for the STORE address, once for the LOAD value --
 with **NOTHING cached across them**. My first attempt cached it in a named
@@ -358,8 +358,8 @@ writing it out literally, all measured, none matched retail's own timing:**
 **The ONLY shape that reproduced retail's double computation is writing the
 ternary expression out twice, verbatim, at the SOURCE level.** This project
 already has one documented precedent for "write it twice, don't cache it"
-(round 19's own note on this same function, and `func_8001EACC`/
-`func_8001E600`'s per-axis-but-not-per-read/write reassignment) -- this
+(round 19's own note on this same function, and `Class6B5CC__FaceTarget`/
+`Class6B5CC__LocalOffsetToWorldPos`'s per-axis-but-not-per-read/write reassignment) -- this
 round establishes that the "twice" can mean twice **per statement**, not
 just once per axis, when the ternary is used as both an l-value and an
 r-value target within one update.
@@ -416,7 +416,7 @@ could not be obtained SIMULTANEOUSLY with anything tried this round.
    order of first address-taken use); my build assigns the same FOUR
    addresses to `$s1`/`$s3`/`$s4`/`$s2` respectively -- a full permutation,
    not a simple pair swap. Every instruction in the `slotA4`/`func_8001F8B8`
-   x2/`func_8001EA8C` call sequence (vram 0x8001E994 onward) that touches
+   x2/`SubVec3S16` call sequence (vram 0x8001E994 onward) that touches
    one of these four addresses shows the SAME register substituted for its
    retail counterpart, consistently. Tried reordering the four buffer
    declarations to match retail's OWN first-use order (`delta, buf30,
@@ -531,7 +531,7 @@ the eventual lever will take.
 ```c
 #if 0
 extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
-extern void func_8001EA8C(s32 *dest, s16 *b, s16 *a);
+extern void SubVec3S16(s32 *dest, s16 *b, s16 *a);
 
 s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     s32 *table;
@@ -584,7 +584,7 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
             return 0;
         }
     }
-    func_8001EA8C(arg1, buf18, buf28);
+    SubVec3S16(arg1, buf18, buf28);
     return 1;
 }
 #endif
