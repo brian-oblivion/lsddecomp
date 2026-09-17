@@ -135,6 +135,49 @@
         "nop\n\t" \
         ".word 0x4B58002D")
 
+/* Local-matrix / IR-vector multiply-add: mvmva(sf=1, mx=0 "local matrix",
+ * v=3 "long IR vector", cv=3 "none", lm=0). Confirmed against retail, not
+ * against include/psyq/INLINE.H's gte_llir() -- that header's `.word
+ * 0x0000133f/0x133e/0x133e` is the ASPSX macro-CALL encoding (only Sony's
+ * assembler expands it, see the file banner above), and is a different
+ * value from the actual COP2 cofun word. The word below is retail's own
+ * three occurrences in func_80018464 (splat already decodes them as
+ * `mvmva 1, 0, 3, 3, 0`), and it fails to assemble under the pinned `as`
+ * with a bare "mvmva" mnemonic (Error: unrecognized opcode) -- confirmed
+ * with the reproducer in CLAUDE.md's "Escalate, do not experiment", so this
+ * is the raw-word case, same as gte_rtps/gte_rtpt/gte_nclip/gte_avsz3 above.
+ * Kept under Sony's own macro name (INLINE.H's naming scheme: "ll" = local
+ * matrix, "ir" = IR vector, no tr/bk/fc suffix = cv=3/none) since the field
+ * VALUES match even though the encoding form does not. */
+#define gte_llir() \
+    __asm__ volatile ( \
+        "nop\n\t" \
+        "nop\n\t" \
+        ".word 0x4A49E012")
+
+/* Depth-cue / color-lookup cofun ops used by func_80018464's per-face
+ * dispatch (one per PS1 GPU primitive flavor: NCDS for flat-shaded,
+ * DPCS/DPCT for depth-cued single/triple). Same raw-word convention as the
+ * transform ops above -- the pinned `as` rejects all three mnemonics
+ * outright ("unrecognized opcode"), confirmed the same way. */
+#define gte_ncds() \
+    __asm__ volatile ( \
+        "nop\n\t" \
+        "nop\n\t" \
+        ".word 0x4AE80413")
+
+#define gte_dpcs() \
+    __asm__ volatile ( \
+        "nop\n\t" \
+        "nop\n\t" \
+        ".word 0x4A780010")
+
+#define gte_dpct() \
+    __asm__ volatile ( \
+        "nop\n\t" \
+        "nop\n\t" \
+        ".word 0x4AF8002A")
+
 /* Read the GTE FLAG control register ($31 of COP2 control), keep only bit 18
  * (0x40000, the SZ3/OTZ saturation flag Sony's macro tests), store it. This
  * is the one macro that uses GPR scratch, and $12/$13 are exactly the GPRs
