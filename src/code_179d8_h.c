@@ -55,14 +55,14 @@
  * would use it unchanged), not redefined locally. */
 #include "code_171e0.h"
 
-/* func_80027E68 is still uncarved (asm/code_179d8.s) -- returns &D_8006D4E8,
+/* GetClass6D4E8Methods is still uncarved (asm/code_179d8.s) -- returns &D_8006D4E8,
  * a DIFFERENT class table (tools/classtable.py --scan: 29 slots, header
  * 0x13) than D_8006D430. func_80028898 chains UnkFlagsObj_171e0's base ctor
  * then overwrites self->methods with this class's own table -- the
  * standard "call base ctor, then install the derived vtable" idiom. Typed
  * against UnkFlagsObjMethods_171e0 for the assignment's sake; the two
  * tables are different classes but share the base's slot layout. */
-extern UnkFlagsObjMethods_171e0 *func_80027E68(void);
+extern UnkFlagsObjMethods_171e0 *GetClass6D4E8Methods(void);
 
 /* func_80028A34/func_80028A50's own `self` -- offsets +0xC/+0x1C happen to
  * coincide with UnkFlagsObj_171e0::unk0C and its documented-unknown pad18
@@ -139,7 +139,7 @@ extern char D_8008A8A8[]; /* ";1", the ISO9660 CD file-version suffix */
 
 void func_80028898(UnkFlagsObj_171e0 *self) {
     ((UnkFlagsObjMethods_171e0 *)func_80026C9C())->ctor(self);
-    self->methods = func_80027E68();
+    self->methods = GetClass6D4E8Methods();
     self->unk0C = 0;
 }
 

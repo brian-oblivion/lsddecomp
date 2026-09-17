@@ -1,26 +1,26 @@
-# func_80027FE4
+> Renamed from `func_80027FD8` on 2026-09-17 (tools/rename.py). Address 0x80027fd8.
+
+# SetFileTable
 
 **Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
 ## What this function does
 
 A plain `$gp`-relative setter: stores its single `s32` argument into the
-scalar global `D_8008A86C` (in `.sdata`). No return value. Paired with the
-getter `func_80027FF0` immediately after it in ROM order, which reads the
-same global back.
+scalar global `D_8008A868` (in `.sdata`). No return value.
 
 ## The C
 
 ```c
-extern s32 D_8008A86C;
+extern s32 D_8008A868;
 
-void func_80027FE4(s32 a0)
+void SetFileTable(s32 a0)
 {
-    D_8008A86C = a0;
+    D_8008A868 = a0;
 }
 ```
 
 ## Provenance
 
 round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). See
-func_80027EC8.md for the sibling-accessor context.
+IsCdBusy.md for the sibling-accessor context.

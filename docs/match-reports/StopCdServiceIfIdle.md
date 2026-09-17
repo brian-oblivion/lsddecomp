@@ -1,4 +1,6 @@
-# func_80028218 — MATCHED (26/26 words)
+> Renamed from `func_80028218` on 2026-09-17 (tools/rename.py). Address 0x80028218.
+
+# StopCdServiceIfIdle — MATCHED (26/26 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
@@ -13,9 +15,9 @@ extern s32 D_8008A8A4;
 extern s32 D_8008A890;
 extern void VSyncCallback(void (*cb)(void));
 
-void func_80028218(void)
+void StopCdServiceIfIdle(void)
 {
-    func_800280D0();
+    LockCd();
 
     if (D_8008A898 == 0 && D_8008A89C != 0) {
         if (D_8008A8A4 != 0) {
@@ -25,23 +27,23 @@ void func_80028218(void)
         D_8008A890 = 0;
     }
 
-    func_800280E0();
+    UnlockCd();
 }
 ```
 
 ## Derivation
 
-Straight read: sets the `D_8008A88C` latch (`func_800280D0`), then a guarded
+Straight read: sets the `D_8008A88C` latch (`LockCd`), then a guarded
 block only entered when `D_8008A898 == 0` AND `D_8008A89C != 0` (the two
 `beqz`/`bnez` gp_rel loads collapse into one `&&`), inside which an optional
 `VSyncCallback(0)` fires when `D_8008A8A4 != 0`, then both `D_8008A89C` and
 `D_8008A890` are cleared; falls through either way to clear the latch
-(`func_800280E0`). The `VSyncCallback(0)` idiom (`extern void
+(`UnlockCd`). The `VSyncCallback(0)` idiom (`extern void
 VSyncCallback(void (*cb)(void));` then call with a literal `0`) is not new —
 it already appears in `src/code_179d8_c_b.c:131-153`, reused verbatim here.
 
-Called from `func_80027D40` (this unit, matched alongside it), so it needed a
-forward `extern void func_80028218(void);` in this file since `func_80027D40`
+Called from `Class6D4E8__StopCdService` (this unit, matched alongside it), so it needed a
+forward `extern void StopCdServiceIfIdle(void);` in this file since `Class6D4E8__StopCdService`
 sits earlier in ROM order and therefore earlier in the file (unit must stay
 in strict ROM-address order).
 

@@ -1,8 +1,10 @@
-# func_800280EC — MATCHED (49/49 words)
+> Renamed from `func_800280EC` on 2026-09-17 (tools/rename.py). Address 0x800280ec.
+
+# ServiceCdDriver — MATCHED (49/49 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`. Its address is
 taken 3x elsewhere in the slice (this function itself, twice as a
-`VSyncCallback` argument, once by `func_800281B0`) — a function pointer.
+`VSyncCallback` argument, once by `StartCdService`) — a function pointer.
 
 ## Result
 
@@ -17,7 +19,7 @@ extern void func_800286E4(void); /* code_179d8_r */
 extern s32 D_8008A890;
 extern void VSyncCallback(void (*cb)(void));
 
-/* This unit's own slot at +0x068 of D_8006D4E8's table (see func_80027E68's
+/* This unit's own slot at +0x068 of D_8006D4E8's table (see GetClass6D4E8Methods's
  * class-map comment above); only the one slot this call site dispatches is
  * typed here, following the pad-to-offset convention include/code_171e0.h
  * uses for D_8006D430's own table. */
@@ -27,7 +29,7 @@ struct D_8006D4E8Methods {
     void (*slot68)(void);
 };
 
-s32 func_800280EC(void)
+s32 ServiceCdDriver(void)
 {
     if (D_8008A88C != 0) {
         return 0;
@@ -48,11 +50,11 @@ s32 func_800280EC(void)
     }
 
     if (D_8008A890 != 0) {
-        ((D_8006D4E8Methods *)func_80027E68())->slot68();
+        ((D_8006D4E8Methods *)GetClass6D4E8Methods())->slot68();
     }
 
     if (D_8008A8A4 != 0) {
-        VSyncCallback((void (*)(void))func_800280EC);
+        VSyncCallback((void (*)(void))ServiceCdDriver);
     }
 
     return 0;

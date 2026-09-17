@@ -11,18 +11,18 @@ the preserved body verbatim; matched on the first build.
 
 ## What it does
 
-`s32 func_80026ECC(void) { if (D_8008A84C == 0x13) return func_80027EE0(); return 0; }`
+`s32 func_80026ECC(void) { if (D_8008A84C == 0x13) return GetCdOperation(); return 0; }`
 — same shape as `func_80026E64`, forwarding to a different still-uncarved
-function (`func_80027EE0`, in `asm/code_179d8.s`).
+function (`GetCdOperation`, in `asm/code_179d8.s`).
 
 ## Final body
 
 ```c
-extern s32 func_80027EE0(void);
+extern s32 GetCdOperation(void);
 
 s32 func_80026ECC(void) {
     if (D_8008A84C == 0x13) {
-        return func_80027EE0();
+        return GetCdOperation();
     }
     return 0;
 }

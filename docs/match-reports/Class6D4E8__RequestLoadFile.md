@@ -1,4 +1,6 @@
-# func_80027C80 — MATCHED (48/48 words)
+> Renamed from `func_80027C80` on 2026-09-17 (tools/rename.py). Address 0x80027c80.
+
+# Class6D4E8__RequestLoadFile — MATCHED (48/48 words)
 
 Round 45, runner echo (third sitting), `src/code_179d8_q.c`. This class's own
 slot +0x06C of `D_8006D4E8`.
@@ -38,23 +40,23 @@ struct UnkC80 {
 };
 
 struct Self800282AC;
-extern void func_800282AC(struct Self800282AC *arg0, s32 arg1, s32 arg2,
+extern void EnqueueCdRequest(struct Self800282AC *arg0, s32 arg1, s32 arg2,
                            s32 arg3, s32 arg4);
 extern s32 func_800284C4(char *arg0); /* code_179d8_r */
 extern s32 D_8008A85C;
 
-void func_80027C80(SelfC80 *self, char *arg1)
+void Class6D4E8__RequestLoadFile(SelfC80 *self, char *arg1)
 {
     UnkC80 *s2;
     s32 idx;
 
-    func_800280D0();
+    LockCd();
 
     if (arg1 != NULL) {
         if (D_8008A85C != 0) {
             s2->unk04 = 1;
             idx = func_800284C4(arg1);
-            func_800282AC((struct Self800282AC *)self, idx, 7, 0, 0);
+            EnqueueCdRequest((struct Self800282AC *)self, idx, 7, 0, 0);
         } else {
             self->methods->slot58(self, arg1);
 
@@ -64,7 +66,7 @@ void func_80027C80(SelfC80 *self, char *arg1)
         }
     }
 
-    func_800280E0();
+    UnlockCd();
 }
 ```
 
@@ -112,22 +114,22 @@ allows.
 ## Other derivation notes
 
 - The early `if (arg1 != NULL)` guard corresponds to retail's `beqz $s0,
-  .L80027D1C` jumping straight to the shared `func_800280E0(); return;` tail
+  .L80027D1C` jumping straight to the shared `UnlockCd(); return;` tail
   — a single early-return-free `if` wrapping the whole body reproduces this
   with no duplicated tail, the same shape CLAUDE.md/prior reports document
   for this unit.
 - `func_800284C4` (still `INCLUDE_ASM` in `code_179d8_r.c`, foxtrot's unit)
   takes a single `char *` argument that it passes straight to `strstr` as
   the needle — read from its own disassembly, not guessed — hence `char
-  *arg0` here rather than `void *`. `arg1` of `func_80027C80` is typed the
+  *arg0` here rather than `void *`. `arg1` of `Class6D4E8__RequestLoadFile` is typed the
   same way, since it flows unchanged into both `func_800284C4` and
   `self->methods->slot58`.
-- `func_800282AC` (already matched this round, later in this file) takes its
+- `EnqueueCdRequest` (already matched this round, later in this file) takes its
   first parameter as a distinct locally-typed `Self800282AC *`. Rather than
   editing its existing declaration or pulling that type earlier in the file
   out of ROM order, this function forward-declares an opaque `struct
   Self800282AC;` and casts `self` to `struct Self800282AC *` at the call
-  site — the tag is the same one `func_800282AC`'s own definition later
+  site — the tag is the same one `EnqueueCdRequest`'s own definition later
   completes with `typedef struct Self800282AC Self800282AC;`, so the
   prototypes are identical types and nothing conflicts.
 - `self`'s own `+0x58` method-table slot is the identical offset the sibling

@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-/* Local view of the object func_80027480/func_800282AC/func_80028A34 read
+/* Local view of the object func_80027480/EnqueueCdRequest/func_80028A34 read
  * through -- the real struct is ObjA34_179D8H (src/code_179d8_h.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
@@ -69,12 +69,12 @@ extern s32 D_8008A860;
 extern s32 D_8008A864;
 
 extern void func_80028A34(Obj80027480 *self);
-extern void func_800280D0(void);
+extern void LockCd(void);
 extern void func_80028844(s32 arg0, s32 arg1);
 extern void func_80028864(void);
-extern void func_800282AC(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
+extern void EnqueueCdRequest(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
                            s32 arg4);
-extern void func_800280E0(void);
+extern void UnlockCd(void);
 
 /* Linear-scan table lookups over the 0x1C-byte string records at
  * D_8008A868 (src/code_179d8_r.c). Declared LOCAL here (own reading of the
@@ -113,7 +113,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
         func_80028920(self, suffix);
         return;
     }
-    func_800280D0();
+    LockCd();
     if (self->unk28 != 0) {
         if (D_8008A864 == 0 && self->unk0C == 0) {
             func_80028844(1, 1);
@@ -145,9 +145,9 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
             }
         }
     } else {
-        func_800282AC(self, func_800284C4(suffix), 2, arg2, arg3);
+        EnqueueCdRequest(self, func_800284C4(suffix), 2, arg2, arg3);
     }
-    func_800280E0();
+    UnlockCd();
 }
 
 void func_80027480(Obj80027480 *self) {
@@ -155,7 +155,7 @@ void func_80027480(Obj80027480 *self) {
         func_80028A34(self);
         return;
     }
-    func_800280D0();
+    LockCd();
     if (self->unk28 != 0) {
         if (D_8008A864 == 0) {
             func_80028844(0, 0);
@@ -163,9 +163,9 @@ void func_80027480(Obj80027480 *self) {
             func_80028864();
         }
     } else {
-        func_800282AC(self, 0, 3, 0, 0);
+        EnqueueCdRequest(self, 0, 3, 0, 0);
     }
-    func_800280E0();
+    UnlockCd();
 }
 
 extern u8 D_8006D574[8];
@@ -185,7 +185,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
     if (D_8008A85C == 0 && D_8008A860 == 0) {
         return func_80028A50(self);
     }
-    func_800280D0();
+    LockCd();
     if (self->unk28 != 0) {
         if (D_8008A864 == 0 && self->unk0C != 0) {
             func_80028844(2, 1);
@@ -210,7 +210,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
                 }
             } else {
                 func_80028864();
-                func_800280E0();
+                UnlockCd();
                 if ((self->unk1C & 0x7FF) != 0) {
                     return ((self->unk1C >> 11) + 1) << 11;
                 }
@@ -218,9 +218,9 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
             }
         }
     } else {
-        func_800282AC(self, 0, 4, (s32)arg1, arg2);
+        EnqueueCdRequest(self, 0, 4, (s32)arg1, arg2);
     }
-    func_800280E0();
+    UnlockCd();
     return 0;
 }
 
@@ -243,7 +243,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
         func_80028A84(self, buf, size);
         return 0;
     }
-    func_800280D0();
+    LockCd();
     if (self->unk28 != 0) {
         if (D_8008A864 == 0 && self->unk0C != 0) {
             func_80028844(3, 7);
@@ -264,9 +264,9 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
             }
         }
     } else {
-        func_800282AC(self, 0, 5, (s32)buf, size);
+        EnqueueCdRequest(self, 0, 5, (s32)buf, size);
     }
-    func_800280E0();
+    UnlockCd();
     return 0;
 }
 
@@ -303,7 +303,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
         self->methods->slot64(self);
         return;
     }
-    func_800280D0();
+    LockCd();
     if (self->unk28 != 0) {
         if (D_8008A864 == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             func_80028844(4, 1);
@@ -356,9 +356,9 @@ void func_80027800(Obj80027480 *self, char *arg1) {
             }
         }
     } else {
-        func_800282AC(self, func_800284C4(arg1), 7, 0, 0);
+        EnqueueCdRequest(self, func_800284C4(arg1), 7, 0, 0);
     }
-    func_800280E0();
+    UnlockCd();
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027A24);

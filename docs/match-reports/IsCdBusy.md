@@ -1,4 +1,6 @@
-# func_80027EC8
+> Renamed from `func_80027EC8` on 2026-09-17 (tools/rename.py). Address 0x80027ec8.
+
+# IsCdBusy
 
 **Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
@@ -13,7 +15,7 @@ A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
 ```c
 extern s32 D_8008A864;
 
-s32 func_80027EC8(void)
+s32 IsCdBusy(void)
 {
     return D_8008A864;
 }
@@ -23,7 +25,7 @@ s32 func_80027EC8(void)
 
 round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). One of
 a run of identically-shaped `$gp_rel` accessors in this unit
-(func_80027EC8/ED4/EE0/EEC are getters, func_80027FD8/FE4 are setters,
-func_80027FF0 is a paired getter, func_800280D0/E0 are a 1/0 setter pair) --
+(IsCdBusy/ED4/EE0/EEC are getters, SetFileTable/FE4 are setters,
+GetFileTableCount is a paired getter, LockCd/E0 are a 1/0 setter pair) --
 see the sibling reports for the same globals block, `D_8008A85C`..
 `D_8008A890`.

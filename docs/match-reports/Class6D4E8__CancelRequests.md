@@ -1,8 +1,10 @@
-# func_80027D70 — MATCHED (62/62 words)
+> Renamed from `func_80027D70` on 2026-09-17 (tools/rename.py). Address 0x80027d70.
+
+# Class6D4E8__CancelRequests — MATCHED (62/62 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`. This class's
 own method-table slot **+0x074** (see the class-map comment above
-`func_80027E68` in the `.c`).
+`GetClass6D4E8Methods` in the `.c`).
 
 ## Result
 
@@ -36,14 +38,14 @@ extern void CdFlush(void);
 extern void func_80028864(void); /* code_179d8_r */
 extern void func_800283C4(QueueEntryD70 *arg0); /* code_179d8_r */
 
-void func_80027D70(SelfD70 *self)
+void Class6D4E8__CancelRequests(SelfD70 *self)
 {
     QueueEntryD70 *entry;
     QueueEntryD70 *node;
     QueueEntryD70 *next;
     s32 saved;
 
-    func_800280D0();
+    LockCd();
 
     entry = (QueueEntryD70 *)D_8008A894;
 
@@ -67,7 +69,7 @@ void func_80027D70(SelfD70 *self)
         }
     }
 
-    func_800280E0();
+    UnlockCd();
 }
 ```
 

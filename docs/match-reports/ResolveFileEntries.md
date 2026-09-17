@@ -1,4 +1,6 @@
-# func_80027FFC — MATCHED (53/53 words)
+> Renamed from `func_80027FFC` on 2026-09-17 (tools/rename.py). Address 0x80027ffc.
+
+# ResolveFileEntries — MATCHED (53/53 words)
 
 Round 45, runner echo (third sitting), `src/code_179d8_q.c`. Last remaining
 function in this unit.
@@ -35,7 +37,7 @@ struct CdStatBufQ {
 /* This class's per-entry array element, 0x1C bytes: `name` is passed
  * directly (as its own address, offset 0) to func_800289CC as the path
  * suffix; unk14/unk18 are filled from a CdSearchFile lookup on that path.
- * D_8008A868 (this unit's own func_80027FD8/set) and D_8008A86C (func_8002
+ * D_8008A868 (this unit's own SetFileTable/set) and D_8008A86C (func_8002
  * 7FE4/FF0) are this array's base pointer and element count -- func_800284C4
  * (code_179d8_r) walks the identical 0x1C stride over D_8008A868 doing
  * strstr() against `name`, confirming the layout independently. */
@@ -50,9 +52,9 @@ extern const char D_800107D8[]; /* "File not found. file = %s\n" */
 extern s32 CdSearchFile(CdStatBufQ *statBuf, char *path); /* lib/libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
 extern char *func_800289CC(char *dest, char *suffix);
-extern void func_80027E78(void);
+extern void InitCdDrive(void);
 
-s32 func_80027FFC(FileEntryQ *arg0, s32 count)
+s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
 {
     FileEntryQ *end;
     char path[0x40];
@@ -61,7 +63,7 @@ s32 func_80027FFC(FileEntryQ *arg0, s32 count)
 
     end = arg0 + count;
 
-    func_80027E78();
+    InitCdDrive();
 
     for (; arg0 < end; arg0++) {
         func_800289CC(path, arg0->name);

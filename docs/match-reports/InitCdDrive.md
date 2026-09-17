@@ -1,4 +1,6 @@
-# func_80027E78 — MATCHED (20/20 words)
+> Renamed from `func_80027E78` on 2026-09-17 (tools/rename.py). Address 0x80027e78.
+
+# InitCdDrive — MATCHED (20/20 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
@@ -14,7 +16,7 @@ extern s32 CdControlB(u_char com, void *param, void *result);
 
 extern s32 D_8008A858;
 
-void func_80027E78(void)
+void InitCdDrive(void)
 {
     u8 mode;
 

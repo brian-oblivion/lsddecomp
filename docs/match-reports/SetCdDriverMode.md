@@ -1,4 +1,6 @@
-# func_80027F18 — MATCHED (48/48 words)
+> Renamed from `func_80027F18` on 2026-09-17 (tools/rename.py). Address 0x80027f18.
+
+# SetCdDriverMode — MATCHED (48/48 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
@@ -8,7 +10,7 @@ Byte-exact, second attempt (one intermediate near-miss, see below).
 
 ```c
 extern s32 func_80020C5C(void); /* class_3ac78, returns a pointer cast to s32 */
-extern s32 func_800280EC(void);
+extern s32 ServiceCdDriver(void);
 extern s32 D_8008A864;
 extern s32 D_8008A85C;
 extern s32 D_8008A860;
@@ -27,7 +29,7 @@ struct ObjF18 {
     ObjF18Methods *methods;
 };
 
-s32 func_80027F18(s32 arg0, s32 arg1, s32 arg2)
+s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
 {
     ObjF18 *obj;
 
@@ -37,7 +39,7 @@ s32 func_80027F18(s32 arg0, s32 arg1, s32 arg2)
 
             if (D_8008A85C == 0) {
                 if (arg0 != 0) {
-                    obj->methods->slot84(obj, (void *)func_800280EC);
+                    obj->methods->slot84(obj, (void *)ServiceCdDriver);
                 }
             } else {
                 if (arg0 == 0) {
@@ -79,13 +81,13 @@ drift) and corrected on the second:
    `slot84(self, arg)`, consistent with CLAUDE.md's "explicit `this` first
    parameter" convention for this codebase's hand-rolled method tables. The
    near-miss diff showed `a0`/`a1` register roles and the materialized
-   `&func_800280EC` address swapped between them, which was the tell.
+   `&ServiceCdDriver` address swapped between them, which was the tell.
 
 `func_80020C5C` is declared exactly as `class_3ac78.c` already declares it
 (`extern s32 func_80020C5C(void);`, cast to a pointer type at the call
-site) — reused convention, not a new one. `func_800280EC` (this unit,
+site) — reused convention, not a new one. `ServiceCdDriver` (this unit,
 matched earlier this round) needed only a forward `extern s32
-func_800280EC(void);` since this function sits earlier in ROM order.
+ServiceCdDriver(void);` since this function sits earlier in ROM order.
 
 ### Proposed learning
 

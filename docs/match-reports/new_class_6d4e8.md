@@ -31,7 +31,7 @@ Obj6D4E8 *new_class_6d4e8(void)
 
     self = func_80017B34(0x2C);
     if (self != NULL) {
-        func_80027E68()->ctor(self);
+        GetClass6D4E8Methods()->ctor(self);
         return self;
     }
     return NULL;
@@ -40,7 +40,7 @@ Obj6D4E8 *new_class_6d4e8(void)
 
 `func_80017B34` is the project's already-established Psy-Q allocator
 (`extern void *func_80017B34(s32 size);`, same signature used throughout the
-codebase). `func_80027E68` (still `INCLUDE_ASM` in the `code_179d8`
+codebase). `GetClass6D4E8Methods` (still `INCLUDE_ASM` in the `code_179d8`
 remainder) returns this class's own table, `&D_8006D4E8`, typed here as
 `Obj6D4E8Methods *` (a local view -- see the unit header comment and the
 sibling reports for `func_80027228`/`func_80027274`, which establish the

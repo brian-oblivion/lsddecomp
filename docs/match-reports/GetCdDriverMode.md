@@ -1,4 +1,6 @@
-# func_80027EF8 — MATCHED (8/8 words)
+> Renamed from `func_80027EF8` on 2026-09-17 (tools/rename.py). Address 0x80027ef8.
+
+# GetCdDriverMode — MATCHED (8/8 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
@@ -10,7 +12,7 @@ Byte-exact on the first attempt.
 extern s32 D_8008A860;
 extern s32 D_8008A85C;
 
-s32 func_80027EF8(s32 *a0)
+s32 GetCdDriverMode(s32 *a0)
 {
     if (a0 != NULL) {
         *a0 = D_8008A860;
@@ -25,7 +27,7 @@ Straight read of the disassembly: `beqz $a0, .L80027F0C` guards a store of
 `D_8008A860` (gp_rel) into `*a0`; fallthrough loads `D_8008A85C` (gp_rel) into
 `$v0` and returns it unconditionally. Both globals are in the same
 `D_8008A85C..D_8008A890` sdata block this unit's other getter/setters touch
-(see `func_80027E68`'s header comment in the `.c` for the class map). No
+(see `GetClass6D4E8Methods`'s header comment in the `.c` for the class map). No
 class/struct involvement — plain scalar globals, plain optional-out-param
 shape.
 

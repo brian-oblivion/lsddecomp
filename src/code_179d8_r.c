@@ -6,7 +6,7 @@
  * attempted before this round.
  *
  * This slice and the adjacent code_179d8_q (runner echo) share callees
- * func_800280D0 (lock: D_8008A88C = 1) and func_800280E0 (unlock:
+ * LockCd (lock: D_8008A88C = 1) and UnlockCd (unlock:
  * D_8008A88C = 0), both defined in code_179d8_q.c. Declared locally here,
  * never in a shared header -- see CLAUDE.md on per-unit local views.
  *
@@ -14,7 +14,7 @@
  *   - D_8008A878 holds the current state/phase.
  *   - D_8008A8A0 is a timeout counter, reset by func_80028888.
  *   - func_8002858C / func_800286E4 are near-identical per-tick state
- *     machine steps (driven from func_800280EC in code_179d8_q via
+ *     machine steps (driven from ServiceCdDriver in code_179d8_q via
  *     D_8008A898 == 1 / == 2), differing only in their state==2 and
  *     state==8-success handling.
  *   - func_80028844 / func_80028864 are the "start" / "reset" bookends of
@@ -27,8 +27,8 @@
  */
 
 /* lock/unlock, defined in code_179d8_q.c (runner echo's unit). */
-extern void func_800280D0(void);
-extern void func_800280E0(void);
+extern void LockCd(void);
+extern void UnlockCd(void);
 
 /* Psy-Q CD-ROM library, linked from lib/libcd/sys.o. Locally typed the same
  * way code_179d8_h.c already types this unit's own call sites. */
@@ -76,7 +76,7 @@ Node8008A894 *func_8002832C(void)
     Node8008A894 *head;
     Node8008A894 *cur;
 
-    func_800280D0();
+    LockCd();
     node = func_80017B34(0x24);
     if (node != NULL) {
         head = D_8008A894;
@@ -97,7 +97,7 @@ Node8008A894 *func_8002832C(void)
             D_8008A894 = node;
         }
     }
-    func_800280E0();
+    UnlockCd();
     return node;
 }
 
@@ -106,7 +106,7 @@ void func_800283C4(Node8008A894 *node)
     Node8008A894 *prev;
     Node8008A894 *next;
 
-    func_800280D0();
+    LockCd();
     if (node != NULL) {
         prev = node->prev;
         if (prev != NULL) {
@@ -120,7 +120,7 @@ void func_800283C4(Node8008A894 *node)
         }
         func_80017CFC(node);
     }
-    func_800280E0();
+    UnlockCd();
 }
 
 void *func_80028448(char *arg0)
@@ -128,10 +128,10 @@ void *func_80028448(char *arg0)
     char *cur = D_8008A868;
     s32 i = 0;
 
-    func_800280D0();
+    LockCd();
     do {
         if (strstr(cur, arg0) != NULL) {
-            func_800280E0();
+            UnlockCd();
             return cur;
         }
         i++;
@@ -145,7 +145,7 @@ s32 func_800284C4(char *arg0)
     char *cur = D_8008A868;
     s32 i = 0;
 
-    func_800280D0();
+    LockCd();
     while (strstr(cur, arg0) == NULL) {
         i++;
         if (i >= D_8008A86C) {
@@ -153,7 +153,7 @@ s32 func_800284C4(char *arg0)
         }
         cur += 0x1C;
     }
-    func_800280E0();
+    UnlockCd();
     return i;
 }
 
@@ -163,9 +163,9 @@ void *func_80028540(s32 index)
     char *base;
 
     base = D_8008A868;
-    func_800280D0();
+    LockCd();
     result = base + index * 0x1C;
-    func_800280E0();
+    UnlockCd();
     return result;
 }
 
@@ -180,7 +180,7 @@ void func_8002858C(void)
     s32 v1;
     s32 newstate;
 
-    func_800280D0();
+    LockCd();
     state = D_8008A878;
 
     if (state == 2)
@@ -248,7 +248,7 @@ L_set:
     func_80028888(newstate);
 
 L_end:
-    func_800280E0();
+    UnlockCd();
 }
 
 void func_800286E4(void)
@@ -258,7 +258,7 @@ void func_800286E4(void)
     s32 newstate;
     void *tmp;
 
-    func_800280D0();
+    LockCd();
     state = D_8008A878;
 
     if (state == 2)
@@ -329,7 +329,7 @@ L_set:
     func_80028888(newstate);
 
 L_end:
-    func_800280E0();
+    UnlockCd();
 }
 
 void func_80028844(s32 arg0, s32 arg1)

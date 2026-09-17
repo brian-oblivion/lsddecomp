@@ -1,4 +1,6 @@
-# func_800282AC — MATCHED (32/32 words)
+> Renamed from `func_800282AC` on 2026-09-17 (tools/rename.py). Address 0x800282ac.
+
+# EnqueueCdRequest — MATCHED (32/32 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
@@ -28,7 +30,7 @@ struct Self800282AC {
     s32 unk24;
 };
 
-void func_800282AC(Self800282AC *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+void EnqueueCdRequest(Self800282AC *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 {
     Entry800282AC *entry = func_8002832C();
 
@@ -40,7 +42,7 @@ void func_800282AC(Self800282AC *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 
     arg0->unk22++;
     arg0->unk24 = 0;
-    func_800281B0();
+    StartCdService();
 }
 ```
 
@@ -51,7 +53,7 @@ Five-argument function (four in registers, a fifth on the caller's stack at
 standard o32 stack-arg slot). Allocates/links a list node via
 `func_8002832C` (foxtrot's `code_179d8_r`, still `INCLUDE_ASM` there —
 declared `extern` here per the cross-unit convention already established by
-`code_179d8_h.c` and `func_800280EC`'s report) and fills five of its
+`code_179d8_h.c` and `ServiceCdDriver`'s report) and fills five of its
 fields with the incoming parameters. The store order to the new entry
 (`+0x08, +0x14, +0x0C, +0x10, +0x18`) is NOT ascending-offset — it's
 `arg2, arg3, arg0, arg1, arg4` in that literal order — and reproducing it
@@ -59,10 +61,10 @@ required writing the assignment *statements* in that same order; GCC
 2.6.3 preserves store-to-store order for what look like independent
 struct-field writes here rather than reordering them by offset. Then
 increments a `u16` counter on `arg0` at `+0x22` and clears a `s32` at
-`+0x24`, then tail-calls the already-matched `func_800281B0` (void, no
-args). GCC scheduled the counter's store-back into `func_800281B0`'s call
+`+0x24`, then tail-calls the already-matched `StartCdService` (void, no
+args). GCC scheduled the counter's store-back into `StartCdService`'s call
 delay slot on its own; writing the natural `arg0->unk22++; arg0->unk24 = 0;
-func_800281B0();` statement order was sufficient — no manual reordering
+StartCdService();` statement order was sufficient — no manual reordering
 needed to reproduce that scheduling choice.
 
 ### Proposed learning

@@ -1,4 +1,6 @@
-# func_80028280 — MATCHED (11/11 words)
+> Renamed from `func_80028280` on 2026-09-17 (tools/rename.py). Address 0x80028280.
+
+# DisableCdQueue — MATCHED (11/11 words)
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 
@@ -9,22 +11,22 @@ Byte-exact on the first attempt.
 ```c
 extern s32 D_8008A890;
 
-void func_80028280(void)
+void DisableCdQueue(void)
 {
-    func_800280D0();
+    LockCd();
     D_8008A890 = 0;
-    func_800280E0();
+    UnlockCd();
 }
 ```
 
 ## Derivation
 
-Straight call sequence: `jal func_800280D0`, a gp_rel store of 0 to
-`D_8008A890`, `jal func_800280E0`, then epilogue. Both callees are already
-matched in this unit (`func_800280D0` sets `D_8008A88C = 1`, `func_800280E0`
-sets it back to `0`) — see the header comment above `func_800280D0` in the
+Straight call sequence: `jal LockCd`, a gp_rel store of 0 to
+`D_8008A890`, `jal UnlockCd`, then epilogue. Both callees are already
+matched in this unit (`LockCd` sets `D_8008A88C = 1`, `UnlockCd`
+sets it back to `0`) — see the header comment above `LockCd` in the
 `.c`, which already named this function as the one that "clears it right
-back". Confirms that comment: `func_80028280` calls the set-to-1 helper,
+back". Confirms that comment: `DisableCdQueue` calls the set-to-1 helper,
 clears an unrelated flag `D_8008A890`, then calls the set-to-0 helper —
 net effect is `D_8008A88C` ends at 0 and `D_8008A890` is cleared. No new
 struct/class knowledge.
