@@ -6,6 +6,119 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-17 — round 51: two units through track 3, and a merge that went red 248 bytes large because gp-symbols was regenerated one step too early
+
+Head on Opus, two runners (the operator capped the round at two, nearing an
+API limit). Both slots went to track 3 from the top of the ready-jobs list;
+no track-1 work. Gate 0 green, header contention zero between the two units.
+
+**State at end: 1138 matched / 1252 game functions, 0 fresh, 114 stalled.
+Track 3 at 3/75 units. Build verifies.**
+
+### Gate 1: the top job was not a job
+
+`plan.py` opened the round ranking `match func_80030980 (324w, fresh)` first.
+It is not fresh. Its `REOPENED -- ASSIGNABLE` marker was set by round 42 and
+the function has been worked twice since — round 45's structural derivation,
+round 50's `volatile` lever that took it to length-exact 324/324 at 7/324
+word-match, which was calibration round A's zero. The marker was still
+turning it into FRESH ground, so the round would have staffed a runner
+straight back onto round 50's failed job. Retired it the way round 43 retired
+`func_8004DCD0`'s, and checked the COUNT moved rather than the diff: fresh
+1 -> 0. With that corrected no track-1 job outranked naming.
+
+This is the fourth round in which a spent honesty marker mis-ranked the
+queue. The marker table in PARALLEL-RUNS §3.3 says a marker edit is not done
+until the count moves; nothing says who retires one when the work that spends
+it happens two rounds later, and the runner who spends it is not the one who
+reads the count.
+
+### What the runners did
+
+**alpha, `code_179d8_q` — the CD-ROM read driver.** 22 functions, 13 globals,
+every local type, field and vtable slot, four named constants. The unit is
+the module-level half of the class whose method table is `D_8006D4E8`:
+`code_171e0` routes here when its source selector holds that table's header
+word `0x13`, and to the SPU/VAB streamer in `code_179d8_e` on `0x23` — two
+interchangeable data sources behind one dispatch layer. Every path bottoms
+out in Psy-Q libcd, and `CdSearchFile`'s 0x18-byte output buffer is exactly
+Sony's `CdlFILE`, which independently confirms round 45's stack-span
+derivation of that size. The class token `Class6D4E8__` is a deliberate hedge
+on the existing `Class6B5CC__` convention: the behaviour is established, the
+developers' name for it is not, and a class name prefixes ~20 methods across
+three units.
+
+**bravo, `code_8220_b` — BasicClass list/notify primitives and the GTE
+per-face projection pipeline.** 20 functions, 16 tier A. The lever that made
+the renderer half nameable is worth keeping: each of `func_80018464`'s 13
+dispatch cases writes a `(len, code)` pair into the primitive before calling
+`SetupPrimCode`, and all eight distinct pairs are Sony's POLY_xx codes
+exactly (F3 4/0x20 through GT4 12/0x3C). That is independent of the `swc2`
+offsets, which cannot separate G3 from FT3 or G4 from FT4 — identical
+layouts. It also caught `ProjectTriFace`/`ProjectQuadFace`'s first two
+parameters being backwards.
+
+Head review sampled five names per unit against their evidence — the vtable
+slots against `classtable.py`, the GPU codes against Sony's, `InitCdDrive`
+and `ServiceCdDriver` against their bodies. No wrong tier-A name in either
+unit. Both `mark-unit`'d, and the naming runner moves to Sonnet on the model
+table's two-clean-Opus-units rule (round 50's `code_d294_c` plus these two).
+
+### The merge failure, which is the round's real finding
+
+Merging both branches produced a clean compile and a SHA1 mismatch: the image
+came out **248 bytes LARGE**, 291764 bytes differing from file `0x1010`. No
+compile error, no conflict marker, nothing that looks like a bad rename.
+
+Cause: during conflict resolution the head regenerated `config/gp-symbols.txt`
+while `asm/` was still extracted from the **bravo-only** symbol set, so
+`gpsyms.py` could not see alpha's renamed sdata/sbss globals. The file came
+out carrying bravo's `gBMemPMgrBusy` but alpha's globals still spelled
+`D_8008A864` / `D_8008A878` / `D_8008A890` and nine more. After the merge
+extract those names no longer exist, so twelve globals dropped out of the
+`--gp-symbols` table, lost `$gp`-relative addressing, and each load became
+`lui`+`addiu` instead of one gp-relative load. Twelve globals, 248 bytes.
+
+The order that works is the reverse of what was done:
+
+```sh
+git merge ...  ->  resolve  ->  make extract  ->  python3 tools/gpsyms.py  ->  verify
+```
+
+**`gpsyms.py --check` is not a guard against this.** It passed, twice, on the
+wrong file — it re-derives from the same stale `asm/` the file was generated
+from, so it can only tell you the file is self-consistent, never that it is
+consistent with the symbols the next build will use. Both runners
+independently escalated a milder form of this (rename.py leaves the file
+stale behind a GREEN oracle, ordering only); the head hit the version where
+the oracle goes red and the symptom points nowhere near the cause.
+
+Isolation cost two failed attempts worth recording: `git checkout` of the
+bravo-merge parent was refused for an uncommitted working-tree edit, and
+`git checkout runner/alpha` was refused because that branch was checked out
+in its own worktree. Both printed their refusal and then the build ran anyway
+on the unchanged tree, reporting `build exit=0` and the right image size — a
+green that measured the commit already loaded, not the one under test. That
+is CLAUDE.md's first way a score lies arriving through git rather than
+through make, and the `echo "$?"` discipline does not catch it because the
+build genuinely did succeed. Read what checkout printed before believing what
+the build printed.
+
+### Head work at merge
+
+Applied bravo's tier-A cross-unit slot rename `BasicClassMethods::onFinalize`
+-> `notifyParents` (+0x030, ten files, both units' views of the same slot),
+whole-tree replace plus the oracle per track 3 step 3, no mis-hits, image
+byte-identical. `onFinalize` was an inherited hypothesis and wrong in kind:
+the slot is the notification EMITTER, not a finalize handler.
+
+The remaining proposals are deferred with their evidence intact in the
+reports and the broadcast: bravo's tier-B `slot38` -> `onNotify` (13 units,
+bravo's own advice is to do it alone) and alpha's field names in
+`code_179d8_r`/`_s`/`_h`'s own views of the CD request node and file records.
+
+---
+
 ## 2026-09-17 — round 50: first round under the finishing plan; track 3 opens and passes its first unit, track 1 calibration round A scores zero
 
 First round run from `docs/FINISHING-PLAN.md` and `tools/plan.py`. Head on

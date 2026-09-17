@@ -1,7 +1,7 @@
 {
   "models": {
     "match_runner": null,
-    "naming_runner": null
+    "naming_runner": "sonnet"
   },
   "stop_rule": {
     "calibration_rounds": 2,
@@ -34,8 +34,22 @@
     },
     "3": {
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-17",
+          "matches": 2,
+          "model": "opus",
+          "note": "Track 3 naming: code_179d8_q (CD-ROM read driver, 22 functions + 13 globals) and code_8220_b (BasicClass list/notify primitives + GTE per-face projection, 20 functions). Both head-reviewed, 5 names each sampled against evidence, no wrong tier-A name; both mark-unit'd. No track-1 work this round. Naming runner switched to sonnet on the two-clean-Opus-units rule.",
+          "round": 51,
+          "runners": 2
+        }
+      ],
       "status": "open",
       "units_done": {
+        "code_179d8_q": "2026-09-17",
+        "code_8220_b": "2026-09-17",
         "code_d294_c": "2026-09-17"
       }
     },
