@@ -7,17 +7,17 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`D_8008A86C` and returns it -- the getter half of the setter/getter pair
+`gFileTableCount` and returns it -- the getter half of the setter/getter pair
 completed by `SetFileTableCount` immediately before it in ROM order.
 
 ## The C
 
 ```c
-extern s32 D_8008A86C;
+extern s32 gFileTableCount;
 
 s32 GetFileTableCount(void)
 {
-    return D_8008A86C;
+    return gFileTableCount;
 }
 ```
 

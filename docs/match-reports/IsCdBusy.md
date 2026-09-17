@@ -7,17 +7,17 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`D_8008A864` (in `.sdata`, confirmed a single `.word` in
+`gCdBusy` (in `.sdata`, confirmed a single `.word` in
 `asm/data/7B048.sdata.s`) and returns it.
 
 ## The C
 
 ```c
-extern s32 D_8008A864;
+extern s32 gCdBusy;
 
 s32 IsCdBusy(void)
 {
-    return D_8008A864;
+    return gCdBusy;
 }
 ```
 
@@ -27,5 +27,5 @@ round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). One of
 a run of identically-shaped `$gp_rel` accessors in this unit
 (IsCdBusy/ED4/EE0/EEC are getters, SetFileTable/FE4 are setters,
 GetFileTableCount is a paired getter, LockCd/E0 are a 1/0 setter pair) --
-see the sibling reports for the same globals block, `D_8008A85C`..
-`D_8008A890`.
+see the sibling reports for the same globals block, `gCdAsyncEnabled`..
+`gCdQueueEnabled`.

@@ -7,18 +7,18 @@
 ## What this function does
 
 A plain `$gp`-relative setter: stores its single `s32` argument into the
-scalar global `D_8008A86C` (in `.sdata`). No return value. Paired with the
+scalar global `gFileTableCount` (in `.sdata`). No return value. Paired with the
 getter `GetFileTableCount` immediately after it in ROM order, which reads the
 same global back.
 
 ## The C
 
 ```c
-extern s32 D_8008A86C;
+extern s32 gFileTableCount;
 
 void SetFileTableCount(s32 a0)
 {
-    D_8008A86C = a0;
+    gFileTableCount = a0;
 }
 ```
 

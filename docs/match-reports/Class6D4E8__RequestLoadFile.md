@@ -43,7 +43,7 @@ struct Self800282AC;
 extern void EnqueueCdRequest(struct Self800282AC *arg0, s32 arg1, s32 arg2,
                            s32 arg3, s32 arg4);
 extern s32 func_800284C4(char *arg0); /* code_179d8_r */
-extern s32 D_8008A85C;
+extern s32 gCdAsyncEnabled;
 
 void Class6D4E8__RequestLoadFile(SelfC80 *self, char *arg1)
 {
@@ -53,7 +53,7 @@ void Class6D4E8__RequestLoadFile(SelfC80 *self, char *arg1)
     LockCd();
 
     if (arg1 != NULL) {
-        if (D_8008A85C != 0) {
+        if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
             idx = func_800284C4(arg1);
             EnqueueCdRequest((struct Self800282AC *)self, idx, 7, 0, 0);

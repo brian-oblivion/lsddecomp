@@ -11,10 +11,10 @@ Byte-exact, second attempt (one intermediate near-miss, see below).
 ```c
 extern s32 func_80020C5C(void); /* class_3ac78, returns a pointer cast to s32 */
 extern s32 ServiceCdDriver(void);
-extern s32 D_8008A864;
-extern s32 D_8008A85C;
+extern s32 gCdBusy;
+extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
-extern s32 D_8008A8A4;
+extern s32 gCdUseVSyncCallback;
 
 /* Object returned by func_80020C5C; only the slot this call site dispatches
  * (+0x84 of its method table) is typed here. */
@@ -33,11 +33,11 @@ s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
 {
     ObjF18 *obj;
 
-    if (D_8008A864 == 0) {
+    if (gCdBusy == 0) {
         if (arg2 == 0) {
             obj = (ObjF18 *)func_80020C5C();
 
-            if (D_8008A85C == 0) {
+            if (gCdAsyncEnabled == 0) {
                 if (arg0 != 0) {
                     obj->methods->slot84(obj, (void *)ServiceCdDriver);
                 }
@@ -48,8 +48,8 @@ s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
             }
         }
 
-        D_8008A8A4 = arg2;
-        D_8008A85C = arg0;
+        gCdUseVSyncCallback = arg2;
+        gCdAsyncEnabled = arg0;
         D_8008A860 = arg1;
 
         return 1;
@@ -66,13 +66,13 @@ drift) and corrected on the second:
 
 1. **The whole-body guard is `if (cond == 0) { body; return 1; } return 0;`,
    not `if (cond != 0) { return 0; } body; return 1;`.** Retail's
-   `D_8008A864 != 0` check branches DIRECTLY to the shared `move v0,zero`
+   `gCdBusy != 0` check branches DIRECTLY to the shared `move v0,zero`
    tail already sitting at the very end of the function (right after the
    `return 1` tail), rather than to a duplicate `v0=0`/jump pair inlined at
    the top. Writing the guard as an early `if (cond) return 0;` makes GCC
    duplicate that tail at the entry instead of reusing the one at the end,
    adding two words and shifting everything after. Wrapping the entire rest
-   of the function in `if (D_8008A864 == 0) { ...; return 1; }` followed by
+   of the function in `if (gCdBusy == 0) { ...; return 1; }` followed by
    a single trailing `return 0;` reproduces retail's single physical copy.
 2. **The virtual dispatch takes an explicit `self` argument, not just the
    callback.** `obj->methods->slot84(callback)` compiles the callback into

@@ -12,11 +12,11 @@ Byte-exact, second attempt (one intermediate near-miss, see below).
 
 ```c
 extern s32 func_80018458(void); /* code_8220_b */
-extern s32 D_8008A8A4;
+extern s32 gCdUseVSyncCallback;
 extern s32 D_8008A898;
 extern void func_8002858C(void); /* code_179d8_r */
 extern void func_800286E4(void); /* code_179d8_r */
-extern s32 D_8008A890;
+extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
 /* This unit's own slot at +0x068 of D_8006D4E8's table (see GetClass6D4E8Methods's
@@ -31,7 +31,7 @@ struct D_8006D4E8Methods {
 
 s32 ServiceCdDriver(void)
 {
-    if (D_8008A88C != 0) {
+    if (gCdLock != 0) {
         return 0;
     }
 
@@ -39,7 +39,7 @@ s32 ServiceCdDriver(void)
         return 0;
     }
 
-    if (D_8008A8A4 != 0) {
+    if (gCdUseVSyncCallback != 0) {
         VSyncCallback(0);
     }
 
@@ -49,11 +49,11 @@ s32 ServiceCdDriver(void)
         func_800286E4();
     }
 
-    if (D_8008A890 != 0) {
+    if (gCdQueueEnabled != 0) {
         ((D_8006D4E8Methods *)GetClass6D4E8Methods())->slot68();
     }
 
-    if (D_8008A8A4 != 0) {
+    if (gCdUseVSyncCallback != 0) {
         VSyncCallback((void (*)(void))ServiceCdDriver);
     }
 
@@ -63,7 +63,7 @@ s32 ServiceCdDriver(void)
 
 ## Derivation
 
-Two early-return guards (the `D_8008A88C` latch, then `func_80018458()`
+Two early-return guards (the `gCdLock` latch, then `func_80018458()`
 gp_rel getter from `code_8220_b`) both return literal `0` — **not** the
 callee's own return value, even for the `func_80018458()` guard. This was
 the one wrinkle: an intermediate attempt captured `func_80018458()`'s result
@@ -80,13 +80,13 @@ evidence of anything conditional — it is the same "if (cond) return 0;"
 idiom as the first guard, just with the zeroing sharing a delay slot instead
 of getting a fallthrough instruction of its own.
 
-Body: an optional `VSyncCallback(0)` (`D_8008A8A4`), a two-way dispatch on
+Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch on
 `D_8008A898` (1 -> `func_8002858C`, 2 -> `func_800286E4`, both in the
 sibling `code_179d8_r` unit — declared extern here per the
 per-call-site-typed convention `code_179d8_h.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
 too), an optional virtual dispatch through `D_8006D4E8`'s own table slot
-+0x68 (guarded by `D_8008A890`), and finally an optional
++0x68 (guarded by `gCdQueueEnabled`), and finally an optional
 self-re-registration as a `VSyncCallback` (its own address, cast — the
 callback type is `void (*)(void)` and this function is typed `s32 (void)`
 for its early-return-0 paths, so the cast is required and harmless: nothing

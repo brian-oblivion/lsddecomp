@@ -37,9 +37,9 @@ struct CdStatBufQ {
 /* This class's per-entry array element, 0x1C bytes: `name` is passed
  * directly (as its own address, offset 0) to func_800289CC as the path
  * suffix; unk14/unk18 are filled from a CdSearchFile lookup on that path.
- * D_8008A868 (this unit's own SetFileTable/set) and D_8008A86C (func_8002
+ * gFileTable (this unit's own SetFileTable/set) and gFileTableCount (func_8002
  * 7FE4/FF0) are this array's base pointer and element count -- func_800284C4
- * (code_179d8_r) walks the identical 0x1C stride over D_8008A868 doing
+ * (code_179d8_r) walks the identical 0x1C stride over gFileTable doing
  * strstr() against `name`, confirming the layout independently. */
 typedef struct FileEntryQ FileEntryQ;
 struct FileEntryQ {
@@ -48,7 +48,7 @@ struct FileEntryQ {
     /* +0x18 */ u32 unk18;
 };
 
-extern const char D_800107D8[]; /* "File not found. file = %s\n" */
+extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 extern s32 CdSearchFile(CdStatBufQ *statBuf, char *path); /* lib/libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
 extern char *func_800289CC(char *dest, char *suffix);
@@ -74,7 +74,7 @@ s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
             }
         }
 
-        printf(D_800107D8, path);
+        printf(sFileNotFoundMsg, path);
 
     found:
         arg0->unk14 = buf.unk0;
@@ -91,10 +91,10 @@ s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
 resolved on the first attempt** — the residue that took two more rounds was
 a different, unrelated issue (see below).
 
-1. **`D_800107D8` is a rodata string, referenced not retyped.** Grepped
+1. **`sFileNotFoundMsg` is a rodata string, referenced not retyped.** Grepped
    `asm/data/*.rodata.s` before writing anything: `asm/data/FD8.rodata.s`
-   holds `dlabel D_800107D8` / `.asciz "File not found. file = %s\n"`. Used
-   as `extern const char D_800107D8[];` and passed straight to `printf`
+   holds `dlabel sFileNotFoundMsg` / `.asciz "File not found. file = %s\n"`. Used
+   as `extern const char sFileNotFoundMsg[];` and passed straight to `printf`
    from the first attempt on — no rodata duplication, no whole-image shift.
 2. **The unaligned struct copy is the STANDARD alignment-2 idiom (not
    bravo's inverse).** Retail's `lwl $v0,0x53(sp)` / `lwr $v0,0x50(sp)` then

@@ -31,7 +31,7 @@ struct SelfD70 {
 };
 
 extern s32 D_8008A894;
-extern s32 D_8008A870;
+extern s32 gCdIdle;
 extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
@@ -52,7 +52,7 @@ void Class6D4E8__CancelRequests(SelfD70 *self)
     if (entry != NULL && self->unk22 != 0) {
         self->unk24 = 0;
 
-        if (entry->owner == (s32)self && entry->unk00 != 0 && D_8008A870 == 0) {
+        if (entry->owner == (s32)self && entry->unk00 != 0 && gCdIdle == 0) {
             CdFlush();
             func_80028864();
             saved = D_8008A888;
@@ -81,7 +81,7 @@ unlink and free them." Two guards gate the ENTIRE body (not just the
 `self->unk22` (a pending-count) must be non-zero — if either fails, the
 function does nothing but the latch dance. Inside that, an inner
 three-condition guard (head node's owner is `self`, head node's `unk00`
-flag is set, and `D_8008A870 == 0`) triggers `CdFlush()` +
+flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
 `func_80028864()` (both cross-unit — `func_80028864` from foxtrot's
 `code_179d8_r`) and a load-clear-store handoff between `D_8008A888` and
 `D_8008A87C` (needs an explicit temp: the store order is `D_8008A888`

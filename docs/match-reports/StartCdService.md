@@ -9,29 +9,29 @@ Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 Byte-exact on the first attempt.
 
 ```c
-extern s32 D_8008A89C;
+extern s32 gCdCallbackInstalled;
 
 void StartCdService(void)
 {
     LockCd();
 
-    if (D_8008A89C == 0) {
-        if (D_8008A8A4 != 0) {
+    if (gCdCallbackInstalled == 0) {
+        if (gCdUseVSyncCallback != 0) {
             VSyncCallback((void (*)(void))ServiceCdDriver);
         }
-        D_8008A89C = 1;
+        gCdCallbackInstalled = 1;
     }
 
-    D_8008A890 = 1;
+    gCdQueueEnabled = 1;
     UnlockCd();
 }
 ```
 
 ## Derivation
 
-Set the `D_8008A88C` latch, then a one-shot guard on `D_8008A89C`: if it's
+Set the `gCdLock` latch, then a one-shot guard on `gCdCallbackInstalled`: if it's
 still 0, optionally register `ServiceCdDriver` as a `VSyncCallback` (guarded
-by `D_8008A8A4`) and set the guard to 1. Either way, set `D_8008A890 = 1`
+by `gCdUseVSyncCallback`) and set the guard to 1. Either way, set `gCdQueueEnabled = 1`
 and clear the latch. All three loads/stores collapse to constant `1`s in
 the disassembly (every `sw` in this function stores a literal `ori
 $v0,$zero,0x1` value, never a loaded one) — reading the raw instruction

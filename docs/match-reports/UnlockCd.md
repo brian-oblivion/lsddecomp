@@ -6,7 +6,7 @@
 
 ## What this function does
 
-Sets the scalar `s32` global `D_8008A88C` to `0`. No arguments, no return
+Sets the scalar `s32` global `gCdLock` to `0`. No arguments, no return
 value. The clear half of the 1/0 latch pair completed by `LockCd`
 (see that report) -- `Class6D4E8__RequestLoadFile` calls `LockCd` on entry and
 `UnlockCd` on every exit path; `DisableCdQueue` (queued, later in this
@@ -15,11 +15,11 @@ unit) also calls both, `LockCd` first then `UnlockCd`.
 ## The C
 
 ```c
-extern s32 D_8008A88C;
+extern s32 gCdLock;
 
 void UnlockCd(void)
 {
-    D_8008A88C = 0;
+    gCdLock = 0;
 }
 ```
 

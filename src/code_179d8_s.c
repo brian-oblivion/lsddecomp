@@ -64,9 +64,9 @@ struct Obj80027480 {
     u16 unk28;
 };
 
-extern s32 D_8008A85C;
+extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
-extern s32 D_8008A864;
+extern s32 gCdBusy;
 
 extern void func_80028A34(Obj80027480 *self);
 extern void LockCd(void);
@@ -77,7 +77,7 @@ extern void EnqueueCdRequest(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
 extern void UnlockCd(void);
 
 /* Linear-scan table lookups over the 0x1C-byte string records at
- * D_8008A868 (src/code_179d8_r.c). Declared LOCAL here (own reading of the
+ * gFileTable (src/code_179d8_r.c). Declared LOCAL here (own reading of the
  * trailing fields this function reads), not via a shared header. */
 typedef struct Rec80028448 {
     u8 pad0[0x14];
@@ -109,15 +109,15 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     s32 temp;
     s32 v0;
 
-    if (D_8008A85C == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         func_80028920(self, suffix);
         return;
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (D_8008A864 == 0 && self->unk0C == 0) {
+        if (gCdBusy == 0 && self->unk0C == 0) {
             func_80028844(1, 1);
-            if (D_8008A85C != 0) {
+            if (gCdAsyncEnabled != 0) {
                 rec = func_80028448(suffix);
                 D_8008A87C = rec;
                 if (rec == NULL) {
@@ -151,13 +151,13 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 }
 
 void func_80027480(Obj80027480 *self) {
-    if (D_8008A85C == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         func_80028A34(self);
         return;
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (D_8008A864 == 0) {
+        if (gCdBusy == 0) {
             func_80028844(0, 0);
             self->unk0C = 0;
             func_80028864();
@@ -182,12 +182,12 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
-    if (D_8008A85C == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         return func_80028A50(self);
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (D_8008A864 == 0 && self->unk0C != 0) {
+        if (gCdBusy == 0 && self->unk0C != 0) {
             func_80028844(2, 1);
             s0tmp = arg1 >> 11;
             if ((arg1 & 0x7FF) != 0) {
@@ -196,7 +196,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
             v0 = CdPosToInt(&self->unk18);
             CdIntToPos(v0 + s0tmp, D_8006D574);
             if (arg2 == 0) {
-                if (D_8008A85C != 0) {
+                if (gCdAsyncEnabled != 0) {
                     D_8008A87C = D_8006D574 - 0x14;
                     D_8008A898 = 1;
                 } else {
@@ -239,15 +239,15 @@ extern void func_80028864(void);
 s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     s32 v1;
 
-    if (D_8008A85C == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         func_80028A84(self, buf, size);
         return 0;
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (D_8008A864 == 0 && self->unk0C != 0) {
+        if (gCdBusy == 0 && self->unk0C != 0) {
             func_80028844(3, 7);
-            if (D_8008A85C != 0) {
+            if (gCdAsyncEnabled != 0) {
                 D_8008A880 = size >> 11;
                 D_8008A884 = buf;
                 D_8008A898 = 1;
@@ -297,7 +297,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
     void *ret;
     s32 v1;
 
-    if (D_8008A85C == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
         func_80026B08();
         self->unk24 |= 0x200;
         self->methods->slot64(self);
@@ -305,7 +305,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (D_8008A864 == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
+        if (gCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             func_80028844(4, 1);
             D_8008A888 = D_8008A87C;
             rec = func_80028448(arg1);
@@ -331,7 +331,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
                 } else {
                     D_8008A884 = self->unk10;
                 }
-                if (D_8008A85C != 0) {
+                if (gCdAsyncEnabled != 0) {
                     self->unk14 = pos;
                     D_8008A898 = 2;
                 } else {

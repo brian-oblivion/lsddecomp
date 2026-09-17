@@ -7,16 +7,16 @@
 ## What this function does
 
 A plain `$gp`-relative setter: stores its single `s32` argument into the
-scalar global `D_8008A868` (in `.sdata`). No return value.
+scalar global `gFileTable` (in `.sdata`). No return value.
 
 ## The C
 
 ```c
-extern s32 D_8008A868;
+extern s32 gFileTable;
 
 void SetFileTable(s32 a0)
 {
-    D_8008A868 = a0;
+    gFileTable = a0;
 }
 ```
 

@@ -10,21 +10,21 @@ Byte-exact on the first attempt.
 
 ```c
 extern s32 D_8008A898;
-extern s32 D_8008A89C;
-extern s32 D_8008A8A4;
-extern s32 D_8008A890;
+extern s32 gCdCallbackInstalled;
+extern s32 gCdUseVSyncCallback;
+extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
 void StopCdServiceIfIdle(void)
 {
     LockCd();
 
-    if (D_8008A898 == 0 && D_8008A89C != 0) {
-        if (D_8008A8A4 != 0) {
+    if (D_8008A898 == 0 && gCdCallbackInstalled != 0) {
+        if (gCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }
-        D_8008A89C = 0;
-        D_8008A890 = 0;
+        gCdCallbackInstalled = 0;
+        gCdQueueEnabled = 0;
     }
 
     UnlockCd();
@@ -33,11 +33,11 @@ void StopCdServiceIfIdle(void)
 
 ## Derivation
 
-Straight read: sets the `D_8008A88C` latch (`LockCd`), then a guarded
-block only entered when `D_8008A898 == 0` AND `D_8008A89C != 0` (the two
+Straight read: sets the `gCdLock` latch (`LockCd`), then a guarded
+block only entered when `D_8008A898 == 0` AND `gCdCallbackInstalled != 0` (the two
 `beqz`/`bnez` gp_rel loads collapse into one `&&`), inside which an optional
-`VSyncCallback(0)` fires when `D_8008A8A4 != 0`, then both `D_8008A89C` and
-`D_8008A890` are cleared; falls through either way to clear the latch
+`VSyncCallback(0)` fires when `gCdUseVSyncCallback != 0`, then both `gCdCallbackInstalled` and
+`gCdQueueEnabled` are cleared; falls through either way to clear the latch
 (`UnlockCd`). The `VSyncCallback(0)` idiom (`extern void
 VSyncCallback(void (*cb)(void));` then call with a literal `0`) is not new —
 it already appears in `src/code_179d8_c_b.c:131-153`, reused verbatim here.

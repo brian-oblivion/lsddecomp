@@ -7,17 +7,17 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`D_8008A870` (in `.sdata`, initialized to `0x00000001` per
+`gCdIdle` (in `.sdata`, initialized to `0x00000001` per
 `asm/data/7B048.sdata.s`) and returns it.
 
 ## The C
 
 ```c
-extern s32 D_8008A870;
+extern s32 gCdIdle;
 
 s32 IsCdIdle(void)
 {
-    return D_8008A870;
+    return gCdIdle;
 }
 ```
 

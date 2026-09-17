@@ -7,16 +7,16 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`D_8008A878` (in `.sdata`, zero-initialized) and returns it.
+`gCdState` (in `.sdata`, zero-initialized) and returns it.
 
 ## The C
 
 ```c
-extern s32 D_8008A878;
+extern s32 gCdState;
 
 s32 GetCdState(void)
 {
-    return D_8008A878;
+    return gCdState;
 }
 ```
 

@@ -33,7 +33,7 @@ struct Self800282AC;
 extern void EnqueueCdRequest(struct Self800282AC *arg0, s32 arg1, s32 arg2,
                            s32 arg3, s32 arg4);
 extern s32 func_800284C4(char *arg0); /* code_179d8_r */
-extern s32 D_8008A85C;
+extern s32 gCdAsyncEnabled;
 
 void Class6D4E8__RequestLoadFile(SelfC80 *self, char *arg1)
 {
@@ -43,7 +43,7 @@ void Class6D4E8__RequestLoadFile(SelfC80 *self, char *arg1)
     LockCd();
 
     if (arg1 != NULL) {
-        if (D_8008A85C != 0) {
+        if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
             idx = func_800284C4(arg1);
             EnqueueCdRequest((struct Self800282AC *)self, idx, 7, 0, 0);
@@ -90,7 +90,7 @@ struct SelfD70 {
 };
 
 extern s32 D_8008A894;
-extern s32 D_8008A870;
+extern s32 gCdIdle;
 extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
@@ -111,7 +111,7 @@ void Class6D4E8__CancelRequests(SelfD70 *self)
     if (entry != NULL && self->unk22 != 0) {
         self->unk24 = 0;
 
-        if (entry->owner == (s32)self && entry->unk00 != 0 && D_8008A870 == 0) {
+        if (entry->owner == (s32)self && entry->unk00 != 0 && gCdIdle == 0) {
             CdFlush();
             func_80028864();
             saved = D_8008A888;
@@ -153,13 +153,13 @@ s32 *GetClass6D4E8Methods(void)
 extern s32 CdSetDebug(s32 arg0);
 extern s32 CdControlB(u_char com, void *param, void *result);
 
-extern s32 D_8008A858;
+extern s32 sCdDriveInited;
 
 void InitCdDrive(void)
 {
     u8 mode;
 
-    if (D_8008A858 != 0) {
+    if (sCdDriveInited != 0) {
         return;
     }
 
@@ -167,54 +167,54 @@ void InitCdDrive(void)
     mode = 0x80;
     while (CdControlB(0xE, &mode, 0) == 0) {
     }
-    D_8008A858 = 1;
+    sCdDriveInited = 1;
 }
 
-extern s32 D_8008A864;
+extern s32 gCdBusy;
 
 s32 IsCdBusy(void)
 {
-    return D_8008A864;
+    return gCdBusy;
 }
 
-extern s32 D_8008A870;
+extern s32 gCdIdle;
 
 s32 IsCdIdle(void)
 {
-    return D_8008A870;
+    return gCdIdle;
 }
 
-extern s32 D_8008A874;
+extern s32 gCdOperation;
 
 s32 GetCdOperation(void)
 {
-    return D_8008A874;
+    return gCdOperation;
 }
 
-extern s32 D_8008A878;
+extern s32 gCdState;
 
 s32 GetCdState(void)
 {
-    return D_8008A878;
+    return gCdState;
 }
 
 extern s32 D_8008A860;
-extern s32 D_8008A85C;
+extern s32 gCdAsyncEnabled;
 
 s32 GetCdDriverMode(s32 *a0)
 {
     if (a0 != NULL) {
         *a0 = D_8008A860;
     }
-    return D_8008A85C;
+    return gCdAsyncEnabled;
 }
 
 extern s32 func_80020C5C(void); /* class_3ac78, returns a pointer cast to s32 */
 extern s32 ServiceCdDriver(void);
-extern s32 D_8008A864;
-extern s32 D_8008A85C;
+extern s32 gCdBusy;
+extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
-extern s32 D_8008A8A4;
+extern s32 gCdUseVSyncCallback;
 
 /* Object returned by func_80020C5C; only the slot this call site dispatches
  * (+0x84 of its method table) is typed here. */
@@ -233,11 +233,11 @@ s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
 {
     ObjF18 *obj;
 
-    if (D_8008A864 == 0) {
+    if (gCdBusy == 0) {
         if (arg2 == 0) {
             obj = (ObjF18 *)func_80020C5C();
 
-            if (D_8008A85C == 0) {
+            if (gCdAsyncEnabled == 0) {
                 if (arg0 != 0) {
                     obj->methods->slot84(obj, (void *)ServiceCdDriver);
                 }
@@ -248,8 +248,8 @@ s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
             }
         }
 
-        D_8008A8A4 = arg2;
-        D_8008A85C = arg0;
+        gCdUseVSyncCallback = arg2;
+        gCdAsyncEnabled = arg0;
         D_8008A860 = arg1;
 
         return 1;
@@ -258,25 +258,25 @@ s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
     return 0;
 }
 
-extern s32 D_8008A868;
+extern s32 gFileTable;
 
 void SetFileTable(s32 a0)
 {
-    D_8008A868 = a0;
+    gFileTable = a0;
 }
 
-extern s32 D_8008A86C;
+extern s32 gFileTableCount;
 
 void SetFileTableCount(s32 a0)
 {
-    D_8008A86C = a0;
+    gFileTableCount = a0;
 }
 
-extern s32 D_8008A86C;
+extern s32 gFileTableCount;
 
 s32 GetFileTableCount(void)
 {
-    return D_8008A86C;
+    return gFileTableCount;
 }
 
 /* A 4-byte, alignment-2 pair -- the idiom CLAUDE.md/code_179d8_h.c document
@@ -306,9 +306,9 @@ struct CdStatBufQ {
 /* This class's per-entry array element, 0x1C bytes: `name` is passed
  * directly (as its own address, offset 0) to func_800289CC as the path
  * suffix; unk14/unk18 are filled from a CdSearchFile lookup on that path.
- * D_8008A868 (this unit's own SetFileTable/set) and D_8008A86C (func_8002
+ * gFileTable (this unit's own SetFileTable/set) and gFileTableCount (func_8002
  * 7FE4/FF0) are this array's base pointer and element count -- func_800284C4
- * (code_179d8_r) walks the identical 0x1C stride over D_8008A868 doing
+ * (code_179d8_r) walks the identical 0x1C stride over gFileTable doing
  * strstr() against `name`, confirming the layout independently. */
 typedef struct FileEntryQ FileEntryQ;
 struct FileEntryQ {
@@ -317,7 +317,7 @@ struct FileEntryQ {
     /* +0x18 */ u32 unk18;
 };
 
-extern const char D_800107D8[]; /* "File not found. file = %s\n" */
+extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 extern s32 CdSearchFile(CdStatBufQ *statBuf, char *path); /* lib/libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
 extern char *func_800289CC(char *dest, char *suffix);
@@ -343,7 +343,7 @@ s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
             }
         }
 
-        printf(D_800107D8, path);
+        printf(sFileNotFoundMsg, path);
 
     found:
         arg0->unk14 = buf.unk0;
@@ -353,31 +353,31 @@ s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
     return 1;
 }
 
-/* Paired with UnlockCd just below -- a 1/0 flag toggle on D_8008A88C,
+/* Paired with UnlockCd just below -- a 1/0 flag toggle on gCdLock,
  * called from Class6D4E8__RequestLoadFile (this table's slot +0x06C) as the first thing
  * it does, and from DisableCdQueue which clears it right back. Reads as a
  * "some subsystem is active" latch; nothing in this unit's own bodies
- * dereferences D_8008A88C, so its consumer lives elsewhere. */
-extern s32 D_8008A88C;
+ * dereferences gCdLock, so its consumer lives elsewhere. */
+extern s32 gCdLock;
 
 void LockCd(void)
 {
-    D_8008A88C = 1;
+    gCdLock = 1;
 }
 
-extern s32 D_8008A88C;
+extern s32 gCdLock;
 
 void UnlockCd(void)
 {
-    D_8008A88C = 0;
+    gCdLock = 0;
 }
 
 extern s32 func_80018458(void); /* code_8220_b */
-extern s32 D_8008A8A4;
+extern s32 gCdUseVSyncCallback;
 extern s32 D_8008A898;
 extern void func_8002858C(void); /* code_179d8_r */
 extern void func_800286E4(void); /* code_179d8_r */
-extern s32 D_8008A890;
+extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
 /* This unit's own slot at +0x068 of D_8006D4E8's table (see GetClass6D4E8Methods's
@@ -392,7 +392,7 @@ struct D_8006D4E8Methods {
 
 s32 ServiceCdDriver(void)
 {
-    if (D_8008A88C != 0) {
+    if (gCdLock != 0) {
         return 0;
     }
 
@@ -400,7 +400,7 @@ s32 ServiceCdDriver(void)
         return 0;
     }
 
-    if (D_8008A8A4 != 0) {
+    if (gCdUseVSyncCallback != 0) {
         VSyncCallback(0);
     }
 
@@ -410,61 +410,61 @@ s32 ServiceCdDriver(void)
         func_800286E4();
     }
 
-    if (D_8008A890 != 0) {
+    if (gCdQueueEnabled != 0) {
         ((D_8006D4E8Methods *)GetClass6D4E8Methods())->slot68();
     }
 
-    if (D_8008A8A4 != 0) {
+    if (gCdUseVSyncCallback != 0) {
         VSyncCallback((void (*)(void))ServiceCdDriver);
     }
 
     return 0;
 }
 
-extern s32 D_8008A89C;
+extern s32 gCdCallbackInstalled;
 
 void StartCdService(void)
 {
     LockCd();
 
-    if (D_8008A89C == 0) {
-        if (D_8008A8A4 != 0) {
+    if (gCdCallbackInstalled == 0) {
+        if (gCdUseVSyncCallback != 0) {
             VSyncCallback((void (*)(void))ServiceCdDriver);
         }
-        D_8008A89C = 1;
+        gCdCallbackInstalled = 1;
     }
 
-    D_8008A890 = 1;
+    gCdQueueEnabled = 1;
     UnlockCd();
 }
 
 extern s32 D_8008A898;
-extern s32 D_8008A89C;
-extern s32 D_8008A8A4;
-extern s32 D_8008A890;
+extern s32 gCdCallbackInstalled;
+extern s32 gCdUseVSyncCallback;
+extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
 void StopCdServiceIfIdle(void)
 {
     LockCd();
 
-    if (D_8008A898 == 0 && D_8008A89C != 0) {
-        if (D_8008A8A4 != 0) {
+    if (D_8008A898 == 0 && gCdCallbackInstalled != 0) {
+        if (gCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }
-        D_8008A89C = 0;
-        D_8008A890 = 0;
+        gCdCallbackInstalled = 0;
+        gCdQueueEnabled = 0;
     }
 
     UnlockCd();
 }
 
-extern s32 D_8008A890;
+extern s32 gCdQueueEnabled;
 
 void DisableCdQueue(void)
 {
     LockCd();
-    D_8008A890 = 0;
+    gCdQueueEnabled = 0;
     UnlockCd();
 }
 

@@ -9,12 +9,12 @@ Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 Byte-exact on the first attempt.
 
 ```c
-extern s32 D_8008A890;
+extern s32 gCdQueueEnabled;
 
 void DisableCdQueue(void)
 {
     LockCd();
-    D_8008A890 = 0;
+    gCdQueueEnabled = 0;
     UnlockCd();
 }
 ```
@@ -22,13 +22,13 @@ void DisableCdQueue(void)
 ## Derivation
 
 Straight call sequence: `jal LockCd`, a gp_rel store of 0 to
-`D_8008A890`, `jal UnlockCd`, then epilogue. Both callees are already
-matched in this unit (`LockCd` sets `D_8008A88C = 1`, `UnlockCd`
+`gCdQueueEnabled`, `jal UnlockCd`, then epilogue. Both callees are already
+matched in this unit (`LockCd` sets `gCdLock = 1`, `UnlockCd`
 sets it back to `0`) — see the header comment above `LockCd` in the
 `.c`, which already named this function as the one that "clears it right
 back". Confirms that comment: `DisableCdQueue` calls the set-to-1 helper,
-clears an unrelated flag `D_8008A890`, then calls the set-to-0 helper —
-net effect is `D_8008A88C` ends at 0 and `D_8008A890` is cleared. No new
+clears an unrelated flag `gCdQueueEnabled`, then calls the set-to-0 helper —
+net effect is `gCdLock` ends at 0 and `gCdQueueEnabled` is cleared. No new
 struct/class knowledge.
 
 ### Proposed learning

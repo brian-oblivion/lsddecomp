@@ -10,23 +10,23 @@ Byte-exact on the first attempt.
 
 ```c
 extern s32 D_8008A860;
-extern s32 D_8008A85C;
+extern s32 gCdAsyncEnabled;
 
 s32 GetCdDriverMode(s32 *a0)
 {
     if (a0 != NULL) {
         *a0 = D_8008A860;
     }
-    return D_8008A85C;
+    return gCdAsyncEnabled;
 }
 ```
 
 ## Derivation
 
 Straight read of the disassembly: `beqz $a0, .L80027F0C` guards a store of
-`D_8008A860` (gp_rel) into `*a0`; fallthrough loads `D_8008A85C` (gp_rel) into
+`D_8008A860` (gp_rel) into `*a0`; fallthrough loads `gCdAsyncEnabled` (gp_rel) into
 `$v0` and returns it unconditionally. Both globals are in the same
-`D_8008A85C..D_8008A890` sdata block this unit's other getter/setters touch
+`gCdAsyncEnabled..gCdQueueEnabled` sdata block this unit's other getter/setters touch
 (see `GetClass6D4E8Methods`'s header comment in the `.c` for the class map). No
 class/struct involvement — plain scalar globals, plain optional-out-param
 shape.

@@ -14,13 +14,13 @@ Byte-exact on the first attempt.
 extern s32 CdSetDebug(s32 arg0);
 extern s32 CdControlB(u_char com, void *param, void *result);
 
-extern s32 D_8008A858;
+extern s32 sCdDriveInited;
 
 void InitCdDrive(void)
 {
     u8 mode;
 
-    if (D_8008A858 != 0) {
+    if (sCdDriveInited != 0) {
         return;
     }
 
@@ -28,13 +28,13 @@ void InitCdDrive(void)
     mode = 0x80;
     while (CdControlB(0xE, &mode, 0) == 0) {
     }
-    D_8008A858 = 1;
+    sCdDriveInited = 1;
 }
 ```
 
 ## Derivation
 
-`D_8008A858` is a one-shot guard: early-return if already set. Otherwise
+`sCdDriveInited` is a one-shot guard: early-return if already set. Otherwise
 `CdSetDebug(0)`, store `0x80` (= `CdlModeSpeed`) into a one-byte stack local,
 then a do-while retry loop calling `CdControlB(0xE /* CdlSetmode */, &mode,
 0)` until it returns nonzero, then set the guard.
