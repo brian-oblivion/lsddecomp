@@ -6,6 +6,109 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-17 — round 50: first round under the finishing plan; track 3 opens and passes its first unit, track 1 calibration round A scores zero
+
+First round run from `docs/FINISHING-PLAN.md` and `tools/plan.py`. Head on
+Opus, three runners filled from the top of the ready-jobs list, no header
+contention (`headercontention.py`: "NO CONTENTION"). All three merged; main
+green after each.
+
+| runner | model | track | unit | result |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 1 | code_179d8_j_b | `func_80030980` STALL, 292/324-short -> **324/324 length-exact**, zero drift, 7/324 raw |
+| bravo | sonnet | 1 | code_8220_b | `func_80018464` STALL, first-ever attempt, 0 -> **924/954** (30 short), first diff at the prologue |
+| charlie | opus | 3 | code_d294_c | **PASSED**: 11 renames, 5 tier-A / 4 tier-B / 2 tier-C, image byte-identical throughout |
+
+**Track 1 calibration round A: zero matches from two attempts.** Recorded with
+the caveat that matters for round B: the plan asks for "comparably ranked
+stalls", and the queue's two FRESH entries were a 324-word and a 954-word
+function. Round B's Opus runners are therefore not comparable to this round
+unless they are staffed on the same size band. Both functions improved
+measurably without closing, which the stop rule does not count and should not.
+
+**Track 3's first unit passed review.** The head sampled five tier-A names
+against the code: `Class6B5CC__GetRotationDegrees` (`*45>>9` is exactly
+`*360/4096`, corroborated independently by `Class6B5CC__FaceTarget`'s literal
+`*360/4096` in the same unit), `Class6B5CC__LinkModel` (`GsLinkObject4(tmd+0xC,
+…)`, the standard TMD-header skip), `GetSetBitField`, `CalcBoxOutcode` (a 3D
+Cohen-Sutherland outcode) and `FaceTarget`. All evidence-backed. The naming
+runner stays on Opus: the switch to Sonnet needs two clean units in a row.
+
+**The round's largest finding is charlie's and is track 4's, not track 3's:
+`Class6B5CC` is built on libgs types offset-for-offset.** `Class6B5CCSub14` is
+a `GsCOORDINATE2` (0x50, the constructor's own allocation size; `unk38` is
+`workm.t`, the world translation), `Class6B5CCSub44` is a `GsCOORD2PARAM`
+(0x28), and `Class6B5CCObj` +0x10..+0x1C is an embedded `GsDOBJ2`. Charlie
+recorded the derivation additively in `include/code_d294.h` and correctly
+DECLINED to retype: that crosses five units and is track 4's sequential,
+one-class-per-commit work.
+
+**Two structural questions retired on `func_80018464`,** which were round 45's
+stated prerequisites and are reusable regardless of whether that function ever
+matches. (1) The pinned `as` rejects the `mvmva` mnemonic outright, and
+`INLINE.H`'s `gte_llir()` carries the ASPSX macro-CALL encoding
+(`.word 0x0000133x`), a different value from retail's actual COP2 cofun word
+(`0x4A49E012`) — so this is the raw-word case. Four macros added to
+`include/gte.h` (`gte_llir`, `gte_ncds`, `gte_dpcs`, `gte_dpct`), strictly
+additive, pure `.word` with no operand constraints, which is HARD RULE 6's
+documented exception and not a new one. (2) The per-face dispatch is **13 real
+per-case loops**, not ~9 unrolled slots: an outer `do-while` over face groups
+with a 13-way if-cascade, each case its own counted loop with its own stride.
+
+**A cross-unit lead, measured and deliberately not acted on.** The eight
+`RCpoly*` wrappers in `code_8220_c` are written `void` in their preserved
+bodies but are tail calls whose return value is their callee's. Verified on
+`func_800197C4`: `jal RCpolyF3` is the last instruction before the epilogue and
+nothing writes `$v0` before `jr $ra`. All eight are still stalled, so no
+byte-match depends on the current `void`. Recorded in `include/code_8220.h`
+next to the family, byte-neutral; the Sony declaration was left alone because
+its own return type is track 2's to settle.
+
+### Three head errors, all the head's own
+
+1. **The assignment brief called `func_8002D8E0` and `func_8002D1B4` MATCHED.
+   Both are STALLS** (309/311 and 332/316). The false fact propagated into
+   alpha's `### Proposed learning`, which then reasoned from "another
+   already-closed function in the same family". Corrected in the report with
+   the attribution, because the runner did nothing wrong. The correction
+   yielded something: TWO of the three family members now stall with the first
+   real diff at the VERY FIRST instruction (`func_8002D1B4`'s is at word 30),
+   which is a family-level residue worth attacking as one problem rather than
+   two.
+2. **The head piped `build-and-verify.sh` into `tail` and read `build exit=0`
+   off a failed link** — `$?` was `tail`'s. This is the "necessary but not
+   sufficient" hazard from CLAUDE.md reinstalled by hand, in the one place the
+   whole protocol depends on it. Written into PARALLEL-RUNS §3.9.
+3. **That failed link was real, and it is a gap in the merge recipe, not a
+   fluke.** Merging a track 3 naming branch changes the symbols file, and
+   `asm/` is untracked — so the runner's `rename.py` re-extract happened in
+   ITS worktree while main's disassembly still called `func_8001E770`, failing
+   the link from `src/code_55dd4.c`'s `INCLUDE_ASM`. Gate 0 covers round
+   START, not merge. `make extract` after any symbols-changing merge is now in
+   §3.9.
+
+### For the operator
+
+- **`tools/rename.py` rewrites `docs/PROGRESS.md`,** which is the append-only
+  narrative. It renamed symbols inside past rounds' prose, so round 46's entry
+  came to read "`Class6B5CC__GetRotationDegrees` had nine builds and a
+  34,825-iteration permuter run" — describing an observation made when that
+  name did not exist. Charlie flagged it and correctly refused to hand-edit a
+  shared doc. The head restored `PROGRESS.md` to its historical names; the
+  tool fix (exclude `docs/PROGRESS.md`, and frozen narrative under
+  `docs/archive/`, the way it already excludes the archive) is the operator's,
+  and until it lands every naming round needs the same manual revert.
+- **Track 3's procedure has four gaps its first run exposed**, all reported by
+  charlie, none acted on by the head because writing procedure is a Fable
+  task: step 3 "the header the unit owns" has no referent when the header is
+  shared by five units (it produced zero field renames despite six airtight
+  names); tier A vs B is undefined for a pure leaf where mechanics ARE the
+  purpose; tier C for a METHOD may want the existing `Class__func_addr` form
+  rather than bare `func_`; and "one commit per function" cannot apply to
+  renames, which all touch the same three files.
+- **Track 2 is blocked on a Fable head job**: `tools/sdkname.py` does not
+  exist, and 46 SDK-surface functions are still `func_`.
+
 ## 2026-09-16/17 — the finishing plan: one doc, one tool, one prompt (head, Fable)
 
 **No matching this session.** The operator asked for an executable plan to

@@ -10,7 +10,17 @@
   "tracks": {
     "1": {
       "reason": "",
-      "rounds": [],
+      "rounds": [
+        {
+          "attempts": 2,
+          "date": "2026-09-17",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Calibration round A (Sonnet). Both assigned functions were REOPENED-fresh, not comparably-ranked stalls: the queue's two fresh entries were a 324w and a 954w function, so round B's Opus runners should be ranked against that, not against the small-stall band. Both improved measurably without closing: func_80030980 292/324-short -> 324/324 length-exact (zero drift, 7/324 raw); func_80018464 first-ever full-function attempt, 0 -> 924/954 (30 short). Zero byte-exact matches.",
+          "round": 50,
+          "runners": 2
+        }
+      ],
       "status": "open"
     },
     "1b": {

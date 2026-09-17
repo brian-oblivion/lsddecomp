@@ -265,7 +265,21 @@ extern void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
 extern void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
- * func_800197C4 (code_8220_c) with (self, table). */
+ * func_800197C4 (code_8220_c) with (self, table).
+ *
+ * LEAD, round 50, measured but NOT acted on: the eight RCpoly* wrappers in
+ * code_8220_c (func_800197C4, func_8001989C, func_800199EC, func_80019B24,
+ * func_80019C04, func_80019D84, func_80019EE4, func_8001A064) are written
+ * `void` in their preserved bodies, but every one is a TAIL CALL whose
+ * return value is its RCpoly* callee's. Verified on func_800197C4: its last
+ * instruction before the epilogue is `jal RCpolyF3`, and nothing writes $v0
+ * between that and `jr $ra`, so the callee's $v0 flows straight out. All
+ * eight are still stalled, so no byte-match depends on the current `void`
+ * -- which is exactly CLAUDE.md's "a tail-call wrapper's byte match says
+ * nothing about its return type". Whoever works code_8220_c should try
+ * `return RCpolyXX(...)` with the real return type BEFORE anything else;
+ * the return type of the Sony functions themselves is unconfirmed and is
+ * track 2's to settle, so this declaration is left alone deliberately. */
 extern void RCpolyF3(void *self, void *table);
 
 /* Opaque table, referenced only by ADDRESS (never dereferenced in this
