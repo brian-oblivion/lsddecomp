@@ -1,57 +1,76 @@
 #include "common.h"
 
-/* This class's own +0x058 slot. The sibling class D_8006D430 (see
- * include/code_171e0.h's UnkFlagsObjMethods_171e0) has the identical slot
- * unnamed as "func_80026B08's own slot, unused here" -- kept as an
- * independent local view here, per the project's multiple-local-views
- * convention, rather than editing that shared header (code_179d8_h.c and
- * code_171e0.c also include it this round). */
-typedef struct SelfC80Methods SelfC80Methods;
-struct SelfC80Methods {
+/* --- local views of the D_8006D4E8 class ---------------------------------
+ * This unit defines three of that class's own method slots (+0x06C, +0x070,
+ * +0x074) and sees its objects through three per-call-site views that differ
+ * only in which fields they type. They are the same struct; merging them is
+ * track-4 work rather than a rename, so they stay split. The `_<addr>`
+ * suffix names the function each view was read from -- the convention this
+ * unit already used.
+ * ------------------------------------------------------------------------ */
+
+/* The class's method table down to +0x058: the one slot
+ * Class6D4E8__RequestLoadFile dispatches. `tools/classtable.py D_8006D4E8`
+ * resolves that slot to func_80027800 (code_179d8_s), which loads a named
+ * file off the disc, so the slot is named for the method it dispatches to.
+ * The sibling class D_8006D430 (include/code_171e0.h's
+ * UnkFlagsObjMethods_171e0) leaves the identical offset unnamed -- this
+ * stays an independent local view, per the project's multiple-local-views
+ * convention, rather than an edit to that shared header. */
+typedef struct Methods6D4E8_C80 Methods6D4E8_C80;
+struct Methods6D4E8_C80 {
     u8 pad00[0x58];
-    /* +0x58 */ void (*slot58)(void *self, char *arg1);
+    /* +0x58 */ void (*loadFile)(void *self, char *name);
 };
 
-typedef struct SelfC80 SelfC80;
-struct SelfC80 {
-    /* +0x00 */ SelfC80Methods *methods;
+typedef struct Obj6D4E8_C80 Obj6D4E8_C80;
+struct Obj6D4E8_C80 {
+    /* +0x00 */ Methods6D4E8_C80 *methods;
     u8 pad04[0x22 - 0x04];
-    /* +0x22 */ u16 unk22;
-    /* +0x24 */ s32 unk24;
+    /* +0x22 */ u16 pendingRequests; /* ++ per queued request, -- per cancel */
+    /* +0x24 */ s32 flags;           /* OR-ed bit set; no bit is read here */
 };
 
-/* +0x04 slot of whatever object a still-uninitialized local $s2 points at
- * on this path -- see the Class6D4E8__RequestLoadFile report for why that local is never
- * assigned; only the one field this store touches is typed. */
+/* +0x04 of whatever object a still-uninitialized local $s2 points at on this
+ * path -- see the Class6D4E8__RequestLoadFile report for why that local is
+ * never assigned. Only the one field this store touches is typed, and the
+ * object's identity is unknowable from here, so the name stays a
+ * placeholder. */
 typedef struct UnkC80 UnkC80;
 struct UnkC80 {
     u8 pad00[0x04];
     /* +0x04 */ s32 unk04;
 };
 
-struct Self800282AC;
-extern void EnqueueCdRequest(struct Self800282AC *arg0, s32 arg1, s32 arg2,
-                           s32 arg3, s32 arg4);
-extern s32 func_800284C4(char *arg0); /* code_179d8_r */
+/* The request op codes are a small enumeration shared with code_179d8_s,
+ * which enqueues 2 (open by name), 3 (close), 4 (seek) and 5 (read) from the
+ * class's other slots. Only the one this unit itself uses is named. */
+#define CD_OP_LOAD_FILE 7
+
+struct Obj6D4E8_282AC;
+extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
+                             s32 op, s32 param0, s32 param1);
+extern s32 func_800284C4(char *name); /* code_179d8_r: name -> table index */
 extern s32 gCdAsyncEnabled;
 
-void Class6D4E8__RequestLoadFile(SelfC80 *self, char *arg1)
+void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
 {
     UnkC80 *s2;
     s32 idx;
 
     LockCd();
 
-    if (arg1 != NULL) {
+    if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
-            idx = func_800284C4(arg1);
-            EnqueueCdRequest((struct Self800282AC *)self, idx, 7, 0, 0);
+            idx = func_800284C4(name);
+            EnqueueCdRequest((struct Obj6D4E8_282AC *)self, idx,
+                             CD_OP_LOAD_FILE, 0, 0);
         } else {
-            self->methods->slot58(self, arg1);
+            self->methods->loadFile(self, name);
 
-            if (self->unk22 == 0) {
-                self->unk24 |= 4;
+            if (self->pendingRequests == 0) {
+                self->flags |= 4;
             }
         }
     }
@@ -70,23 +89,25 @@ void Class6D4E8__StopCdService(void)
     UnlockCd();
 }
 
-/* The pending-list node type func_8002832C (code_179d8_r) allocates and
- * func_800283C4 (code_179d8_r) unlinks/frees -- only the fields this call
- * site itself reads are typed here. */
-typedef struct QueueEntryD70 QueueEntryD70;
-struct QueueEntryD70 {
-    /* +0x00 */ s32 unk00;
+/* The queued-request node func_8002832C (code_179d8_r) allocates and
+ * func_800283C4 (code_179d8_r) unlinks and frees -- only the fields this
+ * call site itself reads are typed here. `active` is the flag func_80028844
+ * (code_179d8_r) sets on the head node when it starts an operation on it;
+ * func_8002832C clears it at allocation. The list head is D_8008A894. */
+typedef struct CdRequest_D70 CdRequest_D70;
+struct CdRequest_D70 {
+    /* +0x00 */ s32 active;
     u8 pad04[0x0C - 0x04];
     /* +0x0C */ s32 owner;
     u8 pad10[0x20 - 0x10];
-    /* +0x20 */ QueueEntryD70 *next;
+    /* +0x20 */ CdRequest_D70 *next;
 };
 
-typedef struct SelfD70 SelfD70;
-struct SelfD70 {
+typedef struct Obj6D4E8_D70 Obj6D4E8_D70;
+struct Obj6D4E8_D70 {
     u8 pad00[0x22];
-    /* +0x22 */ u16 unk22;
-    /* +0x24 */ s32 unk24;
+    /* +0x22 */ u16 pendingRequests;
+    /* +0x24 */ s32 flags;
 };
 
 extern s32 D_8008A894;
@@ -94,24 +115,24 @@ extern s32 gCdIdle;
 extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
-extern void func_80028864(void); /* code_179d8_r */
-extern void func_800283C4(QueueEntryD70 *arg0); /* code_179d8_r */
+extern void func_80028864(void); /* code_179d8_r: reset the state machine */
+extern void func_800283C4(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
-void Class6D4E8__CancelRequests(SelfD70 *self)
+void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 {
-    QueueEntryD70 *entry;
-    QueueEntryD70 *node;
-    QueueEntryD70 *next;
+    CdRequest_D70 *entry;
+    CdRequest_D70 *node;
+    CdRequest_D70 *next;
     s32 saved;
 
     LockCd();
 
-    entry = (QueueEntryD70 *)D_8008A894;
+    entry = (CdRequest_D70 *)D_8008A894;
 
-    if (entry != NULL && self->unk22 != 0) {
-        self->unk24 = 0;
+    if (entry != NULL && self->pendingRequests != 0) {
+        self->flags = 0;
 
-        if (entry->owner == (s32)self && entry->unk00 != 0 && gCdIdle == 0) {
+        if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
             func_80028864();
             saved = D_8008A888;
@@ -119,11 +140,11 @@ void Class6D4E8__CancelRequests(SelfD70 *self)
             D_8008A87C = saved;
         }
 
-        for (node = (QueueEntryD70 *)D_8008A894; node != NULL; node = next) {
+        for (node = (CdRequest_D70 *)D_8008A894; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
                 func_800283C4(node);
-                self->unk22--;
+                self->pendingRequests--;
             }
         }
     }
@@ -132,15 +153,15 @@ void Class6D4E8__CancelRequests(SelfD70 *self)
 }
 
 /* D_8006D4E8's own method table, 29 slots per tools/classtable.py (header
- * 0x13 at +0x000, func_800269F0 at +0x004/own-slot, func_80027228 at
+ * word 0x13 at +0x000, func_800269F0 at +0x004/own-slot, func_80027228 at
  * +0x008/ctor, func_80027274 at +0x00C/dtor, the 13 inherited BasicClass
- * slots at +0x010..+0x038, then own slots at +0x040..+0x074 -- Class6D4E8__RequestLoadFile
- * (+0x06C), Class6D4E8__StopCdService (+0x070) and Class6D4E8__CancelRequests (+0x074), all three
- * queued later in this unit, are among them). This function is this class's
- * "get my own method table" accessor, the same convention func_800269E0
- * uses for D_8006D3C8 and func_80026C9C uses for D_8006D430 (see
- * include/code_171e0.h) -- just an address-of, not gp_rel since D_8006D4E8
- * lives in .data, not .sdata. */
+ * slots at +0x010..+0x038, then own slots at +0x040..+0x074 -- this unit
+ * defines Class6D4E8__RequestLoadFile (+0x06C), Class6D4E8__StopCdService
+ * (+0x070) and Class6D4E8__CancelRequests (+0x074)). This function is this
+ * class's "get my own method table" accessor, the same convention
+ * func_800269E0 uses for D_8006D3C8 and func_80026C9C uses for D_8006D430
+ * (see include/code_171e0.h) -- just an address-of, not gp_rel, since
+ * D_8006D4E8 lives in .data, not .sdata. */
 extern s32 D_8006D4E8[];
 
 s32 *GetClass6D4E8Methods(void)
@@ -149,9 +170,16 @@ s32 *GetClass6D4E8Methods(void)
 }
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
- * per-call-site typed for this unit, per the code_179d8_h.c convention. */
-extern s32 CdSetDebug(s32 arg0);
+ * per-call-site typed for this unit, per the code_179d8_h.c convention.
+ * The two constants are Psy-Q's own (include/psyq/LIBCD.H: CdlSetmode 0x0E,
+ * CdlModeSpeed 0x80 = double speed); they are spelled locally rather than by
+ * including LIBCD.H, because this unit's libcd declarations are deliberately
+ * per-call-site and Sony's prototypes would conflict with them. */
+extern s32 CdSetDebug(s32 level);
 extern s32 CdControlB(u_char com, void *param, void *result);
+
+#define CD_CMD_SETMODE 0x0E
+#define CD_MODE_DOUBLE_SPEED 0x80
 
 extern s32 sCdDriveInited;
 
@@ -164,8 +192,8 @@ void InitCdDrive(void)
     }
 
     CdSetDebug(0);
-    mode = 0x80;
-    while (CdControlB(0xE, &mode, 0) == 0) {
+    mode = CD_MODE_DOUBLE_SPEED;
+    while (CdControlB(CD_CMD_SETMODE, &mode, 0) == 0) {
     }
     sCdDriveInited = 1;
 }
@@ -198,30 +226,38 @@ s32 GetCdState(void)
     return gCdState;
 }
 
+/* D_8008A860 keeps its placeholder name: it is written only by
+ * SetCdDriverMode's second argument and read back only here and in
+ * code_179d8_s, where every read is `gCdAsyncEnabled == 0 && D_8008A860 == 0`
+ * -- i.e. "neither mode is on, take the plain synchronous path". Nothing
+ * establishes what the second mode IS, so nothing here names it. */
 extern s32 D_8008A860;
 extern s32 gCdAsyncEnabled;
 
-s32 GetCdDriverMode(s32 *a0)
+s32 GetCdDriverMode(s32 *outMode2)
 {
-    if (a0 != NULL) {
-        *a0 = D_8008A860;
+    if (outMode2 != NULL) {
+        *outMode2 = D_8008A860;
     }
     return gCdAsyncEnabled;
 }
 
-extern s32 func_80020C5C(void); /* class_3ac78, returns a pointer cast to s32 */
+extern s32 func_80020C5C(void); /* returns D_8008A83C, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 gCdBusy;
 extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
 extern s32 gCdUseVSyncCallback;
 
-/* Object returned by func_80020C5C; only the slot this call site dispatches
- * (+0x84 of its method table) is typed here. */
+/* The singleton func_80020C5C returns; only the slot this call site
+ * dispatches (+0x84 of its method table) is typed here. That slot is handed
+ * either ServiceCdDriver or 0, so it installs and clears a callback -- named
+ * for what this one call site does with it, which is all the evidence
+ * there is. */
 typedef struct ObjF18Methods ObjF18Methods;
 struct ObjF18Methods {
     u8 pad00[0x84];
-    void (*slot84)(void *self, void *arg);
+    void (*setCallback)(void *self, void *cb);
 };
 
 typedef struct ObjF18 ObjF18;
@@ -229,28 +265,28 @@ struct ObjF18 {
     ObjF18Methods *methods;
 };
 
-s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
+s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 {
     ObjF18 *obj;
 
     if (gCdBusy == 0) {
-        if (arg2 == 0) {
+        if (useVSyncCallback == 0) {
             obj = (ObjF18 *)func_80020C5C();
 
             if (gCdAsyncEnabled == 0) {
-                if (arg0 != 0) {
-                    obj->methods->slot84(obj, (void *)ServiceCdDriver);
+                if (async != 0) {
+                    obj->methods->setCallback(obj, (void *)ServiceCdDriver);
                 }
             } else {
-                if (arg0 == 0) {
-                    obj->methods->slot84(obj, 0);
+                if (async == 0) {
+                    obj->methods->setCallback(obj, 0);
                 }
             }
         }
 
-        gCdUseVSyncCallback = arg2;
-        gCdAsyncEnabled = arg0;
-        D_8008A860 = arg1;
+        gCdUseVSyncCallback = useVSyncCallback;
+        gCdAsyncEnabled = async;
+        D_8008A860 = mode2;
 
         return 1;
     }
@@ -260,16 +296,16 @@ s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2)
 
 extern s32 gFileTable;
 
-void SetFileTable(s32 a0)
+void SetFileTable(s32 table)
 {
-    gFileTable = a0;
+    gFileTable = table;
 }
 
 extern s32 gFileTableCount;
 
-void SetFileTableCount(s32 a0)
+void SetFileTableCount(s32 count)
 {
-    gFileTableCount = a0;
+    gFileTableCount = count;
 }
 
 extern s32 gFileTableCount;
@@ -279,66 +315,72 @@ s32 GetFileTableCount(void)
     return gFileTableCount;
 }
 
-/* A 4-byte, alignment-2 pair -- the idiom CLAUDE.md/code_179d8_h.c document
- * for a struct whose whole-struct assignment compiles to lwl/lwr + swl/swr
- * instead of a plain lw/sw. Kept as this unit's own local view (per-call-site
- * typed, same shape as code_179d8_h.c's Pair16_179D8H, different name so
- * nothing is shared across units). */
-typedef struct Pair16Q Pair16Q;
-struct Pair16Q {
+/* A disc position in the shape Psy-Q's CdlLOC has (minute/second/sector/
+ * track), but declared as two s16 rather than four u8: the game's own struct
+ * is 2-aligned, which is why a whole-struct assignment of it compiles to
+ * lwl/lwr + swl/swr instead of a plain lw/sw (the idiom CLAUDE.md and
+ * code_179d8_h.c document). The two halves are never read apart here, so
+ * they keep placeholder names. Kept as this unit's own local view, the same
+ * shape as code_179d8_h.c's Pair16_179D8H under a different name. */
+typedef struct CdLoc16 CdLoc16;
+struct CdLoc16 {
     s16 unk0;
     s16 unk2;
 };
 
-/* CdSearchFile's own output buffer. Only the first two fields this call
- * site copies out are named; sized to 0x18 bytes total because that is
- * exactly the span between this local's stack slot (sp+0x50) and the next
- * saved register (sp+0x68) -- independently confirms the same 0x18-byte
- * figure code_179d8_h.c's func_80028920 derived for the same Sony
- * function's output struct (StatBuf179D8H). */
-typedef struct CdStatBufQ CdStatBufQ;
-struct CdStatBufQ {
-    Pair16Q unk0;
-    u32 unk4;
+/* CdSearchFile's output buffer, which is Sony's CdlFILE: pos, size, name[16]
+ * = 0x18 bytes (include/psyq/LIBCD.H). The 0x18 was derived here
+ * independently, from the span between this local's stack slot (sp+0x50) and
+ * the next saved register (sp+0x68), and it is the same figure
+ * code_179d8_h.c's func_80028920 derived for the same Sony function. Only
+ * the two fields this call site copies out are typed. */
+typedef struct CdFileInfo CdFileInfo;
+struct CdFileInfo {
+    CdLoc16 pos;
+    u32 size;
     u8 pad8[0x18 - 0x8];
 };
 
-/* This class's per-entry array element, 0x1C bytes: `name` is passed
- * directly (as its own address, offset 0) to func_800289CC as the path
- * suffix; unk14/unk18 are filled from a CdSearchFile lookup on that path.
- * gFileTable (this unit's own SetFileTable/set) and gFileTableCount (func_8002
- * 7FE4/FF0) are this array's base pointer and element count -- func_800284C4
- * (code_179d8_r) walks the identical 0x1C stride over gFileTable doing
- * strstr() against `name`, confirming the layout independently. */
-typedef struct FileEntryQ FileEntryQ;
-struct FileEntryQ {
+/* One element of the file table: 0x1C bytes of {name, disc position, size}.
+ * `name` is passed by its own address (offset 0) to func_800289CC, which
+ * builds the full path from it; `pos` and `size` are then filled in from a
+ * CdSearchFile lookup on that path, so an entry is a name resolved once and
+ * reused as a seek target. gFileTable and gFileTableCount (this unit's
+ * SetFileTable / SetFileTableCount) are the array's base and length --
+ * func_800284C4 (code_179d8_r) walks the identical 0x1C stride over
+ * gFileTable doing strstr() against `name`, confirming the layout
+ * independently. */
+typedef struct CdFileEntry CdFileEntry;
+struct CdFileEntry {
     /* +0x00 */ char name[0x14];
-    /* +0x14 */ Pair16Q unk14;
-    /* +0x18 */ u32 unk18;
+    /* +0x14 */ CdLoc16 pos;
+    /* +0x18 */ u32 size;
 };
 
 extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
-extern s32 CdSearchFile(CdStatBufQ *statBuf, char *path); /* lib/libcd/iso9660.o */
+extern s32 CdSearchFile(CdFileInfo *fileInfo, char *path); /* libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
-extern char *func_800289CC(char *dest, char *suffix);
+extern char *func_800289CC(char *dest, char *suffix); /* code_179d8_r */
 extern void InitCdDrive(void);
 
-s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
+#define CD_SEARCH_RETRIES 0x65
+
+s32 ResolveFileEntries(CdFileEntry *entries, s32 count)
 {
-    FileEntryQ *end;
+    CdFileEntry *end;
     char path[0x40];
-    CdStatBufQ buf;
+    CdFileInfo info;
     s32 tries;
 
-    end = arg0 + count;
+    end = entries + count;
 
     InitCdDrive();
 
-    for (; arg0 < end; arg0++) {
-        func_800289CC(path, arg0->name);
+    for (; entries < end; entries++) {
+        func_800289CC(path, entries->name);
 
-        for (tries = 0; tries < 0x65; tries++) {
-            if (CdSearchFile(&buf, path) != 0) {
+        for (tries = 0; tries < CD_SEARCH_RETRIES; tries++) {
+            if (CdSearchFile(&info, path) != 0) {
                 goto found;
             }
         }
@@ -346,18 +388,18 @@ s32 ResolveFileEntries(FileEntryQ *arg0, s32 count)
         printf(sFileNotFoundMsg, path);
 
     found:
-        arg0->unk14 = buf.unk0;
-        arg0->unk18 = buf.unk4;
+        entries->pos = info.pos;
+        entries->size = info.size;
     }
 
     return 1;
 }
 
-/* Paired with UnlockCd just below -- a 1/0 flag toggle on gCdLock,
- * called from Class6D4E8__RequestLoadFile (this table's slot +0x06C) as the first thing
- * it does, and from DisableCdQueue which clears it right back. Reads as a
- * "some subsystem is active" latch; nothing in this unit's own bodies
- * dereferences gCdLock, so its consumer lives elsewhere. */
+/* The driver's re-entrancy lock, and its one reader is ServiceCdDriver
+ * below: the service tick returns immediately while gCdLock is set, so every
+ * public entry point in this unit and in code_179d8_r/_s brackets its body
+ * with LockCd()/UnlockCd() to keep the VSync-driven tick out of a
+ * half-updated queue. Not a mutex -- nothing spins or blocks on it. */
 extern s32 gCdLock;
 
 void LockCd(void)
@@ -375,19 +417,22 @@ void UnlockCd(void)
 extern s32 func_80018458(void); /* code_8220_b */
 extern s32 gCdUseVSyncCallback;
 extern s32 D_8008A898;
-extern void func_8002858C(void); /* code_179d8_r */
-extern void func_800286E4(void); /* code_179d8_r */
+extern void func_8002858C(void); /* code_179d8_r: state-machine step 1 */
+extern void func_800286E4(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
-/* This unit's own slot at +0x068 of D_8006D4E8's table (see GetClass6D4E8Methods's
+/* The class's method table down to +0x068 (see GetClass6D4E8Methods's
  * class-map comment above); only the one slot this call site dispatches is
- * typed here, following the pad-to-offset convention include/code_171e0.h
- * uses for D_8006D430's own table. */
-typedef struct D_8006D4E8Methods D_8006D4E8Methods;
-struct D_8006D4E8Methods {
+ * typed, following the pad-to-offset convention include/code_171e0.h uses
+ * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
+ * func_80027A24 (code_179d8_s), which walks the D_8008A894 request list,
+ * dispatches each request through its owner's own slots and frees it with
+ * func_800283C4 -- so the slot is named for what that method does. */
+typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
+struct Methods6D4E8_80EC {
     u8 pad00[0x68];
-    void (*slot68)(void);
+    void (*runRequestQueue)(void);
 };
 
 s32 ServiceCdDriver(void)
@@ -411,7 +456,7 @@ s32 ServiceCdDriver(void)
     }
 
     if (gCdQueueEnabled != 0) {
-        ((D_8006D4E8Methods *)GetClass6D4E8Methods())->slot68();
+        ((Methods6D4E8_80EC *)GetClass6D4E8Methods())->runRequestQueue();
     }
 
     if (gCdUseVSyncCallback != 0) {
@@ -468,38 +513,47 @@ void DisableCdQueue(void)
     UnlockCd();
 }
 
-/* func_8002832C (code_179d8_r) allocates and links a 0x24-byte list node;
- * only the fields this call site writes are typed here (padded to their
- * offsets, per this unit's convention). */
-typedef struct Entry800282AC Entry800282AC;
-struct Entry800282AC {
+/* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
+ * writing side: func_8002832C (code_179d8_r) allocates one and links it onto
+ * D_8008A894, and only the fields this call site writes are typed here
+ * (padded to their offsets, per this unit's convention). `op` takes the
+ * CD_OP_* values, `fileIndex` is func_800284C4's index into gFileTable (0
+ * when the op does not name a file), and param0/param1 are the two per-op
+ * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
+ * buffer and a size for op 5. */
+typedef struct CdRequest_282AC CdRequest_282AC;
+struct CdRequest_282AC {
     u8 pad00[0x08];
-    s32 unk08;
-    s32 unk0C;
-    s32 unk10;
-    s32 unk14;
-    s32 unk18;
+    /* +0x08 */ s32 op;
+    /* +0x0C */ s32 owner;
+    /* +0x10 */ s32 fileIndex;
+    /* +0x14 */ s32 param0;
+    /* +0x18 */ s32 param1;
 };
-extern Entry800282AC *func_8002832C(void); /* code_179d8_r */
+extern CdRequest_282AC *func_8002832C(void); /* code_179d8_r: alloc + link */
 
-typedef struct Self800282AC Self800282AC;
-struct Self800282AC {
+typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;
+struct Obj6D4E8_282AC {
     u8 pad00[0x22];
-    u16 unk22;
-    s32 unk24;
+    /* +0x22 */ u16 pendingRequests;
+    /* +0x24 */ s32 flags;
 };
 
-void EnqueueCdRequest(Self800282AC *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+/* The store order below is retail's own (+0x08, +0x14, +0x0C, +0x10, +0x18),
+ * not ascending offset -- see the match report: this compiler keeps
+ * statement order for these, so the statements are in retail's order. */
+void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
+                      s32 param0, s32 param1)
 {
-    Entry800282AC *entry = func_8002832C();
+    CdRequest_282AC *entry = func_8002832C();
 
-    entry->unk08 = arg2;
-    entry->unk14 = arg3;
-    entry->unk0C = (s32)arg0;
-    entry->unk10 = arg1;
-    entry->unk18 = arg4;
+    entry->op = op;
+    entry->param0 = param0;
+    entry->owner = (s32)owner;
+    entry->fileIndex = fileIndex;
+    entry->param1 = param1;
 
-    arg0->unk22++;
-    arg0->unk24 = 0;
+    owner->pendingRequests++;
+    owner->flags = 0;
     StartCdService();
 }
