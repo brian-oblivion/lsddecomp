@@ -64,3 +64,23 @@ the parameter -- write the SOURCE the way retail's disassembly reads
 (through the field), not the way that looks most natural (through the
 still-in-scope parameter), when the two are interchangeable in value but
 not in registers.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001E770` -> `Class6B5CC__LinkModel`. Tier A**, and the evidence
+  is Sony's own API rather than a reading of this body. `&self->unk10` is
+  passed to `GsLinkObject4` as its GsDOBJ2 argument; `GsLinkObject4(tmd,
+  objp, n)` links object `n` of a TMD to `objp`. That only type-checks if
+  Class6B5CCObj has a GsDOBJ2 at +0x10, and it does, field for field:
+  +0x10 attribute (the packed flags word the `GetSetBitField` wrapper family
+  sets), +0x14 coord2 (the GsCOORDINATE2 this class allocates in its ctor
+  and initialises with `GsInitCoordinate2`), +0x18 tmd -- which is precisely
+  the field this function writes, one line before the call.
+- The `+ 0xC` on the first argument is the TMD file header skip (id, flags,
+  nobj), which is what makes the "model data" reading concrete rather than
+  generic.
+- **`other` is not narrowed.** Other units call this symbol with a different
+  class as the receiver and a plain `s32` second argument
+  (`include/code_55dd4.h`, `src/class_3bb8c_s.c`); the `Class6B5CC__` prefix
+  is still right, because any caller must carry the GsDOBJ2 layout this body
+  dereferences.
