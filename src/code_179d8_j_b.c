@@ -213,8 +213,31 @@ extern Rec34Half D_8008D988[];
 extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
-/* STALL -- see docs/match-reports/func_80030980.md. Best body reached
- * (292/324 built words, 32 words SHORT) preserved there in #if 0. */
+/* Shared with func_8002D8E0/func_8002D1B4 in code_179d8_l.c (same
+ * two-level entry table, same blend-cascade shape); this unit's own
+ * reduced view, per the project's per-unit-local-view convention --
+ * only the two fields func_80030980 itself touches are named. */
+typedef struct {
+    u8 pad0[0x74];
+    u16 unk74;
+    u16 unk76;
+    u8 pad78[0xAC - 0x78];
+} D800902E8Entry;
+extern D800902E8Entry *D_800902E8[];
+
+typedef struct {
+    u8 pad0[0x18];
+    u8 unk18; /* +0x18 */
+} ObjE970;
+extern ObjE970 *D_8008E970;
+
+extern s16 D_8008E8C0;
+extern u8 D_8008D7F0[];
+extern u8 D_8008D970[];
+
+/* STALL -- see docs/match-reports/func_80030980.md. Round 50: LENGTH-EXACT
+ * (324/324 words, zero drift outside the function), 7/324 raw word-match,
+ * best body preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
 
 /* STALL -- see docs/match-reports/func_80030E90.md. Round 26: 239/252 words
