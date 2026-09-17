@@ -238,3 +238,25 @@ register for whichever pointer is referenced FIRST in the compiled
 control flow, and the loop guard's own construction is an easy, cheap
 thing to swap when a register-identity residue looks like a two-value
 swap between a function's own parameters.
+
+## Naming (round 50, charlie -- FINISHING-PLAN track 3)
+
+- **`func_8001EE04` -> `ApplyMatrixToSVArray`. Tier A.** Free function,
+  complete semantics: `count` iterations of Sony's `ApplyMatrixSV(m, v0,
+  v1)` (`v1 = m * v0`, SVECTOR in and out) over 6-byte elements.
+- **Spelled `ApplyMatrixTo...`, not `ApplyMatrixSVArray`, on purpose.** This
+  is game code, and a name one token away from a real SDK export would read
+  as an SDK symbol in the symbols file and in `plan.py`'s track-2 accounting.
+  Sony's names are Sony's; this one says what it does without borrowing one.
+- **Parameters corrected to `(dst, src, count, m)`.** The previous names had
+  destination and source the wrong way round: the loop copies an element out
+  of the 2nd argument and calls `ApplyMatrixSV(m, &buf, dst)`, so the 1st
+  argument is written. Both call sites (`func_8001D624`, `func_8001D950`,
+  code_d294_b) pass the same address for both, which is why it was
+  invisible. Names only -- no type, arity or order change; byte-identical.
+- **The local `Rec6_d294` typedef is gone**, replaced by the existing
+  `Vec3S16_d294`. Same layout and the same all-`s16` alignment-2 property
+  the unaligned `lwl`/`lwr` copy depends on (that derivation, above, is
+  unaffected), but the correct reading: `ApplyMatrixSV` consumes SVECTORs,
+  so the 6 bytes are three `s16` components, not the "32-bit value plus a
+  trailing s16" the typedef guessed. Byte-identical.
