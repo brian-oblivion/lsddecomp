@@ -39,6 +39,53 @@
  * (func_8001CA94).
  */
 
+/* ================= PSY-Q IDENTIFICATION (round 50, charlie) =================
+ *
+ * Class6B5CC is a POSITIONED 3D OBJECT class built directly on libgs's own
+ * scene-graph types, and three of the structs below are Sony's, reached
+ * under this project's own placeholder names. This is offset arithmetic
+ * against include/psyq/LIBGS.H, not a resemblance argument -- every field
+ * already recorded below lands where Sony's does, and the two sizes the
+ * ctor allocates (0x50 and 0x28) are the two Sony struct sizes exactly.
+ *
+ *   Class6B5CCSub14  ==  GsCOORDINATE2   (0x50 bytes)
+ *     +0x00 unk0   == flg     the "matrix needs recomputing" flag; already
+ *                             documented below as a pending-update flag
+ *     +0x04        == coord   MATRIX, 0x20 bytes (s16 m[3][3], pad, s32 t[3])
+ *     +0x18 unk18/unk1C/unk20 == coord.t[0..2]   (+0x04 + 0x14 = +0x18)
+ *     +0x24 unk24  == workm   MATRIX, the COMPOSED world matrix; already
+ *                             recorded below as an address-only span
+ *     +0x38 unk38[3] == workm.t[0..2]            (+0x24 + 0x14 = +0x38)
+ *     +0x44 unk44  == param   GsCOORD2PARAM *
+ *     +0x48 unk48  == super   the PARENT coordinate; func_8001D0EC's
+ *                             "attach" sets it to the owner's own unk14,
+ *                             which is exactly what super means
+ *     +0x4C        == sub     (not yet touched by any carved function)
+ *
+ *   Class6B5CCSub44  ==  GsCOORD2PARAM   (0x28 bytes)
+ *     +0x00 unk0/unk4/unk8 == scale.vx/vy/vz (VECTOR, +0x0C is its pad)
+ *     +0x10 vec            == rotate        (SVECTOR; x/y/z/w == vx/vy/vz/pad)
+ *     +0x18 pad18          == trans         (VECTOR)
+ *   so S16Quad_d294 is an SVECTOR, and the 4096-per-turn angle reading
+ *   func_8001CEB4's full-turn wrap already established is Sony's own.
+ *
+ *   Class6B5CCObj +0x10 .. +0x1C  ==  an embedded GsDOBJ2
+ *     +0x10 unk10 == attribute  (the packed flags word the GetSetBitField
+ *                                family sets fields in)
+ *     +0x14 unk14 == coord2     (the GsCOORDINATE2 above)
+ *     +0x18 unk18 == tmd        (the model data pointer)
+ *   Class6B5CC__LinkModel passes `&self->unk10` to Sony's GsLinkObject4 as
+ *   its GsDOBJ2 argument, which only type-checks at this layout, and the
+ *   ctor calls GsInitCoordinate2 on the 0x50-byte block.
+ *
+ * NOT ACTED ON HERE, DELIBERATELY. Retyping these to Sony's names and
+ * renaming their fields is cross-unit work: code_d294.c, code_d294_b.c,
+ * class_3bb8c_o.c and class_3bb8c_p.c all read these fields, and a naming
+ * runner owns ONE unit (docs/PARALLEL-RUNS.md section 2). It is a
+ * FINISHING-PLAN track 4 job, and a large one -- flagged, with the
+ * derivation above, so that round does not have to rediscover it.
+ * ========================================================================= */
+
 typedef struct Class6B5CCObj Class6B5CCObj;
 typedef struct Class6B5CCMethods Class6B5CCMethods;
 typedef struct Class6B5CCSub14 Class6B5CCSub14;
@@ -617,19 +664,19 @@ extern Sixteen6_d294 *func_8001F50C(void *arg0, s32 arg1);
  * with the opaque `void *`/`s32` shape that call site needs. */
 extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
 
-/* ApplyMatrixToSVArray (this unit; MATCHED round 19, echo -- see
- * docs/match-reports/ApplyMatrixToSVArray.md): an element-copy loop -- `count`
- * iterations, 6 bytes/element. CORRECTED naming vs. the original guess
- * below (confirmed against the byte-exact disassembly, not reasoned from
- * the name): each iteration reads a 6-byte `Rec6_d294` record OUT OF
- * `dest` into a stack-local copy, then forwards that copy AND `src`
- * (unchanged, raw pointer, never dereferenced by this function itself) to
- * `ApplyMatrixSV(out, &buf, src)`. `func_8001D624` (this unit, round 12)
- * calls it with `src` and `dest` (its own arg0/arg1) equal to the SAME
- * address, which is why this asymmetry was invisible until this function
- * was actually matched. Declared only with the opaque shape its callers
- * need. */
-extern void ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *out);
+/* ApplyMatrixToSVArray (src/code_d294_c.c; MATCHED round 19, echo -- see
+ * docs/match-reports/ApplyMatrixToSVArray.md): `dst[i] = m * src[i]` for
+ * `count` elements of 6 bytes each. Each iteration copies one element out
+ * of `src` into an all-s16 stack local (alignment 2, which is what makes
+ * retail's unaligned lwl/lwr + swl/swr copy come out) and forwards it to
+ * Sony's `ApplyMatrixSV(m, &buf, dst)` -- so the 1st parameter is the
+ * WRITE destination and the 2nd the read source, confirmed against the
+ * byte-exact disassembly. `func_8001D624` (code_d294_b) calls it with both
+ * equal to the SAME address, which is why the asymmetry was invisible
+ * until this function was actually matched; round 50 renamed the
+ * parameters (names only) to say which is which. Declared with the opaque
+ * shape its callers need. */
+extern void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m);
 
 /* ApplyMatrixLV (still uncarved, a different/earlier segment): called once
  * per iteration by ApplyMatrixToLVArray below as `(fixed, b, a)`; not decompiled
@@ -662,7 +709,12 @@ extern void ApplyMatrixLV();
  * 0xC-byte stack vector `self->methods`'s own `slot84` just filled in --
  * i.e. `a`/`b` here are the SAME pointer at that one call site, so it does
  * not by itself distinguish their roles. */
-void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed);
+/* CHANGED round 50 (charlie), parameter NAMES only -- no type, arity or
+ * order change: (a, b, count, fixed) -> (dst, src, count, m). `a` is the
+ * WRITE destination and `b` the read source, per the byte-exact call
+ * `ApplyMatrixLV(m, src, dst)` inside the loop. The same correction
+ * applies to ApplyMatrixToSVArray's declaration above. */
+void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 
 extern Class6B5CCObj *func_8001CA94(void);
 void *func_8001CAF4(Class6B5CCObj *self);
