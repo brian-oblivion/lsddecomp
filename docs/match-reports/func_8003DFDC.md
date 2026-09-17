@@ -6,7 +6,7 @@
 
 This IS `D_8006E878`'s own +0x008 slot -- the "IntermediateBase" shared
 utility class's constructor (`tools/classtable.py D_8006E878` shows
-`+0x008 func_8003DFDC`). Runs the BasicClass ctor through `func_80018390()`,
+`+0x008 func_8003DFDC`). Runs the BasicClass ctor through `Get_vtable_BasicClass()`,
 installs this class's own vtable (`&D_8006E878`, via the already-matched
 getter `func_8003E5C8`), then dispatches its own freshly-installed slot40
 (`func_8003E100`, already matched, void-returning) once.
@@ -23,7 +23,7 @@ unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
 ```c
 void func_8003DFDC(Obj86B60 *self)
 {
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = (Obj86B60Methods *)func_8003E5C8();
     self->methods->slot40(self);
 }

@@ -268,7 +268,7 @@ void *BasicClass__func_17eb0(BasicClass *self)
 
 void BasicClass__BasicClass(BasicClass *self)
 {
-    self->methods = func_80018390();
+    self->methods = Get_vtable_BasicClass();
     self->parentRefs = NULL;
     self->children = NULL;
 }
@@ -301,10 +301,10 @@ void BasicClass__func_18040(BasicClass *self)
 
     childPtr = &child;
     cursor = self->children;
-    if (func_800183A0(childPtr, &cursor), child != NULL) {
+    if (GetNextBasicClass(childPtr, &cursor), child != NULL) {
         do {
             self->methods->removeChild(self, child);
-        } while (func_800183A0(childPtr, &cursor), child != NULL);
+        } while (GetNextBasicClass(childPtr, &cursor), child != NULL);
     }
 }
 
@@ -313,7 +313,7 @@ void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassL
     if (*outChild == NULL) {
         *cursor = self->children;
     }
-    func_800183A0(outChild, cursor);
+    GetNextBasicClass(outChild, cursor);
 }
 
 s32 BasicClass__func_180fc(BasicClass *self, BasicClass *parent)
@@ -328,7 +328,7 @@ void BasicClass__func_1811c(BasicClass *self, BasicClass *parent)
 
 void BasicClass__func_1813c(BasicClass *self)
 {
-    func_80018288(&self->parentRefs);
+    FreeBasicClassList(&self->parentRefs);
     self->parentRefs = NULL;
 }
 
@@ -337,7 +337,7 @@ void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClass
     if (*outParent == NULL) {
         *cursor = self->parentRefs;
     }
-    func_800183A0(outParent, cursor);
+    GetNextBasicClass(outParent, cursor);
 }
 
 s32 func_800181AC(BasicClassListNode **head, BasicClass *value)

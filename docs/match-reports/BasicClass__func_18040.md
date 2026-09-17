@@ -9,19 +9,19 @@ winning shape is non-obvious and generalizes.
 
 ## What it does
 
-Iterates `self->children` via `func_800183A0` (still `asm/code_8220_b.s`,
+Iterates `self->children` via `GetNextBasicClass` (still `asm/code_8220_b.s`,
 not yet carved to C — see signature below), calling `removeChild` (slot
 `+0x014`, this unit's `BasicClass__func_17ff0`) on each extracted child
 until the list is exhausted.
 
-## `func_800183A0`'s signature, established here
+## `GetNextBasicClass`'s signature, established here
 
-`func_800183A0(BasicClass **outValue, BasicClassListNode **cursor)`,
+`GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor)`,
 `void`. Pop-and-advance: reads `node = *cursor`; if null, `*outValue = 0`;
 else `*outValue = node->value`, `*cursor = node->next`. Does NOT free the
 popped node (that's `removeChild`'s/`func_80018208`'s job, which is called
 separately on each extracted value by THIS function's caller-facing use of
-it — `func_800183A0` only walks, it never frees). Also used, identically,
+it — `GetNextBasicClass` only walks, it never frees). Also used, identically,
 by the still-`INCLUDE_ASM` `BasicClass__func_180bc`/`BasicClass__func_1816c`
 ("get next child"/"get next parent ref" iterators) — not derived
 independently here, just cross-checked for a consistent call shape.
@@ -37,10 +37,10 @@ void BasicClass__func_18040(BasicClass *self)
 
     childPtr = &child;
     cursor = self->children;
-    if (func_800183A0(childPtr, &cursor), child != NULL) {
+    if (GetNextBasicClass(childPtr, &cursor), child != NULL) {
         do {
             self->methods->removeChild(self, child);
-        } while (func_800183A0(childPtr, &cursor), child != NULL);
+        } while (GetNextBasicClass(childPtr, &cursor), child != NULL);
     }
 }
 ```
@@ -48,7 +48,7 @@ void BasicClass__func_18040(BasicClass *self)
 ## Why this shape, in three separately-necessary pieces
 
 Retail's own instruction sequence is unusual for a loop this simple: ONE
-physical `jal func_800183A0` (not duplicated), reached two ways — an
+physical `jal GetNextBasicClass` (not duplicated), reached two ways — an
 initial unconditional jump straight to it (skipping the loop body on the
 very first pass) and the loop's own backward branch — with `$s1` cached
 once, outside the loop, to hold `&child`'s address (never recomputed), and
@@ -69,7 +69,7 @@ plausible-looking near-miss):
    producing a visibly smaller/wrong frame.
 
 2. **The comma-operator `while`/`if`+`do`+`while` combination, not a plain
-   `while`.** A single `while (func_800183A0(...), child != NULL) { body }`
+   `while`.** A single `while (GetNextBasicClass(...), child != NULL) { body }`
    — the natural first reading of "extract, test, loop" — compiles with the
    test/extraction block placed FIRST (straight-line fallthrough, no
    initial jump needed) and the loop body AFTER, looping back with a

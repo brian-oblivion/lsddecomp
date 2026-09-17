@@ -38,7 +38,7 @@
  *    header -- nothing else references it yet). Its base class IS
  *    BasicClass (include/code_8220.h): slots 0x0C/0x10/0x14/0x18 line up
  *    exactly with BasicClassMethods' finalize/addChild/removeChild/
- *    removeAllChildren. Reached via func_80018390(), which class_3bb8c.h
+ *    removeAllChildren. Reached via Get_vtable_BasicClass(), which class_3bb8c.h
  *    ALREADY declares (class_3bb8c_f's own local view, `BasicMethods866E8F`)
  *    -- this round additively named those four slots on THAT existing
  *    type rather than adding a second, incompatible local declaration of
@@ -181,7 +181,7 @@ void func_80051998(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3)
  * func_80051DA0: a child object's own `*(s32*)(*(void**)child) & 0xF`
  * selects unk34 for tag 2, unk38 for tag 5), layered on top of the
  * INHERITED BasicClass generic children list (added/removed via
- * func_80018390()'s addChild/removeChild in the same two functions).
+ * Get_vtable_BasicClass()'s addChild/removeChild in the same two functions).
  */
 typedef struct Class86ED0Methods Class86ED0Methods;
 typedef struct Class86ED0 Class86ED0;
@@ -271,7 +271,7 @@ Class86ED0Methods *func_80051A4C(void)
  * not redeclared here.
  *
  * BasicClass's own method table getter is ALREADY declared in the shared
- * class_3bb8c.h (`func_80018390`/`BasicMethods866E8F`, class_3bb8c_f's
+ * class_3bb8c.h (`Get_vtable_BasicClass`/`BasicMethods866E8F`, class_3bb8c_f's
  * local view -- reused here rather than redeclared, since a second
  * incompatible extern for the same function in one translation unit is a
  * conflicting-types error). This round additively named its own
@@ -332,7 +332,7 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
     s32 index;
     s32 len;
 
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = func_80052B60();
 
     count = 0;
@@ -390,7 +390,7 @@ void func_80051C84(Class86ED0 *self)
     }
     func_80017CFC(self->unk1C);
     func_80017CFC(self->unk18);
-    func_80018390()->finalize(self);
+    Get_vtable_BasicClass()->finalize(self);
 }
 
 void func_80051D1C(Class86ED0 *self, void *arg1)
@@ -398,7 +398,7 @@ void func_80051D1C(Class86ED0 *self, void *arg1)
     s32 tag;
 
     if (arg1) {
-        func_80018390()->addChild(self, arg1);
+        Get_vtable_BasicClass()->addChild(self, arg1);
         tag = **(s32 **)arg1 & 0xF;
         if (tag == 2) {
             self->unk34 = arg1;
@@ -419,7 +419,7 @@ void func_80051DA0(Class86ED0 *self, void *arg1)
         } else if (tag == 5) {
             self->unk38 = NULL;
         }
-        func_80018390()->removeChild(self, arg1);
+        Get_vtable_BasicClass()->removeChild(self, arg1);
     }
 }
 
@@ -428,14 +428,14 @@ void func_80051E20(Class86ED0 *self)
     self->unk34 = NULL;
     self->unk38 = NULL;
     self->unk50 = NULL;
-    func_80018390()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
 void func_80051E64(Class86ED0 *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
-    func_80018390()->slot38(self, arg1, arg2);
+    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
     tag = **(s32 **)arg1 & 0xF;
     if (tag == 2) {
         self->methods->slot5C(self, arg1, arg2);

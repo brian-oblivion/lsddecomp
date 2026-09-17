@@ -1,4 +1,6 @@
-# func_80018390
+> Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
+
+# Get_vtable_BasicClass
 
 **Unit:** code_8220_b · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
@@ -12,7 +14,7 @@ freshly-constructed `BasicClass`.
 ## The C
 
 ```c
-BasicClassMethods *func_80018390(void)
+BasicClassMethods *Get_vtable_BasicClass(void)
 {
     return &D_8006B58C;
 }
@@ -31,7 +33,7 @@ bytes / 16 words — one header word, 14 method-pointer words matching every
 field of `BasicClassMethods`, and a trailing `.word 0x00000000` past the
 struct's own `0x03C` end. That extra word is not part of the C-visible
 `BasicClassMethods` layout (nothing reads it) and did not need to be modeled
-here; `func_80018390` only takes the table's address, never indexes past its
+here; `Get_vtable_BasicClass` only takes the table's address, never indexes past its
 declared fields.
 
 ## Provenance

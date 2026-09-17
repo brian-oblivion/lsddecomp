@@ -11,7 +11,7 @@ sibling this one mirrors exactly, over `parentRefs` instead.
 
 The `parentRefs`-list iterator, identical shape to `getNextChild`: seeds
 `*cursor` from `self->parentRefs` on the caller's first call (detected via
-`*outParent == NULL`), then pop-and-advances via `func_800183A0`.
+`*outParent == NULL`), then pop-and-advances via `GetNextBasicClass`.
 
 ## The C
 
@@ -21,7 +21,7 @@ void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClass
     if (*outParent == NULL) {
         *cursor = self->parentRefs;
     }
-    func_800183A0(outParent, cursor);
+    GetNextBasicClass(outParent, cursor);
 }
 ```
 

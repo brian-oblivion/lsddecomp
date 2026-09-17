@@ -504,7 +504,7 @@ void func_8004FB04(TaskObjF *self, void *arg1, s32 arg2) {
     s32 mask;
 
     methods = self->methods;
-    bm = func_80018390();
+    bm = Get_vtable_BasicClass();
     bm->slot38(self, arg1, arg2);
 
     tag = **(s32 **)arg1;

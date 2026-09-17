@@ -18,7 +18,7 @@ void BasicClass__func_182cc(BasicClass *self, s32 arg1)
     BasicClassListNode *cursor = self->parentRefs;
     BasicClass *value;
 
-    for (func_800183A0(&value, &cursor); value != NULL; func_800183A0(&value, &cursor)) {
+    for (GetNextBasicClass(&value, &cursor); value != NULL; GetNextBasicClass(&value, &cursor)) {
         value->methods->slot38(value, self, arg1);
     }
 }
@@ -30,10 +30,10 @@ Byte-exact on the first attempt. The disassembly's `j` straight to the loop
 condition before the first iteration is the classic `for`/`while`
 lowering — GCC emits `init; goto cond; body: ...; cond: test; branch`. Since
 this function's "condition" is itself a call with a side-effecting output
-parameter (`func_800183A0` pops the cursor and writes `*value`), the natural
+parameter (`GetNextBasicClass` pops the cursor and writes `*value`), the natural
 C spelling is a `for` loop whose init AND increment clauses are both that
 same call, with the body running only the vtable dispatch. Writing it as a
-`while (func_800183A0(&value, &cursor), value != NULL)`-style comma
+`while (GetNextBasicClass(&value, &cursor), value != NULL)`-style comma
 expression was unnecessary — the plain `for (call; test; call) { body }`
 form reproduces the goto-to-condition shape directly and needs no unusual
 syntax.

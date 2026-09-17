@@ -11,7 +11,7 @@ allocation itself is `func_8001CA94`, a separate `New_X` wrapper, not this
 function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
 `self->unk14->unk44`, 0x28 bytes), frees the first and bails out if the
 second allocation fails, otherwise calls the BasicClass base constructor
-(`func_80018390()->ctor(self)`), overwrites `self->methods` with this
+(`Get_vtable_BasicClass()->ctor(self)`), overwrites `self->methods` with this
 class's own vtable (`func_8001E57C()`, i.e. `&D_8006B5CC`), zeroes several
 freshly-added fields, and finally calls its own virtual init hook
 (`self->methods->slot40`, `func_8001CE30` — still queued) before returning
@@ -33,7 +33,7 @@ void *func_8001CAF4(Class6B5CCObj *self) {
         func_80017CFC(self->unk14);
         return NULL;
     }
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = func_8001E57C();
     self->unk20 = 0;
     self->unk18 = 0;

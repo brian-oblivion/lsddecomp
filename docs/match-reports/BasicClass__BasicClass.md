@@ -31,7 +31,7 @@ It maintains two singly-linked lists of pool-allocated 8-byte nodes
 The base constructor, dispatched through the class framework's own slot
 `+0x008` convention (docs/research/class-framework.md: "constructors are
 called through the method table, base-class constructors included").
-Fetches the class's own vtable via `func_80018390` (a tiny getter, still
+Fetches the class's own vtable via `Get_vtable_BasicClass` (a tiny getter, still
 `asm/code_8220_b.s`, that just returns `&D_8006B58C`), stores it at
 `self->methods`, and zeroes both lists.
 
@@ -40,7 +40,7 @@ Fetches the class's own vtable via `func_80018390` (a tiny getter, still
 ```c
 void BasicClass__BasicClass(BasicClass *self)
 {
-    self->methods = func_80018390();
+    self->methods = Get_vtable_BasicClass();
     self->parentRefs = NULL;
     self->children = NULL;
 }
@@ -49,9 +49,9 @@ void BasicClass__BasicClass(BasicClass *self)
 ## One residue, from collateral drift — not a real defect in this function
 
 First measured at 12/13 words, with the sole difference being the `jal`
-TARGET immediate for `func_80018390` (a call, not a branch — the encoded
+TARGET immediate for `Get_vtable_BasicClass` (a call, not a branch — the encoded
 absolute address itself differed). This is not a scheduling or codegen
-issue in this function at all: `func_80018390` lives in the still-uncarved
+issue in this function at all: `Get_vtable_BasicClass` lives in the still-uncarved
 `code_8220_b.s` tail, so its real link address depends on the total size of
 everything before it, including `BasicClass__func_18040` (this unit's
 hardest function, worked on afterward — see its own report). Once

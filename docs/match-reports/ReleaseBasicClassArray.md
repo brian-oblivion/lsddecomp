@@ -1,6 +1,8 @@
-# func_800183DC — MATCHED (28/28 words)
+> Renamed from `func_800183DC` on 2026-09-17 (tools/rename.py). Address 0x800183dc.
 
-Unit: `src/code_8220_b.c`. `void func_800183DC(BasicClass **array, s32 count)`
+# ReleaseBasicClassArray — MATCHED (28/28 words)
+
+Unit: `src/code_8220_b.c`. `void ReleaseBasicClassArray(BasicClass **array, s32 count)`
 — releases every element of a `BasicClass*` array (calling each element's
 vtable slot `+0x004`, `release`, and storing the result back into the slot)
 and advances a pointer walk over `count` elements.
@@ -8,7 +10,7 @@ and advances a pointer walk over `count` elements.
 ## Final source
 
 ```c
-void func_800183DC(BasicClass **array, s32 count)
+void ReleaseBasicClassArray(BasicClass **array, s32 count)
 {
     if (count-- > 0) {
         do {
@@ -60,4 +62,4 @@ the SAME saved register both times. `while(count-->0)` inside an
 `if(count-->0)` do-while wrapper reproduces this exactly; a fresh
 `remaining` local (even initialized identically) puts the decrement in a
 different register than the one being tested and drifts the function's
-length. (`func_800183DC`, 4/28 -> 28/28.)
+length. (`ReleaseBasicClassArray`, 4/28 -> 28/28.)

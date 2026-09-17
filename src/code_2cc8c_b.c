@@ -281,7 +281,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
 
 void func_8003D6D4(Obj86B60 *self)
 {
-    func_800183DC(self->unk64[self->unk58], self->unk5C[self->unk58]);
+    ReleaseBasicClassArray(self->unk64[self->unk58], self->unk5C[self->unk58]);
     func_80017CFC(self->unk64[self->unk58]);
 }
 

@@ -168,14 +168,14 @@ extern s32 func_800181AC(BasicClassListNode **head, BasicClass *value);  /* push
 extern void func_80018208(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
 
 /* Matched in code_8220_b, round 13. */
-extern void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */
-extern void func_80018288(BasicClassListNode **head);                          /* free every node in the list, does not clear *head itself */
+extern void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */
+extern void FreeBasicClassList(BasicClassListNode **head);                          /* free every node in the list, does not clear *head itself */
 
 /* BasicClass's own method table (BASICCLASS_METHODS), asm/data/57070.data.s.
- * 14 slots per BasicClassMethods, matching func_80018390 (code_8220_b, round
+ * 14 slots per BasicClassMethods, matching Get_vtable_BasicClass (code_8220_b, round
  * 12) which returns its address. */
 extern BasicClassMethods D_8006B58C;
-extern BasicClassMethods *func_80018390(void);                                 /* returns &D_8006B58C */
+extern BasicClassMethods *Get_vtable_BasicClass(void);                                 /* returns &D_8006B58C */
 
 /* The "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n" format string,
  * asm/data/A8C.rodata.s. */

@@ -15,7 +15,7 @@
  *
  * The object derives from the same BasicClass framework documented in
  * include/code_8220.h (base vtable fetched via a no-argument getter,
- * func_80018390(), with finalize/addChild/removeChild/removeAllChildren at
+ * Get_vtable_BasicClass(), with finalize/addChild/removeChild/removeAllChildren at
  * +0x00C/+0x010/+0x014/+0x018) -- this unit's own independent local view of
  * that same getter, per the project's established
  * multiple-independent-local-views convention (docs/DECOMPILATION_LEARNINGS.md).
@@ -28,7 +28,7 @@ struct BaseMethods3bb8cE {
     void (*removeChild)(void *self, void *child); /* +0x014, func_8004E4E8 */
     void (*removeAllChildren)(void *self);        /* +0x018, func_8004E588 */
 };
-extern BaseMethods3bb8cE *func_80018390(void);
+extern BaseMethods3bb8cE *Get_vtable_BasicClass(void);
 
 /*
  * A typed child resource attached to a Node3bb8cE. Only the resource's own
@@ -55,7 +55,7 @@ struct Res3bb8cE {
 typedef struct Node3bb8cE Node3bb8cE;
 
 /* The object's OWN vtable, at offset 0 -- distinct from the separately
- * fetched base-class table (`func_80018390()`, `BaseMethods3bb8cE` above).
+ * fetched base-class table (`Get_vtable_BasicClass()`, `BaseMethods3bb8cE` above).
  * Only the one slot this unit's functions reach is typed. */
 typedef struct SelfMethods3bb8cE SelfMethods3bb8cE;
 struct SelfMethods3bb8cE {
@@ -124,7 +124,7 @@ void func_8004E3F4(Node3bb8cE *self)
 
 void func_8004E40C(Node3bb8cE *self)
 {
-    func_80018390()->finalize(self);
+    Get_vtable_BasicClass()->finalize(self);
 }
 
 void func_8004E444(Node3bb8cE *self, Res3bb8cE *res)
@@ -134,7 +134,7 @@ void func_8004E444(Node3bb8cE *self, Res3bb8cE *res)
     if (res == NULL) {
         return;
     }
-    func_80018390()->addChild(self, res);
+    Get_vtable_BasicClass()->addChild(self, res);
     tag = res->methods->header;
     if ((tag & 0xF) == 2) {
         self->unk60 = res;
@@ -170,7 +170,7 @@ void func_8004E4E8(Node3bb8cE *self, Res3bb8cE *res)
     } else if ((tag & 0xFF) == 0x20) {
         self->unk7C = NULL;
     }
-    func_80018390()->removeChild(self, res);
+    Get_vtable_BasicClass()->removeChild(self, res);
 }
 
 void func_8004E588(Node3bb8cE *self)
@@ -180,7 +180,7 @@ void func_8004E588(Node3bb8cE *self)
     self->unk68 = NULL;
     self->unk78 = NULL;
     self->unk7C = NULL;
-    func_80018390()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
 void func_8004E5D4(Node3bb8cE *self, s32 val)

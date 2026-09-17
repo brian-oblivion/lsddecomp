@@ -7,7 +7,7 @@ BasicClass vtable slot `+0x01C` (`getNextChild`) — see
 
 ## What it does
 
-The `children`-list iterator: `func_800183A0` pop-and-advances a cursor
+The `children`-list iterator: `GetNextBasicClass` pop-and-advances a cursor
 (see `BasicClass__func_18040.md` for that function's established
 signature), and this wraps it with a "first call" seed — if `*outChild`
 is still `NULL` (the caller's sentinel for "haven't started yet"),
@@ -32,7 +32,7 @@ void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassL
     if (*outChild == NULL) {
         *cursor = self->children;
     }
-    func_800183A0(outChild, cursor);
+    GetNextBasicClass(outChild, cursor);
 }
 ```
 

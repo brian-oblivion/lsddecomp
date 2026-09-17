@@ -8,7 +8,7 @@
 If `other`'s vtable header tag is `9`, first calls `Class6B5CC__UnlinkModel(self)`
 (zeroes `self->unk18`/`self->unk20` -- MEASURED from its own disassembly,
 see `include/code_d294.h`), THEN unconditionally forwards to the base
-class's own `+0x014` slot (`func_80018390()->slot14`). "Detach" to
+class's own `+0x014` slot (`Get_vtable_BasicClass()->slot14`). "Detach" to
 `func_8001CC48`'s "attach": the pre-work happens before the base call here,
 where `func_8001CC48` did its post-work after.
 
@@ -19,7 +19,7 @@ void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__UnlinkModel(self);
     }
-    func_80018390()->slot14(self, other);
+    Get_vtable_BasicClass()->slot14(self, other);
 }
 ```
 

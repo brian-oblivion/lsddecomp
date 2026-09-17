@@ -26,7 +26,7 @@ extern Obj86ED0Methods D_80086ED0;
  * bravo, which returns it as its own `Class86ED0Methods *` local view of
  * the same table). Returns `&D_80086ED0`; confirmed in the disassembly as
  * `lui/addiu` materialising that exact address then `jr $ra`, the same
- * no-argument-getter shape as `func_80018390`. Declared here rather than
+ * no-argument-getter shape as `Get_vtable_BasicClass`. Declared here rather than
  * in the shared header because the two units' return types differ. */
 extern Obj86ED0Methods *func_80051A4C(void);
 
@@ -63,7 +63,7 @@ void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
     u8 *p;
     s32 count;
 
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = func_80051A4C();
     self->unk10 = strlen(arg1);
     self->unk28 = func_80017B34(self->unk10 + 4);
@@ -90,7 +90,7 @@ void func_80050CD8(Obj86ED0 *self)
 void func_80050CE8(Obj86ED0 *self)
 {
     func_80017CFC(self->unk28);
-    func_80018390()->finalize(self);
+    Get_vtable_BasicClass()->finalize(self);
 }
 
 void func_80050D30(Obj86ED0 *self, void *arg1)
@@ -99,7 +99,7 @@ void func_80050D30(Obj86ED0 *self, void *arg1)
     s32 mask;
 
     if (arg1 != NULL) {
-        func_80018390()->addChild(self, arg1);
+        Get_vtable_BasicClass()->addChild(self, arg1);
         tag = **(s32 **)arg1;
         mask = tag & 0xF;
         if (mask == 2) {
@@ -123,7 +123,7 @@ void func_80050DB4(Obj86ED0 *self, void *arg1)
         } else if (mask == 5) {
             self->unk38 = NULL;
         }
-        func_80018390()->removeChild(self, arg1);
+        Get_vtable_BasicClass()->removeChild(self, arg1);
     }
 }
 
@@ -132,7 +132,7 @@ void func_80050E34(Obj86ED0 *self)
     self->unk34 = NULL;
     self->unk38 = NULL;
     self->unk48 = NULL;
-    func_80018390()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
 void func_80050E78(Obj86ED0 *self, void *arg1, s32 arg2)
@@ -140,7 +140,7 @@ void func_80050E78(Obj86ED0 *self, void *arg1, s32 arg2)
     s32 tag;
     s32 mask;
 
-    func_80018390()->slot38(self, arg1, arg2);
+    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
 
     tag = **(s32 **)arg1;
     mask = tag & 0xF;

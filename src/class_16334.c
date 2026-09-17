@@ -15,7 +15,7 @@ fail:
 }
 
 void func_80025BA0(Pad *self, void *arg1, s32 port) {
-    func_80018390()->ctor(self);
+    Get_vtable_BasicClass()->ctor(self);
     self->methods = func_80025E9C();
     if (D_8008A848++ == 0) {
         PadInit(arg1);
@@ -27,7 +27,7 @@ void *func_80025C30(Pad *self) {
     if (--D_8008A848 == 0) {
         PadStop();
     }
-    return func_80018390()->dtor(self);
+    return Get_vtable_BasicClass()->dtor(self);
 }
 
 void func_80025C84(Pad *self, s32 port) {

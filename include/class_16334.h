@@ -5,7 +5,7 @@
 
 /* Class table at D_8006D370 (see tools/classtable.py D_8006D370). 21 slots:
  * header + 14 slots inherited verbatim from BASICCLASS_METHODS (D_8006B58C,
- * returned by func_80018390) + 7 slots this class adds/overrides (+0x08
+ * returned by Get_vtable_BasicClass) + 7 slots this class adds/overrides (+0x08
  * ctor, +0x0C dtor, +0x40.. new virtuals).
  *
  * Working hypothesis (see docs/match-reports for the evidence trail): this
@@ -60,7 +60,7 @@ struct Pad {
     /* +0x1C */ u8 unk1C[4];
 };
 
-/* BasicClass's own table (D_8006B58C) -- returned by func_80018390, which
+/* BasicClass's own table (D_8006B58C) -- returned by Get_vtable_BasicClass, which
  * lives in the still-uncarved code_8220 segment. Only the two slots this
  * unit calls are typed here. */
 typedef struct BasicClassMethods {
@@ -70,7 +70,7 @@ typedef struct BasicClassMethods {
     /* +0x0C */ void *(*dtor)(void *self);
 } BasicClassMethods;
 
-extern BasicClassMethods *func_80018390(void);
+extern BasicClassMethods *Get_vtable_BasicClass(void);
 extern void *func_80017B34(s32 size);
 
 /* Psy-Q Pad library helpers (asm/psyq_PadInit.s, uncarved). */

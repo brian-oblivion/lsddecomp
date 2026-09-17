@@ -2,7 +2,7 @@
 #include "code_8220.h"
 #include "gte.h"
 
-void func_80018288(BasicClassListNode **head)
+void FreeBasicClassList(BasicClassListNode **head)
 {
     BasicClassListNode *node = *head;
 
@@ -18,7 +18,7 @@ void BasicClass__func_182cc(BasicClass *self, s32 arg1)
     BasicClassListNode *cursor = self->parentRefs;
     BasicClass *value;
 
-    for (func_800183A0(&value, &cursor); value != NULL; func_800183A0(&value, &cursor)) {
+    for (GetNextBasicClass(&value, &cursor); value != NULL; GetNextBasicClass(&value, &cursor)) {
         value->methods->slot38(value, self, arg1);
     }
 }
@@ -33,12 +33,12 @@ void BasicClass__func_18358(BasicClass *self, void *arg1, s32 arg2)
     }
 }
 
-BasicClassMethods *func_80018390(void)
+BasicClassMethods *Get_vtable_BasicClass(void)
 {
     return &D_8006B58C;
 }
 
-void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor)
+void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor)
 {
     if (*cursor != NULL) {
         *outValue = (*cursor)->value;
@@ -48,7 +48,7 @@ void func_800183A0(BasicClass **outValue, BasicClassListNode **cursor)
     }
 }
 
-void func_800183DC(BasicClass **array, s32 count)
+void ReleaseBasicClassArray(BasicClass **array, s32 count)
 {
     if (count-- > 0) {
         do {

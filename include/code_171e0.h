@@ -36,7 +36,7 @@ typedef struct Vec3_171e0 {
     s32 z;
 } Vec3_171e0;
 
-/* BasicClass's own table (D_8006B58C-equivalent, returned by func_80018390,
+/* BasicClass's own table (D_8006B58C-equivalent, returned by Get_vtable_BasicClass,
  * which lives in the still-uncarved code_8220 segment -- see also
  * include/class_16334.h, which independently derived the same two slots
  * from a different unit). Declared again here, under a unit-local name, so
@@ -49,7 +49,7 @@ struct BasicClassMethods171e0 {
     /* +0x08 */ void *(*ctor)(void *self);
     /* +0x0C */ void *(*dtor)(void *self);
 };
-extern BasicClassMethods171e0 *func_80018390(void);
+extern BasicClassMethods171e0 *Get_vtable_BasicClass(void);
 extern void *func_80017B34(s32 size); /* one arg confirmed by new_class_6d3c8.md (code_1677c) */
 extern void func_80017CFC(void *arg);
 extern s32 strlen(char *s);

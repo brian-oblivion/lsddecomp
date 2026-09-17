@@ -1867,7 +1867,7 @@ extern void *func_80050BA8(s32 arg0, s32 arg1);
  * vtable pointer if the two were the same type. This is this unit's own
  * BasicClass-derived (docs/research/class-framework.md, include/code_8220.h)
  * task-ish object: it dispatches through the INHERITED BasicClass
- * addChild/removeChild slots at +0x010/+0x014 (func_80018390()'s own table
+ * addChild/removeChild slots at +0x010/+0x014 (Get_vtable_BasicClass()'s own table
  * establishes those two slots' exact signatures) and adds its own slots
  * from +0x044 on. No FirecatFG name survives, so fields are named by
  * offset. Only the slots/fields this unit's functions actually touch are
@@ -1980,7 +1980,7 @@ extern DeviceName866E8 D_8008AAA4;   /* "bu00:" */
 extern char *strcat(char *dest, char *src);
 
 /* BasicClass's own method table getter (include/code_8220.h's
- * `func_80018390`/`BasicClassMethods`, established there from
+ * `Get_vtable_BasicClass`/`BasicClassMethods`, established there from
  * BASICCLASS_METHODS/D_8006B58C -- see that header for slot38's exact
  * signature, `void (*)(BasicClass *self, void *arg1, s32 arg2)`, which
  * this local view matches). Kept as this unit's own independent local
@@ -1992,7 +1992,7 @@ extern char *strcat(char *dest, char *src);
  * removeChild/removeAllChildren slots -- previously opaque pad, now named
  * from that unit's own functions dispatching through them (func_80050C14's
  * base-ctor call, func_80050CE8/func_80050D30/func_80050DB4/func_80050E34's
- * explicit `func_80018390()->slotN(...)` base-class calls). Pure pad-to-
+ * explicit `Get_vtable_BasicClass()->slotN(...)` base-class calls). Pure pad-to-
  * field split, same total size, offset of the pre-existing `slot38` is
  * unchanged. `void *self` throughout, matching `slot38`'s existing style. */
 typedef struct BasicMethods866E8F BasicMethods866E8F;
@@ -2013,7 +2013,7 @@ struct BasicMethods866E8F {
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, func_8004FB04's first dispatch */
 };
-extern BasicMethods866E8F *func_80018390(void);
+extern BasicMethods866E8F *Get_vtable_BasicClass(void);
 
 /* ROUND 34: five of the six prototypes that used to sit here were the PSX
  * BIOS file trampolines, and they are Sony's -- `open`/`read`/`lseek`/
@@ -2594,7 +2594,7 @@ extern void func_80054D30(void);
  * removeAllChildren/slot38 are all overridden by this unit's own
  * functions. Only the slots this unit's own functions dispatch through
  * SELF (`self->methods->slotN`, as opposed to the explicit
- * `func_80018390()->slotN` base-table calls, which go through
+ * `Get_vtable_BasicClass()->slotN` base-table calls, which go through
  * `BasicMethods866E8F` above) are named below; the rest stays opaque
  * padding, same policy as `Obj866E8Methods` elsewhere in this header.
  */
@@ -2666,7 +2666,7 @@ struct Obj86ED0Methods {
     u8 pad018[0x030 - 0x018];
     /* +0x030, func_800512C8's own dispatch -- UNMODIFIED BasicClass
      * onFinalize (BasicClass__func_182cc, code_8220_b), reached through
-     * self's own table this one time instead of `func_80018390()`. */
+     * self's own table this one time instead of `Get_vtable_BasicClass()`. */
     void (*onFinalize)(Obj86ED0 *self, s32 arg1);
     u8 pad034[0x040 - 0x034];
     /* +0x040, round 45's func_80050C14 -- its own tail dispatch,

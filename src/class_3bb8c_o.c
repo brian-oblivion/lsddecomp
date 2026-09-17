@@ -69,8 +69,8 @@ void func_80056DF0(void) {
  * Group 1: func_80056DF8 / func_80056E44 / func_80056F28.
  * Self is some larger object with an inline 5-element `BasicClass *`
  * array at +0x084.  func_80056DF8/func_80056F28 release the whole array
- * (func_800183DC, already established elsewhere as
- * `void func_800183DC(BasicClass **array, s32 count)` in code_8220_b.c --
+ * (ReleaseBasicClassArray, already established elsewhere as
+ * `void ReleaseBasicClassArray(BasicClass **array, s32 count)` in code_8220_b.c --
  * kept generic `void **` here per this project's per-unit convention for
  * that symbol, e.g. code_2cc8c.h's own looser reading).  func_80056E44
  * walks array indices [1..4] (self+0x88 .. self+0x94), which is exactly
@@ -80,7 +80,7 @@ void func_80056DF0(void) {
  * (`(rand() % 360) << 12`, a degrees->fixed-point conversion).
  * ------------------------------------------------------------------ */
 
-extern void func_800183DC(void **array, s32 count);
+extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 rand(void);
 
 typedef struct Vec3O {
@@ -108,7 +108,7 @@ typedef struct LinkOwnerObj {
 } LinkOwnerObj;
 
 void func_80056DF8(LinkOwnerObj *this) {
-    func_800183DC((void **)this->arr84, 5);
+    ReleaseBasicClassArray((void **)this->arr84, 5);
 }
 
 extern void func_80056D18(void *arg0, s32 arg1, s32 arg2, s32 arg3);
@@ -130,7 +130,7 @@ void func_80056E44(LinkOwnerObj *this) {
 }
 
 void func_80056F28(LinkOwnerObj *this) {
-    func_800183DC((void **)this->arr84, 5);
+    ReleaseBasicClassArray((void **)this->arr84, 5);
 }
 
 /* ------------------------------------------------------------------ *
