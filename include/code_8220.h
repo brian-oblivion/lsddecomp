@@ -49,7 +49,7 @@ struct BasicClassMethods {
     /* +0x000 */ s32 header;
     /* +0x004 */ void *(*release)(BasicClass *self);                              /* BasicClass__func_17eb0: virtual finalize, then free self */
     /* +0x008 */ void (*ctor)(BasicClass *self);                                  /* BasicClass__BasicClass */
-    /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__func_17f2c: onFinalize(1), removeAllChildren(), clearParentRefs() */
+    /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__func_17f2c: notifyParents(1), removeAllChildren(), clearParentRefs() */
     /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__func_17f98 */
     /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__func_17ff0 */
     /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__func_18040 */
@@ -58,7 +58,7 @@ struct BasicClassMethods {
     /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls func_80018208, which is void (see below) */
     /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
     /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */
-    /* +0x030 */ void (*onFinalize)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, event). PROPOSED RENAME (round 51, tier A): onFinalize -> notifyParents -- it is the EMITTER, not a handler, and it is not finalize-specific: `arg1` is a general event code the base only ever sees as 1. Cross-unit field (class_3bb8c_i.c, code_8220.c), so the head applies it. */
+    /* +0x030 */ void (*notifyParents)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, event). PROPOSED RENAME (round 51, tier A): notifyParents -> notifyParents -- it is the EMITTER, not a handler, and it is not finalize-specific: `arg1` is a general event code the base only ever sees as 1. Cross-unit field (class_3bb8c_i.c, code_8220.c), so the head applies it. */
     /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b. No name: measured round 51 across all 60 method tables, 58 carry this exact address here and the 2 that differ are not BasicClass-derived, so nothing in the game overrides it and nothing establishes its purpose OR its real signature -- `void (*)(void)` is what the empty base body permits, not what a caller was seen to pass. No accessor anywhere in src/. */
     /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__OnNotify; code_8220_b. Receiving half of +0x030: arg1 is the SENDER, arg2 an event code (base acts only on 1; func_8001CD60/code_d294 and func_80065790/code_55dd4 forward to the base then branch on the sender's class tag). PROPOSED RENAME (round 51, tier B): slot38 -> onNotify, arg1 -> sender, arg2 -> event. Cross-unit field, 13 units access it, so the head applies it. */
 };

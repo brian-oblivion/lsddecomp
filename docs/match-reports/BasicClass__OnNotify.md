@@ -5,7 +5,7 @@
 **Unit:** code_8220_b · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 
 BasicClass vtable slot `+0x038` (`slot38` in `BasicClassMethods`). Called by
-`BasicClass__NotifyParents` (slot `+0x030`, `onFinalize`, still `INCLUDE_ASM`
+`BasicClass__NotifyParents` (slot `+0x030`, `notifyParents`, still `INCLUDE_ASM`
 this round) once per entry in `self->parentRefs`, as
 `parent->methods->slot38(parent, childBeingFinalized, 1)`.
 

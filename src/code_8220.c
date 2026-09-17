@@ -275,7 +275,7 @@ void BasicClass__BasicClass(BasicClass *self)
 
 void BasicClass__func_17f2c(BasicClass *self)
 {
-    self->methods->onFinalize(self, 1);
+    self->methods->notifyParents(self, 1);
     self->methods->removeAllChildren(self);
     self->methods->clearParentRefs(self);
 }

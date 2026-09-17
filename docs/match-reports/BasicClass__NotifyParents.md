@@ -3,12 +3,12 @@
 # BasicClass__NotifyParents — MATCHED (33/33 words)
 
 Unit: `src/code_8220_b.c`. This is `BasicClassMethods` vtable slot `+0x030`,
-`onFinalize(self, s32 flag)` (already documented in
+`notifyParents(self, s32 flag)` (already documented in
 `include/code_8220.h`'s struct comment). Walks `self->parentRefs` and, for
 each parent, calls that parent's own `slot38` (`BasicClass__OnNotify`,
 already matched in this unit) with `self` as its `arg1` and `flag` passed
 through as `arg2`. Since `slot38` only acts `if (arg2 == 1)`, calling
-`onFinalize(self, 1)` (as `BasicClass__func_17f2c`'s finalize path does)
+`notifyParents(self, 1)` (as `BasicClass__func_17f2c`'s finalize path does)
 tells every parent holding a reference to `self` to remove `self` as its
 own child.
 
@@ -68,9 +68,9 @@ boolean.
 
 ### Proposed field name for the head
 
-`BasicClassMethods::onFinalize` (slot `+0x030`) -> `notifyParents`.
+`BasicClassMethods::notifyParents` (slot `+0x030`) -> `notifyParents`.
 **Tier A**, by the vtable-slot convention (name the slot after the method
-it dispatches to). The inherited `onFinalize` is wrong twice: this is the
+it dispatches to). The inherited `notifyParents` is wrong twice: this is the
 EMITTER, not an `on*` handler, and it is not finalize-specific --
 `BasicClass__func_17f2c` (finalize) happens to be the only caller in carved
 C, which is a fact about how much is carved, not about the slot.

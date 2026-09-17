@@ -12,7 +12,7 @@ slot `+0x004`) before it frees `self`. Dispatches three further virtual
 calls through `self->methods`, all THIS class's own slots, in address
 order:
 
-- `+0x030` (`onFinalize`, `self, 1`) — a subclass-specific hook. The base
+- `+0x030` (`notifyParents`, `self, 1`) — a subclass-specific hook. The base
   occupant, `BasicClass__NotifyParents`, is out of this round's carved slice
   (`code_8220_b`), so its own behaviour is unconfirmed here; only that this
   function calls it with a literal `1` second argument.
@@ -29,7 +29,7 @@ order:
 ```c
 void BasicClass__func_17f2c(BasicClass *self)
 {
-    self->methods->onFinalize(self, 1);
+    self->methods->notifyParents(self, 1);
     self->methods->removeAllChildren(self);
     self->methods->clearParentRefs(self);
 }

@@ -132,8 +132,8 @@ a pointer-cast read, deliberately, to avoid introducing a union into
   of `pad000[0x88]`; split into `pad000[0x30]` + `slot30` +
   `pad034[0x88-0x34]` (0x30 + 4 + 0x54 = 0x88, total preserved). Resolved
   via `tools/classtable.py 0x800866E8`'s own `+0x030` entry to
-  `BasicClass__NotifyParents` (`BasicClass::onFinalize`, already typed in
-  `include/code_8220.h` as `void (*onFinalize)(BasicClass *self, s32
+  `BasicClass__NotifyParents` (`BasicClass::notifyParents`, already typed in
+  `include/code_8220.h` as `void (*notifyParents)(BasicClass *self, s32
   arg1)`) -- this class's low vtable slots are inherited straight from
   `BasicClassMethods` (classtable confirms slots +0x004 through +0x038 all
   resolve to `BasicClass__func_*` symbols). Typed here as
@@ -156,7 +156,7 @@ UNCHANGED (see derivation note above for why).
 - **`tools/classtable.py` can resolve a vtable slot to an ALREADY-MATCHED
   sibling function, and when it does, that function's real signature (not
   a fresh guess from the new call site alone) is the one to trust.** Both
-  new slots here (`slot30` -> `BasicClass::onFinalize`, `slot128` ->
+  new slots here (`slot30` -> `BasicClass::notifyParents`, `slot128` ->
   `func_8004C620`) had their true signatures already nailed down elsewhere
   in the codebase; classtable is what connects a raw `self->methods->slotNN`
   offset to that existing knowledge instead of re-deriving a shape from

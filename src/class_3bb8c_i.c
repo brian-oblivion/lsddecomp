@@ -262,7 +262,7 @@ void func_800512C8(Obj86ED0 *self, s32 arg1)
         self->unk2C = arg1;
         break;
     case 4:
-        self->methods->onFinalize(self, self->unk2C);
+        self->methods->notifyParents(self, self->unk2C);
         break;
     }
 }
