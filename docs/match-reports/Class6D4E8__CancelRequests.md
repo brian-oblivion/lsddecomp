@@ -127,3 +127,40 @@ already on file (round 44's `func_8001CEB4`): when a near-miss is
 length-correct but register-swapped only at sites that don't overlap in
 lifetime, try splitting a reused local into two independently-named ones
 before suspecting anything structural.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027D70` | `Class6D4E8__CancelRequests` | A |
+
+**Evidence.** Slot `+0x074` of `D_8006D4E8`. It walks the `D_8008A894`
+request list and, for every node whose `owner` is this object, calls
+`func_800283C4` (code_179d8_r: unlink + free) and decrements the object's own
+pending count. Before that, if the HEAD node is this object's and is already
+`active` and the drive is not idle, it aborts the transfer in flight
+(`CdFlush`, `func_80028864` = reset the state machine) and restores the saved
+position pointer. Cancelling this owner's outstanding requests is the whole
+function; the `Cancel` is not an inference about purpose but a description of
+`unlink + free + abort the one in flight`.
+
+**Field names established here** (applied in this unit, which owns its views):
+
+- `CdRequest_D70.active` (`+0x00`): `func_80028844` (code_179d8_r) sets the
+  head node's `+0x00` to 1 when it starts an operation on it, and
+  `func_8002832C` clears it at allocation. Tier B -- "an operation has been
+  started on this node" is what the two writers show; whether it also means
+  anything to the state machine's later steps is not established.
+- `CdRequest_D70.owner` (`+0x0C`): `EnqueueCdRequest` stores the requesting
+  object there. Tier A. (Already named `owner` in round 45; confirmed.)
+- `Obj6D4E8_D70.pendingRequests` / `.flags`: see
+  `Class6D4E8__RequestLoadFile.md`.
+
+## Proposed field names
+
+| unit | type | field | proposed | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| code_179d8_r | `Node8008A894` | `unk0` | `active` | B | set by `func_80028844` on the head node at operation start, cleared at allocation |
+| code_179d8_s | `Node8008A894` | `unkC` | `owner` | A | written by `EnqueueCdRequest` with the requesting object |

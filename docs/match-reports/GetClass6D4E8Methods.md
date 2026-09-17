@@ -55,3 +55,45 @@ the array (which decays to its address) reproduces that exactly.
 ## Provenance
 
 round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve).
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027E68` | `GetClass6D4E8Methods` | A |
+
+**Evidence.** A two-instruction address-of: it returns `&D_8006D4E8`, this
+class's own 29-slot method table. A pure leaf whose mechanics are its
+purpose, so tier A by the plan's own rule. The same accessor shape
+`func_800269E0` has for `D_8006D3C8` and `func_80026C9C` for `D_8006D430`.
+
+**The class token `Class6D4E8` is deliberate, and this is the report that
+says why.** What the class IS, is now well evidenced: every method reachable
+from this table bottoms out in Psy-Q libcd (`CdSearchFile`, `CdRead`,
+`CdControlF`, `CdSync`, `CdFlush`, `CdPosToInt`/`CdIntToPos`), its objects
+cache a disc position and a byte size, and `code_171e0.c` selects this
+class's module functions only when `D_8008A84C == 0x13`, this table's own
+header word -- the other value that gate takes, `0x23`, is `D_8006D9BC`, the
+SPU/VAB streamer in `code_179d8_e.c`. So the two are interchangeable data
+sources behind one dispatch layer, and this one is the CD-ROM source.
+
+What is NOT established is what the developers CALLED it. Naming it
+`CdStream` or `CdFile` would be a tier-A assertion drawn from behaviour
+alone, and it would propagate into every method name in three units, so this
+round used the address token instead -- the convention the symbols file
+already carries as `Class6B5CC__RotateLocalVector`. **Proposed for track 4,
+when the class's views are unified:** `CdReader` or `CdFile`, on the evidence
+above. That is a proposal, not a name.
+
+### Proposed learning
+
+**A class whose behaviour is fully established can still be the wrong thing
+to name, because a class name is not one name -- it is the prefix of every
+method in every unit that touches the class.** The cost of being wrong scales
+with the class's method count, while the cost of a placeholder token is one
+`rename.py` run per method later. Where the plan's "a wrong tier-A name is
+worse than a placeholder" bites hardest is exactly here, and the existing
+`Class6B5CC__` spelling shows the project already settled on the hedge:
+placeholder CLASS, evidence-based METHOD.

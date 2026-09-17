@@ -32,3 +32,26 @@ void LockCd(void)
 round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). See
 IsCdBusy.md for the sibling-accessor context; see UnlockCd.md for
 its pair.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800280D0` | `LockCd` | A |
+| `D_8008A88C` | `gCdLock` | A |
+
+**Evidence, and it corrects this report's round-45 reading.** That reading
+said "nothing in this unit's own bodies dereferences `D_8008A88C`, so its
+consumer lives elsewhere". The consumer is in this unit and was queued at the
+time: `ServiceCdDriver` (`func_800280EC`) returns immediately when the flag
+is set. With that reader in hand the pattern is unambiguous -- every public
+entry point in this unit and in `code_179d8_r`/`code_179d8_s` brackets its
+body with set-then-clear, and the one thing that reads the flag is the
+VSync-driven service tick, which skips its turn rather than walk a
+half-updated queue. That is a re-entrancy latch against an interrupt-time
+callback, not a mutex: nothing spins or blocks on it.
+
+`code_179d8_r`'s header comment had already called this pair lock/unlock;
+this rename records it in the symbols.

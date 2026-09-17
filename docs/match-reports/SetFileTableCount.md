@@ -26,3 +26,18 @@ void SetFileTableCount(s32 a0)
 
 round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). See
 IsCdBusy.md for the sibling-accessor context.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027FE4` | `SetFileTableCount` | A |
+| `D_8008A86C` | `gFileTableCount` | A |
+
+**Evidence.** The loop bound both table scans in `code_179d8_r` stop at
+(`while (i < gFileTableCount)`, `if (i >= gFileTableCount) return -1;`) over
+the 0x1C-stride array based at `gFileTable`. `code_171e0.c`'s `func_80027024`
+sets it to `GetFileTableCount() + n` before resolving `n` new entries, i.e.
+the table grows by appending. Setter of the element count: tier A.

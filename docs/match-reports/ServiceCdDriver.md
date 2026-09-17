@@ -103,3 +103,33 @@ should preserve the call's live return value) produces C that still
 compiles and still looks plausible, and the resulting diff is a single
 clean word, not a structural mismatch — cheap to miss on a skim of the
 diff output.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800280EC` | `ServiceCdDriver` | A |
+| `D_8008A890` | `gCdQueueEnabled` | A |
+
+**Evidence.** This is the driver's tick, and it is installed as one: both
+`StartCdService` and this function itself pass its address to
+`VSyncCallback`, and `SetCdDriverMode` passes the same address to the
+singleton's `+0x84` callback slot when the VSync path is off. One call does
+all the periodic work there is -- skip if `gCdLock` is held or
+`func_80018458` says no; step `code_179d8_r`'s CD state machine
+(`func_8002858C` for `D_8008A898 == 1`, `func_800286E4` for 2); drain the
+request queue through the class's own `+0x068` slot; re-arm itself. "Service"
+is the one word that covers a tick that both advances a state machine and
+drains a queue.
+
+**`gCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
+here, and `tools/classtable.py` resolves that slot to `func_80027A24`
+(code_179d8_s), which walks `D_8008A894`, dispatches each request and frees
+it with `func_800283C4`. So the flag gates queue processing specifically --
+not the tick, which still runs the state machine while the flag is clear.
+Tier A.
+
+**Slot name.** `Methods6D4E8_80EC.slot68` -> `runRequestQueue`, named for the
+method `classtable.py` resolves it to, per track 3's vtable-slot rule.

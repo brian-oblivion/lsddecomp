@@ -57,3 +57,41 @@ directly, no manual unrolling needed.
 
 None new — confirms the libcd/sys.o per-call-site `extern` convention from
 `code_179d8_h.c` transfers cleanly to a second, independently-carved unit.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027E78` | `InitCdDrive` | A |
+| `D_8008A858` | `sCdDriveInited` | A |
+
+**Evidence.** Guarded by a one-shot flag, it calls `CdSetDebug(0)` and then
+retries `CdControlB(0x0E, &mode, 0)` with `mode = 0x80` until it is accepted,
+then sets the flag. `0x0E` is Psy-Q's `CdlSetmode` and `0x80` its
+`CdlModeSpeed` (double speed) -- `include/psyq/LIBCD.H`. So: put the drive
+into double-speed mode, once. Both constants are now spelled
+`CD_CMD_SETMODE` / `CD_MODE_DOUBLE_SPEED` in the `.c` rather than as bare
+literals; they are NOT spelled with Sony's own macro names, because this unit
+declares libcd per call site and including `LIBCD.H` would collide with those
+declarations.
+
+`sCdDriveInited` takes the unit-static `s` prefix: no other unit in `src/`
+references it (`grep -rn D_8008A858 src/` before the rename: zero hits outside
+this file).
+
+### Proposed learning
+
+**`tools/rename.py` leaves `config/gp-symbols.txt` in a state
+`tools/gpsyms.py --check` calls stale, and the build stays GREEN while it is
+in that state -- so the oracle does not catch it.** `rename.py` lists
+`config/gp-symbols.txt` among the text files it rewrites, so a renamed sdata
+symbol keeps its gp-relative treatment and the image stays byte-identical;
+what it does not do is regenerate the file, and `gpsyms.py` writes the
+generated names in a different order, so `--check` reports stale until the
+generator is run. A naming runner that renames any `.sdata`/`.sbss` symbol
+must therefore finish with `python3 tools/gpsyms.py` and one more
+`./build-and-verify.sh` before committing -- the green build in between is
+real, but the committed tree would otherwise fail `gpsyms.py --check` for the
+next person. Measured this round across 12 sdata renames.

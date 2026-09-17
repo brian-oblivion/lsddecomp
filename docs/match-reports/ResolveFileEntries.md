@@ -158,3 +158,47 @@ This complements alpha's parameter-mutation lever from earlier this round:
 both symptoms (a spurious comparison instruction, a spurious `move`) come
 from the same root cause — writing a fresh local where retail's C reused an
 existing value/register directly.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027FFC` | `ResolveFileEntries` | A |
+| `D_800107D8` | `sFileNotFoundMsg` | A |
+
+**Evidence.** For each element of the array it is handed, it builds a path
+from the element's `name` (`func_800289CC`), retries `CdSearchFile` on that
+path up to 101 times, prints `"File not found. file = %s\n"` if all of them
+fail, and then copies the search result's position and size back into the
+element. Turning names into disc positions is the entire function; tier A.
+
+**Types and fields established here**, all local to this `.c`:
+
+- `CdStatBufQ` -> `CdFileInfo`, fields `unk0`/`unk4` -> `pos`/`size`. The
+  0x18-byte buffer is Sony's `CdlFILE` exactly (`include/psyq/LIBCD.H`:
+  `CdlLOC pos; u_long size; char name[16];` = 4 + 4 + 16). Round 45 derived
+  the 0x18 independently from the stack-slot span; this round matched the
+  shape to the declared Sony struct, which also confirms field order. Tier A.
+- `Pair16Q` -> `CdLoc16`. The 4-byte, 2-aligned position pair. It has the
+  same CONTENT as Sony's `CdlLOC` (minute/second/sector/track) but not the
+  same declaration: `CdlLOC` is four `u_char` and would be 1-aligned, while
+  retail's `lwl`/`lwr` + `swl`/`swr` copy proves the game's own struct was
+  2-aligned, i.e. two 16-bit members. Worth knowing before anyone "fixes" the
+  local view by substituting `CdlLOC`: that substitution would change the
+  alignment and the copy would stop matching. The two halves keep placeholder
+  names -- nothing in this corpus reads them apart.
+- `FileEntryQ` -> `CdFileEntry`, `unk14`/`unk18` -> `pos`/`size`. Filled
+  straight from `CdFileInfo.pos`/`.size`; `code_179d8_r` confirms the 0x14
+  name field independently by `strstr`-ing it. Tier A.
+- `CD_SEARCH_RETRIES` for the bare `0x65`.
+
+## Proposed field names
+
+| unit | type | field | proposed | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| code_179d8_s | `Rec80028448` | `unk14` | `pos` | A | same 0x1C record; filled from `CdSearchFile`'s `CdlFILE.pos` |
+| code_179d8_s | `Rec80028448` | `unk18` | `size` | A | same record; `func_80027800` divides it by 0x800 to get a sector count |
+| code_179d8_s | `StatBuf80027` | `unk0`/`unk4` | `pos`/`size` | A | it is `CdlFILE`; see above |
+| code_179d8_h | `StatBuf179D8H` | `unk0`/`unk4` | `pos`/`size` | A | same Sony struct, same call |

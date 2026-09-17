@@ -155,3 +155,44 @@ candidate that *branches* on an uninitialized read (disqualified as
 scorer-exploiting UB); a straight-line store through an uninitialized
 pointer, on a path retail demonstrably takes unconditionally once entered,
 is just matching the code that shipped.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027C80` | `Class6D4E8__RequestLoadFile` | B |
+
+**Evidence.** Slot `+0x06C` of `D_8006D4E8` (`tools/classtable.py`). Given a
+file name, it either enqueues a `CD_OP_LOAD_FILE` (7) request through
+`EnqueueCdRequest` with `func_800284C4`'s file-table index, or -- when
+`gCdAsyncEnabled` is 0 -- calls the class's own `+0x058` slot
+(`func_80027800`, code_179d8_s) directly, which is the synchronous
+load-this-file-by-name method that enqueues the identical op 7 on its own
+async path. So both arms request the same thing, which is what `Request`
+names; `LoadFile` is the op, read off the slot it dispatches to and off the
+op code it enqueues.
+
+**Why tier B, not A.** The behaviour is established, but the class's identity
+is not: `Class6D4E8` is a placeholder token for the table address, following
+the existing `Class6B5CC__RotateLocalVector` convention in the symbols file.
+The unit as a whole is demonstrably the CD-ROM read driver, but no evidence
+here says what the developers called this class -- see
+`GetClass6D4E8Methods.md`.
+
+**Names left alone.** `UnkC80` and its `unk04`: the store goes through a
+register the function never assigns (the shipped bug this report documents),
+so the object it lands in is not identifiable from any path. A name here
+would be invention.
+
+## Proposed field names
+
+Applied in this unit (all three of its object views are local to the `.c`).
+The SAME physical fields carry `unk` names in two sibling units' own local
+views; proposing rather than renaming, since those units are not mine:
+
+| unit | type | field | proposed | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| code_179d8_s | `Obj80027480` | `unk22` | `pendingRequests` | A | `EnqueueCdRequest` increments it per queued request; `Class6D4E8__CancelRequests` decrements it once per node it unlinks |
+| code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `func_80027800`) or cleared |

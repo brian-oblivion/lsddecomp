@@ -49,3 +49,23 @@ identical).
 ### Proposed learning
 
 None new beyond what `ServiceCdDriver`'s report already states.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800281B0` | `StartCdService` | A |
+| `D_8008A89C` | `gCdCallbackInstalled` | A |
+
+**Evidence.** Under the lock: if `gCdCallbackInstalled` is 0, register
+`ServiceCdDriver` with `VSyncCallback` (when the VSync path is selected) and
+set the flag; then enable queue processing. Its one caller is
+`EnqueueCdRequest`, immediately after appending a node -- "a request now
+exists, make sure the service is running". Start is what it does; the
+one-shot flag is what stops it doing it twice.
+
+`gCdCallbackInstalled` is written 1 exactly where the callback is registered
+and 0 exactly where `StopCdServiceIfIdle` clears it, and is read nowhere
+else. Tier A.

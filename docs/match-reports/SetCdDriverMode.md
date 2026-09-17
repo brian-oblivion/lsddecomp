@@ -103,3 +103,34 @@ would-be-early-exit branch jumps to code positioned at the very end (past
 the "normal path" return), the C is `if (cond == 0) { body; return X; }
 return Y;`, not `if (cond) return Y; body; return X;` — same semantics,
 different word count.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027F18` | `SetCdDriverMode` | B |
+| `D_8008A8A4` | `gCdUseVSyncCallback` | A |
+
+**Evidence for the function.** It refuses (returns 0) while `gCdBusy`, and
+otherwise stores its three arguments into `gCdUseVSyncCallback`,
+`gCdAsyncEnabled` and `D_8008A860` and returns 1 -- the write half of the
+pair `GetCdDriverMode` reads back. `code_171e0.c`'s `func_80026F34` calls it
+in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
+the new mode", which is what the refusal-while-busy return value is for.
+Parameters are now named `async`, `mode2`, `useVSyncCallback`. Tier B: the
+second argument is unidentified (see `GetCdDriverMode.md`), so the function's
+full contract is not established.
+
+**Evidence for `gCdUseVSyncCallback`.** Every one of its five readers is
+`if (gCdUseVSyncCallback != 0) VSyncCallback(...)` -- register or clear the
+tick. And this function only installs the ALTERNATIVE delivery path (the
+`+0x84` slot of the singleton `func_80020C5C` returns, handed
+`ServiceCdDriver` or 0) when the argument is zero. So the flag chooses which
+of two callbacks drives the service; tier A.
+
+**Slot name.** `ObjF18Methods.slot84` -> `setCallback`: this call site hands
+that slot either `ServiceCdDriver` or `0`, which is install/clear and nothing
+else. Tier B -- one call site is thin evidence for another class's slot, and
+the type stays a per-call-site local view.

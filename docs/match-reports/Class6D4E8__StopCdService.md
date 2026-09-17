@@ -37,3 +37,21 @@ ahead of this definition to satisfy strict ROM-address file ordering.
 None new — same "set latch / do work / clear latch" bracket pattern already
 seen around `gCdLock` in this unit (`Class6D4E8__RequestLoadFile`, `DisableCdQueue`, now
 this one), just with a different body in the middle.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027D40` | `Class6D4E8__StopCdService` | B |
+
+**Evidence.** Slot `+0x070` of `D_8006D4E8`. The whole body is
+`LockCd(); StopCdServiceIfIdle(); UnlockCd();` -- the locked wrapper around
+this unit's `StopCdServiceIfIdle`, which unhooks the `VSyncCallback` and
+clears `gCdCallbackInstalled`/`gCdQueueEnabled` when the state machine has
+nothing pending. The name says exactly that: the class's "stop the CD
+service" slot.
+
+Tier B for the class token only (see `Class6D4E8__RequestLoadFile.md`); the
+method's own behaviour is not in doubt.

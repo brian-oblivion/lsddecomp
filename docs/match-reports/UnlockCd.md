@@ -28,3 +28,15 @@ void UnlockCd(void)
 round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). See
 IsCdBusy.md for the sibling-accessor context; see LockCd.md for
 its pair.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800280E0` | `UnlockCd` | A |
+
+**Evidence.** Clears `gCdLock`; the release half of the pair documented in
+`LockCd.md`, called on every exit path of every entry point that takes it.
+Tier A.

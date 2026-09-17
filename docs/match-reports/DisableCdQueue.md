@@ -35,3 +35,17 @@ struct/class knowledge.
 
 None — same shape as the rest of this unit's small functions (plain global
 touches plus already-matched sibling calls).
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80028280` | `DisableCdQueue` | A |
+
+**Evidence.** Under the lock, clears `gCdQueueEnabled` -- and nothing else.
+It does not unregister the callback and does not touch the state machine, so
+the tick keeps running and only queue draining stops. The narrow name is the
+accurate one; `StopCdService` is `StopCdServiceIfIdle`, which is a different
+function with a different effect.

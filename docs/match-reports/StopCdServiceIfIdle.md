@@ -51,3 +51,23 @@ in strict ROM-address order).
 
 None new — confirms the existing `VSyncCallback(0)` idiom transfers cleanly
 to a second call site in a different unit.
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80028218` | `StopCdServiceIfIdle` | A |
+
+**Evidence.** Under the lock, and only when `D_8008A898 == 0` (no
+state-machine step is armed) AND the callback is installed: unregister the
+`VSyncCallback`, clear `gCdCallbackInstalled` and clear `gCdQueueEnabled`.
+The conditional is half the function, so the name carries it -- calling this
+`StopCdService` would say it always stops, which it does not. The mirror of
+`StartCdService`.
+
+`D_8008A898` itself is left named: it is `code_179d8_r`'s "which state-machine
+step to tick" selector (1 or 2), written by `code_179d8_s` and cleared by
+that unit's reset, so it belongs to whichever unit's naming pass takes
+`code_179d8_r`. Proposed there: `gCdStep`.

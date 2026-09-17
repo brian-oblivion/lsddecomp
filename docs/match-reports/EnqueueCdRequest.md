@@ -78,3 +78,43 @@ already on file for do-while retry loops and pointer-walk loops: this
 compiler is comparatively deferential to source order except where genuine
 scheduling freedom exists (as it exercised here, moving one store into an
 unrelated call's delay slot).
+
+## Naming
+
+Round 51 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800282AC` | `EnqueueCdRequest` | A |
+
+**Evidence.** Allocates and links a node via `func_8002832C` (code_179d8_r,
+which appends to the `D_8008A894` list), fills five of its fields from the
+parameters, bumps the requesting object's pending count, clears its flags and
+calls `StartCdService`. Every caller is a class method taking its
+asynchronous path (`code_179d8_s` at op 2/3/4/5/7,
+`Class6D4E8__RequestLoadFile` at op 7). Append a request and make sure the
+service runs: tier A.
+
+**Parameter and field names established here**, all local to this `.c`:
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `func_80027A24` switches on it when it drains the queue |
+| `+0x0C` | `owner` | A | the requesting object; `Class6D4E8__CancelRequests` matches on it to cancel one object's requests |
+| `+0x10` | `fileIndex` | A | `func_800284C4`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
+| `+0x14` | `param0` | B | the op's first extra argument: `arg2` for op 2, a byte count for op 4, a buffer for op 5 |
+| `+0x18` | `param1` | B | the op's second extra argument, same call sites |
+
+`param0`/`param1` are tier B deliberately: they are per-op arguments with a
+different meaning in each op, so any more specific name would be true of one
+call site and false of three.
+
+## Proposed field names
+
+| unit | type | field | proposed | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| code_179d8_s | `Node8008A894` | `unk8` | `op` | A | as above |
+| code_179d8_s | `Node8008A894` | `unkC` | `owner` | A | as above |
+| code_179d8_s | `Node8008A894` | `unk10` | `fileIndex` | A | as above |
+| code_179d8_s | `Node8008A894` | `unk14`/`unk18` | `param0`/`param1` | B | as above |
+| code_179d8_r | `Node8008A894` | `unk4` | *(no proposal)* | C | this unit never touches `+0x04`; only `func_8002832C` zeroes it |
