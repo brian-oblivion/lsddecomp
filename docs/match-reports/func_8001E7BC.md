@@ -44,7 +44,7 @@ return 1;
 
 - **`Class6B5CCObj` gains (at least) THREE new fields**, all read directly
   off `self` (not through `unk14`):
-  - `+0x20`: ALREADY typed `void *unk20` (round 12, `func_8001D600`) --
+  - `+0x20`: ALREADY typed `void *unk20` (round 12, `Class6B5CC__ReadUnk20Data`) --
     this function is a SECOND confirming use, null-checked at entry (a
     `return 0` guard) and later passed as `func_8001F8B8`'s own first
     argument. No retype needed, just a second confirmed non-NULL-checked

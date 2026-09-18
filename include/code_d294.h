@@ -470,10 +470,10 @@ struct Class6B5CCMethods {
     u8 pad088[0x08C - 0x088];
     /* +0x08C/+0x090, round 13 (func_8001D568's own call site): dispatched
      * as `(self, dest)` and `(self, a1, a2)` respectively, matching
-     * func_8001D600/func_8001D624's own direct-call prototypes below
+     * Class6B5CC__ReadUnk20Data/func_8001D624's own direct-call prototypes below
      * exactly (both already matched, code_d294_b) -- `tools/classtable.py
      * D_8006B5CC` confirms they occupy these two slots. */
-    void (*slot8C)(Class6B5CCObj *self, void *dest); /* +0x08C, func_8001D600 */
+    void (*slot8C)(Class6B5CCObj *self, void *dest); /* +0x08C, Class6B5CC__ReadUnk20Data */
     void (*slot90)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, func_8001D624 */
     /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
      * triple -- func_8001CD60 (code_d294) dispatches to exactly one of
@@ -544,7 +544,7 @@ struct Class6B5CCObj {
     u8 unk1C[0x020 - 0x01C];    /* unknown; not touched by this unit's chosen functions */
     /* +0x020, zeroed by the ctor. func_8001CC48's still-queued forward
      * target Class6B5CC__LinkModel (code_d294_b.s) stores its own 2nd argument into
-     * this offset. RETYPED round 12 (code_d294_b, func_8001D600): that
+     * this offset. RETYPED round 12 (code_d294_b, Class6B5CC__ReadUnk20Data): that
      * function passes `self->unk20` straight through as func_8001F51C's own
      * `void *` arg0 (psyq_fa50.s; func_8001F51C forwards it
      * unmodified to func_8001F3B0, which dereferences it at +0x10) --
@@ -633,13 +633,13 @@ extern void GetNextBasicClass(GenericObj_d294 **out, GenericObj_d294 **cursor);
  * buffer via func_8001F3B0 (its own arg0 forwarded straight through). Its
  * own last write to $v0 is leftover from an unrelated `lhu` a few
  * instructions earlier, not a deliberate return value -- read as `void`.
- * func_8001D600 (this unit, round 12) calls it as `func_8001F51C(self->unk20,
+ * Class6B5CC__ReadUnk20Data (this unit, round 12) calls it as `func_8001F51C(self->unk20,
  * dest)`; declared here only with the opaque `void *` shape that call site
  * needs. */
 extern void func_8001F51C(void *arg0, void *dest);
 
 /* func_8001F3A4 (asm/psyq_fa50.s, Psy-Q library, not game code): a
- * predicate over the same opaque `self->unk20` pointer func_8001D600 and
+ * predicate over the same opaque `self->unk20` pointer Class6B5CC__ReadUnk20Data and
  * func_8001F51C above already treat as `void *` -- func_8001D568 (round 13,
  * this unit) tests its `$v0` result for non-zero, so declared `s32`
  * (boolean-ish) here. Not decompiled in this project. */
@@ -791,7 +791,7 @@ extern void BasicClass__func_1816c(void *self, GenericObj_d294 **outParent, void
 void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D568(Class6B5CCObj *self, s32 a1);
 
-void func_8001D600(Class6B5CCObj *self, void *dest);
+void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest);
 void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
 void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);

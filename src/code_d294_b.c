@@ -51,13 +51,13 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
 
 /* a1 gates a small range (2 <= a1 < 4). When self->unk20 is set and
  * func_8001F3A4(self->unk20) reports true, fills a stack buffer through
- * this class's own +0x8C slot (func_8001D600, already matched in this
+ * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
  * unit -- fills it via func_8001F51C(self->unk20, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
  * (func_8001D624, also already matched in this unit), with the original
  * a1 passed through as func_8001D624's own a2. */
 void func_8001D568(Class6B5CCObj *self, s32 a1) {
-    /* Sized to reproduce retail's own frame (0x58): func_8001D600's own
+    /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
      * target (func_8001F51C, PsyQ, asm/psyq_fa50.s, not
      * decompiled here) fills fields out past +0x32 of its own `dest`
      * argument, so the true destination struct is bigger than the 8 bytes
@@ -87,7 +87,7 @@ void func_8001D568(Class6B5CCObj *self, s32 a1) {
  * func_8001F51C, untouched. func_8001F51C's own body (psyq_fa50.s)
  * has no deliberate return value -- see the extern's own comment -- so this
  * wrapper is void, not `return func_8001F51C(...)`. */
-void func_8001D600(Class6B5CCObj *self, void *dest) {
+void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
     func_8001F51C(self->unk20, dest);
 }
 

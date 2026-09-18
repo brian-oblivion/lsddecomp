@@ -1,4 +1,6 @@
-# func_8001D600 -- MATCHED (9/9 words)
+> Renamed from `func_8001D600` on 2026-09-18 (tools/rename.py). Address 0x8001d600.
+
+# Class6B5CC__ReadUnk20Data -- MATCHED (9/9 words)
 
 Round 12, runner delta. `code_d294_b`.
 
@@ -9,14 +11,14 @@ argument straight through (untouched, still in `$a1` from the caller) to
 `func_8001F51C` (Psy-Q, `psyq_GsLinkObject4.s`).
 
 ```c
-void func_8001D600(Class6B5CCObj *self, void *dest) {
+void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
     func_8001F51C(self->unk20, dest);
 }
 ```
 
 ## Return type: `void`, not `return func_8001F51C(...)`
 
-`func_8001D600` never touches `$v0` after the `jal`, so the byte match alone
+`Class6B5CC__ReadUnk20Data` never touches `$v0` after the `jal`, so the byte match alone
 doesn't distinguish `void` from a pass-through `return`. Checked
 `func_8001F51C`'s own disassembly instead: its last write to `$v0` before
 `jr $ra` is leftover from an unrelated `lhu $v0, 0x1E($sp)` a few
@@ -37,7 +39,7 @@ image SHA1 still green).
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/func_8001D600.s`):
+Disassembly (`asm/nonmatchings/code_d294_b/Class6B5CC__ReadUnk20Data.s`):
 ```
 lw  $a0, 0x20($a0)      # a0 = self->unk20
 jal func_8001F51C
