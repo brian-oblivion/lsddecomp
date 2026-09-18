@@ -19,9 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 2 (2026-09-17, after round 50's four escalated gaps). Changing
-the plan is a Fable head task; record the change in `docs/PROGRESS.md` and
-bump this line.
+Plan revision: 3 (2026-09-18, after rounds 51 and 52: starved calibration,
+the false field-rename guarantee, two rename.py refusals, unretired markers).
+Changing the plan is a Fable head task; record the change in
+`docs/PROGRESS.md` and bump this line.
 
 ## 1. What done means
 
@@ -65,9 +66,13 @@ prompt is binding; with none stated, use three.
 ## 3. Tracks
 
 Tracks are not gates on each other. `plan.py` prints one ready-jobs list
-across every open track, and the head fills its runner slots from the top,
-one unit per runner. Every track has a stop or park rule so that "hard"
-becomes "parked with a written reason" rather than another round.
+that takes turns across every open track (fresh matches, naming, a stall
+runner, the SDK batch, revisits, promotions, types, close-out), and the head
+fills its runner slots from the top, one unit per runner. A round with two
+slots therefore always carries one naming pass and one stall runner; a
+priority-sorted list starved every track but naming for two rounds. Every
+track has a stop or park rule so that "hard" becomes "parked with a written
+reason" rather than another round.
 
 ### Track 1: stall matching, calibrated, with a stop rule
 
@@ -85,13 +90,16 @@ better funcdiff score or when its one bounded search ends; never re-attempt a
 function whose report marks its levers spent unless the brief names a changed
 state.
 
-**Calibration and stop rule.** Two rounds, round A Sonnet runners, round B
-Opus runners. A calibration round takes **at least four assignments from the
-top of `nearmiss.py`'s ranked stall list**, so the two models are measured on
-the same band. Fresh giants and revisits are jobs too, but a round that worked
-only those is recorded with `--not-calibration` and does not count toward the
-stop rule (round 50 measured two runners on a 324w and a 954w fresh body and
-was re-flagged this way). After each round the head records:
+**Calibration and stop rule.** Measured in stall ATTEMPTS per model, not in
+rounds: Sonnet runners take stall jobs until Sonnet has six attempts from the
+ranked band, then Opus runners until Opus has six, then whichever produced
+more matches per attempt keeps the track. `plan.py` says which model is next
+and groups the ranked stalls into one-unit runner jobs of three, so a single
+runner slot per round accumulates toward it. Fresh giants and revisits are
+jobs too, but a round that worked only those is recorded with
+`--not-calibration` and does not count (round 50 measured two runners on a
+324w and a 954w fresh body and was re-flagged this way). After each round
+the head records:
 
 ```sh
 python3 tools/plan.py record-round --track 1 --round <N> --model <sonnet|opus> \
@@ -99,10 +107,18 @@ python3 tools/plan.py record-round --track 1 --round <N> --model <sonnet|opus> \
     [--not-calibration]
 ```
 
-If the two rounds together produce fewer than 3 matches, `plan.py` parks the
-track by itself and says so. The head does not argue with it in the same
-round. Parked means: no runner is staffed onto a stall for matching. It does
-not delete anything.
+When both models have their six attempts and the twelve together produced
+fewer than 3 matches, `plan.py` parks the track by itself and says so. The
+head does not argue with it in the same round. Parked means: no runner is
+staffed onto a stall for matching. It does not delete anything.
+
+**Spent markers are retired by whoever spends them.** A report carrying
+`REOPENED -- ASSIGNABLE` or `DERIVATION ONLY -- ASSIGNABLE` counts as fresh
+until that line is gone. The runner who attempts such a function replaces the
+marker line with the outcome (a stall title with its three figures, or
+MATCHED), in the same commit as the attempt. The head checks it at merge:
+every attempted function's report must no longer carry a marker. Rounds 49
+to 52 re-ranked the queue on markers nobody had retired.
 
 **Revisit rule.** A score taken before a unit's types and names existed is
 evidence about what was known then, not about the function (southpark round
@@ -224,10 +240,14 @@ propagates everywhere.
    - accessed from other units too: do NOT rename. Put the proposed name, its
      tier and its evidence under `## Proposed field names` in the report of
      the function that established it, and post it to the broadcast. The HEAD
-     applies cross-unit field renames at merge time, one at a time, as a
-     whole-tree textual replace followed by the oracle: a hit on a same-named
-     field of a DIFFERENT struct fails to compile, so the compiler flags every
-     mis-hit and the head reverts just those.
+     applies it at merge time by TYPE SCOPE, never by whole-tree replace:
+     rename the field in the struct DEFINITION only, rebuild, and the
+     compiler lists every accessor of that struct as an error; fix exactly
+     those, rebuild, oracle. Same-named fields in other structs are untouched
+     because their definitions did not change. (Revision 2 claimed a
+     whole-tree replace was safe because a mis-hit fails to compile; round 52
+     measured `unk10` in 347 places across 50 files, where replacing
+     definitions and uses together compiles clean and mislabels ~49 structs.)
    Never move an offset or change a type in a shared header (CLAUDE.md, the
    shared-struct hazard); a rename is the only edit this step makes.
 4. Name globals with `tools/rename.py`. Replace magic constants with named
@@ -265,8 +285,9 @@ propagates everywhere.
 - **Do not rename a Sony symbol.** Those names are Sony's.
 
 **Head at merge.** Apply the runner's proposed cross-unit field names one at
-a time (whole-tree replace, build, revert the compiler's mis-hits, build
-again), then `make extract` (the symbols file changed) and the oracle.
+a time by type scope (definition first, compiler lists the accessors, fix
+those, oracle), then `make extract` (the symbols file changed) and the
+oracle.
 
 **Head review before `mark-unit`.** Sample five names per unit against their
 evidence. A tier-A name without evidence, or a name that asserts purpose

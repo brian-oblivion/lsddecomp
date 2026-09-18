@@ -123,9 +123,11 @@ def corpus():
 # --- the query: retail words for a function --------------------------------
 
 def retail_functions_in_psyq_asm():
-    """{name: (vram, words)} for every glabel in asm/psyq_*.s."""
+    """{name: (vram, words)} for every glabel in asm/psyq_*.s, plus every
+    still-INCLUDE_ASM game function in asm/nonmatchings/ (round 51 wanted to
+    fingerprint func_80018464, a game-segment stall, to settle its ownership)."""
     out = {}
-    for s in sorted(ROOT.glob("asm/psyq_*.s")):
+    for s in sorted(ROOT.glob("asm/psyq_*.s")) + sorted(ROOT.glob("asm/nonmatchings/**/*.s")):
         text = s.read_text(errors="replace")
         for m in re.finditer(r"^glabel (\w+)\n(.*?)^endlabel \1$", text, re.M | re.S):
             # splat prints the word as STORED (little-endian bytes): `4404828F`
@@ -301,7 +303,7 @@ def main():
     placed = placements()
     for fn in names:
         if fn not in retail:
-            print(f"{fn}: not a glabel in asm/psyq_*.s (already named, or game code)")
+            print(f"{fn}: no glabel in asm/psyq_*.s or asm/nonmatchings/ (already named or matched)")
             continue
         vram, words = retail[fn]
         print_rank(fn, vram, words, rank(words, corp, a.top), placed)

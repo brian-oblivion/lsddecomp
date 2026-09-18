@@ -327,7 +327,10 @@ git rev-parse -q --verify MERGE_HEAD >/dev/null && echo "MERGE IN PROGRESS"
 A green build on top of `MERGE IN PROGRESS` means nothing (CLAUDE.md, fourth
 way a score lies). Resolve first, verify after. Expect `modify/delete`
 conflicts on report files the head stubbed and a runner then wrote; take the
-runner's.
+runner's. Then, for every function the runner attempted, confirm its report
+no longer carries an `-- ASSIGNABLE` marker (`grep -l -- '-- ASSIGNABLE'
+docs/match-reports/<func>.md`); a spent marker left in place re-ranks the
+next round's queue on ground that is no longer fresh.
 
 **`make extract` again after merging any branch that changed the symbols
 file** — i.e. every track 3 naming merge. `asm/` is untracked, so the runner's
@@ -384,7 +387,10 @@ with the largest queue.
 > when 30 consecutive builds have not improved its best funcdiff score, or when
 > your one bounded permuter search on it ends; then file the report and move
 > on. Do not re-attempt a function whose report says its cheap levers are
-> spent unless the broadcast or your brief names a CHANGED state.
+> spent unless the broadcast or your brief names a CHANGED state. If the
+> report carries a `REOPENED -- ASSIGNABLE` or `DERIVATION ONLY --
+> ASSIGNABLE` line, your attempt SPENDS it: replace that line with the
+> outcome in the same commit, or the function stays counted as fresh forever.
 >
 > **Broadcast.** Nobody can message you and you cannot message anyone. Run
 > `tools/broadcast.sh read` before each function and act on it. The moment you

@@ -459,6 +459,21 @@ its first `--all` pass names 13 of the 46 game-called SDK functions exactly
 and shows the rest come from library builds the discs do not carry, where
 position evidence has to decide.
 
+**Revision 3 (2026-09-18, after rounds 51 and 52).** Both heads escalated
+the same defects and were right. The ready-jobs list was priority-sorted, so
+at a 2-3 slot cap no round reached a stall job or track 2: it is now
+round-robin across open tracks, ranked stalls are grouped into one-unit
+runner jobs of three, and calibration is measured in attempts per model (six
+each) rather than rounds. The revision-2 claim that a whole-tree field
+rename is safe because a mis-hit fails to compile was FALSE for `unkNN`
+names (run 2 measured `unk10` at 347 sites in 50 files); the head applies
+cross-unit field renames by type scope, definition first, compiler-listed
+accessors second. `rename.py` bounds addresses by RAM, not the file image
+(bss globals were refused), and treats comment and doc mentions of the new
+name as prose, not as a collision. Whoever attempts a function with a
+`-- ASSIGNABLE` marker retires it in the same commit; the head checks at
+merge. `sdkname.py` also fingerprints game-segment stalls.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

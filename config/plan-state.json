@@ -4,7 +4,7 @@
     "naming_runner": "sonnet"
   },
   "stop_rule": {
-    "calibration_rounds": 2,
+    "attempts_per_model": 6,
     "min_matches": 3
   },
   "tracks": {

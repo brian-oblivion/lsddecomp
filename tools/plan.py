@@ -79,7 +79,7 @@ TRACK5_ITEMS = {
 }
 
 DEFAULT_STATE = {
-    "stop_rule": {"calibration_rounds": 2, "min_matches": 3},
+    "stop_rule": {"attempts_per_model": 6, "min_matches": 3},
     "models": {"match_runner": None, "naming_runner": None},
     "tracks": {
         "1": {"status": "open", "reason": "", "rounds": []},
@@ -238,38 +238,40 @@ def git_date(path):
     return out or None
 
 
-MIN_CALIBRATION_ATTEMPTS = 4
-
-
 def calibration_rounds(st):
     """The rounds that COUNT toward calibration and the stop rule: recorded
-    without --not-calibration, on the ranked stall band, with at least
-    MIN_CALIBRATION_ATTEMPTS assignments. Round 50 measured two runners on a
-    324w and a 954w FRESH body and was recorded as calibration round A; the
-    stop rule would then have parked the track on evidence that never touched
-    the small stalls (FINISHING-PLAN track 1, revision 2)."""
-    return [r for r in st["tracks"]["1"]["rounds"]
-            if r.get("calibration", True) and r.get("attempts", 0) >= MIN_CALIBRATION_ATTEMPTS]
+    without --not-calibration, i.e. their attempts came from the ranked stall
+    band. Calibration is measured in ATTEMPTS PER MODEL, not in rounds, so a
+    single three-function stall runner per round accumulates toward it (plan
+    revision 3: rounds 51 and 52 never reached a stall job at a 2-3 slot cap,
+    and a per-round threshold could never have been met)."""
+    return [r for r in st["tracks"]["1"]["rounds"] if r.get("calibration", True)]
 
 
-def match_model(st):
-    """Which model matching runners use next: alternate through calibration,
-    then whichever won on matches per runner-session."""
-    if st["models"].get("match_runner"):
-        return st["models"]["match_runner"], "set by head"
-    rounds = calibration_rounds(st)
-    k = st["stop_rule"]["calibration_rounds"]
-    if len(rounds) < k:
-        order = ["sonnet", "opus"]
-        return order[len(rounds) % 2], f"calibration round {len(rounds) + 1} of {k}"
-    per = {}
-    for r in rounds:
+def calibration_tally(st):
+    """{model: [matches, attempts]} over calibration rounds."""
+    per = {"sonnet": [0, 0], "opus": [0, 0]}
+    for r in calibration_rounds(st):
         m = r.get("model", "?")
         per.setdefault(m, [0, 0])
         per[m][0] += r.get("matches", 0)
-        per[m][1] += max(1, r.get("runners", 1))
-    best = max(per.items(), key=lambda kv: kv[1][0] / kv[1][1])
-    return best[0], "won calibration (matches per runner-session)"
+        per[m][1] += r.get("attempts", 0)
+    return per
+
+
+def match_model(st):
+    """Which model matching runners use next: Sonnet until it has its
+    calibration attempts, then Opus until it has its own, then whichever
+    produced more matches per attempt."""
+    if st["models"].get("match_runner"):
+        return st["models"]["match_runner"], "set by head"
+    need = st["stop_rule"].get("attempts_per_model", 6)
+    per = calibration_tally(st)
+    for m in ("sonnet", "opus"):
+        if per[m][1] < need:
+            return m, f"calibration: {m} has {per[m][1]}/{need} stall attempts"
+    best = max(("sonnet", "opus"), key=lambda m: per[m][0] / max(1, per[m][1]))
+    return best, "won calibration (matches per attempt)"
 
 
 def track1_status(st, fresh, stalled):
@@ -278,15 +280,15 @@ def track1_status(st, fresh, stalled):
         return t["status"], t.get("reason", "")
     if fresh == 0 and stalled == 0:
         return "done", "queue empty"
-    rounds = calibration_rounds(st)
-    k = st["stop_rule"]["calibration_rounds"]
+    per = calibration_tally(st)
+    need_att = st["stop_rule"].get("attempts_per_model", 6)
     need = st["stop_rule"]["min_matches"]
-    if len(rounds) >= k:
-        recent = rounds[-k:]
-        got = sum(r.get("matches", 0) for r in recent)
+    if all(per[m][1] >= need_att for m in ("sonnet", "opus")):
+        got = sum(v[0] for v in per.values())
+        att = sum(v[1] for v in per.values())
         if got < need:
-            return "parked", (f"stop rule: last {k} rounds produced {got} match(es), "
-                              f"fewer than {need}. Revisit only per FINISHING-PLAN track 1 revisit rule.")
+            return "parked", (f"stop rule: calibration complete, {got} match(es) in {att} stall "
+                              f"attempts, fewer than {need}. Revisits per FINISHING-PLAN track 1 still run.")
     return "open", ""
 
 
@@ -392,45 +394,74 @@ def nm_defined(unit):
     return _nm_cache[unit]
 
 
+STALLS_PER_RUNNER = 3
+
+
+def stall_runner_jobs(rows, model, label):
+    """Group ranked stalls into one-unit runner jobs of up to STALLS_PER_RUNNER,
+    in ranking order: a runner owns one unit, so the top stall's unit-mates
+    (next in rank) ride along with it."""
+    by_unit, order = {}, []
+    for words, unit, func, title in rows:
+        if unit not in by_unit:
+            by_unit[unit] = []
+            order.append(unit)
+        by_unit[unit].append((words, func))
+    jobs_ = []
+    for unit in order:
+        fs = by_unit[unit]
+        for i in range(0, len(fs), STALLS_PER_RUNNER):
+            chunk = fs[i:i + STALLS_PER_RUNNER]
+            names = ", ".join(f"{f} ({w}w)" for w, f in chunk)
+            jobs_.append(("1", f"{label} runner on {unit}: {names}", model))
+    return jobs_
+
+
 def jobs(d, n):
-    """Ready jobs across open tracks, highest value first, with a model each."""
-    out = []
+    """Ready jobs across open tracks, ROUND-ROBIN by track priority, a model each.
+
+    Revision 3. A priority-sorted list starved every track but the first: at
+    a two or three slot cap rounds 51 and 52 never reached a stall job, so
+    calibration could not record and track 2 sat unstaffed. Now each open
+    track contributes one job per turn, in this order of turns: fresh matches,
+    naming, stall runner (calibration), SDK batch, revisits, promotions,
+    types, close-out. A head with K slots takes the top K, one unit each."""
     t = d["tracks"]
-    per = max(3, n // 3)   # no single track may crowd the others out of the list
-    for words, unit, func, title in sorted(d["_fresh"]):
-        out.append(("1", f"match {func} ({unit}, {words}w, fresh)", t["1"]["next_match_model"]))
-    for unit in d["_todo3"][:per]:
+    queues = []
+    q_fresh = [("1", f"match {func} ({unit}, {words}w, fresh)", t["1"]["next_match_model"])
+               for words, unit, func, title in sorted(d["_fresh"])]
+    q_naming = []
+    for unit in d["_todo3"]:
         u = d["units"][unit]
-        out.append(("3", f"naming pass on {unit} (centrality {u['centrality']}, "
-                         f"{u['func_named']}/{u['defs']} defs unnamed, {u['unk_refs']} unk, "
-                         f"{u['slot_refs']} slot calls, {u['d_refs']} D_)", t["3"]["naming_model"]))
+        q_naming.append(("3", f"naming pass on {unit} (centrality {u['centrality']}, "
+                              f"{u['func_named']}/{u['defs']} defs unnamed, {u['unk_refs']} unk, "
+                              f"{u['slot_refs']} slot calls, {u['d_refs']} D_)", t["3"]["naming_model"]))
+    q_stall = stall_runner_jobs(d["_stalls"], t["1"]["next_match_model"], "stall") \
+        if t["1"]["status"] == "open" else []
+    q_sdk = []
     if t["2"]["unnamed"]:
         if not (ROOT / "tools/sdkname.py").exists():
-            out.append(("2", "HEAD: build tools/sdkname.py (fingerprint unnamed SDK functions against every "
-                             "object on every disc; self-check on ten placed functions) before staffing track 2",
-                        MODELS["head_when_new_procedure"]))
+            q_sdk.append(("2", "HEAD: build tools/sdkname.py before staffing track 2",
+                          MODELS["head_when_new_procedure"]))
         else:
-            out.append(("2", f"identify and name {t['2']['unnamed']} SDK functions game code calls "
-                             f"(one runner, batch; list: plan.py --json .tracks.2.unnamed_list)",
-                        MODELS["mechanical_runner"]))
-    if t["1"]["status"] == "open":
-        for words, unit, func, title in d["_stalls"][:per]:
-            out.append(("1", f"stall attempt {func} ({unit}, {words}w) :: {title[:60]}",
-                        t["1"]["next_match_model"]))
-    for words, unit, func, title in d["_revisit"][:per]:
-        out.append(("1", f"REVISIT stall {func} ({unit}, {words}w) after its unit's naming pass",
-                    t["1"]["next_match_model"]))
-    if t["1b"]["status"] == "open":
-        for words, unit, func in sorted(d["_promotable"])[:per]:
-            out.append(("1b", f"promote {func} ({unit}, {words}w) preserved body to #ifdef NON_MATCHING",
-                        MODELS["mechanical_runner"]))
-    if t["4"]["status"] == "open":
-        out.append(("4", f"unify {t['4']['local_struct_views']} unit-local struct views into shared headers, one class at a time", "opus"))
-    if t["5"]["status"] == "open":
-        for k, done in t["5"]["checklist"].items():
-            if not done:
-                out.append(("5", f"{k}: {TRACK5_ITEMS[k]}", "opus"))
-    return out[:n]
+            q_sdk.append(("2", f"identify and name {t['2']['unnamed']} SDK functions game code calls "
+                               f"(one runner, batch; list: plan.py --json .tracks.2.unnamed_list)",
+                          MODELS["mechanical_runner"]))
+    q_revisit = stall_runner_jobs(d["_revisit"], t["1"]["next_match_model"], "REVISIT")
+    q_promote = [("1b", f"promote {func} ({unit}, {words}w) preserved body to #ifdef NON_MATCHING",
+                  MODELS["mechanical_runner"])
+                 for words, unit, func in sorted(d["_promotable"])] if t["1b"]["status"] == "open" else []
+    q_types = [("4", f"unify {t['4']['local_struct_views']} unit-local struct views into shared "
+                     "headers, one class at a time", "opus")] if t["4"]["status"] == "open" else []
+    q_close = [("5", f"{k}: {TRACK5_ITEMS[k]}", "opus")
+               for k, done in t["5"]["checklist"].items() if not done] if t["5"]["status"] == "open" else []
+    queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close]
+    out = []
+    while len(out) < n and any(queues):
+        for q in queues:
+            if q and len(out) < n:
+                out.append(q.pop(0))
+    return out
 
 
 def print_status(d, n, st):
@@ -444,9 +475,10 @@ def print_status(d, n, st):
     print()
     print("  track  status     measured")
     t1 = t["1"]
-    ncal = len(calibration_rounds(st))
+    per = calibration_tally(st)
     print(f"  1      {t1['status']:<10} stall matching: {t1['fresh']} fresh, {t1['stalled']} stalled; "
-          f"{len(t1['rounds'])} round(s) recorded, {ncal} count for calibration; "
+          f"{len(t1['rounds'])} round(s) recorded; calibration sonnet {per['sonnet'][0]}/{per['sonnet'][1]} "
+          f"opus {per['opus'][0]}/{per['opus'][1]} (matches/attempts); "
           f"next runner model {t1['next_match_model']} ({t1['why']})")
     if t1["reason"]:
         print(f"                    {t1['reason']}")
@@ -533,9 +565,9 @@ def main():
             "attempts": a.attempts, "matches": a.matches, "note": a.note,
             "calibration": not a.not_calibration})
         save_state(st)
-        if not a.not_calibration and a.attempts < MIN_CALIBRATION_ATTEMPTS:
-            print(f"NOTE: {a.attempts} attempt(s) is below {MIN_CALIBRATION_ATTEMPTS}; this round "
-                  f"is recorded but does not count toward calibration or the stop rule.")
+        if not a.not_calibration:
+            print("counted toward calibration: attempts must be from the ranked stall band "
+                  "(use --not-calibration for fresh giants or revisits).")
         print(f"recorded round {a.round} on track {a.track}: {a.matches} match(es) from "
               f"{a.attempts} attempt(s) by {a.runners} {a.model} runner(s)")
         return

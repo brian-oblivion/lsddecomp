@@ -51,7 +51,9 @@ REPORTS = ROOT / "docs/match-reports"
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 PLACEHOLDER = re.compile(r"^(func|D|jtbl|jpt)_(800[0-9A-Fa-f]{5})$")
 SYMLINE = re.compile(r"^(\w+)\s*=\s*(0x[0-9A-Fa-f]+)\s*;(.*)$")
-VRAM_LO, VRAM_HI = 0x80010000, 0x8008B800
+# The whole of PS1 main RAM. The old bound was the end of the FILE image, and
+# bss lives past it: round 51 was refused `D_8008E248 -> gShadeTex`.
+VRAM_LO, VRAM_HI = 0x80010000, 0x80200000
 
 
 def text_files():
@@ -82,19 +84,35 @@ def symbol_address(name):
 
 
 def name_in_use(name):
-    """Where NEW already appears as a whole word, if anywhere."""
+    """(code_hits, prose_hits): where NEW already appears as a whole word.
+
+    Only CODE decides: src/, include/, the symbols file, and asm labels. A
+    report or doc that already uses the intended name in prose is the normal
+    state of a well-derived rename (round 51 was refused `BASICCLASS_METHODS`
+    on six such files) and is reported as a warning, not a refusal."""
     pat = re.compile(rf"\b{re.escape(name)}\b")
-    hits = []
+    code, prose = [], []
     for p in text_files():
-        if pat.search(p.read_text(errors="replace")):
-            hits.append(str(p.relative_to(ROOT)))
+        text = p.read_text(errors="replace")
+        rel = str(p.relative_to(ROOT))
+        is_code = rel.startswith(("src/", "include/", "config/"))
+        if is_code:
+            # A comment in a header saying "PROPOSED RENAME: NEW" is prose,
+            # not a definition (round 51's BASICCLASS_METHODS refusal).
+            stripped = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+            if pat.search(stripped):
+                code.append(rel)
+            elif pat.search(text):
+                prose.append(rel)
+        elif pat.search(text):
+            prose.append(rel)
     if pat.search(SYMBOLS.read_text()):
-        hits.append(str(SYMBOLS.relative_to(ROOT)))
+        code.append(str(SYMBOLS.relative_to(ROOT)))
     for p in ROOT.glob("asm/**/*.s"):
         if re.search(rf"^glabel {re.escape(name)}$|^dlabel {re.escape(name)}$",
                      p.read_text(errors="replace"), re.M):
-            hits.append(str(p.relative_to(ROOT)))
-    return hits
+            code.append(str(p.relative_to(ROOT)))
+    return code, prose
 
 
 def is_text_symbol(addr):
@@ -136,9 +154,12 @@ def main():
     if not (VRAM_LO <= addr < VRAM_HI):
         sys.exit(f"FATAL: {old!r} resolves to {addr:#x}, outside the image")
 
-    used = name_in_use(new)
-    if used:
-        sys.exit(f"FATAL: {new!r} already appears in: " + ", ".join(used[:6]))
+    code_hits, prose_hits = name_in_use(new)
+    if code_hits:
+        sys.exit(f"FATAL: {new!r} already exists in code: " + ", ".join(code_hits[:6]))
+    if prose_hits:
+        print(f"note: {new!r} already appears in prose ({len(prose_hits)} file(s): "
+              + ", ".join(prose_hits[:3]) + "); those mentions are left as they are.")
 
     pat = re.compile(rf"\b{re.escape(old)}\b")
     touched = [p for p in text_files() if pat.search(p.read_text(errors="replace"))]
