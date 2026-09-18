@@ -117,8 +117,8 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
     if (!func_8001F3A4(self->unk20)) {
         return;
     }
-    self->methods->slot8C(self, buf);
-    self->methods->slot90(self, (GenericCountList_d294 *)buf, a1);
+    self->methods->readUnk20Data(self, buf);
+    self->methods->transformAndNotifyParents(self, (GenericCountList_d294 *)buf, a1);
 }
 
 /* Forwards self->unk20 (still opaque, retyped `void *` this round -- see
@@ -158,7 +158,7 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
     switch (a2) {
     case 2:
     case 3:
-        self->methods->slotA0(self);
+        self->methods->tryAttachNearby(self);
         break;
     case 4:
         self->unk28 = a1;
@@ -241,12 +241,12 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     diff.z = diffRaw.z;
 
     count = other->unk30->unk0;
-    self->methods->slotA4(self, &diff, buf54, &other->unk30->unk4, count * 8);
+    self->methods->composeAndApplyRotation(self, &diff, buf54, &other->unk30->unk4, count * 8);
 
-    if (!self->methods->slotA8(self, &count, &diff)) {
+    if (!self->methods->checkBoundsOverlap(self, &count, &diff)) {
         return;
     }
-    if (!self->methods->slotAC(self, other->unk2C, &diff, &count)) {
+    if (!self->methods->classifyAgainstPlanes(self, other->unk2C, &diff, &count)) {
         return;
     }
 
@@ -267,7 +267,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
     u8 buf1[0x20];
     UnkOwner_d294 *node;
 
-    self->methods->slot84(self, buf1, 1);
+    self->methods->getRotMatrix(self, buf1, 1);
 
     node = self->unkC;
     if (node != NULL) {

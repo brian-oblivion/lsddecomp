@@ -466,15 +466,15 @@ struct Class6B5CCMethods {
      * (code_d294_b) calls the same slot on `self` itself, and
      * UnkOwnerMethods_d294's own +0x084 has the same number and shape --
      * likely a shared ancestor method. */
-    void (*slot84)(Class6B5CCObj *self, void *out, s32 arg2);
+    void (*getRotMatrix)(Class6B5CCObj *self, void *out, s32 arg2);
     u8 pad088[0x08C - 0x088];
     /* +0x08C/+0x090, round 13 (Class6B5CC__NotifyIfUnk20Active's own call site): dispatched
      * as `(self, dest)` and `(self, a1, a2)` respectively, matching
      * Class6B5CC__ReadUnk20Data/Class6B5CC__TransformAndNotifyParents's own direct-call prototypes below
      * exactly (both already matched, code_d294_b) -- `tools/classtable.py
      * D_8006B5CC` confirms they occupy these two slots. */
-    void (*slot8C)(Class6B5CCObj *self, void *dest); /* +0x08C, Class6B5CC__ReadUnk20Data */
-    void (*slot90)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, Class6B5CC__TransformAndNotifyParents */
+    void (*readUnk20Data)(Class6B5CCObj *self, void *dest); /* +0x08C, Class6B5CC__ReadUnk20Data */
+    void (*transformAndNotifyParents)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, Class6B5CC__TransformAndNotifyParents */
     /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
      * triple -- func_8001CD60 (code_d294) dispatches to exactly one of
      * these three depending on `other->methods->header & 0xF` (2 -> +0x094,
@@ -487,23 +487,23 @@ struct Class6B5CCMethods {
      * only `self`, per that function's own disassembly (`jalr $v0` with
      * `$a0` untouched since function entry). Class6B5CC__TryAttachNearby (still queued)
      * is this slot's occupant per `tools/classtable.py D_8006B5CC`. */
-    void (*slotA0)(Class6B5CCObj *self);
+    void (*tryAttachNearby)(Class6B5CCObj *self);
     /* +0x0A4, round 13 (Class6B5CC__TryAttachNearby's own call site): this slot's
      * occupant is Class6B5CC__ComposeAndApplyRotation itself (`tools/classtable.py D_8006B5CC`),
      * already matched this round -- dispatched indirectly (through the
      * vtable, not a direct `jal`) since the slot is polymorphic even
      * though this class's own table happens to point at it. Signature
      * matches Class6B5CC__ComposeAndApplyRotation's own exactly. */
-    void (*slotA4)(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
+    void (*composeAndApplyRotation)(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
     /* +0x0A8, occupant Class6B5CC__CheckBoundsOverlap (still queued this round). Return
      * value IS tested by this call site (truthy -> continue, falsy ->
      * early return), so non-void. */
-    s32 (*slotA8)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
+    s32 (*checkBoundsOverlap)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
     /* +0x0AC, occupant Class6B5CC__ClassifyAgainstPlanes -- the documented gp_rel blocker
      * (docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md), NOT decompiled by this
      * runner. Typed here only for this call site's own dispatch shape;
      * return value is also tested truthy/falsy like slotA8's. */
-    s32 (*slotAC)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2, void *arg3);
+    s32 (*classifyAgainstPlanes)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2, void *arg3);
 };
 
 /* MEASURED: GetClass6B5CCMethods's whole body is `lui/addiu %hi/%lo(D_8006B5CC);

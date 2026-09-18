@@ -31,7 +31,7 @@
 void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Vec3_d294 *dst, s16 *src) {
     u8 buf[0x20];
 
-    self->methods->slot84(self, buf, 0);
+    self->methods->getRotMatrix(self, buf, 0);
     dst->x = src[0];
     dst->y = src[1];
     dst->z = src[2];
@@ -54,7 +54,7 @@ void Class6B5CC__LocalOffsetToWorldPos(Class6B5CCObj *self, s32 *dst, s32 *src) 
     u8 buf[0x20];
     s32 *table;
 
-    self->methods->slot84(self, buf, 0);
+    self->methods->getRotMatrix(self, buf, 0);
     ApplyMatrixToLVArray(dst, src, 1, buf);
 
     table = self->unkC != 0 ? self->unk14->unk38 : 0;
@@ -167,7 +167,7 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     delta[1] = (u16)arg2[1] - (u16)table[1];
     delta[2] = (u16)arg2[2] - (u16)table[2];
 
-    self->methods->slotA4(self, 0, buf18, delta, 1);
+    self->methods->composeAndApplyRotation(self, 0, buf18, delta, 1);
 
     delta[0] = buf18[0];
     delta[1] = (u16)buf18[1] - 0x400;
