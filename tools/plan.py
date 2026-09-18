@@ -204,20 +204,45 @@ def all_symbols():
     return syms
 
 
+def parked_sdk_names():
+    """func_ names the track-2 park rule has closed: their symbols-file line, or
+    the comment line right above it, says `unidentified` (round 53 parked 44
+    this way and plan.py kept re-offering them as the top track-2 job)."""
+    parked, block = set(), []      # block: the contiguous comment lines above
+    for line in (ROOT / "config/symbols.slps01556.lsdde.txt").read_text().splitlines():
+        m = re.match(r"^\s*(func_800[0-9A-Fa-f]{5})\s*=", line)
+        if m:
+            if "unidentified" in line or any("unidentified" in b for b in block):
+                parked.add(m.group(1))
+            block = []
+        elif line.strip().startswith("//"):
+            block.append(line)
+        else:
+            block = []
+    return parked
+
+
 def sdk_surface(info, units):
-    """Functions game code calls that live in Psy-Q segments: named vs func_."""
+    """Functions game code calls that live in Psy-Q segments: named vs func_,
+    minus the ones the park rule has closed."""
     info = {n: (a, 0) for n, a in all_symbols().items()} or info
     referenced = set()
     for c in srcpath.src_files():
         live = progress.strip_dead_code(c.read_text(errors="replace"))
         referenced.update(re.findall(r"\b([A-Za-z_]\w*)\s*\(", live))
-    named, unnamed = [], []
+    named, unnamed, parked = [], [], []
+    closed = parked_sdk_names()
     for name in sorted(referenced):
         a = info.get(name, (None, 0))[0]
         if a is None or not progress.is_library(a):
             continue
-        (unnamed if FUNC_PH.match(name) else named).append(name)
-    return named, unnamed
+        if not FUNC_PH.match(name):
+            named.append(name)
+        elif name in closed:
+            parked.append(name)
+        else:
+            unnamed.append(name)
+    return named, unnamed, parked
 
 
 def report_state(func):
@@ -296,7 +321,7 @@ def collect(st):
     pj = run_json([sys.executable, "tools/progress.py", "--json"])
     info = progress.text_symbols()
     units = unit_metrics(info)
-    named_sdk, unnamed_sdk = sdk_surface(info, units)
+    named_sdk, unnamed_sdk, parked_sdk = sdk_surface(info, units)
     rows = nearmiss_rows()
 
     fresh_funcs, stall_rows, promotable = [], [], []
@@ -319,13 +344,25 @@ def collect(st):
                    key=lambda u: (-units[u]["centrality"], -units[u]["func_named"]))
     pct3 = len(done) / max(1, len(units))
 
-    # track 1 revisit: stalls in units whose naming pass finished AFTER the
-    # stall's report was last touched
+    # Stall ordering: nearmiss ranks by size; a stall attempted last round
+    # returned to the top the moment the round ended (rounds 53, 54). The
+    # cheapest mechanical proxy for "shallowest history" is the report's last
+    # git touch: least recently touched first, size second.
+    dated = [(git_date(REPORTS / f"{func}.md") or "0000", words, unit, func, title)
+             for words, unit, func, title in stall_rows]
+    dated.sort()
+    stall_rows = [(w, u, f, t) for _, w, u, f, t in dated]
+
+    # track 1 revisit: every stall in a unit that has passed track 3, exactly
+    # once: the runner writes REVISITED into the report, and that is what
+    # retires it. (Revision 3 dated it from the report's git date, which
+    # rename.py moves during the very naming pass that should trigger it, so
+    # no revisit was ever listed.)
     revisit = []
     for words, unit, func, title in stall_rows:
         if unit in done:
-            rd = git_date(REPORTS / f"{func}.md")
-            if rd and rd < done[unit]:
+            rp = REPORTS / f"{func}.md"
+            if rp.exists() and "REVISITED" not in rp.read_text(errors="replace"):
                 revisit.append((words, unit, func, title))
 
     t4 = st["tracks"]["4"]
@@ -364,7 +401,8 @@ def collect(st):
             "1b": {"status": t1b_status, "promotable": len(promotable),
                    "nm_bodies": sum(u["nm_bodies"] for u in units.values())},
             "2": {"status": st["tracks"]["2"]["status"] if unnamed_sdk else "done",
-                  "named": len(named_sdk), "unnamed": len(unnamed_sdk), "unnamed_list": unnamed_sdk},
+                  "named": len(named_sdk), "unnamed": len(unnamed_sdk), "parked": len(parked_sdk),
+                  "unnamed_list": unnamed_sdk},
             "3": {"status": "done" if not todo3 else st["tracks"]["3"]["status"],
                   "units_total": len(units), "units_done": len(done),
                   "func_named_defs": sum(u["func_named"] for u in units.values()),
@@ -486,7 +524,8 @@ def print_status(d, n, st):
         print(f"                    {t1['revisit']} stall(s) eligible for a post-naming REVISIT")
     print(f"  1b     {t['1b']['status']:<10} NON_MATCHING bodies: {t['1b']['nm_bodies']} in src, "
           f"{t['1b']['promotable']} stall(s) with a preserved body and none yet")
-    print(f"  2      {t['2']['status']:<10} SDK call surface: {t['2']['named']} named, {t['2']['unnamed']} still func_")
+    print(f"  2      {t['2']['status']:<10} SDK call surface: {t['2']['named']} named, "
+          f"{t['2']['unnamed']} still func_, {t['2']['parked']} parked (unidentified, done for this track)")
     t3 = t["3"]
     print(f"  3      {t3['status']:<10} readability: {t3['units_done']}/{t3['units_total']} units passed; "
           f"{t3['func_named_defs']}/{t3['defs']} defs still func_; {t3['unk_refs']} unk refs, "
@@ -535,9 +574,9 @@ def main():
     r.add_argument("--matches", type=int, required=True)
     r.add_argument("--note", default="")
     r.add_argument("--not-calibration", action="store_true",
-                   help="this round did not take >=4 assignments from the ranked stall band "
-                        "(e.g. it worked fresh giants); it is recorded but does not count "
-                        "toward calibration or the stop rule")
+                   help="this round's attempts were NOT from the ranked stall band (fresh "
+                        "giants, revisits); recorded, but not counted toward calibration "
+                        "or the stop rule. Any number of band attempts counts, even one.")
     m = sub.add_parser("mark-unit")
     m.add_argument("--unit", required=True)
     m.add_argument("--undo", action="store_true")
@@ -565,9 +604,9 @@ def main():
             "attempts": a.attempts, "matches": a.matches, "note": a.note,
             "calibration": not a.not_calibration})
         save_state(st)
-        if not a.not_calibration:
-            print("counted toward calibration: attempts must be from the ranked stall band "
-                  "(use --not-calibration for fresh giants or revisits).")
+        if a.track == "1" and not a.not_calibration:
+            print("counted toward calibration (attempts from the ranked stall band; "
+                  "use --not-calibration for fresh giants or revisits).")
         print(f"recorded round {a.round} on track {a.track}: {a.matches} match(es) from "
               f"{a.attempts} attempt(s) by {a.runners} {a.model} runner(s)")
         return

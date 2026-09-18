@@ -19,8 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 3 (2026-09-18, after rounds 51 and 52: starved calibration,
-the false field-rename guarantee, two rename.py refusals, unretired markers).
+Plan revision: 4 (2026-09-18, after rounds 53 and 54: plan.py could not see
+parked SDK functions, spent stalls or revisits; the track 2 header rule
+contradicted the codebase).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -207,10 +208,16 @@ fingerprint above the threshold the tool's self-check established:
 
 **Recording.** The name goes in the symbols file via `tools/rename.py` with a
 trailing comment: `// identified: fingerprint 0.96 vs libsnd/ss_xxx.o (3.3), header LIBSND.H`.
-The Psy-Q header already declares it, so the game unit must include that
-header; a signature conflict is a finding, not a nuisance. Byte-exact after
-every rename. A function with no evidence keeps `func_` and gets a comment
-naming the library block it sits in.
+Declare it where the game calls it as a local `extern` copied from the Psy-Q
+header's prototype, citing the header in a comment. Game units do NOT include
+`psyq/*.H` and shared project headers do NOT carry Sony prototypes: that is
+the `conflicting types` collision CLAUDE.md warns about, and
+`include/code_2cc8c.h`'s "NO LONGER DECLARED HERE" notes are the precedent.
+A call site whose argument shape disagrees with the prototype is a finding,
+not a nuisance. Byte-exact after every rename. A function with no evidence
+keeps `func_` and gets a `// <library>, unidentified:` comment on the line
+above its symbols-file entry; `plan.py` reads that comment and stops offering
+the function.
 
 **Runner** (Sonnet), prompt in §4.4. **Done** when `plan.py` reports zero
 unnamed. **Park rule:** a function whose best candidate is below the bar and
@@ -233,8 +240,11 @@ propagates everywhere.
    comment and reports.
 2. Name functions with `tools/rename.py` (one command: symbols file, sources,
    report file, extract, verify). Never by hand.
-3. Name struct fields and vtable slots. Ownership is decided per FIELD, not
-   per header, by who accesses it (`grep -rn -- '->oldName\b\|\.oldName\b' src/`):
+3. Name struct fields and vtable slots. (Functions and globals are NOT
+   subject to this rule: `rename.py` renames a symbol tree-wide whoever calls
+   it, because a symbol name is unique. Only FIELDS and SLOTS share names
+   across structs.) Ownership is decided per FIELD, not per header, by who
+   accesses it (`grep -rn -- '->oldName\b\|\.oldName\b' src/`):
    - accessed only from your unit: rename it yourself, in the header and in
      your unit, whatever header it lives in;
    - accessed from other units too: do NOT rename. Put the proposed name, its
@@ -423,9 +433,10 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > plan.py>`: run `python3 tools/sdkname.py <func>`, gather the evidence kinds
 > the track lists, and name it ONLY if the evidence rule is met, with
 > `python3 tools/rename.py <func> <SonyName>` and the identification comment
-> in the symbols file. Include the Psy-Q header in the calling unit if it is
-> not already; a signature conflict is a FINDING to report, not to paper
-> over. `./build-and-verify.sh` green after each. A function below the
+> in the symbols file. Declare it at the call site as a local `extern` copied
+> from the Psy-Q header prototype (never include `psyq/*.H` in a game unit,
+> never put a Sony prototype in a shared header); a call site that disagrees
+> with the prototype is a FINDING to report, not to paper over. `./build-and-verify.sh` green after each. A function below the
 > evidence bar keeps `func_` and gets a `// <library>, unidentified: <best
 > candidate and score>` comment. One commit per function. Report a table:
 > function, name or unidentified, evidence, disc and module.

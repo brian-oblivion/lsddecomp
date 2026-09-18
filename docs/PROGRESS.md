@@ -709,6 +709,21 @@ name as prose, not as a collision. Whoever attempts a function with a
 `-- ASSIGNABLE` marker retires it in the same commit; the head checks at
 merge. `sdkname.py` also fingerprints game-segment stalls.
 
+**Revision 4 (2026-09-18, after rounds 53 and 54).** Three tool blind spots,
+all in `plan.py`, all fixed there rather than in prose: functions the track 2
+park rule closed (the `unidentified` comment in the symbols file) were still
+counted and re-offered as the top track 2 job; a stall attempted last round
+returned to the top of the stall list the moment the round ended, so stall
+runner jobs are now ordered least-recently-touched first; and REVISIT
+eligibility was dated from the report's git date, which `rename.py` moves in
+the very naming pass that should trigger it, so no revisit was ever listed.
+Revisits are now every stall in a passed unit whose report lacks the
+`REVISITED` line the runner writes. The track 2 rule to include the Psy-Q
+header in the calling unit contradicted the codebase precedent (local
+`extern` at the call site, no `psyq/*.H` in game units, no Sony prototype in
+a shared header) and now states the precedent. Step 3's ownership rule says
+explicitly that it covers fields and slots, not functions or globals.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).
