@@ -1,4 +1,4 @@
-> Renamed from `func_80026CFC` on 2026-09-18 (tools/rename.py). Address 0x80026cfc.
+> Renamed from `SetActiveDataSource` on 2026-09-18 (tools/rename.py). Address 0x80026cfc.
 
 # SetActiveDataSource -- 3 words long (38 vs 35) -- 1/35 raw word match -- first real diff at vram 0x80026D00
 
@@ -58,14 +58,14 @@ assignment (undefined behavior), not a legitimate reshape.
 ## What it does
 
 Dispatches on `gActiveDataSource` to pick one of two "ret" objects
-(`GetClass6D4E8Methods()` if `arg0 == 0x13`, else `func_8002C438()`), stores `arg0`
+(`GetClass6D4E8Methods()` if `arg0 == 0x13`, else `GetVabDriverMethods()`), stores `arg0`
 into `gActiveDataSource`, then walks the function-pointer table `D_8006D4AC`
 (14 entries + a NULL sentinel, confirmed in `asm/data/5DB70.data.s`),
 calling `Class6D430__CopyFields(val, ret)` before EVERY table read (including the
 first, before any table entry is even inspected), and — for every NON-NULL
 entry — calling that entry as `val = entry(val)` before advancing to the
 next slot and repeating. All 4 callees are cross-unit: `GetClass6D4E8Methods` /
-`func_8002C438` are shared with `GetActiveDataSourceMethods` (see that report), and the
+`GetVabDriverMethods` are shared with `GetActiveDataSourceMethods` (see that report), and the
 14 table entries are ordinary game functions elsewhere in the image.
 
 ## Residue -- this is a genuine register-allocation puzzle, not a control-flow miss
@@ -155,7 +155,7 @@ void SetActiveDataSource(s32 arg0) {
     if (arg0 == 0x13) {
         ret = GetClass6D4E8Methods();
     } else {
-        ret = func_8002C438();
+        ret = GetVabDriverMethods();
     }
     entry = D_8006D4AC;
     for (val = GetClass6D430Methods(); ; val = fn(val)) {
@@ -169,7 +169,7 @@ void SetActiveDataSource(s32 arg0) {
 }
 ```
 
-(`extern s32 gActiveDataSource;`, `extern void *func_8002C438(void);` and
+(`extern s32 gActiveDataSource;`, `extern void *GetVabDriverMethods(void);` and
 `extern void *GetClass6D4E8Methods(void);` are declared once earlier in this file,
 above `GetActiveDataSourceMethods`.)
 
@@ -202,10 +202,10 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026CFC` | `SetActiveDataSource` | B (STALL -- named without matching) |
+| `SetActiveDataSource` | `SetActiveDataSource` | B (STALL -- named without matching) |
 
 **Evidence.** Stores the new mode into `gActiveDataSource`, resolves the
-newly-active source's vtable (the same `GetClass6D4E8Methods`/`func_8002C438`
+newly-active source's vtable (the same `GetClass6D4E8Methods`/`GetVabDriverMethods`
 pair `GetActiveDataSourceMethods` uses), then walks a table of 14 callbacks,
 calling `Class6D430__CopyFields(val, ret)` before each and threading each
 non-NULL entry's return value into the next call. The control flow and every
@@ -215,11 +215,11 @@ ground to name the operation ("install a new active data source, and refresh
 every registered client with it") even though the function itself is not
 byte-exact. Per the brief, named without attempting to match it.
 
-**Global renamed alongside it.** `D_8008A84C` -> `gActiveDataSource` (tier B):
-this function's own `D_8008A84C = arg0;` write is the clearest evidence for
+**Global renamed alongside it.** `gActiveDataSource` -> `gActiveDataSource` (tier B):
+this function's own `gActiveDataSource = arg0;` write is the clearest evidence for
 what the global holds -- a mode tag whose two observed values (`0x13`,
 `0x23`) are exactly the header words of the two sibling classes it selects
-between (`D_8006D4E8` and `D_8006D9BC`; confirmed by `tools/classtable.py`).
+between (`D_8006D4E8` and `gVabDriverMethods`; confirmed by `tools/classtable.py`).
 Every other function in this unit that reads it forwards to one sibling's
 real implementation or the other's fallback, which is where the whole
 `ActiveDataSource` naming family comes from.

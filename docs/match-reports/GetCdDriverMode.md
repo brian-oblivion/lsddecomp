@@ -50,7 +50,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence for the function.** It is the read half of `SetCdDriverMode`:
 it returns `gCdAsyncEnabled` and, through an optional out-parameter, the
 second value that function stored. `code_171e0.c`'s `GetActiveDataSourceDriverMode` routes to
-it for the CD source and to `func_8002C448` for the sound source -- and that
+it for the CD source and to `GetVabDriverMode` for the sound source -- and that
 function is the same shape over that source's own two globals, which
 independently confirms "read back the two mode values" rather than anything
 specific to the CD. Tier B: the pairing is certain, the second value is not.

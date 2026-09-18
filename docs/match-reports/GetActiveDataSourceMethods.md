@@ -1,4 +1,4 @@
-> Renamed from `func_80026CAC` on 2026-09-18 (tools/rename.py). Address 0x80026cac.
+> Renamed from `GetActiveDataSourceMethods` on 2026-09-18 (tools/rename.py). Address 0x80026cac.
 
 # GetActiveDataSourceMethods
 
@@ -25,7 +25,7 @@ beq   $v1, $v0, .L80026CD0     # gActiveDataSource == 0x23 -> the "then" arm
   jal GetClass6D4E8Methods             # fallthrough (not equal) -- called first in ROM order
   j .L80026CD8
 .L80026CD0:
-  jal func_8002C438             # equal-to-0x23 arm
+  jal GetVabDriverMethods             # equal-to-0x23 arm
 .L80026CD8:
   <epilogue, returns whatever $v0 holds>
 ```
@@ -35,8 +35,8 @@ direct reading `if (cond) A(); else B();` is the right mapping (not the
 inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
 try, with the straightforward `if`/`else` written in source order.
 
-`func_8002C438` is confirmed elsewhere in the repo
-(`src/code_179d8_e.c`: `TableD9BC *func_8002C438(void) { return &D_8006D9BC; }`)
+`GetVabDriverMethods` is confirmed elsewhere in the repo
+(`src/code_179d8_e.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetClass6D4E8Methods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
@@ -48,12 +48,12 @@ each unit's own independent local type -- this report follows the same
 
 ```c
 extern s32 gActiveDataSource;
-extern void *func_8002C438(void);
+extern void *GetVabDriverMethods(void);
 extern void *GetClass6D4E8Methods(void);
 
 void *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == 0x23) {
-        return func_8002C438();
+        return GetVabDriverMethods();
     } else {
         return GetClass6D4E8Methods();
     }
@@ -81,11 +81,11 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026CAC` | `GetActiveDataSourceMethods` | B |
+| `GetActiveDataSourceMethods` | `GetActiveDataSourceMethods` | B |
 
-**Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return func_8002C438();
+**Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return GetVabDriverMethods();
 else return GetClass6D4E8Methods();` -- returns whichever of the two sibling
 data-source classes' vtables is currently active. Part of the family of
 `ActiveDataSource`-named wrappers this round derived from `gActiveDataSource`
-(the renamed `D_8008A84C`); see that global's own naming note. Mechanics
+(the renamed `gActiveDataSource`); see that global's own naming note. Mechanics
 fully known; which higher-level system decides the active source is not.

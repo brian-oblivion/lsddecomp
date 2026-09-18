@@ -1,11 +1,13 @@
-# func_8002CB18 -- MATCHED (16/16 words)
+> Renamed from `func_8002CB18` on 2026-09-18 (tools/rename.py). Address 0x8002cb18.
+
+# VabStreamObj__StopVoice -- MATCHED (16/16 words)
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-s32 func_8002CB18(ObjDA34 *self, s32 index) {
+s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 index) {
     if (index < 0x18) {
         func_80031890(index);
     } else {
@@ -21,13 +23,12 @@ Byte-exact, 16/16 words.
 
 ## Notes
 
-`D_8006DA34`'s vtable slot +0x084. `self` is unused in the body -- confirmed
+`gVabStreamObjMethods`'s vtable slot +0x084. `self` is unused in the body -- confirmed
 by the actual instructions only ever reading `$a1` (the second argument
-register), never `$a0`. Its only caller is the vtable slot itself
-(`func_8002CC84`, this unit), which passes `(self, arr[i].field0)` -- two
-args -- so the unused-`self` parameter has to stay in the C signature or
-`index` would land in `$a0` instead of `$a1` and every access would be
-wrong.
+register), never `$a0`. Its only caller is `FlushSoundCueSet` (this unit),
+which passes `(self, slots[i].index)` -- two args -- so the unused-`self`
+parameter has to stay in the C signature or `index` would land in `$a0`
+instead of `$a1` and every access would be wrong.
 
 Both call targets' (`func_80031890`, `func_80031F3C`) return values are
 discarded -- retail unconditionally sets `$v0 = -1` after either branch --
@@ -56,3 +57,20 @@ setup right before a `jal` is retail's tell that the callee's parameter is
 local. Getting the callee's declared width right can also fix an unrelated-
 looking early-function register-allocation difference, not just the
 instructions at the call site itself.
+
+## Naming
+
+Renamed `func_8002CB18` -> `VabStreamObj__StopVoice`, tier B. Confirmed
+`gVabStreamObjMethods`'s own +0x084 slot; called from `FlushSoundCueSet`
+for every populated sound-cue slot, always returning `-1` (the SoundCueSlot
+free/sentinel value), so it reads as "release/stop whatever `index`
+refers to." The `0x18` branch boundary is the concrete tell: 0x18 == 24,
+the PS1 SPU's own hardware voice count -- named `SPU_VOICE_COUNT` in
+`src/code_179d8_e.c` (FINISHING-PLAN track 3 step 4: replace an
+established magic constant with a named one) -- so `index < SPU_VOICE_COUNT`
+is "a real SPU voice number" and the `else` arm (`func_80031F3C(0)`,
+uncarved) is a
+fallback for anything else. Tier B, not A: `func_80031890`/`func_80031F3C`
+are both still uncarved and unnamed, so the exact stop mechanism (per-voice
+key-off vs. something else) isn't independently confirmed from this unit
+alone.

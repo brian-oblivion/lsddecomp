@@ -392,7 +392,7 @@ extern void *func_80017B34(s32 size);
  * allocates a 0x64-byte instance and, on success, ctors it with the single
  * forwarded argument. Only call site here is func_8004A19C, which stores
  * the result straight into `Obj865C8::subB` (`SubObjB *`). */
-extern SubObjB *func_8002C480(s32 arg1);
+extern SubObjB *New_VabStreamObj(s32 arg1);
 
 /* Rodata symbols right next to this unit's own D_80086668/D_800865C8
  * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before D_80086668

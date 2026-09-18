@@ -75,7 +75,7 @@ from this table bottoms out in Psy-Q libcd (`CdSearchFile`, `CdRead`,
 `CdControlF`, `CdSync`, `CdFlush`, `CdPosToInt`/`CdIntToPos`), its objects
 cache a disc position and a byte size, and `code_171e0.c` selects this
 class's module functions only when `gActiveDataSource == 0x13`, this table's own
-header word -- the other value that gate takes, `0x23`, is `D_8006D9BC`, the
+header word -- the other value that gate takes, `0x23`, is `gVabDriverMethods`, the
 SPU/VAB streamer in `code_179d8_e.c`. So the two are interchangeable data
 sources behind one dispatch layer, and this one is the CD-ROM source.
 

@@ -451,7 +451,7 @@ void func_8005966C(DreamSys *this, s32 arg1)
 	}
 }
 
-extern void func_8002CC34(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
+extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
 
 void func_800596E8(DreamSys *this, s32 arg1)
 {
@@ -471,7 +471,7 @@ void func_800596E8(DreamSys *this, s32 arg1)
 		this->callback_0x98 = vt->func_8005A0B0;
 		this->unk_0xC4 = 1;
 		this->unk_0xC8 = 1;
-		func_8002CC34(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->func_8005A1F4);
+		InitSoundCueSet(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->func_8005A1F4);
 		break;
 	}
 }
@@ -779,7 +779,7 @@ void func_8005A134(DreamSys *this, s32 arg1)
 	this->unk_0xC4 = 0;
 	this->unk_0xC8 = arg1;
 	if (arg1 != 0)
-		func_8002CC84(this->unk_0x58, this->unk_0xCC);
+		FlushSoundCueSet(this->unk_0x58, this->unk_0xCC);
 }
 
 s32 func_8005A168(DreamSys *this, s32 value)

@@ -5,7 +5,7 @@ The pin is still `-G0` everywhere. maspsx gained `--gp-symbols=FILE`
 (`tools/patches/maspsx-lsd-flags.patch`), the Makefile passes
 `config/gp-symbols.txt`, the whole image is byte-exact with it on, and three
 previously blocked functions match (`func_800270AC` 3/3, `func_800270B8` 3/3,
-`func_8002C468` 4/4). Everything below the RESOLVED section is the historical
+`SetVabDriverMode` 4/4). Everything below the RESOLVED section is the historical
 record, kept because the diagnosis it reaches is wrong in an instructive way.**
 
 ## RESOLVED — what the blocker actually was

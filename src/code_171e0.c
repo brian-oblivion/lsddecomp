@@ -8,7 +8,7 @@
  * D_8006D4E8 (the CD-ROM read driver, code_179d8_q.c) shares its own
  * +0x004/+0x05C/+0x060/+0x064 slots with it verbatim (DestroyChained/
  * Class6D430__FreeBuffer/NoOp/Class6D430__SetFlag), so this is a real shared
- * base for at least that sibling, and plausibly for D_8006D9BC too (the
+ * base for at least that sibling, and plausibly for gVabDriverMethods too (the
  * SPU/VAB streamer, code_179d8_e.c).
  *
  * Most of this unit's remaining functions dispatch between those same two
@@ -29,7 +29,7 @@
 
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: D_8006D4E8 (the CD-ROM read driver,
- * code_179d8_q.c) and D_8006D9BC (the SPU/VAB streamer, code_179d8_e.c). */
+ * code_179d8_q.c) and gVabDriverMethods (the SPU/VAB streamer, code_179d8_e.c). */
 #define DATASOURCE_CD  0x13
 #define DATASOURCE_SPU 0x23
 
@@ -115,12 +115,12 @@ void *GetClass6D430Methods(void) {
 }
 
 extern s32 gActiveDataSource;
-extern void *func_8002C438(void);
+extern void *GetVabDriverMethods(void);
 extern void *GetClass6D4E8Methods(void);
 
 void *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == DATASOURCE_SPU) {
-        return func_8002C438();
+        return GetVabDriverMethods();
     } else {
         return GetClass6D4E8Methods();
     }
@@ -203,13 +203,13 @@ s32 GetActiveDataSourceState(void) {
 }
 
 typedef s32 (*Func80026F34Fn)(s32, s32, s32);
-extern s32 func_8002C468(s32 arg0, s32 arg1, s32 arg2);
+extern s32 SetVabDriverMode(s32 arg0, s32 arg1, s32 arg2);
 extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
 
 void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
     Func80026F34Fn fn;
 
-    fn = func_8002C468;
+    fn = SetVabDriverMode;
     if (gActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
@@ -218,13 +218,13 @@ void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
 }
 
 extern s32 GetCdDriverMode(void);
-extern s32 func_8002C448(void);
+extern s32 GetVabDriverMode(void);
 
 s32 GetActiveDataSourceDriverMode(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdDriverMode();
     } else {
-        return func_8002C448();
+        return GetVabDriverMode();
     }
 }
 
