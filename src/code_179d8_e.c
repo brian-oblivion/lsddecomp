@@ -1,11 +1,11 @@
 /*
  * ROUND 43 UPDATE (2026-09-15): the round-17 `gp_rel` cluster named below is
- * now FULLY MATCHED.  All eight functions (`func_8002C448`, `func_8002C468`,
- * `func_8002C4E0`, `func_8002C638`, `func_8002C6FC`, `func_8002C890`,
- * `func_8002CC1C`, `func_8002CC28`) closed byte-exact once round 42's
+ * now FULLY MATCHED.  All eight functions (`GetVabDriverMode`, `SetVabDriverMode`,
+ * `VabStreamObj__VabStreamObj`, `VabStreamObj__Close`, `VabStreamObj__Update`, `VabStreamObj__LoadVagAttrs`,
+ * `GetOpenVabCount`, `func_8002CC28`) closed byte-exact once round 42's
  * `--gp-symbols`/`--no-nop-mflo-mfhi` maspsx flags resolved the blocker --
  * see each function's own `docs/match-reports/<func>.md` for the derivation.
- * `func_8002CA3C` is this unit's one remaining `INCLUDE_ASM` as of round 43
+ * `VabStreamObj__PlayTone` is this unit's one remaining `INCLUDE_ASM` as of round 43
  * -- it was never part of the retracted gp_rel cluster and was out of this
  * round's assigned work list.
  *
@@ -26,19 +26,19 @@
  * class-framework code" note from code_179d8_b/_d's sibling findings, but
  * that finding does NOT hold for THIS slice.  `tools/classtable.py --scan`
  * hits both D_8006D9BC (29 slots, header 0x00000023) and D_8006DA34 (39
- * slots, header 0x00000A03) as real class tables.  func_8002C824's and
- * func_8002CC84's self objects load `*self` (offset 0, the methods pointer)
+ * slots, header 0x00000A03) as real class tables.  VabStreamObj__OnBodyReady's and
+ * FlushSoundCueSet's self objects load `*self` (offset 0, the methods pointer)
  * and dereference table slots at exactly the offsets `classtable.py D_8006DA34`
- * prints for func_8002C890 (+0x7C) and func_8002CB18 (+0x84) -- direct
+ * prints for VabStreamObj__LoadVagAttrs (+0x7C) and VabStreamObj__StopVoice (+0x84) -- direct
  * confirmation this is genuine self->methods->slotN(self, ...) dispatch, not
  * driver code.  D_8006D9BC and D_8006DA34 share the same BasicClass tail
  * (slots +0x10..+0x38), so they are two related classes off the same base --
- * confirmed round 43 as a PS1 SPU/VAB sound-streaming object: `func_8002C4E0`
- * is its constructor, `func_8002C638` its close, `func_8002C6FC` its
- * per-frame poll (header/body transfer state machine), and `func_8002C890`
+ * confirmed round 43 as a PS1 SPU/VAB sound-streaming object: `VabStreamObj__VabStreamObj`
+ * is its constructor, `VabStreamObj__Close` its close, `VabStreamObj__Update` its
+ * per-frame poll (header/body transfer state machine), and `VabStreamObj__LoadVagAttrs`
  * its post-load VAB attribute-table fetch.  `D_8006DA34`'s whole vtable was
  * read straight out of `asm/data/5E140.data.s` while matching this cluster
- * -- see `docs/match-reports/func_8002C4E0.md` for the full slot table,
+ * -- see `docs/match-reports/VabStreamObj__VabStreamObj.md` for the full slot table,
  * including two slots (+0x58, +0x6C) that are null in retail's own data.
  */
 #include "common.h"
@@ -64,31 +64,31 @@ extern TableD9BC D_8006D9BC;
 
 /* D_8006DA34's own methods table -- the class ObjDA34 below dispatches
  * through.  Only the slots this unit's own functions call or are assigned to
- * are named.  round 43 added slot58/slot5C/slot6C/slot9C once func_8002C4E0,
- * func_8002C6FC and func_8002C890 (all round-17 gp_rel stalls, resolved
+ * are named.  round 43 added slot58/slot5C/slot6C/slot9C once VabStreamObj__VabStreamObj,
+ * VabStreamObj__Update and VabStreamObj__LoadVagAttrs (all round-17 gp_rel stalls, resolved
  * round 42) were actually worked. */
 typedef struct TableDA34 {
     u8 pad000[0x008];
-    void (*slot08)(void *self, char *arg1); /* func_8002C4E0 -- this unit's own new_class_da34 dispatch; arg1 is a base filename, not a plain s32 */
-    s32 (*slot0C)(ObjDA34 *self);           /* func_8002C638, confirmed against D_8006DA34's own rodata (+0x0C) */
+    void (*slot08)(void *self, char *arg1); /* VabStreamObj__VabStreamObj -- this unit's own new_class_da34 dispatch; arg1 is a base filename, not a plain s32 */
+    s32 (*slot0C)(ObjDA34 *self);           /* VabStreamObj__Close, confirmed against D_8006DA34's own rodata (+0x0C) */
     u8 pad010[0x058 - 0x010];
     /* +0x058 and +0x06C are BOTH null in retail's own D_8006DA34 (confirmed
-     * against asm/data/5E140.data.s) -- func_8002C6FC and func_8002C4E0 each
+     * against asm/data/5E140.data.s) -- VabStreamObj__Update and VabStreamObj__VabStreamObj each
      * dispatch through one of them anyway, on a path that is apparently
      * never actually taken for an object built with this exact base table.
      * That is retail's own behaviour, not a derivation error: the dispatch
      * still has to compile, whatever sits at the address at runtime. */
-    void (*slot58)(void *self, char *path); /* func_8002C6FC's own dispatch -- begins the VAB body transfer once the ".VB" path is built; null in retail */
-    void (*slot5C)(void *self);             /* func_80026C20 (uncarved, cross-unit) -- func_8002C890's own dispatch, called before it re-fetches the VAB header */
+    void (*slot58)(void *self, char *path); /* VabStreamObj__Update's own dispatch -- begins the VAB body transfer once the ".VB" path is built; null in retail */
+    void (*slot5C)(void *self);             /* func_80026C20 (uncarved, cross-unit) -- VabStreamObj__LoadVagAttrs's own dispatch, called before it re-fetches the VAB header */
     u8 pad060[0x06C - 0x060];
-    void (*slot6C)(void *self, char *path); /* func_8002C4E0's own dispatch -- begins the VAB header transfer for the ".VH" path; null in retail */
+    void (*slot6C)(void *self, char *path); /* VabStreamObj__VabStreamObj's own dispatch -- begins the VAB header transfer for the ".VH" path; null in retail */
     u8 pad070[0x078 - 0x070];
-    s32 (*slot78)(ObjDA34 *self, s32 arg1); /* func_8002C824, and func_8002C6FC's own body-complete notify */
-    s32 (*slot7C)(ObjDA34 *self);           /* func_8002C890 */
+    s32 (*slot78)(ObjDA34 *self, s32 arg1); /* VabStreamObj__OnBodyReady, and VabStreamObj__Update's own body-complete notify */
+    s32 (*slot7C)(ObjDA34 *self);           /* VabStreamObj__LoadVagAttrs */
     u8 pad080[0x084 - 0x080];
-    s32 (*slot84)(ObjDA34 *self, s32 arg1); /* func_8002CB18, arg1 is s16-truncated by the callee */
+    s32 (*slot84)(ObjDA34 *self, s32 arg1); /* VabStreamObj__StopVoice, arg1 is s16-truncated by the callee */
     u8 pad088[0x09C - 0x088];
-    void (*slot9C)(void *self, s32 arg1);   /* func_8002CBF4 -- func_8002C4E0's own dispatch, called with arg1 == 0 right after construction */
+    void (*slot9C)(void *self, s32 arg1);   /* VabStreamObj__SetPitchOffset -- VabStreamObj__VabStreamObj's own dispatch, called with arg1 == 0 right after construction */
 } TableDA34;
 extern TableDA34 D_8006DA34;
 
@@ -97,7 +97,7 @@ extern TableDA34 D_8006DA34;
  * exactly on VagAtr's `center`/`shift` bytes -- but kept under this unit's
  * own local name per the project's independent-local-view convention rather
  * than pulling in the real header (see code_179d8_k.c for the same choice).
- * Only the two bytes func_8002CA3C itself reads are named. */
+ * Only the two bytes VabStreamObj__PlayTone itself reads are named. */
 typedef struct Chunk179D8E {
     u8 pad0[0x4];
     u8 unk4;
@@ -106,7 +106,7 @@ typedef struct Chunk179D8E {
 } Chunk179D8E;
 
 /* This unit's own reduced view of Sony's `VabHdr` (include/psyq/LIBSND.H,
- * 32 bytes) -- only the two fields func_8002C890 itself reads are named:
+ * 32 bytes) -- only the two fields VabStreamObj__LoadVagAttrs itself reads are named:
  * `ts` (program count) and `vs` (vag count), at the real struct's own
  * offsets +0x12/+0x14. */
 typedef struct VabHdr179D8E {
@@ -132,7 +132,7 @@ struct ObjDA34 {
     Chunk179D8E **unk50;             /* +0x050, array of unk2C.ts pointers into unk4C's pool */
     s16 unk54;                        /* +0x054 */
     s16 unk56;                         /* +0x056, boolean-ish flag */
-    u16 unk58;                          /* +0x058, unsigned (retail loads it lhu in func_8002C890) */
+    u16 unk58;                          /* +0x058, unsigned (retail loads it lhu in VabStreamObj__LoadVagAttrs) */
     u16 unk5A;                           /* +0x05A */
     void *unk5C;                          /* +0x05C, malloc'd copy of the base filename */
     s32 unk60;                             /* +0x060 */
@@ -155,7 +155,7 @@ extern void func_80031F3C(s32 arg0);
 extern void SsVabTransCompleted(s32 arg0);
 extern s32 SsSetMute(s32 arg0);
 
-/* func_8002CC34's own "obj" (its `arg1`) -- a small slot-table object,
+/* InitSoundCueSet's own "obj" (its `arg1`) -- a small slot-table object,
  * unrelated to ObjDA34 (this function is NOT a D_8006DA34 vtable slot; its
  * only callers pass a plain heap/stack struct pointer).  Only the fields
  * this unit's own function touches are named. */
@@ -174,9 +174,9 @@ typedef struct ObjCC34 {
     Slot179D8ECC34 arr[3]; /* +0x18 */
 } ObjCC34;
 
-/* Forward declaration: func_8002CC0C is defined later in this file (ROM
- * order), but func_8002C480 (earlier in ROM order) calls it. */
-TableDA34 *func_8002CC0C(void);
+/* Forward declaration: GetVabStreamObjMethods is defined later in this file (ROM
+ * order), but New_VabStreamObj (earlier in ROM order) calls it. */
+TableDA34 *GetVabStreamObjMethods(void);
 
 s32 func_8002C408(void) {
     return 0;
@@ -197,21 +197,21 @@ void func_8002C428(void) {
 void func_8002C430(void) {
 }
 
-TableD9BC *func_8002C438(void) {
+TableD9BC *GetVabDriverMethods(void) {
     return &D_8006D9BC;
 }
 
 extern s32 D_8008A8B0;
 extern s32 D_8008A8B4;
 
-s32 func_8002C448(s32 *arg0) {
+s32 GetVabDriverMode(s32 *arg0) {
     if (arg0 != NULL) {
         *arg0 = D_8008A8B4;
     }
     return D_8008A8B0;
 }
 
-s32 func_8002C468(s32 a, s32 b)
+s32 SetVabDriverMode(s32 a, s32 b)
 {
 	D_8008A8B0 = a;
 	D_8008A8B4 = b;
@@ -222,12 +222,12 @@ s32 func_8002C478(void) {
     return 0;
 }
 
-void *func_8002C480(s32 arg0) {
+void *New_VabStreamObj(s32 arg0) {
     void *self;
 
     self = func_80017B34(0x64);
     if (self != NULL) {
-        func_8002CC0C()->slot08(self, arg0);
+        GetVabStreamObjMethods()->slot08(self, arg0);
         return self;
     }
     return NULL;
@@ -239,8 +239,8 @@ void *func_8002C480(s32 arg0) {
  * code_179d8_d.c's own independent reading of the same physical table. */
 typedef struct BaseTable179D8E {
     u8 pad000[0x008];
-    void (*slot08)(void *self);  /* func_8002C4E0's own base-chain call */
-    /* func_8002C638's own base-chain call -- its own return is likewise a
+    void (*slot08)(void *self);  /* VabStreamObj__VabStreamObj's own base-chain call */
+    /* VabStreamObj__Close's own base-chain call -- its own return is likewise a
      * bare tail call with nothing after it, so per CLAUDE.md's rule this
      * defaults to s32 absent positive void evidence. */
     s32 (*slot0C)(void *self);
@@ -284,12 +284,12 @@ extern s32 D_8008A8C4;
 extern s32 D_8008A8CC;
 extern void *D_8008A8C8;
 
-void func_8002C4E0(ObjDA34 *self, char *arg1) {
+void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
     void *buf;
     char path[0x20];
 
     func_80026CAC()->slot08(self);
-    self->methods = func_8002CC0C();
+    self->methods = GetVabStreamObjMethods();
     self->unk4C = NULL;
     self->unk50 = NULL;
     self->unk54 = 0;
@@ -321,7 +321,7 @@ void func_8002C4E0(ObjDA34 *self, char *arg1) {
     }
 }
 
-s32 func_8002C638(ObjDA34 *self) {
+s32 VabStreamObj__Close(ObjDA34 *self) {
     SsVabClose(self->unk54);
     if (--D_8008A8C4 < 0) {
         D_8008A8C4 = 0;
@@ -339,7 +339,7 @@ s32 func_8002C638(ObjDA34 *self) {
     return func_80026CAC()->slot0C(self);
 }
 
-void func_8002C6FC(ObjDA34 *self) {
+void VabStreamObj__Update(ObjDA34 *self) {
     char path[0x20];
 
     switch (self->unk2A) {
@@ -373,7 +373,7 @@ void func_8002C6FC(ObjDA34 *self) {
     }
 }
 
-s32 func_8002C824(ObjDA34 *self, s32 arg1) {
+s32 VabStreamObj__OnBodyReady(ObjDA34 *self, s32 arg1) {
     s32 result;
 
     result = 0;
@@ -390,7 +390,7 @@ s32 func_8002C824(ObjDA34 *self, s32 arg1) {
 }
 
 /* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/LIBSND.H,
- * 16 bytes) -- only the one field func_8002C890 itself reads is named,
+ * 16 bytes) -- only the one field VabStreamObj__LoadVagAttrs itself reads is named,
  * per the same local-struct convention used for VabHdr179D8E above (and
  * matching code_179d8_k.c's own reduced `ProgAtr` reading). */
 typedef struct ProgAtr179D8E {
@@ -402,7 +402,7 @@ typedef struct ProgAtr179D8E {
  * D_8006DA34's own +0x5C slot (declared above as `slot5C`), never called
  * directly by name here. */
 
-void func_8002C890(ObjDA34 *self)
+void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
 {
     ProgAtr179D8E prog;
     Chunk179D8E *pool;
@@ -449,9 +449,9 @@ void func_8002C890(ObjDA34 *self)
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", func_8002CA3C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_e", VabStreamObj__PlayTone);
 
-s32 func_8002CB18(ObjDA34 *self, s32 index) {
+s32 VabStreamObj__StopVoice(ObjDA34 *self, s32 index) {
     if (index < 0x18) {
         func_80031890(index);
     } else {
@@ -460,7 +460,7 @@ s32 func_8002CB18(ObjDA34 *self, s32 index) {
     return -1;
 }
 
-s32 func_8002CB58(ObjDA34 *self) {
+s32 VabStreamObj__Mute(ObjDA34 *self) {
     s32 flag;
 
     flag = self->unk56;
@@ -472,7 +472,7 @@ s32 func_8002CB58(ObjDA34 *self) {
     return flag;
 }
 
-s32 func_8002CB9C(ObjDA34 *self) {
+s32 VabStreamObj__Unmute(ObjDA34 *self) {
     s32 flag;
 
     flag = self->unk56;
@@ -483,26 +483,26 @@ s32 func_8002CB9C(ObjDA34 *self) {
     return flag;
 }
 
-void func_8002CBDC(void) {
+void VabStreamObj__func_2cbdc(void) {
 }
 
-void func_8002CBE4(void) {
+void VabStreamObj__func_2cbe4(void) {
 }
 
-void func_8002CBEC(void) {
+void VabStreamObj__func_2cbec(void) {
 }
 
-void func_8002CBF4(ObjDA34 *self, s32 arg1) {
+void VabStreamObj__SetPitchOffset(ObjDA34 *self, s32 arg1) {
     self->unk60 = arg1 * 12 - 0x18;
 }
 
-TableDA34 *func_8002CC0C(void) {
+TableDA34 *GetVabStreamObjMethods(void) {
     return &D_8006DA34;
 }
 
 extern s32 D_8008A8C4;
 
-s32 func_8002CC1C(void) {
+s32 GetOpenVabCount(void) {
     return D_8008A8C4;
 }
 
@@ -512,7 +512,7 @@ s32 func_8002CC28(void) {
     return D_8008A8CC;
 }
 
-s32 func_8002CC34(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
+s32 InitSoundCueSet(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
     Slot179D8ECC34 *slot;
     s32 count;
     s32 sentinel;
@@ -536,7 +536,7 @@ s32 func_8002CC34(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
     return 1;
 }
 
-void func_8002CC84(ObjDA34 *self, ObjCC34 *obj) {
+void FlushSoundCueSet(ObjDA34 *self, ObjCC34 *obj) {
     s32 i;
     Slot179D8ECC34 *slot;
 

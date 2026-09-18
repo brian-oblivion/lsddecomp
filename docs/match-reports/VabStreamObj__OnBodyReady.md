@@ -1,11 +1,13 @@
-# func_8002C824 -- MATCHED (27/27 words)
+> Renamed from `func_8002C824` on 2026-09-18 (tools/rename.py). Address 0x8002c824.
+
+# VabStreamObj__OnBodyReady -- MATCHED (27/27 words)
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-s32 func_8002C824(ObjDA34 *self, s32 arg1) {
+s32 VabStreamObj__OnBodyReady(ObjDA34 *self, s32 arg1) {
     s32 result;
 
     result = 0;
@@ -30,7 +32,7 @@ Byte-exact, 27/27 words.
 
 `self->methods->slot7C(self)`'s return value is discarded -- retail
 unconditionally overwrites `$v1` (the `result` accumulator) with `1` right
-after the `jalr`, regardless of what `slot7C` (`func_8002C890`, this unit,
+after the `jalr`, regardless of what `slot7C` (`VabStreamObj__LoadVagAttrs`, this unit,
 BLOCKED gp_rel) returned.
 
 Two wrong turns before the match, both worth recording:

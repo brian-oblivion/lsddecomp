@@ -1,11 +1,13 @@
-# func_8002CC34 -- MATCHED (20/20 words)
+> Renamed from `func_8002CC34` on 2026-09-18 (tools/rename.py). Address 0x8002cc34.
+
+# InitSoundCueSet -- MATCHED (20/20 words)
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-s32 func_8002CC34(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
+s32 InitSoundCueSet(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
     Slot179D8ECC34 *slot;
     s32 count;
     s32 sentinel;

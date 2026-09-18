@@ -1,11 +1,13 @@
-# func_8002C890 -- MATCHED 107/107 (round 43)
+> Renamed from `func_8002C890` on 2026-09-18 (tools/rename.py). Address 0x8002c890.
+
+# VabStreamObj__LoadVagAttrs -- MATCHED 107/107 (round 43)
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
 resolved that blocker project-wide. This is `D_8006DA34`'s own `+0x7C` slot
 (the header comment's original guess was already right here, confirmed
 against `asm/data/5E140.data.s`): once the VAB body transfer completes
-(`func_8002C824` sets `unk58 = 1` and dispatches here), this function pulls
+(`VabStreamObj__OnBodyReady` sets `unk58 = 1` and dispatches here), this function pulls
 the real VAB header and per-program/per-tone attribute tables out of the
 sound driver and caches them on the object.
 
@@ -17,7 +19,7 @@ typedef struct ProgAtr179D8E {
     u8 pad1[0x10 - 0x1];
 } ProgAtr179D8E;
 
-void func_8002C890(ObjDA34 *self)
+void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
 {
     ProgAtr179D8E prog;
     Chunk179D8E *pool;
@@ -83,7 +85,7 @@ the whole bank, calls `func_80032998` and sets the shared master volume once
 First full-image-correct build: byte-exact.
 
 ```
-func_8002C890: 107/107 words match (file 0x1D090-0x1D23C)
+VabStreamObj__LoadVagAttrs: 107/107 words match (file 0x1D090-0x1D23C)
 ```
 
 `./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`. This was the
@@ -92,7 +94,7 @@ matched.
 
 ### Proposed learning
 
-**Same signedness lesson as `func_8002C4E0`/`func_8002C6FC`, a THIRD field
+**Same signedness lesson as `VabStreamObj__VabStreamObj`/`VabStreamObj__Update`, a THIRD field
 on the same struct: `ObjDA34::unk58` is `u16`, not `s16`.** The tell was
 identical -- retail's `lhu v0,0x58(s1)` where a signed field compiles to
 `lh`. Three of this struct's four half-word fields discovered this round
@@ -114,6 +116,6 @@ instruction count agrees before assuming the guard is free.
 
 **`D_8006DA34`'s table can and should be read whole from
 `asm/data/5E140.data.s` before attempting ANY of its dispatch functions** --
-see `func_8002C4E0.md`'s table for the slots this round pinned down. Two
+see `VabStreamObj__VabStreamObj.md`'s table for the slots this round pinned down. Two
 (`+0x58`, `+0x6C`) are null in retail and never actually exercised at
 runtime for an object of this exact base class.

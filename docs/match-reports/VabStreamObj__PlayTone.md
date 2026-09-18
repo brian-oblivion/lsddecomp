@@ -1,4 +1,6 @@
-# func_8002CA3C -- STALL (best: 5/55 words match, but see caveat below)
+> Renamed from `func_8002CA3C` on 2026-09-18 (tools/rename.py). Address 0x8002ca3c.
+
+# VabStreamObj__PlayTone -- STALL (best: 5/55 words match, but see caveat below)
 
 Unit: `code_179d8_e`. Runner: echo, round 17. Restored to `INCLUDE_ASM`.
 
@@ -12,7 +14,7 @@ confirmed with a from-scratch minimal reproducer through the pinned pipeline
 ## What the function does (high confidence, established via m2c + manual read)
 
 `D_8006DA34`'s vtable slot +0x080. Signature:
-`s32 func_8002CA3C(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)`.
+`s32 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)`.
 
 ```c
 if (index >= 0) {
@@ -34,7 +36,7 @@ This structure (control flow, argument counts -- including the double-`arg2`
 7th argument to `func_80030E90`, which m2c independently confirmed -- field
 offsets, and the `self->unk50[hi][lo]` addressing) is corroborated by
 `.venv/bin/python3 tools/m2ctx.py code_179d8_e --sig 's32
-func_8002CA3C(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)' --run`, which
+VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)' --run`, which
 produces the same shape independently from the raw instructions. I am
 confident this part is right.
 
@@ -153,7 +155,7 @@ the one axis all 7 attempts share.**
 
 ```c
 #if 0
-s32 func_8002CA3C(ObjDA34 *self, s32 index, s32 arg2, s32 arg3) {
+s32 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3) {
     s32 hi;
     s32 lo;
     Chunk179D8E *entry;
@@ -247,7 +249,7 @@ sll   v0, v0, 0x2       hi * 4, off the UNTRUNCATED int hi
 lw    a2, 0(v0)
 ```
 
-Compare retail (`asm/nonmatchings/code_179d8_e/func_8002CA3C.s`, 0x8002CA64
+Compare retail (`asm/nonmatchings/code_179d8_e/VabStreamObj__PlayTone.s`, 0x8002CA64
 onward):
 
 ```

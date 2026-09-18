@@ -23,7 +23,7 @@ beq   $v1, $v0, .L80026CD0     # D_8008A84C == 0x23 -> the "then" arm
   jal GetClass6D4E8Methods             # fallthrough (not equal) -- called first in ROM order
   j .L80026CD8
 .L80026CD0:
-  jal func_8002C438             # equal-to-0x23 arm
+  jal GetVabDriverMethods             # equal-to-0x23 arm
 .L80026CD8:
   <epilogue, returns whatever $v0 holds>
 ```
@@ -33,8 +33,8 @@ direct reading `if (cond) A(); else B();` is the right mapping (not the
 inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
 try, with the straightforward `if`/`else` written in source order.
 
-`func_8002C438` is confirmed elsewhere in the repo
-(`src/code_179d8_e.c`: `TableD9BC *func_8002C438(void) { return &D_8006D9BC; }`)
+`GetVabDriverMethods` is confirmed elsewhere in the repo
+(`src/code_179d8_e.c`: `TableD9BC *GetVabDriverMethods(void) { return &D_8006D9BC; }`)
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetClass6D4E8Methods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
@@ -46,12 +46,12 @@ each unit's own independent local type -- this report follows the same
 
 ```c
 extern s32 D_8008A84C;
-extern void *func_8002C438(void);
+extern void *GetVabDriverMethods(void);
 extern void *GetClass6D4E8Methods(void);
 
 void *func_80026CAC(void) {
     if (D_8008A84C == 0x23) {
-        return func_8002C438();
+        return GetVabDriverMethods();
     } else {
         return GetClass6D4E8Methods();
     }

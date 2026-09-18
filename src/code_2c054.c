@@ -175,7 +175,7 @@ void func_8003BF10(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) 
     self->methods = (StreamTaskObjMethods *)core;
     core->slotD8(self, a1);
     if (a2 != 0) {
-        self->unk48 = func_8002C480(a2);
+        self->unk48 = New_VabStreamObj(a2);
     } else {
         self->unk48 = a3;
     }

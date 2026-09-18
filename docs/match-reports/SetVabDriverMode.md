@@ -1,4 +1,6 @@
-# func_8002C468 -- MATCHED 4/4 words, round 42 (2026-09-15)
+> Renamed from `func_8002C468` on 2026-09-18 (tools/rename.py). Address 0x8002c468.
+
+# SetVabDriverMode -- MATCHED 4/4 words, round 42 (2026-09-15)
 
 > **VERDICT CORRECTED, round 42 (2026-09-15). THIS FUNCTION IS MATCHED.**
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
@@ -16,14 +18,14 @@
 > derivation may still be right, its VERDICT is not. Rebuild before believing
 > any score in it.
 
-# func_8002C468 -- STALL (gp-relative blocker, not attempted)
+# SetVabDriverMode -- STALL (gp-relative blocker, not attempted)
 
 Unit `code_179d8_e`, carved round 17 (2026-09-04). **Not attempted.**
 
 ## Classification
 
 ```sh
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_e/func_8002C468.s
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_e/SetVabDriverMode.s
 ```
 
 Hit:

@@ -1,4 +1,6 @@
-# func_8002C638 -- MATCHED 49/49 (round 43)
+> Renamed from `func_8002C638` on 2026-09-18 (tools/rename.py). Address 0x8002c638.
+
+# VabStreamObj__Close -- MATCHED 49/49 (round 43)
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
@@ -9,7 +11,7 @@ the class's "close" method.
 ## Derivation
 
 ```c
-s32 func_8002C638(ObjDA34 *self) {
+s32 VabStreamObj__Close(ObjDA34 *self) {
     SsVabClose(self->unk54);
     if (--D_8008A8C4 < 0) {
         D_8008A8C4 = 0;
@@ -41,18 +43,18 @@ ambiguous between `void` and `s32`, defaulted to `s32` per CLAUDE.md's rule.
 ## Result
 
 First full-image-correct build (needed `ObjDA34::unk2A`'s `u16` fix from
-`func_8002C4E0`/`func_8002C6FC`'s derivation, since all three share the
+`VabStreamObj__VabStreamObj`/`VabStreamObj__Update`'s derivation, since all three share the
 struct): byte-exact.
 
 ```
-func_8002C638: 49/49 words match (file 0x1CE38-0x1CEFC)
+VabStreamObj__Close: 49/49 words match (file 0x1CE38-0x1CEFC)
 ```
 
 `./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`.
 
 ### Proposed learning
 
-See `func_8002C4E0.md` for the `unk2A` signedness lesson (`u16`, confirmed by
+See `VabStreamObj__VabStreamObj.md` for the `unk2A` signedness lesson (`u16`, confirmed by
 `lh` vs `lhu` on the switch-controlling load) -- it was discovered while
 matching this function's neighbour but affects the whole `ObjDA34` struct,
 so it applied here too once all three of this cluster's functions were

@@ -1,4 +1,6 @@
-# func_8002C4E0 -- MATCHED 86/86 (round 43)
+> Renamed from `func_8002C4E0` on 2026-09-18 (tools/rename.py). Address 0x8002c4e0.
+
+# VabStreamObj__VabStreamObj -- MATCHED 86/86 (round 43)
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
@@ -15,33 +17,33 @@ the WHOLE table, not just this one slot:
 
 | offset | target | called from |
 | --- | --- | --- |
-| +0x08 | `func_8002C4E0` | `func_8002C480` (`new_class_da34`) |
-| +0x0C | `func_8002C638` | data only (a subclass's own "close" chain) |
-| +0x58 | **null in retail** | `func_8002C6FC`'s own case-1 dispatch |
-| +0x5C | `func_80026C20` (uncarved) | `func_8002C890`'s own opening call |
-| +0x6C | **null in retail** | `func_8002C4E0`'s own final dispatch |
-| +0x78 | `func_8002C824` | already matched |
-| +0x7C | `func_8002C890` | already matched (as data) |
-| +0x84 | `func_8002CB18` | already matched |
-| +0x9C | `func_8002CBF4` | already matched |
+| +0x08 | `VabStreamObj__VabStreamObj` | `New_VabStreamObj` (`new_class_da34`) |
+| +0x0C | `VabStreamObj__Close` | data only (a subclass's own "close" chain) |
+| +0x58 | **null in retail** | `VabStreamObj__Update`'s own case-1 dispatch |
+| +0x5C | `func_80026C20` (uncarved) | `VabStreamObj__LoadVagAttrs`'s own opening call |
+| +0x6C | **null in retail** | `VabStreamObj__VabStreamObj`'s own final dispatch |
+| +0x78 | `VabStreamObj__OnBodyReady` | already matched |
+| +0x7C | `VabStreamObj__LoadVagAttrs` | already matched (as data) |
+| +0x84 | `VabStreamObj__StopVoice` | already matched |
+| +0x9C | `VabStreamObj__SetPitchOffset` | already matched |
 
 The two null slots (+0x58, +0x6C) are retail's own data, not a derivation
-error: `func_8002C4E0` unconditionally builds a ".VH" path and dispatches
+error: `VabStreamObj__VabStreamObj` unconditionally builds a ".VH" path and dispatches
 through `methods->slot6C` whenever its `arg1` (base filename) is non-NULL,
 and that slot is genuinely `0x00000000` in the shipped table this class
-uses. Whatever calls `func_8002C4E0` with a non-NULL name in practice must
+uses. Whatever calls `VabStreamObj__VabStreamObj` with a non-NULL name in practice must
 either never happen or crash; either way, the C only has to reproduce the
 dispatch, not explain why retail left the target empty.
 
 The body, once the field layout was pinned (see "Proposed learning" below):
 
 ```c
-void func_8002C4E0(ObjDA34 *self, char *arg1) {
+void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
     void *buf;
     char path[0x20];
 
     func_80026CAC()->slot08(self);
-    self->methods = func_8002CC0C();
+    self->methods = GetVabStreamObjMethods();
     self->unk4C = NULL;
     self->unk50 = NULL;
     self->unk54 = 0;
@@ -83,7 +85,7 @@ First full-image-correct build (after fixing `unk2A`'s signedness -- see
 below): byte-exact.
 
 ```
-func_8002C4E0: 86/86 words match (file 0x1CCE0-0x1CE38)
+VabStreamObj__VabStreamObj: 86/86 words match (file 0x1CCE0-0x1CE38)
 ```
 
 `./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`.

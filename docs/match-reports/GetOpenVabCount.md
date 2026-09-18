@@ -1,4 +1,6 @@
-# func_8002CC1C -- MATCHED 3/3 (round 43)
+> Renamed from `func_8002CC1C` on 2026-09-18 (tools/rename.py). Address 0x8002cc1c.
+
+# GetOpenVabCount -- MATCHED 3/3 (round 43)
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17); reopened
 round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi` resolved that blocker for the
@@ -14,7 +16,7 @@ same form -- no special handling needed.
 ```c
 extern s32 D_8008A8C4;
 
-s32 func_8002CC1C(void) {
+s32 GetOpenVabCount(void) {
     return D_8008A8C4;
 }
 ```
@@ -24,7 +26,7 @@ s32 func_8002CC1C(void) {
 First build, byte-exact:
 
 ```
-func_8002CC1C: 3/3 words match (file 0x1D41C-0x1D428)
+GetOpenVabCount: 3/3 words match (file 0x1D41C-0x1D428)
 ```
 
 Whole-image `./build-and-verify.sh` also green (`OK: build matches retail

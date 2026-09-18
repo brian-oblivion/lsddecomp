@@ -399,7 +399,7 @@ extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2)
 /* Four more externs reached only by func_8003BF10's own tail, none of them
  * in this unit. Types are the call sites' own register usage only.
  *
- * func_8002C480/func_80044F30/func_80044CD4's return types were originally
+ * New_VabStreamObj/func_80044F30/func_80044CD4's return types were originally
  * guessed `s32` (no counter-evidence at the time). func_8003C008 (round 2)
  * dereferences StreamTaskObj::unk48/unk7C/unk80 -- all three fed directly by
  * these calls -- as `methods->slot04(...)` objects, which is impossible for
@@ -407,7 +407,7 @@ extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2)
  * bytes in func_8003BF10 (same register width, pure pointer/int relabeling)
  * but corrects the semantics -- see func_8003C008's report and
  * func_8003BF10's report addendum. */
-extern StreamTaskUnkB4Obj *func_8002C480(s32 a0);
+extern StreamTaskUnkB4Obj *New_VabStreamObj(s32 a0);
 extern StreamTaskUnkB4Obj *func_80044F30(s32 a0);
 extern StreamTaskUnkB4Obj *func_80044CD4(s32 a0, StreamTaskUnkB4Obj *a1);
 extern StreamTaskUnk78Obj *func_800441B4(StreamTaskUnkB4Obj *a0, s32 a1); /* return type

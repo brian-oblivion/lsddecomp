@@ -83,12 +83,12 @@ void *func_80026C9C(void) {
 }
 
 extern s32 D_8008A84C;
-extern void *func_8002C438(void);
+extern void *GetVabDriverMethods(void);
 extern void *GetClass6D4E8Methods(void);
 
 void *func_80026CAC(void) {
     if (D_8008A84C == 0x23) {
-        return func_8002C438();
+        return GetVabDriverMethods();
     } else {
         return GetClass6D4E8Methods();
     }
@@ -171,13 +171,13 @@ s32 func_80026F00(void) {
 }
 
 typedef s32 (*Func80026F34Fn)(s32, s32, s32);
-extern s32 func_8002C468(s32 arg0, s32 arg1, s32 arg2);
+extern s32 SetVabDriverMode(s32 arg0, s32 arg1, s32 arg2);
 extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
 
 void func_80026F34(s32 arg0, s32 arg1, s32 arg2) {
     Func80026F34Fn fn;
 
-    fn = func_8002C468;
+    fn = SetVabDriverMode;
     if (D_8008A84C == 0x13) {
         fn = SetCdDriverMode;
     }
@@ -186,13 +186,13 @@ void func_80026F34(s32 arg0, s32 arg1, s32 arg2) {
 }
 
 extern s32 GetCdDriverMode(void);
-extern s32 func_8002C448(void);
+extern s32 GetVabDriverMode(void);
 
 s32 func_80026FAC(void) {
     if (D_8008A84C == 0x13) {
         return GetCdDriverMode();
     } else {
-        return func_8002C448();
+        return GetVabDriverMode();
     }
 }
 

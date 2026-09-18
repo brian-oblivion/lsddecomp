@@ -202,7 +202,7 @@ typedef struct DreamSysUnk5C {
    else about this class -- including whether it is the SAME class as
    DreamSys::unk_0x4C below -- is unknown. Elsewhere in this unit unk_0x58
    is set/read as a plain s32 (func_8005937C, func_8005A134's call into
-   func_8002CC84), which is consistent with it being a pointer value just
+   FlushSoundCueSet), which is consistent with it being a pointer value just
    not typed that way there. slot0x84 takes TWO arguments, not one --
    head-adjudicated 2026-08-30-c: the guard value (DreamSys::unk_0xBC)
    loaded into $a1 by func_80059E3C is never overwritten before the jalr, so
@@ -427,7 +427,7 @@ typedef struct DreamSysEntityObj {
 } DreamSysEntityObj;
 
 /* Struct pointed to by func_8005A1F4's arg1 -- forwarded (never called) as
-   func_8002CC34's 5th argument via func_800596E8's arg1==2 case, so its
+   InitSoundCueSet's 5th argument via func_800596E8's arg1==2 case, so its
    real caller/owner lives outside this unit. Only the offsets
    func_8005A1F4 itself touches are named; +0x8..+0x1C and +0x24..+0x30
    are unconfirmed gaps (round 2026-08-30-d). */
@@ -553,11 +553,11 @@ extern void *func_80017B34(s32 size);
 /* Also declared in Entity.h for a different (Entity) struct's fields; here
    called by func_8005A134 as (this->unk_0x58, this->unk_0xCC)
    (round 2026-08-30-b). */
-extern void func_8002CC84(s32 arg0, void *arg1);
+extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
 /* Also declared in Entity.h. Called by func_8005A0B0 as
    (this->unk_0x58, this->unk_0xCC) -- same argument shape as
-   func_8002CC84 above (round 2026-08-30-d). */
+   FlushSoundCueSet above (round 2026-08-30-d). */
 extern void func_8002CD08(s32 arg0, void *arg1);
 
 typedef struct DreamSys {
@@ -702,7 +702,7 @@ typedef struct DreamSys {
 	/* Set to 1 by func_800596E8's arg1==2 case, alongside unk_0xC4
 	   (round 2026-08-30). */
 	s32 unk_0xC8;
-	/* Struct initialized in-place by func_8002CC34 (still INCLUDE_ASM, in
+	/* Struct initialized in-place by InitSoundCueSet (still INCLUDE_ASM, in
 	   the uncarved code_179d8) via func_800596E8's arg1==2 case; internal
 	   layout unknown beyond that entry point (round 2026-08-30). */
 	s8 unk_0xCC[0x54];
@@ -1037,7 +1037,7 @@ struct vtable_DreamSys{
 	void (*func_8005A1B0)(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
 	void (*func_8005A1EC)(DreamSys *this, s32 value);
 	/* Referenced by func_800596E8's arg1==2 case: its raw address (never
-	   called there) is forwarded as func_8002CC34's 5th argument. arg0 is
+	   called there) is forwarded as InitSoundCueSet's 5th argument. arg0 is
 	   unused in the body; kept generic rather than typed DreamSys* since
 	   nothing here confirms it (round 2026-08-30-d). */
 	void (*func_8005A1F4)(void *arg0, Func8005A1F4Arg *arg1);

@@ -1,11 +1,13 @@
-# func_8002CB58 -- MATCHED (17/17 words)
+> Renamed from `func_8002CB58` on 2026-09-18 (tools/rename.py). Address 0x8002cb58.
+
+# VabStreamObj__Mute -- MATCHED (17/17 words)
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-s32 func_8002CB58(ObjDA34 *self) {
+s32 VabStreamObj__Mute(ObjDA34 *self) {
     s32 flag;
 
     flag = self->unk56;
@@ -51,8 +53,8 @@ and using a constant instead. Reusing the call's return value where retail
 used a constant is a cheap, easy-to-miss source of spurious register
 shuffling (extra `move`s) that shows up as a large early residue rather than
 a one-word near-miss -- worth checking before assuming a deeper structural
-mismatch. Confirmed twice in the same commit: `func_8002CB58` (constant `1`)
-and its mirror `func_8002CB9C` (which, by contrast, DOES thread the call's
+mismatch. Confirmed twice in the same commit: `VabStreamObj__Mute` (constant `1`)
+and its mirror `VabStreamObj__Unmute` (which, by contrast, DOES thread the call's
 return value through -- no `li` between the `jal` and the following store,
 so the two functions are NOT structurally identical despite looking like a
 symmetric flag get/set pair at a glance).

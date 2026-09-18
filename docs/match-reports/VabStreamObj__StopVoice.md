@@ -1,11 +1,13 @@
-# func_8002CB18 -- MATCHED (16/16 words)
+> Renamed from `func_8002CB18` on 2026-09-18 (tools/rename.py). Address 0x8002cb18.
+
+# VabStreamObj__StopVoice -- MATCHED (16/16 words)
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-s32 func_8002CB18(ObjDA34 *self, s32 index) {
+s32 VabStreamObj__StopVoice(ObjDA34 *self, s32 index) {
     if (index < 0x18) {
         func_80031890(index);
     } else {
@@ -24,7 +26,7 @@ Byte-exact, 16/16 words.
 `D_8006DA34`'s vtable slot +0x084. `self` is unused in the body -- confirmed
 by the actual instructions only ever reading `$a1` (the second argument
 register), never `$a0`. Its only caller is the vtable slot itself
-(`func_8002CC84`, this unit), which passes `(self, arr[i].field0)` -- two
+(`FlushSoundCueSet`, this unit), which passes `(self, arr[i].field0)` -- two
 args -- so the unused-`self` parameter has to stay in the C signature or
 `index` would land in `$a0` instead of `$a1` and every access would be
 wrong.

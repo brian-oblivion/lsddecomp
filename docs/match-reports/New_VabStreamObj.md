@@ -1,16 +1,18 @@
-# func_8002C480 -- MATCHED (24/24 words)
+> Renamed from `func_8002C480` on 2026-09-18 (tools/rename.py). Address 0x8002c480.
+
+# New_VabStreamObj -- MATCHED (24/24 words)
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-void *func_8002C480(s32 arg0) {
+void *New_VabStreamObj(s32 arg0) {
     void *self;
 
     self = func_80017B34(0x64);
     if (self != NULL) {
-        func_8002CC0C()->slot08(self, arg0);
+        GetVabStreamObjMethods()->slot08(self, arg0);
         return self;
     }
     return NULL;
@@ -18,7 +20,7 @@ void *func_8002C480(s32 arg0) {
 ```
 
 with a new `slot08` member on `TableDA34` (`void (*slot08)(void *self, s32
-arg1);`, offset +0x008) and a forward declaration of `func_8002CC0C` added
+arg1);`, offset +0x008) and a forward declaration of `GetVabStreamObjMethods` added
 near the top of the unit (it's defined later in ROM order but called here).
 
 Byte-exact, 24/24 words.
@@ -27,9 +29,9 @@ Byte-exact, 24/24 words.
 
 The `new_class_*`-style constructor for the `D_8006DA34` class: allocate
 0x64 bytes, then dispatch through the table's own slot +0x008
-(`func_8002C4E0`, BLOCKED gp_rel -- not this unit's to write, only its
+(`VabStreamObj__VabStreamObj`, BLOCKED gp_rel -- not this unit's to write, only its
 prototype's shape matters here) as the actual constructor, which is where
-`self->methods` gets assigned (inside `func_8002C4E0`'s own body, not here).
+`self->methods` gets assigned (inside `VabStreamObj__VabStreamObj`'s own body, not here).
 Same idiom as `new_class_6d940` in the sibling `code_179d8_d.c`.
 
 `slot08`'s return value is discarded -- retail overwrites `$v0` with `self`

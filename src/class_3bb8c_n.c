@@ -367,7 +367,7 @@ void func_80054CFC(void) {
  * ROM order) takes one of these two per-slot objects. `unk0` is address-
  * taken then chased for a single byte at +0x6 (toggled there); `unk14` is
  * only ever address-taken, as an embedded sub-object handed to
- * `func_8002CC84`/`func_8002CD08` (same discard-return caveat as
+ * `FlushSoundCueSet`/`func_8002CD08` (same discard-return caveat as
  * `include/Entity.h`'s `unk9C` -- a field only ever address-taken carries
  * no evidence about its own declared type). */
 typedef struct ObjN14Sub ObjN14Sub;
@@ -623,7 +623,7 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055410);
 extern s32 D_8008AC7C;
 extern void *func_80055620(void *arg0, s32 *arg1, void *arg2);
 extern s32 D_800874B0[];
-extern s32 func_8002CC34(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
+extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 
 ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     ObjN14Sub *sub;
@@ -631,7 +631,7 @@ ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     sub = (ObjN14Sub *) func_80055620(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
-        func_8002CC34(*(s32 *) D_8008AC7C, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
+        InitSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
         if (sub->unk6 == *arg1) {
             *arg1 = -sub->unk6;
         }
@@ -740,10 +740,10 @@ fail:
 }
 
 extern s32 D_8008AC7C;
-extern void func_8002CC84(s32 arg0, void *arg1);
+extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
 s32 func_800557DC(ObjN14 *arg0) {
-    func_8002CC84(*(s32 *) D_8008AC7C, &arg0->unk14);
+    FlushSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14);
     arg0->unk0->unk6 = -arg0->unk0->unk6;
     return 0;
 }

@@ -56,14 +56,14 @@ assignment (undefined behavior), not a legitimate reshape.
 ## What it does
 
 Dispatches on `D_8008A84C` to pick one of two "ret" objects
-(`GetClass6D4E8Methods()` if `arg0 == 0x13`, else `func_8002C438()`), stores `arg0`
+(`GetClass6D4E8Methods()` if `arg0 == 0x13`, else `GetVabDriverMethods()`), stores `arg0`
 into `D_8008A84C`, then walks the function-pointer table `D_8006D4AC`
 (14 entries + a NULL sentinel, confirmed in `asm/data/5DB70.data.s`),
 calling `func_80026D88(val, ret)` before EVERY table read (including the
 first, before any table entry is even inspected), and — for every NON-NULL
 entry — calling that entry as `val = entry(val)` before advancing to the
 next slot and repeating. All 4 callees are cross-unit: `GetClass6D4E8Methods` /
-`func_8002C438` are shared with `func_80026CAC` (see that report), and the
+`GetVabDriverMethods` are shared with `func_80026CAC` (see that report), and the
 14 table entries are ordinary game functions elsewhere in the image.
 
 ## Residue -- this is a genuine register-allocation puzzle, not a control-flow miss
@@ -153,7 +153,7 @@ void func_80026CFC(s32 arg0) {
     if (arg0 == 0x13) {
         ret = GetClass6D4E8Methods();
     } else {
-        ret = func_8002C438();
+        ret = GetVabDriverMethods();
     }
     entry = D_8006D4AC;
     for (val = func_80026C9C(); ; val = fn(val)) {
@@ -167,7 +167,7 @@ void func_80026CFC(s32 arg0) {
 }
 ```
 
-(`extern s32 D_8008A84C;`, `extern void *func_8002C438(void);` and
+(`extern s32 D_8008A84C;`, `extern void *GetVabDriverMethods(void);` and
 `extern void *GetClass6D4E8Methods(void);` are declared once earlier in this file,
 above `func_80026CAC`.)
 
