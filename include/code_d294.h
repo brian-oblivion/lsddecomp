@@ -584,9 +584,12 @@ struct WholeFrac_d294 {
     s16 frac;
 };
 
-/* RatioToFixed12 (asm/code_d294_b.s, still uncarved -- and separately
- * BLOCKED by the nop_mflo_mfhi toolchain flag once it IS carved, per
- * docs/match-reports/RatioToFixed12.md): reads a `WholeFrac_d294` at the
+/* RatioToFixed12 (round 54 correction: this banner was STALE -- it is
+ * now carved and MATCHED in src/code_d294_c.c, not code_d294_b, and the
+ * nop_mflo_mfhi toolchain flag it was once blocked on is RESOLVED per
+ * CLAUDE.md's "Open toolchain blockers" table; see
+ * docs/match-reports/RatioToFixed12.md for the current history): reads
+ * a `WholeFrac_d294` at the
  * given pointer and returns a 20.12 fixed-point value (`whole << 12 |
  * frac`'s own division-derived low bits) -- read off its own
  * disassembly (a `div` by the pair's own two fields, not decompiled
@@ -618,7 +621,10 @@ extern void Class6B5CC__UnlinkModel(Class6B5CCObj *self);
 extern void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other);
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
-/* GetNextBasicClass (asm/code_8220_b.s, a DIFFERENT still-uncarved unit): a
+/* GetNextBasicClass (round 54 correction: this banner was STALE -- it is
+ * now carved and MATCHED, in src/code_8220_b.c, a DIFFERENT unit; that
+ * unit still has one unrelated stall of its own, func_80018464, per its
+ * own file banner): a
  * generic intrusive-list "pop next" step. Given `out` and `cursor`
  * (both `T **`), if `*cursor` is non-NULL: `*out = (*cursor)->unk4`
  * (the node's own "next" field) and `*cursor = (*cursor)->unk0` (some
@@ -728,7 +734,8 @@ Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self);
 void func_8001D204(Class6B5CCObj *self);
 void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor);
 
-/* GetSetBitField (asm/code_d294_b.s, the NEXT slice, still uncarved): a
+/* GetSetBitField (round 54 correction: this banner was STALE -- it is
+ * now carved and MATCHED in src/code_d294_c.c, not code_d294_b): a
  * generic packed-bitfield accessor. Given a word pointer, a bit SHIFT, a
  * bit WIDTH and a VALUE, it clears WIDTH bits at bit-offset SHIFT in *word,
  * ORs in (value << shift), and returns the PREVIOUS contents of that
@@ -798,7 +805,8 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
 void func_8001E4A4(Class6B5CCObj *self, void *node);
 void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 
-/* CalcBoxOutcode (asm/code_d294_c.s, the NEXT slice, still uncarved):
+/* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
+ * now carved and MATCHED in src/code_d294_c.c):
  * computes the SAME 6-bit box-vs-point outcode BisectSegmentToBox's own `flags`
  * computation does (bit-for-bit identical comparison chain against the
  * same 6 field offsets) -- MEASURED, not guessed; this is the shared
