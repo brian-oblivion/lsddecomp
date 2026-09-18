@@ -9,7 +9,7 @@ Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 Byte-exact on the first attempt.
 
 ```c
-extern s32 D_8008A898;
+extern s32 gCdTickStep;
 extern s32 gCdCallbackInstalled;
 extern s32 gCdUseVSyncCallback;
 extern s32 gCdQueueEnabled;
@@ -19,7 +19,7 @@ void StopCdServiceIfIdle(void)
 {
     LockCd();
 
-    if (D_8008A898 == 0 && gCdCallbackInstalled != 0) {
+    if (gCdTickStep == 0 && gCdCallbackInstalled != 0) {
         if (gCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }
@@ -34,7 +34,7 @@ void StopCdServiceIfIdle(void)
 ## Derivation
 
 Straight read: sets the `gCdLock` latch (`LockCd`), then a guarded
-block only entered when `D_8008A898 == 0` AND `gCdCallbackInstalled != 0` (the two
+block only entered when `gCdTickStep == 0` AND `gCdCallbackInstalled != 0` (the two
 `beqz`/`bnez` gp_rel loads collapse into one `&&`), inside which an optional
 `VSyncCallback(0)` fires when `gCdUseVSyncCallback != 0`, then both `gCdCallbackInstalled` and
 `gCdQueueEnabled` are cleared; falls through either way to clear the latch
@@ -60,14 +60,14 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80028218` | `StopCdServiceIfIdle` | A |
 
-**Evidence.** Under the lock, and only when `D_8008A898 == 0` (no
+**Evidence.** Under the lock, and only when `gCdTickStep == 0` (no
 state-machine step is armed) AND the callback is installed: unregister the
 `VSyncCallback`, clear `gCdCallbackInstalled` and clear `gCdQueueEnabled`.
 The conditional is half the function, so the name carries it -- calling this
 `StopCdService` would say it always stops, which it does not. The mirror of
 `StartCdService`.
 
-`D_8008A898` itself is left named: it is `code_179d8_r`'s "which state-machine
+`gCdTickStep` itself is left named: it is `code_179d8_r`'s "which state-machine
 step to tick" selector (1 or 2), written by `code_179d8_s` and cleared by
 that unit's reset, so it belongs to whichever unit's naming pass takes
 `code_179d8_r`. Proposed there: `gCdStep`.

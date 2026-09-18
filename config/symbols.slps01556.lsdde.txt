@@ -758,3 +758,6 @@ gCdRequestQueue = 0x8008A894;
 gCdSeekParam = 0x8008A87C;
 gCdReadSectorCount = 0x8008A880;
 gCdReadBuffer = 0x8008A884;
+gCdSavedSeekParam = 0x8008A888;
+gCdTickStep = 0x8008A898;
+gCdTimeoutCounter = 0x8008A8A0;

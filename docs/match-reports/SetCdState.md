@@ -7,7 +7,7 @@
 ## What it does
 
 The state machine's "apply new phase" helper: sets `gCdState` to the
-given phase and resets the timeout counter `D_8008A8A0`. This is the
+given phase and resets the timeout counter `gCdTimeoutCounter`. This is the
 shared call site both `TickCdStateMachine` and `TickCdLoadFileStateMachine` route through
 (via a `newstate` local playing `$a0`'s role) every time they advance the
 CD-read state machine.
@@ -18,7 +18,7 @@ CD-read state machine.
 void SetCdState(s32 arg0)
 {
     gCdState = arg0;
-    D_8008A8A0 = 0;
+    gCdTimeoutCounter = 0;
 }
 ```
 

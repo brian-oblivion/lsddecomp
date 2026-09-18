@@ -40,7 +40,7 @@ struct Obj6D4E8_D70 {
 
 extern s32 gCdRequestQueue;
 extern s32 gCdIdle;
-extern s32 D_8008A888;
+extern s32 gCdSavedSeekParam;
 extern s32 gCdSeekParam;
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
@@ -63,8 +63,8 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
         if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
-            saved = D_8008A888;
-            D_8008A888 = 0;
+            saved = gCdSavedSeekParam;
+            gCdSavedSeekParam = 0;
             gCdSeekParam = saved;
         }
 
@@ -91,10 +91,10 @@ function does nothing but the latch dance. Inside that, an inner
 three-condition guard (head node's owner is `self`, head node's `active` flag (`unk00` when this was written)
 flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
 `ResetCdStateMachine()` (both cross-unit — `ResetCdStateMachine` from foxtrot's
-`code_179d8_r`) and a load-clear-store handoff between `D_8008A888` and
-`gCdSeekParam` (needs an explicit temp: the store order is `D_8008A888`
+`code_179d8_r`) and a load-clear-store handoff between `gCdSavedSeekParam` and
+`gCdSeekParam` (needs an explicit temp: the store order is `gCdSavedSeekParam`
 cleared BEFORE the old value lands in `gCdSeekParam`, not the natural-looking
-`gCdSeekParam = D_8008A888; D_8008A888 = 0;`, which would store in the
+`gCdSeekParam = gCdSavedSeekParam; gCdSavedSeekParam = 0;`, which would store in the
 opposite order). Then, regardless of that inner guard, a loop walks the
 whole list unlinking every node whose `owner == self` via
 `FreeCdRequestNode` (also `code_179d8_r`) and decrementing `self->pendingRequests` per

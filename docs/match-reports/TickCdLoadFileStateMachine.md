@@ -8,7 +8,7 @@
 
 The sibling tick of the CD-read state machine implemented by
 `TickCdStateMachine` (see that report for the full state description), called
-from `ServiceCdDriver` when `D_8008A898 == 2`. Identical to `TickCdStateMachine`
+from `ServiceCdDriver` when `gCdTickStep == 2`. Identical to `TickCdStateMachine`
 in every state except:
 
 - **state 2, `CdSync` reports "still busy, same phase"**: `TickCdStateMachine`
@@ -17,7 +17,7 @@ in every state except:
   directly rather than resetting.
 - **state 8, `CdReadSync` succeeds (`v1 == 0`)**: after
   `ResetCdStateMachine()`, this function additionally swaps two globals
-  (`gCdSeekParam = D_8008A888; D_8008A888 = NULL;`) that `TickCdStateMachine`
+  (`gCdSeekParam = gCdSavedSeekParam; gCdSavedSeekParam = NULL;`) that `TickCdStateMachine`
   does not touch at all.
 
 ## Round 45's stall, and what closed it
@@ -118,8 +118,8 @@ L_busy:
     goto L_set;
 
 L_count:
-    D_8008A8A0++;
-    if (D_8008A8A0 < 0x259)
+    gCdTimeoutCounter++;
+    if (gCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;
@@ -139,8 +139,8 @@ L_state8:
     if (v1 != 0)
         goto L_end;
     ResetCdStateMachine();
-    tmp = D_8008A888;
-    D_8008A888 = NULL;
+    tmp = gCdSavedSeekParam;
+    gCdSavedSeekParam = NULL;
     gCdSeekParam = tmp;
     goto L_end;
 

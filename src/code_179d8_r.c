@@ -12,10 +12,10 @@
  *
  * The slice implements a small CD-read state machine:
  *   - gCdState holds the current state/phase.
- *   - D_8008A8A0 is a timeout counter, reset by SetCdState.
+ *   - gCdTimeoutCounter is a timeout counter, reset by SetCdState.
  *   - TickCdStateMachine / TickCdLoadFileStateMachine are near-identical per-tick state
  *     machine steps (driven from ServiceCdDriver in code_179d8_q via
- *     D_8008A898 == 1 / == 2), differing only in their state==2 and
+ *     gCdTickStep == 1 / == 2), differing only in their state==2 and
  *     state==8-success handling.
  *   - StartCdOperation / ResetCdStateMachine are the "start" / "reset" bookends of
  *     that state machine.
@@ -66,9 +66,9 @@ extern s32 gCdState;   /* CD state-machine phase */
 extern void *gCdSeekParam; /* CdControlF param pointer */
 extern s32 gCdReadSectorCount;   /* CdRead sector count */
 extern void *gCdReadBuffer; /* CdRead target buffer */
-extern void *D_8008A888; /* secondary pointer, used only by TickCdLoadFileStateMachine */
-extern s32 D_8008A898;   /* which state-machine step to tick, 1 or 2 */
-extern s32 D_8008A8A0;   /* timeout counter */
+extern void *gCdSavedSeekParam; /* secondary pointer, used only by TickCdLoadFileStateMachine */
+extern s32 gCdTickStep;   /* which state-machine step to tick, 1 or 2 */
+extern s32 gCdTimeoutCounter;   /* timeout counter */
 
 Node8008A894 *AllocCdRequestNode(void)
 {
@@ -217,8 +217,8 @@ L_state2:
     goto L_set;
 
 L_count:
-    D_8008A8A0++;
-    if (D_8008A8A0 < 0x259)
+    gCdTimeoutCounter++;
+    if (gCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;
@@ -299,8 +299,8 @@ L_busy:
     goto L_set;
 
 L_count:
-    D_8008A8A0++;
-    if (D_8008A8A0 < 0x259)
+    gCdTimeoutCounter++;
+    if (gCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;
@@ -320,8 +320,8 @@ L_state8:
     if (v1 != 0)
         goto L_end;
     ResetCdStateMachine();
-    tmp = D_8008A888;
-    D_8008A888 = NULL;
+    tmp = gCdSavedSeekParam;
+    gCdSavedSeekParam = NULL;
     gCdSeekParam = tmp;
     goto L_end;
 
@@ -345,14 +345,14 @@ void ResetCdStateMachine(void)
 {
     gCdOperation = 0;
     gCdState = 0;
-    D_8008A898 = 0;
+    gCdTickStep = 0;
     gCdIdle = 1;
-    D_8008A8A0 = 0;
+    gCdTimeoutCounter = 0;
     gCdBusy = 0;
 }
 
 void SetCdState(s32 arg0)
 {
     gCdState = arg0;
-    D_8008A8A0 = 0;
+    gCdTimeoutCounter = 0;
 }

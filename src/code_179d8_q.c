@@ -140,7 +140,7 @@ struct Obj6D4E8_D70 {
 
 extern s32 gCdRequestQueue;
 extern s32 gCdIdle;
-extern s32 D_8008A888;
+extern s32 gCdSavedSeekParam;
 extern s32 gCdSeekParam;
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
@@ -163,8 +163,8 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
         if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
-            saved = D_8008A888;
-            D_8008A888 = 0;
+            saved = gCdSavedSeekParam;
+            gCdSavedSeekParam = 0;
             gCdSeekParam = saved;
         }
 
@@ -444,7 +444,7 @@ void UnlockCd(void)
 
 extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
 extern s32 gCdUseVSyncCallback;
-extern s32 D_8008A898;
+extern s32 gCdTickStep;
 extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
@@ -477,9 +477,9 @@ s32 ServiceCdDriver(void)
         VSyncCallback(0);
     }
 
-    if (D_8008A898 == 1) {
+    if (gCdTickStep == 1) {
         TickCdStateMachine();
-    } else if (D_8008A898 == 2) {
+    } else if (gCdTickStep == 2) {
         TickCdLoadFileStateMachine();
     }
 
@@ -511,7 +511,7 @@ void StartCdService(void)
     UnlockCd();
 }
 
-extern s32 D_8008A898;
+extern s32 gCdTickStep;
 extern s32 gCdCallbackInstalled;
 extern s32 gCdUseVSyncCallback;
 extern s32 gCdQueueEnabled;
@@ -521,7 +521,7 @@ void StopCdServiceIfIdle(void)
 {
     LockCd();
 
-    if (D_8008A898 == 0 && gCdCallbackInstalled != 0) {
+    if (gCdTickStep == 0 && gCdCallbackInstalled != 0) {
         if (gCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }

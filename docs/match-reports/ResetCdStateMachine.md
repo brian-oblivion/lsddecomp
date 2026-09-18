@@ -19,9 +19,9 @@ void ResetCdStateMachine(void)
 {
     gCdOperation = 0;
     gCdState = 0;
-    D_8008A898 = 0;
+    gCdTickStep = 0;
     gCdIdle = 1;
-    D_8008A8A0 = 0;
+    gCdTimeoutCounter = 0;
     gCdBusy = 0;
 }
 ```

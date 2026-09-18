@@ -88,7 +88,7 @@ typedef struct Rec80028448 {
 extern void *FindCdFileEntry(char *arg0);
 extern s32 FindCdFileIndex(char *arg0);
 extern void *gCdSeekParam;
-extern s32 D_8008A898;
+extern s32 gCdTickStep;
 
 extern void func_80028920(Obj80027480 *self, char *suffix);
 extern char *func_800289CC(char *dest, char *suffix);
@@ -125,7 +125,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
                 }
                 self->unk18 = rec->unk14;
                 temp = ((Rec80028448 *)gCdSeekParam)->unk18;
-                D_8008A898 = 1;
+                gCdTickStep = 1;
                 self->unk0C = 1;
                 self->unk1C = temp;
             } else {
@@ -170,7 +170,7 @@ void func_80027480(Obj80027480 *self) {
 
 extern u8 D_8006D574[8];
 extern void *gCdSeekParam;
-extern s32 D_8008A898;
+extern s32 gCdTickStep;
 
 extern s32 func_80028A50(Obj80027480 *self);
 extern s32 CdPosToInt(void *pos);
@@ -198,7 +198,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
             if (arg2 == 0) {
                 if (gCdAsyncEnabled != 0) {
                     gCdSeekParam = D_8006D574 - 0x14;
-                    D_8008A898 = 1;
+                    gCdTickStep = 1;
                 } else {
                     do {
                         CdControl(2, D_8006D574, 0);
@@ -229,7 +229,7 @@ void func_800276C8(void) {
 
 extern s32 gCdReadSectorCount; /* CdRead sector count */
 extern void *gCdReadBuffer; /* CdRead target buffer */
-extern s32 D_8008A898;
+extern s32 gCdTickStep;
 
 extern void func_80028A84(Obj80027480 *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
@@ -250,7 +250,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
             if (gCdAsyncEnabled != 0) {
                 gCdReadSectorCount = size >> 11;
                 gCdReadBuffer = buf;
-                D_8008A898 = 1;
+                gCdTickStep = 1;
             } else {
             retry:
                 CdRead(size >> 11, buf, 0x80);
@@ -271,7 +271,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
 }
 
 extern void Class6D430__AllocBuffer(void);
-extern void *D_8008A888;
+extern void *gCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
  * reading) -- declared LOCAL, per the project's multiple-local-views
@@ -307,7 +307,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
     if (self->unk28 != 0) {
         if (gCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             StartCdOperation(4, 1);
-            D_8008A888 = gCdSeekParam;
+            gCdSavedSeekParam = gCdSeekParam;
             rec = FindCdFileEntry(arg1);
             gCdSeekParam = rec;
             if (rec == NULL) {
@@ -333,7 +333,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
                 }
                 if (gCdAsyncEnabled != 0) {
                     self->unk14 = pos;
-                    D_8008A898 = 2;
+                    gCdTickStep = 2;
                 } else {
                 retry:
                     do {

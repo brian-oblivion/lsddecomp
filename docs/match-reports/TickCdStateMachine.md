@@ -9,11 +9,11 @@
 One tick of a small CD-read state machine. `gCdState` holds the current
 phase (0 default, 1 = issue `CdControlF` seek, 2 = poll `CdSync`, 7 = issue
 `CdRead`, 8 = poll `CdReadSync`; anything else in `{3,4,5,6}` or `>8` is a
-no-op). `D_8008A8A0` is a busy-wait timeout counter, reset by
+no-op). `gCdTimeoutCounter` is a busy-wait timeout counter, reset by
 `SetCdState` whenever the phase advances. Called from
-`ServiceCdDriver` (in the sibling unit `code_179d8_q.c`) when `D_8008A898 ==
+`ServiceCdDriver` (in the sibling unit `code_179d8_q.c`) when `gCdTickStep ==
 1`; `TickCdLoadFileStateMachine` is this same state machine's other tick variant
-(`D_8008A898 == 2`), differing only in what happens when `CdSync` reports
+(`gCdTickStep == 2`), differing only in what happens when `CdSync` reports
 "still the same phase" and after a successful `CdReadSync`.
 
 ## The C
@@ -65,8 +65,8 @@ L_state2:
     goto L_set;
 
 L_count:
-    D_8008A8A0++;
-    if (D_8008A8A0 < 0x259)
+    gCdTimeoutCounter++;
+    if (gCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;
