@@ -1,4 +1,6 @@
-# func_8001E2E8 — MATCHED
+> Renamed from `func_8001E2E8` on 2026-09-18 (tools/rename.py). Address 0x8001e2e8.
+
+# BisectSegmentToBox — MATCHED
 
 Unit: `code_d294_b`. Round 13, runner delta. 109/109 words, full match on the
 first attempt.
@@ -6,7 +8,7 @@ first attempt.
 ## Signature
 
 ```c
-void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
+void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 ```
 
 Confirmed against its only caller, `ClipSegmentToBox` (same unit, still
@@ -23,7 +25,7 @@ result is whatever `*out` holds when the function returns, not a return
 value.
 
 ```c
-void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
+void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
     Vec3S16_d294 buf0;
     Vec3S16_d294 buf1;
     Vec3S16_d294 *dst;
@@ -103,7 +105,7 @@ iteration — this is why there are two 6-byte stack slots (`sp+0x0`,
 
 - New `Vec3S16_d294` (`{ s16 x, y, z; }`, 6 bytes) and `BoundsBox_d294`
   (`{ Vec3S16_d294 lo, hi; }`, 12 bytes) types.
-- Prototype for `func_8001E2E8` itself.
+- Prototype for `BisectSegmentToBox` itself.
 
 ## Proposed learning
 

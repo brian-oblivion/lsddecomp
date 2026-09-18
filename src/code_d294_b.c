@@ -517,7 +517,7 @@ s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, V
         goto shared_test;
     }
     if (out != NULL) {
-        func_8001E2E8(out, box, p2, p1);
+        BisectSegmentToBox(out, box, p2, p1);
     }
     return 3;
 
@@ -526,7 +526,7 @@ shared_test:
         goto combined;
     }
     if (out != NULL) {
-        func_8001E2E8(out, box, p1, p2);
+        BisectSegmentToBox(out, box, p1, p2);
     }
     return 2;
 
@@ -575,7 +575,7 @@ combined:
  * overshot, so it becomes the new `far`, otherwise it becomes the new
  * `near` -- each written into one of two ping-pong stack buffers so the
  * OTHER endpoint's storage is never disturbed. */
-void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
+void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
     Vec3S16_d294 buf0;
     Vec3S16_d294 buf1;
     Vec3S16_d294 *dst;

@@ -913,3 +913,4 @@ Class6B5CC__NotifyIfUnk20Active = 0x8001D568; // type:func
 Class6B5CC__ComposeAndApplyRotation = 0x8001D950; // type:func
 Class6B5CC__CheckBoundsOverlap = 0x8001DA28; // type:func
 ClipSegmentToBox = 0x8001E110; // type:func
+BisectSegmentToBox = 0x8001E2E8; // type:func

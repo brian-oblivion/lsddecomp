@@ -36,8 +36,8 @@ s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, V
 
 Confirmed from its only caller (itself, recursively, plus one external call
 site not yet found outside this unit) and from `CalcBoxOutcode`'s own
-disassembly (see `func_8001E2E8`'s report — `CalcBoxOutcode` computes the
-identical box-vs-point outcode `func_8001E2E8`'s own `flags` computation
+disassembly (see `BisectSegmentToBox`'s report — `CalcBoxOutcode` computes the
+identical box-vs-point outcode `BisectSegmentToBox`'s own `flags` computation
 does).
 
 ## What it does
@@ -58,13 +58,13 @@ s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, V
     }
     if (r1 != 0 && r2 == 0) {
         if (out != NULL) {
-            func_8001E2E8(out, box, p2, p1);
+            BisectSegmentToBox(out, box, p2, p1);
         }
         return 3;
     }
     if (r1 == 0 && r2 != 0) {
         if (out != NULL) {
-            func_8001E2E8(out, box, p1, p2);
+            BisectSegmentToBox(out, box, p1, p2);
         }
         return 2;
     }
@@ -102,7 +102,7 @@ s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, V
 
 `CalcBoxOutcode(box, p)` returns a 6-bit outcode (0 = inside the box). If
 both endpoints are inside, there's nothing to bisect (return 1). If exactly
-one is outside, bisect toward the boundary via `func_8001E2E8` (this unit,
+one is outside, bisect toward the boundary via `BisectSegmentToBox` (this unit,
 matched this round) and report which side (2 or 3) was the inside one. If
 both are outside on the SAME side (shared outcode bit — `r1 & r2 != 0`),
 the segment cannot cross the box on that side, so short-circuit to 0.
@@ -186,14 +186,14 @@ issue #1, not an independent defect — worth re-checking automatically once
 
 `include/code_d294.h`:
 - New extern `s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point)` —
-  MEASURED shape (identical outcode-computation body to `func_8001E2E8`'s
+  MEASURED shape (identical outcode-computation body to `BisectSegmentToBox`'s
   own `flags` logic, see that report), not guessed.
 - Prototype `s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box,
   Vec3S16_d294 *p1, Vec3S16_d294 *p2);` left in place (harmless with the
   function still `INCLUDE_ASM`; saves the next attempt from re-deriving the
   signature, which took real effort — cross-referencing both call sites in
   `ClipSegmentToBox`'s own body, per the recursion, and the external call
-  sites are inferred from the parameter roles matching `func_8001E2E8`'s
+  sites are inferred from the parameter roles matching `BisectSegmentToBox`'s
   own confirmed signature one-for-one).
 
 **No existing declaration was modified for this function** — only new
@@ -231,12 +231,12 @@ computes `r1` into `$s0` (a real callee-saved register, survives calls)
 but keeps `r2` in `$v1` (a caller-saved SCRATCH register) the entire
 time, because on every retail code path that reaches the combined
 `(r1 & r2) != 0` test, `$v1` survives untouched -- neither of the two
-`func_8001E2E8` call sites is on that path (each returns immediately
+`BisectSegmentToBox` call sites is on that path (each returns immediately
 after its own call). This suggested a hypothesis: the round-13 report's
 four-independent-`if`-condition C shape (`if (r1==0&&r2==0)`, `if
 (r1!=0&&r2==0)`, `if (r1==0&&r2!=0)`, `if ((r1&r2)!=0)`, each re-testing
 both variables) might be what forces GCC to conservatively extend `r2`'s
-live range across the `func_8001E2E8` call sites (since a naive
+live range across the `BisectSegmentToBox` call sites (since a naive
 data-flow read of four flat conditions can't easily see that the `r1&r2`
 branch is unreachable from the two XOR branches), promoting it to a
 callee-saved register unnecessarily.
@@ -418,7 +418,7 @@ s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, V
         goto shared_test;
     }
     if (out != NULL) {
-        func_8001E2E8(out, box, p2, p1);
+        BisectSegmentToBox(out, box, p2, p1);
     }
     return 3;
 
@@ -427,7 +427,7 @@ shared_test:
         goto combined;
     }
     if (out != NULL) {
-        func_8001E2E8(out, box, p1, p2);
+        BisectSegmentToBox(out, box, p1, p2);
     }
     return 2;
 
