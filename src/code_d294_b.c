@@ -54,15 +54,15 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
  * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
  * unit -- fills it via func_8001F51C(self->unk20, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
- * (func_8001D624, also already matched in this unit), with the original
- * a1 passed through as func_8001D624's own a2. */
+ * (Class6B5CC__TransformAndNotifyParents, also already matched in this unit), with the original
+ * a1 passed through as Class6B5CC__TransformAndNotifyParents's own a2. */
 void func_8001D568(Class6B5CCObj *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
      * target (func_8001F51C, PsyQ, asm/psyq_fa50.s, not
      * decompiled here) fills fields out past +0x32 of its own `dest`
      * argument, so the true destination struct is bigger than the 8 bytes
      * GenericCountList_d294 alone would reserve -- not derived beyond its
-     * size, since the field layout past what func_8001D624 itself reads
+     * size, since the field layout past what Class6B5CC__TransformAndNotifyParents itself reads
      * (+0x0/+0x4) is PsyQ-internal. */
     u8 buf[0x38];
 
@@ -97,7 +97,7 @@ void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
  * for the duration of a single self->methods->slot30(self, a2) dispatch
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
-void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
+void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
     ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
     self->unk28 = 0;
     self->unk2C = 0;

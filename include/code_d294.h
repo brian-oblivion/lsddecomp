@@ -152,7 +152,7 @@ struct Class6B5CCSub14 {
     s32 unk18;                   /* +0x018, Vec3.x */
     s32 unk1C;                   /* +0x01C, Vec3.y */
     s32 unk20;                   /* +0x020, Vec3.z */
-    /* +0x024, round 12 (code_d294_b, func_8001D624): only its ADDRESS is
+    /* +0x024, round 12 (code_d294_b, Class6B5CC__TransformAndNotifyParents): only its ADDRESS is
      * taken (`&self->unk14->unk24`, forwarded to ApplyMatrixToSVArray as a
      * write-destination base) -- nothing dereferences through it in this
      * unit's chosen functions, so it stays an opaque byte span rather than
@@ -397,12 +397,12 @@ struct GenericObj_d294 {
      * own `unk24`. */
     u8 unk2C[0x030 - 0x02C];
     /* +0x030, round 13 (func_8001D714): same shape/usage as
-     * func_8001D624's own 2nd argument -- `unk0` read once and multiplied
+     * Class6B5CC__TransformAndNotifyParents's own 2nd argument -- `unk0` read once and multiplied
      * by 8, `&unk4` forwarded as an opaque data pointer. */
     GenericCountList_d294 *unk30;
 };
 
-/* A third small "count + data" shape, seen only through func_8001D624's own
+/* A third small "count + data" shape, seen only through Class6B5CC__TransformAndNotifyParents's own
  * 2nd argument (round 12): `unk0` is read once and multiplied by 8 to form
  * ApplyMatrixToSVArray's own iteration count, and `&unk4` (the address only, never
  * dereferenced here) is ApplyMatrixToSVArray's own source/dest base pointer. Real
@@ -424,7 +424,7 @@ struct Class6B5CCMethods {
     u8 pad010[0x030 - 0x010];
     /* +0x030, BasicClass__NotifyParents, inherited verbatim (per the file
      * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
-     * is a different unit's own ancestor code. func_8001D624 (round 12,
+     * is a different unit's own ancestor code. Class6B5CC__TransformAndNotifyParents (round 12,
      * this unit) dispatches through it as `(self, s32 arg1)`. */
     void (*slot30)(Class6B5CCObj *self, s32 arg1);
     u8 pad034[0x040 - 0x034];
@@ -470,11 +470,11 @@ struct Class6B5CCMethods {
     u8 pad088[0x08C - 0x088];
     /* +0x08C/+0x090, round 13 (func_8001D568's own call site): dispatched
      * as `(self, dest)` and `(self, a1, a2)` respectively, matching
-     * Class6B5CC__ReadUnk20Data/func_8001D624's own direct-call prototypes below
+     * Class6B5CC__ReadUnk20Data/Class6B5CC__TransformAndNotifyParents's own direct-call prototypes below
      * exactly (both already matched, code_d294_b) -- `tools/classtable.py
      * D_8006B5CC` confirms they occupy these two slots. */
     void (*slot8C)(Class6B5CCObj *self, void *dest); /* +0x08C, Class6B5CC__ReadUnk20Data */
-    void (*slot90)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, func_8001D624 */
+    void (*slot90)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, Class6B5CC__TransformAndNotifyParents */
     /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
      * triple -- func_8001CD60 (code_d294) dispatches to exactly one of
      * these three depending on `other->methods->header & 0xF` (2 -> +0x094,
@@ -562,8 +562,8 @@ struct Class6B5CCObj {
      * whole-image after this retype and func_8001D6B4 is still
      * byte-exact). */
     GenericObj_d294 *unk28;
-    s32 unk2C;  /* +0x02C, round 12 (func_8001D624): zeroed, alongside unk28 */
-    /* +0x030, round 12 (func_8001D624): set to that call's own 2nd argument
+    s32 unk2C;  /* +0x02C, round 12 (Class6B5CC__TransformAndNotifyParents): zeroed, alongside unk28 */
+    /* +0x030, round 12 (Class6B5CC__TransformAndNotifyParents): set to that call's own 2nd argument
      * for the duration of a single `self->methods->slot30(self, a2)`
      * dispatch, then zeroed again right after -- reads like a "currently
      * processing" scratch slot rather than a durable field. */
@@ -671,7 +671,7 @@ extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
  * retail's unaligned lwl/lwr + swl/swr copy come out) and forwards it to
  * Sony's `ApplyMatrixSV(m, &buf, dst)` -- so the 1st parameter is the
  * WRITE destination and the 2nd the read source, confirmed against the
- * byte-exact disassembly. `func_8001D624` (code_d294_b) calls it with both
+ * byte-exact disassembly. `Class6B5CC__TransformAndNotifyParents` (code_d294_b) calls it with both
  * equal to the SAME address, which is why the asymmetry was invisible
  * until this function was actually matched; round 50 renamed the
  * parameters (names only) to say which is which. Declared with the opaque
@@ -792,7 +792,7 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D568(Class6B5CCObj *self, s32 a1);
 
 void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest);
-void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
+void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
 void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
 void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
 void func_8001E4A4(Class6B5CCObj *self, void *node);

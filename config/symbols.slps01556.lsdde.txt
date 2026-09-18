@@ -908,3 +908,4 @@ func_800493E4 = 0x800493E4; // type:func
 Class6B5CC__GetSetUnk10Flag7 = 0x8001D450; // type:func
 Class6B5CC__GetSetUnk10Field9 = 0x8001D480; // type:func
 Class6B5CC__ReadUnk20Data = 0x8001D600; // type:func
+Class6B5CC__TransformAndNotifyParents = 0x8001D624; // type:func

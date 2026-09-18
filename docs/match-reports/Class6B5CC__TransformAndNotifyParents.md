@@ -1,11 +1,13 @@
-# func_8001D624 -- MATCHED (32/32 words)
+> Renamed from `func_8001D624` on 2026-09-18 (tools/rename.py). Address 0x8001d624.
+
+# Class6B5CC__TransformAndNotifyParents -- MATCHED (32/32 words)
 
 Round 12, runner delta. `code_d294_b`.
 
 ## Summary
 
 ```c
-void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
+void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
     ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
     self->unk28 = 0;
     self->unk2C = 0;
@@ -15,7 +17,7 @@ void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
 }
 ```
 
-Seeded with m2c (`--sig 'void func_8001D624(Class6B5CCObj *self, void *a1, s32 a2)'`),
+Seeded with m2c (`--sig 'void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, void *a1, s32 a2)'`),
 which independently produced the same shape (a CSE'd `temp = a1 + 4;` used
 for both `ApplyMatrixToSVArray` args, the two zero-stores, the stash-and-clear of
 `unk30`, and the vtable dispatch) -- matched first try after typing m2c's
@@ -52,7 +54,7 @@ loose `void *`/`*a1` reads into real fields.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/func_8001D624.s`).
+Disassembly (`asm/nonmatchings/code_d294_b/Class6B5CC__TransformAndNotifyParents.s`).
 
 ### Proposed learning
 
