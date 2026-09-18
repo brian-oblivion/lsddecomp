@@ -48,7 +48,7 @@ void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
   spurious `move` is emitted.
 - **Tag classification reads a full WORD (`arg->methods->header`), masked
   `& 0xFFF` / `& 0xF`, not a byte.** This is a DIFFERENT tag check than
-  `func_80057320`'s/`func_800571F8`'s (which read just the low byte via
+  `DispatchObjO__func_57320`'s/`BaseObjO__func_571f8`'s (which read just the low byte via
   `lbu`) -- kept as a separate local type, `TagWordObjO`, rather than
   conflating the two shapes.
 - **`self->unk4C = arg;` / `self->unk50 = arg;` are companion-object

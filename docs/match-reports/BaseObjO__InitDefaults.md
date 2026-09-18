@@ -1,4 +1,6 @@
-# func_800571E8 -- MATCHED (4/4 words)
+> Renamed from `func_800571E8` on 2026-09-18 (tools/rename.py). Address 0x800571e8.
+
+# BaseObjO__InitDefaults -- MATCHED (4/4 words)
 
 Unit: `class_3bb8c_o` (round 17). A two-field setter: `self->unk48 = 0x12C`
 (halfword), `self->unk54 = 0` (word).
@@ -6,7 +8,7 @@ Unit: `class_3bb8c_o` (round 17). A two-field setter: `self->unk48 = 0x12C`
 ## Final source
 
 ```c
-void func_800571E8(BaseObjO *self) {
+void BaseObjO__InitDefaults(BaseObjO *self) {
     self->unk48 = 0x12C;
     self->unk54 = 0;
 }
@@ -17,7 +19,7 @@ void func_800571E8(BaseObjO *self) {
 `sh $v0,0x48($a0)` (`$v0` pre-loaded with the literal `0x12C`) then
 `sw $zero,0x54($a0)` in the branch delay slot of `jr $ra`. Two independent
 field writes, no control flow -- matched first try. `unk48`'s width
-(`s16`) is confirmed by `func_800571F8`'s own `lh` read of the same field
+(`s16`) is confirmed by `BaseObjO__func_571f8`'s own `lh` read of the same field
 (sign-extending load).
 
 ### Proposed learning

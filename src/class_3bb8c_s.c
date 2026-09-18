@@ -114,7 +114,7 @@ struct LinkNode {
 
 extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
-extern void func_800573A8(void *self, Vec3S *v);   /* class_3bb8c_t.c */
+extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_t.c */
 extern void func_80056D18(void *self, s32 a1, s32 a2, void *tbl); /* below */
 extern s32 D_80087844[];
 extern s32 D_8008785C[];
@@ -389,7 +389,7 @@ void func_80056BBC(LinkNode *self) {
 
         child = self->arr84[1];
         D_80087880.x = D_80087844[self->unk70];
-        func_800573A8(child, &D_80087880);
+        BaseObjO__AddVec14(child, &D_80087880);
         m = child->methods;
         arg = (self->unk78 != NULL) ? self->unk78 : self->unk74;
         m->slotB8(child, arg);

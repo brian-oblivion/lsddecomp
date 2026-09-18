@@ -1,4 +1,6 @@
-# func_8005748C -- MATCHED (14/14 words)
+> Renamed from `func_8005748C` on 2026-09-18 (tools/rename.py). Address 0x8005748c.
+
+# BaseObjO__func_5748c -- MATCHED (14/14 words)
 
 Unit: `class_3bb8c_o` (round 17). A shared `BasicClass`-inherited slot
 occupant (`slotC4`), already independently confirmed `void` from BOTH
@@ -13,7 +15,7 @@ calls `func_80057534` (still `INCLUDE_ASM`, sibling unit
 extern s32 D_8008ABA8;
 extern void func_80057534(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void func_8005748C(BaseObjO *self, s32 arg1, s32 arg2) {
+void BaseObjO__func_5748c(BaseObjO *self, s32 arg1, s32 arg2) {
     func_80057534(self, &D_8008ABA8, arg1, arg2, 6);
 }
 ```

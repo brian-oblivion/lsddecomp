@@ -1,7 +1,9 @@
-# func_800573CC -- MATCHED (30/30 words)
+> Renamed from `func_800573CC` on 2026-09-18 (tools/rename.py). Address 0x800573cc.
+
+# BaseObjO__UpdateVec14 -- MATCHED (30/30 words)
 
 Unit: `class_3bb8c_o` (round 17). The shared worker behind
-`func_80057384`/`func_800573A8`: overwrites or accumulates a 3-word vector
+`BaseObjO__SetVec14`/`BaseObjO__AddVec14`: overwrites or accumulates a 3-word vector
 into `self->unk14->vec18`, then clears `self->unk14->unk0`.
 
 ## Final source
@@ -13,7 +15,7 @@ typedef struct Unk14ObjO {
     Vec3O vec18;      /* +0x018 .. +0x023 */
 } Unk14ObjO;
 
-void func_800573CC(BaseObjO *self, s32 flag, Vec3O *v) {
+void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v) {
     BaseObjO *t = self;
     Unk14ObjO *u = t->unk14;
 

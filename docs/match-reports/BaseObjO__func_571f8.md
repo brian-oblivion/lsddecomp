@@ -1,4 +1,6 @@
-# func_800571F8 -- MATCHED (74/74 words)
+> Renamed from `func_800571F8` on 2026-09-18 (tools/rename.py). Address 0x800571f8.
+
+# BaseObjO__func_571f8 -- MATCHED (74/74 words)
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot88` (via the fixed
 `func_8001E57C()` table) followed by a guarded body that only runs for
@@ -12,7 +14,7 @@ iteration to close.
 ## Final source
 
 ```c
-void func_800571F8(BaseObjO *self, s32 arg1) {
+void BaseObjO__func_571f8(BaseObjO *self, s32 arg1) {
     func_8001E57C()->slot88(self, arg1);
     /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
      * range test -- the combined form optimizes into a single unsigned

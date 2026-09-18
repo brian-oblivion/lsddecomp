@@ -80,6 +80,6 @@ larger, partially-opaque) extent.
   `BasicClass__*` and `DreamSys__*` already in the symbols file.
 - **Parameter `dst` retyped `Class6B5CCSub44 *` -> `Vec3_d294 *`.** Evidence:
   only three words at +0/+4/+8 are ever written, and `class_3bb8c_o`'s
-  `func_80057444` -- the one external call site -- passes the address of a
+  `BaseObjO__ApplyRotatedVec14` -- the one external call site -- passes the address of a
   bare 3-word local (`Vec3O buf`). The old typing matched by offset
   coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
