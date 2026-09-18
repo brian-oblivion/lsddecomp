@@ -38,6 +38,20 @@ extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void CdFlush(void);
 
+/* Psy-Q's own command code (include/psyq/LIBCD.H documents the command list
+ * but not the numeric values; this one is confirmed the same way
+ * code_179d8_q.c's CD_CMD_SETMODE is, by the sibling unit's independently
+ * derived 0x0E == CdlSetmode matching the well-known Psy-Q CdlCommand
+ * enumeration -- CdlSetloc is that enumeration's 3rd member, value 2).
+ * Spelled locally rather than by including LIBCD.H, same rationale as
+ * code_179d8_q.c: this unit's libcd declarations are deliberately
+ * per-call-site. */
+#define CD_CMD_SETLOC 2
+
+/* Both state==2 branches below busy-wait this many ticks (~601 service-pump
+ * calls) before giving up and retrying the command from state 1. */
+#define CD_WAIT_TIMEOUT 0x259
+
 /* Psy-Q pool allocator, code_8220.c. */
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
@@ -45,17 +59,23 @@ extern void *func_80017CFC(void *ptr);
 /* libc2/strstr.o, linked (see code_179d8_h.c's carve notes). */
 extern char *strstr(char *s1, char *s2);
 
-/* generic doubly-linked-list node, 0x24 bytes; offsets 0x0/0x4/0x1C/0x20 are
- * the only ones this unit's two list functions touch. */
-typedef struct Node8008A894 {
-    /* 0x00 */ s32 unk0;
+/* the CD request-queue node, 0x24 bytes; offsets 0x0/0x4/0x1C/0x20 are the
+ * only ones this unit's two list functions touch. `active` matches the name
+ * the sibling unit code_179d8_q.c's own independent view of this same
+ * struct (CdRequest_D70) already gives this field: StartCdOperation sets it
+ * on the head node when it starts an operation on it, AllocCdRequestNode
+ * clears it at allocation. This is a unit-local typedef, so the rename is
+ * local to this file (CLAUDE.md, multiple-independent-local-views); `unk4`
+ * has no evidence anywhere and keeps its placeholder name. */
+typedef struct CdRequestNode {
+    /* 0x00 */ s32 active;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ u8 pad8[0x14];
-    /* 0x1C */ struct Node8008A894 *prev;
-    /* 0x20 */ struct Node8008A894 *next;
-} Node8008A894; /* size 0x24 */
+    /* 0x1C */ struct CdRequestNode *prev;
+    /* 0x20 */ struct CdRequestNode *next;
+} CdRequestNode; /* size 0x24 */
 
-extern Node8008A894 *gCdRequestQueue; /* list head */
+extern CdRequestNode *gCdRequestQueue; /* list head */
 
 extern s32 gCdBusy; /* "busy" flag, 0/1 */
 extern char *gFileTable; /* base of a table of 0x1C-byte string records */
@@ -70,11 +90,11 @@ extern void *gCdSavedSeekParam; /* secondary pointer, used only by TickCdLoadFil
 extern s32 gCdTickStep;   /* which state-machine step to tick, 1 or 2 */
 extern s32 gCdTimeoutCounter;   /* timeout counter */
 
-Node8008A894 *AllocCdRequestNode(void)
+CdRequestNode *AllocCdRequestNode(void)
 {
-    Node8008A894 *node;
-    Node8008A894 *head;
-    Node8008A894 *cur;
+    CdRequestNode *node;
+    CdRequestNode *head;
+    CdRequestNode *cur;
 
     LockCd();
     node = func_80017B34(0x24);
@@ -82,7 +102,7 @@ Node8008A894 *AllocCdRequestNode(void)
         head = gCdRequestQueue;
         node->prev = NULL;
         node->next = NULL;
-        node->unk0 = 0;
+        node->active = 0;
         node->unk4 = 0;
         if (head != NULL) {
             cur = head;
@@ -101,10 +121,10 @@ Node8008A894 *AllocCdRequestNode(void)
     return node;
 }
 
-void FreeCdRequestNode(Node8008A894 *node)
+void FreeCdRequestNode(CdRequestNode *node)
 {
-    Node8008A894 *prev;
-    Node8008A894 *next;
+    CdRequestNode *prev;
+    CdRequestNode *next;
 
     LockCd();
     if (node != NULL) {
@@ -123,14 +143,14 @@ void FreeCdRequestNode(Node8008A894 *node)
     UnlockCd();
 }
 
-void *FindCdFileEntry(char *arg0)
+void *FindCdFileEntry(char *name)
 {
     char *cur = gFileTable;
     s32 i = 0;
 
     LockCd();
     do {
-        if (strstr(cur, arg0) != NULL) {
+        if (strstr(cur, name) != NULL) {
             UnlockCd();
             return cur;
         }
@@ -140,13 +160,13 @@ void *FindCdFileEntry(char *arg0)
     return NULL;
 }
 
-s32 FindCdFileIndex(char *arg0)
+s32 FindCdFileIndex(char *name)
 {
     char *cur = gFileTable;
     s32 i = 0;
 
     LockCd();
-    while (strstr(cur, arg0) == NULL) {
+    while (strstr(cur, name) == NULL) {
         i++;
         if (i >= gFileTableCount) {
             return -1;
@@ -172,7 +192,7 @@ void *GetCdFileEntry(s32 index)
 /* forward decls -- both defined later in this unit; ROM order keeps the
  * definitions below. */
 extern void ResetCdStateMachine(void);
-extern void SetCdState(s32 arg0);
+extern void SetCdState(s32 state);
 
 void TickCdStateMachine(void)
 {
@@ -197,7 +217,7 @@ void TickCdStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -218,7 +238,7 @@ L_state2:
 
 L_count:
     gCdTimeoutCounter++;
-    if (gCdTimeoutCounter < 0x259)
+    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT)
         goto L_end;
     newstate = 1;
     goto L_set;
@@ -275,7 +295,7 @@ void TickCdLoadFileStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -300,7 +320,7 @@ L_busy:
 
 L_count:
     gCdTimeoutCounter++;
-    if (gCdTimeoutCounter < 0x259)
+    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT)
         goto L_end;
     newstate = 1;
     goto L_set;
@@ -332,13 +352,13 @@ L_end:
     UnlockCd();
 }
 
-void StartCdOperation(s32 arg0, s32 arg1)
+void StartCdOperation(s32 op, s32 state)
 {
     gCdBusy = 1;
-    gCdOperation = arg0;
-    gCdState = arg1;
+    gCdOperation = op;
+    gCdState = state;
     gCdIdle = 0;
-    gCdRequestQueue->unk0 = 1;
+    gCdRequestQueue->active = 1;
 }
 
 void ResetCdStateMachine(void)
@@ -351,8 +371,8 @@ void ResetCdStateMachine(void)
     gCdBusy = 0;
 }
 
-void SetCdState(s32 arg0)
+void SetCdState(s32 state)
 {
-    gCdState = arg0;
+    gCdState = state;
     gCdTimeoutCounter = 0;
 }
