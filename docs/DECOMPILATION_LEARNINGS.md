@@ -183,7 +183,12 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   loop-carried literal comparison into a spare callee-saved register, one word SHORT;
   `label: …; if (cond) goto label;` defeats it, and register pressure is not the knob.
   Signature: extra `li $sN,<const>` outside, missing `move` inside. Does not generalise
-  across loops even within one function. (a §"Source-shape levers found this round")
+  across loops even within one function. Nor does it reach a repeated LOCAL
+  STACK-ADDRESS CSE across non-adjacent call sites: round 54 tried two CFG shapes on
+  `func_80028920`, one regressed to 3/43 with drift and the other left the CSE fully
+  intact while only relocating the register rotation. The documented address-CSE fix
+  (`extern T name_b __asm__("name");`) is a LINKER-SYMBOL alias and is global-only;
+  there is no known C89 lever for the local-stack case. (a round 54)
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not
   dedupe an explicit `if` against a loop's implicit entry test (where retail has ONE
   check, `guard + do-while` says so), and a provably-dead `x != 5 && x != 8 && x == 0xA`
@@ -224,6 +229,16 @@ function can load through a runtime-indexed global", §"BLOCKED: the
 
 ### 3c. Struct layout, types and widths
 
+- **A type-scoped field rename is enumerated by the COMPILER, and the compiler cannot
+  see a `#if 0` preserved body.** Renaming a shared struct's field in its DEFINITION
+  only, then fixing exactly the accessors the build reports, is the safe procedure (a
+  whole-tree replace of `slotA4` mislabels five other classes that have their own).
+  But preserved bodies in `src/` compile to nothing, so their accessors are silently
+  left spelling the old name, and `tools/stalesyms.py` does not cover them either —
+  it scans match REPORTS. Round 54 left four such accessors behind (`code_d294_c.c`,
+  `code_d294_b.c`) after the compiler declared the rename complete. Discriminator: the
+  build is green AND `awk '/^#if 0/{i=1} /^#endif/{i=0} i && /->oldName/' src/*.c`
+  still prints. Sweep it after every type-scoped rename. (a round 54)
 - **A local's DECLARED WIDTH is a codegen decision and `s16` is the expensive default.**
   An `s16`/`u16` local compared or indexed is re-sign-extended at each use — `sll
   0x10`/`sra 0x10` PAIRS, never scheduling, never movable by a barrier. Declare the LOCAL

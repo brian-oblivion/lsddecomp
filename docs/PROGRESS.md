@@ -6,6 +6,81 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-18 — round 54: two units named, a Shift-JIS codec identified, and the type-scoped rename's blind spot at preserved bodies
+
+Head on Opus, three runners (operator capped the round at three, nearing an
+API limit). Gate 0 green first try; all three worktrees byte-verified before
+handover. No header contention — the three units share no project header,
+after the head swapped `code_2cc8c_c` (ranked 4th) for `code_d294_b` (6th) to
+get a mutually-independent set at equal centrality.
+
+**State at end: 1138 matched / 1252 game functions, 0 fresh, 114 stalled.
+Track 1 calibration sonnet 0/5 of its six attempts. Track 2 unchanged at 98
+named / 44 `func_`. Track 3 at 9/75 units, 922 defs still `func_` (was 959).
+Build verifies.**
+
+**Track 3 (alpha, `code_2cc8c_f`).** The `Obj6EAC0` text/digit display class
+plus a full-width Shift-JIS codec: 24 functions named, 11 struct fields, 6
+kept tier C with what is known written down. The head verified the tier-A
+codec claim independently rather than accepting it — `'0'`->0x824F,
+`'A'`->0x8260, `' '`->0x8140 (the ideographic space), `'a'`->0x8281, and both
+special cases in the encoder (`trail != 0x20`, `trail < 0x60`) are explained
+by exactly those boundaries; decode is the exact inverse. This is a real
+identification, not a plausible-sounding name.
+
+**Track 3 (bravo, `code_d294_b`).** `Class6B5CC` bitfield accessors, the
+parent-notification chain, and an outcode/midpoint-subdivision segment-AABB
+clip. bravo renamed 9 and HELD BACK 8, having applied track 3 step 3's FIELD
+ownership rule to FUNCTION symbols. That reading is wrong — `rename.py` is
+global by construction and is the sanctioned mechanism for a function rename;
+its out-of-unit edits are call sites and prose references, which is what the
+tool is for. The head reviewed each name's evidence and applied all eight.
+Worth noting the error was conservative and well-documented, which cost one
+head pass and nothing else.
+
+**The finding: a type-scoped field rename is enumerated by the COMPILER, and
+the compiler cannot see a `#if 0` preserved body.** Applying bravo's seven
+`Class6B5CCMethods` vtable slot names by type scope worked exactly as
+revision 3 describes — definition first, compiler lists accessors in two
+passes (2 in `code_d294_c.c`, 4 in `code_d294_b.c`), fix exactly those, and
+the five unrelated classes carrying their own `slotA4`/`A8`/`AC` stay
+untouched. But four further accessors sat inside `#if 0` preserved bodies,
+invisible to the compiler, and `tools/stalesyms.py` does not cover them
+either — it scans match REPORTS, not `src/`. The build was green with the
+rename incomplete. Swept and fixed; promoted as a learning with its
+discriminator (§3c).
+
+**Track 1 (charlie, `code_179d8_h`), 0 matches from 2 attempts.** Both
+functions rebuilt before being trusted, both stalls reconfirmed, both titles
+rebuilt to the mandatory three figures. On `func_80028920` a reshape reached
+14/43 at the same 44/43 length — numerically above the recorded 12/43 — and
+charlie correctly declined to call it progress: asm-differ shows the
+identical residue class and the first real diff moved EARLIER. That is the
+honesty the score-lies section asks for, from a Sonnet runner, unprompted.
+Its negative is now a scope boundary on a standing learning: the syntax-gated
+LICM defeat does not reach a repeated LOCAL STACK-ADDRESS CSE across
+non-adjacent call sites, and the documented address-CSE fix is a linker-symbol
+alias, global-only.
+
+**The head skipped four higher-ranked track-1 jobs and the whole track-2 job**,
+each with a written reason posted to the broadcast: `code_2cc8c_e` (round-46
+DELIBERATE SKIP, also skipped round 53), `class_3bb8c_b` x5 (attempted round
+53 for zero, history to round 9), `func_8003E4B8` (82,702-iteration permuter
+search), `code_55dd4` x3 (rounds 14-49). Track 2's 44 are the ones round 53
+PARKED under the track's own park rule. The ranked stall band is now
+uniformly levers-spent, which is the condition the stop rule was written for —
+but the rule cannot fire until Opus has its six attempts, and Opus has none.
+
+**Two measurement gaps escalated, not acted on** (both are tool changes, a
+Fable task per FINISHING-PLAN §6): `plan.py` never lists REVISIT jobs, because
+it dates eligibility from the report file's git date and a naming pass runs
+`rename.py`, which rewrites that report — so a unit's stalls lose revisit
+eligibility exactly when the pass that should trigger it lands (four stalls
+affected). And track 2 counts parked functions as outstanding, so its job
+re-ranks first every round.
+
+---
+
 ## 2026-09-18 — round 53: track 2's first run, the Sonnet calibration's first countable attempts, and two jobs the plan ranks first that a head keeps skipping
 
 Head on Opus, three runners (operator capped the round at three, nearing an

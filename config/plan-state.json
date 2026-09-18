@@ -30,6 +30,16 @@
           "note": "Track-1 Sonnet calibration, first attempts that count. Runner bravo on class_3bb8c_b: func_8004CD38 (new nested-ternary shape, 2/27, a third distinct compiled shape, neither missing instruction recovered), func_8004CFB8 (direct-field-write variant regressed to 15/28 AND broke the already-solved first half; --no-nop-mflo-mfhi correctly ruled out as maspsx-level, downstream of cc1's mflo placement), func_8004CAF0 (full local-declaration reorder and the round-19 mention-twice trick on self, both byte-identical 55/97). Zero matches. HEAD SKIPPED plan.py's top track-1 job (code_2cc8c_e) because all three of its functions carry a round-46 DELIBERATE SKIP / levers-measurably-spent verdict and the unit has not passed track 3, so no revisit trigger; class_3bb8c_b's three explicitly say NOT permuter-exhausted.",
           "round": 53,
           "runners": 1
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-18",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Track-1 Sonnet calibration, attempts 4 and 5 of 6. Runner charlie on code_179d8_h: func_80028920 (rebuilt the inherited 12/43 unchanged, then two reshapes -- a forward-goto block relocation regressed to 3/43 with drift, and retail's own post-increment loop-exit timing reached 14/43 at the SAME 44/43 length but asm-differ confirms the identical residue class and the first real diff moved EARLIER; recorded as best raw figure, explicitly NOT as progress), func_80028A84 (third independent CFG syntax to land in the same score band with the same broken frame size, treated as axis exhausted). Zero matches. Title figures rebuilt to the mandatory three on both. HEAD SKIPPED four higher-ranked track-1 jobs, each with a documented levers-spent or deliberate-skip verdict: code_2cc8c_e (round-46 DELIBERATE SKIP, also skipped round 53), class_3bb8c_b x5 (attempted round 53 for zero, history back to round 9), code_2cc8c_c func_8003E4B8 (82702-iteration permuter search round 46), code_55dd4 x3 (rounds 14-49, deepest in corpus). The ranked band is now uniformly levers-spent, which is the condition the stop rule was written for.",
+          "round": 54,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -86,6 +96,16 @@
           "note": "Track 3 naming, runner alpha, unit code_179d8_r (the CD-ROM read state machine, request queue and file-table lookups). 10/10 functions and 7/7 D_ globals named, plus a local typedef, one field, four parameters, two named constants and a rewritten unit header comment. Head-reviewed 5 names against their bodies (StartCdOperation/ResetCdStateMachine exact mirrors, SetCdState, GetCdFileEntry pure index math vs FindCdFileEntry's strstr scan, FindCdFileIndex) -- no wrong tier-A name; mark-unit'd. Runner kept both tick functions at tier B after call-site cross-referencing FALSIFIED its own seek-vs-read hypothesis. Zero cross-unit field names proposed, so no type-scoped rename for the head to apply. NOTE: attempts/matches for track 3 read as units assigned / units head-reviewed and marked; rounds 51 and 52 recorded this field inconsistently.",
           "round": 53,
           "runners": 1
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-18",
+          "matches": 2,
+          "model": "sonnet",
+          "note": "Track 3 naming, runners alpha (code_2cc8c_f) and bravo (code_d294_b). alpha: the Obj6EAC0 text/digit display class plus a full-width Shift-JIS codec -- 24 functions named, 11 struct fields, 6 kept tier C with what is known written down. Head verified the tier-A SJIS claim independently against four real code points ('0'->0x824F, 'A'->0x8260, ' '->0x8140 ideographic space, 'a'->0x8281), and both special cases in the encoder are explained by it; decode confirmed the exact inverse. bravo: Class6B5CC bitfield accessors, parent-notification chain and an outcode/midpoint-subdivision segment-AABB clip -- 9 renamed, 8 held back, 3 kept tier C. Five names sampled per unit, no wrong tier-A name; both mark-unit'd. HEAD APPLIED at merge: bravo's 8 held-back FUNCTION renames (bravo had applied track 3 step 3's FIELD ownership rule to function symbols; rename.py is global by construction and is the sanctioned mechanism), and its 7 proposed Class6B5CCMethods vtable slot names by TYPE SCOPE.",
+          "round": 54,
+          "runners": 2
         }
       ],
       "status": "open",
@@ -95,7 +115,9 @@
         "code_179d8_e": "2026-09-18",
         "code_179d8_q": "2026-09-17",
         "code_179d8_r": "2026-09-18",
+        "code_2cc8c_f": "2026-09-18",
         "code_8220_b": "2026-09-17",
+        "code_d294_b": "2026-09-18",
         "code_d294_c": "2026-09-17"
       }
     },
