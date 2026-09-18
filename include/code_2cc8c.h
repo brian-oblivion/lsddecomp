@@ -737,10 +737,14 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    code_2cc8c_e.c's reading of a Psy-Q `GsOT`; the struct stays in this header
    because other code uses it, and no byte depends on the naming. */
 
-/* func_80021114 (asm/psyq_10ee0.s, PsyQ library, not game code):
-   func_8003EDF4 (round 14, this unit) calls it with a literal 0 and
-   ignores the return; declared here only with that shape. */
-extern void func_80021114(s32 a0);
+/* DrawSync is NO LONGER DECLARED HERE, round 53. It is Sony's
+   `DrawSync` (`libgpu/sys.o`, fingerprint exact vs the disc corpus, not yet
+   linked from an SDK object) -- same collision reason as GsSetRefView2 and
+   GsClearOt above: LIBGPU.H carries its own prototype (`extern int
+   DrawSync(int mode);`), and a second declaration of that name in a header
+   six units include is the `conflicting types` failure CLAUDE.md and the SDK
+   guide both warn about. Its one caller, func_8003EDF4, now declares it
+   locally in src/code_2cc8c_d.c with that call site's own shape. */
 
 /* The following are called only from func_8003EEC0 (this unit). They are
    plain `void *` global setters (this call site happens to pass an
@@ -769,12 +773,16 @@ extern void func_8003FBE4(void *a0);
    literal 1 and ignores the return. */
 extern s32 ResetGraph(s32 mode);
 
-/* func_80023DA0 (asm/psyq_140dc.s, PsyQ library, not game code):
-   func_8003F04C calls it with self->unk58's own three bytes (read
-   unsigned, same "writer reads signed, this reader reads unsigned"
-   situation as unk5B/func_8003EEC0) plus one more word; declared here
-   only with that call site's own shape. */
-extern void func_80023DA0(u8 a0, u8 a1, u8 a2, s32 a3);
+/* GsSortClear is NO LONGER DECLARED HERE, round 53. It is Sony's
+   `GsSortClear` (`libgs/gs_001.o`, fingerprint exact vs the disc corpus, not
+   yet linked from an SDK object) -- same collision reason as GsClearOt above:
+   LIBGS.H carries its own prototype (`void GsSortClear(u_char r, u_char g,
+   u_char b, GsOT *ot);`), and a second declaration of that name in a header
+   six units include is the `conflicting types` failure CLAUDE.md and the SDK
+   guide both warn about. Its one caller, func_8003F04C, now declares it
+   locally in src/code_2cc8c_d.c with that call site's own shape (self->unk58's
+   three bytes read unsigned, same "writer reads signed, this reader reads
+   unsigned" situation as unk5B/func_8003EEC0, plus one more word). */
 
 /* func_8003FBF4 is NO LONGER DECLARED HERE, round 34. It is Sony's
    `GsDrawOt` (`libgs/gs_111.o`, linked from the SDK object) -- same

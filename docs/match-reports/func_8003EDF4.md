@@ -19,7 +19,7 @@ own logic is independent).
 ```c
 void func_8003EDF4(Unk18Obj *self) {
     if (self->unk70 != 0) {
-        func_80021114(0);
+        DrawSync(0);
         func_80017CFC((void *)self->unk78);
         self->unk70 = 0;
     }
@@ -28,5 +28,5 @@ void func_8003EDF4(Unk18Obj *self) {
 
 ## Header changes
 
-`include/code_2cc8c.h`: new extern `func_80021114(s32 a0)` (PsyQ library,
+`include/code_2cc8c.h`: new extern `DrawSync(s32 a0)` (PsyQ library,
 `asm/psyq_GsLinkObject4.s`, not decompiled).
