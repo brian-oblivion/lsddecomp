@@ -91,8 +91,13 @@ typedef struct VabStreamObj VabStreamObj;
  * unit itself defines are named here. */
 typedef struct VabDriverMethods {
     u8 pad000[0x054];
-    s32 (*slot54)(void); /* func_8002C408 */
-    u8 pad058[0x078 - 0x058];
+    s32 (*slot54)(void);  /* func_8002C408 -- empty (return 0), no call site in this unit */
+    void (*slot58)(void); /* func_8002C410 -- empty, no call site in this unit */
+    u8 pad05C[0x068 - 0x05C];
+    void (*slot68)(void); /* func_8002C418 -- empty, no call site in this unit */
+    void (*slot6C)(void); /* func_8002C420 -- empty, no call site in this unit */
+    void (*slot70)(void); /* func_8002C428 -- empty, no call site in this unit */
+    void (*slot74)(void); /* func_8002C430 -- empty, no call site in this unit */
 } VabDriverMethods;
 extern VabDriverMethods gVabDriverMethods;
 
