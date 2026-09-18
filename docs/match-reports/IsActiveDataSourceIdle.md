@@ -34,3 +34,14 @@ s32 IsActiveDataSourceIdle(void) {
 ## Proposed learning
 
 See `LockActiveDataSource.md` — same family.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026E98` | `IsActiveDataSourceIdle` | B |
+
+**Evidence.** Forwards to `IsCdIdle()` when the CD driver is active, else
+always reports idle (`1`). Same family.

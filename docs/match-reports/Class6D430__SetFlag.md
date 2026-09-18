@@ -46,3 +46,23 @@ function" trap from the runner brief, since there's no callee at all.
 ## Proposed learning
 
 None new.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026C88` | `Class6D430__SetFlag` | B |
+
+**Evidence.** `+0x064` slot: `this->flags |= 1;` -- a read-modify-write on
+the single flags word this round also named (see the field-rename commit).
+Mechanics fully known (sets bit 0); what bit 0 signals in the game is not
+established, so named for the mechanic only.
+
+**Field renamed alongside it.** `unknown_value_0x24` -> `flags` (in
+`include/code_171e0.h`'s `UnkFlagsObj_171e0`): `grep -rn -- '->unknown_value_0x24\b'
+src/` had zero hits outside `code_171e0.c`, so unlike almost every other
+field in this struct (see `## Proposed field names` in this unit's other
+reports / the broadcast), this one is owned solely by this unit and renames
+directly rather than needing a head-applied cross-unit proposal.

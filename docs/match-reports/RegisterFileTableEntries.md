@@ -98,3 +98,18 @@ branch target (so it lands next to the epilogue, no trailing jump) and the
 smaller arm as the plain fallthrough. This cost one wasted build in round
 43; the fix was a straight swap of `if`/`else` polarity with identical
 logic.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027024` | `RegisterFileTableEntries` | B |
+
+**Evidence.** When the CD driver is active: installs the caller's array as
+the file table, advances the running entry count by `arg1`, and resolves
+the new entries' disc positions via `ResolveFileEntries`; otherwise a no-op
+returning `1`. Mechanics fully derived from the body and the callees'
+already-established names (`SetFileTable`/`GetFileTableCount`/
+`SetFileTableCount`/`ResolveFileEntries`).

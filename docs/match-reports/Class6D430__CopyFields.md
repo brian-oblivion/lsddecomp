@@ -77,3 +77,17 @@ a block" shape already covered by existing guidance; worth noting only that
 the *gap* in the offset list is itself informative (there's a real field or
 fields at `+0x5C..+0x64` that this particular copy path intentionally skips,
 likely cache/derived state rather than persistent data).
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026D88` | `Class6D430__CopyFields` | B |
+
+**Evidence.** A field-by-field copy of a fixed subset of one
+`UnkFlagsObj_171e0` instance's fields into another (`+0x40..+0x58`,
+`+0x68..+0x74`, skipping a real 0xC-byte gap). Mechanics fully derived
+(confirmed instruction-by-instruction, not a struct-value copy); why these
+specific fields travel together and not the gap is not established.

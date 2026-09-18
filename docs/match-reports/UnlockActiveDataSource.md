@@ -36,3 +36,14 @@ this file.)
 ## Proposed learning
 
 See `LockActiveDataSource.md` — same six-function family, same finding.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026E38` | `UnlockActiveDataSource` | B |
+
+**Evidence.** Mirrors `LockActiveDataSource`, forwarding to `UnlockCd`. Same
+family, same evidence.

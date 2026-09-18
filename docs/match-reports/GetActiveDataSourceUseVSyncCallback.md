@@ -54,3 +54,17 @@ See `GetActiveDataSourceMethods.md`. This is the instance that upgrades the fami
 non-void typing from "CLAUDE.md-default assumption" to "independently
 confirmed": `func_8002C478`'s real definition elsewhere in the tree already
 declares `s32`.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026FE8` | `GetActiveDataSourceUseVSyncCallback` | B |
+
+**Evidence.** Forwards to `func_80028B6C` (itself just `return
+gCdUseVSyncCallback;`, an already-named global) when the CD driver is
+active, else `func_8002C478` (always `0`). The "VSync callback" framing
+comes directly from that already-established global's name, generalised to
+whichever source is active.

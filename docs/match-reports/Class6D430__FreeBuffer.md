@@ -75,3 +75,17 @@ uniform shift (every word wrong, but the SAME word appearing one slot over)
 with zero words matching, check sibling functions in the same translation
 unit for a genuine size bug before touching this function's own source at
 all — this one needed no changes once the real culprit was fixed.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026C20` | `Class6D430__FreeBuffer` | B |
+
+**Evidence.** `+0x05C` slot: frees `this->unk10` via `func_80017CFC` and
+clears it, guarded by three conditions (non-NULL, sized, not busy per
+`unk20`). Also reachable indirectly through `Class6D430__Destroy`. Mirrors
+`Class6D430__AllocBuffer`'s naming; mechanics known, why the buffer needs
+this specific guard is not.

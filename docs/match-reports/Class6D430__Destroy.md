@@ -76,3 +76,19 @@ wrong constant) rather than a structural residue — that specific fingerprint
 (correct opcode/registers, wrong small immediate, on a `$v0`-relative load
 right after a `this->methods` load) should be checked against the header's
 struct layout *before* being treated as a real residue class.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026AB4` | `Class6D430__Destroy` | B |
+
+**Evidence.** The class's own destructor, `+0x00C` slot (the `dtor` field
+already named in `UnkFlagsObjMethods_171e0`). Calls the subclass-overridable
+hook `slot48` (null at this level) then tail-calls `slot5C`
+(`Class6D430__FreeBuffer` at this class's own level, though dispatched
+indirectly). Mechanics known (release the hook, then the buffer); whether
+this specific sequencing has a game-visible purpose beyond "the dtor" is
+not established.

@@ -41,3 +41,15 @@ BasicClass base (`D_8006B58C`, resolved with `--vs`) for the inherited slots).
 ## Proposed learning
 
 None beyond what `GetClass6D3C8Methods`'s report already says about this shape.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026C9C` | `GetClass6D430Methods` | A |
+
+**Evidence.** `return D_8006D430;` -- the same "get my own vtable" shape as
+`GetClass6D3C8Methods` (this round) and `GetClass6D4E8Methods` (round 51).
+Pure leaf, mechanics are its purpose.

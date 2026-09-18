@@ -45,3 +45,18 @@ with a proper vtable-typed one.
 A function that only does `lui/addiu` to a symbol with no `lw`/`sw` around it
 is returning `&symbol`, not a value read from it — worth checking who calls it
 before guessing a dereferencing signature.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800269E0` | `GetClass6D3C8Methods` | A |
+
+**Evidence.** A two-instruction address-of returning `&D_8006D3C8`. `Class6D3C8`
+is already an established type name in `src/code_1677c.c` (that unit's own
+functions are typed against it), and the "return my own vtable" shape is
+already named twice in this project (`GetClass6D4E8Methods`,
+`GetClass6D430Methods`, this same round). Pure leaf whose mechanics are its
+purpose.

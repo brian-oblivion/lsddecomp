@@ -37,3 +37,14 @@ See `LockActiveDataSource.md` — same family. Confirms the CLAUDE.md caution ab
 tail-call return types: this function's shape (fixed constant on the
 false-path, callee's return on the true-path) is direct positive evidence the
 function is non-void, not an assumption.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026E64` | `IsActiveDataSourceBusy` | B |
+
+**Evidence.** Forwards to `IsCdBusy()` when the CD driver is active, else
+always reports not-busy (`0`). Same family as `LockActiveDataSource`.

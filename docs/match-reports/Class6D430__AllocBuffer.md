@@ -122,3 +122,18 @@ should be corrected to `extern void *func_80017B34(s32 size);` — confirmed
 independently in two units (`new_class_6d3c8` in `code_1677c`, and this
 function). Left unfixed for now since `class_16334.h` is outside this unit's
 scope; flagged for a spawned follow-up.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026B08` | `Class6D430__AllocBuffer` | B |
+
+**Evidence.** `+0x058` slot: a lazy (re)allocation routine. No-ops if
+`this->unk10` is already set; otherwise sizes and commits a new buffer
+through `slot44`/`slot4C`/`slot54`/`slot48` (all null at this class's own
+level -- subclass hooks) and `func_80017B34`, installing the result into
+`unk10`/`unk14` on success. Mechanics fully derived; what the buffer holds
+at the base-class level is not (the subclass provides that via the hooks).

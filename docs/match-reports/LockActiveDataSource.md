@@ -50,3 +50,17 @@ All six matched on the first build once `gActiveDataSource` was declared as a pl
 round-2026-08-29-a "toolchain, not source" diagnosis was correct. See
 `GetActiveDataSourceMethods.md` for a second, `if`/`else` variant of the same family (nine
 functions total share the `gActiveDataSource == 0x13` gate).
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026E0C` | `LockActiveDataSource` | B |
+
+**Evidence.** `if (gActiveDataSource == DATASOURCE_CD) LockCd();` -- forwards
+to the CD driver's own `LockCd` only when it is the active source, no-op
+otherwise. First of a six-function family sharing this shape (see
+`GetActiveDataSourceMethods.md` and the unit header comment); named
+uniformly as `...ActiveDataSource...` across all of them.

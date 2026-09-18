@@ -37,3 +37,14 @@ See `LockActiveDataSource.md` — last of the six-function family
 build once `gp_rel` was resolved, with zero source-shape changes from the
 round-2026-08-29-a preserved bodies — strong confirmation this really was a
 pure toolchain block, not a source-shape problem.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026F00` | `GetActiveDataSourceState` | B |
+
+**Evidence.** Forwards to `GetCdState()` when the CD driver is active, else
+`0`. Same family.

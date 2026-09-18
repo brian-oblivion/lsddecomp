@@ -54,3 +54,14 @@ anything else, with no other use for that copy, is returning the pointer —
 even when the one caller you can find ignores the result. Check the
 function's OWN body for the `addu $v0, $a0, ...` idiom before trusting a
 caller's ignored return value as evidence for `void`.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026CE8` | `SetVec3` | A |
+
+**Evidence.** Writes `x`/`y`/`z` into a `Vec3_171e0` and returns the pointer
+-- a pure "set and return this" setter. Mechanics are its purpose.

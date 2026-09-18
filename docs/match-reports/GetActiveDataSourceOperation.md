@@ -33,3 +33,15 @@ s32 GetActiveDataSourceOperation(void) {
 ## Proposed learning
 
 See `LockActiveDataSource.md` — same family.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026ECC` | `GetActiveDataSourceOperation` | B |
+
+**Evidence.** Forwards to `GetCdOperation()` when the CD driver is active,
+else `0`. Same family; `GetCdOperation`'s own name is Sony's / already
+established, carried straight through to the generalised wrapper's name.

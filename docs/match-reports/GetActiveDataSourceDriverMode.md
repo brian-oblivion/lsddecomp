@@ -49,3 +49,15 @@ s32 GetActiveDataSourceDriverMode(void) {
 
 See `GetActiveDataSourceMethods.md` — third instance of the "if/else, both arms tail-call"
 family in this unit.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026FAC` | `GetActiveDataSourceDriverMode` | B |
+
+**Evidence.** Same if/else tail-call shape as `GetActiveDataSourceMethods`,
+forwarding to `GetCdDriverMode`/`func_8002C448` -- the getter side of
+`SetActiveDataSourceDriverMode`.

@@ -195,3 +195,31 @@ permuter seed (`permuter-work/SetActiveDataSource`, gitignored but reproducible
 from this report's preserved body via `tools/setup-permuter.sh`) and its
 150582-iteration ceiling are the starting point, not a re-derivation from
 scratch.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026CFC` | `SetActiveDataSource` | B (STALL -- named without matching) |
+
+**Evidence.** Stores the new mode into `gActiveDataSource`, resolves the
+newly-active source's vtable (the same `GetClass6D4E8Methods`/`func_8002C438`
+pair `GetActiveDataSourceMethods` uses), then walks a table of 14 callbacks,
+calling `Class6D430__CopyFields(val, ret)` before each and threading each
+non-NULL entry's return value into the next call. The control flow and every
+callee are fully confirmed (only the register allocation in the walk loop is
+unmatched, per the report's own REGISTER-ALLOCATION class) -- solid enough
+ground to name the operation ("install a new active data source, and refresh
+every registered client with it") even though the function itself is not
+byte-exact. Per the brief, named without attempting to match it.
+
+**Global renamed alongside it.** `D_8008A84C` -> `gActiveDataSource` (tier B):
+this function's own `D_8008A84C = arg0;` write is the clearest evidence for
+what the global holds -- a mode tag whose two observed values (`0x13`,
+`0x23`) are exactly the header words of the two sibling classes it selects
+between (`D_8006D4E8` and `D_8006D9BC`; confirmed by `tools/classtable.py`).
+Every other function in this unit that reads it forwards to one sibling's
+real implementation or the other's fallback, which is where the whole
+`ActiveDataSource` naming family comes from.

@@ -72,3 +72,16 @@ loop-invariant arguments live in genuinely separate callee-saved registers
 `SetActiveDataSource` in the same unit, where the loop-carried value DOES change
 every iteration and needs a different, harder-won source shape (see that
 report).
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026F34` | `SetActiveDataSourceDriverMode` | B |
+
+**Evidence.** Picks `SetCdDriverMode` or the SPU-side `func_8002C468` by
+active source, then spins (`do { } while (fn(...) == 0)`) until the call
+reports success. Same family as the Lock/Unlock/Is* wrappers, generalised to
+a 3-argument setter with a retry loop.

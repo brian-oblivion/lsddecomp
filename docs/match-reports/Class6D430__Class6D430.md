@@ -77,3 +77,18 @@ unit had a genuine size bug is a useful diagnostic pattern worth naming: a
 lone call-target-encoding mismatch, with everything else in a function's
 window matching, means look for a wrong-sized function *elsewhere in the same
 translation unit*, not in the function funcdiff is currently pointing at.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026A50` | `Class6D430__Class6D430` | A |
+
+**Evidence.** The class's own constructor, `+0x008` slot by the project's
+convention: chains `Get_vtable_BasicClass()->ctor`, installs
+`GetClass6D430Methods()` as `this->methods`, then zeroes every field this
+unit derived. A constructor's mechanics (chain base, install vtable,
+initialise fields) ARE its purpose, so tier A by the plan's own rule.
+`Class__Class` is the project's constructor-naming convention.

@@ -74,3 +74,18 @@ confirmed non-void (`s32 func_8002C478(void) { return 0; }` in
 `code_179d8_e.c`), so treating all three as `s32`/`void *`-returning tail
 calls is not a guess -- it is the only reading consistent with a callee whose
 real return type is already known.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026CAC` | `GetActiveDataSourceMethods` | B |
+
+**Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return func_8002C438();
+else return GetClass6D4E8Methods();` -- returns whichever of the two sibling
+data-source classes' vtables is currently active. Part of the family of
+`ActiveDataSource`-named wrappers this round derived from `gActiveDataSource`
+(the renamed `D_8008A84C`); see that global's own naming note. Mechanics
+fully known; which higher-level system decides the active source is not.
