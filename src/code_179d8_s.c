@@ -70,8 +70,8 @@ extern s32 gCdBusy;
 
 extern void func_80028A34(Obj80027480 *self);
 extern void LockCd(void);
-extern void func_80028844(s32 arg0, s32 arg1);
-extern void func_80028864(void);
+extern void StartCdOperation(s32 arg0, s32 arg1);
+extern void ResetCdStateMachine(void);
 extern void EnqueueCdRequest(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
                            s32 arg4);
 extern void UnlockCd(void);
@@ -85,10 +85,10 @@ typedef struct Rec80028448 {
     u32 unk18;
 } Rec80028448;
 
-extern void *func_80028448(char *arg0);
-extern s32 func_800284C4(char *arg0);
-extern void *D_8008A87C;
-extern s32 D_8008A898;
+extern void *FindCdFileEntry(char *arg0);
+extern s32 FindCdFileIndex(char *arg0);
+extern void *gCdSeekParam;
+extern s32 gCdTickStep;
 
 extern void func_80028920(Obj80027480 *self, char *suffix);
 extern char *func_800289CC(char *dest, char *suffix);
@@ -116,16 +116,16 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     LockCd();
     if (self->unk28 != 0) {
         if (gCdBusy == 0 && self->unk0C == 0) {
-            func_80028844(1, 1);
+            StartCdOperation(1, 1);
             if (gCdAsyncEnabled != 0) {
-                rec = func_80028448(suffix);
-                D_8008A87C = rec;
+                rec = FindCdFileEntry(suffix);
+                gCdSeekParam = rec;
                 if (rec == NULL) {
                     return;
                 }
                 self->unk18 = rec->unk14;
-                temp = ((Rec80028448 *)D_8008A87C)->unk18;
-                D_8008A898 = 1;
+                temp = ((Rec80028448 *)gCdSeekParam)->unk18;
+                gCdTickStep = 1;
                 self->unk0C = 1;
                 self->unk1C = temp;
             } else {
@@ -141,11 +141,11 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
                     } while (v0 == 0);
                 } while (v0 == 5);
                 self->unk0C = 1;
-                func_80028864();
+                ResetCdStateMachine();
             }
         }
     } else {
-        EnqueueCdRequest(self, func_800284C4(suffix), 2, arg2, arg3);
+        EnqueueCdRequest(self, FindCdFileIndex(suffix), 2, arg2, arg3);
     }
     UnlockCd();
 }
@@ -158,9 +158,9 @@ void func_80027480(Obj80027480 *self) {
     LockCd();
     if (self->unk28 != 0) {
         if (gCdBusy == 0) {
-            func_80028844(0, 0);
+            StartCdOperation(0, 0);
             self->unk0C = 0;
-            func_80028864();
+            ResetCdStateMachine();
         }
     } else {
         EnqueueCdRequest(self, 0, 3, 0, 0);
@@ -169,8 +169,8 @@ void func_80027480(Obj80027480 *self) {
 }
 
 extern u8 D_8006D574[8];
-extern void *D_8008A87C;
-extern s32 D_8008A898;
+extern void *gCdSeekParam;
+extern s32 gCdTickStep;
 
 extern s32 func_80028A50(Obj80027480 *self);
 extern s32 CdPosToInt(void *pos);
@@ -188,7 +188,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
     LockCd();
     if (self->unk28 != 0) {
         if (gCdBusy == 0 && self->unk0C != 0) {
-            func_80028844(2, 1);
+            StartCdOperation(2, 1);
             s0tmp = arg1 >> 11;
             if ((arg1 & 0x7FF) != 0) {
                 s0tmp = s0tmp + 1;
@@ -197,8 +197,8 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
             CdIntToPos(v0 + s0tmp, D_8006D574);
             if (arg2 == 0) {
                 if (gCdAsyncEnabled != 0) {
-                    D_8008A87C = D_8006D574 - 0x14;
-                    D_8008A898 = 1;
+                    gCdSeekParam = D_8006D574 - 0x14;
+                    gCdTickStep = 1;
                 } else {
                     do {
                         CdControl(2, D_8006D574, 0);
@@ -206,10 +206,10 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
                             v0 = CdSync(0, 0);
                         } while (v0 == 0);
                     } while (v0 == 5);
-                    func_80028864();
+                    ResetCdStateMachine();
                 }
             } else {
-                func_80028864();
+                ResetCdStateMachine();
                 UnlockCd();
                 if ((self->unk1C & 0x7FF) != 0) {
                     return ((self->unk1C >> 11) + 1) << 11;
@@ -227,14 +227,14 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
 void func_800276C8(void) {
 }
 
-extern s32 D_8008A880; /* CdRead sector count */
-extern void *D_8008A884; /* CdRead target buffer */
-extern s32 D_8008A898;
+extern s32 gCdReadSectorCount; /* CdRead sector count */
+extern void *gCdReadBuffer; /* CdRead target buffer */
+extern s32 gCdTickStep;
 
 extern void func_80028A84(Obj80027480 *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
-extern void func_80028864(void);
+extern void ResetCdStateMachine(void);
 
 s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     s32 v1;
@@ -246,11 +246,11 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     LockCd();
     if (self->unk28 != 0) {
         if (gCdBusy == 0 && self->unk0C != 0) {
-            func_80028844(3, 7);
+            StartCdOperation(3, 7);
             if (gCdAsyncEnabled != 0) {
-                D_8008A880 = size >> 11;
-                D_8008A884 = buf;
-                D_8008A898 = 1;
+                gCdReadSectorCount = size >> 11;
+                gCdReadBuffer = buf;
+                gCdTickStep = 1;
             } else {
             retry:
                 CdRead(size >> 11, buf, 0x80);
@@ -260,7 +260,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
                 if (v1 == -1) {
                     goto retry;
                 }
-                func_80028864();
+                ResetCdStateMachine();
             }
         }
     } else {
@@ -271,7 +271,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
 }
 
 extern void Class6D430__AllocBuffer(void);
-extern void *D_8008A888;
+extern void *gCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
  * reading) -- declared LOCAL, per the project's multiple-local-views
@@ -287,7 +287,7 @@ typedef struct Node8008A894 {
     s32 unk18;
 } Node8008A894;
 
-extern Node8008A894 *D_8008A894;
+extern Node8008A894 *gCdRequestQueue;
 extern void *func_80017B34(s32 size);
 
 void func_80027800(Obj80027480 *self, char *arg1) {
@@ -306,43 +306,43 @@ void func_80027800(Obj80027480 *self, char *arg1) {
     LockCd();
     if (self->unk28 != 0) {
         if (gCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
-            func_80028844(4, 1);
-            D_8008A888 = D_8008A87C;
-            rec = func_80028448(arg1);
-            D_8008A87C = rec;
+            StartCdOperation(4, 1);
+            gCdSavedSeekParam = gCdSeekParam;
+            rec = FindCdFileEntry(arg1);
+            gCdSeekParam = rec;
             if (rec == NULL) {
                 return;
             }
             {
                 sectorCount = rec->unk18 >> 11;
-                D_8008A880 = sectorCount;
+                gCdReadSectorCount = sectorCount;
                 if ((rec->unk18 & 0x7FF) != 0) {
-                    D_8008A880 = sectorCount + 1;
+                    gCdReadSectorCount = sectorCount + 1;
                 }
-                pos = D_8008A880 << 11;
+                pos = gCdReadSectorCount << 11;
                 if (self->unk10 == NULL) {
                     ret = func_80017B34(pos);
                     if (ret == NULL) {
                         self->methods->slot48(self);
                         return;
                     }
-                    D_8008A884 = ret;
+                    gCdReadBuffer = ret;
                     self->unk10 = ret;
                 } else {
-                    D_8008A884 = self->unk10;
+                    gCdReadBuffer = self->unk10;
                 }
                 if (gCdAsyncEnabled != 0) {
                     self->unk14 = pos;
-                    D_8008A898 = 2;
+                    gCdTickStep = 2;
                 } else {
                 retry:
                     do {
-                        CdControl(2, (u8 *)D_8008A87C + 0x14, 0);
+                        CdControl(2, (u8 *)gCdSeekParam + 0x14, 0);
                         do {
                             v1 = CdSync(0, 0);
                         } while (v1 == 0);
                     } while (v1 == 5);
-                    CdRead(D_8008A880, self->unk10, 0x80);
+                    CdRead(gCdReadSectorCount, self->unk10, 0x80);
                     do {
                         v1 = CdReadSync(0, 0);
                     } while (v1 > 0);
@@ -350,13 +350,13 @@ void func_80027800(Obj80027480 *self, char *arg1) {
                         goto retry;
                     }
                     self->unk14 = pos;
-                    D_8008A894->unk0 = 1;
-                    func_80028864();
+                    gCdRequestQueue->unk0 = 1;
+                    ResetCdStateMachine();
                 }
             }
         }
     } else {
-        EnqueueCdRequest(self, func_800284C4(arg1), 7, 0, 0);
+        EnqueueCdRequest(self, FindCdFileIndex(arg1), 7, 0, 0);
     }
     UnlockCd();
 }

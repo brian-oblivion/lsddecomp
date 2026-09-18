@@ -16,10 +16,10 @@ carries the evidence for each one.
 
 ```c
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
- * writing side: func_8002832C (code_179d8_r) allocates one and links it onto
- * D_8008A894, and only the fields this call site writes are typed here
+ * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
+ * gCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
- * CD_OP_* values, `fileIndex` is func_800284C4's index into gFileTable (0
+ * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
  * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
  * buffer and a size for op 5. */
@@ -32,7 +32,7 @@ struct CdRequest_282AC {
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;
 };
-extern CdRequest_282AC *func_8002832C(void); /* code_179d8_r: alloc + link */
+extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
 typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;
 struct Obj6D4E8_282AC {
@@ -47,7 +47,7 @@ struct Obj6D4E8_282AC {
 void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
                       s32 param0, s32 param1)
 {
-    CdRequest_282AC *entry = func_8002832C();
+    CdRequest_282AC *entry = AllocCdRequestNode();
 
     entry->op = op;
     entry->param0 = param0;
@@ -66,7 +66,7 @@ void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
 Five-argument function (four in registers, a fifth on the caller's stack at
 `0x38($sp)` after this function's own `-0x28` prologue adjustment —
 standard o32 stack-arg slot). Allocates/links a list node via
-`func_8002832C` (foxtrot's `code_179d8_r`, still `INCLUDE_ASM` there —
+`AllocCdRequestNode` (foxtrot's `code_179d8_r`, still `INCLUDE_ASM` there —
 declared `extern` here per the cross-unit convention already established by
 `code_179d8_h.c` and `ServiceCdDriver`'s report) and fills five of its
 fields with the incoming parameters. The store order to the new entry
@@ -102,8 +102,8 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_800282AC` | `EnqueueCdRequest` | A |
 
-**Evidence.** Allocates and links a node via `func_8002832C` (code_179d8_r,
-which appends to the `D_8008A894` list), fills five of its fields from the
+**Evidence.** Allocates and links a node via `AllocCdRequestNode` (code_179d8_r,
+which appends to the `gCdRequestQueue` list), fills five of its fields from the
 parameters, bumps the requesting object's pending count, clears its flags and
 calls `StartCdService`. Every caller is a class method taking its
 asynchronous path (`code_179d8_s` at op 2/3/4/5/7,
@@ -116,7 +116,7 @@ service runs: tier A.
 | --- | --- | --- | --- |
 | `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `func_80027A24` switches on it when it drains the queue |
 | `+0x0C` | `owner` | A | the requesting object; `Class6D4E8__CancelRequests` matches on it to cancel one object's requests |
-| `+0x10` | `fileIndex` | A | `func_800284C4`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
+| `+0x10` | `fileIndex` | A | `FindCdFileIndex`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
 | `+0x14` | `param0` | B | the op's first extra argument: `arg2` for op 2, a byte count for op 4, a buffer for op 5 |
 | `+0x18` | `param1` | B | the op's second extra argument, same call sites |
 
@@ -141,4 +141,4 @@ which is the procedure working in the direction where it can work.
 | code_179d8_s | `Node8008A894` | `unkC` | `owner` | A | as above |
 | code_179d8_s | `Node8008A894` | `unk10` | `fileIndex` | A | as above |
 | code_179d8_s | `Node8008A894` | `unk14`/`unk18` | `param0`/`param1` | B | as above |
-| code_179d8_r | `Node8008A894` | `unk4` | *(no proposal)* | C | this unit never touches `+0x04`; only `func_8002832C` zeroes it |
+| code_179d8_r | `Node8008A894` | `unk4` | *(no proposal)* | C | this unit never touches `+0x04`; only `AllocCdRequestNode` zeroes it |

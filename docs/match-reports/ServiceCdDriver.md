@@ -19,9 +19,9 @@ carries the evidence for each one.
 ```c
 extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
 extern s32 gCdUseVSyncCallback;
-extern s32 D_8008A898;
-extern void func_8002858C(void); /* code_179d8_r: state-machine step 1 */
-extern void func_800286E4(void); /* code_179d8_r: state-machine step 2 */
+extern s32 gCdTickStep;
+extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
+extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
@@ -29,9 +29,9 @@ extern void VSyncCallback(void (*cb)(void));
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/code_171e0.h uses
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * func_80027A24 (code_179d8_s), which walks the D_8008A894 request list,
+ * func_80027A24 (code_179d8_s), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
- * func_800283C4 -- so the slot is named for what that method does. */
+ * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
 struct Methods6D4E8_80EC {
     u8 pad00[0x68];
@@ -52,10 +52,10 @@ s32 ServiceCdDriver(void)
         VSyncCallback(0);
     }
 
-    if (D_8008A898 == 1) {
-        func_8002858C();
-    } else if (D_8008A898 == 2) {
-        func_800286E4();
+    if (gCdTickStep == 1) {
+        TickCdStateMachine();
+    } else if (gCdTickStep == 2) {
+        TickCdLoadFileStateMachine();
     }
 
     if (gCdQueueEnabled != 0) {
@@ -90,7 +90,7 @@ idiom as the first guard, just with the zeroing sharing a delay slot instead
 of getting a fallthrough instruction of its own.
 
 Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch on
-`D_8008A898` (1 -> `func_8002858C`, 2 -> `func_800286E4`, both in the
+`gCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
 sibling `code_179d8_r` unit — declared extern here per the
 per-call-site-typed convention `code_179d8_h.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
@@ -128,15 +128,15 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 singleton's `+0x84` callback slot when the VSync path is off. One call does
 all the periodic work there is -- skip if `gCdLock` is held or
 `GetBMemPMgrBusy` says no; step `code_179d8_r`'s CD state machine
-(`func_8002858C` for `D_8008A898 == 1`, `func_800286E4` for 2); drain the
+(`TickCdStateMachine` for `gCdTickStep == 1`, `TickCdLoadFileStateMachine` for 2); drain the
 request queue through the class's own `+0x068` slot; re-arm itself. "Service"
 is the one word that covers a tick that both advances a state machine and
 drains a queue.
 
 **`gCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
 here, and `tools/classtable.py` resolves that slot to `func_80027A24`
-(code_179d8_s), which walks `D_8008A894`, dispatches each request and frees
-it with `func_800283C4`. So the flag gates queue processing specifically --
+(code_179d8_s), which walks `gCdRequestQueue`, dispatches each request and frees
+it with `FreeCdRequestNode`. So the flag gates queue processing specifically --
 not the tick, which still runs the state machine while the flag is clear.
 Tier A.
 

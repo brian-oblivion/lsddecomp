@@ -2,28 +2,42 @@
 
 /*
  * code_179d8_r -- tail slice of the code_179d8 monolith, carved round 45.
- * Runner foxtrot. Cold ground: none of these 10 functions has ever been
- * attempted before this round.
+ * Named (track 3), round 53 -- runner alpha. All 10 functions were already
+ * matched C when this pass started (fresh carve, round 45/46, runner
+ * foxtrot); nothing here changes a single byte, only names.
  *
- * This slice and the adjacent code_179d8_q (runner echo) share callees
- * LockCd (lock: gCdLock = 1) and UnlockCd (unlock:
- * gCdLock = 0), both defined in code_179d8_q.c. Declared locally here,
- * never in a shared header -- see CLAUDE.md on per-unit local views.
+ * This slice and the adjacent code_179d8_q (runner echo, the CD-ROM read
+ * driver's module-level half) share callees LockCd (lock: gCdLock = 1) and
+ * UnlockCd (unlock: gCdLock = 0), both defined in code_179d8_q.c. Declared
+ * locally here, never in a shared header -- see CLAUDE.md on per-unit local
+ * views.
  *
- * The slice implements a small CD-read state machine:
- *   - gCdState holds the current state/phase.
- *   - D_8008A8A0 is a timeout counter, reset by func_80028888.
- *   - func_8002858C / func_800286E4 are near-identical per-tick state
- *     machine steps (driven from ServiceCdDriver in code_179d8_q via
- *     D_8008A898 == 1 / == 2), differing only in their state==2 and
- *     state==8-success handling.
- *   - func_80028844 / func_80028864 are the "start" / "reset" bookends of
- *     that state machine.
- *   - func_8002832C / func_800283C4 are a generic doubly-linked-list
- *     append/remove+free pair over 0x24-byte nodes, list head D_8008A894.
- *   - func_80028448 / func_800284C4 / func_80028540 are linear-scan /
+ * The slice implements the driver's small CD-read state machine plus its
+ * two support structures:
+ *   - gCdState holds the current phase: 1 = issue a CdlSetloc seek, 2 = poll
+ *     CdSync for it, 7 = issue CdRead, 8 = poll CdReadSync; gCdTimeoutCounter
+ *     is the busy-wait counter both tick functions bump while polling,
+ *     cleared on every phase change by SetCdState.
+ *   - TickCdStateMachine / TickCdLoadFileStateMachine are the two per-tick
+ *     steps ServiceCdDriver (code_179d8_q) dispatches on gCdTickStep (1 / 2).
+ *     TickCdStateMachine is the default, used by code_179d8_s.c's open,
+ *     explicit-seek and straight-read call sites. TickCdLoadFileStateMachine
+ *     is used exclusively by that unit's func_80027800 (the
+ *     Class6D4E8__RequestLoadFile worker, per its own report): on the
+ *     "still busy" signal at phase 2 it proceeds straight into the read
+ *     phase instead of resetting, and on a successful read it restores the
+ *     caller's saved gCdSeekParam from gCdSavedSeekParam -- both differences
+ *     specific to that one combined seek+read operation.
+ *   - StartCdOperation / ResetCdStateMachine are the state machine's "start" /
+ *     "reset" bookends -- exact mirror images of each other.
+ *   - AllocCdRequestNode / FreeCdRequestNode allocate+link / unlink+free a
+ *     request-queue node (CdRequestNode, 0x24 bytes), list head
+ *     gCdRequestQueue -- the queue code_179d8_q.c's EnqueueCdRequest and
+ *     Class6D4E8__CancelRequests drive from the other end.
+ *   - FindCdFileEntry / FindCdFileIndex / GetCdFileEntry are linear-scan /
  *     index helpers over a flat table of 0x1C-byte string records based at
- *     gFileTable, count gFileTableCount.
+ *     gFileTable, count gFileTableCount (code_179d8_q.c's CdFileEntry, its
+ *     own local view of the same records).
  */
 
 /* lock/unlock, defined in code_179d8_q.c (runner echo's unit). */
@@ -38,6 +52,20 @@ extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void CdFlush(void);
 
+/* Psy-Q's own command code (include/psyq/LIBCD.H documents the command list
+ * but not the numeric values; this one is confirmed the same way
+ * code_179d8_q.c's CD_CMD_SETMODE is, by the sibling unit's independently
+ * derived 0x0E == CdlSetmode matching the well-known Psy-Q CdlCommand
+ * enumeration -- CdlSetloc is that enumeration's 3rd member, value 2).
+ * Spelled locally rather than by including LIBCD.H, same rationale as
+ * code_179d8_q.c: this unit's libcd declarations are deliberately
+ * per-call-site. */
+#define CD_CMD_SETLOC 2
+
+/* Both state==2 branches below busy-wait this many ticks (~601 service-pump
+ * calls) before giving up and retrying the command from state 1. */
+#define CD_WAIT_TIMEOUT 0x259
+
 /* Psy-Q pool allocator, code_8220.c. */
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
@@ -45,44 +73,50 @@ extern void *func_80017CFC(void *ptr);
 /* libc2/strstr.o, linked (see code_179d8_h.c's carve notes). */
 extern char *strstr(char *s1, char *s2);
 
-/* generic doubly-linked-list node, 0x24 bytes; offsets 0x0/0x4/0x1C/0x20 are
- * the only ones this unit's two list functions touch. */
-typedef struct Node8008A894 {
-    /* 0x00 */ s32 unk0;
+/* the CD request-queue node, 0x24 bytes; offsets 0x0/0x4/0x1C/0x20 are the
+ * only ones this unit's two list functions touch. `active` matches the name
+ * the sibling unit code_179d8_q.c's own independent view of this same
+ * struct (CdRequest_D70) already gives this field: StartCdOperation sets it
+ * on the head node when it starts an operation on it, AllocCdRequestNode
+ * clears it at allocation. This is a unit-local typedef, so the rename is
+ * local to this file (CLAUDE.md, multiple-independent-local-views); `unk4`
+ * has no evidence anywhere and keeps its placeholder name. */
+typedef struct CdRequestNode {
+    /* 0x00 */ s32 active;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ u8 pad8[0x14];
-    /* 0x1C */ struct Node8008A894 *prev;
-    /* 0x20 */ struct Node8008A894 *next;
-} Node8008A894; /* size 0x24 */
+    /* 0x1C */ struct CdRequestNode *prev;
+    /* 0x20 */ struct CdRequestNode *next;
+} CdRequestNode; /* size 0x24 */
 
-extern Node8008A894 *D_8008A894; /* list head */
+extern CdRequestNode *gCdRequestQueue; /* list head */
 
 extern s32 gCdBusy; /* "busy" flag, 0/1 */
 extern char *gFileTable; /* base of a table of 0x1C-byte string records */
 extern s32 gFileTableCount;   /* record count */
 extern s32 gCdIdle;   /* "idle"/"ready" flag, 0/1 */
-extern s32 gCdOperation;   /* context value stashed by func_80028844 */
+extern s32 gCdOperation;   /* context value stashed by StartCdOperation */
 extern s32 gCdState;   /* CD state-machine phase */
-extern void *D_8008A87C; /* CdControlF param pointer */
-extern s32 D_8008A880;   /* CdRead sector count */
-extern void *D_8008A884; /* CdRead target buffer */
-extern void *D_8008A888; /* secondary pointer, used only by func_800286E4 */
-extern s32 D_8008A898;   /* which state-machine step to tick, 1 or 2 */
-extern s32 D_8008A8A0;   /* timeout counter */
+extern void *gCdSeekParam; /* CdControlF param pointer */
+extern s32 gCdReadSectorCount;   /* CdRead sector count */
+extern void *gCdReadBuffer; /* CdRead target buffer */
+extern void *gCdSavedSeekParam; /* secondary pointer, used only by TickCdLoadFileStateMachine */
+extern s32 gCdTickStep;   /* which state-machine step to tick, 1 or 2 */
+extern s32 gCdTimeoutCounter;   /* timeout counter */
 
-Node8008A894 *func_8002832C(void)
+CdRequestNode *AllocCdRequestNode(void)
 {
-    Node8008A894 *node;
-    Node8008A894 *head;
-    Node8008A894 *cur;
+    CdRequestNode *node;
+    CdRequestNode *head;
+    CdRequestNode *cur;
 
     LockCd();
     node = func_80017B34(0x24);
     if (node != NULL) {
-        head = D_8008A894;
+        head = gCdRequestQueue;
         node->prev = NULL;
         node->next = NULL;
-        node->unk0 = 0;
+        node->active = 0;
         node->unk4 = 0;
         if (head != NULL) {
             cur = head;
@@ -94,17 +128,17 @@ Node8008A894 *func_8002832C(void)
             cur->next = node;
             node->prev = cur;
         } else {
-            D_8008A894 = node;
+            gCdRequestQueue = node;
         }
     }
     UnlockCd();
     return node;
 }
 
-void func_800283C4(Node8008A894 *node)
+void FreeCdRequestNode(CdRequestNode *node)
 {
-    Node8008A894 *prev;
-    Node8008A894 *next;
+    CdRequestNode *prev;
+    CdRequestNode *next;
 
     LockCd();
     if (node != NULL) {
@@ -112,7 +146,7 @@ void func_800283C4(Node8008A894 *node)
         if (prev != NULL) {
             prev->next = node->next;
         } else {
-            D_8008A894 = node->next;
+            gCdRequestQueue = node->next;
         }
         next = node->next;
         if (next != NULL) {
@@ -123,14 +157,14 @@ void func_800283C4(Node8008A894 *node)
     UnlockCd();
 }
 
-void *func_80028448(char *arg0)
+void *FindCdFileEntry(char *name)
 {
     char *cur = gFileTable;
     s32 i = 0;
 
     LockCd();
     do {
-        if (strstr(cur, arg0) != NULL) {
+        if (strstr(cur, name) != NULL) {
             UnlockCd();
             return cur;
         }
@@ -140,13 +174,13 @@ void *func_80028448(char *arg0)
     return NULL;
 }
 
-s32 func_800284C4(char *arg0)
+s32 FindCdFileIndex(char *name)
 {
     char *cur = gFileTable;
     s32 i = 0;
 
     LockCd();
-    while (strstr(cur, arg0) == NULL) {
+    while (strstr(cur, name) == NULL) {
         i++;
         if (i >= gFileTableCount) {
             return -1;
@@ -157,7 +191,7 @@ s32 func_800284C4(char *arg0)
     return i;
 }
 
-void *func_80028540(s32 index)
+void *GetCdFileEntry(s32 index)
 {
     void *result;
     char *base;
@@ -171,10 +205,10 @@ void *func_80028540(s32 index)
 
 /* forward decls -- both defined later in this unit; ROM order keeps the
  * definitions below. */
-extern void func_80028864(void);
-extern void func_80028888(s32 arg0);
+extern void ResetCdStateMachine(void);
+extern void SetCdState(s32 state);
 
-void func_8002858C(void)
+void TickCdStateMachine(void)
 {
     s32 state;
     s32 v1;
@@ -197,7 +231,7 @@ void func_8002858C(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)D_8008A87C + 0x14) == 0)
+    if (CdControlF(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -217,14 +251,14 @@ L_state2:
     goto L_set;
 
 L_count:
-    D_8008A8A0++;
-    if (D_8008A8A0 < 0x259)
+    gCdTimeoutCounter++;
+    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT)
         goto L_end;
     newstate = 1;
     goto L_set;
 
 L_state7:
-    if (CdRead(D_8008A880, D_8008A884, 0x80) == 0)
+    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -237,7 +271,7 @@ L_state8:
         goto L_end;
 
 L_reset:
-    func_80028864();
+    ResetCdStateMachine();
     goto L_end;
 
 L_pending:
@@ -245,13 +279,13 @@ L_pending:
     newstate = 1;
 
 L_set:
-    func_80028888(newstate);
+    SetCdState(newstate);
 
 L_end:
     UnlockCd();
 }
 
-void func_800286E4(void)
+void TickCdLoadFileStateMachine(void)
 {
     s32 state;
     s32 v1;
@@ -275,7 +309,7 @@ void func_800286E4(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)D_8008A87C + 0x14) == 0)
+    if (CdControlF(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -299,14 +333,14 @@ L_busy:
     goto L_set;
 
 L_count:
-    D_8008A8A0++;
-    if (D_8008A8A0 < 0x259)
+    gCdTimeoutCounter++;
+    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT)
         goto L_end;
     newstate = 1;
     goto L_set;
 
 L_state7:
-    if (CdRead(D_8008A880, D_8008A884, 0x80) == 0)
+    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -319,40 +353,40 @@ L_state8:
     }
     if (v1 != 0)
         goto L_end;
-    func_80028864();
-    tmp = D_8008A888;
-    D_8008A888 = NULL;
-    D_8008A87C = tmp;
+    ResetCdStateMachine();
+    tmp = gCdSavedSeekParam;
+    gCdSavedSeekParam = NULL;
+    gCdSeekParam = tmp;
     goto L_end;
 
 L_set:
-    func_80028888(newstate);
+    SetCdState(newstate);
 
 L_end:
     UnlockCd();
 }
 
-void func_80028844(s32 arg0, s32 arg1)
+void StartCdOperation(s32 op, s32 state)
 {
     gCdBusy = 1;
-    gCdOperation = arg0;
-    gCdState = arg1;
+    gCdOperation = op;
+    gCdState = state;
     gCdIdle = 0;
-    D_8008A894->unk0 = 1;
+    gCdRequestQueue->active = 1;
 }
 
-void func_80028864(void)
+void ResetCdStateMachine(void)
 {
     gCdOperation = 0;
     gCdState = 0;
-    D_8008A898 = 0;
+    gCdTickStep = 0;
     gCdIdle = 1;
-    D_8008A8A0 = 0;
+    gCdTimeoutCounter = 0;
     gCdBusy = 0;
 }
 
-void func_80028888(s32 arg0)
+void SetCdState(s32 state)
 {
-    gCdState = arg0;
-    D_8008A8A0 = 0;
+    gCdState = state;
+    gCdTimeoutCounter = 0;
 }

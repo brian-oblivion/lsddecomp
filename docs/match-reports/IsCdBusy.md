@@ -39,9 +39,9 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_80027EC8` | `IsCdBusy` | A |
 | `D_8008A864` | `gCdBusy` | A |
 
-**Evidence.** The global is set to 1 by `func_80028844` (code_179d8_r), which
+**Evidence.** The global is set to 1 by `StartCdOperation` (code_179d8_r), which
 every method of this class calls to BEGIN an operation, and back to 0 by
-`func_80028864`, the state-machine reset. Every reader is a refusal guard:
+`ResetCdStateMachine`, the state-machine reset. Every reader is a refusal guard:
 `code_179d8_s` tests `gCdBusy == 0` before starting any transfer, and
 `SetCdDriverMode` in this unit returns 0 (rejected) while it is non-zero.
 `code_171e0.c`'s wrapper `IsActiveDataSourceBusy` returns 0 -- not busy -- when no CD

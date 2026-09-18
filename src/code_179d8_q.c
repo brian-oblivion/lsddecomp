@@ -13,7 +13,7 @@
  *     SetCdDriverMode, which decide whether a request is queued and serviced
  *     in the background or performed by a blocking CdSync spin;
  *   - the request queue's front door: EnqueueCdRequest appends a node to the
- *     D_8008A894 list (code_179d8_r owns the list itself) and starts the
+ *     gCdRequestQueue list (code_179d8_r owns the list itself) and starts the
  *     service;
  *   - the service pump: ServiceCdDriver, installed as a VSyncCallback (or as
  *     a callback on the singleton func_80020C5C returns), which ticks
@@ -78,7 +78,7 @@ struct UnkC80 {
 struct Obj6D4E8_282AC;
 extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
-extern s32 func_800284C4(char *name); /* code_179d8_r: name -> table index */
+extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 extern s32 gCdAsyncEnabled;
 
 void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
@@ -91,7 +91,7 @@ void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
     if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
-            idx = func_800284C4(name);
+            idx = FindCdFileIndex(name);
             EnqueueCdRequest((struct Obj6D4E8_282AC *)self, idx,
                              CD_OP_LOAD_FILE, 0, 0);
         } else {
@@ -117,11 +117,11 @@ void Class6D4E8__StopCdService(void)
     UnlockCd();
 }
 
-/* The queued-request node func_8002832C (code_179d8_r) allocates and
- * func_800283C4 (code_179d8_r) unlinks and frees -- only the fields this
- * call site itself reads are typed here. `active` is the flag func_80028844
+/* The queued-request node AllocCdRequestNode (code_179d8_r) allocates and
+ * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
+ * call site itself reads are typed here. `active` is the flag StartCdOperation
  * (code_179d8_r) sets on the head node when it starts an operation on it;
- * func_8002832C clears it at allocation. The list head is D_8008A894. */
+ * AllocCdRequestNode clears it at allocation. The list head is gCdRequestQueue. */
 typedef struct CdRequest_D70 CdRequest_D70;
 struct CdRequest_D70 {
     /* +0x00 */ s32 active;
@@ -138,13 +138,13 @@ struct Obj6D4E8_D70 {
     /* +0x24 */ s32 flags;
 };
 
-extern s32 D_8008A894;
+extern s32 gCdRequestQueue;
 extern s32 gCdIdle;
-extern s32 D_8008A888;
-extern s32 D_8008A87C;
+extern s32 gCdSavedSeekParam;
+extern s32 gCdSeekParam;
 extern void CdFlush(void);
-extern void func_80028864(void); /* code_179d8_r: reset the state machine */
-extern void func_800283C4(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
+extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
+extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
 void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 {
@@ -155,23 +155,23 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 
     LockCd();
 
-    entry = (CdRequest_D70 *)D_8008A894;
+    entry = (CdRequest_D70 *)gCdRequestQueue;
 
     if (entry != NULL && self->pendingRequests != 0) {
         self->flags = 0;
 
         if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
-            func_80028864();
-            saved = D_8008A888;
-            D_8008A888 = 0;
-            D_8008A87C = saved;
+            ResetCdStateMachine();
+            saved = gCdSavedSeekParam;
+            gCdSavedSeekParam = 0;
+            gCdSeekParam = saved;
         }
 
-        for (node = (CdRequest_D70 *)D_8008A894; node != NULL; node = next) {
+        for (node = (CdRequest_D70 *)gCdRequestQueue; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
-                func_800283C4(node);
+                FreeCdRequestNode(node);
                 self->pendingRequests--;
             }
         }
@@ -375,7 +375,7 @@ struct CdFileInfo {
  * CdSearchFile lookup on that path, so an entry is a name resolved once and
  * reused as a seek target. gFileTable and gFileTableCount (this unit's
  * SetFileTable / SetFileTableCount) are the array's base and length --
- * func_800284C4 (code_179d8_r) walks the identical 0x1C stride over
+ * FindCdFileIndex (code_179d8_r) walks the identical 0x1C stride over
  * gFileTable doing strstr() against `name`, confirming the layout
  * independently. */
 typedef struct CdFileEntry CdFileEntry;
@@ -444,9 +444,9 @@ void UnlockCd(void)
 
 extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
 extern s32 gCdUseVSyncCallback;
-extern s32 D_8008A898;
-extern void func_8002858C(void); /* code_179d8_r: state-machine step 1 */
-extern void func_800286E4(void); /* code_179d8_r: state-machine step 2 */
+extern s32 gCdTickStep;
+extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
+extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
@@ -454,9 +454,9 @@ extern void VSyncCallback(void (*cb)(void));
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/code_171e0.h uses
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * func_80027A24 (code_179d8_s), which walks the D_8008A894 request list,
+ * func_80027A24 (code_179d8_s), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
- * func_800283C4 -- so the slot is named for what that method does. */
+ * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
 struct Methods6D4E8_80EC {
     u8 pad00[0x68];
@@ -477,10 +477,10 @@ s32 ServiceCdDriver(void)
         VSyncCallback(0);
     }
 
-    if (D_8008A898 == 1) {
-        func_8002858C();
-    } else if (D_8008A898 == 2) {
-        func_800286E4();
+    if (gCdTickStep == 1) {
+        TickCdStateMachine();
+    } else if (gCdTickStep == 2) {
+        TickCdLoadFileStateMachine();
     }
 
     if (gCdQueueEnabled != 0) {
@@ -511,7 +511,7 @@ void StartCdService(void)
     UnlockCd();
 }
 
-extern s32 D_8008A898;
+extern s32 gCdTickStep;
 extern s32 gCdCallbackInstalled;
 extern s32 gCdUseVSyncCallback;
 extern s32 gCdQueueEnabled;
@@ -521,7 +521,7 @@ void StopCdServiceIfIdle(void)
 {
     LockCd();
 
-    if (D_8008A898 == 0 && gCdCallbackInstalled != 0) {
+    if (gCdTickStep == 0 && gCdCallbackInstalled != 0) {
         if (gCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }
@@ -542,10 +542,10 @@ void DisableCdQueue(void)
 }
 
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
- * writing side: func_8002832C (code_179d8_r) allocates one and links it onto
- * D_8008A894, and only the fields this call site writes are typed here
+ * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
+ * gCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
- * CD_OP_* values, `fileIndex` is func_800284C4's index into gFileTable (0
+ * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
  * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
  * buffer and a size for op 5. */
@@ -558,7 +558,7 @@ struct CdRequest_282AC {
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;
 };
-extern CdRequest_282AC *func_8002832C(void); /* code_179d8_r: alloc + link */
+extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
 typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;
 struct Obj6D4E8_282AC {
@@ -573,7 +573,7 @@ struct Obj6D4E8_282AC {
 void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
                       s32 param0, s32 param1)
 {
-    CdRequest_282AC *entry = func_8002832C();
+    CdRequest_282AC *entry = AllocCdRequestNode();
 
     entry->op = op;
     entry->param0 = param0;

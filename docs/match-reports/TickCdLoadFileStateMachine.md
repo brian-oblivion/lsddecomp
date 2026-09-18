@@ -1,21 +1,23 @@
-# func_800286E4 -- MATCHED (round 46): 88/88 words, byte-exact
+> Renamed from `func_800286E4` on 2026-09-18 (tools/rename.py). Address 0x800286e4.
+
+# TickCdLoadFileStateMachine -- MATCHED (round 46): 88/88 words, byte-exact
 
 **Unit:** code_179d8_r · **Round 46** · **MATCHED**
 
 ## What it does
 
 The sibling tick of the CD-read state machine implemented by
-`func_8002858C` (see that report for the full state description), called
-from `ServiceCdDriver` when `D_8008A898 == 2`. Identical to `func_8002858C`
+`TickCdStateMachine` (see that report for the full state description), called
+from `ServiceCdDriver` when `gCdTickStep == 2`. Identical to `TickCdStateMachine`
 in every state except:
 
-- **state 2, `CdSync` reports "still busy, same phase"**: `func_8002858C`
-  calls `func_80028864()` (full reset); this function instead just
-  advances to phase 7 (`func_80028888(7)`) -- i.e. re-issue the read
+- **state 2, `CdSync` reports "still busy, same phase"**: `TickCdStateMachine`
+  calls `ResetCdStateMachine()` (full reset); this function instead just
+  advances to phase 7 (`SetCdState(7)`) -- i.e. re-issue the read
   directly rather than resetting.
 - **state 8, `CdReadSync` succeeds (`v1 == 0`)**: after
-  `func_80028864()`, this function additionally swaps two globals
-  (`D_8008A87C = D_8008A888; D_8008A888 = NULL;`) that `func_8002858C`
+  `ResetCdStateMachine()`, this function additionally swaps two globals
+  (`gCdSeekParam = gCdSavedSeekParam; gCdSavedSeekParam = NULL;`) that `TickCdStateMachine`
   does not touch at all.
 
 ## Round 45's stall, and what closed it
@@ -68,7 +70,7 @@ lever closed without one.
 ## Final body (byte-exact)
 
 ```c
-void func_800286E4(void)
+void TickCdLoadFileStateMachine(void)
 {
     s32 state;
     s32 v1;
@@ -92,7 +94,7 @@ void func_800286E4(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)D_8008A87C + 0x14) == 0)
+    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -116,14 +118,14 @@ L_busy:
     goto L_set;
 
 L_count:
-    D_8008A8A0++;
-    if (D_8008A8A0 < 0x259)
+    gCdTimeoutCounter++;
+    if (gCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;
 
 L_state7:
-    if (CdRead(D_8008A880, D_8008A884, 0x80) == 0)
+    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -136,14 +138,14 @@ L_state8:
     }
     if (v1 != 0)
         goto L_end;
-    func_80028864();
-    tmp = D_8008A888;
-    D_8008A888 = NULL;
-    D_8008A87C = tmp;
+    ResetCdStateMachine();
+    tmp = gCdSavedSeekParam;
+    gCdSavedSeekParam = NULL;
+    gCdSeekParam = tmp;
     goto L_end;
 
 L_set:
-    func_80028888(newstate);
+    SetCdState(newstate);
 
 L_end:
     UnlockCd();
@@ -165,3 +167,26 @@ can absorb it "for free" under -O2's scheduling. Round 45 tried both
 `if (v1 == 5) { newstate = 1; ... }` -- both keep the assignment inside an
 arm and both compiled to the same (wrong) encoding; hoisting it above the
 `if` entirely was the untried third option and it matched immediately.
+
+## Naming
+
+**Tier B.** The state machine's other tick function, selected by
+`ServiceCdDriver` when `gCdTickStep == 2`. Grepping every `gCdTickStep = 2`
+assignment in code_179d8_s.c finds exactly one: `func_80027800`, which
+`docs/match-reports` for the class's method table (`GetClass6D4E8Methods`'s
+own comment, code_179d8_q.c) identifies via `tools/classtable.py` as the
+`loadFile` slot (+0x58) of class `D_6D4E8` -- i.e. the
+`Class6D4E8__RequestLoadFile` worker. The two mechanical differences from
+`TickCdStateMachine` both make sense for that one operation: on the
+phase-2 "still busy" signal it proceeds straight into the read phase
+(`newstate = 7`) instead of resetting, because a LoadFile always intends a
+read to follow the seek; and on a successful read it restores
+`gCdSeekParam` from `gCdSavedSeekParam`, because `func_80027800` is the one
+call site that stashes the caller's previous `gCdSeekParam` there before
+overwriting it with the file it looked up (`gCdSavedSeekParam =
+gCdSeekParam; ... gCdSeekParam = rec;`). "LoadFile" names the operation this
+function is used for, established by the classtable evidence above, not a
+guess -- kept tier B because the report can name the caller and the effect
+but not independently confirm from this unit alone why LoadFile specifically
+needs the differences (as opposed to it merely being how retail happened to
+implement it).

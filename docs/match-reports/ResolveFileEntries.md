@@ -48,7 +48,7 @@ struct CdFileInfo {
  * CdSearchFile lookup on that path, so an entry is a name resolved once and
  * reused as a seek target. gFileTable and gFileTableCount (this unit's
  * SetFileTable / SetFileTableCount) are the array's base and length --
- * func_800284C4 (code_179d8_r) walks the identical 0x1C stride over
+ * FindCdFileIndex (code_179d8_r) walks the identical 0x1C stride over
  * gFileTable doing strstr() against `name`, confirming the layout
  * independently. */
 typedef struct CdFileEntry CdFileEntry;
