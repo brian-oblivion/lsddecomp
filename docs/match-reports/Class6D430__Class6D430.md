@@ -27,7 +27,7 @@ sw    $zero, 0x10($s0)       ; this->unk10 = 0
 sw    $zero, 0x14($s0)       ; this->unk14 = 0
 sh    $zero, 0x20($s0)       ; this->unk20 = 0
 sh    $zero, 0x22($s0)       ; this->unk22 = 0
-sw    $zero, 0x24($s0)       ; this->unknown_value_0x24 = 0
+sw    $zero, 0x24($s0)       ; this->flags = 0
 sh    $zero, 0x28($s0)       ; this->unk28 = 0
 sh    $zero, 0x2A($s0)       ; this->unk2A = 0
 ```
@@ -47,7 +47,7 @@ void Class6D430__Class6D430(UnkFlagsObj_171e0 *this) {
     this->unk14 = 0;
     this->unk20 = 0;
     this->unk22 = 0;
-    this->unknown_value_0x24 = 0;
+    this->flags = 0;
     this->unk28 = 0;
     this->unk2A = 0;
 }

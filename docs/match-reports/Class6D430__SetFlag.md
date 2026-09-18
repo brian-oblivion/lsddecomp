@@ -30,11 +30,11 @@ while being honest that nothing earlier than `0x24` is known yet:
 ```c
 typedef struct UnkFlagsObj_171e0 {
     u8 pad0[0x24];
-    s32 unknown_value_0x24;
+    s32 flags;
 } UnkFlagsObj_171e0;
 
 void Class6D430__SetFlag(UnkFlagsObj_171e0 *this) {
-    this->unknown_value_0x24 |= 1;
+    this->flags |= 1;
 }
 ```
 

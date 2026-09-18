@@ -86,8 +86,8 @@ struct UnkFlagsObjMethods_171e0 {
 };
 
 /* An instance of the D_8006D430 class. UnkFlagsObj_171e0's own name and the
- * unknown_value_0x24 field predate this unit's work (see Class6D430__SetFlag);
- * fields below it are new, derived from Class6D430__Class6D430 (the ctor, which
+ * flags field (formerly unknown_value_0x24) predate this unit's work (see
+ * Class6D430__SetFlag); fields below it are new, derived from Class6D430__Class6D430 (the ctor, which
  * zeroes them), Class6D430__AllocBuffer/Class6D430__FreeBuffer (unk0C/unk10/unk14/unk20) and
  * Class6D430__CopyFields (the unk40..unk74 block, a field-by-field copy -- retail
  * copies +0x40..+0x58 then jumps a 0xC-byte gap to +0x68..+0x74, so that gap
@@ -101,7 +101,8 @@ struct UnkFlagsObj_171e0 {
     /* +0x18 */ u8 pad18[0x20 - 0x18];       /* unknown, 8 bytes */
     /* +0x20 */ u16 unk20;                   /* nonzero blocks the unk10 free in Class6D430__FreeBuffer */
     /* +0x22 */ u16 unk22;
-    /* +0x24 */ s32 unknown_value_0x24;      /* flags; bit 0 set by Class6D430__SetFlag */
+    /* +0x24 */ s32 flags;                   /* bit 0 set by Class6D430__SetFlag; only bit
+                                                  established so far, meaning unknown */
     /* +0x28 */ u16 unk28;
     /* +0x2A */ u16 unk2A;
     /* +0x2C */ u8 pad2C[0x40 - 0x2C];       /* unknown, 0x14 bytes */
