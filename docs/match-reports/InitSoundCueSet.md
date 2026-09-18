@@ -34,7 +34,7 @@ s32 InitSoundCueSet(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) 
 
 with `Slot179D8ECC34`/`ObjCC34` declared at the top of the unit (a small
 3-slot init-guarded table, unrelated to `ObjDA34` -- this function is NOT a
-`D_8006DA34` vtable slot; checked `classtable.py D_8006DA34`'s slot list and
+`gVabStreamObjMethods` vtable slot; checked `classtable.py gVabStreamObjMethods`'s slot list and
 it's absent).
 
 Byte-exact, 20/20 words.

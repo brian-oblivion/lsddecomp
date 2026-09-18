@@ -8,16 +8,16 @@ Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ```c
 TableD9BC *GetVabDriverMethods(void) {
-    return &D_8006D9BC;
+    return &gVabDriverMethods;
 }
 ```
 
-Byte-exact, 4/4 words (`lui`/`addiu` computing `&D_8006D9BC`, then `jr`/`nop`).
+Byte-exact, 4/4 words (`lui`/`addiu` computing `&gVabDriverMethods`, then `jr`/`nop`).
 
 ## Notes
 
-The "get methods table" accessor for the `D_8006D9BC` class -- same idiom as
-`GetVabStreamObjMethods` (this unit) returning `&D_8006DA34`, and `func_8002C3A8` in
+The "get methods table" accessor for the `gVabDriverMethods` class -- same idiom as
+`GetVabStreamObjMethods` (this unit) returning `&gVabStreamObjMethods`, and `func_8002C3A8` in
 the sibling `code_179d8_d.c` returning `&D_8006D940`. Confirmed void-argument
 by checking its two call sites (`code_171e0/func_80026CAC.s`,
 `code_171e0/func_80026FE8.s`): both `jal GetVabDriverMethods` with no argument

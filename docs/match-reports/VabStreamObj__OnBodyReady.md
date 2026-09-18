@@ -24,7 +24,7 @@ s32 VabStreamObj__OnBodyReady(ObjDA34 *self, s32 arg1) {
 }
 ```
 
-`ObjDA34::unk5A` typed `u16` (see below). `D_8006DA34`'s vtable slot +0x078.
+`ObjDA34::unk5A` typed `u16` (see below). `gVabStreamObjMethods`'s vtable slot +0x078.
 
 Byte-exact, 27/27 words.
 

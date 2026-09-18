@@ -9,15 +9,15 @@ whole project (see `docs/research/gp-relative-blocker.md`, "RESOLVED").
 ## Derivation
 
 The prior stall's classification was correct on mechanism: retail is a single
-`lw $v0, %gp_rel(D_8008A8C4)($gp)` then `jr $ra`. With the gp-relative flags
+`lw $v0, %gp_rel(gOpenVabCount)($gp)` then `jr $ra`. With the gp-relative flags
 now passed by the Makefile, an ordinary C accessor compiles straight to that
 same form -- no special handling needed.
 
 ```c
-extern s32 D_8008A8C4;
+extern s32 gOpenVabCount;
 
 s32 GetOpenVabCount(void) {
-    return D_8008A8C4;
+    return gOpenVabCount;
 }
 ```
 

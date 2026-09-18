@@ -26,7 +26,7 @@ Byte-exact, 33/33 words.
 
 ## Notes
 
-`D_8006DA34`'s vtable slot +0x084 is NOT this function -- `FlushSoundCueSet`
+`gVabStreamObjMethods`'s vtable slot +0x084 is NOT this function -- `FlushSoundCueSet`
 itself is called directly (its only caller,
 `asm/class_3bb8c_n.s:func_800557DC`, passes `(*D_8008AC7C, &param0->unk14)`
 with no vtable indirection), while `FlushSoundCueSet`'s OWN body dispatches

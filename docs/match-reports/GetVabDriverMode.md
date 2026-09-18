@@ -13,29 +13,29 @@ Retail:
 ```
 beqz  $a0, .L8002C45C
 nop
-lw    $v0, %gp_rel(D_8008A8B4)($gp)
+lw    $v0, %gp_rel(gVabDriverModeArg)($gp)
 nop
 sw    $v0, 0x0($a0)
 .L8002C45C:
-lw    $v0, %gp_rel(D_8008A8B0)($gp)
+lw    $v0, %gp_rel(gVabDriverMode)($gp)
 jr    $ra
 nop
 ```
 
-If the argument pointer is non-NULL, store `D_8008A8B4` through it; either
-way, return `D_8008A8B0`. Same two globals `SetVabDriverMode` (already matched,
+If the argument pointer is non-NULL, store `gVabDriverModeArg` through it; either
+way, return `gVabDriverMode`. Same two globals `SetVabDriverMode` (already matched,
 just below in ROM order) writes through plain assignment -- this is the
 paired reader. Written as an ordinary conditional store plus return:
 
 ```c
-extern s32 D_8008A8B0;
-extern s32 D_8008A8B4;
+extern s32 gVabDriverMode;
+extern s32 gVabDriverModeArg;
 
 s32 GetVabDriverMode(s32 *arg0) {
     if (arg0 != NULL) {
-        *arg0 = D_8008A8B4;
+        *arg0 = gVabDriverModeArg;
     }
-    return D_8008A8B0;
+    return gVabDriverMode;
 }
 ```
 

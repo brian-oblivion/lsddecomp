@@ -5,13 +5,13 @@
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
 resolved that blocker project-wide. This is the class's own
-`new_class_da34` dispatch target -- `D_8006DA34`'s own slot +0x08, confirmed
+`new_class_da34` dispatch target -- `gVabStreamObjMethods`'s own slot +0x08, confirmed
 against the real rodata (`asm/data/5E140.data.s`), not just inferred from the
 header comment.
 
 ## Derivation
 
-Cross-referencing `asm/data/5E140.data.s`'s `D_8006DA34` table (not just the
+Cross-referencing `asm/data/5E140.data.s`'s `gVabStreamObjMethods` table (not just the
 existing header-comment guess) against every call site in this unit pins down
 the WHOLE table, not just this one slot:
 
@@ -52,23 +52,23 @@ void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
     self->unk58 = 0;
     self->unk5A = 0;
     self->unk5C = NULL;
-    if (D_8008A8B8 == 0) {
+    if (gVabSizeTableInited == 0) {
         func_80032368();
-        D_8008A8B8 = 1;
+        gVabSizeTableInited = 1;
         SsSetTableSize(func_8003A068(), 2, 1);
     }
-    if (D_8008A8BC == 0) {
+    if (gVabStreamInited == 0) {
         D_8008A8CC = 0x3C;
         func_80032588(1);
-        D_8008A8BC = 1;
+        gVabStreamInited = 1;
     }
-    D_8008A8C4++;
+    gOpenVabCount++;
     if (arg1 != NULL) {
         buf = func_80017B34(strlen(arg1) + 1);
         if (buf != NULL) {
             self->unk5C = buf;
             strcpy(buf, arg1);
-            func_800270C4(path, buf, NULL, D_8008A8D0);
+            func_800270C4(path, buf, NULL, gVabHeaderSuffix);
             self->unk2A = 1;
             self->methods->slot6C(self, path);
         }
@@ -76,7 +76,7 @@ void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
 }
 ```
 
-`D_8008A8D0` is retail's own `.sdata` string `".VH"` -- referenced, not
+`gVabHeaderSuffix` is retail's own `.sdata` string `".VH"` -- referenced, not
 retyped, per the duplicated-string-shift lesson in CLAUDE.md.
 
 ## Result
@@ -116,7 +116,7 @@ behaviourally identical to `default`) is what makes GCC treat 0 as a
 distinct low case needing its own range exclusion, matching retail's shape
 exactly.
 
-**`D_8006DA34`'s vtable can be walked function-by-function straight out of
+**`gVabStreamObjMethods`'s vtable can be walked function-by-function straight out of
 `asm/data/5E140.data.s`** rather than guessed from which functions happen to
 be in this unit. Two of the slots this unit's own functions dispatch through
 (+0x58, +0x6C) are null in the shipped table -- worth knowing before

@@ -8,7 +8,7 @@ Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ```c
 TableDA34 *GetVabStreamObjMethods(void) {
-    return &D_8006DA34;
+    return &gVabStreamObjMethods;
 }
 ```
 
@@ -16,7 +16,7 @@ Byte-exact, 4/4 words.
 
 ## Notes
 
-The "get methods table" accessor for the `D_8006DA34` class -- called from
+The "get methods table" accessor for the `gVabStreamObjMethods` class -- called from
 `New_VabStreamObj` (this unit) and from `VabStreamObj__VabStreamObj`/`VabStreamObj__Close` (this
 unit, both BLOCKED gp_rel) to obtain the constructor/dispatch table before
-indexing a slot. Same idiom as `GetVabDriverMethods` (this unit) for `D_8006D9BC`.
+indexing a slot. Same idiom as `GetVabDriverMethods` (this unit) for `gVabDriverMethods`.

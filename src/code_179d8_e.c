@@ -25,18 +25,18 @@
  * CORRECTION (runner echo, round 17): the assignment inherited a blanket "not
  * class-framework code" note from code_179d8_b/_d's sibling findings, but
  * that finding does NOT hold for THIS slice.  `tools/classtable.py --scan`
- * hits both D_8006D9BC (29 slots, header 0x00000023) and D_8006DA34 (39
+ * hits both gVabDriverMethods (29 slots, header 0x00000023) and gVabStreamObjMethods (39
  * slots, header 0x00000A03) as real class tables.  VabStreamObj__OnBodyReady's and
  * FlushSoundCueSet's self objects load `*self` (offset 0, the methods pointer)
- * and dereference table slots at exactly the offsets `classtable.py D_8006DA34`
+ * and dereference table slots at exactly the offsets `classtable.py gVabStreamObjMethods`
  * prints for VabStreamObj__LoadVagAttrs (+0x7C) and VabStreamObj__StopVoice (+0x84) -- direct
  * confirmation this is genuine self->methods->slotN(self, ...) dispatch, not
- * driver code.  D_8006D9BC and D_8006DA34 share the same BasicClass tail
+ * driver code.  gVabDriverMethods and gVabStreamObjMethods share the same BasicClass tail
  * (slots +0x10..+0x38), so they are two related classes off the same base --
  * confirmed round 43 as a PS1 SPU/VAB sound-streaming object: `VabStreamObj__VabStreamObj`
  * is its constructor, `VabStreamObj__Close` its close, `VabStreamObj__Update` its
  * per-frame poll (header/body transfer state machine), and `VabStreamObj__LoadVagAttrs`
- * its post-load VAB attribute-table fetch.  `D_8006DA34`'s whole vtable was
+ * its post-load VAB attribute-table fetch.  `gVabStreamObjMethods`'s whole vtable was
  * read straight out of `asm/data/5E140.data.s` while matching this cluster
  * -- see `docs/match-reports/VabStreamObj__VabStreamObj.md` for the full slot table,
  * including two slots (+0x58, +0x6C) that are null in retail's own data.
@@ -44,7 +44,7 @@
 #include "common.h"
 
 /* ------------------------------------------------------------------------
- * SoundObj class framework (D_8006D9BC / D_8006DA34).  Only the slots and
+ * SoundObj class framework (gVabDriverMethods / gVabStreamObjMethods).  Only the slots and
  * fields THIS unit's functions actually touch are named; everything else is
  * opaque padding, per this project's local-reading convention (see
  * code_179d8_d.c's Table6D940/Obj6D940 for the same idiom applied to a
@@ -54,15 +54,15 @@
  * ------------------------------------------------------------------------ */
 typedef struct ObjDA34 ObjDA34;
 
-/* D_8006D9BC's own methods table.  Only +0x054 is a slot this unit defines. */
+/* gVabDriverMethods's own methods table.  Only +0x054 is a slot this unit defines. */
 typedef struct TableD9BC {
     u8 pad000[0x054];
     s32 (*slot54)(void); /* func_8002C408 */
     u8 pad058[0x078 - 0x058];
 } TableD9BC;
-extern TableD9BC D_8006D9BC;
+extern TableD9BC gVabDriverMethods;
 
-/* D_8006DA34's own methods table -- the class ObjDA34 below dispatches
+/* gVabStreamObjMethods's own methods table -- the class ObjDA34 below dispatches
  * through.  Only the slots this unit's own functions call or are assigned to
  * are named.  round 43 added slot58/slot5C/slot6C/slot9C once VabStreamObj__VabStreamObj,
  * VabStreamObj__Update and VabStreamObj__LoadVagAttrs (all round-17 gp_rel stalls, resolved
@@ -70,9 +70,9 @@ extern TableD9BC D_8006D9BC;
 typedef struct TableDA34 {
     u8 pad000[0x008];
     void (*slot08)(void *self, char *arg1); /* VabStreamObj__VabStreamObj -- this unit's own new_class_da34 dispatch; arg1 is a base filename, not a plain s32 */
-    s32 (*slot0C)(ObjDA34 *self);           /* VabStreamObj__Close, confirmed against D_8006DA34's own rodata (+0x0C) */
+    s32 (*slot0C)(ObjDA34 *self);           /* VabStreamObj__Close, confirmed against gVabStreamObjMethods's own rodata (+0x0C) */
     u8 pad010[0x058 - 0x010];
-    /* +0x058 and +0x06C are BOTH null in retail's own D_8006DA34 (confirmed
+    /* +0x058 and +0x06C are BOTH null in retail's own gVabStreamObjMethods (confirmed
      * against asm/data/5E140.data.s) -- VabStreamObj__Update and VabStreamObj__VabStreamObj each
      * dispatch through one of them anyway, on a path that is apparently
      * never actually taken for an object built with this exact base table.
@@ -90,7 +90,7 @@ typedef struct TableDA34 {
     u8 pad088[0x09C - 0x088];
     void (*slot9C)(void *self, s32 arg1);   /* VabStreamObj__SetPitchOffset -- VabStreamObj__VabStreamObj's own dispatch, called with arg1 == 0 right after construction */
 } TableDA34;
-extern TableDA34 D_8006DA34;
+extern TableDA34 gVabStreamObjMethods;
 
 /* One "chunk" entry inside a self->unk50 sub-array, stride 0x20.  This is
  * Sony's own `VagAtr` (include/psyq/LIBSND.H, 32 bytes) -- unk4/unk5 land
@@ -116,7 +116,7 @@ typedef struct VabHdr179D8E {
     u8 pad16[0x20 - 0x16];
 } VabHdr179D8E;
 
-/* self for the D_8006DA34-dispatched methods in this unit.  Only fields this
+/* self for the gVabStreamObjMethods-dispatched methods in this unit.  Only fields this
  * unit's own functions touch are named -- see the header-comment correction
  * above for how this was established. */
 struct ObjDA34 {
@@ -156,7 +156,7 @@ extern void SsVabTransCompleted(s32 arg0);
 extern s32 SsSetMute(s32 arg0);
 
 /* InitSoundCueSet's own "obj" (its `arg1`) -- a small slot-table object,
- * unrelated to ObjDA34 (this function is NOT a D_8006DA34 vtable slot; its
+ * unrelated to ObjDA34 (this function is NOT a gVabStreamObjMethods vtable slot; its
  * only callers pass a plain heap/stack struct pointer).  Only the fields
  * this unit's own function touches are named. */
 typedef struct Slot179D8ECC34 {
@@ -198,23 +198,23 @@ void func_8002C430(void) {
 }
 
 TableD9BC *GetVabDriverMethods(void) {
-    return &D_8006D9BC;
+    return &gVabDriverMethods;
 }
 
-extern s32 D_8008A8B0;
-extern s32 D_8008A8B4;
+extern s32 gVabDriverMode;
+extern s32 gVabDriverModeArg;
 
 s32 GetVabDriverMode(s32 *arg0) {
     if (arg0 != NULL) {
-        *arg0 = D_8008A8B4;
+        *arg0 = gVabDriverModeArg;
     }
-    return D_8008A8B0;
+    return gVabDriverMode;
 }
 
 s32 SetVabDriverMode(s32 a, s32 b)
 {
-	D_8008A8B0 = a;
-	D_8008A8B4 = b;
+	gVabDriverMode = a;
+	gVabDriverModeArg = b;
 	return 1;
 }
 
@@ -274,15 +274,15 @@ extern char *strcpy(char *dest, char *src);
 
 /* ".VH"/".VB" -- already emitted by splat in .sdata, referenced not
  * retyped (a literal here would duplicate the bytes and shift the image). */
-extern const char D_8008A8D0[];
-extern const char D_8008A8D4[];
+extern const char gVabHeaderSuffix[];
+extern const char gVabBodySuffix[];
 
-extern s32 D_8008A8B8;
-extern s32 D_8008A8BC;
-extern s32 D_8008A8C0;
-extern s32 D_8008A8C4;
+extern s32 gVabSizeTableInited;
+extern s32 gVabStreamInited;
+extern s32 gVabVolumeInited;
+extern s32 gOpenVabCount;
 extern s32 D_8008A8CC;
-extern void *D_8008A8C8;
+extern void *gPendingVabBuffer;
 
 void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
     void *buf;
@@ -298,23 +298,23 @@ void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
     self->unk58 = 0;
     self->unk5A = 0;
     self->unk5C = NULL;
-    if (D_8008A8B8 == 0) {
+    if (gVabSizeTableInited == 0) {
         func_80032368();
-        D_8008A8B8 = 1;
+        gVabSizeTableInited = 1;
         SsSetTableSize(func_8003A068(), 2, 1);
     }
-    if (D_8008A8BC == 0) {
+    if (gVabStreamInited == 0) {
         D_8008A8CC = 0x3C;
         func_80032588(1);
-        D_8008A8BC = 1;
+        gVabStreamInited = 1;
     }
-    D_8008A8C4++;
+    gOpenVabCount++;
     if (arg1 != NULL) {
         buf = func_80017B34(strlen(arg1) + 1);
         if (buf != NULL) {
             self->unk5C = buf;
             strcpy(buf, arg1);
-            func_800270C4(path, buf, NULL, D_8008A8D0);
+            func_800270C4(path, buf, NULL, gVabHeaderSuffix);
             self->unk2A = 1;
             self->methods->slot6C(self, path);
         }
@@ -323,13 +323,13 @@ void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
 
 s32 VabStreamObj__Close(ObjDA34 *self) {
     SsVabClose(self->unk54);
-    if (--D_8008A8C4 < 0) {
-        D_8008A8C4 = 0;
+    if (--gOpenVabCount < 0) {
+        gOpenVabCount = 0;
     }
-    if (D_8008A8C4 == 0 && func_8003A05C() == 0) {
-        D_8008A8B8 = 0;
-        D_8008A8C0 = 0;
-        D_8008A8BC = 0;
+    if (gOpenVabCount == 0 && func_8003A05C() == 0) {
+        gVabSizeTableInited = 0;
+        gVabVolumeInited = 0;
+        gVabStreamInited = 0;
         func_800329D8();
         func_80032A7C();
     }
@@ -348,8 +348,8 @@ void VabStreamObj__Update(ObjDA34 *self) {
     case 1:
         if (self->unk24 & 0x200) {
             self->unk54 = SsVabOpenHead(self->unk10, -1);
-            func_800270C4(path, self->unk5C, NULL, D_8008A8D4);
-            D_8008A8C8 = self->unk10;
+            func_800270C4(path, self->unk5C, NULL, gVabBodySuffix);
+            gPendingVabBuffer = self->unk10;
             self->unk2A = 6;
             self->unk10 = NULL;
             self->methods->slot58(self, path);
@@ -399,7 +399,7 @@ typedef struct ProgAtr179D8E {
 } ProgAtr179D8E;
 
 /* func_80026C20 -- uncarved, cross-unit; reached only through
- * D_8006DA34's own +0x5C slot (declared above as `slot5C`), never called
+ * gVabStreamObjMethods's own +0x5C slot (declared above as `slot5C`), never called
  * directly by name here. */
 
 void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
@@ -414,7 +414,7 @@ void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
         return;
     }
     self->methods->slot5C(self);
-    self->unk10 = D_8008A8C8;
+    self->unk10 = gPendingVabBuffer;
     result = SsUtGetVabHdr(self->unk54, &self->unk2C);
     if (result == -1) {
         return;
@@ -442,10 +442,10 @@ void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
             pool++;
         }
     }
-    if (D_8008A8C0 == 0) {
+    if (gVabVolumeInited == 0) {
         func_80032998();
         SsSetMVol(0x78, 0x78);
-        D_8008A8C0 = 1;
+        gVabVolumeInited = 1;
     }
 }
 
@@ -497,13 +497,13 @@ void VabStreamObj__SetPitchOffset(ObjDA34 *self, s32 arg1) {
 }
 
 TableDA34 *GetVabStreamObjMethods(void) {
-    return &D_8006DA34;
+    return &gVabStreamObjMethods;
 }
 
-extern s32 D_8008A8C4;
+extern s32 gOpenVabCount;
 
 s32 GetOpenVabCount(void) {
-    return D_8008A8C4;
+    return gOpenVabCount;
 }
 
 extern s32 D_8008A8CC;

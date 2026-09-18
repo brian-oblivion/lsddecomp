@@ -23,7 +23,7 @@ Byte-exact, 16/16 words.
 
 ## Notes
 
-`D_8006DA34`'s vtable slot +0x08C. The mirror of `VabStreamObj__Mute` (slot
+`gVabStreamObjMethods`'s vtable slot +0x08C. The mirror of `VabStreamObj__Mute` (slot
 +0x088) in shape (a `self->unk56` boolean-ish flag guarded by a
 `func_800336CC` call), but NOT byte-symmetric with it: unlike
 `VabStreamObj__Mute`, which discards `func_800336CC`'s return value and stores a

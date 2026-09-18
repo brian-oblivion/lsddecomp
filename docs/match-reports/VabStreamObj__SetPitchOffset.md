@@ -18,7 +18,7 @@ strength-reduction shape for a small constant multiply).
 
 ## Notes
 
-`D_8006DA34`'s vtable slot +0x09C (last slot in this unit's typed range).
+`gVabStreamObjMethods`'s vtable slot +0x09C (last slot in this unit's typed range).
 `self->unk60` is a genuine 32-bit field here (`sw`, not `sh`) -- see
 `VabStreamObj__PlayTone`'s report for the same field read back with an `(u16)` cast
 (a direct `lhu`), which is why `ObjDA34::unk60` is declared `s32` rather than

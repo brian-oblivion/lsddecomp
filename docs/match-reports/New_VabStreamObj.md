@@ -27,7 +27,7 @@ Byte-exact, 24/24 words.
 
 ## Notes
 
-The `new_class_*`-style constructor for the `D_8006DA34` class: allocate
+The `new_class_*`-style constructor for the `gVabStreamObjMethods` class: allocate
 0x64 bytes, then dispatch through the table's own slot +0x008
 (`VabStreamObj__VabStreamObj`, BLOCKED gp_rel -- not this unit's to write, only its
 prototype's shape matters here) as the actual constructor, which is where

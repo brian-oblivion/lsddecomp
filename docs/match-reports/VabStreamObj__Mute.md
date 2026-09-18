@@ -24,8 +24,8 @@ Byte-exact, 17/17 words.
 
 ## Notes
 
-`D_8006DA34`'s vtable slot +0x088 (confirmed against `tools/classtable.py
-D_8006DA34`'s output).
+`gVabStreamObjMethods`'s vtable slot +0x088 (confirmed against `tools/classtable.py
+gVabStreamObjMethods`'s output).
 
 **First attempt was a near-miss (6/17, and it warned of an out-of-range
 size drift) from a single wrong detail: I initially wrote

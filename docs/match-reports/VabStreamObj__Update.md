@@ -4,7 +4,7 @@
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
-resolved that blocker project-wide. Confirmed against `D_8006DA34`'s own
+resolved that blocker project-wide. Confirmed against `gVabStreamObjMethods`'s own
 rodata as that table's `+0x64` slot -- the class's own per-frame poll/update
 method: it switches on the object's own load state (`self->unk2A`) and drives
 the VAB header/body streaming state machine.
@@ -21,8 +21,8 @@ void VabStreamObj__Update(ObjDA34 *self) {
     case 1:
         if (self->unk24 & 0x200) {
             self->unk54 = SsVabOpenHead(self->unk10, -1);
-            func_800270C4(path, self->unk5C, NULL, D_8008A8D4);
-            D_8008A8C8 = self->unk10;
+            func_800270C4(path, self->unk5C, NULL, gVabBodySuffix);
+            gPendingVabBuffer = self->unk10;
             self->unk2A = 6;
             self->unk10 = NULL;
             self->methods->slot58(self, path);
@@ -50,15 +50,15 @@ void VabStreamObj__Update(ObjDA34 *self) {
 State 1 ("header pending", set by `VabStreamObj__VabStreamObj`): if the object's flag
 word has bit 0x200 set, open the VAB header (`SsVabOpenHead`), build a
 ".VB" path from the same base filename, hand the old streaming buffer
-pointer off to the shared `D_8008A8C8` global, transition to state 6, and
+pointer off to the shared `gPendingVabBuffer` global, transition to state 6, and
 dispatch the body transfer through `methods->slot58` (null in retail's own
-`D_8006DA34` -- see `VabStreamObj__VabStreamObj.md`); then free the filename copy if one
+`gVabStreamObjMethods` -- see `VabStreamObj__VabStreamObj.md`); then free the filename copy if one
 was allocated. State 6 ("body pending"): if the same flag is set, continue
 the body transfer (`SsVabTransBody`), and on success mark the object ready
 (`unk5A = 1`) and notify via `methods->slot78` (== `VabStreamObj__OnBodyReady`).
 
-`D_8008A8D4` is retail's own `.sdata` string `".VB"`, referenced not
-retyped, same as `D_8008A8D0` in the sibling function.
+`gVabBodySuffix` is retail's own `.sdata` string `".VB"`, referenced not
+retyped, same as `gVabHeaderSuffix` in the sibling function.
 
 ## Result
 

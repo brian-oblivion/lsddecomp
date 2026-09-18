@@ -4,7 +4,7 @@
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
-resolved that blocker project-wide. Confirmed against `D_8006DA34`'s own
+resolved that blocker project-wide. Confirmed against `gVabStreamObjMethods`'s own
 rodata (`asm/data/5E140.data.s`) as that table's own `+0x0C` slot -- this is
 the class's "close" method.
 
@@ -13,13 +13,13 @@ the class's "close" method.
 ```c
 s32 VabStreamObj__Close(ObjDA34 *self) {
     SsVabClose(self->unk54);
-    if (--D_8008A8C4 < 0) {
-        D_8008A8C4 = 0;
+    if (--gOpenVabCount < 0) {
+        gOpenVabCount = 0;
     }
-    if (D_8008A8C4 == 0 && func_8003A05C() == 0) {
-        D_8008A8B8 = 0;
-        D_8008A8C0 = 0;
-        D_8008A8BC = 0;
+    if (gOpenVabCount == 0 && func_8003A05C() == 0) {
+        gVabSizeTableInited = 0;
+        gVabVolumeInited = 0;
+        gVabStreamInited = 0;
         func_800329D8();
         func_80032A7C();
     }

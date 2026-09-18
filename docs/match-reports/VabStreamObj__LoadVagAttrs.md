@@ -4,7 +4,7 @@
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
-resolved that blocker project-wide. This is `D_8006DA34`'s own `+0x7C` slot
+resolved that blocker project-wide. This is `gVabStreamObjMethods`'s own `+0x7C` slot
 (the header comment's original guess was already right here, confirmed
 against `asm/data/5E140.data.s`): once the VAB body transfer completes
 (`VabStreamObj__OnBodyReady` sets `unk58 = 1` and dispatches here), this function pulls
@@ -31,7 +31,7 @@ void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
         return;
     }
     self->methods->slot5C(self);
-    self->unk10 = D_8008A8C8;
+    self->unk10 = gPendingVabBuffer;
     result = SsUtGetVabHdr(self->unk54, &self->unk2C);
     if (result == -1) {
         return;
@@ -59,10 +59,10 @@ void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
             pool++;
         }
     }
-    if (D_8008A8C0 == 0) {
+    if (gVabVolumeInited == 0) {
         func_80032998();
         SsSetMVol(0x78, 0x78);
-        D_8008A8C0 = 1;
+        gVabVolumeInited = 1;
     }
 }
 ```
@@ -78,7 +78,7 @@ byte matters here), then walks that many `VagAtr` entries out of the pool via
 per program -- confirmed by where retail's `addiu $s2,$s2,0x20` actually sits,
 in the INNER loop's own branch-delay slot). On first successful pass through
 the whole bank, calls `func_80032998` and sets the shared master volume once
-(`D_8008A8C0` guards it from repeating).
+(`gVabVolumeInited` guards it from repeating).
 
 ## Result
 
@@ -114,7 +114,7 @@ Anyone who writes an explicit skip-guard in front of a loop whose own
 condition already covers the empty case should check whether retail's
 instruction count agrees before assuming the guard is free.
 
-**`D_8006DA34`'s table can and should be read whole from
+**`gVabStreamObjMethods`'s table can and should be read whole from
 `asm/data/5E140.data.s` before attempting ANY of its dispatch functions** --
 see `VabStreamObj__VabStreamObj.md`'s table for the slots this round pinned down. Two
 (`+0x58`, `+0x6C`) are null in retail and never actually exercised at

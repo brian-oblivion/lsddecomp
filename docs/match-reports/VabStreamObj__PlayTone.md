@@ -13,7 +13,7 @@ confirmed with a from-scratch minimal reproducer through the pinned pipeline
 
 ## What the function does (high confidence, established via m2c + manual read)
 
-`D_8006DA34`'s vtable slot +0x080. Signature:
+`gVabStreamObjMethods`'s vtable slot +0x080. Signature:
 `s32 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)`.
 
 ```c

@@ -23,7 +23,7 @@ Byte-exact, 16/16 words.
 
 ## Notes
 
-`D_8006DA34`'s vtable slot +0x084. `self` is unused in the body -- confirmed
+`gVabStreamObjMethods`'s vtable slot +0x084. `self` is unused in the body -- confirmed
 by the actual instructions only ever reading `$a1` (the second argument
 register), never `$a0`. Its only caller is the vtable slot itself
 (`FlushSoundCueSet`, this unit), which passes `(self, arr[i].field0)` -- two
