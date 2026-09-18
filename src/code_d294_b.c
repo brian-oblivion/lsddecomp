@@ -129,7 +129,7 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
 
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
- * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = func_8001DA28, +0xAC = func_8001DDF4)
+ * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = func_8001DDF4)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
 /* STALL -- see docs/match-reports/func_8001D714.md. Round 20: closed 11
@@ -245,7 +245,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
     }
 }
 
-/* STALL -- see docs/match-reports/func_8001DA28.md. Round 20: reached
+/* STALL -- see docs/match-reports/Class6B5CC__CheckBoundsOverlap.md. Round 20: reached
  * 14/243 words in-range (up from round 13's 6/243) after fixing the
  * frame size (0x98 -> 0xF8, a 24-word unused-buffer padding) and a
  * deferred-self-materialization residue (barrier as first statement).
@@ -254,7 +254,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
  * structural work in the two loop bodies and tail comparison.
  * Restored to INCLUDE_ASM per project rule. */
 #if 0
-s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
     CornerList_d294 *list;
     Vec3S16_d294 *cur;
     s16 *zview;
@@ -382,7 +382,7 @@ s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
+INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
 
 /* STALL -- see docs/match-reports/func_8001DDF4.md. Round 46 (echo):
  * FIRST-EVER build/score for this function -- inherited round 45's
@@ -390,7 +390,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
  * (199/199 words in-range, no drift), 29/199 raw word-match, first real
  * diff at vram 0x8001DDF8 (register identity: `self` lands in $s4 here,
  * $s5 in retail). Two levers found this round: an unaccounted 0x18-byte
- * stack buffer (same "unused padding" shape as func_8001DA28's own
+ * stack buffer (same "unused padding" shape as Class6B5CC__CheckBoundsOverlap's own
  * history -- fixed the frame size, which was originally 0x18 short) and
  * a resolution of round 45's open Part-3 ambiguity (see the report).
  * Restored to INCLUDE_ASM per project rule. */

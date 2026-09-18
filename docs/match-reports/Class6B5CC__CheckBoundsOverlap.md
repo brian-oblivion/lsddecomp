@@ -1,4 +1,6 @@
-# func_8001DA28 — STALL (21 words SHORT: built 222/retail 243 words; 14/243 raw words match per funcdiff; first diff read off asm-differ at file offset 0xE238 / vram 0x8001DA38 — `addiu $t4, $a3, 4` (materializing the `cur` corner-loop pointer into its own register) where this build instead re-uses `arg2` copied into a scratch register at that point; see the round-37 addendum for how this title was rebuilt and what it supersedes)
+> Renamed from `func_8001DA28` on 2026-09-18 (tools/rename.py). Address 0x8001da28.
+
+# Class6B5CC__CheckBoundsOverlap — STALL (21 words SHORT: built 222/retail 243 words; 14/243 raw words match per funcdiff; first diff read off asm-differ at file offset 0xE238 / vram 0x8001DA38 — `addiu $t4, $a3, 4` (materializing the `cur` corner-loop pointer into its own register) where this build instead re-uses `arg2` copied into a scratch register at that point; see the round-37 addendum for how this title was rebuilt and what it supersedes)
 
 Unit: `code_d294_b`. Round 13, runner delta. This is the unit's largest
 queued function (268 asm lines / 243 words). One real attempt reached
@@ -11,7 +13,7 @@ match was reached.
 ## Signature (as attempted)
 
 ```c
-s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
 ```
 
 Confirmed from `func_8001D714`'s own call site (this round, also stalled —
@@ -91,7 +93,7 @@ themselves.
 ## Best attempt reached (preserved literally, positioned to compile)
 
 ```c
-s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
     CornerList_d294 *list;
     Vec3S16_d294 *cur;
     s16 *zview;
@@ -241,7 +243,7 @@ concrete, measured leads for the next attempt:
 2. **The `CornerList_d294`/`Sixteen6_d294` field NAMES here are honestly
    opaque placeholders** (`f0`..`f5`, `hdr`) — real semantic names were not
    recoverable from this one function alone. If a caller of
-   `func_8001DA28` gets matched later and clarifies what `arg1`/`arg2`
+   `Class6B5CC__CheckBoundsOverlap` gets matched later and clarifies what `arg1`/`arg2`
    actually represent (geometry? a hit-test volume?), rename these before
    they propagate further.
 
@@ -253,7 +255,7 @@ concrete, measured leads for the next attempt:
 - New externs `func_8001F4E4(void *arg0)` and `func_8001F50C(void *arg0,
   s32 arg1)` returning `Sixteen6_d294 *` (PsyQ library,
   `asm/psyq_GsLinkObject4.s`) — see the `D_8008B21C` finding above.
-- Prototype for `func_8001DA28` itself.
+- Prototype for `Class6B5CC__CheckBoundsOverlap` itself.
 - **No existing declaration was modified** for this function — `Class6B5CCMethods::slotA8`
   (typed `s32 (*)(Class6B5CCObj*, void*, Vec3S16_d294*)`) was already added
   while working `func_8001D714` earlier this round; this attempt only
@@ -281,11 +283,11 @@ and fixed -- `func_8001D714` (this unit's OTHER round-13 stall, addressed
 earlier the same round) had been left LIVE in `src/code_d294_b.c`
 (missing its `#if 0`/`INCLUDE_ASM` wrapper) after an experiment, which
 silently shifted every function after it in the file by 13 words. This
-made `func_8001DA28`'s own vram address wrong in the LINKED build
+made `Class6B5CC__CheckBoundsOverlap`'s own vram address wrong in the LINKED build
 (`0x8001D9F4` instead of retail's `0x8001DA28`, confirmed via
 `build/lsdde.map`), which in turn made every early diff read against it
 meaningless. Fixed by re-wrapping `func_8001D714` properly; confirmed via
-the map file that `func_8001DA28` lands at the correct retail address
+the map file that `Class6B5CC__CheckBoundsOverlap` lands at the correct retail address
 before trusting any further diff. **Whenever a diff for an
 `INCLUDE_ASM`-adjacent function looks nonsensical from word 0 (a
 completely different instruction, not a plausible near-miss), check
@@ -358,7 +360,7 @@ restored; confirmed clean rebuild (`build exit=0`, whole-image OK).
 
 ```c
 #if 0
-s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
     CornerList_d294 *list;
     Vec3S16_d294 *cur;
     s16 *zview;
@@ -521,14 +523,14 @@ back into `src/code_d294_b.c` verbatim, confirmed `func_8001D714`
 `#if 0`/`INCLUDE_ASM`-wrapped before trusting the address, and rebuilt.
 
 **Reproduces exactly: 14/243 raw words match, `build exit=2`, no compile
-errors.** `build/lsdde.map` confirms `func_8001DA28` itself lands at the
+errors.** `build/lsdde.map` confirms `Class6B5CC__CheckBoundsOverlap` itself lands at the
 correct retail address `0x8001da28` (so the earlier frame-size fix still
 holds and this function's own window is trustworthy) — but the NEXT
 function, `func_8001DDF4`, lands at `0x8001dda0` where retail has it at
 `0x8001DDF4`, a **0x54-byte / 21-word deficit**. That is this function's
 own true LENGTH residue: 222 words built vs 243 retail.
 
-Ran `tools/asm-differ/diff.py func_8001DA28` to find the first REAL
+Ran `tools/asm-differ/diff.py Class6B5CC__CheckBoundsOverlap` to find the first REAL
 defect (realigned, not the raw funcdiff list which runs into ripple
 almost immediately once the lengths diverge). The prologue
 (`addiu $sp,$sp,-0xf8` / `sw $s0` / `move $s0,$a0` / `move $a3,$a1`) is
@@ -575,7 +577,7 @@ the same 340154-byte drift warning this report already documents --
 expected, since the function is still a genuine 21-word length deficit,
 not a pure register residue).
 
-This was `func_8001DA28`'s first-ever permuter search, per this round's
+This was `Class6B5CC__CheckBoundsOverlap`'s first-ever permuter search, per this round's
 assignment. Round 37 explicitly declined to run one ("too large to
 responsibly hand off to the permuter without first closing the
 arg2-liveness residue by hand... a permuter search seeded from a 14/243

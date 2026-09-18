@@ -109,7 +109,7 @@ every subsequent word differed as a result (nothing downstream can line up
 while the frame pointer itself is wrong).
 
 **Fix: add an unused `u8 pad[0x18];` local.** This is the same shape as
-`func_8001DA28`'s own history in this unit (round 20: "fixing the frame size
+`Class6B5CC__CheckBoundsOverlap`'s own history in this unit (round 20: "fixing the frame size
 (0x98 -> 0xF8, a 24-word unused-buffer padding)") -- GCC 2.6.3 reserves
 stack space for locals whose source declaration doesn't survive into any
 generated reference (dead-but-declared buffers, or -- more likely here,
@@ -253,7 +253,7 @@ literal ZERO figure to a real, if incomplete, score in one sitting by
 transcribing the high-confidence parts of an inherited derivation and
 building it -- the frame-size gap alone (a single missing padding buffer)
 cost 15/199 words before it was found, exactly the same lever
-`func_8001DA28` needed in this same unit two rounds ago.** When a derivation
+`Class6B5CC__CheckBoundsOverlap` needed in this same unit two rounds ago.** When a derivation
 report is inherited with NO C ever attempted, build the solid parts first
 and let the frame-size check (word 0 of `funcdiff`'s output) tell you
 immediately whether an unaccounted local exists, rather than reading

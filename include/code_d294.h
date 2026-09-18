@@ -239,7 +239,7 @@ typedef struct BoundsBox_d294 {
     Vec3S16_d294 hi;
 } BoundsBox_d294;
 
-/* Round 13 (func_8001DA28): a 12-byte, all-s16, 6-field record -- MEASURED,
+/* Round 13 (Class6B5CC__CheckBoundsOverlap): a 12-byte, all-s16, 6-field record -- MEASURED,
  * same all-s16-struct-copy idiom as Vec3S16_d294 (whole-value assignment
  * compiles to unaligned lwl/lwr). Used as func_8001F50C's own return-array
  * element type and as this function's own second running-tracker. Field
@@ -257,7 +257,7 @@ typedef struct Sixteen6_d294 {
     s16 f5;
 } Sixteen6_d294;
 
-/* Round 13 (func_8001DA28): `arg1`'s own struct -- a count followed by the
+/* Round 13 (Class6B5CC__CheckBoundsOverlap): `arg1`'s own struct -- a count followed by the
  * FIRST corner (`hdr`), with `count*8 - 1` more Vec3S16_d294 corners
  * immediately after (stride 6, walked by raw pointer arithmetic since a
  * C89 flexible array member isn't available). MEASURED: `count*48` is the
@@ -495,7 +495,7 @@ struct Class6B5CCMethods {
      * though this class's own table happens to point at it. Signature
      * matches Class6B5CC__ComposeAndApplyRotation's own exactly. */
     void (*slotA4)(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
-    /* +0x0A8, occupant func_8001DA28 (still queued this round). Return
+    /* +0x0A8, occupant Class6B5CC__CheckBoundsOverlap (still queued this round). Return
      * value IS tested by this call site (truthy -> continue, falsy ->
      * early return), so non-void. */
     s32 (*slotA8)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
@@ -649,7 +649,7 @@ extern s32 func_8001F3A4(void *arg0);
  * game code): func_8001F4E4 fills a PsyQ-internal global
  * (D_8008B21C, via func_8001F3B0) from its own argument; func_8001F50C
  * IGNORES both its arguments and just returns `&D_8008B21C` -- MEASURED,
- * its whole body is `lui/addiu %hi/%lo(D_8008B21C); jr $ra`. func_8001DA28
+ * its whole body is `lui/addiu %hi/%lo(D_8008B21C); jr $ra`. Class6B5CC__CheckBoundsOverlap
  * (round 13, code_d294_b) calls the pair as `func_8001F4E4(self->unk20);
  * arr = func_8001F50C(self->unk20, 0);` -- declared here typed to that
  * call site's own use of the result (an array of Sixteen6_d294). */
@@ -808,7 +808,7 @@ void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, V
 extern s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point);
 
 s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
-s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
 
 /* ratan2 (Psy-Q library, not game code; symbol address per
  * config/symbols.slps01556.lsdde.txt, 0x8001F0C8): arctangent of
