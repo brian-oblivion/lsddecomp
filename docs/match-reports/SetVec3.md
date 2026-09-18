@@ -1,4 +1,6 @@
-# func_80026CE8
+> Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
+
+# SetVec3
 
 **Unit:** code_171e0 · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
@@ -34,7 +36,7 @@ typedef struct Vec3_171e0 {
     s32 z;
 } Vec3_171e0;
 
-Vec3_171e0 *func_80026CE8(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
+Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
     this->x = x;
     this->y = y;
     this->z = z;
@@ -52,3 +54,14 @@ anything else, with no other use for that copy, is returning the pointer —
 even when the one caller you can find ignores the result. Check the
 function's OWN body for the `addu $v0, $a0, ...` idiom before trusting a
 caller's ignored return value as evidence for `void`.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026CE8` | `SetVec3` | A |
+
+**Evidence.** Writes `x`/`y`/`z` into a `Vec3_171e0` and returns the pointer
+-- a pure "set and return this" setter. Mechanics are its purpose.

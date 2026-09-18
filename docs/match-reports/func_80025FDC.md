@@ -28,7 +28,7 @@ lw    $v0, 0x8($v0)              ; base table's ctor slot
 nop
 jalr  $v0                         ; base_ctor(self, arg->unk00), return discarded
  addu $a0, $s0, $zero
-jal   func_800269E0                ; -> &D_8006D3C8 (own vtable)
+jal   GetClass6D3C8Methods                ; -> &D_8006D3C8 (own vtable)
  nop
 sw    $v0, 0x0($s0)                 ; self->methods = own vtable
 jal   func_80048CF0                  ; reads an unnamed small-data global
@@ -70,7 +70,7 @@ void func_80025FDC(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     LoadModelRequest req;
 
     func_8003B20C()->ctor(self, arg->unk00);
-    self->methods = func_800269E0();
+    self->methods = GetClass6D3C8Methods();
     self->arg = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
@@ -118,7 +118,7 @@ another caller is found that writes them.
   opaque `void *` to real callable signatures now that this function
   exercises them, retyped `Class6D3C8::arg` and `::dreamSys` from `void *`
   to their real pointer types, and declared the small externs this function
-  needed (`func_800269E0`, `D_800107A4`, `func_80048CF0`, `func_800270AC`,
+  needed (`GetClass6D3C8Methods`, `D_800107A4`, `func_80048CF0`, `func_800270AC`,
   `func_80043840`).
 - `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named

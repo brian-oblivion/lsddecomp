@@ -18,7 +18,7 @@ Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
     Class6D3C8 *self = func_80017B34(0x2C);
 
     if (self != 0) {
-        ((Class6D3C8Methods *)func_800269E0())->ctor(self, arg);
+        ((Class6D3C8Methods *)GetClass6D3C8Methods())->ctor(self, arg);
         return self;
     }
 }
@@ -119,10 +119,10 @@ Five attempts spent, all at 23/24 or worse (never better):
    DIFFERENT value from the fallthrough, unlike the previously-tried
    `goto done; done: return self;` where both paths shared one return).
    Needed one incidental fix along the way: calling
-   `func_800269E0()->ctor(...)` directly (rather than through an
-   intermediate `self->methods = func_800269E0();` assignment as in
+   `GetClass6D3C8Methods()->ctor(...)` directly (rather than through an
+   intermediate `self->methods = GetClass6D3C8Methods();` assignment as in
    `func_80025FDC`) requires an explicit `(Class6D3C8Methods *)` cast,
-   since `func_800269E0` returns bare `void *` and dereferencing a `void *`
+   since `GetClass6D3C8Methods` returns bare `void *` and dereferencing a `void *`
    member is a hard error, not just a warning, in this compiler. **Result:
    23/24, identical residue** (delay slot: retail `nop`, ours
    `move v0,s0`).

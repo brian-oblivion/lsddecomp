@@ -900,7 +900,7 @@ extern Class86AA0Methods *func_8004D508(void);
  * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` (asm/code_d294.s) -- it reads
  * neither $a0 nor $a1, and just returns &D_8006B5CC. It is the plain
  * no-parameter vtable getter documented in docs/research/class-framework.md,
- * the same shape as func_800269E0.
+ * the same shape as GetClass6D3C8Methods.
  *
  * The arg list below is therefore NOT the callee's signature; it is what THIS
  * call site passes, and it is what this unit's bytes need. src/class_3ac78.c

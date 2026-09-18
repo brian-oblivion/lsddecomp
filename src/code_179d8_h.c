@@ -50,7 +50,7 @@
 #include "common.h"
 /* code_171e0.h's UnkFlagsObj_171e0/UnkFlagsObjMethods_171e0 already
  * describe D_8006D430's class exactly -- func_80028898 dispatches
- * func_80026C9C()->ctor(self) (offset +0x008), matching that header's own
+ * GetClass6D430Methods()->ctor(self) (offset +0x008), matching that header's own
  * ctor slot. Reused UNCHANGED per CLAUDE.md's header discipline (a sibling
  * would use it unchanged), not redefined locally. */
 #include "code_171e0.h"
@@ -138,13 +138,13 @@ extern char *strcat(char *dest, char *src);
 extern char D_8008A8A8[]; /* ";1", the ISO9660 CD file-version suffix */
 
 void func_80028898(UnkFlagsObj_171e0 *self) {
-    ((UnkFlagsObjMethods_171e0 *)func_80026C9C())->ctor(self);
+    ((UnkFlagsObjMethods_171e0 *)GetClass6D430Methods())->ctor(self);
     self->methods = GetClass6D4E8Methods();
     self->unk0C = 0;
 }
 
 void *func_800288E0(UnkFlagsObj_171e0 *self) {
-    return ((UnkFlagsObjMethods_171e0 *)func_80026C9C())->dtor(self);
+    return ((UnkFlagsObjMethods_171e0 *)GetClass6D430Methods())->dtor(self);
 }
 
 void func_80028918(void) {

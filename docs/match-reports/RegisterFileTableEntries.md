@@ -1,4 +1,6 @@
-# func_80027024
+> Renamed from `func_80027024` on 2026-09-18 (tools/rename.py). Address 0x80027024.
+
+# RegisterFileTableEntries
 
 **Unit:** code_171e0 · **Size:** 34 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 34/34 words, byte-exact whole-image build.
@@ -7,13 +9,13 @@
 
 Never attempted (round-2026-08-29-a/30-a stub, `gp_rel`-blocked before any
 derivation). Round 42 resolved `gp_rel`. Round 43 derived this fresh from
-`asm/nonmatchings/code_171e0/func_80027024.s`.
+`asm/nonmatchings/code_171e0/RegisterFileTableEntries.s`.
 
 **First attempt (1 word too long) -- a branch-polarity mistake, not a
 `gp_rel` residue.** The natural first reading is an early-return guard:
 
 ```c
-if (D_8008A84C != 0x13) {
+if (gActiveDataSource != 0x13) {
     return 1;
 }
 <work>
@@ -32,7 +34,7 @@ actually reads it -- positive, wrapping the work, with the constant return
 falling out the bottom:
 
 ```c
-if (D_8008A84C == 0x13) {
+if (gActiveDataSource == 0x13) {
     <work>
     return ResolveFileEntries(...);
 }
@@ -51,7 +53,7 @@ polarity.
 
 ## What it does
 
-Mode-gated: if `D_8008A84C == 0x13`, sets `D_8008A850 = 1`, forwards
+Mode-gated: if `gActiveDataSource == 0x13`, sets `D_8008A850 = 1`, forwards
 `arg0` to `SetFileTable`, fetches an index via `GetFileTableCount()`, adds it
 to `arg1` and forwards to `SetFileTableCount`, then tail-calls `ResolveFileEntries`
 with `arg0` advanced by `idx * 0x1C` (28 bytes -- computed by retail via
@@ -70,10 +72,10 @@ extern s32 GetFileTableCount(void);
 extern void SetFileTableCount(s32 arg0);
 extern s32 ResolveFileEntries(void *arg0, s32 arg1);
 
-s32 func_80027024(void *arg0, s32 arg1) {
+s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
     s32 idx;
 
-    if (D_8008A84C == 0x13) {
+    if (gActiveDataSource == 0x13) {
         D_8008A850 = 1;
         SetFileTable(arg0);
         idx = GetFileTableCount();
@@ -96,3 +98,18 @@ branch target (so it lands next to the epilogue, no trailing jump) and the
 smaller arm as the plain fallthrough. This cost one wasted build in round
 43; the fix was a straight swap of `if`/`else` polarity with identical
 logic.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027024` | `RegisterFileTableEntries` | B |
+
+**Evidence.** When the CD driver is active: installs the caller's array as
+the file table, advances the running entry count by `arg1`, and resolves
+the new entries' disc positions via `ResolveFileEntries`; otherwise a no-op
+returning `1`. Mechanics fully derived from the body and the callees'
+already-established names (`SetFileTable`/`GetFileTableCount`/
+`SetFileTableCount`/`ResolveFileEntries`).

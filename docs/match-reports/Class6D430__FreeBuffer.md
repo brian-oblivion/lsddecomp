@@ -1,11 +1,13 @@
-# func_80026C20
+> Renamed from `func_80026C20` on 2026-09-18 (tools/rename.py). Address 0x80026c20.
+
+# Class6D430__FreeBuffer
 
 **Unit:** code_171e0 · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
 
 ## What it does
 
 `D_8006D430`'s vtable slot `+0x05C` (also reachable indirectly through
-`func_80026AB4`, the class's own dtor). Frees `this->unk10` via
+`Class6D430__Destroy`, the class's own dtor). Frees `this->unk10` via
 `func_80017CFC` and clears it, but only when three conditions all hold:
 the pointer is non-NULL, `this->unk14` (its recorded size) is non-zero, and
 `this->unk20` (a flag cleared in the constructor) is zero.
@@ -32,7 +34,7 @@ than re-fetching it, which is exactly what plain sequential C produces here
 ## Final C
 
 ```c
-void func_80026C20(UnkFlagsObj_171e0 *this) {
+void Class6D430__FreeBuffer(UnkFlagsObj_171e0 *this) {
     if (this->unk10 == NULL) {
         return;
     }
@@ -52,7 +54,7 @@ void func_80026C20(UnkFlagsObj_171e0 *this) {
 Matched on the first real attempt (once written against the corrected
 `UnkFlagsObj_171e0` struct). An earlier diff run against this function showed
 0/24 and a pure 1-word shift for its entire body — that was **not** a bug in
-this function; it was downstream drift from `func_80026B08`'s wrong-sized
+this function; it was downstream drift from `Class6D430__AllocBuffer`'s wrong-sized
 allocator call (see that report) shifting every address after it in the
 unit. Re-diffed clean after the sibling fix, with zero changes to this
 function's own source.
@@ -68,8 +70,33 @@ function's own source.
 
 ## Proposed learning
 
-Reinforces `func_80026A50.md`'s note: when a function's `funcdiff` shows a
+Reinforces `Class6D430__Class6D430.md`'s note: when a function's `funcdiff` shows a
 uniform shift (every word wrong, but the SAME word appearing one slot over)
 with zero words matching, check sibling functions in the same translation
 unit for a genuine size bug before touching this function's own source at
 all — this one needed no changes once the real culprit was fixed.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026C20` | `Class6D430__FreeBuffer` | B |
+
+**Evidence.** `+0x05C` slot: frees `this->unk10` via `func_80017CFC` and
+clears it, guarded by three conditions (non-NULL, sized, not busy per
+`unk20`). Also reachable indirectly through `Class6D430__Destroy`. Mirrors
+`Class6D430__AllocBuffer`'s naming; mechanics known, why the buffer needs
+this specific guard is not.
+
+## Proposed field names
+
+Same cross-unit exposure as `Class6D430__AllocBuffer.md` (`UnkFlagsObj_171e0`
+is shared with `code_179d8_h.c`/`code_179d8_q.c`), so PROPOSED, not renamed:
+
+| field | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `unk20` | `freeGuard` | B | Nonzero blocks the `unk10` free in this function; zeroed in the constructor. Mechanics (a guard flag) are clear; what sets it nonzero was not found in this unit -- likely a subclass concern. |
+
+Posted to the broadcast.

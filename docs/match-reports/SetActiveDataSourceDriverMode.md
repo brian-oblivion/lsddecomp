@@ -1,4 +1,6 @@
-# func_80026F34
+> Renamed from `func_80026F34` on 2026-09-18 (tools/rename.py). Address 0x80026f34.
+
+# SetActiveDataSourceDriverMode
 
 **Unit:** code_171e0 · **Size:** 30 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 30/30 words, byte-exact whole-image build.
@@ -7,7 +9,7 @@
 
 Never attempted (round-2026-08-29-a/30-a stub, `gp_rel`-blocked before any
 derivation). Round 42 resolved `gp_rel`. Round 43 derived this fresh from
-`asm/nonmatchings/code_171e0/func_80026F34.s`; matched on the first build.
+`asm/nonmatchings/code_171e0/SetActiveDataSourceDriverMode.s`; matched on the first build.
 
 ## What it does
 
@@ -18,7 +20,7 @@ function; they never change):
 
 ```
 lui $s0,%hi(func_8002C468); addiu $s0,$s0,%lo(func_8002C468)   # default fn
-lw $v1,%gp_rel(D_8008A84C)($gp); ori $v0,0x13
+lw $v1,%gp_rel(gActiveDataSource)($gp); ori $v0,0x13
 bne $v1,$v0,.L80026F74
   lui $s0,%hi(SetCdDriverMode); addiu $s0,$s0,%lo(SetCdDriverMode) # override fn
 .L80026F74:
@@ -29,7 +31,7 @@ bne $v1,$v0,.L80026F74
 
 There's no separate "check-then-enter" -- the function falls straight into
 the loop body, confirming a `do { } while (cond)` (not a pre-tested `while`),
-matching CLAUDE.md's `func_80026F34` prediction area for this unit's
+matching CLAUDE.md's `SetActiveDataSourceDriverMode` prediction area for this unit's
 accessor-family shape.
 
 `func_8002C468` is independently defined elsewhere
@@ -48,11 +50,11 @@ typedef s32 (*Func80026F34Fn)(s32, s32, s32);
 extern s32 func_8002C468(s32 arg0, s32 arg1, s32 arg2);
 extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
 
-void func_80026F34(s32 arg0, s32 arg1, s32 arg2) {
+void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
     Func80026F34Fn fn;
 
     fn = func_8002C468;
-    if (D_8008A84C == 0x13) {
+    if (gActiveDataSource == 0x13) {
         fn = SetCdDriverMode;
     }
     do {
@@ -67,6 +69,19 @@ void func_80026F34(s32 arg0, s32 arg1, s32 arg2) {
 first build with no register-pinning tricks needed**, because the three
 loop-invariant arguments live in genuinely separate callee-saved registers
 (`s1`/`s2`/`s3`) that never change across iterations -- contrast this with
-`func_80026CFC` in the same unit, where the loop-carried value DOES change
+`SetActiveDataSource` in the same unit, where the loop-carried value DOES change
 every iteration and needs a different, harder-won source shape (see that
 report).
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026F34` | `SetActiveDataSourceDriverMode` | B |
+
+**Evidence.** Picks `SetCdDriverMode` or the SPU-side `func_8002C468` by
+active source, then spins (`do { } while (fn(...) == 0)`) until the call
+reports success. Same family as the Lock/Unlock/Is* wrappers, generalised to
+a 3-argument setter with a retry loop.

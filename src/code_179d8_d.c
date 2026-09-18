@@ -105,7 +105,7 @@ struct Obj6D940 {
 
 /*
  * A second, DIFFERENT function-pointer table, reached only via the
- * uncarved accessor `func_80026CAC()` (not this unit's function to
+ * uncarved accessor `GetActiveDataSourceMethods()` (not this unit's function to
  * define). Only the three slots this unit's functions dispatch through
  * are typed.
  */
@@ -124,7 +124,7 @@ struct BaseTable6D940 {
      * slot0C above. */
     s32 (*slot64)(void *self);
 };
-extern BaseTable6D940 *func_80026CAC(void);
+extern BaseTable6D940 *GetActiveDataSourceMethods(void);
 
 /* Pool allocator, already established elsewhere (e.g.
  * include/class_16334.h, include/code_8220.h) -- declared LOCAL here since
@@ -147,7 +147,7 @@ void *new_class_6d940(s32 arg1)
 
 void func_8002C18C(Obj6D940 *self, s32 arg1)
 {
-    func_80026CAC()->slot08(self);
+    GetActiveDataSourceMethods()->slot08(self);
     self->methods = func_8002C3A8();
     self->unk2C = 0;
     self->unk30 = 0;
@@ -158,13 +158,13 @@ void func_8002C18C(Obj6D940 *self, s32 arg1)
 
 s32 func_8002C200(void *self)
 {
-    return func_80026CAC()->slot0C(self);
+    return GetActiveDataSourceMethods()->slot0C(self);
 }
 
 s32 func_8002C238(s32 *self)
 {
     self[0xC] = 1;
-    return func_80026CAC()->slot64(self);
+    return GetActiveDataSourceMethods()->slot64(self);
 }
 
 /*

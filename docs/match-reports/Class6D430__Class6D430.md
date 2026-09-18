@@ -1,4 +1,6 @@
-# func_80026A50
+> Renamed from `func_80026A50` on 2026-09-18 (tools/rename.py). Address 0x80026a50.
+
+# Class6D430__Class6D430
 
 **Unit:** code_171e0 · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
 
@@ -8,7 +10,7 @@ The constructor for the `D_8006D430` class (its own vtable slot `+0x008`,
 per `include/code_171e0.h`'s `UnkFlagsObjMethods_171e0`). Chains the base
 class's constructor first (`Get_vtable_BasicClass()->ctor(this)`), then installs
 this class's own vtable pointer (fetched via the already-matched
-`func_80026C9C`, which just returns `&D_8006D430`), then zeroes every field
+`GetClass6D430Methods`, which just returns `&D_8006D430`), then zeroes every field
 this unit currently knows about.
 
 ## Derivation
@@ -18,14 +20,14 @@ jal   Get_vtable_BasicClass
  addu $s0, $a0, $zero        ; s0 = this
 lw    $v0, 0x8($v0)          ; v0 = (base table)->ctor
 jalr  $v0                    ; Get_vtable_BasicClass()->ctor(this)
-jal   func_80026C9C          ; v0 = &D_8006D430
+jal   GetClass6D430Methods          ; v0 = &D_8006D430
 sw    $v0, 0x0($s0)          ; this->methods = v0
 sw    $zero, 0xC($s0)        ; this->unk0C = 0
 sw    $zero, 0x10($s0)       ; this->unk10 = 0
 sw    $zero, 0x14($s0)       ; this->unk14 = 0
 sh    $zero, 0x20($s0)       ; this->unk20 = 0
 sh    $zero, 0x22($s0)       ; this->unk22 = 0
-sw    $zero, 0x24($s0)       ; this->unknown_value_0x24 = 0
+sw    $zero, 0x24($s0)       ; this->flags = 0
 sh    $zero, 0x28($s0)       ; this->unk28 = 0
 sh    $zero, 0x2A($s0)       ; this->unk2A = 0
 ```
@@ -37,15 +39,15 @@ field-by-field zeroing matches straight-line C with no reordering needed.
 ## Final C
 
 ```c
-void func_80026A50(UnkFlagsObj_171e0 *this) {
+void Class6D430__Class6D430(UnkFlagsObj_171e0 *this) {
     Get_vtable_BasicClass()->ctor(this);
-    this->methods = (UnkFlagsObjMethods_171e0 *) func_80026C9C();
+    this->methods = (UnkFlagsObjMethods_171e0 *) GetClass6D430Methods();
     this->unk0C = 0;
     this->unk10 = NULL;
     this->unk14 = 0;
     this->unk20 = 0;
     this->unk22 = 0;
-    this->unknown_value_0x24 = 0;
+    this->flags = 0;
     this->unk28 = 0;
     this->unk2A = 0;
 }
@@ -54,8 +56,8 @@ void func_80026A50(UnkFlagsObj_171e0 *this) {
 ## Attempt log (abbreviated)
 
 Matched on the second attempt in isolation — the first showed 24/25 in-range
-with one call-target (`jal func_80026C9C`) word differing purely from
-address drift caused by `func_80026B08` (below) still being the wrong size
+with one call-target (`jal GetClass6D430Methods`) word differing purely from
+address drift caused by `Class6D430__AllocBuffer` (below) still being the wrong size
 at that point. No change to this function was needed; fixing the drift
 source elsewhere resolved it to 25/25.
 
@@ -68,10 +70,42 @@ source elsewhere resolved it to 25/25.
 
 ## Proposed learning
 
-See `func_80026B08.md` for the real finding from this round: `func_80017B34`
+See `Class6D430__AllocBuffer.md` for the real finding from this round: `func_80017B34`
 (the allocator) takes **one** argument (`size`), not two. This function's own
 "one word off, call-target only" symptom while a sibling function in the same
 unit had a genuine size bug is a useful diagnostic pattern worth naming: a
 lone call-target-encoding mismatch, with everything else in a function's
 window matching, means look for a wrong-sized function *elsewhere in the same
 translation unit*, not in the function funcdiff is currently pointing at.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026A50` | `Class6D430__Class6D430` | A |
+
+**Evidence.** The class's own constructor, `+0x008` slot by the project's
+convention: chains `Get_vtable_BasicClass()->ctor`, installs
+`GetClass6D430Methods()` as `this->methods`, then zeroes every field this
+unit derived. A constructor's mechanics (chain base, install vtable,
+initialise fields) ARE its purpose, so tier A by the plan's own rule.
+`Class__Class` is the project's constructor-naming convention.
+
+## Proposed field names
+
+`UnkFlagsObj_171e0` is shared with `code_179d8_h.c`/`code_179d8_q.c`
+(see `Class6D430__AllocBuffer.md`); every field this constructor zeroes is
+therefore checked, and only `flags` (this round's own rename, zero
+cross-unit hits) renamed outright. The rest:
+
+| field | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `unk22` | -- (no change proposed) | C | Zeroed here, never read or written anywhere else in this unit. No evidence beyond "exists, width 2 bytes". Left as `unk22` rather than guess. |
+| `unk28` | -- (no change proposed) | C | Same as `unk22`: write-only in this unit, no read site found. |
+| `unk2A` | -- (no change proposed) | C | Same as `unk22`/`unk28`. |
+
+Not posting these three to the broadcast as renames (there is nothing to
+apply); noting them here so the next reader does not re-derive "these are
+zeroed and otherwise untouched" from scratch.

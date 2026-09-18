@@ -1,4 +1,6 @@
-# func_80026D88
+> Renamed from `func_80026D88` on 2026-09-18 (tools/rename.py). Address 0x80026d88.
+
+# Class6D430__CopyFields
 
 **Unit:** code_171e0 · **Size:** 33 instructions · **Status:** MATCHED (33/33 words, whole-image build verified byte-exact)
 
@@ -37,7 +39,7 @@ them.
 ## Final C
 
 ```c
-void func_80026D88(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
+void Class6D430__CopyFields(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
     dst->unk40 = src->unk40;
     dst->unk44 = src->unk44;
     dst->unk48 = src->unk48;
@@ -75,3 +77,31 @@ a block" shape already covered by existing guidance; worth noting only that
 the *gap* in the offset list is itself informative (there's a real field or
 fields at `+0x5C..+0x64` that this particular copy path intentionally skips,
 likely cache/derived state rather than persistent data).
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026D88` | `Class6D430__CopyFields` | B |
+
+**Evidence.** A field-by-field copy of a fixed subset of one
+`UnkFlagsObj_171e0` instance's fields into another (`+0x40..+0x58`,
+`+0x68..+0x74`, skipping a real 0xC-byte gap). Mechanics fully derived
+(confirmed instruction-by-instruction, not a struct-value copy); why these
+specific fields travel together and not the gap is not established.
+
+## Proposed field names
+
+Same cross-unit exposure (`code_179d8_h.c`/`code_179d8_q.c` include
+`UnkFlagsObj_171e0`), so PROPOSED, not renamed. None of `unk40`/`unk44`/
+`unk48`/`unk4C`/`unk50`/`unk54`/`unk58`/`unk68`/`unk6C`/`unk70`/`unk74` has
+any evidence beyond "copied together, in this order, with a real 0xC-byte
+gap between the two runs" -- no read or write site elsewhere in this unit
+distinguishes one from another. Proposing a rename for any single one of
+them would be a purpose guess with nothing behind it, which the plan is
+explicit is worse than the placeholder. No renames proposed for this block;
+flagging it here so a future round with more context (e.g. once the
+subclass that actually populates these fields is identified) does not have
+to re-discover that they travel together.

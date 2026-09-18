@@ -16,7 +16,7 @@ void func_8005C508(void)
         }
     }
 
-    func_80026CE8(&req, 0, D_8001186C, 1);
+    SetVec3(&req, 0, D_8001186C, 1);
 
     for (i = 0; i < 1; i++) {
         D_80088D28[i].obj = func_8004468C(&req);

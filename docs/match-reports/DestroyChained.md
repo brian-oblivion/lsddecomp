@@ -1,4 +1,6 @@
-# func_800269F0
+> Renamed from `func_800269F0` on 2026-09-18 (tools/rename.py). Address 0x800269f0.
+
+# DestroyChained
 
 **Unit:** code_171e0 · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
 
@@ -7,7 +9,7 @@
 Slot `+0x004` of the `D_8006D430` method table (see `include/code_171e0.h`'s
 `UnkFlagsObjMethods_171e0`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
-itself `func_80026AB4`, resolved through the vtable rather than by name) and
+itself `Class6D430__Destroy`, resolved through the vtable rather than by name) and
 the base class's (`Get_vtable_BasicClass()->dtor`, `BasicClassMethods.dtor`), then
 calls `func_80017CFC(this)` (a still-uncarved release/free routine, address
 only) before returning `NULL` unconditionally.
@@ -46,7 +48,7 @@ disassembly.
 ## Final C
 
 ```c
-void *func_800269F0(UnkFlagsObj_171e0 *this) {
+void *DestroyChained(UnkFlagsObj_171e0 *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
@@ -74,3 +76,20 @@ explicitly re-invoking `+0x00C` (its own dtor) *and* the base class's dtor is
 a legitimate "Destroy()" idiom distinct from the raw dtor slot itself, and is
 worth checking for on any other class's `+0x004`-equivalent slot before
 assuming it's an ordinary virtual.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800269F0` | `DestroyChained` | B |
+
+**Evidence.** `D_8006D430`'s `+0x004` own-class slot -- but verbatim-shared
+with `D_8006D4E8` at the identical offset (`docs/match-reports/GetClass6D4E8Methods.md`),
+so it is not really "Class6D430's own" and a `Class6D430__` prefix would
+misattribute it. Clears the busy flag, then explicitly chains its own dtor
+(`this->methods->dtor`) and the base BasicClass dtor before releasing the
+object -- this function's own report already characterised this as a
+"Destroy()" idiom distinct from the raw dtor slot. Named for the mechanic
+(chains both destructors then frees), not for a resolved purpose.

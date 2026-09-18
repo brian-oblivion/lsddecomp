@@ -10,7 +10,7 @@ This function is the "get my own method table" accessor for the class whose
 vtable is `D_8006D4E8` (29 slots, header word `0x13`, resolved with
 `tools/classtable.py D_8006D4E8`). Slot map:
 
-- `+0x004` `func_800269F0` (own-class slot, shared with `D_8006D430` at the
+- `+0x004` `DestroyChained` (own-class slot, shared with `D_8006D430` at the
   identical offset)
 - `+0x008` `func_80027228` (ctor, by the project's `+0x008` convention)
 - `+0x00C` `func_80027274` (dtor)
@@ -21,15 +21,15 @@ vtable is `D_8006D4E8` (29 slots, header word `0x13`, resolved with
 
 Compared against `D_8006D430` (`include/code_171e0.h`'s
 `UnkFlagsObjMethods_171e0`) with `classtable.py D_8006D4E8 --vs D_8006D430`:
-`func_800269F0` at `+0x004` and `func_80026C20`/`func_80026C80`/
-`func_80026C88` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
+`DestroyChained` at `+0x004` and `Class6D430__FreeBuffer`/`NoOp`/
+`Class6D430__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
 between the two tables, strongly suggesting `D_8006D4E8`'s class is a
 subclass or close sibling of `D_8006D430`'s, inheriting the same BasicClass
 slot block and several of the same concrete method implementations.
 
 `GetClass6D4E8Methods` itself is the same "return my own vtable's address"
-accessor the project already names elsewhere: `func_800269E0` for
-`D_8006D3C8` and `func_80026C9C` for `D_8006D430` (both in
+accessor the project already names elsewhere: `GetClass6D3C8Methods` for
+`D_8006D3C8` and `GetClass6D430Methods` for `D_8006D430` (both in
 `include/code_171e0.h`'s doc comment).
 
 ## The C
@@ -67,14 +67,14 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** A two-instruction address-of: it returns `&D_8006D4E8`, this
 class's own 29-slot method table. A pure leaf whose mechanics are its
 purpose, so tier A by the plan's own rule. The same accessor shape
-`func_800269E0` has for `D_8006D3C8` and `func_80026C9C` for `D_8006D430`.
+`GetClass6D3C8Methods` has for `D_8006D3C8` and `GetClass6D430Methods` for `D_8006D430`.
 
 **The class token `Class6D4E8` is deliberate, and this is the report that
 says why.** What the class IS, is now well evidenced: every method reachable
 from this table bottoms out in Psy-Q libcd (`CdSearchFile`, `CdRead`,
 `CdControlF`, `CdSync`, `CdFlush`, `CdPosToInt`/`CdIntToPos`), its objects
 cache a disc position and a byte size, and `code_171e0.c` selects this
-class's module functions only when `D_8008A84C == 0x13`, this table's own
+class's module functions only when `gActiveDataSource == 0x13`, this table's own
 header word -- the other value that gate takes, `0x23`, is `D_8006D9BC`, the
 SPU/VAB streamer in `code_179d8_e.c`. So the two are interchangeable data
 sources behind one dispatch layer, and this one is the CD-ROM source.

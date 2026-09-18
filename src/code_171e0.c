@@ -1,11 +1,43 @@
+/*
+ * code_171e0 -- Class6D430's own module, plus an active-data-source
+ * dispatch layer built on top of it.
+ *
+ * Class6D430 (UnkFlagsObj_171e0/UnkFlagsObjMethods_171e0) is a small
+ * BasicClass subclass holding one lazily-(re)allocated buffer (unk10/unk14,
+ * managed by Class6D430__AllocBuffer/FreeBuffer) plus a flags word.
+ * D_8006D4E8 (the CD-ROM read driver, code_179d8_q.c) shares its own
+ * +0x004/+0x05C/+0x060/+0x064 slots with it verbatim (DestroyChained/
+ * Class6D430__FreeBuffer/NoOp/Class6D430__SetFlag), so this is a real shared
+ * base for at least that sibling, and plausibly for D_8006D9BC too (the
+ * SPU/VAB streamer, code_179d8_e.c).
+ *
+ * Most of this unit's remaining functions dispatch between those same two
+ * sibling classes by `gActiveDataSource` (DATASOURCE_CD/DATASOURCE_SPU,
+ * their own header words): Lock/UnlockActiveDataSource,
+ * IsActiveDataSourceBusy/Idle, GetActiveDataSourceOperation/State/
+ * DriverMode/Methods/UseVSyncCallback, SetActiveDataSourceDriverMode,
+ * RegisterFileTableEntries and the stalled SetActiveDataSource all forward
+ * to the CD driver's own functions when it is active, and to an SPU/VAB-
+ * side fallback otherwise.
+ *
+ * GetClass6D3C8Methods, SetVec3 and BuildFileName are unrelated utilities
+ * that happen to live in this segment; func_800270AC/func_800270B8 (a
+ * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
+ */
 #include "common.h"
 #include "code_171e0.h"
 
-void *func_800269E0(void) {
+/* gActiveDataSource's two observed values are the header words of the two
+ * sibling classes it selects between: D_8006D4E8 (the CD-ROM read driver,
+ * code_179d8_q.c) and D_8006D9BC (the SPU/VAB streamer, code_179d8_e.c). */
+#define DATASOURCE_CD  0x13
+#define DATASOURCE_SPU 0x23
+
+void *GetClass6D3C8Methods(void) {
     return D_8006D3C8;
 }
 
-void *func_800269F0(UnkFlagsObj_171e0 *this) {
+void *DestroyChained(UnkFlagsObj_171e0 *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
@@ -13,25 +45,25 @@ void *func_800269F0(UnkFlagsObj_171e0 *this) {
     return NULL;
 }
 
-void func_80026A50(UnkFlagsObj_171e0 *this) {
+void Class6D430__Class6D430(UnkFlagsObj_171e0 *this) {
     Get_vtable_BasicClass()->ctor(this);
-    this->methods = (UnkFlagsObjMethods_171e0 *) func_80026C9C();
+    this->methods = (UnkFlagsObjMethods_171e0 *) GetClass6D430Methods();
     this->unk0C = 0;
     this->unk10 = NULL;
     this->unk14 = 0;
     this->unk20 = 0;
     this->unk22 = 0;
-    this->unknown_value_0x24 = 0;
+    this->flags = 0;
     this->unk28 = 0;
     this->unk2A = 0;
 }
 
-void *func_80026AB4(UnkFlagsObj_171e0 *this) {
+void *Class6D430__Destroy(UnkFlagsObj_171e0 *this) {
     this->methods->slot48(this);
     return this->methods->slot5C(this);
 }
 
-void func_80026B08(UnkFlagsObj_171e0 *this, s32 arg1) {
+void Class6D430__AllocBuffer(UnkFlagsObj_171e0 *this, s32 arg1) {
     s32 savedUnk0C;
     s32 size;
     void *newRes;
@@ -57,7 +89,7 @@ void func_80026B08(UnkFlagsObj_171e0 *this, s32 arg1) {
     }
 }
 
-void func_80026C20(UnkFlagsObj_171e0 *this) {
+void Class6D430__FreeBuffer(UnkFlagsObj_171e0 *this) {
     if (this->unk10 == NULL) {
         return;
     }
@@ -71,39 +103,39 @@ void func_80026C20(UnkFlagsObj_171e0 *this) {
     this->unk10 = NULL;
 }
 
-void func_80026C80(void) {
+void NoOp(void) {
 }
 
-void func_80026C88(UnkFlagsObj_171e0 *this) {
-    this->unknown_value_0x24 |= 1;
+void Class6D430__SetFlag(UnkFlagsObj_171e0 *this) {
+    this->flags |= 1;
 }
 
-void *func_80026C9C(void) {
+void *GetClass6D430Methods(void) {
     return D_8006D430;
 }
 
-extern s32 D_8008A84C;
+extern s32 gActiveDataSource;
 extern void *func_8002C438(void);
 extern void *GetClass6D4E8Methods(void);
 
-void *func_80026CAC(void) {
-    if (D_8008A84C == 0x23) {
+void *GetActiveDataSourceMethods(void) {
+    if (gActiveDataSource == DATASOURCE_SPU) {
         return func_8002C438();
     } else {
         return GetClass6D4E8Methods();
     }
 }
 
-Vec3_171e0 *func_80026CE8(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
+Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
     this->x = x;
     this->y = y;
     this->z = z;
     return this;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", func_80026CFC);
+INCLUDE_ASM("asm/nonmatchings/code_171e0", SetActiveDataSource);
 
-void func_80026D88(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
+void Class6D430__CopyFields(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
     dst->unk40 = src->unk40;
     dst->unk44 = src->unk44;
     dst->unk48 = src->unk48;
@@ -117,27 +149,27 @@ void func_80026D88(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
     dst->unk74 = src->unk74;
 }
 
-extern s32 D_8008A84C;
+extern s32 gActiveDataSource;
 extern s32 LockCd(void);
 
-void func_80026E0C(void) {
-    if (D_8008A84C == 0x13) {
+void LockActiveDataSource(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         LockCd();
     }
 }
 
 extern s32 UnlockCd(void);
 
-void func_80026E38(void) {
-    if (D_8008A84C == 0x13) {
+void UnlockActiveDataSource(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         UnlockCd();
     }
 }
 
 extern s32 IsCdBusy(void);
 
-s32 func_80026E64(void) {
-    if (D_8008A84C == 0x13) {
+s32 IsActiveDataSourceBusy(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return IsCdBusy();
     }
     return 0;
@@ -145,8 +177,8 @@ s32 func_80026E64(void) {
 
 extern s32 IsCdIdle(void);
 
-s32 func_80026E98(void) {
-    if (D_8008A84C == 0x13) {
+s32 IsActiveDataSourceIdle(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return IsCdIdle();
     }
     return 1;
@@ -154,8 +186,8 @@ s32 func_80026E98(void) {
 
 extern s32 GetCdOperation(void);
 
-s32 func_80026ECC(void) {
-    if (D_8008A84C == 0x13) {
+s32 GetActiveDataSourceOperation(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdOperation();
     }
     return 0;
@@ -163,8 +195,8 @@ s32 func_80026ECC(void) {
 
 extern s32 GetCdState(void);
 
-s32 func_80026F00(void) {
-    if (D_8008A84C == 0x13) {
+s32 GetActiveDataSourceState(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdState();
     }
     return 0;
@@ -174,11 +206,11 @@ typedef s32 (*Func80026F34Fn)(s32, s32, s32);
 extern s32 func_8002C468(s32 arg0, s32 arg1, s32 arg2);
 extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
 
-void func_80026F34(s32 arg0, s32 arg1, s32 arg2) {
+void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
     Func80026F34Fn fn;
 
     fn = func_8002C468;
-    if (D_8008A84C == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
     do {
@@ -188,8 +220,8 @@ void func_80026F34(s32 arg0, s32 arg1, s32 arg2) {
 extern s32 GetCdDriverMode(void);
 extern s32 func_8002C448(void);
 
-s32 func_80026FAC(void) {
-    if (D_8008A84C == 0x13) {
+s32 GetActiveDataSourceDriverMode(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdDriverMode();
     } else {
         return func_8002C448();
@@ -199,8 +231,8 @@ s32 func_80026FAC(void) {
 extern s32 func_80028B6C(void);
 extern s32 func_8002C478(void);
 
-s32 func_80026FE8(void) {
-    if (D_8008A84C == 0x13) {
+s32 GetActiveDataSourceUseVSyncCallback(void) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return func_80028B6C();
     } else {
         return func_8002C478();
@@ -213,10 +245,10 @@ extern s32 GetFileTableCount(void);
 extern void SetFileTableCount(s32 arg0);
 extern s32 ResolveFileEntries(void *arg0, s32 arg1);
 
-s32 func_80027024(void *arg0, s32 arg1) {
+s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
     s32 idx;
 
-    if (D_8008A84C == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         D_8008A850 = 1;
         SetFileTable(arg0);
         idx = GetFileTableCount();
@@ -238,7 +270,7 @@ void *func_800270B8(void)
 	return D_8008A854;
 }
 
-char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
+char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3) {
     dest[0] = '\0';
     if (arg2 != NULL) {
         strcat(dest, arg2);
@@ -262,6 +294,6 @@ char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
  * `return NULL` on the NULL-dest path, worth one) are preserved in full in
  * docs/match-reports/strcat.md. Nothing is lost by deleting them here.
  *
- * Callers in this unit (func_800270C4, just above) keep calling `strcat`
+ * Callers in this unit (BuildFileName, just above) keep calling `strcat`
  * under that name -- the declaration in include/code_171e0.h still serves,
  * and now resolves to the linked object. */

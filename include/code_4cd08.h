@@ -87,7 +87,7 @@ extern const char D_8001186C[];
 extern const char D_8001187C[];
 
 /* A 3-word request record, physically the same shape as code_171e0.h's
- * Vec3_171e0 (func_80026CE8 there does `this->x=x; this->y=y; this->z=z;
+ * Vec3_171e0 (SetVec3 there does `this->x=x; this->y=y; this->z=z;
  * return this;` regardless of what the caller's fields actually mean) but
  * used here to hold a load flag, a MOM filename pointer, and a mode byte for
  * func_8004468C. Declared locally because code_4cd08.c does not otherwise
@@ -98,7 +98,7 @@ typedef struct DreamAuxLoadReq {
     s32 mode;
 } DreamAuxLoadReq;
 
-extern DreamAuxLoadReq *func_80026CE8(DreamAuxLoadReq *this, s32 flag, const char *name, s32 mode);
+extern DreamAuxLoadReq *SetVec3(DreamAuxLoadReq *this, s32 flag, const char *name, s32 mode);
 extern void *func_8004468C(DreamAuxLoadReq *req);
 
 /* A trigger/spawn record walked by func_8005CAB4 and func_8005CBC8. Only

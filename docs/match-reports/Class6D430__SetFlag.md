@@ -1,11 +1,13 @@
-# func_80026C88
+> Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
+
+# Class6D430__SetFlag
 
 **Unit:** code_171e0 · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
 Sets bit 0 of a flags word at offset `0x24` of its argument. It is itself
-slot `+0x064` of the `D_8006D430` method table (see `func_80026C9C`'s
+slot `+0x064` of the `D_8006D430` method table (see `GetClass6D430Methods`'s
 report), so its real signature is fixed by whatever that slot is called with
 elsewhere — here, just `this`.
 
@@ -28,11 +30,11 @@ while being honest that nothing earlier than `0x24` is known yet:
 ```c
 typedef struct UnkFlagsObj_171e0 {
     u8 pad0[0x24];
-    s32 unknown_value_0x24;
+    s32 flags;
 } UnkFlagsObj_171e0;
 
-void func_80026C88(UnkFlagsObj_171e0 *this) {
-    this->unknown_value_0x24 |= 1;
+void Class6D430__SetFlag(UnkFlagsObj_171e0 *this) {
+    this->flags |= 1;
 }
 ```
 
@@ -44,3 +46,23 @@ function" trap from the runner brief, since there's no callee at all.
 ## Proposed learning
 
 None new.
+
+## Naming
+
+Round 52 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80026C88` | `Class6D430__SetFlag` | B |
+
+**Evidence.** `+0x064` slot: `this->flags |= 1;` -- a read-modify-write on
+the single flags word this round also named (see the field-rename commit).
+Mechanics fully known (sets bit 0); what bit 0 signals in the game is not
+established, so named for the mechanic only.
+
+**Field renamed alongside it.** `unknown_value_0x24` -> `flags` (in
+`include/code_171e0.h`'s `UnkFlagsObj_171e0`): `grep -rn -- '->unknown_value_0x24\b'
+src/` had zero hits outside `code_171e0.c`, so unlike almost every other
+field in this struct (see `## Proposed field names` in this unit's other
+reports / the broadcast), this one is owned solely by this unit and renames
+directly rather than needing a head-applied cross-unit proposal.

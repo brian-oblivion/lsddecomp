@@ -167,14 +167,14 @@ void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
 
 /*
  * func_80050F98's own helpers/data -- resolves two "CARD\\<name>.TIM"
- * memory-card icon/font resource paths (func_800270C4, already matched in
+ * memory-card icon/font resource paths (BuildFileName, already matched in
  * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
  * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
  * func_80041C9C, unk44/unk40 via func_800408CC/func_80041AB4 -- both still
  * uncarved elsewhere, typed purely from this call site's own register
  * usage, same convention as func_80040FC0 above).
  */
-extern char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3);
+extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern ChildObj86ED0 *func_80041AB4(ChildObj86ED0 *arg0, s32 arg1);
@@ -207,13 +207,13 @@ void func_80050F98(Obj86ED0 *self, void *arg1)
     dir = D_8008AAE8;
     ext = D_8008AAF0;
 
-    handle1 = func_8003B39C(func_800270C4(path, D_80011610, dir, ext));
+    handle1 = func_8003B39C(BuildFileName(path, D_80011610, dir, ext));
     handle1->methods->slot78(handle1);
     self->unk48 = func_80041C9C(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 
-    handle2 = func_8003B39C(func_800270C4(path, D_8001161C, dir, ext));
+    handle2 = func_8003B39C(BuildFileName(path, D_8001161C, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = func_800408CC(handle2, self->unk10, self->unk28);
     self->unk40 = func_80041AB4(handle2, 0x5F);

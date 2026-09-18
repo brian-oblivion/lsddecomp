@@ -107,7 +107,7 @@ extern Class6D3C8Methods D_8006D3C8;
 /* Cross-unit accessor, matched C in src/code_171e0.c (not this unit). No
  * header currently declares it there, so it's declared here at the one
  * call site that needs it (func_80025FDC). Returns &D_8006D3C8. */
-extern void *func_800269E0(void);
+extern void *GetClass6D3C8Methods(void);
 
 /* The game's allocator, in the uncarved code_8220 block. Returns void *
  * rather than a typed pointer because every New_X in the game calls it. */
@@ -159,7 +159,7 @@ typedef struct StreamTask {
 
 extern StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3);
 
-extern s32 func_80026F34(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
+extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
                                                        func_80026170/func_80026348 discard it, but
                                                        func_8002677C keeps it */
