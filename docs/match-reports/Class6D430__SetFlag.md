@@ -1,11 +1,13 @@
-# func_80026C88
+> Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
+
+# Class6D430__SetFlag
 
 **Unit:** code_171e0 · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
 Sets bit 0 of a flags word at offset `0x24` of its argument. It is itself
-slot `+0x064` of the `D_8006D430` method table (see `func_80026C9C`'s
+slot `+0x064` of the `D_8006D430` method table (see `GetClass6D430Methods`'s
 report), so its real signature is fixed by whatever that slot is called with
 elsewhere — here, just `this`.
 
@@ -31,7 +33,7 @@ typedef struct UnkFlagsObj_171e0 {
     s32 unknown_value_0x24;
 } UnkFlagsObj_171e0;
 
-void func_80026C88(UnkFlagsObj_171e0 *this) {
+void Class6D430__SetFlag(UnkFlagsObj_171e0 *this) {
     this->unknown_value_0x24 |= 1;
 }
 ```

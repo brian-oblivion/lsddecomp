@@ -3,7 +3,7 @@
 
 /* The `New_X` allocator for the class whose method table is D_8006D3C8:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
- * constructor through slot +0x008 of the table func_800269E0() returns.
+ * constructor through slot +0x008 of the table GetClass6D3C8Methods() returns.
  *
  * The null path deliberately falls off the end rather than returning a
  * value. That is not an oversight in the transcription -- it is what
@@ -19,7 +19,7 @@ Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
     Class6D3C8 *self = func_80017B34(0x2C);
 
     if (self != 0) {
-        ((Class6D3C8Methods *)func_800269E0())->ctor(self, arg);
+        ((Class6D3C8Methods *)GetClass6D3C8Methods())->ctor(self, arg);
         return self;
     }
 }
@@ -33,7 +33,7 @@ void func_80025FDC(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     LoadModelRequest req;
 
     func_8003B20C()->ctor(self, arg->unk00);
-    self->methods = func_800269E0();
+    self->methods = GetClass6D3C8Methods();
     self->arg = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
@@ -71,7 +71,7 @@ void func_80026170(Class6D3C8 *self) {
     StreamTask *task;
 
     if (self->arg->unk0C != 0) {
-        func_80026F34(0, 0, 0);
+        SetActiveDataSourceDriverMode(0, 0, 0);
         func_80026254(self, D_800107B4);
         task = func_8003B854(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
@@ -113,7 +113,7 @@ void func_80026348(Class6D3C8 *self) {
     StreamTask *task;
 
     if (self->arg->unk08 != 0) {
-        func_80026F34(0, 0, 0);
+        SetActiveDataSourceDriverMode(0, 0, 0);
         task = func_8003B854(0, 0, 0, 0);
         derivedValue = func_8004913C(&typeCode, 0);
         typeLookup = func_800493C8(typeCode);
@@ -134,7 +134,7 @@ s32 func_80026410(Class6D3C8 *self) {
     s32 pollDone;
 
     if (self->arg->unk10 != 0) {
-        func_80026F34(0, 0, 0);
+        SetActiveDataSourceDriverMode(0, 0, 0);
 
         status = self->dreamSys->vt->func_8005A2E4(self->dreamSys, 0);
         if (status != 1) {
@@ -186,7 +186,7 @@ void func_8002658C(Class6D3C8 *self) {
     s32 extra;
 
     if (self->arg->unk08 != 0) {
-        func_80026F34(0, 0, 0);
+        SetActiveDataSourceDriverMode(0, 0, 0);
         task = func_8003B854(0, 0, 0, 0);
         extra = func_800493E4(&buf.count, 0, 10);
         task->methods->slot6C(task, buf.count / 15);
@@ -270,7 +270,7 @@ void func_8002677C(Class6D3C8 *self) {
 
     cc = self->dreamSys->vt->GetCinematic(self->dreamSys);
     groupId = func_80049334(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
-    func_80026F34(0, 0, 0);
+    SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (chanBuf.chan != -1) {
         if (self->arg->unk08 != 0) {
@@ -303,7 +303,7 @@ void func_80026900(Class6D3C8 *self) {
     s32 typeLookup;
 
     if (self->arg->unk08 != 0) {
-        func_80026F34(0, 0, 0);
+        SetActiveDataSourceDriverMode(0, 0, 0);
         task = func_8003B854(0, 0, 0, 0);
         task->methods->slot12C(task, 0);
         outerValue = func_800491FC(&typeCode, 0);

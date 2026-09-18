@@ -188,7 +188,7 @@ typedef struct Class86ED0 Class86ED0;
 
 /*
  * Class86ED0's own opaque "handle" object (self->unk50's pointee, built by
- * func_80051F24 via func_800270C4/func_8003B39C/func_80041C9C -- none of
+ * func_80051F24 via BuildFileName/func_8003B39C/func_80041C9C -- none of
  * which are this round's functions, so `local`'s own real structure and
  * these three helpers' precise semantics are unestablished beyond their
  * register-level call shape). Only the three slots this unit's own
@@ -451,7 +451,7 @@ void func_80051F14(Class86ED0 *self)
     self->unk28 = 0;
 }
 
-extern void *func_800270C4(void *out, void *a1, void *a2, void *a3);
+extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
 extern Class86ED0Handle *func_8003B39C(void *arg0);
 extern Class86ED0Handle *func_80041C9C(Class86ED0Handle *arg0, void *arg1, s32 arg2);
 extern s32 D_8008AB14;

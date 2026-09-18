@@ -270,7 +270,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     return 0;
 }
 
-extern void func_80026B08(void);
+extern void Class6D430__AllocBuffer(void);
 extern void *D_8008A888;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
@@ -298,7 +298,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        func_80026B08();
+        Class6D430__AllocBuffer();
         self->unk24 |= 0x200;
         self->methods->slot64(self);
         return;

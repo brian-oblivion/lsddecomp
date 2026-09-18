@@ -1,4 +1,6 @@
-# func_800269F0
+> Renamed from `func_800269F0` on 2026-09-18 (tools/rename.py). Address 0x800269f0.
+
+# DestroyChained
 
 **Unit:** code_171e0 · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
 
@@ -7,7 +9,7 @@
 Slot `+0x004` of the `D_8006D430` method table (see `include/code_171e0.h`'s
 `UnkFlagsObjMethods_171e0`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
-itself `func_80026AB4`, resolved through the vtable rather than by name) and
+itself `Class6D430__Destroy`, resolved through the vtable rather than by name) and
 the base class's (`Get_vtable_BasicClass()->dtor`, `BasicClassMethods.dtor`), then
 calls `func_80017CFC(this)` (a still-uncarved release/free routine, address
 only) before returning `NULL` unconditionally.
@@ -46,7 +48,7 @@ disassembly.
 ## Final C
 
 ```c
-void *func_800269F0(UnkFlagsObj_171e0 *this) {
+void *DestroyChained(UnkFlagsObj_171e0 *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);

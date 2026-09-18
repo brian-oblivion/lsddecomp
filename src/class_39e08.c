@@ -29,7 +29,7 @@ void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     tmp = func_80048D74(0);
     self->unk40 = func_800398E0(tmp, 0, 1);
     func_8004A070(1);
-    func_80026F34((u32)arg3 < 1, 1, 1);
+    SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->unk0C = arg1;
     arg1->unk10 = func_8004D254();
     arg1->unk8 = func_80042400();
@@ -220,7 +220,7 @@ Class865C8Methods *func_8004A060(void) {
  * write. Declared locally per CLAUDE.md's rule against writing C for
  * SDK-owned code. */
 extern void *func_80048D48(s32 *out);
-extern s32 func_80027024(void *arg0, s32 arg1);
+extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 
 extern s32 D_8008A978;
 extern s32 D_8008A97C;
@@ -253,7 +253,7 @@ s32 func_8004A070(s32 arg0)
         break;
     }
 
-    while ((result = func_80027024(obj, local)) == 0) {
+    while ((result = RegisterFileTableEntries(obj, local)) == 0) {
     }
     return result;
 }

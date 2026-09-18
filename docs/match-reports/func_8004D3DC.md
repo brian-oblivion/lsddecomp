@@ -61,7 +61,7 @@ jr    $ra
 
 It reads **neither `$a0` nor `$a1`**. It takes **no arguments** and returns
 `&D_8006B5CC` — the plain no-parameter vtable getter already documented in
-`docs/research/class-framework.md`, the same shape as `func_800269E0`. So the
+`docs/research/class-framework.md`, the same shape as `GetClass6D3C8Methods`. So the
 2-argument declaration in `src/class_3ac78.c` and the 1-argument declaration
 in `include/class_3bb8c.h` are **both wrong about the function**, and both are
 **right about their own call site**, and both units are byte-exact.

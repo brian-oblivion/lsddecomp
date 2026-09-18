@@ -1,14 +1,16 @@
-# func_80026AB4
+> Renamed from `func_80026AB4` on 2026-09-18 (tools/rename.py). Address 0x80026ab4.
+
+# Class6D430__Destroy
 
 **Unit:** code_171e0 · **Size:** 21 instructions · **Status:** MATCHED (21/21 words, whole-image build verified byte-exact)
 
 ## What it does
 
 This class's own destructor — `D_8006D430`'s vtable slot `+0x00C`, called
-`func_800269F0` and `func_80025C30` (in `class_16334`, a different class'
+`DestroyChained` and `func_80025C30` (in `class_16334`, a different class'
 `dtor`, same convention) alike. It calls two more of its own slots in turn:
 `+0x048` (unimplemented/null at this level — a subclass-provided hook,
-`slot48`) and then `+0x05C`, which happens to resolve to `func_80026C20` *at
+`slot48`) and then `+0x05C`, which happens to resolve to `Class6D430__FreeBuffer` *at
 this class's own level*, but is still dispatched indirectly through the
 table, never called by name, since retail's bytes are `jalr`, not `jal`.
 
@@ -32,7 +34,7 @@ bare call-then-return-something-else.
 ## Final C
 
 ```c
-void *func_80026AB4(UnkFlagsObj_171e0 *this) {
+void *Class6D430__Destroy(UnkFlagsObj_171e0 *this) {
     this->methods->slot48(this);
     return this->methods->slot5C(this);
 }
@@ -50,7 +52,7 @@ immediately after `dtor` with no padding, so the C struct actually placed
 comments were fiction the compiler never saw. Adding explicit `u8 padN[...]`
 members to close the gaps (`+0x10`..`+0x44`, `+0x50`..`+0x54`, `+0x58`..`+0x5C`)
 fixed every affected function in the unit at once (this one, and
-`func_80026B08` below) on the next build. This is a sharper restatement of
+`Class6D430__AllocBuffer` below) on the next build. This is a sharper restatement of
 CLAUDE.md's "name the field, don't do raw pointer arithmetic" — the risk runs
 the other way too: naming fields with offset *comments* that aren't backed by
 real padding is silently worse than pointer arithmetic, because the mistake

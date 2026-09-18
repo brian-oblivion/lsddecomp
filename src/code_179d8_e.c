@@ -79,7 +79,7 @@ typedef struct TableDA34 {
      * That is retail's own behaviour, not a derivation error: the dispatch
      * still has to compile, whatever sits at the address at runtime. */
     void (*slot58)(void *self, char *path); /* func_8002C6FC's own dispatch -- begins the VAB body transfer once the ".VB" path is built; null in retail */
-    void (*slot5C)(void *self);             /* func_80026C20 (uncarved, cross-unit) -- func_8002C890's own dispatch, called before it re-fetches the VAB header */
+    void (*slot5C)(void *self);             /* Class6D430__FreeBuffer (uncarved, cross-unit) -- func_8002C890's own dispatch, called before it re-fetches the VAB header */
     u8 pad060[0x06C - 0x060];
     void (*slot6C)(void *self, char *path); /* func_8002C4E0's own dispatch -- begins the VAB header transfer for the ".VH" path; null in retail */
     u8 pad070[0x078 - 0x070];
@@ -233,7 +233,7 @@ void *func_8002C480(s32 arg0) {
     return NULL;
 }
 
-/* Base-class table reached via the uncarved accessor `func_80026CAC()` --
+/* Base-class table reached via the uncarved accessor `GetActiveDataSourceMethods()` --
  * not this unit's function to define.  Only the two slots this unit's own
  * functions dispatch through are typed, per the same convention as
  * code_179d8_d.c's own independent reading of the same physical table. */
@@ -245,7 +245,7 @@ typedef struct BaseTable179D8E {
      * defaults to s32 absent positive void evidence. */
     s32 (*slot0C)(void *self);
 } BaseTable179D8E;
-extern BaseTable179D8E *func_80026CAC(void);
+extern BaseTable179D8E *GetActiveDataSourceMethods(void);
 
 /* Sony's own VAB streaming calls (include/psyq/LIBSND.H), declared locally
  * per this project's convention of not sharing Psy-Q prototypes across
@@ -268,7 +268,7 @@ extern void func_80032A7C(void);
 extern void func_80032588(s32 a0);
 extern void func_80032998(void);
 extern void *func_80017CFC(void *ptr);
-extern char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3);
+extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern s32 strlen(char *s);
 extern char *strcpy(char *dest, char *src);
 
@@ -288,7 +288,7 @@ void func_8002C4E0(ObjDA34 *self, char *arg1) {
     void *buf;
     char path[0x20];
 
-    func_80026CAC()->slot08(self);
+    GetActiveDataSourceMethods()->slot08(self);
     self->methods = func_8002CC0C();
     self->unk4C = NULL;
     self->unk50 = NULL;
@@ -314,7 +314,7 @@ void func_8002C4E0(ObjDA34 *self, char *arg1) {
         if (buf != NULL) {
             self->unk5C = buf;
             strcpy(buf, arg1);
-            func_800270C4(path, buf, NULL, D_8008A8D0);
+            BuildFileName(path, buf, NULL, D_8008A8D0);
             self->unk2A = 1;
             self->methods->slot6C(self, path);
         }
@@ -336,7 +336,7 @@ s32 func_8002C638(ObjDA34 *self) {
     func_80017CFC(self->unk4C);
     func_80017CFC(self->unk50);
     func_80017CFC(self->unk5C);
-    return func_80026CAC()->slot0C(self);
+    return GetActiveDataSourceMethods()->slot0C(self);
 }
 
 void func_8002C6FC(ObjDA34 *self) {
@@ -348,7 +348,7 @@ void func_8002C6FC(ObjDA34 *self) {
     case 1:
         if (self->unk24 & 0x200) {
             self->unk54 = SsVabOpenHead(self->unk10, -1);
-            func_800270C4(path, self->unk5C, NULL, D_8008A8D4);
+            BuildFileName(path, self->unk5C, NULL, D_8008A8D4);
             D_8008A8C8 = self->unk10;
             self->unk2A = 6;
             self->unk10 = NULL;
@@ -398,7 +398,7 @@ typedef struct ProgAtr179D8E {
     u8 pad1[0x10 - 0x1];
 } ProgAtr179D8E;
 
-/* func_80026C20 -- uncarved, cross-unit; reached only through
+/* Class6D430__FreeBuffer -- uncarved, cross-unit; reached only through
  * D_8006DA34's own +0x5C slot (declared above as `slot5C`), never called
  * directly by name here. */
 

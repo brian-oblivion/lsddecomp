@@ -44,6 +44,6 @@ every method of this class calls to BEGIN an operation, and back to 0 by
 `func_80028864`, the state-machine reset. Every reader is a refusal guard:
 `code_179d8_s` tests `gCdBusy == 0` before starting any transfer, and
 `SetCdDriverMode` in this unit returns 0 (rejected) while it is non-zero.
-`code_171e0.c`'s wrapper `func_80026E64` returns 0 -- not busy -- when no CD
+`code_171e0.c`'s wrapper `IsActiveDataSourceBusy` returns 0 -- not busy -- when no CD
 source is selected. Getter of a flag whose writers define it: tier A by the
 pure-leaf rule.

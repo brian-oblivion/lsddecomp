@@ -1,4 +1,6 @@
-# func_800270C4
+> Renamed from `func_800270C4` on 2026-09-18 (tools/rename.py). Address 0x800270c4.
+
+# BuildFileName
 
 **Unit:** code_171e0 · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
 
@@ -38,7 +40,7 @@ choosing to fill the delay slot with it.
 ## Final C
 
 ```c
-char *func_800270C4(char *dest, char *arg1, char *arg2, char *arg3) {
+char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3) {
     dest[0] = '\0';
     if (arg2 != NULL) {
         strcat(dest, arg2);

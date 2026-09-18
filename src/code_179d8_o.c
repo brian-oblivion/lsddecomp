@@ -42,7 +42,7 @@
  * 0x8006B58C`.  D_8006D4E8 (this class's own 29-slot method table, the
  * address the FirecatFG name is drawn from) overrides BasicClass's table
  * (D_8006B58C, 14 slots, header 0) at exactly three slots: +0x004
- * (func_800269F0), +0x008 (func_80027228) and +0x00C (func_80027274);
+ * (DestroyChained), +0x008 (func_80027228) and +0x00C (func_80027274);
  * slots +0x010..+0x038 are inherited verbatim (same BasicClass__func_*
  * addresses in both tables) and the rest (+0x040 upward, including
  * func_800272C8) are new slots BasicClass's own table does not have at
@@ -66,7 +66,7 @@
 typedef struct Obj6D4E8Methods Obj6D4E8Methods;
 struct Obj6D4E8Methods {
     s32 header;                    /* +0x000, not a pointer -- 0x13 for D_8006D4E8, 0 for BasicClass's own table */
-    void *unk04;                   /* +0x004, func_800269F0 for this class -- unused by this unit's own functions */
+    void *unk04;                   /* +0x004, DestroyChained for this class -- unused by this unit's own functions */
     void (*ctor)(void *self);      /* +0x008, confirmed via classtable.py: BasicClass's OWN table has
                                      * BasicClass__BasicClass at this exact slot */
     u8 pad00C[0x05C - 0x00C];
@@ -96,7 +96,7 @@ typedef struct {
 } BaseCtorTable6D4E8;
 
 extern void *func_80017B34(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
-extern BaseCtorTable6D4E8 *func_80026C9C(void *self); /* still INCLUDE_ASM in the code_179d8 remainder */
+extern BaseCtorTable6D4E8 *GetClass6D430Methods(void *self); /* still INCLUDE_ASM in the code_179d8 remainder */
 extern Obj6D4E8Methods *GetClass6D4E8Methods(void);        /* still INCLUDE_ASM in the code_179d8 remainder;
                                                        returns this class's own table, &D_8006D4E8 */
 extern void InitCdDrive(void);                    /* still INCLUDE_ASM in the code_179d8 remainder;
@@ -116,7 +116,7 @@ Obj6D4E8 *new_class_6d4e8(void)
 
 void func_80027228(Obj6D4E8 *self)
 {
-    func_80026C9C(self)->ctor(self);
+    GetClass6D430Methods(self)->ctor(self);
     self->methods = GetClass6D4E8Methods();
     self->unk28 = 0;
     InitCdDrive();

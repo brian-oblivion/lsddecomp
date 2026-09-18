@@ -1,4 +1,6 @@
-# func_80026CE8
+> Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
+
+# SetVec3
 
 **Unit:** code_171e0 · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
@@ -34,7 +36,7 @@ typedef struct Vec3_171e0 {
     s32 z;
 } Vec3_171e0;
 
-Vec3_171e0 *func_80026CE8(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
+Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
     this->x = x;
     this->y = y;
     this->z = z;

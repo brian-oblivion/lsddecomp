@@ -1,4 +1,6 @@
-# func_80026B08
+> Renamed from `func_80026B08` on 2026-09-18 (tools/rename.py). Address 0x80026b08.
+
+# Class6D430__AllocBuffer
 
 **Unit:** code_171e0 · **Size:** 70 instructions · **Status:** MATCHED (70/70 words, whole-image build verified byte-exact)
 
@@ -52,7 +54,7 @@ END: epilogue
 ## Final C
 
 ```c
-void func_80026B08(UnkFlagsObj_171e0 *this, s32 arg1) {
+void Class6D430__AllocBuffer(UnkFlagsObj_171e0 *this, s32 arg1) {
     s32 savedUnk0C;
     s32 size;
     void *newRes;

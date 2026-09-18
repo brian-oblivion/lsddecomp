@@ -313,7 +313,7 @@ typedef struct IntermediateBaseMethods {
 
 /* Uncarved (asm/code_2cc8c.s, not this unit's to write): a plain accessor
  * with no parameters, returning &D_8006E878. Same shape as
- * Get_vtable_DreamSys / func_800269E0 (docs/research/class-framework.md). */
+ * Get_vtable_DreamSys / GetClass6D3C8Methods (docs/research/class-framework.md). */
 extern IntermediateBaseMethods *func_8003E5C8(void);
 
 /* Allocator in the still-uncarved unit class_3bb8c (asm/class_3bb8c.s):
@@ -475,7 +475,7 @@ extern s32 func_8004A070(s32 arg1);
 
 /* Already declared elsewhere (Class6D3C8.h) with this exact signature; this
  * unit's own local view. Return value discarded at this call site. */
-extern s32 func_80026F34(s32 arg1, s32 arg2, s32 arg3);
+extern s32 SetActiveDataSourceDriverMode(s32 arg1, s32 arg2, s32 arg3);
 
 /* "New_X"-shaped allocator (uncarved, asm/class_3bb8c.s), zero forwarded
  * arguments (its own ctor call passes only the new instance). Stored into

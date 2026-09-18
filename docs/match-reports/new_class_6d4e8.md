@@ -12,7 +12,7 @@ instead with `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` (comparing
 against `D_8006B58C`, the 14-slot table for the project's "BasicClass"
 hierarchy, whose constructor `BasicClass__BasicClass` sits at `+0x008`).
 `D_8006D4E8` overrides exactly three slots relative to `D_8006B58C`
-(`+0x004`, `+0x008`, `+0x00C` -- `func_800269F0`, `func_80027228`,
+(`+0x004`, `+0x008`, `+0x00C` -- `DestroyChained`, `func_80027228`,
 `func_80027274`), inherits `+0x010..+0x038` verbatim (identical
 `BasicClass__func_*` addresses in both tables), and adds new slots from
 `+0x040` up that `D_8006B58C` doesn't have at all (including this unit's own

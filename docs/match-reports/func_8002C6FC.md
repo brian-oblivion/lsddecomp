@@ -19,7 +19,7 @@ void func_8002C6FC(ObjDA34 *self) {
     case 1:
         if (self->unk24 & 0x200) {
             self->unk54 = SsVabOpenHead(self->unk10, -1);
-            func_800270C4(path, self->unk5C, NULL, D_8008A8D4);
+            BuildFileName(path, self->unk5C, NULL, D_8008A8D4);
             D_8008A8C8 = self->unk10;
             self->unk2A = 6;
             self->unk10 = NULL;

@@ -22,7 +22,7 @@
  *     queue.
  *
  * code_171e0.c reaches all of this through wrappers gated on
- * `D_8008A84C == 0x13`, this class's header word; the other value that gate
+ * `gActiveDataSource == 0x13`, this class's header word; the other value that gate
  * takes, 0x23, selects the SPU/VAB streamer in code_179d8_e.c. So the two
  * are interchangeable data sources behind one small dispatch layer.
  */
@@ -181,13 +181,13 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 }
 
 /* D_8006D4E8's own method table, 29 slots per tools/classtable.py (header
- * word 0x13 at +0x000, func_800269F0 at +0x004/own-slot, func_80027228 at
+ * word 0x13 at +0x000, DestroyChained at +0x004/own-slot, func_80027228 at
  * +0x008/ctor, func_80027274 at +0x00C/dtor, the 13 inherited BasicClass
  * slots at +0x010..+0x038, then own slots at +0x040..+0x074 -- this unit
  * defines Class6D4E8__RequestLoadFile (+0x06C), Class6D4E8__StopCdService
  * (+0x070) and Class6D4E8__CancelRequests (+0x074)). This function is this
  * class's "get my own method table" accessor, the same convention
- * func_800269E0 uses for D_8006D3C8 and func_80026C9C uses for D_8006D430
+ * GetClass6D3C8Methods uses for D_8006D3C8 and GetClass6D430Methods uses for D_8006D430
  * (see include/code_171e0.h) -- just an address-of, not gp_rel, since
  * D_8006D4E8 lives in .data, not .sdata. */
 extern s32 D_8006D4E8[];

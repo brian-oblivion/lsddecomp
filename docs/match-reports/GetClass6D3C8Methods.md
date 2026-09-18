@@ -1,4 +1,6 @@
-# func_800269E0
+> Renamed from `func_800269E0` on 2026-09-18 (tools/rename.py). Address 0x800269e0.
+
+# GetClass6D3C8Methods
 
 **Unit:** code_171e0 · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
@@ -27,7 +29,7 @@ CLAUDE.md's "Writing a class method".
 ```c
 extern s32 D_8006D3C8[];
 
-void *func_800269E0(void) {
+void *GetClass6D3C8Methods(void) {
     return D_8006D3C8;
 }
 ```

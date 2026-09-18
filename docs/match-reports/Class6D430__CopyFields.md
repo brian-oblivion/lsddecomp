@@ -1,4 +1,6 @@
-# func_80026D88
+> Renamed from `func_80026D88` on 2026-09-18 (tools/rename.py). Address 0x80026d88.
+
+# Class6D430__CopyFields
 
 **Unit:** code_171e0 · **Size:** 33 instructions · **Status:** MATCHED (33/33 words, whole-image build verified byte-exact)
 
@@ -37,7 +39,7 @@ them.
 ## Final C
 
 ```c
-void func_80026D88(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
+void Class6D430__CopyFields(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
     dst->unk40 = src->unk40;
     dst->unk44 = src->unk44;
     dst->unk48 = src->unk48;
