@@ -1,34 +1,58 @@
+/*
+ * code_2cc8c_f -- the `Obj6EAC0` class (base table `D_8006EAC0`, override
+ * table `D_8006EB90`; see include/code_2cc8c.h for the full derivation)
+ * plus three unrelated free functions that happen to live in this file
+ * (`DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
+ * confirmed by their OWN callers elsewhere to take a plain buffer, not an
+ * `Obj6EAC0 *`, despite matching this file's dominant `self`-typed style).
+ *
+ * Named round 54 (runner alpha, track 3); every non-`func_` symbol below
+ * is new this round. Working hypothesis (tier B, this unit's own evidence
+ * only -- see include/code_2cc8c.h's own `Obj6EAC0` comment for the full
+ * case): a small on-screen text/digit display. A leaf instance
+ * (`hasChildren`==0) is one character glyph (`SetChar`); a container
+ * instance holds a `children` array laid out along one axis, `posX`/
+ * `posY` as a running cursor advanced by `childPitch` per child, with one
+ * extra gap inserted at `gapIndex` (plausibly a decimal point). `SetText`
+ * walks a string dispatching one child per byte, and this file's own
+ * `FormatFullWidthNumber` builds exactly the padded, Shift-JIS-encoded
+ * digit string `SetText` would consume.
+ *
+ * All 20 non-trivial functions in this unit are MATCHED; zero live
+ * INCLUDE_ASM, zero NON_MATCHING bodies. `Obj6EAC0__NoOpSetter`/
+ * `Obj6EAC0__NoOpSlotD0` are splat-generated `jr $ra; nop` occupants.
+ */
 #include "common.h"
 #include "code_2cc8c.h"
 
-void func_80040664(Obj6EAC0 *self, s32 a1, void *a2) {
-    if (self->unkC == 0) {
+void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
+    if (self->hasChildren == 0) {
         func_8001E57C()->slot4C(self, a1, 0);
         self->methods->slotBC(self, a2);
     }
 }
 
 s32 func_800406E4(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->unk58, 0x1F, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->flags, 0x1F, 1, a1 == 0) == 0;
 }
 
 s32 func_80040714(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->unk58, 0x1E, 1, a1 != 0);
+    return GetSetBitField(&self->flags, 0x1E, 1, a1 != 0);
 }
 
 s32 func_80040740(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->unk58, 0x1C, 2, a1);
+    return GetSetBitField(&self->flags, 0x1C, 2, a1);
 }
 
-void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
+void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
 
-void func_8004076C(Obj6EAC0 *self, s32 overwrite, u8 *src) {
-    func_80040790(self, self->unk64, src, overwrite);
+void Obj6EAC0__SetColor(Obj6EAC0 *self, s32 overwrite, u8 *src) {
+    Obj6EAC0__ApplyColor(self, self->color, src, overwrite);
 }
 
 typedef struct { s8 r, g, b; } RGB80040790;
 
-void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
     d = dst;
     if (overwrite) {
@@ -40,20 +64,20 @@ void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     }
 }
 
-void func_800407F8(Obj6EAC0 *self, Pair32E99C *a1) {
-    if (self->unkC != 0) {
-        *(Pair32E99C *)&self->unk50 = *a1;
+void Obj6EAC0__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
+    if (self->hasChildren != 0) {
+        *(Pair32E99C *)&self->posX = *a1;
     }
 }
 
 void func_80040824(Obj6EAC0 *self, s32 *a1) {
-    if (self->unkC != 0) {
+    if (self->hasChildren != 0) {
         self->unk60 = ((u16 *)a1)[0];
         self->unk62 = ((u16 *)&a1[1])[0];
     }
 }
 
-void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
 {
     void (*fn)();
     Obj6EAC0 *q;
@@ -74,38 +98,38 @@ void func_800408A0(Obj6EAC0 *self, s32 a1) {
     self->unk44 = a1;
 }
 
-s32 func_800408A8(Obj6EAC0 *self, s32 a1) {
-    return self->unk68 = (1 << a1) - 1;
+s32 Obj6EAC0__SetMask(Obj6EAC0 *self, s32 a1) {
+    return self->mask = (1 << a1) - 1;
 }
 
-Obj6EAC0Methods *func_800408BC(void) {
+Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void) {
     return &D_8006EAC0;
 }
 
-Obj6EAC0Methods *func_80040FB0(void);
+Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
 
-Unk64Elem *func_800408CC(void *ctx, s32 len, char *name) {
+Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
     Obj6EAC0 *self = func_80017B34(0xB8);
     if (self != NULL) {
-        func_80040FB0()->slot08(self, (s32)ctx, len, (s32)name);
+        Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
         return (Unk64Elem *)self;
     }
     return NULL;
 }
 
-void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
     ((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20);
-    self->methods = func_80040FB0();
-    self->unkA9 = a2;
-    self->unkAB = a2;
-    self->unkAC = 0;
-    self->unkAA = 0;
+    self->methods = Obj6EAC0__GetDerivedMethods();
+    self->totalChildCount = a2;
+    self->childCount = a2;
+    self->childStart = 0;
+    self->gapIndex = 0;
     cursor = func_80017B34(a2 * 4);
     if (cursor != NULL) {
-        self->unkB4 = cursor;
+        self->children = cursor;
         i = 0;
         if (i < a2) {
             do {
@@ -118,41 +142,41 @@ void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     }
 }
 
-void func_80040A30(Obj6EAC0 *self) {
-    ReleaseBasicClassArray(self->unkB4, self->unkA9);
-    self->unkB4 = func_80017CFC(self->unkB4);
+void Obj6EAC0__Destruct(Obj6EAC0 *self) {
+    ReleaseBasicClassArray(self->children, self->totalChildCount);
+    self->children = func_80017CFC(self->children);
     func_80041C3C()->slot0C(self);
 }
 
-void func_80040A88(Obj6EAC0 *self, s32 a1) {
+void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
     self->methods->slotD4(self, 7);
     self->methods->slotCC(self, a1);
 }
 
-void func_80040AE8(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
+void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     Pair32E99C buf;
     s32 i, bound;
     Obj6EAC0 **elemp;
 
-    if (self->unkC != 0) {
+    if (self->hasChildren != 0) {
         return;
     }
     func_80041C3C()->slot4C(self, a1, a2);
     buf = *a2;
-    elemp = self->unkB4 + self->unkAC;
-    i = self->unkAC;
+    elemp = self->children + self->childStart;
+    i = self->childStart;
     bound = i;
-    if (i < bound + self->unkAB) {
+    if (i < bound + self->childCount) {
         do {
-            if (self->unkAA != 0 && i == self->unkAA) {
+            if (self->gapIndex != 0 && i == self->gapIndex) {
                 buf.a += 0x10;
             }
             (*elemp)->methods->slot4C(*elemp, self, &buf);
-            buf.a += self->unkB0;
-            bound = self->unkAC;
+            buf.a += self->childPitch;
+            bound = self->childStart;
             elemp++;
             i++;
-        } while (i < bound + self->unkAB);
+        } while (i < bound + self->childCount);
     }
 }
 
@@ -160,62 +184,62 @@ void func_80040C00(Obj6EAC0 *self) {
     Obj6EAC0 **elemp;
     s32 i, bound;
 
-    if (self->unkC != 0) {
-        if (self->unkB4 != NULL) {
-            elemp = self->unkB4 + self->unkAC;
-            i = self->unkAC;
+    if (self->hasChildren != 0) {
+        if (self->children != NULL) {
+            elemp = self->children + self->childStart;
+            i = self->childStart;
             bound = i;
-            if (i < bound + self->unkAB) {
+            if (i < bound + self->childCount) {
                 do {
                     (*elemp)->methods->slot50(*elemp);
                     elemp++;
-                    bound = self->unkAC;
+                    bound = self->childStart;
                     i++;
-                } while (i < bound + self->unkAB);
+                } while (i < bound + self->childCount);
             }
         }
         func_80041C3C()->slot50(self);
     }
 }
 
-s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
-    Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
-    s32 i = self->unkAC;
+s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
+    Obj6EAC0 **elemp = self->children + self->childStart;
+    s32 i = self->childStart;
     s32 bound = i;
-    if (i < bound + self->unkAB) {
+    if (i < bound + self->childCount) {
         do {
             Obj6EAC0 *elem = *elemp;
             s32 result;
             elemp++;
             i++;
             result = elem->methods->slot60(elem, a1);
-            bound = self->unkAC;
+            bound = self->childStart;
             a2 = result;
-        } while (i < bound + self->unkAB);
+        } while (i < bound + self->childCount);
     }
     return a2;
 }
 
-void func_80040D74(Obj6EAC0 *self, s32 a1) {
-    Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
-    s32 i = self->unkAC;
+void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
+    Obj6EAC0 **elemp = self->children + self->childStart;
+    s32 i = self->childStart;
     s32 bound = i;
-    s32 count = i + self->unkAB;
+    s32 count = i + self->childCount;
     if (i < count) {
         do {
             Obj6EAC0 *elem = *elemp;
             s32 ab;
             elemp++;
-            ab = self->unkAB;
+            ab = self->childCount;
             elem->methods->slotB8(elem, a1);
             i++;
-            bound = self->unkAC;
-        } while (i < (bound + self->unkAB));
+            bound = self->childStart;
+        } while (i < (bound + self->childCount));
     }
 }
 
-void func_80040E14(Obj6EAC0 *self, Pair32E99C *a1) {
-    if (self->unkC != 0) {
+void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
+    if (self->hasChildren != 0) {
         Pair32E99C buf;
         s32 i;
         s32 bound;
@@ -224,12 +248,12 @@ void func_80040E14(Obj6EAC0 *self, Pair32E99C *a1) {
         func_80041C3C()->slotBC(self, a1);
         buf = *a1;
         i = 0;
-        elemp = self->unkB4;
-        if (i < self->unkA9) {
+        elemp = self->children;
+        if (i < self->totalChildCount) {
             do {
                 (*elemp)->methods->slotBC(*elemp, &buf);
-                buf.a += self->unkB0;
-                bound = self->unkA9;
+                buf.a += self->childPitch;
+                bound = self->totalChildCount;
                 elemp++;
                 i++;
             } while (i < bound);
@@ -237,16 +261,16 @@ void func_80040E14(Obj6EAC0 *self, Pair32E99C *a1) {
     }
 }
 
-void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
-    Obj6EAC0 *elem = self->unkB4[a2];
+void Obj6EAC0__SetChildChar(Obj6EAC0 *self, s32 a1, s32 a2) {
+    Obj6EAC0 *elem = self->children[a2];
     elem->methods->slotC4(elem, a1 & 0xFF);
 }
 
-void func_80040F20(void) {
+void Obj6EAC0__NoOpSetter(void) {
 }
 
-void func_80040F28(Obj6EAC0 *self, u8 *a1) {
-    Obj6EAC0 **elemp = self->unkB4;
+void Obj6EAC0__SetText(Obj6EAC0 *self, u8 *a1) {
+    Obj6EAC0 **elemp = self->children;
     u8 *p = a1;
     if (p != NULL && *p != 0) {
         do {
@@ -258,24 +282,24 @@ void func_80040F28(Obj6EAC0 *self, u8 *a1) {
     }
 }
 
-void func_80040FA0(void) {
+void Obj6EAC0__NoOpSlotD0(void) {
 }
 
-void func_80040FA8(Obj6EAC0 *self, s32 a1) {
-    self->unkB0 = a1;
+void Obj6EAC0__SetChildPitch(Obj6EAC0 *self, s32 a1) {
+    self->childPitch = a1;
 }
 
-Obj6EAC0Methods *func_80040FB0(void) {
+Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void) {
     return &D_8006EB90;
 }
 
-/* func_80040FC0 -- MATCHED round 38 (24/24). A permuter search (208
+/* DecodeFullWidthSjis -- MATCHED round 38 (24/24). A permuter search (208
  * iterations, rc=0) closed the last residue: retail materializes the
  * 0x40 comparison constant into its own register BEFORE copying `dst`
  * into `d`, and GCC 2.6.3 only reproduces that emission order when the
  * constant is named by a separate local assigned first. See
- * docs/match-reports/func_80040FC0.md. */
-u8 *func_80040FC0(u8 *dst, u8 *src) {
+ * docs/match-reports/DecodeFullWidthSjis.md. */
+u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 special;
     u32 c;
@@ -304,15 +328,15 @@ u8 *func_80040FC0(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* func_80041020 -- MATCHED round 38 (31/31). Round 37 got structure and
+/* EncodeFullWidthSjis -- MATCHED round 38 (31/31). Round 37 got structure and
  * length exact via the two-cursor idiom (`d = dst; dst++; *d = x;`),
  * leaving a pure 3-way register-identity residue. A permuter search
  * (158 iterations, rc=0) closed it: copying the second byte's value
  * into its own local (`trail`) before using it in the comparisons and
  * arithmetic, instead of reusing `c` directly, changes GCC 2.6.3's
  * register allocation to match retail's exactly. See
- * docs/match-reports/func_80041020.md. */
-u8 *func_80041020(u8 *dst, u8 *src) {
+ * docs/match-reports/EncodeFullWidthSjis.md. */
+u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
     u32 v;
@@ -347,7 +371,7 @@ u8 *func_80041020(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* func_8004109C -- MATCHED round 38 (56/56). Round 35 got structure and
+/* FormatFullWidthNumber -- MATCHED round 38 (56/56). Round 35 got structure and
  * length exact (padded/text VLAs, strlen/itoa naming fixed post-SDK-object
  * renaming) leaving a 4-value register-identity residue (fill/text
  * swapped relative to retail). A permuter search (733 iterations, rc=0)
@@ -355,16 +379,16 @@ u8 *func_80041020(u8 *dst, u8 *src) {
  * padded/text) PLUS splitting `fill = width - strlen(...)` into two
  * statements (`fill = strlen(...); fill = width - fill;`) together
  * reproduce retail's exact register assignment. Also fixed a stale
- * prototype: the preserved body's forward declaration of func_80041020
+ * prototype: the preserved body's forward declaration of EncodeFullWidthSjis
  * as `(Obj6EAC0 *, char *)` predates that function's own round-38 match
- * as `u8 *func_80041020(u8 *, u8 *)` -- calling it now needs `self` cast
- * to `u8 *`. See docs/match-reports/func_8004109C.md. */
+ * as `u8 *EncodeFullWidthSjis(u8 *, u8 *)` -- calling it now needs `self` cast
+ * to `u8 *`. See docs/match-reports/FormatFullWidthNumber.md. */
 extern char *strcpy(char *dst, char *src);
 extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern int strlen(char *s);
 extern char *itoa(int n);
 
-void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
+void FormatFullWidthNumber(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
     char text[width + 1];
     s32 fill;
     char padded[width + 1];
@@ -375,5 +399,5 @@ void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
         memset((unsigned char *)padded, '0', width);
         strcpy(&padded[fill], text);
     }
-    func_80041020((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
+    EncodeFullWidthSjis((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
 }

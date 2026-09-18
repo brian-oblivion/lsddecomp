@@ -48,7 +48,7 @@ void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
     void *tableEntry;
 
-    base = (ClassEAC0Methods *)func_800408BC();
+    base = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
     if (a2 != 0) {
         tableEntry = &D_8006EA90[a2 * 3];
     } else {
@@ -254,7 +254,7 @@ ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
 
     self = func_80017B34(0x6C);
     if (self != NULL) {
-        ((ClassEAC0Methods *)func_800408BC())->ctor(self, a0, a1, a2);
+        ((ClassEAC0Methods *)Obj6EAC0__GetBaseMethods())->ctor(self, a0, a1, a2);
         return self;
     }
     return NULL;
@@ -262,7 +262,7 @@ ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
 
 void func_8004054C(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     func_8001E57C()->ctor(self);
-    self->methods = (ClassEAC0Methods *)func_800408BC();
+    self->methods = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
     self->methods->slot40(self, a1, a2, a3);
 }
 

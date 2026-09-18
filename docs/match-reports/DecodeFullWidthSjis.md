@@ -1,15 +1,17 @@
-# func_80040FC0 -- STALL: length EXACT (24/24 words, no drift); **22/24 raw word-match (round 37 head, up from 15/24)**; first real diff at file 0x317D0 / vram 0x80040FD0 -- and it is the ONLY diff: two preheader words TRANSPOSED (`ori $a3,$zero,0x40` / `addu $a2,$a0,$zero`).
+> Renamed from `func_80040FC0` on 2026-09-18 (tools/rename.py). Address 0x80040fc0.
+
+# DecodeFullWidthSjis -- STALL: length EXACT (24/24 words, no drift); **22/24 raw word-match (round 37 head, up from 15/24)**; first real diff at file 0x317D0 / vram 0x80040FD0 -- and it is the ONLY diff: two preheader words TRANSPOSED (`ori $a3,$zero,0x40` / `addu $a2,$a0,$zero`).
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean. No `self`/vtable
 involvement -- a standalone byte-transcoding string function (likely a
-half/full-width character remap; see the sibling `func_80041020` for
+half/full-width character remap; see the sibling `EncodeFullWidthSjis` for
 the inverse direction).
 
 Body reached (near-miss, preserved literally):
 
 ```c
 #if 0
-u8 *func_80040FC0(u8 *dst, u8 *src) {
+u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d = dst;
     u8 *s = src;
     u8 peek;
@@ -41,7 +43,7 @@ u8 *func_80040FC0(u8 *dst, u8 *src) {
 ## Shape, derived from the disassembly (and cross-checked with m2c)
 
 `src` skips its own first byte entirely (matches the same "skip first
-byte" shape seen in `func_80040790`, historically cited here as a stall --
+byte" shape seen in `Obj6EAC0__ApplyColor`, historically cited here as a stall --
 **that function is MATCHED, see the round-38 correction below**). Per byte
 after that,
 translate `c` to `c-0x20` if `c >= 0x80` OR `c == 0x40`, else
@@ -61,9 +63,9 @@ COUNTER (incremented once per iteration but never dereferenced again
 after the initial cache). Every C form tried collapses `d` and the
 original `dst` parameter back into ONE register (`$a0`), storing
 through `$a0` directly -- the SAME "redundant cursor cache" residue
-class historically cross-referenced against `func_80040790`'s "stall" in
+class historically cross-referenced against `Obj6EAC0__ApplyColor`'s "stall" in
 this unit (see that report for the prior attempts against
-declaration-order/barrier/volatile). **Correction, round 38: `func_80040790`
+declaration-order/barrier/volatile). **Correction, round 38: `Obj6EAC0__ApplyColor`
 is MATCHED, not stalled -- this cross-reference is stale, see the
 round-38 correction below.**
 
@@ -88,24 +90,24 @@ round-38 correction below.**
 
 ### Proposed learning
 
-A third instance (with `func_80040790`) of the project's "redundant
+A third instance (with `Obj6EAC0__ApplyColor`) of the project's "redundant
 cursor cache, resists reshaping" class, specifically in the
 "an argument used only as a store TARGET, never re-read, still gets
 its own register in retail" shape. Cross-referenced in both reports;
 a lever found for either should be retried on both. (STALE AS OF ROUND
-19, corrected round 37: this sentence used to name `func_800407F8` as a
+19, corrected round 37: this sentence used to name `Obj6EAC0__SetPosition` as a
 third instance. That function was MATCHED 11/11 in round 19 by an
 unrelated lever and is not a member of this class. **STALE AGAIN, round
-38: `func_80040790` -- the OTHER function this sentence names -- is
+38: `Obj6EAC0__ApplyColor` -- the OTHER function this sentence names -- is
 ALSO matched, and was matched before this stall was even filed; see the
 round-38 correction below. Corrected membership: the class had exactly
-TWO live members, `func_80040FC0` and `func_80041020`, both closed as
+TWO live members, `DecodeFullWidthSjis` and `EncodeFullWidthSjis`, both closed as
 of round 38.**)
 
 ## Round 27 update: same residue, confirmed from a different angle (still 15/24)
 
 Rewrote the branch structure using this round's new combined-condition lever
-(`func_80041020`'s report, same unit): `if (c >= 0x80) v=c-0x20; else if
+(`EncodeFullWidthSjis`'s report, same unit): `if (c >= 0x80) v=c-0x20; else if
 (c==0x40) v=c-0x20; else v=c-0x1F;` becomes `if (c < 0x80 && c != 0x40) { v
 = c - 0x1F; } else { v = c - 0x20; }`, sharing retail's single
 `addiu $v0,$v1,-0x20` instruction between the `c>=0x80` and `c==0x40` cases
@@ -121,7 +123,7 @@ depending on `c`'s declared width:**
 - **`u8 c`** (this round's kept choice, matches the pre-existing 15/24):
   compiles a genuine EXTRA `andi $a2,$v1,0xff` before the `sltiu` (the
   SAME "byte value reused across multiple comparisons needs a wider
-  local" issue `func_80041020`'s report names) — but reaches the correct
+  local" issue `EncodeFullWidthSjis`'s report names) — but reaches the correct
   24-word length, because that spurious `andi` happens to occupy the same
   word retail spends on its separate cursor register.
 - **`u32 c`** (tried, then reverted): removes the `andi` cleanly — the
@@ -149,8 +151,8 @@ changed.
 Kept the `u8`/combined-`&&` body as the new best (cleaner source, same
 score, correct length) — see below. Not spending further attempts on the
 cursor residue itself this round; it remains the shared, still-unresolved
-class across this unit's `func_80040FC0`, `func_800407F8`, and (this
-round) `func_80041020`.
+class across this unit's `DecodeFullWidthSjis`, `Obj6EAC0__SetPosition`, and (this
+round) `EncodeFullWidthSjis`.
 
 ### Proposed learning
 
@@ -166,7 +168,7 @@ have traded one word-cost for another rather than truly having no effect.
 
 ```c
 #if 0
-u8 *func_80040FC0(u8 *dst, u8 *src) {
+u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d = dst;
     u8 *s = src;
     u8 peek;
@@ -212,7 +214,7 @@ Two fresh reshapes, both self-tested and both worse than the recorded best:
    the `$a0`/`$a2` lockstep relationship the residue section above derives):
    regressed to **6/24 with 169525 bytes of out-of-range drift** — the named
    second pointer costs MORE registers than it saves, exactly the same
-   regression `func_80041020`'s report already recorded for this idea on the
+   regression `EncodeFullWidthSjis`'s report already recorded for this idea on the
    sibling function. Confirms the class generalizes across both functions,
    not just the one it was first tried on.
 2. **A bare `__asm__("")` barrier between `d++` and the branch/store block**
@@ -231,8 +233,8 @@ round. `INCLUDE_ASM` restored; `./build-and-verify.sh` clean.
 ### Proposed learning
 
 The "named second pointer" and "barrier between the increment and the store"
-levers were previously tried only on `func_80041020`. Retrying both on
-`func_80040FC0` (same redundant-cursor-cache class, different function body)
+levers were previously tried only on `EncodeFullWidthSjis`. Retrying both on
+`DecodeFullWidthSjis` (same redundant-cursor-cache class, different function body)
 reproduces the SAME regression shape on each — evidence this is a property
 of the class, not an artifact of one function's specific instruction mix.
 Future attempts on any sibling in this family should treat both as
@@ -264,7 +266,7 @@ report already documented):
 
 ```c
 #if 0
-u8 *func_80040FC0(u8 *dst, u8 *src) {
+u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
     u32 v;
@@ -331,16 +333,16 @@ No search was run here because five runners were saturating the host.
 
 **A "the compiler refuses to make a second register" residue is a hypothesis
 about the SOURCE, not a finding about the toolchain — and it is worth testing
-by simply writing the second variable.** This report, `func_80041020` and
-`func_800407F8` were cross-referenced for three rounds as instances of one
+by simply writing the second variable.** This report, `EncodeFullWidthSjis` and
+`Obj6EAC0__SetPosition` were cross-referenced for three rounds as instances of one
 "redundant cursor cache" toolchain class, on the shared reasoning that every
 C form collapsed the two registers. Every one of those forms had a single
 pointer in it. The moment the source named two pointers that happen to carry
 equal values, GCC 2.6.3 kept two registers without any persuasion. **The two
-sibling `func_80041020` was the obvious place to retry this, and round 37
+sibling `EncodeFullWidthSjis` was the obvious place to retry this, and round 37
 did: it went 19/31 -> 20/31 with retail's structure reproduced exactly.
 (The class had TWO members, not the three the cross-references claimed --
-`func_800407F8` was matched back in round 19.) Note the general
+`Obj6EAC0__SetPosition` was matched back in round 19.) Note the general
 shape, which this project has recorded before in other clothes: a class
 assembled from repeated failures of ONE idiom measures that idiom, not the
 compiler.
@@ -362,7 +364,7 @@ records: *"no change at all -- GCC still keeps the values in `$a0`/`$a1`"*.
 
 The discriminator is mutation, and it is mechanical:
 
-- `func_80040FC0` / `func_80041020`: `d` and `dst` are **both incremented
+- `DecodeFullWidthSjis` / `EncodeFullWidthSjis`: `d` and `dst` are **both incremented
   every iteration**. Two live induction variables, so two registers. The
   idiom works.
 - `func_8004042C`: the copy is never modified, so it is a pure alias and
@@ -392,7 +394,7 @@ body from the disassembly independently and landed on the same state:
 
 ```
 build exit=2   (SHA1 red, as expected with non-matching C live in src/)
-func_80040FC0: 22/24 words match (file 0x317C0-0x31820)
+DecodeFullWidthSjis: 22/24 words match (file 0x317C0-0x31820)
   4 off=0x0317D0 vram=0x80040FD0 DIFF retail=40000734 built=21308000
   5 off=0x0317D4 vram=0x80040FD4 DIFF retail=21308000 built=40000734
 ```
@@ -426,16 +428,16 @@ searched, so there is no negative to record.
 
 ## ROUND 38 (bravo, second attempt): MATCHED, 22/24 -> 24/24
 
-### Correction: stale cross-references to `func_80040790` and class membership
+### Correction: stale cross-references to `Obj6EAC0__ApplyColor` and class membership
 
-Before searching, checked `func_80040790`'s MATCHED C in this same unit
+Before searching, checked `Obj6EAC0__ApplyColor`'s MATCHED C in this same unit
 (`src/code_2cc8c_f.c`) per the head's instruction, to see whether it already
 spells the `d = dst; dst++; *d = x;` two-pointer idiom this report's
 round-37 section credits with solving the class. It does not, and the
 reason is structural, not a counter-example to the idiom:
 
 ```c
-void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
     d = dst;
     if (overwrite) {
@@ -448,7 +450,7 @@ void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
 }
 ```
 
-`func_80040790` has **no loop and no increment of either `d` or `dst`** --
+`Obj6EAC0__ApplyColor` has **no loop and no increment of either `d` or `dst`** --
 it is a single conditional copy-or-accumulate over a fixed 3-byte struct,
 not the "two induction variables advancing together" shape round 37's
 "SCOPE OF THE IDIOM" section identified as the discriminator. So it neither
@@ -456,7 +458,7 @@ confirms nor contradicts the two-pointer lever by exercising it; it is
 simply not a member of the class the lever was found for, and never was --
 it does not have the residue shape (a redundant cursor register in a loop)
 at all. It was matched round 19 by an unrelated lever, before this stall
-was even filed, which makes the several "with `func_80040790`'s stall"
+was even filed, which makes the several "with `Obj6EAC0__ApplyColor`'s stall"
 cross-references throughout this report's older sections (`## Shape`,
 `## The residue`, and the round-19-era "Proposed learning") wrong on a
 plain fact, not merely stale phrasing: the cited report is not a stall and
@@ -465,19 +467,19 @@ never described this class. Those sections are corrected in place above
 not erasing the historical record.
 
 **Corrected class membership, final:** the "redundant cursor cache" class
-this report and `func_80041020`'s report cross-reference had exactly two
-live members, `func_80040FC0` and `func_80041020`. Both are closed as of
-round 38 (this report and `func_80041020.md` respectively). `func_800407F8`
-(matched round 19) and `func_80040790` (matched round 19, predates this
+this report and `EncodeFullWidthSjis`'s report cross-reference had exactly two
+live members, `DecodeFullWidthSjis` and `EncodeFullWidthSjis`. Both are closed as of
+round 38 (this report and `EncodeFullWidthSjis.md` respectively). `Obj6EAC0__SetPosition`
+(matched round 19) and `Obj6EAC0__ApplyColor` (matched round 19, predates this
 stall) were never members; both stale citations are corrected in place.
 
 Restaffed after the salvage above. Re-ran `tools/setup-permuter.sh
-func_80040FC0 <seed>` from the round-37 preserved body (the `u32`-width,
+DecodeFullWidthSjis <seed>` from the round-37 preserved body (the `u32`-width,
 two-pointer form quoted above) and confirmed the base score with
 `--debug --stack-diffs` before searching:
 
 ```
-[func_80040FC0] base score = 60
+[DecodeFullWidthSjis] base score = 60
 Reorderings: 1  (60)
 ```
 
@@ -488,7 +490,7 @@ bounded search:
 ```
 timeout 600 env PATH=$PWD/permuter-work/bin:$PATH \
   .venv/bin/python3 tools/decomp-permuter/permuter.py -j 6 \
-    --stop-on-zero --best-only --stack-diffs permuter-work/func_80040FC0
+    --stop-on-zero --best-only --stack-diffs permuter-work/DecodeFullWidthSjis
 ```
 
 Zero score found at **iteration 208**, `permuter rc=0` (ran to completion,
@@ -517,13 +519,13 @@ scorer:
 ```
 build exit=0
 OK: build matches retail
-func_80040FC0: 24/24 words match (file 0x317C0-0x31820)
+DecodeFullWidthSjis: 24/24 words match (file 0x317C0-0x31820)
 ```
 
 **Byte-exact. `INCLUDE_ASM` replaced with real C.** Final matched body:
 
 ```c
-u8 *func_80040FC0(u8 *dst, u8 *src) {
+u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 special;
     u32 c;
@@ -556,8 +558,8 @@ u8 *func_80040FC0(u8 *dst, u8 *src) {
 ### Disposition
 
 **MATCHED, 24/24.** This closes the function and the "redundant cursor
-cache" class in this unit entirely (both members closed: `func_800407F8`
-round 19, `func_80040FC0` round 38).
+cache" class in this unit entirely (both members closed: `Obj6EAC0__SetPosition`
+round 19, `DecodeFullWidthSjis` round 38).
 
 ### Proposed learning
 
@@ -573,3 +575,23 @@ cheap permuter target" shapes: an exact-length near-miss whose only diff is
 two adjacent instructions holding each other's values is close to free to
 search (208 iterations, well under a minute) and should not accumulate
 manual `__asm__`/declaration-order attempts first.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040FC0` | `DecodeFullWidthSjis` | A |
+
+**Evidence.** Verified against real Shift-JIS byte-pair codes, not just
+internal consistency: this function's decode table maps trail byte 0x4F
+(the second byte of SJIS fullwidth `'0'`, 0x824F) back to 0x30 (`'0'`), and
+trail byte 0x60 (SJIS fullwidth `'A'`, 0x8260) back to 0x41 (`'A'`) --
+`c - 0x1F` for `c=0x4F` gives `0x30`, and for `c=0x60` gives `0x41`. This is
+the exact inverse of `EncodeFullWidthSjis` (see that report), confirmed by
+running both directions against the same two real SJIS code points. The
+lead byte of each pair is skipped, not inspected, so this reads only every
+other input byte -- the "decode" half of a genuine halfwidth<->fullwidth
+Shift-JIS ASCII/digit conversion pair, not a guess about purpose from a
+single call site.

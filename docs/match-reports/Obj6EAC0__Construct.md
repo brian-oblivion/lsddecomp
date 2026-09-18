@@ -1,4 +1,6 @@
-# func_80040948 — MATCHED (58/58 words)
+> Renamed from `func_80040948` on 2026-09-18 (tools/rename.py). Address 0x80040948.
+
+# Obj6EAC0__Construct — MATCHED (58/58 words)
 
 Unit: `src/code_2cc8c_f.c`. 12 attempts. **Re-attempted after a
 coordinator correction**: this function had originally been triaged
@@ -9,12 +11,12 @@ pooled census across rounds 13+14 (81 matched, 10 stalled) showed the
 this function proves it.
 
 ```c
-void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
     ((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20);
-    self->methods = func_80040FB0();
+    self->methods = Obj6EAC0__GetDerivedMethods();
     self->unkA9 = a2;
     self->unkAB = a2;
     self->unkAC = 0;
@@ -36,11 +38,11 @@ void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 The derived table's constructor (`Obj6EAC0Methods::slot08`), called by
-this unit's own `func_800408CC` via
-`func_80040FB0()->slot08(self, ctx, len, name)`. Chains to the THIRD
+this unit's own `New_Obj6EAC0` via
+`Obj6EAC0__GetDerivedMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
 sibling table's own `slot08` (a base-class-style constructor call
-through `func_80041C3C()`, same shape as `func_800408CC` calling
-`func_80040FB0()->slot08`), then sets up `self->methods` to the
+through `func_80041C3C()`, same shape as `New_Obj6EAC0` calling
+`Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
 `a2`-element child array via `func_80017B34`, fills each slot by
 calling the external New_X-shaped allocator `func_80041AB4(a1, 0x20)`
@@ -74,7 +76,7 @@ THIS call site only —
 argument register at all, and the leftover value in `$a3` (never
 touched since function entry) does the rest for free. Zero-attempt
 verification that this doesn't disturb the OTHER call through
-`slot08` (`func_800408CC`, which genuinely does use 4 args): that call
+`slot08` (`New_Obj6EAC0`, which genuinely does use 4 args): that call
 still goes through the struct's own canonical 4-arg field, untouched.
 
 ## Attempts (12)
@@ -136,3 +138,24 @@ still goes through the struct's own canonical 4-arg field, untouched.
   narrower call site exists and the widest call site is otherwise
   clean — prefer a cast at the odd site over weakening the whole
   slot's type checking for everyone.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040948` | `Obj6EAC0__Construct` | B |
+
+**Evidence.** Derived occupant of `slot08`: chains to the third sibling
+table's own `slot08` first (base-class-style construction), sets
+`self->methods` to the derived table, initialises the child-slice fields
+(`totalChildCount`, `childCount`, `childStart`, `gapIndex`), allocates an
+`a2`-element `children` array and fills each slot via the external
+New_X-shaped `func_80041AB4`, then dispatches `self->methods->slot40`.
+This is unambiguously a constructor by mechanics (allocates + wires up
+the object this class needs); named `Construct` per the project's
+`Class__Class`-shaped constructor convention rather than `Class__Class`
+literally, since `Obj6EAC0` is a placeholder table-address name, not a
+real class identity -- tier B (the CTOR role is certain, the class's own
+purpose is the unit's working hypothesis only).

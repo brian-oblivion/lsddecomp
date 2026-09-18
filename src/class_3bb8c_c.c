@@ -143,14 +143,14 @@ void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
     out->block[1] = flag;
 }
 
-/* func_8004109C is GAME code (matched round 38, src/code_2cc8c_f.c -- its
+/* FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_f.c -- its
  * own C definition, not a Sony object), which formats a1 as a zero-padded
  * `width`-digit decimal string into `self`. This unit's own local view
  * keeps `self` opaque (`void *`) since nothing here touches Obj6EAC0's
  * fields -- the pointer is only passed through. */
-extern void func_8004109C(void *self, s32 a1, s32 width, s32 unpadded);
+extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
-/* The 6-byte value formatted into D_8008AA24's buffer by func_8004109C
+/* The 6-byte value formatted into D_8008AA24's buffer by FormatFullWidthNumber
  * above, copied whole into D_8008AA18's buffer at +0x12 as ONE struct
  * assignment. All-`s8` fields (alignment 1, not 2 or 4) is what makes
  * retail's block-move split this way: the leading 4 bytes go via the
@@ -165,6 +165,6 @@ typedef struct {
 
 void func_8004D6AC(s32 arg0)
 {
-    func_8004109C(D_8008AA24, arg0, 3, 0);
+    FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
     *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
 }

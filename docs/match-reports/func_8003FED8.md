@@ -25,7 +25,7 @@ vtable -- no extern needed.
 
 The ctor's call site only sets up `a1` before dispatching `self->methods->
 slot40(self, a2)`; `a2`/`a3` registers still hold leftover values from the
-PRECEDING `func_800408BC()->ctor(...)` call and are never intentionally set.
+PRECEDING `Obj6EAC0__GetBaseMethods()->ctor(...)` call and are never intentionally set.
 Since this occupant's own body never reads a 3rd/4th argument, the slot's
 type is `(Class6E99CObj *self, s32 a1)` -- two args, matching CLAUDE.md's
 "the converse does NOT hold" caution (a `jalr` with no visible extra setup

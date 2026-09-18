@@ -1081,7 +1081,7 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, func_8004DE08's own call: `(self, buf)` where `buf` is a
-     * pool-allocated string this function fills with `func_80040FC0`
+     * pool-allocated string this function fills with `DecodeFullWidthSjis`
      * before the call and frees right after. */
     void (*slotCC)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
 };
@@ -1093,7 +1093,7 @@ struct Class86B60UnkB0Obj_3bb8c_d {
      * an allocation SIZE (`func_80017B34`'s own argument). */
     u8 unkA9;
     /* +0x0AA/+0x0AB/+0x0AC, func_8004DB18: three literal byte fields
-     * (9/8/4) set right after allocation via `func_800408CC` -- this is
+     * (9/8/4) set right after allocation via `New_Obj6EAC0` -- this is
      * the SAME real object as `code_2cc8c.h`'s `Unk64Elem` (matching
      * slot offsets 0x004/0x04C/0x0B8, see that header's own note), so
      * these three bytes are almost certainly flags/type-tag data on that
@@ -1486,7 +1486,7 @@ extern void *D_8008AA10;
 extern void *D_8008AA18;
 
 /* Same VALUE-of `%gp_rel` pattern, read (and its buffer formatted into via
- * func_8004109C) by round 45's `func_8004D6AC` (src/class_3bb8c_c.c). Holds
+ * FormatFullWidthNumber) by round 45's `func_8004D6AC` (src/class_3bb8c_c.c). Holds
  * `D_8008AA1C` in the ROM image -- the "7654321" placeholder string
  * (`asm/data/7B12C.sdata.s`) -- so, like `D_8008AA18` above, this is a
  * writable-buffer placeholder rather than the real runtime value. */
@@ -2188,7 +2188,7 @@ struct FieldM50 {
 };
 
 /* self->unk7C's target (func_800543FC/func_800542D0). Returned by
- * func_800408CC, matched elsewhere (src/code_2cc8c_f.c) with return type
+ * New_Obj6EAC0, matched elsewhere (src/code_2cc8c_f.c) with return type
  * `Unk64Elem *` (include/code_2cc8c.h). This unit keeps its own
  * independent local view rather than including code_2cc8c.h, per the
  * project's established multiple-independent-local-views convention --
@@ -2209,10 +2209,10 @@ struct FieldM7C {
     FieldM7CMethods *methods;   /* +0x000 */
 };
 
-/* This unit's own view of the uncarved func_800408CC (see FieldM7C's
+/* This unit's own view of the uncarved New_Obj6EAC0 (see FieldM7C's
  * comment above for why the return type differs from the other unit's
  * already-matched view of the same external symbol). */
-extern FieldM7C *func_800408CC(void *ctx, s32 len, char *name);
+extern FieldM7C *New_Obj6EAC0(void *ctx, s32 len, char *name);
 
 /* func_800542D0's own literal arguments -- a "Pause" name string plus two
  * small opaque blocks, all reached only by address (never dereferenced in
@@ -2259,7 +2259,7 @@ struct ObjM {
     u8 pad040[0x054 - 0x040];
     FieldM50 *unk54;          /* +0x054, func_800543FC/func_800542D0 -- same type as unk10 above */
     u8 pad058[0x074 - 0x058];
-    void *unk74;               /* +0x074, func_800542D0: forwarded opaquely to func_800408CC's ctx arg */
+    void *unk74;               /* +0x074, func_800542D0: forwarded opaquely to New_Obj6EAC0's ctx arg */
     u8 pad078[0x07C - 0x078];
     FieldM7C *unk7C;          /* +0x07C, func_800542D0 (written)/func_800543FC (dispatched) */
     s32 unk80;                 /* +0x080, func_800541D4/func_800542D0 */
@@ -2620,7 +2620,7 @@ struct ChildMethods86ED0 {
      * parameter; arg2 is a small opaque data blob passed only by address. */
     void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
     u8 pad050[0x078 - 0x050];
-    void (*slot78)(ChildObj86ED0 *self); /* +0x078, func_80050F98, on the short-lived handle before func_80041C9C/func_800408CC consume it */
+    void (*slot78)(ChildObj86ED0 *self); /* +0x078, func_80050F98, on the short-lived handle before func_80041C9C/New_Obj6EAC0 consume it */
     u8 pad07C[0x0B8 - 0x07C];
     void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, func_80050F98, self->unk44 only */
 };
@@ -2720,7 +2720,7 @@ struct Obj86ED0 {
     s32 unk1C;                   /* +0x01C, func_80050F28 (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
     s32 unk20;                   /* +0x020, func_80051200 (zeroed) */
     char *unk24;                 /* +0x024, func_80050F28: its own `arg1` (name string) */
-    char *unk28;                 /* +0x028, func_80050CE8 (freed in finalize)/func_80050F28 (func_80040FC0/strcpy destination) */
+    char *unk28;                 /* +0x028, func_80050CE8 (freed in finalize)/func_80050F28 (DecodeFullWidthSjis/strcpy destination) */
     s32 unk2C;                   /* +0x02C, func_80051200 (zeroed)/func_800512C8 (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/func_80051370 (range-checked against [2,4)) */
     s32 unk30;                   /* +0x030, func_800512C8 (zeroed)/func_80051370 (incremented; gates the slot54 call on the OLD value being nonzero) */
     void *unk34;                 /* +0x034, func_80050D30/func_80050DB4 (addChild/removeChild target when child's tag==2)/func_800512C8/func_80051270 (removeChild target) */
@@ -2748,9 +2748,9 @@ struct Obj86ED0 {
  * runner bravo did with `Class86ED0` deliberately. The TYPES below stay
  * here because they are the richer, measured view; only the symbol moved. */
 
-/* HEAD NOTE round 15: alpha's `extern char *func_80040FC0(char *dest, char
+/* HEAD NOTE round 15: alpha's `extern char *DecodeFullWidthSjis(char *dest, char
  * *src);` moved into src/class_3bb8c_i.c -- FOURTH instance of the
- * shared-header prototype rule this round. func_80040FC0 is still
+ * shared-header prototype rule this round. DecodeFullWidthSjis is still
  * INCLUDE_ASM in code_2cc8c_f, so NOBODY has its definition and every
  * declaration is a call-site typing; class_3bb8c_i reads it as
  * `char *(char *, char *)` and class_3bb8c_j as `void (void *, void *)`.
@@ -2850,7 +2850,7 @@ struct Class86F88ElemMethods {
     void (*release)(Class86F88Elem *self); /* +0x004 */
     u8 pad008[0x04C - 0x008];
     /* +0x04C, round 45's func_80052644 -- called once per freshly-created
-     * element right after `func_800408CC` returns it, before the same
+     * element right after `New_Obj6EAC0` returns it, before the same
      * element's own `slotB8` call. `arg2` points at a 2-word stack-local
      * (`D_8008AB00`'s value, then a running `D_8008AB04`-seeded
      * accumulator incremented by 0xA per loop iteration) -- kept opaque

@@ -11,7 +11,7 @@ list" descriptor (`SrcDesc *a1`, a NULL-terminated array of C strings plus
 one extra word), it counts the strings, allocates a same-sized array of
 `Unk64Elem *`, installs it (and the count, and `a1`'s extra word) into
 `self->unk64[idx]`/`self->unk5C[idx]`/`self->unk60[idx]`, then populates
-the new array by resolving each string through `func_800408CC` (with its
+the new array by resolving each string through `New_Obj6EAC0` (with its
 length from `func_80013348`, a strlen-shaped helper already matched
 elsewhere in the project).
 
@@ -39,7 +39,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
         do {
             s32 len = func_80013348(*list);
 
-            *buf = func_800408CC(a2, len, *list);
+            *buf = New_Obj6EAC0(a2, len, *list);
             list++;
             buf++;
         } while (*list != NULL);
@@ -58,7 +58,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
 - `extern s32 func_80013348(char *s);` — already matched in
   `code_171e0.c`/`src/code_171e0.c` as a strlen-shaped helper; this unit
   keeps its own local view (established convention).
-- `extern Unk64Elem *func_800408CC(void *ctx, s32 len, char *name);` — not
+- `extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name);` — not
   previously seen in this project. Typed from this call site: its return
   value is stored directly into the same array `func_8003D980`,
   `func_8003D2CC`, `func_8003DA10` and `func_8003DE9C` all walk as

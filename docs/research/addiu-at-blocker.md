@@ -95,7 +95,7 @@ unchanged.
   remaining `gp_rel` hit. Five substantive reports KEPT — their structural
   analysis is still good — with a banner saying the verdict is stale and the
   function is assignable: `func_80018464`, `func_8003C48C`, `func_8003C63C`,
-  `func_8004109C`, `func_80049EB4`.
+  `FormatFullWidthNumber`, `func_80049EB4`.
 
   `func_8003C63C` is worth singling out: CLAUDE.md cites it as the case where
   **seven attempts went into the wrong half** of a two-word residue because an

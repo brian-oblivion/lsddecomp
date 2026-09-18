@@ -90,7 +90,7 @@ void func_8004DABC(Class86B60 *self)
 }
 
 /* func_8004DB18's own `arg1`: only its own +0x004 field is read, forwarded
- * opaquely as func_800408CC's `ctx` argument. */
+ * opaquely as New_Obj6EAC0's `ctx` argument. */
 typedef struct Arg1DB18_3bb8c_d Arg1DB18_3bb8c_d;
 struct Arg1DB18_3bb8c_d {
     u8 pad0[0x004];
@@ -104,11 +104,11 @@ struct Arg1DB18_3bb8c_d {
 extern char *strcpy(char *dest, char *src);
 extern s32 strlen(char *s);
 
-/* This unit's own view of func_80040FC0 (already matched,
+/* This unit's own view of DecodeFullWidthSjis (already matched,
  * src/code_2cc8c_f.c) -- return value unused at this call site, unlike
  * that unit's own `u8 *` view, so kept minimal per the project's
  * independent-arities convention. */
-extern void func_80040FC0(void *dst, void *src);
+extern void DecodeFullWidthSjis(void *dst, void *src);
 
 void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
 {
@@ -125,8 +125,8 @@ void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     size = strlen((char *)D_8008AA18);
     size = (size >> 1) + 4;
     buf = func_80017B34(size);
-    func_80040FC0(buf, D_8008AA18);
-    self->unkB0 = (Class86B60UnkB0Obj_3bb8c_d *)func_800408CC(arg1->unk4, size, buf);
+    DecodeFullWidthSjis(buf, D_8008AA18);
+    self->unkB0 = (Class86B60UnkB0Obj_3bb8c_d *)New_Obj6EAC0(arg1->unk4, size, buf);
     self->unkB0->unkAB = 8;
     self->unkB0->unkAC = 4;
     self->unkB0->unkAA = 9;
@@ -228,7 +228,7 @@ void func_8004DE08(Class86B60 *self)
     size = self->unkB0->unkA9;
     origUnk58 = self->unk58;
     buf1 = func_80017B34(size);
-    func_80040FC0(buf1, D_8008AA18);
+    DecodeFullWidthSjis(buf1, D_8008AA18);
     self->unkB0->methods->slotCC(self->unkB0, buf1);
     func_80017CFC(buf1);
     func_8004D678(self, self->unk4C, self->unkA4);

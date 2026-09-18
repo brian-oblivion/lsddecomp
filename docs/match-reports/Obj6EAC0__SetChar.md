@@ -1,4 +1,6 @@
-# func_80040854 — MATCHED (19/19), round 19
+> Renamed from `func_80040854` on 2026-09-18 (tools/rename.py). Address 0x80040854.
+
+# Obj6EAC0__SetChar — MATCHED (19/19), round 19
 
 ## Round 19: closed via the permuter, `do { ... } while (0)` scoping lever
 
@@ -6,7 +8,7 @@
 0):**
 
 ```c
-void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
 {
     void (*fn)();
     Obj6EAC0 *q;
@@ -82,10 +84,10 @@ STALL (prologue store-order residue, 17/19 words)
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean. Correct length (19/19
 words at the right total size, confirmed via the funcdiff word count
-matching the `.s` file's own `nonmatching func_80040854, 0x4C`).
+matching the `.s` file's own `nonmatching Obj6EAC0__SetChar, 0x4C`).
 
 ```c
-void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     self->methods->slot4C(self, a1, a2, a3);
     self->unk48 = 0;
     self->unk4C = a3;
@@ -130,9 +132,9 @@ store ORDER is not reachable from C" class.
 ## Round 15 update: two more attempts, still resistant
 
 Re-attempted after the coordinator flagged this as one of the three
-closest stalls to revisit, with `func_80040948`'s freshly-discovered
+closest stalls to revisit, with `Obj6EAC0__Construct`'s freshly-discovered
 "leftover register" and "narrower cast" levers in mind. Neither
-applied here -- unlike `func_80040948`, the CALL setup itself is
+applied here -- unlike `Obj6EAC0__Construct`, the CALL setup itself is
 already exactly right (retail's own `self->methods->slot4C` call also
 forwards `self`/`a1`/`a2`/`a3` with NO explicit register moves at all,
 since none of the four have been touched since function entry; the
@@ -179,3 +181,24 @@ runners tried it on unrelated residues and worsened them"). Six
 attempts across two sessions found no C-level lever at all for this
 specific instance -- the permuter (untried here) is the most credible
 remaining direction.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040854` | `Obj6EAC0__SetChar` | B |
+
+**Evidence.** Base occupant of `slotC4`: forwards `(a1, a2, a3)` to
+`self->methods->slot4C` (the "layout" slot -- see `Obj6EAC0__Layout`),
+then `self->unk48 = 0; self->unk4C = a3;`. `slotC4`'s DERIVED occupant
+(`Obj6EAC0__SetChildChar`, this unit) indexes into `self->children[a2]`
+and dispatches THAT child's own `slotC4` with `a1 & 0xFF` -- an 8-bit
+value. `Obj6EAC0__SetText` (this unit, `slotCC`'s derived occupant)
+independently walks a byte string dispatching `elem->methods->slotC4(elem,
+*p)` per child -- i.e. `slotC4` is called elsewhere with individual
+string bytes, which is the evidence this slot sets a per-glyph character
+code rather than an arbitrary value. Tier B (mechanics + one clean
+cross-reference; not independently confirmed against gameplay/rendering
+code outside this unit).

@@ -320,7 +320,7 @@ void func_80052644(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32
 
     for (i = 0; i < count; i++) {
         func_8005292C(self, buf, i, arg3, (char *)arg4);
-        *p = (Class86F88Elem *)func_800408CC((void *)arg2, 0x1A, buf);
+        *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
         (*p)->methods->slotB8(*p, &D_8008AB0C);
         local.b += 0xA;
@@ -365,7 +365,7 @@ void func_8005278C(Class86F88 *self)
  * (`s32 strlen(void *arg0)`); this unit's own call site reads its
  * argument as a byte pointer, so it is typed `char *` here instead --
  * per-call-site typing of an undefined function's argument, same
- * convention as func_80040FC0 (see include/class_3bb8c.h HEAD NOTE).
+ * convention as DecodeFullWidthSjis (see include/class_3bb8c.h HEAD NOTE).
  * memcpy's return type is `void *` to agree with include/psyq/MEMORY.H's
  * unprototyped declaration should this unit ever include it; the result
  * is discarded at the one call site either way. */

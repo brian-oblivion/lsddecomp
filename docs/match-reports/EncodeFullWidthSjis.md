@@ -1,4 +1,6 @@
-# func_80041020 -- MATCHED, round 38 (31/31). Closed by permuter search from round 37's 20/31 exact-length register-identity near-miss: reading the second byte's value through a fresh local instead of reusing the first byte's variable made GCC's allocator match retail's 3-way register assignment exactly.
+> Renamed from `func_80041020` on 2026-09-18 (tools/rename.py). Address 0x80041020.
+
+# EncodeFullWidthSjis -- MATCHED, round 38 (31/31). Closed by permuter search from round 37's 20/31 exact-length register-identity near-miss: reading the second byte's value through a fresh local instead of reusing the first byte's variable made GCC's allocator match retail's 3-way register assignment exactly.
 
 **Round 35 (runner delta) confirmation at the bottom of this file: reconfirmed
 19/31 after rebuilding the preserved body; a bare `__asm__("")` barrier tried
@@ -10,7 +12,7 @@ head's fresh-ground list.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_2cc8c_f/func_80041020.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_2cc8c_f/EncodeFullWidthSjis.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -130,8 +132,8 @@ the next attempt does not re-spend on them:**
    worse, not better.
 
 This is the SAME "redundant cursor cache" residue class already
-documented on this unit's sibling stalls, `func_80040FC0` and (by
-extension) `func_800407F8` — an argument/pointer used only as a store
+documented on this unit's sibling stalls, `DecodeFullWidthSjis` and (by
+extension) `Obj6EAC0__SetPosition` — an argument/pointer used only as a store
 TARGET, never re-read, still gets its OWN register in retail, and no
 C-level reshape tried on any of the three functions in this family has
 reproduced it. Per CLAUDE.md, fixing which physical register holds a
@@ -169,7 +171,7 @@ to reach it a second time.
 
 ```c
 #if 0
-u8 *func_80041020(u8 *dst, u8 *src) {
+u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     if (*src != 0) {
         do {
             u8 c1 = *src;
@@ -209,7 +211,7 @@ worth trying next" open. Tried it at two positions this round:
 2. Between the `if`/`else` computing `v` and the second `*dst++ = v;` store.
 
 **Both produced byte-identical output to the un-barriered body: 19/31, same
-diff set, no drift.** Unlike on the sibling `func_80040FC0` (where the same
+diff set, no drift.** Unlike on the sibling `DecodeFullWidthSjis` (where the same
 lever this round REGRESSED the score sharply at both positions tried there),
 here it did nothing measurable at either position. So the barrier's effect
 is position- and function-sensitive, not a generic tool for this residue
@@ -223,7 +225,7 @@ round. `INCLUDE_ASM` restored; `./build-and-verify.sh` clean.
 
 **A bare `__asm__("")` scheduling barrier's effect on the redundant-cursor-
 cache residue is NOT consistent across sibling functions in the same class**
-— inert on `func_80041020`, sharply regressive on `func_80040FC0` (same
+— inert on `EncodeFullWidthSjis`, sharply regressive on `DecodeFullWidthSjis` (same
 round, same source-level lever, two different bodies). Do not generalize a
 single measurement of this barrier to "the barrier is safe/inert for this
 residue class" or "the barrier is harmful for this residue class" — it must
@@ -235,7 +237,7 @@ evidence for or against trying it on another.
 
 ## ROUND 37 (head): the "redundant cursor cache" class DISSOLVES here too. Structure now exact; residue is pure register identity.
 
-This function was cross-filed with `func_80040FC0` as an instance of a
+This function was cross-filed with `DecodeFullWidthSjis` as an instance of a
 "redundant cursor cache" toolchain class -- the shared claim being that a
 second cursor register is one "every C form tried collapses into one".
 **That claim was false for the sibling and it is false here.** It measured
@@ -259,7 +261,7 @@ Body reached (20/31, exact length):
 
 ```c
 #if 0
-u8 *func_80041020(u8 *dst, u8 *src) {
+u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
     u32 v;
@@ -343,14 +345,14 @@ because five runners were saturating the host.
 
 ### Proposed learning
 
-See `func_80040FC0.md` for the general form. The addition from this
+See `DecodeFullWidthSjis.md` for the general form. The addition from this
 function: **the two-cursor idiom is `d = dst; dst++; *d = x;` -- the
 LONGHAND of `*dst++ = x`, which is NOT equivalent in codegen.** The
 post-increment spelling collapses to a single register and stores through
 the parameter; the longhand keeps retail's separate copy.
 
 **And a correction while dissolving the class: it had TWO members, not
-three.** `func_800407F8` has been cross-filed with these two since round
+three.** `Obj6EAC0__SetPosition` has been cross-filed with these two since round
 18 as an "analogous stall" -- but it was **MATCHED 11/11 in round 19**, by
 an unrelated whole-struct-assignment lever, and the cross-references were
 never updated. A class assembled by cross-reference keeps counting a
@@ -368,17 +370,17 @@ trusting" instruction: it links and scores exactly **20/31 at the correct
 Set up and ran the permuter from that body:
 
 ```
-tools/setup-permuter.sh func_80041020 <seed>
+tools/setup-permuter.sh EncodeFullWidthSjis <seed>
 PATH=$PWD/permuter-work/bin:$PATH \
   .venv/bin/python3 tools/decomp-permuter/permuter.py --debug --stack-diffs \
-    permuter-work/func_80041020
+    permuter-work/EncodeFullWidthSjis
 ```
 
 `--debug` confirmed the base score against the report before searching:
 
 ```
 Register Differences:          12  (5)
-[func_80041020] base score = 60
+[EncodeFullWidthSjis] base score = 60
 ```
 
 12 register differences at penalty 5 each = 60, matching the report's own
@@ -390,7 +392,7 @@ Bounded search:
 ```
 timeout 600 env PATH=$PWD/permuter-work/bin:$PATH \
   .venv/bin/python3 tools/decomp-permuter/permuter.py -j 6 \
-    --stop-on-zero --best-only --stack-diffs permuter-work/func_80041020
+    --stop-on-zero --best-only --stack-diffs permuter-work/EncodeFullWidthSjis
 ```
 
 Zero found at **iteration 158**, `permuter rc=0` (ran to completion). The
@@ -422,13 +424,13 @@ re-verified through the real oracle:
 ```
 build exit=0
 OK: build matches retail
-func_80041020: 31/31 words match (file 0x31820-0x3189C)
+EncodeFullWidthSjis: 31/31 words match (file 0x31820-0x3189C)
 ```
 
 **Byte-exact. `INCLUDE_ASM` replaced with real C.** Final matched body:
 
 ```c
-u8 *func_80041020(u8 *dst, u8 *src) {
+u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
     u32 v;
@@ -467,7 +469,7 @@ u8 *func_80041020(u8 *dst, u8 *src) {
 ### Disposition
 
 **MATCHED, 31/31.** This closes the last live member of the "redundant
-cursor cache" class in this unit -- see `func_80040FC0.md`'s round-38
+cursor cache" class in this unit -- see `DecodeFullWidthSjis.md`'s round-38
 section for the corrected final membership (two live members, both now
 closed).
 
@@ -487,3 +489,20 @@ of what is conceptually the same kind of value (a decoded byte), not
 widening one variable's type. Worth trying on any register-identity stall
 where one source variable is read for two textually-separate purposes
 across the function body.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80041020` | `EncodeFullWidthSjis` | A |
+
+**Evidence.** Verified against real Shift-JIS byte-pair codes: for input
+byte 0x30 (`'0'`), this function emits lead byte 0x82 and trail byte
+`0x30+0x1F=0x4F`, i.e. the pair 0x82 0x4F -- which IS the real SJIS
+fullwidth `'0'` (0x824F). For input byte 0x41 (`'A'`), it emits 0x82 and
+`0x41+0x1F=0x60`, i.e. 0x8260 -- the real SJIS fullwidth `'A'`. Two
+independent data points against the actual Shift-JIS table, not just
+"this looks like character encoding" -- tier A. `DecodeFullWidthSjis`
+(same unit) is confirmed as this function's exact inverse.

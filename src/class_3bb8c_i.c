@@ -12,7 +12,7 @@ extern char *strcpy(char *dest, char *src);
  * HERE, not in include/class_3bb8c.h: src/class_3bb8c_j.c types the same
  * (still undefined) function as `void (void *, void *)` from its own call
  * site, and two call-site typings of one function cannot share a header. */
-extern char *func_80040FC0(char *dest, char *src);
+extern char *DecodeFullWidthSjis(char *dest, char *src);
 
 /* This class's method table. Declared HERE and not in include/class_3bb8c.h
  * because src/class_3bb8c_j.c declares the same object as its own
@@ -158,7 +158,7 @@ void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
     self->unk18 = 0;
     self->unk1C = 0;
     if (mode == 1) {
-        func_80040FC0(self->unk28, arg1);
+        DecodeFullWidthSjis(self->unk28, arg1);
         self->unk10 /= 2;
     } else {
         strcpy(self->unk28, arg1);
@@ -170,9 +170,9 @@ void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
  * memory-card icon/font resource paths (BuildFileName, already matched in
  * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
  * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
- * func_80041C9C, unk44/unk40 via func_800408CC/func_80041AB4 -- both still
+ * func_80041C9C, unk44/unk40 via New_Obj6EAC0/func_80041AB4 -- both still
  * uncarved elsewhere, typed purely from this call site's own register
- * usage, same convention as func_80040FC0 above).
+ * usage, same convention as DecodeFullWidthSjis above).
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
@@ -215,7 +215,7 @@ void func_80050F98(Obj86ED0 *self, void *arg1)
 
     handle2 = func_8003B39C(BuildFileName(path, D_8001161C, dir, ext));
     handle2->methods->slot78(handle2);
-    self->unk44 = func_800408CC(handle2, self->unk10, self->unk28);
+    self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
     self->unk40 = func_80041AB4(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
@@ -290,10 +290,10 @@ void func_80051370(Obj86ED0 *self)
  * still `INCLUDE_ASM`), typed purely from this call site's own register
  * usage: `a0`/`a1` are `self->unk24`/`self->unk28` (both `char *`, the same
  * pair `strcpy` is fed in the other arm), return value unused. Same
- * declare-locally convention as `func_80040FC0` above (a different unit
+ * declare-locally convention as `DecodeFullWidthSjis` above (a different unit
  * types this same-shaped function with a different signature from its own
  * call site). */
-extern void func_80041020(char *dest, char *src);
+extern void EncodeFullWidthSjis(char *dest, char *src);
 
 void func_800513D0(Obj86ED0 *self, void *arg1, s32 arg2)
 {
@@ -302,7 +302,7 @@ void func_800513D0(Obj86ED0 *self, void *arg1, s32 arg2)
         return;
     case 25:
         if (self->unkC == 1) {
-            func_80041020(self->unk24, self->unk28);
+            EncodeFullWidthSjis(self->unk24, self->unk28);
         } else {
             strcpy(self->unk24, self->unk28);
         }

@@ -1,4 +1,6 @@
-# func_8004109C — MATCHED, round 38 (56/56). Closed by permuter search from round 35's 49/56 exact-length register-identity near-miss: declaration reorder (text/fill/padded) plus splitting the fill subtraction into two statements together reproduce retail's exact register assignment.
+> Renamed from `func_8004109C` on 2026-09-18 (tools/rename.py). Address 0x8004109c.
+
+# FormatFullWidthNumber — MATCHED, round 38 (56/56). Closed by permuter search from round 35's 49/56 exact-length register-identity near-miss: declaration reorder (text/fill/padded) plus splitting the fill subtraction into two statements together reproduce retail's exact register assignment.
 
 **Round 35 update (runner delta): the 42/56 figure below was NEVER ACTUALLY
 MEASURED — the preserved body called two symbols by placeholder names
@@ -30,7 +32,7 @@ fully derived and the residue is characterised.
 
 A zero-padded right-justify. It renders `a1` to text, then places that text
 flush right in a `width`-character field of ASCII `'0'` (`0x30`), and hands
-either the padded or the raw form to `func_80041020`.
+either the padded or the raw form to `EncodeFullWidthSjis`.
 
 **The two `subu $sp, $sp, $v0` with an `$fp` frame are two VLAs**, not spills:
 
@@ -72,9 +74,9 @@ extern char *strcpy(char *dst, char *src);
 extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern s32 func_80013348(char *s);   /* matches the canonical declaration; do not add const */
 extern char *func_800411A8(s32 a1);
-void func_80041020(Obj6EAC0 *self, char *text);
+void EncodeFullWidthSjis(Obj6EAC0 *self, char *text);
 
-void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
+void FormatFullWidthNumber(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
     s32 fill;
     char text[width + 1];
     char padded[width + 1];
@@ -84,7 +86,7 @@ void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
         memset((unsigned char *)padded, '0', width);
         strcpy(&padded[fill], text);
     }
-    func_80041020(self, unpadded != 0 ? text : padded);
+    EncodeFullWidthSjis(self, unpadded != 0 ? text : padded);
 }
 ```
 
@@ -185,7 +187,7 @@ build, fewer, or none-on-both-sides (per the third outcome found on
 than re-reasoning from the existing table:
 
 ```sh
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_2cc8c_f/func_8004109C.s | sort -u
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_2cc8c_f/FormatFullWidthNumber.s | sort -u
 # -> $fp, $s0, $s1, $s2, $s3, $s4, $s5   (7 registers)
 ```
 
@@ -240,7 +242,7 @@ strlen = 0x80013348; // type:func  (Psy-Q, from the SDK object)
 itoa = 0x800411A8; // type:func  (Psy-Q libc2/itoa, from the SDK object)
 ```
 
-This function's own disassembly (`asm/nonmatchings/code_2cc8c_f/func_8004109C.s`)
+This function's own disassembly (`asm/nonmatchings/code_2cc8c_f/FormatFullWidthNumber.s`)
 already shows the `jal` targets by these real names (`jal itoa`, `jal
 strcpy`, `jal strlen`, `jal memset`) — splat resolved them once the SDK
 object conversion work (the round-34 SDK rounds visible in git log) placed
@@ -359,9 +361,9 @@ extern char *strcpy(char *dst, char *src);
 extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern int strlen(char *s);
 extern char *itoa(int n);
-void func_80041020(Obj6EAC0 *self, char *text);
+void EncodeFullWidthSjis(Obj6EAC0 *self, char *text);
 
-void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
+void FormatFullWidthNumber(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
     /* VLA declaration order is load-bearing: padded-then-text (not the
      * textually more obvious text-then-padded) is what gets `padded` and
      * `width` onto retail's exact registers. See the round-35 section of
@@ -377,7 +379,7 @@ void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
         memset((unsigned char *)padded, '0', width);
         strcpy(&padded[fill], text);
     }
-    func_80041020(self, unpadded != 0 ? text : padded);
+    EncodeFullWidthSjis(self, unpadded != 0 ? text : padded);
 }
 #endif
 ```
@@ -406,19 +408,19 @@ trusting" instruction. **Hit a real, distinct problem doing so**: the
 preserved body's own forward declaration --
 
 ```c
-void func_80041020(Obj6EAC0 *self, char *text);
+void EncodeFullWidthSjis(Obj6EAC0 *self, char *text);
 ```
 
--- conflicts with `func_80041020`'s ACTUAL signature, because that sibling
+-- conflicts with `EncodeFullWidthSjis`'s ACTUAL signature, because that sibling
 function (in this same unit) was matched earlier in round 38 as
-`u8 *func_80041020(u8 *dst, u8 *src)`. The preserved body predates that
-match and could never have compiled as written once `func_80041020` had a
+`u8 *EncodeFullWidthSjis(u8 *dst, u8 *src)`. The preserved body predates that
+match and could never have compiled as written once `EncodeFullWidthSjis` had a
 real prototype in scope. Fixed by dropping the stale forward declaration
 (the real one, defined earlier in the file in ROM-address order, is
 already visible) and casting at the call site: `self` is not actually a
 `u8 *`, but the disassembly's `move $a0,$s5` (passing `self` unmodified as
-`func_80041020`'s `dst` argument) is unambiguous, so
-`func_80041020((u8 *)self, (u8 *)(unpadded != 0 ? text : padded))` is the
+`EncodeFullWidthSjis`'s `dst` argument) is unambiguous, so
+`EncodeFullWidthSjis((u8 *)self, (u8 *)(unpadded != 0 ? text : padded))` is the
 correct spelling, not a hack -- retail really does hand this transcoder
 function a pointer to something that is, at this call site, being treated
 as a raw byte destination. With that fix, the round-35 body **rebuilds and
@@ -428,17 +430,17 @@ confirmed, not stale.
 Set up and ran the permuter from the fixed, linkable body:
 
 ```
-tools/setup-permuter.sh func_8004109C <seed>
+tools/setup-permuter.sh FormatFullWidthNumber <seed>
 PATH=$PWD/permuter-work/bin:$PATH \
   .venv/bin/python3 tools/decomp-permuter/permuter.py --debug --stack-diffs \
-    permuter-work/func_8004109C
+    permuter-work/FormatFullWidthNumber
 ```
 
 `--debug` confirmed the base score against the report before searching:
 
 ```
 Register Differences:          7  (5)
-[func_8004109C] base score = 35
+[FormatFullWidthNumber] base score = 35
 ```
 
 7 register differences at penalty 5 = 35, matching the report's own 7-word
@@ -449,7 +451,7 @@ Bounded search:
 ```
 timeout 600 env PATH=$PWD/permuter-work/bin:$PATH \
   .venv/bin/python3 tools/decomp-permuter/permuter.py -j 6 \
-    --stop-on-zero --best-only --stack-diffs permuter-work/func_8004109C
+    --stop-on-zero --best-only --stack-diffs permuter-work/FormatFullWidthNumber
 ```
 
 Zero found at **iteration 733**, `permuter rc=0` (ran to completion). The
@@ -482,7 +484,7 @@ functions needed renaming) and re-verified through the real oracle:
 ```
 build exit=0
 OK: build matches retail
-func_8004109C: 56/56 words match (file 0x3189C-0x3197C)
+FormatFullWidthNumber: 56/56 words match (file 0x3189C-0x3197C)
 ```
 
 **Byte-exact. `INCLUDE_ASM` replaced with real C.** Final matched body:
@@ -493,7 +495,7 @@ extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern int strlen(char *s);
 extern char *itoa(int n);
 
-void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
+void FormatFullWidthNumber(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
     char text[width + 1];
     s32 fill;
     char padded[width + 1];
@@ -504,7 +506,7 @@ void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
         memset((unsigned char *)padded, '0', width);
         strcpy(&padded[fill], text);
     }
-    func_80041020((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
+    EncodeFullWidthSjis((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
 }
 ```
 
@@ -520,8 +522,8 @@ report was written and when its preserved body is next rebuilt.** This is
 a variant of CLAUDE.md's "prototype for a function another unit defines
 belongs in your own .c" hazard, but INSIDE one unit rather than across
 units: a preserved body's own local forward declaration of
-`func_80041020` (guessed as `(Obj6EAC0*, char*)` before that function had
-any real signature) silently went stale the moment `func_80041020` itself
+`EncodeFullWidthSjis` (guessed as `(Obj6EAC0*, char*)` before that function had
+any real signature) silently went stale the moment `EncodeFullWidthSjis` itself
 was matched earlier in the SAME round with a different, real signature.
 Any report whose preserved body forward-declares a function that is ALSO
 live in the same unit's queue should be re-checked for this before
@@ -538,4 +540,23 @@ combined expression into separate statements when retail's disassembly
 shows the same value materialized in two steps (e.g., `move` from a call
 return THEN a separate arithmetic op)" to the register-identity toolkit
 alongside declaration order and reused-variable-vs-fresh-local (the lever
-that closed `func_80041020` earlier this same round).
+that closed `EncodeFullWidthSjis` earlier this same round).
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_8004109C` | `FormatFullWidthNumber` | A |
+
+**Evidence.** A pure leaf whose mechanics are its whole purpose (tier A by
+the plan's own rule for "a getter, a clamp, a list push"): converts `a1`
+to a decimal string (`itoa`+`strcpy`), zero-pads it to `width` unless
+`unpadded` is set, then feeds the result through `EncodeFullWidthSjis`
+(this same unit, confirmed tier A against real SJIS codes). Its own
+caller (`src/class_3bb8c_c.c:168`, `FormatFullWidthNumber(D_8008AA24,
+arg0, 3, 0)`) passes a plain buffer as the first argument, not an
+`Obj6EAC0 *`, confirming this function (despite living in this file and
+sharing its dominant `self`-typed signature style) is unrelated to the
+`Obj6EAC0` class.
