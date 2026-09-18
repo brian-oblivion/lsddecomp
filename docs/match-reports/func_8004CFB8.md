@@ -318,3 +318,77 @@ apart, because cc1 expands that pair together during RTL expansion, before
 any block layout decision. So when screening for block-order candidates,
 a `mult`/`div`/`mflo`/`mfhi` residue is a *negative* indicator, not a
 neutral one.
+
+---
+
+## Round 53 (bravo) — CALIBRATION attempt, one fresh shape, regressed the already-solved half, negative
+
+Assigned as one of three functions in a round-53 Sonnet calibration slot for
+the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `func_8004CD38`
+and `func_8004CAF0`. This report's disposition (round 18: "bounded search
+exhausted its time budget with no improvement, NOT permuter-exhausted") is
+the reason it was picked over the plan's higher-ranked but
+levers-measurably-spent `code_2cc8c_e` job.
+
+**Checked whether anything relevant changed since round 25.** The
+`nop_mflo_mfhi` toolchain blocker was resolved in round 42
+(`--no-nop-mflo-mfhi`, already in `Makefile`'s `MASPSX_FLAGS`) — a flag
+change touching exactly the `mflo`/`mult` pairing this function's residue is
+about, and this report's most recent entry predates it. On inspection this
+does not apply: round 25's attempt 6 (and the report's own text) already
+established the eager-vs-deferred `mflo` placement as a cc1 RTL-expansion
+choice, verified by inspecting cc1's OWN `.s` output directly — upstream of
+maspsx entirely. `--no-nop-mflo-mfhi` changes how maspsx pads a
+`mflo`/`mfhi` immediately followed by `mult`/`div`; it cannot change WHEN
+cc1 decides to emit the `mflo` in the first place. Rebuilt the "Best-attempt
+body" fresh to confirm: still exactly **25/28**, same shape as originally
+recorded — the flag changed nothing here, as expected.
+
+**Attempt 8** (a new shape): keep the "default value, then conditionally
+overwritten" idiom (already proven for the FIRST half's store-sharing
+problem, and for this same second half via a `val` local in attempt 2), but
+write directly to `self->unk1E0` both times instead of through an
+intermediate `val`:
+
+```c
+self->unk1E0 = self->unk1E4->unk6 * rate;
+if (rate < 0) {
+    self->unk1E0 = self->unk1E4->unk6 * (~rate + 1);
+}
+```
+
+This differs from attempt 2 (used a `val` local, eager `mflo`, first half
+still byte-exact) and from attempts 4/5 (no shared default at all, direct
+field writes, both worse). Attempt 8 is the direct-field-write variant OF
+the shape that already gets the closest — untried combination.
+
+**Result: 15/28, WORSE, and it broke the already-solved first half too.**
+The table-selection code (byte-exact since round 9) diverged starting at the
+very first `%lo(D_8008699C)` immediate — the built object referenced a
+DIFFERENT static table entry at that position than retail/every prior
+attempt. Nothing about the first half's source changed; only the second
+half's assignment target did. This means writing directly to the struct
+field (vs. through a local) perturbed cc1's block-layout choice for the
+WHOLE function, not just the second half — the two halves are not
+independently compiled the way their separately-diagnosed residues implied.
+Reverted (`git checkout -- src/class_3bb8c_b.c`; clean `OK: build matches
+retail` confirmed immediately after).
+
+**Disposition unchanged: `INCLUDE_ASM`, still 25/28 (best-attempt body from
+round 9/18), still a genuine cc1 RTL-expansion choice, not
+permuter-exhausted** (round 18's bounded search: 36023 iterations, never
+below the seed's own score). This is the honest negative half of this
+round's Sonnet track-1 calibration measurement.
+
+### Proposed learning
+
+**A direct-field-write variant of an already-working local-variable idiom is
+not a safe substitution to try in isolation — it can regress an
+UNRELATED, already-solved half of the same function.** The intermediate
+`val` local in attempt 2 looked purely cosmetic (same value, same eventual
+store) but removing it changed cc1's block layout for the whole compilation
+unit enough to pick a different table-selection code path in the FIRST
+half, which no earlier attempt's source touched. Treat "swap a local for a
+direct field write" as a whole-function-scope experiment, not a local one —
+build after every such swap even when the target statement is nowhere near
+the part you believe you are testing.
