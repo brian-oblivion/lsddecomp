@@ -11,7 +11,7 @@ copy at the end (below).
 ## Derivation
 
 ```c
-extern void func_8004109C(void *self, s32 a1, s32 width, s32 unpadded);
+extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
 typedef struct {
     s8 a, b, c, d, e, f;
@@ -19,14 +19,14 @@ typedef struct {
 
 void func_8004D6AC(s32 arg0)
 {
-    func_8004109C(D_8008AA24, arg0, 3, 0);
+    FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
     *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
 }
 ```
 
-`func_8004109C` (matched round 38, `src/code_2cc8c_f.c`) formats `arg0` as a
+`FormatFullWidthNumber` (matched round 38, `src/code_2cc8c_f.c`) formats `arg0` as a
 zero-padded 3-digit decimal string into the buffer pointed to by
-`D_8008AA24`. This unit keeps `func_8004109C`'s `self` parameter opaque
+`D_8008AA24`. This unit keeps `FormatFullWidthNumber`'s `self` parameter opaque
 (`void *`) rather than pulling in `Obj6EAC0` from `code_2cc8c.h`, since
 nothing here touches its fields — just a pass-through pointer, per the
 project's independent-local-view convention.
@@ -36,7 +36,7 @@ project's independent-local-view convention.
 `D_8008AA10`/`D_8008AA18` VALUE-of `%gp_rel` globals — same pattern: the ROM
 image initializes it to a rodata placeholder (`D_8008AA1C`, the "7654321"
 string in `asm/data/7B12C.sdata.s`) but the runtime value is a writable
-buffer that `func_8004109C` formats into.
+buffer that `FormatFullWidthNumber` formats into.
 
 The 6-byte copy afterward is the interesting part, and needed three
 structurally distinct attempts to land:
@@ -51,7 +51,7 @@ structurally distinct attempts to land:
 2. **Second attempt** — split the trailing two bytes out of the struct into
    two separate scalar statements (`dst[4] = src[4]; dst[5] = src[5];`)
    computed via local `s8 *src, *dst;` pointer variables assigned BEFORE the
-   `func_8004109C` call. This forced `src`/`dst` to be kept alive ACROSS the
+   `FormatFullWidthNumber` call. This forced `src`/`dst` to be kept alive ACROSS the
    call, spilling them into callee-saved `s0`/`s1` with a much larger
    prologue/epilogue that retail does not have — retail computes both
    pointers fresh (via `%gp_rel`) AFTER the call returns, using only

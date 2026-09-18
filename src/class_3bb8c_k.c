@@ -365,7 +365,7 @@ void func_8005278C(Class86F88 *self)
  * (`s32 strlen(void *arg0)`); this unit's own call site reads its
  * argument as a byte pointer, so it is typed `char *` here instead --
  * per-call-site typing of an undefined function's argument, same
- * convention as func_80040FC0 (see include/class_3bb8c.h HEAD NOTE).
+ * convention as DecodeFullWidthSjis (see include/class_3bb8c.h HEAD NOTE).
  * memcpy's return type is `void *` to agree with include/psyq/MEMORY.H's
  * unprototyped declaration should this unit ever include it; the result
  * is discarded at the one call site either way. */

@@ -1081,7 +1081,7 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, func_8004DE08's own call: `(self, buf)` where `buf` is a
-     * pool-allocated string this function fills with `func_80040FC0`
+     * pool-allocated string this function fills with `DecodeFullWidthSjis`
      * before the call and frees right after. */
     void (*slotCC)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
 };
@@ -1486,7 +1486,7 @@ extern void *D_8008AA10;
 extern void *D_8008AA18;
 
 /* Same VALUE-of `%gp_rel` pattern, read (and its buffer formatted into via
- * func_8004109C) by round 45's `func_8004D6AC` (src/class_3bb8c_c.c). Holds
+ * FormatFullWidthNumber) by round 45's `func_8004D6AC` (src/class_3bb8c_c.c). Holds
  * `D_8008AA1C` in the ROM image -- the "7654321" placeholder string
  * (`asm/data/7B12C.sdata.s`) -- so, like `D_8008AA18` above, this is a
  * writable-buffer placeholder rather than the real runtime value. */
@@ -2720,7 +2720,7 @@ struct Obj86ED0 {
     s32 unk1C;                   /* +0x01C, func_80050F28 (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
     s32 unk20;                   /* +0x020, func_80051200 (zeroed) */
     char *unk24;                 /* +0x024, func_80050F28: its own `arg1` (name string) */
-    char *unk28;                 /* +0x028, func_80050CE8 (freed in finalize)/func_80050F28 (func_80040FC0/strcpy destination) */
+    char *unk28;                 /* +0x028, func_80050CE8 (freed in finalize)/func_80050F28 (DecodeFullWidthSjis/strcpy destination) */
     s32 unk2C;                   /* +0x02C, func_80051200 (zeroed)/func_800512C8 (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/func_80051370 (range-checked against [2,4)) */
     s32 unk30;                   /* +0x030, func_800512C8 (zeroed)/func_80051370 (incremented; gates the slot54 call on the OLD value being nonzero) */
     void *unk34;                 /* +0x034, func_80050D30/func_80050DB4 (addChild/removeChild target when child's tag==2)/func_800512C8/func_80051270 (removeChild target) */
@@ -2748,9 +2748,9 @@ struct Obj86ED0 {
  * runner bravo did with `Class86ED0` deliberately. The TYPES below stay
  * here because they are the richer, measured view; only the symbol moved. */
 
-/* HEAD NOTE round 15: alpha's `extern char *func_80040FC0(char *dest, char
+/* HEAD NOTE round 15: alpha's `extern char *DecodeFullWidthSjis(char *dest, char
  * *src);` moved into src/class_3bb8c_i.c -- FOURTH instance of the
- * shared-header prototype rule this round. func_80040FC0 is still
+ * shared-header prototype rule this round. DecodeFullWidthSjis is still
  * INCLUDE_ASM in code_2cc8c_f, so NOBODY has its definition and every
  * declaration is a call-site typing; class_3bb8c_i reads it as
  * `char *(char *, char *)` and class_3bb8c_j as `void (void *, void *)`.

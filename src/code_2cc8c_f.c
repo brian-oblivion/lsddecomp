@@ -269,13 +269,13 @@ Obj6EAC0Methods *func_80040FB0(void) {
     return &D_8006EB90;
 }
 
-/* func_80040FC0 -- MATCHED round 38 (24/24). A permuter search (208
+/* DecodeFullWidthSjis -- MATCHED round 38 (24/24). A permuter search (208
  * iterations, rc=0) closed the last residue: retail materializes the
  * 0x40 comparison constant into its own register BEFORE copying `dst`
  * into `d`, and GCC 2.6.3 only reproduces that emission order when the
  * constant is named by a separate local assigned first. See
- * docs/match-reports/func_80040FC0.md. */
-u8 *func_80040FC0(u8 *dst, u8 *src) {
+ * docs/match-reports/DecodeFullWidthSjis.md. */
+u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 special;
     u32 c;
@@ -304,15 +304,15 @@ u8 *func_80040FC0(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* func_80041020 -- MATCHED round 38 (31/31). Round 37 got structure and
+/* EncodeFullWidthSjis -- MATCHED round 38 (31/31). Round 37 got structure and
  * length exact via the two-cursor idiom (`d = dst; dst++; *d = x;`),
  * leaving a pure 3-way register-identity residue. A permuter search
  * (158 iterations, rc=0) closed it: copying the second byte's value
  * into its own local (`trail`) before using it in the comparisons and
  * arithmetic, instead of reusing `c` directly, changes GCC 2.6.3's
  * register allocation to match retail's exactly. See
- * docs/match-reports/func_80041020.md. */
-u8 *func_80041020(u8 *dst, u8 *src) {
+ * docs/match-reports/EncodeFullWidthSjis.md. */
+u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
     u32 v;
@@ -347,7 +347,7 @@ u8 *func_80041020(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* func_8004109C -- MATCHED round 38 (56/56). Round 35 got structure and
+/* FormatFullWidthNumber -- MATCHED round 38 (56/56). Round 35 got structure and
  * length exact (padded/text VLAs, strlen/itoa naming fixed post-SDK-object
  * renaming) leaving a 4-value register-identity residue (fill/text
  * swapped relative to retail). A permuter search (733 iterations, rc=0)
@@ -355,16 +355,16 @@ u8 *func_80041020(u8 *dst, u8 *src) {
  * padded/text) PLUS splitting `fill = width - strlen(...)` into two
  * statements (`fill = strlen(...); fill = width - fill;`) together
  * reproduce retail's exact register assignment. Also fixed a stale
- * prototype: the preserved body's forward declaration of func_80041020
+ * prototype: the preserved body's forward declaration of EncodeFullWidthSjis
  * as `(Obj6EAC0 *, char *)` predates that function's own round-38 match
- * as `u8 *func_80041020(u8 *, u8 *)` -- calling it now needs `self` cast
- * to `u8 *`. See docs/match-reports/func_8004109C.md. */
+ * as `u8 *EncodeFullWidthSjis(u8 *, u8 *)` -- calling it now needs `self` cast
+ * to `u8 *`. See docs/match-reports/FormatFullWidthNumber.md. */
 extern char *strcpy(char *dst, char *src);
 extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern int strlen(char *s);
 extern char *itoa(int n);
 
-void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
+void FormatFullWidthNumber(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
     char text[width + 1];
     s32 fill;
     char padded[width + 1];
@@ -375,5 +375,5 @@ void func_8004109C(Obj6EAC0 *self, s32 a1, s32 width, s32 unpadded) {
         memset((unsigned char *)padded, '0', width);
         strcpy(&padded[fill], text);
     }
-    func_80041020((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
+    EncodeFullWidthSjis((u8 *)self, (u8 *)(unpadded != 0 ? text : padded));
 }
