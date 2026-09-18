@@ -7,7 +7,7 @@
 ## What it does
 
 The constructor for the `D_8006D430` class (its own vtable slot `+0x008`,
-per `include/code_171e0.h`'s `UnkFlagsObjMethods_171e0`). Chains the base
+per `include/code_171e0.h`'s `Class6D430Methods`). Chains the base
 class's constructor first (`Get_vtable_BasicClass()->ctor(this)`), then installs
 this class's own vtable pointer (fetched via the already-matched
 `GetClass6D430Methods`, which just returns `&D_8006D430`), then zeroes every field
@@ -32,16 +32,16 @@ sh    $zero, 0x28($s0)       ; this->unk28 = 0
 sh    $zero, 0x2A($s0)       ; this->unk2A = 0
 ```
 
-This is where every offset in `UnkFlagsObj_171e0` beyond `+0x24` (the only
+This is where every offset in `Class6D430` beyond `+0x24` (the only
 field known before this unit's round) was derived — a straight-line
 field-by-field zeroing matches straight-line C with no reordering needed.
 
 ## Final C
 
 ```c
-void Class6D430__Class6D430(UnkFlagsObj_171e0 *this) {
+void Class6D430__Class6D430(Class6D430 *this) {
     Get_vtable_BasicClass()->ctor(this);
-    this->methods = (UnkFlagsObjMethods_171e0 *) GetClass6D430Methods();
+    this->methods = (Class6D430Methods *) GetClass6D430Methods();
     this->unk0C = 0;
     this->unk10 = NULL;
     this->unk14 = 0;
@@ -95,7 +95,16 @@ initialise fields) ARE its purpose, so tier A by the plan's own rule.
 
 ## Proposed field names
 
-`UnkFlagsObj_171e0` is shared with `code_179d8_h.c`/`code_179d8_q.c`
+**APPLIED by the head at merge, round 52** -- all four fields, both types
+and all five vtable slots below are now in the tree, each one applied
+separately with `./build-and-verify.sh` green and byte-exact after it. One
+mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
+The compiler named that mis-hit (`structure has no member named 'unk0C'`),
+which is the procedure working in the direction where it can work.
+
+`Class6D430` is shared with `code_179d8_h.c`/`code_179d8_q.c`
 (see `Class6D430__AllocBuffer.md`); every field this constructor zeroes is
 therefore checked, and only `flags` (this round's own rename, zero
 cross-unit hits) renamed outright. The rest:

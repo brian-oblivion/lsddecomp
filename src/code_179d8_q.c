@@ -42,7 +42,7 @@
  * resolves that slot to func_80027800 (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class D_8006D430 (include/code_171e0.h's
- * UnkFlagsObjMethods_171e0) leaves the identical offset unnamed -- this
+ * Class6D430Methods) leaves the identical offset unnamed -- this
  * stays an independent local view, per the project's multiple-local-views
  * convention, rather than an edit to that shared header. */
 typedef struct Methods6D4E8_C80 Methods6D4E8_C80;

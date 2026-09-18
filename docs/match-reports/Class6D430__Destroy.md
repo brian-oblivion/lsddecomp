@@ -34,7 +34,7 @@ bare call-then-return-something-else.
 ## Final C
 
 ```c
-void *Class6D430__Destroy(UnkFlagsObj_171e0 *this) {
+void *Class6D430__Destroy(Class6D430 *this) {
     this->methods->slot48(this);
     return this->methods->slot5C(this);
 }
@@ -45,7 +45,7 @@ void *Class6D430__Destroy(UnkFlagsObj_171e0 *this) {
 Two attempts. The first (correct call sequence) showed 19/21 in-range, with
 both mismatches at `lw $v0, N($v0)` instructions where `N` was wrong (`0x14`
 and `0x20` instead of `0x48` and `0x5C`) — not a control-flow or register
-problem at all, but a **struct-layout bug**: `UnkFlagsObjMethods_171e0` in
+problem at all, but a **struct-layout bug**: `Class6D430Methods` in
 `include/code_171e0.h` declared `slot44`/`slot48`/`slot4C`/`slot54`/`slot5C`
 immediately after `dtor` with no padding, so the C struct actually placed
 `slot44` at byte offset `0x10`, not the intended `0x44` — the `/* +0x44 */`
@@ -86,7 +86,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_80026AB4` | `Class6D430__Destroy` | B |
 
 **Evidence.** The class's own destructor, `+0x00C` slot (the `dtor` field
-already named in `UnkFlagsObjMethods_171e0`). Calls the subclass-overridable
+already named in `Class6D430Methods`). Calls the subclass-overridable
 hook `slot48` (null at this level) then tail-calls `slot5C`
 (`Class6D430__FreeBuffer` at this class's own level, though dispatched
 indirectly). Mechanics known (release the hook, then the buffer); whether
@@ -97,7 +97,7 @@ not established.
 
 | slot | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `+0x05C` (`slot5C`) | `freeBuffer` | B | Resolves to `Class6D430__FreeBuffer` at this class's own level (confirmed by dumping `D_8006D430`'s raw words), dispatched indirectly. Per the project's "vtable slots named like the method they dispatch to" convention. Proposed rather than renamed only because the slot's declaration lives in the shared, cross-unit-exposed `UnkFlagsObjMethods_171e0`. |
+| `+0x05C` (`slot5C`) | `freeBuffer` | B | Resolves to `Class6D430__FreeBuffer` at this class's own level (confirmed by dumping `D_8006D430`'s raw words), dispatched indirectly. Per the project's "vtable slots named like the method they dispatch to" convention. Proposed rather than renamed only because the slot's declaration lives in the shared, cross-unit-exposed `Class6D430Methods`. |
 
 See `Class6D430__AllocBuffer.md` for `+0x048`'s proposal (`onBufferChanged`),
 also dispatched from this function. Posted to the broadcast.

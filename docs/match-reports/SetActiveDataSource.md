@@ -101,7 +101,7 @@ Every structurally-equivalent C rewrite tried in round 43 (a `for(;;)` with
 same with the formal parameter `arg0` reused as the `val` slot to try to
 pin it to `$a0`'s "home" register, dropping the named `fn` variable and
 calling through `*entry` directly, and typing `val`/`ret` as
-`UnkFlagsObj_171e0 *` instead of `void *`) makes this project's pinned GCC
+`Class6D430 *` instead of `void *`) makes this project's pinned GCC
 2.6.3 allocate a THIRD callee-saved register (`$s2`) for `val` and round-trip
 it through TWO extra `move` instructions per production/consumption instead
 of flowing straight through `$a0`/`$v0` -- consistently **38 words (3 over)**
@@ -143,7 +143,7 @@ covers and a longer or differently-seeded run might still find something.
 ```c
 extern void *D_8006D4AC[];
 
-void Class6D430__CopyFields(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src);
+void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src);
 
 void SetActiveDataSource(s32 arg0) {
     void *ret;

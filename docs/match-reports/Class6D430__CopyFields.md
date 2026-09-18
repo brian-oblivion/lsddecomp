@@ -6,7 +6,7 @@
 
 ## What it does
 
-A field-by-field copy from one `UnkFlagsObj_171e0` instance into another:
+A field-by-field copy from one `Class6D430` instance into another:
 `+0x40`..`+0x58` (7 words), then a gap of 3 words (`+0x5C`..`+0x64`, not
 copied), then `+0x68`..`+0x74` (4 words).
 
@@ -32,14 +32,14 @@ which *is* a block copy) — so this is a straight sequence of per-field
 assignments, not a `struct` value copy or a loop. The 3-word gap
 (`+0x5C`..`+0x64`) is real: retail's instruction stream jumps straight from
 `+0x58` to `+0x68` with no intervening load/store, so those offsets are
-deliberately excluded from the copy, not merely unread — `UnkFlagsObj_171e0`
+deliberately excluded from the copy, not merely unread — `Class6D430`
 leaves them as an unnamed `pad5C` array rather than guessing a name for
 them.
 
 ## Final C
 
 ```c
-void Class6D430__CopyFields(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
+void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src) {
     dst->unk40 = src->unk40;
     dst->unk44 = src->unk44;
     dst->unk48 = src->unk48;
@@ -87,15 +87,24 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_80026D88` | `Class6D430__CopyFields` | B |
 
 **Evidence.** A field-by-field copy of a fixed subset of one
-`UnkFlagsObj_171e0` instance's fields into another (`+0x40..+0x58`,
+`Class6D430` instance's fields into another (`+0x40..+0x58`,
 `+0x68..+0x74`, skipping a real 0xC-byte gap). Mechanics fully derived
 (confirmed instruction-by-instruction, not a struct-value copy); why these
 specific fields travel together and not the gap is not established.
 
 ## Proposed field names
 
+**APPLIED by the head at merge, round 52** -- all four fields, both types
+and all five vtable slots below are now in the tree, each one applied
+separately with `./build-and-verify.sh` green and byte-exact after it. One
+mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
+The compiler named that mis-hit (`structure has no member named 'unk0C'`),
+which is the procedure working in the direction where it can work.
+
 Same cross-unit exposure (`code_179d8_h.c`/`code_179d8_q.c` include
-`UnkFlagsObj_171e0`), so PROPOSED, not renamed. None of `unk40`/`unk44`/
+`Class6D430`), so PROPOSED, not renamed. None of `unk40`/`unk44`/
 `unk48`/`unk4C`/`unk50`/`unk54`/`unk58`/`unk68`/`unk6C`/`unk70`/`unk74` has
 any evidence beyond "copied together, in this order, with a real 0xC-byte
 gap between the two runs" -- no read or write site elsewhere in this unit

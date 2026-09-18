@@ -15,8 +15,8 @@ extern s32 D_8006D3C8[];
 /* Some class instance (a slot of D_8006D430's table, going by
  * classtable.py) with at least one flag word at offset 0x24, OR'd with 1 by
  * Class6D430__SetFlag. The full layout is derived further down this file, once
- * the method table type it needs (UnkFlagsObjMethods_171e0) is declared. */
-typedef struct UnkFlagsObj_171e0 UnkFlagsObj_171e0;
+ * the method table type it needs (Class6D430Methods) is declared. */
+typedef struct Class6D430 Class6D430;
 
 /* Method table (header 0x00000003) for a second class. Several of this
  * unit's own functions are its slots: DestroyChained (slot 0, offset +0x004),
@@ -67,39 +67,39 @@ extern s32 strlen(char *s);
  * queued functions actually dispatch through are typed; the rest are
  * skipped rather than padded out to +0x0B0, since nothing here ever
  * instantiates this struct by value. */
-typedef struct UnkFlagsObjMethods_171e0 UnkFlagsObjMethods_171e0;
-struct UnkFlagsObjMethods_171e0 {
+typedef struct Class6D430Methods Class6D430Methods;
+struct Class6D430Methods {
     /* +0x00 */ s32 header;
-    /* +0x04 */ void *(*ownDtorChain)(UnkFlagsObj_171e0 *self); /* DestroyChained */
-    /* +0x08 */ void (*ctor)(UnkFlagsObj_171e0 *self);          /* Class6D430__Class6D430 */
-    /* +0x0C */ void *(*dtor)(UnkFlagsObj_171e0 *self);         /* Class6D430__Destroy */
+    /* +0x04 */ void *(*ownDtorChain)(Class6D430 *self); /* DestroyChained */
+    /* +0x08 */ void (*ctor)(Class6D430 *self);          /* Class6D430__Class6D430 */
+    /* +0x0C */ void *(*dtor)(Class6D430 *self);         /* Class6D430__Destroy */
     /* +0x10 */ u8 pad10[0x44 - 0x10];      /* inherited BasicClass slots + null slots */
-    /* +0x44 */ void (*slot44)(UnkFlagsObj_171e0 *self, s32 arg1, s32 arg2, s32 arg3);
-    /* +0x48 */ void (*slot48)(UnkFlagsObj_171e0 *self);
-    /* +0x4C */ s32 (*slot4C)(UnkFlagsObj_171e0 *self, s32 arg1, s32 arg2);
+    /* +0x44 */ void (*configureBuffer)(Class6D430 *self, s32 arg1, s32 arg2, s32 arg3);
+    /* +0x48 */ void (*onBufferChanged)(Class6D430 *self);
+    /* +0x4C */ s32 (*bufferControl)(Class6D430 *self, s32 arg1, s32 arg2);
     /* +0x50 */ u8 pad50[0x54 - 0x50];      /* null slot */
-    /* +0x54 */ void (*slot54)(UnkFlagsObj_171e0 *self, void *arg1, s32 arg2);
+    /* +0x54 */ void (*installBuffer)(Class6D430 *self, void *arg1, s32 arg2);
     /* +0x58 */ u8 pad58[0x5C - 0x58];      /* Class6D430__AllocBuffer's own slot, unused here */
-    /* +0x5C */ void *(*slot5C)(UnkFlagsObj_171e0 *self);       /* Class6D430__FreeBuffer, dispatched
+    /* +0x5C */ void *(*freeBuffer)(Class6D430 *self);       /* Class6D430__FreeBuffer, dispatched
                                                                   * indirectly even though this
                                                                   * class's own copy is known */
 };
 
-/* An instance of the D_8006D430 class. UnkFlagsObj_171e0's own name and the
+/* An instance of the D_8006D430 class. Class6D430's own name and the
  * flags field (formerly unknown_value_0x24) predate this unit's work (see
  * Class6D430__SetFlag); fields below it are new, derived from Class6D430__Class6D430 (the ctor, which
- * zeroes them), Class6D430__AllocBuffer/Class6D430__FreeBuffer (unk0C/unk10/unk14/unk20) and
+ * zeroes them), Class6D430__AllocBuffer/Class6D430__FreeBuffer (pendingGeneration/buffer/bufferSize/freeGuard) and
  * Class6D430__CopyFields (the unk40..unk74 block, a field-by-field copy -- retail
  * copies +0x40..+0x58 then jumps a 0xC-byte gap to +0x68..+0x74, so that gap
  * is left unnamed rather than guessed at). */
-struct UnkFlagsObj_171e0 {
-    /* +0x00 */ UnkFlagsObjMethods_171e0 *methods;
+struct Class6D430 {
+    /* +0x00 */ Class6D430Methods *methods;
     /* +0x04 */ u8 pad04[0x0C - 0x04];       /* BasicClass instance fields; owned elsewhere */
-    /* +0x0C */ s32 unk0C;                   /* saved/restored around the unk10 (re)alloc */
-    /* +0x10 */ void *unk10;                 /* resource from func_80017B34; freed via func_80017CFC */
-    /* +0x14 */ s32 unk14;                   /* unk10's allocation size */
+    /* +0x0C */ s32 pendingGeneration;                   /* saved/restored around the buffer (re)alloc */
+    /* +0x10 */ void *buffer;                 /* resource from func_80017B34; freed via func_80017CFC */
+    /* +0x14 */ s32 bufferSize;                   /* buffer's allocation size */
     /* +0x18 */ u8 pad18[0x20 - 0x18];       /* unknown, 8 bytes */
-    /* +0x20 */ u16 unk20;                   /* nonzero blocks the unk10 free in Class6D430__FreeBuffer */
+    /* +0x20 */ u16 freeGuard;                   /* nonzero blocks the buffer free in Class6D430__FreeBuffer */
     /* +0x22 */ u16 unk22;
     /* +0x24 */ s32 flags;                   /* bit 0 set by Class6D430__SetFlag; only bit
                                                   established so far, meaning unknown */

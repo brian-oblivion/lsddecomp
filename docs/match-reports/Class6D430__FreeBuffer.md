@@ -34,7 +34,7 @@ than re-fetching it, which is exactly what plain sequential C produces here
 ## Final C
 
 ```c
-void Class6D430__FreeBuffer(UnkFlagsObj_171e0 *this) {
+void Class6D430__FreeBuffer(Class6D430 *this) {
     if (this->unk10 == NULL) {
         return;
     }
@@ -52,7 +52,7 @@ void Class6D430__FreeBuffer(UnkFlagsObj_171e0 *this) {
 ## Attempt log
 
 Matched on the first real attempt (once written against the corrected
-`UnkFlagsObj_171e0` struct). An earlier diff run against this function showed
+`Class6D430` struct). An earlier diff run against this function showed
 0/24 and a pure 1-word shift for its entire body — that was **not** a bug in
 this function; it was downstream drift from `Class6D430__AllocBuffer`'s wrong-sized
 allocator call (see that report) shifting every address after it in the
@@ -92,7 +92,16 @@ this specific guard is not.
 
 ## Proposed field names
 
-Same cross-unit exposure as `Class6D430__AllocBuffer.md` (`UnkFlagsObj_171e0`
+**APPLIED by the head at merge, round 52** -- all four fields, both types
+and all five vtable slots below are now in the tree, each one applied
+separately with `./build-and-verify.sh` green and byte-exact after it. One
+mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
+The compiler named that mis-hit (`structure has no member named 'unk0C'`),
+which is the procedure working in the direction where it can work.
+
+Same cross-unit exposure as `Class6D430__AllocBuffer.md` (`Class6D430`
 is shared with `code_179d8_h.c`/`code_179d8_q.c`), so PROPOSED, not renamed:
 
 | field | proposed name | tier | evidence |

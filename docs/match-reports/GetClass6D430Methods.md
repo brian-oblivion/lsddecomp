@@ -56,17 +56,17 @@ Pure leaf, mechanics are its purpose.
 
 ## Proposed type names
 
-Not renamed (types aren't `rename.py` symbols, and `UnkFlagsObj_171e0`/
-`UnkFlagsObjMethods_171e0` are used by `code_179d8_h.c` too -- same
+Not renamed (types aren't `rename.py` symbols, and `Class6D430`/
+`Class6D430Methods` are used by `code_179d8_h.c` too -- same
 cross-unit exposure as the fields below), but proposed for the head to
 apply as a whole-tree replace, since a `ClassNNNN__Method` function prefix
 (this round gave the class's own functions `Class6D430__` names) reading
-against a struct still called `UnkFlagsObj_171e0` is an inconsistency this
+against a struct still called `Class6D430` is an inconsistency this
 unit's own header already predicted ("Not yet named or typed field-by-field"):
 
 | type | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `UnkFlagsObj_171e0` | `Class6D430` | C | Matches this round's `Class6D430__*` function-name token (the vtable's own address, per the project's existing `Class6B5CC`/`Class6D3C8`/`Class6D4E8` convention for a class whose real name is not yet established). |
-| `UnkFlagsObjMethods_171e0` | `Class6D430Methods` | C | Same convention, applied to the method-table type. |
+| `Class6D430` | `Class6D430` | C | Matches this round's `Class6D430__*` function-name token (the vtable's own address, per the project's existing `Class6B5CC`/`Class6D3C8`/`Class6D4E8` convention for a class whose real name is not yet established). |
+| `Class6D430Methods` | `Class6D430Methods` | C | Same convention, applied to the method-table type. |
 
 Posted to the broadcast.

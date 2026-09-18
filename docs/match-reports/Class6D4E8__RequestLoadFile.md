@@ -21,7 +21,7 @@ carries the evidence for each one.
  * resolves that slot to func_80027800 (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class D_8006D430 (include/code_171e0.h's
- * UnkFlagsObjMethods_171e0) leaves the identical offset unnamed -- this
+ * Class6D430Methods) leaves the identical offset unnamed -- this
  * stays an independent local view, per the project's multiple-local-views
  * convention, rather than an edit to that shared header. */
 typedef struct Methods6D4E8_C80 Methods6D4E8_C80;
@@ -150,7 +150,7 @@ allows.
   prototypes are identical types and nothing conflicts.
 - `self`'s own `+0x58` method-table slot is the identical offset the sibling
   class `D_8006D430` leaves as an unnamed pad in
-  `include/code_171e0.h`'s `UnkFlagsObjMethods_171e0` ("Class6D430__AllocBuffer's own
+  `include/code_171e0.h`'s `Class6D430Methods` ("Class6D430__AllocBuffer's own
   slot, unused here"). Rather than editing that shared header — which
   `code_179d8_h.c` and `code_171e0.c` also include —
   this unit keeps its own local view (`Methods6D4E8_C80`/`Obj6D4E8_C80`), per the
@@ -203,6 +203,15 @@ so the object it lands in is not identifiable from any path. A name here
 would be invention.
 
 ## Proposed field names
+
+**APPLIED by the head at merge, round 52** -- all four fields, both types
+and all five vtable slots below are now in the tree, each one applied
+separately with `./build-and-verify.sh` green and byte-exact after it. One
+mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
+The compiler named that mis-hit (`structure has no member named 'unk0C'`),
+which is the procedure working in the direction where it can work.
 
 Applied in this unit (all three of its object views are local to the `.c`).
 The SAME physical fields carry `unk` names in two sibling units' own local

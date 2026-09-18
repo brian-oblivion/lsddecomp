@@ -208,6 +208,15 @@ element. Turning names into disc positions is the entire function; tier A.
 
 ## Proposed field names
 
+**APPLIED by the head at merge, round 52** -- all four fields, both types
+and all five vtable slots below are now in the tree, each one applied
+separately with `./build-and-verify.sh` green and byte-exact after it. One
+mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+accesses `pendingGeneration` on a `Class6D430 *self`, while the same file's
+lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
+The compiler named that mis-hit (`structure has no member named 'unk0C'`),
+which is the procedure working in the direction where it can work.
+
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
 | code_179d8_s | `Rec80028448` | `unk14` | `pos` | A | same 0x1C record; filled from `CdSearchFile`'s `CdlFILE.pos` |

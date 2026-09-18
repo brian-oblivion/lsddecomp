@@ -48,7 +48,7 @@
  * the check for your own functions rather than inheriting either verdict.
  */
 #include "common.h"
-/* code_171e0.h's UnkFlagsObj_171e0/UnkFlagsObjMethods_171e0 already
+/* code_171e0.h's Class6D430/Class6D430Methods already
  * describe D_8006D430's class exactly -- func_80028898 dispatches
  * GetClass6D430Methods()->ctor(self) (offset +0x008), matching that header's own
  * ctor slot. Reused UNCHANGED per CLAUDE.md's header discipline (a sibling
@@ -57,15 +57,15 @@
 
 /* GetClass6D4E8Methods is still uncarved (asm/code_179d8.s) -- returns &D_8006D4E8,
  * a DIFFERENT class table (tools/classtable.py --scan: 29 slots, header
- * 0x13) than D_8006D430. func_80028898 chains UnkFlagsObj_171e0's base ctor
+ * 0x13) than D_8006D430. func_80028898 chains Class6D430's base ctor
  * then overwrites self->methods with this class's own table -- the
  * standard "call base ctor, then install the derived vtable" idiom. Typed
- * against UnkFlagsObjMethods_171e0 for the assignment's sake; the two
+ * against Class6D430Methods for the assignment's sake; the two
  * tables are different classes but share the base's slot layout. */
-extern UnkFlagsObjMethods_171e0 *GetClass6D4E8Methods(void);
+extern Class6D430Methods *GetClass6D4E8Methods(void);
 
 /* func_80028A34/func_80028A50's own `self` -- offsets +0xC/+0x1C happen to
- * coincide with UnkFlagsObj_171e0::unk0C and its documented-unknown pad18
+ * coincide with Class6D430::unk0C and its documented-unknown pad18
  * gap, but that header is code_171e0.c's shared reading and is off-limits
  * to edit here (out of unit) -- kept as this unit's own LOCAL, narrower
  * view per the project's multiple-independent-local-views convention. */
@@ -137,14 +137,14 @@ extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 extern char D_8008A8A8[]; /* ";1", the ISO9660 CD file-version suffix */
 
-void func_80028898(UnkFlagsObj_171e0 *self) {
-    ((UnkFlagsObjMethods_171e0 *)GetClass6D430Methods())->ctor(self);
+void func_80028898(Class6D430 *self) {
+    ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
     self->methods = GetClass6D4E8Methods();
-    self->unk0C = 0;
+    self->pendingGeneration = 0;
 }
 
-void *func_800288E0(UnkFlagsObj_171e0 *self) {
-    return ((UnkFlagsObjMethods_171e0 *)GetClass6D430Methods())->dtor(self);
+void *func_800288E0(Class6D430 *self) {
+    return ((Class6D430Methods *)GetClass6D430Methods())->dtor(self);
 }
 
 void func_80028918(void) {

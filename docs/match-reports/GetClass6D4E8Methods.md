@@ -20,7 +20,7 @@ vtable is `D_8006D4E8` (29 slots, header word `0x13`, resolved with
   `+0x070`/`+0x074`)
 
 Compared against `D_8006D430` (`include/code_171e0.h`'s
-`UnkFlagsObjMethods_171e0`) with `classtable.py D_8006D4E8 --vs D_8006D430`:
+`Class6D430Methods`) with `classtable.py D_8006D4E8 --vs D_8006D430`:
 `DestroyChained` at `+0x004` and `Class6D430__FreeBuffer`/`NoOp`/
 `Class6D430__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
 between the two tables, strongly suggesting `D_8006D4E8`'s class is a

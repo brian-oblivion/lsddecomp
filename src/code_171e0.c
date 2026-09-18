@@ -2,8 +2,8 @@
  * code_171e0 -- Class6D430's own module, plus an active-data-source
  * dispatch layer built on top of it.
  *
- * Class6D430 (UnkFlagsObj_171e0/UnkFlagsObjMethods_171e0) is a small
- * BasicClass subclass holding one lazily-(re)allocated buffer (unk10/unk14,
+ * Class6D430 (Class6D430/Class6D430Methods) is a small
+ * BasicClass subclass holding one lazily-(re)allocated buffer (buffer/bufferSize,
  * managed by Class6D430__AllocBuffer/FreeBuffer) plus a flags word.
  * D_8006D4E8 (the CD-ROM read driver, code_179d8_q.c) shares its own
  * +0x004/+0x05C/+0x060/+0x064 slots with it verbatim (DestroyChained/
@@ -37,76 +37,76 @@ void *GetClass6D3C8Methods(void) {
     return D_8006D3C8;
 }
 
-void *DestroyChained(UnkFlagsObj_171e0 *this) {
-    this->unk20 = 0;
+void *DestroyChained(Class6D430 *this) {
+    this->freeGuard = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
     func_80017CFC(this);
     return NULL;
 }
 
-void Class6D430__Class6D430(UnkFlagsObj_171e0 *this) {
+void Class6D430__Class6D430(Class6D430 *this) {
     Get_vtable_BasicClass()->ctor(this);
-    this->methods = (UnkFlagsObjMethods_171e0 *) GetClass6D430Methods();
-    this->unk0C = 0;
-    this->unk10 = NULL;
-    this->unk14 = 0;
-    this->unk20 = 0;
+    this->methods = (Class6D430Methods *) GetClass6D430Methods();
+    this->pendingGeneration = 0;
+    this->buffer = NULL;
+    this->bufferSize = 0;
+    this->freeGuard = 0;
     this->unk22 = 0;
     this->flags = 0;
     this->unk28 = 0;
     this->unk2A = 0;
 }
 
-void *Class6D430__Destroy(UnkFlagsObj_171e0 *this) {
-    this->methods->slot48(this);
-    return this->methods->slot5C(this);
+void *Class6D430__Destroy(Class6D430 *this) {
+    this->methods->onBufferChanged(this);
+    return this->methods->freeBuffer(this);
 }
 
-void Class6D430__AllocBuffer(UnkFlagsObj_171e0 *this, s32 arg1) {
-    s32 savedUnk0C;
+void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
+    s32 savedPendingGeneration;
     s32 size;
     void *newRes;
 
-    if (this->unk10 != NULL) {
+    if (this->buffer != NULL) {
         return;
     }
-    savedUnk0C = this->unk0C;
-    this->unk0C = 0;
-    this->methods->slot44(this, arg1, 1, 0);
-    size = this->methods->slot4C(this, 0, 2);
+    savedPendingGeneration = this->pendingGeneration;
+    this->pendingGeneration = 0;
+    this->methods->configureBuffer(this, arg1, 1, 0);
+    size = this->methods->bufferControl(this, 0, 2);
     newRes = func_80017B34(size);
     if (newRes != NULL) {
-        this->methods->slot4C(this, 0, 0);
-        this->methods->slot54(this, newRes, size);
-        this->methods->slot48(this);
-        this->unk10 = newRes;
-        this->unk14 = size;
-        this->unk0C = savedUnk0C;
+        this->methods->bufferControl(this, 0, 0);
+        this->methods->installBuffer(this, newRes, size);
+        this->methods->onBufferChanged(this);
+        this->buffer = newRes;
+        this->bufferSize = size;
+        this->pendingGeneration = savedPendingGeneration;
     } else {
         func_80017CFC(NULL);
-        this->methods->slot48(this);
+        this->methods->onBufferChanged(this);
     }
 }
 
-void Class6D430__FreeBuffer(UnkFlagsObj_171e0 *this) {
-    if (this->unk10 == NULL) {
+void Class6D430__FreeBuffer(Class6D430 *this) {
+    if (this->buffer == NULL) {
         return;
     }
-    if (this->unk14 == 0) {
+    if (this->bufferSize == 0) {
         return;
     }
-    if (this->unk20 != 0) {
+    if (this->freeGuard != 0) {
         return;
     }
-    func_80017CFC(this->unk10);
-    this->unk10 = NULL;
+    func_80017CFC(this->buffer);
+    this->buffer = NULL;
 }
 
 void NoOp(void) {
 }
 
-void Class6D430__SetFlag(UnkFlagsObj_171e0 *this) {
+void Class6D430__SetFlag(Class6D430 *this) {
     this->flags |= 1;
 }
 
@@ -135,7 +135,7 @@ Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
 
 INCLUDE_ASM("asm/nonmatchings/code_171e0", SetActiveDataSource);
 
-void Class6D430__CopyFields(UnkFlagsObj_171e0 *dst, UnkFlagsObj_171e0 *src) {
+void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src) {
     dst->unk40 = src->unk40;
     dst->unk44 = src->unk44;
     dst->unk48 = src->unk48;

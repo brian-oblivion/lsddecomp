@@ -7,7 +7,7 @@
 ## What it does
 
 Slot `+0x004` of the `D_8006D430` method table (see `include/code_171e0.h`'s
-`UnkFlagsObjMethods_171e0`). It clears one flag, then explicitly chains
+`Class6D430Methods`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
 itself `Class6D430__Destroy`, resolved through the vtable rather than by name) and
 the base class's (`Get_vtable_BasicClass()->dtor`, `BasicClassMethods.dtor`), then
@@ -48,7 +48,7 @@ disassembly.
 ## Final C
 
 ```c
-void *DestroyChained(UnkFlagsObj_171e0 *this) {
+void *DestroyChained(Class6D430 *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
