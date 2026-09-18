@@ -1430,6 +1430,38 @@ extern BasicClassMethodsCC8C *Get_vtable_BasicClass(void);
  * "per-call-site convention" (see docs/DECOMPILATION_LEARNINGS.md) --
  * narrower call sites cast the slot to a narrower function-pointer type
  * rather than widening every call to match one struct-wide signature.
+ *
+ * NAMED round 54 (runner alpha, track 3). Struct name kept as `Obj6EAC0`
+ * (no independent class identity established; renaming it would also
+ * collide with the still-unresolved `ClassEAC0Obj` dual-view note above,
+ * which is a bigger, separate merge). Every FIELD/METHOD name below is
+ * new this round; see each function's own `docs/match-reports/*.md` for
+ * the evidence trail. The composite picture that came out of naming this
+ * unit's own functions (tier B, not independently confirmed against any
+ * other unit): this looks like a small on-screen TEXT/DIGIT DISPLAY --
+ * `hasChildren`==0 instances are single-character leaf glyphs (`SetChar`),
+ * `hasChildren`!=0 instances are containers holding a `children` array of
+ * more `Obj6EAC0`s laid out along one axis (`posX`/`posY` as a running
+ * cursor, advanced by `childPitch` per child, with one extra +0x10 gap
+ * inserted at `gapIndex` -- plausibly a decimal-point/separator slot).
+ * The evidence: `New_Obj6EAC0(ctx, count, text)` builds an N-child
+ * instance and its `text` argument flows straight through construction
+ * into `Obj6EAC0__SetText`, which walks a NUL-terminated byte string
+ * dispatching one child per character; and this SAME unit's
+ * `FormatFullWidthNumber`/`EncodeFullWidthSjis` (unrelated free functions
+ * that happen to live in this file, confirmed by their OWN callers
+ * elsewhere to take a plain buffer, not an `Obj6EAC0 *`, despite sharing
+ * this file's dominant `self`-typed signature style) build exactly the
+ * kind of zero-padded, Shift-JIS-encoded digit string this class's own
+ * `SetText` would consume. No caller outside this unit constructs or
+ * touches an `Obj6EAC0` (confirmed: `grep -rl Obj6EAC0 src/*.c` finds only
+ * this file and one dead comment in `class_3bb8c_c.c`), so this reading
+ * is internally consistent but not cross-checked against any other unit's
+ * independent evidence -- treat "text/digit display" as the working
+ * hypothesis this unit's own functions all agree with, not a confirmed
+ * fact. `unk44`/`unk48`/`unk4C`/`unk60`/`unk62` are left unrenamed:
+ * nothing in this unit's functions gives them a purpose beyond "a stored
+ * word"/"a stored halfword" (see their own field comments below).
  */
 typedef struct Obj6EAC0 Obj6EAC0;
 typedef struct Obj6EAC0Methods Obj6EAC0Methods;

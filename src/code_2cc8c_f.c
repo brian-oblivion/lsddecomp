@@ -1,3 +1,27 @@
+/*
+ * code_2cc8c_f -- the `Obj6EAC0` class (base table `D_8006EAC0`, override
+ * table `D_8006EB90`; see include/code_2cc8c.h for the full derivation)
+ * plus three unrelated free functions that happen to live in this file
+ * (`DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
+ * confirmed by their OWN callers elsewhere to take a plain buffer, not an
+ * `Obj6EAC0 *`, despite matching this file's dominant `self`-typed style).
+ *
+ * Named round 54 (runner alpha, track 3); every non-`func_` symbol below
+ * is new this round. Working hypothesis (tier B, this unit's own evidence
+ * only -- see include/code_2cc8c.h's own `Obj6EAC0` comment for the full
+ * case): a small on-screen text/digit display. A leaf instance
+ * (`hasChildren`==0) is one character glyph (`SetChar`); a container
+ * instance holds a `children` array laid out along one axis, `posX`/
+ * `posY` as a running cursor advanced by `childPitch` per child, with one
+ * extra gap inserted at `gapIndex` (plausibly a decimal point). `SetText`
+ * walks a string dispatching one child per byte, and this file's own
+ * `FormatFullWidthNumber` builds exactly the padded, Shift-JIS-encoded
+ * digit string `SetText` would consume.
+ *
+ * All 20 non-trivial functions in this unit are MATCHED; zero live
+ * INCLUDE_ASM, zero NON_MATCHING bodies. `Obj6EAC0__NoOpSetter`/
+ * `Obj6EAC0__NoOpSlotD0` are splat-generated `jr $ra; nop` occupants.
+ */
 #include "common.h"
 #include "code_2cc8c.h"
 
