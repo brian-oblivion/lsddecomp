@@ -128,7 +128,7 @@ void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b);
 void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4);
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 
-/* func_80056DF0/func_80056E1C/func_80056E44 are defined in class_3bb8c_o.c
+/* Noop/func_80056E1C/func_80056E44 are defined in class_3bb8c_o.c
  * (own their addresses, own local view "LinkOwnerObj"/"LinkElemObj") with
  * signatures of 0 or 1 pointer argument. Every call site in THIS unit still
  * sets up a second argument register that those bodies never read (retail's
@@ -140,7 +140,7 @@ extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55d
  * later IN THIS FILE (func_80056520 calls it, ROM-earlier than its own
  * definition). func_800569A8 is likewise defined later in this file, and
  * func_80056640 forwards a dead second argument to it the same way. */
-extern void func_80056DF0();
+extern void Noop();
 extern void func_80056E1C();
 extern void func_80056E44();
 extern void func_80056BBC();
@@ -211,7 +211,7 @@ void func_80056640(LinkNode *self, void *arg1) {
         func_800569A8(self, arg1);
         break;
     case 2:
-        func_80056DF0(self, arg1);
+        Noop(self, arg1);
         break;
     case 3:
         func_80056E44(self, arg1);
