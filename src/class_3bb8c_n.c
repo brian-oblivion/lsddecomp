@@ -287,7 +287,7 @@ void func_80054B50(void) {
 
 extern s32 D_8008AC80;
 extern s32 D_8008AC7C;
-extern void func_80056F5C(s32 arg0, void *arg1, s32 arg2, s32 arg3);
+extern void BaseObjO__func_56f5c(s32 arg0, void *arg1, s32 arg2, s32 arg3);
 extern s32 rand(void);
 extern s8 D_80087324[];
 extern s32 D_8008AC88;
@@ -307,7 +307,7 @@ void func_80054B84(void *arg0) {
         return;
     }
     base = D_8008AC7C;
-    func_80056F5C(D_8008AC80, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
+    BaseObjO__func_56f5c(D_8008AC80, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
     val = D_80087324[rand() & 3];
     count = (D_8008AC80 == 2) ? 0x10 - val : 0;
     D_8008AC88 = val + count;

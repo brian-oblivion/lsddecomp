@@ -44,7 +44,7 @@ the same symbol (`code_2cc8c.h`'s `void ReleaseBasicClassArray(void *a0, void *a
 
 `this` is NOT the same class as `BaseObjO` (the shared intermediate base
 class the rest of this unit implements, see the file banner) -- `+0x84`
-would overflow that class's 0x58-byte allocation (`func_80056FE4`). It is
+would overflow that class's 0x58-byte allocation (`New_BaseObjO`). It is
 kept as its own independent local type, `LinkOwnerObj`, established
 together with `LinkOwnerObj__RandomizeLinks` (which walks indices 1..4 of the SAME
 5-element array) and `LinkOwnerObj__ReleaseLinksB` (byte-identical body to this

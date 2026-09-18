@@ -1,4 +1,6 @@
-# func_80056F5C -- MATCHED, round 44 (2026-09-15)
+> Renamed from `func_80056F5C` on 2026-09-18 (tools/rename.py). Address 0x80056f5c.
+
+# BaseObjO__func_56f5c -- MATCHED, round 44 (2026-09-15)
 
 Unit `class_3bb8c_o`. **34/34 words, byte-exact, first build.** Reopened,
 never attempted before this round.
@@ -24,7 +26,7 @@ extern s32 D_8008AB94;
 
 extern void func_80020510(void *arg0, void *arg1);
 
-void func_80056F5C(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
+void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 

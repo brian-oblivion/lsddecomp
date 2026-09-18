@@ -1,7 +1,9 @@
-# func_80056FE4 -- MATCHED (24/24 words)
+> Renamed from `func_80056FE4` on 2026-09-18 (tools/rename.py). Address 0x80056fe4.
 
-Unit: `class_3bb8c_o` (round 17). `New_BaseObjO` -- allocates 0x58 bytes,
-constructs, frees and returns `NULL` on construction failure.
+# New_BaseObjO -- MATCHED (24/24 words)
+
+Unit: `class_3bb8c_o` (round 17). The BaseObjO allocator -- allocates 0x58
+bytes, constructs, frees and returns `NULL` on construction failure.
 
 ## Final source
 
@@ -10,7 +12,7 @@ extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern BaseObjOMethods *func_80057C84(void);
 
-void *func_80056FE4(void) {
+void *New_BaseObjO(void) {
     BaseObjO *self = func_80017B34(0x58);
 
     if (self != NULL) {

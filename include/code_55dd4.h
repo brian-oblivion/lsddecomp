@@ -275,7 +275,7 @@ extern Class65650Methods *func_80066818(void);
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: func_80065830 passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
-extern void *func_80056FE4(void);
+extern void *New_BaseObjO(void);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).
  * func_80065C5C/func_80065CEC are the +0x5C sub-object's setup/teardown

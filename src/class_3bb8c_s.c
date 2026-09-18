@@ -150,7 +150,7 @@ extern void func_800569A8();
  * three arguments for real. */
 extern void *func_80057C94(void *arg1, void *arg2, void *arg3);
 
-/* Three globals a class_3bb8c_o.c ctor-shaped function (func_80056F5C)
+/* Three globals a class_3bb8c_o.c ctor-shaped function (BaseObjO__func_56f5c)
  * captures once from its own three pointer-typed parameters -- D_8008ACA4 is
  * some other object (first field a methods pointer, called through a new
  * +0x080 slot below), D_8008ACA8 is forwarded opaquely to func_80057C94 as
@@ -263,8 +263,8 @@ void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4)
  * arr7C slots, fold a table-driven contribution into a local Vec3 (either
  * into .x, scaled by *self->unk68, or straight into .y, depending on
  * self->unk6C), then either forward it to an existing child's slotB8 or
- * spin up a brand new child via func_80056FE4/Class6B5CC__LinkModel/func_800567D4. */
-extern void *func_80056FE4(void);        /* class_3bb8c_o.c, New_X allocator */
+ * spin up a brand new child via New_BaseObjO/Class6B5CC__LinkModel/func_800567D4. */
+extern void *New_BaseObjO(void);        /* class_3bb8c_o.c, New_X allocator */
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 extern Vec3S D_800877EC;
 extern s32 D_800877F8[];
@@ -290,7 +290,7 @@ void func_80056858(LinkNode *self, s32 reuse) {
             LinkNode *child = *p;
             child->methods->slotB8(child, &accum);
         } else {
-            LinkNode *child = func_80056FE4();
+            LinkNode *child = New_BaseObjO();
             *p = child;
             Class6B5CC__LinkModel(child, self->unk20);
             func_800567D4(*p, self, &accum, self->unk64, self->unk68);

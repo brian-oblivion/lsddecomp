@@ -293,7 +293,7 @@ s32 func_80065E1C(Class65650 *self)
     self->unk6C = 0;
     if (count != 0) {
         do {
-            *p = func_80056FE4();
+            *p = New_BaseObjO();
             __asm__("");
             if (*p == NULL) {
                 goto fail;

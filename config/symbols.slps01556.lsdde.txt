@@ -672,3 +672,5 @@ LinkOwnerObj__ReleaseLinks = 0x80056DF8; // type:func
 LinkOwnerObj__func_56e1c = 0x80056E1C; // type:func
 LinkOwnerObj__RandomizeLinks = 0x80056E44; // type:func
 LinkOwnerObj__ReleaseLinksB = 0x80056F28; // type:func
+BaseObjO__func_56f5c = 0x80056F5C; // type:func
+New_BaseObjO = 0x80056FE4; // type:func

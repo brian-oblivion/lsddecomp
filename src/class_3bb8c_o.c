@@ -19,7 +19,7 @@
  * Blocker census, three-grep screen run per function at carve time:
  * 19 of the 20 clean.
  *
- * func_80056F5C: was gp_rel. MATCHED round 44, 34/34, first build.
+ * BaseObjO__func_56f5c: was gp_rel. MATCHED round 44, 34/34, first build.
  *
  * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
  * rodata sub-slot is attached to this unit.
@@ -213,7 +213,7 @@ struct BaseObjOMethods {
     u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
     void (*slot40)(BaseObjO *self);                                     /* +0x040, called by func_80057044's own ctor; occupant outside this unit */
     u8 pad44[0x80 - 0x44];                                                /* +0x044 .. +0x07F */
-    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by func_80056F5C (this unit); occupant outside this unit (D_800876FC's slot80 is func_8001D4AC, a BasicClass-range function) */
+    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by BaseObjO__func_56f5c (this unit); occupant outside this unit (D_800876FC's slot80 is func_8001D4AC, a BasicClass-range function) */
     u8 pad84[0x8C - 0x84];                                                /* +0x084 .. +0x08B */
     void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by func_800571F8 */
     void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by func_800571F8 */
@@ -252,7 +252,7 @@ extern s32 D_8008AB94;
 
 extern void func_80020510(void *arg0, void *arg1);
 
-void func_80056F5C(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
+void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 
@@ -271,7 +271,7 @@ extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern BaseObjOMethods *func_80057C84(void);
 
-void *func_80056FE4(void) {
+void *New_BaseObjO(void) {
     BaseObjO *self = func_80017B34(0x58);
 
     if (self != NULL) {
