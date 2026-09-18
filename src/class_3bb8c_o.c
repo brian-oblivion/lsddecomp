@@ -35,7 +35,7 @@
  * Confirmed round 17 (runner bravo): the slice really does span (at least)
  * two classes.
  *
- *  - func_80056DF8/func_80056E44/func_80056F28 operate on a DIFFERENT,
+ *  - LinkOwnerObj__ReleaseLinks/LinkOwnerObj__RandomizeLinks/LinkOwnerObj__ReleaseLinksB operate on a DIFFERENT,
  *    larger object (fields observed at +0x84/+0x88, an inline 5-element
  *    `BasicClass *` array) that is unrelated to the class below -- no
  *    shared header claims it, so it is kept purely local to this file
@@ -66,13 +66,13 @@ void Noop(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * Group 1: func_80056DF8 / func_80056E44 / func_80056F28.
+ * Group 1: LinkOwnerObj__ReleaseLinks / LinkOwnerObj__RandomizeLinks / LinkOwnerObj__ReleaseLinksB.
  * Self is some larger object with an inline 5-element `BasicClass *`
- * array at +0x084.  func_80056DF8/func_80056F28 release the whole array
+ * array at +0x084.  LinkOwnerObj__ReleaseLinks/LinkOwnerObj__ReleaseLinksB release the whole array
  * (ReleaseBasicClassArray, already established elsewhere as
  * `void ReleaseBasicClassArray(BasicClass **array, s32 count)` in code_8220_b.c --
  * kept generic `void **` here per this project's per-unit convention for
- * that symbol, e.g. code_2cc8c.h's own looser reading).  func_80056E44
+ * that symbol, e.g. code_2cc8c.h's own looser reading).  LinkOwnerObj__RandomizeLinks
  * walks array indices [1..4] (self+0x88 .. self+0x94), which is exactly
  * inside the same 5-element array, and for each element calls its own
  * vtable slot +0x048 with a random Vec3-ish table entry, then sets the
@@ -99,7 +99,7 @@ typedef struct LinkElemMethods {
 struct LinkElemObj {
     LinkElemMethods *methods; /* +0x000 */
     u8 pad4[0x80];             /* +0x004 .. +0x083, unknown */
-    s32 unk84;                   /* +0x084, a random "angle" set by func_80056E44 */
+    s32 unk84;                   /* +0x084, a random "angle" set by LinkOwnerObj__RandomizeLinks */
 };
 
 typedef struct LinkOwnerObj {
@@ -107,17 +107,17 @@ typedef struct LinkOwnerObj {
     LinkElemObj *arr84[5];        /* +0x084 .. +0x097 */
 } LinkOwnerObj;
 
-void func_80056DF8(LinkOwnerObj *this) {
+void LinkOwnerObj__ReleaseLinks(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->arr84, 5);
 }
 
 extern void func_80056D18(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void func_80056E1C(void *this) {
+void LinkOwnerObj__func_56e1c(void *this) {
     func_80056D18(this, 0, 0, 0);
 }
 
-void func_80056E44(LinkOwnerObj *this) {
+void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
     LinkElemObj **p = &this->arr84[1];
     s32 i;
 
@@ -129,7 +129,7 @@ void func_80056E44(LinkOwnerObj *this) {
     }
 }
 
-void func_80056F28(LinkOwnerObj *this) {
+void LinkOwnerObj__ReleaseLinksB(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->arr84, 5);
 }
 

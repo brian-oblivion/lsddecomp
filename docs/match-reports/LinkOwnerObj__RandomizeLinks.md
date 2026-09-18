@@ -1,4 +1,6 @@
-# func_80056E44 -- MATCHED (57/57 words)
+> Renamed from `func_80056E44` on 2026-09-18 (tools/rename.py). Address 0x80056e44.
+
+# LinkOwnerObj__RandomizeLinks -- MATCHED (57/57 words)
 
 Unit: `class_3bb8c_o` (round 17). Walks 4 elements of the 5-element
 `arr84` array (indices 1..4), and for each one calls its own vtable
@@ -11,7 +13,7 @@ random "angle" field.
 extern s32 rand(void);
 extern Vec3O D_8008788C[];
 
-void func_80056E44(LinkOwnerObj *this) {
+void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
     LinkElemObj **p = &this->arr84[1];
     s32 i;
 

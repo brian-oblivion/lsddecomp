@@ -112,8 +112,8 @@ struct LinkNode {
                                                                 LinkOwnerObj::arr84 */
 };
 
-extern void func_80056DF8(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
-extern void func_80056F28(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
+extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
+extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void func_800573A8(void *self, Vec3S *v);   /* class_3bb8c_t.c */
 extern void func_80056D18(void *self, s32 a1, s32 a2, void *tbl); /* below */
 extern s32 D_80087844[];
@@ -128,7 +128,7 @@ void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b);
 void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4);
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 
-/* Noop/func_80056E1C/func_80056E44 are defined in class_3bb8c_o.c
+/* Noop/LinkOwnerObj__func_56e1c/LinkOwnerObj__RandomizeLinks are defined in class_3bb8c_o.c
  * (own their addresses, own local view "LinkOwnerObj"/"LinkElemObj") with
  * signatures of 0 or 1 pointer argument. Every call site in THIS unit still
  * sets up a second argument register that those bodies never read (retail's
@@ -141,8 +141,8 @@ extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55d
  * definition). func_800569A8 is likewise defined later in this file, and
  * func_80056640 forwards a dead second argument to it the same way. */
 extern void Noop();
-extern void func_80056E1C();
-extern void func_80056E44();
+extern void LinkOwnerObj__func_56e1c();
+extern void LinkOwnerObj__RandomizeLinks();
 extern void func_80056BBC();
 extern void func_800569A8();
 
@@ -192,7 +192,7 @@ void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
         func_80056BBC(self, 0);
         break;
     case 3:
-        func_80056E1C(self, 0);
+        LinkOwnerObj__func_56e1c(self, 0);
         break;
     default:
         break;
@@ -214,7 +214,7 @@ void func_80056640(LinkNode *self, void *arg1) {
         Noop(self, arg1);
         break;
     case 3:
-        func_80056E44(self, arg1);
+        LinkOwnerObj__RandomizeLinks(self, arg1);
         break;
     default:
         break;
@@ -232,10 +232,10 @@ void func_80056718(LinkNode *self) {
         func_80056B8C(self);
         break;
     case 2:
-        func_80056DF8(self);
+        LinkOwnerObj__ReleaseLinks(self);
         break;
     case 3:
-        func_80056F28(self);
+        LinkOwnerObj__ReleaseLinksB(self);
         break;
     default:
         break;
