@@ -337,6 +337,22 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   1/69) applied to all four. Small straight-line bodies only; per-return, never
   whole-function. (a §"`do{...}while(0)` is a REGISTER-PRESSURE lever", §"`do { } while
   (0)` wrapping is a SMALL-BODY lever", §"Two levers from the re-send")
+- **The "mention a value twice" lever needs a value with a genuine SECOND, INDEPENDENT
+  USE POINT, not merely a second textual mention.** This is what reconciles round 19's
+  close (duplicating `hSpan` into `hSpan2` for one of three writes closed a register)
+  with the INERT entry below saying a same-valued alias is copy-propagated away: `hSpan`
+  is assigned once and used at two points with a gap, so the alias SPLITS a lifetime.
+  Round 53 applied the identical trick to `self` on `func_8004CAF0` — a parameter live
+  continuously, referenced at every method call — and got a byte-identical 55/97. Before
+  spending an attempt on a register-rotation stall, ask which of the two the candidate
+  value is; only the lifetime-splitting kind has ever paid here. (round 53, bravo)
+- **Swapping an intermediate local for a direct field write is a WHOLE-FUNCTION
+  experiment, not a local one.** On `func_8004CFB8` the `val` local looked cosmetic (same
+  value, same eventual store), but removing it changed cc1's block layout enough to pick
+  a different table-selection path in the function's already-solved FIRST half, which no
+  attempt's source had touched — 25/28 down to 15/28. Build and score the whole function
+  after every such swap, even when the statement you edited is nowhere near the part you
+  believe you are testing. (round 53, bravo)
 - **Levers measured INERT — do not re-derive.** C89 `register` (the legal form) is a no-op
   for allocation; a clobber-bearing barrier is no better than an empty one; a dummy unused
   SCALAR cannot nudge frame allocation; a same-valued alias is collapsed by copy

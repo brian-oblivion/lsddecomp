@@ -6,6 +6,166 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-18 — round 53: track 2's first run, the Sonnet calibration's first countable attempts, and two jobs the plan ranks first that a head keeps skipping
+
+Head on Opus, three runners (operator capped the round at three, nearing an
+API limit). First round to fill all three open tracks at once, which is what
+revision 3's round-robin job list was for. Gate 0 green first try. All three
+worktrees byte-verified before handover.
+
+**State at end: 1138 matched / 1252 game functions, 0 fresh, 114 stalled.
+Track 1 calibration sonnet 0/3 of its six attempts. Track 2 at 98 named / 44
+`func_`. Track 3 at 7/75 units, 959 defs still `func_` (was 969). Build
+verifies.**
+
+### Two deviations from the literal top of the ready-jobs list
+
+Both were contention- or screen-driven, and the first is the more important.
+
+**The top track-1 job, `code_2cc8c_e`, was skipped.** All three of its
+functions (`func_8004042C`, `func_80040024`, `func_800400B0`) carry a round-46
+`DELIBERATE SKIP -- levers measurably spent` verdict, and the runner budget
+forbids re-attempting such a function absent a named CHANGED state. The unit
+has not passed track 3, so the revisit rule supplies no trigger either. It was
+replaced with `class_3bb8c_b`, whose three reports say the opposite in as many
+words ("NOT permuter-exhausted in the guide's technical sense"). **`plan.py`
+ranks stalls by title figures and does not read a levers-spent verdict, so it
+put `code_2cc8c_e` back at the top of the list the moment the round ended.**
+That is the §6 trigger — the fix is in the tool, not in a head skipping the
+same job every round.
+
+**The top track-3 unit, `code_2cc8c_f`, was swapped for `code_179d8_r`**
+because `code_2cc8c_f` calls 6 of the 46 symbols the track-2 runner was about
+to rename, and `rename.py` rewrites call sites in `src/`. The two runners would
+have edited one file. `code_2cc8c_f` goes back to the top next round with the
+collision gone.
+
+### alpha, `code_179d8_r` (track 3) — the CD-ROM read state machine
+
+All 10 functions and all 7 `D_` globals named, plus a local typedef
+(`CdRequestNode`), one field, four parameters, two named constants
+(`CD_CMD_SETLOC`, `CD_WAIT_TIMEOUT`) and a rewritten unit header comment. The
+unit is the small state machine behind the CD driver: a phase global
+(`gCdState`) cycling seek → poll → read → poll, a request queue, and linear
+lookups over a flat table of 0x1C-byte string records.
+
+The runner **falsified its own hypothesis before it became a name.** The two
+tick functions looked like "seek-only vs read" from their state values alone;
+call-site cross-referencing showed `TickCdLoadFileStateMachine` is used
+exclusively by the `Class6D4E8__RequestLoadFile` worker. Both stayed **tier B**
+rather than taking an operation-specific tier-A name. Head sampled five names
+against their bodies before `mark-unit`: `StartCdOperation` and
+`ResetCdStateMachine` are exact mirrors, `GetCdFileEntry` is pure index
+arithmetic where `FindCdFileEntry` is a `strstr` scan (which is what earns the
+Find/Get split). No wrong tier-A name. Zero cross-unit field names proposed,
+so no type-scoped rename for the head to apply.
+
+Incidental, not a defect to fix: `FindCdFileEntry` and `FindCdFileIndex` both
+return on the not-found path without calling `UnlockCd()`. The build is
+byte-exact, so that lock leak is retail's.
+
+### bravo, `class_3bb8c_b` (track 1) — three worked stalls, three negatives
+
+The first attempts that count toward the Sonnet half of the stop rule
+(`0/3` of six). Zero matches, honestly documented rather than padded, which is
+what a calibration measurement needs.
+
+- `func_8004CD38` — a genuinely new axis (single nested ternary collapsing all
+  five outcomes) produced a *third* distinct compiled shape at the same 2/27
+  and recovered neither missing instruction.
+- `func_8004CFB8` — checked the round-42 `--no-nop-mflo-mfhi` flag against this
+  residue and **correctly ruled it out**: the flag pads a `mflo`/`mult` pairing
+  inside maspsx, and cannot change when cc1 decides to emit the `mflo`. Baseline
+  rebuilt to confirm 25/28 before attempting.
+- `func_8004CAF0` — two untried levers (full local-declaration reorder; the
+  round-19 "mention it twice" trick applied to `self`), both byte-identical
+  55/97, both now recorded inert.
+
+Two of its three proposed learnings were promoted to
+DECOMPILATION_LEARNINGS §3d. The first resolves an apparent contradiction the
+doc already contained: the INERT list says a same-valued alias is collapsed by
+copy propagation, yet round 19 closed a register by duplicating `hSpan`. The
+reconciliation is a precondition — the lever needs a value with a genuine
+second, independent USE POINT whose lifetime the alias can SPLIT, not a
+parameter already live for the whole body. The second: swapping an intermediate
+local for a direct field write is a whole-function experiment, not a local one
+(here it regressed an already-solved *other half* of the same function from
+25/28 to 15/28 by changing block layout).
+
+### charlie, track 2's first ever run — 2 identified, 44 parked
+
+`sdkname.py --selfcheck 10` recovered 9/9 placed functions exactly, floor 1.00,
+so the tool was trusted for the round. **`DrawSync`** (libgpu/sys, masked 1.00
+EXACT + `LIBGPU.H` prototype agreeing with the call site) and **`GsSortClear`**
+(libgs/gs_001, masked 1.00 + `LIBGS.H`) were named. The other 44 were parked
+under the track's park rule with their best candidate, score and position
+evidence written into the symbols file.
+
+2 of 46 is a low yield and an honest one: the track section predicts exactly
+this for a top candidate below ~0.6 masked with no EXACT — a function from a
+library build the discs do not carry. The park comments are the round's real
+product. They record position evidence *against* as well as for: `func_8003A05C`
+draws the same 5-way `libgte/reg` tie as three siblings, but its neighbours are
+`libspu/s_sav` and `libsnd/ssvol`, so the tie is a coincidental word-shape
+collision rather than libgte.
+
+**One signature conflict, used correctly.** `func_80048CFC`'s top candidate
+`AddCOMB` is declared argument-less in `LIBCOMB.H` while the call site passes
+two arguments — evidence *against* the candidate, which is the check track 2
+adds precisely because the byte oracle cannot see a wrong signature.
+
+### The track-2 wording the codebase already contradicts
+
+Track 2's prompt says to "include the Psy-Q header in the calling unit". The
+runner found, and followed, an established round-33/34 precedent against
+exactly that: `include/code_2cc8c.h` already carries `NO LONGER DECLARED HERE`
+comments for `GsSetRefView2`, `GsClearOt`, `GsDrawOt`, `GsSetLightMode`,
+`SetFogNear` and `ResetGraph`, because a literal shared-header include of the
+real Psy-Q prototype is the `conflicting types` collision CLAUDE.md warns
+about — different call sites legitimately hold different local readings of one
+Sony function. No unit in `src/` literally `#include`s a `psyq/*.H`. The runner
+instead put local `extern SonyName(<call site's own shape>);` declarations in
+the calling `.c`, each citing the canonical prototype. **Accepted for this
+merge** — it is what CLAUDE.md's own rule about prototypes for functions
+another unit defines requires — but FINISHING-PLAN §3 track 2 and §4.4 still
+say the other thing, and reconciling them is a plan change, so it is left for
+the operator.
+
+### Merge notes
+
+The symbols file conflicted between alpha and charlie — both appended at the
+end of the file, so the resolution was to keep both blocks (checked for
+duplicate symbol definitions, none). Worth recording because it is the fourth
+way a score lies in its natural habitat: `git merge` exited 1, and only the
+`MERGE_HEAD` check stood between that and a green-looking build. Re-extract was
+required after both the alpha and charlie merges, since both changed the
+symbols file.
+
+### Two tool gaps found, neither acted on
+
+1. **`plan.py` cannot see a levers-spent verdict** and so re-ranks
+   `code_2cc8c_e` first every round (above).
+2. **`plan.py` cannot see track 2's park rule.** The track says a parked
+   function "is done for this track", but the measurement counts by name
+   prefix, so all 44 stay in `unnamed_list` and the job is re-offered intact
+   and forever.
+
+Also cosmetic: `record-round`'s `--not-calibration` help text says the
+threshold is "≥4 assignments from the ranked stall band", which contradicts
+both the function's own docstring (the criterion is *that the attempts came
+from the ranked band*) and FINISHING-PLAN's design of three-function jobs
+accumulating toward six. Recorded as calibration on the docstring's reading.
+The same "counted toward calibration" line also prints for tracks 2 and 3,
+where calibration does not apply.
+
+### Next
+
+`plan.py` offers `code_2cc8c_f` naming, the `code_2cc8c_e` stall job (see
+above), and the 44-function track-2 batch (see above). Sonnet needs three more
+countable stall attempts before Opus takes its six.
+
+---
+
 ## 2026-09-18 — round 52: three units through track 3, and a cross-unit rename guarantee the plan does not actually have
 
 Head on Opus, three runners (the operator capped the round at three, nearing

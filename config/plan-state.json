@@ -20,6 +20,16 @@
           "note": "Calibration round A (Sonnet). Both assigned functions were REOPENED-fresh, not comparably-ranked stalls: the queue's two fresh entries were a 324w and a 954w function, so round B's Opus runners should be ranked against that, not against the small-stall band. Both improved measurably without closing: func_80030980 292/324-short -> 324/324 length-exact (zero drift, 7/324 raw); func_80018464 first-ever full-function attempt, 0 -> 924/954 (30 short). Zero byte-exact matches. RE-FLAGGED (plan revision 2): not a calibration round, both assignments were fresh giants outside the ranked stall band.",
           "round": 50,
           "runners": 2
+        },
+        {
+          "attempts": 3,
+          "calibration": true,
+          "date": "2026-09-18",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Track-1 Sonnet calibration, first attempts that count. Runner bravo on class_3bb8c_b: func_8004CD38 (new nested-ternary shape, 2/27, a third distinct compiled shape, neither missing instruction recovered), func_8004CFB8 (direct-field-write variant regressed to 15/28 AND broke the already-solved first half; --no-nop-mflo-mfhi correctly ruled out as maspsx-level, downstream of cc1's mflo placement), func_8004CAF0 (full local-declaration reorder and the round-19 mention-twice trick on self, both byte-identical 55/97). Zero matches. HEAD SKIPPED plan.py's top track-1 job (code_2cc8c_e) because all three of its functions carry a round-46 DELIBERATE SKIP / levers-measurably-spent verdict and the unit has not passed track 3, so no revisit trigger; class_3bb8c_b's three explicitly say NOT permuter-exhausted.",
+          "round": 53,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -30,6 +40,18 @@
     },
     "2": {
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 46,
+          "calibration": true,
+          "date": "2026-09-18",
+          "matches": 2,
+          "model": "sonnet",
+          "note": "Track 2 FIRST RUN, runner charlie. sdkname.py --selfcheck 10 recovered 9/9 EXACT, floor 1.00. Identified DrawSync (libgpu/sys, masked 1.00 + LIBGPU.H prototype agrees with call site) and GsSortClear (libgs/gs_001, masked 1.00 + LIBGS.H agrees); 44 parked under the track park rule with per-function best candidate, score and position evidence in the symbols file. Yield is low but honest: most are from library builds the discs do not carry, exactly what the track section predicts for masked<0.6 with no EXACT. One signature conflict found and used correctly as evidence AGAINST a candidate: func_80048CFC's top candidate AddCOMB is declared argument-less in LIBCOMB.H but the call site passes two arguments.",
+          "round": 53,
+          "runners": 1
+        }
+      ],
       "status": "open"
     },
     "3": {
@@ -54,6 +76,16 @@
           "note": "three track-3 naming units (code_171e0, class_3bb8c_o, code_179d8_e); no matching runners, so nothing from the ranked stall band",
           "round": 52,
           "runners": 3
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-18",
+          "matches": 1,
+          "model": "sonnet",
+          "note": "Track 3 naming, runner alpha, unit code_179d8_r (the CD-ROM read state machine, request queue and file-table lookups). 10/10 functions and 7/7 D_ globals named, plus a local typedef, one field, four parameters, two named constants and a rewritten unit header comment. Head-reviewed 5 names against their bodies (StartCdOperation/ResetCdStateMachine exact mirrors, SetCdState, GetCdFileEntry pure index math vs FindCdFileEntry's strstr scan, FindCdFileIndex) -- no wrong tier-A name; mark-unit'd. Runner kept both tick functions at tier B after call-site cross-referencing FALSIFIED its own seek-vs-read hypothesis. Zero cross-unit field names proposed, so no type-scoped rename for the head to apply. NOTE: attempts/matches for track 3 read as units assigned / units head-reviewed and marked; rounds 51 and 52 recorded this field inconsistently.",
+          "round": 53,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -62,6 +94,7 @@
         "code_171e0": "2026-09-18",
         "code_179d8_e": "2026-09-18",
         "code_179d8_q": "2026-09-17",
+        "code_179d8_r": "2026-09-18",
         "code_8220_b": "2026-09-17",
         "code_d294_c": "2026-09-17"
       }
