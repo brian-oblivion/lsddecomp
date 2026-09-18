@@ -391,7 +391,7 @@ struct Unk68Obj {
 /* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
    New_X allocator for `ClassEAC0Obj` (see the Class6E99CObj/ClassEAC0Obj
    section far below) -- `func_80017B34(0x6C)` then
-   `func_800408BC()->ctor(self, a0, a1, a2)`. Parameter types are UNCHANGED
+   `Obj6EAC0__GetBaseMethods()->ctor(self, a0, a1, a2)`. Parameter types are UNCHANGED
    from the existing declaration (both already pointer/pointer/s32, matching
    this call site's own real arguments exactly); only the RETURN type
    differs from `code_2cc8c_b.c`'s own `Unk68Obj *` view -- ABI-identical
@@ -1500,16 +1500,16 @@ struct Obj6EAC0Methods {
                                   reads 2) */
     void (*slotC8)(Obj6EAC0 *self, s32 a1); /* +0x0C8, IS func_800408A0
                                   (base, this unit, setter) and
-                                  func_80040F20 (derived, this unit,
+                                  Obj6EAC0__NoOpSetter (derived, this unit,
                                   splat-generated trivial jr $ra; nop) */
-    s32 (*slotCC)(Obj6EAC0 *self, s32 a1); /* +0x0CC, IS func_800408A8
+    s32 (*slotCC)(Obj6EAC0 *self, s32 a1); /* +0x0CC, IS Obj6EAC0__SetMask
                                   (base, this unit) and func_80040F28
                                   (derived, this unit) */
     void (*slotD0)(Obj6EAC0 *self); /* +0x0D0, derived-only, IS
-                                  func_80040FA0 (this unit, splat-
+                                  Obj6EAC0__NoOpSlotD0 (this unit, splat-
                                   generated trivial) */
     void (*slotD4)(Obj6EAC0 *self, s32 a1); /* +0x0D4, derived-only, IS
-                                  func_80040FA8 (this unit, setter) */
+                                  Obj6EAC0__SetChildPitch (this unit, setter) */
 };
 
 struct Obj6EAC0 {
@@ -1542,7 +1542,7 @@ struct Obj6EAC0 {
     u8 unk64[3];               /* +0x064, OBSERVED: func_8004076C -- a
                                   3-byte colour buffer, overwritten or
                                   added-into via func_80040790 */
-    s32 unk68;                 /* +0x068, OBSERVED: func_800408A8 (setter,
+    s32 unk68;                 /* +0x068, OBSERVED: Obj6EAC0__SetMask (setter,
                                   a `(1 << a1) - 1` bitmask) */
     u8 pad06C[0x0A9 - 0x06C];
     u8 unkA9;                  /* +0x0A9, OBSERVED: func_80040A30 (passed
@@ -1559,7 +1559,7 @@ struct Obj6EAC0 {
                                   START INDEX into unkB4, paired with
                                   unkAB above */
     u8 padAD[0x0B0 - 0x0AD];
-    s32 unkB0;                 /* +0x0B0, OBSERVED: func_80040FA8 (setter);
+    s32 unkB0;                 /* +0x0B0, OBSERVED: Obj6EAC0__SetChildPitch (setter);
                                   read and added into a local running total
                                   by func_80040AE8/func_80040E14 */
     Obj6EAC0 **unkB4;          /* +0x0B4, OBSERVED: an array of child
@@ -1576,10 +1576,10 @@ struct Obj6EAC0 {
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 extern Obj6EAC0Methods D_8006EAC0; /* the base table itself, so
-                                       func_800408BC's own definition
+                                       Obj6EAC0__GetBaseMethods's own definition
                                        (this unit) can return &D_8006EAC0 */
 extern Obj6EAC0Methods D_8006EB90; /* the override table itself, so
-                                       func_80040FB0's own definition
+                                       Obj6EAC0__GetDerivedMethods's own definition
                                        (this unit) can return &D_8006EB90 */
 extern Obj6EAC0Methods *func_80041C3C(void); /* returns &D_8006EC74, a
                                        third sibling table sharing this
@@ -1641,11 +1641,11 @@ extern D6B5CCGetterMethodsCC8C *func_8001E57C(void);
  * `Class6B5CCMethods`) -- the same base-class fingerprint code_d294.h
  * already established, so D_8006E99C is a Class6B5CCObj descendant. It is
  * NOT a direct child, though: its own ctor (func_8003FE2C, this unit)
- * calls `func_800408BC()->ctor(self, a1, a2, a3)` before overwriting
+ * calls `Obj6EAC0__GetBaseMethods()->ctor(self, a1, a2, a3)` before overwriting
  * `self->methods` with `&D_8006E99C` and re-dispatching through it --
  * exactly the established "base ctor first, then set own vtable pointer,
  * then dispatch through it" idiom (see e.g. func_8004D578's entry in
- * DECOMPILATION_LEARNINGS). `func_800408BC` (code_2cc8c_f, bravo's own
+ * DECOMPILATION_LEARNINGS). `Obj6EAC0__GetBaseMethods` (code_2cc8c_f, bravo's own
  * function) is a bare no-argument getter for a SECOND table, D_8006EAC0
  * -- itself sharing the identical fingerprint with D_8006B5CC, so the
  * real chain is Class6B5CCObj -> "ClassEAC0" -> "Class6E99C". Two
@@ -1653,7 +1653,7 @@ extern D6B5CCGetterMethodsCC8C *func_8001E57C(void);
  * allocates 0xA0 bytes for a Class6E99C instance (getting its own table
  * via func_800404C0, a bare getter this unit also implements) and
  * func_800404D0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
- * instance (getting D_8006EAC0 via func_800408BC) -- consistent with
+ * instance (getting D_8006EAC0 via Obj6EAC0__GetBaseMethods) -- consistent with
  * ClassEAC0 being the smaller, less-derived class. func_8004054C is
  * ClassEAC0's OWN ctor, sharing the identical "call a further-base ctor,
  * reset methods, redispatch slot40" shape one level up: it calls
@@ -1731,7 +1731,7 @@ struct ClassEAC0Methods {
     void (*slotB8)(ClassEAC0Obj *self, s32 a1, void *tableEntry);
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, OBSERVED (func_800405D0): dispatched as `(self, 0xD)`.
-       Occupant `func_800408A8` (code_2cc8c_f). */
+       Occupant `Obj6EAC0__SetMask` (code_2cc8c_f). */
     void (*slotCC)(ClassEAC0Obj *self, s32 a1);
     u8 pad0D0[0x0DC - 0x0D0];
     /* +0x0DC, OBSERVED (func_80040024/func_800400B0): dispatched with only
@@ -1813,7 +1813,7 @@ struct Class6E99CMethods {
     void (*slot98)(Class6E99CObj *self, void *a1, s32 a2); /* +0x098, func_8003FF44 */
     u8 pad09C[0x0B8 - 0x09C];
     /* +0x0B8/+0x0CC, IS ClassEAC0Methods's own +0x0B8/+0x0CC
-       (func_8004076C/func_800408A8, both code_2cc8c_f) -- identical
+       (func_8004076C/Obj6EAC0__SetMask, both code_2cc8c_f) -- identical
        addresses in both tables (this class does not override them), same
        fingerprint as the other shared slots above. OBSERVED:
        func_80040024/func_800400B0 (both this unit). */
@@ -1929,11 +1929,11 @@ extern Class6E99CMethods *func_800404C0(void); /* this unit's own bare getter
                                                     idiom as func_8001E57C
                                                     (code_d294.h) */
 /* Declared ONCE, matching its definition in src/code_2cc8c_f.c
- * (`Obj6EAC0Methods *func_800408BC(void)`). code_2cc8c_e declared it
+ * (`Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void)`). code_2cc8c_e declared it
  * returning its own `ClassEAC0Methods *` view of the same table, which
  * collided as `conflicting types`; that unit casts at its two call
  * sites instead. */
-extern Obj6EAC0Methods *func_800408BC(void);  /* code_2cc8c_f (bravo's own
+extern Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void);  /* code_2cc8c_f (bravo's own
                                                     function): bare getter
                                                     for &D_8006EAC0 */
 

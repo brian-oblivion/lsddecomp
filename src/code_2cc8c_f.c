@@ -74,20 +74,20 @@ void func_800408A0(Obj6EAC0 *self, s32 a1) {
     self->unk44 = a1;
 }
 
-s32 func_800408A8(Obj6EAC0 *self, s32 a1) {
+s32 Obj6EAC0__SetMask(Obj6EAC0 *self, s32 a1) {
     return self->unk68 = (1 << a1) - 1;
 }
 
-Obj6EAC0Methods *func_800408BC(void) {
+Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void) {
     return &D_8006EAC0;
 }
 
-Obj6EAC0Methods *func_80040FB0(void);
+Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
 
 Unk64Elem *func_800408CC(void *ctx, s32 len, char *name) {
     Obj6EAC0 *self = func_80017B34(0xB8);
     if (self != NULL) {
-        func_80040FB0()->slot08(self, (s32)ctx, len, (s32)name);
+        Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
         return (Unk64Elem *)self;
     }
     return NULL;
@@ -98,7 +98,7 @@ void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     Obj6EAC0 **cursor;
 
     ((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20);
-    self->methods = func_80040FB0();
+    self->methods = Obj6EAC0__GetDerivedMethods();
     self->unkA9 = a2;
     self->unkAB = a2;
     self->unkAC = 0;
@@ -242,7 +242,7 @@ void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
     elem->methods->slotC4(elem, a1 & 0xFF);
 }
 
-void func_80040F20(void) {
+void Obj6EAC0__NoOpSetter(void) {
 }
 
 void func_80040F28(Obj6EAC0 *self, u8 *a1) {
@@ -258,14 +258,14 @@ void func_80040F28(Obj6EAC0 *self, u8 *a1) {
     }
 }
 
-void func_80040FA0(void) {
+void Obj6EAC0__NoOpSlotD0(void) {
 }
 
-void func_80040FA8(Obj6EAC0 *self, s32 a1) {
+void Obj6EAC0__SetChildPitch(Obj6EAC0 *self, s32 a1) {
     self->unkB0 = a1;
 }
 
-Obj6EAC0Methods *func_80040FB0(void) {
+Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void) {
     return &D_8006EB90;
 }
 

@@ -8,7 +8,7 @@ void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
     void *tableEntry;
 
-    base = func_800408BC();
+    base = Obj6EAC0__GetBaseMethods();
     if (a2 != 0) {
         tableEntry = &D_8006EA90[a2 * 3];
     } else {
@@ -20,18 +20,18 @@ void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
 }
 ```
 
-**Correction: the `func_800408BC()` call must be hoisted into its own
+**Correction: the `Obj6EAC0__GetBaseMethods()` call must be hoisted into its own
 statement BEFORE the `if`/`else`, matching retail's own evaluation order.**
 An earlier version of this report called it inline as part of the
 `base->ctor(...)` expression, positioned textually AFTER the `if`/`else` --
 that version actually inflated the function from 43 to 46 words (a real
 register-saturation regression, +3 callee-saved registers) because GCC
-evaluated `func_800408BC()` late instead of early. Confirmed with a full
+evaluated `Obj6EAC0__GetBaseMethods()` late instead of early. Confirmed with a full
 rebuild and an address cross-check against `build/lsdde.map`; the version
 above is the one that reaches the real 43/43 stated below.
 
 Textbook "call the further-base ctor first (through a getter for its
-table, not by direct name -- `func_800408BC` returns `&D_8006EAC0`), THEN
+table, not by direct name -- `Obj6EAC0__GetBaseMethods` returns `&D_8006EAC0`), THEN
 overwrite `self->methods` with this class's own table, THEN dispatch
 through it immediately" idiom (DECOMPILATION_LEARNINGS' `func_8004D578`
 entry). See `include/code_2cc8c.h`'s header comment above

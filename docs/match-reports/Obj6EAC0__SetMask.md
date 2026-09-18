@@ -1,9 +1,11 @@
-# func_800408A8 — MATCHED (5/5 words)
+> Renamed from `func_800408A8` on 2026-09-18 (tools/rename.py). Address 0x800408a8.
+
+# Obj6EAC0__SetMask — MATCHED (5/5 words)
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-s32 func_800408A8(Obj6EAC0 *self, s32 a1) {
+s32 Obj6EAC0__SetMask(Obj6EAC0 *self, s32 a1) {
     return self->unk68 = (1 << a1) - 1;
 }
 ```
