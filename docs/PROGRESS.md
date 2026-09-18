@@ -6,6 +6,170 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-18 — round 52: three units through track 3, and a cross-unit rename guarantee the plan does not actually have
+
+Head on Opus, three runners (the operator capped the round at three, nearing
+an API limit). All three slots went to track 3 from the top of the ready-jobs
+list; no track-1 work, so the round is recorded `--not-calibration` and does
+not count toward the stop rule. Gate 0 green on the first try —
+`progress.py` printed no stale-monolith warning, `make extract` and the
+oracle both clean. `headercontention.py` reported zero contention between the
+three units, and all three worktrees byte-verified before handover.
+
+**State at end: 1138 matched / 1252 game functions, 0 fresh, 114 stalled.
+Track 3 at 6/75 units, 969 defs still `func_` (was 1023). Build verifies.**
+
+### What the runners did
+
+**alpha, `code_171e0` — the `Class6D430` buffer holder and the active
+data-source indirection.** All 25 functions, one global (`gActiveDataSource`),
+one field, two named constants. The unit's real subject is a selector: a
+single global picks between the CD reader (`0x13`) and the SPU/VAB streamer
+(`0x23`), and half the unit is accessors that dispatch on it.
+
+**bravo, `class_3bb8c_o` — `LinkOwnerObj` and the `BaseObjO` base class.**
+19 of 20 named, plus every local field and vtable slot. Its finding is the
+structural one of the round: `BaseObjO` is the shared INTERMEDIATE base of
+`DreamSys`, `Class65650` and a third sibling, and `BaseObjO__BaseObjO` is the
+BASE's own constructor rather than `Class65650`'s. The head confirmed it the
+way this project is supposed to — `tools/classtable.py D_800878D4` puts
+`BaseObjO__BaseObjO` in the ctor slot at `+0x008`, which is exactly the slot
+`code_55dd4.c`'s `class_65650__Constructor` calls through, and the three
+companion methods sit at `+0x010`/`+0x014`/`+0x018` as bravo's slot names say.
+Constructors reached through the table, not by direct call, is the
+class-framework fact from CLAUDE.md showing up as ordinary evidence.
+
+**charlie, `code_179d8_e` — the SPU/VAB sound-streaming backend.** All 29
+functions, 13 globals, every local type and field, one named constant. Two
+claims were worth checking and both held exactly: `D_8006D9BC`'s header word
+is `0x00000023`, which is the same value `gActiveDataSource` compares against,
+so the table charlie named `gVabDriverMethods` really is that backend's driver
+interface; and its `VagAtrView` places `center` at `+0x04` and `shift` at
+`+0x05`, which is where Sony's own `VagAtr` in `include/psyq/LIBSND.H` puts
+them, in a struct that is 32 bytes on both sides. A local view checked against
+the SDK header it shadows is the cheapest naming evidence available and this
+is the first round to use it.
+
+### `Noop` and `NoOp`, one letter of case apart
+
+alpha named `0x80026C80` `NoOp` and bravo named `0x80056DF0` `Noop`. Both are
+genuinely empty functions, both names are honest, and neither runner could see
+the other's — the collision only existed once both branches were in one tree,
+which makes it head work by construction.
+
+Resolved by measuring which one deserves the plain name rather than by
+merge order: `classtable.py --scan` finds `0x80026C80` in **10** method tables
+and `0x80056DF0` in **zero**, so alpha's is the shared vtable filler and keeps
+`NoOp`; bravo's is reached by a direct call and became `NoOpIgnoreArgs`.
+
+The first attempt was `LinkOwnerObj__NoOp`, and withdrawing it is the part
+worth recording. bravo's own report had already argued against a class
+prefix — the function is a bare `void(void)` and every call site passes a dead
+argument, so it is not meaningfully a method of that class. That argument is
+correct, and the head had not read it before renaming. **A runner's written
+reasoning is evidence at merge time, not just a summary of work done**; the
+head overrode it and the report was right.
+
+### The cross-unit rename guarantee, measured false
+
+FINISHING-PLAN track 3 step 3 tells the head to apply a runner's proposed
+cross-unit field rename as *"a whole-tree textual replace followed by the
+oracle: a hit on a same-named field of a DIFFERENT struct fails to compile, so
+the compiler flags every mis-hit and the head reverts just those."*
+
+That safety net only works in one direction, and this round needed the other
+one. Measured before applying anything:
+
+| proposed field | occurrences in `src/` + `include/` | files |
+| --- | --- | --- |
+| `unk0C` | 59 | 17 |
+| `unk10` | 347 | 50 |
+| `unk14` | 292 | 42 |
+| `unk20` | 184 | 36 |
+| `slot44` / `slot48` / `slot4C` | 127 / 99 / 113 | 30 / 31 / 34 |
+
+A whole-tree replace of `unk10` renames the **definition and every use** in
+all 50 files together. That compiles perfectly, produces no diagnostic, and
+silently relabels a field in ~49 unrelated structs. The compiler can only
+flag the case where a definition is renamed and a use is not — which is a
+mis-hit of SCOPE, not the mis-hit of IDENTITY that a generic `unkNN` name
+produces. The plan's claim is true for a distinctive field name and false for
+exactly the names this track will keep meeting, because `unkNN`/`slotNN` is
+what an unnamed field IS.
+
+Applied by type scope instead: the four fields and five slots were renamed in
+the two files that actually access them, one at a time, oracle green and
+byte-exact after each. **Escalated, not fixed here** — the replacement
+procedure is a plan change and this head is Opus.
+
+And the direction that does work caught the head being wrong. `unk0C` came
+back `src/code_179d8_h.c:143: structure has no member named 'unk0C'`, because
+that file accesses `Class6D430::unk0C` at line 143 while lines 97/174/175/182
+are its own `ObjA34_179D8H::unk0C`. The head had read that grep output and
+attributed all five occurrences to the local struct — so the conclusion
+"`code_179d8_h.c` accesses no fields of this type" was wrong, and cc1
+corrected it. This is also why alpha was right to PROPOSE rather than rename:
+the ownership test keys on who ACCESSES a field, and one of the five
+accessors was in another unit.
+
+### Merging charlie: the union resolution
+
+charlie branched before alpha and bravo merged, so its merge conflicted in 13
+paths. Almost all of them were the same shape and have the same resolution:
+each side had applied **its own** renames to a file both touched, so neither
+side is stale and the correct result is the UNION, not a choice. The clearest
+instance was a third unit's report that mentioned both `func_8002CC84` (which
+charlie renamed to `FlushSoundCueSet`) and `func_800573A8` (which bravo
+renamed to `BaseObjO__AddVec14`): each branch had exactly one of the two new
+names. Resolved by taking one side of every hunk and then applying the other
+branch's rename map over it, after which all four remaining marker pairs were
+byte-identical on both sides.
+
+Two sub-shapes worth naming, because §3.9 documents only the first:
+
+- **modify/delete where the RUNNER did the rename.** §3.9 says to expect a
+  report the head stubbed and a runner then wrote, and to take the runner's.
+  Here it was inverted: charlie RENAMED three reports (the function names
+  changed) while the head's earlier alpha merge had edited the old-named
+  files. Confirmed the new-named files existed and that the old ones differed
+  only in carrying pre-rename type names, then deleted the old ones.
+- **the symbols file conflicts every time, and always the same way.** It is
+  append-structured — `rename.py` adds a line per renamed symbol and splat
+  auto-names everything else — so two naming branches always collide at the
+  tail with no `-` lines at all. Keep both blocks, then check for duplicate
+  names and duplicate addresses; both were clean here. The absence of `-`
+  lines is also why an old name cannot be recovered from the diff: it has to
+  be derived as `func_<ADDR>`/`D_<ADDR>`.
+
+### A practical note for any head driving this repo from zsh
+
+Three separate commands in this round silently did nothing because **zsh does
+not word-split unquoted parameter expansions**. `for f in $list` iterates once
+with the whole blob; a file list built with `$(...)` and passed to `sed`
+arrives as one filename. Each failure was loud in a different way — `sed`
+said "can't read", a coverage check reported every function MISSING, a
+delete loop reported a file that existed as absent — and none of them
+corrupted anything, but the second one would have read as a runner failing to
+write reports. Use `arr=(${(f)"$(...)"})` and `"${arr[@]}"`. The tell is a
+count that comes back 1, or 0, when the data is plainly there.
+
+### What the round did not touch
+
+Track 1 is still at calibration round 1 of 2 after two consecutive rounds in
+which no matching runner was staffed, because `plan.py` ranks every track-3
+unit above every track-1 stall and the operator's cap is filled from the top.
+The calibration that gates the stop rule cannot complete while that ordering
+holds and the cap stays at two or three. Flagged to the operator as a
+plan-ordering question under FINISHING-PLAN §6, which is explicit that the fix
+belongs in the tool rather than in a head quietly skipping the top job.
+
+### Next
+
+`plan.py` ranks `code_2cc8c_f` (30 defs), `code_179d8_r` (10) and
+`code_2cc8c_c` (19) as the top naming units. Track 2 (46 unnamed SDK
+functions, one batch runner) has been sitting fifth for two rounds and is the
+one open track no round has yet touched.
+
 ## 2026-09-17 — round 51: two units through track 3, and a merge that went red 248 bytes large because gp-symbols was regenerated one step too early
 
 Head on Opus, two runners (the operator capped the round at two, nearing an

@@ -44,10 +44,23 @@
           "note": "Track 3 naming: code_179d8_q (CD-ROM read driver, 22 functions + 13 globals) and code_8220_b (BasicClass list/notify primitives + GTE per-face projection, 20 functions). Both head-reviewed, 5 names each sampled against evidence, no wrong tier-A name; both mark-unit'd. No track-1 work this round. Naming runner switched to sonnet on the two-clean-Opus-units rule.",
           "round": 51,
           "runners": 2
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-18",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "three track-3 naming units (code_171e0, class_3bb8c_o, code_179d8_e); no matching runners, so nothing from the ranked stall band",
+          "round": 52,
+          "runners": 3
         }
       ],
       "status": "open",
       "units_done": {
+        "class_3bb8c_o": "2026-09-18",
+        "code_171e0": "2026-09-18",
+        "code_179d8_e": "2026-09-18",
         "code_179d8_q": "2026-09-17",
         "code_8220_b": "2026-09-17",
         "code_d294_c": "2026-09-17"
