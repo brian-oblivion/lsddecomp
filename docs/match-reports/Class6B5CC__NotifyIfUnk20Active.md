@@ -1,11 +1,13 @@
-# func_8001D568 — MATCHED
+> Renamed from `func_8001D568` on 2026-09-18 (tools/rename.py). Address 0x8001d568.
+
+# Class6B5CC__NotifyIfUnk20Active — MATCHED
 
 Unit: `code_d294_b`. Round 13, runner delta. 38/38 words, full match.
 
 ## Signature
 
 ```c
-void func_8001D568(Class6B5CCObj *self, s32 a1);
+void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);
 ```
 
 ## What it does
@@ -18,7 +20,7 @@ slot (`Class6B5CC__ReadUnk20Data`, already matched in this unit — forwards to
 passed through as `Class6B5CC__TransformAndNotifyParents`'s own `a2`.
 
 ```c
-void func_8001D568(Class6B5CCObj *self, s32 a1) {
+void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
     u8 buf[0x38];
 
     if (a1 >= 4) {
@@ -98,7 +100,7 @@ trusting that a natural-looking `&&` will reproduce them.
 **A vtable call's argument buffer can need to be sized for what a
 DIFFERENT, non-decompiled callee (reached transitively through another
 already-matched slot) writes into it, not for what the function you're
-currently writing reads back out of it.** `func_8001D568` itself never reads
+currently writing reads back out of it.** `Class6B5CC__NotifyIfUnk20Active` itself never reads
 `buf`'s contents; it only forwards the pointer twice. The size that makes
 the frame match came from PsyQ's `func_8001F51C`, three calls away. When a
 "send a same buffer to two vtable slots" shape scores an in-range match but

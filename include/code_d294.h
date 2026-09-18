@@ -468,7 +468,7 @@ struct Class6B5CCMethods {
      * likely a shared ancestor method. */
     void (*slot84)(Class6B5CCObj *self, void *out, s32 arg2);
     u8 pad088[0x08C - 0x088];
-    /* +0x08C/+0x090, round 13 (func_8001D568's own call site): dispatched
+    /* +0x08C/+0x090, round 13 (Class6B5CC__NotifyIfUnk20Active's own call site): dispatched
      * as `(self, dest)` and `(self, a1, a2)` respectively, matching
      * Class6B5CC__ReadUnk20Data/Class6B5CC__TransformAndNotifyParents's own direct-call prototypes below
      * exactly (both already matched, code_d294_b) -- `tools/classtable.py
@@ -640,7 +640,7 @@ extern void func_8001F51C(void *arg0, void *dest);
 
 /* func_8001F3A4 (asm/psyq_fa50.s, Psy-Q library, not game code): a
  * predicate over the same opaque `self->unk20` pointer Class6B5CC__ReadUnk20Data and
- * func_8001F51C above already treat as `void *` -- func_8001D568 (round 13,
+ * func_8001F51C above already treat as `void *` -- Class6B5CC__NotifyIfUnk20Active (round 13,
  * this unit) tests its `$v0` result for non-zero, so declared `s32`
  * (boolean-ish) here. Not decompiled in this project. */
 extern s32 func_8001F3A4(void *arg0);
@@ -789,7 +789,7 @@ extern void MulMatrix2(void *arg0, void *arg1);
 extern void BasicClass__func_1816c(void *self, GenericObj_d294 **outParent, void **cursor);
 
 void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
-void func_8001D568(Class6B5CCObj *self, s32 a1);
+void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);
 
 void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest);
 void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);

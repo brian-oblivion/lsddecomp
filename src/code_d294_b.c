@@ -56,7 +56,7 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
  * (Class6B5CC__TransformAndNotifyParents, also already matched in this unit), with the original
  * a1 passed through as Class6B5CC__TransformAndNotifyParents's own a2. */
-void func_8001D568(Class6B5CCObj *self, s32 a1) {
+void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
      * target (func_8001F51C, PsyQ, asm/psyq_fa50.s, not
      * decompiled here) fills fields out past +0x32 of its own `dest`
