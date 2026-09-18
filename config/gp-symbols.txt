@@ -11,7 +11,6 @@ D_8008A834
 D_8008A838
 D_8008A83C
 D_8008A848
-gActiveDataSource
 D_8008A850
 D_8008A854
 D_8008A860
@@ -203,6 +202,7 @@ D_8008ACCC
 D_8008ACD0
 D_8008AEE8
 Small__rand
+gActiveDataSource
 gBMemPMgrBusy
 gCdAsyncEnabled
 gCdBusy
