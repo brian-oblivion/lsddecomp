@@ -20,7 +20,7 @@ s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1) {
 }
 
 /* Same family as func_8001D424, shift 9 width 3. Raw pass-through. */
-u32 func_8001D480(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__GetSetUnk10Field9(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 9, 3, a1);
 }
 
