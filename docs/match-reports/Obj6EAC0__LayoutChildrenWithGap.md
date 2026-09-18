@@ -194,3 +194,24 @@ residue on a large loop body) doesn't cleanly fit an existing named
 class, and per `docs/MATCHING-GUIDE.md`'s own caution, a length gap
 should be resolved before trusting any register-identity reading on
 top of it.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040AE8` | `Obj6EAC0__LayoutChildrenWithGap` | B |
+
+**Evidence.** Derived occupant of `slot4C` (same slot `Obj6EAC0__Layout`
+fills for the leaf case): the SAME "walk children, advance a position
+cursor by `childPitch` per child" shape as `Obj6EAC0__LayoutChildren`
+(this unit, `slotBC`'s derived occupant), but with one extra difference:
+when the loop index equals `self->gapIndex`, an additional `0x10` is
+added to the cursor before that child is placed -- a one-shot extra gap
+at one specific child slot. Given this unit's own text/digit-display
+hypothesis (see the unit header comment), the most natural reading is a
+decimal-point or separator gap in a digit string, but that is not
+independently confirmed -- tier B, and `gapIndex`/`childPitch` are named
+for their mechanics (which index gets the gap; how far each child
+advances), not for that specific guess.

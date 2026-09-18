@@ -21,3 +21,16 @@ slot0xCC is `Obj6EAC0__SetText` (this unit, also queued).
 ### Proposed learning
 
 None beyond what's already recorded.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800408A8` | `Obj6EAC0__SetMask` | A |
+
+**Evidence.** A pure leaf whose mechanics ARE its purpose (tier A):
+`self->mask = (1 << a1) - 1`, a bitmask-of-the-low-`a1`-bits computation
+and store, with no other logic. Renamed the field too (`unk68` -> `mask`,
+this unit's own exclusive field -- see the struct-field rename commit).

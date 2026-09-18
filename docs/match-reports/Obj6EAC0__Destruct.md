@@ -39,3 +39,20 @@ Another instance of "a discarded return value is never evidence of
 void" -- this one caught BEFORE it caused a stall, because the callee's
 own disassembly was checked directly rather than trusted from another
 unit's caller-side typing.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040A30` | `Obj6EAC0__Destruct` | B |
+
+**Evidence.** Derived occupant of `slot0C`: releases the whole
+`children` array (`ReleaseBasicClassArray(self->children,
+self->totalChildCount)`), frees the array pointer itself
+(`func_80017CFC`), then chains to the third sibling table's own `slot0C`
+-- the mirror-image teardown of `Obj6EAC0__Construct`'s own setup. Tier B
+for the same reason as `Construct`: the destructor role is certain from
+the mechanics, the class's broader purpose is not independently
+confirmed.

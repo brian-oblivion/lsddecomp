@@ -17,3 +17,17 @@ slot, no base equivalent). Called by `Obj6EAC0__FinishConstruct` (this unit) as
 ### Proposed learning
 
 None beyond what's already recorded.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040FA8` | `Obj6EAC0__SetChildPitch` | A |
+
+**Evidence.** A pure leaf setter (tier A): `self->childPitch = a1`, one
+field, no other logic. `childPitch` (renamed from `unkB0`) is the value
+`Obj6EAC0__LayoutChildren`/`Obj6EAC0__LayoutChildrenWithGap` add into the
+running position cursor once per child -- i.e. the per-child advance/
+spacing distance, confirmed by those two callers (this same unit).

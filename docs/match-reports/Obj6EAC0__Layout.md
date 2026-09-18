@@ -34,3 +34,22 @@ existing header carefully enough to recognize both slots were already on
 file.
 
 No header changes; no residue.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040664` | `Obj6EAC0__Layout` | B |
+
+**Evidence.** Base occupant of `slot4C`: when `self->hasChildren == 0`
+(the leaf case), forwards to the shared default handler's own `slot4C`
+then dispatches `self->methods->slotBC(self, a2)`
+(`Obj6EAC0__SetPosition`, this unit) -- i.e. for a leaf instance, "lay
+out" reduces to "apply the default handler, then set my own position".
+The derived occupant of the SAME slot
+(`Obj6EAC0__LayoutChildrenWithGap`) does the container-side equivalent
+(recursively position every child). Named for the slot's own common
+mechanic across both occupants (position/layout), not for `a1`'s specific
+meaning here, which is not established -- tier B.

@@ -21,3 +21,23 @@ as a bare statement.
 ### Proposed learning
 
 None beyond what's already recorded.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040A88` | `Obj6EAC0__FinishConstruct` | B |
+
+**Evidence.** Derived occupant of `slot40`, called as the LAST step of
+`Obj6EAC0__Construct` (`self->methods->slot40(self, a3)`, where `a3` is
+`Construct`'s own last parameter -- itself forwarded from
+`New_Obj6EAC0`'s own `name` argument, see that report). Body:
+`self->methods->slotD4(self, 7)` (`Obj6EAC0__SetChildPitch`, hard-coding
+the pitch to 7) then `self->methods->slotCC(self, a1)` (`SetMask` on a
+base instance, `SetText` on a derived one). Named for its ROLE in the
+construction sequence (the post-allocation finishing step), not for a
+guessed purpose -- tier B: the "hard-code pitch=7, then apply
+mask-or-text" mechanics are certain, but why 7 specifically is not
+established.

@@ -181,3 +181,24 @@ runners tried it on unrelated residues and worsened them"). Six
 attempts across two sessions found no C-level lever at all for this
 specific instance -- the permuter (untried here) is the most credible
 remaining direction.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040854` | `Obj6EAC0__SetChar` | B |
+
+**Evidence.** Base occupant of `slotC4`: forwards `(a1, a2, a3)` to
+`self->methods->slot4C` (the "layout" slot -- see `Obj6EAC0__Layout`),
+then `self->unk48 = 0; self->unk4C = a3;`. `slotC4`'s DERIVED occupant
+(`Obj6EAC0__SetChildChar`, this unit) indexes into `self->children[a2]`
+and dispatches THAT child's own `slotC4` with `a1 & 0xFF` -- an 8-bit
+value. `Obj6EAC0__SetText` (this unit, `slotCC`'s derived occupant)
+independently walks a byte string dispatching `elem->methods->slotC4(elem,
+*p)` per child -- i.e. `slotC4` is called elsewhere with individual
+string bytes, which is the evidence this slot sets a per-glyph character
+code rather than an arbitrary value. Tier B (mechanics + one clean
+cross-reference; not independently confirmed against gameplay/rendering
+code outside this unit).

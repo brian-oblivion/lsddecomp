@@ -575,3 +575,23 @@ cheap permuter target" shapes: an exact-length near-miss whose only diff is
 two adjacent instructions holding each other's values is close to free to
 search (208 iterations, well under a minute) and should not accumulate
 manual `__asm__`/declaration-order attempts first.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040FC0` | `DecodeFullWidthSjis` | A |
+
+**Evidence.** Verified against real Shift-JIS byte-pair codes, not just
+internal consistency: this function's decode table maps trail byte 0x4F
+(the second byte of SJIS fullwidth `'0'`, 0x824F) back to 0x30 (`'0'`), and
+trail byte 0x60 (SJIS fullwidth `'A'`, 0x8260) back to 0x41 (`'A'`) --
+`c - 0x1F` for `c=0x4F` gives `0x30`, and for `c=0x60` gives `0x41`. This is
+the exact inverse of `EncodeFullWidthSjis` (see that report), confirmed by
+running both directions against the same two real SJIS code points. The
+lead byte of each pair is skipped, not inspected, so this reads only every
+other input byte -- the "decode" half of a genuine halfwidth<->fullwidth
+Shift-JIS ASCII/digit conversion pair, not a guess about purpose from a
+single call site.

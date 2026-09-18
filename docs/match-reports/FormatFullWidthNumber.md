@@ -541,3 +541,22 @@ shows the same value materialized in two steps (e.g., `move` from a call
 return THEN a separate arithmetic op)" to the register-identity toolkit
 alongside declaration order and reused-variable-vs-fresh-local (the lever
 that closed `EncodeFullWidthSjis` earlier this same round).
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_8004109C` | `FormatFullWidthNumber` | A |
+
+**Evidence.** A pure leaf whose mechanics are its whole purpose (tier A by
+the plan's own rule for "a getter, a clamp, a list push"): converts `a1`
+to a decimal string (`itoa`+`strcpy`), zero-pads it to `width` unless
+`unpadded` is set, then feeds the result through `EncodeFullWidthSjis`
+(this same unit, confirmed tier A against real SJIS codes). Its own
+caller (`src/class_3bb8c_c.c:168`, `FormatFullWidthNumber(D_8008AA24,
+arg0, 3, 0)`) passes a plain buffer as the first argument, not an
+`Obj6EAC0 *`, confirming this function (despite living in this file and
+sharing its dominant `self`-typed signature style) is unrelated to the
+`Obj6EAC0` class.

@@ -138,3 +138,24 @@ still goes through the struct's own canonical 4-arg field, untouched.
   narrower call site exists and the widest call site is otherwise
   clean — prefer a cast at the odd site over weakening the whole
   slot's type checking for everyone.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040948` | `Obj6EAC0__Construct` | B |
+
+**Evidence.** Derived occupant of `slot08`: chains to the third sibling
+table's own `slot08` first (base-class-style construction), sets
+`self->methods` to the derived table, initialises the child-slice fields
+(`totalChildCount`, `childCount`, `childStart`, `gapIndex`), allocates an
+`a2`-element `children` array and fills each slot via the external
+New_X-shaped `func_80041AB4`, then dispatches `self->methods->slot40`.
+This is unambiguously a constructor by mechanics (allocates + wires up
+the object this class needs); named `Construct` per the project's
+`Class__Class`-shaped constructor convention rather than `Class__Class`
+literally, since `Obj6EAC0` is a placeholder table-address name, not a
+real class identity -- tier B (the CTOR role is certain, the class's own
+purpose is the unit's working hypothesis only).

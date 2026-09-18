@@ -92,3 +92,24 @@ epilogue AND lets the null path use a plain zero-register move. Worth
 trying before reaching for the heavier "default value, conditionally
 overwritten" idiom whenever the two return values are constants/simple
 casts rather than expressions requiring real computation.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800408CC` | `New_Obj6EAC0` | B |
+
+**Evidence.** The class's `New_X`-shaped public allocator (matches the
+project's established `New_Class` constructor convention): allocates
+`0xB8` bytes then dispatches the derived table's own `slot08`
+(`Obj6EAC0__Construct`) with `(ctx, len, name)` forwarded as
+`Construct`'s `(a1, a2, a3)`. Confirmed the `len`/`a2` argument becomes
+`totalChildCount`/`childCount` (a genuine "how many children" parameter,
+via `Construct`'s own body) and `name`/`a3` flows through
+`Obj6EAC0__FinishConstruct` into `Obj6EAC0__SetText` on a derived
+instance -- consistent with "construct an N-character text display and
+immediately set its text", the unit's own header-comment hypothesis.
+Tier B: the allocate-then-construct mechanics and the parameter-flow
+chain are certain; the specific in-game role is this unit's own reading.

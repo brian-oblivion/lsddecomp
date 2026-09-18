@@ -90,3 +90,23 @@ Round 2 (2026-09-0x), unspecified runner: original 2 attempts, restored to
 `INCLUDE_ASM` at 15/50 (wrong length). Round 19, runner alpha: closed in
 4 attempts (struct-copy retype; barrier, no effect; statement-order swap,
 closed it).
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040E14` | `Obj6EAC0__LayoutChildren` | B |
+
+**Evidence.** Derived occupant of `slotBC` (same slot
+`Obj6EAC0__SetPosition` fills for the base/leaf case): when
+`self->hasChildren != 0`, walks `self->children[0..self->totalChildCount)`
+dispatching `(*elemp)->methods->slotBC(*elemp, &buf)` on each, with
+`buf.a` (posX) incremented by `self->childPitch` every iteration -- a
+recursive "place each child along a line, `childPitch` apart" layout
+pass. Mechanics well-established from the loop shape itself; the
+in-game purpose (text layout, per this unit's own header-comment
+hypothesis) is not independently confirmed, hence tier B. Sibling of
+`Obj6EAC0__LayoutChildrenWithGap` (same shape, plus one extra offset at
+`gapIndex`).

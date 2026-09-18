@@ -71,3 +71,17 @@ consecutive scalar assignments, try folding it into one aggregate
 assignment before spending further attempts on the register/scheduling
 symptom directly -- it has now closed 4 different apparent residue
 shapes in this same unit's neighborhood alone.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040790` | `Obj6EAC0__ApplyColor` | A |
+
+**Evidence.** Mechanics are the whole purpose (tier A): given `overwrite`,
+either copies a 3-byte RGB buffer wholesale (`*(RGB *)d = *(RGB *)src`) or
+adds each of the 3 bytes into the destination in place -- a "set or blend
+a colour" operation, with `dst` always `self->color` at its one call site
+(`Obj6EAC0__SetColor`, this unit).

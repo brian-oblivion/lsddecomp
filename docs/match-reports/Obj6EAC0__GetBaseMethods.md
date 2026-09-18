@@ -20,3 +20,17 @@ override table `D_8006EB90`.
 ### Proposed learning
 
 None beyond what's already recorded.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800408BC` | `Obj6EAC0__GetBaseMethods` | A |
+
+**Evidence.** A pure leaf getter (tier A by definition): returns
+`&D_8006EAC0`, the base method table, with no other logic. Twin of
+`Obj6EAC0__GetDerivedMethods` (returns `&D_8006EB90`, the override table);
+both are named identically to the project's existing "getter returns a
+fixed vtable" precedent (e.g. `Get_vtable_BasicClass`).

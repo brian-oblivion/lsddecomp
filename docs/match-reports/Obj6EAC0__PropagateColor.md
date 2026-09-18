@@ -112,3 +112,21 @@ diffing) surfaced which one retail used. Cross-reference
 `unkB4[unkAC..unkAC+unkAB)` loop functions -- to check whether this same
 "condition is a fresh expression, not the maintained variable" shape
 applies to their own remaining residues too.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040D74` | `Obj6EAC0__PropagateColor` | B |
+
+**Evidence.** Derived occupant of `slotB8` (the same slot
+`Obj6EAC0__SetColor`, this unit's base occupant, fills with the real
+colour-set/blend call): loops over `self->children[self->childStart ..
+self->childStart+self->childCount)` calling `elem->methods->slotB8(elem,
+a1)` on each -- i.e. forwards the same slot's own call down to every
+child. Mechanics fully established (a for-each-child dispatch through the
+identical slot); whether the game actually uses this to recolour a whole
+row of children (vs. some other meaning `a1` carries) is not independently
+confirmed, hence tier B rather than A.

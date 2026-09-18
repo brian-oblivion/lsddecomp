@@ -489,3 +489,20 @@ of what is conceptually the same kind of value (a decoded byte), not
 widening one variable's type. Worth trying on any register-identity stall
 where one source variable is read for two textually-separate purposes
 across the function body.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80041020` | `EncodeFullWidthSjis` | A |
+
+**Evidence.** Verified against real Shift-JIS byte-pair codes: for input
+byte 0x30 (`'0'`), this function emits lead byte 0x82 and trail byte
+`0x30+0x1F=0x4F`, i.e. the pair 0x82 0x4F -- which IS the real SJIS
+fullwidth `'0'` (0x824F). For input byte 0x41 (`'A'`), it emits 0x82 and
+`0x41+0x1F=0x60`, i.e. 0x8260 -- the real SJIS fullwidth `'A'`. Two
+independent data points against the actual Shift-JIS table, not just
+"this looks like character encoding" -- tier A. `DecodeFullWidthSjis`
+(same unit) is confirmed as this function's exact inverse.

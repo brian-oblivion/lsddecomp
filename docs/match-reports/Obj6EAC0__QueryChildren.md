@@ -213,3 +213,21 @@ transfer**, even when the two functions share the same loop skeleton
 almost verbatim (`Obj6EAC0__PropagateColor` vs this function) -- cross-reference
 both reports before assuming a fix generalises across this unit's
 `unkB4[unkAC..unkAC+unkAB)` loop family.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040CD0` | `Obj6EAC0__QueryChildren` | B |
+
+**Evidence.** Derived occupant of `slot60`: loops over
+`self->children[self->childStart..self->childStart+self->childCount)`
+calling `elem->methods->slot60(elem, a1)` on each, threading the return
+value through as its own return (last child's result wins, or the
+incoming `a2` if the slice is empty) -- a for-each-child dispatch that
+returns a value, distinct from the void-returning
+`Obj6EAC0__PropagateColor`/`Obj6EAC0__LayoutChildren` family. Named for
+this mechanic (query across children, not a specific field); the exact
+value being queried is not established -- tier B.

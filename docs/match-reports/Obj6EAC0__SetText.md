@@ -33,3 +33,23 @@ why it was reachable on the first try.
 ### Proposed learning
 
 None beyond what's already recorded.
+
+## Naming
+
+Round 54 (alpha), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80040F28` | `Obj6EAC0__SetText` | B |
+
+**Evidence.** Derived occupant of `slotCC` (base occupant is
+`Obj6EAC0__SetMask`, an unrelated bitmask setter -- this slot means
+different things on the two tables, per this project's per-call-site
+convention): walks a NUL-terminated byte string in lockstep with
+`self->children`, dispatching `elem->methods->slotC4(elem, *p)` for each
+byte -- i.e. sets each child's character one string byte at a time. This
+is the strongest single piece of evidence for the whole unit's
+text/digit-display reading (see the unit header comment): it is a
+literal "for each character in this string, tell the next child glyph
+what it is" loop. Tier B: the loop mechanics are unambiguous, but nothing
+outside this unit confirms the in-game role.
