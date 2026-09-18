@@ -7,49 +7,53 @@ Unit: `code_179d8_e`. Runner: echo, round 17.
 ## Result
 
 ```c
-s32 InitSoundCueSet(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32 arg4) {
-    Slot179D8ECC34 *slot;
+s32 InitSoundCueSet(void *unused, SoundCueSet *set, s32 tag, void *owner, s32 callback) {
+    SoundCueSlot *slot;
     s32 count;
     s32 sentinel;
 
-    if (obj->unk0 != 0) {
+    if (set->tag != 0) {
         return 0;
     }
-    slot = obj->arr;
+    slot = set->slots;
     sentinel = -1;
     count = 2;
-    obj->unk0 = arg2;
-    obj->unk8 = arg3;
-    obj->unkC = arg4;
+    set->tag = tag;
+    set->owner = owner;
+    set->callback = callback;
     do {
-        slot->unk0 = sentinel;
+        slot->index = sentinel;
         count--;
         slot++;
     } while (count >= 0);
-    obj->unk4 = 0;
-    obj->unk14 = 10;
+    set->unk4 = 0;
+    set->unk14 = 10;
     return 1;
 }
 ```
 
-with `Slot179D8ECC34`/`ObjCC34` declared at the top of the unit (a small
-3-slot init-guarded table, unrelated to `ObjDA34` -- this function is NOT a
-`gVabStreamObjMethods` vtable slot; checked `classtable.py gVabStreamObjMethods`'s slot list and
-it's absent).
+with `SoundCueSlot`/`SoundCueSet` declared at the top of the unit (a small
+3-slot init-guarded table, unrelated to `VabStreamObj` -- this function is
+NOT a `gVabStreamObjMethods` vtable slot; checked
+`classtable.py gVabStreamObjMethods`'s slot list and it's absent). Both
+types, and every parameter name here, were renamed round 52 --
+`ObjCC34`/`Slot179D8ECC34` are now `SoundCueSet`/`SoundCueSlot`, and the
+former `obj`/`arg2`/`arg3`/`arg4` parameters are `set`/`tag`/`owner`/
+`callback` (see "Naming" below for the evidence).
 
 Byte-exact, 20/20 words.
 
 ## Notes
 
-`obj` (`self->unk58`, at the one visible caller in
-`asm/nonmatchings/Entity/func_8005DAFC.s`) is a lazily-initialized slot
-table: guarded by `obj->unk0 == 0`, fills 3 `Slot179D8ECC34` entries
-(stride 0x14) with a `-1` sentinel, sets `obj->unk4 = 0` and
-`obj->unk14 = 10`, and stores the three constructor arguments
-(`arg2`/`arg3`/`arg4`) into `obj->unk0`/`unk8`/`unkC`. `arg1` (this unit's
-own first parameter, `unused`) is genuinely dead -- never referenced in the
-body -- but must stay in the signature: the real second parameter (`obj`)
-arrives in `$a1`, not `$a0`, at every call site.
+`set` (the caller's own `this->unk58`/`&this->unk9C` pair, at the one
+visible caller in `asm/nonmatchings/Entity/func_8005DAFC.s`) is a
+lazily-initialized slot table: guarded by `set->tag == 0`, fills 3
+`SoundCueSlot` entries (stride 0x14) with a `-1` sentinel, sets
+`set->unk4 = 0` and `set->unk14 = 10`, and stores the three constructor
+arguments (`tag`/`owner`/`callback`) into `set->tag`/`owner`/`callback`.
+`arg0` (this unit's own first parameter, `unused`) is genuinely dead --
+never referenced in the body -- but must stay in the signature: the real
+second parameter (`set`) arrives in `$a1`, not `$a0`, at every call site.
 
 Two issues before the match, both from CLAUDE.md's own listed traps:
 
@@ -88,3 +92,25 @@ instance of the class `code_179d8_d.c`'s `Table6D940::slot0C`/`slot64`
 comment already names generically ("a `void` wrapper around an `s32` tail
 call is byte-identical") -- this one has no tail call at all, so the trap
 generalises past that specific phrasing.
+
+## Naming
+
+Renamed `func_8002CC34` -> `InitSoundCueSet`, tier B, and its
+struct/parameters accordingly (`ObjCC34` -> `SoundCueSet`,
+`Slot179D8ECC34` -> `SoundCueSlot`, `arg2`/`arg3`/`arg4` -> `tag`/`owner`/
+`callback`). Evidence: this unit's only caller list (`Entity.c`,
+`DreamSys.c`, `class_3bb8c_n.c`) shows `arg2` is always a small caller-side
+tag value -- concretely `this->moodIndex + 1` in `Entity.c` -- `arg3` is
+always the caller's own `this` pointer, and `arg4` is a value indexed out
+of (or read directly from) a function-pointer table in every caller
+(`this->vt->func_8005A1F4` in `DreamSys.c`; `D_800874B0[sub->unk6]` in
+`class_3bb8c_n.c`, and `D_800874B0` is itself a 14-slot class table per
+`classtable.py --scan`). So `owner`/`callback` are tier A by mechanics
+(store the caller's own context and a function-pointer-shaped value,
+verbatim); `InitSoundCueSet` as the whole function's name is tier B: it's
+an unambiguous guarded init (`Init`), but the exact in-game trigger for
+these sound cues (the caller's own "mood" framing) isn't independently
+re-derived from THIS unit, only cross-referenced from the callers'.
+`unused` kept as-is (dead in the body); `set->unk4`/`set->unk14` kept
+unnamed (set but never read by this unit's own functions, no evidence for
+a name beyond "some default/config word").

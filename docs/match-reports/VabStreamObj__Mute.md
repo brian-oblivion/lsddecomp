@@ -7,18 +7,23 @@ Unit: `code_179d8_e`. Runner: echo, round 17.
 ## Result
 
 ```c
-s32 VabStreamObj__Mute(ObjDA34 *self) {
+s32 VabStreamObj__Mute(VabStreamObj *self) {
     s32 flag;
 
-    flag = self->unk56;
+    flag = self->muted;
     if (flag == 0) {
-        func_800336CC(1);
+        SsSetMute(1);
         flag = 1;
-        self->unk56 = flag;
+        self->muted = flag;
     }
     return flag;
 }
 ```
+
+(Updated to round 52's names: `func_800336CC` was `SsSetMute`'s
+placeholder name before the SDK-linking track identified it -- never
+back-filled into this report until now; `ObjDA34::unk56` is now
+`VabStreamObj::muted`. Bytes unchanged.)
 
 Byte-exact, 17/17 words.
 
@@ -29,10 +34,10 @@ gVabStreamObjMethods`'s output).
 
 **First attempt was a near-miss (6/17, and it warned of an out-of-range
 size drift) from a single wrong detail: I initially wrote
-`result = func_800336CC(1);` -- using the CALL's return value as the flag's
-new value.** Retail actually discards `func_800336CC`'s return and
+`result = SsSetMute(1);` -- using the CALL's return value as the flag's
+new value.** Retail actually discards `SsSetMute`'s return and
 overwrites `$v0` with the LITERAL constant `1` (`li v0,1`) right after the
-call, before storing it to `self->unk56` and returning it. Using the call's
+call, before storing it to `self->muted` and returning it. Using the call's
 return value forced GCC to preserve the pre-call flag value across the call
 in a second register (`$v1`), producing two extra `move` instructions that
 don't exist in retail. Once the assignment became a literal `1` instead of
@@ -58,3 +63,10 @@ and its mirror `VabStreamObj__Unmute` (which, by contrast, DOES thread the call'
 return value through -- no `li` between the `jal` and the following store,
 so the two functions are NOT structurally identical despite looking like a
 symmetric flag get/set pair at a glance).
+
+## Naming
+
+Renamed `func_8002CB58` -> `VabStreamObj__Mute`, tier A. Confirmed
+`gVabStreamObjMethods`'s own +0x088 slot; body is an unambiguous
+"mute if not already muted" (`SsSetMute(1)`, a real Sony call) -- mechanics
+ARE the purpose for a leaf like this.
