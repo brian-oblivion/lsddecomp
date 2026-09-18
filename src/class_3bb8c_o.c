@@ -59,7 +59,7 @@ typedef struct Vec3O {
 
 /* A rand()-indexed table of 6 Vec3-shaped entries, passed to each link
  * element's own slot48. */
-extern Vec3O D_8008788C[];
+extern Vec3O gLinkElemVec3Table[];
 
 typedef struct LinkElemObj LinkElemObj;
 typedef struct LinkElemMethods {
@@ -94,7 +94,7 @@ void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
     for (i = 0; i < 4; i++, p++) {
         u32 r = rand();
 
-        (*p)->methods->slot48(*p, 1, &D_8008788C[r % 6]);
+        (*p)->methods->slot48(*p, 1, &gLinkElemVec3Table[r % 6]);
         (*p)->angle = (rand() % 360) << 12;
     }
 }

@@ -11,7 +11,7 @@ random "angle" field.
 
 ```c
 extern s32 rand(void);
-extern Vec3O D_8008788C[];
+extern Vec3O gLinkElemVec3Table[];
 
 void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
     LinkElemObj **p = &this->arr84[1];
@@ -20,7 +20,7 @@ void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
     for (i = 0; i < 4; i++, p++) {
         u32 r = rand();
 
-        (*p)->methods->slot48(*p, 1, &D_8008788C[r % 6]);
+        (*p)->methods->slot48(*p, 1, &gLinkElemVec3Table[r % 6]);
         (*p)->unk84 = (rand() % 360) << 12;
     }
 }
@@ -49,16 +49,16 @@ void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
   because the intermediate result of the modulo is stored into a variable
   the compiler can prove non-negative here (an implicit consequence of
   `rand()`'s int return combined with the `u32` index expression
-  `D_8008788C[r % 6]` requiring an unsigned index) -- written as
+  `gLinkElemVec3Table[r % 6]` requiring an unsigned index) -- written as
   `u32 r = rand(); ... r % 6 ...`, not `(unsigned)rand() % 6` inline, to
   land the intermediate in the right register lifetime. The second `%360`
   is a genuinely signed division (retail's sign-fix `sra`/`subu` chain is
   present), so it stays `rand() % 360` on the plain `s32`-returning
   `rand()` with no cast.
-- **`D_8008788C` is a 6-entry, 12-byte-stride rodata table**
+- **`gLinkElemVec3Table` is a 6-entry, 12-byte-stride rodata table**
   (`asm/data/76DC8.data.s`, `0x8008788C`..`0x800878D0`, 18 words = 6 * 3),
   confirmed from the disassembly directly rather than guessed; declared
-  `extern Vec3O D_8008788C[];`. `LinkElemMethods::slot48`'s third argument
+  `extern Vec3O gLinkElemVec3Table[];`. `LinkElemMethods::slot48`'s third argument
   is a pointer into this table.
 - **`(rand() % 360) << 12`** is a plain degrees -> Q19.12-ish fixed-point
   conversion; no idiom needed beyond writing the arithmetic directly.
@@ -81,3 +81,12 @@ for each of 4 link elements, calls the element's own `slot48` with a
 random entry from a 6-entry `Vec3O` table and sets the element's own
 `angle` field to a random degrees value -- "randomize" describes exactly
 this and nothing more speculative.
+
+## Global naming
+
+**`gLinkElemVec3Table` (was `D_8008788C`) -- tier B.** A rand()-indexed
+table of 6 `Vec3O`-shaped rodata entries, used only by this unit, passed to
+each link element's own `slot48`. Named for its structure and access
+pattern (a global table of `Vec3` entries feeding `LinkElemObj`), not for
+a guessed game purpose (what `slot48`'s occupant does with the vector is
+not established).

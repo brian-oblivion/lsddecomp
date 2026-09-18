@@ -686,3 +686,4 @@ BaseObjO__SetVec14 = 0x80057384; // type:func
 BaseObjO__AddVec14 = 0x800573A8; // type:func
 BaseObjO__ApplyRotatedVec14 = 0x80057444; // type:func
 BaseObjO__func_5748c = 0x8005748C; // type:func
+gLinkElemVec3Table = 0x8008788C; // type:func
