@@ -89,3 +89,14 @@ clears it, guarded by three conditions (non-NULL, sized, not busy per
 `unk20`). Also reachable indirectly through `Class6D430__Destroy`. Mirrors
 `Class6D430__AllocBuffer`'s naming; mechanics known, why the buffer needs
 this specific guard is not.
+
+## Proposed field names
+
+Same cross-unit exposure as `Class6D430__AllocBuffer.md` (`UnkFlagsObj_171e0`
+is shared with `code_179d8_h.c`/`code_179d8_q.c`), so PROPOSED, not renamed:
+
+| field | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `unk20` | `freeGuard` | B | Nonzero blocks the `unk10` free in this function; zeroed in the constructor. Mechanics (a guard flag) are clear; what sets it nonzero was not found in this unit -- likely a subclass concern. |
+
+Posted to the broadcast.

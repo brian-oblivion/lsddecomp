@@ -137,3 +137,39 @@ through `slot44`/`slot4C`/`slot54`/`slot48` (all null at this class's own
 level -- subclass hooks) and `func_80017B34`, installing the result into
 `unk10`/`unk14` on success. Mechanics fully derived; what the buffer holds
 at the base-class level is not (the subclass provides that via the hooks).
+
+## Proposed field names
+
+`UnkFlagsObj_171e0` (`include/code_171e0.h`) is included by `src/code_179d8_h.c`
+and `src/code_179d8_q.c` too, and `code_179d8_h.c`'s `func_80028898`
+genuinely reads/writes `self->unk0C` on this exact type (not a same-named
+field on a different struct), so per track 3's ownership rule these are
+PROPOSED, not renamed:
+
+| field | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `unk0C` | `pendingGeneration` | C | Saved before being zeroed for the duration of the `slot44`/`slot4C` alloc dance, restored on success, left at `0` on failure. Read/write shape of a counter or sequence id, but no read site outside this dance was found to confirm what it counts -- kept speculative (tier C) rather than asserted. |
+| `unk10` | `buffer` | B | The lazily-(re)allocated resource itself: obtained from `func_80017B34`, released via `func_80017CFC`. Mechanics fully known; what the buffer actually holds at this base-class level is not (subclass-specific, via the null hooks). |
+| `unk14` | `bufferSize` | B | `unk10`'s allocation size, threaded through the same `slot4C`/`func_80017B34` calls. |
+
+Posted to the broadcast for the head to apply (whole-tree replace + oracle,
+per FINISHING-PLAN track 3's merge procedure).
+
+## Proposed vtable slot names
+
+`UnkFlagsObjMethods_171e0`'s slots this function dispatches through are
+null at `D_8006D430`'s own level (subclass-provided), and the same
+cross-unit exposure applies (`code_179d8_h.c` types objects against this
+table too). Proposed, not renamed:
+
+| slot | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `+0x044` (`slot44`) | `configureBuffer` | C | Called as `(this, arg1, 1, 0)` before sizing; `arg1` is caller-supplied (an identifier or key), the two constants look like a mode/flag pair. Mechanics of the call site known, the callee's behaviour (null here) is not. |
+| `+0x04C` (`slot4C`) | `bufferControl` | C | Called twice with different second/third args -- `(0, 2)` to obtain `size`, `(0, 0)` after a successful alloc -- reading like a generic opcode-style control method rather than a plain getter. |
+| `+0x054` (`slot54`) | `installBuffer` | C | Called as `(this, newRes, size)` right after a successful allocation -- installs/commits the new buffer into whatever subclass-specific bookkeeping exists. |
+| `+0x048` (`slot48`) | `onBufferChanged` | C | Called on both the success and failure paths of this function, and also from `Class6D430__Destroy` -- a notification/finalize hook rather than part of the alloc logic itself. |
+
+All four are tier C: the CALL SITES are fully derived, but every one of
+these slots is null at `D_8006D430`'s own level, so nothing here confirms
+what an overriding subclass's implementation actually does. Posted to the
+broadcast.

@@ -92,3 +92,20 @@ convention: chains `Get_vtable_BasicClass()->ctor`, installs
 unit derived. A constructor's mechanics (chain base, install vtable,
 initialise fields) ARE its purpose, so tier A by the plan's own rule.
 `Class__Class` is the project's constructor-naming convention.
+
+## Proposed field names
+
+`UnkFlagsObj_171e0` is shared with `code_179d8_h.c`/`code_179d8_q.c`
+(see `Class6D430__AllocBuffer.md`); every field this constructor zeroes is
+therefore checked, and only `flags` (this round's own rename, zero
+cross-unit hits) renamed outright. The rest:
+
+| field | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `unk22` | -- (no change proposed) | C | Zeroed here, never read or written anywhere else in this unit. No evidence beyond "exists, width 2 bytes". Left as `unk22` rather than guess. |
+| `unk28` | -- (no change proposed) | C | Same as `unk22`: write-only in this unit, no read site found. |
+| `unk2A` | -- (no change proposed) | C | Same as `unk22`/`unk28`. |
+
+Not posting these three to the broadcast as renames (there is nothing to
+apply); noting them here so the next reader does not re-derive "these are
+zeroed and otherwise untouched" from scratch.

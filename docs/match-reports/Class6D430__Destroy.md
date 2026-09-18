@@ -92,3 +92,12 @@ hook `slot48` (null at this level) then tail-calls `slot5C`
 indirectly). Mechanics known (release the hook, then the buffer); whether
 this specific sequencing has a game-visible purpose beyond "the dtor" is
 not established.
+
+## Proposed vtable slot names
+
+| slot | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `+0x05C` (`slot5C`) | `freeBuffer` | B | Resolves to `Class6D430__FreeBuffer` at this class's own level (confirmed by dumping `D_8006D430`'s raw words), dispatched indirectly. Per the project's "vtable slots named like the method they dispatch to" convention. Proposed rather than renamed only because the slot's declaration lives in the shared, cross-unit-exposed `UnkFlagsObjMethods_171e0`. |
+
+See `Class6D430__AllocBuffer.md` for `+0x048`'s proposal (`onBufferChanged`),
+also dispatched from this function. Posted to the broadcast.
