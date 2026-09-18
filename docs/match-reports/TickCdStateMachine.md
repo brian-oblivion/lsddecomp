@@ -1,4 +1,6 @@
-# func_8002858C
+> Renamed from `func_8002858C` on 2026-09-18 (tools/rename.py). Address 0x8002858c.
+
+# TickCdStateMachine
 
 **Unit:** code_179d8_r · **Size:** 86 words · **Status:** MATCHED (86/86 words) · **Round 45**
 
@@ -10,7 +12,7 @@ phase (0 default, 1 = issue `CdControlF` seek, 2 = poll `CdSync`, 7 = issue
 no-op). `D_8008A8A0` is a busy-wait timeout counter, reset by
 `func_80028888` whenever the phase advances. Called from
 `ServiceCdDriver` (in the sibling unit `code_179d8_q.c`) when `D_8008A898 ==
-1`; `func_800286E4` is this same state machine's other tick variant
+1`; `TickCdLoadFileStateMachine` is this same state machine's other tick variant
 (`D_8008A898 == 2`), differing only in what happens when `CdSync` reports
 "still the same phase" and after a successful `CdReadSync`.
 
@@ -20,7 +22,7 @@ no-op). `D_8008A8A0` is a busy-wait timeout counter, reset by
 extern void func_80028864(void);
 extern void func_80028888(s32 arg0);
 
-void func_8002858C(void)
+void TickCdStateMachine(void)
 {
     s32 state;
     s32 v1;

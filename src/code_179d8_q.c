@@ -445,8 +445,8 @@ void UnlockCd(void)
 extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
 extern s32 gCdUseVSyncCallback;
 extern s32 D_8008A898;
-extern void func_8002858C(void); /* code_179d8_r: state-machine step 1 */
-extern void func_800286E4(void); /* code_179d8_r: state-machine step 2 */
+extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
+extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
@@ -478,9 +478,9 @@ s32 ServiceCdDriver(void)
     }
 
     if (D_8008A898 == 1) {
-        func_8002858C();
+        TickCdStateMachine();
     } else if (D_8008A898 == 2) {
-        func_800286E4();
+        TickCdLoadFileStateMachine();
     }
 
     if (gCdQueueEnabled != 0) {

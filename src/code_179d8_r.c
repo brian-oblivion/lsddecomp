@@ -13,7 +13,7 @@
  * The slice implements a small CD-read state machine:
  *   - gCdState holds the current state/phase.
  *   - D_8008A8A0 is a timeout counter, reset by func_80028888.
- *   - func_8002858C / func_800286E4 are near-identical per-tick state
+ *   - TickCdStateMachine / TickCdLoadFileStateMachine are near-identical per-tick state
  *     machine steps (driven from ServiceCdDriver in code_179d8_q via
  *     D_8008A898 == 1 / == 2), differing only in their state==2 and
  *     state==8-success handling.
@@ -66,7 +66,7 @@ extern s32 gCdState;   /* CD state-machine phase */
 extern void *D_8008A87C; /* CdControlF param pointer */
 extern s32 D_8008A880;   /* CdRead sector count */
 extern void *D_8008A884; /* CdRead target buffer */
-extern void *D_8008A888; /* secondary pointer, used only by func_800286E4 */
+extern void *D_8008A888; /* secondary pointer, used only by TickCdLoadFileStateMachine */
 extern s32 D_8008A898;   /* which state-machine step to tick, 1 or 2 */
 extern s32 D_8008A8A0;   /* timeout counter */
 
@@ -174,7 +174,7 @@ void *GetCdFileEntry(s32 index)
 extern void func_80028864(void);
 extern void func_80028888(s32 arg0);
 
-void func_8002858C(void)
+void TickCdStateMachine(void)
 {
     s32 state;
     s32 v1;
@@ -251,7 +251,7 @@ L_end:
     UnlockCd();
 }
 
-void func_800286E4(void)
+void TickCdLoadFileStateMachine(void)
 {
     s32 state;
     s32 v1;

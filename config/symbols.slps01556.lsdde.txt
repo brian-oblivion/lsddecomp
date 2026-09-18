@@ -749,3 +749,5 @@ FreeCdRequestNode = 0x800283C4; // type:func
 FindCdFileEntry = 0x80028448; // type:func
 FindCdFileIndex = 0x800284C4; // type:func
 GetCdFileEntry = 0x80028540; // type:func
+TickCdStateMachine = 0x8002858C; // type:func
+TickCdLoadFileStateMachine = 0x800286E4; // type:func

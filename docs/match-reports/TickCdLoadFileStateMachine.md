@@ -1,21 +1,23 @@
-# func_800286E4 -- MATCHED (round 46): 88/88 words, byte-exact
+> Renamed from `func_800286E4` on 2026-09-18 (tools/rename.py). Address 0x800286e4.
+
+# TickCdLoadFileStateMachine -- MATCHED (round 46): 88/88 words, byte-exact
 
 **Unit:** code_179d8_r · **Round 46** · **MATCHED**
 
 ## What it does
 
 The sibling tick of the CD-read state machine implemented by
-`func_8002858C` (see that report for the full state description), called
-from `ServiceCdDriver` when `D_8008A898 == 2`. Identical to `func_8002858C`
+`TickCdStateMachine` (see that report for the full state description), called
+from `ServiceCdDriver` when `D_8008A898 == 2`. Identical to `TickCdStateMachine`
 in every state except:
 
-- **state 2, `CdSync` reports "still busy, same phase"**: `func_8002858C`
+- **state 2, `CdSync` reports "still busy, same phase"**: `TickCdStateMachine`
   calls `func_80028864()` (full reset); this function instead just
   advances to phase 7 (`func_80028888(7)`) -- i.e. re-issue the read
   directly rather than resetting.
 - **state 8, `CdReadSync` succeeds (`v1 == 0`)**: after
   `func_80028864()`, this function additionally swaps two globals
-  (`D_8008A87C = D_8008A888; D_8008A888 = NULL;`) that `func_8002858C`
+  (`D_8008A87C = D_8008A888; D_8008A888 = NULL;`) that `TickCdStateMachine`
   does not touch at all.
 
 ## Round 45's stall, and what closed it
@@ -68,7 +70,7 @@ lever closed without one.
 ## Final body (byte-exact)
 
 ```c
-void func_800286E4(void)
+void TickCdLoadFileStateMachine(void)
 {
     s32 state;
     s32 v1;
