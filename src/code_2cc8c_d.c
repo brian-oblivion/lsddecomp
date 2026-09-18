@@ -220,10 +220,18 @@ void func_8003ECD0(Unk18Obj *self) {
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003ECD0);
 
+/* Sony's `DrawSync` (libgpu/sys, fingerprint exact vs the disc corpus, not
+ * yet linked from an SDK object). LOCAL to this unit, not code_2cc8c.h --
+ * see the note on ResetGraph/GsClearOt above: a second declaration of this
+ * name in a header six units include is exactly where LIBGPU.H's own
+ * prototype (`extern int DrawSync(int mode);`) will one day collide. This
+ * call site passes a literal 0 and ignores the return. */
+extern void DrawSync(s32 mode);
+
 /* Teardown counterpart to func_8003ECD0's init. */
 void func_8003EDF4(Unk18Obj *self) {
     if (self->unk70 != 0) {
-        func_80021114(0);
+        DrawSync(0);
         func_80017CFC((void *)self->unk78);
         self->unk70 = 0;
     }
@@ -328,6 +336,15 @@ void func_8003EEC0(Unk18Obj *self) {
  * GsDrawOtIO at this one address -- gs_111/GsDrawOt is what the build links. */
 extern void GsDrawOt(s32 a0);
 
+/* Sony's `GsSortClear` (libgs/gs_001, fingerprint exact vs the disc corpus,
+ * not yet linked from an SDK object). Local for the same collision reason as
+ * the three above: LIBGS.H's own prototype is `void GsSortClear(u_char r,
+ * u_char g, u_char b, GsOT *ot);`. This call site reads self->unk58's own
+ * three bytes UNSIGNED (same "writer reads signed, this reader reads
+ * unsigned" situation as unk5B/func_8003EEC0) and passes the fourth as a
+ * plain word, same as GsClearOt/GsDrawOt above. */
+extern void GsSortClear(u8 a0, u8 a1, u8 a2, s32 a3);
+
 /* Recomputes self->unk74 from self->unkC->methods->slot54, optionally
  * resets the graphics context and re-notifies self->unkC->methods->slot50
  * (once, or twice more if unk74 is still 0), forwards the current
@@ -357,8 +374,8 @@ void func_8003F04C(Unk18Obj *self) {
 
     idx = self->unk74;
     rawBytes = (u8 *)&self->unk58;
-    func_80023DA0(rawBytes[0], rawBytes[1], rawBytes[2],
-                  *(s32 *)((u8 *)self + 0x78 + idx * 4));
+    GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2],
+                *(s32 *)((u8 *)self + 0x78 + idx * 4));
 
     idx = self->unk74;
     GsDrawOt(*(s32 *)((u8 *)self + 0x78 + idx * 4));
