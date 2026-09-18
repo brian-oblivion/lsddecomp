@@ -1,3 +1,29 @@
+/*
+ * code_171e0 -- Class6D430's own module, plus an active-data-source
+ * dispatch layer built on top of it.
+ *
+ * Class6D430 (UnkFlagsObj_171e0/UnkFlagsObjMethods_171e0) is a small
+ * BasicClass subclass holding one lazily-(re)allocated buffer (unk10/unk14,
+ * managed by Class6D430__AllocBuffer/FreeBuffer) plus a flags word.
+ * D_8006D4E8 (the CD-ROM read driver, code_179d8_q.c) shares its own
+ * +0x004/+0x05C/+0x060/+0x064 slots with it verbatim (DestroyChained/
+ * Class6D430__FreeBuffer/NoOp/Class6D430__SetFlag), so this is a real shared
+ * base for at least that sibling, and plausibly for D_8006D9BC too (the
+ * SPU/VAB streamer, code_179d8_e.c).
+ *
+ * Most of this unit's remaining functions dispatch between those same two
+ * sibling classes by `gActiveDataSource` (DATASOURCE_CD/DATASOURCE_SPU,
+ * their own header words): Lock/UnlockActiveDataSource,
+ * IsActiveDataSourceBusy/Idle, GetActiveDataSourceOperation/State/
+ * DriverMode/Methods/UseVSyncCallback, SetActiveDataSourceDriverMode,
+ * RegisterFileTableEntries and the stalled SetActiveDataSource all forward
+ * to the CD driver's own functions when it is active, and to an SPU/VAB-
+ * side fallback otherwise.
+ *
+ * GetClass6D3C8Methods, SetVec3 and BuildFileName are unrelated utilities
+ * that happen to live in this segment; func_800270AC/func_800270B8 (a
+ * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
+ */
 #include "common.h"
 #include "code_171e0.h"
 
