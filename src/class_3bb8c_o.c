@@ -9,7 +9,7 @@
  * Named round 52 (runner bravo). SPANS TWO CLASSES, cut at a ROM address,
  * not a class boundary (`tools/classtable.py`, confirmed round 17/52):
  *
- *  - `LinkOwnerObj`/`LinkElemObj` (`Noop`, `LinkOwnerObj__ReleaseLinks[B]`,
+ *  - `LinkOwnerObj`/`LinkElemObj` (`NoOpIgnoreArgs`, `LinkOwnerObj__ReleaseLinks[B]`,
  *    `LinkOwnerObj__RandomizeLinks`, `LinkOwnerObj__func_56e1c`): a small
  *    object holding an inline 5-element link array (`links`). This is the
  *    SAME node `class_3bb8c_s.c` independently calls `LinkNode` -- kept as
@@ -30,7 +30,7 @@
  */
 #include "common.h"
 
-void Noop(void) {
+void NoOpIgnoreArgs(void) {
 }
 
 /* ------------------------------------------------------------------ *
