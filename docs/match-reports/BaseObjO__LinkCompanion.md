@@ -23,7 +23,7 @@ typedef struct TagWordObjO {
 void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag;
 
-    func_8001E57C()->slot10(self, arg);
+    GetClass6B5CCMethods()->slot10(self, arg);
     tag = arg->methods->header;
     if ((tag & 0xFFF) == 0x114) {
         self->unk4C = arg;
@@ -36,15 +36,15 @@ void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
 ## Derivation
 
 - **Order matters: chain to the fixed table FIRST, tag-check SECOND.**
-  Retail calls `func_8001E57C()->slot10(self, arg)` before ever reading
+  Retail calls `GetClass6B5CCMethods()->slot10(self, arg)` before ever reading
   `arg`'s own vtable header, then re-derives `arg->methods->header` fresh
   afterward. Reversing the order (tag-check first) does not reproduce this
   and was not needed -- writing the statements in retail's own order was
   sufficient first try.
-- **`func_8001E57C()` called with implicit `self` in `$a0`.** At the call
+- **`GetClass6B5CCMethods()` called with implicit `self` in `$a0`.** At the call
   site nothing has touched `$a0` yet (it still holds this function's own
   first parameter), matching the project's established "MEASURED:
-  `func_8001E57C` takes no real arguments" 0-argument declaration -- no
+  `GetClass6B5CCMethods` takes no real arguments" 0-argument declaration -- no
   spurious `move` is emitted.
 - **Tag classification reads a full WORD (`arg->methods->header`), masked
   `& 0xFFF` / `& 0xF`, not a byte.** This is a DIFFERENT tag check than

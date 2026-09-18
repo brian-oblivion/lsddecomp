@@ -24,7 +24,7 @@ New struct/vtable knowledge added regardless of the stall (all verified
 straight from the disassembly): `Class866E8Methods::slot88` (declared with
 a 4th `s32 arg3` parameter that the occupant, `func_8004AA6C`, doesn't
 read — same "field type need not match every occupant's real signature"
-precedent as `func_8004A984`/`func_8004AA6C`'s `func_8001E57C`), `slot108`
+precedent as `func_8004A984`/`func_8004AA6C`'s `GetClass6B5CCMethods`), `slot108`
 (`func_8004C0AC`, not decompiled), `slot140` (`func_8004D088`, not
 decompiled — this promotes what was previously just end-of-struct
 padding into a real slot), `Class866E8::unkEC[7]` (`UnkSlotEntry_3ac78`,

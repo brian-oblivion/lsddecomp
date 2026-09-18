@@ -1,4 +1,6 @@
-# func_8001D6B4 -- MATCHED (24/24 words)
+> Renamed from `func_8001D6B4` on 2026-09-18 (tools/rename.py). Address 0x8001d6b4.
+
+# Class6B5CC__DispatchLinkCommand -- MATCHED (24/24 words)
 
 Round 12, runner delta. `code_d294_b`.
 
@@ -9,7 +11,7 @@ Round 12, runner delta. `code_d294_b`.
 and anything else (`< 2` or `> 4`) is a no-op.
 
 ```c
-void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
+void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
     switch (a2) {
     case 2:
     case 3:
@@ -53,14 +55,14 @@ image SHA1 is green).
 - `Class6B5CCMethods::slotA0` (+0x0A0, new field): dispatched with only
   `self` (the `jalr` leaves `$a0` untouched from function entry).
   `tools/classtable.py D_8006B5CC` confirms this slot's occupant is
-  `func_8001D714` (still queued, this unit).
+  `Class6B5CC__TryAttachNearby` (still queued, this unit).
 - `Class6B5CCObj::unk28` (new field, `s32`): m2c inferred `s32` from `a1`'s
   own usage; never dereferenced by this unit's chosen functions, so nothing
   narrows it further.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/func_8001D6B4.s`).
+Disassembly (`asm/nonmatchings/code_d294_b/Class6B5CC__DispatchLinkCommand.s`).
 
 ### Proposed learning
 
@@ -76,12 +78,12 @@ physical body-out-of-line-vs-inline layout.
 
 **Not renamed -- PROPOSED only.** Proposed name: `Class6B5CC__DispatchLinkCommand`
 (tier B). `a2` selects one of three behaviors: `2`/`3` dispatch through
-`self->methods->slotA0` (occupant `func_8001D714`, proposed
+`self->methods->slotA0` (occupant `Class6B5CC__TryAttachNearby`, proposed
 `Class6B5CC__TryAttachNearby` below); exactly `4` stores `a1` directly
-into `self->unk28` (the same field `func_8001D714` itself sets on a
+into `self->unk28` (the same field `Class6B5CC__TryAttachNearby` itself sets on a
 successful attach); anything else is a no-op. Reads like a small
 command dispatcher over the same "attach a nearby object" state
-`func_8001D714` manages, with `a2==4` as a direct/forced-attach
+`Class6B5CC__TryAttachNearby` manages, with `a2==4` as a direct/forced-attach
 shortcut that skips the proximity/bounds checks. Tier B: mechanics
 (the three-way dispatch) are certain from the disassembly-verified
 `switch`; which caller uses which `a2` value and why is not established

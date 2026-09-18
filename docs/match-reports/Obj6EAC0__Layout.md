@@ -6,7 +6,7 @@ Unit `code_2cc8c_f`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
 FUNCTION the vtable slot points to, not a caller of it -- the header's
 existing "IS Obj6EAC0__Layout" note on that slot already said as much before
 this round). Body: when `self->unkC == 0`, forwards to the shared
-"default handler" table's own `slot4C` (`func_8001E57C()`, already typed
+"default handler" table's own `slot4C` (`GetClass6B5CCMethods()`, already typed
 in `include/code_2cc8c.h` as `D6B5CCGetterMethodsCC8C`, with a `slot4C`
 member at the exact offset/arity this call site needs -- no header changes
 were necessary), then dispatches `self->methods->slotBC(self, a2)` --
@@ -16,7 +16,7 @@ pointer").
 ```c
 void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
     if (self->unkC == 0) {
-        func_8001E57C()->slot4C(self, a1, 0);
+        GetClass6B5CCMethods()->slot4C(self, a1, 0);
         self->methods->slotBC(self, a2);
     }
 }

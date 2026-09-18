@@ -16,7 +16,7 @@ match was reached.
 s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
 ```
 
-Confirmed from `func_8001D714`'s own call site (this round, also stalled —
+Confirmed from `Class6B5CC__TryAttachNearby`'s own call site (this round, also stalled —
 see that report): `Class6B5CCMethods`'s `+0x0A8` slot, dispatched as
 `(self, arg1, &diff)` where `diff` is a `Vec3S16_d294`.
 
@@ -230,7 +230,7 @@ concrete, measured leads for the next attempt:
 1. **Frame size is 0x98 (152 bytes) vs retail's 0xF8 (248 bytes) — a
    96-byte/24-word deficit**, found from the very first diffed word
    (`addiu $sp,$sp,-0xF8` vs this attempt's `-0x98`). Given this round's
-   repeated pattern (`Class6B5CC__NotifyIfUnk20Active`, `func_8001D714`) of an "unused-
+   repeated pattern (`Class6B5CC__NotifyIfUnk20Active`, `Class6B5CC__TryAttachNearby`) of an "unused-
    looking" local needing to be sized much larger than its own field
    accesses suggest, in order to reproduce retail's frame — check first
    whether `track`, `mm`, or a not-yet-identified THIRD local needs
@@ -258,7 +258,7 @@ concrete, measured leads for the next attempt:
 - Prototype for `Class6B5CC__CheckBoundsOverlap` itself.
 - **No existing declaration was modified** for this function — `Class6B5CCMethods::slotA8`
   (typed `s32 (*)(Class6B5CCObj*, void*, Vec3S16_d294*)`) was already added
-  while working `func_8001D714` earlier this round; this attempt only
+  while working `Class6B5CC__TryAttachNearby` earlier this round; this attempt only
   consumed that existing type, it did not change it.
 
 ## Proposed learning
@@ -279,14 +279,14 @@ shows more than one live pointer-class register surviving the loop.
 
 **First, a correctness note for whoever resumes this:** while re-deriving
 this function, a bug from earlier in this same session was discovered
-and fixed -- `func_8001D714` (this unit's OTHER round-13 stall, addressed
+and fixed -- `Class6B5CC__TryAttachNearby` (this unit's OTHER round-13 stall, addressed
 earlier the same round) had been left LIVE in `src/code_d294_b.c`
 (missing its `#if 0`/`INCLUDE_ASM` wrapper) after an experiment, which
 silently shifted every function after it in the file by 13 words. This
 made `Class6B5CC__CheckBoundsOverlap`'s own vram address wrong in the LINKED build
 (`0x8001D9F4` instead of retail's `0x8001DA28`, confirmed via
 `build/lsdde.map`), which in turn made every early diff read against it
-meaningless. Fixed by re-wrapping `func_8001D714` properly; confirmed via
+meaningless. Fixed by re-wrapping `Class6B5CC__TryAttachNearby` properly; confirmed via
 the map file that `Class6B5CC__CheckBoundsOverlap` lands at the correct retail address
 before trusting any further diff. **Whenever a diff for an
 `INCLUDE_ASM`-adjacent function looks nonsensical from word 0 (a
@@ -307,7 +307,7 @@ in place of the bare `INCLUDE_ASM`. Baseline reproduced: **5/243, frame
 report's own "22-word/96-byte deficit" figure closely (96 bytes exactly).
 
 **Frame size, closed exactly.** Per this report's own flagged first lead,
-and this unit's now-repeated idiom (`Class6B5CC__NotifyIfUnk20Active`, `func_8001D714`):
+and this unit's now-repeated idiom (`Class6B5CC__NotifyIfUnk20Active`, `Class6B5CC__TryAttachNearby`):
 mapped every `(sp)`-relative load/store in retail's own `.s` and found
 the ENTIRE stack usage is two 12-byte structs (`mm` at `+0x10`, `track`
 at `+0x20`) plus the standard `0x10` outgoing-arg minimum -- nothing else
@@ -504,7 +504,7 @@ before concluding the function's OWN source is somehow producing
 alien code.
 
 Also: this function's frame-size fix is the THIRD instance in this one
-unit (`Class6B5CC__NotifyIfUnk20Active`, `func_8001D714`, now this) of "an unused-looking
+unit (`Class6B5CC__NotifyIfUnk20Active`, `Class6B5CC__TryAttachNearby`, now this) of "an unused-looking
 local needs to be sized to close a frame gap, not to what the function's
 own visible code needs" -- strong enough now to treat as a standing
 first-check for any `code_d294_b` stall with a non-matching frame size,
@@ -518,7 +518,7 @@ CLAUDE.md's per-round instructions flagged explicitly as blocking the next
 round from ranking it. Per the round's "build the inherited body before
 you trust its score" discipline, spliced the round-20 preserved body
 (above, 14/243, frame + self-materialization fixes already folded in)
-back into `src/code_d294_b.c` verbatim, confirmed `func_8001D714`
+back into `src/code_d294_b.c` verbatim, confirmed `Class6B5CC__TryAttachNearby`
 (the sibling immediately before it in ROM order) was still properly
 `#if 0`/`INCLUDE_ASM`-wrapped before trusting the address, and rebuilt.
 
@@ -526,7 +526,7 @@ back into `src/code_d294_b.c` verbatim, confirmed `func_8001D714`
 errors.** `build/lsdde.map` confirms `Class6B5CC__CheckBoundsOverlap` itself lands at the
 correct retail address `0x8001da28` (so the earlier frame-size fix still
 holds and this function's own window is trustworthy) — but the NEXT
-function, `func_8001DDF4`, lands at `0x8001dda0` where retail has it at
+function, `Class6B5CC__ClassifyAgainstPlanes`, lands at `0x8001dda0` where retail has it at
 `0x8001DDF4`, a **0x54-byte / 21-word deficit**. That is this function's
 own true LENGTH residue: 222 words built vs 243 retail.
 
@@ -612,7 +612,7 @@ scoring-mode difference, not a discrepancy in the residue itself).**
 Read every one of the eight `output-*` directories `--best-only` wrote
 (7075, 6820, 6205, 6200, 5775, 5705, 5655, 4990), not just the final
 best, since round 20's own finding on a DIFFERENT function in this unit
-(`func_8001D714`) was that a permuter's headline score can bundle a
+(`Class6B5CC__TryAttachNearby`) was that a permuter's headline score can bundle a
 load-bearing change with unrelated noise:
 
 - **None of the eight candidates touch the function's actual first

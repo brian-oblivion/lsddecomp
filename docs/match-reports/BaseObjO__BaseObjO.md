@@ -4,14 +4,14 @@
 
 Unit: `class_3bb8c_o` (round 17). The constructor of the shared
 intermediate base class this unit implements from here onward -- chains to
-the base-class ctor via the fixed `func_8001E57C()` table, installs this
+the base-class ctor via the fixed `GetClass6B5CCMethods()` table, installs this
 class's own vtable, zeroes three fields and dispatches its own `slot40`.
 
 ## Final source
 
 ```c
 BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
-    if (func_8001E57C()->ctor(self) == NULL) {
+    if (GetClass6B5CCMethods()->ctor(self) == NULL) {
         goto fail;
     }
     self->methods = func_80057C84();
@@ -51,14 +51,14 @@ discipline and the file banner), so this unit keeps its own local reading,
 
 ## Derivation
 
-- **`func_8001E57C()` needed a NON-VOID `ctor`, forcing a fresh local
+- **`GetClass6B5CCMethods()` needed a NON-VOID `ctor`, forcing a fresh local
   table type rather than reusing `class_3bb8c.h`'s existing
   `BaseCtorTableB_3bb8c_c`.** That header's own `ctor` field is typed
   `void (*ctor)(void *self)` (established from a DIFFERENT unit's call site
   that discards the return), but THIS call site checks
-  `func_8001E57C()->ctor(self) == NULL` -- an outright arity/return-type
+  `GetClass6B5CCMethods()->ctor(self) == NULL` -- an outright arity/return-type
   conflict at the same slot, same shape as the project's other
-  `func_8001E57C` per-call-site-typing precedent already written up in
+  `GetClass6B5CCMethods` per-call-site-typing precedent already written up in
   that very header (see its own long comment on why the arg list "is what
   THIS call site's bytes need", not the callee's true signature). Declared
   a fresh local `FixedBaseTable` here instead of touching the shared
@@ -81,7 +81,7 @@ discipline and the file banner), so this unit keeps its own local reading,
 
 ### Proposed learning
 
-- **`func_8001E57C`'s per-call-site-typing precedent is not unique to
+- **`GetClass6B5CCMethods`'s per-call-site-typing precedent is not unique to
   `class_3bb8c.h`/`code_d294.h`/`class_3ac78.c`.** A fourth, independent
   local reading (`FixedBaseTable` here) needed the SAME non-void-vs-void
   fork on the SAME slot (`ctor`, offset `+0x008`) for the identical reason
@@ -95,7 +95,7 @@ discipline and the file banner), so this unit keeps its own local reading,
 
 **`BaseObjO__BaseObjO` -- tier A.** The raw `Class__Class` constructor form:
 takes an already-allocated `self`, chains to the true root
-(`func_8001E57C()->ctor`), installs `self->methods`, zeroes three fields
+(`GetClass6B5CCMethods()->ctor`), installs `self->methods`, zeroes three fields
 and dispatches `slot40`. The report's own "Class identification" section
 establishes THREE independent ways that this is the shared intermediate
 base's own constructor, not `Class65650`'s: (1) it installs the exact

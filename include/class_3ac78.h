@@ -170,7 +170,7 @@ struct Class866E8Methods {
     /* +0x03C */ u8 pad03C[0x040 - 0x03C];
     /* +0x040 */ void (*slot40)(Class866E8 *self);                              /* func_8004AA10; called by func_8004B344 */
     /* +0x044 */ u8 pad044[0x080 - 0x044];
-    /* +0x080 */ void (*slot80)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* func_8001D4AC; called by func_8004A478 through Class86668::unk34 */
+    /* +0x080 */ void (*slot80)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* Class6B5CC__GetSetUnk10Flag8; called by func_8004A478 through Class86668::unk34 */
     /* +0x084 */ u8 pad084[0x088 - 0x084];
     /* +0x088 */ void (*slot88)(Class866E8 *self, s32 arg1, void *arg2, s32 arg3); /* func_8004AA6C; called by func_8004ABD0 with a 4th arg AA6C's own body never reads */
     /* +0x08C */ u8 pad08C[0x0B8 - 0x08C];

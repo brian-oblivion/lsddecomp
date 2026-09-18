@@ -10,7 +10,7 @@
  * unit's helpers are called from a dozen other units.
  *
  * NONE of this unit's functions is a vtable slot (`tools/classtable.py
- * D_8006B5CC` stops at func_8001E4A4). It is the class's FREE-FUNCTION tail:
+ * D_8006B5CC` stops at Class6B5CC__NotifyTaggedParents). It is the class's FREE-FUNCTION tail:
  * five instance helpers that dispatch through the table (`Class6B5CC__*`)
  * and eight standalone leaves -- vector, matrix, fixed-point, bounding-box
  * and bitfield primitives -- that the rest of the game calls by symbol.
@@ -24,7 +24,7 @@
 
 /* Rotates a 3-element s16 vector, given in the object's own local frame,
  * by the object's own orientation, widening it into `dst`. `slot84`
- * (func_8001D4DC, code_d294_b) builds that rotation with RotMatrix from
+ * (Class6B5CC__GetRotMatrix, code_d294_b) builds that rotation with RotMatrix from
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
  * class_3bb8c_o's own call site (BaseObjO__ApplyRotatedVec14) passes a local `Vec3O`. */
@@ -411,7 +411,7 @@ extern s32 D_8008A838;
  * of the global `D_8008A838` (read old, store new, return old), the shape
  * the project spells `GetSet...` elsewhere. What the global MEANS is not
  * established, so there is no noun to put in the name: its only known
- * reader is func_8001DDF4 (code_d294_b), where `D_8008A838 == 0 || outWord
+ * reader is Class6B5CC__ClassifyAgainstPlanes (code_d294_b), where `D_8008A838 == 0 || outWord
  * >= 0x201` gates accepting a hit, and its only known writer is
  * class_3bb8c_l.c's func_80052F10, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.

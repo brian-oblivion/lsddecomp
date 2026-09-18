@@ -5,7 +5,7 @@
 ## What it does
 
 The constructor (`ctor`, slot +0x008) for `Class86AA0`. Chains to a base
-ctor (fetched via `func_8001E57C(self)`), installs this class's own vtable,
+ctor (fetched via `GetClass6B5CCMethods(self)`), installs this class's own vtable,
 then zeroes three of its own fields (`unk34` u16, `unk36` u16, `unk38`
 s32) directly -- unlike func_8004D2A4's sibling ctor, there is no
 post-construct hook call here (the retail instruction stream ends right
@@ -16,7 +16,7 @@ after the zero-stores).
 ```c
 void func_8004D3DC(Class86AA0 *self)
 {
-    func_8001E57C(self)->ctor(self);
+    GetClass6B5CCMethods(self)->ctor(self);
     self->methods = func_8004D508();
     self->unk34 = 0;
     self->unk36 = 0;
@@ -24,15 +24,15 @@ void func_8004D3DC(Class86AA0 *self)
 }
 ```
 
-## Notes on func_8001E57C's declared arity
+## Notes on GetClass6B5CCMethods's declared arity
 
-`func_8001E57C` is already declared elsewhere in the codebase
+`GetClass6B5CCMethods` is already declared elsewhere in the codebase
 (`include/class_3ac78.h`) with a two-argument signature,
-`void *func_8001E57C(Class866E8 *self, s32 arg1)`. This unit's own call
+`void *GetClass6B5CCMethods(Class866E8 *self, s32 arg1)`. This unit's own call
 site never sets up a second argument register (`$a1`) before the `jal` --
 the instruction immediately after is a plain `lw` on the return value, not
 an `addu $a1, ...` -- so it is declared here, file-locally, as single-
-argument: `extern BaseCtorTable_3bb8c_c *func_8001E57C(void *self);`. This
+argument: `extern BaseCtorTable_3bb8c_c *GetClass6B5CCMethods(void *self);`. This
 is safe: each translation unit gets its own extern prototype for a given
 external symbol in this project (no shared declaration is enforced across
 units), and the only thing that has to be right for THIS unit's codegen to
@@ -49,7 +49,7 @@ match is what THIS call site's own register usage requires.
 declarations of one symbol means nobody has established the real signature
 yet, and settling it is one `cat` away: read the CALLEE.**
 
-Here that read settles it flatly. `func_8001E57C`'s entire body
+Here that read settles it flatly. `GetClass6B5CCMethods`'s entire body
 (`asm/code_d294.s`) is:
 
 ```

@@ -1,4 +1,6 @@
-# func_8001D4DC — MATCHED
+> Renamed from `func_8001D4DC` on 2026-09-18 (tools/rename.py). Address 0x8001d4dc.
+
+# Class6B5CC__GetRotMatrix — MATCHED
 
 Unit: `code_d294_b`. Round 13, runner delta. 35/35 words, full match on the
 first attempt.
@@ -6,7 +8,7 @@ first attempt.
 ## Signature
 
 ```c
-void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2);
+void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2);
 ```
 
 ## What it does
@@ -29,7 +31,7 @@ project).
 ## Source
 
 ```c
-void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
+void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2) {
     S16Quad_d294 buf;
     S16Quad_d294 *src = &self->unk14->unk44->vec;
 
@@ -65,8 +67,8 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
   `func_80017CFC(sub->unk44)`, which takes `void *`) — both are safe under
   implicit pointer conversion, no cast needed.
 - New extern `func_800160B0(S16Quad_d294 *vec, s32 a1)`, PsyQ library,
-  per-call-site typed (same precedent as `func_8001E57C`'s note on
-  `func_8001E57C`/other cross-unit PsyQ calls) — `$v0` is never read after
+  per-call-site typed (same precedent as `GetClass6B5CCMethods`'s note on
+  `GetClass6B5CCMethods`/other cross-unit PsyQ calls) — `$v0` is never read after
   this call site's own `jal`, so it's declared `void`.
 
 ## Proposed learning
@@ -92,7 +94,7 @@ dispatched as `slot84(self, out, flag)` from both this unit's own
 `Class6B5CC__ComposeAndApplyRotation` (`self` as receiver) and
 `code_d294_c.c`'s `Class6B5CC__RotateLocalVector` (a different
 Class6B5CCObj instance) -- so the SIGNATURE this file declares
-(`func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2)`) is really
+(`Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2)`) is really
 `(self, MATRIX *out, s32 negate)`: builds this object's own rotation
 quad (`self->unk14->unk44->vec`, the PSY-Q-identified `GsCOORD2PARAM.rotate`
 per `include/code_d294.h`'s own "PSY-Q IDENTIFICATION" note -- negated

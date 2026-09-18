@@ -67,7 +67,7 @@ accesses are plain uses of existing fields, not new ones.
 
 - **`func_8001E600` -> `Class6B5CC__LocalOffsetToWorldPos`. Tier B.** Two
   measured halves: (1) it rotates `src` by the object's own orientation
-  (`slot84` with the flag-0, un-negated branch of `func_8001D4DC`), and
+  (`slot84` with the flag-0, un-negated branch of `Class6B5CC__GetRotMatrix`), and
   (2) it adds `self->unk14->unk38`, which is `GsCOORDINATE2.workm.t` -- the
   COMPOSED world matrix's translation (`workm` at +0x24, `t` at +0x14 into
   MATRIX, = +0x38; see the PSY-Q IDENTIFICATION note in

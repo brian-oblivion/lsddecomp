@@ -172,21 +172,21 @@ void func_8004A7C0(Class866E8 *self)
     func_800428E4()->dtor(self);
 }
 
-/* MEASURED, round 9: func_8001E57C TAKES NO ARGUMENTS -- its body is
+/* MEASURED, round 9: GetClass6B5CCMethods TAKES NO ARGUMENTS -- its body is
  * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` and it reads neither $a0 nor $a1
  * (asm/code_d294.s). The two args below are what THIS call site passes, not
  * the callee's signature; include/class_3bb8c.h passes ONE to the same symbol
  * and is equally byte-exact. Retail's source called one zero-argument getter
  * with different argument counts from different files, which is what C89 does
  * with no prototype in scope. Do not reconcile the two declarations. */
-extern void *func_8001E57C(Class866E8 *self, s32 arg1);
+extern void *GetClass6B5CCMethods(Class866E8 *self, s32 arg1);
 
 void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
 {
     void (*fn)(Class866E8 *self, GenericObject *arg1, s32 arg2);
 
     fn = *(void (**)(Class866E8 *, GenericObject *, s32))
-        ((u8 *)func_8001E57C(self, (s32)arg1) + 0x38);
+        ((u8 *)GetClass6B5CCMethods(self, (s32)arg1) + 0x38);
     fn(self, arg1, arg2);
 
     if ((arg1->methods->header & 0xF) == 1) {
@@ -212,7 +212,7 @@ void func_8004AA6C(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
 {
     void (*fn)(Class866E8 *self, s32 arg1);
 
-    fn = *(void (**)(Class866E8 *, s32))((u8 *)func_8001E57C(self, arg1) + 0x88);
+    fn = *(void (**)(Class866E8 *, s32))((u8 *)GetClass6B5CCMethods(self, arg1) + 0x88);
     fn(self, arg1);
 
     if (arg1 == 6)
@@ -487,7 +487,7 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
 /* Widened this round (func_8004B100) from a single-param signature to
  * accept two more, unused, forwarded params: func_8004B100's own call
  * sites explicitly set up $a1/$a2 before every call here (unlike
- * func_8001E57C's "leftover, already-there" args -- these are real,
+ * GetClass6B5CCMethods's "leftover, already-there" args -- these are real,
  * explicit `move` instructions), so the call itself needs a matching
  * 3-param prototype to compile. Confirmed harmless to THIS function's own
  * already-matched body: neither extra param is read, and GCC does not

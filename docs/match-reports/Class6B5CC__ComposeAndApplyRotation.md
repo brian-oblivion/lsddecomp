@@ -135,7 +135,7 @@ all.
 
 Renamed from `func_8001D950` via `tools/rename.py`. **Tier B** -- slot
 `+0x0A4` occupant. Builds `self`'s own rotation matrix via
-`self->methods->slot84` (occupant `func_8001D4DC`, proposed
+`self->methods->slot84` (occupant `Class6B5CC__GetRotMatrix`, proposed
 `Class6B5CC__GetRotMatrix` below -- not renamed, cross-unit reference),
 folds in every `self->unkC` list node's own `slot84` output via
 `MulMatrix2` (a compose step), then applies the composed matrix to one

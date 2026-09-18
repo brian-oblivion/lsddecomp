@@ -891,8 +891,8 @@ struct vtable_DreamSys{
 	/* Called by this unit's own func_80057B90 as (this, arg1, count) when
 	   `5 <= count < 9` -- dispatched through THIS object's own vtable
 	   (unlike func_80057B90's other, unconditional call, which goes
-	   through the shared base table via func_8001E57C() instead).
-	   Resolves to func_8001D714, not overridden at the DreamSys level
+	   through the shared base table via GetClass6B5CCMethods() instead).
+	   Resolves to Class6B5CC__TryAttachNearby, not overridden at the DreamSys level
 	   (round 2026-09-04). */
 	void (*slotA0)(DreamSys *this, void *arg1, s32 count);
 	u32 unknown_functions_0xa4[5];

@@ -6,7 +6,7 @@ Round 12, runner delta. `code_d294_b`.
 
 ## Summary
 
-Same family as `func_8001D424` (see that report) -- raw pass-through wrapper
+Same family as `Class6B5CC__GetSetUnk10Field0` (see that report) -- raw pass-through wrapper
 around `GetSetBitField(&self->unk10, shift, width, value)`, shift 9, width 3.
 
 ```c
@@ -29,7 +29,7 @@ No post-processing of `$v0`.
 
 ### Proposed learning
 
-None beyond the family census already noted in `func_8001D424.md`.
+None beyond the family census already noted in `Class6B5CC__GetSetUnk10Field0.md`.
 
 ## Naming (round 54, bravo, track 3)
 

@@ -46,7 +46,7 @@ loose `void *`/`*a1` reads into real fields.
   here) and **`unk30`** (new `GenericCountList_d294 *` field): set to this
   call's own `a1` only for the duration of the `slot30` dispatch, then
   cleared again right after -- reads like a "currently processing" scratch
-  slot, not a durable one. (`unk28` was already added by `func_8001D6B4`,
+  slot, not a durable one. (`unk28` was already added by `Class6B5CC__DispatchLinkCommand`,
   matched earlier this round; this function only adds `unk2C`/`unk30`.)
 - **`ApplyMatrixToSVArray`** (extern, `asm/code_d294_c.s`, the next slice, still
   uncarved): declared `(void *src, void *dest, s32 count, void *out)`,

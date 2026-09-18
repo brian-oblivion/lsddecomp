@@ -17,7 +17,7 @@ void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     } else if ((tag & 0xF) == 5) {
         self->unk50 = NULL;
     }
-    func_8001E57C()->slot14(self, arg);
+    GetClass6B5CCMethods()->slot14(self, arg);
 }
 ```
 
@@ -28,13 +28,13 @@ Mirror image of `BaseObjO__LinkCompanion`'s order: here the tag check runs FIRST
 and the chain to the fixed table's `slot14` runs LAST. Confirmed directly
 against the disassembly's own instruction order -- no iteration needed.
 
-`func_8001E57C()`'s call site here passes `$a0` = leftover garbage from the
+`GetClass6B5CCMethods()`'s call site here passes `$a0` = leftover garbage from the
 preceding tag-check code (`arg->methods->header`, not `self`) -- retail
 itself sets up no explicit `$a0` before this `jal` either, which is exactly
 the established "declare it 0-argument and let whatever is already resident
 in `$a0` go along for the ride, because the callee ignores it regardless"
 precedent. Matching this required NOT adding any argument-setup code before
-the call, i.e. leaving `func_8001E57C()` as a plain 0-argument call at every
+the call, i.e. leaving `GetClass6B5CCMethods()` as a plain 0-argument call at every
 site, not just the ones where `self` happens to still be resident.
 
 ### Proposed learning
@@ -42,11 +42,11 @@ site, not just the ones where `self` happens to still be resident.
 - **The same fixed-table getter can be called with visibly different
   garbage in its ignored argument register across different call sites in
   the SAME function's sibling, and both reproduce retail exactly.**
-  `BaseObjO__LinkCompanion` calls `func_8001E57C()` with `self` still resident;
+  `BaseObjO__LinkCompanion` calls `GetClass6B5CCMethods()` with `self` still resident;
   `BaseObjO__UnlinkCompanion` calls it with the tag-check's leftover header word
   resident instead. Both are correct because the callee provably ignores
   its input -- reinforces (rather than extends) the existing
-  `func_8001E57C` precedent, but from the "it doesn't matter what's
+  `GetClass6B5CCMethods` precedent, but from the "it doesn't matter what's
   there" side rather than the "self happens to be there" side.
 
 ## Naming

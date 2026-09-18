@@ -1,4 +1,6 @@
-# func_8001E57C -- MATCHED (4/4 words)
+> Renamed from `func_8001E57C` on 2026-09-18 (tools/rename.py). Address 0x8001e57c.
+
+# GetClass6B5CCMethods -- MATCHED (4/4 words)
 
 Round 12, runner delta. `code_d294_b`.
 
@@ -11,7 +13,7 @@ established cross-unit precedent, not new). Whole body is `lui/addiu
 %hi/%lo(D_8006B5CC); jr $ra`.
 
 ```c
-Class6B5CCMethods *func_8001E57C(void) {
+Class6B5CCMethods *GetClass6B5CCMethods(void) {
     return &D_8006B5CC;
 }
 ```
@@ -24,7 +26,7 @@ all of which belong to this and the sibling `code_d294`/`code_d294_c` units.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/func_8001E57C.s`):
+Disassembly (`asm/nonmatchings/code_d294_b/GetClass6B5CCMethods.s`):
 ```
 lui   $v0, %hi(D_8006B5CC)
 addiu $v0, $v0, %lo(D_8006B5CC)

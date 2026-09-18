@@ -264,7 +264,7 @@ void *func_80057B54(void *arg0, void *arg1, void *arg2) {
     return NULL;
 }
 
-/* This unit's own local view of func_8001E57C()'s return, matching only
+/* This unit's own local view of GetClass6B5CCMethods()'s return, matching only
  * the one slot this unit's own functions dispatch through directly (the
  * OTHER slot these functions use, +0xA0, is reached through the object's
  * OWN vtable instead -- see include/DreamSys.h's `slotA0`) -- per the
@@ -277,10 +277,10 @@ typedef struct DreamSysBasicSlots {
     u8 pad00[0x9C];
     void (*slot9C)(DreamSys *self, void *arg1, s32 count);
 } DreamSysBasicSlots;
-extern DreamSysBasicSlots *func_8001E57C(void);
+extern DreamSysBasicSlots *GetClass6B5CCMethods(void);
 
 void func_80057B90(DreamSys *self, void *arg1, s32 count) {
-    func_8001E57C()->slot9C(self, arg1, count);
+    GetClass6B5CCMethods()->slot9C(self, arg1, count);
     if (count < 9) {
         if (count >= 5) {
             self->vt->slotA0(self, arg1, count);
@@ -289,7 +289,7 @@ void func_80057B90(DreamSys *self, void *arg1, s32 count) {
 }
 
 void func_80057C14(DreamSys *self, void *arg1, s32 count) {
-    func_8001E57C()->slot9C(self, arg1, count);
+    GetClass6B5CCMethods()->slot9C(self, arg1, count);
 }
 
 void func_80057C6C(DreamSys *self, s16 val) {

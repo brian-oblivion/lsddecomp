@@ -3,7 +3,7 @@
 # BaseObjO__func_571f8 -- MATCHED (74/74 words)
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot88` (via the fixed
-`func_8001E57C()` table) followed by a guarded body that only runs for
+`GetClass6B5CCMethods()` table) followed by a guarded body that only runs for
 `arg1` in `[5, 9)`: an "is armed" check on `self->unk20`, an own-`slot8C`
 call, a conditional angle-adjustment helper call, an own-`slot90` call, and
 a tag-gated `slotE8` notification through `self->unk28`. The most
@@ -15,7 +15,7 @@ iteration to close.
 
 ```c
 void BaseObjO__func_571f8(BaseObjO *self, s32 arg1) {
-    func_8001E57C()->slot88(self, arg1);
+    GetClass6B5CCMethods()->slot88(self, arg1);
     /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
      * range test -- the combined form optimizes into a single unsigned
      * `(arg1-5) < 4` comparison, which is not what retail does (two

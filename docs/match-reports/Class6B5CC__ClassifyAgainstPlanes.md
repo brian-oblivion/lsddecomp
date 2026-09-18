@@ -1,4 +1,6 @@
-# func_8001DDF4 -- STALL: length EXACT (199/199 words, no drift); 29/199 raw word-match; first real diff at vram 0x8001DDF8 (register identity, `self` in $s4 vs retail's $s5)
+> Renamed from `func_8001DDF4` on 2026-09-18 (tools/rename.py). Address 0x8001ddf4.
+
+# Class6B5CC__ClassifyAgainstPlanes -- STALL: length EXACT (199/199 words, no drift); 29/199 raw word-match; first real diff at vram 0x8001DDF8 (register identity, `self` in $s4 vs retail's $s5)
 
 Round 46 (echo). **This is the first time C was ever written or built for
 this function.** Round 45 (delta) filed a structure-only derivation with NO
@@ -9,7 +11,7 @@ resolved below.
 
 ## What round 45 handed this round
 
-Signature `s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
+Signature `s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
 `func_8001F50C` planes, gated by `ClipSegmentToBox`/`func_8001F8B8`, setting
@@ -20,7 +22,7 @@ precise relationship between the middle `k` loop ... and the inner fixed-4
 
 ## Part 3, resolved
 
-Re-read `asm/nonmatchings/code_d294_b/func_8001DDF4.s` lines 197-268
+Re-read `asm/nonmatchings/code_d294_b/Class6B5CC__ClassifyAgainstPlanes.s` lines 197-268
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
@@ -148,7 +150,7 @@ register permutation with no tool support for exploring it directly.
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
-s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
     Vec3S16_d294 mid[2];
     s16 *loPtr;
     s16 *hiPtr;

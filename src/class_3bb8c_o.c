@@ -152,7 +152,7 @@ typedef struct Unk14ObjO {
     Vec3O vec18;      /* +0x018 .. +0x023 */
 } Unk14ObjO;
 
-/* The FIXED base table returned by func_8001E57C(), which -- MEASURED
+/* The FIXED base table returned by GetClass6B5CCMethods(), which -- MEASURED
  * elsewhere (class_3bb8c.h, code_d294.h) -- takes no real arguments and
  * always returns the same global regardless of what garbage is in $a0 at
  * the call site.  This unit's own reading needs slots +0x008 (ctor,
@@ -170,7 +170,7 @@ typedef struct FixedBaseTable {
     void (*slot88)(BaseObjO *self, s32 arg1);                       /* +0x088 */
 } FixedBaseTable;
 
-extern FixedBaseTable *func_8001E57C(void);
+extern FixedBaseTable *GetClass6B5CCMethods(void);
 
 struct BaseObjOMethods {
     s32 header;                                       /* +0x000 */
@@ -183,7 +183,7 @@ struct BaseObjOMethods {
     u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
     void (*slot40)(BaseObjO *self);                                     /* +0x040, called by BaseObjO__BaseObjO's own ctor; occupant outside this unit */
     u8 pad44[0x80 - 0x44];                                                /* +0x044 .. +0x07F */
-    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by BaseObjO__func_56f5c (this unit); occupant outside this unit (D_800876FC's slot80 is func_8001D4AC, a BasicClass-range function) */
+    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by BaseObjO__func_56f5c (this unit); occupant outside this unit (D_800876FC's slot80 is Class6B5CC__GetSetUnk10Flag8, a BasicClass-range function) */
     u8 pad84[0x8C - 0x84];                                                /* +0x084 .. +0x08B */
     void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by BaseObjO__func_571f8 */
     void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by BaseObjO__func_571f8 */
@@ -255,7 +255,7 @@ void *New_BaseObjO(void) {
 }
 
 BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
-    if (func_8001E57C()->ctor(self) == NULL) {
+    if (GetClass6B5CCMethods()->ctor(self) == NULL) {
         goto fail;
     }
     self->methods = func_80057C84();
@@ -271,7 +271,7 @@ fail:
 void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag;
 
-    func_8001E57C()->slot10(self, arg);
+    GetClass6B5CCMethods()->slot10(self, arg);
     tag = arg->methods->header;
     if ((tag & 0xFFF) == 0x114) {
         self->companion1 = arg;
@@ -288,13 +288,13 @@ void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     } else if ((tag & 0xF) == 5) {
         self->companion2 = NULL;
     }
-    func_8001E57C()->slot14(self, arg);
+    GetClass6B5CCMethods()->slot14(self, arg);
 }
 
 void BaseObjO__ClearCompanions(BaseObjO *self) {
     self->companion1 = NULL;
     self->companion2 = NULL;
-    func_8001E57C()->slot18(self);
+    GetClass6B5CCMethods()->slot18(self);
 }
 
 void BaseObjO__InitDefaults(BaseObjO *self) {
@@ -306,7 +306,7 @@ extern s32 func_8001F3A4(void *arg0);
 extern void func_8001F66C(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
 
 void BaseObjO__func_571f8(BaseObjO *self, s32 arg1) {
-    func_8001E57C()->slot88(self, arg1);
+    GetClass6B5CCMethods()->slot88(self, arg1);
     /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
      * range test -- the combined form optimizes into a single unsigned
      * `(arg1-5) < 4` comparison, which is not what retail does (two

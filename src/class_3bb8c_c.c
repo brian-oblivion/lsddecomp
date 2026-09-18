@@ -61,7 +61,7 @@ Class86AA0 *func_8004D38C(void)
 
 void func_8004D3DC(Class86AA0 *self)
 {
-    func_8001E57C(self)->ctor(self);
+    GetClass6B5CCMethods(self)->ctor(self);
     self->methods = func_8004D508();
     self->unk34 = 0;
     self->unk36 = 0;
@@ -80,7 +80,7 @@ void func_8004D434(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
 
 void func_8004D47C(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
-    func_8001E57C(self)->slot9C(self, arg1, arg2);
+    GetClass6B5CCMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
         return;
     }

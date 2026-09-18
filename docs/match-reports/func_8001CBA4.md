@@ -35,7 +35,7 @@ elsewhere in this unit as a no-argument `void(void)` body (`{}`, a bare
 every argument it's given, so the caller's arity is unconstrained. Typed
 `slot5C` as `void (*)(Class6B5CCObj *, s32)` in `include/code_d294.h`
 to match THIS call site; did not touch `func_8001D33C`'s own declaration.
-Same precedent as `func_8001E57C`, documented in `include/class_3bb8c.h`.
+Same precedent as `GetClass6B5CCMethods`, documented in `include/class_3bb8c.h`.
 
 ## Provenance
 

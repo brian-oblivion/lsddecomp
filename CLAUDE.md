@@ -483,7 +483,7 @@ backstop, not a substitute for reading `build exit=`.
 
    **The drift need not come from the function you are editing, and that is an
    ATTRIBUTION hazard rather than a fifth way (round 20).** Runner alpha left
-   an earlier experiment's C live in its unit — `func_8001D714` without its
+   an earlier experiment's C live in its unit — `Class6B5CC__TryAttachNearby` without its
    `#if 0`/`INCLUDE_ASM` wrapper — and every LATER function in the unit then
    measured against a shifted window, including the one alpha was actually
    working on. The guard fired correctly: the out-of-range byte count was

@@ -1,4 +1,6 @@
-# func_8001E4A4 — STALL (register identity, near miss: 48/54; round-37 permuter search, 73118 iterations rc=124, never beat the base score -- see that round's addendum)
+> Renamed from `func_8001E4A4` on 2026-09-18 (tools/rename.py). Address 0x8001e4a4.
+
+# Class6B5CC__NotifyTaggedParents — STALL (register identity, near miss: 48/54; round-37 permuter search, 73118 iterations rc=124, never beat the base score -- see that round's addendum)
 
 Unit: `code_d294_b`. Round 13, runner delta; improved round 19 (echo), see
 that section at the end. Best score reached: 48/54 words
@@ -11,11 +13,11 @@ round-19 pass. Restored to
 ## Signature (as attempted)
 
 ```c
-void func_8001E4A4(Class6B5CCObj *self, void *node);
+void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node);
 ```
 
 Confirmed from the disassembly's own register roles, not guessed: `a0`
-(func_8001E4A4's 1st param) is forwarded, unmodified, as the 2nd argument to
+(Class6B5CC__NotifyTaggedParents's 1st param) is forwarded, unmodified, as the 2nd argument to
 the final dispatch call (`entry->methods->slot10(entry, self)`) — a "self"
 role. `a1` (2nd param) is what gets walked via `BasicClass__func_1816c` —
 the "node" being scanned for tag-4 parents.
@@ -30,7 +32,7 @@ whole list (there can be more than one qualifying entry) rather than
 stopping at the first match.
 
 ```c
-void func_8001E4A4(Class6B5CCObj *self, void *node) {
+void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     Class6B5CCObj *s;
     void *n;
     GenericObj_d294 *entry;
@@ -177,7 +179,7 @@ whether the function itself matched)
   the padding fix is the load-bearing part).
 - New extern `BasicClass__func_1816c(void *self, GenericObj_d294 **outParent,
   void **cursor)`.
-- Prototype `void func_8001E4A4(Class6B5CCObj *self, void *node);` left in
+- Prototype `void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node);` left in
   place even though the function is back to `INCLUDE_ASM` — harmless (no
   caller references it yet), and saves the next attempt from re-deriving
   the signature.
@@ -328,7 +330,7 @@ written for.
 
 ```c
 #if 0
-void func_8001E4A4(Class6B5CCObj *self, void *node) {
+void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     Class6B5CCObj *s;
     void *n;
     GenericObj_d294 *entry;
@@ -380,7 +382,7 @@ This was this function's **first-ever permuter search** -- one of the
 round's identified never-searched near-misses, despite already carrying
 three prior rounds of hand-lever attempts.
 
-`tools/setup-permuter.sh func_8001E4A4 <seed>` scaffolded cleanly (seed:
+`tools/setup-permuter.sh Class6B5CC__NotifyTaggedParents <seed>` scaffolded cleanly (seed:
 the round-19 48/54 body, `#include "code_d294.h"` for the project's own
 struct/extern declarations rather than re-declaring them locally, since
 this unit already shares that header). `--debug --stack-diffs` sanity
@@ -392,13 +394,13 @@ of "every instruction otherwise identical, just one register-pair
 swapped").
 
 Ran the bounded search: `timeout 900 ... permuter.py -j 6 --stop-on-zero
---best-only --stack-diffs permuter-work/func_8001E4A4`, rc captured on
+--best-only --stack-diffs permuter-work/Class6B5CC__NotifyTaggedParents`, rc captured on
 the very next command. **rc=124** (900-second bound fired; nothing
 external killed it). **73118 iterations** -- the highest iteration count
 of any search this round, consistent with this being the smallest/fastest
 function to recompile of the three searched. **No candidate ever beat the
 base score of 38** -- confirmed two ways: the raw score log's minimum
-value across the entire run is 38, and `permuter-work/func_8001E4A4/`
+value across the entire run is 38, and `permuter-work/Class6B5CC__NotifyTaggedParents/`
 contains no `output-*` directories at all (the permuter only creates one
 when `--best-only` finds something strictly better than the running
 best). This is the same "no candidate ever improved on the seed" signature
@@ -463,7 +465,7 @@ matches this report's own figures with no contamination.
   the loop's masked-comparison line, then again at the dispatch
   eligibility check, then again at the `slot10` call), is not a source-level
   redundancy needing a manual fix -- reading retail's own disassembly
-  (`asm/nonmatchings/code_d294_b/func_8001E4A4.s`) shows GCC 2.6.3
+  (`asm/nonmatchings/code_d294_b/Class6B5CC__NotifyTaggedParents.s`) shows GCC 2.6.3
   ALREADY reuses the SAME register (`$a1`) across the eligibility check
   (`lbu $v1,0x0($a1)`, `0x8001E530`) and the `slot10` load
   (`lw $v0,0x10($a1)`, `0x8001E540`) with no re-fetch of `entry->methods`
@@ -529,7 +531,7 @@ the game-level meaning of tag `4`/`0x34` and what the `+0x010`
 dispatch actually does to `entry` is not established. This is also the
 class's own table-slot BOUNDARY -- `code_d294_c.c`'s own file banner
 already documents "`tools/classtable.py D_8006B5CC` stops at
-func_8001E4A4" -- i.e. it is `Class6B5CCMethods`'s LAST slot
+Class6B5CC__NotifyTaggedParents" -- i.e. it is `Class6B5CCMethods`'s LAST slot
 (`+0x0B4`), not evidence of anything about this function's own
 purpose beyond position. Held back from an actual rename because this
 symbol is referenced (in a comment) from `src/code_d294_c.c:13` -- a

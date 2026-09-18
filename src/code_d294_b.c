@@ -9,30 +9,30 @@
  * two renamed this round, `Class6B5CC__GetSetUnk10Flag7`/`Field9`, two
  * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
  * symbol is comment-referenced from other units' own vtable census notes);
- * a rotation-matrix builder (`func_8001D4DC`, proposed
+ * a rotation-matrix builder (`Class6B5CC__GetRotMatrix`, proposed
  * `Class6B5CC__GetRotMatrix`); a gated read-transform-notify chain
  * (`Class6B5CC__ReadUnk20Data` -> `Class6B5CC__NotifyIfUnk20Active` ->
  * `Class6B5CC__TransformAndNotifyParents`); two vtable no-op stubs
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
  * `func_8001D33C` no-op precedent); a command dispatcher over the same
- * "attach" state (`func_8001D6B4`, proposed `Class6B5CC__DispatchLinkCommand`);
- * a proximity-attach attempt (`func_8001D714`, STALL, proposed
+ * "attach" state (`Class6B5CC__DispatchLinkCommand`, proposed `Class6B5CC__DispatchLinkCommand`);
+ * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, STALL, proposed
  * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-
  * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
  * overlap test (`Class6B5CC__CheckBoundsOverlap`, STALL, name only), and a
- * plane-classification test (`func_8001DDF4`, STALL, proposed
+ * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, STALL, proposed
  * `Class6B5CC__ClassifyAgainstPlanes` -- the RESOLVED former `gp_rel`
  * blocker, ordinary matching work now); a third no-op stub
- * (`func_8001E49C`); a parent-list notify walk (`func_8001E4A4`, STALL,
+ * (`func_8001E49C`); a parent-list notify walk (`Class6B5CC__NotifyTaggedParents`, STALL,
  * proposed `Class6B5CC__NotifyTaggedParents` -- naming only, matching
  * this one is explicitly out of scope for this round); this unit's own
- * vtable getter (`func_8001E57C`, proposed `GetClass6B5CCMethods`,
+ * vtable getter (`GetClass6B5CCMethods`, proposed `GetClass6B5CCMethods`,
  * cross-unit); and a small free-function pair for segment/AABB clipping
  * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
- * all) that `Class6B5CC__CheckBoundsOverlap` and `func_8001DDF4` build on.
+ * all) that `Class6B5CC__CheckBoundsOverlap` and `Class6B5CC__ClassifyAgainstPlanes` build on.
  *
- * Four functions remain INCLUDE_ASM: `func_8001D714`, `Class6B5CC__CheckBoundsOverlap`,
- * `func_8001DDF4`, `func_8001E4A4` -- all documented stalls, see
+ * Four functions remain INCLUDE_ASM: `Class6B5CC__TryAttachNearby`, `Class6B5CC__CheckBoundsOverlap`,
+ * `Class6B5CC__ClassifyAgainstPlanes`, `Class6B5CC__NotifyTaggedParents` -- all documented stalls, see
  * docs/match-reports/. This round (54, bravo, track 3) is a NAMING pass
  * only: no match was attempted on any of them.
  */
@@ -44,7 +44,7 @@
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
  * func_8001D374/D3A0/D3F8 (no `== 0` on either side). */
-u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 0, 3, a1);
 }
 
@@ -58,13 +58,13 @@ s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 7, 1, a1 == 0) == 0;
 }
 
-/* Same family as func_8001D424, shift 9 width 3. Raw pass-through. */
+/* Same family as Class6B5CC__GetSetUnk10Field0, shift 9 width 3. Raw pass-through. */
 u32 Class6B5CC__GetSetUnk10Field9(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 9, 3, a1);
 }
 
 /* Same family as Class6B5CC__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
-s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
+s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 8, 1, a1 == 0) == 0;
 }
 
@@ -74,7 +74,7 @@ s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
  * own negate path never stores to it) or copying the quad verbatim, then
  * forwards the result -- plus a1, passed straight through -- to the PsyQ
  * helper RotMatrix. */
-void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
+void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2) {
     S16Quad_d294 buf;
     S16Quad_d294 *src = &self->unk14->unk44->vec;
 
@@ -154,7 +154,7 @@ void func_8001D6AC(void) {
 /* a2 selects one of three behaviors: 2 or 3 dispatches through the vtable
  * (self->methods->slotA0), exactly 4 stores a1 into self->unk28, and
  * anything else (< 2 or > 4) is a no-op. */
-void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
+void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
     switch (a2) {
     case 2:
     case 3:
@@ -168,10 +168,10 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
 
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
- * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = func_8001DDF4)
+ * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = Class6B5CC__ClassifyAgainstPlanes)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
-/* STALL -- see docs/match-reports/func_8001D714.md. Round 20: closed 11
+/* STALL -- see docs/match-reports/Class6B5CC__TryAttachNearby.md. Round 20: closed 11
  * of the original 13-word size deficit (130 -> 141 words) via a
  * `count = expr; if (count)` intermediate-assignment lever on the X and
  * Z axes' negative-branch magnitude checks, which prevents GCC's
@@ -179,7 +179,7 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
  * elsewhere. 2 words remain; every other axis/branch combination tried
  * regressed. Restored to INCLUDE_ASM per project rule. */
 #if 0
-void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
@@ -255,7 +255,7 @@ void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
+INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__TryAttachNearby);
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
  * self->unkC list (each node's own +0x84 slot combined into buf1 via
@@ -423,7 +423,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
 
-/* STALL -- see docs/match-reports/func_8001DDF4.md. Round 46 (echo):
+/* STALL -- see docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md. Round 46 (echo):
  * FIRST-EVER build/score for this function -- inherited round 45's
  * structure-only derivation with no C ever attempted. Length EXACT
  * (199/199 words in-range, no drift), 29/199 raw word-match, first real
@@ -437,7 +437,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
-s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
     Vec3S16_d294 mid[2];
     s16 *loPtr;
     s16 *hiPtr;
@@ -522,7 +522,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
+INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__ClassifyAgainstPlanes);
 
 /* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
  * tail-merge/shared-block dispatch, see the git history for the full
@@ -663,12 +663,12 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
 void func_8001E49C(void) {
 }
 
-/* STALL -- see docs/match-reports/func_8001E4A4.md. Best reached this
+/* STALL -- see docs/match-reports/Class6B5CC__NotifyTaggedParents.md. Best reached this
  * round: 48/54 words in-range (up from the round-13 best of 47/54), a
  * clean self<->tag register-pair swap in $s1/$s2, no size drift.
  * Restored to INCLUDE_ASM per project rule. */
 #if 0
-void func_8001E4A4(Class6B5CCObj *self, void *node) {
+void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     Class6B5CCObj *s;
     void *n;
     GenericObj_d294 *entry;
@@ -709,10 +709,10 @@ tail:
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001E4A4);
+INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__NotifyTaggedParents);
 
 /* This unit's own no-argument vtable getter -- see the extended note on
  * D_8006B5CC in include/code_d294.h and the file banner up top. */
-Class6B5CCMethods *func_8001E57C(void) {
+Class6B5CCMethods *GetClass6B5CCMethods(void) {
     return &D_8006B5CC;
 }

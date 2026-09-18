@@ -1,4 +1,6 @@
-# func_8001D714 — STALL (2 words SHORT: built 141/retail 143 per `nm -S`; raw funcdiff word-match is NOT meaningful for this function once the length differs -- see round 41 -- so it is omitted here; first REAL diff, read off `asm-differ`'s realigned output, is at retail vram `0x8001DA18`, a 5-instruction Y-axis-positive-branch tail-merge un-merge; historical title was "47/143" from before round 20's fixes, see that round)
+> Renamed from `func_8001D714` on 2026-09-18 (tools/rename.py). Address 0x8001d714.
+
+# Class6B5CC__TryAttachNearby — STALL (2 words SHORT: built 141/retail 143 per `nm -S`; raw funcdiff word-match is NOT meaningful for this function once the length differs -- see round 41 -- so it is omitted here; first REAL diff, read off `asm-differ`'s realigned output, is at retail vram `0x8001DA18`, a 5-instruction Y-axis-positive-branch tail-merge un-merge; historical title was "47/143" from before round 20's fixes, see that round)
 
 Unit: `code_d294_b`. Round 13, runner delta. Best score: 47/143 words
 in-range, but a genuine size deficit remains (compiled body ~52 bytes/13
@@ -7,7 +9,7 @@ words shorter than retail). ~15 real attempts. Restored to `INCLUDE_ASM`.
 ## Signature (as attempted)
 
 ```c
-void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other);
+void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other);
 ```
 
 Confirmed: this is `Class6B5CCMethods`'s own `+0x0A0` slot occupant
@@ -18,7 +20,7 @@ plus three newly-discovered fields — see below).
 ## What it does
 
 ```c
-void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
@@ -66,7 +68,7 @@ void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
 Range-checks `other` against `self` (each axis of position difference must
 fit in `+/-0x4000`), then hands off to three vtable slots — `+0xA4`
 (`Class6B5CC__ComposeAndApplyRotation`, already matched this round), `+0xA8` (`Class6B5CC__CheckBoundsOverlap`,
-still queued), `+0xAC` (`func_8001DDF4`, the documented `gp_rel` blocker) —
+still queued), `+0xAC` (`Class6B5CC__ClassifyAgainstPlanes`, the documented `gp_rel` blocker) —
 with the resulting `Vec3S16` difference, before registering `other` into
 `self->unk28` and notifying it via its own `+0x038` slot.
 
@@ -90,16 +92,16 @@ with the resulting `Vec3S16` difference, before registering `other` into
   direct `jal`), `+0xA8` (`slotA8`, `s32 (*)(Class6B5CCObj*, void*,
   Vec3S16_d294*)`, occupant `Class6B5CC__CheckBoundsOverlap`), `+0xAC` (`slotAC`, `s32
   (*)(Class6B5CCObj*, void*, Vec3S16_d294*, void*)`, occupant
-  `func_8001DDF4` — the documented blocker, NOT decompiled here, only its
+  `Class6B5CC__ClassifyAgainstPlanes` — the documented blocker, NOT decompiled here, only its
   call-site shape is typed).
 - **`self->unk28` retyped** from `s32` to `GenericObj_d294 *` (existing
   declaration change — see round summary). Checked the other write site
-  (`func_8001D6B4`'s `self->unk28 = a1;`, `a1` still `s32`) compiles under
+  (`Class6B5CC__DispatchLinkCommand`'s `self->unk28 = a1;`, `a1` still `s32`) compiles under
   the new type via ordinary int-to-pointer conversion (a warning, not an
-  error) and rebuilt the WHOLE image to confirm `func_8001D6B4` (already
+  error) and rebuilt the WHOLE image to confirm `Class6B5CC__DispatchLinkCommand` (already
   matched) is still byte-exact before proceeding — this is the exact
   scenario CLAUDE.md's vtable-retype warning describes, and it came up
-  again this round (see `func_8001E4A4`'s report for the other instance,
+  again this round (see `Class6B5CC__NotifyTaggedParents`'s report for the other instance,
   a genuine struct-layout bug rather than a retype).
 
 ## What got the structure this close (in order — each one was real
@@ -191,7 +193,7 @@ correct; the residue is a pure peephole-adjacent merge decision.
 - `Class6B5CCMethods`: added `slotA4`/`slotA8`/`slotAC`.
 - **`Class6B5CCObj::unk28` retyped** `s32` → `GenericObj_d294 *` (existing
   declaration change, checked against both write sites — see above).
-- Prototype for `func_8001D714` itself left in place.
+- Prototype for `Class6B5CC__TryAttachNearby` itself left in place.
 
 ## Proposed learning
 
@@ -244,7 +246,7 @@ exactly, no contamination, and the diff's shape (missing words clustered
 around the per-axis check tail) is consistent with the documented
 cross-jump merge.
 
-Set up a permuter scaffold (`permuter-work/func_8001D714`, base score
+Set up a permuter scaffold (`permuter-work/Class6B5CC__TryAttachNearby`, base score
 2582 under `--stack-diffs`, `Stack Differences: 0` contribution --
 consistent with this report's claim that the frame size itself is
 already correct and the deficit is purely the cross-jump merge) and
@@ -254,7 +256,7 @@ running at once (this one alongside an already-in-flight search for
 time" rule. Killed this function's search immediately upon noticing;
 `func_8004ABD0`'s continued undisturbed. This function's own permuter
 pass is DEFERRED, not run, this round -- the scaffold is left in place
-(`permuter-work/func_8001D714`, gitignored) for whoever picks this up
+(`permuter-work/Class6B5CC__TryAttachNearby`, gitignored) for whoever picks this up
 next, or for a future round of this same runner once `func_8004ABD0`'s
 search completes.
 
@@ -272,7 +274,7 @@ via `nm -S` on the built object that it compiles to exactly **130 words**
 (`0x208` bytes) against retail's 143 (`0x23C`) -- the same 13-word deficit
 this report has always described, no new drift.
 
-**Set up a fresh permuter scaffold** (`permuter-work/func_8001D714`,
+**Set up a fresh permuter scaffold** (`permuter-work/Class6B5CC__TryAttachNearby`,
 `tools/setup-permuter.sh`) -- the round-19 scaffold no longer exists in
 this worktree (gitignored, lived in a different session's checkout).
 Sanity-checked: `--debug --stack-diffs` gives base score 2582, matching
@@ -349,7 +351,7 @@ change).
 
 ```c
 #if 0
-void func_8001D714(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
@@ -455,7 +457,7 @@ before crediting the whole diff.
 ## Round 41 (bravo): did not reach as primary work; one confirmation check only
 
 This function was item 4 of this round's ordered work list ("hardest,
-reach only if the others land"). Items 1-3 (`func_8001E4A4`,
+reach only if the others land"). Items 1-3 (`Class6B5CC__NotifyTaggedParents`,
 `ClipSegmentToBox`, `Class6B5CC__CheckBoundsOverlap`) consumed the round's attempt budget
 first, per the assignment's own ordering, so this function got only a
 single confirmation check, not a fresh attempt cycle.
@@ -471,7 +473,7 @@ size gap itself causes
 function, lands 8 bytes early, `0x8001d948` vs retail's `0x8001d950` --
 exactly the 2-word shortfall, nothing more).
 
-Read `tools/asm-differ/diff.py func_8001D714`'s realigned output in
+Read `tools/asm-differ/diff.py Class6B5CC__TryAttachNearby`'s realigned output in
 full (not just the raw funcdiff word count, which is meaningless here
 without realignment once the function's own length differs from
 retail's) and found the residue is entirely contained in ONE five-
@@ -586,7 +588,7 @@ against `self` (each axis of position difference must fit `+/-0x4000`,
 via the two now-renamed geometry helpers' sibling checks), then hands
 off to `Class6B5CC__ComposeAndApplyRotation` (slot `+0x0A4`),
 `Class6B5CC__CheckBoundsOverlap` (slot `+0x0A8`), and
-`func_8001DDF4`/proposed `Class6B5CC__ClassifyAgainstPlanes` (slot
+`Class6B5CC__ClassifyAgainstPlanes`/proposed `Class6B5CC__ClassifyAgainstPlanes` (slot
 `+0x0AC`) in turn, only registering `other` into `self->unk28` and
 notifying it (`other->methods->slot38`) if ALL three pass. "TryAttachNearby"
 describes the measured gate-then-link mechanics; the game-level meaning
@@ -611,13 +613,13 @@ renames/proposals:
 
 | slot | current | proposed | occupant (this unit) |
 | --- | --- | --- | --- |
-| `+0x084` | `slot84` | `getRotMatrix` | `func_8001D4DC` (proposed `Class6B5CC__GetRotMatrix`) |
+| `+0x084` | `slot84` | `getRotMatrix` | `Class6B5CC__GetRotMatrix` (proposed `Class6B5CC__GetRotMatrix`) |
 | `+0x08C` | `slot8C` | `readUnk20Data` | `Class6B5CC__ReadUnk20Data` |
 | `+0x090` | `slot90` | `transformAndNotifyParents` | `Class6B5CC__TransformAndNotifyParents` |
-| `+0x0A0` | `slotA0` | `tryAttachNearby` | `func_8001D714` (proposed `Class6B5CC__TryAttachNearby`, this function) |
+| `+0x0A0` | `slotA0` | `tryAttachNearby` | `Class6B5CC__TryAttachNearby` (proposed `Class6B5CC__TryAttachNearby`, this function) |
 | `+0x0A4` | `slotA4` | `composeAndApplyRotation` | `Class6B5CC__ComposeAndApplyRotation` |
 | `+0x0A8` | `slotA8` | `checkBoundsOverlap` | `Class6B5CC__CheckBoundsOverlap` |
-| `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `func_8001DDF4` (proposed `Class6B5CC__ClassifyAgainstPlanes`) |
+| `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `Class6B5CC__ClassifyAgainstPlanes` (proposed `Class6B5CC__ClassifyAgainstPlanes`) |
 
 Apply by type scope (edit `Class6B5CCMethods`'s own definition in
 `include/code_d294.h`, rebuild, fix exactly the accessors the compiler

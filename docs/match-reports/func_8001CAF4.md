@@ -12,7 +12,7 @@ function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
 `self->unk14->unk44`, 0x28 bytes), frees the first and bails out if the
 second allocation fails, otherwise calls the BasicClass base constructor
 (`Get_vtable_BasicClass()->ctor(self)`), overwrites `self->methods` with this
-class's own vtable (`func_8001E57C()`, i.e. `&D_8006B5CC`), zeroes several
+class's own vtable (`GetClass6B5CCMethods()`, i.e. `&D_8006B5CC`), zeroes several
 freshly-added fields, and finally calls its own virtual init hook
 (`self->methods->slot40`, `func_8001CE30` — still queued) before returning
 `self` unconditionally.
@@ -34,7 +34,7 @@ void *func_8001CAF4(Class6B5CCObj *self) {
         return NULL;
     }
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_8001E57C();
+    self->methods = GetClass6B5CCMethods();
     self->unk20 = 0;
     self->unk18 = 0;
     self->unkC = NULL;

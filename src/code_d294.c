@@ -8,7 +8,7 @@ Class6B5CCObj *func_8001CA94(void) {
     if (obj == NULL) {
         return NULL;
     }
-    if (func_8001E57C()->ctor(obj) != NULL) {
+    if (GetClass6B5CCMethods()->ctor(obj) != NULL) {
         return obj;
     }
     func_80017CFC(obj);
@@ -29,7 +29,7 @@ void *func_8001CAF4(Class6B5CCObj *self) {
         return NULL;
     }
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_8001E57C();
+    self->methods = GetClass6B5CCMethods();
     self->unk20 = 0;
     self->unk18 = 0;
     self->unkC = NULL;

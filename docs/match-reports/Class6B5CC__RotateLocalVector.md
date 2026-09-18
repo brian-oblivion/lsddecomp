@@ -29,7 +29,7 @@ void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Class6B5CCSub44 *dst, s1
   s32)`), split out of the `pad060[0x094-0x060]` range this round
   established (now `pad060[0x084-0x060]` + `slot84` + `pad088[0x094-
   0x088]`). Confirmed against `tools/classtable.py D_8006B5CC`: the
-  occupant is `func_8001D4DC`, in `code_d294_b` (out of this carve's
+  occupant is `Class6B5CC__GetRotMatrix`, in `code_d294_b` (out of this carve's
   scope, not decompiled here).
 - **New forward declaration for `ApplyMatrixToLVArray`** (this unit, matched
   separately this round) and a new opaque extern for `func_80015618`
@@ -67,16 +67,16 @@ larger, partially-opaque) extent.
 ## Naming (round 50, charlie -- FINISHING-PLAN track 3)
 
 - **`func_8001E58C` -> `Class6B5CC__RotateLocalVector`. Tier B.** It calls
-  `slot84(self, buf, 0)`, whose occupant is `func_8001D4DC` (code_d294_b,
+  `slot84(self, buf, 0)`, whose occupant is `Class6B5CC__GetRotMatrix` (code_d294_b,
   matched: `RotMatrix(&param->rotate, buf)` with the angles NOT negated when
   the 3rd argument is 0), then applies that matrix to a widened copy of its
   own 3-element `s16` argument. So "Rotate" is the operation and "Local" is
   the frame the input is in -- inferred from the flag-0 (un-negated) branch
-  of `func_8001D4DC`, which is why this is B and not A.
+  of `Class6B5CC__GetRotMatrix`, which is why this is B and not A.
 - **Method prefix `Class6B5CC__`:** the first parameter is a
   `Class6B5CCObj *` and the body dispatches through its method table. The
   function is NOT itself a vtable slot (`tools/classtable.py D_8006B5CC`
-  ends at `func_8001E4A4`); the prefix records the receiver, matching
+  ends at `Class6B5CC__NotifyTaggedParents`); the prefix records the receiver, matching
   `BasicClass__*` and `DreamSys__*` already in the symbols file.
 - **Parameter `dst` retyped `Class6B5CCSub44 *` -> `Vec3_d294 *`.** Evidence:
   only three words at +0/+4/+8 are ever written, and `class_3bb8c_o`'s

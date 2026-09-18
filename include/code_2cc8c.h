@@ -749,7 +749,7 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 /* The following are called only from func_8003EEC0 (this unit). They are
    plain `void *` global setters (this call site happens to pass an
    already-`s32`-shaped value, which is an ordinary int-to-pointer conversion
-   with identical codegen, same precedent as func_8001D6B4/func_8001D714 in
+   with identical codegen, same precedent as Class6B5CC__DispatchLinkCommand/Class6B5CC__TryAttachNearby in
    code_d294.h); the retypes come from the functions' own definitions and are
    ABI-identical (word-sized values either way), so they do not change this
    call site's own compiled bytes.
@@ -1634,7 +1634,7 @@ extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
 
 /*
  * MEASURED elsewhere (round 9, include/class_3bb8c.h / src/class_3ac78.c):
- * func_8001E57C takes NO arguments and its whole body is a fixed
+ * GetClass6B5CCMethods takes NO arguments and its whole body is a fixed
  * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` -- it always returns the SAME
  * global table regardless of caller, a shared "default handler" utility
  * reached the same way IntermediateBaseMethods/TaskUtilMethods are
@@ -1644,17 +1644,17 @@ extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
  * view rather than reusing that struct (same per-call-site-arity
  * reasoning as slot4C/slotC4 above). Do not reconcile this declaration
  * with code_d294.h's or class_3ac78.h's own differently-typed views of
- * the same symbol -- see class_3ac78.c's comment on func_8001E57C for
+ * the same symbol -- see class_3ac78.c's comment on GetClass6B5CCMethods for
  * why that is expected.
  */
-/* func_8001E57C's return type, UNIFIED by the head at merge time. Runners
+/* GetClass6B5CCMethods's return type, UNIFIED by the head at merge time. Runners
  * alpha and bravo each built a local view of it in the same round, with
  * different names AND different members -- bravo's had only `slot4C` at
  * +0x04C, alpha's only `ctor` at +0x008 -- which collided as `conflicting
  * types` the moment both landed in this one header. Merged here at the
  * correct offsets rather than picked between, so both units' call sites keep
  * working. The canonical definition is src/code_d294_b.c's
- * `Class6B5CCMethods *func_8001E57C(void)`. */
+ * `Class6B5CCMethods *GetClass6B5CCMethods(void)`. */
 typedef struct D6B5CCGetterMethodsCC8C D6B5CCGetterMethodsCC8C;
 struct D6B5CCGetterMethodsCC8C {
     u8 pad000[0x008];
@@ -1662,7 +1662,7 @@ struct D6B5CCGetterMethodsCC8C {
     u8 pad00C[0x04C - 0x00C];
     void (*slot4C)(Obj6EAC0 *self, s32 a1, s32 a2); /* +0x04C, code_2cc8c_f */
 };
-extern D6B5CCGetterMethodsCC8C *func_8001E57C(void);
+extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
 
 /*
  * Round 14 (code_2cc8c_e): a THIRD independent class pair, found while
@@ -1689,7 +1689,7 @@ extern D6B5CCGetterMethodsCC8C *func_8001E57C(void);
  * ClassEAC0 being the smaller, less-derived class. func_8004054C is
  * ClassEAC0's OWN ctor, sharing the identical "call a further-base ctor,
  * reset methods, redispatch slot40" shape one level up: it calls
- * `func_8001E57C()->ctor(self)` (func_8001E57C, code_d294.h's own getter
+ * `GetClass6B5CCMethods()->ctor(self)` (GetClass6B5CCMethods, code_d294.h's own getter
  * for the ACTUAL Class6B5CCObj table, D_8006B5CC) first.
  *
  * Per this project's established multiple-independent-local-views
@@ -1958,7 +1958,7 @@ extern Class6E99CMethods D_8006E99C;
  * it too but never references it, so the duplicate is dropped. */
 extern Class6E99CMethods *func_800404C0(void); /* this unit's own bare getter
                                                     for &D_8006E99C, same
-                                                    idiom as func_8001E57C
+                                                    idiom as GetClass6B5CCMethods
                                                     (code_d294.h) */
 /* Declared ONCE, matching its definition in src/code_2cc8c_f.c
  * (`Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void)`). code_2cc8c_e declared it
@@ -1970,10 +1970,10 @@ extern Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void);  /* code_2cc8c_f (bravo'
                                                     for &D_8006EAC0 */
 
 /* This unit's own local view of the REAL base, `Class6B5CCObj`'s own table
-   (code_d294.h's `func_8001E57C`/`D_8006B5CC`) -- func_8004054C (this
+   (code_d294.h's `GetClass6B5CCMethods`/`D_8006B5CC`) -- func_8004054C (this
    unit) dispatches only the ctor slot, so only that one is modelled here,
    per this project's independent-local-views convention. */
-/* (code_2cc8c_e's own view of func_8001E57C's return type was merged
+/* (code_2cc8c_e's own view of GetClass6B5CCMethods's return type was merged
  * into D6B5CCGetterMethodsCC8C above by the head.) */
 
 

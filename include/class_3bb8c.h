@@ -875,7 +875,7 @@ struct Class86AA0Methods {
      * (`self->methods->slotB8(self)`, already matched) -- but this slot's
      * REAL occupant is func_8004D47C, whose own body reads three args
      * (self, arg1, arg2). Both are right about their own codegen; see
-     * func_8004D3DC's report/func_8001E57C's declaration below for the
+     * func_8004D3DC's report/GetClass6B5CCMethods's declaration below for the
      * identical situation on a different symbol. Not reconciled: widening
      * this field to 3 args would force func_8004D434's call site to
      * synthesize an arg2 it doesn't have, breaking that already-matched
@@ -896,7 +896,7 @@ struct Class86AA0 {
 extern Class86AA0Methods D_80086AA0;
 extern Class86AA0Methods *func_8004D508(void);
 
-/* MEASURED, round 9: func_8001E57C TAKES NO ARGUMENTS. Its whole body is
+/* MEASURED, round 9: GetClass6B5CCMethods TAKES NO ARGUMENTS. Its whole body is
  * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` (asm/code_d294.s) -- it reads
  * neither $a0 nor $a1, and just returns &D_8006B5CC. It is the plain
  * no-parameter vtable getter documented in docs/research/class-framework.md,
@@ -924,12 +924,12 @@ extern Class86AA0Methods *func_8004D508(void);
  * conflict means different table/different class, per this project's
  * established split policy (see e.g. TaskCoreObjMethods in
  * include/code_2c054.h). Purely a type-name change here -- func_8004D3DC's
- * own already-matched call (`func_8001E57C(self)->ctor(self)`) only touches
+ * own already-matched call (`GetClass6B5CCMethods(self)->ctor(self)`) only touches
  * the +0x008 `ctor` slot, whose layout is identical in both names, so this
  * renaming changes no bytes.
  *
  * Head-verified round 10 by measuring both callees rather than reasoning from
- * the arity conflict: func_8001E57C returns &D_8006B5CC (asm/code_d294.s) and
+ * the arity conflict: GetClass6B5CCMethods returns &D_8006B5CC (asm/code_d294.s) and
  * func_8003F24C returns &D_8006E8E4 (asm/code_2cc8c_b.s). Different globals,
  * so genuinely different tables -- one type could not have carried both, and
  * the split would have been right even without the arity conflict that
@@ -949,7 +949,7 @@ struct BaseCtorTableB_3bb8c_c {
     void (*slot9C)(void *self, void *arg1, s32 arg2); /* +0x09C */
 };
 
-extern BaseCtorTableB_3bb8c_c *func_8001E57C(void *self);
+extern BaseCtorTableB_3bb8c_c *GetClass6B5CCMethods(void *self);
 
 /*
  * Generic class-instance shape used only to read another object's own
@@ -1388,7 +1388,7 @@ struct DreamSysView_3bb8c_c {
  * plus-self there from func_8003B8E4's own byte-exact call). Same real
  * global (`D_8006E730`) two units deep, two independent arities recorded
  * from two real call sites -- the identical situation already documented
- * for func_8001E57C above and for func_8004D3DC's report. Kept local
+ * for GetClass6B5CCMethods above and for func_8004D3DC's report. Kept local
  * rather than including code_2c054.h, since this unit does not otherwise
  * need that header and each translation unit gets its own extern
  * prototype for a symbol in this project.
@@ -2357,7 +2357,7 @@ typedef struct Obj14_3bb8c_l {
  * the exact offsets this unit's functions dispatch (+0x050, +0x074,
  * +0x0FC, +0x104, +0x108, +0x200) against tools/classtable.py's dump of
  * DREAMSYS_METHODS (0x80087BDC, include/DreamSys.h): every one lands on a
- * real occupant there (func_80058A94, func_8001D424, func_80059310,
+ * real occupant there (func_80058A94, Class6B5CC__GetSetUnk10Field0, func_80059310,
  * DreamSys__GetSetDreamTimeLimit, func_80059360, DreamSys__GetDreamColor
  * respectively), and the two whose header signatures are pinned down
  * (+0x104 `s32(DreamSys*, s32)`, +0x108 `s32(DreamSys*)`) match this unit's

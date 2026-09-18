@@ -1,4 +1,6 @@
-# func_8001D424 -- MATCHED (11/11 words)
+> Renamed from `func_8001D424` on 2026-09-18 (tools/rename.py). Address 0x8001d424.
+
+# Class6B5CC__GetSetUnk10Field0 -- MATCHED (11/11 words)
 
 Round 12, runner delta. `code_d294_b`.
 
@@ -11,14 +13,14 @@ value and result both pass straight through (no `== 0` boolean conversion on
 either side -- same shape as `func_8001D374`/`D3A0`/`D3F8`).
 
 ```c
-u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 0, 3, a1);
 }
 ```
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/func_8001D424.s`):
+Disassembly (`asm/nonmatchings/code_d294_b/Class6B5CC__GetSetUnk10Field0.s`):
 ```
 addu $a3, $a1, $zero      # a3 (value) = a1
 addiu $a0, $a0, 0x10      # a0 = &self->unk10

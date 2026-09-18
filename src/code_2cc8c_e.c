@@ -261,7 +261,7 @@ ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
 }
 
 void func_8004054C(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
-    func_8001E57C()->ctor(self);
+    GetClass6B5CCMethods()->ctor(self);
     self->methods = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
     self->methods->slot40(self, a1, a2, a3);
 }

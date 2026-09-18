@@ -505,7 +505,7 @@ re-reading the new diff: the first real difference is still at vram
 both still appear at their same addresses. The permuter's search, run to
 completion (56437 iterations), never found anything touching any of the
 three -- consistent with round 41's own finding on a DIFFERENT function in
-this unit's neighborhood (`func_8001E4A4`) that a pure register-identity
+this unit's neighborhood (`Class6B5CC__NotifyTaggedParents`) that a pure register-identity
 residue lies outside what a bounded source-mutation search can reach.
 
 **Verdict: the search closed one real, independent lever (statement

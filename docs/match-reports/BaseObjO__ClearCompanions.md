@@ -13,7 +13,7 @@ already named `unk18`/`BaseObjO__ClearCompanions` in `code_55dd4.h`'s
 void BaseObjO__ClearCompanions(BaseObjO *self) {
     self->unk4C = NULL;
     self->unk50 = NULL;
-    func_8001E57C()->slot18(self);
+    GetClass6B5CCMethods()->slot18(self);
 }
 ```
 
