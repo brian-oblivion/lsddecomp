@@ -1,64 +1,32 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_o -- functions 54..73 of the 113-function `class_3bb8c_n`
- * remainder, 0x475F0..0x47CC4 (vram 0x80056DF0..0x800574C4).  Carved round 17
+ * remainder, 0x475F0..0x47CC4 (vram 0x80056DF0..0x800574C4). Carved round 17
  * (2026-09-04); `class_3bb8c_n` keeps its name for the 54 functions in front
  * of this slice and `class_3bb8c_q` is the 19-function tail behind
- * `class_3bb8c_p`.
+ * `class_3bb8c_p`. All 20 functions matched, byte-exact; zero INCLUDE_ASM
+ * stalls, zero NON_MATCHING bodies. Owns no switch jump table.
  *
- * Blocker census, three-grep screen run per function at carve time:
- * 19 of the 20 clean.
+ * Named round 52 (runner bravo). SPANS TWO CLASSES, cut at a ROM address,
+ * not a class boundary (`tools/classtable.py`, confirmed round 17/52):
  *
- * BaseObjO__func_56f5c: was gp_rel. MATCHED round 44, 34/34, first build.
- *
- * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
- * rodata sub-slot is attached to this unit.
- *
- * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM addresses,
- * not at class boundaries, and round 15 measured three of five such slices
- * spanning two or more vtables.  Identify each class with tools/classtable.py
- * rather than assuming the unit has one.  A class that spans a carve boundary
- * is also the normal reason two units name the same table -- see the
- * multiple-independent-local-views convention in CLAUDE.md before deciding
- * whether your view of one belongs in include/class_3bb8c.h or here.
- *
- * Confirmed round 17 (runner bravo): the slice really does span (at least)
- * two classes.
- *
- *  - LinkOwnerObj__ReleaseLinks/LinkOwnerObj__RandomizeLinks/LinkOwnerObj__ReleaseLinksB operate on a DIFFERENT,
- *    larger object (fields observed at +0x84/+0x88, an inline 5-element
- *    `BasicClass *` array) that is unrelated to the class below -- no
- *    shared header claims it, so it is kept purely local to this file
- *    (`LinkOwnerObj`/`LinkElemObj`).
- *  - BaseObjO__BaseObjO onward implement the SAME shared intermediate base
- *    class already known from two independent angles: `code_55dd4.h`'s
- *    `D800878D4Methods` (Class65650's own reading, resolved via its own
- *    getter `func_80057C84`) and `DreamSys.h`'s `vtable_DreamSys` (whose
- *    +0x010/+0x014/+0x0B8/+0x0BC slots already name BaseObjO__LinkCompanion/
- *    BaseObjO__UnlinkCompanion/BaseObjO__SetVec14/BaseObjO__AddVec14 as the shared occupants).
- *    This unit is where those functions are actually DEFINED, so it earns
- *    its own local view (`BaseObjO`/`BaseObjOMethods`) rather than
- *    extending either sibling header -- neither is this unit's to edit,
- *    and the ctor's own dispatch through `func_8001E57C()` needs a
- *    non-void, checkable return that `class_3bb8c.h`'s existing
- *    `BaseCtorTableB_3bb8c_c` (ctor typed `void`) cannot provide (see
- *    that header's own note on `func_8001E57C`'s per-call-site typing).
- *  - `func_80056F4C` is this class's SIBLING table's own getter (returns
- *    `&D_800876FC`, exactly analogous to `func_80057C84`/`func_80066818`
- *    already documented in code_55dd4.h) -- `D_800876FC` shares this same
- *    class's +0x010/+0x014/+0x018/+0x088/+0x09C/+0x0B8/+0x0BC/+0x0C0/+0x0C4
- *    slots with the functions below (confirmed with
- *    `tools/classtable.py D_800876FC`), so it is typed `BaseObjOMethods *`.
+ *  - `LinkOwnerObj`/`LinkElemObj` (`Noop`, `LinkOwnerObj__ReleaseLinks[B]`,
+ *    `LinkOwnerObj__RandomizeLinks`, `LinkOwnerObj__func_56e1c`): a small
+ *    object holding an inline 5-element link array (`links`). This is the
+ *    SAME node `class_3bb8c_s.c` independently calls `LinkNode` -- kept as
+ *    this unit's own local view per the multiple-independent-local-views
+ *    convention, unrelated to the class below.
+ *  - `BaseObjO`/`BaseObjOMethods` (`New_BaseObjO` onward): the shared
+ *    INTERMEDIATE BASE class of `DreamSys` (`DreamSys.h`), `Class65650`
+ *    (`code_55dd4.h`'s `D800878D4Methods`), and `D_800876FC`'s own sibling
+ *    concrete class (`func_80056F4C` is that sibling's own vtable getter,
+ *    kept unnamed for consistency with the codebase's other unnamed
+ *    singleton getters). `BaseObjO__BaseObjO` is proven to be the BASE's
+ *    own constructor, not `Class65650`'s: `code_55dd4.c`'s real
+ *    `class_65650__Constructor` calls it to chain to the base FIRST, then
+ *    overwrites `self->methods` with `Class65650`'s own, more specific
+ *    table. This unit is where the base class's methods are DEFINED;
+ *    `DreamSys.h`/`code_55dd4.h` keep their own independent local views of
+ *    the same slots and are not this unit's to edit.
  */
 #include "common.h"
 
