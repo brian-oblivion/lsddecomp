@@ -115,3 +115,12 @@ struct's whole-value assignment is the way to reliably reproduce retail's
 instance) — worth promoting to DECOMPILATION_LEARNINGS as a standing idiom
 alongside the existing `FlashbackRotation` entry, since this project now has
 three independent confirming instances across two units.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001E2E8` via `tools/rename.py`. **Tier A** -- a free
+function, `ClipSegmentToBox`'s only caller: bisects `[near, far]`
+against an AABB until the running midpoint exactly equals one endpoint,
+writing the midpoint into `*out` every iteration. Mechanics unambiguous
+from the body and the one caller. Purely local to this unit + its
+header.

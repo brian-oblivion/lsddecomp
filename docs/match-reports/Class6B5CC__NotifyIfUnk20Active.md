@@ -108,3 +108,13 @@ funcdiff's outside-range byte count is huge, check what the buffer's
 producer (not just its declared field-access pattern) writes through it
 before assuming the type/size you inferred from the READER slot is
 complete.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D568` via `tools/rename.py`. **Tier B** -- gates
+on `2 <= a1 < 4` and `self->unk20 != NULL && func_8001F3A4(self->unk20)`,
+then chains `Class6B5CC__ReadUnk20Data` (slot `+0x08C`) into
+`Class6B5CC__TransformAndNotifyParents` (slot `+0x090`). Name describes
+the gate-then-forward mechanics; purpose of the `a1` range or the
+underlying notification is not established. Purely local to this unit
++ its header.

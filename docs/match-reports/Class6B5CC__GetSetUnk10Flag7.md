@@ -36,3 +36,16 @@ sltiu $v0, $v0, 0x1       # result = (raw < 1) = (raw == 0)
 None new -- confirms the double-inversion shape is per-function, not
 per-family (this and `func_8001D4AC`, matched alongside it, are now 2/9
 siblings that use it; the other 7 don't).
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D450` via `tools/rename.py`. **Tier A** -- pure
+`GetSetBitField` wrapper over `self->unk10`, shift 7 width 1,
+double-inverted boolean shape (same as sibling `func_8001D344` in
+`code_d294.c`, still unrenamed there). Mechanics are the whole of what
+this function does (a getter/setter over a known bit range), which
+qualifies as tier A "by definition" per FINISHING-PLAN.md track 3 even
+though the FIELD's own game-level meaning (what bit 7 of `unk10`
+represents) is not established. Safe to rename directly: the only
+references outside this unit are this unit's own `include/code_d294.h`
+and this unit's own `func_8001D4AC.md` report.

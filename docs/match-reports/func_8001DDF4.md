@@ -258,3 +258,23 @@ report is inherited with NO C ever attempted, build the solid parts first
 and let the frame-size check (word 0 of `funcdiff`'s output) tell you
 immediately whether an unaccounted local exists, rather than reading
 further into the diff before that's settled.
+
+## Naming (round 54, bravo, track 3)
+
+**Not renamed -- PROPOSED only.** Proposed name: `Class6B5CC__ClassifyAgainstPlanes`
+(tier B). STALL, still `INCLUDE_ASM`; not attempted for a match this
+round (naming pass only, and this is the documented `gp_rel`-history
+blocker's successor -- see CLAUDE.md's "Open toolchain blockers" table,
+now RESOLVED, so this function is ordinary matching work for whoever
+picks it up next). Slot `+0x0AC` occupant: computes a fixed 2-row
+box-midpoint average, then classifies it against every one of
+`self->unk20`'s planes (via `ClipSegmentToBox`/`func_8001F8B8`,
+setting bits in `self->unk2C`), and if none set, runs a second,
+`list`-driven sliding-window pass doing the same per-plane
+classification over a corner list. "ClassifyAgainstPlanes" describes
+the measured mechanics (a plane-membership/clip test, not a specific
+game concept); which planes `self->unk20` holds is not established
+beyond "the same planes `Class6B5CC__CheckBoundsOverlap` reads." Held
+back from an actual rename because this symbol is referenced (in a
+comment) from `src/code_d294_c.c:414` -- a different unit. Posted to
+the broadcast.

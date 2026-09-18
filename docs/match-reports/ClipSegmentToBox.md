@@ -582,3 +582,14 @@ build cycle and confirmed half the candidate's diff was noise, which
 matters for keeping the merged C minimal and for not preserving a
 red herring in the next reader's mental model of what code was
 "necessary."
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001E110` via `tools/rename.py`. **Tier A** -- a free
+function (no `self`/`Class6B5CCObj` argument at all): a recursive
+Cohen-Sutherland-style line-segment-vs-AABB clip, using `CalcBoxOutcode`
+(already named, `code_d294_c.c`) for the outcode test and
+`BisectSegmentToBox` (this unit, below) for the bisection step when the
+segment straddles the box. The algorithm shape is unambiguous from the
+body alone -- this is the textbook mechanism, not a guess about game
+purpose. Purely local to this unit + its header.

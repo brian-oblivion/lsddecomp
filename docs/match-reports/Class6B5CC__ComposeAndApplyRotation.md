@@ -130,3 +130,19 @@ all.
   view types):** does not apply. This function has exactly one walker
   (`node`, over `self->unkC`'s list), not a strided dual-walk over one
   array.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D950` via `tools/rename.py`. **Tier B** -- slot
+`+0x0A4` occupant. Builds `self`'s own rotation matrix via
+`self->methods->slot84` (occupant `func_8001D4DC`, proposed
+`Class6B5CC__GetRotMatrix` below -- not renamed, cross-unit reference),
+folds in every `self->unkC` list node's own `slot84` output via
+`MulMatrix2` (a compose step), then applies the composed matrix to one
+or two vertex arrays via `ApplyMatrixToSVArray`. Name describes the
+measured mechanics (compose a matrix by walking a list, then apply it);
+whether `self->unkC` is a parent-hierarchy chain in the game sense is a
+reasonable reading, not an independently confirmed one. Purely local to
+this unit + its header for the FUNCTION rename; the underlying vtable
+FIELD name (`slotA4`) is proposed, not renamed -- see below, it is also
+dispatched from `code_d294_c.c` (a different unit).

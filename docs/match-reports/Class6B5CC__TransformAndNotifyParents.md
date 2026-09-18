@@ -61,3 +61,13 @@ Disassembly (`asm/nonmatchings/code_d294_b/Class6B5CC__TransformAndNotifyParents
 None new -- this just extends the "opaque view typed only to the one call
 site that needs it" convention already established repeatedly in this file
 (`GenericObj_d294`, `UnkOwner_d294`) to a third shape.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D624` via `tools/rename.py`. **Tier B** -- slot
+`+0x090` occupant. Transforms `a1`'s array through
+`self->unk14->unk24` then stashes `a1` into `self->unk30` for exactly
+one `self->methods->slot30` (`BasicClass__NotifyParents`, inherited)
+dispatch. Mechanics measured from the disassembly; the in-game reason
+for notifying parents with a freshly-transformed array is not
+established. Purely local to this unit + its header.

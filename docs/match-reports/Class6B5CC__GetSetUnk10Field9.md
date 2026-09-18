@@ -30,3 +30,10 @@ No post-processing of `$v0`.
 ### Proposed learning
 
 None beyond the family census already noted in `func_8001D424.md`.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D480` via `tools/rename.py`. **Tier A** -- same
+reasoning as `Class6B5CC__GetSetUnk10Flag7`: a pure bitfield accessor
+(shift 9, width 3, raw pass-through), mechanics fully known, field's
+real purpose not established. Purely local to this unit + its header.

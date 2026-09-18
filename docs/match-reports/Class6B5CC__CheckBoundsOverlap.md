@@ -692,3 +692,17 @@ behavior; a human reading the diff is the only check. Worth stating
 alongside CLAUDE.md's existing "a permuter score drop is a LEAD, not a
 RESULT" framing: sometimes the lead, once read, is a reason NOT to
 translate anything, and that is itself the useful output of the check.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001DA28` via `tools/rename.py` (name only -- still
+`INCLUDE_ASM`, not attempted for a match this round). **Tier B** -- slot
+`+0x0A8` occupant. Builds an AABB from a `CornerList` (offset by `arg2`,
+running min/max over every corner), a second per-plane running minimum
+from `self->unk20`'s planes, then a 6-guard scrambled AABB-overlap test
+between the two, returning a boolean. "Overlap test" describes the
+measured tail comparison; the real identity of the second box (what
+`self->unk20`'s planes represent) is not confirmed beyond the field
+offsets, per this report's own "What it does" section. Purely local to
+this unit + its header for the FUNCTION rename; the vtable FIELD name
+(`slotA8`) is proposed, not renamed.

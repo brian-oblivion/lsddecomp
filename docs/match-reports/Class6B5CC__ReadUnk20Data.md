@@ -49,3 +49,12 @@ jal func_8001F51C
 ### Proposed learning
 
 None beyond the retype itself, which is local to this unit's own header.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D600` via `tools/rename.py`. **Tier B** -- slot
+`+0x08C` occupant. Mechanics fully confirmed (forwards `self->unk20` and
+its own 2nd argument straight through to Psy-Q `func_8001F51C`, which
+fills the caller's buffer), but `unk20`'s own real content/purpose is
+still opaque, so the name describes the READ operation, not what is
+actually being read. Purely local to this unit + its header.
