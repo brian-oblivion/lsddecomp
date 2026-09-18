@@ -65,8 +65,11 @@ Renamed `func_8002CB18` -> `VabStreamObj__StopVoice`, tier B. Confirmed
 for every populated sound-cue slot, always returning `-1` (the SoundCueSlot
 free/sentinel value), so it reads as "release/stop whatever `index`
 refers to." The `0x18` branch boundary is the concrete tell: 0x18 == 24,
-the PS1 SPU's own hardware voice count, so `index < 0x18` is "a real SPU
-voice number" and the `else` arm (`func_80031F3C(0)`, uncarved) is a
+the PS1 SPU's own hardware voice count -- named `SPU_VOICE_COUNT` in
+`src/code_179d8_e.c` (FINISHING-PLAN track 3 step 4: replace an
+established magic constant with a named one) -- so `index < SPU_VOICE_COUNT`
+is "a real SPU voice number" and the `else` arm (`func_80031F3C(0)`,
+uncarved) is a
 fallback for anything else. Tier B, not A: `func_80031890`/`func_80031F3C`
 are both still uncarved and unnamed, so the exact stop mechanism (per-voice
 key-off vs. something else) isn't independently confirmed from this unit

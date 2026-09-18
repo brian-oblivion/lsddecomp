@@ -497,8 +497,12 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", VabStreamObj__PlayTone);
 
+/* The PS1 SPU's own hardware voice count -- the boundary VabStreamObj__StopVoice
+ * checks `index` against. */
+#define SPU_VOICE_COUNT 0x18
+
 s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 index) {
-    if (index < 0x18) {
+    if (index < SPU_VOICE_COUNT) {
         func_80031890(index);
     } else {
         func_80031F3C(0);
