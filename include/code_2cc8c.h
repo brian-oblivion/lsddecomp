@@ -1515,22 +1515,22 @@ struct Obj6EAC0Methods {
 struct Obj6EAC0 {
     Obj6EAC0Methods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    s32 unkC;                 /* +0x00C, OBSERVED: an enable/child-count
+    s32 hasChildren;           /* +0x00C, OBSERVED: an enable/child-count
                                   gate tested by Obj6EAC0__Layout,
                                   Obj6EAC0__LayoutChildrenWithGap, func_80040C00,
                                   Obj6EAC0__LayoutChildren */
     u8 pad010[0x044 - 0x010];
-    s32 unk44;                /* +0x044, OBSERVED: func_800408A0 (setter) */
-    s32 unk48;                /* +0x048, OBSERVED: zeroed by Obj6EAC0__SetChar */
-    s32 unk4C;                /* +0x04C, OBSERVED: Obj6EAC0__SetChar (setter,
+    s32 unk44;                 /* +0x044, OBSERVED: func_800408A0 (setter) */
+    s32 unk48;                 /* +0x048, OBSERVED: zeroed by Obj6EAC0__SetChar */
+    s32 unk4C;                 /* +0x04C, OBSERVED: Obj6EAC0__SetChar (setter,
                                   from its own a3) */
-    s32 unk50;                 /* +0x050, OBSERVED: Obj6EAC0__SetPosition/
+    s32 posX;                  /* +0x050, OBSERVED: Obj6EAC0__SetPosition/
                                   Obj6EAC0__LayoutChildren (slotBC occupants) --
                                   first word of a 2-word struct copied
                                   from their own `a1` argument */
-    s32 unk54;                 /* +0x054, OBSERVED: ditto, second word */
-    u32 unk58;                 /* +0x058, OBSERVED: a packed-bitfield word,
-                                  passed as `GetSetBitField(&self->unk58, ...)`
+    s32 posY;                  /* +0x054, OBSERVED: ditto, second word */
+    u32 flags;                 /* +0x058, OBSERVED: a packed-bitfield word,
+                                  passed as `GetSetBitField(&self->flags, ...)`
                                   -- same generic accessor as
                                   include/code_d294.h's `unk10` */
     u8 pad05C[0x060 - 0x05C];
@@ -1539,38 +1539,38 @@ struct Obj6EAC0 {
                                   2-halfword struct copied from its own
                                   `a1` argument */
     s16 unk62;                 /* +0x062, OBSERVED: ditto, second halfword */
-    u8 unk64[3];               /* +0x064, OBSERVED: Obj6EAC0__SetColor -- a
+    u8 color[3];                /* +0x064, OBSERVED: Obj6EAC0__SetColor -- a
                                   3-byte colour buffer, overwritten or
                                   added-into via Obj6EAC0__ApplyColor */
-    s32 unk68;                 /* +0x068, OBSERVED: Obj6EAC0__SetMask (setter,
+    s32 mask;                  /* +0x068, OBSERVED: Obj6EAC0__SetMask (setter,
                                   a `(1 << a1) - 1` bitmask) */
     u8 pad06C[0x0A9 - 0x06C];
-    u8 unkA9;                  /* +0x0A9, OBSERVED: Obj6EAC0__Destruct (passed
+    u8 totalChildCount;         /* +0x0A9, OBSERVED: Obj6EAC0__Destruct (passed
                                   as ReleaseBasicClassArray's count arg),
                                   Obj6EAC0__LayoutChildren (loop bound) */
-    u8 unkAA;                  /* +0x0AA, OBSERVED: Obj6EAC0__LayoutChildrenWithGap -- a
+    u8 gapIndex;                /* +0x0AA, OBSERVED: Obj6EAC0__LayoutChildrenWithGap -- a
                                   one-shot "extra offset" gate compared
                                   against the loop index */
-    u8 unkAB;                  /* +0x0AB, OBSERVED: a per-slice element
-                                  COUNT, paired with unkAC as the base
+    u8 childCount;               /* +0x0AB, OBSERVED: a per-slice element
+                                  COUNT, paired with childStart as the base
                                   index -- Obj6EAC0__LayoutChildrenWithGap, func_80040C00,
                                   Obj6EAC0__QueryChildren, Obj6EAC0__PropagateColor */
-    u8 unkAC;                  /* +0x0AC, OBSERVED: a per-slice element
-                                  START INDEX into unkB4, paired with
-                                  unkAB above */
+    u8 childStart;               /* +0x0AC, OBSERVED: a per-slice element
+                                  START INDEX into children, paired with
+                                  childCount above */
     u8 padAD[0x0B0 - 0x0AD];
-    s32 unkB0;                 /* +0x0B0, OBSERVED: Obj6EAC0__SetChildPitch (setter);
+    s32 childPitch;             /* +0x0B0, OBSERVED: Obj6EAC0__SetChildPitch (setter);
                                   read and added into a local running total
                                   by Obj6EAC0__LayoutChildrenWithGap/Obj6EAC0__LayoutChildren */
-    Obj6EAC0 **unkB4;          /* +0x0B4, OBSERVED: an array of child
+    Obj6EAC0 **children;        /* +0x0B4, OBSERVED: an array of child
                                   objects of this SAME class, indexed by
-                                  unkAC..unkAC+unkAB and dispatched
+                                  childStart..childStart+childCount and dispatched
                                   through their own `->methods` */
 };
 
 /* Same generic packed-bitfield-word accessor documented in
  * include/code_d294.h (`u32 GetSetBitField(u32 *word, s32 shift, s32
- * width, u32 value)`), reached here over `&self->unk58` instead of
+ * width, u32 value)`), reached here over `&self->flags` instead of
  * `&self->unk10`. Declared again here under this unit's own local view
  * per the established multiple-independent-local-views convention. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);

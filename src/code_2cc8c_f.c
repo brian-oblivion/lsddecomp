@@ -2,28 +2,28 @@
 #include "code_2cc8c.h"
 
 void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
-    if (self->unkC == 0) {
+    if (self->hasChildren == 0) {
         func_8001E57C()->slot4C(self, a1, 0);
         self->methods->slotBC(self, a2);
     }
 }
 
 s32 func_800406E4(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->unk58, 0x1F, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->flags, 0x1F, 1, a1 == 0) == 0;
 }
 
 s32 func_80040714(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->unk58, 0x1E, 1, a1 != 0);
+    return GetSetBitField(&self->flags, 0x1E, 1, a1 != 0);
 }
 
 s32 func_80040740(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->unk58, 0x1C, 2, a1);
+    return GetSetBitField(&self->flags, 0x1C, 2, a1);
 }
 
 void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
 
 void Obj6EAC0__SetColor(Obj6EAC0 *self, s32 overwrite, u8 *src) {
-    Obj6EAC0__ApplyColor(self, self->unk64, src, overwrite);
+    Obj6EAC0__ApplyColor(self, self->color, src, overwrite);
 }
 
 typedef struct { s8 r, g, b; } RGB80040790;
@@ -41,13 +41,13 @@ void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
 }
 
 void Obj6EAC0__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
-    if (self->unkC != 0) {
-        *(Pair32E99C *)&self->unk50 = *a1;
+    if (self->hasChildren != 0) {
+        *(Pair32E99C *)&self->posX = *a1;
     }
 }
 
 void func_80040824(Obj6EAC0 *self, s32 *a1) {
-    if (self->unkC != 0) {
+    if (self->hasChildren != 0) {
         self->unk60 = ((u16 *)a1)[0];
         self->unk62 = ((u16 *)&a1[1])[0];
     }
@@ -75,7 +75,7 @@ void func_800408A0(Obj6EAC0 *self, s32 a1) {
 }
 
 s32 Obj6EAC0__SetMask(Obj6EAC0 *self, s32 a1) {
-    return self->unk68 = (1 << a1) - 1;
+    return self->mask = (1 << a1) - 1;
 }
 
 Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void) {
@@ -99,13 +99,13 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 
     ((void (*)(Obj6EAC0 *, s32, s32))func_80041C3C()->slot08)(self, a1, 0x20);
     self->methods = Obj6EAC0__GetDerivedMethods();
-    self->unkA9 = a2;
-    self->unkAB = a2;
-    self->unkAC = 0;
-    self->unkAA = 0;
+    self->totalChildCount = a2;
+    self->childCount = a2;
+    self->childStart = 0;
+    self->gapIndex = 0;
     cursor = func_80017B34(a2 * 4);
     if (cursor != NULL) {
-        self->unkB4 = cursor;
+        self->children = cursor;
         i = 0;
         if (i < a2) {
             do {
@@ -119,8 +119,8 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 }
 
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
-    ReleaseBasicClassArray(self->unkB4, self->unkA9);
-    self->unkB4 = func_80017CFC(self->unkB4);
+    ReleaseBasicClassArray(self->children, self->totalChildCount);
+    self->children = func_80017CFC(self->children);
     func_80041C3C()->slot0C(self);
 }
 
@@ -134,25 +134,25 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     s32 i, bound;
     Obj6EAC0 **elemp;
 
-    if (self->unkC != 0) {
+    if (self->hasChildren != 0) {
         return;
     }
     func_80041C3C()->slot4C(self, a1, a2);
     buf = *a2;
-    elemp = self->unkB4 + self->unkAC;
-    i = self->unkAC;
+    elemp = self->children + self->childStart;
+    i = self->childStart;
     bound = i;
-    if (i < bound + self->unkAB) {
+    if (i < bound + self->childCount) {
         do {
-            if (self->unkAA != 0 && i == self->unkAA) {
+            if (self->gapIndex != 0 && i == self->gapIndex) {
                 buf.a += 0x10;
             }
             (*elemp)->methods->slot4C(*elemp, self, &buf);
-            buf.a += self->unkB0;
-            bound = self->unkAC;
+            buf.a += self->childPitch;
+            bound = self->childStart;
             elemp++;
             i++;
-        } while (i < bound + self->unkAB);
+        } while (i < bound + self->childCount);
     }
 }
 
@@ -160,18 +160,18 @@ void func_80040C00(Obj6EAC0 *self) {
     Obj6EAC0 **elemp;
     s32 i, bound;
 
-    if (self->unkC != 0) {
-        if (self->unkB4 != NULL) {
-            elemp = self->unkB4 + self->unkAC;
-            i = self->unkAC;
+    if (self->hasChildren != 0) {
+        if (self->children != NULL) {
+            elemp = self->children + self->childStart;
+            i = self->childStart;
             bound = i;
-            if (i < bound + self->unkAB) {
+            if (i < bound + self->childCount) {
                 do {
                     (*elemp)->methods->slot50(*elemp);
                     elemp++;
-                    bound = self->unkAC;
+                    bound = self->childStart;
                     i++;
-                } while (i < bound + self->unkAB);
+                } while (i < bound + self->childCount);
             }
         }
         func_80041C3C()->slot50(self);
@@ -179,43 +179,43 @@ void func_80040C00(Obj6EAC0 *self) {
 }
 
 s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
-    Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
-    s32 i = self->unkAC;
+    Obj6EAC0 **elemp = self->children + self->childStart;
+    s32 i = self->childStart;
     s32 bound = i;
-    if (i < bound + self->unkAB) {
+    if (i < bound + self->childCount) {
         do {
             Obj6EAC0 *elem = *elemp;
             s32 result;
             elemp++;
             i++;
             result = elem->methods->slot60(elem, a1);
-            bound = self->unkAC;
+            bound = self->childStart;
             a2 = result;
-        } while (i < bound + self->unkAB);
+        } while (i < bound + self->childCount);
     }
     return a2;
 }
 
 void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
-    Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
-    s32 i = self->unkAC;
+    Obj6EAC0 **elemp = self->children + self->childStart;
+    s32 i = self->childStart;
     s32 bound = i;
-    s32 count = i + self->unkAB;
+    s32 count = i + self->childCount;
     if (i < count) {
         do {
             Obj6EAC0 *elem = *elemp;
             s32 ab;
             elemp++;
-            ab = self->unkAB;
+            ab = self->childCount;
             elem->methods->slotB8(elem, a1);
             i++;
-            bound = self->unkAC;
-        } while (i < (bound + self->unkAB));
+            bound = self->childStart;
+        } while (i < (bound + self->childCount));
     }
 }
 
 void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
-    if (self->unkC != 0) {
+    if (self->hasChildren != 0) {
         Pair32E99C buf;
         s32 i;
         s32 bound;
@@ -224,12 +224,12 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
         func_80041C3C()->slotBC(self, a1);
         buf = *a1;
         i = 0;
-        elemp = self->unkB4;
-        if (i < self->unkA9) {
+        elemp = self->children;
+        if (i < self->totalChildCount) {
             do {
                 (*elemp)->methods->slotBC(*elemp, &buf);
-                buf.a += self->unkB0;
-                bound = self->unkA9;
+                buf.a += self->childPitch;
+                bound = self->totalChildCount;
                 elemp++;
                 i++;
             } while (i < bound);
@@ -238,7 +238,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
 }
 
 void Obj6EAC0__SetChildChar(Obj6EAC0 *self, s32 a1, s32 a2) {
-    Obj6EAC0 *elem = self->unkB4[a2];
+    Obj6EAC0 *elem = self->children[a2];
     elem->methods->slotC4(elem, a1 & 0xFF);
 }
 
@@ -246,7 +246,7 @@ void Obj6EAC0__NoOpSetter(void) {
 }
 
 void Obj6EAC0__SetText(Obj6EAC0 *self, u8 *a1) {
-    Obj6EAC0 **elemp = self->unkB4;
+    Obj6EAC0 **elemp = self->children;
     u8 *p = a1;
     if (p != NULL && *p != 0) {
         do {
@@ -262,7 +262,7 @@ void Obj6EAC0__NoOpSlotD0(void) {
 }
 
 void Obj6EAC0__SetChildPitch(Obj6EAC0 *self, s32 a1) {
-    self->unkB0 = a1;
+    self->childPitch = a1;
 }
 
 Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void) {
