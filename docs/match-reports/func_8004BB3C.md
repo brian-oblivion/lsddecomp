@@ -59,7 +59,7 @@
 > (`func_800357B0`, `func_800344FC`, both in `code_179d8_k`): the
 > split-declare lever closes a register-CLASS residue for a value crossing
 > a CALL boundary with independently-confirmed-correct timing
-> (`func_80028540`'s case), and does nothing for a whole-function
+> (`GetCdFileEntry`'s case), and does nothing for a whole-function
 > parameter/induction-variable register-COLORING residue. `ep`/`sp` here
 > are exactly the latter shape -- two loop-local walking pointers seeded
 > once before the loop and never crossing a call boundary in a way their

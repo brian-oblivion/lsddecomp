@@ -19,7 +19,7 @@ carries the evidence for each one.
  * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
  * D_8008A894, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
- * CD_OP_* values, `fileIndex` is func_800284C4's index into gFileTable (0
+ * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
  * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
  * buffer and a size for op 5. */
@@ -116,7 +116,7 @@ service runs: tier A.
 | --- | --- | --- | --- |
 | `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `func_80027A24` switches on it when it drains the queue |
 | `+0x0C` | `owner` | A | the requesting object; `Class6D4E8__CancelRequests` matches on it to cancel one object's requests |
-| `+0x10` | `fileIndex` | A | `func_800284C4`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
+| `+0x10` | `fileIndex` | A | `FindCdFileIndex`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
 | `+0x14` | `param0` | B | the op's first extra argument: `arg2` for op 2, a byte count for op 4, a buffer for op 5 |
 | `+0x18` | `param1` | B | the op's second extra argument, same call sites |
 

@@ -85,8 +85,8 @@ typedef struct Rec80028448 {
     u32 unk18;
 } Rec80028448;
 
-extern void *func_80028448(char *arg0);
-extern s32 func_800284C4(char *arg0);
+extern void *FindCdFileEntry(char *arg0);
+extern s32 FindCdFileIndex(char *arg0);
 extern void *D_8008A87C;
 extern s32 D_8008A898;
 
@@ -118,7 +118,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
         if (gCdBusy == 0 && self->unk0C == 0) {
             func_80028844(1, 1);
             if (gCdAsyncEnabled != 0) {
-                rec = func_80028448(suffix);
+                rec = FindCdFileEntry(suffix);
                 D_8008A87C = rec;
                 if (rec == NULL) {
                     return;
@@ -145,7 +145,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
             }
         }
     } else {
-        EnqueueCdRequest(self, func_800284C4(suffix), 2, arg2, arg3);
+        EnqueueCdRequest(self, FindCdFileIndex(suffix), 2, arg2, arg3);
     }
     UnlockCd();
 }
@@ -308,7 +308,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
         if (gCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             func_80028844(4, 1);
             D_8008A888 = D_8008A87C;
-            rec = func_80028448(arg1);
+            rec = FindCdFileEntry(arg1);
             D_8008A87C = rec;
             if (rec == NULL) {
                 return;
@@ -356,7 +356,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
             }
         }
     } else {
-        EnqueueCdRequest(self, func_800284C4(arg1), 7, 0, 0);
+        EnqueueCdRequest(self, FindCdFileIndex(arg1), 7, 0, 0);
     }
     UnlockCd();
 }

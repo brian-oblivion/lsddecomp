@@ -21,7 +21,7 @@
  *     that state machine.
  *   - AllocCdRequestNode / FreeCdRequestNode are a generic doubly-linked-list
  *     append/remove+free pair over 0x24-byte nodes, list head D_8008A894.
- *   - func_80028448 / func_800284C4 / func_80028540 are linear-scan /
+ *   - FindCdFileEntry / FindCdFileIndex / GetCdFileEntry are linear-scan /
  *     index helpers over a flat table of 0x1C-byte string records based at
  *     gFileTable, count gFileTableCount.
  */
@@ -123,7 +123,7 @@ void FreeCdRequestNode(Node8008A894 *node)
     UnlockCd();
 }
 
-void *func_80028448(char *arg0)
+void *FindCdFileEntry(char *arg0)
 {
     char *cur = gFileTable;
     s32 i = 0;
@@ -140,7 +140,7 @@ void *func_80028448(char *arg0)
     return NULL;
 }
 
-s32 func_800284C4(char *arg0)
+s32 FindCdFileIndex(char *arg0)
 {
     char *cur = gFileTable;
     s32 i = 0;
@@ -157,7 +157,7 @@ s32 func_800284C4(char *arg0)
     return i;
 }
 
-void *func_80028540(s32 index)
+void *GetCdFileEntry(s32 index)
 {
     void *result;
     char *base;

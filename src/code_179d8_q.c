@@ -78,7 +78,7 @@ struct UnkC80 {
 struct Obj6D4E8_282AC;
 extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
-extern s32 func_800284C4(char *name); /* code_179d8_r: name -> table index */
+extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 extern s32 gCdAsyncEnabled;
 
 void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
@@ -91,7 +91,7 @@ void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
     if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
-            idx = func_800284C4(name);
+            idx = FindCdFileIndex(name);
             EnqueueCdRequest((struct Obj6D4E8_282AC *)self, idx,
                              CD_OP_LOAD_FILE, 0, 0);
         } else {
@@ -375,7 +375,7 @@ struct CdFileInfo {
  * CdSearchFile lookup on that path, so an entry is a name resolved once and
  * reused as a seek target. gFileTable and gFileTableCount (this unit's
  * SetFileTable / SetFileTableCount) are the array's base and length --
- * func_800284C4 (code_179d8_r) walks the identical 0x1C stride over
+ * FindCdFileIndex (code_179d8_r) walks the identical 0x1C stride over
  * gFileTable doing strstr() against `name`, confirming the layout
  * independently. */
 typedef struct CdFileEntry CdFileEntry;
@@ -545,7 +545,7 @@ void DisableCdQueue(void)
  * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
  * D_8008A894, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
- * CD_OP_* values, `fileIndex` is func_800284C4's index into gFileTable (0
+ * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
  * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
  * buffer and a size for op 5. */

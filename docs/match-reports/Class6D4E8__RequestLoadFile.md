@@ -57,7 +57,7 @@ struct UnkC80 {
 struct Obj6D4E8_282AC;
 extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
-extern s32 func_800284C4(char *name); /* code_179d8_r: name -> table index */
+extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 extern s32 gCdAsyncEnabled;
 
 void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
@@ -70,7 +70,7 @@ void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
     if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
             s2->unk04 = 1;
-            idx = func_800284C4(name);
+            idx = FindCdFileIndex(name);
             EnqueueCdRequest((struct Obj6D4E8_282AC *)self, idx,
                              CD_OP_LOAD_FILE, 0, 0);
         } else {
@@ -96,7 +96,7 @@ working around it) needed:
 
 ```
 ori   $v0, $zero, 0x1
-jal   func_800284C4
+jal   FindCdFileIndex
  sw   $v0, 0x4($s2)      <-- $s2 never loaded/assigned anywhere in this function
 ```
 
@@ -134,11 +134,11 @@ allows.
   — a single early-return-free `if` wrapping the whole body reproduces this
   with no duplicated tail, the same shape CLAUDE.md/prior reports document
   for this unit.
-- `func_800284C4` (still `INCLUDE_ASM` in `code_179d8_r.c`, foxtrot's unit)
+- `FindCdFileIndex` (still `INCLUDE_ASM` in `code_179d8_r.c`, foxtrot's unit)
   takes a single `char *` argument that it passes straight to `strstr` as
   the needle — read from its own disassembly, not guessed — hence `char
   *arg0` here rather than `void *`. `arg1` of `Class6D4E8__RequestLoadFile` is typed the
-  same way, since it flows unchanged into both `func_800284C4` and
+  same way, since it flows unchanged into both `FindCdFileIndex` and
   `self->methods->loadFile` (spelled `slot58` when this was written).
 - `EnqueueCdRequest` (already matched this round, later in this file) takes its
   first parameter as a distinct locally-typed `Obj6D4E8_282AC *` (`Self800282AC` when this was written). Rather than
@@ -182,7 +182,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** Slot `+0x06C` of `D_8006D4E8` (`tools/classtable.py`). Given a
 file name, it either enqueues a `CD_OP_LOAD_FILE` (7) request through
-`EnqueueCdRequest` with `func_800284C4`'s file-table index, or -- when
+`EnqueueCdRequest` with `FindCdFileIndex`'s file-table index, or -- when
 `gCdAsyncEnabled` is 0 -- calls the class's own `+0x058` slot
 (`func_80027800`, code_179d8_s) directly, which is the synchronous
 load-this-file-by-name method that enqueues the identical op 7 on its own

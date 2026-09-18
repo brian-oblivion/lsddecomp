@@ -1,11 +1,13 @@
-# func_80028540 -- MATCHED (round 46): 19/19 words, byte-exact
+> Renamed from `func_80028540` on 2026-09-18 (tools/rename.py). Address 0x80028540.
+
+# GetCdFileEntry -- MATCHED (round 46): 19/19 words, byte-exact
 
 **Unit:** code_179d8_r · **Round 46** · **MATCHED**
 
 ## What it does
 
 Index-to-pointer helper over the same `gFileTable` string-record table used
-by `func_80028448`/`func_800284C4`: returns `gFileTable + index * 0x1C`,
+by `FindCdFileEntry`/`FindCdFileIndex`: returns `gFileTable + index * 0x1C`,
 bracketed by the unit's lock/unlock pair.
 
 ## Round 45's stall, and what closed it
@@ -38,7 +40,7 @@ worked. **Found a zero-score candidate at iteration 19.** The winning
 diff:
 
 ```diff
- void *func_80028540(s32 index)
+ void *GetCdFileEntry(s32 index)
  {
    void *result;
 +  char *new_var;
@@ -61,7 +63,7 @@ whole-image `OK: build matches retail SLPS_015.56`.**
 ## Final body (byte-exact)
 
 ```c
-void *func_80028540(s32 index)
+void *GetCdFileEntry(s32 index)
 {
     void *result;
     char *base;

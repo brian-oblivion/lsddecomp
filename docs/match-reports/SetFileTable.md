@@ -35,8 +35,8 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `D_8008A868` | `gFileTable` | A |
 
 **Evidence.** The global is the base of an array of 0x1C-byte records:
-`func_80028448` and `func_800284C4` (code_179d8_r) walk it with a literal
-0x1C stride doing `strstr(record, needle)` from offset 0, `func_80028540`
+`FindCdFileEntry` and `FindCdFileIndex` (code_179d8_r) walk it with a literal
+0x1C stride doing `strstr(record, needle)` from offset 0, `GetCdFileEntry`
 indexes it as `base + index * 0x1C`, and `ResolveFileEntries` (this unit)
 fills each record's `+0x14`/`+0x18` from a `CdSearchFile` lookup on the name
 at offset 0. `code_171e0.c`'s `RegisterFileTableEntries` sets the base, then the count,

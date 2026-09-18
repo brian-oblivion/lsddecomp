@@ -1,4 +1,6 @@
-# func_80028448
+> Renamed from `func_80028448` on 2026-09-18 (tools/rename.py). Address 0x80028448.
+
+# FindCdFileEntry
 
 **Unit:** code_179d8_r · **Size:** 31 words · **Status:** MATCHED (31/31 words) · **Round 45**
 
@@ -15,7 +17,7 @@ behaviour, reproduced exactly; it is not a bug introduced here.
 ## The C
 
 ```c
-void *func_80028448(char *arg0)
+void *FindCdFileEntry(char *arg0)
 {
     char *cur = gFileTable;
     s32 i = 0;

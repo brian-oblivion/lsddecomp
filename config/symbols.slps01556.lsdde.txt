@@ -746,3 +746,6 @@ gVabHeaderSuffix = 0x8008A8D0; // type:func
 gVabBodySuffix = 0x8008A8D4; // type:func
 AllocCdRequestNode = 0x8002832C; // type:func
 FreeCdRequestNode = 0x800283C4; // type:func
+FindCdFileEntry = 0x80028448; // type:func
+FindCdFileIndex = 0x800284C4; // type:func
+GetCdFileEntry = 0x80028540; // type:func
