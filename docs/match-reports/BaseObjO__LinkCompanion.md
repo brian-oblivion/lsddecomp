@@ -68,3 +68,15 @@ void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
   `(header & 0xF) == 5` picks out a second, broader kind (any table whose
   header's low nibble is 5). Worth remembering the exact masks if another
   class's link/unlink pair turns up with the same shape.
+
+## Naming
+
+**`BaseObjO__LinkCompanion` -- tier A.** Mechanics ARE the purpose:
+classifies `arg` by its own vtable header tag (`(header&0xFFF)==0x114` or
+`(header&0xF)==5`) and stores it into the matching one of two companion
+pointer fields (`companion1`/`companion2`) -- a "link" operation exactly
+as the existing term "companion-object pointer" (already used by
+`code_55dd4.h` for the identical field pattern at the same shared slot) is
+already established for. `func_800570B4` is the "link" half of the
+`slot10`/`slot14` pair; `BaseObjO__UnlinkCompanion` (`slot14`) is the other
+half, right after it in ROM order.

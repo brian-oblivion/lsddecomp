@@ -51,3 +51,15 @@ None -- a direct application of the already-documented `slotC4`-must-stay-
 `void` constraint to a NEW occupant of the same shared slot, confirming it
 generalizes past the two instances (`func_8005FA64`, `func_8005E160`)
 `Entity.h` already names.
+
+## Naming
+
+**`BaseObjO__func_5748c` -- tier C.** Class is known (occupies the shared
+`slotC4` `BasicClass`-inherited slot, confirmed by `tools/classtable.py`
+against `Entity.h`/`code_55dd4.h`'s independent readings of the same
+address), but the function tail-calls a still-`INCLUDE_ASM` sibling-unit
+function (`func_80057534`, `class_3bb8c_p.c`) with a fixed global address
+and a literal mode value `6`, and no occupant of `slotC4` anywhere in the
+codebase has an established purpose either (`Entity.h`'s own comment on
+this exact slot only documents a MUST-STAY-`void` return-type constraint,
+not what the slot means). Kept the tier-C `Class__func_xxxxx` form.

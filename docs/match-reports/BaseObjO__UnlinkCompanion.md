@@ -48,3 +48,11 @@ site, not just the ones where `self` happens to still be resident.
   its input -- reinforces (rather than extends) the existing
   `func_8001E57C` precedent, but from the "it doesn't matter what's
   there" side rather than the "self happens to be there" side.
+
+## Naming
+
+**`BaseObjO__UnlinkCompanion` -- tier A.** Mirror image of
+`BaseObjO__LinkCompanion` (see that report): classifies `arg` by the same
+tag rule and CLEARS the matching companion field instead of setting it --
+the "unlink" half of the pair, matched in ROM order right after `slot10`'s
+occupant.

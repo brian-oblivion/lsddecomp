@@ -27,3 +27,10 @@ include `DreamSys.h`.
 ### Proposed learning
 
 None -- see `BaseObjO__UpdateVec14`'s report for the real work.
+
+## Naming
+
+**`BaseObjO__AddVec14` -- tier A.** One-line forward to
+`BaseObjO__UpdateVec14(self, 0, arg1)` -- the flag literal `0` selects the
+accumulate (`vec18.x += v->x` etc.) branch, so "Add" is exactly what this
+wrapper causes to happen; mirrors `BaseObjO__SetVec14`'s naming logic.

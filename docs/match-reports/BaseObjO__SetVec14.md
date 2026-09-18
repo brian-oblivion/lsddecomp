@@ -29,3 +29,12 @@ vector, block-assigned or accumulated into `self->unk14->vec18`).
 ### Proposed learning
 
 None -- see `BaseObjO__UpdateVec14`'s report for the real work.
+
+## Naming
+
+**`BaseObjO__SetVec14` -- tier A.** One-line forward to
+`BaseObjO__UpdateVec14(self, 1, arg1)` -- the flag literal `1` selects
+`UpdateVec14`'s overwrite (`vec18 = *v`) branch, so "Set" is exactly what
+this wrapper causes to happen. `Vec14` names the field it writes
+(`self->vecTarget->vec18`, at `Unk14ObjO`'s `+0x018`, reached through
+`BaseObjO`'s own `+0x014` `vecTarget` pointer).

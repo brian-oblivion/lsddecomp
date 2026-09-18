@@ -81,3 +81,13 @@ Two residues, both closed:
   rather than an artifact: omitting the second name compiled clean but
   used `$a0` directly at both sites, 1 word short via a register-identity
   mismatch that a fresh `BaseObjO *t = self;` closed exactly.
+
+## Naming
+
+**`BaseObjO__UpdateVec14` -- tier A.** The shared worker behind
+`SetVec14`/`AddVec14`: overwrites or accumulates a `Vec3O` into
+`self->vecTarget->vec18` depending on `flag`, then always clears
+`self->vecTarget->unk0`. "Update" covers both the overwrite and the
+accumulate case without picking one, which is what the shared (flag-gated)
+function needs; the two one-line callers get the more specific
+`Set`/`Add` names instead.

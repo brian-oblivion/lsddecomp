@@ -58,3 +58,14 @@ constant.
 
 None -- see `BaseObjO__func_571f8`'s report for the shared `TagByteObjO` tag
 convention.
+
+## Naming
+
+**`DispatchObjO__func_57320` -- tier C.** Mechanics are fully known (reads
+`arg1`'s vtable tag byte, dispatches to one of `self`'s own two vtable
+slots depending on whether it is `0x34` or `0x24`), but the report's own
+class-identification section explicitly declines to assert a relationship
+between `DispatchObjO` (this function's `self`) and `BaseObjO`, since
+nothing in this unit calls `func_80057320` to test that relationship.
+Kept `DispatchObjO` (this unit's own type for this unresolved class) as
+the prefix rather than guessing `BaseObjO`.

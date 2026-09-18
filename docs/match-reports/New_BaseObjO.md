@@ -49,3 +49,19 @@ named, all of which fit within the first 0x58 bytes.
 ### Proposed learning
 
 None beyond the already-documented `New_X` sub-shape #3.
+
+## Naming
+
+**`New_BaseObjO` -- tier A.** Matches the project's documented `New_X`
+allocator sub-shape #3 exactly (alloc, test, ctor, test-ctor's-own-return,
+free-on-failure) -- mechanics are the entire visible purpose of this
+function, which is why the previous round's own report already used this
+name in prose before anyone renamed it. Constructs a `BaseObjO`, not a
+`Class65650`: it calls `func_80057C84()->ctor(self)` with a SINGLE
+argument, which only makes sense if that slot resolves to
+`BaseObjO__BaseObjO` (this unit's own 1-argument base ctor) rather than to
+`Class65650`'s real, 3-argument constructor
+(`code_55dd4.c:class_65650__Constructor`) -- confirmed directly by
+`func_80057C84`'s declared return type, `BaseObjOMethods *` here (this
+unit's own reading of the SAME table `code_55dd4.h` calls
+`D800878D4Methods`).

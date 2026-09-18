@@ -62,3 +62,14 @@ through, split the pad rather than guessing a name from nothing --
 `tools/classtable.py <table>` names the real occupant function at that
 offset even when this unit never defines it, which is enough to type the
 slot (return/argument shape) without derivation risk.
+
+## Naming
+
+**`BaseObjO__func_56f5c` -- tier C.** Class is known (`self` is `BaseObjO`,
+confirmed by the `self->methods->slot80` dispatch), and the mechanics are
+fully described in this report (stash `self`/two scalars into three
+globals, then loop twice through the still-unresolved `slot80` occupant
+and an unrenamed Psy-Q object, `func_80020510`), but nothing establishes
+WHAT this accomplishes -- `arg0` is discarded by every known caller, and
+`class_3bb8c_s.c`'s own comment calls it merely "ctor-shaped" as a guess,
+not a finding. Kept the tier-C `Class__func_xxxxx` form.

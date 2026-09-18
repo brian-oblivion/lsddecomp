@@ -30,3 +30,12 @@ argument to classify; it simply clears both fields regardless of which one
 
 None -- confirms rather than extends the link/unlink pair's field naming
 already established by `BaseObjO__LinkCompanion`/`BaseObjO__UnlinkCompanion`.
+
+## Naming
+
+**`BaseObjO__ClearCompanions` -- tier A.** Mechanics ARE the purpose:
+unconditionally clears BOTH companion fields (no tag check, unlike
+`LinkCompanion`/`UnlinkCompanion`) and chains to the base table's own
+`slot18`. `slot18` has no other established occupant name in any sibling
+header (`code_55dd4.h` still calls the field `unk18`), so this name is
+this unit's own contribution.

@@ -46,3 +46,13 @@ and calling through it rather than `jal`-ing the symbol directly.
 
 None -- straightforward once `Class6B5CC__RotateLocalVector`'s established signature and
 `BaseObjOMethods`'s `slotBC` slot were both in place.
+
+## Naming
+
+**`BaseObjO__ApplyRotatedVec14` -- tier A.** Mechanics ARE the purpose:
+rotates a source `s16` triple through the already-established
+`Class6B5CC__RotateLocalVector` into a stack `Vec3O`, then forwards that
+buffer to `self`'s own `addVec14` slot (`BaseObjO__AddVec14`, a
+self-referential virtual dispatch to a function this same unit defines).
+"Apply a rotated vector" is exactly the composition of "rotate" then
+"add".

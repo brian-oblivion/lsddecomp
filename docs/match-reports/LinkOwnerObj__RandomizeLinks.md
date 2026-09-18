@@ -73,3 +73,11 @@ void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
   out that a non-zero starting index makes this MORE likely to bite (array
   indexing with a variable base offset gives the compiler more freedom to
   split the address computation), not less.
+
+## Naming
+
+**`LinkOwnerObj__RandomizeLinks` -- tier A.** Mechanics ARE the purpose:
+for each of 4 link elements, calls the element's own `slot48` with a
+random entry from a 6-entry `Vec3O` table and sets the element's own
+`angle` field to a random degrees value -- "randomize" describes exactly
+this and nothing more speculative.

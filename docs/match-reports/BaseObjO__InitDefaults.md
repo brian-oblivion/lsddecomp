@@ -25,3 +25,14 @@ field writes, no control flow -- matched first try. `unk48`'s width
 ### Proposed learning
 
 None -- straightforward setter.
+
+## Naming
+
+**`BaseObjO__InitDefaults` -- tier B.** Mechanics fully described: sets
+`self->unk48 = 0x12C` (300) and `self->unk54 = 0`, unconditionally, no
+control flow. Named for the mechanic (initializing two fields to fixed
+default values) without asserting what those fields represent in the
+game -- `unk48`/`unk54` are left unrenamed. `BaseObjO__func_571f8` reads
+both fields together (adding/subtracting `unk54` from `unk48` depending on
+sign) which is suggestive of a paired value/adjustment relationship, but
+not strong enough evidence for a purpose-asserting name like "heading".

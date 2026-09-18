@@ -53,3 +53,13 @@ function).
 ### Proposed learning
 
 None beyond what's already documented -- straightforward wrapper.
+
+## Naming
+
+**`LinkOwnerObj__ReleaseLinks` -- tier A.** Mechanics ARE the purpose: the
+whole body is `ReleaseBasicClassArray(this->links, 5)`, i.e. "release [all
+of] this object's links". `LinkOwnerObj` is this unit's own established
+local view of the class `class_3bb8c_s.c` independently calls `LinkNode`
+(same object, same `arr84`/`links` array, per that unit's own header
+comment) -- kept distinct per the multiple-independent-local-views
+convention rather than importing that name here.

@@ -90,3 +90,20 @@ discipline and the file banner), so this unit keeps its own local reading,
   occupants across many classes share this one dispatch stub, and at least
   two of them use their return value while at least one doesn't), not an
   artifact of one unit's local confusion.
+
+## Naming
+
+**`BaseObjO__BaseObjO` -- tier A.** The raw `Class__Class` constructor form:
+takes an already-allocated `self`, chains to the true root
+(`func_8001E57C()->ctor`), installs `self->methods`, zeroes three fields
+and dispatches `slot40`. The report's own "Class identification" section
+establishes THREE independent ways that this is the shared intermediate
+base's own constructor, not `Class65650`'s: (1) it installs the exact
+table `func_80057C84()` returns, (2) the functions defined right after it
+in this unit occupy that same table's `+0x010`/`+0x014`/`+0x018` slots and
+are independently named at the identical offsets in two sibling headers'
+own local views (`DreamSys.h`, `code_55dd4.h`), (3) `code_55dd4.c`'s real
+`Class65650` constructor (`class_65650__Constructor`) calls THIS function
+through `base->ctor(self)` to chain to it first, then immediately
+overwrites `self->methods` with `Class65650`'s own, more specific table --
+i.e. `Class65650` derives from this class, it is not this class.
