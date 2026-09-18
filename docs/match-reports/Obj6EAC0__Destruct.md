@@ -1,9 +1,11 @@
-# func_80040A30 — MATCHED (22/22 words)
+> Renamed from `func_80040A30` on 2026-09-18 (tools/rename.py). Address 0x80040a30.
+
+# Obj6EAC0__Destruct — MATCHED (22/22 words)
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-void func_80040A30(Obj6EAC0 *self) {
+void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = func_80017CFC(self->unkB4);
     func_80041C3C()->slot0C(self);

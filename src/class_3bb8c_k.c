@@ -320,7 +320,7 @@ void func_80052644(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32
 
     for (i = 0; i < count; i++) {
         func_8005292C(self, buf, i, arg3, (char *)arg4);
-        *p = (Class86F88Elem *)func_800408CC((void *)arg2, 0x1A, buf);
+        *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
         (*p)->methods->slotB8(*p, &D_8008AB0C);
         local.b += 0xA;

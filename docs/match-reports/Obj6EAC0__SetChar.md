@@ -1,4 +1,6 @@
-# func_80040854 — MATCHED (19/19), round 19
+> Renamed from `func_80040854` on 2026-09-18 (tools/rename.py). Address 0x80040854.
+
+# Obj6EAC0__SetChar — MATCHED (19/19), round 19
 
 ## Round 19: closed via the permuter, `do { ... } while (0)` scoping lever
 
@@ -6,7 +8,7 @@
 0):**
 
 ```c
-void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
 {
     void (*fn)();
     Obj6EAC0 *q;
@@ -82,10 +84,10 @@ STALL (prologue store-order residue, 17/19 words)
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean. Correct length (19/19
 words at the right total size, confirmed via the funcdiff word count
-matching the `.s` file's own `nonmatching func_80040854, 0x4C`).
+matching the `.s` file's own `nonmatching Obj6EAC0__SetChar, 0x4C`).
 
 ```c
-void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     self->methods->slot4C(self, a1, a2, a3);
     self->unk48 = 0;
     self->unk4C = a3;
@@ -130,9 +132,9 @@ store ORDER is not reachable from C" class.
 ## Round 15 update: two more attempts, still resistant
 
 Re-attempted after the coordinator flagged this as one of the three
-closest stalls to revisit, with `func_80040948`'s freshly-discovered
+closest stalls to revisit, with `Obj6EAC0__Construct`'s freshly-discovered
 "leftover register" and "narrower cast" levers in mind. Neither
-applied here -- unlike `func_80040948`, the CALL setup itself is
+applied here -- unlike `Obj6EAC0__Construct`, the CALL setup itself is
 already exactly right (retail's own `self->methods->slot4C` call also
 forwards `self`/`a1`/`a2`/`a3` with NO explicit register moves at all,
 since none of the four have been touched since function entry; the

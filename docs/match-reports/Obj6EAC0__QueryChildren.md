@@ -1,9 +1,11 @@
-# func_80040CD0 — MATCHED (41/41), round 19
+> Renamed from `func_80040CD0` on 2026-09-18 (tools/rename.py). Address 0x80040cd0.
+
+# Obj6EAC0__QueryChildren — MATCHED (41/41), round 19
 
 ## Final body (byte-exact, full oracle green)
 
 ```c
-s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
+s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
     s32 i = self->unkAC;
     s32 bound = i;
@@ -24,7 +26,7 @@ s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
 
 `build-and-verify.sh` exits 0 -- genuinely whole-image byte-exact.
 
-## Round 19: `func_80040AE8`'s bound-recompute idiom transferred cleanly
+## Round 19: `Obj6EAC0__LayoutChildrenWithGap`'s bound-recompute idiom transferred cleanly
 
 Ran the permuter first (seeded from this report's attempt-2 body, the
 recommended untried direction): `--debug --stack-diffs` confirmed base
@@ -34,14 +36,14 @@ iterations and found no zero -- best was 165, barely under the base and
 never translated to anything idiomatic. Not adopted; recorded as a
 negative permuter result, not a lever.
 
-**What closed it instead was applying `func_80040AE8`'s fix (matched
+**What closed it instead was applying `Obj6EAC0__LayoutChildrenWithGap`'s fix (matched
 earlier this same round) precisely, not just "the same family idiom
 loosely applied":** the report's own cross-reference note warned that a
 lever closing one `unkB4[unkAC..unkAC+unkAB)`-loop sibling doesn't
-reliably transfer to another (attempts 6-9 tried `func_80040D74`'s
+reliably transfer to another (attempts 6-9 tried `Obj6EAC0__PropagateColor`'s
 named-`ab`/`ac`-temp idiom here and got a DIFFERENT residue triplet each
 time, never an improvement over attempt 2's 33/41). The detail that
-made `func_80040AE8` succeed where those attempts didn't: never
+made `Obj6EAC0__LayoutChildrenWithGap` succeed where those attempts didn't: never
 pre-summing `self->unkAC + self->unkAB` into a single stored `bound`/
 `count` variable at all -- keep `bound` as a bare `self->unkAC` field
 re-read, and write the comparison itself as `i < bound + self->unkAB`
@@ -57,9 +59,9 @@ separately.
 
 ### Proposed learning
 
-Strengthens `func_80040AE8`'s own new learning with a second, harder
+Strengthens `Obj6EAC0__LayoutChildrenWithGap`'s own new learning with a second, harder
 instance (this function's residue was rated "more tangled" than
-`func_80040D74`'s in the original report, and it still yielded to the
+`Obj6EAC0__PropagateColor`'s in the original report, and it still yielded to the
 same precise idiom): for this unit's whole `unkB4[unkAC..unkAC+unkAB)`
 loop family, the transferable lever is specifically **"never store the
 summed bound in a variable; keep the recomputed field bare and add the
@@ -79,7 +81,7 @@ Body reached (near-miss, preserved literally):
 
 ```c
 #if 0
-s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
+s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
     s32 i = self->unkAC;
     s32 count = self->unkAB + i;
@@ -103,7 +105,7 @@ s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
 uninitialised" case: it is only ever used as the fallback return value
 when the child array is empty, and gets overwritten with each
 iteration's call result otherwise (last iteration wins). This is the
-same shape as `func_80040AE8`/`func_80040C00` (loop over
+same shape as `Obj6EAC0__LayoutChildrenWithGap`/`func_80040C00` (loop over
 `self->unkB4[unkAC..unkAC+unkAB)`) but this time `self` correctly
 lands in `$s1` with `$s0`=`i`, `$s2`=cursor, `$s3`=`a1` -- so THIS
 function is NOT an instance of that register-permutation class; the
@@ -149,7 +151,7 @@ residue here is two much smaller, more local scheduling questions.
 ## Round 15 update: 5 more attempts, all negative; still 33/41
 
 Re-attempted per coordinator request, both to close the "not tried"
-direction above and to test whether `func_80040D74`'s newly-found
+direction above and to test whether `Obj6EAC0__PropagateColor`'s newly-found
 "split the in-loop recompute into named `ab`/`ac` temps, in a specific
 order, entangled with the pre-loop operand choice" lever transfers to
 this near-identical sibling function. It does NOT transfer cleanly:
@@ -161,7 +163,7 @@ this near-identical sibling function. It does NOT transfer cleanly:
    warning fires). Closes the "not tried" note from the original
    report with a firm negative; the barrier is not viable anywhere in
    this function regardless of what else is held fixed.
-6. `func_80040D74`'s exact winning combination (`i + self->unkAB` for
+6. `Obj6EAC0__PropagateColor`'s exact winning combination (`i + self->unkAB` for
    the pre-loop bound, PLUS named `ab`,`ac` temps for the in-loop
    recompute, `ab` assigned first) -- 33/41, no improvement, and a
    DIFFERENT residue triplet than attempt 2's (the pre-loop `addu` and
@@ -179,7 +181,7 @@ this near-identical sibling function. It does NOT transfer cleanly:
    order from attempt 1) -- 32/41.
 
 None of attempts 5-9 beat attempt 2's original 33/41, which remains
-the reported best. Unlike `func_80040D74`, splitting the field reads
+the reported best. Unlike `Obj6EAC0__PropagateColor`, splitting the field reads
 into named temps here shifts the residue around (sometimes fixing the
 `addu` operand order, sometimes not, always leaving at least 8 words
 wrong) without ever closing more than attempt 2 already closed --
@@ -190,7 +192,7 @@ manual reshaping.
 
 ## Direction NOT tried, and why
 
-**Did not try:** the permuter. Given `func_80040D74`'s sibling
+**Did not try:** the permuter. Given `Obj6EAC0__PropagateColor`'s sibling
 residue (from the identical loop skeleton) turned out to be a clean
 permuter target once isolated, and this function's remaining residue
 is more tangled (three interacting sub-residues rather than one), a
@@ -208,6 +210,6 @@ back-edge branch, not just a tail call -- worth generalising that
 entry once a lever is found here. Separately: **a lever that closes
 one residue in a near-identical sibling function does not reliably
 transfer**, even when the two functions share the same loop skeleton
-almost verbatim (`func_80040D74` vs this function) -- cross-reference
+almost verbatim (`Obj6EAC0__PropagateColor` vs this function) -- cross-reference
 both reports before assuming a fix generalises across this unit's
 `unkB4[unkAC..unkAC+unkAB)` loop family.

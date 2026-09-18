@@ -133,7 +133,7 @@ the next attempt does not re-spend on them:**
 
 This is the SAME "redundant cursor cache" residue class already
 documented on this unit's sibling stalls, `DecodeFullWidthSjis` and (by
-extension) `func_800407F8` — an argument/pointer used only as a store
+extension) `Obj6EAC0__SetPosition` — an argument/pointer used only as a store
 TARGET, never re-read, still gets its OWN register in retail, and no
 C-level reshape tried on any of the three functions in this family has
 reproduced it. Per CLAUDE.md, fixing which physical register holds a
@@ -352,7 +352,7 @@ post-increment spelling collapses to a single register and stores through
 the parameter; the longhand keeps retail's separate copy.
 
 **And a correction while dissolving the class: it had TWO members, not
-three.** `func_800407F8` has been cross-filed with these two since round
+three.** `Obj6EAC0__SetPosition` has been cross-filed with these two since round
 18 as an "analogous stall" -- but it was **MATCHED 11/11 in round 19**, by
 an unrelated whole-struct-assignment lever, and the cross-references were
 never updated. A class assembled by cross-reference keeps counting a

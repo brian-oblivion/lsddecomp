@@ -11,7 +11,7 @@ Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void) {
 ```
 
 The override-table twin of `Obj6EAC0__GetBaseMethods` (returns `&D_8006EAC0`).
-Called by `func_800408CC` (this unit, the class's `New_X`-shaped
+Called by `New_Obj6EAC0` (this unit, the class's `New_X`-shaped
 allocator) to fetch the constructor at `slot0x08`.
 
 ### Proposed learning

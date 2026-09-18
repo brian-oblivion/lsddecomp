@@ -71,7 +71,7 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
             void *extra = a1->unk24[i];
             s32 len = strlen(*list);
 
-            *arr = func_800408CC(handle, len, *list);
+            *arr = New_Obj6EAC0(handle, len, *list);
             arr++;
             if (extra != NULL) {
                 self->unk58 = i;
@@ -272,7 +272,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
         do {
             s32 len = strlen(*list);
 
-            *buf = func_800408CC(a2, len, *list);
+            *buf = New_Obj6EAC0(a2, len, *list);
             list++;
             buf++;
         } while (*list != NULL);

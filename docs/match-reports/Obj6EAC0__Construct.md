@@ -1,4 +1,6 @@
-# func_80040948 — MATCHED (58/58 words)
+> Renamed from `func_80040948` on 2026-09-18 (tools/rename.py). Address 0x80040948.
+
+# Obj6EAC0__Construct — MATCHED (58/58 words)
 
 Unit: `src/code_2cc8c_f.c`. 12 attempts. **Re-attempted after a
 coordinator correction**: this function had originally been triaged
@@ -9,7 +11,7 @@ pooled census across rounds 13+14 (81 matched, 10 stalled) showed the
 this function proves it.
 
 ```c
-void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
@@ -36,10 +38,10 @@ void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 The derived table's constructor (`Obj6EAC0Methods::slot08`), called by
-this unit's own `func_800408CC` via
+this unit's own `New_Obj6EAC0` via
 `Obj6EAC0__GetDerivedMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
 sibling table's own `slot08` (a base-class-style constructor call
-through `func_80041C3C()`, same shape as `func_800408CC` calling
+through `func_80041C3C()`, same shape as `New_Obj6EAC0` calling
 `Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
 `a2`-element child array via `func_80017B34`, fills each slot by
@@ -74,7 +76,7 @@ THIS call site only —
 argument register at all, and the leftover value in `$a3` (never
 touched since function entry) does the rest for free. Zero-attempt
 verification that this doesn't disturb the OTHER call through
-`slot08` (`func_800408CC`, which genuinely does use 4 args): that call
+`slot08` (`New_Obj6EAC0`, which genuinely does use 4 args): that call
 still goes through the struct's own canonical 4-arg field, untouched.
 
 ## Attempts (12)

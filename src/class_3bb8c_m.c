@@ -147,7 +147,7 @@ void func_8005426C(ObjM *self) {
 void func_800542D0(ObjM *self) {
     s32 state = self->unk80;
     if (state == 0) {
-        self->unk7C = func_800408CC(self->unk74, 5, &D_8008AB44[0]);
+        self->unk7C = New_Obj6EAC0(self->unk74, 5, &D_8008AB44[0]);
         self->unk7C->methods->slot4C(self->unk7C, self->unk14, &D_8008AB38);
         self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
         self->unk80 = state + 1;

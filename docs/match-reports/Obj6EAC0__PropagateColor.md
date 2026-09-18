@@ -1,11 +1,13 @@
-# func_80040D74 -- MATCHED (40/40 words)
+> Renamed from `func_80040D74` on 2026-09-18 (tools/rename.py). Address 0x80040d74.
+
+# Obj6EAC0__PropagateColor -- MATCHED (40/40 words)
 
 Unit: `src/code_2cc8c_f.c`.
 
 ## Final body
 
 ```c
-void func_80040D74(Obj6EAC0 *self, s32 a1) {
+void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
     s32 i = self->unkAC;
     s32 bound = i;
@@ -71,7 +73,7 @@ is the structural fix; the `ab` load happening before the call
 once written this way) came along for free.
 
 Verified against the real oracle: `./build-and-verify.sh` exits 0,
-whole-image SHA1 matches, `funcdiff.py func_80040D74` reports `40/40
+whole-image SHA1 matches, `funcdiff.py Obj6EAC0__PropagateColor` reports `40/40
 words match`.
 
 ## Attempts (7 manual, round 15, preserved from the prior report)
@@ -106,7 +108,7 @@ expression-lowering level: a maintained loop variable and a
 recomputed-inline condition can be semantically identical yet compile
 to different code, and only the permuter's blind search (not word-count
 diffing) surfaced which one retail used. Cross-reference
-`func_80040CD0.md` and `func_80040C00.md` -- this unit's OTHER
+`Obj6EAC0__QueryChildren.md` and `func_80040C00.md` -- this unit's OTHER
 `unkB4[unkAC..unkAC+unkAB)` loop functions -- to check whether this same
 "condition is a fresh expression, not the maintained variable" shape
 applies to their own remaining residues too.

@@ -1,8 +1,10 @@
-# func_80040664 -- MATCH (32/32 words, 1 attempt)
+> Renamed from `func_80040664` on 2026-09-18 (tools/rename.py). Address 0x80040664.
+
+# Obj6EAC0__Layout -- MATCH (32/32 words, 1 attempt)
 
 Unit `code_2cc8c_f`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
 FUNCTION the vtable slot points to, not a caller of it -- the header's
-existing "IS func_80040664" note on that slot already said as much before
+existing "IS Obj6EAC0__Layout" note on that slot already said as much before
 this round). Body: when `self->unkC == 0`, forwards to the shared
 "default handler" table's own `slot4C` (`func_8001E57C()`, already typed
 in `include/code_2cc8c.h` as `D6B5CCGetterMethodsCC8C`, with a `slot4C`
@@ -12,7 +14,7 @@ were necessary), then dispatches `self->methods->slotBC(self, a2)` --
 pointer").
 
 ```c
-void func_80040664(Obj6EAC0 *self, s32 a1, void *a2) {
+void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
     if (self->unkC == 0) {
         func_8001E57C()->slot4C(self, a1, 0);
         self->methods->slotBC(self, a2);
@@ -25,7 +27,7 @@ under the 7+ saturation band this project's `MATCHING-GUIDE.md` flags as
 low-yield. Matched on the first attempt with a direct transliteration of
 the disassembly -- both vtable slot types needed were already established
 by earlier rounds' work on sibling functions in this same unit
-(`func_800407F8`/`func_80040E14` for `slotBC`'s struct shape;
+(`Obj6EAC0__SetPosition`/`Obj6EAC0__LayoutChildren` for `slotBC`'s struct shape;
 `code_2cc8c_e`'s ctor call for `D6B5CCGetterMethodsCC8C::slot4C`), so
 there was no struct derivation left to do here -- just reading the
 existing header carefully enough to recognize both slots were already on

@@ -90,7 +90,7 @@ void func_8004DABC(Class86B60 *self)
 }
 
 /* func_8004DB18's own `arg1`: only its own +0x004 field is read, forwarded
- * opaquely as func_800408CC's `ctx` argument. */
+ * opaquely as New_Obj6EAC0's `ctx` argument. */
 typedef struct Arg1DB18_3bb8c_d Arg1DB18_3bb8c_d;
 struct Arg1DB18_3bb8c_d {
     u8 pad0[0x004];
@@ -126,7 +126,7 @@ void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     size = (size >> 1) + 4;
     buf = func_80017B34(size);
     DecodeFullWidthSjis(buf, D_8008AA18);
-    self->unkB0 = (Class86B60UnkB0Obj_3bb8c_d *)func_800408CC(arg1->unk4, size, buf);
+    self->unkB0 = (Class86B60UnkB0Obj_3bb8c_d *)New_Obj6EAC0(arg1->unk4, size, buf);
     self->unkB0->unkAB = 8;
     self->unkB0->unkAC = 4;
     self->unkB0->unkAA = 9;

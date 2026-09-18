@@ -1,7 +1,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-void func_80040664(Obj6EAC0 *self, s32 a1, void *a2) {
+void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
     if (self->unkC == 0) {
         func_8001E57C()->slot4C(self, a1, 0);
         self->methods->slotBC(self, a2);
@@ -20,15 +20,15 @@ s32 func_80040740(Obj6EAC0 *self, s32 a1) {
     return GetSetBitField(&self->unk58, 0x1C, 2, a1);
 }
 
-void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
+void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
 
-void func_8004076C(Obj6EAC0 *self, s32 overwrite, u8 *src) {
-    func_80040790(self, self->unk64, src, overwrite);
+void Obj6EAC0__SetColor(Obj6EAC0 *self, s32 overwrite, u8 *src) {
+    Obj6EAC0__ApplyColor(self, self->unk64, src, overwrite);
 }
 
 typedef struct { s8 r, g, b; } RGB80040790;
 
-void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
     d = dst;
     if (overwrite) {
@@ -40,7 +40,7 @@ void func_80040790(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     }
 }
 
-void func_800407F8(Obj6EAC0 *self, Pair32E99C *a1) {
+void Obj6EAC0__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->unkC != 0) {
         *(Pair32E99C *)&self->unk50 = *a1;
     }
@@ -53,7 +53,7 @@ void func_80040824(Obj6EAC0 *self, s32 *a1) {
     }
 }
 
-void func_80040854(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
 {
     void (*fn)();
     Obj6EAC0 *q;
@@ -84,7 +84,7 @@ Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void) {
 
 Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
 
-Unk64Elem *func_800408CC(void *ctx, s32 len, char *name) {
+Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
     Obj6EAC0 *self = func_80017B34(0xB8);
     if (self != NULL) {
         Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
@@ -93,7 +93,7 @@ Unk64Elem *func_800408CC(void *ctx, s32 len, char *name) {
     return NULL;
 }
 
-void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
@@ -118,18 +118,18 @@ void func_80040948(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     }
 }
 
-void func_80040A30(Obj6EAC0 *self) {
+void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = func_80017CFC(self->unkB4);
     func_80041C3C()->slot0C(self);
 }
 
-void func_80040A88(Obj6EAC0 *self, s32 a1) {
+void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
     self->methods->slotD4(self, 7);
     self->methods->slotCC(self, a1);
 }
 
-void func_80040AE8(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
+void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     Pair32E99C buf;
     s32 i, bound;
     Obj6EAC0 **elemp;
@@ -178,7 +178,7 @@ void func_80040C00(Obj6EAC0 *self) {
     }
 }
 
-s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
+s32 Obj6EAC0__QueryChildren(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
     s32 i = self->unkAC;
     s32 bound = i;
@@ -196,7 +196,7 @@ s32 func_80040CD0(Obj6EAC0 *self, s32 a1, s32 a2) {
     return a2;
 }
 
-void func_80040D74(Obj6EAC0 *self, s32 a1) {
+void Obj6EAC0__PropagateColor(Obj6EAC0 *self, s32 a1) {
     Obj6EAC0 **elemp = self->unkB4 + self->unkAC;
     s32 i = self->unkAC;
     s32 bound = i;
@@ -214,7 +214,7 @@ void func_80040D74(Obj6EAC0 *self, s32 a1) {
     }
 }
 
-void func_80040E14(Obj6EAC0 *self, Pair32E99C *a1) {
+void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->unkC != 0) {
         Pair32E99C buf;
         s32 i;
@@ -237,7 +237,7 @@ void func_80040E14(Obj6EAC0 *self, Pair32E99C *a1) {
     }
 }
 
-void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
+void Obj6EAC0__SetChildChar(Obj6EAC0 *self, s32 a1, s32 a2) {
     Obj6EAC0 *elem = self->unkB4[a2];
     elem->methods->slotC4(elem, a1 & 0xFF);
 }
@@ -245,7 +245,7 @@ void func_80040EDC(Obj6EAC0 *self, s32 a1, s32 a2) {
 void Obj6EAC0__NoOpSetter(void) {
 }
 
-void func_80040F28(Obj6EAC0 *self, u8 *a1) {
+void Obj6EAC0__SetText(Obj6EAC0 *self, u8 *a1) {
     Obj6EAC0 **elemp = self->unkB4;
     u8 *p = a1;
     if (p != NULL && *p != 0) {

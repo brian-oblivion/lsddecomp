@@ -11,7 +11,7 @@ void Obj6EAC0__SetChildPitch(Obj6EAC0 *self, s32 a1) {
 ```
 
 Derived-table occupant of `Obj6EAC0Methods::slot0xD4` (derived-only
-slot, no base equivalent). Called by `func_80040A88` (this unit) as
+slot, no base equivalent). Called by `Obj6EAC0__FinishConstruct` (this unit) as
 `self->methods->slotD4(self, 7)`.
 
 ### Proposed learning

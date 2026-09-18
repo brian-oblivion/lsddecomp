@@ -1,9 +1,11 @@
-# func_80040A88 — MATCHED (24/24 words)
+> Renamed from `func_80040A88` on 2026-09-18 (tools/rename.py). Address 0x80040a88.
+
+# Obj6EAC0__FinishConstruct — MATCHED (24/24 words)
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-void func_80040A88(Obj6EAC0 *self, s32 a1) {
+void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
     self->methods->slotD4(self, 7);
     self->methods->slotCC(self, a1);
 }
