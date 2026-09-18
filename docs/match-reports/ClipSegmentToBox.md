@@ -1,4 +1,6 @@
-# func_8001E110 — MATCHED (round 41), 118/118, byte-exact
+> Renamed from `func_8001E110` on 2026-09-18 (tools/rename.py). Address 0x8001e110.
+
+# ClipSegmentToBox — MATCHED (round 41), 118/118, byte-exact
 
 **Round 41 update (read this first): CLOSED.** Round 20 closed the CFG and
 register mapping (16/118 -> 95/118), leaving one standalone residue: an
@@ -29,7 +31,7 @@ mapping). ~12 real attempts. Restored to `INCLUDE_ASM` per project rule.
 ## Signature (as attempted)
 
 ```c
-s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
+s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
 ```
 
 Confirmed from its only caller (itself, recursively, plus one external call
@@ -43,7 +45,7 @@ does).
 Recursive segment-vs-box intersection test:
 
 ```c
-s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
+s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
     u8 r1;
     u8 r2;
     Vec3S16_d294 mid;
@@ -83,13 +85,13 @@ s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3
     }
 
     {
-        s32 result = func_8001E110(out, box, p1, &mid);
+        s32 result = ClipSegmentToBox(out, box, p1, &mid);
         if (result != 0) {
             return result;
         }
     }
     {
-        s32 result = func_8001E110(out, box, &mid, p2);
+        s32 result = ClipSegmentToBox(out, box, &mid, p2);
         if (result != 0) {
             return result;
         }
@@ -169,7 +171,7 @@ not move it, it is a stall" framing.
 Independent of the above: this attempt's compiled tail has
 `move $v1,$v0` before testing the SECOND recursive call's result (`bnez
 $v1,...`), where retail tests `$v0` directly (no move) after BOTH recursive
-calls. Wrapping each `s32 result = func_8001E110(...); if (result) return
+calls. Wrapping each `s32 result = ClipSegmentToBox(...); if (result) return
 result;` pair in its OWN nested `{ }` block (so the two `result`s are
 independent locals, not one reused variable) fixed this for the FIRST call
 but not the second — the first call's test went from `move v1,v0; bnez v1`
@@ -186,11 +188,11 @@ issue #1, not an independent defect — worth re-checking automatically once
 - New extern `s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point)` —
   MEASURED shape (identical outcode-computation body to `func_8001E2E8`'s
   own `flags` logic, see that report), not guessed.
-- Prototype `s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box,
+- Prototype `s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box,
   Vec3S16_d294 *p1, Vec3S16_d294 *p2);` left in place (harmless with the
   function still `INCLUDE_ASM`; saves the next attempt from re-deriving the
   signature, which took real effort — cross-referencing both call sites in
-  `func_8001E110`'s own body, per the recursion, and the external call
+  `ClipSegmentToBox`'s own body, per the recursion, and the external call
   sites are inferred from the parameter roles matching `func_8001E2E8`'s
   own confirmed signature one-for-one).
 
@@ -201,7 +203,7 @@ this round's summary for the `GenericMethods_d294` padding fix.)
 
 ## Proposed learning
 
-Promote `func_8001E110` and `func_8001E4A4` in the round's consolidation as
+Promote `ClipSegmentToBox` and `func_8001E4A4` in the round's consolidation as
 **confirmed instances of the same open question**: this project has now
 seen two functions, in the same unit, both `INCLUDE_ASM`-worthy near
 matches, both blocked by a register-to-value mapping that's provably
@@ -294,7 +296,7 @@ Dropping the preserved 16/118 body in live and running the real oracle
 gives `funcdiff.py`'s **WARNING: the build differs OUTSIDE this range too
 (282262 bytes)** -- i.e. real, substantial address drift, not "no drift"
 as round 19's text states. Confirmed independently via `nm -S` on the
-built object: `func_8001E110` compiles to `0x1D0` bytes (116 words), not
+built object: `ClipSegmentToBox` compiles to `0x1D0` bytes (116 words), not
 retail's `0x1D8` (118 words) -- **a real 2-word size shortfall**, not a
 pure register-coloring residue. This is the same class of false claim
 just corrected in this session's other unit (`func_80065AE0`,
@@ -312,7 +314,7 @@ total shortfall). The first jump is at retail address range
 this build's flat 4-condition C source never emits at all.
 
 **The mechanism, read directly from retail's own `.s`
-(`asm/nonmatchings/code_d294_b/func_8001E110.s`), not inferred:** retail
+(`asm/nonmatchings/code_d294_b/ClipSegmentToBox.s`), not inferred:** retail
 computes `r1`/`r2` outcodes into `$s0`/`$v1`, then tests them with THREE
 physical `andi $v0,$s0,0xFF` instructions, not two -- at `0x8001E15C`,
 `0x8001E16C` (both explained by the existing flat-condition reading), and
@@ -374,7 +376,7 @@ register-rotation problem) -- with the rotation now fully closed, it
 turns out to be a genuine, small, standalone residue, not a symptom.
 
 Five variants tried against this single word, all negative:
-- Collapsing to `return func_8001E110(out, box, &mid, p2);` (dropping the
+- Collapsing to `return ClipSegmentToBox(out, box, &mid, p2);` (dropping the
   named `result` and the `if` entirely, since the semantics are
   identical: return the call's value whether zero or not) -- **worse,
   83/118 with drift**, and the differing region shown by `asm-differ`
@@ -398,7 +400,7 @@ Filing as STALL at **95/118** (up from 16/118), `INCLUDE_ASM` restored;
 
 ```c
 #if 0
-s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
+s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
     u8 r1;
     u8 r2;
     Vec3S16_d294 mid;
@@ -446,13 +448,13 @@ combined:
     }
 
     {
-        s32 result = func_8001E110(out, box, p1, &mid);
+        s32 result = ClipSegmentToBox(out, box, p1, &mid);
         if (result != 0) {
             return result;
         }
     }
     {
-        s32 result = func_8001E110(out, box, &mid, p2);
+        s32 result = ClipSegmentToBox(out, box, &mid, p2);
         if (result != 0) {
             return result;
         }
@@ -494,7 +496,7 @@ body verbatim, `funcdiff.py` confirmed 95/118 with the same 338537-byte
 drift warning the report already documents (expected, since the built
 function is 1 word longer than retail at this point). No contamination.
 
-This was `func_8001E110`'s first-ever permuter search, despite three
+This was `ClipSegmentToBox`'s first-ever permuter search, despite three
 prior rounds of hand-lever attempts (13, 19, 20).
 
 **Scaffold validation (`--debug --stack-diffs`) before trusting anything:**
@@ -508,12 +510,12 @@ before searching.
 
 **Search:** `PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 6 --stop-on-zero --best-only
-permuter-work/func_8001E110`, bounded at 900s, rc captured on the very
+permuter-work/ClipSegmentToBox`, bounded at 900s, rc captured on the very
 next command: **rc=0** (found a zero and exited on its own, not a bound
 timeout). **Zero score found at iteration 2642** (`output-0-1`).
 
 **Reducing the candidate to statements** (the permuter's own C is a
-flattened, heavily reformatted TU -- see `permuter-work/func_8001E110/
+flattened, heavily reformatted TU -- see `permuter-work/ClipSegmentToBox/
 output-0-1/source.c` for the raw form) turned up exactly two changes
 from the seed:
 

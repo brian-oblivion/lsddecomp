@@ -435,7 +435,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
     flag2 = 0;
     for (i = 0; i < count1; i++) {
         plane = func_8001F50C(self->unk20, i);
-        if (func_8001E110(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
+        if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0 || outWord >= 0x201) {
                     self->unk2C |= (1 << i);
@@ -464,7 +464,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
                 if (m == 1 || m == 2) {
                     u8 *rowM = rowBase;
                     u8 *rowMplus1 = rowBase + 0x18;
-                    if (func_8001E110(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                         if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                             if (D_8008A838 == 0 || outWord >= 0x201) {
                                 self->unk2C |= bitJ;
@@ -490,7 +490,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
  * derivation) and the register mapping exactly right, leaving one
  * standalone residue: an extra `move v1,v0` before the SECOND recursive
  * call's result test, where retail tests $v0 directly. Closed by a
- * first-ever permuter search (`docs/match-reports/func_8001E110.md`,
+ * first-ever permuter search (`docs/match-reports/ClipSegmentToBox.md`,
  * "Round 41"): the tautological trailing `if (mid.y) return 0; else
  * return 0;` below is not meaningful control flow -- both arms return 0,
  * exactly like the plain `return 0;` it replaces -- but it changes
@@ -499,7 +499,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
  * matching retail exactly. Kept because it is what's needed for
  * byte-exactness, not because it means anything; see the report for the
  * hand-lever history this replaced. */
-s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
+s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
     u8 r1;
     u8 r2;
     Vec3S16_d294 mid;
@@ -547,13 +547,13 @@ combined:
     }
 
     {
-        s32 result = func_8001E110(out, box, p1, &mid);
+        s32 result = ClipSegmentToBox(out, box, p1, &mid);
         if (result != 0) {
             return result;
         }
     }
     {
-        s32 result = func_8001E110(out, box, &mid, p2);
+        s32 result = ClipSegmentToBox(out, box, &mid, p2);
         if (result != 0) {
             return result;
         }

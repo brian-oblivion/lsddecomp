@@ -803,11 +803,11 @@ void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, V
  * computation does (bit-for-bit identical comparison chain against the
  * same 6 field offsets) -- MEASURED, not guessed; this is the shared
  * primitive both functions build on. Returns the accumulated flags in
- * `$v0` unmasked (the mask is the CALLER's job, per func_8001E110's own
+ * `$v0` unmasked (the mask is the CALLER's job, per ClipSegmentToBox's own
  * repeated `andi ...,0xFF` every time it re-reads a stored result). */
 extern s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point);
 
-s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
+s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
 s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
 
 /* ratan2 (Psy-Q library, not game code; symbol address per

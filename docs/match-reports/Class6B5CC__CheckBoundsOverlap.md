@@ -589,7 +589,7 @@ rather than defer again.
 prediction before any search budget was spent:** base score 7871 --
 **136 stack-difference points, 123 register-difference points, 7
 reorderings, 23 insertions, 44 deletions.** This is not a clean
-register-identity residue (contrast `func_8001E110`'s validated scaffold
+register-identity residue (contrast `ClipSegmentToBox`'s validated scaffold
 the same round: 0 insertions, 0 deletions, a pure 1-instruction
 symptom) -- 23 insertions and 44 deletions describe a genuinely different
 program shape across a large fraction of the function, matching round
@@ -670,7 +670,7 @@ the committed state (`git diff --stat` empty) after the check.
 **A `--debug --stack-diffs` scaffold's insertion/deletion count is a
 reliable PRE-SEARCH predictor of whether a bounded permuter run will be
 productive, and this round is a second, independent data point for it
-(after `func_8001E110`, same round, same unit).** `func_8001E110`'s
+(after `ClipSegmentToBox`, same round, same unit).** `ClipSegmentToBox`'s
 scaffold showed 0/0 insertions/deletions (a pure register/stack
 residue) and its search found a zero in 2642 iterations. This
 function's scaffold showed 23/44 (a genuinely different program shape

@@ -12,7 +12,7 @@ resolved below.
 Signature `s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
-`func_8001F50C` planes, gated by `func_8001E110`/`func_8001F8B8`, setting
+`func_8001F50C` planes, gated by `ClipSegmentToBox`/`func_8001F8B8`, setting
 bits in `self->unk2C`) both fully derived and high-confidence. Part 3 (a
 second, `list`-driven double loop) was flagged NOT fully decoded: "the
 precise relationship between the middle `k` loop ... and the inner fixed-4
@@ -24,7 +24,7 @@ Re-read `asm/nonmatchings/code_d294_b/func_8001DDF4.s` lines 197-268
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
-  box-test body (the `func_8001E110`/`func_8001F8B8` pair) only executes
+  box-test body (the `ClipSegmentToBox`/`func_8001F8B8` pair) only executes
   when `(u32)(m - 1) < 2`, i.e. **`m == 1` or `m == 2`** -- confirmed at
   `sltiu $v0, $v0, 2` / `beqz $v0, .L8001E094` (vram 0x8001E00C-0x8001E010).
   `m == 0` and `m == 3` fall straight through to the loop-continue check with
@@ -185,7 +185,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
     flag2 = 0;
     for (i = 0; i < count1; i++) {
         plane = func_8001F50C(self->unk20, i);
-        if (func_8001E110(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
+        if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0 || outWord >= 0x201) {
                     self->unk2C |= (1 << i);
@@ -214,7 +214,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
                 if (m == 1 || m == 2) {
                     u8 *rowM = rowBase;
                     u8 *rowMplus1 = rowBase + 0x18;
-                    if (func_8001E110(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                         if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                             if (D_8008A838 == 0 || outWord >= 0x201) {
                                 self->unk2C |= bitJ;
