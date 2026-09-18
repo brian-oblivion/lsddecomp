@@ -312,7 +312,7 @@ extern void func_80017CFC(void *arg);
  * unknown -- named for the field it lives behind, per this unit's own
  * convention (see Class6B5CCSub14, also field-named).
  *
- * Round 13 (func_8001D950): self->unkC is also walked as an intrusive
+ * Round 13 (Class6B5CC__ComposeAndApplyRotation): self->unkC is also walked as an intrusive
  * singly-linked list -- MEASURED, `lw $s0, 0xC($s0)` repeated with a
  * `bnez` back-edge -- so this class has its own self-referential `next` at
  * +0xC, and its vtable has a slot at +0x84 with the same `(self, void
@@ -325,7 +325,7 @@ struct UnkOwnerMethods_d294 {
     u8 pad0[0x010];
     void (*slot10)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x010, "attach" */
     void (*slot14)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x014, "detach" */
-    /* +0x084, func_8001D950's own call target on each list node (round 13).
+    /* +0x084, Class6B5CC__ComposeAndApplyRotation's own call target on each list node (round 13).
      * `out` is a 0x20-byte buffer (MATRIX-shaped -- MulMatrix2, this
      * call site's own consumer, loads it into GTE control regs 0-4 via
      * `ctc2`, PsyQ, not decompiled). */
@@ -335,7 +335,7 @@ struct UnkOwnerMethods_d294 {
 struct UnkOwner_d294 {
     UnkOwnerMethods_d294 *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
-    UnkOwner_d294 *next;            /* +0x00C, round 13 (func_8001D950) -- MEASURED, see above */
+    UnkOwner_d294 *next;            /* +0x00C, round 13 (Class6B5CC__ComposeAndApplyRotation) -- MEASURED, see above */
     u8 pad10[0x014 - 0x010];
     /* RETYPED round 19 (echo, func_8001E7BC): from a plain `s32` to
      * `Class6B5CCSub14 *` -- func_8001E7BC dereferences it
@@ -462,7 +462,7 @@ struct Class6B5CCMethods {
      * bytes, not the 0xC that would fit just the leading vector its own
      * caller reads back. Only those leading 0xC bytes are read back, by
      * Class6B5CC__RotateLocalVector's `ApplyMatrixToLVArray` call a few lines later; the rest is
-     * opaque callback output that call site never touches. func_8001D950
+     * opaque callback output that call site never touches. Class6B5CC__ComposeAndApplyRotation
      * (code_d294_b) calls the same slot on `self` itself, and
      * UnkOwnerMethods_d294's own +0x084 has the same number and shape --
      * likely a shared ancestor method. */
@@ -489,11 +489,11 @@ struct Class6B5CCMethods {
      * is this slot's occupant per `tools/classtable.py D_8006B5CC`. */
     void (*slotA0)(Class6B5CCObj *self);
     /* +0x0A4, round 13 (func_8001D714's own call site): this slot's
-     * occupant is func_8001D950 itself (`tools/classtable.py D_8006B5CC`),
+     * occupant is Class6B5CC__ComposeAndApplyRotation itself (`tools/classtable.py D_8006B5CC`),
      * already matched this round -- dispatched indirectly (through the
      * vtable, not a direct `jal`) since the slot is polymorphic even
      * though this class's own table happens to point at it. Signature
-     * matches func_8001D950's own exactly. */
+     * matches Class6B5CC__ComposeAndApplyRotation's own exactly. */
     void (*slotA4)(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
     /* +0x0A8, occupant func_8001DA28 (still queued this round). Return
      * value IS tested by this call site (truthy -> continue, falsy ->
@@ -772,7 +772,7 @@ extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
  * code): loads its
  * own arg0 into GTE control regs 0-4 via `ctc2` (5 words, the packed
  * MATRIX rotation part) then combines it with arg1 -- a matrix-compose
- * primitive (PsyQ's `CompMatrix` family). func_8001D950 (round 13, this
+ * primitive (PsyQ's `CompMatrix` family). Class6B5CC__ComposeAndApplyRotation (round 13, this
  * unit) calls it as `MulMatrix2(buf2, buf1)`, both 0x20-byte opaque
  * local buffers; declared only with that shape. */
 extern void MulMatrix2(void *arg0, void *arg1);
@@ -794,7 +794,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);
 void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest);
 void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
 void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2);
-void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
+void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
 void func_8001E4A4(Class6B5CCObj *self, void *node);
 void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 

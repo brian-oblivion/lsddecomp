@@ -251,7 +251,7 @@ swap between a function's own parameters.
 - **Parameters corrected to `(dst, src, count, m)`.** The previous names had
   destination and source the wrong way round: the loop copies an element out
   of the 2nd argument and calls `ApplyMatrixSV(m, &buf, dst)`, so the 1st
-  argument is written. Both call sites (`Class6B5CC__TransformAndNotifyParents`, `func_8001D950`,
+  argument is written. Both call sites (`Class6B5CC__TransformAndNotifyParents`, `Class6B5CC__ComposeAndApplyRotation`,
   code_d294_b) pass the same address for both, which is why it was
   invisible. Names only -- no type, arity or order change; byte-identical.
 - **The local `Rec6_d294` typedef is gone**, replaced by the existing

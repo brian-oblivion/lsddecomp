@@ -87,5 +87,5 @@ one use, can still get promoted into an extra callee-saved register if the
 compiler can't prove no intervening call needs it preserved — spelling the
 default as a ternary passed directly into the call, without reassigning
 the parameter, avoids the promotion.** Same family as this round's
-`func_8001D950` (declaration-order-driven register hoisting) but a
+`Class6B5CC__ComposeAndApplyRotation` (declaration-order-driven register hoisting) but a
 different lever (expression form, not declaration order).

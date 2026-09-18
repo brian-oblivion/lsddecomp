@@ -1,11 +1,13 @@
-# func_8001D950 — MATCHED
+> Renamed from `func_8001D950` on 2026-09-18 (tools/rename.py). Address 0x8001d950.
+
+# Class6B5CC__ComposeAndApplyRotation — MATCHED
 
 Unit: `code_d294_b`. Round 13, runner delta. 54/54 words, full match.
 
 ## Signature
 
 ```c
-void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
+void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
 ```
 
 `count` is the 5th argument, passed on the incoming stack (`lw $a2, 0x78($sp)`
@@ -15,7 +17,7 @@ inside the function — the caller's stack-arg slot, at `newsp + 0x68(own frame)
 ## What it does
 
 ```c
-void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
+void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
     u8 buf2[0x20];
     u8 buf1[0x20];
     UnkOwner_d294 *node;
