@@ -12,31 +12,31 @@ the VAB header/body streaming state machine.
 ## Derivation
 
 ```c
-void VabStreamObj__Update(ObjDA34 *self) {
+void VabStreamObj__Update(VabStreamObj *self) {
     char path[0x20];
 
-    switch (self->unk2A) {
+    switch (self->loadState) {
     case 0:
         break;
     case 1:
-        if (self->unk24 & 0x200) {
-            self->unk54 = SsVabOpenHead(self->unk10, -1);
-            func_800270C4(path, self->unk5C, NULL, gVabBodySuffix);
-            gPendingVabBuffer = self->unk10;
-            self->unk2A = 6;
-            self->unk10 = NULL;
+        if (self->flags & 0x200) {
+            self->vabId = SsVabOpenHead(self->streamBuffer, -1);
+            func_800270C4(path, self->baseFilename, NULL, gVabBodySuffix);
+            gPendingVabBuffer = self->streamBuffer;
+            self->loadState = 6;
+            self->streamBuffer = NULL;
             self->methods->slot58(self, path);
-            if (self->unk5C != NULL) {
-                func_80017CFC(self->unk5C);
-                self->unk5C = NULL;
+            if (self->baseFilename != NULL) {
+                func_80017CFC(self->baseFilename);
+                self->baseFilename = NULL;
             }
         }
         break;
     case 6:
-        if (self->unk24 & 0x200) {
-            self->unk54 = SsVabTransBody(self->unk10, self->unk54);
-            if (self->unk54 != -1) {
-                self->unk5A = 1;
+        if (self->flags & 0x200) {
+            self->vabId = SsVabTransBody(self->streamBuffer, self->vabId);
+            if (self->vabId != -1) {
+                self->bodyTransferPending = 1;
                 self->methods->slot78(self, 1);
             }
         }
@@ -47,6 +47,10 @@ void VabStreamObj__Update(ObjDA34 *self) {
 }
 ```
 
+(Field names updated to round 52's renames -- `ObjDA34::unk2A/unk24/unk54/
+unk10/unk5C/unk5A` are now `loadState`/`flags`/`vabId`/`streamBuffer`/
+`baseFilename`/`bodyTransferPending`; bytes unchanged.)
+
 State 1 ("header pending", set by `VabStreamObj__VabStreamObj`): if the object's flag
 word has bit 0x200 set, open the VAB header (`SsVabOpenHead`), build a
 ".VB" path from the same base filename, hand the old streaming buffer
@@ -55,7 +59,8 @@ dispatch the body transfer through `methods->slot58` (null in retail's own
 `gVabStreamObjMethods` -- see `VabStreamObj__VabStreamObj.md`); then free the filename copy if one
 was allocated. State 6 ("body pending"): if the same flag is set, continue
 the body transfer (`SsVabTransBody`), and on success mark the object ready
-(`unk5A = 1`) and notify via `methods->slot78` (== `VabStreamObj__OnBodyReady`).
+(`bodyTransferPending = 1`) and notify via `methods->slot78` (==
+`VabStreamObj__OnBodyReady`).
 
 `gVabBodySuffix` is retail's own `.sdata` string `".VB"`, referenced not
 retyped, same as `gVabHeaderSuffix` in the sibling function.
@@ -85,3 +90,14 @@ since they all touch the same struct.
 GCC drops the `slti`-based range guard retail has and the switch compiles
 one word short. See `VabStreamObj__VabStreamObj.md`'s proposed learning for the full
 mechanism.
+
+## Naming
+
+Renamed `func_8002C6FC` -> `VabStreamObj__Update`, tier B. Confirmed as
+`gVabStreamObjMethods`'s own +0x64 slot. Mechanics are concrete (a
+state-machine switch driving the header-load then body-load steps of VAB
+streaming), matching this unit's header-comment description of it as the
+class's "per-frame poll" -- that specific cadence claim (once per frame,
+rather than on some other trigger) isn't independently re-derived here
+(this unit has no visibility into slot +0x64's own caller), so kept as
+tier B rather than A.

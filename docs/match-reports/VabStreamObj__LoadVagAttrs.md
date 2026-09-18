@@ -14,45 +14,45 @@ sound driver and caches them on the object.
 ## Derivation
 
 ```c
-typedef struct ProgAtr179D8E {
+typedef struct ProgAtrView {
     u8 tones; /* +0x00, program's tone count, written by SsUtGetProgAtr */
     u8 pad1[0x10 - 0x1];
-} ProgAtr179D8E;
+} ProgAtrView;
 
-void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
+void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
 {
-    ProgAtr179D8E prog;
-    Chunk179D8E *pool;
+    ProgAtrView prog;
+    VagAtrView *pool;
     s32 i;
     s32 j;
     s16 result;
 
-    if (self->unk58 == 0) {
+    if (self->attrsReady == 0) {
         return;
     }
     self->methods->slot5C(self);
-    self->unk10 = gPendingVabBuffer;
-    result = SsUtGetVabHdr(self->unk54, &self->unk2C);
+    self->streamBuffer = gPendingVabBuffer;
+    result = SsUtGetVabHdr(self->vabId, &self->vabHdr);
     if (result == -1) {
         return;
     }
-    self->unk4C = func_80017B34(self->unk2C.vs << 5);
-    if (self->unk4C == NULL) {
+    self->vagAttrPool = func_80017B34(self->vabHdr.vs << 5);
+    if (self->vagAttrPool == NULL) {
         return;
     }
-    self->unk50 = func_80017B34(self->unk2C.ts << 2);
-    if (self->unk50 == NULL) {
+    self->progVagTable = func_80017B34(self->vabHdr.ts << 2);
+    if (self->progVagTable == NULL) {
         return;
     }
-    pool = self->unk4C;
-    for (i = 0; i < self->unk2C.ts; i++) {
-        self->unk50[i] = pool;
-        result = SsUtGetProgAtr(self->unk54, i, &prog);
+    pool = self->vagAttrPool;
+    for (i = 0; i < self->vabHdr.ts; i++) {
+        self->progVagTable[i] = pool;
+        result = SsUtGetProgAtr(self->vabId, i, &prog);
         if (result == -1) {
             return;
         }
         for (j = 0; j < prog.tones; j++) {
-            result = SsUtGetVagAtr(self->unk54, i, j, pool);
+            result = SsUtGetVagAtr(self->vabId, i, j, pool);
             if (result == -1) {
                 return;
             }
@@ -67,11 +67,16 @@ void VabStreamObj__LoadVagAttrs(ObjDA34 *self)
 }
 ```
 
-Allocates `self->unk4C` as a flat `VagAtr` pool sized `vs` entries (one per
-vag in the bank) and `self->unk50` as a `ts`-entry pointer array (one per
-program); `self->unk2C.vs`/`self->unk2C.ts` are `VabHdr`'s own program/vag
-counts, filled by `SsUtGetVabHdr` two lines earlier -- see `VabHdr179D8E`,
-added to this unit alongside this function. For each program, records where
+(Types/fields updated to round 52's renames -- `ProgAtr179D8E`/
+`Chunk179D8E` are now `ProgAtrView`/`VagAtrView`; `ObjDA34::unk58/unk10/
+unk54/unk2C/unk4C/unk50` are now `attrsReady`/`streamBuffer`/`vabId`/
+`vabHdr`/`vagAttrPool`/`progVagTable`. Bytes unchanged.)
+
+Allocates `self->vagAttrPool` as a flat `VagAtr` pool sized `vs` entries
+(one per vag in the bank) and `self->progVagTable` as a `ts`-entry pointer
+array (one per program); `self->vabHdr.vs`/`self->vabHdr.ts` are `VabHdr`'s
+own program/vag counts, filled by `SsUtGetVabHdr` two lines earlier -- see
+`VabHdrView`, added to this unit alongside this function. For each program, records where
 its tones start in the pool, fetches its `ProgAtr` (only the `tones` count
 byte matters here), then walks that many `VagAtr` entries out of the pool via
 `SsUtGetVagAtr`, advancing the shared pool pointer once per tone (not once
@@ -95,13 +100,14 @@ matched.
 ### Proposed learning
 
 **Same signedness lesson as `VabStreamObj__VabStreamObj`/`VabStreamObj__Update`, a THIRD field
-on the same struct: `ObjDA34::unk58` is `u16`, not `s16`.** The tell was
-identical -- retail's `lhu v0,0x58(s1)` where a signed field compiles to
-`lh`. Three of this struct's four half-word fields discovered this round
-(`unk2A`, `unk58`, and `unk5A` which was already `u16` from before this
-round) are all unsigned; only `unk54`/`unk56` are signed. Worth checking
-EVERY `s16` guess against the actual load instruction rather than assuming
-a "state/flag" field defaults to signed.
+on the same struct: `attrsReady` (`ObjDA34::unk58` before round 52) is
+`u16`, not `s16`.** The tell was identical -- retail's `lhu v0,0x58(s1)`
+where a signed field compiles to `lh`. Three of this struct's four
+half-word fields discovered this round (`loadState`, `attrsReady`, and
+`bodyTransferPending` which was already `u16` from before this round) are
+all unsigned; only `vabId`/`muted` are signed. Worth checking EVERY `s16`
+guess against the actual load instruction rather than assuming a
+"state/flag" field defaults to signed.
 
 **A guard condition that duplicates the following loop's own entry check
 costs a real word, and the mechanism generalizes beyond this function.**
@@ -119,3 +125,12 @@ instruction count agrees before assuming the guard is free.
 see `VabStreamObj__VabStreamObj.md`'s table for the slots this round pinned down. Two
 (`+0x58`, `+0x6C`) are null in retail and never actually exercised at
 runtime for an object of this exact base class.
+
+## Naming
+
+Renamed `func_8002C890` -> `VabStreamObj__LoadVagAttrs`, tier A. Confirmed
+`gVabStreamObjMethods`'s own +0x7C slot; the whole body is a concrete,
+unambiguous sequence of Sony VAB attribute-table fetches
+(`SsUtGetVabHdr`/`SsUtGetProgAtr`/`SsUtGetVagAtr`) building exactly the two
+per-object tables (`vagAttrPool`, `progVagTable`) those calls fill --
+mechanics ARE the purpose here.

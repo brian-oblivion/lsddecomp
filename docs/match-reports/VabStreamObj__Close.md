@@ -11,8 +11,8 @@ the class's "close" method.
 ## Derivation
 
 ```c
-s32 VabStreamObj__Close(ObjDA34 *self) {
-    SsVabClose(self->unk54);
+s32 VabStreamObj__Close(VabStreamObj *self) {
+    SsVabClose(self->vabId);
     if (--gOpenVabCount < 0) {
         gOpenVabCount = 0;
     }
@@ -23,18 +23,23 @@ s32 VabStreamObj__Close(ObjDA34 *self) {
         func_800329D8();
         func_80032A7C();
     }
-    func_80017CFC(self->unk4C);
-    func_80017CFC(self->unk50);
-    func_80017CFC(self->unk5C);
+    func_80017CFC(self->vagAttrPool);
+    func_80017CFC(self->progVagTable);
+    func_80017CFC(self->baseFilename);
     return func_80026CAC()->slot0C(self);
 }
 ```
 
+(Field names updated to round 52's renames -- `ObjDA34::unk54/unk4C/unk50/
+unk5C` are now `vabId`/`vagAttrPool`/`progVagTable`/`baseFilename`; bytes
+unchanged.)
+
 Closes the VAB handle, decrements the module-wide open-VAB refcount
 (clamped at zero), and if that count hit zero and the streaming-idle check
 (`func_8003A05C`) also says idle, tears down the shared VAB table state. Then
-frees the three per-object allocations (`unk4C`'s VagAtr pool, `unk50`'s
-pointer array, `unk5C`'s filename copy) and chains to the base class's own
+frees the three per-object allocations (`vagAttrPool`'s VagAtr pool,
+`progVagTable`'s pointer array, `baseFilename`'s filename copy) and chains
+to the base class's own
 `+0x0C` slot (`func_80026CAC()->slot0C`), the same base-chain pattern
 `code_179d8_d.c` already established for a sibling table. The final call's
 return type is a bare tail call with nothing after it -- genuinely
@@ -54,8 +59,19 @@ VabStreamObj__Close: 49/49 words match (file 0x1CE38-0x1CEFC)
 
 ### Proposed learning
 
-See `VabStreamObj__VabStreamObj.md` for the `unk2A` signedness lesson (`u16`, confirmed by
-`lh` vs `lhu` on the switch-controlling load) -- it was discovered while
-matching this function's neighbour but affects the whole `ObjDA34` struct,
-so it applied here too once all three of this cluster's functions were
-built together.
+See `VabStreamObj__VabStreamObj.md` for the `loadState` signedness lesson
+(`u16`, confirmed by `lh` vs `lhu` on the switch-controlling load) -- it was
+discovered while matching this function's neighbour but affects the whole
+`VabStreamObj` struct, so it applied here too once all three of this
+cluster's functions were built together.
+
+## Naming
+
+Renamed `func_8002C638` -> `VabStreamObj__Close`, tier A. Confirmed as
+`gVabStreamObjMethods`'s own +0x0C slot (the ctor's `+0x08` sibling) and its
+body is unambiguously a teardown: closes the VAB handle, decrements/clamps
+the shared refcount, frees the object's three allocations, chains to the
+base class's own `+0x0C` slot. "Close" (not "Delete"/"Destroy") because it
+does not free `self` itself -- that's left to the caller, matching the
+project's own use of "Close" elsewhere for a VAB/CD handle teardown that
+doesn't own the container.

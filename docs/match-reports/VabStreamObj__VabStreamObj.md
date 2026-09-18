@@ -38,20 +38,20 @@ dispatch, not explain why retail left the target empty.
 The body, once the field layout was pinned (see "Proposed learning" below):
 
 ```c
-void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
+void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     void *buf;
     char path[0x20];
 
     func_80026CAC()->slot08(self);
     self->methods = GetVabStreamObjMethods();
-    self->unk4C = NULL;
-    self->unk50 = NULL;
-    self->unk54 = 0;
-    self->unk56 = 0;
+    self->vagAttrPool = NULL;
+    self->progVagTable = NULL;
+    self->vabId = 0;
+    self->muted = 0;
     self->methods->slot9C(self, 0);
-    self->unk58 = 0;
-    self->unk5A = 0;
-    self->unk5C = NULL;
+    self->attrsReady = 0;
+    self->bodyTransferPending = 0;
+    self->baseFilename = NULL;
     if (gVabSizeTableInited == 0) {
         func_80032368();
         gVabSizeTableInited = 1;
@@ -66,15 +66,20 @@ void VabStreamObj__VabStreamObj(ObjDA34 *self, char *arg1) {
     if (arg1 != NULL) {
         buf = func_80017B34(strlen(arg1) + 1);
         if (buf != NULL) {
-            self->unk5C = buf;
+            self->baseFilename = buf;
             strcpy(buf, arg1);
             func_800270C4(path, buf, NULL, gVabHeaderSuffix);
-            self->unk2A = 1;
+            self->loadState = 1;
             self->methods->slot6C(self, path);
         }
     }
 }
 ```
+
+(Field names updated to round 52's `VabStreamObj`/field renames --
+`ObjDA34::unk4C/unk50/unk54/unk56/unk58/unk5A/unk5C/unk2A` are now
+`vagAttrPool`/`progVagTable`/`vabId`/`muted`/`attrsReady`/
+`bodyTransferPending`/`baseFilename`/`loadState`; the bytes are unchanged.)
 
 `gVabHeaderSuffix` is retail's own `.sdata` string `".VH"` -- referenced, not
 retyped, per the duplicated-string-shift lesson in CLAUDE.md.
@@ -92,7 +97,8 @@ VabStreamObj__VabStreamObj: 86/86 words match (file 0x1CCE0-0x1CE38)
 
 ### Proposed learning
 
-**`ObjDA34::unk2A`'s real type is `u16`, not `s16`, and the tell is which
+**`VabStreamObj::loadState` (`ObjDA34::unk2A` before round 52)'s real type
+is `u16`, not `s16`, and the tell is which
 half-word load instruction the switch statement compiles to, not the field's
 "looks signed" small-state-machine usage.** A minimal reproducer of the
 switch shape (case 0/1/6, `slti` boundary check) compiles a `s16` field to
@@ -122,3 +128,16 @@ be in this unit. Two of the slots this unit's own functions dispatch through
 (+0x58, +0x6C) are null in the shipped table -- worth knowing before
 spending an attempt trying to explain a "why does this crash" question that
 the C doesn't need to answer.
+
+## Naming
+
+Renamed `func_8002C4E0` -> `VabStreamObj__VabStreamObj`, tier A. This is
+the class's real per-object constructor (dispatched through
+`gVabStreamObjMethods`'s own slot +0x08 by `New_VabStreamObj`'s
+`slot08(self, arg0)` call) -- FINISHING-PLAN track 3's `Class__Class` form
+for a constructor whose allocating entry point already has its own
+`New_Class` name. Mechanics are concrete and well evidenced (assigns
+`self->methods`, resets every field, dispatches the base-class chain and,
+optionally, the VAB header-load chain) -- the class itself
+(`VabStreamObj`, an SPU/VAB sound-streaming object) is established at the
+unit level, not guessed here.

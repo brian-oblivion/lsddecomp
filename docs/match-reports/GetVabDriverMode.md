@@ -60,3 +60,14 @@ Another confirmation that the round-17 `gp_rel` cluster in this unit needed
 no special C idiom at all post round-42 -- ordinary pointer-store-then-return
 C reproduces the `%gp_rel` load/store pair once the toolchain flags are in
 place.
+
+## Naming
+
+Renamed `func_8002C448` -> `GetVabDriverMode`, tier B. Evidence:
+`code_171e0.c`'s own `func_80026FAC` calls `GetCdDriverMode()` when
+`gActiveDataSource == 0x13`, else calls this function -- a direct,
+call-site-level substitution for a named Sony "get driver mode" accessor,
+confirming this backend's own `gVabDriverMode`/`gVabDriverModeArg` pair
+serves the same role for the SPU/VAB data source. Not tier A: the exact
+in-game reason `gVabDriverModeArg` exists (a second word alongside the mode
+itself) is not established, only that it's read/written alongside the mode.

@@ -14,15 +14,15 @@ confirmed with a from-scratch minimal reproducer through the pinned pipeline
 ## What the function does (high confidence, established via m2c + manual read)
 
 `gVabStreamObjMethods`'s vtable slot +0x080. Signature:
-`s32 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)`.
+`s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3)`.
 
 ```c
 if (index >= 0) {
     hi = index >> 4;                      /* array-of-pointers index */
     lo = index - hi * 16;                 /* sub-index within that chunk */
-    entry = &self->unk50[hi][lo];         /* Chunk179D8E *, 0x20-byte stride */
-    result = func_80030E90(self->unk54, (s16)hi, (s16)lo,
-                            (s16)(entry->unk4 + self->unk60), entry->unk5,
+    entry = &self->progVagTable[hi][lo];  /* VagAtrView *, 0x20-byte stride */
+    result = func_80030E90(self->vabId, (s16)hi, (s16)lo,
+                            (s16)(entry->center + self->pitchOffset), entry->shift,
                             (s16)arg2, (s16)arg2);   /* NOTE: arg2 passed TWICE */
     if (result >= 0) {
         func_80031E94(result, (s16)arg2, (s16)arg3, 2);
@@ -31,6 +31,10 @@ if (index >= 0) {
 }
 return -1;
 ```
+
+(field/type names in this preview updated to round 52's renames, same as
+the preserved body below -- `unk50/unk54/unk60/unk4/unk5` were the field
+names m2c/the original derivation actually saw.)
 
 This structure (control flow, argument counts -- including the double-`arg2`
 7th argument to `func_80030E90`, which m2c independently confirmed -- field
@@ -155,18 +159,18 @@ the one axis all 7 attempts share.**
 
 ```c
 #if 0
-s32 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3) {
+s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
     s32 hi;
     s32 lo;
-    Chunk179D8E *entry;
+    VagAtrView *entry;
     s16 result;
 
     if (index >= 0) {
         hi = index / 16;
         lo = index - hi * 16;
-        entry = &self->unk50[hi][lo];
-        result = func_80030E90(self->unk54, (s16)hi, (s16)lo, (s16)(entry->unk4 + self->unk60),
-                                entry->unk5, (s16)arg2, (s16)arg2);
+        entry = &self->progVagTable[hi][lo];
+        result = func_80030E90(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
+                                entry->shift, (s16)arg2, (s16)arg2);
         if (result >= 0) {
             func_80031E94(result, (s16)arg2, (s16)arg3, 2);
             return result;
@@ -177,10 +181,17 @@ s32 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3) {
 #endif
 ```
 
-Needs, from this unit's top-of-file scaffolding: `ObjDA34`, `Chunk179D8E`,
-`extern s16 func_80030E90(s16, s16, s16, s16, s32, s32, s32);`,
-`extern void func_80031E94(s16, s16, s16, s32);` -- all already present in
-`src/code_179d8_e.c`.
+(Updated to round 52's names: `ObjDA34`/`Chunk179D8E` are now
+`VabStreamObj`/`VagAtrView`; `self->unk50/unk54/unk60` are now
+`progVagTable`/`vabId`/`pitchOffset`; `entry->unk4/unk5` are now
+`entry->center/shift` -- confirmed round 52 against Sony's real `VagAtr`
+in `include/psyq/LIBSND.H`, where they land on the struct's own
+same-named bytes. Bytes/derivation unchanged.)
+
+Needs, from this unit's top-of-file scaffolding: `VabStreamObj`,
+`VagAtrView`, `extern s16 func_80030E90(s16, s16, s16, s16, s32, s32,
+s32);`, `extern void func_80031E94(s16, s16, s16, s32);` -- all already
+present in `src/code_179d8_e.c`.
 
 ### Proposed learning
 
@@ -295,8 +306,27 @@ which is precisely the search the seven hand-probes were doing one at a
 time. Re-staff it with the probe above as the starting body.
 
 Everything echo established about the FUNCTION stands unchanged and was not
-re-derived here: the signature, the `self->unk50[hi][lo]` addressing with
-0x20-byte stride, the `s16 self->unk54` / `u16 self->unk60` field widths,
-and the double-`arg2` seventh argument to `func_80030E90` (visible in
-retail as `sw $s1, 0x14($sp)` and `sw $s1, 0x18($sp)` from one
-sign-extension).
+re-derived here: the signature, the `self->progVagTable[hi][lo]` addressing
+(named `unk50` at the time) with 0x20-byte stride, the `s16 vabId` /
+`s32 pitchOffset` field widths (named `unk54`/`unk60` at the time), and the
+double-`arg2` seventh argument to `func_80030E90` (visible in retail as
+`sw $s1, 0x14($sp)` and `sw $s1, 0x18($sp)` from one sign-extension).
+
+## Naming
+
+Renamed `func_8002CA3C` -> `VabStreamObj__PlayTone`, tier B. Confirmed
+`gVabStreamObjMethods`'s own +0x080 slot. Named from the mechanics already
+fully derived above, not attempted this round (still `INCLUDE_ASM`, as
+instructed): the function resolves a packed `index` into a program/tone
+pair (`hi`/`lo`, exactly the `(vabId, prog, tone)` triple `SsUtGetVagAtr`
+uses elsewhere in this unit), looks up the matching `VagAtrView` entry,
+adds `self->pitchOffset` to its `center` note, and dispatches
+`func_80030E90(vabId, hi, lo, pitch, shift, arg2, arg2)` -- a "start
+playing this program/tone" call whose result (a voice/handle number) is
+then registered via `func_80031E94`. `VabStreamObj__StopVoice`'s own
+"index < 0x18" guard (0x18 == 24, the PS1 SPU's own voice count) is the
+other half of this same "select a tone/voice" vocabulary, which is why
+"PlayTone" rather than a more generic "Dispatch" or "Trigger" name --
+mechanics are concrete enough to earn tier B, but the exact GAME-level
+event that calls this (a footstep, an ambient loop, dialogue) is not
+established from this unit alone, so not tier A.

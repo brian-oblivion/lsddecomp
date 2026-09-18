@@ -38,7 +38,17 @@ Same idiom as `new_class_6d940` in the sibling `code_179d8_d.c`.
 unconditionally right after the `jalr`, regardless of what the constructor
 returned -- so it's typed `void`.
 
-Return type is `void *` rather than `ObjDA34 *`: nothing in this function
-itself dereferences the allocated object (the field-0/methods assignment
-happens inside the blocked constructor), so there's no positive evidence for
-the more specific type here.
+Return type is `void *` rather than `VabStreamObj *` (`ObjDA34` before
+round 52's local-type rename): nothing in this function itself dereferences
+the allocated object (the field-0/methods assignment happens inside the
+constructor), so there's no positive evidence for the more specific type
+here.
+
+## Naming
+
+Renamed `func_8002C480` -> `New_VabStreamObj`, tier A. Matches
+FINISHING-PLAN track 3's own constructor convention (`New_Class` for the
+allocate-and-dispatch entry point, `Class__Class` for the real per-object
+init) -- this function's whole body IS "malloc the object, dispatch to the
+real constructor," the same idiom already named `new_class_6d940` in the
+sibling `code_179d8_d.c`.

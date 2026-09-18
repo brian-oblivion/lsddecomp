@@ -7,15 +7,15 @@ Unit: `code_179d8_e`. Runner: echo, round 17.
 ## Result
 
 ```c
-s32 VabStreamObj__OnBodyReady(ObjDA34 *self, s32 arg1) {
+s32 VabStreamObj__OnBodyReady(VabStreamObj *self, s32 arg1) {
     s32 result;
 
     result = 0;
-    if (self->unk5A != 0) {
+    if (self->bodyTransferPending != 0) {
         if (arg1 != 0) {
-            func_8003370C(1);
-            self->unk5A = 0;
-            self->unk58 = 1;
+            SsVabTransCompleted(1);
+            self->bodyTransferPending = 0;
+            self->attrsReady = 1;
             self->methods->slot7C(self);
             result = 1;
         }
@@ -24,7 +24,15 @@ s32 VabStreamObj__OnBodyReady(ObjDA34 *self, s32 arg1) {
 }
 ```
 
-`ObjDA34::unk5A` typed `u16` (see below). `gVabStreamObjMethods`'s vtable slot +0x078.
+(Updated to current names: `func_8003370C` was this call's placeholder
+name before the SDK-linking track identified it as Sony's
+`SsVabTransCompleted` -- that rename predates this report's own update and
+was never back-filled here until round 52; `ObjDA34::unk5A/unk58` are now
+`VabStreamObj::bodyTransferPending/attrsReady`. Bytes unchanged either
+way.)
+
+`VabStreamObj::bodyTransferPending` typed `u16` (see below).
+`gVabStreamObjMethods`'s vtable slot +0x078.
 
 Byte-exact, 27/27 words.
 
@@ -32,12 +40,12 @@ Byte-exact, 27/27 words.
 
 `self->methods->slot7C(self)`'s return value is discarded -- retail
 unconditionally overwrites `$v1` (the `result` accumulator) with `1` right
-after the `jalr`, regardless of what `slot7C` (`VabStreamObj__LoadVagAttrs`, this unit,
-BLOCKED gp_rel) returned.
+after the `jalr`, regardless of what `slot7C` (`VabStreamObj__LoadVagAttrs`)
+returned.
 
 Two wrong turns before the match, both worth recording:
 
-1. **First attempt mis-typed `ObjDA34::unk5A` as `s16`.** Retail loads it
+1. **First attempt mis-typed `bodyTransferPending` as `s16`.** Retail loads it
    with `lhu` (unsigned); an `s16` field compiles to `lh` (signed). Field
    changed to `u16`.
 2. **Second attempt collapsed the two nested conditions into
@@ -60,3 +68,15 @@ return result;`) before assuming a deeper structural mismatch -- GCC 2.6.3
 at `-O2` does not always fold a logical-AND-guarded early return into the
 same code as the accumulator form, even though they're semantically
 identical.
+
+## Naming
+
+Renamed `func_8002C824` -> `VabStreamObj__OnBodyReady`, tier B. Confirmed
+as `gVabStreamObjMethods`'s own +0x078 slot, and its only caller in this
+unit is `VabStreamObj__Update`'s own case-6 branch, dispatched right after
+`SsVabTransBody` succeeds (`self->methods->slot78(self, 1)`) -- so this is
+the notification step between "body transfer just finished" and "go load
+the VAG attribute tables" (`slot7C`/`VabStreamObj__LoadVagAttrs`). Tier B,
+not A: this reads as a virtual hook a subclass could override, and nothing
+in this unit shows whether anything OTHER than `VabStreamObj__Update` ever
+dispatches through it.
