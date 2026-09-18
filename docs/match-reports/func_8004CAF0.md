@@ -436,3 +436,87 @@ disagreement before doing that comparison.
 **Disposition: unchanged, still `INCLUDE_ASM`, still a pure register-identity
 rotation with no new lever found.** Not a permuter target until the scaffold
 mismatch itself is root-caused.
+
+---
+
+## Round 53 (bravo) — CALIBRATION attempt, two fresh levers, both inert, negative
+
+Assigned as one of three functions in a round-53 Sonnet calibration slot for
+the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `func_8004CD38`
+and `func_8004CFB8`. Round 33's disposition ("still a pure register-identity
+rotation with no new lever found") is the reason this unit was picked over
+the plan's higher-ranked but levers-measurably-spent `code_2cc8c_e` job.
+
+Rebuilt the round-19/33 preserved body fresh first, per hygiene: confirmed
+**55/97, exact length (0x184), zero outside-range drift** — unchanged from
+both prior rounds' recorded figure.
+
+**Lever 1: full local-declaration reorder (not just `hSpan2`'s position).**
+Round 19 tried moving only `hSpan2` and found it inert. The current body
+still declares `h4` before `nextArg` even though `nextArg` is assigned
+FIRST in source order (inside the `p5 < 10` branch, before `h4`). Reordered
+to match first-use order (`hSpan; hSpan2; nextArg; h4;`):
+
+**Result: byte-identical 55/97.** No effect — confirms the declaration-order
+lever is inert for every permutation of these four locals, not just the one
+round 19 tried.
+
+**Lever 2: "mention self twice" — the same trick that closed `hSpan` in
+round 19, applied to `self` in the function's final block.** Round 19's key
+lever for closing the last register was duplicating `hSpan` into `hSpan2`,
+used for exactly one of the three `slot->hA = hSpan` writes. Applied the
+same idea to `self` (which the report's own residue analysis names as one
+of the three rotating registers), scoped to the final `if (hSpan2 >= 21)`
+block only:
+
+```c
+if (hSpan2 >= 21) {
+    Obj866E8 *selfCopy;
+
+    selfCopy = self;
+    count = count + 1;
+    slot->h8 = (p7 + 20) - hSpan2;
+    slot = &selfCopy->slots8C[count];
+    slot->elemIdx = selfCopy->methods->slot120(selfCopy, nextArg + 1);
+    slot->h4 = 0;
+    slot->h6 = 0;
+    slot->h8 = hSpan2 - 20;
+    slot->hA = hSpan;
+    return count;
+}
+```
+
+**Result: byte-identical 55/97.** No effect — unlike `hSpan` (a genuinely
+reused VALUE with two independent lifetimes the compiler could choose to
+split or coalesce), `self` is a PARAMETER already live across the entire
+function body and every method call; duplicating its name does not give
+cc1 a new coalescing decision to make, because there was never a point
+where its old value could have been considered dead. The "mention it twice"
+lever's precondition (a value whose lifetime the compiler is currently
+choosing to SHORTEN) does not hold for a parameter that is live throughout.
+
+Both reverted (`git checkout -- src/class_3bb8c_b.c`; clean `OK: build
+matches retail` confirmed after each).
+
+**Disposition unchanged: `INCLUDE_ASM`, still 55/97, still a clean 3-register
+rotation (self/slot/temp among `$s0`/`$s1`/`$s3`) per CLAUDE.md HARD RULE 6
+— not something a `register`/asm-constraint fix is permitted to close.**
+Four rounds (9, 19, 33, 53) have now worked this function; round 19 closed
+most of the gap with real levers, and rounds 33 and 53 each independently
+re-derived the residue and found nothing further. This is the honest
+negative half of this round's Sonnet track-1 calibration measurement.
+
+### Proposed learning
+
+**The "mention a value twice" lever's precondition is a value whose
+lifetime the compiler could otherwise shorten — a local intermediate, not a
+parameter that is already live for the function's entire body.** Round 19
+closed a register with this lever on `hSpan` (assigned once, used at two
+points with a gap between); this round's negative on `self` (live
+continuously, referenced at every method call) is the boundary case that
+makes the precondition explicit rather than assumed. Worth checking against
+any OTHER register-rotation stall before spending an attempt: does the
+candidate value for the "duplicate it" trick have a genuine second,
+independent USE POINT the compiler could split from the first, or is it
+just a parameter mentioned in more than one place? Only the former has
+shown a positive result in this corpus so far.
