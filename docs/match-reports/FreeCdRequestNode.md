@@ -1,10 +1,12 @@
-# func_800283C4
+> Renamed from `func_800283C4` on 2026-09-18 (tools/rename.py). Address 0x800283c4.
+
+# FreeCdRequestNode
 
 **Unit:** code_179d8_r · **Size:** 33 words · **Status:** MATCHED (33/33 words) · **Round 45**
 
 ## What it does
 
-The remove/free counterpart to `func_8002832C`: unlinks a node from the
+The remove/free counterpart to `AllocCdRequestNode`: unlinks a node from the
 doubly-linked list rooted at `D_8008A894` (fixing up `prev->next`,
 `next->prev`, or the list head as appropriate) and frees it via
 `func_80017CFC`. Void return. Never-attempted cold ground.
@@ -12,7 +14,7 @@ doubly-linked list rooted at `D_8008A894` (fixing up `prev->next`,
 ## The C
 
 ```c
-void func_800283C4(Node8008A894 *node)
+void FreeCdRequestNode(Node8008A894 *node)
 {
     Node8008A894 *prev;
     Node8008A894 *next;
@@ -36,4 +38,4 @@ void func_800283C4(Node8008A894 *node)
 ```
 
 Closed on the first attempt (uses the `Node8008A894` struct from
-`func_8002832C`, declared once at the top of the unit).
+`AllocCdRequestNode`, declared once at the top of the unit).

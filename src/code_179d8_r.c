@@ -19,7 +19,7 @@
  *     state==8-success handling.
  *   - func_80028844 / func_80028864 are the "start" / "reset" bookends of
  *     that state machine.
- *   - func_8002832C / func_800283C4 are a generic doubly-linked-list
+ *   - AllocCdRequestNode / FreeCdRequestNode are a generic doubly-linked-list
  *     append/remove+free pair over 0x24-byte nodes, list head D_8008A894.
  *   - func_80028448 / func_800284C4 / func_80028540 are linear-scan /
  *     index helpers over a flat table of 0x1C-byte string records based at
@@ -70,7 +70,7 @@ extern void *D_8008A888; /* secondary pointer, used only by func_800286E4 */
 extern s32 D_8008A898;   /* which state-machine step to tick, 1 or 2 */
 extern s32 D_8008A8A0;   /* timeout counter */
 
-Node8008A894 *func_8002832C(void)
+Node8008A894 *AllocCdRequestNode(void)
 {
     Node8008A894 *node;
     Node8008A894 *head;
@@ -101,7 +101,7 @@ Node8008A894 *func_8002832C(void)
     return node;
 }
 
-void func_800283C4(Node8008A894 *node)
+void FreeCdRequestNode(Node8008A894 *node)
 {
     Node8008A894 *prev;
     Node8008A894 *next;

@@ -1,4 +1,6 @@
-# func_8002832C
+> Renamed from `func_8002832C` on 2026-09-18 (tools/rename.py). Address 0x8002832c.
+
+# AllocCdRequestNode
 
 **Unit:** code_179d8_r · **Size:** 38 words · **Status:** MATCHED (38/38 words) · **Round 45**
 
@@ -24,7 +26,7 @@ typedef struct Node8008A894 {
 
 extern Node8008A894 *D_8008A894; /* list head */
 
-Node8008A894 *func_8002832C(void)
+Node8008A894 *AllocCdRequestNode(void)
 {
     Node8008A894 *node;
     Node8008A894 *head;

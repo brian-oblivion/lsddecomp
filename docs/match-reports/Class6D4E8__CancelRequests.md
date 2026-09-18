@@ -17,11 +17,11 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-/* The queued-request node func_8002832C (code_179d8_r) allocates and
- * func_800283C4 (code_179d8_r) unlinks and frees -- only the fields this
+/* The queued-request node AllocCdRequestNode (code_179d8_r) allocates and
+ * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
  * call site itself reads are typed here. `active` is the flag func_80028844
  * (code_179d8_r) sets on the head node when it starts an operation on it;
- * func_8002832C clears it at allocation. The list head is D_8008A894. */
+ * AllocCdRequestNode clears it at allocation. The list head is D_8008A894. */
 typedef struct CdRequest_D70 CdRequest_D70;
 struct CdRequest_D70 {
     /* +0x00 */ s32 active;
@@ -44,7 +44,7 @@ extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
 extern void func_80028864(void); /* code_179d8_r: reset the state machine */
-extern void func_800283C4(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
+extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
 void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 {
@@ -71,7 +71,7 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
         for (node = (CdRequest_D70 *)D_8008A894; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
-                func_800283C4(node);
+                FreeCdRequestNode(node);
                 self->pendingRequests--;
             }
         }
@@ -97,7 +97,7 @@ cleared BEFORE the old value lands in `D_8008A87C`, not the natural-looking
 `D_8008A87C = D_8008A888; D_8008A888 = 0;`, which would store in the
 opposite order). Then, regardless of that inner guard, a loop walks the
 whole list unlinking every node whose `owner == self` via
-`func_800283C4` (also `code_179d8_r`) and decrementing `self->pendingRequests` per
+`FreeCdRequestNode` (also `code_179d8_r`) and decrementing `self->pendingRequests` per
 node removed.
 
 Two register-allocation traps, both giving clean length-matching near-misses
@@ -106,7 +106,7 @@ that still diffed:
 1. **The list-walk loop must pre-fetch `next` before the removal call, as
    its own local, not `node = node->next` at the `for` update clause.**
    Writing the update as `node = node->next` reads `node->next` AFTER
-   `func_800283C4(node)` may have freed/unlinked `node` — GCC still compiled
+   `FreeCdRequestNode(node)` may have freed/unlinked `node` — GCC still compiled
    it (nothing catches use-after-free at compile time), but it forced a
    `move $a0,$s0` to preserve `node` across the call for the (now
    mis-timed) later read, one extra word retail doesn't have. Retail
@@ -146,7 +146,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** Slot `+0x074` of `D_8006D4E8`. It walks the `D_8008A894`
 request list and, for every node whose `owner` is this object, calls
-`func_800283C4` (code_179d8_r: unlink + free) and decrements the object's own
+`FreeCdRequestNode` (code_179d8_r: unlink + free) and decrements the object's own
 pending count. Before that, if the HEAD node is this object's and is already
 `active` and the drive is not idle, it aborts the transfer in flight
 (`CdFlush`, `func_80028864` = reset the state machine) and restores the saved
@@ -158,7 +158,7 @@ function; the `Cancel` is not an inference about purpose but a description of
 
 - `CdRequest_D70.active` (`+0x00`): `func_80028844` (code_179d8_r) sets the
   head node's `+0x00` to 1 when it starts an operation on it, and
-  `func_8002832C` clears it at allocation. Tier B -- "an operation has been
+  `AllocCdRequestNode` clears it at allocation. Tier B -- "an operation has been
   started on this node" is what the two writers show; whether it also means
   anything to the state machine's later steps is not established.
 - `CdRequest_D70.owner` (`+0x0C`): `EnqueueCdRequest` stores the requesting

@@ -744,3 +744,5 @@ gOpenVabCount = 0x8008A8C4; // type:func
 gPendingVabBuffer = 0x8008A8C8; // type:func
 gVabHeaderSuffix = 0x8008A8D0; // type:func
 gVabBodySuffix = 0x8008A8D4; // type:func
+AllocCdRequestNode = 0x8002832C; // type:func
+FreeCdRequestNode = 0x800283C4; // type:func

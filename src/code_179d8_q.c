@@ -117,11 +117,11 @@ void Class6D4E8__StopCdService(void)
     UnlockCd();
 }
 
-/* The queued-request node func_8002832C (code_179d8_r) allocates and
- * func_800283C4 (code_179d8_r) unlinks and frees -- only the fields this
+/* The queued-request node AllocCdRequestNode (code_179d8_r) allocates and
+ * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
  * call site itself reads are typed here. `active` is the flag func_80028844
  * (code_179d8_r) sets on the head node when it starts an operation on it;
- * func_8002832C clears it at allocation. The list head is D_8008A894. */
+ * AllocCdRequestNode clears it at allocation. The list head is D_8008A894. */
 typedef struct CdRequest_D70 CdRequest_D70;
 struct CdRequest_D70 {
     /* +0x00 */ s32 active;
@@ -144,7 +144,7 @@ extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
 extern void func_80028864(void); /* code_179d8_r: reset the state machine */
-extern void func_800283C4(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
+extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
 void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 {
@@ -171,7 +171,7 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
         for (node = (CdRequest_D70 *)D_8008A894; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
-                func_800283C4(node);
+                FreeCdRequestNode(node);
                 self->pendingRequests--;
             }
         }
@@ -456,7 +456,7 @@ extern void VSyncCallback(void (*cb)(void));
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
  * func_80027A24 (code_179d8_s), which walks the D_8008A894 request list,
  * dispatches each request through its owner's own slots and frees it with
- * func_800283C4 -- so the slot is named for what that method does. */
+ * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
 struct Methods6D4E8_80EC {
     u8 pad00[0x68];
@@ -542,7 +542,7 @@ void DisableCdQueue(void)
 }
 
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
- * writing side: func_8002832C (code_179d8_r) allocates one and links it onto
+ * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
  * D_8008A894, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
  * CD_OP_* values, `fileIndex` is func_800284C4's index into gFileTable (0
@@ -558,7 +558,7 @@ struct CdRequest_282AC {
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;
 };
-extern CdRequest_282AC *func_8002832C(void); /* code_179d8_r: alloc + link */
+extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
 typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;
 struct Obj6D4E8_282AC {
@@ -573,7 +573,7 @@ struct Obj6D4E8_282AC {
 void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
                       s32 param0, s32 param1)
 {
-    CdRequest_282AC *entry = func_8002832C();
+    CdRequest_282AC *entry = AllocCdRequestNode();
 
     entry->op = op;
     entry->param0 = param0;
