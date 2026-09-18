@@ -1,4 +1,6 @@
-# func_80028888
+> Renamed from `func_80028888` on 2026-09-18 (tools/rename.py). Address 0x80028888.
+
+# SetCdState
 
 **Unit:** code_179d8_r · **Size:** 4 words · **Status:** MATCHED (4/4 words) · **Round 45**
 
@@ -13,7 +15,7 @@ CD-read state machine.
 ## The C
 
 ```c
-void func_80028888(s32 arg0)
+void SetCdState(s32 arg0)
 {
     gCdState = arg0;
     D_8008A8A0 = 0;

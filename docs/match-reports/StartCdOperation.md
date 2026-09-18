@@ -1,4 +1,6 @@
-# func_80028844
+> Renamed from `func_80028844` on 2026-09-18 (tools/rename.py). Address 0x80028844.
+
+# StartCdOperation
 
 **Unit:** code_179d8_r · **Size:** 8 words · **Status:** MATCHED (8/8 words) · **Round 45**
 
@@ -15,7 +17,7 @@ presumably only ever called with a live list head.
 ## The C
 
 ```c
-void func_80028844(s32 arg0, s32 arg1)
+void StartCdOperation(s32 arg0, s32 arg1)
 {
     gCdBusy = 1;
     gCdOperation = arg0;

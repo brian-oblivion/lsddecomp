@@ -38,7 +38,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 in `code_179d8_r`: `TickCdStateMachine` and `TickCdLoadFileStateMachine` both open with
 `state = gCdState` and then switch on it (1 -> issue `CdlSetloc` via
 `CdControlF`, 2 -> poll `CdSync`, 7 -> issue `CdRead`, 8 -> poll
-`CdReadSync`), and `func_80028888` is a one-line "set the phase and reset the
-timeout" helper. `func_80028844` seeds it per operation; `func_80028864`
+`CdReadSync`), and `SetCdState` is a one-line "set the phase and reset the
+timeout" helper. `StartCdOperation` seeds it per operation; `ResetCdStateMachine`
 clears it to 0. That unit's own header comment already called it "the CD
 state-machine phase"; this rename records it in the symbol.

@@ -12,12 +12,12 @@
  *
  * The slice implements a small CD-read state machine:
  *   - gCdState holds the current state/phase.
- *   - D_8008A8A0 is a timeout counter, reset by func_80028888.
+ *   - D_8008A8A0 is a timeout counter, reset by SetCdState.
  *   - TickCdStateMachine / TickCdLoadFileStateMachine are near-identical per-tick state
  *     machine steps (driven from ServiceCdDriver in code_179d8_q via
  *     D_8008A898 == 1 / == 2), differing only in their state==2 and
  *     state==8-success handling.
- *   - func_80028844 / func_80028864 are the "start" / "reset" bookends of
+ *   - StartCdOperation / ResetCdStateMachine are the "start" / "reset" bookends of
  *     that state machine.
  *   - AllocCdRequestNode / FreeCdRequestNode are a generic doubly-linked-list
  *     append/remove+free pair over 0x24-byte nodes, list head D_8008A894.
@@ -61,7 +61,7 @@ extern s32 gCdBusy; /* "busy" flag, 0/1 */
 extern char *gFileTable; /* base of a table of 0x1C-byte string records */
 extern s32 gFileTableCount;   /* record count */
 extern s32 gCdIdle;   /* "idle"/"ready" flag, 0/1 */
-extern s32 gCdOperation;   /* context value stashed by func_80028844 */
+extern s32 gCdOperation;   /* context value stashed by StartCdOperation */
 extern s32 gCdState;   /* CD state-machine phase */
 extern void *D_8008A87C; /* CdControlF param pointer */
 extern s32 D_8008A880;   /* CdRead sector count */
@@ -171,8 +171,8 @@ void *GetCdFileEntry(s32 index)
 
 /* forward decls -- both defined later in this unit; ROM order keeps the
  * definitions below. */
-extern void func_80028864(void);
-extern void func_80028888(s32 arg0);
+extern void ResetCdStateMachine(void);
+extern void SetCdState(s32 arg0);
 
 void TickCdStateMachine(void)
 {
@@ -237,7 +237,7 @@ L_state8:
         goto L_end;
 
 L_reset:
-    func_80028864();
+    ResetCdStateMachine();
     goto L_end;
 
 L_pending:
@@ -245,7 +245,7 @@ L_pending:
     newstate = 1;
 
 L_set:
-    func_80028888(newstate);
+    SetCdState(newstate);
 
 L_end:
     UnlockCd();
@@ -319,20 +319,20 @@ L_state8:
     }
     if (v1 != 0)
         goto L_end;
-    func_80028864();
+    ResetCdStateMachine();
     tmp = D_8008A888;
     D_8008A888 = NULL;
     D_8008A87C = tmp;
     goto L_end;
 
 L_set:
-    func_80028888(newstate);
+    SetCdState(newstate);
 
 L_end:
     UnlockCd();
 }
 
-void func_80028844(s32 arg0, s32 arg1)
+void StartCdOperation(s32 arg0, s32 arg1)
 {
     gCdBusy = 1;
     gCdOperation = arg0;
@@ -341,7 +341,7 @@ void func_80028844(s32 arg0, s32 arg1)
     D_8008A894->unk0 = 1;
 }
 
-void func_80028864(void)
+void ResetCdStateMachine(void)
 {
     gCdOperation = 0;
     gCdState = 0;
@@ -351,7 +351,7 @@ void func_80028864(void)
     gCdBusy = 0;
 }
 
-void func_80028888(s32 arg0)
+void SetCdState(s32 arg0)
 {
     gCdState = arg0;
     D_8008A8A0 = 0;

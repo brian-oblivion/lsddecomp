@@ -12,11 +12,11 @@ from `ServiceCdDriver` when `D_8008A898 == 2`. Identical to `TickCdStateMachine`
 in every state except:
 
 - **state 2, `CdSync` reports "still busy, same phase"**: `TickCdStateMachine`
-  calls `func_80028864()` (full reset); this function instead just
-  advances to phase 7 (`func_80028888(7)`) -- i.e. re-issue the read
+  calls `ResetCdStateMachine()` (full reset); this function instead just
+  advances to phase 7 (`SetCdState(7)`) -- i.e. re-issue the read
   directly rather than resetting.
 - **state 8, `CdReadSync` succeeds (`v1 == 0`)**: after
-  `func_80028864()`, this function additionally swaps two globals
+  `ResetCdStateMachine()`, this function additionally swaps two globals
   (`D_8008A87C = D_8008A888; D_8008A888 = NULL;`) that `TickCdStateMachine`
   does not touch at all.
 
@@ -138,14 +138,14 @@ L_state8:
     }
     if (v1 != 0)
         goto L_end;
-    func_80028864();
+    ResetCdStateMachine();
     tmp = D_8008A888;
     D_8008A888 = NULL;
     D_8008A87C = tmp;
     goto L_end;
 
 L_set:
-    func_80028888(newstate);
+    SetCdState(newstate);
 
 L_end:
     UnlockCd();

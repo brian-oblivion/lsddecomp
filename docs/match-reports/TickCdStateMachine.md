@@ -10,7 +10,7 @@ One tick of a small CD-read state machine. `gCdState` holds the current
 phase (0 default, 1 = issue `CdControlF` seek, 2 = poll `CdSync`, 7 = issue
 `CdRead`, 8 = poll `CdReadSync`; anything else in `{3,4,5,6}` or `>8` is a
 no-op). `D_8008A8A0` is a busy-wait timeout counter, reset by
-`func_80028888` whenever the phase advances. Called from
+`SetCdState` whenever the phase advances. Called from
 `ServiceCdDriver` (in the sibling unit `code_179d8_q.c`) when `D_8008A898 ==
 1`; `TickCdLoadFileStateMachine` is this same state machine's other tick variant
 (`D_8008A898 == 2`), differing only in what happens when `CdSync` reports
@@ -19,8 +19,8 @@ no-op). `D_8008A8A0` is a busy-wait timeout counter, reset by
 ## The C
 
 ```c
-extern void func_80028864(void);
-extern void func_80028888(s32 arg0);
+extern void ResetCdStateMachine(void);
+extern void SetCdState(s32 arg0);
 
 void TickCdStateMachine(void)
 {
@@ -85,7 +85,7 @@ L_state8:
         goto L_end;
 
 L_reset:
-    func_80028864();
+    ResetCdStateMachine();
     goto L_end;
 
 L_pending:
@@ -93,7 +93,7 @@ L_pending:
     newstate = 1;
 
 L_set:
-    func_80028888(newstate);
+    SetCdState(newstate);
 
 L_end:
     UnlockCd();
@@ -109,7 +109,7 @@ different branch shape from retail: each `if` in an `else-if` chain
 branches *around* its own body, whereas retail's actual layout is a
 dispatch of forward `goto`s at the top followed by the bodies placed in
 source order -- and, crucially, retail shares **one** call site for
-`func_80028888(newstate)` across five different callers (state1-success,
+`SetCdState(newstate)` across five different callers (state1-success,
 state2's two "retry" exits, state7-success, state8-pending) rather than
 five separate call sites. Reading the raw asm label-by-label and
 translating it 1:1 into `goto`s targeting a single shared `L_set:`

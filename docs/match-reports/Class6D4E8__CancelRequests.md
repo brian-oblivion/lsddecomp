@@ -19,7 +19,7 @@ carries the evidence for each one.
 ```c
 /* The queued-request node AllocCdRequestNode (code_179d8_r) allocates and
  * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
- * call site itself reads are typed here. `active` is the flag func_80028844
+ * call site itself reads are typed here. `active` is the flag StartCdOperation
  * (code_179d8_r) sets on the head node when it starts an operation on it;
  * AllocCdRequestNode clears it at allocation. The list head is D_8008A894. */
 typedef struct CdRequest_D70 CdRequest_D70;
@@ -43,7 +43,7 @@ extern s32 gCdIdle;
 extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
-extern void func_80028864(void); /* code_179d8_r: reset the state machine */
+extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
 void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
@@ -62,7 +62,7 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 
         if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
-            func_80028864();
+            ResetCdStateMachine();
             saved = D_8008A888;
             D_8008A888 = 0;
             D_8008A87C = saved;
@@ -90,7 +90,7 @@ unlink and free them." Two guards gate the ENTIRE body (not just the
 function does nothing but the latch dance. Inside that, an inner
 three-condition guard (head node's owner is `self`, head node's `active` flag (`unk00` when this was written)
 flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
-`func_80028864()` (both cross-unit — `func_80028864` from foxtrot's
+`ResetCdStateMachine()` (both cross-unit — `ResetCdStateMachine` from foxtrot's
 `code_179d8_r`) and a load-clear-store handoff between `D_8008A888` and
 `D_8008A87C` (needs an explicit temp: the store order is `D_8008A888`
 cleared BEFORE the old value lands in `D_8008A87C`, not the natural-looking
@@ -149,14 +149,14 @@ request list and, for every node whose `owner` is this object, calls
 `FreeCdRequestNode` (code_179d8_r: unlink + free) and decrements the object's own
 pending count. Before that, if the HEAD node is this object's and is already
 `active` and the drive is not idle, it aborts the transfer in flight
-(`CdFlush`, `func_80028864` = reset the state machine) and restores the saved
+(`CdFlush`, `ResetCdStateMachine` = reset the state machine) and restores the saved
 position pointer. Cancelling this owner's outstanding requests is the whole
 function; the `Cancel` is not an inference about purpose but a description of
 `unlink + free + abort the one in flight`.
 
 **Field names established here** (applied in this unit, which owns its views):
 
-- `CdRequest_D70.active` (`+0x00`): `func_80028844` (code_179d8_r) sets the
+- `CdRequest_D70.active` (`+0x00`): `StartCdOperation` (code_179d8_r) sets the
   head node's `+0x00` to 1 when it starts an operation on it, and
   `AllocCdRequestNode` clears it at allocation. Tier B -- "an operation has been
   started on this node" is what the two writers show; whether it also means
@@ -179,5 +179,5 @@ which is the procedure working in the direction where it can work.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| code_179d8_r | `Node8008A894` | `unk0` | `active` | B | set by `func_80028844` on the head node at operation start, cleared at allocation |
+| code_179d8_r | `Node8008A894` | `unk0` | `active` | B | set by `StartCdOperation` on the head node at operation start, cleared at allocation |
 | code_179d8_s | `Node8008A894` | `unkC` | `owner` | A | written by `EnqueueCdRequest` with the requesting object |

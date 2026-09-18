@@ -119,7 +119,7 @@ void Class6D4E8__StopCdService(void)
 
 /* The queued-request node AllocCdRequestNode (code_179d8_r) allocates and
  * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
- * call site itself reads are typed here. `active` is the flag func_80028844
+ * call site itself reads are typed here. `active` is the flag StartCdOperation
  * (code_179d8_r) sets on the head node when it starts an operation on it;
  * AllocCdRequestNode clears it at allocation. The list head is D_8008A894. */
 typedef struct CdRequest_D70 CdRequest_D70;
@@ -143,7 +143,7 @@ extern s32 gCdIdle;
 extern s32 D_8008A888;
 extern s32 D_8008A87C;
 extern void CdFlush(void);
-extern void func_80028864(void); /* code_179d8_r: reset the state machine */
+extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
 
 void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
@@ -162,7 +162,7 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 
         if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
-            func_80028864();
+            ResetCdStateMachine();
             saved = D_8008A888;
             D_8008A888 = 0;
             D_8008A87C = saved;
