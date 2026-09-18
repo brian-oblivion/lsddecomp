@@ -1,4 +1,6 @@
-# func_8005748C -- MATCHED (14/14 words)
+> Renamed from `func_8005748C` on 2026-09-18 (tools/rename.py). Address 0x8005748c.
+
+# BaseObjO__func_5748c -- MATCHED (14/14 words)
 
 Unit: `class_3bb8c_o` (round 17). A shared `BasicClass`-inherited slot
 occupant (`slotC4`), already independently confirmed `void` from BOTH
@@ -13,7 +15,7 @@ calls `func_80057534` (still `INCLUDE_ASM`, sibling unit
 extern s32 D_8008ABA8;
 extern void func_80057534(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void func_8005748C(BaseObjO *self, s32 arg1, s32 arg2) {
+void BaseObjO__func_5748c(BaseObjO *self, s32 arg1, s32 arg2) {
     func_80057534(self, &D_8008ABA8, arg1, arg2, 6);
 }
 ```
@@ -49,3 +51,15 @@ None -- a direct application of the already-documented `slotC4`-must-stay-
 `void` constraint to a NEW occupant of the same shared slot, confirming it
 generalizes past the two instances (`func_8005FA64`, `func_8005E160`)
 `Entity.h` already names.
+
+## Naming
+
+**`BaseObjO__func_5748c` -- tier C.** Class is known (occupies the shared
+`slotC4` `BasicClass`-inherited slot, confirmed by `tools/classtable.py`
+against `Entity.h`/`code_55dd4.h`'s independent readings of the same
+address), but the function tail-calls a still-`INCLUDE_ASM` sibling-unit
+function (`func_80057534`, `class_3bb8c_p.c`) with a fixed global address
+and a literal mode value `6`, and no occupant of `slotC4` anywhere in the
+codebase has an established purpose either (`Entity.h`'s own comment on
+this exact slot only documents a MUST-STAY-`void` return-type constraint,
+not what the slot means). Kept the tier-C `Class__func_xxxxx` form.

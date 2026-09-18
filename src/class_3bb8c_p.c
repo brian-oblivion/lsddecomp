@@ -55,7 +55,7 @@ void func_800574FC(DreamSys *self, s32 val, void *extra) {
 
 /* `count` is `volatile` so it stays a stack reference reloaded at its one use
  * site, rather than being promoted to a callee-saved register across the
- * intervening func_80057444 call -- confirmed with a standalone reproducer
+ * intervening BaseObjO__ApplyRotatedVec14 call -- confirmed with a standalone reproducer
  * through the pinned toolchain: dropping `volatile` grows the frame by one
  * callee-saved register (s3) and changes 0x1c/0x20 byte offsets throughout,
  * which is not what retail does (round 2026-09-04).
@@ -72,7 +72,7 @@ void func_80057534(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32
     s16 val16 = (s16) val;
     *slot = val16;
     self->field_0x48 = val16;
-    self->vt->func_80057444(self, &D_8008ABA4[0]);
+    self->vt->BaseObjO__ApplyRotatedVec14(self, &D_8008ABA4[0]);
     *slot = 0;
     if (extra != NULL) {
         self->vt->func_80058B08(self, count);
@@ -82,7 +82,7 @@ void func_80057534(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32
 void func_80057618(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s32 val, void *extra);
 
 void func_800575B0(DreamSys *self, s32 val, void *extra) {
-    func_80057618(self, self->vt->func_8005748C, val, extra);
+    func_80057618(self, self->vt->BaseObjO__func_5748c, val, extra);
 }
 
 void func_800575E0(DreamSys *self, s32 val, void *extra) {
@@ -178,7 +178,7 @@ s32 func_80057668(DreamSys *self) {
 
             self->unk_0x28 = result;
             if (result != NULL) {
-                self->vt->func_800573A8(self, &sp88);
+                self->vt->BaseObjO__AddVec14(self, &sp88);
                 self->vt->func_80058B08(self, -1);
                 return 1;
             }

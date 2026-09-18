@@ -27,7 +27,7 @@
  * (func_8001D4DC, code_d294_b) builds that rotation with RotMatrix from
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
- * class_3bb8c_o's own call site (func_80057444) passes a local `Vec3O`. */
+ * class_3bb8c_o's own call site (BaseObjO__ApplyRotatedVec14) passes a local `Vec3O`. */
 void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Vec3_d294 *dst, s16 *src) {
     u8 buf[0x20];
 

@@ -1,7 +1,9 @@
-# func_80056FE4 -- MATCHED (24/24 words)
+> Renamed from `func_80056FE4` on 2026-09-18 (tools/rename.py). Address 0x80056fe4.
 
-Unit: `class_3bb8c_o` (round 17). `New_BaseObjO` -- allocates 0x58 bytes,
-constructs, frees and returns `NULL` on construction failure.
+# New_BaseObjO -- MATCHED (24/24 words)
+
+Unit: `class_3bb8c_o` (round 17). The BaseObjO allocator -- allocates 0x58
+bytes, constructs, frees and returns `NULL` on construction failure.
 
 ## Final source
 
@@ -10,7 +12,7 @@ extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern BaseObjOMethods *func_80057C84(void);
 
-void *func_80056FE4(void) {
+void *New_BaseObjO(void) {
     BaseObjO *self = func_80017B34(0x58);
 
     if (self != NULL) {
@@ -35,7 +37,7 @@ NULL -- nonzero means success (return `self`), zero means failure
 (`func_80017CFC(self)` then return `NULL`). `func_80057C84` is already
 declared elsewhere (`code_55dd4.h`) returning `D800878D4Methods *`; this
 unit uses its own local `BaseObjOMethods *` reading of the same table (see
-`func_80057044`'s report). `func_80017B34`/`func_80017CFC` are the
+`BaseObjO__BaseObjO`'s report). `func_80017B34`/`func_80017CFC` are the
 project's established single-argument pool allocator pair.
 
 `0x58` is a literal allocation size, not `sizeof(BaseObjO)`, per the
@@ -47,3 +49,19 @@ named, all of which fit within the first 0x58 bytes.
 ### Proposed learning
 
 None beyond the already-documented `New_X` sub-shape #3.
+
+## Naming
+
+**`New_BaseObjO` -- tier A.** Matches the project's documented `New_X`
+allocator sub-shape #3 exactly (alloc, test, ctor, test-ctor's-own-return,
+free-on-failure) -- mechanics are the entire visible purpose of this
+function, which is why the previous round's own report already used this
+name in prose before anyone renamed it. Constructs a `BaseObjO`, not a
+`Class65650`: it calls `func_80057C84()->ctor(self)` with a SINGLE
+argument, which only makes sense if that slot resolves to
+`BaseObjO__BaseObjO` (this unit's own 1-argument base ctor) rather than to
+`Class65650`'s real, 3-argument constructor
+(`code_55dd4.c:class_65650__Constructor`) -- confirmed directly by
+`func_80057C84`'s declared return type, `BaseObjOMethods *` here (this
+unit's own reading of the SAME table `code_55dd4.h` calls
+`D800878D4Methods`).

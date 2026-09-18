@@ -1,7 +1,9 @@
-# func_800573CC -- MATCHED (30/30 words)
+> Renamed from `func_800573CC` on 2026-09-18 (tools/rename.py). Address 0x800573cc.
+
+# BaseObjO__UpdateVec14 -- MATCHED (30/30 words)
 
 Unit: `class_3bb8c_o` (round 17). The shared worker behind
-`func_80057384`/`func_800573A8`: overwrites or accumulates a 3-word vector
+`BaseObjO__SetVec14`/`BaseObjO__AddVec14`: overwrites or accumulates a 3-word vector
 into `self->unk14->vec18`, then clears `self->unk14->unk0`.
 
 ## Final source
@@ -13,7 +15,7 @@ typedef struct Unk14ObjO {
     Vec3O vec18;      /* +0x018 .. +0x023 */
 } Unk14ObjO;
 
-void func_800573CC(BaseObjO *self, s32 flag, Vec3O *v) {
+void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v) {
     BaseObjO *t = self;
     Unk14ObjO *u = t->unk14;
 
@@ -79,3 +81,13 @@ Two residues, both closed:
   rather than an artifact: omitting the second name compiled clean but
   used `$a0` directly at both sites, 1 word short via a register-identity
   mismatch that a fresh `BaseObjO *t = self;` closed exactly.
+
+## Naming
+
+**`BaseObjO__UpdateVec14` -- tier A.** The shared worker behind
+`SetVec14`/`AddVec14`: overwrites or accumulates a `Vec3O` into
+`self->vecTarget->vec18` depending on `flag`, then always clears
+`self->vecTarget->unk0`. "Update" covers both the overwrite and the
+accumulate case without picking one, which is what the shared (flag-gated)
+function needs; the two one-line callers get the more specific
+`Set`/`Add` names instead.

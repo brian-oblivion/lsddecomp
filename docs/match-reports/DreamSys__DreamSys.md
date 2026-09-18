@@ -55,7 +55,7 @@ anywhere) made it obvious before writing any C.
 - **`DreamSysBaseMethods` (this unit's local view of the shared `D_800878D4`
   base table) gets a new slot at `+0x008`: `ctor`.** Cross-confirmed against
   `include/code_55dd4.h`'s `D800878D4Methods`, which ALREADY names and
-  resolves this exact slot as `func_80057044`, taking/returning
+  resolves this exact slot as `BaseObjO__BaseObjO`, taking/returning
   `Class65650 *self` — the same base constructor, just viewed through a
   different subclass's local header (per this project's established
   "multiple independent local views of the same table" convention). Typed
@@ -65,8 +65,8 @@ anywhere) made it obvious before writing any C.
   for chaining, unneeded since the caller already holds `this`).
 - **`vtable_DreamSys+0x010` is `slot10`, shared with Class65650's OWN vtable
   at the identical offset.** `code_55dd4.h` already names and resolves it
-  there as `func_800570B4`, and its own comment identifies it as the "link"
-  companion of `slot14`/`func_80057130` — a slot THIS unit's header already
+  there as `BaseObjO__LinkCompanion`, and its own comment identifies it as the "link"
+  companion of `slot14`/`BaseObjO__UnlinkCompanion` — a slot THIS unit's header already
   names (at `+0x014`, same offset relationship) with the same companion
   description, just from `DreamSys`'s side. This round's call
   (`this->vt->slot10(this, val)`) is the constructor performing that exact

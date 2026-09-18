@@ -1,4 +1,6 @@
-# func_80056DF8 -- MATCHED (9/9 words)
+> Renamed from `func_80056DF8` on 2026-09-18 (tools/rename.py). Address 0x80056df8.
+
+# LinkOwnerObj__ReleaseLinks -- MATCHED (9/9 words)
 
 Unit: `class_3bb8c_o` (round 17). A one-line wrapper releasing a 5-element
 `BasicClass *` array inline at `self+0x84`.
@@ -24,7 +26,7 @@ typedef struct LinkOwnerObj {
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 
-void func_80056DF8(LinkOwnerObj *this) {
+void LinkOwnerObj__ReleaseLinks(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->arr84, 5);
 }
 ```
@@ -42,12 +44,22 @@ the same symbol (`code_2cc8c.h`'s `void ReleaseBasicClassArray(void *a0, void *a
 
 `this` is NOT the same class as `BaseObjO` (the shared intermediate base
 class the rest of this unit implements, see the file banner) -- `+0x84`
-would overflow that class's 0x58-byte allocation (`func_80056FE4`). It is
+would overflow that class's 0x58-byte allocation (`New_BaseObjO`). It is
 kept as its own independent local type, `LinkOwnerObj`, established
-together with `func_80056E44` (which walks indices 1..4 of the SAME
-5-element array) and `func_80056F28` (byte-identical body to this
+together with `LinkOwnerObj__RandomizeLinks` (which walks indices 1..4 of the SAME
+5-element array) and `LinkOwnerObj__ReleaseLinksB` (byte-identical body to this
 function).
 
 ### Proposed learning
 
 None beyond what's already documented -- straightforward wrapper.
+
+## Naming
+
+**`LinkOwnerObj__ReleaseLinks` -- tier A.** Mechanics ARE the purpose: the
+whole body is `ReleaseBasicClassArray(this->links, 5)`, i.e. "release [all
+of] this object's links". `LinkOwnerObj` is this unit's own established
+local view of the class `class_3bb8c_s.c` independently calls `LinkNode`
+(same object, same `arr84`/`links` array, per that unit's own header
+comment) -- kept distinct per the multiple-independent-local-views
+convention rather than importing that name here.

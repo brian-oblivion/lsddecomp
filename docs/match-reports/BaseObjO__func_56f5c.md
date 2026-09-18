@@ -1,4 +1,6 @@
-# func_80056F5C -- MATCHED, round 44 (2026-09-15)
+> Renamed from `func_80056F5C` on 2026-09-18 (tools/rename.py). Address 0x80056f5c.
+
+# BaseObjO__func_56f5c -- MATCHED, round 44 (2026-09-15)
 
 Unit `class_3bb8c_o`. **34/34 words, byte-exact, first build.** Reopened,
 never attempted before this round.
@@ -24,7 +26,7 @@ extern s32 D_8008AB94;
 
 extern void func_80020510(void *arg0, void *arg1);
 
-void func_80056F5C(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
+void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 
@@ -60,3 +62,14 @@ through, split the pad rather than guessing a name from nothing --
 `tools/classtable.py <table>` names the real occupant function at that
 offset even when this unit never defines it, which is enough to type the
 slot (return/argument shape) without derivation risk.
+
+## Naming
+
+**`BaseObjO__func_56f5c` -- tier C.** Class is known (`self` is `BaseObjO`,
+confirmed by the `self->methods->slot80` dispatch), and the mechanics are
+fully described in this report (stash `self`/two scalars into three
+globals, then loop twice through the still-unresolved `slot80` occupant
+and an unrenamed Psy-Q object, `func_80020510`), but nothing establishes
+WHAT this accomplishes -- `arg0` is discarded by every known caller, and
+`class_3bb8c_s.c`'s own comment calls it merely "ctor-shaped" as a guess,
+not a finding. Kept the tier-C `Class__func_xxxxx` form.

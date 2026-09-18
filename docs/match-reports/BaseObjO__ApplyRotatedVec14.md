@@ -1,15 +1,17 @@
-# func_80057444 -- MATCHED (18/18 words)
+> Renamed from `func_80057444` on 2026-09-18 (tools/rename.py). Address 0x80057444.
+
+# BaseObjO__ApplyRotatedVec14 -- MATCHED (18/18 words)
 
 Unit: `class_3bb8c_o` (round 17). Converts a source `s16` triple into a
 stack `Vec3O` via `Class6B5CC__RotateLocalVector`, then forwards it to `self`'s own
-`slotBC` (= `func_800573A8`, this unit) through the vtable.
+`slotBC` (= `BaseObjO__AddVec14`, this unit) through the vtable.
 
 ## Final source
 
 ```c
 extern void Class6B5CC__RotateLocalVector(BaseObjO *self, Vec3O *dst, s16 *src);
 
-void func_80057444(BaseObjO *self, s16 *arg1) {
+void BaseObjO__ApplyRotatedVec14(BaseObjO *self, s16 *arg1) {
     Vec3O buf;
 
     Class6B5CC__RotateLocalVector(self, &buf, arg1);
@@ -34,13 +36,23 @@ project's per-call-site-typing convention for cross-unit calls.
 
 The second call, `self->methods->slotBC(self, &buf)`, dispatches through
 `self`'s OWN vtable (not a fixed/global table) at `+0xBC` -- the exact slot
-`func_800573A8` (this unit) already occupies per `DreamSys.h`'s
-`vtable_DreamSys::func_800573A8`. This is a self-referential virtual call
+`BaseObjO__AddVec14` (this unit) already occupies per `DreamSys.h`'s
+`vtable_DreamSys::BaseObjO__AddVec14`. This is a self-referential virtual call
 (the class calling its own overridable slot rather than jumping to
-`func_800573A8` by name), matched by adding `slotBC` to `BaseObjOMethods`
+`BaseObjO__AddVec14` by name), matched by adding `slotBC` to `BaseObjOMethods`
 and calling through it rather than `jal`-ing the symbol directly.
 
 ### Proposed learning
 
 None -- straightforward once `Class6B5CC__RotateLocalVector`'s established signature and
 `BaseObjOMethods`'s `slotBC` slot were both in place.
+
+## Naming
+
+**`BaseObjO__ApplyRotatedVec14` -- tier A.** Mechanics ARE the purpose:
+rotates a source `s16` triple through the already-established
+`Class6B5CC__RotateLocalVector` into a stack `Vec3O`, then forwards that
+buffer to `self`'s own `addVec14` slot (`BaseObjO__AddVec14`, a
+self-referential virtual dispatch to a function this same unit defines).
+"Apply a rotated vector" is exactly the composition of "rotate" then
+"add".

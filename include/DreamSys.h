@@ -357,7 +357,7 @@ typedef struct DreamSysBaseMethods {
 	u8 pad00[0x8];
 	/* Shared with Class65650's own inherited "ctor" slot at the same offset
 	   in the SAME base table (code_55dd4.h's D800878D4Methods, which already
-	   names and resolves this exact slot as `func_80057044`, taking/
+	   names and resolves this exact slot as `BaseObjO__BaseObjO`, taking/
 	   returning `Class65650 *self`). Called by DreamSys__DreamSys as
 	   (this), its return value discarded (round 2026-09-02) -- consistent
 	   with the base ctor returning `self` for chaining, unneeded here since
@@ -446,7 +446,7 @@ typedef struct Func8005A1F4Arg {
    -- the on-disk/network form). func_8005AF64 builds one of these on the
    stack as a-b with y forced to 0; func_8005A0B0 passes the static
    D_80087EA4 instance of one. Both feed vtable slot +0xBC
-   (func_800573A8, round 2026-08-30-d). */
+   (BaseObjO__AddVec14, round 2026-08-30-d). */
 typedef struct DreamSysVec3 {
 	s32 x, y, z;
 } DreamSysVec3;
@@ -841,9 +841,9 @@ struct vtable_DreamSys{
 	DreamSys *(*Constructor)(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
 	u32 unknown_functions_0xc[1];
 	/* Shared with Class65650's own vtable at the same offset (code_55dd4.h:
-	   `slot10`, resolved there as `func_800570B4`, the "link" companion of
-	   `slot14`/`func_80057130` immediately below -- this unit already names
-	   THAT slot `func_80057130` and notes the same companion relationship).
+	   `slot10`, resolved there as `BaseObjO__LinkCompanion`, the "link" companion of
+	   `slot14`/`BaseObjO__UnlinkCompanion` immediately below -- this unit already names
+	   THAT slot `BaseObjO__UnlinkCompanion` and notes the same companion relationship).
 	   Called by DreamSys__DreamSys as (this, arg1->methods->slot0x80(arg1,
 	   0)) -- the constructor's own "buddy-link" step (round 2026-09-02). */
 	void (*slot10)(DreamSys *this, void *arg);
@@ -852,7 +852,7 @@ struct vtable_DreamSys{
 	   of slot10"). Called by func_80058A94 as (this, this->unk_0x4C)
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
-	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
+	void (*BaseObjO__UnlinkCompanion)(DreamSys *this, DreamSysUnk4CObj *arg1);
 	u32 unknown_functions_0x18[6];
 	/* +0x030, BasicClass__NotifyParents -- shared base-class slot, same one
 	   `class_3ac78.h`/`Class6D3C8.h` name (see their comments); called by
@@ -900,19 +900,19 @@ struct vtable_DreamSys{
 	   func_8005A82C right after unk_0x4C->methods->slot0xE8, as (this,
 	   &local) using that same output buffer (round 2026-09-02). Address
 	   0x80057384 is outside this unit/runner's range; still INCLUDE_ASM. */
-	void (*func_80057384)(DreamSys *this, void *arg1);
+	void (*BaseObjO__SetVec14)(DreamSys *this, void *arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0BC). Called by
 	   func_8005AF64 and func_8005A0B0 with a DreamSysVec3* second argument
 	   (round 2026-08-30-d). */
-	void (*func_800573A8)(DreamSys *this, DreamSysVec3 *arg1);
+	void (*BaseObjO__AddVec14)(DreamSys *this, DreamSysVec3 *arg1);
 	/* Called by func_80057534 (this unit's own helper, invoked by its own
 	   +0x0C8/+0x0CC slots) as (this, &D_8008ABA4) -- resolves to
-	   func_80057444, out of this unit/runner's range (round 2026-09-04). */
-	void (*func_80057444)(DreamSys *this, void *arg1);
+	   BaseObjO__ApplyRotatedVec14, out of this unit/runner's range (round 2026-09-04). */
+	void (*BaseObjO__ApplyRotatedVec14)(DreamSys *this, void *arg1);
 	/* Read (not called) by this unit's own +0x0D0 slot (func_800575B0) and
 	   forwarded as a raw callback value to func_80057618 -- resolves to
-	   func_8005748C, out of this unit/runner's range (round 2026-09-04). */
-	void (*func_8005748C)(DreamSys *this, s32 val, void *extra);
+	   BaseObjO__func_5748c, out of this unit/runner's range (round 2026-09-04). */
+	void (*BaseObjO__func_5748c)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; forwards (val, extra) to
 	   func_80057534(this, &D_8008ABA4[0], val, extra, 7)
 	   (round 2026-09-04). */
@@ -922,7 +922,7 @@ struct vtable_DreamSys{
 	   (round 2026-09-04). */
 	void (*func_800574FC)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C4
-	   (func_8005748C) as a raw callback value and forwards it, with its
+	   (BaseObjO__func_5748c) as a raw callback value and forwards it, with its
 	   own two arguments, to func_80057618 (round 2026-09-04). */
 	void (*func_800575B0)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C8

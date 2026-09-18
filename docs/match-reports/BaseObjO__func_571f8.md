@@ -1,4 +1,6 @@
-# func_800571F8 -- MATCHED (74/74 words)
+> Renamed from `func_800571F8` on 2026-09-18 (tools/rename.py). Address 0x800571f8.
+
+# BaseObjO__func_571f8 -- MATCHED (74/74 words)
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot88` (via the fixed
 `func_8001E57C()` table) followed by a guarded body that only runs for
@@ -12,7 +14,7 @@ iteration to close.
 ## Final source
 
 ```c
-void func_800571F8(BaseObjO *self, s32 arg1) {
+void BaseObjO__func_571f8(BaseObjO *self, s32 arg1) {
     func_8001E57C()->slot88(self, arg1);
     /* Written as two nested guards, not a combined `arg1 >= 5 && arg1 < 9`
      * range test -- the combined form optimizes into a single unsigned
@@ -129,3 +131,15 @@ void func_800571F8(BaseObjO *self, s32 arg1) {
   optimization. Distinct from (though related in spirit to) the
   already-documented inverted-guard-clause family -- this one is about
   suppressing an unwanted STRENGTH REDUCTION, not about `if`/`else` layout.
+
+## Naming
+
+**`BaseObjO__func_571f8` -- tier C.** The most structurally involved
+function in this unit (74 words) and the existing report already
+describes its mechanics exhaustively (a range-gated dispatch through
+`slot8C`/`slot90`/`slotE8`, an "armed" check via `func_8001F3A4`, and a
+sign-based adjustment of `unk48` by `unk54`) -- but nothing establishes
+what the `arg1` range `[5,9)` selects between, what "armed" means in the
+game, or what `unk20`/`unk28`/`unk48`/`unk54` actually represent. Kept the
+tier-C `Class__func_xxxxx` form rather than inventing a purpose for the
+most consequential unknown in the unit.

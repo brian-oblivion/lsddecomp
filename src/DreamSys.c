@@ -84,7 +84,7 @@ void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 void func_80058A94(DreamSys *this)
 {
 	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
-	this->vt->func_80057130(this, this->unk_0x4C);
+	this->vt->BaseObjO__UnlinkCompanion(this, this->unk_0x4C);
 	func_80057C84()->slot0x50(this);
 }
 
@@ -767,7 +767,7 @@ void func_8005A050(DreamSys *this)
 void func_8005A0B0(DreamSys *this)
 {
 	if (this->unk_0xC4 != 0) {
-		this->vt->func_800573A8(this, &D_80087EA4);
+		this->vt->BaseObjO__AddVec14(this, &D_80087EA4);
 		this->unk_0x5C->unk_0x24 -= 0x258;
 	}
 	if (this->unk_0xC8 != 0)
@@ -1068,7 +1068,7 @@ bool func_8005A82C(DreamSys *this, PlayerSpawnPoint *currentPos)
 		return true;
 	this->unknwon_int_0x44 = 0;
 	this->unk_0x4C->methods->slot0xE8(this->unk_0x4C, local, &this->linkCoordinates);
-	this->vt->func_80057384(this, local);
+	this->vt->BaseObjO__SetVec14(this, local);
 	if (saved == 0)
 		return true;
 	if (this->isFlashbackSession)
@@ -1279,7 +1279,7 @@ void func_8005AF64(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
 	diff.y = a->y - b->y;
 	diff.z = a->z - b->z;
 	diff.y = 0;
-	this->vt->func_800573A8(this, &diff);
+	this->vt->BaseObjO__AddVec14(this, &diff);
 }
 
 s32 func_8005AFD0(DreamSys *this)
