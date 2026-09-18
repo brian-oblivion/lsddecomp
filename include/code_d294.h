@@ -755,7 +755,7 @@ u32 func_8001D3F8(Class6B5CCObj *self, u32 a1);
  * family as the five above. See src/code_d294_b.c for the per-function
  * shift/width/return-type notes. */
 u32 func_8001D424(Class6B5CCObj *self, u32 a1);
-s32 func_8001D450(Class6B5CCObj *self, s32 a1);
+s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1);
 u32 func_8001D480(Class6B5CCObj *self, u32 a1);
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1);
 

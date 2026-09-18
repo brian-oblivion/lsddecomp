@@ -4,7 +4,7 @@ Round 12, runner delta. `code_d294_b`.
 
 ## Summary
 
-Same family as `func_8001D450` (see that report) -- double-inversion
+Same family as `Class6B5CC__GetSetUnk10Flag7` (see that report) -- double-inversion
 (`a1 == 0` in, `== 0` on the result) wrapper around `GetSetBitField`, shift 8
 width 1, `s32` return type.
 

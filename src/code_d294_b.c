@@ -15,7 +15,7 @@ u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
  * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
  * return type as func_8001D344 rather than the plain `u32` of the other
  * three siblings. */
-s32 func_8001D450(Class6B5CCObj *self, s32 a1) {
+s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 7, 1, a1 == 0) == 0;
 }
 
@@ -24,7 +24,7 @@ u32 func_8001D480(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 9, 3, a1);
 }
 
-/* Same family as func_8001D450: double-inversion shape, shift 8 width 1. */
+/* Same family as Class6B5CC__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 8, 1, a1 == 0) == 0;
 }
