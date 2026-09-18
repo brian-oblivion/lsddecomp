@@ -1,6 +1,12 @@
 #include "common.h"
 #include "code_171e0.h"
 
+/* gActiveDataSource's two observed values are the header words of the two
+ * sibling classes it selects between: D_8006D4E8 (the CD-ROM read driver,
+ * code_179d8_q.c) and D_8006D9BC (the SPU/VAB streamer, code_179d8_e.c). */
+#define DATASOURCE_CD  0x13
+#define DATASOURCE_SPU 0x23
+
 void *GetClass6D3C8Methods(void) {
     return D_8006D3C8;
 }
@@ -87,7 +93,7 @@ extern void *func_8002C438(void);
 extern void *GetClass6D4E8Methods(void);
 
 void *GetActiveDataSourceMethods(void) {
-    if (gActiveDataSource == 0x23) {
+    if (gActiveDataSource == DATASOURCE_SPU) {
         return func_8002C438();
     } else {
         return GetClass6D4E8Methods();
@@ -121,7 +127,7 @@ extern s32 gActiveDataSource;
 extern s32 LockCd(void);
 
 void LockActiveDataSource(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         LockCd();
     }
 }
@@ -129,7 +135,7 @@ void LockActiveDataSource(void) {
 extern s32 UnlockCd(void);
 
 void UnlockActiveDataSource(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         UnlockCd();
     }
 }
@@ -137,7 +143,7 @@ void UnlockActiveDataSource(void) {
 extern s32 IsCdBusy(void);
 
 s32 IsActiveDataSourceBusy(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return IsCdBusy();
     }
     return 0;
@@ -146,7 +152,7 @@ s32 IsActiveDataSourceBusy(void) {
 extern s32 IsCdIdle(void);
 
 s32 IsActiveDataSourceIdle(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return IsCdIdle();
     }
     return 1;
@@ -155,7 +161,7 @@ s32 IsActiveDataSourceIdle(void) {
 extern s32 GetCdOperation(void);
 
 s32 GetActiveDataSourceOperation(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdOperation();
     }
     return 0;
@@ -164,7 +170,7 @@ s32 GetActiveDataSourceOperation(void) {
 extern s32 GetCdState(void);
 
 s32 GetActiveDataSourceState(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdState();
     }
     return 0;
@@ -178,7 +184,7 @@ void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
     Func80026F34Fn fn;
 
     fn = func_8002C468;
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
     do {
@@ -189,7 +195,7 @@ extern s32 GetCdDriverMode(void);
 extern s32 func_8002C448(void);
 
 s32 GetActiveDataSourceDriverMode(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdDriverMode();
     } else {
         return func_8002C448();
@@ -200,7 +206,7 @@ extern s32 func_80028B6C(void);
 extern s32 func_8002C478(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         return func_80028B6C();
     } else {
         return func_8002C478();
@@ -216,7 +222,7 @@ extern s32 ResolveFileEntries(void *arg0, s32 arg1);
 s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
     s32 idx;
 
-    if (gActiveDataSource == 0x13) {
+    if (gActiveDataSource == DATASOURCE_CD) {
         D_8008A850 = 1;
         SetFileTable(arg0);
         idx = GetFileTableCount();
