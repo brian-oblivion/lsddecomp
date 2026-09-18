@@ -22,7 +22,7 @@
 > members are all `s8`/`s16` has alignment 2, and that is what makes a
 > whole-struct assignment compile to unaligned `lwl`/`lwr` + `swl`/`swr`
 > instead of aligned `lw`/`sw`** (DECOMPILATION_LEARNINGS; `func_8004B38C`,
-> `FlashbackRotation`, and delta's `func_8001E2E8` this round). `PolyXY8` is
+> `FlashbackRotation`, and delta's `BisectSegmentToBox` this round). `PolyXY8` is
 > four `s16`, `PolyUV4` is two, and both live in `include/code_8220.h` with
 > the alignment requirement stated next to them, because one stray `s32`
 > member silently breaks the copy.

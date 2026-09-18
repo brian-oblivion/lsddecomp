@@ -63,7 +63,7 @@ current derivation.
   as a 6-bit word. "Outcode" is the standard name for exactly this
   Cohen-Sutherland region code, and the original report already identified
   the shape.
-- Corroborated by its caller: `func_8001E110` (code_d294_b) computes it for
+- Corroborated by its caller: `ClipSegmentToBox` (code_d294_b) computes it for
   two points and masks each result with `0xFF`, which is the classic
   outcode segment-vs-box trivial-accept/reject test.
 - Parameters already carry the derived types `BoundsBox_d294 *` /

@@ -1,3 +1,42 @@
+/* code_d294_b -- the second carve of the Class6B5CC segment (see
+ * include/code_d294.h's own banner and code_d294_c.c's file header for the
+ * class-identity derivation: Class6B5CC is this game's POSITIONED 3D OBJECT
+ * base class, MEASURED onto Psy-Q's GsDOBJ2/GsCOORDINATE2/GsCOORD2PARAM).
+ *
+ * Covers method-table slots +0x074 through +0x0B4 (tools/classtable.py
+ * D_8006B5CC) -- the table's own LAST 17 slots. In ROM order: four more
+ * self->unk10 bitfield accessors (the sibling family code_d294.c starts;
+ * two renamed this round, `Class6B5CC__GetSetUnk10Flag7`/`Field9`, two
+ * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
+ * symbol is comment-referenced from other units' own vtable census notes);
+ * a rotation-matrix builder (`func_8001D4DC`, proposed
+ * `Class6B5CC__GetRotMatrix`); a gated read-transform-notify chain
+ * (`Class6B5CC__ReadUnk20Data` -> `Class6B5CC__NotifyIfUnk20Active` ->
+ * `Class6B5CC__TransformAndNotifyParents`); two vtable no-op stubs
+ * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
+ * `func_8001D33C` no-op precedent); a command dispatcher over the same
+ * "attach" state (`func_8001D6B4`, proposed `Class6B5CC__DispatchLinkCommand`);
+ * a proximity-attach attempt (`func_8001D714`, STALL, proposed
+ * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-
+ * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
+ * overlap test (`Class6B5CC__CheckBoundsOverlap`, STALL, name only), and a
+ * plane-classification test (`func_8001DDF4`, STALL, proposed
+ * `Class6B5CC__ClassifyAgainstPlanes` -- the RESOLVED former `gp_rel`
+ * blocker, ordinary matching work now); a third no-op stub
+ * (`func_8001E49C`); a parent-list notify walk (`func_8001E4A4`, STALL,
+ * proposed `Class6B5CC__NotifyTaggedParents` -- naming only, matching
+ * this one is explicitly out of scope for this round); this unit's own
+ * vtable getter (`func_8001E57C`, proposed `GetClass6B5CCMethods`,
+ * cross-unit); and a small free-function pair for segment/AABB clipping
+ * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
+ * all) that `Class6B5CC__CheckBoundsOverlap` and `func_8001DDF4` build on.
+ *
+ * Four functions remain INCLUDE_ASM: `func_8001D714`, `Class6B5CC__CheckBoundsOverlap`,
+ * `func_8001DDF4`, `func_8001E4A4` -- all documented stalls, see
+ * docs/match-reports/. This round (54, bravo, track 3) is a NAMING pass
+ * only: no match was attempted on any of them.
+ */
+
 #include "common.h"
 #include "code_d294.h"
 
@@ -15,16 +54,16 @@ u32 func_8001D424(Class6B5CCObj *self, u32 a1) {
  * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
  * return type as func_8001D344 rather than the plain `u32` of the other
  * three siblings. */
-s32 func_8001D450(Class6B5CCObj *self, s32 a1) {
+s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 7, 1, a1 == 0) == 0;
 }
 
 /* Same family as func_8001D424, shift 9 width 3. Raw pass-through. */
-u32 func_8001D480(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__GetSetUnk10Field9(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 9, 3, a1);
 }
 
-/* Same family as func_8001D450: double-inversion shape, shift 8 width 1. */
+/* Same family as Class6B5CC__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
 s32 func_8001D4AC(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 8, 1, a1 == 0) == 0;
 }
@@ -51,18 +90,18 @@ void func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2) {
 
 /* a1 gates a small range (2 <= a1 < 4). When self->unk20 is set and
  * func_8001F3A4(self->unk20) reports true, fills a stack buffer through
- * this class's own +0x8C slot (func_8001D600, already matched in this
+ * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
  * unit -- fills it via func_8001F51C(self->unk20, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
- * (func_8001D624, also already matched in this unit), with the original
- * a1 passed through as func_8001D624's own a2. */
-void func_8001D568(Class6B5CCObj *self, s32 a1) {
-    /* Sized to reproduce retail's own frame (0x58): func_8001D600's own
+ * (Class6B5CC__TransformAndNotifyParents, also already matched in this unit), with the original
+ * a1 passed through as Class6B5CC__TransformAndNotifyParents's own a2. */
+void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
+    /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
      * target (func_8001F51C, PsyQ, asm/psyq_fa50.s, not
      * decompiled here) fills fields out past +0x32 of its own `dest`
      * argument, so the true destination struct is bigger than the 8 bytes
      * GenericCountList_d294 alone would reserve -- not derived beyond its
-     * size, since the field layout past what func_8001D624 itself reads
+     * size, since the field layout past what Class6B5CC__TransformAndNotifyParents itself reads
      * (+0x0/+0x4) is PsyQ-internal. */
     u8 buf[0x38];
 
@@ -87,7 +126,7 @@ void func_8001D568(Class6B5CCObj *self, s32 a1) {
  * func_8001F51C, untouched. func_8001F51C's own body (psyq_fa50.s)
  * has no deliberate return value -- see the extern's own comment -- so this
  * wrapper is void, not `return func_8001F51C(...)`. */
-void func_8001D600(Class6B5CCObj *self, void *dest) {
+void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
     func_8001F51C(self->unk20, dest);
 }
 
@@ -97,7 +136,7 @@ void func_8001D600(Class6B5CCObj *self, void *dest) {
  * for the duration of a single self->methods->slot30(self, a2) dispatch
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
-void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
+void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
     ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
     self->unk28 = 0;
     self->unk2C = 0;
@@ -129,7 +168,7 @@ void func_8001D6B4(Class6B5CCObj *self, s32 a1, s32 a2) {
 
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
- * (+0xA4 = func_8001D950, +0xA8 = func_8001DA28, +0xAC = func_8001DDF4)
+ * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = func_8001DDF4)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
 /* STALL -- see docs/match-reports/func_8001D714.md. Round 20: closed 11
@@ -223,7 +262,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001D714);
  * MulMatrix2) before using buf1 as ApplyMatrixToSVArray's own "out" argument,
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
-void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
+void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
     u8 buf2[0x20];
     u8 buf1[0x20];
     UnkOwner_d294 *node;
@@ -245,7 +284,7 @@ void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 
     }
 }
 
-/* STALL -- see docs/match-reports/func_8001DA28.md. Round 20: reached
+/* STALL -- see docs/match-reports/Class6B5CC__CheckBoundsOverlap.md. Round 20: reached
  * 14/243 words in-range (up from round 13's 6/243) after fixing the
  * frame size (0x98 -> 0xF8, a 24-word unused-buffer padding) and a
  * deferred-self-materialization residue (barrier as first statement).
@@ -254,7 +293,7 @@ void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 
  * structural work in the two loop bodies and tail comparison.
  * Restored to INCLUDE_ASM per project rule. */
 #if 0
-s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
     CornerList_d294 *list;
     Vec3S16_d294 *cur;
     s16 *zview;
@@ -382,7 +421,7 @@ s32 func_8001DA28(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
+INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
 
 /* STALL -- see docs/match-reports/func_8001DDF4.md. Round 46 (echo):
  * FIRST-EVER build/score for this function -- inherited round 45's
@@ -390,7 +429,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DA28);
  * (199/199 words in-range, no drift), 29/199 raw word-match, first real
  * diff at vram 0x8001DDF8 (register identity: `self` lands in $s4 here,
  * $s5 in retail). Two levers found this round: an unaccounted 0x18-byte
- * stack buffer (same "unused padding" shape as func_8001DA28's own
+ * stack buffer (same "unused padding" shape as Class6B5CC__CheckBoundsOverlap's own
  * history -- fixed the frame size, which was originally 0x18 short) and
  * a resolution of round 45's open Part-3 ambiguity (see the report).
  * Restored to INCLUDE_ASM per project rule. */
@@ -435,7 +474,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
     flag2 = 0;
     for (i = 0; i < count1; i++) {
         plane = func_8001F50C(self->unk20, i);
-        if (func_8001E110(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
+        if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0 || outWord >= 0x201) {
                     self->unk2C |= (1 << i);
@@ -464,7 +503,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
                 if (m == 1 || m == 2) {
                     u8 *rowM = rowBase;
                     u8 *rowMplus1 = rowBase + 0x18;
-                    if (func_8001E110(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                         if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                             if (D_8008A838 == 0 || outWord >= 0x201) {
                                 self->unk2C |= bitJ;
@@ -490,7 +529,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
  * derivation) and the register mapping exactly right, leaving one
  * standalone residue: an extra `move v1,v0` before the SECOND recursive
  * call's result test, where retail tests $v0 directly. Closed by a
- * first-ever permuter search (`docs/match-reports/func_8001E110.md`,
+ * first-ever permuter search (`docs/match-reports/ClipSegmentToBox.md`,
  * "Round 41"): the tautological trailing `if (mid.y) return 0; else
  * return 0;` below is not meaningful control flow -- both arms return 0,
  * exactly like the plain `return 0;` it replaces -- but it changes
@@ -499,7 +538,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", func_8001DDF4);
  * matching retail exactly. Kept because it is what's needed for
  * byte-exactness, not because it means anything; see the report for the
  * hand-lever history this replaced. */
-s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
+s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2) {
     u8 r1;
     u8 r2;
     Vec3S16_d294 mid;
@@ -517,7 +556,7 @@ s32 func_8001E110(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3
         goto shared_test;
     }
     if (out != NULL) {
-        func_8001E2E8(out, box, p2, p1);
+        BisectSegmentToBox(out, box, p2, p1);
     }
     return 3;
 
@@ -526,7 +565,7 @@ shared_test:
         goto combined;
     }
     if (out != NULL) {
-        func_8001E2E8(out, box, p1, p2);
+        BisectSegmentToBox(out, box, p1, p2);
     }
     return 2;
 
@@ -547,13 +586,13 @@ combined:
     }
 
     {
-        s32 result = func_8001E110(out, box, p1, &mid);
+        s32 result = ClipSegmentToBox(out, box, p1, &mid);
         if (result != 0) {
             return result;
         }
     }
     {
-        s32 result = func_8001E110(out, box, &mid, p2);
+        s32 result = ClipSegmentToBox(out, box, &mid, p2);
         if (result != 0) {
             return result;
         }
@@ -575,7 +614,7 @@ combined:
  * overshot, so it becomes the new `far`, otherwise it becomes the new
  * `near` -- each written into one of two ping-pong stack buffers so the
  * OTHER endpoint's storage is never disturbed. */
-void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
+void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
     Vec3S16_d294 buf0;
     Vec3S16_d294 buf1;
     Vec3S16_d294 *dst;

@@ -83,3 +83,25 @@ it as `buf.x = src->x; buf.y = src->y; ...` would very likely NOT reproduce
 this (untested here since the struct-assignment form matched first try, but
 consistent with how GCC 2.6.3 lowers struct copies elsewhere in this
 project).
+
+## Naming (round 54, bravo, track 3)
+
+**Not renamed -- PROPOSED only.** Proposed name: `Class6B5CC__GetRotMatrix`
+(tier B). Slot `+0x084` occupant (`tools/classtable.py D_8006B5CC`),
+dispatched as `slot84(self, out, flag)` from both this unit's own
+`Class6B5CC__ComposeAndApplyRotation` (`self` as receiver) and
+`code_d294_c.c`'s `Class6B5CC__RotateLocalVector` (a different
+Class6B5CCObj instance) -- so the SIGNATURE this file declares
+(`func_8001D4DC(Class6B5CCObj *self, s32 a1, s32 a2)`) is really
+`(self, MATRIX *out, s32 negate)`: builds this object's own rotation
+quad (`self->unk14->unk44->vec`, the PSY-Q-identified `GsCOORD2PARAM.rotate`
+per `include/code_d294.h`'s own "PSY-Q IDENTIFICATION" note -- negated
+per-axis when `negate` is set, copied verbatim otherwise) and hands it
+to Sony's `RotMatrix(vec, out)` to fill the caller's matrix. "GetRotMatrix"
+describes the measured mechanics (compute-and-write-out this object's
+rotation matrix, optionally mirrored); tier B because the negate flag's
+in-game meaning (which callers want the mirrored form, and why) is not
+established from this function's own body. Held back from an actual
+rename because this symbol is referenced (in a comment) from
+`src/code_d294_c.c:27` -- a different unit -- discussing exactly the
+slot-84 relationship above. Posted to the broadcast.

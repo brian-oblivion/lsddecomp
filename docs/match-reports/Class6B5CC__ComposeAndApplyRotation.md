@@ -1,11 +1,13 @@
-# func_8001D950 — MATCHED
+> Renamed from `func_8001D950` on 2026-09-18 (tools/rename.py). Address 0x8001d950.
+
+# Class6B5CC__ComposeAndApplyRotation — MATCHED
 
 Unit: `code_d294_b`. Round 13, runner delta. 54/54 words, full match.
 
 ## Signature
 
 ```c
-void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
+void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
 ```
 
 `count` is the 5th argument, passed on the incoming stack (`lw $a2, 0x78($sp)`
@@ -15,7 +17,7 @@ inside the function — the caller's stack-arg slot, at `newsp + 0x68(own frame)
 ## What it does
 
 ```c
-void func_8001D950(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
+void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
     u8 buf2[0x20];
     u8 buf1[0x20];
     UnkOwner_d294 *node;
@@ -128,3 +130,19 @@ all.
   view types):** does not apply. This function has exactly one walker
   (`node`, over `self->unkC`'s list), not a strided dual-walk over one
   array.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D950` via `tools/rename.py`. **Tier B** -- slot
+`+0x0A4` occupant. Builds `self`'s own rotation matrix via
+`self->methods->slot84` (occupant `func_8001D4DC`, proposed
+`Class6B5CC__GetRotMatrix` below -- not renamed, cross-unit reference),
+folds in every `self->unkC` list node's own `slot84` output via
+`MulMatrix2` (a compose step), then applies the composed matrix to one
+or two vertex arrays via `ApplyMatrixToSVArray`. Name describes the
+measured mechanics (compose a matrix by walking a list, then apply it);
+whether `self->unkC` is a parent-hierarchy chain in the game sense is a
+reasonable reading, not an independently confirmed one. Purely local to
+this unit + its header for the FUNCTION rename; the underlying vtable
+FIELD name (`slotA4`) is proposed, not renamed -- see below, it is also
+dispatched from `code_d294_c.c` (a different unit).

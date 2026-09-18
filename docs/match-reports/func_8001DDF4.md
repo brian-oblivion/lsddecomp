@@ -12,7 +12,7 @@ resolved below.
 Signature `s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
-`func_8001F50C` planes, gated by `func_8001E110`/`func_8001F8B8`, setting
+`func_8001F50C` planes, gated by `ClipSegmentToBox`/`func_8001F8B8`, setting
 bits in `self->unk2C`) both fully derived and high-confidence. Part 3 (a
 second, `list`-driven double loop) was flagged NOT fully decoded: "the
 precise relationship between the middle `k` loop ... and the inner fixed-4
@@ -24,7 +24,7 @@ Re-read `asm/nonmatchings/code_d294_b/func_8001DDF4.s` lines 197-268
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
-  box-test body (the `func_8001E110`/`func_8001F8B8` pair) only executes
+  box-test body (the `ClipSegmentToBox`/`func_8001F8B8` pair) only executes
   when `(u32)(m - 1) < 2`, i.e. **`m == 1` or `m == 2`** -- confirmed at
   `sltiu $v0, $v0, 2` / `beqz $v0, .L8001E094` (vram 0x8001E00C-0x8001E010).
   `m == 0` and `m == 3` fall straight through to the loop-continue check with
@@ -109,7 +109,7 @@ every subsequent word differed as a result (nothing downstream can line up
 while the frame pointer itself is wrong).
 
 **Fix: add an unused `u8 pad[0x18];` local.** This is the same shape as
-`func_8001DA28`'s own history in this unit (round 20: "fixing the frame size
+`Class6B5CC__CheckBoundsOverlap`'s own history in this unit (round 20: "fixing the frame size
 (0x98 -> 0xF8, a 24-word unused-buffer padding)") -- GCC 2.6.3 reserves
 stack space for locals whose source declaration doesn't survive into any
 generated reference (dead-but-declared buffers, or -- more likely here,
@@ -185,7 +185,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
     flag2 = 0;
     for (i = 0; i < count1; i++) {
         plane = func_8001F50C(self->unk20, i);
-        if (func_8001E110(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
+        if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0 || outWord >= 0x201) {
                     self->unk2C |= (1 << i);
@@ -214,7 +214,7 @@ s32 func_8001DDF4(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *l
                 if (m == 1 || m == 2) {
                     u8 *rowM = rowBase;
                     u8 *rowMplus1 = rowBase + 0x18;
-                    if (func_8001E110(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                         if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                             if (D_8008A838 == 0 || outWord >= 0x201) {
                                 self->unk2C |= bitJ;
@@ -253,8 +253,28 @@ literal ZERO figure to a real, if incomplete, score in one sitting by
 transcribing the high-confidence parts of an inherited derivation and
 building it -- the frame-size gap alone (a single missing padding buffer)
 cost 15/199 words before it was found, exactly the same lever
-`func_8001DA28` needed in this same unit two rounds ago.** When a derivation
+`Class6B5CC__CheckBoundsOverlap` needed in this same unit two rounds ago.** When a derivation
 report is inherited with NO C ever attempted, build the solid parts first
 and let the frame-size check (word 0 of `funcdiff`'s output) tell you
 immediately whether an unaccounted local exists, rather than reading
 further into the diff before that's settled.
+
+## Naming (round 54, bravo, track 3)
+
+**Not renamed -- PROPOSED only.** Proposed name: `Class6B5CC__ClassifyAgainstPlanes`
+(tier B). STALL, still `INCLUDE_ASM`; not attempted for a match this
+round (naming pass only, and this is the documented `gp_rel`-history
+blocker's successor -- see CLAUDE.md's "Open toolchain blockers" table,
+now RESOLVED, so this function is ordinary matching work for whoever
+picks it up next). Slot `+0x0AC` occupant: computes a fixed 2-row
+box-midpoint average, then classifies it against every one of
+`self->unk20`'s planes (via `ClipSegmentToBox`/`func_8001F8B8`,
+setting bits in `self->unk2C`), and if none set, runs a second,
+`list`-driven sliding-window pass doing the same per-plane
+classification over a corner list. "ClassifyAgainstPlanes" describes
+the measured mechanics (a plane-membership/clip test, not a specific
+game concept); which planes `self->unk20` holds is not established
+beyond "the same planes `Class6B5CC__CheckBoundsOverlap` reads." Held
+back from an actual rename because this symbol is referenced (in a
+comment) from `src/code_d294_c.c:414` -- a different unit. Posted to
+the broadcast.

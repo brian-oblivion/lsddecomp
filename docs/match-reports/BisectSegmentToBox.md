@@ -1,4 +1,6 @@
-# func_8001E2E8 — MATCHED
+> Renamed from `func_8001E2E8` on 2026-09-18 (tools/rename.py). Address 0x8001e2e8.
+
+# BisectSegmentToBox — MATCHED
 
 Unit: `code_d294_b`. Round 13, runner delta. 109/109 words, full match on the
 first attempt.
@@ -6,10 +8,10 @@ first attempt.
 ## Signature
 
 ```c
-void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
+void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 ```
 
-Confirmed against its only caller, `func_8001E110` (same unit, still
+Confirmed against its only caller, `ClipSegmentToBox` (same unit, still
 queued): both call sites pass `(dest, boundsPtr, endpointA, endpointB)`,
 with the last two arguments swapped between the two call sites (consistent
 with a symmetric `near`/`far` pair, not a fixed-role 3rd/4th argument).
@@ -23,7 +25,7 @@ result is whatever `*out` holds when the function returns, not a return
 value.
 
 ```c
-void func_8001E2E8(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
+void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far) {
     Vec3S16_d294 buf0;
     Vec3S16_d294 buf1;
     Vec3S16_d294 *dst;
@@ -103,7 +105,7 @@ iteration — this is why there are two 6-byte stack slots (`sp+0x0`,
 
 - New `Vec3S16_d294` (`{ s16 x, y, z; }`, 6 bytes) and `BoundsBox_d294`
   (`{ Vec3S16_d294 lo, hi; }`, 12 bytes) types.
-- Prototype for `func_8001E2E8` itself.
+- Prototype for `BisectSegmentToBox` itself.
 
 ## Proposed learning
 
@@ -113,3 +115,12 @@ struct's whole-value assignment is the way to reliably reproduce retail's
 instance) — worth promoting to DECOMPILATION_LEARNINGS as a standing idiom
 alongside the existing `FlashbackRotation` entry, since this project now has
 three independent confirming instances across two units.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001E2E8` via `tools/rename.py`. **Tier A** -- a free
+function, `ClipSegmentToBox`'s only caller: bisects `[near, far]`
+against an AABB until the running midpoint exactly equals one endpoint,
+writing the midpoint into `*out` every iteration. Mechanics unambiguous
+from the body and the one caller. Purely local to this unit + its
+header.

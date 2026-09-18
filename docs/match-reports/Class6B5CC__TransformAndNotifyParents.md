@@ -1,11 +1,13 @@
-# func_8001D624 -- MATCHED (32/32 words)
+> Renamed from `func_8001D624` on 2026-09-18 (tools/rename.py). Address 0x8001d624.
+
+# Class6B5CC__TransformAndNotifyParents -- MATCHED (32/32 words)
 
 Round 12, runner delta. `code_d294_b`.
 
 ## Summary
 
 ```c
-void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
+void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
     ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
     self->unk28 = 0;
     self->unk2C = 0;
@@ -15,7 +17,7 @@ void func_8001D624(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
 }
 ```
 
-Seeded with m2c (`--sig 'void func_8001D624(Class6B5CCObj *self, void *a1, s32 a2)'`),
+Seeded with m2c (`--sig 'void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, void *a1, s32 a2)'`),
 which independently produced the same shape (a CSE'd `temp = a1 + 4;` used
 for both `ApplyMatrixToSVArray` args, the two zero-stores, the stash-and-clear of
 `unk30`, and the vtable dispatch) -- matched first try after typing m2c's
@@ -52,10 +54,20 @@ loose `void *`/`*a1` reads into real fields.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/func_8001D624.s`).
+Disassembly (`asm/nonmatchings/code_d294_b/Class6B5CC__TransformAndNotifyParents.s`).
 
 ### Proposed learning
 
 None new -- this just extends the "opaque view typed only to the one call
 site that needs it" convention already established repeatedly in this file
 (`GenericObj_d294`, `UnkOwner_d294`) to a third shape.
+
+## Naming (round 54, bravo, track 3)
+
+Renamed from `func_8001D624` via `tools/rename.py`. **Tier B** -- slot
+`+0x090` occupant. Transforms `a1`'s array through
+`self->unk14->unk24` then stashes `a1` into `self->unk30` for exactly
+one `self->methods->slot30` (`BasicClass__NotifyParents`, inherited)
+dispatch. Mechanics measured from the disassembly; the in-game reason
+for notifying parents with a freshly-transformed array is not
+established. Purely local to this unit + its header.

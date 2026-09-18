@@ -206,7 +206,7 @@ comment**, invisible until this function was actually matched: the
 matched code reads FROM `dest` into the stack buffer and forwards `src`
 raw (unchanged) to `func_80015D58` -- the OPPOSITE of the header's
 earlier prose ("reading from `src`... into `dest`"). This asymmetry was
-undetectable from `ApplyMatrixToSVArray`'s one known caller (`func_8001D624`),
+undetectable from `ApplyMatrixToSVArray`'s one known caller (`Class6B5CC__TransformAndNotifyParents`),
 which always passes `src == dest`. The header comment is updated; the
 declared C signature (`void *src, void *dest, ...`) is UNCHANGED, only
 the prose describing which parameter plays which role.
@@ -251,7 +251,7 @@ swap between a function's own parameters.
 - **Parameters corrected to `(dst, src, count, m)`.** The previous names had
   destination and source the wrong way round: the loop copies an element out
   of the 2nd argument and calls `ApplyMatrixSV(m, &buf, dst)`, so the 1st
-  argument is written. Both call sites (`func_8001D624`, `func_8001D950`,
+  argument is written. Both call sites (`Class6B5CC__TransformAndNotifyParents`, `Class6B5CC__ComposeAndApplyRotation`,
   code_d294_b) pass the same address for both, which is why it was
   invisible. Names only -- no type, arity or order change; byte-identical.
 - **The local `Rec6_d294` typedef is gone**, replaced by the existing

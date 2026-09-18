@@ -8,7 +8,7 @@ adjacent-`mult`/`div` hit.
 
 **No C was written or built for this function.** Given the size, the two
 still-uncarved callees it depends on (`func_8001F8B8`, `slotA4`'s
-occupant `func_8001D950`), and the amount of genuinely new field/struct
+occupant `Class6B5CC__ComposeAndApplyRotation`), and the amount of genuinely new field/struct
 derivation needed, a full structural read was the higher-value use of
 this session's remaining time over a first, likely-incomplete C attempt.
 This does NOT count against the 30-attempt budget -- the analysis below
@@ -29,7 +29,7 @@ if (self->unk10 < 0) {
     <accumulate self's own "attached node" list into self->unk14->unk38>
 }
 <compute a 3-entry s16 delta between arg2 and self->unk14->unk38 (or {0,0,0} if self->unkC==0)>
-self->methods->slotA4(self, 0, /* &sp+0x18-ish scratch */, /* &delta */, 1);  /* 5 args, occupant func_8001D950, code_d294_b, out of scope */
+self->methods->slotA4(self, 0, /* &sp+0x18-ish scratch */, /* &delta */, 1);  /* 5 args, occupant Class6B5CC__ComposeAndApplyRotation, code_d294_b, out of scope */
 if (!func_8001F8B8(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_minus_1024)) {
     if (!func_8001F8B8(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_plus_1024)) {
         return 0;
@@ -44,7 +44,7 @@ return 1;
 
 - **`Class6B5CCObj` gains (at least) THREE new fields**, all read directly
   off `self` (not through `unk14`):
-  - `+0x20`: ALREADY typed `void *unk20` (round 12, `func_8001D600`) --
+  - `+0x20`: ALREADY typed `void *unk20` (round 12, `Class6B5CC__ReadUnk20Data`) --
     this function is a SECOND confirming use, null-checked at entry (a
     `return 0` guard) and later passed as `func_8001F8B8`'s own first
     argument. No retype needed, just a second confirmed non-NULL-checked
@@ -105,7 +105,7 @@ return 1;
   "does this candidate angle lead to something valid" test, but that's
   inference, not confirmed.
 - **New `Class6B5CCMethods` slot needed: `+0xA4`** (occupant
-  `func_8001D950`, `code_d294_b`, confirmed via `tools/classtable.py
+  `Class6B5CC__ComposeAndApplyRotation`, `code_d294_b`, confirmed via `tools/classtable.py
   D_8006B5CC`, out of this carve's scope) -- called with 5 arguments
   (`self`, `0`, two scratch pointers, `1`), signature not yet pinned down
   precisely enough to commit.
@@ -603,7 +603,7 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     `Class6B5CC__FaceTarget` are both consumers of that field.
   - The rest computes the target point `arg2` relative to that world
     position, rotates the delta into the object's own frame via `slotA4`
-    (func_8001D950, the inverse-chain matrix: `slot84` with the NEGATED
+    (Class6B5CC__ComposeAndApplyRotation, the inverse-chain matrix: `slot84` with the NEGATED
     angle flag, composed down the owner list with `MulMatrix2`), then calls
     `func_8001F8B8` twice -- once with the Y component minus 0x400 and, on
     failure, once plus 0x400, i.e. +/- 90 degrees -- and finally returns
