@@ -115,8 +115,28 @@ def name_in_use(name):
     return code, prose
 
 
-def is_text_symbol(addr):
-    """Is this address inside the executable's text, per the linked ELF?"""
+def is_text_symbol(name, addr):
+    """Is this symbol a FUNCTION? Decided from splat's own labelling first:
+    `glabel NAME` in a text `.s` is a function, `dlabel NAME` under asm/data/
+    is data. The linked ELF is only a fallback, because splat's data labels
+    come out of the link typed `T` (D_8006B58C, a method table, reads as a
+    function there), and a wrong `type:func` in the symbols file would make
+    splat disassemble a table as code."""
+    esc = re.escape(name)
+    for p in ROOT.glob("asm/data/*.s"):
+        if re.search(rf"^dlabel {esc}$", p.read_text(errors="replace"), re.M):
+            return False
+    for p in list(ROOT.glob("asm/*.s")) + list(ROOT.glob("asm/nonmatchings/**/*.s")):
+        if re.search(rf"^glabel {esc}$", p.read_text(errors="replace"), re.M):
+            return True
+    # Already-C functions have no .s: a src/ definition, or a symbols-file
+    # line that says type:func (an untyped line proves nothing either way).
+    for p in ROOT.glob("src/**/*.c"):
+        if re.search(rf"^\w[^;=]*?\b{esc}\s*\([^;{{]*\)\s*\{{", p.read_text(errors="replace"), re.M):
+            return True
+    for line in SYMBOLS.read_text().splitlines():
+        if re.match(rf"^\s*{esc}\s*=", line) and "type:func" in line:
+            return True
     nm = ROOT / "tools/binutils/bin/mipsel-linux-gnu-nm"
     elf = ROOT / "build/lsdde.elf"
     if not (nm.exists() and elf.exists()):
@@ -125,7 +145,7 @@ def is_text_symbol(addr):
                          text=True).stdout
     for line in out.splitlines():
         parts = line.split()
-        if len(parts) == 3 and int(parts[0], 16) == addr:
+        if len(parts) == 3 and int(parts[0], 16) == addr and parts[2] == name:
             return parts[1] in ("T", "t")
     return None
 
@@ -168,7 +188,7 @@ def main():
     if report_new.exists():
         sys.exit(f"FATAL: {report_new.relative_to(ROOT)} already exists")
 
-    is_text = is_text_symbol(addr)
+    is_text = is_text_symbol(old, addr)
     kind = "func" if is_text else ("data" if is_text is False else "unknown")
 
     print(f"rename {old} -> {new}   ({addr:#x}, {kind})")
