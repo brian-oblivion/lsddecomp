@@ -34,18 +34,20 @@ void Noop(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * Group 1: LinkOwnerObj__ReleaseLinks / LinkOwnerObj__RandomizeLinks / LinkOwnerObj__ReleaseLinksB.
+ * Group 1: LinkOwnerObj__ReleaseLinks / LinkOwnerObj__ReleaseLinksB /
+ * LinkOwnerObj__RandomizeLinks / LinkOwnerObj__func_56e1c.
  * Self is some larger object with an inline 5-element `BasicClass *`
- * array at +0x084.  LinkOwnerObj__ReleaseLinks/LinkOwnerObj__ReleaseLinksB release the whole array
- * (ReleaseBasicClassArray, already established elsewhere as
- * `void ReleaseBasicClassArray(BasicClass **array, s32 count)` in code_8220_b.c --
- * kept generic `void **` here per this project's per-unit convention for
- * that symbol, e.g. code_2cc8c.h's own looser reading).  LinkOwnerObj__RandomizeLinks
- * walks array indices [1..4] (self+0x88 .. self+0x94), which is exactly
- * inside the same 5-element array, and for each element calls its own
- * vtable slot +0x048 with a random Vec3-ish table entry, then sets the
- * element's own +0x084 field to a random "angle" value
- * (`(rand() % 360) << 12`, a degrees->fixed-point conversion).
+ * array at +0x084 (`links`). ReleaseLinks/ReleaseLinksB (two identical,
+ * separate ROM functions -- see their own reports) release the whole
+ * array via ReleaseBasicClassArray, already established elsewhere as
+ * `void ReleaseBasicClassArray(BasicClass **array, s32 count)` in
+ * code_8220_b.c -- kept generic `void **` here per this project's
+ * per-unit convention for that symbol, e.g. code_2cc8c.h's own looser
+ * reading. RandomizeLinks walks array indices [1..4] (self+0x88 ..
+ * self+0x94), which is exactly inside the same 5-element array, and for
+ * each element calls its own vtable slot +0x048 with a random Vec3-ish
+ * table entry, then sets the element's own `angle` field to a random
+ * value (`(rand() % 360) << 12`, a degrees->fixed-point conversion).
  * ------------------------------------------------------------------ */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
