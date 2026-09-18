@@ -1,3 +1,42 @@
+/* code_d294_b -- the second carve of the Class6B5CC segment (see
+ * include/code_d294.h's own banner and code_d294_c.c's file header for the
+ * class-identity derivation: Class6B5CC is this game's POSITIONED 3D OBJECT
+ * base class, MEASURED onto Psy-Q's GsDOBJ2/GsCOORDINATE2/GsCOORD2PARAM).
+ *
+ * Covers method-table slots +0x074 through +0x0B4 (tools/classtable.py
+ * D_8006B5CC) -- the table's own LAST 17 slots. In ROM order: four more
+ * self->unk10 bitfield accessors (the sibling family code_d294.c starts;
+ * two renamed this round, `Class6B5CC__GetSetUnk10Flag7`/`Field9`, two
+ * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
+ * symbol is comment-referenced from other units' own vtable census notes);
+ * a rotation-matrix builder (`func_8001D4DC`, proposed
+ * `Class6B5CC__GetRotMatrix`); a gated read-transform-notify chain
+ * (`Class6B5CC__ReadUnk20Data` -> `Class6B5CC__NotifyIfUnk20Active` ->
+ * `Class6B5CC__TransformAndNotifyParents`); two vtable no-op stubs
+ * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
+ * `func_8001D33C` no-op precedent); a command dispatcher over the same
+ * "attach" state (`func_8001D6B4`, proposed `Class6B5CC__DispatchLinkCommand`);
+ * a proximity-attach attempt (`func_8001D714`, STALL, proposed
+ * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-
+ * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
+ * overlap test (`Class6B5CC__CheckBoundsOverlap`, STALL, name only), and a
+ * plane-classification test (`func_8001DDF4`, STALL, proposed
+ * `Class6B5CC__ClassifyAgainstPlanes` -- the RESOLVED former `gp_rel`
+ * blocker, ordinary matching work now); a third no-op stub
+ * (`func_8001E49C`); a parent-list notify walk (`func_8001E4A4`, STALL,
+ * proposed `Class6B5CC__NotifyTaggedParents` -- naming only, matching
+ * this one is explicitly out of scope for this round); this unit's own
+ * vtable getter (`func_8001E57C`, proposed `GetClass6B5CCMethods`,
+ * cross-unit); and a small free-function pair for segment/AABB clipping
+ * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
+ * all) that `Class6B5CC__CheckBoundsOverlap` and `func_8001DDF4` build on.
+ *
+ * Four functions remain INCLUDE_ASM: `func_8001D714`, `Class6B5CC__CheckBoundsOverlap`,
+ * `func_8001DDF4`, `func_8001E4A4` -- all documented stalls, see
+ * docs/match-reports/. This round (54, bravo, track 3) is a NAMING pass
+ * only: no match was attempted on any of them.
+ */
+
 #include "common.h"
 #include "code_d294.h"
 
