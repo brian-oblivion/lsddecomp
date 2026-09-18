@@ -99,16 +99,16 @@ typedef struct LinkElemMethods {
 struct LinkElemObj {
     LinkElemMethods *methods; /* +0x000 */
     u8 pad4[0x80];             /* +0x004 .. +0x083, unknown */
-    s32 unk84;                   /* +0x084, a random "angle" set by LinkOwnerObj__RandomizeLinks */
+    s32 angle;                   /* +0x084, a random "angle" set by LinkOwnerObj__RandomizeLinks */
 };
 
 typedef struct LinkOwnerObj {
     u8 pad0[0x84];              /* +0x000 .. +0x083, unknown */
-    LinkElemObj *arr84[5];        /* +0x084 .. +0x097 */
+    LinkElemObj *links[5];        /* +0x084 .. +0x097 */
 } LinkOwnerObj;
 
 void LinkOwnerObj__ReleaseLinks(LinkOwnerObj *this) {
-    ReleaseBasicClassArray((void **)this->arr84, 5);
+    ReleaseBasicClassArray((void **)this->links, 5);
 }
 
 extern void func_80056D18(void *arg0, s32 arg1, s32 arg2, s32 arg3);
@@ -118,19 +118,19 @@ void LinkOwnerObj__func_56e1c(void *this) {
 }
 
 void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {
-    LinkElemObj **p = &this->arr84[1];
+    LinkElemObj **p = &this->links[1];
     s32 i;
 
     for (i = 0; i < 4; i++, p++) {
         u32 r = rand();
 
         (*p)->methods->slot48(*p, 1, &D_8008788C[r % 6]);
-        (*p)->unk84 = (rand() % 360) << 12;
+        (*p)->angle = (rand() % 360) << 12;
     }
 }
 
 void LinkOwnerObj__ReleaseLinksB(LinkOwnerObj *this) {
-    ReleaseBasicClassArray((void **)this->arr84, 5);
+    ReleaseBasicClassArray((void **)this->links, 5);
 }
 
 /* ------------------------------------------------------------------ *
@@ -174,7 +174,7 @@ typedef struct Buf38O {
     u8 raw[0x38];
 } Buf38O;
 
-/* self->unk14's pointee (BaseObjO__UpdateVec14): +0x000 is a word cleared after
+/* self->vecTarget's pointee (BaseObjO__UpdateVec14): +0x000 is a word cleared after
  * the vector at +0x018 is written/accumulated into. */
 typedef struct Unk14ObjO {
     s32 unk0;      /* +0x000 */
@@ -207,9 +207,9 @@ struct BaseObjOMethods {
     void *unk04;                                         /* +0x004 */
     BaseObjO *(*ctor)(BaseObjO *self);                     /* +0x008 BaseObjO__BaseObjO (this unit) */
     void (*dtor)(BaseObjO *self);                            /* +0x00C */
-    void (*slot10)(BaseObjO *self, TagWordObjO *arg);          /* +0x010 BaseObjO__LinkCompanion (this unit) */
-    void (*slot14)(BaseObjO *self, TagWordObjO *arg);            /* +0x014 BaseObjO__UnlinkCompanion (this unit) */
-    void (*slot18)(BaseObjO *self);                                 /* +0x018 BaseObjO__ClearCompanions (this unit) */
+    void (*linkCompanion)(BaseObjO *self, TagWordObjO *arg);   /* +0x010 BaseObjO__LinkCompanion (this unit) */
+    void (*unlinkCompanion)(BaseObjO *self, TagWordObjO *arg); /* +0x014 BaseObjO__UnlinkCompanion (this unit) */
+    void (*clearCompanions)(BaseObjO *self);                   /* +0x018 BaseObjO__ClearCompanions (this unit) */
     u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
     void (*slot40)(BaseObjO *self);                                     /* +0x040, called by BaseObjO__BaseObjO's own ctor; occupant outside this unit */
     u8 pad44[0x80 - 0x44];                                                /* +0x044 .. +0x07F */
@@ -218,13 +218,13 @@ struct BaseObjOMethods {
     void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by BaseObjO__func_571f8 */
     void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by BaseObjO__func_571f8 */
     u8 pad94[0xBC - 0x94];                                                       /* +0x094 .. +0x0BB */
-    void (*slotBC)(BaseObjO *self, Vec3O *arg1);                                  /* +0x0BC BaseObjO__AddVec14 (this unit), called by BaseObjO__ApplyRotatedVec14 */
+    void (*addVec14)(BaseObjO *self, Vec3O *arg1);                                /* +0x0BC BaseObjO__AddVec14 (this unit), called by BaseObjO__ApplyRotatedVec14 */
 };
 
 struct BaseObjO {
     BaseObjOMethods *methods; /* +0x000 */
     u8 pad4[0x10];              /* +0x004 .. +0x013, unknown */
-    Unk14ObjO *unk14;             /* +0x014 */
+    Unk14ObjO *vecTarget;             /* +0x014 */
     u8 pad18[0x8];                  /* +0x018 .. +0x01F, unknown */
     void *unk20;                      /* +0x020, checked non-NULL and passed to func_8001F3A4 */
     u8 pad24[0x4];                      /* +0x024 .. +0x027, unknown */
@@ -233,8 +233,8 @@ struct BaseObjO {
     s32 unk44;                                /* +0x044 */
     s16 unk48;                                  /* +0x048 */
     u8 pad4A[0x2];                                /* +0x04A .. +0x04B, unknown */
-    TagWordObjO *unk4C;                             /* +0x04C, companion-object pointer #1 (header&0xFFF==0x114) */
-    TagWordObjO *unk50;                               /* +0x050, companion-object pointer #2 (header&0xF==5) */
+    TagWordObjO *companion1;                             /* +0x04C, companion-object pointer #1 (header&0xFFF==0x114) */
+    TagWordObjO *companion2;                               /* +0x050, companion-object pointer #2 (header&0xF==5) */
     s32 unk54;                                          /* +0x054 */
 };
 
@@ -290,8 +290,8 @@ BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
     }
     self->methods = func_80057C84();
     self->unk44 = 0;
-    self->unk4C = NULL;
-    self->unk50 = NULL;
+    self->companion1 = NULL;
+    self->companion2 = NULL;
     self->methods->slot40(self);
     return self;
 fail:
@@ -304,9 +304,9 @@ void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     func_8001E57C()->slot10(self, arg);
     tag = arg->methods->header;
     if ((tag & 0xFFF) == 0x114) {
-        self->unk4C = arg;
+        self->companion1 = arg;
     } else if ((tag & 0xF) == 5) {
-        self->unk50 = arg;
+        self->companion2 = arg;
     }
 }
 
@@ -314,16 +314,16 @@ void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag = arg->methods->header;
 
     if ((tag & 0xFFF) == 0x114) {
-        self->unk4C = NULL;
+        self->companion1 = NULL;
     } else if ((tag & 0xF) == 5) {
-        self->unk50 = NULL;
+        self->companion2 = NULL;
     }
     func_8001E57C()->slot14(self, arg);
 }
 
 void BaseObjO__ClearCompanions(BaseObjO *self) {
-    self->unk4C = NULL;
-    self->unk50 = NULL;
+    self->companion1 = NULL;
+    self->companion2 = NULL;
     func_8001E57C()->slot18(self);
 }
 
@@ -406,7 +406,7 @@ void BaseObjO__AddVec14(BaseObjO *self, Vec3O *arg1) {
 
 void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v) {
     BaseObjO *t = self;
-    Unk14ObjO *u = t->unk14;
+    Unk14ObjO *u = t->vecTarget;
 
     if (flag) {
         u->vec18 = *v;
@@ -415,7 +415,7 @@ void BaseObjO__UpdateVec14(BaseObjO *self, s32 flag, Vec3O *v) {
         u->vec18.y += v->y;
         u->vec18.z += v->z;
     }
-    t->unk14->unk0 = 0;
+    t->vecTarget->unk0 = 0;
 }
 
 extern void Class6B5CC__RotateLocalVector(BaseObjO *self, Vec3O *dst, s16 *src);
@@ -424,7 +424,7 @@ void BaseObjO__ApplyRotatedVec14(BaseObjO *self, s16 *arg1) {
     Vec3O buf;
 
     Class6B5CC__RotateLocalVector(self, &buf, arg1);
-    self->methods->slotBC(self, &buf);
+    self->methods->addVec14(self, &buf);
 }
 
 extern s32 D_8008ABA8;
