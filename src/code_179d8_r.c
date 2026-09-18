@@ -2,28 +2,42 @@
 
 /*
  * code_179d8_r -- tail slice of the code_179d8 monolith, carved round 45.
- * Runner foxtrot. Cold ground: none of these 10 functions has ever been
- * attempted before this round.
+ * Named (track 3), round 53 -- runner alpha. All 10 functions were already
+ * matched C when this pass started (fresh carve, round 45/46, runner
+ * foxtrot); nothing here changes a single byte, only names.
  *
- * This slice and the adjacent code_179d8_q (runner echo) share callees
- * LockCd (lock: gCdLock = 1) and UnlockCd (unlock:
- * gCdLock = 0), both defined in code_179d8_q.c. Declared locally here,
- * never in a shared header -- see CLAUDE.md on per-unit local views.
+ * This slice and the adjacent code_179d8_q (runner echo, the CD-ROM read
+ * driver's module-level half) share callees LockCd (lock: gCdLock = 1) and
+ * UnlockCd (unlock: gCdLock = 0), both defined in code_179d8_q.c. Declared
+ * locally here, never in a shared header -- see CLAUDE.md on per-unit local
+ * views.
  *
- * The slice implements a small CD-read state machine:
- *   - gCdState holds the current state/phase.
- *   - gCdTimeoutCounter is a timeout counter, reset by SetCdState.
- *   - TickCdStateMachine / TickCdLoadFileStateMachine are near-identical per-tick state
- *     machine steps (driven from ServiceCdDriver in code_179d8_q via
- *     gCdTickStep == 1 / == 2), differing only in their state==2 and
- *     state==8-success handling.
- *   - StartCdOperation / ResetCdStateMachine are the "start" / "reset" bookends of
- *     that state machine.
- *   - AllocCdRequestNode / FreeCdRequestNode are a generic doubly-linked-list
- *     append/remove+free pair over 0x24-byte nodes, list head gCdRequestQueue.
+ * The slice implements the driver's small CD-read state machine plus its
+ * two support structures:
+ *   - gCdState holds the current phase: 1 = issue a CdlSetloc seek, 2 = poll
+ *     CdSync for it, 7 = issue CdRead, 8 = poll CdReadSync; gCdTimeoutCounter
+ *     is the busy-wait counter both tick functions bump while polling,
+ *     cleared on every phase change by SetCdState.
+ *   - TickCdStateMachine / TickCdLoadFileStateMachine are the two per-tick
+ *     steps ServiceCdDriver (code_179d8_q) dispatches on gCdTickStep (1 / 2).
+ *     TickCdStateMachine is the default, used by code_179d8_s.c's open,
+ *     explicit-seek and straight-read call sites. TickCdLoadFileStateMachine
+ *     is used exclusively by that unit's func_80027800 (the
+ *     Class6D4E8__RequestLoadFile worker, per its own report): on the
+ *     "still busy" signal at phase 2 it proceeds straight into the read
+ *     phase instead of resetting, and on a successful read it restores the
+ *     caller's saved gCdSeekParam from gCdSavedSeekParam -- both differences
+ *     specific to that one combined seek+read operation.
+ *   - StartCdOperation / ResetCdStateMachine are the state machine's "start" /
+ *     "reset" bookends -- exact mirror images of each other.
+ *   - AllocCdRequestNode / FreeCdRequestNode allocate+link / unlink+free a
+ *     request-queue node (CdRequestNode, 0x24 bytes), list head
+ *     gCdRequestQueue -- the queue code_179d8_q.c's EnqueueCdRequest and
+ *     Class6D4E8__CancelRequests drive from the other end.
  *   - FindCdFileEntry / FindCdFileIndex / GetCdFileEntry are linear-scan /
  *     index helpers over a flat table of 0x1C-byte string records based at
- *     gFileTable, count gFileTableCount.
+ *     gFileTable, count gFileTableCount (code_179d8_q.c's CdFileEntry, its
+ *     own local view of the same records).
  */
 
 /* lock/unlock, defined in code_179d8_q.c (runner echo's unit). */
