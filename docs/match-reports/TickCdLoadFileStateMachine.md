@@ -167,3 +167,26 @@ can absorb it "for free" under -O2's scheduling. Round 45 tried both
 `if (v1 == 5) { newstate = 1; ... }` -- both keep the assignment inside an
 arm and both compiled to the same (wrong) encoding; hoisting it above the
 `if` entirely was the untried third option and it matched immediately.
+
+## Naming
+
+**Tier B.** The state machine's other tick function, selected by
+`ServiceCdDriver` when `gCdTickStep == 2`. Grepping every `gCdTickStep = 2`
+assignment in code_179d8_s.c finds exactly one: `func_80027800`, which
+`docs/match-reports` for the class's method table (`GetClass6D4E8Methods`'s
+own comment, code_179d8_q.c) identifies via `tools/classtable.py` as the
+`loadFile` slot (+0x58) of class `D_6D4E8` -- i.e. the
+`Class6D4E8__RequestLoadFile` worker. The two mechanical differences from
+`TickCdStateMachine` both make sense for that one operation: on the
+phase-2 "still busy" signal it proceeds straight into the read phase
+(`newstate = 7`) instead of resetting, because a LoadFile always intends a
+read to follow the seek; and on a successful read it restores
+`gCdSeekParam` from `gCdSavedSeekParam`, because `func_80027800` is the one
+call site that stashes the caller's previous `gCdSeekParam` there before
+overwriting it with the file it looked up (`gCdSavedSeekParam =
+gCdSeekParam; ... gCdSeekParam = rec;`). "LoadFile" names the operation this
+function is used for, established by the classtable evidence above, not a
+guess -- kept tier B because the report can name the caller and the effect
+but not independently confirm from this unit alone why LoadFile specifically
+needs the differences (as opposed to it merely being how retail happened to
+implement it).

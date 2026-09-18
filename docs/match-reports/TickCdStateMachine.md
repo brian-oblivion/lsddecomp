@@ -127,3 +127,22 @@ source-ordered blocks, with the shared tail reached via a plain variable
 (`newstate`) set right before each `goto`. GCC 2.6.3 -O2 places labeled
 blocks in the order they're *written*, so matching that written order is
 what reproduces the exact branch/block layout, not just the logic.
+
+## Naming
+
+**Tier B.** One tick of the CD-read state-machine's phase dispatch (phase 1
+= issue `CdControlF(CD_CMD_SETLOC, ...)`, 2 = poll `CdSync`, 7 = issue
+`CdRead`, 8 = poll `CdReadSync`), selected by `ServiceCdDriver`
+(code_179d8_q.c) when `gCdTickStep == 1`. This is the *default* of the two
+tick functions: cross-referencing every `gCdTickStep = 1` assignment in
+code_179d8_s.c shows it backs three different request paths --
+`func_800272D0` (open/resolve), `func_80027528` (explicit seek) and
+`func_800276D0` (straight read from the current position, which starts at
+phase 7 directly, so this function's phase-2 branch is never exercised on
+that path). Named for the mechanics (a generic state-machine tick); which
+of those three call sites is *the* reason for its behaviour (as opposed to
+`TickCdLoadFileStateMachine`'s) is not established, so this stays tier B
+rather than a name asserting one specific operation.
+
+See `TickCdLoadFileStateMachine`'s report for the paired evidence and the
+one call site that needs the other tick function.

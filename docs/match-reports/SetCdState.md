@@ -23,3 +23,11 @@ void SetCdState(s32 arg0)
 ```
 
 Closed on the first attempt.
+
+## Naming
+
+**Tier A.** Sets `gCdState` to a new phase and clears `gCdTimeoutCounter` --
+the shared "advance to phase N" primitive both tick functions route every
+transition through (`goto L_set; ... SetCdState(newstate);`). Named to
+parallel `GetCdState` (code_179d8_q.c's already-established accessor for
+the same global).

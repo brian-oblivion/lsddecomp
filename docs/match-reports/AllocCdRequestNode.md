@@ -71,3 +71,14 @@ flag `gCdLock`. Every function in this slice's small CD-state-machine
 and list-management group brackets its body with them; declare them
 locally as `extern void LockCd(void); extern void
 UnlockCd(void);` rather than sharing a header with the adjacent unit.
+
+## Naming
+
+**Tier A.** Allocates a 0x24-byte queue node (`func_80017B34(0x24)`) and
+appends it to the tail of `gCdRequestQueue`, clearing `active` (offset 0x00)
+and `unk4` (offset 0x04). Named for exactly this mechanics -- a pure
+alloc+link leaf, tier A by the "mechanics ARE its purpose" rule. Corroborated
+independently by code_179d8_q.c's own comment on this function (written
+before this rename, referring to it by address): "func_8002832C allocates
+one and links it onto D_8008A894" / "func_8002832C clears it [active] at
+allocation".

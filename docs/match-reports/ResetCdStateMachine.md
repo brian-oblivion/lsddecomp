@@ -27,3 +27,13 @@ void ResetCdStateMachine(void)
 ```
 
 Closed on the first attempt.
+
+## Naming
+
+**Tier A.** Zeroes the phase/operation/tick-step globals, marks the driver
+idle (`gCdIdle = 1`) and clears busy/timeout -- the exact mirror image of
+`StartCdOperation`, called from both tick functions on a successful
+`CdReadSync` and from `Class6D4E8__CancelRequests` (code_179d8_q.c) when
+cancelling the in-flight head request. Corroborated by that unit's own
+pre-existing comment on this function: "code_179d8_r: reset the state
+machine".

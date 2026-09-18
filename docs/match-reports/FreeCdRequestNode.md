@@ -39,3 +39,10 @@ void FreeCdRequestNode(Node8008A894 *node)
 
 Closed on the first attempt (uses the `Node8008A894` struct from
 `AllocCdRequestNode`, declared once at the top of the unit).
+
+## Naming
+
+**Tier A.** The remove/free counterpart to `AllocCdRequestNode`: unlinks a
+node from `gCdRequestQueue` and frees it via `func_80017CFC`. Corroborated
+by code_179d8_q.c's own comment (pre-rename): "func_800283C4 unlinks and
+frees".

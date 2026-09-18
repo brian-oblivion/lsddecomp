@@ -34,3 +34,10 @@ s32 FindCdFileIndex(char *arg0)
 ```
 
 Closed on the first attempt.
+
+## Naming
+
+**Tier A.** Sibling of `FindCdFileEntry` over the same table, returning the
+matching record's index (`-1` if none), consumed as `fileIndex` by
+code_179d8_q.c's `EnqueueCdRequest` and as `func_800284C4`'s own
+pre-existing comment there put it: "code_179d8_r: name -> table index".
