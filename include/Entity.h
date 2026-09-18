@@ -22,7 +22,7 @@
  * of that slot (found by reading that caller's own disassembly), while
  * "this unit's own slot" comments elsewhere name the function occupying a
  * slot in the table. Early slots (+0x004, +0x010, +0x014, +0x01C..+0x038)
- * hold `BasicClass__func_*`/`func_800570B4`/`func_80057130` -- the SAME
+ * hold `BasicClass__func_*`/`BaseObjO__LinkCompanion`/`BaseObjO__UnlinkCompanion` -- the SAME
  * addresses `code_55dd4.h`'s `Class65650Methods` holds at its own +0x004/
  * +0x010/+0x014, confirming Entity and Class65650 share the identical
  * "BasicClass" ancestor and its vtable layout convention (ctor at +0x008,

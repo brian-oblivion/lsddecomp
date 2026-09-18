@@ -84,7 +84,7 @@ void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 void func_80058A94(DreamSys *this)
 {
 	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
-	this->vt->func_80057130(this, this->unk_0x4C);
+	this->vt->BaseObjO__UnlinkCompanion(this, this->unk_0x4C);
 	func_80057C84()->slot0x50(this);
 }
 

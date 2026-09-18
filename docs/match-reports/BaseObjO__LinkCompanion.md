@@ -1,4 +1,6 @@
-# func_800570B4 -- MATCHED (31/31 words)
+> Renamed from `func_800570B4` on 2026-09-18 (tools/rename.py). Address 0x800570b4.
+
+# BaseObjO__LinkCompanion -- MATCHED (31/31 words)
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot10` -- the "link"
 half of a buddy-object pair, already named `slot10`
@@ -18,7 +20,7 @@ typedef struct TagWordObjO {
     TagWordMethodsO *methods;
 } TagWordObjO;
 
-void func_800570B4(BaseObjO *self, TagWordObjO *arg) {
+void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag;
 
     func_8001E57C()->slot10(self, arg);
@@ -53,7 +55,7 @@ void func_800570B4(BaseObjO *self, TagWordObjO *arg) {
   pointers**, mirroring `code_55dd4.h`'s already-documented `Class65650`
   field `unk50` ("companion-object pointer, unlinked via slot14") at the
   exact same offset in a sibling class built on the same base -- this
-  function is the "link" (sets the pointer); `func_80057130` right after
+  function is the "link" (sets the pointer); `BaseObjO__UnlinkCompanion` right after
   it in ROM order is the "unlink" (clears it), matching the header's own
   cross-reference between the two.
 

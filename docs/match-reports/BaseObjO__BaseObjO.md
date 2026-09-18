@@ -1,4 +1,6 @@
-# func_80057044 -- MATCHED (28/28 words)
+> Renamed from `func_80057044` on 2026-09-18 (tools/rename.py). Address 0x80057044.
+
+# BaseObjO__BaseObjO -- MATCHED (28/28 words)
 
 Unit: `class_3bb8c_o` (round 17). The constructor of the shared
 intermediate base class this unit implements from here onward -- chains to
@@ -8,7 +10,7 @@ class's own vtable, zeroes three fields and dispatches its own `slot40`.
 ## Final source
 
 ```c
-BaseObjO *func_80057044(BaseObjO *self) {
+BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
     if (func_8001E57C()->ctor(self) == NULL) {
         goto fail;
     }
@@ -34,9 +36,9 @@ implicit base-construction step -- confirmed three ways:
    install `self->methods`, i.e. this function is establishing the exact
    table `func_80057C84` returns.
 2. The functions this unit defines right after this one --
-   `func_800570B4`/`func_80057130`/`func_800571A8` -- occupy exactly
+   `BaseObjO__LinkCompanion`/`BaseObjO__UnlinkCompanion`/`BaseObjO__ClearCompanions` -- occupy exactly
    `D800878D4Methods`'s `+0x010`/`+0x014`/`+0x018` slots, and
-   `func_800570B4`/`func_80057130` are independently named at
+   `BaseObjO__LinkCompanion`/`BaseObjO__UnlinkCompanion` are independently named at
    `vtable_DreamSys`'s `+0x010`/`+0x014` in `DreamSys.h` too (as
    "the SAME shared base class... slot10/slot14, the link/unlink pair").
 3. `func_80057C84()->ctor(self)` returning NULL on failure and `self` on

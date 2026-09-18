@@ -1,13 +1,15 @@
-# func_80057130 -- MATCHED (30/30 words)
+> Renamed from `func_80057130` on 2026-09-18 (tools/rename.py). Address 0x80057130.
+
+# BaseObjO__UnlinkCompanion -- MATCHED (30/30 words)
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot14` -- the
-"unlink" companion of `func_800570B4` (`slot10`), already named by both
+"unlink" companion of `BaseObjO__LinkCompanion` (`slot10`), already named by both
 `code_55dd4.h` and `DreamSys.h` at the identical offset in sibling classes.
 
 ## Final source
 
 ```c
-void func_80057130(BaseObjO *self, TagWordObjO *arg) {
+void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag = arg->methods->header;
 
     if ((tag & 0xFFF) == 0x114) {
@@ -21,7 +23,7 @@ void func_80057130(BaseObjO *self, TagWordObjO *arg) {
 
 ## Derivation
 
-Mirror image of `func_800570B4`'s order: here the tag check runs FIRST
+Mirror image of `BaseObjO__LinkCompanion`'s order: here the tag check runs FIRST
 (clearing `self->unk4C`/`self->unk50` to `NULL` rather than setting them),
 and the chain to the fixed table's `slot14` runs LAST. Confirmed directly
 against the disassembly's own instruction order -- no iteration needed.
@@ -40,8 +42,8 @@ site, not just the ones where `self` happens to still be resident.
 - **The same fixed-table getter can be called with visibly different
   garbage in its ignored argument register across different call sites in
   the SAME function's sibling, and both reproduce retail exactly.**
-  `func_800570B4` calls `func_8001E57C()` with `self` still resident;
-  `func_80057130` calls it with the tag-check's leftover header word
+  `BaseObjO__LinkCompanion` calls `func_8001E57C()` with `self` still resident;
+  `BaseObjO__UnlinkCompanion` calls it with the tag-check's leftover header word
   resident instead. Both are correct because the callee provably ignores
   its input -- reinforces (rather than extends) the existing
   `func_8001E57C` precedent, but from the "it doesn't matter what's

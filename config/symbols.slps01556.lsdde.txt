@@ -674,3 +674,7 @@ LinkOwnerObj__RandomizeLinks = 0x80056E44; // type:func
 LinkOwnerObj__ReleaseLinksB = 0x80056F28; // type:func
 BaseObjO__func_56f5c = 0x80056F5C; // type:func
 New_BaseObjO = 0x80056FE4; // type:func
+BaseObjO__BaseObjO = 0x80057044; // type:func
+BaseObjO__LinkCompanion = 0x800570B4; // type:func
+BaseObjO__UnlinkCompanion = 0x80057130; // type:func
+BaseObjO__ClearCompanions = 0x800571A8; // type:func

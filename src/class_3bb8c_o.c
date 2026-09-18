@@ -40,12 +40,12 @@
  *    `BasicClass *` array) that is unrelated to the class below -- no
  *    shared header claims it, so it is kept purely local to this file
  *    (`LinkOwnerObj`/`LinkElemObj`).
- *  - func_80057044 onward implement the SAME shared intermediate base
+ *  - BaseObjO__BaseObjO onward implement the SAME shared intermediate base
  *    class already known from two independent angles: `code_55dd4.h`'s
  *    `D800878D4Methods` (Class65650's own reading, resolved via its own
  *    getter `func_80057C84`) and `DreamSys.h`'s `vtable_DreamSys` (whose
- *    +0x010/+0x014/+0x0B8/+0x0BC slots already name func_800570B4/
- *    func_80057130/func_80057384/func_800573A8 as the shared occupants).
+ *    +0x010/+0x014/+0x0B8/+0x0BC slots already name BaseObjO__LinkCompanion/
+ *    BaseObjO__UnlinkCompanion/func_80057384/func_800573A8 as the shared occupants).
  *    This unit is where those functions are actually DEFINED, so it earns
  *    its own local view (`BaseObjO`/`BaseObjOMethods`) rather than
  *    extending either sibling header -- neither is this unit's to edit,
@@ -205,13 +205,13 @@ extern FixedBaseTable *func_8001E57C(void);
 struct BaseObjOMethods {
     s32 header;                                       /* +0x000 */
     void *unk04;                                         /* +0x004 */
-    BaseObjO *(*ctor)(BaseObjO *self);                     /* +0x008 func_80057044 (this unit) */
+    BaseObjO *(*ctor)(BaseObjO *self);                     /* +0x008 BaseObjO__BaseObjO (this unit) */
     void (*dtor)(BaseObjO *self);                            /* +0x00C */
-    void (*slot10)(BaseObjO *self, TagWordObjO *arg);          /* +0x010 func_800570B4 (this unit) */
-    void (*slot14)(BaseObjO *self, TagWordObjO *arg);            /* +0x014 func_80057130 (this unit) */
-    void (*slot18)(BaseObjO *self);                                 /* +0x018 func_800571A8 (this unit) */
+    void (*slot10)(BaseObjO *self, TagWordObjO *arg);          /* +0x010 BaseObjO__LinkCompanion (this unit) */
+    void (*slot14)(BaseObjO *self, TagWordObjO *arg);            /* +0x014 BaseObjO__UnlinkCompanion (this unit) */
+    void (*slot18)(BaseObjO *self);                                 /* +0x018 BaseObjO__ClearCompanions (this unit) */
     u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
-    void (*slot40)(BaseObjO *self);                                     /* +0x040, called by func_80057044's own ctor; occupant outside this unit */
+    void (*slot40)(BaseObjO *self);                                     /* +0x040, called by BaseObjO__BaseObjO's own ctor; occupant outside this unit */
     u8 pad44[0x80 - 0x44];                                                /* +0x044 .. +0x07F */
     void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by BaseObjO__func_56f5c (this unit); occupant outside this unit (D_800876FC's slot80 is func_8001D4AC, a BasicClass-range function) */
     u8 pad84[0x8C - 0x84];                                                /* +0x084 .. +0x08B */
@@ -284,7 +284,7 @@ void *New_BaseObjO(void) {
     return NULL;
 }
 
-BaseObjO *func_80057044(BaseObjO *self) {
+BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
     if (func_8001E57C()->ctor(self) == NULL) {
         goto fail;
     }
@@ -298,7 +298,7 @@ fail:
     return NULL;
 }
 
-void func_800570B4(BaseObjO *self, TagWordObjO *arg) {
+void BaseObjO__LinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag;
 
     func_8001E57C()->slot10(self, arg);
@@ -310,7 +310,7 @@ void func_800570B4(BaseObjO *self, TagWordObjO *arg) {
     }
 }
 
-void func_80057130(BaseObjO *self, TagWordObjO *arg) {
+void BaseObjO__UnlinkCompanion(BaseObjO *self, TagWordObjO *arg) {
     s32 tag = arg->methods->header;
 
     if ((tag & 0xFFF) == 0x114) {
@@ -321,7 +321,7 @@ void func_80057130(BaseObjO *self, TagWordObjO *arg) {
     func_8001E57C()->slot14(self, arg);
 }
 
-void func_800571A8(BaseObjO *self) {
+void BaseObjO__ClearCompanions(BaseObjO *self) {
     self->unk4C = NULL;
     self->unk50 = NULL;
     func_8001E57C()->slot18(self);

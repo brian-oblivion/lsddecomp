@@ -357,7 +357,7 @@ typedef struct DreamSysBaseMethods {
 	u8 pad00[0x8];
 	/* Shared with Class65650's own inherited "ctor" slot at the same offset
 	   in the SAME base table (code_55dd4.h's D800878D4Methods, which already
-	   names and resolves this exact slot as `func_80057044`, taking/
+	   names and resolves this exact slot as `BaseObjO__BaseObjO`, taking/
 	   returning `Class65650 *self`). Called by DreamSys__DreamSys as
 	   (this), its return value discarded (round 2026-09-02) -- consistent
 	   with the base ctor returning `self` for chaining, unneeded here since
@@ -841,9 +841,9 @@ struct vtable_DreamSys{
 	DreamSys *(*Constructor)(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
 	u32 unknown_functions_0xc[1];
 	/* Shared with Class65650's own vtable at the same offset (code_55dd4.h:
-	   `slot10`, resolved there as `func_800570B4`, the "link" companion of
-	   `slot14`/`func_80057130` immediately below -- this unit already names
-	   THAT slot `func_80057130` and notes the same companion relationship).
+	   `slot10`, resolved there as `BaseObjO__LinkCompanion`, the "link" companion of
+	   `slot14`/`BaseObjO__UnlinkCompanion` immediately below -- this unit already names
+	   THAT slot `BaseObjO__UnlinkCompanion` and notes the same companion relationship).
 	   Called by DreamSys__DreamSys as (this, arg1->methods->slot0x80(arg1,
 	   0)) -- the constructor's own "buddy-link" step (round 2026-09-02). */
 	void (*slot10)(DreamSys *this, void *arg);
@@ -852,7 +852,7 @@ struct vtable_DreamSys{
 	   of slot10"). Called by func_80058A94 as (this, this->unk_0x4C)
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
-	void (*func_80057130)(DreamSys *this, DreamSysUnk4CObj *arg1);
+	void (*BaseObjO__UnlinkCompanion)(DreamSys *this, DreamSysUnk4CObj *arg1);
 	u32 unknown_functions_0x18[6];
 	/* +0x030, BasicClass__NotifyParents -- shared base-class slot, same one
 	   `class_3ac78.h`/`Class6D3C8.h` name (see their comments); called by

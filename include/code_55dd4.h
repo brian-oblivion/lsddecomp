@@ -35,11 +35,11 @@ typedef struct Class65650 Class65650;
 typedef struct D800878D4Methods {
     s32 header;                                    /* +0x000 */
     void *unk04;                                    /* +0x004 BasicClass__func_17eb0, inherited */
-    Class65650 *(*ctor)(Class65650 *self);            /* +0x008 func_80057044 */
+    Class65650 *(*ctor)(Class65650 *self);            /* +0x008 BaseObjO__BaseObjO */
     void (*dtor)(Class65650 *self);                    /* +0x00C func_8001CBA4 */
-    void (*slot10)(void *self, void *arg);             /* +0x010 func_800570B4 */
-    void *unk14;                                        /* +0x014 func_80057130 */
-    void *unk18;                                         /* +0x018 func_800571A8 */
+    void (*slot10)(void *self, void *arg);             /* +0x010 BaseObjO__LinkCompanion */
+    void *unk14;                                        /* +0x014 BaseObjO__UnlinkCompanion */
+    void *unk18;                                         /* +0x018 BaseObjO__ClearCompanions */
     u8 pad1C[0x1C];                                       /* +0x01C .. +0x037, not yet needed */
     void (*slot38)(Class65650 *self, void *arg1, s32 arg2); /* +0x038 -- called by func_80065790 as slot38(self, arg1, arg2) */
     u8 pad3C[0x10];                                         /* +0x03C .. +0x04B, not yet needed */
@@ -203,8 +203,8 @@ typedef struct Class65650Methods {
     void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__func_17eb0, inherited -- used by func_80065B80 when its `val` == 4 */
     Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 class_65650__Constructor */
     void (*dtor)(Class65650 *self);                                   /* +0x00C func_8006573C */
-    void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 func_800570B4, inherited -- "link" companion of slot14, see func_80066748 */
-    void (*slot14)(Class65650 *self, void *arg);                        /* +0x014 func_80057130, inherited -- "unlink" companion of slot10, see func_800667B0 */
+    void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 BaseObjO__LinkCompanion, inherited -- "link" companion of slot14, see func_80066748 */
+    void (*slot14)(Class65650 *self, void *arg);                        /* +0x014 BaseObjO__UnlinkCompanion, inherited -- "unlink" companion of slot10, see func_800667B0 */
     u8 pad18[0x28];                                                      /* +0x018 .. +0x03C, inherited from D_800878D4, not yet needed */
     void (*slot40)(Class65650 *self);                                    /* +0x040 func_80065830, this class's own */
     u8 pad44[0x80];                                                       /* +0x044 .. +0x0C0, inherited/not yet needed */

@@ -37,7 +37,7 @@ NULL -- nonzero means success (return `self`), zero means failure
 (`func_80017CFC(self)` then return `NULL`). `func_80057C84` is already
 declared elsewhere (`code_55dd4.h`) returning `D800878D4Methods *`; this
 unit uses its own local `BaseObjOMethods *` reading of the same table (see
-`func_80057044`'s report). `func_80017B34`/`func_80017CFC` are the
+`BaseObjO__BaseObjO`'s report). `func_80017B34`/`func_80017CFC` are the
 project's established single-argument pool allocator pair.
 
 `0x58` is a literal allocation size, not `sizeof(BaseObjO)`, per the
