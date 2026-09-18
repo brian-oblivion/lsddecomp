@@ -754,3 +754,7 @@ TickCdLoadFileStateMachine = 0x800286E4; // type:func
 StartCdOperation = 0x80028844; // type:func
 ResetCdStateMachine = 0x80028864; // type:func
 SetCdState = 0x80028888; // type:func
+gCdRequestQueue = 0x8008A894;
+gCdSeekParam = 0x8008A87C;
+gCdReadSectorCount = 0x8008A880;
+gCdReadBuffer = 0x8008A884;

@@ -13,7 +13,7 @@
  *     SetCdDriverMode, which decide whether a request is queued and serviced
  *     in the background or performed by a blocking CdSync spin;
  *   - the request queue's front door: EnqueueCdRequest appends a node to the
- *     D_8008A894 list (code_179d8_r owns the list itself) and starts the
+ *     gCdRequestQueue list (code_179d8_r owns the list itself) and starts the
  *     service;
  *   - the service pump: ServiceCdDriver, installed as a VSyncCallback (or as
  *     a callback on the singleton func_80020C5C returns), which ticks
@@ -121,7 +121,7 @@ void Class6D4E8__StopCdService(void)
  * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
  * call site itself reads are typed here. `active` is the flag StartCdOperation
  * (code_179d8_r) sets on the head node when it starts an operation on it;
- * AllocCdRequestNode clears it at allocation. The list head is D_8008A894. */
+ * AllocCdRequestNode clears it at allocation. The list head is gCdRequestQueue. */
 typedef struct CdRequest_D70 CdRequest_D70;
 struct CdRequest_D70 {
     /* +0x00 */ s32 active;
@@ -138,10 +138,10 @@ struct Obj6D4E8_D70 {
     /* +0x24 */ s32 flags;
 };
 
-extern s32 D_8008A894;
+extern s32 gCdRequestQueue;
 extern s32 gCdIdle;
 extern s32 D_8008A888;
-extern s32 D_8008A87C;
+extern s32 gCdSeekParam;
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
@@ -155,7 +155,7 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 
     LockCd();
 
-    entry = (CdRequest_D70 *)D_8008A894;
+    entry = (CdRequest_D70 *)gCdRequestQueue;
 
     if (entry != NULL && self->pendingRequests != 0) {
         self->flags = 0;
@@ -165,10 +165,10 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
             ResetCdStateMachine();
             saved = D_8008A888;
             D_8008A888 = 0;
-            D_8008A87C = saved;
+            gCdSeekParam = saved;
         }
 
-        for (node = (CdRequest_D70 *)D_8008A894; node != NULL; node = next) {
+        for (node = (CdRequest_D70 *)gCdRequestQueue; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
                 FreeCdRequestNode(node);
@@ -454,7 +454,7 @@ extern void VSyncCallback(void (*cb)(void));
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/code_171e0.h uses
  * for D_8006D430's own table. tools/classtable.py resolves +0x068 to
- * func_80027A24 (code_179d8_s), which walks the D_8008A894 request list,
+ * func_80027A24 (code_179d8_s), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
  * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
@@ -543,7 +543,7 @@ void DisableCdQueue(void)
 
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
  * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
- * D_8008A894, and only the fields this call site writes are typed here
+ * gCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
  * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op

@@ -21,7 +21,7 @@ carries the evidence for each one.
  * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
  * call site itself reads are typed here. `active` is the flag StartCdOperation
  * (code_179d8_r) sets on the head node when it starts an operation on it;
- * AllocCdRequestNode clears it at allocation. The list head is D_8008A894. */
+ * AllocCdRequestNode clears it at allocation. The list head is gCdRequestQueue. */
 typedef struct CdRequest_D70 CdRequest_D70;
 struct CdRequest_D70 {
     /* +0x00 */ s32 active;
@@ -38,10 +38,10 @@ struct Obj6D4E8_D70 {
     /* +0x24 */ s32 flags;
 };
 
-extern s32 D_8008A894;
+extern s32 gCdRequestQueue;
 extern s32 gCdIdle;
 extern s32 D_8008A888;
-extern s32 D_8008A87C;
+extern s32 gCdSeekParam;
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
@@ -55,7 +55,7 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 
     LockCd();
 
-    entry = (CdRequest_D70 *)D_8008A894;
+    entry = (CdRequest_D70 *)gCdRequestQueue;
 
     if (entry != NULL && self->pendingRequests != 0) {
         self->flags = 0;
@@ -65,10 +65,10 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
             ResetCdStateMachine();
             saved = D_8008A888;
             D_8008A888 = 0;
-            D_8008A87C = saved;
+            gCdSeekParam = saved;
         }
 
-        for (node = (CdRequest_D70 *)D_8008A894; node != NULL; node = next) {
+        for (node = (CdRequest_D70 *)gCdRequestQueue; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
                 FreeCdRequestNode(node);
@@ -85,16 +85,16 @@ void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 
 Reads as "flush a pending CD queue's entries belonging to `self`, then
 unlink and free them." Two guards gate the ENTIRE body (not just the
-`CdFlush` block): the pending-list head (`D_8008A894`) must be non-NULL and
+`CdFlush` block): the pending-list head (`gCdRequestQueue`) must be non-NULL and
 `self->pendingRequests` (spelled `unk22` when this was written) must be non-zero — if either fails, the
 function does nothing but the latch dance. Inside that, an inner
 three-condition guard (head node's owner is `self`, head node's `active` flag (`unk00` when this was written)
 flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
 `ResetCdStateMachine()` (both cross-unit — `ResetCdStateMachine` from foxtrot's
 `code_179d8_r`) and a load-clear-store handoff between `D_8008A888` and
-`D_8008A87C` (needs an explicit temp: the store order is `D_8008A888`
-cleared BEFORE the old value lands in `D_8008A87C`, not the natural-looking
-`D_8008A87C = D_8008A888; D_8008A888 = 0;`, which would store in the
+`gCdSeekParam` (needs an explicit temp: the store order is `D_8008A888`
+cleared BEFORE the old value lands in `gCdSeekParam`, not the natural-looking
+`gCdSeekParam = D_8008A888; D_8008A888 = 0;`, which would store in the
 opposite order). Then, regardless of that inner guard, a loop walks the
 whole list unlinking every node whose `owner == self` via
 `FreeCdRequestNode` (also `code_179d8_r`) and decrementing `self->pendingRequests` per
@@ -115,7 +115,7 @@ that still diffed:
    call needs it in — with no copy.
 2. **The initial guard's list-head read and the loop's OWN list-head reread
    are different C locals, not the same variable reused.** Both statements
-   are literally `X = D_8008A894;`, and reusing a single `node` variable for
+   are literally `X = gCdRequestQueue;`, and reusing a single `node` variable for
    both is semantically identical — but it made GCC keep the value in `$a0`
    for BOTH sites, while retail's actual register choice is `$v1` for the
    first (guard) read and `$a0` for the second (loop-entry) read. A second,
@@ -144,7 +144,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80027D70` | `Class6D4E8__CancelRequests` | A |
 
-**Evidence.** Slot `+0x074` of `D_8006D4E8`. It walks the `D_8008A894`
+**Evidence.** Slot `+0x074` of `D_8006D4E8`. It walks the `gCdRequestQueue`
 request list and, for every node whose `owner` is this object, calls
 `FreeCdRequestNode` (code_179d8_r: unlink + free) and decrements the object's own
 pending count. Before that, if the HEAD node is this object's and is already

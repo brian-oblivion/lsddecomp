@@ -8,10 +8,10 @@
 
 "Start" bookend of the CD-read state machine: takes a context value and an
 initial phase, stashes them into the state-machine globals, marks the
-machine busy, and flags the current head-of-list node (`D_8008A894`,
+machine busy, and flags the current head-of-list node (`gCdRequestQueue`,
 shared with `AllocCdRequestNode`/`FreeCdRequestNode`'s list) as active. No
 lock/unlock bracketing (unlike its siblings in this unit) and no NULL
-check on `D_8008A894` -- retail dereferences it unconditionally, so this is
+check on `gCdRequestQueue` -- retail dereferences it unconditionally, so this is
 presumably only ever called with a live list head.
 
 ## The C
@@ -23,7 +23,7 @@ void StartCdOperation(s32 arg0, s32 arg1)
     gCdOperation = arg0;
     gCdState = arg1;
     gCdIdle = 0;
-    D_8008A894->unk0 = 1;
+    gCdRequestQueue->unk0 = 1;
 }
 ```
 

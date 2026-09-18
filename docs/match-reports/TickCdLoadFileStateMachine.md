@@ -17,7 +17,7 @@ in every state except:
   directly rather than resetting.
 - **state 8, `CdReadSync` succeeds (`v1 == 0`)**: after
   `ResetCdStateMachine()`, this function additionally swaps two globals
-  (`D_8008A87C = D_8008A888; D_8008A888 = NULL;`) that `TickCdStateMachine`
+  (`gCdSeekParam = D_8008A888; D_8008A888 = NULL;`) that `TickCdStateMachine`
   does not touch at all.
 
 ## Round 45's stall, and what closed it
@@ -94,7 +94,7 @@ void TickCdLoadFileStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)D_8008A87C + 0x14) == 0)
+    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -125,7 +125,7 @@ L_count:
     goto L_set;
 
 L_state7:
-    if (CdRead(D_8008A880, D_8008A884, 0x80) == 0)
+    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -141,7 +141,7 @@ L_state8:
     ResetCdStateMachine();
     tmp = D_8008A888;
     D_8008A888 = NULL;
-    D_8008A87C = tmp;
+    gCdSeekParam = tmp;
     goto L_end;
 
 L_set:

@@ -20,7 +20,7 @@
  *   - StartCdOperation / ResetCdStateMachine are the "start" / "reset" bookends of
  *     that state machine.
  *   - AllocCdRequestNode / FreeCdRequestNode are a generic doubly-linked-list
- *     append/remove+free pair over 0x24-byte nodes, list head D_8008A894.
+ *     append/remove+free pair over 0x24-byte nodes, list head gCdRequestQueue.
  *   - FindCdFileEntry / FindCdFileIndex / GetCdFileEntry are linear-scan /
  *     index helpers over a flat table of 0x1C-byte string records based at
  *     gFileTable, count gFileTableCount.
@@ -55,7 +55,7 @@ typedef struct Node8008A894 {
     /* 0x20 */ struct Node8008A894 *next;
 } Node8008A894; /* size 0x24 */
 
-extern Node8008A894 *D_8008A894; /* list head */
+extern Node8008A894 *gCdRequestQueue; /* list head */
 
 extern s32 gCdBusy; /* "busy" flag, 0/1 */
 extern char *gFileTable; /* base of a table of 0x1C-byte string records */
@@ -63,9 +63,9 @@ extern s32 gFileTableCount;   /* record count */
 extern s32 gCdIdle;   /* "idle"/"ready" flag, 0/1 */
 extern s32 gCdOperation;   /* context value stashed by StartCdOperation */
 extern s32 gCdState;   /* CD state-machine phase */
-extern void *D_8008A87C; /* CdControlF param pointer */
-extern s32 D_8008A880;   /* CdRead sector count */
-extern void *D_8008A884; /* CdRead target buffer */
+extern void *gCdSeekParam; /* CdControlF param pointer */
+extern s32 gCdReadSectorCount;   /* CdRead sector count */
+extern void *gCdReadBuffer; /* CdRead target buffer */
 extern void *D_8008A888; /* secondary pointer, used only by TickCdLoadFileStateMachine */
 extern s32 D_8008A898;   /* which state-machine step to tick, 1 or 2 */
 extern s32 D_8008A8A0;   /* timeout counter */
@@ -79,7 +79,7 @@ Node8008A894 *AllocCdRequestNode(void)
     LockCd();
     node = func_80017B34(0x24);
     if (node != NULL) {
-        head = D_8008A894;
+        head = gCdRequestQueue;
         node->prev = NULL;
         node->next = NULL;
         node->unk0 = 0;
@@ -94,7 +94,7 @@ Node8008A894 *AllocCdRequestNode(void)
             cur->next = node;
             node->prev = cur;
         } else {
-            D_8008A894 = node;
+            gCdRequestQueue = node;
         }
     }
     UnlockCd();
@@ -112,7 +112,7 @@ void FreeCdRequestNode(Node8008A894 *node)
         if (prev != NULL) {
             prev->next = node->next;
         } else {
-            D_8008A894 = node->next;
+            gCdRequestQueue = node->next;
         }
         next = node->next;
         if (next != NULL) {
@@ -197,7 +197,7 @@ void TickCdStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)D_8008A87C + 0x14) == 0)
+    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -224,7 +224,7 @@ L_count:
     goto L_set;
 
 L_state7:
-    if (CdRead(D_8008A880, D_8008A884, 0x80) == 0)
+    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -275,7 +275,7 @@ void TickCdLoadFileStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)D_8008A87C + 0x14) == 0)
+    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -306,7 +306,7 @@ L_count:
     goto L_set;
 
 L_state7:
-    if (CdRead(D_8008A880, D_8008A884, 0x80) == 0)
+    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -322,7 +322,7 @@ L_state8:
     ResetCdStateMachine();
     tmp = D_8008A888;
     D_8008A888 = NULL;
-    D_8008A87C = tmp;
+    gCdSeekParam = tmp;
     goto L_end;
 
 L_set:
@@ -338,7 +338,7 @@ void StartCdOperation(s32 arg0, s32 arg1)
     gCdOperation = arg0;
     gCdState = arg1;
     gCdIdle = 0;
-    D_8008A894->unk0 = 1;
+    gCdRequestQueue->unk0 = 1;
 }
 
 void ResetCdStateMachine(void)

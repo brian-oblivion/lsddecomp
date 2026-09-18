@@ -17,7 +17,7 @@ carries the evidence for each one.
 ```c
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
  * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
- * D_8008A894, and only the fields this call site writes are typed here
+ * gCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
  * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
@@ -103,7 +103,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_800282AC` | `EnqueueCdRequest` | A |
 
 **Evidence.** Allocates and links a node via `AllocCdRequestNode` (code_179d8_r,
-which appends to the `D_8008A894` list), fills five of its fields from the
+which appends to the `gCdRequestQueue` list), fills five of its fields from the
 parameters, bumps the requesting object's pending count, clears its flags and
 calls `StartCdService`. Every caller is a class method taking its
 asynchronous path (`code_179d8_s` at op 2/3/4/5/7,

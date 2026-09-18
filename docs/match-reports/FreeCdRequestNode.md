@@ -7,7 +7,7 @@
 ## What it does
 
 The remove/free counterpart to `AllocCdRequestNode`: unlinks a node from the
-doubly-linked list rooted at `D_8008A894` (fixing up `prev->next`,
+doubly-linked list rooted at `gCdRequestQueue` (fixing up `prev->next`,
 `next->prev`, or the list head as appropriate) and frees it via
 `func_80017CFC`. Void return. Never-attempted cold ground.
 
@@ -25,7 +25,7 @@ void FreeCdRequestNode(Node8008A894 *node)
         if (prev != NULL) {
             prev->next = node->next;
         } else {
-            D_8008A894 = node->next;
+            gCdRequestQueue = node->next;
         }
         next = node->next;
         if (next != NULL) {

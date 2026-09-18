@@ -7,7 +7,7 @@
 ## What it does
 
 Allocates a 0x24-byte doubly-linked-list node (`func_80017B34(0x24)`) and
-appends it to the tail of the list rooted at `D_8008A894`. New-node fields
+appends it to the tail of the list rooted at `gCdRequestQueue`. New-node fields
 at offset 0x0 and 0x4 are zeroed; 0x1C/0x20 are the prev/next links. If the
 list is empty, the new node simply becomes the head; otherwise the function
 walks `next` pointers to the current tail and links the new node on.
@@ -24,7 +24,7 @@ typedef struct Node8008A894 {
     /* 0x20 */ struct Node8008A894 *next;
 } Node8008A894; /* size 0x24 */
 
-extern Node8008A894 *D_8008A894; /* list head */
+extern Node8008A894 *gCdRequestQueue; /* list head */
 
 Node8008A894 *AllocCdRequestNode(void)
 {
@@ -35,7 +35,7 @@ Node8008A894 *AllocCdRequestNode(void)
     LockCd();
     node = func_80017B34(0x24);
     if (node != NULL) {
-        head = D_8008A894;
+        head = gCdRequestQueue;
         node->prev = NULL;
         node->next = NULL;
         node->unk0 = 0;
@@ -50,7 +50,7 @@ Node8008A894 *AllocCdRequestNode(void)
             cur->next = node;
             node->prev = cur;
         } else {
-            D_8008A894 = node;
+            gCdRequestQueue = node;
         }
     }
     UnlockCd();
