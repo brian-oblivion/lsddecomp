@@ -1,4 +1,4 @@
-# func_8001E7BC -- STALL: length EXACT (180/180 words, no drift); 142/180 raw word-match; first real diff at vram 0x8001E810 (register identity, `node` in $a1 vs retail's $a3). SEE ROUND 46 AT THE BOTTOM FOR THE CURRENT BEST -- everything below this point is superseded history kept for its derivation value.
+# func_8001E7BC -- MATCHED (round 57, revisit): 180/180 words, byte-exact, whole-image SHA1 green. SEE ROUND 57 AT THE BOTTOM -- everything between here and it is superseded history, kept for its derivation value; the round-46 section it points to is no longer the current best.
 
 Unit: `code_d294_c` (round 14). By far the largest function in this
 round's queue (200 asm lines, 0x2D0 bytes / 180 words -- more than 60%
@@ -619,3 +619,191 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
 - Naming touched nothing in this function's preserved `#if 0` body except
   the callee names `rename.py` rewrote (`SubVec3S16`). It is still
   `INCLUDE_ASM`; the stall verdict above is unchanged.
+
+
+## Round 57 (charlie, REVISIT): MATCHED, 142/180 -> 180/180, four levers
+
+**REVISITED, round 57: MATCHED 180/180 byte-exact; names/types used**
+
+Honest split, because the revisit rule is measuring its own hypothesis: **two
+of the four levers came from post-track-3 TYPES and two came from plain
+re-reading of the disassembly.** The two that came from types are the two
+that had been open the longest (round 44's residues 1 and 2), and the
+function does not match without them, so this revisit is a positive for the
+rule rather than another round-55-style "closed it by re-reading".
+
+Baseline re-verified live first: the round-46 preserved body rebuilt to
+exactly **142/180, no drift** (`tools/stalesyms.py` lists no stale callee for
+this report, and the `composeAndApplyRotation` rename was already in the
+body). `build exit=2`, no compile-error grep hits.
+
+### Lever 1 (re-reading): retail's tail is CROSS-JUMPED -- write the success body TWICE. 142 -> 155
+
+The tell-tale is in the delay slots. Retail has `addu $a0, $s5, $zero` in the
+delay slot of BOTH `func_8001F8B8` result branches (vram 0x8001EA18 and
+0x8001EA48) but only ONE `jal SubVec3S16`. That is `jump.c` cross-jumping two
+identical tails and hoisting the first surviving insn of the shared block
+into the earlier branch's delay slot. So the source duplicates the body:
+
+```c
+if (func_8001F8B8(...)) { SubVec3S16(arg1, buf18, buf28); return 1; }
+delta[1] = (u16)buf18[1] + 0x400;
+if (func_8001F8B8(...)) { SubVec3S16(arg1, buf18, buf28); return 1; }
+```
+
+rather than round 46's single trailing call under a doubly-negated `if`.
+
+**What this closed is NOT what it looks like.** The instruction sequence is
+almost identical either way; what changed is round 44's residue 3, the
+"4-register permutation" of `$s1`-`$s4` over the four stack buffers, which
+vanished completely. Round 44 had tried to move it by reordering the buffer
+DECLARATIONS and regressed. The s-register assignment follows the live ranges
+the CALL structure creates, not declaration order -- with the `SubVec3S16`
+call inside each probe's body, `buf18`/`buf28` are live across a different
+set of calls than when the call sits after the whole `if`.
+
+### Lever 2 (re-reading): the null-`unk20` guard is an ENCLOSING `if`, not an early return. 155 -> 164
+
+Retail's shared `addu $v0, $zero, $zero` block sits at 0x8001EA60, AFTER the
+success tail, and falls through to the epilogue. Writing
+
+```c
+if (self->unk20 == NULL) { return 0; }
+```
+
+at the top puts that block BEFORE the success tail instead, costing an extra
+`j` and inverting the second probe's branch. Wrapping the whole body in
+`if (self->unk20 != NULL) { ... }` with one bare `return 0;` as the
+function's last statement reproduces retail exactly, including the early
+branch's own target (`beqz $v0, 0x8001EA60` at 0x8001E7E8, which had been
+wrong since round 19 and was never separately itemised).
+
+### Lever 3 (TYPES): cast the ternary to `Vec3_d294 *` and reach it by FIELD. 164 -> 172
+
+This is round 44's residue 2, and round 44 recorded it as a dead end: "the
+two properties -- correct NULL fallback and un-folded 0x38 base with
+instruction-level indexing -- could not be obtained SIMULTANEOUSLY with
+anything tried this round."
+
+They can. The problem is that `(cond ? p : NULL)[i]` is a tree PLUS_EXPR over
+a COND_EXPR, and `fold()` distributes it into both arms -- which both folds
+`0x38 + i*4` into one `addiu` on the true arm and turns the false arm into
+the literal `i*4`. A **COMPONENT_REF offset is not a tree PLUS_EXPR**: it is
+applied at expand time as the MEM's own displacement. So
+
+```c
+((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->y
+```
+
+leaves the cond-expr's arms untouched (`addiu $a0, $v0, 0x38` / `addu $a0,
+$zero, $zero`, both exactly retail's) and puts the axis in the `4($a0)`
+displacement. Round 44's two properties are not in tension at all; they were
+only in tension while the axis was expressed as an index.
+
+`Vec3_d294` is the unit's own committed `{s32 x, y, z}` (include/code_d294.h),
+and `Class6B5CCSub14::unk38` is deliberately `s32 unk38[3]` rather than a
+`Vec3_d294` because `Class6B5CC__LocalOffsetToWorldPos` needs to index it.
+Nothing about the header changed here -- the CAST is local to this function,
+which is exactly the split that header note anticipates.
+
+### Lever 4 (TYPES): the backup copy is ONE `Vec3_d294` struct assignment. 172 -> 180, MATCHED
+
+The last residue, open since round 44 and filed as a pure register-identity
+stall (`node` in `$a1` vs retail's `$a3`, 8 words at vram
+0x8001E810-0x8001E838). Round 44 tried declaration order and variable
+merging; round 46's permuter search ran 56437 iterations and never touched
+it; this round re-swept all 12 permutations of the three pointer locals
+(`table`/`node`/`cur`, block front and back) and every one scored exactly
+172 -- declaration order is **completely inert** on this function, now
+measured three times.
+
+The fix is not an allocation lever at all. Three scalar assignments
+
+```c
+node->unk38[0] = node->unk18;
+node->unk38[1] = node->unk1C;
+node->unk38[2] = node->unk20;
+```
+
+and the whole-struct assignment
+
+```c
+*(Vec3_d294 *)node->unk38 = *(Vec3_d294 *)&node->unk18;
+```
+
+emit the **same six instructions** (`lw`/`lw`/`lw` then `sw`/`sw`/`sw`, same
+temps `$v0`/`$v1`/`$a0`, same displacements). They differ only in which hard
+register `node` itself lands in: the scalar form gives `$a1`, the struct copy
+gives retail's `$a3`. A 12-byte struct move is expanded by `emit_block_move`
+as one unit, so `node`'s pseudo is referenced by a different number of insns
+and with a different live shape than when three independent statements each
+reference it -- enough to change where it sorts in `global_alloc` and which
+hard register it is offered.
+
+The header already says these three words ARE a vector ("copied wholesale
+into `Class6B5CCSub14::unk18/unk1C/unk20`"), so the struct copy is also the
+more faithful source shape, not a trick.
+
+### Negatives measured this round (all at the 172 base unless noted)
+
+| variant | score | note |
+| --- | --- | --- |
+| 12 declaration-order permutations of `table`/`node`/`cur` | 172 each | inert, third independent confirmation |
+| `cur` hoisted above `node = self->unk14` | 172 | dead store, eliminated |
+| `(cur = self->unkC) != NULL` inside the `&&` | 153 | moves `cur` to `$a0` and splits the block's base register |
+| no `node` variable, `self->unk14` written inline | 32 (drift) | the stores invalidate CSE, so `self->unk14` is reloaded per access |
+| `while (cur != NULL)` instead of `if (...) do {} while` | 76 (drift) | genuinely different loop rotation |
+| guard as `node->unk38 != NULL` instead of `(u8 *)node + 0x38 != NULL` | 172 | equivalent; kept the explicit form, which reads as the defensive check retail actually performs |
+
+### Gate 3 / permuter
+
+**No search was spent, and the reason is a result rather than a skip.** Round
+46 had already run one to completion on this function (56437 iterations,
+`--stop-on-zero --best-only -j 4`, 900s bound, base permuter score 1503) and
+recorded a clean negative on all three named residues. Gate 3 check 1
+(scaffold compiles and scores) and check 3 (scaffold signature agrees with
+the real in-tree build) were both satisfied by that round's own record; check
+2's insertion/deletion count (6/6) was likewise already on file. Re-spending
+against the same three residues would have re-measured a recorded negative.
+All four levers here are source-SHAPE changes -- statement duplication, guard
+nesting, a cast, and a struct assignment -- and only the first of those is in
+the permuter's mutation vocabulary at all, which is consistent with round
+46's search having found only a statement-order swap.
+
+### Proposed learning
+
+**`(cond ? p : NULL)[i]` and `((T *)(cond ? p : NULL))->field` are not the
+same construct to GCC, and the difference decides whether a constant offset
+folds into the ternary's arms.** An array index on a conditional expression
+is a tree `PLUS_EXPR` that `fold()` distributes into BOTH arms -- combining
+the offset with the true arm's own `addiu` and, worse, silently turning a
+NULL false arm into the literal `i * sizeof(T)`. A struct field reference is
+a `COMPONENT_REF`, whose offset is applied at expand time as the MEM's
+displacement, so the arms are left exactly as written. Whenever retail shows
+a **constant base `addiu` plus a per-element instruction displacement** on
+the far side of a ternary, reach for a struct-pointer cast and a field, not
+an index. This retires the "could not be obtained simultaneously" dead end
+round 44 recorded.
+
+**Three scalar assignments and one struct assignment can emit byte-identical
+instructions and still allocate a different register to the POINTER they go
+through.** `emit_block_move` expands a small struct copy as a single unit, so
+the base pointer's pseudo has a different reference count and live shape than
+when three separate statements each mention it, which is enough to move it in
+`global_alloc`'s ordering. **So a register-identity residue on a pointer used
+by a run of same-shaped field copies is worth one struct-assignment attempt
+before it is filed as a stall** -- it is cheap, it is not a register pin, and
+here it was the difference between 172/180 and a match after three rounds had
+classified it as unreachable by source shape.
+
+**A "register identity" classification is a claim about the RESIDUE, not
+about the function, and it decays as the rest of the function changes.** All
+three of round 44's residues were filed as one class ("register/
+materialization identity, not a missing feature or wrong value") and two of
+them turned out to be ordinary source-shape differences elsewhere in the
+function: the `$s1`-`$s4` permutation was the tail's call structure, and the
+`$a1`/`$a3` one was the copy idiom. Only re-deriving the surrounding shape
+exposed them. When a stall carries several same-class residues, fixing the
+STRUCTURE first and re-measuring is worth more than attacking any of them
+directly -- here levers 1 and 2 together removed one "register identity"
+residue outright without ever addressing it.

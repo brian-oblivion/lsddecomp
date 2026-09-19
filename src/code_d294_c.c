@@ -15,8 +15,8 @@
  * and eight standalone leaves -- vector, matrix, fixed-point, bounding-box
  * and bitfield primitives -- that the rest of the game calls by symbol.
  *
- * One function is still INCLUDE_ASM: func_8001E7BC, a documented stall
- * (docs/match-reports/func_8001E7BC.md).
+ * Every function in this unit is now decompiled; func_8001E7BC, the last
+ * INCLUDE_ASM, matched in round 57 (docs/match-reports/func_8001E7BC.md).
  */
 
 #include "common.h"
@@ -116,17 +116,50 @@ void Class6B5CC__UnlinkModel(Class6B5CCObj *self) {
 extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
 
-#if 0
-/* STALL -- see docs/match-reports/func_8001E7BC.md. Round 46 (echo): 142/180
- * words, EXACT length (no drift), first real diff at vram 0x8001E810 (a
- * register-identity residue, node in $a1 vs retail's $a3, unchanged).
- * First-ever permuter search this round found ONE real lever: swapping the
- * source order of the `delta[1]`/`delta[2]` assignments right after the
- * `slotA4` call (136 -> 142/180) -- everything else in the search's
- * best-scoring candidate was noise. Round 44's three named residues
- * (node's register identity, the 0x38-vs-0x38+i combined ADDIU, and the
- * tail's 4-register permutation) are otherwise UNCHANGED. Restored to
- * INCLUDE_ASM per project rule. */
+/* MATCHED round 57 (revisit) -- see docs/match-reports/func_8001E7BC.md.
+ *
+ * Kept as `func_8001E7BC` on purpose (track 3, tier C): the whole second
+ * half hangs off `func_8001F8B8`, which is still undecompiled Psy-Q
+ * (`psyq_fa50`), so any verb for the function as a whole would be a guess.
+ * What it DOES is settled. First it maintains the object's world
+ * translation: `unk14->unk38` is GsCOORDINATE2.workm.t, and the guarded
+ * block rewrites it as this object's own coord.t plus every owner's
+ * coord.t, walking the `self->unkC` owner list. Then it takes the target
+ * point `arg2` relative to that world translation, rotates the delta into
+ * the object's own frame through slotA4 (Class6B5CC__ComposeAndApplyRotation, the
+ * inverse-chain matrix), and probes `func_8001F8B8` twice -- Y minus 0x400
+ * and, on failure, Y plus 0x400, i.e. -90 and +90 degrees in BAM. On
+ * success `arg1` receives `buf28 - buf18` and the function returns 1.
+ *
+ * Four source shapes here are load-bearing; each was measured against the
+ * oracle and the report records what the alternatives scored.
+ *
+ *  - `(s32)self->unk10 < 0`: `unk10` is a `u32` bitfield word, so without
+ *    the cast the comparison is constant-false and GCC deletes the whole
+ *    guarded block silently (round 19).
+ *  - The backup copy is ONE `Vec3_d294` struct assignment, not three
+ *    scalar ones. Both spell lw/lw/lw + sw/sw/sw, but only the struct copy
+ *    puts `node` in retail's $a3; the scalar form gives it $a1. That was
+ *    the last residue, open since round 44.
+ *  - The `self->unkC != 0 ? ... : 0` ternary is written out TWICE per axis
+ *    -- once for the store, once for the load -- because retail evaluates
+ *    it twice (the diamond blocks it from CSE). Caching it in a variable
+ *    costs two instructions per axis. It is also cast to `Vec3_d294 *` and
+ *    reached by FIELD, not indexed as `[i]`: `(cond ? p : NULL)[i]`
+ *    distributes the index into both arms, which turns the NULL arm into
+ *    the literal `i*4` and folds `0x38 + i*4` into one addiu, where retail
+ *    keeps a constant 0x38 base and puts the axis in the load/store
+ *    displacement.
+ *  - The success body is written out twice, once per probe, with the bare
+ *    `return 0` last and the null-`unk20` guard as an enclosing
+ *    `if (self->unk20 != NULL)` rather than an early return. jump.c
+ *    cross-jumps the two copies into the single `jal SubVec3S16` retail
+ *    has (the giveaway is `move a0,s5` appearing in BOTH probe delay
+ *    slots), and that placement is what puts the shared `v0 = 0` block
+ *    after the success tail instead of before it.
+ *
+ * `(u8 *)node + 0x38 != NULL` is retail's own check, not a typo for
+ * `node != NULL`: the disassembly forms the sum first and tests THAT. */
 s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     s32 *table;
     s16 buf18[4];
@@ -136,60 +169,57 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     Class6B5CCSub14 *node;
     UnkOwner_d294 *cur;
 
-    if (self->unk20 == NULL) {
-        return 0;
-    }
-    if ((s32)self->unk10 < 0 && self->unkC != NULL) {
-        node = self->unk14;
-        if ((u8 *)node + 0x38 != NULL) {
-            node->unk38[0] = node->unk18;
-            node->unk38[1] = node->unk1C;
-            node->unk38[2] = node->unk20;
+    if (self->unk20 != NULL) {
+        if ((s32)self->unk10 < 0 && self->unkC != NULL) {
+            node = self->unk14;
+            if ((u8 *)node + 0x38 != NULL) {
+                *(Vec3_d294 *)node->unk38 = *(Vec3_d294 *)&node->unk18;
 
-            cur = self->unkC;
-            if (cur != NULL) {
-                do {
-                    (self->unkC != 0 ? &self->unk14->unk38[0] : (s32 *)0)[0] =
-                        (self->unkC != 0 ? &self->unk14->unk38[0] : (s32 *)0)[0] + cur->unk14->unk18;
-                    (self->unkC != 0 ? &self->unk14->unk38[1] : (s32 *)0)[0] =
-                        (self->unkC != 0 ? &self->unk14->unk38[1] : (s32 *)0)[0] + cur->unk14->unk1C;
-                    (self->unkC != 0 ? &self->unk14->unk38[2] : (s32 *)0)[0] =
-                        (self->unkC != 0 ? &self->unk14->unk38[2] : (s32 *)0)[0] + cur->unk14->unk20;
+                cur = self->unkC;
+                if (cur != NULL) {
+                    do {
+                        ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->x =
+                            ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->x + cur->unk14->unk18;
+                        ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->y =
+                            ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->y + cur->unk14->unk1C;
+                        ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->z =
+                            ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->z + cur->unk14->unk20;
 
-                    cur = cur->next;
-                } while (cur != NULL);
+                        cur = cur->next;
+                    } while (cur != NULL);
+                }
             }
         }
-    }
 
-    table = self->unkC != 0 ? self->unk14->unk38 : 0;
-    delta[0] = (u16)arg2[0] - (u16)table[0];
-    delta[1] = (u16)arg2[1] - (u16)table[1];
-    delta[2] = (u16)arg2[2] - (u16)table[2];
+        table = self->unkC != 0 ? self->unk14->unk38 : 0;
+        delta[0] = (u16)arg2[0] - (u16)table[0];
+        delta[1] = (u16)arg2[1] - (u16)table[1];
+        delta[2] = (u16)arg2[2] - (u16)table[2];
 
-    self->methods->composeAndApplyRotation(self, 0, buf18, delta, 1);
+        self->methods->composeAndApplyRotation(self, 0, buf18, delta, 1);
 
-    delta[0] = buf18[0];
-    delta[1] = (u16)buf18[1] - 0x400;
-    delta[2] = buf18[2];
-    if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+        delta[0] = buf18[0];
+        delta[1] = (u16)buf18[1] - 0x400;
+        delta[2] = buf18[2];
+        if (func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+            SubVec3S16(arg1, buf18, buf28);
+            return 1;
+        }
         delta[1] = (u16)buf18[1] + 0x400;
-        if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
-            return 0;
+        if (func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+            SubVec3S16(arg1, buf18, buf28);
+            return 1;
         }
     }
-    SubVec3S16(arg1, buf18, buf28);
-    return 1;
+    return 0;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_d294_c", func_8001E7BC);
 
 /* dest = to - from, over three components, widening s16 inputs to s32.
  * Parameter ORDER is the subtrahend first: the value subtracted is the 2nd
  * argument, the value subtracted FROM is the 3rd. What the two vectors
- * represent is not established -- func_8001E7BC is the only known caller
- * and it is still INCLUDE_ASM. */
+ * represent is not established -- func_8001E7BC is the only known caller,
+ * and it passes `buf18` (slotA4's rotated delta) as `from` and `buf28`
+ * (func_8001F8B8's own output) as `to`. */
 void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
     dest[0] = to[0] - from[0];
     dest[1] = to[1] - from[1];
