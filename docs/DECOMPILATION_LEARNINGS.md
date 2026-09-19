@@ -283,6 +283,15 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   rematerialization shape has no C spelling — bracketing lands one word out on each side,
   a characterised STALL and not grounds for raw asm. (a §"One named C variable gets ONE
   storage location", §"A fresh local that only carries one branch's result")
+- **That "no C spelling" half is now MEASURED, and its trigger is narrower than naming.**
+  Two ~15-line reproducers through the pinned pipeline: GCC 2.6.3 rematerializes a
+  constant when a delay-slot filler materializes it early and an intervening CALL
+  invalidates the caller-saved register holding it; a no-call control emits exactly one
+  materialization. So the trigger is branch-proximity plus call-invalidation, NOT what the
+  value is named — naming is the axis the six failed variants had already spent.
+  Discriminator: retail keeping N copies of one literal at a merge point can be TWO
+  stacked sub-mechanisms (speculative no-call fills, post-call reloads), which do not
+  answer to one lever. (a docs/match-reports/func_80064E34.md, round 55)
 - **The SCOPE of a named local is the lever, not the name.** Declaring it INSIDE the block
   where the value must survive one call closed `func_800357B0` 179/179 after rounds 35, 39
   and 46 all failed by hoisting to function entry. Three distinct forms exist, so "tried a
