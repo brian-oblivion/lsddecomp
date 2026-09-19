@@ -73,7 +73,7 @@ typedef struct Class865C8Methods {
     /* Shared with D_80086668 (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */
     void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 func_8004A3EC */
-    void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset/78) */
+    void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset / Obj86B60__NotifyChildReset) */
     /* Also shared with D_80086668 at the same offset. */
     void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C func_8004A458 */
     void *unk70;                                   /* func_8004A478 */
