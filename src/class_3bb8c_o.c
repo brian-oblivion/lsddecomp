@@ -239,13 +239,13 @@ void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
-extern BaseObjOMethods *func_80057C84(void);
+extern BaseObjOMethods *DreamSys__GetBaseMethods(void);
 
 void *New_BaseObjO(void) {
     BaseObjO *self = func_80017B34(0x58);
 
     if (self != NULL) {
-        if (func_80057C84()->ctor(self) != NULL) {
+        if (DreamSys__GetBaseMethods()->ctor(self) != NULL) {
             return self;
         }
         func_80017CFC(self);
@@ -258,7 +258,7 @@ BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
     if (GetClass6B5CCMethods()->ctor(self) == NULL) {
         goto fail;
     }
-    self->methods = func_80057C84();
+    self->methods = DreamSys__GetBaseMethods();
     self->unk44 = 0;
     self->companion1 = NULL;
     self->companion2 = NULL;
@@ -398,8 +398,8 @@ void BaseObjO__ApplyRotatedVec14(BaseObjO *self, s16 *arg1) {
 }
 
 extern s32 D_8008ABA8;
-extern void func_80057534(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void DreamSys__ApplyOffsetSlotAndNotify(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
 void BaseObjO__func_5748c(BaseObjO *self, s32 arg1, s32 arg2) {
-    func_80057534(self, &D_8008ABA8, arg1, arg2, 6);
+    DreamSys__ApplyOffsetSlotAndNotify(self, &D_8008ABA8, arg1, arg2, 6);
 }

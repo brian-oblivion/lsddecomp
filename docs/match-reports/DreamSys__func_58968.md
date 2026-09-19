@@ -17,7 +17,7 @@ void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 	s32 local[4];
 
 	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
-	func_80057C84()->slot4C(this, arg1, local);
+	DreamSys__GetBaseMethods()->slot4C(this, arg1, local);
 	this->vt->slot10(this, arg1);
 	if (this->unknwon_int_0x44 == 0xE) {
 		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];

@@ -11,7 +11,7 @@ The constructor for the class at method table `D_8008A6C4` (see
 Signature `(self, arg1, arg2)`, matching `New_class_65650`'s call. Sequence:
 
 1. Call the base class's constructor through its own vtable, slot `+0x008`
-   (`func_80057C84()->ctor(self)`, per `docs/research/class-framework.md`'s
+   (`DreamSys__GetBaseMethods()->ctor(self)`, per `docs/research/class-framework.md`'s
    "base constructor called through the base table's slot +0x008" shape). If
    it returns `NULL`, bail out immediately (no partial teardown needed —
    nothing of this class's own has been touched yet).
@@ -24,7 +24,7 @@ Signature `(self, arg1, arg2)`, matching `New_class_65650`'s call. Sequence:
    `INCLUDE_ASM` this round as `func_80065BFC`) — forwarding the
    constructor's own `arg1` through. If it returns nonzero (failure), roll
    back: fetch the base table *again* (a second, independent
-   `func_80057C84()` call — retail really does call it twice, not cache the
+   `DreamSys__GetBaseMethods()` call — retail really does call it twice, not cache the
    first result) and call its dtor slot, then return `NULL`.
 5. On success, call `self->methods->slot10(self, self->unk5C)` (`+0x010`,
    inherited from the base, not overridden here) and
@@ -36,7 +36,7 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
 {
     D800878D4Methods *base;
 
-    base = func_80057C84();
+    base = DreamSys__GetBaseMethods();
     if (base->ctor(self) == NULL) {
         return NULL;
     }
@@ -47,7 +47,7 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
     self->unk70 = NULL;
     self->unk94 = 0;
     if (self->methods->slot_setup5C(self, arg1) != 0) {
-        base = func_80057C84();
+        base = DreamSys__GetBaseMethods();
         base->dtor(self);
         return NULL;
     }
@@ -74,7 +74,7 @@ by name** — the call goes through a typed function-pointer field in
 a direct declaration of the not-yet-matched function. This is cheaper than
 the "calling into a function that is still `INCLUDE_ASM`" pattern in
 CLAUDE.md, which applies to *direct* `jal`-by-name calls (like
-`func_80057C84` here), not vtable dispatch.
+`DreamSys__GetBaseMethods` here), not vtable dispatch.
 
 ### Proposed learning
 

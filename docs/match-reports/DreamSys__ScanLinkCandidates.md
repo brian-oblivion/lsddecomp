@@ -1,4 +1,6 @@
-# func_80057954 -- MATCHED (49/49)
+> Renamed from `func_80057954` on 2026-09-19 (tools/rename.py). Address 0x80057954.
+
+# DreamSys__ScanLinkCandidates -- MATCHED (49/49)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot.
@@ -6,23 +8,23 @@ helper, not a vtable slot.
 ## Signature
 
 ```c
-void *func_80057954(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2);
+void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2);
 ```
 
 Called only by this unit's own (still-queued at the time this was
-written) `func_80057668`.
+written) `DreamSys__FindNearbyLink`.
 
 ## Body
 
 ```c
-void *func_80057954(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2) {
+void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2) {
     s32 i;
 
     for (i = 0; i < count;) {
         GridArrElem *elem = *arr2;
         i++;
-        if (elem->unk4->unk2C != 0) {
-            void *result = func_80057A18(self, arg1, arg2, arr1, elem);
+        if (elem->info->enabled != 0) {
+            void *result = DreamSys__ScanGridWindow(self, arg1, arg2, arr1, elem);
             if (result != NULL) {
                 return result;
             }
@@ -36,13 +38,13 @@ void *func_80057954(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery
 
 Walks `count` entries of two parallel arrays -- `arr1` (`GridQuery[]`,
 stride `0xC`) and `arr2` (`GridArrElem *[]`, stride 4) -- skipping any
-entry whose `GridArrElem->unk4->unk2C` flag is zero, calling
-`func_80057A18` (this unit's own, see its report) on the rest, and
+entry whose `GridArrElem->info->enabled` flag is zero, calling
+`DreamSys__ScanGridWindow` (this unit's own, see its report) on the rest, and
 returning the first non-NULL result.
 
-New local types introduced (shared with `func_80057A18`, declared once
+New local types introduced (shared with `DreamSys__ScanGridWindow`, declared once
 above this function): `GridQuery` (12-byte `{s16,s16,s32,s32}` record,
-built by this unit's own still-queued `func_80057784`), `GridArrElem`/
+built by this unit's own still-queued `DreamSys__BuildLinkQueries`), `GridArrElem`/
 `GridArrElemInner` (only the two fields actually read are named).
 
 ## Shape note: `i++` must be the loop's FIRST statement, not its
@@ -67,11 +69,20 @@ Three loop shapes were tried:
   (so `count <= 0` skips the whole loop via a single `blez`, matching
   retail) while placing `i++` where retail's scheduler put it.
 
+## Naming
+
+**`DreamSys__ScanLinkCandidates` -- tier B.** Mechanics fully confirmed
+(49/49): walks `count` paired `GridQuery`/`GridArrElem*` entries,
+skipping any whose `info->enabled` flag is zero, testing the rest via
+`DreamSys__ScanGridWindow`, returning the first non-NULL result. Named
+for exactly this "scan a set of link candidates" mechanic, which is
+`DreamSys__BuildLinkQueries`'s own output.
+
 ## Verify
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057954   # 49/49
+tools/funcdiff.py DreamSys__ScanLinkCandidates   # 49/49
 ```
 
 ### Proposed learning

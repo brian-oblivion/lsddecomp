@@ -52,7 +52,7 @@
  *    `&D_800876FC`, and its shared-base slots +0x010/+0x014/+0x018/+0x088/
  *    etc. are INHERITED, not overridden, by this class). This unit
  *    supplies the class's OWN slots (ctor/dtor/slot40), confirmed by both
- *    chaining to `func_80057C84()` -- the SAME shared-base getter
+ *    chaining to `DreamSys__GetBaseMethods()` -- the SAME shared-base getter
  *    `class_3bb8c_o.c` already used for its own ctor/New_X pair. Kept as
  *    this unit's own local view, `Obj876FC`/`Obj876FCMethods` --
  *    `class_3bb8c_o.c` is not this unit's to edit, and per the
@@ -381,7 +381,7 @@ struct Obj876FC {
 };
 
 /* The shared base-class table getter, SAME symbol `class_3bb8c_o.c`
- * already established as `func_80057C84` there (also MEASURED to take no
+ * already established as `DreamSys__GetBaseMethods` there (also MEASURED to take no
  * real arguments). Fresh local reading here: this unit needs both `ctor`
  * (+0x008, checked against NULL) and `dtor` (+0x00C, its return value
  * forwarded by func_80056464). */
@@ -390,7 +390,7 @@ typedef struct FixedBaseTableR {
     void *(*ctor)(void *self); /* +0x008 */
     void *(*dtor)(void *self);   /* +0x00C */
 } FixedBaseTableR;
-extern FixedBaseTableR *func_80057C84(void);
+extern FixedBaseTableR *DreamSys__GetBaseMethods(void);
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
@@ -412,7 +412,7 @@ void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3) {
 }
 
 void *func_800563C0(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
-    if (func_80057C84()->ctor(self) == NULL) {
+    if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }
     self->methods = func_80056F4C();
@@ -427,7 +427,7 @@ fail:
 
 void *func_80056464(Obj876FC *self) {
     func_80056718(self);
-    return func_80057C84()->dtor(self);
+    return DreamSys__GetBaseMethods()->dtor(self);
 }
 
 void func_800564A4(Obj876FC *self, Block24 *src) {

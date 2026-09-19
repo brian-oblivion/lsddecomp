@@ -40,7 +40,7 @@ addu  $v0, $s0, $zero          ; return the object
 `DreamSys__DreamSys` (0x800587F0), the constructor itself:
 
 ```
-jal   func_80057C84            ; -> &D_800878D4 (the BASE class table)
+jal   DreamSys__GetBaseMethods            ; -> &D_800878D4 (the BASE class table)
 lw    $v0, 0x8($v0)            ; slot +0x008 again
 jalr  $v0, $a0 = this          ; BASE CONSTRUCTOR, ALSO INDIRECT
 jal   Get_vtable_DreamSys

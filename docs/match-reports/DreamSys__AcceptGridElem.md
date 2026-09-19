@@ -1,14 +1,16 @@
-# func_80057B54 -- MATCHED (15/15)
+> Renamed from `func_80057B54` on 2026-09-19 (tools/rename.py). Address 0x80057b54.
+
+# DreamSys__AcceptGridElem -- MATCHED (15/15)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family (called only from
-this unit's own `func_80057A18`, still queued at time of writing, twice, as
-`func_80057B54(elemOrHead, arg1, arg2)`). Not itself a vtable slot in any
+this unit's own `DreamSys__ScanGridWindow`, still queued at time of writing, twice, as
+`DreamSys__AcceptGridElem(elemOrHead, arg1, arg2)`). Not itself a vtable slot in any
 of the class tables reachable from this unit's addresses.
 
 ## Signature
 
 ```c
-void *func_80057B54(void *arg0, void *arg1, void *arg2);
+void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2);
 ```
 
 `arg1`/`arg2` are never read by the body -- present only to match the
@@ -17,7 +19,7 @@ caller's 3-argument calling convention.
 ## Body
 
 ```c
-void *func_80057B54(void *arg0, void *arg1, void *arg2) {
+void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     if (arg0 != NULL) {
         if (func_8001E7BC() != 0) {
             return arg0;
@@ -41,11 +43,22 @@ retail's, which falls through to the shared `move v0,zero` from the INNER
 check only). Confirmed by direct comparison: combined form gives 6/15
 words with the size drift warning; nested form gives 15/15 exactly.
 
+## Naming
+
+**`DreamSys__AcceptGridElem` -- tier A.** A pure predicate/leaf: returns
+`arg0` unchanged if it is non-NULL AND the global gate `func_8001E7BC()`
+is non-zero, else `NULL`. Mechanics ARE the purpose here (an accept/reject
+test), matching CLAUDE.md's tier-A carve-out for "a pure leaf whose
+mechanics ARE its purpose (a getter, a clamp, a list push)". `arg1`/`arg2`
+are read by neither this function's body nor this name -- they exist only
+to match the caller's calling convention (documented in the report body
+above).
+
 ## Verify
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057B54   # 15/15
+tools/funcdiff.py DreamSys__AcceptGridElem   # 15/15
 ```
 
 ### Proposed learning

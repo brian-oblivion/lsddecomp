@@ -148,12 +148,12 @@ extern void func_800569A8();
 
 /* class_3bb8c_p.c; fully prototyped since every call site here uses all
  * three arguments for real. */
-extern void *func_80057C94(void *arg1, void *arg2, void *arg3);
+extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
 
 /* Three globals a class_3bb8c_o.c ctor-shaped function (BaseObjO__func_56f5c)
  * captures once from its own three pointer-typed parameters -- D_8008ACA4 is
  * some other object (first field a methods pointer, called through a new
- * +0x080 slot below), D_8008ACA8 is forwarded opaquely to func_80057C94 as
+ * +0x080 slot below), D_8008ACA8 is forwarded opaquely to New_D800879C4 as
  * its own third argument, and D_8008ACAC's pointee has a lookup field at
  * +0x018 that func_80056520/func_80056640 snapshot/diff via D_8008ACB0. */
 typedef struct {
@@ -409,7 +409,7 @@ void func_80056D18(void *self, s32 a1, s32 a2, void *tbl) {
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = func_80057C94((void *)a2, 0, D_8008ACA8);
+        node = New_D800879C4((void *)a2, 0, D_8008ACA8);
         *p = node;
         node->methods->slot4C(node, self, 0);
         (*p)->methods->slotB8(*p, ((LinkNode *)self)->unk74);

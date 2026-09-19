@@ -10,13 +10,13 @@ bytes, constructs, frees and returns `NULL` on construction failure.
 ```c
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
-extern BaseObjOMethods *func_80057C84(void);
+extern BaseObjOMethods *DreamSys__GetBaseMethods(void);
 
 void *New_BaseObjO(void) {
     BaseObjO *self = func_80017B34(0x58);
 
     if (self != NULL) {
-        if (func_80057C84()->ctor(self) != NULL) {
+        if (DreamSys__GetBaseMethods()->ctor(self) != NULL) {
             return self;
         }
         func_80017CFC(self);
@@ -32,9 +32,9 @@ This is the `New_X` allocator sub-shape #3 from `DECOMPILATION_LEARNINGS.md`
 ("tests BOTH the allocation and the constructor's return, freeing on
 constructor failure -- plain `if`/`return`"), confirmed by disassembly: a
 literal `ori $a0,$zero,0x58` allocation, an unconditional test of the
-result, then `func_80057C84()->ctor(self)`'s OWN return checked against
+result, then `DreamSys__GetBaseMethods()->ctor(self)`'s OWN return checked against
 NULL -- nonzero means success (return `self`), zero means failure
-(`func_80017CFC(self)` then return `NULL`). `func_80057C84` is already
+(`func_80017CFC(self)` then return `NULL`). `DreamSys__GetBaseMethods` is already
 declared elsewhere (`code_55dd4.h`) returning `D800878D4Methods *`; this
 unit uses its own local `BaseObjOMethods *` reading of the same table (see
 `BaseObjO__BaseObjO`'s report). `func_80017B34`/`func_80017CFC` are the
@@ -57,11 +57,11 @@ allocator sub-shape #3 exactly (alloc, test, ctor, test-ctor's-own-return,
 free-on-failure) -- mechanics are the entire visible purpose of this
 function, which is why the previous round's own report already used this
 name in prose before anyone renamed it. Constructs a `BaseObjO`, not a
-`Class65650`: it calls `func_80057C84()->ctor(self)` with a SINGLE
+`Class65650`: it calls `DreamSys__GetBaseMethods()->ctor(self)` with a SINGLE
 argument, which only makes sense if that slot resolves to
 `BaseObjO__BaseObjO` (this unit's own 1-argument base ctor) rather than to
 `Class65650`'s real, 3-argument constructor
 (`code_55dd4.c:class_65650__Constructor`) -- confirmed directly by
-`func_80057C84`'s declared return type, `BaseObjOMethods *` here (this
+`DreamSys__GetBaseMethods`'s declared return type, `BaseObjOMethods *` here (this
 unit's own reading of the SAME table `code_55dd4.h` calls
 `D800878D4Methods`).

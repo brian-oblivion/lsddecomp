@@ -1,7 +1,9 @@
-# func_80057784 -- STALL (best 13/116 words, structurally correct)
+> Renamed from `func_80057784` on 2026-09-19 (tools/rename.py). Address 0x80057784.
+
+# DreamSys__BuildLinkQueries -- STALL (best 13/116 words, structurally correct)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain internal
-helper, not a vtable slot. Called by this unit's own `func_80057668`
+helper, not a vtable slot. Called by this unit's own `DreamSys__FindNearbyLink`
 (also still queued/stalled -- see its own report, which depends on this
 one).
 
@@ -18,24 +20,24 @@ burning the rest chasing the same residue class.
 ## Signature
 
 ```c
-s32 func_80057784(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4);
+s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4);
 ```
 
 New types this function needed, declared once (shared with
-`func_80057668`, `func_80057954`, `func_80057A18`) above `func_80057668`
-in this file: `LinkQueryBuf` (`arg3`'s type -- `s8 unk2`/`unk3`, `GridArrElem
-*unk24`), and `DreamSysUnk4C68Obj`/`DreamSysUnk4CObj::unk_0x68` (added to
-`include/DreamSys.h`, additive). `DreamSysUnk4CMethods::slot0x110`/
-`slot0x118` were also added there (splitting the existing
+`DreamSys__FindNearbyLink`, `DreamSys__ScanLinkCandidates`, `DreamSys__ScanGridWindow`) above `DreamSys__FindNearbyLink`
+in this file: `LinkQueryBuf` (`arg3`'s type -- `s8 queryCol`/`queryRow`, `GridArrElem
+*source`), and `DreamSysUnk4C68Obj`/`DreamSysUnk4CObj::unk_0x68` (added to
+`include/DreamSys.h`, additive). `DreamSysUnk4CMethods::queryLinkAtPos`/
+`getGridArrElemAt` were also added there (splitting the existing
 `pad_0x110[0x11C-0x110]`).
 
 ## Best-reached body (13/116, preserved for the next attempt)
 
 ```c
 #if 0
-s32 func_80057784(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
-    s32 f2 = arg3->unk2;
-    s32 f3 = arg3->unk3;
+s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
+    s32 f2 = arg3->queryCol;
+    s32 f3 = arg3->queryRow;
     s32 oddCount = (arg4 & 1) ? arg4 : arg4 + 1;
     s32 idx = 1;
 
@@ -46,27 +48,27 @@ s32 func_80057784(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQuery
         s16 s3;
         s32 pos;
 
-        arr1[0].unk0 = (s16) f2;
-        arr1[0].unk2 = (s16) f3;
-        arr1[0].unk4 = oddCount;
-        arr1[0].unk8 = oddCount;
-        src = arg3->unk24;
+        arr1[0].startCol = (s16) f2;
+        arr1[0].startRow = (s16) f3;
+        arr1[0].numCols = oddCount;
+        arr1[0].numRows = oddCount;
+        src = arg3->source;
         arr2[0] = src;
         unk4C = self->unk_0x4C;
         unk68 = unk4C->unk_0x68;
         if (unk68->unk_0x4 != 1) {
             return 1;
         }
-        s3 = src->unk4->unk32;
+        s3 = src->info->unk32;
         pos = s3 + 1;
         if (pos < unk68->unk_0x2) {
             idx = 2;
-            arr2[1] = unk4C->methods->slot0x118(unk4C, pos, f3, src);
+            arr2[1] = unk4C->methods->getGridArrElemAt(unk4C, pos, f3, src);
             arr1[1] = arr1[0];
         }
         pos = s3 - 1;
         if (pos >= 0) {
-            arr2[idx] = unk4C->methods->slot0x118(unk4C, pos, f3, src);
+            arr2[idx] = unk4C->methods->getGridArrElemAt(unk4C, pos, f3, src);
             arr1[idx] = arr1[0];
             idx++;
         }
@@ -92,14 +94,14 @@ s32 func_80057784(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQuery
         } else {
             vv0 -= 1;
         }
-        arr1[0].unk0 = (s16) a1;
+        arr1[0].startCol = (s16) a1;
         if (f3 == 0) {
             vv0 -= 1;
         }
-        arr1[0].unk2 = (s16) a2;
-        arr1[0].unk4 = t0;
-        arr1[0].unk8 = vv0;
-        arr2[0] = arg3->unk24;
+        arr1[0].startRow = (s16) a2;
+        arr1[0].numCols = t0;
+        arr1[0].numRows = vv0;
+        arr2[0] = arg3->source;
         return 1;
     }
 }
@@ -107,7 +109,7 @@ s32 func_80057784(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQuery
 ```
 
 This body is semantically the exact translation of the disassembly
-(verified line-by-line against `asm/nonmatchings/class_3bb8c_p/func_80057784.s`
+(verified line-by-line against `asm/nonmatchings/class_3bb8c_p/DreamSys__BuildLinkQueries.s`
 and cross-checked with `m2ctx.py`), truncates and stores every field
 correctly, and takes the right branches. It compiles clean and scores
 13/116 (frame `-0x30` vs retail's `-0x28`, one extra callee-saved
@@ -121,12 +123,12 @@ listed after)
    `lb` (signed).** Confirmed with a standalone reproducer through the
    pinned toolchain: identical code, only the LOCAL's declared width
    changed, and the emitted load instruction changed with it. Since the
-   loaded byte is later STORED into a `s16` field (`arr1[0].unk0 = ...`),
-   it must be properly sign-extended by then; `s32 f2 = arg3->unk2;`
+   loaded byte is later STORED into a `s16` field (`arr1[0].startCol = ...`),
+   it must be properly sign-extended by then; `s32 f2 = arg3->queryCol;`
    (not `s8`) is what gives `lb`, matching retail. Cost: went from
    completely unrelated (0/116, with a further-drifted frame) to a
    recognizable near-miss.
-2. **Caching `arg3->unk2`/`unk3` into a local ONCE and reusing it across
+2. **Caching `arg3->queryCol`/`queryRow` into a local ONCE and reusing it across
    both branches is correct** (retail's own disassembly shows the SAME
    `t2`/`t1` registers, loaded once at function entry, used in BOTH the
    `oddCount==1` branch and the `else` branch) -- this is the opposite of
@@ -153,7 +155,7 @@ listed after)
   to 0/116). This suggests the value feeding the `== 1` check is NOT
   simply `oddCount` reused, but something reconstructed from a genuinely
   different expression not yet identified.
-- **The second `slot0x118` call re-materializes `f3`/`src` into
+- **The second `getGridArrElemAt` call re-materializes `f3`/`src` into
   `a2`/`a3`**, even though (per retail's own disassembly) those
   registers should already hold the right values unchanged from the
   first call. Casting the field to a 2-argument function-pointer type at
@@ -174,7 +176,7 @@ listed after)
 - Ternary vs. explicit if/else, and one-variable vs. two-variable
   (`v0`/`v1`-mirroring) forms for `oddCount` -- three variants tried, none
   beat the ternary.
-- Function-pointer cast at the second `slot0x118` call site to suppress
+- Function-pointer cast at the second `getGridArrElemAt` call site to suppress
   argument re-materialization -- tried once, worse.
 
 **Not yet tried:** varying the SHARED-prep hypothesis more carefully (only
@@ -185,20 +187,32 @@ pair were not independently isolated), and checking whether `arg2`
 class. Given `arr2`'s the field holding the extra register, that's the
 next axis worth a fresh session's attempts.
 
+## Naming
+
+**`DreamSys__BuildLinkQueries` -- tier B, STALL.** Control and data flow
+are independently confirmed (cross-checked against `m2ctx.py`, byte
+residue is register-allocation only): builds one or two `GridQuery` +
+`GridArrElem*` pairs from a `LinkQueryBuf` position query, optionally
+consulting an adjacent-cell lookup (`getGridArrElemAt`) when a neighbour
+object's `unk_0x68->unk_0x4` flag reads `1`. "Build link queries" names
+what the function assembles for its caller (`DreamSys__FindNearbyLink`)
+to scan; still a STALL, so kept as a mechanics-only tier B name per
+CLAUDE.md ("a wrong tier-A name is worse than a placeholder").
+
 ## Verify
 
 ```
-./build-and-verify.sh   # build exit=0 with func_80057784 restored to INCLUDE_ASM
-tools/funcdiff.py func_80057784   # still INCLUDE_ASM -- do not trust a "full match" reading, it is retail-vs-retail
+./build-and-verify.sh   # build exit=0 with DreamSys__BuildLinkQueries restored to INCLUDE_ASM
+tools/funcdiff.py DreamSys__BuildLinkQueries   # still INCLUDE_ASM -- do not trust a "full match" reading, it is retail-vs-retail
 ```
 
 ## Round: re-verified from raw asm, claim confirmed accurate (runner delta, round 19)
 
 Re-derived this function's control flow directly from
-`asm/nonmatchings/class_3bb8c_p/func_80057784.s`, instruction by
+`asm/nonmatchings/class_3bb8c_p/DreamSys__BuildLinkQueries.s`, instruction by
 instruction, as a check against the kind of misread that turned out to be
 real elsewhere this round (`func_8005A1F4`). No discrepancy found -- every
-branch, field offset, and the two `slot0x118` call sites (including the
+branch, field offset, and the two `getGridArrElemAt` call sites (including the
 confirmed fact that the SECOND call reuses `f3`/`src` in `$a2`/`$a3`
 unchanged from the first call's setup, rather than retail re-loading them)
 match this report's existing C exactly.
@@ -209,6 +223,6 @@ Also rebuilt the exact preserved body into `src/class_3bb8c_p.c` directly
 new axis tried beyond what this report already records exhausted (the
 `void **`/type-class idea for `arr2` flagged above as the next lead was
 not attempted this round -- it requires touching the caller
-`func_80057668`'s buffer types too, and this round's time budget went to
+`DreamSys__FindNearbyLink`'s buffer types too, and this round's time budget went to
 functions with a clearer path to closing). Left as-is, `INCLUDE_ASM`
 restored, no source changes.

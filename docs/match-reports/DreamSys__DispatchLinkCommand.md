@@ -1,0 +1,44 @@
+> Renamed from `func_80057C14` on 2026-09-19 (tools/rename.py). Address 0x80057c14.
+
+# DreamSys__DispatchLinkCommand -- MATCHED (22/22)
+
+Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0E0`
+in the shared base table `D_800878D4` (`include/DreamSys.h`'s
+`DreamSysBaseMethods::slot0xE0` already carried a comment naming this
+exact function as its resolution). Not overridden at the top `DreamSys`
+level, which instead has its own distinct `+0xE0` implementation
+(`DreamSys__WallLink`, `LinkWall` in `include/DreamSys.h`).
+
+## Signature
+
+```c
+void DreamSys__DispatchLinkCommand(DreamSys *self, void *arg1, s32 count);
+```
+
+## Body
+
+```c
+void DreamSys__DispatchLinkCommand(DreamSys *self, void *arg1, s32 count) {
+    GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
+}
+```
+
+Sibling of `DreamSys__DispatchLinkCommandAndTryAttach` (see that report for `GetClass6B5CCMethods()` and this
+unit's local `Class6B5CCBaseTable` view): same single unconditional call
+through the shared base table's `+0x09C` slot, but no second conditional
+dispatch.
+
+## Naming
+
+**`DreamSys__DispatchLinkCommand` -- tier A.** A pure single-call forward
+to `Class6B5CCBaseTable::dispatchLinkCommand` with no other logic --
+mechanics ARE the purpose, matching the "pure leaf" carve-out. Sibling of
+`DreamSys__DispatchLinkCommandAndTryAttach` (this unit) without its
+conditional second dispatch.
+
+## Verify
+
+```
+./build-and-verify.sh   # build exit=0, OK: build matches retail
+tools/funcdiff.py DreamSys__DispatchLinkCommand   # 22/22
+```
