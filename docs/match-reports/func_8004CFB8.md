@@ -1,4 +1,4 @@
-# func_8004CFB8 — STALL (25/28 words, best attempt)
+# func_8004CFB8 — MATCHED (round 58), 28/28, whole-image SHA1 green
 
 > **HEAD VERIFICATION, round 9. Classification CONFIRMED as a stall, but
 > RECLASSIFIED as to kind: this is a SOURCE-SHAPE stall and a permuter
@@ -392,3 +392,120 @@ half, which no earlier attempt's source touched. Treat "swap a local for a
 direct field write" as a whole-function-scope experiment, not a local one —
 build after every such swap even when the target statement is nowhere near
 the part you believe you are testing.
+
+---
+
+## Round 58 (bravo) — MATCHED, 28/28. The "cc1 cannot defer the `mflo`" verdict was wrong: retail's single pre-branch load of the scale is a SOURCE-LEVEL local, and it only works together with an explicit if/else
+
+**Result: `28/28`, `build exit=0`, `OK: build matches retail SLPS_015.56`,
+SHA1 `76322eeade5ebb22dca57fdeac7d68c30f06308d`. Confirmed with the unit's
+object deleted and the image rebuilt from scratch, not from an incremental
+build.** Four attempts this round (and 27 words of C).
+
+### The lever
+
+The residue every previous round chased was the `mult`/`mflo` pairing in the
+second half. Retail:
+
+```
+3d7fc: lw   v0,0x1e4(a0)
+3d804: lh   v1,6(v0)          <- the scale, loaded ONCE, before the branch
+3d808: bgez a1,3d81c
+3d80c:  mult v1,a1            <- arm 1's mult, in the delay slot
+3d810: nor  v0,zero,a1
+3d814: addiu v0,v0,1
+3d818: mult v1,v0             <- arm 2's mult
+3d81c: mflo v0                <- ONE mflo, after the join
+3d820: jr   ra
+3d824:  sw  v0,0x1e0(a0)
+```
+
+Two things had to be true in the source at once, and **neither works
+without the other**:
+
+1. **The scale is a named local, assigned once before the sign test.**
+   `scale = self->unk1E4->unk6;` — not `self->unk1E4->unk6` written inside
+   each arm. Retail's single `lh` is not cc1 finding a common subexpression
+   for you; it is one load because the source had one load.
+2. **The sign test is an explicit `if`/`else` assigning a local `val`** —
+   not the "default value, then conditionally overwritten" idiom every
+   earlier attempt used.
+
+```c
+    scale = self->unk1E4->unk6;
+    if (rate >= 0) {
+        val = scale * rate;
+    } else {
+        val = scale * (~rate + 1);
+    }
+    self->unk1E0 = val;
+```
+
+The first half (the `goto` ladder selecting one of the four
+`EntryDesc866E8` entries, with its deliberate store asymmetry) is
+**unchanged from round 9** and stayed byte-exact throughout.
+
+### Measured, all four in one session, so the joint requirement is not a guess
+
+| # | second-half shape | result |
+| --- | --- | --- |
+| s0 | the report's recorded best body: default-then-overwrite, field access in both places | **17/28, length changes (drift)** |
+| s1 | s0 with a `do { … break; … } while (0)` around it (round 58's new lever from `func_8004CAF0`) | **17/28, drift** — byte-identical to s0 |
+| s2 | explicit `if`/`else` with `val`, but the field access still written in both arms | **10/28, drift** — worse than s0 |
+| s3 | explicit `if`/`else` **plus** the cached `scale` local | **28/28, exact, whole image green** |
+
+s2 is the informative row. The if/else alone makes things *worse*; it is
+only correct once the scale load has been lifted out of the arms. That is
+why six rounds of single-axis variation never found it — each half of the
+lever, tried alone, measures as a regression.
+
+### What this corrects, and the measurement warning underneath it
+
+**Round 25's conclusion was wrong**, and it is worth quoting because it is
+the kind of verdict that stops later rounds from looking:
+
+> …or is a case where cc1's per-statement RTL expansion genuinely cannot
+> avoid the early `mflo`, making the deferred-extraction version something
+> only OTHER compilers/versions would produce.
+
+It can, with this compiler, in 27 lines of ordinary C. The reasoning that
+led there was sound about the mechanism (cc1 does extract the `mflo` eagerly
+after an assignment statement) and wrong about the conclusion, because it
+assumed the assignment statement had to be the one the attempts kept using.
+
+**And the score this function was queued on was never trustworthy.** The
+recorded best was `25/28`, and the round-18 entry describes the same state
+as "3 extra words" / "1 reordering + 3 insertions" — i.e. the body is three
+words LONG. A length change is exactly way 3 of CLAUDE.md's four ways a
+score lies, and `funcdiff.py` warns about it. Rebuilding that same body this
+round gives **17/28 with an outside-range warning**, not 25/28; the two
+numbers differ because a shifted window scores different instructions
+against each other. The `25/28` propagated into the report title and into
+`plan.py`'s ranking regardless.
+
+So: **before ranking work on a recorded near-miss, check whether that
+score was measured under drift.** If a report's own structural description
+says the attempt is N words long or N words short, its word-match figure is
+one of the four lies and should not be compared against a clean one. A
+function whose "best" is a drifting 17/28 is a very different prospect from
+one whose best is a clean 25/28, and this one was filed as the latter.
+
+### Proposed learning
+
+**When retail loads a value once before a branch and both arms use it, that
+single load is a source-level local — write it as one, and expect the
+payoff only in combination with the branch shape.** The pattern to look for
+is a `lh`/`lw` sitting *above* a conditional branch whose arms both consume
+it. Writing the field access inside each arm and trusting cc1 to CSE it
+gives a different RTL expansion order for anything with a two-instruction
+materialisation (`mult`/`mflo`, `div`/`mflo`, `mfhi`), because cc1 extracts
+the result per assignment statement. The corollary is the one that cost six
+rounds here: **this lever and the branch-shape lever are multiplicative, not
+additive.** Each alone measured as a regression (17/28 and 10/28 against a
+17/28 baseline); together they were byte-exact on the first build. When two
+axes are both suspected, try the product before concluding either is inert.
+
+`do { } while (0)`, round 58's new lever from `func_8004CAF0`, was tried
+here (s1) and is **byte-identical to s0** — a clean negative that helps
+scope it: it moves scheduling and delay-slot placement, and does not touch
+how cc1 expands a statement into `mult` + `mflo`.
