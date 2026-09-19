@@ -25,7 +25,7 @@ Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
     if (func_80066818()->ctor(this, arg2, arg3) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = arg1;
-        this->unk9C = 0;
+        this->soundCueSet = 0;
         this->unk100 = NULL;
         this->unk104 = NULL;
         this->methods->initState(this);
@@ -154,7 +154,7 @@ void Entity__NotifyReset(Entity *this, s32 a1, s32 a2) {
 }
 
 void Entity__TickSoundCue(Entity *this) {
-    func_8002CD08(this->unk58, &this->unk9C);
+    func_8002CD08(this->soundCueChannel, &this->soundCueSet);
     this->unkFC++;
 }
 
@@ -217,7 +217,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
     if (threshold < result) {
         return -1;
     }
-    return result / (threshold / self->unkB0);
+    return result / (threshold / self->proximityDivisor);
 }
 
 void *Entity__GetMoodEffect(Entity *this) {
@@ -270,7 +270,7 @@ extern EntityMoodHandlerRow gEntityMoodHandlerTable[];
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, Entity *arg3, void *arg4);
 
 void Entity__StartSoundCue(Entity *this) {
-    InitSoundCueSet(this->unk58, &this->unk9C, this->moodIndex + 1, this,
+    InitSoundCueSet(this->soundCueChannel, &this->soundCueSet, this->moodIndex + 1, this,
                   gEntityMoodHandlerTable[this->moodIndex].handler);
     this->methods->slot12C(this);
     this->methods->slot110(this);
@@ -279,7 +279,7 @@ void Entity__StartSoundCue(Entity *this) {
 }
 
 void Entity__StopSoundCue(Entity *this) {
-    FlushSoundCueSet(this->unk58, &this->unk9C);
+    FlushSoundCueSet(this->soundCueChannel, &this->soundCueSet);
     this->methods->slot130(this);
     this->methods->slot114(this);
     this->unkF8 = 0;

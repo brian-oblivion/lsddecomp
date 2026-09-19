@@ -284,7 +284,7 @@ struct EntityRegionRef {
 
 /* Field offsets derived from this unit's own functions (Entity__TickSoundCue,
  * Entity__Activate, Entity__SetUnkF4, Entity__StopSoundCue, and the Get*Effect/Stage/Video
- * family). `unk9C` is only ever address-taken (passed as an output buffer to
+ * family). `soundCueSet` is only ever address-taken (passed as an output buffer to
  * two still-uncarved functions, func_8002CD08/FlushSoundCueSet), never read
  * here beyond its first word (zeroed by Entity__Entity), so its true
  * size/shape past that first s32 is still unconfirmed -- it's padded out
@@ -305,7 +305,7 @@ struct Entity {
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachUnk4C; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
     /* +0x50 */ s32 unk50;              /* read by func_80061198 (Entity_d), passed opaquely to this->unk100->methods->slotD4 as its arg1 */
     /* +0x54 */ u8 pad54[0x58 - 0x54];
-    /* +0x58 */ s32 unk58;             /* passed to func_8002CD08/FlushSoundCueSet */
+    /* +0x58 */ s32 soundCueChannel;             /* passed to func_8002CD08/FlushSoundCueSet */
     /* +0x5C */ u8 pad5C[0x70 - 0x5C];
     /* +0x70 */ Unk70Obj *unk70;       /* read by func_80061400 (Entity_d), see Unk70Obj's own comment */
     /* +0x74 */ u8 pad74[0x7C - 0x74];
@@ -317,9 +317,9 @@ struct Entity {
     /* +0x90 */ s32 unk90;             /* func_80062C58 (Entity_e): nonzero gates `out->unk1C = 0x1C` when `out->unk4 & 3` is also 0 */
     /* +0x94 */ Unk94Obj *unk94;         /* passed as Class6B5CC__FaceTarget's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
-    /* +0x9C */ s32 unk9C;             /* zeroed by Entity__Entity; address-taken by Entity__TickSoundCue/Entity__StopSoundCue */
+    /* +0x9C */ s32 soundCueSet;             /* zeroed by Entity__Entity; address-taken by Entity__TickSoundCue/Entity__StopSoundCue */
     /* +0xA0 */ u8 padA0[0xB0 - 0xA0];
-    /* +0xB0 */ s32 unkB0;             /* divisor in Entity__GetProximityRatio's (slot148) computation, this unit */
+    /* +0xB0 */ s32 proximityDivisor;             /* divisor in Entity__GetProximityRatio's (slot148) computation, this unit */
     /* +0xB4 */ u8 padB4[0xF0 - 0xB4];
     /* +0xF0 */ s32 unkF0;             /* set to 1 by Entity__Activate; gate flag for Entity__UpdateActivationState/Entity__UpdateDeactivationState */
     /* +0xF4 */ s32 unkF4;             /* set from Entity__SetUnkF4's arg1 */
