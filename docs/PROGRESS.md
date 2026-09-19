@@ -6,6 +6,130 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-19 — round 56: a silent stale-object trap in the build, and two rounds' conclusions overturned
+
+Head on Opus (no new procedure, no HARD RULE adjudication; the top jobs named
+Sonnet and Opus runners). Three runners, the operator's default cap. Gate 0
+green first try, all three worktrees byte-verified before handover,
+`headercontention.py` reported no contention between `Entity`, `code_179d8_j`
+and `code_8220_b`.
+
+**State at end: 1138 matched / 1252 game functions, 0 fresh, 114 stalled.
+Track 1 calibration Opus 0 matches / 2 band attempts (Sonnet stays complete at
+0/6). Track 2 unchanged at 98 named / 44 parked. Track 3 at 11/75 units, 884
+defs still `func_` (was 903), `unk` refs 3042 (was 3398), `slotNN` calls 1049
+(was 1163). Build verifies.**
+
+**Zero byte-exact matches. The round's most valuable output is a defect in the
+build system that makes a red build look like a clean one.**
+
+**1. A failed compile leaves an object NEWER than the header that broke it,
+and the next `make` silently links the stale one.** The compile rule
+(`Makefile:130`) is a pipeline — `cpp | cc1 | maspsx | as -o $@`. When `cc1`
+exits 33, `as` still runs and CREATES `$@`. make deletes a target on failure
+only for the recipe's own exit status, which is `as`'s, so the object survives
+with a fresh mtime. On the NEXT build make finds that object newer than the
+header, considers it up to date, SKIPS the unit, and links it.
+
+The head hit this in anger applying a type-scoped rename: 74753 differing
+bytes with an EMPTY compile-error grep, and the unit actually broken
+(`src/Entity_g.c`) absent from every subsequent log. Reproduced in isolation
+in a scratch worktree from a green baseline: break one unit through a header
+change only, build A gives 42 errors in that unit, build B — nothing changed,
+source still uncompilable, 29 offending references still present — gives
+**zero**. The failing target simply moves on to the next unit.
+
+Why it matters beyond the incident: CLAUDE.md's loop teaches that no grep hits
+plus `build exit=2` is "a fresh build that does not match yet". Under this
+mechanism that reading is FALSE — no hits can equally mean "the unit you broke
+was skipped". The documented `*** [….o]` pattern catches build A and cannot
+catch build B, because build B has no failing `.o` target for the unit at all.
+Recovery is `make clean` (which also wipes `asm/`, so `make extract` after) or
+`rm -f build/src/<unit>.c.o`.
+
+**ESCALATED, not fixed** — the Makefile is pinned and this is the operator's
+call. Three candidate one-line fixes, each setting one behaviour:
+`.DELETE_ON_ERROR:`; `SHELL := /bin/bash -o pipefail` so the recipe's status is
+cc1's rather than `as`'s; or assemble to a temp and `mv` on success. Note the
+round-1 entry at the bottom of this log fixed the OTHER half of this same
+seam ("a header edit rebuilt nothing"); this is the failure mode that survived
+that fix.
+
+**2. Both matching runners overturned a previous round's recorded
+conclusion, and for the same underlying reason.** Neither function matched;
+both moved a long way.
+
+- `func_80030404` (bravo): 21/96 and 5 words short → **89/96, length EXACT**.
+  Its loop counter had been typed `(u8)`-masked since round 23, inherited *by
+  analogy* from its sibling `func_8003069C` whose loop genuinely is byte-masked
+  (`andi 0xFF`). It is actually an `s16` — `sll 16`/`sra 16` and a signed
+  `slt`. That one retype was worth 44/96 → 86/96 and is what made the length
+  exact.
+- `func_8003069C` (bravo): 45/85 → **60/85**, length stays exact. The lever:
+  a plain, non-`volatile` pointer local holding `&global`, assigned before a
+  loop, lets LICM hoist the symbol's `lui`/`addiu` into the preheader. That
+  idiom was on file as FAILED **twice** (rounds 23 and 32) — and both
+  attempts spelled the pointer `volatile`. The qualifier was the defect, not
+  the idiom. One bounded permuter search spent: 352k iterations, nothing above
+  base 870.
+- `func_80018464` (charlie, REVISIT): still a stall, but its gap REVERSED
+  direction and is now fully accounted: **30 words short (924/954) → 28 words
+  LONG (982/954)**. All 28 are one transformation — GCC splits `elem` into two
+  induction variables in each of the 13 case loops: 13 setup `addiu` + 13 tail
+  increments + the 8th callee-saved register's save/restore. Verified by the
+  head against the disassembly: retail's frame is exactly `-0x40` with eight
+  saved-register stores packed at `0x20`–`0x3C`, so an eighth s-register has
+  nowhere to go and `-0x48` follows. This overturns round 50 twice: the 13-way
+  dispatch IS a C `switch` (the tell is BODY LAYOUT — retail's 13 bodies sit at
+  ascending addresses in ascending tag order, impossible for an if/else chain
+  whose first test is the 7th tag), and the `-0x48` frame is the extra IV, not
+  the per-case helper pointers round 50 blamed. Ten Psy-Q `gte_*` macros added
+  to `include/gte.h`, strictly additive.
+
+**The generalisation, and it is the round's finding: a recorded NEGATIVE is
+only as good as the exact spelling that was tried.** Three of the above are a
+prior round's conclusion failing not because the idea was wrong but because
+one qualifier, one type, or one structural reading was. Bravo reached the same
+rule independently after the permuter disproved its own five-variant negative
+in the same session, and stated it as: write negatives as "every spelling
+TRIED", with the list. Promoted to the runner discipline via the broadcast;
+worth a DECOMPILATION_LEARNINGS entry when someone is next writing one.
+
+**3. Track 3: `Entity` passed.** 19 functions, 9 globals, 3 unit-local fields
+and 4 self-only vtable slots renamed by the runner; the head then applied 11
+cross-unit proposals by TYPE SCOPE (definition first, compiler names the
+accessors, fix exactly those, oracle) — byte-exact after each. The runner
+self-corrected a backwards name mid-round after `classtable.py` showed the
+slots resolve to Activate/Deactivate rather than the reverse. Head review
+sampled five names: the tier-A claims are pure-leaf or vtable-slot identities,
+which the plan defines as tier A.
+
+**The round-54 blind spot bit again, in a new place.** The type-scoped rename
+is driven by compiler errors, so it cannot reach a preserved `#if 0` body —
+the compiler never sees one. Nine stale field references survived in
+`func_80062C58`'s body in `src/Entity_e.c` and were fixed by hand. Note
+`tools/stalesyms.py` does NOT cover this case: it scans `docs/match-reports/`,
+not preserved bodies living in `src/`. A scan for it is a one-line `awk` over
+`#if 0` ranges (and `awk` has no `\b` — use `[^0-9A-Za-z_]`).
+
+**Two items left for the operator, neither acted on.**
+
+- **The revisit rule's trigger, second round running.** Charlie's REVISITED
+  line says `names/types not relevant`, exactly as round 55's did: real ground
+  closed, and the new names were not the reason. What paid both times was a
+  second reader re-deriving structure with a specific question in hand.
+  FINISHING-PLAN §3 track 1 states in advance that if this is the pattern, the
+  trigger should change from "unit passed track 3" to "title older than N
+  rounds". That is a plan revision and therefore Fable head work.
+- **A track 3 rule tension.** The naming runner changed a TYPE in a shared
+  header — a vtable slot's return from `void` to `s32`, because its occupant
+  returns `s32` and only a discarded return ever suggested otherwise. The
+  reasoning is sound, the slot has one caller, and it is byte-exact, so it was
+  kept. But track 3 step 3 says "a rename is the only edit this step makes".
+  Whether that should carve out a function-pointer return type with every
+  caller checked is a plan change, not a head call.
+
+
 ## 2026-09-19 — round 55: Sonnet's calibration band closes at 0/6, a 42-round-old figure falls, and a revisit closes a length nobody had closed in 35 rounds
 
 Head on Opus (the model table sends the head to Fable only for new procedure,

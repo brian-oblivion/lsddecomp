@@ -70,6 +70,26 @@
           "note": "CORRECTION to this round's revisit entry above, recorded as a zero-attempt entry because the ledger is append-only and written only through plan.py. That entry said the revisit rule 'earned its keep'. It did not, and runner charlie said so itself for all three functions: round 54 renamed Class6B5CCMethods vtable SLOTS, and none of these three functions' own symbols (GenericObj_d294, GenericMethods_d294::slot10, func_8001F8B8, D_8008A838, ClipSegmentToBox) were touched by it, so the revisit's premise -- that new names and types let you write a shape you could not write before -- supplied nothing here. What closed TryAttachNearby's length was re-reading the disassembly's own jump graph instead of trusting a five-round-old title. The result stands; the CAUSE does not. This matters for the plan: if revisits keep paying off through fresh re-reads rather than through naming, the rule is mis-specified and should trigger on stale-title age rather than on mark-unit date. Not changed here -- that is a plan question for the operator.",
           "round": 55,
           "runners": 0
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-19",
+          "matches": 0,
+          "model": "opus",
+          "note": "bravo, ranked stall band, code_179d8_j: func_80030404 21/96-and-5-short -> 89/96 length-EXACT (loop counter was s16, mistyped by analogy since round 23); func_8003069C 45/85 -> 60/85 length exact, one bounded permuter search spent (352k iterations, nothing above base 870). Both still STALL. Levers: a plain non-volatile pointer local hoists a global's lui/addiu out of a loop -- the same idiom was recorded FAILED twice (rounds 23, 32) and both spellings were 'volatile'.",
+          "round": 56,
+          "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-19",
+          "matches": 0,
+          "model": "opus",
+          "note": "charlie, REVISIT (not the ranked band), code_8220_b func_80018464: STALL but the gap is now fully accounted for and it REVERSED direction -- 30 words short (924/954) -> 28 words LONG (982/954). All 28 are one transformation (GCC splits elem into two IVs in each of 13 loops: 13 setup addiu + 13 tail increments + the 8th callee-saved register's save/restore). Overturns round 50 on two counts: the dispatch IS a C switch (tell is body layout order), and the -0x48 frame is the extra IV, not per-case helper pointers. 10 Psy-Q gte_* macros added to include/gte.h. REVISITED line says names/types NOT relevant.",
+          "round": 56,
+          "runners": 1
         }
       ],
       "status": "open"

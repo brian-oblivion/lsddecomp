@@ -416,6 +416,20 @@ Gate 2.
    exit 2 means the build is fresh and simply does not match yet, which is
    what iterating looks like.
 
+   **One mechanism defeats that last sentence, and it is silent (round 56).**
+   The compile rule is a pipeline (`cpp | cc1 | maspsx | as -o $@`), so when
+   cc1 fails, `as` still CREATES `$@`; make judges the recipe by `as`'s exit
+   status and leaves the object in place, NEWER than the header that broke it.
+   The next `make` then treats that object as up to date, SKIPS the unit, and
+   links the stale one. The unit you actually broke vanishes from every
+   subsequent log, and the only symptom is a red whole-image SHA1 with no
+   compile error anywhere. The `*** [….o]` pattern catches the FIRST such
+   build and cannot catch the second, because by then the unit has no failing
+   target at all. So: **a red build with no compile error means suspect a
+   skipped unit, not a mysterious byte.** `rm -f build/src/<unit>.c.o` and
+   rebuild, or `make clean` followed by `make extract` (clean wipes `asm/`).
+   Reproducer and the escalated Makefile fixes: `docs/PROGRESS.md`, round 56.
+
    **How this was found matters more than the patch, because it is the loop
    auditing itself.** The head hit it running an ordinary experiment: a
    duplicate `typedef` gave `build exit=2`, zero grep hits, and a funcdiff
