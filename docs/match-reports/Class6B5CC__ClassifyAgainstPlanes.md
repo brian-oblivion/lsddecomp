@@ -358,12 +358,62 @@ This satisfies Gate 3 check 2 (cost) and check 1 (compiles and scores); check
 scaffold was seeded from the exact body just rebuilt and confirmed 29/199 in
 the real tree with no drift.
 
-Time budget for this round's three assigned functions did not extend to
-running the actual bounded search this round (the second `TryAttachNearby`
-search consumed the remaining window) -- the scaffold is left in place
+**Update: the bounded search WAS run** (`timeout 700`, `-j 6`,
+`--stop-on-zero --best-only --stack-diffs`), after `TryAttachNearby`'s own
+second search freed up the round's remaining budget. **rc=124 (bound
+fired), 85100 iterations.** Three `output-*` candidates were produced --
+2803, 2661 and **2563** (down from base 3056), so the search DID find
+things the base seed didn't have.
+
+**Per CLAUDE.md's "a permuter score drop is a LEAD, not a RESULT," each
+candidate was read and, where safe, translated to real source and verified
+against `nm -S`/`funcdiff.py` -- not adopted on the permuter's own score:**
+
+- **output-2661 (safest, most plausible):** reorders `self->unk2C = 0;`
+  to BEFORE `count1 = func_8001F3A4(self->unk20);` (matching retail's own
+  disassembly, which places the `self->unk2C` store in the delay slot of
+  the `jal func_8001F3A4`) plus a benign `new_var` split of the `hiPtr`
+  initialization (same "aliased local" shape as `TryAttachNearby`'s own
+  successful `countList` lever). Applied both pieces to the real tree:
+  **zero effect, still 29/199, length still exactly 199 (`0x31c`).**
+  Retail's delay-slot placement is evidently a SCHEDULING decision the
+  compiler makes independent of source statement order here, not something
+  reachable by reordering the two statements.
+- **output-2803:** `self->unk2C |= 1 << (j = i);` -- steals `j`'s dead
+  storage (unused until Part 3's own `for (j = 0; ...)` loop) as a place to
+  stash `i`'s value. Not applied to the real tree: even if behaviorally
+  inert (Part 3 reinitializes `j` before any read), it did not appear
+  promising enough on its own to spend a build on given the other two
+  candidates' clean negative, and the round's time budget was closing.
+- **output-2563 (REJECTED, not tested against the real oracle):** reuses
+  `bitJ`'s storage as a scratch temp for `outWord` at Part 2's own check
+  (`(bitJ = outWord) >= 0x201`), which is a legitimate "dead variable as
+  scratch space" move IF `bitJ` is truly unread before Part 3's own
+  `bitJ = 1 << j;` -- but the SAME diff hunk also rewrites the analogous
+  check INSIDE Part 3's own `m`-loop (`bitJ >= 0x201` instead of
+  `outWord >= 0x201`), and at THAT point `bitJ` already holds a real,
+  semantically different value (`1 << j`, the plane bit mask) written
+  earlier in the same iteration. Reading `bitJ` there instead of `outWord`
+  is not a cosmetic rename -- it changes which value the `D_8008A838`
+  gate compares against, i.e. it can change the game's actual runtime
+  behavior (whether `self->unk2C`/`*outFlag` get a bit set), not just the
+  compiled bytes. This is exactly the "reject UB candidates" case CLAUDE.md
+  and PARALLEL-RUNS 3.5 warn about: a permuter mutation can score well by
+  exploiting the fixed/degenerate test input the scorer runs against
+  without being behaviorally equivalent to the source it mutated. Declined
+  to test this one in the real tree at all -- adopting a candidate that
+  reads the wrong variable would not be "preserving a near-miss body," it
+  would be committing an incorrect transcription of the function's own
+  logic even if it happened to score well.
+
+**Net result: the search found real byte-level improvements to its own
+scorer, but none of the safe-to-adopt candidates moved the real oracle's
+score, and the one candidate that DID look promising by score was
+semantically unsound and was not adopted.** The scaffold is left in place
 (`permuter-work/Class6B5CC__ClassifyAgainstPlanes/`, gitignored) for whoever
-picks this up next, with the Gate 3 checks already passed and recorded here
-so the next attempt does not have to re-derive them.
+picks this up next, with all three candidates' diffs preserved under
+`output-*/diff.txt` and this report's read of each one, so the next attempt
+does not have to re-derive which are safe.
 
 **Explicit answer to the revisit's own question: the round-54 naming gave NO
 new shape here either**, for the same reason as `NotifyTaggedParents` --
@@ -379,9 +429,12 @@ premise (naming) actually supplied.
 REVISITED (round 55): confirmed unchanged at 29/199 as the filed score;
 one structural rewrite of Part 1 tried and reverted as a verified negative
 (worse, 16/199, larger drift); Gate 3 permuter checks run and passed
-(agreement confirmed, 11/11 insertions/deletions -- real structural room,
-unlike a pure register wall) but the bounded search itself was not run this
-round for lack of remaining time budget. Restored to `INCLUDE_ASM`,
+(11/11 insertions/deletions -- real structural room, unlike a pure register
+wall) and the bounded search itself WAS run (85100 iterations, rc=124,
+three candidates found) -- two safe candidates translated and verified
+inert against the real oracle (still 29/199), one candidate rejected
+outright as semantically unsound (reads a bit-mask value where the source
+means a plane-test result) rather than tested. Restored to `INCLUDE_ASM`,
 `git diff --stat src/code_d294_b.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
@@ -404,3 +457,18 @@ regresses the whole-function score is a real, verified negative, not a
 sign the loop-shape theory was wrong (the loop body itself DID come out
 closer to retail; the cost showed up in the surrounding marshalling code
 instead).
+
+**A permuter candidate that reuses a "dead" variable's storage needs its
+EVERY occurrence checked, not just the first.** `output-2563` looked, at
+its first hunk, like the same legitimate "steal a not-yet-live variable's
+stack slot as scratch space" move that closed real words on
+`TryAttachNearby` this same round (the `countList` lever) and on
+`output-2803`/`output-2661` here. Its SECOND hunk reused the same variable
+(`bitJ`) at a point where it was no longer dead -- it already held a real,
+different, semantically load-bearing value from earlier in the same loop
+iteration. A diff that touches a variable in two places needs each site
+checked against that variable's OWN liveness at that point, not just
+pattern-matched against "this looks like the lever that worked elsewhere."
+Scoring well is not evidence of correctness -- the permuter's fixed test
+input can fail to distinguish "reads the right value" from "reads a
+different value that happens not to matter for this particular input."
