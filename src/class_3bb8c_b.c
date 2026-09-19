@@ -414,7 +414,58 @@ void func_8004CFB0(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
     self->unk1DC = arg1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CFB8);
+/* Picks one of the four static 0xC-byte EntryDesc866E8 entries by the sign of
+ * `rate` and by `flag`, then sets unk1E0 to |rate| scaled by the chosen
+ * entry's unk6.
+ *
+ * Two source shapes here are load-bearing and neither is cosmetic:
+ *
+ *  - The `goto` ladder, and its asymmetry. Retail emits TWO stores to
+ *    unk1E4: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
+ *    0x8004CFDC) and the other three SHARE one (0x8004CFF8). Writing the
+ *    field directly on that one path and going through `table` on the other
+ *    three is what reproduces that split. Byte-exact since round 9.
+ *  - `scale` and `val`. Retail loads the entry's unk6 ONCE (`lh $v1,6($v0)`)
+ *    before the sign branch and keeps a single `mflo` after the join, with a
+ *    `mult` in each arm. Caching the load in `scale` and letting an explicit
+ *    if/else assign a local `val` is what defers that `mflo`; the
+ *    default-then-overwrite spelling makes cc1 extract it eagerly, and
+ *    storing to self->unk1E0 directly instead of through `val` perturbs the
+ *    table-selection half as well. Both were measured -- round 58 and
+ *    docs/match-reports/func_8004CFB8.md.
+ *
+ * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
+void func_8004CFB8(Obj866E8 *self, s32 rate, s32 flag) {
+    EntryDesc866E8 *table;
+    s32 val;
+    s32 scale;
+
+    if (rate <= 0) {
+        goto rate_le;
+    }
+    table = &D_8008699C;
+    if (flag == 0) {
+        goto store;
+    }
+    self->unk1E4 = &D_800869A8;
+    goto merge;
+rate_le:
+    table = &D_800869B4;
+    if (flag == 0) {
+        goto store;
+    }
+    table = &D_800869C0;
+store:
+    self->unk1E4 = table;
+merge:
+    scale = self->unk1E4->unk6;
+    if (rate >= 0) {
+        val = scale * rate;
+    } else {
+        val = scale * (~rate + 1);
+    }
+    self->unk1E0 = val;
+}
 
 /* Forward declaration: defined later in this file (after func_8004D028 in
  * ROM-address order), but passed to func_8004D140 as a function-pointer
