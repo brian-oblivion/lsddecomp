@@ -76,6 +76,15 @@ EXE      := $(BUILD_DIR)/$(TARGET)
 .PHONY: all build check extract clean format expected diff-init progress
 .DEFAULT_GOAL := all
 
+# The compile rule is a PIPELINE ending in `as -o $@`. When cc1 fails, `as`
+# still creates $@ from empty input; pipefail makes the recipe fail, but make
+# leaves the (newer, empty) object in place, judges the unit up to date on the
+# NEXT build, and silently links the stale object. Round 56 reproduced it:
+# a header edit with the unit's .c untouched, red SHA1, no compile error in
+# any later log. This is GNU make's own switch for exactly that: delete the
+# target of any recipe that fails.
+.DELETE_ON_ERROR:
+
 all: build check
 
 build: $(EXE)

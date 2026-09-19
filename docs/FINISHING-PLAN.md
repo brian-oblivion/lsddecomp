@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 5 (2026-09-19, after round 55: the stall ranking put spent,
-deeply-searched functions first for four rounds; the revisit rule's
-hypothesis is now measured per revisit).
+Plan revision: 6 (2026-09-19, after rounds 56 and 57: the stale-object
+build trap, the slot ownership test, type corrections, extern arity, the
+revisit trigger, and a teardown guard).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -128,14 +128,13 @@ to 52 re-ranked the queue on markers nobody had retired.
 evidence about what was known then, not about the function (southpark round
 126: 4 of 4 warm bodies matched once their unit's types were derived). So
 after a unit passes track 3, each of its stalls becomes a REVISIT job exactly
-once. `plan.py` lists them (a stall in a passed unit whose report has no
-REVISITED line). A revisit is one bounded attempt with the budget above; its
-report line says `REVISITED, round N: <outcome>; names/types <used | not
-relevant>`, so it is not listed again AND the rule's own hypothesis is
-measured. Round 55's revisit closed a length gap by re-reading the
-disassembly, not by using new names; if that stays the pattern over several
-revisits, the trigger changes from "unit passed track 3" to "title older
-than N rounds", as a plan revision.
+once. A second trigger, added after rounds 55 and 57 both moved a stall by
+re-reading an old title rather than by using new names: a stall whose report
+mentions no round within the last ten is eligible too. `plan.py` lists both
+kinds (a stall with no REVISITED line whose unit has passed, or whose title
+is stale). A revisit is one bounded attempt with the budget above; its report
+line says `REVISITED, round N: <outcome>; names/types <used | not relevant>`,
+so it is not listed again and the naming hypothesis keeps being measured.
 
 **Head at merge.** Verify per PARALLEL-RUNS.md §3.9, record the round, and
 correct any report whose cause the round falsified.
@@ -250,11 +249,13 @@ propagates everywhere.
 3. Name struct fields and vtable slots. (Functions and globals are NOT
    subject to this rule: `rename.py` renames a symbol tree-wide whoever calls
    it, because a symbol name is unique. Only FIELDS and SLOTS share names
-   across structs.) Ownership is decided per FIELD, not per header, by who
-   accesses it (`grep -rn -- '->oldName\b\|\.oldName\b' src/`):
-   - accessed only from your unit: rename it yourself, in the header and in
-     your unit, whatever header it lives in;
-   - accessed from other units too: do NOT rename. Put the proposed name, its
+   across structs.) Ownership is decided per FIELD by the COMPILER, never by
+   grep: `slotNN` and `unkNN` names recur across unrelated structs, so a
+   textual search over-counts (round 57: seven textual hits, one real
+   accessor). Rename the field in the struct DEFINITION only and rebuild; the
+   error list is the exact accessor set.
+   - every error is in your unit: fix them, oracle, done;
+   - any error is in another unit: revert the definition and do NOT rename. Put the proposed name, its
      tier and its evidence under `## Proposed field names` in the report of
      the function that established it, and post it to the broadcast. The HEAD
      applies it at merge time by TYPE SCOPE, never by whole-tree replace:
@@ -265,8 +266,11 @@ propagates everywhere.
      whole-tree replace was safe because a mis-hit fails to compile; round 52
      measured `unk10` in 347 places across 50 files, where replacing
      definitions and uses together compiles clean and mislabels ~49 structs.)
-   Never move an offset or change a type in a shared header (CLAUDE.md, the
-   shared-struct hazard); a rename is the only edit this step makes.
+   Never move an offset or a size in a shared header (CLAUDE.md, the
+   shared-struct hazard). A return-type or parameter-type CORRECTION to a slot
+   or prototype is allowed when the oracle stays green and the report lists
+   every caller you checked (CLAUDE.md: a tail-call wrapper's byte match says
+   nothing about its return type, so the callers are the evidence).
 4. Name globals with `tools/rename.py`. Replace magic constants with named
    constants or enums where the meaning is established.
 5. Write the unit's header comment: what the unit IS (which class or

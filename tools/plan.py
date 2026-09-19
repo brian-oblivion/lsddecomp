@@ -378,17 +378,32 @@ def collect(st):
     # small comes first.
     stall_rows = sorted(stall_rows, key=lambda r: stall_cost(r[2], r[3]) + (r[0],))
 
-    # track 1 revisit: every stall in a unit that has passed track 3, exactly
-    # once: the runner writes REVISITED into the report, and that is what
-    # retires it. (Revision 3 dated it from the report's git date, which
-    # rename.py moves during the very naming pass that should trigger it, so
-    # no revisit was ever listed.)
+    # track 1 revisit (revision 6). Two triggers, either suffices, one attempt
+    # each; the runner's REVISITED line retires it:
+    #   - the stall's unit has passed track 3 (revision 4's rule; its
+    #     hypothesis, that names/types unlock, is recorded per revisit);
+    #   - the stall's title is STALE: the highest round number its report
+    #     mentions is at least STALE_ROUNDS behind the current round. Rounds
+    #     55 and 57 both closed movement by re-reading an old title, and
+    #     neither used new names, so the fresh re-read is a trigger in itself.
+    current_round = max([r.get("round", 0) for r in st["tracks"]["1"]["rounds"]] + [0])
     revisit = []
     for words, unit, func, title in stall_rows:
-        if unit in done:
-            rp = REPORTS / f"{func}.md"
-            if rp.exists() and "REVISITED" not in rp.read_text(errors="replace"):
-                revisit.append((words, unit, func, title))
+        rp = REPORTS / f"{func}.md"
+        if not rp.exists():
+            continue
+        txt = rp.read_text(errors="replace")
+        if "REVISITED" in txt:
+            continue
+        rounds = [int(x) for x in re.findall(r"[Rr]ound\s+(\d{1,3})\b", txt)]
+        last = max(rounds) if rounds else 0
+        stale = current_round - last >= STALE_ROUNDS
+        if unit in done or stale:
+            revisit.append((words, unit, func, title))
+    # A function eligible for a revisit is offered ONLY there, so the two
+    # track-1 queues never hand the same function to two runners.
+    rv = {f for _, _, f, _ in revisit}
+    stall_rows = [r for r in stall_rows if r[2] not in rv]
 
     t4 = st["tracks"]["4"]
     if t4["status"] == "auto":
@@ -416,7 +431,10 @@ def collect(st):
         docs[rel] = {"lines": n, "budget": budget,
                      "over": n is not None and n > budget}
 
+    ec = subprocess.run([sys.executable, "tools/externcheck.py"], capture_output=True, text=True, cwd=ROOT).stdout
+    m_ec = re.search(r"^(\d+) function\(s\) with conflicting arity", ec, re.M)
     return {
+        "extern_conflicts": int(m_ec.group(1)) if m_ec else 0,
         "progress": {k: pj[k] for k in ("matched", "queued", "stalled", "fresh", "uncarved", "game", "library")},
         "elf_present": bool(info),
         "tracks": {
@@ -458,6 +476,7 @@ def nm_defined(unit):
 
 
 STALLS_PER_RUNNER = 3
+STALE_ROUNDS = 10
 
 
 def stall_runner_jobs(rows, model, label):
@@ -501,6 +520,11 @@ def jobs(d, n):
                               f"{u['slot_refs']} slot calls, {u['d_refs']} D_)", t["3"]["naming_model"]))
     q_stall = stall_runner_jobs(d["_stalls"], t["1"]["next_match_model"], "stall") \
         if t["1"]["status"] == "open" else []
+    if d.get("extern_conflicts"):
+        q_naming.insert(0, ("3", f"extern hygiene: {d['extern_conflicts']} function(s) whose extern "
+                                 "declarations disagree in arity with their definition "
+                                 "(python3 tools/externcheck.py); fix externs to definitions, oracle green",
+                            MODELS["mechanical_runner"]))
     q_sdk = []
     if t["2"]["unnamed"]:
         if not (ROOT / "tools/sdkname.py").exists():
@@ -546,7 +570,7 @@ def print_status(d, n, st):
     if t1["reason"]:
         print(f"                    {t1['reason']}")
     if t1["revisit"]:
-        print(f"                    {t1['revisit']} stall(s) eligible for a post-naming REVISIT")
+        print(f"                    {t1['revisit']} stall(s) eligible for a REVISIT (unit named, or title >= {STALE_ROUNDS} rounds old)")
     print(f"  1b     {t['1b']['status']:<10} NON_MATCHING bodies: {t['1b']['nm_bodies']} in src, "
           f"{t['1b']['promotable']} stall(s) with a preserved body and none yet")
     print(f"  2      {t['2']['status']:<10} SDK call surface: {t['2']['named']} named, "

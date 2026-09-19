@@ -1147,6 +1147,20 @@ revisit rule stands but measures itself: the REVISITED line records whether
 the unit's new names or types contributed, since round 55's revisit closed by
 re-reading rather than by naming.
 
+**Revision 6 (2026-09-19, after rounds 56 and 57).** Makefile gains
+`.DELETE_ON_ERROR` (round 56's stale-object trap: verified here that the
+failing object is removed and the second build re-fails instead of linking
+the stale one; no bytes change). Track 3 step 3's ownership test is the
+compiler, not grep: rename in the definition, the error list is the accessor
+set. Type CORRECTIONS to a slot or prototype are allowed when the oracle is
+green and the callers are listed; offsets and sizes never move. New
+`tools/externcheck.py` finds extern declarations whose arity disagrees with
+the definition (18 on first run, listed as a track 3 job); PARALLEL-RUNS 3.9
+runs it after any matching round. New `tools/teardown-worktree.sh` refuses
+to remove a worktree with an unmerged commit, uncommitted paths or a live
+search. Revisit gains a second trigger: a title with no round mentioned in
+the last ten. Gate 3: a permuter negative is about the body it measured.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

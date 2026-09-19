@@ -245,7 +245,10 @@ rounds 40 to 47):
 | perfect zero | does not match | whole-file effect, decline, stop looking inside the function |
 
 Zero-ness is not the discriminator; agreement is. A recorded negative whose
-search never passed check 3 is not evidence about the function. Translate
+search never passed check 3 is not evidence about the function, and a
+negative is a verdict about the BODY it was measured on: after a rewrite that
+moves the score, re-run checks 2 and 3 before citing the old negative
+(round 57, bravo). Translate
 every promising candidate AND measure it in-tree: permuter units are not
 funcdiff words, in either direction.
 
@@ -352,13 +355,21 @@ declares; promote `Proposed learning` entries into DECOMPILATION_LEARNINGS.md
 entry; update `config/plan-state.json` through `tools/plan.py` as
 FINISHING-PLAN.md says; fix in place any doc line the round invalidated.
 
-Teardown preconditions, checked immediately before each `--force`: every
-touched function has a report file; every runner has REPORTED; `git log
---oneline main..runner/<name>` is empty; the agent mapping is right. Then:
+Teardown goes through the guard, which refuses on an unmerged commit, an
+uncommitted path, or a live search in the worktree (round 57 removed a
+worktree with an unmerged commit by chaining the command onto a push):
 
 ```sh
+tools/teardown-worktree.sh <name>            # refuses unless merged, clean, idle
+python3 tools/externcheck.py                 # after any round that MATCHED: externs vs new signatures
 git status --porcelain && ./build-and-verify.sh && git push origin main
 ```
+
+`externcheck.py` exists because a wrong `extern` arity is invisible to the
+byte oracle: the callee reads registers the caller already left loaded
+(round 57, `func_8001E7BC` declared `(void)` and called with none while
+taking three). A match is the first moment a real signature exists to check
+against.
 
 Escalate to the operator, never act yourself, on: any toolchain or flag
 change; a branch that fails to verify after claimed matches; a runner that
