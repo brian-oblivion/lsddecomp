@@ -6,6 +6,101 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-19 — round 55: Sonnet's calibration band closes at 0/6, a 42-round-old figure falls, and a revisit closes a length nobody had closed in 35 rounds
+
+Head on Opus (the model table sends the head to Fable only for new procedure,
+a HARD RULE adjudication or a toolchain lead; plan revision 4 had just landed,
+so procedure was current and every top job named a Sonnet runner). Three
+runners, the operator's default cap. Gate 0 green first try, all three
+worktrees byte-verified before handover, no header contention —
+`code_2cc8c.h`, `Entity.h` and `code_d294.h` are disjoint.
+
+**State at end: 1138 matched / 1252 game functions, 0 fresh, 114 stalled.
+Track 1 calibration Sonnet COMPLETE at 0 matches / 6 attempts; next model is
+Opus. Track 2 unchanged at 98 named / 44 parked. Track 3 at 10/75 units, 903
+defs still `func_` (was 922). Build verifies.**
+
+**Zero byte-exact matches, and the round was still worth running.** Three
+things moved, none of them a match.
+
+**1. A recorded figure that was wrong for 42 rounds.** `func_80064E34`
+(Entity_g) had carried "short by ~4 words, best 69/98" since round 13. Rebuilt
+from scratch: the preserved body compiles to **91** instructions, not 94, so
+it is **7 words short**, not 4. Retail's 98 was confirmed two independent ways
+(funcdiff's own file range, and a direct count of instruction comments in the
+`.s`). The raw 69/98 was right. This is PARALLEL-RUNS screen 4 — "a title is
+only as good as the last person who rebuilt it" — collecting on a 42-round
+debt, and it is the argument for making a figure-rebuild an acceptable
+deliverable rather than a preamble to one.
+
+**2. A promoted learning tested instead of repeated.** DECOMPILATION_LEARNINGS
+§3d asserted retail's transient rematerialization shape "has no C spelling".
+Round 55 put that through the pinned pipeline in two ~15-line reproducers
+rather than assuming it. It **reproduces** — but the trigger is
+delay-slot-filler proximity plus caller-saved-register invalidation across an
+intervening call, **not** variable naming, and naming is exactly the axis
+round 20's six failed variants had already spent. Retail's four sites split
+into two stacked sub-mechanisms (speculative no-call fills, post-call
+reloads), which do not answer to one lever. §3d sharpened accordingly. A
+claim that survives its own test comes back narrower and more useful.
+
+**3. The revisit rule earned its keep.** `code_d294_b` passed naming in round
+54, so its three stalls became REVISIT jobs. `Class6B5CC__TryAttachNearby`
+had sat at "141/143, 2 short" since round 20. Discarding round 20's
+`count=expr; if(count)` lever — which cost +2 words of `xori`+`sw` per branch
+— for a plain goto-CFG mirroring retail's actual jump graph, applied to all
+three axes at once instead of just X/Z, **closed the length exactly**:
+143/143 per `nm -S`, zero drift, raw 140/143. The residue is now 3 words of
+pure stack-slot-address class (`buf54` at retail `sp+0x54` vs built `sp+0x30`),
+explicitly not a register-identity wall — so it leaves the round a live lead,
+not a characterised stall. Nobody tried that shape in 35 rounds because the
+unit had no names to write it with.
+
+**Track 3: `code_2cc8c_c` named, 19/19.** The Obj86B60 tail plus the Unk18Obj
+allocator/ctor/child chain; 3 shared globals, ~16 exclusive fields and slots,
+6 cross-unit field names proposed and applied by the head. Head review sampled
+five names and checked the *convention* rather than just the name —
+`Get_vtable_*` has three precedents on `main`, so it is an existing style, not
+an invented one. No wrong tier-A name; naming runner stays Sonnet.
+
+**Two things the round measured about its own machinery**
+
+- **Round 54's preserved-body blind spot reproduced exactly, on the first
+  type-scoped rename that met one.** Applying `Obj86B60::unk58 -> activeSlot`,
+  the compiler listed 44 accessors across four units and missed exactly one:
+  `src/code_2cc8c_b.c:308`, inside a `#if 0` body it never sees. The oracle
+  cannot catch it either, because a preserved body compiles to nothing. Swept
+  `src/` and every report; no others. The lesson is not "be careful" — it is
+  that the compiler-enumerates-accessors procedure has one structural hole and
+  it is always in the same place.
+- **The stall queue's remaining workable ground is BIG, and both rankers bury
+  it.** Across plan.py's top 12 stall jobs, 7 carry a spent-lever verdict and
+  the four deepest carry 130167, 102842, 73020 and 68682 permuter iterations.
+  The 5 that do not are all the large ones: `func_80029478` (337w),
+  `func_80036528` (240w), `func_80033C90` (202w), `func_8002F3E8` (138w),
+  `func_80031F3C` (131w). `func_80033C90` is the sharpest — 202/202 length
+  exact, 18/202 raw, first real diff at **word 1** and it is a frame-size
+  difference (`addiu sp,sp,-0x40` vs `-0x38`), i.e. a missing local or spill,
+  not a register wall — on a report with almost no attempt history.
+  `nearmiss.py` sorts size-first and `plan.py` sorts report-date-first with
+  size as the tiebreak, so neither surfaces it. Escalated to the operator as a
+  tool-ordering question, not acted on: FINISHING-PLAN §6 says the fix belongs
+  in the tool, and this is the fourth consecutive round a head has skipped
+  plan.py's top track-1 job for a documented reason.
+
+**A runner stopped mid-search and the protocol held.** charlie backgrounded a
+bounded permuter run on `Class6B5CC__ClassifyAgainstPlanes` and stopped while
+it was live. Because its prompt says COMMIT BEFORE YOU WAIT, everything but
+the search result was already committed; the head waited out the bound and
+recorded the outcome as a report addendum (rc=124 at the 700s bound, 85100
+iterations, floor 3056 unmoved across the last ~23000 — a bounded negative,
+not permuter-exhaustion, and Gate 3 check 3 had passed so it is evidence about
+the function rather than the scaffold). `ListAgents` does show a stopped
+runner as resumable, but no `SendMessage` tool exists in this environment, so
+PARALLEL-RUNS §3.6's statement is correct as written and needs no change.
+
+---
+
 ## 2026-09-18 — round 54: two units named, a Shift-JIS codec identified, and the type-scoped rename's blind spot at preserved bodies
 
 Head on Opus, three runners (operator capped the round at three, nearing an

@@ -40,6 +40,26 @@
           "note": "Track-1 Sonnet calibration, attempts 4 and 5 of 6. Runner charlie on code_179d8_h: func_80028920 (rebuilt the inherited 12/43 unchanged, then two reshapes -- a forward-goto block relocation regressed to 3/43 with drift, and retail's own post-increment loop-exit timing reached 14/43 at the SAME 44/43 length but asm-differ confirms the identical residue class and the first real diff moved EARLIER; recorded as best raw figure, explicitly NOT as progress), func_80028A84 (third independent CFG syntax to land in the same score band with the same broken frame size, treated as axis exhausted). Zero matches. Title figures rebuilt to the mandatory three on both. HEAD SKIPPED four higher-ranked track-1 jobs, each with a documented levers-spent or deliberate-skip verdict: code_2cc8c_e (round-46 DELIBERATE SKIP, also skipped round 53), class_3bb8c_b x5 (attempted round 53 for zero, history back to round 9), code_2cc8c_c func_8003E4B8 (82702-iteration permuter search round 46), code_55dd4 x3 (rounds 14-49, deepest in corpus). The ranked band is now uniformly levers-spent, which is the condition the stop rule was written for.",
           "round": 54,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-19",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Track-1 Sonnet calibration, attempt 6 of 6 -- calibration band now COMPLETE for Sonnet at 6 attempts, 0 matches. Runner bravo on Entity_g func_80064E34. No new structural variant was tried and that was the brief: the function's own report argued the residue is register-allocation-level, so bravo was told to rebuild every recorded figure and test the mechanism claim instead. Both paid. (1) The LENGTH figure was WRONG and had been for 42 rounds: the preserved body compiles to 91 instructions, not 94, so it is 7 words short of retail's 98, not '~4'; retail's 98 confirmed two independent ways (funcdiff file range, glabel instruction count in the .s). Title rebuilt to the mandatory three figures. (2) The 'no C spelling for independent transient lifetimes' claim, promoted into DECOMPILATION_LEARNINGS 3d, was put through the pinned pipeline in two ~15-line reproducers: it REPRODUCES, but the trigger is delay-slot-filler proximity plus caller-saved invalidation across an intervening call, NOT variable naming -- and naming is precisely the axis round 20's six failed variants had already spent. Retail's four sites split into two stacked sub-mechanisms. Learning sharpened in 3d by the head.",
+          "round": 55,
+          "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-19",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Track-1 REVISIT job, runner charlie on code_d294_b (unit passed track 3 naming in round 54, so all three scores predated its names and types). Not calibration: revisits are excluded by the plan. Zero byte-exact, but the revisit rule earned its keep on one of three. Class6B5CC__TryAttachNearby: the LENGTH CLOSED EXACTLY, 141 -> 143/143 per nm -S with zero drift, raw 140/143, by discarding round 20's 'count=expr; if(count)' intermediate-assignment lever (which cost +2 words of xori+sw per branch) for a plain goto-CFG mirroring retail's actual jump graph, applied to all three axes at once rather than just X/Z -- a shape no prior round tried. Residue is now 3 words of pure STACK-SLOT-ADDRESS class (buf54 at retail sp+0x54 vs built sp+0x30, a count slot at sp+0x50 vs sp+0x80, one ld/ld reorder), explicitly NOT a register-identity wall, so this function is a live lead rather than a characterised stall. Class6B5CC__ClassifyAgainstPlanes: 199/199 length exact, 29/199, first diff register identity (self in $s4 vs retail $s5); Gate 3 checks 1-3 all passed and recorded, bounded search run to rc=124 at 85100 iterations with the floor stuck at 3056 for the last ~23000 -- a real bounded negative about the function, not about the scaffold. Class6B5CC__NotifyTaggedParents: confirmed unchanged with new negatives. All three reports carry REVISITED (round 55), so plan.py will not list them again. The runner committed before backgrounding its search, stopped while it ran, and the head recorded the search outcome as an addendum -- there is no wake channel.",
+          "round": 55,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -106,6 +126,16 @@
           "note": "Track 3 naming, runners alpha (code_2cc8c_f) and bravo (code_d294_b). alpha: the Obj6EAC0 text/digit display class plus a full-width Shift-JIS codec -- 24 functions named, 11 struct fields, 6 kept tier C with what is known written down. Head verified the tier-A SJIS claim independently against four real code points ('0'->0x824F, 'A'->0x8260, ' '->0x8140 ideographic space, 'a'->0x8281), and both special cases in the encoder are explained by it; decode confirmed the exact inverse. bravo: Class6B5CC bitfield accessors, parent-notification chain and an outcode/midpoint-subdivision segment-AABB clip -- 9 renamed, 8 held back, 3 kept tier C. Five names sampled per unit, no wrong tier-A name; both mark-unit'd. HEAD APPLIED at merge: bravo's 8 held-back FUNCTION renames (bravo had applied track 3 step 3's FIELD ownership rule to function symbols; rename.py is global by construction and is the sanctioned mechanism), and its 7 proposed Class6B5CCMethods vtable slot names by TYPE SCOPE.",
           "round": 54,
           "runners": 2
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-19",
+          "matches": 1,
+          "model": "sonnet",
+          "note": "Track 3 naming, runner alpha, unit code_2cc8c_c (plan.py's top job at centrality 8): the Obj86B60 tail plus the Unk18Obj allocator/ctor/child chain. 19/19 defs named, 3 shared globals named (gTaskCoreMethods, gDefaultStreamTaskInitData, gIntermediateBaseMethods), ~16 exclusive fields and slots renamed directly, 6 cross-unit field names PROPOSED and applied by the head by type scope, unit header comment written, ## Naming in all 19 reports. Head-reviewed 5 names: Get_vtable_TaskCore (checked the convention rather than the name -- Get_vtable_* has 3 precedents on main, so not an invented style), Obj86B60__GetActiveSlotCount (report explicitly declines to claim purpose beyond the getter), IntermediateBase__IntermediateBase (body confirms ctor chain + vtable install), Obj86B60__NotifyParents (vtable-slot inheritance evidence, named while still a STALL, which track 3 requires), plus all header edits read as a class: pure identifier substitution, no offset or type changed. No wrong tier-A name; mark-unit'd. Naming runner stays sonnet.",
+          "round": 55,
+          "runners": 1
         }
       ],
       "status": "open",
