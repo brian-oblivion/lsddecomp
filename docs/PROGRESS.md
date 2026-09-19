@@ -845,6 +845,16 @@ header in the calling unit contradicted the codebase precedent (local
 a shared header) and now states the precedent. Step 3's ownership rule says
 explicitly that it covers fields and slots, not functions or globals.
 
+**Revision 5 (2026-09-19, after round 55).** The stall ranking was inverted
+for the fourth round running: nearmiss ranks by size, revision 4 by report
+date, and neither reads the cost signals PARALLEL-RUNS 3.3 names. Census of
+the 113 stall reports: 58 carry both a permuter run and a spent-levers
+verdict, 23 carry neither. `plan.py` now ranks stalls by (spent, searched,
+not length-exact, size) read from the report and tags each job line. The
+revisit rule stands but measures itself: the REVISITED line records whether
+the unit's new names or types contributed, since round 55's revisit closed by
+re-reading rather than by naming.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

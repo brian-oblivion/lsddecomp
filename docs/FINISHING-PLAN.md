@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 4 (2026-09-18, after rounds 53 and 54: plan.py could not see
-parked SDK functions, spent stalls or revisits; the track 2 header rule
-contradicted the codebase).
+Plan revision: 5 (2026-09-19, after round 55: the stall ranking put spent,
+deeply-searched functions first for four rounds; the revisit rule's
+hypothesis is now measured per revisit).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -80,10 +80,13 @@ reason" rather than another round.
 **Goal.** Take the matches that are still cheap; measure the rate; stop when
 it is not worth the tokens.
 
-**Order.** `fresh` functions first (however large). Then stalls as
-`tools/nearmiss.py` ranks them: smallest gap, shallowest attempt history,
-never permuter-searched, scaffold-agreement check passed. Mix worked and
-unworked ground in one assignment.
+**Order.** `fresh` functions first (however large). Then stalls by ATTEMPT
+COST as `plan.py` reads it off each report: no spent-levers verdict first,
+never permuter-searched next, length-exact next, smallest last. Each job line
+carries the tags (`unspent,never-searched,len-exact`). `nearmiss.py` ranks by
+size alone and is the wrong list to assign from; a head that finds itself
+skipping the top job for a documented reason reports it, per §6, rather than
+re-ranking by hand.
 
 **Runner budget** (in the runner prompt, PARALLEL-RUNS.md §5): at most three
 functions per session; stop a function after 30 consecutive builds without a
@@ -125,10 +128,14 @@ to 52 re-ranked the queue on markers nobody had retired.
 evidence about what was known then, not about the function (southpark round
 126: 4 of 4 warm bodies matched once their unit's types were derived). So
 after a unit passes track 3, each of its stalls becomes a REVISIT job exactly
-once. `plan.py` lists them (a stall whose report predates the unit's
-`mark-unit` date). A revisit is one bounded attempt with the budget above;
-its report line says REVISITED whatever the outcome, so it is not listed
-again.
+once. `plan.py` lists them (a stall in a passed unit whose report has no
+REVISITED line). A revisit is one bounded attempt with the budget above; its
+report line says `REVISITED, round N: <outcome>; names/types <used | not
+relevant>`, so it is not listed again AND the rule's own hypothesis is
+measured. Round 55's revisit closed a length gap by re-reading the
+disassembly, not by using new names; if that stays the pattern over several
+revisits, the trigger changes from "unit passed track 3" to "title older
+than N rounds", as a plan revision.
 
 **Head at merge.** Verify per PARALLEL-RUNS.md §3.9, record the round, and
 correct any report whose cause the round falsified.

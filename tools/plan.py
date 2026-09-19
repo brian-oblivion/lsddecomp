@@ -257,6 +257,30 @@ def report_state(func):
     return "stalled", body
 
 
+PERM_RUN_RE = re.compile(r"[0-9]{3,}[, ]*(iteration|iters)|rc=(124|137)|permuter-exhausted|--stop-on-zero", re.I)
+SPENT_RE = re.compile(r"levers? (are |is )?spent|exhausted|do not (re-)?attempt|not worth (another|further)|no further attempt", re.I)
+EXACT_RE = re.compile(r"length[: ]*EXACT|exact length|\b(\d+)/\1\b", re.I)
+
+
+def stall_cost(func, title):
+    """(spent, searched, not_exact, words_key): lower is cheaper to attempt."""
+    p = REPORTS / f"{func}.md"
+    txt = p.read_text(errors="replace") if p.exists() else ""
+    spent = 1 if SPENT_RE.search(txt) else 0
+    searched = 1 if PERM_RUN_RE.search(txt) else 0
+    exact = 1 if EXACT_RE.search(title) else 0
+    return (spent, searched, 1 - exact)
+
+
+def cost_tag(func, title):
+    spent, searched, notexact = stall_cost(func, title)
+    tags = []
+    tags.append("spent" if spent else "unspent")
+    tags.append("searched" if searched else "never-searched")
+    tags.append("len-exact" if not notexact else "len-off")
+    return ",".join(tags)
+
+
 def git_date(path):
     out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", str(path)],
                          capture_output=True, text=True, cwd=ROOT).stdout.strip()
@@ -344,14 +368,15 @@ def collect(st):
                    key=lambda u: (-units[u]["centrality"], -units[u]["func_named"]))
     pct3 = len(done) / max(1, len(units))
 
-    # Stall ordering: nearmiss ranks by size; a stall attempted last round
-    # returned to the top the moment the round ended (rounds 53, 54). The
-    # cheapest mechanical proxy for "shallowest history" is the report's last
-    # git touch: least recently touched first, size second.
-    dated = [(git_date(REPORTS / f"{func}.md") or "0000", words, unit, func, title)
-             for words, unit, func, title in stall_rows]
-    dated.sort()
-    stall_rows = [(w, u, f, t) for _, w, u, f, t in dated]
+    # Stall ordering is by ATTEMPT COST, read from the report (revision 5).
+    # nearmiss.py ranks by size and revision 4 ranked by report date; both put
+    # deeply-searched, levers-spent functions first, and heads skipped the
+    # top job four rounds running. PARALLEL-RUNS 3.3's screens 5 and 6 name
+    # the signals; this reads them: a spent-levers verdict, evidence of an
+    # actual permuter RUN (iteration counts, rc=, --stop-on-zero), then
+    # length-exactness, then size. Never-searched, unspent, length-exact and
+    # small comes first.
+    stall_rows = sorted(stall_rows, key=lambda r: stall_cost(r[2], r[3]) + (r[0],))
 
     # track 1 revisit: every stall in a unit that has passed track 3, exactly
     # once: the runner writes REVISITED into the report, and that is what
@@ -444,13 +469,13 @@ def stall_runner_jobs(rows, model, label):
         if unit not in by_unit:
             by_unit[unit] = []
             order.append(unit)
-        by_unit[unit].append((words, func))
+        by_unit[unit].append((words, func, title))
     jobs_ = []
     for unit in order:
         fs = by_unit[unit]
         for i in range(0, len(fs), STALLS_PER_RUNNER):
             chunk = fs[i:i + STALLS_PER_RUNNER]
-            names = ", ".join(f"{f} ({w}w)" for w, f in chunk)
+            names = ", ".join(f"{f} ({w}w; {cost_tag(f, t)})" for w, f, t in chunk)
             jobs_.append(("1", f"{label} runner on {unit}: {names}", model))
     return jobs_
 
