@@ -90,6 +90,26 @@
           "note": "charlie, REVISIT (not the ranked band), code_8220_b func_80018464: STALL but the gap is now fully accounted for and it REVERSED direction -- 30 words short (924/954) -> 28 words LONG (982/954). All 28 are one transformation (GCC splits elem into two IVs in each of 13 loops: 13 setup addiu + 13 tail increments + the 8th callee-saved register's save/restore). Overturns round 50 on two counts: the dispatch IS a C switch (tell is body layout order), and the -0x48 frame is the extra IV, not per-case helper pointers. 10 Psy-Q gte_* macros added to include/gte.h. REVISITED line says names/types NOT relevant.",
           "round": 56,
           "runners": 1
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-19",
+          "matches": 0,
+          "model": "opus",
+          "note": "Opus calibration band, runner bravo on code_179d8_j. Zero matches, but both functions moved and one was RECLASSIFIED. func_8003069C 60/85 -> 73/85: the D_8008EA26 value must be carried by hiBit specifically -- the one local round 56 did not try, and the only one assigned in BOTH arms of the following if/else -- which lands i/loBit/hiBit in retail's $a3/$a2/$a1 and makes the entire loop head byte-identical, closing a loBit/hiBit residue carried since round 23. Plus: write the complement as its own local (t = ~y; x & t) and the or as a direct global RMW. Residue now 12 words, exactly two things. func_80030404: Gate 3 passed clean (base 45; 0 insertions/deletions/reorderings, 9 register differences), search spent 438,478 iterations rc=124, no zero. The search paid in CLASSIFICATION, not a match: spelling (entry + n)->field at each access instead of entry += n produces retail's addu and all six 0x74/0x76 accesses, so the seven-word register residue is REACHABLE from source shape -- but the correct program is then 97 words, because two live pseudos make the table base take $a1 from parameter p1. Nine spellings all measure 97. Both permuter candidates bought the word back only by breaking semantics at the same access; rejected as mirror images.",
+          "round": 57,
+          "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-19",
+          "matches": 1,
+          "model": "opus",
+          "note": "REVISIT job, runner charlie on code_d294_c: func_8001E7BC MATCHED 180/180 byte-exact, the largest function in the queue, open since round 14 and filed three times as unreachable register identity. Revisit-rule verdict, measured as the rule requires: names/types USED -- two of four levers came from the unit's post-naming type Vec3_d294 and they are the two residues open longest (round 44's #1 and #2); the other two came from plain re-reading (the tail is cross-jumped, written twice, and the null-unk20 guard is an enclosing if, not an early return). So this is a POSITIVE for the revisit rule, against round 55's negative where re-reading did all the work. The trigger-change condition in FINISHING-PLAN track 1 is therefore NOT met. No permuter spent: round 46 had run one to completion against these exact residues and all four levers are source-shape changes outside its mutation vocabulary. code_d294_c is now 15/15 with zero queued.",
+          "round": 57,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -172,6 +192,7 @@
       "units_done": {
         "Entity": "2026-09-19",
         "class_3bb8c_o": "2026-09-18",
+        "class_3bb8c_p": "2026-09-19",
         "code_171e0": "2026-09-18",
         "code_179d8_e": "2026-09-18",
         "code_179d8_q": "2026-09-17",

@@ -6,6 +6,162 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-19 — round 57: a 180-word stall open since round 14 closes, and a wrong prototype the byte oracle could not see
+
+Head on Opus (no new procedure, no HARD RULE adjudication; the top jobs named
+a Sonnet naming runner and Opus stall/revisit runners). Three runners, the
+operator's default cap. Gate 0 green first try, all three worktrees
+byte-verified before handover, `headercontention.py` reported no contention
+between `class_3bb8c_p`, `code_179d8_j` and `code_d294_c`.
+
+**State at end: 1139 matched / 1252 game functions, 0 fresh, 113 stalled.
+Track 1 calibration Opus 0 matches / 4 band attempts (Sonnet complete at 0/6).
+Track 2 unchanged at 98 named / 44 parked. Track 3 at 12/75 units, 866 defs
+still `func_`. Track 4 and 5 still waiting.**
+
+### charlie: `func_8001E7BC` MATCHED 180/180, and the revisit rule measures positive
+
+The largest function in the queue, open since round 14, filed three separate
+times as unreachable register identity. Four levers, and the split matters
+because the revisit rule is instrumented to measure its own hypothesis:
+
+- *(re-reading)* the tail is **cross-jumped** — the success body is written
+  twice, once per `func_8001F8B8` probe, with `return 0` last. The tell is
+  `move a0,s5` in BOTH probe delay slots against one `jal SubVec3S16`. This
+  dissolved round 44's whole "4-register permutation" residue without ever
+  addressing it: the `$s1`-`$s4` assignment follows the CALL STRUCTURE, not
+  declaration order, which is what round 44 had tried and regressed on.
+- *(re-reading)* the null-`unk20` guard is an enclosing `if`, not an early
+  return, which is what places the shared `v0 = 0` block after the success
+  tail.
+- *(types)* `((Vec3_d294 *)(cond ? p->unk38 : NULL))->y` instead of `(...)[1]`.
+- *(types)* the backup copy is ONE `Vec3_d294` struct assignment.
+
+**Verdict line written: `REVISITED, round 57: MATCHED 180/180 byte-exact;
+names/types used`.** Two of four levers came from the unit's post-naming type,
+and they are the two residues open longest. So this is a POSITIVE for the
+revisit rule, against round 55's negative where re-reading did all the work —
+the trigger-change condition in FINISHING-PLAN track 1 is **not** met, and the
+rule stays as written. `code_d294_c` is now 15/15 with zero queued.
+
+No permuter spent, which is a result rather than a skip: round 46 ran one to
+completion (56,437 iterations) against these exact residues, and all four
+levers are source-shape changes outside its mutation vocabulary.
+
+### The cross-runner finding: a wrong `extern` is invisible to the byte oracle
+
+`class_3bb8c_p` had long declared `extern s32 func_8001E7BC(void);` and called
+it with no arguments. In the SAME round `code_d294_c` matched that function and
+established the real signature, a three-argument `Class6B5CC` method. The two
+readings met at merge.
+
+The zero-argument call compiled **byte-identically**, because
+`DreamSys__AcceptGridElem(arg0, arg1, arg2)` receives them in `$a0`-`$a2` and
+the callee reads the same registers — so alpha's report claim that `arg1`/
+`arg2` were unused parameters "existing only to match the calling convention"
+was exactly wrong: they are FORWARDED. Rewritten against the real prototype,
+byte-exact, whole-image green.
+
+This is the failure mode FINISHING-PLAN track 2 names for SDK identification —
+*the byte oracle cannot see a wrong signature* — occurring in ordinary game
+code, between two units, and surviving because the callee was `INCLUDE_ASM`
+until this round, so no C prototype existed to conflict with. **When a function
+leaves the queue by MATCHING, its new signature is evidence about every other
+unit that declares it `extern`.** Learning recorded on
+`DreamSys__AcceptGridElem.md`.
+
+### alpha: `class_3bb8c_p` passed track 3
+
+20 functions named, tier recorded per name with evidence. Head review sampled
+five; all held. The slot noun that looked coined (`dispatchLinkCommand`) turned
+out to be inherited from `Class6B5CC__DispatchLinkCommand`, which
+`classtable.py` resolves at the same `+0x9C` offset — naming a slot after the
+method it dispatches to, per convention. Sonnet stays the naming runner.
+
+The three proposed cross-unit names applied by type scope, each byte-exact:
+`DreamSys::unk_0x28` -> `linkTarget`, `unk_0x4C` -> `linkMgr`,
+`vtable_DreamSys::slotA0` -> `tryAttachNearby`. **Two things the procedure
+caught that a whole-tree replace would not:**
+
+1. `src/DreamSys.c:1070` accesses `unk_0x4C` from inside a `#if 0` preserved
+   body, which compiles to nothing, so the compiler structurally cannot
+   enumerate it (the round-54 trap, DECOMPILATION_LEARNINGS 3c). It was the
+   only one; swept to zero for both fields afterwards.
+2. Six unrelated structs define their own `slotA0`. By type scope the
+   `DreamSys` slot had exactly ONE accessor.
+
+**Which exposes a gap in track 3 step 3, flagged to the operator, not acted
+on** (a plan change is a Fable task): step 3 spells the field-ownership test as
+a textual `grep -rn -- '->oldName\b'`. That systematically OVER-counts for
+`slotNN` names, because slot names are shared across unrelated classes by
+construction — alpha's grep reported seven other units for a slot that was
+unit-local by type. It cost a rename alpha could safely have done itself. The
+type-scoped truth is whatever the compiler enumerates.
+
+### bravo: two stalls moved, one reclassified, zero matches
+
+`func_8003069C` 60/85 -> 73/85. **The carrier local must be `hiBit`** — the one
+candidate round 56 did not try, and the only local assigned in BOTH arms of the
+following if/else. It lands `i`/`loBit`/`hiBit` in retail's `$a3`/`$a2`/`$a1`
+and makes the entire loop head byte-identical, closing a `loBit`/`hiBit`
+residue carried since round 23 and cross-referenced from `func_80031890`. Plus:
+write the complement as its own local (`t = ~y; x & t`) and the `or` as a
+direct global RMW. Residue now 12 words and exactly two things.
+
+`func_80030404` **RECLASSIFIED**. Gate 3 passed clean (base 45; 0 insertions,
+0 deletions, 0 reorderings, 9 register differences — round 47 had declined this
+same function at 4350/17/22, a decline its rewritten body had voided). Search
+spent: 438,478 iterations, `rc=124`, no zero. **The search paid in
+classification, not a match:** spelling `(entry + n)->field` at each access
+instead of `entry += n` produces retail's `addu` and all six `0x74/0x76`
+accesses, so the seven-word register residue is REACHABLE from source shape —
+but the correct program is then 97 words, because two live pseudos make the
+table base take `$a1` from parameter `p1`. Nine spellings all measure 97. Both
+permuter candidates bought the word back only by breaking semantics at the same
+access, mirror images of each other; rejected.
+
+Bravo's own note, worth keeping: **a permuter DECLINE is a verdict about the
+body it was measured on**, exactly like a blacklisted spelling — re-run Gate 3
+check (b) when the body has been rewritten.
+
+### Doc hygiene: stale figures ABOVE a correct title
+
+Bravo found `func_80030404` carrying a round-23 measurement note positioned
+above its correct title and contradicting it, for 34 rounds. It marked it
+superseded in place rather than deleting it (its negatives remain valid for the
+body they were measured on). The shape matters because PARALLEL-RUNS §3.3
+screen 4 ranks from TITLE lines only, so a stale paragraph ABOVE the title is
+invisible to the screen while reading as current to a human.
+
+The head swept all match reports for that shape: figures in the first 17 lines
+sharing a denominator with the title but a different numerator. Ten hits, of
+which nine are benign — dated sections that explain their own older numbers.
+One is the real pathology: **`func_80031A44`** carries an undated note stating
+"87 words, ONE word short" and "51/88" directly beneath a title stating "88/88
+no drift" and "84/88". Annotated as contradicting, NOT resolved — nobody has
+re-measured it and this head did not either.
+
+### Three learnings consolidated (all from charlie)
+
+Into DECOMPILATION_LEARNINGS 3c, 3d and section 4:
+`(cond ? p : NULL)[i]` distributes the index into both arms via `fold()` while
+a `COMPONENT_REF` does not; one struct assignment and three scalar assignments
+emit identical instructions but allocate the base POINTER differently
+(`emit_block_move` expands as one unit); and **a register-identity verdict is a
+claim about the RESIDUE, not the function, and decays as the function changes**
+— two of round 44's three same-class residues were ordinary source shape
+elsewhere in the body.
+
+### Next
+
+`plan.py` says: naming pass on `class_3bb8c_f` (Sonnet), a stall runner on
+`class_3bb8c_b`, a revisit on `code_2cc8c_c`. Opus needs 2 more band attempts
+to finish calibration at 6; on the current 0/4 and Sonnet's 0/6, the track's
+stop rule (fewer than 3 matches across the twelve) is close to firing on its
+own.
+
+---
+
 ## 2026-09-19 — round 56: a silent stale-object trap in the build, and two rounds' conclusions overturned
 
 Head on Opus (no new procedure, no HARD RULE adjudication; the top jobs named
