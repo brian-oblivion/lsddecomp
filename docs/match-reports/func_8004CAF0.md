@@ -1,4 +1,4 @@
-# func_8004CAF0 — STALL, 97 words (exact length, zero drift), 55/97 raw word-match, first diff at the prologue register saves (`self`/`slot` register-number swap; re-confirmed round 34)
+# func_8004CAF0 — STALL, 97 words (exact length, zero drift), 62/97 raw word-match (round 58, up from 55/97), first diff at the prologue register saves (0x3D2F4, `self`/`slot`/temp 3-cycle among `$s0`/`$s1`/`$s3`) — but round 58 argues that rotation is DOWNSTREAM of the one remaining structural diff, an arithmetic reassociation at 0x3D3E0, and so this is not yet established as a HARD RULE 6 register-identity stall
 
 > **ROUND 19 (bravo) UPDATE: the round-9 "reconstruction problem, frame off
 > by 8 bytes" diagnosis is SUPERSEDED.** Acting directly on the round-9 head
