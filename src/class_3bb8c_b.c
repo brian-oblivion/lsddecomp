@@ -259,47 +259,56 @@ void func_8004C93C(Obj866E8 *self) {
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 
-/* STALLED at 55/97 words -- see docs/match-reports/func_8004CAF0.md for the
- * full round-19 analysis. Frame size, callee-saved register SET and CFG
- * shape all now match retail exactly (round 9's "frame off by 8 bytes,
- * reconstruction problem" diagnosis is SUPERSEDED); the residue is a clean
- * 3-register rotation (self/slot/a third reused value among $s0/$s1/$s3)
- * confirmed inert to declaration reordering, consistent with this
- * project's established register-identity-rotation class. Preserved here
- * per project convention rather than only in the report. */
+/* STALLED at 62/97 words (round 58, up from 55/97) -- see
+ * docs/match-reports/func_8004CAF0.md. Frame size, callee-saved register SET
+ * and CFG shape match retail exactly. Round 58 retired the "permuter scaffold
+ * is untrustworthy" blocker that rounds 19 and 33 had recorded (it was a unit
+ * error: funcdiff reports no insertion/deletion counts at all, so the "0 ins /
+ * 0 del" those rounds weighed against the permuter was never measured), ran
+ * this function's first search, and closed two of its three structural diffs
+ * with the pair of levers in the body below -- the do-while(0) around the
+ * first half AND the named h8Val temp, which only work JOINTLY (either alone
+ * changes the function's length). What is left is one arithmetic
+ * reassociation plus the 3-register rotation (self/slot/temp among
+ * $s0/$s1/$s3) that is very likely DOWNSTREAM of it. Preserved here per
+ * project convention rather than only in the report. */
 #if 0
 s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 hSpan;
     s32 hSpan2;
     s32 h4;
     s32 nextArg;
+    s32 h8Val;
 
     if (p6 + p8 >= 21) {
-        hSpan = (p6 + p8) - 20;
-        hSpan2 = hSpan;
-        slot->hA = p8 - hSpan;
-        count = count + 1;
-        slot = &self->slots8C[count];
+        do {
+            hSpan = (p6 + p8) - 20;
+            hSpan2 = hSpan;
+            slot->hA = p8 - hSpan;
+            count = count + 1;
+            slot = &self->slots8C[count];
 
-        if (p5 < 10) {
-            nextArg = baseIdx + 2;
-            slot->elemIdx = self->methods->slot120(self, nextArg);
-            __asm__("");
-            h4 = p5 + 10;
-        } else {
-            nextArg = baseIdx + 3;
-            slot->elemIdx = self->methods->slot120(self, nextArg);
-            __asm__("");
-            h4 = p5 - 10;
-        }
-        slot->h4 = h4;
-        slot->hA = hSpan2;
+            if (p5 < 10) {
+                nextArg = baseIdx + 2;
+                slot->elemIdx = self->methods->slot120(self, nextArg);
+                __asm__("");
+                h4 = p5 + 10;
+            } else {
+                nextArg = baseIdx + 3;
+                slot->elemIdx = self->methods->slot120(self, nextArg);
+                __asm__("");
+                h4 = p5 - 10;
+            }
+            slot->h4 = h4;
+            slot->hA = hSpan2;
+        } while (0);
 
         hSpan2 = slot->h4 + p7;
         slot->h6 = 0;
         if (hSpan2 >= 21) {
             count = count + 1;
-            slot->h8 = (p7 + 20) - hSpan2;
+            h8Val = (p7 + 20) - hSpan2;
+            slot->h8 = h8Val;
             slot = &self->slots8C[count];
             slot->elemIdx = self->methods->slot120(self, nextArg + 1);
             slot->h4 = 0;

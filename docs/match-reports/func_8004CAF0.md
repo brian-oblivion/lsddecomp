@@ -520,3 +520,257 @@ candidate value for the "duplicate it" trick have a genuine second,
 independent USE POINT the compiler could split from the first, or is it
 just a parameter mentioned in more than one place? Only the former has
 shown a positive result in this corpus so far.
+
+---
+
+## Round 58 (bravo) — the 39-round "permuter scaffold is untrustworthy" blocker is RETIRED (it was a unit error, not a scaffold fault); residue re-characterised as 3 real insertions + 3 real deletions that cancel, NOT a pure register rotation
+
+Assigned as PRIMARY with the brief noting `plan.py` tags this function
+`unspent, never-searched, len-exact`. Rebuilt the round-19 preserved body
+first, per hygiene: **55/97, exact length (0x184), zero outside-range drift**
+— unchanged from rounds 19, 33 and 53.
+
+### 1. The residue is not what three rounds have recorded
+
+Rounds 19, 33 and 53 all describe what is left as "a clean register-identity
+ROTATION … zero insertions, zero deletions". Read with
+`tools/asm-differ/diff.py` rather than with `funcdiff.py`'s word count, that
+is false in a way that matters: there are **three distinct local structural
+differences**, and they happen to cancel in total length, which is why every
+prior round's "length exact / zero drift" reading passed them over.
+
+**Structural diff A — the load-delay slot at `0x3D3C0`.**
+
+```
+retail                          ours (55/97)
+3d3bc: sh   v0,4(s0)            3d3bc: sh   v0,4(s1)
+3d3c0: sh   s3,0xa(s0)          3d3c0: lh   v0,4(s1)
+3d3c4: lh   v0,4(s0)            3d3c4: sh   s0,0xa(s1)
+3d3c8: nop                      3d3c8: addu s0,v0,s7
+3d3cc: addu s3,v0,s7
+```
+
+Retail emits the `slot->hA = hSpan2` store BEFORE the `slot->h4` reload and
+leaves the reload's load-delay slot as a `nop`. Ours hoists the `lh` and uses
+the `sh` as the delay-slot filler — **one word shorter here (a deletion)**.
+
+**Structural diff B — the `h8` arithmetic at `0x3D3E0`.**
+
+```
+retail                          ours
+3d3e0: addiu v0,s7,0x14         3d3dc: addiu s0,s0,-0x14
+3d3e4: subu  v0,v0,s3           3d3e0: subu  v0,s7,s0
+...                             ...
+3d41c: addiu v0,s3,-0x14        3d41c: move  v0,s2
+3d428: sh    v0,8(s0)           3d428: sh    s0,8(s1)
+```
+
+Retail evaluates `(p7 + 20) - h4sum` **literally**, keeps `h4sum` itself alive
+in `$s3` across the `slot120` call, and computes `h4sum - 20` separately
+afterwards. Ours reassociates: it computes `t = h4sum - 20` **early, before
+the call**, destroying `h4sum` in place, then derives the first store as
+`p7 - t`. Same value, different instruction stream, and it changes which
+value is the one held across the call.
+
+**Structural diff C — the third call site at `0x3D3FC`.**
+
+```
+retail                          ours
+3d3fc: addu s0,s1,v0            3d3f8: addu s1,s3,v0
+3d400: lw   v0,0(s1)            3d3fc: move a0,s3        <- insertion
+3d404: move a0,s1               3d400: lw   v0,0(a0)
+3d408: lw   v0,0x120(v0)        3d404: nop               <- insertion
+```
+
+Ours schedules the `move a0, self` ahead of the `lw self->methods` and then
+needs a load-delay `nop` — **two words longer here (insertions)**.
+
+Net: −1 +2 and one more deletion elsewhere ⇒ **equal length**. The permuter's
+own structural summary counts it exactly: **3 insertions, 3 deletions, 1
+reordering, 37 register differences, 24 stack differences.**
+
+### 2. Why that matters: the scaffold blocker was a UNIT ERROR
+
+Rounds 19 and 33 both set up a permuter scaffold, both ran
+`permuter.py --debug`, both got base score 869 with "24 stack differences, 3
+insertions / 3 deletions", and both concluded the scaffold **disagreed with
+the real build** ("55/97 with zero insertions/deletions") and was therefore
+untrustworthy. Round 33 re-checked it on a fresh build and recorded the
+disagreement as reproducible. On that basis **no permuter search has ever
+been run on this function** — 39 rounds of a self-sustaining blocker.
+
+**The scaffold was correct the whole time.** Gate 3 check 3
+(`docs/PARALLEL-RUNS.md` §3.5) — does the scaffold's own compile of the same
+body agree with that body rebuilt in the real tree? — was never actually run;
+what was compared was two tools' *summary numbers*. Run properly this round:
+
+```sh
+tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/func_8004CAF0/base.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_3bb8c_b.c.o
+```
+
+`func_8004CAF0` is **byte-identical** between the two, instruction for
+instruction, with the only textual differences being the absolute targets of
+`j`/`bnez` (`j 4cbbc` vs `j cc`) — which is what a standalone object always
+shows, because those are section-relative until link time. 98 vs 99 lines,
+6 differing lines, all of them branch/jump target addresses.
+
+So the two numbers never disagreed about anything:
+
+| figure | what it actually measures |
+| --- | --- |
+| funcdiff `55/97` | words equal at the same offset |
+| funcdiff "zero drift" | bytes differing OUTSIDE the function's range |
+| permuter `3 ins / 3 del` | instructions present in one stream and not the other |
+| permuter `24 stack diffs` | `sw/lw sN,0xNN(sp)` pairs whose slot offset differs — i.e. the rotation, seen in the prologue |
+
+**`funcdiff.py` does not report insertions or deletions at all.** The
+"zero insertions, zero deletions" that rounds 19 and 33 weighed against the
+permuter was never measured — it was *inferred from "length exact"*, and
+equal length is not zero ins/del. Here it is 3 and 3, cancelling.
+
+### 3. The bounded search (the function's first, ever)
+
+**Gate 3 (`docs/PARALLEL-RUNS.md` §3.5) — which checks were run.** All three.
+Check 1 (the target asm is the current extraction) and check 2 (the base
+compiles with 0 errors) pass trivially. Check 3 is the one that had never been
+run, and it is recorded in §2 above: `base.o` is byte-identical to the real
+tree's object for this function. It was re-run a second time for the improved
+base before the second search window, with the same result.
+
+**Window 1 — seeded from the round-19 body (55/97), base score 845.**
+`-j 6 --stop-on-zero --best-only`, **45,150 iterations, 0 errors**, stopped by
+hand once its lead had been harvested (it was still running under a 2700s
+cap). Candidates written out at scores 680, 565, 400, 400 and 350.
+
+**The permuter's score is NOT this project's metric, and window 1 shows it
+sharply.** Every candidate was re-verified in the real tree with
+`./build-and-verify.sh` + `funcdiff.py`, and the ranking did not survive:
+
+| permuter score | in the real tree |
+| --- | --- |
+| 400 (`output-400-1`) | **62/97, exact length, zero drift — the improvement** |
+| 400 (`output-400-2`) | 58/97 |
+| 350 (`output-350-1`) | **length changes — drift**, unusable |
+
+The permuter weights insertions and deletions at 100 each but will still take
+a length change if it buys enough register and stack agreement; this project
+scores only words equal at the same offset, and treats any length change as
+disqualifying. So **a lower permuter score is a LEAD, not a result** — the
+setup script says this about the base score and it is just as true of every
+candidate. Rank candidates by re-verifying them, never by their search score.
+
+**Window 2 — re-seeded from the 62/97 body**, after re-running Gate 3 check 3
+against the new base. WINDOW2_RESULT
+
+### 3a. The lever, isolated
+
+`output-400-1` differs from the round-19 body in exactly two places, and
+**neither works on its own** — each alone changes the function's length and
+drifts the whole image:
+
+| body | result |
+| --- | --- |
+| round-19 base | 55/97, exact length |
+| + named `h8Val` temp only | **drift** |
+| + `do { } while (0)` only | **drift** |
+| + **both** | **62/97, exact length, zero drift** |
+
+A plain brace block `{ ... }` in place of the `do { } while (0)` also drifts —
+so this is not a scoping effect. **`do { } while (0)` is a real RTL construct
+to GCC 2.6.3**: the loop pass sees a loop and runs over the body, and a plain
+compound statement gives it nothing to run over. That is the whole mechanism,
+and it is worth reaching for on any stall whose residue is a scheduling or
+delay-slot artefact that resists statement reordering.
+
+What the pair buys is **two of the three structural diffs, closed**:
+
+- **Diff A closed.** Ours now emits `sh hA` before the `lh h4` reload and
+  leaves the load-delay `nop` in place, exactly as retail does.
+- **Diff C closed.** The spurious `move a0, self` ahead of
+  `lw self->methods` and its load-delay `nop` are gone; ours now matches
+  retail's `lw` / `move` order at the third call site.
+- **Diff B survives** unchanged, and so does the 3-register rotation.
+
+### 3b. Why the rotation is probably DOWNSTREAM of diff B — read this before filing this as a HARD RULE 6 stall
+
+Rounds 19, 33 and 53 all classify what is left as a pure register-identity
+rotation, which is the class CLAUDE.md HARD RULE 6 forbids fixing. That
+classification should not be inherited without re-testing, because diff B is a
+**register-pressure** difference and the rotation is a **register-priority**
+difference, and in GCC 2.6.3 the second is computed from the first.
+
+`global.c` orders allocnos by roughly `log2(n_refs) * n_refs / live_length`
+and hands out `$s0`, `$s1`, … in that order. The measured orders are:
+
+| | rank 0 | rank 1 | rank 2 | rank 3 |
+| --- | --- | --- | --- | --- |
+| retail | `slot` (`$s0`) | `self` (`$s1`) | `count` (`$s2`) | temp (`$s3`) |
+| ours | temp (`$s0`) | `slot` (`$s1`) | `count` (`$s2`) | `self` (`$s3`) |
+
+`$s4`-`$s7` (`nextArg`, `hSpan`, `p5`, `p7`) already agree. The single value
+whose rank moved furthest is the **temp** — from last of the four to first —
+and diff B is precisely an extra use of that temp: ours computes
+`h4sum - 20` early and carries it across the call in the temp, giving that
+allocno an extra reference and a shorter effective live range, i.e. exactly
+the two inputs that raise its priority. **Fix diff B and the temp's priority
+should fall back**, which is the only thing that has to change for the
+rotation to unwind.
+
+So the honest disposition is: this is **not yet established as a register-
+identity stall**. It is one arithmetic-shape residue with a rotation that has
+a plausible, mechanism-level reason to be its consequence. It becomes a HARD
+RULE 6 stall only if diff B is closed and the rotation survives.
+
+### 3c. Diff B, characterised
+
+```
+retail                                  ours (62/97)
+3d3e0: addiu v0,s7,0x14                 3d3e0: addiu s0,s0,-0x14
+3d3e4: subu  v0,v0,s3                   3d3e4: subu  v0,s7,s0
+...            (call)                   ...            (call)
+3d41c: addiu v0,s3,-0x14                3d41c: move  v0,s2
+3d428: sh    v0,8(s0)                   3d428: sh    s0,8(s1)
+3d42c: j     4cc40                      3d42c: j     4cc44
+```
+
+Retail evaluates `(p7 + 20) - h4sum` literally and keeps `h4sum` itself in
+`$s3` across the `slot120` call, recomputing `h4sum - 20` afterwards. Ours
+reassociates to `p7 - (h4sum - 20)`, computing `h4sum - 20` **before** the
+call and carrying that instead. The `j 4cc44` vs `j 4cc40` is a consequence,
+not a separate diff: having hoisted the subtraction, ours has a spare slot and
+puts the `move v0, count` return-value setup there, so it jumps past the
+shared epilogue's copy of it.
+
+Everything tried against it this round was inert or worse:
+
+| shape | result |
+| --- | --- |
+| name `p7 + 20` in its own local before the subtraction | inert (55/97 on the old base, 62/97 on the new) |
+| name the second `h8` value too (`h8Val` reused, or a second local) | inert, 62/97 |
+| `__asm__("")` barrier after the first `h8` store | inert, 62/97 |
+| `__asm__("")` barrier before the second `h8` store | inert, 62/97 |
+| write the first store as `p7 - (hSpan2 - 20)` (i.e. concede the reassociation) | drift |
+| write the first store as `p7 - hSpan2 + 20` | drift |
+| split into `new = p7 + 20; new = new - hSpan2;` | drift |
+
+A scheduling barrier does not touch it, which fits: this is a value-numbering
+/ reassociation decision taken well before scheduling.
+
+
+### 4. Source-shape levers tried this round (all against the 55/97 base)
+
+| # | shape | result |
+| --- | --- | --- |
+| 1 | split the dual-use `hSpan2` into `hSpan2` (the `hSpan` copy) and a separate `h4sum` local | **46/97 — regression.** The variable's dual use is load-bearing; retail's `$s3` double duty is reachable from one C variable and not from two. |
+| 2 | give `p7 + 20` its own named local before the subtraction, to block the reassociation in structural diff B | **55/97, byte-identical — inert.** The reassociation happens below the level a named temporary can reach. |
+| 3 | swap the `slot->h4 = h4;` / `slot->hA = hSpan2;` statement order | **length changes (drift) — regression.** |
+| 4 | swap which copy feeds which `hA` write (`hSpan` in the middle, `hSpan2` at the end) | **31/97 — regression.** Confirms round 19's assignment of the two copies is the right one. |
+| 5 | split the reload into two statements (`hSpan2 = slot->h4; hSpan2 = hSpan2 + p7;`) to stop the delay-slot hoist in structural diff A | **length changes (drift) — regression.** |
+
+Lever 1's negative is the informative one: it is the exact opposite of round
+9's successful "give each distinct value its own named local", on the same
+function. The two are not in conflict — round 9's lever ADDED live values to
+grow the frame, and the frame is now correct; adding a ninth here perturbs an
+allocation that is already the right size.
+
