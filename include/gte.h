@@ -178,6 +178,147 @@
         "nop\n\t" \
         ".word 0x4AF8002A")
 
+/* RGB load/store. COP2 data register 6 is RGB (the colour INPUT the
+ * depth-cue and normal-colour ops read); 20/21/22 are RGB0/RGB1/RGB2, the
+ * three colour OUTPUTS. These are Sony's own operand shapes, read off
+ * include/psyq/INLINE.H and confirmed instruction-for-instruction against
+ * retail in func_80018464:
+ *
+ *   gte_ldrgb(p)          one pointer,   1 op
+ *   gte_ldrgb3(p0,p1,p2)  three pointers, 4 ops (the 4th reloads p2 into RGB)
+ *   gte_ldrgb3c(p)        one pointer "contiguous", 4 ops, same 4th load
+ *   gte_strgb(p)          one pointer,   1 op
+ *   gte_strgb3(p0,p1,p2)  three pointers, 3 ops
+ *   gte_strgb3_g3(p)      one pointer,   3 ops, POLY_G3/G4 colour offsets
+ *
+ * INLINE.H is the ASPSX flavour and its macro-call words say nothing about
+ * the offsets (see the file banner above), but the OPERAND COUNT and the OP
+ * COUNT are readable there and they decide the bytes -- which is why these
+ * forms are not interchangeable. The pointer forms take their address at
+ * offset 0x0, so a call site spelling `gte_strgb(prim + 0x4)` makes GCC
+ * materialise the sum with its own `addiu`. That is exactly what retail
+ * shows, fifteen times over in func_80018464. Open-coding the same store as
+ * `swc2 $22, 0x4(%0)` on the base pointer drops the addiu, and the function
+ * then assembles short by one word per call site.
+ *
+ * The _g3 suffix is Sony's: POLY_G3 and POLY_G4 carry their three RGBs at
+ * +0x4/+0xC/+0x14, close enough to index from one pointer. POLY_GT3 and
+ * POLY_GT4 space theirs at +0x4/+0x10/+0x1C, and retail reaches those with
+ * the generic three-pointer gte_strgb3() rather than Sony's own
+ * gte_strgb3_gt3(), so only the form actually observed is spelled here. */
+#define gte_ldrgb(r1) \
+    __asm__ volatile ("lwc2 $6, 0x0(%0)" : : "r" (r1))
+
+#define gte_ldrgb3(r1, r2, r3) \
+    __asm__ volatile ( \
+        "lwc2 $20, 0x0(%0)\n\t" \
+        "lwc2 $21, 0x0(%1)\n\t" \
+        "lwc2 $22, 0x0(%2)\n\t" \
+        "lwc2 $6, 0x0(%2)" \
+        : : "r" (r1), "r" (r2), "r" (r3))
+
+#define gte_ldrgb3c(r1) \
+    __asm__ volatile ( \
+        "lwc2 $20, 0x0(%0)\n\t" \
+        "lwc2 $21, 0x4(%0)\n\t" \
+        "lwc2 $22, 0x8(%0)\n\t" \
+        "lwc2 $6, 0x8(%0)" \
+        : : "r" (r1))
+
+#define gte_strgb(r1) \
+    __asm__ volatile ("swc2 $22, 0x0(%0)" : : "r" (r1) : "memory")
+
+#define gte_strgb3(r1, r2, r3) \
+    __asm__ volatile ( \
+        "swc2 $20, 0x0(%0)\n\t" \
+        "swc2 $21, 0x0(%1)\n\t" \
+        "swc2 $22, 0x0(%2)" \
+        : : "r" (r1), "r" (r2), "r" (r3) : "memory")
+
+#define gte_strgb3_g3(r1) \
+    __asm__ volatile ( \
+        "swc2 $20, 0x4(%0)\n\t" \
+        "swc2 $21, 0xC(%0)\n\t" \
+        "swc2 $22, 0x14(%0)" \
+        : : "r" (r1) : "memory")
+
+/* Whole-MATRIX moves through the COP2 CONTROL registers, and the column-vector
+ * pair. These four are the only macros here that touch GPRs, and $12/$13/$14
+ * are exactly the GPRs retail shows -- the same situation gte_stflg() is in
+ * below, not the "wrong clobbers" trap, since these instructions really do
+ * move through general registers.
+ *
+ * Sony's include/psyq/INLINE.H settles which op belongs to which name by
+ * operand count and op count even though its macro-call words say nothing
+ * about the encodings: gte_ReadRotMatrix is 16 ops, gte_SetRotMatrix 10,
+ * gte_ldclmv and gte_stclmv 6 each. Retail's func_80018464 preamble has
+ * blocks of exactly 16, 10, 6, 6 and 10 in that order, so the mapping is not
+ * a guess.
+ *
+ * Note the asymmetry, which is retail's and not a transcription slip:
+ * gte_ReadRotMatrix saves control 0..7 -- the 3x3 rotation AND the
+ * translation vector, a full Psy-Q MATRIX, 0x20 bytes -- while
+ * gte_SetRotMatrix restores only control 0..4, the 3x3. The translation
+ * vector is read out and never put back.
+ *
+ * gte_ldclmv/gte_stclmv move ONE COLUMN of a 3x3 s16 matrix (stride 6) in and
+ * out of IR1/IR2/IR3, which is what makes the three-call loop in that
+ * preamble a matrix multiply done a column at a time. The halfword loads are
+ * `lhu`, unsigned, so the C form is u16. */
+#define gte_ReadRotMatrix(r1) \
+    __asm__ volatile ( \
+        "cfc2 $12, $0\n\t" \
+        "cfc2 $13, $1\n\t" \
+        "sw $12, 0x0(%0)\n\t" \
+        "sw $13, 0x4(%0)\n\t" \
+        "cfc2 $12, $2\n\t" \
+        "cfc2 $13, $3\n\t" \
+        "cfc2 $14, $4\n\t" \
+        "sw $12, 0x8(%0)\n\t" \
+        "sw $13, 0xC(%0)\n\t" \
+        "sw $14, 0x10(%0)\n\t" \
+        "cfc2 $12, $5\n\t" \
+        "cfc2 $13, $6\n\t" \
+        "cfc2 $14, $7\n\t" \
+        "sw $12, 0x14(%0)\n\t" \
+        "sw $13, 0x18(%0)\n\t" \
+        "sw $14, 0x1C(%0)" \
+        : : "r" (r1) : "$12", "$13", "$14", "memory")
+
+#define gte_SetRotMatrix(r1) \
+    __asm__ volatile ( \
+        "lw $12, 0x0(%0)\n\t" \
+        "lw $13, 0x4(%0)\n\t" \
+        "ctc2 $12, $0\n\t" \
+        "ctc2 $13, $1\n\t" \
+        "lw $12, 0x8(%0)\n\t" \
+        "lw $13, 0xC(%0)\n\t" \
+        "lw $14, 0x10(%0)\n\t" \
+        "ctc2 $12, $2\n\t" \
+        "ctc2 $13, $3\n\t" \
+        "ctc2 $14, $4" \
+        : : "r" (r1) : "$12", "$13", "$14")
+
+#define gte_ldclmv(r1) \
+    __asm__ volatile ( \
+        "lhu $12, 0x0(%0)\n\t" \
+        "lhu $13, 0x6(%0)\n\t" \
+        "lhu $14, 0xC(%0)\n\t" \
+        "mtc2 $12, $9\n\t" \
+        "mtc2 $13, $10\n\t" \
+        "mtc2 $14, $11" \
+        : : "r" (r1) : "$12", "$13", "$14")
+
+#define gte_stclmv(r1) \
+    __asm__ volatile ( \
+        "mfc2 $12, $9\n\t" \
+        "mfc2 $13, $10\n\t" \
+        "mfc2 $14, $11\n\t" \
+        "sh $12, 0x0(%0)\n\t" \
+        "sh $13, 0x6(%0)\n\t" \
+        "sh $14, 0xC(%0)" \
+        : : "r" (r1) : "$12", "$13", "$14", "memory")
+
 /* Read the GTE FLAG control register ($31 of COP2 control), keep only bit 18
  * (0x40000, the SZ3/OTZ saturation flag Sony's macro tests), store it. This
  * is the one macro that uses GPR scratch, and $12/$13 are exactly the GPRs
