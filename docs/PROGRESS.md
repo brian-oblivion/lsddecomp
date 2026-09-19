@@ -44,17 +44,35 @@ into two stacked sub-mechanisms (speculative no-call fills, post-call
 reloads), which do not answer to one lever. §3d sharpened accordingly. A
 claim that survives its own test comes back narrower and more useful.
 
-**3. The revisit rule earned its keep.** `code_d294_b` passed naming in round
-54, so its three stalls became REVISIT jobs. `Class6B5CC__TryAttachNearby`
-had sat at "141/143, 2 short" since round 20. Discarding round 20's
-`count=expr; if(count)` lever — which cost +2 words of `xori`+`sw` per branch
-— for a plain goto-CFG mirroring retail's actual jump graph, applied to all
-three axes at once instead of just X/Z, **closed the length exactly**:
-143/143 per `nm -S`, zero drift, raw 140/143. The residue is now 3 words of
-pure stack-slot-address class (`buf54` at retail `sp+0x54` vs built `sp+0x30`),
-explicitly not a register-identity wall — so it leaves the round a live lead,
-not a characterised stall. Nobody tried that shape in 35 rounds because the
-unit had no names to write it with.
+**3. A length closed since round 20 — but NOT by the mechanism the revisit
+rule assumes, and the runner said so itself.** `code_d294_b` passed naming in
+round 54, so its three stalls became REVISIT jobs.
+`Class6B5CC__TryAttachNearby` had sat at "141/143, 2 short" since round 20.
+Discarding round 20's `count=expr; if(count)` lever — which cost +2 words of
+`xori`+`sw` per branch — for a plain goto-CFG mirroring retail's actual jump
+graph, applied to all three axes at once instead of just X/Z, **closed the
+length exactly**: 143/143 per `nm -S`, zero drift; a permuter-found lever
+(caching `other->unk30` into a local before the call) then took it to 140/143.
+The remaining 2 words are pure stack-slot-address class (`buf54` at retail
+`sp+0x54` vs built `sp+0x30`), unmoved by 7 declaration-order variants and
+131770 combined iterations across two bounded searches — explicitly not a
+register-identity wall, so it leaves the round a live lead rather than a
+characterised stall.
+
+**The attribution matters more than the result, and the head's first draft of
+this entry got it wrong.** The revisit rule's premise is that a unit's new
+names and types let someone write a shape they could not write before. Charlie
+answered that question explicitly for all three functions and the answer was
+**no, three times**: round 54 renamed `Class6B5CCMethods` vtable slots, and
+none of these functions' own symbols (`GenericObj_d294`,
+`GenericMethods_d294::slot10`, `func_8001F8B8`, `D_8008A838`,
+`ClipSegmentToBox`) were touched by it. What actually moved
+`TryAttachNearby` was re-reading the disassembly's own jump graph instead of
+trusting a five-round-old title's summary. So this round is evidence for
+"re-read the asm fresh, distrust the inherited framing" and **not** evidence
+for the naming-unlocks-shapes premise — which is a distinction the plan's
+revisit rule depends on, and would have been silently inverted had the head
+kept its own summary over the runner's.
 
 **Track 3: `code_2cc8c_c` named, 19/19.** The Obj86B60 tail plus the Unk18Obj
 allocator/ctor/child chain; 3 shared globals, ~16 exclusive fields and slots,
@@ -88,16 +106,24 @@ an invented one. No wrong tier-A name; naming runner stays Sonnet.
   in the tool, and this is the fourth consecutive round a head has skipped
   plan.py's top track-1 job for a documented reason.
 
-**A runner stopped mid-search and the protocol held.** charlie backgrounded a
-bounded permuter run on `Class6B5CC__ClassifyAgainstPlanes` and stopped while
-it was live. Because its prompt says COMMIT BEFORE YOU WAIT, everything but
-the search result was already committed; the head waited out the bound and
-recorded the outcome as a report addendum (rc=124 at the 700s bound, 85100
-iterations, floor 3056 unmoved across the last ~23000 — a bounded negative,
-not permuter-exhaustion, and Gate 3 check 3 had passed so it is evidence about
-the function rather than the scaffold). `ListAgents` does show a stopped
-runner as resumable, but no `SendMessage` tool exists in this environment, so
-PARALLEL-RUNS §3.6's statement is correct as written and needs no change.
+**A runner stopped mid-search, and §3.7's "a notification is not a death
+certificate" was right to insist on waiting.** charlie backgrounded a bounded
+permuter run on `Class6B5CC__ClassifyAgainstPlanes` and notified the head
+while it was still live. Because its prompt says COMMIT BEFORE YOU WAIT,
+everything but the search result was already committed. The head sampled the
+worktree rather than concluding anything, found the search genuinely running
+(`timeout 700`, rc to its own file, exactly as the prompt requires), and let
+it finish — then charlie **resumed on its own** and wrote the result up
+itself, in more detail than the head had: 85100 iterations, rc=124 at the
+bound, three candidates, two translated and verified inert against the real
+oracle, one rejected outright as semantically unsound (it reads a bit-mask
+where the source means a plane-test result) rather than adopted for its score.
+The head had written a stopgap addendum with the same figures and deleted it
+on merge; the runner's own account is the authoritative one. Two lessons: a
+runner that commits before waiting loses nothing by stopping, and a head that
+treats a notification as death would have thrown away the better write-up.
+`ListAgents` shows a stopped runner as resumable, but no `SendMessage` tool
+exists here, so PARALLEL-RUNS §3.6 is correct as written and needs no change.
 
 ---
 

@@ -60,6 +60,16 @@
           "note": "Track-1 REVISIT job, runner charlie on code_d294_b (unit passed track 3 naming in round 54, so all three scores predated its names and types). Not calibration: revisits are excluded by the plan. Zero byte-exact, but the revisit rule earned its keep on one of three. Class6B5CC__TryAttachNearby: the LENGTH CLOSED EXACTLY, 141 -> 143/143 per nm -S with zero drift, raw 140/143, by discarding round 20's 'count=expr; if(count)' intermediate-assignment lever (which cost +2 words of xori+sw per branch) for a plain goto-CFG mirroring retail's actual jump graph, applied to all three axes at once rather than just X/Z -- a shape no prior round tried. Residue is now 3 words of pure STACK-SLOT-ADDRESS class (buf54 at retail sp+0x54 vs built sp+0x30, a count slot at sp+0x50 vs sp+0x80, one ld/ld reorder), explicitly NOT a register-identity wall, so this function is a live lead rather than a characterised stall. Class6B5CC__ClassifyAgainstPlanes: 199/199 length exact, 29/199, first diff register identity (self in $s4 vs retail $s5); Gate 3 checks 1-3 all passed and recorded, bounded search run to rc=124 at 85100 iterations with the floor stuck at 3056 for the last ~23000 -- a real bounded negative about the function, not about the scaffold. Class6B5CC__NotifyTaggedParents: confirmed unchanged with new negatives. All three reports carry REVISITED (round 55), so plan.py will not list them again. The runner committed before backgrounding its search, stopped while it ran, and the head recorded the search outcome as an addendum -- there is no wake channel.",
           "round": 55,
           "runners": 1
+        },
+        {
+          "attempts": 0,
+          "calibration": false,
+          "date": "2026-09-19",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "CORRECTION to this round's revisit entry above, recorded as a zero-attempt entry because the ledger is append-only and written only through plan.py. That entry said the revisit rule 'earned its keep'. It did not, and runner charlie said so itself for all three functions: round 54 renamed Class6B5CCMethods vtable SLOTS, and none of these three functions' own symbols (GenericObj_d294, GenericMethods_d294::slot10, func_8001F8B8, D_8008A838, ClipSegmentToBox) were touched by it, so the revisit's premise -- that new names and types let you write a shape you could not write before -- supplied nothing here. What closed TryAttachNearby's length was re-reading the disassembly's own jump graph instead of trusting a five-round-old title. The result stands; the CAUSE does not. This matters for the plan: if revisits keep paying off through fresh re-reads rather than through naming, the rule is mis-specified and should trigger on stale-title age rather than on mark-unit date. Not changed here -- that is a plan question for the operator.",
+          "round": 55,
+          "runners": 0
         }
       ],
       "status": "open"
