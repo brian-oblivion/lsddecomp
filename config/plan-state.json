@@ -1,6 +1,6 @@
 {
   "models": {
-    "match_runner": null,
+    "match_runner": "opus",
     "naming_runner": "sonnet"
   },
   "stop_rule": {

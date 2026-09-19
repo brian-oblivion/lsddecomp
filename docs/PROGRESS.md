@@ -1161,6 +1161,17 @@ to remove a worktree with an unmerged commit, uncommitted paths or a live
 search. Revisit gains a second trigger: a title with no round mentioned in
 the last ten. Gate 3: a permuter negative is about the body it measured.
 
+**Model decision, 2026-09-19 (operator + Fable head): matching runners are
+Opus from here, including every revisit.** Sonnet's band closed at 0/6 with
+output that mostly re-confirmed the reports; Opus's 4 band attempts produced
+no match but moved every function substantially with the cause named (a
+loop counter mistyped since round 23; a carrier local identified), and its
+revisits produced the round-57 180/180 match. Per useful outcome Sonnet was
+the more expensive runner on this tail. Sonnet stays on track 3 naming, where
+the head's review has passed it twice. The stop rule still runs to its end:
+two more Opus band attempts decide whether stall matching continues or parks;
+revisits continue on Opus either way.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).
