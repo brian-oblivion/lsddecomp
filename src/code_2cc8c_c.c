@@ -228,7 +228,7 @@ void Unk18Obj__Finalize(Unk18Obj *self)
 {
     self->methods->slot90(self);
     self->methods->slot74(self);
-    self->unkAC->methods->slot4(self->unkAC);
+    self->unkAC->methods->release(self->unkAC);
     self->methods->slotA8(self, 0);
     Get_vtable_BasicClass()->finalize(self);
 }

@@ -460,8 +460,17 @@ extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
  */
 struct Unk18AcObjMethods {
     u8 pad000[0x004];
-    void *(*slot4)(Unk18AcObj *self); /* +0x004, inherited BasicClass
-                                          "release"; OBSERVED: Unk18Obj__Finalize */
+    void *(*release)(Unk18AcObj *self); /* +0x004, inherited BasicClass
+                                          "release"; OBSERVED: Unk18Obj__Finalize.
+                                          Renamed from slot4, round 55 --
+                                          exclusive to this unit (only
+                                          Unk18Obj__Finalize dereferences
+                                          `self->unkAC->methods`;
+                                          code_2cc8c_d.c passes `unkAC` along
+                                          opaquely without going through its
+                                          own vtable). Matches the canonical
+                                          BasicClassMethods name at this
+                                          offset (include/code_8220.h). */
 };
 struct Unk18AcObj {
     Unk18AcObjMethods *methods; /* +0x000 */

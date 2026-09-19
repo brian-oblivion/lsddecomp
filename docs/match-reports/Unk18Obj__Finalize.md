@@ -71,7 +71,8 @@ first build.
 
 **Unk18Obj__Finalize** (renamed from `func_8003E6CC`, round 55, runner
 alpha). Tier A: calls its own teardown steps (`slot90`, `slot74`, releases
-`self->unkAC`, `slotA8(self, 0)`) and THEN forwards to
+`self->unkAC` via `Unk18AcObjMethods::release` (renamed from
+`slot4`, exclusive to this unit, tier A), `slotA8(self, 0)`) and THEN forwards to
 `Get_vtable_BasicClass()->finalize` (that base slot's own confirmed name,
 matching `include/code_8220.h`'s canonical `BasicClassMethods::finalize`
 at the identical offset `+0x00C`) -- the standard "derived finalize does
