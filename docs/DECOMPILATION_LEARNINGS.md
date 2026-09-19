@@ -275,6 +275,17 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   General form: when a residue is a MASK, ask WHICH VALUE is truncated. (a §"The \"split
   scaled index\"")
 
+- **`(cond ? p : NULL)[i]` and `((T *)(cond ? p : NULL))->field` are NOT the same
+  construct, and the difference decides whether a constant offset folds into the
+  ternary's arms.** An index on a conditional is a tree `PLUS_EXPR` that `fold()`
+  distributes into BOTH arms, combining the offset with the true arm's own `addiu` and
+  silently turning a NULL false arm into the literal `i * sizeof(T)`. A field reference
+  is a `COMPONENT_REF`, applied at expand time as the MEM displacement, so the arms are
+  left as written. Discriminator: retail shows a CONSTANT base `addiu` plus a
+  per-element instruction displacement on the far side of a ternary. Retires round 44's
+  "correct NULL fallback and un-folded base could not be obtained simultaneously" dead
+  end. (a docs/match-reports/func_8001E7BC.md, round 57)
+
 ### 3d. Locals, naming and register identity
 
 - **A named C variable gets ONE storage location for its whole scope, so any new name is a
@@ -383,6 +394,16 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   propagation and an algebraic identity rewrite is transparent to value numbering;
   narrowing a cast-local's lexical SCOPE does not help while its LIVE RANGE crosses a
   call. (a §"Levers measured INERT on this pipeline")
+
+- **Three scalar assignments and ONE struct assignment can emit byte-identical
+  instructions and still allocate a different register to the POINTER they go through.**
+  `emit_block_move` expands a small struct copy as a single unit, so the base pointer's
+  pseudo has a different reference count and live shape than when three statements each
+  mention it — enough to move it in `global_alloc`'s ordering. So a register-identity
+  residue on a pointer used by a run of same-shaped field copies is worth one
+  struct-assignment attempt before it is filed: it is cheap, it is not a register pin,
+  and it was the difference between 172/180 and a match after three rounds had called it
+  unreachable by source shape. (a docs/match-reports/func_8001E7BC.md, round 57)
 
 ### 3e. Frames and stack
 
@@ -636,6 +657,16 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   went below base\"")
 ## 4. Verdict classes and how far to trust them
 
+- **A register-identity verdict is a claim about the RESIDUE, not about the function,
+  and it DECAYS as the rest of the function changes.** All three of round 44's residues
+  on `func_8001E7BC` were filed as one class; two were ordinary source-shape differences
+  elsewhere in the body (a `$s1`-`$s4` permutation that was really the tail's call
+  structure, an `$a1`/`$a3` one that was really the copy idiom), and only re-deriving the
+  surrounding shape exposed them. So when a stall carries SEVERAL same-class residues,
+  fixing the STRUCTURE first and re-measuring is worth more than attacking any residue
+  directly — and a residue figure taken before the last structural change is evidence
+  about that older body, not about this one. (a docs/match-reports/func_8001E7BC.md,
+  round 57)
 - **"Register identity" is the LEAST reliable verdict class in this corpus.** It is
   self-sealing and 26% of everything queued. Contaminants found, all ordinary C: a masked
   byte parameter mistyped `s32`; a missing field-offset term; a statement swap between
