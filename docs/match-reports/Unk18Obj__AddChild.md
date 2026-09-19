@@ -87,3 +87,14 @@ slot name confirmed, matches canonical `BasicClassMethods::addChild`
 (`arg1->methods->header & 0xF`) to cache a typed reference -- the standard
 "override calls base, then does its own bookkeeping" addChild-override
 shape. Mirrored exactly by `Unk18Obj__RemoveChild`.
+
+## Proposed field names
+
+- `Unk18ObjMethods::slot10` -> `addChild` (tier A). Offset `+0x010` matches
+  the canonical `BasicClassMethods::addChild` offset exactly, and this
+  header already documents it as "inherited BasicClass addChild". NOT
+  renamed directly: `code_2cc8c_d.c`'s `func_8003EACC` also dispatches
+  `m->slot10(self, a1)` on a `Unk18Obj *`, so this field is shared with
+  that unit. Head applies by type scope (rename in `Unk18ObjMethods`'s own
+  definition, fix the compiler-listed accessors in both `code_2cc8c_c.c`
+  and `code_2cc8c_d.c`, oracle).

@@ -64,3 +64,15 @@ alpha). Tier A: exact mirror of `Unk18Obj__AddChild` -- clears the same
 tag-keyed cached reference, THEN forwards to
 `Get_vtable_BasicClass()->removeChild` (matches canonical
 `BasicClassMethods::removeChild` `+0x014`).
+
+## Proposed field names
+
+- `Unk18ObjMethods::slot14` -> `removeChild` (tier A). Offset `+0x014`
+  matches the canonical `BasicClassMethods::removeChild` offset exactly,
+  and this header already documents it as "inherited BasicClass
+  removeChild". NOT renamed directly: `code_2cc8c_d.c`'s `func_8003EB84`
+  also dispatches `self->methods->slot14(self, self->unk10)` on a
+  `Unk18Obj *`, so this field is shared with that unit. Head applies by
+  type scope (rename in `Unk18ObjMethods`'s own definition, fix the
+  compiler-listed accessors in both `code_2cc8c_c.c` and
+  `code_2cc8c_d.c`, oracle).

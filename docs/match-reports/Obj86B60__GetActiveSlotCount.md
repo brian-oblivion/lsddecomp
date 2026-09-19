@@ -65,3 +65,19 @@ the running count for the currently-active ring-buffer slot (`unk60` is an
 array indexed by the `unk58` slot index, established across
 `Obj86B60__GetActiveSlotCount`/func_8003DDC8/func_8003DE30, code_2cc8c_b.c). No purpose beyond
 the getter itself is claimed.
+
+## Proposed field names
+
+- `Obj86B60::unk58` -> `activeSlot` (tier B). The index into
+  `unk4C->unk24[]`/`unk64[]`/`unk60[]`/`unk5C[]`, i.e. which ring-buffer
+  slot is currently selected -- established across `func_8003CA1C`,
+  `func_8003D3B0`, `func_8003D2CC`, `func_8003D6D4` (code_2cc8c.c/_b.c) and
+  this function. NOT renamed directly: heavily shared with `code_2cc8c.c`
+  and `code_2cc8c_b.c` (the same class, split by address range). Head
+  applies by type scope.
+- `Obj86B60::unk60` -> `slotCounts` (tier B). A per-slot running count
+  array, indexed by `unk58`/`activeSlot` above, incremented by
+  `func_8003DDC8` and decremented by `func_8003DE30` (both code_2cc8c_b.c)
+  -- this function is the plain getter for the active slot's own entry.
+  NOT renamed directly: shared with `code_2cc8c_b.c`. Head applies by type
+  scope.

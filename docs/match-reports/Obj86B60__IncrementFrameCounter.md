@@ -39,3 +39,18 @@ the same "mechanics ARE the purpose" rule as a getter/clamp/list-push.
 `func_8003CC2C`, code_2cc8c.c) rather than inventing a new one; `unk1C`
 itself is PROPOSED for rename to `frameCounter` in this unit's
 `## Proposed field names` (shared with code_2cc8c.c).
+
+## Proposed field names
+
+- `Obj86B60::unk1C` -> `frameCounter` (tier B). Mechanics established across
+  three independent sources: incremented here unconditionally
+  (`Obj86B60__IncrementFrameCounter`), zeroed on state-reset paths
+  (`Obj86B60__ResetCounters`, `Obj86B60__NotifyTargetReset`,
+  `Obj86B60__NotifyChildReset`, and `func_8003C63C` in `code_2cc8c.c` on
+  several message codes), and consumed as a multiplier in `func_8003CC2C`
+  (code_2cc8c.c) against `unk84` -- consistent with a per-instance
+  frame/tick counter. What in-game effect the resulting product drives is
+  NOT established, hence tier B. NOT renamed directly: shared with
+  `code_2cc8c.c` (`func_8003C63C`, `func_8003CC2C`, and likely
+  `func_8003CBB8`/`func_8003CBC0`'s own callers of `self->unk1C`). Head
+  applies by type scope.

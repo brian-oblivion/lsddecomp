@@ -96,3 +96,16 @@ own work" shape for a virtual method whose base identity is independently
 confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
 `onNotify` in this unit's `## Proposed field names` (shared with
 `code_2cc8c_d.c`'s own `func_8003E8B8`).
+
+## Proposed field names
+
+- `BasicClassMethodsCC8C::slot38` -> `onNotify` (tier A). Offset `+0x038`
+  matches `include/code_8220.h`'s own canonical, already-named
+  `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
+  code_8220_b, per this header's own comment). NOT renamed directly:
+  `code_2cc8c_d.c`'s `func_8003E8B8` also calls
+  `Get_vtable_BasicClass()->slot38(self, arg1, arg2)`, so this field is
+  shared within the code_2cc8c family. Head applies by type scope (rename
+  the field in `BasicClassMethodsCC8C`'s own definition,
+  `include/code_2cc8c.h`, rebuild, fix the compiler-listed accessors in
+  both `code_2cc8c_c.c` and `code_2cc8c_d.c`, oracle).
