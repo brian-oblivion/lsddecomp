@@ -891,7 +891,7 @@ struct Unk4ArgObj {
 };
 
 /*
- * self->unkC->unk0's pointee (round 13, func_8003E578) -- the SAME field
+ * self->unkC->unk0's pointee (round 13, Obj86B60__NotifyChildReset) -- the SAME field
  * `Obj86B60__Init`/`Obj86B60__Deinit` forward as an opaque `addChild`/
  * `removeChild` child; this function is the first to dereference it as a
  * real class instance (same "one field, multiple independent-evidence
@@ -902,7 +902,7 @@ typedef struct Unk0ArgObj Unk0ArgObj;
 typedef struct Unk0ArgObjMethods Unk0ArgObjMethods;
 struct Unk0ArgObjMethods {
     u8 pad000[0x04C];
-    void (*slot4C)(Unk0ArgObj *self); /* +0x04C, OBSERVED: func_8003E578 */
+    void (*slot4C)(Unk0ArgObj *self); /* +0x04C, OBSERVED: Obj86B60__NotifyChildReset */
 };
 struct Unk0ArgObj {
     Unk0ArgObjMethods *methods; /* +0x000 */
@@ -919,7 +919,7 @@ struct Unk0ArgObj {
 struct Obj86B60InitArgs {
     Unk0ArgObj *unk0; /* +0x000, forwarded to self->methods->slot10 (child)
                           as `void *`; ALSO OBSERVED (round 13) dereferenced
-                          directly by func_8003E578 as a real class instance
+                          directly by Obj86B60__NotifyChildReset as a real class instance
                           -- see Unk0ArgObj's own comment */
     Unk4ArgObj *unk4; /* +0x004, forwarded to self->methods->slot10 (child)
                           as `void *`; ALSO OBSERVED (round 13) dereferenced
@@ -963,7 +963,7 @@ struct Obj86B60Methods {
     void (*slot30)(Obj86B60 *self);               /* +0x030, inherited
                                                       BasicClass slot
                                                       (BasicClass__NotifyParents);
-                                                      OBSERVED: func_8003E4B8
+                                                      OBSERVED: Obj86B60__NotifyParents
                                                       (round 13) */
     u8 pad034[0x040 - 0x034];
     void (*slot40)(Obj86B60 *self);               /* +0x040, IS
@@ -998,13 +998,13 @@ struct Obj86B60Methods {
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
                                                       (func_8004D90C) */
     void (*slot64)(Obj86B60 *self);               /* +0x064, IS
-                                                      func_8003E538 (already
+                                                      Obj86B60__NotifyTargetReset (already
                                                       matched); OBSERVED:
-                                                      func_8003E4B8
+                                                      Obj86B60__NotifyParents
                                                       (round 13) */
     void (*slot68)(Obj86B60 *self);               /* +0x068, IS
-                                                      func_8003E578;
-                                                      OBSERVED: func_8003E4B8
+                                                      Obj86B60__NotifyChildReset;
+                                                      OBSERVED: Obj86B60__NotifyParents
                                                       (round 13) */
     u8 pad06C[0x070 - 0x06C];
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
@@ -1160,26 +1160,26 @@ struct Obj86B60Methods {
 };
 
 /*
- * self->unkC's pointee, observed only by func_8003E538 -- a shared
+ * self->unkC's pointee, observed only by Obj86B60__NotifyTargetReset -- a shared
  * base-class method also reachable through UNRELATED classes' own vtables
- * at this same slot offset (class_39e08.h documents func_8003E538/78
+ * at this same slot offset (class_39e08.h documents Obj86B60__NotifyTargetReset/78
  * occupying Obj865C8Methods/Class86668Methods +0x064/+0x068). Dispatch
  * shape: `self->unkC->target->methods->slot48(target)` -- one extra level
  * of indirection past the usual `self->fieldN->methods->slotM(self->fieldN)`
- * idiom. Only the one field/slot func_8003E538 touches is modelled.
+ * idiom. Only the one field/slot Obj86B60__NotifyTargetReset touches is modelled.
  */
 typedef struct Obj86B60UnkC Obj86B60UnkC;
 typedef struct Obj86B60UnkCTarget Obj86B60UnkCTarget;
 typedef struct Obj86B60UnkCTargetMethods Obj86B60UnkCTargetMethods;
 struct Obj86B60UnkCTargetMethods {
     u8 pad000[0x048];
-    void (*slot48)(Obj86B60UnkCTarget *self); /* +0x048, OBSERVED: func_8003E538 */
+    void (*slot48)(Obj86B60UnkCTarget *self); /* +0x048, OBSERVED: Obj86B60__NotifyTargetReset */
 };
 struct Obj86B60UnkCTarget {
     Obj86B60UnkCTargetMethods *methods; /* +0x000 */
 };
 struct Obj86B60UnkC {
-    Obj86B60UnkCTarget *target; /* +0x000, OBSERVED: func_8003E538 */
+    Obj86B60UnkCTarget *target; /* +0x000, OBSERVED: Obj86B60__NotifyTargetReset */
 };
 
 /*
@@ -1191,15 +1191,15 @@ struct Obj86B60UnkC {
 struct Obj86B60 {
     Obj86B60Methods *methods;   /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    Obj86B60UnkC *unkC;          /* +0x00C, func_8003E538 (see Obj86B60UnkC's
+    Obj86B60UnkC *unkC;          /* +0x00C, Obj86B60__NotifyTargetReset (see Obj86B60UnkC's
                                     own comment): `self->unkC->target->methods
                                     ->slot48(target)`. Also zeroed by
-                                    func_8003E874 (a ctor-shaped function that
+                                    Obj86B60__ResetAndRemoveAllChildren (a ctor-shaped function that
                                     also zeroes unk10/unk30 below). NOTE: this
                                     slot is reached through a SHARED base-class
                                     method -- class_39e08.h's own view of an
                                     unrelated class documents the same
-                                    func_8003E538 occupying its own vtable at
+                                    Obj86B60__NotifyTargetReset occupying its own vtable at
                                     the identical offset (+0x064), so this
                                     field is very likely part of a common
                                     base-object layout every subclass shares
@@ -1207,7 +1207,7 @@ struct Obj86B60 {
                                     itself introduces -- kept here anyway,
                                     per this header's flat single-struct
                                     style (no explicit base/derived split). */
-    s32 unk10;                  /* +0x010, func_8003E874: zeroed by the same
+    s32 unk10;                  /* +0x010, Obj86B60__ResetAndRemoveAllChildren: zeroed by the same
                                     ctor-shaped function as unkC/unk30.
                                     ALSO OBSERVED (round 13) by Obj86B60__Init,
                                     which sets it from an init-args field or
@@ -1245,7 +1245,7 @@ struct Obj86B60 {
                                     arg2 (also gates the rest of that
                                     function's body on == 0) */
     u8 pad028[0x030 - 0x028];
-    s32 unk30;                  /* +0x030, func_8003E874 only: zeroed by the
+    s32 unk30;                  /* +0x030, Obj86B60__ResetAndRemoveAllChildren only: zeroed by the
                                     same ctor-shaped function as unkC/unk10;
                                     real meaning unknown, generic word */
     u8 pad034[0x038 - 0x034];
@@ -1379,7 +1379,7 @@ struct BasicClassMethodsCC8C {
                                   BasicClass__func_17ff0 (code_8220.c,
                                   "removeChild"); OBSERVED: func_8003E7F4
                                   (round 13) */
-    void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
+    void (*slot18)(void *self); /* +0x018, Obj86B60__ResetAndRemoveAllChildren's forward target */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
                                   BasicClass__OnNotify (code_8220_b);

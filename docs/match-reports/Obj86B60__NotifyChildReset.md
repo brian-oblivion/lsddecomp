@@ -1,20 +1,22 @@
-# func_8003E578 — MATCH (20/20 words)
+> Renamed from `func_8003E578` on 2026-09-19 (tools/rename.py). Address 0x8003e578.
+
+# Obj86B60__NotifyChildReset — MATCH (20/20 words)
 
 **Unit:** code_2cc8c_c · **Size:** 20 instructions
 
 ## What it does
 
 `D_8006E878+0x068` (and `D_80086B60`'s own verbatim-inherited `+0x068`,
-`func_8003E4B8`'s `slot68` occupant): dereferences `self->unkC->unk0` (the
+`Obj86B60__NotifyParents`'s `slot68` occupant): dereferences `self->unkC->unk0` (the
 `Obj86B60InitArgs` field `Obj86B60__Init`/`Obj86B60__Deinit` only ever forward
-opaquely, and the same field `func_8003E538` reaches independently through
+opaquely, and the same field `Obj86B60__NotifyTargetReset` reaches independently through
 the completely unrelated `Obj86B60UnkC->target` reading) as a real class
 instance and dispatches its `slot4C`, then zeroes `self->unk1C`.
 
 ## The C
 
 ```c
-void func_8003E578(Obj86B60 *self)
+void Obj86B60__NotifyChildReset(Obj86B60 *self)
 {
     Unk0ArgObj *obj0;
 

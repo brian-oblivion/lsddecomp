@@ -1,4 +1,6 @@
-# func_8003E4B8 — STALL, IMPROVED round 46 (register identity, now CLEANLY isolated; best 23/32, up from 21/32)
+> Renamed from `func_8003E4B8` on 2026-09-19 (tools/rename.py). Address 0x8003e4b8.
+
+# Obj86B60__NotifyParents — STALL, IMPROVED round 46 (register identity, now CLEANLY isolated; best 23/32, up from 21/32)
 
 ## ROUND 46 (runner delta): FIRST PERMUTER SEARCH on this function -- 279 base score, ~82,702 iterations under a 600s bound, no real zero; one heuristic-tempting sub-baseline candidate verified WORSE for real
 
@@ -67,7 +69,7 @@ diffed against the seed and checked, and the most tempting one
 to idiomatic C and rebuilt through the REAL pinned toolchain:
 
 ```c
-void func_8003E4B8(Obj86B60 *self, s32 arg1)
+void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
     Obj86B60Methods *methods2;
@@ -121,7 +123,7 @@ change) -- should collapse the scheduling half of the residue even if it
 cannot fix the register-identity half.
 
 ```c
-void func_8003E4B8(Obj86B60 *self, s32 arg1)
+void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
 
@@ -219,7 +221,7 @@ compile errors in a fresh build.
 ## Blocker screen (mandatory, round 13 head broadcast)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_2cc8c_c/func_8003E4B8.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_2cc8c_c/Obj86B60__NotifyParents.s
 ```
 
 No hits. NOT toolchain-blocked -- this is a genuine register-identity
@@ -230,8 +232,8 @@ residue, verified against the actual instructions below, not assumed.
 `D_8006E878+0x060` (and `D_80086B60`'s own verbatim-inherited `+0x060`):
 records `arg1` into `self->unk20`, dispatches `self->methods->slot30`
 (inherited BasicClass slot, `BasicClass__NotifyParents`) unconditionally, then
-`self->methods->slot64` (`func_8003E538`, already matched) if `arg1 == 2`,
-or `self->methods->slot68` (`func_8003E578`, next in this queue) if
+`self->methods->slot64` (`Obj86B60__NotifyTargetReset`, already matched) if `arg1 == 2`,
+or `self->methods->slot68` (`Obj86B60__NotifyChildReset`, next in this queue) if
 `arg1 == 3`. Fully understood -- the control flow, every field, and every
 slot identity all check out and are not in question.
 
@@ -239,7 +241,7 @@ slot identity all check out and are not in question.
 
 ```c
 #if 0
-void func_8003E4B8(Obj86B60 *self, s32 arg1)
+void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
 
@@ -257,7 +259,7 @@ void func_8003E4B8(Obj86B60 *self, s32 arg1)
 
 ## The residue
 
-21/32 words match. `tools/asm-differ/diff.py func_8003E4B8` shows the ENTIRE
+21/32 words match. `tools/asm-differ/diff.py Obj86B60__NotifyParents` shows the ENTIRE
 diff is one thing: retail assigns `self` (the `a0` parameter) to `$s1` and
 `arg1` (`a1`) to `$s0`; every build of mine assigns `self`->`$s0` and
 `arg1`->`$s1` -- the "natural" ascending parameter-index order. Every

@@ -76,7 +76,7 @@ without a register-pressure iteration this time.
   unit outside `Obj86B60__Init`'s own (non-dereferencing) forwards.
 - This confirms `self->unkC`'s runtime identity across BOTH functions that
   touch it: it is the `Obj86B60InitArgs *` `Obj86B60__Init` stored there, not
-  the unrelated `Obj86B60UnkC *` reading `func_8003E538` uses at the same
+  the unrelated `Obj86B60UnkC *` reading `Obj86B60__NotifyTargetReset` uses at the same
   offset from a completely different call path -- consistent with this
   project's established "one struct offset, multiple independent readings by
   different call paths" pattern (`Unk4CObj->unk24`, `Unk64Elem`'s own

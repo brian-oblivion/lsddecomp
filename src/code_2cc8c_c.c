@@ -129,14 +129,14 @@ void Obj86B60__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
     }
 }
 
-void func_8003E4A4(Obj86B60 *self)
+void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
 {
     self->unk1C++;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E4B8);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", Obj86B60__NotifyParents);
 
-void func_8003E538(Obj86B60 *self)
+void Obj86B60__NotifyTargetReset(Obj86B60 *self)
 {
     Obj86B60UnkCTarget *target;
 
@@ -145,7 +145,7 @@ void func_8003E538(Obj86B60 *self)
     target->methods->slot48(target);
 }
 
-void func_8003E578(Obj86B60 *self)
+void Obj86B60__NotifyChildReset(Obj86B60 *self)
 {
     Unk0ArgObj *obj0;
 
@@ -223,7 +223,7 @@ void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
     Get_vtable_BasicClass()->slot14(self, arg1);
 }
 
-void func_8003E874(Obj86B60 *self)
+void Obj86B60__ResetAndRemoveAllChildren(Obj86B60 *self)
 {
     self->unk30 = 0;
     self->unk10 = 0;

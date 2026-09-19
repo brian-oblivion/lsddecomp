@@ -58,9 +58,9 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 queue in one pass** -- `D_8006E878` (`tools/classtable.py D_8006E878`) is
 literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 Obj86B60__OnNotify`,
 `+0x040 Obj86B60__ResetCounters` (already matched), `+0x044 Obj86B60__Init`,
-`+0x048 Obj86B60__Deinit`, `+0x054 Obj86B60__OnTag1Notify`, `+0x05C func_8003E4A4`
-(already matched), `+0x060 func_8003E4B8`, `+0x064 func_8003E538` (already
-matched), `+0x068 func_8003E578`. Every one of this round's 12 fresh
+`+0x048 Obj86B60__Deinit`, `+0x054 Obj86B60__OnTag1Notify`, `+0x05C Obj86B60__IncrementFrameCounter`
+(already matched), `+0x060 Obj86B60__NotifyParents`, `+0x064 Obj86B60__NotifyTargetReset` (already
+matched), `+0x068 Obj86B60__NotifyChildReset`. Every one of this round's 12 fresh
 functions except `func_8003E5D8`/`func_8003E628`/`func_8003E6CC`/
 `func_8003E770`/`func_8003E7F4` (a SECOND, unrelated shared table,
 `D_8006E8E4`, see `func_8003E5D8.md`) is a slot of this one table.

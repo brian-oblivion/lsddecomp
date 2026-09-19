@@ -84,7 +84,7 @@ the next build.
   child pointers forwarded to `addChild`; `unk8`/`unkC`/`unk10` are the
   three optional overrides for `self->unk10`/`unk14`/`unk18`.
 - `Obj86B60.unk10`/`unk14`: BOTH were previously modelled as opaque
-  generic words (`func_8003E874`/`func_8003DA10` in a sibling unit). This
+  generic words (`Obj86B60__ResetAndRemoveAllChildren`/`func_8003DA10` in a sibling unit). This
   function CONFIRMS both are pointer-valued in this unit's own reading too
   -- `unk10` is forwarded as an `addChild`-style child and as `Unk14Obj::
   slot10`'s 2nd arg; `unk14` is dispatched through as `Unk14Obj *`. Kept

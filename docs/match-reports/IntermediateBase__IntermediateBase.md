@@ -14,7 +14,7 @@ getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed
 (`Obj86B60__ResetCounters`, already matched, void-returning) once.
 
 Same self-typing convention as this unit's other already-matched siblings
-from the same shared table (`Obj86B60__ResetCounters`, `func_8003E4A4`, `func_8003E538`):
+from the same shared table (`Obj86B60__ResetCounters`, `Obj86B60__IncrementFrameCounter`, `Obj86B60__NotifyTargetReset`):
 `Obj86B60 *self`, even though the class is generically shared across many
 unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
 `D_8006E878+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
