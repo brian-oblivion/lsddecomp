@@ -33,7 +33,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 {
 	void *val;
 
-	func_80057C84()->ctor(this);
+	DreamSys__GetBaseMethods()->ctor(this);
 	this->vt = Get_vtable_DreamSys();
 	this->unk_0x58 = arg2;
 	this->unk_0x5C = (DreamSysUnk5C *)arg3;
@@ -68,7 +68,7 @@ void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 	s32 local[4];
 
 	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
-	func_80057C84()->slot4C(this, arg1, local);
+	DreamSys__GetBaseMethods()->slot4C(this, arg1, local);
 	this->vt->slot10(this, arg1);
 	if (this->unknwon_int_0x44 == 0xE) {
 		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
@@ -85,14 +85,14 @@ void func_80058A94(DreamSys *this)
 {
 	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
 	this->vt->BaseObjO__UnlinkCompanion(this, this->unk_0x4C);
-	func_80057C84()->slot0x50(this);
+	DreamSys__GetBaseMethods()->slot0x50(this);
 }
 
 void func_80058B08(DreamSys *this, s32 arg1)
 {
 	s32 v;
 
-	func_80057C84()->slot0x88(this, arg1);
+	DreamSys__GetBaseMethods()->slot0x88(this, arg1);
 	if (arg1 == -2)
 		goto handle_neg2;
 	if (arg1 != -1)
@@ -209,7 +209,7 @@ tick_only:
 
 void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
 {
-	func_80057C84()->slot0x9C(this, arg1, arg2);
+	DreamSys__GetBaseMethods()->slot0x9C(this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
 		this->vt->ProcessChunkChange(this, arg1, arg2);
 	}
@@ -217,7 +217,7 @@ void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
 
 void func_80058F18(DreamSys *this, void *arg1, s32 arg2)
 {
-	func_80057C84()->slot0xDC(this, arg1, arg2);
+	DreamSys__GetBaseMethods()->slot0xDC(this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFFFF) == 0x1F234) {
 		this->vt->InstanceEffectsOnJournal(this, arg1, arg2);
 	}
@@ -225,7 +225,7 @@ void func_80058F18(DreamSys *this, void *arg1, s32 arg2)
 
 void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 {
-	func_80057C84()->slot0xE0(this, unk_class_86aa0, arg2);
+	DreamSys__GetBaseMethods()->slot0xE0(this, unk_class_86aa0, arg2);
 	if (arg2 != 4)
 		return;
 	if (this->unknwon_int_0x44 != 0)

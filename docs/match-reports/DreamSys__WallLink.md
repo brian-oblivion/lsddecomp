@@ -15,7 +15,7 @@ always finishes by restoring `*this->unk_0x14` and firing a no-op stub:
 ```c
 void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 {
-	func_80057C84()->slot0xE0(this, unk_class_86aa0, arg2);
+	DreamSys__GetBaseMethods()->slot0xE0(this, unk_class_86aa0, arg2);
 	if (arg2 != 4)
 		return;
 	if (this->unknwon_int_0x44 != 0)

@@ -26,7 +26,7 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
 {
     D800878D4Methods *base;
 
-    base = func_80057C84();
+    base = DreamSys__GetBaseMethods();
     if (base->ctor(self) == NULL) {
         return NULL;
     }
@@ -37,7 +37,7 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
     self->unk70 = NULL;
     self->unk94 = 0;
     if (self->methods->slot_setup5C(self, arg1) != 0) {
-        base = func_80057C84();
+        base = DreamSys__GetBaseMethods();
         base->dtor(self);
         return NULL;
     }
@@ -49,14 +49,14 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
 void func_8006573C(Class65650 *self)
 {
     self->methods->slot_teardown5C(self);
-    func_80057C84()->dtor(self);
+    DreamSys__GetBaseMethods()->dtor(self);
 }
 
 void func_80065790(Class65650 *self, TagCheckArg *arg1, s32 arg2)
 {
     D800878D4Methods *base;
 
-    base = func_80057C84();
+    base = DreamSys__GetBaseMethods();
     base->slot38(self, arg1, arg2);
     if (arg1->tagged->tag == 0x5F03 && arg2 == 1 && self->unk60 == 0) {
         self->methods->slot04(self);
@@ -67,7 +67,7 @@ void func_80065830(Class65650 *self)
 {
     D800878D4Methods *base;
 
-    base = func_80057C84();
+    base = DreamSys__GetBaseMethods();
     base->slot60(self, 0);
     self->methods->slotF0(self, 1);
     self->methods->slotE4(self, 0x12C);
@@ -85,7 +85,7 @@ void func_80065918(Class65650 *self, Class65650 *other, void *arg2, void *arg3, 
     D800878D4Methods *base;
 
     if (self->unk0C == 0) {
-        base = func_80057C84();
+        base = DreamSys__GetBaseMethods();
         base->slot4C(self, arg3, arg4);
         if (arg2 != NULL && self->unk50 == NULL) {
             self->methods->slot10(self, arg2);
@@ -101,7 +101,7 @@ void func_800659D0(Class65650 *self)
         if (self->unk50 != NULL) {
             self->methods->slot14(self, self->unk50);
         }
-        func_80057C84()->slot50(self);
+        DreamSys__GetBaseMethods()->slot50(self);
     }
 }
 
@@ -153,7 +153,7 @@ void func_80065AE0(Class65650 *self, void *arg)
             p++;
         } while (i < self->unk6C);
     }
-    base = func_80057C84();
+    base = DreamSys__GetBaseMethods();
     base->slot70(self, arg);
 }
 #endif

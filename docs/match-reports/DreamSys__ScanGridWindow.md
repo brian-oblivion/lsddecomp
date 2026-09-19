@@ -1,14 +1,16 @@
-# func_80057A18 -- MATCHED (79/79)
+> Renamed from `func_80057A18` on 2026-09-19 (tools/rename.py). Address 0x80057a18.
+
+# DreamSys__ScanGridWindow -- MATCHED (79/79)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain internal
-helper, not a vtable slot. Called by this unit's own `func_80057954` (see
-its report) and, indirectly, `func_80057668` (still queued at the time
+helper, not a vtable slot. Called by this unit's own `DreamSys__ScanLinkCandidates` (see
+its report) and, indirectly, `DreamSys__FindNearbyLink` (still queued at the time
 this was written).
 
 ## Signature
 
 ```c
-void *func_80057A18(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
+void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
 ```
 
 `self` is read from `a0` in the disassembly and then never touched again
@@ -18,7 +20,7 @@ function's own body.
 ## Body
 
 ```c
-void *func_80057A18(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source) {
+void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source) {
     s32 row, col;
     GridElem **bucket;
 
@@ -27,11 +29,11 @@ void *func_80057A18(DreamSys *self, void *arg1, void *arg2, GridQuery *query, Gr
         for (col = 0; col < query->unk4; col++) {
             GridElem *node;
 
-            if (func_80057B54(*bucket, arg1, arg2) != NULL) {
+            if (DreamSys__AcceptGridElem(*bucket, arg1, arg2) != NULL) {
                 return *bucket;
             }
             for (node = (*bucket)->next; node != NULL; node = node->next) {
-                if (func_80057B54(node, arg1, arg2) != NULL) {
+                if (DreamSys__AcceptGridElem(node, arg1, arg2) != NULL) {
                     return node;
                 }
             }
@@ -47,25 +49,25 @@ Scans a rectangular window of a grid of bucket lists rooted at
 `source->unk_0x10`: `query->unk8` rows by `query->unk4` columns, starting
 at row `query->unk2`, column `query->unk0` (row stride `0x50` bytes = 20
 bucket-head pointers; column stride 4 bytes, one pointer). For each
-bucket, tries `func_80057B54` (already matched, this unit) against the
+bucket, tries `DreamSys__AcceptGridElem` (already matched, this unit) against the
 head first, then walks the linked chain (`GridElem::next`, at `+0x38` --
 the same "self-typed next pointer at +0x38" idiom already established
 for the unrelated `EntryChildObj` in `include/class_3bb8c.h`, per this
 round's own research; convergent shape, not a shared type). Returns the
-first element `func_80057B54` accepts, or NULL if the whole window comes
+first element `DreamSys__AcceptGridElem` accepts, or NULL if the whole window comes
 up empty.
 
 ## Shape note: do NOT cache the bucket head in a local
 
 ```c
 GridElem *head = *bucket;
-if (func_80057B54(head, ...) != NULL) { return head; }
+if (DreamSys__AcceptGridElem(head, ...) != NULL) { return head; }
 for (node = head->next; ...)
 ```
 scored 27/79 and grew the function -- retail re-dereferences `*bucket`
 FRESH at every use (once before the call, again for the return value,
 again to compute `->next`) rather than caching it in a register. Same
-"do not cache across a call" family as `func_80057534`'s report, but for
+"do not cache across a call" family as `DreamSys__ApplyOffsetSlotAndNotify`'s report, but for
 a plain pointer dereference rather than a `this->field` read. Rewriting
 without the `head` local -- `*bucket` written out at each of the three
 use sites -- matched exactly.
@@ -74,7 +76,7 @@ use sites -- matched exactly.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057A18   # 79/79
+tools/funcdiff.py DreamSys__ScanGridWindow   # 79/79
 ```
 
 ### Proposed learning

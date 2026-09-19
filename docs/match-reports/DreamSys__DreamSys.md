@@ -17,7 +17,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 {
 	void *val;
 
-	func_80057C84()->ctor(this);
+	DreamSys__GetBaseMethods()->ctor(this);
 	this->vt = Get_vtable_DreamSys();
 	this->unk_0x58 = arg2;
 	this->unk_0x5C = (DreamSysUnk5C *)arg3;

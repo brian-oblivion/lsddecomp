@@ -1,4 +1,6 @@
-# func_80057534 -- MATCHED (31/31)
+> Renamed from `func_80057534` on 2026-09-19 (tools/rename.py). Address 0x80057534.
+
+# DreamSys__ApplyOffsetSlotAndNotify -- MATCHED (31/31)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` (self+0, vtable
 `vtable_DreamSys`, resolved via `tools/classtable.py DREAMSYS_METHODS`).
@@ -6,16 +8,16 @@ Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` (self+0, vtable
 ## Signature
 
 ```c
-void func_80057534(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count);
+void DreamSys__ApplyOffsetSlotAndNotify(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count);
 ```
 
-Called only by this unit's own `func_800574C4`/`func_800574FC` (its own
+Called only by this unit's own `DreamSys__ApplyOffsetSlot0`/`DreamSys__ApplyOffsetSlot1` (its own
 `+0x0C8`/`+0x0CC` vtable slots).
 
 ## Body
 
 ```c
-void func_80057534(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count) {
+void DreamSys__ApplyOffsetSlotAndNotify(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count) {
     s16 val16 = (s16) val;
     *slot = val16;
     self->field_0x48 = val16;
@@ -60,7 +62,7 @@ followed by `if (extra) ...`).
    local before either store.** Two variants were tried and rejected:
    - `s16 val` in the signature: matches THIS function's own body exactly
      (register order s2/s1/ra/s0, instruction order), but its two callers
-     (`func_800574C4`/`func_800574FC`) then have to re-sign-extend their
+     (`DreamSys__ApplyOffsetSlot0`/`DreamSys__ApplyOffsetSlot1`) then have to re-sign-extend their
      own incoming `s32` value into a `s16` argument at every call site
      (`sll`/`sra` pair) -- confirmed with a standalone reproducer that
      GCC 2.6.3 ALWAYS re-normalizes a `short` argument when forwarding it
@@ -83,7 +85,7 @@ followed by `if (extra) ...`).
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057534   # 31/31
+tools/funcdiff.py DreamSys__ApplyOffsetSlotAndNotify   # 31/31
 ```
 
 ### Proposed learning

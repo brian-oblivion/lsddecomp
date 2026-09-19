@@ -1,4 +1,6 @@
-# func_80057C7C -- MATCHED (2/2)
+> Renamed from `func_80057C7C` on 2026-09-19 (tools/rename.py). Address 0x80057c7c.
+
+# DreamSys__SetPendingExtra -- MATCHED (2/2)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0EC`
 (base-class-inherited; `include/DreamSys.h` already named this slot in an
@@ -7,7 +9,7 @@ earlier commit this round).
 ## Body
 
 ```c
-void func_80057C7C(DreamSys *self, void *extra) {
+void DreamSys__SetPendingExtra(DreamSys *self, void *extra) {
     self->unk_0x54 = extra;
 }
 ```
@@ -20,5 +22,5 @@ existing `unknown_values_0x50[8]` array, additive/size-preserving, into
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057C7C   # 2/2
+tools/funcdiff.py DreamSys__SetPendingExtra   # 2/2
 ```

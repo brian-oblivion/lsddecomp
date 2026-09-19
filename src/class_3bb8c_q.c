@@ -22,7 +22,7 @@
  * file, only exposing the ctor slot and `+0xA4`) -- per the project's
  * multiple-independent-local-views convention this unit does not touch
  * that file, it defines its own view sized for what THESE two functions
- * read/write. The allocator (class_3bb8c_p's func_80057C94) sizes the
+ * read/write. The allocator (class_3bb8c_p's New_D800879C4) sizes the
  * object at 0xA8 bytes, which every offset below stays inside.
  */
 typedef struct D_800879C4Obj_q D_800879C4Obj_q;

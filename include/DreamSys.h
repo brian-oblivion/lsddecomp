@@ -40,7 +40,7 @@ extern s32 D_80087E20[5];
 extern s8 D_80087E34[8];
 /* Declared further down (after the real `DreamSys` typedef exists) as
    `extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);` --
-   same element type as func_800575B0/func_800575E0 below, which this table
+   same element type as DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below, which this table
    holds pointers to. */
 
 /* {value, flag} pair array; func_800598E8 always writes index 0's value and
@@ -311,16 +311,16 @@ typedef struct DreamSysUnk4CMethods {
 	   straight into vtable slot +0x1D4 (func_8005A7A0)'s `currentPos`
 	   argument (round 2026-09-02) -- same signature, different caller. */
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
-	/* Called by this unit's own func_80057668 as (this->unk_0x4C, out,
+	/* Called by this unit's own DreamSys__FindNearbyLink as (this->unk_0x4C, out,
 	   this->unk_0x14 + 0x18) -- an output buffer (`out`, later read by
-	   func_80057784 as its own `arg3`) and the same "self->unk_0x14 + 0x18"
+	   DreamSys__BuildLinkQueries as its own `arg3`) and the same "self->unk_0x14 + 0x18"
 	   raw byte-offset position pointer as slot0x11C's own call site above
 	   (round 2026-09-04). */
 	s32 (*slot0x110)(void *self, void *out, void *pos);
 	u8 pad_0x114[0x118 - 0x114];
-	/* This unit's own func_80057784 dispatches to it twice, with a
+	/* This unit's own DreamSys__BuildLinkQueries dispatches to it twice, with a
 	   different argument count each time (per-call-site signature, see
-	   func_80057B54's report): `(this->unk_0x4C, arg1, arg2, arg3)` and
+	   DreamSys__AcceptGridElem's report): `(this->unk_0x4C, arg1, arg2, arg3)` and
 	   `(this->unk_0x4C, arg1)` -- typed here with the fuller shape; the
 	   shorter call simply leaves the trailing two as whatever the
 	   registers already held. Return value is stored into a
@@ -333,7 +333,7 @@ typedef struct DreamSysUnk4CMethods {
 } DreamSysUnk4CMethods;
 
 /* Object pointed to by DreamSysUnk4CObj::unk_0x68 -- only the two fields
- * this unit's own func_80057784 reads are named (round 2026-09-04). */
+ * this unit's own DreamSys__BuildLinkQueries reads are named (round 2026-09-04). */
 typedef struct DreamSysUnk4C68Obj {
 	u8 pad00[0x2];
 	s16 unk_0x2;
@@ -343,7 +343,7 @@ typedef struct DreamSysUnk4C68Obj {
 typedef struct DreamSysUnk4CObj {
 	DreamSysUnk4CMethods *methods;
 	u8 pad04[0x68 - 0x4];
-	/* Read by this unit's own func_80057784 (round 2026-09-04). */
+	/* Read by this unit's own DreamSys__BuildLinkQueries (round 2026-09-04). */
 	DreamSysUnk4C68Obj *unk_0x68;
 } DreamSysUnk4CObj;
 
@@ -389,14 +389,14 @@ typedef struct DreamSysBaseMethods {
 	u8 padA0[0xDC - 0xA0];
 	/* Called unconditionally by func_80058F18 (this unit's own +0xDC slot)
 	   as (this, arg1, arg2) -- same argument shape as slot0x9C above
-	   (round 2026-09-02). Resolves to func_80057B90 in D_800878D4, out of
+	   (round 2026-09-02). Resolves to DreamSys__DispatchLinkCommandAndTryAttach in D_800878D4, out of
 	   this unit's scope. */
 	void (*slot0xDC)(struct DreamSys *self, void *arg1, s32 arg2);
 	/* Called by DreamSys__WallLink as (this, arg1, arg2) -- same argument
 	   shape as slot0x9C/slot0xDC above (round 2026-09-02). */
 	void (*slot0xE0)(struct DreamSys *self, void *arg1, s32 arg2);
 } DreamSysBaseMethods;
-extern DreamSysBaseMethods *func_80057C84(void);
+extern DreamSysBaseMethods *DreamSys__GetBaseMethods(void);
 
 /* Opaque view of whatever object DreamSys__ProcessChunkChange's `entity`
    parameter points to -- almost certainly an `Entity*` (include/Entity.h),
@@ -587,8 +587,8 @@ typedef struct DreamSys {
 	s8 unknown_values_0x2C[24];
 
 	s32 unknwon_int_0x44;
-	/* Written by func_80057534 (this unit's own helper, invoked via its own
-	   +0x0C8/+0x0CC slots func_800574C4/func_800574FC) and by func_80057C6C
+	/* Written by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked via its own
+	   +0x0C8/+0x0CC slots DreamSys__ApplyOffsetSlot0/DreamSys__ApplyOffsetSlot1) and by DreamSys__SetLastOffsetValue
 	   (this unit's own +0x0E4 slot), both as a plain `sh` store of a `s16`
 	   value (round 2026-09-04). */
 	s16 field_0x48;
@@ -598,7 +598,7 @@ typedef struct DreamSys {
 	   func_80058A94 (round 2026-08-30-b); see DreamSysUnk4CObj above. */
 	DreamSysUnk4CObj *unk_0x4C;
 	s8 unknown_values_0x50[4];
-	/* Written by this unit's own func_80057C7C (its own +0x0EC slot), a
+	/* Written by this unit's own DreamSys__SetPendingExtra (its own +0x0EC slot), a
 	   plain `sw` store of its `extra` argument (round 2026-09-04). */
 	void *unk_0x54;
 
@@ -809,7 +809,7 @@ typedef struct DreamSys {
 
 /* Dispatch table indexed by func_80059E98's `arg1`; see that table's own
    comment near D_80087E20/D_80087E34 above. Same element signature as
-   func_800575B0/func_800575E0 below. */
+   DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below. */
 extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);
 
 /* 4-entry table of `s32 (DreamSys *this)` functions (func_8005AB2C,
@@ -888,9 +888,9 @@ struct vtable_DreamSys{
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-08-30-d). */
 	void (*func_80058E8C)(DreamSys *this, void *arg1, s32 arg2);
-	/* Called by this unit's own func_80057B90 as (this, arg1, count) when
+	/* Called by this unit's own DreamSys__DispatchLinkCommandAndTryAttach as (this, arg1, count) when
 	   `5 <= count < 9` -- dispatched through THIS object's own vtable
-	   (unlike func_80057B90's other, unconditional call, which goes
+	   (unlike DreamSys__DispatchLinkCommandAndTryAttach's other, unconditional call, which goes
 	   through the shared base table via GetClass6B5CCMethods() instead).
 	   Resolves to Class6B5CC__TryAttachNearby, not overridden at the DreamSys level
 	   (round 2026-09-04). */
@@ -905,47 +905,47 @@ struct vtable_DreamSys{
 	   func_8005AF64 and func_8005A0B0 with a DreamSysVec3* second argument
 	   (round 2026-08-30-d). */
 	void (*BaseObjO__AddVec14)(DreamSys *this, DreamSysVec3 *arg1);
-	/* Called by func_80057534 (this unit's own helper, invoked by its own
+	/* Called by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked by its own
 	   +0x0C8/+0x0CC slots) as (this, &D_8008ABA4) -- resolves to
 	   BaseObjO__ApplyRotatedVec14, out of this unit/runner's range (round 2026-09-04). */
 	void (*BaseObjO__ApplyRotatedVec14)(DreamSys *this, void *arg1);
-	/* Read (not called) by this unit's own +0x0D0 slot (func_800575B0) and
-	   forwarded as a raw callback value to func_80057618 -- resolves to
+	/* Read (not called) by this unit's own +0x0D0 slot (DreamSys__DispatchOffsetSlotC4) and
+	   forwarded as a raw callback value to DreamSys__ApplyOffsetOrFindNearby -- resolves to
 	   BaseObjO__func_5748c, out of this unit/runner's range (round 2026-09-04). */
 	void (*BaseObjO__func_5748c)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; forwards (val, extra) to
-	   func_80057534(this, &D_8008ABA4[0], val, extra, 7)
+	   DreamSys__ApplyOffsetSlotAndNotify(this, &D_8008ABA4[0], val, extra, 7)
 	   (round 2026-09-04). */
-	void (*func_800574C4)(DreamSys *this, s32 val, void *extra);
+	void (*DreamSys__ApplyOffsetSlot0)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; forwards (val, extra) to
-	   func_80057534(this, &D_8008ABA4[1], val, extra, 8)
+	   DreamSys__ApplyOffsetSlotAndNotify(this, &D_8008ABA4[1], val, extra, 8)
 	   (round 2026-09-04). */
-	void (*func_800574FC)(DreamSys *this, s32 val, void *extra);
+	void (*DreamSys__ApplyOffsetSlot1)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C4
 	   (BaseObjO__func_5748c) as a raw callback value and forwards it, with its
-	   own two arguments, to func_80057618 (round 2026-09-04). */
-	void (*func_800575B0)(DreamSys *this, s32 val, void *extra);
+	   own two arguments, to DreamSys__ApplyOffsetOrFindNearby (round 2026-09-04). */
+	void (*DreamSys__DispatchOffsetSlotC4)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C8
-	   (func_800574C4, self-referential) as a raw callback value and
-	   forwards it, with its own two arguments, to func_80057618
+	   (DreamSys__ApplyOffsetSlot0, self-referential) as a raw callback value and
+	   forwards it, with its own two arguments, to DreamSys__ApplyOffsetOrFindNearby
 	   (round 2026-09-04). */
-	void (*func_800575E0)(DreamSys *this, s32 val, void *extra);
+	void (*DreamSys__DispatchOffsetSlot0)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; empty stub `{ }` (round 2026-09-04). */
-	void (*func_80057610)(DreamSys *this);
+	void (*DreamSys__NoOpSlotD8)(DreamSys *this);
 	u32 unknown_functions_0xdc[1];
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-09-02). */
 	void (*LinkWall)(DreamSys *this, void *arg1, s32 arg2);
 	/* This function's OWN slot; a single `sh a1, 0x48(a0)` store
 	   (`this->field_0x48 = val`) (round 2026-09-04). */
-	void (*func_80057C6C)(DreamSys *this, s16 val);
+	void (*DreamSys__SetLastOffsetValue)(DreamSys *this, s16 val);
 	/* This unit's own no-op stub (`func_800590E0`, `{ }`). Called by
 	   DreamSys__WallLink as (this) -- the callee ignores its argument
 	   (round 2026-09-02). */
 	void (*func_800590E0)(DreamSys *this);
 	/* This function's OWN slot; a single `sw a1, 0x54(a0)` store
 	   (`this->unk_0x54 = extra`) (round 2026-09-04). */
-	void (*func_80057C7C)(DreamSys *this, void *extra);
+	void (*DreamSys__SetPendingExtra)(DreamSys *this, void *extra);
 	u32 unknown_functions_0xf0[2];
 	/* This function's OWN slot (+0x0F8, resolved via
 	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:

@@ -30,7 +30,7 @@ typedef struct Class65650 Class65650;
 
 /* The intermediate base class at D_800878D4. Same policy as Class6D3C8.h's
  * MiddleClassMethods: only slots this unit actually dispatches through are
- * typed. Resolved via func_80057C84, which returns &D_800878D4 (a plain
+ * typed. Resolved via DreamSys__GetBaseMethods, which returns &D_800878D4 (a plain
  * lui/addiu address-of, not a gp_rel load). */
 typedef struct D800878D4Methods {
     s32 header;                                    /* +0x000 */
@@ -48,10 +48,10 @@ typedef struct D800878D4Methods {
     u8 pad54[0x0C];                                          /* +0x054 .. +0x05F, not yet needed */
     void (*slot60)(Class65650 *self, s32 arg);                /* +0x060 -- called by func_80065830 as slot60(self, 0) */
     u8 pad64[0x0C];                                             /* +0x064 .. +0x06F, not yet needed */
-    void (*slot70)(Class65650 *self, void *arg);              /* +0x070 -- called by func_80065AE0 via func_80057C84()->slot70(self, arg) */
+    void (*slot70)(Class65650 *self, void *arg);              /* +0x070 -- called by func_80065AE0 via DreamSys__GetBaseMethods()->slot70(self, arg) */
 } D800878D4Methods;
 
-extern D800878D4Methods *func_80057C84(void);
+extern D800878D4Methods *DreamSys__GetBaseMethods(void);
 
 /* func_80065790's `arg1`: unidentified, only its own +0x000 field (itself
  * a pointer) is needed so far -- that pointed-at object's +0x000 field is

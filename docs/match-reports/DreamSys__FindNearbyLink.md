@@ -1,20 +1,22 @@
-# func_80057668 -- MATCHED (71/71)
+> Renamed from `func_80057668` on 2026-09-19 (tools/rename.py). Address 0x80057668.
+
+# DreamSys__FindNearbyLink -- MATCHED (71/71)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0BC`'s
 caller? No -- checked all 6 method tables reachable from this unit's
 addresses with `tools/classtable.py`: no hit. Plain internal helper,
-called by this unit's own `func_80057618` (already matched).
+called by this unit's own `DreamSys__ApplyOffsetOrFindNearby` (already matched).
 
 ## Signature
 
 ```c
-s32 func_80057668(DreamSys *self);
+s32 DreamSys__FindNearbyLink(DreamSys *self);
 ```
 
 ## Body
 
 ```c
-s32 func_80057668(DreamSys *self) {
+s32 DreamSys__FindNearbyLink(DreamSys *self) {
     LinkQueryBuf sp18;
     GridQuery sp48[3];
     /* No known field needs this gap; empirically required to reproduce
@@ -28,8 +30,8 @@ s32 func_80057668(DreamSys *self) {
         void *pos = (u8 *) self->unk_0x14 + 0x18;
 
         if (self->unk_0x4C->methods->slot0x110(self->unk_0x4C, &sp18, pos) == 0) {
-            s32 count = func_80057784(self, sp48, sp78, &sp18, 1);
-            void *result = func_80057954(self, &sp88, pos, count, sp48, sp78);
+            s32 count = DreamSys__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
+            void *result = DreamSys__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
             self->unk_0x28 = result;
             if (result != NULL) {
@@ -50,9 +52,9 @@ Fetches an output position (`self->unk_0x14 + 0x18`, raw byte offset --
 `include/DreamSys.h`) via `self->unk_0x4C`'s own vtable slot `+0x110`
 (`DreamSysUnk4CMethods::slot0x110`, newly named this round, splitting the
 existing `pad_0x110[0x11C-0x110]`), then -- only if that call signals
-success (`== 0`) -- builds a query (`func_80057784`, THIS unit's own,
+success (`== 0`) -- builds a query (`DreamSys__BuildLinkQueries`, THIS unit's own,
 currently STALLED -- see its report; still linkable and correct as an
-`INCLUDE_ASM` symbol) and runs it (`func_80057954`, this unit's own,
+`INCLUDE_ASM` symbol) and runs it (`DreamSys__ScanLinkCandidates`, this unit's own,
 already matched). Stores the search result into `self->unk_0x28`
 (`DreamSysUnk28Target *`), and on success dispatches `self->vt->slotBC`
 (`BaseObjO__AddVec14`, already named) and `self->vt->slot0x88`
@@ -79,11 +81,11 @@ both are declared as opaque `u8` padding.
 ## New shared types/fields
 
 - `LinkQueryBuf` grown from `0x28` to `0x30` bytes (this file's own
-  local type, first introduced in `func_80057784`'s stalled report).
+  local type, first introduced in `DreamSys__BuildLinkQueries`'s stalled report).
 - `include/DreamSys.h`: `DreamSysUnk4CMethods::slot0x110` (already added
   alongside `slot0x118` in the previous commit, for this function).
-- The forward declaration `s32 func_80057668(DreamSys *self);` (added
-  earlier for `func_80057618`'s call) had to be updated from a stale
+- The forward declaration `s32 DreamSys__FindNearbyLink(DreamSys *self);` (added
+  earlier for `DreamSys__ApplyOffsetOrFindNearby`'s call) had to be updated from a stale
   `void` return type once this function's real signature was known --
   C89 caught the mismatch as a hard `conflicting types` error, not a
   silent problem.
@@ -92,7 +94,7 @@ both are declared as opaque `u8` padding.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057668   # 71/71
+tools/funcdiff.py DreamSys__FindNearbyLink   # 71/71
 ```
 
 ### Proposed learning

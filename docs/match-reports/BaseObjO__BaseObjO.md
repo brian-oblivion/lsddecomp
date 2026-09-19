@@ -14,7 +14,7 @@ BaseObjO *BaseObjO__BaseObjO(BaseObjO *self) {
     if (GetClass6B5CCMethods()->ctor(self) == NULL) {
         goto fail;
     }
-    self->methods = func_80057C84();
+    self->methods = DreamSys__GetBaseMethods();
     self->unk44 = 0;
     self->unk4C = NULL;
     self->unk50 = NULL;
@@ -31,17 +31,17 @@ This function IS `D800878D4Methods::ctor` (`code_55dd4.h`, Class65650's own
 reading of the shared base) and simultaneously IS `vtable_DreamSys`'s
 implicit base-construction step -- confirmed three ways:
 
-1. `func_80057C84()` (Class65650's own getter, already declared in
+1. `DreamSys__GetBaseMethods()` (Class65650's own getter, already declared in
    `code_55dd4.h` returning `D800878D4Methods *`) is called here to
    install `self->methods`, i.e. this function is establishing the exact
-   table `func_80057C84` returns.
+   table `DreamSys__GetBaseMethods` returns.
 2. The functions this unit defines right after this one --
    `BaseObjO__LinkCompanion`/`BaseObjO__UnlinkCompanion`/`BaseObjO__ClearCompanions` -- occupy exactly
    `D800878D4Methods`'s `+0x010`/`+0x014`/`+0x018` slots, and
    `BaseObjO__LinkCompanion`/`BaseObjO__UnlinkCompanion` are independently named at
    `vtable_DreamSys`'s `+0x010`/`+0x014` in `DreamSys.h` too (as
    "the SAME shared base class... slot10/slot14, the link/unlink pair").
-3. `func_80057C84()->ctor(self)` returning NULL on failure and `self` on
+3. `DreamSys__GetBaseMethods()->ctor(self)` returning NULL on failure and `self` on
    success matches this function's OWN return convention exactly (a
    self-consistent constructor chain).
 
@@ -76,7 +76,7 @@ discipline and the file banner), so this unit keeps its own local reading,
 - **The reload of `self->methods` after the store** (`sw v0,0(s0)` then
   `lw v0,0(s0)` before the `slot40` dispatch) falls out naturally from
   writing `self->methods->slot40(self)` as an ordinary field access after
-  `self->methods = func_80057C84();` -- no caching needed, no barrier
+  `self->methods = DreamSys__GetBaseMethods();` -- no caching needed, no barrier
   needed.
 
 ### Proposed learning
@@ -99,7 +99,7 @@ takes an already-allocated `self`, chains to the true root
 and dispatches `slot40`. The report's own "Class identification" section
 establishes THREE independent ways that this is the shared intermediate
 base's own constructor, not `Class65650`'s: (1) it installs the exact
-table `func_80057C84()` returns, (2) the functions defined right after it
+table `DreamSys__GetBaseMethods()` returns, (2) the functions defined right after it
 in this unit occupy that same table's `+0x010`/`+0x014`/`+0x018` slots and
 are independently named at the identical offsets in two sibling headers'
 own local views (`DreamSys.h`, `code_55dd4.h`), (3) `code_55dd4.c`'s real

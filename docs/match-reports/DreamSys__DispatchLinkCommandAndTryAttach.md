@@ -1,4 +1,6 @@
-# func_80057B90 -- MATCHED (33/33)
+> Renamed from `func_80057B90` on 2026-09-19 (tools/rename.py). Address 0x80057b90.
+
+# DreamSys__DispatchLinkCommandAndTryAttach -- MATCHED (33/33)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0DC`
 (base-class-inherited at this offset; `include/DreamSys.h`'s
@@ -9,13 +11,13 @@ it).
 ## Signature
 
 ```c
-void func_80057B90(DreamSys *self, void *arg1, s32 count);
+void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 count);
 ```
 
 ## Body
 
 ```c
-void func_80057B90(DreamSys *self, void *arg1, s32 count) {
+void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 count) {
     GetClass6B5CCMethods()->slot9C(self, arg1, count);
     if (count < 9) {
         if (count >= 5) {
@@ -65,7 +67,7 @@ different dispatch mechanism from the first call, not a repeat of it.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057B90   # 33/33
+tools/funcdiff.py DreamSys__DispatchLinkCommandAndTryAttach   # 33/33
 ```
 
 ### Proposed learning

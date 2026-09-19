@@ -1,14 +1,16 @@
-# func_80057B54 -- MATCHED (15/15)
+> Renamed from `func_80057B54` on 2026-09-19 (tools/rename.py). Address 0x80057b54.
+
+# DreamSys__AcceptGridElem -- MATCHED (15/15)
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family (called only from
-this unit's own `func_80057A18`, still queued at time of writing, twice, as
-`func_80057B54(elemOrHead, arg1, arg2)`). Not itself a vtable slot in any
+this unit's own `DreamSys__ScanGridWindow`, still queued at time of writing, twice, as
+`DreamSys__AcceptGridElem(elemOrHead, arg1, arg2)`). Not itself a vtable slot in any
 of the class tables reachable from this unit's addresses.
 
 ## Signature
 
 ```c
-void *func_80057B54(void *arg0, void *arg1, void *arg2);
+void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2);
 ```
 
 `arg1`/`arg2` are never read by the body -- present only to match the
@@ -17,7 +19,7 @@ caller's 3-argument calling convention.
 ## Body
 
 ```c
-void *func_80057B54(void *arg0, void *arg1, void *arg2) {
+void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     if (arg0 != NULL) {
         if (func_8001E7BC() != 0) {
             return arg0;
@@ -45,7 +47,7 @@ words with the size drift warning; nested form gives 15/15 exactly.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057B54   # 15/15
+tools/funcdiff.py DreamSys__AcceptGridElem   # 15/15
 ```
 
 ### Proposed learning

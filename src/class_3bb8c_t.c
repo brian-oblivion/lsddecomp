@@ -48,7 +48,7 @@
 #include "common.h"
 
 /* The class allocated by this unit's own func_80057F68, table D_800879C4
- * (49 slots, resolved via tools/classtable.py). Its ctor (func_80057D10)
+ * (49 slots, resolved via tools/classtable.py). Its ctor (D800879C4__D800879C4)
  * and its own funcs 80057F38/40/48/50 live in the neighbouring
  * `class_3bb8c_p` unit (round 2026-09-04 earlier this round), which
  * already carries its own local view of this table

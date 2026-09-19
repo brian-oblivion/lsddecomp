@@ -3,7 +3,7 @@
 Round 47 (runner charlie). Unit: `src/class_3bb8c_q.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `D_800879C4` (49
 slots, resolved with `tools/classtable.py 0x800879C4`) -- this is slot40,
-the function tail-called by this class's own ctor `func_80057D10` (see
+the function tail-called by this class's own ctor `D800879C4__D800879C4` (see
 that report, `src/class_3bb8c_p.c`) as `self->methods->slot40(self,
 arg1)` once construction is otherwise complete.
 
@@ -21,10 +21,10 @@ void func_80057DBC(D_800879C4Obj_q *self, s32 arg1);
 `D_800879C4Obj_q` is THIS unit's own local view of the class -- the
 neighbouring `class_3bb8c_p.c` already carries its own, smaller local
 view (`D_800879C4Obj`, only the vtable pointer and `+0xA4`) of the SAME
-table/object, established from `func_80057D10`/`func_80057C94`. Per the
+table/object, established from `D800879C4__D800879C4`/`New_D800879C4`. Per the
 project's multiple-independent-local-views convention this unit does not
 edit that file; it defines its own struct sized for what these two
-functions read/write. The allocator (`class_3bb8c_p.c`'s `func_80057C94`)
+functions read/write. The allocator (`class_3bb8c_p.c`'s `New_D800879C4`)
 sizes the object at `0xA8` bytes, which every offset in both views stays
 inside.
 
