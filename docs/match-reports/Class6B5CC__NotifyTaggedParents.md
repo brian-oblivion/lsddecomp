@@ -537,3 +537,68 @@ purpose beyond position. Held back from an actual rename because this
 symbol is referenced (in a comment) from `src/code_d294_c.c:13` -- a
 different unit's own file banner, making exactly that boundary
 observation. Posted to the broadcast.
+
+(Later renamed for real in round 54's own second head commit, "apply
+bravo's eight held-back cross-unit function renames" -- the function is
+`Class6B5CC__NotifyTaggedParents` in `src/` as of round 55.)
+
+## Round 55 (charlie): REVISITED (round 55) -- confirmed unchanged, 48/54
+
+Assigned as a track-1 REVISIT job per FINISHING-PLAN.md's revisit rule: this
+unit passed track 3 naming last round (round 54), so every score on file here
+predates that naming. Rebuilt the round-19 preserved body live first, per this
+round's "build any inherited body before trusting its score" discipline:
+reproduces exactly, `build exit=2`, no compile errors, `funcdiff.py` confirms
+**48/54**, no drift, the exact same `self`/`tag` `$s1`/`$s2` swap this report's
+round-13/19/20/37/41 sections already describe.
+
+**Explicit answer to the revisit's own question: the round-54 renaming gave
+NO new shape here.** This function's own body references `GenericObj_d294`,
+`GenericMethods_d294::slot10`, `Class6B5CCObj`, `BasicClass__func_1816c` --
+none of those symbols were touched by round 54's naming pass (which renamed
+only seven `Class6B5CCMethods` vtable slots -- `getRotMatrix`,
+`readUnk20Data`, `transformAndNotifyParents`, `tryAttachNearby`,
+`composeAndApplyRotation`, `checkBoundsOverlap`, `classifyAgainstPlanes` --
+plus eight cross-unit function symbols, none of which this function calls or
+is called through). The naming pass changed nothing about ANY type, offset,
+or struct this function reads. This is a clean instance of "the changed state
+named in the brief does not reach this particular function" -- worth
+recording since the revisit rule's own justifying precedent (four warm bodies
+in the sister project) was about types actually used by the function, not
+merely present somewhere in the unit.
+
+Checked DECOMPILATION_LEARNINGS 3d's newest entry (round 53, "the 'mention a
+value twice' lever needs a value with a genuine SECOND, INDEPENDENT USE
+POINT") against this function's residue before spending a build: `self`
+(here, `s`) and `tag` each have exactly ONE static use site (the one dispatch
+call and the one loop comparison, respectively) -- neither qualifies as a
+lifetime-splitting candidate, so the lever does not apply here. This was
+confirmed by inspection, not by a build, since the precondition (a second,
+independent use point) is visibly absent from the 12-line function body.
+
+No new attempt was made beyond the live re-verification and this
+applicability check -- this residue has now survived a full round-13
+hand-lever sweep (13 assignment/declaration/barrier variants), round-19's
+split-expression axis, round-20's three further axes, a 73118-iteration
+permuter search (round 37) that never beat the base score, and round-41's
+dead-reload-lever check (ruled inapplicable, clean negative). Filing
+unchanged as STALL at 48/54, `INCLUDE_ASM` confirmed restored,
+`git diff --stat src/code_d294_b.c` empty after the check.
+
+REVISITED (round 55): confirmed unchanged at 48/54; round-54 naming reached
+none of this function's own symbols; no new lever found or attempted beyond
+an applicability check of the one new lever added to DECOMPILATION_LEARNINGS
+since this function's last attempt (round 53's "mention twice", ruled
+inapplicable by inspection).
+
+### Proposed learning (round 55)
+
+**A REVISIT job's premise -- "the unit's types changed, re-derive from them"
+-- can be true of the UNIT while being false of the specific function
+assigned.** This unit's track-3 pass renamed seven vtable slots and eight
+cross-unit functions; this function's entire body touches none of them. The
+revisit rule should be read as "check whether the changed state reaches this
+function's own symbol set" before spending a build, not as a blanket
+license to assume new shape exists -- confirming absence by reading the
+symbol list cost nothing, re-deriving blind would have cost a full attempt
+cycle for a function whose inputs provably did not change.

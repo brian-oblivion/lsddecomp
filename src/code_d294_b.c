@@ -171,13 +171,15 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
  * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = Class6B5CC__ClassifyAgainstPlanes)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
-/* STALL -- see docs/match-reports/Class6B5CC__TryAttachNearby.md. Round 20: closed 11
- * of the original 13-word size deficit (130 -> 141 words) via a
- * `count = expr; if (count)` intermediate-assignment lever on the X and
- * Z axes' negative-branch magnitude checks, which prevents GCC's
- * cross-jump merge on those two branches without reintroducing it
- * elsewhere. 2 words remain; every other axis/branch combination tried
- * regressed. Restored to INCLUDE_ASM per project rule. */
+/* STALL -- see docs/match-reports/Class6B5CC__TryAttachNearby.md. Round 55
+ * (charlie, REVISIT): closed the LENGTH exactly (141 -> 143/143) via a
+ * plain goto-CFG rewrite mirroring retail's actual jump graph on all three
+ * axes (X/Y/Z), then closed 2 more words (138 -> 140/143) via a
+ * permuter-found lever caching other->unk30 into a local before the
+ * composeAndApplyRotation call. Remaining 2-word residue is a pure
+ * stack-slot-address swap between buf54 and count's own address-taken
+ * slot -- unresponsive to declaration-order variants and ~132000 combined
+ * permuter iterations. Restored to INCLUDE_ASM per project rule. */
 #if 0
 void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
@@ -185,8 +187,8 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 diffRaw;
     Vec3S16_d294 diff;
     s32 count;
-    u8 buf54[0x4C];
     s32 abs;
+    u8 buf54[0x4C];
 
     if (self->unk20 == NULL) {
         return;
@@ -203,45 +205,55 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;
 
-    if (diffRaw.x >= 0) {
-        if (diffRaw.x >= 0x4001) {
-            return;
-        }
-    } else {
-        abs = ~diffRaw.x + 1;
-        count = abs >= 0x4001;
-        if (count) {
-            return;
-        }
+    if (diffRaw.x < 0) {
+        goto x_neg;
     }
-    if (diffRaw.y >= 0) {
-        if (diffRaw.y >= 0x4001) {
-            return;
-        }
-    } else {
-        abs = ~diffRaw.y + 1;
-        if (abs >= 0x4001) {
-            return;
-        }
+    if (diffRaw.x < 0x4001) {
+        goto x_done;
     }
-    if (diffRaw.z >= 0) {
-        if (diffRaw.z >= 0x4001) {
-            return;
-        }
-    } else {
-        abs = ~diffRaw.z + 1;
-        count = abs >= 0x4001;
-        if (count) {
-            return;
-        }
+    return;
+x_neg:
+    abs = ~diffRaw.x + 1;
+    if (abs >= 0x4001) {
+        return;
     }
+x_done:
+    if (diffRaw.y < 0) {
+        goto y_neg;
+    }
+    if (diffRaw.y < 0x4001) {
+        goto y_done;
+    }
+    return;
+y_neg:
+    abs = ~diffRaw.y + 1;
+    if (abs >= 0x4001) {
+        return;
+    }
+y_done:
+    if (diffRaw.z < 0) {
+        goto z_neg;
+    }
+    if (diffRaw.z < 0x4001) {
+        goto z_done;
+    }
+    return;
+z_neg:
+    abs = ~diffRaw.z + 1;
+    if (abs >= 0x4001) {
+        return;
+    }
+z_done:
 
     diff.x = diffRaw.x;
     diff.y = diffRaw.y;
     diff.z = diffRaw.z;
 
     count = other->unk30->unk0;
-    self->methods->composeAndApplyRotation(self, &diff, buf54, &other->unk30->unk4, count * 8);
+    {
+        GenericCountList_d294 *countList = other->unk30;
+        self->methods->composeAndApplyRotation(self, &diff, buf54, &countList->unk4, count * 8);
+    }
 
     if (!self->methods->checkBoundsOverlap(self, &count, &diff)) {
         return;
@@ -432,7 +444,15 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
  * stack buffer (same "unused padding" shape as Class6B5CC__CheckBoundsOverlap's own
  * history -- fixed the frame size, which was originally 0x18 short) and
  * a resolution of round 45's open Part-3 ambiguity (see the report).
- * Restored to INCLUDE_ASM per project rule. */
+ * Round 55 (charlie, REVISIT): confirmed unchanged at 29/199 -- the
+ * residue is a whole-function register-pressure interaction, not a simple
+ * self-vs-tag swap; Part 1's own induction-variable decomposition differs
+ * from retail's (four raw read pointers + two write pointers instead of
+ * indexed mid[row].x/y/z), and reproducing it in isolation regressed the
+ * score (16/199) rather than improving it. Gate 3 permuter checks passed
+ * (11 insertions/11 deletions -- real structural room) but the bounded
+ * search itself was not run this round. See the report for the full
+ * derivation. Restored to INCLUDE_ASM per project rule. */
 #if 0
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
