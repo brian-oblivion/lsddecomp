@@ -43,7 +43,7 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
     cached = this->unk100;
     if (cached == NULL) {
         if (name == NULL) {
-            name = D_8008AC14;
+            name = gEntityDefaultPos;
         }
         sub = func_8003FDB0(name, 0, arg4);
         if (sub == NULL) {
@@ -57,7 +57,7 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
-        dispatchArg2 = D_8008AC0C;
+        dispatchArg2 = gEntityDefaultOffset;
     }
     m->slot4C(sub, this, dispatchArg2);
     sub->methods->slotD0(sub, arg3);
@@ -77,7 +77,7 @@ void Entity__Destructor(Entity *this) {
 void Entity__InitState(Entity *this) {
     s32 kind;
 
-    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
     if ((u32)(kind - 1) < 9) {
         this->methods->slot70(this, 1);
     }
@@ -123,7 +123,7 @@ void Entity__Update(Entity *this, s32 a1, s32 a2) {
 void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     s32 linkStage;
 
-    linkStage = D_80089EAB[this->moodIndex * 0x10];
+    linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
     if ((u32)(arg2 - 2) < 7) {
         if (linkStage <= 0) {
             return;
@@ -138,7 +138,7 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     }
     if (linkStage != 0x7F) {
         arg2 = 0xA;
-    } else if (D_80089EAC[this->moodIndex * 0x10] != 0) {
+    } else if (gEntityEventVideoTable[this->moodIndex * 0x10] != 0) {
         arg2 = 0xB;
     } else {
         arg2 = 0xC;
@@ -170,7 +170,7 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
     s32 kind;
 
     local = *(EntityVec3 *)pos;
-    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
     if ((u32)((kind + 9) & 0xFF) < 9) {
         local.y += (s8)kind * 1024;
     }
@@ -213,7 +213,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
     } while (0);
     self = this;
     result = this->methods->slot144(this, self->unk94);
-    threshold = D_80089EAE[self->moodIndex * 0x10] << 11;
+    threshold = gEntityProximityThresholdTable[self->moodIndex * 0x10] << 11;
     if (threshold < result) {
         return -1;
     }
@@ -221,15 +221,15 @@ s32 Entity__GetProximityRatio(Entity *this) {
 }
 
 void *Entity__GetMoodEffect(Entity *this) {
-    return &D_80089EA4[this->moodIndex];
+    return &gEntityMoodTable[this->moodIndex];
 }
 
 s32 Entity__GetUnlockEffect(Entity *this) {
-    return D_80089EA6[this->moodIndex * 0x10] * 1000;
+    return gEntityUnlockKindTable[this->moodIndex * 0x10] * 1000;
 }
 
 s32 Entity__GetLinkStage(Entity *this) {
-    s32 linkStage = D_80089EAB[this->moodIndex * 0x10];
+    s32 linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
 
     if (linkStage < 0) {
         return ~linkStage;
@@ -238,7 +238,7 @@ s32 Entity__GetLinkStage(Entity *this) {
 }
 
 s32 Entity__GetEventVideo(Entity *this) {
-    return D_80089EAC[this->moodIndex * 0x10] - 1;
+    return gEntityEventVideoTable[this->moodIndex * 0x10] - 1;
 }
 
 void Entity__Activate(Entity *this) {
@@ -266,12 +266,12 @@ struct EntityMoodHandlerRow {
     void *handler; /* +0x00 */
     u8 pad04[0x10 - 0x04];
 };
-extern EntityMoodHandlerRow D_80089EB0[];
+extern EntityMoodHandlerRow gEntityMoodHandlerTable[];
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, Entity *arg3, void *arg4);
 
 void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->unk58, &this->unk9C, this->moodIndex + 1, this,
-                  D_80089EB0[this->moodIndex].handler);
+                  gEntityMoodHandlerTable[this->moodIndex].handler);
     this->methods->slot12C(this);
     this->methods->slot110(this);
     this->unkFC = 0;
@@ -290,7 +290,7 @@ s32 Entity__UpdateDetachState(Entity *this) {
     s32 doDetach;
 
     if (this->unkF0 == 0 && this->unk44 != 1) {
-        row = &D_80089EA4[this->moodIndex];
+        row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
         if (row->detachKind != 0) {
             if (row->detachKind == 4) {
@@ -330,7 +330,7 @@ s32 Entity__UpdateLinkState(Entity *this) {
     s32 scaled;
 
     if (this->unkF0 != 0) {
-        row = &D_80089EA4[this->moodIndex];
+        row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
         func_8005DF9C(this, 0);
         if (row->linkKind != 0 && row->linkKind != 3) {

@@ -7,7 +7,7 @@
 ## What it does
 
 Gated by `this->unkF0` (set by `Entity__Activate`, cleared by `Entity__Deactivate`):
-looks up this entity's mood row (`D_80089EA4[this->moodIndex]`), calls
+looks up this entity's mood row (`gEntityMoodTable[this->moodIndex]`), calls
 `func_8005DF9C(this, 0)` (still-uncarved, in `Entity_b` — see "Proposed
 learning" below for the second argument), then decides whether to detach
 based on `row->linkKind`:
@@ -33,7 +33,7 @@ s32 Entity__UpdateLinkState(Entity *this) {
     s32 scaled;
 
     if (this->unkF0 != 0) {
-        row = &D_80089EA4[this->moodIndex];
+        row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
         func_8005DF9C(this, 0);
         if (row->linkKind != 0 && row->linkKind != 3) {

@@ -9,7 +9,7 @@ Occupies `EntityMethods` slot `+0x17C` (dispatched by `Entity__Update` in
 `Entity.c` as `this->methods->slot17C(this)`, already typed `s32` in the
 header before this round). Early-returns `this->unkF8` unless
 `this->unkF0 != 0 && this->unkF8 == 0 && this->unk44 != 1`; otherwise looks up
-`D_80089EA4[this->moodIndex]` and, if `row->unkB != 0`, computes a distance
+`gEntityMoodTable[this->moodIndex]` and, if `row->unkB != 0`, computes a distance
 from `row->unkB` (absolute value), calls `Entity__IsNearTarget(this,
 &this->unk14->x, dist, row->unk9)`, and dispatches
 `this->methods->slot168(this)` if that returned non-zero. Always returns
@@ -28,7 +28,7 @@ s32 func_8005DEE0(Entity *this) {
     s32 dist;
 
     if (this->unkF0 != 0 && this->unkF8 == 0 && this->unk44 != 1) {
-        row = &D_80089EA4[this->moodIndex];
+        row = &gEntityMoodTable[this->moodIndex];
         if (row->unkB != 0) {
             xptr = &this->unk14->x;
             dist = row->unkB;

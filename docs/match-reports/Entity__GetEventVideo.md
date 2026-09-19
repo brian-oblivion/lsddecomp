@@ -36,12 +36,12 @@
 
 ```c
 s32 Entity__GetEventVideo(Entity *this) {
-    return D_80089EAC[this->moodIndex * 0x10] - 1;
+    return gEntityEventVideoTable[this->moodIndex * 0x10] - 1;
 }
 ```
 
 Exactly the expression the report below derived, with the `(s8)` cast
-dropped -- `D_80089EAC` is already declared `extern s8 []` in
+dropped -- `gEntityEventVideoTable` is already declared `extern s8 []` in
 `include/Entity.h`, so the cast was redundant rather than wrong.
 
 ---
@@ -70,7 +70,7 @@ dropped -- `D_80089EAC` is already declared `extern s8 []` in
 
 ## What it does
 
-`return (s8)D_80089EAC[this->moodIndex * 0x10] - 1;` — a signed-byte table
+`return (s8)gEntityEventVideoTable[this->moodIndex * 0x10] - 1;` — a signed-byte table
 lookup indexed by `this->moodIndex` (a 16-byte stride, the same index used
 by `Entity__GetMoodEffect`/`Entity__GetUnlockEffect`/`Entity__GetLinkStage`,
 all four keyed off the same field, each with its own table).
@@ -78,13 +78,13 @@ all four keyed off the same field, each with its own table).
 ## The residue
 
 ```
-retail:  lui   $at,%hi(D_80089EAC)
-         addiu $at,$at,%lo(D_80089EAC)
+retail:  lui   $at,%hi(gEntityEventVideoTable)
+         addiu $at,$at,%lo(gEntityEventVideoTable)
          addu  $at,$at,$v0
          lb    $v0,0x0($at)
-built:   lui   $at,%hi(D_80089EAC)
+built:   lui   $at,%hi(gEntityEventVideoTable)
          addu  $at,$at,$v0
-         lb    $v0,%lo(D_80089EAC)($at)
+         lb    $v0,%lo(gEntityEventVideoTable)($at)
 ```
 
 Both compute the identical final address; retail fully resolves the symbol
@@ -98,9 +98,9 @@ with the pinned pipeline per CLAUDE.md's reproducer recipe:
 ```c
 typedef signed char s8;
 typedef signed int s32;
-extern s8 D_80089EAC[];
+extern s8 gEntityEventVideoTable[];
 s32 test(s32 mood) {
-    return D_80089EAC[mood * 0x10] - 1;
+    return gEntityEventVideoTable[mood * 0x10] - 1;
 }
 ```
 
@@ -109,7 +109,7 @@ pseudo-instruction:
 
 ```
 sll  $4,$4,4
-lb   $2,D_80089EAC($4)
+lb   $2,gEntityEventVideoTable($4)
 j    $31
 addu $2,$2,-1
 ```
@@ -187,7 +187,7 @@ possibly larger, since indexed table lookups are a very common shape.
 ```c
 #if 0
 s32 Entity__GetUnlockEffect(Entity *this) {
-    return D_80089EA6[this->moodIndex * 0x10] * 1000;
+    return gEntityUnlockKindTable[this->moodIndex * 0x10] * 1000;
 }
 #endif
 ```
@@ -197,7 +197,7 @@ s32 Entity__GetUnlockEffect(Entity *this) {
 s32 Entity__GetLinkStage(Entity *this) {
     s32 v;
 
-    v = D_80089EAB[this->moodIndex * 0x10];
+    v = gEntityLinkStageTable[this->moodIndex * 0x10];
     if (v < 0) {
         return ~v;
     }
@@ -209,7 +209,7 @@ s32 Entity__GetLinkStage(Entity *this) {
 ```c
 #if 0
 s32 Entity__GetEventVideo(Entity *this) {
-    return D_80089EAC[this->moodIndex * 0x10] - 1;
+    return gEntityEventVideoTable[this->moodIndex * 0x10] - 1;
 }
 #endif
 ```
@@ -220,7 +220,7 @@ correct — same branch targets as retail, confirmed with `asm-differ`, which
 is exactly the check the head's round-2026-08-30-a broadcast on `strcat`
 said to make before calling anything compiler-internal; here the CFG matches
 and the *only* residue is the one-instruction addressing-mode gap above).
-Any of the four table declarations (`s8 D_80089EA6/AB/AC[]`) and
+Any of the four table declarations (`s8 gEntityUnlockKindTable/AB/AC[]`) and
 `Entity.h`'s `moodIndex` field are correct regardless of this stall.
 
 ## Proposed learning

@@ -6,7 +6,7 @@
 
 ## What it does
 
-Reads `D_80089EA6[this->moodIndex*0x10]` (the same "GetUnlockEffect" table
+Reads `gEntityUnlockKindTable[this->moodIndex*0x10]` (the same "GetUnlockEffect" table
 `Entity__GetUnlockEffect` reads, unsigned byte load here vs. that stalled
 function's signed one), and if `kind - 1` is unsigned-less-than 9 (i.e.
 `kind` in `[1..9]`) calls a new self-only vtable slot with `arg1==1`. Then
@@ -18,7 +18,7 @@ unconditionally calls two more vtable slots.
 void Entity__InitState(Entity *this) {
     s32 kind;
 
-    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
     if ((u32)(kind - 1) < 9) {
         this->methods->slot70(this, 1);
     }
@@ -42,12 +42,12 @@ Two new `EntityMethods` vtable slots: `slot70` (`self, s32 arg1`, called
 here with `arg1==1`) and `slot10C` (`self, s32 arg1`, called here with
 `arg1==0x42`, unconditionally). `slot160` was already documented.
 
-`kind` is read via a cast to `u8 *` (`((u8 *)D_80089EA6)[...]`) rather than
-through the header's own `extern s8 D_80089EA6[]` declaration, because this
+`kind` is read via a cast to `u8 *` (`((u8 *)gEntityUnlockKindTable)[...]`) rather than
+through the header's own `extern s8 gEntityUnlockKindTable[]` declaration, because this
 site's load is `lbu` (unsigned) while `Entity__GetUnlockEffect`'s stalled
 body reads the same table with `lb` (signed) -- same table, two different
 element interpretations at two different call sites. Casting locally avoids
-redeclaring `D_80089EA6` with a conflicting type in this same translation
+redeclaring `gEntityUnlockKindTable` with a conflicting type in this same translation
 unit (which would be a silent fatal `conflicting types` error, per
 CLAUDE.md's build-log guidance).
 
@@ -56,7 +56,7 @@ CLAUDE.md's build-log guidance).
 **A table read that "looks like" another function's near-identical-looking
 table read is not evidence of the same expression shape -- check the actual
 instructions before pattern-matching from memory.** Here `Entity__IsNearTarget`
-(read moments earlier while scoping the whole batch) uses `D_80089EA6`-style
+(read moments earlier while scoping the whole batch) uses `gEntityUnlockKindTable`-style
 byte reads with a `+9`/`&0xFF`/sign-extend-by-shift idiom for an unrelated
 purpose (widening a byte to a signed multiplier); this function reads the
 *same table symbol* for a plain unsigned range check and has neither the

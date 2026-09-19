@@ -21,7 +21,7 @@ s32 func_8005DE18(Entity *this) {
     s32 *xptr;
     s32 dist;
 
-    row = &D_80089EA4[this->moodIndex];
+    row = &gEntityMoodTable[this->moodIndex];
     if (this->unkF0 != 0) {
         if (this->unkF4 == 0) {
             xptr = &this->unk14->x;
@@ -46,7 +46,7 @@ s32 func_8005DEE0(Entity *this) {
     s32 dist;
 
     if (this->unkF0 != 0 && this->unkF8 == 0 && this->unk44 != 1) {
-        row = &D_80089EA4[this->moodIndex];
+        row = &gEntityMoodTable[this->moodIndex];
         if (row->unkB != 0) {
             xptr = &this->unk14->x;
             dist = row->unkB;
@@ -69,9 +69,9 @@ extern s32 func_8005E02C(Entity *this, s32 arg1);
 /* arg1 is unused here; the canonical declaration in include/Entity.h has it
  * and func_8005DABC passes 0. Do not drop it -- `conflicting types`. */
 void func_8005DF9C(Entity *this, s32 arg1) {
-    if (D_80089EAB[this->moodIndex * 0x10] < 0 &&
-        D_80089EAC[this->moodIndex * 0x10] != 0 &&
-        func_8005E02C(this, D_80089EAC[this->moodIndex * 0x10] << 9)) {
+    if (gEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
+        gEntityEventVideoTable[this->moodIndex * 0x10] != 0 &&
+        func_8005E02C(this, gEntityEventVideoTable[this->moodIndex * 0x10] << 9)) {
         this->methods->slot30(this, 0xA);
     }
 }
@@ -103,7 +103,7 @@ s32 func_8005E0B0(Entity *this) {
     s32 dist;
 
     if (this->unkF0 != 0 && this->unkF8 != 0) {
-        row = &D_80089EA4[this->moodIndex];
+        row = &gEntityMoodTable[this->moodIndex];
         dist = row->unkB;
         if (dist < 0) {
             dist = ~dist + 1;
@@ -117,7 +117,7 @@ s32 func_8005E0B0(Entity *this) {
 }
 
 EntityMethods *Get_vtable_Entity(void) {
-    return &D_80089AD4;
+    return &ENTITY_METHODS;
 }
 
 void func_8005E160(Entity *this, EntityMoodHandlerArg *out) {

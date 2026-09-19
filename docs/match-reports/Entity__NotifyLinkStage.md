@@ -6,12 +6,12 @@
 
 ## What it does
 
-Range-gates on `arg2` and the "GetLinkStage" mood table (`D_80089EAB`) before
+Range-gates on `arg2` and the "GetLinkStage" mood table (`gEntityLinkStageTable`) before
 calling a new `BasicClassMethods` slot (`slotDC`, forwarding `arg1`/`arg2`),
 then, only when `arg2 == 4` and the link stage is positive, dispatches a
 small state code (0xA/0xB/0xC) into `EntityMethods::slot30` -- 0xA unless the
 link stage is exactly `0x7F`, in which case a second table
-(`D_80089EAC`, "GetEventVideo") picks between 0xB and 0xC.
+(`gEntityEventVideoTable`, "GetEventVideo") picks between 0xB and 0xC.
 
 ## Final C
 
@@ -19,7 +19,7 @@ link stage is exactly `0x7F`, in which case a second table
 void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     s32 linkStage;
 
-    linkStage = D_80089EAB[this->moodIndex * 0x10];
+    linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
     if ((u32)(arg2 - 2) < 7) {
         if (linkStage <= 0) {
             return;
@@ -34,7 +34,7 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     }
     if (linkStage != 0x7F) {
         arg2 = 0xA;
-    } else if (D_80089EAC[this->moodIndex * 0x10] != 0) {
+    } else if (gEntityEventVideoTable[this->moodIndex * 0x10] != 0) {
         arg2 = 0xB;
     } else {
         arg2 = 0xC;
@@ -56,7 +56,7 @@ Byte-exact, whole-image build verified.
    attempts trying to fix the order by literally reordering the two
    statements, or introducing a boolean `inRange` computed first, both
    made it WORSE (32/62 and 5/62 respectively) -- the second duplicated
-   the `D_80089EAB` load into two separate `lb` instructions instead of
+   the `gEntityLinkStageTable` load into two separate `lb` instructions instead of
    being CSE'd back into one, causing a genuine 139789-byte whole-image
    drift.
 2. **The actual fix was to stop introducing a second local entirely.**
@@ -80,7 +80,7 @@ Byte-exact, whole-image build verified.
    `if (linkStage != 0x7F) { arg2 = 0xA; } else {...}` (condition negated,
    arms swapped) matched retail's explicit-jump-for-the-short-arm layout.
    Took it to 59/62.
-4. The innermost `D_80089EAC[...] == 0` check had the identical polarity
+4. The innermost `gEntityEventVideoTable[...] == 0` check had the identical polarity
    residue one level deeper -- flipped to `!= 0` with arms swapped the same
    way, closing it to 62/62.
 

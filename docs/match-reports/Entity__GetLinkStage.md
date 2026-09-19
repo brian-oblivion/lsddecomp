@@ -36,7 +36,7 @@
 
 ```c
 s32 Entity__GetLinkStage(Entity *this) {
-    s32 linkStage = D_80089EAB[this->moodIndex * 0x10];
+    s32 linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
 
     if (linkStage < 0) {
         return ~linkStage;
@@ -77,7 +77,7 @@ does not produce it.
 ## What it does
 
 ```c
-s32 v = D_80089EAB[this->moodIndex * 0x10];  /* signed byte */
+s32 v = gEntityLinkStageTable[this->moodIndex * 0x10];  /* signed byte */
 if (v < 0) {
     return ~v;
 }
@@ -102,8 +102,8 @@ reproducer there) — the table load is 1 word short, everything else
 (including the branch and both return paths) matches:
 
 ```
-retail:  lui $at,%hi(D_80089EAB) / addiu $at,$at,%lo(D_80089EAB) / addu $at,$at,$v0 / lb $v0,0x0($at)
-built:   lui $at,%hi(D_80089EAB) / addu $at,$at,$v0 / lb $v0,%lo(D_80089EAB)($at)
+retail:  lui $at,%hi(gEntityLinkStageTable) / addiu $at,$at,%lo(gEntityLinkStageTable) / addu $at,$at,$v0 / lb $v0,0x0($at)
+built:   lui $at,%hi(gEntityLinkStageTable) / addu $at,$at,$v0 / lb $v0,%lo(gEntityLinkStageTable)($at)
 ```
 
 ## Preserved body
@@ -113,7 +113,7 @@ built:   lui $at,%hi(D_80089EAB) / addu $at,$at,$v0 / lb $v0,%lo(D_80089EAB)($at
 s32 Entity__GetLinkStage(Entity *this) {
     s32 v;
 
-    v = D_80089EAB[this->moodIndex * 0x10];
+    v = gEntityLinkStageTable[this->moodIndex * 0x10];
     if (v < 0) {
         return ~v;
     }

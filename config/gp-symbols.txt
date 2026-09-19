@@ -155,8 +155,6 @@ D_8008ABFC
 D_8008AC00
 D_8008AC04
 D_8008AC08
-D_8008AC0C
-D_8008AC14
 D_8008AC1C
 D_8008AC20
 D_8008AC4C
@@ -204,6 +202,8 @@ gCdState
 gCdTickStep
 gCdTimeoutCounter
 gCdUseVSyncCallback
+gEntityDefaultOffset
+gEntityDefaultPos
 gFileTable
 gFileTableCount
 gOpenVabCount

@@ -9,9 +9,9 @@ Unit: `Entity_b` · Size: 36 words · Round 23 (2026-09-07), head. Fresh ground
 /* arg1 is unused here; the canonical declaration in include/Entity.h has it
  * and func_8005DABC passes 0. Do not drop it -- `conflicting types`. */
 void func_8005DF9C(Entity *this, s32 arg1) {
-    if (D_80089EAB[this->moodIndex * 0x10] < 0 &&
-        D_80089EAC[this->moodIndex * 0x10] != 0 &&
-        func_8005E02C(this, D_80089EAC[this->moodIndex * 0x10] << 9)) {
+    if (gEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
+        gEntityEventVideoTable[this->moodIndex * 0x10] != 0 &&
+        func_8005E02C(this, gEntityEventVideoTable[this->moodIndex * 0x10] << 9)) {
         this->methods->slot30(this, 0xA);
     }
 }
@@ -27,7 +27,7 @@ Three gates, all branching to the SAME epilogue, so it is one flat `&&` chain
 rather than nested `if`s — read off the fact that all three of `bgez`, `beqz`
 and the post-call `beqz` target `.L8005E018`.
 
-`D_80089EAC[...]` is written three times and GCC common-subexpression-eliminates
+`gEntityEventVideoTable[...]` is written three times and GCC common-subexpression-eliminates
 it to one `lb`; no local is needed and adding one is not what retail did. Both
 table reads share the single `sll $a1, $v0, 4` row index, likewise from CSE.
 

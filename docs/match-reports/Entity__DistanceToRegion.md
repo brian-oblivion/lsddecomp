@@ -7,7 +7,7 @@
 ## What it does
 
 Not an `Entity`/`Entity`-pair function despite living in this unit's vtable
-(`D_80089AD4` offset `+0x144`, see the class-table note in `Entity.h`) — its
+(`ENTITY_METHODS` offset `+0x144`, see the class-table note in `Entity.h`) — its
 SECOND argument is an unrelated type (`EntityRegionRef *`, newly named this
 round: a flag plus a pointer to an array of 0x38-byte slots, element `[1]`
 of which is read). Computes a "distance" between `this`'s 3D position

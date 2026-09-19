@@ -8,7 +8,7 @@ No hits.
 
 ## What it does
 
-`D_80089EB0` handler row; `out` unused. `slot48(this, 1, D_80089DD8)` then
+`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, D_80089DD8)` then
 `slotC4(this, -0xA, 0)`.
 
 ## The C

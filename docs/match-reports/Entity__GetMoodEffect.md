@@ -4,20 +4,20 @@
 
 ## What it does
 
-`return &D_80089EA4[this->moodIndex];` — forms the address of a 16-byte-stride
+`return &gEntityMoodTable[this->moodIndex];` — forms the address of a 16-byte-stride
 table row selected by `this->moodIndex`, without loading through it. Same
 index (`moodIndex`, `Entity.h` offset `+0x98`) as the other three
 `Entity__Get*Effect/Stage/Video` functions in this unit, each keyed to its
 own table.
 
 **Updated in round 2026-09-01 (runner bravo, Entity 11-function pass):**
-`D_80089EA4` is no longer typed as a bare `u8[]` indexed with a manual
+`gEntityMoodTable` is no longer typed as a bare `u8[]` indexed with a manual
 `* 0x10`. `Entity__UpdateDetachState`/`Entity__UpdateLinkState` (this same table's other readers,
 matched in that pass) needed named sub-byte fields inside each 16-byte row
 (`detachKind` at +0x3, `linkKind` at +0x4, plus `unk5`/`unk9`), so the table
-is now `extern EntityMoodRow D_80089EA4[];` (see `include/Entity.h`) and this
-function's own indexing changed from `D_80089EA4[this->moodIndex * 0x10]` to
-`D_80089EA4[this->moodIndex]` to match — `sizeof(EntityMoodRow)` is 16, so
+is now `extern EntityMoodRow gEntityMoodTable[];` (see `include/Entity.h`) and this
+function's own indexing changed from `gEntityMoodTable[this->moodIndex * 0x10]` to
+`gEntityMoodTable[this->moodIndex]` to match — `sizeof(EntityMoodRow)` is 16, so
 the compiler's own array-stride multiply reproduces the identical
 `sll $v0,$v0,4` either way. Re-verified byte-exact after the change; the
 disassembly below is unchanged.
@@ -26,23 +26,23 @@ disassembly below is unchanged.
 
 ```
 lw   $v0, 0x98($a0)          ; v0 = this->moodIndex
-lui  $v1, %hi(D_80089EA4)
-addiu $v1, $v1, %lo(D_80089EA4)
+lui  $v1, %hi(gEntityMoodTable)
+addiu $v1, $v1, %lo(gEntityMoodTable)
 sll  $v0, $v0, 4             ; v0 = moodIndex * 16
 jr   $ra
- addu $v0, $v0, $v1           ; return &D_80089EA4[moodIndex*16]
+ addu $v0, $v0, $v1           ; return &gEntityMoodTable[moodIndex*16]
 ```
 
 ## Final C
 
 ```c
 void *Entity__GetMoodEffect(Entity *this) {
-    return &D_80089EA4[this->moodIndex];
+    return &gEntityMoodTable[this->moodIndex];
 }
 ```
 
-`D_80089EA4` is declared `extern EntityMoodRow D_80089EA4[];` in `Entity.h`
-(a real 16-byte struct now, see the note above — was `extern u8 D_80089EA4[]`
+`gEntityMoodTable` is declared `extern EntityMoodRow gEntityMoodTable[];` in `Entity.h`
+(a real 16-byte struct now, see the note above — was `extern u8 gEntityMoodTable[]`
 with a manual `* 0x10` before this round).
 
 ## Attempt log

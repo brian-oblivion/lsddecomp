@@ -13,8 +13,8 @@ through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 `slotD0(sub, arg3)`. Returns the object (new or cached), or NULL if
 allocation failed.
 
-`name` defaults to `D_8008AC14` (`{320, 240}`) and `arg2` defaults to
-`D_8008AC0C` (`{-100, -100}`) when the caller passes NULL — both plain
+`name` defaults to `gEntityDefaultPos` (`{320, 240}`) and `arg2` defaults to
+`gEntityDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
 2-word data buffers, not strings, in `asm/data/7B3F8.sdata.s`.
 
 ## Derivation
@@ -41,7 +41,7 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
     cached = this->unk100;
     if (cached == NULL) {
         if (name == NULL) {
-            name = D_8008AC14;
+            name = gEntityDefaultPos;
         }
         sub = func_8003FDB0(name, 0, arg4);
         if (sub == NULL) {
@@ -55,7 +55,7 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
-        dispatchArg2 = D_8008AC0C;
+        dispatchArg2 = gEntityDefaultOffset;
     }
     m->slot4C(sub, this, dispatchArg2);
     sub->methods->slotD0(sub, arg3);
@@ -86,7 +86,7 @@ the way the "obviously equivalent" nested-if reads.**
    directly next time rather than "cleaning it up" first.
 3. The dispatch tail still needed two more fixes after that: `arg2`'s
    NULL-default was written by reassigning the *parameter itself*
-   (`if (arg2 == NULL) arg2 = D_8008AC0C;`), and that block-reused `$s2`
+   (`if (arg2 == NULL) arg2 = gEntityDefaultOffset;`), and that block-reused `$s2`
    for both the check and the final value — but retail computes the checked
    value into `$a2` (a temp, distinct from the parameter's home register)
    and leaves `$s2` alone. Introducing a separate `dispatchArg2` local fixed

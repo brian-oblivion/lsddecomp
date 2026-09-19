@@ -14,10 +14,10 @@ calls `this->methods->slot144(this, this->unk94)` (already documented in
 `Entity.h` as returning a value, not void, and noting that retail keeps
 `this->unk94` live in `$a1` from its first load all the way to this call --
 which is exactly what happens here). Looks up a per-mood byte,
-`D_80089EAE[this->moodIndex * 0x10]` (the same 16-byte-row family as
-`D_80089EA6`/`D_80089EAB`/`D_80089EAC`/`D_80089EAF`, already documented in
-`Entity.h`; `D_80089EAE` itself was new -- added to that list, sitting
-between `D_80089EAC` and `D_80089EAF`), shifts it left 11, and if that value
+`gEntityProximityThresholdTable[this->moodIndex * 0x10]` (the same 16-byte-row family as
+`gEntityUnlockKindTable`/`gEntityLinkStageTable`/`gEntityEventVideoTable`/`D_80089EAF`, already documented in
+`Entity.h`; `gEntityProximityThresholdTable` itself was new -- added to that list, sitting
+between `gEntityEventVideoTable` and `D_80089EAF`), shifts it left 11, and if that value
 is less than the slot144 result, returns -1. Otherwise computes
 `slot144_result / (threshold / this->unkB0)` (two chained integer
 divisions, each expanding to the standard div-by-zero/`INT_MIN/-1`
@@ -38,7 +38,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
     } while (0);
     self = this;
     result = this->methods->slot144(this, self->unk94);
-    threshold = D_80089EAE[self->moodIndex * 0x10] << 11;
+    threshold = gEntityProximityThresholdTable[self->moodIndex * 0x10] << 11;
     if (threshold < result) {
         return -1;
     }

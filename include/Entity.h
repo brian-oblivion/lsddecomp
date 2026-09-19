@@ -14,7 +14,7 @@
  * NOT padded out to its full size (New_Entity allocates 0x108 bytes, but
  * nothing here needs the whole layout).
  *
- * The vtable itself is `D_80089AD4` (asm/data/79528.data.s, offsets 0x000..
+ * The vtable itself is `ENTITY_METHODS` (asm/data/79528.data.s, offsets 0x000..
  * 0x180) and it doubles as a legible cross-check: whichever function each
  * slot currently HOLDS is the function that OVERRIDES/OCCUPIES that slot,
  * not the function that CALLS it. Do not confuse the two -- the "called by"
@@ -68,7 +68,7 @@ struct EntityMethods {
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by Entity__Activate, Entity__Deactivate */
     /* +0x64 */ u8 pad64[0x70 - 0x64];
-    /* +0x70 */ void (*slot70)(Entity *self, s32 arg1);   /* called by Entity__InitState as slot70(this, 1), gated on `D_80089EA6[this->moodIndex*0x10]-1` being unsigned-less-than 9 */
+    /* +0x70 */ void (*slot70)(Entity *self, s32 arg1);   /* called by Entity__InitState as slot70(this, 1), gated on `gEntityUnlockKindTable[this->moodIndex*0x10]-1` being unsigned-less-than 9 */
     /* +0x74 */ u8 pad74[0xB8 - 0x74];
     /* +0xB8 */ void (*slotB8)(Entity *self, void *arg1);  /* called by func_8005F800 as slotB8(this, &this->unk94->unk14->x) -- a vector-pointer argument, same shape as Entity__IsNearTarget's still-INCLUDE_ASM arg1 */
     /* +0xBC */ void (*slotBC)(Entity *self, void *arg1);  /* called by func_8005E694 */
@@ -243,10 +243,10 @@ struct Unk70Obj {
 
 /* Default arguments Entity__GetOrCreateUnk100 substitutes when its own `name`/`arg2`
  * parameters are NULL -- both plain 2-word buffers (asm/data/7B3F8.sdata.s),
- * not strings; `D_8008AC14` reads as {0x140, 0xF0} (320, 240, a plausible
- * screen-extent default) and `D_8008AC0C` as {-100, -100}. */
-extern s32 D_8008AC14[2];
-extern s32 D_8008AC0C[2];
+ * not strings; `gEntityDefaultPos` reads as {0x140, 0xF0} (320, 240, a plausible
+ * screen-extent default) and `gEntityDefaultOffset` as {-100, -100}. */
+extern s32 gEntityDefaultPos[2];
+extern s32 gEntityDefaultOffset[2];
 
 /* A 3-word (x, y, z) position, pointed to by `Entity::unk14` (and by
  * `Unk94Obj::unk14`, same convention). +0x1C (y) is now confirmed by a
@@ -355,18 +355,18 @@ extern s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3);
 extern void func_8005DF9C(Entity *this, s32 arg1);
 extern s32 rand(void);
 
-/* The mood-indexed table lookups. `D_80089EA4` is a real struct array (16
+/* The mood-indexed table lookups. `gEntityMoodTable` is a real struct array (16
  * bytes/entry, `this->moodIndex` selects the row) -- Entity__UpdateDetachState reads
  * its +0x3 (signed) and Entity__UpdateLinkState its +0x4 (UNSIGNED) as two DIFFERENT
  * small-enum fields, not the same byte reinterpreted; both also read +0x5
- * (signed) and +0x9 (signed). `D_80089EA6`/`D_80089EAB`/`D_80089EAC` are
+ * (signed) and +0x9 (signed). `gEntityUnlockKindTable`/`gEntityLinkStageTable`/`gEntityEventVideoTable` are
  * SEPARATE global arrays (own base symbols, own `lui`/`addiu`), each also
  * 16-byte/entry and independently `this->moodIndex`-indexed -- despite the
- * base addresses' proximity, they are not sub-fields of the D_80089EA4 row.
+ * base addresses' proximity, they are not sub-fields of the gEntityMoodTable row.
  * Table element types past what's listed here are `s8` (signed byte loads),
  * not `char`, despite `-funsigned-char` making plain `char` unsigned project-
  * wide -- these tables are explicitly `lb`, not `lbu`, in every user seen so
- * far (contrast `linkKind`, `D_80089EA6`, both `lbu`/`lb`-mixed by design,
+ * far (contrast `linkKind`, `gEntityUnlockKindTable`, both `lbu`/`lb`-mixed by design,
  * not by the project's usual char convention). */
 struct EntityMoodRow {
     u8 pad00[0x03];
@@ -381,13 +381,13 @@ struct EntityMoodRow {
     u8 pad0C[0x04];
 };
 
-extern EntityMoodRow D_80089EA4[];
-extern s8 D_80089EA6[];  /* GetUnlockEffect */
-extern s8 D_80089EA7[];  /* read by Entity__AttachUnk4C, own base symbol immediately after D_80089EA6, moodIndex*0x10-indexed like the rest of this family */
-extern s8 D_80089EAB[];  /* GetLinkStage */
-extern s8 D_80089EAC[];  /* GetEventVideo */
-extern s8 D_80089EAE[];  /* read by Entity__GetProximityRatio (slot148), own base symbol immediately before D_80089EAF, moodIndex*0x10-indexed like the rest of this family */
-extern s8 D_80089EAF[];  /* read by Entity__AttachUnk4C, own base symbol immediately after D_80089EAC, moodIndex*0x10-indexed like the rest of this family */
+extern EntityMoodRow gEntityMoodTable[];
+extern s8 gEntityUnlockKindTable[];  /* GetUnlockEffect */
+extern s8 D_80089EA7[];  /* read by Entity__AttachUnk4C, own base symbol immediately after gEntityUnlockKindTable, moodIndex*0x10-indexed like the rest of this family */
+extern s8 gEntityLinkStageTable[];  /* GetLinkStage */
+extern s8 gEntityEventVideoTable[];  /* GetEventVideo */
+extern s8 gEntityProximityThresholdTable[];  /* read by Entity__GetProximityRatio (slot148), own base symbol immediately before D_80089EAF, moodIndex*0x10-indexed like the rest of this family */
+extern s8 D_80089EAF[];  /* read by Entity__AttachUnk4C, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
 
 void *Entity__GetMoodEffect(Entity *this);
 s32 Entity__GetEventVideo(Entity *this);
@@ -397,7 +397,7 @@ s32 Entity__GetLinkStage(Entity *this);
 /* The vtable data slot Get_vtable_Entity returns the address of. Still a raw
  * asm data blob (asm/data/79528.data.s, offsets 0x000..0x180) -- only an
  * extern of the right TYPE is needed here, the bytes stay splat-generated. */
-extern EntityMethods D_80089AD4;
+extern EntityMethods ENTITY_METHODS;
 
 /* Still uncarved (code_d294.s). func_8005DE18 calls it with this->unk94 as
  * the second argument, a literal 1 as the third, and 0 for both the fourth
@@ -416,8 +416,8 @@ extern s32 func_8005E02C(Entity *this, s32 arg1);
 /* Second argument threaded through the moodIndex-selected event-dispatch
  * handlers (func_8005ED10, func_8005E480, func_8005E7A8, and the sibling
  * handlers this unit hasn't reached yet -- all reachable as {handler,
- * data0, data1, data2} 16-byte rows of the D_80089EB0 table in
- * asm/data/79528.data.s, immediately after D_80089EAC). Not an Entity --
+ * data0, data1, data2} 16-byte rows of the gEntityMoodHandlerTable table in
+ * asm/data/79528.data.s, immediately after gEntityEventVideoTable). Not an Entity --
  * these handlers only ever read a gate flag out of it and write result
  * codes back in. Real name/size unknown; only the offsets touched so far
  * are given. */

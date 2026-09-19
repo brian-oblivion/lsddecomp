@@ -35,7 +35,7 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
     s32 kind;
 
     local = *(EntityVec3 *)pos;
-    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
     if ((u32)((kind + 9) & 0xFF) < 9) {
         local.y += (s8)kind * 1024;
     }

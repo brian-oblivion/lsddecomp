@@ -46,10 +46,10 @@ already documented (called by `Entity__UpdateDetachState`/`func_8005DEE0`
 respectively) -- this is just their second known caller.
 
 `D_80089EA7` and `D_80089EAF` are two more single-byte, `moodIndex*0x10`-
-strided tables in the same family as the already-declared `D_80089EA6`
-("GetUnlockEffect"), `D_80089EAB` ("GetLinkStage"), `D_80089EAC`
+strided tables in the same family as the already-declared `gEntityUnlockKindTable`
+("GetUnlockEffect"), `gEntityLinkStageTable` ("GetLinkStage"), `gEntityEventVideoTable`
 ("GetEventVideo") -- confirmed via `asm/data/79528.data.s` as their own
-`dlabel`s (own relocations), not sub-fields of `D_80089EA4`. Declared
+`dlabel`s (own relocations), not sub-fields of `gEntityMoodTable`. Declared
 `extern s8 D_80089EA7[]`/`extern s8 D_80089EAF[]` in `Entity.h` next to
 their siblings, matching the `lb` (signed) instruction at both sites.
 
