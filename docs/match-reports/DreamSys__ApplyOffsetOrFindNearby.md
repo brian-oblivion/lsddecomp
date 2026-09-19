@@ -37,6 +37,15 @@ The `self->unk_0x28 = NULL` store is scheduled by retail into the `jalr`'s
 delay slot (executes unconditionally, right as the call is issued) --
 reproduced by plain statement order, no barrier needed.
 
+## Naming
+
+**`DreamSys__ApplyOffsetOrFindNearby` -- tier B.** Mechanics fully
+confirmed: clears `self->unk_0x28`, invokes the given callback, and --
+only if the callback left `unk_0x28` NULL (i.e. did not attach to a
+link) -- falls back to `DreamSys__FindNearbyLink`'s grid search. The name
+states exactly this two-step fallback without asserting why a caller
+would want either outcome.
+
 ## Verify
 
 ```

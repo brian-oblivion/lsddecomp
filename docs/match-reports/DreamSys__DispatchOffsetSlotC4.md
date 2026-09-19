@@ -23,6 +23,17 @@ of this unit/runner's range -- as a raw function-pointer VALUE, and
 forwards it plus its own two arguments to `DreamSys__ApplyOffsetOrFindNearby` (this unit's own
 helper, see its report), which is what actually invokes it.
 
+## Naming
+
+**`DreamSys__DispatchOffsetSlotC4` -- tier B.** Confirmed mechanics: reads
+(does not call) the vtable's `+0x0C4` slot (`BaseObjO__func_5748c`, a
+sibling of this unit's own offset-slot family defined in a DIFFERENT
+unit, `class_3bb8c_o.c`, and out of this runner's scope to rename) as a
+raw function pointer, and forwards it to
+`DreamSys__ApplyOffsetOrFindNearby`. Named by the SLOT it reads (`C4`,
+objective) rather than by inventing a name for `BaseObjO__func_5748c`'s
+own purpose, which belongs to another unit.
+
 ## Verify
 
 ```

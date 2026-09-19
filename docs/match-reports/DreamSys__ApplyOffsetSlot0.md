@@ -39,6 +39,15 @@ splat's single-word `dlabel D_8008ABA4` (`asm/data/7B008.sdata.s`) is really
 declared locally in `src/class_3bb8c_p.c` rather than added to a shared
 header.
 
+## Naming
+
+**`DreamSys__ApplyOffsetSlot0` -- tier B.** Mechanics fully confirmed
+(forwards to `DreamSys__ApplyOffsetSlotAndNotify` with a fixed pointer
+into element 0 of the local `D_8008ABA4[2]` array and the constant `7`);
+purpose of "why element 0, why 7" is not established. `Slot0` names the
+array element this wrapper owns -- an objective, code-confirmed fact --
+rather than guessing which axis or game concept it represents.
+
 ## Verify
 
 ```

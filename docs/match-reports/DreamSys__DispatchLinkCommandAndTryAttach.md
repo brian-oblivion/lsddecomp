@@ -18,7 +18,7 @@ void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 c
 
 ```c
 void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->slot9C(self, arg1, count);
+    GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
     if (count < 9) {
         if (count >= 5) {
             self->vt->slotA0(self, arg1, count);
@@ -33,7 +33,7 @@ tables:
   `GetClass6B5CCMethods()`'s return -- the shared base-class table at
   `D_8006B5CC` (already established with the project's "per-call-site
   signature" precedent in `include/code_d294.h`) -- at its `+0x09C` slot.
-  This unit's own local view (`DreamSysBasicSlots`, declared in this file)
+  This unit's own local view (`Class6B5CCBaseTable`, declared in this file)
   types only that one slot.
 - The second, conditional on `5 <= count < 9`, dispatches through
   `self`'s OWN vtable (`self->vt->slotA0`, `include/DreamSys.h`) at
@@ -62,6 +62,17 @@ word. Reading the disassembly closely: the second call's `lw v0,0(a0)`
 loads from `a0` == `s1` == `self` (not from `GetClass6B5CCMethods()`'s return,
 which was never re-fetched) -- i.e. it is `self->vt->slotA0`, a genuinely
 different dispatch mechanism from the first call, not a repeat of it.
+
+## Naming
+
+**`DreamSys__DispatchLinkCommandAndTryAttach` -- tier B.** Mechanics fully
+confirmed (33/33): unconditionally forwards through the shared
+`Class6B5CCBaseTable::dispatchLinkCommand` slot, then -- only for
+`5 <= count < 9` -- ALSO dispatches through the object's own inherited
+`vt->slotA0` (resolves to `Class6B5CC__TryAttachNearby` via
+`tools/classtable.py D_8006B5CC`, confirmed this round). The name states
+both calls and their conditional relationship; why `[5,9)` specifically
+gates the attach attempt is not established.
 
 ## Verify
 

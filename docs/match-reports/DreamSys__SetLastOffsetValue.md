@@ -10,11 +10,18 @@ earlier commit this round).
 
 ```c
 void DreamSys__SetLastOffsetValue(DreamSys *self, s16 val) {
-    self->field_0x48 = val;
+    self->lastOffsetValue = val;
 }
 ```
 
 A single `sh` store, splat-matched-length two-word leaf.
+
+## Naming
+
+**`DreamSys__SetLastOffsetValue` -- tier A.** A pure setter (`self->lastOffsetValue = val`) --
+mechanics ARE the purpose. Named after the field it sets
+(`DreamSys::lastOffsetValue`, this round's naming pass -- see that
+field's own comment in `include/DreamSys.h`).
 
 ## Verify
 

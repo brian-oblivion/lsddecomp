@@ -327,8 +327,12 @@ typedef struct DreamSysUnk4CMethods {
 	   `(this->unk_0x4C, arg1)` -- typed here with the fuller shape; the
 	   shorter call simply leaves the trailing two as whatever the
 	   registers already held. Return value is stored into a
-	   `GridArrElem *` array slot (round 2026-09-04). */
-	void *(*slot0x118)(void *self, s32 arg1, s32 arg2, void *arg3);
+	   `GridArrElem *` array slot (round 2026-09-04). Named
+	   `getGridArrElemAt`: both calls pass an adjacent grid index
+	   (`pos = s3 +/- 1` in DreamSys__BuildLinkQueries's own preserved
+	   derivation) and get back the `GridArrElem *` for that index --
+	   accessed only from `class_3bb8c_p.c` (round 57 naming pass). */
+	void *(*getGridArrElemAt)(void *self, s32 arg1, s32 arg2, void *arg3);
 	/* Called by func_80058B08's `arg1 == -2` path as (this->unk_0x4C,
 	   (u8 *)this->unk_0x14 + 0x18); the result's `unk_0x4` is chased and its
 	   `unk_0x2C` compared against the literal 2 (round 2026-09-02). */

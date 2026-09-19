@@ -10,13 +10,21 @@ earlier commit this round).
 
 ```c
 void DreamSys__SetPendingExtra(DreamSys *self, void *extra) {
-    self->unk_0x54 = extra;
+    self->pendingExtra = extra;
 }
 ```
 
-A single `sw` store. Newly names `DreamSys::unk_0x54` (splitting the
+A single `sw` store. Newly names `DreamSys::pendingExtra` (splitting the
 existing `unknown_values_0x50[8]` array, additive/size-preserving, into
-`unknown_values_0x50[4]` + this new `void *unk_0x54`).
+`unknown_values_0x50[4]` + this new `void *pendingExtra`).
+
+## Naming
+
+**`DreamSys__SetPendingExtra` -- tier A.** A pure setter (`self->pendingExtra = extra`) --
+mechanics ARE the purpose. Named after the field it sets
+(`DreamSys::pendingExtra`, this round's naming pass); no reader is
+confirmed yet, so the field itself stays tier B/C in intent even though
+this setter's own mechanics are unambiguous.
 
 ## Verify
 

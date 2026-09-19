@@ -23,7 +23,7 @@ void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 c
     for (i = 0; i < count;) {
         GridArrElem *elem = *arr2;
         i++;
-        if (elem->unk4->unk2C != 0) {
+        if (elem->info->enabled != 0) {
             void *result = DreamSys__ScanGridWindow(self, arg1, arg2, arr1, elem);
             if (result != NULL) {
                 return result;
@@ -38,7 +38,7 @@ void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 c
 
 Walks `count` entries of two parallel arrays -- `arr1` (`GridQuery[]`,
 stride `0xC`) and `arr2` (`GridArrElem *[]`, stride 4) -- skipping any
-entry whose `GridArrElem->unk4->unk2C` flag is zero, calling
+entry whose `GridArrElem->info->enabled` flag is zero, calling
 `DreamSys__ScanGridWindow` (this unit's own, see its report) on the rest, and
 returning the first non-NULL result.
 
@@ -68,6 +68,15 @@ Three loop shapes were tried:
   statement of the body): exact match. Keeps the top-tested `for` shape
   (so `count <= 0` skips the whole loop via a single `blez`, matching
   retail) while placing `i++` where retail's scheduler put it.
+
+## Naming
+
+**`DreamSys__ScanLinkCandidates` -- tier B.** Mechanics fully confirmed
+(49/49): walks `count` paired `GridQuery`/`GridArrElem*` entries,
+skipping any whose `info->enabled` flag is zero, testing the rest via
+`DreamSys__ScanGridWindow`, returning the first non-NULL result. Named
+for exactly this "scan a set of link candidates" mechanic, which is
+`DreamSys__BuildLinkQueries`'s own output.
 
 ## Verify
 

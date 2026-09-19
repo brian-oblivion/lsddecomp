@@ -19,14 +19,22 @@ void DreamSys__DispatchLinkCommand(DreamSys *self, void *arg1, s32 count);
 
 ```c
 void DreamSys__DispatchLinkCommand(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->slot9C(self, arg1, count);
+    GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
 }
 ```
 
 Sibling of `DreamSys__DispatchLinkCommandAndTryAttach` (see that report for `GetClass6B5CCMethods()` and this
-unit's local `DreamSysBasicSlots` view): same single unconditional call
+unit's local `Class6B5CCBaseTable` view): same single unconditional call
 through the shared base table's `+0x09C` slot, but no second conditional
 dispatch.
+
+## Naming
+
+**`DreamSys__DispatchLinkCommand` -- tier A.** A pure single-call forward
+to `Class6B5CCBaseTable::dispatchLinkCommand` with no other logic --
+mechanics ARE the purpose, matching the "pure leaf" carve-out. Sibling of
+`DreamSys__DispatchLinkCommandAndTryAttach` (this unit) without its
+conditional second dispatch.
 
 ## Verify
 

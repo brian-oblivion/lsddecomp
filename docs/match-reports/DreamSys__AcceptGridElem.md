@@ -43,6 +43,17 @@ retail's, which falls through to the shared `move v0,zero` from the INNER
 check only). Confirmed by direct comparison: combined form gives 6/15
 words with the size drift warning; nested form gives 15/15 exactly.
 
+## Naming
+
+**`DreamSys__AcceptGridElem` -- tier A.** A pure predicate/leaf: returns
+`arg0` unchanged if it is non-NULL AND the global gate `func_8001E7BC()`
+is non-zero, else `NULL`. Mechanics ARE the purpose here (an accept/reject
+test), matching CLAUDE.md's tier-A carve-out for "a pure leaf whose
+mechanics ARE its purpose (a getter, a clamp, a list push)". `arg1`/`arg2`
+are read by neither this function's body nor this name -- they exist only
+to match the caller's calling convention (documented in the report body
+above).
+
 ## Verify
 
 ```

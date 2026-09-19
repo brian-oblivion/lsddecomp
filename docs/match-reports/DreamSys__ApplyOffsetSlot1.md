@@ -23,6 +23,12 @@ Sibling of `DreamSys__ApplyOffsetSlot0` (see that report for the shared helper a
 `D_8008ABA4[2]` array discovery): same shape, writes element 1 instead of
 element 0, and passes `8` instead of `7` as the trailing constant.
 
+## Naming
+
+**`DreamSys__ApplyOffsetSlot1` -- tier B.** Sibling of
+`DreamSys__ApplyOffsetSlot0` (see that report's Naming section): same
+reasoning, element 1 instead of 0.
+
 ## Verify
 
 ```

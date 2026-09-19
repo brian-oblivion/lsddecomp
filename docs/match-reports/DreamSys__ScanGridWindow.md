@@ -24,9 +24,9 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
     s32 row, col;
     GridElem **bucket;
 
-    bucket = (GridElem **) ((u8 *) source->unk10 + query->unk2 * 0x50 + query->unk0 * 4);
-    for (row = 0; row < query->unk8; row++) {
-        for (col = 0; col < query->unk4; col++) {
+    bucket = (GridElem **) ((u8 *) source->buckets + query->startRow * 0x50 + query->startCol * 4);
+    for (row = 0; row < query->numRows; row++) {
+        for (col = 0; col < query->numCols; col++) {
             GridElem *node;
 
             if (DreamSys__AcceptGridElem(*bucket, arg1, arg2) != NULL) {
@@ -39,15 +39,15 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
             }
             bucket++;
         }
-        bucket = (GridElem **) ((u8 *) bucket - (query->unk4 * 4 + 0x50));
+        bucket = (GridElem **) ((u8 *) bucket - (query->numCols * 4 + 0x50));
     }
     return NULL;
 }
 ```
 
 Scans a rectangular window of a grid of bucket lists rooted at
-`source->unk_0x10`: `query->unk8` rows by `query->unk4` columns, starting
-at row `query->unk2`, column `query->unk0` (row stride `0x50` bytes = 20
+`source->buckets`: `query->numRows` rows by `query->numCols` columns, starting
+at row `query->startRow`, column `query->startCol` (row stride `0x50` bytes = 20
 bucket-head pointers; column stride 4 bytes, one pointer). For each
 bucket, tries `DreamSys__AcceptGridElem` (already matched, this unit) against the
 head first, then walks the linked chain (`GridElem::next`, at `+0x38` --
@@ -71,6 +71,15 @@ again to compute `->next`) rather than caching it in a register. Same
 a plain pointer dereference rather than a `this->field` read. Rewriting
 without the `head` local -- `*bucket` written out at each of the three
 use sites -- matched exactly.
+
+## Naming
+
+**`DreamSys__ScanGridWindow` -- tier B.** Mechanics fully confirmed
+(79/79): walks a `numRows` x `numCols` rectangular window of a bucketed
+grid of `GridElem` linked lists, rooted at `source->buckets`, starting at
+`(startRow, startCol)`, testing each element via `DreamSys__AcceptGridElem`
+and returning the first accepted one. "Grid window" names the
+`GridQuery`-described rectangle this function actually iterates.
 
 ## Verify
 

@@ -23,6 +23,14 @@ slot instead of `+0x0C4` -- which is `DreamSys__ApplyOffsetSlot0`, THIS unit's o
 neighbouring function (a self-referential vtable read: the slot's value is
 the address of another function this same unit implements).
 
+## Naming
+
+**`DreamSys__DispatchOffsetSlot0` -- tier B.** Sibling of
+`DreamSys__DispatchOffsetSlotC4` (see that report): same shape, but reads
+the vtable's `+0x0C8` slot -- `DreamSys__ApplyOffsetSlot0`, THIS unit's
+own neighbour (a self-referential vtable read). Named consistently with
+that function's own `Slot0` naming.
+
 ## Verify
 
 ```

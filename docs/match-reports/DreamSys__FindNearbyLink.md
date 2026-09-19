@@ -29,7 +29,7 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
     if (self->unk_0x4C != NULL) {
         void *pos = (u8 *) self->unk_0x14 + 0x18;
 
-        if (self->unk_0x4C->methods->slot0x110(self->unk_0x4C, &sp18, pos) == 0) {
+        if (self->unk_0x4C->methods->queryLinkAtPos(self->unk_0x4C, &sp18, pos) == 0) {
             s32 count = DreamSys__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
             void *result = DreamSys__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
@@ -50,7 +50,7 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
 Fetches an output position (`self->unk_0x14 + 0x18`, raw byte offset --
 `unk_0x14` is `DreamSysUnk14 *`, already established in
 `include/DreamSys.h`) via `self->unk_0x4C`'s own vtable slot `+0x110`
-(`DreamSysUnk4CMethods::slot0x110`, newly named this round, splitting the
+(`DreamSysUnk4CMethods::queryLinkAtPos`, newly named this round, splitting the
 existing `pad_0x110[0x11C-0x110]`), then -- only if that call signals
 success (`== 0`) -- builds a query (`DreamSys__BuildLinkQueries`, THIS unit's own,
 currently STALLED -- see its report; still linkable and correct as an
@@ -82,13 +82,26 @@ both are declared as opaque `u8` padding.
 
 - `LinkQueryBuf` grown from `0x28` to `0x30` bytes (this file's own
   local type, first introduced in `DreamSys__BuildLinkQueries`'s stalled report).
-- `include/DreamSys.h`: `DreamSysUnk4CMethods::slot0x110` (already added
-  alongside `slot0x118` in the previous commit, for this function).
+- `include/DreamSys.h`: `DreamSysUnk4CMethods::queryLinkAtPos` (already added
+  alongside `getGridArrElemAt` in the previous commit, for this function).
 - The forward declaration `s32 DreamSys__FindNearbyLink(DreamSys *self);` (added
   earlier for `DreamSys__ApplyOffsetOrFindNearby`'s call) had to be updated from a stale
   `void` return type once this function's real signature was known --
   C89 caught the mismatch as a hard `conflicting types` error, not a
   silent problem.
+
+## Naming
+
+**`DreamSys__FindNearbyLink` -- tier B.** Mechanics fully confirmed
+(71/71 byte-exact): fetches a `LinkQueryBuf` via
+`self->unk_0x4C->methods->queryLinkAtPos` for a fixed position
+(`self->unk_0x14 + 0x18`), builds and scans grid candidates
+(`DreamSys__BuildLinkQueries` + `DreamSys__ScanLinkCandidates`), stores
+the result into `self->unk_0x28`, and on success applies the found
+position (`BaseObjO__AddVec14`) and tags the outcome via `func_80058B08`
+(`-1` success / `-2` failure). "Find a nearby link" is squarely what the
+grid search does; the surrounding game purpose (why search for one here)
+is not established, which keeps this tier B rather than A.
 
 ## Verify
 
