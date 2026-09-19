@@ -1,3 +1,41 @@
+/* code_2cc8c_c -- third slice of the 0x2CC8C block (0x8003DFA0..0x8003E874,
+ * 19 functions plus one stall), continuing directly from code_2cc8c_b.
+ *
+ * The first 10 functions (through Obj86B60__OnTag1Notify) are the tail of
+ * `Obj86B60` (base vtable D_80086B60, override D_80087AAC -- see
+ * code_2cc8c.h's own header comment and code_2cc8c.c's unit comment for the
+ * class-framework shape and the carve provenance). They cover the class's
+ * two-argument constructor pair (`Obj86B60__Init`/`Obj86B60__Deinit`, which
+ * install and later release up to three externally- or default-supplied
+ * helper objects), its `OnNotify` override (dispatches on an incoming
+ * `EventArg`'s dynamic class tag to `onTag1Notify`/an external func_8003C48C
+ * STALL/func_8003C51C), and its `NotifyParents` override (`Obj86B60__
+ * NotifyParents`, still a register-identity STALL -- see its match report)
+ * with the two small helpers it forwards to on mode 2/3.
+ *
+ * The remaining functions are `Unk18Obj`'s own constructor chain (`New_
+ * Unk18Obj`, `Unk18Obj__Unk18Obj`, `Unk18Obj__Finalize`) and its `addChild`/
+ * `removeChild` overrides (`Unk18Obj__AddChild`/`Unk18Obj__RemoveChild`,
+ * which cache a child's pointer by its dynamic class tag) -- `Unk18Obj` is
+ * SHARED with code_2cc8c_d.c, which carves the rest of its own vtable slots;
+ * see include/code_2cc8c.h's own struct comment for what evidence is
+ * exclusive to which unit. `Get_vtable_TaskCore`/`GetDefaultStreamTaskInitData`/
+ * `Get_vtable_IntermediateBase`/`IntermediateBase__IntermediateBase` are
+ * plain accessors/ctor for tables SHARED far more widely (code_2c054.c,
+ * class_39e08.c, class_3bb8c_t.c) that simply happen to live in this
+ * unit's address range.
+ *
+ * Round 55 (runner alpha): full track-3 naming pass. Every definition named;
+ * see each function's own match report for the `## Naming` evidence.
+ * Obj86B60/Obj86B60Methods/Unk18Obj/Unk18ObjMethods/GenericObjMethods are
+ * SHARED with one or more of code_2cc8c.c, code_2cc8c_b.c and
+ * code_2cc8c_d.c (same classes, split by address range across sibling
+ * units), so most field/slot renames on those particular structs are
+ * PROPOSALS in this round's report, not direct edits -- only the
+ * fields/slots this unit's own functions touch AND no sibling reaches were
+ * renamed here.
+ */
+
 #include "common.h"
 #include "code_2cc8c.h"
 
