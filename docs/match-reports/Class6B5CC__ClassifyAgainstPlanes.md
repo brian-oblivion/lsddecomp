@@ -280,3 +280,127 @@ beyond "the same planes `Class6B5CC__CheckBoundsOverlap` reads." Held
 back from an actual rename because this symbol is referenced (in a
 comment) from `src/code_d294_c.c:414` -- a different unit. Posted to
 the broadcast.
+
+## Round 55 (charlie): REVISITED (round 55) -- register-identity framing
+## incomplete; the real Part-1 residue is a different LOOP SHAPE, not just
+## `self`'s register; one structural rewrite tried, net negative
+
+Assigned as a track-1 REVISIT job (FINISHING-PLAN.md's revisit rule): this
+unit passed track 3 naming last round. Rebuilt the round-46 preserved body
+live first: reproduces exactly, `build exit=2`, no compile errors,
+`funcdiff.py` confirms **29/199**, no drift, isolated (only this function's
+own `#if 0` wrapper removed; every sibling confirmed still wrapped via
+`grep -c '^INCLUDE_ASM' src/code_d294_b.c`).
+
+**The round-46 title's own framing -- "register identity: `self` lands in
+$s4 here, $s5 in retail" -- undersells the residue.** Reading
+`asm/nonmatchings/code_d294_b/Class6B5CC__ClassifyAgainstPlanes.s` against
+the built object's own disassembly line by line (not just the funcdiff word
+count) for the FIRST loop (the 2-row box-midpoint average, this report's own
+"Part 1") shows retail does not index through `mid[row].x/.y/.z` at all.
+Instead it walks the `mid` array with TWO separate raw pointers advancing by
+0x18 (one row) per iteration -- an X-only pointer (`$a3`, writes `mid[row].x`
+then `+=6`) and a combined Y/Z pointer (`$a2`, writes `mid[row].y` at `-2`
+then `mid[row].z` at `0`, then `+=6`) -- fed by FOUR separate read pointers
+(`$s1`/`$t0` for the X field of lo/hi, `$a0`/`$a1` for the Y and Z fields of
+lo/hi via the same `-2`/`0` offset trick), all four read pointers ALSO
+advancing by 0x18 per iteration. This is a completely different induction
+variable decomposition than the indexed `for (row = 0; row < 2; row++)
+{ mid[row].x = ...; mid[row].y = ...; mid[row].z = ...; }` this report's own
+preserved body writes, even though both compute the identical result.
+
+**Confirmed this is not an artifact of `self`'s placement by testing it
+directly:** rewrote Part 1 with the matching pointer decomposition (four
+read pointers `xLo`/`xHi`/`yzLo`/`yzHi`, two write pointers `xDst`/`yzDst`,
+a `do { } while` loop bounded by a raw pointer comparison against `xEnd`,
+mirroring retail's exact read/write pattern including the `-2`/`0` offset
+pairing for Y/Z). Built clean, but this made things WORSE, not better:
+`nm -S` gives `0x328` = 202 words (+3 over retail's 199), `funcdiff.py`
+score dropped to **16/199** with the out-of-range byte count blowing out to
+345316 bytes (the whole rest of the image shifted). Reading the resulting
+disassembly showed the loop BODY itself came out close to retail's shape
+(mostly register renames), but the surrounding call-argument setup picked up
+two EXTRA spill/reload instructions (`lw t3`/`addiu t2` in place of a single
+`lw t2`) that retail's version doesn't have, and outFlag's own stack store
+moved earlier -- i.e. matching Part 1's internals in isolation perturbed
+something in the PROLOGUE/argument-marshalling area enough to cost more than
+it saved. Reverted immediately; confirmed byte-identical to the round-46
+preserved body afterward.
+
+**This is a genuine, verified negative, not a null result:** the residue
+here is not simply "get `self` into the right register" -- it is a
+whole-function register-pressure interaction where Part 1's own induction
+variables (four read pointers plus two write pointers, all candidates for
+callee-saved registers even though the loop makes no calls) compete for the
+SAME register pool as `self`, the loop counters `i`/`j`/`k`/`m`, and every
+other long-lived value in the ~150 lines of code that follow. Reproducing
+Part 1's own instruction sequence exactly is necessary but not sufficient,
+and doing it in isolation (without also getting the REST of the function's
+register pressure profile to match) actively regressed the score. This
+matches the class CLAUDE.md's HARD RULE 6 discussion and
+DECOMPILATION_LEARNINGS 3d describe as "too few/too many other values
+compete for saved registers ahead of X in program order" -- except here the
+competing values are FOUR pointers from a loop that never even reaches a
+function call, which the original round-46 framing (a single self-vs-tag-
+style swap) did not anticipate.
+
+**Permuter, Gate 3 checks run (PARALLEL-RUNS 3.5), first-ever for this
+function:** scaffold built clean (`tools/setup-permuter.sh`, seed = the
+round-46 preserved body verbatim). `--debug --stack-diffs`: base score
+**3056** (136 stack-difference points, 60 register-difference points, 7
+reorderings, **11 insertions, 11 deletions**) -- unlike
+`Class6B5CC__NotifyTaggedParents`'s clean 0/0 insertion/deletion signature
+(a pure register-shuffle wall), this scaffold shows REAL structural
+insertions/deletions, consistent with the Part-1-loop-shape finding above:
+there is genuine room for a source-level fix, not just a register swap.
+This satisfies Gate 3 check 2 (cost) and check 1 (compiles and scores); check
+3 (scaffold/real-build signature agreement) holds by construction since the
+scaffold was seeded from the exact body just rebuilt and confirmed 29/199 in
+the real tree with no drift.
+
+Time budget for this round's three assigned functions did not extend to
+running the actual bounded search this round (the second `TryAttachNearby`
+search consumed the remaining window) -- the scaffold is left in place
+(`permuter-work/Class6B5CC__ClassifyAgainstPlanes/`, gitignored) for whoever
+picks this up next, with the Gate 3 checks already passed and recorded here
+so the next attempt does not have to re-derive them.
+
+**Explicit answer to the revisit's own question: the round-54 naming gave NO
+new shape here either**, for the same reason as `NotifyTaggedParents` --
+this function's own symbols (`func_8001F8B8`, `D_8008A838`,
+`self->unk2C`/`unk20`, `ClipSegmentToBox`, `func_8001F50C`,
+`func_8001F3A4`) were untouched by round 54's `Class6B5CCMethods` slot
+renames. What DID move the investigation forward was reading the
+disassembly's own pointer arithmetic directly rather than trusting the
+round-46 title's "self register identity" summary -- the real structural
+finding here came from that re-read, not from anything the revisit's
+premise (naming) actually supplied.
+
+REVISITED (round 55): confirmed unchanged at 29/199 as the filed score;
+one structural rewrite of Part 1 tried and reverted as a verified negative
+(worse, 16/199, larger drift); Gate 3 permuter checks run and passed
+(agreement confirmed, 11/11 insertions/deletions -- real structural room,
+unlike a pure register wall) but the bounded search itself was not run this
+round for lack of remaining time budget. Restored to `INCLUDE_ASM`,
+`git diff --stat src/code_d294_b.c` confirmed clean after the check.
+
+### Proposed learning (round 55)
+
+**A register-identity title can undersell a residue that is actually a
+different LOOP INDUCTION VARIABLE DECOMPOSITION -- and reproducing the loop
+shape in isolation is not sufficient when the loop's own pointers compete
+for callee-saved registers with everything else in the function, even
+though the loop itself makes no calls.** This is a variant of the
+"whole-function register pressure" class already in DECOMPILATION_LEARNINGS
+3d, but the specific trap here is worth naming: a loop with NO function
+calls inside it can still need its induction variables in callee-saved
+registers (retail's own disassembly proves this -- `$s1`/`$t0`/`$a0`-class
+regs used for pointers that are never live across a call), so "does this
+variable cross a call" is not a reliable filter for "does this variable need
+a saved register" on this pipeline. Before spending a rewrite on matching a
+sub-loop's own instruction sequence, check whether the REST of the function
+also needs to be re-shaped simultaneously -- a locally-correct rewrite that
+regresses the whole-function score is a real, verified negative, not a
+sign the loop-shape theory was wrong (the loop body itself DID come out
+closer to retail; the cost showed up in the surrounding marshalling code
+instead).

@@ -1,6 +1,6 @@
 > Renamed from `func_8001D714` on 2026-09-18 (tools/rename.py). Address 0x8001d714.
 
-# Class6B5CC__TryAttachNearby — STALL (2 words SHORT: built 141/retail 143 per `nm -S`; raw funcdiff word-match is NOT meaningful for this function once the length differs -- see round 41 -- so it is omitted here; first REAL diff, read off `asm-differ`'s realigned output, is at retail vram `0x8001DA18`, a 5-instruction Y-axis-positive-branch tail-merge un-merge; historical title was "47/143" from before round 20's fixes, see that round)
+# Class6B5CC__TryAttachNearby — STALL (round 55: length EXACT, 143/143 per `nm -S`, up from 141/143; raw funcdiff word-match 140/143; first real diff at file offset 0xE098 / vram 0x8001D898, a pure stack-slot-address swap between `buf54` and `count`'s own address-taken slot, zero other difference anywhere in the function; historical titles "47/143" (pre round-20) and "141/143, 2 short" (rounds 20-46) are superseded by this round's length fix)
 
 Unit: `code_d294_b`. Round 13, runner delta. Best score: 47/143 words
 in-range, but a genuine size deficit remains (compiled body ~52 bytes/13
@@ -628,3 +628,290 @@ replace of e.g. `slotA4` would corrupt every OTHER class's own
 identically-named, unrelated `slotA4` field (measured: `class_3bb8c_f.c`,
 `code_2cc8c_d.c`, `class_3bb8c_i.c`/`_j.c`/`_l.c` all have their own,
 different `slotA4`).
+
+## Round 55 (charlie): REVISITED (round 55) -- LENGTH closed exactly
+## (141 -> 143/143), 2-word stack-layout residue remains, from 46/143 down
+## to 3/143 raw mismatch
+
+Assigned as a track-1 REVISIT job (FINISHING-PLAN.md's revisit rule): this
+unit passed track 3 naming last round. Rebuilt the round-20 preserved body
+(141/143, `nm -S` confirmed `0x234`) live first, per this round's "build any
+inherited body before trusting its score" discipline -- reproduces exactly,
+no drift.
+
+**The round-54 renaming DID reach this function** (unlike its two siblings
+this round) -- the preserved body already called through
+`composeAndApplyRotation`/`checkBoundsOverlap`/`classifyAgainstPlanes`
+rather than `slotA4`/`slotA8`/`slotAC`, since those are the exact renames
+round 54 applied. But the rename itself is a pure accessor-name change with
+no type or offset difference, so it gave no NEW shape on its own -- the real
+progress this round came from re-reading `tools/asm-differ/diff.py`'s
+realigned output fresh rather than from anything the naming pass supplied.
+
+### Lever 1: the plain goto-CFG form, applied to ALL THREE axes, closes the
+### length exactly
+
+Round 41/46 had already localized the residue to ONE 5-instruction block:
+retail's Y-axis POSITIVE branch ends in its own separate
+`slti`/`beqz`/`nop`/`j`/`nop`, un-merged from the negative branch's tail,
+while every attempt through round 46 only tried the `count = expr; if
+(count) return;` intermediate-assignment lever on THAT one branch (always
+overshooting: 146 or 147 words against a target of 143).
+
+Re-read the disassembly for the X-axis block (which the round-20 lever
+`count=expr;if(count)` DOES already close, at the cost of 2 extra words for
+an `xori`+`sw` pair the lever introduces) and noticed retail's X-axis
+positive branch has the IDENTICAL shape to the still-broken Y-axis: `bltz ->
+negative branch; positive path falls through to its own slti+beqz(fail
+return)+j(skip negative, success)`. The round-20/41/46 lever fixes X and Z's
+NEGATIVE branch via an intermediate assignment (which is a different,
+more expensive mechanism than what retail's own X/Z NEGATIVE branches
+actually need), but had never been tried as a **plain goto rewrite mirroring
+retail's actual jump graph on all three axes uniformly**:
+
+```c
+if (diffRaw.x < 0) {
+    goto x_neg;
+}
+if (diffRaw.x < 0x4001) {
+    goto x_done;
+}
+return;
+x_neg:
+    abs = ~diffRaw.x + 1;
+    if (abs >= 0x4001) {
+        return;
+    }
+x_done:
+    /* ...same shape repeated for y_neg/y_done, z_neg/z_done... */
+```
+
+Applied to Y ALONE first (isolated test, keeping X/Z on the old
+`count=expr;if(count)` lever): **bit-identical to retail for the ENTIRE
+Y-axis block**, confirmed via `tools/asm-differ/diff.py` -- no `xori`, no
+spill, exactly retail's `bltz`/`slti`/`beqz`/`j` sequence. This is the first
+time in this function's history that ANY block closed with zero extra
+overhead.
+
+Applying the SAME plain-goto form to X and Z as well (replacing the
+round-20 `count=expr;if(count)` lever entirely, not just adding to it):
+**141 -> 143/143 words, `nm -S` confirms `0x23c` exactly matching retail's
+`0x23c`, zero drift.** The round-13 note that "an explicit `goto`-based
+rewrite of the X-axis check... produced BIT-IDENTICAL compiled output to the
+if/else version" turns out to have been testing the WRONG goto shape (one
+that still routed through an `if/else` with the negative branch computing
+`abs` unconditionally); the plain "if negative goto neg; if in-range goto
+done; return; neg: ...; done:" shape is a different, and here decisive,
+source structure. DECOMPILATION_LEARNINGS' "write the literal jump graph
+with goto" entry is vindicated on THIS residue, three rounds after this
+report's own round-13 section reported it as bit-identical to if/else --
+the discriminator was which of two nearly-identical goto shapes was tried,
+not whether goto helps at all.
+
+### Lever 2: caching the pointer chain closes the last-but-two words
+### (138 -> 140/143), found by permuter
+
+With length exact, the remaining residue (5/143 raw mismatch) was entirely
+stack-offset noise from comparing against retail's addresses at the OLD
+141-word layout; re-scoring after the length fix gave **138/143** with 3
+clean `DIFF` lines, all stack-slot-address class (`addiu a2,sp,0x54` vs
+`sp,0x30`; `sw v0,0x50(sp)` vs `0x80(sp)`; a swapped `lw a3`/`lw v1` order).
+
+Ran Gate 3's three checks (PARALLEL-RUNS 3.5) before spending a search:
+
+1. Scaffold compiles and scores: yes (`tools/setup-permuter.sh`, seed = the
+   143-word goto-CFG body).
+2. `--debug --stack-diffs`: base score **88** (48 stack-difference points, 8
+   register-difference points, **0 insertions, 0 deletions**) -- a pure
+   stack/register penalty, no structural difference, matching the 3-line
+   hand diff exactly.
+3. Scaffold/real-build signature AGREEMENT: the scaffold's penalty
+   breakdown (stack + register only, zero insert/delete) matches the real
+   build's own 3-line diff shape exactly -- AGREE, search is meaningful
+   (not a whole-file artifact, not a scaffold-only signature).
+
+Bounded search (`timeout 900`, `-j 6`, `--stop-on-zero --best-only
+--stack-diffs`): rc=124 (bound fired), 79117 iterations, but **one
+`output-58-1/` candidate WAS produced** (score 58, down from base 88) --
+caching `other->unk30` into a local before the `composeAndApplyRotation`
+call:
+
+```c
+count = other->unk30->unk0;
+{
+    GenericCountList_d294 *countList = other->unk30;
+    self->methods->composeAndApplyRotation(self, &diff, buf54, &countList->unk4, count * 8);
+}
+```
+
+instead of `&other->unk30->unk4` computed inline. Per CLAUDE.md's "a
+permuter score drop is a LEAD, not a RESULT": translated to real source and
+verified against `nm -S` + `funcdiff.py`, not the permuter's own score --
+**138 -> 140/143, length still exactly 143 (`0x23c`), zero drift.** This
+also incidentally fixed the `lw a3`/`lw v1` reordering diff for free (the
+cached pointer changed instruction scheduling enough that the load order
+now matches retail too), leaving only the two stack-slot-address lines.
+
+**Follow-up hand attempts, all negative, all confirmed via real
+`nm -S`/`funcdiff.py`, not permuter score:**
+
+- Seven declaration-order variants (`count`/`diff`/`buf54`/`abs` in every
+  relative order tried across rounds 13/19/20/41/46 plus new ones with
+  `countList` inserted at different points; `countList`'s own scope
+  narrowed to a nested block scoped tightly around its one use) -- **zero
+  effect on the score in every case, still 140/143 byte-identical.**
+  Consistent with this project's standing "C89 declaration order does not
+  affect RTL emission order" finding (already established for this same
+  function in round 13's own table).
+- Caching `buf54`'s own address into a pointer local
+  (`u8 *buf54Ptr = buf54;`, used at the call site) alongside the `countList`
+  cache -- **zero effect, still 140/143.**
+- A second, fresh permuter search (Gate 3 re-run: base score now **58** on
+  the 140-word seed, still 0 insertions/0 deletions, confirmed AGREEMENT
+  with the real build's now-2-line diff), bounded at 400s: **rc=124 (bound
+  fired), 52653 iterations, no candidate ever beat the base score of 58** --
+  confirmed via the raw score log's minimum (58, achieved only by the
+  starting seed re-scoring itself) and the absence of any new `output-*`
+  directory. Clean negative: this specific 2-word residue did not yield to
+  either hand-driven declaration/caching variants or ~132000 combined
+  permuter iterations across both searches this round.
+
+**Remaining residue at 140/143 (or whatever the second search's outcome
+leaves it at): two absolute stack-slot offsets trade places.** Retail puts
+the scalar `count`'s own address-taken slot at the LOWER offset (`sp+0x50`)
+and the `buf54` array at the HIGHER offset (`sp+0x54`, immediately
+following); this build's compiled output puts them in the opposite relative
+order (`buf54` low at `sp+0x30`, `count`'s slot high at `sp+0x80`). Frame
+SIZE is already exactly correct (`0xa0` both sides) and every other
+instruction in the function is now byte-identical -- this is purely a stack
+SLOT ASSIGNMENT decision, unresponsive to every declaration-order and
+caching variant tried. Flagging for whoever picks this up next: the
+discriminator has not been found, but the search space is now extremely
+narrow (2 words, 1 conceptual swap, 0 other differences anywhere in a
+143-word function).
+
+REVISITED (round 55): closed the LENGTH exactly (141 -> 143/143) via a
+plain goto-CFG rewrite applied uniformly to all three axes (a genuinely new
+source shape, not tried in this exact form in rounds 13/19/20/41/46), then
+closed 2 more words via a permuter-found pointer-caching lever (138 ->
+140/143), leaving a 2-word pure stack-slot-swap residue that survived seven
+hand declaration/caching variants plus two bounded permuter searches
+(79117 + 52653 = 131770 combined iterations, neither beating its own base
+score). `INCLUDE_ASM` restored, preserved body updated below to the new
+best, `git diff --stat src/code_d294_b.c` confirmed clean after the check.
+
+### Proposed learning (round 55)
+
+**Two goto rewrites that look like the same lever ("write the literal jump
+graph") can differ in exactly the detail that decides whether the merge is
+prevented.** Round 13 tried a goto form for this same X-axis block and
+reported "bit-identical to if/else" -- correctly, for THAT shape (an
+if/else-equivalent goto that still let the negative branch's `abs`
+computation sit on the positive path's fall-through). The shape that
+actually worked keeps the positive path's `return`-on-failure and
+success-`goto` structurally separate from the negative label, with no
+shared fall-through at all. Before concluding "goto doesn't help here" from
+one attempt, check whether the specific CFG shape written actually differs
+from the if/else the compiler would generate anyway -- read the disassembly
+of the FIRST goto attempt, per this report's own round-19 learning, rather
+than generalizing from a single negative.
+
+**A permuter search that finds a real lever on a near-zero-insertion/
+deletion scaffold is not "just register shuffling"** -- the `countList`
+cache is a genuine, meaningful source change (an aliasing/CSE decision, not
+a register pin), and it closed 2 words that seven hand-driven
+declaration-order variants could not touch. Once a residue is down to a
+handful of words with 0/0 insertions/deletions, a short bounded search is
+cheap (79117 iterations in 900s here) and can still out-perform an
+experienced hand sweep on the specific expression-level change needed.
+
+## Preserved body (round 55 best, 140/143, length exact)
+
+```c
+#if 0
+void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
+    Vec3_d294 *posA;
+    Vec3_d294 *posB;
+    Vec3_d294 diffRaw;
+    Vec3S16_d294 diff;
+    s32 count;
+    s32 abs;
+    u8 buf54[0x4C];
+
+    if (self->unk20 == NULL) {
+        return;
+    }
+    if (!func_8001F3A4(self->unk20)) {
+        return;
+    }
+
+    posA = (other->unkC != NULL) ? (Vec3_d294 *)other->unk14->unk38 : NULL;
+    diffRaw = *posA;
+
+    posB = (self->unkC != NULL) ? (Vec3_d294 *)self->unk14->unk38 : NULL;
+    diffRaw.x = diffRaw.x - posB->x;
+    diffRaw.y = diffRaw.y - posB->y;
+    diffRaw.z = diffRaw.z - posB->z;
+
+    if (diffRaw.x < 0) {
+        goto x_neg;
+    }
+    if (diffRaw.x < 0x4001) {
+        goto x_done;
+    }
+    return;
+x_neg:
+    abs = ~diffRaw.x + 1;
+    if (abs >= 0x4001) {
+        return;
+    }
+x_done:
+    if (diffRaw.y < 0) {
+        goto y_neg;
+    }
+    if (diffRaw.y < 0x4001) {
+        goto y_done;
+    }
+    return;
+y_neg:
+    abs = ~diffRaw.y + 1;
+    if (abs >= 0x4001) {
+        return;
+    }
+y_done:
+    if (diffRaw.z < 0) {
+        goto z_neg;
+    }
+    if (diffRaw.z < 0x4001) {
+        goto z_done;
+    }
+    return;
+z_neg:
+    abs = ~diffRaw.z + 1;
+    if (abs >= 0x4001) {
+        return;
+    }
+z_done:
+
+    diff.x = diffRaw.x;
+    diff.y = diffRaw.y;
+    diff.z = diffRaw.z;
+
+    count = other->unk30->unk0;
+    {
+        GenericCountList_d294 *countList = other->unk30;
+        self->methods->composeAndApplyRotation(self, &diff, buf54, &countList->unk4, count * 8);
+    }
+
+    if (!self->methods->checkBoundsOverlap(self, &count, &diff)) {
+        return;
+    }
+    if (!self->methods->classifyAgainstPlanes(self, other->unk2C, &diff, &count)) {
+        return;
+    }
+
+    self->unk28 = other;
+    other->methods->slot38(other, self, 4);
+}
+#endif
+```
