@@ -145,7 +145,7 @@ void Obj86B60__Deinit(Obj86B60 *self)
     methods->removeChild(self, ((Obj86B60InitArgs *)self->initArgs)->unk4);
     methods->removeChild(self, ((Obj86B60InitArgs *)self->initArgs)->unk0);
     if (((Obj86B60InitArgs *)self->initArgs)->unk10 != obj18) {
-        self->viewport = obj18->methods->slot4(obj18);
+        self->viewport = obj18->methods->release(obj18);
     }
     if ((void *)((Obj86B60InitArgs *)self->initArgs)->unkC != (void *)self->unk14) {
         self->unk14 = (s32)((Unk14Obj *)self->unk14)->methods->release((Unk14Obj *)self->unk14);

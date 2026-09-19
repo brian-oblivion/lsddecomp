@@ -529,11 +529,23 @@ typedef struct Vec3_2cc8c {
 
 struct Unk18ObjMethods {
     u8 pad000[0x004];
-    void *(*slot4)(Unk18Obj *self);            /* +0x004, inherited
+    void *(*release)(Unk18Obj *self);            /* +0x004, inherited
                                                     BasicClass "release"
                                                     (finalize then free);
                                                     OBSERVED: Obj86B60__Deinit
-                                                    (round 13) */
+                                                    (round 13). Renamed from
+                                                    slot4, round 55 --
+                                                    exclusive to this unit:
+                                                    code_2cc8c_d.c never
+                                                    dispatches through this
+                                                    exact slot on a Unk18Obj*
+                                                    (checked: its own
+                                                    `methods->slot4` calls
+                                                    are on unrelated types).
+                                                    Matches the canonical
+                                                    BasicClassMethods name at
+                                                    this offset
+                                                    (include/code_8220.h). */
     void (*ctor)(Unk18Obj *self);              /* +0x008, called by
                                                     New_Unk18Obj with only
                                                     `self` set up */

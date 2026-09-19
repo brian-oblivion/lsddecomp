@@ -111,8 +111,9 @@ first build.
 **Obj86B60__Deinit** (renamed from `func_8003E280`, round 55, runner
 alpha). Tier A: exact mirror of `Obj86B60__Init` -- removes the children
 `Init` added (`removeChild`), then releases (`Unk14ObjMethods::release`/
-`Unk10ObjMethods::release`, both renamed this round, and the shared
-`Unk18ObjMethods::slot4`, proposed as `release`) each of the three helper
+`Unk10ObjMethods::release`, both renamed this round, and
+`Unk18ObjMethods::release` (also renamed this round, exclusive --
+code_2cc8c_d.c never dispatches this exact slot on a Unk18Obj*)) each of the three helper
 objects `Init` may have default-constructed, but ONLY the ones whose
 current value still differs from the caller-supplied `initArgs` field --
 i.e. only the ones this object actually owns. `Obj86B60Methods::deinit`
