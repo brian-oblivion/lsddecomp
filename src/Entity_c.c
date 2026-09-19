@@ -27,7 +27,7 @@ extern u8 D_80089D48[];
 extern u8 D_80089D60[];
 
 void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
-    out->unk10 = this->methods->slot148(this);
+    out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 % 10 == 0) {
         out->unk1C = 0x11;
     }
@@ -35,11 +35,11 @@ void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void func_8005EFF4(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->unkFC == 0 && rand() % 7 == 0) {
+    if (this->moodTimer == 0 && rand() % 7 == 0) {
         this->methods->slot48(this, 1, D_80089E50);
     }
     if ((out->unk4 & 3) == 0) {
-        out->unk10 = this->methods->slot148(this);
+        out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 0x1C;
     }
     this->methods->slotC4(this, -0x64, 0);
@@ -49,7 +49,7 @@ void func_8005F0D8(Entity *this, EntityMoodHandlerArg *out) {
     s32 half;
     s32 rem;
 
-    out->unk10 = this->methods->slot148(this);
+    out->unk10 = this->methods->getProximityRatio(this);
     half = this->unk80 / 2;
     rem = out->unk4 % half;
     if (rem == 0) {
@@ -61,36 +61,36 @@ void func_8005F0D8(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void func_8005F1A8(Entity *this) {
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 }
 
 void func_8005F1D4(Entity *this) {
     s32 arg1;
 
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 
     if (this->unkF4 != 0) {
-        if (this->unkFC >= 0x41) {
-            this->unkFC = 0;
+        if (this->moodTimer >= 0x41) {
+            this->moodTimer = 0;
         }
-        if (this->unkFC >= 7) {
-            this->methods->slotBC(this, D_80089D78);
+        if (this->moodTimer >= 7) {
+            this->methods->addVec14(this, D_80089D78);
             this->methods->slotC4(this, 0xA, 0);
         } else {
-            this->methods->slotBC(this, D_80089D9C);
+            this->methods->addVec14(this, D_80089D9C);
         }
-    } else if (this->unkFC == 0) {
-        this->methods->slotBC(this, D_80089D48);
-    } else if (this->unkFC < 0x41) {
-        this->methods->slotBC(this, D_80089D60);
-    } else if (this->unkFC < 0x47) {
-        this->methods->slotBC(this, D_80089D78);
+    } else if (this->moodTimer == 0) {
+        this->methods->addVec14(this, D_80089D48);
+    } else if (this->moodTimer < 0x41) {
+        this->methods->addVec14(this, D_80089D60);
+    } else if (this->moodTimer < 0x47) {
+        this->methods->addVec14(this, D_80089D78);
         this->methods->slotC4(this, -0x1E, 0);
     } else {
         EntityMethods *methods = this->methods;
 
-        if (this->unkFC < 0x100) {
-            arg1 = -this->unkFC - 0x41;
+        if (this->moodTimer < 0x100) {
+            arg1 = -this->moodTimer - 0x41;
         } else {
             arg1 = 0xFF;
         }
@@ -100,7 +100,7 @@ void func_8005F1D4(Entity *this) {
 
 void func_8005F368(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 15 == 0) {
-        out->unk10 = this->methods->slot148(this);
+        out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 7;
         out->unk20 = -2;
     }
@@ -111,13 +111,13 @@ void func_8005F368(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_8005F454(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
-    if (this->unkFC < 0x64) {
+    if (this->moodTimer < 0x64) {
         if (out->unk4 % 3 == 0) {
             out->unk1C = 0x16;
             out->unk20 = 1;
         }
         this->methods->slotCC(this, -0x40, 0);
-    } else if (this->unkFC < 0x12C) {
+    } else if (this->moodTimer < 0x12C) {
         out->unk1C = 0xC;
         out->unk20 = -1;
         out->unk30 = 0xC;
@@ -142,7 +142,7 @@ void func_8005F544(Entity *this, EntityMoodHandlerArg *out) {
      * whole function. */
     do {
         if (out->unk4 % this->unk80 == 0) {
-            out->unk10 = this->methods->slot148(this);
+            out->unk10 = this->methods->getProximityRatio(this);
             out->unk1C = 0x1A;
             __asm__("");
             v1 = 0x6E;
@@ -153,7 +153,7 @@ void func_8005F544(Entity *this, EntityMoodHandlerArg *out) {
 compare:
     slotD0 = &this->methods->slotD0;
     arg1 = -0x180;
-    if (this->unkFC == v1) {
+    if (this->moodTimer == v1) {
         arg1 = -0x2D00;
     }
     (*slotD0)(this, arg1, 0);
@@ -165,9 +165,9 @@ void func_8005F608(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0x1B;
     }
     this->methods->slotC4(this, -0x80, 0);
-    if (this->unkFC < 0x64) {
+    if (this->moodTimer < 0x64) {
         this->methods->slotCC(this, 0x20, 0);
-    } else if (this->unkFC >= 0x12D) {
+    } else if (this->moodTimer >= 0x12D) {
         this->methods->slotCC(this, -0x20, 0);
     }
 }
@@ -177,8 +177,8 @@ s32 func_8005F6D4(Entity *this) {
 }
 
 void func_8005F708(Entity *this) {
-    if (this->unkFC == 0) {
-        if (this->unk94->methods->slot200(this->unk94) == 7) {
+    if (this->moodTimer == 0) {
+        if (this->target->methods->slot200(this->target) == 7) {
             this->methods->slot48(this, 1, D_80089E74);
             this->methods->slotCC(this, -0x7800, 0);
         }
@@ -191,7 +191,7 @@ void func_8005F708(Entity *this) {
 
 void func_8005F800(Entity *this) {
     if (this->unk44 == 0) {
-        if (this->unk94->methods->slot200(this->unk94) == 1) {
+        if (this->target->methods->slot200(this->target) == 1) {
             this->unk44 = 0xB;
         } else {
             this->unk44 = 0xC;
@@ -202,33 +202,33 @@ void func_8005F800(Entity *this) {
         this->methods->slot48(this, 1, D_80089DF0);
         this->methods->slotCC(this, -0x1E, 0);
     } else {
-        Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
+        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         if (this->unk44 == 0xB) {
             this->methods->slotC4(this, -0x64, 0);
-            if ((u32)(this->unkFC - 0x55) < 0x1E) {
+            if ((u32)(this->moodTimer - 0x55) < 0x1E) {
                 this->methods->slotCC(this, 0x50, 0);
-            } else if (this->unkFC == 0x78) {
+            } else if (this->moodTimer == 0x78) {
                 this->unk44 = 0xD;
             }
         } else if (this->unk44 == 0xD) {
-            this->methods->slotB8(this, &this->unk94->unk14->x);
-            this->methods->slotBC(this, D_80089DB4);
+            this->methods->setVec14(this, &this->target->unk14->x);
+            this->methods->addVec14(this, D_80089DB4);
         }
     }
 }
 
 void func_8005F970(Entity *this, EntityMoodHandlerArg *out) {
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
-    this->unk94->methods->slot130(this->unk94, 1);
+    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+    this->target->methods->slot130(this->target, 1);
     if ((out->unk4 % 10) < 3) {
         out->unk10 = 0;
         out->unk1C = 0xD;
         out->unk30 = 0xD;
         out->unk44 = 0xD;
     }
-    if (this->unkFC == this->unk80) {
+    if (this->moodTimer == this->unk80) {
         this->methods->slot130(this);
-        this->methods->slot30(this, 0xA);
+        this->methods->notifyParents(this, 0xA);
     }
 }
 
@@ -253,18 +253,18 @@ void func_8005FB6C(Entity *this) {
     EntityMethods *methods;
     s32 arg1;
 
-    if ((u32)(this->unkFC - 0x190) < 0xA) {
+    if ((u32)(this->moodTimer - 0x190) < 0xA) {
         this->methods->slot44(this, 0, D_80089C64);
-    } else if ((u32)(this->unkFC - 0x2BC) < 0xA) {
+    } else if ((u32)(this->moodTimer - 0x2BC) < 0xA) {
         this->methods->slot44(this, 0, D_80089C70);
-    } else if ((u32)(this->unkFC - 0x33E) < 0x4) {
+    } else if ((u32)(this->moodTimer - 0x33E) < 0x4) {
         this->methods->slot44(this, 0, D_80089C70);
-    } else if (this->unkFC >= 0x353) {
-        this->methods->slot160(this);
+    } else if (this->moodTimer >= 0x353) {
+        this->methods->deactivate(this);
     }
     methods = this->methods;
     arg1 = -0x200;
-    if (this->unkFC < 0x320) {
+    if (this->moodTimer < 0x320) {
         arg1 = -0x3C;
     }
     methods->slotC4(this, arg1, 1);
@@ -279,10 +279,10 @@ void func_8005FC58(Entity *this) {
     void (**slotC8)(Entity *self, s32 arg1, s32 arg2);
     void (**slotC4)(Entity *self, s32 arg1, s32 arg2);
 
-    rem500 = this->unkFC % 500;
+    rem500 = this->moodTimer % 500;
 
     slotCC = &this->methods->slotCC;
-    if (this->unkFC % 6 < 3) {
+    if (this->moodTimer % 6 < 3) {
         arg1a = -0x40;
     } else {
         arg1a = 0x40;
@@ -290,7 +290,7 @@ void func_8005FC58(Entity *this) {
     (*slotCC)(this, arg1a, 0);
 
     slotC8 = &this->methods->slotC8;
-    if (this->unkFC % 12 < 6) {
+    if (this->moodTimer % 12 < 6) {
         arg1b = -0x40;
     } else {
         arg1b = 0x40;
@@ -298,7 +298,7 @@ void func_8005FC58(Entity *this) {
     (*slotC8)(this, arg1b, 0);
 
     slotC4 = &this->methods->slotC4;
-    if (this->unkFC % 64 < 0x20) {
+    if (this->moodTimer % 64 < 0x20) {
         arg1c = -0x80;
     } else {
         arg1c = 0x80;
@@ -306,9 +306,9 @@ void func_8005FC58(Entity *this) {
     (*slotC4)(this, arg1c, 0);
 
     if (rem500 < 0x20) {
-        this->methods->slotBC(this, D_80089D78);
+        this->methods->addVec14(this, D_80089D78);
     } else if (rem500 < 0x40) {
-        this->methods->slotBC(this, D_80089D60);
+        this->methods->addVec14(this, D_80089D60);
     }
 }
 
@@ -325,8 +325,8 @@ void func_8005FDFC(Entity *this) {
         this->methods->slot48(this, 1, arg2);
         this->unk44 = 0xB;
     }
-    Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
-    if (this->methods->slot144(this, this->unk94) < 0x7000) {
+    Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+    if (this->methods->slot144(this, this->target) < 0x7000) {
         this->methods->slotC4(this, 0x100, 0);
     }
 }
@@ -337,7 +337,7 @@ s32 func_8005FEC8(Entity *this) {
 
 void func_8005FEF8(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 120 == 0) {
-        out->unk10 = this->methods->slot148(this);
+        out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 1;
     }
 }

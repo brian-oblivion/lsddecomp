@@ -100,7 +100,7 @@ void Entity__InitState(Entity *this) {
         this->methods->slot70(this, 1);
     }
     this->methods->slot10C(this, 0x42);
-    this->methods->slot160(this);
+    this->methods->deactivate(this);
 }
 
 void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
@@ -116,12 +116,12 @@ void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 a
     if (D_80089EAF[this->moodIndex * 0x10] != 0) {
         return;
     }
-    this->methods->slot168(this);
+    this->methods->startSoundCue(this);
 }
 
 void Entity__DetachUnk4C(Entity *this) {
     if (this->unk0C != 0) {
-        this->methods->slot160(this);
+        this->methods->deactivate(this);
         func_80066818()->slot50(this);
         this->unk4C = 0;
     }
@@ -161,19 +161,19 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     } else {
         arg2 = 0xC;
     }
-    this->methods->slot30(this, arg2);
+    this->methods->notifyParents(this, arg2);
 }
 
 void Entity__NotifyReset(Entity *this, s32 a1, s32 a2) {
     func_80066818()->slotE0(this, a1, a2);
     if (a2 == 4) {
-        this->methods->slot160(this);
+        this->methods->deactivate(this);
     }
 }
 
 void Entity__TickSoundCue(Entity *this) {
     func_8002CD08(this->soundCueChannel, &this->soundCueSet);
-    this->unkFC++;
+    this->moodTimer++;
 }
 
 typedef struct EntityVec3 EntityVec3;
@@ -197,7 +197,7 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
     } else {
         arg3 <<= 11;
     }
-    return this->unk94->methods->slot120(this->unk94, 0, arg2 << 11, &local, arg3);
+    return this->target->methods->slot120(this->target, 0, arg2 << 11, &local, arg3);
 }
 
 s32 Entity__DistanceToRegion(Entity *this, EntityRegionRef *region) {
@@ -225,12 +225,12 @@ s32 Entity__GetProximityRatio(Entity *this) {
     s32 threshold;
 
     do {
-        if (this->unk94 == NULL) {
+        if (this->target == NULL) {
             return -1;
         }
     } while (0);
     self = this;
-    result = this->methods->slot144(this, self->unk94);
+    result = this->methods->slot144(this, self->target);
     threshold = gEntityProximityThresholdTable[self->moodIndex * 0x10] << 11;
     if (threshold < result) {
         return -1;
@@ -261,20 +261,20 @@ s32 Entity__GetEventVideo(Entity *this) {
 
 void Entity__Activate(Entity *this) {
     this->methods->slot60(this, 1);
-    this->unkF0 = 1;
+    this->active = 1;
     this->unk24 = 0;
 }
 
 void Entity__Deactivate(Entity *this) {
     this->methods->slot60(this, 0);
-    this->methods->slot16C(this);
+    this->methods->stopSoundCue(this);
     this->methods->slot164(this, 0);
-    this->unkF0 = 0;
+    this->active = 0;
 }
 
 void Entity__SetUnkF4(Entity *this, s32 arg1) {
     if (arg1 != 0) {
-        this->methods->slot30(this, 9);
+        this->methods->notifyParents(this, 9);
     }
     this->unkF4 = arg1;
 }
@@ -292,22 +292,22 @@ void Entity__StartSoundCue(Entity *this) {
                   gEntityMoodHandlerTable[this->moodIndex].handler);
     this->methods->slot12C(this);
     this->methods->slot110(this);
-    this->unkFC = 0;
-    this->unkF8 = 1;
+    this->moodTimer = 0;
+    this->soundCueActive = 1;
 }
 
 void Entity__StopSoundCue(Entity *this) {
     FlushSoundCueSet(this->soundCueChannel, &this->soundCueSet);
     this->methods->slot130(this);
     this->methods->slot114(this);
-    this->unkF8 = 0;
+    this->soundCueActive = 0;
 }
 
 s32 Entity__UpdateActivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
 
-    if (this->unkF0 == 0 && this->unk44 != 1) {
+    if (this->active == 0 && this->unk44 != 1) {
         row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
         if (row->detachKind != 0) {
@@ -338,7 +338,7 @@ s32 Entity__UpdateActivationState(Entity *this) {
             this->methods->activate(this);
         }
     }
-    return this->unkF0;
+    return this->active;
 }
 
 s32 Entity__UpdateDeactivationState(Entity *this) {
@@ -347,7 +347,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
     s32 dist;
     s32 scaled;
 
-    if (this->unkF0 != 0) {
+    if (this->active != 0) {
         row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
         func_8005DF9C(this, 0);
@@ -369,8 +369,8 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
             }
         }
         if (doDetach) {
-            this->methods->slot160(this);
+            this->methods->deactivate(this);
         }
     }
-    return this->unkF0;
+    return this->active;
 }
