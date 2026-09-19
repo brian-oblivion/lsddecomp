@@ -26,7 +26,7 @@ void func_8003E6CC(Unk18Obj *self)
 
 Matched on the first build. Retail reloads `self->methods` fresh at each of
 the three dispatch sites (no cached local) -- matched by not introducing one,
-same convention as `func_8003E280`.
+same convention as `Obj86B60__Deinit`.
 
 ## Struct/table knowledge established
 
@@ -46,7 +46,7 @@ same convention as `func_8003E280`.
 
 Confirms `func_8003E628.md`'s own note as a general pattern in this unit:
 a ctor/dtor PAIR occupying adjacent table slots (`+0x008`/`+0x00C` here,
-same as `func_8003E10C`/`func_8003E280`'s `+0x044`/`+0x048`) is worth
+same as `Obj86B60__Init`/`Obj86B60__Deinit`'s `+0x044`/`+0x048`) is worth
 reading together even when queued far apart in ROM order -- the dtor is
 frequently the first place a field the ctor left generically typed gets
 dereferenced, correcting an earlier "never dereferenced" note rather than

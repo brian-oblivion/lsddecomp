@@ -59,7 +59,7 @@ typedef struct Class865C8Methods {
     /* Occupied here by func_80049958 itself; only reachable from THIS
      * struct via func_8004A4B8()'s own D_80086668 view of the same offset
      * (Class86668Methods::slot38 below), where it forwards to the inherited
-     * func_8003E030. */
+     * Obj86B60__OnNotify. */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_80049958 */
     void *unk3C;                                   /* +0x03C null slot */
     void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 func_80049A14 */
@@ -353,9 +353,9 @@ typedef struct Class86668Methods {
     u8 pad10[0x38 - 0x10];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (func_80049958, this unit): D_80086668's own +0x038 is
-     * func_8003E030 (a base/inherited slot, out of this unit's scope).
+     * Obj86B60__OnNotify (a base/inherited slot, out of this unit's scope).
      * Called by func_80049958 as func_8004A4B8()->slot38(self, arg1, arg2). */
-    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_8003E030 */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
     u8 pad3C[0x44 - 0x3C];
     /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
      * the base's own slot44, returns self->unk28. Called by func_80049A1C
@@ -368,10 +368,10 @@ typedef struct Class86668Methods {
     u8 pad4C[0x54 - 0x4C];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (func_80049CA8, this unit): D_80086668's own +0x054 is
-     * func_8003E418 (a base/inherited slot, out of this unit's scope).
+     * Obj86B60__OnTag1Notify (a base/inherited slot, out of this unit's scope).
      * Called by func_80049CA8 as func_8004A4B8()->slot54(self, arg1,
      * arg2), return discarded. */
-    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 func_8003E418 */
+    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 Obj86B60__OnTag1Notify */
 } Class86668Methods;
 
 /* A plain accessor with no parameters, returning &D_80086668. Defined in the

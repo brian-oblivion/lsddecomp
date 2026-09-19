@@ -1,4 +1,6 @@
-# func_8003E10C — MATCH (93/93 words)
+> Renamed from `func_8003E10C` on 2026-09-19 (tools/rename.py). Address 0x8003e10c.
+
+# Obj86B60__Init — MATCH (93/93 words)
 
 **Unit:** code_2cc8c_c · **Size:** 93 instructions
 
@@ -14,12 +16,12 @@ slot10`), forwards `(self,0,0,0)` to `slot4C`, records `arg2` into
 `self->unk24`, and -- only when `arg2 == 0` -- runs three more registration
 calls (two through the just-constructed `self->unk18` object, one through
 `self->unk14` reinterpreted as a pointer) before dispatching `slot60(self,2)`
-and `slot48(self)` (`func_8003E280`, the very next function in this queue).
+and `slot48(self)` (`Obj86B60__Deinit`, the very next function in this queue).
 
 ## The C
 
 ```c
-void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
+void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -61,7 +63,7 @@ void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
 
 First attempt built and linked (build exit=0) but scored 7/93 with a
 178502-byte OUTSIDE-range diff -- textbook address drift, one word short.
-`tools/asm-differ/diff.py func_8003E10C` showed retail saving 5 registers
+`tools/asm-differ/diff.py Obj86B60__Init` showed retail saving 5 registers
 (`s0..s4`, frame `-0x28`) against my first cut's 4 (`s0..s3`, frame `-0x20`):
 the classic "one fewer live-across-call value than retail" register
 shortfall this project's learnings describe.
@@ -98,7 +100,7 @@ the next build.
   types, one dispatch slot (`slot10`) each, both OBSERVED only by this
   function.
 - `Obj86B60Methods`: added `slot10` (inherited BasicClass `addChild`),
-  `slot4C` (external `func_8003C238`), `slot48` (`func_8003E280`, next in
+  `slot4C` (external `func_8003C238`), `slot48` (`Obj86B60__Deinit`, next in
   this queue).
 
 ### Proposed learning

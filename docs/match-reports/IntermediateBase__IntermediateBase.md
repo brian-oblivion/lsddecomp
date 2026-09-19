@@ -11,10 +11,10 @@ utility class's constructor (`tools/classtable.py D_8006E878` shows
 `+0x008 IntermediateBase__IntermediateBase`). Runs the BasicClass ctor through `Get_vtable_BasicClass()`,
 installs this class's own vtable (`&D_8006E878`, via the already-matched
 getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed slot40
-(`func_8003E100`, already matched, void-returning) once.
+(`Obj86B60__ResetCounters`, already matched, void-returning) once.
 
 Same self-typing convention as this unit's other already-matched siblings
-from the same shared table (`func_8003E100`, `func_8003E4A4`, `func_8003E538`):
+from the same shared table (`Obj86B60__ResetCounters`, `func_8003E4A4`, `func_8003E538`):
 `Obj86B60 *self`, even though the class is generically shared across many
 unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
 `D_8006E878+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
@@ -39,7 +39,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
   already matched there).
 - Added `slot40` to `Obj86B60Methods` (`Obj86B60 *self`), the slot this
   function calls through after installing its own vtable -- it IS
-  `func_8003E100`, already matched elsewhere in this unit.
+  `Obj86B60__ResetCounters`, already matched elsewhere in this unit.
 - The explicit cast `(Obj86B60Methods *)Get_vtable_IntermediateBase()` mirrors
   `src/class_39e08.c`'s own `self->methods = (Class865C8Methods *)
   func_8004A4B8();` -- assigning a shared/generic table getter's return
@@ -51,4 +51,4 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the first
 build. Classtable dump of `D_8006E878` (26 slots) resolved this and six
 sibling queue functions' exact slot identities in one pass; see
-`func_8003E030.md` for the full table.
+`Obj86B60__OnNotify.md` for the full table.

@@ -1,4 +1,6 @@
-# func_8003E280 — MATCH (102/102 words)
+> Renamed from `func_8003E280` on 2026-09-19 (tools/rename.py). Address 0x8003e280.
+
+# Obj86B60__Deinit — MATCH (102/102 words)
 
 **Unit:** code_2cc8c_c · **Size:** 102 instructions (largest in this
 round's queue)
@@ -6,23 +8,23 @@ round's queue)
 ## What it does
 
 `D_8006E878+0x048` (and `D_80086B60`'s own verbatim-inherited `+0x048`, per
-`tools/classtable.py`): the teardown counterpart to `func_8003E10C`'s
+`tools/classtable.py`): the teardown counterpart to `Obj86B60__Init`'s
 init/registration -- calls `slot50` (external, unobserved elsewhere),
-unconditionally removes the three children `func_8003E10C` added
+unconditionally removes the three children `Obj86B60__Init` added
 (`self->unk10`, `self->unkC->unk4`, `self->unkC->unk0`, via the inherited
 BasicClass `removeChild`), and, only when `self->unk24 == 0`, also removes
 `self->unk10` and `self->unkC->unk0` through `self->unk14`'s/`self->unk18`'s
 OWN `removeChild` slots first. Finally, for each of `self->unk10`/`unk14`/
 `unk18`, releases it (inherited BasicClass "release", offset +0x004) ONLY IF
 it was not the one explicitly supplied via `self->unkC` (the cached
-`Obj86B60InitArgs *` from `func_8003E10C`) -- the standard "free only what
+`Obj86B60InitArgs *` from `Obj86B60__Init`) -- the standard "free only what
 you allocated yourself" ownership idiom, mirroring that function's own
 "use if given, else allocate" construction.
 
 ## The C
 
 ```c
-void func_8003E280(Obj86B60 *self)
+void Obj86B60__Deinit(Obj86B60 *self)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -71,9 +73,9 @@ without a register-pressure iteration this time.
   established "keep the general field, cast locally" convention -- see
   `Unk14Obj`'s own comment). Only `slot4` (release) is modelled; this
   function is the only place it is dereferenced as a pointer at all in this
-  unit outside `func_8003E10C`'s own (non-dereferencing) forwards.
+  unit outside `Obj86B60__Init`'s own (non-dereferencing) forwards.
 - This confirms `self->unkC`'s runtime identity across BOTH functions that
-  touch it: it is the `Obj86B60InitArgs *` `func_8003E10C` stored there, not
+  touch it: it is the `Obj86B60InitArgs *` `Obj86B60__Init` stored there, not
   the unrelated `Obj86B60UnkC *` reading `func_8003E538` uses at the same
   offset from a completely different call path -- consistent with this
   project's established "one struct offset, multiple independent readings by
@@ -82,7 +84,7 @@ without a register-pressure iteration this time.
 
 ### Proposed learning
 
-`func_8003E10C`'s "construct with an optional override" idiom
+`Obj86B60__Init`'s "construct with an optional override" idiom
 (`field = arg ? arg : helper()`) has a predictable TEARDOWN counterpart one
 function away in the same vtable: "release `field` only if
 `storedInitArgs->correspondingField != field`". When a match report

@@ -1,4 +1,6 @@
-# func_8003E100 — MATCH (3/3 words)
+> Renamed from `func_8003E100` on 2026-09-19 (tools/rename.py). Address 0x8003e100.
+
+# Obj86B60__ResetCounters — MATCH (3/3 words)
 
 **Unit:** code_2cc8c_c · **Size:** 3 instructions
 
@@ -10,7 +12,7 @@ Zeroes two `Obj86B60` fields, both already documented in
 ## The C
 
 ```c
-void func_8003E100(Obj86B60 *self)
+void Obj86B60__ResetCounters(Obj86B60 *self)
 {
     self->unk1C = 0;
     self->unk20 = 0;

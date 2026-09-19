@@ -1,4 +1,6 @@
-# func_8003E030 — MATCH (52/52 words)
+> Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
+
+# Obj86B60__OnNotify — MATCH (52/52 words)
 
 **Unit:** code_2cc8c_c · **Size:** 52 instructions
 
@@ -13,13 +15,13 @@ for header values 1/2/5 respectively; any other value is a no-op.
 
 `D_80086B60`'s own `+0x038` is this same function (verbatim inherit, no
 override) -- confirmed with `tools/classtable.py D_80086B60`, which is also
-how `slot54`/`slot58`/`slot5C`'s occupants (`func_8003E418`,
+how `slot54`/`slot58`/`slot5C`'s occupants (`Obj86B60__OnTag1Notify`,
 `func_8003C48C`, `func_8003C51C`) were identified.
 
 ## The C
 
 ```c
-void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
@@ -41,9 +43,9 @@ void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
   shape `include/class_39e08.h` independently derived (`arg1->target->header`).
   Only the one field each touches is modelled.
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
-  `func_8003E10C`), `slot40` (`func_8003E100`, `IntermediateBase__IntermediateBase`), `slot48`
-  (`func_8003E280`, `func_8003E10C`), `slot4C` (external `func_8003C238`,
-  `func_8003E10C`), `slot54` (`func_8003E418`), `slot58` (external
+  `Obj86B60__Init`), `slot40` (`Obj86B60__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
+  (`Obj86B60__Deinit`, `Obj86B60__Init`), `slot4C` (external `func_8003C238`,
+  `Obj86B60__Init`), `slot54` (`Obj86B60__OnTag1Notify`), `slot58` (external
   `func_8003C48C`, STALL in unit `code_2cc8c` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
@@ -54,9 +56,9 @@ void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
 
 **One classtable dump resolved this function plus six more of this round's
 queue in one pass** -- `D_8006E878` (`tools/classtable.py D_8006E878`) is
-literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 func_8003E030`,
-`+0x040 func_8003E100` (already matched), `+0x044 func_8003E10C`,
-`+0x048 func_8003E280`, `+0x054 func_8003E418`, `+0x05C func_8003E4A4`
+literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 Obj86B60__OnNotify`,
+`+0x040 Obj86B60__ResetCounters` (already matched), `+0x044 Obj86B60__Init`,
+`+0x048 Obj86B60__Deinit`, `+0x054 Obj86B60__OnTag1Notify`, `+0x05C func_8003E4A4`
 (already matched), `+0x060 func_8003E4B8`, `+0x064 func_8003E538` (already
 matched), `+0x068 func_8003E578`. Every one of this round's 12 fresh
 functions except `func_8003E5D8`/`func_8003E628`/`func_8003E6CC`/

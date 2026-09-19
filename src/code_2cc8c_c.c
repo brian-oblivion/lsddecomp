@@ -32,7 +32,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
     self->methods->slot40(self);
 }
 
-void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
@@ -47,13 +47,13 @@ void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
     }
 }
 
-void func_8003E100(Obj86B60 *self)
+void Obj86B60__ResetCounters(Obj86B60 *self)
 {
     self->unk1C = 0;
     self->unk20 = 0;
 }
 
-void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
+void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -90,7 +90,7 @@ void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     }
 }
 
-void func_8003E280(Obj86B60 *self)
+void Obj86B60__Deinit(Obj86B60 *self)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -117,7 +117,7 @@ void func_8003E280(Obj86B60 *self)
     }
 }
 
-void func_8003E418(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void Obj86B60__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     Unk4ArgObj *obj4;
 
