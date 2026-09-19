@@ -1,4 +1,6 @@
-# func_8005D864 -- MATCHED, round 44 (2026-09-15)
+> Renamed from `func_8005D864` on 2026-09-19 (tools/rename.py). Address 0x8005d864.
+
+# Entity__GetProximityRatio -- MATCHED, round 44 (2026-09-15)
 
 Unit `Entity`. **56/56 words, byte-exact.** Never attempted before this round
 (the head's round-44 correction withdrew the last stale "blocked" verdict --
@@ -12,10 +14,10 @@ calls `this->methods->slot144(this, this->unk94)` (already documented in
 `Entity.h` as returning a value, not void, and noting that retail keeps
 `this->unk94` live in `$a1` from its first load all the way to this call --
 which is exactly what happens here). Looks up a per-mood byte,
-`D_80089EAE[this->moodIndex * 0x10]` (the same 16-byte-row family as
-`D_80089EA6`/`D_80089EAB`/`D_80089EAC`/`D_80089EAF`, already documented in
-`Entity.h`; `D_80089EAE` itself was new -- added to that list, sitting
-between `D_80089EAC` and `D_80089EAF`), shifts it left 11, and if that value
+`gEntityProximityThresholdTable[this->moodIndex * 0x10]` (the same 16-byte-row family as
+`gEntityUnlockKindTable`/`gEntityLinkStageTable`/`gEntityEventVideoTable`/`D_80089EAF`, already documented in
+`Entity.h`; `gEntityProximityThresholdTable` itself was new -- added to that list, sitting
+between `gEntityEventVideoTable` and `D_80089EAF`), shifts it left 11, and if that value
 is less than the slot144 result, returns -1. Otherwise computes
 `slot144_result / (threshold / this->unkB0)` (two chained integer
 divisions, each expanding to the standard div-by-zero/`INT_MIN/-1`
@@ -24,7 +26,7 @@ construct the function's superseded stall history refers to, resolved
 project-wide in round 42).
 
 ```c
-s32 func_8005D864(Entity *this) {
+s32 Entity__GetProximityRatio(Entity *this) {
     s32 result;
     Entity *self;
     s32 threshold;
@@ -36,7 +38,7 @@ s32 func_8005D864(Entity *this) {
     } while (0);
     self = this;
     result = this->methods->slot144(this, self->unk94);
-    threshold = D_80089EAE[self->moodIndex * 0x10] << 11;
+    threshold = gEntityProximityThresholdTable[self->moodIndex * 0x10] << 11;
     if (threshold < result) {
         return -1;
     }
@@ -63,7 +65,7 @@ for the receiver vs. the argument, declaration-order changes -- reproduced
 the identical single-word diff. That is the tell that the cause isn't in the
 call at all: it's something about the STATEMENT BEFORE it.
 
-Ran the permuter (`tools/setup-permuter.sh func_8005D864 <seed>`, seed = the
+Ran the permuter (`tools/setup-permuter.sh Entity__GetProximityRatio <seed>`, seed = the
 55/56 body) for a bounded search (`-j 6 --stop-on-zero --best-only`,
 ~1250 iterations, load acknowledged, not exhausted) and it found a byte-exact
 candidate. Isolated the ONE change that mattered by bisecting the permuter's
@@ -120,3 +122,22 @@ reopened it as assignable and it is now closed. Nothing in the corrected
 cause history needed re-deriving -- both divisions in the final C are
 ordinary `/` operators, and the pinned `--no-nop-mflo-mfhi` flag reproduced
 retail's exact `mflo`/`div`/`break` sequence with no special handling.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D864` this round (tools/rename.py).
+Occupies `EntityMethods` +0x148 (`tools/classtable.py`, confirmed CROSS-UNIT
+-- Entity_b/c/d/e/f/g all dispatch through `slot148`). Computes
+`slot144_result / (gEntityProximityThresholdTable_value / this->
+proximityDivisor)`, or -1 when out of range -- a ratio (or sentinel), fully
+described by the body; what the many cross-unit callers DO with that ratio
+is not established from this unit alone, so "Ratio" rather than a stronger
+claim.
+
+## Proposed field names
+
+- `EntityMethods::slot148` -> `getProximityRatio` -- **tier A.** Its
+  occupant IS this very function (self-referential dispatch, the same idiom
+  every other named slot in this table uses). CROSS-UNIT caller (already
+  noted in `Entity.h`'s existing comment: "called by func_8005E480"),
+  proposed rather than applied.

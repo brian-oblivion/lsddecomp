@@ -1,11 +1,15 @@
-# func_8005DD18
+> Renamed from `Entity__UpdateLinkState` on 2026-09-19 (tools/rename.py). Address 0x8005dd18.
+
+> Renamed from `func_8005DD18` on 2026-09-19 (tools/rename.py). Address 0x8005dd18.
+
+# Entity__UpdateDeactivationState
 
 **Unit:** Entity · **Size:** 64 words · **Status:** MATCHED (64/64 words, whole-image build verified byte-exact)
 
 ## What it does
 
-Gated by `this->unkF0` (set by `func_8005D9F4`, cleared by `func_8005DA3C`):
-looks up this entity's mood row (`D_80089EA4[this->moodIndex]`), calls
+Gated by `this->unkF0` (set by `Entity__Activate`, cleared by `Entity__Deactivate`):
+looks up this entity's mood row (`gEntityMoodTable[this->moodIndex]`), calls
 `func_8005DF9C(this, 0)` (still-uncarved, in `Entity_b` — see "Proposed
 learning" below for the second argument), then decides whether to detach
 based on `row->linkKind`:
@@ -13,25 +17,25 @@ based on `row->linkKind`:
 - `linkKind == 0` or `== 3`: no detach.
 - `linkKind >= 10`: detach iff `(row->linkKind * 15) ^ this->unk24 == 0`.
 - otherwise (1, 2, 4..9), only if `row->unk5 != 0`: calls
-  `func_8005D714(this, &this->unk14->x, row->unk5, row->unk9)` (still
+  `Entity__IsNearTarget(this, &this->unk14->x, row->unk5, row->unk9)` (still
   `addiu_at`-blocked, but its own call-site shape is fully known from its
   `.s` file) and detaches iff `linkKind == 1` when that call returned
   non-zero, or `linkKind == 2` when it returned zero.
 
 Detaching calls `this->methods->slot160(this)` — the same slot
-`func_8005D418`/`func_8005D658` dispatch through.
+`Entity__DetachUnk4C`/`Entity__NotifyReset` dispatch through.
 
 ## Final C
 
 ```c
-s32 func_8005DD18(Entity *this) {
+s32 Entity__UpdateDeactivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
     s32 dist;
     s32 scaled;
 
     if (this->unkF0 != 0) {
-        row = &D_80089EA4[this->moodIndex];
+        row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
         func_8005DF9C(this, 0);
         if (row->linkKind != 0 && row->linkKind != 3) {
@@ -41,7 +45,7 @@ s32 func_8005DD18(Entity *this) {
                     doDetach = 1;
                 }
             } else if (row->unk5 != 0) {
-                dist = func_8005D714(this, &this->unk14->x, row->unk5, row->unk9);
+                dist = Entity__IsNearTarget(this, &this->unk14->x, row->unk5, row->unk9);
                 if (dist != 0) {
                     if (row->linkKind == 1) {
                         doDetach = 1;
@@ -62,7 +66,7 @@ s32 func_8005DD18(Entity *this) {
 ## Attempt log
 
 Started at 37 words short (this function's queue-order predecessor,
-`func_8005DBF0`, and this one share almost identical logic shapes — see that
+`Entity__UpdateActivationState`, and this one share almost identical logic shapes — see that
 report). Three separate residues, closed one at a time:
 
 1. **Boolean-expression assignments compile to arithmetic, not branches.**
@@ -74,7 +78,7 @@ report). Three separate residues, closed one at a time:
    these as plain `if (...) { doDetach = 1; }`, not as a direct boolean
    assignment; rewriting both this way closed a 20-word gap immediately
    and, as a side effect, moved `doDetach` from a caller-saved temp (`$v1`,
-   dead across the `func_8005D714` call — a LATENT BUG, since `doDetach`
+   dead across the `Entity__IsNearTarget` call — a LATENT BUG, since `doDetach`
    genuinely needs to survive that call on one path) into the correct
    callee-saved `$s2` your prologue already reserves for it.
 2. Retail computes the `dist != 0` "expected value" as two SEPARATE
@@ -111,3 +115,16 @@ doesn't pass it. Anyone carving `func_8005DF9C` out of `Entity_b` should
 give it a real 2-parameter signature (`Entity *this, s32 arg1`) even though
 `arg1` looks unused in its body — other call sites may rely on side effects
 this one doesn't need, or it may simply be dead in the source too.
+
+## Naming
+
+**Tier B, CORRECTED this round.** Originally `Entity__UpdateLinkState`.
+Same `tools/classtable.py` finding as `Entity__UpdateActivationState.md`:
+this function is gated on `this->unkF0 != 0` (active) and, when its
+`row->linkKind`-derived condition fires, calls `this->methods->slot160(this)`
+-- confirmed to resolve to `Entity__Deactivate` for a base Entity. So this
+one WAS already correctly directioned by its old name ("Link" conditions
+trigger detach/deactivate) -- it is its sibling, `func_8005DBF0`, that had
+the mismatch. Renamed anyway for a matching, symmetric pair with the
+corrected `Entity__UpdateActivationState`. See that report for the full
+reasoning on why `detachKind`/`linkKind` are left alone.

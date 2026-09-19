@@ -5,7 +5,7 @@ whole-image build verified byte-exact)
 
 ## What it does
 
-Another `D_80089EB0` mood-dispatch handler, `(Entity *this,
+Another `gEntityMoodHandlerTable` mood-dispatch handler, `(Entity *this,
 EntityMoodHandlerArg *out)`. Sets `out->unk10` from `slot148`, then branches
 on `out->unk4`: if zero, sets `out->unk1C = 0xC` and increments
 `this->unk44`; otherwise (nonzero), clamps `out->unk4` to `-1` once it grows

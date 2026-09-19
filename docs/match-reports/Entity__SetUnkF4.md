@@ -1,10 +1,12 @@
-# func_8005DAAC
+> Renamed from `func_8005DAAC` on 2026-09-19 (tools/rename.py). Address 0x8005daac.
+
+# Entity__SetUnkF4
 
 **Unit:** Entity · **Size:** 20 instructions · **Status:** MATCHED (20/20 words, whole-image build verified byte-exact)
 
 ## What it does
 
-`func_8005DAAC(Entity *this, s32 arg1)`: if `arg1` is nonzero, calls this
+`Entity__SetUnkF4(Entity *this, s32 arg1)`: if `arg1` is nonzero, calls this
 entity's own vtable slot `+0x030` with a literal `9`; unconditionally stores
 `arg1` into `this->unkF4`.
 
@@ -29,7 +31,7 @@ the C needs to express explicitly.
 ## Final C
 
 ```c
-void func_8005DAAC(Entity *this, s32 arg1) {
+void Entity__SetUnkF4(Entity *this, s32 arg1) {
     if (arg1 != 0) {
         this->methods->slot30(this, 9);
     }
@@ -47,3 +49,21 @@ unconditionally either way) — not the `goto`-lever shape from
 ## Proposed learning
 
 None new.
+
+## Naming
+
+**Tier A.** Renamed from `func_8005DAAC` this round (tools/rename.py). A
+setter (`this->unkF4 = arg1`) plus a conditional notify when going nonzero
+-- the store's mechanics fully describe the function even though `unkF4`'s
+own broader significance (read by every Entity_x unit) is not established.
+
+## Proposed field names
+
+- `EntityMethods::slot30` -> `notifyParents` -- **tier B.** `tools/
+  classtable.py` on `ENTITY_METHODS` shows +0x030 occupied by the already-
+  named `BasicClass__NotifyParents` (a slot inherited from the shared
+  ancestor `func_80066818()` also returns -- same idiom, confirmed by
+  offset match against that table). CROSS-UNIT: `slot30` is dispatched from
+  every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
+  as well as this unit's own `Entity__SetUnkF4`/`func_8005DF9C` (the latter
+  in Entity_b.c), so proposed rather than applied.

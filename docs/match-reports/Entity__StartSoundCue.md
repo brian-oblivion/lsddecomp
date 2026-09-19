@@ -1,4 +1,6 @@
-# func_8005DAFC -- MATCHED (36/36 words)
+> Renamed from `func_8005DAFC` on 2026-09-19 (tools/rename.py). Address 0x8005dafc.
+
+# Entity__StartSoundCue -- MATCHED (36/36 words)
 
 **Unit:** Entity · Runner: charlie, round 23.
 
@@ -8,8 +10,8 @@ Lazily-flavoured "start" call: initializes a slot table via `InitSoundCueSet`
 (matched in `code_179d8_e.c`), passing that unit's own `this->unk58`, the
 address of `this->unk9C` as the object to init, `this->moodIndex + 1` as
 `arg2`, `this` itself as `arg3`, and the current mood row's dispatch-handler
-function pointer (`D_80089EB0[this->moodIndex].handler`, first word of the
-16-byte `D_80089EB0` row) as `arg4`. Then calls two more self-only vtable
+function pointer (`gEntityMoodHandlerTable[this->moodIndex].handler`, first word of the
+16-byte `gEntityMoodHandlerTable` row) as `arg4`. Then calls two more self-only vtable
 slots and resets a pair of counters.
 
 ## Final C
@@ -20,12 +22,12 @@ struct EntityMoodHandlerRow {
     void *handler; /* +0x00 */
     u8 pad04[0x10 - 0x04];
 };
-extern EntityMoodHandlerRow D_80089EB0[];
+extern EntityMoodHandlerRow gEntityMoodHandlerTable[];
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, Entity *arg3, void *arg4);
 
-void func_8005DAFC(Entity *this) {
+void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->unk58, &this->unk9C, this->moodIndex + 1, this,
-                  D_80089EB0[this->moodIndex].handler);
+                  gEntityMoodHandlerTable[this->moodIndex].handler);
     this->methods->slot12C(this);
     this->methods->slot110(this);
     this->unkFC = 0;
@@ -46,7 +48,7 @@ independent local views" rule for cross-unit prototypes (kept local to this
 `.c`, not added to `Entity.h`, since `InitSoundCueSet` is defined in a
 different unit).
 
-`D_80089EB0` is the mood-index-selected event-dispatch table (16-byte rows:
+`gEntityMoodHandlerTable` is the mood-index-selected event-dispatch table (16-byte rows:
 handler fn ptr + 3 data words) already referenced by name in several match
 reports for `Entity_b`'s handler functions (e.g. `func_8005E480`), but this
 is the first place any unit indexes the RAW TABLE itself in C rather than
@@ -71,3 +73,24 @@ translation with no residue. The round-23 head broadcast's three levers
 (s16-local widening, sltiu-implies-unsigned-counter, subscript-vs-pointer
 addressing) do not apply here: no `s16` locals, no loop, no `&arr[i+j]`
 shape.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005DAFC` this round (tools/rename.py).
+Calls the already-matched, already-named `InitSoundCueSet` (code_179d8_e.c)
+on the `(this->soundCueChannel, &this->soundCueSet)` pair (both renamed
+this round), then two self-only slot calls, then resets `this->unkFC` and
+sets `this->unkF8 = 1`. Pairs with `Entity__StopSoundCue`.
+
+## Proposed field names
+
+- `Entity::unkF8` -> `soundCueActive` -- **tier B.** Set here, cleared by
+  `Entity__StopSoundCue`; read directly by Entity_b.c
+  (`grep -rn -- '->unkF8\b' src/Entity_b.c`). CROSS-UNIT, proposed rather
+  than applied.
+- `EntityMethods::slot168` -> `startSoundCue` -- **tier B.** `tools/
+  classtable.py` resolves +0x168 to this very function (self-referential
+  dispatch). CROSS-UNIT: called by `func_8005DEE0` (Entity_b.c), whose own
+  gate (`this->unkF8 == 0`, i.e. sound cue not yet active) is exactly
+  consistent with "start the sound cue when a proximity condition fires."
+  Proposed rather than applied.

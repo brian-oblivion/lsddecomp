@@ -36,7 +36,7 @@
 
 ```c
 s32 Entity__GetUnlockEffect(Entity *this) {
-    return D_80089EA6[this->moodIndex * 0x10] * 1000;
+    return gEntityUnlockKindTable[this->moodIndex * 0x10] * 1000;
 }
 ```
 
@@ -71,7 +71,7 @@ for a constant multiplicand with no `mult` needed.
 
 ## What it does
 
-`return (s8)D_80089EA6[this->moodIndex * 0x10] * 1000;` — same mood-indexed
+`return (s8)gEntityUnlockKindTable[this->moodIndex * 0x10] * 1000;` — same mood-indexed
 table-lookup family as `Entity__GetMoodEffect`/`Entity__GetLinkStage`/
 `Entity__GetEventVideo`. The `* 1000` is a genuine multiply-by-constant,
 confirmed structurally correct (matches retail's shift/subtract/shift/add/
@@ -85,8 +85,8 @@ for the full isolated reproducer and the maspsx source citation) — the table
 load itself is 1 word short:
 
 ```
-retail:  lui $at,%hi(D_80089EA6) / addiu $at,$at,%lo(D_80089EA6) / addu $at,$at,$v0 / lb $v1,0x0($at)
-built:   lui $at,%hi(D_80089EA6) / addu $at,$at,$v0 / lb $v1,%lo(D_80089EA6)($at)
+retail:  lui $at,%hi(gEntityUnlockKindTable) / addiu $at,$at,%lo(gEntityUnlockKindTable) / addu $at,$at,$v0 / lb $v1,0x0($at)
+built:   lui $at,%hi(gEntityUnlockKindTable) / addu $at,$at,$v0 / lb $v1,%lo(gEntityUnlockKindTable)($at)
 ```
 
 Every instruction *after* the load (the strength-reduced `* 1000`) matches
@@ -101,7 +101,7 @@ cleanly, with zero residue anywhere else in the batch.
 ```c
 #if 0
 s32 Entity__GetUnlockEffect(Entity *this) {
-    return D_80089EA6[this->moodIndex * 0x10] * 1000;
+    return gEntityUnlockKindTable[this->moodIndex * 0x10] * 1000;
 }
 #endif
 ```
@@ -110,3 +110,9 @@ s32 Entity__GetUnlockEffect(Entity *this) {
 
 See `Entity__GetEventVideo.md` for the full writeup — same toolchain class,
 documented once there to avoid repeating the reproducer three times.
+
+## Naming
+
+**Tier A, pre-existing (round 2026-08-30-a), confirmed this round.** A pure
+getter over `gEntityUnlockKindTable` (named this round), `* 1000` (a GCC
+2.6.3 strength-reduction expansion, not a source constant). Not renamed.

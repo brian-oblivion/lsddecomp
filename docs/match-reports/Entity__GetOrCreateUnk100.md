@@ -1,4 +1,6 @@
-# func_8005D108
+> Renamed from `func_8005D108` on 2026-09-19 (tools/rename.py). Address 0x8005d108.
+
+# Entity__GetOrCreateUnk100
 
 **Unit:** Entity · **Size:** 57 words · **Status:** MATCHED (57/57 words, whole-image build verified byte-exact)
 
@@ -11,8 +13,8 @@ through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 `slotD0(sub, arg3)`. Returns the object (new or cached), or NULL if
 allocation failed.
 
-`name` defaults to `D_8008AC14` (`{320, 240}`) and `arg2` defaults to
-`D_8008AC0C` (`{-100, -100}`) when the caller passes NULL — both plain
+`name` defaults to `gEntityDefaultPos` (`{320, 240}`) and `arg2` defaults to
+`gEntityDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
 2-word data buffers, not strings, in `asm/data/7B3F8.sdata.s`.
 
 ## Derivation
@@ -30,7 +32,7 @@ return sub
 ## Final C
 
 ```c
-Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
     Unk100Obj *cached;
     Unk100Obj *sub;
     Unk100Methods *m;
@@ -39,7 +41,7 @@ Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 a
     cached = this->unk100;
     if (cached == NULL) {
         if (name == NULL) {
-            name = D_8008AC14;
+            name = gEntityDefaultPos;
         }
         sub = func_8003FDB0(name, 0, arg4);
         if (sub == NULL) {
@@ -53,7 +55,7 @@ Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 a
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
-        dispatchArg2 = D_8008AC0C;
+        dispatchArg2 = gEntityDefaultOffset;
     }
     m->slot4C(sub, this, dispatchArg2);
     sub->methods->slotD0(sub, arg3);
@@ -84,7 +86,7 @@ the way the "obviously equivalent" nested-if reads.**
    directly next time rather than "cleaning it up" first.
 3. The dispatch tail still needed two more fixes after that: `arg2`'s
    NULL-default was written by reassigning the *parameter itself*
-   (`if (arg2 == NULL) arg2 = D_8008AC0C;`), and that block-reused `$s2`
+   (`if (arg2 == NULL) arg2 = gEntityDefaultOffset;`), and that block-reused `$s2`
    for both the check and the final value — but retail computes the checked
    value into `$a2` (a temp, distinct from the parameter's home register)
    and leaves `$s2` alone. Introducing a separate `dispatchArg2` local fixed
@@ -120,3 +122,16 @@ Two generalizable points from this one:
   before the FIRST subsequent call — this project doesn't yet have a name for
   this pattern in `docs/MATCHING-GUIDE.md`'s residue list and it's probably
   worth adding it.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D108` this round (tools/rename.py). The
+MECHANIC is fully established by the body and by its cross-unit callers
+(`func_80061198`/`func_80063874` in Entity_d/Entity_f, per this report and
+`Entity.h`): lazily get-or-create `this->unk100`, then dispatch three init
+calls through its own vtable, defaulting `name`/`arg2` to two 2-word screen-
+coordinate-shaped buffers when NULL. The PURPOSE of the cached `Unk100Obj` is
+not established -- every known call site passes `name`/`arg2` as NULL, so
+those defaults are never actually exercised in the corpus read so far. Named
+after the mechanic (get-or-create) and the field it operates on (`unk100`),
+not after a guess about what the object represents.

@@ -414,8 +414,8 @@ void func_80061198(Entity *this, EntityMoodHandlerArg *out) {
             out->unk44 = 0x16;
             out->unk48 = -2;
         } else if (mood == 0x30) {
-            if (func_8005D714(this, &this->unk14->x, 0xF, 0xA)) {
-                if (func_8005D108(this, NULL, NULL, (void *)0xA, 0) != NULL) {
+            if (Entity__IsNearTarget(this, &this->unk14->x, 0xF, 0xA)) {
+                if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0xA, 0) != NULL) {
                     this->unk100->methods->slotD4(this->unk100, this->unk50, 4, 0);
                 }
                 if (rand() & 1) {

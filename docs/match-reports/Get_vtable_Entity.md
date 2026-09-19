@@ -5,7 +5,7 @@ whole-image build verified byte-exact)
 
 ## What it does
 
-Trivial table-pointer accessor: returns `&D_80089AD4`, the same
+Trivial table-pointer accessor: returns `&ENTITY_METHODS`, the same
 `EntityMethods` table `New_Entity`/`Entity__Entity` assign to
 `this->methods`. Called directly by name (`jal Get_vtable_Entity`), not
 through a vtable slot itself.
@@ -14,20 +14,20 @@ through a vtable slot itself.
 
 ```c
 EntityMethods *Get_vtable_Entity(void) {
-    return &D_80089AD4;
+    return &ENTITY_METHODS;
 }
 ```
 
 Required one new declaration in `include/Entity.h`:
 
 ```c
-extern EntityMethods D_80089AD4;
+extern EntityMethods ENTITY_METHODS;
 ```
 
-`D_80089AD4` itself stays a raw asm data blob (`asm/data/79528.data.s`,
+`ENTITY_METHODS` itself stays a raw asm data blob (`asm/data/79528.data.s`,
 offsets `0x000`..`0x180`) — only a correctly-typed `extern` was needed here,
 per this unit's own convention for still-uncarved data (same as
-`D_8008AC14`/`D_8008AC0C` already in this header).
+`gEntityDefaultPos`/`gEntityDefaultOffset` already in this header).
 
 ## Attempt log
 

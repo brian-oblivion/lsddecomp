@@ -1,11 +1,13 @@
-# func_8005D7FC
+> Renamed from `func_8005D7FC` on 2026-09-19 (tools/rename.py). Address 0x8005d7fc.
+
+# Entity__DistanceToRegion
 
 **Unit:** Entity · **Size:** 26 words · **Status:** MATCHED (26/26 words, whole-image build verified byte-exact)
 
 ## What it does
 
 Not an `Entity`/`Entity`-pair function despite living in this unit's vtable
-(`D_80089AD4` offset `+0x144`, see the class-table note in `Entity.h`) — its
+(`ENTITY_METHODS` offset `+0x144`, see the class-table note in `Entity.h`) — its
 SECOND argument is an unrelated type (`EntityRegionRef *`, newly named this
 round: a flag plus a pointer to an array of 0x38-byte slots, element `[1]`
 of which is read). Computes a "distance" between `this`'s 3D position
@@ -27,7 +29,7 @@ return (dz >= 0) ? (dx + dz) : (dx - dz);
 ## Final C
 
 ```c
-s32 func_8005D7FC(Entity *this, EntityRegionRef *region) {
+s32 Entity__DistanceToRegion(Entity *this, EntityRegionRef *region) {
     EntityRegionSlot *range;
     EntityPos *pos;
     s32 dx;
@@ -71,3 +73,10 @@ b;` when the two don't match on the first attempt — they are not
 interchangeable to this compiler even though they're semantically identical
 C, and swapping which arm comes first in the `if` form did not help where
 switching to a ternary did.
+
+## Naming
+
+**Tier A.** Renamed from `func_8005D7FC` this round (tools/rename.py). A
+pure leaf: `|this->unk14->x - slot.x0| + |this->unk14->z - slot.z0|`
+(retail computes the sum either way regardless of which delta is negative).
+A distance calculation's mechanics ARE its purpose.

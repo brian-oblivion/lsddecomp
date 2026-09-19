@@ -7,7 +7,7 @@
    and cpp emits "implicit declaration of function". The implicit type
    happens to agree with the real one here, so nothing miscompiled -- but an
    implicit declaration also disables argument checking, which is precisely
-   what caught func_8005D714's over-narrow `s8` parameters in include/Entity.h
+   what caught Entity__IsNearTarget's over-narrow `s8` parameters in include/Entity.h
    this round. A declaration is not a definition, so this does NOT affect the
    strict ROM-address ordering of the definitions below. */
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);

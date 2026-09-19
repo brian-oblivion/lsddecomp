@@ -70,3 +70,10 @@ shape doesn't fall out on the first try — GCC 2.6.3 at `-O2` picks a
 different one of the two as the "direct" (non-branching) path depending on
 which the source states first, and only one of the two matches retail's
 choice.
+
+## Naming
+
+**Tier A.** Occupies `EntityMethods::ctor` (+0x008, `tools/classtable.py`).
+A constructor's mechanics are its purpose; matches the `Class__Class`
+convention already used by `class_65650__Constructor`/`DreamSys__DreamSys`.
+Not renamed (already correct).

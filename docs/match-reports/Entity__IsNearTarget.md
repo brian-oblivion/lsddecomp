@@ -1,4 +1,6 @@
-# func_8005D714 -- MATCHED (58/58 words)
+> Renamed from `func_8005D714` on 2026-09-19 (tools/rename.py). Address 0x8005d714.
+
+# Entity__IsNearTarget -- MATCHED (58/58 words)
 
 **Unit:** Entity · Runner: charlie, round 23.
 
@@ -13,7 +15,7 @@ abs(arg3)` depending on sign), and tail-calls `this->unk94`'s vtable slot
 `+0x120` with the scaled vector, `arg2 << 11`, and that distance. This
 function was already extensively cross-validated by header comments and
 five other units' match reports (`func_8005DE18`, `func_8005DEE0`,
-`func_8005DBF0`, `func_80061198`, `func_8005E0B0`, `func_8005E4D0`, plus
+`Entity__UpdateActivationState`, `func_80061198`, `func_8005E0B0`, `func_8005E4D0`, plus
 `Entity_b`/`Entity_d`) that all already call it with `s32`-not-`s8`
 parameters and treat its return as a real value compared against 0 -- this
 round only had to supply the BODY, the signature was already settled.
@@ -28,12 +30,12 @@ struct EntityVec3 {
     s32 z;
 };
 
-s32 func_8005D714(Entity *this, void *pos, s32 arg2, s32 arg3) {
+s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
     EntityVec3 local;
     s32 kind;
 
     local = *(EntityVec3 *)pos;
-    kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
+    kind = ((u8 *)gEntityUnlockKindTable)[this->moodIndex * 0x10];
     if ((u32)((kind + 9) & 0xFF) < 9) {
         local.y += (s8)kind * 1024;
     }
@@ -77,7 +79,7 @@ Byte-exact, whole-image build verified.
    shift arm) on the next build.
 
 One new `Unk94Methods` vtable slot: `slot120` (`self, s32, s32, void*,
-s32`), a tail call whose return value is forwarded (`func_8005D714` itself
+s32`), a tail call whose return value is forwarded (`Entity__IsNearTarget` itself
 returns `s32`, matching every already-matched caller's `!= 0`/`== 0`
 comparison of this function's result).
 
@@ -103,3 +105,21 @@ underlying principle -- a local's declared identity/width is a codegen
 decision, not just documentation -- is exactly the axis this stall turned
 on, just for "does this value get its own register" rather than "how wide
 is it".
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D714` this round (tools/rename.py).
+Every known caller (5+ units, per this report and `Entity.h`) compares its
+return against 0, i.e. treats it as a boolean predicate; it applies a mood-
+scaled Y offset and a fixed-point-11 distance conversion, then tail-calls
+`this->unk94`'s own `slot120`. "Target" is not a fresh guess for
+`this->unk94` -- it is `Class6B5CC__FaceTarget`'s (code_d294.c, a different
+unit) OWN established name for dereferencing this exact field, cited
+already in `Entity.h`'s `Unk94Obj` comment before this round.
+
+## Proposed field names
+
+- `Entity::unk94` -> `target` -- **tier B.** Same evidence as above
+  (`Class6B5CC__FaceTarget` treats it as its own "target" argument).
+  CROSS-UNIT (Entity_b/c/d/e/f/g all dereference `->unk94`, grep -rn --
+  '->unk94\b'), so proposed rather than applied.
