@@ -103,6 +103,28 @@ position (`BaseObjO__AddVec14`) and tags the outcome via `func_80058B08`
 grid search does; the surrounding game purpose (why search for one here)
 is not established, which keeps this tier B rather than A.
 
+## Proposed field names
+
+`DreamSys::unk_0x28` and `DreamSys::unk_0x4C` are accessed from OTHER
+units too (`src/DreamSys.c`, per `grep -rn -- '->unk_0x28\b\|->unk_0x4C\b'
+src/`), so per FINISHING-PLAN.md track 3 step 3 they are proposed here,
+not renamed, and posted to the broadcast for the head to apply by type
+scope at merge.
+
+- **`DreamSys::unk_0x28` -> `linkTarget`** (type `DreamSysUnk28Target *`,
+  tier B). Evidence: `DreamSys__ApplyOffsetOrFindNearby` clears it to
+  NULL before invoking a per-axis callback and treats a still-NULL value
+  afterward as "no link found, fall back to a grid search"; this function
+  itself stores the grid search's own result into it. Consistently
+  "the currently attached/found link object", never anything else, across
+  every access in this unit.
+- **`DreamSys::unk_0x4C` -> `linkMgr`** (type `DreamSysUnk4CObj *`, tier
+  B). Evidence: this function calls `unk_0x4C->methods->queryLinkAtPos`
+  to look up a link at a position; `include/DreamSys.h`'s own existing
+  comments show it used the same way by `DreamSys__WallLink`,
+  `func_8005A82C` and `func_80058A94` in `src/DreamSys.c` -- every access
+  across every unit is link-related.
+
 ## Verify
 
 ```

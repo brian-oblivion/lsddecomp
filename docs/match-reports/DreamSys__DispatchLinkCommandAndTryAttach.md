@@ -74,6 +74,26 @@ confirmed (33/33): unconditionally forwards through the shared
 both calls and their conditional relationship; why `[5,9)` specifically
 gates the attach attempt is not established.
 
+## Proposed field names
+
+`vtable_DreamSys::slotA0` is accessed from SEVEN other units too
+(`grep -rln -- '->slotA0\b' src/` lists `class_3bb8c_g.c`,
+`class_3bb8c_l.c`, `class_3bb8c_c.c`, `code_d294_b.c`, `code_2c054.c`,
+`class_3bb8c_i.c`, `code_2cc8c_d.c`, besides this unit), so per
+FINISHING-PLAN.md track 3 step 3 it is proposed here, not renamed, and
+posted to the broadcast for the head to apply at merge.
+
+- **`vtable_DreamSys::slotA0` -> `tryAttachNearby`** (tier B). Evidence:
+  `tools/classtable.py D_8006B5CC` resolves the SAME offset (`+0x0A0`) in
+  the fixed base table `GetClass6B5CCMethods()` returns to
+  `Class6B5CC__TryAttachNearby`, and this function's own report already
+  established the slot is unoverridden at the `DreamSys` level (still
+  resolves to that same function) -- matching this project's convention
+  of naming a resolved base-class slot after the method it dispatches to
+  (e.g. `BaseObjO__AddVec14`, `LinkWall` in the same struct). Not tier A:
+  the other seven call sites' own purpose for calling it is not reviewed
+  here, only this unit's own.
+
 ## Verify
 
 ```
