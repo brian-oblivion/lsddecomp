@@ -29,7 +29,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 {
     Get_vtable_BasicClass()->ctor(self);
     self->methods = (Obj86B60Methods *)Get_vtable_IntermediateBase();
-    self->methods->slot40(self);
+    self->methods->resetCounters(self);
 }
 
 void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
@@ -39,7 +39,7 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
     Get_vtable_BasicClass()->slot38(self, arg1, arg2);
     header = arg1->target->header & 0xF;
     if (header == 1) {
-        self->methods->slot54(self, arg1, arg2);
+        self->methods->onTag1Notify(self, arg1, arg2);
     } else if (header == 2) {
         self->methods->slot58(self, arg1, arg2);
     } else if (header == 5) {
@@ -70,23 +70,23 @@ void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
         self->unk14 = (s32)func_80042694();
     }
     if (arg1->unk10 != NULL) {
-        self->unk18 = arg1->unk10;
+        self->viewport = arg1->unk10;
     } else {
-        self->unk18 = New_Unk18Obj();
+        self->viewport = New_Unk18Obj();
     }
-    self->unkC = (Obj86B60UnkC *)arg1;
-    obj18 = self->unk18;
-    methods->slot10(self, arg1->unk0);
-    methods->slot10(self, arg1->unk4);
-    methods->slot10(self, (void *)self->unk10);
+    self->initArgs = (Obj86B60UnkC *)arg1;
+    obj18 = self->viewport;
+    methods->addChild(self, arg1->unk0);
+    methods->addChild(self, arg1->unk4);
+    methods->addChild(self, (void *)self->unk10);
     methods->slot4C(self, 0, 0, 0);
-    self->unk24 = arg2;
+    self->initMode = arg2;
     if (arg2 == 0) {
         obj18->methods->slot10(obj18, arg1->unk0);
         obj18->methods->slot10(obj18, (void *)self->unk10);
-        ((Unk14Obj *)self->unk14)->methods->slot10((Unk14Obj *)self->unk14, (void *)self->unk10);
+        ((Unk14Obj *)self->unk14)->methods->addChild((Unk14Obj *)self->unk14, (void *)self->unk10);
         methods->slot60(self, 2);
-        methods->slot48(self);
+        methods->deinit(self);
     }
 }
 
@@ -97,23 +97,23 @@ void Obj86B60__Deinit(Obj86B60 *self)
 
     methods = self->methods;
     methods->slot50(self);
-    obj18 = self->unk18;
-    if (self->unk24 == 0) {
-        ((Unk14Obj *)self->unk14)->methods->slot14((Unk14Obj *)self->unk14, (void *)self->unk10);
+    obj18 = self->viewport;
+    if (self->initMode == 0) {
+        ((Unk14Obj *)self->unk14)->methods->removeChild((Unk14Obj *)self->unk14, (void *)self->unk10);
         obj18->methods->slot14(obj18, (void *)self->unk10);
-        obj18->methods->slot14(obj18, ((Obj86B60InitArgs *)self->unkC)->unk0);
+        obj18->methods->slot14(obj18, ((Obj86B60InitArgs *)self->initArgs)->unk0);
     }
-    methods->slot14(self, (void *)self->unk10);
-    methods->slot14(self, ((Obj86B60InitArgs *)self->unkC)->unk4);
-    methods->slot14(self, ((Obj86B60InitArgs *)self->unkC)->unk0);
-    if (((Obj86B60InitArgs *)self->unkC)->unk10 != obj18) {
-        self->unk18 = obj18->methods->slot4(obj18);
+    methods->removeChild(self, (void *)self->unk10);
+    methods->removeChild(self, ((Obj86B60InitArgs *)self->initArgs)->unk4);
+    methods->removeChild(self, ((Obj86B60InitArgs *)self->initArgs)->unk0);
+    if (((Obj86B60InitArgs *)self->initArgs)->unk10 != obj18) {
+        self->viewport = obj18->methods->slot4(obj18);
     }
-    if ((void *)((Obj86B60InitArgs *)self->unkC)->unkC != (void *)self->unk14) {
-        self->unk14 = (s32)((Unk14Obj *)self->unk14)->methods->slot4((Unk14Obj *)self->unk14);
+    if ((void *)((Obj86B60InitArgs *)self->initArgs)->unkC != (void *)self->unk14) {
+        self->unk14 = (s32)((Unk14Obj *)self->unk14)->methods->release((Unk14Obj *)self->unk14);
     }
-    if (((Obj86B60InitArgs *)self->unkC)->unk8 != (void *)self->unk10) {
-        self->unk10 = (s32)((Unk10Obj *)self->unk10)->methods->slot4((Unk10Obj *)self->unk10);
+    if (((Obj86B60InitArgs *)self->initArgs)->unk8 != (void *)self->unk10) {
+        self->unk10 = (s32)((Unk10Obj *)self->unk10)->methods->release((Unk10Obj *)self->unk10);
     }
 }
 
@@ -123,7 +123,7 @@ void Obj86B60__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 
     if (arg2 == 2) {
         ((Unk10Obj *)self->unk10)->methods->slot44((Unk10Obj *)self->unk10);
-        obj4 = ((Obj86B60InitArgs *)self->unkC)->unk4;
+        obj4 = ((Obj86B60InitArgs *)self->initArgs)->unk4;
         obj4->methods->slot44(obj4);
         obj4->methods->slot48(obj4);
     }
@@ -141,7 +141,7 @@ void Obj86B60__NotifyTargetReset(Obj86B60 *self)
     Obj86B60UnkCTarget *target;
 
     self->unk1C = 0;
-    target = self->unkC->target;
+    target = self->initArgs->target;
     target->methods->slot48(target);
 }
 
@@ -149,7 +149,7 @@ void Obj86B60__NotifyChildReset(Obj86B60 *self)
 {
     Unk0ArgObj *obj0;
 
-    obj0 = ((Obj86B60InitArgs *)self->unkC)->unk0;
+    obj0 = ((Obj86B60InitArgs *)self->initArgs)->unk0;
     obj0->methods->slot4C(obj0);
     self->unk1C = 0;
 }
@@ -192,14 +192,14 @@ void Unk18Obj__Finalize(Unk18Obj *self)
     self->methods->slot74(self);
     self->unkAC->methods->slot4(self->unkAC);
     self->methods->slotA8(self, 0);
-    Get_vtable_BasicClass()->slot0C(self);
+    Get_vtable_BasicClass()->finalize(self);
 }
 
 void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->slot10(self, arg1);
+    Get_vtable_BasicClass()->addChild(self, arg1);
     header = arg1->methods->header & 0xF;
     if (header == 4) {
         self->unk10 = arg1;
@@ -220,13 +220,13 @@ void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
     } else if (header == 1) {
         self->unkC = NULL;
     }
-    Get_vtable_BasicClass()->slot14(self, arg1);
+    Get_vtable_BasicClass()->removeChild(self, arg1);
 }
 
 void Obj86B60__ResetAndRemoveAllChildren(Obj86B60 *self)
 {
     self->unk30 = 0;
     self->unk10 = 0;
-    self->unkC = NULL;
-    Get_vtable_BasicClass()->slot18(self);
+    self->initArgs = NULL;
+    Get_vtable_BasicClass()->removeAllChildren(self);
 }
