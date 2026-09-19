@@ -41,7 +41,7 @@
 
 s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
 {
-    return self->unk60[self->unk58];
+    return self->slotCounts[self->activeSlot];
 }
 
 /* TaskCoreMethods table (see code_2c054.h's own richer local view); opaque
@@ -74,7 +74,7 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    Get_vtable_BasicClass()->onNotify(self, arg1, arg2);
     header = arg1->target->header & 0xF;
     if (header == 1) {
         self->methods->onTag1Notify(self, arg1, arg2);
@@ -87,7 +87,7 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 
 void Obj86B60__ResetCounters(Obj86B60 *self)
 {
-    self->unk1C = 0;
+    self->frameCounter = 0;
     self->unk20 = 0;
 }
 
@@ -120,8 +120,8 @@ void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     methods->slot4C(self, 0, 0, 0);
     self->initMode = arg2;
     if (arg2 == 0) {
-        obj18->methods->slot10(obj18, arg1->unk0);
-        obj18->methods->slot10(obj18, (void *)self->unk10);
+        obj18->methods->addChild(obj18, arg1->unk0);
+        obj18->methods->addChild(obj18, (void *)self->unk10);
         ((Unk14Obj *)self->unk14)->methods->addChild((Unk14Obj *)self->unk14, (void *)self->unk10);
         methods->slot60(self, 2);
         methods->deinit(self);
@@ -138,8 +138,8 @@ void Obj86B60__Deinit(Obj86B60 *self)
     obj18 = self->viewport;
     if (self->initMode == 0) {
         ((Unk14Obj *)self->unk14)->methods->removeChild((Unk14Obj *)self->unk14, (void *)self->unk10);
-        obj18->methods->slot14(obj18, (void *)self->unk10);
-        obj18->methods->slot14(obj18, ((Obj86B60InitArgs *)self->initArgs)->unk0);
+        obj18->methods->removeChild(obj18, (void *)self->unk10);
+        obj18->methods->removeChild(obj18, ((Obj86B60InitArgs *)self->initArgs)->unk0);
     }
     methods->removeChild(self, (void *)self->unk10);
     methods->removeChild(self, ((Obj86B60InitArgs *)self->initArgs)->unk4);
@@ -169,7 +169,7 @@ void Obj86B60__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 
 void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
 {
-    self->unk1C++;
+    self->frameCounter++;
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", Obj86B60__NotifyParents);
@@ -178,7 +178,7 @@ void Obj86B60__NotifyTargetReset(Obj86B60 *self)
 {
     Obj86B60UnkCTarget *target;
 
-    self->unk1C = 0;
+    self->frameCounter = 0;
     target = self->initArgs->target;
     target->methods->slot48(target);
 }
@@ -189,7 +189,7 @@ void Obj86B60__NotifyChildReset(Obj86B60 *self)
 
     obj0 = ((Obj86B60InitArgs *)self->initArgs)->unk0;
     obj0->methods->slot4C(obj0);
-    self->unk1C = 0;
+    self->frameCounter = 0;
 }
 
 IntermediateBaseMethods *Get_vtable_IntermediateBase(void)

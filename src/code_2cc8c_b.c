@@ -3,7 +3,7 @@
 
 s32 func_8003CD48(Obj86B60 *self)
 {
-    s32 c = 0x80 - (self->unk1C * self->unk84);
+    s32 c = 0x80 - (self->frameCounter * self->unk84);
     u8 buf[3];
 
     buf[0] = c;
@@ -52,7 +52,7 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
     arr = func_80017B34(size);
     self->unk54 = arr;
     self->unk5C = func_80017B34(size);
-    self->unk60 = func_80017B34(size);
+    self->slotCounts = func_80017B34(size);
     self->unk64 = func_80017B34(size);
     self->unk50 = count;
 
@@ -74,7 +74,7 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
             *arr = New_Obj6EAC0(handle, len, *list);
             arr++;
             if (extra != NULL) {
-                self->unk58 = i;
+                self->activeSlot = i;
                 self->methods->slotF8(self, extra, handle);
             }
             list++;
@@ -104,7 +104,7 @@ void func_8003D050(Obj86B60 *self)
         Unk64Elem *elem;
 
         if (self->unk4C->unk24[i] != NULL) {
-            self->unk58 = i;
+            self->activeSlot = i;
             self->methods->slotFC(self);
         }
         elem = *arr;
@@ -112,7 +112,7 @@ void func_8003D050(Obj86B60 *self)
         i++;
     }
     func_80017CFC(self->unk64);
-    func_80017CFC(self->unk60);
+    func_80017CFC(self->slotCounts);
     func_80017CFC(self->unk5C);
     func_80017CFC(self->unk54);
 }
@@ -134,7 +134,7 @@ void func_8003D194(Obj86B60 *self, void *a1)
 
             elem->methods->slot4C(elem, a1, ptr);
             if (self->unk4C->unk24[i] != NULL) {
-                self->unk58 = i;
+                self->activeSlot = i;
                 self->methods->slot100(self, a1, 0);
             }
         } else {
@@ -155,20 +155,20 @@ void func_8003D2CC(Obj86B60 *self, void *a1)
         return;
     }
     arr = self->unk54;
-    origIdx = self->unk58;
+    origIdx = self->activeSlot;
     for (i = 0; i < self->unk50;) {
         Unk64Elem *elem = *arr;
 
         arr++;
         elem->methods->slotB8(elem, a1);
         if (self->unk4C->unk24[i] != NULL) {
-            self->unk58 = i;
+            self->activeSlot = i;
             self->methods->slot104(self, a1);
         }
         i++;
         __asm__("");
     }
-    self->unk58 = origIdx;
+    self->activeSlot = origIdx;
 }
 
 void func_8003D3B0(Obj86B60 *self)
@@ -178,13 +178,13 @@ void func_8003D3B0(Obj86B60 *self)
     if (self->unk4C == NULL) {
         return;
     }
-    i = self->unk58;
+    i = self->activeSlot;
     i++;
     for (;;) {
         if (i >= self->unk50) {
             i = 0;
         }
-        if (i == self->unk58) {
+        if (i == self->activeSlot) {
             break;
         }
         if (self->unk4C->unk18[i++] != NULL) {
@@ -203,13 +203,13 @@ void func_8003D444(Obj86B60 *self)
     if (self->unk4C == NULL) {
         return;
     }
-    i = self->unk58;
+    i = self->activeSlot;
     i--;
     for (;;) {
         if (i < 0) {
             i = self->unk50 - 1;
         }
-        if (i == self->unk58) {
+        if (i == self->activeSlot) {
             break;
         }
         if (self->unk4C->unk18[i--] != NULL) {
@@ -230,14 +230,14 @@ void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
     if (self->unk4C == NULL) {
         return;
     }
-    idx = self->unk58;
+    idx = self->activeSlot;
     elemB = self->unk54[idx];
     elemA = self->unk54[a1];
     if (idx >= 0) {
         elemB->methods->slotB8(elemB, self->unk4C->unk10);
     }
     elemA->methods->slotB8(elemA, (u8 *)self->unk4C + 0x13);
-    self->unk58 = a1;
+    self->activeSlot = a1;
     if (a2 != NULL) {
         self->methods->slot70(self, 0);
     }
@@ -246,7 +246,7 @@ void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
 
 s32 func_8003D5C0(Obj86B60 *self)
 {
-    return self->unk58;
+    return self->activeSlot;
 }
 
 void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
@@ -257,14 +257,14 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
     Unk64Elem **buf;
 
     list = a1->unk18;
-    idx = self->unk58;
+    idx = self->activeSlot;
     count = 0;
     while (*list++ != NULL) {
         count++;
     }
     buf = func_80017B34(count * 4);
     self->unk64[idx] = (void *)buf;
-    self->unk60[idx] = a1->unk4;
+    self->slotCounts[idx] = a1->unk4;
     self->unk5C[idx] = count;
 
     list = a1->unk18;
@@ -281,8 +281,8 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
 
 void func_8003D6D4(Obj86B60 *self)
 {
-    ReleaseBasicClassArray(self->unk64[self->unk58], self->unk5C[self->unk58]);
-    func_80017CFC(self->unk64[self->unk58]);
+    ReleaseBasicClassArray(self->unk64[self->activeSlot], self->unk5C[self->activeSlot]);
+    func_80017CFC(self->unk64[self->activeSlot]);
 }
 
 /* STALL -- see docs/match-reports/func_8003D73C.md. Round 49 (delta):
@@ -305,7 +305,7 @@ void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
     s32 counter;
     s32 local[2];
 
-    idx = self->unk58;
+    idx = self->activeSlot;
     arr = (Unk64Elem **)self->unk64[idx];
     {
         Unk24Elem *target = (Unk24Elem *)self->unk4C->unk24[idx];
@@ -374,7 +374,7 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D73C);
 
 void func_8003D980(Obj86B60 *self, void *a1)
 {
-    s32 idx = self->unk58;
+    s32 idx = self->activeSlot;
     Unk64Elem **arr = (Unk64Elem **)self->unk64[idx];
     s32 count = self->unk5C[idx];
     s32 i;
@@ -395,9 +395,9 @@ void func_8003DA10(Obj86B60 *self)
     if (self->unk3C != 1) {
         return;
     }
-    idx = self->unk58;
+    idx = self->activeSlot;
     self->methods->slot100(self, self->unk14, 1);
-    elem = ((Unk64Elem **)self->unk64[idx])[self->unk60[idx]];
+    elem = ((Unk64Elem **)self->unk64[idx])[self->slotCounts[idx]];
     buf = (u8 *)self->unk4C->unk24[idx] + 8;
     elem->methods->slotB8(elem, buf);
     self->unk3C = 2;
@@ -418,14 +418,14 @@ void func_8003DCAC(Obj86B60 *self)
     if (self->unk3C != 2) {
         return;
     }
-    idx = self->unk58;
-    counter = self->unk60[idx];
+    idx = self->activeSlot;
+    counter = self->slotCounts[idx];
     self->methods->slot100(self, self->unk14, 0);
     arr = (Unk64Elem **)self->unk64[idx];
     elem1 = arr[counter];
     elem1->methods->slotB8(elem1, self->unk4C->unk10);
     newVal = ((s32 *)self->unk4C->unk24[idx])[1];
-    self->unk60[idx] = newVal;
+    self->slotCounts[idx] = newVal;
     elem2 = arr[newVal];
     elem2->methods->slot60(elem2, 1);
     self->unk3C = 1;
@@ -434,8 +434,8 @@ void func_8003DCAC(Obj86B60 *self)
 
 void func_8003DDC8(Obj86B60 *self)
 {
-    s32 idx = self->unk58;
-    s32 v = self->unk60[idx];
+    s32 idx = self->activeSlot;
+    s32 v = self->slotCounts[idx];
 
     v++;
     if (v >= self->unk5C[idx]) {
@@ -446,8 +446,8 @@ void func_8003DDC8(Obj86B60 *self)
 
 void func_8003DE30(Obj86B60 *self)
 {
-    s32 idx = self->unk58;
-    s32 v = self->unk60[idx];
+    s32 idx = self->activeSlot;
+    s32 v = self->slotCounts[idx];
 
     v--;
     if (v < 0) {
@@ -465,15 +465,15 @@ void func_8003DE9C(Obj86B60 *self, s32 a1, void *a2)
     Unk64Elem *elem2;
     u8 *buf;
 
-    idx = self->unk58;
-    counter = self->unk60[idx];
+    idx = self->activeSlot;
+    counter = self->slotCounts[idx];
     arr = (Unk64Elem **)self->unk64[idx];
     elem1 = arr[counter];
     elem2 = arr[a1];
     elem1->methods->slotB8(elem1, self->unk4C->unk10);
     buf = (u8 *)self->unk4C->unk24[idx] + 8;
     elem2->methods->slotB8(elem2, buf);
-    self->unk60[idx] = a1;
+    self->slotCounts[idx] = a1;
     if (a2 != NULL) {
         self->methods->slot70(self, 0);
     }

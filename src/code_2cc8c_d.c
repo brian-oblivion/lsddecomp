@@ -8,7 +8,7 @@
 void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     s32 tag;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    Get_vtable_BasicClass()->onNotify(self, arg1, arg2);
 
     tag = arg1->methods->header & 0xF;
     if (tag == 5) {
@@ -121,7 +121,7 @@ void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
     if (self->unk10 != NULL) {
         return;
     }
-    m->slot10(self, a1);
+    m->addChild(self, a1);
     m->slot78(self, a2);
     m->slot7C(self, a3);
     m->slot80(self, arg5 != NULL ? arg5 : D_8008A8F4);
@@ -132,7 +132,7 @@ void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
  * child (inherited BasicClass "removeChild") if it was ever set. */
 void func_8003EB84(Unk18Obj *self) {
     if (self->unk10 != NULL) {
-        self->methods->slot14(self, self->unk10);
+        self->methods->removeChild(self, self->unk10);
     }
 }
 

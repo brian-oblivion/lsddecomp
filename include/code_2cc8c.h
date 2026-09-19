@@ -550,10 +550,10 @@ struct Unk18ObjMethods {
                                                     New_Unk18Obj with only
                                                     `self` set up */
     u8 pad00C[0x010 - 0x00C];
-    void (*slot10)(Unk18Obj *self, void *a1);  /* +0x010, inherited
+    void (*addChild)(Unk18Obj *self, void *a1);  /* +0x010, inherited
                                                     BasicClass addChild;
                                                     OBSERVED: Obj86B60__Init */
-    void (*slot14)(Unk18Obj *self, void *a1);  /* +0x014, inherited
+    void (*removeChild)(Unk18Obj *self, void *a1);  /* +0x014, inherited
                                                     BasicClass removeChild;
                                                     OBSERVED: Obj86B60__Deinit
                                                     (round 13) */
@@ -1321,7 +1321,7 @@ struct Obj86B60 {
                                     unit's own New_X allocator
                                     (New_Unk18Obj), then dispatched through
                                     (`self->viewport->methods->slot10(...)`) */
-    s32 unk1C;                  /* +0x01C, func_8003CC2C (a running count/
+    s32 frameCounter;                  /* +0x01C, func_8003CC2C (a running count/
                                     frame value multiplied against unk84);
                                     func_8003C63C (STALL) zeroes it on
                                     several message codes. PROPOSED (round 55,
@@ -1364,7 +1364,7 @@ struct Obj86B60 {
     Unk64Elem **unk54;          /* +0x054, func_8003D2CC: walked with an
                                     incrementing pointer, dereferenced
                                     directly for each element */
-    s32 unk58;                  /* +0x058, func_8003CA1C: index into
+    s32 activeSlot;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
     s32 *unk5C;                  /* +0x05C, array indexed by unk58: a
@@ -1376,7 +1376,7 @@ struct Obj86B60 {
                                      an explicit upper bound compared
                                      against unk60[unk58], which is what
                                      settles it as a count, not a pointer */
-    s32 *unk60;                   /* +0x060, array indexed by unk58: a
+    s32 *slotCounts;                   /* +0x060, array indexed by unk58: a
                                      per-slot running count, incremented
                                      (wrapping to 0 past unk5C[unk58]) by
                                      func_8003DDC8 and decremented
@@ -1487,7 +1487,7 @@ struct BasicClassMethodsCC8C {
                                   (include/code_8220.h). Same exclusivity as
                                   finalize above. */
     u8 pad01C[0x038 - 0x01C];
-    void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
+    void (*onNotify)(void *self, void *arg1, s32 arg2); /* +0x038, IS
                                   BasicClass__OnNotify (code_8220_b);
                                   OBSERVED: Obj86B60__OnNotify. NOT renamed:
                                   code_2cc8c_d.c's func_8003E8B8 also

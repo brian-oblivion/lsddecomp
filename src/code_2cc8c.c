@@ -68,7 +68,7 @@ void func_8003C51C(Obj86B60 *self, s32 a1, s32 a2)
     if (self->unk3C != 0) {
         u32 bound;
 
-        bound = self->unk1C;
+        bound = self->frameCounter;
         if ((u32)self->unk40 < bound) {
             methods->slot60(self, 6);
         }
@@ -99,7 +99,7 @@ void func_8003C63C(Obj86B60 *self, s32 a1)
     case 5:
         methods->slotE4(self, self->unk4C->unk10);
         methods->slotF0(self, self->unk4C->unk8, 0);
-        self->unk1C = 0;
+        self->frameCounter = 0;
         self->unk3C = 1;
         break;
     case 6:
@@ -108,11 +108,11 @@ void func_8003C63C(Obj86B60 *self, s32 a1)
         break;
     case 4:
     case 7:
-        self->unk1C = 0;
+        self->frameCounter = 0;
         self->unk3C = 0;
         break;
     case 8:
-        self->unk1C = 0;
+        self->frameCounter = 0;
         break;
     case 9:
     case 0xA:
@@ -122,7 +122,7 @@ void func_8003C63C(Obj86B60 *self, s32 a1)
     case 0x10:
     case 0x11:
         self->unk20 = 5;
-        self->unk1C = 0;
+        self->frameCounter = 0;
         switch (a1) {
         case 0xB:
             methods->slot90(self);
@@ -226,7 +226,7 @@ void func_8003CA1C(Obj86B60 *self)
     s32 idx;
 
     target = self->unk4C;
-    idx = self->unk58;
+    idx = self->activeSlot;
     if (target->unk24[idx] != NULL) {
         self->methods->slot108(self);
     } else if (idx == target->unkC) {
@@ -311,7 +311,7 @@ s32 func_8003CC2C(Obj86B60 *self)
     s32 prod;
     u8 buffer[3];
 
-    prod = self->unk1C * self->unk84;
+    prod = self->frameCounter * self->unk84;
     buffer[0] = prod + self->unk90[0];
     buffer[1] = prod + self->unk90[1];
     buffer[2] = prod + self->unk90[2];
