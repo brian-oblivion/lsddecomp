@@ -83,8 +83,8 @@ void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 
 void func_80058A94(DreamSys *this)
 {
-	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
-	this->vt->BaseObjO__UnlinkCompanion(this, this->unk_0x4C);
+	this->linkMgr->methods->slot0xF0(this->linkMgr);
+	this->vt->BaseObjO__UnlinkCompanion(this, this->linkMgr);
 	DreamSys__GetBaseMethods()->slot0x50(this);
 }
 
@@ -98,7 +98,7 @@ void func_80058B08(DreamSys *this, s32 arg1)
 	if (arg1 != -1)
 		return;
 
-	v = this->unk_0x28->unk_0x36 & 0x7F;
+	v = this->linkTarget->unk_0x36 & 0x7F;
 	this->unk_0xB8 = v;
 	if (v >= 0x18)
 		this->unk_0xB8 = 0;
@@ -111,11 +111,11 @@ void func_80058B08(DreamSys *this, s32 arg1)
 	goto shared_tail;
 
 handle_neg2:
-	if (this->unk_0x4C->methods->slot0x11C(this->unk_0x4C, (u8 *)this->unk_0x14 + 0x18)->unk_0x4->unk_0x2C != 2)
+	if (this->linkMgr->methods->slot0x11C(this->linkMgr, (u8 *)this->unk_0x14 + 0x18)->unk_0x4->unk_0x2C != 2)
 		goto neg2_mismatch;
 
 shared_tail:
-	this->vt->func_8005A7A0(this, this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0));
+	this->vt->func_8005A7A0(this, this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0));
 	return;
 
 neg2_mismatch:
@@ -230,7 +230,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 		return;
 	if (this->unknwon_int_0x44 != 0)
 		return;
-	this->linkCoordinates = *this->unk_0x4C->methods->slot0xD4(this->unk_0x4C, unk_class_86aa0);
+	this->linkCoordinates = *this->linkMgr->methods->slot0xD4(this->linkMgr, unk_class_86aa0);
 	if (!this->vt->StaticWallLink(this, &this->linkCoordinates) && this->unk_0x124 != 0) {
 		this->vt->DynamicLink(this);
 	}
@@ -737,7 +737,7 @@ s32 func_80059E98(DreamSys *this, s32 arg1)
 	if (arg1 != 0) {
 		delta = D_80087E34[arg1] * D_80087E20[this->unk_0xAC];
 		this->vt->func_800595A0(this);
-		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
+		pos = this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0);
 		if (!this->vt->func_8005A9CC(this, pos)
 		 && !this->vt->func_8005A82C(this, pos)
 		 && !this->vt->func_8005A700(this, pos)) {
@@ -1067,7 +1067,7 @@ bool func_8005A82C(DreamSys *this, PlayerSpawnPoint *currentPos)
 	if (!ExecuteLink(this, result, 0x11, 0))
 		return true;
 	this->unknwon_int_0x44 = 0;
-	this->unk_0x4C->methods->slot0xE8(this->unk_0x4C, local, &this->linkCoordinates);
+	this->linkMgr->methods->slot0xE8(this->linkMgr, local, &this->linkCoordinates);
 	this->vt->BaseObjO__SetVec14(this, local);
 	if (saved == 0)
 		return true;
@@ -1564,8 +1564,8 @@ void DreamSys__FlashbackSaving(DreamSys *this, s32 arg1, s32 arg2)
 	PlayerSpawnPoint *pos;
 	s32 local[4];
 
-	if (this->unk_0x4C != NULL && rand() % 3 == 0) {
-		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
+	if (this->linkMgr != NULL && rand() % 3 == 0) {
+		pos = this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0);
 		Class6B5CC__GetRotationDegrees(this, local);
 		this->vt->AddFlashback(this, this->currentStage, pos, local, arg1, arg2, this->currentDay);
 	}

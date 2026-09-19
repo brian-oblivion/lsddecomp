@@ -590,7 +590,7 @@ typedef struct DreamSys {
 	/* Read as a pointer by func_80058B08 (round 2026-09-02): loaded, then
 	   dereferenced at +0x36 for a `u16` (masked to 0x7F and stashed into
 	   unk_0xB8 below). Target type otherwise unconfirmed. */
-	DreamSysUnk28Target *unk_0x28;
+	DreamSysUnk28Target *linkTarget;
 	s8 unknown_values_0x2C[24];
 
 	s32 unknwon_int_0x44;
@@ -607,7 +607,7 @@ typedef struct DreamSys {
 	/* Pointer to an unidentified object (own vtable at offset 0, slot
 	   +0xF0 called with itself as the sole argument). Used by
 	   func_80058A94 (round 2026-08-30-b); see DreamSysUnk4CObj above. */
-	DreamSysUnk4CObj *unk_0x4C;
+	DreamSysUnk4CObj *linkMgr;
 	s8 unknown_values_0x50[4];
 	/* Written by this unit's own DreamSys__SetPendingExtra (its own +0x0EC slot), a
 	   plain `sw` store of its `extra` argument (round 2026-09-04). Named
@@ -907,7 +907,7 @@ struct vtable_DreamSys{
 	   through the shared base table via GetClass6B5CCMethods() instead).
 	   Resolves to Class6B5CC__TryAttachNearby, not overridden at the DreamSys level
 	   (round 2026-09-04). */
-	void (*slotA0)(DreamSys *this, void *arg1, s32 count);
+	void (*tryAttachNearby)(DreamSys *this, void *arg1, s32 count);
 	u32 unknown_functions_0xa4[5];
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0B8). Called by
 	   func_8005A82C right after unk_0x4C->methods->slot0xE8, as (this,

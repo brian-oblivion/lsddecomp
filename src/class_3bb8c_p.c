@@ -92,9 +92,9 @@ void DreamSys__NoOpSlotD8(void) {
 s32 DreamSys__FindNearbyLink(DreamSys *self);
 
 void DreamSys__ApplyOffsetOrFindNearby(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s32 val, void *extra) {
-    self->unk_0x28 = NULL;
+    self->linkTarget = NULL;
     callback(self, val, extra);
-    if (self->unk_0x28 == NULL) {
+    if (self->linkTarget == NULL) {
         DreamSys__FindNearbyLink(self);
     }
 }
@@ -123,7 +123,7 @@ typedef struct GridElem {
     struct GridElem *next;
 } GridElem;
 
-/* self->unk_0x4C's pointee dereferences to one of these via its own
+/* self->linkMgr's pointee dereferences to one of these via its own
  * `+0x4` field (a s16 flag at +0x2C, read by DreamSys__ScanLinkCandidates, and a second
  * s16 at +0x32, read by DreamSys__BuildLinkQueries) and, when treated as
  * DreamSys__ScanGridWindow's 5th argument, a grid-array base pointer at `+0x10`.
@@ -181,14 +181,14 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
     GridArrElem *sp78[3];
     DreamSysVec3 sp88;
 
-    if (self->unk_0x4C != NULL) {
+    if (self->linkMgr != NULL) {
         void *pos = (u8 *) self->unk_0x14 + 0x18;
 
-        if (self->unk_0x4C->methods->queryLinkAtPos(self->unk_0x4C, &sp18, pos) == 0) {
+        if (self->linkMgr->methods->queryLinkAtPos(self->linkMgr, &sp18, pos) == 0) {
             s32 count = DreamSys__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
             void *result = DreamSys__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
-            self->unk_0x28 = result;
+            self->linkTarget = result;
             if (result != NULL) {
                 self->vt->BaseObjO__AddVec14(self, &sp88);
                 self->vt->func_80058B08(self, -1);
@@ -305,7 +305,7 @@ void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 c
     GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
     if (count < 9) {
         if (count >= 5) {
-            self->vt->slotA0(self, arg1, count);
+            self->vt->tryAttachNearby(self, arg1, count);
         }
     }
 }
