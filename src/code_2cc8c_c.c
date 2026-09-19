@@ -1,7 +1,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-s32 func_8003DFA0(Obj86B60 *self)
+s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
 {
     return self->unk60[self->unk58];
 }

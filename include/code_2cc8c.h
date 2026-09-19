@@ -1115,7 +1115,7 @@ struct Obj86B60Methods {
                                                        (round 12, runner
                                                        alpha): the occupant
                                                        is func_8003DE30, NOT
-                                                       func_8003DFA0 as this
+                                                       Obj86B60__GetActiveSlotCount as this
                                                        comment previously
                                                        said -- verified by
                                                        reading the raw table
@@ -1150,10 +1150,10 @@ struct Obj86B60Methods {
                                                        computed index value
                                                        and a literal 1) */
     s32 (*slot120)(Obj86B60 *self);                 /* +0x120, external:
-                                                       IS func_8003DFA0
+                                                       IS Obj86B60__GetActiveSlotCount
                                                        (verified the same
                                                        way as slot118 above;
-                                                       `func_8003DFA0` itself
+                                                       `Obj86B60__GetActiveSlotCount` itself
                                                        returns
                                                        `self->unk60[self->
                                                        unk58]`, s32) */

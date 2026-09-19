@@ -946,3 +946,4 @@ Class6B5CC__TryAttachNearby = 0x8001D714; // type:func
 Class6B5CC__ClassifyAgainstPlanes = 0x8001DDF4; // type:func
 Class6B5CC__NotifyTaggedParents = 0x8001E4A4; // type:func
 GetClass6B5CCMethods = 0x8001E57C; // type:func
+Obj86B60__GetActiveSlotCount = 0x8003DFA0; // type:func

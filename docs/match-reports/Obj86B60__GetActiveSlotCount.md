@@ -1,4 +1,6 @@
-# func_8003DFA0 — MATCH (7/7 words)
+> Renamed from `func_8003DFA0` on 2026-09-19 (tools/rename.py). Address 0x8003dfa0.
+
+# Obj86B60__GetActiveSlotCount — MATCH (7/7 words)
 
 **Unit:** code_2cc8c_c · **Size:** 7 instructions
 
@@ -12,7 +14,7 @@ running count: `self->unk60[self->unk58]`.
 ## The C
 
 ```c
-s32 func_8003DFA0(Obj86B60 *self)
+s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
 {
     return self->unk60[self->unk58];
 }
@@ -21,22 +23,22 @@ s32 func_8003DFA0(Obj86B60 *self)
 ## Struct knowledge established / corrected
 
 `include/code_2cc8c.h`'s `Obj86B60Methods` already had a `slot118` field
-whose comment attributed it to `func_8003DFA0` (citing `func_8003C944.md`'s
+whose comment attributed it to `Obj86B60__GetActiveSlotCount` (citing `func_8003C944.md`'s
 "Struct knowledge established" section as the source). **That attribution
 was wrong.** Reading the retail table bytes directly:
 
 ```
-D_80086B60+0x118 = 0x8003DE30  (func_8003DE30, NOT func_8003DFA0)
-D_80086B60+0x120 = 0x8003DFA0  (func_8003DFA0's real slot)
+D_80086B60+0x118 = 0x8003DE30  (func_8003DE30, NOT Obj86B60__GetActiveSlotCount)
+D_80086B60+0x120 = 0x8003DFA0  (Obj86B60__GetActiveSlotCount's real slot)
 ```
 
 The byte OFFSET `func_8003C944` compiled against (0x118) was and is
 correct -- that function still matches -- but the function pointer VALUE
-stored there at runtime is `func_8003DE30`, not `func_8003DFA0`. The old
+stored there at runtime is `func_8003DE30`, not `Obj86B60__GetActiveSlotCount`. The old
 report's error: a discarded/void-typed call site is not evidence of which
 function occupies a slot, only of the slot's own signature. I corrected
 `slot118`'s comment and added the (previously missing) `slot120` field for
-`func_8003DFA0` itself, both in `include/code_2cc8c.h`. See this unit's
+`Obj86B60__GetActiveSlotCount` itself, both in `include/code_2cc8c.h`. See this unit's
 final summary for the flagged existing-declaration change.
 
 ### Proposed learning
