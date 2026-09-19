@@ -265,11 +265,17 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
     return NULL;
 }
 
-extern s32 func_8001E7BC(void);
+/* The real signature, established when code_d294_c matched this function in
+ * round 57: it is a Class6B5CC method taking (self, out, target). This unit
+ * had long declared it `(void)` and called it with no arguments, which is
+ * byte-identical here only because arg0-arg2 are already in $a0-$a2 -- the
+ * byte oracle cannot see a wrong prototype. Spelled out so the forwarding is
+ * visible; verified byte-exact. */
+extern s32 func_8001E7BC(void *self, void *out, void *target);
 
 void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     if (arg0 != NULL) {
-        if (func_8001E7BC() != 0) {
+        if (func_8001E7BC(arg0, arg1, arg2) != 0) {
             return arg0;
         }
     }

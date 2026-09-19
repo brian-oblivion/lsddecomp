@@ -50,9 +50,8 @@ words with the size drift warning; nested form gives 15/15 exactly.
 is non-zero, else `NULL`. Mechanics ARE the purpose here (an accept/reject
 test), matching CLAUDE.md's tier-A carve-out for "a pure leaf whose
 mechanics ARE its purpose (a getter, a clamp, a list push)". `arg1`/`arg2`
-are read by neither this function's body nor this name -- they exist only
-to match the caller's calling convention (documented in the report body
-above).
+are not named by this name, but they are NOT dead: see the round-57 head
+correction below.
 
 ## Verify
 
@@ -72,3 +71,42 @@ reach a single shared zero-setter, the other lets the inner check fall
 through directly. When a combined condition scores short by exactly a
 handful of words with everything downstream shifted, try splitting it into
 nested `if`s before suspecting anything else.
+
+
+## Round 57 (head, at merge) -- the prototype was wrong and the oracle could not see it
+
+This unit declared `extern s32 func_8001E7BC(void);` and called it with no
+arguments. In the SAME round, `code_d294_c` matched `func_8001E7BC` and
+established its real signature: `s32 func_8001E7BC(Class6B5CCObj *self,
+s32 *arg1, s32 *arg2)`, a Class6B5CC method. The two readings met at merge.
+
+`arg1`/`arg2` were therefore never "unused parameters that exist to match
+the calling convention" -- they are FORWARDED. `AcceptGridElem(arg0, arg1,
+arg2)` receives them in `$a0`-`$a2` and `func_8001E7BC` reads them from the
+same registers, so the zero-argument call compiled byte-identically while
+saying something false about the code. Rewritten as
+`func_8001E7BC(arg0, arg1, arg2)` against the real prototype: **byte-exact,
+whole-image SHA1 green**, so this is a readability fix with no codegen
+component.
+
+**Why it matters beyond this function.** This is the failure mode
+FINISHING-PLAN track 2 names for SDK identification -- "the byte oracle
+cannot see a wrong signature" -- occurring in ordinary game code, between
+two units, and surviving because the callee was `INCLUDE_ASM` (no C
+prototype existed to conflict with) until round 57. A wrong `extern` in one
+unit is invisible to every check this project runs until some other unit
+declares the same symbol correctly and the two land in one translation
+unit as `conflicting types`.
+
+### Proposed learning
+
+**When a function leaves the queue by MATCHING, its new C signature is
+evidence about every OTHER unit that declares it `extern`.** Those `extern`
+lines were written against disassembly, with no prototype to check them,
+and a wrong one is byte-invisible whenever the arguments already sit in the
+right registers -- which is exactly the common case for a forwarding leaf.
+Discriminator: a local `extern ... (void)` (or any arity) for a symbol some
+other unit now DEFINES. Sweep with
+`grep -rn 'extern .*func_' src/` against the matched set after any round
+that closes functions. (a docs/match-reports/DreamSys__AcceptGridElem.md
+and docs/match-reports/func_8001E7BC.md, round 57)
