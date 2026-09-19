@@ -93,6 +93,12 @@ struct Table6D940 {
 };
 extern Table6D940 D_8006D940;
 
+/* Forward-declared: defined below at its own ROM address (func_8002C3A8),
+ * but called here (new_class_6d940, func_8002C18C) before that point in the
+ * file. Without this, cc1 implicitly declares it `int`, which happens to be
+ * byte-identical on this ABI but is a lie about the real signature. */
+Table6D940 *func_8002C3A8(void);
+
 /* The 0x34-byte object new_class_6d940 allocates. Only the fields
  * func_8002C18C itself touches are named. */
 typedef struct Obj6D940 Obj6D940;
