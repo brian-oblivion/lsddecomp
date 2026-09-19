@@ -235,3 +235,8 @@ instructions) is this class, not a reshaping target — check with
 `--aspsx-version` in isolation) before spending attempts. Escalating per
 CLAUDE.md's "report with a reproducer, never experiment mid-round" — the
 reproducer above is self-contained and takes under a second to re-run.
+
+## Naming
+
+**Tier A, pre-existing (round 2026-08-30-a), confirmed this round.** A pure
+getter over `gEntityEventVideoTable` (named this round). Not renamed.

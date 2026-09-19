@@ -35,3 +35,11 @@ disassembly (and of m2c's own output, which was already correct here).
 ## Proposed learning
 
 None new.
+
+## Naming
+
+**Tier A.** Renamed from `func_8005D1EC` this round (tools/rename.py).
+Occupies `EntityMethods` dtor slot +0x00C (`tools/classtable.py`), the
+direct counterpart to `Entity__Entity`'s ctor slot +0x008. A destructor's
+mechanics (tear down the two cached sub-objects, then the shared ancestor's
+own `dtor`) are its purpose.

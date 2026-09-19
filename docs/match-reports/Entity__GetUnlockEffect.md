@@ -110,3 +110,9 @@ s32 Entity__GetUnlockEffect(Entity *this) {
 
 See `Entity__GetEventVideo.md` for the full writeup — same toolchain class,
 documented once there to avoid repeating the reproducer three times.
+
+## Naming
+
+**Tier A, pre-existing (round 2026-08-30-a), confirmed this round.** A pure
+getter over `gEntityUnlockKindTable` (named this round), `* 1000` (a GCC
+2.6.3 strength-reduction expansion, not a source constant). Not renamed.

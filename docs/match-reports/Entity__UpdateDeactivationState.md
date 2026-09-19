@@ -115,3 +115,16 @@ doesn't pass it. Anyone carving `func_8005DF9C` out of `Entity_b` should
 give it a real 2-parameter signature (`Entity *this, s32 arg1`) even though
 `arg1` looks unused in its body — other call sites may rely on side effects
 this one doesn't need, or it may simply be dead in the source too.
+
+## Naming
+
+**Tier B, CORRECTED this round.** Originally `Entity__UpdateLinkState`.
+Same `tools/classtable.py` finding as `Entity__UpdateActivationState.md`:
+this function is gated on `this->unkF0 != 0` (active) and, when its
+`row->linkKind`-derived condition fires, calls `this->methods->slot160(this)`
+-- confirmed to resolve to `Entity__Deactivate` for a base Entity. So this
+one WAS already correctly directioned by its old name ("Link" conditions
+trigger detach/deactivate) -- it is its sibling, `func_8005DBF0`, that had
+the mismatch. Renamed anyway for a matching, symmetric pair with the
+corrected `Entity__UpdateActivationState`. See that report for the full
+reasoning on why `detachKind`/`linkKind` are left alone.

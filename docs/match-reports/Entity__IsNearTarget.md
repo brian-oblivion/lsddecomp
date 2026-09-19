@@ -105,3 +105,21 @@ underlying principle -- a local's declared identity/width is a codegen
 decision, not just documentation -- is exactly the axis this stall turned
 on, just for "does this value get its own register" rather than "how wide
 is it".
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D714` this round (tools/rename.py).
+Every known caller (5+ units, per this report and `Entity.h`) compares its
+return against 0, i.e. treats it as a boolean predicate; it applies a mood-
+scaled Y offset and a fixed-point-11 distance conversion, then tail-calls
+`this->unk94`'s own `slot120`. "Target" is not a fresh guess for
+`this->unk94` -- it is `Class6B5CC__FaceTarget`'s (code_d294.c, a different
+unit) OWN established name for dereferencing this exact field, cited
+already in `Entity.h`'s `Unk94Obj` comment before this round.
+
+## Proposed field names
+
+- `Entity::unk94` -> `target` -- **tier B.** Same evidence as above
+  (`Class6B5CC__FaceTarget` treats it as its own "target" argument).
+  CROSS-UNIT (Entity_b/c/d/e/f/g all dereference `->unk94`, grep -rn --
+  '->unk94\b'), so proposed rather than applied.

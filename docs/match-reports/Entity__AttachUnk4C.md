@@ -72,3 +72,13 @@ threaded across a branch.
 Round-23 head broadcast's three levers do not apply (no `s16` locals, no
 loop, no `&arr[i+j]` shape) -- reported per the "reply with the negative
 answer too" instruction.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D314` this round (tools/rename.py). The
+mechanic is a leaf-simple field set (`this->unk4C = arg3`) past a gate, so
+the name says exactly that -- "Attach" for the store, "Unk4C" because the
+field's own real-world purpose is still open (its only other known reader,
+`func_8005EA94`, dereferences it as a vtable-holding object but that alone
+doesn't say what it IS). Pairs with `Entity__DetachUnk4C` below under the
+same `this->unk0C` gate.

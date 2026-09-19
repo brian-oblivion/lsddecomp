@@ -45,3 +45,22 @@ Matched on the first attempt.
 
 None new — a clean instance of the vtable-dispatch-needs-no-forward-
 declaration pattern already documented for `code_55dd4`.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D9F4` this round (tools/rename.py). Sets
+`this->unkF0 = 1`, clears `this->unk24`, dispatches `slot60(this, 1)`.
+"Activate" is a deliberately NEUTRAL description of the `unkF0` toggle,
+chosen over a more evocative "Detach"/"Attach" pairing that would overload
+`Entity__GetLinkStage`'s already-established, semantically DIFFERENT "Link"
+vocabulary (a per-mood table, not this flag) -- see
+`Entity__UpdateActivationState.md` for the full reasoning, which reached the
+same tie-break the other way and documents why. Pairs with
+`Entity__Deactivate`.
+
+## Proposed field names
+
+- `Entity::unkF0` -> `active` -- **tier B.** Toggled by this function and
+  its pair; read directly (not just through the accessor pair) by
+  Entity_b.c (`grep -rn -- '->unkF0\b' src/Entity_b.c`). CROSS-UNIT,
+  proposed rather than applied.

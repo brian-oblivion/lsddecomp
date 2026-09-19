@@ -111,3 +111,24 @@ caused `arg2`/`linkStage` to swap `$s0`/`$s1`.
 Round-23 head broadcast's three levers do not apply here (no `s16` locals,
 no `sltiu`-gated loop, no `&arr[i+j]` shape) -- reported per the "reply
 with the negative answer too" instruction.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D560` this round (tools/rename.py).
+Forwards `(arg1, arg2)` straight through to the base ancestor's `slotDC`,
+and on `arg2 == 4` with a positive `gEntityLinkStageTable` value, also
+notifies `EntityMethods::slot30` with a link/event-derived code (0xA/0xB/0xC).
+"Link" here is not a fresh guess -- it is the SAME vocabulary this function
+directly reads (`gEntityLinkStageTable`, the table `Entity__GetLinkStage`
+already established, tier A, in an earlier round) via the identical
+`moodIndex`-selected row.
+
+## Proposed field names
+
+- `EntityMethods::slot30` -> `notifyParents` -- **tier B.** `tools/
+  classtable.py` on `ENTITY_METHODS` shows +0x030 occupied by the already-
+  named `BasicClass__NotifyParents` (a shared-ancestor slot, same idiom as
+  `func_80066818()`'s table). CROSS-UNIT: called from every one of Entity_b/
+  c/d/e/f/g (grep -rn -- '->slot30(' src/Entity_*.c), so proposed here
+  rather than applied. Evidence and full writeup in `Entity__SetUnkF4.md`,
+  which also dispatches through it.

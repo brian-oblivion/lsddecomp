@@ -57,3 +57,18 @@ Matched on the first attempt.
 
 None new beyond what's already in `Entity__TickSoundCue.md` about the
 `func_8002CD08`/`FlushSoundCueSet` pairing.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005DB8C` this round (tools/rename.py).
+Calls `FlushSoundCueSet` on the same `(soundCueChannel, &soundCueSet)` pair,
+two self-only slot calls, clears `this->unkF8`. Exact mirror of
+`Entity__StartSoundCue`.
+
+## Proposed field names
+
+- `EntityMethods::slot16C` -> `stopSoundCue` -- **tier B.** `tools/
+  classtable.py` resolves +0x16C to this very function. CROSS-UNIT: called
+  by `Entity__Deactivate` (consistent: deactivating stops the sound cue),
+  `func_8005E0B0` (Entity_b.c) and `func_80062A40` (Entity_e.c). Proposed
+  rather than applied.

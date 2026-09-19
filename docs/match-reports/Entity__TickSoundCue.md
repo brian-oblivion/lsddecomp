@@ -65,3 +65,27 @@ uncarved function, `FlushSoundCueSet`, with the exact same two-argument shape
 (`this->unk58`, `this->unk9C`) — worth checking whether these two are a
 matched setter/getter pair or share a helper signature when either is
 eventually carved.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D6D4` this round (tools/rename.py).
+Calls the still-uncarved `func_8002CD08(this->soundCueChannel,
+&this->soundCueSet)` -- the exact same two-argument shape as
+`Entity__StartSoundCue`'s `InitSoundCueSet` and `Entity__StopSoundCue`'s
+`FlushSoundCueSet` calls on the identical field pair (renamed this round,
+see `docs/match-reports/... ` field-rename commit) -- then increments
+`this->unkFC`. Strongly suggests `func_8002CD08` is the third
+("tick"/"update") member of an Init/Tick/Flush trio for the same resource;
+NOT renamed here since it is defined in no unit yet (still asm-only, no
+`src/*.c` owns it) and renaming a function outside this assignment's unit
+boundary risks colliding with whoever eventually carves it -- flagged on the
+broadcast instead.
+
+## Proposed field names
+
+- `Entity::unkFC` -> `moodTimer` -- **tier B.** Reset to 0 by
+  `Entity__StartSoundCue`, incremented here, and read/compared by every one
+  of Entity_b/c/d/e/f/g (grep -rn -- '->unkFC\b') for purposes well beyond
+  sound (mood-duration and threshold comparisons in those units' own
+  reports) -- so a sound-specific name would undersell it. CROSS-UNIT,
+  proposed rather than applied.

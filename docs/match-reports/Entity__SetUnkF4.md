@@ -49,3 +49,21 @@ unconditionally either way) — not the `goto`-lever shape from
 ## Proposed learning
 
 None new.
+
+## Naming
+
+**Tier A.** Renamed from `func_8005DAAC` this round (tools/rename.py). A
+setter (`this->unkF4 = arg1`) plus a conditional notify when going nonzero
+-- the store's mechanics fully describe the function even though `unkF4`'s
+own broader significance (read by every Entity_x unit) is not established.
+
+## Proposed field names
+
+- `EntityMethods::slot30` -> `notifyParents` -- **tier B.** `tools/
+  classtable.py` on `ENTITY_METHODS` shows +0x030 occupied by the already-
+  named `BasicClass__NotifyParents` (a slot inherited from the shared
+  ancestor `func_80066818()` also returns -- same idiom, confirmed by
+  offset match against that table). CROSS-UNIT: `slot30` is dispatched from
+  every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
+  as well as this unit's own `Entity__SetUnkF4`/`func_8005DF9C` (the latter
+  in Entity_b.c), so proposed rather than applied.

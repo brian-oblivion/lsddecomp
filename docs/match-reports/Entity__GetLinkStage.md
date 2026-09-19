@@ -130,3 +130,12 @@ with a real branch, and it was the one case where the head's "check branch
 targets" rule from the `strcat` adjudication was directly exercised — and it
 cleared the check (targets agree), which is what let this be classified
 TOOLCHAIN rather than re-attempted as a reshaping problem.
+
+## Naming
+
+**Tier A, pre-existing (round 2026-08-30-a), confirmed this round.** A pure
+getter over `gEntityLinkStageTable` (named this round), `abs(x) - 1` written
+as an explicit two-arm form. This round's `Entity__NotifyLinkStage` and the
+`Entity__Activate`/`Entity__UpdateActivationState` naming reasoning both cite
+this function's "Link" vocabulary as the reason NOT to reuse "Link" for the
+unrelated `unkF0` active/inactive toggle. Not renamed.

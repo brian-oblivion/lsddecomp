@@ -336,3 +336,26 @@ in the original round-8 pass) reaches it.
 floor 660 vs base 700, no zero). No new lever found this round; the
 type-retype avenue this report flagged as the one remaining untried idea
 is now a confirmed negative, not an open thread.
+
+## Naming
+
+**Tier B, CORRECTED this round.** Originally renamed `func_8005DBF0` to
+`Entity__UpdateDetachState` earlier in round 56; that was backwards.
+`tools/classtable.py` on `ENTITY_METHODS` shows this table's own
+self-referential occupants: +0x15C is `Entity__Activate`, +0x160 is
+`Entity__Deactivate`. This function is gated on `this->unkF0 == 0` (NOT
+active) and, when its `row->detachKind`-derived condition fires, calls
+`this->methods->activate(this)` (the +0x15C slot, renamed this round) --
+i.e. it ACTIVATES, not detaches. Corrected to `Entity__UpdateActivationState`
+via `tools/rename.py`.
+
+`EntityMoodRow::detachKind`/`linkKind` and the local `doDetach` variable are
+deliberately left untouched. A plausible reading survives the correction
+intact: "detach" as leaving an idle/linked state (i.e. BECOMING active) and
+"link" as the reverse would make the ORIGINAL field names right all along,
+and only this function's OWN name (built around the wrong axis -- "what
+does detachKind gate" rather than "what does the gated call do") was wrong.
+Recorded here rather than adjudicated, since both readings are consistent
+with the bytes and re-litigating the row-field names is Track 4 territory
+(they are Entity.c-exclusive, confirmed by grep, so nothing stops a future
+round from revisiting it with more cross-unit context).

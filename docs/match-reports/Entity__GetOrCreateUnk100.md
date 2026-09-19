@@ -122,3 +122,16 @@ Two generalizable points from this one:
   before the FIRST subsequent call — this project doesn't yet have a name for
   this pattern in `docs/MATCHING-GUIDE.md`'s residue list and it's probably
   worth adding it.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D108` this round (tools/rename.py). The
+MECHANIC is fully established by the body and by its cross-unit callers
+(`func_80061198`/`func_80063874` in Entity_d/Entity_f, per this report and
+`Entity.h`): lazily get-or-create `this->unk100`, then dispatch three init
+calls through its own vtable, defaulting `name`/`arg2` to two 2-word screen-
+coordinate-shaped buffers when NULL. The PURPOSE of the cached `Unk100Obj` is
+not established -- every known call site passes `name`/`arg2` as NULL, so
+those defaults are never actually exercised in the corpus read so far. Named
+after the mechanic (get-or-create) and the field it operates on (`unk100`),
+not after a guess about what the object represents.

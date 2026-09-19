@@ -67,3 +67,9 @@ their now-stalled residue — that was never a bug in this function itself.
 See `Entity__GetEventVideo.md`. This function is the useful control case
 proving the maspsx bug is specific to the *load* macro, not table-lookup
 address arithmetic generally.
+
+## Naming
+
+**Tier A, pre-existing (round 2026-08-30-a), confirmed this round.** A pure
+getter over `gEntityMoodTable` (named this round) indexed by `moodIndex`. A
+getter's mechanics are its purpose by definition. Not renamed.

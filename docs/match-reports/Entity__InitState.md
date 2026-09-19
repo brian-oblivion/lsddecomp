@@ -66,3 +66,14 @@ immediately by the drift warning, not by a plausible-looking wrong score.
 
 Also: none of the round-23 head broadcast's three levers apply here -- no
 `s16` locals, no loop counter, no `&arr[i+j]` pointer arithmetic.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D278` this round (tools/rename.py).
+Occupies `EntityMethods` +0x040 (`tools/classtable.py`) -- the exact slot
+`Entity__Entity` calls immediately after (re)assigning `this->methods`, so
+this is definitely Entity's own post-construction setup step (hence
+`initState`, not a bare `func_`). WHAT state it initializes (an unlock-kind-
+gated conditional call plus two unconditional ones) is described in this
+report but not asserted as a specific game concept -- kept at the mechanic
+level.

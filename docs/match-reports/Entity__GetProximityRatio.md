@@ -122,3 +122,22 @@ reopened it as assignable and it is now closed. Nothing in the corrected
 cause history needed re-deriving -- both divisions in the final C are
 ordinary `/` operators, and the pinned `--no-nop-mflo-mfhi` flag reproduced
 retail's exact `mflo`/`div`/`break` sequence with no special handling.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D864` this round (tools/rename.py).
+Occupies `EntityMethods` +0x148 (`tools/classtable.py`, confirmed CROSS-UNIT
+-- Entity_b/c/d/e/f/g all dispatch through `slot148`). Computes
+`slot144_result / (gEntityProximityThresholdTable_value / this->
+proximityDivisor)`, or -1 when out of range -- a ratio (or sentinel), fully
+described by the body; what the many cross-unit callers DO with that ratio
+is not established from this unit alone, so "Ratio" rather than a stronger
+claim.
+
+## Proposed field names
+
+- `EntityMethods::slot148` -> `getProximityRatio` -- **tier A.** Its
+  occupant IS this very function (self-referential dispatch, the same idiom
+  every other named slot in this table uses). CROSS-UNIT caller (already
+  noted in `Entity.h`'s existing comment: "called by func_8005E480"),
+  proposed rather than applied.

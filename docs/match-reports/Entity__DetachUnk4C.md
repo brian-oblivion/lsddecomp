@@ -41,3 +41,12 @@ accessor, reused verbatim by Entity. A local, Entity-scoped `BasicClassMethods`
 view of the SAME table (rather than importing `Class65650Methods` and
 coupling the two units) is in `Entity.h` now, typed only as far as this
 unit's own call sites need.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D418` this round (tools/rename.py). The
+exact mirror of `Entity__AttachUnk4C` (clears `this->unk4C` under the same
+`this->unk0C` gate, plus a base-ancestor `slot50` call and `methods->slot160`
+-- now known to resolve to `Entity__Deactivate`, see the proposed field
+names in `Entity__Deactivate.md`). Same caveat as AttachUnk4C: mechanics
+established, the unk4C object's own purpose is not.

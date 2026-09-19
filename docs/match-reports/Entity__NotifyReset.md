@@ -29,3 +29,14 @@ Matched on the first attempt.
 ## Proposed learning
 
 None new.
+
+## Naming
+
+**Tier B.** Renamed from `func_8005D658` this round (tools/rename.py).
+Forwards `(a1, a2)` to the base ancestor's `slotE0`, and on `a2 == 4` also
+fires `EntityMethods::slot160` -- confirmed this round via
+`tools/classtable.py` to resolve to `Entity__Deactivate` for a base Entity
+(see `Entity__Deactivate.md`'s proposed field name for the slot itself).
+"Reset" is deliberately weaker than "Deactivate": this function's own
+evidence is only "forwards an event code, and on code 4 also deactivates",
+not what the forwarded event fundamentally represents.

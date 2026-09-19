@@ -73,3 +73,10 @@ b;` when the two don't match on the first attempt — they are not
 interchangeable to this compiler even though they're semantically identical
 C, and swapping which arm comes first in the `if` form did not help where
 switching to a ternary did.
+
+## Naming
+
+**Tier A.** Renamed from `func_8005D7FC` this round (tools/rename.py). A
+pure leaf: `|this->unk14->x - slot.x0| + |this->unk14->z - slot.z0|`
+(retail computes the sum either way regardless of which delta is negative).
+A distance calculation's mechanics ARE its purpose.
