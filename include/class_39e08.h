@@ -312,7 +312,7 @@ typedef struct IntermediateBaseMethods {
 } IntermediateBaseMethods;
 
 /* Uncarved (asm/code_2cc8c.s, not this unit's to write): a plain accessor
- * with no parameters, returning &D_8006E878. Same shape as
+ * with no parameters, returning &gIntermediateBaseMethods. Same shape as
  * Get_vtable_DreamSys / GetClass6D3C8Methods (docs/research/class-framework.md). */
 extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);
 

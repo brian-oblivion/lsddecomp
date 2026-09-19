@@ -237,7 +237,7 @@ void func_8003C238(StreamTaskObj *self) {
         self->unk78->methods->slotB8(self->unk78, 1, &self->unk90);
     }
     if (self->unk74 == 0) {
-        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, D_8006E854);
+        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, gDefaultStreamTaskInitData);
     }
     self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, 0);
     core->slot48(unk18, self->unk28);

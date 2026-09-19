@@ -8,7 +8,7 @@ Two dispatches in a row, both discarding/forwarding through `self`, no other
 side effect. First, a genuine virtual call through `self->unkB4`'s own
 1-slot vtable (a small object type distinct from `StreamTaskObj`, discovered
 here for the first time in this unit); second, the same
-`Get_vtable_TaskCore()`-mediated delegation to the sibling class `D_8006E730`
+`Get_vtable_TaskCore()`-mediated delegation to the sibling class `gTaskCoreMethods`
 (`LoaderTaskMethods`) used by `func_8003BD74`/`func_8003BDAC`, this time
 slot `+0x00C`. Occupies `D_8006E5F8` slot `+0x00C` itself.
 
@@ -42,7 +42,7 @@ is `self->unkB4` itself (a virtual self-call on the sub-object), not `self`.
 Added `include/code_2c054.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
 (a new, previously-unseen 1-slot-vtable object reached through
 `StreamTaskObj::unkB4`, `+0x0B4`) and `TaskCoreMethods::slot0C` (this unit's
-local view of `D_8006E730`, see `func_8003BD74`'s report).
+local view of `gTaskCoreMethods`, see `func_8003BD74`'s report).
 
 ## Proposed learning
 

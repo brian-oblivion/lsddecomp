@@ -65,7 +65,7 @@ typedef struct D_80087AACObj D_80087AACObj;
 /* This unit's own local view of the shared base-class table returned by
  * Get_vtable_TaskCore() (a plain no-argument getter, established elsewhere --
  * e.g. include/code_2c054.h, include/class_3bb8c.h -- as returning
- * &D_8006E730). Only the slots this unit's own functions dispatch
+ * &gTaskCoreMethods). Only the slots this unit's own functions dispatch
  * through are typed, per the project's "per-call-site signature"
  * convention (multiple units already carry independent local views of
  * this same table with different slot arities). */

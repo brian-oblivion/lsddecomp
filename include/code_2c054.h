@@ -187,11 +187,11 @@ extern StreamTaskObjMethods D_8006E5F8;
 extern u8 D_8006E860[];
 
 /* Two more rodata symbols reached only by address (round 2, func_8003C238):
- * `D_8006E854`, passed as `TaskTextMethods::slot78`'s 3rd argument, and
+ * `gDefaultStreamTaskInitData`, passed as `TaskTextMethods::slot78`'s 3rd argument, and
  * `D_8006E86C`, passed TWICE (same address) as `TaskCoreObjMethods::slot70`'s
  * 3rd AND 4th arguments. Neither is ever dereferenced by this unit's queued
  * functions. */
-extern u8 D_8006E854[];
+extern u8 gDefaultStreamTaskInitData[];
 extern u8 D_8006E86C[];
 
 /* self->unkB4's own tiny class: a 1-slot vtable, dispatched through by
@@ -273,18 +273,18 @@ struct TaskTextMethods {
                                         func_8003C3D0's call passes literal 0 (valid for
                                         either type, no byte change there), but
                                         func_8003C238's own call to the same slot passes
-                                        `&D_8006E854` -- a real address, not an integer */
+                                        `&gDefaultStreamTaskInitData` -- a real address, not an integer */
 };
 
 struct TaskTextObj {
     TaskTextMethods *methods; /* +0x000 */
 };
 
-/* A sibling class's own method table (D_8006E730, per `tools/classtable.py
- * D_8006E730`) that `StreamTaskObj`'s own slots +0x00C/+0x080/+0x084
+/* A sibling class's own method table (gTaskCoreMethods, per `tools/classtable.py
+ * gTaskCoreMethods`) that `StreamTaskObj`'s own slots +0x00C/+0x080/+0x084
  * (func_8003B9DC/func_8003BD74/func_8003BDAC) forward straight through to,
- * passing `self` on as if it were D_8006E730's own instance -- a delegation
- * pattern, not inheritance (D_8006E730 has its own distinct overrides at
+ * passing `self` on as if it were gTaskCoreMethods's own instance -- a delegation
+ * pattern, not inheritance (gTaskCoreMethods has its own distinct overrides at
  * +0x040/+0x044/etc., so it is a real sibling class, not StreamTaskObj's
  * base). `Class6D3C8.h` already names this exact table `LoaderTaskMethods`
  * (established from func_8003BE94's ctor call, a DIFFERENT allocator/unit)
@@ -303,22 +303,22 @@ typedef struct TaskCoreMethods TaskCoreMethods;
 struct TaskCoreMethods {
     u8 pad00[0x008];
     void (*slot08)(StreamTaskObj *self, s32 a1, s32 a2, s32 a3); /* +0x008, func_8003B8E4's
-                                              forward target (D_8006E730+0x008 = func_8003BF10,
+                                              forward target (gTaskCoreMethods+0x008 = func_8003BF10,
                                               this unit's own queued function -- confirms arity) */
     void (*slot0C)(StreamTaskObj *self);                    /* +0x00C, func_8003B9DC's 2nd call */
     u8 pad10[0x044 - 0x010];
     s32 (*slot44)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x044, func_8003C1DC occupies this slot */
     u8 pad48[0x04C - 0x048];
     void (*slot4C)(StreamTaskObj *self);                       /* +0x04C, func_8003BAB4's forward target
-                                                                     (D_8006E730+0x04C = func_8003C238) */
+                                                                     (gTaskCoreMethods+0x04C = func_8003C238) */
     u8 pad50[0x05C - 0x050];
     void (*slot5C)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x05C, func_8003BB5C's forward target
-                                                                     (D_8006E730+0x05C = func_8003C51C) */
+                                                                     (gTaskCoreMethods+0x05C = func_8003C51C) */
     void (*slot60)(StreamTaskObj *self, s32 a1);                /* +0x060, func_8003BC14's forward target
-                                                                     (D_8006E730+0x060 = func_8003C63C) */
+                                                                     (gTaskCoreMethods+0x060 = func_8003C63C) */
     u8 pad64[0x078 - 0x064];
     void (*slot78)(StreamTaskObj *self);                        /* +0x078, func_8003BD10's forward target
-                                                                      (D_8006E730+0x078 = func_8003C858) */
+                                                                      (gTaskCoreMethods+0x078 = func_8003C858) */
     u8 pad7C[0x080 - 0x07C];
     void (*slot80)(StreamTaskObj *self);                        /* +0x080, func_8003BD74's forward target */
     void (*slot84)(StreamTaskObj *self);                         /* +0x084, func_8003BDAC's forward target */
@@ -330,27 +330,27 @@ struct TaskCoreMethods {
                                                                         this table's own pointer: a base-class
                                                                         constructor chaining pattern, see that
                                                                         function's report
-                                                                        (D_8006E730+0x0D8 = func_8003CE98) */
+                                                                        (gTaskCoreMethods+0x0D8 = func_8003CE98) */
 };
 
-extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &D_8006E730 */
+extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &gTaskCoreMethods */
 
 /* `StreamTaskObj::unk18` and its vtable, `TaskCoreObjMethods`.
  *
  * ORIGINALLY modeled (func_8003C3D0, round 1) as sharing `TaskCoreMethods`
  * itself -- self->unk18's own slots +0x074/+0x090, called there, happened to
- * line up with non-null entries in D_8006E730's OWN table at those same
- * offsets (`classtable.py D_8006E730`). That agreement turned out to be
+ * line up with non-null entries in gTaskCoreMethods's OWN table at those same
+ * offsets (`classtable.py gTaskCoreMethods`). That agreement turned out to be
  * coincidence, not evidence of a shared class: func_8003C238 (round 2) calls
  * THREE MORE slots on self->unk18 (+0x048/+0x04C/+0x050, all 2-argument
- * setters) that cannot exist on `TaskCoreMethods` -- `D_8006E730`'s own
+ * setters) that cannot exist on `TaskCoreMethods` -- `gTaskCoreMethods`'s own
  * +0x04C is func_8003C238's own occupant slot (this very function!),
  * confirmed single-argument by func_8003BAB4's byte-exact call. A vtable
  * slot's arity must be consistent for every instance of the SAME class, so
  * a genuine arity conflict at a shared offset means self->unk18 is a
  * DIFFERENT class that merely happens to also be a `BasicClass` descendant
  * (hence the shared low slots every table in this game has) -- not an
- * instance of D_8006E730's own class. Split into its own
+ * instance of gTaskCoreMethods's own class. Split into its own
  * `TaskCoreObjMethods` type; see func_8003C238's report. */
 
 struct TaskCoreObjMethods {
@@ -372,7 +372,7 @@ struct TaskCoreObj {
     TaskCoreObjMethods *methods; /* +0x000 */
 };
 
-/* A second sibling table (D_8006E878, `tools/classtable.py D_8006E878`),
+/* A second sibling table (gIntermediateBaseMethods, `tools/classtable.py gIntermediateBaseMethods`),
  * used by func_8003C1DC to forward its own work one level further down the
  * same delegation chain. Only the one slot reached here is typed; its
  * return value is discarded at this call site either way. */
@@ -381,14 +381,14 @@ typedef struct TaskUtilMethods TaskUtilMethods;
 struct TaskUtilMethods {
     u8 pad00[0x008];
     void (*slot08)(StreamTaskObj *self); /* +0x008, func_8003BF10's forward target
-                                              (D_8006E878+0x008 = IntermediateBase__IntermediateBase) */
+                                              (gIntermediateBaseMethods+0x008 = IntermediateBase__IntermediateBase) */
     void (*slot0C)(StreamTaskObj *self); /* +0x00C, func_8003C008's forward target
-                                              (D_8006E878+0x00C = BasicClass__func_17f2c) */
+                                              (gIntermediateBaseMethods+0x00C = BasicClass__func_17f2c) */
     u8 pad10[0x044 - 0x010];
     void (*slot44)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x044 */
 };
 
-extern TaskUtilMethods *Get_vtable_IntermediateBase(void); /* returns &D_8006E878 */
+extern TaskUtilMethods *Get_vtable_IntermediateBase(void); /* returns &gIntermediateBaseMethods */
 
 /* Allocates/initializes self->unkB4 (a StreamTaskUnkB4Obj); called by
  * func_8003B8E4 as `func_80045438(GetDefaultStreamTaskInitData(), 0, 0)`. Not this unit's

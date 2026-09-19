@@ -6,10 +6,10 @@
 
 ## What it does
 
-This IS `D_8006E878`'s own +0x008 slot -- the "IntermediateBase" shared
-utility class's constructor (`tools/classtable.py D_8006E878` shows
+This IS `gIntermediateBaseMethods`'s own +0x008 slot -- the "IntermediateBase" shared
+utility class's constructor (`tools/classtable.py gIntermediateBaseMethods` shows
 `+0x008 IntermediateBase__IntermediateBase`). Runs the BasicClass ctor through `Get_vtable_BasicClass()`,
-installs this class's own vtable (`&D_8006E878`, via the already-matched
+installs this class's own vtable (`&gIntermediateBaseMethods`, via the already-matched
 getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed slot40
 (`Obj86B60__ResetCounters`, already matched, void-returning) once.
 
@@ -17,7 +17,7 @@ Same self-typing convention as this unit's other already-matched siblings
 from the same shared table (`Obj86B60__ResetCounters`, `Obj86B60__IncrementFrameCounter`, `Obj86B60__NotifyTargetReset`):
 `Obj86B60 *self`, even though the class is generically shared across many
 unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
-`D_8006E878+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
+`gIntermediateBaseMethods+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
 `StreamTaskObj *self`).
 
 ## The C
@@ -49,6 +49,6 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the first
-build. Classtable dump of `D_8006E878` (26 slots) resolved this and six
+build. Classtable dump of `gIntermediateBaseMethods` (26 slots) resolved this and six
 sibling queue functions' exact slot identities in one pass; see
 `Obj86B60__OnNotify.md` for the full table.

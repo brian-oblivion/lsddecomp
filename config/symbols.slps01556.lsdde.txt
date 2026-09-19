@@ -966,3 +966,6 @@ Unk18Obj__Unk18Obj = 0x8003E628; // type:func
 Unk18Obj__Finalize = 0x8003E6CC; // type:func
 Unk18Obj__AddChild = 0x8003E770; // type:func
 Unk18Obj__RemoveChild = 0x8003E7F4; // type:func
+gTaskCoreMethods = 0x8006E730;
+gDefaultStreamTaskInitData = 0x8006E854;
+gIntermediateBaseMethods = 0x8006E878;

@@ -6,7 +6,7 @@
 
 ## What it does
 
-`D_8006E878+0x054` (and `D_80086B60`'s own verbatim-inherited `+0x054`):
+`gIntermediateBaseMethods+0x054` (and `D_80086B60`'s own verbatim-inherited `+0x054`):
 `self->methods->slot54`'s occupant, and one of `Obj86B60__OnNotify`'s own
 3-way `arg1->target->header` dispatch targets. `arg1` is entirely unused in
 the body -- only `arg2` is read. Gated on `arg2 == 2`: dispatches `slot44`

@@ -18,7 +18,7 @@ void func_8003BAB4(StreamTaskObj *self) {
 ## Evidence
 
 - `Get_vtable_TaskCore()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
-  D_8006E730` shows it occupied by `func_8003C238`, this unit's own (still
+  gTaskCoreMethods` shows it occupied by `func_8003C238`, this unit's own (still
   queued, larger) function — confirms existence/arity, result discarded here
   so typed `void`.
 - `self->unkB4->methods->slot6C(self->unkB4, self->unkC0)`: two-argument

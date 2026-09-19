@@ -6,7 +6,7 @@
 
 ## What it does
 
-A tiny getter: returns the address of the static table `D_8006E730`
+A tiny getter: returns the address of the static table `gTaskCoreMethods`
 (`TaskCoreMethods`, per `include/code_2c054.h`'s own richer local view of
 the same table -- that unit's `func_8003BAB4`/`func_8003BB5C`/etc. dispatch
 through several of its slots). This unit never dereferences the table, only
@@ -15,11 +15,11 @@ returns its address, so it is declared here as an opaque `u8[]`.
 ## The C
 
 ```c
-extern u8 D_8006E730[];
+extern u8 gTaskCoreMethods[];
 
 void *Get_vtable_TaskCore(void)
 {
-    return D_8006E730;
+    return gTaskCoreMethods;
 }
 ```
 

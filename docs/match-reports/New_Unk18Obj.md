@@ -19,7 +19,7 @@ D_8006E8E4`, 45 slots) is the table `func_8003F24C` returns and this
 function constructs an instance of, and it accounts for the rest of this
 round's queue (`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize`/`Unk18Obj__AddChild`/
 `Unk18Obj__RemoveChild` = its own slots `+0x008`/`+0x00C`/`+0x010`/`+0x014`) --
-`D_8006E878` (see `Obj86B60__OnNotify.md`) explained everything else.
+`gIntermediateBaseMethods` (see `Obj86B60__OnNotify.md`) explained everything else.
 
 ## The C
 

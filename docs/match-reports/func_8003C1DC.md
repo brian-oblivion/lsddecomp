@@ -5,13 +5,13 @@
 ## What it does
 
 Forwards to a SECOND sibling class's table (`Get_vtable_IntermediateBase()`, returns
-`&D_8006E878`) at slot `+0x044`, passing `self` and both of its own
+`&gIntermediateBaseMethods`) at slot `+0x044`, passing `self` and both of its own
 arguments unchanged, discards that call's return, then reads and returns
-`self->unk38`. This function itself occupies `D_8006E730` slot `+0x044` --
+`self->unk38`. This function itself occupies `gTaskCoreMethods` slot `+0x044` --
 i.e. it is the delegation TARGET that `func_8003BA58` (`D_8006E5F8::slot44`)
 calls into (see that report). One level further down the same chain:
-`D_8006E5F8::slot44` (`func_8003BA58`) -> `D_8006E730::slot44`
-(`func_8003C1DC`, this function) -> `D_8006E878::slot44` (unnamed,
+`D_8006E5F8::slot44` (`func_8003BA58`) -> `gTaskCoreMethods::slot44`
+(`func_8003C1DC`, this function) -> `gIntermediateBaseMethods::slot44` (unnamed,
 uncarved).
 
 ## Derivation
@@ -40,7 +40,7 @@ s32 func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
 Matched first attempt.
 
 **Return-type discrepancy with `include/Class6D3C8.h`, flagged for the
-head:** that header already types this exact slot (`D_8006E730::slot44`,
+head:** that header already types this exact slot (`gTaskCoreMethods::slot44`,
 its own `LoaderTaskMethods::slot44`) as `void`, established from a
 *different, discarding* caller's call sites in another unit. This function's
 own disassembly, however, unambiguously reads `self->unk38` into `$v0`
@@ -59,7 +59,7 @@ that header under the parallel-run rules); worth the head reconciling in
 ## New struct/header knowledge
 
 Added `include/code_2c054.h`'s `TaskUtilMethods` (this unit's own local view
-of `D_8006E878`) with slot `+0x044` typed
+of `gIntermediateBaseMethods`) with slot `+0x044` typed
 `void (*)(StreamTaskObj *self, s32 a1, s32 a2)` (its own return is
 discarded at this call site, so its true type is unconfirmed either way).
 Named `StreamTaskObj::unk38`.

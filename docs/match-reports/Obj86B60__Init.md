@@ -6,7 +6,7 @@
 
 ## What it does
 
-`D_8006E878+0x044` (the "IntermediateBase" table's own slot44, and
+`gIntermediateBaseMethods+0x044` (the "IntermediateBase" table's own slot44, and
 `D_80086B60`'s own `+0x044` occupant per `tools/classtable.py`): an
 init/registration routine. Fills three fields with "use the init-args field
 if set, else derive from a helper call" (`self->unk10`/`unk14`/`unk18`),

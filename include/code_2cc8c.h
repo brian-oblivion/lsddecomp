@@ -1343,15 +1343,15 @@ struct IntermediateBaseMethods {
     void (*slot60)(void *self, s32 a1);           /* +0x060 */
 };
 
-extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void); /* returns &D_8006E878,
+extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void); /* returns &gIntermediateBaseMethods,
                                                           same static table
                                                           as code_2c054.h's
                                                           and class_39e08.h's
                                                           own views */
-extern IntermediateBaseMethods D_8006E878; /* the table itself, so
+extern IntermediateBaseMethods gIntermediateBaseMethods; /* the table itself, so
                                                 Get_vtable_IntermediateBase's own
                                                 definition (code_2cc8c_c.c)
-                                                can return &D_8006E878 */
+                                                can return &gIntermediateBaseMethods */
 
 /*
  * This unit's own local view of the shared BasicClass ancestor table

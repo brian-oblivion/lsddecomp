@@ -6,7 +6,7 @@
 
 ## What it does
 
-`D_8006E878+0x038` (the "IntermediateBase" table): forwards to the
+`gIntermediateBaseMethods+0x038` (the "IntermediateBase" table): forwards to the
 BasicClass-level slot38 (`BasicClass__OnNotify`, `code_8220_b`, signature
 `(BasicClass *self, void *arg1, s32 arg2)` per `include/code_8220.h`), then
 reads `arg1->target->header & 0xF` and dispatches to one of
@@ -55,7 +55,7 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 - `BasicClassMethodsCC8C`: added `slot38` (`BasicClass__OnNotify`).
 
 **One classtable dump resolved this function plus six more of this round's
-queue in one pass** -- `D_8006E878` (`tools/classtable.py D_8006E878`) is
+queue in one pass** -- `gIntermediateBaseMethods` (`tools/classtable.py gIntermediateBaseMethods`) is
 literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 Obj86B60__OnNotify`,
 `+0x040 Obj86B60__ResetCounters` (already matched), `+0x044 Obj86B60__Init`,
 `+0x048 Obj86B60__Deinit`, `+0x054 Obj86B60__OnTag1Notify`, `+0x05C Obj86B60__IncrementFrameCounter`

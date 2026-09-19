@@ -8,21 +8,21 @@ s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
 
 /* TaskCoreMethods table (see code_2c054.h's own richer local view); opaque
  * here since this unit never dereferences it, only returns its address. */
-extern u8 D_8006E730[];
+extern u8 gTaskCoreMethods[];
 
 void *Get_vtable_TaskCore(void)
 {
-    return D_8006E730;
+    return gTaskCoreMethods;
 }
 
 /* A 3-word struct (see code_2c054.h's own StreamTaskInitData local view);
  * opaque here since this unit never dereferences it, only returns its
  * address. */
-extern u8 D_8006E854[];
+extern u8 gDefaultStreamTaskInitData[];
 
 void *GetDefaultStreamTaskInitData(void)
 {
-    return D_8006E854;
+    return gDefaultStreamTaskInitData;
 }
 
 void IntermediateBase__IntermediateBase(Obj86B60 *self)
@@ -156,7 +156,7 @@ void Obj86B60__NotifyChildReset(Obj86B60 *self)
 
 IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 {
-    return &D_8006E878;
+    return &gIntermediateBaseMethods;
 }
 
 Unk18Obj *New_Unk18Obj(void)

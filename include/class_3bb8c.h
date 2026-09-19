@@ -1386,7 +1386,7 @@ struct DreamSysView_3bb8c_c {
  * independently declared, with a DIFFERENT 4-argument signature, as
  * `TaskCoreMethods` in include/code_2c054.h (`slot08`, confirmed 3-argument-
  * plus-self there from func_8003B8E4's own byte-exact call). Same real
- * global (`D_8006E730`) two units deep, two independent arities recorded
+ * global (`gTaskCoreMethods`) two units deep, two independent arities recorded
  * from two real call sites -- the identical situation already documented
  * for GetClass6B5CCMethods above and for func_8004D3DC's report. Kept local
  * rather than including code_2c054.h, since this unit does not otherwise
@@ -1401,7 +1401,7 @@ struct BaseTaskCtorTable_3bb8c_c {
     void (*slot08)(void *self, void *arg1, void *arg2, s32 arg3); /* +0x008 */
     /* +0x00C, func_8004D704's own unconditional last call, `self` only.
      * Same offset AND arity as `TaskCoreMethods::slot0C` in
-     * include/code_2c054.h (also derived from `D_8006E730`, the same real
+     * include/code_2c054.h (also derived from `gTaskCoreMethods`, the same real
      * global this getter returns) -- independent confirmation, not a
      * coincidence: this is the shared base class's destructor forward,
      * called after `self`'s own two owned sub-objects (`unkA8`/`unkAC`)

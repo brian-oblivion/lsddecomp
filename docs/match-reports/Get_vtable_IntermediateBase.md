@@ -6,7 +6,7 @@
 
 ## What it does
 
-A tiny getter: returns `&D_8006E878`, the "IntermediateBase" shared utility
+A tiny getter: returns `&gIntermediateBaseMethods`, the "IntermediateBase" shared utility
 class's own table. Already declared as an `extern` in
 `include/code_2cc8c.h` (added by whoever carved the original `code_2cc8c.c`
 unit, back when this function itself was still raw asm in the
@@ -21,7 +21,7 @@ own independent local view per this project's established convention).
 ```c
 IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 {
-    return &D_8006E878;
+    return &gIntermediateBaseMethods;
 }
 ```
 

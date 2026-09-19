@@ -6,7 +6,7 @@
 
 ## What it does
 
-A tiny getter: returns the address of the static table `D_8006E854`, a
+A tiny getter: returns the address of the static table `gDefaultStreamTaskInitData`, a
 3-word struct per `include/code_2c054.h`'s own `StreamTaskInitData` local
 view (that unit's `func_8003B8E4` uses it as the 5th/stack argument to a
 constructor call, and `GetDefaultStreamTaskInitData()`'s return value feeds the same
@@ -16,11 +16,11 @@ so it is declared here as an opaque `u8[]`.
 ## The C
 
 ```c
-extern u8 D_8006E854[];
+extern u8 gDefaultStreamTaskInitData[];
 
 void *GetDefaultStreamTaskInitData(void)
 {
-    return D_8006E854;
+    return gDefaultStreamTaskInitData;
 }
 ```
 
