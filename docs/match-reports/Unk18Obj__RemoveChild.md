@@ -1,10 +1,12 @@
-# func_8003E7F4 — MATCH (32/32 words)
+> Renamed from `func_8003E7F4` on 2026-09-19 (tools/rename.py). Address 0x8003e7f4.
+
+# Unk18Obj__RemoveChild — MATCH (32/32 words)
 
 **Unit:** code_2cc8c_c · **Size:** 32 instructions
 
 ## What it does
 
-`D_8006E8E4+0x014`: the exact teardown counterpart to `func_8003E770`
+`D_8006E8E4+0x014`: the exact teardown counterpart to `Unk18Obj__AddChild`
 (`+0x010`) -- same `arg1->methods->header & 0xF` class-header dispatch,
 clearing whichever of `self->unk10`/`unk30` or `self->unkC` that function
 would have set, then unconditionally running the inherited BasicClass
@@ -13,7 +15,7 @@ would have set, then unconditionally running the inherited BasicClass
 ## The C
 
 ```c
-void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
+void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
@@ -28,7 +30,7 @@ void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
 }
 ```
 
-Matched on the first build -- direct transfer of `func_8003E770`'s own
+Matched on the first build -- direct transfer of `Unk18Obj__AddChild`'s own
 field-to-header-value mapping, zero attempts spent re-deriving it, per that
 report's own "Proposed learning" about reading ctor/dtor-adjacent slots
 together.
@@ -38,7 +40,7 @@ together.
 - `BasicClassMethodsCC8C`: added `slot14` (`BasicClass__func_17ff0`,
   "removeChild").
 - No new fields -- this function only confirms (never contradicts)
-  `func_8003E770`'s `unk10`/`unk30`/`unkC` derivation, by clearing exactly
+  `Unk18Obj__AddChild`'s `unk10`/`unk30`/`unkC` derivation, by clearing exactly
   what that function sets.
 
 ## Head-broadcast levers (round 13): applicability check
@@ -51,6 +53,6 @@ together.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build. Last function in this round's queue -- see `Obj86B60__OnNotify.md`
-and `func_8003E5D8.md` for the two shared-table classtable dumps
+and `New_Unk18Obj.md` for the two shared-table classtable dumps
 (`D_8006E878`, `D_8006E8E4`) that resolved this and every other function in
 this round except the register-identity stall `Obj86B60__NotifyParents`.

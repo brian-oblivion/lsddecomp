@@ -1,20 +1,22 @@
-# func_8003E6CC — MATCH (41/41 words)
+> Renamed from `func_8003E6CC` on 2026-09-19 (tools/rename.py). Address 0x8003e6cc.
+
+# Unk18Obj__Finalize — MATCH (41/41 words)
 
 **Unit:** code_2cc8c_c · **Size:** 41 instructions
 
 ## What it does
 
 `D_8006E8E4+0x00C` -- `Unk18Obj`'s dtor, the teardown counterpart to
-`func_8003E628`'s ctor: dispatches `slot90`, `slot74`, releases `self->unkAC`
+`Unk18Obj__Unk18Obj`'s ctor: dispatches `slot90`, `slot74`, releases `self->unkAC`
 (inherited BasicClass "release", corroborating and extending
-`func_8003E628`'s earlier discovery of that field), dispatches `slotA8`
+`Unk18Obj__Unk18Obj`'s earlier discovery of that field), dispatches `slotA8`
 with a literal `0`, then runs `Get_vtable_BasicClass()->slot0C` (BasicClass's own
 `finalize`, `BasicClass__func_17f2c`).
 
 ## The C
 
 ```c
-void func_8003E6CC(Unk18Obj *self)
+void Unk18Obj__Finalize(Unk18Obj *self)
 {
     self->methods->slot90(self);
     self->methods->slot74(self);
@@ -32,7 +34,7 @@ same convention as `Obj86B60__Deinit`.
 
 - `Unk18ObjMethods`: added `slot74`, `slot90`, `slotA8` (all `(Unk18Obj
   *self)` or `(Unk18Obj *self, s32 a1)`).
-- `Unk18Obj->unkAC`: retyped from `void *` (as `func_8003E628`'s report
+- `Unk18Obj->unkAC`: retyped from `void *` (as `Unk18Obj__Unk18Obj`'s report
   left it, "never dereferenced by this unit") to `Unk18AcObj *` -- this
   function is the dereferencing counter-evidence. New type
   `Unk18AcObj`/`Unk18AcObjMethods` models the one slot (`slot4`, inherited
@@ -44,7 +46,7 @@ same convention as `Obj86B60__Deinit`.
 
 ### Proposed learning
 
-Confirms `func_8003E628.md`'s own note as a general pattern in this unit:
+Confirms `Unk18Obj__Unk18Obj.md`'s own note as a general pattern in this unit:
 a ctor/dtor PAIR occupying adjacent table slots (`+0x008`/`+0x00C` here,
 same as `Obj86B60__Init`/`Obj86B60__Deinit`'s `+0x044`/`+0x048`) is worth
 reading together even when queued far apart in ROM order -- the dtor is

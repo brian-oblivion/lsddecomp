@@ -1,10 +1,12 @@
-# func_8003E628 — MATCH (41/41 words)
+> Renamed from `func_8003E628` on 2026-09-19 (tools/rename.py). Address 0x8003e628.
+
+# Unk18Obj__Unk18Obj — MATCH (41/41 words)
 
 **Unit:** code_2cc8c_c · **Size:** 41 instructions
 
 ## What it does
 
-`D_8006E8E4+0x008` -- the ctor of the class `func_8003E5D8`'s New_X
+`D_8006E8E4+0x008` -- the ctor of the class `New_Unk18Obj`'s New_X
 allocator constructs (`Unk18Obj`, 0xBC bytes). Runs the BasicClass ctor,
 installs its own vtable, zeroes two fields (`unkC`/`unk10`), stashes the
 return of `func_8001CA94` (a `New_Class6B5CC` allocator, already matched
@@ -17,7 +19,7 @@ installed `slot40`.
 ## The C
 
 ```c
-void func_8003E628(Unk18Obj *self)
+void Unk18Obj__Unk18Obj(Unk18Obj *self)
 {
     SubHandleObj *obj;
 

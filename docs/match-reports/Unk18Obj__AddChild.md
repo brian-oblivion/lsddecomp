@@ -1,4 +1,6 @@
-# func_8003E770 — MATCH (33/33 words)
+> Renamed from `func_8003E770` on 2026-09-19 (tools/rename.py). Address 0x8003e770.
+
+# Unk18Obj__AddChild — MATCH (33/33 words)
 
 **Unit:** code_2cc8c_c · **Size:** 33 instructions
 
@@ -14,7 +16,7 @@ nibble is 4, or into `self->unkC` when it is 1; any other value is a no-op.
 ## The C
 
 ```c
-void func_8003E770(Unk18Obj *self, GenericObj *arg1)
+void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
@@ -39,7 +41,7 @@ Matched on the first build.
   irrelevant here -- this function's own logic only cares about the header
   nibble, not the type it names.
 - `Unk18Obj->unkC`/`unk10`: retyped from bare `s32` (established by
-  `func_8003E628`'s ctor as "zeroed, meaning unknown") to `GenericObj *` --
+  `Unk18Obj__Unk18Obj`'s ctor as "zeroed, meaning unknown") to `GenericObj *` --
   this function is the first to WRITE a non-zero value into either, and it
   is unambiguously a pointer (`arg1` itself). The ctor's `self->unkC = 0;`/
   `self->unk10 = 0;` assignments are unaffected by the retype (`0` converts

@@ -61,9 +61,9 @@ literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x03
 `+0x048 Obj86B60__Deinit`, `+0x054 Obj86B60__OnTag1Notify`, `+0x05C Obj86B60__IncrementFrameCounter`
 (already matched), `+0x060 Obj86B60__NotifyParents`, `+0x064 Obj86B60__NotifyTargetReset` (already
 matched), `+0x068 Obj86B60__NotifyChildReset`. Every one of this round's 12 fresh
-functions except `func_8003E5D8`/`func_8003E628`/`func_8003E6CC`/
-`func_8003E770`/`func_8003E7F4` (a SECOND, unrelated shared table,
-`D_8006E8E4`, see `func_8003E5D8.md`) is a slot of this one table.
+functions except `New_Unk18Obj`/`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize`/
+`Unk18Obj__AddChild`/`Unk18Obj__RemoveChild` (a SECOND, unrelated shared table,
+`D_8006E8E4`, see `New_Unk18Obj.md`) is a slot of this one table.
 
 ### Proposed learning
 

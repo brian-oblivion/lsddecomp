@@ -72,7 +72,7 @@ void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     if (arg1->unk10 != NULL) {
         self->unk18 = arg1->unk10;
     } else {
-        self->unk18 = func_8003E5D8();
+        self->unk18 = New_Unk18Obj();
     }
     self->unkC = (Obj86B60UnkC *)arg1;
     obj18 = self->unk18;
@@ -159,7 +159,7 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
     return &D_8006E878;
 }
 
-Unk18Obj *func_8003E5D8(void)
+Unk18Obj *New_Unk18Obj(void)
 {
     Unk18Obj *self;
 
@@ -171,7 +171,7 @@ Unk18Obj *func_8003E5D8(void)
     return NULL;
 }
 
-void func_8003E628(Unk18Obj *self)
+void Unk18Obj__Unk18Obj(Unk18Obj *self)
 {
     SubHandleObj *obj;
 
@@ -186,7 +186,7 @@ void func_8003E628(Unk18Obj *self)
     self->methods->slot40(self);
 }
 
-void func_8003E6CC(Unk18Obj *self)
+void Unk18Obj__Finalize(Unk18Obj *self)
 {
     self->methods->slot90(self);
     self->methods->slot74(self);
@@ -195,7 +195,7 @@ void func_8003E6CC(Unk18Obj *self)
     Get_vtable_BasicClass()->slot0C(self);
 }
 
-void func_8003E770(Unk18Obj *self, GenericObj *arg1)
+void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
@@ -209,7 +209,7 @@ void func_8003E770(Unk18Obj *self, GenericObj *arg1)
     }
 }
 
-void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
+void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 

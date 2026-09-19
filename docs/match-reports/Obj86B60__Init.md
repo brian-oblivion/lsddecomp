@@ -40,7 +40,7 @@ void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     if (arg1->unk10 != NULL) {
         self->unk18 = arg1->unk10;
     } else {
-        self->unk18 = func_8003E5D8();
+        self->unk18 = New_Unk18Obj();
     }
     self->unkC = (Obj86B60UnkC *)arg1;
     obj18 = self->unk18;
@@ -93,7 +93,7 @@ the next build.
   `Unk14Obj`'s own header comment.
 - `Obj86B60.unk18`: newly typed `Unk18Obj *` (was unobserved padding).
   Constructed either from `arg1->unk10` or from this unit's own New_X
-  allocator `func_8003E5D8` (queued later this round).
+  allocator `New_Unk18Obj` (queued later this round).
 - `Obj86B60.unk24`: new field, `s32`, set to `arg2`; also the gate for this
   function's second half.
 - `Unk18Obj`/`Unk18ObjMethods`, `Unk14Obj`/`Unk14ObjMethods`: new minimal
