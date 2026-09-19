@@ -28,3 +28,14 @@ void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Obj86B60__IncrementFrameCounter** (renamed from `func_8003E4A4`, round 55,
+runner alpha). Tier A: a pure leaf increment (`self->unk1C++`) -- tier A by
+the same "mechanics ARE the purpose" rule as a getter/clamp/list-push.
+"FrameCounter" reuses the already-established cross-function reading of
+`unk1C` ("a running count/frame value multiplied against unk84",
+`func_8003CC2C`, code_2cc8c.c) rather than inventing a new one; `unk1C`
+itself is PROPOSED for rename to `frameCounter` in this unit's
+`## Proposed field names` (shared with code_2cc8c.c).

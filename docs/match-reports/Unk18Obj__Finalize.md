@@ -66,3 +66,16 @@ not as a permanent property.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Unk18Obj__Finalize** (renamed from `func_8003E6CC`, round 55, runner
+alpha). Tier A: calls its own teardown steps (`slot90`, `slot74`, releases
+`self->unkAC`, `slotA8(self, 0)`) and THEN forwards to
+`Get_vtable_BasicClass()->finalize` (that base slot's own confirmed name,
+matching `include/code_8220.h`'s canonical `BasicClassMethods::finalize`
+at the identical offset `+0x00C`) -- the standard "derived finalize does
+its own cleanup, then calls the base finalize" idiom, which is what
+licenses the name despite `slot90`/`slot74`/`slotA8`'s own occupants being
+unidentified (left as `slotNN`, insufficient evidence for a name, tier
+C/unnamed).

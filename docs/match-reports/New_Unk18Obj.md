@@ -49,3 +49,11 @@ the byte match confirms the reading.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**New_Unk18Obj** (renamed from `func_8003E5D8`, round 55, runner alpha).
+Tier A: standard `New_Class` allocator idiom already established in this
+project (allocate `0xBC` bytes via `func_80017B34`, then invoke the class's
+own ctor through its vtable getter) -- matches this unit's own class
+placeholder name `Unk18Obj`.

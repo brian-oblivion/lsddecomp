@@ -82,3 +82,14 @@ before the byte-level score did.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build (after correctly re-reading the delay-slot ordering above).
+
+## Naming
+
+**Unk18Obj__Unk18Obj** (renamed from `func_8003E628`, round 55, runner
+alpha). Tier A: the `Class__Class` constructor convention (matching
+`BasicClass__BasicClass`) -- confirmed as `Unk18ObjMethods::ctor`'s
+occupant (called by `New_Unk18Obj` via `func_8003F24C()->ctor(self)`,
+`func_8003F24C` being this class's own vtable getter, code_2cc8c_d.c).
+Chains `Get_vtable_BasicClass()->ctor` first, then installs its own vtable
+and sets up `self->unkAC`/`self->unkB0` -- the standard base-then-derived
+construction shape.

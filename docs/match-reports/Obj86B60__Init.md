@@ -134,3 +134,16 @@ tells you which.
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. 2 attempts (address
 drift on the first, closed on the second by hoisting `self->unk18` into a
 local at the position retail's own instruction schedule implied).
+
+## Naming
+
+**Obj86B60__Init** (renamed from `func_8003E10C`, round 55, runner alpha).
+Tier A: mechanics fully known and coherent -- takes an `Obj86B60InitArgs *`
+and a mode flag, resolves three helper-object fields (`self->unk10`,
+`self->unk14`, `self->viewport`) from the caller-supplied args or a default
+helper, retains the args pointer itself (`self->initArgs = (Obj86B60UnkC *)arg1`
+-- the field's own new name, see `## Proposed field names`), registers
+children through the inherited `addChild` slot, and (on mode 0) performs
+extra registration and calls `deinit` -- the standard "construct with
+caller-overridable defaults" idiom this project uses elsewhere. Paired with
+`Obj86B60__Deinit` as the mirror-image teardown (see that report).

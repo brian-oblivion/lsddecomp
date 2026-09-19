@@ -77,3 +77,13 @@ a close cousin one level of indirection removed).
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Unk18Obj__AddChild** (renamed from `func_8003E770`, round 55, runner
+alpha). Tier A: forwards to `Get_vtable_BasicClass()->addChild` first (base
+slot name confirmed, matches canonical `BasicClassMethods::addChild`
+`+0x010`), then examines the added child's dynamic class tag
+(`arg1->methods->header & 0xF`) to cache a typed reference -- the standard
+"override calls base, then does its own bookkeeping" addChild-override
+shape. Mirrored exactly by `Unk18Obj__RemoveChild`.

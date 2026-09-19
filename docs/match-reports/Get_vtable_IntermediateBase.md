@@ -39,3 +39,13 @@ declaration's comment (not its type/signature).
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Get_vtable_IntermediateBase** (renamed from `func_8003E5C8`, round 55,
+runner alpha). Tier A: pure leaf getter, returns `&gIntermediateBaseMethods`
+(formerly `D_8006E878`), matching the `Get_vtable_BasicClass` naming
+precedent already established in this project for this exact shape. Called
+from `code_2c054.c`, `class_39e08.c` and this unit (`code_2cc8c_c.c`) --
+confirming, independently of `IntermediateBase__IntermediateBase`'s own evidence, that this
+accessor's table is genuinely shared across unrelated class hierarchies.

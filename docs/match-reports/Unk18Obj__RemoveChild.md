@@ -56,3 +56,11 @@ first build. Last function in this round's queue -- see `Obj86B60__OnNotify.md`
 and `New_Unk18Obj.md` for the two shared-table classtable dumps
 (`gIntermediateBaseMethods`, `D_8006E8E4`) that resolved this and every other function in
 this round except the register-identity stall `Obj86B60__NotifyParents`.
+
+## Naming
+
+**Unk18Obj__RemoveChild** (renamed from `func_8003E7F4`, round 55, runner
+alpha). Tier A: exact mirror of `Unk18Obj__AddChild` -- clears the same
+tag-keyed cached reference, THEN forwards to
+`Get_vtable_BasicClass()->removeChild` (matches canonical
+`BasicClassMethods::removeChild` `+0x014`).

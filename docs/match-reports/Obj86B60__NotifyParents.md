@@ -346,3 +346,20 @@ specific queued function, for a reason not visible from the C source shape.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. 5 attempts,
 `INCLUDE_ASM` left in place (never removed from the built source).
+
+## Naming (round 55, runner alpha)
+
+**Obj86B60__NotifyParents** (renamed from `func_8003E4B8`; still a STALL,
+23/32 -- naming applies to NON_MATCHING/stalled functions exactly as to
+matched ones, per track 3). Tier A: `Obj86B60Methods::slot30` (this
+function's own occupant, "IS Obj86B60__NotifyParents" per the header) is
+documented as "inherited BasicClass slot (`BasicClass__NotifyParents`)" --
+this function overrides `NotifyParents`, forwarding to the base slot
+unconditionally (`methods->slot30(self)`, itself still `slot30` since the
+occupant/dispatcher pair sits one level up this project doesn't rename
+without a clearer base-vs-derived split) and then, based on its own `arg1`
+parameter (stored into `self->unk20`), forwarding again to
+`Obj86B60__NotifyTargetReset` (mode 2) or `Obj86B60__NotifyChildReset`
+(mode 3) -- fully understood control flow per the report's own "What it
+does" section above, independent of the register-identity residue that
+stalls the byte match.

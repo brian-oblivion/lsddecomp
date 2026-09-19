@@ -27,3 +27,14 @@ void *Get_vtable_TaskCore(void)
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Get_vtable_TaskCore** (renamed from `func_8003DFBC`, round 55, runner alpha).
+Tier A: pure leaf getter, returns `&gTaskCoreMethods` (formerly `D_8006E730`).
+Already independently declared and named `TaskCoreMethods *func_8003DFBC(void)`
+in `include/code_2c054.h` (that unit's own richer local view of the same
+table) -- this rename aligns the function's own name with the established
+type name (`Get_vtable_BasicClass` naming precedent already used in this
+project for exactly this shape: a no-argument getter returning a shared
+static vtable).

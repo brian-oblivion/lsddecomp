@@ -55,3 +55,13 @@ way.
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Obj86B60__GetActiveSlotCount** (renamed from `func_8003DFA0`, round 55, runner alpha).
+Tier A: pure leaf getter (a pure leaf whose mechanics ARE its purpose,
+CLAUDE.md/track 3's own definition) -- returns `self->unk60[self->unk58]`,
+the running count for the currently-active ring-buffer slot (`unk60` is an
+array indexed by the `unk58` slot index, established across
+`Obj86B60__GetActiveSlotCount`/func_8003DDC8/func_8003DE30, code_2cc8c_b.c). No purpose beyond
+the getter itself is claimed.

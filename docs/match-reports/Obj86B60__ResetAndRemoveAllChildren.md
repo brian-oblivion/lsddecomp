@@ -39,3 +39,15 @@ void Obj86B60__ResetAndRemoveAllChildren(Obj86B60 *self)
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Obj86B60__ResetAndRemoveAllChildren** (renamed from `func_8003E874`,
+round 55, runner alpha). Tier A: mechanics fully known -- zeroes
+`self->unk30`, `self->unk10` and `self->initArgs`, then forwards to
+`Get_vtable_BasicClass()->removeAllChildren` (that base slot's own name,
+`+0x018`, matches the canonical `BasicClassMethods::removeAllChildren` at
+the identical offset in `include/code_8220.h`). Named for the whole visible
+effect (clear the object's own cached pointers, then remove every child)
+rather than asserting it is specifically a "finalize" override, since its
+own occupant slot on `Obj86B60Methods` is not otherwise identified.

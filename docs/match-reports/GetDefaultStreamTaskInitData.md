@@ -28,3 +28,12 @@ void *GetDefaultStreamTaskInitData(void)
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**GetDefaultStreamTaskInitData** (renamed from `func_8003DFCC`, round 55,
+runner alpha). Tier A: pure leaf getter, returns `&gDefaultStreamTaskInitData`
+(formerly `D_8006E854`), already declared `StreamTaskInitData *func_8003DFCC(void)`
+in `include/code_2c054.h` and used there (`code_2c054.c`) as the fallback
+default when a caller supplies no init data -- "Default" is the confirmed
+mechanic (a fixed fallback constant), not a guess.

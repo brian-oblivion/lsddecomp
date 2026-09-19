@@ -105,3 +105,18 @@ attempts here.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Obj86B60__Deinit** (renamed from `func_8003E280`, round 55, runner
+alpha). Tier A: exact mirror of `Obj86B60__Init` -- removes the children
+`Init` added (`removeChild`), then releases (`Unk14ObjMethods::release`/
+`Unk10ObjMethods::release`, both renamed this round, and the shared
+`Unk18ObjMethods::slot4`, proposed as `release`) each of the three helper
+objects `Init` may have default-constructed, but ONLY the ones whose
+current value still differs from the caller-supplied `initArgs` field --
+i.e. only the ones this object actually owns. `Obj86B60Methods::deinit`
+(`+0x048`, exclusive to this unit, renamed from `slot48`) IS this function,
+confirmed by `tools/classtable.py`/direct table read (see the header's own
+"IS" attribution) and independently by `Obj86B60__Init` calling
+`methods->deinit(self)` on its own mode-0 path.

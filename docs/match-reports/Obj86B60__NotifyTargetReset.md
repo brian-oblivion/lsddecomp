@@ -69,3 +69,15 @@ control-flow cost.
 ## Provenance
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. 2 attempts.
+
+## Naming
+
+**Obj86B60__NotifyTargetReset** (renamed from `func_8003E538`, round 55,
+runner alpha). Tier B: `Obj86B60Methods::slot64` occupant (dispatched by
+`Obj86B60__NotifyParents` on mode 2). Mechanics fully known: zeroes
+`self->unk1C` (the frame counter) then forwards a notification to
+`self->initArgs->target` (the retained InitArgs' own target object,
+`Obj86B60UnkCTargetMethods::slot48`). The game-level MEANING of "target"
+and of mode 2 vs mode 3 (see `Obj86B60__NotifyChildReset`) is not
+established, hence tier B; the name records the confirmed mechanic
+(reset the counter, then notify the target) rather than a guessed role.

@@ -82,3 +82,17 @@ this function's own bytes.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the first
 build.
+
+## Naming
+
+**Obj86B60__OnNotify** (renamed from `func_8003E030`, round 55, runner
+alpha). Tier A: forwards to `Get_vtable_BasicClass()->slot38` first (that
+slot IS `BasicClass__OnNotify` per `include/code_2cc8c.h`'s own
+`BasicClassMethodsCC8C` struct, offset-verified against
+`include/code_8220.h`'s canonical, already-named `BasicClassMethods::slot38`
+= `onNotify`), then adds its own dispatch on the incoming `EventArg`'s
+dynamic class tag -- the textbook "override calls base first, then does its
+own work" shape for a virtual method whose base identity is independently
+confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
+`onNotify` in this unit's `## Proposed field names` (shared with
+`code_2cc8c_d.c`'s own `func_8003E8B8`).

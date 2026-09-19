@@ -59,3 +59,14 @@ evidence no function *yet attempted* has dereferenced it.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Obj86B60__NotifyChildReset** (renamed from `func_8003E578`, round 55,
+runner alpha). Tier B: `Obj86B60Methods::slot68` occupant (dispatched by
+`Obj86B60__NotifyParents` on mode 3), mirroring `Obj86B60__NotifyTargetReset`'s
+shape exactly but forwarding to `self->initArgs->unk0` instead --
+`initArgs->unk0` is the SAME field `Obj86B60__Init` registers as a child
+via `addChild` (see `Obj86B60InitArgs`'s own header comment), which is why
+"Child" rather than "Target" here; the notification's game-level meaning
+remains unestablished (tier B).

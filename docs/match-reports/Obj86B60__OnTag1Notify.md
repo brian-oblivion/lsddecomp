@@ -68,3 +68,15 @@ side by side.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Obj86B60__OnTag1Notify** (renamed from `func_8003E418`, round 55, runner
+alpha). Tier B: confirmed to be `Obj86B60Methods::onTag1Notify` (`+0x054`,
+exclusive to this unit, renamed from `slot54`), the handler
+`Obj86B60__OnNotify` dispatches to when the incoming `EventArg`'s target
+class tag is 1 -- the "Tag1" in the name records that dispatch condition,
+which is directly observed in the caller, rather than a guessed purpose.
+On event code 2 it finalizes `self->unk10` and the `initArgs->unk4` helper
+object; what event code 2 represents in the game is not established
+(tier B).
