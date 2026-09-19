@@ -119,7 +119,7 @@ void func_8004D578(Class86B60 *self, void *dreamSys)
     DreamSysView_3bb8c_c *dream;
     Class86B60Unk48Obj *obj;
 
-    func_8003DFBC()->slot08(self, &D_80086D44, &D_800114DC, 0);
+    Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
     self->methods = func_8004E2D0();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);

@@ -63,7 +63,7 @@ extern void *func_80017B34(s32 size);
 typedef struct D_80087AACObj D_80087AACObj;
 
 /* This unit's own local view of the shared base-class table returned by
- * func_8003DFBC() (a plain no-argument getter, established elsewhere --
+ * Get_vtable_TaskCore() (a plain no-argument getter, established elsewhere --
  * e.g. include/code_2c054.h, include/class_3bb8c.h -- as returning
  * &D_8006E730). Only the slots this unit's own functions dispatch
  * through are typed, per the project's "per-call-site signature"
@@ -91,7 +91,7 @@ typedef struct D_8006E730Methods {
      * (round 19). */
     void (*slotE0)(D_80087AACObj *self, void *arg1);
 } D_8006E730Methods;
-extern D_8006E730Methods *func_8003DFBC(void);
+extern D_8006E730Methods *Get_vtable_TaskCore(void);
 
 void func_80057F38(void) {
 }
@@ -277,7 +277,7 @@ void *func_80057F68(void *arg1) {
 extern char D_8001176C[];
 
 void *func_80057FC8(D_80087AACObj *self, void *arg1) {
-    func_8003DFBC()->slot8(self, 0, D_8001176C, 0);
+    Get_vtable_TaskCore()->slot8(self, 0, D_8001176C, 0);
     self->methods = func_80058764();
     self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
     self->unk_0xA4 = arg1;
@@ -295,7 +295,7 @@ void func_80058078(D_80087AACObj *self) {
 }
 
 void func_800580E0(D_80087AACObj *self, void *arg1, void *arg2) {
-    func_8003DFBC()->slot5C(self, arg1, arg2);
+    Get_vtable_TaskCore()->slot5C(self, arg1, arg2);
     if (self->unk_0x3C == 1) {
         D_80087AACUnkA4Result *result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
         if (result->unk_0x4 != 0 || result->unk_0x8 != 0) {
@@ -357,12 +357,12 @@ void func_80058308(D_80087AACObj *self) {
     for (i = 0; i < 100; i++) {
         self->unk_0xA8[i]->methods->slot4(self->unk_0xA8[i]);
     }
-    func_8003DFBC()->slotDC(self);
+    Get_vtable_TaskCore()->slotDC(self);
 }
 
 s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
     s32 result;
-    func_8003DFBC()->slot44(self, arg1, arg2);
+    Get_vtable_TaskCore()->slot44(self, arg1, arg2);
     result = 2;
     if (self->unk_0x238 == 0) {
         result = self->unk_0x38;
@@ -387,7 +387,7 @@ void func_80058404(D_80087AACObj *self, void *arg1) {
     Point2 point;
     Point2 firstPoint;
 
-    func_8003DFBC()->slotE0(self, arg1);
+    Get_vtable_TaskCore()->slotE0(self, arg1);
     result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
     self->unk_0x238 = func_800585B4(self, result);
 

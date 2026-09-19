@@ -44,7 +44,7 @@ void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
     u8 *base;
     u8 v;
 
-    func_8003DFBC()->slotE4(self, arg1);
+    Get_vtable_TaskCore()->slotE4(self, arg1);
     base = buf;
     if (self->unk3C != 0) {
         base[0] = 0;
@@ -83,7 +83,7 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
 
 ## Derivation (all confirmed by the diff -- this is not in question)
 
-- `func_8003DFBC()->slotE4(self, arg1)` -- a NEW slot on
+- `Get_vtable_TaskCore()->slotE4(self, arg1)` -- a NEW slot on
   `BaseTaskCtorTable_3bb8c_c` at +0x0E4 (right after the existing
   `slotE0`, no gap), 2-argument, `self` forwarded then `arg1`. **Confirmed
   correct**: the diff shows the `jal 3dfbc` / `lw v0,0xe4(v0)` / `jalr`

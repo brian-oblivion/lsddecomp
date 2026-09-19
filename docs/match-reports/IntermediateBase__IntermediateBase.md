@@ -1,4 +1,6 @@
-# func_8003DFDC — MATCH (21/21 words)
+> Renamed from `func_8003DFDC` on 2026-09-19 (tools/rename.py). Address 0x8003dfdc.
+
+# IntermediateBase__IntermediateBase — MATCH (21/21 words)
 
 **Unit:** code_2cc8c_c · **Size:** 21 instructions
 
@@ -6,25 +8,25 @@
 
 This IS `D_8006E878`'s own +0x008 slot -- the "IntermediateBase" shared
 utility class's constructor (`tools/classtable.py D_8006E878` shows
-`+0x008 func_8003DFDC`). Runs the BasicClass ctor through `Get_vtable_BasicClass()`,
+`+0x008 IntermediateBase__IntermediateBase`). Runs the BasicClass ctor through `Get_vtable_BasicClass()`,
 installs this class's own vtable (`&D_8006E878`, via the already-matched
-getter `func_8003E5C8`), then dispatches its own freshly-installed slot40
+getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed slot40
 (`func_8003E100`, already matched, void-returning) once.
 
 Same self-typing convention as this unit's other already-matched siblings
 from the same shared table (`func_8003E100`, `func_8003E4A4`, `func_8003E538`):
 `Obj86B60 *self`, even though the class is generically shared across many
 unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
-`D_8006E878+0x008`, called there as `func_8003E5C8()->slot08(self)` on a
+`D_8006E878+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
 `StreamTaskObj *self`).
 
 ## The C
 
 ```c
-void func_8003DFDC(Obj86B60 *self)
+void IntermediateBase__IntermediateBase(Obj86B60 *self)
 {
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = (Obj86B60Methods *)func_8003E5C8();
+    self->methods = (Obj86B60Methods *)Get_vtable_IntermediateBase();
     self->methods->slot40(self);
 }
 ```
@@ -38,7 +40,7 @@ void func_8003DFDC(Obj86B60 *self)
 - Added `slot40` to `Obj86B60Methods` (`Obj86B60 *self`), the slot this
   function calls through after installing its own vtable -- it IS
   `func_8003E100`, already matched elsewhere in this unit.
-- The explicit cast `(Obj86B60Methods *)func_8003E5C8()` mirrors
+- The explicit cast `(Obj86B60Methods *)Get_vtable_IntermediateBase()` mirrors
   `src/class_39e08.c`'s own `self->methods = (Class865C8Methods *)
   func_8004A4B8();` -- assigning a shared/generic table getter's return
   into a locally-typed `methods` field is an established idiom in this

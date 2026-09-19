@@ -947,3 +947,7 @@ Class6B5CC__ClassifyAgainstPlanes = 0x8001DDF4; // type:func
 Class6B5CC__NotifyTaggedParents = 0x8001E4A4; // type:func
 GetClass6B5CCMethods = 0x8001E57C; // type:func
 Obj86B60__GetActiveSlotCount = 0x8003DFA0; // type:func
+Get_vtable_TaskCore = 0x8003DFBC; // type:func
+GetDefaultStreamTaskInitData = 0x8003DFCC; // type:func
+IntermediateBase__IntermediateBase = 0x8003DFDC; // type:func
+Get_vtable_IntermediateBase = 0x8003E5C8; // type:func

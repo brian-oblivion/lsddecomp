@@ -176,7 +176,7 @@ void func_80026254(Class6D3C8 *self, const char *path);
 
 /* A second "New_X"-shaped task object, allocated by func_8003BE94
  * (uncarved, asm/code_2c054.s) -- 0xA4 bytes, constructed through
- * func_8003DFBC's slot +0x008. Different class from StreamTaskMethods
+ * Get_vtable_TaskCore's slot +0x008. Different class from StreamTaskMethods
  * above (different allocator, different slot signatures at the same
  * offsets), used by func_80026254 to register a named resource with a
  * completion callback. */

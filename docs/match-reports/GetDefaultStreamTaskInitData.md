@@ -1,4 +1,6 @@
-# func_8003DFCC — MATCH (4/4 words)
+> Renamed from `func_8003DFCC` on 2026-09-19 (tools/rename.py). Address 0x8003dfcc.
+
+# GetDefaultStreamTaskInitData — MATCH (4/4 words)
 
 **Unit:** code_2cc8c_c · **Size:** 4 instructions
 
@@ -7,7 +9,7 @@
 A tiny getter: returns the address of the static table `D_8006E854`, a
 3-word struct per `include/code_2c054.h`'s own `StreamTaskInitData` local
 view (that unit's `func_8003B8E4` uses it as the 5th/stack argument to a
-constructor call, and `func_8003DFCC()`'s return value feeds the same
+constructor call, and `GetDefaultStreamTaskInitData()`'s return value feeds the same
 3-word copy). This unit never dereferences it, only returns its address,
 so it is declared here as an opaque `u8[]`.
 
@@ -16,7 +18,7 @@ so it is declared here as an opaque `u8[]`.
 ```c
 extern u8 D_8006E854[];
 
-void *func_8003DFCC(void)
+void *GetDefaultStreamTaskInitData(void)
 {
     return D_8006E854;
 }

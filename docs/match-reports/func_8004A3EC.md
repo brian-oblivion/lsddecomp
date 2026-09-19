@@ -14,7 +14,7 @@ return -- sets a flag and notifies through the class's own +0x07C slot.
 ## Derivation
 
 ```
-jal   func_8003E5C8
+jal   Get_vtable_IntermediateBase
  move $s0, $a1              ; s0 = original arg1, saved across the call
 move  $a0, $s1               ; a0 = self
 lw    $v0, 0x60($v0)
@@ -35,7 +35,7 @@ Written as:
 
 ```c
 void func_8004A3EC(Obj865C8 *self, s32 arg1) {
-    func_8003E5C8()->slot60(self, arg1);
+    Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
         self->unk28 = 1;
         self->methods->noop7C(self);

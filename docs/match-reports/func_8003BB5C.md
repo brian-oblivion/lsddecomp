@@ -8,7 +8,7 @@ Three sequential early-return guards.
 
 ```c
 void func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
-    func_8003DFBC()->slot5C(self, a1, a2);
+    Get_vtable_TaskCore()->slot5C(self, a1, a2);
     if (self->unkA4 != 0) {
         return;
     }
@@ -25,7 +25,7 @@ void func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
 
 ## Evidence
 
-- `func_8003DFBC()->slot5C`: `TaskCoreMethods` slot `+0x05C`, occupied by
+- `Get_vtable_TaskCore()->slot5C`: `TaskCoreMethods` slot `+0x05C`, occupied by
   `func_8003C51C` (a different unit, not touched here). Takes `(self, a1,
   a2)` matching this function's own two forwarded parameters; result
   discarded, typed `void`.

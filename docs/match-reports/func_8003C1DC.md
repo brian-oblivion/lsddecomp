@@ -4,7 +4,7 @@
 
 ## What it does
 
-Forwards to a SECOND sibling class's table (`func_8003E5C8()`, returns
+Forwards to a SECOND sibling class's table (`Get_vtable_IntermediateBase()`, returns
 `&D_8006E878`) at slot `+0x044`, passing `self` and both of its own
 arguments unchanged, discards that call's return, then reads and returns
 `self->unk38`. This function itself occupies `D_8006E730` slot `+0x044` --
@@ -19,7 +19,7 @@ uncarved).
 ```
 addu $s2, $a0, zero            ; s2 = self
 addu $s0, $a1, zero            ; s0 = a1
-jal  func_8003E5C8
+jal  Get_vtable_IntermediateBase
  addu $s1, $a2, zero            ; s1 = a2 (delay slot)
 addu $a0, $s2, zero
 addu $a1, $s0, zero
@@ -32,7 +32,7 @@ lw   $v0, 0x38($s2)              ; v0 = self->unk38, AFTER the call returns
 
 ```c
 s32 func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
-    func_8003E5C8()->slot44(self, a1, a2);
+    Get_vtable_IntermediateBase()->slot44(self, a1, a2);
     return self->unk38;
 }
 ```

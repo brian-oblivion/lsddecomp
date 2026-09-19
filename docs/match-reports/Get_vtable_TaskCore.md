@@ -1,4 +1,6 @@
-# func_8003DFBC — MATCH (4/4 words)
+> Renamed from `func_8003DFBC` on 2026-09-19 (tools/rename.py). Address 0x8003dfbc.
+
+# Get_vtable_TaskCore — MATCH (4/4 words)
 
 **Unit:** code_2cc8c_c · **Size:** 4 instructions
 
@@ -15,7 +17,7 @@ returns its address, so it is declared here as an opaque `u8[]`.
 ```c
 extern u8 D_8006E730[];
 
-void *func_8003DFBC(void)
+void *Get_vtable_TaskCore(void)
 {
     return D_8006E730;
 }

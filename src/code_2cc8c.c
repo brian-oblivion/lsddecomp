@@ -64,7 +64,7 @@ void func_8003C51C(Obj86B60 *self, s32 a1, s32 a2)
     Obj86B60Methods *methods;
 
     methods = self->methods;
-    func_8003E5C8()->slot5C(self, a1, a2);
+    Get_vtable_IntermediateBase()->slot5C(self, a1, a2);
     if (self->unk3C != 0) {
         u32 bound;
 
@@ -94,7 +94,7 @@ void func_8003C63C(Obj86B60 *self, s32 a1)
     Obj86B60Methods *methods;
 
     methods = self->methods;
-    func_8003E5C8()->slot60(self, a1);
+    Get_vtable_IntermediateBase()->slot60(self, a1);
     switch (a1) {
     case 5:
         methods->slotE4(self, self->unk4C->unk10);

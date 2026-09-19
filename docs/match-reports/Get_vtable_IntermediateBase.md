@@ -1,4 +1,6 @@
-# func_8003E5C8 — MATCH (4/4 words)
+> Renamed from `func_8003E5C8` on 2026-09-19 (tools/rename.py). Address 0x8003e5c8.
+
+# Get_vtable_IntermediateBase — MATCH (4/4 words)
 
 **Unit:** code_2cc8c_c · **Size:** 4 instructions
 
@@ -17,7 +19,7 @@ own independent local view per this project's established convention).
 ## The C
 
 ```c
-IntermediateBaseMethods *func_8003E5C8(void)
+IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 {
     return &D_8006E878;
 }
@@ -26,7 +28,7 @@ IntermediateBaseMethods *func_8003E5C8(void)
 ## Header note
 
 `include/code_2cc8c.h` already declared
-`extern IntermediateBaseMethods *func_8003E5C8(void);` with a comment
+`extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);` with a comment
 saying "still raw asm elsewhere in the still-uncarved code_2cc8c_b portion
 of this segment -- not this unit's function to write". That comment is now
 stale (this round carved it into `code_2cc8c_c.c`) and was updated in place

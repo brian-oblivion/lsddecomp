@@ -264,7 +264,7 @@ struct Obj865C8 {
     u8 pad04[0x0C - 0x04];
     Obj0C *unk0C;                 /* +0x00C, func_80049AC0 dereferences (->unk4); passed
                                       through as a plain register value to
-                                      func_8003E5C8()->slot44's 2nd arg by func_80049E20 */
+                                      Get_vtable_IntermediateBase()->slot44's 2nd arg by func_80049E20 */
     s32 unk10;                    /* +0x010, func_80049AC0 (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, func_80049C50 */
@@ -276,7 +276,7 @@ struct Obj865C8 {
     SubObjB *subB;                /* +0x034, func_8004A228 */
     SubObjD *unk38;                /* +0x038, func_80049AC0 dereferences (->methods); passed
                                        through as a plain register value to
-                                       func_8003E5C8()->slot44's 3rd arg by func_80049E20 */
+                                       Get_vtable_IntermediateBase()->slot44's 3rd arg by func_80049E20 */
     s32 unk3C;                    /* +0x03C, func_80049A14 */
     /* Retyped from `s32` (func_80049E20's own usage only ever forwards
      * these as opaque register values into func_80052B70, never
@@ -314,7 +314,7 @@ typedef struct IntermediateBaseMethods {
 /* Uncarved (asm/code_2cc8c.s, not this unit's to write): a plain accessor
  * with no parameters, returning &D_8006E878. Same shape as
  * Get_vtable_DreamSys / GetClass6D3C8Methods (docs/research/class-framework.md). */
-extern IntermediateBaseMethods *func_8003E5C8(void);
+extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);
 
 /* Allocator in the still-uncarved unit class_3bb8c (asm/class_3bb8c.s):
  * allocates an 0x88-byte instance, ctors it, and dispatches its own slot
@@ -362,7 +362,7 @@ typedef struct Class86668Methods {
      * as func_8004A4B8()->slot44(self, self->unk0C, 0), return discarded. */
     s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
     /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
-     * func_8003E5C8()->slot48(self). Called by func_80049AC0 as
+     * Get_vtable_IntermediateBase()->slot48(self). Called by func_80049AC0 as
      * func_8004A4B8()->slot48(self). */
     void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
     u8 pad4C[0x54 - 0x4C];

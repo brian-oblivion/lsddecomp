@@ -36,7 +36,7 @@ typedef struct TaskCoreObj TaskCoreObj;
 typedef struct StreamTaskInitData StreamTaskInitData;
 
 /* A 3-word struct: func_8003B8E4's optional 5th (stack) argument, and also
- * func_8003DFCC()'s return type -- both feed the exact same 3-word copy into
+ * GetDefaultStreamTaskInitData()'s return type -- both feed the exact same 3-word copy into
  * StreamTaskObj::unkA8/unkAC/unkB0, so they're the same shape. Real field
  * meanings unknown (never dereferenced beyond word offset by this unit's
  * queued functions). */
@@ -46,7 +46,7 @@ struct StreamTaskInitData {
     s32 unk8; /* +0x008 */
 };
 
-extern StreamTaskInitData *func_8003DFCC(void);
+extern StreamTaskInitData *GetDefaultStreamTaskInitData(void);
 
 struct StreamTaskObjMethods {
     s32 header; /* +0x000 */
@@ -155,7 +155,7 @@ struct StreamTaskObj {
     s32 unkA4;                     /* +0x0A4, reset to 0 by func_8003BAB4; read
                                         and set to a call result by func_8003BB5C */
     StreamTaskInitData unkA8;         /* +0x0A8, whole-struct-copied by func_8003B8E4 from
-                                          either its 5th argument or func_8003DFCC()'s
+                                          either its 5th argument or GetDefaultStreamTaskInitData()'s
                                           default (retail batches all 3 loads before all
                                           3 stores -- a struct assignment, not 3 separate
                                           field writes) */
@@ -333,7 +333,7 @@ struct TaskCoreMethods {
                                                                         (D_8006E730+0x0D8 = func_8003CE98) */
 };
 
-extern TaskCoreMethods *func_8003DFBC(void); /* returns &D_8006E730 */
+extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &D_8006E730 */
 
 /* `StreamTaskObj::unk18` and its vtable, `TaskCoreObjMethods`.
  *
@@ -381,17 +381,17 @@ typedef struct TaskUtilMethods TaskUtilMethods;
 struct TaskUtilMethods {
     u8 pad00[0x008];
     void (*slot08)(StreamTaskObj *self); /* +0x008, func_8003BF10's forward target
-                                              (D_8006E878+0x008 = func_8003DFDC) */
+                                              (D_8006E878+0x008 = IntermediateBase__IntermediateBase) */
     void (*slot0C)(StreamTaskObj *self); /* +0x00C, func_8003C008's forward target
                                               (D_8006E878+0x00C = BasicClass__func_17f2c) */
     u8 pad10[0x044 - 0x010];
     void (*slot44)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x044 */
 };
 
-extern TaskUtilMethods *func_8003E5C8(void); /* returns &D_8006E878 */
+extern TaskUtilMethods *Get_vtable_IntermediateBase(void); /* returns &D_8006E878 */
 
 /* Allocates/initializes self->unkB4 (a StreamTaskUnkB4Obj); called by
- * func_8003B8E4 as `func_80045438(func_8003DFCC(), 0, 0)`. Not this unit's
+ * func_8003B8E4 as `func_80045438(GetDefaultStreamTaskInitData(), 0, 0)`. Not this unit's
  * own function (no INCLUDE_ASM here), so only the call site's own argument
  * and return types are modeled. */
 extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2);

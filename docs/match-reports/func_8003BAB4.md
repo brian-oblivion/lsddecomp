@@ -6,7 +6,7 @@
 
 ```c
 void func_8003BAB4(StreamTaskObj *self) {
-    func_8003DFBC()->slot4C(self);
+    Get_vtable_TaskCore()->slot4C(self);
     self->unkA4 = 0;
     self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
     if (self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8) != 0) {
@@ -17,7 +17,7 @@ void func_8003BAB4(StreamTaskObj *self) {
 
 ## Evidence
 
-- `func_8003DFBC()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
+- `Get_vtable_TaskCore()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
   D_8006E730` shows it occupied by `func_8003C238`, this unit's own (still
   queued, larger) function — confirms existence/arity, result discarded here
   so typed `void`.

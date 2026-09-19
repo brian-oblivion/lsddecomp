@@ -10,7 +10,7 @@ s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
  * here since this unit never dereferences it, only returns its address. */
 extern u8 D_8006E730[];
 
-void *func_8003DFBC(void)
+void *Get_vtable_TaskCore(void)
 {
     return D_8006E730;
 }
@@ -20,15 +20,15 @@ void *func_8003DFBC(void)
  * address. */
 extern u8 D_8006E854[];
 
-void *func_8003DFCC(void)
+void *GetDefaultStreamTaskInitData(void)
 {
     return D_8006E854;
 }
 
-void func_8003DFDC(Obj86B60 *self)
+void IntermediateBase__IntermediateBase(Obj86B60 *self)
 {
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = (Obj86B60Methods *)func_8003E5C8();
+    self->methods = (Obj86B60Methods *)Get_vtable_IntermediateBase();
     self->methods->slot40(self);
 }
 
@@ -154,7 +154,7 @@ void func_8003E578(Obj86B60 *self)
     self->unk1C = 0;
 }
 
-IntermediateBaseMethods *func_8003E5C8(void)
+IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 {
     return &D_8006E878;
 }

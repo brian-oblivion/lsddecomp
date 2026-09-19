@@ -7,12 +7,12 @@ void func_8004D704(Class86B60 *self)
         self->unkAC->methods->release(self->unkAC);
         self->unkA8->methods->release(self->unkA8);
     }
-    func_8003DFBC()->slot0C(self);
+    Get_vtable_TaskCore()->slot0C(self);
 }
 
 void func_8004D788(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
 {
-    func_8003DFBC()->slot38(self, arg1, arg2);
+    Get_vtable_TaskCore()->slot38(self, arg1, arg2);
     if ((arg1->methods->header & 0xF) == 0xB) {
         self->methods->slot138(self, arg1, arg2);
     }
@@ -42,7 +42,7 @@ void func_8004D898(Class86B60 *self)
 
 void func_8004D90C(Class86B60 *self, s32 arg1)
 {
-    func_8003DFBC()->slot60(self, arg1);
+    Get_vtable_TaskCore()->slot60(self, arg1);
     if (arg1 == 5) {
         self->methods->slot124(self, 0);
     }
@@ -57,7 +57,7 @@ void func_8004D9D4(Class86B60 *self)
 {
     void (*fn)(Class86B60 *);
 
-    func_8003DFBC()->slot90(self);
+    Get_vtable_TaskCore()->slot90(self);
     switch (self->unk58) {
     case 1:
         self->unk38 = 0;
@@ -84,7 +84,7 @@ void func_8004DABC(Class86B60 *self)
 {
     s32 buf;
 
-    func_8003DFBC()->slot94(self);
+    Get_vtable_TaskCore()->slot94(self);
     buf = self->unk60->unk14;
     self->unkA4->methods->slot19C(self->unkA4, &buf);
 }
@@ -136,12 +136,12 @@ void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
 void func_8004DC08(Class86B60 *self)
 {
     self->unkB0->methods->release(self->unkB0);
-    func_8003DFBC()->slotDC(self);
+    Get_vtable_TaskCore()->slotDC(self);
 }
 
 void func_8004DC64(Class86B60 *self, s32 arg1)
 {
-    func_8003DFBC()->slotE0(self, arg1);
+    Get_vtable_TaskCore()->slotE0(self, arg1);
     self->unkB0->methods->slot4C(self->unkB0, arg1, &D_8008A9B4);
 }
 
@@ -174,7 +174,7 @@ void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
     u8 *base;
     u8 v;
 
-    func_8003DFBC()->slotE4(self, arg1);
+    Get_vtable_TaskCore()->slotE4(self, arg1);
     base = buf;
     if (self->unk3C != 0) {
         base[0] = 0;
@@ -214,7 +214,7 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DCD0);
  * 2-argument function -- but THIS call site sets up a 3rd argument
  * (self->unkA4, in $a2) that the other unit's own 2-parameter view never
  * receives. Same independent-arities situation already documented for
- * func_8003DFBC/BaseTaskCtorTable_3bb8c_c: this unit's own local view
+ * Get_vtable_TaskCore/BaseTaskCtorTable_3bb8c_c: this unit's own local view
  * matches what THIS call site needs. */
 extern void func_8004D678(void *arg0, void *arg1, void *arg2);
 

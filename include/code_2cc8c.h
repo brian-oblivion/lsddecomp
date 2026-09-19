@@ -969,7 +969,7 @@ struct Obj86B60Methods {
     void (*slot40)(Obj86B60 *self);               /* +0x040, IS
                                                       func_8003E100 (already
                                                       matched); OBSERVED:
-                                                      func_8003DFDC */
+                                                      IntermediateBase__IntermediateBase */
     u8 pad044[0x048 - 0x044];
     void (*slot48)(Obj86B60 *self);               /* +0x048, IS
                                                       func_8003E280;
@@ -1325,8 +1325,8 @@ struct Obj86B60 {
 };
 
 /*
- * Shared "IntermediateBase" utility class, reached through func_8003E5C8().
- * UPDATED (round 12, runner alpha): func_8003E5C8 has now been carved into
+ * Shared "IntermediateBase" utility class, reached through Get_vtable_IntermediateBase().
+ * UPDATED (round 12, runner alpha): Get_vtable_IntermediateBase has now been carved into
  * THIS unit's own code_2cc8c_c.c and is defined there -- this comment
  * previously said "not this unit's function to write" because it was
  * written before that carve. Same idiom already established in
@@ -1343,13 +1343,13 @@ struct IntermediateBaseMethods {
     void (*slot60)(void *self, s32 a1);           /* +0x060 */
 };
 
-extern IntermediateBaseMethods *func_8003E5C8(void); /* returns &D_8006E878,
+extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void); /* returns &D_8006E878,
                                                           same static table
                                                           as code_2c054.h's
                                                           and class_39e08.h's
                                                           own views */
 extern IntermediateBaseMethods D_8006E878; /* the table itself, so
-                                                func_8003E5C8's own
+                                                Get_vtable_IntermediateBase's own
                                                 definition (code_2cc8c_c.c)
                                                 can return &D_8006E878 */
 
@@ -1367,7 +1367,7 @@ typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
 struct BasicClassMethodsCC8C {
     u8 pad000[0x008];
     void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
-                                  (code_8220.c); OBSERVED: func_8003DFDC */
+                                  (code_8220.c); OBSERVED: IntermediateBase__IntermediateBase */
     void (*slot0C)(void *self); /* +0x00C, IS BasicClass__func_17f2c
                                   (code_8220.c, "finalize"); OBSERVED:
                                   func_8003E6CC (round 13) */

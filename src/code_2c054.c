@@ -14,21 +14,21 @@ StreamTaskObj *func_8003B854(s32 a1, s32 a2, s32 a3, s32 a4)
 }
 
 void func_8003B8E4(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
-    func_8003DFBC()->slot08(self, a1, a2, a3);
+    Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
     self->methods = func_8003BE84();
     if (a4 != NULL) {
         self->unkA8 = *a4;
     } else {
-        self->unkA8 = *func_8003DFCC();
+        self->unkA8 = *GetDefaultStreamTaskInitData();
     }
-    self->unkB4 = func_80045438(func_8003DFCC(), 0, 0);
+    self->unkB4 = func_80045438(GetDefaultStreamTaskInitData(), 0, 0);
     self->unkB8 = 0;
     self->methods->slot40(self);
 }
 
 void func_8003B9DC(StreamTaskObj *self) {
     self->unkB4->methods->slot04(self->unkB4);
-    func_8003DFBC()->slot0C(self);
+    Get_vtable_TaskCore()->slot0C(self);
 }
 
 void func_8003BA38(StreamTaskObj *self) {
@@ -43,11 +43,11 @@ void func_8003BA58(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32 fl
     self->unkB8 = arg2;
     self->unkBC = typeLookup;
     self->unkC0 = flag;
-    func_8003DFBC()->slot44(self, a1, 0);
+    Get_vtable_TaskCore()->slot44(self, a1, 0);
 }
 
 void func_8003BAB4(StreamTaskObj *self) {
-    func_8003DFBC()->slot4C(self);
+    Get_vtable_TaskCore()->slot4C(self);
     self->unkA4 = 0;
     self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
     if (self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8) != 0) {
@@ -56,7 +56,7 @@ void func_8003BAB4(StreamTaskObj *self) {
 }
 
 void func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
-    func_8003DFBC()->slot5C(self, a1, a2);
+    Get_vtable_TaskCore()->slot5C(self, a1, a2);
     if (self->unkA4 != 0) {
         return;
     }
@@ -71,7 +71,7 @@ void func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
 }
 
 void func_8003BC14(StreamTaskObj *self, s32 a1) {
-    func_8003DFBC()->slot60(self, a1);
+    Get_vtable_TaskCore()->slot60(self, a1);
     switch (a1) {
     case 5:
         self->unkD8 = 0;
@@ -98,7 +98,7 @@ void func_8003BCF4(StreamTaskObj *self, s32 a1) {
 }
 
 void func_8003BD10(StreamTaskObj *self) {
-    func_8003DFBC()->slot78(self);
+    Get_vtable_TaskCore()->slot78(self);
     if (self->unkCC != 0) {
         self->unk38 = 2;
         self->methods->slot60(self, 0x12);
@@ -106,11 +106,11 @@ void func_8003BD10(StreamTaskObj *self) {
 }
 
 void func_8003BD74(StreamTaskObj *self) {
-    func_8003DFBC()->slot80(self);
+    Get_vtable_TaskCore()->slot80(self);
 }
 
 void func_8003BDAC(StreamTaskObj *self) {
-    func_8003DFBC()->slot84(self);
+    Get_vtable_TaskCore()->slot84(self);
 }
 
 void func_8003BDE4(void) {
@@ -160,7 +160,7 @@ TaskCoreObj *func_8003BE94(s32 a1, s32 a2, s32 a3)
 
     self = func_80017B34(0xA4);
     if (self != NULL) {
-        func_8003DFBC()->slot08((StreamTaskObj *)self, a1, a2, a3);
+        Get_vtable_TaskCore()->slot08((StreamTaskObj *)self, a1, a2, a3);
         return self;
     }
     return NULL;
@@ -170,8 +170,8 @@ void func_8003BF10(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) 
     StreamTaskUnkB4Obj *tmp;
     TaskCoreMethods *core;
 
-    func_8003E5C8()->slot08(self);
-    core = func_8003DFBC();
+    Get_vtable_IntermediateBase()->slot08(self);
+    core = Get_vtable_TaskCore();
     self->methods = (StreamTaskObjMethods *)core;
     core->slotD8(self, a1);
     if (a2 != 0) {
@@ -200,7 +200,7 @@ void func_8003C008(StreamTaskObj *self) {
         self->unk74->methods->slot04(self->unk74);
     }
     self->methods->slotDC(self);
-    func_8003E5C8()->slot0C(self);
+    Get_vtable_IntermediateBase()->slot0C(self);
 }
 
 void func_8003C11C(StreamTaskObj *self) {
@@ -220,7 +220,7 @@ void func_8003C11C(StreamTaskObj *self) {
 }
 
 s32 func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
-    func_8003E5C8()->slot44(self, a1, a2);
+    Get_vtable_IntermediateBase()->slot44(self, a1, a2);
     return self->unk38;
 }
 
