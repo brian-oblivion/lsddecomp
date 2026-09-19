@@ -1,8 +1,26 @@
-/* 25 queued, all fresh. Offered to runners in round 2026-08-30-a; no longer
- * banked. The first 25 of a 142-function block split at func_8005DE18; the
- * remainder is Entity_b, still an asm segment, and pairs well with a later
- * carve. No function in this unit touches a %gp_rel global, so none of it is
- * exposed to the gp-relative blocker (docs/research/gp-relative-blocker.md).
+/* The Entity class -- fully matched, no INCLUDE_ASM left (round 56 was a
+ * track 3 naming pass, not matching work). This is the first 25 of a
+ * 142-function block split at func_8005DE18; the rest (Entity_b through
+ * Entity_g, all sharing include/Entity.h) hold the mood-dispatch handler
+ * tables and the per-frame behaviour those handlers run.
+ *
+ * This unit itself covers Entity's own construction/destruction
+ * (New_Entity/Entity__Entity/Entity__Destructor), its per-tick dispatcher
+ * (Entity__Update, chaining through most of EntityMethods), the sound-cue
+ * lifecycle (Entity__StartSoundCue/TickSoundCue/StopSoundCue on the
+ * soundCueChannel/soundCueSet pair), the active-flag toggle
+ * (Entity__Activate/Deactivate and the two functions that decide whether to
+ * fire them, Entity__UpdateActivationState/DeactivationState), and four
+ * small getters over the moodIndex-selected per-mood tables
+ * (Entity__GetMoodEffect/GetUnlockEffect/GetLinkStage/GetEventVideo).
+ *
+ * Entity's own vtable is ENTITY_METHODS (asm/data/79528.data.s), reached via
+ * Get_vtable_Entity (Entity_b.c); `tools/classtable.py ENTITY_METHODS` is
+ * the ground truth for which function occupies which slot, including the
+ * several self-referential slots this unit's own functions dispatch back
+ * into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue --
+ * see the individual match reports' "## Proposed field names" for the
+ * cross-unit ones still awaiting a head apply-by-type-scope).
  */
 #include "common.h"
 #include "Entity.h"
