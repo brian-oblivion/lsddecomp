@@ -12,7 +12,7 @@ own table.
 
 **Updated in round 2026-09-01 (runner bravo, Entity 11-function pass):**
 `D_80089EA4` is no longer typed as a bare `u8[]` indexed with a manual
-`* 0x10`. `func_8005DBF0`/`func_8005DD18` (this same table's other readers,
+`* 0x10`. `Entity__UpdateDetachState`/`Entity__UpdateLinkState` (this same table's other readers,
 matched in that pass) needed named sub-byte fields inside each 16-byte row
 (`detachKind` at +0x3, `linkKind` at +0x4, plus `unk5`/`unk9`), so the table
 is now `extern EntityMoodRow D_80089EA4[];` (see `include/Entity.h`) and this

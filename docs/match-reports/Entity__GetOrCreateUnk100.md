@@ -1,4 +1,6 @@
-# func_8005D108
+> Renamed from `func_8005D108` on 2026-09-19 (tools/rename.py). Address 0x8005d108.
+
+# Entity__GetOrCreateUnk100
 
 **Unit:** Entity · **Size:** 57 words · **Status:** MATCHED (57/57 words, whole-image build verified byte-exact)
 
@@ -30,7 +32,7 @@ return sub
 ## Final C
 
 ```c
-Unk100Obj *func_8005D108(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
     Unk100Obj *cached;
     Unk100Obj *sub;
     Unk100Methods *m;

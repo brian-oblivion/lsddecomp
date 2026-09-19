@@ -46,7 +46,7 @@ Byte-exact, 20/20 words.
 ## Notes
 
 `set` (the caller's own `this->unk58`/`&this->unk9C` pair, at the one
-visible caller in `asm/nonmatchings/Entity/func_8005DAFC.s`) is a
+visible caller in `asm/nonmatchings/Entity/Entity__StartSoundCue.s`) is a
 lazily-initialized slot table: guarded by `set->tag == 0`, fills 3
 `SoundCueSlot` entries (stride 0x14) with a `-1` sentinel, sets
 `set->unk4 = 0` and `set->unk14 = 10`, and stores the three constructor

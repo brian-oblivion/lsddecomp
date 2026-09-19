@@ -1,4 +1,6 @@
-# func_8005DAFC -- MATCHED (36/36 words)
+> Renamed from `func_8005DAFC` on 2026-09-19 (tools/rename.py). Address 0x8005dafc.
+
+# Entity__StartSoundCue -- MATCHED (36/36 words)
 
 **Unit:** Entity · Runner: charlie, round 23.
 
@@ -23,7 +25,7 @@ struct EntityMoodHandlerRow {
 extern EntityMoodHandlerRow D_80089EB0[];
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, Entity *arg3, void *arg4);
 
-void func_8005DAFC(Entity *this) {
+void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->unk58, &this->unk9C, this->moodIndex + 1, this,
                   D_80089EB0[this->moodIndex].handler);
     this->methods->slot12C(this);

@@ -1,4 +1,6 @@
-# func_8005D278 -- MATCHED (39/39 words)
+> Renamed from `func_8005D278` on 2026-09-19 (tools/rename.py). Address 0x8005d278.
+
+# Entity__InitState -- MATCHED (39/39 words)
 
 **Unit:** Entity · Runner: charlie, round 23.
 
@@ -13,7 +15,7 @@ unconditionally calls two more vtable slots.
 ## Final C
 
 ```c
-void func_8005D278(Entity *this) {
+void Entity__InitState(Entity *this) {
     s32 kind;
 
     kind = ((u8 *)D_80089EA6)[this->moodIndex * 0x10];
@@ -28,7 +30,7 @@ void func_8005D278(Entity *this) {
 ## Attempt log
 
 First attempt wrote the range check as `(u32)((kind + 9) & 0xFF) < 9`,
-copying the `+9`/`&0xFF`/byte-sign-extend pattern from `func_8005D714`'s
+copying the `+9`/`&0xFF`/byte-sign-extend pattern from `Entity__IsNearTarget`'s
 similar-looking table read by mistake -- that function's residue really
 does need that shape, but this one's own disassembly is simpler:
 `addiu $v0,$v0,-0x1` / `sltiu $v0,$v0,0x9`, no `andi` mask anywhere. The
@@ -53,7 +55,7 @@ CLAUDE.md's build-log guidance).
 
 **A table read that "looks like" another function's near-identical-looking
 table read is not evidence of the same expression shape -- check the actual
-instructions before pattern-matching from memory.** Here `func_8005D714`
+instructions before pattern-matching from memory.** Here `Entity__IsNearTarget`
 (read moments earlier while scoping the whole batch) uses `D_80089EA6`-style
 byte reads with a `+9`/`&0xFF`/sign-extend-by-shift idiom for an unrelated
 purpose (widening a byte to a signed multiplier); this function reads the

@@ -1,4 +1,6 @@
-# func_8005D480
+> Renamed from `func_8005D480` on 2026-09-19 (tools/rename.py). Address 0x8005d480.
+
+# Entity__Update
 
 **Unit:** Entity · **Size:** 56 words · **Status:** MATCHED (56/56 words, whole-image build verified byte-exact)
 
@@ -13,7 +15,7 @@ parameters forwarded.
 ## Final C
 
 ```c
-void func_8005D480(Entity *this, s32 a1, s32 a2) {
+void Entity__Update(Entity *this, s32 a1, s32 a2) {
     if (this->methods->slot170(this) != 0) {
         this->methods->slot174(this);
     }

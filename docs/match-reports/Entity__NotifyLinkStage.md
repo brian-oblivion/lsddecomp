@@ -1,4 +1,6 @@
-# func_8005D560 -- MATCHED (62/62 words)
+> Renamed from `func_8005D560` on 2026-09-19 (tools/rename.py). Address 0x8005d560.
+
+# Entity__NotifyLinkStage -- MATCHED (62/62 words)
 
 **Unit:** Entity · Runner: charlie, round 23.
 
@@ -14,7 +16,7 @@ link stage is exactly `0x7F`, in which case a second table
 ## Final C
 
 ```c
-void func_8005D560(Entity *this, s32 arg1, s32 arg2) {
+void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     s32 linkStage;
 
     linkStage = D_80089EAB[this->moodIndex * 0x10];
@@ -63,7 +65,7 @@ Byte-exact, whole-image build verified.
    the call site. So retail reuses the `arg2` PARAMETER itself for the
    0xA/0xB/0xC value (dead by that point, since the caller has already
    forced `arg2 == 4` to reach here) rather than allocating a fresh local.
-   Same lever as this round's `func_8005D714` residue: mutating the
+   Same lever as this round's `Entity__IsNearTarget` residue: mutating the
    parameter in place instead of introducing a same-purpose local resolves
    a register-identity swap, because the extra local was what pushed
    `linkStage`'s pseudo-register ahead of `arg2`'s in GCC's allocation
@@ -98,7 +100,7 @@ after fixing the outermost instance.
 **A local variable introduced purely to hold "whichever branch's result
 survives to a single later use" is itself a register-identity risk, and
 this is now the SECOND confirmed instance in one round** (see
-`func_8005D714`'s report, same session). When a still-live PARAMETER is
+`Entity__IsNearTarget`'s report, same session). When a still-live PARAMETER is
 available and semantically dead by the point of reuse (its original value
 already spent, e.g. forced to a known constant by an earlier guard), reuse
 it instead of declaring a fresh local -- retail did exactly that here

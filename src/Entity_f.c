@@ -126,7 +126,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->slotC4(this, -0xA, 0);
         } else {
             func_80063C84(out);
-            if (func_8005D108(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
+            if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
                 this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
             }
             this->unk44 = 0xD;
@@ -135,7 +135,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
     } else if (this->unk44 == 0xD) {
         if (this->unkFC < 0x5A) {
             if (this->unkFC == 0x1E) {
-                if (func_8005D108(this, NULL, NULL, (void *)0xA, 0) != NULL) {
+                if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0xA, 0) != NULL) {
                     this->unk100->methods->slotD8(this->unk100, this->unk50, 0, 0);
                 }
             }
@@ -235,7 +235,7 @@ void func_80063E68(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_80063ED4(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
-        if (func_8005D108(this, NULL, NULL, (void *)5, 0) != NULL) {
+        if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)5, 0) != NULL) {
             if (rand() & 1) {
                 this->methods->slotBC(this, D_80089D90);
             }

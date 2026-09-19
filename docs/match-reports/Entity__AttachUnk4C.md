@@ -1,10 +1,12 @@
-# func_8005D314 -- MATCHED (65/65 words)
+> Renamed from `func_8005D314` on 2026-09-19 (tools/rename.py). Address 0x8005d314.
+
+# Entity__AttachUnk4C -- MATCHED (65/65 words)
 
 **Unit:** Entity · Runner: charlie, round 23.
 
 ## What it does
 
-Gated by `this->unk0C` (the same shared-ancestor "gate flag" `func_8005D418`
+Gated by `this->unk0C` (the same shared-ancestor "gate flag" `Entity__DetachUnk4C`
 reads), forwards all four of its own arguments straight through to a new
 `BasicClassMethods` slot (`slot4C`), stashes `arg3` into `this->unk4C` (the
 `Unk4CObj *` field), then runs two independent early-out checks against two
@@ -15,7 +17,7 @@ self-only vtable calls.
 ## Final C
 
 ```c
-void func_8005D314(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
+void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 arg4) {
     if (this->unk0C != 0) {
         return;
     }
@@ -40,7 +42,7 @@ Two new vtable slots, both already partly informed by the batch's earlier
 functions: `BasicClassMethods::slot4C` (5 args: `self, s32, s32, void*,
 s32` -- the last real gap in the low offsets of that shared-ancestor table
 this unit has needed so far) and `EntityMethods::slot15C`/`slot168` were
-already documented (called by `func_8005DBF0`/`func_8005DEE0`
+already documented (called by `Entity__UpdateDetachState`/`func_8005DEE0`
 respectively) -- this is just their second known caller.
 
 `D_80089EA7` and `D_80089EAF` are two more single-byte, `moodIndex*0x10`-
@@ -60,8 +62,8 @@ with unrelated pointer types).
 ### Proposed learning
 
 None new -- this one built clean on the first attempt with no residue,
-likely because the round's earlier three stalls (`func_8005D714`,
-`func_8005D560`) had already surfaced the two live traps in this unit
+likely because the round's earlier three stalls (`Entity__IsNearTarget`,
+`Entity__NotifyLinkStage`) had already surfaced the two live traps in this unit
 (parameter-vs-fresh-local register identity, `~x+1` vs `-x`) and this
 function's shape simply didn't trigger either: every argument here is
 used exactly once, in the order retail computes it, with no shared local

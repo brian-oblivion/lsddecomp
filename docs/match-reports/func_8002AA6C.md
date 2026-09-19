@@ -480,7 +480,7 @@ Assigned question: **what distinguishes the isolated reduction where a bare
 24, `code_179d8_l`: `func_8002DDBC`/`func_8002E138`/`func_8002E308`) from
 the real function, where it transfers to none of them?** Mid-investigation
 the head sent two broadcasts proposing a BLOCK-ORDER / tail-merge mechanism
-(measured on `func_8005CBC8` and `func_8005DBF0` in other units this same
+(measured on `func_8005CBC8` and `Entity__UpdateDetachState` in other units this same
 round): a bare `__asm__("")` only reorders instructions WITHIN a block; if
 what actually differs is which BASIC BLOCK a value's materialization lives
 in, or which of two candidate arms GCC gives the fallthrough to at a shared

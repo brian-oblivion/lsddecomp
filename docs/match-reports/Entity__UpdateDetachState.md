@@ -1,4 +1,6 @@
-# func_8005DBF0 -- MATCHED (byte-exact, 74/74 words). Round 25, head.
+> Renamed from `func_8005DBF0` on 2026-09-19 (tools/rename.py). Address 0x8005dbf0.
+
+# Entity__UpdateDetachState -- MATCHED (byte-exact, 74/74 words). Round 25, head.
 
 > **ROUND 25 (2026-09-08), head. CLOSED, and the fix is PURE BLOCK PLACEMENT
 > -- not one character of the logic below changed.** The eleven variants
@@ -14,7 +16,7 @@
 > LAST.**
 >
 > In the preserved body, `randCheck:` (with its `doDetach = 1;`) is nested
-> INSIDE the `func_8005D714 != 0` arm, textually BEFORE the
+> INSIDE the `Entity__IsNearTarget != 0` arm, textually BEFORE the
 > `else if (row->detachKind == 2)` arm. So the kind==2 write is last, it gets
 > the fallthrough, and the two writes merge into one. Retail has the opposite:
 > the kind==2 arm jumps (`j MERGE` with `li $s2, 0x1` in its own delay slot)
@@ -30,7 +32,7 @@
 >                 goto randCheck;
 >             }
 >             if (row->unk5 != 0) {
->                 if (func_8005D714(this, &this->unk14->x, row->unk5, row->unk9) != 0) {
+>                 if (Entity__IsNearTarget(this, &this->unk14->x, row->unk5, row->unk9) != 0) {
 >                     if (row->detachKind == 1) {
 >                         doDetach = 1;
 >                     } else if (row->detachKind == 3) {
@@ -93,16 +95,16 @@
 > there too. The fix is always textual: make the block you want to jump
 > not-last, using an explicit `goto` over the block you want to fall through.
 >
-> **A twin worth re-reading:** this report notes `func_8005DD18` is
-> `func_8005DBF0`'s "near-identical twin", matched in the same earlier pass.
+> **A twin worth re-reading:** this report notes `Entity__UpdateLinkState` is
+> `Entity__UpdateDetachState`'s "near-identical twin", matched in the same earlier pass.
 > That one is already matched, so nothing to do -- but the pattern
 > generalises to any pair of sibling handlers where one matched and the other
 > stalled 2 words short.
 >
 > **One dead cause to correct while here:** the "What it does" section below
-> describes `func_8005D714` as "`addiu_at`-blocked". `addiu_at` was RESOLVED
+> describes `Entity__IsNearTarget` as "`addiu_at`-blocked". `addiu_at` was RESOLVED
 > in round 21 (`docs/research/addiu-at-blocker.md`); that parenthetical is a
-> dead cause. `func_8005D714` is matched C in this unit now.
+> dead cause. `Entity__IsNearTarget` is matched C in this unit now.
 >
 > Everything below is the round-2026-09-01 derivation, kept because it is
 > correct and because it is what made this hour's fix a five-minute change.
@@ -120,7 +122,7 @@ row (`D_80089EA4[this->moodIndex]`) and decides whether to detach based on
 
 - `detachKind == 4`: detach iff `(rand() & 0x7F) == 0`.
 - otherwise, only if `row->unk5 != 0`: calls
-  `func_8005D714(this, &this->unk14->x, row->unk5, row->unk9)`
+  `Entity__IsNearTarget(this, &this->unk14->x, row->unk5, row->unk9)`
   (`addiu_at`-blocked, but its call-site shape is fully known). If that call
   returned non-zero: detach iff `detachKind == 1`, or (iff `detachKind ==
   3`) with the SAME `rand()&0x7F==0` check the `detachKind==4` arm uses — a
@@ -130,8 +132,8 @@ row (`D_80089EA4[this->moodIndex]`) and decides whether to detach based on
 
 Detaching calls `this->methods->slot15C(this)`.
 
-This is func_8005DD18's near-identical twin (see that report, matched in
-the same pass) — same mood-row shape, same `func_8005D714` call, same
+This is Entity__UpdateLinkState's near-identical twin (see that report, matched in
+the same pass) — same mood-row shape, same `Entity__IsNearTarget` call, same
 "detach based on a small kind enum, with one shared branch" structure. The
 techniques that closed DD18 (branchy `if`, not boolean-expression
 assignment; per-branch reloads, not a shared "expected" temp) got this one
@@ -141,7 +143,7 @@ from 37 words short down to 8, but not the rest of the way.
 
 ```c
 #if 0
-s32 func_8005DBF0(Entity *this) {
+s32 Entity__UpdateDetachState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
 
@@ -153,7 +155,7 @@ s32 func_8005DBF0(Entity *this) {
                 goto randCheck;
             }
             if (row->unk5 != 0) {
-                if (func_8005D714(this, &this->unk14->x, row->unk5, row->unk9) != 0) {
+                if (Entity__IsNearTarget(this, &this->unk14->x, row->unk5, row->unk9) != 0) {
                     if (row->detachKind == 1) {
                         doDetach = 1;
                     } else if (row->detachKind == 3) {
@@ -178,13 +180,13 @@ s32 func_8005DBF0(Entity *this) {
 
 ## The residue
 
-Retail's `detachKind == 2` case (the `func_8005D714`-returned-zero arm) does
+Retail's `detachKind == 2` case (the `Entity__IsNearTarget`-returned-zero arm) does
 **not** share its `doDetach = 1;` with the `rand()==0` case's `doDetach =
 1;`, even though both are the literal same statement reaching the literal
 same merge point. Retail spends 2 EXTRA instructions to keep them separate:
 
 ```
-; kind==2 case (reached when func_8005D714 returned 0):
+; kind==2 case (reached when Entity__IsNearTarget returned 0):
 lb   $v1, 0x3($s0)
 li   $v0, 0x2
 bne  $v1, $v0, MERGE
@@ -210,7 +212,7 @@ but not what retail has.
   fallthrough matching m2c's own "irregular switch" reading) and the
   equivalent `if`/`else if`/goto form — byte-identical output either way, so
   switch-vs-if is not the axis that matters here.
-- Both orderings of the primary gate (`if (func_8005D714(...) != 0) {kind1/3}
+- Both orderings of the primary gate (`if (Entity__IsNearTarget(...) != 0) {kind1/3}
   else if (kind==2) {...}` vs. the inverted `if (...== 0) {kind==2} else
   {kind1/3}`) — the inverted form does NOT reproduce retail's layout order
   either; instead it triggers a DIFFERENT unwanted optimization (GCC
@@ -227,13 +229,13 @@ but not what retail has.
   CFG/tail-merge decision, not an intra-block scheduling one, and therefore
   not something the permitted barrier can influence.
 - The argument-register lever (per the head's mid-round broadcast): checked
-  every call in this function (`func_8005D714` — already fully matched,
+  every call in this function (`Entity__IsNearTarget` — already fully matched,
   4-argument call site confirmed correct; `rand()` — genuinely no
   arguments, confirmed against `include/psyq/RAND.H`'s
   `extern int rand(void);`; `this->methods->slot15C(this)` — single-argument
   vtable dispatch, matches). **No hidden-argument instance found in this
   function** — every call's argument registers are fully accounted for.
-  (This lever DID close the analogous residue in `func_8005DD18` — see that
+  (This lever DID close the analogous residue in `Entity__UpdateLinkState` — see that
   report — so it was worth checking carefully here too; it just isn't the
   answer for this specific function.)
 
@@ -247,7 +249,7 @@ where this compiler tail-merges them into one, that is NOT a
 declaration-order or scheduling residue — no reshaping of the surrounding
 `if`/`else`/`switch`, no barrier, and no argument fix moved it in this case.
 It may be specific to how many total predecessors converge on the shared
-target (2 in `func_8005DD18`'s analogous spot, which matched; 3 here, which
+target (2 in `Entity__UpdateLinkState`'s analogous spot, which matched; 3 here, which
 didn't) — worth testing on the next instance of this shape before spending
 another 10+ attempts re-deriving the same negative result.
 
@@ -265,7 +267,7 @@ report describes). The search improved to **660 and no further** across a full
 15-minute run at `-j 6`. No zero, and nothing that translated to a lead.
 
 One hand test the report had not tried was also run: **inverting the
-`func_8005D714` guard so the returned-zero arm comes textually FIRST**, on the
+`Entity__IsNearTarget` guard so the returned-zero arm comes textually FIRST**, on the
 theory that cross-jumping merges in one direction and reversing the arms would
 change which block is the merge tail. It moved nothing (33 vs 34 diff lines in
 an instruction-text comparison — noise, not a lever).
@@ -313,7 +315,7 @@ for a type change to perturb. Confirmed empirically rather than assumed.
 
 **This function's residue, precisely characterized against
 `func_80061778`'s (this same round's OTHER tail-merge assignment) for the
-coordinator's discriminator question:** `func_8005DBF0`'s residue is a
+coordinator's discriminator question:** `Entity__UpdateDetachState`'s residue is a
 **whole-statement, single-level merge-count question** -- exactly THREE
 predecessors reach an identical trivial statement (`doDetach = 1;`, one
 instruction, `ori $s2,$zero,0x1`), and retail's cross-jump pass unifies

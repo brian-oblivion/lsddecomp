@@ -29,7 +29,7 @@ s32 func_8005DE18(Entity *this) {
             if (dist < 0) {
                 dist = ~dist + 1;
             }
-            if (func_8005D714(this, xptr, dist, row->unk9) != 0) {
+            if (Entity__IsNearTarget(this, xptr, dist, row->unk9) != 0) {
                 this->methods->slot164(this, 1);
             }
         }
@@ -53,7 +53,7 @@ s32 func_8005DEE0(Entity *this) {
             if (dist < 0) {
                 dist = ~dist + 1;
             }
-            if (func_8005D714(this, xptr, dist, row->unk9) != 0) {
+            if (Entity__IsNearTarget(this, xptr, dist, row->unk9) != 0) {
                 this->methods->slot168(this);
             }
         }
@@ -108,7 +108,7 @@ s32 func_8005E0B0(Entity *this) {
         if (dist < 0) {
             dist = ~dist + 1;
             xptr = &this->unk14->x;
-            if (func_8005D714(this, xptr, dist, row->unk9) == 0) {
+            if (Entity__IsNearTarget(this, xptr, dist, row->unk9) == 0) {
                 this->methods->slot16C(this);
             }
         }
@@ -198,7 +198,7 @@ void func_8005E4D0(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot44(this, 0, D_80089CA0);
         this->methods->slotC4(this, -0x140, 0);
     } else if (this->unkFC >= 0x38 ||
-               func_8005D714(this, &this->unk14->x, 1, 1) != 0) {
+               Entity__IsNearTarget(this, &this->unk14->x, 1, 1) != 0) {
         this->methods->slotBC(this, D_80089D78);
     } else if (this->unkFC >= 0xA) {
         Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);

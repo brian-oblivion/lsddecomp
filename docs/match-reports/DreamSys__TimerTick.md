@@ -67,7 +67,7 @@ matches exactly, including the *other* branch that reaches the very same tail.
 
 This is the already-documented, still-open **"identical assignment reaching
 different merge points"** class from `DECOMPILATION_LEARNINGS.md`
-(`func_8005DBF0`, 72/74) — a GCC 2.6.3 cross-jump/tail-duplication artifact
+(`Entity__UpdateDetachState`, 72/74) — a GCC 2.6.3 cross-jump/tail-duplication artifact
 that source-level reshaping has not moved in either instance now on record.
 
 ## What was tried (5 reshapes, all landing on the identical residue)
@@ -108,7 +108,7 @@ future attempt wants to burn one try confirming that.
 - **Confirms `DREAMSYS_METHODS+0x98` is this function's own slot**, already
   named `TimerTick` in the header.
 - **Second confirmed instance of the "identical assignment reaching different
-  merge points" class**, this time on a `bnez` rather than `func_8005DBF0`'s
+  merge points" class**, this time on a `bnez` rather than `Entity__UpdateDetachState`'s
   case. Worth promoting the class's confidence level in
   `DECOMPILATION_LEARNINGS.md` if a head reviews this: two independent
   functions in the same unit, two different authors' rounds, same
@@ -124,7 +124,7 @@ future attempt wants to burn one try confirming that.
 
 Promote the confidence of the existing `DECOMPILATION_LEARNINGS.md` entry:
 "identical assignment reaching different merge points" now has two
-independent instances (`func_8005DBF0` 72/74, `DreamSys__TimerTick` 61/62)
+independent instances (`Entity__UpdateDetachState` 72/74, `DreamSys__TimerTick` 61/62)
 across two rounds, both stalled after multiple reshapes and both closest
 possible short of full match. Worth flagging as a permuter candidate rather
 than continuing to spend manual reshape attempts on new instances.
@@ -178,9 +178,9 @@ things categorically worse (drift, not just a non-improvement), while the
 same barrier one block over did nothing, and one further in — at the top
 of the actual duplicate-tail block being selected between — closed it
 completely. Before assuming this class is permuter-only work (as the
-original writeup here recommended, and as `func_8005DBF0`'s report still
+original writeup here recommended, and as `Entity__UpdateDetachState`'s report still
 does), try the barrier at EACH block that is a candidate cross-jump target,
 not just at the function entry. The original "worth flagging as a permuter
-candidate" note below is retracted for this function; `func_8005DBF0`
+candidate" note below is retracted for this function; `Entity__UpdateDetachState`
 (72/74, different function, not yet re-attempted this round) may still
 be worth a similar targeted retry before reaching for the permuter.

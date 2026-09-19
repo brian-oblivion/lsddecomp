@@ -1,4 +1,6 @@
-# func_8005D9F4
+> Renamed from `func_8005D9F4` on 2026-09-19 (tools/rename.py). Address 0x8005d9f4.
+
+# Entity__Activate
 
 **Unit:** Entity · **Size:** 18 instructions · **Status:** MATCHED (18/18 words, whole-image build verified byte-exact)
 
@@ -22,7 +24,7 @@ sw   $zero, 0x24($s0)        ; this->unk24 = 0
 ## Final C
 
 ```c
-void func_8005D9F4(Entity *this) {
+void Entity__Activate(Entity *this) {
     this->methods->slot60(this, 1);
     this->unkF0 = 1;
     this->unk24 = 0;

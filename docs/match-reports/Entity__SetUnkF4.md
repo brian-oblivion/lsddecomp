@@ -1,10 +1,12 @@
-# func_8005DAAC
+> Renamed from `func_8005DAAC` on 2026-09-19 (tools/rename.py). Address 0x8005daac.
+
+# Entity__SetUnkF4
 
 **Unit:** Entity · **Size:** 20 instructions · **Status:** MATCHED (20/20 words, whole-image build verified byte-exact)
 
 ## What it does
 
-`func_8005DAAC(Entity *this, s32 arg1)`: if `arg1` is nonzero, calls this
+`Entity__SetUnkF4(Entity *this, s32 arg1)`: if `arg1` is nonzero, calls this
 entity's own vtable slot `+0x030` with a literal `9`; unconditionally stores
 `arg1` into `this->unkF4`.
 
@@ -29,7 +31,7 @@ the C needs to express explicitly.
 ## Final C
 
 ```c
-void func_8005DAAC(Entity *this, s32 arg1) {
+void Entity__SetUnkF4(Entity *this, s32 arg1) {
     if (arg1 != 0) {
         this->methods->slot30(this, 9);
     }

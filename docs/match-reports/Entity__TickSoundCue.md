@@ -1,4 +1,6 @@
-# func_8005D6D4
+> Renamed from `func_8005D6D4` on 2026-09-19 (tools/rename.py). Address 0x8005d6d4.
+
+# Entity__TickSoundCue
 
 **Unit:** Entity · **Size:** 16 instructions · **Status:** MATCHED (16/16 words, whole-image build verified byte-exact)
 
@@ -32,7 +34,7 @@ sw   $v0, 0xFC($s0)          ; this->unkFC++
 ## Final C
 
 ```c
-void func_8005D6D4(Entity *this) {
+void Entity__TickSoundCue(Entity *this) {
     func_8002CD08(this->unk58, &this->unk9C);
     this->unkFC++;
 }
@@ -58,7 +60,7 @@ Matched on the first attempt.
 ## Proposed learning
 
 `func_8002CD08` takes `(s32, void *)` judging by this call site alone;
-`func_8005DB8C` (also in this unit, see its own report) calls a different
+`Entity__StopSoundCue` (also in this unit, see its own report) calls a different
 uncarved function, `FlushSoundCueSet`, with the exact same two-argument shape
 (`this->unk58`, `this->unk9C`) — worth checking whether these two are a
 matched setter/getter pair or share a helper signature when either is

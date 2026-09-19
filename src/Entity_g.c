@@ -31,7 +31,7 @@ extern void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32
 
 void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
-        if (func_8005D108(this, NULL, 0, 0xA, 0) != 0) {
+        if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
             this->methods->slot160(this);
             this->unk94->methods->slot21C(this->unk94);

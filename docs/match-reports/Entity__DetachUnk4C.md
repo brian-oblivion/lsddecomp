@@ -1,4 +1,6 @@
-# func_8005D418
+> Renamed from `func_8005D418` on 2026-09-19 (tools/rename.py). Address 0x8005d418.
+
+# Entity__DetachUnk4C
 
 **Unit:** Entity · **Size:** 26 words · **Status:** MATCHED (26/26 words, whole-image build verified byte-exact)
 
@@ -14,7 +16,7 @@ table), then clears `this->unk4C`.
 ## Final C
 
 ```c
-void func_8005D418(Entity *this) {
+void Entity__DetachUnk4C(Entity *this) {
     if (this->unk0C != 0) {
         this->methods->slot160(this);
         func_80066818()->slot50(this);
@@ -29,7 +31,7 @@ Matched on the first attempt.
 
 ## Proposed learning
 
-This function (along with `func_8005D658`, `func_8005D480`, `func_8005D108`)
+This function (along with `Entity__NotifyReset`, `Entity__Update`, `Entity__GetOrCreateUnk100`)
 is what established `func_80066818()`'s SHARED-vtable role for this unit —
 see the class-framework comment block now at the top of `Entity.h`. Worth
 flagging for anyone touching `Entity_b` next: `func_80066818()` (matched,

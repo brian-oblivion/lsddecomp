@@ -1,11 +1,13 @@
-# func_8005D1EC
+> Renamed from `func_8005D1EC` on 2026-09-19 (tools/rename.py). Address 0x8005d1ec.
+
+# Entity__Destructor
 
 **Unit:** Entity · **Size:** 35 words · **Status:** MATCHED (35/35 words, whole-image build verified byte-exact)
 
 ## What it does
 
 Entity's destructor-side teardown: tears down `this->unk100` and
-`this->unk104` (each a `Unk100Obj *`, see `func_8005D108.md`) by calling
+`this->unk104` (each a `Unk100Obj *`, see `Entity__GetOrCreateUnk100.md`) by calling
 their own `slot04` (a per-object dtor-like slot, not `EntityMethods`'), then
 calls the shared "BasicClass" ancestor's own `dtor` slot,
 `func_80066818()->dtor(this)` (offset `+0x00C` in the shared table — see the
@@ -14,7 +16,7 @@ big comment in `Entity.h`).
 ## Final C
 
 ```c
-void func_8005D1EC(Entity *this) {
+void Entity__Destructor(Entity *this) {
     if (this->unk100 != NULL) {
         this->unk100->methods->slot04(this->unk100);
     }

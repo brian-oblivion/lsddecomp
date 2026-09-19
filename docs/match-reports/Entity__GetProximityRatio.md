@@ -1,4 +1,6 @@
-# func_8005D864 -- MATCHED, round 44 (2026-09-15)
+> Renamed from `func_8005D864` on 2026-09-19 (tools/rename.py). Address 0x8005d864.
+
+# Entity__GetProximityRatio -- MATCHED, round 44 (2026-09-15)
 
 Unit `Entity`. **56/56 words, byte-exact.** Never attempted before this round
 (the head's round-44 correction withdrew the last stale "blocked" verdict --
@@ -24,7 +26,7 @@ construct the function's superseded stall history refers to, resolved
 project-wide in round 42).
 
 ```c
-s32 func_8005D864(Entity *this) {
+s32 Entity__GetProximityRatio(Entity *this) {
     s32 result;
     Entity *self;
     s32 threshold;
@@ -63,7 +65,7 @@ for the receiver vs. the argument, declaration-order changes -- reproduced
 the identical single-word diff. That is the tell that the cause isn't in the
 call at all: it's something about the STATEMENT BEFORE it.
 
-Ran the permuter (`tools/setup-permuter.sh func_8005D864 <seed>`, seed = the
+Ran the permuter (`tools/setup-permuter.sh Entity__GetProximityRatio <seed>`, seed = the
 55/56 body) for a bounded search (`-j 6 --stop-on-zero --best-only`,
 ~1250 iterations, load acknowledged, not exhausted) and it found a byte-exact
 candidate. Isolated the ONE change that mattered by bisecting the permuter's
