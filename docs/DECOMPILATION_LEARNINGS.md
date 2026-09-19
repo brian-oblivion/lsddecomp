@@ -199,6 +199,20 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   a function had been one word short throughout). Two branches with the same result want a
   combined `&&`, not nested `if`s. (a §"Independent global stores are freely reordered",
   §"Round 27: two branches with the same result")
+- **`do { ... } while (0)` is a REAL RTL construct to 2.6.3, not a no-op brace block.**
+  The loop pass runs over it, so it can change code a plain `{ }` in the identical place
+  does not -- that bare-brace control IS the discriminator. Its effect is not fixed: it
+  moved scheduling on `func_8004CAF0` and re-ranked global register allocation on
+  `func_80033C90`. Saturates at one placement. (a round 58, bravo + charlie)
+- **Two levers that each MEASURE AS A REGRESSION alone can be byte-exact together.**
+  `func_8004CFB8`: halves scored 17/28 and 10/28 singly, 28/28 jointly. A single-axis
+  sweep rejecting each on its own score cannot reach that shape -- try the product before
+  discarding either reading. (a round 58, bravo)
+- **A body SHORTER than retail by about one repeated block has probably been
+  tail-merged.** 2.6.3's `jump_optimize` cross-jumps AFTER register allocation, so two
+  identical C blocks that get identical allocations collapse into one; retail keeps them
+  apart when CSE made their code differ. Tell: the same statement once cached, once
+  recomputed. Fix at ONE merge input; backwards costs 184 -> 203 words. (a round 58)
 
 ### 3b. Switch and jump tables
 

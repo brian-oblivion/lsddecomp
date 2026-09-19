@@ -244,6 +244,20 @@ rounds 40 to 47):
 | dirtier than the real build | zero drift | MISMATCH, scaffold artifact, decline |
 | perfect zero | does not match | whole-file effect, decline, stop looking inside the function |
 
+**CHECK 3 IS NOT RUNNABLE WITH `funcdiff.py`, AND THAT IS UNRESOLVED (round 58).**
+The table above is stated in insertion/deletion signatures; `funcdiff.py` reports
+only word-match and length and has no ins/del reporting at all. So "length exact,
+therefore 0 ins / 0 del" has been inferred, and equal length is precisely where
+insertions and deletions CANCEL (measured: 3/3 on `func_8004CAF0`, 14/14 on
+`func_8004CD38`). Two runners independently redid check 3 as a BYTES diff of
+`objdump` on the scaffold's `base.o` against the real unit object and reached the
+same verdicts. Scope is NOT tree-wide: the head swept the 12 reports citing a
+scaffold artifact and most declined on check 2 (the scaffold's OWN measured count,
+untouched by this), or backed 0/0 with an asm-differ reading of positionally
+aligned register diffs, which at equal length does legitimately imply 0/0. Pending
+an operator decision on the method and the tooling; do not cite a check-3 verdict
+without saying how its real-build signature was obtained.
+
 Zero-ness is not the discriminator; agreement is. A recorded negative whose
 search never passed check 3 is not evidence about the function, and a
 negative is a verdict about the BODY it was measured on: after a rewrite that

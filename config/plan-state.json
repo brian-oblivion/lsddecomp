@@ -110,6 +110,26 @@
           "note": "REVISIT job, runner charlie on code_d294_c: func_8001E7BC MATCHED 180/180 byte-exact, the largest function in the queue, open since round 14 and filed three times as unreachable register identity. Revisit-rule verdict, measured as the rule requires: names/types USED -- two of four levers came from the unit's post-naming type Vec3_d294 and they are the two residues open longest (round 44's #1 and #2); the other two came from plain re-reading (the tail is cross-jumped, written twice, and the null-unk20 guard is an enclosing if, not an early return). So this is a POSITIVE for the revisit rule, against round 55's negative where re-reading did all the work. The trigger-change condition in FINISHING-PLAN track 1 is therefore NOT met. No permuter spent: round 46 had run one to completion against these exact residues and all four levers are source-shape changes outside its mutation vocabulary. code_d294_c is now 15/15 with zero queued.",
           "round": 57,
           "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": true,
+          "date": "2026-09-19",
+          "matches": 1,
+          "model": "opus",
+          "note": "Opus stall runner (bravo) on class_3bb8c_b, ranked stall band. MATCH func_8004CFB8 28/28; func_8004CAF0 55/97 -> 62/97 (first movement since round 19); func_8004CD38 inert at 2/27. Levers: do{...}while(0) is a real RTL construct to GCC 2.6.3, not a no-op brace block; a value retail loads once above a conditional that both arms consume is a source-level local; and two levers can be MULTIPLICATIVE -- CFB8's two halves measured 17/28 and 10/28 alone and were byte-exact together, a shape single-axis variation cannot reach. Bravo also root-caused Gate 3 check 3 as unrunnable with documented tooling (funcdiff has no ins/del reporting); head confirmed the mechanism and DECLINED its tree-wide scope (see PROGRESS round 58).",
+          "round": 58,
+          "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-19",
+          "matches": 0,
+          "model": "opus",
+          "note": "Opus REVISIT runner (charlie) on code_179d8_i func_80033C90, stale-title trigger (unit has NOT passed track 3, so names/types were not the lever). STALL, but the revisit paid: re-derived from the .s, 18/202 -> 21/202, and FOUR claims in the old report falsified, including a control-flow bug (the shared call block jumps to tailCheck, not tailFinal, skipping the end-of-ramp check on the commonest path) and the void 'signature is fixed by the caller' claim (the caller became libsnd/sscall in round 34, so nothing declares it). Also reproduced bravo's do-while(0) lever WITH A CONTROL and widened it: on CAF0 it moved scheduling, here it re-ranked global register allocation. Search negative at 232,743 iterations, rejected candidate was a semantic change.",
+          "round": 58,
+          "runners": 1
         }
       ],
       "status": "open"

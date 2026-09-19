@@ -6,6 +6,86 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-19 — round 58: track 1 parks itself, one match, and HARD RULE 2's guard is measured to be absent in every worktree
+
+**State at end: 1140 matched / 1252 game functions (91.05% of game code); queued
+112, all stalled, 0 fresh. Build verifies.**
+
+Head on Opus (no new procedure and no HARD RULE adjudication was foreseen at
+Gate 0; both arrived mid-round and are escalated below, not acted on). Three
+runners, the operator's default cap. Gate 0 green first try; all three
+worktrees byte-verified before handover. Only header contention was
+`include/class_3bb8c.h`, given to alpha outright with bravo told to propose
+rather than edit; it ended the round untouched by both.
+
+**What moved**
+
+- **alpha (Sonnet, extern hygiene).** Of `externcheck.py`'s 18 arity
+  disagreements, **11 are deliberate and load-bearing** — a declaration
+  carrying an extra DEAD argument is what sizes retail's frame, and "fixing"
+  it breaks the match. 6 are genuine call-site/definition disagreements, 1 was
+  fixable (`SetVabDriverMode`, 3->2). Also fixed an implicit declaration
+  (`func_8002C3A8`), removing two real build warnings. 18 -> 17.
+- **bravo (Opus, `class_3bb8c_b`).** **MATCH `func_8004CFB8` 28/28.**
+  `func_8004CAF0` 55/97 -> 62/97, first movement since round 19.
+  `func_8004CD38` inert at 2/27.
+- **charlie (Opus, REVISIT `func_80033C90`).** STALL, 18/202 -> 21/202, but the
+  revisit paid in corrections: **four claims in the old report falsified**,
+  including a real control-flow bug (the shared call block jumps to `tailCheck`,
+  not `tailFinal`, skipping the end-of-ramp check on the commonest path) and the
+  void "signature is fixed by the caller" claim — that caller became
+  `libsnd/sscall` in round 34, so nothing declares the function and the
+  parameter types were free all along.
+
+**Track 1 parked itself.** `plan.py` fired the stop rule unaided: calibration
+complete at 1 match in 13 stall attempts, fewer than 3. Track 1b (NON_MATCHING
+bodies) opened as a result. Per the plan the head does not argue with it in the
+same round, and revisits still run. The operator's call whether to reopen.
+
+**A near-miss on screen 3, recorded because the head's first evidence was
+wrong.** `code_179d8_i`'s own header records two prior cases where a function
+in that exact range passed every screen and was Sony's, and `func_80033C90`
+exactly fills the gap between `libsnd/tempo` and `libsnd/replay`. The head
+cited a ~0.0 `sdkname.py` masked score as corroboration and had to withdraw it:
+that rule is stated for functions ALREADY in a Psy-Q segment, and in a game
+segment a near-zero score is equally what game code looks like. Detector 2
+settled it the other way — the function holds zero `addiu $r,$zero,K` and one
+`ori`, the form our own pipeline emits. Not marked. Topology alone is the
+judgement round 32 cost the project 14 stalls.
+
+**Gate 3 check 3 is not runnable with the documented tooling.** bravo
+root-caused it and charlie independently redid it the bytes way on a third
+function. `funcdiff.py` has no insertion/deletion reporting anywhere in its
+source, while check 3's table is stated entirely in ins/del signatures — so
+"length exact, therefore 0/0" was being inferred, and equal length is exactly
+where insertions and deletions cancel (3/3 and 14/14 measured). **The head
+confirmed the mechanism and DECLINED the tree-wide scope bravo proposed**: of
+the 12 reports citing a scaffold artifact, most declined on check 2 (the
+scaffold's own measured count, untouched by this), two concluded "not a
+scaffold artifact", and `func_8004BB3C` backs its 0/0 with an asm-differ
+reading of positionally aligned register diffs, which at equal length does
+legitimately imply 0/0. A blocker's scope is measured, not reasoned — and that
+applies to our own findings, not only to inherited ones.
+
+**ESCALATED, not acted on: HARD RULE 2's guard does not fire in any worktree.**
+charlie reported that `make build/src/<unit>.c.o` was not blocked, and framed it
+as per-object targets being uncovered. Measured, it is much larger. The hook is
+wired as `$CLAUDE_PROJECT_DIR/.claude/hooks/block-raw-make.py`, so the MAIN
+checkout's copy runs and `project_dir()` resolves to the main checkout; a
+runner's cwd is then outside that root and `main()` returns 0 before any target
+is examined. Tested directly: per-object target and **bare `make`** both exit 0
+with a worktree cwd, both exit 2 from the main checkout. The hook's own comment
+asserts the opposite ("a runner's `make` there is checked against ITS repo,
+which is what we want") — a reasoned claim that measurement falsifies. Every
+runner this project has ever run has been unguarded against a bare `make`, on
+the entire surface where the matching work happens.
+
+**Idioms promoted** (DECOMPILATION_LEARNINGS §3a): `do { } while (0)` is a real
+RTL construct to 2.6.3 and the bare-brace control is its discriminator;
+two levers that each regress alone can be byte-exact together (17/28 and 10/28
+singly, 28/28 jointly); a body short by about one repeated block has been
+tail-merged, fix at one merge input.
+
 ## 2026-09-19 — round 57: a 180-word stall open since round 14 closes, and a wrong prototype the byte oracle could not see
 
 Head on Opus (no new procedure, no HARD RULE adjudication; the top jobs named
