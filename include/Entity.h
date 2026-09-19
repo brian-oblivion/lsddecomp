@@ -62,7 +62,7 @@ struct EntityMethods {
     /* +0x0C */ u8 pad0C[0x30 - 0x0C];
     /* +0x30 */ void (*slot30)(Entity *self, s32 arg1);   /* called by Entity__SetUnkF4, func_8005DF9C */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
-    /* +0x40 */ void (*slot40)(Entity *self);              /* called by Entity__Entity, right after this->methods is (re)assigned */
+    /* +0x40 */ void (*initState)(Entity *self);              /* self-only slot: occupant is Entity__InitState (tools/classtable.py), called by Entity__Entity right after this->methods is (re)assigned */
     /* +0x44 */ void (*slot44)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E4D0 as slot44(this, 0, D_80089CA0) */
     /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E694 (result discarded) and func_8005EF20 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, func_8005EF20 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
@@ -90,13 +90,13 @@ struct EntityMethods {
     /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by func_8005E02C, as slot144(this, this->unk94) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->unk94 in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
     /* +0x148 */ s32 (*slot148)(Entity *self);            /* called by func_8005E480; holds Entity__GetProximityRatio (this unit, MATCHED round 44) */
     /* +0x14C */ u8 pad14C[0x15C - 0x14C];
-    /* +0x15C */ void (*slot15C)(Entity *self);            /* called by Entity__UpdateDetachState */
-    /* +0x160 */ void (*slot160)(Entity *self);             /* called by Entity__DetachUnk4C, Entity__NotifyReset, Entity__UpdateLinkState */
+    /* +0x15C */ void (*activate)(Entity *self);            /* self-only slot: occupant is Entity__Activate (tools/classtable.py -- a self-referential vtable dispatch, same idiom initState/slot60/etc. use throughout this table). Called by Entity__AttachUnk4C (unconditionally once its two per-mood skip-flag gates pass) and by Entity__UpdateActivationState (when its detachKind-derived condition fires) */
+    /* +0x160 */ void (*slot160)(Entity *self);             /* CROSS-UNIT (Entity_c/d/e/f/g also dispatch through this slot -- see docs/match-reports/Entity__Deactivate.md's Proposed field names) -- occupant is Entity__Deactivate, same self-referential idiom as slot15C above. Called by Entity__DetachUnk4C, Entity__NotifyReset, Entity__UpdateDeactivationState */
     /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by Entity__Deactivate and func_8005DE18 (as slot164(self, 1)) */
     /* +0x168 */ void (*slot168)(Entity *self);               /* called by func_8005DEE0 */
     /* +0x16C */ void (*slot16C)(Entity *self);                /* called by Entity__Deactivate, func_8005E0B0, func_80062A40 (Entity_e) */
-    /* +0x170 */ s32 (*slot170)(Entity *self);                  /* called by Entity__Update */
-    /* +0x174 */ void (*slot174)(Entity *self);                  /* called by Entity__Update */
+    /* +0x170 */ s32 (*activationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateActivationState, called by Entity__Update as `if (this->methods->activationState(this) != 0) ...` */
+    /* +0x174 */ s32 (*deactivationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateDeactivationState, which returns s32 (`this->unkF0`) -- retyped from `void` to `s32` to match (CLAUDE.md: a discarded return, which is all Entity__Update does with it, is never evidence of void). Retype re-verified byte-exact; this slot has no other caller to perturb. Called by Entity__Update */
     /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by Entity__Update; holds func_8005DE18, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
     /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by Entity__Update; holds func_8005DEE0, which ends `return this->unkF8;` */
     /* +0x180 */ void (*slot180)(Entity *self);                     /* called by Entity__Update */
@@ -296,10 +296,10 @@ struct Entity {
     /* +0x10 */ u8 pad10[0x14 - 0x10];
     /* +0x14 */ EntityPos *unk14;        /* the 3-word position Entity__IsNearTarget/Entity__DistanceToRegion read via +0x18 */
     /* +0x18 */ u8 pad18[0x24 - 0x18];
-    /* +0x24 */ s32 unk24;             /* cleared by Entity__Activate; xored against a mood-row-derived value in Entity__UpdateLinkState */
+    /* +0x24 */ s32 unk24;             /* cleared by Entity__Activate; xored against a mood-row-derived value in Entity__UpdateDeactivationState */
     /* +0x28 */ s32 unk28;             /* read by func_8005E7F8, gates its final slotCC call */
     /* +0x2C */ u8 pad2C[0x44 - 0x2C];
-    /* +0x44 */ s32 unk44;              /* gates Entity__UpdateDetachState's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by func_8005EBB4 */
+    /* +0x44 */ s32 unk44;              /* gates Entity__UpdateActivationState's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by func_8005EBB4 */
     /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- func_8005E7F8 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
     /* +0x4A */ u8 pad4A[0x4C - 0x4A];
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachUnk4C; dereferenced through its own vtable by func_8005EA94 -- see Unk4CObj's own comment */
@@ -321,7 +321,7 @@ struct Entity {
     /* +0xA0 */ u8 padA0[0xB0 - 0xA0];
     /* +0xB0 */ s32 unkB0;             /* divisor in Entity__GetProximityRatio's (slot148) computation, this unit */
     /* +0xB4 */ u8 padB4[0xF0 - 0xB4];
-    /* +0xF0 */ s32 unkF0;             /* set to 1 by Entity__Activate; gate flag for Entity__UpdateDetachState/Entity__UpdateLinkState */
+    /* +0xF0 */ s32 unkF0;             /* set to 1 by Entity__Activate; gate flag for Entity__UpdateActivationState/Entity__UpdateDeactivationState */
     /* +0xF4 */ s32 unkF4;             /* set from Entity__SetUnkF4's arg1 */
     /* +0xF8 */ s32 unkF8;             /* cleared by Entity__StopSoundCue */
     /* +0xFC */ s32 unkFC;             /* incremented by Entity__TickSoundCue */
@@ -341,7 +341,7 @@ extern void func_80017CFC(void *arg);
  * this unit; its param shape is read directly off that disassembly: a0 is
  * `this` (dereferences ->0x98/->0x94, both known Entity fields), a1 points
  * at a 3-word vector copied onto its own stack. a2/a3 are `s32`, NOT `s8`:
- * every known caller (Entity__UpdateLinkState, func_8005DE18, func_8005DEE0) happens
+ * every known caller (Entity__UpdateDeactivationState, func_8005DE18, func_8005DEE0) happens
  * to pass a byte-range value, but Entity__IsNearTarget's own body (dividing 0x800
  * by a3 and shifting the quotient by 11) treats them as full words with no
  * narrowing on entry, and declaring them `s8` forces a spurious sign-extend
@@ -356,8 +356,8 @@ extern void func_8005DF9C(Entity *this, s32 arg1);
 extern s32 rand(void);
 
 /* The mood-indexed table lookups. `gEntityMoodTable` is a real struct array (16
- * bytes/entry, `this->moodIndex` selects the row) -- Entity__UpdateDetachState reads
- * its +0x3 (signed) and Entity__UpdateLinkState its +0x4 (UNSIGNED) as two DIFFERENT
+ * bytes/entry, `this->moodIndex` selects the row) -- Entity__UpdateActivationState reads
+ * its +0x3 (signed) and Entity__UpdateDeactivationState its +0x4 (UNSIGNED) as two DIFFERENT
  * small-enum fields, not the same byte reinterpreted; both also read +0x5
  * (signed) and +0x9 (signed). `gEntityUnlockKindTable`/`gEntityLinkStageTable`/`gEntityEventVideoTable` are
  * SEPARATE global arrays (own base symbols, own `lui`/`addiu`), each also
@@ -370,8 +370,8 @@ extern s32 rand(void);
  * not by the project's usual char convention). */
 struct EntityMoodRow {
     u8 pad00[0x03];
-    s8 detachKind;   /* +0x03, read by Entity__UpdateDetachState */
-    u8 linkKind;      /* +0x04, read by Entity__UpdateLinkState (unsigned load) */
+    s8 detachKind;   /* +0x03, read by Entity__UpdateActivationState */
+    u8 linkKind;      /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
     s8 unk5;           /* +0x05 */
     s8 unk6;            /* +0x06, read by func_8005DE18: sign selects whether Class6B5CC__FaceTarget also fires, magnitude (after abs) is Entity__IsNearTarget's distance arg */
     u8 pad07[0x02];

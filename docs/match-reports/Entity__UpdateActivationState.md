@@ -1,6 +1,8 @@
+> Renamed from `Entity__UpdateDetachState` on 2026-09-19 (tools/rename.py). Address 0x8005dbf0.
+
 > Renamed from `func_8005DBF0` on 2026-09-19 (tools/rename.py). Address 0x8005dbf0.
 
-# Entity__UpdateDetachState -- MATCHED (byte-exact, 74/74 words). Round 25, head.
+# Entity__UpdateActivationState -- MATCHED (byte-exact, 74/74 words). Round 25, head.
 
 > **ROUND 25 (2026-09-08), head. CLOSED, and the fix is PURE BLOCK PLACEMENT
 > -- not one character of the logic below changed.** The eleven variants
@@ -95,8 +97,8 @@
 > there too. The fix is always textual: make the block you want to jump
 > not-last, using an explicit `goto` over the block you want to fall through.
 >
-> **A twin worth re-reading:** this report notes `Entity__UpdateLinkState` is
-> `Entity__UpdateDetachState`'s "near-identical twin", matched in the same earlier pass.
+> **A twin worth re-reading:** this report notes `Entity__UpdateDeactivationState` is
+> `Entity__UpdateActivationState`'s "near-identical twin", matched in the same earlier pass.
 > That one is already matched, so nothing to do -- but the pattern
 > generalises to any pair of sibling handlers where one matched and the other
 > stalled 2 words short.
@@ -132,7 +134,7 @@ row (`gEntityMoodTable[this->moodIndex]`) and decides whether to detach based on
 
 Detaching calls `this->methods->slot15C(this)`.
 
-This is Entity__UpdateLinkState's near-identical twin (see that report, matched in
+This is Entity__UpdateDeactivationState's near-identical twin (see that report, matched in
 the same pass) — same mood-row shape, same `Entity__IsNearTarget` call, same
 "detach based on a small kind enum, with one shared branch" structure. The
 techniques that closed DD18 (branchy `if`, not boolean-expression
@@ -143,7 +145,7 @@ from 37 words short down to 8, but not the rest of the way.
 
 ```c
 #if 0
-s32 Entity__UpdateDetachState(Entity *this) {
+s32 Entity__UpdateActivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
 
@@ -235,7 +237,7 @@ but not what retail has.
   `extern int rand(void);`; `this->methods->slot15C(this)` — single-argument
   vtable dispatch, matches). **No hidden-argument instance found in this
   function** — every call's argument registers are fully accounted for.
-  (This lever DID close the analogous residue in `Entity__UpdateLinkState` — see that
+  (This lever DID close the analogous residue in `Entity__UpdateDeactivationState` — see that
   report — so it was worth checking carefully here too; it just isn't the
   answer for this specific function.)
 
@@ -249,7 +251,7 @@ where this compiler tail-merges them into one, that is NOT a
 declaration-order or scheduling residue — no reshaping of the surrounding
 `if`/`else`/`switch`, no barrier, and no argument fix moved it in this case.
 It may be specific to how many total predecessors converge on the shared
-target (2 in `Entity__UpdateLinkState`'s analogous spot, which matched; 3 here, which
+target (2 in `Entity__UpdateDeactivationState`'s analogous spot, which matched; 3 here, which
 didn't) — worth testing on the next instance of this shape before spending
 another 10+ attempts re-deriving the same negative result.
 
@@ -315,7 +317,7 @@ for a type change to perturb. Confirmed empirically rather than assumed.
 
 **This function's residue, precisely characterized against
 `func_80061778`'s (this same round's OTHER tail-merge assignment) for the
-coordinator's discriminator question:** `Entity__UpdateDetachState`'s residue is a
+coordinator's discriminator question:** `Entity__UpdateActivationState`'s residue is a
 **whole-statement, single-level merge-count question** -- exactly THREE
 predecessors reach an identical trivial statement (`doDetach = 1;`, one
 instruction, `ori $s2,$zero,0x1`), and retail's cross-jump pass unifies

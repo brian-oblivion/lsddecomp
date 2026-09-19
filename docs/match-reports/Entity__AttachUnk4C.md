@@ -42,7 +42,7 @@ Two new vtable slots, both already partly informed by the batch's earlier
 functions: `BasicClassMethods::slot4C` (5 args: `self, s32, s32, void*,
 s32` -- the last real gap in the low offsets of that shared-ancestor table
 this unit has needed so far) and `EntityMethods::slot15C`/`slot168` were
-already documented (called by `Entity__UpdateDetachState`/`func_8005DEE0`
+already documented (called by `Entity__UpdateActivationState`/`func_8005DEE0`
 respectively) -- this is just their second known caller.
 
 `D_80089EA7` and `D_80089EAF` are two more single-byte, `moodIndex*0x10`-

@@ -28,7 +28,7 @@ Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
         this->unk9C = 0;
         this->unk100 = NULL;
         this->unk104 = NULL;
-        this->methods->slot40(this);
+        this->methods->initState(this);
         return this;
     }
     return NULL;
@@ -94,7 +94,7 @@ void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 a
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;
     }
-    this->methods->slot15C(this);
+    this->methods->activate(this);
     if (D_80089EAF[this->moodIndex * 0x10] != 0) {
         return;
     }
@@ -110,8 +110,8 @@ void Entity__DetachUnk4C(Entity *this) {
 }
 
 void Entity__Update(Entity *this, s32 a1, s32 a2) {
-    if (this->methods->slot170(this) != 0) {
-        this->methods->slot174(this);
+    if (this->methods->activationState(this) != 0) {
+        this->methods->deactivationState(this);
     }
     if (this->methods->slot17C(this) != 0) {
         this->methods->slot180(this);
@@ -285,7 +285,7 @@ void Entity__StopSoundCue(Entity *this) {
     this->unkF8 = 0;
 }
 
-s32 Entity__UpdateDetachState(Entity *this) {
+s32 Entity__UpdateActivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
 
@@ -317,13 +317,13 @@ s32 Entity__UpdateDetachState(Entity *this) {
 
     merge:
         if (doDetach) {
-            this->methods->slot15C(this);
+            this->methods->activate(this);
         }
     }
     return this->unkF0;
 }
 
-s32 Entity__UpdateLinkState(Entity *this) {
+s32 Entity__UpdateDeactivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
     s32 dist;

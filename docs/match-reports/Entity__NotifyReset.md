@@ -8,7 +8,7 @@
 
 Calls the shared "BasicClass" ancestor's `slotE0(this, a1, a2)`, then, if
 `a2 == 4`, also calls this entity's own current `methods->slot160(this)` —
-the same `slot160` that `Entity__DetachUnk4C` and `Entity__UpdateLinkState` also dispatch
+the same `slot160` that `Entity__DetachUnk4C` and `Entity__UpdateDeactivationState` also dispatch
 through.
 
 ## Final C

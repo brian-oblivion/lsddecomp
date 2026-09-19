@@ -1,6 +1,8 @@
+> Renamed from `Entity__UpdateLinkState` on 2026-09-19 (tools/rename.py). Address 0x8005dd18.
+
 > Renamed from `func_8005DD18` on 2026-09-19 (tools/rename.py). Address 0x8005dd18.
 
-# Entity__UpdateLinkState
+# Entity__UpdateDeactivationState
 
 **Unit:** Entity · **Size:** 64 words · **Status:** MATCHED (64/64 words, whole-image build verified byte-exact)
 
@@ -26,7 +28,7 @@ Detaching calls `this->methods->slot160(this)` — the same slot
 ## Final C
 
 ```c
-s32 Entity__UpdateLinkState(Entity *this) {
+s32 Entity__UpdateDeactivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
     s32 dist;
@@ -64,7 +66,7 @@ s32 Entity__UpdateLinkState(Entity *this) {
 ## Attempt log
 
 Started at 37 words short (this function's queue-order predecessor,
-`Entity__UpdateDetachState`, and this one share almost identical logic shapes — see that
+`Entity__UpdateActivationState`, and this one share almost identical logic shapes — see that
 report). Three separate residues, closed one at a time:
 
 1. **Boolean-expression assignments compile to arithmetic, not branches.**
