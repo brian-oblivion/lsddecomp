@@ -1,10 +1,12 @@
-# func_8003E10C — MATCH (93/93 words)
+> Renamed from `func_8003E10C` on 2026-09-19 (tools/rename.py). Address 0x8003e10c.
+
+# Obj86B60__Init — MATCH (93/93 words)
 
 **Unit:** code_2cc8c_c · **Size:** 93 instructions
 
 ## What it does
 
-`D_8006E878+0x044` (the "IntermediateBase" table's own slot44, and
+`gIntermediateBaseMethods+0x044` (the "IntermediateBase" table's own slot44, and
 `D_80086B60`'s own `+0x044` occupant per `tools/classtable.py`): an
 init/registration routine. Fills three fields with "use the init-args field
 if set, else derive from a helper call" (`self->unk10`/`unk14`/`unk18`),
@@ -14,12 +16,12 @@ slot10`), forwards `(self,0,0,0)` to `slot4C`, records `arg2` into
 `self->unk24`, and -- only when `arg2 == 0` -- runs three more registration
 calls (two through the just-constructed `self->unk18` object, one through
 `self->unk14` reinterpreted as a pointer) before dispatching `slot60(self,2)`
-and `slot48(self)` (`func_8003E280`, the very next function in this queue).
+and `slot48(self)` (`Obj86B60__Deinit`, the very next function in this queue).
 
 ## The C
 
 ```c
-void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
+void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -38,7 +40,7 @@ void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     if (arg1->unk10 != NULL) {
         self->unk18 = arg1->unk10;
     } else {
-        self->unk18 = func_8003E5D8();
+        self->unk18 = New_Unk18Obj();
     }
     self->unkC = (Obj86B60UnkC *)arg1;
     obj18 = self->unk18;
@@ -61,7 +63,7 @@ void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
 
 First attempt built and linked (build exit=0) but scored 7/93 with a
 178502-byte OUTSIDE-range diff -- textbook address drift, one word short.
-`tools/asm-differ/diff.py func_8003E10C` showed retail saving 5 registers
+`tools/asm-differ/diff.py Obj86B60__Init` showed retail saving 5 registers
 (`s0..s4`, frame `-0x28`) against my first cut's 4 (`s0..s3`, frame `-0x20`):
 the classic "one fewer live-across-call value than retail" register
 shortfall this project's learnings describe.
@@ -82,7 +84,7 @@ the next build.
   child pointers forwarded to `addChild`; `unk8`/`unkC`/`unk10` are the
   three optional overrides for `self->unk10`/`unk14`/`unk18`.
 - `Obj86B60.unk10`/`unk14`: BOTH were previously modelled as opaque
-  generic words (`func_8003E874`/`func_8003DA10` in a sibling unit). This
+  generic words (`Obj86B60__ResetAndRemoveAllChildren`/`func_8003DA10` in a sibling unit). This
   function CONFIRMS both are pointer-valued in this unit's own reading too
   -- `unk10` is forwarded as an `addChild`-style child and as `Unk14Obj::
   slot10`'s 2nd arg; `unk14` is dispatched through as `Unk14Obj *`. Kept
@@ -91,14 +93,14 @@ the next build.
   `Unk14Obj`'s own header comment.
 - `Obj86B60.unk18`: newly typed `Unk18Obj *` (was unobserved padding).
   Constructed either from `arg1->unk10` or from this unit's own New_X
-  allocator `func_8003E5D8` (queued later this round).
+  allocator `New_Unk18Obj` (queued later this round).
 - `Obj86B60.unk24`: new field, `s32`, set to `arg2`; also the gate for this
   function's second half.
 - `Unk18Obj`/`Unk18ObjMethods`, `Unk14Obj`/`Unk14ObjMethods`: new minimal
   types, one dispatch slot (`slot10`) each, both OBSERVED only by this
   function.
 - `Obj86B60Methods`: added `slot10` (inherited BasicClass `addChild`),
-  `slot4C` (external `func_8003C238`), `slot48` (`func_8003E280`, next in
+  `slot4C` (external `func_8003C238`), `slot48` (`Obj86B60__Deinit`, next in
   this queue).
 
 ### Proposed learning
@@ -132,3 +134,16 @@ tells you which.
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. 2 attempts (address
 drift on the first, closed on the second by hoisting `self->unk18` into a
 local at the position retail's own instruction schedule implied).
+
+## Naming
+
+**Obj86B60__Init** (renamed from `func_8003E10C`, round 55, runner alpha).
+Tier A: mechanics fully known and coherent -- takes an `Obj86B60InitArgs *`
+and a mode flag, resolves three helper-object fields (`self->unk10`,
+`self->unk14`, `self->viewport`) from the caller-supplied args or a default
+helper, retains the args pointer itself (`self->initArgs = (Obj86B60UnkC *)arg1`
+-- the field's own new name, see `## Proposed field names`), registers
+children through the inherited `addChild` slot, and (on mode 0) performs
+extra registration and calls `deinit` -- the standard "construct with
+caller-overridable defaults" idiom this project uses elsewhere. Paired with
+`Obj86B60__Deinit` as the mirror-image teardown (see that report).

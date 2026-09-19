@@ -98,7 +98,7 @@ and rebuilt. **First attempt showed a spurious `WARNING: differs OUTSIDE
 this range too (22 bytes)`** that had nothing to do with this function --
 `cmp -l build/SLPS_015.56 disk/SLPS_015.56` plus
 `vram = (N-1) - 0x800 + 0x80010000` pointed at `0x8003e4bc`, which is
-`func_8003E4B8` (a DIFFERENT function in a DIFFERENT unit,
+`Obj86B60__NotifyParents` (a DIFFERENT function in a DIFFERENT unit,
 `code_2cc8c_c`) -- I had left that function's own stall body live from an
 earlier hand-lever test in this same round instead of restoring its
 `INCLUDE_ASM` before moving on. Restored it (`grep -c '^INCLUDE_ASM'`

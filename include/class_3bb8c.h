@@ -1259,7 +1259,7 @@ struct Class86B60 {
      * zeroes it instead. No setter in this unit. */
     s32 unk3C;
     u8 pad040[0x048 - 0x040];
-    /* Set up by the base ctor chain (func_8003DFBC()->slot08 below), read
+    /* Set up by the base ctor chain (Get_vtable_TaskCore()->slot08 below), read
      * (never written) by func_8004D578 right after. Same offset/shape as
      * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
      * chain output), but kept as its own local type since nothing ties
@@ -1382,11 +1382,11 @@ struct DreamSysView_3bb8c_c {
 };
 
 /*
- * func_8004D578's own local view of `func_8003DFBC`'s return type -- ALSO
+ * func_8004D578's own local view of `Get_vtable_TaskCore`'s return type -- ALSO
  * independently declared, with a DIFFERENT 4-argument signature, as
  * `TaskCoreMethods` in include/code_2c054.h (`slot08`, confirmed 3-argument-
  * plus-self there from func_8003B8E4's own byte-exact call). Same real
- * global (`D_8006E730`) two units deep, two independent arities recorded
+ * global (`gTaskCoreMethods`) two units deep, two independent arities recorded
  * from two real call sites -- the identical situation already documented
  * for GetClass6B5CCMethods above and for func_8004D3DC's report. Kept local
  * rather than including code_2c054.h, since this unit does not otherwise
@@ -1397,11 +1397,11 @@ typedef struct BaseTaskCtorTable_3bb8c_c BaseTaskCtorTable_3bb8c_c;
 struct BaseTaskCtorTable_3bb8c_c {
     u8 pad000[0x008];
     /* func_8004D578's own unconditional first statement:
-     * func_8003DFBC()->slot08(self, &D_80086D44, &D_800114DC, 0). */
+     * Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0). */
     void (*slot08)(void *self, void *arg1, void *arg2, s32 arg3); /* +0x008 */
     /* +0x00C, func_8004D704's own unconditional last call, `self` only.
      * Same offset AND arity as `TaskCoreMethods::slot0C` in
-     * include/code_2c054.h (also derived from `D_8006E730`, the same real
+     * include/code_2c054.h (also derived from `gTaskCoreMethods`, the same real
      * global this getter returns) -- independent confirmation, not a
      * coincidence: this is the shared base class's destructor forward,
      * called after `self`'s own two owned sub-objects (`unkA8`/`unkAC`)
@@ -1434,7 +1434,7 @@ struct BaseTaskCtorTable_3bb8c_c {
     void (*slotE4)(void *self, void *arg1);
 };
 
-extern BaseTaskCtorTable_3bb8c_c *func_8003DFBC(void);
+extern BaseTaskCtorTable_3bb8c_c *Get_vtable_TaskCore(void);
 
 /* Address-of only in this unit (func_8004D578 passes &D_80086D44 both as
  * the base ctor's arg1 and, again, as slotD8's own arg1). Placeholder s32
@@ -1570,7 +1570,7 @@ typedef struct Result678_3bb8c_c {
 typedef struct GenericCtorTable_3bb8c_d GenericCtorTable_3bb8c_d;
 struct GenericCtorTable_3bb8c_d {
     u8 pad000[0x008];
-    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call; IS func_8004E34C -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/func_8003DFBC) since nothing here type-checks the two against each other */
+    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call; IS func_8004E34C -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/Get_vtable_TaskCore) since nothing here type-checks the two against each other */
     u8 pad00C[0x040 - 0x00C];
     /* +0x040, func_8004E34C's own last call, forwarding its own 3rd
      * parameter verbatim; class_3bb8c_e's independent view (round 14,

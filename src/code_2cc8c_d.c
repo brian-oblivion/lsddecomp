@@ -3,7 +3,7 @@
 
 /* Forwards to the inherited BasicClass slot38, then dispatches self's OWN
  * slot94 or slot98 depending on arg1's dynamic class tag (5 or 1
- * respectively, per its header nibble -- same tag idiom as func_8003E770,
+ * respectively, per its header nibble -- same tag idiom as Unk18Obj__AddChild,
  * round 13). Neither dispatch happens for any other tag. */
 void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     s32 tag;

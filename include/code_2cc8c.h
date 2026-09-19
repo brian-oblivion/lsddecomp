@@ -106,12 +106,12 @@ typedef struct Unk4ArgObjMethods Unk4ArgObjMethods;
 
 /*
  * A generic "event" argument, round 13: `arg1->target->header` is read by
- * func_8003E030 to pick which of self->methods->slot54/58/5C to forward to.
+ * Obj86B60__OnNotify to pick which of self->methods->slot54/58/5C to forward to.
  * Same two-type shape as class_39e08.h's own independent `EventArg`/
  * `HeaderObj` local view (a `target` pointer to an object whose first word
  * is a low-nibble-coded header/kind value) -- this unit keeps its own
  * separate local view per the project's established convention. Only the
- * one field/offset func_8003E030 touches is modelled.
+ * one field/offset Obj86B60__OnNotify touches is modelled.
  */
 struct HeaderObj {
     s32 header; /* +0x000 */
@@ -401,11 +401,11 @@ extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
 extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
 /*
- * The pointee of `Unk18Obj->unkB0` (round 13, func_8003E628), returned by
+ * The pointee of `Unk18Obj->unkB0` (round 13, Unk18Obj__Unk18Obj), returned by
  * `func_8003FDB0` -- a function already known elsewhere in this project
  * (`include/Entity.h`'s own `Unk100Obj`/`func_8003FDB0`), kept here under a
  * unit-local name per this project's established "independent local views"
- * convention. Only the one slot this unit's `func_8003E628` dispatches
+ * convention. Only the one slot this unit's `Unk18Obj__Unk18Obj` dispatches
  * through is modelled.
  */
 struct SubHandleObjMethods {
@@ -415,7 +415,7 @@ struct SubHandleObjMethods {
                                     args */
     u8 pad008[0x04C - 0x008];
     void (*slot4C)(SubHandleObj *self, void *arg1, void *arg2); /* +0x04C,
-                                    OBSERVED: func_8003E628 */
+                                    OBSERVED: Unk18Obj__Unk18Obj */
 };
 struct SubHandleObj {
     SubHandleObjMethods *methods; /* +0x000 */
@@ -441,7 +441,7 @@ extern Unk18AcObj *func_8001CA94(void); /* local view of include/code_d294.h's
                                     own `New_Class6B5CC` allocator, returning
                                     `Class6B5CCObj *` there -- this unit's
                                     own view retyped (round 13) once
-                                    func_8003E6CC dereferenced it, see
+                                    Unk18Obj__Finalize dereferenced it, see
                                     Unk18AcObj's own comment */
 extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
                             func_8003FDB0's "name" argument */
@@ -453,25 +453,34 @@ extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
                             2nd argument when its own arg5 is NULL. */
 
 /*
- * `Unk18Obj->unkAC`'s pointee (round 13, func_8003E6CC) -- the return of
- * `func_8001CA94`, first stored opaquely by `func_8003E628` and here
+ * `Unk18Obj->unkAC`'s pointee (round 13, Unk18Obj__Finalize) -- the return of
+ * `func_8001CA94`, first stored opaquely by `Unk18Obj__Unk18Obj` and here
  * dereferenced and released through the inherited BasicClass "release"
  * slot. Only that one slot is modelled.
  */
 struct Unk18AcObjMethods {
     u8 pad000[0x004];
-    void *(*slot4)(Unk18AcObj *self); /* +0x004, inherited BasicClass
-                                          "release"; OBSERVED: func_8003E6CC */
+    void *(*release)(Unk18AcObj *self); /* +0x004, inherited BasicClass
+                                          "release"; OBSERVED: Unk18Obj__Finalize.
+                                          Renamed from slot4, round 55 --
+                                          exclusive to this unit (only
+                                          Unk18Obj__Finalize dereferences
+                                          `self->unkAC->methods`;
+                                          code_2cc8c_d.c passes `unkAC` along
+                                          opaquely without going through its
+                                          own vtable). Matches the canonical
+                                          BasicClassMethods name at this
+                                          offset (include/code_8220.h). */
 };
 struct Unk18AcObj {
     Unk18AcObjMethods *methods; /* +0x000 */
 };
 
 /*
- * A generic class-instance view (round 13, func_8003E770): every class's
+ * A generic class-instance view (round 13, Unk18Obj__AddChild): every class's
  * vtable in this game begins with a "header" word (`tools/classtable.py`'s
  * own label for it, "not a pointer; varies per class -- id/flags"), and
- * `func_8003E770` discriminates its 2nd parameter's DYNAMIC CLASS by
+ * `Unk18Obj__AddChild` discriminates its 2nd parameter's DYNAMIC CLASS by
  * reading `arg1->methods->header & 0xF` -- i.e. runtime type identification
  * through the vtable header nibble, not a struct field of `arg1` itself.
  * Only that one field, plus the one instance field (`unk14`) this function
@@ -493,16 +502,17 @@ struct GenericObj {
     void *unkC;                 /* +0x00C, OBSERVED: func_8003EEC0 (round 14),
                                     truthy-tested only */
     u8 pad010[0x014 - 0x010];
-    s32 unk14;                  /* +0x014, OBSERVED: func_8003E770 */
+    s32 unk14;                  /* +0x014, OBSERVED: Unk18Obj__AddChild */
 };
 
 /*
- * self->unk18's pointee, round 13 (func_8003E10C). Constructed by a
- * New_X allocator this unit itself carves (func_8003E5D8, 0xBC bytes) via
+ * self->viewport's pointee (field renamed from unk18 round 55), round 13
+ * (Obj86B60__Init). Constructed by a
+ * New_X allocator this unit itself carves (New_Unk18Obj, 0xBC bytes) via
  * `func_8003F24C()->ctor(self)` -- func_8003F24C lives in a still-uncarved
  * remainder of this segment (not this unit's function to write), so it is
  * declared here only as an external returning this unit's own local view
- * of the class table it constructs. Only the one slot func_8003E10C
+ * of the class table it constructs. Only the one slot Obj86B60__Init
  * dispatches through is modelled.
  */
 /* Round 14 (code_2cc8c_d): a plain 3-word vector, copied wholesale from a
@@ -519,34 +529,46 @@ typedef struct Vec3_2cc8c {
 
 struct Unk18ObjMethods {
     u8 pad000[0x004];
-    void *(*slot4)(Unk18Obj *self);            /* +0x004, inherited
+    void *(*release)(Unk18Obj *self);            /* +0x004, inherited
                                                     BasicClass "release"
                                                     (finalize then free);
-                                                    OBSERVED: func_8003E280
-                                                    (round 13) */
+                                                    OBSERVED: Obj86B60__Deinit
+                                                    (round 13). Renamed from
+                                                    slot4, round 55 --
+                                                    exclusive to this unit:
+                                                    code_2cc8c_d.c never
+                                                    dispatches through this
+                                                    exact slot on a Unk18Obj*
+                                                    (checked: its own
+                                                    `methods->slot4` calls
+                                                    are on unrelated types).
+                                                    Matches the canonical
+                                                    BasicClassMethods name at
+                                                    this offset
+                                                    (include/code_8220.h). */
     void (*ctor)(Unk18Obj *self);              /* +0x008, called by
-                                                    func_8003E5D8 with only
+                                                    New_Unk18Obj with only
                                                     `self` set up */
     u8 pad00C[0x010 - 0x00C];
     void (*slot10)(Unk18Obj *self, void *a1);  /* +0x010, inherited
                                                     BasicClass addChild;
-                                                    OBSERVED: func_8003E10C */
+                                                    OBSERVED: Obj86B60__Init */
     void (*slot14)(Unk18Obj *self, void *a1);  /* +0x014, inherited
                                                     BasicClass removeChild;
-                                                    OBSERVED: func_8003E280
+                                                    OBSERVED: Obj86B60__Deinit
                                                     (round 13) */
     u8 pad018[0x040 - 0x018];
     void (*slot40)(Unk18Obj *self);            /* +0x040, OBSERVED:
-                                                    func_8003E628 (round 13)
+                                                    Unk18Obj__Unk18Obj (round 13)
                                                     -- a DIFFERENT table from
                                                     Obj86B60Methods's own
                                                     slot40 (`D_8006E8E4`'s
                                                     own occupant here is
                                                     `func_8003E968`, not
-                                                    `func_8003E100`) */
+                                                    `Obj86B60__ResetCounters`) */
     u8 pad044[0x074 - 0x044];
     void (*slot74)(Unk18Obj *self);            /* +0x074, OBSERVED:
-                                                    func_8003E6CC (round 13) */
+                                                    Unk18Obj__Finalize (round 13) */
     /* +0x078/+0x07C/+0x080, round 14 (func_8003EACC's own call site,
        guarded by `self->unk10 == NULL`): dispatched as `(self, a2)`,
        `(self, a3)`, `(self, a1_or_default)` respectively. Occupants (this
@@ -558,7 +580,7 @@ struct Unk18ObjMethods {
     void (*slot80)(Unk18Obj *self, void *a1); /* +0x080 */
     u8 pad084[0x090 - 0x084];
     void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
-                                                    func_8003E6CC (round 13) */
+                                                    Unk18Obj__Finalize (round 13) */
     /* +0x094/+0x098, round 14 (code_2cc8c_d): func_8003E8B8's own call
        site -- dispatched as `(self, arg1, arg2)` when a GenericObj arg1's
        header tag is 5 (slot94) or 1 (slot98). Occupants (this unit, still
@@ -576,7 +598,7 @@ struct Unk18ObjMethods {
     void *slotA0;
     void (*slotA4)(Unk18Obj *self); /* +0x0A4, occupant func_8003F04C (round 14, still queued as of this comment); dispatched by func_8003EE88 */
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
-                                                    func_8003E6CC (round 13) */
+                                                    Unk18Obj__Finalize (round 13) */
 };
 /* Round 14 (code_2cc8c_d): a plain 2-word record, copied as one whole-
    struct assignment (see Unk18Obj::unk34/unk38, func_8003EA0C) --
@@ -599,12 +621,12 @@ struct Unk18Obj {
     Unk18ObjMethods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
     GenericObj *unkC;          /* +0x00C, zeroed by the ctor
-                                  (func_8003E628); OBSERVED (round 13,
-                                  set to `arg1`) by func_8003E770 when
+                                  (Unk18Obj__Unk18Obj); OBSERVED (round 13,
+                                  set to `arg1`) by Unk18Obj__AddChild when
                                   `arg1->methods->header & 0xF == 1` */
     GenericObj *unk10;         /* +0x010, zeroed by the ctor
-                                  (func_8003E628); OBSERVED (round 13,
-                                  set to `arg1`) by func_8003E770 when
+                                  (Unk18Obj__Unk18Obj); OBSERVED (round 13,
+                                  set to `arg1`) by Unk18Obj__AddChild when
                                   `arg1->methods->header & 0xF == 4` */
     /* +0x014, round 14: a Vec3, written wholesale by func_8003EBC4 from
        its own arg1 -- RETYPED from an opaque byte span once
@@ -623,7 +645,7 @@ struct Unk18Obj {
        rather than reusing code_d294.h's `WholeFrac_d294` -- a different
        unit's own local view of the same shape, not a shared type. */
     s32 unk2C;
-    s32 unk30;                 /* +0x030, OBSERVED: func_8003E770 (round
+    s32 unk30;                 /* +0x030, OBSERVED: Unk18Obj__AddChild (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
     /* +0x034, round 14 (func_8003EA0C): copied wholesale from a caller-
@@ -683,13 +705,13 @@ struct Unk18Obj {
     s32 unk98;                  /* +0x098, OBSERVED: func_8003EEC0 (round 14),
                                     a running count incremented by 1 each call */
     u8 pad09C[0x0AC - 0x09C];
-    Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: func_8003E628 (round 13,
+    Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: Unk18Obj__Unk18Obj (round 13,
                                   set from `func_8001CA94()`, a
                                   `New_Class6B5CC` allocator, `code_d294.c`)
-                                  and func_8003E6CC (round 13, dereferenced
+                                  and Unk18Obj__Finalize (round 13, dereferenced
                                   and released -- see `Unk18AcObj`'s own
                                   comment) */
-    SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: func_8003E628 (round
+    SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: Unk18Obj__Unk18Obj (round
                                   13) -- set from `func_8003FDB0`; also read
                                   back by func_8003F230 (round 13, this
                                   unit) as a plain getter */
@@ -700,7 +722,7 @@ struct Unk18Obj {
 extern Unk18ObjMethods D_8006E8E4; /* the table itself (Unk18ObjMethods, resolved via tools/classtable.py D_8006E8E4), so func_8003F24C's own definition (code_2cc8c_d.c) can return &D_8006E8E4 */
 extern Unk18ObjMethods *func_8003F24C(void); /* getter for Unk18Obj's own
                                     class table (returns &D_8006E8E4);
-                                    used by func_8003E5D8's own New_X
+                                    used by New_Unk18Obj's own New_X
                                     allocator. RETARGETED round 13: this
                                     used to live in a still-uncarved
                                     remainder, alpha's own comment said
@@ -708,9 +730,9 @@ extern Unk18ObjMethods *func_8003F24C(void); /* getter for Unk18Obj's own
                                     the round-13 carve of code_2cc8c_d
                                     brought it in, so it is matched there
                                     now. */
-extern Unk18Obj *func_8003E5D8(void); /* this unit's own New_X allocator for
+extern Unk18Obj *New_Unk18Obj(void); /* this unit's own New_X allocator for
                                     Unk18Obj, 0xBC bytes; forward-declared
-                                    here since func_8003E10C (earlier in ROM
+                                    here since Obj86B60__Init (earlier in ROM
                                     order) calls it */
 
 /* Round 13 (code_2cc8c_d): the rest of Unk18ObjMethods's own slot
@@ -825,29 +847,45 @@ extern void *func_80042694(void); /* external, no args; not yet seen
                                     elsewhere in this project */
 
 /*
- * An ALTERNATE reading of self->unk14 (round 13, func_8003E10C only): the
+ * An ALTERNATE reading of self->unk14 (round 13, Obj86B60__Init only): the
  * field itself stays `s32` in `Obj86B60` below (already established,
  * generic-word usage confirmed by a sibling unit's func_8003DA10 forwarding
  * it untyped to slot100) -- same "keep the general field, cast locally"
  * shape already used for Unk4CObj->unk24[idx]/Unk64Elem's own
- * func_8003D980 alternate reading. Here func_8003E10C dispatches through it
+ * func_8003D980 alternate reading. Here Obj86B60__Init dispatches through it
  * as a pointer to an object with its own vtable; only the one slot it
  * reaches is modelled.
  */
 struct Unk14ObjMethods {
     u8 pad000[0x004];
-    void *(*slot4)(Unk14Obj *self);            /* +0x004, inherited
+    void *(*release)(Unk14Obj *self);            /* +0x004, inherited
                                                     BasicClass "release";
-                                                    OBSERVED: func_8003E280
-                                                    (round 13) */
+                                                    OBSERVED: Obj86B60__Deinit
+                                                    (round 13). Renamed from
+                                                    slot4, round 55 --
+                                                    exclusive to this unit
+                                                    (Unk14Obj is this unit's
+                                                    own local type, unused by
+                                                    any other code_2cc8c
+                                                    sibling), matches the
+                                                    canonical BasicClassMethods
+                                                    name at this offset
+                                                    (include/code_8220.h). */
     u8 pad008[0x010 - 0x008];
-    void (*slot10)(Unk14Obj *self, void *a1);  /* +0x010, inherited
+    void (*addChild)(Unk14Obj *self, void *a1);  /* +0x010, inherited
                                                     BasicClass addChild;
-                                                    OBSERVED: func_8003E10C */
-    void (*slot14)(Unk14Obj *self, void *a1);  /* +0x014, inherited
+                                                    OBSERVED: Obj86B60__Init.
+                                                    Renamed from slot10, round
+                                                    55, same exclusivity/
+                                                    evidence as release
+                                                    above. */
+    void (*removeChild)(Unk14Obj *self, void *a1);  /* +0x014, inherited
                                                     BasicClass removeChild;
-                                                    OBSERVED: func_8003E280
-                                                    (round 13) */
+                                                    OBSERVED: Obj86B60__Deinit
+                                                    (round 13). Renamed from
+                                                    slot14, round 55, same
+                                                    exclusivity/evidence as
+                                                    release above. */
 };
 struct Unk14Obj {
     Unk14ObjMethods *methods; /* +0x000 */
@@ -855,44 +893,52 @@ struct Unk14Obj {
 
 /*
  * A THIRD alternate reading of the same shape, this time for self->unk10
- * (round 13, func_8003E280 only): released through the identical inherited
+ * (round 13, Obj86B60__Deinit only): released through the identical inherited
  * BasicClass "release" slot self->unk14/unk18's own pointee types use.
  * self->unk10 itself stays `s32` in `Obj86B60` (already established,
- * generic-word/child-pointer usage confirmed by func_8003E10C) -- cast
+ * generic-word/child-pointer usage confirmed by Obj86B60__Init) -- cast
  * locally here, same convention as `Unk14Obj`.
  */
 struct Unk10ObjMethods {
     u8 pad000[0x004];
-    void *(*slot4)(Unk10Obj *self);            /* +0x004, inherited
+    void *(*release)(Unk10Obj *self);            /* +0x004, inherited
                                                     BasicClass "release";
-                                                    OBSERVED: func_8003E280 */
+                                                    OBSERVED: Obj86B60__Deinit.
+                                                    Renamed from slot4, round
+                                                    55 -- exclusive to this
+                                                    unit (Unk10Obj is this
+                                                    unit's own local type),
+                                                    matches the canonical
+                                                    BasicClassMethods name at
+                                                    this offset
+                                                    (include/code_8220.h). */
     u8 pad008[0x044 - 0x008];
     void (*slot44)(Unk10Obj *self);            /* +0x044, OBSERVED:
-                                                    func_8003E418 (round 13) */
+                                                    Obj86B60__OnTag1Notify (round 13) */
 };
 struct Unk10Obj {
     Unk10ObjMethods *methods; /* +0x000 */
 };
 
 /*
- * self->unkC->unk4's pointee (round 13, func_8003E418) -- the SAME field
- * `func_8003E10C` forwards as an opaque `addChild` child and `func_8003E280`
+ * self->initArgs->unk4's pointee (round 13, Obj86B60__OnTag1Notify) -- the SAME field
+ * `Obj86B60__Init` forwards as an opaque `addChild` child and `Obj86B60__Deinit`
  * forwards as a `removeChild` target; this function is the first to
  * dereference it as a real class instance. Only the two slots it dispatches
  * through are modelled.
  */
 struct Unk4ArgObjMethods {
     u8 pad000[0x044];
-    void (*slot44)(Unk4ArgObj *self); /* +0x044, OBSERVED: func_8003E418 */
-    void (*slot48)(Unk4ArgObj *self); /* +0x048, OBSERVED: func_8003E418 */
+    void (*slot44)(Unk4ArgObj *self); /* +0x044, OBSERVED: Obj86B60__OnTag1Notify */
+    void (*slot48)(Unk4ArgObj *self); /* +0x048, OBSERVED: Obj86B60__OnTag1Notify */
 };
 struct Unk4ArgObj {
     Unk4ArgObjMethods *methods; /* +0x000 */
 };
 
 /*
- * self->unkC->unk0's pointee (round 13, func_8003E578) -- the SAME field
- * `func_8003E10C`/`func_8003E280` forward as an opaque `addChild`/
+ * self->initArgs->unk0's pointee (round 13, Obj86B60__NotifyChildReset) -- the SAME field
+ * `Obj86B60__Init`/`Obj86B60__Deinit` forward as an opaque `addChild`/
  * `removeChild` child; this function is the first to dereference it as a
  * real class instance (same "one field, multiple independent-evidence
  * readings" shape as `Unk4ArgObj` for the adjacent `unk4` field). Only the
@@ -902,32 +948,32 @@ typedef struct Unk0ArgObj Unk0ArgObj;
 typedef struct Unk0ArgObjMethods Unk0ArgObjMethods;
 struct Unk0ArgObjMethods {
     u8 pad000[0x04C];
-    void (*slot4C)(Unk0ArgObj *self); /* +0x04C, OBSERVED: func_8003E578 */
+    void (*slot4C)(Unk0ArgObj *self); /* +0x04C, OBSERVED: Obj86B60__NotifyChildReset */
 };
 struct Unk0ArgObj {
     Unk0ArgObjMethods *methods; /* +0x000 */
 };
 
 /*
- * func_8003E10C's 2nd parameter (round 13) -- a small "init args" struct:
+ * Obj86B60__Init's 2nd parameter (round 13) -- a small "init args" struct:
  * two children forwarded to the inherited BasicClass addChild (self->
  * methods->slot10), and three optional fields each read with a "use if
  * set, else derive from a helper call" idiom mirroring self->unk10/unk14/
- * unk18's own construction. Only the five fields func_8003E10C touches are
+ * unk18's own construction. Only the five fields Obj86B60__Init touches are
  * modelled.
  */
 struct Obj86B60InitArgs {
     Unk0ArgObj *unk0; /* +0x000, forwarded to self->methods->slot10 (child)
                           as `void *`; ALSO OBSERVED (round 13) dereferenced
-                          directly by func_8003E578 as a real class instance
+                          directly by Obj86B60__NotifyChildReset as a real class instance
                           -- see Unk0ArgObj's own comment */
     Unk4ArgObj *unk4; /* +0x004, forwarded to self->methods->slot10 (child)
                           as `void *`; ALSO OBSERVED (round 13) dereferenced
-                          directly by func_8003E418 as a real class instance
+                          directly by Obj86B60__OnTag1Notify as a real class instance
                           -- see Unk4ArgObj's own comment */
     void *unk8;      /* +0x008, fallback source for self->unk10 */
     void *unkC;      /* +0x00C, fallback source for self->unk14 */
-    Unk18Obj *unk10; /* +0x010, fallback source for self->unk18 */
+    Unk18Obj *unk10; /* +0x010, fallback source for self->viewport */
 };
 
 /*
@@ -950,61 +996,81 @@ struct Obj86B60InitArgs {
  */
 struct Obj86B60Methods {
     u8 pad000[0x010];
-    void (*slot10)(Obj86B60 *self, void *a1);     /* +0x010, inherited
+    void (*addChild)(Obj86B60 *self, void *a1);     /* +0x010, inherited
                                                       BasicClass addChild
                                                       (BasicClass__func_17f98);
-                                                      OBSERVED: func_8003E10C */
-    void (*slot14)(Obj86B60 *self, void *a1);     /* +0x014, inherited
+                                                      OBSERVED: Obj86B60__Init.
+                                                      Renamed from slot10,
+                                                      round 55 -- exclusive to
+                                                      this unit (no other
+                                                      code_2cc8c sibling
+                                                      dispatches through
+                                                      Obj86B60Methods at this
+                                                      offset). */
+    void (*removeChild)(Obj86B60 *self, void *a1);     /* +0x014, inherited
                                                       BasicClass removeChild
                                                       (BasicClass__func_17ff0);
-                                                      OBSERVED: func_8003E280
-                                                      (round 13) */
+                                                      OBSERVED: Obj86B60__Deinit
+                                                      (round 13). Renamed from
+                                                      slot14, round 55, same
+                                                      exclusivity as addChild
+                                                      above. */
     u8 pad018[0x030 - 0x018];
     void (*slot30)(Obj86B60 *self);               /* +0x030, inherited
                                                       BasicClass slot
                                                       (BasicClass__NotifyParents);
-                                                      OBSERVED: func_8003E4B8
+                                                      OBSERVED: Obj86B60__NotifyParents
                                                       (round 13) */
     u8 pad034[0x040 - 0x034];
-    void (*slot40)(Obj86B60 *self);               /* +0x040, IS
-                                                      func_8003E100 (already
+    void (*resetCounters)(Obj86B60 *self);               /* +0x040, IS
+                                                      Obj86B60__ResetCounters (already
                                                       matched); OBSERVED:
-                                                      func_8003DFDC */
+                                                      IntermediateBase__IntermediateBase.
+                                                      Renamed from slot40,
+                                                      round 55 -- exclusive to
+                                                      this unit. */
     u8 pad044[0x048 - 0x044];
-    void (*slot48)(Obj86B60 *self);               /* +0x048, IS
-                                                      func_8003E280;
-                                                      OBSERVED: func_8003E10C */
+    void (*deinit)(Obj86B60 *self);               /* +0x048, IS
+                                                      Obj86B60__Deinit;
+                                                      OBSERVED: Obj86B60__Init.
+                                                      Renamed from slot48,
+                                                      round 55, same
+                                                      exclusivity as
+                                                      resetCounters above. */
     void (*slot4C)(Obj86B60 *self, s32 a1, s32 a2, s32 a3); /* +0x04C,
                                                       external (func_8003C238);
-                                                      OBSERVED: func_8003E10C */
+                                                      OBSERVED: Obj86B60__Init */
     void (*slot50)(Obj86B60 *self);               /* +0x050, external
                                                       (func_8004D898);
-                                                      OBSERVED: func_8003E280
+                                                      OBSERVED: Obj86B60__Deinit
                                                       (round 13) */
-    void (*slot54)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x054, IS
-                                                      func_8003E418;
-                                                      OBSERVED: func_8003E030 */
+    void (*onTag1Notify)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x054, IS
+                                                      Obj86B60__OnTag1Notify;
+                                                      OBSERVED: Obj86B60__OnNotify.
+                                                      Renamed from slot54,
+                                                      round 55 -- exclusive to
+                                                      this unit. */
     void (*slot58)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x058,
                                                       external (func_8003C48C,
                                                       STALL in code_2cc8c);
-                                                      OBSERVED: func_8003E030 */
+                                                      OBSERVED: Obj86B60__OnNotify */
     void (*slot5C)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x05C, IS
                                                       func_8003C51C (already
                                                       matched there with a1
                                                       typed s32 -- an
                                                       independent local view,
                                                       same shared slot);
-                                                      OBSERVED: func_8003E030 */
+                                                      OBSERVED: Obj86B60__OnNotify */
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
                                                       (func_8004D90C) */
     void (*slot64)(Obj86B60 *self);               /* +0x064, IS
-                                                      func_8003E538 (already
+                                                      Obj86B60__NotifyTargetReset (already
                                                       matched); OBSERVED:
-                                                      func_8003E4B8
+                                                      Obj86B60__NotifyParents
                                                       (round 13) */
     void (*slot68)(Obj86B60 *self);               /* +0x068, IS
-                                                      func_8003E578;
-                                                      OBSERVED: func_8003E4B8
+                                                      Obj86B60__NotifyChildReset;
+                                                      OBSERVED: Obj86B60__NotifyParents
                                                       (round 13) */
     u8 pad06C[0x070 - 0x06C];
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
@@ -1115,7 +1181,7 @@ struct Obj86B60Methods {
                                                        (round 12, runner
                                                        alpha): the occupant
                                                        is func_8003DE30, NOT
-                                                       func_8003DFA0 as this
+                                                       Obj86B60__GetActiveSlotCount as this
                                                        comment previously
                                                        said -- verified by
                                                        reading the raw table
@@ -1150,36 +1216,37 @@ struct Obj86B60Methods {
                                                        computed index value
                                                        and a literal 1) */
     s32 (*slot120)(Obj86B60 *self);                 /* +0x120, external:
-                                                       IS func_8003DFA0
+                                                       IS Obj86B60__GetActiveSlotCount
                                                        (verified the same
                                                        way as slot118 above;
-                                                       `func_8003DFA0` itself
+                                                       `Obj86B60__GetActiveSlotCount` itself
                                                        returns
                                                        `self->unk60[self->
                                                        unk58]`, s32) */
 };
 
 /*
- * self->unkC's pointee, observed only by func_8003E538 -- a shared
+ * self->initArgs's pointee (field renamed from unkC round 55), observed only
+ * by Obj86B60__NotifyTargetReset -- a shared
  * base-class method also reachable through UNRELATED classes' own vtables
- * at this same slot offset (class_39e08.h documents func_8003E538/78
+ * at this same slot offset (class_39e08.h documents Obj86B60__NotifyTargetReset/78
  * occupying Obj865C8Methods/Class86668Methods +0x064/+0x068). Dispatch
- * shape: `self->unkC->target->methods->slot48(target)` -- one extra level
+ * shape: `self->initArgs->target->methods->slot48(target)` -- one extra level
  * of indirection past the usual `self->fieldN->methods->slotM(self->fieldN)`
- * idiom. Only the one field/slot func_8003E538 touches is modelled.
+ * idiom. Only the one field/slot Obj86B60__NotifyTargetReset touches is modelled.
  */
 typedef struct Obj86B60UnkC Obj86B60UnkC;
 typedef struct Obj86B60UnkCTarget Obj86B60UnkCTarget;
 typedef struct Obj86B60UnkCTargetMethods Obj86B60UnkCTargetMethods;
 struct Obj86B60UnkCTargetMethods {
     u8 pad000[0x048];
-    void (*slot48)(Obj86B60UnkCTarget *self); /* +0x048, OBSERVED: func_8003E538 */
+    void (*slot48)(Obj86B60UnkCTarget *self); /* +0x048, OBSERVED: Obj86B60__NotifyTargetReset */
 };
 struct Obj86B60UnkCTarget {
     Obj86B60UnkCTargetMethods *methods; /* +0x000 */
 };
 struct Obj86B60UnkC {
-    Obj86B60UnkCTarget *target; /* +0x000, OBSERVED: func_8003E538 */
+    Obj86B60UnkCTarget *target; /* +0x000, OBSERVED: Obj86B60__NotifyTargetReset */
 };
 
 /*
@@ -1191,15 +1258,24 @@ struct Obj86B60UnkC {
 struct Obj86B60 {
     Obj86B60Methods *methods;   /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    Obj86B60UnkC *unkC;          /* +0x00C, func_8003E538 (see Obj86B60UnkC's
-                                    own comment): `self->unkC->target->methods
-                                    ->slot48(target)`. Also zeroed by
-                                    func_8003E874 (a ctor-shaped function that
+    Obj86B60UnkC *initArgs;      /* +0x00C, renamed from unkC round 55 --
+                                    Obj86B60__Init sets it to `(Obj86B60UnkC *)arg1`,
+                                    i.e. it is literally the retained
+                                    Obj86B60InitArgs pointer the object was
+                                    constructed with, re-viewed through the
+                                    Obj86B60UnkC local type wherever only its
+                                    `target` field is needed (tier A: exclusive
+                                    to this unit, no other code_2cc8c sibling
+                                    reaches this offset on an Obj86B60*).
+                                    OBSERVED: Obj86B60__NotifyTargetReset (see
+                                    Obj86B60UnkC's own comment): `self->initArgs->target
+                                    ->methods->slot48(target)`. Also zeroed by
+                                    Obj86B60__ResetAndRemoveAllChildren (a ctor-shaped function that
                                     also zeroes unk10/unk30 below). NOTE: this
                                     slot is reached through a SHARED base-class
                                     method -- class_39e08.h's own view of an
                                     unrelated class documents the same
-                                    func_8003E538 occupying its own vtable at
+                                    Obj86B60__NotifyTargetReset occupying its own vtable at
                                     the identical offset (+0x064), so this
                                     field is very likely part of a common
                                     base-object layout every subclass shares
@@ -1207,9 +1283,9 @@ struct Obj86B60 {
                                     itself introduces -- kept here anyway,
                                     per this header's flat single-struct
                                     style (no explicit base/derived split). */
-    s32 unk10;                  /* +0x010, func_8003E874: zeroed by the same
-                                    ctor-shaped function as unkC/unk30.
-                                    ALSO OBSERVED (round 13) by func_8003E10C,
+    s32 unk10;                  /* +0x010, Obj86B60__ResetAndRemoveAllChildren: zeroed by the same
+                                    ctor-shaped function as initArgs/unk30.
+                                    ALSO OBSERVED (round 13) by Obj86B60__Init,
                                     which sets it from an init-args field or
                                     a helper call and forwards it BOTH as an
                                     addChild-style child argument and (cast
@@ -1220,7 +1296,7 @@ struct Obj86B60 {
                                     own comment above. */
     s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
                                     slot100's 2nd arg -- generic word.
-                                    ALSO OBSERVED (round 13) by func_8003E10C,
+                                    ALSO OBSERVED (round 13) by Obj86B60__Init,
                                     which both sets it (from an init-args
                                     field or a helper call) and, on one path,
                                     dispatches through it as a pointer to an
@@ -1229,24 +1305,43 @@ struct Obj86B60 {
                                     comment) -- kept `s32` here since that is
                                     still the more general of the two
                                     observed readings. */
-    Unk18Obj *unk18;             /* +0x018, func_8003E10C (round 13): set
+    Unk18Obj *viewport;          /* +0x018, renamed from unk18 round 55 --
+                                    tier B, exclusive to this unit: holds a
+                                    Unk18Obj instance, and Unk18Obj itself
+                                    manages a 3-word position/rotation pair
+                                    (its own unk14/unk20, both Vec3) and
+                                    calls GsSetRefView2 (code_2cc8c_d.c,
+                                    func_8003EACC) -- a PSX GPU "set
+                                    reference viewport" call -- so the
+                                    pointee is a camera/viewport object, even
+                                    though what specifically the *game*
+                                    uses it for is not established. Set by
+                                    Obj86B60__Init (round 13): set
                                     from an init-args field or from this
                                     unit's own New_X allocator
-                                    (func_8003E5D8), then dispatched through
-                                    (`self->unk18->methods->slot10(...)`) */
+                                    (New_Unk18Obj), then dispatched through
+                                    (`self->viewport->methods->slot10(...)`) */
     s32 unk1C;                  /* +0x01C, func_8003CC2C (a running count/
                                     frame value multiplied against unk84);
                                     func_8003C63C (STALL) zeroes it on
-                                    several message codes */
+                                    several message codes. PROPOSED (round 55,
+                                    tier B): unk1C -> frameCounter -- shared
+                                    with code_2cc8c.c (func_8003C63C,
+                                    func_8003CC2C, func_8003CBB8), so not
+                                    renamed here; see this unit's
+                                    "## Proposed field names". */
     u8 pad020[0x020 - 0x020];
     s32 unk20;                  /* +0x020, func_8003C63C (STALL) sets it
                                     to a literal 5 */
-    s32 unk24;                  /* +0x024, func_8003E10C (round 13): set to
+    s32 initMode;               /* +0x024, renamed from unk24 round 55 --
+                                    tier B, exclusive to this unit.
+                                    Obj86B60__Init (round 13): set to
                                     arg2 (also gates the rest of that
-                                    function's body on == 0) */
+                                    function's body, and of Obj86B60__Deinit,
+                                    on == 0) */
     u8 pad028[0x030 - 0x028];
-    s32 unk30;                  /* +0x030, func_8003E874 only: zeroed by the
-                                    same ctor-shaped function as unkC/unk10;
+    s32 unk30;                  /* +0x030, Obj86B60__ResetAndRemoveAllChildren only: zeroed by the
+                                    same ctor-shaped function as initArgs/unk10;
                                     real meaning unknown, generic word */
     u8 pad034[0x038 - 0x034];
     s32 unk38;                  /* +0x038, func_8003C63C (STALL) sets it
@@ -1325,8 +1420,8 @@ struct Obj86B60 {
 };
 
 /*
- * Shared "IntermediateBase" utility class, reached through func_8003E5C8().
- * UPDATED (round 12, runner alpha): func_8003E5C8 has now been carved into
+ * Shared "IntermediateBase" utility class, reached through Get_vtable_IntermediateBase().
+ * UPDATED (round 12, runner alpha): Get_vtable_IntermediateBase has now been carved into
  * THIS unit's own code_2cc8c_c.c and is defined there -- this comment
  * previously said "not this unit's function to write" because it was
  * written before that carve. Same idiom already established in
@@ -1343,15 +1438,15 @@ struct IntermediateBaseMethods {
     void (*slot60)(void *self, s32 a1);           /* +0x060 */
 };
 
-extern IntermediateBaseMethods *func_8003E5C8(void); /* returns &D_8006E878,
+extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void); /* returns &gIntermediateBaseMethods,
                                                           same static table
                                                           as code_2c054.h's
                                                           and class_39e08.h's
                                                           own views */
-extern IntermediateBaseMethods D_8006E878; /* the table itself, so
-                                                func_8003E5C8's own
+extern IntermediateBaseMethods gIntermediateBaseMethods; /* the table itself, so
+                                                Get_vtable_IntermediateBase's own
                                                 definition (code_2cc8c_c.c)
-                                                can return &D_8006E878 */
+                                                can return &gIntermediateBaseMethods */
 
 /*
  * This unit's own local view of the shared BasicClass ancestor table
@@ -1367,23 +1462,42 @@ typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
 struct BasicClassMethodsCC8C {
     u8 pad000[0x008];
     void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
-                                  (code_8220.c); OBSERVED: func_8003DFDC */
-    void (*slot0C)(void *self); /* +0x00C, IS BasicClass__func_17f2c
+                                  (code_8220.c); OBSERVED: IntermediateBase__IntermediateBase */
+    void (*finalize)(void *self); /* +0x00C, IS BasicClass__func_17f2c
                                   (code_8220.c, "finalize"); OBSERVED:
-                                  func_8003E6CC (round 13) */
-    void (*slot10)(void *self, void *child); /* +0x010, IS
+                                  Unk18Obj__Finalize (round 13). Renamed from
+                                  slot0C, round 55 -- exclusive to this unit
+                                  (only code_2cc8c_c.c calls
+                                  Get_vtable_BasicClass() in the code_2cc8c
+                                  family). */
+    void (*addChild)(void *self, void *child); /* +0x010, IS
                                   BasicClass__func_17f98 (code_8220.c,
-                                  "addChild"); OBSERVED: func_8003E770
-                                  (round 13) */
-    void (*slot14)(void *self, void *child); /* +0x014, IS
+                                  "addChild"); OBSERVED: Unk18Obj__AddChild
+                                  (round 13). Renamed from slot10, round 55,
+                                  same exclusivity as finalize above. */
+    void (*removeChild)(void *self, void *child); /* +0x014, IS
                                   BasicClass__func_17ff0 (code_8220.c,
-                                  "removeChild"); OBSERVED: func_8003E7F4
-                                  (round 13) */
-    void (*slot18)(void *self); /* +0x018, func_8003E874's forward target */
+                                  "removeChild"); OBSERVED: Unk18Obj__RemoveChild
+                                  (round 13). Renamed from slot14, round 55,
+                                  same exclusivity as finalize above. */
+    void (*removeAllChildren)(void *self); /* +0x018, Obj86B60__ResetAndRemoveAllChildren's
+                                  forward target. Renamed from slot18, round 55,
+                                  matches the canonical BasicClassMethods'
+                                  own name at this exact offset
+                                  (include/code_8220.h). Same exclusivity as
+                                  finalize above. */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, IS
                                   BasicClass__OnNotify (code_8220_b);
-                                  OBSERVED: func_8003E030 */
+                                  OBSERVED: Obj86B60__OnNotify. NOT renamed:
+                                  code_2cc8c_d.c's func_8003E8B8 also
+                                  dispatches through this exact slot (its
+                                  own Get_vtable_BasicClass() call), so this
+                                  field is shared -- PROPOSED (round 55,
+                                  tier A): slot38 -> onNotify, matching
+                                  BasicClassMethods' own canonical name at
+                                  this offset (include/code_8220.h). Head
+                                  applies by type scope. */
 };
 
 extern BasicClassMethodsCC8C *Get_vtable_BasicClass(void);

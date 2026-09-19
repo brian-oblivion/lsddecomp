@@ -1,10 +1,12 @@
-# func_8003E628 — MATCH (41/41 words)
+> Renamed from `func_8003E628` on 2026-09-19 (tools/rename.py). Address 0x8003e628.
+
+# Unk18Obj__Unk18Obj — MATCH (41/41 words)
 
 **Unit:** code_2cc8c_c · **Size:** 41 instructions
 
 ## What it does
 
-`D_8006E8E4+0x008` -- the ctor of the class `func_8003E5D8`'s New_X
+`D_8006E8E4+0x008` -- the ctor of the class `New_Unk18Obj`'s New_X
 allocator constructs (`Unk18Obj`, 0xBC bytes). Runs the BasicClass ctor,
 installs its own vtable, zeroes two fields (`unkC`/`unk10`), stashes the
 return of `func_8001CA94` (a `New_Class6B5CC` allocator, already matched
@@ -17,7 +19,7 @@ installed `slot40`.
 ## The C
 
 ```c
-void func_8003E628(Unk18Obj *self)
+void Unk18Obj__Unk18Obj(Unk18Obj *self)
 {
     SubHandleObj *obj;
 
@@ -58,10 +60,10 @@ before the byte-level score did.
 - `Unk18ObjMethods`: added `slot40` -- a DIFFERENT function from
   `Obj86B60Methods::slot40` despite the identical offset; `D_8006E8E4`'s own
   `+0x040` occupant is `func_8003E968` (per `tools/classtable.py
-  D_8006E8E4`), not `func_8003E100`. Two unrelated tables, same offset,
+  D_8006E8E4`), not `Obj86B60__ResetCounters`. Two unrelated tables, same offset,
   different occupants -- ordinary vtable-layout coincidence, not evidence
   of a shared ancestor at this slot (contrast with the GENUINELY shared
-  slots this unit has documented elsewhere, e.g. `func_8003E538`).
+  slots this unit has documented elsewhere, e.g. `Obj86B60__NotifyTargetReset`).
 - New type `SubHandleObj`/`SubHandleObjMethods` (`slot4C`) -- this unit's own
   local view of `include/Entity.h`'s `Unk100Obj`/`func_8003FDB0`, per this
   project's independent-local-views convention.
@@ -80,3 +82,14 @@ before the byte-level score did.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build (after correctly re-reading the delay-slot ordering above).
+
+## Naming
+
+**Unk18Obj__Unk18Obj** (renamed from `func_8003E628`, round 55, runner
+alpha). Tier A: the `Class__Class` constructor convention (matching
+`BasicClass__BasicClass`) -- confirmed as `Unk18ObjMethods::ctor`'s
+occupant (called by `New_Unk18Obj` via `func_8003F24C()->ctor(self)`,
+`func_8003F24C` being this class's own vtable getter, code_2cc8c_d.c).
+Chains `Get_vtable_BasicClass()->ctor` first, then installs its own vtable
+and sets up `self->unkAC`/`self->unkB0` -- the standard base-then-derived
+construction shape.

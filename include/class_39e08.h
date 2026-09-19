@@ -59,7 +59,7 @@ typedef struct Class865C8Methods {
     /* Occupied here by func_80049958 itself; only reachable from THIS
      * struct via func_8004A4B8()'s own D_80086668 view of the same offset
      * (Class86668Methods::slot38 below), where it forwards to the inherited
-     * func_8003E030. */
+     * Obj86B60__OnNotify. */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_80049958 */
     void *unk3C;                                   /* +0x03C null slot */
     void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 func_80049A14 */
@@ -73,7 +73,7 @@ typedef struct Class865C8Methods {
     /* Shared with D_80086668 (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */
     void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 func_8004A3EC */
-    void *unk64, *unk68;                           /* shared base slots (func_8003E538/78) */
+    void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset/78) */
     /* Also shared with D_80086668 at the same offset. */
     void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C func_8004A458 */
     void *unk70;                                   /* func_8004A478 */
@@ -264,7 +264,7 @@ struct Obj865C8 {
     u8 pad04[0x0C - 0x04];
     Obj0C *unk0C;                 /* +0x00C, func_80049AC0 dereferences (->unk4); passed
                                       through as a plain register value to
-                                      func_8003E5C8()->slot44's 2nd arg by func_80049E20 */
+                                      Get_vtable_IntermediateBase()->slot44's 2nd arg by func_80049E20 */
     s32 unk10;                    /* +0x010, func_80049AC0 (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, func_80049C50 */
@@ -276,7 +276,7 @@ struct Obj865C8 {
     SubObjB *subB;                /* +0x034, func_8004A228 */
     SubObjD *unk38;                /* +0x038, func_80049AC0 dereferences (->methods); passed
                                        through as a plain register value to
-                                       func_8003E5C8()->slot44's 3rd arg by func_80049E20 */
+                                       Get_vtable_IntermediateBase()->slot44's 3rd arg by func_80049E20 */
     s32 unk3C;                    /* +0x03C, func_80049A14 */
     /* Retyped from `s32` (func_80049E20's own usage only ever forwards
      * these as opaque register values into func_80052B70, never
@@ -312,9 +312,9 @@ typedef struct IntermediateBaseMethods {
 } IntermediateBaseMethods;
 
 /* Uncarved (asm/code_2cc8c.s, not this unit's to write): a plain accessor
- * with no parameters, returning &D_8006E878. Same shape as
+ * with no parameters, returning &gIntermediateBaseMethods. Same shape as
  * Get_vtable_DreamSys / GetClass6D3C8Methods (docs/research/class-framework.md). */
-extern IntermediateBaseMethods *func_8003E5C8(void);
+extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);
 
 /* Allocator in the still-uncarved unit class_3bb8c (asm/class_3bb8c.s):
  * allocates an 0x88-byte instance, ctors it, and dispatches its own slot
@@ -353,25 +353,25 @@ typedef struct Class86668Methods {
     u8 pad10[0x38 - 0x10];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (func_80049958, this unit): D_80086668's own +0x038 is
-     * func_8003E030 (a base/inherited slot, out of this unit's scope).
+     * Obj86B60__OnNotify (a base/inherited slot, out of this unit's scope).
      * Called by func_80049958 as func_8004A4B8()->slot38(self, arg1, arg2). */
-    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_8003E030 */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
     u8 pad3C[0x44 - 0x3C];
     /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
      * the base's own slot44, returns self->unk28. Called by func_80049A1C
      * as func_8004A4B8()->slot44(self, self->unk0C, 0), return discarded. */
     s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
     /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
-     * func_8003E5C8()->slot48(self). Called by func_80049AC0 as
+     * Get_vtable_IntermediateBase()->slot48(self). Called by func_80049AC0 as
      * func_8004A4B8()->slot48(self). */
     void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
     u8 pad4C[0x54 - 0x4C];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (func_80049CA8, this unit): D_80086668's own +0x054 is
-     * func_8003E418 (a base/inherited slot, out of this unit's scope).
+     * Obj86B60__OnTag1Notify (a base/inherited slot, out of this unit's scope).
      * Called by func_80049CA8 as func_8004A4B8()->slot54(self, arg1,
      * arg2), return discarded. */
-    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 func_8003E418 */
+    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 Obj86B60__OnTag1Notify */
 } Class86668Methods;
 
 /* A plain accessor with no parameters, returning &D_80086668. Defined in the

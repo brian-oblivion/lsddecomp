@@ -6,14 +6,14 @@
 
 Identical shape to `func_8003BD74` (see that report for the full
 derivation and the return-type discussion) one slot over: forwards to
-`func_8003DFBC()`'s (i.e. `D_8006E730`'s / `LoaderTaskMethods`'s) slot
+`Get_vtable_TaskCore()`'s (i.e. `gTaskCoreMethods`'s / `LoaderTaskMethods`'s) slot
 `+0x084` instead of `+0x080`. Occupies `D_8006E5F8` slot `+0x084` itself.
 
 ## Derivation
 
 ```c
 void func_8003BDAC(StreamTaskObj *self) {
-    func_8003DFBC()->slot84(self);
+    Get_vtable_TaskCore()->slot84(self);
 }
 ```
 

@@ -1,4 +1,6 @@
-# func_8003E770 — MATCH (33/33 words)
+> Renamed from `func_8003E770` on 2026-09-19 (tools/rename.py). Address 0x8003e770.
+
+# Unk18Obj__AddChild — MATCH (33/33 words)
 
 **Unit:** code_2cc8c_c · **Size:** 33 instructions
 
@@ -14,7 +16,7 @@ nibble is 4, or into `self->unkC` when it is 1; any other value is a no-op.
 ## The C
 
 ```c
-void func_8003E770(Unk18Obj *self, GenericObj *arg1)
+void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
@@ -39,7 +41,7 @@ Matched on the first build.
   irrelevant here -- this function's own logic only cares about the header
   nibble, not the type it names.
 - `Unk18Obj->unkC`/`unk10`: retyped from bare `s32` (established by
-  `func_8003E628`'s ctor as "zeroed, meaning unknown") to `GenericObj *` --
+  `Unk18Obj__Unk18Obj`'s ctor as "zeroed, meaning unknown") to `GenericObj *` --
   this function is the first to WRITE a non-zero value into either, and it
   is unambiguously a pointer (`arg1` itself). The ctor's `self->unkC = 0;`/
   `self->unk10 = 0;` assignments are unaffected by the retype (`0` converts
@@ -61,7 +63,7 @@ Recognise this shape (`lw v,0(x); lw v,0(v); andi v,v,K`) on sight rather
 than deriving it fresh each time it recurs -- it will likely reappear
 anywhere a class hierarchy dispatches on "what kind of thing was just added
 as a child", which this specific vtable/BasicClass-derived family does
-often (compare `func_8003E030`'s own `arg1->target->header & 0xF` dispatch,
+often (compare `Obj86B60__OnNotify`'s own `arg1->target->header & 0xF` dispatch,
 a close cousin one level of indirection removed).
 
 ## Head-broadcast levers (round 13): applicability check
@@ -75,3 +77,24 @@ a close cousin one level of indirection removed).
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**Unk18Obj__AddChild** (renamed from `func_8003E770`, round 55, runner
+alpha). Tier A: forwards to `Get_vtable_BasicClass()->addChild` first (base
+slot name confirmed, matches canonical `BasicClassMethods::addChild`
+`+0x010`), then examines the added child's dynamic class tag
+(`arg1->methods->header & 0xF`) to cache a typed reference -- the standard
+"override calls base, then does its own bookkeeping" addChild-override
+shape. Mirrored exactly by `Unk18Obj__RemoveChild`.
+
+## Proposed field names
+
+- `Unk18ObjMethods::slot10` -> `addChild` (tier A). Offset `+0x010` matches
+  the canonical `BasicClassMethods::addChild` offset exactly, and this
+  header already documents it as "inherited BasicClass addChild". NOT
+  renamed directly: `code_2cc8c_d.c`'s `func_8003EACC` also dispatches
+  `m->slot10(self, a1)` on a `Unk18Obj *`, so this field is shared with
+  that unit. Head applies by type scope (rename in `Unk18ObjMethods`'s own
+  definition, fix the compiler-listed accessors in both `code_2cc8c_c.c`
+  and `code_2cc8c_d.c`, oracle).

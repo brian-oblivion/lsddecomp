@@ -109,7 +109,7 @@ ends at `+0x010`, but the already-existing `unk14` (round 13) needs
 `+0x014` — a forgotten `u8 pad010[0x014-0x010];`. Same failure mode as
 `func_8003E8B8`'s report earlier this round (compiles clean, `build exit`
 non-zero, whole-image SHA1 off by one byte, `cmp -l` + `lsdde.map`
-localizes it — this time inside `func_8003E770`, round 13). Third live
+localizes it — this time inside `Unk18Obj__AddChild`, round 13). Third live
 instance of this exact bug class within two rounds; see the Proposed
 learning below.
 
@@ -138,7 +138,7 @@ learning below.
 **Third instance in two rounds of "insert a new field, forget the leading
 pad, break a DIFFERENT already-matched function silently."** (First:
 `func_8001D204`/round 13's delta, a different unit entirely. Second:
-`func_8003E6CC`/this round's `func_8003E8B8`. Third: this report.) All
+`Unk18Obj__Finalize`/this round's `func_8003E8B8`. Third: this report.) All
 three were caught the same way — `build exit` non-zero with no compile
 error, localized via `cmp -l` (1-based!) + `lsdde.map`. This is now
 clearly not a one-off: **any struct field insertion in this project should

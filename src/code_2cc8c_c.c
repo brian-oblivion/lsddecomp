@@ -1,45 +1,83 @@
+/* code_2cc8c_c -- third slice of the 0x2CC8C block (0x8003DFA0..0x8003E874,
+ * 19 functions plus one stall), continuing directly from code_2cc8c_b.
+ *
+ * The first 10 functions (through Obj86B60__OnTag1Notify) are the tail of
+ * `Obj86B60` (base vtable D_80086B60, override D_80087AAC -- see
+ * code_2cc8c.h's own header comment and code_2cc8c.c's unit comment for the
+ * class-framework shape and the carve provenance). They cover the class's
+ * two-argument constructor pair (`Obj86B60__Init`/`Obj86B60__Deinit`, which
+ * install and later release up to three externally- or default-supplied
+ * helper objects), its `OnNotify` override (dispatches on an incoming
+ * `EventArg`'s dynamic class tag to `onTag1Notify`/an external func_8003C48C
+ * STALL/func_8003C51C), and its `NotifyParents` override (`Obj86B60__
+ * NotifyParents`, still a register-identity STALL -- see its match report)
+ * with the two small helpers it forwards to on mode 2/3.
+ *
+ * The remaining functions are `Unk18Obj`'s own constructor chain (`New_
+ * Unk18Obj`, `Unk18Obj__Unk18Obj`, `Unk18Obj__Finalize`) and its `addChild`/
+ * `removeChild` overrides (`Unk18Obj__AddChild`/`Unk18Obj__RemoveChild`,
+ * which cache a child's pointer by its dynamic class tag) -- `Unk18Obj` is
+ * SHARED with code_2cc8c_d.c, which carves the rest of its own vtable slots;
+ * see include/code_2cc8c.h's own struct comment for what evidence is
+ * exclusive to which unit. `Get_vtable_TaskCore`/`GetDefaultStreamTaskInitData`/
+ * `Get_vtable_IntermediateBase`/`IntermediateBase__IntermediateBase` are
+ * plain accessors/ctor for tables SHARED far more widely (code_2c054.c,
+ * class_39e08.c, class_3bb8c_t.c) that simply happen to live in this
+ * unit's address range.
+ *
+ * Round 55 (runner alpha): full track-3 naming pass. Every definition named;
+ * see each function's own match report for the `## Naming` evidence.
+ * Obj86B60/Obj86B60Methods/Unk18Obj/Unk18ObjMethods/GenericObjMethods are
+ * SHARED with one or more of code_2cc8c.c, code_2cc8c_b.c and
+ * code_2cc8c_d.c (same classes, split by address range across sibling
+ * units), so most field/slot renames on those particular structs are
+ * PROPOSALS in this round's report, not direct edits -- only the
+ * fields/slots this unit's own functions touch AND no sibling reaches were
+ * renamed here.
+ */
+
 #include "common.h"
 #include "code_2cc8c.h"
 
-s32 func_8003DFA0(Obj86B60 *self)
+s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
 {
     return self->unk60[self->unk58];
 }
 
 /* TaskCoreMethods table (see code_2c054.h's own richer local view); opaque
  * here since this unit never dereferences it, only returns its address. */
-extern u8 D_8006E730[];
+extern u8 gTaskCoreMethods[];
 
-void *func_8003DFBC(void)
+void *Get_vtable_TaskCore(void)
 {
-    return D_8006E730;
+    return gTaskCoreMethods;
 }
 
 /* A 3-word struct (see code_2c054.h's own StreamTaskInitData local view);
  * opaque here since this unit never dereferences it, only returns its
  * address. */
-extern u8 D_8006E854[];
+extern u8 gDefaultStreamTaskInitData[];
 
-void *func_8003DFCC(void)
+void *GetDefaultStreamTaskInitData(void)
 {
-    return D_8006E854;
+    return gDefaultStreamTaskInitData;
 }
 
-void func_8003DFDC(Obj86B60 *self)
+void IntermediateBase__IntermediateBase(Obj86B60 *self)
 {
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = (Obj86B60Methods *)func_8003E5C8();
-    self->methods->slot40(self);
+    self->methods = (Obj86B60Methods *)Get_vtable_IntermediateBase();
+    self->methods->resetCounters(self);
 }
 
-void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
     Get_vtable_BasicClass()->slot38(self, arg1, arg2);
     header = arg1->target->header & 0xF;
     if (header == 1) {
-        self->methods->slot54(self, arg1, arg2);
+        self->methods->onTag1Notify(self, arg1, arg2);
     } else if (header == 2) {
         self->methods->slot58(self, arg1, arg2);
     } else if (header == 5) {
@@ -47,13 +85,13 @@ void func_8003E030(Obj86B60 *self, EventArg *arg1, s32 arg2)
     }
 }
 
-void func_8003E100(Obj86B60 *self)
+void Obj86B60__ResetCounters(Obj86B60 *self)
 {
     self->unk1C = 0;
     self->unk20 = 0;
 }
 
-void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
+void Obj86B60__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
@@ -70,96 +108,96 @@ void func_8003E10C(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
         self->unk14 = (s32)func_80042694();
     }
     if (arg1->unk10 != NULL) {
-        self->unk18 = arg1->unk10;
+        self->viewport = arg1->unk10;
     } else {
-        self->unk18 = func_8003E5D8();
+        self->viewport = New_Unk18Obj();
     }
-    self->unkC = (Obj86B60UnkC *)arg1;
-    obj18 = self->unk18;
-    methods->slot10(self, arg1->unk0);
-    methods->slot10(self, arg1->unk4);
-    methods->slot10(self, (void *)self->unk10);
+    self->initArgs = (Obj86B60UnkC *)arg1;
+    obj18 = self->viewport;
+    methods->addChild(self, arg1->unk0);
+    methods->addChild(self, arg1->unk4);
+    methods->addChild(self, (void *)self->unk10);
     methods->slot4C(self, 0, 0, 0);
-    self->unk24 = arg2;
+    self->initMode = arg2;
     if (arg2 == 0) {
         obj18->methods->slot10(obj18, arg1->unk0);
         obj18->methods->slot10(obj18, (void *)self->unk10);
-        ((Unk14Obj *)self->unk14)->methods->slot10((Unk14Obj *)self->unk14, (void *)self->unk10);
+        ((Unk14Obj *)self->unk14)->methods->addChild((Unk14Obj *)self->unk14, (void *)self->unk10);
         methods->slot60(self, 2);
-        methods->slot48(self);
+        methods->deinit(self);
     }
 }
 
-void func_8003E280(Obj86B60 *self)
+void Obj86B60__Deinit(Obj86B60 *self)
 {
     Obj86B60Methods *methods;
     Unk18Obj *obj18;
 
     methods = self->methods;
     methods->slot50(self);
-    obj18 = self->unk18;
-    if (self->unk24 == 0) {
-        ((Unk14Obj *)self->unk14)->methods->slot14((Unk14Obj *)self->unk14, (void *)self->unk10);
+    obj18 = self->viewport;
+    if (self->initMode == 0) {
+        ((Unk14Obj *)self->unk14)->methods->removeChild((Unk14Obj *)self->unk14, (void *)self->unk10);
         obj18->methods->slot14(obj18, (void *)self->unk10);
-        obj18->methods->slot14(obj18, ((Obj86B60InitArgs *)self->unkC)->unk0);
+        obj18->methods->slot14(obj18, ((Obj86B60InitArgs *)self->initArgs)->unk0);
     }
-    methods->slot14(self, (void *)self->unk10);
-    methods->slot14(self, ((Obj86B60InitArgs *)self->unkC)->unk4);
-    methods->slot14(self, ((Obj86B60InitArgs *)self->unkC)->unk0);
-    if (((Obj86B60InitArgs *)self->unkC)->unk10 != obj18) {
-        self->unk18 = obj18->methods->slot4(obj18);
+    methods->removeChild(self, (void *)self->unk10);
+    methods->removeChild(self, ((Obj86B60InitArgs *)self->initArgs)->unk4);
+    methods->removeChild(self, ((Obj86B60InitArgs *)self->initArgs)->unk0);
+    if (((Obj86B60InitArgs *)self->initArgs)->unk10 != obj18) {
+        self->viewport = obj18->methods->release(obj18);
     }
-    if ((void *)((Obj86B60InitArgs *)self->unkC)->unkC != (void *)self->unk14) {
-        self->unk14 = (s32)((Unk14Obj *)self->unk14)->methods->slot4((Unk14Obj *)self->unk14);
+    if ((void *)((Obj86B60InitArgs *)self->initArgs)->unkC != (void *)self->unk14) {
+        self->unk14 = (s32)((Unk14Obj *)self->unk14)->methods->release((Unk14Obj *)self->unk14);
     }
-    if (((Obj86B60InitArgs *)self->unkC)->unk8 != (void *)self->unk10) {
-        self->unk10 = (s32)((Unk10Obj *)self->unk10)->methods->slot4((Unk10Obj *)self->unk10);
+    if (((Obj86B60InitArgs *)self->initArgs)->unk8 != (void *)self->unk10) {
+        self->unk10 = (s32)((Unk10Obj *)self->unk10)->methods->release((Unk10Obj *)self->unk10);
     }
 }
 
-void func_8003E418(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void Obj86B60__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     Unk4ArgObj *obj4;
 
     if (arg2 == 2) {
         ((Unk10Obj *)self->unk10)->methods->slot44((Unk10Obj *)self->unk10);
-        obj4 = ((Obj86B60InitArgs *)self->unkC)->unk4;
+        obj4 = ((Obj86B60InitArgs *)self->initArgs)->unk4;
         obj4->methods->slot44(obj4);
         obj4->methods->slot48(obj4);
     }
 }
 
-void func_8003E4A4(Obj86B60 *self)
+void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
 {
     self->unk1C++;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", func_8003E4B8);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", Obj86B60__NotifyParents);
 
-void func_8003E538(Obj86B60 *self)
+void Obj86B60__NotifyTargetReset(Obj86B60 *self)
 {
     Obj86B60UnkCTarget *target;
 
     self->unk1C = 0;
-    target = self->unkC->target;
+    target = self->initArgs->target;
     target->methods->slot48(target);
 }
 
-void func_8003E578(Obj86B60 *self)
+void Obj86B60__NotifyChildReset(Obj86B60 *self)
 {
     Unk0ArgObj *obj0;
 
-    obj0 = ((Obj86B60InitArgs *)self->unkC)->unk0;
+    obj0 = ((Obj86B60InitArgs *)self->initArgs)->unk0;
     obj0->methods->slot4C(obj0);
     self->unk1C = 0;
 }
 
-IntermediateBaseMethods *func_8003E5C8(void)
+IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 {
-    return &D_8006E878;
+    return &gIntermediateBaseMethods;
 }
 
-Unk18Obj *func_8003E5D8(void)
+Unk18Obj *New_Unk18Obj(void)
 {
     Unk18Obj *self;
 
@@ -171,7 +209,7 @@ Unk18Obj *func_8003E5D8(void)
     return NULL;
 }
 
-void func_8003E628(Unk18Obj *self)
+void Unk18Obj__Unk18Obj(Unk18Obj *self)
 {
     SubHandleObj *obj;
 
@@ -186,20 +224,20 @@ void func_8003E628(Unk18Obj *self)
     self->methods->slot40(self);
 }
 
-void func_8003E6CC(Unk18Obj *self)
+void Unk18Obj__Finalize(Unk18Obj *self)
 {
     self->methods->slot90(self);
     self->methods->slot74(self);
-    self->unkAC->methods->slot4(self->unkAC);
+    self->unkAC->methods->release(self->unkAC);
     self->methods->slotA8(self, 0);
-    Get_vtable_BasicClass()->slot0C(self);
+    Get_vtable_BasicClass()->finalize(self);
 }
 
-void func_8003E770(Unk18Obj *self, GenericObj *arg1)
+void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->slot10(self, arg1);
+    Get_vtable_BasicClass()->addChild(self, arg1);
     header = arg1->methods->header & 0xF;
     if (header == 4) {
         self->unk10 = arg1;
@@ -209,7 +247,7 @@ void func_8003E770(Unk18Obj *self, GenericObj *arg1)
     }
 }
 
-void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
+void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
@@ -220,13 +258,13 @@ void func_8003E7F4(Unk18Obj *self, GenericObj *arg1)
     } else if (header == 1) {
         self->unkC = NULL;
     }
-    Get_vtable_BasicClass()->slot14(self, arg1);
+    Get_vtable_BasicClass()->removeChild(self, arg1);
 }
 
-void func_8003E874(Obj86B60 *self)
+void Obj86B60__ResetAndRemoveAllChildren(Obj86B60 *self)
 {
     self->unk30 = 0;
     self->unk10 = 0;
-    self->unkC = NULL;
-    Get_vtable_BasicClass()->slot18(self);
+    self->initArgs = NULL;
+    Get_vtable_BasicClass()->removeAllChildren(self);
 }

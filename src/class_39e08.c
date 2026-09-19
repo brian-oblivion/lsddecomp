@@ -271,7 +271,7 @@ Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
 }
 
 void func_8004A19C(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
-    func_8003E5C8()->ctor(self);
+    Get_vtable_IntermediateBase()->ctor(self);
     self->methods = (Class865C8Methods *)func_8004A4B8();
     if (arg1 != 0) {
         self->subB = New_VabStreamObj(arg1);
@@ -286,7 +286,7 @@ void func_8004A228(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
-    func_8003E5C8()->dtor(self);
+    Get_vtable_IntermediateBase()->dtor(self);
 }
 
 void func_8004A294(Obj865C8 *self) {
@@ -295,26 +295,26 @@ void func_8004A294(Obj865C8 *self) {
 
 s32 func_8004A2C4(Obj865C8 *self, s32 arg1, s32 arg2) {
     self->unk28 = 0;
-    func_8003E5C8()->slot44(self, arg1, arg2);
+    Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
     return self->unk28;
 }
 
 void func_8004A324(Obj865C8 *self) {
-    func_8003E5C8()->slot48(self);
+    Get_vtable_IntermediateBase()->slot48(self);
 }
 
 void func_8004A35C(void) {
 }
 
 void func_8004A364(Obj865C8 *self, s32 arg1, s32 arg2) {
-    func_8003E5C8()->slot5C(self, arg1, arg2);
+    Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
     if ((u32)self->unk1C > (u32)self->unk2C) {
         self->methods->onEventArg(self, 4);
     }
 }
 
 void func_8004A3EC(Obj865C8 *self, s32 arg1) {
-    func_8003E5C8()->slot60(self, arg1);
+    Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
         self->unk28 = 1;
         self->methods->noop7C(self);

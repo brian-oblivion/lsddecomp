@@ -11,7 +11,7 @@ Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void) {
 ```
 
 A plain "get the base class table" getter, same shape as
-`func_8003E5C8`/`Get_vtable_BasicClass` elsewhere in this project.
+`Get_vtable_IntermediateBase`/`Get_vtable_BasicClass` elsewhere in this project.
 `D_8006EAC0` is the base method table for a previously-unnamed
 BasicClass-derived class (see `include/code_2cc8c.h`'s `Obj6EAC0`
 comment); this unit's `Obj6EAC0__GetDerivedMethods` is the matching getter for the

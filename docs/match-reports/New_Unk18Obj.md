@@ -1,4 +1,6 @@
-# func_8003E5D8 — MATCH (20/20 words)
+> Renamed from `func_8003E5D8` on 2026-09-19 (tools/rename.py). Address 0x8003e5d8.
+
+# New_Unk18Obj — MATCH (20/20 words)
 
 **Unit:** code_2cc8c_c · **Size:** 20 instructions
 
@@ -6,7 +8,7 @@
 
 The `New_X` allocator for the class whose table is returned by
 `func_8003F24C` (external, still-uncarved remainder of this segment): the
-same allocator `func_8003E10C` calls to fill `self->unk18` when no override
+same allocator `Obj86B60__Init` calls to fill `self->unk18` when no override
 was supplied. Allocates a 0xBC-byte instance and, on success, runs the
 class's own constructor through the table's slot +0x008
 (`func_8003F24C()->ctor(self)`), returning the new instance; returns `NULL`
@@ -15,14 +17,14 @@ explicitly on allocation failure.
 This unit's SECOND shared-table region: `D_8006E8E4` (`tools/classtable.py
 D_8006E8E4`, 45 slots) is the table `func_8003F24C` returns and this
 function constructs an instance of, and it accounts for the rest of this
-round's queue (`func_8003E628`/`func_8003E6CC`/`func_8003E770`/
-`func_8003E7F4` = its own slots `+0x008`/`+0x00C`/`+0x010`/`+0x014`) --
-`D_8006E878` (see `func_8003E030.md`) explained everything else.
+round's queue (`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize`/`Unk18Obj__AddChild`/
+`Unk18Obj__RemoveChild` = its own slots `+0x008`/`+0x00C`/`+0x010`/`+0x014`) --
+`gIntermediateBaseMethods` (see `Obj86B60__OnNotify.md`) explained everything else.
 
 ## The C
 
 ```c
-Unk18Obj *func_8003E5D8(void)
+Unk18Obj *New_Unk18Obj(void)
 {
     Unk18Obj *self;
 
@@ -47,3 +49,11 @@ the byte match confirms the reading.
 
 round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
 first build.
+
+## Naming
+
+**New_Unk18Obj** (renamed from `func_8003E5D8`, round 55, runner alpha).
+Tier A: standard `New_Class` allocator idiom already established in this
+project (allocate `0xBC` bytes via `func_80017B34`, then invoke the class's
+own ctor through its vtable getter) -- matches this unit's own class
+placeholder name `Unk18Obj`.

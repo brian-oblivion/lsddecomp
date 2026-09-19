@@ -1,4 +1,6 @@
-# func_8003E538 — MATCH (16/16 words, 2 attempts)
+> Renamed from `func_8003E538` on 2026-09-19 (tools/rename.py). Address 0x8003e538.
+
+# Obj86B60__NotifyTargetReset — MATCH (16/16 words, 2 attempts)
 
 **Unit:** code_2cc8c_c · **Size:** 16 instructions
 
@@ -6,7 +8,7 @@
 
 A shared "base-class" method, reached through `Obj86B60Methods::slot64`
 -- and, per `include/class_39e08.h`'s own note on an UNRELATED class
-(`Obj865C8Methods`/`Class86668Methods` both list `func_8003E538` at their
+(`Obj865C8Methods`/`Class86668Methods` both list `Obj86B60__NotifyTargetReset` at their
 own `+0x064`), this function is genuinely shared across multiple otherwise-
 unrelated classes at the same vtable slot, not something `Obj86B60`
 introduces itself.
@@ -18,7 +20,7 @@ header): `self->unkC->target->methods->slot48(target)`.
 ## The C
 
 ```c
-void func_8003E538(Obj86B60 *self)
+void Obj86B60__NotifyTargetReset(Obj86B60 *self)
 {
     Obj86B60UnkCTarget *target;
 
@@ -67,3 +69,15 @@ control-flow cost.
 ## Provenance
 
 round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. 2 attempts.
+
+## Naming
+
+**Obj86B60__NotifyTargetReset** (renamed from `func_8003E538`, round 55,
+runner alpha). Tier B: `Obj86B60Methods::slot64` occupant (dispatched by
+`Obj86B60__NotifyParents` on mode 2). Mechanics fully known: zeroes
+`self->unk1C` (the frame counter) then forwards a notification to
+`self->initArgs->target` (the retained InitArgs' own target object,
+`Obj86B60UnkCTargetMethods::slot48`). The game-level MEANING of "target"
+and of mode 2 vs mode 3 (see `Obj86B60__NotifyChildReset`) is not
+established, hence tier B; the name records the confirmed mechanic
+(reset the counter, then notify the target) rather than a guessed role.
