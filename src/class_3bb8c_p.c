@@ -1,35 +1,32 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * class_3bb8c_p -- vram 0x800574C4..0x80057DBC, carved round 17
+ * (2026-09-04), immediately behind class_3bb8c_o. Two DreamSys-method
+ * families plus one unrelated constructor:
  *
- * class_3bb8c_p -- functions 74..93 of the 113-function `class_3bb8c_n`
- * remainder, 0x47CC4..0x485BC (vram 0x800574C4..0x80057DBC).  Carved round 17
- * (2026-09-04), immediately behind `class_3bb8c_o`.
+ *  - A local-offset family (DreamSys__ApplyOffsetSlot0/1, the shared
+ *    DreamSys__ApplyOffsetSlotAndNotify helper, and the
+ *    DreamSys__DispatchOffsetSlot0/SlotC4 + DreamSys__ApplyOffsetOrFindNearby
+ *    pair): writes one component of a shared local-space offset buffer,
+ *    applies it as a rotated positional nudge via the inherited
+ *    BaseObjO__ApplyRotatedVec14, resets that component, and falls back to
+ *    a grid-based nearby-link search (DreamSys__FindNearbyLink,
+ *    DreamSys__BuildLinkQueries [STALL], DreamSys__ScanLinkCandidates,
+ *    DreamSys__ScanGridWindow, DreamSys__AcceptGridElem) when the offset
+ *    alone did not attach to a link (DreamSys::unk_0x28).
+ *  - A link-command dispatch pair (DreamSys__DispatchLinkCommand[AndTryAttach])
+ *    forwarding through the inherited Class6B5CC base table and, for a
+ *    count in [5,9), the object's own inherited TryAttachNearby slot.
+ *  - DreamSys__SetLastOffsetValue/SetPendingExtra/GetBaseMethods: plain
+ *    setters/getter.
+ *  - New_D800879C4 + D800879C4__D800879C4: allocator and constructor for
+ *    an unrelated, still-uncarved sibling class (table D_800879C4, in
+ *    class_3bb8c_q.s).
  *
- * Blocker census, three-grep screen run per function at carve time:
- * 20 of 20 clean -- no gp_rel, no addiu-$at, no nop_mflo_mfhi anywhere in the
- * slice.  This is the cleanest window found in the whole executable this
- * round.  Four of the 20 are two-word leaves; splat matched two of them
- * itself, so the queue below is 18.
- *
- * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
- * rodata sub-slot is attached to this unit.
- *
- * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM addresses,
- * not at class boundaries, and round 15 measured three of five such slices
- * spanning two or more vtables.  Identify each class with tools/classtable.py
- * rather than assuming the unit has one.  A class that spans a carve boundary
- * is also the normal reason two units name the same table -- see the
- * multiple-independent-local-views convention in CLAUDE.md before deciding
- * whether your view of one belongs in include/class_3bb8c.h or here.
+ * One stall: DreamSys__BuildLinkQueries (register-allocation/scheduling
+ * residue only; control and data flow independently confirmed via
+ * m2ctx.py). No switch jump table in this slice, and no gp_rel/addiu_at/
+ * nop_mflo_mfhi anywhere in it (all three are resolved toolchain
+ * constructs anyway, CLAUDE.md "Open toolchain blockers").
  */
 #include "common.h"
 #include "DreamSys.h"
