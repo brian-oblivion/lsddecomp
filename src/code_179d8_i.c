@@ -82,7 +82,7 @@ typedef struct {
     u8 unk2B;
     u8 pad2C[0x3E - 0x2C];
     s16 unk3E;
-    u16 unk40;
+    s16 unk40;
     s16 unk42;
     s16 unk44;
     u8 pad46[0x4A - 0x46];
@@ -107,92 +107,95 @@ extern Entry90902E8 *D_800902E8[];
 
 /* unk3E, unk40, unk42, unk78, unk7A, unk98 added to Entry90902E8 above,
  * in place of existing padding -- no existing field's offset changed.
- * unk40 is loaded with `lhu` (declared u16) but sign-checked via an
- * explicit `(s16)` cast at every comparison site -- matches retail's
- * `sll 16`/`bltz` idiom for checking a 16-bit value's sign without a
- * plain `lh`.
+ * unk40 is s16 (ROUND 58 CORRECTION -- it was read as u16 for many
+ * rounds).  Retail's `lhu 0x40; addiu -1; sh 0x40; sll 16; bltz` is GCC
+ * 2.6.3's OWN narrowing of a SIGNED 16-bit add: the store truncates, so
+ * the load's signedness is dead and cc1 picks `lhu`, then re-signs the
+ * value it just stored with `sll 16` and lets `bltz` read bit 31.  The
+ * u16 reading forced an explicit `(s16)` cast at every compare AND made
+ * `p->unk40 -= 1` an unsigned `+ 0xFFFF`, which cc1 then CSE'd with the
+ * same constant in the value-step -- parking 0xFFFF in a callee-saved
+ * register retail never spends.
  *
- * STALL -- see docs/match-reports/func_80033C90.md for the full
- * algorithm derivation (correct, byte-verified block-by-block against
- * the asm) and the best C body reached (18/202 words, first diff at
- * word 1 -- the prologue's own `-0x40` vs `-0x38` frame size). The
- * residue is register/stack allocation, not logic. */
+ * STALL -- see docs/match-reports/func_80033C90.md.  Round 58 re-derived
+ * the function from the .s and reached 19/202 words, 200 words built vs
+ * 202 retail, with a body that is BLOCK-FOR-BLOCK and
+ * INSTRUCTION-FOR-INSTRUCTION retail modulo a permutation of WHICH
+ * callee-saved register holds which value (retail s1=off, s2=row,
+ * s3=slot, s4=screen; built s3=off, s4=row, s1=slot, s2=screen).  That
+ * is a register-identity residue, which CLAUDE.md HARD RULE 6 makes a
+ * stall. */
 extern s32 func_80030404(s16 a0, u16 a1, u16 a2, s32 a3);
 extern s32 func_80030584(s32 p0, s16 *out1, s16 *out2);
 
 #if 0
-void func_80033C90(s32 a0, s32 a1)
+void func_80033C90(s16 a0, s16 a1)
 {
-    Entry90902E8 *p = &D_800902E8[(s16)a0][(s16)a1];
-    s16 c42 = p->unk42;
-    s32 newCnt = p->unk98 - 1;
+    Entry90902E8 **row = &D_800902E8[a0];
+    s32 off = a1 * sizeof(Entry90902E8);
+    Entry90902E8 *p = (Entry90902E8 *)((u8 *)*row + off);
+    s32 c42 = p->unk42;
+    s32 cnt = p->unk98 - 1;
     s16 pk;
     u16 sp10, sp12;
-    u16 a1arg;
-    s32 a2arg;
+    u16 lo, hi;
 
-    p->unk98 = newCnt;
+    p->unk98 = cnt;
     if (c42 > 0) {
-        if ((u32)newCnt % (u32)c42 == 0) {
-            if (p->unk3E > 0) {
-                p->unk40 -= 1;
-                if ((s16)p->unk40 < 0) {
-                    goto negHandler;
-                }
-                pk = (s16)(a0 | (a1 << 8));
-                func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
-                if (sp10 == 0) {
-                    goto viaE60;
-                }
-                if (sp12 == 0) {
-                    goto viaE5C;
-                }
-                a1arg = sp10 + 0xFFFF;
-                a2arg = sp12 + 0xFFFF;
-                goto callReal;
-            }
+        if ((u32)cnt % (u32)c42 != 0) {
+            goto tailFinal;
+        }
+        if (p->unk3E <= 0) {
             goto tailCheck;
         }
-        goto tailFinal;
-    } else {
-        if (p->unk3E > 0) {
-            p->unk40 += c42;
-            if ((s16)p->unk40 < 0) {
-                goto negHandler;
-            }
-            pk = (s16)(a0 | (a1 << 8));
-            func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
-            if ((s32)sp10 < -(s32)p->unk42) {
-                goto viaE60;
-            }
-            if ((s32)sp12 < -(s32)p->unk42) {
-                goto viaE64;
-            }
-            a1arg = sp10 + p->unk42;
-            a2arg = sp12 + p->unk42;
-            goto callReal;
+        p->unk40 -= 1;
+        if (p->unk40 < 0) {
+            goto negHandler;
         }
-        goto tailCheck;
+        pk = (s16)(a0 | (a1 << 8));
+        func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
+        if (sp10 == 0) {
+            goto clearHandler;
+        }
+        if (sp12 == 0) {
+            goto clearHandler;
+        }
+        lo = sp10 + (u16)-1;
+        hi = sp12 + (u16)-1;
+    } else {
+        if (p->unk3E <= 0) {
+            goto tailCheck;
+        }
+        p->unk40 += c42;
+        if (p->unk40 < 0) {
+            goto negHandler;
+        }
+        pk = (s16)(a0 | (a1 << 8));
+        func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
+        if ((s32)sp10 < -(s32)p->unk42) {
+            goto clearHandler;
+        }
+        if ((s32)sp12 < -(s32)p->unk42) {
+            goto clearHandler;
+        }
+        lo = sp10 + p->unk42;
+        hi = sp12 + p->unk42;
     }
+    func_80030404(pk, lo, hi, 0);
+    goto tailCheck;
+
+clearHandler:
+    func_80030404((s16)(a0 | (a1 << 8)), 0, 0, 0);
+    D_800902E8[a0][a1].unk90 &= ~0x20;
+    goto tailCheck;
 
 negHandler:
     func_80030404((s16)(a0 | (a1 << 8)), 0, 0, 0);
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x20;
-    goto tailCheck;
-
-callReal:
-    func_80030404(pk, a1arg, (u16)a2arg, 0);
-    goto tailFinal;
-
-viaE5C:
-viaE60:
-viaE64:
-    func_80030404((s16)(a0 | (a1 << 8)), 0, 0, 0);
-    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x20;
+    ((Entry90902E8 *)((u8 *)*row + off))->unk90 &= ~0x20;
 
 tailCheck:
-    if (p->unk98 == 0 || (s16)p->unk40 == 0) {
-        D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x20;
+    if (p->unk98 == 0 || p->unk40 == 0) {
+        D_800902E8[a0][a1].unk90 &= ~0x20;
     }
 
 tailFinal:
