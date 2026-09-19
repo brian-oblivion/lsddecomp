@@ -19,9 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 6 (2026-09-19, after rounds 56 and 57: the stale-object
-build trap, the slot ownership test, type corrections, extern arity, the
-revisit trigger, and a teardown guard).
+Plan revision: 7 (2026-09-19, after round 58: the make guard never fired in
+a worktree; Gate 3 check 3 had no real-build measurement; externcheck's
+guidance was wrong for the dead-argument idiom; the model table's
+"escalated" clause was read as a hand-off).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -52,7 +53,7 @@ the SDK" is a goal. Done is all five of:
 
 | role | default | switch, and to what |
 | --- | --- | --- |
-| **head** | Opus | **Fable** when the round will WRITE a new procedure, tool or doc (any change to this plan included), must adjudicate a HARD RULE tension or a toolchain lead, or follows a round that ESCALATED procedure gaps. An Opus head may take a track's first run: it executes what is written and escalates every gap in its report instead of writing procedure, which is what round 50 did correctly. |
+| **head** | Opus | **Fable** only when the round itself will WRITE a new procedure, tool or doc, or must adjudicate a HARD RULE tension or a toolchain lead. Escalated gaps are NOT a reason for the next round's head to be Fable: the operator hands them to a Fable session BETWEEN rounds, which revises this plan and the tools, and the next round runs on Opus again. An Opus head executes what is written and escalates every gap in its report instead of writing procedure (round 50 onward). |
 | **matching runner** (tracks 1, revisit) | decided by calibration: `plan.py` says which | round A Sonnet, round B Opus, on comparably ranked stalls; thereafter whichever produced more matches per runner-session. The head may override with `plan.py set-model`, with a reason in PROGRESS.md. |
 | **naming runner** (track 3) | Opus | **Sonnet** once the head has reviewed two Opus-named units and found no wrong tier-A name. Back to Opus if a Sonnet unit fails review. |
 | **mechanical runner** (track 2 identification, track 1b promotion, report hygiene) | Sonnet | never higher |

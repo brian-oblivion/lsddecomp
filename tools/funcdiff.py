@@ -236,6 +236,38 @@ def main():
     print(f"{name}: {n - bad}/{n} words match "
           f"(file 0x{start:X}-0x{end:X})")
 
+    # Insertions / deletions at the OPCODE level, so Gate 3's check 3 (does the
+    # permuter scaffold's signature AGREE with the real build) can be run at
+    # all: round 58 found it had been inferred from "length exact, so 0/0",
+    # and equal length is exactly where an insertion and a deletion cancel
+    # (measured 3/3 and 14/14). Same skeleton as tools/sdkname.py: the
+    # instruction with its immediate field zeroed, so a register or offset
+    # change counts as a REPLACEMENT and only a genuinely added or dropped
+    # instruction counts here. A pure register-identity residue reads 0/0.
+    import difflib
+    def skel(w):
+        v = int.from_bytes(w, "little")
+        op = v >> 26
+        if op == 0:
+            return v & 0xFFFFF83F
+        if op in (2, 3):
+            return v & 0xFC000000
+        return v & 0xFFFF0000
+    ra = [skel(a[i * 4:i * 4 + 4]) for i in range(len(a) // 4)]
+    rb = [skel(b[i * 4:i * 4 + 4]) for i in range(len(b) // 4)]
+    ins = dele = 0
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, ra, rb, autojunk=False).get_opcodes():
+        if tag == "insert":
+            ins += j2 - j1
+        elif tag == "delete":
+            dele += i2 - i1
+        elif tag == "replace":
+            d = (j2 - j1) - (i2 - i1)
+            ins += max(d, 0)
+            dele += max(-d, 0)
+    print(f"{name}: insertions {ins} / deletions {dele} (opcode-level, built vs retail; "
+          f"Gate 3 check 3 compares these with the scaffold's --stack-diffs)")
+
     if outside:
         print(f"WARNING: the build differs OUTSIDE this range too ({outside} "
               f"bytes) — a size change may have\n"

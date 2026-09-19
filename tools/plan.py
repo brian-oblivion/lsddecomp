@@ -521,10 +521,12 @@ def jobs(d, n):
     q_stall = stall_runner_jobs(d["_stalls"], t["1"]["next_match_model"], "stall") \
         if t["1"]["status"] == "open" else []
     if d.get("extern_conflicts"):
-        q_naming.insert(0, ("3", f"extern hygiene: {d['extern_conflicts']} function(s) whose extern "
-                                 "declarations disagree in arity with their definition "
-                                 "(python3 tools/externcheck.py); fix externs to definitions, oracle green",
-                            MODELS["mechanical_runner"]))
+        q_naming.insert(0, ("3", f"extern review: {d['extern_conflicts']} function(s) whose extern "
+                                 "arity disagrees with the definition (python3 tools/externcheck.py). "
+                                 "Per function read the callee's asm; fix the EXTERN only, or annotate "
+                                 "`arity-ok:` when the callee reads a register the caller leaves loaded. "
+                                 "Never change a call site's arguments. Oracle green after each.",
+                            "opus"))
     q_sdk = []
     if t["2"]["unnamed"]:
         if not (ROOT / "tools/sdkname.py").exists():

@@ -233,10 +233,16 @@ site. Before spending a search, three checks, cheapest first (archive §Gate 3,
 rounds 40 to 47):
 
 1. Does the scaffold compile and score? (correctness)
-2. `--debug --stack-diffs` insertion/deletion count (cost, necessary not
-   sufficient)
-3. Does the scaffold's signature AGREE with the same body rebuilt in the real
-   tree? Three outcomes, one of which says search:
+2. The scaffold's `--debug --stack-diffs` insertion/deletion count (cost,
+   necessary not sufficient)
+3. Does that signature AGREE with the same body rebuilt in the real tree?
+   The real-build side is `tools/funcdiff.py <func>`'s
+   `insertions N / deletions M` line: opcode-level, immediates zeroed, so a
+   register or offset change is a replacement and only an added or dropped
+   instruction counts. Equal length does NOT imply 0/0; an insertion and a
+   deletion cancel in length (round 58 measured 3/3 and 14/14 on
+   length-exact functions after "0/0" had been inferred from length alone).
+   Three outcomes, one of which says search:
 
 | scaffold | real build | verdict |
 | --- | --- | --- |
@@ -244,19 +250,10 @@ rounds 40 to 47):
 | dirtier than the real build | zero drift | MISMATCH, scaffold artifact, decline |
 | perfect zero | does not match | whole-file effect, decline, stop looking inside the function |
 
-**CHECK 3 IS NOT RUNNABLE WITH `funcdiff.py`, AND THAT IS UNRESOLVED (round 58).**
-The table above is stated in insertion/deletion signatures; `funcdiff.py` reports
-only word-match and length and has no ins/del reporting at all. So "length exact,
-therefore 0 ins / 0 del" has been inferred, and equal length is precisely where
-insertions and deletions CANCEL (measured: 3/3 on `func_8004CAF0`, 14/14 on
-`func_8004CD38`). Two runners independently redid check 3 as a BYTES diff of
-`objdump` on the scaffold's `base.o` against the real unit object and reached the
-same verdicts. Scope is NOT tree-wide: the head swept the 12 reports citing a
-scaffold artifact and most declined on check 2 (the scaffold's OWN measured count,
-untouched by this), or backed 0/0 with an asm-differ reading of positionally
-aligned register diffs, which at equal length does legitimately imply 0/0. Pending
-an operator decision on the method and the tooling; do not cite a check-3 verdict
-without saying how its real-build signature was obtained.
+A check-3 verdict written before round 58 that says "0/0" without naming how
+the real-build signature was obtained was inferred from length; the head's
+sweep of the 12 such reports found most decided on check 2 alone, which this
+does not touch. Re-run check 3 with the funcdiff line before citing one.
 
 Zero-ness is not the discriminator; agreement is. A recorded negative whose
 search never passed check 3 is not evidence about the function, and a

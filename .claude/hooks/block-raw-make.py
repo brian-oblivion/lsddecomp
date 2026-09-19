@@ -32,6 +32,7 @@ import json
 import os
 import re
 import shlex
+import subprocess
 import sys
 
 DENY = (
@@ -92,13 +93,36 @@ def project_dir() -> str:
         or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 
-def inside(path: str, root: str) -> bool:
-    """True if `path` is `root` or below it."""
+def repo_roots(root: str):
+    """The project dir AND every git worktree of it.
+
+    Round 58 measured that this hook never fired in a runner worktree: hooks
+    run as $CLAUDE_PROJECT_DIR/.claude/hooks/..., so `root` is always the MAIN
+    checkout, a worktree's cwd is "outside" it, and main() returned 0 before
+    looking at the target. The old comment here claimed a worktree "is checked
+    against ITS repo"; it was not. Every runner had been unguarded. A worktree
+    shares this Makefile, so it is this repo for the purpose of the guard.
+    """
+    roots = [root]
+    try:
+        out = subprocess.run(["git", "-C", root, "worktree", "list", "--porcelain"],
+                             capture_output=True, text=True, timeout=5).stdout
+        for line in out.splitlines():
+            if line.startswith("worktree "):
+                roots.append(os.path.realpath(line[len("worktree "):].strip()))
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return roots
+
+
+def inside(path: str, root) -> bool:
+    """True if `path` is `root` (or any of a list of roots) or below it."""
+    roots = root if isinstance(root, (list, tuple)) else [root]
     try:
         real = os.path.realpath(path)
     except OSError:
         return True  # Unresolvable: assume in-repo and stay strict.
-    return real == root or real.startswith(root + os.sep)
+    return any(real == r or real.startswith(r + os.sep) for r in roots)
 
 
 def tokenize(command: str):
@@ -274,14 +298,11 @@ def main() -> int:
     if not MENTIONS_MAKE.search(command):
         return 0
 
-    root = project_dir()
+    root = repo_roots(project_dir())
 
     # The Bash tool reports the directory the command runs in. A session
-    # already working outside the repo is not touching our Makefile.
-    #
-    # NOTE this deliberately does NOT special-case worktrees: a worktree is a
-    # separate directory with its own root, so a runner's `make` there is
-    # checked against ITS repo, which is what we want.
+    # already working outside the repo AND outside every worktree of it is
+    # not touching our Makefile.
     cwd = data.get("cwd") or ""
     if cwd and not inside(cwd, root):
         return 0
@@ -301,7 +322,7 @@ def main() -> int:
         return 0  # Mentioned, never run: `command -v make`, `grep make ...`.
 
     # `cd <path> && ... make ...` -- if it leaves the repo, allow it.
-    base = cwd if cwd else root
+    base = cwd if cwd else root[0]
     for match in re.finditer(r"\bcd\s+(\"[^\"]+\"|'[^']+'|[^\s;&|]+)", command):
         target = match.group(1).strip("\"'")
         candidate = (target if os.path.isabs(target)

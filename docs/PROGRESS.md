@@ -1252,6 +1252,28 @@ the head's review has passed it twice. The stop rule still runs to its end:
 two more Opus band attempts decide whether stall matching continues or parks;
 revisits continue on Opus either way.
 
+**Revision 7 (2026-09-19, after round 58).** Track 1 PARKED by the stop
+rule: 1 match in 13 band attempts (Sonnet 0/6, Opus 1/7); revisits continue
+on Opus and track 1b opens. Four escalations, all right, three fixed in tools:
+the `make` guard resolved its root from `$CLAUDE_PROJECT_DIR` and so never
+fired for a worktree cwd (every runner so far ran unguarded); it now treats
+every worktree as the repo, measured on a live worktree for bare `make`, a
+per-object target, `make extract` and an outside cwd. `funcdiff.py` prints an
+opcode-level `insertions / deletions` line so Gate 3 check 3 has a real-build
+side instead of being inferred from length. `externcheck.py`'s output no
+longer says "fix the extern to the definition": a disagreement is a finding,
+11 of 18 were the deliberate register-forwarding idiom, an `arity-ok:` comment
+silences a reviewed one, and the job moved to Opus. The model table no longer
+reads as "next head is Fable after an escalation": the Fable session is the
+one between rounds (this one), and the next round is Opus.
+
+**Finding disposed, not a plan matter:** `func_80056640` reads `$a1` and its
+caller `func_800564F4` never sets it; retail's caller leaves `$a1` untouched
+from ITS caller, so the developer's caller almost certainly took a second
+parameter and forwarded it. The caller's reconstruction is the incomplete
+side; adding the forwarded parameter is byte-identical and belongs to the
+extern review job.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

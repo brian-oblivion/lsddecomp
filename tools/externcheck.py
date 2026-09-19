@@ -66,6 +66,15 @@ def main():
             defs.setdefault(name, []).append((arity(params), str(c.relative_to(ROOT))))
         for name, params in EXTERN_RE.findall(live):
             externs.setdefault(name, []).append((arity(params), str(c.relative_to(ROOT))))
+    # A reviewed disagreement is silenced by a comment on the extern's own
+    # line: `extern void f(Foo *self); /* arity-ok: callee reads $a1 the
+    # caller leaves loaded; byte-exact both ways, see report */`
+    ok = set()
+    for path in list(srcpath.src_files()) + list(ROOT.glob("include/*.h")):
+        for line in path.read_text(errors="replace").splitlines():
+            m = re.search(r"\bextern\b[^;]*?\b(\w+)\s*\([^;]*;.*arity-ok:", line)
+            if m:
+                ok.add(m.group(1))
     for h in ROOT.glob("include/*.h"):
         text = re.sub(r"/\*.*?\*/", "", h.read_text(errors="replace"), flags=re.S)
         for name, params in EXTERN_RE.findall(text):
@@ -79,6 +88,8 @@ def main():
             continue            # `extern void (*fp)(...)`: a function POINTER, not a function
         if any(a is None for a, _ in externs[name]) or any(a is None for a, _ in defs.get(name, [])):
             continue            # variadic somewhere (printf): arity is not a fixed number
+        if name in ok:
+            continue            # reviewed: an `arity-ok:` comment sits on the extern line
         decls = [d for d in externs[name] if d[0] is not None]
         truth = [d for d in defs.get(name, []) if d[0] is not None]
         counts = {a for a, _ in decls} | {a for a, _ in truth}
@@ -91,8 +102,13 @@ def main():
         for a, where in decls:
             print(f"    extern     {a}  {where}")
     if bad:
-        print(f"\n{bad} function(s) with conflicting arity. The byte oracle cannot see these;"
-              " fix the extern to the definition (or, with no definition, to the disassembly).")
+        print(f"\n{bad} function(s) with conflicting arity. Each is a FINDING, not a fix list:"
+              " the byte oracle cannot see a wrong prototype, and it equally cannot see a"
+              " deliberate one (a callee that reads a register the caller left loaded is"
+              " byte-exact either way; round 58 measured 11 of 18 as that idiom). Read the"
+              " callee's disassembly: does it read the extra register? If the extern is wrong,"
+              " fix the EXTERN only, never a call site's arguments. If it is the idiom, note it"
+              " in the report and put `/* arity-ok: <why> */` on the extern line.")
         return 1
     print(f"OK: {sum(len(v) for v in externs.values())} extern declarations, no arity conflicts.")
     return 0

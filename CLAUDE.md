@@ -13,7 +13,9 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    because one hex string changes and everything goes green. A hook blocks it.
 2. **All builds go through `./build-and-verify.sh`.** A bare `make` produces
    bytes and says nothing about whether they are the right ones; every score
-   read after one is unanchored. A hook blocks in-repo `make` for anything but
+   read after one is unanchored. A hook blocks in-repo `make`, in the main
+   checkout AND in every worktree of it (round 58 measured that it had never
+   fired in a worktree), for anything but
    `extract`, `progress`, `format`, `clean` and `nonmatching` (the last
    compiles the readable `#ifdef NON_MATCHING` bodies into `build/nonmatching/`
    and links nothing; drive it through `tools/check-nonmatching.sh`).
