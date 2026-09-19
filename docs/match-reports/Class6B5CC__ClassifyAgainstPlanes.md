@@ -365,6 +365,28 @@ search consumed the remaining window) -- the scaffold is left in place
 picks this up next, with the Gate 3 checks already passed and recorded here
 so the next attempt does not have to re-derive them.
 
+**HEAD ADDENDUM (round 55): the paragraph above is superseded -- the search
+WAS run, after charlie committed and before it stopped, and the head recorded
+the outcome because no wake channel exists to ask the runner to.** The
+sequence is the prompt's "COMMIT BEFORE YOU WAIT" working exactly as
+intended: the commit is complete and the only thing it lacked was this
+result.
+
+```
+timeout 700 .venv/bin/python3 tools/decomp-permuter/permuter.py -j 6 \
+    --stop-on-zero --best-only --stack-diffs \
+    permuter-work/Class6B5CC__ClassifyAgainstPlanes
+rc=124        (the 700s bound fired; not a crash, not a kill)
+```
+
+**85100 iterations, score floor 3056, no zero.** The floor did not move
+across the last ~23000 iterations (62232 -> 85100 both sitting at 3056).
+This is a BOUNDED NEGATIVE under a single-search-at-a-time load, not
+permuter-exhaustion: per PARALLEL-RUNS 2.7 record it as "not closed in 85100
+iterations", and note that Gate 3 check 3 (scaffold/real-build AGREEMENT)
+was recorded as passed above, so this negative IS evidence about the
+function rather than about the scaffold.
+
 **Explicit answer to the revisit's own question: the round-54 naming gave NO
 new shape here either**, for the same reason as `NotifyTaggedParents` --
 this function's own symbols (`func_8001F8B8`, `D_8008A838`,
