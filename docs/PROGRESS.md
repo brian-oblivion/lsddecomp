@@ -47,6 +47,18 @@ catch build B, because build B has no failing `.o` target for the unit at all.
 Recovery is `make clean` (which also wipes `asm/`, so `make extract` after) or
 `rm -f build/src/<unit>.c.o`.
 
+**Scope, measured after runner bravo pushed back on it.** The trap needs the
+triggering change to be a HEADER (or other prerequisite) with the unit's own
+`.c` UNTOUCHED: editing the `.c` makes the source newer than the stale object
+and make rebuilds it anyway (verified directly). So the ordinary matching
+loop is NOT exposed — which is most of what this project does — and the
+exposed cases are header/struct edits, `rename.py` runs, merges and rebases,
+i.e. exactly what the HEAD does at consolidation. Bravo could not run the
+check itself (its worktree was already gone) but reasoned out why its own
+negatives were safe and asked for the re-run rather than asserting it; the
+head ran it and they were. The first wording of the CLAUDE.md note would have
+had every runner suspecting every red build, which is the opposite of useful.
+
 **ESCALATED, not fixed** — the Makefile is pinned and this is the operator's
 call. Three candidate one-line fixes, each setting one behaviour:
 `.DELETE_ON_ERROR:`; `SHELL := /bin/bash -o pipefail` so the recipe's status is

@@ -430,6 +430,17 @@ Gate 2.
    rebuild, or `make clean` followed by `make extract` (clean wipes `asm/`).
    Reproducer and the escalated Makefile fixes: `docs/PROGRESS.md`, round 56.
 
+   **Scope, measured, because the paragraph above over-warns without it:**
+   the trap needs the triggering change to be a HEADER (or other prerequisite)
+   with the unit's own `.c` UNTOUCHED. Editing the `.c` makes the source newer
+   than the stale object and make rebuilds it regardless — verified directly.
+   So the ordinary matching loop, where you edit your unit every iteration, is
+   NOT exposed, and a red build there is the usual "does not match yet". What
+   IS exposed: a struct or header edit, a `rename.py` run, a merge, a rebase —
+   anything that changes a unit's inputs without touching the unit. Runner
+   bravo reasoned this out from its own session in round 56 and asked for the
+   check rather than assuming its negatives were safe; they were.
+
    **How this was found matters more than the patch, because it is the loop
    auditing itself.** The head hit it running an ordinary experiment: a
    duplicate `typedef` gave `build exit=2`, zero grep hits, and a funcdiff
