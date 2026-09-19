@@ -71,7 +71,7 @@ void DreamSys__ApplyOffsetSlot1(DreamSys *self, s32 val, void *extra) {
 void DreamSys__ApplyOffsetSlotAndNotify(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count) {
     s16 val16 = (s16) val;
     *slot = val16;
-    self->field_0x48 = val16;
+    self->lastOffsetValue = val16;
     self->vt->BaseObjO__ApplyRotatedVec14(self, &D_8008ABA4[0]);
     *slot = 0;
     if (extra != NULL) {
@@ -104,13 +104,15 @@ void DreamSys__ApplyOffsetOrFindNearby(DreamSys *self, void (*callback)(DreamSys
 
 /* A 12-byte {s16,s16,s32,s32} query/result record. Built by this unit's
  * own DreamSys__BuildLinkQueries (still queued) into caller-supplied buffers, and
- * walked as an array (stride 0xC) by DreamSys__ScanLinkCandidates. Field meaning beyond
- * shape unconfirmed; kept opaque. */
+ * walked as an array (stride 0xC) by DreamSys__ScanLinkCandidates. Describes a
+ * rectangular window of the grid DreamSys__ScanGridWindow walks: `startCol`/
+ * `startRow` is the window's origin bucket, `numCols`/`numRows` its extent --
+ * confirmed directly from that function's own body (round 57 naming pass). */
 typedef struct GridQuery {
-    s16 unk0;
-    s16 unk2;
-    s32 unk4;
-    s32 unk8;
+    s16 startCol;
+    s16 startRow;
+    s32 numCols;
+    s32 numRows;
 } GridQuery;
 
 /* A grid-bucket linked-list node: singly-linked chain at +0x38, the same
@@ -132,26 +134,39 @@ typedef struct GridElem {
  * beyond the fields actually read. */
 typedef struct GridArrElemInner {
     u8 pad00[0x2C];
-    s16 unk2C;
+    /* Gates whether DreamSys__ScanLinkCandidates processes this array
+     * entry at all (`if (elem->info->enabled != 0)`) -- confirmed
+     * directly from that function's own body. */
+    s16 enabled;
     u8 pad2E[0x32 - 0x2E];
     s16 unk32;
 } GridArrElemInner;
 typedef struct GridArrElem {
     u8 pad00[0x4];
-    GridArrElemInner *unk4;
+    /* Per-entry descriptor -- only its `enabled` flag is read by this
+     * unit's matched code. */
+    GridArrElemInner *info;
     u8 pad08[0x10 - 0x8];
-    GridElem **unk10;
+    /* The grid-array base pointer DreamSys__ScanGridWindow indexes as
+     * `(GridElem **)` (confirmed directly from that function's own
+     * body). */
+    GridElem **buckets;
 } GridArrElem;
 
-/* Output buffer filled in by DreamSysUnk4CMethods::slot0x110 (see
+/* Output buffer filled in by DreamSysUnk4CMethods::queryLinkAtPos (see
  * include/DreamSys.h) and read back by this unit's own DreamSys__BuildLinkQueries.
- * Only the three fields actually touched are named. */
+ * Only the three fields actually touched are named. `queryCol`/`queryRow`
+ * feed straight into GridQuery::startCol/startRow (DreamSys__BuildLinkQueries's
+ * best-reached preserved body, its own report: `arr1[0].unk0 = f2` /
+ * `arr1[0].unk2 = f3` where `f2 = arg3->unk2`, `f3 = arg3->unk3` --
+ * data-flow confirmed even though that function itself is still a STALL,
+ * round 57 naming pass). */
 typedef struct LinkQueryBuf {
     u8 pad00[0x2];
-    s8 unk2;
-    s8 unk3;
+    s8 queryCol;
+    s8 queryRow;
     u8 pad04[0x24 - 0x4];
-    GridArrElem *unk24;
+    GridArrElem *source;
     u8 pad28[0x30 - 0x28];
 } LinkQueryBuf;
 
@@ -172,7 +187,7 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
     if (self->unk_0x4C != NULL) {
         void *pos = (u8 *) self->unk_0x14 + 0x18;
 
-        if (self->unk_0x4C->methods->slot0x110(self->unk_0x4C, &sp18, pos) == 0) {
+        if (self->unk_0x4C->methods->queryLinkAtPos(self->unk_0x4C, &sp18, pos) == 0) {
             s32 count = DreamSys__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
             void *result = DreamSys__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
@@ -197,7 +212,7 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
 
 /* Walks `count` entries of `arr1` (a `GridQuery[]`, stride 0xC) paired
  * element-for-element with `arr2` (a `GridArrElem *[]`, stride 4),
- * skipping any entry whose `GridArrElem` doesn't have its `+0x2C` flag
+ * skipping any entry whose `GridArrElem` doesn't have its `enabled` flag
  * set, and calling `DreamSys__ScanGridWindow` on the rest; returns the first
  * non-NULL result, or NULL if every entry was skipped or came back empty
  * (round 2026-09-04). */
@@ -207,7 +222,7 @@ void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 c
     for (i = 0; i < count;) {
         GridArrElem *elem = *arr2;
         i++;
-        if (elem->unk4->unk2C != 0) {
+        if (elem->info->enabled != 0) {
             void *result = DreamSys__ScanGridWindow(self, arg1, arg2, arr1, elem);
             if (result != NULL) {
                 return result;
@@ -220,9 +235,9 @@ void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 c
 }
 
 /* Scans a rectangular window of a grid of `GridElem` bucket lists, rooted
- * at `source->unk_0x10`, `query->unk8` rows by `query->unk4` columns,
- * starting at row `query->unk2`, column `query->unk0` (each row is 0x50
- * bytes = 20 bucket-head pointers; each column step is one bucket-head
+ * at `source->buckets`, `query->numRows` rows by `query->numCols` columns,
+ * starting at row `query->startRow`, column `query->startCol` (each row is
+ * 0x50 bytes = 20 bucket-head pointers; each column step is one bucket-head
  * pointer, 4 bytes). For each bucket, tries `DreamSys__AcceptGridElem` against the
  * head first, then each linked element in turn (`->next`), returning the
  * first one `DreamSys__AcceptGridElem` accepts (non-NULL); NULL if the whole window
@@ -233,9 +248,9 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
     s32 row, col;
     GridElem **bucket;
 
-    bucket = (GridElem **) ((u8 *) source->unk10 + query->unk2 * 0x50 + query->unk0 * 4);
-    for (row = 0; row < query->unk8; row++) {
-        for (col = 0; col < query->unk4; col++) {
+    bucket = (GridElem **) ((u8 *) source->buckets + query->startRow * 0x50 + query->startCol * 4);
+    for (row = 0; row < query->numRows; row++) {
+        for (col = 0; col < query->numCols; col++) {
             GridElem *node;
 
             if (DreamSys__AcceptGridElem(*bucket, arg1, arg2) != NULL) {
@@ -248,7 +263,7 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
             }
             bucket++;
         }
-        bucket = (GridElem **) ((u8 *) bucket - (query->unk4 * 4 + 0x50));
+        bucket = (GridElem **) ((u8 *) bucket - (query->numCols * 4 + 0x50));
     }
     return NULL;
 }
@@ -272,15 +287,19 @@ void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
  * (include/code_d294.h's own file banner; that header's `Class6B5CCMethods`
  * types this SAME slot with a different argument count for ITS OWN call
  * sites, which is fine because the actual callee ignores unused trailing
- * register arguments). Kept local rather than added to code_d294.h. */
-typedef struct DreamSysBasicSlots {
+ * register arguments). Kept local rather than added to code_d294.h.
+ *
+ * `+0x09C` resolves via `tools/classtable.py D_8006B5CC` (the fixed table
+ * GetClass6B5CCMethods() returns) to `Class6B5CC__DispatchLinkCommand` --
+ * named `dispatchLinkCommand` here to match (round 57 naming pass). */
+typedef struct Class6B5CCBaseTable {
     u8 pad00[0x9C];
-    void (*slot9C)(DreamSys *self, void *arg1, s32 count);
-} DreamSysBasicSlots;
-extern DreamSysBasicSlots *GetClass6B5CCMethods(void);
+    void (*dispatchLinkCommand)(DreamSys *self, void *arg1, s32 count);
+} Class6B5CCBaseTable;
+extern Class6B5CCBaseTable *GetClass6B5CCMethods(void);
 
 void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->slot9C(self, arg1, count);
+    GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
     if (count < 9) {
         if (count >= 5) {
             self->vt->slotA0(self, arg1, count);
@@ -289,18 +308,18 @@ void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 c
 }
 
 void DreamSys__DispatchLinkCommand(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->slot9C(self, arg1, count);
+    GetClass6B5CCMethods()->dispatchLinkCommand(self, arg1, count);
 }
 
 void DreamSys__SetLastOffsetValue(DreamSys *self, s16 val) {
-    self->field_0x48 = val;
+    self->lastOffsetValue = val;
 }
 
 void DreamSys__NoOpSlotE8(void) {
 }
 
 void DreamSys__SetPendingExtra(DreamSys *self, void *extra) {
-    self->unk_0x54 = extra;
+    self->pendingExtra = extra;
 }
 
 /* The shared intermediate base-class table -- see include/DreamSys.h's
@@ -323,11 +342,14 @@ extern void *func_80017B34(s32 size);
  * D_800879C4` to this unit's own `D800879C4__D800879C4` (see its own report).
  * `func_80057F58` is a plain no-argument getter for `&D_800879C4` --
  * confirmed by reading its own body directly in asm/class_3bb8c_q.s,
- * which is otherwise off limits (uncarved ground, not this unit's). */
-typedef struct D_800879C4Obj D_800879C4Obj;
-typedef struct D_800879C4Methods {
+ * which is otherwise off limits (uncarved ground, not this unit's). Type
+ * names drop the underscore after `D` per this project's convention for
+ * an as-yet-unnamed class (see `include/code_55dd4.h`'s `D800878D4Methods`,
+ * round 57 naming pass). */
+typedef struct D800879C4Obj D800879C4Obj;
+typedef struct D800879C4Methods {
     u8 pad00[0x8];
-    D_800879C4Obj *(*ctor)(D_800879C4Obj *self, void *arg1, void *arg2, void *arg3);
+    D800879C4Obj *(*ctor)(D800879C4Obj *self, void *arg1, void *arg2, void *arg3);
     /* +0x00C..+0x03C not yet needed by this unit. */
     u8 pad0C[0x40 - 0xC];
     /* This class's OWN slot, resolved via `tools/classtable.py
@@ -335,16 +357,17 @@ typedef struct D_800879C4Methods {
      * successor `class_3bb8c_q` -- out of this unit/runner's range.
      * Tail-called by this unit's own `D800879C4__D800879C4` (its own ctor, see
      * that function's report) as (self, arg1) once construction is
-     * otherwise complete (round 2026-09-04). */
-    void *(*slot40)(D_800879C4Obj *self, s32 arg1);
-} D_800879C4Methods;
-extern D_800879C4Methods *func_80057F58(void);
+     * otherwise complete (round 2026-09-04) -- named `postConstruct` for
+     * that reason (round 57 naming pass). */
+    void *(*postConstruct)(D800879C4Obj *self, s32 arg1);
+} D800879C4Methods;
+extern D800879C4Methods *func_80057F58(void);
 
 /* This unit's own view of a D_800879C4 instance -- only the vtable
  * pointer (set by this unit's own ctor, `D800879C4__D800879C4`) and `+0xA4`
  * (also written by that ctor) are named; the rest is opaque. */
-struct D_800879C4Obj {
-    D_800879C4Methods *methods;
+struct D800879C4Obj {
+    D800879C4Methods *methods;
     u8 pad04[0xA4 - 0x4];
     s32 unk_0xA4;
 };
@@ -361,10 +384,10 @@ void *New_D800879C4(void *arg1, void *arg2, void *arg3) {
 /* 2-element, 0xC-byte-stride table -- address-of only here (never
  * dereferenced by this function), forwarded as the ctor call's `arg3`.
  * Field layout unconfirmed beyond the stride; kept opaque. */
-typedef struct D_80087A8CEntry {
+typedef struct D80087A8CEntry {
     u8 unk[0xC];
-} D_80087A8CEntry;
-extern D_80087A8CEntry D_80087A8C[2];
+} D80087A8CEntry;
+extern D80087A8CEntry D_80087A8C[2];
 
 /* Another uncarved-ground getter (asm/psyq_memset.s, of all places --
  * splat's segmentation, not a meaningful grouping): plain no-argument,
@@ -372,15 +395,15 @@ extern D_80087A8CEntry D_80087A8C[2];
  * this call's "arguments" (this function's OWN a0..a3, left untouched in
  * registers from entry -- the "per-call-site signature" precedent again,
  * see DreamSys__AcceptGridElem's report), so the C call site takes none either. */
-typedef struct D_8006EE1CMethods {
+typedef struct D8006EE1CMethods {
     u8 pad00[0x8];
     void *(*ctor)(void *self, void *arg1, s32 arg2, void *arg3, void *arg4, s32 arg5);
-} D_8006EE1CMethods;
-extern D_8006EE1CMethods *func_800422BC(void);
+} D8006EE1CMethods;
+extern D8006EE1CMethods *func_800422BC(void);
 
-void *D800879C4__D800879C4(D_800879C4Obj *self, s32 arg1, void *arg2, void *arg3) {
+void *D800879C4__D800879C4(D800879C4Obj *self, s32 arg1, void *arg2, void *arg3) {
     func_800422BC()->ctor(self, arg3, 0, &D_80087A8C[arg1], arg2, 0);
     self->methods = func_80057F58();
     self->unk_0xA4 = 0;
-    return self->methods->slot40(self, arg1);
+    return self->methods->postConstruct(self, arg1);
 }

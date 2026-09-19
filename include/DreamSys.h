@@ -315,8 +315,11 @@ typedef struct DreamSysUnk4CMethods {
 	   this->unk_0x14 + 0x18) -- an output buffer (`out`, later read by
 	   DreamSys__BuildLinkQueries as its own `arg3`) and the same "self->unk_0x14 + 0x18"
 	   raw byte-offset position pointer as slot0x11C's own call site above
-	   (round 2026-09-04). */
-	s32 (*slot0x110)(void *self, void *out, void *pos);
+	   (round 2026-09-04). Named `queryLinkAtPos`: it fills a `LinkQueryBuf`
+	   (`class_3bb8c_p.c`'s own type) from a world position, returning 0 on
+	   success -- accessed only from `class_3bb8c_p.c` (round 57 naming
+	   pass). */
+	s32 (*queryLinkAtPos)(void *self, void *out, void *pos);
 	u8 pad_0x114[0x118 - 0x114];
 	/* This unit's own DreamSys__BuildLinkQueries dispatches to it twice, with a
 	   different argument count each time (per-call-site signature, see
@@ -590,8 +593,12 @@ typedef struct DreamSys {
 	/* Written by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked via its own
 	   +0x0C8/+0x0CC slots DreamSys__ApplyOffsetSlot0/DreamSys__ApplyOffsetSlot1) and by DreamSys__SetLastOffsetValue
 	   (this unit's own +0x0E4 slot), both as a plain `sh` store of a `s16`
-	   value (round 2026-09-04). */
-	s16 field_0x48;
+	   value (round 2026-09-04). Named `lastOffsetValue`: it mirrors whichever
+	   local-offset component was most recently written, but survives the
+	   transient scratch buffer's own reset back to 0 right after
+	   DreamSys__ApplyOffsetSlotAndNotify applies it -- accessed only from
+	   `class_3bb8c_p.c` (round 57 naming pass). */
+	s16 lastOffsetValue;
 	s8 unknown_values_0x4A[2];
 	/* Pointer to an unidentified object (own vtable at offset 0, slot
 	   +0xF0 called with itself as the sole argument). Used by
@@ -599,8 +606,10 @@ typedef struct DreamSys {
 	DreamSysUnk4CObj *unk_0x4C;
 	s8 unknown_values_0x50[4];
 	/* Written by this unit's own DreamSys__SetPendingExtra (its own +0x0EC slot), a
-	   plain `sw` store of its `extra` argument (round 2026-09-04). */
-	void *unk_0x54;
+	   plain `sw` store of its `extra` argument (round 2026-09-04). Named
+	   `pendingExtra`: no reader is confirmed yet, and it is accessed only
+	   from `class_3bb8c_p.c` (round 57 naming pass). */
+	void *pendingExtra;
 
 	/* Set by func_8005937C(this, value); no other observed use. */
 	s32 unk_0x58;
@@ -937,14 +946,14 @@ struct vtable_DreamSys{
 	   (round 2026-09-02). */
 	void (*LinkWall)(DreamSys *this, void *arg1, s32 arg2);
 	/* This function's OWN slot; a single `sh a1, 0x48(a0)` store
-	   (`this->field_0x48 = val`) (round 2026-09-04). */
+	   (`this->lastOffsetValue = val`) (round 2026-09-04). */
 	void (*DreamSys__SetLastOffsetValue)(DreamSys *this, s16 val);
 	/* This unit's own no-op stub (`func_800590E0`, `{ }`). Called by
 	   DreamSys__WallLink as (this) -- the callee ignores its argument
 	   (round 2026-09-02). */
 	void (*func_800590E0)(DreamSys *this);
 	/* This function's OWN slot; a single `sw a1, 0x54(a0)` store
-	   (`this->unk_0x54 = extra`) (round 2026-09-04). */
+	   (`this->pendingExtra = extra`) (round 2026-09-04). */
 	void (*DreamSys__SetPendingExtra)(DreamSys *this, void *extra);
 	u32 unknown_functions_0xf0[2];
 	/* This function's OWN slot (+0x0F8, resolved via
