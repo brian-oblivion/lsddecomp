@@ -100,7 +100,12 @@ void func_8004001C(Class6E99CObj *self, s32 a1) {
     self->unk74 = a1;
 }
 
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 29/35 words, length exact. Residue: instruction
+ * scheduling (retail materializes `li $a1,1` immediately after the
+ * slotDC dispatch, before computing idx*3; this body defers it to just
+ * before the slotB8 call) (docs/match-reports/func_80040024.md).
+ * Hand-derived. */
 void func_80040024(Class6E99CObj *self) {
     s32 idx;
 
@@ -112,10 +117,18 @@ void func_80040024(Class6E99CObj *self) {
     self->unk6C = 1;
     self->unk74 = -self->unk74;
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040024);
+#endif
 
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 40/41 words, 1 word short. Residue: two residues --
+ * the shared `li $a1,1`-scheduling class with func_80040024, plus a
+ * genuinely missing register-only dead-store delay-slot filler
+ * (retail copies its unread 3rd argument into $t0 in a branch delay
+ * slot; GCC 2.6.3 eliminates the equivalent C statement as dead code
+ * before scheduling ever sees it) (docs/match-reports/func_800400B0.md).
+ * Hand-derived. */
 void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
@@ -130,8 +143,9 @@ void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
     }
     self->unk6C = 2;
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800400B0);
+#endif
 
 s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
@@ -210,7 +224,14 @@ void *func_800403F8(Class6E99CObj *self) {
     return &D_8006EA90[self->unk78 * 3];
 }
 
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 22/25 words, length exact. Residue: redundant-move
+ * register residue -- retail additionally does `move $t0,$a1`
+ * unconditionally in a branch delay slot and uses $t0 for both a1->x/
+ * a1->y loads; nothing in the C forces an early copy of a1, so no
+ * source shape tried reproduces the extra move. Permuter-exhausted
+ * (~76k combined iterations, two independent runs)
+ * (docs/match-reports/func_8004042C.md). Hand-derived. */
 void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
@@ -225,8 +246,9 @@ void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
         *(Pair32E99C *)&self->unk50 = *a2;
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004042C);
+#endif
 
 void func_80040490(Class6E99CObj *self) {
     s32 t0, t1;
