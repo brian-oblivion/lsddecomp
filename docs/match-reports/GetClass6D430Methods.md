@@ -70,3 +70,46 @@ unit's own header already predicted ("Not yet named or typed field-by-field"):
 | `Class6D430Methods` | `Class6D430Methods` | C | Same convention, applied to the method-table type. |
 
 Posted to the broadcast.
+
+## Extern arity (round 59)
+
+**Verdict: extern FIXED.** The second of the round's two genuinely wrong
+declarations; same shape and same discriminator as `GetClass6B5CCMethods`.
+
+**Callee evidence** (`0x80026C9C`, and the definition in `src/code_171e0.c`):
+
+```
+80026c9c:  lui   v0,0x8007
+80026ca0:  addiu v0,v0,-11216     ; &D_8006D430
+80026ca4:  jr    ra
+80026ca8:  nop
+```
+
+No argument register is read. The definition is
+`void *GetClass6D430Methods(void)`.
+
+**The extra argument is not byte-load-bearing.** `func_80027228`
+(src/code_179d8_o.c) calls it as `GetClass6D430Methods(self)->ctor(self)`:
+
+```
+80027234:  jal   80026c9c <GetClass6D430Methods>
+80027238:  move  s0,a0                 <- callee-save spill of its OWN incoming
+                                          self, not argument setup
+```
+
+`$a0` still holds `func_80027228`'s incoming `self` at the `jal` either way, so
+the declaration's parameter list is free and must agree with the definition.
+
+**Declaration site changed:** `src/code_179d8_o.c:99` —
+`extern BaseCtorTable6D4E8 *GetClass6D430Methods(void *self);` ->
+`extern BaseCtorTable6D4E8 *GetClass6D430Methods();`. Return type untouched
+(this unit's own local view of the table, used for `->ctor` at +0x008); the
+call site is untouched. The other two declarations
+(`src/code_171e0.c`'s definition and `include/code_171e0.h`'s `(void)`) were
+already correct.
+
+**Stale comment corrected on the same line:** it read "still INCLUDE_ASM in the
+code_179d8 remainder". It is not — it has a matched definition in
+`src/code_171e0.c`, which is what made this finding decidable at all.
+
+Oracle green (`build exit=0`, `OK: build matches retail`) after the edit.
