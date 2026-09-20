@@ -296,7 +296,7 @@ in the prior two rounds' tables:
    and is compared against `entry->methods->header & 0xF`, itself
    naturally `<= 0xF`): **no change, 48/54, byte-identical diff.** The
    type-narrowing lever that closed one function in round 18
-   (`func_8004EEA0`) does nothing here.
+   (`TaskObjF__WriteMemcardSaveFile`) does nothing here.
 3. **A second `__asm__("")` immediately before the loop label** (after
    `entry = NULL;`, in addition to the existing barrier before `s =
    self;`): **no change, 48/54, byte-identical diff** -- inert, not

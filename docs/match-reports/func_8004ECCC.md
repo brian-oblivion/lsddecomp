@@ -7,7 +7,7 @@
 `s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)`. Computes a
 sector count from `sizeArg` (`(sizeArg + 0x21FF) >> 13`, i.e. round up to
 an 8KB/0x2000-byte boundary and divide by it), formats a path via
-`func_8004F32C(pathBuf, self->unkC, &D_8008AAAC)` (a 3-argument call, one
+`BuildMemcardPath(pathBuf, self->unkC, &D_8008AAAC)` (a 3-argument call, one
 more argument than `func_8004EA38`'s 2-argument call to the same
 function — `id` itself is unused in this function's own body, same
 "unused-but-forwarded parameter" shape already established elsewhere),
@@ -20,7 +20,7 @@ returning 1 (0 on open failure).
 Three separate residues stacked, closed incrementally:
 
 1. **The `(sizeArg + 0x21FF) >> 13 << 16` computation split across the
-   call to `func_8004F32C`.** Writing it as one combined expression before
+   call to `BuildMemcardPath`.** Writing it as one combined expression before
    the call put the `>>13` in the wrong position — retail computes
    `sizeArg + 0x21FF` early (right after the prologue), defers the `>>13`
    to the call's own delay slot, and folds the final `<<16 | 0x200` into
@@ -41,14 +41,14 @@ Three separate residues stacked, closed incrementally:
 
 ```c
 sectors = (u32)(sizeArg + 0x21FF) >> 13;
-path = func_8004F32C(pathBuf, self->unkC, &D_8008AAAC);
+path = BuildMemcardPath(pathBuf, self->unkC, &D_8008AAAC);
 handle = func_80050938(path, (sectors << 16) | 0x200);
 ```
 
 ## Full body
 
 ```c
-extern void *func_8004F32C();
+extern void *BuildMemcardPath();
 extern s32 func_80050938(void *arg0, s32 arg1);
 extern s32 func_800508F8(s32 arg0);
 extern s32 func_80050908(void *arg0);
@@ -61,7 +61,7 @@ s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)
     s32 sectors;
 
     sectors = (u32)(sizeArg + 0x21FF) >> 13;
-    path = func_8004F32C(pathBuf, self->unkC, &D_8008AAAC);
+    path = BuildMemcardPath(pathBuf, self->unkC, &D_8008AAAC);
     handle = func_80050938(path, (sectors << 16) | 0x200);
     if (handle == -1) {
         return 0;

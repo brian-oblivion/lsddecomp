@@ -1,4 +1,6 @@
-# func_8004EF6C -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 191/240 (re-measured round 37; previously recorded 188/240 -- see round-37 note). First real diff: file 0x3F774 / vram 0x8004EF74 (register-permutation set-up; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7A4 / vram 0x8004EFA4, missing `sw $s0,0x30($sp)`, immediately followed by an empty `nop` at file 0x3F7F0 / vram 0x8004EFF0 where retail fills the delay slot with `move $s7,$s4`).
+> Renamed from `func_8004EF6C` on 2026-09-20 (tools/rename.py). Address 0x8004ef6c.
+
+# TaskObjF__TryWriteMemcardSaveFile -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 191/240 (re-measured round 37; previously recorded 188/240 -- see round-37 note). First real diff: file 0x3F774 / vram 0x8004EF74 (register-permutation set-up; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7A4 / vram 0x8004EFA4, missing `sw $s0,0x30($sp)`, immediately followed by an empty `nop` at file 0x3F7F0 / vram 0x8004EFF0 where retail fills the delay slot with `move $s7,$s4`).
 
 > **ROUND 37 (delta): re-verified by rebuilding this EXACT preserved body,
 > then ran the permuter for the first time on this function (never
@@ -74,7 +76,7 @@
 
 Unit: `class_3bb8c_f`. Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` dispatch in
-`asm/nonmatchings/class_3bb8c_f/func_8004EF6C.s`.
+`asm/nonmatchings/class_3bb8c_f/TaskObjF__TryWriteMemcardSaveFile.s`.
 
 **This is the first C ever attempted against this function.** The previous
 round's report ("predicted-hard, screened and read but not attempted...
@@ -85,15 +87,15 @@ scheduling choice.
 
 ## What it does
 
-`s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5,
-s32 arg6, s32 arg7)` (signature per its one caller, `func_8004EEA0`, which
+`s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5,
+s32 arg6, s32 arg7)` (signature per its one caller, `TaskObjF__WriteMemcardSaveFile`, which
 is ALREADY MATCHED -- no parameter type here was changed in a way that
 touches that caller's own compiled bytes, see the header-discipline note
 below). Reads as a **"WriteFile" memory-card/CD streaming write** (the
 error string this function logs on failure is literally `"File not create
 in WriteFile\n"`, confirmed in rodata at `D_80011530`):
 
-1. Builds a device path via `func_8004F32C(pathBuf, self->unk0C, (char
+1. Builds a device path via `BuildMemcardPath(pathBuf, self->unk0C, (char
    *)a1)` (already-matched sibling; `a1` is really a `char *` suffix
    despite its established `s32` type in this file's forward
    declarations -- kept `s32` at the parameter, cast at the call site,
@@ -136,7 +138,7 @@ function's own use of it is exclusively as `strcpy`'s SOURCE argument --
 i.e. a filename/tag string, unrelated to the internal file handles this
 function opens and closes via `func_80050938`. **Kept `s32` at the
 parameter** (cast to `(char *)handle` at the one use site) rather than
-retyped, since `func_8004EEA0` -- the ONLY caller, already matched --
+retyped, since `TaskObjF__WriteMemcardSaveFile` -- the ONLY caller, already matched --
 forwards this same value through unchanged with its own `s32 handle`
 parameter; retyping either signature risks that caller's own compiled
 bytes for no byte-level benefit (the cast is functionally identical
@@ -206,7 +208,7 @@ per-unit local-view convention).
 ## beyond that)
 
 ```c
-s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
     char pathBuf[0x20];
     char *path;
     s32 fileHandle;
@@ -217,7 +219,7 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
     StreamReq *req;
 
     payload = arg6;
-    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, (char *)a1);
+    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->unk0C, (char *)a1);
     func_80050908(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = func_80050938(path, openMode);
@@ -320,14 +322,14 @@ class already documented in several other functions' reports this round.
   alone does not drive register/scheduling decisions in this GCC 2.6.3
   build.
 
-This is the SAME class `func_8004EF6C`'s own caller, `func_8004EEA0`,
+This is the SAME class `TaskObjF__TryWriteMemcardSaveFile`'s own caller, `TaskObjF__WriteMemcardSaveFile`,
 already hit and documented (per that function's own report, referenced
 in this function's prior round's write-up) as "a full 9-value bijection
 permuted relative to retail's own... reshaping does not resolve it" --
 and per `func_8004C93C`'s precedent (7 reshaping variants, zero
 movement), this project's own experience is that this class does not
 respond to further manual source reshaping. Not pursued further this
-round; `func_8004EEA0`'s residue is register PERMUTATION with zero
+round; `TaskObjF__WriteMemcardSaveFile`'s residue is register PERMUTATION with zero
 length drift, while this one is permutation PLUS a one-word scheduling
 gap -- worth noting as a variant of the same family (register-saturated
 functions can show EITHER pure permutation OR permutation-plus-one-word,
@@ -337,8 +339,8 @@ duplicate-register materialization), not a new independent class.
 ## Screening
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_f/func_8004EF6C.s        # no hits
-grep -n 'addiu *$at, *$at, *%lo' asm/nonmatchings/class_3bb8c_f/func_8004EF6C.s  # no hits
+grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_f/TaskObjF__TryWriteMemcardSaveFile.s        # no hits
+grep -n 'addiu *$at, *$at, *%lo' asm/nonmatchings/class_3bb8c_f/TaskObjF__TryWriteMemcardSaveFile.s  # no hits
 ```
 Clean of both open toolchain blockers (per the coordinator's own
 screening this round, not re-run).
@@ -361,7 +363,7 @@ regressed the 188/240 best, none improved it.
 ### Proposed learnings
 
 - **A register-saturated function's residue is not always PURE
-  permutation.** `func_8004EEA0` (this function's own caller) hit a
+  permutation.** `TaskObjF__WriteMemcardSaveFile` (this function's own caller) hit a
   9-value bijection with ZERO length drift; this function, also
   9-register-saturated, hits permutation PLUS a genuine one-word
   delay-slot placement difference. Screen for BOTH shapes when a

@@ -336,7 +336,7 @@ typedef struct {
 
 /* Signature is `include/class_3bb8c.h`'s ALREADY-shared
  * `extern s32 func_800507F8(s32 arg0, s32 arg1);` (class_3bb8c_m's own
- * caller, func_8004EEA0), matched exactly -- this unit's own definition
+ * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
  * must agree with that declaration since both are visible in this
  * translation unit. Cast to `u8 *` internally; retail's own register
  * content at exit (`$v0` left holding a pointer into the `D_8008AAC4`

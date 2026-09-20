@@ -1870,7 +1870,7 @@ extern void *func_80050BA8(s32 arg0, s32 arg1);
 
 /*
  * class_3bb8c_f: a SEPARATE class from Obj866E8 above -- no evidence unifies
- * them (distinct field layouts), and func_8004F32C below writes raw bytes
+ * them (distinct field layouts), and BuildMemcardPath below writes raw bytes
  * over its own object's first 6 bytes, which would corrupt Obj866E8's own
  * vtable pointer if the two were the same type. This is this unit's own
  * BasicClass-derived (docs/research/class-framework.md, include/code_8220.h)
@@ -1919,9 +1919,9 @@ struct TaskObjFMethods {
 struct TaskObjF {
     TaskObjFMethods *methods;   /* +0x000 */
     u8 pad04[0x00C - 0x004];     /* BasicClass::children/parentRefs, untouched by this unit */
-    s32 cardSlot;                  /* +0x00C, func_8004EDC0: passed as BuildMemcardPath's "selector" (device slot 0/1) -- RENAMED round 60 (was unk0C) */
+    s32 cardSlot;                  /* +0x00C, TaskObjF__TryReadMemcardFile: passed as BuildMemcardPath's "selector" (device slot 0/1) -- RENAMED round 60 (was unk0C) */
     u8 pad10[0x014 - 0x010];
-    s32 events[4];                  /* +0x014, func_8004F40C (walks all 4, early-exit)/func_8004F4A4 (passes &events[0], count 4) -- RENAMED round 60 (was field14): 4 kernel event descriptors, corroborated cross-unit by class_3bb8c_e.c's func_8004E5E4, which fills the identical offset via OpenEvent() then passes the same object to this unit's own EnableEvents wrapper (see func_8004F394's report) */
+    s32 events[4];                  /* +0x014, TaskObjF__ForEachEvent (walks all 4, early-exit)/TaskObjF__FindReadyEvent (passes &events[0], count 4) -- RENAMED round 60 (was field14): 4 kernel event descriptors, corroborated cross-unit by class_3bb8c_e.c's func_8004E5E4, which fills the identical offset via OpenEvent() then passes the same object to this unit's own EnableEvents wrapper (see TaskObjF__EnableEvents's report) */
     s32 opMode;                       /* +0x024, RENAMED round 60 (was unk24): distinguishes which of this class's two operations is active -- func_8004F638 sets 1, func_8004F8A4 sets 2, func_8004F9D8 reads (==1?); the values' exact meaning is not established */
     s32 statusCode;                    /* +0x028, RENAMED round 60 (was unk28): func_8004F55C/func_8004F638 clear or set it, func_8004F8A4/func_8004F9D8 read it and dispatch it through slot7C -- a status/completion code, not confirmed to be error-only */
     s32 bufCount;                       /* +0x02C, RENAMED round 60 (was unk2C): func_8004F638 (slot5C's return)/func_8004F784/func_8004F810 (loop bound over bufArray) -- the number of bufArray entries actually in use */
@@ -1945,26 +1945,26 @@ struct TaskObjF {
     s32 unk70;                                                /* +0x070, func_8004F55C (cleared) */
 };
 
-/* The three library callbacks func_8004F394/func_8004F3BC/func_8004F3E4
- * forward into func_8004F40C are EnableEvent/DisableEvent/TestEvent, now
+/* The three library callbacks TaskObjF__EnableEvents/TaskObjF__DisableEvents/TaskObjF__TestEvents
+ * forward into TaskObjF__ForEachEvent are EnableEvent/DisableEvent/TestEvent, now
  * linked from the Psy-Q objects libapi/a12, libapi/a13 and libapi/a11.
  * Their declarations live in src/class_3bb8c_f.c, the only unit that uses
  * them: a prototype for a function a Sony object defines does not belong in
  * a header 21 units include, where it would one day collide with the real
  * KERNEL.H. (The old comment here called them "SPU routines" -- they are
  * kernel event-queue calls; only their neighbours in the block are libspu.)
- * TestEvent is also the validity check func_8004F4C8 uses on its own array
+ * TestEvent is also the validity check FindFirstReadyEvent uses on its own array
  * argument. */
 
 /* Generic "find the first of up to `count` entries for which
  * TestEvent accepts it, retrying the whole array forever if none
- * qualify yet" helper -- func_8004F4A4 calls it on this unit's own
+ * qualify yet" helper -- TaskObjF__FindReadyEvent calls it on this unit's own
  * TaskObjF::events (count 4). D_80086E78 is a small lookup table indexed
  * by the winning slot; bound unknown from this unit alone, left unsized.
  * (Comment updated round 60: the callback was `func_800390F4` before round
  * 34 linked it as Sony's own `TestEvent`; `field14` renamed to `events`.) */
 extern s32 D_80086E78[];
-extern s32 func_8004F4C8(s32 *arr, s32 count);
+extern s32 FindFirstReadyEvent(s32 *arr, s32 count);
 
 /* The generic pool allocator/free pair, already established the same way
  * by include/code_8220.h, include/code_55dd4.h etc -- `func_80017CFC`
@@ -1975,7 +1975,7 @@ extern void *func_80017CFC(void *ptr);
 
 /* A fixed 6-byte memory-card device-name template ("bu00:"/"bu10:", PS-X
  * BIOS device names -- asm/data/7B008.sdata.s). An all-`s8` struct
- * (natural alignment 1) so the whole-struct assignment in func_8004F32C
+ * (natural alignment 1) so the whole-struct assignment in BuildMemcardPath
  * reproduces retail's unaligned lwl/lwr + byte-store copy, the same idiom
  * already documented for `Descriptor10` above. */
 typedef struct DeviceName866E8 {
@@ -1986,7 +1986,7 @@ extern DeviceName866E8 D_8008AA9C;   /* "bu10:" */
 extern DeviceName866E8 D_8008AAA4;   /* "bu00:" */
 
 /* This project's own strcat (matched elsewhere, src/code_171e0.c) --
- * func_8004F32C is this unit's only caller. */
+ * BuildMemcardPath is this unit's only caller. */
 extern char *strcat(char *dest, char *src);
 
 /* BasicClass's own method table getter (include/code_8220.h's
@@ -2041,7 +2041,7 @@ extern BasicMethods866E8F *Get_vtable_BasicClass(void);
  *
  * func_800507F8 stays: it is game code, defined in src/class_3bb8c_g.c
  * (MATCHED round 45, 60/60 words -- was gp_rel-blocked, resolved round 42). */
-extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
+extern s32 func_800507F8(s32 arg0, s32 arg1);                /* TaskObjF__WriteMemcardSaveFile's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 
 /* -------------------------------------------------------------------
  * class_3bb8c_m additions below (fourth 20-function slice of the tail,

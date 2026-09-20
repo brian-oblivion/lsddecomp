@@ -1,13 +1,15 @@
-# func_8004EEA0 -- MATCHED 51/51 (round 18, echo, via permuter -- targeted PERM macros)
+> Renamed from `func_8004EEA0` on 2026-09-20 (tools/rename.py). Address 0x8004eea0.
+
+# TaskObjF__WriteMemcardSaveFile -- MATCHED 51/51 (round 18, echo, via permuter -- targeted PERM macros)
 
 **Unit:** class_3bb8c_f · **Size:** 51 words (0xCC)
 
 ## What it does
 
-`s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5,
-s32 arg6, s32 arg7)`. The same bounded-retry shape as `func_8004ED40`
+`s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5,
+s32 arg6, s32 arg7)`. The same bounded-retry shape as `TaskObjF__ReadMemcardFile`
 (this unit, matched): calls `func_800507F8(handle, a1)` once up front,
-then retries `func_8004EF6C(self, a1, handle, a3 & 0xFF, arg5, arg6,
+then retries `TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6,
 arg7)` (this unit, also a predicted-hard stall — see its own report) up
 to 11 times via the identical `do { ...; if (result) break; } while
 (count-- != 0);` idiom, and — only if every attempt returned 0 — calls
@@ -36,7 +38,7 @@ not a missing or extra value.
 
 ## What was tried
 
-1. **Direct transcription** (the exact `func_8004ED40` retry idiom,
+1. **Direct transcription** (the exact `TaskObjF__ReadMemcardFile` retry idiom,
    proven correct there). Score 31/51, full permutation as described
    above.
 2. **Reordering the two independent top-of-function statements**
@@ -62,14 +64,14 @@ above — see CLAUDE.md's explicit finding that this residue class is
 
 ```c
 #if 0
-s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
     s32 count;
     s32 result;
 
     count = 10;
     func_800507F8(handle, a1);
     do {
-        result = func_8004EF6C(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
+        result = TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
         if (result != 0) {
             break;
         }
@@ -82,7 +84,7 @@ s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
 #endif
 ```
 
-Needs a forward declaration of `func_8004EF6C` (defined later in this
+Needs a forward declaration of `TaskObjF__TryWriteMemcardSaveFile` (defined later in this
 unit's ROM order; already present near the top of `src/class_3bb8c_f.c`)
 and `func_800507F8`'s extern (declared in `include/class_3bb8c.h`).
 
@@ -137,8 +139,8 @@ race with the outer Bash timeout).
 **The winning diff, verbatim from `output-0-1/diff.txt`:**
 
 ```diff
--s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7)
-+s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7)
+-s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7)
++s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7)
 ```
 
 **Neither PERM_GENERAL axis mattered at all.** The permuter's own random
@@ -158,14 +160,14 @@ across the whole function.
 from the preserved near-miss):
 
 ```c
-s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7) {
     s32 count;
     s32 result;
 
     count = 10;
     func_800507F8(handle, a1);
     do {
-        result = func_8004EF6C(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
+        result = TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
         if (result != 0) {
             break;
         }
@@ -177,16 +179,16 @@ s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg
 }
 ```
 
-Also added a forward declaration for `func_8004EF6C` (defined later in
+Also added a forward declaration for `TaskObjF__TryWriteMemcardSaveFile` (defined later in
 this unit, ROM order) at the top of the file -- the previous report
 claimed one was "already present", which was not the case; without it,
-`cc1` implicitly declares `func_8004EF6C` returning `int` with unpromoted
+`cc1` implicitly declares `TaskObjF__TryWriteMemcardSaveFile` returning `int` with unpromoted
 argument types, which HAPPENED to still byte-match here (`int`==`s32`,
 and `char`/other args promote to the same registers either way under this
 ABI) but is not something to rely on -- the explicit prototype is
 free and removes the compiler's own warning.
 
-**`build exit=0`, `funcdiff`: `func_8004EEA0: 51/51 words match`,
+**`build exit=0`, `funcdiff`: `TaskObjF__WriteMemcardSaveFile: 51/51 words match`,
 whole-image SHA1 verified.**
 
 ### Proposed learning

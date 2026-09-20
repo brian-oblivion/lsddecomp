@@ -1,17 +1,19 @@
-# func_8004EDC0
+> Renamed from `func_8004EDC0` on 2026-09-20 (tools/rename.py). Address 0x8004edc0.
+
+# TaskObjF__TryReadMemcardFile
 
 **Unit:** class_3bb8c_f · **Size:** 56 words (0xE0) · **Status:** MATCH
 
 ## What it does
 
-`s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32
-outSize)`. Builds a memory-card path via `func_8004F32C` (this unit,
+`s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
+outSize)`. Builds a memory-card path via `BuildMemcardPath` (this unit,
 matched: `self->unk0C` selects the "bu00:"/"bu10:" device, `suffix` is the
 filename), opens it (`func_80050938(path, 1)`), and on success reads a
 0x80-byte header into a freshly-allocated scratch buffer, computes a seek
 offset from the header's byte 2 (`(header[2] << 7) - 0x780`), seeks,
 reads `outSize` bytes into the caller's `outBuf`, and closes the handle.
-Returns 0 if the open failed, 1 otherwise. `func_8004ED40` (this unit,
+Returns 0 if the open failed, 1 otherwise. `TaskObjF__ReadMemcardFile` (this unit,
 matched) is the bounded-retry wrapper around this function.
 
 Flagged predicted-hard by the register census (5 distinct callee-saved
@@ -19,15 +21,15 @@ registers) — matched, needing two levers.
 
 ## Levers
 
-1. **Use `func_8004F32C`'s own RETURN VALUE as the path argument to
+1. **Use `BuildMemcardPath`'s own RETURN VALUE as the path argument to
    `func_80050938`, don't re-derive the address from the local buffer
-   variable.** `func_8004F32C` returns the same pointer it was given
-   (like `strcat`), so `path = func_8004F32C(&pathBuf, ...); open(path,
+   variable.** `BuildMemcardPath` returns the same pointer it was given
+   (like `strcat`), so `path = BuildMemcardPath(&pathBuf, ...); open(path,
    1);` reuses the value already sitting in `$v0` after the call. Calling
    `open(pathBuf, 1)` directly (recomputing `&pathBuf` as `$sp+0x10`)
    costs one extra `addiu` — this class of lever ("prefer the call's own
    return over re-deriving an equal value") is now confirmed twice in
-   this unit family (also see `func_8004F32C`'s own report on the
+   this unit family (also see `BuildMemcardPath`'s own report on the
    opposite direction: computing the pointer once, not per-branch).
 2. **The seek-offset arithmetic must be ONE fully-resolved expression
    BEFORE the intervening `free()` call, not split across it.** The raw
@@ -61,4 +63,4 @@ registers) — matched, needing two levers.
   header in the project declares them yet; typed purely from these call
   sites' own register usage).
 
-See `func_8004F40C`'s report for the `TaskObjF` class context.
+See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class context.

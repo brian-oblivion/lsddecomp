@@ -4,8 +4,8 @@
 /* Forward declarations: these are defined later in this file (strict
  * ROM-address order), but earlier functions call them.
  *
- * `func_8004F32C`'s entry here fixes a real Gate-0 warning (round 60):
- * `func_8004EDC0` (line ~52) calls it before its line-226 definition, and
+ * `BuildMemcardPath`'s entry here fixes a real Gate-0 warning (round 60):
+ * `TaskObjF__TryReadMemcardFile` (line ~52) calls it before its line-226 definition, and
  * without a prototype in scope cc1 implicitly declares it as returning
  * `int`, then complains at the real definition ("type mismatch with
  * previous implicit declaration", "was previously implicitly declared to
@@ -13,18 +13,18 @@
  * cross-unit signature disagreement -- both the call site and the
  * definition are in this .c, so the fix is simply adding the prototype
  * here like its neighbours. Confirmed byte-identical after the fix
- * (`func_8004EDC0` is already MATCHED and stays MATCHED): a pointer
+ * (`TaskObjF__TryReadMemcardFile` is already MATCHED and stays MATCHED): a pointer
  * return value lives in `$v0` either way, so the implicit-int reading
  * never produced different code, only a diagnostic. */
 s32 func_8004F9D8(TaskObjF *self);
 void func_8004F704(TaskObjF *self);
 void func_8004F784(TaskObjF *self);
 void func_8004F810(TaskObjF *self);
-s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag);
-s32 func_8004F4C8(s32 *arr, s32 count);
-s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
-s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7);
-char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix);
+s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag);
+s32 FindFirstReadyEvent(s32 *arr, s32 count);
+s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7);
+char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix);
 
 /* PSX BIOS file trampolines, linked from Sony's own objects since round 34
  * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
@@ -40,13 +40,13 @@ extern s32 lseek(s32 handle, s32 pos, s32 whence);/* B(0x33) */
 extern s32 close(s32 handle);                     /* B(0x36) */
 extern s32 delete(void *path);                    /* B(0x45) */
 
-s32 func_8004ED40(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     s32 count;
     s32 result;
 
     count = 10;
     do {
-        result = func_8004EDC0(self, suffix, outBuf, outSize);
+        result = TaskObjF__TryReadMemcardFile(self, suffix, outBuf, outSize);
         if (result != 0) {
             break;
         }
@@ -54,7 +54,7 @@ s32 func_8004ED40(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     return result;
 }
 
-s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     char pathBuf[0x20];
     char *path;
     s32 handle;
@@ -62,7 +62,7 @@ s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     s32 seekPos;
     u8 raw;
 
-    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->cardSlot, suffix);
+    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, suffix);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
@@ -78,14 +78,14 @@ s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     return 1;
 }
 
-s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg6, s32 arg7) {
     s32 count;
     s32 result;
 
     count = 10;
     func_800507F8(handle, a1);
     do {
-        result = func_8004EF6C(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
+        result = TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
         if (result != 0) {
             break;
         }
@@ -96,7 +96,7 @@ s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg
     return result;
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004EF6C.md. Best
+/* STALL snapshot -- see docs/match-reports/TaskObjF__TryWriteMemcardSaveFile.md. Best
  * reached: 188/240 words, 0x3BC/0x3C0 (1 word / 4 bytes short, zero
  * address drift beyond that). Genuinely fresh derivation this round --
  * full struct layout (StreamSrcObj/StreamReq/etc, all new) derived from
@@ -106,12 +106,12 @@ s32 func_8004EEA0(TaskObjF *self, s32 a1, s32 handle, char a3, s32 arg5, s32 arg
  * aligned-vs-unaligned runtime-checked copy idiom, matching
  * class_3bb8c_r.c's Block24 precedent). The residue is confirmed as
  * the SAME 9-register-saturation class already documented for this
- * function's own caller, func_8004EEA0 -- a single delay-slot
+ * function's own caller, TaskObjF__WriteMemcardSaveFile -- a single delay-slot
  * scheduling choice (which of two independent register-materializing
  * moves fills a branch's delay slot) that did not respond to any
  * position/type/declaration-order variant tried. Preserved here per
  * convention -- not live C. */
-/* func_8004EF6C's own local types -- none shared elsewhere in this unit. */
+/* TaskObjF__TryWriteMemcardSaveFile's own local types -- none shared elsewhere in this unit. */
 
 /* A small opaque sub-record, read/written as a whole -- all s16 members
  * (alignment 2, no s32) so a whole-struct copy compiles to the unaligned
@@ -159,7 +159,7 @@ typedef struct StreamArg5Obj {
  * parameter, which despite its established `s32` type across this file
  * is used here as a raw C string -- kept `s32` at the parameter per this
  * project's per-site-cast convention, since retyping it risks the
- * ALREADY-MATCHED func_8004EEA0's own signature). */
+ * ALREADY-MATCHED TaskObjF__WriteMemcardSaveFile's own signature). */
 typedef struct StreamReq {
     u8 tag0;
     u8 tag1;
@@ -188,7 +188,7 @@ extern void printf(const char *fmt);  /* own local view: this call site passes o
  * Seeded a permuter search (never run before this round) -- see the report
  * for iteration count and result. Restored here, not left live -- see the
  * report. */
-s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
     char pathBuf[0x20];
     char *path;
     s32 fileHandle;
@@ -199,7 +199,7 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
     StreamReq *req;
 
     payload = arg6;
-    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
+    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
     delete(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
@@ -233,10 +233,10 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004EF6C);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", TaskObjF__TryWriteMemcardSaveFile);
 
 
-char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix) {
+char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix) {
     DeviceName866E8 *src;
 
     if (selector) {
@@ -253,21 +253,21 @@ char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix) {
  * libapi/a11. Local view: these are Sony's, declared in the one unit that
  * calls them rather than in include/class_3bb8c.h, which 21 units include.
  * Each takes an event descriptor and returns a status word, which is what
- * makes them usable as func_8004F40C's `s32 (*)(s32)` callback. */
+ * makes them usable as TaskObjF__ForEachEvent's `s32 (*)(s32)` callback. */
 extern s32 EnableEvent(s32 event);
 extern s32 DisableEvent(s32 event);
 extern s32 TestEvent(s32 event);
 
-s32 func_8004F394(TaskObjF *self) {
-    return func_8004F40C(self, EnableEvent, 1);
+s32 TaskObjF__EnableEvents(TaskObjF *self) {
+    return TaskObjF__ForEachEvent(self, EnableEvent, 1);
 }
 
-s32 func_8004F3BC(TaskObjF *self) {
-    return func_8004F40C(self, DisableEvent, 1);
+s32 TaskObjF__DisableEvents(TaskObjF *self) {
+    return TaskObjF__ForEachEvent(self, DisableEvent, 1);
 }
 
-s32 func_8004F3E4(TaskObjF *self) {
-    return func_8004F40C(self, TestEvent, 0);
+s32 TaskObjF__TestEvents(TaskObjF *self) {
+    return TaskObjF__ForEachEvent(self, TestEvent, 0);
 }
 
 /* Psy-Q's kernel critical-section pair (libapi/a36, libapi/a37, linked from
@@ -281,7 +281,7 @@ s32 func_8004F3E4(TaskObjF *self) {
 extern void EnterCriticalSection(void);
 extern void ExitCriticalSection(void);
 
-s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
+s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
     s32 i;
     s32 result;
 
@@ -300,11 +300,11 @@ s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
     return result;
 }
 
-s32 func_8004F4A4(TaskObjF *self) {
-    return func_8004F4C8(self->events, 4);
+s32 TaskObjF__FindReadyEvent(TaskObjF *self) {
+    return FindFirstReadyEvent(self->events, 4);
 }
 
-s32 func_8004F4C8(s32 *arr, s32 count) {
+s32 FindFirstReadyEvent(s32 *arr, s32 count) {
     s32 i;
 
     for (;;) {

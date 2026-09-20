@@ -7,8 +7,8 @@
  * none of these 19 functions read or write anything typed there, and no
  * function in _b/_c/_d/_f calls into this unit (checked: the only cross-unit
  * calls are FROM this unit INTO class_3bb8c_f's still-INCLUDE_ASM
- * func_8004F32C/func_8004F394/func_8004F3BC/func_8004F3E4/func_8004F40C/
- * func_8004F4A4, never the reverse). Kept entirely local to this .c file
+ * BuildMemcardPath/TaskObjF__EnableEvents/TaskObjF__DisableEvents/TaskObjF__TestEvents/TaskObjF__ForEachEvent/
+ * TaskObjF__FindReadyEvent, never the reverse). Kept entirely local to this .c file
  * rather than include/class_3bb8c.h, to carry zero collision risk with the
  * other two runners (charlie on _f, echo on _d) editing that shared header
  * this round.
@@ -68,7 +68,7 @@ struct SelfMethods3bb8cE {
 struct Node3bb8cE {
     SelfMethods3bb8cE *methods;   /* +0x000, func_8004EADC */
     u8 pad04[0x00C - 0x004];
-    s32 unkC;              /* +0x00C, func_8004E5D4 sets it (caller value); func_8004E940 nonzero-tests it; func_8004EA38/func_8004ECCC forward it as func_8004F32C's arg1 */
+    s32 unkC;              /* +0x00C, func_8004E5D4 sets it (caller value); func_8004E940 nonzero-tests it; func_8004EA38/func_8004ECCC forward it as BuildMemcardPath's arg1 */
     s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to _card_info/_card_load/func_80050B28 */
     s32 threads[4];        /* +0x014..+0x020, func_8004E5E4: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
     u8 pad24[0x060 - 0x024];
@@ -86,12 +86,12 @@ struct Node3bb8cE {
  * call sites disagree on arity -- same idiom already established for
  * strcpy/strcat in include/psyq/STRINGS.H -- rather than forcing one
  * prototype to fit every call site. */
-extern void *func_8004F32C(); /* arity-ok: definition is 3-parameter and the callee reads $a2 (`suffix`), but this unit's two call sites disagree on arity and BOTH are byte-load-bearing -- func_8004EA38 emits no $a2 at all (0x8004EA58) while func_8004ECCC emits `lui a2`/`addiu a2` (0x8004ECE8) */
-extern void func_8004F394(void *self);
-extern void *func_8004F3BC(void *self);
-extern void func_8004F3E4(void *self);
-extern void func_8004F40C(void *self, void (*fn)(void), s32 arg2);
-extern s32 func_8004F4A4(void *self);
+extern void *BuildMemcardPath(); /* arity-ok: definition is 3-parameter and the callee reads $a2 (`suffix`), but this unit's two call sites disagree on arity and BOTH are byte-load-bearing -- func_8004EA38 emits no $a2 at all (0x8004EA58) while func_8004ECCC emits `lui a2`/`addiu a2` (0x8004ECE8) */
+extern void TaskObjF__EnableEvents(void *self);
+extern void *TaskObjF__DisableEvents(void *self);
+extern void TaskObjF__TestEvents(void *self);
+extern void TaskObjF__ForEachEvent(void *self, void (*fn)(void), s32 arg2);
+extern s32 TaskObjF__FindReadyEvent(void *self);
 
 /* PSX thread-table constant walked by func_8004E5E4 (4 entries, one per
  * OpenTh-style thread it starts). Address-only-derived walk (lui/addiu then
@@ -104,7 +104,7 @@ extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
  * truth value; passed opaquely (never dereferenced in this unit). */
 extern s32 D_8008AA9C;
 extern s32 D_8008AAA4;
-/* Third such constant, passed as func_8004F32C's 3rd argument by
+/* Third such constant, passed as BuildMemcardPath's 3rd argument by
  * func_8004ECCC only. */
 extern s32 D_8008AAAC;
 
@@ -206,7 +206,7 @@ s32 func_8004E5E4(Node3bb8cE *self)
         cur = (Node3bb8cE *)((u8 *)cur + 4);
     } while (i < 4);
     ExitCriticalSection();
-    func_8004F394(self);
+    TaskObjF__EnableEvents(self);
     return 1;
 }
 
@@ -214,8 +214,8 @@ extern void CloseEvent(void);
 
 s32 func_8004E678(Node3bb8cE *self)
 {
-    func_8004F3BC(self);
-    func_8004F40C(self, CloseEvent, 1);
+    TaskObjF__DisableEvents(self);
+    TaskObjF__ForEachEvent(self, CloseEvent, 1);
     return 1;
 }
 
@@ -302,10 +302,10 @@ s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
 
     status = 1;
     *p2 = *p1 = 0;
-    func_8004F3E4(self);
+    TaskObjF__TestEvents(self);
     while (_card_info(self->unk10) == 0)
         ;
-    code = func_8004F4A4(self);
+    code = TaskObjF__FindReadyEvent(self);
     if (code == 0x100) {
         status = 0;
     } else if (code == 0x8000) {
@@ -327,10 +327,10 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
 
     status = 1;
     *p2 = (*p1 = 0, status);
-    func_8004F3E4(self);
+    TaskObjF__TestEvents(self);
     while (_card_load(self->unk10) == 0)
         ;
-    code = func_8004F4A4(self);
+    code = TaskObjF__FindReadyEvent(self);
     if (code == 0x100) {
         status = 0;
     } else if (code == 0x8000) {
@@ -380,7 +380,7 @@ s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
     return result;
 }
 
-extern void *func_8004F32C(); /* arity-ok: second copy of the declaration above, same reason -- the 2-argument call at func_8004EA38 and the 3-argument call at func_8004ECCC cannot share one prototype */
+extern void *BuildMemcardPath(); /* arity-ok: second copy of the declaration above, same reason -- the 2-argument call at func_8004EA38 and the 3-argument call at func_8004ECCC cannot share one prototype */
 extern s32 open(void *arg0, s32 arg1);
 extern s32 read(s32 arg0, void *arg1, s32 arg2);
 extern s32 close(s32 arg0);
@@ -408,7 +408,7 @@ s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
     s32 handle;
     void *buf;
 
-    path = func_8004F32C(pathBuf, self->unkC);
+    path = BuildMemcardPath(pathBuf, self->unkC);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
@@ -483,7 +483,7 @@ s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)
     s32 sectors;
 
     sectors = (u32)(sizeArg + 0x21FF) >> 13;
-    path = func_8004F32C(pathBuf, self->unkC, &D_8008AAAC);
+    path = BuildMemcardPath(pathBuf, self->unkC, &D_8008AAAC);
     handle = open(path, (sectors << 16) | 0x200);
     if (handle == -1) {
         return 0;
