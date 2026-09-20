@@ -239,26 +239,21 @@ extern u8 D_8008D970[];
  * (324/324 words, zero drift outside the function), 7/324 raw word-match,
  * best body preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
-
-/* STALL -- see docs/match-reports/func_80030E90.md. Round 26: 239/252 words
- * (13 short). Round 31: 240/252 (12 short), the `s32 result` axis. Round 36:
- * rebuilt with SpuVmVSetUp's real name (was func_80032148 -- round 34's SDK
- * conversion renamed the callee, and the report's preserved body was never
- * corrected) plus the SlotE968/D_8008EA22 declarations round 34's carve
- * deleted from this family (see this file's header note above). Measured
- * 241/252 words this round (11 short) -- close to but not an exact
- * reproduction of round 31's 240/252, consistent with that round's own
- * caveat that its barrier placement could not be fully recovered from
- * prose. Three residues persist per the report: busy-lock guard polarity
- * (confirmed non-source-derivable by a round-26 head reproducer), missing
- * field-copy load-delay nops (confirmed not barrier-reachable), and the
- * func_8002CF18() return value's register identity -- all three exhausted
- * per this report's own extensive history (14+ hand reshapes across two
- * rounds plus a 9-probe head investigation). Round 40: rebuild confirms
- * 241/252 exactly (isolated from the sibling stall's own shortfall); first
- * real permuter search (70k+ iterations), one sub-base lead found and
- * confirmed NOT to reproduce on the real oracle -- see
- * docs/match-reports/func_80030E90.md's round-40 addendum. */
+/* STALL, TOOLCHAIN-BLOCKED -- see docs/match-reports/func_80030E90.md.
+ * Round 62 (REVISIT): 241/252 built words (11 short), 36/252 raw, ins 22/del
+ * 22, and the 11-word gap is now accounted for EXACTLY: 9 words are a
+ * load-delay `nop` that ASPSX 2.34 emits and maspsx does not (cc1 emits the
+ * bare `sb $3,G` macro; ASPSX decides the hazard before expanding it, maspsx
+ * after, and the interposed `lui $at` then satisfies the hazard). Retail
+ * image-wide census: 40 sites with the nop, 0 without. Not reachable from C
+ * at any shape -- the best possible score here is 250/252 until the blocker
+ * is resolved, so DO NOT staff another source attempt. The remaining 2 words
+ * are the busy-lock guard polarity (retail `bne` NEAR, ours `beq` FAR), which
+ * two byte-exact siblings in this same file -- func_80031280 and
+ * func_80031890 -- both compile as `beq` FAR, so it is not how the guard is
+ * written. Round 26's attribution of the nops to "GCC's delay-slot filler"
+ * is RETRACTED: cc1 never emits the `lui` that attribution depends on.
+ * Same blocker, 11 sites, on this file's func_8003149C below. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030E90);
 
 s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
@@ -312,7 +307,13 @@ fail_nolock:
     return -1;
 }
 
-/* STALL -- see docs/match-reports/func_8003149C.md. func_80030E90's near
+/* STALL, TOOLCHAIN-BLOCKED by the same maspsx load-delay-nop difference as
+ * func_80030E90 above, with 11 sites here against that function's 9 -- see
+ * docs/match-reports/func_80030E90.md's round-62 section for the reproducer
+ * and the retail-wide census. Its own report's residues predate that finding.
+ * DO NOT staff another source attempt until the blocker is resolved.
+ * ORIGINAL NOTE FOLLOWS.
+STALL -- see docs/match-reports/func_8003149C.md. func_80030E90's near
  * twin. Round 26: 236/253 words (17 short). Round 36: rebuilt with
  * SpuVmVSetUp's real name (was func_80032148 -- round 34's SDK conversion
  * renamed the callee, report's preserved body never corrected). Measured
@@ -330,4 +331,51 @@ fail_nolock:
  * docs/match-reports/func_8003149C.md's round-40 addendum. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031890);
+/* The "release channel" twin of func_80031280's else-branch above: same
+ * D_8008E934 lock, same (mask0, mask1) split of a 0..0x17 channel across two
+ * 16-bit mask words, same three per-channel field clears, same mask update.
+ * MATCHED round 62 by writing it in exactly that sibling's idiom -- direct
+ * global expressions with NO cached locals. Four earlier rounds carried four
+ * cached locals here (old60/old64/e228/e22c) and filed the result as an
+ * unreachable register-identity stall; the caching was the whole residue.
+ * The only structural difference from the sibling is that the lock is
+ * released BEFORE the mask block rather than after it (retail's
+ * `sw zero, D_8008E934` sits at 0x80031950, between the D_8008E228 load and
+ * the first `or`). See docs/match-reports/func_80031890.md. */
+s32 func_80031890(s16 idx)
+{
+    u16 chan;
+    u32 mask0;
+    u16 mask1;
+
+    if (D_8008E934 == 1) {
+        goto fail_nolock;
+    }
+    D_8008E934 = 1;
+    if ((u16) idx >= 0x18) {
+        goto fail;
+    }
+    D_8008EA26 = idx;
+    chan = D_8008EA26;
+    if (chan < 0x10) {
+        mask0 = 1 << chan;
+        mask1 = 0;
+    } else {
+        mask0 = 0;
+        mask1 = 1 << (chan - 0x10);
+    }
+    D_8008D9A3[chan].unk0 = 0;
+    D_8008D98C[chan].unk0 = 0;
+    D_8008D988[chan].unk0 = 0;
+    D_8008E934 = 0;
+    D_80090C60 = mask0 | D_80090C60;
+    D_80090C64 |= mask1;
+    D_8008E228 &= ~D_80090C60;
+    D_8008E22C &= ~D_80090C64;
+    return 0;
+
+fail:
+    D_8008E934 = 0;
+fail_nolock:
+    return -1;
+}
