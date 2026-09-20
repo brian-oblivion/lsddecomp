@@ -262,7 +262,7 @@ void Class6E99C__PopPosition(Class6E99CObj *self) {
     self->unk62 = self->unk8C;
 }
 
-void func_800404B4(Class6E99CObj *self, s32 a1, s32 a2) {
+void Class6E99C__SetDivisorMode(Class6E99CObj *self, s32 a1, s32 a2) {
     self->unk98 = a1;
     self->unk9C = a2;
 }

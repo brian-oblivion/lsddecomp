@@ -1910,7 +1910,7 @@ struct ClassEAC0Obj {
                                    Class6E99C leaf, same field */
     u8 pad078[0x098 - 0x078];
     s32 unk98;                 /* +0x098, OBSERVED: Class6E99C__Stop, truthy-tested;
-                                   func_800404B4's own setter also targets this
+                                   Class6E99C__SetDivisorMode's own setter also targets this
                                    offset on the Class6E99C leaf, same field */
 };
 
@@ -1976,7 +1976,7 @@ struct Class6E99CMethods {
     void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, Class6E99C__GetColor */
     void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, Class6E99C__PushPosition */
     void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, Class6E99C__PopPosition */
-    void (*slotF0)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, func_800404B4 */
+    void (*slotF0)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, Class6E99C__SetDivisorMode */
 };
 struct Class6E99CObj {
     Class6E99CMethods *methods; /* +0x000 */
@@ -2041,10 +2041,10 @@ struct Class6E99CObj {
     s32 unk8C;
     s32 unk90;                 /* +0x090, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
     s32 unk94;                 /* +0x094, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
-    s32 unk98;                 /* +0x098, OBSERVED: func_800404B4, setter arg1;
+    s32 unk98;                 /* +0x098, OBSERVED: Class6E99C__SetDivisorMode, setter arg1;
                                    shared field identity with ClassEAC0Obj's
                                    own unk98 above (same base offset) */
-    s32 unk9C;                 /* +0x09C, OBSERVED: func_800404B4, setter arg2;
+    s32 unk9C;                 /* +0x09C, OBSERVED: Class6E99C__SetDivisorMode, setter arg2;
                                    Class6E99C__Configure also reads it as a divisor */
     u8 padA0[0xA0 - 0xA0];
 };
