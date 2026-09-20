@@ -180,17 +180,18 @@ shared:
 
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
 
-/* STALLED at 45/109 words -- see docs/match-reports/func_8004C93C.md for
- * the full round-19 analysis. Two real CFG/scheduling fixes closed most of
- * the gap (a hoisted "flag=0" default matching the project's established
- * "default value in the guarding branch's delay slot" idiom; a
- * deliberately-duplicated `slot0 = &self->slots8C[0];` on both arms of the
- * h6<0 test, held apart with a bare `__asm__("")` scheduling barrier to
- * stop the compiler tail-merging the two identical stores back into one).
- * What remains is a clean register-identity rotation across the whole
- * function (self/h4/h6/slot0/span all permuted, matching set of registers)
- * -- restored here per project convention. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 45/109 words, length exact, zero drift. Residue: register
+ * identity, a clean rotation across the whole function
+ * (self/h4/h6/slot0/span all permuted, matching set of registers), which
+ * CLAUDE.md HARD RULE 6 marks a STALL by definition, not a judgement call
+ * (docs/match-reports/func_8004C93C.md). Two real CFG/scheduling fixes
+ * closed most of the gap (a hoisted "flag=0" default matching the
+ * project's established "default value in the guarding branch's delay
+ * slot" idiom; a deliberately-duplicated `slot0 = &self->slots8C[0];` on
+ * both arms of the h6<0 test, held apart with a bare `__asm__("")`
+ * scheduling barrier to stop the compiler tail-merging the two identical
+ * stores back into one). Hand-derived. */
 void func_8004C93C(Obj866E8 *self) {
     s32 flag;
     s32 h4;
@@ -255,9 +256,9 @@ void func_8004C93C(Obj866E8 *self) {
     count += 1;
     self->unk88 = count;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
+#endif
 
 /* STALLED at 62/97 words (round 58, up from 55/97) -- see
  * docs/match-reports/func_8004CAF0.md. Frame size, callee-saved register SET
