@@ -1973,7 +1973,7 @@ struct Class6E99CMethods {
        unit) is the shared occupant either way. */
     s32 (*slotDC)(Class6E99CObj *self);              /* +0x0DC, Class6E99C__Configure */
     void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, Class6E99C__Stop */
-    void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, func_800403F8 */
+    void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, Class6E99C__GetColor */
     void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, func_8004042C */
     void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, func_80040490 */
     void (*slotF0)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, func_800404B4 */
@@ -2020,7 +2020,7 @@ struct Class6E99CObj {
        Class6E99C__Update via its low byte. */
     s32 unk74;
     s32 unk78;                 /* +0x078, OBSERVED: Class6E99C__Configure/Class6E99C__Update/
-                                   func_800403F8, a flags/mode word tested
+                                   Class6E99C__GetColor, a flags/mode word tested
                                    against 0xF and against bit masks
                                    0x1/0x2/0x4 */
     /* +0x07C, OBSERVED: Class6E99C__FinishConstruct (ctor override zeroes it),
@@ -2053,7 +2053,7 @@ struct Class6E99CObj {
  * address -- real element shape not derived (nothing this unit's chosen
  * functions dereference beyond taking the address), so left as opaque
  * byte blobs sized only by their known stride. `Class6E99C__Class6E99C`/
- * `Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`/`func_800403F8` all compute the index as
+ * `Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`/`Class6E99C__GetColor` all compute the index as
  * a raw BYTE offset (`sll v0,i,1; addu v0,v0,i` = `i*3`, added directly to
  * the base address with no further `*4`) -- i.e. `D_8006EA90` holds 3-BYTE
  * entries (plausibly a signed-byte triple, same shape as this file's own

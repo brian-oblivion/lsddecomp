@@ -217,7 +217,7 @@ void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
     methods->slot30(self, mode);
 }
 
-void *func_800403F8(Class6E99CObj *self) {
+void *Class6E99C__GetColor(Class6E99CObj *self) {
     if (self->unk78 == 0xF) {
         return D_8006EAA8;
     }
