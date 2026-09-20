@@ -17,3 +17,12 @@ Same 3-byte-stride table lookup family as `Class6E99C__StartFadeToIndex`/`Class6
 using `self->unk78` directly as the index (with `0xF` as a distinguished
 "use the fixed table" sentinel, matching `unk78`'s established use
 elsewhere in this unit as a mode/flags word tested against `0xF`).
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__GetColor`** -- tier A. `Class6E99CMethods::slotE4`
+(`+0x0E4`). Pure getter: returns `D_8006EAA8` (the fixed/default table)
+when `unk78 == 0xF`, else `&D_8006EA90[unk78 * 3]` (the indexed table) --
+the same two tables `Class6E99C__StartFadeToIndex`/`StartFadeDefault`
+write through `slotB8`. A pure leaf whose mechanics ARE its purpose (a
+getter) is tier A by this project's own naming rule.

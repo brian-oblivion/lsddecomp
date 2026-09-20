@@ -166,3 +166,17 @@ words, length exact, instruction-scheduling residue on the `li $a1,1`
 materialization) is now live in `src/code_2cc8c_e.c` under `#ifdef
 NON_MATCHING`, with the verified build still taking the `#else INCLUDE_ASM`
 branch. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__StartFadeToIndex`** -- tier B (STALL, preserved body
+unchanged by this rename). `Class6E99CMethods::slotD4` (`+0x0D4`). Guards
+on `state == 0` (idle), looks up an index via `configure`, dispatches the
+`slotB8` color-set slot with `&D_8006EA90[idx * 3]` (an INDEXED table
+entry), sets `state = 1`, and negates `step`. Named opposite
+`Class6E99C__StartFadeDefault` (`slotD8`, `state = 2`, the FIXED
+`D_8006EAA8` table) -- the two are a matched pair distinguished by which
+color source they select. "Fade" is inferred from `step` accumulating into
+color-channel bytes over time in `Class6E99C__Update`; "index" from this
+function's own `idx`-based table lookup versus its sibling's fixed one.
+Game-level purpose (what is fading, and why) is not established.

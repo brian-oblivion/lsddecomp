@@ -443,3 +443,16 @@ words, length exact, permuter-exhausted redundant-move residue) is now live
 in `src/code_2cc8c_e.c` under `#ifdef NON_MATCHING`, with the verified build
 still taking the `#else INCLUDE_ASM` branch. `./build-and-verify.sh` and
 `tools/check-nonmatching.sh` both green.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__PushPosition`** -- tier B (STALL, preserved body unchanged
+by this rename). `Class6E99CMethods::slotE8` (`+0x0E8`), gated on `unkC`
+being non-NULL. Stashes the current `unk60`/`unk62` pair into `unk88`/
+`unk8C` and the current `unk50`/`unk54` pair into `unk90`/`unk94`, then
+installs a NEW position from its own `a1`(x,y)/`a2` arguments into
+`unk60`/`unk62`/`unk50`/`unk54`. Its exact inverse,
+`Class6E99C__PopPosition` (`slotEC`), restores the stashed values back
+into the live fields -- a save/restore-of-one pair, hence
+"Push"/"Pop". What game event drives the push (an on-screen position
+override, e.g. a highlight or animation) is not established -- tier B.

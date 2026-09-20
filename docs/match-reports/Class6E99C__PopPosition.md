@@ -37,3 +37,12 @@ genuine field-width fix on `unk88`/`unk8C` (`s16` -> `s32`, see
 own `lhu`-into-`s16`-locals read is compatible with either way, but which
 was necessary to get the SIBLING function (`Class6E99C__PushPosition`, which WRITES
 these fields as full words) correct.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__PopPosition`** -- tier B. `Class6E99CMethods::slotEC`
+(`+0x0EC`). Exact inverse of `Class6E99C__PushPosition` (see that report's
+naming note): copies `unk90`/`unk94` back into `unk50`/`unk54` and
+`unk88`/`unk8C` back into `unk60`/`unk62`, with no gate of its own (the
+caller is expected to know a push is outstanding). Named as the matching
+"Pop" to `PushPosition`'s "Push".

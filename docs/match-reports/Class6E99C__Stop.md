@@ -142,3 +142,16 @@ than inside a guard clause that only conditions a loop, not the store
 itself") to a guard that conditions an entire computed VALUE, not just
 a loop -- and confirms it transfers to a genuinely different function
 shape (two symmetric arms, not one loop/merge point).
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__Stop`** -- tier B. `Class6E99CMethods::slotE0` (`+0x0E0`).
+Early-returns if `state == 0` (not active); otherwise picks a mode
+(5 or 6) depending on `state`/`altMode`, restores the default color when
+appropriate, forces `step` positive (`abs`), clears `state = 0`
+(deactivating), and dispatches `slot14`/`slot30(mode)` (bravo/base
+occupants) as a finish notification. "Stop" reflects the `state = 0`
+reset mirroring `Class6E99C__StartFadeToIndex`/`StartFadeDefault`'s own
+`state = 1`/`state = 2` -- the three functions form a clear
+start/start/stop triad over the same field. Which mode 5 vs 6 MEANS in
+game terms is not established.

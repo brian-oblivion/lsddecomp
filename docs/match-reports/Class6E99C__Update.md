@@ -60,3 +60,17 @@ with a non-trivial body on BOTH sides rather than a bare early return.
   incremented by the LOW BYTE of `self->unk74` (a full `s32` elsewhere)
   gated by a separate bit of the `unk78` flags word -- named
   `Class6E99CObj::unk64`/`unk65`/`unk66` in `include/code_2cc8c.h`.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__Update`** -- tier B. `Class6E99CMethods::slot98` (`+0x098`).
+Mechanics: ignores every call except `a2 == 2`, then decrements a countdown
+(`self->unk80`, still unnamed -- no other function gives it a purpose
+beyond "the thing this loop decrements") and either accumulates a
+per-tick `step` into three byte counters (gated per-bit by `unk78`) or
+calls `stop` once the countdown expires. The `(self, void *a1, s32 a2)`
+shape with `a2` acting as an event-code gate matches this project's own
+generic per-object dispatch idiom (`Entity__Update(this, a1, a2)`,
+`include/Entity.h`'s slot98 note), which is the evidence for "Update"
+specifically rather than a bespoke name. Purpose in the actual game (what
+the color accumulation drives) is not established -- tier B, not A.

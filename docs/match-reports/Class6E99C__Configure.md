@@ -346,3 +346,19 @@ finer-grained version of the already-documented "declaration order decides
 register/stack layout" family; worth testing named-variable REUSE as its
 own lever on other multi-division register-identity stalls before assuming
 a fresh name is neutral.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__Configure`** -- tier B. `Class6E99CMethods::slotDC`
+(`+0x0DC`, shared occupant with `ClassEAC0Methods::slotDC`). Sets up
+`unk78`/`unk7C`/`unk80`/`unk84`/`unk68`-derived state from its own
+`a1`/`a2`/`a3` (mode, count, and a divisor-flag path via `altMode`), then
+dispatches `slot10`/`slot64`/`slot68`/`slot60` (bravo's own occupants).
+Named "Configure" rather than "Start"/"Init" because it is ALSO reachable
+through `slotDC` with only `self` (no real arguments) from
+`Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`, where its
+return value is read back as a color-table index -- i.e. it is a
+general-purpose "(re)configure and report" entry point, not a one-shot
+initializer. The a2-garbage-on-1-arg-call nuance is inherited unchanged
+from the matched body and already documented in this function's own
+`## Notes`/report history; not re-derived here.

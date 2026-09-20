@@ -20,3 +20,11 @@ void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) 
 bottoms out at the REAL base class two units over. Its `ctor` slot there
 takes only `self` (`void *(*ctor)(void *self)`, `code_d294.h`), matching
 this call site's own single-argument setup.
+
+## Naming (round 61, track 3)
+
+**`ClassEAC0__ClassEAC0`** -- tier A. `ClassEAC0Methods::ctor` (`+0x008`),
+one level further down the same "call the further-base ctor first, reset
+`self->methods`, redispatch `finishConstruct`" chain
+`Class6E99C__Class6E99C` uses one level up. Named per the same
+`Class__Class` constructor convention.

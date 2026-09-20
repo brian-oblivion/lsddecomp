@@ -49,3 +49,14 @@ per this project's convention -- not a real C `struct` embedding).
 function is the one that converts it into a `tableEntry` address before
 forwarding to the next ctor down the chain, whose OWN `a2` really is
 already a pointer.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__Class6E99C`** -- tier A. `Class6E99CMethods::ctor`
+(`+0x008`). Named per the project's `Class__Class` constructor convention
+(see `Entity__Entity`, `DreamSys.c`): calls the further-base ctor
+(`Obj6EAC0__GetBaseMethods()->ctor(...)`) first, then installs this class's
+own `&D_8006E99C` table, then redispatches through `finishConstruct` --
+the textbook "base ctor first, then own vtable, then dispatch" idiom
+already documented elsewhere in this project. Mechanics (construct an
+instance of this class) fully determine the name.

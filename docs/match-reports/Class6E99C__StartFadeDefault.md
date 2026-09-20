@@ -280,3 +280,14 @@ raw funcdiff word-match count is not trustworthy past the length divergence)
 is now live in `src/code_2cc8c_e.c` under `#ifdef NON_MATCHING`, with the
 verified build still taking the `#else INCLUDE_ASM` branch.
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__StartFadeDefault`** -- tier B (STALL, preserved body
+unchanged by this rename). `Class6E99CMethods::slotD8` (`+0x0D8`). Mirror
+of `Class6E99C__StartFadeToIndex` (see that report's naming note for the
+pairing evidence): guards on `state == 0`, and either just decrements the
+countdown (`altMode != 0`, i.e. "resume") or dispatches the FIXED
+`D_8006EAA8[idx * 3]` color entry and sets `state = 2`. "Default" reflects
+`D_8006EAA8` being the same table `Class6E99C__Stop` falls back to when
+`unk78 == 0xF` (its own documented "use the fixed table" sentinel).

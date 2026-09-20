@@ -67,3 +67,10 @@ explicit cast to a sibling type that carries the field the body assumes --
 type here -- rather than assuming the header itself needs changing. A
 sibling function in the same unit (`Class6E99C__Class6E99C`) already demonstrated
 the correct cast one statement earlier in the file.
+
+## Naming (round 61, track 3)
+
+**`New_ClassEAC0`** -- tier A. `New_X`-shaped allocator, mirroring
+`New_Class6E99C` one level down the chain: allocates 0x6C bytes
+(`ClassEAC0Obj`'s own, smaller size) and dispatches
+`((ClassEAC0Methods *)Obj6EAC0__GetBaseMethods())->ctor(...)` on success.

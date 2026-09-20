@@ -53,3 +53,13 @@ all, it IS the `tableEntry` pointer, with `D_8008A924` only as the
 default when the caller passes `NULL`. Same family as the project's
 established "a discarded/defaulted value is not evidence of the wrong
 type" caution, just for a parameter rather than a return.
+
+## Naming (round 61, track 3)
+
+**`ClassEAC0__FinishConstruct`** -- tier A. `ClassEAC0Methods::slot40`
+(`+0x040`), dispatched by `ClassEAC0__ClassEAC0` immediately after
+installing `self->methods` -- the identical architectural role, at the
+identical offset, as `Class6E99C__FinishConstruct` one level up and
+`Obj6EAC0__FinishConstruct` (round 54, this same table family) one level
+further down. See `Class6E99C__FinishConstruct.md`'s naming note for the
+full three-occupant cross-check.

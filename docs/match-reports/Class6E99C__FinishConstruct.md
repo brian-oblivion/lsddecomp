@@ -33,3 +33,17 @@ type is `(Class6E99CObj *self, s32 a1)` -- two args, matching CLAUDE.md's
 "the converse does NOT hold" caution (a `jalr` with no visible extra setup
 is not proof of a 1-arg call; here it IS 2-arg on the strength of the
 occupant's own body, and 2 is also all the CALL SITE bothers to configure).
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__FinishConstruct`** -- tier A. `Class6E99CMethods::slot40`
+(`+0x040`), dispatched by `Class6E99C__Class6E99C` immediately after
+installing `self->methods`. Named to match the architecturally identical
+slot in the same class hierarchy: `Obj6EAC0Methods::slot40` is already
+named `Obj6EAC0__FinishConstruct` (round 54, `code_2cc8c_f`/this header),
+and `ClassEAC0Methods::slot40` (this unit, `ClassEAC0__FinishConstruct`)
+occupies the SAME offset one level up the same chain, dispatched the same
+way (right after a ctor installs the vtable). Three independent occupants
+at the identical offset, all doing "one-time post-construction setup",
+is strong cross-checked evidence for the slot's role, not a guess from
+this one function alone.
