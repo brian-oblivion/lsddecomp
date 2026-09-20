@@ -1,10 +1,12 @@
-# func_8004F9D8
+> Renamed from `func_8004F9D8` on 2026-09-20 (tools/rename.py). Address 0x8004f9d8.
+
+# TaskObjF__Validate
 
 **Unit:** class_3bb8c_f · **Size:** 75 words (0x12C) · **Status:** MATCH
 
 ## What it does
 
-`s32 func_8004F9D8(TaskObjF *self)`. A validation gate: calls
+`s32 TaskObjF__Validate(TaskObjF *self)`. A validation gate: calls
 `self->methods->slot44(self)`, then `self->methods->slot4C(self, &b10,
 &b14, &b18)` (three stack-local out-parameters), then
 `self->methods->slot48(self)`. If `slot4C`'s return was nonzero AND `b14
@@ -32,7 +34,7 @@ derivation; `5` or `6` depending on `self->unk24 == 1`), dispatches
    reproduced retail's own single `.L8004FACC` (one fetch, one `jalr`,
    five predecessors) exactly, with no extra instructions. This is the
    "generic pool of gotos into one call" pattern, and it worked cleanly
-   here (contrast `func_8004F8A4`'s stall, where retail's OWN tail is NOT
+   here (contrast `TaskObjF__func_8004F8A4`'s stall, where retail's OWN tail is NOT
    a single shared fetch+call — see that report).
 3. **`buf10 != 0` / `buf14 != 0`, not `== 0`.** The first working
    transcription had these inverted (`buf10 == 0 -> code = 3`); this

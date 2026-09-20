@@ -1,9 +1,11 @@
-# func_8004F5DC
+> Renamed from `func_8004F5DC` on 2026-09-20 (tools/rename.py). Address 0x8004f5dc.
+
+# TaskObjF__Deinit
 
 **Unit:** class_3bb8c_f · **Size:** 23 words (0x5C) · **Status:** MATCH
 
-`void func_8004F5DC(TaskObjF *self)`. Clears `self->unk68`/`unk6C` to 0,
-then unregisters the two children `func_8004F55C` had registered, via the
+`void TaskObjF__Deinit(TaskObjF *self)`. Clears `self->unk68`/`unk6C` to 0,
+then unregisters the two children `TaskObjF__Init` had registered, via the
 inherited `BasicClass::removeChild` slot:
 `self->methods->removeChild(self, (void *)self->unk60)` then the same for
 `self->unk64`.

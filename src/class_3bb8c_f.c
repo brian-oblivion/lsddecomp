@@ -16,10 +16,10 @@
  * (`TaskObjF__TryReadMemcardFile` is already MATCHED and stays MATCHED): a pointer
  * return value lives in `$v0` either way, so the implicit-int reading
  * never produced different code, only a diagnostic. */
-s32 func_8004F9D8(TaskObjF *self);
-void func_8004F704(TaskObjF *self);
-void func_8004F784(TaskObjF *self);
-void func_8004F810(TaskObjF *self);
+s32 TaskObjF__Validate(TaskObjF *self);
+void TaskObjF__AllocBuffers(TaskObjF *self);
+void TaskObjF__FreeUnusedBuffers(TaskObjF *self);
+void TaskObjF__FreeBuffers(TaskObjF *self);
 s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 FindFirstReadyEvent(s32 *arr, s32 count);
 s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
@@ -316,7 +316,7 @@ s32 FindFirstReadyEvent(s32 *arr, s32 count) {
     }
 }
 
-void func_8004F55C(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a5, s32 a6, s32 a7) {
+void TaskObjF__Init(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a5, s32 a6, s32 a7) {
     self->unk30 = a1;
     self->unk34 = a2;
     self->bufArray = 0;
@@ -329,14 +329,14 @@ void func_8004F55C(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a5, s32 a6, s32 a
     self->opMode = 0;
 }
 
-void func_8004F5DC(TaskObjF *self) {
+void TaskObjF__Deinit(TaskObjF *self) {
     self->unk6C = 0;
     self->unk68 = 0;
     self->methods->removeChild(self, (void *)self->unk60);
     self->methods->removeChild(self, (void *)self->unk64);
 }
 
-void func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
+void TaskObjF__func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
     s32 result;
     s32 code;
 
@@ -345,13 +345,13 @@ void func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
     self->unk54 = a3;
     self->opMode = 1;
     self->unk58 = a4;
-    if (func_8004F9D8(self)) {
-        func_8004F810(self);
-        func_8004F704(self);
+    if (TaskObjF__Validate(self)) {
+        TaskObjF__FreeBuffers(self);
+        TaskObjF__AllocBuffers(self);
         result = self->methods->slot5C(self, self->bufArray, self->scratchBuf, self->unk30, self->unk34);
         self->bufCount = result;
         if (result != 0) {
-            func_8004F784(self);
+            TaskObjF__FreeUnusedBuffers(self);
             if (self->statusCode == 0xE) {
                 code = 0xF;
             } else {
@@ -365,7 +365,7 @@ void func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
     }
 }
 
-void func_8004F704(TaskObjF *self) {
+void TaskObjF__AllocBuffers(TaskObjF *self) {
     s32 i;
 
     if (self->bufArray == 0) {
@@ -377,7 +377,7 @@ void func_8004F704(TaskObjF *self) {
     }
 }
 
-void func_8004F784(TaskObjF *self) {
+void TaskObjF__FreeUnusedBuffers(TaskObjF *self) {
     s32 i;
 
     for (i = self->bufCount; i < 15; i++) {
@@ -386,7 +386,7 @@ void func_8004F784(TaskObjF *self) {
     self->bufArray[i] = 0;
 }
 
-void func_8004F810(TaskObjF *self) {
+void TaskObjF__FreeBuffers(TaskObjF *self) {
     s32 i;
 
     if (self->bufArray != 0) {
@@ -400,7 +400,7 @@ void func_8004F810(TaskObjF *self) {
 }
 
 #if 0
-/* STALL snapshot -- see docs/match-reports/func_8004F8A4.md. Best reached
+/* STALL snapshot -- see docs/match-reports/TaskObjF__func_8004F8A4.md. Best reached
  * this round (delta): 63/77 words, 0x140/0x134 (3 words / 12 bytes TOO
  * LONG, address drift beyond that -- opposite direction from the previous
  * 36/77-at-1-word-short best). Caching `self->methods` into a local
@@ -409,7 +409,7 @@ void func_8004F810(TaskObjF *self) {
  * to 63/77 -- reproduces retail's whole body byte-for-byte up through the
  * final shared `jalr`. The residue is now isolated entirely to the
  * function's OWN early-exit tail (see report): retail reuses
- * `func_8004F9D8`'s own false(0) return value directly as the function's
+ * `TaskObjF__Validate`'s own false(0) return value directly as the function's
  * return with zero extra instructions, but this build always
  * re-materializes an explicit `v0=0` plus a skip-jump around it,
  * regardless of whether the C returns a literal `0` or a captured
@@ -422,7 +422,7 @@ void func_8004F810(TaskObjF *self) {
  * `move $a0,$s0`, built `nop`), matching this report exactly. Seeded a
  * permuter search (never run before this round) -- see the report for
  * iteration count and result. Restored here, not left live. */
-s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     s32 (*dispatch)(TaskObjF *, s32);
 
@@ -434,7 +434,7 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
     self->unk50 = a6;
     self->unk54 = a7;
     self->unk58 = a8;
-    if (func_8004F9D8(self)) {
+    if (TaskObjF__Validate(self)) {
         if (self->methods->slot54(self, 0, a1) == 0) {
             goto slot60_path;
         }
@@ -471,10 +471,10 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", func_8004F8A4);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", TaskObjF__func_8004F8A4);
 
 
-s32 func_8004F9D8(TaskObjF *self) {
+s32 TaskObjF__Validate(TaskObjF *self) {
     s32 buf10;
     s32 buf14;
     s32 buf18;
@@ -510,7 +510,7 @@ dispatch:
     return 0;
 }
 
-void func_8004FB04(TaskObjF *self, void *arg1, s32 arg2) {
+void TaskObjF__Notify(TaskObjF *self, void *arg1, s32 arg2) {
     TaskObjFMethods *methods;
     BasicMethods866E8F *bm;
     s32 tag;

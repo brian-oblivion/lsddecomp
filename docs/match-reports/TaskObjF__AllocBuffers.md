@@ -1,14 +1,16 @@
-# func_8004F704
+> Renamed from `func_8004F704` on 2026-09-20 (tools/rename.py). Address 0x8004f704.
+
+# TaskObjF__AllocBuffers
 
 **Unit:** class_3bb8c_f · **Size:** 32 words (0x80) · **Status:** MATCH
 
-`void func_8004F704(TaskObjF *self)`. If `self->unk38` (a `void **`, a
+`void TaskObjF__AllocBuffers(TaskObjF *self)`. If `self->unk38` (a `void **`, a
 16-entry pointer array) is unallocated, allocates it (`func_80017B34
 (0x40)`, 16 words), fills the first 15 entries with individually-allocated
 0x41-byte buffers, then allocates `self->unk3C` (a single 0x40-byte
 buffer). Entry 15 of `unk38` is deliberately left uninitialized here — it
-is only ever written by `func_8004F784` (this unit, matched), which treats
+is only ever written by `TaskObjF__FreeUnusedBuffers` (this unit, matched), which treats
 it as a sentinel/terminator slot.
 
-Matched on first transcription. See `func_8004F810`'s report for the
+Matched on first transcription. See `TaskObjF__FreeBuffers`'s report for the
 mirror teardown and `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class.

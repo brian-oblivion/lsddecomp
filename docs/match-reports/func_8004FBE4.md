@@ -84,7 +84,7 @@ land on only 5 distinct labels this time (no shared groups, unlike
 deallocator, `docs/match-reports/func_80017CFC.md`) -- no local
 declaration needed. Its return is discarded at all four call sites here
 (a legal, if unusual, use -- the project's own
-`docs/match-reports/func_8004F784.md` documents the OTHER common pattern,
+`docs/match-reports/TaskObjF__FreeUnusedBuffers.md` documents the OTHER common pattern,
 storing the return back into the freed slot; this function is the "just
 free it" variant).
 

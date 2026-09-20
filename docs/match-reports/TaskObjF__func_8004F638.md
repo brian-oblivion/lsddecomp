@@ -1,16 +1,18 @@
-# func_8004F638
+> Renamed from `func_8004F638` on 2026-09-20 (tools/rename.py). Address 0x8004f638.
+
+# TaskObjF__func_8004F638
 
 **Unit:** class_3bb8c_f · **Size:** 51 words (0xCC) · **Status:** MATCH
 
-`void func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4)`.
+`void TaskObjF__func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4)`.
 Stores the four params into `self->unk40`/`unk44`/`unk54`/`unk58`, sets
-the state tag `self->unk24 = 1`, then — only if `func_8004F9D8(self)`
+the state tag `self->unk24 = 1`, then — only if `TaskObjF__Validate(self)`
 (this unit's own validation gate, matched separately) succeeds — tears
-down and reallocates the two buffers via `func_8004F810`/`func_8004F704`
+down and reallocates the two buffers via `TaskObjF__FreeBuffers`/`TaskObjF__AllocBuffers`
 (also this unit, matched), dispatches `self->methods->slot5C(self,
 self->unk38, self->unk3C, self->unk30, self->unk34)` (a 5-argument custom
 slot, this class's own, not inherited), stores its result into
-`self->unk2C`, and on success calls `func_8004F784` (walks the buffer
+`self->unk2C`, and on success calls `TaskObjF__FreeUnusedBuffers` (walks the buffer
 array, matched) before picking an error code (`0xF` if
 `self->unk28 == 0xE`, else `0x12`) or, on failure, forcing `self->unk2C =
 0xF` and code `0xD` — finally dispatching `self->methods->slot7C(self,
