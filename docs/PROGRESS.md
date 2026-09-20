@@ -6,6 +6,116 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-20 — round 62: a below-cc1 blocker that has been invisible for 62 rounds because it can only strike code we have not written yet
+
+**Three runners, three tracks, three merges, all green. 1143 -> 1144 matched.**
+Head on Opus (no new procedure, tool or doc written; the one toolchain lead is
+ESCALATED, not adjudicated). Gate 0 clean, all three worktrees byte-verified
+before handover, no header contention and no call-graph contention among the
+three units.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 3 | `code_179d8_m` | 12 functions, 13 globals, 4 fields named; unit identified; PASSED review |
+| bravo | opus | 1 revisit | `code_179d8_j_b` | 1 MATCH, 2 verdicts rewritten, 1 escalation |
+| charlie | sonnet | 1b | `code_2cc8c_c` | `Obj86B60__NotifyParents` promoted |
+
+### The escalation: a load-delay `nop` ASPSX emits and maspsx does not
+
+Found by bravo while revisiting `func_80030E90`, reproduced independently by
+the head on the pinned pipeline before being written down here. cc1 emits an
+indexed load followed by an unexpanded store-to-symbol macro of the loaded
+register (`lbu $3,0($2)` then `sb $3,G`). ASPSX 2.34 decides the load-delay
+hazard BEFORE expanding the macro and emits a `nop`; maspsx decides AFTER, sees
+the interposed `lui $at`, and suppresses it. maspsx says so in its own debug
+output (`Reuse of '$2'. 'lbu $2,0($2)' does not use $at`).
+
+**Retail census: 40 sites with the `nop`, 0 without** — the rule is universal in
+retail, not contextual. **0 of the 40 lie in a function written as C** (14 in
+linked Sony objects, which never pass through maspsx; 26 inside `INCLUDE_ASM`
+functions, whose retail bytes are used verbatim). That is exactly why the image
+is green today and why 62 rounds never hit it: the construct can only bite a
+function at the moment someone tries to write it in C, and every function that
+contains one is still disassembly. The green oracle is itself the proof of the
+"none in C" half of the census.
+
+It takes 7 queued functions off any honest assignable list: `func_8003149C`
+(11 sites — the most of any function in the image), `func_80030E90` (9),
+`func_8002FAC4` (2), and `func_80029F10` / `func_80031A44` / `func_80055258` /
+`func_80055410` (1 each). For `func_80030E90` it is a COMPLETE accounting of
+the residue: 11 words short = 9 nops + 2 words of guard polarity. No maspsx flag
+exists for it; the closest analogues, `--no-nop-mflo-mfhi` and `--addiu-at`, are
+both exactly this shape of one-boolean fix. maspsx HEAD `e3d5916`.
+
+**Nothing was changed for it.** No flag, no experiment, no edit to CLAUDE.md's
+"Open toolchain blockers" table — adjudicating a toolchain lead is a Fable task
+and the operator holds it. Round 26's attribution of these missing words to
+"GCC's delay-slot filler scheduling the store's own `lui` into the load-delay
+slot" is retracted by the reproducer: cc1 never emits that `lui` at all, so the
+residue is below cc1 and was never source-reachable. Four rounds were sent
+looking for a source trigger that cannot exist.
+
+### The revisit rule paid 3 for 3, and every time on step (a)
+
+Not on the fresh re-read — on rebuilding the inherited body and reading
+`funcdiff.py`'s `insertions / deletions` line BEFORE touching anything. Three
+measurements, two falsified verdicts:
+
+- `func_80030980`: round 50's "LENGTH-EXACT 324/324, register-identity cascade"
+  reproduces every FIGURE and is wrong in its CAUSE — **ins 101 / del 101**. A
+  register-identity residue is 0/0 by definition; equal word count is what 101
+  insertions balanced by 101 deletions produces. Improved to 315/324 on `u8 i`
+  plus `(a0 & 0xFF00) >> 8`. A screen that would have caught it four rounds
+  earlier: retail's frame is `-0x38` = 0x18 args + 0x20 saves = **zero spill
+  bytes**, so no seven-`volatile` body can be its shape — round 50's sweep made
+  it structurally worse.
+- `func_80031890`: **MATCHED** 73/73, ins 0/del 0, after four rounds filed under
+  HARD RULE 6 — which also needs 0/0, and the inherited body measured 4/4.
+- `func_80030E90`: title CONFIRMED, then re-classified as blocked above.
+
+### Levers and names
+
+- **Promoted idiom:** to learn a shape from a matched sibling, diff its compiled
+  OBJECT against your target's retail `.s`, never its C against your C. This
+  closed `func_80031890`: `func_80031280`'s compiled tail IS retail's tail,
+  instruction for instruction. Round 32 compared the same pair in C, found a
+  real `u32`/`u16` mask asymmetry, and missed that the sibling caches nothing.
+- **Promoted idiom:** the frame size bounds the spill budget and screens whole
+  source shapes before you build one (the `-0x38` reading above).
+- `code_179d8_m` is the **MIDI-driven 24-voice SPU sound driver** — settled by
+  `D_8006DAD4 == 0x1F801C00`, the real SPU hardware base, plus `code_179d8_k`'s
+  switch on MIDI status nibbles `0x90/0xB0/0xC0/0xE0`. `StartNote`/`StopNote`
+  are tier A on the velocity-branch symmetry across three sibling units.
+  `ApplyVoicePitchBend` gained a second independent evidence line at head
+  review: its callee `func_8002E038` is a note-to-pitch converter on its
+  arithmetic alone (`+0x3C` = MIDI middle C, `/12` semitones, 16 entries per
+  semitone, octave shift), so the bent value is a PITCH by the producer's maths.
+- Alpha deferred every global its unit shares with bravo's LIVE unit and
+  proposed them in reports instead. That is call-graph contention handled
+  correctly by a runner, unprompted; the head declined to apply them at merge
+  too, because the SPU cluster wants its own pass with no live runner in it.
+
+### Head corrections at merge
+
+- `Obj86B60__NotifyParents`'s promoted comment paraphrased HARD RULE 6 as
+  marking the function "unfixable from plain C". The rule bans the register-pin
+  FIX and calls the mismatch a stall; it does not certify a function unmatchable.
+  Left standing it would teach exactly the lesson this round falsified twice.
+- `func_8003149C`'s new toolchain note was placed ABOVE the `#` heading, which
+  made `nearmiss.py` print it as `[UNRANKABLE-TITLE]` and lose the function's
+  figures. Title restored with the blocked status folded in, note kept verbatim
+  below, and its stale `Unit code_179d8_j` line (pre-round-34 name) corrected.
+
+### For the next head
+
+`nearmiss.py` still lists `func_80030E90` and `func_8003149C` under `ASSIGN FROM
+HERE`, and truncates titles before the blocked status is visible. Until the
+escalation is resolved, do not staff either: they are arithmetically unreachable,
+not merely hard, and they read as well-characterised ordinary stalls. Recording a
+screen for that would be new procedure, so this paragraph is the mechanism.
+
+---
+
 ## 2026-09-20 — round 61: a parked track's revisit closes a two-round "register pressure" stall, and rename.py's global reach meets one-unit-per-runner
 
 **Three runners, three tracks, three merges, all green.** Head on Opus (no new
