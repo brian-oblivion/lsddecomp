@@ -75,6 +75,14 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
    headers, possibly two merges later); state explicitly in the summary any
    change to an EXISTING declaration.
 
+   **Call-graph contention is the other kind, and `headercontention.py`
+   prints it for the units you name.** A naming runner's `rename.py` rewrites
+   every caller tree-wide, including a matching runner's live unit and its
+   reports (round 61: three-file conflict). Never pair a naming runner with
+   any runner on a unit that references its definitions; if unavoidable, merge
+   the other runner first. The extern-review job touches many units and runs
+   alone or merges last.
+
    At merge time, expect two runners' views of one struct to be complementary
    and union them; unify a field that got two type names; then re-verify
    every match from both runners individually, not just the whole-image SHA1.
@@ -435,6 +443,11 @@ with the largest queue.
 > load-bearing: GCC 2.6.3 prints most fatal errors without the word `error`.
 > funcdiff exits 2 when it cannot trust its own number; read its warnings.
 > Your log path carries YOUR name; `/tmp` is shared.
+>
+> **Revisit?** If your brief says REVISIT, first rebuild the preserved body
+> exactly as the report gives it and record `funcdiff.py`'s `insertions /
+> deletions` line in the report before changing anything; a title claiming
+> register identity with nonzero ins/del is a wrong verdict, say so.
 >
 > **Searches.** One at a time. `timeout` on every search, exit status to its
 > own file (`rc.txt`), iteration count in every negative. Run Gate 3's three

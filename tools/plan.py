@@ -378,27 +378,17 @@ def collect(st):
     # small comes first.
     stall_rows = sorted(stall_rows, key=lambda r: stall_cost(r[2], r[3]) + (r[0],))
 
-    # track 1 revisit (revision 6). Two triggers, either suffices, one attempt
-    # each; the runner's REVISITED line retires it:
-    #   - the stall's unit has passed track 3 (revision 4's rule; its
-    #     hypothesis, that names/types unlock, is recorded per revisit);
-    #   - the stall's title is STALE: the highest round number its report
-    #     mentions is at least STALE_ROUNDS behind the current round. Rounds
-    #     55 and 57 both closed movement by re-reading an old title, and
-    #     neither used new names, so the fresh re-read is a trigger in itself.
-    current_round = max([r.get("round", 0) for r in st["tracks"]["1"]["rounds"]] + [0])
+    # track 1 revisit (revision 8): EVERY stall gets exactly one revisit, a
+    # fresh cost-ranked Opus re-read with the body rebuilt and funcdiff's
+    # ins/del line recorded. Revisions 4 and 6 gated it on "unit passed
+    # track 3" and then "title stale"; three consecutive revisits recorded
+    # names/types NOT relevant while paying 3 matches in 7 attempts against
+    # the calibration band's 1 in 13. The trigger was never what paid; the
+    # re-read was. The runner's REVISITED line retires a function.
     revisit = []
     for words, unit, func, title in stall_rows:
         rp = REPORTS / f"{func}.md"
-        if not rp.exists():
-            continue
-        txt = rp.read_text(errors="replace")
-        if "REVISITED" in txt:
-            continue
-        rounds = [int(x) for x in re.findall(r"[Rr]ound\s+(\d{1,3})\b", txt)]
-        last = max(rounds) if rounds else 0
-        stale = current_round - last >= STALE_ROUNDS
-        if unit in done or stale:
+        if rp.exists() and "REVISITED" not in rp.read_text(errors="replace"):
             revisit.append((words, unit, func, title))
     # A function eligible for a revisit is offered ONLY there, so the two
     # track-1 queues never hand the same function to two runners.
@@ -476,7 +466,6 @@ def nm_defined(unit):
 
 
 STALLS_PER_RUNNER = 3
-STALE_ROUNDS = 10
 
 
 def stall_runner_jobs(rows, model, label):
@@ -522,10 +511,8 @@ def jobs(d, n):
         if t["1"]["status"] == "open" else []
     if d.get("extern_conflicts"):
         q_naming.insert(0, ("3", f"extern review: {d['extern_conflicts']} function(s) whose extern "
-                                 "arity disagrees with the definition (python3 tools/externcheck.py). "
-                                 "Per function read the callee's asm; fix the EXTERN only, or annotate "
-                                 "`arity-ok:` when the callee reads a register the caller leaves loaded. "
-                                 "Never change a call site's arguments. Oracle green after each.",
+                                 "arity disagrees with the definition (python3 tools/externcheck.py; "
+                                 "prompt FINISHING-PLAN 4.5; touches many units, so it runs alone or merges last)",
                             "opus"))
     q_sdk = []
     if t["2"]["unnamed"]:
@@ -565,6 +552,8 @@ def print_status(d, n, st):
     print("  track  status     measured")
     t1 = t["1"]
     per = calibration_tally(st)
+    rv = [r for r in st["tracks"]["1"]["rounds"] if not r.get("calibration", True) and "REVISIT" in r.get("note", "").upper()]
+    rv_m, rv_a = sum(r.get("matches", 0) for r in rv), sum(r.get("attempts", 0) for r in rv)
     print(f"  1      {t1['status']:<10} stall matching: {t1['fresh']} fresh, {t1['stalled']} stalled; "
           f"{len(t1['rounds'])} round(s) recorded; calibration sonnet {per['sonnet'][0]}/{per['sonnet'][1]} "
           f"opus {per['opus'][0]}/{per['opus'][1]} (matches/attempts); "
@@ -572,7 +561,8 @@ def print_status(d, n, st):
     if t1["reason"]:
         print(f"                    {t1['reason']}")
     if t1["revisit"]:
-        print(f"                    {t1['revisit']} stall(s) eligible for a REVISIT (unit named, or title >= {STALE_ROUNDS} rounds old)")
+        print(f"                    {t1['revisit']} stall(s) awaiting their one REVISIT; revisit yield so far "
+              f"{rv_m}/{rv_a} (matches/attempts, from rounds recorded with REVISIT in the note)")
     print(f"  1b     {t['1b']['status']:<10} NON_MATCHING bodies: {t['1b']['nm_bodies']} in src, "
           f"{t['1b']['promotable']} stall(s) with a preserved body and none yet")
     print(f"  2      {t['2']['status']:<10} SDK call surface: {t['2']['named']} named, "

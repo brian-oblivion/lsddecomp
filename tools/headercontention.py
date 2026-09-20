@@ -68,6 +68,33 @@ def build_map():
     return {u: unit_headers(u) for u in srcpath.units()}
 
 
+DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.M)
+
+
+def call_contention(units):
+    """Pairs (A, B, [symbols]) where unit A DEFINES a function that unit B
+    references. A NAMING runner on A renames those symbols tree-wide through
+    rename.py, so B's file changes under whoever holds B (round 61: alpha's
+    renames touched bravo's live unit and two of its reports; a three-file
+    conflict). Headers cannot see this; the call graph can."""
+    import progress
+    texts = {}
+    for u in units:
+        p = srcpath.unit_src(u)
+        texts[u] = progress.strip_dead_code(p.read_text(errors="replace")) if p else ""
+    defs = {u: {d for d in DEF_RE.findall(t) if d not in ("if", "while", "for", "switch", "do", "return")}
+            for u, t in texts.items()}
+    out = []
+    for a in units:
+        for b in units:
+            if a == b:
+                continue
+            hits = sorted(d for d in defs[a] if re.search(rf"\b{re.escape(d)}\b", texts[b]))
+            if hits:
+                out.append((a, b, hits))
+    return out
+
+
 def print_full_map(hdrs):
     by_header = defaultdict(list)
     for unit, hs in hdrs.items():
@@ -157,6 +184,15 @@ def main(argv):
     hdrs = build_map()
     if argv:
         print_verdict(hdrs, argv)
+        cc = call_contention(argv)
+        if cc:
+            print("\nCALL-GRAPH contention (a rename in the first unit rewrites the second):")
+            for a, b, hits in cc:
+                print(f"  {a} -> {b}: {len(hits)} symbol(s): {', '.join(hits[:6])}{' ...' if len(hits) > 6 else ''}")
+            print("  Do not pair a NAMING runner on the first unit with any runner on the second in one\n"
+                  "  round; if unavoidable, merge the other runner FIRST, then the naming runner.")
+        else:
+            print("\nno call-graph contention among these units")
     else:
         print_full_map(hdrs)
     return 0

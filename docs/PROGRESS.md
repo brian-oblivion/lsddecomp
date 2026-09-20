@@ -1533,6 +1533,23 @@ parameter and forwarded it. The caller's reconstruction is the incomplete
 side; adding the forwarded parameter is byte-identical and belongs to the
 extern review job.
 
+**Revision 8 (2026-09-20, after rounds 59 to 61).** The revisit rule's
+stated hypothesis (a unit's new names unlock old stalls) recorded "not
+relevant" three revisits running while revisits paid 3 matches in 7 attempts
+against the band's 1 in 13: the trigger was never what paid, the fresh Opus
+re-read was. So every stall now gets exactly one revisit, cost-ranked, one
+runner per round, with the body rebuilt and funcdiff's ins/del recorded first
+(eight live titles claim register identity; a nonzero ins/del falsifies one).
+`plan.py` prints the running revisit yield; if it drops to the band's rate the
+operator decides. `rename.py`'s tree-wide reach is CALL-GRAPH contention that
+`headercontention.py` could not see and now prints for the units named; a
+naming runner is never paired with a runner on a unit that references its
+definitions. `FINISHING-PLAN` gains the §4.5 extern-review prompt (the job
+runs alone or merges last). Doc MAINTENANCE within existing rules (distilling
+to a budget) is the head's or a Sonnet's job, not Fable's; promoting idioms
+is never suppressed to protect a budget. `DECOMPILATION_LEARNINGS.md` is being
+distilled back under its budget in this session.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

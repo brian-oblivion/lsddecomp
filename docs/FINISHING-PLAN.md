@@ -19,10 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 7 (2026-09-19, after round 58: the make guard never fired in
-a worktree; Gate 3 check 3 had no real-build measurement; externcheck's
-guidance was wrong for the dead-argument idiom; the model table's
-"escalated" clause was read as a hand-off).
+Plan revision: 8 (2026-09-20, after rounds 59 to 61: revisits pay for a
+reason other than the stated one, so every stall gets one; rename.py's
+tree-wide reach is call-graph contention; an extern-review prompt; doc
+maintenance is not a Fable task).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -53,7 +53,7 @@ the SDK" is a goal. Done is all five of:
 
 | role | default | switch, and to what |
 | --- | --- | --- |
-| **head** | Opus | **Fable** only when the round itself will WRITE a new procedure, tool or doc, or must adjudicate a HARD RULE tension or a toolchain lead. Escalated gaps are NOT a reason for the next round's head to be Fable: the operator hands them to a Fable session BETWEEN rounds, which revises this plan and the tools, and the next round runs on Opus again. An Opus head executes what is written and escalates every gap in its report instead of writing procedure (round 50 onward). |
+| **head** | Opus | **Fable** only when the round itself will WRITE a new procedure or tool or change a RULE in a doc, or must adjudicate a HARD RULE tension or a toolchain lead. Escalated gaps are NOT a reason for the next round's head to be Fable: the operator hands them to a Fable session BETWEEN rounds, which revises this plan and the tools, and the next round runs on Opus again. An Opus head executes what is written and escalates every gap in its report instead of writing procedure (round 50 onward). MAINTAINING a doc within its existing rules (distilling entries to the archive to meet a budget, fixing a stale figure) is not a plan change: the head does it, or spawns a Sonnet for it, when `plan.py` warns. |
 | **matching runner** (tracks 1, revisit) | decided by calibration: `plan.py` says which | round A Sonnet, round B Opus, on comparably ranked stalls; thereafter whichever produced more matches per runner-session. The head may override with `plan.py set-model`, with a reason in PROGRESS.md. |
 | **naming runner** (track 3) | Opus | **Sonnet** once the head has reviewed two Opus-named units and found no wrong tier-A name. Back to Opus if a Sonnet unit fails review. |
 | **mechanical runner** (track 2 identification, track 1b promotion, report hygiene) | Sonnet | never higher |
@@ -125,17 +125,21 @@ MATCHED), in the same commit as the attempt. The head checks it at merge:
 every attempted function's report must no longer carry a marker. Rounds 49
 to 52 re-ranked the queue on markers nobody had retired.
 
-**Revisit rule.** A score taken before a unit's types and names existed is
-evidence about what was known then, not about the function (southpark round
-126: 4 of 4 warm bodies matched once their unit's types were derived). So
-after a unit passes track 3, each of its stalls becomes a REVISIT job exactly
-once. A second trigger, added after rounds 55 and 57 both moved a stall by
-re-reading an old title rather than by using new names: a stall whose report
-mentions no round within the last ten is eligible too. `plan.py` lists both
-kinds (a stall with no REVISITED line whose unit has passed, or whose title
-is stale). A revisit is one bounded attempt with the budget above; its report
-line says `REVISITED, round N: <outcome>; names/types <used | not relevant>`,
-so it is not listed again and the naming hypothesis keeps being measured.
+**Revisit rule.** Every stall gets exactly ONE revisit: a fresh Opus re-read
+in cost order, with the preserved body rebuilt first so `funcdiff.py`'s
+`insertions / deletions` line is recorded before anything else (a title that
+says "register identity" with a nonzero ins/del is a wrong verdict, and eight
+live titles say it). `plan.py` lists every stall whose report has no
+`REVISITED` line; the runner writes `REVISITED, round N: <outcome>;
+names/types <used | not relevant>` and that retires it. This is what remains
+of track 1 after the stop rule parks the band: one revisit runner per round
+until every stall has had its one. The rule was first written to test whether
+a unit's new names unlock old stalls, then gated on stale titles; three
+consecutive revisits recorded names as not relevant while the revisits paid
+3 matches in 7 attempts against the band's 1 in 13, so the trigger is gone and
+the re-read stays. `plan.py` prints the running revisit yield; if it falls to
+the band's rate over ten or more attempts, the operator decides whether the
+remaining revisits are worth their tokens.
 
 **Head at merge.** Verify per PARALLEL-RUNS.md §3.9, record the round, and
 correct any report whose cause the round falsified.
@@ -453,6 +457,23 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > candidate and score>` comment. One commit per function. Report a table:
 > function, name or unidentified, evidence, disc and module.
 
+### 4.5 Extern review prompt (track 3; Opus)
+
+> You are a review runner for the LSD: Dream Emulator decomp, round `<N>`,
+> worktree `<path>`, branch `runner/<name>`. Read CLAUDE.md and
+> `docs/FINISHING-PLAN.md` §3 track 3. Run `python3 tools/externcheck.py`. For
+> each function it lists: read the CALLEE's disassembly (or its matched C) and
+> decide which registers it actually reads. If an `extern` declares fewer or
+> more parameters than the callee reads, fix that `extern` line only, never a
+> call site's arguments. If the callee reads a register the caller leaves
+> loaded from its own arguments (the forwarding idiom), the CALLER's
+> reconstruction is the incomplete side: give it the forwarded parameter if
+> that is byte-identical, otherwise annotate the extern line with
+> `/* arity-ok: <why> */`. `./build-and-verify.sh` green after every edit;
+> `python3 tools/externcheck.py` clean when you finish. One commit per
+> function. This touches many units: it runs ALONE in its round or the head
+> merges it last. Report a table: function, what was wrong, what you did.
+
 ## 5. Doc hygiene
 
 The southpark sister project's plan, prompts and scripts grew past the point
@@ -465,7 +486,10 @@ this repo from following:
 - **No counts in docs.** Measure with `progress.py` and `plan.py`.
 - **Line budgets**, enforced by `plan.py` as warnings and by track 5 as a
   checklist item. Over budget means distil, and move the history to
-  `docs/archive/`.
+  `docs/archive/`. Promoting a round's idioms is never suppressed to protect
+  a budget; the head promotes, then distils (or spawns a Sonnet to) in the
+  same consolidation when the warning shows. Distillation is maintenance,
+  not a plan change.
 - **A new idiom is at most 12 lines in DECOMPILATION_LEARNINGS.md**, with
   its discriminator and its evidence in one clause each.
 - **One head prompt.** New kinds of work get a track section and a runner
