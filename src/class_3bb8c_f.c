@@ -1,6 +1,29 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
+/*
+ * class_3bb8c_f: `TaskObjF`, a `BasicClass` subclass. Two mostly
+ * independent halves share the object:
+ *
+ * - A direct memory-card file API (BuildMemcardPath,
+ *   TaskObjF__ReadMemcardFile/TryReadMemcardFile,
+ *   TaskObjF__WriteMemcardSaveFile/TryWriteMemcardSaveFile): opens BIOS
+ *   `bu00:`/`bu10:` paths directly to read save data and to write a save
+ *   file whose header is structurally exact to the standard PS1 memory-
+ *   card save format (magic, icon-frame count, block count, title, icon
+ *   palette, up to three icon frames).
+ * - A generic async-task skeleton (TaskObjF__Init/Deinit,
+ *   TaskObjF__AllocBuffers/FreeBuffers/FreeUnusedBuffers,
+ *   TaskObjF__Validate, TaskObjF__Notify, TaskObjF__func_8004F638/
+ *   func_8004F8A4) managing a 16-entry buffer pool and dispatching the
+ *   actual work through vtable slots a subclass outside this unit
+ *   implements -- what those two entry points DO is not established
+ *   here (see their own reports' Tier-C naming).
+ * - `TaskObjF::events[4]` is corroborated cross-unit: class_3bb8c_e.c's
+ *   func_8004E5E4 populates the identical +0x014 offset via OpenEvent()
+ *   and hands the same object to this unit's own TaskObjF__EnableEvents.
+ */
+
 /* Forward declarations: these are defined later in this file (strict
  * ROM-address order), but earlier functions call them.
  *
