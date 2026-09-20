@@ -444,4 +444,69 @@ void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80063144);
+extern u8 D_80089E08[];
+
+void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
+    s32 mod;
+    s32 mood;
+
+    if (this->moodTimer == 0 && (rand() & 1)) {
+        this->unk44 = rand() % 3;
+    }
+    if (this->unk44 != 0 && this->unkF4 != 0) {
+        if (out->unk4 >= 0x3D) {
+            out->unk4 = 0;
+        }
+        if (out->unk4 % 20 == 0) {
+            out->unk1C = 0x17;
+            out->unk10 = 0;
+            out->unk20 = -1;
+            out->unk44 = out->unk30 = 0x17;
+            out->unk34 = -1;
+            out->unk48 = -2;
+        } else if (out->unk4 % 20 == 0xE) {
+            out->unk1C = -2;
+            out->unk30 = -2;
+            out->unk44 = -2;
+        }
+        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        mood = this->unk44;
+        if (mood == 1) {
+            this->methods->slot48(this, 0, D_80089E08);
+            mod = -0x176;
+            if (this->methods->slot144(this, this->target) < 0x200) {
+                this->methods->deactivate(this);
+                this->unk44 = mood;
+            }
+        } else {
+            this->target->methods->slot130(this->target, 1);
+            Class6B5CC__FaceTarget((Entity *)this->target, this, 1, 1, 0);
+            if (this->unk44 == 2) {
+                if (this->methods->slot144(this, this->target) < 0x960) {
+                    this->unk44 = 0xB;
+                    this->methods->notifyParents(this, 0xC);
+                }
+                mod = -0x60;
+            } else {
+                mod = 0;
+            }
+        }
+    } else {
+        out->unk10 = this->methods->getProximityRatio(this);
+        if (out->unk4 % 22 == 0) {
+            out->unk1C = 0x1C;
+        }
+        if (this->moodTimer >= 0x1F5) {
+            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        }
+        if (this->methods->slot144(this, this->target) < 0x800) {
+            this->target->methods->slotC4(this->target, -0x800, 0);
+        }
+        mod = -0x14;
+    }
+    this->methods->slotD0(this, mod, 1);
+    if (this->unk28 != 0) {
+        this->methods->slotCC(this, -0xC8, 0);
+    }
+}
+
