@@ -33,3 +33,12 @@ See `TaskObjF__ForEachEvent`'s report for `func_800390F4` and the `TaskObjF` cla
 context (this function itself does not touch `TaskObjF` — its `arr`
 parameter is a plain `s32*`, happens to be fed `TaskObjF::field14` by its
 only caller in this unit).
+
+## Naming (round 60, track 3)
+
+`func_8004F4C8` -> `FindFirstReadyEvent`. **Tier A.** Free function
+(operates on a caller-supplied `s32 *arr`, not a `self`): forever-scans
+up to `count` entries with `TestEvent`, returning `D_80086E78[i]` for the
+first ready one, re-scanning the whole array from the top if none
+qualify yet. Mechanics and purpose (find which event fired) both
+directly evident from the body.

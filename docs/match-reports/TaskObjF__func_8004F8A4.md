@@ -387,3 +387,13 @@ residue, unwrapping the guard to place the early return textually
 adjacent to the tested call made things WORSE here (regressed to 23/77),
 so this one still needs a genuinely new lever, not a variant of either
 lever already tried.
+
+## Naming (round 60, track 3)
+
+`func_8004F8A4` -> `TaskObjF__func_8004F8A4`. **Tier C placeholder**, same
+reasoning as `TaskObjF__func_8004F638`: class established, concrete
+operation not. This one sets `self->opMode = 2` and dispatches through
+`slot54`/`slot60`/`slot7C`, all implemented by a subclass outside this
+unit. STALL; preserved body unchanged by this naming pass beyond the
+field renames (`unk24`/`unk28` -> `opMode`/`statusCode`) already applied
+project-wide to `TaskObjF`.

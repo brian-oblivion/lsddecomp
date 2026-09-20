@@ -46,3 +46,13 @@ derivation; `5` or `6` depending on `self->unk24 == 1`), dispatches
 
 See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class this function's
 `self` belongs to.
+
+## Naming (round 60, track 3)
+
+`func_8004F9D8` -> `TaskObjF__Validate`. **Tier B.** Its own report
+already calls it "a validation gate": calls three vtable slots
+(`slot44`/`slot4C`/`slot48`), decides an ok/error `statusCode`, and
+dispatches through `slot7C` on failure. Mechanics are clear; what the
+three slots' own implementations actually validate (owned by a subclass
+outside this unit) is not established here, so the name describes the
+gate itself rather than what it checks.

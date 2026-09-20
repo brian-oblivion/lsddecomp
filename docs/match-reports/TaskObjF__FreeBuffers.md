@@ -12,3 +12,11 @@ itself, and clears `self->unk38` to 0.
 Matched on first transcription; `self->unk2C` is re-read fresh each loop
 iteration (`for (i = 0; i < self->unk2C; i++)`, no local cache), matching
 retail's own repeated `lw` of that field.
+
+## Naming (round 60, track 3)
+
+`func_8004F810` -> `TaskObjF__FreeBuffers`. **Tier A.** The mirror
+teardown of `TaskObjF__AllocBuffers`: if `self->bufArray` is allocated,
+frees `self->scratchBuf`, frees every `self->bufArray[i]` for `i` in
+`[0, self->bufCount)`, frees `self->bufArray` itself, and clears it to 0
+-- a full teardown, unlike `TaskObjF__FreeUnusedBuffers`'s partial trim.

@@ -76,3 +76,13 @@ the only spelling, and it is the same idiom this unit already uses for
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to both copies, `src/class_3bb8c_e.c:89` and `:383`. Oracle green.
+
+## Naming (round 60, track 3)
+
+`func_8004F32C` -> `BuildMemcardPath`. **Tier A.** Free function (first
+parameter is a `dest` buffer, not a `self` of any established class, so
+named `VerbNoun` per convention rather than `Class__Method`). Mechanics
+and purpose both evident from the body alone: copies the BIOS `bu10:`/
+`bu00:` device-name template selected by `selector` into `dest`, appends
+`suffix`, and returns `dest` -- the whole point of the function is
+building a memory-card path string.

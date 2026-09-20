@@ -21,3 +21,19 @@ code)`.
 Matched on first structurally-faithful transcription (explicit `if/else`
 for the two-way error-code choice, matching retail's own delay-slot-filled
 branch shape without needing any manual reshaping).
+
+## Naming (round 60, track 3)
+
+`func_8004F638` -> `TaskObjF__func_8004F638`. **Tier C placeholder.** The
+CLASS is established (`TaskObjF`, per `TaskObjF__ForEachEvent`'s report),
+so bare `func_8004F638` would be a regression under FINISHING-PLAN track
+3's convention -- but the function's own concrete purpose is NOT
+established: it sets `self->opMode = 1`, gates on `TaskObjF__Validate`,
+tears down and reallocates the buffer pool, then dispatches
+`self->methods->slot5C(...)`, a vtable slot whose actual implementation
+lives in a subclass outside this unit (not carved/named here). Naming it
+e.g. "StartWrite" or "Submit" would assert a purpose no evidence in this
+unit actually supports -- `self->opMode`'s two values (1 here, 2 in
+`TaskObjF__func_8004F8A4`) distinguish *some* two operations, but which
+is which is not derivable from this unit alone. Left as the documented
+tier-C form rather than guessing.

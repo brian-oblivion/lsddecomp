@@ -216,3 +216,15 @@ round closed one of three instances that class currently claims and the
 mechanism that closed it does not generalize to the other two (both
 re-verified inert to declaration-order changes this same round, and
 neither has an obvious narrow-masked parameter to retype).
+
+## Naming (round 60, track 3)
+
+`func_8004EEA0` -> `TaskObjF__WriteMemcardSaveFile`. **Tier A.** A
+bounded (11-attempt) retry wrapper around
+`TaskObjF__TryWriteMemcardSaveFile` (see that function's own report for
+why "SaveFile": the 0x200-byte buffer it submits is structurally exact
+to the documented PS1 memory-card save file header format), bracketed by
+a `func_800507F8(handle, ...)` registry mark/unmark call (mark before
+the retry loop, unmark only if every attempt failed). The registry call
+itself is a different unit's own helper (`src/class_3bb8c_g.c`) and its
+exact purpose is not re-derived here.

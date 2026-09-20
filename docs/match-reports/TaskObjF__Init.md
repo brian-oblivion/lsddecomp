@@ -19,3 +19,16 @@ in place — no register or ordering lever needed.
 
 `TaskObjF__Deinit` (this unit, matched separately) is this function's mirror:
 it unregisters the same two children via `removeChild`.
+
+## Naming (round 60, track 3)
+
+`func_8004F55C` -> `TaskObjF__Init`. **Tier B.** Mechanics clear: stores
+two context values, resets the buffer-pool pointer and status/mode
+fields to a fresh state, and registers two children via the inherited
+`BasicClass::addChild` slot. Kept generic ("Init", not e.g. "AttachChildren")
+because the two children's own purpose is not established here -- and,
+per this function's own report, `self->unk60`/`unk64` (the fields
+`TaskObjF__Deinit` later removes as children) are never written inside
+this function at all, so whatever the real "child" relationship is, it
+is set up by a caller outside this unit, not fully visible from
+`TaskObjF__Init` alone.

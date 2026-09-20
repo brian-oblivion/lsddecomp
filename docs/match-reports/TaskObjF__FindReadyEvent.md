@@ -8,3 +8,9 @@
 4); }` — a one-line forward to `FindFirstReadyEvent` (see its report), passing
 `TaskObjF::field14` (the same 4-word array `TaskObjF__ForEachEvent` walks) as a
 plain `s32*`. Matched on first transcription.
+
+## Naming (round 60, track 3)
+
+`func_8004F4A4` -> `TaskObjF__FindReadyEvent`. **Tier A.** A one-line
+forward to `FindFirstReadyEvent(self->events, 4)` -- finds which of this
+object's 4 events is ready (per `TestEvent`). Name mirrors the callee.

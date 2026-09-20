@@ -87,3 +87,12 @@ longer needed for anything else. Worth a general callout for future
 `self`-shaped loops in this codebase: check whether the "base" register
 is ever used for a SECOND purpose after the loop before concluding it's a
 raw array of small structs.
+
+## Naming (round 60, track 3)
+
+`func_8004F40C` -> `TaskObjF__ForEachEvent`. **Tier A.** The shared
+generic helper `TaskObjF__EnableEvents`/`DisableEvents`/`TestEvents` all
+forward into: optionally brackets a critical section, then calls
+`callback` on each of `self->events[4]` in turn, stopping at the first
+zero return. Mechanics and role (a for-each over this object's own event
+array) both directly evident from the body and its three callers.

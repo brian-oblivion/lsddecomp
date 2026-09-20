@@ -64,3 +64,15 @@ registers) — matched, needing two levers.
   sites' own register usage).
 
 See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class context.
+
+## Naming (round 60, track 3)
+
+`func_8004EDC0` -> `TaskObjF__TryReadMemcardFile`. **Tier A.** Single
+attempt (see `TaskObjF__ReadMemcardFile`'s own retry wrapper, hence the
+"Try" prefix -- this project's existing convention for a function a
+caller retries, `Class6B5CC__TryAttachNearby` in `src/code_d294_b.c`).
+Builds a memory-card path via `BuildMemcardPath` (`self->cardSlot`
+selects `bu00:`/`bu10:`), opens it, reads an 0x80-byte header, computes a
+seek offset from the header's own byte 2, seeks, reads the caller's
+payload, closes. Mechanics and purpose both directly evident from the
+body.

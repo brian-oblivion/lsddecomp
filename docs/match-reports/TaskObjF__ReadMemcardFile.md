@@ -38,3 +38,11 @@ untouched through to the function's own `return`.
 
 See `TaskObjF__TryReadMemcardFile`'s report for the callee's own signature and the
 `TaskObjF` class context (`TaskObjF__ForEachEvent`'s report).
+
+## Naming (round 60, track 3)
+
+`func_8004ED40` -> `TaskObjF__ReadMemcardFile`. **Tier A.** A bounded
+(11-attempt) retry wrapper around `TaskObjF__TryReadMemcardFile`, stopping
+early on the first success -- both the retry mechanics and the purpose
+(read a memory-card file, tolerating transient failures) are evident from
+the body plus the callee's own established behaviour.

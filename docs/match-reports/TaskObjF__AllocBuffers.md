@@ -14,3 +14,11 @@ it as a sentinel/terminator slot.
 
 Matched on first transcription. See `TaskObjF__FreeBuffers`'s report for the
 mirror teardown and `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class.
+
+## Naming (round 60, track 3)
+
+`func_8004F704` -> `TaskObjF__AllocBuffers`. **Tier A.** Mechanics fully
+evident from the body: if `self->bufArray` is unallocated, allocates it
+(16 entries), fills the first 15 with individually-allocated 0x41-byte
+buffers, and allocates `self->scratchBuf` (a single 0x40-byte buffer).
+Mirror of `TaskObjF__FreeBuffers`.

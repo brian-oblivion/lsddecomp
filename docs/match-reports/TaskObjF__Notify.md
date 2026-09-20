@@ -55,3 +55,14 @@ arg1, arg2)`) depending on the tag, masked two different ways.
 
 See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class and the
 `BasicMethods866E8F`/`Get_vtable_BasicClass` local view.
+
+## Naming (round 60, track 3)
+
+`func_8004FB04` -> `TaskObjF__Notify`. **Tier A.** Forwards `(self, arg1,
+arg2)` to the inherited `BasicClass` notify slot
+(`Get_vtable_BasicClass()->slot38`, the project's own established
+"notify every parent" mechanism, `include/code_8220.h`), then reads a
+type tag out of `arg1` and dispatches one of this class's own four
+vtable slots (+0x088/+0x098/+0x0A4/+0x0B0) accordingly -- a message
+dispatcher, directly evident from the body and the established
+`BasicClass` precedent.

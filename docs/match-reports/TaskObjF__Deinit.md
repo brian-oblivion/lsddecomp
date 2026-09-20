@@ -18,3 +18,11 @@ their numeric/offset order); retail stores `unk6C` first. Simply matching
 retail's own store order (`unk6C = 0; unk68 = 0;`) fixed the last 2/23
 words with no other change — a pure statement-order residue, not a
 register or type issue.
+
+## Naming (round 60, track 3)
+
+`func_8004F5DC` -> `TaskObjF__Deinit`. **Tier B.** The mirror teardown of
+`TaskObjF__Init` (see that report): clears two fields and unregisters two
+children via the inherited `BasicClass::removeChild` slot. Same caveat as
+`TaskObjF__Init`: the children's own purpose is not established from
+this unit alone.

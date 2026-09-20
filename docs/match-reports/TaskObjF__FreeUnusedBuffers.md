@@ -16,3 +16,12 @@ Matched on first transcription — a plain `for (i = self->unk2C; i < 15;
 i++) { self->unk38[i] = func_80017CFC(self->unk38[i]); } self->unk38[i] =
 0;` reproduces retail's per-iteration reload of `self->unk38` (not cached
 in a local) exactly.
+
+## Naming (round 60, track 3)
+
+`func_8004F784` -> `TaskObjF__FreeUnusedBuffers`. **Tier A.** Frees
+`self->bufArray[i]` for `i` from `self->bufCount` up to (not including)
+15 and null-terminates the array there -- i.e. releases only the entries
+BEYOND how many buffers a just-finished operation actually used, keeping
+the used ones (`[0, bufCount)`) allocated. Distinguished from
+`TaskObjF__FreeBuffers` (full teardown) by name.

@@ -9,3 +9,11 @@ func_80038F6C, 1); }` — a one-line forward to `TaskObjF__ForEachEvent` (see it
 report for the `TaskObjF` class and the callback/array shape). No
 independent lever; matched on first transcription once `TaskObjF__ForEachEvent`'s
 own signature was established.
+
+## Naming (round 60, track 3)
+
+`func_8004F394` -> `TaskObjF__EnableEvents`. **Tier A.** A one-line
+forward to `TaskObjF__ForEachEvent(self, EnableEvent, 1)` -- Sony's own
+`EnableEvent` (linked, libapi/a12) applied across all 4 of this object's
+events with the critical-section bracket engaged. Name mirrors the
+callee directly.
