@@ -294,7 +294,7 @@ extern s32 D_8008AC88;
 extern void *D_8008E0C8[];
 extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
 extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);
-extern void *func_80054FD8(void *arg0, void *arg1);
+extern void **func_80054FD8(void **arg0, void *arg1);
 extern void *func_8005511C(void *arg0, void *arg1);
 
 void func_80054B84(void *arg0) {
@@ -475,11 +475,19 @@ extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
 extern u8 D_8008721C[];
 
-/* STALL, 38/81 words, length matches (no drift) -- see
- * docs/match-reports/func_80054FD8.md. Preserved near-miss body: */
+/* STALL, 78/81 words, length EXACT (no drift), first real diff at word 69
+ * (0x458EC / vram 0x800550EC) -- see docs/match-reports/func_80054FD8.md.
+ * Round 61 REVISIT: 38/81 -> 78/81. Round 47's "pure arg0/arg1 register-
+ * colour swap, ZERO drift" verdict was wrong on both counts; the equal
+ * length was two defects cancelling. Residue is now ONE instruction's
+ * placement: the `*q = D_80087174` store must sink below `lw a2` and
+ * `move a3` into the jal's delay slot, and cannot because a store through
+ * a pointer is an opaque MEM that gcc 2.6.3's scheduler will not let the
+ * gp-relative load hoist across. Preserved near-miss body: */
 #if 0
-void *func_80054FD8(void *arg0, void *arg1) {
-    s32 idx;
+void **func_80054FD8(void **arg0, void *arg1) {
+    s32 *p;
+    u8 **q;
 
     func_80055258(arg1, (void *) D_80087330);
     if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
@@ -488,18 +496,20 @@ void *func_80054FD8(void *arg0, void *arg1) {
         D_8008E0AC = 0;
         D_8008E0C0[0] = (s32) (D_8008721C + 3);
     } else {
-        if (D_8008E0AC > 0) {
-            D_8008E0AC = -D_8008E0AC;
+        p = &D_8008E0AC;
+        if (*p > 0) {
+            *p = -*p;
         }
-        if (D_8008E0AC < -0x7800) {
-            D_8008E0AC = -0x7800;
+        if (*p < -0x7800) {
+            *p = -0x7800;
         }
-        idx = (u32) rand() % 3;
-        D_8008E0C0[0] = (s32) (D_8008721C + idx * 3);
+        D_8008E0C0[0] = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
     }
-    D_8008E0B0 = D_80087174;
-    *(void **) arg0 = func_80056320((void *) 3, (u8 *) &D_8008E0B0 - 0xC, (void *) D_8008AB4C, arg1);
-    return (u8 *) arg0 + 4;
+    q = &D_8008E0B0;
+    *q = D_80087174;
+    *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+    arg0++;
+    return arg0;
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054FD8);
