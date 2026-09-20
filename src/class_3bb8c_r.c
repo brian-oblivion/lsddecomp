@@ -435,7 +435,7 @@ void func_800564A4(Obj876FC *self, Block24 *src) {
     self->unk24 = 0;
 }
 
-extern void func_80056640(Obj876FC *self);
+extern void func_80056640(Obj876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but func_800564F4 passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
 
 void func_800564F4(Obj876FC *self) {
     self->unk24 = self->unk24 + 1;
