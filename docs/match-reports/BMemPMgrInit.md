@@ -111,3 +111,31 @@ returns the just-nulled pointer.
 
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve, first
 function).
+
+## Extern arity (round 59)
+
+**Verdict: arity-ok idiom.** `src/main.c`'s unprototyped declaration stays.
+
+**Callee evidence** (`0x80017A20`): the body does `move s1,a0` and never touches
+`$a1` on any path — the definition in `src/code_8220.c`
+(`void *BMemPMgrInit(s32 poolSize)`) is right, one argument.
+
+**Why the extern must keep saying nothing.** `func_800118DC` (src/main.c) calls
+it as `BMemPMgrInit(0x166C00, 0)`, and that second argument is *byte-load-bearing*:
+retail emits it.
+
+```
+800118f4:  lui   a0,0x16
+800118f8:  ori   a0,a0,0x6c00
+800118fc:  jal   80017a20 <BMemPMgrInit>
+80011900:  move  a1,zero          <- the dead 2nd argument, in retail
+```
+
+Replacing `extern void *BMemPMgrInit();` with the real one-parameter prototype
+would make that call a `too many arguments` compile error, and dropping the
+argument from the call site would delete `move a1,zero` and break the match.
+The unprototyped form is the only spelling that reproduces retail, and it is
+the same idiom `include/code_8220.h` uses for `func_80017B34`/`func_80017CFC`.
+
+**Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
+added to `src/main.c:24`. Oracle green after the edit.

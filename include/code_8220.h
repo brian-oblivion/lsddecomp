@@ -125,8 +125,8 @@ struct BMemPMgr {
  * unspecified-parameter declaration here does the same for everything
  * before the definition. Do not "fix" this back to a full prototype --
  * that reintroduces the conflict this was written to route around. */
-extern void *func_80017B34();
-extern void *func_80017CFC();
+extern void *func_80017B34(); /* arity-ok: re-measured round 59 -- the body really does read $a1 -- `move s1,a1` at 0x80017B40, consumed as `move t0,s1` at 0x80017B68 only when the gp default pool is unset. The ~22 one-parameter declarations elsewhere are right about THEIR call sites (retail emits $a0 only, e.g. `move a0,s2` at 0x80026B74); this unprototyped pair is required by the K&R definitions in code_8220.c. */
+extern void *func_80017CFC(); /* arity-ok: re-measured round 59, same -- `move s1,a1` at 0x80017D0C, consumed as `move t0,s1` at 0x80017D2C on the unset-default-pool path. */
 
 /* BMemPMgr setup, gp_rel-blocked (docs/research/gp-relative-blocker.md).
  * Called only by BMemPMgrInit in this unit. Genuinely ONE argument: its

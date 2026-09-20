@@ -182,3 +182,34 @@ All four are tier C: the CALL SITES are fully derived, but every one of
 these slots is null at `D_8006D430`'s own level, so nothing here confirms
 what an overriding subclass's implementation actually does. Posted to the
 broadcast.
+
+## Extern arity (round 59)
+
+**Verdict: arity-ok idiom.** `src/code_179d8_s.c`'s `(void)` declaration stays.
+
+**Callee evidence** (`0x80026B08`, and the matched definition in
+`src/code_171e0.c`): the body reads BOTH argument registers before writing
+them — `move s0,a0` at entry, and `$a1` is still the incoming `arg1` when it is
+forwarded to `this->methods->configureBuffer(this, arg1, 1, 0)` at `0x80026B48`
+(only `$a2`/`$a3` are re-set there, with `li a2,0x1` / `move a3,zero`). Two
+real arguments.
+
+**Why the `(void)` extern is right anyway.** The one caller,
+`func_80027800` (this unit, matched), passes nothing at all:
+
+```
+8002780c:  move  s0,a0          <- its own self, only spilled
+80027814:  move  s1,a1          <- its own arg1, only spilled
+80027834:  jal   80026b08 <Class6D430__AllocBuffer>
+80027838:  nop                  <- no argument setup, in retail
+```
+
+`$a0` and `$a1` still hold `func_80027800`'s own incoming arguments, which the
+callee then consumes. This is the textbook dead-argument idiom: byte-exact
+either way, and writing the two arguments out at the call site would change
+nothing *only* if the values happened to match — they do here by accident of
+register allocation, which is precisely why the declaration must not be
+"corrected" to two parameters and the call site must not grow arguments.
+
+**Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
+added to `src/code_179d8_s.c:273`. Oracle green.

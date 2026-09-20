@@ -96,7 +96,15 @@ typedef struct {
 } BaseCtorTable6D4E8;
 
 extern void *func_80017B34(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
-extern BaseCtorTable6D4E8 *GetClass6D430Methods(void *self); /* still INCLUDE_ASM in the code_179d8 remainder */
+/* ROUND 59 (extern review): parameter list only, return type untouched. This
+ * is NOT still INCLUDE_ASM -- it is defined in src/code_171e0.c as
+ * `void *GetClass6D430Methods(void)`, and the callee at 0x80026C9C is
+ * lui/addiu/jr reading no argument register. Measured before changing it:
+ * func_80027228's `jal 80026c9c` (0x80027234) carries `move s0,a0` in the
+ * delay slot -- a callee-save spill, not argument setup -- so the `self`
+ * passed below costs zero bytes and the one-parameter prototype was simply
+ * false. Unspecified parameters keep func_80027228's call site untouched. */
+extern BaseCtorTable6D4E8 *GetClass6D430Methods();
 extern Obj6D4E8Methods *GetClass6D4E8Methods(void);        /* still INCLUDE_ASM in the code_179d8 remainder;
                                                        returns this class's own table, &D_8006D4E8 */
 extern void InitCdDrive(void);                    /* still INCLUDE_ASM in the code_179d8 remainder;

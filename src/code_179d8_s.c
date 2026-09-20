@@ -270,7 +270,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     return 0;
 }
 
-extern void Class6D430__AllocBuffer(void);
+extern void Class6D430__AllocBuffer(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but func_80027800 passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
 extern void *gCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own

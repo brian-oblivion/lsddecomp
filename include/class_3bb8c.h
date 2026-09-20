@@ -614,7 +614,7 @@ extern QueryTemplate866E8 D_8008E98C;
  * raw disassembly (`$a1`/`$a2` both `sp+0x54`), not a transcription
  * shortcut. */
 extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
-extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2);
+extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
 /*
  * Opaque target of Obj866E8::unk1DC (func_8004CFB0 stores it raw;
@@ -949,7 +949,15 @@ struct BaseCtorTableB_3bb8c_c {
     void (*slot9C)(void *self, void *arg1, s32 arg2); /* +0x09C */
 };
 
-extern BaseCtorTableB_3bb8c_c *GetClass6B5CCMethods(void *self);
+/* ROUND 59 (extern review): parameter list only, return type untouched.
+ * Measured first -- func_8004D3DC's `jal 8001e57c` (0x8004D3E8) carries
+ * `move s0,a0` in the delay slot, a callee-save spill and not argument setup,
+ * so the `self` this unit passes costs zero bytes. The definition
+ * (src/code_d294_b.c:736) is `(void)` and the callee at 0x8001E57C reads no
+ * argument register at all, so the one-parameter prototype was simply false.
+ * Unspecified parameters is what round 9's own "no prototype in scope" reading
+ * means, and it keeps class_3bb8c_c.c's call sites exactly as they are. */
+extern BaseCtorTableB_3bb8c_c *GetClass6B5CCMethods();
 
 /*
  * Generic class-instance shape used only to read another object's own

@@ -216,7 +216,7 @@ INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DCD0);
  * receives. Same independent-arities situation already documented for
  * Get_vtable_TaskCore/BaseTaskCtorTable_3bb8c_c: this unit's own local view
  * matches what THIS call site needs. */
-extern void func_8004D678(void *arg0, void *arg1, void *arg2);
+extern void func_8004D678(void *arg0, void *arg1, void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 
 void func_8004DE08(Class86B60 *self)
 {

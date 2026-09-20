@@ -86,7 +86,7 @@ struct Node3bb8cE {
  * call sites disagree on arity -- same idiom already established for
  * strcpy/strcat in include/psyq/STRINGS.H -- rather than forcing one
  * prototype to fit every call site. */
-extern void *func_8004F32C();
+extern void *func_8004F32C(); /* arity-ok: definition is 3-parameter and the callee reads $a2 (`suffix`), but this unit's two call sites disagree on arity and BOTH are byte-load-bearing -- func_8004EA38 emits no $a2 at all (0x8004EA58) while func_8004ECCC emits `lui a2`/`addiu a2` (0x8004ECE8) */
 extern void func_8004F394(void *self);
 extern void *func_8004F3BC(void *self);
 extern void func_8004F3E4(void *self);
@@ -380,7 +380,7 @@ s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
     return result;
 }
 
-extern void *func_8004F32C();
+extern void *func_8004F32C(); /* arity-ok: second copy of the declaration above, same reason -- the 2-argument call at func_8004EA38 and the 3-argument call at func_8004ECCC cannot share one prototype */
 extern s32 open(void *arg0, s32 arg1);
 extern s32 read(s32 arg0, void *arg1, s32 arg2);
 extern s32 close(s32 arg0);

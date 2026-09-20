@@ -179,7 +179,19 @@ void func_8004A7C0(Class866E8 *self)
  * and is equally byte-exact. Retail's source called one zero-argument getter
  * with different argument counts from different files, which is what C89 does
  * with no prototype in scope. Do not reconcile the two declarations. */
-extern void *GetClass6B5CCMethods(Class866E8 *self, s32 arg1);
+/* ROUND 59 (extern review), refining the paragraph above rather than
+ * overturning it. Round 9's own conclusion is "no prototype in scope", and
+ * the faithful spelling of that is an UNSPECIFIED parameter list, not a
+ * fabricated two-parameter prototype -- which is what the line below now is.
+ * Measured before changing it: the two arguments this unit passes cost ZERO
+ * bytes. Retail's `jal 8001e57c` in func_8004A984 (0x8004A9A0) and
+ * func_8004AA6C (0x8004AA88) both carry `move s2,a2` in the delay slot -- a
+ * callee-save spill, NOT argument setup -- and $a0/$a1 still hold each
+ * caller's own incoming arguments. So unlike the other round-59 findings,
+ * nothing here is byte-load-bearing, and the arity claim was simply false
+ * against the definition (src/code_d294_b.c:736, `(void)`). The call sites
+ * below are UNCHANGED; only this declaration is. */
+extern void *GetClass6B5CCMethods();
 
 void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
 {
