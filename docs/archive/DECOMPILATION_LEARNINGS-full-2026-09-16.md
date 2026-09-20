@@ -8428,3 +8428,199 @@ Third consecutive round in which a correction travelled UPWARD from a
 cheap-model runner (round 47: a family-wide scaffold claim narrowed, and a
 zero-ness rule narrowed; round 48: provenance corrections). The channel is doing
 the job it was built for; read the replies as evidence, not as compliance.
+
+## Distilled out on 2026-09-20
+
+`docs/DECOMPILATION_LEARNINGS.md` was cut from 893 to 779 lines against the
+800-line budget `tools/plan.py` enforces. No rule was dropped. The facts,
+worked examples and counter-examples removed from individual entries are kept
+here, under the heading of the entry they came from.
+
+**1. Toolchain facts**
+
+- INLINE.H / macro inertness: the way to prove a macro EXPANDED is to read the
+  preprocessed output.
+- Class framework: null method-table slots exist, alongside the 4-byte entries
+  and the 128 flat tables.
+
+**2. Build hygiene, `make extract` after merging**
+
+- The bogus window `67808/67808 words match` on an 82-word function had only
+  the START of the window wrong, which is what made it readable as a match.
+
+**2. Build hygiene, sizing from a `.s`**
+
+- The same tooling defect produced the `uncarved.py` over-count and was found
+  again in the "14 stalled functions were Sony library code" pass.
+
+**2. Build hygiene, an inherited body fails THREE ways**
+
+- Splicing a body in from another checkout also drops its `#include`s, and the
+  resulting parse error reads as a MATCH (the stale build then reported
+  fourteen fictional matches).
+
+**2. Build hygiene, one preserved body in six**
+
+- A body calling a nonexistent symbol never linked in the first place.
+- A self-consistent prose reading of a residue survives indefinitely, because
+  nothing in the loop re-checks prose.
+- The body listed in a report and the body banked in `src/` drift apart
+  silently.
+
+**2. Build hygiene, prototype placement**
+
+- Round 15 hit the shared-header collision four times; the worst instance
+  stayed latent through two merges.
+
+**3a. Control flow, FALLTHROUGH last in source order**
+
+- `func_8005CBC8` closed 100/100 only after ~77k permuter iterations had been
+  spent on the wrong axis.
+
+**3a. Control flow, guard POSITION not POLARITY**
+
+- Round 19 measured that flipping the polarity changed nothing, which is what
+  closed the polarity axis; the same position shape also moved the inner
+  `return -1`.
+
+**3a. Control flow, not strictly dominant**
+
+- The mechanical screen built for this lever flagged 51 functions and its one
+  tested hit was false.
+
+**3a. Control flow, shared `return` block**
+
+- The second early exit can also be tail-duplicated by GCC, in which case the
+  defect presents as SIZE drift rather than as a placement diff.
+
+**3a. Control flow, `if`/`else` is mechanical**
+
+- The longer-arm-falls-through rule was applied 5 times in one unit, and the
+  choice is made by writing `if`/`else if` versus a nested `if`.
+
+**3a. Control flow, loop optimisations are SYNTAX-GATED**
+
+- Round 54's two CFG shapes on `func_80028920`: one regressed to 3/43 with
+  drift, the other left the local-stack-address CSE fully intact and only
+  relocated the register rotation. There is no known C89 lever for the
+  local-stack case.
+
+**3c. Struct layout, type-scoped field rename**
+
+- Round 54's four stale accessors were in `src/code_d294_c.c` and
+  `src/code_d294_b.c`, left behind after the compiler had declared the rename
+  complete.
+
+**3c. Struct layout, declare a narrow value wide**
+
+- Also confirmed in round 27 on a byte value reused across comparisons.
+
+**3c. Struct layout, settle a claim CORPUS-WIDE**
+
+- The data-modelling hypothesis was settled by two greps over the data section
+  after eleven builds had failed to settle it.
+
+**3c. Struct layout, ternary index versus field reference**
+
+- This retires round 44's dead end, "correct NULL fallback and un-folded base
+  could not be obtained simultaneously".
+
+**3d. Locals, what a value is NAMED**
+
+- Dropping a name and recomputing inline is itself a lever, and it applies
+  where retail recomputes the value per path.
+
+**3d. Locals, a same-size pointer cast**
+
+- A local reused across two MUTUALLY EXCLUSIVE branches still perturbs
+  allocation in the branch you did not touch.
+- Two identical global reads with non-overlapping live ranges can want
+  DIFFERENT registers.
+
+**3d. Locals, cache a re-read struct field**
+
+- An intervening whole-struct assignment defeats the CSE (see the BLKmode
+  entry in 3j, which supplies the mechanism).
+
+**3d. Locals, two near-misses closed by DELETING a named value**
+
+- Splitting a table address into two live locals helps ONLY when starting from
+  an unnamed global folded into one line.
+- Splitting a combined expression so the STATEMENT count matches retail's
+  INSTRUCTION count is a lever in its own right.
+
+**3d. Locals, the "mention a value twice" lever**
+
+- Round 53's negative instance in full: `self` on `func_8004CAF0` is a
+  parameter live continuously and referenced at every method call, so the
+  alias had no lifetime to split and the result was byte-identical at 55/97.
+
+**3e. Frames, the frame-padding idiom**
+
+- The advertised 18/376 -> 48/376 improvement came from a paired
+  tail-duplication fix, not from the padding.
+
+**3f. Calls, a bare `nop` in a call's delay slot**
+
+- A missing argument can be invisible from the callee, which is the other half
+  of the reason to type a slot from its call sites.
+
+**3f. Calls, a multi-exit function typed `void`**
+
+- Retyping an already-matched `void`-shaped function by ADDING `return`s can
+  grow it.
+
+**3f. Calls, type the CALLER's parameters**
+
+- A call result both stored into a field and reused later needs a named local.
+
+**3f. Calls, extern arity versus the dead-argument idiom**
+
+- A third example of retail paying for the extra argument: `lw a2, 164(s0)`.
+
+**3g. Delay slots, a delay-slot store is UNCONDITIONAL**
+
+- Hoisting such a store out of an `if` closed 8 words.
+
+**3g. Arithmetic, commutative-operand canonicalization**
+
+- The width-driven `rs` flip was measured on a 47/47 close.
+
+**3h. volatile, a sibling's set is a HYPOTHESIS**
+
+- `func_80030980`'s discovered set was six divisor-chain locals PLUS `off16`,
+  a pure address-arithmetic local with no division in it, where its sibling
+  `func_8002D8E0` had named only four.
+- The two systematic sweeps were a drop-one sweep and an add-one sweep, 15
+  builds in total, and neither found anything better either side of the
+  discovered set.
+
+**3h. volatile, the address CSE and the asm-label alias**
+
+- The six byte-verified uses of the alias live in `src/code_179d8_m.c`.
+
+**4. Verdict classes, a register-identity verdict DECAYS**
+
+- Round 44's two mis-filed residues on `func_8001E7BC` in full: an `$s1`-`$s4`
+  permutation that was really the tail's call structure, and an `$a1`/`$a3`
+  one that was really the copy idiom.
+
+**4. Verdict classes, a stall report's CLASS goes stale**
+
+- Both round-59 revisits recorded `names/types not relevant`, so on that
+  evidence a revisit's payload is RE-CLASSIFYING, not re-reading with new
+  names.
+
+**4. Verdict classes, a saturated file**
+
+- The 40/145 catastrophic-looking case was at exact length with purely
+  `r`-tagged renames.
+
+**4. Verdict classes, a lever's NEGATIVE is scoped**
+
+- Round 27's three levers each closed one function and made another worse.
+
+**4. Verdict classes, budget by ATTEMPT HISTORY**
+
+- The permuter-history screen also counted the bare string `15862+` as
+  never-searched.
