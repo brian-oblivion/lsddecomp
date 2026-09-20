@@ -6,6 +6,91 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-20 — round 59: two revisits close 14- and 46-round stalls, track 1b opens with three bodies, and the extern queue reaches zero
+
+**State at end: 1142 matched / 1252 game functions (91.21% of game code);
+queued 110, all stalled, 0 fresh. Build verifies; `check-nonmatching.sh`
+green.**
+
+Head on Opus. Three runners, the operator's default cap. Gate 0 green first
+try; all three worktrees byte-verified before handover. `headercontention.py`
+reported no contention between the two unit runners. The cross-cutting extern
+job made alpha the only runner permitted to change an existing declaration
+this round, posted to the broadcast before spawning.
+
+**What moved**
+
+- **bravo (Opus, REVISIT on `Entity_e`).** **MATCH `func_80062C58` 213/213**
+  (11 builds) and **MATCH `func_80063144` 217/217** (2 builds), closing stalls
+  open since rounds 45 and 13. `src/Entity_e.c` now has **zero
+  `INCLUDE_ASM`** — the unit is complete.
+- **charlie (Sonnet, track 1b on `code_2cc8c_e`).** The track's first three
+  bodies promoted: `func_8004042C` (22/25), `func_80040024` (29/35),
+  `func_800400B0` (40/41). Both oracles green — the verified build takes the
+  `#else` branch and moved zero bytes.
+- **alpha (Opus, extern arity review).** All 17 `externcheck.py` findings
+  resolved; the tool now exits 0 on 650 declarations and the job has left
+  `plan.py`'s ready list. 15 confirmed as the deliberate dead-argument idiom
+  and annotated `arity-ok`; 2 false prototypes corrected. Zero bytes moved.
+
+**The round's real result is about revisits, and it is not the one the rule
+assumes.** Both of bravo's stalls had their MEASUREMENT re-verified by two or
+three later rounds and correct; both had their residue CLASS — "delay-slot
+scheduling" — never re-questioned and wrong, the true cause being source
+statement/branch structure each time. Both reports record `names/types not
+relevant`. So on this evidence the payload of a revisit is RE-CLASSIFYING,
+not re-reading with the unit's new names, which is the opposite of the
+hypothesis track 1's revisit rule was written to test. One round is a
+measurement, but it is a measurement the next few revisits should be read
+against.
+
+**Two levers, both absent from the learnings and both now in them.** A
+one-instruction `else` arm leaves no block in the output — reorg steals it
+into the branch's delay slot — so "retail assigns this in a delay slot" is
+evidence about if/else shape, not about the scheduler; that alone took
+`func_80063144` from 77/217 to 208/217. And when a residue is a missing
+register-to-register copy, DELETING the named local and inlining the
+expression is worth trying: it is the inverse of the project's usual "name the
+subexpression" lever, and it was the closer on `func_80062C58`.
+
+**A permuter that plateaus flat points away from the residue, not at it.**
+`func_80063144`'s 30485-iteration run found nothing because a permuter never
+moves a statement into an else arm absent from its base. Related: on a
+length-defective function `insertions/deletions` is the signal and the word
+count actively misleads — a correct fix ran 27/27 -> 11/11 -> 7/7 -> 0/0 while
+the word score went 61 -> 56 -> 91 -> 213, and round 45 rejected a correct
+lever on that 5-word drop.
+
+**The extern discriminator is at the call site, not in the callee.** Reading
+the callee says "ignores `$a1`" for a wrong declaration and a deliberate one
+alike. What decides is whether retail emits an instruction for the extra
+argument. 15 of 17 did (round 58 measured 11 of 18, so the idiom is if
+anything commoner than thought). The fix that touches no call site is an
+unspecified parameter list `()`, not `(void)`: `(void)` makes an
+argument-passing call a fatal `too many arguments`, which is what round 9's
+standing ban on reducing these getters was really about — `()` was never
+considered, and it is what round 9's own "no prototype in scope" reading
+spells.
+
+**A report claim this round falsified, corrected in place.** An older
+`Proposed learning` in `docs/match-reports/Class6D430__AllocBuffer.md` held
+that `func_80017B34` takes one argument, not two. The head verified alpha's
+contrary measurement directly: `addu $s1, $a1, $zero` at `0x80017B44` saves
+the incoming `$a1` before anything writes it and it is consumed at
+`0x80017B68`. The callee takes two. What the two units measured is that THEIR
+call sites pass one and retail emits nothing for a second — a fact about those
+call sites, not about the callee's arity. Alpha was told by its brief to
+converge that 22-declaration family on one arity and correctly refused,
+reporting the measurement instead; the brief was wrong.
+
+**Escalated, not acted on** (see the round report): `DECOMPILATION_LEARNINGS.md`
+stood at 798 lines against its 800 budget BEFORE this round, so promoting five
+learnings put it 44 over even after compressing each below the 12-line cap. The
+budget has no headroom left and needs a distil-and-archive pass. Also,
+`plan.py` emits the extern-review job into the track-3 queue but
+`FINISHING-PLAN.md` §4 carries no runner prompt for it; this round's head
+re-scoped §4.2 by hand.
+
 ## 2026-09-19 — round 58: track 1 parks itself, one match, and HARD RULE 2's guard is measured to be absent in every worktree
 
 **State at end: 1140 matched / 1252 game functions (91.05% of game code); queued

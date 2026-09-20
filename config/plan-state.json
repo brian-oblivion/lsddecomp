@@ -130,12 +130,34 @@
           "note": "Opus REVISIT runner (charlie) on code_179d8_i func_80033C90, stale-title trigger (unit has NOT passed track 3, so names/types were not the lever). STALL, but the revisit paid: re-derived from the .s, 18/202 -> 21/202, and FOUR claims in the old report falsified, including a control-flow bug (the shared call block jumps to tailCheck, not tailFinal, skipping the end-of-ramp check on the commonest path) and the void 'signature is fixed by the caller' claim (the caller became libsnd/sscall in round 34, so nothing declares it). Also reproduced bravo's do-while(0) lever WITH A CONTROL and widened it: on CAF0 it moved scheduling, here it re-ranked global register allocation. Search negative at 232,743 iterations, rejected candidate was a semantic change.",
           "round": 58,
           "runners": 1
+        },
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-20",
+          "matches": 2,
+          "model": "opus",
+          "note": "Revisit runner bravo on Entity_e: func_80062C58 (213/213) and func_80063144 (217/217) both MATCHED, closing 14- and 46-round stalls in 11 and 2 builds. Both reports recorded names/types not relevant; in both the report's measurement was correct and its residue CLASS (delay-slot scheduling) was wrong, the real cause being source statement/branch structure. Entity_e now has zero INCLUDE_ASM.",
+          "round": 59,
+          "runners": 1
         }
       ],
       "status": "open"
     },
     "1b": {
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-20",
+          "matches": 3,
+          "model": "sonnet",
+          "note": "First track 1b round: charlie promoted func_8004042C (22/25), func_80040024 (29/35) and func_800400B0 (40/41) in code_2cc8c_e to #ifdef NON_MATCHING. build-and-verify green (zero bytes moved) and check-nonmatching green (3 bodies, 1 unit).",
+          "round": 59,
+          "runners": 1
+        }
+      ],
       "status": "auto"
     },
     "2": {
@@ -205,6 +227,16 @@
           "model": "sonnet",
           "note": "Track 3 naming, runner alpha, unit code_2cc8c_c (plan.py's top job at centrality 8): the Obj86B60 tail plus the Unk18Obj allocator/ctor/child chain. 19/19 defs named, 3 shared globals named (gTaskCoreMethods, gDefaultStreamTaskInitData, gIntermediateBaseMethods), ~16 exclusive fields and slots renamed directly, 6 cross-unit field names PROPOSED and applied by the head by type scope, unit header comment written, ## Naming in all 19 reports. Head-reviewed 5 names: Get_vtable_TaskCore (checked the convention rather than the name -- Get_vtable_* has 3 precedents on main, so not an invented style), Obj86B60__GetActiveSlotCount (report explicitly declines to claim purpose beyond the getter), IntermediateBase__IntermediateBase (body confirms ctor chain + vtable install), Obj86B60__NotifyParents (vtable-slot inheritance evidence, named while still a STALL, which track 3 requires), plus all header edits read as a class: pure identifier substitution, no offset or type changed. No wrong tier-A name; mark-unit'd. Naming runner stays sonnet.",
           "round": 55,
+          "runners": 1
+        },
+        {
+          "attempts": 17,
+          "calibration": false,
+          "date": "2026-09-20",
+          "matches": 17,
+          "model": "opus",
+          "note": "Extern arity review (alpha): all 17 externcheck findings resolved, externcheck now exits 0 on 650 declarations. 15 confirmed as the deliberate dead-argument idiom and annotated arity-ok; 2 false prototypes (GetClass6B5CCMethods, GetClass6D430Methods) corrected to unspecified parameter lists. Zero bytes moved. Declined to converge the func_80017B34/func_80017CFC family: measurement shows both bodies really read $a1.",
+          "round": 59,
           "runners": 1
         }
       ],

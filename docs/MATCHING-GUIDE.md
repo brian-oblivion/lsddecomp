@@ -574,7 +574,10 @@ Two consequences, both paid for in round 18:
 - Where a number is load-bearing, re-measure it with the flag and SAY you did.
   `func_80063144`'s two-divergence finding was re-run this way and came back an
   identical 465 with `Stack Differences: 0` genuinely measured, which is what
-  makes it trustworthy rather than merely plausible.
+  makes it trustworthy rather than merely plausible. Round 59 matched that
+  function and the number held — but its residue CLASS did not, and the
+  distinction is the point: a re-measured figure is trustworthy as a FIGURE
+  and says nothing about the diagnosis built on top of it.
 
 **A permuter score drop is a LEAD, never a RESULT, until the real oracle
 confirms it — and round 18 went 0-for-3 on trusting one.** Every permuter-local

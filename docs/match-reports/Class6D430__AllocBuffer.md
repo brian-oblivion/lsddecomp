@@ -116,6 +116,17 @@ worst-drifted function in the build before the fix — `70/70` after).
 
 ## Proposed learning
 
+**FALSIFIED, round 59 (head, extern review).** The claim below is wrong
+about the callee. `func_80017B34` genuinely reads TWO argument registers:
+`addu $s1, $a1, $zero` at `0x80017B44` saves the incoming `$a1` before
+anything writes it, and it is consumed as `addu $t0, $s1, $zero` at
+`0x80017B68` on the path taken when the `$gp` default pool is unset. What
+the two units below measured is that THEIR OWN call sites pass one argument
+and retail emits nothing for a second -- true, and the reason
+`include/class_16334.h:74`'s one-parameter declaration is byte-correct for
+them. It is a fact about those call sites, not about the callee's arity.
+See `docs/match-reports/func_80017B34.md`, `## Extern arity (round 59)`.
+
 **`func_80017B34` takes one argument (`size`), not two.**
 `include/class_16334.h:74`'s `extern void *func_80017B34(s32 size, s32 zone);`
 should be corrected to `extern void *func_80017B34(s32 size);` — confirmed

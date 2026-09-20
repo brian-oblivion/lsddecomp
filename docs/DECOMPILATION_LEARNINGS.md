@@ -214,6 +214,14 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   apart when CSE made their code differ. Tell: the same statement once cached, once
   recomputed. Fix at ONE merge input; backwards costs 184 -> 203 words. (a round 58)
 
+- **A one-instruction `else` arm leaves NO BLOCK**: reorg steals it into the branch's
+  own delay slot and the branch targets the outer join. So "retail assigns this in a
+  delay slot, mine assigns it plainly" is evidence about the source's if/else shape, not
+  about the scheduler. Tell: a conditional branch targeting the OUTER join with a real
+  assignment in its delay slot — distinct from the fallthrough rule above, whose own
+  tell (a bare unconditional `j`) is absent. Moving one `mod = 0;` into an else arm:
+  77/217 -> 208/217. (a docs/match-reports/func_80063144.md, round 59)
+
 ### 3b. Switch and jump tables
 
 - **For a DENSE switch, arm bodies are emitted in SOURCE order and the table order is
@@ -419,6 +427,16 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   and it was the difference between 172/180 and a match after three rounds had called it
   unreachable by source shape. (a docs/match-reports/func_8001E7BC.md, round 57)
 
+- **When a residue is a missing register-to-register COPY, try DELETING the named local
+  and inlining the expression** — the inverse of the "name the subexpression" lever, the
+  same knob turned the other way. 2.6.3's signed `x / 2**k` (k > 1) opens with `t = x`,
+  and whether that copy survives is coalescing driven by `x`'s live range. Discriminator:
+  a one-word copy residue where your build reuses a register destructively
+  (`addiu v1,v1,3`) and retail uses a second (`addiu a2,v1,3`) is a LIVE-RANGE question,
+  and naming is the source knob for it. Not the "redundant move" permuter class, which
+  is for copies surviving every REORDERING. (a docs/match-reports/func_80062C58.md,
+  round 59)
+
 ### 3e. Frames and stack
 
 - **An unused stack frame is reserved by an unused local ARRAY, never a scalar.** `s32
@@ -476,6 +494,16 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   argument loads as one `lhu` where a signed one is `lw`+`sll`+`sra`. A call result both
   stored into a field and reused later needs a named local. (a §"A symbol accessed at TWO
   WIDTHS", §"Confirmed on this game")
+
+- **A wrong extern arity and the deliberate dead-argument idiom are told apart at the
+  CALL SITE, never in the callee** — the callee says "ignores `$a1`" either way. Does
+  retail emit an instruction for the extra argument (`move a1,zero`, `lw a2,164(s0)`,
+  `li a0,0xff`)? Then the declaration is byte-load-bearing: keep the arity, annotate
+  `/* arity-ok: */`. Delay slot a callee-save spill or a bare `nop` with the register
+  already loaded? Then a disagreement with the definition is simply false. 15 of 17 were
+  the idiom (round 59; 11 of 18 in round 58). **The fix that touches no call site is an
+  unspecified list `()`, not `(void)`** — `(void)` makes an argument-passing call a fatal
+  `too many arguments`. (a docs/match-reports/GetClass6B5CCMethods.md, round 59)
 
 ### 3g. Delay slots, arithmetic, one-instruction residues
 
@@ -669,7 +697,25 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   beat base, and track a manual `PERM_GENERAL` enumeration separately from an open random
   search. (a §"A permuter negative is ONE SAMPLE", §"\"Never re-searched\" and \"never
   went below base\"")
+- **A permuter run that plateaus with NO MOVEMENT AT ALL points AWAY from the residue
+  you measured**: it mutates expressions, operand order and temporaries within the
+  statements given, and never moves a statement into an else arm absent from its base.
+  `func_80063144`'s 30485 iterations plateaued while the real defect was two statement
+  placements, closed in 2 builds. **Corollary: on a length-defective function
+  `insertions/deletions` is the signal and the word count misleads** — a correct fix ran
+  27/27 -> 11/11 -> 7/7 -> 0/0 while the word score went 61 -> 56 -> 91 -> 213, and
+  round 45 rejected a correct lever on that 5-word drop. (a round 59)
+
 ## 4. Verdict classes and how far to trust them
+
+- **A stall report's MEASUREMENT and its residue CLASS decay at different rates, and the
+  class is what goes stale unnoticed.** Both round-59 revisits found the figures correct
+  and re-verified by later rounds, while the class — "delay-slot scheduling" both times —
+  had never been re-questioned and was wrong both times; each closed in single-digit
+  builds after 14 and 46 rounds. A revisit's first act is to re-derive the CLASS from the
+  disassembly, not to re-read the narrative. Both recorded `names/types not relevant`, so
+  on this evidence a revisit's payload is RE-CLASSIFYING, not re-reading with new names.
+  (a round 59)
 
 - **A register-identity verdict is a claim about the RESIDUE, not about the function,
   and it DECAYS as the rest of the function changes.** All three of round 44's residues
