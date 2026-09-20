@@ -1,4 +1,6 @@
-# func_8004042C -- STALL, corrected (was misfiled as unfixable register-identity; real fix narrowed the function to a 3-word permuter-exhausted "redundant move" residue -- 22/25, NOT the "1 word remaining" (i.e. implied 24/25) figure this report previously stated, which propagated into PROGRESS.md and round 19's assignment)
+> Renamed from `func_8004042C` on 2026-09-20 (tools/rename.py). Address 0x8004042c.
+
+# Class6E99C__PushPosition -- STALL, corrected (was misfiled as unfixable register-identity; real fix narrowed the function to a 3-word permuter-exhausted "redundant move" residue -- 22/25, NOT the "1 word remaining" (i.e. implied 24/25) figure this report previously stated, which propagated into PROGRESS.md and round 19's assignment)
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 
@@ -54,12 +56,12 @@ figure below is WRONG, verified by direct rebuild, not by re-reading
 permuter output.** The round-bravo section further down states "this
 final 1-word 'redundant move' residue" and the title inherited that
 language; round 18's own PROGRESS entry and this round's task assignment
-both repeated it as "func_8004042C ... ONE WORD REMAINING." Rebuilding
+both repeated it as "Class6E99C__PushPosition ... ONE WORD REMAINING." Rebuilding
 the EXACT preserved body (below, unchanged) against the real oracle
 gives:
 
 ```
-func_8004042C: 22/25 words match (file 0x30C2C-0x30C90)
+Class6E99C__PushPosition: 22/25 words match (file 0x30C2C-0x30C90)
 ```
 
 -- three words differ, not one:
@@ -117,7 +119,7 @@ function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
 
 ```c
 #if 0
-void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -239,7 +241,7 @@ changed.
 
 ```c
 #if 0
-void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;

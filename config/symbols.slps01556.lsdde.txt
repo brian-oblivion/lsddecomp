@@ -1047,3 +1047,4 @@ Class6E99C__StartFadeDefault = 0x800400B0; // type:func
 Class6E99C__Configure = 0x80040154; // type:func
 Class6E99C__Stop = 0x800402F0; // type:func
 Class6E99C__GetColor = 0x800403F8; // type:func
+Class6E99C__PushPosition = 0x8004042C; // type:func

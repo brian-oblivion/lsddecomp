@@ -74,7 +74,7 @@ Retail's `Class6E99C__StartFadeDefault.s` contains **two** separate
 
 This is the SAME underlying "GCC schedules a delay slot differently
 than retail, and retail's choice happens to look like a redundant
-register copy" class as `func_8004042C`'s and `func_8003FCFC`'s
+register copy" class as `Class6E99C__PushPosition`'s and `func_8003FCFC`'s
 already-documented coalescing residues in this unit -- but manifesting
 as a missing WORD (length regression) rather than a same-length
 register swap, which is why the drift guard fires here and not there.

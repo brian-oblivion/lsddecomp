@@ -231,8 +231,8 @@ void *Class6E99C__GetColor(Class6E99CObj *self) {
  * a1->y loads; nothing in the C forces an early copy of a1, so no
  * source shape tried reproduces the extra move. Permuter-exhausted
  * (~76k combined iterations, two independent runs)
- * (docs/match-reports/func_8004042C.md). Hand-derived. */
-void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+ * (docs/match-reports/Class6E99C__PushPosition.md). Hand-derived. */
+void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -247,7 +247,7 @@ void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004042C);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__PushPosition);
 #endif
 
 void func_80040490(Class6E99CObj *self) {

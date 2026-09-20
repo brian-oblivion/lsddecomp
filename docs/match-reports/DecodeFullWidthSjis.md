@@ -353,7 +353,7 @@ compiler.
 **The idiom is NOT "name a second variable and GCC keeps a second
 register". It requires both variables to be independently MUTATED.**
 
-`func_8004042C` (`code_2cc8c_e`) is the measured boundary, and it was
+`Class6E99C__PushPosition` (`code_2cc8c_e`) is the measured boundary, and it was
 already on record before this round: retail copies BOTH its parameters
 into fresh registers at entry (`move $a3,$a0` / `move $t0,$a1`) and never
 touches the originals again -- superficially the identical "retail spends
@@ -367,7 +367,7 @@ The discriminator is mutation, and it is mechanical:
 - `DecodeFullWidthSjis` / `EncodeFullWidthSjis`: `d` and `dst` are **both incremented
   every iteration**. Two live induction variables, so two registers. The
   idiom works.
-- `func_8004042C`: the copy is never modified, so it is a pure alias and
+- `Class6E99C__PushPosition`: the copy is never modified, so it is a pure alias and
   GCC 2.6.3's copy propagation collapses it no matter how the source
   spells it. The idiom cannot work, and that function's residue really is
   register identity.

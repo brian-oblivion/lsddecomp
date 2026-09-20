@@ -72,7 +72,7 @@ residue, alongside the existing "reuse an existing variable name" and
 Note this is NOT the extended-asm/`register asm("$N")` mechanism CLAUDE.md
 HARD RULE 6 bans -- it is ordinary C whose SHAPE happens to guide the
 allocator's own choice, the same category of lever as the whole-struct-
-assignment fix documented in `func_8003FC70.md`/`func_8004042C.md`.
+assignment fix documented in `func_8003FC70.md`/`Class6E99C__PushPosition.md`.
 
 ## Round 20 (runner delta): two more attempts on the third division, both negative
 

@@ -32,7 +32,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
 }
 ```
 
-`Pair32E99C` is the existing two-`s32` record from `func_8004042C`; this
+`Pair32E99C` is the existing two-`s32` record from `Class6E99C__PushPosition`; this
 is the same type `Obj6EAC0__SetPosition` (this unit's `slotBC` base occupant, also
 matched this round) uses for its own `a1`. `Obj6EAC0Methods::slotBC` was
 already retyped to `Pair32E99C *a1` for that function, so this derived
@@ -47,7 +47,7 @@ The original report reached 15/50 at the WRONG total length (52 words vs
 retail's 50) with a `s32 buf[2]` stack array copied field-by-field
 (`buf[0]=a1[0]; buf[1]=a1[1];`). Two things closed the gap:
 
-1. **The whole-struct-assignment axis** (same lever as `func_8004042C`/
+1. **The whole-struct-assignment axis** (same lever as `Class6E99C__PushPosition`/
    `Obj6EAC0__SetPosition`/`func_8003CB68`/`Obj6EAC0__ApplyColor` this round and last):
    replacing the two scalar array-element copies with one `buf = *a1;`
    struct assignment (after retyping the buffer from a raw `s32[2]` to
@@ -73,7 +73,7 @@ retail's 50) with a `s32 buf[2]` stack array copied field-by-field
 
 ### Proposed learning
 
-A second confirmation (after `func_8004042C`'s "statement order flips
+A second confirmation (after `Class6E99C__PushPosition`'s "statement order flips
 register allocation elsewhere in the function") that **plain statement
 ORDER inside a loop body can decide which of two adjacent, otherwise
 symmetric delay slots gets which independent instruction**, even when
