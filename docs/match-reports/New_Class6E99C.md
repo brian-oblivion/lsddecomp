@@ -20,7 +20,7 @@ Unit `code_2cc8c_e`, carved round 14.
 >
 >     self = func_80017B34(0xA0);
 >     if (self != NULL) {
->         Class6E99C__GetMethods()->ctor(self, a1, a2, a3);
+>         GetClass6E99CMethods()->ctor(self, a1, a2, a3);
 >         return self;
 >     }
 >     return NULL;
@@ -92,7 +92,7 @@ once the research doc identified that, this function (and its sibling
 
 **`New_Class6E99C`** -- tier A. Standard `New_X`-shaped allocator: allocates
 a fixed 0xA0 bytes (`Class6E99CObj`'s own size) and, on success, dispatches
-its ctor through `Class6E99C__GetMethods()->ctor(...)` before returning it;
+its ctor through `GetClass6E99CMethods()->ctor(...)` before returning it;
 matches the project's established `New_X` convention (`New_Entity`,
 `New_DreamSys`, `New_Obj6EAC0`, etc.) exactly. Mechanics fully determine the
 name; no game-purpose claim beyond "allocate and construct one".

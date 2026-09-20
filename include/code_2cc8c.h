@@ -424,7 +424,7 @@ struct SubHandleObj {
 /* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
    New_X allocator for `Class6E99CObj` (this unit's own view, see the
    Class6E99CObj/ClassEAC0Obj section far below) -- `func_80017B34(0xA0)`
-   then `Class6E99C__GetMethods()->ctor(self, a1, a2, a3)`. `a1`/`a2`/`a3` forward
+   then `GetClass6E99CMethods()->ctor(self, a1, a2, a3)`. `a1`/`a2`/`a3` forward
    straight through to that ctor unmodified; `a1` is a pointer (confirmed
    by THIS unit's own two real callers, `code_2cc8c_c.c` passing
    `D_8008A90C` and `Entity.c` passing its own `name` parameter, both
@@ -1797,7 +1797,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * real chain is Class6B5CCObj -> "ClassEAC0" -> "Class6E99C". Two
  * `New_X`-shaped allocators confirm the two concrete sizes: New_Class6E99C
  * allocates 0xA0 bytes for a Class6E99C instance (getting its own table
- * via Class6E99C__GetMethods, a bare getter this unit also implements) and
+ * via GetClass6E99CMethods, a bare getter this unit also implements) and
  * New_ClassEAC0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
  * instance (getting D_8006EAC0 via Obj6EAC0__GetBaseMethods) -- consistent with
  * ClassEAC0 being the smaller, less-derived class. ClassEAC0__ClassEAC0 is
@@ -2103,7 +2103,7 @@ extern Class6E99CMethods D_8006E99C;
 /* D_8006EAC0 is declared once, above, as `Obj6EAC0Methods` -- bravo's
  * matched src/code_2cc8c_f.c returns its address. code_2cc8c_e declared
  * it too but never references it, so the duplicate is dropped. */
-extern Class6E99CMethods *Class6E99C__GetMethods(void); /* this unit's own bare getter
+extern Class6E99CMethods *GetClass6E99CMethods(void); /* this unit's own bare getter
                                                     for &D_8006E99C, same
                                                     idiom as GetClass6B5CCMethods
                                                     (code_d294.h) */

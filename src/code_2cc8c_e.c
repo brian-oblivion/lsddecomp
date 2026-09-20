@@ -70,7 +70,7 @@ Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
 
     self = func_80017B34(0xA0);
     if (self != NULL) {
-        Class6E99C__GetMethods()->ctor(self, a1, a2, a3);
+        GetClass6E99CMethods()->ctor(self, a1, a2, a3);
         return self;
     }
     return NULL;
@@ -87,7 +87,7 @@ void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
         tableEntry = D_8006EAA8;
     }
     base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
-    self->methods = Class6E99C__GetMethods();
+    self->methods = GetClass6E99CMethods();
     self->methods->finishConstruct(self, a2);
 }
 
@@ -299,7 +299,7 @@ void Class6E99C__SetDivisorMode(Class6E99CObj *self, s32 a1, s32 a2) {
     self->divisor = a2;
 }
 
-Class6E99CMethods *Class6E99C__GetMethods(void) {
+Class6E99CMethods *GetClass6E99CMethods(void) {
     return &D_8006E99C;
 }
 
