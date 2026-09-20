@@ -1,4 +1,6 @@
-# func_8002EDD4 -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
+> Renamed from `func_8002EDD4` on 2026-09-20 (tools/rename.py). Address 0x8002edd4.
+
+# InitSpuDriver -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
 
 **Round 32 update supersedes everything below except as a historical record
 of the residue's diagnosis, which was correct and is the reason this match
@@ -19,7 +21,7 @@ HEAD's diagnosis of the "split scaled index" residue (see below).
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002EDD4.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/InitSpuDriver.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -54,7 +56,7 @@ same block) with `s0` in place of retail's `a0` and nothing else differing
 the score): the preserved body's two `SPU` calls used STALE placeholder
 names.** `func_80039228(0)` and `func_80039104(0x20, D_8008DEB0)` were
 written when these two library calls had no symbol yet; `asm/nonmatchings/
-code_179d8_m/func_8002EDD4.s` itself now names them `_spu_setInTransfer`
+code_179d8_m/InitSpuDriver.s` itself now names them `_spu_setInTransfer`
 and `SpuInitMalloc` (`config/symbols.slps01556.lsdde.txt` lines 287/291,
 Psy-Q `libspu`, from the SDK-object-linking work in later rounds). The
 preserved body below has been updated to the current names; nothing about
@@ -62,7 +64,7 @@ the residue or the score changes.
 
 **Permuter search launched per this round's assignment** (this is the
 round's designated permuter target, the closest large near-miss in the
-corpus): `tools/setup-permuter.sh func_8002EDD4 <seed>` with the corrected
+corpus): `tools/setup-permuter.sh InitSpuDriver <seed>` with the corrected
 seed (SDK symbol names fixed, all needed struct/extern declarations
 inlined), sanity-checked with `--debug --stack-diffs` first — base score
 **15** (3 register differences × 5, zero insertions/deletions/reorderings/
@@ -104,7 +106,7 @@ downstream register-identity residue noted below). This is the single
 biggest structural fix of the round and should be treated as the
 established idiom for this record family's D_8006DAD4-array writes
 whenever they occur inside a LOOP (see the caveat under
-`func_8002E4D8`'s report on the non-loop case, which behaves differently).
+`StepVoiceEnvelope`'s report on the non-loop case, which behaves differently).
 
 **One sub-finding not in the head's message:** the `+0x8` field
 (`0x80FF`) needed a `u16 *` cast rather than `s16 *` at its specific store
@@ -254,12 +256,12 @@ and stored identically to retail.
 4. **The `woff`-halfword-index idiom for a small-struct array proven inside
    a loop (this function's D_8006DAD4 fix, confirmed byte-exact) does NOT
    transfer cleanly to the equivalent access OUTSIDE a loop** — see
-   `func_8002E4D8`'s report, attempted this same round with the identical
+   `StepVoiceEnvelope`'s report, attempted this same round with the identical
    idiom against a single (non-looping) call site, which reduced but did
    not eliminate its residue and surfaced different register-pressure
    side effects. Loop vs. non-loop context is a real discriminator for
    this idiom, not a detail. **Round 30 adds a THIRD variant**:
-   `func_8002EA44.md`'s round-30 update found the idiom REGRESSES a third
+   `StepVoiceFade.md`'s round-30 update found the idiom REGRESSES a third
    sibling because retail derives the shift from an ALREADY-sign-extended
    working value shared with a neighbouring computation, not from a fresh
    copy of the raw parameter — so "top of function, `s16`, mask deferred to
@@ -270,7 +272,7 @@ and stored identically to retail.
 5. **A preserved body's `jal` targets can go stale when they were written
    before an SDK-object round gave the target a real symbol.** This
    report's own `func_80039228`/`func_80039104` (round 26) and
-   `func_8002F700.md`'s `func_800375E8` (round 26) were both placeholder
+   `UpdateVoiceEnvelopes.md`'s `func_800375E8` (round 26) were both placeholder
    `func_ADDRESS` names at write time; `asm/nonmatchings/.../<func>.s`
    itself now names them `_spu_setInTransfer`/`SpuInitMalloc`/
    `SpuSetNoiseVoice` per `config/symbols.slps01556.lsdde.txt`. The score
@@ -289,7 +291,7 @@ and stored identically to retail.
 #if 0
 extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
-extern void func_8002F700(void);
+extern void UpdateVoiceEnvelopes(void);
 
 extern u8 D_8008DEB0[];
 extern s16 D_8008E9FC;
@@ -352,7 +354,7 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void func_8002EDD4(s32 a0) {
+void InitSpuDriver(s32 a0) {
     s16 i;
 
     _spu_setInTransfer(0);
@@ -397,7 +399,7 @@ void func_8002EDD4(s32 a0) {
          * disassembly shows on the PRODUCT and the LATE base-pointer
          * load. This idiom, confirmed byte-exact for this loop, does
          * NOT transfer cleanly to the equivalent non-loop access in
-         * func_8002E4D8 -- see that function's report. */
+         * StepVoiceEnvelope -- see that function's report. */
         woff = (u16) i * 8;
 
         D_8008D98A[(u16) i].unk0 = 0x18;
@@ -468,7 +470,7 @@ void func_8002EDD4(s32 a0) {
     D_8008EA40 = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
-    func_8002F700();
+    UpdateVoiceEnvelopes();
 }
 #endif
 ```
@@ -575,12 +577,12 @@ figure exactly, no drift), then ran a fresh, cleanly-bounded permuter search.
 ### Permuter run: clean exit, own bound never reached -- found zero instead
 
 ```sh
-tools/setup-permuter.sh func_8002EDD4 <seed from this report's own preserved body>
+tools/setup-permuter.sh InitSpuDriver <seed from this report's own preserved body>
 PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3 tools/decomp-permuter/permuter.py \
-  --debug --stack-diffs permuter-work/func_8002EDD4        # sanity check: base score 15
+  --debug --stack-diffs permuter-work/InitSpuDriver        # sanity check: base score 15
 PATH=$PWD/permuter-work/bin:$PATH nohup timeout 900 .venv/bin/python3 \
   tools/decomp-permuter/permuter.py -j 6 --stack-diffs --stop-on-zero --best-only \
-  permuter-work/func_8002EDD4 > /tmp/bravo_permuter_8002EDD4.log 2>&1 &
+  permuter-work/InitSpuDriver > /tmp/bravo_permuter_8002EDD4.log 2>&1 &
 ```
 
 Base score sanity-checked at **15** (3 register differences x 5, zero
@@ -595,8 +597,8 @@ bound -- confirmed by `ps -o etime` immediately before the exit, and the log
 line itself), the permuter printed:
 
 ```
-[func_8002EDD4] found new best score! (0 vs 15)
-wrote to permuter-work/func_8002EDD4/output-0-1
+[InitSpuDriver] found new best score! (0 vs 15)
+wrote to permuter-work/InitSpuDriver/output-0-1
 iteration 66199, 0 errors, score = 0
 Found zero score! Exiting.
 ```
@@ -612,7 +614,7 @@ entirely and should not be graded on the same rubric.
 
 ### The candidate, and why it is NOT a false lead this time
 
-`permuter-work/func_8002EDD4/output-0-1/diff.txt` shows three related
+`permuter-work/InitSpuDriver/output-0-1/diff.txt` shows three related
 substitutions, all using ONE permuter-inserted `int new_var;`:
 
 1. `a0 = (u8) a0; new_var = a0; ... D_8008E9D0 = new_var;` in place of

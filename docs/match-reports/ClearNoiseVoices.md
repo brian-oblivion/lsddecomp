@@ -1,4 +1,6 @@
-# func_8002F2A4 -- MATCHED (49/49 words)
+> Renamed from `func_8002F2A4` on 2026-09-20 (tools/rename.py). Address 0x8002f2a4.
+
+# ClearNoiseVoices -- MATCHED (49/49 words)
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 
@@ -30,7 +32,7 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void func_8002F2A4(void) {
+void ClearNoiseVoices(void) {
     s16 i;
 
     for (i = 0; i < D_8008E9D0; i++) {

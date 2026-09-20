@@ -1,4 +1,6 @@
-# func_8002FAC4 -- STALL: 15 words LONG (402/387 built length), first real diff at vram 0x8002FAC4 (function entry, differing register-save set / frame size 0x140 vs retail's 0x148)
+> Renamed from `func_8002FAC4` on 2026-09-20 (tools/rename.py). Address 0x8002fac4.
+
+# StartNote -- STALL: 15 words LONG (402/387 built length), first real diff at vram 0x8002FAC4 (function entry, differing register-save set / frame size 0x140 vs retail's 0x148)
 
 Unit: `src/code_179d8_m.c`. Round 27, runner bravo. This is the ordered
 work-list's item 1 -- FRESH ground, no prior report existed for this
@@ -7,8 +9,8 @@ function.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002FAC4.s            -> no hits
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_m/func_8002FAC4.s \
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/StartNote.s            -> no hits
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_m/StartNote.s \
   | grep -E '\b(mult|multu|div|divu)\b'                                   -> no hits
 ```
 
@@ -32,7 +34,7 @@ function showed a genuine content/order mismatch in this round's reading.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
-`func_8002FAC4` at `0x648` bytes = **402 words**, retail 387 (15 long,
+`StartNote` at `0x648` bytes = **402 words**, retail 387 (15 long,
 exactly as titled), and `funcdiff.py`'s in-range figure is **6/387** with
 its drift warning firing, matching this report's own caution. No new axis
 attempted this round: this is fresh ground from the immediately preceding
@@ -44,21 +46,21 @@ correctly triaged as such by the work order.
 ## Signature -- corroborated independently by three sibling units, not just derived here
 
 ```c
-s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 ```
 
-Before writing any C, `grep -rn func_8002FAC4 src/*.c docs/match-reports/*.md`
+Before writing any C, `grep -rn StartNote src/*.c docs/match-reports/*.md`
 turned up this **exact** signature already guessed independently by
 `code_179d8_i.c`, `code_179d8_j.c` and `code_179d8_k.c` (each calls this
 function and typed it from its own call site), plus two live call sites
 with concrete argument roles:
 
 - `code_179d8_j.c`'s `func_800302DC` (matched): `return
-  func_8002FAC4(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
+  StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
   0x21` is a real sentinel value this function itself branches on (see
   below).
 - `code_179d8_k.c`'s `func_800344FC` (its own report, STALL):
-  `func_8002FAC4(packed, note, vol, (u8)a3, (u16)divided, status)` where
+  `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` where
   `packed = (a1<<8)|a0` is a `[screen | slot<<8]` pair into the SAME
   `D_800902E8[][]` array this function itself indexes with `a0`. This
   confirms `a0`'s low byte is a `D_800902E8` row index and its next byte an
@@ -89,13 +91,13 @@ until you diff registers, not just word counts.
   a per-voice "speed" `s16` at `*(s16*)((u8*)rec + 0x4E + rec->unk12*2)` --
   the SAME access shape `code_179d8_k.c`'s `func_800344FC` already uses on
   the identical field, corroborating both units' independent readings.
-- `Tbl32E978` (already declared for `func_8002F3E8`'s stall) needed
+- `Tbl32E978` (already declared for `ApplyVoicePitchBend`'s stall) needed
   EXTENDING, not a second conflicting type: this function additionally
   touches `unk0`/`unk1`/`unk2`/`unk3`/`unk4`/`unk5`/`unk6`/`unk7` (a
   per-channel byte-field block used in bulk) alongside the existing
   `unkC`/`unkD`, none of which overlap.
 - `ObjE970` (already declared with a `+0x18` byte field for the stalled
-  `func_8002E4D8`/`func_8002EA44` bodies) needed a NEW `u16` field at
+  `StepVoiceEnvelope`/`StepVoiceFade` bodies) needed a NEW `u16` field at
   `+0x12` -- a "channel-count difficulty threshold" compared unsigned
   against `D_8008EA13`. Since neither prior user of `ObjE970` is currently
   compiled (both are `INCLUDE_ASM`), extending the struct in place was
@@ -110,7 +112,7 @@ until you diff registers, not just word counts.
 
 ## Where this came from: a sibling unit had already typed almost everything
 
-Before deriving anything by hand, `grep -rn func_8002FAC4 src/*.c` found
+Before deriving anything by hand, `grep -rn StartNote src/*.c` found
 this function's signature independently triple-corroborated (above), and
 `code_179d8_j.c`'s header comment for its OWN (still-`INCLUDE_ASM`)
 `func_80030E90` already named the exact same globals this function
@@ -132,7 +134,7 @@ someone touching an adjacent unit has usually already typed half of it.
 Retail's `a0` (this function's packed screen/slot id) needs THREE
 different views: its low byte (`a0 & 0xFF`, for the `D_800902E8` row
 index), a sign-extended 16-bit copy (`s1` in retail, used later as
-`func_800300D0`'s first argument), and a second byte (`(u8)((u16)s1 >>
+`StopNote`'s first argument), and a second byte (`(u8)((u16)s1 >>
 8)`, the row's slot index) -- and retail computes the LAST TWO from a
 SHARED intermediate (`v1 = a0 << 16`, materialized ONCE, then `sra v1,16`
 for the sign-extend and, SEPARATELY, `srl v1,24` reusing that SAME shifted
@@ -245,7 +247,7 @@ it was written:
    Sony's own `SpuVmVSetUp` (`code_179d8_c.c`'s own header comment: "round
    32 then found it is Sony's ... see docs/match-reports/func_80032148.md"),
    already declared and called with this exact signature
-   (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `func_8002F610` earlier in this
+   (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `ApplyPitchBendToAllVoices` earlier in this
    same file. Fixed by calling `SpuVmVSetUp(a1, a2)` instead.
 2. **`D_8008EA0D` is not a real symbol.** The disassembly reads it as
    `lbu $v1, -0x17($s0)` where `$s0 = &D_8008EA24` -- a raw negative
@@ -267,12 +269,12 @@ content, control flow and field accesses are unaffected -- both are
 symbol-naming bugs that could only be caught by actually linking the
 body**, which is precisely round 33's lesson this round's brief called out
 by name. With both fixed, **the title's length figure reconfirms exactly**:
-`objdump -t build/src/code_179d8_m.c.o` shows `func_8002FAC4` at `0x648`
+`objdump -t build/src/code_179d8_m.c.o` shows `StartNote` at `0x648`
 bytes = **402 words** (retail 387, 15 words LONG, exactly as titled).
 
 ### Permuter search
 
-`tools/setup-permuter.sh func_8002FAC4 <seed>` -- seed built from this
+`tools/setup-permuter.sh StartNote <seed>` -- seed built from this
 report's preserved body with both fixes above applied. See the Permuter
 result subsection for the base `--debug --stack-diffs` score and the real
 search's outcome (iteration count and `rc`). Lowest priority of the five
@@ -298,7 +300,7 @@ with a **reduced `timeout 600`** (10 minutes) rather than the full 900,
 per this report's own note that a shorter bound is acceptable here if the
 round's budget is tight. **Completed cleanly, `rc=124`** (own bound) after
 **51,596 iterations**. Best score: **12471** (from base 15053), saved at
-`permuter-work/func_8002FAC4/output-12471-1/`; no zero reached. Given the
+`permuter-work/StartNote/output-12471-1/`; no zero reached. Given the
 base score's scale (15053, an order of magnitude above the other four
 functions' bases) and the modest fractional improvement in 51k iterations,
 this reads as consistent with the report's own "two residues, ~10-12 words
@@ -348,7 +350,7 @@ confirmed via objdump) **but built length is UNCHANGED at 402/387 (still
 
 This is the THIRD function on this unit this round where the lever
 produces the identical shape: exact frame-byte recovery, zero effect on
-word count. Unlike `func_8002F700` (where the same fix's realignment
+word count. Unlike `UpdateVoiceEnvelopes` (where the same fix's realignment
 surfaced a fresh, fixable `andi` mask), realigning this function's frame
 did not surface anything new beyond what this report's own two residues
 already diagnose -- the early-materialization scheduling point (~2-3
@@ -366,8 +368,8 @@ SHA1 reconfirmed green.
 **Three for three on `code_179d8_m` this round: charlie's `dead[N]`/`if(0)`
 frame-padding idiom recovers frame byte-alignment exactly every time it is
 applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
-gap ZERO of three times on this unit** (`func_8002F700`, `func_8002EA44`,
-`func_8002FAC4`) -- including on a function that is overall LONG (this one,
+gap ZERO of three times on this unit** (`UpdateVoiceEnvelopes`, `StepVoiceFade`,
+`StartNote`) -- including on a function that is overall LONG (this one,
 15 words over) as readily as on the two that are SHORT. The common thread
 across the unit's three tests: every one of this unit's frame gaps is pure
 unaddressed register-save-area padding, with whatever content residue the
@@ -447,20 +449,20 @@ extern void func_8002D6A4(void);
 extern void func_8002D8E0(s32 a0);
 extern s32 func_8002DF7C(void);
 extern void func_8002D1B4(s32 a0, u16 a1);
-extern u8 func_800300D0(s16 a0, s16 a1, s16 a2, u16 a3);
+extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
 
-/* Called as `func_8002FAC4(0x21, p0, p1, p2, outA, outB)` from
+/* Called as `StartNote(0x21, p0, p1, p2, outA, outB)` from
  * code_179d8_j.c's func_800302DC and as
- * `func_8002FAC4(packed, note, vol, (u8)a3, (u16)divided, status)` from
+ * `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` from
  * code_179d8_k.c's func_800344FC -- signature confirmed independently
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
  * dispatch id into `D_800902E8`; `a1`/`a2` are the "key" values
- * `func_800300D0`'s own three-field match loop checks; `a4`/`a5` are
+ * `StopNote`'s own three-field match loop checks; `a4`/`a5` are
  * 7-bit-percentage volume/pan bytes staged into the same
  * D_8008EA10/D_8008EA11 scratch globals the interpolation-setup
  * functions elsewhere in this unit use. */
-s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
+s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
 {
     Entry90902E8M *s6;
     SlotE968M *slot;
@@ -572,7 +574,7 @@ s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
             }
         }
     } else {
-        func_800300D0(a0s16, a1, a2, a3);
+        StopNote(a0s16, a1, a2, a3);
     }
 
     return s3;
@@ -584,5 +586,5 @@ Note: `ObjE970` gained a `+0x12` `u16` field for this attempt (see
 "Struct/global knowledge" above) -- that extension is left in place in
 `src/` (outside the `#if 0`) since it does not affect any currently
 compiled function and the next attempt at this function, or at
-`func_8002E4D8`/`func_8002EA44` (which also use `D_8008E970`), will need
+`StepVoiceEnvelope`/`StepVoiceFade` (which also use `D_8008E970`), will need
 it again.

@@ -1,4 +1,6 @@
-# func_8002F368 -- MATCHED (32/32 words)
+> Renamed from `func_8002F368` on 2026-09-20 (tools/rename.py). Address 0x8002f368.
+
+# PlayFixedSound -- MATCHED (32/32 words)
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 
@@ -18,7 +20,7 @@ extern u8 D_8008EA1B;
 extern s32 func_8002CF18(s32 a0);
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
-void func_8002F368(s32 a0, s32 a1) {
+void PlayFixedSound(s32 a0, s32 a1) {
     s32 v0;
 
     D_8008EA1B = 0x7F;

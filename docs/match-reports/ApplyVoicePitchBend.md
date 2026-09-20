@@ -1,11 +1,13 @@
-# func_8002F3E8 -- STALL: exact length (138/138 words), 77/138 raw word-match, first diff at file 0x1FBEC / vram 0x8002F3EC (word 1, `move t2,a0` vs `move t1,a0`)
+> Renamed from `func_8002F3E8` on 2026-09-20 (tools/rename.py). Address 0x8002f3e8.
+
+# ApplyVoicePitchBend -- STALL: exact length (138/138 words), 77/138 raw word-match, first diff at file 0x1FBEC / vram 0x8002F3EC (word 1, `move t2,a0` vs `move t1,a0`)
 
 Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002F3E8.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/ApplyVoicePitchBend.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -35,8 +37,8 @@ and `asm-differ` confirms the first real divergence is still the function's
 second instruction, `move t2,a0` (retail) vs `move t1,a0` (built).
 
 **New axis 12: applied this unit's own `idxCopy = a0;`-at-the-top idiom**
-(the pattern already established and proven in `func_8002E4D8`/
-`func_8002EA44`, sibling functions in this same unit) — declare `s16
+(the pattern already established and proven in `StepVoiceEnvelope`/
+`StepVoiceFade`, sibling functions in this same unit) — declare `s16
 idxCopy;`, assign it from `a0` as the function's first statement, and use
 `idxCopy` in place of `a0` for every one of the record-index accesses
 (`D_8008D996[idxCopy]`, `D_8008D99E[idxCopy]`, etc., through to the final
@@ -71,14 +73,14 @@ value would have — reinforcing, rather than resolving, the open
 "undentified caller-visible register" hypothesis already in this report.
 Reverted (no improvement to keep).
 
-## Signature (derived, and cross-checked against `func_8002F610`'s call site)
+## Signature (derived, and cross-checked against `ApplyPitchBendToAllVoices`'s call site)
 
 ```c
-s16 func_8002F3E8(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
+s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
 ```
 
-`func_8002F610` (matched 60/60 this round, unchanged) calls this function as
-`func_8002F3E8(i, a0, a1, a2, a3)` and its own report originally reasoned the
+`ApplyPitchBendToAllVoices` (matched 60/60 this round, unchanged) calls this function as
+`ApplyVoicePitchBend(i, a0, a1, a2, a3)` and its own report originally reasoned the
 second parameter must be `s32` (to explain a per-iteration re-sign-extension
 at the call site). **That reasoning was re-examined and retracted this
 round**: the MIPS o32 ABI represents an `s16` argument as a properly
@@ -86,25 +88,25 @@ sign-extended 32-bit value regardless of whether the callee declares it
 `s16` or `s32`, so the caller-side widening instructions do not distinguish
 the two. Declaring it `s16` here (matching every neighbouring parameter, and
 matching this function's own single, once-only use of it) does not change
-`func_8002F610`'s compiled bytes at all -- re-verified 60/60 with zero drift
+`ApplyPitchBendToAllVoices`'s compiled bytes at all -- re-verified 60/60 with zero drift
 after the change. The comparison against the field it is checked against
 needs an explicit `(s16)` cast on the OLD `s32` typing; once retyped `s16`
-the cast is redundant and was dropped. This did not move `func_8002F3E8`'s
+the cast is redundant and was dropped. This did not move `ApplyVoicePitchBend`'s
 own score (77/138 before and after), so it is recorded as a correction to
-`func_8002F610`'s report, not a lever for this one.
+`ApplyPitchBendToAllVoices`'s report, not a lever for this one.
 
 ## Struct/global knowledge derived this round (kept in `src/`, unused while stalled)
 
 - `Rec34U16` / `D_8008D99C[]`: the SAME 0x34-stride record family as
   `Rec34S16` (already declared above for `D_8008D994`/`D_8008D996`/
   `D_8008D99A`/`D_8008D99E`/`D_8008D988`), but this function reads
-  `D_8008D99C` UNSIGNED (`lhu`) where `func_800300D0` (same unit, already
+  `D_8008D99C` UNSIGNED (`lhu`) where `StopNote` (same unit, already
   matched) reads it -- and `D_8008D994` -- SIGNED (`lh`). Since one extern
   symbol cannot carry two conflicting C types in one translation unit, the
   unsigned view is reached with a pointer-cast reinterpretation:
   `((Rec34U16 *) D_8008D994)[a0].unk0`. `D_8008D99C` is ALSO read at a
   SECOND, BYTE width (`lbu`, same offset 0) later in this same function --
-  the established `*(u8 *)&sym` idiom (see `func_8002F368`'s report)
+  the established `*(u8 *)&sym` idiom (see `PlayFixedSound`'s report)
   applies again, on top of the signed/unsigned split.
 - `Tbl32E978` / `D_8008E978` (pointer variable, `lw`-loaded): a 0x20
   (32)-byte-stride table; only two trailing byte fields are read,
@@ -131,7 +133,7 @@ own score (77/138 before and after), so it is recorded as a correction to
 Given a record index `a0` and three `s16` key values (`a1`, `a2`, `a3`),
 verify they match `D_8008D996[a0]`/`D_8008D99E[a0]`/`D_8008D99A[a0]`
 respectively (three early-return guard clauses, same idiom as
-`func_800300D0`'s key-match loop). `threshold = a4 - 0x40` is computed
+`StopNote`'s key-match loop). `threshold = a4 - 0x40` is computed
 BEFORE these checks (an early, unconditional local -- moving it there from
 an initial after-the-checks placement was itself a real fix, see below). If
 all three match: combine a debug byte into an index (`someTotal =
@@ -184,9 +186,9 @@ return `1`.
    shows; declaring it its true narrow unsigned width forced the genuine
    copy to reappear, closing the drift entirely and moving the score from
    50 to 77 in one change.
-7. **Retyped `func_8002F3E8`'s own second parameter from `s32` to `s16`**
+7. **Retyped `ApplyVoicePitchBend`'s own second parameter from `s32` to `s16`**
    (see the signature section above): **no change (77/138)**, confirmed
-   `func_8002F610` unaffected. Kept as the more honest typing regardless.
+   `ApplyPitchBendToAllVoices` unaffected. Kept as the more honest typing regardless.
 8. **Retyped `outA2`/`outA1` from `s32` to `u16`**: **WORSE, 67/138 with
    280490-byte drift reappearing.** Reverted.
 9. **Hoisted the `outA2 & 0xFFFF` call-argument mask into an explicit named
@@ -250,7 +252,7 @@ plateau:
  * width (`lbu`, same offset) elsewhere in this same function; the byte
  * view is reached via a plain pointer cast, same idiom as D_8008EA26's
  * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
- * here even though func_800300D0 (above) reads the SAME symbol signed
+ * here even though StopNote (above) reads the SAME symbol signed
  * (`lh`) -- reinterpreted through a cast rather than redeclared, since
  * one extern symbol cannot carry two conflicting C types in one file. */
 typedef struct {
@@ -289,7 +291,7 @@ extern u8 D_8008EA18;
 
 extern s16 func_8002E038(u16 a0, u16 a1);
 
-s16 func_8002F3E8(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
+s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     s16 threshold;
     u16 someTotal;
     u16 baseValue;
@@ -353,7 +355,7 @@ duplicate-declaration conflicts by reusing the ALREADY-declared `Rec34U16`/
 `Tbl32E978`/etc. types this unit's later functions define, rather than
 redeclaring — this unit's own functions appear in ROM order after this one's
 declaration site, so the existing types were directly reusable this time,
-unlike `func_8002E4D8`, which sits FIRST in the file and needs its own local
+unlike `StepVoiceEnvelope`, which sits FIRST in the file and needs its own local
 copies). **All three title figures reconfirmed exactly:** `funcdiff.py`
 reports **77/138 words match, file 0x1FBE8-0x1FE10** (zero out-of-range
 drift, genuinely exact length), first real diff still the function's second
@@ -361,13 +363,13 @@ instruction (`move t2,a0` retail vs `move t1,a0` built).
 
 Read the raw disassembly directly this round (rather than re-deriving from
 the report's prose) to check whether the persisted-register class this
-unit's OTHER two large stalls (`func_8002EA44`, `func_8002E4D8`) show is the
+unit's OTHER two large stalls (`StepVoiceFade`, `StepVoiceEnvelope`) show is the
 same mechanism here. It is not quite the same shape: this function's
 register renumbering starts at instruction 2 and is a near-total CLASS
 shift (both `$t`-temporaries and `$a`-arguments renumbered together) rather
 than one dedicated persisted value computed early and consumed once late.
 No new lever identified this round; not spending further attempts here
-given `func_8002EA44` and `func_8002E4D8` (this unit's two other open
+given `StepVoiceFade` and `StepVoiceEnvelope` (this unit's two other open
 stalls) each had a specific, named, untried lever this round, and both of
 those also failed to move when tried (see their own round-32 updates) —
 consistent with all three of this unit's remaining stalls being the same
@@ -424,7 +426,7 @@ instruction (`move t2,a0` retail vs `move t1,a0` built).
 
 ### Permuter search
 
-`tools/setup-permuter.sh func_8002F3E8 <seed>`, seed built from this
+`tools/setup-permuter.sh ApplyVoicePitchBend <seed>`, seed built from this
 report's preserved body (all needed struct/extern declarations already
 present in the live unit above this function's position, so no renamed
 local types were needed this time -- this function is not first in the
@@ -444,7 +446,7 @@ proceeded on the unit's other four functions.
 captured (see the process-lifetime finding below).** The search ran with
 `-j 6 --stop-on-zero --best-only --stack-diffs` under a `timeout 900`
 bound. The best score reached was **485** (from base 770), saved at
-`permuter-work/func_8002F3E8/output-485-1/`; no candidate ever reached
+`permuter-work/ApplyVoicePitchBend/output-485-1/`; no candidate ever reached
 zero across the whole run. Diffing that candidate against `base.c` shows
 the improvement came from dropping the `& 0xFFFF` mask on the SECOND
 `func_8002E038` call argument (relying on the value's already-narrow

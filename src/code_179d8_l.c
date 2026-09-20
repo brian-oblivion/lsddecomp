@@ -52,7 +52,7 @@
  * time, because the `jr $t2` trampoline screen is blind to variants and a
  * trampoline-dense segment reads as the cleanest ground in the file while
  * being the least matchable (round 17, class_3bb8c_h).  It is also a
- * near-identical sibling of func_8002E874 in code_179d8_m: same prologue,
+ * near-identical sibling of BeginVoiceFade in code_179d8_m: same prologue,
  * same narrowing shape, same early-out branch.  If you match one, say so in
  * the report -- the other unit's runner is deriving the same shape.
  *

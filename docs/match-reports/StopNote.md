@@ -1,4 +1,6 @@
-# func_800300D0 -- MATCHED (131/131 words)
+> Renamed from `func_800300D0` on 2026-09-20 (tools/rename.py). Address 0x800300d0.
+
+# StopNote -- MATCHED (131/131 words)
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 
@@ -26,7 +28,7 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-u8 func_800300D0(s16 a0, s16 a1, s16 a2, u16 a3) {
+u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
     u8 count;
 
@@ -86,10 +88,10 @@ same 0x34-stride record family `code_179d8_j.c` documents as
 `(a3, a2, a0, a1)`. For every match, do one of two cleanups depending on
 `D_8008D988[i]`:
 
-- **`== 0xFF`:** the same "type A" reset `func_800300D0`'s neighbours use
+- **`== 0xFF`:** the same "type A" reset `StopNote`'s neighbours use
   -- clear `D_8008D9A3[i]`, `D_8008D98C[i]`, and the current object's
   `unk194`/`unk196` fields (`D_8006DAD4`, both already declared for
-  `func_8002F2A4`).
+  `ClearNoiseVoices`).
 - **otherwise:** a "channel" reset: stash `i` into the "currently selected
   channel" scratch global `D_8008EA26`, re-read it, clear `D_8008D9A3`/
   `D_8008D98C`/`D_8008D988` at the CHANNEL index (not `i` -- same value in
@@ -110,8 +112,8 @@ reset.
 
 1. **`D_8008EA26` genuinely needs `volatile`, and this function is what
    proves it (see the promoted declaration and its comment, moved above
-   `func_8002F20C` since this function is the third user in ROM order).**
-   Every earlier user of this symbol (`func_8002F368`, `func_8002F20C`)
+   `PlaySound` since this function is the third user in ROM order).**
+   Every earlier user of this symbol (`PlayFixedSound`, `PlaySound`)
    only ever read it back through a BYTE-narrowing pointer cast
    (`*(u8 *)&D_8008EA26`), and a plain non-volatile declaration was
    sufficient there. This function is the first to read it back at its
@@ -128,7 +130,7 @@ reset.
    **Getting `volatile` right took a wrong turn first.** The natural
    instinct -- forcing the reload via a pointer cast, `*(volatile u16
    *)&D_8008EA26` on a non-volatile object -- reproduces the SAME failure
-   mode `func_8002F368`'s report already found for a byte-width volatile
+   mode `PlayFixedSound`'s report already found for a byte-width volatile
    pointer cast: it defeats the compiler's addressing-mode fold, emitting
    `lui`/`addiu`/`lhu` (compute the pointer, then dereference) instead of
    retail's compact `lui`/`lhu %lo(sym)(reg)` two-instruction form.
@@ -143,12 +145,12 @@ reset.
    | `chan = D_8008EA26;` (plain scalar) | no | n/a | yes, but elides the reload entirely (wrong) |
    | `chan = D_8008EA26;` (plain scalar) | **yes** | n/a | **yes, and reload happens (right)** |
    | `*(volatile u16 *)&D_8008EA26` | no | yes | no -- 3 extra instructions |
-   | `*(u8 *)&D_8008EA26` (func_8002F368's read) | **yes** | no | **yes** (unaffected by the object's own volatility) |
+   | `*(u8 *)&D_8008EA26` (PlayFixedSound's read) | **yes** | no | **yes** (unaffected by the object's own volatility) |
 
    So the one-line fix, once isolated, is simply: promote the shared
    `D_8008EA26` declaration to `extern volatile u16 D_8008EA26;` (matching
    `code_179d8_j.c`'s own declaration for this symbol) and read it plainly
-   everywhere. `func_8002F368`/`func_8002F20C`'s byte-cast reads were
+   everywhere. `PlayFixedSound`/`PlaySound`'s byte-cast reads were
    re-verified to still match after this change -- their `*(u8 *)&...`
    pattern is unaffected by the object gaining `volatile`, because the
    pointer type itself was never volatile-qualified.
@@ -187,7 +189,7 @@ on the already-documented but here-ineffective axes.
 
 **`volatile` on a pointer TYPE and `volatile` on the underlying OBJECT are
 different levers with opposite failure modes, and the existing project note
-(`func_8002F368`'s report) only demonstrated one side of this.** That report
+(`PlayFixedSound`'s report) only demonstrated one side of this.** That report
 established "a volatile pointer cast breaks the addressing fold"; this
 function needed the complementary fact -- "a volatile OBJECT read through a
 plain non-volatile pointer/cast does NOT break the fold, and is the

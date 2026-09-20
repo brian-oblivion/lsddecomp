@@ -65,12 +65,12 @@
  * are themselves addiu-$at blocked in their own units"; that is stale as of
  * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
  * ------------------------------------------------------------------------ */
-extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
-extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);
+extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 func_8002F3E8(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
+extern s16 ApplyVoicePitchBend(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
 extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
-extern void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3);
+extern void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3);
 
 extern u16 D_8008EA22;
 
@@ -106,12 +106,12 @@ s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
         outA = p5;
         outB = 0x7F - ((p4 << 6) / p5);
     }
-    return func_8002FAC4(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
+    return StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
 }
 
 s32 func_800303C8(s16 p0, s16 p1, u16 p2)
 {
-    return func_800300D0(0x21, p0, p1, p2);
+    return StopNote(0x21, p0, p1, p2);
 }
 
 void func_800303FC(void) {

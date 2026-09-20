@@ -1,4 +1,6 @@
-# func_8002E874 -- MATCHED (116/116 words)
+> Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
+
+# BeginVoiceFade -- MATCHED (116/116 words)
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 
@@ -22,7 +24,7 @@ extern Rec34Half D_8008D9B6[]; /* step/quotient (companion pair) */
 extern Rec34Half D_8008D9B8[]; /* saved start value */
 extern Rec34Half D_8008D9BA[]; /* saved end value */
 
-void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3) {
+void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
 
     if (a1 == a2) {
@@ -62,7 +64,7 @@ the same opening shape from the sibling side; this confirms it.
 `D_8008D9B0`..`D_8008D9BA` are six 2-bytes-apart symbols in the SAME
 0x34-byte-stride channel-configuration record family `code_179d8_j.c`
 documents (`Rec34D994`, `Rec34Byte`) -- this unit's own local
-`Rec34Half` type (already declared for `func_8002F2A4`'s `D_8008D98C`,
+`Rec34Half` type (already declared for `ClearNoiseVoices`'s `D_8008D98C`,
 hoisted above this function since it is the earlier ROM-order user).
 
 ## Shape
