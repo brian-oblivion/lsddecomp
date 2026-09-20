@@ -702,7 +702,7 @@ extern void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m);
  * eliminated -- so the frame remembers an arg count the emitted code
  * never uses). A K&R/unprototyped declaration is required for this: an
  * ANSI prototype would make the mismatched-arity calls a compile error. */
-extern void ApplyMatrixLV();
+extern void ApplyMatrixLV(); /* arity-ok: deliberately unprototyped (round 19, see above); the real callee takes 3 (include/class_3bb8c.h), the 6-argument `if (0)` call here only sizes the outgoing-arg area */
 
 /* ApplyMatrixToLVArray (this unit, round 14; MATCHED round 19, echo -- see
  * docs/match-reports/ApplyMatrixToLVArray.md): a paired-array iteration sibling

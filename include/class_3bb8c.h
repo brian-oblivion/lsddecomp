@@ -614,7 +614,7 @@ extern QueryTemplate866E8 D_8008E98C;
  * raw disassembly (`$a1`/`$a2` both `sp+0x54`), not a transcription
  * shortcut. */
 extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
-extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2);
+extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
 /*
  * Opaque target of Obj866E8::unk1DC (func_8004CFB0 stores it raw;
