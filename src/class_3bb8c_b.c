@@ -260,20 +260,21 @@ void func_8004C93C(Obj866E8 *self) {
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 #endif
 
-/* STALLED at 62/97 words (round 58, up from 55/97) -- see
- * docs/match-reports/func_8004CAF0.md. Frame size, callee-saved register SET
- * and CFG shape match retail exactly. Round 58 retired the "permuter scaffold
- * is untrustworthy" blocker that rounds 19 and 33 had recorded (it was a unit
- * error: funcdiff reports no insertion/deletion counts at all, so the "0 ins /
- * 0 del" those rounds weighed against the permuter was never measured), ran
- * this function's first search, and closed two of its three structural diffs
- * with the pair of levers in the body below -- the do-while(0) around the
- * first half AND the named h8Val temp, which only work JOINTLY (either alone
- * changes the function's length). What is left is one arithmetic
- * reassociation plus the 3-register rotation (self/slot/temp among
- * $s0/$s1/$s3) that is very likely DOWNSTREAM of it. Preserved here per
- * project convention rather than only in the report. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 62/97 words, length exact, zero drift (round 58, up from
+ * 55/97). Residue: an arithmetic reassociation plus a 3-register rotation
+ * (self/slot/temp among $s0/$s1/$s3) that round 58 argues is DOWNSTREAM of
+ * it -- not yet established as a HARD RULE 6 register-identity stall
+ * (docs/match-reports/func_8004CAF0.md). Frame size, callee-saved register
+ * SET and CFG shape match retail exactly. Round 58 retired the "permuter
+ * scaffold is untrustworthy" blocker that rounds 19 and 33 had recorded
+ * (it was a unit error: funcdiff reports no insertion/deletion counts at
+ * all, so the "0 ins / 0 del" those rounds weighed against the permuter
+ * was never measured), ran this function's first search, and closed two
+ * of its three structural diffs with the pair of levers in the body below
+ * -- the do-while(0) around the first half AND the named h8Val temp,
+ * which only work JOINTLY (either alone changes the function's length).
+ * Hand-derived. */
 s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 hSpan;
     s32 hSpan2;
@@ -324,9 +325,9 @@ s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s
     slot->hA = p8;
     return count;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CAF0);
+#endif
 
 /* Forward declaration: defined later in this file (in ROM order, after
  * func_8004CC74), and EXCLUDED from this round's targets (documented
