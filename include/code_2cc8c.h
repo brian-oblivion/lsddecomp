@@ -1868,7 +1868,7 @@ struct ClassEAC0Methods {
     u8 pad010[0x040 - 0x010];
     void (*slot40)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, func_800405D0 (this unit) */
     u8 pad044[0x0B8 - 0x044];
-    /* +0x0B8, OBSERVED (this unit, func_800405D0/func_80040024/
+    /* +0x0B8, OBSERVED (this unit, func_800405D0/Class6E99C__StartFadeToIndex/
        func_800400B0): dispatched as `(self, 1, tableEntry)` where
        `tableEntry` is a computed address into D_8006EA90 (indexed) or the
        fixed D_8006EAA8/D_8008A924. Occupant `Obj6EAC0__SetColor`
@@ -1880,7 +1880,7 @@ struct ClassEAC0Methods {
        Occupant `Obj6EAC0__SetMask` (code_2cc8c_f). */
     void (*slotCC)(ClassEAC0Obj *self, s32 a1);
     u8 pad0D0[0x0DC - 0x0D0];
-    /* +0x0DC, OBSERVED (func_80040024/func_800400B0): dispatched with only
+    /* +0x0DC, OBSERVED (Class6E99C__StartFadeToIndex/func_800400B0): dispatched with only
        `self`, and its own return feeds `slotB8`'s table index. For THIS
        class's own leaf instances the occupant is `func_80040154` (this
        unit, a Class6E99C-table slot) -- a method calling a sibling slot
@@ -1901,10 +1901,10 @@ struct ClassEAC0Obj {
     s16 unk60;                 /* +0x060, OBSERVED: func_800405D0, from a1->0x0 */
     s16 unk62;                 /* +0x062, OBSERVED: func_800405D0, from a1->0x4 */
     u8 pad064[0x06C - 0x064];
-    s32 unk6C;                 /* +0x06C, OBSERVED: func_800402F0/func_80040024/
+    s32 unk6C;                 /* +0x06C, OBSERVED: func_800402F0/Class6E99C__StartFadeToIndex/
                                    func_800400B0, a small dispatch-state tag */
     u8 pad070[0x074 - 0x070];
-    s32 unk74;                 /* +0x074, OBSERVED: func_80040024, negated on the
+    s32 unk74;                 /* +0x074, OBSERVED: Class6E99C__StartFadeToIndex, negated on the
                                    "already had one" path; Class6E99C__SetStep's own
                                    setter also targets this offset on the
                                    Class6E99C leaf, same field */
@@ -1962,12 +1962,12 @@ struct Class6E99CMethods {
        (Obj6EAC0__SetColor/Obj6EAC0__SetMask, both code_2cc8c_f) -- identical
        addresses in both tables (this class does not override them), same
        fingerprint as the other shared slots above. OBSERVED:
-       func_80040024/func_800400B0 (both this unit). */
+       Class6E99C__StartFadeToIndex/func_800400B0 (both this unit). */
     void (*slotB8)(Class6E99CObj *self, s32 a1, void *tableEntry);
     u8 pad0BC[0x0CC - 0x0BC];
     void (*slotCC)(Class6E99CObj *self, s32 a1);
     void (*slotD0)(Class6E99CObj *self, s32 a1);     /* +0x0D0, Class6E99C__SetStep */
-    void (*slotD4)(Class6E99CObj *self);             /* +0x0D4, func_80040024 */
+    void (*slotD4)(Class6E99CObj *self);             /* +0x0D4, Class6E99C__StartFadeToIndex */
     void (*slotD8)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, func_800400B0 */
     /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- func_80040154 (this
        unit) is the shared occupant either way. */
@@ -2008,14 +2008,14 @@ struct Class6E99CObj {
     u8 unk66;
     u8 pad067[0x068 - 0x067];
     s32 unk68;                 /* +0x068, OBSERVED: func_80040154, a divisor */
-    /* +0x06C, OBSERVED: func_800402F0/func_80040024/func_800400B0/
+    /* +0x06C, OBSERVED: func_800402F0/Class6E99C__StartFadeToIndex/func_800400B0/
        Class6E99C__FinishConstruct (zeroed by the ctor override) -- a small dispatch-state
        tag (0, 1, or 2 observed). */
     s32 unk6C;
     s32 unk70;                 /* +0x070, OBSERVED: Class6E99C__FinishConstruct, set from
                                    its own `a1` parameter */
     /* +0x074, OBSERVED: Class6E99C__FinishConstruct (ctor override sets it to 0xA),
-       func_80040024 (negated on the "already had one" path), Class6E99C__SetStep
+       Class6E99C__StartFadeToIndex (negated on the "already had one" path), Class6E99C__SetStep
        (a plain setter, `self->unk74 = a1`); also read a BYTE at a time by
        Class6E99C__Update via its low byte. */
     s32 unk74;
@@ -2053,7 +2053,7 @@ struct Class6E99CObj {
  * address -- real element shape not derived (nothing this unit's chosen
  * functions dereference beyond taking the address), so left as opaque
  * byte blobs sized only by their known stride. `Class6E99C__Class6E99C`/
- * `func_80040024`/`func_800400B0`/`func_800403F8` all compute the index as
+ * `Class6E99C__StartFadeToIndex`/`func_800400B0`/`func_800403F8` all compute the index as
  * a raw BYTE offset (`sll v0,i,1; addu v0,v0,i` = `i*3`, added directly to
  * the base address with no further `*4`) -- i.e. `D_8006EA90` holds 3-BYTE
  * entries (plausibly a signed-byte triple, same shape as this file's own

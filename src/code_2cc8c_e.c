@@ -104,9 +104,9 @@ void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
 /* NON_MATCHING: 29/35 words, length exact. Residue: instruction
  * scheduling (retail materializes `li $a1,1` immediately after the
  * slotDC dispatch, before computing idx*3; this body defers it to just
- * before the slotB8 call) (docs/match-reports/func_80040024.md).
+ * before the slotB8 call) (docs/match-reports/Class6E99C__StartFadeToIndex.md).
  * Hand-derived. */
-void func_80040024(Class6E99CObj *self) {
+void Class6E99C__StartFadeToIndex(Class6E99CObj *self) {
     s32 idx;
 
     if (self->unk6C != 0) {
@@ -118,12 +118,12 @@ void func_80040024(Class6E99CObj *self) {
     self->unk74 = -self->unk74;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040024);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeToIndex);
 #endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 40/41 words, 1 word short. Residue: two residues --
- * the shared `li $a1,1`-scheduling class with func_80040024, plus a
+ * the shared `li $a1,1`-scheduling class with Class6E99C__StartFadeToIndex, plus a
  * genuinely missing register-only dead-store delay-slot filler
  * (retail copies its unread 3rd argument into $t0 in a branch delay
  * slot; GCC 2.6.3 eliminates the equivalent C statement as dead code

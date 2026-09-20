@@ -1042,3 +1042,4 @@ Class6E99C__Class6E99C = 0x8003FE2C; // type:func
 Class6E99C__FinishConstruct = 0x8003FED8; // type:func
 Class6E99C__Update = 0x8003FF44; // type:func
 Class6E99C__SetStep = 0x8004001C; // type:func
+Class6E99C__StartFadeToIndex = 0x80040024; // type:func

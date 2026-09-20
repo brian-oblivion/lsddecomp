@@ -1,4 +1,6 @@
-# func_80040024 -- STALL (scheduling residue, 29/35)
+> Renamed from `func_80040024` on 2026-09-20 (tools/rename.py). Address 0x80040024.
+
+# Class6E99C__StartFadeToIndex -- STALL (scheduling residue, 29/35)
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 
@@ -95,7 +97,7 @@ this function turned out to still have a real residue.
 
 ```c
 #if 0
-void func_80040024(Class6E99CObj *self) {
+void Class6E99C__StartFadeToIndex(Class6E99CObj *self) {
     s32 idx;
 
     if (self->unk6C != 0) {
