@@ -239,7 +239,6 @@ extern u8 D_8008D970[];
  * (324/324 words, zero drift outside the function), 7/324 raw word-match,
  * best body preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
-
 /* STALL -- see docs/match-reports/func_80030E90.md. Round 26: 239/252 words
  * (13 short). Round 31: 240/252 (12 short), the `s32 result` axis. Round 36:
  * rebuilt with SpuVmVSetUp's real name (was func_80032148 -- round 34's SDK
