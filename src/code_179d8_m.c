@@ -1,52 +1,68 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * code_179d8_m -- part of the game's SPU sound driver: the per-voice
+ * envelope/fade stepper, the per-tick voice updater, and a NoteOn/NoteOff
+ * pair for a 24-voice (0..0x17) PS1 SPU wavetable player driven by MIDI-
+ * shaped events (confirmed: code_179d8_k.c's caller switches on a status
+ * byte with the MIDI 0x90/0xB0/0xC0/0xE0/0xFF nibbles; D_8006DAD4 is the
+ * PS1 SPU's real hardware base, 0x1F801C00, per func_8002DDBC's report in
+ * code_179d8_l). Plain free functions, no vtable -- `tools/classtable.py`
+ * lists no method table at these addresses.
  *
- * code_179d8_m -- BACK half of what was the `code_179d8_mid_c` asm
- * remainder: functions 161..172 of the original 274-function code_179d8
- * monolith, 0x1ECD8..0x20ADC (vram 0x8002E4D8..0x800302DC), 12 functions.
- * Carved round 24 (2026-09-08).  `code_179d8_l` is the front half and
- * carries the shared carve-time census; `code_179d8_j` follows behind.
+ * Twelve functions, functions 161..172 of the original 274-function
+ * code_179d8 monolith, 0x1ECD8..0x20ADC (vram 0x8002E4D8..0x800302DC).
+ * Carved round 24 (2026-09-08); `code_179d8_l` is the front half (owns the
+ * shared carve-time census) and `code_179d8_j` follows behind. No jump
+ * table, no rodata attach, no BIOS trampoline (every function ends in its
+ * own `jr $ra`, none open on `$sp`) -- see code_179d8_l's header for the
+ * full carve-time survey.
  *
- * WHY IT WAS UNCARVED, AND WHY THAT VERDICT IS DEAD.  The old remainder was
- * left as "the addiu-$at dense heart of this monolith".  `addiu_at` was
- * RESOLVED in round 21 (maspsx `--addiu-at`;
- * docs/research/addiu-at-blocker.md).  Re-censused 2026-09-08 with the four
- * screens, canonical shell forms (`grep -A2` FORWARD for nop_mflo_mfhi):
+ * WHAT EACH FUNCTION DOES (see docs/match-reports/<name>.md for the full
+ * derivation and evidence):
+ *   - StartNote / StopNote: a matched NoteOn/NoteOff pair. Given a packed
+ *     [screen|slot] identity, note, volume/program and (for StartNote) a
+ *     velocity and a computed stereo pan split, StartNote registers a new
+ *     active-voice record; StopNote scans every voice for one whose
+ *     identity fields match and releases it, returning the count released.
+ *   - PlaySound / PlayFixedSound: find a free voice (func_8002CF18, in
+ *     code_179d8_l) and, if one exists, key it on (func_8002DDBC, also
+ *     code_179d8_l) with the caller's parameters or, for PlayFixedSound,
+ *     two hardcoded constants.
+ *   - BeginVoiceFade / StepVoiceFade: a linear-ramp pair over the
+ *     gVoiceFade* per-voice arrays -- Begin sets a start/target/step-rate;
+ *     Step advances the accumulator (throttled by an interval/countdown
+ *     pair), clamps at the target, and writes the resulting stereo output
+ *     level.
+ *   - StepVoiceEnvelope: the same accumulate-until-limit shape over its
+ *     own gVoiceEnv* family, but with no "Begin" counterpart in this
+ *     unit -- whatever sets gVoiceEnvActive/gVoiceEnvStep/gVoiceEnvLimit
+ *     is still undecompiled elsewhere. func_8002E308 in code_179d8_l opens
+ *     with the identical prologue/argument-narrowing shape and is worth
+ *     checking as that counterpart.
+ *   - UpdateVoiceEnvelopes: the per-tick dispatcher. Maintains a 16-slot
+ *     ring buffer of per-tick voice-activity bitmasks; when a voice has
+ *     shown no activity for 16 consecutive ticks it force-releases it
+ *     (disabling the SPU noise generator if that voice was in noise
+ *     state); then calls StepVoiceEnvelope/StepVoiceFade for every voice
+ *     whose respective flag is set. Called once at the end of
+ *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
+ *     meant to run every frame thereafter.
+ *   - ClearNoiseVoices: releases every voice whose state byte reads
+ *     exactly 2 (the same value StopNote/UpdateVoiceEnvelopes/func_8002CF18
+ *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
+ *   - ApplyVoicePitchBend / ApplyPitchBendToAllVoices: match a voice by
+ *     identity and apply a curve-table-driven pitch bend from a 0-127
+ *     depth value centered at 0x40, writing the result through
+ *     func_8002E038; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
+ *     and then runs this over every voice, returning the count affected.
+ *   - InitSpuDriver: the SPU driver's init call -- _spu_setInTransfer,
+ *     SpuInitMalloc, zeroes every per-voice table and the two master
+ *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
+ *     UpdateVoiceEnvelopes once.
  *
- *   12 of 12 CLEAN -- the whole nop_mflo_mfhi cluster (3 functions) fell in
- *   the front half, so this unit has NO blocked function at all.  Zero
- *   gp_rel, zero nop_mflo_mfhi, zero `jr $t2` trampolines.
- *
- * Sizes, cheapest first -- four functions at 32..60 words:
- *   PlayFixedSound   32w   PlaySound   38w   ClearNoiseVoices   49w
- *   ApplyPitchBendToAllVoices   60w   BeginVoiceFade  116w   StopNote  131w
- *   ApplyVoicePitchBend  138w   StepVoiceFade  228w   StepVoiceEnvelope  231w
- *   UpdateVoiceEnvelopes  241w   InitSpuDriver  270w   StartNote  387w
- *
- * BeginVoiceFade is a near-identical sibling of func_8002E308 in
- * code_179d8_l -- same prologue (`addu $t3, $a0, $zero`), same s16
- * argument-narrowing shape, same early-out branch.  That opening is
- * REGISTER PRESSURE, not a BIOS trampoline; checked by hand at carve time
- * because the `jr $t2` screen is blind to variants.  If you match it, say
- * so in the report: the other unit's runner is deriving the same shape.
- *
- * Owns NO jump table and needs no rodata attach (see code_179d8_l's header
- * for the survey).  Boundary checks both sides: no function has more than
- * one `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero
- * `alabel`, and the frameless ones open on their own arguments or on a
- * global, never on $sp.
- *
- * Expect this slice to span more than one class; identify each with
- * tools/classtable.py rather than assuming the unit has one.
+ * STALLS: ApplyVoicePitchBend, StartNote, UpdateVoiceEnvelopes,
+ * StepVoiceEnvelope, StepVoiceFade -- all five are the same "whole-function
+ * register-count decision predates any of the function's own locals"
+ * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
 #include "common.h"
 
