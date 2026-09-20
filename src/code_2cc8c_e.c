@@ -271,7 +271,7 @@ Class6E99CMethods *Class6E99C__GetMethods(void) {
     return &D_8006E99C;
 }
 
-ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
+ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
     ClassEAC0Obj *self;
 
     self = func_80017B34(0x6C);

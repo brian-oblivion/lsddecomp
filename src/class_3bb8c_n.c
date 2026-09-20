@@ -128,7 +128,7 @@ extern s32 D_8008AB68;
 extern s32 D_8008AB6C;
 extern s32 D_8008AB70;
 extern s32 D_8008AB74;
-extern void *func_800404D0(void *a0, void *a1, s32 a2);
+extern void *New_ClassEAC0(void *a0, void *a1, s32 a2);
 extern void *D_8008E10C[];
 extern s32 D_8008AC7C;
 
@@ -176,12 +176,12 @@ void func_80054850(void) {
     paramB[0] = D_8008AB70;
     paramB[1] = D_8008AB74;
 
-    obj = func_800404D0(paramB, (void *) D_8008AC8C, 0x1FFF);
+    obj = New_ClassEAC0(paramB, (void *) D_8008AC8C, 0x1FFF);
     s1 = 3;
     arr = D_8008E10C;
     arr[0] = obj;
     for (i = 1; i < 0x12; i++) {
-        obj = func_800404D0(paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
+        obj = New_ClassEAC0(paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
         arr[i] = obj;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], paramA);
         s1 += 3;

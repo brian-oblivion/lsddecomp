@@ -1,4 +1,6 @@
-# func_800404D0 -- MATCHED (31/31 words)
+> Renamed from `func_800404D0` on 2026-09-20 (tools/rename.py). Address 0x800404d0.
+
+# New_ClassEAC0 -- MATCHED (31/31 words)
 
 Unit `code_2cc8c_e`, carved round 14.
 
@@ -9,7 +11,7 @@ Unit `code_2cc8c_e`, carved round 14.
 > the first try once the preserved single-merged-return body was split:
 >
 > ```c
-> ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
+> ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
 >     ClassEAC0Obj *self;
 >
 >     self = func_80017B34(0x6C);
@@ -29,7 +31,7 @@ Unit `code_2cc8c_e`, carved round 14.
 > header's own `ClassEAC0Methods` type (used identically by
 > `Class6E99C__Class6E99C`, a few lines above this function in the same file) DOES
 > have a `ctor` field at `+0x008`, and its own doc comment explicitly lists
-> `func_800404D0` as one of the vtable's callers through that slot -- so the
+> `New_ClassEAC0` as one of the vtable's callers through that slot -- so the
 > correct call is an explicit cast, `((ClassEAC0Methods *)
 > Obj6EAC0__GetBaseMethods())->ctor(...)`, matching the pattern `Class6E99C__Class6E99C` already
 > uses one statement earlier in this same unit (`base = (ClassEAC0Methods

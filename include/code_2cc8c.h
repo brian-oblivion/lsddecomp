@@ -360,8 +360,8 @@ struct Unk64Elem {
 
 /*
  * self->unk68's pointee (round 12, from func_8003D050/func_8003DAD4/
- * func_8003D73C). Built by `func_800404D0(&D_8008A8E8, &D_8008A8F0, 0)` in
- * func_8003CE98 -- func_800404D0 itself lives in the still-uncarved
+ * func_8003D73C). Built by `New_ClassEAC0(&D_8008A8E8, &D_8008A8F0, 0)` in
+ * func_8003CE98 -- New_ClassEAC0 itself lives in the still-uncarved
  * code_2cc8c_d segment (not this unit's function to attempt), so it is
  * declared here only as an external returning this unit's own local view
  * of the type it constructs. D_8008A8E8/D_8008A8F0 are likewise only ever
@@ -396,7 +396,7 @@ struct Unk68Obj {
    this call site's own real arguments exactly); only the RETURN type
    differs from `code_2cc8c_b.c`'s own `Unk68Obj *` view -- ABI-identical
    (a plain pointer either way), verified with a full rebuild. */
-extern ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2);
+extern ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
 extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
 extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
@@ -1388,7 +1388,7 @@ struct Obj86B60 {
     Unk68Obj *unk68;             /* +0x068, OBSERVED: func_8003D050,
                                      func_8003DAD4, func_8003D73C (round 12)
                                      -- built once by func_8003CE98 via
-                                     func_800404D0(&D_8008A8E8, &D_8008A8F0,
+                                     New_ClassEAC0(&D_8008A8E8, &D_8008A8F0,
                                      0), then dispatched through repeatedly */
     u8 pad06C[0x070 - 0x06C];
     const char *unk70;          /* +0x070, func_8003CDE0: truthy gate and a
@@ -1798,7 +1798,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * `New_X`-shaped allocators confirm the two concrete sizes: New_Class6E99C
  * allocates 0xA0 bytes for a Class6E99C instance (getting its own table
  * via Class6E99C__GetMethods, a bare getter this unit also implements) and
- * func_800404D0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
+ * New_ClassEAC0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
  * instance (getting D_8006EAC0 via Obj6EAC0__GetBaseMethods) -- consistent with
  * ClassEAC0 being the smaller, less-derived class. func_8004054C is
  * ClassEAC0's OWN ctor, sharing the identical "call a further-base ctor,
@@ -1860,7 +1860,7 @@ struct ClassEAC0Methods {
                                 plain `void *` here (not `SkipShort2 *`) --
                                 this is the SLOT's own type, used by every
                                 CALLER of the ctor through the vtable
-                                (New_Class6E99C/Class6E99C__Class6E99C/func_800404D0,
+                                (New_Class6E99C/Class6E99C__Class6E99C/New_ClassEAC0,
                                 none of which know about `SkipShort2`); the
                                 occupant's own definition is free to use a
                                 more specific parameter type internally. */
