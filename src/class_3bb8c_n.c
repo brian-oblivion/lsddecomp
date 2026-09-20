@@ -506,8 +506,19 @@ extern u8 D_8008721C[];
  * `move a3` into the jal's delay slot, and cannot because a store through
  * a pointer is an opaque MEM that gcc 2.6.3's scheduler will not let the
  * gp-relative load hoist across. Preserved near-miss body: */
+/* STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real
+ * diff at word 60 (0x458C8 / vram 0x800550C8) -- see
+ * docs/match-reports/func_80054FD8.md.  Round 61 REVISIT: 38/81 -> 79/81.
+ * Round 47's "pure arg0/arg1 register-colour swap, ZERO drift" verdict was
+ * wrong on both counts; the equal length was two defects cancelling.  What
+ * is left is 2 words of genuine register identity: the else branch's
+ * computed value sits in $a2 here and in $v1 in retail, because `t`'s single
+ * pseudo (deliberately shared -- splitting it into two variables costs 4
+ * words) coalesces with the third-argument register.  Preserved near-miss
+ * body: */
 #if 0
 void **func_80054FD8(void **arg0, void *arg1) {
+    s32 t;
     s32 *p;
     u8 **q;
 
@@ -525,11 +536,13 @@ void **func_80054FD8(void **arg0, void *arg1) {
         if (*p < -0x7800) {
             *p = -0x7800;
         }
-        D_8008E0C0[0] = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
+        t = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
+        D_8008E0C0[0] = t;
     }
+    t = D_8008AB4C;
     q = &D_8008E0B0;
     *q = D_80087174;
-    *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+    *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;
     return arg0;
 }
