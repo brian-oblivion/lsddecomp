@@ -186,7 +186,7 @@ s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     return a2;
 }
 
-void func_800402F0(Class6E99CObj *self, void *a1) {
+void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
     Class6E99CMethods *methods;
     s32 mode;
 

@@ -1,4 +1,6 @@
-# func_800402F0 -- MATCHED (66/66 words)
+> Renamed from `func_800402F0` on 2026-09-20 (tools/rename.py). Address 0x800402f0.
+
+# Class6E99C__Stop -- MATCHED (66/66 words)
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slot14` (`+0x014`,
 shared with `Class6B5CCMethods`'s own inherited slot).
@@ -6,7 +8,7 @@ shared with `Class6B5CCMethods`'s own inherited slot).
 ## Final body
 
 ```c
-void func_800402F0(Class6E99CObj *self, void *a1) {
+void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
     Class6E99CMethods *methods;
     s32 mode;
 
@@ -80,14 +82,14 @@ symmetrically to both arms, not two independent fixes):
 Confirmed via `permuter.py --debug` (score 0, all five penalty
 categories zero) and then the real oracle:
 `./build-and-verify.sh` exits 0, whole-image SHA1 matches, and
-`funcdiff.py func_800402F0` reports `66/66 words match`.
+`funcdiff.py Class6E99C__Stop` reports `66/66 words match`.
 
 ## Attempts (7 total across two rounds)
 
 Round 14/15 (5, all pre-`__asm__`/nested-if shapes; see git history for
 exact text) plus this round's 2:
 
-6. Bare-randomization permuter run (`permuter-work/func_800402F0`, no
+6. Bare-randomization permuter run (`permuter-work/Class6E99C__Stop`, no
    `PERM` macros, `-j 6 --stop-on-zero --best-only`, `timeout 550`):
    score improved from base 410 (both residues open) down to 100 (one
    residue closed -- the `mode = 6` hoist, discovered blind by the

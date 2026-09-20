@@ -1901,7 +1901,7 @@ struct ClassEAC0Obj {
     s16 unk60;                 /* +0x060, OBSERVED: func_800405D0, from a1->0x0 */
     s16 unk62;                 /* +0x062, OBSERVED: func_800405D0, from a1->0x4 */
     u8 pad064[0x06C - 0x064];
-    s32 unk6C;                 /* +0x06C, OBSERVED: func_800402F0/Class6E99C__StartFadeToIndex/
+    s32 unk6C;                 /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/
                                    Class6E99C__StartFadeDefault, a small dispatch-state tag */
     u8 pad070[0x074 - 0x070];
     s32 unk74;                 /* +0x074, OBSERVED: Class6E99C__StartFadeToIndex, negated on the
@@ -1909,7 +1909,7 @@ struct ClassEAC0Obj {
                                    setter also targets this offset on the
                                    Class6E99C leaf, same field */
     u8 pad078[0x098 - 0x078];
-    s32 unk98;                 /* +0x098, OBSERVED: func_800402F0, truthy-tested;
+    s32 unk98;                 /* +0x098, OBSERVED: Class6E99C__Stop, truthy-tested;
                                    func_800404B4's own setter also targets this
                                    offset on the Class6E99C leaf, same field */
 };
@@ -1930,10 +1930,10 @@ struct Class6E99CMethods {
        (func_8001CC48/func_8001CCB4/func_8001CD20) -- identical addresses in
        both tables per the file banner's classtable.py census. */
     void (*slot10)(Class6E99CObj *self); /* +0x010, OBSERVED: Class6E99C__Configure */
-    void (*slot14)(Class6E99CObj *self, s32 a1); /* +0x014, OBSERVED: func_800402F0 */
+    void (*slot14)(Class6E99CObj *self, s32 a1); /* +0x014, OBSERVED: Class6E99C__Stop */
     u8 pad018[0x030 - 0x018];
     /* +0x030, BasicClass-inherited (per the file banner's census, matches
-       D_8006B58C's own +0x030 verbatim) -- OBSERVED: func_800402F0
+       D_8006B58C's own +0x030 verbatim) -- OBSERVED: Class6E99C__Stop
        dispatches it as `(self, s32 a1)` with a1 a small literal (5 or 6). */
     void (*slot30)(Class6E99CObj *self, s32 a1);
     u8 pad034[0x040 - 0x034];
@@ -1944,7 +1944,7 @@ struct Class6E99CMethods {
                                 ctor call and the occupant's own body never
                                 reads them. */
     u8 pad044[0x060 - 0x044];
-    /* +0x060/+0x064, OBSERVED: Class6E99C__FinishConstruct/func_800402F0, both dispatched
+    /* +0x060/+0x064, OBSERVED: Class6E99C__FinishConstruct/Class6E99C__Stop, both dispatched
        as `(self, s32 a1)`. Occupants (code_2cc8c_f, bravo's own functions):
        func_800406E4 (+0x060), func_80040714 (+0x064). */
     void (*slot60)(Class6E99CObj *self, s32 a1);
@@ -1972,7 +1972,7 @@ struct Class6E99CMethods {
     /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- Class6E99C__Configure (this
        unit) is the shared occupant either way. */
     s32 (*slotDC)(Class6E99CObj *self);              /* +0x0DC, Class6E99C__Configure */
-    void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, func_800402F0 */
+    void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, Class6E99C__Stop */
     void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, func_800403F8 */
     void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, func_8004042C */
     void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, func_80040490 */
@@ -2008,7 +2008,7 @@ struct Class6E99CObj {
     u8 unk66;
     u8 pad067[0x068 - 0x067];
     s32 unk68;                 /* +0x068, OBSERVED: Class6E99C__Configure, a divisor */
-    /* +0x06C, OBSERVED: func_800402F0/Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault/
+    /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault/
        Class6E99C__FinishConstruct (zeroed by the ctor override) -- a small dispatch-state
        tag (0, 1, or 2 observed). */
     s32 unk6C;
