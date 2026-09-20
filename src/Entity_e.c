@@ -338,19 +338,12 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-/* STALL -- see docs/match-reports/func_80062C58.md. Round 45: logic fully
- * derived and control flow confirmed correct (61/213 words match, +2 words
- * long); remaining residue is GCC's own delay-slot scheduling of the
- * unk80/2 + unk80/4 dual-division block, which resists straightforward
- * source reordering. Restored to INCLUDE_ASM per project rule. */
-#if 0
 extern u8 D_80089D0C[];
 extern u8 D_80089E50[];
 extern u8 D_80089E14[];
 extern s32 D_8008ACCC;
 
 void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
-    s32 half, quarter;
     s32 tmp;
     void *table;
 
@@ -374,24 +367,18 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == this->unk80 - 1) {
         this->moodTimer = -1;
     } else {
-        quarter = this->unk80 / 4;
-        half = this->unk80 / 2;
-        if (this->moodTimer < half + quarter) {
-            if (this->moodTimer < half) {
-                if (this->moodTimer < quarter) {
-                    /* nothing */
-                } else {
-                    this->methods->slot130(this);
-                    this->methods->slotC4(this, -0x6E, 0);
-                }
-            } else {
-                if (this->moodTimer == half) {
-                    out->unk1C = 0x10;
-                }
-                this->methods->slotC4(this, 0x6E, 0);
-            }
-        } else {
+        if (this->moodTimer >= this->unk80 / 2 + this->unk80 / 4) {
             this->methods->slot12C(this);
+        } else if (this->moodTimer >= this->unk80 / 2) {
+            if (this->moodTimer == this->unk80 / 2) {
+                out->unk1C = 0x10;
+            }
+            this->methods->slotC4(this, 0x6E, 0);
+        } else if (this->moodTimer < this->unk80 / 4) {
+            /* nothing */
+        } else {
+            this->methods->slot130(this);
+            this->methods->slotC4(this, -0x6E, 0);
         }
     }
 
@@ -402,21 +389,17 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
         this->unk44 = 1;
         D_8008ACCC = 1;
     } else if (this->unk44 >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
-        s32 old;
-
         tmp = 0;
         if (rand() & 1) {
-            old = this->unk44;
-            this->unk44 = 0xD;
-            tmp = (old == 0xC) ? 0x190 : 0;
             table = D_80089E50;
+            tmp = (this->unk44 == 0xC) ? 0x190 : 0;
+            this->unk44 = 0xD;
         } else {
-            old = this->unk44;
-            this->unk44 = 0xC;
-            if (old == 0xD) {
+            table = D_80089E14;
+            if (this->unk44 == 0xD) {
                 tmp = -0x190;
             }
-            table = D_80089E14;
+            this->unk44 = 0xC;
         }
         this->methods->slot48(this, 1, table);
         this->methods->slotCC(this, tmp, 0);
@@ -427,9 +410,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
         this->unk44 = 1;
     }
 }
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80062C58);
 
 extern u8 D_80089CA0[];
 
@@ -463,4 +444,69 @@ void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80063144);
+extern u8 D_80089E08[];
+
+void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
+    s32 mod;
+    s32 mood;
+
+    if (this->moodTimer == 0 && (rand() & 1)) {
+        this->unk44 = rand() % 3;
+    }
+    if (this->unk44 != 0 && this->unkF4 != 0) {
+        if (out->unk4 >= 0x3D) {
+            out->unk4 = 0;
+        }
+        if (out->unk4 % 20 == 0) {
+            out->unk1C = 0x17;
+            out->unk10 = 0;
+            out->unk20 = -1;
+            out->unk44 = out->unk30 = 0x17;
+            out->unk34 = -1;
+            out->unk48 = -2;
+        } else if (out->unk4 % 20 == 0xE) {
+            out->unk1C = -2;
+            out->unk30 = -2;
+            out->unk44 = -2;
+        }
+        Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        mood = this->unk44;
+        if (mood == 1) {
+            this->methods->slot48(this, 0, D_80089E08);
+            mod = -0x176;
+            if (this->methods->slot144(this, this->target) < 0x200) {
+                this->methods->deactivate(this);
+                this->unk44 = mood;
+            }
+        } else {
+            this->target->methods->slot130(this->target, 1);
+            Class6B5CC__FaceTarget((Entity *)this->target, this, 1, 1, 0);
+            if (this->unk44 == 2) {
+                if (this->methods->slot144(this, this->target) < 0x960) {
+                    this->unk44 = 0xB;
+                    this->methods->notifyParents(this, 0xC);
+                }
+                mod = -0x60;
+            } else {
+                mod = 0;
+            }
+        }
+    } else {
+        out->unk10 = this->methods->getProximityRatio(this);
+        if (out->unk4 % 22 == 0) {
+            out->unk1C = 0x1C;
+        }
+        if (this->moodTimer >= 0x1F5) {
+            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+        }
+        if (this->methods->slot144(this, this->target) < 0x800) {
+            this->target->methods->slotC4(this->target, -0x800, 0);
+        }
+        mod = -0x14;
+    }
+    this->methods->slotD0(this, mod, 1);
+    if (this->unk28 != 0) {
+        this->methods->slotCC(this, -0xC8, 0);
+    }
+}
+
