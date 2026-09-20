@@ -361,7 +361,7 @@ void func_800593D8(DreamSys *this)
  * CLAUDE.md's convention for calling into a not-yet-preceding definition).
  * arg4 on Class6B5CC__LocalOffsetToWorldPos is unused by its own body but IS set (to 0) by this
  * call site's own disassembly, so it is declared here to reproduce that. */
-extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
+extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4); /* arity-ok: definition is 3-parameter, but arg4 is byte-load-bearing HERE -- retail emits `move a3,zero` at 0x80059460 */
 extern s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 

@@ -440,7 +440,7 @@ bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry)
  * register to 0 even though its 3-parameter C signature never reads it --
  * declared here to reproduce that register content, same as DreamSys.c's
  * own local prototype. */
-extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
+extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4); /* arity-ok: definition is 3-parameter, but arg4 is byte-load-bearing HERE -- retail emits `move a3,zero` at 0x8005CF7C */
 extern void Class6B5CC__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
 void func_8005CF34(DreamAuxSlot *a0)

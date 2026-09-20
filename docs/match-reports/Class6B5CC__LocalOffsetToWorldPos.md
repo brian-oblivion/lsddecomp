@@ -82,3 +82,30 @@ accesses are plain uses of existing fields, not new ones.
   (offset in, position out) more than a reading: `DreamSys.c`'s
   `func_8005942C` feeds it a 3-word offset and treats the result as a map
   position; `code_4cd08.c`'s `func_8005CF34` does the same for an aux slot.
+
+## Extern arity (round 59)
+
+**Verdict: arity-ok idiom.** Both 4-parameter declarations stay.
+
+**Callee evidence** (`0x8001E600`): entry is `move s1,a0` / `move s2,a1` /
+`move s0,a2` and `$a3` is never read — three real arguments, exactly what the
+definition in `src/code_d294_c.c` says.
+
+**Why both externs must keep the 4th parameter.** Every known call site sets
+`$a3` to zero, and that instruction is in retail:
+
+```
+80059460:  move  a3,zero                                  <- func_8005942C (DreamSys.c)
+80059468:  jal   8001e600 <Class6B5CC__LocalOffsetToWorldPos>
+
+8005cf78:  jal   8001e600 <Class6B5CC__LocalOffsetToWorldPos>
+8005cf7c:  move  a3,zero                                  <- func_8005CF34 (code_4cd08.c)
+```
+
+Reducing either declaration to the definition's three parameters makes the
+call a `too many arguments` compile error, and dropping the literal `0` from
+the call site deletes the `move a3,zero` and breaks both matches. The callee
+ignores the value; the caller still has to place it.
+
+**Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
+added to `src/DreamSys.c:364` and `src/code_4cd08.c:443`. Oracle green.
