@@ -172,7 +172,29 @@ void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
     self->frameCounter++;
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 23/32 words, length exact, zero drift. Residue: register
+ * identity (self/arg1 land in $s0/$s1 here vs retail's $s1/$s0,
+ * consistently through every later use -- CLAUDE.md HARD RULE 6 marks this
+ * unfixable from plain C, not a judgement call)
+ * (docs/match-reports/Obj86B60__NotifyParents.md). Hand-derived. */
+void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
+{
+    Obj86B60Methods *methods;
+
+    methods = self->methods;
+    __asm__("" ::: "memory");
+    self->unk20 = arg1;
+    methods->slot30(self);
+    if (arg1 == 2) {
+        methods->slot64(self);
+    } else if (arg1 == 3) {
+        methods->slot68(self);
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", Obj86B60__NotifyParents);
+#endif
 
 void Obj86B60__NotifyTargetReset(Obj86B60 *self)
 {

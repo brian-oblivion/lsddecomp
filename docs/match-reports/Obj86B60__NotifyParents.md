@@ -363,3 +363,23 @@ parameter (stored into `self->unk20`), forwarding again to
 (mode 3) -- fully understood control flow per the report's own "What it
 does" section above, independent of the register-identity residue that
 stalls the byte match.
+
+## NON_MATCHING body promoted, round 62
+
+Placed the round-46 best-reached body (the `__asm__("" ::: "memory")`
+barrier variant, 23/32, zero drift) in `src/code_2cc8c_c.c` under
+`#ifdef NON_MATCHING`/`#else INCLUDE_ASM`, per track 1b. Confirmed
+hand-derived from this report before promoting: round 46's own text
+tried the permuter's tempting sub-baseline candidate (`output-58-1`)
+translated to C and it scored a real 2/32 with outside-range drift --
+worse than baseline -- and was explicitly rejected un-promoted; the body
+promoted here is the separate hand lever (a memory-clobber barrier
+placed before `self->unk20 = arg1;`) that round 46 tried next and
+verified at 23/32 with no outside-range drift, not a permuter output.
+`./build-and-verify.sh` green (`build exit=0`, `OK: build matches retail
+SLPS_015.56` -- no bytes changed, the verified build never compiles the
+`#ifdef NON_MATCHING` half) and `tools/check-nonmatching.sh` green
+(`OK: 10 NON_MATCHING body(ies) in 4 unit(s) compile and reference only
+linked symbols`). The report's recorded 23/32 figure and residue class
+(pure register identity, self/arg1 swapped `$s0`/`$s1` vs retail's
+`$s1`/`$s0`) matched the body exactly; no discrepancy to flag.
