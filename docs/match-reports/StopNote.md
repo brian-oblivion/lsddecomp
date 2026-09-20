@@ -197,3 +197,16 @@ correct way to force a redundant-store-elimination-defeating reload when
 the value's narrow range would otherwise let the compiler prove the reload
 unnecessary." Both facts belong together for the next runner who hits this
 symbol or one like it.
+
+## Naming
+
+**StopNote** (was `func_800300D0`) -- Tier A. Same evidence as StartNote:
+`code_179d8_k.c`'s `func_800344FC` calls this in its zero-velocity branch
+(the MIDI note-off convention) and StartNote in the nonzero-velocity
+branch of the same switch; `code_179d8_j.c`'s `func_800303C8` wraps this
+with the same fixed leading identity constant `code_179d8_j.c`'s
+`func_800302DC` uses to wrap StartNote. Scans every voice for one whose
+four identity fields match the caller's, and releases it (a no-op
+bookkeeping clear if it was never actually keyed on, per the
+`D_8008D988[i].unk0 == 0xFF` branch; otherwise the real SPU-mask
+deallocation), returning the count released.

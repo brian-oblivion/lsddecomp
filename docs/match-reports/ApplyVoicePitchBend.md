@@ -500,3 +500,17 @@ description. Worth checking the debug breakdown's Insertions/Deletions
 counts against a report's own claimed residue shape before spending search
 time -- a mismatch there would mean the seed is not scoring the residue
 the report thinks it is.
+
+## Naming
+
+**ApplyVoicePitchBend** (was `func_8002F3E8`) -- Tier A. Body fully
+evident (preserved below, exact length): matches a voice by its
+(track/note/program) identity fields, then computes a curve-table-driven
+bend from a 0-127 depth value centered at `0x40` (`threshold = a4 - 0x40`,
+looked up in `D_8008E978`'s `bendCurveUp`/`bendCurveDown` fields depending
+on sign) applied to a base value, writes the result through
+`func_8002E038`, and returns `1` on match / `0` otherwise -- the return
+value is what `ApplyPitchBendToAllVoices` sums into its own return.
+"PitchBend" rather than a vaguer name because the `a4-0x40`-centered,
+signed-threshold, curve-table shape is the textbook MIDI pitch-bend-depth
+computation, not merely "some per-voice adjustment".

@@ -102,3 +102,17 @@ and with the right instruction shape. This is a distinct axis from
 -- here the VARIABLE's declaration stays `s16` (matching the first,
 sign-extending use); it's a per-SITE cast that forces the second
 occurrence's own narrower codegen.
+
+## Naming
+
+**ClearNoiseVoices** (was `func_8002F2A4`) -- Tier B. Releases every
+voice whose state byte (`D_8008D9A3`) reads exactly `2`. The value `2` is
+the same one `func_8002CF18` (code_179d8_l) and UpdateVoiceEnvelopes both
+react to by calling their respective "silence the SPU noise generator"
+Sony/library function (`func_800375E8` / `SpuSetNoiseVoice`) before
+clearing state -- three independent sites agreeing on what state `2`
+means is why "Noise" is used here rather than a bare "state-2" name, even
+though this function itself never calls a noise-silencing routine (it
+only clears the bookkeeping fields, which is consistent with being called
+AFTER the noise generator has already been silenced elsewhere, or for a
+voice that never needed it).

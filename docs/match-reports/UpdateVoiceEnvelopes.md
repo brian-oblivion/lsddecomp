@@ -771,3 +771,50 @@ void UpdateVoiceEnvelopes(void) {
 }
 #endif
 ```
+
+## Naming
+
+**UpdateVoiceEnvelopes** (was `func_8002F700`) -- Tier B. Body mostly
+evident (preserved below, 4 words short): appends this tick's voice-
+activity bitmask to a 16-slot ring buffer (`gVoiceActivityRingIdx`/
+`gVoiceActivityRing`), and once 16 consecutive ticks show a voice as
+inactive, force-releases it (silencing the SPU noise generator first if
+its state was the `2`/noise value ClearNoiseVoices also reacts to); then
+clears the active-voice mask and calls StepVoiceEnvelope/StepVoiceFade
+for every voice whose respective flag is set. Named for the dispatch
+role, which is unambiguous; the exact tick cadence (every video frame?
+every audio-driver callback?) is not established from this function's
+body alone -- it is simply called once at the end of InitSpuDriver in
+this unit, with its own logic implying a recurring caller elsewhere.
+
+## Proposed field names
+
+This function is the best-evidenced site for several of this cluster's
+shared globals, but per the ownership rule (and this round's
+call-graph-contention note on the broadcast: `code_179d8_j_b.c`, bravo's
+live unit this round, references nearly all of them) none are applied
+here -- proposing for the head to apply once no runner is live on
+`code_179d8_j_b`/`_l`/`_j`/`_j_c`/`_k`/`_p`:
+
+- `D_8008EA26` -> `gSelectedVoice` ("currently selected channel" scratch,
+  already documented `volatile`, read back via a plain `u8 *` cast --
+  see StopNote's own report for why that specific cast matters).
+- `D_8008E9D0` -> `gVoiceCount` ("loop bound for a small table of active
+  objects", consistently the upper bound of every per-voice loop in this
+  unit and its siblings).
+- `D_80090C60`/`D_80090C64` -> `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`
+  (OR'd with a per-voice bit when releasing a voice, split low/high 16
+  across the 0..0x1F channel space).
+- `D_8008E228`/`D_8008E22C` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
+  (AND-NOT'd with the enable mask above -- the actual SPU key bitmask
+  pair, per `func_8002DDBC`'s report).
+- `D_8008D970` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
+  several functions in this cluster; never fully decoded here).
+- `D_8008D9A3` -> `gVoiceState` (the byte StopNote/ClearNoiseVoices/
+  `func_8002CF18` all compare against `2` for "noise voice").
+- `D_8006DAD4` (and this unit's two local views `ObjDAD4`/`ObjDAD4Edd4`)
+  -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
+  `0x1F801C00` by `func_8002DDBC`'s report in `code_179d8_l`.
+
+Posted to the broadcast this round; see also InitSpuDriver.md's own
+`## Proposed field names`.

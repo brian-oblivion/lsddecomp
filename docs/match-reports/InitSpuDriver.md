@@ -703,3 +703,29 @@ here, the specific missing mutation (reusing one declared variable for two
 unrelated purposes) is not something a human reshaping by hand would
 naturally try, since it looks strictly worse (an extra, seemingly
 pointless assignment) by ordinary C style standards.
+
+## Naming
+
+**InitSpuDriver** (was `func_8002EDD4`) -- Tier A. Two Sony `libspu` calls
+(`_spu_setInTransfer`, `SpuInitMalloc`), zeroes every per-voice table this
+unit owns plus `gMasterVolL`/`gMasterVolR` (reset to `0x3FFF`, the PS1
+SPU's actual 14-bit max volume register value -- strong corroborating
+evidence for those two names, tier B on their own), and calls
+UpdateVoiceEnvelopes once at the end. This is squarely "initialize the
+sound driver"; nothing about it is guessed beyond what the body does.
+
+## Proposed field names
+
+Not this function's own struct, but noting here since this report already
+lists most of the cluster: `D_8006DAD4Edd4`/`D_8006DAD4` (this unit's two
+independent local views of the same base pointer) is the PS1 SPU hardware
+base address `0x1F801C00`, per `func_8002DDBC`'s own report in
+`code_179d8_l`. Proposing (not applying -- shared with bravo's live
+`code_179d8_j_b.c` this round, see broadcast) a base-pointer rename to
+`gSpuRegs` once no live runner touches `code_179d8_j_b`/`_l`/`_j`/`_j_c`/
+`_k`/`_p`. See the broadcast post from this round for the fuller list of
+globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
+`D_8008E9D0` -> `gVoiceCount`, `D_80090C60`/`D_80090C64` ->
+`gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`D_8008E22C` ->
+`gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `D_8008D970` -> `gVoiceFlags`,
+`D_8008D9A3` -> `gVoiceState`).

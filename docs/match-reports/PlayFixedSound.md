@@ -107,3 +107,14 @@ compiler generation still forces the reload through the pointer without any
 volatile qualifier at all. Worth confirming on a second instance before
 promoting further, but both of the wrong turns here are worth knowing before
 trying either.
+
+## Naming
+
+**PlayFixedSound** (was `func_8002F368`) -- Tier B. Identical shape to
+PlaySound (allocate a free voice, key it on) but with the trailing two
+`func_8002DDBC` parameters replaced by the constants `0x80FF`/`0x5FC8`
+rather than forwarded from the caller -- i.e. a specific always-the-same
+sound rather than a general playback entry point. What that fixed sound
+IS (a UI cue? a fixed sample?) is not established from this function's
+body; "Fixed" names the mechanical distinction from PlaySound, not the
+sound's identity.

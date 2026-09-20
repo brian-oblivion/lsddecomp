@@ -132,3 +132,13 @@ callee's -- the caller-side narrowing instructions are the conversion
 FROM the caller's declared type TO the callee's declared type, so an
 odd-one-out parameter width on the callee side often means an ordinary
 (non-odd) type on the caller side, and vice versa.
+
+## Naming
+
+**ApplyPitchBendToAllVoices** (was `func_8002F610`) -- Tier B. Calls
+Sony's `SpuVmVSetUp` once, then runs `ApplyVoicePitchBend` over every
+voice (`0..D_8008E9D0`) with the same identity/depth arguments, summing
+its 0/1 return into a count. The uncertain part is `SpuVmVSetUp`'s own
+role (an SDK function, not renamed here) -- named for what THIS function
+visibly does (batch-apply a bend, report how many voices it affected),
+not for what the SDK call underneath it is for.

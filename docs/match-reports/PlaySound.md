@@ -62,3 +62,13 @@ first (ROM-order-earliest) user instead of duplicating them.
 No new learning beyond `PlayFixedSound`'s report; this one is corroborating
 evidence for that report's `sh`-then-`lbu` idiom and for `func_8002DDBC`'s
 signature.
+
+## Naming
+
+**PlaySound** (was `func_8002F20C`) -- Tier B. Allocates a free voice via
+`func_8002CF18` (code_179d8_l, "voice-steal candidate scan") and, if one
+is available (`v0 < D_8008E9D0`, the voice count), keys it on via
+`func_8002DDBC` (code_179d8_l, confirmed to write the PS1 SPU's key-on
+registers) forwarding all four caller-supplied parameters unchanged. The
+generic name reflects that this is the "just play it" wrapper, in
+contrast to PlayFixedSound's hardcoded-parameter variant.

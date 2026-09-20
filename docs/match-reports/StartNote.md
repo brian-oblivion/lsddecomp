@@ -588,3 +588,31 @@ Note: `ObjE970` gained a `+0x12` `u16` field for this attempt (see
 compiled function and the next attempt at this function, or at
 `StepVoiceEnvelope`/`StepVoiceFade` (which also use `D_8008E970`), will need
 it again.
+
+## Naming
+
+**StartNote** (was `func_8002FAC4`) -- Tier A. Signature and role
+corroborated independently by three sibling units (`code_179d8_i.c`,
+`code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
+section) before any body-level derivation: `code_179d8_k.c`'s
+`func_800344FC` calls this in its nonzero-velocity branch and StopNote in
+its zero-velocity branch of the SAME MIDI-status-byte switch, and
+`code_179d8_j.c` wraps both with the same fixed leading identity constant
+(`0x21`) -- a clean NoteOn/NoteOff symmetry, which is the primary evidence
+for "Note" rather than the more mechanical "RegisterActiveChannel" this
+report's own prose used while deriving it. Registers a new active-voice
+record for the given (packed screen/slot identity, note, program/volume,
+velocity, pan-split pair, status).
+
+## Proposed field names
+
+`D_8008E970`/`ObjE970` (already locally typed with `difficultyThreshold`/
+`masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
+(`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
+declared in this unit but only used by functions still `INCLUDE_ASM`
+(StepVoiceEnvelope, StepVoiceFade, ApplyVoicePitchBend, and this
+function) -- the field renames are live in `src/code_179d8_m.c` now (pure
+documentation, nothing compiled references them yet); the base symbols
+themselves (`D_8008E970`, `D_8008E978`) were not renamed since
+`D_8008E978` is shared with bravo's live `code_179d8_j_b.c` this round
+(see broadcast).

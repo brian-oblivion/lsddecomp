@@ -149,3 +149,17 @@ listing (not a new derivation, just closer reading) resolved it. The tell
 here specifically: `grep -n 'label\|beqz\|bnez\|beq\|bne\|blez\|bgez\|bltz'`
 between the point you think gates a block and the block itself -- if it's
 empty, the block runs on every path through that point.
+
+## Naming
+
+**BeginVoiceFade** (was `func_8002E874`) -- Tier B. Mechanics fully evident
+from the body: given a voice index and a from/to/rate triple, it
+unconditionally records the from/to pair and the "fading" flag into the
+`gVoiceFade*` arrays, then computes a per-tick step (and, in the
+"close" branch, a throttle interval) so that `StepVoiceFade` can advance
+the value later. What in the game actually gets faded this way (a MIDI
+CC-driven volume slide? an automatic release curve?) is not established --
+only that the destination of the ramp feeds into a stereo-volume
+computation (see StepVoiceFade's own report), which is why "Fade" rather
+than a more specific term. See the unit header comment in
+`src/code_179d8_m.c` for the cross-function picture.

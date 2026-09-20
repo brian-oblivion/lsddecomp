@@ -591,3 +591,15 @@ void StepVoiceFade(s16 a0) {
 }
 #endif
 ```
+
+## Naming
+
+**StepVoiceFade** (was `func_8002EA44`) -- Tier B. Companion to
+BeginVoiceFade: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
+`gVoiceFadeStep`, throttled by `gVoiceFadeInterval`/`gVoiceFadeCountdown`,
+clears `gVoiceFadeActive` on reaching the limit, then computes and writes
+this voice's stereo output level from the resulting percentage (same
+final block as StepVoiceEnvelope, confirmed near-identical between the
+two reports). "Fade" rather than a more specific name for the same reason
+as BeginVoiceFade: what value is actually being interpolated in-game is
+not established from this function's body alone.
