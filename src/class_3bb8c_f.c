@@ -62,7 +62,7 @@ s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     s32 seekPos;
     u8 raw;
 
-    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, suffix);
+    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->cardSlot, suffix);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
@@ -199,7 +199,7 @@ s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6
     StreamReq *req;
 
     payload = arg6;
-    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->unk0C, (char *)a1);
+    path = func_8004F32C((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
     delete(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
@@ -289,7 +289,7 @@ s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
         EnterCriticalSection();
     }
     for (i = 0; i < 4; i++) {
-        result = callback(self->field14[i]);
+        result = callback(self->events[i]);
         if (result == 0) {
             break;
         }
@@ -301,7 +301,7 @@ s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
 }
 
 s32 func_8004F4A4(TaskObjF *self) {
-    return func_8004F4C8(self->field14, 4);
+    return func_8004F4C8(self->events, 4);
 }
 
 s32 func_8004F4C8(s32 *arr, s32 count) {
@@ -319,14 +319,14 @@ s32 func_8004F4C8(s32 *arr, s32 count) {
 void func_8004F55C(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a5, s32 a6, s32 a7) {
     self->unk30 = a1;
     self->unk34 = a2;
-    self->unk38 = 0;
+    self->bufArray = 0;
     self->unk68 = a6;
     self->unk6C = a7;
     self->methods->addChild(self, (void *)a3);
     self->methods->addChild(self, (void *)a5);
     self->unk70 = 0;
-    self->unk28 = 0;
-    self->unk24 = 0;
+    self->statusCode = 0;
+    self->opMode = 0;
 }
 
 void func_8004F5DC(TaskObjF *self) {
@@ -343,23 +343,23 @@ void func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
     self->unk40 = a1;
     self->unk44 = a2;
     self->unk54 = a3;
-    self->unk24 = 1;
+    self->opMode = 1;
     self->unk58 = a4;
     if (func_8004F9D8(self)) {
         func_8004F810(self);
         func_8004F704(self);
-        result = self->methods->slot5C(self, self->unk38, self->unk3C, self->unk30, self->unk34);
-        self->unk2C = result;
+        result = self->methods->slot5C(self, self->bufArray, self->scratchBuf, self->unk30, self->unk34);
+        self->bufCount = result;
         if (result != 0) {
             func_8004F784(self);
-            if (self->unk28 == 0xE) {
+            if (self->statusCode == 0xE) {
                 code = 0xF;
             } else {
                 code = 0x12;
             }
         } else {
             code = 0xD;
-            self->unk2C = 0xF;
+            self->bufCount = 0xF;
         }
         self->methods->slot7C(self, code);
     }
@@ -368,34 +368,34 @@ void func_8004F638(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4) {
 void func_8004F704(TaskObjF *self) {
     s32 i;
 
-    if (self->unk38 == 0) {
-        self->unk38 = func_80017B34(0x40);
+    if (self->bufArray == 0) {
+        self->bufArray = func_80017B34(0x40);
         for (i = 0; i < 15; i++) {
-            self->unk38[i] = func_80017B34(0x41);
+            self->bufArray[i] = func_80017B34(0x41);
         }
-        self->unk3C = func_80017B34(0x40);
+        self->scratchBuf = func_80017B34(0x40);
     }
 }
 
 void func_8004F784(TaskObjF *self) {
     s32 i;
 
-    for (i = self->unk2C; i < 15; i++) {
-        self->unk38[i] = func_80017CFC(self->unk38[i]);
+    for (i = self->bufCount; i < 15; i++) {
+        self->bufArray[i] = func_80017CFC(self->bufArray[i]);
     }
-    self->unk38[i] = 0;
+    self->bufArray[i] = 0;
 }
 
 void func_8004F810(TaskObjF *self) {
     s32 i;
 
-    if (self->unk38 != 0) {
-        func_80017CFC(self->unk3C);
-        for (i = 0; i < self->unk2C; i++) {
-            func_80017CFC(self->unk38[i]);
+    if (self->bufArray != 0) {
+        func_80017CFC(self->scratchBuf);
+        for (i = 0; i < self->bufCount; i++) {
+            func_80017CFC(self->bufArray[i]);
         }
-        func_80017CFC(self->unk38);
-        self->unk38 = 0;
+        func_80017CFC(self->bufArray);
+        self->bufArray = 0;
     }
 }
 
@@ -405,7 +405,7 @@ void func_8004F810(TaskObjF *self) {
  * LONG, address drift beyond that -- opposite direction from the previous
  * 36/77-at-1-word-short best). Caching `self->methods` into a local
  * `TaskObjFMethods *m` right where retail does (in the `slot60`-returned-
- * nonzero tail, before its own 2-way `unk28` check) took this from 36/77
+ * nonzero tail, before its own 2-way `statusCode` check) took this from 36/77
  * to 63/77 -- reproduces retail's whole body byte-for-byte up through the
  * final shared `jalr`. The residue is now isolated entirely to the
  * function's OWN early-exit tail (see report): retail reuses
@@ -429,7 +429,7 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
     self->unk40 = a1;
     self->unk44 = a2;
     self->unk48 = a3;
-    self->unk24 = 2;
+    self->opMode = 2;
     self->unk4C = a5;
     self->unk50 = a6;
     self->unk54 = a7;
@@ -439,9 +439,9 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
             goto slot60_path;
         }
         code = 0xA;
-        if (self->unk28 == code) {
+        if (self->statusCode == code) {
             code = 0x11;
-        } else if (self->unk28 == 0x11) {
+        } else if (self->statusCode == 0x11) {
             code = 0xB;
         }
 
@@ -458,7 +458,7 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
         {
             TaskObjFMethods *m = self->methods;
             code = 0x11;
-            if (self->unk28 == code) {
+            if (self->statusCode == code) {
                 code = 0xB;
             }
             dispatch = m->slot7C;
@@ -499,7 +499,7 @@ s32 func_8004F9D8(TaskObjF *self) {
         code = 4;
     } else if (buf18 != 0) {
         goto dispatch;
-    } else if (self->unk24 == 1) {
+    } else if (self->opMode == 1) {
         code = 5;
     } else {
         code = 6;

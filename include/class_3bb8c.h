@@ -1919,16 +1919,16 @@ struct TaskObjFMethods {
 struct TaskObjF {
     TaskObjFMethods *methods;   /* +0x000 */
     u8 pad04[0x00C - 0x004];     /* BasicClass::children/parentRefs, untouched by this unit */
-    s32 unk0C;                    /* +0x00C, func_8004EDC0: passed as func_8004F32C's "selector" (device slot 0/1) */
+    s32 cardSlot;                  /* +0x00C, func_8004EDC0: passed as BuildMemcardPath's "selector" (device slot 0/1) -- RENAMED round 60 (was unk0C) */
     u8 pad10[0x014 - 0x010];
-    s32 field14[4];                /* +0x014, func_8004F40C (walks all 4, early-exit)/func_8004F4A4 (passes &field14[0], count 4) */
-    s32 unk24;                       /* +0x024, a state/mode tag: func_8004F638 sets 1, func_8004F8A4 sets 2, func_8004F9D8 reads (==1?) */
-    s32 unk28;                        /* +0x028, a result/error code: func_8004F55C/func_8004F638 clear or set it, func_8004F8A4/func_8004F9D8 read it */
-    s32 unk2C;                         /* +0x02C, func_8004F638 (slot5C's return)/func_8004F784/func_8004F810 (loop bound over unk38's array) */
+    s32 events[4];                  /* +0x014, func_8004F40C (walks all 4, early-exit)/func_8004F4A4 (passes &events[0], count 4) -- RENAMED round 60 (was field14): 4 kernel event descriptors, corroborated cross-unit by class_3bb8c_e.c's func_8004E5E4, which fills the identical offset via OpenEvent() then passes the same object to this unit's own EnableEvents wrapper (see func_8004F394's report) */
+    s32 opMode;                       /* +0x024, RENAMED round 60 (was unk24): distinguishes which of this class's two operations is active -- func_8004F638 sets 1, func_8004F8A4 sets 2, func_8004F9D8 reads (==1?); the values' exact meaning is not established */
+    s32 statusCode;                    /* +0x028, RENAMED round 60 (was unk28): func_8004F55C/func_8004F638 clear or set it, func_8004F8A4/func_8004F9D8 read it and dispatch it through slot7C -- a status/completion code, not confirmed to be error-only */
+    s32 bufCount;                       /* +0x02C, RENAMED round 60 (was unk2C): func_8004F638 (slot5C's return)/func_8004F784/func_8004F810 (loop bound over bufArray) -- the number of bufArray entries actually in use */
     s32 unk30;                          /* +0x030, func_8004F55C (arg1)/func_8004F638 (slot5C's arg3) */
     s32 unk34;                           /* +0x034, func_8004F55C (arg2)/func_8004F638 (slot5C's stack arg4) */
-    void **unk38;                         /* +0x038, a 16-entry pointer array allocated by func_8004F704, torn down by func_8004F810, walked by func_8004F784; also func_8004F638's slot5C arg1 */
-    void *unk3C;                            /* +0x03C, a single buffer allocated by func_8004F704, freed by func_8004F810; also func_8004F638's slot5C arg2 */
+    void **bufArray;                      /* +0x038, RENAMED round 60 (was unk38): a 16-entry pointer array allocated by func_8004F704, torn down by func_8004F810, walked by func_8004F784; also func_8004F638's slot5C arg1 */
+    void *scratchBuf;                       /* +0x03C, RENAMED round 60 (was unk3C): a single buffer allocated by func_8004F704, freed by func_8004F810; also func_8004F638's slot5C arg2 */
     s32 unk40;                                /* +0x040, func_8004F638 (arg1)/func_8004F8A4 (arg1, forwarded to slot54 as its own arg2) */
     s32 unk44;                                 /* +0x044, func_8004F638 (arg2)/func_8004F8A4 (arg2) */
     s32 unk48;                                  /* +0x048, func_8004F8A4 (arg3) */
@@ -1957,10 +1957,12 @@ struct TaskObjF {
  * argument. */
 
 /* Generic "find the first of up to `count` entries for which
- * func_800390F4 accepts it, retrying the whole array forever if none
+ * TestEvent accepts it, retrying the whole array forever if none
  * qualify yet" helper -- func_8004F4A4 calls it on this unit's own
- * TaskObjF::field14 (count 4). D_80086E78 is a small lookup table indexed
- * by the winning slot; bound unknown from this unit alone, left unsized. */
+ * TaskObjF::events (count 4). D_80086E78 is a small lookup table indexed
+ * by the winning slot; bound unknown from this unit alone, left unsized.
+ * (Comment updated round 60: the callback was `func_800390F4` before round
+ * 34 linked it as Sony's own `TestEvent`; `field14` renamed to `events`.) */
 extern s32 D_80086E78[];
 extern s32 func_8004F4C8(s32 *arr, s32 count);
 
