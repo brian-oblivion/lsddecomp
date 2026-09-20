@@ -33,6 +33,38 @@
  * retitled CONVERTED, and carries its derivation verbatim.
  */
 
+/*
+ * WHAT THIS UNIT IS (round 61, track 3 naming pass). This file's own 17
+ * functions are the bottom two links of a three-class chain rooted in
+ * `code_d294.h`'s `Class6B5CCObj`: `Class6B5CCObj -> ClassEAC0Obj ->
+ * Class6E99CObj` (`tools/classtable.py D_8006E99C --vs D_8006B58C`,
+ * round 14; see `include/code_2cc8c.h`'s own header comment above
+ * `struct ClassEAC0Obj` for the full derivation). Critically, `ClassEAC0Obj`
+ * is THIS unit's own local view of the SAME table family that
+ * `code_2cc8c_f` (bravo's unit) views as `Obj6EAC0` -- `ClassEAC0Methods`'s
+ * `slotB8`/`slotCC` dispatch to bravo's own `Obj6EAC0__SetColor`/
+ * `Obj6EAC0__SetMask` -- so `Class6E99CObj` is a further-derived subclass
+ * of bravo's "on-screen text/digit display" class (round 54's own
+ * working hypothesis for `Obj6EAC0`).
+ *
+ * `Class6E99CObj`'s own functions (`New_Class6E99C` onward) add a
+ * start/stop pair over an indexed and a fixed color table
+ * (`Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`/
+ * `Class6E99C__Stop`), a per-tick `step`-driven RGB-channel accumulator
+ * gated by a countdown (`Class6E99C__Update`), and a save/restore-of-one
+ * position pair (`Class6E99C__PushPosition`/`Class6E99C__PopPosition`).
+ * Read together this looks like a COLOR-FADE CONTROLLER layered on top of
+ * bravo's digit display -- plausibly driving a transition when an
+ * on-screen digit/counter's value or color changes -- but that reading is
+ * this unit's own working hypothesis (tier B throughout), not confirmed
+ * against any caller outside this file: nothing else in `src/*.c`
+ * constructs or touches a `Class6E99CObj`/`ClassEAC0Obj` (only
+ * `New_Class6E99C`/`New_ClassEAC0` themselves are called elsewhere, always
+ * through a caller's own differently-typed local view -- see each
+ * function's own match report). See each function's own `## Naming`
+ * section for the specific evidence behind its name.
+ */
+
 Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
     Class6E99CObj *self;
 
