@@ -356,7 +356,37 @@ void func_8004CC74(Obj866E8 *self) {
     }
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 2/27 words, length exact, zero drift. Residue: register
+ * identity (retail copies `bounds` into $a2 with an unconditional `move
+ * a2,a0` before the null check, dedicates $v0 to the constant 1 for the
+ * whole body, and re-extracts point[0] from the saved-but-unshifted $a3 in
+ * a delay slot; every hand-derived C shape tried instead keeps everything
+ * in $a0/$v0 and re-materializes `li v0,1` at three of the four exits).
+ * Eleven independent source restatements (if-chains, `||`, `goto`, a
+ * consistent-alias local, narrow `s8` locals, a nested ternary, and a
+ * `result`/`do..while(0)` variable) all converge on this same shape or
+ * worse; permuter search (round 18, 71363 iterations) also failed to
+ * reach zero against the identical, since-confirmed-faithful scaffold
+ * (round 58) (docs/match-reports/func_8004CD38.md). Hand-derived. */
+s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+    if (bounds == NULL) {
+        return 1;
+    }
+    if (point[0] < bounds->unk0) {
+        return 1;
+    }
+    if (bounds->unk4 < point[0]) {
+        return 1;
+    }
+    if (point[1] < bounds->unk2) {
+        return 1;
+    }
+    return bounds->unk8 < point[1];
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CD38);
+#endif
 
 s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;
