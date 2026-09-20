@@ -21,7 +21,7 @@ extern void SetMem(s32 mode);
  * matched body never reads -- an unspecified-parameter declaration lets the
  * call carry it without contradicting the real prototype, the same idiom
  * code_8220.h already uses for func_80017B34/func_80017CFC. */
-extern void *BMemPMgrInit();
+extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bearing here -- retail emits `move a1,zero` in the jal's delay slot at 0x80011900 */
 
 /* func_80017A9C(BMemPMgr *pool) -- one-line `D_8008A818 = pool;`, matched
  * in code_8220.c but not yet declared in code_8220.h (no carved caller
