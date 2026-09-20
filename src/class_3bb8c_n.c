@@ -242,52 +242,53 @@ struct ObjSlotB8B8 {
     ObjSlotB8B8Methods *methods; /* +0x000 */
 };
 
-/* STALL, 24/93 words match, ~4 words short -- see
- * docs/match-reports/func_800549A8.md. Preserved near-miss body: */
-#if 0
+/* MATCHED round 61 (bravo), first attempt, after the BLKmode-struct-copy
+ * lever found on func_80054850 -- see docs/match-reports/func_800549A8.md.
+ * `rgb` is written only at [0..2] (by func_80054B1C); its declared size of 8
+ * is inferred from the STACK LAYOUT (it occupies sp+0x10..0x17, with `pos`
+ * at sp+0x18), not from any access. */
 void func_800549A8(void) {
     ObjAC7CSub *self;
     s32 delta;
-    s32 s3;
-    s32 paramA[2];
-    s32 paramB[2];
-    s32 s1;
+    s32 shift;
+    u8 rgb[8];
+    PairXY pos;
+    s32 srcOfs;
     s32 i;
-    void **arr;
-    void *obj;
+    void **wp;
+    ObjSlotB8B8 *obj;
 
     if (D_8008AB50 == 0) {
         return;
     }
     self = *(ObjAC7CSub **) (D_8008AC7C + 0xC);
     delta = self->field18 - self->field24;
-    s3 = (delta / 600) * 3;
-    if (s3 <= 0) {
+    shift = (delta / 600) * 3;
+    if (shift <= 0) {
         return;
     }
-    paramB[0] = D_8008AB68;
-    paramB[1] = D_8008AB6C;
+    pos = *(PairXY *) &D_8008AB68;
     i = 0;
     if (D_8008AB50 == 2) {
-        paramB[1] += 0x1E;
+        pos.y += 0x1E;
     }
-    arr = D_8008E10C;
-    s1 = 0;
-    paramB[1] = paramB[1] + s3 * 3;
-    for (; i < 0x12; i++) {
-        func_80054B1C((u8 *) paramA, (u8 *) (s1 + D_8008AC8C), s3);
-        obj = arr[i];
-        ((ObjSlotB8B8 *) obj)->methods->slotB8(obj, 1, paramA);
-        obj = arr[i];
-        s1 += 3;
-        ((ObjSlotB8B8 *) obj)->methods->slotBC(obj, paramB);
-        paramB[1] += 3;
-    }
-    func_80054B1C((u8 *) paramA, (u8 *) D_8008AC90, s3);
-    self->methods->slot64(self, paramA);
+    wp = D_8008E10C;
+    srcOfs = 0;
+    pos.y += shift * 3;
+    do {
+        func_80054B1C(rgb, (u8 *) (srcOfs + D_8008AC8C), shift);
+        obj = (ObjSlotB8B8 *) *wp;
+        obj->methods->slotB8(obj, 1, rgb);
+        obj = (ObjSlotB8B8 *) *wp;
+        i++;
+        srcOfs += 3;
+        obj->methods->slotBC(obj, &pos);
+        pos.y += 3;
+        wp++;
+    } while (i < 0x12);
+    func_80054B1C(rgb, (u8 *) D_8008AC90, shift);
+    self->methods->slot64(self, rgb);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800549A8);
 
 void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
     dst[0] = src[0] - delta;
