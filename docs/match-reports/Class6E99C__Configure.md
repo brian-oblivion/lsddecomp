@@ -1,4 +1,6 @@
-# func_80040154 -- MATCHED (103/103)
+> Renamed from `func_80040154` on 2026-09-20 (tools/rename.py). Address 0x80040154.
+
+# Class6E99C__Configure -- MATCHED (103/103)
 
 ## Round 21 (runner delta): the final 2-word mflo-destination residue closed by an in-place division
 
@@ -174,7 +176,7 @@ shared verbatim with `ClassEAC0Methods::slotDC`).
 
 ```c
 #if 0
-s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
     s32 flag;
     s32 q1, q2;
@@ -298,7 +300,7 @@ division 2 has no direct analog to try on division 3 without changing the
 stored value's width. **Best remaining: the 10-scoring body above (2
 words), reported as the new stall state.** Not run further given the
 round's wind-down; flagging the exact remaining instruction pair (division
-3's `mflo` destination, `func_80040154.s`'s own third `mflo`/`sw` pair) for
+3's `mflo` destination, `Class6E99C__Configure.s`'s own third `mflo`/`sw` pair) for
 the next attempt.
 
 ### Proposed learning (this round)

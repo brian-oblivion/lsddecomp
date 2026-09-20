@@ -30,7 +30,7 @@ sibling): `tools/funcdiff.py` reports `20/41 words match` with a
 **`WARNING: the build differs OUTSIDE this range too (224685 bytes)`**
 -- genuine drift, not the "same total instruction count, same
 registers, purely reordered" every prior round (18/19/20) claimed for
-this residue. `build/lsdde.map` confirms it directly: `func_80040154`
+this residue. `build/lsdde.map` confirms it directly: `Class6E99C__Configure`
 (the very next function in ROM order) links at `0x80040150` in this
 build, one word short of its retail address `0x80040154`. **This
 function's own compiled body is 40 words, not the reported 41** --
@@ -83,7 +83,7 @@ register swap, which is why the drift guard fires here and not there.
 
 1. Named local `t = idx;` right after the `slotDC` dispatch, used in
    place of `idx` in the else-branch's `idx * 3`: no change, still 40
-   words (`func_80040154` still links at `0x80040150`).
+   words (`Class6E99C__Configure` still links at `0x80040150`).
 2. Branch-forced-copy trick (`if (self->unk98) { t = idx; } else { t =
    idx; }`, the `func_80051858`-precedent idiom used elsewhere in this
    project): no change.

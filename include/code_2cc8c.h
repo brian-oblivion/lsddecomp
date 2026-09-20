@@ -1882,7 +1882,7 @@ struct ClassEAC0Methods {
     u8 pad0D0[0x0DC - 0x0D0];
     /* +0x0DC, OBSERVED (Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault): dispatched with only
        `self`, and its own return feeds `slotB8`'s table index. For THIS
-       class's own leaf instances the occupant is `func_80040154` (this
+       class's own leaf instances the occupant is `Class6E99C__Configure` (this
        unit, a Class6E99C-table slot) -- a method calling a sibling slot
        back through the vtable rather than by name, which is legal and
        already established. */
@@ -1929,7 +1929,7 @@ struct Class6E99CMethods {
     /* +0x010/+0x014/+0x018, IS Class6B5CCMethods's own +0x010/+0x014/+0x018
        (func_8001CC48/func_8001CCB4/func_8001CD20) -- identical addresses in
        both tables per the file banner's classtable.py census. */
-    void (*slot10)(Class6E99CObj *self); /* +0x010, OBSERVED: func_80040154 */
+    void (*slot10)(Class6E99CObj *self); /* +0x010, OBSERVED: Class6E99C__Configure */
     void (*slot14)(Class6E99CObj *self, s32 a1); /* +0x014, OBSERVED: func_800402F0 */
     u8 pad018[0x030 - 0x018];
     /* +0x030, BasicClass-inherited (per the file banner's census, matches
@@ -1949,7 +1949,7 @@ struct Class6E99CMethods {
        func_800406E4 (+0x060), func_80040714 (+0x064). */
     void (*slot60)(Class6E99CObj *self, s32 a1);
     void (*slot64)(Class6E99CObj *self, s32 a1);
-    /* +0x068, OBSERVED: func_80040154, dispatched as `(self, s32 flag)`
+    /* +0x068, OBSERVED: Class6E99C__Configure, dispatched as `(self, s32 flag)`
        where `flag` is that same function's own locally-computed 1-or-2
        mode value. */
     void (*slot68)(Class6E99CObj *self, s32 a1);
@@ -1969,9 +1969,9 @@ struct Class6E99CMethods {
     void (*slotD0)(Class6E99CObj *self, s32 a1);     /* +0x0D0, Class6E99C__SetStep */
     void (*slotD4)(Class6E99CObj *self);             /* +0x0D4, Class6E99C__StartFadeToIndex */
     void (*slotD8)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, Class6E99C__StartFadeDefault */
-    /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- func_80040154 (this
+    /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- Class6E99C__Configure (this
        unit) is the shared occupant either way. */
-    s32 (*slotDC)(Class6E99CObj *self);              /* +0x0DC, func_80040154 */
+    s32 (*slotDC)(Class6E99CObj *self);              /* +0x0DC, Class6E99C__Configure */
     void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, func_800402F0 */
     void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, func_800403F8 */
     void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, func_8004042C */
@@ -2007,7 +2007,7 @@ struct Class6E99CObj {
     u8 unk65;
     u8 unk66;
     u8 pad067[0x068 - 0x067];
-    s32 unk68;                 /* +0x068, OBSERVED: func_80040154, a divisor */
+    s32 unk68;                 /* +0x068, OBSERVED: Class6E99C__Configure, a divisor */
     /* +0x06C, OBSERVED: func_800402F0/Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault/
        Class6E99C__FinishConstruct (zeroed by the ctor override) -- a small dispatch-state
        tag (0, 1, or 2 observed). */
@@ -2019,16 +2019,16 @@ struct Class6E99CObj {
        (a plain setter, `self->unk74 = a1`); also read a BYTE at a time by
        Class6E99C__Update via its low byte. */
     s32 unk74;
-    s32 unk78;                 /* +0x078, OBSERVED: func_80040154/Class6E99C__Update/
+    s32 unk78;                 /* +0x078, OBSERVED: Class6E99C__Configure/Class6E99C__Update/
                                    func_800403F8, a flags/mode word tested
                                    against 0xF and against bit masks
                                    0x1/0x2/0x4 */
     /* +0x07C, OBSERVED: Class6E99C__FinishConstruct (ctor override zeroes it),
-       Class6E99C__Update (tested `== 9`), func_80040154 (set from its own a3
+       Class6E99C__Update (tested `== 9`), Class6E99C__Configure (set from its own a3
        parameter). */
     s32 unk7C;
     s32 unk80;                 /* +0x080, OBSERVED: Class6E99C__Update, a countdown */
-    s32 unk84;                 /* +0x084, OBSERVED: func_80040154, a division result */
+    s32 unk84;                 /* +0x084, OBSERVED: Class6E99C__Configure, a division result */
     /* +0x088/+0x08C, OBSERVED: func_80040490 (read via `lhu`, into `s16`
        unk60/unk62 -- a narrowing read of only the low halfword) and
        func_8004042C (WRITTEN via a plain WORD `sw`, from `lhu`-loaded
@@ -2045,7 +2045,7 @@ struct Class6E99CObj {
                                    shared field identity with ClassEAC0Obj's
                                    own unk98 above (same base offset) */
     s32 unk9C;                 /* +0x09C, OBSERVED: func_800404B4, setter arg2;
-                                   func_80040154 also reads it as a divisor */
+                                   Class6E99C__Configure also reads it as a divisor */
     u8 padA0[0xA0 - 0xA0];
 };
 

@@ -147,7 +147,7 @@ void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeDefault);
 #endif
 
-s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
     s32 flag;
     s32 q1, q2;
