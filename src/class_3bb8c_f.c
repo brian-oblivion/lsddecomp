@@ -2,8 +2,20 @@
 #include "class_3bb8c.h"
 
 /* Forward declarations: these are defined later in this file (strict
- * ROM-address order), but func_8004F638/func_8004F8A4 (defined earlier)
- * call them. */
+ * ROM-address order), but earlier functions call them.
+ *
+ * `func_8004F32C`'s entry here fixes a real Gate-0 warning (round 60):
+ * `func_8004EDC0` (line ~52) calls it before its line-226 definition, and
+ * without a prototype in scope cc1 implicitly declares it as returning
+ * `int`, then complains at the real definition ("type mismatch with
+ * previous implicit declaration", "was previously implicitly declared to
+ * return `int'"). This is a same-file forward-declaration gap, not a
+ * cross-unit signature disagreement -- both the call site and the
+ * definition are in this .c, so the fix is simply adding the prototype
+ * here like its neighbours. Confirmed byte-identical after the fix
+ * (`func_8004EDC0` is already MATCHED and stays MATCHED): a pointer
+ * return value lives in `$v0` either way, so the implicit-int reading
+ * never produced different code, only a diagnostic. */
 s32 func_8004F9D8(TaskObjF *self);
 void func_8004F704(TaskObjF *self);
 void func_8004F784(TaskObjF *self);
@@ -12,6 +24,7 @@ s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 func_8004F4C8(s32 *arr, s32 count);
 s32 func_8004EDC0(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
 s32 func_8004EF6C(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7);
+char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix);
 
 /* PSX BIOS file trampolines, linked from Sony's own objects since round 34
  * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
