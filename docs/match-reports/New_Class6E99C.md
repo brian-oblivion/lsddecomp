@@ -1,4 +1,6 @@
-# func_8003FDB0 -- MATCHED (31/31 words)
+> Renamed from `func_8003FDB0` on 2026-09-20 (tools/rename.py). Address 0x8003fdb0.
+
+# New_Class6E99C -- MATCHED (31/31 words)
 
 Unit `code_2cc8c_e`, carved round 14.
 
@@ -13,7 +15,7 @@ Unit `code_2cc8c_e`, carved round 14.
 > the first try:
 >
 > ```c
-> Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
+> Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
 >     Class6E99CObj *self;
 >
 >     self = func_80017B34(0xA0);

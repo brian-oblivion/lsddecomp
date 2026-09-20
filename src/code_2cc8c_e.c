@@ -2,7 +2,7 @@
 #include "code_2cc8c.h"
 
 /* ROUND 34: THIS UNIT LOST ITS FIRST EIGHT FUNCTIONS -- six of them to Sony,
- * two to files of their own -- and now begins at 0x305B0 / func_8003FDB0.
+ * two to files of their own -- and now begins at 0x305B0 / New_Class6E99C.
  * The segment it used to be is split three ways:
  *
  *   [c code_2cc8c_e0]  func_8003FB0C          game code, own file
@@ -13,7 +13,7 @@
  *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
  *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
  *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
- *   [c code_2cc8c_e]   func_8003FDB0 onward   <- this file
+ *   [c code_2cc8c_e]   New_Class6E99C onward   <- this file
  *
  * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
  * INCLUDE_ASM stubs and its class, so every
@@ -33,7 +33,7 @@
  * retitled CONVERTED, and carries its derivation verbatim.
  */
 
-Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
+Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
     Class6E99CObj *self;
 
     self = func_80017B34(0xA0);

@@ -402,8 +402,8 @@ extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
 /*
  * The pointee of `Unk18Obj->unkB0` (round 13, Unk18Obj__Unk18Obj), returned by
- * `func_8003FDB0` -- a function already known elsewhere in this project
- * (`include/Entity.h`'s own `Unk100Obj`/`func_8003FDB0`), kept here under a
+ * `New_Class6E99C` -- a function already known elsewhere in this project
+ * (`include/Entity.h`'s own `Unk100Obj`/`New_Class6E99C`), kept here under a
  * unit-local name per this project's established "independent local views"
  * convention. Only the one slot this unit's `Unk18Obj__Unk18Obj` dispatches
  * through is modelled.
@@ -436,7 +436,7 @@ struct SubHandleObj {
    OWN separately-typed local, so this only changes an implicit-conversion
    warning at the assignment, not the compiled bytes. Verified with a full
    rebuild. */
-extern Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3);
+extern Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3);
 extern Unk18AcObj *func_8001CA94(void); /* local view of include/code_d294.h's
                                     own `New_Class6B5CC` allocator, returning
                                     `Class6B5CCObj *` there -- this unit's
@@ -444,7 +444,7 @@ extern Unk18AcObj *func_8001CA94(void); /* local view of include/code_d294.h's
                                     Unk18Obj__Finalize dereferenced it, see
                                     Unk18AcObj's own comment */
 extern u8 D_8008A90C[]; /* address-taken only by this unit, passed as
-                            func_8003FDB0's "name" argument */
+                            New_Class6E99C's "name" argument */
 extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
                             SubHandleObjMethods::slot4C's 3rd argument */
 extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
@@ -712,7 +712,7 @@ struct Unk18Obj {
                                   and released -- see `Unk18AcObj`'s own
                                   comment) */
     SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: Unk18Obj__Unk18Obj (round
-                                  13) -- set from `func_8003FDB0`; also read
+                                  13) -- set from `New_Class6E99C`; also read
                                   back by func_8003F230 (round 13, this
                                   unit) as a plain getter */
     s32 unkB4;                  /* +0x0B4, OBSERVED: func_8003F23C (round 13) */
@@ -1795,7 +1795,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * function) is a bare no-argument getter for a SECOND table, D_8006EAC0
  * -- itself sharing the identical fingerprint with D_8006B5CC, so the
  * real chain is Class6B5CCObj -> "ClassEAC0" -> "Class6E99C". Two
- * `New_X`-shaped allocators confirm the two concrete sizes: func_8003FDB0
+ * `New_X`-shaped allocators confirm the two concrete sizes: New_Class6E99C
  * allocates 0xA0 bytes for a Class6E99C instance (getting its own table
  * via func_800404C0, a bare getter this unit also implements) and
  * func_800404D0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
@@ -1860,7 +1860,7 @@ struct ClassEAC0Methods {
                                 plain `void *` here (not `SkipShort2 *`) --
                                 this is the SLOT's own type, used by every
                                 CALLER of the ctor through the vtable
-                                (func_8003FDB0/func_8003FE2C/func_800404D0,
+                                (New_Class6E99C/func_8003FE2C/func_800404D0,
                                 none of which know about `SkipShort2`); the
                                 occupant's own definition is free to use a
                                 more specific parameter type internally. */

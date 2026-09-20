@@ -20,7 +20,7 @@ allocation failed.
 ## Derivation
 
 ```
-sub = this->unk100 (cached) OR func_8003FDB0(name-or-default, 0, arg4) (fresh)
+sub = this->unk100 (cached) OR New_Class6E99C(name-or-default, 0, arg4) (fresh)
 if (fresh alloc failed) return NULL
 if (fresh) this->unk100 = sub
 sub->methods->slot50(sub)
@@ -43,7 +43,7 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
         if (name == NULL) {
             name = gEntityDefaultPos;
         }
-        sub = func_8003FDB0(name, 0, arg4);
+        sub = New_Class6E99C(name, 0, arg4);
         if (sub == NULL) {
             return NULL;
         }

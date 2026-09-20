@@ -63,7 +63,7 @@ Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void 
         if (name == NULL) {
             name = gEntityDefaultPos;
         }
-        sub = func_8003FDB0(name, 0, arg4);
+        sub = New_Class6E99C(name, 0, arg4);
         if (sub == NULL) {
             return NULL;
         }

@@ -1037,3 +1037,4 @@ TaskObjF__func_8004F638 = 0x8004F638; // type:func
 TaskObjF__func_8004F8A4 = 0x8004F8A4; // type:func
 TaskObjF__Validate = 0x8004F9D8; // type:func
 TaskObjF__Notify = 0x8004FB04; // type:func
+New_Class6E99C = 0x8003FDB0; // type:func
