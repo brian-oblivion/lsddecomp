@@ -329,4 +329,51 @@ fail_nolock:
  * docs/match-reports/func_8003149C.md's round-40 addendum. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80031890);
+/* The "release channel" twin of func_80031280's else-branch above: same
+ * D_8008E934 lock, same (mask0, mask1) split of a 0..0x17 channel across two
+ * 16-bit mask words, same three per-channel field clears, same mask update.
+ * MATCHED round 62 by writing it in exactly that sibling's idiom -- direct
+ * global expressions with NO cached locals. Four earlier rounds carried four
+ * cached locals here (old60/old64/e228/e22c) and filed the result as an
+ * unreachable register-identity stall; the caching was the whole residue.
+ * The only structural difference from the sibling is that the lock is
+ * released BEFORE the mask block rather than after it (retail's
+ * `sw zero, D_8008E934` sits at 0x80031950, between the D_8008E228 load and
+ * the first `or`). See docs/match-reports/func_80031890.md. */
+s32 func_80031890(s16 idx)
+{
+    u16 chan;
+    u32 mask0;
+    u16 mask1;
+
+    if (D_8008E934 == 1) {
+        goto fail_nolock;
+    }
+    D_8008E934 = 1;
+    if ((u16) idx >= 0x18) {
+        goto fail;
+    }
+    D_8008EA26 = idx;
+    chan = D_8008EA26;
+    if (chan < 0x10) {
+        mask0 = 1 << chan;
+        mask1 = 0;
+    } else {
+        mask0 = 0;
+        mask1 = 1 << (chan - 0x10);
+    }
+    D_8008D9A3[chan].unk0 = 0;
+    D_8008D98C[chan].unk0 = 0;
+    D_8008D988[chan].unk0 = 0;
+    D_8008E934 = 0;
+    D_80090C60 = mask0 | D_80090C60;
+    D_80090C64 |= mask1;
+    D_8008E228 &= ~D_80090C60;
+    D_8008E22C &= ~D_80090C64;
+    return 0;
+
+fail:
+    D_8008E934 = 0;
+fail_nolock:
+    return -1;
+}
