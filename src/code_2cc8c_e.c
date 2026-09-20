@@ -56,18 +56,18 @@ void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     }
     base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
     self->methods = Class6E99C__GetMethods();
-    self->methods->slot40(self, a2);
+    self->methods->finishConstruct(self, a2);
 }
 
 void Class6E99C__FinishConstruct(Class6E99CObj *self, s32 a1) {
     self->unk70 = a1;
-    self->unk6C = 0;
-    self->unk74 = 0xA;
+    self->state = 0;
+    self->step = 0xA;
     self->unk78 = 0;
     self->unk7C = 0;
     self->methods->slot60(self, 0);
     self->methods->slot64(self, 0);
-    self->unk98 = 0;
+    self->altMode = 0;
 }
 
 void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
@@ -83,39 +83,39 @@ void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
             return;
         }
         if (self->unk78 & 4) {
-            self->unk64 += (u8)self->unk74;
+            self->unk64 += (u8)self->step;
         }
         if (self->unk78 & 2) {
-            self->unk65 += (u8)self->unk74;
+            self->unk65 += (u8)self->step;
         }
         if (self->unk78 & 1) {
-            self->unk66 += (u8)self->unk74;
+            self->unk66 += (u8)self->step;
         }
     } else {
-        self->methods->slotE0(self, a1);
+        self->methods->stop(self, a1);
     }
 }
 
 void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
-    self->unk74 = a1;
+    self->step = a1;
 }
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 29/35 words, length exact. Residue: instruction
  * scheduling (retail materializes `li $a1,1` immediately after the
- * slotDC dispatch, before computing idx*3; this body defers it to just
+ * configure dispatch, before computing idx*3; this body defers it to just
  * before the slotB8 call) (docs/match-reports/Class6E99C__StartFadeToIndex.md).
  * Hand-derived. */
 void Class6E99C__StartFadeToIndex(Class6E99CObj *self) {
     s32 idx;
 
-    if (self->unk6C != 0) {
+    if (self->state != 0) {
         return;
     }
-    idx = self->methods->slotDC(self);
+    idx = self->methods->configure(self);
     self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
-    self->unk6C = 1;
-    self->unk74 = -self->unk74;
+    self->state = 1;
+    self->step = -self->step;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeToIndex);
@@ -132,16 +132,16 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeToIndex);
 void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
-    if (self->unk6C != 0) {
+    if (self->state != 0) {
         return;
     }
-    idx = self->methods->slotDC(self);
-    if (self->unk98 != 0) {
+    idx = self->methods->configure(self);
+    if (self->altMode != 0) {
         self->unk80--;
     } else {
         self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
     }
-    self->unk6C = 2;
+    self->state = 2;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeDefault);
@@ -169,11 +169,11 @@ s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     if (a2 == 0) {
         self->unk78 = 0xF;
     }
-    q1 = 0x100 / self->unk74;
+    q1 = 0x100 / self->step;
     self->unk7C = a3;
     self->unk80 = q1;
-    if (self->unk98 != 0) {
-        q2 = q1 / self->unk9C;
+    if (self->altMode != 0) {
+        q2 = q1 / self->divisor;
         self->unk80 = q1 - (s16)q2;
     }
     q2 = self->unk68;
@@ -191,18 +191,18 @@ void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
     s32 mode;
 
     methods = self->methods;
-    if (self->unk6C == 0) {
+    if (self->state == 0) {
         return;
     }
-    if (self->unk6C == 1) {
+    if (self->state == 1) {
         mode = 5;
-        if (self->unk98 == 0) {
+        if (self->altMode == 0) {
             methods->slot60(self, 0);
             methods->slot64(self, 0);
         }
     } else {
         mode = 6;
-        if (self->unk98 != 0) {
+        if (self->altMode != 0) {
             if (self->unk78 == 0xF) {
                 methods->slotB8(self, 1, D_8006EAA8);
             }
@@ -210,10 +210,10 @@ void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
         }
     }
     methods->slot14(self, a1);
-    if (self->unk74 < 0) {
-        self->unk74 = -self->unk74;
+    if (self->step < 0) {
+        self->step = -self->step;
     }
-    self->unk6C = 0;
+    self->state = 0;
     methods->slot30(self, mode);
 }
 
@@ -263,8 +263,8 @@ void Class6E99C__PopPosition(Class6E99CObj *self) {
 }
 
 void Class6E99C__SetDivisorMode(Class6E99CObj *self, s32 a1, s32 a2) {
-    self->unk98 = a1;
-    self->unk9C = a2;
+    self->altMode = a1;
+    self->divisor = a2;
 }
 
 Class6E99CMethods *Class6E99C__GetMethods(void) {
@@ -285,7 +285,7 @@ ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
 void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     GetClass6B5CCMethods()->ctor(self);
     self->methods = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
-    self->methods->slot40(self, a1, a2, a3);
+    self->methods->finishConstruct(self, a1, a2, a3);
 }
 
 void ClassEAC0__FinishConstruct(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {

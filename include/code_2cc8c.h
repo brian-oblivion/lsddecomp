@@ -1866,7 +1866,8 @@ struct ClassEAC0Methods {
                                 more specific parameter type internally. */
     void (*dtor)(ClassEAC0Obj *self);                   /* +0x00C, func_8001CBA4, shared with Class6B5CCMethods */
     u8 pad010[0x040 - 0x010];
-    void (*slot40)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, ClassEAC0__FinishConstruct (this unit) */
+    void (*finishConstruct)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, ClassEAC0__FinishConstruct (this unit).
+                                RENAMED round 61 (was slot40). */
     u8 pad044[0x0B8 - 0x044];
     /* +0x0B8, OBSERVED (this unit, ClassEAC0__FinishConstruct/Class6E99C__StartFadeToIndex/
        Class6E99C__StartFadeDefault): dispatched as `(self, 1, tableEntry)` where
@@ -1886,7 +1887,7 @@ struct ClassEAC0Methods {
        unit, a Class6E99C-table slot) -- a method calling a sibling slot
        back through the vtable rather than by name, which is legal and
        already established. */
-    s32 (*slotDC)(ClassEAC0Obj *self);
+    s32 (*configure)(ClassEAC0Obj *self); /* RENAMED round 61 (was slotDC). */
 };
 struct ClassEAC0Obj {
     ClassEAC0Methods *methods; /* +0x000 */
@@ -1901,17 +1902,23 @@ struct ClassEAC0Obj {
     s16 unk60;                 /* +0x060, OBSERVED: ClassEAC0__FinishConstruct, from a1->0x0 */
     s16 unk62;                 /* +0x062, OBSERVED: ClassEAC0__FinishConstruct, from a1->0x4 */
     u8 pad064[0x06C - 0x064];
-    s32 unk6C;                 /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/
-                                   Class6E99C__StartFadeDefault, a small dispatch-state tag */
+    s32 state;                 /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/
+                                   Class6E99C__StartFadeDefault, a small dispatch-state tag
+                                   (0 == idle, 1 == fading to an indexed color, 2 == fading
+                                   to the default color -- RENAMED round 61, was unk6C;
+                                   same field as Class6E99CObj::state below). */
     u8 pad070[0x074 - 0x070];
-    s32 unk74;                 /* +0x074, OBSERVED: Class6E99C__StartFadeToIndex, negated on the
+    s32 step;                  /* +0x074, OBSERVED: Class6E99C__StartFadeToIndex, negated on the
                                    "already had one" path; Class6E99C__SetStep's own
                                    setter also targets this offset on the
-                                   Class6E99C leaf, same field */
+                                   Class6E99C leaf, same field (RENAMED round 61, was
+                                   unk74; per-tick fade increment, see
+                                   Class6E99CObj::step). */
     u8 pad078[0x098 - 0x078];
-    s32 unk98;                 /* +0x098, OBSERVED: Class6E99C__Stop, truthy-tested;
+    s32 altMode;               /* +0x098, OBSERVED: Class6E99C__Stop, truthy-tested;
                                    Class6E99C__SetDivisorMode's own setter also targets this
-                                   offset on the Class6E99C leaf, same field */
+                                   offset on the Class6E99C leaf, same field (RENAMED
+                                   round 61, was unk98; see Class6E99CObj::altMode). */
 };
 
 struct Class6E99CMethods {
@@ -1937,12 +1944,12 @@ struct Class6E99CMethods {
        dispatches it as `(self, s32 a1)` with a1 a small literal (5 or 6). */
     void (*slot30)(Class6E99CObj *self, s32 a1);
     u8 pad034[0x040 - 0x034];
-    void (*slot40)(Class6E99CObj *self, s32 a1); /* +0x040, Class6E99C__FinishConstruct
+    void (*finishConstruct)(Class6E99CObj *self, s32 a1); /* +0x040, Class6E99C__FinishConstruct
                                 (this unit). Two args, not four: its own
                                 call site (Class6E99C__Class6E99C) only sets `a1`;
                                 `a2`/`a3` are leftover from the preceding
                                 ctor call and the occupant's own body never
-                                reads them. */
+                                reads them. RENAMED round 61 (was slot40). */
     u8 pad044[0x060 - 0x044];
     /* +0x060/+0x064, OBSERVED: Class6E99C__FinishConstruct/Class6E99C__Stop, both dispatched
        as `(self, s32 a1)`. Occupants (code_2cc8c_f, bravo's own functions):
@@ -1956,7 +1963,8 @@ struct Class6E99CMethods {
     u8 pad06C_[0x098 - 0x06C];
     /* +0x098, OBSERVED: Class6E99C__Update's own call target when `a2 == 2`.
        This unit's own function. */
-    void (*slot98)(Class6E99CObj *self, void *a1, s32 a2); /* +0x098, Class6E99C__Update */
+    void (*update)(Class6E99CObj *self, void *a1, s32 a2); /* +0x098, Class6E99C__Update.
+                                RENAMED round 61 (was slot98). */
     u8 pad09C[0x0B8 - 0x09C];
     /* +0x0B8/+0x0CC, IS ClassEAC0Methods's own +0x0B8/+0x0CC
        (Obj6EAC0__SetColor/Obj6EAC0__SetMask, both code_2cc8c_f) -- identical
@@ -1966,29 +1974,47 @@ struct Class6E99CMethods {
     void (*slotB8)(Class6E99CObj *self, s32 a1, void *tableEntry);
     u8 pad0BC[0x0CC - 0x0BC];
     void (*slotCC)(Class6E99CObj *self, s32 a1);
-    void (*slotD0)(Class6E99CObj *self, s32 a1);     /* +0x0D0, Class6E99C__SetStep */
-    void (*slotD4)(Class6E99CObj *self);             /* +0x0D4, Class6E99C__StartFadeToIndex */
-    void (*slotD8)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, Class6E99C__StartFadeDefault */
+    void (*setStep)(Class6E99CObj *self, s32 a1);     /* +0x0D0, Class6E99C__SetStep.
+                                RENAMED round 61 (was slotD0). */
+    void (*startFadeToIndex)(Class6E99CObj *self);             /* +0x0D4, Class6E99C__StartFadeToIndex.
+                                RENAMED round 61 (was slotD4). */
+    void (*startFadeDefault)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, Class6E99C__StartFadeDefault.
+                                RENAMED round 61 (was slotD8). */
     /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- Class6E99C__Configure (this
-       unit) is the shared occupant either way. */
-    s32 (*slotDC)(Class6E99CObj *self);              /* +0x0DC, Class6E99C__Configure */
-    void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, Class6E99C__Stop */
-    void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, Class6E99C__GetColor */
-    void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, Class6E99C__PushPosition */
-    void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, Class6E99C__PopPosition */
-    void (*slotF0)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, Class6E99C__SetDivisorMode */
+       unit) is the shared occupant either way. RENAMED round 61 (was slotDC). */
+    s32 (*configure)(Class6E99CObj *self);              /* +0x0DC, Class6E99C__Configure */
+    void (*stop)(Class6E99CObj *self, void *a1);   /* +0x0E0, Class6E99C__Stop.
+                                RENAMED round 61 (was slotE0). */
+    void *(*getColor)(Class6E99CObj *self);            /* +0x0E4, Class6E99C__GetColor.
+                                RENAMED round 61 (was slotE4). */
+    void (*pushPosition)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, Class6E99C__PushPosition.
+                                RENAMED round 61 (was slotE8). */
+    void (*popPosition)(Class6E99CObj *self);             /* +0x0EC, Class6E99C__PopPosition.
+                                RENAMED round 61 (was slotEC). */
+    void (*setDivisorMode)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, Class6E99C__SetDivisorMode.
+                                RENAMED round 61 (was slotF0). */
 };
 struct Class6E99CObj {
     Class6E99CMethods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
     void *unkC;                /* +0x00C, OBSERVED: Class6E99C__PushPosition, truthy-tested only */
-    /* +0x010, OBSERVED: func_8003FBF4 -- loaded and forwarded opaquely as
-       `func_80021678`'s own arg0, which itself only ever forwards the value
-       further without dereferencing it. Same base offset as
+    /* +0x010, STALE CITATION FIXED round 61: this comment previously cited
+       "func_8003FBF4" as evidence, but that address is `GsDrawOt`
+       (`libgs/gs_111.o`, a linked Sony object -- see this file's own
+       round-34 banner) and has never been part of this unit; nothing in
+       this unit's current 17 functions reads or writes this field at all
+       (confirmed: `grep -n 'unk10' src/code_2cc8c_e.c` matches only this
+       declaration). The citation predates the round-34 segment split, when
+       the address now known as `GsDrawOt` still lived in this file under a
+       different, since-reclassified reading. Left untyped and unrenamed --
+       there is no live evidence left for it in this unit -- but kept as a
+       `void *` (not folded into surrounding padding) since offsets past it
+       are load-bearing for +0x050 onward. Same base offset as
        Class6B5CCObj's own inherited `unk10` (code_d294.h, a `u32` packed
        bit-flags word) -- plausibly the same underlying field reused
        opaquely here, but kept independent per this project's
-       multiple-local-views convention. */
+       multiple-local-views convention; that parallel is the only reason to
+       keep the slot typed at all. */
     void *unk10;
     u8 pad014[0x050 - 0x014];
     s32 unk50;                 /* +0x050, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
@@ -2010,15 +2036,19 @@ struct Class6E99CObj {
     s32 unk68;                 /* +0x068, OBSERVED: Class6E99C__Configure, a divisor */
     /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault/
        Class6E99C__FinishConstruct (zeroed by the ctor override) -- a small dispatch-state
-       tag (0, 1, or 2 observed). */
-    s32 unk6C;
+       tag: 0 == idle, 1 == fading to an indexed color (StartFadeToIndex),
+       2 == fading to the default color (StartFadeDefault). RENAMED round
+       61 (was unk6C); same field identity as ClassEAC0Obj::state above. */
+    s32 state;
     s32 unk70;                 /* +0x070, OBSERVED: Class6E99C__FinishConstruct, set from
                                    its own `a1` parameter */
     /* +0x074, OBSERVED: Class6E99C__FinishConstruct (ctor override sets it to 0xA),
        Class6E99C__StartFadeToIndex (negated on the "already had one" path), Class6E99C__SetStep
-       (a plain setter, `self->unk74 = a1`); also read a BYTE at a time by
-       Class6E99C__Update via its low byte. */
-    s32 unk74;
+       (a plain setter, `self->step = a1`); also read a BYTE at a time by
+       Class6E99C__Update via its low byte -- the per-tick amount added into
+       unk64/unk65/unk66 while a fade is running. RENAMED round 61 (was
+       unk74); same field identity as ClassEAC0Obj::step above. */
+    s32 step;
     s32 unk78;                 /* +0x078, OBSERVED: Class6E99C__Configure/Class6E99C__Update/
                                    Class6E99C__GetColor, a flags/mode word tested
                                    against 0xF and against bit masks
@@ -2041,11 +2071,14 @@ struct Class6E99CObj {
     s32 unk8C;
     s32 unk90;                 /* +0x090, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
     s32 unk94;                 /* +0x094, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
-    s32 unk98;                 /* +0x098, OBSERVED: Class6E99C__SetDivisorMode, setter arg1;
+    s32 altMode;               /* +0x098, OBSERVED: Class6E99C__SetDivisorMode, setter arg1;
                                    shared field identity with ClassEAC0Obj's
-                                   own unk98 above (same base offset) */
-    s32 unk9C;                 /* +0x09C, OBSERVED: Class6E99C__SetDivisorMode, setter arg2;
-                                   Class6E99C__Configure also reads it as a divisor */
+                                   own altMode above (same base offset).
+                                   RENAMED round 61 (was unk98). */
+    s32 divisor;               /* +0x09C, OBSERVED: Class6E99C__SetDivisorMode, setter arg2;
+                                   Class6E99C__Configure also reads it as a divisor
+                                   (gated on altMode != 0). RENAMED round 61
+                                   (was unk9C). */
     u8 padA0[0xA0 - 0xA0];
 };
 
