@@ -1,4 +1,6 @@
-# func_800400B0 -- STALL, PRIOR "29/41, same length" CLAIM CORRECTED (real one-word length regression, not a pure register/scheduling residue)
+> Renamed from `func_800400B0` on 2026-09-20 (tools/rename.py). Address 0x800400b0.
+
+# Class6E99C__StartFadeDefault -- STALL, PRIOR "29/41, same length" CLAIM CORRECTED (real one-word length regression, not a pure register/scheduling residue)
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 
@@ -43,7 +45,7 @@ compiles to a shorter function than retail.
 
 ### The real mechanism (found via `mipsel-linux-gnu-objdump` on the built object, cross-checked against retail's own `.s`)
 
-Retail's `func_800400B0.s` contains **two** separate
+Retail's `Class6E99C__StartFadeDefault.s` contains **two** separate
 `addu $t0, $reg, $zero` copies, each sitting in a branch's delay slot
 (both execute unconditionally, MIPS delay-slot semantics):
 
@@ -191,7 +193,7 @@ distinct residues.
 
 ```c
 #if 0
-void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
+void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
     if (self->unk6C != 0) {

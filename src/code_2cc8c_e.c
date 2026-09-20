@@ -127,9 +127,9 @@ INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeToIndex);
  * genuinely missing register-only dead-store delay-slot filler
  * (retail copies its unread 3rd argument into $t0 in a branch delay
  * slot; GCC 2.6.3 eliminates the equivalent C statement as dead code
- * before scheduling ever sees it) (docs/match-reports/func_800400B0.md).
+ * before scheduling ever sees it) (docs/match-reports/Class6E99C__StartFadeDefault.md).
  * Hand-derived. */
-void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
+void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
     if (self->unk6C != 0) {
@@ -144,7 +144,7 @@ void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
     self->unk6C = 2;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800400B0);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeDefault);
 #endif
 
 s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {

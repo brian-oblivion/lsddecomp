@@ -19,7 +19,7 @@ re-confirmed green.
 ## Round 21 (runner delta): re-verified fresh, no new attempt
 
 Restored the exact 29/35 body and rebuilt fresh, isolated (with
-`func_800400B0` reverted to `INCLUDE_ASM` at the time, so this
+`Class6E99C__StartFadeDefault` reverted to `INCLUDE_ASM` at the time, so this
 function's own window cannot be contaminated by that sibling's own
 drift -- see that function's own report for a real instance of this
 project's "one inherited body in six carries a false drift-free claim"
@@ -69,7 +69,7 @@ A "retail materializes a literal argument immediately after an unrelated
 dispatch, before computing an index expression" residue does not yield
 to ~94,000 unguided permuter iterations either, on top of the four
 hand-reshaping attempts the original report already spent. Combined with
-`func_800400B0`'s identical-shape residue (see that report), this is now
+`Class6E99C__StartFadeDefault`'s identical-shape residue (see that report), this is now
 a **confirmed-negative class**, not merely an untried one -- a future
 runner should not re-spend permuter budget on this specific
 `slotXX(self, 1, tableEntry)`-after-a-fresh-dispatch shape without a new
@@ -155,7 +155,7 @@ A trivial constant argument (`1`) to a call reached immediately after a
 DIFFERENT dispatch through the same vtable pointer can resist being pinned
 to retail's early position by any combination of source reordering, naming
 it in a local, or a bare scheduling barrier (which actively regresses it).
-`func_800400B0` in this same unit shows the identical pattern on the exact
+`Class6E99C__StartFadeDefault` in this same unit shows the identical pattern on the exact
 same call shape (`slotB8(self, 1, tableEntry)`) -- worth treating as one
 class rather than two coincidences; see that function's own report.
 
