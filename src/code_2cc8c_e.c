@@ -44,7 +44,7 @@ Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
     return NULL;
 }
 
-void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
+void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
     void *tableEntry;
 

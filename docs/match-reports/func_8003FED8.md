@@ -1,7 +1,7 @@
 # func_8003FED8 -- MATCH (27/27 words, first attempt)
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slot40` (`+0x040`),
-dispatched by the class's own ctor (`func_8003FE2C`) right after it installs
+dispatched by the class's own ctor (`Class6E99C__Class6E99C`) right after it installs
 `self->methods`.
 
 ```c

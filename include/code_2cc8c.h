@@ -1786,7 +1786,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * inherited slots (+0x01C..+0x038) with D_8006B5CC (code_d294.h's own
  * `Class6B5CCMethods`) -- the same base-class fingerprint code_d294.h
  * already established, so D_8006E99C is a Class6B5CCObj descendant. It is
- * NOT a direct child, though: its own ctor (func_8003FE2C, this unit)
+ * NOT a direct child, though: its own ctor (Class6E99C__Class6E99C, this unit)
  * calls `Obj6EAC0__GetBaseMethods()->ctor(self, a1, a2, a3)` before overwriting
  * `self->methods` with `&D_8006E99C` and re-dispatching through it --
  * exactly the established "base ctor first, then set own vtable pointer,
@@ -1860,7 +1860,7 @@ struct ClassEAC0Methods {
                                 plain `void *` here (not `SkipShort2 *`) --
                                 this is the SLOT's own type, used by every
                                 CALLER of the ctor through the vtable
-                                (New_Class6E99C/func_8003FE2C/func_800404D0,
+                                (New_Class6E99C/Class6E99C__Class6E99C/func_800404D0,
                                 none of which know about `SkipShort2`); the
                                 occupant's own definition is free to use a
                                 more specific parameter type internally. */
@@ -1918,9 +1918,9 @@ struct Class6E99CMethods {
     s32 header;                                     /* +0x000 */
     void *unk04;                                     /* +0x004, BasicClass__func_17eb0, inherited, unused here */
     void (*ctor)(Class6E99CObj *self, void *a1, s32 a2, s32 a3); /* +0x008,
-                                func_8003FE2C (this unit). `a2` is a RAW
+                                Class6E99C__Class6E99C (this unit). `a2` is a RAW
                                 index/mode (0 or a small positive count),
-                                not a pointer -- func_8003FE2C's own body
+                                not a pointer -- Class6E99C__Class6E99C's own body
                                 converts it into a tableEntry pointer
                                 internally before forwarding to the next
                                 ctor down the chain (ClassEAC0Methods::ctor,
@@ -1939,7 +1939,7 @@ struct Class6E99CMethods {
     u8 pad034[0x040 - 0x034];
     void (*slot40)(Class6E99CObj *self, s32 a1); /* +0x040, func_8003FED8
                                 (this unit). Two args, not four: its own
-                                call site (func_8003FE2C) only sets `a1`;
+                                call site (Class6E99C__Class6E99C) only sets `a1`;
                                 `a2`/`a3` are leftover from the preceding
                                 ctor call and the occupant's own body never
                                 reads them. */
@@ -2052,14 +2052,14 @@ struct Class6E99CObj {
 /* Round-14 static tables this unit's own functions index into or pass by
  * address -- real element shape not derived (nothing this unit's chosen
  * functions dereference beyond taking the address), so left as opaque
- * byte blobs sized only by their known stride. `func_8003FE2C`/
+ * byte blobs sized only by their known stride. `Class6E99C__Class6E99C`/
  * `func_80040024`/`func_800400B0`/`func_800403F8` all compute the index as
  * a raw BYTE offset (`sll v0,i,1; addu v0,v0,i` = `i*3`, added directly to
  * the base address with no further `*4`) -- i.e. `D_8006EA90` holds 3-BYTE
  * entries (plausibly a signed-byte triple, same shape as this file's own
  * `SByte3_d294`), not 0xC-byte ones. `D_8006EAA8` is indexed the SAME way
  * by `func_800400B0` (not a single fixed entry as an earlier reading of
- * `func_8003FE2C` alone suggested -- that one just always passes index 0),
+ * `Class6E99C__Class6E99C` alone suggested -- that one just always passes index 0),
  * so left unsized rather than fixed at 3 bytes. `D_8008A924` has only the
  * one (unindexed) use, so kept at a single entry's size. */
 extern u8 D_8006EA90[];
