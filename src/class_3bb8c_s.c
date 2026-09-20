@@ -142,7 +142,7 @@ extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55d
  * func_80056640 forwards a dead second argument to it the same way. */
 extern void NoOpIgnoreArgs();
 extern void LinkOwnerObj__func_56e1c();
-extern void LinkOwnerObj__RandomizeLinks();
+extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but func_80056640's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
 extern void func_80056BBC();
 extern void func_800569A8();
 

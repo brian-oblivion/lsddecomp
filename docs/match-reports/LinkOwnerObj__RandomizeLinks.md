@@ -90,3 +90,31 @@ each link element's own `slot48`. Named for its structure and access
 pattern (a global table of `Vec3` entries feeding `LinkElemObj`), not for
 a guessed game purpose (what `slot48`'s occupant does with the vector is
 not established).
+
+## Extern arity (round 59)
+
+**Verdict: arity-ok idiom.** `src/class_3bb8c_s.c`'s unprototyped declaration
+stays.
+
+**Callee evidence** (`0x80056E44`, and the definition in
+`src/class_3bb8c_o.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
+one real argument, exactly as `void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this)`
+says.
+
+**Why the extern must stay unprototyped.** `func_80056640`'s dispatch passes a
+second argument, and retail emits it:
+
+```
+800566f8:  jal   80056e44 <LinkOwnerObj__RandomizeLinks>
+800566fc:  move  a1,s1            <- the dead 2nd argument, in retail
+```
+
+`s1` is `func_80056640`'s own `arg1`. Its two sibling arms in the same switch
+do the same thing (`jal func_800569A8` / `move a1,s1` at `0x800566D8`,
+`jal NoOpIgnoreArgs` / `move a1,s1` at `0x800566EC`), so the whole dispatch
+forwards `(self, arg1)` uniformly regardless of what each target reads. A
+one-parameter prototype here would make every arm a `too many arguments`
+error, and dropping the argument would delete `move a1,s1`.
+
+**Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
+added to `src/class_3bb8c_s.c:145`. Oracle green.
