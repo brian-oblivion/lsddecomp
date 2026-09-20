@@ -63,17 +63,18 @@ void func_8004C620(Obj866E8 *self) {
  * func_8004CAF0), but tail-called here before its own definition appears. */
 extern void func_8004C93C(Obj866E8 *self);
 
-/* STALLED at 85/165 words (round 34) -- see docs/match-reports/func_8004C6A8.md.
- * Every branch TARGET in the raw-range dispatch now agrees with retail
- * (previously 60/165 with a different, wrong-polarity CFG shape); compiled
- * length is still 3 words (12 bytes) short of retail's 165. The residue is a
- * register-class choice: retail promotes a value that is never live across a
- * CALL (the RotMatrix pointer argument, `(u8 *)sub + 0x10`) into its own
+#ifdef NON_MATCHING
+/* NON_MATCHING: 85/165 words, 3 words (12 bytes) short (round 34) -- see
+ * docs/match-reports/func_8004C6A8.md. Every branch TARGET in the
+ * raw-range dispatch now agrees with retail (previously 60/165 with a
+ * different, wrong-polarity CFG shape). Residue: a register-class choice
+ * -- retail promotes a value that is never live across a CALL (the
+ * RotMatrix pointer argument, `(u8 *)sub + 0x10`) into its own
  * callee-saved register anyway, which saturates all nine $s/$fp slots and
  * forces `flag` to spill to the stack (an extra sw/lw pair retail has and
- * this body does not); nothing tried reproduces that promotion. Restored
- * here per project convention. */
-#if 0
+ * this body does not); nothing tried reproduces that promotion. This is a
+ * HARD RULE 6 register-identity residue -- not closeable with a
+ * `register`/asm-constraint fix. Hand-derived. */
 void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
@@ -176,9 +177,9 @@ shared:
     }
     func_8004C93C(self);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
+#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 45/109 words, length exact, zero drift. Residue: register
