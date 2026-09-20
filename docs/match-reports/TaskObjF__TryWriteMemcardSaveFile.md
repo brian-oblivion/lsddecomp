@@ -95,7 +95,7 @@ below). Reads as a **"WriteFile" memory-card/CD streaming write** (the
 error string this function logs on failure is literally `"File not create
 in WriteFile\n"`, confirmed in rodata at `D_80011530`):
 
-1. Builds a device path via `BuildMemcardPath(pathBuf, self->unk0C, (char
+1. Builds a device path via `BuildMemcardPath(pathBuf, self->cardSlot, (char
    *)a1)` (already-matched sibling; `a1` is really a `char *` suffix
    despite its established `s32` type in this file's forward
    declarations -- kept `s32` at the parameter, cast at the call site,
@@ -112,7 +112,7 @@ in WriteFile\n"`, confirmed in rodata at `D_80011530`):
    (`func_80050938(path, 2)`) -- this second handle is the one actually
    used for the rest of the function. Fails the same way (return 0, no
    error log this time) if this second open also fails.
-5. Resolves `src = ((StreamArg5Obj *)arg5)->unk10` -- `arg5`'s own type is
+5. Resolves `src = ((McIconSourceRef *)arg5)->iconSource` -- `arg5`'s own type is
    otherwise unestablished; only this one field is ever read.
 6. Allocates a 0x200-byte request buffer (`func_80017B34`), fills a 4-byte
    header (`'S'`, `'C'`, `(u8)(a3+0x10)`, `(u8)ceil(arg7/0x2000)`),
@@ -147,47 +147,56 @@ either way).
 ## New types (all local to `class_3bb8c_f.c` -- none shared, no header
 ## changes made this round)
 
+**RENAMED round 60** (track 3 naming pass; these are local typedefs, not
+symbol-table entries, so `tools/rename.py` does not touch them -- edited
+by hand in `src/class_3bb8c_f.c` and re-verified with an isolated
+`cpp|cc1` syntax check since the body sits in `#if 0` and the normal
+build never compiles it; see `## Naming` below). Original names, carried
+from the round that first derived this body: `StreamSmallSub`/
+`StreamRawBlock`/`StreamSrcObj`/`StreamArg5Obj`/`StreamReq`, with fields
+`f0..fE`/`raw`/`arr`/`unk10`/`tag0,tag1,b2,b3,name,arr,blkA,blkB,blkC`.
+
 ```c
-typedef struct StreamSmallSub {
-    s16 f0, f2, f4, f6, f8, fA, fC, fE;
-} StreamSmallSub;
+typedef struct IconPaletteHalf {
+    s16 color[8];
+} IconPaletteHalf;
 
-typedef struct StreamRawBlock {
+typedef struct IconFrame {
     u8 raw[0x80];
-} StreamRawBlock;
+} IconFrame;
 
-typedef struct StreamSrcObj {
+typedef struct McIconSource {
     u8 pad0[0x14];
-    StreamSmallSub arr[2];      /* +0x14 */
+    IconPaletteHalf palette[2];  /* +0x14 */
     u8 pad34[0x40 - 0x34];
-    StreamRawBlock blkA;          /* +0x40 */
-    StreamRawBlock blkB;            /* +0xC0 */
-    StreamRawBlock blkC;              /* +0x140 */
-} StreamSrcObj;
+    IconFrame frame0;              /* +0x40 */
+    IconFrame frame1;                /* +0xC0 */
+    IconFrame frame2;                  /* +0x140 */
+} McIconSource;
 
-typedef struct StreamArg5Obj {
+typedef struct McIconSourceRef {
     u8 pad0[0x10];
-    StreamSrcObj *unk10;
-} StreamArg5Obj;
+    McIconSource *iconSource;
+} McIconSourceRef;
 
-typedef struct StreamReq {
-    u8 tag0;
-    u8 tag1;
-    u8 b2;
-    u8 b3;
-    char name[0x5C];
-    StreamSmallSub arr[2];
-    StreamRawBlock blkA;
-    StreamRawBlock blkB;
-    StreamRawBlock blkC;
-} StreamReq;
+typedef struct McSaveHeader {
+    u8 magic0;
+    u8 magic1;
+    u8 iconFrameFlag;
+    u8 blockCount;
+    char title[0x5C];
+    IconPaletteHalf palette[2];
+    IconFrame frame0;
+    IconFrame frame1;
+    IconFrame frame2;
+} McSaveHeader;
 ```
 
-`StreamSmallSub` deliberately has no `s32` member (alignment 2) so a
+`IconPaletteHalf` deliberately has no `s32` member (alignment 2) so a
 whole-struct copy compiles to the unaligned `lwl`/`lwr` + `swl`/`swr`
 idiom already documented for `Descriptor10`
 (`include/class_3bb8c.h`) and `Block24` (`src/class_3bb8c_r.c`).
-`StreamRawBlock` is a plain byte array (alignment 1) so a whole-struct
+`IconFrame` is a plain byte array (alignment 1) so a whole-struct
 copy compiles to the RUNTIME-alignment-checked dual-path copy retail
 actually shows for the three 0x80-byte spans -- confirmed against
 `class_3bb8c_r.c`'s own comment on `Block24`: *"a byte array... compiles
@@ -219,7 +228,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     StreamReq *req;
 
     payload = arg6;
-    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->unk0C, (char *)a1);
+    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
     func_80050908(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = func_80050938(path, openMode);
@@ -233,18 +242,18 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     if (fileHandle == -1) {
         return 0;
     }
-    src = ((StreamArg5Obj *)arg5)->unk10;
-    req = (StreamReq *)func_80017B34(0x200);
-    req->tag0 = 'S';
-    req->tag1 = 'C';
-    req->b2 = a3 + 0x10;
-    req->b3 = ((u32)arg7 + 0x1FFF) >> 13;
-    strcpy(req->name, (char *)handle);
-    req->arr[0] = src->arr[0];
-    req->arr[1] = src->arr[1];
-    req->blkA = src->blkA;
-    req->blkB = src->blkB;
-    req->blkC = src->blkC;
+    src = ((McIconSourceRef *)arg5)->iconSource;
+    req = (McSaveHeader *)func_80017B34(0x200);
+    req->magic0 = 'S';
+    req->magic1 = 'C';
+    req->iconFrameFlag = a3 + 0x10;
+    req->blockCount = ((u32)arg7 + 0x1FFF) >> 13;
+    strcpy(req->title, (char *)handle);
+    req->palette[0] = src->palette[0];
+    req->palette[1] = src->palette[1];
+    req->frame0 = src->frame0;
+    req->frame1 = src->frame1;
+    req->frame2 = src->frame2;
     func_80013488(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
     func_80017CFC(req);
     func_80013488(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
@@ -252,6 +261,13 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     return 1;
 }
 ```
+
+(Note: this "best body reached" snapshot predates round 34's BIOS
+relinking and round 60's `self->cardSlot` field rename; the LIVE
+preserved body in `src/class_3bb8c_f.c` calls `open`/`delete`/`close`/
+`write`/`printf` directly and has no separate probe-open step. Both
+describe the same residue class; only the current source is
+byte-verified.)
 
 ## Levers that mattered, in order
 
@@ -359,6 +375,33 @@ function (239/240, 188 real words matching -- the configuration kept) ->
 five further variants (position swaps, `s32` vs `void *` typing, a
 scheduling barrier, declaration-order swap) all either matched or
 regressed the 188/240 best, none improved it.
+
+## Naming (round 60, track 3)
+
+`func_8004EF6C` -> `TaskObjF__TryWriteMemcardSaveFile`. **Tier A.**
+Evidence: this unit's own `TaskObjF__WriteMemcardSaveFile` (its only
+caller) is the bounded-retry wrapper around it, and the "Try" prefix
+matches this project's existing convention for a single, non-retrying
+attempt a caller may retry (`Class6B5CC__TryAttachNearby`,
+`src/code_d294_b.c`). "Memcard" is established by `BuildMemcardPath`'s
+own `bu00:`/`bu10:` device templates; "SaveFile" is established by the
+0x200-byte buffer's structural match to the PS1 memory-card save file
+header format (see the local-type naming note below) plus the BIOS
+create-with-block-count `open()` convention (`openMode`'s upper 16 bits
+encode a block count only when creating a file).
+
+Local types renamed for the same reason, Tier B (structural match to a
+well-known format, not a string/symbol-table fact): `StreamSmallSub` ->
+`IconPaletteHalf`, `StreamRawBlock` -> `IconFrame`, `StreamSrcObj` ->
+`McIconSource`, `StreamArg5Obj` -> `McIconSourceRef`, `StreamReq` ->
+`McSaveHeader`, with fields renamed to match (`tag0/tag1` -> `magic0/
+magic1`, `b2` -> `iconFrameFlag`, `b3` -> `blockCount`, `name` ->
+`title`, `arr` -> `palette`, `blkA/blkB/blkC` -> `frame0/frame1/frame2`).
+These are unit-local typedefs, not symbols in `config/symbols.slps01556.lsdde.txt`,
+so `tools/rename.py` does not apply; edited directly in `src/class_3bb8c_f.c`
+and confirmed to still parse with an isolated `cpp|cc1` pass (the body is
+`#if 0`, so the normal build never compiles it and could not have caught
+a syntax error here).
 
 ### Proposed learnings
 

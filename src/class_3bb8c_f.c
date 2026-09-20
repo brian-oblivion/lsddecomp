@@ -99,11 +99,11 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, 
 /* STALL snapshot -- see docs/match-reports/TaskObjF__TryWriteMemcardSaveFile.md. Best
  * reached: 188/240 words, 0x3BC/0x3C0 (1 word / 4 bytes short, zero
  * address drift beyond that). Genuinely fresh derivation this round --
- * full struct layout (StreamSrcObj/StreamReq/etc, all new) derived from
- * scratch and confirmed correct in control flow, arithmetic (including
- * two signed/unsigned shift fixes -- retail uses `srl`, a naive signed
- * `>>` on `s32 arg7` compiles to `sra`), and struct-copy shape (the
- * aligned-vs-unaligned runtime-checked copy idiom, matching
+ * full struct layout (McIconSource/McSaveHeader/etc, all new) derived
+ * from scratch and confirmed correct in control flow, arithmetic
+ * (including two signed/unsigned shift fixes -- retail uses `srl`, a
+ * naive signed `>>` on `s32 arg7` compiles to `sra`), and struct-copy
+ * shape (the aligned-vs-unaligned runtime-checked copy idiom, matching
  * class_3bb8c_r.c's Block24 precedent). The residue is confirmed as
  * the SAME 9-register-saturation class already documented for this
  * function's own caller, TaskObjF__WriteMemcardSaveFile -- a single delay-slot
@@ -111,66 +111,78 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, 
  * moves fills a branch's delay slot) that did not respond to any
  * position/type/declaration-order variant tried. Preserved here per
  * convention -- not live C. */
-/* TaskObjF__TryWriteMemcardSaveFile's own local types -- none shared elsewhere in this unit. */
+/* TaskObjF__TryWriteMemcardSaveFile's own local types -- none shared
+ * elsewhere in this unit.
+ *
+ * NAMING (round 60): the submitted 0x200-byte buffer is structurally
+ * exact to the well-documented PS1 memory-card save FILE HEADER format
+ * -- 'S'/'C' magic, an icon-frame-count byte, a block-count byte, a
+ * 0x5C title field, a 16-colour icon palette (2 x 8-colour halves,
+ * matching this function's own back-to-back-pair copy shape), and up to
+ * three 0x80-byte (16x16 4bpp) icon animation frames, for exactly
+ * 4+0x5C+0x20+3*0x80 = 0x200 bytes. Named on that structural match, not
+ * on any string or symbol table -- Tier B. */
 
-/* A small opaque sub-record, read/written as a whole -- all s16 members
- * (alignment 2, no s32) so a whole-struct copy compiles to the unaligned
- * lwl/lwr + swl/swr idiom already documented (Descriptor10 in
+/* Half of the 16-colour icon CLUT (8 x s16 = 0x10 bytes) -- all s16
+ * members (alignment 2, no s32) so a whole-struct copy compiles to the
+ * unaligned lwl/lwr + swl/swr idiom already documented (Descriptor10 in
  * class_3bb8c.h, Block24 in class_3bb8c_r.c). Two of these sit back to
  * back (0x14..0x33) in the source object and (0x60..0x7F) in the request
  * buffer -- copied as an array of 2, not a loop (matches retail: fully
  * unrolled, no branch, no runtime alignment check). */
-typedef struct StreamSmallSub {
-    s16 f0, f2, f4, f6, f8, fA, fC, fE;
-} StreamSmallSub;
+typedef struct IconPaletteHalf {
+    s16 color[8];
+} IconPaletteHalf;
 
-/* A raw, opaque 0x80-byte span -- alignment 1 (a plain byte array), so a
- * whole-struct copy compiles to the RUNTIME-alignment-checked
- * lw/sw-vs-lwl/lwr dual path retail shows for these three chunks (the
- * same idiom src/class_3bb8c_r.c's Block24 documents: "a byte array...
- * compiles the copy as a generic runtime-alignment-checked memcpy loop
- * instead"). Three of these are copied in sequence. */
-typedef struct StreamRawBlock {
+/* One 16x16 4bpp icon animation frame -- a raw, opaque 0x80-byte span
+ * (alignment 1, a plain byte array), so a whole-struct copy compiles to
+ * the RUNTIME-alignment-checked lw/sw-vs-lwl/lwr dual path retail shows
+ * for these three chunks (the same idiom src/class_3bb8c_r.c's Block24
+ * documents: "a byte array... compiles the copy as a generic
+ * runtime-alignment-checked memcpy loop instead"). Three of these are
+ * copied in sequence. */
+typedef struct IconFrame {
     u8 raw[0x80];
-} StreamRawBlock;
+} IconFrame;
 
-/* arg5->unk10's pointee -- only the two small subs (+0x14/+0x24) and the
- * three raw 0x80-byte spans (+0x40/+0xC0/+0x140) are ever read by this
+/* arg5->iconSource's pointee -- only the two palette halves (+0x14/+0x24)
+ * and the three icon frames (+0x40/+0xC0/+0x140) are ever read by this
  * function; nothing establishes the leading 0x14 bytes or the 0xC-byte
  * gap at +0x34. */
-typedef struct StreamSrcObj {
+typedef struct McIconSource {
     u8 pad0[0x14];
-    StreamSmallSub arr[2];      /* +0x14 */
+    IconPaletteHalf palette[2];  /* +0x14 */
     u8 pad34[0x40 - 0x34];
-    StreamRawBlock blkA;          /* +0x40 */
-    StreamRawBlock blkB;            /* +0xC0 */
-    StreamRawBlock blkC;              /* +0x140 */
-} StreamSrcObj;
+    IconFrame frame0;              /* +0x40 */
+    IconFrame frame1;                /* +0xC0 */
+    IconFrame frame2;                  /* +0x140 */
+} McIconSource;
 
-/* arg5's own type -- only +0x10 (a StreamSrcObj*) is ever read. */
-typedef struct StreamArg5Obj {
+/* arg5's own type -- only +0x10 (a McIconSource*) is ever read. */
+typedef struct McIconSourceRef {
     u8 pad0[0x10];
-    StreamSrcObj *unk10;
-} StreamArg5Obj;
+    McIconSource *iconSource;
+} McIconSourceRef;
 
-/* The 0x200-byte request buffer this function builds and submits.
- * tag0/tag1 are the literal bytes 'S'/'C'; b2/b3 are computed size/mode
- * bytes; name is a strcpy target (source: this function's own `handle`
+/* The 0x200-byte memory-card save FILE HEADER this function builds and
+ * submits -- see the NAMING note above. magic0/magic1 are the literal
+ * bytes 'S'/'C'; iconFrameFlag/blockCount are computed size/mode bytes;
+ * title is a strcpy target (source: this function's own `handle`
  * parameter, which despite its established `s32` type across this file
  * is used here as a raw C string -- kept `s32` at the parameter per this
  * project's per-site-cast convention, since retyping it risks the
  * ALREADY-MATCHED TaskObjF__WriteMemcardSaveFile's own signature). */
-typedef struct StreamReq {
-    u8 tag0;
-    u8 tag1;
-    u8 b2;
-    u8 b3;
-    char name[0x5C];
-    StreamSmallSub arr[2];
-    StreamRawBlock blkA;
-    StreamRawBlock blkB;
-    StreamRawBlock blkC;
-} StreamReq;
+typedef struct McSaveHeader {
+    u8 magic0;
+    u8 magic1;
+    u8 iconFrameFlag;
+    u8 blockCount;
+    char title[0x5C];
+    IconPaletteHalf palette[2];
+    IconFrame frame0;
+    IconFrame frame1;
+    IconFrame frame2;
+} McSaveHeader;
 
 extern const char D_80011530[];  /* rodata string "File not create in WriteFile\n" */
 extern s32 write(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
@@ -195,8 +207,8 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     s32 openMode;
     s32 flagCopy;
     s32 payload;
-    StreamSrcObj *src;
-    StreamReq *req;
+    McIconSource *src;
+    McSaveHeader *req;
 
     payload = arg6;
     path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
@@ -213,18 +225,18 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     if (fileHandle == -1) {
         return 0;
     }
-    src = ((StreamArg5Obj *)arg5)->unk10;
-    req = (StreamReq *)func_80017B34(0x200);
-    req->tag0 = 'S';
-    req->tag1 = 'C';
-    req->b2 = a3 + 0x10;
-    req->b3 = ((u32)arg7 + 0x1FFF) >> 13;
-    strcpy(req->name, (char *)handle);
-    req->arr[0] = src->arr[0];
-    req->arr[1] = src->arr[1];
-    req->blkA = src->blkA;
-    req->blkB = src->blkB;
-    req->blkC = src->blkC;
+    src = ((McIconSourceRef *)arg5)->iconSource;
+    req = (McSaveHeader *)func_80017B34(0x200);
+    req->magic0 = 'S';
+    req->magic1 = 'C';
+    req->iconFrameFlag = a3 + 0x10;
+    req->blockCount = ((u32)arg7 + 0x1FFF) >> 13;
+    strcpy(req->title, (char *)handle);
+    req->palette[0] = src->palette[0];
+    req->palette[1] = src->palette[1];
+    req->frame0 = src->frame0;
+    req->frame1 = src->frame1;
+    req->frame2 = src->frame2;
     write(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
     func_80017CFC(req);
     write(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
