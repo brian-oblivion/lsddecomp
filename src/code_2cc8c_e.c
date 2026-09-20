@@ -250,7 +250,7 @@ void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__PushPosition);
 #endif
 
-void func_80040490(Class6E99CObj *self) {
+void Class6E99C__PopPosition(Class6E99CObj *self) {
     s32 t0, t1;
 
     t0 = self->unk90;

@@ -98,7 +98,7 @@ remaining."
 ## Field width correction (kept, unlike the stall verdict above)
 
 `Class6E99CObj::unk88`/`unk8C` were originally typed `s16` (from
-`func_80040490`'s own `lhu` read alone). This function's OWN `sw` (a full
+`Class6E99C__PopPosition`'s own `lhu` read alone). This function's OWN `sw` (a full
 WORD store, not `sh`) at those exact offsets is direct evidence they are
 `s32`, not `s16`:
 
@@ -109,7 +109,7 @@ sw $v1, 0x8c($a3)
 
 Retyped to `s32` in the header (removing an earlier, now-known-wrong 2-byte
 `pad08A` inserted to compensate for the old `s16` typing). This retype is
-what let `func_80040490` (a SIBLING function, already matched) reach a
+what let `Class6E99C__PopPosition` (a SIBLING function, already matched) reach a
 genuine 9/9 -- confirmed by rebuild, not assumed. Separately,
 `Class6E99CObj::unk60`/`unk62` needed retyping `s16` -> `u16`: this
 function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
@@ -171,8 +171,8 @@ which retail does not do -- retail interleaves each load immediately with
 its own store before starting the next pair. A bare
 `__asm__("" ::: "memory")` between pairs is what stops the hoist (a bare
 `__asm__("")` with no clobber did NOT work when tried on the sibling
-`func_80040490`, memory clobber was required there too). This same lever
-closed `func_80040490` (now a real, confirmed 9/9 match) and is the reason
+`Class6E99C__PopPosition`, memory clobber was required there too). This same lever
+closed `Class6E99C__PopPosition` (now a real, confirmed 9/9 match) and is the reason
 this function's own remaining gap is ONLY the register-identity issue, not
 also a structural one.
 

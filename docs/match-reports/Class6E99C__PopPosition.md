@@ -1,9 +1,11 @@
-# func_80040490 -- MATCH (9/9 words, first attempt)
+> Renamed from `func_80040490` on 2026-09-20 (tools/rename.py). Address 0x80040490.
+
+# Class6E99C__PopPosition -- MATCH (9/9 words, first attempt)
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotEC` (`+0x0EC`).
 
 ```c
-void func_80040490(Class6E99CObj *self) {
+void Class6E99C__PopPosition(Class6E99CObj *self) {
     s32 t0, t1;
 
     t0 = self->unk90;

@@ -1975,7 +1975,7 @@ struct Class6E99CMethods {
     void (*slotE0)(Class6E99CObj *self, void *a1);   /* +0x0E0, Class6E99C__Stop */
     void *(*slotE4)(Class6E99CObj *self);            /* +0x0E4, Class6E99C__GetColor */
     void (*slotE8)(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2); /* +0x0E8, Class6E99C__PushPosition */
-    void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, func_80040490 */
+    void (*slotEC)(Class6E99CObj *self);             /* +0x0EC, Class6E99C__PopPosition */
     void (*slotF0)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0F0, func_800404B4 */
 };
 struct Class6E99CObj {
@@ -1991,10 +1991,10 @@ struct Class6E99CObj {
        multiple-local-views convention. */
     void *unk10;
     u8 pad014[0x050 - 0x014];
-    s32 unk50;                 /* +0x050, OBSERVED: func_80040490/Class6E99C__PushPosition */
-    s32 unk54;                 /* +0x054, OBSERVED: func_80040490/Class6E99C__PushPosition */
+    s32 unk50;                 /* +0x050, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
+    s32 unk54;                 /* +0x054, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
     u8 pad058[0x060 - 0x058];
-    /* +0x060/+0x062, OBSERVED: func_80040490/Class6E99C__PushPosition -- `u16`, not
+    /* +0x060/+0x062, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition -- `u16`, not
        `s16`: Class6E99C__PushPosition widens these into the `s32` unk88/unk8C fields
        via a plain assignment, and retail's `lhu` there (zero-extending)
        only matches when the source type is unsigned. */
@@ -2029,18 +2029,18 @@ struct Class6E99CObj {
     s32 unk7C;
     s32 unk80;                 /* +0x080, OBSERVED: Class6E99C__Update, a countdown */
     s32 unk84;                 /* +0x084, OBSERVED: Class6E99C__Configure, a division result */
-    /* +0x088/+0x08C, OBSERVED: func_80040490 (read via `lhu`, into `s16`
+    /* +0x088/+0x08C, OBSERVED: Class6E99C__PopPosition (read via `lhu`, into `s16`
        unk60/unk62 -- a narrowing read of only the low halfword) and
        Class6E99C__PushPosition (WRITTEN via a plain WORD `sw`, from `lhu`-loaded
        unk60/unk62 -- a genuine `s32` field, widened on write). Retail's
        own `sw` at this offset is why these are `s32`, not `s16` -- an
-       earlier reading typed them `s16` from func_80040490's read alone and
+       earlier reading typed them `s16` from Class6E99C__PopPosition's read alone and
        inserted a 2-byte pad to keep unk90 at the right offset; the pad was
        the wrong fix for the wrong field width. */
     s32 unk88;
     s32 unk8C;
-    s32 unk90;                 /* +0x090, OBSERVED: func_80040490/Class6E99C__PushPosition */
-    s32 unk94;                 /* +0x094, OBSERVED: func_80040490/Class6E99C__PushPosition */
+    s32 unk90;                 /* +0x090, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
+    s32 unk94;                 /* +0x094, OBSERVED: Class6E99C__PopPosition/Class6E99C__PushPosition */
     s32 unk98;                 /* +0x098, OBSERVED: func_800404B4, setter arg1;
                                    shared field identity with ClassEAC0Obj's
                                    own unk98 above (same base offset) */
