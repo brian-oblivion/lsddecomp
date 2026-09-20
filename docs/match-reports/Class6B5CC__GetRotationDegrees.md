@@ -243,7 +243,7 @@ restored (never disturbed in `src/`).
 
 ## Round 18 continued: exhaustive type/declaration-axis search (head's requested lever)
 
-Per the head's round-wide broadcast on the `func_8004EEA0`/`func_8004042C`
+Per the head's round-wide broadcast on the `TaskObjF__WriteMemcardSaveFile`/`func_8004042C`
 overturns (a mistyped parameter masquerading as a register-identity
 residue), built a `PERM_GENERAL`-based seed exploring type/declaration
 axes rather than statement order: (1) `src`'s declaration split across

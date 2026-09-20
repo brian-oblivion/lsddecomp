@@ -1,11 +1,13 @@
-# func_8004ED40
+> Renamed from `func_8004ED40` on 2026-09-20 (tools/rename.py). Address 0x8004ed40.
+
+# TaskObjF__ReadMemcardFile
 
 **Unit:** class_3bb8c_f · **Size:** 32 words (0x80) · **Status:** MATCH
 
 ## What it does
 
-`s32 func_8004ED40(TaskObjF *self, char *suffix, void *outBuf, s32
-outSize)`. A bounded-retry wrapper: calls `func_8004EDC0` (this unit, also
+`s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
+outSize)`. A bounded-retry wrapper: calls `TaskObjF__TryReadMemcardFile` (this unit, also
 matched — the actual CD-stream open/read/seek/close) up to 11 times (a
 counter starting at 10, checked and decremented in a way that allows one
 extra iteration — see the lever below), stopping early the first time it
@@ -30,9 +32,17 @@ untouched through to the function's own `return`.
 
 ## Header additions
 
-- Forward declaration `s32 func_8004EDC0(TaskObjF *self, char *suffix,
+- Forward declaration `s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix,
   void *outBuf, s32 outSize);` in `src/class_3bb8c_f.c` (defined later in
   ROM order).
 
-See `func_8004EDC0`'s report for the callee's own signature and the
-`TaskObjF` class context (`func_8004F40C`'s report).
+See `TaskObjF__TryReadMemcardFile`'s report for the callee's own signature and the
+`TaskObjF` class context (`TaskObjF__ForEachEvent`'s report).
+
+## Naming (round 60, track 3)
+
+`func_8004ED40` -> `TaskObjF__ReadMemcardFile`. **Tier A.** A bounded
+(11-attempt) retry wrapper around `TaskObjF__TryReadMemcardFile`, stopping
+early on the first success -- both the retry mechanics and the purpose
+(read a memory-card file, tolerating transient failures) are evident from
+the body plus the callee's own established behaviour.

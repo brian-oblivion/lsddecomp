@@ -1,10 +1,12 @@
-# func_8004FB04
+> Renamed from `func_8004FB04` on 2026-09-20 (tools/rename.py). Address 0x8004fb04.
+
+# TaskObjF__Notify
 
 **Unit:** class_3bb8c_f · **Size:** 56 words (0xE0) · **Status:** MATCH
 
 ## What it does
 
-`void func_8004FB04(TaskObjF *self, void *arg1, s32 arg2)`. First forwards
+`void TaskObjF__Notify(TaskObjF *self, void *arg1, s32 arg2)`. First forwards
 `(self, arg1, arg2)` to the BASE class's own generic notification slot —
 `Get_vtable_BasicClass()` returns `BasicClass`'s method table
 (`include/code_8220.h`), and its slot +0x038 (`BasicClassMethods::slot38`)
@@ -48,8 +50,19 @@ arg1, arg2)`) depending on the tag, masked two different ways.
    `else if`.** A plain `if/else if/else if` chain, each arm ending in its
    own `methods->slotNN(self, arg1, arg2)` call, reproduced this sharing
    automatically — no manual `goto`/shared-call-site restructuring was
-   needed here (contrast `func_8004F8A4`, where the equivalent sharing did
+   needed here (contrast `TaskObjF__func_8004F8A4`, where the equivalent sharing did
    need an explicit local function-pointer variable).
 
-See `func_8004F40C`'s report for the `TaskObjF` class and the
+See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class and the
 `BasicMethods866E8F`/`Get_vtable_BasicClass` local view.
+
+## Naming (round 60, track 3)
+
+`func_8004FB04` -> `TaskObjF__Notify`. **Tier A.** Forwards `(self, arg1,
+arg2)` to the inherited `BasicClass` notify slot
+(`Get_vtable_BasicClass()->slot38`, the project's own established
+"notify every parent" mechanism, `include/code_8220.h`), then reads a
+type tag out of `arg1` and dispatches one of this class's own four
+vtable slots (+0x088/+0x098/+0x0A4/+0x0B0) accordingly -- a message
+dispatcher, directly evident from the body and the established
+`BasicClass` precedent.

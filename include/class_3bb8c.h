@@ -1870,7 +1870,7 @@ extern void *func_80050BA8(s32 arg0, s32 arg1);
 
 /*
  * class_3bb8c_f: a SEPARATE class from Obj866E8 above -- no evidence unifies
- * them (distinct field layouts), and func_8004F32C below writes raw bytes
+ * them (distinct field layouts), and BuildMemcardPath below writes raw bytes
  * over its own object's first 6 bytes, which would corrupt Obj866E8's own
  * vtable pointer if the two were the same type. This is this unit's own
  * BasicClass-derived (docs/research/class-framework.md, include/code_8220.h)
@@ -1892,88 +1892,90 @@ struct TaskObjFMethods {
     void *unk04;                                                /* +0x004 */
     void *ctor;                                                  /* +0x008 */
     void *unk0C;                                                  /* +0x00C */
-    void (*addChild)(TaskObjF *self, void *child);                 /* +0x010, func_8004F55C (x2) */
-    void (*removeChild)(TaskObjF *self, void *child);               /* +0x014, func_8004F5DC (x2) */
+    void (*addChild)(TaskObjF *self, void *child);                 /* +0x010, TaskObjF__Init (x2) */
+    void (*removeChild)(TaskObjF *self, void *child);               /* +0x014, TaskObjF__Deinit (x2) */
     void *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* inherited BasicClass slots, untouched by this unit */
     u8 pad3C[0x044 - 0x03C];
-    void (*slot44)(TaskObjF *self);                                   /* +0x044, func_8004F9D8 */
-    s32 (*slot48)(TaskObjF *self);                                     /* +0x048, func_8004F9D8 */
-    s32 (*slot4C)(TaskObjF *self, s32 *out1, s32 *out2, s32 *out3);      /* +0x04C, func_8004F9D8 */
+    void (*slot44)(TaskObjF *self);                                   /* +0x044, TaskObjF__Validate */
+    s32 (*slot48)(TaskObjF *self);                                     /* +0x048, TaskObjF__Validate */
+    s32 (*slot4C)(TaskObjF *self, s32 *out1, s32 *out2, s32 *out3);      /* +0x04C, TaskObjF__Validate */
     u8 pad50[0x054 - 0x050];
-    s32 (*slot54)(TaskObjF *self, s32 a1, s32 a2);                          /* +0x054, func_8004F8A4 */
+    s32 (*slot54)(TaskObjF *self, s32 a1, s32 a2);                          /* +0x054, TaskObjF__func_8004F8A4 */
     u8 pad58[0x05C - 0x058];
-    s32 (*slot5C)(TaskObjF *self, void *a1, void *a2, s32 a3, s32 a4);        /* +0x05C, func_8004F638 */
-    s32 (*slot60)(TaskObjF *self, s32 a1, s32 a2);                              /* +0x060, func_8004F8A4 */
+    s32 (*slot5C)(TaskObjF *self, void *a1, void *a2, s32 a3, s32 a4);        /* +0x05C, TaskObjF__func_8004F638 */
+    s32 (*slot60)(TaskObjF *self, s32 a1, s32 a2);                              /* +0x060, TaskObjF__func_8004F8A4 */
     u8 pad64[0x07C - 0x064];
-    s32 (*slot7C)(TaskObjF *self, s32 a1);                                        /* +0x07C, func_8004F638/func_8004F8A4/func_8004F9D8 */
+    s32 (*slot7C)(TaskObjF *self, s32 a1);                                        /* +0x07C, TaskObjF__func_8004F638/TaskObjF__func_8004F8A4/TaskObjF__Validate */
     u8 pad80[0x088 - 0x080];
-    void (*slot88)(TaskObjF *self, void *arg1, s32 arg2);                          /* +0x088, func_8004FB04 */
+    void (*slot88)(TaskObjF *self, void *arg1, s32 arg2);                          /* +0x088, TaskObjF__Notify */
     u8 pad8C[0x098 - 0x08C];
-    void (*slot98)(TaskObjF *self, void *arg1, s32 arg2);                            /* +0x098, func_8004FB04 */
+    void (*slot98)(TaskObjF *self, void *arg1, s32 arg2);                            /* +0x098, TaskObjF__Notify */
     u8 pad9C[0x0A4 - 0x09C];
-    void (*slotA4)(TaskObjF *self, void *arg1, s32 arg2);                              /* +0x0A4, func_8004FB04 */
+    void (*slotA4)(TaskObjF *self, void *arg1, s32 arg2);                              /* +0x0A4, TaskObjF__Notify */
     u8 padA8[0x0B0 - 0x0A8];
-    void (*slotB0)(TaskObjF *self, void *arg1, s32 arg2);                                /* +0x0B0, func_8004FB04 */
+    void (*slotB0)(TaskObjF *self, void *arg1, s32 arg2);                                /* +0x0B0, TaskObjF__Notify */
 };
 
 struct TaskObjF {
     TaskObjFMethods *methods;   /* +0x000 */
     u8 pad04[0x00C - 0x004];     /* BasicClass::children/parentRefs, untouched by this unit */
-    s32 unk0C;                    /* +0x00C, func_8004EDC0: passed as func_8004F32C's "selector" (device slot 0/1) */
+    s32 cardSlot;                  /* +0x00C, TaskObjF__TryReadMemcardFile: passed as BuildMemcardPath's "selector" (device slot 0/1) -- RENAMED round 60 (was unk0C) */
     u8 pad10[0x014 - 0x010];
-    s32 field14[4];                /* +0x014, func_8004F40C (walks all 4, early-exit)/func_8004F4A4 (passes &field14[0], count 4) */
-    s32 unk24;                       /* +0x024, a state/mode tag: func_8004F638 sets 1, func_8004F8A4 sets 2, func_8004F9D8 reads (==1?) */
-    s32 unk28;                        /* +0x028, a result/error code: func_8004F55C/func_8004F638 clear or set it, func_8004F8A4/func_8004F9D8 read it */
-    s32 unk2C;                         /* +0x02C, func_8004F638 (slot5C's return)/func_8004F784/func_8004F810 (loop bound over unk38's array) */
-    s32 unk30;                          /* +0x030, func_8004F55C (arg1)/func_8004F638 (slot5C's arg3) */
-    s32 unk34;                           /* +0x034, func_8004F55C (arg2)/func_8004F638 (slot5C's stack arg4) */
-    void **unk38;                         /* +0x038, a 16-entry pointer array allocated by func_8004F704, torn down by func_8004F810, walked by func_8004F784; also func_8004F638's slot5C arg1 */
-    void *unk3C;                            /* +0x03C, a single buffer allocated by func_8004F704, freed by func_8004F810; also func_8004F638's slot5C arg2 */
-    s32 unk40;                                /* +0x040, func_8004F638 (arg1)/func_8004F8A4 (arg1, forwarded to slot54 as its own arg2) */
-    s32 unk44;                                 /* +0x044, func_8004F638 (arg2)/func_8004F8A4 (arg2) */
-    s32 unk48;                                  /* +0x048, func_8004F8A4 (arg3) */
-    u8 unk4C;                                     /* +0x04C, func_8004F8A4's 5th (byte) arg; also forwarded live to slot60's arg1 */
+    s32 events[4];                  /* +0x014, TaskObjF__ForEachEvent (walks all 4, early-exit)/TaskObjF__FindReadyEvent (passes &events[0], count 4) -- RENAMED round 60 (was field14): 4 kernel event descriptors, corroborated cross-unit by class_3bb8c_e.c's func_8004E5E4, which fills the identical offset via OpenEvent() then passes the same object to this unit's own EnableEvents wrapper (see TaskObjF__EnableEvents's report) */
+    s32 opMode;                       /* +0x024, RENAMED round 60 (was unk24): distinguishes which of this class's two operations is active -- TaskObjF__func_8004F638 sets 1, TaskObjF__func_8004F8A4 sets 2, TaskObjF__Validate reads (==1?); the values' exact meaning is not established */
+    s32 statusCode;                    /* +0x028, RENAMED round 60 (was unk28): TaskObjF__Init/TaskObjF__func_8004F638 clear or set it, TaskObjF__func_8004F8A4/TaskObjF__Validate read it and dispatch it through slot7C -- a status/completion code, not confirmed to be error-only */
+    s32 bufCount;                       /* +0x02C, RENAMED round 60 (was unk2C): TaskObjF__func_8004F638 (slot5C's return)/TaskObjF__FreeUnusedBuffers/TaskObjF__FreeBuffers (loop bound over bufArray) -- the number of bufArray entries actually in use */
+    s32 unk30;                          /* +0x030, TaskObjF__Init (arg1)/TaskObjF__func_8004F638 (slot5C's arg3) */
+    s32 unk34;                           /* +0x034, TaskObjF__Init (arg2)/TaskObjF__func_8004F638 (slot5C's stack arg4) */
+    void **bufArray;                      /* +0x038, RENAMED round 60 (was unk38): a 16-entry pointer array allocated by TaskObjF__AllocBuffers, torn down by TaskObjF__FreeBuffers, walked by TaskObjF__FreeUnusedBuffers; also TaskObjF__func_8004F638's slot5C arg1 */
+    void *scratchBuf;                       /* +0x03C, RENAMED round 60 (was unk3C): a single buffer allocated by TaskObjF__AllocBuffers, freed by TaskObjF__FreeBuffers; also TaskObjF__func_8004F638's slot5C arg2 */
+    s32 unk40;                                /* +0x040, TaskObjF__func_8004F638 (arg1)/TaskObjF__func_8004F8A4 (arg1, forwarded to slot54 as its own arg2) */
+    s32 unk44;                                 /* +0x044, TaskObjF__func_8004F638 (arg2)/TaskObjF__func_8004F8A4 (arg2) */
+    s32 unk48;                                  /* +0x048, TaskObjF__func_8004F8A4 (arg3) */
+    u8 unk4C;                                     /* +0x04C, TaskObjF__func_8004F8A4's 5th (byte) arg; also forwarded live to slot60's arg1 */
     u8 pad4D[0x050 - 0x04D];
-    s32 unk50;                                      /* +0x050, func_8004F8A4's 6th arg */
-    s32 unk54;                                       /* +0x054, func_8004F638 (arg3)/func_8004F8A4's 7th arg */
-    s32 unk58;                                        /* +0x058, func_8004F638's 5th/stack arg/func_8004F8A4's 8th arg; also forwarded live to slot60's arg2 */
+    s32 unk50;                                      /* +0x050, TaskObjF__func_8004F8A4's 6th arg */
+    s32 unk54;                                       /* +0x054, TaskObjF__func_8004F638 (arg3)/TaskObjF__func_8004F8A4's 7th arg */
+    s32 unk58;                                        /* +0x058, TaskObjF__func_8004F638's 5th/stack arg/TaskObjF__func_8004F8A4's 8th arg; also forwarded live to slot60's arg2 */
     u8 pad5C[0x060 - 0x05C];
-    s32 unk60;                                          /* +0x060, func_8004F5DC: removeChild's arg */
-    s32 unk64;                                            /* +0x064, func_8004F5DC: removeChild's arg */
-    s32 unk68;                                             /* +0x068, func_8004F55C (arg6)/func_8004F5DC (cleared) */
-    s32 unk6C;                                              /* +0x06C, func_8004F55C (arg7)/func_8004F5DC (cleared) */
-    s32 unk70;                                                /* +0x070, func_8004F55C (cleared) */
+    s32 unk60;                                          /* +0x060, TaskObjF__Deinit: removeChild's arg */
+    s32 unk64;                                            /* +0x064, TaskObjF__Deinit: removeChild's arg */
+    s32 unk68;                                             /* +0x068, TaskObjF__Init (arg6)/TaskObjF__Deinit (cleared) */
+    s32 unk6C;                                              /* +0x06C, TaskObjF__Init (arg7)/TaskObjF__Deinit (cleared) */
+    s32 unk70;                                                /* +0x070, TaskObjF__Init (cleared) */
 };
 
-/* The three library callbacks func_8004F394/func_8004F3BC/func_8004F3E4
- * forward into func_8004F40C are EnableEvent/DisableEvent/TestEvent, now
+/* The three library callbacks TaskObjF__EnableEvents/TaskObjF__DisableEvents/TaskObjF__TestEvents
+ * forward into TaskObjF__ForEachEvent are EnableEvent/DisableEvent/TestEvent, now
  * linked from the Psy-Q objects libapi/a12, libapi/a13 and libapi/a11.
  * Their declarations live in src/class_3bb8c_f.c, the only unit that uses
  * them: a prototype for a function a Sony object defines does not belong in
  * a header 21 units include, where it would one day collide with the real
  * KERNEL.H. (The old comment here called them "SPU routines" -- they are
  * kernel event-queue calls; only their neighbours in the block are libspu.)
- * TestEvent is also the validity check func_8004F4C8 uses on its own array
+ * TestEvent is also the validity check FindFirstReadyEvent uses on its own array
  * argument. */
 
 /* Generic "find the first of up to `count` entries for which
- * func_800390F4 accepts it, retrying the whole array forever if none
- * qualify yet" helper -- func_8004F4A4 calls it on this unit's own
- * TaskObjF::field14 (count 4). D_80086E78 is a small lookup table indexed
- * by the winning slot; bound unknown from this unit alone, left unsized. */
+ * TestEvent accepts it, retrying the whole array forever if none
+ * qualify yet" helper -- TaskObjF__FindReadyEvent calls it on this unit's own
+ * TaskObjF::events (count 4). D_80086E78 is a small lookup table indexed
+ * by the winning slot; bound unknown from this unit alone, left unsized.
+ * (Comment updated round 60: the callback was `func_800390F4` before round
+ * 34 linked it as Sony's own `TestEvent`; `field14` renamed to `events`.) */
 extern s32 D_80086E78[];
-extern s32 func_8004F4C8(s32 *arr, s32 count);
+extern s32 FindFirstReadyEvent(s32 *arr, s32 count);
 
 /* The generic pool allocator/free pair, already established the same way
  * by include/code_8220.h, include/code_55dd4.h etc -- `func_80017CFC`
- * returning `void *` (not `void`) matches func_8004F784's own use here,
+ * returning `void *` (not `void`) matches TaskObjF__FreeUnusedBuffers's own use here,
  * which stores its return value back into the freed slot. */
 /* func_80017B34/func_80017CFC already declared above in this header. */
 extern void *func_80017CFC(void *ptr);
 
 /* A fixed 6-byte memory-card device-name template ("bu00:"/"bu10:", PS-X
  * BIOS device names -- asm/data/7B008.sdata.s). An all-`s8` struct
- * (natural alignment 1) so the whole-struct assignment in func_8004F32C
+ * (natural alignment 1) so the whole-struct assignment in BuildMemcardPath
  * reproduces retail's unaligned lwl/lwr + byte-store copy, the same idiom
  * already documented for `Descriptor10` above. */
 typedef struct DeviceName866E8 {
@@ -1984,7 +1986,7 @@ extern DeviceName866E8 D_8008AA9C;   /* "bu10:" */
 extern DeviceName866E8 D_8008AAA4;   /* "bu00:" */
 
 /* This project's own strcat (matched elsewhere, src/code_171e0.c) --
- * func_8004F32C is this unit's only caller. */
+ * BuildMemcardPath is this unit's only caller. */
 extern char *strcat(char *dest, char *src);
 
 /* BasicClass's own method table getter (include/code_8220.h's
@@ -2019,7 +2021,7 @@ struct BasicMethods866E8F {
     void (*removeChild)(void *self, void *child);/* +0x014, func_80050DB4 (_i) / func_80051DA0 (_j) */
     void (*removeAllChildren)(void *self);       /* +0x018, func_80050E34 (_i) / func_80051E20 (_j) */
     u8 pad01C[0x038 - 0x01C];
-    void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, func_8004FB04's first dispatch */
+    void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, TaskObjF__Notify's first dispatch */
 };
 extern BasicMethods866E8F *Get_vtable_BasicClass(void);
 
@@ -2039,7 +2041,7 @@ extern BasicMethods866E8F *Get_vtable_BasicClass(void);
  *
  * func_800507F8 stays: it is game code, defined in src/class_3bb8c_g.c
  * (MATCHED round 45, 60/60 words -- was gp_rel-blocked, resolved round 42). */
-extern s32 func_800507F8(s32 arg0, s32 arg1);                /* func_8004EEA0's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
+extern s32 func_800507F8(s32 arg0, s32 arg1);                /* TaskObjF__WriteMemcardSaveFile's own retry-loop bracket; also called with (arg,0) after the retry loop gives up */
 
 /* -------------------------------------------------------------------
  * class_3bb8c_m additions below (fourth 20-function slice of the tail,

@@ -1,10 +1,12 @@
-# func_8004F32C
+> Renamed from `func_8004F32C` on 2026-09-20 (tools/rename.py). Address 0x8004f32c.
+
+# BuildMemcardPath
 
 **Unit:** class_3bb8c_f · **Size:** 26 words (0x68) · **Status:** MATCH
 
 ## What it does
 
-`char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix)`.
+`char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix)`.
 Copies a fixed 6-byte PS-X BIOS memory-card device-name template
 ("bu10:" when `selector` is nonzero, "bu00:" otherwise —
 `asm/data/7B008.sdata.s`, `D_8008AA9C`/`D_8008AAA4`) into `dest`, appends
@@ -12,7 +14,7 @@ Copies a fixed 6-byte PS-X BIOS memory-card device-name template
 `src/code_171e0.c`), and returns `dest`.
 
 This function's `dest` argument is **not** the `TaskObjF` class this unit's
-other queued functions operate on (see `func_8004F40C`'s report for that
+other queued functions operate on (see `TaskObjF__ForEachEvent`'s report for that
 class) — it plainly overwrites its own object's first 6 bytes, which would
 corrupt a vtable pointer at offset 0 if it were the same kind of object.
 Treated as an unrelated small helper.
@@ -48,7 +50,7 @@ already documented for `Descriptor10` in `include/class_3bb8c.h`.
 two call sites in ONE unit, with different argument counts, both byte-load-bearing.
 
 **Callee evidence** (the matched definition in `src/class_3bb8c_f.c`):
-`char *func_8004F32C(DeviceName866E8 *dest, s32 selector, char *suffix)` — three
+`char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix)` — three
 real arguments, `$a2` being the suffix string it appends.
 
 **Why `src/class_3bb8c_e.c` must declare it unprototyped.** Its two call sites
@@ -56,15 +58,15 @@ pass different numbers of arguments, and retail's bytes show both:
 
 ```
 8004ea54:  lw    a1,12(v0)                 <- func_8004EA38: $a0/$a1 only, no $a2
-8004ea58:  jal   8004f32c <func_8004F32C>
+8004ea58:  jal   8004f32c <BuildMemcardPath>
 
 8004ece4:  lw    a1,12(v0)                 <- func_8004ECCC: $a0/$a1 ...
 8004ece8:  lui   a2,0x8009                 <- ... and $a2, the &D_8008AAAC suffix
 8004ecec:  addiu a2,a2,-21844
-8004ecf0:  jal   8004f32c <func_8004F32C>
+8004ecf0:  jal   8004f32c <BuildMemcardPath>
 ```
 
-`func_8004EA38`'s call (`func_8004F32C(pathBuf, self->unkC)`) relies on `$a2`
+`func_8004EA38`'s call (`BuildMemcardPath(pathBuf, self->unkC)`) relies on `$a2`
 already holding a usable suffix pointer from the caller — the dead-argument
 idiom — while `func_8004ECCC`'s call materialises one. No single prototype
 compiles both: a 3-parameter one makes the first call `too few arguments`, a
@@ -74,3 +76,13 @@ the only spelling, and it is the same idiom this unit already uses for
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to both copies, `src/class_3bb8c_e.c:89` and `:383`. Oracle green.
+
+## Naming (round 60, track 3)
+
+`func_8004F32C` -> `BuildMemcardPath`. **Tier A.** Free function (first
+parameter is a `dest` buffer, not a `self` of any established class, so
+named `VerbNoun` per convention rather than `Class__Method`). Mechanics
+and purpose both evident from the body alone: copies the BIOS `bu10:`/
+`bu00:` device-name template selected by `selector` into `dest`, appends
+`suffix`, and returns `dest` -- the whole point of the function is
+building a memory-card path string.

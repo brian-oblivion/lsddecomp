@@ -1,4 +1,6 @@
-# func_8004F8A4 -- STALL. Length: 3 words TOO LONG (80/77, 0x140/0x134). Word-match: 63/77. First real diff: file 0x40158 / vram 0x8004F958 (delay-slot fill: retail `move $a0,$s0`, built `nop`).
+> Renamed from `func_8004F8A4` on 2026-09-20 (tools/rename.py). Address 0x8004f8a4.
+
+# TaskObjF__func_8004F8A4 -- STALL. Length: 3 words TOO LONG (80/77, 0x140/0x134). Word-match: 63/77. First real diff: file 0x40158 / vram 0x8004F958 (delay-slot fill: retail `move $a0,$s0`, built `nop`).
 
 **Unit:** class_3bb8c_f · **Size:** 77 words (0x134) · **Status:** STALL —
 tail-merge / early-return scheduling residue. Previously 36/77 (0x130, 1 word
@@ -24,12 +26,12 @@ word-match or first-diff location.
 > confirming the scaffold measures the right thing.
 >
 > Ran `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
-> --stack-diffs` in the background (after the func_8004EF6C search
+> --stack-diffs` in the background (after the TaskObjF__TryWriteMemcardSaveFile search
 > released the machine -- one search at a time, per this round's rule).
 > **68,682 iterations**, floor reached was **490** (seen once; 520 was
 > the recurring local floor, seen 74 times), **no zero found**. Compile
 > errors climbed steadily through the run (up to 1730 per generation by
-> the end). Same detached-launch caveat as func_8004EF6C's search: `rc`
+> the end). Same detached-launch caveat as TaskObjF__TryWriteMemcardSaveFile's search: `rc`
 > could not be read back directly (not this shell's own child); the log's
 > mid-line cutoff timing is consistent with the 900s bound firing, not
 > reported as a captured `rc=124`. Not closed in this budget. Not
@@ -104,17 +106,17 @@ word-match or first-diff location.
 
 ## What it does
 
-`s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6,
+`s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6,
 s32 a7, s32 a8)`. A constructor-ish setup: stores the first three
 parameters plus four stack args into `self->unk40..unk58` (one of them a
 byte field, `unk4C`), sets the state tag `self->unk24 = 2`, then — only if
-`func_8004F9D8(self)` (this unit's own validation gate, matched
+`TaskObjF__Validate(self)` (this unit's own validation gate, matched
 separately) succeeds — dispatches `self->methods->slot54(self, 0, a1)`.
 On success, picks one of three error codes (0xA/0xB/0x11-ish logic against
 `self->unk28`) and dispatches `self->methods->slot7C(self, code)`. On
 `slot54` failure, dispatches `self->methods->slot60(self, a5, a8)`
 instead, similarly picking a code (9, or 0xB/0x11) before the same
-`slot7C` dispatch. Returns 0 if `func_8004F9D8` itself failed, otherwise
+`slot7C` dispatch. Returns 0 if `TaskObjF__Validate` itself failed, otherwise
 whatever `slot7C` returns.
 
 **Every branch target, every field write, and every arithmetic/comparison
@@ -126,7 +128,7 @@ code)` call retail's own compiler chose.
 ## The residue
 
 Retail's tail dispatch is **not** one single shared fetch+call (contrast
-`func_8004F9D8` and `func_8004FB04`, both matched, where the whole
+`TaskObjF__Validate` and `TaskObjF__Notify`, both matched, where the whole
 multi-predecessor tail collapses to one `lw;lw;jalr` triple). Instead
 retail has **three independent `self->methods->slot7C` FETCHES** (one for
 the `unk28`-check "top" merge point reached by all 3 of its own
@@ -145,7 +147,7 @@ worked elsewhere reproduced it exactly.
    cross-jump-merge these into anything: 0x194 (100 bytes too long, no
    sharing at all).
 2. **One shared `goto dispatch; ... dispatch: self->methods->slot7C(self,
-   code); return 0;`** (the `func_8004F9D8`/`func_8004FB04` lever) — fully
+   code); return 0;`** (the `TaskObjF__Validate`/`TaskObjF__Notify` lever) — fully
    shares the fetch AND the call across all 5 predecessors. 0x12C (8 bytes
    / 2 words short) — undershoots because retail does NOT share this much.
 3. **A local function-pointer variable** (`s32 (*dispatch)(TaskObjF*,
@@ -243,8 +245,8 @@ thing (below), isolated to the function's own early-exit tail.
 **Two further attempts on the remaining 3-word-long residue, both
 negative:**
 
-1. **Unwrap the guard** (`if (!func_8004F9D8(self)) { return 0; }` followed
-   by the rest of the body UNINDENTED, instead of `if (func_8004F9D8(self))
+1. **Unwrap the guard** (`if (!TaskObjF__Validate(self)) { return 0; }` followed
+   by the rest of the body UNINDENTED, instead of `if (TaskObjF__Validate(self))
    { <body> } return 0;`) -- tried on the theory that retail's early exit
    needs to be textually adjacent to the call whose result it reuses.
    **Regressed hard, to 23/77 at 0x13C (2 words long)** -- this also
@@ -253,8 +255,8 @@ negative:**
    required, not merely stylistic, for this function (opposite of what the
    "unwrap the guard" lever suggests in isolation -- another case where
    two candidate fixes can't be evaluated independently of each other).
-2. **Capture `func_8004F9D8`'s own return value in a local and `return`
-   THAT instead of a literal `0`** (`s32 ok = func_8004F9D8(self); ...
+2. **Capture `TaskObjF__Validate`'s own return value in a local and `return`
+   THAT instead of a literal `0`** (`s32 ok = TaskObjF__Validate(self); ...
    return ok;`), on the theory that GCC might recognize the value is
    already sitting in the right register and skip re-materializing it.
    **Zero effect** -- byte-identical output to the literal-`0` form. GCC
@@ -262,7 +264,7 @@ negative:**
    intervening call-heavy body just because the C source names it.
 
 **The isolated residue, precisely**: retail's early-exit path (`beqz
-$v0,<target>` on `func_8004F9D8`'s own false/0 return) branches DIRECTLY
+$v0,<target>` on `TaskObjF__Validate`'s own false/0 return) branches DIRECTLY
 into the function's epilogue, reusing the already-0 `$v0` as the return
 value with ZERO extra instructions. This build always re-materializes an
 explicit `move $v0,zero` for that path, and -- because the "real" return
@@ -288,7 +290,7 @@ remaining residue being the isolated early-exit tail described above.
 
 ```c
 #if 0
-s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     s32 (*dispatch)(TaskObjF *, s32);
 
@@ -300,7 +302,7 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
     self->unk50 = a6;
     self->unk54 = a7;
     self->unk58 = a8;
-    if (func_8004F9D8(self)) {
+    if (TaskObjF__Validate(self)) {
         if (self->methods->slot54(self, 0, a1) == 0) {
             goto slot60_path;
         }
@@ -338,17 +340,17 @@ s32 func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7,
 #endif
 ```
 
-Needs `TaskObjF`/`TaskObjFMethods` (see `func_8004F40C`'s report) and a
-forward declaration of `func_8004F9D8` (defined later in this unit's ROM
+Needs `TaskObjF`/`TaskObjFMethods` (see `TaskObjF__ForEachEvent`'s report) and a
+forward declaration of `TaskObjF__Validate` (defined later in this unit's ROM
 order; already present near the top of `src/class_3bb8c_f.c`).
 
 ## Proposed learning
 
 **A multi-predecessor shared tail has (at least) three distinct
 sub-shapes, not one "tail merge" lever**: (a) fully shared fetch+call
-(`func_8004F9D8`, `func_8004FB04`, this unit, both matched with a plain
+(`TaskObjF__Validate`, `TaskObjF__Notify`, this unit, both matched with a plain
 `goto`), (b) fully independent, no sharing at all, and (c) shared CALL
-only, with each predecessor doing its own fetch (`func_8004F8A4`, this
+only, with each predecessor doing its own fetch (`TaskObjF__func_8004F8A4`, this
 report). GCC 2.6.3 chooses which of these three a given call site gets
 based on something not yet identified from source reshaping alone.
 
@@ -368,7 +370,7 @@ SAME lever (named function-pointer local vs. inline call) with OPPOSITE
 correct answers, confirmed by testing both directions on both
 functions.** `func_800513D0` needed the local REMOVED (retail keeps two
 guard blocks separate that a shared local caused GCC to merge).
-`func_8004F8A4` needs the local KEPT (retail's own partial-sharing shape
+`TaskObjF__func_8004F8A4` needs the local KEPT (retail's own partial-sharing shape
 is UNREACHABLE without it -- the fully-inlined form is 4 words too long
 here). Never apply either direction of this lever without testing the
 specific function; "does retail merge here" is measured per call site,
@@ -376,7 +378,7 @@ not inherited from a sibling finding in the same round.
 
 **The now-isolated early-exit residue is a separate, third finding**: an
 early `return` whose value is provably already sitting in the tested
-register (`func_8004F9D8`'s own false/0 result) still gets a fresh `move
+register (`TaskObjF__Validate`'s own false/0 result) still gets a fresh `move
 $v0,zero` from this compiler, whether the C spells it as a literal `0` or
 a captured variable holding the identical value -- GCC 2.6.3 does not
 track a value's register binding live across an intervening large,
@@ -385,3 +387,13 @@ residue, unwrapping the guard to place the early return textually
 adjacent to the tested call made things WORSE here (regressed to 23/77),
 so this one still needs a genuinely new lever, not a variant of either
 lever already tried.
+
+## Naming (round 60, track 3)
+
+`func_8004F8A4` -> `TaskObjF__func_8004F8A4`. **Tier C placeholder**, same
+reasoning as `TaskObjF__func_8004F638`: class established, concrete
+operation not. This one sets `self->opMode = 2` and dispatches through
+`slot54`/`slot60`/`slot7C`, all implemented by a subclass outside this
+unit. STALL; preserved body unchanged by this naming pass beyond the
+field renames (`unk24`/`unk28` -> `opMode`/`statusCode`) already applied
+project-wide to `TaskObjF`.

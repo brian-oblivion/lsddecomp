@@ -1,10 +1,12 @@
-# func_8004F40C
+> Renamed from `func_8004F40C` on 2026-09-20 (tools/rename.py). Address 0x8004f40c.
+
+# TaskObjF__ForEachEvent
 
 **Unit:** class_3bb8c_f · **Size:** 38 words (0x98) · **Status:** MATCH
 
 ## The class this unit's back half operates on
 
-Every function from here through `func_8004FB04` in this unit shares one
+Every function from here through `TaskObjF__Notify` in this unit shares one
 object type — call it `TaskObjF` — that is **not** `Obj866E8`
 (class_3bb8c_b/c/d/e's class) and not any previously-documented class in
 this codebase. Established from first principles across this whole batch:
@@ -12,7 +14,7 @@ this codebase. Established from first principles across this whole batch:
 - `TaskObjF`'s vtable pointer sits at offset 0, and its first several
   slots (+0x010 `addChild`, +0x014 `removeChild`) are **inherited,
   unmodified `BasicClass` slots** (`include/code_8220.h`'s
-  `BasicClassMethods`) — confirmed because `func_8004FB04` fetches
+  `BasicClassMethods`) — confirmed because `TaskObjF__Notify` fetches
   `BasicClass`'s own table directly (`Get_vtable_BasicClass()`, which
   `include/code_8220.h` already establishes returns `&D_8006B58C`) and
   dispatches its slot +0x038 with a `(self, arg1, arg2)` signature that
@@ -20,7 +22,7 @@ this codebase. Established from first principles across this whole batch:
   `BasicClass` subclass whose own new slots start at +0x044 (the same
   "inherited low slots, subclass slots from the first free offset after
   BasicClass's own 15" shape already documented for `Class6D3C8Methods`).
-- `func_8004F32C` (this unit's other matched function) is a **different,
+- `BuildMemcardPath` (this unit's other matched function) is a **different,
   unrelated object** — see its own report.
 
 `include/class_3bb8c.h` gets a new, purely additive section
@@ -28,9 +30,9 @@ this codebase. Established from first principles across this whole batch:
 in the same file as `Obj866E8`, same policy as `class_3ac78.h`'s
 `Class866E8Methods` vs. this file's own `Obj866E8Methods`.
 
-## What func_8004F40C does
+## What TaskObjF__ForEachEvent does
 
-`s32 func_8004F40C(TaskObjF *self, s32 (*callback)(s32), s32 flag)`.
+`s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag)`.
 Optionally brackets a scan with a lock/unlock pair
 (`func_80024CE0`/`func_80024CF0`, called only when `flag` is set), then
 calls `callback` on each of `self->field14[4]` in turn, stopping at the
@@ -45,7 +47,7 @@ FIXED +0x14 offset rather than `self[i].field14` — a real reading trap
 worth flagging for whoever revisits this unit.
 
 Three thin wrappers around this (this unit's other queued functions,
-matched separately): `func_8004F394`/`func_8004F3BC`/`func_8004F3E4`, each
+matched separately): `TaskObjF__EnableEvents`/`TaskObjF__DisableEvents`/`TaskObjF__TestEvents`, each
 forwarding `self` unchanged with a different callback
 (`func_80038F6C`/`func_8003903C`/`func_800390F4`) and flag.
 
@@ -58,7 +60,7 @@ forwarding `self` unchanged with a different callback
 - `extern s32 func_80038F6C(s32 arg); extern s32 func_8003903C(s32 arg);
   extern s32 func_800390F4(s32 arg);` — the three callbacks (the first two
   are Psy-Q SPU routines, `the 0x272C8..0x2C054 Psy-Q block (now linked from lib/ where a disc owns it, formerly asm/psyq_SpuSetMute.s)`, uncarved; the third is
-  also used directly by `func_8004F4C8`, see that report).
+  also used directly by `FindFirstReadyEvent`, see that report).
 - `extern void func_80024CE0(void); extern void func_80024CF0(void);` —
   **externs for functions outside this unit** (typed purely from this call
   site's own register usage: no arguments set up, no return value read).
@@ -85,3 +87,12 @@ longer needed for anything else. Worth a general callout for future
 `self`-shaped loops in this codebase: check whether the "base" register
 is ever used for a SECOND purpose after the loop before concluding it's a
 raw array of small structs.
+
+## Naming (round 60, track 3)
+
+`func_8004F40C` -> `TaskObjF__ForEachEvent`. **Tier A.** The shared
+generic helper `TaskObjF__EnableEvents`/`DisableEvents`/`TestEvents` all
+forward into: optionally brackets a critical section, then calls
+`callback` on each of `self->events[4]` in turn, stopping at the first
+zero return. Mechanics and role (a for-each over this object's own event
+array) both directly evident from the body and its three callers.
