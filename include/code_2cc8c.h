@@ -1905,7 +1905,7 @@ struct ClassEAC0Obj {
                                    func_800400B0, a small dispatch-state tag */
     u8 pad070[0x074 - 0x070];
     s32 unk74;                 /* +0x074, OBSERVED: func_80040024, negated on the
-                                   "already had one" path; func_8004001C's own
+                                   "already had one" path; Class6E99C__SetStep's own
                                    setter also targets this offset on the
                                    Class6E99C leaf, same field */
     u8 pad078[0x098 - 0x078];
@@ -1966,7 +1966,7 @@ struct Class6E99CMethods {
     void (*slotB8)(Class6E99CObj *self, s32 a1, void *tableEntry);
     u8 pad0BC[0x0CC - 0x0BC];
     void (*slotCC)(Class6E99CObj *self, s32 a1);
-    void (*slotD0)(Class6E99CObj *self, s32 a1);     /* +0x0D0, func_8004001C */
+    void (*slotD0)(Class6E99CObj *self, s32 a1);     /* +0x0D0, Class6E99C__SetStep */
     void (*slotD4)(Class6E99CObj *self);             /* +0x0D4, func_80040024 */
     void (*slotD8)(Class6E99CObj *self, s32 a1, s32 a2); /* +0x0D8, func_800400B0 */
     /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- func_80040154 (this
@@ -2015,7 +2015,7 @@ struct Class6E99CObj {
     s32 unk70;                 /* +0x070, OBSERVED: Class6E99C__FinishConstruct, set from
                                    its own `a1` parameter */
     /* +0x074, OBSERVED: Class6E99C__FinishConstruct (ctor override sets it to 0xA),
-       func_80040024 (negated on the "already had one" path), func_8004001C
+       func_80040024 (negated on the "already had one" path), Class6E99C__SetStep
        (a plain setter, `self->unk74 = a1`); also read a BYTE at a time by
        Class6E99C__Update via its low byte. */
     s32 unk74;

@@ -96,7 +96,7 @@ void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
     }
 }
 
-void func_8004001C(Class6E99CObj *self, s32 a1) {
+void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
     self->unk74 = a1;
 }
 
