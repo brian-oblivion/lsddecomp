@@ -152,15 +152,34 @@ struct ObjSlotAC {
     ObjSlotACMethods *methods; /* +0x000 */
 };
 
-/* STALL, 80/86 words (6 short) -- see docs/match-reports/func_80054850.md.
- * Preserved near-miss body: */
+/* Local view: D_8008AB68/D_8008AB6C and D_8008AB70/D_8008AB74 are two
+ * adjacent 8-byte pairs, and this unit copies each into a local pair as a
+ * WHOLE-STRUCT assignment rather than field by field.  That is not a style
+ * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call
+ * invalidate_memory(), dropping every cached memory value, which is what
+ * produces retail's otherwise inexplicable reload of D_8008AB50 for the
+ * `== 2` test and its reload of the pair's second word right after writing
+ * it.  Written as two scalar stores, neither reload appears and the body is
+ * several words short.  Round 61; see docs/match-reports/func_80054850.md. */
+typedef struct PairXY PairXY;
+struct PairXY {
+    s32 x; /* +0x000 */
+    s32 y; /* +0x004 */
+};
+
+/* STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first
+ * real diff at word 15 (0x4508C / vram 0x8005488C) -- see
+ * docs/match-reports/func_80054850.md.  Round 61 REVISIT: 12/86 and 6 short
+ * -> 17/86 and 1 short.  Residue is one redundant `move` retail emits and
+ * two scheduling reorderings.  Preserved near-miss body: */
 #if 0
 void func_80054850(void) {
-    s32 paramA[2];
-    s32 paramB[2];
+    PairXY paramA;
+    PairXY paramB;
     s32 i;
     s32 s1;
     void **arr;
+    void **wp;
     void *obj;
     ObjSlotAC *self2;
     void *result;
@@ -168,30 +187,32 @@ void func_80054850(void) {
     if (D_8008AB50 == 0) {
         return;
     }
-    paramA[0] = D_8008AB68;
-    paramA[1] = D_8008AB6C;
+    paramA = *(PairXY *) &D_8008AB68;
     if (D_8008AB50 == 2) {
-        paramA[1] += 0x1E;
+        paramA.y += 0x1E;
     }
-    paramB[0] = D_8008AB70;
-    paramB[1] = D_8008AB74;
-
-    obj = New_ClassEAC0(paramB, (void *) D_8008AC8C, 0x1FFF);
+    paramB = *(PairXY *) &D_8008AB70;
+    i = 1;
     s1 = 3;
+    obj = New_ClassEAC0(&paramB, (void *) D_8008AC8C, 0x1FFF);
+    __asm__("");
     arr = D_8008E10C;
-    arr[0] = obj;
-    for (i = 1; i < 0x12; i++) {
-        obj = New_ClassEAC0(paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
-        arr[i] = obj;
-        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], paramA);
+    wp = arr + 1;
+    *arr = obj;
+    do {
+        obj = New_ClassEAC0(&paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
+        *wp = obj;
+        wp++;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
         s1 += 3;
-        paramA[1] += 3;
-        paramB[1] -= 7;
-    }
+        paramA.y += 3;
+        paramB.y -= 7;
+        i++;
+    } while (i < 0x12);
 
     self2 = *(ObjSlotAC **) (D_8008AC7C + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) arr[0])->methods->slot4C(arr[0], result, paramA);
+    ((ObjSlot4C *) D_8008E10C[0])->methods->slot4C(D_8008E10C[0], result, &paramA);
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
@@ -221,52 +242,53 @@ struct ObjSlotB8B8 {
     ObjSlotB8B8Methods *methods; /* +0x000 */
 };
 
-/* STALL, 24/93 words match, ~4 words short -- see
- * docs/match-reports/func_800549A8.md. Preserved near-miss body: */
-#if 0
+/* MATCHED round 61 (bravo), first attempt, after the BLKmode-struct-copy
+ * lever found on func_80054850 -- see docs/match-reports/func_800549A8.md.
+ * `rgb` is written only at [0..2] (by func_80054B1C); its declared size of 8
+ * is inferred from the STACK LAYOUT (it occupies sp+0x10..0x17, with `pos`
+ * at sp+0x18), not from any access. */
 void func_800549A8(void) {
     ObjAC7CSub *self;
     s32 delta;
-    s32 s3;
-    s32 paramA[2];
-    s32 paramB[2];
-    s32 s1;
+    s32 shift;
+    u8 rgb[8];
+    PairXY pos;
+    s32 srcOfs;
     s32 i;
-    void **arr;
-    void *obj;
+    void **wp;
+    ObjSlotB8B8 *obj;
 
     if (D_8008AB50 == 0) {
         return;
     }
     self = *(ObjAC7CSub **) (D_8008AC7C + 0xC);
     delta = self->field18 - self->field24;
-    s3 = (delta / 600) * 3;
-    if (s3 <= 0) {
+    shift = (delta / 600) * 3;
+    if (shift <= 0) {
         return;
     }
-    paramB[0] = D_8008AB68;
-    paramB[1] = D_8008AB6C;
+    pos = *(PairXY *) &D_8008AB68;
     i = 0;
     if (D_8008AB50 == 2) {
-        paramB[1] += 0x1E;
+        pos.y += 0x1E;
     }
-    arr = D_8008E10C;
-    s1 = 0;
-    paramB[1] = paramB[1] + s3 * 3;
-    for (; i < 0x12; i++) {
-        func_80054B1C((u8 *) paramA, (u8 *) (s1 + D_8008AC8C), s3);
-        obj = arr[i];
-        ((ObjSlotB8B8 *) obj)->methods->slotB8(obj, 1, paramA);
-        obj = arr[i];
-        s1 += 3;
-        ((ObjSlotB8B8 *) obj)->methods->slotBC(obj, paramB);
-        paramB[1] += 3;
-    }
-    func_80054B1C((u8 *) paramA, (u8 *) D_8008AC90, s3);
-    self->methods->slot64(self, paramA);
+    wp = D_8008E10C;
+    srcOfs = 0;
+    pos.y += shift * 3;
+    do {
+        func_80054B1C(rgb, (u8 *) (srcOfs + D_8008AC8C), shift);
+        obj = (ObjSlotB8B8 *) *wp;
+        obj->methods->slotB8(obj, 1, rgb);
+        obj = (ObjSlotB8B8 *) *wp;
+        i++;
+        srcOfs += 3;
+        obj->methods->slotBC(obj, &pos);
+        pos.y += 3;
+        wp++;
+    } while (i < 0x12);
+    func_80054B1C(rgb, (u8 *) D_8008AC90, shift);
+    self->methods->slot64(self, rgb);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_800549A8);
 
 void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
     dst[0] = src[0] - delta;
@@ -294,7 +316,7 @@ extern s32 D_8008AC88;
 extern void *D_8008E0C8[];
 extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
 extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);
-extern void *func_80054FD8(void *arg0, void *arg1);
+extern void **func_80054FD8(void **arg0, void *arg1);
 extern void *func_8005511C(void *arg0, void *arg1);
 
 void func_80054B84(void *arg0) {
@@ -475,11 +497,30 @@ extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
 extern u8 D_8008721C[];
 
-/* STALL, 38/81 words, length matches (no drift) -- see
- * docs/match-reports/func_80054FD8.md. Preserved near-miss body: */
+/* STALL, 78/81 words, length EXACT (no drift), first real diff at word 69
+ * (0x458EC / vram 0x800550EC) -- see docs/match-reports/func_80054FD8.md.
+ * Round 61 REVISIT: 38/81 -> 78/81. Round 47's "pure arg0/arg1 register-
+ * colour swap, ZERO drift" verdict was wrong on both counts; the equal
+ * length was two defects cancelling. Residue is now ONE instruction's
+ * placement: the `*q = D_80087174` store must sink below `lw a2` and
+ * `move a3` into the jal's delay slot, and cannot because a store through
+ * a pointer is an opaque MEM that gcc 2.6.3's scheduler will not let the
+ * gp-relative load hoist across. Preserved near-miss body: */
+/* STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real
+ * diff at word 60 (0x458C8 / vram 0x800550C8) -- see
+ * docs/match-reports/func_80054FD8.md.  Round 61 REVISIT: 38/81 -> 79/81.
+ * Round 47's "pure arg0/arg1 register-colour swap, ZERO drift" verdict was
+ * wrong on both counts; the equal length was two defects cancelling.  What
+ * is left is 2 words of genuine register identity: the else branch's
+ * computed value sits in $a2 here and in $v1 in retail, because `t`'s single
+ * pseudo (deliberately shared -- splitting it into two variables costs 4
+ * words) coalesces with the third-argument register.  Preserved near-miss
+ * body: */
 #if 0
-void *func_80054FD8(void *arg0, void *arg1) {
-    s32 idx;
+void **func_80054FD8(void **arg0, void *arg1) {
+    s32 t;
+    s32 *p;
+    u8 **q;
 
     func_80055258(arg1, (void *) D_80087330);
     if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
@@ -488,18 +529,22 @@ void *func_80054FD8(void *arg0, void *arg1) {
         D_8008E0AC = 0;
         D_8008E0C0[0] = (s32) (D_8008721C + 3);
     } else {
-        if (D_8008E0AC > 0) {
-            D_8008E0AC = -D_8008E0AC;
+        p = &D_8008E0AC;
+        if (*p > 0) {
+            *p = -*p;
         }
-        if (D_8008E0AC < -0x7800) {
-            D_8008E0AC = -0x7800;
+        if (*p < -0x7800) {
+            *p = -0x7800;
         }
-        idx = (u32) rand() % 3;
-        D_8008E0C0[0] = (s32) (D_8008721C + idx * 3);
+        t = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
+        D_8008E0C0[0] = t;
     }
-    D_8008E0B0 = D_80087174;
-    *(void **) arg0 = func_80056320((void *) 3, (u8 *) &D_8008E0B0 - 0xC, (void *) D_8008AB4C, arg1);
-    return (u8 *) arg0 + 4;
+    t = D_8008AB4C;
+    q = &D_8008E0B0;
+    *q = D_80087174;
+    *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
+    arg0++;
+    return arg0;
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054FD8);
