@@ -1866,9 +1866,9 @@ struct ClassEAC0Methods {
                                 more specific parameter type internally. */
     void (*dtor)(ClassEAC0Obj *self);                   /* +0x00C, func_8001CBA4, shared with Class6B5CCMethods */
     u8 pad010[0x040 - 0x010];
-    void (*slot40)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, func_800405D0 (this unit) */
+    void (*slot40)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, ClassEAC0__FinishConstruct (this unit) */
     u8 pad044[0x0B8 - 0x044];
-    /* +0x0B8, OBSERVED (this unit, func_800405D0/Class6E99C__StartFadeToIndex/
+    /* +0x0B8, OBSERVED (this unit, ClassEAC0__FinishConstruct/Class6E99C__StartFadeToIndex/
        Class6E99C__StartFadeDefault): dispatched as `(self, 1, tableEntry)` where
        `tableEntry` is a computed address into D_8006EA90 (indexed) or the
        fixed D_8006EAA8/D_8008A924. Occupant `Obj6EAC0__SetColor`
@@ -1876,7 +1876,7 @@ struct ClassEAC0Methods {
        further. */
     void (*slotB8)(ClassEAC0Obj *self, s32 a1, void *tableEntry);
     u8 pad0BC[0x0CC - 0x0BC];
-    /* +0x0CC, OBSERVED (func_800405D0): dispatched as `(self, 0xD)`.
+    /* +0x0CC, OBSERVED (ClassEAC0__FinishConstruct): dispatched as `(self, 0xD)`.
        Occupant `Obj6EAC0__SetMask` (code_2cc8c_f). */
     void (*slotCC)(ClassEAC0Obj *self, s32 a1);
     u8 pad0D0[0x0DC - 0x0D0];
@@ -1891,15 +1891,15 @@ struct ClassEAC0Methods {
 struct ClassEAC0Obj {
     ClassEAC0Methods *methods; /* +0x000 */
     u8 pad004[0x044 - 0x004];
-    s32 unk44;                 /* +0x044, OBSERVED: func_800405D0 (ctor's own a3) */
-    s32 unk48;                 /* +0x048, OBSERVED: func_800405D0, set to 1 */
-    s32 unk4C;                 /* +0x04C, OBSERVED: func_800405D0, zeroed */
+    s32 unk44;                 /* +0x044, OBSERVED: ClassEAC0__FinishConstruct (ctor's own a3) */
+    s32 unk48;                 /* +0x048, OBSERVED: ClassEAC0__FinishConstruct, set to 1 */
+    s32 unk4C;                 /* +0x04C, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
     u8 pad050[0x058 - 0x050];
-    s32 unk58;                 /* +0x058, OBSERVED: func_800405D0, zeroed */
-    s16 unk5C;                 /* +0x05C, OBSERVED: func_800405D0, zeroed */
-    s16 unk5E;                 /* +0x05E, OBSERVED: func_800405D0, zeroed */
-    s16 unk60;                 /* +0x060, OBSERVED: func_800405D0, from a1->0x0 */
-    s16 unk62;                 /* +0x062, OBSERVED: func_800405D0, from a1->0x4 */
+    s32 unk58;                 /* +0x058, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
+    s16 unk5C;                 /* +0x05C, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
+    s16 unk5E;                 /* +0x05E, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
+    s16 unk60;                 /* +0x060, OBSERVED: ClassEAC0__FinishConstruct, from a1->0x0 */
+    s16 unk62;                 /* +0x062, OBSERVED: ClassEAC0__FinishConstruct, from a1->0x4 */
     u8 pad064[0x06C - 0x064];
     s32 unk6C;                 /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/
                                    Class6E99C__StartFadeDefault, a small dispatch-state tag */

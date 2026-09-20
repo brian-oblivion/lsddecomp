@@ -1,10 +1,12 @@
-# func_800405D0 -- MATCH (37/37 words, first attempt)
+> Renamed from `func_800405D0` on 2026-09-20 (tools/rename.py). Address 0x800405d0.
+
+# ClassEAC0__FinishConstruct -- MATCH (37/37 words, first attempt)
 
 Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::slot40` (`+0x040`),
 dispatched by the class's own ctor (`ClassEAC0__ClassEAC0`).
 
 ```c
-void func_800405D0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void ClassEAC0__FinishConstruct(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     ClassEAC0Methods *methods;
 
     self->unk44 = a3;
