@@ -210,7 +210,14 @@ void *func_800403F8(Class6E99CObj *self) {
     return &D_8006EA90[self->unk78 * 3];
 }
 
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 22/25 words, length exact. Residue: redundant-move
+ * register residue -- retail additionally does `move $t0,$a1`
+ * unconditionally in a branch delay slot and uses $t0 for both a1->x/
+ * a1->y loads; nothing in the C forces an early copy of a1, so no
+ * source shape tried reproduces the extra move. Permuter-exhausted
+ * (~76k combined iterations, two independent runs)
+ * (docs/match-reports/func_8004042C.md). Hand-derived. */
 void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
@@ -225,8 +232,9 @@ void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
         *(Pair32E99C *)&self->unk50 = *a2;
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004042C);
+#endif
 
 void func_80040490(Class6E99CObj *self) {
     s32 t0, t1;
