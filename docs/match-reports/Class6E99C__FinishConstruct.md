@@ -1,11 +1,13 @@
-# func_8003FED8 -- MATCH (27/27 words, first attempt)
+> Renamed from `func_8003FED8` on 2026-09-20 (tools/rename.py). Address 0x8003fed8.
+
+# Class6E99C__FinishConstruct -- MATCH (27/27 words, first attempt)
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slot40` (`+0x040`),
 dispatched by the class's own ctor (`Class6E99C__Class6E99C`) right after it installs
 `self->methods`.
 
 ```c
-void func_8003FED8(Class6E99CObj *self, s32 a1) {
+void Class6E99C__FinishConstruct(Class6E99CObj *self, s32 a1) {
     self->unk70 = a1;
     self->unk6C = 0;
     self->unk74 = 0xA;

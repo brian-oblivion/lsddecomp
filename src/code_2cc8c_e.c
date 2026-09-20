@@ -59,7 +59,7 @@ void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     self->methods->slot40(self, a2);
 }
 
-void func_8003FED8(Class6E99CObj *self, s32 a1) {
+void Class6E99C__FinishConstruct(Class6E99CObj *self, s32 a1) {
     self->unk70 = a1;
     self->unk6C = 0;
     self->unk74 = 0xA;

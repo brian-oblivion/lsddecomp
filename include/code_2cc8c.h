@@ -1937,14 +1937,14 @@ struct Class6E99CMethods {
        dispatches it as `(self, s32 a1)` with a1 a small literal (5 or 6). */
     void (*slot30)(Class6E99CObj *self, s32 a1);
     u8 pad034[0x040 - 0x034];
-    void (*slot40)(Class6E99CObj *self, s32 a1); /* +0x040, func_8003FED8
+    void (*slot40)(Class6E99CObj *self, s32 a1); /* +0x040, Class6E99C__FinishConstruct
                                 (this unit). Two args, not four: its own
                                 call site (Class6E99C__Class6E99C) only sets `a1`;
                                 `a2`/`a3` are leftover from the preceding
                                 ctor call and the occupant's own body never
                                 reads them. */
     u8 pad044[0x060 - 0x044];
-    /* +0x060/+0x064, OBSERVED: func_8003FED8/func_800402F0, both dispatched
+    /* +0x060/+0x064, OBSERVED: Class6E99C__FinishConstruct/func_800402F0, both dispatched
        as `(self, s32 a1)`. Occupants (code_2cc8c_f, bravo's own functions):
        func_800406E4 (+0x060), func_80040714 (+0x064). */
     void (*slot60)(Class6E99CObj *self, s32 a1);
@@ -2009,12 +2009,12 @@ struct Class6E99CObj {
     u8 pad067[0x068 - 0x067];
     s32 unk68;                 /* +0x068, OBSERVED: func_80040154, a divisor */
     /* +0x06C, OBSERVED: func_800402F0/func_80040024/func_800400B0/
-       func_8003FED8 (zeroed by the ctor override) -- a small dispatch-state
+       Class6E99C__FinishConstruct (zeroed by the ctor override) -- a small dispatch-state
        tag (0, 1, or 2 observed). */
     s32 unk6C;
-    s32 unk70;                 /* +0x070, OBSERVED: func_8003FED8, set from
+    s32 unk70;                 /* +0x070, OBSERVED: Class6E99C__FinishConstruct, set from
                                    its own `a1` parameter */
-    /* +0x074, OBSERVED: func_8003FED8 (ctor override sets it to 0xA),
+    /* +0x074, OBSERVED: Class6E99C__FinishConstruct (ctor override sets it to 0xA),
        func_80040024 (negated on the "already had one" path), func_8004001C
        (a plain setter, `self->unk74 = a1`); also read a BYTE at a time by
        func_8003FF44 via its low byte. */
@@ -2023,7 +2023,7 @@ struct Class6E99CObj {
                                    func_800403F8, a flags/mode word tested
                                    against 0xF and against bit masks
                                    0x1/0x2/0x4 */
-    /* +0x07C, OBSERVED: func_8003FED8 (ctor override zeroes it),
+    /* +0x07C, OBSERVED: Class6E99C__FinishConstruct (ctor override zeroes it),
        func_8003FF44 (tested `== 9`), func_80040154 (set from its own a3
        parameter). */
     s32 unk7C;
