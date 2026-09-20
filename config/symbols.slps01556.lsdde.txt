@@ -1052,3 +1052,4 @@ Class6E99C__PopPosition = 0x80040490; // type:func
 Class6E99C__SetDivisorMode = 0x800404B4; // type:func
 Class6E99C__GetMethods = 0x800404C0; // type:func
 New_ClassEAC0 = 0x800404D0; // type:func
+ClassEAC0__ClassEAC0 = 0x8004054C; // type:func

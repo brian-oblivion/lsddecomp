@@ -1800,7 +1800,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * via Class6E99C__GetMethods, a bare getter this unit also implements) and
  * New_ClassEAC0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
  * instance (getting D_8006EAC0 via Obj6EAC0__GetBaseMethods) -- consistent with
- * ClassEAC0 being the smaller, less-derived class. func_8004054C is
+ * ClassEAC0 being the smaller, less-derived class. ClassEAC0__ClassEAC0 is
  * ClassEAC0's OWN ctor, sharing the identical "call a further-base ctor,
  * reset methods, redispatch slot40" shape one level up: it calls
  * `GetClass6B5CCMethods()->ctor(self)` (GetClass6B5CCMethods, code_d294.h's own getter
@@ -1856,7 +1856,7 @@ struct ClassEAC0Methods {
     s32 header;                                        /* +0x000 */
     void *unk04;                                        /* +0x004, BasicClass__func_17eb0, inherited, unused here */
     void (*ctor)(ClassEAC0Obj *self, void *a1, void *a2, s32 a3); /* +0x008,
-                                func_8004054C (this unit). `a1`/`a2` kept as
+                                ClassEAC0__ClassEAC0 (this unit). `a1`/`a2` kept as
                                 plain `void *` here (not `SkipShort2 *`) --
                                 this is the SLOT's own type, used by every
                                 CALLER of the ctor through the vtable
@@ -2084,7 +2084,7 @@ extern Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void);  /* code_2cc8c_f (bravo'
                                                     for &D_8006EAC0 */
 
 /* This unit's own local view of the REAL base, `Class6B5CCObj`'s own table
-   (code_d294.h's `GetClass6B5CCMethods`/`D_8006B5CC`) -- func_8004054C (this
+   (code_d294.h's `GetClass6B5CCMethods`/`D_8006B5CC`) -- ClassEAC0__ClassEAC0 (this
    unit) dispatches only the ctor slot, so only that one is modelled here,
    per this project's independent-local-views convention. */
 /* (code_2cc8c_e's own view of GetClass6B5CCMethods's return type was merged

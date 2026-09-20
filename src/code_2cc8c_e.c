@@ -282,7 +282,7 @@ ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
     return NULL;
 }
 
-void func_8004054C(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     GetClass6B5CCMethods()->ctor(self);
     self->methods = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
     self->methods->slot40(self, a1, a2, a3);
