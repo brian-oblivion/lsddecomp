@@ -122,6 +122,15 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   continuation marker and a dereference. Which of several preserved bodies is
   authoritative is stated in PROSE, so do not build a screen for it. (a §"A report's
   MANDATED preservation form can point at the WRONG body")
+- **To learn a shape from a MATCHED sibling, diff its compiled OBJECT against your
+  target's retail `.s` -- never its C against your C.** The C comparison shows what the two
+  sources say; the object comparison shows what the compiler DID, which is the thing that
+  has to agree. Round 62 closed `func_80031890` (73/73, ins 0/del 0) after four rounds
+  because the matched `func_80031280`'s compiled tail IS retail's tail instruction for
+  instruction; round 32 had compared the same pair in C, found a real `u32`/`u16` mask
+  asymmetry, and missed that the sibling caches nothing -- the four cached locals were two
+  documented residue clusters at once. Discriminator: use it whenever a sibling of the same
+  family is already byte-exact, and read the object, not the source. (a round 62)
 
 ## 3. Source-shape idioms
 
@@ -404,6 +413,13 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   look for a separate companion fix. An allocated-but-unused frame on a leaf function is
   not a residue at all. (a §"The frame-padding idiom recovers frame ALIGNMENT", §"An
   allocated-but-unused stack frame")
+
+- **The frame size bounds how many spilled locals a body can have, so it screens whole
+  source shapes before you build one.** Retail's `func_80030980` frame is `-0x38` = 0x18
+  outgoing args + 0x20 saved registers = ZERO spill bytes, so no body that forces seven
+  scalars to memory can be its shape -- round 50's seven-`volatile` sweep was structurally
+  excluded by a number already printed at the top of the `.s`. Read the frame first and
+  subtract args and saves; what remains is the spill budget your C must fit. (a round 62)
 
 ### 3f. Calls, arguments and return types
 
