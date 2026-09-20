@@ -56,8 +56,8 @@ Retail's `Class6E99C__StartFadeDefault.s` contains **two** separate
    `volatile`-local and extended-asm tricks (both wrong-direction: they
    push a register-only dead value toward memory).
 2. `addu $t0, $v0, $zero` -- delay slot of the SECOND branch
-   (`beqz $v0/$v1,...` testing `self->unk98`), copying the just-computed
-   `idx` (still live in `$v0` from the `slotDC` dispatch) into `$t0`.
+   (`beqz $v0/$v1,...` testing `self->altMode`), copying the just-computed
+   `idx` (still live in `$v0` from the `configure` dispatch) into `$t0`.
    **This one is NOT dead** -- on the branch-taken path it is read by
    the table-index computation (`sll $a2,$t0,1` / `addu $a2,$a2,$t0`),
    i.e. `idx * 3`. Every C shape tried (this report's own preserved
@@ -81,13 +81,13 @@ register swap, which is why the drift guard fires here and not there.
 
 ### Attempts this round targeting the missing delay-slot filler (4, all negative)
 
-1. Named local `t = idx;` right after the `slotDC` dispatch, used in
+1. Named local `t = idx;` right after the `configure` dispatch, used in
    place of `idx` in the else-branch's `idx * 3`: no change, still 40
    words (`Class6E99C__Configure` still links at `0x80040150`).
-2. Branch-forced-copy trick (`if (self->unk98) { t = idx; } else { t =
+2. Branch-forced-copy trick (`if (self->altMode) { t = idx; } else { t =
    idx; }`, the `func_80051858`-precedent idiom used elsewhere in this
    project): no change.
-3. Bare `__asm__("" ::: "memory")` immediately after the `slotDC`
+3. Bare `__asm__("" ::: "memory")` immediately after the `configure`
    dispatch, attempting to block the `move a0,s0` hoist so the
    scheduler would need a different filler: no change -- confirmed via
    direct disassembly, byte-identical to the baseline.
@@ -152,7 +152,7 @@ attempted with a real search.** The existing report's two attempts
 (volatile-local, banned extended-asm) already established the value is
 register-only, never spilled. Working through the mechanism further: the
 dead `move $t0,$a2` sits in the delay slot of the FUNCTION'S OWN TOP
-GUARD branch (`bnez $v0,...`, testing `self->unk6C != 0`) -- i.e. it is
+GUARD branch (`bnez $v0,...`, testing `self->state != 0`) -- i.e. it is
 a genuine **delay-slot filler pulled from nowhere the source can name**,
 not a scheduled-forward real statement. The existing report's own
 attempt 1 already showed that writing `idx = a2;` explicitly (before the
@@ -182,7 +182,7 @@ instruction (not the shared residue-1 axis), remains the concrete
 untried lever and the most likely way to either close it or confirm it
 compiler-internal beyond reasoning.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotD8` (`+0x0D8`).
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::startFadeDefault` (`+0x0D8`).
 
 **Correction to an earlier version of this report**, which claimed a full
 41/41 match under the stale-build window described in `New_Class6E99C.md`
@@ -196,16 +196,16 @@ distinct residues.
 void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
-    if (self->unk6C != 0) {
+    if (self->state != 0) {
         return;
     }
-    idx = self->methods->slotDC(self);
-    if (self->unk98 != 0) {
+    idx = self->methods->configure(self);
+    if (self->altMode != 0) {
         self->unk80--;
     } else {
         self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
     }
-    self->unk6C = 2;
+    self->state = 2;
 }
 #endif
 ```
@@ -213,7 +213,7 @@ void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
 ## Residue 1 -- same `li a1,1` scheduling class as `Class6E99C__StartFadeToIndex`
 
 Identical to that function's own residue: retail materialises the `1`
-literal right after the `slotDC` dispatch, before computing `idx*3`; this
+literal right after the `configure` dispatch, before computing `idx*3`; this
 body defers it to just before the `slotB8` call. See that report for the
 attempts already spent on this exact shape (not repeated here since the
 mechanism is the same call, `slotB8(self, 1, tableEntry)`).
@@ -222,10 +222,10 @@ mechanism is the same call, `slotB8(self, 1, tableEntry)`).
 
 Retail's own 3rd parameter (`a2`, this function's own incoming argument) is
 copied into a scratch register (`move $t0, $a2`) immediately after the top
-guard's branch, and is IMMEDIATELY overwritten by the `slotDC` dispatch's
+guard's branch, and is IMMEDIATELY overwritten by the `configure` dispatch's
 own return value one instruction later -- a provably dead value with no
 later use anywhere in the function. GCC 2.6.3 at `-O2` eliminates a plain
-`idx = a2;` statement written before `idx = self->methods->slotDC(self);`
+`idx = a2;` statement written before `idx = self->methods->configure(self);`
 as dead code (confirmed: adding it produced no instruction at all).
 
 ### Attempts to force the dead store (2)
@@ -284,7 +284,7 @@ verified build still taking the `#else INCLUDE_ASM` branch.
 ## Naming (round 61, track 3)
 
 **`Class6E99C__StartFadeDefault`** -- tier B (STALL, preserved body
-unchanged by this rename). `Class6E99CMethods::slotD8` (`+0x0D8`). Mirror
+unchanged by this rename). `Class6E99CMethods::startFadeDefault` (`+0x0D8`). Mirror
 of `Class6E99C__StartFadeToIndex` (see that report's naming note for the
 pairing evidence): guards on `state == 0`, and either just decrements the
 countdown (`altMode != 0`, i.e. "resume") or dispatches the FIXED

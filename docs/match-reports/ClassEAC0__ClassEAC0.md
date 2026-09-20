@@ -4,14 +4,14 @@
 
 Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Obj`'s own constructor
 (`ClassEAC0Methods::ctor`, slot `+0x008`) -- one level further down the
-same "call the further-base ctor first, reset methods, redispatch slot40"
+same "call the further-base ctor first, reset methods, redispatch finishConstruct"
 chain `Class6E99C__Class6E99C` uses one level up:
 
 ```c
 void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     GetClass6B5CCMethods()->ctor(self);
     self->methods = Obj6EAC0__GetBaseMethods();
-    self->methods->slot40(self, a1, a2, a3);
+    self->methods->finishConstruct(self, a1, a2, a3);
 }
 ```
 

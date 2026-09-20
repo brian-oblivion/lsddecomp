@@ -2,7 +2,7 @@
 
 # ClassEAC0__FinishConstruct -- MATCH (37/37 words, first attempt)
 
-Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::slot40` (`+0x040`),
+Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::finishConstruct` (`+0x040`),
 dispatched by the class's own ctor (`ClassEAC0__ClassEAC0`).
 
 ```c
@@ -56,7 +56,7 @@ type" caution, just for a parameter rather than a return.
 
 ## Naming (round 61, track 3)
 
-**`ClassEAC0__FinishConstruct`** -- tier A. `ClassEAC0Methods::slot40`
+**`ClassEAC0__FinishConstruct`** -- tier A. `ClassEAC0Methods::finishConstruct`
 (`+0x040`), dispatched by `ClassEAC0__ClassEAC0` immediately after
 installing `self->methods` -- the identical architectural role, at the
 identical offset, as `Class6E99C__FinishConstruct` one level up and

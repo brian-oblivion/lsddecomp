@@ -42,7 +42,7 @@ the same lever applied twice. Given two independent permuter searches
 rounds 18/19, not re-spending a further search without a genuinely new
 angle. Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotE8` (`+0x0E8`).
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::pushPosition` (`+0x0E8`).
 
 **Correction to an earlier version of this report**, which claimed a full
 25/25 match under the stale-build window described in `New_Class6E99C.md`.
@@ -447,12 +447,12 @@ still taking the `#else INCLUDE_ASM` branch. `./build-and-verify.sh` and
 ## Naming (round 61, track 3)
 
 **`Class6E99C__PushPosition`** -- tier B (STALL, preserved body unchanged
-by this rename). `Class6E99CMethods::slotE8` (`+0x0E8`), gated on `unkC`
+by this rename). `Class6E99CMethods::pushPosition` (`+0x0E8`), gated on `unkC`
 being non-NULL. Stashes the current `unk60`/`unk62` pair into `unk88`/
 `unk8C` and the current `unk50`/`unk54` pair into `unk90`/`unk94`, then
 installs a NEW position from its own `a1`(x,y)/`a2` arguments into
 `unk60`/`unk62`/`unk50`/`unk54`. Its exact inverse,
-`Class6E99C__PopPosition` (`slotEC`), restores the stashed values back
+`Class6E99C__PopPosition` (`popPosition`), restores the stashed values back
 into the live fields -- a save/restore-of-one pair, hence
 "Push"/"Pop". What game event drives the push (an on-screen position
 override, e.g. a highlight or animation) is not established -- tier B.

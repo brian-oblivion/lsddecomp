@@ -2,7 +2,7 @@
 
 # Class6E99C__GetColor -- MATCH (13/13 words, first attempt)
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotE4` (`+0x0E4`).
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::getColor` (`+0x0E4`).
 
 ```c
 void *Class6E99C__GetColor(Class6E99CObj *self) {
@@ -20,7 +20,7 @@ elsewhere in this unit as a mode/flags word tested against `0xF`).
 
 ## Naming (round 61, track 3)
 
-**`Class6E99C__GetColor`** -- tier A. `Class6E99CMethods::slotE4`
+**`Class6E99C__GetColor`** -- tier A. `Class6E99CMethods::getColor`
 (`+0x0E4`). Pure getter: returns `D_8006EAA8` (the fixed/default table)
 when `unk78 == 0xF`, else `&D_8006EA90[unk78 * 3]` (the indexed table) --
 the same two tables `Class6E99C__StartFadeToIndex`/`StartFadeDefault`
