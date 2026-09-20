@@ -63,17 +63,18 @@ void func_8004C620(Obj866E8 *self) {
  * func_8004CAF0), but tail-called here before its own definition appears. */
 extern void func_8004C93C(Obj866E8 *self);
 
-/* STALLED at 85/165 words (round 34) -- see docs/match-reports/func_8004C6A8.md.
- * Every branch TARGET in the raw-range dispatch now agrees with retail
- * (previously 60/165 with a different, wrong-polarity CFG shape); compiled
- * length is still 3 words (12 bytes) short of retail's 165. The residue is a
- * register-class choice: retail promotes a value that is never live across a
- * CALL (the RotMatrix pointer argument, `(u8 *)sub + 0x10`) into its own
+#ifdef NON_MATCHING
+/* NON_MATCHING: 85/165 words, 3 words (12 bytes) short (round 34) -- see
+ * docs/match-reports/func_8004C6A8.md. Every branch TARGET in the
+ * raw-range dispatch now agrees with retail (previously 60/165 with a
+ * different, wrong-polarity CFG shape). Residue: a register-class choice
+ * -- retail promotes a value that is never live across a CALL (the
+ * RotMatrix pointer argument, `(u8 *)sub + 0x10`) into its own
  * callee-saved register anyway, which saturates all nine $s/$fp slots and
  * forces `flag` to spill to the stack (an extra sw/lw pair retail has and
- * this body does not); nothing tried reproduces that promotion. Restored
- * here per project convention. */
-#if 0
+ * this body does not); nothing tried reproduces that promotion. This is a
+ * HARD RULE 6 register-identity residue -- not closeable with a
+ * `register`/asm-constraint fix. Hand-derived. */
 void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
@@ -176,21 +177,22 @@ shared:
     }
     func_8004C93C(self);
 }
+#else
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
-
-/* STALLED at 45/109 words -- see docs/match-reports/func_8004C93C.md for
- * the full round-19 analysis. Two real CFG/scheduling fixes closed most of
- * the gap (a hoisted "flag=0" default matching the project's established
- * "default value in the guarding branch's delay slot" idiom; a
- * deliberately-duplicated `slot0 = &self->slots8C[0];` on both arms of the
- * h6<0 test, held apart with a bare `__asm__("")` scheduling barrier to
- * stop the compiler tail-merging the two identical stores back into one).
- * What remains is a clean register-identity rotation across the whole
- * function (self/h4/h6/slot0/span all permuted, matching set of registers)
- * -- restored here per project convention. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 45/109 words, length exact, zero drift. Residue: register
+ * identity, a clean rotation across the whole function
+ * (self/h4/h6/slot0/span all permuted, matching set of registers), which
+ * CLAUDE.md HARD RULE 6 marks a STALL by definition, not a judgement call
+ * (docs/match-reports/func_8004C93C.md). Two real CFG/scheduling fixes
+ * closed most of the gap (a hoisted "flag=0" default matching the
+ * project's established "default value in the guarding branch's delay
+ * slot" idiom; a deliberately-duplicated `slot0 = &self->slots8C[0];` on
+ * both arms of the h6<0 test, held apart with a bare `__asm__("")`
+ * scheduling barrier to stop the compiler tail-merging the two identical
+ * stores back into one). Hand-derived. */
 void func_8004C93C(Obj866E8 *self) {
     s32 flag;
     s32 h4;
@@ -255,24 +257,25 @@ void func_8004C93C(Obj866E8 *self) {
     count += 1;
     self->unk88 = count;
 }
+#else
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
-
-/* STALLED at 62/97 words (round 58, up from 55/97) -- see
- * docs/match-reports/func_8004CAF0.md. Frame size, callee-saved register SET
- * and CFG shape match retail exactly. Round 58 retired the "permuter scaffold
- * is untrustworthy" blocker that rounds 19 and 33 had recorded (it was a unit
- * error: funcdiff reports no insertion/deletion counts at all, so the "0 ins /
- * 0 del" those rounds weighed against the permuter was never measured), ran
- * this function's first search, and closed two of its three structural diffs
- * with the pair of levers in the body below -- the do-while(0) around the
- * first half AND the named h8Val temp, which only work JOINTLY (either alone
- * changes the function's length). What is left is one arithmetic
- * reassociation plus the 3-register rotation (self/slot/temp among
- * $s0/$s1/$s3) that is very likely DOWNSTREAM of it. Preserved here per
- * project convention rather than only in the report. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 62/97 words, length exact, zero drift (round 58, up from
+ * 55/97). Residue: an arithmetic reassociation plus a 3-register rotation
+ * (self/slot/temp among $s0/$s1/$s3) that round 58 argues is DOWNSTREAM of
+ * it -- not yet established as a HARD RULE 6 register-identity stall
+ * (docs/match-reports/func_8004CAF0.md). Frame size, callee-saved register
+ * SET and CFG shape match retail exactly. Round 58 retired the "permuter
+ * scaffold is untrustworthy" blocker that rounds 19 and 33 had recorded
+ * (it was a unit error: funcdiff reports no insertion/deletion counts at
+ * all, so the "0 ins / 0 del" those rounds weighed against the permuter
+ * was never measured), ran this function's first search, and closed two
+ * of its three structural diffs with the pair of levers in the body below
+ * -- the do-while(0) around the first half AND the named h8Val temp,
+ * which only work JOINTLY (either alone changes the function's length).
+ * Hand-derived. */
 s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 hSpan;
     s32 hSpan2;
@@ -323,9 +326,9 @@ s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s
     slot->hA = p8;
     return count;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CAF0);
+#endif
 
 /* Forward declaration: defined later in this file (in ROM order, after
  * func_8004CC74), and EXCLUDED from this round's targets (documented
@@ -356,7 +359,37 @@ void func_8004CC74(Obj866E8 *self) {
     }
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 2/27 words, length exact, zero drift. Residue: register
+ * identity (retail copies `bounds` into $a2 with an unconditional `move
+ * a2,a0` before the null check, dedicates $v0 to the constant 1 for the
+ * whole body, and re-extracts point[0] from the saved-but-unshifted $a3 in
+ * a delay slot; every hand-derived C shape tried instead keeps everything
+ * in $a0/$v0 and re-materializes `li v0,1` at three of the four exits).
+ * Eleven independent source restatements (if-chains, `||`, `goto`, a
+ * consistent-alias local, narrow `s8` locals, a nested ternary, and a
+ * `result`/`do..while(0)` variable) all converge on this same shape or
+ * worse; permuter search (round 18, 71363 iterations) also failed to
+ * reach zero against the identical, since-confirmed-faithful scaffold
+ * (round 58) (docs/match-reports/func_8004CD38.md). Hand-derived. */
+s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+    if (bounds == NULL) {
+        return 1;
+    }
+    if (point[0] < bounds->unk0) {
+        return 1;
+    }
+    if (bounds->unk4 < point[0]) {
+        return 1;
+    }
+    if (point[1] < bounds->unk2) {
+        return 1;
+    }
+    return bounds->unk8 < point[1];
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CD38);
+#endif
 
 s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;

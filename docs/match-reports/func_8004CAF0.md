@@ -774,3 +774,17 @@ function. The two are not in conflict — round 9's lever ADDED live values to
 grow the frame, and the frame is now correct; adding a ninth here perturbs an
 allocation that is already the right size.
 
+---
+
+## Round 60 (charlie) — NON_MATCHING body promoted, round 60
+
+Track 1b promotion. Score re-verified unchanged (62/97, exact length, zero
+drift) before promoting. Placed the existing round-58 preserved body
+(the do-while(0)-plus-named-h8Val body carried in `src/class_3bb8c_b.c`)
+inside `#ifdef NON_MATCHING`, with `INCLUDE_ASM` restored in the `#else`.
+No source change beyond the wrapper and comment; both oracles green:
+`./build-and-verify.sh` (exit 0, `OK: build matches retail`) and
+`tools/check-nonmatching.sh` (exit 0). Disposition otherwise unchanged
+(still `INCLUDE_ASM` in the verified build; the remaining residue is not
+yet established as a HARD RULE 6 register-identity stall per round 58).
+
