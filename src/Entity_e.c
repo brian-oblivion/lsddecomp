@@ -338,19 +338,12 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-/* STALL -- see docs/match-reports/func_80062C58.md. Round 45: logic fully
- * derived and control flow confirmed correct (61/213 words match, +2 words
- * long); remaining residue is GCC's own delay-slot scheduling of the
- * unk80/2 + unk80/4 dual-division block, which resists straightforward
- * source reordering. Restored to INCLUDE_ASM per project rule. */
-#if 0
 extern u8 D_80089D0C[];
 extern u8 D_80089E50[];
 extern u8 D_80089E14[];
 extern s32 D_8008ACCC;
 
 void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
-    s32 half, quarter;
     s32 tmp;
     void *table;
 
@@ -374,24 +367,18 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == this->unk80 - 1) {
         this->moodTimer = -1;
     } else {
-        quarter = this->unk80 / 4;
-        half = this->unk80 / 2;
-        if (this->moodTimer < half + quarter) {
-            if (this->moodTimer < half) {
-                if (this->moodTimer < quarter) {
-                    /* nothing */
-                } else {
-                    this->methods->slot130(this);
-                    this->methods->slotC4(this, -0x6E, 0);
-                }
-            } else {
-                if (this->moodTimer == half) {
-                    out->unk1C = 0x10;
-                }
-                this->methods->slotC4(this, 0x6E, 0);
-            }
-        } else {
+        if (this->moodTimer >= this->unk80 / 2 + this->unk80 / 4) {
             this->methods->slot12C(this);
+        } else if (this->moodTimer >= this->unk80 / 2) {
+            if (this->moodTimer == this->unk80 / 2) {
+                out->unk1C = 0x10;
+            }
+            this->methods->slotC4(this, 0x6E, 0);
+        } else if (this->moodTimer < this->unk80 / 4) {
+            /* nothing */
+        } else {
+            this->methods->slot130(this);
+            this->methods->slotC4(this, -0x6E, 0);
         }
     }
 
@@ -402,21 +389,17 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
         this->unk44 = 1;
         D_8008ACCC = 1;
     } else if (this->unk44 >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
-        s32 old;
-
         tmp = 0;
         if (rand() & 1) {
-            old = this->unk44;
-            this->unk44 = 0xD;
-            tmp = (old == 0xC) ? 0x190 : 0;
             table = D_80089E50;
+            tmp = (this->unk44 == 0xC) ? 0x190 : 0;
+            this->unk44 = 0xD;
         } else {
-            old = this->unk44;
-            this->unk44 = 0xC;
-            if (old == 0xD) {
+            table = D_80089E14;
+            if (this->unk44 == 0xD) {
                 tmp = -0x190;
             }
-            table = D_80089E14;
+            this->unk44 = 0xC;
         }
         this->methods->slot48(this, 1, table);
         this->methods->slotCC(this, tmp, 0);
@@ -427,9 +410,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
         this->unk44 = 1;
     }
 }
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/Entity_e", func_80062C58);
 
 extern u8 D_80089CA0[];
 
