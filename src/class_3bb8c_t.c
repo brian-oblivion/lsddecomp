@@ -325,18 +325,18 @@ typedef struct D_8008ABB8Color {
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
-extern D_80087AACEntry *func_800404D0(void *a0, void *a1, s32 a2);
+extern D_80087AACEntry *New_ClassEAC0(void *a0, void *a1, s32 a2);
 
 void func_80058228(D_80087AACObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
-    self->unk_0xA8[0] = func_800404D0(&D_8008ABAC, &D_8008ABB4, 0);
+    self->unk_0xA8[0] = New_ClassEAC0(&D_8008ABAC, &D_8008ABB4, 0);
     rgb = D_8008ABB8;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = func_800404D0(&D_8008ABAC, &rgb, 0);
+        self->unk_0xA8[i] = New_ClassEAC0(&D_8008ABAC, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;

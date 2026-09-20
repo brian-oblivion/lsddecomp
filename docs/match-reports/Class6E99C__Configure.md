@@ -1,4 +1,6 @@
-# func_80040154 -- MATCHED (103/103)
+> Renamed from `func_80040154` on 2026-09-20 (tools/rename.py). Address 0x80040154.
+
+# Class6E99C__Configure -- MATCHED (103/103)
 
 ## Round 21 (runner delta): the final 2-word mflo-destination residue closed by an in-place division
 
@@ -70,7 +72,7 @@ residue, alongside the existing "reuse an existing variable name" and
 Note this is NOT the extended-asm/`register asm("$N")` mechanism CLAUDE.md
 HARD RULE 6 bans -- it is ordinary C whose SHAPE happens to guide the
 allocator's own choice, the same category of lever as the whole-struct-
-assignment fix documented in `func_8003FC70.md`/`func_8004042C.md`.
+assignment fix documented in `func_8003FC70.md`/`Class6E99C__PushPosition.md`.
 
 ## Round 20 (runner delta): two more attempts on the third division, both negative
 
@@ -86,7 +88,7 @@ conditional block):
    baseline. The compiler folds the named divisor straight back to a
    direct field read either way.
 2. **Hoisted the dividend's load (`d = self->unk68`) to BEFORE the
-   `if (self->unk98 != 0)` block**, instead of immediately before the
+   `if (self->altMode != 0)` block**, instead of immediately before the
    final division (its position in every prior attempt): regressed
    sharply to 78/103 -- this is NOT a register-identity residue, it is a
    real instruction INSERTION (confirmed via `funcdiff.py`'s own
@@ -167,14 +169,14 @@ division 3, as the round-bravo report already noted. This strengthens
 before spending further hand attempts on expression-level variants of
 the third division alone.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotDC` (`+0x0DC`,
-shared verbatim with `ClassEAC0Methods::slotDC`).
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::configure` (`+0x0DC`,
+shared verbatim with `ClassEAC0Methods::configure`).
 
 ## Shape
 
 ```c
 #if 0
-s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
     s32 flag;
     s32 q1, q2;
@@ -196,11 +198,11 @@ s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     if (a2 == 0) {
         self->unk78 = 0xF;
     }
-    q1 = 0x100 / self->unk74;
+    q1 = 0x100 / self->step;
     self->unk7C = a3;
     self->unk80 = q1;
-    if (self->unk98 != 0) {
-        q2 = q1 / self->unk9C;
+    if (self->altMode != 0) {
+        q2 = q1 / self->divisor;
         self->unk80 = q1 - q2;
     }
     q2 = self->unk68;
@@ -215,11 +217,11 @@ s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
 ```
 
 Real 3-parameter occupant, NOT the 1-argument shape its two known callers
-(`func_80040024`, `func_800400B0`, both this unit) actually invoke it
+(`Class6E99C__StartFadeToIndex`, `Class6E99C__StartFadeDefault`, both this unit) actually invoke it
 with -- those callers set up only `self` before the `jalr`, so `a1`/`a2`/
 `a3` are leftover register values from whatever preceded the call at each
 site, unused by design at those two call sites. The vtable slot's own
-DECLARED type therefore stays `s32 (*slotDC)(Class6E99CObj *self);`
+DECLARED type therefore stays `s32 (*configure)(Class6E99CObj *self);`
 (matching what the two known callers actually configure) while this
 function's own top-level definition keeps the real 4-parameter signature
 its body needs -- the two are independent per this project's established
@@ -229,7 +231,7 @@ compiled C and enforces nothing.
 ## Residue
 
 Two paired instructions differ (4 words total): the SECOND division
-(`q1 / self->unk9C`, guarded by `self->unk98 != 0`) and the THIRD division
+(`q1 / self->divisor`, guarded by `self->altMode != 0`) and the THIRD division
 (`self->unk68 / self->unk80`) have their `mflo` DESTINATION and subsequent
 `sw` SOURCE registers swapped relative to retail -- retail's second
 division lands in `$v0`, third in `$v1`; every C shape tried lands the
@@ -255,7 +257,7 @@ at its exact retail address), pure register bank.
 4. Hoist the third division's dividend into `q1` instead (reusing the
    FIRST division's own variable, dead by that point): 98/103 -- worse
    than reusing `q2`, better than a fresh name.
-5. A bare `__asm__("")` between the `if (self->unk98 != 0) {...}` block
+5. A bare `__asm__("")` between the `if (self->altMode != 0) {...}` block
    and the `q2 = self->unk68;` reassignment, attempting to pin the
    register choice at the boundary: no change from attempt 2's 99/103.
 
@@ -298,7 +300,7 @@ division 2 has no direct analog to try on division 3 without changing the
 stored value's width. **Best remaining: the 10-scoring body above (2
 words), reported as the new stall state.** Not run further given the
 round's wind-down; flagging the exact remaining instruction pair (division
-3's `mflo` destination, `func_80040154.s`'s own third `mflo`/`sw` pair) for
+3's `mflo` destination, `Class6E99C__Configure.s`'s own third `mflo`/`sw` pair) for
 the next attempt.
 
 ### Proposed learning (this round)
@@ -344,3 +346,19 @@ finer-grained version of the already-documented "declaration order decides
 register/stack layout" family; worth testing named-variable REUSE as its
 own lever on other multi-division register-identity stalls before assuming
 a fresh name is neutral.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__Configure`** -- tier B. `Class6E99CMethods::configure`
+(`+0x0DC`, shared occupant with `ClassEAC0Methods::configure`). Sets up
+`unk78`/`unk7C`/`unk80`/`unk84`/`unk68`-derived state from its own
+`a1`/`a2`/`a3` (mode, count, and a divisor-flag path via `altMode`), then
+dispatches `slot10`/`slot64`/`slot68`/`slot60` (bravo's own occupants).
+Named "Configure" rather than "Start"/"Init" because it is ALSO reachable
+through `configure` with only `self` (no real arguments) from
+`Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`, where its
+return value is read back as a color-table index -- i.e. it is a
+general-purpose "(re)configure and report" entry point, not a one-shot
+initializer. The a2-garbage-on-1-arg-call nuance is inherited unchanged
+from the matched body and already documented in this function's own
+`## Notes`/report history; not re-derived here.

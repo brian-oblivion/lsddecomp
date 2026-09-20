@@ -1,4 +1,6 @@
-# func_8004042C -- STALL, corrected (was misfiled as unfixable register-identity; real fix narrowed the function to a 3-word permuter-exhausted "redundant move" residue -- 22/25, NOT the "1 word remaining" (i.e. implied 24/25) figure this report previously stated, which propagated into PROGRESS.md and round 19's assignment)
+> Renamed from `func_8004042C` on 2026-09-20 (tools/rename.py). Address 0x8004042c.
+
+# Class6E99C__PushPosition -- STALL, corrected (was misfiled as unfixable register-identity; real fix narrowed the function to a 3-word permuter-exhausted "redundant move" residue -- 22/25, NOT the "1 word remaining" (i.e. implied 24/25) figure this report previously stated, which propagated into PROGRESS.md and round 19's assignment)
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 
@@ -28,7 +30,7 @@ hits, so this was never a masked compile error either -- the "22/25,
 permuter-exhausted" verdict genuinely stands.
 
 Considered whether the "write the expression in place, back into a
-dying operand" lever that closed this round's `func_80040154` (a
+dying operand" lever that closed this round's `Class6E99C__Configure` (a
 different function in this same unit) would transfer here: it would
 not -- this residue is the OPPOSITE shape. There, retail wanted a value
 kept in ONE register and this compiler split it into two; here, retail
@@ -40,10 +42,10 @@ the same lever applied twice. Given two independent permuter searches
 rounds 18/19, not re-spending a further search without a genuinely new
 angle. Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotE8` (`+0x0E8`).
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::pushPosition` (`+0x0E8`).
 
 **Correction to an earlier version of this report**, which claimed a full
-25/25 match under the stale-build window described in `func_8003FDB0.md`.
+25/25 match under the stale-build window described in `New_Class6E99C.md`.
 Re-verified genuinely fresh, this function has a real residue -- but the
 investigation also found and fixed a genuine FIELD-WIDTH bug in
 `include/code_2cc8c.h` along the way (see "Field width correction" below),
@@ -54,12 +56,12 @@ figure below is WRONG, verified by direct rebuild, not by re-reading
 permuter output.** The round-bravo section further down states "this
 final 1-word 'redundant move' residue" and the title inherited that
 language; round 18's own PROGRESS entry and this round's task assignment
-both repeated it as "func_8004042C ... ONE WORD REMAINING." Rebuilding
+both repeated it as "Class6E99C__PushPosition ... ONE WORD REMAINING." Rebuilding
 the EXACT preserved body (below, unchanged) against the real oracle
 gives:
 
 ```
-func_8004042C: 22/25 words match (file 0x30C2C-0x30C90)
+Class6E99C__PushPosition: 22/25 words match (file 0x30C2C-0x30C90)
 ```
 
 -- three words differ, not one:
@@ -96,7 +98,7 @@ remaining."
 ## Field width correction (kept, unlike the stall verdict above)
 
 `Class6E99CObj::unk88`/`unk8C` were originally typed `s16` (from
-`func_80040490`'s own `lhu` read alone). This function's OWN `sw` (a full
+`Class6E99C__PopPosition`'s own `lhu` read alone). This function's OWN `sw` (a full
 WORD store, not `sh`) at those exact offsets is direct evidence they are
 `s32`, not `s16`:
 
@@ -107,7 +109,7 @@ sw $v1, 0x8c($a3)
 
 Retyped to `s32` in the header (removing an earlier, now-known-wrong 2-byte
 `pad08A` inserted to compensate for the old `s16` typing). This retype is
-what let `func_80040490` (a SIBLING function, already matched) reach a
+what let `Class6E99C__PopPosition` (a SIBLING function, already matched) reach a
 genuine 9/9 -- confirmed by rebuild, not assumed. Separately,
 `Class6E99CObj::unk60`/`unk62` needed retyping `s16` -> `u16`: this
 function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
@@ -117,7 +119,7 @@ function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
 
 ```c
 #if 0
-void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -169,8 +171,8 @@ which retail does not do -- retail interleaves each load immediately with
 its own store before starting the next pair. A bare
 `__asm__("" ::: "memory")` between pairs is what stops the hoist (a bare
 `__asm__("")` with no clobber did NOT work when tried on the sibling
-`func_80040490`, memory clobber was required there too). This same lever
-closed `func_80040490` (now a real, confirmed 9/9 match) and is the reason
+`Class6E99C__PopPosition`, memory clobber was required there too). This same lever
+closed `Class6E99C__PopPosition` (now a real, confirmed 9/9 match) and is the reason
 this function's own remaining gap is ONLY the register-identity issue, not
 also a structural one.
 
@@ -239,7 +241,7 @@ changed.
 
 ```c
 #if 0
-void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -286,7 +288,7 @@ this project.
 the body above): `-j 6 --stop-on-zero --best-only`, bounded with
 `timeout 500`. Base score confirmed 210 via `--debug` before the search.
 Ran to completion (~28,487 iterations; exit code not literally captured,
-see "Anomaly" in `func_800402F0.md` for the same wrapper issue -- the
+see "Anomaly" in `Class6E99C__Stop.md` for the same wrapper issue -- the
 iteration count and log tail are consistent with the 500s bound firing,
 not with `--stop-on-zero`). **No zero reached; best found was 25**, not
 210 -- but every candidate at or below 210 that was inspected used a
@@ -441,3 +443,16 @@ words, length exact, permuter-exhausted redundant-move residue) is now live
 in `src/code_2cc8c_e.c` under `#ifdef NON_MATCHING`, with the verified build
 still taking the `#else INCLUDE_ASM` branch. `./build-and-verify.sh` and
 `tools/check-nonmatching.sh` both green.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__PushPosition`** -- tier B (STALL, preserved body unchanged
+by this rename). `Class6E99CMethods::pushPosition` (`+0x0E8`), gated on `unkC`
+being non-NULL. Stashes the current `unk60`/`unk62` pair into `unk88`/
+`unk8C` and the current `unk50`/`unk54` pair into `unk90`/`unk94`, then
+installs a NEW position from its own `a1`(x,y)/`a2` arguments into
+`unk60`/`unk62`/`unk50`/`unk54`. Its exact inverse,
+`Class6E99C__PopPosition` (`popPosition`), restores the stashed values back
+into the live fields -- a save/restore-of-one pair, hence
+"Push"/"Pop". What game event drives the push (an on-screen position
+override, e.g. a highlight or animation) is not established -- tier B.

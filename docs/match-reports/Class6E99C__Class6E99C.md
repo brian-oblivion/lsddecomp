@@ -1,10 +1,12 @@
-# func_8003FE2C -- MATCH (43/43 words, first attempt)
+> Renamed from `func_8003FE2C` on 2026-09-20 (tools/rename.py). Address 0x8003fe2c.
+
+# Class6E99C__Class6E99C -- MATCH (43/43 words, first attempt)
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CObj`'s own constructor
 (`Class6E99CMethods::ctor`, slot `+0x008`).
 
 ```c
-void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
+void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
     void *tableEntry;
 
@@ -15,8 +17,8 @@ void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
         tableEntry = D_8006EAA8;
     }
     base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
-    self->methods = func_800404C0();
-    self->methods->slot40(self, a2);
+    self->methods = Class6E99C__GetMethods();
+    self->methods->finishConstruct(self, a2);
 }
 ```
 
@@ -47,3 +49,14 @@ per this project's convention -- not a real C `struct` embedding).
 function is the one that converts it into a `tableEntry` address before
 forwarding to the next ctor down the chain, whose OWN `a2` really is
 already a pointer.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__Class6E99C`** -- tier A. `Class6E99CMethods::ctor`
+(`+0x008`). Named per the project's `Class__Class` constructor convention
+(see `Entity__Entity`, `DreamSys.c`): calls the further-base ctor
+(`Obj6EAC0__GetBaseMethods()->ctor(...)`) first, then installs this class's
+own `&D_8006E99C` table, then redispatches through `finishConstruct` --
+the textbook "base ctor first, then own vtable, then dispatch" idiom
+already documented elsewhere in this project. Mechanics (construct an
+instance of this class) fully determine the name.

@@ -1,4 +1,6 @@
-# func_8003FDB0 -- MATCHED (31/31 words)
+> Renamed from `func_8003FDB0` on 2026-09-20 (tools/rename.py). Address 0x8003fdb0.
+
+# New_Class6E99C -- MATCHED (31/31 words)
 
 Unit `code_2cc8c_e`, carved round 14.
 
@@ -13,12 +15,12 @@ Unit `code_2cc8c_e`, carved round 14.
 > the first try:
 >
 > ```c
-> Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
+> Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
 >     Class6E99CObj *self;
 >
 >     self = func_80017B34(0xA0);
 >     if (self != NULL) {
->         func_800404C0()->ctor(self, a1, a2, a3);
+>         Class6E99C__GetMethods()->ctor(self, a1, a2, a3);
 >         return self;
 >     }
 >     return NULL;
@@ -84,4 +86,13 @@ and funcdiff's own guards say nothing.
 **Superseded by this round's fix:** the class is not "unfixable, retail
 merges what GCC won't" -- it is a textual-order-of-returns sensitivity, and
 once the research doc identified that, this function (and its sibling
-`func_800404D0`) matched on the very first correctly-shaped attempt.
+`New_ClassEAC0`) matched on the very first correctly-shaped attempt.
+
+## Naming (round 61, track 3)
+
+**`New_Class6E99C`** -- tier A. Standard `New_X`-shaped allocator: allocates
+a fixed 0xA0 bytes (`Class6E99CObj`'s own size) and, on success, dispatches
+its ctor through `Class6E99C__GetMethods()->ctor(...)` before returning it;
+matches the project's established `New_X` convention (`New_Entity`,
+`New_DreamSys`, `New_Obj6EAC0`, etc.) exactly. Mechanics fully determine the
+name; no game-purpose claim beyond "allocate and construct one".

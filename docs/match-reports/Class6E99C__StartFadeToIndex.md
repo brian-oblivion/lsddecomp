@@ -1,4 +1,6 @@
-# func_80040024 -- STALL (scheduling residue, 29/35)
+> Renamed from `func_80040024` on 2026-09-20 (tools/rename.py). Address 0x80040024.
+
+# Class6E99C__StartFadeToIndex -- STALL (scheduling residue, 29/35)
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 
@@ -17,7 +19,7 @@ re-confirmed green.
 ## Round 21 (runner delta): re-verified fresh, no new attempt
 
 Restored the exact 29/35 body and rebuilt fresh, isolated (with
-`func_800400B0` reverted to `INCLUDE_ASM` at the time, so this
+`Class6E99C__StartFadeDefault` reverted to `INCLUDE_ASM` at the time, so this
 function's own window cannot be contaminated by that sibling's own
 drift -- see that function's own report for a real instance of this
 project's "one inherited body in six carries a false drift-free claim"
@@ -67,7 +69,7 @@ A "retail materializes a literal argument immediately after an unrelated
 dispatch, before computing an index expression" residue does not yield
 to ~94,000 unguided permuter iterations either, on top of the four
 hand-reshaping attempts the original report already spent. Combined with
-`func_800400B0`'s identical-shape residue (see that report), this is now
+`Class6E99C__StartFadeDefault`'s identical-shape residue (see that report), this is now
 a **confirmed-negative class**, not merely an untried one -- a future
 runner should not re-spend permuter budget on this specific
 `slotXX(self, 1, tableEntry)`-after-a-fresh-dispatch shape without a new
@@ -83,10 +85,10 @@ boundary).
 > a finding about `setup-permuter.sh`'s own behaviour, which is a property
 > of the TOOL and not of whose code it was pointed at.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotD4` (`+0x0D4`).
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::startFadeToIndex` (`+0x0D4`).
 
 **Correction to an earlier version of this report**, which claimed a full
-35/35 match under the stale-build window described in `func_8003FDB0.md`
+35/35 match under the stale-build window described in `New_Class6E99C.md`
 (same cause, cross-referenced there). Once the build was confirmed genuinely
 fresh (every symbol's linked address checked against `build/lsdde.map`),
 this function turned out to still have a real residue.
@@ -95,16 +97,16 @@ this function turned out to still have a real residue.
 
 ```c
 #if 0
-void func_80040024(Class6E99CObj *self) {
+void Class6E99C__StartFadeToIndex(Class6E99CObj *self) {
     s32 idx;
 
-    if (self->unk6C != 0) {
+    if (self->state != 0) {
         return;
     }
-    idx = self->methods->slotDC(self);
+    idx = self->methods->configure(self);
     self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
-    self->unk6C = 1;
-    self->unk74 = -self->unk74;
+    self->state = 1;
+    self->step = -self->step;
 }
 #endif
 ```
@@ -113,7 +115,7 @@ void func_80040024(Class6E99CObj *self) {
 
 Pure instruction-scheduling difference, zero insertions/deletions. Retail
 materialises the `slotB8` call's literal `1` argument (`li $a1,0x1`)
-IMMEDIATELY after the `slotDC` dispatch's own delay slot -- before computing
+IMMEDIATELY after the `configure` dispatch's own delay slot -- before computing
 `idx*3` -- and reloads `self->methods` a second time (fresh, not cached)
 right before the `slotB8` dispatch itself. This body's compiled form
 computes `idx*3` first and defers the `li $a1,0x1` to just before the call.
@@ -141,7 +143,7 @@ Same total instruction count, same registers, purely reordered.
   zero structural difference -- close to the ideal permuter target. Not run
   due to time budget in this round; worth a `PERM_VAR`-guided search on a
   re-attempt, seeded from the base body above.
-- **Reordering the two `self->methods` reads** (the `slotDC` dispatch's own
+- **Reordering the two `self->methods` reads** (the `configure` dispatch's own
   read vs the `slotB8` dispatch's fresh reload) relative to the `idx*3`
   computation, independently of the literal's position. Only the literal's
   position was varied across all 4 attempts; the reload's position was left
@@ -153,7 +155,7 @@ A trivial constant argument (`1`) to a call reached immediately after a
 DIFFERENT dispatch through the same vtable pointer can resist being pinned
 to retail's early position by any combination of source reordering, naming
 it in a local, or a bare scheduling barrier (which actively regresses it).
-`func_800400B0` in this same unit shows the identical pattern on the exact
+`Class6E99C__StartFadeDefault` in this same unit shows the identical pattern on the exact
 same call shape (`slotB8(self, 1, tableEntry)`) -- worth treating as one
 class rather than two coincidences; see that function's own report.
 
@@ -164,3 +166,17 @@ words, length exact, instruction-scheduling residue on the `li $a1,1`
 materialization) is now live in `src/code_2cc8c_e.c` under `#ifdef
 NON_MATCHING`, with the verified build still taking the `#else INCLUDE_ASM`
 branch. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__StartFadeToIndex`** -- tier B (STALL, preserved body
+unchanged by this rename). `Class6E99CMethods::startFadeToIndex` (`+0x0D4`). Guards
+on `state == 0` (idle), looks up an index via `configure`, dispatches the
+`slotB8` color-set slot with `&D_8006EA90[idx * 3]` (an INDEXED table
+entry), sets `state = 1`, and negates `step`. Named opposite
+`Class6E99C__StartFadeDefault` (`startFadeDefault`, `state = 2`, the FIXED
+`D_8006EAA8` table) -- the two are a matched pair distinguished by which
+color source they select. "Fade" is inferred from `step` accumulating into
+color-channel bytes over time in `Class6E99C__Update`; "index" from this
+function's own `idx`-based table lookup versus its sibling's fixed one.
+Game-level purpose (what is fading, and why) is not established.

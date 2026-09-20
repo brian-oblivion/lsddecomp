@@ -7,7 +7,7 @@ Unit: `src/code_2cc8c_f.c`. Blocker screen clean (no `gp_rel`, no
 
 ## Round 19: closed with the whole-struct-assignment axis
 
-Same lever that closed `func_8003CB68` (this round) and `func_8004042C`/
+Same lever that closed `func_8003CB68` (this round) and `Class6E99C__PushPosition`/
 `Obj6EAC0__SetPosition` (round 18/19): the "copy arm" of this function was a
 3-byte scalar-by-scalar assignment (`d[0]=r; d[1]=g; d[2]=b;`), and
 rewriting it as one whole-struct assignment through a local 3-byte
@@ -59,7 +59,7 @@ sX[1]=aY[1]; sX[2]=aY[2];` byte triple) and the same fix applies.
 ### Proposed learning
 
 A fourth confirmation of the whole-struct-assignment lever (after
-`func_8004042C`, `Obj6EAC0__SetPosition`, `func_8003CB68`), and the first
+`Class6E99C__PushPosition`, `Obj6EAC0__SetPosition`, `func_8003CB68`), and the first
 instance paired with a "redundant move" framing rather than an
 insertion/deletion framing: **the "retail caches an argument into an
 extra unconditional register" residue and the "scalar-vs-aggregate

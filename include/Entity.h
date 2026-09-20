@@ -143,7 +143,7 @@ struct Unk100Obj {
     Unk100Methods *methods; /* +0x00 */
 };
 
-extern Unk100Obj *func_8003FDB0(void *name, s32 arg1, s32 arg2);
+extern Unk100Obj *New_Class6E99C(void *name, s32 arg1, s32 arg2);
 
 /* Already matched in Entity.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- func_80061198 (Entity_d) is its first cross-unit

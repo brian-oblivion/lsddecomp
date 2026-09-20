@@ -63,7 +63,7 @@ store's BASE register from `a1` (the `dst` parameter, retail's own base
 throughout) to `v0` (the early `move v0,a1` return-value materialization)
 once that copy exists. Retail keeps `a1` as the store base the WHOLE
 function and touches `v0` only once, at entry, never again until `jr
-ra`. This is the exact same coalescing shape as `func_8004042C`'s
+ra`. This is the exact same coalescing shape as `Class6E99C__PushPosition`'s
 PERMUTER-EXHAUSTED residue (a value retail deliberately keeps live in
 TWO separate registers -- one for the parameter's ongoing use, one for
 a return/redundant copy -- that GCC 2.6.3 here collapses back into one).
@@ -77,14 +77,14 @@ targeting the base-register-switch specifically:**
     Reasoning: `volatile` might prevent GCC from recognizing `out` and
     `dst` hold the same value and collapsing them. Regressed HARD
     (blew past 20 words, real frame-size change): `volatile` forces
-    `out` to a real stack slot the way it did for `func_800400B0`'s
+    `out` to a real stack slot the way it did for `Class6E99C__StartFadeDefault`'s
     dead-store attempt -- same mechanism, wrong direction entirely (a
     stack-resident copy is not what retail's register-only two-name
     residue needs). Reverted immediately.
 
 **Verdict unchanged: STALL, register-identity/coalescing, best 135
 (`--debug`) / 2/20 words (raw funcdiff).** This is now confirmed to
-share its exact mechanism with `func_8004042C`'s already
+share its exact mechanism with `Class6E99C__PushPosition`'s already
 PERMUTER-EXHAUSTED "redundant move"/coalescing class (see that report),
 which took ~28,000 + ~48,000 permuter iterations across two rounds to
 exhaust without closing. Not re-running an unguided permuter search
@@ -98,7 +98,7 @@ decision). Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 **The "two live copies of the same pointer value, retail keeps them in
 separate registers, GCC 2.6.3 collapses them to one" coalescing class
 now has two confirmed instances in this single unit**
-(`func_8003FCFC`'s `dst`/return-copy, `func_8004042C`'s `a1`/redundant-
+(`func_8003FCFC`'s `dst`/return-copy, `Class6E99C__PushPosition`'s `a1`/redundant-
 `$t0`-copy) and neither closed despite a `volatile` local, named
 copies, branch-forced-copy tricks, and tens of thousands of permuter
 iterations between them. Worth treating this as this project's
@@ -336,7 +336,7 @@ differs" framing was measuring the CONSEQUENCE of a wrong return type, not
 an intrinsic property of the loads/stores. Recommend re-staffing this one
 specifically (not dismissing it as an unfixable register class) --the
 remaining 135 looks like the SAME "keep an argument live in its own
-register separately from a coalesced copy" shape `func_8004042C.md` hit
+register separately from a coalesced copy" shape `Class6E99C__PushPosition.md` hit
 and did not fully solve either (see that report's own final residue), so a
 lever that closes one may close both. Not spent further attempts this
 round; flagging as the strongest re-attempt candidate this sweep found.
@@ -377,7 +377,7 @@ permuter-exhausted (no PERM macros were written to guide the search, and
 search of this space) -- phrasing precisely: **not closed in ~45,000
 iterations under load.**
 
-**Why the `func_8004042C`/`Obj6EAC0__SetPosition` whole-struct-assignment lever
+**Why the `Class6E99C__PushPosition`/`Obj6EAC0__SetPosition` whole-struct-assignment lever
 does not transfer here, checked explicitly rather than assumed:** both of
 those functions' residues were a two-SEPARATE-SCALAR-ASSIGNMENT shape
 copying one struct's fields into another struct's fields, where GCC 2.6.3

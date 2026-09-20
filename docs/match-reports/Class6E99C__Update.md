@@ -1,9 +1,11 @@
-# func_8003FF44 -- MATCH (54/54 words, first attempt)
+> Renamed from `func_8003FF44` on 2026-09-20 (tools/rename.py). Address 0x8003ff44.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slot98` (`+0x098`).
+# Class6E99C__Update -- MATCH (54/54 words, first attempt)
+
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::update` (`+0x098`).
 
 ```c
-void func_8003FF44(Class6E99CObj *self, void *a1, s32 a2) {
+void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
     s32 old;
 
     if (a2 != 2) {
@@ -16,27 +18,27 @@ void func_8003FF44(Class6E99CObj *self, void *a1, s32 a2) {
             return;
         }
         if (self->unk78 & 4) {
-            self->unk64 += (u8)self->unk74;
+            self->unk64 += (u8)self->step;
         }
         if (self->unk78 & 2) {
-            self->unk65 += (u8)self->unk74;
+            self->unk65 += (u8)self->step;
         }
         if (self->unk78 & 1) {
-            self->unk66 += (u8)self->unk74;
+            self->unk66 += (u8)self->step;
         }
     } else {
-        self->methods->slotE0(self, a1);
+        self->methods->stop(self, a1);
     }
 }
 ```
 
 **Correction: the `old <= 0` guard needs a POSITIVE `if (old > 0) {...}
 else {...}` shape, not an early-return guard clause.** An earlier version
-of this report used `if (old <= 0) { slotE0(...); return; }` followed by
+of this report used `if (old <= 0) { stop(...); return; }` followed by
 the rest of the body at the top level -- that version reproduced retail's
 branch CONDITION but put the wrong block as the physical branch target vs.
 fallthrough (confirmed via `tools/asm-differ/diff.py`: retail falls
-through into the `old > 0` body and branches AWAY into the `slotE0` call;
+through into the `old > 0` body and branches AWAY into the `stop` call;
 the early-return form did the reverse). Same branch-polarity family as
 `func_8003F674`'s own confirmed lesson, generalised here to a guard clause
 with a non-trivial body on BOTH sides rather than a bare early return.
@@ -49,12 +51,26 @@ with a non-trivial body on BOTH sides rather than a bare early return.
   = old - 1; if (old <= 0) ...` rather than a naive `self->unk80--; if
   (self->unk80 < 0) ...`, which would test the wrong (already-decremented)
   value.
-- `slotE0`'s own argument: nothing at the call site re-sets `$a1` before the
+- `stop`'s own argument: nothing at the call site re-sets `$a1` before the
   `jalr`, so whatever this function's OWN `a1` parameter still holds gets
   forwarded through untouched -- an ordinary "argument register survives
   because nothing overwrote it" case (own `a1` is unused for anything else
   in this function).
 - `self->unk64`/`unk65`/`unk66` are three independent `u8` counters, each
-  incremented by the LOW BYTE of `self->unk74` (a full `s32` elsewhere)
+  incremented by the LOW BYTE of `self->step` (a full `s32` elsewhere)
   gated by a separate bit of the `unk78` flags word -- named
   `Class6E99CObj::unk64`/`unk65`/`unk66` in `include/code_2cc8c.h`.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__Update`** -- tier B. `Class6E99CMethods::update` (`+0x098`).
+Mechanics: ignores every call except `a2 == 2`, then decrements a countdown
+(`self->unk80`, still unnamed -- no other function gives it a purpose
+beyond "the thing this loop decrements") and either accumulates a
+per-tick `step` into three byte counters (gated per-bit by `unk78`) or
+calls `stop` once the countdown expires. The `(self, void *a1, s32 a2)`
+shape with `a2` acting as an event-code gate matches this project's own
+generic per-object dispatch idiom (`Entity__Update(this, a1, a2)`,
+`include/Entity.h`'s slot98 note), which is the evidence for "Update"
+specifically rather than a bespoke name. Purpose in the actual game (what
+the color accumulation drives) is not established -- tier B, not A.

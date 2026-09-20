@@ -82,7 +82,7 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
         } while (*list != NULL);
     }
 
-    self->unk68 = func_800404D0(D_8008A8E8, D_8008A8F0, 0);
+    self->unk68 = New_ClassEAC0(D_8008A8E8, D_8008A8F0, 0);
     a1->unk4 = handle;
 }
 

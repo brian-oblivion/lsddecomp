@@ -1,4 +1,6 @@
-# func_800400B0 -- STALL, PRIOR "29/41, same length" CLAIM CORRECTED (real one-word length regression, not a pure register/scheduling residue)
+> Renamed from `func_800400B0` on 2026-09-20 (tools/rename.py). Address 0x800400b0.
+
+# Class6E99C__StartFadeDefault -- STALL, PRIOR "29/41, same length" CLAIM CORRECTED (real one-word length regression, not a pure register/scheduling residue)
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 
@@ -8,7 +10,7 @@ rebuilt: **20/41 words match, `WARNING: differs OUTSIDE this range too
 (40/41 compiled words, one real missing instruction), confirming the
 correction still holds and nothing has drifted since. Deliberate skip:
 residue 1 (the shared `slotB8(self,1,tableEntry)` scheduling class) is
-the same confirmed-negative mechanism as `func_80040024`'s own
+the same confirmed-negative mechanism as `Class6E99C__StartFadeToIndex`'s own
 ~94,000-iteration search; residue 2 (the register-only dead `move
 $t0,$a2`) already has four negative attempts plus a 280-second bounded
 permuter search (base score 440, no improvement) and a reasoned
@@ -22,13 +24,13 @@ residue. Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 **This is the "roughly one inherited body in six carries a false
 clean/drift-free claim" case this round's assignment warned about.**
 Restored the exact preserved body from round 20 verbatim (unchanged, see
-below) and rebuilt in ISOLATION (`func_80040024` reverted to
+below) and rebuilt in ISOLATION (`Class6E99C__StartFadeToIndex` reverted to
 `INCLUDE_ASM` first, to rule out any cross-contamination from that
 sibling): `tools/funcdiff.py` reports `20/41 words match` with a
 **`WARNING: the build differs OUTSIDE this range too (224685 bytes)`**
 -- genuine drift, not the "same total instruction count, same
 registers, purely reordered" every prior round (18/19/20) claimed for
-this residue. `build/lsdde.map` confirms it directly: `func_80040154`
+this residue. `build/lsdde.map` confirms it directly: `Class6E99C__Configure`
 (the very next function in ROM order) links at `0x80040150` in this
 build, one word short of its retail address `0x80040154`. **This
 function's own compiled body is 40 words, not the reported 41** --
@@ -37,13 +39,13 @@ differently-registered.
 
 Re-ran with the coordinator's corrected oracle grep this round
 (`error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]`): zero
-hits both times (isolated and combined with `func_80040024`), so this
+hits both times (isolated and combined with `Class6E99C__StartFadeToIndex`), so this
 is not a masked compile error either -- the build genuinely, cleanly
 compiles to a shorter function than retail.
 
 ### The real mechanism (found via `mipsel-linux-gnu-objdump` on the built object, cross-checked against retail's own `.s`)
 
-Retail's `func_800400B0.s` contains **two** separate
+Retail's `Class6E99C__StartFadeDefault.s` contains **two** separate
 `addu $t0, $reg, $zero` copies, each sitting in a branch's delay slot
 (both execute unconditionally, MIPS delay-slot semantics):
 
@@ -54,8 +56,8 @@ Retail's `func_800400B0.s` contains **two** separate
    `volatile`-local and extended-asm tricks (both wrong-direction: they
    push a register-only dead value toward memory).
 2. `addu $t0, $v0, $zero` -- delay slot of the SECOND branch
-   (`beqz $v0/$v1,...` testing `self->unk98`), copying the just-computed
-   `idx` (still live in `$v0` from the `slotDC` dispatch) into `$t0`.
+   (`beqz $v0/$v1,...` testing `self->altMode`), copying the just-computed
+   `idx` (still live in `$v0` from the `configure` dispatch) into `$t0`.
    **This one is NOT dead** -- on the branch-taken path it is read by
    the table-index computation (`sll $a2,$t0,1` / `addu $a2,$a2,$t0`),
    i.e. `idx * 3`. Every C shape tried (this report's own preserved
@@ -72,20 +74,20 @@ Retail's `func_800400B0.s` contains **two** separate
 
 This is the SAME underlying "GCC schedules a delay slot differently
 than retail, and retail's choice happens to look like a redundant
-register copy" class as `func_8004042C`'s and `func_8003FCFC`'s
+register copy" class as `Class6E99C__PushPosition`'s and `func_8003FCFC`'s
 already-documented coalescing residues in this unit -- but manifesting
 as a missing WORD (length regression) rather than a same-length
 register swap, which is why the drift guard fires here and not there.
 
 ### Attempts this round targeting the missing delay-slot filler (4, all negative)
 
-1. Named local `t = idx;` right after the `slotDC` dispatch, used in
+1. Named local `t = idx;` right after the `configure` dispatch, used in
    place of `idx` in the else-branch's `idx * 3`: no change, still 40
-   words (`func_80040154` still links at `0x80040150`).
-2. Branch-forced-copy trick (`if (self->unk98) { t = idx; } else { t =
+   words (`Class6E99C__Configure` still links at `0x80040150`).
+2. Branch-forced-copy trick (`if (self->altMode) { t = idx; } else { t =
    idx; }`, the `func_80051858`-precedent idiom used elsewhere in this
    project): no change.
-3. Bare `__asm__("" ::: "memory")` immediately after the `slotDC`
+3. Bare `__asm__("" ::: "memory")` immediately after the `configure`
    dispatch, attempting to block the `move a0,s0` hoist so the
    scheduler would need a different filler: no change -- confirmed via
    direct disassembly, byte-identical to the baseline.
@@ -110,7 +112,7 @@ beating 440.
 verdict is WRONG for this function's real state and is corrected here.**
 The true state is: **40/41 compiled words (one real missing
 instruction), residue 1 (the shared `li a1,1` scheduling class with
-`func_80040024`) unconfirmed on its own since the length mismatch makes
+`Class6E99C__StartFadeToIndex`) unconfirmed on its own since the length mismatch makes
 `funcdiff`'s per-word window untrustworthy past the divergence point**
 -- residue 1's own bytes may well still hold once residue 2's length is
 fixed, but that cannot be verified against a drifted window, only
@@ -136,11 +138,11 @@ wrong function.
 ## Round 20 (runner delta): not re-attempted, downgraded shared axis
 
 Did not spend a fresh attempt on this function directly this round.
-`func_80040024`'s own residue 1 is the SAME `slotB8(self, 1,
+`Class6E99C__StartFadeToIndex`'s own residue 1 is the SAME `slotB8(self, 1,
 tableEntry)`-after-a-fresh-dispatch shape as this function's residue 1
 (both reports already cross-reference each other on this), and that
 shared axis was permuter-searched to ~94,000 unguided iterations this
-round with zero improvement (see `func_80040024.md`). Since residue 1
+round with zero improvement (see `Class6E99C__StartFadeToIndex.md`). Since residue 1
 here is the identical mechanism, treating it as re-confirmed negative by
 transfer rather than re-spending a second ~94,000-iteration budget on a
 byte-identical scheduling shape.
@@ -150,7 +152,7 @@ attempted with a real search.** The existing report's two attempts
 (volatile-local, banned extended-asm) already established the value is
 register-only, never spilled. Working through the mechanism further: the
 dead `move $t0,$a2` sits in the delay slot of the FUNCTION'S OWN TOP
-GUARD branch (`bnez $v0,...`, testing `self->unk6C != 0`) -- i.e. it is
+GUARD branch (`bnez $v0,...`, testing `self->state != 0`) -- i.e. it is
 a genuine **delay-slot filler pulled from nowhere the source can name**,
 not a scheduled-forward real statement. The existing report's own
 attempt 1 already showed that writing `idx = a2;` explicitly (before the
@@ -180,10 +182,10 @@ instruction (not the shared residue-1 axis), remains the concrete
 untried lever and the most likely way to either close it or confirm it
 compiler-internal beyond reasoning.
 
-Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slotD8` (`+0x0D8`).
+Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::startFadeDefault` (`+0x0D8`).
 
 **Correction to an earlier version of this report**, which claimed a full
-41/41 match under the stale-build window described in `func_8003FDB0.md`
+41/41 match under the stale-build window described in `New_Class6E99C.md`
 (same cause). Re-verified genuinely stale-free, this function has two
 distinct residues.
 
@@ -191,27 +193,27 @@ distinct residues.
 
 ```c
 #if 0
-void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
+void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
-    if (self->unk6C != 0) {
+    if (self->state != 0) {
         return;
     }
-    idx = self->methods->slotDC(self);
-    if (self->unk98 != 0) {
+    idx = self->methods->configure(self);
+    if (self->altMode != 0) {
         self->unk80--;
     } else {
         self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
     }
-    self->unk6C = 2;
+    self->state = 2;
 }
 #endif
 ```
 
-## Residue 1 -- same `li a1,1` scheduling class as `func_80040024`
+## Residue 1 -- same `li a1,1` scheduling class as `Class6E99C__StartFadeToIndex`
 
 Identical to that function's own residue: retail materialises the `1`
-literal right after the `slotDC` dispatch, before computing `idx*3`; this
+literal right after the `configure` dispatch, before computing `idx*3`; this
 body defers it to just before the `slotB8` call. See that report for the
 attempts already spent on this exact shape (not repeated here since the
 mechanism is the same call, `slotB8(self, 1, tableEntry)`).
@@ -220,10 +222,10 @@ mechanism is the same call, `slotB8(self, 1, tableEntry)`).
 
 Retail's own 3rd parameter (`a2`, this function's own incoming argument) is
 copied into a scratch register (`move $t0, $a2`) immediately after the top
-guard's branch, and is IMMEDIATELY overwritten by the `slotDC` dispatch's
+guard's branch, and is IMMEDIATELY overwritten by the `configure` dispatch's
 own return value one instruction later -- a provably dead value with no
 later use anywhere in the function. GCC 2.6.3 at `-O2` eliminates a plain
-`idx = a2;` statement written before `idx = self->methods->slotDC(self);`
+`idx = a2;` statement written before `idx = self->methods->configure(self);`
 as dead code (confirmed: adding it produced no instruction at all).
 
 ### Attempts to force the dead store (2)
@@ -255,7 +257,7 @@ as dead code (confirmed: adding it produced no instruction at all).
   never spilled). Flagging the rejection explicitly per this round's
   "record the lever you didn't pull and why" convention, in case the
   reasoning is wrong -- it would cost one attempt to check directly.
-- **The permuter**, for the same reasons given in `func_80040024`'s report
+- **The permuter**, for the same reasons given in `Class6E99C__StartFadeToIndex`'s report
   -- time budget, and this looks like the same underlying scheduling
   mechanism as that function's residue 1, so a `PERM_VAR`-guided search
   seeded from either function's near-miss body might close both at once.
@@ -278,3 +280,14 @@ raw funcdiff word-match count is not trustworthy past the length divergence)
 is now live in `src/code_2cc8c_e.c` under `#ifdef NON_MATCHING`, with the
 verified build still taking the `#else INCLUDE_ASM` branch.
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
+
+## Naming (round 61, track 3)
+
+**`Class6E99C__StartFadeDefault`** -- tier B (STALL, preserved body
+unchanged by this rename). `Class6E99CMethods::startFadeDefault` (`+0x0D8`). Mirror
+of `Class6E99C__StartFadeToIndex` (see that report's naming note for the
+pairing evidence): guards on `state == 0`, and either just decrements the
+countdown (`altMode != 0`, i.e. "resume") or dispatches the FIXED
+`D_8006EAA8[idx * 3]` color entry and sets `state = 2`. "Default" reflects
+`D_8006EAA8` being the same table `Class6E99C__Stop` falls back to when
+`unk78 == 0xF` (its own documented "use the fixed table" sentinel).

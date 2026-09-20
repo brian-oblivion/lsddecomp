@@ -7,13 +7,13 @@ callee-saved count is 0 -- not the saturated-register-file class.
 
 **Round 19 correction: the "missing unconditional cache" framing below
 (round-18 verdict) was the wrong lever, not an unfixable residue.** The
-same whole-struct-assignment idiom that closed `func_8004042C` (see that
+same whole-struct-assignment idiom that closed `Class6E99C__PushPosition` (see that
 report) closes this one too, and for the SAME reason: `self`'s own extra
 unconditional cache (`addu $a2,$a0,$zero`) and `a1`'s cache into the
 branch's delay slot (`addu $a3,$a1,$zero`) are not something the source
 needs to ask for directly -- they fall out of GCC 2.6.3's register
 allocation once the final field-copy is expressed as ONE aggregate copy
-instead of two scalar assignments, exactly as `func_8004042C` documented.
+instead of two scalar assignments, exactly as `Class6E99C__PushPosition` documented.
 
 ## Final body (byte-exact, 11/11, no drift)
 
@@ -26,7 +26,7 @@ void Obj6EAC0__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
 ```
 
 `Pair32E99C` (`include/code_2cc8c.h`) is the existing two-`s32`-record
-type introduced for `func_8004042C`'s own `a2` argument; `self->unk50`/
+type introduced for `Class6E99C__PushPosition`'s own `a2` argument; `self->unk50`/
 `unk54` are already documented there as "first/second word of a 2-word
 struct copied from their own `a1` argument", so this is the same shape,
 not a new one. `Obj6EAC0Methods::slotBC`'s prototype was retyped from
@@ -62,7 +62,7 @@ register) looked identical, but the underlying mechanisms differ.
 
 ### Proposed learning
 
-Confirms and generalizes `func_8004042C`'s own learning with a THIRD
+Confirms and generalizes `Class6E99C__PushPosition`'s own learning with a THIRD
 instance in a different function/unit: **retail's "cache an argument
 into a fresh unconditional register before/inside a branch" residue,
 when the argument's only use is a field-pair store, is frequently a

@@ -1,10 +1,12 @@
-# func_800405D0 -- MATCH (37/37 words, first attempt)
+> Renamed from `func_800405D0` on 2026-09-20 (tools/rename.py). Address 0x800405d0.
 
-Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::slot40` (`+0x040`),
-dispatched by the class's own ctor (`func_8004054C`).
+# ClassEAC0__FinishConstruct -- MATCH (37/37 words, first attempt)
+
+Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::finishConstruct` (`+0x040`),
+dispatched by the class's own ctor (`ClassEAC0__ClassEAC0`).
 
 ```c
-void func_800405D0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void ClassEAC0__FinishConstruct(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     ClassEAC0Methods *methods;
 
     self->unk44 = a3;
@@ -28,9 +30,9 @@ void func_800405D0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
 `a2` null-check**, not read fresh at the `slotB8` call site. An earlier
 version of this report read `self->methods` inline at the call and claimed
 37/37 -- taken during the stale-build window described in
-`func_8003FDB0.md`. Genuinely rebuilt, that inline form regressed
+`New_Class6E99C.md`. Genuinely rebuilt, that inline form regressed
 (16/37): after `Class6E99CObj::unk60`/`unk62` were retyped `s16` -> `u16`
-(see `func_8004042C.md`), GCC stopped loading `self->methods` early and
+(see `Class6E99C__PushPosition.md`), GCC stopped loading `self->methods` early and
 deferred it past the `a2` check instead, where retail loads it right after
 storing `unk62`. Hoisting it into a named local restores retail's early
 load. Worth noting as a SHARED-FIELD side effect: a field TYPE change in
@@ -51,3 +53,13 @@ all, it IS the `tableEntry` pointer, with `D_8008A924` only as the
 default when the caller passes `NULL`. Same family as the project's
 established "a discarded/defaulted value is not evidence of the wrong
 type" caution, just for a parameter rather than a return.
+
+## Naming (round 61, track 3)
+
+**`ClassEAC0__FinishConstruct`** -- tier A. `ClassEAC0Methods::finishConstruct`
+(`+0x040`), dispatched by `ClassEAC0__ClassEAC0` immediately after
+installing `self->methods` -- the identical architectural role, at the
+identical offset, as `Class6E99C__FinishConstruct` one level up and
+`Obj6EAC0__FinishConstruct` (round 54, this same table family) one level
+further down. See `Class6E99C__FinishConstruct.md`'s naming note for the
+full three-occupant cross-check.

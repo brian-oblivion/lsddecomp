@@ -2,7 +2,7 @@
 #include "code_2cc8c.h"
 
 /* ROUND 34: THIS UNIT LOST ITS FIRST EIGHT FUNCTIONS -- six of them to Sony,
- * two to files of their own -- and now begins at 0x305B0 / func_8003FDB0.
+ * two to files of their own -- and now begins at 0x305B0 / New_Class6E99C.
  * The segment it used to be is split three ways:
  *
  *   [c code_2cc8c_e0]  func_8003FB0C          game code, own file
@@ -13,7 +13,7 @@
  *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
  *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
  *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
- *   [c code_2cc8c_e]   func_8003FDB0 onward   <- this file
+ *   [c code_2cc8c_e]   New_Class6E99C onward   <- this file
  *
  * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
  * INCLUDE_ASM stubs and its class, so every
@@ -33,18 +33,50 @@
  * retitled CONVERTED, and carries its derivation verbatim.
  */
 
-Class6E99CObj *func_8003FDB0(void *a1, s32 a2, s32 a3) {
+/*
+ * WHAT THIS UNIT IS (round 61, track 3 naming pass). This file's own 17
+ * functions are the bottom two links of a three-class chain rooted in
+ * `code_d294.h`'s `Class6B5CCObj`: `Class6B5CCObj -> ClassEAC0Obj ->
+ * Class6E99CObj` (`tools/classtable.py D_8006E99C --vs D_8006B58C`,
+ * round 14; see `include/code_2cc8c.h`'s own header comment above
+ * `struct ClassEAC0Obj` for the full derivation). Critically, `ClassEAC0Obj`
+ * is THIS unit's own local view of the SAME table family that
+ * `code_2cc8c_f` (bravo's unit) views as `Obj6EAC0` -- `ClassEAC0Methods`'s
+ * `slotB8`/`slotCC` dispatch to bravo's own `Obj6EAC0__SetColor`/
+ * `Obj6EAC0__SetMask` -- so `Class6E99CObj` is a further-derived subclass
+ * of bravo's "on-screen text/digit display" class (round 54's own
+ * working hypothesis for `Obj6EAC0`).
+ *
+ * `Class6E99CObj`'s own functions (`New_Class6E99C` onward) add a
+ * start/stop pair over an indexed and a fixed color table
+ * (`Class6E99C__StartFadeToIndex`/`Class6E99C__StartFadeDefault`/
+ * `Class6E99C__Stop`), a per-tick `step`-driven RGB-channel accumulator
+ * gated by a countdown (`Class6E99C__Update`), and a save/restore-of-one
+ * position pair (`Class6E99C__PushPosition`/`Class6E99C__PopPosition`).
+ * Read together this looks like a COLOR-FADE CONTROLLER layered on top of
+ * bravo's digit display -- plausibly driving a transition when an
+ * on-screen digit/counter's value or color changes -- but that reading is
+ * this unit's own working hypothesis (tier B throughout), not confirmed
+ * against any caller outside this file: nothing else in `src/*.c`
+ * constructs or touches a `Class6E99CObj`/`ClassEAC0Obj` (only
+ * `New_Class6E99C`/`New_ClassEAC0` themselves are called elsewhere, always
+ * through a caller's own differently-typed local view -- see each
+ * function's own match report). See each function's own `## Naming`
+ * section for the specific evidence behind its name.
+ */
+
+Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
     Class6E99CObj *self;
 
     self = func_80017B34(0xA0);
     if (self != NULL) {
-        func_800404C0()->ctor(self, a1, a2, a3);
+        Class6E99C__GetMethods()->ctor(self, a1, a2, a3);
         return self;
     }
     return NULL;
 }
 
-void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
+void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
     void *tableEntry;
 
@@ -55,22 +87,22 @@ void func_8003FE2C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
         tableEntry = D_8006EAA8;
     }
     base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
-    self->methods = func_800404C0();
-    self->methods->slot40(self, a2);
+    self->methods = Class6E99C__GetMethods();
+    self->methods->finishConstruct(self, a2);
 }
 
-void func_8003FED8(Class6E99CObj *self, s32 a1) {
+void Class6E99C__FinishConstruct(Class6E99CObj *self, s32 a1) {
     self->unk70 = a1;
-    self->unk6C = 0;
-    self->unk74 = 0xA;
+    self->state = 0;
+    self->step = 0xA;
     self->unk78 = 0;
     self->unk7C = 0;
     self->methods->slot60(self, 0);
     self->methods->slot64(self, 0);
-    self->unk98 = 0;
+    self->altMode = 0;
 }
 
-void func_8003FF44(Class6E99CObj *self, void *a1, s32 a2) {
+void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
     s32 old;
 
     if (a2 != 2) {
@@ -83,71 +115,71 @@ void func_8003FF44(Class6E99CObj *self, void *a1, s32 a2) {
             return;
         }
         if (self->unk78 & 4) {
-            self->unk64 += (u8)self->unk74;
+            self->unk64 += (u8)self->step;
         }
         if (self->unk78 & 2) {
-            self->unk65 += (u8)self->unk74;
+            self->unk65 += (u8)self->step;
         }
         if (self->unk78 & 1) {
-            self->unk66 += (u8)self->unk74;
+            self->unk66 += (u8)self->step;
         }
     } else {
-        self->methods->slotE0(self, a1);
+        self->methods->stop(self, a1);
     }
 }
 
-void func_8004001C(Class6E99CObj *self, s32 a1) {
-    self->unk74 = a1;
+void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
+    self->step = a1;
 }
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 29/35 words, length exact. Residue: instruction
  * scheduling (retail materializes `li $a1,1` immediately after the
- * slotDC dispatch, before computing idx*3; this body defers it to just
- * before the slotB8 call) (docs/match-reports/func_80040024.md).
+ * configure dispatch, before computing idx*3; this body defers it to just
+ * before the slotB8 call) (docs/match-reports/Class6E99C__StartFadeToIndex.md).
  * Hand-derived. */
-void func_80040024(Class6E99CObj *self) {
+void Class6E99C__StartFadeToIndex(Class6E99CObj *self) {
     s32 idx;
 
-    if (self->unk6C != 0) {
+    if (self->state != 0) {
         return;
     }
-    idx = self->methods->slotDC(self);
+    idx = self->methods->configure(self);
     self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
-    self->unk6C = 1;
-    self->unk74 = -self->unk74;
+    self->state = 1;
+    self->step = -self->step;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040024);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeToIndex);
 #endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 40/41 words, 1 word short. Residue: two residues --
- * the shared `li $a1,1`-scheduling class with func_80040024, plus a
+ * the shared `li $a1,1`-scheduling class with Class6E99C__StartFadeToIndex, plus a
  * genuinely missing register-only dead-store delay-slot filler
  * (retail copies its unread 3rd argument into $t0 in a branch delay
  * slot; GCC 2.6.3 eliminates the equivalent C statement as dead code
- * before scheduling ever sees it) (docs/match-reports/func_800400B0.md).
+ * before scheduling ever sees it) (docs/match-reports/Class6E99C__StartFadeDefault.md).
  * Hand-derived. */
-void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
+void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
-    if (self->unk6C != 0) {
+    if (self->state != 0) {
         return;
     }
-    idx = self->methods->slotDC(self);
-    if (self->unk98 != 0) {
+    idx = self->methods->configure(self);
+    if (self->altMode != 0) {
         self->unk80--;
     } else {
         self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
     }
-    self->unk6C = 2;
+    self->state = 2;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800400B0);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeDefault);
 #endif
 
-s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
     s32 flag;
     s32 q1, q2;
@@ -169,11 +201,11 @@ s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     if (a2 == 0) {
         self->unk78 = 0xF;
     }
-    q1 = 0x100 / self->unk74;
+    q1 = 0x100 / self->step;
     self->unk7C = a3;
     self->unk80 = q1;
-    if (self->unk98 != 0) {
-        q2 = q1 / self->unk9C;
+    if (self->altMode != 0) {
+        q2 = q1 / self->divisor;
         self->unk80 = q1 - (s16)q2;
     }
     q2 = self->unk68;
@@ -186,23 +218,23 @@ s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     return a2;
 }
 
-void func_800402F0(Class6E99CObj *self, void *a1) {
+void Class6E99C__Stop(Class6E99CObj *self, void *a1) {
     Class6E99CMethods *methods;
     s32 mode;
 
     methods = self->methods;
-    if (self->unk6C == 0) {
+    if (self->state == 0) {
         return;
     }
-    if (self->unk6C == 1) {
+    if (self->state == 1) {
         mode = 5;
-        if (self->unk98 == 0) {
+        if (self->altMode == 0) {
             methods->slot60(self, 0);
             methods->slot64(self, 0);
         }
     } else {
         mode = 6;
-        if (self->unk98 != 0) {
+        if (self->altMode != 0) {
             if (self->unk78 == 0xF) {
                 methods->slotB8(self, 1, D_8006EAA8);
             }
@@ -210,14 +242,14 @@ void func_800402F0(Class6E99CObj *self, void *a1) {
         }
     }
     methods->slot14(self, a1);
-    if (self->unk74 < 0) {
-        self->unk74 = -self->unk74;
+    if (self->step < 0) {
+        self->step = -self->step;
     }
-    self->unk6C = 0;
+    self->state = 0;
     methods->slot30(self, mode);
 }
 
-void *func_800403F8(Class6E99CObj *self) {
+void *Class6E99C__GetColor(Class6E99CObj *self) {
     if (self->unk78 == 0xF) {
         return D_8006EAA8;
     }
@@ -231,8 +263,8 @@ void *func_800403F8(Class6E99CObj *self) {
  * a1->y loads; nothing in the C forces an early copy of a1, so no
  * source shape tried reproduces the extra move. Permuter-exhausted
  * (~76k combined iterations, two independent runs)
- * (docs/match-reports/func_8004042C.md). Hand-derived. */
-void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+ * (docs/match-reports/Class6E99C__PushPosition.md). Hand-derived. */
+void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -247,10 +279,10 @@ void func_8004042C(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_8004042C);
+INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__PushPosition);
 #endif
 
-void func_80040490(Class6E99CObj *self) {
+void Class6E99C__PopPosition(Class6E99CObj *self) {
     s32 t0, t1;
 
     t0 = self->unk90;
@@ -262,16 +294,16 @@ void func_80040490(Class6E99CObj *self) {
     self->unk62 = self->unk8C;
 }
 
-void func_800404B4(Class6E99CObj *self, s32 a1, s32 a2) {
-    self->unk98 = a1;
-    self->unk9C = a2;
+void Class6E99C__SetDivisorMode(Class6E99CObj *self, s32 a1, s32 a2) {
+    self->altMode = a1;
+    self->divisor = a2;
 }
 
-Class6E99CMethods *func_800404C0(void) {
+Class6E99CMethods *Class6E99C__GetMethods(void) {
     return &D_8006E99C;
 }
 
-ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
+ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
     ClassEAC0Obj *self;
 
     self = func_80017B34(0x6C);
@@ -282,13 +314,13 @@ ClassEAC0Obj *func_800404D0(void *a0, void *a1, s32 a2) {
     return NULL;
 }
 
-void func_8004054C(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     GetClass6B5CCMethods()->ctor(self);
     self->methods = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
-    self->methods->slot40(self, a1, a2, a3);
+    self->methods->finishConstruct(self, a1, a2, a3);
 }
 
-void func_800405D0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void ClassEAC0__FinishConstruct(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     ClassEAC0Methods *methods;
 
     self->unk44 = a3;

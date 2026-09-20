@@ -218,7 +218,7 @@ void Unk18Obj__Unk18Obj(Unk18Obj *self)
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = func_8001CA94();
-    obj = func_8003FDB0(D_8008A90C, 0, 0);
+    obj = New_Class6E99C(D_8008A90C, 0, 0);
     self->unkB0 = obj;
     obj->methods->slot4C(obj, self->unkAC, D_8008A904);
     self->methods->slot40(self);
