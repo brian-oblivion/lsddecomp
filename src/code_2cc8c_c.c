@@ -175,8 +175,10 @@ void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
 #ifdef NON_MATCHING
 /* NON_MATCHING: 23/32 words, length exact, zero drift. Residue: register
  * identity (self/arg1 land in $s0/$s1 here vs retail's $s1/$s0,
- * consistently through every later use -- CLAUDE.md HARD RULE 6 marks this
- * unfixable from plain C, not a judgement call)
+ * consistently through every later use.  HARD RULE 6 bans FIXING that with a
+ * register pin or an operand constraint and calls the mismatch a STALL; it
+ * does NOT certify the function unmatchable from C, and register-identity
+ * titles on this corpus have been falsified by a fresh re-read before)
  * (docs/match-reports/Obj86B60__NotifyParents.md). Hand-derived. */
 void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
 {
