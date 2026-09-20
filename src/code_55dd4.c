@@ -105,11 +105,10 @@ void func_800659D0(Class65650 *self)
     }
 }
 
-/* STALL -- see docs/match-reports/func_80065A5C.md. Best reached: 30/33
- * words in-range, no size drift, residue is a 3-way callee-save
- * prologue store-order permutation ($s0/$ra/$s1). Restored to
- * INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 30/33 words, length exact. Residue: prologue callee-save
+ * store-order permutation ($s0/$ra/$s1)
+ * (docs/match-reports/func_80065A5C.md). Hand-derived. */
 void func_80065A5C(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
@@ -128,9 +127,9 @@ void func_80065A5C(Class65650 *self, void *arg)
         p++;
     } while (i < self->unk6C);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
+#endif
 
 /* STALL -- see docs/match-reports/func_80065AE0.md. Best reached: 33/40
  * words in-range, no size drift, residue is the `arg` parameter's copy
@@ -417,11 +416,10 @@ void func_800662B4(Class65650 *self)
     self->unk90 = 0;
 }
 
-/* STALL -- see docs/match-reports/func_800662BC.md. Best reached: 17/33
- * words in-range, residue is `count`'s load routing through $v0 instead
- * of directly into its long-lived register. Restored to INCLUDE_ASM per
- * project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 17/33 words, length exact. Residue: count's lhu load
+ * routes through $v0 instead of directly into its long-lived register $s2
+ * (docs/match-reports/func_800662BC.md). Hand-derived. */
 void *func_800662BC(Class65650 *self, void *hdr, void *extra)
 {
     void *acc;
@@ -443,9 +441,9 @@ void *func_800662BC(Class65650 *self, void *hdr, void *extra)
     }
     return acc;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
+#endif
 
 /* STALL -- see docs/match-reports/func_80066340.md. Best reached: 252/258
  * words in-range, no size drift, residue is two symmetric 3-word
