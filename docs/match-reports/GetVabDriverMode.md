@@ -71,3 +71,29 @@ confirming this backend's own `gVabDriverMode`/`gVabDriverModeArg` pair
 serves the same role for the SPU/VAB data source. Not tier A: the exact
 in-game reason `gVabDriverModeArg` exists (a second word alongside the mode
 itself) is not established, only that it's read/written alongside the mode.
+
+## Extern arity (round 59)
+
+**Verdict: arity-ok idiom.** `src/code_171e0.c`'s `(void)` declaration stays.
+Identical in shape to `GetCdDriverMode`, its sibling on the previous line.
+
+**Callee evidence** (`0x8002C448`): the first instruction is `beqz a0,...`, so
+`$a0` is read before it is written. The definition in `src/code_179d8_e.c`
+(`s32 GetVabDriverMode(s32 *arg0)`) is right: one real argument, an optional
+out-pointer written only when non-NULL.
+
+**Why the `(void)` extern is right anyway.** Its only carved caller,
+`GetActiveDataSourceDriverMode` (this unit, matched), takes no arguments of its
+own and sets none:
+
+```
+80026fc0:  jal   8002c448 <GetVabDriverMode>
+80026fc4:  nop                            <- no $a0 setup, in retail
+```
+
+`$a0` is whatever that function's own caller left, and the callee's NULL test
+consumes it. A real one-parameter prototype would force an argument retail does
+not have.
+
+**Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
+added to `src/code_171e0.c:231`. Oracle green.
