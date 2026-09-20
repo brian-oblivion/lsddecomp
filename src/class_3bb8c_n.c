@@ -152,15 +152,34 @@ struct ObjSlotAC {
     ObjSlotACMethods *methods; /* +0x000 */
 };
 
-/* STALL, 80/86 words (6 short) -- see docs/match-reports/func_80054850.md.
- * Preserved near-miss body: */
+/* Local view: D_8008AB68/D_8008AB6C and D_8008AB70/D_8008AB74 are two
+ * adjacent 8-byte pairs, and this unit copies each into a local pair as a
+ * WHOLE-STRUCT assignment rather than field by field.  That is not a style
+ * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call
+ * invalidate_memory(), dropping every cached memory value, which is what
+ * produces retail's otherwise inexplicable reload of D_8008AB50 for the
+ * `== 2` test and its reload of the pair's second word right after writing
+ * it.  Written as two scalar stores, neither reload appears and the body is
+ * several words short.  Round 61; see docs/match-reports/func_80054850.md. */
+typedef struct PairXY PairXY;
+struct PairXY {
+    s32 x; /* +0x000 */
+    s32 y; /* +0x004 */
+};
+
+/* STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first
+ * real diff at word 15 (0x4508C / vram 0x8005488C) -- see
+ * docs/match-reports/func_80054850.md.  Round 61 REVISIT: 12/86 and 6 short
+ * -> 17/86 and 1 short.  Residue is one redundant `move` retail emits and
+ * two scheduling reorderings.  Preserved near-miss body: */
 #if 0
 void func_80054850(void) {
-    s32 paramA[2];
-    s32 paramB[2];
+    PairXY paramA;
+    PairXY paramB;
     s32 i;
     s32 s1;
     void **arr;
+    void **wp;
     void *obj;
     ObjSlotAC *self2;
     void *result;
@@ -168,30 +187,32 @@ void func_80054850(void) {
     if (D_8008AB50 == 0) {
         return;
     }
-    paramA[0] = D_8008AB68;
-    paramA[1] = D_8008AB6C;
+    paramA = *(PairXY *) &D_8008AB68;
     if (D_8008AB50 == 2) {
-        paramA[1] += 0x1E;
+        paramA.y += 0x1E;
     }
-    paramB[0] = D_8008AB70;
-    paramB[1] = D_8008AB74;
-
-    obj = func_800404D0(paramB, (void *) D_8008AC8C, 0x1FFF);
+    paramB = *(PairXY *) &D_8008AB70;
+    i = 1;
     s1 = 3;
+    obj = func_800404D0(&paramB, (void *) D_8008AC8C, 0x1FFF);
+    __asm__("");
     arr = D_8008E10C;
-    arr[0] = obj;
-    for (i = 1; i < 0x12; i++) {
-        obj = func_800404D0(paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
-        arr[i] = obj;
-        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], paramA);
+    wp = arr + 1;
+    *arr = obj;
+    do {
+        obj = func_800404D0(&paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
+        *wp = obj;
+        wp++;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
         s1 += 3;
-        paramA[1] += 3;
-        paramB[1] -= 7;
-    }
+        paramA.y += 3;
+        paramB.y -= 7;
+        i++;
+    } while (i < 0x12);
 
     self2 = *(ObjSlotAC **) (D_8008AC7C + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) arr[0])->methods->slot4C(arr[0], result, paramA);
+    ((ObjSlot4C *) D_8008E10C[0])->methods->slot4C(D_8008E10C[0], result, &paramA);
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
