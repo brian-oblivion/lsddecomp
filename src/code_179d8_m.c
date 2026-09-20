@@ -372,7 +372,7 @@ extern u8 D_8008E9D0;
 /* Flag byte forced on unconditionally at entry. */
 extern u8 D_8008EA1B;
 
-extern s32 func_8002CF18(s32 a0);
+extern s32 func_8002CF18(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void func_8002F20C(s32 a0, s32 a1, s32 a2, s32 a3) {
