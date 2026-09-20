@@ -514,3 +514,21 @@ value is what `ApplyPitchBendToAllVoices` sums into its own return.
 "PitchBend" rather than a vaguer name because the `a4-0x40`-centered,
 signed-threshold, curve-table shape is the textbook MIDI pitch-bend-depth
 computation, not merely "some per-voice adjustment".
+
+## Head review, round 62: the tier-A name is corroborated by the callee
+
+The naming pass rested "PitchBend" on this function's own shape (a 0-127
+depth centred at `0x40`, signed into `bendCurveUp`/`bendCurveDown`). That
+reading is right, and there is a second, independent line of evidence the
+pass did not cite: the callee it writes its result through,
+`func_8002E038` (`src/code_179d8_l.c:183`), is a note-to-pitch converter on
+its face. It computes `origA0 + 0x3C - e->unk4`, divides the result by 12,
+indexes a table 16 entries per semitone, and finishes with a shift by
+`q12 - 5`. `0x3C` is 60, MIDI middle C; 12 is semitones per octave; the
+trailing shift is octave scaling of an SPU sample-rate value. So the value
+this function bends is a PITCH, established by the arithmetic of the
+function that produces it, not only by the MIDI-shaped depth encoding here.
+
+Two independent kinds of evidence, so tier A stands. `func_8002E038` is
+itself a naming candidate (a note-to-SPU-pitch converter) for whoever takes
+`code_179d8_l`; it was correctly left alone this round as out of unit.
