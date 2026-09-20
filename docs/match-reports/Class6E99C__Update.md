@@ -1,9 +1,11 @@
-# func_8003FF44 -- MATCH (54/54 words, first attempt)
+> Renamed from `func_8003FF44` on 2026-09-20 (tools/rename.py). Address 0x8003ff44.
+
+# Class6E99C__Update -- MATCH (54/54 words, first attempt)
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slot98` (`+0x098`).
 
 ```c
-void func_8003FF44(Class6E99CObj *self, void *a1, s32 a2) {
+void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
     s32 old;
 
     if (a2 != 2) {

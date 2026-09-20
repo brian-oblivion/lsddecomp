@@ -1954,9 +1954,9 @@ struct Class6E99CMethods {
        mode value. */
     void (*slot68)(Class6E99CObj *self, s32 a1);
     u8 pad06C_[0x098 - 0x06C];
-    /* +0x098, OBSERVED: func_8003FF44's own call target when `a2 == 2`.
+    /* +0x098, OBSERVED: Class6E99C__Update's own call target when `a2 == 2`.
        This unit's own function. */
-    void (*slot98)(Class6E99CObj *self, void *a1, s32 a2); /* +0x098, func_8003FF44 */
+    void (*slot98)(Class6E99CObj *self, void *a1, s32 a2); /* +0x098, Class6E99C__Update */
     u8 pad09C[0x0B8 - 0x09C];
     /* +0x0B8/+0x0CC, IS ClassEAC0Methods's own +0x0B8/+0x0CC
        (Obj6EAC0__SetColor/Obj6EAC0__SetMask, both code_2cc8c_f) -- identical
@@ -2000,7 +2000,7 @@ struct Class6E99CObj {
        only matches when the source type is unsigned. */
     u16 unk60;
     u16 unk62;
-    /* +0x064/+0x065/+0x066, OBSERVED: func_8003FF44 -- three independent
+    /* +0x064/+0x065/+0x066, OBSERVED: Class6E99C__Update -- three independent
        byte counters, each incremented by the low byte of `unk74` when the
        corresponding bit of `unk78` (0x4/0x2/0x1) is set. */
     u8 unk64;
@@ -2017,17 +2017,17 @@ struct Class6E99CObj {
     /* +0x074, OBSERVED: Class6E99C__FinishConstruct (ctor override sets it to 0xA),
        func_80040024 (negated on the "already had one" path), func_8004001C
        (a plain setter, `self->unk74 = a1`); also read a BYTE at a time by
-       func_8003FF44 via its low byte. */
+       Class6E99C__Update via its low byte. */
     s32 unk74;
-    s32 unk78;                 /* +0x078, OBSERVED: func_80040154/func_8003FF44/
+    s32 unk78;                 /* +0x078, OBSERVED: func_80040154/Class6E99C__Update/
                                    func_800403F8, a flags/mode word tested
                                    against 0xF and against bit masks
                                    0x1/0x2/0x4 */
     /* +0x07C, OBSERVED: Class6E99C__FinishConstruct (ctor override zeroes it),
-       func_8003FF44 (tested `== 9`), func_80040154 (set from its own a3
+       Class6E99C__Update (tested `== 9`), func_80040154 (set from its own a3
        parameter). */
     s32 unk7C;
-    s32 unk80;                 /* +0x080, OBSERVED: func_8003FF44, a countdown */
+    s32 unk80;                 /* +0x080, OBSERVED: Class6E99C__Update, a countdown */
     s32 unk84;                 /* +0x084, OBSERVED: func_80040154, a division result */
     /* +0x088/+0x08C, OBSERVED: func_80040490 (read via `lhu`, into `s16`
        unk60/unk62 -- a narrowing read of only the low halfword) and

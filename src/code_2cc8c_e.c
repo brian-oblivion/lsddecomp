@@ -70,7 +70,7 @@ void Class6E99C__FinishConstruct(Class6E99CObj *self, s32 a1) {
     self->unk98 = 0;
 }
 
-void func_8003FF44(Class6E99CObj *self, void *a1, s32 a2) {
+void Class6E99C__Update(Class6E99CObj *self, void *a1, s32 a2) {
     s32 old;
 
     if (a2 != 2) {
