@@ -100,7 +100,12 @@ void func_8004001C(Class6E99CObj *self, s32 a1) {
     self->unk74 = a1;
 }
 
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 29/35 words, length exact. Residue: instruction
+ * scheduling (retail materializes `li $a1,1` immediately after the
+ * slotDC dispatch, before computing idx*3; this body defers it to just
+ * before the slotB8 call) (docs/match-reports/func_80040024.md).
+ * Hand-derived. */
 void func_80040024(Class6E99CObj *self) {
     s32 idx;
 
@@ -112,8 +117,9 @@ void func_80040024(Class6E99CObj *self) {
     self->unk6C = 1;
     self->unk74 = -self->unk74;
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040024);
+#endif
 
 #if 0
 void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
