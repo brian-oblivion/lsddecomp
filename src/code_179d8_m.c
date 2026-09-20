@@ -1,52 +1,68 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * code_179d8_m -- part of the game's SPU sound driver: the per-voice
+ * envelope/fade stepper, the per-tick voice updater, and a NoteOn/NoteOff
+ * pair for a 24-voice (0..0x17) PS1 SPU wavetable player driven by MIDI-
+ * shaped events (confirmed: code_179d8_k.c's caller switches on a status
+ * byte with the MIDI 0x90/0xB0/0xC0/0xE0/0xFF nibbles; D_8006DAD4 is the
+ * PS1 SPU's real hardware base, 0x1F801C00, per func_8002DDBC's report in
+ * code_179d8_l). Plain free functions, no vtable -- `tools/classtable.py`
+ * lists no method table at these addresses.
  *
- * code_179d8_m -- BACK half of what was the `code_179d8_mid_c` asm
- * remainder: functions 161..172 of the original 274-function code_179d8
- * monolith, 0x1ECD8..0x20ADC (vram 0x8002E4D8..0x800302DC), 12 functions.
- * Carved round 24 (2026-09-08).  `code_179d8_l` is the front half and
- * carries the shared carve-time census; `code_179d8_j` follows behind.
+ * Twelve functions, functions 161..172 of the original 274-function
+ * code_179d8 monolith, 0x1ECD8..0x20ADC (vram 0x8002E4D8..0x800302DC).
+ * Carved round 24 (2026-09-08); `code_179d8_l` is the front half (owns the
+ * shared carve-time census) and `code_179d8_j` follows behind. No jump
+ * table, no rodata attach, no BIOS trampoline (every function ends in its
+ * own `jr $ra`, none open on `$sp`) -- see code_179d8_l's header for the
+ * full carve-time survey.
  *
- * WHY IT WAS UNCARVED, AND WHY THAT VERDICT IS DEAD.  The old remainder was
- * left as "the addiu-$at dense heart of this monolith".  `addiu_at` was
- * RESOLVED in round 21 (maspsx `--addiu-at`;
- * docs/research/addiu-at-blocker.md).  Re-censused 2026-09-08 with the four
- * screens, canonical shell forms (`grep -A2` FORWARD for nop_mflo_mfhi):
+ * WHAT EACH FUNCTION DOES (see docs/match-reports/<name>.md for the full
+ * derivation and evidence):
+ *   - StartNote / StopNote: a matched NoteOn/NoteOff pair. Given a packed
+ *     [screen|slot] identity, note, volume/program and (for StartNote) a
+ *     velocity and a computed stereo pan split, StartNote registers a new
+ *     active-voice record; StopNote scans every voice for one whose
+ *     identity fields match and releases it, returning the count released.
+ *   - PlaySound / PlayFixedSound: find a free voice (func_8002CF18, in
+ *     code_179d8_l) and, if one exists, key it on (func_8002DDBC, also
+ *     code_179d8_l) with the caller's parameters or, for PlayFixedSound,
+ *     two hardcoded constants.
+ *   - BeginVoiceFade / StepVoiceFade: a linear-ramp pair over the
+ *     gVoiceFade* per-voice arrays -- Begin sets a start/target/step-rate;
+ *     Step advances the accumulator (throttled by an interval/countdown
+ *     pair), clamps at the target, and writes the resulting stereo output
+ *     level.
+ *   - StepVoiceEnvelope: the same accumulate-until-limit shape over its
+ *     own gVoiceEnv* family, but with no "Begin" counterpart in this
+ *     unit -- whatever sets gVoiceEnvActive/gVoiceEnvStep/gVoiceEnvLimit
+ *     is still undecompiled elsewhere. func_8002E308 in code_179d8_l opens
+ *     with the identical prologue/argument-narrowing shape and is worth
+ *     checking as that counterpart.
+ *   - UpdateVoiceEnvelopes: the per-tick dispatcher. Maintains a 16-slot
+ *     ring buffer of per-tick voice-activity bitmasks; when a voice has
+ *     shown no activity for 16 consecutive ticks it force-releases it
+ *     (disabling the SPU noise generator if that voice was in noise
+ *     state); then calls StepVoiceEnvelope/StepVoiceFade for every voice
+ *     whose respective flag is set. Called once at the end of
+ *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
+ *     meant to run every frame thereafter.
+ *   - ClearNoiseVoices: releases every voice whose state byte reads
+ *     exactly 2 (the same value StopNote/UpdateVoiceEnvelopes/func_8002CF18
+ *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
+ *   - ApplyVoicePitchBend / ApplyPitchBendToAllVoices: match a voice by
+ *     identity and apply a curve-table-driven pitch bend from a 0-127
+ *     depth value centered at 0x40, writing the result through
+ *     func_8002E038; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
+ *     and then runs this over every voice, returning the count affected.
+ *   - InitSpuDriver: the SPU driver's init call -- _spu_setInTransfer,
+ *     SpuInitMalloc, zeroes every per-voice table and the two master
+ *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
+ *     UpdateVoiceEnvelopes once.
  *
- *   12 of 12 CLEAN -- the whole nop_mflo_mfhi cluster (3 functions) fell in
- *   the front half, so this unit has NO blocked function at all.  Zero
- *   gp_rel, zero nop_mflo_mfhi, zero `jr $t2` trampolines.
- *
- * Sizes, cheapest first -- four functions at 32..60 words:
- *   func_8002F368   32w   func_8002F20C   38w   func_8002F2A4   49w
- *   func_8002F610   60w   func_8002E874  116w   func_800300D0  131w
- *   func_8002F3E8  138w   func_8002EA44  228w   func_8002E4D8  231w
- *   func_8002F700  241w   func_8002EDD4  270w   func_8002FAC4  387w
- *
- * func_8002E874 is a near-identical sibling of func_8002E308 in
- * code_179d8_l -- same prologue (`addu $t3, $a0, $zero`), same s16
- * argument-narrowing shape, same early-out branch.  That opening is
- * REGISTER PRESSURE, not a BIOS trampoline; checked by hand at carve time
- * because the `jr $t2` screen is blind to variants.  If you match it, say
- * so in the report: the other unit's runner is deriving the same shape.
- *
- * Owns NO jump table and needs no rodata attach (see code_179d8_l's header
- * for the survey).  Boundary checks both sides: no function has more than
- * one `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero
- * `alabel`, and the frameless ones open on their own arguments or on a
- * global, never on $sp.
- *
- * Expect this slice to span more than one class; identify each with
- * tools/classtable.py rather than assuming the unit has one.
+ * STALLS: ApplyVoicePitchBend, StartNote, UpdateVoiceEnvelopes,
+ * StepVoiceEnvelope, StepVoiceFade -- all five are the same "whole-function
+ * register-count decision predates any of the function's own locals"
+ * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
 #include "common.h"
 
@@ -54,14 +70,14 @@
  * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
  * saves ZERO callee-saved registers and addresses NOTHING via $sp beyond
  * the prologue/epilogue immediate itself, confirmed via grep -- textbook
- * pure-padding shape). See docs/match-reports/func_8002E4D8.md for the
+ * pure-padding shape). See docs/match-reports/StepVoiceEnvelope.md for the
  * full derivation this body is otherwise unchanged from.
  *
  * This function sits FIRST in ROM order in this unit, so the shared
  * record-family types its sibling stalls also use (Rec34Half, Rec34HalfU,
  * Rec16D7F0, ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
  * defined HERE instead of duplicated -- their old definitions further
- * down this file (originally written for func_8002EA44's isolated splice)
+ * down this file (originally written for StepVoiceFade's isolated splice)
  * are removed; the plain externs that used to accompany them there are
  * left in place and now just reference these same, earlier-defined types
  * (a harmless duplicate extern declaration, not a redefinition). Same
@@ -71,12 +87,12 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half D_8008D9A4[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
-extern Rec34Half D_8008D9AE[];
+extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by StepVoiceEnvelope when it reaches gVoiceEnvLimit */
+extern Rec34Half gVoiceEnvStep[]; /* per-tick increment/decrement applied to gVoiceEnvAccum */
+extern Rec34Half gVoiceEnvInterval[]; /* ticks between steps (0 = every tick), same throttle idiom as gVoiceFadeInterval below */
+extern Rec34Half gVoiceEnvCountdown[]; /* countdown to the next step, reloaded from gVoiceEnvInterval */
+extern Rec34Half gVoiceEnvAccum[]; /* running envelope value */
+extern Rec34Half gVoiceEnvLimit[]; /* value the envelope clamps to once reached */
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -94,9 +110,9 @@ extern u8 D_8008D970[];
 
 typedef struct {
     u8 pad[0x12];
-    u16 unk12; /* +0x12 */
+    u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per StartNote's report */
     u8 pad14[0x18 - 0x14];
-    u8 unk18; /* +0x18 */
+    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in StepVoiceEnvelope/StepVoiceFade */
 } ObjE970;
 extern ObjE970 *D_8008E970;
 
@@ -109,7 +125,7 @@ extern u8 D_8008EA1A;
 
 extern s16 D_8008E8C0;
 
-/* STALL -- see docs/match-reports/func_8002E4D8.md. Round 48 (echo):
+/* STALL -- see docs/match-reports/StepVoiceEnvelope.md. Round 48 (echo):
  * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
  * frame gap: -0x10 -> -0x18, byte-exact vs retail; retail addresses
  * NOTHING via $sp beyond the prologue/epilogue immediate itself and
@@ -121,67 +137,67 @@ extern s16 D_8008E8C0;
  * section already explored from three placements; no new residue
  * surfaced. Best body (237/231 built words, 6 words LONG) preserved there
  * in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002E4D8);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
 
 /* Same 0x34-stride channel-configuration record family documented in
  * code_179d8_j.c (Rec34D994/Rec34Byte/Rec34Half); this unit keeps its
  * own local view rather than sharing that file's header-less types.
  * Six independent 2-bytes-apart symbols share this one shape, same
  * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-extern Rec34Half D_8008D9B0[]; /* "interpolating" flag */
-extern Rec34Half D_8008D9B2[]; /* "interpolating" flag (companion pair) */
-extern Rec34Half D_8008D9B4[]; /* step/quotient */
-extern Rec34Half D_8008D9B6[]; /* step/quotient (companion pair) */
-extern Rec34Half D_8008D9B8[]; /* saved start value */
-extern Rec34Half D_8008D9BA[]; /* saved end value */
+extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by BeginVoiceFade, cleared by StepVoiceFade when gVoiceFadeAccum reaches gVoiceFadeLimit */
+extern Rec34Half gVoiceFadeStep[]; /* per-tick increment/decrement applied to gVoiceFadeAccum */
+extern Rec34Half gVoiceFadeInterval[]; /* ticks between steps (0 = every tick); same throttle idiom as gVoiceEnvInterval above */
+extern Rec34Half gVoiceFadeCountdown[]; /* countdown to the next step, reloaded from gVoiceFadeInterval */
+extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to BeginVoiceFade's "from" argument */
+extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, BeginVoiceFade's "to" argument */
 
-void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3) {
+void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
 
     if (a1 == a2) {
         return;
     }
-    D_8008D9B0[a0].unk0 = 1;
-    D_8008D9B8[a0].unk0 = a1;
-    D_8008D9BA[a0].unk0 = a2;
+    gVoiceFadeActive[a0].unk0 = 1;
+    gVoiceFadeAccum[a0].unk0 = a1;
+    gVoiceFadeLimit[a0].unk0 = a2;
     if ((a1 - a2 < 0 ? a2 - a1 : a1 - a2) < a3) {
         q = a3 / (a1 - a2);
-        D_8008D9B2[a0].unk0 = 1;
-        D_8008D9B4[a0].unk0 = q;
-        D_8008D9B6[a0].unk0 = q;
+        gVoiceFadeStep[a0].unk0 = 1;
+        gVoiceFadeInterval[a0].unk0 = q;
+        gVoiceFadeCountdown[a0].unk0 = q;
     } else {
         q = (a1 - a2) / a3;
-        D_8008D9B4[a0].unk0 = 0;
-        D_8008D9B2[a0].unk0 = q;
+        gVoiceFadeInterval[a0].unk0 = 0;
+        gVoiceFadeStep[a0].unk0 = q;
     }
 }
 
 
-/* STALL -- see docs/match-reports/func_8002EA44.md. Round 48 (echo):
+/* STALL -- see docs/match-reports/StepVoiceFade.md. Round 48 (echo):
  * tested charlie's frame-padding lever (u8 dead[8], sized to the current
  * build's frame gap: -0x10 -> -0x18, byte-exact vs retail). Frame realigns
  * exactly but built length is UNCHANGED (222/228, still 6 words short) --
- * same negative-for-length-closure result as func_8002F700. The
+ * same negative-for-length-closure result as UpdateVoiceEnvelopes. The
  * already-diagnosed missing early-persisted value ($t1 = idx<<3, held live
  * across the whole function) is still the real gap; frame padding does not
  * touch it. Best body (222/228 built words, 6 words short) preserved there
  * in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002EA44);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceFade);
 
 extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
-extern void func_8002F700(void);
+extern void UpdateVoiceEnvelopes(void);
 
-extern u8 D_8008DEB0[];
+extern u8 gSpuMallocArea[];
 extern s16 D_8008E9FC;
 extern s16 D_8008E84C;
-extern s16 D_8008E260;
-extern s16 D_8008E262;
+extern s16 gMasterVolL;
+extern s16 gMasterVolR;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
-extern u8 D_8008EA40;
+extern u8 gDisableVoiceStarveScan;
 extern s16 D_8008E938;
 
 extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
@@ -198,10 +214,10 @@ extern Rec34Half D_8008D990[];
 extern Rec34Half D_8008D98C[];
 extern Rec34Half D_8008D98E[];
 extern Rec34Half D_8008D998[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
+extern Rec34Half gVoiceEnvStep[];
+extern Rec34Half gVoiceEnvInterval[];
+extern Rec34Half gVoiceEnvCountdown[];
+extern Rec34Half gVoiceEnvAccum[];
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -215,7 +231,7 @@ typedef struct {
 } Rec34ByteEdd4;
 extern Rec34ByteEdd4 D_8008D992[]; /* byte field, forced to 0x40 at init */
 extern Rec34ByteEdd4 D_8008D9A3Edd4[] __asm__("D_8008D9A3");
-extern Rec34Half D_8008D9A4[];
+extern Rec34Half gVoiceEnvActive[];
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -243,17 +259,17 @@ extern ObjDAD4Edd4 *D_8006DAD4Edd4 __asm__("D_8006DAD4");
  * two separately-named locals (the natural, more readable choice) gives a
  * WORSE result than either leaving `a0` alone or this single-variable
  * reuse; the reuse itself is load-bearing, not cosmetic.  See
- * docs/match-reports/func_8002EDD4.md for the full derivation, the
+ * docs/match-reports/InitSpuDriver.md for the full derivation, the
  * permuter trace, and why the naive two-variable translation regresses
  * sharply (47/270) despite being semantically identical. */
-void func_8002EDD4(s32 a0) {
+void InitSpuDriver(s32 a0) {
     s16 i;
     s32 scratch;
 
     _spu_setInTransfer(0);
     D_8008E9FC = 0;
     D_8008E84C = 0;
-    SpuInitMalloc(0x20, D_8008DEB0);
+    SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {
         ((u16 *) D_8008D7F0)[(u16) i] = 0;
@@ -296,16 +312,16 @@ void func_8002EDD4(s32 a0) {
         D_8008D99CEdd4[(u16) i].unk0 = 0xFF;
         D_8008D990[(u16) i].unk0 = 0;
         D_8008D992[(u16) i].unk0 = 0x40;
-        D_8008D9A4[(u16) i].unk0 = 0;
-        D_8008D9A6[(u16) i].unk0 = 0;
-        D_8008D9A8[(u16) i].unk0 = 0;
-        D_8008D9AA[(u16) i].unk0 = 0;
-        D_8008D9B0[(u16) i].unk0 = 0;
-        D_8008D9B2[(u16) i].unk0 = 0;
-        D_8008D9B4[(u16) i].unk0 = 0;
-        D_8008D9B6[(u16) i].unk0 = 0;
-        D_8008D9B8[(u16) i].unk0 = 0;
-        D_8008D9AC[(u16) i].unk0 = 0;
+        gVoiceEnvActive[(u16) i].unk0 = 0;
+        gVoiceEnvStep[(u16) i].unk0 = 0;
+        gVoiceEnvInterval[(u16) i].unk0 = 0;
+        gVoiceEnvCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeActive[(u16) i].unk0 = 0;
+        gVoiceFadeStep[(u16) i].unk0 = 0;
+        gVoiceFadeInterval[(u16) i].unk0 = 0;
+        gVoiceFadeCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeAccum[(u16) i].unk0 = 0;
+        gVoiceEnvAccum[(u16) i].unk0 = 0;
 
         ((s16 *) D_8006DAD4Edd4)[woff + 3] = 0x200;   /* +0x6 */
         scratch = woff;
@@ -336,8 +352,8 @@ void func_8002EDD4(s32 a0) {
         D_8008E22C &= ~D_80090C64;
     }
 
-    D_8008E260 = 0x3FFF;
-    D_8008E262 = 0x3FFF;
+    gMasterVolL = 0x3FFF;
+    gMasterVolR = 0x3FFF;
     D_8008E228 = 0;
     D_8008E22C = 0;
     D_80090C60 = 0;
@@ -345,10 +361,10 @@ void func_8002EDD4(s32 a0) {
     D_8008E234 = 0;
     D_8008E258 = 0;
     D_8008E25C = 0;
-    D_8008EA40 = 0;
+    gDisableVoiceStarveScan = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
-    func_8002F700();
+    UpdateVoiceEnvelopes();
 }
 
 /* "Currently selected channel" scratch global: written as a side
@@ -375,7 +391,7 @@ extern u8 D_8008EA1B;
 extern s32 func_8002CF18(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
-void func_8002F20C(s32 a0, s32 a1, s32 a2, s32 a3) {
+void PlaySound(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
@@ -389,7 +405,7 @@ void func_8002F20C(s32 a0, s32 a1, s32 a2, s32 a3) {
 /* Same 0x34-stride channel-configuration record family documented in
  * code_179d8_j.c (Rec34D994/Rec34Byte); this unit keeps its own local
  * view rather than sharing that file's header-less types. Rec34Half
- * itself is declared above, before its first user func_8002E874. */
+ * itself is declared above, before its first user BeginVoiceFade. */
 typedef struct {
     u8 unk0; /* +0x0 */
     u8 pad1[0x34 - 0x1];
@@ -410,7 +426,7 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void func_8002F2A4(void) {
+void ClearNoiseVoices(void) {
     s16 i;
 
     for (i = 0; i < D_8008E9D0; i++) {
@@ -423,7 +439,7 @@ void func_8002F2A4(void) {
     }
 }
 
-void func_8002F368(s32 a0, s32 a1) {
+void PlayFixedSound(s32 a0, s32 a1) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
@@ -455,7 +471,7 @@ extern Rec34S16 D_8008D988[];
  * width (`lbu`, same offset) elsewhere in this same function; the byte
  * view is reached via a plain pointer cast, same idiom as D_8008EA26's
  * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
- * here even though func_800300D0 (above) reads the SAME symbol signed
+ * here even though StopNote (above) reads the SAME symbol signed
  * (`lh`) -- reinterpreted through a cast rather than redeclared, since
  * one extern symbol cannot carry two conflicting C types in one file. */
 typedef struct {
@@ -468,8 +484,8 @@ extern Rec34U16 D_8008D99C[];
 extern u8 D_8008EA13;
 
 /* Pointer to a 0x20-byte-stride table. Originally only the two
- * trailing byte fields func_8002F3E8 reads (unkC/unkD) were named;
- * func_8002FAC4 (below) additionally needs unk0/unk1/unk2/unk3/unk4/
+ * trailing byte fields ApplyVoicePitchBend reads (unkC/unkD) were named;
+ * StartNote (below) additionally needs unk0/unk1/unk2/unk3/unk4/
  * unk5/unk6/unk7/unk16, all in the same struct (no offset conflicts,
  * per this project's convention of extending rather than duplicating
  * a local view when the fields don't overlap). */
@@ -483,8 +499,8 @@ typedef struct {
     u8 unk6; /* +0x6 */
     u8 unk7; /* +0x7 */
     u8 pad8[0xC - 0x8];
-    u8 unkC; /* +0xC */
-    u8 unkD; /* +0xD */
+    u8 bendCurveUp; /* +0xC -- multiplier used when the bend threshold is positive, per ApplyVoicePitchBend's report */
+    u8 bendCurveDown; /* +0xD -- multiplier used when the bend threshold is negative */
     u8 pad0E[0x16 - 0xE];
     u8 unk16; /* +0x16 */
     u8 pad17[0x20 - 0x17];
@@ -508,9 +524,9 @@ extern u8 D_8008EA18;
 
 extern s16 func_8002E038(u16 a0, u16 a1);
 
-/* STALL -- see docs/match-reports/func_8002F3E8.md. Best body reached
+/* STALL -- see docs/match-reports/ApplyVoicePitchBend.md. Best body reached
  * (77/138 words, byte-exact length) preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F3E8);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", ApplyVoicePitchBend);
 
 /* "Currently selected channel" scratch global -- same idiom as
  * D_8008EA26 above, write-only here (see code_179d8_j.c's own reading
@@ -518,9 +534,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F3E8);
 extern u16 D_8008EA22;
 
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 func_8002F3E8(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
+extern s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
 
-s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
+s32 ApplyPitchBendToAllVoices(s16 a0, s16 a1, s16 a2, u16 a3) {
     s16 i;
     s32 sum;
 
@@ -528,12 +544,12 @@ s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
     D_8008EA22 = a0;
     sum = 0;
     for (i = 0; i < D_8008E9D0; i++) {
-        sum += func_8002F3E8(i, a0, a1, a2, a3);
+        sum += ApplyVoicePitchBend(i, a0, a1, a2, a3);
     }
     return sum;
 }
 
-/* STALL -- see docs/match-reports/func_8002F700.md. Round 48 (echo):
+/* STALL -- see docs/match-reports/UpdateVoiceEnvelopes.md. Round 48 (echo):
  * tested charlie's func_800351D0 frame-padding lever (u8 dead[8], sized to
  * the CURRENT BUILD's frame gap: -0x30 -> -0x38, byte-exact vs retail) plus
  * an "s32 count" fix (avoid a spurious `andi 0xff` mask GCC inserted for a
@@ -544,19 +560,19 @@ s32 func_8002F610(s16 a0, s16 a1, s16 a2, u16 a3) {
  * does not by itself close a missing-CONTENT gap the way it did for
  * func_800351D0 (which also gained words from tail duplication). Best
  * body (236/241 built words, 5 words short) preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002F700);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", UpdateVoiceEnvelopes);
 
-/* STALL -- see docs/match-reports/func_8002FAC4.md. Round 48 (echo):
+/* STALL -- see docs/match-reports/StartNote.md. Round 48 (echo):
  * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
  * frame gap: 0x140 -> 0x148, byte-exact vs retail). THIRD confirmed
- * negative for length closure this round (same as func_8002F700 and
- * func_8002EA44 above) -- built length UNCHANGED (402/387, still 15
+ * negative for length closure this round (same as UpdateVoiceEnvelopes and
+ * StepVoiceFade above) -- built length UNCHANGED (402/387, still 15
  * words LONG). This function's own report already diagnoses its gap as
  * two unrelated residues (an early-materialization scheduling point, and
  * a mid-loop addressing-cost difference for D_8008EA26 and neighbors) --
  * frame padding does not touch either. Best body (402/387 built words,
  * 15 words LONG) preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", func_8002FAC4);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StartNote);
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
  * 16 channels in the first word, next 16 in the second), each paired
@@ -567,7 +583,7 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-u8 func_800300D0(s16 a0, s16 a1, s16 a2, u16 a3) {
+u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
     u8 count;
 

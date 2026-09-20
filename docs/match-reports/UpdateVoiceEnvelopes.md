@@ -1,11 +1,13 @@
-# func_8002F700 -- STALL: 5 words short (236/241 built length), 93/241 raw word-match (drift-affected, not fully trustworthy), first real diff at file 0x1FF58 vram 0x8002F758 (retail's unconditional `move a2,v0`/`li t0,1`/`move a3,a0` setup inside the `count>0` block, which this C's `for` does not reproduce) -- see "Round 48 update" below
+> Renamed from `func_8002F700` on 2026-09-20 (tools/rename.py). Address 0x8002f700.
+
+# UpdateVoiceEnvelopes -- STALL: 5 words short (236/241 built length), 93/241 raw word-match (drift-affected, not fully trustworthy), first real diff at file 0x1FF58 vram 0x8002F758 (retail's unconditional `move a2,v0`/`li t0,1`/`move a3,a0` setup inside the `count>0` block, which this C's `for` does not reproduce) -- see "Round 48 update" below
 
 Unit: `src/code_179d8_m.c`. Round 26, runner bravo.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002F700.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/UpdateVoiceEnvelopes.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -34,17 +36,17 @@ every fix below.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** built length **237 words** (`objdump -t
-build/src/code_179d8_m.c.o` shows `func_8002F700` at `0x3b4` bytes = 237
+build/src/code_179d8_m.c.o` shows `UpdateVoiceEnvelopes` at `0x3b4` bytes = 237
 words, retail is 241, so 4 short exactly as titled), `funcdiff.py`'s
 in-range figure **49/241** with its own drift warning firing (matching the
 report's own caution not to trust that number as a distance measure).
 
 **One correction found during the rebuild, cosmetic only (does not affect
 the score): the preserved body's `func_800375E8(0, 0xFFFFFF)` call used a
-STALE placeholder name.** `asm/nonmatchings/code_179d8_m/func_8002F700.s`
+STALE placeholder name.** `asm/nonmatchings/code_179d8_m/UpdateVoiceEnvelopes.s`
 now names this call `SpuSetNoiseVoice` (`config/symbols.slps01556.lsdde.txt`
 line 263, Psy-Q `libspu`, from the SDK-object-linking work in later
-rounds) — same staleness class found in `func_8002EDD4`'s two SPU calls
+rounds) — same staleness class found in `InitSpuDriver`'s two SPU calls
 this round. The preserved body below has been updated to the current name;
 nothing about the residue or the score changes. No new structural axis was
 attempted this round given the time budget and the six-function work list;
@@ -52,14 +54,14 @@ the 2-word frame gap plus 2 unidentified words remain as described above.
 
 ## Signature and shape (believed fully correct in content, order and control flow)
 
-`void func_8002F700(void)` — no arguments (confirmed: `func_8002EDD4`'s own
+`void UpdateVoiceEnvelopes(void)` — no arguments (confirmed: `InitSpuDriver`'s own
 report, and this function's own prologue, never touch `$a0` before first
 overwriting it). Five phases, each independently verified against the
 disassembly instruction-by-instruction within the true `0x1ff00`-`0x202c4`
 window:
 
-1. **Ring-buffer bookkeeping.** `D_8008DE68` is a rotating index (`(x+1)
-   & 0xF`), stored back immediately; `D_8008DE6C[ringIdx]` (an `s32[16]`
+1. **Ring-buffer bookkeeping.** `gVoiceActivityRingIdx` is a rotating index (`(x+1)
+   & 0xF`), stored back immediately; `gVoiceActivityRing[ringIdx]` (an `s32[16]`
    array) is the new ring slot, zeroed.
 2. **Per-channel "ready" snapshot**, guarded by `D_8008E9D0 > 0`: for each
    channel `i`, copy `D_8006DAD4[i].unkC` (a NEW field on the already
@@ -71,9 +73,9 @@ window:
    Written with EXPLICIT WALKING POINTERS (`p98E`, `pDad`, each `++`
    advancing one whole record), not `array[i]` indexing — see "Axes tried"
    #1, the single highest-value fix this round.
-3. **Starved-channel force-release**, guarded by `D_8008EA40 == 0`: AND all
+3. **Starved-channel force-release**, guarded by `gDisableVoiceStarveScan == 0`: AND all
    FIFTEEN of the OTHER ring slots together (a plain `for (j=0;j<0xF;j++)
-   mask &= D_8008DE6C[j];` loop — note this reads only 15 of the 16 slots,
+   mask &= gVoiceActivityRing[j];` loop — note this reads only 15 of the 16 slots,
    confirmed against the raw instruction count), then for each channel
    whose bit is set in that combined mask, force-release it
    (`func_800375E8(0, 0xFFFFFF)` if `D_8008D9A3[i] == 2`, then zero it
@@ -81,8 +83,8 @@ window:
 4. Two unconditional bitmask updates:
    `D_8008E228 &= ~D_80090C60; D_8008E22C &= ~D_80090C64;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
-   `func_8002E4D8(i)` if `D_8008D9A4[i] != 0`, `func_8002EA44(i)` if
-   `D_8008D9B0[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
+   `StepVoiceEnvelope(i)` if `gVoiceEnvActive[i] != 0`, `StepVoiceFade(i)` if
+   `gVoiceFadeActive[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
    match reports).
 6. **Flag-driven per-channel field copy**, another unconditional 0..0x17
    loop, testing four independent bits of `D_8008D970[i]` (1, 4, 8, 0x10)
@@ -104,7 +106,7 @@ window:
 
 ## Struct/global knowledge derived this round
 
-- `D_8008DE68` (`s32`, ring index 0-15) and `D_8008DE6C[]` (`s32[16]`, ring
+- `gVoiceActivityRingIdx` (`s32`, ring index 0-15) and `gVoiceActivityRing[]` (`s32[16]`, ring
   buffer of per-call "channel ready" bitmasks).
 - `D_8008D98E[]`: needs an UNSIGNED 16-bit view (`Rec34HalfU2`, not the
   existing signed `Rec34Half`) — confirmed by the `lhu` re-read after the
@@ -113,7 +115,7 @@ window:
 - `D_8006DAD4` gains a THIRD independent local view in this function
   (`Rec16DAD4C`, 0x10-byte stride, fields at `+0`,`+2`,`+4`,`+6`,`+8`,`+0xA`,
   and now also `+0xC` [`u16`, read via `lhu`] beyond the six fields
-  `func_8002EDD4`'s stalled report already established) — on top of the
+  `InitSpuDriver`'s stalled report already established) — on top of the
   existing single-struct view (`+0x194`/`+0x196`) and this function's own
   final-tail single-struct-again view (`+0x188` through `+0x19A`). Three
   independent readings of the SAME base pointer in different parts of ONE
@@ -125,7 +127,7 @@ window:
   other multi-width symbol in this file).
 - `D_8008D7F6[]`: a NEW 0x10-byte-stride array, same shape as the already-
   established `Rec16D7F4`/`D_8008D7F4`.
-- `D_8008EA40` (`u8` flag), `D_8008E230`/`D_8008E234` (`s16`).
+- `gDisableVoiceStarveScan` (`u8` flag), `D_8008E230`/`D_8008E234` (`s16`).
 
 ## Axes tried, in order, with effect on built length (retail is 241 words)
 
@@ -253,14 +255,14 @@ and everything it needs was already declared upstream) and rebuilt from
 scratch.
 
 **All title figures reconfirmed exactly:** `objdump -t
-build/src/code_179d8_m.c.o` shows `func_8002F700` at `0x3b4` bytes = **237
+build/src/code_179d8_m.c.o` shows `UpdateVoiceEnvelopes` at `0x3b4` bytes = **237
 words** (retail 241, 4 short, exactly as titled), `funcdiff.py` reports
 **49/241** in-range with its drift warning firing, matching this report's
 own caution not to trust that figure as a distance measure.
 
 ### Permuter search
 
-`tools/setup-permuter.sh func_8002F700 <seed>` -- seed built from this
+`tools/setup-permuter.sh UpdateVoiceEnvelopes <seed>` -- seed built from this
 report's preserved body. Since the built length itself is short by 4
 words, the permuter's own scorer (which diffs against retail's actual
 bytes, not a realigned window) is expected to report a nonzero baseline
@@ -279,19 +281,19 @@ x 100 = 600; Deletions 10 x 100 = 1000; zero Branch differences).
 
 Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 --stack-diffs`, launched via the harness's own `run_in_background` (not
-the hand-rolled `cmd & ; echo rc=$?` pattern -- see `func_8002F3E8.md`'s
+the hand-rolled `cmd & ; echo rc=$?` pattern -- see `ApplyVoicePitchBend.md`'s
 round 37 update for why that pattern lost its exit-code marker on the
 previous search this round). **Completed cleanly with `rc=124`** (the
 search's own 900s bound, not an external kill) after **63,192
 iterations**. Best score reached: **1578** (from base 2276), saved at
-`permuter-work/func_8002F700/output-1578-1/`; no candidate reached zero.
+`permuter-work/UpdateVoiceEnvelopes/output-1578-1/`; no candidate reached zero.
 
 Diffing the 1578 candidate against the scaffold's `base.c` (both
 re-extracted to just the function body and compared) shows the
 improvement comes from materializing `count > 0` into an explicit boolean
 temporary (`new_var = count > 0; if (new_var) {...}`) rather than any
 translatable structural change -- a permuter-internal boolean-hoisting
-mutation with no natural idiomatic C phrasing, not unlike `func_8002F3E8`'s
+mutation with no natural idiomatic C phrasing, not unlike `ApplyVoicePitchBend`'s
 own best candidate this round. **Not closed; the frame-size gap and the
 associated register-class residue this report already diagnoses did not
 move.** Given this function's own report already identifies the extra
@@ -346,7 +348,7 @@ disassembly comparison meaningful instead of running through a
 
 ### Fix 2: `s32 count` instead of `u8 count` -- found BECAUSE the frame fix made the diff readable
 
-With the frame aligned, `tools/asm-differ/diff.py func_8002F700` showed a
+With the frame aligned, `tools/asm-differ/diff.py UpdateVoiceEnvelopes` showed a
 real, localized residue right after the frame/prologue: this build's
 `if (count > 0)` (with `u8 count`) compiled to an extra `andi a0,a0,0xff`
 before the `beqz`, where retail uses a single `blez a0,...` directly on the
@@ -430,9 +432,9 @@ length gap itself has closed.
  * 233/241,16/241). */
 
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
- * call, most-recent index tracked by D_8008DE68 (mod 16). */
-extern s32 D_8008DE68;
-extern s32 D_8008DE6C[];
+ * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
+extern s32 gVoiceActivityRingIdx;
+extern s32 gVoiceActivityRing[];
 
 /* 0x34-stride record family, UNSIGNED 16-bit view -- this function
  * writes it via `lhu`-driven re-reads (store, then re-check the SAME
@@ -448,8 +450,8 @@ typedef struct {
  * release" scan below. */
 
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
-extern void func_8002E4D8(s16 a0);
-extern void func_8002EA44(s16 a0);
+extern void StepVoiceEnvelope(s16 a0);
+extern void StepVoiceFade(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
 /* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
@@ -482,7 +484,7 @@ typedef struct {
     u8 padE[0x10 - 0xE];
 } Rec16DAD4C;
 
-void func_8002F700(void) {
+void UpdateVoiceEnvelopes(void) {
     s32 i = 0;
     s32 ringIdx;
     s32 *slot;
@@ -493,9 +495,9 @@ void func_8002F700(void) {
         dead[0] = 0;
     }
 
-    ringIdx = (D_8008DE68 + 1) & 0xF;
-    D_8008DE68 = ringIdx;
-    slot = &D_8008DE6C[ringIdx];
+    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
+    gVoiceActivityRingIdx = ringIdx;
+    slot = &gVoiceActivityRing[ringIdx];
     count = D_8008E9D0;
     *slot = 0;
 
@@ -513,13 +515,13 @@ void func_8002F700(void) {
         }
     }
 
-    if (D_8008EA40 == 0) {
+    if (gDisableVoiceStarveScan == 0) {
         s32 mask;
         s32 j;
 
         mask = -1;
         for (j = 0; j < 0xF; j++) {
-            mask &= D_8008DE6C[j];
+            mask &= gVoiceActivityRing[j];
         }
 
         for (i = 0; i < D_8008E9D0; i++) {
@@ -538,11 +540,11 @@ void func_8002F700(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D9A4[i].unk0 != 0) {
-            func_8002E4D8(i);
+        if (gVoiceEnvActive[i].unk0 != 0) {
+            StepVoiceEnvelope(i);
         }
-        if (D_8008D9B0[i].unk0 != 0) {
-            func_8002EA44(i);
+        if (gVoiceFadeActive[i].unk0 != 0) {
+            StepVoiceFade(i);
         }
     }
 
@@ -600,9 +602,9 @@ void func_8002F700(void) {
 ```c
 #if 0
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
- * call, most-recent index tracked by D_8008DE68 (mod 16). */
-extern s32 D_8008DE68;
-extern s32 D_8008DE6C[];
+ * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
+extern s32 gVoiceActivityRingIdx;
+extern s32 gVoiceActivityRing[];
 
 /* 0x34-stride record family, UNSIGNED 16-bit view -- this function
  * writes it via `lhu`-driven re-reads (store, then re-check the SAME
@@ -612,11 +614,11 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34HalfU2;
 extern Rec34HalfU2 D_8008D98E[];
-extern Rec34Half D_8008D9A4[];
+extern Rec34Half gVoiceEnvActive[];
 
 /* Flag byte: when set, skip the "channel starved for N frames -> force
  * release" scan below. */
-extern u8 D_8008EA40;
+extern u8 gDisableVoiceStarveScan;
 
 extern u16 D_80090C60;
 extern u16 D_80090C64;
@@ -628,8 +630,8 @@ extern s32 D_8008E258;
 extern s32 D_8008E25C;
 
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
-extern void func_8002E4D8(s16 a0);
-extern void func_8002EA44(s16 a0);
+extern void StepVoiceEnvelope(s16 a0);
+extern void StepVoiceFade(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
 /* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
@@ -662,15 +664,15 @@ typedef struct {
     u8 padE[0x10 - 0xE];
 } Rec16DAD4C;
 
-void func_8002F700(void) {
+void UpdateVoiceEnvelopes(void) {
     s32 i = 0;
     s32 ringIdx;
     s32 *slot;
     u8 count;
 
-    ringIdx = (D_8008DE68 + 1) & 0xF;
-    D_8008DE68 = ringIdx;
-    slot = &D_8008DE6C[ringIdx];
+    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
+    gVoiceActivityRingIdx = ringIdx;
+    slot = &gVoiceActivityRing[ringIdx];
     count = D_8008E9D0;
     *slot = 0;
 
@@ -688,13 +690,13 @@ void func_8002F700(void) {
         }
     }
 
-    if (D_8008EA40 == 0) {
+    if (gDisableVoiceStarveScan == 0) {
         s32 mask;
         s32 j;
 
         mask = -1;
         for (j = 0; j < 0xF; j++) {
-            mask &= D_8008DE6C[j];
+            mask &= gVoiceActivityRing[j];
         }
 
         for (i = 0; i < D_8008E9D0; i++) {
@@ -713,11 +715,11 @@ void func_8002F700(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D9A4[i].unk0 != 0) {
-            func_8002E4D8(i);
+        if (gVoiceEnvActive[i].unk0 != 0) {
+            StepVoiceEnvelope(i);
         }
-        if (D_8008D9B0[i].unk0 != 0) {
-            func_8002EA44(i);
+        if (gVoiceFadeActive[i].unk0 != 0) {
+            StepVoiceFade(i);
         }
     }
 
@@ -769,3 +771,50 @@ void func_8002F700(void) {
 }
 #endif
 ```
+
+## Naming
+
+**UpdateVoiceEnvelopes** (was `func_8002F700`) -- Tier B. Body mostly
+evident (preserved below, 4 words short): appends this tick's voice-
+activity bitmask to a 16-slot ring buffer (`gVoiceActivityRingIdx`/
+`gVoiceActivityRing`), and once 16 consecutive ticks show a voice as
+inactive, force-releases it (silencing the SPU noise generator first if
+its state was the `2`/noise value ClearNoiseVoices also reacts to); then
+clears the active-voice mask and calls StepVoiceEnvelope/StepVoiceFade
+for every voice whose respective flag is set. Named for the dispatch
+role, which is unambiguous; the exact tick cadence (every video frame?
+every audio-driver callback?) is not established from this function's
+body alone -- it is simply called once at the end of InitSpuDriver in
+this unit, with its own logic implying a recurring caller elsewhere.
+
+## Proposed field names
+
+This function is the best-evidenced site for several of this cluster's
+shared globals, but per the ownership rule (and this round's
+call-graph-contention note on the broadcast: `code_179d8_j_b.c`, bravo's
+live unit this round, references nearly all of them) none are applied
+here -- proposing for the head to apply once no runner is live on
+`code_179d8_j_b`/`_l`/`_j`/`_j_c`/`_k`/`_p`:
+
+- `D_8008EA26` -> `gSelectedVoice` ("currently selected channel" scratch,
+  already documented `volatile`, read back via a plain `u8 *` cast --
+  see StopNote's own report for why that specific cast matters).
+- `D_8008E9D0` -> `gVoiceCount` ("loop bound for a small table of active
+  objects", consistently the upper bound of every per-voice loop in this
+  unit and its siblings).
+- `D_80090C60`/`D_80090C64` -> `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`
+  (OR'd with a per-voice bit when releasing a voice, split low/high 16
+  across the 0..0x1F channel space).
+- `D_8008E228`/`D_8008E22C` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
+  (AND-NOT'd with the enable mask above -- the actual SPU key bitmask
+  pair, per `func_8002DDBC`'s report).
+- `D_8008D970` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
+  several functions in this cluster; never fully decoded here).
+- `D_8008D9A3` -> `gVoiceState` (the byte StopNote/ClearNoiseVoices/
+  `func_8002CF18` all compare against `2` for "noise voice").
+- `D_8006DAD4` (and this unit's two local views `ObjDAD4`/`ObjDAD4Edd4`)
+  -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
+  `0x1F801C00` by `func_8002DDBC`'s report in `code_179d8_l`.
+
+Posted to the broadcast this round; see also InitSpuDriver.md's own
+`## Proposed field names`.

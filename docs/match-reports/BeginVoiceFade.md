@@ -1,4 +1,6 @@
-# func_8002E874 -- MATCHED (116/116 words)
+> Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
+
+# BeginVoiceFade -- MATCHED (116/116 words)
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 
@@ -15,31 +17,31 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half D_8008D9B0[]; /* "interpolating" flag */
-extern Rec34Half D_8008D9B2[]; /* "interpolating" flag (companion pair) */
-extern Rec34Half D_8008D9B4[]; /* step/quotient */
-extern Rec34Half D_8008D9B6[]; /* step/quotient (companion pair) */
-extern Rec34Half D_8008D9B8[]; /* saved start value */
-extern Rec34Half D_8008D9BA[]; /* saved end value */
+extern Rec34Half gVoiceFadeActive[]; /* "interpolating" flag */
+extern Rec34Half gVoiceFadeStep[]; /* "interpolating" flag (companion pair) */
+extern Rec34Half gVoiceFadeInterval[]; /* step/quotient */
+extern Rec34Half gVoiceFadeCountdown[]; /* step/quotient (companion pair) */
+extern Rec34Half gVoiceFadeAccum[]; /* saved start value */
+extern Rec34Half gVoiceFadeLimit[]; /* saved end value */
 
-void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3) {
+void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
 
     if (a1 == a2) {
         return;
     }
-    D_8008D9B0[a0].unk0 = 1;
-    D_8008D9B8[a0].unk0 = a1;
-    D_8008D9BA[a0].unk0 = a2;
+    gVoiceFadeActive[a0].unk0 = 1;
+    gVoiceFadeAccum[a0].unk0 = a1;
+    gVoiceFadeLimit[a0].unk0 = a2;
     if ((a1 - a2 < 0 ? a2 - a1 : a1 - a2) < a3) {
         q = a3 / (a1 - a2);
-        D_8008D9B2[a0].unk0 = 1;
-        D_8008D9B4[a0].unk0 = q;
-        D_8008D9B6[a0].unk0 = q;
+        gVoiceFadeStep[a0].unk0 = 1;
+        gVoiceFadeInterval[a0].unk0 = q;
+        gVoiceFadeCountdown[a0].unk0 = q;
     } else {
         q = (a1 - a2) / a3;
-        D_8008D9B4[a0].unk0 = 0;
-        D_8008D9B2[a0].unk0 = q;
+        gVoiceFadeInterval[a0].unk0 = 0;
+        gVoiceFadeStep[a0].unk0 = q;
     }
 }
 ```
@@ -59,10 +61,10 @@ standard div-by-zero/`INT_MIN`-overflow `break` guards), not a jump
 through a table. `code_179d8_l`'s runner (charlie, this round) is deriving
 the same opening shape from the sibling side; this confirms it.
 
-`D_8008D9B0`..`D_8008D9BA` are six 2-bytes-apart symbols in the SAME
+`gVoiceFadeActive`..`gVoiceFadeLimit` are six 2-bytes-apart symbols in the SAME
 0x34-byte-stride channel-configuration record family `code_179d8_j.c`
 documents (`Rec34D994`, `Rec34Byte`) -- this unit's own local
-`Rec34Half` type (already declared for `func_8002F2A4`'s `D_8008D98C`,
+`Rec34Half` type (already declared for `ClearNoiseVoices`'s `D_8008D98C`,
 hoisted above this function since it is the earlier ROM-order user).
 
 ## Shape
@@ -70,8 +72,8 @@ hoisted above this function since it is the earlier ROM-order user).
 Given an index `a0` and three `s16` values `a1` (start), `a2` (end), `a3`
 (a rate/threshold): if `a1 == a2` there is nothing to interpolate, return
 immediately. Otherwise, UNCONDITIONALLY record the start/end pair and set
-an "interpolating" flag (`D_8008D9B0[a0]=1`, `D_8008D9B8[a0]=a1`,
-`D_8008D9BA[a0]=a2`) -- this happens regardless of which branch below is
+an "interpolating" flag (`gVoiceFadeActive[a0]=1`, `gVoiceFadeAccum[a0]=a1`,
+`gVoiceFadeLimit[a0]=a2`) -- this happens regardless of which branch below is
 taken, a fact the disassembly states plainly but that is easy to
 misattribute as "only in the close case" on a first read (see below).
 Then branch on whether `abs(a1 - a2) < a3`:
@@ -79,11 +81,11 @@ Then branch on whether `abs(a1 - a2) < a3`:
 - **"Close" (the gap is smaller than the rate):** compute
   `a3 / (a1 - a2)` (note: the actual signed difference, NOT its absolute
   value -- so this quotient can be negative), and store it into BOTH
-  `D_8008D9B4[a0]` and `D_8008D9B6[a0]`, with `D_8008D9B2[a0]` set to the
+  `gVoiceFadeInterval[a0]` and `gVoiceFadeCountdown[a0]`, with `gVoiceFadeStep[a0]` set to the
   constant `1`.
 - **"Far" (the gap is at least the rate):** compute `(a1 - a2) / a3`
   (dividend and divisor swapped from the close case), store it into
-  `D_8008D9B2[a0]`, and clear `D_8008D9B4[a0]` to `0`.
+  `gVoiceFadeStep[a0]`, and clear `gVoiceFadeInterval[a0]` to `0`.
 
 Both divisions are variable (non-constant) `s16`/`s16` divisions, which
 this compiler expands to the standard MIPS `div` idiom with explicit
@@ -102,16 +104,16 @@ ordinary C, no special handling needed.
    optimization level, AND -- more importantly -- **I had misread which
    instructions were inside the conditional at all.** Building this gave a
    completely different, much-shorter control-flow shape with the
-   `D_8008D9B0`/`B8`/`BA` writes structured as part of a merged early
+   `gVoiceFadeActive`/`B8`/`BA` writes structured as part of a merged early
    computation the compiler produced from the duplicated bodies, nothing
    like retail. Effectively unusable as a diagnostic (5/116, gross
    structural mismatch, not a near-miss).
 
 2. **Second attempt: introduced an explicit `s16 absdiff = ... ? ... :
    ...;` local and a single `if (absdiff < a3) {...} else {...}`, still
-   with the `D_8008D9B0`/`B8`/`BA` writes placed INSIDE the close branch.**
+   with the `gVoiceFadeActive`/`B8`/`BA` writes placed INSIDE the close branch.**
    This was based on the same misreading carried over: I had read the
-   disassembly's `D_8008D9B0`/`B8`/`BA` block as belonging to the "close"
+   disassembly's `gVoiceFadeActive`/`B8`/`BA` block as belonging to the "close"
    path because it is followed (many instructions later) by the actual
    close/far branch, without checking whether a `beqz`/`bnez` stood
    between the writes and the entry point. It does not -- **the writes are
@@ -122,7 +124,7 @@ ordinary C, no special handling needed.
 
 3. **What worked: re-read the `.s` file instruction-by-instruction instead
    of trusting my own earlier paraphrase**, confirming with the actual
-   listing that `D_8008D9B0`/`B8`/`BA` sit STRICTLY BETWEEN the `beq
+   listing that `gVoiceFadeActive`/`B8`/`BA` sit STRICTLY BETWEEN the `beq
    .L8002EA3C` (early return) and the first `subu` that computes `a1 -
    a2` -- i.e., unconditional -- and that the close/far split is a
    SEPARATE, later `if` using the abs-value ternary. Moving those three
@@ -147,3 +149,17 @@ listing (not a new derivation, just closer reading) resolved it. The tell
 here specifically: `grep -n 'label\|beqz\|bnez\|beq\|bne\|blez\|bgez\|bltz'`
 between the point you think gates a block and the block itself -- if it's
 empty, the block runs on every path through that point.
+
+## Naming
+
+**BeginVoiceFade** (was `func_8002E874`) -- Tier B. Mechanics fully evident
+from the body: given a voice index and a from/to/rate triple, it
+unconditionally records the from/to pair and the "fading" flag into the
+`gVoiceFade*` arrays, then computes a per-tick step (and, in the
+"close" branch, a throttle interval) so that `StepVoiceFade` can advance
+the value later. What in the game actually gets faded this way (a MIDI
+CC-driven volume slide? an automatic release curve?) is not established --
+only that the destination of the ramp feeds into a stereo-volume
+computation (see StepVoiceFade's own report), which is why "Fade" rather
+than a more specific term. See the unit header comment in
+`src/code_179d8_m.c` for the cross-function picture.

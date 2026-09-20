@@ -61,12 +61,12 @@
  * are themselves addiu-$at blocked in their own units"; that is stale as of
  * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
  * ------------------------------------------------------------------------ */
-extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
-extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);
+extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 func_8002F3E8(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
+extern s16 ApplyVoicePitchBend(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
 extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
-extern void func_8002E874(s16 a0, s16 a1, s16 a2, s16 a3);
+extern void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3);
 
 /* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
  * id.  Only the two leading s16 fields this unit's own accessors touch
@@ -237,7 +237,7 @@ s32 func_80031E94(s16 p0, s16 p1, s16 p2, s16 p3)
 s32 func_80031EE8(s16 p0, s16 p1, s16 p2, s16 p3)
 {
     if ((u16) p0 < 0x18) {
-        func_8002E874(p0, p1, p2, p3);
+        BeginVoiceFade(p0, p1, p2, p3);
         return 0;
     }
     return -1;

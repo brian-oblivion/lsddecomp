@@ -1,11 +1,13 @@
-# func_8002EA44 -- STALL: 6 words short (222/228 built length -- corrected round 37, was recorded 223), 13/228 raw word-match, first diff at file 0x1F244 / vram 0x8002EA44 (frame gap fixable with the dead[8] padding idiom -- round 48 confirmed byte-exact frame recovery -- but real first-content diff is the persisted `$t1 = idx<<3` value at file 0x1F250, still unresolved)
+> Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
+
+# StepVoiceFade -- STALL: 6 words short (222/228 built length -- corrected round 37, was recorded 223), 13/228 raw word-match, first diff at file 0x1F244 / vram 0x8002EA44 (frame gap fixable with the dead[8] padding idiom -- round 48 confirmed byte-exact frame recovery -- but real first-content diff is the persisted `$t1 = idx<<3` value at file 0x1F250, still unresolved)
 
 Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002EA44.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/StepVoiceFade.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -25,12 +27,12 @@ the next attempt.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** built length **223 words** (`objdump -t
-build/src/code_179d8_m.c.o` confirms `func_8002EA44` at `0x37c` bytes = 223
+build/src/code_179d8_m.c.o` confirms `StepVoiceFade` at `0x37c` bytes = 223
 words, retail 228, so 5 short), `funcdiff.py`'s in-range figure **13/228**
 with drift (238724 bytes this run, matching the report's own figure to
 within measurement noise).
 
-**New axis: applied `func_8002E4D8`'s "woff" idiom** (declare `s16 woff;`,
+**New axis: applied `StepVoiceEnvelope`'s "woff" idiom** (declare `s16 woff;`,
 set `woff = idxCopy << 3;` as one of the function's FIRST statements,
 before any of the 0x34-stride record accesses, then store the two final
 results through flat `((s16 *) D_8008D7F2)[(u16) woff]` / `((s16 *)
@@ -38,7 +40,7 @@ D_8008D7F0)[(u16) woff]` casts instead of the `Rec16D7F0`-typed
 `array[idxCopy].unk0` form) — this is exactly the SAME "persisted `idx*8`,
 consumed once near the end for these same two arrays" shape this report's
 own "What's missing" section already named as the open mystery, and it is
-the identical fix `func_8002E4D8` (this unit's own sibling, same round)
+the identical fix `StepVoiceEnvelope` (this unit's own sibling, same round)
 used to close its analogous early-`sll`/mid-block-mask gap. **This
 REGRESSED the score**: still 223/228 built length (unchanged), but the
 in-range match dropped from 13/228 to 7/228 and out-of-range drift grew
@@ -46,13 +48,13 @@ in-range match dropped from 13/228 to 7/228 and out-of-range drift grew
 the better of the two and is what is preserved.
 
 **Why it regressed, read off `asm-differ` directly — a THIRD placement
-variant beyond `func_8002E4D8`'s own loop-vs-non-loop distinction.**
+variant beyond `StepVoiceEnvelope`'s own loop-vs-non-loop distinction.**
 Retail's actual dependency chain here is: sign-extend `a0` ONCE into a
 temp (`v1 = (s16) a0`), THEN derive `t1 = v1 << 3` (the woff-equivalent)
 FROM that already-sign-extended value, and separately reuse the SAME `v1`
 to start the 0x34-stride multiply chain — i.e. retail computes the
 sign-extension exactly once and shares it between both consumers. Placing
-`woff = idxCopy << 3;` at the very top (mirroring `func_8002E4D8`'s
+`woff = idxCopy << 3;` at the very top (mirroring `StepVoiceEnvelope`'s
 winning placement verbatim) instead computes it from the RAW,
 not-yet-sign-extended parameter as a standalone early instruction, which
 `asm-differ` shows landing as `sll t1,a0,0x3` / `move t0,a0` / `sll
@@ -65,7 +67,7 @@ original (non-woff) attempt, which never introduced the extra early
 
 **So the idiom's correct placement is a THIRD, function-specific variant,
 not just "top of function, `s16`, mask deferred to use" as
-`func_8002E4D8`'s report generalised it.** Here the shift must be derived
+`StepVoiceEnvelope`'s report generalised it.** Here the shift must be derived
 from the ALREADY-sign-extended working value the 0x34-stride chain also
 uses (i.e. computed AFTER whatever sign-extends the parameter for its
 first record-index use, not before it) — untried this round given the
@@ -75,7 +77,7 @@ mystery this report already documents below.
 
 **This is a substantially harder function than anything else in this unit
 so far, and it did not reach a "clean length, register-only residue" state
-the way `func_8002F3E8` did.** What follows is a full structural derivation
+the way `ApplyVoicePitchBend` did.** What follows is a full structural derivation
 (believed correct in its BROAD SHAPE -- every branch target and field
 access matches something in the disassembly) with a genuine, unresolved gap
 in one specific spot (see "What's missing" below).
@@ -126,10 +128,10 @@ obvious from context.
 ## Struct/global knowledge derived this round
 
 - `Rec34HalfU`: the SAME 0x34-stride record family already declared
-  (`Rec34Half`, `s16 unk0`), but `D_8008D9B2`, `D_8008D9B6` and `D_8008D9B8`
+  (`Rec34Half`, `s16 unk0`), but `gVoiceFadeStep`, `gVoiceFadeCountdown` and `gVoiceFadeAccum`
   each need an UNSIGNED (`lhu`) read at least once in this function, on top
-  of (for `D_8008D9B2`) a plain SIGNED read at a different point --
-  reinterpreted through a cast (`((Rec34HalfU *) D_8008D9B2)[a0].unk0`)
+  of (for `gVoiceFadeStep`) a plain SIGNED read at a different point --
+  reinterpreted through a cast (`((Rec34HalfU *) gVoiceFadeStep)[a0].unk0`)
   rather than redeclared, same rule as everywhere else in this file.
 - `Rec16D7F0` / `D_8008D7F0[]`, `D_8008D7F2[]`: the SAME 0x10-byte-stride
   record family `code_179d8_j.c` documents as `Rec16D7F0`.
@@ -187,13 +189,13 @@ obvious from context.
 ## Shape (believed correct)
 
 Given a record index `a0` (this function's only parameter): a
-countdown/reset gate (`D_8008D9B4[a0]` step, `D_8008D9B6[a0]` countdown,
+countdown/reset gate (`gVoiceFadeInterval[a0]` step, `gVoiceFadeCountdown[a0]` countdown,
 same "unsigned re-read after unsigned decrement, early-return if still
-positive, else reset from `D_8008D9B4`" shape as the OTHER interpolation
+positive, else reset from `gVoiceFadeInterval`" shape as the OTHER interpolation
 functions in this unit), then an accumulator update against a clamped limit
-(`D_8008D9B2`/`D_8008D9B8`/`D_8008D9BA`, the SAME "increment, clamp against
+(`gVoiceFadeStep`/`gVoiceFadeAccum`/`gVoiceFadeLimit`, the SAME "increment, clamp against
 a limit whose comparison direction depends on the increment's sign" shape
-already documented for `func_8002E874`'s and `func_800300D0`'s siblings in
+already documented for `BeginVoiceFade`'s and `StopNote`'s siblings in
 this record family). Then a four-stage 7-bit-percentage blend chain:
 combine two byte-scratch globals through the identified 16129 divisor
 (twice, once signed once unsigned) to get a base level `q2`, then apply
@@ -207,7 +209,7 @@ the two results into `D_8008D7F2`/`D_8008D7F0` and OR a flag bit into
 ## What's missing: a persisted early value that doesn't reduce to anything I could name
 
 Retail computes `$t1 = (s16) a0 << 3` as its SECOND instruction (right
-after sign-extending the parameter, BEFORE even reading `D_8008D9B4[a0]`),
+after sign-extending the parameter, BEFORE even reading `gVoiceFadeInterval[a0]`),
 keeps it alive across the ENTIRE function body (confirmed by `grep '\$t1\b'`
 against the `.s` file: exactly two occurrences, the initial computation and
 one consuming use ~200 instructions later), and consumes it at the very end
@@ -276,7 +278,7 @@ working value the 0x34-stride record-index chain also uses, rather than
 from a fresh copy — i.e. compute `idx8 = a0 << 3;` using bare `a0` directly,
 placed as the FIRST statement (before `idxCopy = a0;`), so the compiler
 shares the sign-extension between `idx8`'s computation and the record-index
-multiply chain the very next statement (`D_8008D9B4[a0]`) also needs.
+multiply chain the very next statement (`gVoiceFadeInterval[a0]`) also needs.
 Confirmed directly against the raw `.s` first (not just the report's prose)
 that this IS retail's actual dependency shape: `sll v1,a0,16 / sra
 v1,v1,16 / sll t1,v1,3 / sll v0,v1,1 / ...` — `v1` (the sign-extended `a0`)
@@ -319,7 +321,7 @@ its recorded score.
 
 **The rebuild reproduces the exact same C, but the true built length is
 222 words, not 223.** `objdump -t build/src/code_179d8_m.c.o` gives
-`func_8002EA44` at `0x378` bytes = 222 words (confirmed independently by
+`StepVoiceFade` at `0x378` bytes = 222 words (confirmed independently by
 counting disassembled instructions from the function's `addiu sp,sp,-0x18`
 line to its final `nop`, inclusive: 222 lines). Retail is 228, so this is
 **6 words short, not 5** as every prior round (26, 30, 32) recorded. The
@@ -338,7 +340,7 @@ was.
 
 ### Permuter search
 
-`tools/setup-permuter.sh func_8002EA44 <seed>` (seed: the preserved body
+`tools/setup-permuter.sh StepVoiceFade <seed>` (seed: the preserved body
 below, `Rec34HalfU`'s three unsigned-view symbols routed through
 `__asm__`-aliased C names to avoid clashing with the plain signed
 declarations the same file needs elsewhere -- a scaffold-only device, not
@@ -363,12 +365,12 @@ Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 --stack-diffs` via the harness's `run_in_background`. **Completed cleanly,
 `rc=124`** (own bound) after **63,989 iterations**. Best score: **2430**
 (from base 4125), saved at
-`permuter-work/func_8002EA44/output-2430-1/`; no zero reached.
+`permuter-work/StepVoiceFade/output-2430-1/`; no zero reached.
 
 The 2430 candidate's only content change from the scaffold is dropping the
-intermediate `limit = D_8008D9BA[a0].unk0;` assignment in the
+intermediate `limit = gVoiceFadeLimit[a0].unk0;` assignment in the
 `incrementS < 0` branch and inlining the array read directly into the
-comparison (`if (D_8008D9BA[a0].unk0 >= (s16) accum)`), leaving a stray
+comparison (`if (gVoiceFadeLimit[a0].unk0 >= (s16) accum)`), leaving a stray
 empty statement (`;`) where the assignment was removed -- a permuter
 scope/statement-elision artifact, not a naming of the actual missing
 early-persisted value this report's own "What's missing" section
@@ -394,19 +396,19 @@ is `-0x18`. Applied `u8 dead[8];` under the established `if (0)` guard.
 objdump), but built LENGTH is UNCHANGED at 222/228 (still 6 words
 short).** Raw word-match barely moved (13/228 -> 14/228, noise-level).
 This is the SAME negative shape found this round on this unit's sibling
-`func_8002F700`: charlie's padding idiom rewrites only the `addiu
+`UpdateVoiceEnvelopes`: charlie's padding idiom rewrites only the `addiu
 sp,sp,-N` / `sw $sN,N(sp)` IMMEDIATE operands of already-existing
 prologue/epilogue instructions, which costs the same instruction count
 regardless of the immediate value -- it cannot by itself manufacture
 missing content words. It only recovers frame BYTE-ALIGNMENT, which makes
 the rest of the disassembly comparison meaningful again.
 
-With the frame realigned, `tools/asm-differ/diff.py func_8002EA44` shows
+With the frame realigned, `tools/asm-differ/diff.py StepVoiceFade` shows
 retail computing `t1 = v1 << 3` (the sign-extended `a0`, shifted) as its
 THIRD instruction and holding it live, exactly as this report's own "What's
 missing" section already diagnosed from the un-realigned disassembly —
 **the frame fix did not surface any NEW residue here** (unlike
-`func_8002F700`, where realignment revealed a fresh, fixable `andi 0xff`
+`UpdateVoiceEnvelopes`, where realignment revealed a fresh, fixable `andi 0xff`
 mask). The already-tried-and-regressed `$t1` transcription (rounds 30 and
 32, both confirmed negative) remains the actual open gap; frame padding
 does not touch it and this report's existing conclusion stands unchanged.
@@ -418,8 +420,8 @@ Reverted to `INCLUDE_ASM`; whole-image SHA1 reconfirmed green.
 ### Proposed learning (same lever, second data point)
 
 **Two-for-two this round: charlie's `dead[N]`/`if(0)` frame-padding idiom
-recovered frame byte-alignment exactly on both `func_8002F700` and
-`func_8002EA44`, and closed the missing-WORD-count gap on NEITHER.** Both
+recovered frame byte-alignment exactly on both `UpdateVoiceEnvelopes` and
+`StepVoiceFade`, and closed the missing-WORD-count gap on NEITHER.** Both
 functions' extra retail frame bytes are pure unaddressed register-save-area
 padding with no companion missing-instruction elsewhere in THIS unit,
 unlike `func_800351D0` (a different unit), whose length recovery came from
@@ -434,8 +436,8 @@ which has to be checked separately, not assumed from the frame gap itself.
 
 ```c
 #if 0
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9B2,
- * D_8008D9B6 and D_8008D9B8 each need this width (`lhu`) at least once
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- gVoiceFadeStep,
+ * gVoiceFadeCountdown and gVoiceFadeAccum each need this width (`lhu`) at least once
  * in this function, on top of the plain signed Rec34Half view
  * declared above (which some of these same symbols also need, at a
  * DIFFERENT read site in this same function). Reinterpreted through a
@@ -484,7 +486,7 @@ extern u8 D_8008EA1A;
  * when set to 1. */
 extern s16 D_8008E8C0;
 
-void func_8002EA44(s16 a0) {
+void StepVoiceFade(s16 a0) {
     s16 idxCopy;
     s16 step;
     u16 increment;
@@ -504,40 +506,40 @@ void func_8002EA44(s16 a0) {
     u8 v0;
 
     idxCopy = a0;
-    step = D_8008D9B4[a0].unk0;
+    step = gVoiceFadeInterval[a0].unk0;
     if (step != 0) {
-        u16 current = ((Rec34HalfU *) D_8008D9B6)[a0].unk0;
+        u16 current = ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0;
 
-        ((Rec34HalfU *) D_8008D9B6)[a0].unk0 = current - 1;
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = current - 1;
         if ((s16) current > 0) {
             return;
         }
-        ((Rec34HalfU *) D_8008D9B6)[a0].unk0 = D_8008D9B4[a0].unk0;
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = gVoiceFadeInterval[a0].unk0;
     }
 
-    increment = ((Rec34HalfU *) D_8008D9B2)[a0].unk0;
-    accum = ((Rec34HalfU *) D_8008D9B8)[a0].unk0;
-    incrementS = D_8008D9B2[a0].unk0;
+    increment = ((Rec34HalfU *) gVoiceFadeStep)[a0].unk0;
+    accum = ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0;
+    incrementS = gVoiceFadeStep[a0].unk0;
     accum = accum + increment;
-    ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
+    ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
 
     if (incrementS > 0) {
-        limit = D_8008D9BA[a0].unk0;
+        limit = gVoiceFadeLimit[a0].unk0;
         if ((s16) accum >= limit) {
             accum = limit;
-            ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
-            D_8008D9B0[a0].unk0 = 0;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
         }
     } else if (incrementS < 0) {
-        limit = D_8008D9BA[a0].unk0;
+        limit = gVoiceFadeLimit[a0].unk0;
         if (limit >= (s16) accum) {
             accum = limit;
-            ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
-            D_8008D9B0[a0].unk0 = 0;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
         }
     }
 
-    accumByte = *(u8 *) &D_8008D9B8[a0].unk0;
+    accumByte = *(u8 *) &gVoiceFadeAccum[a0].unk0;
     D_8008EA11 = accumByte;
     tableval = D_8008E970->unk18;
 
@@ -589,3 +591,15 @@ void func_8002EA44(s16 a0) {
 }
 #endif
 ```
+
+## Naming
+
+**StepVoiceFade** (was `func_8002EA44`) -- Tier B. Companion to
+BeginVoiceFade: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
+`gVoiceFadeStep`, throttled by `gVoiceFadeInterval`/`gVoiceFadeCountdown`,
+clears `gVoiceFadeActive` on reaching the limit, then computes and writes
+this voice's stereo output level from the resulting percentage (same
+final block as StepVoiceEnvelope, confirmed near-identical between the
+two reports). "Fade" rather than a more specific name for the same reason
+as BeginVoiceFade: what value is actually being interpolated in-game is
+not established from this function's body alone.

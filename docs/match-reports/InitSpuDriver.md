@@ -1,4 +1,6 @@
-# func_8002EDD4 -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
+> Renamed from `func_8002EDD4` on 2026-09-20 (tools/rename.py). Address 0x8002edd4.
+
+# InitSpuDriver -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
 
 **Round 32 update supersedes everything below except as a historical record
 of the residue's diagnosis, which was correct and is the reason this match
@@ -19,7 +21,7 @@ HEAD's diagnosis of the "split scaled index" residue (see below).
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002EDD4.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/InitSpuDriver.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -52,9 +54,9 @@ same block) with `s0` in place of retail's `a0` and nothing else differing
 
 **One correction found during the rebuild, cosmetic only (does not affect
 the score): the preserved body's two `SPU` calls used STALE placeholder
-names.** `func_80039228(0)` and `func_80039104(0x20, D_8008DEB0)` were
+names.** `func_80039228(0)` and `func_80039104(0x20, gSpuMallocArea)` were
 written when these two library calls had no symbol yet; `asm/nonmatchings/
-code_179d8_m/func_8002EDD4.s` itself now names them `_spu_setInTransfer`
+code_179d8_m/InitSpuDriver.s` itself now names them `_spu_setInTransfer`
 and `SpuInitMalloc` (`config/symbols.slps01556.lsdde.txt` lines 287/291,
 Psy-Q `libspu`, from the SDK-object-linking work in later rounds). The
 preserved body below has been updated to the current names; nothing about
@@ -62,7 +64,7 @@ the residue or the score changes.
 
 **Permuter search launched per this round's assignment** (this is the
 round's designated permuter target, the closest large near-miss in the
-corpus): `tools/setup-permuter.sh func_8002EDD4 <seed>` with the corrected
+corpus): `tools/setup-permuter.sh InitSpuDriver <seed>` with the corrected
 seed (SDK symbol names fixed, all needed struct/extern declarations
 inlined), sanity-checked with `--debug --stack-diffs` first — base score
 **15** (3 register differences × 5, zero insertions/deletions/reorderings/
@@ -104,7 +106,7 @@ downstream register-identity residue noted below). This is the single
 biggest structural fix of the round and should be treated as the
 established idiom for this record family's D_8006DAD4-array writes
 whenever they occur inside a LOOP (see the caveat under
-`func_8002E4D8`'s report on the non-loop case, which behaves differently).
+`StepVoiceEnvelope`'s report on the non-loop case, which behaves differently).
 
 **One sub-finding not in the head's message:** the `+0x8` field
 (`0x80FF`) needed a `u16 *` cast rather than `s16 *` at its specific store
@@ -254,12 +256,12 @@ and stored identically to retail.
 4. **The `woff`-halfword-index idiom for a small-struct array proven inside
    a loop (this function's D_8006DAD4 fix, confirmed byte-exact) does NOT
    transfer cleanly to the equivalent access OUTSIDE a loop** — see
-   `func_8002E4D8`'s report, attempted this same round with the identical
+   `StepVoiceEnvelope`'s report, attempted this same round with the identical
    idiom against a single (non-looping) call site, which reduced but did
    not eliminate its residue and surfaced different register-pressure
    side effects. Loop vs. non-loop context is a real discriminator for
    this idiom, not a detail. **Round 30 adds a THIRD variant**:
-   `func_8002EA44.md`'s round-30 update found the idiom REGRESSES a third
+   `StepVoiceFade.md`'s round-30 update found the idiom REGRESSES a third
    sibling because retail derives the shift from an ALREADY-sign-extended
    working value shared with a neighbouring computation, not from a fresh
    copy of the raw parameter — so "top of function, `s16`, mask deferred to
@@ -270,7 +272,7 @@ and stored identically to retail.
 5. **A preserved body's `jal` targets can go stale when they were written
    before an SDK-object round gave the target a real symbol.** This
    report's own `func_80039228`/`func_80039104` (round 26) and
-   `func_8002F700.md`'s `func_800375E8` (round 26) were both placeholder
+   `UpdateVoiceEnvelopes.md`'s `func_800375E8` (round 26) were both placeholder
    `func_ADDRESS` names at write time; `asm/nonmatchings/.../<func>.s`
    itself now names them `_spu_setInTransfer`/`SpuInitMalloc`/
    `SpuSetNoiseVoice` per `config/symbols.slps01556.lsdde.txt`. The score
@@ -289,18 +291,18 @@ and stored identically to retail.
 #if 0
 extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
-extern void func_8002F700(void);
+extern void UpdateVoiceEnvelopes(void);
 
-extern u8 D_8008DEB0[];
+extern u8 gSpuMallocArea[];
 extern s16 D_8008E9FC;
 extern s16 D_8008E84C;
-extern s16 D_8008E260;
-extern s16 D_8008E262;
+extern s16 gMasterVolL;
+extern s16 gMasterVolR;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
-extern u8 D_8008EA40;
+extern u8 gDisableVoiceStarveScan;
 extern s16 D_8008E938;
 
 extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
@@ -317,10 +319,10 @@ extern Rec34Half D_8008D990[];
 extern Rec34Half D_8008D98C[];
 extern Rec34Half D_8008D98E[];
 extern Rec34Half D_8008D998[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
+extern Rec34Half gVoiceEnvStep[];
+extern Rec34Half gVoiceEnvInterval[];
+extern Rec34Half gVoiceEnvCountdown[];
+extern Rec34Half gVoiceEnvAccum[];
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -334,7 +336,7 @@ typedef struct {
 } Rec34Byte;
 extern Rec34Byte D_8008D992[]; /* byte field, forced to 0x40 at init */
 extern Rec34Byte D_8008D9A3[];
-extern Rec34Half D_8008D9A4[];
+extern Rec34Half gVoiceEnvActive[];
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -352,13 +354,13 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void func_8002EDD4(s32 a0) {
+void InitSpuDriver(s32 a0) {
     s16 i;
 
     _spu_setInTransfer(0);
     D_8008E9FC = 0;
     D_8008E84C = 0;
-    SpuInitMalloc(0x20, D_8008DEB0);
+    SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {
         ((u16 *) D_8008D7F0)[(u16) i] = 0;
@@ -397,7 +399,7 @@ void func_8002EDD4(s32 a0) {
          * disassembly shows on the PRODUCT and the LATE base-pointer
          * load. This idiom, confirmed byte-exact for this loop, does
          * NOT transfer cleanly to the equivalent non-loop access in
-         * func_8002E4D8 -- see that function's report. */
+         * StepVoiceEnvelope -- see that function's report. */
         woff = (u16) i * 8;
 
         D_8008D98A[(u16) i].unk0 = 0x18;
@@ -411,16 +413,16 @@ void func_8002EDD4(s32 a0) {
         D_8008D99C[(u16) i].unk0 = 0xFF;
         D_8008D990[(u16) i].unk0 = 0;
         D_8008D992[(u16) i].unk0 = 0x40;
-        D_8008D9A4[(u16) i].unk0 = 0;
-        D_8008D9A6[(u16) i].unk0 = 0;
-        D_8008D9A8[(u16) i].unk0 = 0;
-        D_8008D9AA[(u16) i].unk0 = 0;
-        D_8008D9B0[(u16) i].unk0 = 0;
-        D_8008D9B2[(u16) i].unk0 = 0;
-        D_8008D9B4[(u16) i].unk0 = 0;
-        D_8008D9B6[(u16) i].unk0 = 0;
-        D_8008D9B8[(u16) i].unk0 = 0;
-        D_8008D9AC[(u16) i].unk0 = 0;
+        gVoiceEnvActive[(u16) i].unk0 = 0;
+        gVoiceEnvStep[(u16) i].unk0 = 0;
+        gVoiceEnvInterval[(u16) i].unk0 = 0;
+        gVoiceEnvCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeActive[(u16) i].unk0 = 0;
+        gVoiceFadeStep[(u16) i].unk0 = 0;
+        gVoiceFadeInterval[(u16) i].unk0 = 0;
+        gVoiceFadeCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeAccum[(u16) i].unk0 = 0;
+        gVoiceEnvAccum[(u16) i].unk0 = 0;
 
         ((s16 *) D_8006DAD4)[woff + 3] = 0x200;   /* +0x6 */
         ((s16 *) D_8006DAD4)[woff + 2] = 0x1000;  /* +0x4 */
@@ -456,8 +458,8 @@ void func_8002EDD4(s32 a0) {
         D_8008E22C &= ~D_80090C64;
     }
 
-    D_8008E260 = 0x3FFF;
-    D_8008E262 = 0x3FFF;
+    gMasterVolL = 0x3FFF;
+    gMasterVolR = 0x3FFF;
     D_8008E228 = 0;
     D_8008E22C = 0;
     D_80090C60 = 0;
@@ -465,10 +467,10 @@ void func_8002EDD4(s32 a0) {
     D_8008E234 = 0;
     D_8008E258 = 0;
     D_8008E25C = 0;
-    D_8008EA40 = 0;
+    gDisableVoiceStarveScan = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
-    func_8002F700();
+    UpdateVoiceEnvelopes();
 }
 #endif
 ```
@@ -575,12 +577,12 @@ figure exactly, no drift), then ran a fresh, cleanly-bounded permuter search.
 ### Permuter run: clean exit, own bound never reached -- found zero instead
 
 ```sh
-tools/setup-permuter.sh func_8002EDD4 <seed from this report's own preserved body>
+tools/setup-permuter.sh InitSpuDriver <seed from this report's own preserved body>
 PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3 tools/decomp-permuter/permuter.py \
-  --debug --stack-diffs permuter-work/func_8002EDD4        # sanity check: base score 15
+  --debug --stack-diffs permuter-work/InitSpuDriver        # sanity check: base score 15
 PATH=$PWD/permuter-work/bin:$PATH nohup timeout 900 .venv/bin/python3 \
   tools/decomp-permuter/permuter.py -j 6 --stack-diffs --stop-on-zero --best-only \
-  permuter-work/func_8002EDD4 > /tmp/bravo_permuter_8002EDD4.log 2>&1 &
+  permuter-work/InitSpuDriver > /tmp/bravo_permuter_8002EDD4.log 2>&1 &
 ```
 
 Base score sanity-checked at **15** (3 register differences x 5, zero
@@ -595,8 +597,8 @@ bound -- confirmed by `ps -o etime` immediately before the exit, and the log
 line itself), the permuter printed:
 
 ```
-[func_8002EDD4] found new best score! (0 vs 15)
-wrote to permuter-work/func_8002EDD4/output-0-1
+[InitSpuDriver] found new best score! (0 vs 15)
+wrote to permuter-work/InitSpuDriver/output-0-1
 iteration 66199, 0 errors, score = 0
 Found zero score! Exiting.
 ```
@@ -612,7 +614,7 @@ entirely and should not be graded on the same rubric.
 
 ### The candidate, and why it is NOT a false lead this time
 
-`permuter-work/func_8002EDD4/output-0-1/diff.txt` shows three related
+`permuter-work/InitSpuDriver/output-0-1/diff.txt` shows three related
 substitutions, all using ONE permuter-inserted `int new_var;`:
 
 1. `a0 = (u8) a0; new_var = a0; ... D_8008E9D0 = new_var;` in place of
@@ -701,3 +703,29 @@ here, the specific missing mutation (reusing one declared variable for two
 unrelated purposes) is not something a human reshaping by hand would
 naturally try, since it looks strictly worse (an extra, seemingly
 pointless assignment) by ordinary C style standards.
+
+## Naming
+
+**InitSpuDriver** (was `func_8002EDD4`) -- Tier A. Two Sony `libspu` calls
+(`_spu_setInTransfer`, `SpuInitMalloc`), zeroes every per-voice table this
+unit owns plus `gMasterVolL`/`gMasterVolR` (reset to `0x3FFF`, the PS1
+SPU's actual 14-bit max volume register value -- strong corroborating
+evidence for those two names, tier B on their own), and calls
+UpdateVoiceEnvelopes once at the end. This is squarely "initialize the
+sound driver"; nothing about it is guessed beyond what the body does.
+
+## Proposed field names
+
+Not this function's own struct, but noting here since this report already
+lists most of the cluster: `D_8006DAD4Edd4`/`D_8006DAD4` (this unit's two
+independent local views of the same base pointer) is the PS1 SPU hardware
+base address `0x1F801C00`, per `func_8002DDBC`'s own report in
+`code_179d8_l`. Proposing (not applying -- shared with bravo's live
+`code_179d8_j_b.c` this round, see broadcast) a base-pointer rename to
+`gSpuRegs` once no live runner touches `code_179d8_j_b`/`_l`/`_j`/`_j_c`/
+`_k`/`_p`. See the broadcast post from this round for the fuller list of
+globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
+`D_8008E9D0` -> `gVoiceCount`, `D_80090C60`/`D_80090C64` ->
+`gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`D_8008E22C` ->
+`gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `D_8008D970` -> `gVoiceFlags`,
+`D_8008D9A3` -> `gVoiceState`).

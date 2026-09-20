@@ -63,9 +63,9 @@
  * guesses, not authoritative.  Per this project's convention, a prototype
  * for a function ANOTHER unit defines stays in this .c, not in a shared
  * header. */
-extern void func_8002F610(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
-extern s32 func_8002FAC4(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
-extern s32 func_800300D0(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
+extern void ApplyPitchBendToAllVoices(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
+extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
+extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
 /* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
  * `vm_doff`. Both were carried as matched C in code_179d8_f.c until that
  * unit's prefix was given back to Sony; these are local views, as a Psy-Q
@@ -353,13 +353,13 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
-        func_8002FAC4(packed, note, vol, (u8)a3, (u16)divided, status);
+        StartNote(packed, note, vol, (u8)a3, (u16)divided, status);
         rec->unkA8 = (u8)speed;
     } else {
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
-        func_800300D0(packed, note, vol, (u8)a3);
+        StopNote(packed, note, vol, (u8)a3);
     }
 }
 #endif
@@ -1149,7 +1149,7 @@ void func_80035A7C(s16 a0, s16 a1)
     rec->unk4 = rec->unk4 + 1;
     vol = *((u8 *)rec + b + 0x2C);
     b = *cursor;
-    func_8002F610(packed, rec->unk4C, vol, b);
+    ApplyPitchBendToAllVoices(packed, rec->unk4C, vol, b);
     rec->unk88 = func_80035E80(a0, a1);
 }
 #endif

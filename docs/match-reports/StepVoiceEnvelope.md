@@ -1,4 +1,6 @@
-# func_8002E4D8 -- STALL: 6 words long (237/231 built length) -- the HEAD-diagnosed halfword-index idiom was applied and DOES close the early-`sll`/mid-block-mask gap, but this function's NON-LOOP context surfaces a residual sign-extension/scheduling issue the same fix left behind in func_8002EDD4's loop context. Round 48: frame gap (-0x10 vs retail -0x18) confirmed pure unaddressed padding and closed byte-exact with charlie's dead[8] idiom, but length unaffected -- 4th unit-wide confirmation this round that the lever does not close length by itself.
+> Renamed from `func_8002E4D8` on 2026-09-20 (tools/rename.py). Address 0x8002e4d8.
+
+# StepVoiceEnvelope -- STALL: 6 words long (237/231 built length) -- the HEAD-diagnosed halfword-index idiom was applied and DOES close the early-`sll`/mid-block-mask gap, but this function's NON-LOOP context surfaces a residual sign-extension/scheduling issue the same fix left behind in InitSpuDriver's loop context. Round 48: frame gap (-0x10 vs retail -0x18) confirmed pure unaddressed padding and closed byte-exact with charlie's dead[8] idiom, but length unaffected -- 4th unit-wide confirmation this round that the lever does not close length by itself.
 
 Unit: `src/code_179d8_m.c`. Round 26 (second pass), runner bravo, applying
 the HEAD's "split scaled index" diagnosis per the work order.
@@ -6,7 +8,7 @@ the HEAD's "split scaled index" diagnosis per the work order.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/func_8002E4D8.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -14,7 +16,7 @@ grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no 
 
 `./build-and-verify.sh` GREEN with `INCLUDE_ASM` restored. **The
 halfword-index idiom the HEAD diagnosed (and this round confirmed
-byte-exact for `func_8002EDD4`'s loop) DOES reproduce the early `sll #3`
+byte-exact for `InitSpuDriver`'s loop) DOES reproduce the early `sll #3`
 here too** — confirmed via `asm-differ`, the function's very first
 instruction now matches retail's `sll t0,v1,0x3` shape (register-renamed
 but structurally identical), closing the specific gap the HEAD's message
@@ -48,13 +50,13 @@ the HEAD predicted.
 
 ## Why this is NOT a loop, and why that matters
 
-`func_8002EDD4`'s version of this idiom lives inside a per-channel `for`
+`InitSpuDriver`'s version of this idiom lives inside a per-channel `for`
 loop, where `i` changes every iteration and `woff` is naturally recomputed
 each time as the loop body's first statement — there is no "which value is
 `woff` derived from" ambiguity, because `i` IS the loop induction variable
 and nothing else touches it.
 
-`func_8002E4D8` runs once per call with a single fixed `a0`. Here, `idx*8`
+`StepVoiceEnvelope` runs once per call with a single fixed `a0`. Here, `idx*8`
 has to be derived from the PARAMETER, which is ALSO used (via `idxCopy`) to
 index the unrelated 0x34-stride record family the rest of the function
 reads. Three placements were tried for where this derivation should read
@@ -90,7 +92,7 @@ spurious `sll`/`sra` re-extension pair at each comparison site, because
 the compiler will not treat a value it derived through an unsigned load as
 already sign-clean for a later signed comparison. This round tried the
 next lever on that specific bug — reading `accumS` back from MEMORY
-(`D_8008D9AC[idxCopy].unk0`, a genuine fresh `lh`) instead of assigning it
+(`gVoiceEnvAccum[idxCopy].unk0`, a genuine fresh `lh`) instead of assigning it
 from the already-computed `accumU` register (a register-level reinterpret
 cast) — on the theory that a fresh signed load, rather than a same-register
 reinterpretation, is what retail's disassembly actually shows at the
@@ -116,7 +118,7 @@ triggering it, not yet identified.
    the early-`sll`-#3 gap, one word worse overall than the pre-idiom
    baseline because of the pre-existing sign-extension bug documented
    above (unaffected either way by this idiom).
-5. Replaced `D_8008D9A8`/`D_8008D9AA`/etc. array indices from the raw
+5. Replaced `gVoiceEnvInterval`/`gVoiceEnvCountdown`/etc. array indices from the raw
    parameter `a0` to the local `idxCopy` throughout the function (matching
    retail's apparent single-variable-for-everything usage): no change
    (still 237/231) -- ruled out as a lever for the remaining gap.
@@ -137,7 +139,7 @@ parameter reaching a home-slot spill vs. a dedicated `$sN`, see
 candidate. Checked directly rather than inferred from the frame-size gap:
 
 ```sh
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_179d8_m/func_8002E4D8.s
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s
 # -> no hits at all
 ```
 
@@ -170,7 +172,7 @@ stored sum, rather than once before either):
    spelled in the source -- the compiler hoists the sign-extend to that
    point regardless.
 2. **A bare `__asm__("")` between `incU`'s read and `incS`'s read** (both
-   read the SAME `D_8008D9A6[idxCopy]` address, one unsigned one signed --
+   read the SAME `gVoiceEnvStep[idxCopy]` address, one unsigned one signed --
    retail's disassembly shows this as two SEPARATE loads, `lhu` then `lh`,
    while my build shows only the `lhu` with `incS` derived from it via a
    register-level sign-extend instead of its own `lh`): **no change
@@ -196,14 +198,14 @@ were renamed only to route around unrelated duplicate-declaration
 conflicts with OTHER still-`INCLUDE_ASM` functions sharing the file; the
 reported C itself is unchanged) and rebuilt from scratch. **All title
 figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
-`func_8002E4D8` at `0x3b4` bytes = **237 words**, against retail's 231 (6
+`StepVoiceEnvelope` at `0x3b4` bytes = **237 words**, against retail's 231 (6
 long, exactly as titled). No new axis attempted this round: this function
 was already worked twice in the immediately preceding rounds (26 and 27)
 with the callee-saved lever explicitly closed as inapplicable, and the
-`func_8002EA44` sibling attempt this round (applying THIS function's own
-"woff" idiom back to `func_8002EA44`) surfaced that the idiom's correct
+`StepVoiceFade` sibling attempt this round (applying THIS function's own
+"woff" idiom back to `StepVoiceFade`) surfaced that the idiom's correct
 placement is more context-sensitive than either report currently
-documents — see `func_8002EA44.md`'s round-30 update for the negative
+documents — see `StepVoiceFade.md`'s round-30 update for the negative
 result and its diagnosis, which is relevant background for anyone
 revisiting either function's split-index code next.
 
@@ -213,9 +215,9 @@ revisiting either function's split-index code next.
 array write is CONFIRMED to generalize across this record family and
 across at least two different sibling functions, but its correct SOURCE
 FORM depends on whether the write site is inside a loop or not.** Inside a
-loop (`func_8002EDD4`), declaring `woff` fresh each iteration as the loop
+loop (`InitSpuDriver`), declaring `woff` fresh each iteration as the loop
 body's first statement, computed from the loop induction variable directly,
-reproduces retail exactly. Outside a loop (`func_8002E4D8`, this report),
+reproduces retail exactly. Outside a loop (`StepVoiceEnvelope`, this report),
 the SAME idiom needs the intermediate value kept at its NATURAL type (here
 `s16`, matching the parameter's own type, with the `(u16)` mask deferred
 to the point of use) rather than materialized as `u16` immediately — an
@@ -244,8 +246,8 @@ Round 27's update named a specific untried next step for the remaining
 sign-extension residue: swap the `incS`/`incU` derivation order, or derive
 `incU` from `incS` via a cast rather than as an independent load. Read the
 raw `.s` directly first to confirm the exact shape at this site (lines
-1ED70-1EDB0 of `asm/nonmatchings/code_179d8_m/func_8002E4D8.s`): retail
-issues TWO separate loads of `D_8008D9A6[a1]` — one `lhu` into `incU`, one
+1ED70-1EDB0 of `asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s`): retail
+issues TWO separate loads of `gVoiceEnvStep[a1]` — one `lhu` into `incU`, one
 `lh` into `incS` (a different register) — immediately adjacent, then adds
 `incU` into `accumU`.
 
@@ -283,8 +285,8 @@ and rebuilt from scratch.
 **This function sits FIRST in `code_179d8_m.c`**, so the shared
 `Rec34Half`/`Rec34HalfU`/`Rec16D7F0`/`ObjE970`/scratch-global declarations
 this body needs (originally written for a standalone splice with their
-own flat externs) are declared LATER in the file, after `func_8002E874`
-and `func_8002EA44`'s own stall bodies. Re-declaring them again here under
+own flat externs) are declared LATER in the file, after `BeginVoiceFade`
+and `StepVoiceFade`'s own stall bodies. Re-declaring them again here under
 the same names is a hard conflict (duplicate typedef names, and for
 `D_8008E970`/`D_8008D7F0`/`D_8008D7F2` a redeclaration of the same extern
 symbol under an incompatible pointee type) -- not a new finding, but the
@@ -293,23 +295,23 @@ conflicting C types in one file" rule warns about, hitting a typedef this
 time rather than a symbol.
 
 **Fix: moved the shared typedef block (`Rec34Half` and its
-`D_8008D9B0`.`D_8008D9BA` externs, `Rec34HalfU`, `Rec16D7F0` +
+`gVoiceFadeActive`.`gVoiceFadeLimit` externs, `Rec34HalfU`, `Rec16D7F0` +
 `D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) from its old position (between
-`func_8002E874` and `func_8002EA44`) up to right after `#include
-"common.h"`, adding this function's own `D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`
+`BeginVoiceFade` and `StepVoiceFade`) up to right after `#include
+"common.h"`, adding this function's own `gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`
 externs (same `Rec34Half` shape, disjoint symbols) alongside the existing
 ones.** Declaration order carries no code -- only DEFINITIONS need strict
 ROM order, which this move does not disturb (no function moved). This is
 believed to generalize as a documented pattern below.
 
 **All title figures reconfirmed exactly:** `objdump -t
-build/src/code_179d8_m.c.o` shows `func_8002E4D8` at `0x3b4` bytes = **237
+build/src/code_179d8_m.c.o` shows `StepVoiceEnvelope` at `0x3b4` bytes = **237
 words** (retail 231, 6 words LONG, exactly as titled).
 
 ### Permuter search
 
-`tools/setup-permuter.sh func_8002E4D8 <seed>` -- seed built from this
+`tools/setup-permuter.sh StepVoiceEnvelope <seed>` -- seed built from this
 report's preserved body (standalone, with its own flat-extern
 declarations, since the seed is compiled in isolation and does not need
 the in-file reorganization above). See the Permuter result subsection for
@@ -321,7 +323,7 @@ the base `--debug --stack-diffs` score and the real search's outcome
 `--debug --stack-diffs` base score: **4155** (Register Differences 71 x 5
 = 355; Reorderings 10 x 60 = 600; Insertions 19 x 100 = 1900; Deletions 13
 x 100 = 1300; Stack Differences 0 and Branch Differences 0 -- same pattern
-as `func_8002EA44`'s sibling search: this function's own documented frame
+as `StepVoiceFade`'s sibling search: this function's own documented frame
 gap, `0x10` built vs retail's `0x18`, is likewise not reflected as a
 stack-slot difference, only as an immediate-operand difference on the
 `addiu sp,sp,-N` line itself).
@@ -330,7 +332,7 @@ Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 --stack-diffs` via the harness's `run_in_background`. **Completed cleanly,
 `rc=124`** (own bound) after **80,882 iterations** -- the deepest search
 of the five functions in this unit this round. Best score: **2105** (from
-base 4155), saved at `permuter-work/func_8002E4D8/output-2105-1/`; no zero
+base 4155), saved at `permuter-work/StepVoiceEnvelope/output-2105-1/`; no zero
 reached, and none of the eight other intermediate best-score directories
 saved along the way (`2275`, `2310`, `2415`, `2935`, `3015`, `3315`,
 `3340`) reached one either. **Not closed; both open residues this report
@@ -366,7 +368,7 @@ callee-saved-lever check, above): built `-0x10` vs retail `-0x18`, an
 8-byte gap. Direct grep confirms the textbook shape:
 
 ```sh
-grep -oE '0x[0-9a-fA-F]+\(\$sp\)|\$sp,\$sp,' asm/nonmatchings/code_179d8_m/func_8002E4D8.s
+grep -oE '0x[0-9a-fA-F]+\(\$sp\)|\$sp,\$sp,' asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s
 # -> only the prologue "addiu $sp,$sp,-0x18" and epilogue "addiu $sp,$sp,0x18"
 ```
 
@@ -385,18 +387,18 @@ section already explored from three different placements: this build's
 function entry (word 2), before the sign-extension chain (`sll/sra v1`)
 the 0x34-stride record accesses need; retail computes the equivalent
 value only AFTER that sign-extension, sharing it with the record-index
-multiply chain. **No new residue surfaced** — unlike `func_8002F700`
+multiply chain. **No new residue surfaced** — unlike `UpdateVoiceEnvelopes`
 (this unit's other post-realignment win), realigning this function's
 frame did not reveal anything beyond what was already on file.
 
 **This unit is now 4-for-4 this round: charlie's `dead[N]`/`if(0)`
 padding idiom recovers frame byte-alignment exactly every time (four
-measured cases: `func_8002F700`, `func_8002EA44`, `func_8002FAC4`, and
+measured cases: `UpdateVoiceEnvelopes`, `StepVoiceFade`, `StartNote`, and
 this function), and has closed a missing-WORD-COUNT gap on none of them.**
 Every one of `code_179d8_m`'s frame gaps is pure unaddressed
 register-save-area padding — confirmed directly by grep in three of the
-four cases (`func_8002E4D8`, `func_8002F700` here; `func_8002EA44` and
-`func_8002FAC4`'s own permuter `--stack-diffs` runs independently
+four cases (`StepVoiceEnvelope`, `UpdateVoiceEnvelopes` here; `StepVoiceFade` and
+`StartNote`'s own permuter `--stack-diffs` runs independently
 confirmed zero stack differences) — with each function's real content
 residue (a redundant mask, a persisted early value, an addressing-cost
 difference, an early-materialization placement) living entirely
@@ -406,7 +408,7 @@ tail-duplication fix, not from the padding move itself.
 
 **Housekeeping note on this splice**: this function sits FIRST in ROM
 order in the unit, so its shared record-family types (`Rec34Half` and
-`D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
+`gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
 `D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) had to be declared BEFORE this
 function rather than duplicated under function-local names — duplicating
@@ -415,7 +417,7 @@ project's "one extern symbol/typedef cannot carry two conflicting
 declarations in one file" rule, exactly the same shape round 37 already
 hit and fixed the same way. The shared prelude now lives right after
 `#include "common.h"`, and the later, now-redundant typedef definitions
-(previously positioned for `func_8002EA44`'s isolated splice) were
+(previously positioned for `StepVoiceFade`'s isolated splice) were
 removed, leaving only their accompanying `extern` lines in place (which
 remain valid: same already-declared type, referenced from a later point
 in the file). Reverted the function itself to `INCLUDE_ASM`; the shared
@@ -429,7 +431,7 @@ green after the revert.
 on length closure, 4-for-4 on frame-byte-alignment recovery.** The lever's
 reliable, repeatable value on this unit was diagnostic — it makes an
 otherwise length-misaligned diff readable — and it directly PAID OFF once
-(`func_8002F700`'s `andi 0xff` mask, found only after realignment). But
+(`UpdateVoiceEnvelopes`'s `andi 0xff` mask, found only after realignment). But
 treating it as a length-closing move in its own right would have been
 wrong all four times here. The generalizable rule for the next runner:
 apply the padding cheaply whenever a frame gap is confirmed pure
@@ -448,16 +450,16 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half D_8008D9A4[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
-extern Rec34Half D_8008D9AE[];
+extern Rec34Half gVoiceEnvActive[];
+extern Rec34Half gVoiceEnvStep[];
+extern Rec34Half gVoiceEnvInterval[];
+extern Rec34Half gVoiceEnvCountdown[];
+extern Rec34Half gVoiceEnvAccum[];
+extern Rec34Half gVoiceEnvLimit[];
 
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9A6 and
- * D_8008D9AC each need this width (`lhu`) at least once in this function,
- * on top of the plain signed `Rec34Half` view above (which D_8008D9A6
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- gVoiceEnvStep and
+ * gVoiceEnvAccum each need this width (`lhu`) at least once in this function,
+ * on top of the plain signed `Rec34Half` view above (which gVoiceEnvStep
  * ALSO needs, at a DIFFERENT read site: retail issues TWO separate loads
  * of the same address, one `lhu` and one `lh`). */
 typedef struct {
@@ -488,7 +490,7 @@ extern s16 D_8008D7F2[];
 
 extern u8 D_8008D970[];
 
-void func_8002E4D8(s16 a0) {
+void StepVoiceEnvelope(s16 a0) {
     s16 idxCopy;
     s16 accum;
     u8 flagByte;
@@ -513,50 +515,50 @@ void func_8002E4D8(s16 a0) {
      * the point of use (indexing an `s16 *`, which then scales by 2),
      * reaching idx*16 -- the real per-channel byte stride for these two
      * 0x10-stride, single-field arrays. Same base idiom as
-     * func_8002EDD4's D_8006DAD4 fix, but kept `s16` (not `u16`) until
+     * InitSpuDriver's D_8006DAD4 fix, but kept `s16` (not `u16`) until
      * point of use -- see this report's "non-loop" analysis for why the
      * loop-context version of the idiom does not transfer directly. */
     idxCopy = a0;
     woff = idxCopy << 3;
 
-    if (D_8008D9A8[idxCopy].unk0 != 0) {
-        s16 orig = D_8008D9AA[idxCopy].unk0;
+    if (gVoiceEnvInterval[idxCopy].unk0 != 0) {
+        s16 orig = gVoiceEnvCountdown[idxCopy].unk0;
 
-        D_8008D9AA[idxCopy].unk0 = orig - 1;
+        gVoiceEnvCountdown[idxCopy].unk0 = orig - 1;
         if (orig > 0) {
             return;
         }
-        D_8008D9AA[idxCopy].unk0 = D_8008D9A8[idxCopy].unk0;
+        gVoiceEnvCountdown[idxCopy].unk0 = gVoiceEnvInterval[idxCopy].unk0;
     }
 
     {
-        u16 accumU = ((Rec34HalfU *) D_8008D9AC)[idxCopy].unk0;
-        u16 incU = ((Rec34HalfU *) D_8008D9A6)[idxCopy].unk0;
-        s16 incS = D_8008D9A6[idxCopy].unk0;
+        u16 accumU = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
+        u16 incU = ((Rec34HalfU *) gVoiceEnvStep)[idxCopy].unk0;
+        s16 incS = gVoiceEnvStep[idxCopy].unk0;
         s16 accumS;
 
         accumU = accumU + incU;
-        D_8008D9AC[idxCopy].unk0 = accumU;
-        accumS = D_8008D9AC[idxCopy].unk0;
+        gVoiceEnvAccum[idxCopy].unk0 = accumU;
+        accumS = gVoiceEnvAccum[idxCopy].unk0;
 
         if (incS > 0) {
-            limit = D_8008D9AE[idxCopy].unk0;
+            limit = gVoiceEnvLimit[idxCopy].unk0;
             if (accumS >= limit) {
                 accumU = limit;
-                D_8008D9AC[idxCopy].unk0 = accumU;
-                D_8008D9A4[idxCopy].unk0 = 0;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
             }
         } else if (incS < 0) {
-            limit = D_8008D9AE[idxCopy].unk0;
+            limit = gVoiceEnvLimit[idxCopy].unk0;
             if (limit >= accumS) {
                 accumU = limit;
-                D_8008D9AC[idxCopy].unk0 = accumU;
-                D_8008D9A4[idxCopy].unk0 = 0;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
             }
         }
     }
 
-    accum = ((Rec34HalfU *) D_8008D9AC)[idxCopy].unk0;
+    accum = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
     D_8008EA10 = (u8) accum;
     tableval = D_8008E970->unk18;
 
@@ -608,3 +610,19 @@ void func_8002E4D8(s16 a0) {
 }
 #endif
 ```
+
+## Naming
+
+**StepVoiceEnvelope** (was `func_8002E4D8`) -- Tier B. Same shape as
+StepVoiceFade (accumulate-until-limit, throttled by an interval/countdown
+pair, clear an active flag on reaching the limit, then compute and write
+a stereo output level from the result) but over its own `gVoiceEnv*`
+family, and with no "Begin"-style setup function in this unit -- nothing
+here writes `gVoiceEnvActive`, `gVoiceEnvStep` or `gVoiceEnvLimit`.
+`func_8002E308` in `code_179d8_l` opens with the identical prologue and
+argument-narrowing shape this unit's header already calls out as a
+register-pressure sibling, not a coincidence worth re-deriving; worth
+checking directly whether it is the missing "BeginVoiceEnvelope".
+"Envelope" rather than "Fade" is the mechanical distinction (no saved
+start/end pair, just increment-until-limit), not a claim about which one
+is ADSR-shaped in the audio sense.
