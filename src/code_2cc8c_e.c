@@ -121,7 +121,14 @@ void func_80040024(Class6E99CObj *self) {
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_80040024);
 #endif
 
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 40/41 words, 1 word short. Residue: two residues --
+ * the shared `li $a1,1`-scheduling class with func_80040024, plus a
+ * genuinely missing register-only dead-store delay-slot filler
+ * (retail copies its unread 3rd argument into $t0 in a branch delay
+ * slot; GCC 2.6.3 eliminates the equivalent C statement as dead code
+ * before scheduling ever sees it) (docs/match-reports/func_800400B0.md).
+ * Hand-derived. */
 void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
     s32 idx;
 
@@ -136,8 +143,9 @@ void func_800400B0(Class6E99CObj *self, s32 a1, s32 a2) {
     }
     self->unk6C = 2;
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", func_800400B0);
+#endif
 
 s32 func_80040154(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
