@@ -60,8 +60,8 @@ overwriting it). Five phases, each independently verified against the
 disassembly instruction-by-instruction within the true `0x1ff00`-`0x202c4`
 window:
 
-1. **Ring-buffer bookkeeping.** `D_8008DE68` is a rotating index (`(x+1)
-   & 0xF`), stored back immediately; `D_8008DE6C[ringIdx]` (an `s32[16]`
+1. **Ring-buffer bookkeeping.** `gVoiceActivityRingIdx` is a rotating index (`(x+1)
+   & 0xF`), stored back immediately; `gVoiceActivityRing[ringIdx]` (an `s32[16]`
    array) is the new ring slot, zeroed.
 2. **Per-channel "ready" snapshot**, guarded by `D_8008E9D0 > 0`: for each
    channel `i`, copy `D_8006DAD4[i].unkC` (a NEW field on the already
@@ -73,9 +73,9 @@ window:
    Written with EXPLICIT WALKING POINTERS (`p98E`, `pDad`, each `++`
    advancing one whole record), not `array[i]` indexing — see "Axes tried"
    #1, the single highest-value fix this round.
-3. **Starved-channel force-release**, guarded by `D_8008EA40 == 0`: AND all
+3. **Starved-channel force-release**, guarded by `gDisableVoiceStarveScan == 0`: AND all
    FIFTEEN of the OTHER ring slots together (a plain `for (j=0;j<0xF;j++)
-   mask &= D_8008DE6C[j];` loop — note this reads only 15 of the 16 slots,
+   mask &= gVoiceActivityRing[j];` loop — note this reads only 15 of the 16 slots,
    confirmed against the raw instruction count), then for each channel
    whose bit is set in that combined mask, force-release it
    (`func_800375E8(0, 0xFFFFFF)` if `D_8008D9A3[i] == 2`, then zero it
@@ -83,8 +83,8 @@ window:
 4. Two unconditional bitmask updates:
    `D_8008E228 &= ~D_80090C60; D_8008E22C &= ~D_80090C64;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
-   `StepVoiceEnvelope(i)` if `D_8008D9A4[i] != 0`, `StepVoiceFade(i)` if
-   `D_8008D9B0[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
+   `StepVoiceEnvelope(i)` if `gVoiceEnvActive[i] != 0`, `StepVoiceFade(i)` if
+   `gVoiceFadeActive[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
    match reports).
 6. **Flag-driven per-channel field copy**, another unconditional 0..0x17
    loop, testing four independent bits of `D_8008D970[i]` (1, 4, 8, 0x10)
@@ -106,7 +106,7 @@ window:
 
 ## Struct/global knowledge derived this round
 
-- `D_8008DE68` (`s32`, ring index 0-15) and `D_8008DE6C[]` (`s32[16]`, ring
+- `gVoiceActivityRingIdx` (`s32`, ring index 0-15) and `gVoiceActivityRing[]` (`s32[16]`, ring
   buffer of per-call "channel ready" bitmasks).
 - `D_8008D98E[]`: needs an UNSIGNED 16-bit view (`Rec34HalfU2`, not the
   existing signed `Rec34Half`) — confirmed by the `lhu` re-read after the
@@ -127,7 +127,7 @@ window:
   other multi-width symbol in this file).
 - `D_8008D7F6[]`: a NEW 0x10-byte-stride array, same shape as the already-
   established `Rec16D7F4`/`D_8008D7F4`.
-- `D_8008EA40` (`u8` flag), `D_8008E230`/`D_8008E234` (`s16`).
+- `gDisableVoiceStarveScan` (`u8` flag), `D_8008E230`/`D_8008E234` (`s16`).
 
 ## Axes tried, in order, with effect on built length (retail is 241 words)
 
@@ -432,9 +432,9 @@ length gap itself has closed.
  * 233/241,16/241). */
 
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
- * call, most-recent index tracked by D_8008DE68 (mod 16). */
-extern s32 D_8008DE68;
-extern s32 D_8008DE6C[];
+ * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
+extern s32 gVoiceActivityRingIdx;
+extern s32 gVoiceActivityRing[];
 
 /* 0x34-stride record family, UNSIGNED 16-bit view -- this function
  * writes it via `lhu`-driven re-reads (store, then re-check the SAME
@@ -495,9 +495,9 @@ void UpdateVoiceEnvelopes(void) {
         dead[0] = 0;
     }
 
-    ringIdx = (D_8008DE68 + 1) & 0xF;
-    D_8008DE68 = ringIdx;
-    slot = &D_8008DE6C[ringIdx];
+    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
+    gVoiceActivityRingIdx = ringIdx;
+    slot = &gVoiceActivityRing[ringIdx];
     count = D_8008E9D0;
     *slot = 0;
 
@@ -515,13 +515,13 @@ void UpdateVoiceEnvelopes(void) {
         }
     }
 
-    if (D_8008EA40 == 0) {
+    if (gDisableVoiceStarveScan == 0) {
         s32 mask;
         s32 j;
 
         mask = -1;
         for (j = 0; j < 0xF; j++) {
-            mask &= D_8008DE6C[j];
+            mask &= gVoiceActivityRing[j];
         }
 
         for (i = 0; i < D_8008E9D0; i++) {
@@ -540,10 +540,10 @@ void UpdateVoiceEnvelopes(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D9A4[i].unk0 != 0) {
+        if (gVoiceEnvActive[i].unk0 != 0) {
             StepVoiceEnvelope(i);
         }
-        if (D_8008D9B0[i].unk0 != 0) {
+        if (gVoiceFadeActive[i].unk0 != 0) {
             StepVoiceFade(i);
         }
     }
@@ -602,9 +602,9 @@ void UpdateVoiceEnvelopes(void) {
 ```c
 #if 0
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
- * call, most-recent index tracked by D_8008DE68 (mod 16). */
-extern s32 D_8008DE68;
-extern s32 D_8008DE6C[];
+ * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
+extern s32 gVoiceActivityRingIdx;
+extern s32 gVoiceActivityRing[];
 
 /* 0x34-stride record family, UNSIGNED 16-bit view -- this function
  * writes it via `lhu`-driven re-reads (store, then re-check the SAME
@@ -614,11 +614,11 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34HalfU2;
 extern Rec34HalfU2 D_8008D98E[];
-extern Rec34Half D_8008D9A4[];
+extern Rec34Half gVoiceEnvActive[];
 
 /* Flag byte: when set, skip the "channel starved for N frames -> force
  * release" scan below. */
-extern u8 D_8008EA40;
+extern u8 gDisableVoiceStarveScan;
 
 extern u16 D_80090C60;
 extern u16 D_80090C64;
@@ -670,9 +670,9 @@ void UpdateVoiceEnvelopes(void) {
     s32 *slot;
     u8 count;
 
-    ringIdx = (D_8008DE68 + 1) & 0xF;
-    D_8008DE68 = ringIdx;
-    slot = &D_8008DE6C[ringIdx];
+    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
+    gVoiceActivityRingIdx = ringIdx;
+    slot = &gVoiceActivityRing[ringIdx];
     count = D_8008E9D0;
     *slot = 0;
 
@@ -690,13 +690,13 @@ void UpdateVoiceEnvelopes(void) {
         }
     }
 
-    if (D_8008EA40 == 0) {
+    if (gDisableVoiceStarveScan == 0) {
         s32 mask;
         s32 j;
 
         mask = -1;
         for (j = 0; j < 0xF; j++) {
-            mask &= D_8008DE6C[j];
+            mask &= gVoiceActivityRing[j];
         }
 
         for (i = 0; i < D_8008E9D0; i++) {
@@ -715,10 +715,10 @@ void UpdateVoiceEnvelopes(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D9A4[i].unk0 != 0) {
+        if (gVoiceEnvActive[i].unk0 != 0) {
             StepVoiceEnvelope(i);
         }
-        if (D_8008D9B0[i].unk0 != 0) {
+        if (gVoiceFadeActive[i].unk0 != 0) {
             StepVoiceFade(i);
         }
     }

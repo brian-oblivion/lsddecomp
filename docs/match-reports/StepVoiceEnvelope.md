@@ -92,7 +92,7 @@ spurious `sll`/`sra` re-extension pair at each comparison site, because
 the compiler will not treat a value it derived through an unsigned load as
 already sign-clean for a later signed comparison. This round tried the
 next lever on that specific bug — reading `accumS` back from MEMORY
-(`D_8008D9AC[idxCopy].unk0`, a genuine fresh `lh`) instead of assigning it
+(`gVoiceEnvAccum[idxCopy].unk0`, a genuine fresh `lh`) instead of assigning it
 from the already-computed `accumU` register (a register-level reinterpret
 cast) — on the theory that a fresh signed load, rather than a same-register
 reinterpretation, is what retail's disassembly actually shows at the
@@ -118,7 +118,7 @@ triggering it, not yet identified.
    the early-`sll`-#3 gap, one word worse overall than the pre-idiom
    baseline because of the pre-existing sign-extension bug documented
    above (unaffected either way by this idiom).
-5. Replaced `D_8008D9A8`/`D_8008D9AA`/etc. array indices from the raw
+5. Replaced `gVoiceEnvInterval`/`gVoiceEnvCountdown`/etc. array indices from the raw
    parameter `a0` to the local `idxCopy` throughout the function (matching
    retail's apparent single-variable-for-everything usage): no change
    (still 237/231) -- ruled out as a lever for the remaining gap.
@@ -172,7 +172,7 @@ stored sum, rather than once before either):
    spelled in the source -- the compiler hoists the sign-extend to that
    point regardless.
 2. **A bare `__asm__("")` between `incU`'s read and `incS`'s read** (both
-   read the SAME `D_8008D9A6[idxCopy]` address, one unsigned one signed --
+   read the SAME `gVoiceEnvStep[idxCopy]` address, one unsigned one signed --
    retail's disassembly shows this as two SEPARATE loads, `lhu` then `lh`,
    while my build shows only the `lhu` with `incS` derived from it via a
    register-level sign-extend instead of its own `lh`): **no change
@@ -247,7 +247,7 @@ sign-extension residue: swap the `incS`/`incU` derivation order, or derive
 `incU` from `incS` via a cast rather than as an independent load. Read the
 raw `.s` directly first to confirm the exact shape at this site (lines
 1ED70-1EDB0 of `asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s`): retail
-issues TWO separate loads of `D_8008D9A6[a1]` — one `lhu` into `incU`, one
+issues TWO separate loads of `gVoiceEnvStep[a1]` — one `lhu` into `incU`, one
 `lh` into `incS` (a different register) — immediately adjacent, then adds
 `incU` into `accumU`.
 
@@ -295,11 +295,11 @@ conflicting C types in one file" rule warns about, hitting a typedef this
 time rather than a symbol.
 
 **Fix: moved the shared typedef block (`Rec34Half` and its
-`D_8008D9B0`.`D_8008D9BA` externs, `Rec34HalfU`, `Rec16D7F0` +
+`gVoiceFadeActive`.`gVoiceFadeLimit` externs, `Rec34HalfU`, `Rec16D7F0` +
 `D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) from its old position (between
 `BeginVoiceFade` and `StepVoiceFade`) up to right after `#include
-"common.h"`, adding this function's own `D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`
+"common.h"`, adding this function's own `gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`
 externs (same `Rec34Half` shape, disjoint symbols) alongside the existing
 ones.** Declaration order carries no code -- only DEFINITIONS need strict
 ROM order, which this move does not disturb (no function moved). This is
@@ -408,7 +408,7 @@ tail-duplication fix, not from the padding move itself.
 
 **Housekeeping note on this splice**: this function sits FIRST in ROM
 order in the unit, so its shared record-family types (`Rec34Half` and
-`D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
+`gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
 `D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) had to be declared BEFORE this
 function rather than duplicated under function-local names — duplicating
@@ -450,16 +450,16 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half D_8008D9A4[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
-extern Rec34Half D_8008D9AE[];
+extern Rec34Half gVoiceEnvActive[];
+extern Rec34Half gVoiceEnvStep[];
+extern Rec34Half gVoiceEnvInterval[];
+extern Rec34Half gVoiceEnvCountdown[];
+extern Rec34Half gVoiceEnvAccum[];
+extern Rec34Half gVoiceEnvLimit[];
 
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9A6 and
- * D_8008D9AC each need this width (`lhu`) at least once in this function,
- * on top of the plain signed `Rec34Half` view above (which D_8008D9A6
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- gVoiceEnvStep and
+ * gVoiceEnvAccum each need this width (`lhu`) at least once in this function,
+ * on top of the plain signed `Rec34Half` view above (which gVoiceEnvStep
  * ALSO needs, at a DIFFERENT read site: retail issues TWO separate loads
  * of the same address, one `lhu` and one `lh`). */
 typedef struct {
@@ -521,44 +521,44 @@ void StepVoiceEnvelope(s16 a0) {
     idxCopy = a0;
     woff = idxCopy << 3;
 
-    if (D_8008D9A8[idxCopy].unk0 != 0) {
-        s16 orig = D_8008D9AA[idxCopy].unk0;
+    if (gVoiceEnvInterval[idxCopy].unk0 != 0) {
+        s16 orig = gVoiceEnvCountdown[idxCopy].unk0;
 
-        D_8008D9AA[idxCopy].unk0 = orig - 1;
+        gVoiceEnvCountdown[idxCopy].unk0 = orig - 1;
         if (orig > 0) {
             return;
         }
-        D_8008D9AA[idxCopy].unk0 = D_8008D9A8[idxCopy].unk0;
+        gVoiceEnvCountdown[idxCopy].unk0 = gVoiceEnvInterval[idxCopy].unk0;
     }
 
     {
-        u16 accumU = ((Rec34HalfU *) D_8008D9AC)[idxCopy].unk0;
-        u16 incU = ((Rec34HalfU *) D_8008D9A6)[idxCopy].unk0;
-        s16 incS = D_8008D9A6[idxCopy].unk0;
+        u16 accumU = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
+        u16 incU = ((Rec34HalfU *) gVoiceEnvStep)[idxCopy].unk0;
+        s16 incS = gVoiceEnvStep[idxCopy].unk0;
         s16 accumS;
 
         accumU = accumU + incU;
-        D_8008D9AC[idxCopy].unk0 = accumU;
-        accumS = D_8008D9AC[idxCopy].unk0;
+        gVoiceEnvAccum[idxCopy].unk0 = accumU;
+        accumS = gVoiceEnvAccum[idxCopy].unk0;
 
         if (incS > 0) {
-            limit = D_8008D9AE[idxCopy].unk0;
+            limit = gVoiceEnvLimit[idxCopy].unk0;
             if (accumS >= limit) {
                 accumU = limit;
-                D_8008D9AC[idxCopy].unk0 = accumU;
-                D_8008D9A4[idxCopy].unk0 = 0;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
             }
         } else if (incS < 0) {
-            limit = D_8008D9AE[idxCopy].unk0;
+            limit = gVoiceEnvLimit[idxCopy].unk0;
             if (limit >= accumS) {
                 accumU = limit;
-                D_8008D9AC[idxCopy].unk0 = accumU;
-                D_8008D9A4[idxCopy].unk0 = 0;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
             }
         }
     }
 
-    accum = ((Rec34HalfU *) D_8008D9AC)[idxCopy].unk0;
+    accum = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
     D_8008EA10 = (u8) accum;
     tableval = D_8008E970->unk18;
 

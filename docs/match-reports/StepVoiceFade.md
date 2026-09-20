@@ -128,10 +128,10 @@ obvious from context.
 ## Struct/global knowledge derived this round
 
 - `Rec34HalfU`: the SAME 0x34-stride record family already declared
-  (`Rec34Half`, `s16 unk0`), but `D_8008D9B2`, `D_8008D9B6` and `D_8008D9B8`
+  (`Rec34Half`, `s16 unk0`), but `gVoiceFadeStep`, `gVoiceFadeCountdown` and `gVoiceFadeAccum`
   each need an UNSIGNED (`lhu`) read at least once in this function, on top
-  of (for `D_8008D9B2`) a plain SIGNED read at a different point --
-  reinterpreted through a cast (`((Rec34HalfU *) D_8008D9B2)[a0].unk0`)
+  of (for `gVoiceFadeStep`) a plain SIGNED read at a different point --
+  reinterpreted through a cast (`((Rec34HalfU *) gVoiceFadeStep)[a0].unk0`)
   rather than redeclared, same rule as everywhere else in this file.
 - `Rec16D7F0` / `D_8008D7F0[]`, `D_8008D7F2[]`: the SAME 0x10-byte-stride
   record family `code_179d8_j.c` documents as `Rec16D7F0`.
@@ -189,11 +189,11 @@ obvious from context.
 ## Shape (believed correct)
 
 Given a record index `a0` (this function's only parameter): a
-countdown/reset gate (`D_8008D9B4[a0]` step, `D_8008D9B6[a0]` countdown,
+countdown/reset gate (`gVoiceFadeInterval[a0]` step, `gVoiceFadeCountdown[a0]` countdown,
 same "unsigned re-read after unsigned decrement, early-return if still
-positive, else reset from `D_8008D9B4`" shape as the OTHER interpolation
+positive, else reset from `gVoiceFadeInterval`" shape as the OTHER interpolation
 functions in this unit), then an accumulator update against a clamped limit
-(`D_8008D9B2`/`D_8008D9B8`/`D_8008D9BA`, the SAME "increment, clamp against
+(`gVoiceFadeStep`/`gVoiceFadeAccum`/`gVoiceFadeLimit`, the SAME "increment, clamp against
 a limit whose comparison direction depends on the increment's sign" shape
 already documented for `BeginVoiceFade`'s and `StopNote`'s siblings in
 this record family). Then a four-stage 7-bit-percentage blend chain:
@@ -209,7 +209,7 @@ the two results into `D_8008D7F2`/`D_8008D7F0` and OR a flag bit into
 ## What's missing: a persisted early value that doesn't reduce to anything I could name
 
 Retail computes `$t1 = (s16) a0 << 3` as its SECOND instruction (right
-after sign-extending the parameter, BEFORE even reading `D_8008D9B4[a0]`),
+after sign-extending the parameter, BEFORE even reading `gVoiceFadeInterval[a0]`),
 keeps it alive across the ENTIRE function body (confirmed by `grep '\$t1\b'`
 against the `.s` file: exactly two occurrences, the initial computation and
 one consuming use ~200 instructions later), and consumes it at the very end
@@ -278,7 +278,7 @@ working value the 0x34-stride record-index chain also uses, rather than
 from a fresh copy — i.e. compute `idx8 = a0 << 3;` using bare `a0` directly,
 placed as the FIRST statement (before `idxCopy = a0;`), so the compiler
 shares the sign-extension between `idx8`'s computation and the record-index
-multiply chain the very next statement (`D_8008D9B4[a0]`) also needs.
+multiply chain the very next statement (`gVoiceFadeInterval[a0]`) also needs.
 Confirmed directly against the raw `.s` first (not just the report's prose)
 that this IS retail's actual dependency shape: `sll v1,a0,16 / sra
 v1,v1,16 / sll t1,v1,3 / sll v0,v1,1 / ...` — `v1` (the sign-extended `a0`)
@@ -368,9 +368,9 @@ Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 `permuter-work/StepVoiceFade/output-2430-1/`; no zero reached.
 
 The 2430 candidate's only content change from the scaffold is dropping the
-intermediate `limit = D_8008D9BA[a0].unk0;` assignment in the
+intermediate `limit = gVoiceFadeLimit[a0].unk0;` assignment in the
 `incrementS < 0` branch and inlining the array read directly into the
-comparison (`if (D_8008D9BA[a0].unk0 >= (s16) accum)`), leaving a stray
+comparison (`if (gVoiceFadeLimit[a0].unk0 >= (s16) accum)`), leaving a stray
 empty statement (`;`) where the assignment was removed -- a permuter
 scope/statement-elision artifact, not a naming of the actual missing
 early-persisted value this report's own "What's missing" section
@@ -436,8 +436,8 @@ which has to be checked separately, not assumed from the frame gap itself.
 
 ```c
 #if 0
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9B2,
- * D_8008D9B6 and D_8008D9B8 each need this width (`lhu`) at least once
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- gVoiceFadeStep,
+ * gVoiceFadeCountdown and gVoiceFadeAccum each need this width (`lhu`) at least once
  * in this function, on top of the plain signed Rec34Half view
  * declared above (which some of these same symbols also need, at a
  * DIFFERENT read site in this same function). Reinterpreted through a
@@ -506,40 +506,40 @@ void StepVoiceFade(s16 a0) {
     u8 v0;
 
     idxCopy = a0;
-    step = D_8008D9B4[a0].unk0;
+    step = gVoiceFadeInterval[a0].unk0;
     if (step != 0) {
-        u16 current = ((Rec34HalfU *) D_8008D9B6)[a0].unk0;
+        u16 current = ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0;
 
-        ((Rec34HalfU *) D_8008D9B6)[a0].unk0 = current - 1;
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = current - 1;
         if ((s16) current > 0) {
             return;
         }
-        ((Rec34HalfU *) D_8008D9B6)[a0].unk0 = D_8008D9B4[a0].unk0;
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = gVoiceFadeInterval[a0].unk0;
     }
 
-    increment = ((Rec34HalfU *) D_8008D9B2)[a0].unk0;
-    accum = ((Rec34HalfU *) D_8008D9B8)[a0].unk0;
-    incrementS = D_8008D9B2[a0].unk0;
+    increment = ((Rec34HalfU *) gVoiceFadeStep)[a0].unk0;
+    accum = ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0;
+    incrementS = gVoiceFadeStep[a0].unk0;
     accum = accum + increment;
-    ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
+    ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
 
     if (incrementS > 0) {
-        limit = D_8008D9BA[a0].unk0;
+        limit = gVoiceFadeLimit[a0].unk0;
         if ((s16) accum >= limit) {
             accum = limit;
-            ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
-            D_8008D9B0[a0].unk0 = 0;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
         }
     } else if (incrementS < 0) {
-        limit = D_8008D9BA[a0].unk0;
+        limit = gVoiceFadeLimit[a0].unk0;
         if (limit >= (s16) accum) {
             accum = limit;
-            ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
-            D_8008D9B0[a0].unk0 = 0;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
         }
     }
 
-    accumByte = *(u8 *) &D_8008D9B8[a0].unk0;
+    accumByte = *(u8 *) &gVoiceFadeAccum[a0].unk0;
     D_8008EA11 = accumByte;
     tableval = D_8008E970->unk18;
 

@@ -71,12 +71,12 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half D_8008D9A4[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
-extern Rec34Half D_8008D9AE[];
+extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by StepVoiceEnvelope when it reaches gVoiceEnvLimit */
+extern Rec34Half gVoiceEnvStep[]; /* per-tick increment/decrement applied to gVoiceEnvAccum */
+extern Rec34Half gVoiceEnvInterval[]; /* ticks between steps (0 = every tick), same throttle idiom as gVoiceFadeInterval below */
+extern Rec34Half gVoiceEnvCountdown[]; /* countdown to the next step, reloaded from gVoiceEnvInterval */
+extern Rec34Half gVoiceEnvAccum[]; /* running envelope value */
+extern Rec34Half gVoiceEnvLimit[]; /* value the envelope clamps to once reached */
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -94,9 +94,9 @@ extern u8 D_8008D970[];
 
 typedef struct {
     u8 pad[0x12];
-    u16 unk12; /* +0x12 */
+    u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per StartNote's report */
     u8 pad14[0x18 - 0x14];
-    u8 unk18; /* +0x18 */
+    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in StepVoiceEnvelope/StepVoiceFade */
 } ObjE970;
 extern ObjE970 *D_8008E970;
 
@@ -128,12 +128,12 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
  * own local view rather than sharing that file's header-less types.
  * Six independent 2-bytes-apart symbols share this one shape, same
  * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-extern Rec34Half D_8008D9B0[]; /* "interpolating" flag */
-extern Rec34Half D_8008D9B2[]; /* "interpolating" flag (companion pair) */
-extern Rec34Half D_8008D9B4[]; /* step/quotient */
-extern Rec34Half D_8008D9B6[]; /* step/quotient (companion pair) */
-extern Rec34Half D_8008D9B8[]; /* saved start value */
-extern Rec34Half D_8008D9BA[]; /* saved end value */
+extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by BeginVoiceFade, cleared by StepVoiceFade when gVoiceFadeAccum reaches gVoiceFadeLimit */
+extern Rec34Half gVoiceFadeStep[]; /* per-tick increment/decrement applied to gVoiceFadeAccum */
+extern Rec34Half gVoiceFadeInterval[]; /* ticks between steps (0 = every tick); same throttle idiom as gVoiceEnvInterval above */
+extern Rec34Half gVoiceFadeCountdown[]; /* countdown to the next step, reloaded from gVoiceFadeInterval */
+extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to BeginVoiceFade's "from" argument */
+extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, BeginVoiceFade's "to" argument */
 
 void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
@@ -141,18 +141,18 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
     if (a1 == a2) {
         return;
     }
-    D_8008D9B0[a0].unk0 = 1;
-    D_8008D9B8[a0].unk0 = a1;
-    D_8008D9BA[a0].unk0 = a2;
+    gVoiceFadeActive[a0].unk0 = 1;
+    gVoiceFadeAccum[a0].unk0 = a1;
+    gVoiceFadeLimit[a0].unk0 = a2;
     if ((a1 - a2 < 0 ? a2 - a1 : a1 - a2) < a3) {
         q = a3 / (a1 - a2);
-        D_8008D9B2[a0].unk0 = 1;
-        D_8008D9B4[a0].unk0 = q;
-        D_8008D9B6[a0].unk0 = q;
+        gVoiceFadeStep[a0].unk0 = 1;
+        gVoiceFadeInterval[a0].unk0 = q;
+        gVoiceFadeCountdown[a0].unk0 = q;
     } else {
         q = (a1 - a2) / a3;
-        D_8008D9B4[a0].unk0 = 0;
-        D_8008D9B2[a0].unk0 = q;
+        gVoiceFadeInterval[a0].unk0 = 0;
+        gVoiceFadeStep[a0].unk0 = q;
     }
 }
 
@@ -172,16 +172,16 @@ extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
 extern void UpdateVoiceEnvelopes(void);
 
-extern u8 D_8008DEB0[];
+extern u8 gSpuMallocArea[];
 extern s16 D_8008E9FC;
 extern s16 D_8008E84C;
-extern s16 D_8008E260;
-extern s16 D_8008E262;
+extern s16 gMasterVolL;
+extern s16 gMasterVolR;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
-extern u8 D_8008EA40;
+extern u8 gDisableVoiceStarveScan;
 extern s16 D_8008E938;
 
 extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
@@ -198,10 +198,10 @@ extern Rec34Half D_8008D990[];
 extern Rec34Half D_8008D98C[];
 extern Rec34Half D_8008D98E[];
 extern Rec34Half D_8008D998[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
+extern Rec34Half gVoiceEnvStep[];
+extern Rec34Half gVoiceEnvInterval[];
+extern Rec34Half gVoiceEnvCountdown[];
+extern Rec34Half gVoiceEnvAccum[];
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -215,7 +215,7 @@ typedef struct {
 } Rec34ByteEdd4;
 extern Rec34ByteEdd4 D_8008D992[]; /* byte field, forced to 0x40 at init */
 extern Rec34ByteEdd4 D_8008D9A3Edd4[] __asm__("D_8008D9A3");
-extern Rec34Half D_8008D9A4[];
+extern Rec34Half gVoiceEnvActive[];
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -253,7 +253,7 @@ void InitSpuDriver(s32 a0) {
     _spu_setInTransfer(0);
     D_8008E9FC = 0;
     D_8008E84C = 0;
-    SpuInitMalloc(0x20, D_8008DEB0);
+    SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {
         ((u16 *) D_8008D7F0)[(u16) i] = 0;
@@ -296,16 +296,16 @@ void InitSpuDriver(s32 a0) {
         D_8008D99CEdd4[(u16) i].unk0 = 0xFF;
         D_8008D990[(u16) i].unk0 = 0;
         D_8008D992[(u16) i].unk0 = 0x40;
-        D_8008D9A4[(u16) i].unk0 = 0;
-        D_8008D9A6[(u16) i].unk0 = 0;
-        D_8008D9A8[(u16) i].unk0 = 0;
-        D_8008D9AA[(u16) i].unk0 = 0;
-        D_8008D9B0[(u16) i].unk0 = 0;
-        D_8008D9B2[(u16) i].unk0 = 0;
-        D_8008D9B4[(u16) i].unk0 = 0;
-        D_8008D9B6[(u16) i].unk0 = 0;
-        D_8008D9B8[(u16) i].unk0 = 0;
-        D_8008D9AC[(u16) i].unk0 = 0;
+        gVoiceEnvActive[(u16) i].unk0 = 0;
+        gVoiceEnvStep[(u16) i].unk0 = 0;
+        gVoiceEnvInterval[(u16) i].unk0 = 0;
+        gVoiceEnvCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeActive[(u16) i].unk0 = 0;
+        gVoiceFadeStep[(u16) i].unk0 = 0;
+        gVoiceFadeInterval[(u16) i].unk0 = 0;
+        gVoiceFadeCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeAccum[(u16) i].unk0 = 0;
+        gVoiceEnvAccum[(u16) i].unk0 = 0;
 
         ((s16 *) D_8006DAD4Edd4)[woff + 3] = 0x200;   /* +0x6 */
         scratch = woff;
@@ -336,8 +336,8 @@ void InitSpuDriver(s32 a0) {
         D_8008E22C &= ~D_80090C64;
     }
 
-    D_8008E260 = 0x3FFF;
-    D_8008E262 = 0x3FFF;
+    gMasterVolL = 0x3FFF;
+    gMasterVolR = 0x3FFF;
     D_8008E228 = 0;
     D_8008E22C = 0;
     D_80090C60 = 0;
@@ -345,7 +345,7 @@ void InitSpuDriver(s32 a0) {
     D_8008E234 = 0;
     D_8008E258 = 0;
     D_8008E25C = 0;
-    D_8008EA40 = 0;
+    gDisableVoiceStarveScan = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
     UpdateVoiceEnvelopes();
@@ -483,8 +483,8 @@ typedef struct {
     u8 unk6; /* +0x6 */
     u8 unk7; /* +0x7 */
     u8 pad8[0xC - 0x8];
-    u8 unkC; /* +0xC */
-    u8 unkD; /* +0xD */
+    u8 bendCurveUp; /* +0xC -- multiplier used when the bend threshold is positive, per ApplyVoicePitchBend's report */
+    u8 bendCurveDown; /* +0xD -- multiplier used when the bend threshold is negative */
     u8 pad0E[0x16 - 0xE];
     u8 unk16; /* +0x16 */
     u8 pad17[0x20 - 0x17];

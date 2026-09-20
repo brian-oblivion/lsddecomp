@@ -54,7 +54,7 @@ same block) with `s0` in place of retail's `a0` and nothing else differing
 
 **One correction found during the rebuild, cosmetic only (does not affect
 the score): the preserved body's two `SPU` calls used STALE placeholder
-names.** `func_80039228(0)` and `func_80039104(0x20, D_8008DEB0)` were
+names.** `func_80039228(0)` and `func_80039104(0x20, gSpuMallocArea)` were
 written when these two library calls had no symbol yet; `asm/nonmatchings/
 code_179d8_m/InitSpuDriver.s` itself now names them `_spu_setInTransfer`
 and `SpuInitMalloc` (`config/symbols.slps01556.lsdde.txt` lines 287/291,
@@ -293,16 +293,16 @@ extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
 extern void UpdateVoiceEnvelopes(void);
 
-extern u8 D_8008DEB0[];
+extern u8 gSpuMallocArea[];
 extern s16 D_8008E9FC;
 extern s16 D_8008E84C;
-extern s16 D_8008E260;
-extern s16 D_8008E262;
+extern s16 gMasterVolL;
+extern s16 gMasterVolR;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
-extern u8 D_8008EA40;
+extern u8 gDisableVoiceStarveScan;
 extern s16 D_8008E938;
 
 extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
@@ -319,10 +319,10 @@ extern Rec34Half D_8008D990[];
 extern Rec34Half D_8008D98C[];
 extern Rec34Half D_8008D98E[];
 extern Rec34Half D_8008D998[];
-extern Rec34Half D_8008D9A6[];
-extern Rec34Half D_8008D9A8[];
-extern Rec34Half D_8008D9AA[];
-extern Rec34Half D_8008D9AC[];
+extern Rec34Half gVoiceEnvStep[];
+extern Rec34Half gVoiceEnvInterval[];
+extern Rec34Half gVoiceEnvCountdown[];
+extern Rec34Half gVoiceEnvAccum[];
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -336,7 +336,7 @@ typedef struct {
 } Rec34Byte;
 extern Rec34Byte D_8008D992[]; /* byte field, forced to 0x40 at init */
 extern Rec34Byte D_8008D9A3[];
-extern Rec34Half D_8008D9A4[];
+extern Rec34Half gVoiceEnvActive[];
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -360,7 +360,7 @@ void InitSpuDriver(s32 a0) {
     _spu_setInTransfer(0);
     D_8008E9FC = 0;
     D_8008E84C = 0;
-    SpuInitMalloc(0x20, D_8008DEB0);
+    SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {
         ((u16 *) D_8008D7F0)[(u16) i] = 0;
@@ -413,16 +413,16 @@ void InitSpuDriver(s32 a0) {
         D_8008D99C[(u16) i].unk0 = 0xFF;
         D_8008D990[(u16) i].unk0 = 0;
         D_8008D992[(u16) i].unk0 = 0x40;
-        D_8008D9A4[(u16) i].unk0 = 0;
-        D_8008D9A6[(u16) i].unk0 = 0;
-        D_8008D9A8[(u16) i].unk0 = 0;
-        D_8008D9AA[(u16) i].unk0 = 0;
-        D_8008D9B0[(u16) i].unk0 = 0;
-        D_8008D9B2[(u16) i].unk0 = 0;
-        D_8008D9B4[(u16) i].unk0 = 0;
-        D_8008D9B6[(u16) i].unk0 = 0;
-        D_8008D9B8[(u16) i].unk0 = 0;
-        D_8008D9AC[(u16) i].unk0 = 0;
+        gVoiceEnvActive[(u16) i].unk0 = 0;
+        gVoiceEnvStep[(u16) i].unk0 = 0;
+        gVoiceEnvInterval[(u16) i].unk0 = 0;
+        gVoiceEnvCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeActive[(u16) i].unk0 = 0;
+        gVoiceFadeStep[(u16) i].unk0 = 0;
+        gVoiceFadeInterval[(u16) i].unk0 = 0;
+        gVoiceFadeCountdown[(u16) i].unk0 = 0;
+        gVoiceFadeAccum[(u16) i].unk0 = 0;
+        gVoiceEnvAccum[(u16) i].unk0 = 0;
 
         ((s16 *) D_8006DAD4)[woff + 3] = 0x200;   /* +0x6 */
         ((s16 *) D_8006DAD4)[woff + 2] = 0x1000;  /* +0x4 */
@@ -458,8 +458,8 @@ void InitSpuDriver(s32 a0) {
         D_8008E22C &= ~D_80090C64;
     }
 
-    D_8008E260 = 0x3FFF;
-    D_8008E262 = 0x3FFF;
+    gMasterVolL = 0x3FFF;
+    gMasterVolR = 0x3FFF;
     D_8008E228 = 0;
     D_8008E22C = 0;
     D_80090C60 = 0;
@@ -467,7 +467,7 @@ void InitSpuDriver(s32 a0) {
     D_8008E234 = 0;
     D_8008E258 = 0;
     D_8008E25C = 0;
-    D_8008EA40 = 0;
+    gDisableVoiceStarveScan = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
     UpdateVoiceEnvelopes();
