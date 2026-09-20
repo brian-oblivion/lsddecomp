@@ -725,6 +725,27 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   27/27 -> 11/11 -> 7/7 -> 0/0 while the word score went 61 -> 56 -> 91 -> 213, and
   round 45 rejected a correct lever on that 5-word drop. (a round 59)
 
+- **An unexplained RELOAD is evidence of a BLKmode assignment upstream, not of register
+  pressure.** gcc 2.6.3's `cse.c` answers a BLKmode (struct or array) `set` with
+  `invalidate_memory()`, discarding every cached memory value rather than the ones that
+  could alias — so a whole-struct assignment is a CSE memory barrier and a field-by-field
+  one is transparent. Discriminator, one build: retail re-reads a global it already read,
+  or a stack slot it just wrote, with NO call in between; write the adjacent-globals copy
+  as `pos = *(PairXY *) &D_8008AB68;` instead of two scalar stores. Took `func_80054850`
+  from 6 words short to 1, then transferred unchanged to its sibling `func_800549A8` and
+  closed it 93/93 first attempt. **Corollary: a lever found on one function is worth one
+  build on every recorded sibling before anything else is tried.** (a round 61)
+
+- **A register-colour difference can change instruction COUNT, because `jump_optimize`
+  cross-jumps AFTER reload and compares hard registers.** Two arms ending in the same
+  store merge into one copy when the stored value lands in the same register in both, and
+  stay duplicated when it does not. Observable: you are N words SHORT and retail has a
+  bare `j` into a shared tail you reach by falling through. Discriminator against §3a's
+  "an arm that must JUMP has to be written NOT-LAST": there retail's arm jumps and yours
+  falls through and the fix is textual block order; here both sides jump correctly and
+  what differs is whether the tail is DUPLICATED, so the fix is upstream of the colours.
+  (a round 61)
+
 ## 4. Verdict classes and how far to trust them
 
 - **A stall report's MEASUREMENT and its residue CLASS decay at different rates, and the

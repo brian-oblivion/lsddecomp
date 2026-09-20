@@ -150,6 +150,16 @@
           "note": "REVISIT func_8002C278: 11/76 -> 54/76, length exact, insertions 0/deletions 0. Still a stall, now a GENUINE register-identity one (two long-lived pointers vs three; alias collapses under full use). Four separable defects were hiding inside the old 'pervasive register-allocation residue' verdict, three of them plain C. First permuter run on this function: rc=124, 218094 iterations, best 130, no zero; Gate 3 all three checks recorded and AGREE.",
           "round": 60,
           "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-20",
+          "matches": 1,
+          "model": "opus",
+          "note": "Track 1 REVISIT runner (bravo) on class_3bb8c_n, staffed on the stale-title trigger (all three reports last touched round 47; the unit has NOT passed track 3, so names/types were not the payload). Recorded --not-calibration: track 1 is parked and these were revisits, not ranked-band stall attempts. func_800549A8 MATCHED 93/93 ins0/del0 on the first attempt after two rounds of 'register pressure'; func_80054FD8 38/81 -> 79/81 length-exact ins0/del0; func_80054850 12/86 and 6 words short -> 17/86 and 1 word short. THREE ROUND-47 VERDICTS RETRACTED: 'pure register-colour swap with ZERO drift' measured as funcdiff 11/11 (equal length was two defects cancelling); 's32 *p = &D_8008E0AC reverted as a failure' was correct but incomplete; both of func_80054850's 'register-pressure' residues were ONE construct. Levers: BLKmode struct assignment is a CSE memory barrier (closed the match, transferred between siblings unchanged); cross-jumping runs after reload so register colour can change instruction COUNT; variable reuse across disjoint live ranges (permuter-found, unreachable by ordering sweeps). Gate 3 all three checks run on func_80054FD8 (its first ever check 3), scaffold and real build AGREE at 2/2; one bounded search, 165218 iterations, no zero -- but its best candidate still improved the in-tree body 78->79 and took ins/del to 0/0, so a timed-out search is not automatically a negative.",
+          "round": 61,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -165,6 +175,16 @@
           "model": "sonnet",
           "note": "First track 1b round: charlie promoted func_8004042C (22/25), func_80040024 (29/35) and func_800400B0 (40/41) in code_2cc8c_e to #ifdef NON_MATCHING. build-and-verify green (zero bytes moved) and check-nonmatching green (3 bodies, 1 unit).",
           "round": 59,
+          "runners": 1
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-20",
+          "matches": 2,
+          "model": "sonnet",
+          "note": "Track 1b, runner charlie, unit code_55dd4: func_80065A5C (30/33, prologue callee-save store-order residue) and func_800662BC (17/33, count lhu routing through $v0) promoted to the sanctioned #ifdef NON_MATCHING / #else INCLUDE_ASM / #endif shape. Both hand-derived and confirmed so: 80065A5C's two permuter campaigns (192610 iterations combined) never beat base, and 800662BC's two sub-base permuter candidates were traced and rejected in rounds 24/31/49, so in both cases the manual body was the only promotable candidate. No new declarations needed. build-and-verify green (zero bytes moved), check-nonmatching green at 9 bodies in 3 units. CHARLIE CORRECTED A HEAD FIGURE, and was right: the brief cited 3 and 2 preserved bodies from an UNANCHORED grep -c '#if 0', which counts the marker where reports quote it in prose and backticks; anchored ^#if 0 gives one each.",
+          "round": 61,
           "runners": 1
         }
       ],
@@ -248,6 +268,16 @@
           "note": "Extern arity review (alpha): all 17 externcheck findings resolved, externcheck now exits 0 on 650 declarations. 15 confirmed as the deliberate dead-argument idiom and annotated arity-ok; 2 false prototypes (GetClass6B5CCMethods, GetClass6D430Methods) corrected to unspecified parameter lists. Zero bytes moved. Declined to converge the func_80017B34/func_80017CFC family: measurement shows both bodies really read $a1.",
           "round": 59,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-20",
+          "matches": 1,
+          "model": "sonnet",
+          "note": "Track 3 naming, runner alpha, unit code_2cc8c_e: the Class6E99C color-fade controller layered on the ClassEAC0 display base (Class6B5CCObj -> ClassEAC0Obj -> Class6E99CObj). 17 functions named, 4 fields and 11 vtable slots renamed by type scope with the compiler deciding ownership, unit header comment written, ## Naming in all 17 reports, NON_MATCHING body named too (track 3 step 6). Zero cross-unit field names proposed. HEAD REVIEW: five names sampled -- GetColor (pure leaf lookup with a 0xF sentinel, tier A holds), PushPosition/PopPosition verified an exact inverse pair field by field, Stop confirmed against its body (state reset + slot30 notify), New_Class6E99C confirmed as a 0xA0 allocator with ctor dispatch. ONE CORRECTION APPLIED AT MERGE: Class6E99C__GetMethods -> GetClass6E99CMethods, because X__GetMethods invents a third style where Get_vtable_X (5) and GetXMethods (7) already exist on main; evidence was sound, only the spelling was wrong, so the unit passed rather than going back and the naming runner stays sonnet. PROTOCOL FINDING: alpha's rename.py runs touched 5 source files and 2 reports OUTSIDE its unit, including bravo's live unit class_3bb8c_n.c -- all legitimate (rename.py is tree-global, function symbols are unique, and it kept bravo's preserved bodies from going stale), but headercontention.py prices HEADERS and cannot see a collision that arrives through the CALL GRAPH.",
+          "round": 61,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -261,6 +291,7 @@
         "code_179d8_q": "2026-09-17",
         "code_179d8_r": "2026-09-18",
         "code_2cc8c_c": "2026-09-19",
+        "code_2cc8c_e": "2026-09-20",
         "code_2cc8c_f": "2026-09-18",
         "code_8220_b": "2026-09-17",
         "code_d294_b": "2026-09-18",

@@ -6,6 +6,102 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-20 — round 61: a parked track's revisit closes a two-round "register pressure" stall, and rename.py's global reach meets one-unit-per-runner
+
+**Three runners, three tracks, three merges, all green.** Head on Opus (no new
+procedure, tool or doc; no HARD RULE tension to adjudicate). Gate 0 clean, no
+stale-asm warning. matched 1142 -> 1143, queued 110 -> 109.
+
+**Track 1 (bravo, Opus, REVISIT on `class_3bb8c_n`).** Staffed on the
+stale-title trigger alone — all three reports were last touched in round 47 and
+the unit has not passed track 3, so there were no new names or types to bring.
+Recorded `--not-calibration`: track 1 is parked and these were revisits, not
+ranked-band attempts.
+
+- `func_800549A8` **MATCHED 93/93, insertions 0 / deletions 0, first attempt**,
+  after two rounds had filed it as the same "register pressure" residue as its
+  sibling.
+- `func_80054FD8` 38/81 -> **79/81**, length exact, ins 0 / del 0.
+- `func_80054850` 12/86 and 6 words short -> 17/86 and **1 word short**.
+
+**Three round-47 verdicts retracted, and the pattern is the one round 59 found.**
+The measurements were right; the CLASSES were wrong. "Pure `arg0`/`arg1`
+register-colour swap with ZERO drift" measured as funcdiff **11/11** — the equal
+length was two defects cancelling, a cross-jumped store (2 short) against four
+recomputed `%hi`/`%lo` pairs (2 long). "`s32 *p = &D_8008E0AC` reverted as a
+failure" was correct but incomplete. And both of `func_80054850`'s residues,
+filed separately as "register-pressure-driven, not something a source rewrite
+obviously controls", were one construct.
+
+**The lever that closed it, and why it transferred.** A BLKmode (struct or
+array) assignment is a CSE memory barrier: `cse.c` answers a BLKmode `set` with
+`invalidate_memory()`, discarding every cached memory value rather than the ones
+that could alias. So `pos = *(PairXY *) &D_8008AB68;` produces the reload of an
+already-read global that field-by-field stores cannot. Derived on
+`func_80054850` (6 words short -> 1, did not close), transferred **unchanged** to
+its recorded sibling and closed it outright. Both learnings promoted, with the
+corollary that a lever found on one function is worth one build on every
+recorded sibling before anything else is tried.
+
+**"Register pressure" is an unfinished diagnosis.** It names no construct,
+suggests no experiment, and both round 46 and round 47 stopped on it. Two
+functions carried it for two rounds; in both the real cause was a single named C
+construct a one-line change tests.
+
+**Gate 3, and a negative that is not one.** All three checks run on
+`func_80054FD8`, its first ever check 3; scaffold and real build AGREE at 2/2.
+One bounded search, 165218 iterations, no zero — but its best candidate still
+improved the in-tree body 78 -> 79 and took ins/del from 2/2 to 0/0. **A
+timed-out search is not automatically a negative about the body.**
+
+**Track 3 (alpha, Sonnet, `code_2cc8c_e`), reviewed and marked.** The
+`Class6E99C` colour-fade controller layered on the `ClassEAC0` display base. 17
+functions named, 4 fields and 11 vtable slots renamed with the compiler deciding
+ownership, the unit's `NON_MATCHING` body named too. Five names sampled at
+review: `PushPosition`/`PopPosition` verified an exact inverse pair field by
+field, `New_Class6E99C` confirmed as an 0xA0 allocator with ctor dispatch,
+`Stop` and `GetColor` confirmed against their bodies. **One correction applied at
+merge:** `Class6E99C__GetMethods` -> `GetClass6E99CMethods`, because
+`X__GetMethods` invents a third style where `Get_vtable_X` (5 occurrences) and
+`GetXMethods` (7) already exist. The evidence was sound and only the spelling
+was wrong, so the unit passed rather than going back and the naming runner stays
+Sonnet.
+
+**Track 1b (charlie, Sonnet, `code_55dd4`).** `func_80065A5C` (30/33) and
+`func_800662BC` (17/33) promoted; both oracles green, 9 bodies in 3 units.
+Charlie **corrected a head figure and was right**: the brief cited 3 and 2
+preserved bodies from an unanchored `grep -c '#if 0'`, which counts the marker
+where a report quotes it in prose or backticks. Anchored `^#if 0` gives one
+each. A cheap-model runner disagreeing with the head, with numbers, is the
+protocol working — the third time it has been recorded.
+
+**The protocol finding, and it is for the operator.** Alpha's `rename.py` runs
+touched **five source files and two match reports outside its assigned unit**,
+including `src/class_3bb8c_n.c` and two reports that were **bravo's live
+assignment**. Every edit was legitimate: `rename.py` is tree-global by
+construction, function symbols are unique, and the propagation is exactly what
+keeps a preserved body from going stale (what `stalesyms.py` exists to catch).
+But it means one-unit-per-runner and `rename.py`'s global scope are in tension
+whenever a naming runner and a matching runner run in the same round, and
+`headercontention.py` cannot see it — it prices HEADERS, and this collision
+arrived through the CALL GRAPH. The merge conflicted on all three files
+(bravo's improved bodies against alpha's renamed identifiers) and was resolved
+by taking bravo's content and re-applying the renames. Escalated, not acted on.
+
+**Also escalated:** `docs/DECOMPILATION_LEARNINGS.md` is over its 800-line
+budget and this round's two promotions made it worse (872 -> 893). Distilling it
+is a Fable task per the model table; the Opus head does not write the doc.
+
+**Head slip, recorded.** The bravo merge was started with
+`config/plan-state.json` dirty from a `mark-unit`, against §3.9's "your own tree
+must be clean first". It did not conflict and nothing was lost, but the rule
+exists so that a merge's state is unambiguous.
+
+**Next move.** `plan.py`'s list keeps taking turns across tracks 3, 1-revisit
+and 1b. The deferred job is the 1b promotion of `Obj86B60__NotifyParents` in
+`code_2cc8c_c`, skipped this round only because it shared `code_2cc8c.h` with
+the naming unit.
+
 ## 2026-09-20 — round 60: a four-round "register-allocation residue" verdict turns out to be four defects, and the memory-card class gets its names
 
 **State at end: 1142 matched / 1252 game functions (91.21% of game code);
