@@ -51,3 +51,40 @@ outside this unit's carved range with no prototype or report anywhere yet.
 Three literal zero arguments carry no evidence of what they mean, so
 naming this wrapper would just be naming a guess about `func_80056D18`.
 Kept the tier-C `Class__func_xxxxx` form per FINISHING-PLAN track 3.
+
+## Extern arity (round 59)
+
+**Verdict: arity-ok idiom.** `src/class_3bb8c_s.c`'s unprototyped declaration
+stays.
+
+**Callee evidence** (`0x80056E1C`, and the definition in
+`src/class_3bb8c_o.c`): the whole body is a forwarding tail call, and it
+*writes* `$a1`/`$a2`/`$a3` to zero before reading anything, passing only its
+incoming `$a0` through:
+
+```
+80056e24:  move  a1,zero
+80056e28:  move  a2,zero
+80056e2c:  jal   80056d18 <func_80056D18>
+80056e30:  move  a3,zero
+```
+
+So one real argument, exactly as `void LinkOwnerObj__func_56e1c(void *this)`
+says — and unusually clear, since the second argument register is not merely
+ignored but overwritten.
+
+**Why the extern must stay unprototyped.** `func_80056520`'s dispatch passes a
+second argument anyway, and retail emits it:
+
+```
+80056620:  jal   80056e1c <LinkOwnerObj__func_56e1c>
+80056624:  move  a1,zero          <- the dead 2nd argument, in retail
+```
+
+Its sibling arms do the same (`jal func_80056858` / `move a1,zero` at
+`0x80056600`, `jal func_80056BBC` / `move a1,zero` at `0x80056614`). The
+dispatch forwards `(self, 0)` uniformly; a one-parameter prototype would break
+every arm.
+
+**Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
+added to `src/class_3bb8c_s.c:144`. Oracle green.
