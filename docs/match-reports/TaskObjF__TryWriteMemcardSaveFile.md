@@ -224,21 +224,21 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     s32 openMode;
     s32 flagCopy;
     s32 payload;
-    StreamSrcObj *src;
-    StreamReq *req;
+    McIconSource *src;
+    McSaveHeader *req;
 
     payload = arg6;
     path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
-    func_80050908(path);
+    delete(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
-    fileHandle = func_80050938(path, openMode);
+    fileHandle = open(path, openMode);
     flagCopy = a3;
     if (fileHandle == -1) {
-        func_80012C20(D_80011530);
+        printf(D_80011530);
         return 0;
     }
-    func_800508F8(fileHandle);
-    fileHandle = func_80050938(path, 2);
+    close(fileHandle);
+    fileHandle = open(path, 2);
     if (fileHandle == -1) {
         return 0;
     }
@@ -254,20 +254,21 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     req->frame0 = src->frame0;
     req->frame1 = src->frame1;
     req->frame2 = src->frame2;
-    func_80013488(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
+    write(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
     func_80017CFC(req);
-    func_80013488(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
-    func_800508F8(fileHandle);
+    write(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
+    close(fileHandle);
     return 1;
 }
 ```
 
-(Note: this "best body reached" snapshot predates round 34's BIOS
-relinking and round 60's `self->cardSlot` field rename; the LIVE
-preserved body in `src/class_3bb8c_f.c` calls `open`/`delete`/`close`/
-`write`/`printf` directly and has no separate probe-open step. Both
-describe the same residue class; only the current source is
-byte-verified.)
+(round 60: this snapshot now matches the LIVE preserved body in
+`src/class_3bb8c_f.c` exactly -- the `func_80050908`/`func_80050938`/
+`func_800508F8`/`func_80013488`/`func_80012C20`-style names in the prose
+above this point in the report are historical, from before round 34
+relinked these as Sony's `delete`/`open`/`close`/`write`/`printf`; the
+code block itself is now current and resumable, confirmed via
+`tools/stalesyms.py`.)
 
 ## Levers that mattered, in order
 
