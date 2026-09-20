@@ -8,7 +8,7 @@
  * function in _b/_c/_d/_f calls into this unit (checked: the only cross-unit
  * calls are FROM this unit INTO class_3bb8c_f's still-INCLUDE_ASM
  * BuildMemcardPath/TaskObjF__EnableEvents/TaskObjF__DisableEvents/TaskObjF__TestEvents/TaskObjF__ForEachEvent/
- * TaskObjF__FindReadyEvent, never the reverse). Kept entirely local to this .c file
+ * TaskObjF__WaitForReadyEvent, never the reverse). Kept entirely local to this .c file
  * rather than include/class_3bb8c.h, to carry zero collision risk with the
  * other two runners (charlie on _f, echo on _d) editing that shared header
  * this round.
@@ -91,7 +91,7 @@ extern void TaskObjF__EnableEvents(void *self);
 extern void *TaskObjF__DisableEvents(void *self);
 extern void TaskObjF__TestEvents(void *self);
 extern void TaskObjF__ForEachEvent(void *self, void (*fn)(void), s32 arg2);
-extern s32 TaskObjF__FindReadyEvent(void *self);
+extern s32 TaskObjF__WaitForReadyEvent(void *self);
 
 /* PSX thread-table constant walked by func_8004E5E4 (4 entries, one per
  * OpenTh-style thread it starts). Address-only-derived walk (lui/addiu then
@@ -305,7 +305,7 @@ s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
     TaskObjF__TestEvents(self);
     while (_card_info(self->unk10) == 0)
         ;
-    code = TaskObjF__FindReadyEvent(self);
+    code = TaskObjF__WaitForReadyEvent(self);
     if (code == 0x100) {
         status = 0;
     } else if (code == 0x8000) {
@@ -330,7 +330,7 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
     TaskObjF__TestEvents(self);
     while (_card_load(self->unk10) == 0)
         ;
-    code = TaskObjF__FindReadyEvent(self);
+    code = TaskObjF__WaitForReadyEvent(self);
     if (code == 0x100) {
         status = 0;
     } else if (code == 0x8000) {

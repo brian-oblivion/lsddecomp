@@ -44,7 +44,7 @@ void TaskObjF__AllocBuffers(TaskObjF *self);
 void TaskObjF__FreeUnusedBuffers(TaskObjF *self);
 void TaskObjF__FreeBuffers(TaskObjF *self);
 s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag);
-s32 FindFirstReadyEvent(s32 *arr, s32 count);
+s32 WaitForReadyEvent(s32 *arr, s32 count);
 s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
 s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7);
 char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix);
@@ -335,11 +335,11 @@ s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
     return result;
 }
 
-s32 TaskObjF__FindReadyEvent(TaskObjF *self) {
-    return FindFirstReadyEvent(self->events, 4);
+s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) {
+    return WaitForReadyEvent(self->events, 4);
 }
 
-s32 FindFirstReadyEvent(s32 *arr, s32 count) {
+s32 WaitForReadyEvent(s32 *arr, s32 count) {
     s32 i;
 
     for (;;) {

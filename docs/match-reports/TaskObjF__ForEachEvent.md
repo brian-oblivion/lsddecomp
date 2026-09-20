@@ -60,7 +60,7 @@ forwarding `self` unchanged with a different callback
 - `extern s32 func_80038F6C(s32 arg); extern s32 func_8003903C(s32 arg);
   extern s32 func_800390F4(s32 arg);` — the three callbacks (the first two
   are Psy-Q SPU routines, `the 0x272C8..0x2C054 Psy-Q block (now linked from lib/ where a disc owns it, formerly asm/psyq_SpuSetMute.s)`, uncarved; the third is
-  also used directly by `FindFirstReadyEvent`, see that report).
+  also used directly by `WaitForReadyEvent`, see that report).
 - `extern void func_80024CE0(void); extern void func_80024CF0(void);` —
   **externs for functions outside this unit** (typed purely from this call
   site's own register usage: no arguments set up, no return value read).
