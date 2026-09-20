@@ -140,6 +140,16 @@
           "note": "Revisit runner bravo on Entity_e: func_80062C58 (213/213) and func_80063144 (217/217) both MATCHED, closing 14- and 46-round stalls in 11 and 2 builds. Both reports recorded names/types not relevant; in both the report's measurement was correct and its residue CLASS (delay-slot scheduling) was wrong, the real cause being source statement/branch structure. Entity_e now has zero INCLUDE_ASM.",
           "round": 59,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-20",
+          "matches": 0,
+          "model": "opus",
+          "note": "REVISIT func_8002C278: 11/76 -> 54/76, length exact, insertions 0/deletions 0. Still a stall, now a GENUINE register-identity one (two long-lived pointers vs three; alias collapses under full use). Four separable defects were hiding inside the old 'pervasive register-allocation residue' verdict, three of them plain C. First permuter run on this function: rc=124, 218094 iterations, best 130, no zero; Gate 3 all three checks recorded and AGREE.",
+          "round": 60,
+          "runners": 1
         }
       ],
       "status": "open"

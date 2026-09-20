@@ -6,6 +6,84 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-20 — round 60: a four-round "register-allocation residue" verdict turns out to be four defects, and the memory-card class gets its names
+
+**State at end: 1142 matched / 1252 game functions (91.21% of game code);
+queued 110, all stalled, 0 fresh. Build verifies; `check-nonmatching.sh`
+green at 7 bodies in 2 units. Track 3 at 13/75 units passed.**
+
+Head on Opus. Three runners, the operator's default cap. Gate 0 green first
+try; all three worktrees byte-verified before handover. `headercontention.py`
+found one contending pair (alpha and charlie both under
+`include/class_3bb8c.h`); alpha was given the header and charlie told to keep
+every declaration in its own `.c`, posted to the broadcast before spawning.
+No merge conflicted.
+
+**What moved**
+
+- **bravo (Opus, REVISIT on `code_179d8_d`).** `func_8002C278` **11/76 ->
+  54/76**, length exact, **insertions 0 / deletions 0**. Still a STALL, but
+  now a genuine register-identity one. Five levers, all new; eleven negatives,
+  all measured. First permuter run on the function (rc=124, 218094 iterations,
+  best 130, no zero), with all three Gate 3 checks recorded and AGREE.
+- **alpha (Sonnet, track 3 naming on `class_3bb8c_f`).** The unit is the
+  **memory-card file/task class**: 20 functions and 7 `TaskObjF` fields named,
+  a unit header comment written, zero bytes moved. Unit marked passed.
+- **charlie (Sonnet, track 1b on `class_3bb8c_b`).** All four of the unit's
+  preserved bodies promoted to `#ifdef NON_MATCHING`. Both oracles green; the
+  verified build takes the `#else` and moved zero bytes. Track 1b is now 7
+  bodies across 2 units.
+
+**The round's real result: a residue CLASS can hide separable defects, and
+`funcdiff` already prints the discriminator.** `func_8002C278` carried
+"pervasive register-allocation residue" for four rounds. Underneath it were
+FOUR separable defects, three of them plain C — a misassociated `+ 8`, two
+block-position fixes, and one statement-order scheduling fix — and the
+function only reached the banned-fix category after all four were gone. The
+mechanical tell is `funcdiff`'s `insertions N / deletions M` line: it was
+7/7 the whole time, and a genuine register-identity stall is 0/0. This
+sharpens round 59's finding rather than repeating it: round 59 established
+that a residue class goes stale unnoticed, and round 60 supplies the cheap
+check that says so without re-deriving the function.
+
+Two inherited negatives were falsified on the reshaped body. "GCC eliminates
+the trivial dead copy" was true of the body it was measured on and false
+after the reshape — six of six joint-best permuter candidates converged
+independently on the alias that exploits it. The allocno-priority model was
+falsified outright. Both are the revisit hypothesis landing as written, and
+bravo recorded `names/types not relevant`, which is now three revisits in a
+row whose payload was re-classifying rather than re-reading with new names.
+
+**Head corrections at merge.**
+
+- I gave alpha a wrong fact in its brief — that `func_8004EF6C` sat in an
+  `#ifdef NON_MATCHING` body. It sits in `#if 0`. The difference is
+  load-bearing: an `#if 0` body is compiled by NEITHER oracle, so a field
+  rename inside one has no compiler behind it. Corrected on the broadcast
+  with a `stalesyms.py` baseline so alpha could tell its own damage from the
+  pre-existing; alpha then found and fixed a real stale-symbol block.
+- `FindFirstReadyEvent` renamed to `WaitForReadyEvent` (and its forwarder) at
+  review. The evidence and the tier were right; the name was wrong about
+  control flow — the outer loop has no exit but its `return`, so the function
+  blocks, and "can this call hang?" is what a caller most needs answered. By
+  the plan's written test the unit still passes, so the Sonnet naming runner
+  keeps the role, but this was not a clean pass.
+
+**Not promoted to the learnings doc, on purpose.** Alpha's cross-unit finding
+— that `Node3bb8cE` and `TaskObjF` may be one class seen through two
+independent local views, evidenced by `func_8004E5E4` filling `threads[4]` at
++0x014 and handing the same pointer to this unit's event-enable wrapper — is
+a track-4 class-identity lead, not a source-shape idiom. It stays in
+`docs/match-reports/TaskObjF__EnableEvents.md` for whoever runs track 4.
+
+**Escalated to the operator, not acted on** (see the round's report): a
+proposed ins/del sweep of the 8 live stalls whose title region claims
+register identity, which is a new screen and therefore not an Opus head's to
+write; and `DECOMPILATION_LEARNINGS.md` now 872 lines against its 800 budget,
+which needs a distillation pass.
+
+---
+
 ## 2026-09-20 — round 59: two revisits close 14- and 46-round stalls, track 1b opens with three bodies, and the extern queue reaches zero
 
 **State at end: 1142 matched / 1252 game functions (91.21% of game code);

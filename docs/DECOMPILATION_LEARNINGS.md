@@ -144,6 +144,17 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   that falls through); a duplicated assignment retail keeps in two copies needs the OTHER
   copy last. Closed `func_8005CBC8` 100/100 after ~77k permuter iterations on the wrong
   axis. (a §"An arm that must JUMP")
+- **A guard's source POSITION decides where its block lands; its POLARITY does not.** To
+  put `return 0` at the BOTTOM as retail has it, the body goes inside `if (cond) { ... }`
+  with the return as the function's LAST statement; every early-return and `goto`
+  spelling inlines that block at the top instead. Round 19 measured that flipping the
+  polarity changed nothing and closed the axis; the lever was position all along, and the
+  same shape moved the inner `return -1` too. (a round 60, `func_8002C278`, 11/76 -> 24/76)
+- **Statement ORDER drives load-delay scheduling, and the effect is INVERTED in the
+  output.** Writing the `unk10` store before `unk14` — against the store order that
+  appears in the compiled code — is what makes cc1 hoist the `lh` into the delay slot and
+  drop a nop. So do not order source statements to mirror the asm you are chasing; treat
+  order as an independent lever and try it both ways. (a round 60, `func_8002C278`)
 - **Not strictly dominant — diagnose per instance.** Round 25 closed three functions with
   FOUR different placement fixes and regressed one already right. Tell: a lone
   unconditional `j` to a nearby join whose delay slot carries real work. Build no screen —
@@ -436,6 +447,14 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   and naming is the source knob for it. Not the "redundant move" permuter class, which
   is for copies surviving every REORDERING. (a docs/match-reports/func_80062C58.md,
   round 59)
+
+- **An explicit alias can force the parameter copy cc1 would otherwise coalesce away, and
+  "the dead copy gets eliminated" is a per-BODY negative.** `Obj278 *p; p = self;` used
+  for even ONE access made cc1 emit retail's `move`; six of six joint-best permuter
+  candidates converged on it independently. The standing report had recorded elimination
+  as a closed negative — true of the body it was measured on, false after the reshape.
+  Using the alias EVERYWHERE collapses back to two pointers and cc1 coalesces again, so
+  the lever is partial use. (a round 60, `func_8002C278`, -> 54/76)
 
 ### 3e. Frames and stack
 
@@ -792,6 +811,15 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   unpromoted learning does not exist. (a §"\"Unscoreable\" describes a SESSION's state",
   §"Distinguishing \"spent\" from \"hard\"", §"Gate 1b's sixth screen is neither SOUND nor
   COMPLETE")
+- **`funcdiff`'s `insertions N / deletions M` line is the mechanical discriminator for a
+  register-identity verdict: 0/0 means genuine, anything else means separable defects are
+  hiding inside the class.** `func_8002C278` carried "pervasive register-allocation
+  residue" for four rounds at 7/7 — four separable defects, three of them plain C (a
+  misassociated `+ 8`, two block-position fixes, one scheduling order). At 0/0 every
+  instruction is retail's in retail's order and only the register pairing differs, which
+  IS the banned-fix category. Cheap, and it needs no new tooling: rebuild the preserved
+  body and read the line. (a round 60)
+
 ## 5. Withdrawn or SDK-voided — do not re-add
 
 Each rests on Sony's linked SDK objects (ASPSX-built, so no source shape of ours reached

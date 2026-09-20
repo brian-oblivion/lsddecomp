@@ -6,12 +6,24 @@
  * on a class UNRELATED to Obj866E8/D_800866E8 (include/class_3bb8c.h) --
  * none of these 19 functions read or write anything typed there, and no
  * function in _b/_c/_d/_f calls into this unit (checked: the only cross-unit
- * calls are FROM this unit INTO class_3bb8c_f's still-INCLUDE_ASM
- * BuildMemcardPath/TaskObjF__EnableEvents/TaskObjF__DisableEvents/TaskObjF__TestEvents/TaskObjF__ForEachEvent/
- * TaskObjF__WaitForReadyEvent, never the reverse). Kept entirely local to this .c file
- * rather than include/class_3bb8c.h, to carry zero collision risk with the
- * other two runners (charlie on _f, echo on _d) editing that shared header
- * this round.
+ * calls are FROM this unit INTO class_3bb8c_f's BuildMemcardPath /
+ * TaskObjF__EnableEvents / TaskObjF__DisableEvents / TaskObjF__TestEvents /
+ * TaskObjF__ForEachEvent / TaskObjF__WaitForReadyEvent, never the reverse).
+ * These declarations are kept local to this .c rather than moved into
+ * include/class_3bb8c.h, per the project's cross-unit-prototype rule.
+ *
+ * ROUND 60 CORRECTIONS to this comment. (1) Those six callees were described
+ * here as "still-INCLUDE_ASM"; they are MATCHED C and have been for several
+ * rounds -- the round-14 wording outlived the fact. (2) The original reason
+ * given for keeping them local was "zero collision risk with the other two
+ * runners editing that shared header this round", which froze one round's
+ * staffing into a source comment; the durable reason is the rule, not who
+ * happened to be running. (3) The "UNRELATED class" claim above concerns
+ * Obj866E8 and still stands, but round 60 found concrete evidence that this
+ * unit's Node3bb8cE and class_3bb8c_f's TaskObjF may be ONE class seen
+ * through two independent local views: func_8004E5E4 fills Node3bb8cE's
+ * threads[4] at +0x014 and hands the same pointer to TaskObjF__EnableEvents.
+ * A track-4 lead; see docs/match-reports/TaskObjF__EnableEvents.md.
  *
  * The object derives from the same BasicClass framework documented in
  * include/code_8220.h (base vtable fetched via a no-argument getter,
