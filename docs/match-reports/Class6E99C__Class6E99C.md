@@ -17,7 +17,7 @@ void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
         tableEntry = D_8006EAA8;
     }
     base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
-    self->methods = func_800404C0();
+    self->methods = Class6E99C__GetMethods();
     self->methods->slot40(self, a2);
 }
 ```

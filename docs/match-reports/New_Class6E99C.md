@@ -20,7 +20,7 @@ Unit `code_2cc8c_e`, carved round 14.
 >
 >     self = func_80017B34(0xA0);
 >     if (self != NULL) {
->         func_800404C0()->ctor(self, a1, a2, a3);
+>         Class6E99C__GetMethods()->ctor(self, a1, a2, a3);
 >         return self;
 >     }
 >     return NULL;
