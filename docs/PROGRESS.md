@@ -6,6 +6,170 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-21 — round 64: the first track closes, and a per-lever negative that stood 16 rounds turns out to be the lever
+
+**Three runners, three tracks, three merges, all green. 1148 -> 1150 matched,
+queued 104 -> 102, and TRACK 2 IS DONE** — the first of the five to close. Head
+on Opus (no new procedure, tool or doc rule written; the three findings that
+would need one are ESCALATED below, not adjudicated). Gate 0 clean, all three
+worktrees byte-verified before handover, zero orphaned workers at teardown.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 3 | `code_179d8_h` | 11 functions, 2 globals, 6 unit-local fields named; PASSED review, five names sampled |
+| bravo | sonnet | 2 | (call surface) | `func_80038D54` -> `SpuInit`; **track 2 closed** |
+| charlie | opus | 1 revisit | `class_3bb8c_n` | MATCH `func_80055258` 110/110 and `func_80055410` 87/87; `func_8005511C` 16/79 -> 49/79 length exact |
+
+### Track 2 closed on position, not on the fingerprint
+
+`sdkname.py` scored `func_80038D54` at masked 1.00 / shape 1.00 — and returned a
+**four-way AMBIGUOUS tie** (`SsInit`, `SsStart2`, `SsUtReverbOff`, `SpuInit`).
+The fingerprint alone could not have named it. Position did: the function
+occupies the 0x20-byte gap `config/psyq-objects.txt` already documents between
+the placed, byte-verified `libspu/s_m_f` and `libspu/s_sr`, and `SpuInit` is the
+only libspu name among the four candidates — the rest are libsnd and do not
+belong in a contiguous libspu run. `LIBSPU.H`'s `extern void SpuInit (void);`
+then agreed with the call site's existing `(void)` shape, giving three evidence
+kinds where the track requires two. `--selfcheck 10` recovered 9/9 first.
+
+This is the track's own evidence ranking working exactly as written, on the last
+function in the queue: the strongest evidence kind was insufficient by itself and
+the second kind decided. A round that had trusted the top fingerprint row would
+have had a 1-in-4 chance of writing `SsInit` into the symbols file.
+
+### The revisit rule pays 2 of 3 again, both on axes a permuter cannot search
+
+`func_80055258` (STALL 6/110, filed round 47, "extra saved register from an
+address GCC caches that retail recomputes") closed at **110/110, ins0/del0** on
+the global's declaration shape. The four in-tree points that pin the axis:
+`extern u8 D_X[]` + `*(s32 *) D_X = v` and `extern s32 D_X[]` + `D_X[0] = v`
+both 5/110 RED with an extra `$s1` and 8 more frame bytes; `extern s32 D_X;`
+assigned either by name or through `*(s32 *) &D_X` both 110/110 GREEN. So
+element type and cast spelling are inert and **arrayness is the whole axis**.
+
+The head's contribution here was a wrong mechanism corrected in public on the
+broadcast, which is worth recording because the correction went the right way.
+The head ran four isolation variants through the pinned pipeline and posted that
+the declared type was *not* the mechanism. Charlie replied with numbers: all
+four variants were ARRAY declarations, so they measured element type and cast
+spelling, never array-vs-scalar. The head then ran the missing scalar variant —
+byte-identical to the array one — which established that **isolation cannot
+distinguish this axis in either direction**, and that the effect needs the real
+body's context. Charlie's in-tree four-point table is the evidence; the head's
+reproducer is the negative half of the discriminator. A cheap-model runner
+disagreeing with the head, with measurements, is the protocol working (round 47).
+
+`func_80055410` (STALL 25/87, "pervasive `$v0`/`$v1`/`$a0`/`$a1` temp-register
+renaming", 900s / 136,367 iterations, no zero) closed at **87/87, ins0/del0**
+after ONE build. The entire residue was one named local: a single `s32 r` reused
+for three `rand()` results kept `r` live across the calls, so cc1 could not
+coalesce `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal`.
+Deleting `r` and calling `rand()` inline recoloured the whole body. This
+confirms round 63's corollary verbatim — a permuter mutates a body but never
+DELETES its locals, so 136,367 iterations bounded the search, not the function.
+
+Charlie's procedure note is worth more than either match: the discriminator was
+visible in one `asm-differ` read as a literal extra `move a1,v0`. Two rounds
+filed it as diffuse register colour and one spent 900s searching it without ever
+reading the diff for an extra COPY. **If a residue is "pervasive register
+renaming" AND you are N words long, look for N copies first.**
+
+### A per-lever negative is the most expensive stale report entry
+
+`func_8005511C` went 16/79 and one word short to **49/79 and LENGTH EXACT**. The
+lever that closed the entire length gap was a pointer local forcing an address
+into a saved register (`u8 **q = &D_8008E0B0`, deriving `q - 0xC`) — copied from
+a matched sibling in the same unit. **Round 48's attempt 6 had recorded that
+exact lever as "regressed badly (8/79)", and charlie could not reproduce the
+regression.** It is the lever, and the stale negative stood for 16 rounds.
+
+The generalisation, which is charlie's and which the head is escalating rather
+than writing into a doc itself: a report's ATTEMPTS list is a record of what
+someone did, not proof of what does not work. A per-lever negative is uniquely
+expensive because it reads as a *reason not to retry*, so on a revisit, derive
+the mechanism from the disassembly BEFORE reading the attempts. PARALLEL-RUNS
+§3.3 screens titles, attempt history and permuter history; it does not yet screen
+per-lever negatives inside a report body.
+
+### Two levers each measured BYTE-INERT are not jointly inert
+
+From `func_8005511C`'s permuter candidate (495 against a 1900 base — a 74%
+reduction, stronger than round 48's 830/2899, and it still did not transfer).
+The candidate made two changes through one extra local: (a) a single-use store
+alias, (b) a named local for a global load passed as an argument. In-tree, three
+builds, all length-checked off the map: (a) alone byte-inert, (b) alone
+byte-inert, **(a)+(b) together ins 7/7 -> 3/3**, the lowest reached on the
+function. The same pseudo then carries two unrelated values in two DISJOINT live
+ranges, which splits its lifetime; a single-use alias is copy-propagated away,
+and REUSE is a property of the PAIR. §3d records the converse ("a residue
+surviving two levers independently has not been shown to survive their
+combination"); this is the mirror, and the more surprising half. Practical
+consequence: screening a candidate by splitting it into halves, two inert halves
+do NOT license discarding it.
+
+### Track 3: a naming pass that falsified two of its own unit's claims
+
+`code_179d8_h` got the CD-file quad (`OpenCdFile`, `CloseCdFile`,
+`GetCdFileSize`, `ReadCdFile`), the `Class6D430__Install/DestroyCdReadDriver`
+ctor/dtor pair, `BuildCdFilePath`, `GetCdUseVSyncCallback` and `NoOp2/3/4` —
+11 functions, 5 tier A and 6 tier B, no tier C. `GetCdFileSize`'s body
+(`((size >> 11) + 1) << 11`) rounds up to whole 2048-byte CD sectors, which is
+what makes the name evidence rather than a guess.
+
+Two of the unit header's own claims turned out false and were fixed: a "zero
+functions reference any of the 60 class tables" line (the ctor/dtor pair
+dispatch `D_8006D430`/`D_8006D4E8`, both scanned) and a stale `gp_rel` BLOCKED
+banner for a function that matched in round 45. Alpha also declined to apply an
+offset coincidence it found — `Class6D430::pendingGeneration` documented as a
+counter in `code_171e0.h` versus a 0/1 open flag at the same offset here — and
+wrote it up as a specific claim to verify instead. That is the park rule's
+spirit applied without being told.
+
+Alpha proposed one cross-unit field name (`Methods80027480::slot48` ->
+`onError`), which the head applied by TYPE SCOPE: definition first, then the
+compiler named the accessor set — exactly one, `src/code_179d8_s.c:326`. The
+type turned out unit-local, so the proposal was conservative; alpha proposed
+rather than applied because the unit was not its own, which is the rule working.
+
+### Head-side: a doc recipe that has been silently failing
+
+The head hit this running the isolation reproducer above. CLAUDE.md's
+"Escalate, do not experiment" recipe pipes the maspsx flags in as
+`$(sed -n 's/^MASPSX_FLAGS *:= *//p' Makefile)`. **This project's shell is zsh,
+which does not word-split an unquoted `$(...)`**, so all seven flags arrive as
+one argv entry, maspsx dies on `--aspsx-version`, and because that is mid-PIPE
+the recipe's own exit status still reads 0 — the same
+necessary-but-not-sufficient hazard PARALLEL-RUNS §3.9 documents for
+`build-and-verify.sh`. The only symptom is an objdump that prints its "file
+format" line and no function.
+
+Fixed in place as maintenance (a factually broken command, no rule changed):
+the recipe now assigns `MASPSX_FLAGS` on its own line, states that it must run
+under bash, and gives the zsh spelling `${=MASPSX_FLAGS}`. Verified end to end.
+Flagged to the operator in case they want it treated as a rule change instead.
+
+Also corrected: DECOMPILATION_LEARNINGS' "The three RESOLVED blockers" heading
+and table, which had not been updated when `--nop-at-expansion` resolved the
+fourth in round 63.
+
+### Escalated, not acted on
+
+1. **`funcdiff.py` is not preprocessor-aware.** It decides "still INCLUDE_ASM"
+   by grepping `^INCLUDE_ASM`, so while you iterate with the body under
+   `#if 1` and the `INCLUDE_ASM` in `#else`, it prints its "a full match means
+   NOTHING" warning on a *genuine* match. Harmless here (the oracle was green
+   and `nm` showed a real `T`), but it inverts the signal at the exact moment
+   you close a function — and it is the second funcdiff signal-inversion
+   escalated in two rounds. Charlie reported it rather than editing the tool.
+2. **PARALLEL-RUNS §3.3 does not screen per-lever negatives**, which round 64
+   measured at a 16-round cost. Proposed as a new sub-point to the attempt-history
+   screen; a procedure change, so not written by an Opus head.
+3. **`SpuInit` may be convertible to a linked SDK object.** It sits in a
+   documented gap between two placed `libspu` objects, and `progress.py` reports
+   9 still-asm SDK functions a placed object already owns. That is
+   SDK-object-conversion work (`docs/SDK-OBJECTS-GUIDE.md`), which no open track
+   currently schedules.
+
 ## 2026-09-21 — round 63: four revisits, four matches, and the queue has been quietly de-ranking itself in proportion to our progress
 
 **Four runners, four tracks, four merges, all green. 1144 -> 1148 matched, queued

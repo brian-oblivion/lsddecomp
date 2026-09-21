@@ -180,6 +180,16 @@
           "note": "REVISIT runners (bravo code_179d8_c, delta class_3bb8c). 4 attempts, 4 MATCHES, all ins0/del0: func_8003221C 83/83, func_8004C1C0 106/106, func_8004BA40 63/63, func_8004B700 140/140. Two 'register identity' verdicts CONFIRMED by step (a) and still closed -- by varying LOCAL COUNT, the axis a permuter cannot search. One FALSIFIED (func_8004C1C0, ins12/del12 with real asm-differ markers) after eight rounds. Not calibration: track 1 is parked, these were revisits.",
           "round": 63,
           "runners": 2
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-21",
+          "matches": 2,
+          "model": "opus",
+          "note": "REVISIT runner on class_3bb8c_n: MATCH func_80055258 110/110 and func_80055410 87/87 (both ins0/del0, verified individually post-merge); func_8005511C 16/79 1-short -> 49/79 LENGTH EXACT, still a stall at ins3/3 plateau. Both matches closed on axes a permuter cannot search: the global's INCOMPLETE-ARRAY vs SCALAR declaration, and DELETING a local whose live range crosses a call. Round 48's attempt-6 per-lever negative on func_8005511C's winning lever was unreproducible and had stood 16 rounds. All three REVISITED lines written, all three ASSIGNABLE markers retired.",
+          "round": 64,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -231,6 +241,16 @@
           "model": "sonnet",
           "note": "Track 2 FIRST RUN, runner charlie. sdkname.py --selfcheck 10 recovered 9/9 EXACT, floor 1.00. Identified DrawSync (libgpu/sys, masked 1.00 + LIBGPU.H prototype agrees with call site) and GsSortClear (libgs/gs_001, masked 1.00 + LIBGS.H agrees); 44 parked under the track park rule with per-function best candidate, score and position evidence in the symbols file. Yield is low but honest: most are from library builds the discs do not carry, exactly what the track section predicts for masked<0.6 with no EXACT. One signature conflict found and used correctly as evidence AGAINST a candidate: func_80048CFC's top candidate AddCOMB is declared argument-less in LIBCOMB.H but the call site passes two arguments.",
           "round": 53,
+          "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-21",
+          "matches": 1,
+          "model": "sonnet",
+          "note": "TRACK 2 CLOSED. func_80038D54 -> SpuInit (libspu/s_i). Fingerprint alone was a 4-way AMBIGUOUS tie (masked 1.00 against SsInit/SsStart2/SsUtReverbOff/SpuInit); position broke it -- the function sits in the 0x20-byte gap psyq-objects.txt already documents between placed libspu/s_m_f and libspu/s_sr, and SpuInit is the only libspu name among the four. LIBSPU.H's prototype agrees with the call site's (void) shape: three evidence kinds. sdkname.py --selfcheck 10 recovered 9/9.",
+          "round": 64,
           "runners": 1
         }
       ],
@@ -318,6 +338,16 @@
           "note": "code_179d8_m named and marked passed: 12 functions, 13 globals, 4 fields; unit identified as the MIDI-driven 24-voice SPU sound driver (D_8006DAD4 == 0x1F801C00 plus code_179d8_k's MIDI status-byte switch). Head review sampled five names against evidence, all stand, naming runner STAYS sonnet. Runner correctly deferred every global shared with bravo's live unit (call-graph contention) and proposed them instead.",
           "round": 62,
           "runners": 1
+        },
+        {
+          "attempts": 11,
+          "calibration": false,
+          "date": "2026-09-21",
+          "matches": 11,
+          "model": "sonnet",
+          "note": "Naming pass on code_179d8_h: 11 functions named (tier A x5, tier B x6, no tier C), 2 globals, 6 unit-local fields. Head review sampled five names against evidence -- all stand, no tier-A name without evidence, so the naming runner stays sonnet. Alpha also falsified two of its own unit header's claims (a 'zero functions reference any of the 60 class tables' line that was false, and a stale gp_rel BLOCKED banner for a function matched in round 45) and proposed one cross-unit field name, applied by the head by TYPE SCOPE.",
+          "round": 64,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -328,6 +358,7 @@
         "class_3bb8c_p": "2026-09-19",
         "code_171e0": "2026-09-18",
         "code_179d8_e": "2026-09-18",
+        "code_179d8_h": "2026-09-21",
         "code_179d8_m": "2026-09-20",
         "code_179d8_q": "2026-09-17",
         "code_179d8_r": "2026-09-18",
