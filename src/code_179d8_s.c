@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-/* Local view of the object func_80027480/EnqueueCdRequest/func_80028A34 read
+/* Local view of the object func_80027480/EnqueueCdRequest/CloseCdFile read
  * through -- the real struct is ObjA34_179D8H (src/code_179d8_h.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
@@ -68,7 +68,7 @@ extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
 extern s32 gCdBusy;
 
-extern void func_80028A34(Obj80027480 *self);
+extern void CloseCdFile(Obj80027480 *self);
 extern void LockCd(void);
 extern void StartCdOperation(s32 arg0, s32 arg1);
 extern void ResetCdStateMachine(void);
@@ -90,8 +90,8 @@ extern s32 FindCdFileIndex(char *arg0);
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
-extern void func_80028920(Obj80027480 *self, char *suffix);
-extern char *func_800289CC(char *dest, char *suffix);
+extern void OpenCdFile(Obj80027480 *self, char *suffix);
+extern char *BuildCdFilePath(char *dest, char *suffix);
 extern s32 CdSearchFile(void *statBuf, char *path);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
 extern s32 CdSync(s32 mode, void *result);
@@ -110,7 +110,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     s32 v0;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        func_80028920(self, suffix);
+        OpenCdFile(self, suffix);
         return;
     }
     LockCd();
@@ -129,7 +129,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
                 self->unk0C = 1;
                 self->unk1C = temp;
             } else {
-                func_800289CC(path, suffix);
+                BuildCdFilePath(path, suffix);
                 do {
                 } while (CdSearchFile(&statBuf, path) == 0);
                 self->unk18 = statBuf.unk0;
@@ -152,7 +152,7 @@ void func_800272D0(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 
 void func_80027480(Obj80027480 *self) {
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        func_80028A34(self);
+        CloseCdFile(self);
         return;
     }
     LockCd();
@@ -172,7 +172,7 @@ extern u8 D_8006D574[8];
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
-extern s32 func_80028A50(Obj80027480 *self);
+extern s32 GetCdFileSize(Obj80027480 *self);
 extern s32 CdPosToInt(void *pos);
 extern void CdIntToPos(s32 i, void *pos);
 extern void CdControl(s32 arg0, void *buf, s32 arg2);
@@ -183,7 +183,7 @@ s32 func_80027528(Obj80027480 *self, u32 arg1, s32 arg2) {
     u32 s0tmp;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        return func_80028A50(self);
+        return GetCdFileSize(self);
     }
     LockCd();
     if (self->unk28 != 0) {
@@ -231,7 +231,7 @@ extern s32 gCdReadSectorCount; /* CdRead sector count */
 extern void *gCdReadBuffer; /* CdRead target buffer */
 extern s32 gCdTickStep;
 
-extern void func_80028A84(Obj80027480 *self, void *arg1, s32 arg2);
+extern void ReadCdFile(Obj80027480 *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
 extern s32 CdReadSync(s32 mode, s32 result);
 extern void ResetCdStateMachine(void);
@@ -240,7 +240,7 @@ s32 func_800276D0(Obj80027480 *self, void *buf, u32 size) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        func_80028A84(self, buf, size);
+        ReadCdFile(self, buf, size);
         return 0;
     }
     LockCd();

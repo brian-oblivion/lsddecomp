@@ -1,4 +1,6 @@
-# func_80028A50 -- MATCHED (11/11 words)
+# GetCdFileSize -- MATCHED (11/11 words)
+
+> Renamed from `func_80028A50` on 2026-09-21 (tools/rename.py). Address 0x80028a50.
 
 Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 
@@ -12,7 +14,7 @@ typedef struct ObjA34_179D8H {
     u32 unk1C;
 } ObjA34_179D8H;
 
-s32 func_80028A50(ObjA34_179D8H *self) {
+s32 GetCdFileSize(ObjA34_179D8H *self) {
     u32 result;
 
     if (self->unk0C == 0) {

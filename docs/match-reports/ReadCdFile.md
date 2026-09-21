@@ -1,4 +1,6 @@
-# func_80028A84 -- STALL (best: 8/56 words at length 57/56 [1 word long], structural / block-layout)
+# ReadCdFile -- STALL (best: 8/56 words at length 57/56 [1 word long], structural / block-layout)
+
+> Renamed from `func_80028A84` on 2026-09-21 (tools/rename.py). Address 0x80028a84.
 
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then one more
 > structural reshape, negative.**
@@ -115,10 +117,10 @@ Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment). Restored to
 `INCLUDE_ASM`.
 
 ## Class: structural (basic-block placement), plus an unresolved
-register-role rotation similar to `func_80028920`'s stall in this same unit
+register-role rotation similar to `OpenCdFile`'s stall in this same unit
 
 Screened clean on both documented blockers. Confirmed via `tools/m2ctx.py
-code_179d8_h --sig 's32 func_80028A84(ObjA34_179D8H *self, char *arg1, s32
+code_179d8_h --sig 's32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32
 arg2)' --run`, whose independent reconstruction matches this report's
 reading of the algorithm.
 
@@ -128,7 +130,7 @@ CD-ROM read/retry loop: if `self->unk0C == 0`, dispatch through
 `self->methods->slot48(self)` (a new vtable slot on the SAME
 `ObjA34_179D8H` class this unit already established) and return 0.
 Otherwise, loop: reset something via `func_80028DF0(2, &self->unk18, 0)`
-(this unit's own `unk18` field, matched in `func_80028920`'s stall report),
+(this unit's own `unk18` field, matched in `OpenCdFile`'s stall report),
 poll `func_80028D68` (already matched elsewhere, in `code_179d8_b.c`) until
 it returns nonzero; on `5` specifically, restart the whole loop; on any
 other nonzero, and only if the caller-supplied `arg2 >> 11` ("sector
@@ -157,7 +159,7 @@ extern s32 CdSync(s32 arg0, void *buf);
 extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
 extern s32 CdReadSync(s32 arg0, s32 arg1);
 
-s32 func_80028A84(ObjA34_179D8H *self, char *arg1, s32 arg2) {
+s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
     s32 hi;
     s32 status;
     char scratch[0x800];
@@ -198,7 +200,7 @@ region `sp+0x10..0x810` (a suspicious, exact `0x800` = one CD sector) is
 otherwise unreferenced by this function's own instructions -- a `scratch[0x800]`
 declared before the small `buf[0x10]` reproduces this layout (confirmed:
 the `lwl`/`swl`-style address `sp+0x810` came out right with this
-declaration order, matching `func_80028920`'s earlier finding that GCC
+declaration order, matching `OpenCdFile`'s earlier finding that GCC
 allocates locals low-to-high in DECLARATION order here).
 
 ## The residue (two distinct issues)
@@ -220,7 +222,7 @@ allocates locals low-to-high in DECLARATION order here).
    NOT controlled by simple source reordering the way it was for smaller
    functions earlier this round.
 2. **Even in the closer (8/56) attempt, register roles differ from retail**
-   in the same style as `func_80028920`'s stall in this unit: which
+   in the same style as `OpenCdFile`'s stall in this unit: which
    callee-saved register holds `self` vs. the loop's other live values
    does not match, and the frame's REGISTER SAVE ORDER at the top of the
    function differs (`sw s0` vs `sw s1` first).
@@ -270,7 +272,7 @@ order) needs more work, not that the first attempt was closer to done.
 body into `src/code_179d8_h.c` in place of the `INCLUDE_ASM` and ran the
 real oracle: `build exit=2`, no compile-error grep hits, `funcdiff.py`
 reads **8/56 raw word-match**, identical to the recorded figure.
-`build/lsdde.map` (`func_80028B64 - func_80028A84 = 0xE4` = 57 words)
+`build/lsdde.map` (`func_80028B64 - ReadCdFile = 0xE4` = 57 words)
 confirms the function is still exactly one word (4 bytes) longer than
 retail's 56, matching round 36's own re-verification exactly. Restored to
 `INCLUDE_ASM` immediately after; diffed the restored file byte-for-byte
@@ -284,7 +286,7 @@ confirms `OK: build matches retail SLPS_015.56`.
   layout, per this report's own stack-layout note above, and is never
   read).
 - **(b) insertion/deletion penalties, `--debug --stack-diffs`:** **NOT**
-  near 0/0, and further from it than `func_80028920`'s sibling residue in
+  near 0/0, and further from it than `OpenCdFile`'s sibling residue in
   this same unit. Measured: `Insertions: 5 (100)`, `Deletions: 4 (100)`,
   `Reorderings: 6 (60)`, `Register Differences: 13 (5)`, `Stack
   Differences: 8 (1)`, **base score = 1333**. Consistent with this
@@ -299,7 +301,7 @@ confirms `OK: build matches retail SLPS_015.56`.
   measure the SAME already-on-file residue rather than a contradictory
   one, so there is nothing to flag as a scaffold/real-build disagreement.
 
-**Verdict: search DECLINED**, for the same reason as `func_80028920` in
+**Verdict: search DECLINED**, for the same reason as `OpenCdFile` in
 this unit and made stronger by the larger insertion/deletion/reordering
 counts here: this is a block-placement (whole basic block relocated
 relative to the loop) plus register-role-rotation residue, which is a

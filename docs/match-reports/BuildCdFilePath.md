@@ -1,11 +1,13 @@
-# func_800289CC -- MATCHED (26/26 words)
+# BuildCdFilePath -- MATCHED (26/26 words)
+
+> Renamed from `func_800289CC` on 2026-09-21 (tools/rename.py). Address 0x800289cc.
 
 Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 
 ## Result
 
 ```c
-char *func_800289CC(char *dest, char *suffix) {
+char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
     strcpy(dest + 1, func_800270B8());
     strcat(dest, suffix);

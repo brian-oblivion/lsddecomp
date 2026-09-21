@@ -64,14 +64,14 @@
  * tables are different classes but share the base's slot layout. */
 extern Class6D430Methods *GetClass6D4E8Methods(void);
 
-/* func_80028A34/func_80028A50's own `self` -- offsets +0xC/+0x1C happen to
+/* CloseCdFile/GetCdFileSize's own `self` -- offsets +0xC/+0x1C happen to
  * coincide with Class6D430::unk0C and its documented-unknown pad18
  * gap, but that header is code_171e0.c's shared reading and is off-limits
  * to edit here (out of unit) -- kept as this unit's own LOCAL, narrower
  * view per the project's multiple-independent-local-views convention. */
 /* A 4-byte, alignment-2 pair -- the idiom CLAUDE.md documents for a struct
  * whose whole-struct assignment compiles to lwl/lwr + swl/swr instead of a
- * plain lw/sw (func_80028920's own unk18 copy needs this). Field meaning
+ * plain lw/sw (OpenCdFile's own unk18 copy needs this). Field meaning
  * unestablished beyond width/alignment. */
 typedef struct Pair16_179D8H {
     s16 unk0;
@@ -80,11 +80,11 @@ typedef struct Pair16_179D8H {
 
 typedef struct ObjA34_179D8H ObjA34_179D8H;
 
-/* ObjA34_179D8H's own methods table -- only the one slot func_80028A84
+/* ObjA34_179D8H's own methods table -- only the one slot ReadCdFile
  * dispatches through is named. Total leading padding through +0xC is
  * unchanged from before this slot was identified (0x4 + 0x8 = 0xC), so
- * this is not a shifting edit -- confirmed by re-verifying func_80028A34
- * and func_80028A50 (both already matched, both readers of this struct)
+ * this is not a shifting edit -- confirmed by re-verifying CloseCdFile
+ * and GetCdFileSize (both already matched, both readers of this struct)
  * after adding it. */
 typedef struct MethodsA34_179D8H {
     u8 pad000[0x48];
@@ -100,9 +100,9 @@ struct ObjA34_179D8H {
     u32 unk1C;
 };
 
-/* func_8002B640's own stat-like output buffer (func_80028920's local
- * `sp+0x10`). Only the two fields func_80028920 itself copies out are
- * named; the buffer runs up to sp+0x28, where func_80028920's own path
+/* func_8002B640's own stat-like output buffer (OpenCdFile's local
+ * `sp+0x10`). Only the two fields OpenCdFile itself copies out are
+ * named; the buffer runs up to sp+0x28, where OpenCdFile's own path
  * string buffer starts, so it's at least 0x18 bytes -- the rest is
  * unestablished. */
 typedef struct StatBuf179D8H {
@@ -125,9 +125,9 @@ extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path);   /* lib/libcd/iso9
 extern void printf(const char *fmt, void *arg1);
 extern char D_800107F4[];
 
-/* Forward declaration: func_800289CC is defined later in this file (ROM
- * order), but func_80028920 (earlier in ROM order) calls it. */
-char *func_800289CC(char *dest, char *suffix);
+/* Forward declaration: BuildCdFilePath is defined later in this file (ROM
+ * order), but OpenCdFile (earlier in ROM order) calls it. */
+char *BuildCdFilePath(char *dest, char *suffix);
 
 /* func_800270B8 is code_171e0.c's; strcpy and strcat are Sony's
  * (lib/libc2/strcpy.o, lib/libc2/strcat.o, linked since round 34) --
@@ -152,7 +152,7 @@ void func_80028918(void) {
 
 /* ROUND 36 (runner charlie): the round-17 preserved body (best 12/43,
  * structural -- path-address CSE across the loop's calls, plus a
- * register-role rotation, per docs/match-reports/func_80028920.md) spelled
+ * register-role rotation, per docs/match-reports/OpenCdFile.md) spelled
  * its two callees func_8002B640/func_80012C20, which round 34's SDK-object
  * conversion retargeted to CdSearchFile/printf (already declared above,
  * per-call-site typed for this unit). Corrected and rebuilt: reproduces the
@@ -160,9 +160,9 @@ void func_80028918(void) {
  * confirmed via asm-differ) -- the previously recorded figure is now
  * measured, not carried forward. Still genuinely stalled; restored to
  * INCLUDE_ASM. The report carries the corrected, linkable body. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028920);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_h", OpenCdFile);
 
-char *func_800289CC(char *dest, char *suffix) {
+char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
     strcpy(dest + 1, func_800270B8());
     strcat(dest, suffix);
@@ -170,13 +170,13 @@ char *func_800289CC(char *dest, char *suffix) {
     return dest;
 }
 
-void func_80028A34(ObjA34_179D8H *self) {
+void CloseCdFile(ObjA34_179D8H *self) {
     if (self->unk0C != 0) {
         self->unk0C = 0;
     }
 }
 
-s32 func_80028A50(ObjA34_179D8H *self) {
+s32 GetCdFileSize(ObjA34_179D8H *self) {
     u32 result;
 
     if (self->unk0C == 0) {
@@ -191,7 +191,7 @@ void func_80028A7C(void) {
 }
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) -- this
- * unit's own per-call-site typing for func_80028A84's calls, kept local. */
+ * unit's own per-call-site typing for ReadCdFile's calls, kept local. */
 extern void CdControl(s32 arg0, Pair16_179D8H *buf, s32 arg2);
 extern s32 CdSync(s32 arg0, void *buf);
 extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
@@ -199,7 +199,7 @@ extern s32 CdReadSync(s32 arg0, s32 arg1);
 
 /* ROUND 36 (runner charlie): the round-17 preserved body (best 8/56
  * structural, via asm-differ realignment -- block-placement + a
- * register-role rotation, per docs/match-reports/func_80028A84.md) spelled
+ * register-role rotation, per docs/match-reports/ReadCdFile.md) spelled
  * its four callees func_80028DF0/func_80028D68/func_80029274/func_80029254,
  * which round 34's SDK-object conversion retargeted to
  * CdControl/CdSync/CdRead/CdReadSync (already declared above, per-call-site
@@ -212,7 +212,7 @@ extern s32 CdReadSync(s32 arg0, s32 arg1);
  * statements -- identical compiled length and shape, no improvement.
  * Still genuinely stalled; restored to INCLUDE_ASM. The report carries the
  * corrected, linkable body. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", func_80028A84);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_h", ReadCdFile);
 
 void func_80028B64(void) {
 }

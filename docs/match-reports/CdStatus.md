@@ -31,6 +31,6 @@ Byte-exact, 4/4 words.
 
 Inherited name from FirecatFG's lsddecomp, treated as a hypothesis per
 CLAUDE.md -- but the shape (a trivial byte accessor) and this unit's overall
-CD-ROM theme (`func_800289CC`'s path-building, the `;1` ISO9660 suffix) make
+CD-ROM theme (`BuildCdFilePath`'s path-building, the `;1` ISO9660 suffix) make
 "CD status byte" a plausible read, not just an inherited label taken on
 faith.
