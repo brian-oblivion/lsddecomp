@@ -170,6 +170,16 @@
           "note": "REVISIT runner on code_179d8_j_b. func_80031890 MATCHED 73/73 ins0/del0 (lever: diff the matched sibling func_80031280's compiled OBJECT against retail's .s, not its C). func_80030980 improved 292->315/324 and round 50's 'length-exact, register identity' verdict FALSIFIED at ins101/del101. func_80030E90 confirmed and re-classified toolchain-blocked, 11-word gap accounted for exactly (9 maspsx load-delay nops + 2 guard words). All three revisits turned on step (a), reading ins/del off the rebuilt inherited body before touching anything. Escalation raised, not acted on.",
           "round": 62,
           "runners": 1
+        },
+        {
+          "attempts": 4,
+          "calibration": false,
+          "date": "2026-09-21",
+          "matches": 4,
+          "model": "opus",
+          "note": "REVISIT runners (bravo code_179d8_c, delta class_3bb8c). 4 attempts, 4 MATCHES, all ins0/del0: func_8003221C 83/83, func_8004C1C0 106/106, func_8004BA40 63/63, func_8004B700 140/140. Two 'register identity' verdicts CONFIRMED by step (a) and still closed -- by varying LOCAL COUNT, the axis a permuter cannot search. One FALSIFIED (func_8004C1C0, ins12/del12 with real asm-differ markers) after eight rounds. Not calibration: track 1 is parked, these were revisits.",
+          "round": 63,
+          "runners": 2
         }
       ],
       "status": "open"
@@ -324,6 +334,7 @@
         "code_2cc8c_c": "2026-09-19",
         "code_2cc8c_e": "2026-09-20",
         "code_2cc8c_f": "2026-09-18",
+        "code_4cd08": "2026-09-21",
         "code_8220_b": "2026-09-17",
         "code_d294_b": "2026-09-18",
         "code_d294_c": "2026-09-17"

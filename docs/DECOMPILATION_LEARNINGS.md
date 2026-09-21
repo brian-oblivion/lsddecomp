@@ -667,6 +667,46 @@ function can load through a runtime-indexed global", §"BLOCKED: the
   **Corollary: a lever found on one function is worth one build on every recorded sibling
   before anything else is tried.** (a round 61)
 
+- **On a register-identity residue, vary the NUMBER OF LOCALS before anything else.**
+  Closed `func_8004BA40` 63/63 (four locals merged into two) and `func_8004B700` 140/140
+  (deleted `Elem *e2;` so the second loop reuses the first loop's pointer), both after
+  step (a) CONFIRMED the register-identity cause at ins 0 / del 0. Discriminator: on
+  B700, all 8 loop-SHAPE variants -- declaration order included -- were inert at exactly
+  137/140, and both variants that reached 140/140 differ only in local COUNT. Shape and
+  order are not this axis. **Corollary, and it is why ~330k prior iterations missed both:
+  a permuter mutates a body but never merges or deletes its locals, so local count is a
+  PARAMETER of the search space, not a point in it. A validated high-iteration negative
+  bounds the search, not the function.** (a round 63)
+- **When the residue is a lone scheduling difference, sweep one statement's PLACEMENT.**
+  Eight placements of a single `sw`, one build each, body otherwise byte-identical:
+  80, 82, 82, 83, 83, 83, 92, then 106/106 at "last statement in the block". Mechanical
+  and cheap; it found the zero on `func_8004C1C0`. (a round 63)
+- **Retail reuses the same counter pseudo-registers across sibling loops and SWAPS their
+  outer/inner roles.** A `for (i...) { for (j...) }` nest pins `i` outer in every loop;
+  rewriting the nest with the roles swapped took `func_8003221C` 48 -> 83/83 in one build.
+  A loop's counter reset may also be its own statement BEFORE the base-pointer load
+  (`reg = ...; i = 0; base = ...; for (; i < N; i++)`), worth 2 words. Check whether a
+  sibling loop in the SAME function already uses the correct idiom -- that is where both
+  fixes were found. (a round 63)
+- **A narrow signed field may need an `s32` LOCAL rather than a cast to get retail's
+  `lb` + `sll 0xb`, but ONLY under aliasing -- this does NOT reproduce in isolation.**
+  In `func_8004C1C0` (fields re-read after a callee writes the struct through `u8 *`),
+  `s32 t = o->b2; t << 11` and `o->b2 * 2048` gave retail's form while `(s32)o->b2 << 11`
+  and an `s8` local gave `lbu` + `sll 0x18` + `sra 0xd`. **The head could not reproduce
+  any difference on the pinned pipeline**: two reproducers, one plain and one replicating
+  the store-then-reload shape (reload confirmed present, `sb` then `lb`), emit identical
+  `lb` + `sll 0xb` for all spellings. So the trigger is the aliasing context, not the
+  spelling -- do not "fix" a spelling that is already correct. (a round 63)
+- **HImode constant narrowing: retail `addiu rX,rX,-K` but your build has
+  `li rY,<0x10000-K>` + `addu`.** A constant between a u16 source and an s16 destination
+  field reads as unsigned and no longer fits an `addiu` immediate. Fix: move it INSIDE
+  the subtracted group -- `x - (y + K)`, never `(x - K) - y`; GCC reassociates it back out
+  at full width. Greppable straight from a diff. (a round 63)
+- **Inherited no-op statements must be tested in BOTH directions.** Removing
+  `func_8004B700`'s `__asm__("")` kept the image green (it was a crutch for a shape that
+  no longer exists); removing `func_8004BA40`'s `do {} while (0);` DRIFTED the image.
+  Neither outcome is predictable from reading it. (a round 63)
+
 ## 4. Verdict classes and how far to trust them
 
 - **A stall report's MEASUREMENT and its residue CLASS decay at different rates, and the
