@@ -123,7 +123,7 @@ typedef struct StatBuf179D8H {
  * 34: it is Sony's CdSearchFile, linked from the object, never matchable. */
 extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path);   /* lib/libcd/iso9660.o (round 34) */
 extern void printf(const char *fmt, void *arg1);
-extern char D_800107F4[];
+extern char gCdFileNotFoundFmt[];
 
 /* Forward declaration: BuildCdFilePath is defined later in this file (ROM
  * order), but OpenCdFile (earlier in ROM order) calls it. */
@@ -135,7 +135,7 @@ char *BuildCdFilePath(char *dest, char *suffix);
 extern char *func_800270B8(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
-extern char D_8008A8A8[]; /* ";1", the ISO9660 CD file-version suffix */
+extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
 
 void Class6D430__InstallCdReadDriver(Class6D430 *self) {
     ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
@@ -166,7 +166,7 @@ char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
     strcpy(dest + 1, func_800270B8());
     strcat(dest, suffix);
-    strcat(dest, D_8008A8A8);
+    strcat(dest, gCdFileVersionSuffix);
     return dest;
 }
 

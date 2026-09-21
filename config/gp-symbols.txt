@@ -14,7 +14,6 @@ D_8008A848
 D_8008A850
 D_8008A854
 D_8008A860
-D_8008A8A8
 D_8008A8CC
 D_8008A8D8
 D_8008A8DC
@@ -187,6 +186,7 @@ gBMemPMgrBusy
 gCdAsyncEnabled
 gCdBusy
 gCdCallbackInstalled
+gCdFileVersionSuffix
 gCdIdle
 gCdLock
 gCdOperation
