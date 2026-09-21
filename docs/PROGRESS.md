@@ -6,6 +6,137 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-21 — round 63: four revisits, four matches, and the queue has been quietly de-ranking itself in proportion to our progress
+
+**Four runners, four tracks, four merges, all green. 1144 -> 1148 matched, queued
+108 -> 104.** Head on Opus (no new procedure, tool or doc rule written; the two
+findings that would require one are ESCALATED, not adjudicated). Gate 0 clean,
+every worktree byte-verified before handover.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 3 | `code_4cd08` | 17 functions, 12 globals, 2 fields named; PASSED review with one head correction |
+| bravo | opus | 1 revisit | `code_179d8_c` | MATCH `func_8003221C` 83/83; unit now 3/3 |
+| charlie | sonnet | 1b | `code_55dd4` | `func_80065AE0` promoted (10 -> 11 bodies) |
+| delta | opus | 1 revisit | `class_3bb8c` | 3 MATCHES; `INCLUDE_ASM` 6 -> 3 |
+
+Track 1 revisits went **4 attempts, 4 matches** (`--not-calibration`: the track is
+parked and these were revisits). Running revisit yield **9/19**, against the parked
+band's 1/13.
+
+### The escalation: `tools/rename.py` has been de-ranking the assignment queue since naming began
+
+Round 62 fixed `func_8003149C`'s report by hand after a note above its `#` heading
+made `nearmiss.py` print `[UNRANKABLE-TITLE]`, and recorded it as a runner mistake.
+It is not. `tools/rename.py:228` PREPENDS `> Renamed from ... (tools/rename.py)`
+above the `#` title on every rename, pushing the real title out of the title window.
+Measured over all 108 stall reports:
+
+- **18** carry the note AND a fully conforming three-figure title -- well-written
+  reports made unrankable purely by the tool. `ApplyVoicePitchBend`'s title carries
+  exact length, raw word-match and first-diff offset; `nearmiss.py` sees none of it.
+- **0** have the note and a genuinely bad title.
+- **11** are genuinely figure-less titles, a separate and older problem.
+
+`nearmiss.py`'s own summary says `[UNRANKABLE-TITLE]` marks 28 of 107. **All 18 are
+functions that went through a track 3 naming pass**, which is where the plan spends
+most of its slots: the queue degrades in proportion to progress on the most active
+track, invisibly, because the functions still appear -- just unranked. Nothing was
+changed for it: fixing the tool is a Fable task, and screen 4 forbids copying a body
+figure into a title without rebuilding it, so a batch fix would launder 18 unverified
+figures onto the ranking surface. `func_8003221C` reached bravo tagged `len-off` while
+its own body said length-exact, and `func_8004C1C0` did the same to delta.
+
+### The second escalation: funcdiff's ins/del has a measured false-positive mode
+
+Round 62 promoted "a title claiming register identity with nonzero ins/del is a wrong
+verdict" into three docs. bravo disputed it with numbers mid-round; the head verified
+rather than accepted, on synthetic sequences containing ZERO real insertions:
+
+| alphabet | real positional diffs | funcdiff reads |
+| --- | --- | --- |
+| repeating skeleton (`bnez/addiu/lui/slti`, i.e. a loop nest) | 13 | **26/26** |
+| repeating skeleton | 23 | **22/22** |
+| distinct (non-repeating) | 5, 15, 35 | **0/0** |
+| distinct, genuine 1 insert + 1 delete | -- | **1/1** correct |
+
+The discriminator is a REPEATING SKELETON ALPHABET, not loop nests as such. And since
+ins must equal del on any length-exact function, the N/N shape alone never separates
+artifact from real defect. **But both real instances this round were genuine** --
+bravo's 14/14 and delta's 12/12 each led to real separable defects, delta confirming
+with asm-differ's literal markers. So the rule is empirically sound in practice and
+unsound at the edge: a POINTER to read the diff, not a verdict. That is exactly why it
+is the operator's call and not the head's. Rule text untouched in all three docs.
+
+### What actually closed four stalls: the number of locals
+
+delta's three matches are the round's best result because **two of them had their
+"register identity" cause CONFIRMED by step (a) at ins 0 / del 0 -- and closed
+anyway.** `func_8004BA40` merged four locals into two; `func_8004B700` deleted one
+`Elem *e2;` so the second loop reuses the first loop's pointer. On B700 all eight
+loop-SHAPE variants, declaration order included, were inert at exactly 137/140, and
+both variants reaching 140/140 differ only in local COUNT.
+
+**The corollary is why ~330k prior iterations missed both: a permuter mutates a body
+but never merges or deletes its locals, so local count is a PARAMETER of the search
+space, not a point in it. A validated high-iteration negative bounds the search, not
+the function.** Round 41 had concluded retail "needs a single already-computed element
+pointer reused twice per iteration" -- right, and one step short of asking whether that
+pointer is the first loop's.
+
+A matching Gate 3 failure: rounds 32 and 40 EACH built a scaffold for `func_8004C1C0`,
+measured 9/9, compared it against a BELIEVED in-context 0/0 nobody had measured, and
+discarded it. The real figure was 12/12; both scaffolds were broadly right, thrown away
+four rounds apart on an unmeasured number.
+
+### A promoted lever, scoped by a reproducer that failed
+
+delta broadcast a general rule: a narrow signed field needs an `s32` local, not a
+`(s32)` cast, to get retail's `lb` + `sll 0xb`. The head could not reproduce ANY
+difference on the pinned pipeline -- two reproducers, one plain and one replicating the
+store-then-reload shape with the reload confirmed present (`sb` then `lb`) -- all
+spellings emitting identical `lb` + `sll 0xb`. delta's in-tree result is real; the
+GENERALISATION is not. Promoted scoped to the aliasing context (a callee writing the
+struct through `u8 *`), with the negative recorded, so the next runner does not "fix" a
+spelling that is already correct. CLAUDE.md's rule that a failed reproducer is itself a
+result, applied to a runner's lever rather than a toolchain lead.
+
+### Head corrections and things the round got wrong
+
+- **alpha corrected the head's brief and was right.** `func_8005BF68` is defined in
+  `DreamSys.c`, not `code_4cd08`; the head read `headercontention.py`'s
+  `DreamSys -> code_4cd08` line as naming the callee's owner and skipped the rank-3 1b
+  job on a contention that did not exist. Cost nothing (an equivalent rank-6 job ran
+  instead) but the stated reason was wrong.
+- `MatchesDreamAuxRange` -> `MatchesDreamAuxProgression` at naming review: the body
+  tests membership in a stride-3 arithmetic progression, not a contiguous range, and a
+  reader trusting "Range" would misread the sole call site. Tier stays A.
+- **`rename.py` edits CLAUDE.md.** Benign this round (a renamed symbol inside an example
+  sentence, no rule text), and alpha flagged it rather than hiding it -- but a naming
+  runner's tooling reaching the HARD RULES file is worth knowing.
+- Track 2 flipped from `done` back to open with one entry, `func_80038D54` -- a callee
+  of the function bravo matched. Matching game code EXPOSES SDK call sites, so "done"
+  on track 2 was never terminal.
+- bravo found a category claim riding on someone else's measurement: a "not reachable
+  from C" verdict citing a 64631-iteration negative run on `func_80032BB8`, not on the
+  function it was applied to. It stood four rounds.
+- `DECOMPILATION_LEARNINGS.md` went over budget on promotion (835 vs 800) and was
+  distilled back to 792 in the same consolidation, 7 same-discriminator merges, every
+  rule kept, removed narrative appended to the archive. Verified by token sweep: every
+  symbol name, round pointer and measured figure that left the file is in the archive.
+
+### For the next head
+
+The two escalations above are the operator's. Until the `rename.py` one is resolved,
+treat `nearmiss.py`'s ranking as under-reporting by roughly 18 functions, and do not
+believe a `len-exact`/`len-off` tag without checking the report body -- it is derived
+from the TITLE only. Round 62's do-not-staff list still stands (`func_8003149C`,
+`func_80030E90`, `func_8002FAC4`, `func_80029F10`, `func_80031A44`, `func_80055258`,
+`func_80055410`); note `func_80055258` and `func_80055410` sit in plan.py's ready jobs
+at the class_3bb8c_n revisit, so that job needs them excluded if it is staffed.
+
+---
+
 ## 2026-09-20 — round 62: a below-cc1 blocker that has been invisible for 62 rounds because it can only strike code we have not written yet
 
 **Three runners, three tracks, three merges, all green. 1143 -> 1144 matched.**
