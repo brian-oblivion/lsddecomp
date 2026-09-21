@@ -80,3 +80,14 @@ experiment was run in 2026-08-29 with operator authorisation and REJECTED.
 Operator's call.
 
 No C was written and no score was measured; the screen ran at carve time.
+
+## Naming (round 64, runner alpha)
+
+`func_80028B6C` -> `GetCdUseVSyncCallback`, tier A. Pure getter -- the whole
+body is `return gCdUseVSyncCallback;` -- and per CLAUDE.md/FINISHING-PLAN.md
+track 3, "a pure leaf whose mechanics ARE its purpose (a getter, a clamp, a
+list push) is tier A by definition." `gCdUseVSyncCallback` itself was
+already properly named (not a placeholder) before this round, by
+`src/code_179d8_q.c`'s own header comment ("the driver mode:
+gCdAsyncEnabled and gCdUseVSyncCallback, set through SetCdDriverMode"); no
+further rename needed there.

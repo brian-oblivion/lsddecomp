@@ -1,0 +1,35 @@
+# NoOp2 -- MATCHED (2/2 words, splat matched itself)
+
+> Renamed from `func_80028918` on 2026-09-21 (tools/rename.py, round 64,
+> runner alpha). Address 0x80028918.
+
+Unit: `code_179d8_h`. One of the three 2-instruction leaves the unit's own
+header comment already noted as "splat matched itself" at carve time
+(mid-round 17, 2026-09-04) -- no C was ever written for it, and no report
+existed before this one.
+
+## Result
+
+```c
+void NoOp2(void) {
+}
+```
+
+Byte-exact: `build/lsdde.map` confirms `func_80028920 - func_80028918 = 0x8`
+(2 instructions, `jr $ra; nop`) both before and after this rename.
+
+## Naming (round 64, runner alpha)
+
+`func_80028918` -> `NoOp2`, tier A. An empty function body IS its own
+complete mechanics -- CLAUDE.md/FINISHING-PLAN.md track 3: "a pure leaf
+whose mechanics ARE its purpose... is tier A by definition." No caller is
+visible in carved code (referenced, if at all, only from the still-uncarved
+`code_179d8` remainder or as an as-yet-unidentified vtable slot -- neither
+`grep` over `asm/data/*.s` nor `tools/classtable.py --scan` finds this
+address anywhere), so there is no evidence for WHICH slot or subsystem this
+serves. Named `NoOp2` following the existing project-wide precedent for
+multiple distinct no-op functions at different addresses (`NoOp` at
+0x80026C80, `NoOpIgnoreArgs` at 0x80056DF0, both in `code_171e0.c`/
+elsewhere) -- the suffix numbers this unit's three no-op leaves in ROM
+order (`NoOp2`/`NoOp3`/`NoOp4`) purely for disambiguation, not because they
+share a slot or a caller; no such link is established.
