@@ -81,8 +81,8 @@ function's own `void *out` parameter, itself a 4-word caller-provided
 scratch buffer per the header's existing comment on this function's
 signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `gDreamAuxSpawnInfo`/`gDreamAuxPosTable` are two
 more small unit-owned lookup tables (a 4-byte "spawn info" record indexed by
-`entry`, and a 6-byte position record indexed by that record's `val3`
-field). `entity->vtable[0x13]` is the SAME slot `DespawnDreamAuxEntity` (matched
+`entry`, and a 6-byte position record indexed by that record's `posIndex`
+field, named round 63). `entity->vtable[0x13]` is the SAME slot `DespawnDreamAuxEntity` (matched
 earlier this round) dispatches through, reusing `DreamAuxObjFn13`.
 `D_8008ABFC`'s vtable slot 0x3A (byte offset 0xE8) and `entity`'s slot 0x11
 (byte offset 0x44) are new, function-local typedefs.

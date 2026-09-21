@@ -365,8 +365,9 @@ inserted/deleted markers can, and they say two.
 `CheckDreamAuxTriggerCondition(value, record)`: reads `record->sel` (offset `0x1`,
 signed byte). If it's `1`, succeeds immediately. Otherwise derives a switch
 index `idx`: if `sel >= 0`, `idx = sel`; if `sel < 0`, fails immediately
-when `record->unk0` (offset `0x0`, signed byte) is nonzero, else
-`idx = -sel`. Dispatches on `idx - 2` through a 20-entry jump table:
+when `record->triggered` (offset `0x0`, signed byte; named round 63 --
+see `## Naming` below) is nonzero, else `idx = -sel`. Dispatches on
+`idx - 2` through a 20-entry jump table:
 
 - 0,1,2: delegate to `MatchesDreamAuxRange(value, idx - 1)`.
 - 3: succeed iff `value % 3 == 0`.
@@ -380,7 +381,7 @@ when `record->unk0` (offset `0x0`, signed byte) is nonzero, else
   roughly `[2, 22)`): succeed unconditionally if `idx < 10`; otherwise
   delegate to `CheckDreamAuxWorldState(idx)`.
 
-On any success path, `record->unk0` is set to `1` before returning `true`.
+On any success path, `record->triggered` is set to `1` before returning `true`.
 
 ## Best body, ROUND 24 (compiles, builds green, 99/100 -- ONE word short, no blocker)
 

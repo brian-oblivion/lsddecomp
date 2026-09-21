@@ -105,6 +105,11 @@ extern void *func_8004468C(DreamAuxLoadReq *req);
  * three fields and the overall stride (0x38 -- ProcessDreamAuxTriggerRecord recurses on
  * `record + 1`, i.e. the next record in what is evidently an array) are
  * established:
+ *  - offset 0x0 (`triggered`): 0 until CheckDreamAuxTriggerCondition's `success`
+ *    path sets it to 1; while `sel < 0`, a nonzero value here short-circuits
+ *    the whole condition check to `false` instead of re-testing `sel`. Reads
+ *    as a "fire once" latch, though nothing here explains WHY only the
+ *    `sel < 0` path consults it.
  *  - offset 0x1: a selector CheckDreamAuxTriggerCondition switches on (its own param, not
  *    yet named the same as `kind` below -- may or may not be the same
  *    logical field; not proven either way).
@@ -119,7 +124,7 @@ extern void *func_8004468C(DreamAuxLoadReq *req);
  *    a `-1` sentinel, each tried against SpawnDreamAuxTriggerEntity.
  * Everything else is undiscovered padding. */
 typedef struct TriggerRecord {
-    s8 unk0;
+    s8 triggered;
     s8 sel;
     s8 parity;
     u8 kind;

@@ -265,7 +265,7 @@ fail:
  * an explicit `j` over the join; the obvious spelling
  * (`if (sel < 0) { ...; idx = ~sel + 1; goto have_idx; } idx = sel;`) lets
  * the `sel >= 0` arm fall through into the join instead and is one word
- * short forever.  Writing the inner test as `if (unk0 == 0) goto negate;
+ * short forever.  Writing the inner test as `if (triggered == 0) goto negate;
  * return false;`, with the `idx = sel; goto have_idx;` block placed
  * textually BEFORE the `negate:` label, reproduces retail's block order
  * exactly.  See docs/match-reports/CheckDreamAuxTriggerCondition.md.
@@ -281,7 +281,7 @@ bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
     }
 
     if (sel < 0) {
-        if (record->unk0 == 0) {
+        if (record->triggered == 0) {
             goto negate;
         }
         return false;
@@ -343,7 +343,7 @@ have_idx:
     }
 
 success:
-    record->unk0 = 1;
+    record->triggered = 1;
     return true;
 }
 
@@ -375,11 +375,12 @@ bool MatchesDreamAuxRange(s32 a0, s32 a1)
 /* A 4-byte record indexed by `entry` (this function's own last parameter):
  * a u16 followed by two signed bytes. `val2` indexes D_80088F18 (stride
  * 0xC, element type undiscovered -- only its address is ever taken here)
- * and `val3` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6 below). */
+ * and `posIndex` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6
+ * below; named round 63 -- confirmed by this struct's only reader). */
 typedef struct {
     u16 val0;
     s8 val2;
-    s8 val3;
+    s8 posIndex;
 } DreamAuxSpawnInfo;
 
 extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
@@ -387,7 +388,7 @@ extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
 /* A 6-byte position record: a 4-byte (x,y) pair copied as ONE unaligned
  * whole-struct assignment (the idiom CLAUDE.md documents: an all-s8/s16
  * struct at alignment 2 compiles a whole-struct copy to lwl/lwr), plus a
- * separate z half-word. Indexed by DreamAuxSpawnInfo.val3. */
+ * separate z half-word. Indexed by DreamAuxSpawnInfo.posIndex. */
 typedef struct {
     s16 x;
     s16 y;
@@ -421,7 +422,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         coords.ctxVal = *(u16 *)ctx;
         rec = &gDreamAuxSpawnInfo[entry];
         coords.recordVal0 = rec->val0;
-        coords.pos = gDreamAuxPosTable[rec->val3];
+        coords.pos = gDreamAuxPosTable[rec->posIndex];
 
         obj = (DreamAuxObj *)D_8008ABFC;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
