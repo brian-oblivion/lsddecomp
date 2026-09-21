@@ -227,15 +227,19 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
     }
 }
 
-#if 0
-/* STALL, round 32 (bravo2): re-verified 58/63, no drift, identical
- * residue. See docs/match-reports/func_8004BA40.md for the full history.
- * This round: separating `fieldVal`/`sum` temps from `value` (to mirror
- * retail's v1-running-sum/v0-final-result split) -- IDENTICAL 58/63, no
- * change. A fresh 144,370-iteration permuter run (independent RNG, own
- * scaffold `--debug`-verified to score the same residue as the real
- * build) also never beat the base score of 25. Genuine negative, not
- * inconclusive; not attempted further this round. */
+/* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round
+ * 27 across five re-verifications and ~330,000 permuter iterations -- see
+ * docs/match-reports/func_8004BA40.md. The 5-word residue really was pure
+ * register identity (funcdiff ins 0 / del 0, no asm-differ markers), and the
+ * fix was FEWER variables, not more: retail carries the multiply result AND
+ * the running sum AND both branch addends in ONE local (`sum`, retail's
+ * $v1), with the `val +` hoisted out of every branch into a single
+ * `value = val + sum;` after the if/else (retail's $v0). Round 32 tried the
+ * opposite -- splitting `fieldVal`/`sum` out of `value` -- and measured it
+ * inert; the permuter then searched around that same split for 330k
+ * iterations without ever reaching the merged shape.
+ * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
+ * image. It was inherited with the near-miss body and is verified here. */
 s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = D_8008688C[key];
@@ -249,21 +253,19 @@ s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, 
     if (self->unk68->unk4 == 0) {
         const Unk54Struct *entry = &D_800868A8[key];
         s32 value;
+        s32 sum;
 
         if (entry->unk0 == 0) {
-            s32 fieldVal = entry->unk4;
-            value = val + fieldVal;
+            sum = entry->unk4;
         } else {
-            s32 lo = divisor * entry->unk0;
-            s32 sum;
-
+            sum = divisor * entry->unk0;
             if (flag != 0) {
-                sum = lo + entry->unk4;
+                sum += entry->unk4;
             } else {
-                sum = lo + entry->unk8;
+                sum += entry->unk8;
             }
-            value = val + sum;
         }
+        value = val + sum;
         *(s32 *)((u8 *)arg1 + 4) = value;
     } else {
         *(s32 *)((u8 *)arg1 + 4) = val + key;
@@ -281,9 +283,7 @@ storeKey:
     arg1->id = key;
     return result;
 }
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
 
 #if 0
 /* STALL snapshot -- see docs/match-reports/func_8004BB3C.md. 90/105 words
