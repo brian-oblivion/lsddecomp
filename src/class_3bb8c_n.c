@@ -317,7 +317,7 @@ extern void *D_8008E0C8[];
 extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
 extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);
 extern void **func_80054FD8(void **arg0, void *arg1);
-extern void *func_8005511C(void *arg0, void *arg1);
+extern void **func_8005511C(void **arg0, void *arg1);
 
 void func_80054B84(void *arg0) {
     s32 base;
@@ -431,7 +431,7 @@ extern u8 D_800871C8[];
 extern s32 D_80087328[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
-extern u8 D_8008E0A4[];
+extern s32 D_8008E0A4;
 extern void func_80055258(void *arg0, void *arg1);
 extern void func_80055410(void *arg0, void *arg1);
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
@@ -463,7 +463,7 @@ void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = func_80056320((void *) 0, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        *arr = func_80056320((void *) 0, &D_8008E0A4, (void *) D_8008AB4C, arg2);
         arr++;
     }
     return (void *) arr;
@@ -482,7 +482,7 @@ void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
         func_80055258(arg2, (void *) val);
-        *arg0 = func_80056320((void *) 1, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        *arg0 = func_80056320((void *) 1, &D_8008E0A4, (void *) D_8008AB4C, arg2);
         arg0++;
     }
     return arg0;
@@ -524,7 +524,7 @@ void **func_80054FD8(void **arg0, void *arg1) {
 
     func_80055258(arg1, (void *) D_80087330);
     if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
-        *(s32 *) D_8008E0A4 = 0xFFFF5000;
+        D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
         D_8008E0C0[0] = (s32) (D_8008721C + 3);
@@ -556,17 +556,31 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0BC;
 
-/* STALL, 16/79 words, 1 word short (78/79 built) -- see
- * docs/match-reports/func_8005511C.md. Round 48: check 3 confirms AGREE
- * (scaffold Insertions 12, Deletions 13, Reorderings 3 vs in-tree
- * rebuild's identical 16/79 with expected out-of-range drift from the
- * 1-word-short size). Preserved near-miss body: */
+/* STALL, 49/79 words, length EXACT (round 64, charlie: was 16/79 and 1 word
+ * short).  Two levers closed the length gap and the whole prologue:
+ *   (1) `u8 **q = &D_8008E0B0;` -- retail CACHES that address in a
+ *       callee-saved register and derives D_8008E0A4's address from it as
+ *       `q - 0xC`, which is the idiom func_80054FD8 below already uses.
+ *       16/79 (1 short) -> 42/79 (exact).
+ *   (2) the arg0 shape of the matched sibling func_80054F30 -- `void **`
+ *       parameter, `*arg0 = ...; arg0++; return arg0;` rather than a cast
+ *       and `+ 4`.  42/79 -> 49/79, and the $s1/$s2 parameter colours and
+ *       the entire prologue then matched exactly.
+ * Residue is now ONLY the scheduling interleave (retail hoists the /20
+ * `mult` and the D_8008AC74 load into the /3 `multu`'s latency window,
+ * ahead of the D_8008E0C0 address) plus the if/else block order.
+ * MEASURED NEGATIVE, twice, on two different bodies: inverting the arms to
+ * `% 20 != 0` first regresses (16->9/79 and 49->13/79) and reintroduces
+ * length drift -- cc1 collapses `v0 = 0` into the branch delay slot and
+ * loses retail's `addiu a2,a2,4` there.  Do not re-derive that.
+ * Preserved near-miss body: */
 #if 0
-void *func_8005511C(void *arg0, void *arg1) {
+void **func_8005511C(void **arg0, void *arg1) {
     s32 idx;
     s32 randval;
     s32 v0;
     s32 *slot;
+    u8 **q;
 
     idx = (u32) rand() % 3;
     slot = D_8008E0C0;
@@ -579,11 +593,13 @@ void *func_8005511C(void *arg0, void *arg1) {
     }
     *slot = v0;
     func_80055258(arg1, (void *) D_80087330);
-    D_8008E0B0 = D_80087174;
+    q = &D_8008E0B0;
+    *q = D_80087174;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
-    *(void **) arg0 = func_80056320((void *) 2, (u8 *) &D_8008E0B0 - 0xC, (void *) D_8008AB4C, arg1);
-    return (u8 *) arg0 + 4;
+    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+    arg0++;
+    return arg0;
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005511C);
@@ -594,25 +610,27 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0B8;
 
-/* STALL, 8/110 words (length matches, 0x1B8) -- retail recomputes
- * D_8008E0A4's lui/addiu address fresh at each of 3 accesses, my build
- * caches it in an extra saved register ($s0), shifting every later
- * register by one colour. See docs/match-reports/func_80055258.md.
- * Round 48: check 3 confirms AGREE -- scaffold (Insertions 5, Deletions 6,
- * frame -0x18 -> -0x20, extra `$s1` save) matches the in-tree rebuild
- * exactly, same frame growth and same extra saved register. The in-tree
- * rebuild's out-of-range funcdiff warning is the expected consequence of
- * this near-miss being 8 bytes longer than retail, not a new finding.
- * Preserved near-miss body: */
-#if 0
+/* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
+ * round-46..48 residue (an extra callee-saved register caching
+ * `D_8008E0A4`'s address, frame -0x18 -> -0x20) was NOT register identity:
+ * `D_8008E0A4` was declared as an INCOMPLETE ARRAY.  Every reference to
+ * `extern T D_8008E0A4[]` is an array decay, i.e. an address-take VALUE,
+ * which cc1 2.6.3's CSE promotes into a callee-saved register across the
+ * intervening `rand()` calls; declared `extern s32 D_8008E0A4` it emits
+ * retail's absolute `lui $at, %hi / sw %lo($at)` fresh at each of the three
+ * accesses.  Four in-tree variants pin the axis to ARRAY vs SCALAR: the
+ * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
+ * vs `D_X`) are both measurably INERT.  Do not restate this as "the
+ * declared type" -- that was the first, wrong, reading.
+ * See docs/match-reports/func_80055258.md. */
 void func_80055258(void *arg0, void *arg1) {
     if (arg1 == 0) {
         arg1 = (void *) D_80087328[rand() & 3];
     }
     D_8008E0A8 = (s32) arg1;
-    *(s32 *) D_8008E0A4 = (rand() % 23) << 11;
+    D_8008E0A4 = (rand() % 23) << 11;
     if (rand() & 1) {
-        *(s32 *) D_8008E0A4 = -*(s32 *) D_8008E0A4;
+        D_8008E0A4 = -D_8008E0A4;
     }
     D_8008E0AC = (rand() % 23) << 11;
     if (rand() & 1) {
@@ -621,35 +639,33 @@ void func_80055258(void *arg0, void *arg1) {
     D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055258);
 
 extern s32 D_8008732C;
 extern s32 D_8008E0B8;
 
-/* STALL, 25/87 words, 2 words long -- see docs/match-reports/func_80055410.md.
- * Signature widened from `void func_80055410(void)` (round 46) to two dead
- * void* params: func_80054DA4 dispatches this through a function pointer
- * shared with func_80055258 (which genuinely takes two args), and the ABI
- * slot is call-site-determined, not body-determined -- see CLAUDE.md's
- * "already-matched signature can be too narrow" lesson. Dead params cost
- * zero instructions in the callee, so the round-46 body is otherwise
- * untouched. Round 48: check 3 confirms AGREE (scaffold Insertions 3,
- * Deletions 1, Register 90 vs in-tree rebuild's identical 25/87 with
- * expected out-of-range drift from the 2-extra-word size). Round 48:
- * searched (not closed, 900s/136367 iterations, best score 100/850 base);
- * the score-100 candidate's literal transcription regressed to 5/87
- * in-tree (worse than 25/87) rather than the isolated scaffold's
- * improvement -- not applied. Preserved near-miss body: */
-#if 0
+/* MATCHED round 64 (charlie), 87/87, ins 0 / del 0.  The round-46..48
+ * residue -- filed as "pervasive $v0/$v1/$a0/$a1 temp-register renaming" and
+ * searched for 900s / 136367 permuter iterations without a zero -- was ONE
+ * named local.  The body used a single `s32 r` for all three `rand()`
+ * results, whose live range spans the calls, so cc1 could not coalesce
+ * `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal rand`
+ * (two visible, a third word from the knock-on).  Deleting `r` and calling
+ * `rand()` inline in each expression -- exactly the idiom the matched
+ * sibling func_80055258 above already uses -- keeps the value in `$v0` and
+ * recolours the whole body to retail's.  `mod3` stays a local: it has two
+ * genuine use points.  A permuter mutates a body but never deletes its
+ * locals, which is why the 136367-iteration negative bounded the search and
+ * not the function (round 63's LOCAL COUNT corollary).
+ * The signature keeps round 47's two dead void* params: func_80054DA4
+ * dispatches this through a function pointer shared with func_80055258, so
+ * the ABI slot is call-site-determined.  Dead params cost nothing here.
+ * See docs/match-reports/func_80055410.md. */
 void func_80055410(void *arg0, void *arg1) {
-    s32 r;
     s32 mod3;
 
     rand();
     D_8008E0A8 = D_8008732C;
-    r = rand();
-    *(s32 *) D_8008E0A4 = (r % 20) << 11;
+    D_8008E0A4 = (rand() % 20) << 11;
     mod3 = D_8008AC74 % 3;
     D_8008E0AC = 0xA000;
     if (mod3 == 1) {
@@ -657,13 +673,9 @@ void func_80055410(void *arg0, void *arg1) {
     } else if (mod3 == 2) {
         D_8008E0AC = 0x800;
     }
-    r = rand();
-    D_8008E0B0 = D_80087174 + ((u32) r % 7) * 12;
-    r = rand();
-    D_8008E0B8 = r % 5;
+    D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
+    D_8008E0B8 = rand() % 5;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055410);
 
 extern s32 D_8008AC7C;
 extern void *func_80055620(void *arg0, s32 *arg1, void *arg2);
