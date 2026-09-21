@@ -431,7 +431,7 @@ extern u8 D_800871C8[];
 extern s32 D_80087328[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
-extern u8 D_8008E0A4[];
+extern s32 D_8008E0A4;
 extern void func_80055258(void *arg0, void *arg1);
 extern void func_80055410(void *arg0, void *arg1);
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
@@ -463,7 +463,7 @@ void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = func_80056320((void *) 0, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        *arr = func_80056320((void *) 0, &D_8008E0A4, (void *) D_8008AB4C, arg2);
         arr++;
     }
     return (void *) arr;
@@ -482,7 +482,7 @@ void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
         func_80055258(arg2, (void *) val);
-        *arg0 = func_80056320((void *) 1, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        *arg0 = func_80056320((void *) 1, &D_8008E0A4, (void *) D_8008AB4C, arg2);
         arg0++;
     }
     return arg0;
@@ -524,7 +524,7 @@ void **func_80054FD8(void **arg0, void *arg1) {
 
     func_80055258(arg1, (void *) D_80087330);
     if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
-        *(s32 *) D_8008E0A4 = 0xFFFF5000;
+        D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;
         D_8008E0C0[0] = (s32) (D_8008721C + 3);
@@ -594,25 +594,24 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0B8;
 
-/* STALL, 8/110 words (length matches, 0x1B8) -- retail recomputes
- * D_8008E0A4's lui/addiu address fresh at each of 3 accesses, my build
- * caches it in an extra saved register ($s0), shifting every later
- * register by one colour. See docs/match-reports/func_80055258.md.
- * Round 48: check 3 confirms AGREE -- scaffold (Insertions 5, Deletions 6,
- * frame -0x18 -> -0x20, extra `$s1` save) matches the in-tree rebuild
- * exactly, same frame growth and same extra saved register. The in-tree
- * rebuild's out-of-range funcdiff warning is the expected consequence of
- * this near-miss being 8 bytes longer than retail, not a new finding.
- * Preserved near-miss body: */
-#if 0
+/* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
+ * round-46..48 residue (an extra callee-saved register caching
+ * `D_8008E0A4`'s address, frame -0x18 -> -0x20) was NOT register identity:
+ * it was the DECLARED TYPE of the global.  Declared `extern u8
+ * D_8008E0A4[]` and written `*(s32 *) D_8008E0A4 = v`, the array decay is
+ * an address-take VALUE that cc1 2.6.3's CSE promotes into a callee-saved
+ * register across the intervening `rand()` calls.  Declared `extern s32
+ * D_8008E0A4` and assigned BY NAME it emits retail's absolute
+ * `lui $at, %hi / sw %lo($at)` fresh at each of the three accesses.
+ * See docs/match-reports/func_80055258.md. */
 void func_80055258(void *arg0, void *arg1) {
     if (arg1 == 0) {
         arg1 = (void *) D_80087328[rand() & 3];
     }
     D_8008E0A8 = (s32) arg1;
-    *(s32 *) D_8008E0A4 = (rand() % 23) << 11;
+    D_8008E0A4 = (rand() % 23) << 11;
     if (rand() & 1) {
-        *(s32 *) D_8008E0A4 = -*(s32 *) D_8008E0A4;
+        D_8008E0A4 = -D_8008E0A4;
     }
     D_8008E0AC = (rand() % 23) << 11;
     if (rand() & 1) {
@@ -621,8 +620,6 @@ void func_80055258(void *arg0, void *arg1) {
     D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
     D_8008E0B8 = rand() % 5;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055258);
 
 extern s32 D_8008732C;
 extern s32 D_8008E0B8;
@@ -649,7 +646,7 @@ void func_80055410(void *arg0, void *arg1) {
     rand();
     D_8008E0A8 = D_8008732C;
     r = rand();
-    *(s32 *) D_8008E0A4 = (r % 20) << 11;
+    D_8008E0A4 = (r % 20) << 11;
     mod3 = D_8008AC74 % 3;
     D_8008E0AC = 0xA000;
     if (mod3 == 1) {
