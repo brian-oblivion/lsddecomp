@@ -342,3 +342,15 @@ from check (b)), not as a spent, failed search.
   at the identical offset. Not applied in `code_179d8_s.c` (out of unit);
   PROPOSED there under the same name. Recorded in full in
   `src/code_179d8_h.c`'s own field comment and in `OpenCdFile.md`.
+
+## Proposed field names
+
+- `src/code_179d8_s.c`'s `Methods80027480::slot48` (its own independent
+  local view of what appears to be the SAME table this unit calls through
+  `MethodsA34_179D8H`) -> `onError`, tier B. Same evidence as above: two
+  unrelated give-up paths (this unit's `ReadCdFile` on "not open",
+  `code_179d8_s.c`'s own `func_80027800` on allocation failure) dispatch the
+  identical slot number. `code_179d8_s.c` is out of unit and not staffed
+  this round; posted to the broadcast for the head to apply at merge time
+  per FINISHING-PLAN.md track 3 step 3 (rename the field in the struct
+  DEFINITION only, rebuild, fix exactly the accessors the compiler lists).
