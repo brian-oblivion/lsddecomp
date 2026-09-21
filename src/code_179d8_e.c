@@ -66,9 +66,9 @@
  * backend's own implementations of the same generic driver-mode interface
  * `code_171e0.c` dispatches on `gActiveDataSource` -- confirmed round 52 by
  * that unit's own substitution (`func_80026FAC`/`func_80026F34`/
- * `func_80026FE8` call `GetCdDriverMode`/`SetCdDriverMode`/`func_80028B6C`
+ * `func_80026FE8` call `GetCdDriverMode`/`SetCdDriverMode`/`GetCdUseVSyncCallback`
  * when `gActiveDataSource == 0x13`, else these).  `func_8002C478` itself
- * stays unnamed: its only paired counterpart, `func_80028B6C`, is still
+ * stays unnamed: its only paired counterpart, `GetCdUseVSyncCallback`, is still
  * unnamed too, so there's nothing to name it AS a stand-in for.
  */
 #include "common.h"

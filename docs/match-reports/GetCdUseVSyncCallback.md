@@ -1,4 +1,6 @@
-# func_80028B6C -- MATCHED (round 45: 3/3 words, first-ever attempt)
+# GetCdUseVSyncCallback -- MATCHED (round 45: 3/3 words, first-ever attempt)
+
+> Renamed from `func_80028B6C` on 2026-09-21 (tools/rename.py). Address 0x80028b6c.
 
 Unit: `src/code_179d8_h.c` (carved mid-round 17, 2026-09-04). Size: 3 words
 (0xC bytes), file offset `0x1936C`, vram `0x80028B6C`.
@@ -29,13 +31,13 @@ nop
 ```c
 extern s32 gCdUseVSyncCallback;
 
-s32 func_80028B6C(void) {
+s32 GetCdUseVSyncCallback(void) {
     return gCdUseVSyncCallback;
 }
 ```
 
 Built to `0xC` bytes (`objdump -t build/src/code_179d8_h.c.o`), matching
-retail's `nonmatching func_80028B6C, 0xC` header exactly. `funcdiff.py`
+retail's `nonmatching GetCdUseVSyncCallback, 0xC` header exactly. `funcdiff.py`
 reports 3/3 words match in-range (some out-of-range drift was present at
 measurement time from this runner's other in-progress stalls elsewhere in
 the same round, not from this function -- the whole-image build is
@@ -48,7 +50,7 @@ MATCHED. Committed as C.
 
 ---
 
-# (round 17/42, superseded) func_80028B6C -- STALL (gp-relative blocker, not attempted)
+# (round 17/42, superseded) GetCdUseVSyncCallback -- STALL (gp-relative blocker, not attempted)
 
 > **REOPENED -- ASSIGNABLE, round 42 (2026-09-15).** This function was
 > screened as blocked by `gp_rel`. **That blocker is RESOLVED**: maspsx gained
@@ -64,7 +66,7 @@ Unit `code_179d8_h`, carved mid-round 17 (2026-09-04). **Not attempted.**
 ## Classification
 
 ```sh
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_h/func_80028B6C.s
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_h/GetCdUseVSyncCallback.s
 ```
 
 Hit. The function is 3 instructions long and is a bare gp-relative load and

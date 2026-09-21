@@ -28,7 +28,7 @@
  * 16 of 17 clean.
  *
  * BLOCKED, stub report already filed, do NOT spend attempts on it:
- *   gp_rel: func_80028B6C (only 3 instructions, so nothing is lost)
+ *   gp_rel: GetCdUseVSyncCallback (only 3 instructions, so nothing is lost)
  *
  * Three of the entries carry real names inherited from FirecatFG's lsddecomp
  * (`strcpy`, `strstr`, `CdStatus`) -- treat those names as HYPOTHESES like any
@@ -219,6 +219,6 @@ void func_80028B64(void) {
 
 extern s32 gCdUseVSyncCallback;
 
-s32 func_80028B6C(void) {
+s32 GetCdUseVSyncCallback(void) {
     return gCdUseVSyncCallback;
 }

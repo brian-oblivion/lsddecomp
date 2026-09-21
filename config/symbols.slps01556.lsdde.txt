@@ -1112,3 +1112,4 @@ gDreamAuxTriggerCounts = 0x80089AC4;
 gDreamAuxTriggerEntries = 0x80089A8C;
 gDreamAuxSpawnInfo = 0x80088F48;
 gDreamAuxPosTable = 0x80088D3C;
+GetCdUseVSyncCallback = 0x80028B6C; // type:func
