@@ -114,33 +114,19 @@ s32 func_8004B5BC(Obj866E8 *self) {
     return result;
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004B700.md. 137/140 words,
- * correct length, no drift (round 40 permuter-found improvement, up from
- * 125/140). ROUND 40 (bravo): first-ever permuter search on this function
- * (37155 iterations, no rc captured -- the wrapping shell was torn down
- * before the trailing echo ran, same trap documented for func_8004BB3C in
- * round 17). Best candidate dropped the permuter score 75 -> 15 and never
- * improved further across the remaining ~36,900 iterations. The lead:
- * replace the second `u14 = e->unkC->unk14; u14->unk0 = 0;` reload with a
- * direct `e->unkC->unk14->unk0 = 0;` (no named-local reassignment) --
- * closed 12 of the 15 remaining words. Remaining 3-word residue (second
- * loop's row pointer, retail `$a2` vs built `$v0`) is the SAME pure
- * register-identity class this report already documented and is untouched
- * by this fix -- confirmed via asm-differ, no instruction-shape difference
- * anywhere in that loop, just the one register substitution.
- *
- * ROUND 27 (delta): re-verified per the head's callee-saved-registers
- * broadcast -- compiled prologue saves the IDENTICAL set to retail (s0-s7,
- * fp, ra, same stack slots), so the "extra callee-saved parameter" lever
- * does NOT apply here. Verdict (pure register identity) CONFIRMED, not
- * just plausible.
- *
- * ROUND 32 (bravo2): re-verified, 125/140, no drift, identical residue
- * (tbl/u14/second-loop-row-pointer register swaps, no instruction shape
- * differences). Not re-attempted -- three prior rounds' worth of
- * confirmation (register-identity verdict, callee-saved order match) left
- * nothing untried within this round's budget worth spending on. */
-#if 0
+/* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
+ * 40 across four re-verifications, ten inert structural variants and a
+ * 37,155-iteration permuter search -- see docs/match-reports/func_8004B700.md.
+ * The 3-word residue was a genuine pure register-identity difference (funcdiff
+ * ins 0 / del 0, no asm-differ markers): retail held the second loop's element
+ * pointer in $a2, the build in $v0. The fix was to DELETE a local -- the
+ * second loop reuses `e`, the same variable the first loop walks, instead of a
+ * separate `e2`. Nothing else in the body changed.
+ * That axis is exactly the one a permuter cannot reach: it mutates a body, it
+ * does not merge two of its locals into one. Same lever as func_8004BA40 this
+ * round.
+ * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
+ * with `e` merged it is no longer needed, verified by whole-image rebuild. */
 void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
     s32 divisor;
     s32 flag;
@@ -148,7 +134,6 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
     s32 count;
     s32 i;
     Elem *e;
-    Elem *e2;
     Unk14Obj *u14;
     Unk54Struct *tbl;
     SetupEntry866E8 stackBuf[7];
@@ -164,7 +149,6 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
                 tbl = &D_80086838[arg3[i].key];
-                __asm__("");
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
                     u14->unk18.w = arg2->unk0 + tbl->unk0;
@@ -182,16 +166,14 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
         }
 
         for (i = 0; i < 7; i++) {
-            e2 = &self->arr[i];
-            e2->unk4->unk32 = e2->unk2;
+            e = &self->arr[i];
+            e->unk4->unk32 = e->unk2;
         }
 
         self->methods->slotFC(self, stackBuf, count);
     }
 }
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B700);
 
 s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
     Unk68Struct *u;
