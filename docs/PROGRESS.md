@@ -152,6 +152,26 @@ Also corrected: DECOMPILATION_LEARNINGS' "The three RESOLVED blockers" heading
 and table, which had not been updated when `--nop-at-expansion` resolved the
 fourth in round 63.
 
+### The doc budget was met by REFLOW, not distillation — and the proxy has decoupled
+
+Promoting four idioms took DECOMPILATION_LEARNINGS to 823 against its 800-line
+budget, which §5 says to fix by distilling and moving history to the archive.
+A delegated Sonnet instead reflowed the file to a consistent column: 823 -> 777
+lines with the content **word-for-word identical**. The head verified that
+independently of the runner's own checks — the whitespace-normalised word stream
+matches at 10,065 words, bullet count 124 = 124, measured-figure count 97 = 97 —
+and the file's LONGEST line got *shorter*, 159 -> 138 chars, with only two lines
+over 100. The previous file was inconsistently wrapped somewhere between 85 and
+159 columns, so this is normalisation rather than stretching lines to beat a
+count, and nothing was lost.
+
+**It is still not distillation, and the next head should not read 777/800 as 23
+lines of content headroom.** The count fell 46 lines in the same round that
+ADDED four entries. Whether these budgets should be measured in words rather
+than lines is escalated, not decided here: a line budget is only a proxy for
+"this doc is getting too long to read", and this round is the first time the
+proxy and the thing moved in opposite directions.
+
 ### Escalated, not acted on
 
 1. **`funcdiff.py` is not preprocessor-aware.** It decides "still INCLUDE_ASM"
@@ -164,7 +184,16 @@ fourth in round 63.
 2. **PARALLEL-RUNS §3.3 does not screen per-lever negatives**, which round 64
    measured at a 16-round cost. Proposed as a new sub-point to the attempt-history
    screen; a procedure change, so not written by an Opus head.
-3. **`SpuInit` may be convertible to a linked SDK object.** It sits in a
+3. **Doc budgets may want measuring in words, not lines** — see the reflow
+   section above; content and line count moved in opposite directions for the
+   first time this round.
+4. **`stalesyms.py` reports a real backlog no track schedules**: 52 stale symbol
+   references across 25 LIVE reports (a preserved body naming a since-renamed
+   callee will not link, so its recorded score measured nothing), and 5 of those
+   reports have no `#if 0` block at all, keeping their figure in a ```c fence
+   instead of the form CLAUDE.md mandates. `func_80055258` was one of the five
+   and charlie converted it while matching; the other four are untouched.
+5. **`SpuInit` may be convertible to a linked SDK object.** It sits in a
    documented gap between two placed `libspu` objects, and `progress.py` reports
    9 still-asm SDK functions a placed object already owns. That is
    SDK-object-conversion work (`docs/SDK-OBJECTS-GUIDE.md`), which no open track
