@@ -1112,3 +1112,11 @@ gDreamAuxTriggerCounts = 0x80089AC4;
 gDreamAuxTriggerEntries = 0x80089A8C;
 gDreamAuxSpawnInfo = 0x80088F48;
 gDreamAuxPosTable = 0x80088D3C;
+// identified: fingerprint 1.00 (EXACT) vs libspu/s_i.o (discs 3.3,3.5,3.6),
+// position: the exact 0x20-byte gap between already-placed libspu/s_m_f
+// (ends here) and libspu/s_sr (starts at end), disc 3.3 -- the only libspu
+// candidate among a 4-way AMBIGUOUS fingerprint tie otherwise all libsnd.
+// Header LIBSPU.H `extern void SpuInit (void);` agrees with the call
+// site's (void) arg shape. Round 64 (track 2), not yet linked from an SDK
+// object.
+SpuInit = 0x80038D54; // type:func
