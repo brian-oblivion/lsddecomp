@@ -630,34 +630,28 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     return &self->unkBC;
 }
 
-/* STALLED at 72/106 words -- see docs/match-reports/func_8004C1C0.md for
- * the full analysis (two independent residue classes: an $a1-vs-$a3
- * register-identity choice for u14b, and a store-then-reread narrow-field
- * codegen sensitivity confirmed with an isolated toolchain reproducer).
- * ROUND 27 (delta): re-verified 72/106, no drift; two more attempts on
- * class 2 (dropping the b2/b3 locals and re-reading `out->base.b2/b3`
- * directly at the h4/h8 use sites) -- both REGRESSED (drift, extra saved
- * register in the prologue), reverted. Not re-attempted further this
- * round. Preserved here per convention.
- *
- * ROUND 32 (bravo2): re-verified, 72/106, no drift, identical residue.
- * Set up an isolated permuter scaffold to probe the store-then-reread
- * class-2 residue -- its own `--debug` base score showed 9 INSERTIONS and
- * 9 DELETIONS versus the real in-context build's zero, i.e. the isolated
- * scaffold compiles to a structurally DIFFERENT function than the real
- * build (the same scaffold-context-mismatch trap documented for
- * func_8004BB3C in round 17). Not run further -- a search against a
- * scaffold provably scoring a different residue would not transfer.
- * Scaffold deleted; not attempted further this round. */
-#if 0
+/* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)
+ * with three source-shape corrections, none of them register pinning -- see
+ * docs/match-reports/func_8004C1C0.md.
+ *   1. `b2`/`b3` are s32 locals RE-READ from `out->base.b2`/`b3` after the
+ *      byte stores. An s8 field shifted directly in the expression compiles
+ *      to `lbu` + `sll 0x18` + `sra 0xd`; assigning it to an s32 local first
+ *      folds the sign extension into retail's `lb` + `sll 0xb`.
+ *   2. The 0x400 sits INSIDE the subtracted group -- `x - (y + (b<<11) +
+ *      0x400)`. GCC reassociates that to retail's `addiu a0,a0,-0x400`.
+ *      Writing `(x - 0x400) - (...)` instead narrows the constant to HImode
+ *      and emits `li 0xfc00` + `addu`.
+ *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
+ *      placement schedules its `sw` too early; only trailing it after the
+ *      h8 store reproduces retail's order. */
 s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
     s32 rate;
     s32 t;
-    s8 b2;
-    s8 b3;
+    s32 b2;
+    s32 b3;
 
     e = self->methods->slot11C(self, in);
     if (e != 0) {
@@ -679,28 +673,25 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
         if (t < 0) {
             t += 0x7FF;
         }
-        b2 = t >> 11;
-        out->base.b2 = b2;
+        out->base.b2 = t >> 11;
 
         t = in->unk8.w - u14b->unk20.w;
         if (t < 0) {
             t += 0x7FF;
         }
-        b3 = t >> 11;
-        out->base.b3 = b3;
+        out->base.b3 = t >> 11;
 
-        out->base.h4 = (in->unk0.h - 0x400) - (u14b->unk18.h + (b2 << 11));
+        b2 = out->base.b2;
+        out->base.h4 = in->unk0.h - (u14b->unk18.h + (b2 << 11) + 0x400);
         out->base.h6 = in->unk4.h;
+        b3 = out->base.b3;
+        out->base.h8 = in->unk8.h - (u14b->unk20.h + (b3 << 11) + 0x400);
         out->unk24 = e;
-        out->base.h8 = (in->unk8.h - 0x400) - (u14b->unk20.h + (b3 << 11));
 
         return 0;
     }
     return 1;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C1C0);
 
 
 void func_8004C368(Obj866E8 *self, u8 *out, s32 val) {
