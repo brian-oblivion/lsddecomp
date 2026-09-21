@@ -161,7 +161,7 @@ The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
 `Class6D430` (`include/code_171e0.h`) is included by `src/code_179d8_h.c`
-and `src/code_179d8_q.c` too, and `code_179d8_h.c`'s `func_80028898`
+and `src/code_179d8_q.c` too, and `code_179d8_h.c`'s `Class6D430__InstallCdReadDriver`
 genuinely reads/writes `self->unk0C` on this exact type (not a same-named
 field on a different struct), so per track 3's ownership rule these are
 PROPOSED, not renamed:

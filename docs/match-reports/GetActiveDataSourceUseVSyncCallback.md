@@ -17,11 +17,11 @@ Same `if`/`else` tail-call shape as `GetActiveDataSourceMethods`/`GetActiveDataS
 `0x13`, different callees:
 
 ```
-beq $v1, $v0(0x13), .L8002700C   # equal -> func_80028B6C
+beq $v1, $v0(0x13), .L8002700C   # equal -> GetCdUseVSyncCallback
   jal func_8002C478                # fallthrough (not equal)
   j .L80027014
 .L8002700C:
-  jal func_80028B6C
+  jal GetCdUseVSyncCallback
 .L80027014:
 ```
 
@@ -30,18 +30,18 @@ beq $v1, $v0(0x13), .L8002700C   # equal -> func_80028B6C
 the direct positive evidence CLAUDE.md asks for -- the else-arm really does
 return `s32`, so the whole function (and, by the same shape, its two
 siblings `GetActiveDataSourceMethods`/`GetActiveDataSourceDriverMode`) is correctly typed non-void, not
-merely defaulted to it. `func_80028B6C` is still uncarved
-(`asm/nonmatchings/code_179d8_h/func_80028B6C.s`).
+merely defaulted to it. `GetCdUseVSyncCallback` is still uncarved
+(`asm/nonmatchings/code_179d8_h/GetCdUseVSyncCallback.s`).
 
 ## Final body
 
 ```c
-extern s32 func_80028B6C(void);
+extern s32 GetCdUseVSyncCallback(void);
 extern s32 func_8002C478(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
     if (gActiveDataSource == 0x13) {
-        return func_80028B6C();
+        return GetCdUseVSyncCallback();
     } else {
         return func_8002C478();
     }
@@ -63,7 +63,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026FE8` | `GetActiveDataSourceUseVSyncCallback` | B |
 
-**Evidence.** Forwards to `func_80028B6C` (itself just `return
+**Evidence.** Forwards to `GetCdUseVSyncCallback` (itself just `return
 gCdUseVSyncCallback;`, an already-named global) when the CD driver is
 active, else `func_8002C478` (always `0`). The "VSync callback" framing
 comes directly from that already-established global's name, generalised to

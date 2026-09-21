@@ -225,7 +225,7 @@ first assignment lands relative to the branch)
    the loop-exhausted case) does not get shared this way, producing a
    substantially different, longer function.
 7. `haystack` used directly as the mutating scan pointer (no separate
-   `scan` local, matching the parameter-reuse idiom that fixed `func_80028A50`
+   `scan` local, matching the parameter-reuse idiom that fixed `GetCdFileSize`
    and was explored for `strcpy`) -- no change to this specific residue
    (still 26/30); ruled out as the relevant axis for this particular
    instruction.

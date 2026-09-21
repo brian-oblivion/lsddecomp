@@ -173,7 +173,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `label: …; if (cond) goto label;` defeats it, and register pressure is not the knob.
   Signature: extra `li $sN,<const>` outside, missing `move` inside. Does not generalise
   across loops even within one function, and does not reach a repeated LOCAL STACK-ADDRESS
-  CSE across non-adjacent call sites (round 54, `func_80028920`, two CFG shapes, neither).
+  CSE across non-adjacent call sites (round 54, `OpenCdFile`, two CFG shapes, neither).
   (a round 54)
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe
   an explicit `if` against a loop's implicit entry test (where retail has ONE check, `guard

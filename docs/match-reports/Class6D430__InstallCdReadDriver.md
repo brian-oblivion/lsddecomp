@@ -1,16 +1,22 @@
-# func_80028898 -- MATCHED (18/18 words)
+# Class6D430__InstallCdReadDriver -- MATCHED (18/18 words)
+
+> Renamed from `func_80028898` on 2026-09-21 (tools/rename.py). Address 0x80028898.
 
 Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 
 ## Result
 
 ```c
-void func_80028898(Class6D430 *self) {
+void Class6D430__InstallCdReadDriver(Class6D430 *self) {
     ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
     self->methods = GetClass6D4E8Methods();
-    self->unk0C = 0;
+    self->pendingGeneration = 0;
 }
 ```
+
+(`self->unk0C` above was `code_171e0.h`'s own field, renamed to
+`pendingGeneration` by that unit's owner before this round; this report's
+code sample was stale and is corrected here, round 64.)
 
 with `#include "code_171e0.h"` (already-established header, reused
 UNCHANGED -- not copied or redefined) and a new local
@@ -48,3 +54,22 @@ offsets. `GetClass6D430Methods()` itself returns bare `void *`, so every externa
 call site needs its own cast to the slot-bearing type; this is not
 `code_171e0.c`'s problem to fix (its own call sites go through
 `this->methods`, already correctly typed).
+
+## Naming (round 64, runner alpha)
+
+`func_80028898` -> `Class6D430__InstallCdReadDriver`, tier B. `self` is
+`Class6D430*`, the header's own established type (this match is byte-exact
+against that typing) -- so `Class6D430__` follows track 3's convention
+letter-for-letter ("methods `Class__Method`, where `Class` is the struct's
+type name"). The rest of the name describes only confirmed MECHANICS: chain
+to `Class6D430`'s own ctor, then overwrite `self->methods` with
+`GetClass6D4E8Methods()`'s table -- `D_8006D4E8`, independently named
+elsewhere in the tree (`src/code_179d8_q.c`'s own header comment) as "the
+CD-ROM read driver", not a guess coined here. WHICH broader class or game
+subsystem this function itself belongs to (why a `Class6D430` instance gets
+reclassified this way here, distinct from `src/code_179d8_o.c`'s own
+confirmed ctor `func_80027228` for the same `D_8006D4E8` class) is NOT
+established -- no caller is visible yet (only referenced from the
+still-uncarved `code_179d8` remainder) and this is flagged as such rather
+than guessed at. See `Class6D430__DestroyCdReadDriver.md` for the paired
+dtor.

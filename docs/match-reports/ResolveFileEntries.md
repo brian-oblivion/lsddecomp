@@ -33,7 +33,7 @@ struct CdLoc16 {
  * = 0x18 bytes (include/psyq/LIBCD.H). The 0x18 was derived here
  * independently, from the span between this local's stack slot (sp+0x50) and
  * the next saved register (sp+0x68), and it is the same figure
- * code_179d8_h.c's func_80028920 derived for the same Sony function. Only
+ * code_179d8_h.c's OpenCdFile derived for the same Sony function. Only
  * the two fields this call site copies out are typed. */
 typedef struct CdFileInfo CdFileInfo;
 struct CdFileInfo {
@@ -43,7 +43,7 @@ struct CdFileInfo {
 };
 
 /* One element of the file table: 0x1C bytes of {name, disc position, size}.
- * `name` is passed by its own address (offset 0) to func_800289CC, which
+ * `name` is passed by its own address (offset 0) to BuildCdFilePath, which
  * builds the full path from it; `pos` and `size` are then filled in from a
  * CdSearchFile lookup on that path, so an entry is a name resolved once and
  * reused as a seek target. gFileTable and gFileTableCount (this unit's
@@ -61,7 +61,7 @@ struct CdFileEntry {
 extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 extern s32 CdSearchFile(CdFileInfo *fileInfo, char *path); /* libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
-extern char *func_800289CC(char *dest, char *suffix); /* code_179d8_r */
+extern char *BuildCdFilePath(char *dest, char *suffix); /* code_179d8_r */
 extern void InitCdDrive(void);
 
 #define CD_SEARCH_RETRIES 0x65
@@ -78,7 +78,7 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count)
     InitCdDrive();
 
     for (; entries < end; entries++) {
-        func_800289CC(path, entries->name);
+        BuildCdFilePath(path, entries->name);
 
         for (tries = 0; tries < CD_SEARCH_RETRIES; tries++) {
             if (CdSearchFile(&info, path) != 0) {
@@ -181,7 +181,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `D_800107D8` | `sFileNotFoundMsg` | A |
 
 **Evidence.** For each element of the array it is handed, it builds a path
-from the element's `name` (`func_800289CC`), retries `CdSearchFile` on that
+from the element's `name` (`BuildCdFilePath`), retries `CdSearchFile` on that
 path up to 101 times, prints `"File not found. file = %s\n"` if all of them
 fail, and then copies the search result's position and size back into the
 element. Turning names into disc positions is the entire function; tier A.

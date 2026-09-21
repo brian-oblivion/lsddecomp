@@ -1,4 +1,16 @@
-# func_80028920 -- STALL (best: 14/43 words at length 44/43 [1 word long], structural, first real diff at file offset 0x19124 per asm-differ)
+# OpenCdFile -- STALL (best: 14/43 words at length 44/43 [1 word long], structural, first real diff at file offset 0x19124 per asm-differ)
+
+> Renamed from `func_80028920` on 2026-09-21 (tools/rename.py). Address 0x80028920.
+
+> **ROUND 64 (2026-09-21), runner alpha -- field rename note.** `ObjA34_179D8H`'s
+> fields were renamed this round: `unk0C` -> `isOpen`, `unk18` -> `pos`,
+> `unk1C` -> `size`; `StatBuf179D8H`: `unk0` -> `pos`, `unk4` -> `size`;
+> `MethodsA34_179D8H`: `slot48` -> `onError`. All prose and code below this
+> note PREDATES the rename and uses the old field names throughout (it is
+> historical narrative, left as written); the `## Best result` block's actual
+> function body has been updated to compile against the CURRENT struct
+> definitions in `src/code_179d8_h.c` -- that is the one to splice if you
+> pick this function up again.
 
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then two more structural
 > reshapes, both negative.**
@@ -6,7 +18,7 @@
 > **Rebuild-before-trusting-the-score.** Spliced the preserved (round-36)
 > body into `src/code_179d8_h.c` in place of the `INCLUDE_ASM` unchanged and
 > ran the real oracle: `build exit=2`, no compile-error grep hits,
-> `build/lsdde.map` confirms `func_800289CC - func_80028920 = 0xB0` = 44
+> `build/lsdde.map` confirms `BuildCdFilePath - OpenCdFile = 0xB0` = 44
 > words against retail's 43 (one word long, unchanged since round 36/47).
 > Restored immediately; `./build-and-verify.sh` -> `OK: build matches retail
 > SLPS_015.56`.
@@ -24,13 +36,13 @@
 >    ```c
 >    i = 0;
 >    if (self->unk0C == 0) {
->        func_800289CC(path, suffix);
+>        BuildCdFilePath(path, suffix);
 >        do {
 >            if (CdSearchFile(&statBuf, path) != 0) {
 >                goto found;
 >            }
 >        } while (i++ < 100);
->        printf(D_800107F4, path);
+>        printf(gCdFileNotFoundFmt, path);
 >        goto end;
 >    found:
 >        self->unk18 = statBuf.unk0;
@@ -53,13 +65,13 @@
 >    ```c
 >    i = 0;
 >    if (self->unk0C == 0) {
->        func_800289CC(path, suffix);
+>        BuildCdFilePath(path, suffix);
 >        while (1) {
 >            if (CdSearchFile(&statBuf, path) != 0) {
 >                break;
 >            }
 >            if (!(i++ < 100)) {
->                printf(D_800107F4, path);
+>                printf(gCdFileNotFoundFmt, path);
 >                return;
 >            }
 >        }
@@ -73,7 +85,7 @@
 >    `asm-differ` shows it is the IDENTICAL residue class, not an
 >    improvement: the address computation is still hoisted one instruction
 >    earlier than retail (an extra `addiu s0,sp,0x28` appears BEFORE the
->    `jal func_800289CC` where retail computes it in the jal's own delay
+>    `jal BuildCdFilePath` where retail computes it in the jal's own delay
 >    slot), and the register-role rotation persists in a different exact
 >    permutation (`s2`=self/`s1`=i/`s0`=path here, vs retail's
 >    `s1`=self/`s0`=i/`s2`=path — still a three-way rotation, not resolved).
@@ -141,19 +153,19 @@ to `INCLUDE_ASM`.
 one of the two documented blockers
 
 Screened clean on both. Confirmed via `tools/m2ctx.py code_179d8_h --sig
-'void func_80028920(ObjA34_179D8H *self, char *suffix)' --run`, which
+'void OpenCdFile(ObjA34_179D8H *self, char *suffix)' --run`, which
 independently reconstructs the same algorithm and confirms the field
 offsets/types this report uses.
 
 ## What it does (high confidence)
 
-Builds a CD path via `func_800289CC` (this unit, matched) into a local 64-byte
+Builds a CD path via `BuildCdFilePath` (this unit, matched) into a local 64-byte
 buffer, then retries `func_8002B640` (CD stat lookup, still uncarved,
 BLOCKED addiu_at in its own unit `code_179d8_g`) up to 100 times; on success,
 copies the stat buffer's first two fields into `self->unk18`/`self->unk1C`
 and marks `self->unk0C = 1`; on exhausting the retries, logs via
 `func_80012C20` (Psy-Q print wrapper) and gives up. `self` is the SAME
-`ObjA34_179D8H` this unit's `func_80028A34`/`func_80028A50` already
+`ObjA34_179D8H` this unit's `CloseCdFile`/`GetCdFileSize` already
 established (fields `unk0C`, `unk1C` line up exactly) -- this function adds
 a new field, `unk18`, a 4-byte alignment-2 pair (the `lwl`/`lwr` +
 `swl`/`swr` idiom CLAUDE.md documents), copied from the same offset in the
@@ -163,14 +175,19 @@ stat buffer.
 
 ```c
 #if 0
+/* Pair16_179D8H, StatBuf179D8H, ObjA34_179D8H and MethodsA34_179D8H are
+ * ALREADY declared earlier in src/code_179d8_h.c (current field names:
+ * ObjA34_179D8H::isOpen/pos/size, StatBuf179D8H::pos/size) -- do not
+ * re-paste these typedefs when splicing, only the function body below. Shown
+ * here again only so this block reads standalone. */
 typedef struct Pair16_179D8H {
     s16 unk0;
     s16 unk2;
 } Pair16_179D8H;
 
 typedef struct StatBuf179D8H {
-    Pair16_179D8H unk0;
-    u32 unk4;
+    Pair16_179D8H pos;
+    u32 size;
     u8 pad8[0x18 - 0x8];
 } StatBuf179D8H;
 
@@ -179,30 +196,30 @@ typedef struct StatBuf179D8H {
  * SDK-object conversion -- corrected round 36. */
 extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path);
 extern void printf(const char *fmt, void *arg1);
-extern char D_800107F4[];
-char *func_800289CC(char *dest, char *suffix);  /* forward decl, ROM order */
+extern char gCdFileNotFoundFmt[];
+char *BuildCdFilePath(char *dest, char *suffix);  /* forward decl, ROM order */
 
-void func_80028920(ObjA34_179D8H *self, char *suffix) {
+void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
     s32 i;
     StatBuf179D8H statBuf;
     char path[0x40];
 
     i = 0;
-    if (self->unk0C == 0) {
-        func_800289CC(path, suffix);
+    if (self->isOpen == 0) {
+        BuildCdFilePath(path, suffix);
         while (1) {
             if (CdSearchFile(&statBuf, path) != 0) {
                 break;
             }
             i++;
             if (i >= 100) {
-                printf(D_800107F4, path);
+                printf(gCdFileNotFoundFmt, path);
                 return;
             }
         }
-        self->unk18 = statBuf.unk0;
-        self->unk0C = 1;
-        self->unk1C = statBuf.unk4;
+        self->pos = statBuf.pos;
+        self->isOpen = 1;
+        self->size = statBuf.size;
     }
 }
 #endif
@@ -210,7 +227,7 @@ void func_80028920(ObjA34_179D8H *self, char *suffix) {
 
 `ObjA34_179D8H::unk18` (added this attempt) and the field order in
 `ObjA34_179D8H`/`StatBuf179D8H` are worth keeping even though this function
-stalled -- `func_80028A34`/`func_80028A50` (already matched) are unaffected
+stalled -- `CloseCdFile`/`GetCdFileSize` (already matched) are unaffected
 (neither reads `unk18`), and the STACK LAYOUT this version reaches
 (`statBuf` at `sp+0x10`, `path` at `sp+0x28`, matching retail's `lwl
 $v0,0x13(sp)` / `lwr $v0,0x10(sp)` source and frame size `-0x78`) is
@@ -219,7 +236,7 @@ correct -- confirmed by diffing against retail's exact addresses.
 ## The residue (two distinct issues, best attempt has both)
 
 1. **GCC unifies `path`'s address across all three call sites** (the
-   `func_800289CC` dest argument, the `func_8002B640` second argument, and
+   `BuildCdFilePath` dest argument, the `func_8002B640` second argument, and
    the `func_80012C20` second argument) into ONE cached register value,
    computed once. Retail does NOT: it computes `$a0 = sp+0x28` freshly for
    the FIRST call (a plain `addiu`, no caching), and only starts caching
@@ -257,7 +274,7 @@ correct -- confirmed by diffing against retail's exact addresses.
    5/43, worse; the post-increment condition changed the CFG more than
    intended.
 
-**The untested axis: whether the FIRST call (`func_800289CC`) needs a
+**The untested axis: whether the FIRST call (`BuildCdFilePath`) needs a
 GENUINELY different C-level expression for `path` than the loop's two later
 calls** -- e.g. if retail's source takes `path`'s address into a variable
 only INSIDE the loop (never before it), the first call might use a
@@ -286,18 +303,22 @@ shape.
 
 ## Round 18 (echo) — one more hypothesis, also negative
 
-Tried using `func_800289CC`'s own return value (it returns `dest`
+Tried using `BuildCdFilePath`'s own return value (it returns `dest`
 verbatim, confirmed by reading its now-matched body) as the address
 reused across the loop's later calls, instead of referencing the `path`
 array by name a second time:
 
 ```c
-char *p = func_800289CC(path, suffix);
+char *p = BuildCdFilePath(path, suffix);
 while (1) {
-    if (func_8002B640(&statBuf, p) != 0) { break; }
+    if (CdSearchFile(&statBuf, p) != 0) { break; }
     ...
 }
 ```
+(`func_8002B640` corrected to `CdSearchFile` round 64 -- Sony's,
+`lib/libcd/iso9660.o` since round 34; this fragment is illustrative/partial
+and was never itself a build target, but `tools/stalesyms.py` flags any
+LIVE preserved-block reference to a since-renamed name regardless.)
 
 Hypothesis: if the loop's calls consume a value that arrived via a
 CALL's return register ($v0) rather than a locally-recomputed `addiu`,
@@ -324,7 +345,7 @@ yet spent this round due to time).
 preserved body (unchanged from round 36's, above) into `src/code_179d8_h.c`
 in place of the `INCLUDE_ASM` and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `build/lsdde.map` shows
-`func_800289CC - func_80028920 = 0xB0` = 44 words against retail's 43 (one
+`BuildCdFilePath - OpenCdFile = 0xB0` = 44 words against retail's 43 (one
 word longer, matching round 36's own note exactly). `funcdiff.py` read
 13/43 raw word-match this time (round 36 recorded 12/43) -- a one-word
 difference in the RAW count that does not change the verdict; the
@@ -339,7 +360,7 @@ afterward.
 (b) run, (c) not reached because (b) already said no:**
 
 - **(a) scaffold compiles and scores:** yes.
-  `tools/setup-permuter.sh func_80028920 permuter-work/seed_80028920.c`
+  `tools/setup-permuter.sh OpenCdFile permuter-work/seed_80028920.c`
   built clean (`scaffold built ... base compiles, target assembled`).
 - **(b) insertion/deletion penalties, `--debug --stack-diffs`:** **NOT**
   near 0/0. Measured: `Insertions: 4 (100)`, `Deletions: 3 (100)`,
@@ -348,7 +369,7 @@ afterward.
   the exact residue this report already documents in prose, now in
   registers: retail's `s1`/`s2` map to this attempt's `s2`/`s1`
   (a genuine role swap, not a naming accident) and retail computes `a0 =
-  sp+0x28` fresh for the FIRST `func_800289CC` call (`addiu a0,sp,0x28`)
+  sp+0x28` fresh for the FIRST `BuildCdFilePath` call (`addiu a0,sp,0x28`)
   where this attempt caches it into `s0` one instruction earlier and reuses
   the cached copy (`move a0,s0`) -- the identical "address computed once,
   hoisted above the first use" residue five prior attempts already
@@ -387,3 +408,23 @@ hoisted before the loop; register roles swapped) that five independent
 hand-written C attempts had already converged on separately -- meaning the
 debug diff can be read as a FREE cross-check of a "structural" verdict
 before deciding whether to spend a search on it at all, not only after.
+
+---
+
+## Naming (round 64, runner alpha)
+
+- **`func_80028920` -> `OpenCdFile`, tier B.** Mechanics: if not already
+  open, builds the CD path (`BuildCdFilePath`), retries `CdSearchFile` up to
+  100 times, and on success records the result and marks the object open.
+  Not derived from this function's own (stalled) body alone: independently
+  confirmed by `src/code_179d8_s.c`'s `func_800272D0`, which calls this
+  function directly when CD-async mode is off, and otherwise reimplements
+  the identical algorithm (same field offsets, same `CdSearchFile`/`CdControl`
+  sequence) for its own async path. Paired with `CloseCdFile`/`GetCdFileSize`/
+  `ReadCdFile` (also this unit) as an Open/Close/Size/Read quad; see those
+  reports and `src/code_179d8_h.c`'s unit header comment.
+- Field renames on `ObjA34_179D8H`/`StatBuf179D8H` this function reads
+  (`unk0C`->`isOpen`, `unk18`->`pos`, `unk1C`->`size`; `StatBuf179D8H`
+  `unk0`->`pos`, `unk4`->`size`) are recorded in `CloseCdFile.md`'s and
+  `GetCdFileSize.md`'s `## Naming` sections and in `src/code_179d8_h.c`
+  directly; not re-derived here.

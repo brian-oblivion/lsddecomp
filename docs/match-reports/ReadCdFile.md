@@ -1,4 +1,15 @@
-# func_80028A84 -- STALL (best: 8/56 words at length 57/56 [1 word long], structural / block-layout)
+# ReadCdFile -- STALL (best: 8/56 words at length 57/56 [1 word long], structural / block-layout)
+
+> Renamed from `func_80028A84` on 2026-09-21 (tools/rename.py). Address 0x80028a84.
+
+> **ROUND 64 (2026-09-21), runner alpha -- field rename note.** `ObjA34_179D8H`'s
+> fields were renamed this round: `unk0C` -> `isOpen`, `unk18` -> `pos`,
+> `unk1C` -> `size`; `MethodsA34_179D8H`: `slot48` -> `onError`. All prose
+> and code below this note PREDATES the rename and uses the old field names
+> throughout (it is historical narrative, left as written); the
+> `## Result` block's actual function body has been updated to compile
+> against the CURRENT struct definitions in `src/code_179d8_h.c` -- that is
+> the one to splice if you pick this function up again.
 
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then one more
 > structural reshape, negative.**
@@ -115,10 +126,10 @@ Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment). Restored to
 `INCLUDE_ASM`.
 
 ## Class: structural (basic-block placement), plus an unresolved
-register-role rotation similar to `func_80028920`'s stall in this same unit
+register-role rotation similar to `OpenCdFile`'s stall in this same unit
 
 Screened clean on both documented blockers. Confirmed via `tools/m2ctx.py
-code_179d8_h --sig 's32 func_80028A84(ObjA34_179D8H *self, char *arg1, s32
+code_179d8_h --sig 's32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32
 arg2)' --run`, whose independent reconstruction matches this report's
 reading of the algorithm.
 
@@ -128,7 +139,7 @@ CD-ROM read/retry loop: if `self->unk0C == 0`, dispatch through
 `self->methods->slot48(self)` (a new vtable slot on the SAME
 `ObjA34_179D8H` class this unit already established) and return 0.
 Otherwise, loop: reset something via `func_80028DF0(2, &self->unk18, 0)`
-(this unit's own `unk18` field, matched in `func_80028920`'s stall report),
+(this unit's own `unk18` field, matched in `OpenCdFile`'s stall report),
 poll `func_80028D68` (already matched elsewhere, in `code_179d8_b.c`) until
 it returns nonzero; on `5` specifically, restart the whole loop; on any
 other nonzero, and only if the caller-supplied `arg2 >> 11` ("sector
@@ -141,9 +152,14 @@ which case retry the whole outer loop again).
 
 ```c
 #if 0
+/* MethodsA34_179D8H and ObjA34_179D8H are ALREADY declared earlier in
+ * src/code_179d8_h.c (current names: MethodsA34_179D8H::onError,
+ * ObjA34_179D8H::isOpen/pos) -- do not re-paste this typedef when splicing,
+ * only the function body below. Shown here again only so this block reads
+ * standalone. */
 typedef struct MethodsA34_179D8H {
     u8 pad000[0x48];
-    void (*slot48)(ObjA34_179D8H *self);
+    void (*onError)(ObjA34_179D8H *self);
 } MethodsA34_179D8H;
 /* ObjA34_179D8H gets a `MethodsA34_179D8H *methods;` field at +0x000,
  * with the leading padding through +0xC unchanged in total size -- see
@@ -157,18 +173,18 @@ extern s32 CdSync(s32 arg0, void *buf);
 extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
 extern s32 CdReadSync(s32 arg0, s32 arg1);
 
-s32 func_80028A84(ObjA34_179D8H *self, char *arg1, s32 arg2) {
+s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
     s32 hi;
     s32 status;
     char scratch[0x800];
     char buf[0x10];
 
-    if (self->unk0C == 0) {
-        self->methods->slot48(self);
+    if (self->isOpen == 0) {
+        self->methods->onError(self);
         return 0;
     }
     do {
-        CdControl(2, &self->unk18, 0);
+        CdControl(2, &self->pos, 0);
         hi = (u32)arg2 >> 11;
         do {
             status = CdSync(0, buf);
@@ -198,7 +214,7 @@ region `sp+0x10..0x810` (a suspicious, exact `0x800` = one CD sector) is
 otherwise unreferenced by this function's own instructions -- a `scratch[0x800]`
 declared before the small `buf[0x10]` reproduces this layout (confirmed:
 the `lwl`/`swl`-style address `sp+0x810` came out right with this
-declaration order, matching `func_80028920`'s earlier finding that GCC
+declaration order, matching `OpenCdFile`'s earlier finding that GCC
 allocates locals low-to-high in DECLARATION order here).
 
 ## The residue (two distinct issues)
@@ -220,7 +236,7 @@ allocates locals low-to-high in DECLARATION order here).
    NOT controlled by simple source reordering the way it was for smaller
    functions earlier this round.
 2. **Even in the closer (8/56) attempt, register roles differ from retail**
-   in the same style as `func_80028920`'s stall in this unit: which
+   in the same style as `OpenCdFile`'s stall in this unit: which
    callee-saved register holds `self` vs. the loop's other live values
    does not match, and the frame's REGISTER SAVE ORDER at the top of the
    function differs (`sw s0` vs `sw s1` first).
@@ -270,7 +286,7 @@ order) needs more work, not that the first attempt was closer to done.
 body into `src/code_179d8_h.c` in place of the `INCLUDE_ASM` and ran the
 real oracle: `build exit=2`, no compile-error grep hits, `funcdiff.py`
 reads **8/56 raw word-match**, identical to the recorded figure.
-`build/lsdde.map` (`func_80028B64 - func_80028A84 = 0xE4` = 57 words)
+`build/lsdde.map` (`NoOp4 - ReadCdFile = 0xE4` = 57 words)
 confirms the function is still exactly one word (4 bytes) longer than
 retail's 56, matching round 36's own re-verification exactly. Restored to
 `INCLUDE_ASM` immediately after; diffed the restored file byte-for-byte
@@ -284,7 +300,7 @@ confirms `OK: build matches retail SLPS_015.56`.
   layout, per this report's own stack-layout note above, and is never
   read).
 - **(b) insertion/deletion penalties, `--debug --stack-diffs`:** **NOT**
-  near 0/0, and further from it than `func_80028920`'s sibling residue in
+  near 0/0, and further from it than `OpenCdFile`'s sibling residue in
   this same unit. Measured: `Insertions: 5 (100)`, `Deletions: 4 (100)`,
   `Reorderings: 6 (60)`, `Register Differences: 13 (5)`, `Stack
   Differences: 8 (1)`, **base score = 1333**. Consistent with this
@@ -299,10 +315,42 @@ confirms `OK: build matches retail SLPS_015.56`.
   measure the SAME already-on-file residue rather than a contradictory
   one, so there is nothing to flag as a scaffold/real-build disagreement.
 
-**Verdict: search DECLINED**, for the same reason as `func_80028920` in
+**Verdict: search DECLINED**, for the same reason as `OpenCdFile` in
 this unit and made stronger by the larger insertion/deletion/reordering
 counts here: this is a block-placement (whole basic block relocated
 relative to the loop) plus register-role-rotation residue, which is a
 CONTROL-FLOW-SHAPE gap, not an expression-tree rewrite a source-mutation
 search is built to close. Recorded as NOT SEARCHED (declined on evidence
 from check (b)), not as a spent, failed search.
+
+---
+
+## Naming (round 64, runner alpha)
+
+- **`func_80028A84` -> `ReadCdFile`, tier B.** Mechanics: if not open,
+  dispatches the object's own error/failure slot and returns; otherwise
+  loops issuing `CdControl`/`CdSync` then `CdRead`/`CdReadSync` to fill the
+  caller's buffer. Confirmed by `src/code_179d8_s.c`'s `func_800276D0`,
+  which calls this function directly when CD-async mode is off and
+  otherwise reimplements the identical `CdRead`/`CdReadSync` retry loop for
+  its async path. Paired with `OpenCdFile`/`CloseCdFile`/`GetCdFileSize`
+  (also this unit) as an Open/Close/Size/Read quad.
+- `MethodsA34_179D8H::slot48` -> `onError` (tier B): the slot NUMBER (+0x48)
+  matches `src/code_179d8_s.c`'s own independent view
+  (`Methods80027480::slot48`), dispatched there on an unrelated
+  allocation-failure path (`func_80027800`) -- two unrelated give-up paths
+  at the identical offset. Not applied in `code_179d8_s.c` (out of unit);
+  PROPOSED there under the same name. Recorded in full in
+  `src/code_179d8_h.c`'s own field comment and in `OpenCdFile.md`.
+
+## Proposed field names
+
+- `src/code_179d8_s.c`'s `Methods80027480::slot48` (its own independent
+  local view of what appears to be the SAME table this unit calls through
+  `MethodsA34_179D8H`) -> `onError`, tier B. Same evidence as above: two
+  unrelated give-up paths (this unit's `ReadCdFile` on "not open",
+  `code_179d8_s.c`'s own `func_80027800` on allocation failure) dispatch the
+  identical slot number. `code_179d8_s.c` is out of unit and not staffed
+  this round; posted to the broadcast for the head to apply at merge time
+  per FINISHING-PLAN.md track 3 step 3 (rename the field in the struct
+  DEFINITION only, rebuild, fix exactly the accessors the compiler lists).

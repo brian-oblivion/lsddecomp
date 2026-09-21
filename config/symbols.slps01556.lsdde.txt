@@ -1120,3 +1120,16 @@ gDreamAuxPosTable = 0x80088D3C;
 // site's (void) arg shape. Round 64 (track 2), not yet linked from an SDK
 // object.
 SpuInit = 0x80038D54; // type:func
+GetCdUseVSyncCallback = 0x80028B6C; // type:func
+BuildCdFilePath = 0x800289CC; // type:func
+CloseCdFile = 0x80028A34; // type:func
+GetCdFileSize = 0x80028A50; // type:func
+OpenCdFile = 0x80028920; // type:func
+ReadCdFile = 0x80028A84; // type:func
+NoOp2 = 0x80028918; // type:func
+NoOp3 = 0x80028A7C; // type:func
+NoOp4 = 0x80028B64; // type:func
+Class6D430__InstallCdReadDriver = 0x80028898; // type:func
+Class6D430__DestroyCdReadDriver = 0x800288E0; // type:func
+gCdFileNotFoundFmt = 0x800107F4;
+gCdFileVersionSuffix = 0x8008A8A8;

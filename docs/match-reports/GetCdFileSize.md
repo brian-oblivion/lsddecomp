@@ -1,4 +1,6 @@
-# func_80028A50 -- MATCHED (11/11 words)
+# GetCdFileSize -- MATCHED (11/11 words)
+
+> Renamed from `func_80028A50` on 2026-09-21 (tools/rename.py). Address 0x80028a50.
 
 Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 
@@ -7,33 +9,34 @@ Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 ```c
 typedef struct ObjA34_179D8H {
     u8 pad0[0x0C];
-    s32 unk0C;
+    s32 isOpen;
     u8 pad10[0x1C - 0x10];
-    u32 unk1C;
+    u32 size;
 } ObjA34_179D8H;
 
-s32 func_80028A50(ObjA34_179D8H *self) {
+s32 GetCdFileSize(ObjA34_179D8H *self) {
     u32 result;
 
-    if (self->unk0C == 0) {
+    if (self->isOpen == 0) {
         result = 0;
     } else {
-        result = ((self->unk1C >> 11) + 1) << 11;
+        result = ((self->size >> 11) + 1) << 11;
     }
     return result;
 }
 ```
 
-Byte-exact, 11/11 words.
+Byte-exact, 11/11 words. (Fields renamed round 64: `unk0C` -> `isOpen`,
+`unk1C` -> `size`; see `## Naming` below.)
 
 ## Notes
 
-Rounds `self->unk1C` up to the next 0x800 (2048)-byte boundary when
-`self->unk0C != 0`, else returns 0 -- reads like a CD-ROM sector-aligned
+Rounds `self->size` up to the next 0x800 (2048)-byte boundary when
+`self->isOpen != 0`, else returns 0 -- reads like a CD-ROM sector-aligned
 buffer-size computation, consistent with this unit's overall CD theme
 (`CdStatus`, `strcpy`/`strstr` inherited names).
 
-`self->unk1C` is `u32` (not `s32`): retail's shift is `srl` (logical), not
+`self->size` is `u32` (not `s32`): retail's shift is `srl` (logical), not
 `sra`. A first attempt with the field left `s32` and an explicit `(u32)`
 cast at the read site got the shift right but left a DIFFERENT residue (see
 below); retyping the field itself was cleaner and is arguably the more
@@ -41,18 +44,20 @@ honest reading anyway -- nothing suggests this quantity is ever negative.
 
 **`ObjA34_179D8H` is a local type, not an extension of
 `code_171e0.h`'s `Class6D430`**, even though the offsets coincide
-suspiciously well: `self->unk0C` lines up with `Class6D430::unk0C`
-(already named there, "saved/restored around the unk10 (re)alloc"), and
-`self->unk1C` falls inside that struct's `pad18[0x20-0x18]` gap (explicitly
-documented there as "unknown, 8 bytes"). Extending the shared header would
-require splitting that padding without shifting anything after it, which is
-mechanically safe -- but `code_171e0.h` is OUT OF UNIT (shared with
-`code_171e0.c`, not this unit) and this round's rules are explicit that nothing
+suspiciously well: `self->isOpen` (offset +0x0C) lines up with
+`Class6D430::pendingGeneration` (same offset, "saved/restored around the
+buffer (re)alloc"), and `self->size` falls inside that struct's
+`pad18[0x20-0x18]` gap (explicitly documented there as "unknown, 8 bytes").
+Extending the shared header would require splitting that padding without
+shifting anything after it, which is mechanically safe -- but
+`code_171e0.h` is OUT OF UNIT (shared with `code_171e0.c` and
+`code_179d8_q.c`, neither this unit) and the rule is explicit that nothing
 outside the assigned unit + its reports gets edited. Kept as this unit's own
 narrower local reading instead, per the project's multiple-independent-
 local-views convention. Worth flagging for the head: if this coincidence
 holds up under more scrutiny, `code_171e0.h`'s owner may want to fold
-`unk1C` in properly.
+`size` in properly -- though round 64 notes the semantic mismatch this
+would need to resolve first (see `## Naming` below).
 
 **Residue and the fix, worth having as a general note.** First attempt used
 the by-then-familiar "pre-zero an accumulator, conditionally overwrite it"
@@ -60,8 +65,8 @@ shape:
 
 ```c
 u32 result = 0;
-if (self->unk0C != 0) {
-    result = ((self->unk1C >> 11) + 1) << 11;
+if (self->isOpen != 0) {
+    result = ((self->size >> 11) + 1) << 11;
 }
 return result;
 ```
@@ -99,3 +104,32 @@ needed nested-if/single-exit over combined-`&&`/early-return; this one
 needed if/else over pre-zero), which makes it worth trying all three
 sibling forms as a matter of course before spending time on manual RTL
 reasoning.
+
+## Naming (round 64, runner alpha)
+
+- `func_80028A50` -> `GetCdFileSize`, tier B. `src/code_179d8_s.c`'s
+  `func_80027528` calls this function directly (ignoring its own `arg1`,
+  `arg2`) when CD-async mode is off; its async path, when asked to just
+  query size (`arg2 != 0`), does the IDENTICAL `self->unk1C` rounding as a
+  fallthrough of the same seek function. Paired with `OpenCdFile`/
+  `CloseCdFile`/`ReadCdFile` (also this unit) as an Open/Close/Size/Read
+  quad.
+- `ObjA34_179D8H::unk0C` -> `isOpen`, `unk1C` -> `size` (tier B, both).
+  Evidence is cross-unit: `src/code_179d8_s.c`'s `Obj80027480` is an
+  independent local view of what is very likely the SAME object (see the
+  coincidence note above and `CloseCdFile.md`), and its own
+  `func_800272D0`/`func_80027480`/`func_80027528` async bodies set/clear
+  the identical offsets (`self->unk0C = 1` on a successful CD lookup,
+  `self->unk0C = 0` on close, `self->unk1C` fed the identical
+  `(x >> 11) + 1) << 11` rounding on a size query) around the identical
+  `CdSearchFile`/`CdControl`+`CdSync` sequence this unit's own `OpenCdFile`
+  uses. Not derived from this function's body in isolation.
+- **Note on the `Class6D430::pendingGeneration` coincidence (see `## Notes`
+  above): the SEMANTICS now look different, not just the offset.**
+  `pendingGeneration` is documented in `code_171e0.h` as "saved/restored
+  around the buffer (re)alloc" (implying a counter), while this unit's
+  reading at the same offset is a plain 0/1 open flag. These could still be
+  the same field serving double duty (0 = no generation yet = "closed"),
+  but that is now a SPECIFIC claim to verify, not just an offset match --
+  flagged here rather than resolved, per the park-rule spirit for anything
+  short of direct evidence. Not applied to `code_171e0.h` (out of unit).
