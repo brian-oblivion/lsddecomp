@@ -87,3 +87,11 @@ compiled to different destination registers here, and only the order
 matching retail's own `xor` operand order (`$s0, $s0, $v0` -> "cached value
 first") produced the byte-exact result. Cheap to check by operand-swap
 before treating a residue like this as a deeper stall.
+
+## Naming
+
+**CheckDreamAuxWorldState** — tier A. A pure predicate: calls
+`gDreamAuxWorld`'s vtable slot 0x80 (self-only) and compares the result
+against a per-`idx` entry of `D_80088D16`. The mechanics (query the world,
+compare) ARE the name; tier A by the pure-leaf rule even though what the
+world's vtable-0x80 slot itself represents is unknown.

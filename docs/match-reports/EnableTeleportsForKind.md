@@ -90,3 +90,15 @@ first — write the literal jump graph with `goto` instead. This is the second
 function in this unit (after `CheckTriggerParity`) where the byte-exact shape
 depended on avoiding an optimization the compiler is eager to apply to more
 "natural" C — worth trying `goto` earlier on this unit's branch-heavy leaves.
+
+## Naming
+
+**EnableTeleportsForKind** — tier B. Called as `EnableTeleportsForKind(record->kind)`
+from `ProcessDreamAuxTriggerRecord`, right after `CheckDreamAuxTriggerCondition`
+succeeds; unconditionally enables teleports (`func_8005BF68(1)`) when `kind`
+is one of `{0x4E, 0xB, 0x38, 0x5D}`, otherwise a no-op. The mechanics (which
+four `kind` values, what they do) are fully derived and documented above;
+renamed the formerly-`triggerType` parameter to `kind` to match the caller's
+actual argument and this unit's own `TriggerRecord.kind` field. Tier B, not
+A, because WHY these four values enable teleports (as opposed to some other
+game-meaningful grouping) is not established from this unit alone.

@@ -93,3 +93,17 @@ that is one retail expression as ONE C statement" learning already on file
 (round 10) but at one level up: that one is about splitting an expression
 across statements, this one is about splitting a REPEATED field access into
 a cached local at all.
+
+## Naming
+
+**DespawnDreamAuxEntity** — tier B. Given a `DreamAuxSlot *`, if its `entity`
+is live: ticks its vtable slot 0x14, computes a world-space position from
+the slot's stored `pos` via `Class6B5CC__LocalOffsetToWorldPos`, dispatches
+that position through vtable slot 0x13, then calls
+`Class6B5CC__FaceTarget`. Confirming the name this function's own report
+already carried since round 43 ("despawn sequence") -- consistent with
+`TryDreamAuxTrigger` calling it as a small-probability ALTERNATIVE to firing
+a trigger normally (culling an existing occupant instead of processing a
+new one). Tier B: the sequence's mechanics are clear, but whether it
+literally removes the entity (vs. repositions/reorients it) is inferred,
+not read directly off any single instruction.

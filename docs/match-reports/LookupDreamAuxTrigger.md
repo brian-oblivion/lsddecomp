@@ -86,3 +86,11 @@ source array element is narrower.** Symptom when this is missed: one extra
 register, costing exactly one word and (because it's inside a small
 function) enough to look like an unrelated residue rather than a type-width
 issue.
+
+## Naming
+
+**LookupDreamAuxTrigger** — tier A. A linear search over
+`gDreamAuxTriggerEntries[gDreamAuxStage]` for an entry whose `key` matches
+`*a0`, dispatching the match (or its absence) into
+`AdjustDreamAuxTriggerOffset`. The search IS the function's purpose, so tier
+A applies even though it delegates the on-hit adjustment to a sibling.

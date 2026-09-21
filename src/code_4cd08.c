@@ -76,21 +76,21 @@ void SetTeleportsEnabled(s32 triggerType)
     func_8005BF68(triggerType == 0xB || triggerType == 3);
 }
 
-void EnableTeleportsForKind(s32 triggerType)
+void EnableTeleportsForKind(s32 kind)
 {
-    if (triggerType == 0x4E) {
+    if (kind == 0x4E) {
         goto call;
     }
-    if (triggerType < 0x4F) {
-        if (triggerType == 0xB) {
+    if (kind < 0x4F) {
+        if (kind == 0xB) {
             goto call;
         }
-        if (triggerType == 0x38) {
+        if (kind == 0x38) {
             goto call;
         }
         return;
     }
-    if (triggerType != 0x5D) {
+    if (kind != 0x5D) {
         return;
     }
 call:

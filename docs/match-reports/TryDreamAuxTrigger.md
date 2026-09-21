@@ -100,3 +100,15 @@ and diff the instruction sequence directly rather than guessing from the
 constant alone.** `0x55555556` is `/3`; `0x2AAAAAAB` is the same reciprocal
 halved, and its correct divisor (`6`? `12`? more factors of 2?) is read off
 the extra `sra` count and final `sll` shift, not off the constant.
+
+## Naming
+
+**TryDreamAuxTrigger** — tier B. Called externally from `class_3bb8c_m.c`
+(`func_8005C7D4(child->unk4->unk34, &out, thing)` at the time of writing).
+Looks up a trigger record by key (`LookupDreamAuxTrigger`); on a hit, either
+dispatches it (`FireDreamAuxTriggerEntries`, whose result it returns) or, on
+a small random/parity chance, silently despawns instead
+(`DespawnDreamAuxEntity`); returns 0 on a miss or on the despawn branch.
+"Try" reflects the function's own fallible, silently-returning-0 shape; the
+broader game meaning of the (value, key, parity) triple it is handed is not
+established from this unit alone, hence B not A.

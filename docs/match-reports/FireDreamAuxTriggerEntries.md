@@ -118,3 +118,14 @@ mechanisms:
   already implicit in `ProcessDreamAuxTriggerRecord`'s own body, now independently
   reproduced by matching a second, unrelated function against the same
   idiom.
+
+## Naming
+
+**FireDreamAuxTriggerEntries** — tier B. Constructs a `TriggerWorld` via
+`func_80044A0C`; on success, walks up to 3 candidate bytes
+(`a1[3..5]`, `-1`-terminated) and calls `ProcessDreamAuxTriggerRecord` once
+per byte purely for side effects (its per-byte return values are discarded);
+returns whether construction succeeded. "Fire" reflects the discard-the-
+result, side-effect-only dispatch loop; why exactly 3 candidate bytes (out
+of the record's 4-entry `entries` array) are walked here specifically is not
+established from this unit alone, hence B.

@@ -59,3 +59,13 @@ newly-derived `TriggerWorldFn80` idiom, and it matched on the first build.
 Worth noting as a *process* point rather than a technical one: solving the
 smaller sibling first and immediately re-using its vtable-slot typedef paid
 off completely here -- zero iteration needed on the second function.
+
+## Naming
+
+**AdjustDreamAuxTriggerOffset** — tier B. Adds `0x1E` (30) to its `a0`
+(really an entry pointer smuggled through as `s32`, per
+`LookupDreamAuxTrigger`) when the unit is in state 4 AND `a1 == 0x10` AND a
+re-check of the world's vtable-0x80 predicate still reports state 4;
+otherwise returns `a0` unchanged. The mechanics (conditional fixed offset)
+are exactly what the name says; WHY 30, and why this particular re-check
+gates it, are not established from this unit alone, hence B not A.

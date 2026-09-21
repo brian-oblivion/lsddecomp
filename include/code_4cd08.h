@@ -171,7 +171,7 @@ extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
  * and never reads `out` -- it only forwards it untouched to `New_Entity`'s
  * 2nd argument; its own outgoing buffer is a separate local `outBuf[4]`. */
 extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry);
-extern void EnableTeleportsForKind(s32 triggerType);
+extern void EnableTeleportsForKind(s32 kind);
 extern bool func_8005630C(void);
 extern bool CheckDreamAuxWorldState(s32 idx);
 extern bool MatchesDreamAuxRange(s32 a0, s32 a1);

@@ -153,3 +153,14 @@ Fixes, in order:
   calling a "spilled but seemingly-dead value" a compiler artifact, check
   whether it lines up with a buffer/struct passed to another call in the
   same function -- it may be initializing a field the callee actually reads.
+
+## Naming
+
+**ProcessDreamAuxTriggerRecord** — tier B. The central per-record dispatcher:
+checks `CheckDreamAuxTriggerCondition`, gates teleports for the record's
+`kind` (`EnableTeleportsForKind`), invokes the world's vtable-0x22 callback,
+tries each of the record's `entries` against `SpawnDreamAuxTriggerEntity`
+until one succeeds, and recurses onto `record + 1` when `kind == 2`. "Process"
+covers this multi-step, multi-outcome shape without asserting which outcome
+is the "real" purpose; tier B since the record's game-level meaning is not
+established from this unit alone.

@@ -761,3 +761,17 @@ is genuinely an instruction-selection/scheduling choice, not a wrong CFG.
   with MATCHING-GUIDE.md's existing caution (three prior false leads in
   round 18) -- this is the fourth measured instance, on a different
   function, in a different round.
+
+## Naming
+
+**CheckDreamAuxTriggerCondition** — tier B. A multi-branch predicate: derives
+a switch index from `record->sel` (short-circuiting to `false` via the new
+`triggered` field when `sel < 0` and the record already fired once), then
+dispatches through a ~20-entry jump table of small, heterogeneous checks
+(mod-3 residues, parity, a day/range-bucket delegate, a world-state
+delegate, an unconditional pass for a middle band of indices). The mechanics
+are exactly what the name says -- gate on a per-record condition -- but the
+game-level meaning of `sel`'s cases is not established from this unit alone,
+hence B not A. Renamed `record->unk0` to `triggered` in the struct
+definition as part of this pass (see the commit renaming struct fields);
+every accessor was confined to this unit, confirmed by rebuild.

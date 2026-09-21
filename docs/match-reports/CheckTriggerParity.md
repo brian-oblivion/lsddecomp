@@ -86,3 +86,15 @@ forms do NOT get this treatment here — they cost an extra instruction or
 change comparison codegen entirely. When a residue is "same value, one extra
 instruction, or a `beq` where retail has `xor`+`sltu`", try the default-value
 shape before anything more exotic.
+
+## Naming
+
+**CheckTriggerParity** — tier A. A pure predicate over `entry`'s side/parity
+byte at offset `0x2` and a caller-supplied `coordParity`: true when the byte
+is 0 (no constraint) or when it disagrees with `coordParity`'s own parity.
+The mechanics (a parity comparison) ARE the name, tier A by the pure-leaf
+rule. Dropped the unit-specific "DreamAux" prefix other functions here carry
+since this predicate reads a byte offset shared with `TriggerRecord.parity`
+without being proven to be the same field (see the header's own caveat on
+`TriggerRecord`'s offset-0x2 comment) -- "Trigger" alone reflects that
+looser confidence.

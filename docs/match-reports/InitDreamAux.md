@@ -212,3 +212,15 @@ build will fail at link with `undefined reference to gMomPathSymSpy`.
   its own residue category distinct from "instruction order only" and
   "register identity" in MATCHING-GUIDE.md's list -- next attempt should
   probably reach for the permuter rather than more manual reshaping.
+
+## Naming
+
+**InitDreamAux** — tier B. Called exactly once, as the first DreamAux-specific
+call inside `func_80049684` (a constructor: `func_8004A4B8()->ctor(self,...);
+self->methods = func_8004A060(); InitDreamAux(); ...`), before the rest of
+that object's own fields are set up. Clears every `gDreamAuxGroupRecord`'s
+`flag` across all 14 groups and loads the initial MOM audio-stream object
+into `gDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time
+call site; the broader game reason (why THIS unit's state resets alongside
+that particular object's construction) is not established from this unit
+alone, hence tier B rather than A.

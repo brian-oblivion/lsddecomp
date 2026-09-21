@@ -95,3 +95,13 @@ this function alone), so the type is deliberately generic
   otherwise blocked/stalled). Likely a shared "process the first slot of an
   N-slot table" macro/pattern in the original source where N happened to be
   1 at these call sites.
+
+## Naming
+
+**TickDreamAuxSlots** — tier A. A pure leaf over `gDreamAuxSlots`: if slot 0's
+`obj` is live, call its vtable slot 1 (the unit's own established
+`DreamAuxTickFn` typedef, already named "tick" before this round) and store
+the result back. The mechanics ARE the name (a tick pass), so this qualifies
+as tier A by FINISHING-PLAN's "pure leaf whose mechanics are its purpose"
+rule regardless of why the caller (`func_80049830`, apparently a destructor)
+invokes it once at that point.

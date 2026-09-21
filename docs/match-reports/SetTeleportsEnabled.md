@@ -59,3 +59,15 @@ add a local `extern` prototype at the call site derived from how it's used
 from whether the caller consumes `$v0`). The prototype does not need to be
 authoritative; it only needs to make the call site's own bytes match, since
 the callee's own body is untouched either way.
+
+## Naming
+
+**SetTeleportsEnabled** — tier A, pre-existing (not renamed this round;
+reviewed as part of the track 3 pass). A pure leaf: forwards
+`triggerType == 0xB || triggerType == 3` to `func_8005BF68`. The mechanics
+ARE the name. Note: `func_8005BF68` (called here and by
+`EnableTeleportsForKind`) is defined in `DreamSys`, not in this unit --
+MATCHED there round 43 (this report's "still `INCLUDE_ASM` at the time of
+this report" note is accurate for when it was written but is now stale;
+left as historical record rather than rewritten). It is DreamSys's function
+to name, not this unit's, so it keeps `func_` here.

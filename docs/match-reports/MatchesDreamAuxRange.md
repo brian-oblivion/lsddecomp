@@ -61,3 +61,14 @@ gives the wrong bucket but truncating (round-toward-zero) division doesn't.
   many `d` and matching both the constant AND the shift together. Hand-
   matching just the multiplier is not enough since several divisors
   (15/30/60/120) share close constants at different shifts.
+
+## Naming
+
+**MatchesDreamAuxRange** — tier A. A pure predicate: `target = (a0-1)/30+1`,
+then tests whether `a1` equals `target`, `target+3`, `target+6` or
+`target+9` (stride-3, 4-step arithmetic progression), true on the first hit.
+The mechanics (a range/bucket membership test) ARE the name; tier A by the
+pure-leaf rule. Deliberately did NOT name this around "day" despite the
+division by 30 -- `a0` traces back to an external caller's opaque field
+(`child->unk4->unk34` via `TryDreamAuxTrigger`), and nothing in this unit
+ties it to an actual day counter.

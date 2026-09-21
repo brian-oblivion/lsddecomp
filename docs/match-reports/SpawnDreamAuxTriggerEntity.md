@@ -25,7 +25,7 @@ object); on `New_Entity` failure, return `true` immediately instead:
 typedef struct {
     u16 val0;
     s8 val2;
-    s8 val3;
+    s8 posIndex;
 } DreamAuxSpawnInfo;
 
 extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
@@ -63,7 +63,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         coords.ctxVal = *(u16 *)ctx;
         rec = &gDreamAuxSpawnInfo[entry];
         coords.recordVal0 = rec->val0;
-        coords.pos = gDreamAuxPosTable[rec->val3];
+        coords.pos = gDreamAuxPosTable[rec->posIndex];
 
         obj = (DreamAuxObj *)D_8008ABFC;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
@@ -153,3 +153,16 @@ here was the function coming out too SHORT with a large out-of-range drift
 "redundant `andi`" (which makes code longer), a useful reminder that both
 directions of length mismatch can come from the same family of "narrow type
 handled at the wrong granularity" issue.
+
+## Naming
+
+**SpawnDreamAuxTriggerEntity** — tier B. Spawns an `Entity` via `New_Entity`
+for a trigger `entry`; on success, fills a local coordinate buffer from
+`gDreamAuxSpawnInfo`/`gDreamAuxPosTable` and dispatches it through three
+vtable calls (two through the new entity, one through `D_8008ABFC`); on
+`New_Entity` failure returns `true` (treated as "handled" by callers) rather
+than `false`. Named for the mechanic that dominates the body (spawn +
+attach); tier B since the exact game meaning of the coordinate/dispatch
+sequence is not established from this unit alone. Renamed
+`DreamAuxSpawnInfo.val3` to `posIndex` in this pass (definition-only
+rename, confirmed confined to this unit by rebuild).
