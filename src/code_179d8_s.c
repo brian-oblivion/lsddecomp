@@ -39,7 +39,7 @@ typedef struct Obj80027480 Obj80027480;
 typedef struct Methods80027480 {
     u8 pad0[0x44];
     s32 (*slot44)(Obj80027480 *self, void *arg1, s32 arg2, s32 arg3);
-    s32 (*slot48)(Obj80027480 *self);
+    s32 (*onError)(Obj80027480 *self);
     s32 (*slot4C)(Obj80027480 *self, s32 arg1, s32 arg2);
     u8 pad50[0x54 - 0x50];
     s32 (*slot54)(Obj80027480 *self, s32 arg1, s32 arg2);
@@ -323,7 +323,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
                 if (self->unk10 == NULL) {
                     ret = func_80017B34(pos);
                     if (ret == NULL) {
-                        self->methods->slot48(self);
+                        self->methods->onError(self);
                         return;
                     }
                     gCdReadBuffer = ret;
