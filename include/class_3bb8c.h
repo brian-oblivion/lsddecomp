@@ -2147,7 +2147,7 @@ struct ChildM114 {
     u8 pad0[0x004];
     SubM4 *unk4;                 /* +0x004, func_80054120 */
     u8 pad8[0x014 - 0x008];
-    s32 unk14;                    /* +0x014, func_80054120: set from func_8005C7D4's return */
+    s32 unk14;                    /* +0x014, func_80054120: set from TryDreamAuxTrigger's return */
 };
 
 /* func_80053F84's own arg1 parameter -- dispatched via its own vtable
@@ -2168,7 +2168,7 @@ struct ParamM {
  * FieldM3CMethods::slot1A0's own return value (not `self->unk14`'s
  * child), so it stays void* rather than ChildM114* -- nothing ties the
  * two together. */
-extern s32 func_8005C7D4(s32 arg0, s32 *arg1, void *arg2);
+extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
 
 /* self->unk34's target (func_800543FC/func_800542D0). */
 struct FieldM34Methods {
@@ -2491,7 +2491,7 @@ struct Obj87034_3bb8c_l {
     s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
     u8 pad24[0x034 - 0x024];
-    s32 unk34;                            /* +0x034, round 45's func_800534C8: forwarded opaquely to func_8005C650's own arg3 */
+    s32 unk34;                            /* +0x034, round 45's func_800534C8: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, func_80052E7C: forwarded opaquely to func_80049060/func_80049098 */
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
     s32 unk40;                             /* +0x040, func_80053764 */
@@ -2563,7 +2563,7 @@ extern void func_800558F0(void *arg0, void *arg1, s32 arg2);
 /* func_80053134's own helpers -- still-uncarved ground
  * (asm/class_3bb8c_n.s), called with no arguments and their return values
  * unused. */
-extern void func_8005C76C(void);
+extern void TickDreamAuxSlots2(void);
 extern void func_80054D30(void);
 
 

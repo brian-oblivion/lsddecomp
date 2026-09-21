@@ -139,7 +139,7 @@ function can load through a runtime-indexed global", §"BLOCKED: the
 - **GCC 2.6.3 gives the FALLTHROUGH to whichever candidate is LAST in source order.** An
   arm that must `j` over a join must be written NOT-LAST (explicit `goto` over the block
   that falls through); a duplicated assignment retail keeps in two copies needs the OTHER
-  copy last. Closed `func_8005CBC8` 100/100. (a §"An arm that must JUMP")
+  copy last. Closed `CheckDreamAuxTriggerCondition` 100/100. (a §"An arm that must JUMP")
 - **A guard's source POSITION decides where its block lands; its POLARITY does not.** To
   put `return 0` at the BOTTOM as retail has it, the body goes inside `if (cond) { ... }`
   with the return as the function's LAST statement; every early-return and `goto` spelling

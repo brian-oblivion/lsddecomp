@@ -19,7 +19,7 @@ void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
 
     func_8004A4B8()->ctor(self, func_80048E08(0), 0);
     self->methods = func_8004A060();
-    func_8005C508();
+    InitDreamAux();
     self->unk44 = func_8003B39C(D_800113EC);
     self->unk44->methods->slot78(self->unk44);
     self->unk44->methods->slot5C(self->unk44);
@@ -55,7 +55,7 @@ void func_80049830(Obj865C8 *self) {
     self->unk40->methods->slot4(self->unk40);
     self->unk48->methods->slot4(self->unk48);
     self->unk44->methods->slot4(self->unk44);
-    func_8005C5E8();
+    TickDreamAuxSlots();
     func_8004A4B8()->dtor(self);
 }
 

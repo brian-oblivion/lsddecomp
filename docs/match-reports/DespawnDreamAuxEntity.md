@@ -1,4 +1,6 @@
-# func_8005CF34
+> Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
+
+# DespawnDreamAuxEntity
 
 **Unit:** code_4cd08 · **Size:** 42 words · **Status:** MATCHED round 43
 (42/42, byte-exact whole-image build).
@@ -6,7 +8,7 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on five `%gp_rel` references (the first
-to `D_8008AC00`). Round 42 resolved the gp-relative blocker. Never actually
+to `gDreamAuxWorld`). Round 42 resolved the gp-relative blocker. Never actually
 attempted -- the stub carried no derivation. Round 43 derived and matched it.
 
 ## What it does
@@ -20,20 +22,20 @@ globals to vtable slot 0x13, then call `Class6B5CC__FaceTarget` on it.
 extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
 extern void Class6B5CC__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
-void func_8005CF34(DreamAuxSlot *a0)
+void DespawnDreamAuxEntity(DreamAuxSlot *a0)
 {
     if (a0->entity != NULL) {
         s32 localPos[3];
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
-        Class6B5CC__LocalOffsetToWorldPos((void *)D_8008AC00, localPos, a0->pos, 0);
-        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, D_8008AC00, D_8008AC08, (void *)D_8008ABFC, localPos);
-        Class6B5CC__FaceTarget(a0->entity, (void *)D_8008AC00, 1, 0, 0);
+        Class6B5CC__LocalOffsetToWorldPos((void *)gDreamAuxWorld, localPos, a0->pos, 0);
+        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, localPos);
+        Class6B5CC__FaceTarget(a0->entity, (void *)gDreamAuxWorld, 1, 0, 0);
     }
 }
 ```
 
-This closes the loop `func_8005C650` (matched earlier this round) opened:
+This closes the loop `SetDreamAuxWorld` (matched earlier this round) opened:
 `DreamAuxSlot.entity` is the `New_Entity` result that function stashed at
 offset 0x4, and `DreamAuxSlot`'s remaining 12 bytes (previously
 `u8 unkC[0xC]`) are exactly a 3-word position vector -- confirmed by this
@@ -66,7 +68,7 @@ alias (`s32, s32, void *, void *`) rather than importing Entity.h's.
 ## Derivation notes
 
 One attempt short of byte-exact, one fix, and it is the SAME shape as the
-`func_8005CF34`-adjacent learning already on file for `func_8005C8AC`
+`DespawnDreamAuxEntity`-adjacent learning already on file for `LookupDreamAuxTrigger`
 (narrow value kept live too long) but the opposite direction:
 
 - **First pass (5/42, one word too long):** cached `a0->entity` into a local
@@ -91,3 +93,17 @@ that is one retail expression as ONE C statement" learning already on file
 (round 10) but at one level up: that one is about splitting an expression
 across statements, this one is about splitting a REPEATED field access into
 a cached local at all.
+
+## Naming
+
+**DespawnDreamAuxEntity** — tier B. Given a `DreamAuxSlot *`, if its `entity`
+is live: ticks its vtable slot 0x14, computes a world-space position from
+the slot's stored `pos` via `Class6B5CC__LocalOffsetToWorldPos`, dispatches
+that position through vtable slot 0x13, then calls
+`Class6B5CC__FaceTarget`. Confirming the name this function's own report
+already carried since round 43 ("despawn sequence") -- consistent with
+`TryDreamAuxTrigger` calling it as a small-probability ALTERNATIVE to firing
+a trigger normally (culling an existing occupant instead of processing a
+new one). Tier B: the sequence's mechanics are clear, but whether it
+literally removes the entity (vs. repositions/reorients it) is inferred,
+not read directly off any single instruction.

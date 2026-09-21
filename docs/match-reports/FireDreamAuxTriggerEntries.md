@@ -1,4 +1,6 @@
-# func_8005C9DC
+> Renamed from `func_8005C9DC` on 2026-09-21 (tools/rename.py). Address 0x8005c9dc.
+
+# FireDreamAuxTriggerEntries
 
 **Unit:** code_4cd08 · **Size:** 54 words · **Status:** MATCHED round 43
 (54/54, byte-exact whole-image build).
@@ -6,7 +8,7 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on one `%gp_rel` reference (to
-`D_8008ABF8`) plus one `addiu_at` indexed-load. Round 42 resolved both.
+`gDreamAuxStage`) plus one `addiu_at` indexed-load. Round 42 resolved both.
 Never actually attempted -- the stub carried no derivation. Round 43 derived
 and matched it.
 
@@ -14,17 +16,17 @@ and matched it.
 
 Construct a `TriggerWorld` via `func_80044A0C`; if construction succeeds,
 walk 3 candidate bytes (`a1[3..5]`, terminated early by a `-1` sentinel) and
-fire `func_8005CAB4` once per non-sentinel byte against the SAME
-`D_80089A44`/`D_8008ABF8` parallel-group table `func_8005C508` clears
+fire `ProcessDreamAuxTriggerRecord` once per non-sentinel byte against the SAME
+`gDreamAuxGroupRecords`/`gDreamAuxStage` parallel-group table `InitDreamAux` clears
 (8-byte stride, confirmed there and reused here identically); the loop's
-`func_8005CAB4` results are discarded (called for side effects only). The
+`ProcessDreamAuxTriggerRecord` results are discarded (called for side effects only). The
 return value is just whether construction succeeded:
 
 ```c
 extern TriggerWorld *func_80044A0C(s32 *ctx);
-bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
+bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
 
-s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
+s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
 {
     s32 ctxArg[4];
     TriggerWorld *world;
@@ -33,7 +35,7 @@ s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
     world = func_80044A0C(ctxArg);
 
     if (world != NULL) {
-        DreamAuxGroupRecord *base = D_80089A44[D_8008ABF8];
+        DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
         s8 *p = a1 + 3;
         s8 *end = a1 + 6;
 
@@ -43,7 +45,7 @@ s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
             if (entry == -1) {
                 break;
             }
-            func_8005CAB4(a0, a1, (TriggerRecord *)((u8 *)base + entry * 8), world);
+            ProcessDreamAuxTriggerRecord(a0, a1, (TriggerRecord *)((u8 *)base + entry * 8), world);
             p++;
         }
         return (s32)world;
@@ -52,17 +54,17 @@ s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
 }
 ```
 
-`func_8005CAB4`'s `record` parameter here is a `DreamAuxGroupRecord *`
-(8-byte stride, `D_80089A44`) reinterpret-cast to `TriggerRecord *` (0x38-byte
-stride, `func_8005CAB4`'s own already-matched typed view). Both sizes are
+`ProcessDreamAuxTriggerRecord`'s `record` parameter here is a `DreamAuxGroupRecord *`
+(8-byte stride, `gDreamAuxGroupRecords`) reinterpret-cast to `TriggerRecord *` (0x38-byte
+stride, `ProcessDreamAuxTriggerRecord`'s own already-matched typed view). Both sizes are
 independently confirmed correct for their own already-matched call sites
-(`func_8005C508`'s pointer scaling for the first, `func_8005CAB4`'s own
+(`InitDreamAux`'s pointer scaling for the first, `ProcessDreamAuxTriggerRecord`'s own
 `record + 1` recursion for the second) -- this call site legitimately hands
 a small 8-byte slot to a function that privately treats it as a much larger
 struct, which is safe here only because the recursive (`kind == 2`) arm of
-`func_8005CAB4` is never taken for these particular records. This is the
+`ProcessDreamAuxTriggerRecord` is never taken for these particular records. This is the
 same kind of cross-type reinterpretation CLAUDE.md documents for
-`func_8005CD58`/`func_8005C930`'s shared `D_8008AC00` global, just at a
+`CheckDreamAuxWorldState`/`AdjustDreamAuxTriggerOffset`'s shared `gDreamAuxWorld` global, just at a
 struct-pointer level instead of a scalar.
 
 `func_80044A0C` is a new symbol, not owned by this unit and not previously
@@ -82,7 +84,7 @@ first build, but the STACK FRAME size was wrong twice:
    asm has an explicit `sltu $v1, $s0, $s1` BEFORE the loop even starts. That
    only happens when the bound is a runtime POINTER COMPARISON the compiler
    cannot fold, i.e. retail's C walks `s8 *p`/`s8 *end` pointers, not integer
-   indices, the same idiom `func_8005CAB4` (already matched, same unit) uses
+   indices, the same idiom `ProcessDreamAuxTriggerRecord` (already matched, same unit) uses
    for its own `entries` scan. Switching to `s8 *p = a1+3; s8 *end = a1+6;
    while (p < end) { ...; p++; }` reproduced the guard (36/54, no more
    out-of-range drift).
@@ -93,7 +95,7 @@ first build, but the STACK FRAME size was wrong twice:
    offsets. Retail reserves 0x10 bytes (4 words) at the bottom of its frame
    for this local, not 4 bytes for one word -- the same "caller hands the
    callee a stack buffer wider than what gets explicitly written" shape as
-   `func_8005C650`'s `New_Entity` call (a 4-word buffer with only the last
+   `SetDreamAuxWorld`'s `New_Entity` call (a 4-word buffer with only the last
    word set) documented earlier this round. Widening `ctxArg` from a scalar
    to `s32 ctxArg[4]` (only `ctxArg[0]` ever written) matched the frame size
    exactly and reached byte-exact.
@@ -103,16 +105,27 @@ first build, but the STACK FRAME size was wrong twice:
 Two entries, both reinforcing patterns already on file rather than new
 mechanisms:
 
-- Confirms the round-43 `func_8005CF34`/`func_8005C650` observation that a
+- Confirms the round-43 `DespawnDreamAuxEntity`/`SetDreamAuxWorld` observation that a
   scratch buffer handed to an external call can be WIDER than what the
   caller itself writes -- a THIRD instance in this same unit
-  (`func_8005C650`'s `New_Entity` buffer, `func_8005CF34`'s implicit
-  `localPos`, now `func_8005C9DC`'s `ctxArg[4]`). When a local's frame
+  (`SetDreamAuxWorld`'s `New_Entity` buffer, `DespawnDreamAuxEntity`'s implicit
+  `localPos`, now `FireDreamAuxTriggerEntries`'s `ctxArg[4]`). When a local's frame
   footprint comes up short by a clean multiple of 4 bytes with every
   instruction otherwise matching, suspect an under-sized scratch buffer
   before anything else.
 - Confirms (does not add) the existing "pointer-walk over two runtime
   bounds needs actual pointers, not integer indices over literal bounds" --
-  already implicit in `func_8005CAB4`'s own body, now independently
+  already implicit in `ProcessDreamAuxTriggerRecord`'s own body, now independently
   reproduced by matching a second, unrelated function against the same
   idiom.
+
+## Naming
+
+**FireDreamAuxTriggerEntries** — tier B. Constructs a `TriggerWorld` via
+`func_80044A0C`; on success, walks up to 3 candidate bytes
+(`a1[3..5]`, `-1`-terminated) and calls `ProcessDreamAuxTriggerRecord` once
+per byte purely for side effects (its per-byte return values are discarded);
+returns whether construction succeeded. "Fire" reflects the discard-the-
+result, side-effect-only dispatch loop; why exactly 3 candidate bytes (out
+of the record's 4-entry `entries` array) are walked here specifically is not
+established from this unit alone, hence B.

@@ -1,10 +1,12 @@
-# func_8005CDA8 -- MATCHED
+> Renamed from `func_8005CDA8` on 2026-09-21 (tools/rename.py). Address 0x8005cda8.
+
+# MatchesDreamAuxRange -- MATCHED
 
 Unit `code_4cd08` ("DreamAux"). 20/20 words, `0x4D5A8`-`0x4D5F8`. Whole-image
 `build-and-verify.sh` green. First attempt matched.
 
 ```c
-bool func_8005CDA8(s32 a0, s32 a1)
+bool MatchesDreamAuxRange(s32 a0, s32 a1)
 {
     s32 target = (a0 - 1) / 30 + 1;
     s32 i;
@@ -25,8 +27,8 @@ bool func_8005CDA8(s32 a0, s32 a1)
 `a1` equals `target`, `target+3`, `target+6`, or `target+9` in turn (a
 4-step arithmetic-progression search with stride 3), returning `true` on
 the first match and `false` if none of the 4 hit. Called from
-`func_8005CBC8` (still `INCLUDE_ASM`, see its stall report) as
-`func_8005CDA8(value, idx - 1)` for switch indices 0-2 (i.e. `idx-1` in
+`CheckDreamAuxTriggerCondition` (still `INCLUDE_ASM`, see its stall report) as
+`MatchesDreamAuxRange(value, idx - 1)` for switch indices 0-2 (i.e. `idx-1` in
 `{1,2,3}`), suggesting `a1` is something like "which of a small fixed set of
 3-wide day/slot buckets does `value` fall into" and this checks against
 3 different starting offsets depending on which of those 3 switch cases
@@ -59,3 +61,14 @@ gives the wrong bucket but truncating (round-toward-zero) division doesn't.
   many `d` and matching both the constant AND the shift together. Hand-
   matching just the multiplier is not enough since several divisors
   (15/30/60/120) share close constants at different shifts.
+
+## Naming
+
+**MatchesDreamAuxRange** — tier A. A pure predicate: `target = (a0-1)/30+1`,
+then tests whether `a1` equals `target`, `target+3`, `target+6` or
+`target+9` (stride-3, 4-step arithmetic progression), true on the first hit.
+The mechanics (a range/bucket membership test) ARE the name; tier A by the
+pure-leaf rule. Deliberately did NOT name this around "day" despite the
+division by 30 -- `a0` traces back to an external caller's opaque field
+(`child->unk4->unk34` via `TryDreamAuxTrigger`), and nothing in this unit
+ties it to an actual day counter.

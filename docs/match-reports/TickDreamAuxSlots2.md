@@ -1,18 +1,20 @@
-# func_8005C76C -- MATCHED
+> Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
+
+# TickDreamAuxSlots2 -- MATCHED
 
 Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
-`build-and-verify.sh` green. Same shape as `func_8005C5E8`, over `D_80088D2C`
-instead of `D_80088D28` (see that report for the object/vtable/loop-shape
+`build-and-verify.sh` green. Same shape as `TickDreamAuxSlots`, over `gDreamAuxSlots2`
+instead of `gDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
 
 ```c
-void func_8005C76C(void)
+void TickDreamAuxSlots2(void)
 {
     u32 done;
     DreamAuxSlot *slot;
 
     done = 0;
-    slot = D_80088D2C;
+    slot = gDreamAuxSlots2;
 
     for (; done < 1; done++) {
         DreamAuxObj *obj = slot->obj;
@@ -28,8 +30,8 @@ void func_8005C76C(void)
 
 ## Residue: prologue spill/init INTERLEAVING, not just store order
 
-The first, direct port of `func_8005C5E8`'s shape (`DreamAuxSlot *slot =
-D_80088D2C; u32 done;`, initializers at declaration) built clean but only
+The first, direct port of `TickDreamAuxSlots`'s shape (`DreamAuxSlot *slot =
+gDreamAuxSlots2; u32 done;`, initializers at declaration) built clean but only
 21/26 -- the two callee-save spills and their register inits were emitted in
 the wrong relative order:
 
@@ -44,7 +46,7 @@ sw   ra, 0x18(sp)                   sw   ra, 0x18(sp)
 ```
 
 Retail interleaves per-variable (spill `s1`, init `s1`, spill `s0`, init
-`s0`), in the OPPOSITE variable order from `func_8005C5E8`'s retail (which is
+`s0`), in the OPPOSITE variable order from `TickDreamAuxSlots`'s retail (which is
 slot/`s0` first, done/`s1` second) even though the two functions are
 otherwise structurally identical. Per the head's broadcast on
 `func_80025D10` (Lever 1: prologue callee-save store order is not reachable
@@ -52,7 +54,7 @@ from C; use a bare `__asm__("")` as the first statement), I checked whether
 this is the same class of residue before reshaping further:
 
 - Swapping the *declaration* order alone (`u32 done;` before
-  `DreamAuxSlot *slot = D_80088D2C;`, both still initialized in their
+  `DreamAuxSlot *slot = gDreamAuxSlots2;`, both still initialized in their
   declarators) made **no difference** -- still 21/26, byte-identical to the
   unswapped version. Confirms declaration order alone does not reach
   whatever pass decides this, same finding as the broadcast.
@@ -63,12 +65,12 @@ this is the same class of residue before reshaping further:
   residue.
 - What worked: splitting the declarations from their initialization into
   separate STATEMENTS, in the order retail wants (`done = 0;` before
-  `slot = D_80088D2C;`), with the declarations themselves left in either
+  `slot = gDreamAuxSlots2;`), with the declarations themselves left in either
   order. This is a genuinely different C shape from an initializer at the
   declarator (not just cosmetically -- GCC 2.6.3 apparently schedules
   spill/init pairs for straight assignment statements as a unit, in
   STATEMENT order, whereas declarator initializers get scheduled by some
-  other heuristic that produced `func_8005C5E8`'s order regardless of which
+  other heuristic that produced `TickDreamAuxSlots`'s order regardless of which
   declarator came first).
 
 ## Proposed learning
@@ -83,3 +85,14 @@ this is the same class of residue before reshaping further:
   barrier at all. This is a cheaper, more targeted lever than
   `__asm__("")` for this specific residue shape (adjacent prologue
   spill+init pairs out of order) and should be tried first.
+
+## Naming
+
+**TickDreamAuxSlots2** — tier A. Identical mechanics to `TickDreamAuxSlots`,
+over `gDreamAuxSlots2` instead of `gDreamAuxSlots` (see that report/entry for
+the shared derivation). Tier A for the same reason: the tick pass over the
+slot family IS the function's purpose. Called from `func_80053134`
+(`class_3bb8c_l.c`) alongside other per-frame-looking calls, consistent with
+"tick", though nothing in this unit distinguishes what makes the "2" family
+different in KIND from the first (it is never populated by any function in
+this unit's own queue).

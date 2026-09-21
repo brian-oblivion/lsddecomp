@@ -405,7 +405,7 @@ extern u8 D_8008665C[];
  * "calling into a function that is still INCLUDE_ASM in another unit is
  * fine" convention, extended to an already-matched cross-unit function:
  * only a local extern prototype is needed). No return value used. */
-extern void func_8005C5E8(void);
+extern void TickDreamAuxSlots(void);
 
 /* The ctor, func_80049684. A large web of external calls; each is declared
  * locally with the minimal signature its call site here demonstrates (per
@@ -421,10 +421,10 @@ extern void func_8005C5E8(void);
  * asm/psyq_memset.s. */
 extern s32 func_80048E08(s32 arg1);
 
-/* Matched in code_4cd08.c (still called `func_8005C508` there, STALLED at
- * 40/56 -- see docs/match-reports/func_8005C508.md). Takes no arguments,
+/* Matched in code_4cd08.c (still called `InitDreamAux` there, STALLED at
+ * 40/56 -- see docs/match-reports/InitDreamAux.md). Takes no arguments,
  * return value (if any) unused here. */
-extern void func_8005C508(void);
+extern void InitDreamAux(void);
 
 /* "New_X"-shaped allocator (uncarved, in the Psy-Q SPU/SND block at
  * 0x272C8..0x2C054): allocates,

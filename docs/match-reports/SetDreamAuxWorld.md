@@ -1,4 +1,6 @@
-# func_8005C650
+> Renamed from `func_8005C650` on 2026-09-21 (tools/rename.py). Address 0x8005c650.
+
+# SetDreamAuxWorld
 
 **Unit:** code_4cd08 · **Size:** 34 words · **Status:** MATCHED round 43
 (34/34, byte-exact whole-image build).
@@ -6,7 +8,7 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on 6 `%gp_rel` references (the first to
-`D_8008ABF8`). Round 42 resolved the gp-relative blocker with
+`gDreamAuxStage`). Round 42 resolved the gp-relative blocker with
 `--gp-symbols`/`--no-nop-mflo-mfhi` (`docs/research/gp-relative-blocker.md`,
 "RESOLVED"). This function was never actually attempted under the old
 toolchain -- the round-42 stub carried no derivation to rebuild, just the
@@ -19,22 +21,22 @@ The initializer for this unit's five `%gp_rel` globals plus a one-shot
 
 ```c
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
-extern s32 D_8008ABF8;
+extern s32 gDreamAuxStage;
 extern s32 D_8008ABFC;
-extern s32 D_8008AC00;
+extern s32 gDreamAuxWorld;
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
 
 void SetTeleportsEnabled(s32 triggerType);
 
-void func_8005C650(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
-    DreamAuxSlot *slot = D_80088D28;
+    DreamAuxSlot *slot = gDreamAuxSlots;
     u32 i;
 
-    D_8008ABF8 = a0;
+    gDreamAuxStage = a0;
     D_8008ABFC = a1;
-    D_8008AC00 = a2;
+    gDreamAuxWorld = a2;
     D_8008AC04 = a3;
     D_8008AC08 = a4;
 
@@ -58,7 +60,7 @@ Two derivation points worth recording:
   `beqz $s0, .L8005C68C` (`f7ff0012`), the `s32` build emitted
   `blez $s0, ...` (`f7ff001a`). GCC 2.6.3 lowers a *signed* `for (i=0;i<1;i++)`
   to a `<=0` backward test (since it cannot assume `i` never goes negative)
-  but a matched sibling in this same unit, `func_8005C5E8`
+  but a matched sibling in this same unit, `TickDreamAuxSlots`
   (`for (done = 0; done < 1; done++)` with `u32 done`), already demonstrated
   the `beqz` form for the identical "run once" shape. Switching `i` to `u32`
   reproduced `beqz` and closed the last word. **This unit now has two
@@ -100,4 +102,16 @@ Add to the corpus: **an unsigned loop counter is required for the
 backward branch** -- a signed counter of the same shape compiles to `blez`
 instead, one word different, easy to miss since both are logically correct.
 Two independent instances now confirm it in this unit alone
-(`func_8005C5E8`, `func_8005C650`).
+(`TickDreamAuxSlots`, `SetDreamAuxWorld`).
+
+## Naming
+
+**SetDreamAuxWorld** — tier B. Installs its five parameters into the unit's
+shared context globals (`gDreamAuxStage`, `gDreamAuxWorld` and three still-
+unnamed siblings), spawns one entity into `gDreamAuxSlots[0].entity` via
+`New_Entity`, then calls `SetTeleportsEnabled`. Called from
+`func_800534C8` (`class_3bb8c_l.c`), itself a per-object/per-level setup
+routine. "World" reflects `gDreamAuxWorld`'s own established role (cast
+`TriggerWorld*`, dispatched through vtable slots 0x80/0x22 elsewhere in the
+unit) -- but this function's OWN purpose (why these five values, together,
+constitute entering a "world") is inferred from usage, not proven, hence B.

@@ -1,4 +1,6 @@
-# func_8005CD58
+> Renamed from `func_8005CD58` on 2026-09-21 (tools/rename.py). Address 0x8005cd58.
+
+# CheckDreamAuxWorldState
 
 **Unit:** code_4cd08 · **Size:** 20 words · **Status:** MATCHED round 43
 (20/20, byte-exact whole-image build).
@@ -6,14 +8,14 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on one `%gp_rel` reference (to
-`D_8008AC00`) plus one `addiu_at` indexed-load. Round 42 resolved both
+`gDreamAuxWorld`) plus one `addiu_at` indexed-load. Round 42 resolved both
 (`--gp-symbols`, and `addiu_at` back in round 21). Never actually attempted
 under the old toolchain -- the stub carried no derivation. Round 43 derived
 and matched it fresh.
 
 ## What it does
 
-A predicate: call the object at global `D_8008AC00`'s vtable slot 0x80 (byte
+A predicate: call the object at global `gDreamAuxWorld`'s vtable slot 0x80 (byte
 offset 0x200) with no argument but `self`, and compare the (word-sized)
 result against a per-`idx` signed byte from a small lookup table
 `D_80088D16`.
@@ -21,9 +23,9 @@ result against a per-`idx` signed byte from a small lookup table
 ```c
 typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
 
-bool func_8005CD58(s32 idx)
+bool CheckDreamAuxWorldState(s32 idx)
 {
-    TriggerWorld *w = (TriggerWorld *)D_8008AC00;
+    TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
     s32 val = D_80088D16[idx];
     s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
 
@@ -63,13 +65,13 @@ bool func_8005CD58(s32 idx)
    reading `$s0` first) reproduced the exact register choice. Byte-exact on
    this change.
 
-`D_8008AC00`'s declaration (`extern s32 D_8008AC00;`, shared with
-`func_8005C650`) predates this function; it is cast to `TriggerWorld *` at
+`gDreamAuxWorld`'s declaration (`extern s32 gDreamAuxWorld;`, shared with
+`SetDreamAuxWorld`) predates this function; it is cast to `TriggerWorld *` at
 the point of use here rather than declared as a pointer at file scope, since
-`func_8005C650` treats the same global as a generic `s32` parameter store.
+`SetDreamAuxWorld` treats the same global as a generic `s32` parameter store.
 `TriggerWorldFn80` started as a local typedef distinct from `TriggerWorldFn`
 (vtable slot 0x22, different arity) and was promoted into
-`include/code_4cd08.h` once `func_8005C930` (matched immediately after, same
+`include/code_4cd08.h` once `AdjustDreamAuxTriggerOffset` (matched immediately after, same
 round) turned out to need the identical alias -- see that function's report.
 `D_80088D16` (a small `s8[]` lookup table, layout otherwise unknown) is now
 declared in `include/code_4cd08.h` alongside this unit's other module-owned
@@ -85,3 +87,11 @@ compiled to different destination registers here, and only the order
 matching retail's own `xor` operand order (`$s0, $s0, $v0` -> "cached value
 first") produced the byte-exact result. Cheap to check by operand-swap
 before treating a residue like this as a deeper stall.
+
+## Naming
+
+**CheckDreamAuxWorldState** — tier A. A pure predicate: calls
+`gDreamAuxWorld`'s vtable slot 0x80 (self-only) and compares the result
+against a per-`idx` entry of `D_80088D16`. The mechanics (query the world,
+compare) ARE the name; tier A by the pure-leaf rule even though what the
+world's vtable-0x80 slot itself represents is unknown.

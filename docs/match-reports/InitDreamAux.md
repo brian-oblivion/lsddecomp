@@ -1,16 +1,18 @@
-# func_8005C508 -- MATCHED (56/56), round 24
+> Renamed from `func_8005C508` on 2026-09-21 (tools/rename.py). Address 0x8005c508.
+
+# InitDreamAux -- MATCHED (56/56), round 24
 
 > **VERDICT CORRECTED, round 24 (2026-09-08), runner delta.** Everything
 > below this note was written against the `addiu_at` jump-table/global-index
 > folding blocker, resolved in round 21 (maspsx `--addiu-at`;
 > `docs/research/addiu-at-blocker.md`). **This report was never re-screened
-> after that fix** -- the same way `func_8005CBC8`'s report was missed by
+> after that fix** -- the same way `CheckDreamAuxTriggerCondition`'s report was missed by
 > round 22's sweep because it reads as a considered plateau, not a stub.
 >
-> The residue this report called unclosable (`%lo(D_80088D28)` folded into
+> The residue this report called unclosable (`%lo(gDreamAuxSlots)` folded into
 > the store's own displacement, instead of retail's full `lui`+`addiu`
 > materialize-then-`addu`) is **the exact same construct** as the switch
-> jump-table fold that blocked `func_8005CBC8` -- an indexed-global address
+> jump-table fold that blocked `CheckDreamAuxTriggerCondition` -- an indexed-global address
 > computation, which is precisely the class CLAUDE.md's blocker screen
 > already generalizes ("a jump-table dispatch loads a CODE address and jumps
 > ... an indexed global loads a DATA value ... they are ONE construct at the
@@ -21,18 +23,18 @@
 >
 > ```sh
 > ./build-and-verify.sh   # exit 0, "OK: build matches retail SLPS_015.56"
-> .venv/bin/python3 tools/funcdiff.py func_8005C508
-> # func_8005C508: 56/56 words match (file 0x4CD08-0x4CDE8)
+> .venv/bin/python3 tools/funcdiff.py InitDreamAux
+> # InitDreamAux: 56/56 words match (file 0x4CD08-0x4CDE8)
 > ```
 >
-> Measured with `func_8005CBC8` held at `INCLUDE_ASM` (its own case-6/7 fix
+> Measured with `CheckDreamAuxTriggerCondition` held at `INCLUDE_ASM` (its own case-6/7 fix
 > is a separate, still-open residue -- see that function's own report) so
 > this result is isolated from any other function's drift. The whole-image
 > oracle passed outright, which is the strongest possible confirmation: no
 > per-function window, no drift caveat, just a green `build-and-verify.sh`.
 >
 > **This is now real C in `src/code_4cd08.c`, committed.** The rodata
-> ownership trap documented below (defining `D_8001186C`/`D_8001187C` as real
+> ownership trap documented below (defining `gMomPathSymSpy`/`gMomPathSymDog` as real
 > string data ahead of the function) was exactly as described and is now
 > permanent, not a note for a future attempt.
 >
@@ -62,15 +64,15 @@ is not the gp-relative blocker, it is a residue class of its own. Restored to
 Two independent passes over unrelated tables, then a load of the "DreamAux"
 audio-stream-request object:
 
-1. For `i` in `0..13`: `D_80089A44[i]` is a pointer to an array of
-   `D_80089A7C[i]` (signed count) 8-byte records; clear byte 0 (offset `0x0`,
+1. For `i` in `0..13`: `gDreamAuxGroupRecords[i]` is a pointer to an array of
+   `gDreamAuxGroupCounts[i]` (signed count) 8-byte records; clear byte 0 (offset `0x0`,
    named `flag`) of each.
 2. Build a request (`SetVec3`, already matched elsewhere in
    `code_171e0.c` as a plain 3-word field setter) with `flag=0`,
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
-   in `func_8005C5E8`'s report -- same confirmed idiom) that calls
-   `func_8004468C(&req)` and stores the result into `D_80088D28[0].obj`,
+   in `TickDreamAuxSlots`'s report -- same confirmed idiom) that calls
+   `func_8004468C(&req)` and stores the result into `gDreamAuxSlots[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
    likely a leftover of an original 2-iteration loop (SYMSPY then SYMDOG)
@@ -83,43 +85,43 @@ audio-stream-request object:
 #include "common.h"
 #include "code_4cd08.h"
 
-/* const char D_8001186C[] = "ETC\\SYMSPY.MOM"; */
-/* const char D_8001187C[] = "ETC\\SYMDOG.MOM"; */
+/* const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM"; */
+/* const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM"; */
 /* ^ These must be defined in this .c file (not just declared extern) when
  * this function is not INCLUDE_ASM'd -- see "Rodata ownership" below. */
 
-void func_8005C508(void)
+void InitDreamAux(void)
 {
     DreamAuxLoadReq req;
     u32 i;
     s32 j;
 
     for (i = 0; i < 14; i++) {
-        for (j = 0; j < D_80089A7C[i]; j++) {
-            D_80089A44[i][j].flag = 0;
+        for (j = 0; j < gDreamAuxGroupCounts[i]; j++) {
+            gDreamAuxGroupRecords[i][j].flag = 0;
         }
     }
 
-    SetVec3(&req, 0, D_8001186C, 1);
+    SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        D_80088D28[i].obj = func_8004468C(&req);
-        req.name = D_8001187C;
+        gDreamAuxSlots[i].obj = func_8004468C(&req);
+        req.name = gMomPathSymDog;
     }
 }
 ```
 
 Needs (from `include/code_4cd08.h`, added this round):
-`DreamAuxLoadReq`, `DreamAuxGroupRecord`, `D_80089A7C`, `D_80089A44`,
-`DreamAuxSlot`, `D_80088D28`, `SetVec3`, `func_8004468C`.
+`DreamAuxLoadReq`, `DreamAuxGroupRecord`, `gDreamAuxGroupCounts`, `gDreamAuxGroupRecords`,
+`DreamAuxSlot`, `gDreamAuxSlots`, `SetVec3`, `func_8004468C`.
 
 ## The residue, precisely
 
-Retail, storing the call result into `D_80088D28[i].obj`:
+Retail, storing the call result into `gDreamAuxSlots[i].obj`:
 
 ```
-lui   at, %hi(D_80088D28)
-addiu at, at, %lo(D_80088D28)   ; <-- retail materializes the FULL address
+lui   at, %hi(gDreamAuxSlots)
+addiu at, at, %lo(gDreamAuxSlots)   ; <-- retail materializes the FULL address
 addu  at, at, s0                 ;     (s0 = running byte offset, i*0x14)
 sw    v0, 0(at)
 ```
@@ -127,24 +129,24 @@ sw    v0, 0(at)
 Every source shape tried here compiles to:
 
 ```
-lui   at, %hi(D_80088D28)
+lui   at, %hi(gDreamAuxSlots)
 addu  at, at, s0
-sw    v0, %lo(D_80088D28)(at)   ; <-- %lo folded into the store's own
+sw    v0, %lo(gDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
                                  ;     displacement instead
 ```
 
 Both compute the identical target address; mine is one instruction shorter.
 This is the ONLY residue in the function -- the two preceding loops, the
 `SetVec3` call, and the loop-control shape of the final loop (see
-`func_8005C5E8`'s report for why `for (i=0;i<1;i++)` is the right shape, not
+`TickDreamAuxSlots`'s report for why `for (i=0;i<1;i++)` is the right shape, not
 decompiler noise) are all byte-exact already (confirmed via `asm-differ`,
 which shows the first ~46 instructions matching before this one diverges).
 
 ## What was tried (all rejected, in order)
 
 1. Manually hoisted `s8 *counts` / `DreamAuxGroupRecord **groups` pointers
-   incremented by hand in loop 1, instead of indexing `D_80089A7C[i]` /
-   `D_80089A44[i][j]` directly -- **worse** (5/56). Switching to direct
+   incremented by hand in loop 1, instead of indexing `gDreamAuxGroupCounts[i]` /
+   `gDreamAuxGroupRecords[i][j]` directly -- **worse** (5/56). Switching to direct
    array indexing and letting GCC do its own induction-variable strength
    reduction (per the head's "let GCC hoist its own invariants" broadcast)
    got loop 1 to match byte-for-byte; this part of the lever generalizes.
@@ -164,12 +166,12 @@ which shows the first ~46 instructions matching before this one diverges).
    clean but do not add the missing instruction (most made other things
    *worse*, none improved past 40/56): reordering `req.name = ...` before
    vs. after the store; splitting the call result into a named temporary
-   before storing it; declaring `D_80088D28` with an explicit bound (`[14]`)
+   before storing it; declaring `gDreamAuxSlots` with an explicit bound (`[14]`)
    vs. incomplete (`[]`) -- no difference either way; replacing the
    `u8 unk4[0x10]` padding with four named `s32` fields -- no difference;
-   `DreamAuxSlot *entry = &D_80088D28[i]; entry->obj = ...;` -- worse
+   `DreamAuxSlot *entry = &gDreamAuxSlots[i]; entry->obj = ...;` -- worse
    (36/56); explicit byte-pointer arithmetic
-   (`*(DreamAuxObj **)((u8 *)D_80088D28 + i * sizeof(DreamAuxSlot))`) --
+   (`*(DreamAuxObj **)((u8 *)gDreamAuxSlots + i * sizeof(DreamAuxSlot))`) --
    worse (36/56 and 28/56 depending on exact form); a `volatile` cast on the
    array -- worse (36/56); a bare `__asm__("")` as the function's first
    statement -- worse (33/56), and per CLAUDE.md rule 6 this would need
@@ -181,21 +183,21 @@ which shows the first ~46 instructions matching before this one diverges).
 ## Rodata ownership (a real trap, worth flagging even though this stalled)
 
 `config/splat.slps01556.lsdde.yaml` marks the `0x206C` rodata segment
-`.rodata, code_4cd08` (dot-prefixed) for `func_8005CBC8`'s jump tables, but
-`D_8001186C`/`D_8001187C` (the two MOM filenames) live in the same run and
-are consumed only by `func_8005C508`. While this function is `INCLUDE_ASM`,
+`.rodata, code_4cd08` (dot-prefixed) for `CheckDreamAuxTriggerCondition`'s jump tables, but
+`gMomPathSymSpy`/`gMomPathSymDog` (the two MOM filenames) live in the same run and
+are consumed only by `InitDreamAux`. While this function is `INCLUDE_ASM`,
 its own `.s` file carries these two strings as raw (`nonmatching`) asm
 blocks and the build is green. The MOMENT this function is de-`INCLUDE_ASM`'d,
 that `.s` file is no longer pulled in by anything (it lives under
 `asm/nonmatchings/`, which per the Makefile is *only* assembled via
 `INCLUDE_ASM`), and both symbols go undefined at link time. Fix: define them
-as real C string data (`const char D_8001186C[] = "ETC\\SYMSPY.MOM";` etc.)
+as real C string data (`const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";` etc.)
 directly in `code_4cd08.c`, ahead of the function -- this is "flip to the
 dot form in the same commit that writes the C" from
 `docs/DECOMPILATION_LEARNINGS.md`, just for a rodata slot that happens to
 hold strings rather than a table. Whoever re-attempts this function needs
 that definition back (commented out above, in the near-miss body) or the
-build will fail at link with `undefined reference to D_8001186C`.
+build will fail at link with `undefined reference to gMomPathSymSpy`.
 
 ## Proposed learning
 
@@ -210,3 +212,15 @@ build will fail at link with `undefined reference to D_8001186C`.
   its own residue category distinct from "instruction order only" and
   "register identity" in MATCHING-GUIDE.md's list -- next attempt should
   probably reach for the permuter rather than more manual reshaping.
+
+## Naming
+
+**InitDreamAux** — tier B. Called exactly once, as the first DreamAux-specific
+call inside `func_80049684` (a constructor: `func_8004A4B8()->ctor(self,...);
+self->methods = func_8004A060(); InitDreamAux(); ...`), before the rest of
+that object's own fields are set up. Clears every `gDreamAuxGroupRecord`'s
+`flag` across all 14 groups and loads the initial MOM audio-stream object
+into `gDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time
+call site; the broader game reason (why THIS unit's state resets alongside
+that particular object's construction) is not established from this unit
+alone, hence tier B rather than A.

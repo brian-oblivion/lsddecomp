@@ -1,19 +1,21 @@
-# func_8005C5E8 -- MATCHED
+> Renamed from `func_8005C5E8` on 2026-09-21 (tools/rename.py). Address 0x8005c5e8.
+
+# TickDreamAuxSlots -- MATCHED
 
 Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CDE8`-`0x4CE50`. Whole-image
 `build-and-verify.sh` green (`build exit=0`, sha1 OK). First attempt matched.
 
 ## What it does
 
-Ticks slot 0 of the `D_80088D28` object-slot family exactly once: if the slot
+Ticks slot 0 of the `gDreamAuxSlots` object-slot family exactly once: if the slot
 holds a live object, call that object's method-table slot 1 (offset `0x4`)
 with the object itself as the argument, and overwrite the slot with whatever
 the call returns.
 
 ```c
-void func_8005C5E8(void)
+void TickDreamAuxSlots(void)
 {
-    DreamAuxSlot *slot = D_80088D28;
+    DreamAuxSlot *slot = gDreamAuxSlots;
     u32 done;
 
     for (done = 0; done < 1; done++) {
@@ -28,7 +30,7 @@ void func_8005C5E8(void)
 }
 ```
 
-Uses `DreamAuxObj`, `DreamAuxTickFn`, `DreamAuxSlot`, `D_80088D28` from the new
+Uses `DreamAuxObj`, `DreamAuxTickFn`, `DreamAuxSlot`, `gDreamAuxSlots` from the new
 `include/code_4cd08.h` (see below).
 
 ## Why the "loop that only runs once" shape
@@ -43,20 +45,20 @@ no leading guard before `.L8005C604`, and `beqz $s1, .L8005C604` as the
 back-edge test. Do not "clean this up" to a plain `if` -- the loop shape
 *is* what produces the byte-exact instruction sequence.
 
-Same shape recurs at `func_8005C76C` (below, over `D_80088D2C`) and, per
-splat's asm, in `func_8005C650` and `func_8005C508`'s second loop (both
+Same shape recurs at `TickDreamAuxSlots2` (below, over `gDreamAuxSlots2`) and, per
+splat's asm, in `SetDreamAuxWorld` and `InitDreamAux`'s second loop (both
 off-limits/gp-relative or already stalled elsewhere in this unit) -- this
 looks like a recurring internal idiom for "process slot 0 of a small
 object-slot table", not a one-off.
 
 ## Struct derivation
 
-`D_80088D28` stride confirmed as `0x14` (20 bytes) independently by
-`func_8005C650` (off-limits here, gp-relative-blocked, but read for context):
+`gDreamAuxSlots` stride confirmed as `0x14` (20 bytes) independently by
+`SetDreamAuxWorld` (off-limits here, gp-relative-blocked, but read for context):
 it writes a *different* field of the same array, at `+0x4`, with a
 `New_Entity()` result, while reading `+0x0` as an argument to that same call
 -- meaning slot 0's `obj` field (this function's target) is populated
-*before* `func_8005C650` runs, and `func_8005C650`'s own `+0x4` write in turn
+*before* `SetDreamAuxWorld` runs, and `SetDreamAuxWorld`'s own `+0x4` write in turn
 feeds something else. Only `+0x0` (`obj`) and the fact that the struct is
 `0x14` bytes are established; the other `0x10` bytes are undocumented
 padding (`u8 unk4[0x10]`).
@@ -77,7 +79,7 @@ this function alone), so the type is deliberately generic
 - **Prologue callee-save order / "let GCC hoist its own loop invariants"
   (Levers from `func_80025D10`):** the second lever *is* what's happening
   here structurally -- `slot` is a pointer named directly at the top
-  (`DreamAuxSlot *slot = D_80088D28;`), not a byte offset hand-maintained
+  (`DreamAuxSlot *slot = gDreamAuxSlots;`), not a byte offset hand-maintained
   inside the loop, and it matched first try. Consistent with "let the
   compiler own the induction variable."
 
@@ -88,8 +90,18 @@ this function alone), so the type is deliberately generic
   GCC 2.6.3 -O2 compiles it to a `do`-style loop with a `beqz $reg` back-edge
   test (no leading guard, no `slti`), and removing the "loop" in favor of a
   plain `if` changes the instruction count. Confirmed independently on two
-  functions in `code_4cd08` (`func_8005C5E8`, `func_8005C76C`); the same
-  shape also appears in `func_8005C650` and `func_8005C508`'s tail (both
+  functions in `code_4cd08` (`TickDreamAuxSlots`, `TickDreamAuxSlots2`); the same
+  shape also appears in `SetDreamAuxWorld` and `InitDreamAux`'s tail (both
   otherwise blocked/stalled). Likely a shared "process the first slot of an
   N-slot table" macro/pattern in the original source where N happened to be
   1 at these call sites.
+
+## Naming
+
+**TickDreamAuxSlots** — tier A. A pure leaf over `gDreamAuxSlots`: if slot 0's
+`obj` is live, call its vtable slot 1 (the unit's own established
+`DreamAuxTickFn` typedef, already named "tick" before this round) and store
+the result back. The mechanics ARE the name (a tick pass), so this qualifies
+as tier A by FINISHING-PLAN's "pure leaf whose mechanics are its purpose"
+rule regardless of why the caller (`func_80049830`, apparently a destructor)
+invokes it once at that point.
