@@ -2,6 +2,15 @@
 
 > Renamed from `func_80028A84` on 2026-09-21 (tools/rename.py). Address 0x80028a84.
 
+> **ROUND 64 (2026-09-21), runner alpha -- field rename note.** `ObjA34_179D8H`'s
+> fields were renamed this round: `unk0C` -> `isOpen`, `unk18` -> `pos`,
+> `unk1C` -> `size`; `MethodsA34_179D8H`: `slot48` -> `onError`. All prose
+> and code below this note PREDATES the rename and uses the old field names
+> throughout (it is historical narrative, left as written); the
+> `## Result` block's actual function body has been updated to compile
+> against the CURRENT struct definitions in `src/code_179d8_h.c` -- that is
+> the one to splice if you pick this function up again.
+
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then one more
 > structural reshape, negative.**
 >
@@ -143,9 +152,14 @@ which case retry the whole outer loop again).
 
 ```c
 #if 0
+/* MethodsA34_179D8H and ObjA34_179D8H are ALREADY declared earlier in
+ * src/code_179d8_h.c (current names: MethodsA34_179D8H::onError,
+ * ObjA34_179D8H::isOpen/pos) -- do not re-paste this typedef when splicing,
+ * only the function body below. Shown here again only so this block reads
+ * standalone. */
 typedef struct MethodsA34_179D8H {
     u8 pad000[0x48];
-    void (*slot48)(ObjA34_179D8H *self);
+    void (*onError)(ObjA34_179D8H *self);
 } MethodsA34_179D8H;
 /* ObjA34_179D8H gets a `MethodsA34_179D8H *methods;` field at +0x000,
  * with the leading padding through +0xC unchanged in total size -- see
@@ -165,12 +179,12 @@ s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
     char scratch[0x800];
     char buf[0x10];
 
-    if (self->unk0C == 0) {
-        self->methods->slot48(self);
+    if (self->isOpen == 0) {
+        self->methods->onError(self);
         return 0;
     }
     do {
-        CdControl(2, &self->unk18, 0);
+        CdControl(2, &self->pos, 0);
         hi = (u32)arg2 >> 11;
         do {
             status = CdSync(0, buf);
@@ -308,3 +322,23 @@ relative to the loop) plus register-role-rotation residue, which is a
 CONTROL-FLOW-SHAPE gap, not an expression-tree rewrite a source-mutation
 search is built to close. Recorded as NOT SEARCHED (declined on evidence
 from check (b)), not as a spent, failed search.
+
+---
+
+## Naming (round 64, runner alpha)
+
+- **`func_80028A84` -> `ReadCdFile`, tier B.** Mechanics: if not open,
+  dispatches the object's own error/failure slot and returns; otherwise
+  loops issuing `CdControl`/`CdSync` then `CdRead`/`CdReadSync` to fill the
+  caller's buffer. Confirmed by `src/code_179d8_s.c`'s `func_800276D0`,
+  which calls this function directly when CD-async mode is off and
+  otherwise reimplements the identical `CdRead`/`CdReadSync` retry loop for
+  its async path. Paired with `OpenCdFile`/`CloseCdFile`/`GetCdFileSize`
+  (also this unit) as an Open/Close/Size/Read quad.
+- `MethodsA34_179D8H::slot48` -> `onError` (tier B): the slot NUMBER (+0x48)
+  matches `src/code_179d8_s.c`'s own independent view
+  (`Methods80027480::slot48`), dispatched there on an unrelated
+  allocation-failure path (`func_80027800`) -- two unrelated give-up paths
+  at the identical offset. Not applied in `code_179d8_s.c` (out of unit);
+  PROPOSED there under the same name. Recorded in full in
+  `src/code_179d8_h.c`'s own field comment and in `OpenCdFile.md`.
