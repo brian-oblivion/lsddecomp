@@ -63,9 +63,100 @@
 #include "common.h"
 
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c", func_8003221C);
+extern s32 ResetCallback(void);
+extern void func_80038D54(void);
+extern void func_80036AA8(void);
+extern void InitSpuDriver(s32 arg0);
+extern s32 GetVideoMode(void);
+extern u16 D_8006DC5C[8];
+extern u16 D_8006DC6C[0x10];
+extern s32 D_8009024C;
+extern s32 D_8008EA00;
+extern s32 D_8006DC8C;
+extern s32 D_8006DC90;
+extern s32 D_8006DC94;
+extern void (*D_8006DC9C)(void);
+extern s32 D_8006DC98;
+extern s32 D_8008E934;
 
-extern void func_8003221C(s32 arg0);
+/* One 0x40-byte per-voice software state slot; the init below just zeroes it. */
+typedef struct {
+    s32 pad0[0x10];
+} VoiceState80090368;
+
+extern VoiceState80090368 D_80090368[0x20];
+
+/*
+ * Sound-system init.  Reached only through func_80032368 (arg0 = 0) and
+ * func_80032388 (arg0 = 1) below.
+ *
+ * DO NOT "TIDY" THE LOOP VARIABLES -- the pairing is byte-load-bearing
+ * (round 63).  Retail reuses exactly two counter pseudos across all three
+ * loops and SWAPS their outer/inner roles in the last one: `i` is the outer
+ * counter of loops 1-2 and the INNER counter of loop 3, `j` the inner counter
+ * of loop 1 and the OUTER counter of loop 3.  Writing loop 3 as
+ * `for (i ...) for (j ...)` costs 35 words to register renames; splitting
+ * them into per-loop names costs the function's size outright.  Likewise the
+ * `i = 0;` before each loop is a statement in its own right, not a `for`
+ * init clause: retail zeroes the counter BEFORE loading the source base.
+ */
+void func_8003221C(s32 arg0)
+{
+    s32 i, j;
+    u16 *base;
+    u16 *src;
+    u16 *reg;
+
+    ResetCallback();
+
+    if (arg0 == 0) {
+        func_80038D54();
+    } else {
+        func_80036AA8();
+    }
+
+    /* Stamp the same 8-halfword template into all 24 SPU voice register
+       blocks (0x1F801C00, stride 0x10 -- `reg` runs straight through). */
+    reg = (u16 *)0x1F801C00;
+    i = 0;
+    base = D_8006DC5C;
+    for (; i < 0x18; i++) {
+        j = 0;
+        src = base;
+        for (; j < 8; j++) {
+            *reg = *src;
+            src++;
+            reg++;
+        }
+    }
+
+    /* Then 16 consecutive halfwords into the SPU control block at 0x1F801D80. */
+    reg = (u16 *)0x1F801D80;
+    i = 0;
+    src = D_8006DC6C;
+    for (; i < 0x10; i++) {
+        *reg = *src;
+        src++;
+        reg++;
+    }
+
+    InitSpuDriver(0x18);
+
+    for (j = 0; j < 0x20; j++) {
+        for (i = 15; i >= 0; i--) {
+            D_80090368[j].pad0[i] = 0;
+        }
+    }
+
+    D_8009024C = 0x3C;
+    D_8008EA00 = 0;
+    D_8006DC8C = 0;
+    D_8006DC90 = -1;
+    D_8006DC94 = 0;
+    D_8006DC9C = NULL;
+    D_8006DC98 = GetVideoMode();
+    D_8008E934 = 0;
+}
 
 void func_80032368(void)
 {
