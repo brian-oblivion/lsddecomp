@@ -194,7 +194,7 @@ same-file `.sdata`/`.comm` directives — which splat-owned data never produces.
 **The lessons those blockers taught are not retired with them:**
 
 - **Run the screen before you accept a stall's CAUSE, not only before you
-  assign work.** Round 13 found `func_8005CBC8` filed as a one-word near-miss
+  assign work.** Round 13 found `CheckDreamAuxTriggerCondition` filed as a one-word near-miss
   attributed to instruction selection while an `addiu $at, $at, %lo(jtbl_*)`
   hit sat unexamined in its own `.s`. A wrong SCORE is corrected the next time
   anyone measures; a wrong CAUSE is what the next round acts on.

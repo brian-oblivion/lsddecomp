@@ -1,4 +1,6 @@
-# func_8005CBC8 -- MATCHED (byte-exact, 100/100 words). Round 25, head.
+> Renamed from `func_8005CBC8` on 2026-09-21 (tools/rename.py). Address 0x8005cbc8.
+
+# CheckDreamAuxTriggerCondition -- MATCHED (byte-exact, 100/100 words). Round 25, head.
 
 > **ROUND 25 (2026-09-08), head. CLOSED. The last word was BASIC-BLOCK ORDER,
 > and every expression in round 24's 99/100 body was already right.**
@@ -9,7 +11,7 @@
 > permuter: it is a consequence of WHICH BASIC BLOCK GCC PLACES WHERE, and
 > the source controls that.
 >
-> Retail's layout, read off `asm/nonmatchings/code_4cd08/func_8005CBC8.s`:
+> Retail's layout, read off `asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`:
 >
 > ```
 >         bgez  $a0, .L8005CC0C     # sel >= 0 -> the "idx = sel" arm
@@ -123,7 +125,7 @@
 >
 > Restoring round 23's exact preserved body and building it gave **108/100
 > words -- 8 WORDS TOO LONG**, not 99/100 (confirmed via `nm` on the linked
-> ELF: `func_8005CD58` landed at `+0x1B0` from this function's start, not
+> ELF: `CheckDreamAuxWorldState` landed at `+0x1B0` from this function's start, not
 > retail's `+0x190`). Round 23 never re-derived this number from a build; it
 > inherited round 13's asm-differ read and treated the dispatch fix as the
 > whole story.
@@ -131,7 +133,7 @@
 > **The actual cause: retail MERGES switch cases 6 and 7 into ONE shared
 > handler, and the preserved C body had them as two separate `case` blocks.**
 > Proof is in the function's own jump table, still on disk in
-> `asm/nonmatchings/code_4cd08/func_8005CBC8.s`:
+> `asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`:
 >
 > ```
 >     /* 20A4 800118A4 C8CC0580 */ .word .L8005CCC8   <- index 6
@@ -200,7 +202,7 @@
 >
 > **Translated to real C and re-verified against the actual oracle, this
 > REGRESSES: 98/100 (2 words short), not an improvement** -- confirmed via
-> `nm` (`func_8005CD58` moved to `+0x188`, not `+0x190`). This is exactly the
+> `nm` (`CheckDreamAuxWorldState` moved to `+0x188`, not `+0x190`). This is exactly the
 > documented caution that a permuter score is not the project's oracle
 > (MATCHING-GUIDE.md's "Permuter" section): the permuter's own weighted
 > penalty improved (fewer visible mismatched instructions in ITS diff) while
@@ -211,7 +213,7 @@
 > dead-store trick, not an idiomatic reshape:
 >
 > ```c
-> bool func_8005CBC8(s32 value, TriggerRecord *record)
+> bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
 > {
 >     volatile unsigned int new_var;
 >     s8 sel = record->sel;
@@ -229,7 +231,7 @@
 >     /* ... rest unchanged ... */
 > ```
 >
-> Compiled directly through this run's `permuter-work/func_8005CBC8/compile.sh`
+> Compiled directly through this run's `permuter-work/CheckDreamAuxTriggerCondition/compile.sh`
 > and objdumped (not just read as permuter-internal score): it grows the
 > stack frame from retail's `addiu sp,sp,-0x18` to `addiu sp,sp,-0x20` and
 > inserts a real `sw zero,0x10(sp)` for the `volatile` write -- a frame-size
@@ -260,14 +262,14 @@
 > default section) instead, which corrupted `target.o` enough that
 > `permuter.py`'s objdump-output parser crashed outright
 > (`IndexError: list index out of range` in `simplify_objdump`). Both were
-> patched only inside this run's gitignored `permuter-work/func_8005CBC8/`
+> patched only inside this run's gitignored `permuter-work/CheckDreamAuxTriggerCondition/`
 > (never in the shared `tools/setup-permuter.sh`, per this round's parallel-
 > mode constraint) -- fix: keep `--addiu-at` in `compile.sh`'s
 > `MASPSX_FLAGS`, and for `target.s` generation, drop only the TRUE
 > boilerplate lines (here, `sed -e '1,3d'`, keeping `.section .rodata`)
 > rather than a hardcoded `1,4d`. Whoever owns `tools/setup-permuter.sh`
 > should fix this for every future embedded-rodata function, not just this
-> one -- `func_8005C508` in this same unit shares the "indexed-global folds
+> one -- `InitDreamAux` in this same unit shares the "indexed-global folds
 > through the same maspsx mechanism" trait, though it has no embedded rodata
 > of its own so it did not hit the second bug.
 >
@@ -328,7 +330,7 @@
 > near-miss, and it should not be staffed again until that blocker is resolved.
 >
 > The tell was in this report's own file all along and was never run:
-> `grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_4cd08/func_8005CBC8.s`
+> `grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`
 > hits at line 66. CLAUDE.md's screen says in terms that a `%lo(jtbl_*)` hit
 > counts; the screen was not applied to this function because it had already
 > been reasoned about as a preamble problem. **The blocker screen is a
@@ -339,7 +341,7 @@
 
 Unit `code_4cd08` ("DreamAux"). Restored to `INCLUDE_ASM`; no C left in
 `src/`. Owns the `0x206C` rodata slot's jump table (`jtbl_8001188C`, 20
-entries) -- untouched, stays embedded in `asm/nonmatchings/code_4cd08/func_8005CBC8.s`
+entries) -- untouched, stays embedded in `asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`
 since the function reverted to `INCLUDE_ASM`.
 
 Every branch target and every case body in this ~100-word, 20-case switch
@@ -360,13 +362,13 @@ inserted/deleted markers can, and they say two.
 
 ## What it does
 
-`func_8005CBC8(value, record)`: reads `record->sel` (offset `0x1`,
+`CheckDreamAuxTriggerCondition(value, record)`: reads `record->sel` (offset `0x1`,
 signed byte). If it's `1`, succeeds immediately. Otherwise derives a switch
 index `idx`: if `sel >= 0`, `idx = sel`; if `sel < 0`, fails immediately
 when `record->unk0` (offset `0x0`, signed byte) is nonzero, else
 `idx = -sel`. Dispatches on `idx - 2` through a 20-entry jump table:
 
-- 0,1,2: delegate to `func_8005CDA8(value, idx - 1)`.
+- 0,1,2: delegate to `MatchesDreamAuxRange(value, idx - 1)`.
 - 3: succeed iff `value % 3 == 0`.
 - 4: succeed iff `value % 3 != 0`.
 - 5: succeed iff `func_8005630C()` (no args) is truthy.
@@ -376,7 +378,7 @@ when `record->unk0` (offset `0x0`, signed byte) is nonzero, else
 - 19: succeed iff `value` is odd.
 - default (indices 8-17, and anything outside the table's `idx` range of
   roughly `[2, 22)`): succeed unconditionally if `idx < 10`; otherwise
-  delegate to `func_8005CD58(idx)`.
+  delegate to `CheckDreamAuxWorldState(idx)`.
 
 On any success path, `record->unk0` is set to `1` before returning `true`.
 
@@ -392,7 +394,7 @@ below refers to.
 #include "common.h"
 #include "code_4cd08.h"
 
-bool func_8005CBC8(s32 value, TriggerRecord *record)
+bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
 {
     s8 sel = record->sel;
     s32 idx;
@@ -416,7 +418,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!func_8005CDA8(value, idx - 1)) {
+        if (!MatchesDreamAuxRange(value, idx - 1)) {
             return false;
         }
         break;
@@ -453,7 +455,7 @@ have_idx:
         break;
     default:
         if (idx >= 10) {
-            if (!func_8005CD58(idx)) {
+            if (!CheckDreamAuxWorldState(idx)) {
                 return false;
             }
         }
@@ -479,7 +481,7 @@ the top of this report).
 #include "common.h"
 #include "code_4cd08.h"
 
-bool func_8005CBC8(s32 value, TriggerRecord *record)
+bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
 {
     s8 sel = record->sel;
     s32 idx;
@@ -503,7 +505,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!func_8005CDA8(value, idx - 1)) {
+        if (!MatchesDreamAuxRange(value, idx - 1)) {
             return false;
         }
         break;
@@ -544,7 +546,7 @@ have_idx:
         break;
     default:
         if (idx >= 10) {
-            if (!func_8005CD58(idx)) {
+            if (!CheckDreamAuxWorldState(idx)) {
                 return false;
             }
         }
@@ -557,9 +559,9 @@ success:
 }
 ```
 
-Needs `TriggerRecord`, `func_8005CDA8`, `func_8005630C`, `func_8005CD58` from
-`include/code_4cd08.h` (already added this round -- `func_8005CDA8` is
-matched, see its own report; `func_8005630C`/`func_8005CD58` are still
+Needs `TriggerRecord`, `MatchesDreamAuxRange`, `func_8005630C`, `CheckDreamAuxWorldState` from
+`include/code_4cd08.h` (already added this round -- `MatchesDreamAuxRange` is
+matched, see its own report; `func_8005630C`/`CheckDreamAuxWorldState` are still
 `INCLUDE_ASM` elsewhere in this unit and off-limits this round, gp-relative-
 blocked per `docs/research/gp-relative-blocker.md`).
 
@@ -707,7 +709,7 @@ is genuinely an instruction-selection/scheduling choice, not a wrong CFG.
   Six distinct if/else/goto/ternary encodings of the exact same 3-way
   branch (`sel==1` / `sel>=0` / `sel<0 && unk0`) all compiled to the more
   efficient form; only the *choice of which branch carries the extra
-  jump* moved, never whether one exists. Contrast with `func_8005CAB4`
+  jump* moved, never whether one exists. Contrast with `ProcessDreamAuxTriggerRecord`
   (same round, same unit) where a genuinely analogous-looking "extra
   jump" residue WAS reachable, by switching `do-while` to a pre-test
   `while` -- the difference there was a real CFG change (confirmed via
@@ -715,7 +717,7 @@ is genuinely an instruction-selection/scheduling choice, not a wrong CFG.
   selection preference. Always do the branch-target check before assuming
   either "this is fixable" or "this is a scheduling stall" -- both
   conclusions need the same evidence, and this function is the
-  counter-example to file next to `func_8005CAB4`'s.
+  counter-example to file next to `ProcessDreamAuxTriggerRecord`'s.
 
 ## Proposed learnings, round 24
 

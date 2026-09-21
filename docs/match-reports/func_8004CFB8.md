@@ -260,7 +260,7 @@ fixed) or a fresh hand-written idea; not closed off.
 ## Variant 7 (round 25, head) — NEGATIVE, 5 words too long
 
 Tried because the round-25 block-order lever (see
-`docs/match-reports/func_8005CBC8.md`) suggested this function's deferred
+`docs/match-reports/CheckDreamAuxTriggerCondition.md`) suggested this function's deferred
 single `mflo` might be a CROSS-JUMPING result rather than an RTL-expansion
 one: if both arms end in an identical `mflo`/`sw` tail, GCC 2.6.3 can merge
 those tails and absorb the shorter arm's lone `mult` into the `bgez` delay
@@ -310,7 +310,7 @@ expansion choice, not a missing cross-jump.**
 ### Proposed learning
 
 **A one-word residue that survives every expression reshape is evidence
-about block order (round 25's `func_8005CBC8`) — but a residue that
+about block order (round 25's `CheckDreamAuxTriggerCondition`) — but a residue that
 survives reshaping AND is an `mflo`/HI-LO extraction is NOT, and this
 function is the measured counterexample.** The block-order lever applies to
 which BLOCK a computation lands in; it cannot move a `mult`/`mflo` pair

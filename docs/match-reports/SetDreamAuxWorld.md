@@ -1,4 +1,6 @@
-# func_8005C650
+> Renamed from `func_8005C650` on 2026-09-21 (tools/rename.py). Address 0x8005c650.
+
+# SetDreamAuxWorld
 
 **Unit:** code_4cd08 · **Size:** 34 words · **Status:** MATCHED round 43
 (34/34, byte-exact whole-image build).
@@ -27,7 +29,7 @@ extern s32 D_8008AC08;
 
 void SetTeleportsEnabled(s32 triggerType);
 
-void func_8005C650(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     DreamAuxSlot *slot = D_80088D28;
     u32 i;
@@ -58,7 +60,7 @@ Two derivation points worth recording:
   `beqz $s0, .L8005C68C` (`f7ff0012`), the `s32` build emitted
   `blez $s0, ...` (`f7ff001a`). GCC 2.6.3 lowers a *signed* `for (i=0;i<1;i++)`
   to a `<=0` backward test (since it cannot assume `i` never goes negative)
-  but a matched sibling in this same unit, `func_8005C5E8`
+  but a matched sibling in this same unit, `TickDreamAuxSlots`
   (`for (done = 0; done < 1; done++)` with `u32 done`), already demonstrated
   the `beqz` form for the identical "run once" shape. Switching `i` to `u32`
   reproduced `beqz` and closed the last word. **This unit now has two
@@ -100,4 +102,4 @@ Add to the corpus: **an unsigned loop counter is required for the
 backward branch** -- a signed counter of the same shape compiles to `blez`
 instead, one word different, easy to miss since both are logically correct.
 Two independent instances now confirm it in this unit alone
-(`func_8005C5E8`, `func_8005C650`).
+(`TickDreamAuxSlots`, `SetDreamAuxWorld`).

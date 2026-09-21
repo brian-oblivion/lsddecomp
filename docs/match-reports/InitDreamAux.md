@@ -1,16 +1,18 @@
-# func_8005C508 -- MATCHED (56/56), round 24
+> Renamed from `func_8005C508` on 2026-09-21 (tools/rename.py). Address 0x8005c508.
+
+# InitDreamAux -- MATCHED (56/56), round 24
 
 > **VERDICT CORRECTED, round 24 (2026-09-08), runner delta.** Everything
 > below this note was written against the `addiu_at` jump-table/global-index
 > folding blocker, resolved in round 21 (maspsx `--addiu-at`;
 > `docs/research/addiu-at-blocker.md`). **This report was never re-screened
-> after that fix** -- the same way `func_8005CBC8`'s report was missed by
+> after that fix** -- the same way `CheckDreamAuxTriggerCondition`'s report was missed by
 > round 22's sweep because it reads as a considered plateau, not a stub.
 >
 > The residue this report called unclosable (`%lo(D_80088D28)` folded into
 > the store's own displacement, instead of retail's full `lui`+`addiu`
 > materialize-then-`addu`) is **the exact same construct** as the switch
-> jump-table fold that blocked `func_8005CBC8` -- an indexed-global address
+> jump-table fold that blocked `CheckDreamAuxTriggerCondition` -- an indexed-global address
 > computation, which is precisely the class CLAUDE.md's blocker screen
 > already generalizes ("a jump-table dispatch loads a CODE address and jumps
 > ... an indexed global loads a DATA value ... they are ONE construct at the
@@ -21,11 +23,11 @@
 >
 > ```sh
 > ./build-and-verify.sh   # exit 0, "OK: build matches retail SLPS_015.56"
-> .venv/bin/python3 tools/funcdiff.py func_8005C508
-> # func_8005C508: 56/56 words match (file 0x4CD08-0x4CDE8)
+> .venv/bin/python3 tools/funcdiff.py InitDreamAux
+> # InitDreamAux: 56/56 words match (file 0x4CD08-0x4CDE8)
 > ```
 >
-> Measured with `func_8005CBC8` held at `INCLUDE_ASM` (its own case-6/7 fix
+> Measured with `CheckDreamAuxTriggerCondition` held at `INCLUDE_ASM` (its own case-6/7 fix
 > is a separate, still-open residue -- see that function's own report) so
 > this result is isolated from any other function's drift. The whole-image
 > oracle passed outright, which is the strongest possible confirmation: no
@@ -69,7 +71,7 @@ audio-stream-request object:
    `code_171e0.c` as a plain 3-word field setter) with `flag=0`,
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
-   in `func_8005C5E8`'s report -- same confirmed idiom) that calls
+   in `TickDreamAuxSlots`'s report -- same confirmed idiom) that calls
    `func_8004468C(&req)` and stores the result into `D_80088D28[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
@@ -88,7 +90,7 @@ audio-stream-request object:
 /* ^ These must be defined in this .c file (not just declared extern) when
  * this function is not INCLUDE_ASM'd -- see "Rodata ownership" below. */
 
-void func_8005C508(void)
+void InitDreamAux(void)
 {
     DreamAuxLoadReq req;
     u32 i;
@@ -136,7 +138,7 @@ sw    v0, %lo(D_80088D28)(at)   ; <-- %lo folded into the store's own
 Both compute the identical target address; mine is one instruction shorter.
 This is the ONLY residue in the function -- the two preceding loops, the
 `SetVec3` call, and the loop-control shape of the final loop (see
-`func_8005C5E8`'s report for why `for (i=0;i<1;i++)` is the right shape, not
+`TickDreamAuxSlots`'s report for why `for (i=0;i<1;i++)` is the right shape, not
 decompiler noise) are all byte-exact already (confirmed via `asm-differ`,
 which shows the first ~46 instructions matching before this one diverges).
 
@@ -181,9 +183,9 @@ which shows the first ~46 instructions matching before this one diverges).
 ## Rodata ownership (a real trap, worth flagging even though this stalled)
 
 `config/splat.slps01556.lsdde.yaml` marks the `0x206C` rodata segment
-`.rodata, code_4cd08` (dot-prefixed) for `func_8005CBC8`'s jump tables, but
+`.rodata, code_4cd08` (dot-prefixed) for `CheckDreamAuxTriggerCondition`'s jump tables, but
 `D_8001186C`/`D_8001187C` (the two MOM filenames) live in the same run and
-are consumed only by `func_8005C508`. While this function is `INCLUDE_ASM`,
+are consumed only by `InitDreamAux`. While this function is `INCLUDE_ASM`,
 its own `.s` file carries these two strings as raw (`nonmatching`) asm
 blocks and the build is green. The MOMENT this function is de-`INCLUDE_ASM`'d,
 that `.s` file is no longer pulled in by anything (it lives under

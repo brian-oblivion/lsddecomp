@@ -1,4 +1,6 @@
-# func_8005C7D4
+> Renamed from `func_8005C7D4` on 2026-09-21 (tools/rename.py). Address 0x8005c7d4.
+
+# TryDreamAuxTrigger
 
 **Unit:** code_4cd08 · **Size:** 54 words · **Status:** MATCHED round 43
 (54/54, byte-exact whole-image build).
@@ -11,49 +13,49 @@ attempted -- the stub carried no derivation. Round 43 derived and matched it.
 
 ## What it does
 
-Look up a table entry via `func_8005C8AC`; if found, check a parity
-condition via `func_8005C9A4` and either dispatch into `func_8005C9DC`
+Look up a table entry via `LookupDreamAuxTrigger`; if found, check a parity
+condition via `CheckTriggerParity` and either dispatch into `FireDreamAuxTriggerEntries`
 (returning its result) or -- on a small random/parity chance -- spawn via
-`func_8005CF34`:
+`DespawnDreamAuxEntity`:
 
 ```c
 extern s32 rand(void);
 
-s32 func_8005C8AC(s16 *a0);
-bool func_8005C9A4(s32 coordParity, s8 *entry);
-s32 func_8005C9DC(s32 a0, s32 a1, s32 a2);
-void func_8005CF34(DreamAuxSlot *a0);
+s32 LookupDreamAuxTrigger(s16 *a0);
+bool CheckTriggerParity(s32 coordParity, s8 *entry);
+s32 FireDreamAuxTriggerEntries(s32 a0, s32 a1, s32 a2);
+void DespawnDreamAuxEntity(DreamAuxSlot *a0);
 
-s32 func_8005C7D4(s32 a0, s16 *a1, s32 a2)
+s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
 {
-    s32 record = func_8005C8AC(a1);
+    s32 record = LookupDreamAuxTrigger(a1);
 
     if (record != 0) {
-        if (func_8005C9A4(a2, (s8 *)record)) {
-            return func_8005C9DC(a2, record, a0);
+        if (CheckTriggerParity(a2, (s8 *)record)) {
+            return FireDreamAuxTriggerEntries(a2, record, a0);
         }
         if (D_8008ABF8 != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            func_8005CF34(D_80088D28);
+            DespawnDreamAuxEntity(D_80088D28);
         }
     }
     return 0;
 }
 ```
 
-`func_8005C8AC`'s return value (a small-record pointer or 0, per that
+`LookupDreamAuxTrigger`'s return value (a small-record pointer or 0, per that
 function's own report) is kept as a plain `s32` and cast to `s8 *` only at
-the point `func_8005C9A4` needs it (that function's own signature takes a
+the point `CheckTriggerParity` needs it (that function's own signature takes a
 raw `s8 *`, per its existing match report) -- there is no evidence either
 way that this is a distinct pointer type worth naming, so it stays untyped
 like `D_8008AC00` elsewhere in this unit.
 
-`func_8005C9DC` is forward-declared here with a placeholder `(s32, s32,
+`FireDreamAuxTriggerEntries` is forward-declared here with a placeholder `(s32, s32,
 s32)` signature to be filled in when that function (also queued this round)
 is itself derived; its true parameter types must end up compatible with this
 call site (`a2, record, a0` in that order).
 
 The caller (`class_3bb8c_m.c`, a different unit) has its OWN typed view of
-this function, `extern s32 func_8005C7D4(s32 arg0, s32 *arg1, void *arg2);`
+this function, `extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);`
 (`include/class_3bb8c.h`) -- `s32 *` where this unit reads `s16 *`, and
 `void *` where this unit treats the value as a plain `s32` bitmask (the `& 1`
 parity test). Both views are internally consistent with their own unit's
@@ -69,7 +71,7 @@ One attempt short of byte-exact, one arithmetic-idiom fix:
 - **First pass (23/54, 82195 bytes of drift):** wrote the guard as
   `rand() % 3 == 0`. This reproduces the general SHAPE of retail's
   reciprocal-multiply division sequence (same `mult`/`mfhi` skeleton already
-  seen in `func_8005CBC8`'s `value % 3` checks) but not its CONTENT: retail's
+  seen in `CheckDreamAuxTriggerCondition`'s `value % 3` checks) but not its CONTENT: retail's
   magic constant is `0x2AAAAAAB` (not `0x55555556`), and retail has an extra
   `sra $a0, $a0, 1` between the `mfhi` and the sign correction, plus a final
   `sll` by 2 (not 1) before the compare. All three are the signature of a

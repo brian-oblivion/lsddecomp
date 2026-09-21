@@ -1,4 +1,6 @@
-# func_8005CF34
+> Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
+
+# DespawnDreamAuxEntity
 
 **Unit:** code_4cd08 · **Size:** 42 words · **Status:** MATCHED round 43
 (42/42, byte-exact whole-image build).
@@ -20,7 +22,7 @@ globals to vtable slot 0x13, then call `Class6B5CC__FaceTarget` on it.
 extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
 extern void Class6B5CC__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
-void func_8005CF34(DreamAuxSlot *a0)
+void DespawnDreamAuxEntity(DreamAuxSlot *a0)
 {
     if (a0->entity != NULL) {
         s32 localPos[3];
@@ -33,7 +35,7 @@ void func_8005CF34(DreamAuxSlot *a0)
 }
 ```
 
-This closes the loop `func_8005C650` (matched earlier this round) opened:
+This closes the loop `SetDreamAuxWorld` (matched earlier this round) opened:
 `DreamAuxSlot.entity` is the `New_Entity` result that function stashed at
 offset 0x4, and `DreamAuxSlot`'s remaining 12 bytes (previously
 `u8 unkC[0xC]`) are exactly a 3-word position vector -- confirmed by this
@@ -66,7 +68,7 @@ alias (`s32, s32, void *, void *`) rather than importing Entity.h's.
 ## Derivation notes
 
 One attempt short of byte-exact, one fix, and it is the SAME shape as the
-`func_8005CF34`-adjacent learning already on file for `func_8005C8AC`
+`DespawnDreamAuxEntity`-adjacent learning already on file for `LookupDreamAuxTrigger`
 (narrow value kept live too long) but the opposite direction:
 
 - **First pass (5/42, one word too long):** cached `a0->entity` into a local

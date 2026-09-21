@@ -1,4 +1,6 @@
-# func_8005CD58
+> Renamed from `func_8005CD58` on 2026-09-21 (tools/rename.py). Address 0x8005cd58.
+
+# CheckDreamAuxWorldState
 
 **Unit:** code_4cd08 · **Size:** 20 words · **Status:** MATCHED round 43
 (20/20, byte-exact whole-image build).
@@ -21,7 +23,7 @@ result against a per-`idx` signed byte from a small lookup table
 ```c
 typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
 
-bool func_8005CD58(s32 idx)
+bool CheckDreamAuxWorldState(s32 idx)
 {
     TriggerWorld *w = (TriggerWorld *)D_8008AC00;
     s32 val = D_80088D16[idx];
@@ -64,12 +66,12 @@ bool func_8005CD58(s32 idx)
    this change.
 
 `D_8008AC00`'s declaration (`extern s32 D_8008AC00;`, shared with
-`func_8005C650`) predates this function; it is cast to `TriggerWorld *` at
+`SetDreamAuxWorld`) predates this function; it is cast to `TriggerWorld *` at
 the point of use here rather than declared as a pointer at file scope, since
-`func_8005C650` treats the same global as a generic `s32` parameter store.
+`SetDreamAuxWorld` treats the same global as a generic `s32` parameter store.
 `TriggerWorldFn80` started as a local typedef distinct from `TriggerWorldFn`
 (vtable slot 0x22, different arity) and was promoted into
-`include/code_4cd08.h` once `func_8005C930` (matched immediately after, same
+`include/code_4cd08.h` once `AdjustDreamAuxTriggerOffset` (matched immediately after, same
 round) turned out to need the identical alias -- see that function's report.
 `D_80088D16` (a small `s8[]` lookup table, layout otherwise unknown) is now
 declared in `include/code_4cd08.h` alongside this unit's other module-owned

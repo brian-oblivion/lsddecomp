@@ -108,7 +108,7 @@ s32 func_80054120(ObjM *self) {
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
     void *thing = self->unk3C->methods->slot1A0(self->unk3C, 0);
-    result = func_8005C7D4(child->unk4->unk34, &out, thing);
+    result = TryDreamAuxTrigger(child->unk4->unk34, &out, thing);
     child->unk14 = result;
     if (result != 0) {
         return 0;

@@ -24,7 +24,7 @@ The leading `addu $v0, $a0, $zero` copies the incoming pointer into the return
 register before the stores, which only makes sense if the function's C source
 actually returns it — nothing else in the body needs a copy of `$a0` in
 `$v0`. Declared accordingly, rather than as `void`, on that positive evidence
-(the one caller found, in `asm/nonmatchings/code_4cd08/func_8005C508.s`,
+(the one caller found, in `asm/nonmatchings/code_4cd08/InitDreamAux.s`,
 discards the return value, so a `void` guess would have looked equally
 plausible from the call site alone — the `addu` in this function's own body is
 what settles it):

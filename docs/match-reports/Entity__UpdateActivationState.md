@@ -84,7 +84,7 @@
 >
 > **This is the SECOND instance of round 25's block-order lever, in a
 > different unit and a different shape, which is what makes it a rule rather
-> than an anecdote.** `func_8005CBC8` (`code_4cd08`) was an if/else arm that
+> than an anecdote.** `CheckDreamAuxTriggerCondition` (`code_4cd08`) was an if/else arm that
 > had to jump over a join; this is a DUPLICATED ASSIGNMENT where retail keeps
 > both copies and GCC wants to merge them. Same underlying fact in both:
 > **GCC 2.6.3 gives the fallthrough to the LAST candidate in source order, so

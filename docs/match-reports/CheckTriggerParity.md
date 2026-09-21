@@ -1,4 +1,6 @@
-# func_8005C9A4
+> Renamed from `func_8005C9A4` on 2026-09-21 (tools/rename.py). Address 0x8005c9a4.
+
+# CheckTriggerParity
 
 **Unit:** code_4cd08 · **Size:** 14 words · **Status:** MATCHED (14/14 words)
 
@@ -9,8 +11,8 @@ byte at offset `0x2` is zero (no constraint), otherwise `true` iff that byte
 disagrees with `coordParity`'s own parity (`coordParity % 2 + 1`, computed
 with C's round-toward-zero `%`, not `& 1` — see below).
 
-Called from `func_8005C7D4` as `func_8005C9A4(thirdParam, candidateRecord)`
-where `candidateRecord` comes from `func_8005C8AC`, one of this unit's
+Called from `TryDreamAuxTrigger` as `CheckTriggerParity(thirdParam, candidateRecord)`
+where `candidateRecord` comes from `LookupDreamAuxTrigger`, one of this unit's
 stage-table lookups (6-byte-stride records, same size as `StageSpawn` /
 `StaticLinkTrigger` in `include/DreamSys.h`, but the field this function reads
 is loaded with `lb` — a SIGNED byte — while both of those structs' offset-2
@@ -46,7 +48,7 @@ the arithmetic shift, so the remainder keeps the dividend's sign) — confirms
 the source used `%`, not `& 1`, matching CLAUDE.md's residue list.
 
 ```c
-bool func_8005C9A4(s32 coordParity, s8 *entry)
+bool CheckTriggerParity(s32 coordParity, s8 *entry)
 {
     bool result = true;
 

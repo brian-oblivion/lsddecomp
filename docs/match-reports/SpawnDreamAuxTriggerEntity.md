@@ -1,4 +1,6 @@
-# func_8005CDF8
+> Renamed from `func_8005CDF8` on 2026-09-21 (tools/rename.py). Address 0x8005cdf8.
+
+# SpawnDreamAuxTriggerEntity
 
 **Unit:** code_4cd08 · **Size:** 79 words · **Status:** MATCHED round 43
 (79/79, byte-exact whole-image build). This was the LAST of the eight
@@ -44,7 +46,7 @@ extern u8 D_80088F18[];
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
 typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
 
-bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry)
+bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 {
     DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)D_8008AC04);
 
@@ -74,13 +76,13 @@ bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry)
 ```
 
 `New_Entity`'s three arguments here are the exact same shape as
-`func_8005C650`'s call: `(kind, out, D_8008AC04)`, where `out` is THIS
+`SetDreamAuxWorld`'s call: `(kind, out, D_8008AC04)`, where `out` is THIS
 function's own `void *out` parameter, itself a 4-word caller-provided
 scratch buffer per the header's existing comment on this function's
-signature (`func_8005CAB4`'s `scratch[4]`). `D_80088F48`/`D_80088D3C` are two
+signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `D_80088F48`/`D_80088D3C` are two
 more small unit-owned lookup tables (a 4-byte "spawn info" record indexed by
 `entry`, and a 6-byte position record indexed by that record's `val3`
-field). `entity->vtable[0x13]` is the SAME slot `func_8005CF34` (matched
+field). `entity->vtable[0x13]` is the SAME slot `DespawnDreamAuxEntity` (matched
 earlier this round) dispatches through, reusing `DreamAuxObjFn13`.
 `D_8008ABFC`'s vtable slot 0x3A (byte offset 0xE8) and `entity`'s slot 0x11
 (byte offset 0x44) are new, function-local typedefs.
@@ -91,7 +93,7 @@ Four attempts to byte-exact, three distinct mechanisms:
 
 1. **First pass (3/79, one word too long, 90339 bytes of drift):** wrote
    `kind`/`entry` as `u8` (matching the ALREADY-CORRECT prototype this
-   function's caller, `func_8005CAB4`, already used) and cast `kind` through
+   function's caller, `ProcessDreamAuxTriggerRecord`, already used) and cast `kind` through
    an explicit `(void *)(s32)kind`. This produced spurious `andi $x, $y,
    0xff` masks at the FUNCTION ENTRY for both parameters, which retail does
    not have. This is exactly the round-10-era learning already on file in
@@ -102,7 +104,7 @@ Four attempts to byte-exact, three distinct mechanisms:
    words (array index, opaque `void *` argument) with no narrowing -- so the
    fix was to WIDEN THE CALLEE'S OWN PARAMETER TYPES to `s32` in both the
    definition and (necessarily, to avoid a silent `conflicting types` error)
-   the shared header prototype. Rebuilding confirmed `func_8005CAB4` (the
+   the shared header prototype. Rebuilding confirmed `ProcessDreamAuxTriggerRecord` (the
    only caller, already matched) is UNAFFECTED by this change -- its own
    69/69 score held exactly, because its call-site arguments are already
    memory loads (`record->kind`, a cast byte read) that zero-extend for free

@@ -4,7 +4,7 @@
 const char D_8001186C[] = "ETC\\SYMSPY.MOM";
 const char D_8001187C[] = "ETC\\SYMDOG.MOM";
 
-void func_8005C508(void)
+void InitDreamAux(void)
 {
     DreamAuxLoadReq req;
     u32 i;
@@ -24,7 +24,7 @@ void func_8005C508(void)
     }
 }
 
-void func_8005C5E8(void)
+void TickDreamAuxSlots(void)
 {
     DreamAuxSlot *slot = D_80088D28;
     u32 done;
@@ -49,7 +49,7 @@ extern s32 D_8008AC08;
 
 void SetTeleportsEnabled(s32 triggerType);
 
-void func_8005C650(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     DreamAuxSlot *slot = D_80088D28;
     u32 i;
@@ -76,7 +76,7 @@ void SetTeleportsEnabled(s32 triggerType)
     func_8005BF68(triggerType == 0xB || triggerType == 3);
 }
 
-void func_8005C714(s32 triggerType)
+void EnableTeleportsForKind(s32 triggerType)
 {
     if (triggerType == 0x4E) {
         goto call;
@@ -97,7 +97,7 @@ call:
     func_8005BF68(1);
 }
 
-void func_8005C76C(void)
+void TickDreamAuxSlots2(void)
 {
     u32 done;
     DreamAuxSlot *slot;
@@ -118,29 +118,29 @@ void func_8005C76C(void)
 
 extern s32 rand(void);
 
-s32 func_8005C8AC(s16 *a0);
-bool func_8005C9A4(s32 coordParity, s8 *entry);
-s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2);
-void func_8005CF34(DreamAuxSlot *a0);
+s32 LookupDreamAuxTrigger(s16 *a0);
+bool CheckTriggerParity(s32 coordParity, s8 *entry);
+s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2);
+void DespawnDreamAuxEntity(DreamAuxSlot *a0);
 
-s32 func_8005C7D4(s32 a0, s16 *a1, s32 a2)
+s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
 {
-    s32 record = func_8005C8AC(a1);
+    s32 record = LookupDreamAuxTrigger(a1);
 
     if (record != 0) {
-        if (func_8005C9A4(a2, (s8 *)record)) {
-            return func_8005C9DC(a2, (s8 *)record, a0);
+        if (CheckTriggerParity(a2, (s8 *)record)) {
+            return FireDreamAuxTriggerEntries(a2, (s8 *)record, a0);
         }
         if (D_8008ABF8 != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            func_8005CF34(D_80088D28);
+            DespawnDreamAuxEntity(D_80088D28);
         }
     }
     return 0;
 }
 
-s32 func_8005C930(s32 a0, s32 a1);
+s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1);
 
-s32 func_8005C8AC(s16 *a0)
+s32 LookupDreamAuxTrigger(s16 *a0)
 {
     s32 idx = D_8008ABF8;
     s32 count = D_80089AC4[idx];
@@ -149,14 +149,14 @@ s32 func_8005C8AC(s16 *a0)
 
     for (i = 0; i < count; i++) {
         if (*a0 == entry->key) {
-            return func_8005C930((s32)entry, i);
+            return AdjustDreamAuxTriggerOffset((s32)entry, i);
         }
         entry++;
     }
     return 0;
 }
 
-s32 func_8005C930(s32 a0, s32 a1)
+s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
 {
     s32 val = D_8008ABF8;
 
@@ -173,11 +173,11 @@ s32 func_8005C930(s32 a0, s32 a1)
 
 /* True when `entry`'s side/parity byte (offset 0x2) disagrees with
  * `coordParity`'s own parity. `entry` is a candidate spawn/link record from
- * one of this unit's stage tables (see func_8005C8AC); its layout beyond this
+ * one of this unit's stage tables (see LookupDreamAuxTrigger); its layout beyond this
  * one byte is not yet known here, so it is addressed by byte offset rather
  * than through a named struct. A parity byte of 0 means "no side constraint",
  * hence the early `true`. */
-bool func_8005C9A4(s32 coordParity, s8 *entry)
+bool CheckTriggerParity(s32 coordParity, s8 *entry)
 {
     bool result = true;
 
@@ -189,9 +189,9 @@ bool func_8005C9A4(s32 coordParity, s8 *entry)
 }
 
 extern TriggerWorld *func_80044A0C(s32 *ctx);
-bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
+bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
 
-s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
+s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
 {
     s32 ctxArg[4];
     TriggerWorld *world;
@@ -210,7 +210,7 @@ s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
             if (entry == -1) {
                 break;
             }
-            func_8005CAB4(a0, a1, (TriggerRecord *)((u8 *)base + entry * 8), world);
+            ProcessDreamAuxTriggerRecord(a0, a1, (TriggerRecord *)((u8 *)base + entry * 8), world);
             p++;
         }
         return (s32)world;
@@ -218,18 +218,18 @@ s32 func_8005C9DC(s32 a0, s8 *a1, s32 a2)
     return 0;
 }
 
-bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world)
+bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world)
 {
     s8 *p;
     s8 *end;
     void *callResult;
     s32 scratch[4];
 
-    if (!func_8005CBC8(value, record)) {
+    if (!CheckDreamAuxTriggerCondition(value, record)) {
         goto fail;
     }
 
-    func_8005C714(record->kind);
+    EnableTeleportsForKind(record->kind);
 
     p = record->entries;
     end = record->entries + 4;
@@ -244,7 +244,7 @@ bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *wo
         if (*p == -1) {
             break;
         }
-        if (func_8005CDF8(record->kind, scratch, ctx, (u8)*p)) {
+        if (SpawnDreamAuxTriggerEntity(record->kind, scratch, ctx, (u8)*p)) {
             return true;
         }
         p++;
@@ -252,14 +252,14 @@ bool func_8005CAB4(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *wo
 
 skip:
     if (record->kind == 2) {
-        return func_8005CAB4(value, ctx, record + 1, world);
+        return ProcessDreamAuxTriggerRecord(value, ctx, record + 1, world);
     }
 
 fail:
     return false;
 }
 
-/* func_8005CBC8 -- MATCHED round 25.  The last word came from BASIC-BLOCK
+/* CheckDreamAuxTriggerCondition -- MATCHED round 25.  The last word came from BASIC-BLOCK
  * ORDER, not from the expression shapes.  Retail lays the `sel >= 0` arm
  * out BETWEEN the `return false` path and the `~sel + 1` tail, so it needs
  * an explicit `j` over the join; the obvious spelling
@@ -268,10 +268,10 @@ fail:
  * short forever.  Writing the inner test as `if (unk0 == 0) goto negate;
  * return false;`, with the `idx = sel; goto have_idx;` block placed
  * textually BEFORE the `negate:` label, reproduces retail's block order
- * exactly.  See docs/match-reports/func_8005CBC8.md.
+ * exactly.  See docs/match-reports/CheckDreamAuxTriggerCondition.md.
  */
 
-bool func_8005CBC8(s32 value, TriggerRecord *record)
+bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
 {
     s8 sel = record->sel;
     s32 idx;
@@ -298,7 +298,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!func_8005CDA8(value, idx - 1)) {
+        if (!MatchesDreamAuxRange(value, idx - 1)) {
             return false;
         }
         break;
@@ -335,7 +335,7 @@ have_idx:
         break;
     default:
         if (idx >= 10) {
-            if (!func_8005CD58(idx)) {
+            if (!CheckDreamAuxWorldState(idx)) {
                 return false;
             }
         }
@@ -349,7 +349,7 @@ success:
 
 /* Compares the vtable-slot-0x80 result of `*D_8008AC00` (TriggerWorldFn80,
  * include/code_4cd08.h) against a per-idx signed byte from D_80088D16. */
-bool func_8005CD58(s32 idx)
+bool CheckDreamAuxWorldState(s32 idx)
 {
     TriggerWorld *w = (TriggerWorld *)D_8008AC00;
     s32 val = D_80088D16[idx];
@@ -358,7 +358,7 @@ bool func_8005CD58(s32 idx)
     return val == result;
 }
 
-bool func_8005CDA8(s32 a0, s32 a1)
+bool MatchesDreamAuxRange(s32 a0, s32 a1)
 {
     s32 target = (a0 - 1) / 30 + 1;
     s32 i;
@@ -404,7 +404,7 @@ extern u8 D_80088F18[];
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
 typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
 
-bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry)
+bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 {
     DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)D_8008AC04);
 
@@ -443,7 +443,7 @@ bool func_8005CDF8(s32 kind, void *out, void *ctx, s32 entry)
 extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4); /* arity-ok: definition is 3-parameter, but arg4 is byte-load-bearing HERE -- retail emits `move a3,zero` at 0x8005CF7C */
 extern void Class6B5CC__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
-void func_8005CF34(DreamAuxSlot *a0)
+void DespawnDreamAuxEntity(DreamAuxSlot *a0)
 {
     if (a0->entity != NULL) {
         s32 localPos[3];

@@ -15,7 +15,7 @@
 >
 > **How it stayed hidden for three rounds is the part worth keeping.** Round
 > 22 built the `REOPENED -- ASSIGNABLE` marker and swept for reports citing
-> `addiu_at`; round 23 found it had missed `func_8005CBC8` (99/100) because
+> `addiu_at`; round 23 found it had missed `CheckDreamAuxTriggerCondition` (99/100) because
 > that report "does not look like a stub"; this one and its siblings were
 > missed for the same reason, one step further. They open with a **HEAD
 > ADJUDICATION** box certifying the diagnosis as independently reproduced and

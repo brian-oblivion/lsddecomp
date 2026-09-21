@@ -169,7 +169,7 @@ void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, 
 
 void func_80053134(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
-    func_8005C76C();
+    TickDreamAuxSlots2();
     func_80054D30();
     self->unk54->methods->slot48(self->unk54);
 }
@@ -303,7 +303,7 @@ struct UnkCObj_3bb8c_l {
 /* Uncarved cross-unit helper (code_4cd08.c, MATCHED round 43) -- no header
  * declares it, so this unit's own call-site typing is local, all-`s32`
  * per that function's own definition. */
-extern void func_8005C650(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 /* This unit's own local reading of the already-matched `GetStageGridDimensions`
  * (include/StageGrid.h, `(s32 index)` -> `StageGridDimensions *`) -- kept
@@ -336,7 +336,7 @@ void func_800534C8(Obj87034_3bb8c_l *self) {
 
     unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
 
-    func_8005C650((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
+    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
 
     unk14 = self->unk14;
     self->methods->slot10(self, (s32)unk14);
