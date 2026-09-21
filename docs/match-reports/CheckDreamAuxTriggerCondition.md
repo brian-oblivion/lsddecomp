@@ -369,7 +369,7 @@ when `record->triggered` (offset `0x0`, signed byte; named round 63 --
 see `## Naming` below) is nonzero, else `idx = -sel`. Dispatches on
 `idx - 2` through a 20-entry jump table:
 
-- 0,1,2: delegate to `MatchesDreamAuxRange(value, idx - 1)`.
+- 0,1,2: delegate to `MatchesDreamAuxProgression(value, idx - 1)`.
 - 3: succeed iff `value % 3 == 0`.
 - 4: succeed iff `value % 3 != 0`.
 - 5: succeed iff `func_8005630C()` (no args) is truthy.
@@ -419,7 +419,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!MatchesDreamAuxRange(value, idx - 1)) {
+        if (!MatchesDreamAuxProgression(value, idx - 1)) {
             return false;
         }
         break;
@@ -506,7 +506,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!MatchesDreamAuxRange(value, idx - 1)) {
+        if (!MatchesDreamAuxProgression(value, idx - 1)) {
             return false;
         }
         break;
@@ -560,8 +560,8 @@ success:
 }
 ```
 
-Needs `TriggerRecord`, `MatchesDreamAuxRange`, `func_8005630C`, `CheckDreamAuxWorldState` from
-`include/code_4cd08.h` (already added this round -- `MatchesDreamAuxRange` is
+Needs `TriggerRecord`, `MatchesDreamAuxProgression`, `func_8005630C`, `CheckDreamAuxWorldState` from
+`include/code_4cd08.h` (already added this round -- `MatchesDreamAuxProgression` is
 matched, see its own report; `func_8005630C`/`CheckDreamAuxWorldState` are still
 `INCLUDE_ASM` elsewhere in this unit and off-limits this round, gp-relative-
 blocked per `docs/research/gp-relative-blocker.md`).

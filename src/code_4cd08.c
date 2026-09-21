@@ -298,7 +298,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!MatchesDreamAuxRange(value, idx - 1)) {
+        if (!MatchesDreamAuxProgression(value, idx - 1)) {
             return false;
         }
         break;
@@ -358,7 +358,7 @@ bool CheckDreamAuxWorldState(s32 idx)
     return val == result;
 }
 
-bool MatchesDreamAuxRange(s32 a0, s32 a1)
+bool MatchesDreamAuxProgression(s32 a0, s32 a1)
 {
     s32 target = (a0 - 1) / 30 + 1;
     s32 i;

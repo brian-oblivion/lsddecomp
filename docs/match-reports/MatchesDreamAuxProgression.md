@@ -1,12 +1,14 @@
+> Renamed from `MatchesDreamAuxRange` on 2026-09-21 (tools/rename.py). Address 0x8005cda8.
+
 > Renamed from `func_8005CDA8` on 2026-09-21 (tools/rename.py). Address 0x8005cda8.
 
-# MatchesDreamAuxRange -- MATCHED
+# MatchesDreamAuxProgression -- MATCHED
 
 Unit `code_4cd08` ("DreamAux"). 20/20 words, `0x4D5A8`-`0x4D5F8`. Whole-image
 `build-and-verify.sh` green. First attempt matched.
 
 ```c
-bool MatchesDreamAuxRange(s32 a0, s32 a1)
+bool MatchesDreamAuxProgression(s32 a0, s32 a1)
 {
     s32 target = (a0 - 1) / 30 + 1;
     s32 i;
@@ -28,7 +30,7 @@ bool MatchesDreamAuxRange(s32 a0, s32 a1)
 4-step arithmetic-progression search with stride 3), returning `true` on
 the first match and `false` if none of the 4 hit. Called from
 `CheckDreamAuxTriggerCondition` (still `INCLUDE_ASM`, see its stall report) as
-`MatchesDreamAuxRange(value, idx - 1)` for switch indices 0-2 (i.e. `idx-1` in
+`MatchesDreamAuxProgression(value, idx - 1)` for switch indices 0-2 (i.e. `idx-1` in
 `{1,2,3}`), suggesting `a1` is something like "which of a small fixed set of
 3-wide day/slot buckets does `value` fall into" and this checks against
 3 different starting offsets depending on which of those 3 switch cases
@@ -64,7 +66,7 @@ gives the wrong bucket but truncating (round-toward-zero) division doesn't.
 
 ## Naming
 
-**MatchesDreamAuxRange** — tier A. A pure predicate: `target = (a0-1)/30+1`,
+**MatchesDreamAuxProgression** — tier A. A pure predicate: `target = (a0-1)/30+1`,
 then tests whether `a1` equals `target`, `target+3`, `target+6` or
 `target+9` (stride-3, 4-step arithmetic progression), true on the first hit.
 The mechanics (a range/bucket membership test) ARE the name; tier A by the
@@ -72,3 +74,20 @@ pure-leaf rule. Deliberately did NOT name this around "day" despite the
 division by 30 -- `a0` traces back to an external caller's opaque field
 (`child->unk4->unk34` via `TryDreamAuxTrigger`), and nothing in this unit
 ties it to an actual day counter.
+
+## Head review, round 63: `MatchesDreamAuxRange` -> `MatchesDreamAuxProgression`
+
+Renamed at merge review (`tools/rename.py`, image byte-identical). The runner's
+evidence for tier A is sound -- this is a pure leaf whose mechanics are its
+purpose -- but the word "Range" asserted a property the body does not have.
+
+The body derives `target = (a0 - 1) / 30 + 1` and then tests `target` against
+`a1`, `a1 + 3`, `a1 + 6`, `a1 + 9`: membership in a four-element arithmetic
+progression of STRIDE 3, not in a contiguous range. A reader who trusted
+"Range" would expect `a1 <= target <= a1 + 3` and would misread the sole call
+site (`!MatchesDreamAuxProgression(value, idx - 1)`) in a way the disassembly
+does not support. Tier stays A; only the noun changed.
+
+The `/ 30` is suggestive of a day-to-period conversion given this project's
+`DreamSys__AdvanceDay`, but nothing in this unit establishes it, so the name
+does not encode it.
