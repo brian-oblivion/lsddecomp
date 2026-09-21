@@ -317,7 +317,7 @@ extern void *D_8008E0C8[];
 extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
 extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);
 extern void **func_80054FD8(void **arg0, void *arg1);
-extern void *func_8005511C(void *arg0, void *arg1);
+extern void **func_8005511C(void **arg0, void *arg1);
 
 void func_80054B84(void *arg0) {
     s32 base;
@@ -556,17 +556,31 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0BC;
 
-/* STALL, 16/79 words, 1 word short (78/79 built) -- see
- * docs/match-reports/func_8005511C.md. Round 48: check 3 confirms AGREE
- * (scaffold Insertions 12, Deletions 13, Reorderings 3 vs in-tree
- * rebuild's identical 16/79 with expected out-of-range drift from the
- * 1-word-short size). Preserved near-miss body: */
+/* STALL, 49/79 words, length EXACT (round 64, charlie: was 16/79 and 1 word
+ * short).  Two levers closed the length gap and the whole prologue:
+ *   (1) `u8 **q = &D_8008E0B0;` -- retail CACHES that address in a
+ *       callee-saved register and derives D_8008E0A4's address from it as
+ *       `q - 0xC`, which is the idiom func_80054FD8 below already uses.
+ *       16/79 (1 short) -> 42/79 (exact).
+ *   (2) the arg0 shape of the matched sibling func_80054F30 -- `void **`
+ *       parameter, `*arg0 = ...; arg0++; return arg0;` rather than a cast
+ *       and `+ 4`.  42/79 -> 49/79, and the $s1/$s2 parameter colours and
+ *       the entire prologue then matched exactly.
+ * Residue is now ONLY the scheduling interleave (retail hoists the /20
+ * `mult` and the D_8008AC74 load into the /3 `multu`'s latency window,
+ * ahead of the D_8008E0C0 address) plus the if/else block order.
+ * MEASURED NEGATIVE, twice, on two different bodies: inverting the arms to
+ * `% 20 != 0` first regresses (16->9/79 and 49->13/79) and reintroduces
+ * length drift -- cc1 collapses `v0 = 0` into the branch delay slot and
+ * loses retail's `addiu a2,a2,4` there.  Do not re-derive that.
+ * Preserved near-miss body: */
 #if 0
-void *func_8005511C(void *arg0, void *arg1) {
+void **func_8005511C(void **arg0, void *arg1) {
     s32 idx;
     s32 randval;
     s32 v0;
     s32 *slot;
+    u8 **q;
 
     idx = (u32) rand() % 3;
     slot = D_8008E0C0;
@@ -579,11 +593,13 @@ void *func_8005511C(void *arg0, void *arg1) {
     }
     *slot = v0;
     func_80055258(arg1, (void *) D_80087330);
-    D_8008E0B0 = D_80087174;
+    q = &D_8008E0B0;
+    *q = D_80087174;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
-    *(void **) arg0 = func_80056320((void *) 2, (u8 *) &D_8008E0B0 - 0xC, (void *) D_8008AB4C, arg1);
-    return (u8 *) arg0 + 4;
+    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+    arg0++;
+    return arg0;
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005511C);
