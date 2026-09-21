@@ -131,11 +131,11 @@ void func_80065A5C(Class65650 *self, void *arg)
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
 #endif
 
-/* STALL -- see docs/match-reports/func_80065AE0.md. Best reached: 33/40
- * words in-range, no size drift, residue is the `arg` parameter's copy
- * into its callee-saved register being deferred past the `blez` guard.
- * Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 33/40 words, length exact. Residue: compound of the same
+ * 3-way callee-save store-order permutation as func_80065A5C ($s0/$ra/$s1)
+ * plus the `arg` parameter's copy into $s3 deferred past the `blez` guard
+ * (docs/match-reports/func_80065AE0.md). Hand-derived. */
 void func_80065AE0(Class65650 *self, void *arg)
 {
     u8 unused[8];
@@ -155,9 +155,9 @@ void func_80065AE0(Class65650 *self, void *arg)
     base = DreamSys__GetBaseMethods();
     base->slot70(self, arg);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065AE0);
+#endif
 
 void func_80065B80(Class65650 *self, void *arg1, s32 val)
 {
