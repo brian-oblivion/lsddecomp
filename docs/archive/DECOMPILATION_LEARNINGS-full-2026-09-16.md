@@ -8624,3 +8624,176 @@ here, under the heading of the entry they came from.
 
 - The permuter-history screen also counted the bare string `15862+` as
   never-searched.
+
+## Distilled out on 2026-09-21 (round 63)
+
+`docs/DECOMPILATION_LEARNINGS.md` was cut from 835 to 792 lines against the
+800-line budget `tools/plan.py` enforces. No rule was dropped. Most of the
+reduction came from reflowing every paragraph to a consistent fill width (a
+pure line-break change — verified byte-for-byte identical to the pre-round-63
+text once whitespace is normalized, so nothing in this category needs
+recording here). Seven near-duplicate entries were merged; both original
+bold lead-ins are quoted below, and the full content of both survives in the
+merged entry, so nothing from these seven is otherwise repeated here. The
+remaining category is ordinary narrative trimming — secondary examples,
+extra measured instances and cross-references cut from individual entries
+that were already within budget. Kept here, under the heading of the entry
+they came from.
+
+### Merges (both halves survive, combined into one entry)
+
+**2. Build hygiene, "To learn a shape from a MATCHED sibling"**
+
+- "A value in an ARGUMENT register live at the next call IS an argument,
+  even when its only visible use is a branch condition" merged with
+  "A delay-slot residue writing `$a0`-`$a3` is a CALL ARGUMENT until proven
+  otherwise." (now one entry in 3f, Calls/arguments/return types)
+
+**3a. Control flow, guard placement**
+
+- "A guard's source POSITION decides where its block lands; its POLARITY
+  does not." merged with "Statement ORDER drives load-delay scheduling, and
+  the effect is INVERTED in the output." (now one entry, "Two independent
+  CFG/scheduling levers, both from `func_8002C278` (round 60)")
+- "`if`/`else` codegen is MECHANICAL: the test is always NOT(what you
+  wrote), the `if`-body falls through" merged with "Write a small early
+  exit as an inverted guard — a DEFAULT, not a rule"
+
+**3d. Locals, register identity**
+
+- "A same-size pointer cast in a FUNCTION-SCOPE local can cost a
+  callee-saved register — the cost is LIFETIME, not the name" merged with
+  "Cache a re-read struct field only across a CALL-FREE span; reload after
+  any intervening call"
+
+**3f. Calls, return types**
+
+- "A discarded return value is never evidence of `void`" merged with "A
+  declared RETURN TYPE can block a cross-jump merge that should happen"
+
+**3h. volatile and memory**
+
+- "`volatile` is the NARROW instrument for the instruction-ORDER class, and
+  it is not the banned construct" merged with "The discriminator is
+  EVIDENCE that the location is memory-mapped I/O, not whether `volatile`
+  helps."
+
+**3i. GTE and inline asm**
+
+- "The permitted barrier is inert against every pass that is not the
+  scheduler" merged with "Three conditions must hold for a barrier to be
+  worth trying."
+
+### Narrative trimmed from entries kept at budget
+
+**2. Build hygiene, "To learn a shape from a MATCHED sibling"**
+
+- The mechanism-level detail behind the round-62 close: "because the
+  matched `func_80031280`'s compiled tail IS retail's tail instruction for
+  instruction; round 32 had compared the same pair in C, found a real
+  `u32`/`u16` mask asymmetry, and missed that the sibling caches nothing --
+  the four cached locals were two documented residue clusters at once."
+
+**2. Build hygiene, rodata `D_XXXXXXXX` strings**
+
+- "The mechanism is a fact about this build system and stands on the
+  round-20 `func_8003FC70` whole-image green, the one SDK-exit precedent
+  that survives" was compressed to a clause; the full sentence form is
+  preserved here for anyone searching on it verbatim.
+
+**3a. Control flow, `do { ... } while (0)` is a REAL RTL construct**
+
+- "Saturates at one placement."
+
+**3a. Control flow, loop optimisations SYNTAX-GATED**
+
+- "; the address-CSE alias fix in 3h is global-only" (a cross-reference
+  from the round-54 entry to the 3h address-CSE-defeated-by-asm-label-alias
+  entry).
+
+**3b. Switch and jump tables, JUMP-TABLE WIDTH**
+
+- "the pivot tree depends on the exact value SET, so" (qualifier ahead of
+  "a GAP is evidence of an empty case").
+
+**3c. Struct layout, struct-layout claim settled CORPUS-WIDE**
+
+- "and settle a data-modelling hypothesis by reading the DATA SECTION."
+
+**3d. Locals, "A named C variable gets ONE storage location"**
+
+- "and narrower than naming: two pinned-pipeline reproducers show" (the
+  rematerialization trigger was described as coming from "two
+  pinned-pipeline reproducers"; the entry now just states the mechanism).
+- "(no-call control: one materialization)" — the negative control that
+  confirmed the CALL is what triggers rematerialization.
+
+**3d. Locals, "`do { } while (0)` is a REGISTER-PRESSURE lever"**
+
+- Two of the five measured instances in the original enumeration:
+  "regressive on an unrelated matched sequence" and "61/70 -> 62/70 around
+  one early return" (three of the five — four delay-slot-fill sites, a
+  4-word length closer elsewhere, and the catastrophic 66/69 -> 1/69 whole
+  -function case — remain in the entry).
+
+**3d. Locals, "mention a value twice" lever**
+
+- "Ask which of the two the candidate value is before spending an
+  attempt."
+
+**3j. Permuter practice, "A permuter run that plateaus with NO MOVEMENT"**
+
+- "and round 45 rejected a correct lever on that 5-word drop" (trailing off
+  the word-score-misleads corollary; the corollary's own figures — 27/27 ->
+  11/11 -> 7/7 -> 0/0 against 61 -> 56 -> 91 -> 213 — remain).
+
+**4. Verdict classes, register-identity verdict DECAYS**
+
+- "a figure taken before the last structural change is evidence about that
+  older body."
+
+**4. Verdict classes, "Register identity" is the LEAST reliable class**
+
+- Three of the seven contaminant examples in the original enumeration: "a
+  statement swap between independent stores", "a discarded return on a
+  wrongly-`void` function", and "a cached local masquerading as
+  SATURATION" (four remain: the masked byte parameter, the missing
+  field-offset term, the stale helper signature, and the field-copy pair).
+
+**4. Verdict classes, register-identity verdict is a HYPOTHESIS**
+
+- "one census member had `Register Differences: 0`, and" (a specific
+  `--debug` census instance ahead of the general "a differing register
+  COUNT is not identity at all" rule).
+
+**4. Verdict classes, "Pure register rotation" / saturated file**
+
+- "above the threshold a full PERMUTATION and a missing-register
+  FRAME-SIZE gap share no fix" (the saturated-file class's boundary case).
+
+**4. Verdict classes, callee-saved demand screen**
+
+- "because a screen built only from the failures it predicted needs a
+  deliberate attempt on its wrong side" (the reasoning behind why the
+  threshold was corrected twice; the correction itself — 5 -> 7, then 7+
+  matched byte-exact at 8 — remains).
+
+**4. Verdict classes, "N words short" vs "N/M words match"**
+
+- "\"one instruction short\" can be FOUR stacked residues, and an
+  instruction that MOVED is ONE residue" (two more worked examples of the
+  same-reading-different-meaning trap; the 144/145-vs-50/145 and
+  216/217-scored-465 examples remain).
+
+**4. Verdict classes, a lever's NEGATIVE is scoped**
+
+- "Equally, a lever found on one function is evidence about THAT function
+  until a second confirms it, and a" (the positive-direction restatement
+  ahead of "a class several reports agree on may be one error copied").
+
+**4. Verdict classes, budget by ATTEMPT HISTORY**
+
+- "and a sibling's iteration count" (a second thing the permuter-history
+  screen miscounts, alongside the word "permuter").
+- "count trivial `jr $ra; nop` functions separately," (a second ranking
+  instruction, alongside "rank a fresh unit by SIBLING GROUP").
