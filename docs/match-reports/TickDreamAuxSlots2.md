@@ -3,8 +3,8 @@
 # TickDreamAuxSlots2 -- MATCHED
 
 Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
-`build-and-verify.sh` green. Same shape as `TickDreamAuxSlots`, over `D_80088D2C`
-instead of `D_80088D28` (see that report for the object/vtable/loop-shape
+`build-and-verify.sh` green. Same shape as `TickDreamAuxSlots`, over `gDreamAuxSlots2`
+instead of `gDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
 
 ```c
@@ -14,7 +14,7 @@ void TickDreamAuxSlots2(void)
     DreamAuxSlot *slot;
 
     done = 0;
-    slot = D_80088D2C;
+    slot = gDreamAuxSlots2;
 
     for (; done < 1; done++) {
         DreamAuxObj *obj = slot->obj;
@@ -31,7 +31,7 @@ void TickDreamAuxSlots2(void)
 ## Residue: prologue spill/init INTERLEAVING, not just store order
 
 The first, direct port of `TickDreamAuxSlots`'s shape (`DreamAuxSlot *slot =
-D_80088D2C; u32 done;`, initializers at declaration) built clean but only
+gDreamAuxSlots2; u32 done;`, initializers at declaration) built clean but only
 21/26 -- the two callee-save spills and their register inits were emitted in
 the wrong relative order:
 
@@ -54,7 +54,7 @@ from C; use a bare `__asm__("")` as the first statement), I checked whether
 this is the same class of residue before reshaping further:
 
 - Swapping the *declaration* order alone (`u32 done;` before
-  `DreamAuxSlot *slot = D_80088D2C;`, both still initialized in their
+  `DreamAuxSlot *slot = gDreamAuxSlots2;`, both still initialized in their
   declarators) made **no difference** -- still 21/26, byte-identical to the
   unswapped version. Confirms declaration order alone does not reach
   whatever pass decides this, same finding as the broadcast.
@@ -65,7 +65,7 @@ this is the same class of residue before reshaping further:
   residue.
 - What worked: splitting the declarations from their initialization into
   separate STATEMENTS, in the order retail wants (`done = 0;` before
-  `slot = D_80088D2C;`), with the declarations themselves left in either
+  `slot = gDreamAuxSlots2;`), with the declarations themselves left in either
   order. This is a genuinely different C shape from an initializer at the
   declarator (not just cosmetically -- GCC 2.6.3 apparently schedules
   spill/init pairs for straight assignment statements as a unit, in

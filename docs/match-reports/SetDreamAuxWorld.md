@@ -8,7 +8,7 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on 6 `%gp_rel` references (the first to
-`D_8008ABF8`). Round 42 resolved the gp-relative blocker with
+`gDreamAuxStage`). Round 42 resolved the gp-relative blocker with
 `--gp-symbols`/`--no-nop-mflo-mfhi` (`docs/research/gp-relative-blocker.md`,
 "RESOLVED"). This function was never actually attempted under the old
 toolchain -- the round-42 stub carried no derivation to rebuild, just the
@@ -21,9 +21,9 @@ The initializer for this unit's five `%gp_rel` globals plus a one-shot
 
 ```c
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
-extern s32 D_8008ABF8;
+extern s32 gDreamAuxStage;
 extern s32 D_8008ABFC;
-extern s32 D_8008AC00;
+extern s32 gDreamAuxWorld;
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
 
@@ -31,12 +31,12 @@ void SetTeleportsEnabled(s32 triggerType);
 
 void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
-    DreamAuxSlot *slot = D_80088D28;
+    DreamAuxSlot *slot = gDreamAuxSlots;
     u32 i;
 
-    D_8008ABF8 = a0;
+    gDreamAuxStage = a0;
     D_8008ABFC = a1;
-    D_8008AC00 = a2;
+    gDreamAuxWorld = a2;
     D_8008AC04 = a3;
     D_8008AC08 = a4;
 

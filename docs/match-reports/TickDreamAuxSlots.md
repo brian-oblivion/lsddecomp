@@ -7,7 +7,7 @@ Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CDE8`-`0x4CE50`. Whole-image
 
 ## What it does
 
-Ticks slot 0 of the `D_80088D28` object-slot family exactly once: if the slot
+Ticks slot 0 of the `gDreamAuxSlots` object-slot family exactly once: if the slot
 holds a live object, call that object's method-table slot 1 (offset `0x4`)
 with the object itself as the argument, and overwrite the slot with whatever
 the call returns.
@@ -15,7 +15,7 @@ the call returns.
 ```c
 void TickDreamAuxSlots(void)
 {
-    DreamAuxSlot *slot = D_80088D28;
+    DreamAuxSlot *slot = gDreamAuxSlots;
     u32 done;
 
     for (done = 0; done < 1; done++) {
@@ -30,7 +30,7 @@ void TickDreamAuxSlots(void)
 }
 ```
 
-Uses `DreamAuxObj`, `DreamAuxTickFn`, `DreamAuxSlot`, `D_80088D28` from the new
+Uses `DreamAuxObj`, `DreamAuxTickFn`, `DreamAuxSlot`, `gDreamAuxSlots` from the new
 `include/code_4cd08.h` (see below).
 
 ## Why the "loop that only runs once" shape
@@ -45,7 +45,7 @@ no leading guard before `.L8005C604`, and `beqz $s1, .L8005C604` as the
 back-edge test. Do not "clean this up" to a plain `if` -- the loop shape
 *is* what produces the byte-exact instruction sequence.
 
-Same shape recurs at `TickDreamAuxSlots2` (below, over `D_80088D2C`) and, per
+Same shape recurs at `TickDreamAuxSlots2` (below, over `gDreamAuxSlots2`) and, per
 splat's asm, in `SetDreamAuxWorld` and `InitDreamAux`'s second loop (both
 off-limits/gp-relative or already stalled elsewhere in this unit) -- this
 looks like a recurring internal idiom for "process slot 0 of a small
@@ -53,7 +53,7 @@ object-slot table", not a one-off.
 
 ## Struct derivation
 
-`D_80088D28` stride confirmed as `0x14` (20 bytes) independently by
+`gDreamAuxSlots` stride confirmed as `0x14` (20 bytes) independently by
 `SetDreamAuxWorld` (off-limits here, gp-relative-blocked, but read for context):
 it writes a *different* field of the same array, at `+0x4`, with a
 `New_Entity()` result, while reading `+0x0` as an argument to that same call
@@ -79,7 +79,7 @@ this function alone), so the type is deliberately generic
 - **Prologue callee-save order / "let GCC hoist its own loop invariants"
   (Levers from `func_80025D10`):** the second lever *is* what's happening
   here structurally -- `slot` is a pointer named directly at the top
-  (`DreamAuxSlot *slot = D_80088D28;`), not a byte offset hand-maintained
+  (`DreamAuxSlot *slot = gDreamAuxSlots;`), not a byte offset hand-maintained
   inside the loop, and it matched first try. Consistent with "let the
   compiler own the induction variable."
 

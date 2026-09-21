@@ -28,7 +28,7 @@ typedef struct {
     s8 val3;
 } DreamAuxSpawnInfo;
 
-extern DreamAuxSpawnInfo D_80088F48[];
+extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
 
 typedef struct {
     s16 x;
@@ -40,7 +40,7 @@ typedef struct {
     s16 z;
 } DreamAuxPos6;
 
-extern DreamAuxPos6 D_80088D3C[];
+extern DreamAuxPos6 gDreamAuxPosTable[];
 extern u8 D_80088F18[];
 
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
@@ -61,14 +61,14 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         DreamAuxObj *obj;
 
         coords.ctxVal = *(u16 *)ctx;
-        rec = &D_80088F48[entry];
+        rec = &gDreamAuxSpawnInfo[entry];
         coords.recordVal0 = rec->val0;
-        coords.pos = D_80088D3C[rec->val3];
+        coords.pos = gDreamAuxPosTable[rec->val3];
 
         obj = (DreamAuxObj *)D_8008ABFC;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
         ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, D_80088F18 + rec->val2 * 12);
-        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, D_8008AC00, D_8008AC08, (void *)D_8008ABFC, outBuf);
+        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, outBuf);
         return false;
     }
     return true;
@@ -79,7 +79,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 `SetDreamAuxWorld`'s call: `(kind, out, D_8008AC04)`, where `out` is THIS
 function's own `void *out` parameter, itself a 4-word caller-provided
 scratch buffer per the header's existing comment on this function's
-signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `D_80088F48`/`D_80088D3C` are two
+signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `gDreamAuxSpawnInfo`/`gDreamAuxPosTable` are two
 more small unit-owned lookup tables (a 4-byte "spawn info" record indexed by
 `entry`, and a 6-byte position record indexed by that record's `val3`
 field). `entity->vtable[0x13]` is the SAME slot `DespawnDreamAuxEntity` (matched
@@ -119,7 +119,7 @@ Four attempts to byte-exact, three distinct mechanisms:
    `z` half-word's symbol) from the same register before storing anything.
 3. **Third pass, the fix:** merged the destination fields into a single
    embedded `DreamAuxPos6 pos;` member and did ONE whole-struct assignment,
-   `coords.pos = D_80088D3C[rec->val3];`, instead of two separate sub-field
+   `coords.pos = gDreamAuxPosTable[rec->val3];`, instead of two separate sub-field
    assignments. This is the SAME "all-s8/s16 struct, alignment 2, whole-
    struct assignment compiles to `lwl`/`lwr` + `swl`/`swr`" idiom CLAUDE.md
    already documents (confirmed there three times previously) -- but this is
@@ -128,13 +128,13 @@ Four attempts to byte-exact, three distinct mechanisms:
    assignments of its two halves) was the difference between computing the
    shared index once versus twice. Byte-exact immediately after (79/79).
 
-The `D_80088D3C`/`D_80088D3F` symbol pair (used respectively for the `lwr`
+The `gDreamAuxPosTable`/`D_80088D3F` symbol pair (used respectively for the `lwr`
 and `lwl` halves of the unaligned load, 3 bytes apart) is not referenced by
-name anywhere in this unit's C -- only `D_80088D3C` appears in the source,
+name anywhere in this unit's C -- only `gDreamAuxPosTable` appears in the source,
 scaled by `sizeof(DreamAuxPos6)` (6) through ordinary array indexing.
-`D_80088D3F` is retail's own separately-named symbol for `D_80088D3C+3`
+`D_80088D3F` is retail's own separately-named symbol for `gDreamAuxPosTable+3`
 (the byte address `lwl` needs); since both resolve to the same linked
-address, the compiler's own `+3` computation over `D_80088D3C` produces
+address, the compiler's own `+3` computation over `gDreamAuxPosTable` produces
 identical final bytes to referencing `D_80088D3F` directly. Nothing needed
 to be added to `config/` for this.
 

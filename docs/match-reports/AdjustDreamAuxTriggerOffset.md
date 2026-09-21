@@ -8,11 +8,11 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on two `%gp_rel` references (the first to
-`D_8008ABF8`). Round 42 resolved the gp-relative blocker
+`gDreamAuxStage`). Round 42 resolved the gp-relative blocker
 (`--gp-symbols`/`--no-nop-mflo-mfhi`). Never actually attempted -- the
 round-42 stub carried no derivation. Round 43 derived and matched it on the
 first build, using the `CheckDreamAuxWorldState` sibling (matched immediately before
-this one in the same round) as a template for the `D_8008AC00` vtable-0x80
+this one in the same round) as a template for the `gDreamAuxWorld` vtable-0x80
 dispatch idiom.
 
 ## What it does
@@ -20,10 +20,10 @@ dispatch idiom.
 ```c
 s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
 {
-    s32 val = D_8008ABF8;
+    s32 val = gDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
-        TriggerWorld *w = (TriggerWorld *)D_8008AC00;
+        TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
         s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
 
         if (result == val) {
@@ -34,12 +34,12 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
 }
 ```
 
-`a0 + 0x1E` (30) only happens when the unit is in state 4 (`D_8008ABF8 == 4`),
+`a0 + 0x1E` (30) only happens when the unit is in state 4 (`gDreamAuxStage == 4`),
 the caller passes `0x10` as `a1`, and a re-check of the same vtable-0x80
 predicate used by `CheckDreamAuxWorldState` still reports state 4. Otherwise `a0` is
 returned unchanged. `val` is read once into a local and reused both for the
 initial `== 4` test and the post-call re-check (`result == val`), matching
-retail's single `lw $s1, %gp_rel(D_8008ABF8)($gp)` cached across the call --
+retail's single `lw $s1, %gp_rel(gDreamAuxStage)($gp)` cached across the call --
 re-reading the global a second time in C, or comparing against the literal
 `4` instead of `val`, would very likely still be correct C but was not
 tested since the cached-local reading matched on the first build.

@@ -8,13 +8,13 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on one `%gp_rel` reference (to
-`D_8008ABF8`) plus two `addiu_at` indexed loads. Round 42 resolved both
+`gDreamAuxStage`) plus two `addiu_at` indexed loads. Round 42 resolved both
 mechanisms. Never actually attempted -- the stub carried no derivation.
 Round 43 derived and matched it fresh.
 
 ## What it does
 
-A linear search over one of 14 parallel groups (selected by `D_8008ABF8`,
+A linear search over one of 14 parallel groups (selected by `gDreamAuxStage`,
 the same index this unit also uses in `AdjustDreamAuxTriggerOffset`/`CheckDreamAuxWorldState`) for
 an entry whose 2-byte `key` matches `*a0`, dispatching the match (or its
 absence) into `AdjustDreamAuxTriggerOffset`:
@@ -25,14 +25,14 @@ typedef struct DreamAuxTriggerEntry {
     u8 unk2[4];
 } DreamAuxTriggerEntry;
 
-extern s8 D_80089AC4[];
-extern DreamAuxTriggerEntry *D_80089A8C[];
+extern s8 gDreamAuxTriggerCounts[];
+extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
 
 s32 LookupDreamAuxTrigger(s16 *a0)
 {
-    s32 idx = D_8008ABF8;
-    s32 count = D_80089AC4[idx];
-    DreamAuxTriggerEntry *entry = D_80089A8C[idx];
+    s32 idx = gDreamAuxStage;
+    s32 count = gDreamAuxTriggerCounts[idx];
+    DreamAuxTriggerEntry *entry = gDreamAuxTriggerEntries[idx];
     s32 i;
 
     for (i = 0; i < count; i++) {
@@ -45,10 +45,10 @@ s32 LookupDreamAuxTrigger(s16 *a0)
 }
 ```
 
-`D_80089AC4`/`D_80089A8C` is a second "count + pointer-to-array" parallel
+`gDreamAuxTriggerCounts`/`gDreamAuxTriggerEntries` is a second "count + pointer-to-array" parallel
 family in this unit, structurally identical to the already-documented
-`D_80089A7C`/`D_80089A44` (`InitDreamAux`) but a different stride (6 bytes,
-not 8) and a different index space (`D_8008ABF8`, not a loop counter). The
+`gDreamAuxGroupCounts`/`gDreamAuxGroupRecords` (`InitDreamAux`) but a different stride (6 bytes,
+not 8) and a different index space (`gDreamAuxStage`, not a loop counter). The
 record type is named `DreamAuxTriggerEntry` since `LookupDreamAuxTrigger`'s only
 consumer of the match, `AdjustDreamAuxTriggerOffset`, is itself part of this unit's
 trigger-dispatch cluster (`ProcessDreamAuxTriggerRecord`/`CheckDreamAuxTriggerCondition`/etc.).
@@ -58,11 +58,11 @@ trigger-dispatch cluster (`ProcessDreamAuxTriggerRecord`/`CheckDreamAuxTriggerCo
 One attempt short of byte-exact, one fix:
 
 - **First pass (10/33, 129492 bytes of drift, one word too long):**
-  `s8 count = D_80089AC4[idx];` produced a `lb` into `$v0` followed by a
+  `s8 count = gDreamAuxTriggerCounts[idx];` produced a `lb` into `$v0` followed by a
   separate `move $a2, $v0` to get the value into the register the loop bound
   needs to live in across the whole function. Retail's `lb $a2, 0x0($at)`
   loads the byte DIRECTLY into `$a2` with no intermediate register at all.
-  Widening the local from `s8` to `s32` (`s32 count = D_80089AC4[idx];`)
+  Widening the local from `s8` to `s32` (`s32 count = gDreamAuxTriggerCounts[idx];`)
   removed the extra `move` and matched retail's direct-into-`$a2` load.
   Byte-exact immediately after.
 

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "code_4cd08.h"
 
-const char D_8001186C[] = "ETC\\SYMSPY.MOM";
-const char D_8001187C[] = "ETC\\SYMDOG.MOM";
+const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
+const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
 
 void InitDreamAux(void)
 {
@@ -11,22 +11,22 @@ void InitDreamAux(void)
     s32 j;
 
     for (i = 0; i < 14; i++) {
-        for (j = 0; j < D_80089A7C[i]; j++) {
-            D_80089A44[i][j].flag = 0;
+        for (j = 0; j < gDreamAuxGroupCounts[i]; j++) {
+            gDreamAuxGroupRecords[i][j].flag = 0;
         }
     }
 
-    SetVec3(&req, 0, D_8001186C, 1);
+    SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        D_80088D28[i].obj = func_8004468C(&req);
-        req.name = D_8001187C;
+        gDreamAuxSlots[i].obj = func_8004468C(&req);
+        req.name = gMomPathSymDog;
     }
 }
 
 void TickDreamAuxSlots(void)
 {
-    DreamAuxSlot *slot = D_80088D28;
+    DreamAuxSlot *slot = gDreamAuxSlots;
     u32 done;
 
     for (done = 0; done < 1; done++) {
@@ -41,9 +41,9 @@ void TickDreamAuxSlots(void)
 }
 
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
-extern s32 D_8008ABF8;
+extern s32 gDreamAuxStage;
 extern s32 D_8008ABFC;
-extern s32 D_8008AC00;
+extern s32 gDreamAuxWorld;
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
 
@@ -51,12 +51,12 @@ void SetTeleportsEnabled(s32 triggerType);
 
 void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
-    DreamAuxSlot *slot = D_80088D28;
+    DreamAuxSlot *slot = gDreamAuxSlots;
     u32 i;
 
-    D_8008ABF8 = a0;
+    gDreamAuxStage = a0;
     D_8008ABFC = a1;
-    D_8008AC00 = a2;
+    gDreamAuxWorld = a2;
     D_8008AC04 = a3;
     D_8008AC08 = a4;
 
@@ -103,7 +103,7 @@ void TickDreamAuxSlots2(void)
     DreamAuxSlot *slot;
 
     done = 0;
-    slot = D_80088D2C;
+    slot = gDreamAuxSlots2;
 
     for (; done < 1; done++) {
         DreamAuxObj *obj = slot->obj;
@@ -131,8 +131,8 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
         if (CheckTriggerParity(a2, (s8 *)record)) {
             return FireDreamAuxTriggerEntries(a2, (s8 *)record, a0);
         }
-        if (D_8008ABF8 != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            DespawnDreamAuxEntity(D_80088D28);
+        if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
+            DespawnDreamAuxEntity(gDreamAuxSlots);
         }
     }
     return 0;
@@ -142,9 +142,9 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1);
 
 s32 LookupDreamAuxTrigger(s16 *a0)
 {
-    s32 idx = D_8008ABF8;
-    s32 count = D_80089AC4[idx];
-    DreamAuxTriggerEntry *entry = D_80089A8C[idx];
+    s32 idx = gDreamAuxStage;
+    s32 count = gDreamAuxTriggerCounts[idx];
+    DreamAuxTriggerEntry *entry = gDreamAuxTriggerEntries[idx];
     s32 i;
 
     for (i = 0; i < count; i++) {
@@ -158,10 +158,10 @@ s32 LookupDreamAuxTrigger(s16 *a0)
 
 s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
 {
-    s32 val = D_8008ABF8;
+    s32 val = gDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
-        TriggerWorld *w = (TriggerWorld *)D_8008AC00;
+        TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
         s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
 
         if (result == val) {
@@ -200,7 +200,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
     world = func_80044A0C(ctxArg);
 
     if (world != NULL) {
-        DreamAuxGroupRecord *base = D_80089A44[D_8008ABF8];
+        DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
         s8 *p = a1 + 3;
         s8 *end = a1 + 6;
 
@@ -347,11 +347,11 @@ success:
     return true;
 }
 
-/* Compares the vtable-slot-0x80 result of `*D_8008AC00` (TriggerWorldFn80,
+/* Compares the vtable-slot-0x80 result of `*gDreamAuxWorld` (TriggerWorldFn80,
  * include/code_4cd08.h) against a per-idx signed byte from D_80088D16. */
 bool CheckDreamAuxWorldState(s32 idx)
 {
-    TriggerWorld *w = (TriggerWorld *)D_8008AC00;
+    TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
     s32 val = D_80088D16[idx];
     s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
 
@@ -375,14 +375,14 @@ bool MatchesDreamAuxRange(s32 a0, s32 a1)
 /* A 4-byte record indexed by `entry` (this function's own last parameter):
  * a u16 followed by two signed bytes. `val2` indexes D_80088F18 (stride
  * 0xC, element type undiscovered -- only its address is ever taken here)
- * and `val3` indexes D_80088D3C (stride 6, see DreamAuxPos6 below). */
+ * and `val3` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6 below). */
 typedef struct {
     u16 val0;
     s8 val2;
     s8 val3;
 } DreamAuxSpawnInfo;
 
-extern DreamAuxSpawnInfo D_80088F48[];
+extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
 
 /* A 6-byte position record: a 4-byte (x,y) pair copied as ONE unaligned
  * whole-struct assignment (the idiom CLAUDE.md documents: an all-s8/s16
@@ -398,7 +398,7 @@ typedef struct {
     s16 z;
 } DreamAuxPos6;
 
-extern DreamAuxPos6 D_80088D3C[];
+extern DreamAuxPos6 gDreamAuxPosTable[];
 extern u8 D_80088F18[];
 
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
@@ -419,14 +419,14 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         DreamAuxObj *obj;
 
         coords.ctxVal = *(u16 *)ctx;
-        rec = &D_80088F48[entry];
+        rec = &gDreamAuxSpawnInfo[entry];
         coords.recordVal0 = rec->val0;
-        coords.pos = D_80088D3C[rec->val3];
+        coords.pos = gDreamAuxPosTable[rec->val3];
 
         obj = (DreamAuxObj *)D_8008ABFC;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
         ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, D_80088F18 + rec->val2 * 12);
-        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, D_8008AC00, D_8008AC08, (void *)D_8008ABFC, outBuf);
+        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, outBuf);
         return false;
     }
     return true;
@@ -449,8 +449,8 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0)
         s32 localPos[3];
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
-        Class6B5CC__LocalOffsetToWorldPos((void *)D_8008AC00, localPos, a0->pos, 0);
-        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, D_8008AC00, D_8008AC08, (void *)D_8008ABFC, localPos);
-        Class6B5CC__FaceTarget(a0->entity, (void *)D_8008AC00, 1, 0, 0);
+        Class6B5CC__LocalOffsetToWorldPos((void *)gDreamAuxWorld, localPos, a0->pos, 0);
+        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, localPos);
+        Class6B5CC__FaceTarget(a0->entity, (void *)gDreamAuxWorld, 1, 0, 0);
     }
 }

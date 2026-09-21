@@ -8,7 +8,7 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on five `%gp_rel` references (the first
-to `D_8008AC00`). Round 42 resolved the gp-relative blocker. Never actually
+to `gDreamAuxWorld`). Round 42 resolved the gp-relative blocker. Never actually
 attempted -- the stub carried no derivation. Round 43 derived and matched it.
 
 ## What it does
@@ -28,9 +28,9 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0)
         s32 localPos[3];
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
-        Class6B5CC__LocalOffsetToWorldPos((void *)D_8008AC00, localPos, a0->pos, 0);
-        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, D_8008AC00, D_8008AC08, (void *)D_8008ABFC, localPos);
-        Class6B5CC__FaceTarget(a0->entity, (void *)D_8008AC00, 1, 0, 0);
+        Class6B5CC__LocalOffsetToWorldPos((void *)gDreamAuxWorld, localPos, a0->pos, 0);
+        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, localPos);
+        Class6B5CC__FaceTarget(a0->entity, (void *)gDreamAuxWorld, 1, 0, 0);
     }
 }
 ```

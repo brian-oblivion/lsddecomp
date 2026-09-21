@@ -8,14 +8,14 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on one `%gp_rel` reference (to
-`D_8008AC00`) plus one `addiu_at` indexed-load. Round 42 resolved both
+`gDreamAuxWorld`) plus one `addiu_at` indexed-load. Round 42 resolved both
 (`--gp-symbols`, and `addiu_at` back in round 21). Never actually attempted
 under the old toolchain -- the stub carried no derivation. Round 43 derived
 and matched it fresh.
 
 ## What it does
 
-A predicate: call the object at global `D_8008AC00`'s vtable slot 0x80 (byte
+A predicate: call the object at global `gDreamAuxWorld`'s vtable slot 0x80 (byte
 offset 0x200) with no argument but `self`, and compare the (word-sized)
 result against a per-`idx` signed byte from a small lookup table
 `D_80088D16`.
@@ -25,7 +25,7 @@ typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
 
 bool CheckDreamAuxWorldState(s32 idx)
 {
-    TriggerWorld *w = (TriggerWorld *)D_8008AC00;
+    TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
     s32 val = D_80088D16[idx];
     s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
 
@@ -65,7 +65,7 @@ bool CheckDreamAuxWorldState(s32 idx)
    reading `$s0` first) reproduced the exact register choice. Byte-exact on
    this change.
 
-`D_8008AC00`'s declaration (`extern s32 D_8008AC00;`, shared with
+`gDreamAuxWorld`'s declaration (`extern s32 gDreamAuxWorld;`, shared with
 `SetDreamAuxWorld`) predates this function; it is cast to `TriggerWorld *` at
 the point of use here rather than declared as a pointer at file scope, since
 `SetDreamAuxWorld` treats the same global as a generic `s32` parameter store.

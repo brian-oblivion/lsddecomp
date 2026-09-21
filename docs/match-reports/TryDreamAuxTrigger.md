@@ -8,7 +8,7 @@
 ## History
 
 Filed BLOCKED in round 2026-08-30-a on one `%gp_rel` reference (to
-`D_8008ABF8`). Round 42 resolved the gp-relative blocker. Never actually
+`gDreamAuxStage`). Round 42 resolved the gp-relative blocker. Never actually
 attempted -- the stub carried no derivation. Round 43 derived and matched it.
 
 ## What it does
@@ -34,8 +34,8 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
         if (CheckTriggerParity(a2, (s8 *)record)) {
             return FireDreamAuxTriggerEntries(a2, record, a0);
         }
-        if (D_8008ABF8 != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            DespawnDreamAuxEntity(D_80088D28);
+        if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
+            DespawnDreamAuxEntity(gDreamAuxSlots);
         }
     }
     return 0;
@@ -47,7 +47,7 @@ function's own report) is kept as a plain `s32` and cast to `s8 *` only at
 the point `CheckTriggerParity` needs it (that function's own signature takes a
 raw `s8 *`, per its existing match report) -- there is no evidence either
 way that this is a distinct pointer type worth naming, so it stays untyped
-like `D_8008AC00` elsewhere in this unit.
+like `gDreamAuxWorld` elsewhere in this unit.
 
 `FireDreamAuxTriggerEntries` is forward-declared here with a placeholder `(s32, s32,
 s32)` signature to be filled in when that function (also queued this round)
@@ -86,7 +86,7 @@ One attempt short of byte-exact, one arithmetic-idiom fix:
   that difference was just the reproducer's own `return (cond);` idiom
   materializing a boolean where the real call site's `if (...)` guard
   branches directly; it went away once substituted into the real
-  `if (D_8008ABF8 != 0 && rand() % 12 == 0 && (a2 & 1) == 0)` guard. Fixing
+  `if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0)` guard. Fixing
   the divisor alone (`% 3` -> `% 12`) reached byte-exact.
 
 ## Proposed learning

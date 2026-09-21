@@ -27,15 +27,15 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
  * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
  * `Class6B5CC__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
- * confirmed by SetDreamAuxWorld's walk over D_80088D28. */
+ * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
 typedef struct DreamAuxSlot {
     void *obj;
     DreamAuxObj *entity;
     s32 pos[3];
 } DreamAuxSlot;
 
-extern DreamAuxSlot D_80088D28[14];
-extern DreamAuxSlot D_80088D2C[14];
+extern DreamAuxSlot gDreamAuxSlots[14];
+extern DreamAuxSlot gDreamAuxSlots2[14];
 
 /* Two more vtable slots on the DreamAuxObj family (see DespawnDreamAuxEntity):
  * slot 0x14 (byte offset 0x50) takes only self, slot 0x13 (byte offset
@@ -49,7 +49,7 @@ typedef void (*DreamAuxObjFn14)(DreamAuxObj *self);
 typedef void (*DreamAuxObjFn13)(DreamAuxObj *self, s32 arg1, s32 arg2, void *arg3, void *arg4);
 
 /* A tiny fixed-size record family read by InitDreamAux: 14 (0xE) parallel
- * groups, D_80089A7C[i] a signed count and D_80089A44[i] a pointer to an
+ * groups, gDreamAuxGroupCounts[i] a signed count and gDreamAuxGroupRecords[i] a pointer to an
  * array of count 8-byte records whose first byte InitDreamAux clears. The
  * record's remaining 7 bytes are not accessed here. */
 typedef struct DreamAuxGroupRecord {
@@ -57,13 +57,13 @@ typedef struct DreamAuxGroupRecord {
     u8 pad1[7];
 } DreamAuxGroupRecord;
 
-extern s8 D_80089A7C[];
-extern DreamAuxGroupRecord *D_80089A44[];
+extern s8 gDreamAuxGroupCounts[];
+extern DreamAuxGroupRecord *gDreamAuxGroupRecords[];
 
 /* A second parallel-group family, same "count + pointer to array" shape as
  * DreamAuxGroupRecord above but a different stride and a different index
- * space: 14 (0xE) groups selected by `D_8008ABF8` (not a loop index),
- * D_80089AC4[i] a signed count, D_80089A8C[i] a pointer to an array of
+ * space: 14 (0xE) groups selected by `gDreamAuxStage` (not a loop index),
+ * gDreamAuxTriggerCounts[i] a signed count, gDreamAuxTriggerEntries[i] a pointer to an array of
  * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
  * only field LookupDreamAuxTrigger accesses. The remaining 4 bytes are undiscovered
  * from this unit alone. */
@@ -72,8 +72,8 @@ typedef struct DreamAuxTriggerEntry {
     u8 unk2[4];
 } DreamAuxTriggerEntry;
 
-extern s8 D_80089AC4[];
-extern DreamAuxTriggerEntry *D_80089A8C[];
+extern s8 gDreamAuxTriggerCounts[];
+extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
 
 /* A small signed-byte lookup table read by CheckDreamAuxWorldState, indexed by its
  * `idx` parameter. Layout beyond "one signed byte per entry" is not known
@@ -83,8 +83,8 @@ extern s8 D_80088D16[];
 /* "ETC\\SYMSPY.MOM" / "ETC\\SYMDOG.MOM" -- MOM = this game's audio-stream
  * format (per lsddecomp naming elsewhere in the project). Defined in
  * code_4cd08.c, right before InitDreamAux which is their only reader. */
-extern const char D_8001186C[];
-extern const char D_8001187C[];
+extern const char gMomPathSymSpy[];
+extern const char gMomPathSymDog[];
 
 /* A 3-word request record, physically the same shape as code_171e0.h's
  * Vec3_171e0 (SetVec3 there does `this->x=x; this->y=y; this->z=z;
@@ -141,7 +141,7 @@ typedef void *(*TriggerWorldFn)(TriggerWorld *self, s8 parity);
 /* vtable slot 0x80 (byte offset 0x200) of a TriggerWorld-shaped object:
  * takes only `self`, returns a value compared against a caller value.
  * Distinct arity/slot from TriggerWorldFn above -- same object family
- * (per D_8008AC00, the only TriggerWorld-typed global known so far),
+ * (per gDreamAuxWorld, the only TriggerWorld-typed global known so far),
  * different vtable entry. Used by CheckDreamAuxWorldState and AdjustDreamAuxTriggerOffset. */
 typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
 
