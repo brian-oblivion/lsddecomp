@@ -85,19 +85,41 @@ typedef struct ObjA34_179D8H ObjA34_179D8H;
  * unchanged from before this slot was identified (0x4 + 0x8 = 0xC), so
  * this is not a shifting edit -- confirmed by re-verifying CloseCdFile
  * and GetCdFileSize (both already matched, both readers of this struct)
- * after adding it. */
+ * after adding it. Named `onError`: the ONE confirmed dispatch (ReadCdFile,
+ * when `self->isOpen == 0`) matches the SAME slot number (+0x48) that
+ * src/code_179d8_s.c's independent local view (Methods80027480::slot48)
+ * dispatches on ITS OWN allocation-failure path (func_80027800) -- two
+ * unrelated call sites landing on the identical offset for a give-up path
+ * is evidence for "error/failure handler", not a guess at a specific
+ * message; PROPOSED for code_179d8_s.c under the same name, not applied
+ * there (out of unit). */
 typedef struct MethodsA34_179D8H {
     u8 pad000[0x48];
-    void (*slot48)(ObjA34_179D8H *self);
+    void (*onError)(ObjA34_179D8H *self);
 } MethodsA34_179D8H;
 
 struct ObjA34_179D8H {
     MethodsA34_179D8H *methods;
     u8 pad4[0x0C - 0x04];
-    s32 unk0C;
+    s32 isOpen;   /* was unk0C -- 0/nonzero, set by OpenCdFile on a successful
+                   * CdSearchFile, cleared by CloseCdFile; GetCdFileSize
+                   * returns 0 when this is 0. Named from src/code_179d8_s.c's
+                   * independent async reimplementation of the same three
+                   * operations (func_800272D0/func_80027480/func_80027528),
+                   * which sets/clears the identical field (its own
+                   * Obj80027480::unk0C) around the identical CD-search /
+                   * CdControl+CdSync sequence -- not guessed from this unit
+                   * alone. */
     u8 pad10[0x18 - 0x10];
-    Pair16_179D8H unk18;
-    u32 unk1C;
+    Pair16_179D8H pos;   /* was unk18 -- the resolved file's CD position,
+                          * copied from CdSearchFile's stat buffer (below) by
+                          * OpenCdFile and read by ReadCdFile's CdControl
+                          * seek; matches code_179d8_s.c's own field `Pos18
+                          * unk18` at the identical offset in its Obj80027480
+                          * view, commented there as a CdlLOC-shaped position. */
+    u32 size;    /* was unk1C -- the resolved file's byte size, copied from
+                  * the same stat buffer; GetCdFileSize rounds this up to the
+                  * next 0x800 (one CD sector) boundary. */
 };
 
 /* func_8002B640's own stat-like output buffer (OpenCdFile's local
@@ -106,8 +128,8 @@ struct ObjA34_179D8H {
  * string buffer starts, so it's at least 0x18 bytes -- the rest is
  * unestablished. */
 typedef struct StatBuf179D8H {
-    Pair16_179D8H unk0;
-    u32 unk4;
+    Pair16_179D8H pos;   /* was unk0 -- copied into ObjA34_179D8H::pos */
+    u32 size;            /* was unk4 -- copied into ObjA34_179D8H::size */
     u8 pad8[0x18 - 0x8];
 } StatBuf179D8H;
 
@@ -171,18 +193,18 @@ char *BuildCdFilePath(char *dest, char *suffix) {
 }
 
 void CloseCdFile(ObjA34_179D8H *self) {
-    if (self->unk0C != 0) {
-        self->unk0C = 0;
+    if (self->isOpen != 0) {
+        self->isOpen = 0;
     }
 }
 
 s32 GetCdFileSize(ObjA34_179D8H *self) {
     u32 result;
 
-    if (self->unk0C == 0) {
+    if (self->isOpen == 0) {
         result = 0;
     } else {
-        result = ((self->unk1C >> 11) + 1) << 11;
+        result = ((self->size >> 11) + 1) << 11;
     }
     return result;
 }
@@ -208,7 +230,7 @@ extern s32 CdReadSync(s32 arg0, s32 arg1);
  * shape, confirmed via asm-differ) -- the previously recorded figure is now
  * measured, not carried forward. Tried one additional, previously-untested
  * reshape within budget -- writing the cold path as a single
- * `return self->methods->slot48(self), 0;` expression instead of two
+ * `return self->methods->onError(self), 0;` expression instead of two
  * statements -- identical compiled length and shape, no improvement.
  * Still genuinely stalled; restored to INCLUDE_ASM. The report carries the
  * corrected, linkable body. */
