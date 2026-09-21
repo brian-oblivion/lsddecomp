@@ -114,33 +114,19 @@ s32 func_8004B5BC(Obj866E8 *self) {
     return result;
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004B700.md. 137/140 words,
- * correct length, no drift (round 40 permuter-found improvement, up from
- * 125/140). ROUND 40 (bravo): first-ever permuter search on this function
- * (37155 iterations, no rc captured -- the wrapping shell was torn down
- * before the trailing echo ran, same trap documented for func_8004BB3C in
- * round 17). Best candidate dropped the permuter score 75 -> 15 and never
- * improved further across the remaining ~36,900 iterations. The lead:
- * replace the second `u14 = e->unkC->unk14; u14->unk0 = 0;` reload with a
- * direct `e->unkC->unk14->unk0 = 0;` (no named-local reassignment) --
- * closed 12 of the 15 remaining words. Remaining 3-word residue (second
- * loop's row pointer, retail `$a2` vs built `$v0`) is the SAME pure
- * register-identity class this report already documented and is untouched
- * by this fix -- confirmed via asm-differ, no instruction-shape difference
- * anywhere in that loop, just the one register substitution.
- *
- * ROUND 27 (delta): re-verified per the head's callee-saved-registers
- * broadcast -- compiled prologue saves the IDENTICAL set to retail (s0-s7,
- * fp, ra, same stack slots), so the "extra callee-saved parameter" lever
- * does NOT apply here. Verdict (pure register identity) CONFIRMED, not
- * just plausible.
- *
- * ROUND 32 (bravo2): re-verified, 125/140, no drift, identical residue
- * (tbl/u14/second-loop-row-pointer register swaps, no instruction shape
- * differences). Not re-attempted -- three prior rounds' worth of
- * confirmation (register-identity verdict, callee-saved order match) left
- * nothing untried within this round's budget worth spending on. */
-#if 0
+/* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
+ * 40 across four re-verifications, ten inert structural variants and a
+ * 37,155-iteration permuter search -- see docs/match-reports/func_8004B700.md.
+ * The 3-word residue was a genuine pure register-identity difference (funcdiff
+ * ins 0 / del 0, no asm-differ markers): retail held the second loop's element
+ * pointer in $a2, the build in $v0. The fix was to DELETE a local -- the
+ * second loop reuses `e`, the same variable the first loop walks, instead of a
+ * separate `e2`. Nothing else in the body changed.
+ * That axis is exactly the one a permuter cannot reach: it mutates a body, it
+ * does not merge two of its locals into one. Same lever as func_8004BA40 this
+ * round.
+ * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
+ * with `e` merged it is no longer needed, verified by whole-image rebuild. */
 void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
     s32 divisor;
     s32 flag;
@@ -148,7 +134,6 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
     s32 count;
     s32 i;
     Elem *e;
-    Elem *e2;
     Unk14Obj *u14;
     Unk54Struct *tbl;
     SetupEntry866E8 stackBuf[7];
@@ -164,7 +149,6 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
                 tbl = &D_80086838[arg3[i].key];
-                __asm__("");
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
                     u14->unk18.w = arg2->unk0 + tbl->unk0;
@@ -182,16 +166,14 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
         }
 
         for (i = 0; i < 7; i++) {
-            e2 = &self->arr[i];
-            e2->unk4->unk32 = e2->unk2;
+            e = &self->arr[i];
+            e->unk4->unk32 = e->unk2;
         }
 
         self->methods->slotFC(self, stackBuf, count);
     }
 }
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004B700);
 
 s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
     Unk68Struct *u;
@@ -227,15 +209,19 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
     }
 }
 
-#if 0
-/* STALL, round 32 (bravo2): re-verified 58/63, no drift, identical
- * residue. See docs/match-reports/func_8004BA40.md for the full history.
- * This round: separating `fieldVal`/`sum` temps from `value` (to mirror
- * retail's v1-running-sum/v0-final-result split) -- IDENTICAL 58/63, no
- * change. A fresh 144,370-iteration permuter run (independent RNG, own
- * scaffold `--debug`-verified to score the same residue as the real
- * build) also never beat the base score of 25. Genuine negative, not
- * inconclusive; not attempted further this round. */
+/* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round
+ * 27 across five re-verifications and ~330,000 permuter iterations -- see
+ * docs/match-reports/func_8004BA40.md. The 5-word residue really was pure
+ * register identity (funcdiff ins 0 / del 0, no asm-differ markers), and the
+ * fix was FEWER variables, not more: retail carries the multiply result AND
+ * the running sum AND both branch addends in ONE local (`sum`, retail's
+ * $v1), with the `val +` hoisted out of every branch into a single
+ * `value = val + sum;` after the if/else (retail's $v0). Round 32 tried the
+ * opposite -- splitting `fieldVal`/`sum` out of `value` -- and measured it
+ * inert; the permuter then searched around that same split for 330k
+ * iterations without ever reaching the merged shape.
+ * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
+ * image. It was inherited with the near-miss body and is verified here. */
 s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = D_8008688C[key];
@@ -249,21 +235,19 @@ s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, 
     if (self->unk68->unk4 == 0) {
         const Unk54Struct *entry = &D_800868A8[key];
         s32 value;
+        s32 sum;
 
         if (entry->unk0 == 0) {
-            s32 fieldVal = entry->unk4;
-            value = val + fieldVal;
+            sum = entry->unk4;
         } else {
-            s32 lo = divisor * entry->unk0;
-            s32 sum;
-
+            sum = divisor * entry->unk0;
             if (flag != 0) {
-                sum = lo + entry->unk4;
+                sum += entry->unk4;
             } else {
-                sum = lo + entry->unk8;
+                sum += entry->unk8;
             }
-            value = val + sum;
         }
+        value = val + sum;
         *(s32 *)((u8 *)arg1 + 4) = value;
     } else {
         *(s32 *)((u8 *)arg1 + 4) = val + key;
@@ -281,9 +265,7 @@ storeKey:
     arg1->id = key;
     return result;
 }
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BA40);
 
 #if 0
 /* STALL snapshot -- see docs/match-reports/func_8004BB3C.md. 90/105 words
@@ -630,34 +612,28 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     return &self->unkBC;
 }
 
-/* STALLED at 72/106 words -- see docs/match-reports/func_8004C1C0.md for
- * the full analysis (two independent residue classes: an $a1-vs-$a3
- * register-identity choice for u14b, and a store-then-reread narrow-field
- * codegen sensitivity confirmed with an isolated toolchain reproducer).
- * ROUND 27 (delta): re-verified 72/106, no drift; two more attempts on
- * class 2 (dropping the b2/b3 locals and re-reading `out->base.b2/b3`
- * directly at the h4/h8 use sites) -- both REGRESSED (drift, extra saved
- * register in the prologue), reverted. Not re-attempted further this
- * round. Preserved here per convention.
- *
- * ROUND 32 (bravo2): re-verified, 72/106, no drift, identical residue.
- * Set up an isolated permuter scaffold to probe the store-then-reread
- * class-2 residue -- its own `--debug` base score showed 9 INSERTIONS and
- * 9 DELETIONS versus the real in-context build's zero, i.e. the isolated
- * scaffold compiles to a structurally DIFFERENT function than the real
- * build (the same scaffold-context-mismatch trap documented for
- * func_8004BB3C in round 17). Not run further -- a search against a
- * scaffold provably scoring a different residue would not transfer.
- * Scaffold deleted; not attempted further this round. */
-#if 0
+/* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)
+ * with three source-shape corrections, none of them register pinning -- see
+ * docs/match-reports/func_8004C1C0.md.
+ *   1. `b2`/`b3` are s32 locals RE-READ from `out->base.b2`/`b3` after the
+ *      byte stores. An s8 field shifted directly in the expression compiles
+ *      to `lbu` + `sll 0x18` + `sra 0xd`; assigning it to an s32 local first
+ *      folds the sign extension into retail's `lb` + `sll 0xb`.
+ *   2. The 0x400 sits INSIDE the subtracted group -- `x - (y + (b<<11) +
+ *      0x400)`. GCC reassociates that to retail's `addiu a0,a0,-0x400`.
+ *      Writing `(x - 0x400) - (...)` instead narrows the constant to HImode
+ *      and emits `li 0xfc00` + `addu`.
+ *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
+ *      placement schedules its `sw` too early; only trailing it after the
+ *      h8 store reproduces retail's order. */
 s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
     s32 rate;
     s32 t;
-    s8 b2;
-    s8 b3;
+    s32 b2;
+    s32 b3;
 
     e = self->methods->slot11C(self, in);
     if (e != 0) {
@@ -679,28 +655,25 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
         if (t < 0) {
             t += 0x7FF;
         }
-        b2 = t >> 11;
-        out->base.b2 = b2;
+        out->base.b2 = t >> 11;
 
         t = in->unk8.w - u14b->unk20.w;
         if (t < 0) {
             t += 0x7FF;
         }
-        b3 = t >> 11;
-        out->base.b3 = b3;
+        out->base.b3 = t >> 11;
 
-        out->base.h4 = (in->unk0.h - 0x400) - (u14b->unk18.h + (b2 << 11));
+        b2 = out->base.b2;
+        out->base.h4 = in->unk0.h - (u14b->unk18.h + (b2 << 11) + 0x400);
         out->base.h6 = in->unk4.h;
+        b3 = out->base.b3;
+        out->base.h8 = in->unk8.h - (u14b->unk20.h + (b3 << 11) + 0x400);
         out->unk24 = e;
-        out->base.h8 = (in->unk8.h - 0x400) - (u14b->unk20.h + (b3 << 11));
 
         return 0;
     }
     return 1;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C1C0);
 
 
 void func_8004C368(Obj866E8 *self, u8 *out, s32 val) {
