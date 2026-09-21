@@ -30,7 +30,7 @@ report, the head promotes after merging.
   ancestor, and the longer identical high-slot run is the real parent. (a §"The class
   framework (SETTLED")
 
-### The three RESOLVED blockers
+### The four RESOLVED blockers
 
 Each is one maspsx flag setting one behaviour, proven inert by a byte-exact rebuild. Do not
 screen for them, do not stall on them, do not trust a verdict predating the fix.
@@ -40,6 +40,7 @@ screen for them, do not stall on them, do not trust a verdict predating the fix.
 | `addiu_at` (indexed global load) | 21 | `--addiu-at` | `research/addiu-at-blocker.md` |
 | `gp_rel` (small-data global) | 42 | `--gp-symbols=config/gp-symbols.txt` | `research/gp-relative-blocker.md` |
 | `nop_mflo_mfhi` | 42 | `--no-nop-mflo-mfhi` | `addiu-at-blocker.md`, RESOLVED addendum |
+| `nop_at_expansion` (indexed load, then store-to-symbol of that reg) | 63 | `--nop-at-expansion` | `research/load-delay-nop-blocker.md` |
 
 (a §"BLOCKED: no C function can reach a small-data global", §"BLOCKED: no C function can
 load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen runs FORWARD")
@@ -207,6 +208,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   conditional branch targeting the OUTER join with a real assignment in its delay slot, the
   bare unconditional `j` of the fallthrough rule absent. 77/217 -> 208/217. (a
   docs/match-reports/func_80063144.md, round 59)
+- **The arm-order lever has a cheap COUNTER-indication: retail's bare `j` must carry REAL
+  WORK in its delay slot.** Where retail's carries a `nop`, inverting an if/else to fix block
+  order regressed twice on two different bodies (16/79 -> 9, 49/79 -> 13, drift both times),
+  because 2.6.3 collapses a free `v0 = 0` arm into the BRANCH's own delay slot and evicts a
+  `slot++` that was already matching. Read the delay slot before you build the variant.
+  (a round 64, charlie)
 
 ### 3b. Switch and jump tables
 
@@ -319,6 +326,14 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `CalcDreamColor` both acted on one fused address expression and all three variants were
   byte-identical). **Levers do not commute**: if a residue MOVES rather than SHRINKS, revert
   before the next. (a §"The combination corollary", §"Levers do not commute")
+- **And the MIRROR, which is the more surprising half: two levers each measured BYTE-INERT
+  are not jointly inert.** On `func_8005511C` a 495/1900 permuter candidate split into (a) a
+  single-use store alias and (b) a named local for a global load passed as an argument: each
+  alone byte-identical in-tree, the two together moved ins 7/7 -> 3/3. The same pseudo then
+  carries two unrelated values in two DISJOINT live ranges, which splits its lifetime, and
+  REUSE is a property of the PAIR — a single-use alias is copy-propagated away. Consequence:
+  screening a candidate by halves, two inert halves do NOT license discarding it.
+  (a round 64, charlie)
 - **A same-size pointer cast in a FUNCTION-SCOPE local can cost a callee-saved register —
   the cost is LIFETIME, not the name** (inline casts took a function to 106/110; a
   case-local temp was byte-identical). Splitting a combined declaration (`T x; x = expr;`)
@@ -368,8 +383,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   signed `x / 2**k` (k > 1) opens with `t = x`, and whether that copy survives is coalescing
   driven by `x`'s live range. Discriminator: a one-word copy residue where your build reuses
   a register destructively (`addiu v1,v1,3`) and retail uses a second (`addiu a2,v1,3`) is a
-  LIVE-RANGE question, not the "redundant move" permuter class. (a
-  docs/match-reports/func_80062C58.md, round 59)
+  LIVE-RANGE question, not the "redundant move" permuter class. **The live range must cross
+  a CALL**: one `s32 r` reused for three `rand()` results cost one `move $a1,$v0` per call and
+  deleting it closed 25/87 -> 87/87, while deleting a SINGLE-USE local measured exactly inert
+  in the same unit. (a docs/match-reports/func_80062C58.md, round 59; a round 64, charlie)
 - **An explicit alias can force the parameter copy cc1 would otherwise coalesce away, and
   "the dead copy gets eliminated" is a per-BODY negative.** `Obj278 *p; p = self;` used for
   even ONE access made cc1 emit retail's `move`, and six of six joint-best permuter
@@ -507,6 +524,18 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ### 3h. volatile and memory
 
+- **An INCOMPLETE-ARRAY global declaration makes 2.6.3 CSE the address-take into a
+  callee-saved register; a SCALAR declaration of the same symbol emits absolute-per-access.**
+  Four in-tree points on `func_80055258`: `extern u8 D_X[]` + `*(s32 *) D_X = v` and
+  `extern s32 D_X[]` + `D_X[0] = v` both 5/110 RED, carrying an extra `$s1` and 8 more frame
+  bytes; `extern s32 D_X;` assigned either by name or through `*(s32 *) &D_X` both 110/110
+  GREEN. So ELEMENT TYPE and CAST SPELLING are inert and ARRAYNESS is the whole axis.
+  **The effect is CONTEXTUAL and does NOT reproduce in isolation** — a five-line file emits
+  `lui $at` per access for `u8[]`, `int[]` and `int` alike, with or without intervening calls
+  (four pinned-pipeline variants), so the real body's context is part of the trigger and a
+  reproducer cannot screen this for you. Round 48 filed the residue as register identity and
+  recorded "`volatile` does not stop address caching": a correct negative about the wrong
+  instrument. (a round 64, charlie + head)
 - **`volatile` is the NARROW instrument for the instruction-ORDER class, not the banned
   construct** — it names no register, exactly like the sanctioned bare `__asm__("")`. Where
   three barrier placements across two rounds all regressed, declaring three hardware-shadow
