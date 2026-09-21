@@ -3,10 +3,20 @@
 
 #include "common.h"
 
-/* This unit is lsddecomp's "DreamAux". It owns the 0x206C rodata slot (its
- * switch jump tables) and a small family of "tick this class instance"
- * slots living at 0x80088D28 / 0x80088D2C -- see match reports for
- * InitDreamAux, TickDreamAuxSlots and TickDreamAuxSlots2 for how these were derived.
+/* This unit is lsddecomp's "DreamAux". Fully matched, round 43 (0
+ * INCLUDE_ASM); track 3 naming pass round 63. It owns the 0x206C rodata
+ * slot (its switch jump tables) and manages a small "trigger record" system:
+ * a table of 8-byte TriggerRecord entries, each gating on a caller-supplied
+ * `value` (CheckDreamAuxTriggerCondition) and a coordinate parity
+ * (CheckTriggerParity), that on success spawns or despawns an Entity into
+ * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
+ * DespawnDreamAuxEntity, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
+ * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
+ * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
+ * construct/tick/destruct hooks a caller in class_39e08.c and
+ * class_3bb8c_l.c drives this subsystem through. `gDreamAuxStage`,
+ * `gDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
+ * the shared context every other function in the unit reads.
  */
 
 /* An object whose method table pointer sits at offset 0 (every object in
@@ -156,9 +166,10 @@ extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
  * caller with the return value of the TriggerWorld vtable-0x88 call before
  * the loop starts (`scratch[3] = (s32)callResult;` in ProcessDreamAuxTriggerRecord) --
  * confirmed load-bearing: the match was 19/69 without it, 69/69 with it, no
- * other change. SpawnDreamAuxTriggerEntity is still INCLUDE_ASM (gp-relative-blocked,
- * see docs/research/gp-relative-blocker.md), so its own use of that word is
- * not derived here. */
+ * other change. SpawnDreamAuxTriggerEntity itself MATCHED round 43 (once the
+ * gp-relative blocker was resolved, see docs/research/gp-relative-blocker.md)
+ * and never reads `out` -- it only forwards it untouched to `New_Entity`'s
+ * 2nd argument; its own outgoing buffer is a separate local `outBuf[4]`. */
 extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry);
 extern void EnableTeleportsForKind(s32 triggerType);
 extern bool func_8005630C(void);
