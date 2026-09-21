@@ -1,11 +1,13 @@
-# func_80028898 -- MATCHED (18/18 words)
+# Class6D430__InstallCdReadDriver -- MATCHED (18/18 words)
+
+> Renamed from `func_80028898` on 2026-09-21 (tools/rename.py). Address 0x80028898.
 
 Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
 
 ## Result
 
 ```c
-void func_80028898(Class6D430 *self) {
+void Class6D430__InstallCdReadDriver(Class6D430 *self) {
     ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
     self->methods = GetClass6D4E8Methods();
     self->unk0C = 0;

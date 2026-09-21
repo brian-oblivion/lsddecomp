@@ -35,5 +35,5 @@ function's OWN reference to it is a plain absolute `lui`/`addiu`, not
 found zero `gp_rel` hits, so this is not an instance of the gp-relative
 blocker despite the symbol's `.sdata` placement. `strcpy` is this unit's own
 (defined later in ROM order, forward-declared here); `strcat` is already
-declared identically in `code_171e0.h` (included for `func_80028898`), so
+declared identically in `code_171e0.h` (included for `Class6D430__InstallCdReadDriver`), so
 the local `extern` here is a harmless duplicate, not a conflict.

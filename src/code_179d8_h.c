@@ -49,7 +49,7 @@
  */
 #include "common.h"
 /* code_171e0.h's Class6D430/Class6D430Methods already
- * describe D_8006D430's class exactly -- func_80028898 dispatches
+ * describe D_8006D430's class exactly -- Class6D430__InstallCdReadDriver dispatches
  * GetClass6D430Methods()->ctor(self) (offset +0x008), matching that header's own
  * ctor slot. Reused UNCHANGED per CLAUDE.md's header discipline (a sibling
  * would use it unchanged), not redefined locally. */
@@ -57,7 +57,7 @@
 
 /* GetClass6D4E8Methods is still uncarved (asm/code_179d8.s) -- returns &D_8006D4E8,
  * a DIFFERENT class table (tools/classtable.py --scan: 29 slots, header
- * 0x13) than D_8006D430. func_80028898 chains Class6D430's base ctor
+ * 0x13) than D_8006D430. Class6D430__InstallCdReadDriver chains Class6D430's base ctor
  * then overwrites self->methods with this class's own table -- the
  * standard "call base ctor, then install the derived vtable" idiom. Typed
  * against Class6D430Methods for the assignment's sake; the two
@@ -137,17 +137,17 @@ extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 extern char D_8008A8A8[]; /* ";1", the ISO9660 CD file-version suffix */
 
-void func_80028898(Class6D430 *self) {
+void Class6D430__InstallCdReadDriver(Class6D430 *self) {
     ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
     self->methods = GetClass6D4E8Methods();
     self->pendingGeneration = 0;
 }
 
-void *func_800288E0(Class6D430 *self) {
+void *Class6D430__DestroyCdReadDriver(Class6D430 *self) {
     return ((Class6D430Methods *)GetClass6D430Methods())->dtor(self);
 }
 
-void func_80028918(void) {
+void NoOp2(void) {
 }
 
 /* ROUND 36 (runner charlie): the round-17 preserved body (best 12/43,
@@ -187,7 +187,7 @@ s32 GetCdFileSize(ObjA34_179D8H *self) {
     return result;
 }
 
-void func_80028A7C(void) {
+void NoOp3(void) {
 }
 
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) -- this
@@ -214,7 +214,7 @@ extern s32 CdReadSync(s32 arg0, s32 arg1);
  * corrected, linkable body. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", ReadCdFile);
 
-void func_80028B64(void) {
+void NoOp4(void) {
 }
 
 extern s32 gCdUseVSyncCallback;

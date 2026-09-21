@@ -272,7 +272,7 @@ order) needs more work, not that the first attempt was closer to done.
 body into `src/code_179d8_h.c` in place of the `INCLUDE_ASM` and ran the
 real oracle: `build exit=2`, no compile-error grep hits, `funcdiff.py`
 reads **8/56 raw word-match**, identical to the recorded figure.
-`build/lsdde.map` (`func_80028B64 - ReadCdFile = 0xE4` = 57 words)
+`build/lsdde.map` (`NoOp4 - ReadCdFile = 0xE4` = 57 words)
 confirms the function is still exactly one word (4 bytes) longer than
 retail's 56, matching round 36's own re-verification exactly. Restored to
 `INCLUDE_ASM` immediately after; diffed the restored file byte-for-byte
