@@ -597,12 +597,15 @@ extern s32 D_8008E0B8;
 /* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
  * round-46..48 residue (an extra callee-saved register caching
  * `D_8008E0A4`'s address, frame -0x18 -> -0x20) was NOT register identity:
- * it was the DECLARED TYPE of the global.  Declared `extern u8
- * D_8008E0A4[]` and written `*(s32 *) D_8008E0A4 = v`, the array decay is
- * an address-take VALUE that cc1 2.6.3's CSE promotes into a callee-saved
- * register across the intervening `rand()` calls.  Declared `extern s32
- * D_8008E0A4` and assigned BY NAME it emits retail's absolute
- * `lui $at, %hi / sw %lo($at)` fresh at each of the three accesses.
+ * `D_8008E0A4` was declared as an INCOMPLETE ARRAY.  Every reference to
+ * `extern T D_8008E0A4[]` is an array decay, i.e. an address-take VALUE,
+ * which cc1 2.6.3's CSE promotes into a callee-saved register across the
+ * intervening `rand()` calls; declared `extern s32 D_8008E0A4` it emits
+ * retail's absolute `lui $at, %hi / sw %lo($at)` fresh at each of the three
+ * accesses.  Four in-tree variants pin the axis to ARRAY vs SCALAR: the
+ * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
+ * vs `D_X`) are both measurably INERT.  Do not restate this as "the
+ * declared type" -- that was the first, wrong, reading.
  * See docs/match-reports/func_80055258.md. */
 void func_80055258(void *arg0, void *arg1) {
     if (arg1 == 0) {
