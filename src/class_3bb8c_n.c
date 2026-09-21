@@ -627,29 +627,29 @@ void func_80055258(void *arg0, void *arg1) {
 extern s32 D_8008732C;
 extern s32 D_8008E0B8;
 
-/* STALL, 25/87 words, 2 words long -- see docs/match-reports/func_80055410.md.
- * Signature widened from `void func_80055410(void)` (round 46) to two dead
- * void* params: func_80054DA4 dispatches this through a function pointer
- * shared with func_80055258 (which genuinely takes two args), and the ABI
- * slot is call-site-determined, not body-determined -- see CLAUDE.md's
- * "already-matched signature can be too narrow" lesson. Dead params cost
- * zero instructions in the callee, so the round-46 body is otherwise
- * untouched. Round 48: check 3 confirms AGREE (scaffold Insertions 3,
- * Deletions 1, Register 90 vs in-tree rebuild's identical 25/87 with
- * expected out-of-range drift from the 2-extra-word size). Round 48:
- * searched (not closed, 900s/136367 iterations, best score 100/850 base);
- * the score-100 candidate's literal transcription regressed to 5/87
- * in-tree (worse than 25/87) rather than the isolated scaffold's
- * improvement -- not applied. Preserved near-miss body: */
-#if 0
+/* MATCHED round 64 (charlie), 87/87, ins 0 / del 0.  The round-46..48
+ * residue -- filed as "pervasive $v0/$v1/$a0/$a1 temp-register renaming" and
+ * searched for 900s / 136367 permuter iterations without a zero -- was ONE
+ * named local.  The body used a single `s32 r` for all three `rand()`
+ * results, whose live range spans the calls, so cc1 could not coalesce
+ * `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal rand`
+ * (two visible, a third word from the knock-on).  Deleting `r` and calling
+ * `rand()` inline in each expression -- exactly the idiom the matched
+ * sibling func_80055258 above already uses -- keeps the value in `$v0` and
+ * recolours the whole body to retail's.  `mod3` stays a local: it has two
+ * genuine use points.  A permuter mutates a body but never deletes its
+ * locals, which is why the 136367-iteration negative bounded the search and
+ * not the function (round 63's LOCAL COUNT corollary).
+ * The signature keeps round 47's two dead void* params: func_80054DA4
+ * dispatches this through a function pointer shared with func_80055258, so
+ * the ABI slot is call-site-determined.  Dead params cost nothing here.
+ * See docs/match-reports/func_80055410.md. */
 void func_80055410(void *arg0, void *arg1) {
-    s32 r;
     s32 mod3;
 
     rand();
     D_8008E0A8 = D_8008732C;
-    r = rand();
-    D_8008E0A4 = (r % 20) << 11;
+    D_8008E0A4 = (rand() % 20) << 11;
     mod3 = D_8008AC74 % 3;
     D_8008E0AC = 0xA000;
     if (mod3 == 1) {
@@ -657,13 +657,9 @@ void func_80055410(void *arg0, void *arg1) {
     } else if (mod3 == 2) {
         D_8008E0AC = 0x800;
     }
-    r = rand();
-    D_8008E0B0 = D_80087174 + ((u32) r % 7) * 12;
-    r = rand();
-    D_8008E0B8 = r % 5;
+    D_8008E0B0 = D_80087174 + ((u32) rand() % 7) * 12;
+    D_8008E0B8 = rand() % 5;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80055410);
 
 extern s32 D_8008AC7C;
 extern void *func_80055620(void *arg0, s32 *arg1, void *arg2);
