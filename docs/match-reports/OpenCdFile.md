@@ -311,10 +311,14 @@ array by name a second time:
 ```c
 char *p = BuildCdFilePath(path, suffix);
 while (1) {
-    if (func_8002B640(&statBuf, p) != 0) { break; }
+    if (CdSearchFile(&statBuf, p) != 0) { break; }
     ...
 }
 ```
+(`func_8002B640` corrected to `CdSearchFile` round 64 -- Sony's,
+`lib/libcd/iso9660.o` since round 34; this fragment is illustrative/partial
+and was never itself a build target, but `tools/stalesyms.py` flags any
+LIVE preserved-block reference to a since-renamed name regardless.)
 
 Hypothesis: if the loop's calls consume a value that arrived via a
 CALL's return register ($v0) rather than a locally-recomputed `addiu`,
