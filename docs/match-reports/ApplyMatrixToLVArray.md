@@ -1,6 +1,6 @@
-> Renamed from `func_8001EE98` on 2026-09-17 (tools/rename.py). Address 0x8001ee98.
-
 # ApplyMatrixToLVArray -- MATCHED (31/31, round 19)
+
+> Renamed from `func_8001EE98` on 2026-09-17 (tools/rename.py). Address 0x8001ee98.
 
 **Status: MATCHED, whole-image green.** See "Round 19 (echo): MATCHED --
 the six-argument dead-code reproducer" at the end of this report for the

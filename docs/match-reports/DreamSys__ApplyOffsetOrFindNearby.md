@@ -1,6 +1,6 @@
-> Renamed from `func_80057618` on 2026-09-19 (tools/rename.py). Address 0x80057618.
-
 # DreamSys__ApplyOffsetOrFindNearby -- MATCHED (20/20)
+
+> Renamed from `func_80057618` on 2026-09-19 (tools/rename.py). Address 0x80057618.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`. Plain internal helper --
 not a vtable slot itself (checked all 6 method tables reachable from this

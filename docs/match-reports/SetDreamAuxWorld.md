@@ -1,6 +1,6 @@
-> Renamed from `func_8005C650` on 2026-09-21 (tools/rename.py). Address 0x8005c650.
-
 # SetDreamAuxWorld
+
+> Renamed from `func_8005C650` on 2026-09-21 (tools/rename.py). Address 0x8005c650.
 
 **Unit:** code_4cd08 · **Size:** 34 words · **Status:** MATCHED round 43
 (34/34, byte-exact whole-image build).

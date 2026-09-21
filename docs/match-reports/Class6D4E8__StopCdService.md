@@ -1,6 +1,6 @@
-> Renamed from `func_80027D40` on 2026-09-17 (tools/rename.py). Address 0x80027d40.
-
 # Class6D4E8__StopCdService — MATCHED (12/12 words)
+
+> Renamed from `func_80027D40` on 2026-09-17 (tools/rename.py). Address 0x80027d40.
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`. This class's
 own method-table slot **+0x070** (see the class-map comment above

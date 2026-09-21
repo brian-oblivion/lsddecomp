@@ -1,6 +1,6 @@
-> Renamed from `BasicClass__func_18358` on 2026-09-17 (tools/rename.py). Address 0x80018358.
-
 # BasicClass__OnNotify
+
+> Renamed from `BasicClass__func_18358` on 2026-09-17 (tools/rename.py). Address 0x80018358.
 
 **Unit:** code_8220_b · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 

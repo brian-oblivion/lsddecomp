@@ -1,6 +1,6 @@
-> Renamed from `func_8001E6F8` on 2026-09-17 (tools/rename.py). Address 0x8001e6f8.
-
 # Class6B5CC__GetRotationDegrees -- MATCHED (byte-exact, 30/30 words). Round 32, head.
+
+> Renamed from `func_8001E6F8` on 2026-09-17 (tools/rename.py). Address 0x8001e6f8.
 
 > **ROUND 32 (2026-09-12), head. CLOSED by reversing two statements.**
 >

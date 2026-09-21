@@ -1,6 +1,6 @@
-> Renamed from `func_80027EE0` on 2026-09-17 (tools/rename.py). Address 0x80027ee0.
-
 # GetCdOperation
+
+> Renamed from `func_80027EE0` on 2026-09-17 (tools/rename.py). Address 0x80027ee0.
 
 **Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 

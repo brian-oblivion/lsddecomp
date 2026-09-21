@@ -1,6 +1,6 @@
-> Renamed from `func_8005D864` on 2026-09-19 (tools/rename.py). Address 0x8005d864.
-
 # Entity__GetProximityRatio -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `func_8005D864` on 2026-09-19 (tools/rename.py). Address 0x8005d864.
 
 Unit `Entity`. **56/56 words, byte-exact.** Never attempted before this round
 (the head's round-44 correction withdrew the last stale "blocked" verdict --

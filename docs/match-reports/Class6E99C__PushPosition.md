@@ -1,6 +1,6 @@
-> Renamed from `func_8004042C` on 2026-09-20 (tools/rename.py). Address 0x8004042c.
-
 # Class6E99C__PushPosition -- STALL, corrected (was misfiled as unfixable register-identity; real fix narrowed the function to a 3-word permuter-exhausted "redundant move" residue -- 22/25, NOT the "1 word remaining" (i.e. implied 24/25) figure this report previously stated, which propagated into PROGRESS.md and round 19's assignment)
+
+> Renamed from `func_8004042C` on 2026-09-20 (tools/rename.py). Address 0x8004042c.
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 

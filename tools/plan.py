@@ -524,9 +524,17 @@ def jobs(d, n):
                                f"(one runner, batch; list: plan.py --json .tracks.2.unnamed_list)",
                           MODELS["mechanical_runner"]))
     q_revisit = stall_runner_jobs(d["_revisit"], t["1"]["next_match_model"], "REVISIT")
-    q_promote = [("1b", f"promote {func} ({unit}, {words}w) preserved body to #ifdef NON_MATCHING",
-                  MODELS["mechanical_runner"])
-                 for words, unit, func in sorted(d["_promotable"])] if t["1b"]["status"] == "open" else []
+    # One job per UNIT (a runner owns one unit; round 62's slot drew one 32w
+    # function while its unit had nine promotable bodies).
+    q_promote = []
+    if t["1b"]["status"] == "open":
+        by_unit = {}
+        for words, unit, func in sorted(d["_promotable"]):
+            by_unit.setdefault(unit, []).append((words, func))
+        for unit, fs in sorted(by_unit.items(), key=lambda kv: -len(kv[1])):
+            names = ", ".join(f"{f} ({w}w)" for w, f in fs)
+            q_promote.append(("1b", f"promote {len(fs)} preserved body(ies) in {unit} to #ifdef NON_MATCHING: {names}",
+                              MODELS["mechanical_runner"]))
     q_types = [("4", f"unify {t['4']['local_struct_views']} unit-local struct views into shared "
                      "headers, one class at a time", "opus")] if t["4"]["status"] == "open" else []
     q_close = [("5", f"{k}: {TRACK5_ITEMS[k]}", "opus")

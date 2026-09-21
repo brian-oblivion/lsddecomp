@@ -1,6 +1,6 @@
-> Renamed from `func_800573A8` on 2026-09-18 (tools/rename.py). Address 0x800573a8.
-
 # BaseObjO__AddVec14 -- MATCHED (9/9 words)
+
+> Renamed from `func_800573A8` on 2026-09-18 (tools/rename.py). Address 0x800573a8.
 
 Unit: `class_3bb8c_o` (round 17). One-line wrapper: `BaseObjO__UpdateVec14(self, 0,
 arg1)`. Already named at `vtable_DreamSys` `+0x0BC` in `DreamSys.h`, typed

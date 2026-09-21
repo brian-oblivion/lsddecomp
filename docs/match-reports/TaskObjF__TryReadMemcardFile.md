@@ -1,6 +1,6 @@
-> Renamed from `func_8004EDC0` on 2026-09-20 (tools/rename.py). Address 0x8004edc0.
-
 # TaskObjF__TryReadMemcardFile
+
+> Renamed from `func_8004EDC0` on 2026-09-20 (tools/rename.py). Address 0x8004edc0.
 
 **Unit:** class_3bb8c_f · **Size:** 56 words (0xE0) · **Status:** MATCH
 

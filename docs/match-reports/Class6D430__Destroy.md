@@ -1,6 +1,6 @@
-> Renamed from `func_80026AB4` on 2026-09-18 (tools/rename.py). Address 0x80026ab4.
-
 # Class6D430__Destroy
+
+> Renamed from `func_80026AB4` on 2026-09-18 (tools/rename.py). Address 0x80026ab4.
 
 **Unit:** code_171e0 · **Size:** 21 instructions · **Status:** MATCHED (21/21 words, whole-image build verified byte-exact)
 

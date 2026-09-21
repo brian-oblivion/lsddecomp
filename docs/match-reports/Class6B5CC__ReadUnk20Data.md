@@ -1,6 +1,6 @@
-> Renamed from `func_8001D600` on 2026-09-18 (tools/rename.py). Address 0x8001d600.
-
 # Class6B5CC__ReadUnk20Data -- MATCHED (9/9 words)
+
+> Renamed from `func_8001D600` on 2026-09-18 (tools/rename.py). Address 0x8001d600.
 
 Round 12, runner delta. `code_d294_b`.
 

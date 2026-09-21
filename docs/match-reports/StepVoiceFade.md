@@ -1,6 +1,6 @@
-> Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
-
 # StepVoiceFade -- STALL: 6 words short (222/228 built length -- corrected round 37, was recorded 223), 13/228 raw word-match, first diff at file 0x1F244 / vram 0x8002EA44 (frame gap fixable with the dead[8] padding idiom -- round 48 confirmed byte-exact frame recovery -- but real first-content diff is the persisted `$t1 = idx<<3` value at file 0x1F250, still unresolved)
+
+> Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
 
 Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
 

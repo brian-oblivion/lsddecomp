@@ -1,6 +1,6 @@
-> Renamed from `func_800269E0` on 2026-09-18 (tools/rename.py). Address 0x800269e0.
-
 # GetClass6D3C8Methods
+
+> Renamed from `func_800269E0` on 2026-09-18 (tools/rename.py). Address 0x800269e0.
 
 **Unit:** code_171e0 · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 

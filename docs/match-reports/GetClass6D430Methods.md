@@ -1,6 +1,6 @@
-> Renamed from `func_80026C9C` on 2026-09-18 (tools/rename.py). Address 0x80026c9c.
-
 # GetClass6D430Methods
+
+> Renamed from `func_80026C9C` on 2026-09-18 (tools/rename.py). Address 0x80026c9c.
 
 **Unit:** code_171e0 · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 

@@ -1,6 +1,6 @@
-> Renamed from `func_8002CB18` on 2026-09-18 (tools/rename.py). Address 0x8002cb18.
-
 # VabStreamObj__StopVoice -- MATCHED (16/16 words)
+
+> Renamed from `func_8002CB18` on 2026-09-18 (tools/rename.py). Address 0x8002cb18.
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 

@@ -1,6 +1,6 @@
-> Renamed from `func_80040FC0` on 2026-09-18 (tools/rename.py). Address 0x80040fc0.
-
 # DecodeFullWidthSjis -- STALL: length EXACT (24/24 words, no drift); **22/24 raw word-match (round 37 head, up from 15/24)**; first real diff at file 0x317D0 / vram 0x80040FD0 -- and it is the ONLY diff: two preheader words TRANSPOSED (`ori $a3,$zero,0x40` / `addu $a2,$a0,$zero`).
+
+> Renamed from `func_80040FC0` on 2026-09-18 (tools/rename.py). Address 0x80040fc0.
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean. No `self`/vtable
 involvement -- a standalone byte-transcoding string function (likely a

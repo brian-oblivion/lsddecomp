@@ -1,6 +1,6 @@
-> Renamed from `func_8005C930` on 2026-09-21 (tools/rename.py). Address 0x8005c930.
-
 # AdjustDreamAuxTriggerOffset
+
+> Renamed from `func_8005C930` on 2026-09-21 (tools/rename.py). Address 0x8005c930.
 
 **Unit:** code_4cd08 · **Size:** 29 words · **Status:** MATCHED round 43
 (29/29, byte-exact whole-image build, first attempt).

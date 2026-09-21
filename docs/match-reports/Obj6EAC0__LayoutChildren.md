@@ -1,6 +1,6 @@
-> Renamed from `func_80040E14` on 2026-09-18 (tools/rename.py). Address 0x80040e14.
-
 # Obj6EAC0__LayoutChildren — MATCHED (50/50), round 19
+
+> Renamed from `func_80040E14` on 2026-09-18 (tools/rename.py). Address 0x80040e14.
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean. Callee-saved count 4 --
 below saturation.

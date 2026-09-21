@@ -1,6 +1,6 @@
-> Renamed from `func_8002E4D8` on 2026-09-20 (tools/rename.py). Address 0x8002e4d8.
-
 # StepVoiceEnvelope -- STALL: 6 words long (237/231 built length) -- the HEAD-diagnosed halfword-index idiom was applied and DOES close the early-`sll`/mid-block-mask gap, but this function's NON-LOOP context surfaces a residual sign-extension/scheduling issue the same fix left behind in InitSpuDriver's loop context. Round 48: frame gap (-0x10 vs retail -0x18) confirmed pure unaddressed padding and closed byte-exact with charlie's dead[8] idiom, but length unaffected -- 4th unit-wide confirmation this round that the lever does not close length by itself.
+
+> Renamed from `func_8002E4D8` on 2026-09-20 (tools/rename.py). Address 0x8002e4d8.
 
 Unit: `src/code_179d8_m.c`. Round 26 (second pass), runner bravo, applying
 the HEAD's "split scaled index" diagnosis per the work order.

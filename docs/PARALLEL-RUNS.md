@@ -447,7 +447,9 @@ with the largest queue.
 > **Revisit?** If your brief says REVISIT, first rebuild the preserved body
 > exactly as the report gives it and record `funcdiff.py`'s `insertions /
 > deletions` line in the report before changing anything; a title claiming
-> register identity with nonzero ins/del is a wrong verdict, say so.
+> register identity with nonzero ins/del deserves a re-read of the diff (at
+> equal length N/N can be a false alignment; funcdiff's positional skeleton
+> diffs figure says which).
 >
 > **Searches.** One at a time. `timeout` on every search, exit status to its
 > own file (`rc.txt`), iteration count in every negative. Run Gate 3's three

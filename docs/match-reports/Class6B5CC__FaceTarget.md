@@ -1,6 +1,6 @@
-> Renamed from `func_8001EACC` on 2026-09-17 (tools/rename.py). Address 0x8001eacc.
-
 # Class6B5CC__FaceTarget -- MATCHED (110/110 words)
+
+> Renamed from `func_8001EACC` on 2026-09-17 (tools/rename.py). Address 0x8001eacc.
 
 Unit: `code_d294_c` (round 14). **The function two runners independently
 flagged for its argument-swap oddity** (see `docs/match-reports/

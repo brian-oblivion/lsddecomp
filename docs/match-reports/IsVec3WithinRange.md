@@ -1,6 +1,6 @@
-> Renamed from `func_8001EF14` on 2026-09-17 (tools/rename.py). Address 0x8001ef14.
-
 # IsVec3WithinRange -- MATCHED (19/19 words)
+
+> Renamed from `func_8001EF14` on 2026-09-17 (tools/rename.py). Address 0x8001ef14.
 
 Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- a 3-element range check: returns 1 if

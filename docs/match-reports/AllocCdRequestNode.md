@@ -1,6 +1,6 @@
-> Renamed from `func_8002832C` on 2026-09-18 (tools/rename.py). Address 0x8002832c.
-
 # AllocCdRequestNode
+
+> Renamed from `func_8002832C` on 2026-09-18 (tools/rename.py). Address 0x8002832c.
 
 **Unit:** code_179d8_r · **Size:** 38 words · **Status:** MATCHED (38/38 words) · **Round 45**
 

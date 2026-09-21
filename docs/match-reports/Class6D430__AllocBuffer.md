@@ -1,6 +1,6 @@
-> Renamed from `func_80026B08` on 2026-09-18 (tools/rename.py). Address 0x80026b08.
-
 # Class6D430__AllocBuffer
+
+> Renamed from `func_80026B08` on 2026-09-18 (tools/rename.py). Address 0x80026b08.
 
 **Unit:** code_171e0 · **Size:** 70 instructions · **Status:** MATCHED (70/70 words, whole-image build verified byte-exact)
 

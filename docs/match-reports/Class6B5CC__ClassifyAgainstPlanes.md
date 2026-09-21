@@ -1,6 +1,6 @@
-> Renamed from `func_8001DDF4` on 2026-09-18 (tools/rename.py). Address 0x8001ddf4.
-
 # Class6B5CC__ClassifyAgainstPlanes -- STALL: length EXACT (199/199 words, no drift); 29/199 raw word-match; first real diff at vram 0x8001DDF8 (register identity, `self` in $s4 vs retail's $s5)
+
+> Renamed from `func_8001DDF4` on 2026-09-18 (tools/rename.py). Address 0x8001ddf4.
 
 Round 46 (echo). **This is the first time C was ever written or built for
 this function.** Round 45 (delta) filed a structure-only derivation with NO

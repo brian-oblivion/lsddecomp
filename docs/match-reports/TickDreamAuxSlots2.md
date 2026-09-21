@@ -1,6 +1,6 @@
-> Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
-
 # TickDreamAuxSlots2 -- MATCHED
+
+> Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
 
 Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
 `build-and-verify.sh` green. Same shape as `TickDreamAuxSlots`, over `gDreamAuxSlots2`

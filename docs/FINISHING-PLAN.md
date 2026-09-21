@@ -19,10 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 8 (2026-09-20, after rounds 59 to 61: revisits pay for a
-reason other than the stated one, so every stall gets one; rename.py's
-tree-wide reach is call-graph contention; an extern-review prompt; doc
-maintenance is not a Fable task).
+Plan revision: 9 (2026-09-21, after rounds 62 and 63: a fourth maspsx
+blocker resolved the same way as the first three; rename.py had been
+de-ranking the queue; 1b jobs per unit; the ins/del rule is a pointer, not a
+verdict).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -127,9 +127,12 @@ to 52 re-ranked the queue on markers nobody had retired.
 
 **Revisit rule.** Every stall gets exactly ONE revisit: a fresh Opus re-read
 in cost order, with the preserved body rebuilt first so `funcdiff.py`'s
-`insertions / deletions` line is recorded before anything else (a title that
-says "register identity" with a nonzero ins/del is a wrong verdict, and eight
-live titles say it). `plan.py` lists every stall whose report has no
+`insertions / deletions` line is recorded before anything else. Read it as
+a pointer, not a verdict: a title claiming register identity with a nonzero
+ins/del deserves a re-read, but at equal length an N/N figure can be a false
+alignment on a loop nest's repeating instruction skeleton (round 63 measured
+26/26 on a zero-insertion input), so funcdiff also prints positional skeleton
+diffs and reports 0/0 when those are zero. `plan.py` lists every stall whose report has no
 `REVISITED` line; the runner writes `REVISITED, round N: <outcome>;
 names/types <used | not relevant>` and that retires it. This is what remains
 of track 1 after the stop rule parks the band: one revisit runner per round

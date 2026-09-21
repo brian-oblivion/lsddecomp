@@ -1,6 +1,6 @@
-> Renamed from `func_80040CD0` on 2026-09-18 (tools/rename.py). Address 0x80040cd0.
-
 # Obj6EAC0__QueryChildren — MATCHED (41/41), round 19
+
+> Renamed from `func_80040CD0` on 2026-09-18 (tools/rename.py). Address 0x80040cd0.
 
 ## Final body (byte-exact, full oracle green)
 

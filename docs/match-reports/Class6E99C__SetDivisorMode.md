@@ -1,6 +1,6 @@
-> Renamed from `func_800404B4` on 2026-09-20 (tools/rename.py). Address 0x800404b4.
-
 # Class6E99C__SetDivisorMode -- MATCH (3/3 words, first attempt, trivial)
+
+> Renamed from `func_800404B4` on 2026-09-20 (tools/rename.py). Address 0x800404b4.
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::setDivisorMode` (`+0x0F0`),
 a plain two-field setter: `void Class6E99C__SetDivisorMode(Class6E99CObj *self, s32 a1,

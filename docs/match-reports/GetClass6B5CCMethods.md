@@ -1,6 +1,6 @@
-> Renamed from `func_8001E57C` on 2026-09-18 (tools/rename.py). Address 0x8001e57c.
-
 # GetClass6B5CCMethods -- MATCHED (4/4 words)
+
+> Renamed from `func_8001E57C` on 2026-09-18 (tools/rename.py). Address 0x8001e57c.
 
 Round 12, runner delta. `code_d294_b`.
 

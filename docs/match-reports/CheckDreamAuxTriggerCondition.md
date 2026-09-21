@@ -1,6 +1,6 @@
-> Renamed from `func_8005CBC8` on 2026-09-21 (tools/rename.py). Address 0x8005cbc8.
-
 # CheckDreamAuxTriggerCondition -- MATCHED (byte-exact, 100/100 words). Round 25, head.
+
+> Renamed from `func_8005CBC8` on 2026-09-21 (tools/rename.py). Address 0x8005cbc8.
 
 > **ROUND 25 (2026-09-08), head. CLOSED. The last word was BASIC-BLOCK ORDER,
 > and every expression in round 24's 99/100 body was already right.**

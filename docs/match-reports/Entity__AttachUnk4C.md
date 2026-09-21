@@ -1,6 +1,6 @@
-> Renamed from `func_8005D314` on 2026-09-19 (tools/rename.py). Address 0x8005d314.
-
 # Entity__AttachUnk4C -- MATCHED (65/65 words)
+
+> Renamed from `func_8005D314` on 2026-09-19 (tools/rename.py). Address 0x8005d314.
 
 **Unit:** Entity · Runner: charlie, round 23.
 

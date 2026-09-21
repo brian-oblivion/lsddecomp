@@ -1,6 +1,6 @@
-> Renamed from `func_80027C80` on 2026-09-17 (tools/rename.py). Address 0x80027c80.
-
 # Class6D4E8__RequestLoadFile — MATCHED (48/48 words)
+
+> Renamed from `func_80027C80` on 2026-09-17 (tools/rename.py). Address 0x80027c80.
 
 Round 45, runner echo (third sitting), `src/code_179d8_q.c`. This class's own
 slot +0x06C of `D_8006D4E8`.

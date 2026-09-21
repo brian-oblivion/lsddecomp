@@ -1,6 +1,6 @@
-> Renamed from `func_80027EC8` on 2026-09-17 (tools/rename.py). Address 0x80027ec8.
-
 # IsCdBusy
+
+> Renamed from `func_80027EC8` on 2026-09-17 (tools/rename.py). Address 0x80027ec8.
 
 **Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 

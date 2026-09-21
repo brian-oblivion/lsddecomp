@@ -1,6 +1,6 @@
-> Renamed from `func_800573CC` on 2026-09-18 (tools/rename.py). Address 0x800573cc.
-
 # BaseObjO__UpdateVec14 -- MATCHED (30/30 words)
+
+> Renamed from `func_800573CC` on 2026-09-18 (tools/rename.py). Address 0x800573cc.
 
 Unit: `class_3bb8c_o` (round 17). The shared worker behind
 `BaseObjO__SetVec14`/`BaseObjO__AddVec14`: overwrites or accumulates a 3-word vector

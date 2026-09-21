@@ -1,6 +1,6 @@
-> Renamed from `func_8004F394` on 2026-09-20 (tools/rename.py). Address 0x8004f394.
-
 # TaskObjF__EnableEvents
+
+> Renamed from `func_8004F394` on 2026-09-20 (tools/rename.py). Address 0x8004f394.
 
 **Unit:** class_3bb8c_f · **Size:** 10 words (0x28) · **Status:** MATCH
 

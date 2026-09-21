@@ -1,6 +1,6 @@
-> Renamed from `func_80026A50` on 2026-09-18 (tools/rename.py). Address 0x80026a50.
-
 # Class6D430__Class6D430
+
+> Renamed from `func_80026A50` on 2026-09-18 (tools/rename.py). Address 0x80026a50.
 
 **Unit:** code_171e0 · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
 

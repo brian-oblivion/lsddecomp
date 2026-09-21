@@ -1,6 +1,6 @@
-> Renamed from `func_8002F2A4` on 2026-09-20 (tools/rename.py). Address 0x8002f2a4.
-
 # ClearNoiseVoices -- MATCHED (49/49 words)
+
+> Renamed from `func_8002F2A4` on 2026-09-20 (tools/rename.py). Address 0x8002f2a4.
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 

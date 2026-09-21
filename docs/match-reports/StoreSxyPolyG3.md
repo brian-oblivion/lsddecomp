@@ -1,6 +1,6 @@
-> Renamed from `func_800196E8` on 2026-09-17 (tools/rename.py). Address 0x800196e8.
-
 # StoreSxyPolyG3
+
+> Renamed from `func_800196E8` on 2026-09-17 (tools/rename.py). Address 0x800196e8.
 
 **Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 

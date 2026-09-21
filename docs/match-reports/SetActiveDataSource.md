@@ -1,6 +1,6 @@
-> Renamed from `SetActiveDataSource` on 2026-09-18 (tools/rename.py). Address 0x80026cfc.
-
 # SetActiveDataSource -- 3 words long (38 vs 35) -- 1/35 raw word match -- first real diff at vram 0x80026D00
+
+> Renamed from `SetActiveDataSource` on 2026-09-18 (tools/rename.py). Address 0x80026cfc.
 
 > **HEAD CORRECTION, round 43 (2026-09-15): THE PERMUTER NEGATIVE IN THIS
 > REPORT IS AN ARTIFACT AND MUST NOT BE READ AS EVIDENCE.** The

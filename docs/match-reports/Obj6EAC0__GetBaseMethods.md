@@ -1,6 +1,6 @@
-> Renamed from `func_800408BC` on 2026-09-18 (tools/rename.py). Address 0x800408bc.
-
 # Obj6EAC0__GetBaseMethods — MATCHED (4/4 words)
+
+> Renamed from `func_800408BC` on 2026-09-18 (tools/rename.py). Address 0x800408bc.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 

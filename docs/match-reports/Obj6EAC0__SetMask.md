@@ -1,6 +1,6 @@
-> Renamed from `func_800408A8` on 2026-09-18 (tools/rename.py). Address 0x800408a8.
-
 # Obj6EAC0__SetMask — MATCHED (5/5 words)
+
+> Renamed from `func_800408A8` on 2026-09-18 (tools/rename.py). Address 0x800408a8.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 

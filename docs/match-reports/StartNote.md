@@ -1,6 +1,6 @@
-> Renamed from `func_8002FAC4` on 2026-09-20 (tools/rename.py). Address 0x8002fac4.
-
 # StartNote -- STALL: 15 words LONG (402/387 built length), first real diff at vram 0x8002FAC4 (function entry, differing register-save set / frame size 0x140 vs retail's 0x148)
+
+> Renamed from `func_8002FAC4` on 2026-09-20 (tools/rename.py). Address 0x8002fac4.
 
 Unit: `src/code_179d8_m.c`. Round 27, runner bravo. This is the ordered
 work-list's item 1 -- FRESH ground, no prior report existed for this

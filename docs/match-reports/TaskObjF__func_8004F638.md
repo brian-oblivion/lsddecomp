@@ -1,6 +1,6 @@
-> Renamed from `func_8004F638` on 2026-09-20 (tools/rename.py). Address 0x8004f638.
-
 # TaskObjF__func_8004F638
+
+> Renamed from `func_8004F638` on 2026-09-20 (tools/rename.py). Address 0x8004f638.
 
 **Unit:** class_3bb8c_f · **Size:** 51 words (0xCC) · **Status:** MATCH
 

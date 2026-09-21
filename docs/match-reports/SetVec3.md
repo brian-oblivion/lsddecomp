@@ -1,6 +1,6 @@
-> Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
-
 # SetVec3
+
+> Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
 
 **Unit:** code_171e0 · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 

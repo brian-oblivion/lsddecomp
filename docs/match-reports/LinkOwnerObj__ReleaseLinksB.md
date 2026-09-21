@@ -1,6 +1,6 @@
-> Renamed from `func_80056F28` on 2026-09-18 (tools/rename.py). Address 0x80056f28.
-
 # LinkOwnerObj__ReleaseLinksB -- MATCHED (9/9 words)
+
+> Renamed from `func_80056F28` on 2026-09-18 (tools/rename.py). Address 0x80056f28.
 
 Unit: `class_3bb8c_o` (round 17). Byte-identical body to `LinkOwnerObj__ReleaseLinks`
 (see that report) -- releases the same 5-element `arr84` array.

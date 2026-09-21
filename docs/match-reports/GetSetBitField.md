@@ -1,6 +1,6 @@
-> Renamed from `func_8001EDAC` on 2026-09-17 (tools/rename.py). Address 0x8001edac.
-
 # GetSetBitField -- MATCHED (22/22, round 18 permuter pass)
+
+> Renamed from `func_8001EDAC` on 2026-09-17 (tools/rename.py). Address 0x8001edac.
 
 Unit: `code_d294_c` (round 14). The generic packed-bitfield accessor
 already MEASURED and documented (before this carve existed) in

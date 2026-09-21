@@ -1,6 +1,6 @@
-> Renamed from `func_80056E44` on 2026-09-18 (tools/rename.py). Address 0x80056e44.
-
 # LinkOwnerObj__RandomizeLinks -- MATCHED (57/57 words)
+
+> Renamed from `func_80056E44` on 2026-09-18 (tools/rename.py). Address 0x80056e44.
 
 Unit: `class_3bb8c_o` (round 17). Walks 4 elements of the 5-element
 `arr84` array (indices 1..4), and for each one calls its own vtable

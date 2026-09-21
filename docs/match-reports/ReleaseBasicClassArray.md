@@ -1,6 +1,6 @@
-> Renamed from `func_800183DC` on 2026-09-17 (tools/rename.py). Address 0x800183dc.
-
 # ReleaseBasicClassArray — MATCHED (28/28 words)
+
+> Renamed from `func_800183DC` on 2026-09-17 (tools/rename.py). Address 0x800183dc.
 
 Unit: `src/code_8220_b.c`. `void ReleaseBasicClassArray(BasicClass **array, s32 count)`
 — releases every element of a `BasicClass*` array (calling each element's

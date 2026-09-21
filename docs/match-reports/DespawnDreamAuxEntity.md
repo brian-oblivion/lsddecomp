@@ -1,6 +1,6 @@
-> Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
-
 # DespawnDreamAuxEntity
+
+> Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
 
 **Unit:** code_4cd08 · **Size:** 42 words · **Status:** MATCHED round 43
 (42/42, byte-exact whole-image build).

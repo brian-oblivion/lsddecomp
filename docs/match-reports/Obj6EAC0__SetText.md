@@ -1,6 +1,6 @@
-> Renamed from `func_80040F28` on 2026-09-18 (tools/rename.py). Address 0x80040f28.
-
 # Obj6EAC0__SetText — MATCHED (30/30 words)
+
+> Renamed from `func_80040F28` on 2026-09-18 (tools/rename.py). Address 0x80040f28.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 

@@ -1,8 +1,8 @@
+# Entity__UpdateDeactivationState
+
 > Renamed from `Entity__UpdateLinkState` on 2026-09-19 (tools/rename.py). Address 0x8005dd18.
 
 > Renamed from `func_8005DD18` on 2026-09-19 (tools/rename.py). Address 0x8005dd18.
-
-# Entity__UpdateDeactivationState
 
 **Unit:** Entity · **Size:** 64 words · **Status:** MATCHED (64/64 words, whole-image build verified byte-exact)
 

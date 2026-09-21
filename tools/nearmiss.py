@@ -52,6 +52,35 @@ INCLUDE_ASM_RE = re.compile(r'^INCLUDE_ASM\("[^"]*",\s*(\w+)\)', re.M)
 SIZE_RE = re.compile(r'nonmatching \w+, 0x([0-9A-Fa-f]+)')
 
 
+_INS_RE = re.compile(r'^\s*/\* [0-9A-F]+ [0-9A-F]{8} [0-9A-F]{8} \*/\s+(\S+)\s*(.*)$')
+_LOAD_RE = re.compile(r'^l(?:b|bu|h|hu|w|wl|wr)$')
+_STORE_RE = re.compile(r'^s(?:b|h|w|wl|wr)$')
+
+
+def _nop_at_expansion_sites(path):
+    """Count `load $r,off($b); nop; lui $at,...; s? $r,...($at)` in a .s."""
+    lines = []
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        for l in fh:
+            m = _INS_RE.match(l)
+            if m:
+                lines.append((m.group(1), m.group(2)))
+    n = 0
+    for i in range(len(lines) - 3):
+        op, args = lines[i]
+        if not _LOAD_RE.match(op) or "(" not in args or "%" in args:
+            continue
+        r = args.split(",")[0].strip()
+        if lines[i + 1][0] != "nop":
+            continue
+        if lines[i + 2][0] != "lui" or not lines[i + 2][1].startswith("$at"):
+            continue
+        op2, args2 = lines[i + 3]
+        if _STORE_RE.match(op2) and args2.split(",")[0].strip() == r and "($at)" in args2:
+            n += 1
+    return n
+
+
 def screens(path):
     """Return the list of blockers hitting `path`.
 
@@ -65,6 +94,13 @@ def screens(path):
 
     if subprocess.run(["grep", "-q", "gp_rel", path]).returncode == 0:
         hits.append("gp_rel(RESOLVED-not-a-blocker)")
+
+    # Load-delay nop before a store-to-symbol macro of the loaded register:
+    # RESOLVED round 63 by maspsx --nop-at-expansion; reported so the reports
+    # that blame it (func_80030E90, func_8003149C, ...) read as pre-fix.
+    # docs/research/load-delay-nop-blocker.md.
+    if _nop_at_expansion_sites(path):
+        hits.append("nop_at_expansion(RESOLVED-not-a-blocker)")
 
     # addiu_at is NO LONGER A BLOCKER as of round 21 (2026-09-06).  maspsx
     # gained a --addiu-at flag (tools/patches/maspsx-addiu-at.patch, applied

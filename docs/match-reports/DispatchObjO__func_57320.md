@@ -1,6 +1,6 @@
-> Renamed from `func_80057320` on 2026-09-18 (tools/rename.py). Address 0x80057320.
-
 # DispatchObjO__func_57320 -- MATCHED (25/25 words)
+
+> Renamed from `func_80057320` on 2026-09-18 (tools/rename.py). Address 0x80057320.
 
 Unit: `class_3bb8c_o` (round 17). A tag-gated double dispatch: reads
 `arg1`'s own vtable header LOW BYTE and calls one of two of `self`'s own

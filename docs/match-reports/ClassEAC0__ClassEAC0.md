@@ -1,6 +1,6 @@
-> Renamed from `func_8004054C` on 2026-09-20 (tools/rename.py). Address 0x8004054c.
-
 # ClassEAC0__ClassEAC0 -- MATCH (33/33 words, first attempt)
+
+> Renamed from `func_8004054C` on 2026-09-20 (tools/rename.py). Address 0x8004054c.
 
 Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Obj`'s own constructor
 (`ClassEAC0Methods::ctor`, slot `+0x008`) -- one level further down the

@@ -1,6 +1,6 @@
-> Renamed from `func_8005DAAC` on 2026-09-19 (tools/rename.py). Address 0x8005daac.
-
 # Entity__SetUnkF4
+
+> Renamed from `func_8005DAAC` on 2026-09-19 (tools/rename.py). Address 0x8005daac.
 
 **Unit:** Entity · **Size:** 20 instructions · **Status:** MATCHED (20/20 words, whole-image build verified byte-exact)
 

@@ -1,6 +1,6 @@
-> Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
-
 # BeginVoiceFade -- MATCHED (116/116 words)
+
+> Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 

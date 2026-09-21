@@ -1,6 +1,6 @@
-> Renamed from `func_8004F784` on 2026-09-20 (tools/rename.py). Address 0x8004f784.
-
 # TaskObjF__FreeUnusedBuffers
+
+> Renamed from `func_8004F784` on 2026-09-20 (tools/rename.py). Address 0x8004f784.
 
 **Unit:** class_3bb8c_f · **Size:** 35 words (0x8C) · **Status:** MATCH
 

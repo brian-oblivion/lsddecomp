@@ -1,6 +1,6 @@
-> Renamed from `func_80027E68` on 2026-09-17 (tools/rename.py). Address 0x80027e68.
-
 # GetClass6D4E8Methods
+
+> Renamed from `func_80027E68` on 2026-09-17 (tools/rename.py). Address 0x80027e68.
 
 **Unit:** code_179d8_q (fresh carve) · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 

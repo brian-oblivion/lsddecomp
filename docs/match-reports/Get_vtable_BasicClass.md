@@ -1,6 +1,6 @@
-> Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
-
 # Get_vtable_BasicClass
+
+> Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
 
 **Unit:** code_8220_b · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 

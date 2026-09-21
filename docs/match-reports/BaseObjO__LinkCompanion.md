@@ -1,6 +1,6 @@
-> Renamed from `func_800570B4` on 2026-09-18 (tools/rename.py). Address 0x800570b4.
-
 # BaseObjO__LinkCompanion -- MATCHED (31/31 words)
+
+> Renamed from `func_800570B4` on 2026-09-18 (tools/rename.py). Address 0x800570b4.
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot10` -- the "link"
 half of a buddy-object pair, already named `slot10`

@@ -1,6 +1,6 @@
-> Renamed from `func_8005CDF8` on 2026-09-21 (tools/rename.py). Address 0x8005cdf8.
-
 # SpawnDreamAuxTriggerEntity
+
+> Renamed from `func_8005CDF8` on 2026-09-21 (tools/rename.py). Address 0x8005cdf8.
 
 **Unit:** code_4cd08 · **Size:** 79 words · **Status:** MATCHED round 43
 (79/79, byte-exact whole-image build). This was the LAST of the eight

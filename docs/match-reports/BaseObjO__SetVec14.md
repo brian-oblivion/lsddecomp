@@ -1,6 +1,6 @@
-> Renamed from `func_80057384` on 2026-09-18 (tools/rename.py). Address 0x80057384.
-
 # BaseObjO__SetVec14 -- MATCHED (9/9 words)
+
+> Renamed from `func_80057384` on 2026-09-18 (tools/rename.py). Address 0x80057384.
 
 Unit: `class_3bb8c_o` (round 17). One-line wrapper: `BaseObjO__UpdateVec14(self, 1,
 arg1)`. Already named `BaseObjO__SetVec14` at `vtable_DreamSys` `+0x0B8` in

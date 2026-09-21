@@ -1,6 +1,6 @@
-> Renamed from `func_8003E578` on 2026-09-19 (tools/rename.py). Address 0x8003e578.
-
 # Obj86B60__NotifyChildReset — MATCH (20/20 words)
+
+> Renamed from `func_8003E578` on 2026-09-19 (tools/rename.py). Address 0x8003e578.
 
 **Unit:** code_2cc8c_c · **Size:** 20 instructions
 

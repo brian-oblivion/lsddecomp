@@ -1,6 +1,6 @@
-> Renamed from `func_8003E4A4` on 2026-09-19 (tools/rename.py). Address 0x8003e4a4.
-
 # Obj86B60__IncrementFrameCounter — MATCH (5/5 words)
+
+> Renamed from `func_8003E4A4` on 2026-09-19 (tools/rename.py). Address 0x8003e4a4.
 
 **Unit:** code_2cc8c_c · **Size:** 5 instructions
 

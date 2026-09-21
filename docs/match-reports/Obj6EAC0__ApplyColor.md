@@ -1,6 +1,6 @@
-> Renamed from `func_80040790` on 2026-09-18 (tools/rename.py). Address 0x80040790.
-
 # Obj6EAC0__ApplyColor — MATCHED (26/26), round 19
+
+> Renamed from `func_80040790` on 2026-09-18 (tools/rename.py). Address 0x80040790.
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean (no `gp_rel`, no
 `addiu $at,$at,%lo`, no jump table).

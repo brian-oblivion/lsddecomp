@@ -1,6 +1,6 @@
-> Renamed from `func_8001D714` on 2026-09-18 (tools/rename.py). Address 0x8001d714.
-
 # Class6B5CC__TryAttachNearby — STALL (round 55: length EXACT, 143/143 per `nm -S`, up from 141/143; raw funcdiff word-match 140/143; first real diff at file offset 0xE098 / vram 0x8001D898, a pure stack-slot-address swap between `buf54` and `count`'s own address-taken slot, zero other difference anywhere in the function; historical titles "47/143" (pre round-20) and "141/143, 2 short" (rounds 20-46) are superseded by this round's length fix)
+
+> Renamed from `func_8001D714` on 2026-09-18 (tools/rename.py). Address 0x8001d714.
 
 Unit: `code_d294_b`. Round 13, runner delta. Best score: 47/143 words
 in-range, but a genuine size deficit remains (compiled body ~52 bytes/13

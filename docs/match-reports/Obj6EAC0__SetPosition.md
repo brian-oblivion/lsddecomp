@@ -1,6 +1,6 @@
-> Renamed from `func_800407F8` on 2026-09-18 (tools/rename.py). Address 0x800407f8.
-
 # Obj6EAC0__SetPosition — MATCHED (11/11), round 19
+
+> Renamed from `func_800407F8` on 2026-09-18 (tools/rename.py). Address 0x800407f8.
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean. Retail's own
 callee-saved count is 0 -- not the saturated-register-file class.

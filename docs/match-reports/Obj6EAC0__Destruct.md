@@ -1,6 +1,6 @@
-> Renamed from `func_80040A30` on 2026-09-18 (tools/rename.py). Address 0x80040a30.
-
 # Obj6EAC0__Destruct — MATCHED (22/22 words)
+
+> Renamed from `func_80040A30` on 2026-09-18 (tools/rename.py). Address 0x80040a30.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 

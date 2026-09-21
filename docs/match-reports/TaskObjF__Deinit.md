@@ -1,6 +1,6 @@
-> Renamed from `func_8004F5DC` on 2026-09-20 (tools/rename.py). Address 0x8004f5dc.
-
 # TaskObjF__Deinit
+
+> Renamed from `func_8004F5DC` on 2026-09-20 (tools/rename.py). Address 0x8004f5dc.
 
 **Unit:** class_3bb8c_f · **Size:** 23 words (0x5C) · **Status:** MATCH
 

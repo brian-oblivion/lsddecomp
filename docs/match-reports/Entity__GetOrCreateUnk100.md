@@ -1,6 +1,6 @@
-> Renamed from `func_8005D108` on 2026-09-19 (tools/rename.py). Address 0x8005d108.
-
 # Entity__GetOrCreateUnk100
+
+> Renamed from `func_8005D108` on 2026-09-19 (tools/rename.py). Address 0x8005d108.
 
 **Unit:** Entity · **Size:** 57 words · **Status:** MATCHED (57/57 words, whole-image build verified byte-exact)
 

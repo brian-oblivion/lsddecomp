@@ -1,6 +1,6 @@
-> Renamed from `func_8005C714` on 2026-09-21 (tools/rename.py). Address 0x8005c714.
-
 # EnableTeleportsForKind
+
+> Renamed from `func_8005C714` on 2026-09-21 (tools/rename.py). Address 0x8005c714.
 
 **Unit:** code_4cd08 · **Size:** 22 words · **Status:** MATCHED (22/22 words)
 

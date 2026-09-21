@@ -1,6 +1,6 @@
-> Renamed from `func_8005DB8C` on 2026-09-19 (tools/rename.py). Address 0x8005db8c.
-
 # Entity__StopSoundCue
+
+> Renamed from `func_8005DB8C` on 2026-09-19 (tools/rename.py). Address 0x8005db8c.
 
 **Unit:** Entity · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
 

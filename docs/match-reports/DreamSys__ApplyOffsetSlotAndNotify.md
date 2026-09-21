@@ -1,6 +1,6 @@
-> Renamed from `func_80057534` on 2026-09-19 (tools/rename.py). Address 0x80057534.
-
 # DreamSys__ApplyOffsetSlotAndNotify -- MATCHED (31/31)
+
+> Renamed from `func_80057534` on 2026-09-19 (tools/rename.py). Address 0x80057534.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` (self+0, vtable
 `vtable_DreamSys`, resolved via `tools/classtable.py DREAMSYS_METHODS`).

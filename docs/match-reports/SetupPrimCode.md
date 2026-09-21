@@ -1,6 +1,6 @@
-> Renamed from `func_8001934C` on 2026-09-17 (tools/rename.py). Address 0x8001934c.
-
 # SetupPrimCode — MATCHED (29/29 words)
+
+> Renamed from `func_8001934C` on 2026-09-17 (tools/rename.py). Address 0x8001934c.
 
 Unit: `src/code_8220_b.c`. Not previously declared in `include/code_8220.h`;
 called only from the still-`INCLUDE_ASM` giant `func_80018464` (13 call

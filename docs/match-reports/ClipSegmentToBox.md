@@ -1,6 +1,6 @@
-> Renamed from `func_8001E110` on 2026-09-18 (tools/rename.py). Address 0x8001e110.
-
 # ClipSegmentToBox — MATCHED (round 41), 118/118, byte-exact
+
+> Renamed from `func_8001E110` on 2026-09-18 (tools/rename.py). Address 0x8001e110.
 
 **Round 41 update (read this first): CLOSED.** Round 20 closed the CFG and
 register mapping (16/118 -> 95/118), leaving one standalone residue: an

@@ -1,6 +1,6 @@
-> Renamed from `func_8005C9DC` on 2026-09-21 (tools/rename.py). Address 0x8005c9dc.
-
 # FireDreamAuxTriggerEntries
+
+> Renamed from `func_8005C9DC` on 2026-09-21 (tools/rename.py). Address 0x8005c9dc.
 
 **Unit:** code_4cd08 · **Size:** 54 words · **Status:** MATCHED round 43
 (54/54, byte-exact whole-image build).

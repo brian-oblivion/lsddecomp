@@ -1,6 +1,6 @@
-> Renamed from `func_80027ED4` on 2026-09-17 (tools/rename.py). Address 0x80027ed4.
-
 # IsCdIdle
+
+> Renamed from `func_80027ED4` on 2026-09-17 (tools/rename.py). Address 0x80027ed4.
 
 **Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 

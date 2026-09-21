@@ -1,6 +1,6 @@
-> Renamed from `func_8002F368` on 2026-09-20 (tools/rename.py). Address 0x8002f368.
-
 # PlayFixedSound -- MATCHED (32/32 words)
+
+> Renamed from `func_8002F368` on 2026-09-20 (tools/rename.py). Address 0x8002f368.
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 

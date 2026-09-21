@@ -1,6 +1,6 @@
-> Renamed from `func_80056DF8` on 2026-09-18 (tools/rename.py). Address 0x80056df8.
-
 # LinkOwnerObj__ReleaseLinks -- MATCHED (9/9 words)
+
+> Renamed from `func_80056DF8` on 2026-09-18 (tools/rename.py). Address 0x80056df8.
 
 Unit: `class_3bb8c_o` (round 17). A one-line wrapper releasing a 5-element
 `BasicClass *` array inline at `self+0x84`.

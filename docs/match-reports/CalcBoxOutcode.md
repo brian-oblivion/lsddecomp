@@ -1,6 +1,6 @@
-> Renamed from `func_8001ECFC` on 2026-09-17 (tools/rename.py). Address 0x8001ecfc.
-
 # CalcBoxOutcode -- MATCHED (44/44 words)
+
+> Renamed from `func_8001ECFC` on 2026-09-17 (tools/rename.py). Address 0x8001ecfc.
 
 Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- a Cohen-Sutherland-style "outcode"

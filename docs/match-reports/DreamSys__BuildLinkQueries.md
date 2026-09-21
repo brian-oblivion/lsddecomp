@@ -1,6 +1,6 @@
-> Renamed from `func_80057784` on 2026-09-19 (tools/rename.py). Address 0x80057784.
-
 # DreamSys__BuildLinkQueries -- STALL (best 13/116 words, structurally correct)
+
+> Renamed from `func_80057784` on 2026-09-19 (tools/rename.py). Address 0x80057784.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot. Called by this unit's own `DreamSys__FindNearbyLink`

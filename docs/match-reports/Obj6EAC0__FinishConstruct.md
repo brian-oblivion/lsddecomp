@@ -1,6 +1,6 @@
-> Renamed from `func_80040A88` on 2026-09-18 (tools/rename.py). Address 0x80040a88.
-
 # Obj6EAC0__FinishConstruct — MATCHED (24/24 words)
+
+> Renamed from `func_80040A88` on 2026-09-18 (tools/rename.py). Address 0x80040a88.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 

@@ -1,6 +1,6 @@
-> Renamed from `func_800269F0` on 2026-09-18 (tools/rename.py). Address 0x800269f0.
-
 # DestroyChained
+
+> Renamed from `func_800269F0` on 2026-09-18 (tools/rename.py). Address 0x800269f0.
 
 **Unit:** code_171e0 · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
 

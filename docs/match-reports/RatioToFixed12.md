@@ -1,6 +1,6 @@
-> Renamed from `func_8001EC84` on 2026-09-17 (tools/rename.py). Address 0x8001ec84.
-
 # RatioToFixed12 -- MATCHED 30/30 words
+
+> Renamed from `func_8001EC84` on 2026-09-17 (tools/rename.py). Address 0x8001ec84.
 
 Unit `code_d294_c`, carved round 13. Reopened round 42 as `nop_mflo_mfhi`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually

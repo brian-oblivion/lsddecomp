@@ -1,6 +1,6 @@
-> Renamed from `func_80057A18` on 2026-09-19 (tools/rename.py). Address 0x80057a18.
-
 # DreamSys__ScanGridWindow -- MATCHED (79/79)
+
+> Renamed from `func_80057A18` on 2026-09-19 (tools/rename.py). Address 0x80057a18.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot. Called by this unit's own `DreamSys__ScanLinkCandidates` (see

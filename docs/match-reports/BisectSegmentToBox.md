@@ -1,6 +1,6 @@
-> Renamed from `func_8001E2E8` on 2026-09-18 (tools/rename.py). Address 0x8001e2e8.
-
 # BisectSegmentToBox — MATCHED
+
+> Renamed from `func_8001E2E8` on 2026-09-18 (tools/rename.py). Address 0x8001e2e8.
 
 Unit: `code_d294_b`. Round 13, runner delta. 109/109 words, full match on the
 first attempt.

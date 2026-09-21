@@ -1,6 +1,6 @@
-> Renamed from `func_8001DA28` on 2026-09-18 (tools/rename.py). Address 0x8001da28.
-
 # Class6B5CC__CheckBoundsOverlap — STALL (21 words SHORT: built 222/retail 243 words; 14/243 raw words match per funcdiff; first diff read off asm-differ at file offset 0xE238 / vram 0x8001DA38 — `addiu $t4, $a3, 4` (materializing the `cur` corner-loop pointer into its own register) where this build instead re-uses `arg2` copied into a scratch register at that point; see the round-37 addendum for how this title was rebuilt and what it supersedes)
+
+> Renamed from `func_8001DA28` on 2026-09-18 (tools/rename.py). Address 0x8001da28.
 
 Unit: `code_d294_b`. Round 13, runner delta. This is the unit's largest
 queued function (268 asm lines / 243 words). One real attempt reached

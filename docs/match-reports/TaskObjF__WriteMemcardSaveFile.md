@@ -1,6 +1,6 @@
-> Renamed from `func_8004EEA0` on 2026-09-20 (tools/rename.py). Address 0x8004eea0.
-
 # TaskObjF__WriteMemcardSaveFile -- MATCHED 51/51 (round 18, echo, via permuter -- targeted PERM macros)
+
+> Renamed from `func_8004EEA0` on 2026-09-20 (tools/rename.py). Address 0x8004eea0.
 
 **Unit:** class_3bb8c_f · **Size:** 51 words (0xCC)
 

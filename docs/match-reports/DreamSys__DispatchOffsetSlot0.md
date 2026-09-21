@@ -1,6 +1,6 @@
-> Renamed from `func_800575E0` on 2026-09-19 (tools/rename.py). Address 0x800575e0.
-
 # DreamSys__DispatchOffsetSlot0 -- MATCHED (12/12)
+
+> Renamed from `func_800575E0` on 2026-09-19 (tools/rename.py). Address 0x800575e0.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0D4`.
 

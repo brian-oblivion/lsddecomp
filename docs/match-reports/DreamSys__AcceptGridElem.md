@@ -1,6 +1,6 @@
-> Renamed from `func_80057B54` on 2026-09-19 (tools/rename.py). Address 0x80057b54.
-
 # DreamSys__AcceptGridElem -- MATCHED (15/15)
+
+> Renamed from `func_80057B54` on 2026-09-19 (tools/rename.py). Address 0x80057b54.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family (called only from
 this unit's own `DreamSys__ScanGridWindow`, still queued at time of writing, twice, as

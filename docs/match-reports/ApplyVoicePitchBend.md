@@ -1,6 +1,6 @@
-> Renamed from `func_8002F3E8` on 2026-09-20 (tools/rename.py). Address 0x8002f3e8.
-
 # ApplyVoicePitchBend -- STALL: exact length (138/138 words), 77/138 raw word-match, first diff at file 0x1FBEC / vram 0x8002F3EC (word 1, `move t2,a0` vs `move t1,a0`)
+
+> Renamed from `func_8002F3E8` on 2026-09-20 (tools/rename.py). Address 0x8002f3e8.
 
 Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
 

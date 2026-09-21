@@ -1,6 +1,6 @@
-> Renamed from `func_8004109C` on 2026-09-18 (tools/rename.py). Address 0x8004109c.
-
 # FormatFullWidthNumber — MATCHED, round 38 (56/56). Closed by permuter search from round 35's 49/56 exact-length register-identity near-miss: declaration reorder (text/fill/padded) plus splitting the fill subtraction into two statements together reproduce retail's exact register assignment.
+
+> Renamed from `func_8004109C` on 2026-09-18 (tools/rename.py). Address 0x8004109c.
 
 **Round 35 update (runner delta): the 42/56 figure below was NEVER ACTUALLY
 MEASURED — the preserved body called two symbols by placeholder names

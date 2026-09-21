@@ -1,6 +1,6 @@
-> Renamed from `func_80040854` on 2026-09-18 (tools/rename.py). Address 0x80040854.
-
 # Obj6EAC0__SetChar — MATCHED (19/19), round 19
+
+> Renamed from `func_80040854` on 2026-09-18 (tools/rename.py). Address 0x80040854.
 
 ## Round 19: closed via the permuter, `do { ... } while (0)` scoping lever
 

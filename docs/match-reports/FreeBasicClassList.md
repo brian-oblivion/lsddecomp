@@ -1,6 +1,6 @@
-> Renamed from `func_80018288` on 2026-09-17 (tools/rename.py). Address 0x80018288.
-
 # FreeBasicClassList — MATCHED (17/17 words)
+
+> Renamed from `func_80018288` on 2026-09-17 (tools/rename.py). Address 0x80018288.
 
 Unit: `src/code_8220_b.c`. Signature (already in `include/code_8220.h`):
 `void FreeBasicClassList(BasicClassListNode **head);` — free every node in a

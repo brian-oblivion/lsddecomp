@@ -1,6 +1,6 @@
-> Renamed from `func_80057C6C` on 2026-09-19 (tools/rename.py). Address 0x80057c6c.
-
 # DreamSys__SetLastOffsetValue -- MATCHED (2/2)
+
+> Renamed from `func_80057C6C` on 2026-09-19 (tools/rename.py). Address 0x80057c6c.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0E4`
 (base-class-inherited; `include/DreamSys.h` already named this slot in an

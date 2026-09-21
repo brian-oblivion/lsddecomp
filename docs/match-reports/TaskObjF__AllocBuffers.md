@@ -1,6 +1,6 @@
-> Renamed from `func_8004F704` on 2026-09-20 (tools/rename.py). Address 0x8004f704.
-
 # TaskObjF__AllocBuffers
+
+> Renamed from `func_8004F704` on 2026-09-20 (tools/rename.py). Address 0x8004f704.
 
 **Unit:** class_3bb8c_f · **Size:** 32 words (0x80) · **Status:** MATCH
 

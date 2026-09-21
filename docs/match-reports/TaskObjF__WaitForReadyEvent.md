@@ -1,8 +1,8 @@
+# TaskObjF__WaitForReadyEvent
+
 > Renamed from `TaskObjF__FindReadyEvent` on 2026-09-20 (tools/rename.py). Address 0x8004f4a4.
 
 > Renamed from `func_8004F4A4` on 2026-09-20 (tools/rename.py). Address 0x8004f4a4.
-
-# TaskObjF__WaitForReadyEvent
 
 **Unit:** class_3bb8c_f · **Size:** 9 words (0x24) · **Status:** MATCH
 

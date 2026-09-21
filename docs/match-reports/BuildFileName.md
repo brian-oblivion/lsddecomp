@@ -1,6 +1,6 @@
-> Renamed from `func_800270C4` on 2026-09-18 (tools/rename.py). Address 0x800270c4.
-
 # BuildFileName
+
+> Renamed from `func_800270C4` on 2026-09-18 (tools/rename.py). Address 0x800270c4.
 
 **Unit:** code_171e0 · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
 

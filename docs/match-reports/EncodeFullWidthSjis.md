@@ -1,6 +1,6 @@
-> Renamed from `func_80041020` on 2026-09-18 (tools/rename.py). Address 0x80041020.
-
 # EncodeFullWidthSjis -- MATCHED, round 38 (31/31). Closed by permuter search from round 37's 20/31 exact-length register-identity near-miss: reading the second byte's value through a fresh local instead of reusing the first byte's variable made GCC's allocator match retail's 3-way register assignment exactly.
+
+> Renamed from `func_80041020` on 2026-09-18 (tools/rename.py). Address 0x80041020.
 
 **Round 35 (runner delta) confirmation at the bottom of this file: reconfirmed
 19/31 after rebuilding the preserved body; a bare `__asm__("")` barrier tried

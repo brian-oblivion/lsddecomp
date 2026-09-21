@@ -1,6 +1,6 @@
-> Renamed from `func_8001D4DC` on 2026-09-18 (tools/rename.py). Address 0x8001d4dc.
-
 # Class6B5CC__GetRotMatrix — MATCHED
+
+> Renamed from `func_8001D4DC` on 2026-09-18 (tools/rename.py). Address 0x8001d4dc.
 
 Unit: `code_d294_b`. Round 13, runner delta. 35/35 words, full match on the
 first attempt.

@@ -1,6 +1,6 @@
-> Renamed from `func_8005D714` on 2026-09-19 (tools/rename.py). Address 0x8005d714.
-
 # Entity__IsNearTarget -- MATCHED (58/58 words)
+
+> Renamed from `func_8005D714` on 2026-09-19 (tools/rename.py). Address 0x8005d714.
 
 **Unit:** Entity · Runner: charlie, round 23.
 

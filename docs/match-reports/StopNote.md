@@ -1,6 +1,6 @@
-> Renamed from `func_800300D0` on 2026-09-20 (tools/rename.py). Address 0x800300d0.
-
 # StopNote -- MATCHED (131/131 words)
+
+> Renamed from `func_800300D0` on 2026-09-20 (tools/rename.py). Address 0x800300d0.
 
 Unit: `src/code_179d8_m.c`. Round 24, runner bravo.
 

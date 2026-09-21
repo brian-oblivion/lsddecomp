@@ -1,6 +1,6 @@
-> Renamed from `func_8004F55C` on 2026-09-20 (tools/rename.py). Address 0x8004f55c.
-
 # TaskObjF__Init
+
+> Renamed from `func_8004F55C` on 2026-09-20 (tools/rename.py). Address 0x8004f55c.
 
 **Unit:** class_3bb8c_f · **Size:** 32 words (0x80) · **Status:** MATCH
 

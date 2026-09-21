@@ -1,6 +1,6 @@
-> Renamed from `func_800193C0` on 2026-09-17 (tools/rename.py). Address 0x800193c0.
-
 # ProjectTriFace — MATCHED (57/57 words)
+
+> Renamed from `func_800193C0` on 2026-09-17 (tools/rename.py). Address 0x800193c0.
 
 Unit: `src/code_8220_b.c`. Triangle submission routine: computes three
 vertex-array pointers from a shared base and three `u16` indices, stores

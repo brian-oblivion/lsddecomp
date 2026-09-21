@@ -1,6 +1,6 @@
-> Renamed from `func_8001D480` on 2026-09-18 (tools/rename.py). Address 0x8001d480.
-
 # Class6B5CC__GetSetUnk10Field9 -- MATCHED (11/11 words)
+
+> Renamed from `func_8001D480` on 2026-09-18 (tools/rename.py). Address 0x8001d480.
 
 Round 12, runner delta. `code_d294_b`.
 

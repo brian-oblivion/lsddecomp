@@ -1,6 +1,6 @@
-> Renamed from `func_8003E6CC` on 2026-09-19 (tools/rename.py). Address 0x8003e6cc.
-
 # Unk18Obj__Finalize — MATCH (41/41 words)
+
+> Renamed from `func_8003E6CC` on 2026-09-19 (tools/rename.py). Address 0x8003e6cc.
 
 **Unit:** code_2cc8c_c · **Size:** 41 instructions
 

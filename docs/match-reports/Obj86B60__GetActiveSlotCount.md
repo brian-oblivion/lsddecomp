@@ -1,6 +1,6 @@
-> Renamed from `func_8003DFA0` on 2026-09-19 (tools/rename.py). Address 0x8003dfa0.
-
 # Obj86B60__GetActiveSlotCount — MATCH (7/7 words)
+
+> Renamed from `func_8003DFA0` on 2026-09-19 (tools/rename.py). Address 0x8003dfa0.
 
 **Unit:** code_2cc8c_c · **Size:** 7 instructions
 

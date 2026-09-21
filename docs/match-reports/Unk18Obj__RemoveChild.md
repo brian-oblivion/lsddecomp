@@ -1,6 +1,6 @@
-> Renamed from `func_8003E7F4` on 2026-09-19 (tools/rename.py). Address 0x8003e7f4.
-
 # Unk18Obj__RemoveChild — MATCH (32/32 words)
+
+> Renamed from `func_8003E7F4` on 2026-09-19 (tools/rename.py). Address 0x8003e7f4.
 
 **Unit:** code_2cc8c_c · **Size:** 32 instructions
 

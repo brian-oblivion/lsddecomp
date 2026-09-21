@@ -1,6 +1,6 @@
-> Renamed from `func_8005C9A4` on 2026-09-21 (tools/rename.py). Address 0x8005c9a4.
-
 # CheckTriggerParity
+
+> Renamed from `func_8005C9A4` on 2026-09-21 (tools/rename.py). Address 0x8005c9a4.
 
 **Unit:** code_4cd08 · **Size:** 14 words · **Status:** MATCHED (14/14 words)
 

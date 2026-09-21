@@ -1,6 +1,6 @@
-> Renamed from `func_8003E770` on 2026-09-19 (tools/rename.py). Address 0x8003e770.
-
 # Unk18Obj__AddChild — MATCH (33/33 words)
+
+> Renamed from `func_8003E770` on 2026-09-19 (tools/rename.py). Address 0x8003e770.
 
 **Unit:** code_2cc8c_c · **Size:** 33 instructions
 

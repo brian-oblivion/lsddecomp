@@ -1,6 +1,6 @@
-> Renamed from `func_8003FE2C` on 2026-09-20 (tools/rename.py). Address 0x8003fe2c.
-
 # Class6E99C__Class6E99C -- MATCH (43/43 words, first attempt)
+
+> Renamed from `func_8003FE2C` on 2026-09-20 (tools/rename.py). Address 0x8003fe2c.
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CObj`'s own constructor
 (`Class6E99CMethods::ctor`, slot `+0x008`).

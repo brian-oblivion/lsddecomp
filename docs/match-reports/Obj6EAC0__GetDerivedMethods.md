@@ -1,6 +1,6 @@
-> Renamed from `func_80040FB0` on 2026-09-18 (tools/rename.py). Address 0x80040fb0.
-
 # Obj6EAC0__GetDerivedMethods — MATCHED (4/4 words)
+
+> Renamed from `func_80040FB0` on 2026-09-18 (tools/rename.py). Address 0x80040fb0.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 

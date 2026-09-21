@@ -1,6 +1,6 @@
-> Renamed from `func_8005C7D4` on 2026-09-21 (tools/rename.py). Address 0x8005c7d4.
-
 # TryDreamAuxTrigger
+
+> Renamed from `func_8005C7D4` on 2026-09-21 (tools/rename.py). Address 0x8005c7d4.
 
 **Unit:** code_4cd08 · **Size:** 54 words · **Status:** MATCHED round 43
 (54/54, byte-exact whole-image build).

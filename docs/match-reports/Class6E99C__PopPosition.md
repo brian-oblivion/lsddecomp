@@ -1,6 +1,6 @@
-> Renamed from `func_80040490` on 2026-09-20 (tools/rename.py). Address 0x80040490.
-
 # Class6E99C__PopPosition -- MATCH (9/9 words, first attempt)
+
+> Renamed from `func_80040490` on 2026-09-20 (tools/rename.py). Address 0x80040490.
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::popPosition` (`+0x0EC`).
 

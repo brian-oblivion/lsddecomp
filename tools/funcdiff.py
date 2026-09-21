@@ -255,6 +255,11 @@ def main():
         return v & 0xFFFF0000
     ra = [skel(a[i * 4:i * 4 + 4]) for i in range(len(a) // 4)]
     rb = [skel(b[i * 4:i * 4 + 4]) for i in range(len(b) // 4)]
+    # Positional skeleton mismatches. If ZERO at equal length, no instruction
+    # was inserted or dropped, whatever the sequence matcher says: on a loop
+    # nest's repeating skeleton alphabet it can report N/N where nothing moved
+    # (round 63 measured 26/26 and 22/22 on synthetic zero-insertion inputs).
+    positional = sum(1 for x, y in zip(ra, rb) if x != y) if len(ra) == len(rb) else None
     ins = dele = 0
     for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, ra, rb, autojunk=False).get_opcodes():
         if tag == "insert":
@@ -265,8 +270,16 @@ def main():
             d = (j2 - j1) - (i2 - i1)
             ins += max(d, 0)
             dele += max(-d, 0)
+    if positional == 0:
+        ins = dele = 0
+    note = ""
+    if positional is not None and ins and ins == dele:
+        note = (f"; NOTE equal length with {positional} positional skeleton diff(s): an N/N figure "
+                f"here is a pointer to READ the diff, not a verdict (a repeating skeleton alphabet "
+                f"can align falsely)")
     print(f"{name}: insertions {ins} / deletions {dele} (opcode-level, built vs retail; "
-          f"Gate 3 check 3 compares these with the scaffold's --stack-diffs)")
+          f"positional skeleton diffs {positional if positional is not None else 'n/a'}; "
+          f"Gate 3 check 3 compares these with the scaffold's --stack-diffs){note}")
 
     if outside:
         print(f"WARNING: the build differs OUTSIDE this range too ({outside} "

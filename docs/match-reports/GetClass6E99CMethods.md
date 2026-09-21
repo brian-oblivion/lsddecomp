@@ -1,8 +1,8 @@
+# GetClass6E99CMethods -- MATCH (4/4 words, first attempt, trivial)
+
 > Renamed from `Class6E99C__GetMethods` on 2026-09-20 (tools/rename.py). Address 0x800404c0.
 
 > Renamed from `func_800404C0` on 2026-09-20 (tools/rename.py). Address 0x800404c0.
-
-# GetClass6E99CMethods -- MATCH (4/4 words, first attempt, trivial)
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CObj`'s own bare
 no-argument table getter, same idiom as `GetClass6B5CCMethods`

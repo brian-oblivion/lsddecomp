@@ -1,6 +1,6 @@
-> Renamed from `func_8002C638` on 2026-09-18 (tools/rename.py). Address 0x8002c638.
-
 # VabStreamObj__Close -- MATCHED 49/49 (round 43)
+
+> Renamed from `func_8002C638` on 2026-09-18 (tools/rename.py). Address 0x8002c638.
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`

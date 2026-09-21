@@ -1,6 +1,6 @@
-> Renamed from `func_80057C14` on 2026-09-19 (tools/rename.py). Address 0x80057c14.
-
 # DreamSys__DispatchLinkCommand -- MATCHED (22/22)
+
+> Renamed from `func_80057C14` on 2026-09-19 (tools/rename.py). Address 0x80057c14.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0E0`
 in the shared base table `D_800878D4` (`include/DreamSys.h`'s

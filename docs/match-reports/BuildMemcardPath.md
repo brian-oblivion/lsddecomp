@@ -1,6 +1,6 @@
-> Renamed from `func_8004F32C` on 2026-09-20 (tools/rename.py). Address 0x8004f32c.
-
 # BuildMemcardPath
+
+> Renamed from `func_8004F32C` on 2026-09-20 (tools/rename.py). Address 0x8004f32c.
 
 **Unit:** class_3bb8c_f · **Size:** 26 words (0x68) · **Status:** MATCH
 

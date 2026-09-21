@@ -1,6 +1,6 @@
-> Renamed from `func_8005CAB4` on 2026-09-21 (tools/rename.py). Address 0x8005cab4.
-
 # ProcessDreamAuxTriggerRecord -- MATCHED
+
+> Renamed from `func_8005CAB4` on 2026-09-21 (tools/rename.py). Address 0x8005cab4.
 
 Unit `code_4cd08` ("DreamAux"). 69/69 words, `0x4D2B4`-`0x4D3C8`. Whole-image
 `build-and-verify.sh` green.

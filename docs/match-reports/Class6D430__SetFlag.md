@@ -1,6 +1,6 @@
-> Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
-
 # Class6D430__SetFlag
+
+> Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
 
 **Unit:** code_171e0 · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 

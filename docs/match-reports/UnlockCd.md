@@ -1,6 +1,6 @@
-> Renamed from `func_800280E0` on 2026-09-17 (tools/rename.py). Address 0x800280e0.
-
 # UnlockCd
+
+> Renamed from `func_800280E0` on 2026-09-17 (tools/rename.py). Address 0x800280e0.
 
 **Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 

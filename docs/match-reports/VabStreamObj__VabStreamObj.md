@@ -1,6 +1,6 @@
-> Renamed from `VabStreamObj__VabStreamObj` on 2026-09-18 (tools/rename.py). Address 0x8002c4e0.
-
 # VabStreamObj__VabStreamObj -- MATCHED 86/86 (round 43)
+
+> Renamed from `VabStreamObj__VabStreamObj` on 2026-09-18 (tools/rename.py). Address 0x8002c4e0.
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`

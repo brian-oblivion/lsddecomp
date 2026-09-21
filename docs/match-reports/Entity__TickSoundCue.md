@@ -1,6 +1,6 @@
-> Renamed from `func_8005D6D4` on 2026-09-19 (tools/rename.py). Address 0x8005d6d4.
-
 # Entity__TickSoundCue
+
+> Renamed from `func_8005D6D4` on 2026-09-19 (tools/rename.py). Address 0x8005d6d4.
 
 **Unit:** Entity · **Size:** 16 instructions · **Status:** MATCHED (16/16 words, whole-image build verified byte-exact)
 

@@ -1,6 +1,6 @@
-> Renamed from `func_80057954` on 2026-09-19 (tools/rename.py). Address 0x80057954.
-
 # DreamSys__ScanLinkCandidates -- MATCHED (49/49)
+
+> Renamed from `func_80057954` on 2026-09-19 (tools/rename.py). Address 0x80057954.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot.

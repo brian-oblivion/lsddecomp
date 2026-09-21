@@ -1,6 +1,6 @@
-> Renamed from `func_80057C84` on 2026-09-19 (tools/rename.py). Address 0x80057c84.
-
 # DreamSys__GetBaseMethods -- MATCHED (4/4)
+
+> Renamed from `func_80057C84` on 2026-09-19 (tools/rename.py). Address 0x80057c84.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain getter, not
 a vtable slot itself (checked all 6 method tables reachable from this

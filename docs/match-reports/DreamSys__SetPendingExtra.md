@@ -1,6 +1,6 @@
-> Renamed from `func_80057C7C` on 2026-09-19 (tools/rename.py). Address 0x80057c7c.
-
 # DreamSys__SetPendingExtra -- MATCHED (2/2)
+
+> Renamed from `func_80057C7C` on 2026-09-19 (tools/rename.py). Address 0x80057c7c.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0EC`
 (base-class-inherited; `include/DreamSys.h` already named this slot in an

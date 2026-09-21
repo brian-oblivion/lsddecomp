@@ -1,6 +1,6 @@
-> Renamed from `func_80040AE8` on 2026-09-18 (tools/rename.py). Address 0x80040ae8.
-
 # Obj6EAC0__LayoutChildrenWithGap — MATCHED (70/70), round 19
+
+> Renamed from `func_80040AE8` on 2026-09-18 (tools/rename.py). Address 0x80040ae8.
 
 ## Final body (byte-exact, full oracle green)
 

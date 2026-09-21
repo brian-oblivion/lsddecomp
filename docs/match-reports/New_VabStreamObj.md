@@ -1,6 +1,6 @@
-> Renamed from `func_8002C480` on 2026-09-18 (tools/rename.py). Address 0x8002c480.
-
 # New_VabStreamObj -- MATCHED (24/24 words)
+
+> Renamed from `func_8002C480` on 2026-09-18 (tools/rename.py). Address 0x8002c480.
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 

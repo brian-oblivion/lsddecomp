@@ -1,6 +1,6 @@
-> Renamed from `func_80057044` on 2026-09-18 (tools/rename.py). Address 0x80057044.
-
 # BaseObjO__BaseObjO -- MATCHED (28/28 words)
+
+> Renamed from `func_80057044` on 2026-09-18 (tools/rename.py). Address 0x80057044.
 
 Unit: `class_3bb8c_o` (round 17). The constructor of the shared
 intermediate base class this unit implements from here onward -- chains to

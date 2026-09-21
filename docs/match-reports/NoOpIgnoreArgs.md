@@ -1,8 +1,8 @@
+# NoOpIgnoreArgs -- MATCHED (trivial, splat-generated)
+
 > Renamed from `LinkOwnerObj__NoOp` on 2026-09-18 (tools/rename.py). Address 0x80056df0.
 
 > Renamed from `Noop` on 2026-09-18 (tools/rename.py). Address 0x80056df0.
-
-# NoOpIgnoreArgs -- MATCHED (trivial, splat-generated)
 
 Unit: `class_3bb8c_o` (round 17; named round 52). `void func_80056DF0(void) {}`
 -- an empty body, `jr $ra; nop`. No hand derivation was needed or done; it is

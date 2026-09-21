@@ -1,6 +1,6 @@
-> Renamed from `func_80057130` on 2026-09-18 (tools/rename.py). Address 0x80057130.
-
 # BaseObjO__UnlinkCompanion -- MATCHED (30/30 words)
+
+> Renamed from `func_80057130` on 2026-09-18 (tools/rename.py). Address 0x80057130.
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot14` -- the
 "unlink" companion of `BaseObjO__LinkCompanion` (`slot10`), already named by both

@@ -1,6 +1,6 @@
-> Renamed from `func_8004F3BC` on 2026-09-20 (tools/rename.py). Address 0x8004f3bc.
-
 # TaskObjF__DisableEvents
+
+> Renamed from `func_8004F3BC` on 2026-09-20 (tools/rename.py). Address 0x8004f3bc.
 
 **Unit:** class_3bb8c_f · **Size:** 10 words (0x28) · **Status:** MATCH
 

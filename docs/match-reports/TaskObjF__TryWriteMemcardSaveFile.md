@@ -1,6 +1,6 @@
-> Renamed from `func_8004EF6C` on 2026-09-20 (tools/rename.py). Address 0x8004ef6c.
-
 # TaskObjF__TryWriteMemcardSaveFile -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 191/240 (re-measured round 37; previously recorded 188/240 -- see round-37 note). First real diff: file 0x3F774 / vram 0x8004EF74 (register-permutation set-up; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7A4 / vram 0x8004EFA4, missing `sw $s0,0x30($sp)`, immediately followed by an empty `nop` at file 0x3F7F0 / vram 0x8004EFF0 where retail fills the delay slot with `move $s7,$s4`).
+
+> Renamed from `func_8004EF6C` on 2026-09-20 (tools/rename.py). Address 0x8004ef6c.
 
 > **ROUND 37 (delta): re-verified by rebuilding this EXACT preserved body,
 > then ran the permuter for the first time on this function (never

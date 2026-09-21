@@ -1,6 +1,6 @@
-> Renamed from `func_80028540` on 2026-09-18 (tools/rename.py). Address 0x80028540.
-
 # GetCdFileEntry -- MATCHED (round 46): 19/19 words, byte-exact
+
+> Renamed from `func_80028540` on 2026-09-18 (tools/rename.py). Address 0x80028540.
 
 **Unit:** code_179d8_r · **Round 46** · **MATCHED**
 

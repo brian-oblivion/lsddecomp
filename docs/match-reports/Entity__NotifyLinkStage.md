@@ -1,6 +1,6 @@
-> Renamed from `func_8005D560` on 2026-09-19 (tools/rename.py). Address 0x8005d560.
-
 # Entity__NotifyLinkStage -- MATCHED (62/62 words)
+
+> Renamed from `func_8005D560` on 2026-09-19 (tools/rename.py). Address 0x8005d560.
 
 **Unit:** Entity · Runner: charlie, round 23.
 

@@ -1,6 +1,6 @@
-> Renamed from `func_8005D658` on 2026-09-19 (tools/rename.py). Address 0x8005d658.
-
 # Entity__NotifyReset
+
+> Renamed from `func_8005D658` on 2026-09-19 (tools/rename.py). Address 0x8005d658.
 
 **Unit:** Entity · **Size:** 31 words · **Status:** MATCHED (31/31 words, whole-image build verified byte-exact)
 

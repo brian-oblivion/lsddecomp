@@ -1,6 +1,6 @@
-> Renamed from `func_8001D950` on 2026-09-18 (tools/rename.py). Address 0x8001d950.
-
 # Class6B5CC__ComposeAndApplyRotation — MATCHED
+
+> Renamed from `func_8001D950` on 2026-09-18 (tools/rename.py). Address 0x8001d950.
 
 Unit: `code_d294_b`. Round 13, runner delta. 54/54 words, full match.
 

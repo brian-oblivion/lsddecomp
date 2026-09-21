@@ -1,6 +1,6 @@
-> Renamed from `func_8003E5C8` on 2026-09-19 (tools/rename.py). Address 0x8003e5c8.
-
 # Get_vtable_IntermediateBase — MATCH (4/4 words)
+
+> Renamed from `func_8003E5C8` on 2026-09-19 (tools/rename.py). Address 0x8003e5c8.
 
 **Unit:** code_2cc8c_c · **Size:** 4 instructions
 

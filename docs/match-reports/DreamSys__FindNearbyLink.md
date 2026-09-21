@@ -1,6 +1,6 @@
-> Renamed from `func_80057668` on 2026-09-19 (tools/rename.py). Address 0x80057668.
-
 # DreamSys__FindNearbyLink -- MATCHED (71/71)
+
+> Renamed from `func_80057668` on 2026-09-19 (tools/rename.py). Address 0x80057668.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0BC`'s
 caller? No -- checked all 6 method tables reachable from this unit's

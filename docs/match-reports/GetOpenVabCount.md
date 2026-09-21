@@ -1,6 +1,6 @@
-> Renamed from `func_8002CC1C` on 2026-09-18 (tools/rename.py). Address 0x8002cc1c.
-
 # GetOpenVabCount -- MATCHED 3/3 (round 43)
+
+> Renamed from `func_8002CC1C` on 2026-09-18 (tools/rename.py). Address 0x8002cc1c.
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17); reopened
 round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi` resolved that blocker for the

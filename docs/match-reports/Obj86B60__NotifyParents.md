@@ -1,6 +1,6 @@
-> Renamed from `func_8003E4B8` on 2026-09-19 (tools/rename.py). Address 0x8003e4b8.
-
 # Obj86B60__NotifyParents — STALL, IMPROVED round 46 (register identity, now CLEANLY isolated; best 23/32, up from 21/32)
+
+> Renamed from `func_8003E4B8` on 2026-09-19 (tools/rename.py). Address 0x8003e4b8.
 
 ## ROUND 46 (runner delta): FIRST PERMUTER SEARCH on this function -- 279 base score, ~82,702 iterations under a 600s bound, no real zero; one heuristic-tempting sub-baseline candidate verified WORSE for real
 

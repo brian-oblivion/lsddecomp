@@ -1,6 +1,6 @@
-> Renamed from `func_8001EA8C` on 2026-09-17 (tools/rename.py). Address 0x8001ea8c.
-
 # SubVec3S16 -- MATCHED (16/16 words)
+
+> Renamed from `func_8001EA8C` on 2026-09-17 (tools/rename.py). Address 0x8001ea8c.
 
 Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- three-element vector subtraction between

@@ -1,6 +1,6 @@
-> Renamed from `func_80040FA8` on 2026-09-18 (tools/rename.py). Address 0x80040fa8.
-
 # Obj6EAC0__SetChildPitch — MATCHED (2/2 words)
+
+> Renamed from `func_80040FA8` on 2026-09-18 (tools/rename.py). Address 0x80040fa8.
 
 Unit: `src/code_2cc8c_f.c`. Trivial setter, first attempt.
 

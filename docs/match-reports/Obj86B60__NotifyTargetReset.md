@@ -1,6 +1,6 @@
-> Renamed from `func_8003E538` on 2026-09-19 (tools/rename.py). Address 0x8003e538.
-
 # Obj86B60__NotifyTargetReset — MATCH (16/16 words, 2 attempts)
+
+> Renamed from `func_8003E538` on 2026-09-19 (tools/rename.py). Address 0x8003e538.
 
 **Unit:** code_2cc8c_c · **Size:** 16 instructions
 

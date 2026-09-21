@@ -1,6 +1,6 @@
-> Renamed from `func_8002EDD4` on 2026-09-20 (tools/rename.py). Address 0x8002edd4.
-
 # InitSpuDriver -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
+
+> Renamed from `func_8002EDD4` on 2026-09-20 (tools/rename.py). Address 0x8002edd4.
 
 **Round 32 update supersedes everything below except as a historical record
 of the residue's diagnosis, which was correct and is the reason this match

@@ -1,6 +1,6 @@
-> Renamed from `func_8005D7FC` on 2026-09-19 (tools/rename.py). Address 0x8005d7fc.
-
 # Entity__DistanceToRegion
+
+> Renamed from `func_8005D7FC` on 2026-09-19 (tools/rename.py). Address 0x8005d7fc.
 
 **Unit:** Entity · **Size:** 26 words · **Status:** MATCHED (26/26 words, whole-image build verified byte-exact)
 

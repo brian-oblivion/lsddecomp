@@ -1,6 +1,6 @@
-> Renamed from `func_800402F0` on 2026-09-20 (tools/rename.py). Address 0x800402f0.
-
 # Class6E99C__Stop -- MATCHED (66/66 words)
+
+> Renamed from `func_800402F0` on 2026-09-20 (tools/rename.py). Address 0x800402f0.
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::slot14` (`+0x014`,
 shared with `Class6B5CCMethods`'s own inherited slot).

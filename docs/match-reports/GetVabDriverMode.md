@@ -1,6 +1,6 @@
-> Renamed from `func_8002C448` on 2026-09-18 (tools/rename.py). Address 0x8002c448.
-
 # GetVabDriverMode -- MATCHED 8/8 (round 43)
+
+> Renamed from `func_8002C448` on 2026-09-18 (tools/rename.py). Address 0x8002c448.
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17); reopened
 round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi` resolved that blocker for the

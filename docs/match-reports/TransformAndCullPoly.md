@@ -1,6 +1,6 @@
-> Renamed from `func_800195EC` on 2026-09-17 (tools/rename.py). Address 0x800195ec.
-
 # TransformAndCullPoly — MATCHED (58/58 words), as C over the GTE macros
+
+> Renamed from `func_800195EC` on 2026-09-17 (tools/rename.py). Address 0x800195ec.
 
 Unit: `src/code_8220_b.c`. GTE transform/clip/OT-bucket routine: runs `rtpt`
 on the three vertices the caller loaded with `gte_ldv3`, checks the FLAG

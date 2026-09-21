@@ -1,6 +1,6 @@
-> Renamed from `func_8003E10C` on 2026-09-19 (tools/rename.py). Address 0x8003e10c.
-
 # Obj86B60__Init — MATCH (93/93 words)
+
+> Renamed from `func_8003E10C` on 2026-09-19 (tools/rename.py). Address 0x8003e10c.
 
 **Unit:** code_2cc8c_c · **Size:** 93 instructions
 

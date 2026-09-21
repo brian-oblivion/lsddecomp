@@ -1,6 +1,6 @@
-> Renamed from `func_800571A8` on 2026-09-18 (tools/rename.py). Address 0x800571a8.
-
 # BaseObjO__ClearCompanions -- MATCHED (16/16 words)
+
+> Renamed from `func_800571A8` on 2026-09-18 (tools/rename.py). Address 0x800571a8.
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot18` -- an
 unconditional full teardown of both companion pointers (no tag check),

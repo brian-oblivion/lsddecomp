@@ -1,6 +1,6 @@
-> Renamed from `func_80057444` on 2026-09-18 (tools/rename.py). Address 0x80057444.
-
 # BaseObjO__ApplyRotatedVec14 -- MATCHED (18/18 words)
+
+> Renamed from `func_80057444` on 2026-09-18 (tools/rename.py). Address 0x80057444.
 
 Unit: `class_3bb8c_o` (round 17). Converts a source `s16` triple into a
 stack `Vec3O` via `Class6B5CC__RotateLocalVector`, then forwards it to `self`'s own

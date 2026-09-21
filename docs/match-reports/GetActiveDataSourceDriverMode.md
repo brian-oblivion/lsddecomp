@@ -1,6 +1,6 @@
-> Renamed from `func_80026FAC` on 2026-09-18 (tools/rename.py). Address 0x80026fac.
-
 # GetActiveDataSourceDriverMode
+
+> Renamed from `func_80026FAC` on 2026-09-18 (tools/rename.py). Address 0x80026fac.
 
 **Unit:** code_171e0 · **Size:** 15 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 15/15 words, byte-exact whole-image build.

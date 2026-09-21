@@ -1,6 +1,6 @@
-> Renamed from `func_8001D568` on 2026-09-18 (tools/rename.py). Address 0x8001d568.
-
 # Class6B5CC__NotifyIfUnk20Active — MATCHED
+
+> Renamed from `func_8001D568` on 2026-09-18 (tools/rename.py). Address 0x8001d568.
 
 Unit: `code_d294_b`. Round 13, runner delta. 38/38 words, full match.
 

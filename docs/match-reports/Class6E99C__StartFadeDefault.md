@@ -1,6 +1,6 @@
-> Renamed from `func_800400B0` on 2026-09-20 (tools/rename.py). Address 0x800400b0.
-
 # Class6E99C__StartFadeDefault -- STALL, PRIOR "29/41, same length" CLAIM CORRECTED (real one-word length regression, not a pure register/scheduling residue)
+
+> Renamed from `func_800400B0` on 2026-09-20 (tools/rename.py). Address 0x800400b0.
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 

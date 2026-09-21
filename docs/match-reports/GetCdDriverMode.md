@@ -1,6 +1,6 @@
-> Renamed from `func_80027EF8` on 2026-09-17 (tools/rename.py). Address 0x80027ef8.
-
 # GetCdDriverMode — MATCHED (8/8 words)
+
+> Renamed from `func_80027EF8` on 2026-09-17 (tools/rename.py). Address 0x80027ef8.
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 

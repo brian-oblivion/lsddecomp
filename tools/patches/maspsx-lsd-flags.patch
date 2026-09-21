@@ -1,15 +1,18 @@
+diff --git a/maspsx.py b/maspsx.py
+index 4e3a382..a6a24e9 100644
 --- a/maspsx.py
 +++ b/maspsx.py
-@@ -59,6 +59,8 @@
+@@ -59,6 +59,9 @@ def main() -> None:
      parser.add_argument("--macro-inc", action="store_true")
      parser.add_argument("--dont-expand-li", action="store_true")
      parser.add_argument("--addiu-at", action="store_true")
 +    parser.add_argument("--gp-symbols", type=str, default=None)
 +    parser.add_argument("--no-nop-mflo-mfhi", action="store_true")
++    parser.add_argument("--nop-at-expansion", action="store_true")
      parser.add_argument("--force-stdin", action="store_true")
      parser.add_argument("--passthrough", action="store_true")
      parser.add_argument("--use-comm-section", action="store_true")
-@@ -129,6 +131,19 @@
+@@ -129,6 +132,19 @@ def main() -> None:
  
          filtered_as_args.append(arg)
  
@@ -29,7 +32,7 @@
      if args.passthrough:
          processor = PassthroughProcessor(in_lines)
  
-@@ -146,10 +161,18 @@
+@@ -146,10 +162,26 @@ def main() -> None:
          # docs/research/addiu-at-blocker.md, "Options", option 1.
          if args.addiu_at:
              version_config.addiu_at = True
@@ -40,6 +43,14 @@
 +        # the whole image. See docs/research/addiu-at-blocker.md.
 +        if args.no_nop_mflo_mfhi:
 +            version_config.nop_mflo_mfhi = False
++        # Fourth decoupling, same shape (lsddecomp2 round 62/63). ASPSX 2.34
++        # decides the load-delay hazard BEFORE expanding a store-to-symbol
++        # macro, so `lbu $2,0($4)` followed by `sb $2,G` gets a nop even though
++        # the expansion interposes `lui $at`. Retail: 40 such sites with the
++        # nop, 0 without. config_for_aspsx_version turns this on only below
++        # 2.30; this flag turns it on alone.
++        if args.nop_at_expansion:
++            version_config.nop_at_expansion = True
  
          processor = MaspsxProcessor(
              in_lines,
@@ -48,9 +59,11 @@
              expand_div=args.expand_div,
              expand_li=version_config.expand_li,
              nop_at_expansion=version_config.nop_at_expansion,
+diff --git a/maspsx/__init__.py b/maspsx/__init__.py
+index b351c8a..e9776e1 100644
 --- a/maspsx/__init__.py
 +++ b/maspsx/__init__.py
-@@ -423,6 +423,7 @@
+@@ -423,6 +423,7 @@ class MaspsxProcessor:
          self,
          lines: List[str],
          sdata_limit=0,
@@ -58,7 +71,7 @@
          expand_div=False,
          expand_li=False,
          nop_at_expansion=False,
-@@ -439,6 +440,7 @@
+@@ -439,6 +440,7 @@ class MaspsxProcessor:
          self.lines = [x.strip() for x in lines]
  
          self.sdata_limit = sdata_limit
@@ -66,7 +79,7 @@
  
          self.expand_div = expand_div
          self.expand_li = expand_li
-@@ -568,6 +570,9 @@
+@@ -568,6 +570,9 @@ class MaspsxProcessor:
          self.sdata_entries = {}
  
          self.preprocess_lines()
@@ -76,7 +89,7 @@
  
          res = []
          in_include_asm_hack = False
-@@ -649,7 +654,7 @@
+@@ -649,7 +654,7 @@ class MaspsxProcessor:
          return ""  # warn user?
  
      def _uses_gp(self, line: str) -> bool:

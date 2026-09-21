@@ -1,6 +1,6 @@
-> Renamed from `func_80040154` on 2026-09-20 (tools/rename.py). Address 0x80040154.
-
 # Class6E99C__Configure -- MATCHED (103/103)
+
+> Renamed from `func_80040154` on 2026-09-20 (tools/rename.py). Address 0x80040154.
 
 ## Round 21 (runner delta): the final 2-word mflo-destination residue closed by an in-place division
 

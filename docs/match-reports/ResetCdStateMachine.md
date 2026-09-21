@@ -1,6 +1,6 @@
-> Renamed from `func_80028864` on 2026-09-18 (tools/rename.py). Address 0x80028864.
-
 # ResetCdStateMachine
+
+> Renamed from `func_80028864` on 2026-09-18 (tools/rename.py). Address 0x80028864.
 
 **Unit:** code_179d8_r · **Size:** 9 words · **Status:** MATCHED (9/9 words) · **Round 45**
 

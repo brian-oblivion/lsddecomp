@@ -1,6 +1,6 @@
-> Renamed from `func_800281B0` on 2026-09-17 (tools/rename.py). Address 0x800281b0.
-
 # StartCdService — MATCHED (26/26 words)
+
+> Renamed from `func_800281B0` on 2026-09-17 (tools/rename.py). Address 0x800281b0.
 
 Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 

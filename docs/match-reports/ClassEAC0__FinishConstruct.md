@@ -1,6 +1,6 @@
-> Renamed from `func_800405D0` on 2026-09-20 (tools/rename.py). Address 0x800405d0.
-
 # ClassEAC0__FinishConstruct -- MATCH (37/37 words, first attempt)
+
+> Renamed from `func_800405D0` on 2026-09-20 (tools/rename.py). Address 0x800405d0.
 
 Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::finishConstruct` (`+0x040`),
 dispatched by the class's own ctor (`ClassEAC0__ClassEAC0`).

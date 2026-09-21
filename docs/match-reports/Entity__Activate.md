@@ -1,6 +1,6 @@
-> Renamed from `func_8005D9F4` on 2026-09-19 (tools/rename.py). Address 0x8005d9f4.
-
 # Entity__Activate
+
+> Renamed from `func_8005D9F4` on 2026-09-19 (tools/rename.py). Address 0x8005d9f4.
 
 **Unit:** Entity · **Size:** 18 instructions · **Status:** MATCHED (18/18 words, whole-image build verified byte-exact)
 

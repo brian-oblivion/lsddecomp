@@ -1,6 +1,6 @@
-> Renamed from `func_8005D480` on 2026-09-19 (tools/rename.py). Address 0x8005d480.
-
 # Entity__Update
+
+> Renamed from `func_8005D480` on 2026-09-19 (tools/rename.py). Address 0x8005d480.
 
 **Unit:** Entity · **Size:** 56 words · **Status:** MATCHED (56/56 words, whole-image build verified byte-exact)
 

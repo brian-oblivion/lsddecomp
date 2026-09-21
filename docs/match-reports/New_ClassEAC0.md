@@ -1,6 +1,6 @@
-> Renamed from `func_800404D0` on 2026-09-20 (tools/rename.py). Address 0x800404d0.
-
 # New_ClassEAC0 -- MATCHED (31/31 words)
+
+> Renamed from `func_800404D0` on 2026-09-20 (tools/rename.py). Address 0x800404d0.
 
 Unit `code_2cc8c_e`, carved round 14.
 

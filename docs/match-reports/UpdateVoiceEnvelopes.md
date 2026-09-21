@@ -1,6 +1,6 @@
-> Renamed from `func_8002F700` on 2026-09-20 (tools/rename.py). Address 0x8002f700.
-
 # UpdateVoiceEnvelopes -- STALL: 5 words short (236/241 built length), 93/241 raw word-match (drift-affected, not fully trustworthy), first real diff at file 0x1FF58 vram 0x8002F758 (retail's unconditional `move a2,v0`/`li t0,1`/`move a3,a0` setup inside the `count>0` block, which this C's `for` does not reproduce) -- see "Round 48 update" below
+
+> Renamed from `func_8002F700` on 2026-09-20 (tools/rename.py). Address 0x8002f700.
 
 Unit: `src/code_179d8_m.c`. Round 26, runner bravo.
 

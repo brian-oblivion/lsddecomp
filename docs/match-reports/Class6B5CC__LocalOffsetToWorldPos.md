@@ -1,6 +1,6 @@
-> Renamed from `func_8001E600` on 2026-09-17 (tools/rename.py). Address 0x8001e600.
-
 # Class6B5CC__LocalOffsetToWorldPos -- MATCHED (62/62 words)
+
+> Renamed from `func_8001E600` on 2026-09-17 (tools/rename.py). Address 0x8001e600.
 
 Unit: `code_d294_c` (round 14). Fills a 0x20-byte stack buffer via
 `slot84` (same shape as `Class6B5CC__RotateLocalVector`), forwards it into

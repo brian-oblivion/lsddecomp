@@ -1,6 +1,6 @@
-> Renamed from `BasicClass__func_182cc` on 2026-09-17 (tools/rename.py). Address 0x800182cc.
-
 # BasicClass__NotifyParents — MATCHED (33/33 words)
+
+> Renamed from `BasicClass__func_182cc` on 2026-09-17 (tools/rename.py). Address 0x800182cc.
 
 Unit: `src/code_8220_b.c`. This is `BasicClassMethods` vtable slot `+0x030`,
 `notifyParents(self, s32 flag)` (already documented in

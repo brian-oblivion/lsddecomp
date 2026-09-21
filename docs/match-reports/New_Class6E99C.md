@@ -1,6 +1,6 @@
-> Renamed from `func_8003FDB0` on 2026-09-20 (tools/rename.py). Address 0x8003fdb0.
-
 # New_Class6E99C -- MATCHED (31/31 words)
+
+> Renamed from `func_8003FDB0` on 2026-09-20 (tools/rename.py). Address 0x8003fdb0.
 
 Unit `code_2cc8c_e`, carved round 14.
 

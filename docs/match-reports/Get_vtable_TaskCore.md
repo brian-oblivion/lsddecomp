@@ -1,6 +1,6 @@
-> Renamed from `func_8003DFBC` on 2026-09-19 (tools/rename.py). Address 0x8003dfbc.
-
 # Get_vtable_TaskCore — MATCH (4/4 words)
+
+> Renamed from `func_8003DFBC` on 2026-09-19 (tools/rename.py). Address 0x8003dfbc.
 
 **Unit:** code_2cc8c_c · **Size:** 4 instructions
 

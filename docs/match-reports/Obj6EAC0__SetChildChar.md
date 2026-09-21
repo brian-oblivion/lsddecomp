@@ -1,6 +1,6 @@
-> Renamed from `func_80040EDC` on 2026-09-18 (tools/rename.py). Address 0x80040edc.
-
 # Obj6EAC0__SetChildChar — MATCHED (17/17 words)
+
+> Renamed from `func_80040EDC` on 2026-09-18 (tools/rename.py). Address 0x80040edc.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 

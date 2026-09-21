@@ -1,6 +1,6 @@
-> Renamed from `func_8003E874` on 2026-09-19 (tools/rename.py). Address 0x8003e874.
-
 # Obj86B60__ResetAndRemoveAllChildren — MATCH (17/17 words)
+
+> Renamed from `func_8003E874` on 2026-09-19 (tools/rename.py). Address 0x8003e874.
 
 **Unit:** code_2cc8c_c · **Size:** 17 instructions
 

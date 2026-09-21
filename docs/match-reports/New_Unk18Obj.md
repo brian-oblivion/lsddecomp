@@ -1,6 +1,6 @@
-> Renamed from `func_8003E5D8` on 2026-09-19 (tools/rename.py). Address 0x8003e5d8.
-
 # New_Unk18Obj — MATCH (20/20 words)
+
+> Renamed from `func_8003E5D8` on 2026-09-19 (tools/rename.py). Address 0x8003e5d8.
 
 **Unit:** code_2cc8c_c · **Size:** 20 instructions
 

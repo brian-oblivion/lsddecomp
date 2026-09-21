@@ -1,6 +1,6 @@
-> Renamed from `func_8004F8A4` on 2026-09-20 (tools/rename.py). Address 0x8004f8a4.
-
 # TaskObjF__func_8004F8A4 -- STALL. Length: 3 words TOO LONG (80/77, 0x140/0x134). Word-match: 63/77. First real diff: file 0x40158 / vram 0x8004F958 (delay-slot fill: retail `move $a0,$s0`, built `nop`).
+
+> Renamed from `func_8004F8A4` on 2026-09-20 (tools/rename.py). Address 0x8004f8a4.
 
 **Unit:** class_3bb8c_f · **Size:** 77 words (0x134) · **Status:** STALL —
 tail-merge / early-return scheduling residue. Previously 36/77 (0x130, 1 word

@@ -1,6 +1,6 @@
-> Renamed from `func_8005C508` on 2026-09-21 (tools/rename.py). Address 0x8005c508.
-
 # InitDreamAux -- MATCHED (56/56), round 24
+
+> Renamed from `func_8005C508` on 2026-09-21 (tools/rename.py). Address 0x8005c508.
 
 > **VERDICT CORRECTED, round 24 (2026-09-08), runner delta.** Everything
 > below this note was written against the `addiu_at` jump-table/global-index

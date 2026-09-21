@@ -1,6 +1,6 @@
-> Renamed from `func_8001E4A4` on 2026-09-18 (tools/rename.py). Address 0x8001e4a4.
-
 # Class6B5CC__NotifyTaggedParents — STALL (register identity, near miss: 48/54; round-37 permuter search, 73118 iterations rc=124, never beat the base score -- see that round's addendum)
+
+> Renamed from `func_8001E4A4` on 2026-09-18 (tools/rename.py). Address 0x8001e4a4.
 
 Unit: `code_d294_b`. Round 13, runner delta; improved round 19 (echo), see
 that section at the end. Best score reached: 48/54 words

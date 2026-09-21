@@ -1,6 +1,6 @@
-> Renamed from `func_8005DAFC` on 2026-09-19 (tools/rename.py). Address 0x8005dafc.
-
 # Entity__StartSoundCue -- MATCHED (36/36 words)
+
+> Renamed from `func_8005DAFC` on 2026-09-19 (tools/rename.py). Address 0x8005dafc.
 
 **Unit:** Entity · Runner: charlie, round 23.
 

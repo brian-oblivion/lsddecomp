@@ -1,6 +1,6 @@
-> Renamed from `func_80040664` on 2026-09-18 (tools/rename.py). Address 0x80040664.
-
 # Obj6EAC0__Layout -- MATCH (32/32 words, 1 attempt)
+
+> Renamed from `func_80040664` on 2026-09-18 (tools/rename.py). Address 0x80040664.
 
 Unit `code_2cc8c_f`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
 FUNCTION the vtable slot points to, not a caller of it -- the header's

@@ -1,6 +1,6 @@
-> Renamed from `func_8005D1EC` on 2026-09-19 (tools/rename.py). Address 0x8005d1ec.
-
 # Entity__Destructor
+
+> Renamed from `func_8005D1EC` on 2026-09-19 (tools/rename.py). Address 0x8005d1ec.
 
 **Unit:** Entity · **Size:** 35 words · **Status:** MATCHED (35/35 words, whole-image build verified byte-exact)
 

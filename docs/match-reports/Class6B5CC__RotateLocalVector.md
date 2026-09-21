@@ -1,6 +1,6 @@
-> Renamed from `func_8001E58C` on 2026-09-17 (tools/rename.py). Address 0x8001e58c.
-
 # Class6B5CC__RotateLocalVector -- MATCHED (29/29 words)
+
+> Renamed from `func_8001E58C` on 2026-09-17 (tools/rename.py). Address 0x8001e58c.
 
 Unit: `code_d294_c` (round 14). Calls a new `Class6B5CCMethods` slot
 (`+0x084`) to fill a 0x20-byte stack buffer, copies a 3-element `s16`

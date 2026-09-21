@@ -1,6 +1,6 @@
-> Renamed from `func_8001D4AC` on 2026-09-18 (tools/rename.py). Address 0x8001d4ac.
-
 # Class6B5CC__GetSetUnk10Flag8 -- MATCHED (12/12 words)
+
+> Renamed from `func_8001D4AC` on 2026-09-18 (tools/rename.py). Address 0x8001d4ac.
 
 Round 12, runner delta. `code_d294_b`.
 

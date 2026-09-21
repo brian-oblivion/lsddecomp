@@ -1,6 +1,6 @@
-> Renamed from `func_8005CD58` on 2026-09-21 (tools/rename.py). Address 0x8005cd58.
-
 # CheckDreamAuxWorldState
+
+> Renamed from `func_8005CD58` on 2026-09-21 (tools/rename.py). Address 0x8005cd58.
 
 **Unit:** code_4cd08 · **Size:** 20 words · **Status:** MATCHED round 43
 (20/20, byte-exact whole-image build).

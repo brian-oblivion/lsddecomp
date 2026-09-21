@@ -1,6 +1,6 @@
-> Renamed from `func_80056F5C` on 2026-09-18 (tools/rename.py). Address 0x80056f5c.
-
 # BaseObjO__func_56f5c -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `func_80056F5C` on 2026-09-18 (tools/rename.py). Address 0x80056f5c.
 
 Unit `class_3bb8c_o`. **34/34 words, byte-exact, first build.** Reopened,
 never attempted before this round.

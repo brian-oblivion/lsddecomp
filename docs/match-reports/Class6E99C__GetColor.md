@@ -1,6 +1,6 @@
-> Renamed from `func_800403F8` on 2026-09-20 (tools/rename.py). Address 0x800403f8.
-
 # Class6E99C__GetColor -- MATCH (13/13 words, first attempt)
+
+> Renamed from `func_800403F8` on 2026-09-20 (tools/rename.py). Address 0x800403f8.
 
 Unit `code_2cc8c_e`, carved round 14. `Class6E99CMethods::getColor` (`+0x0E4`).
 

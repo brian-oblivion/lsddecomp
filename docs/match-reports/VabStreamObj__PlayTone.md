@@ -1,6 +1,6 @@
-> Renamed from `func_8002CA3C` on 2026-09-18 (tools/rename.py). Address 0x8002ca3c.
-
 # VabStreamObj__PlayTone -- STALL (best: 5/55 words match, but see caveat below)
+
+> Renamed from `func_8002CA3C` on 2026-09-18 (tools/rename.py). Address 0x8002ca3c.
 
 Unit: `code_179d8_e`. Runner: echo, round 17. Restored to `INCLUDE_ASM`.
 

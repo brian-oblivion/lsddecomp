@@ -698,9 +698,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   for three rounds closed 14/14 on a type change. Screen with `--debug`: a differing
   register COUNT is not identity at all. (a §"A register-identity verdict is a HYPOTHESIS",
   §"Round 27: the register COUNT and the addressing-mode IMMEDIATE")
-- **`funcdiff`'s `insertions N / deletions M` line is the mechanical discriminator: 0/0
-  means genuine register identity, anything else means separable defects are hiding inside
-  the class.** `func_8002C278` carried "pervasive register-allocation residue" for four
+- **`funcdiff`'s `insertions N / deletions M` line is the first thing to read on a
+  register-identity claim: 0/0 is consistent with it, anything else says READ THE DIFF for
+  separable defects.** Not a verdict: at equal length an N/N figure can be a false alignment
+  on a repeating loop skeleton (round 63: 26/26 on a zero-insertion input); funcdiff's
+  positional skeleton diffs figure tells the two apart and forces 0/0 when it is zero. `func_8002C278` carried "pervasive register-allocation residue" for four
   rounds at 7/7 and held four separable defects, three of them plain C. At 0/0 every
   instruction is retail's in retail's order and only the register pairing differs, which IS
   the banned-fix category. Rebuild the preserved body and read the line. (a round 60)

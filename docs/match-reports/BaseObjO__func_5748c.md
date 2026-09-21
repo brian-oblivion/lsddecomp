@@ -1,6 +1,6 @@
-> Renamed from `func_8005748C` on 2026-09-18 (tools/rename.py). Address 0x8005748c.
-
 # BaseObjO__func_5748c -- MATCHED (14/14 words)
+
+> Renamed from `func_8005748C` on 2026-09-18 (tools/rename.py). Address 0x8005748c.
 
 Unit: `class_3bb8c_o` (round 17). A shared `BasicClass`-inherited slot
 occupant (`slotC4`), already independently confirmed `void` from BOTH

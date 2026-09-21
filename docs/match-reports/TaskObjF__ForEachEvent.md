@@ -1,6 +1,6 @@
-> Renamed from `func_8004F40C` on 2026-09-20 (tools/rename.py). Address 0x8004f40c.
-
 # TaskObjF__ForEachEvent
+
+> Renamed from `func_8004F40C` on 2026-09-20 (tools/rename.py). Address 0x8004f40c.
 
 **Unit:** class_3bb8c_f · **Size:** 38 words (0x98) · **Status:** MATCH
 

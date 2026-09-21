@@ -1,6 +1,6 @@
-> Renamed from `func_8003DFDC` on 2026-09-19 (tools/rename.py). Address 0x8003dfdc.
-
 # IntermediateBase__IntermediateBase — MATCH (21/21 words)
+
+> Renamed from `func_8003DFDC` on 2026-09-19 (tools/rename.py). Address 0x8003dfdc.
 
 **Unit:** code_2cc8c_c · **Size:** 21 instructions
 

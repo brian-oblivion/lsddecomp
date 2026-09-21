@@ -1,6 +1,6 @@
-> Renamed from `func_8005C8AC` on 2026-09-21 (tools/rename.py). Address 0x8005c8ac.
-
 # LookupDreamAuxTrigger
+
+> Renamed from `func_8005C8AC` on 2026-09-21 (tools/rename.py). Address 0x8005c8ac.
 
 **Unit:** code_4cd08 · **Size:** 33 words · **Status:** MATCHED round 43
 (33/33, byte-exact whole-image build).

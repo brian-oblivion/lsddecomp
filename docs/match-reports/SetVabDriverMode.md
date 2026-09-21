@@ -1,6 +1,6 @@
-> Renamed from `func_8002C468` on 2026-09-18 (tools/rename.py). Address 0x8002c468.
-
 # SetVabDriverMode -- MATCHED 4/4 words, round 42 (2026-09-15)
+
+> Renamed from `func_8002C468` on 2026-09-18 (tools/rename.py). Address 0x8002c468.
 
 > **VERDICT CORRECTED, round 42 (2026-09-15). THIS FUNCTION IS MATCHED.**
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained

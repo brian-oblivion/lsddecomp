@@ -1,6 +1,6 @@
-> Renamed from `func_8002C890` on 2026-09-18 (tools/rename.py). Address 0x8002c890.
-
 # VabStreamObj__LoadVagAttrs -- MATCHED 107/107 (round 43)
+
+> Renamed from `func_8002C890` on 2026-09-18 (tools/rename.py). Address 0x8002c890.
 
 Unit `code_179d8_e`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`

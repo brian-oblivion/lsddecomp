@@ -1,6 +1,6 @@
-> Renamed from `func_8001EE04` on 2026-09-17 (tools/rename.py). Address 0x8001ee04.
-
 # ApplyMatrixToSVArray -- MATCHED (37/37, round 19)
+
+> Renamed from `func_8001EE04` on 2026-09-17 (tools/rename.py). Address 0x8001ee04.
 
 **Status: MATCHED, whole-image green.** See "Round 19 (echo): MATCHED --
 the all-s16 whole-struct-copy idiom" at the end of this report for the

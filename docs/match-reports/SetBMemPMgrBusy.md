@@ -1,6 +1,6 @@
-> Renamed from `func_8001844C` on 2026-09-17 (tools/rename.py). Address 0x8001844c.
-
 # SetBMemPMgrBusy — MATCHED (round 45)
+
+> Renamed from `func_8001844C` on 2026-09-17 (tools/rename.py). Address 0x8001844c.
 
 **Unit:** `code_8220_b` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 

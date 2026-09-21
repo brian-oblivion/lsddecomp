@@ -1,6 +1,6 @@
-> Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
-
 # Obj86B60__OnNotify — MATCH (52/52 words)
+
+> Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
 
 **Unit:** code_2cc8c_c · **Size:** 52 instructions
 

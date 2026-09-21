@@ -1791,6 +1791,24 @@ to a budget) is the head's or a Sonnet's job, not Fable's; promoting idioms
 is never suppressed to protect a budget. `DECOMPILATION_LEARNINGS.md` is being
 distilled back under its budget in this session.
 
+**Revision 9 (2026-09-21, after rounds 62 and 63).** The load-delay nop
+before a store-to-symbol macro is RESOLVED: maspsx `--nop-at-expansion`,
+one boolean it already had (the below-2.30 group, alongside `addiu_at` and
+`nop_lw_lw`), added to the Makefile, reproducer confirmed on the pinned
+pipeline, independent census 28 with / 0 without in the visible disassembly,
+whole image byte-exact with every C unit recompiled from scratch. Fourth row
+in CLAUDE.md's table; `docs/research/load-delay-nop-blocker.md`;
+`nearmiss.py` screens it tagged RESOLVED like the others; the lsd-flags patch
+regenerated. The seven functions it blocked are ordinary work again.
+`rename.py` put its "Renamed from" note ABOVE the report title and so pushed
+18 conforming titles out of `nearmiss.py`'s eight-line window; it now goes
+below the title and all 283 reports were repaired mechanically (a line moved,
+no figure touched): unrankable titles 28 -> 11, the remainder genuinely
+figureless. Track 1b jobs are one per UNIT. `funcdiff.py` prints positional
+skeleton diffs and forces ins/del to 0/0 when they are zero; the rule text in
+all three docs now says N/N at equal length is a pointer to read the diff,
+not a verdict.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

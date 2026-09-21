@@ -1,6 +1,6 @@
-> Renamed from `func_8003E418` on 2026-09-19 (tools/rename.py). Address 0x8003e418.
-
 # Obj86B60__OnTag1Notify — MATCH (35/35 words)
+
+> Renamed from `func_8003E418` on 2026-09-19 (tools/rename.py). Address 0x8003e418.
 
 **Unit:** code_2cc8c_c · **Size:** 35 instructions
 

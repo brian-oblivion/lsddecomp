@@ -1,6 +1,6 @@
-> Renamed from `func_80056FE4` on 2026-09-18 (tools/rename.py). Address 0x80056fe4.
-
 # New_BaseObjO -- MATCHED (24/24 words)
+
+> Renamed from `func_80056FE4` on 2026-09-18 (tools/rename.py). Address 0x80056fe4.
 
 Unit: `class_3bb8c_o` (round 17). The BaseObjO allocator -- allocates 0x58
 bytes, constructs, frees and returns `NULL` on construction failure.

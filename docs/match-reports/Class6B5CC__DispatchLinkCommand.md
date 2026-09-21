@@ -1,6 +1,6 @@
-> Renamed from `func_8001D6B4` on 2026-09-18 (tools/rename.py). Address 0x8001d6b4.
-
 # Class6B5CC__DispatchLinkCommand -- MATCHED (24/24 words)
+
+> Renamed from `func_8001D6B4` on 2026-09-18 (tools/rename.py). Address 0x8001d6b4.
 
 Round 12, runner delta. `code_d294_b`.
 

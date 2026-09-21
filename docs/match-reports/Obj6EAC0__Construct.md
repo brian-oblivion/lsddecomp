@@ -1,6 +1,6 @@
-> Renamed from `func_80040948` on 2026-09-18 (tools/rename.py). Address 0x80040948.
-
 # Obj6EAC0__Construct — MATCHED (58/58 words)
+
+> Renamed from `func_80040948` on 2026-09-18 (tools/rename.py). Address 0x80040948.
 
 Unit: `src/code_2cc8c_f.c`. 12 attempts. **Re-attempted after a
 coordinator correction**: this function had originally been triaged

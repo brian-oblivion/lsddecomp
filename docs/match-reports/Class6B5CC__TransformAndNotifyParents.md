@@ -1,6 +1,6 @@
-> Renamed from `func_8001D624` on 2026-09-18 (tools/rename.py). Address 0x8001d624.
-
 # Class6B5CC__TransformAndNotifyParents -- MATCHED (32/32 words)
+
+> Renamed from `func_8001D624` on 2026-09-18 (tools/rename.py). Address 0x8001d624.
 
 Round 12, runner delta. `code_d294_b`.
 

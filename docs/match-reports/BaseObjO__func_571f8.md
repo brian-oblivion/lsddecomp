@@ -1,6 +1,6 @@
-> Renamed from `func_800571F8` on 2026-09-18 (tools/rename.py). Address 0x800571f8.
-
 # BaseObjO__func_571f8 -- MATCHED (74/74 words)
+
+> Renamed from `func_800571F8` on 2026-09-18 (tools/rename.py). Address 0x800571f8.
 
 Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot88` (via the fixed
 `GetClass6B5CCMethods()` table) followed by a guarded body that only runs for

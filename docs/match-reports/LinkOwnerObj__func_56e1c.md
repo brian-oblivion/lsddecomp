@@ -1,6 +1,6 @@
-> Renamed from `func_80056E1C` on 2026-09-18 (tools/rename.py). Address 0x80056e1c.
-
 # LinkOwnerObj__func_56e1c -- MATCHED (10/10 words)
+
+> Renamed from `func_80056E1C` on 2026-09-18 (tools/rename.py). Address 0x80056e1c.
 
 Unit: `class_3bb8c_o` (round 17). A 4-argument forward to `func_80056D18`.
 

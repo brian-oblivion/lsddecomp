@@ -1,6 +1,6 @@
-> Renamed from `func_8005D278` on 2026-09-19 (tools/rename.py). Address 0x8005d278.
-
 # Entity__InitState -- MATCHED (39/39 words)
+
+> Renamed from `func_8005D278` on 2026-09-19 (tools/rename.py). Address 0x8005d278.
 
 **Unit:** Entity · Runner: charlie, round 23.
 

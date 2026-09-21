@@ -1,6 +1,6 @@
-> Renamed from `func_8001E7B0` on 2026-09-17 (tools/rename.py). Address 0x8001e7b0.
-
 # Class6B5CC__UnlinkModel -- MATCHED (3/3 words)
+
+> Renamed from `func_8001E7B0` on 2026-09-17 (tools/rename.py). Address 0x8001e7b0.
 
 Unit: `code_d294_c` (round 14, first slice-3 carve). Called by
 `func_8001CD20` (`code_d294.c`) as its forward target for

@@ -1,8 +1,8 @@
+# Entity__UpdateActivationState -- MATCHED (byte-exact, 74/74 words). Round 25, head.
+
 > Renamed from `Entity__UpdateDetachState` on 2026-09-19 (tools/rename.py). Address 0x8005dbf0.
 
 > Renamed from `func_8005DBF0` on 2026-09-19 (tools/rename.py). Address 0x8005dbf0.
-
-# Entity__UpdateActivationState -- MATCHED (byte-exact, 74/74 words). Round 25, head.
 
 > **ROUND 25 (2026-09-08), head. CLOSED, and the fix is PURE BLOCK PLACEMENT
 > -- not one character of the logic below changed.** The eleven variants

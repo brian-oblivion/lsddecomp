@@ -1,6 +1,6 @@
-> Renamed from `func_8005DA3C` on 2026-09-19 (tools/rename.py). Address 0x8005da3c.
-
 # Entity__Deactivate
+
+> Renamed from `func_8005DA3C` on 2026-09-19 (tools/rename.py). Address 0x8005da3c.
 
 **Unit:** Entity · **Size:** 28 words · **Status:** MATCHED (28/28 words, whole-image build verified byte-exact)
 

@@ -1,6 +1,6 @@
-> Renamed from `func_8005D418` on 2026-09-19 (tools/rename.py). Address 0x8005d418.
-
 # Entity__DetachUnk4C
+
+> Renamed from `func_8005D418` on 2026-09-19 (tools/rename.py). Address 0x8005d418.
 
 **Unit:** Entity · **Size:** 26 words · **Status:** MATCHED (26/26 words, whole-image build verified byte-exact)
 

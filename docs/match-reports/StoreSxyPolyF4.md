@@ -1,6 +1,6 @@
-> Renamed from `func_80019724` on 2026-09-17 (tools/rename.py). Address 0x80019724.
-
 # StoreSxyPolyF4
+
+> Renamed from `func_80019724` on 2026-09-17 (tools/rename.py). Address 0x80019724.
 
 **Unit:** code_8220_b · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
 

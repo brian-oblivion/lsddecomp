@@ -1,6 +1,6 @@
-> Renamed from `func_800408CC` on 2026-09-18 (tools/rename.py). Address 0x800408cc.
-
 # New_Obj6EAC0 — MATCHED (31/31 words)
+
+> Renamed from `func_800408CC` on 2026-09-18 (tools/rename.py). Address 0x800408cc.
 
 Unit: `src/code_2cc8c_f.c`. 3 attempts.
 

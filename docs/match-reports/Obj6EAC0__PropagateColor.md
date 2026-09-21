@@ -1,6 +1,6 @@
-> Renamed from `func_80040D74` on 2026-09-18 (tools/rename.py). Address 0x80040d74.
-
 # Obj6EAC0__PropagateColor -- MATCHED (40/40 words)
+
+> Renamed from `func_80040D74` on 2026-09-18 (tools/rename.py). Address 0x80040d74.
 
 Unit: `src/code_2cc8c_f.c`.
 

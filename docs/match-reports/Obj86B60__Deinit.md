@@ -1,6 +1,6 @@
-> Renamed from `func_8003E280` on 2026-09-19 (tools/rename.py). Address 0x8003e280.
-
 # Obj86B60__Deinit — MATCH (102/102 words)
+
+> Renamed from `func_8003E280` on 2026-09-19 (tools/rename.py). Address 0x8003e280.
 
 **Unit:** code_2cc8c_c · **Size:** 102 instructions (largest in this
 round's queue)

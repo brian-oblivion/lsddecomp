@@ -1,6 +1,6 @@
-> Renamed from `func_80040024` on 2026-09-20 (tools/rename.py). Address 0x80040024.
-
 # Class6E99C__StartFadeToIndex -- STALL (scheduling residue, 29/35)
+
+> Renamed from `func_80040024` on 2026-09-20 (tools/rename.py). Address 0x80040024.
 
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP
 

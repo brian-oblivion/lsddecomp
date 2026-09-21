@@ -226,7 +226,19 @@ def main():
         today = datetime.date.today().isoformat()
         body = report_new.read_text()
         note = f"> Renamed from `{old}` on {today} (tools/rename.py). Address {addr:#x}.\n\n"
-        report_new.write_text(note + body)
+        # AFTER the title line, never above it: nearmiss.py ranks from the first
+        # eight lines and a note above the `#` heading pushed 18 conforming
+        # titles out of that window (round 63), de-ranking the queue in
+        # proportion to naming progress.
+        lines = body.split("\n")
+        for i, line in enumerate(lines):
+            if line.startswith("# "):
+                lines.insert(i + 1, "\n" + note.rstrip("\n"))
+                body = "\n".join(lines)
+                break
+        else:
+            body = note + body
+        report_new.write_text(body)
 
     if a.no_build:
         print("edited. You must run: make extract && ./build-and-verify.sh")

@@ -138,7 +138,10 @@ fi
 #                        them. Resolves the gp_rel blocker WITHOUT touching -G.
 #   --no-nop-mflo-mfhi   leave cc1's "#nop" hints between an mflo/mfhi and a
 #                        following mult/div commented out, as retail does.
-# Both byte-exact across the whole image; both required by the Makefile.
+#   --nop-at-expansion   (round 63) keep the load-delay nop between an indexed
+#                        load and a store-to-symbol macro of the loaded register;
+#                        ASPSX decided the hazard before expanding the macro.
+# All byte-exact across the whole image; all required by the Makefile.
 # See docs/research/gp-relative-blocker.md and addiu-at-blocker.md.
 if [ -f tools/maspsx/maspsx.py ]; then
     if grep -q -- '--gp-symbols' tools/maspsx/maspsx.py; then

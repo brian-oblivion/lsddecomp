@@ -1,6 +1,6 @@
-> Renamed from `func_800571E8` on 2026-09-18 (tools/rename.py). Address 0x800571e8.
-
 # BaseObjO__InitDefaults -- MATCHED (4/4 words)
+
+> Renamed from `func_800571E8` on 2026-09-18 (tools/rename.py). Address 0x800571e8.
 
 Unit: `class_3bb8c_o` (round 17). A two-field setter: `self->unk48 = 0x12C`
 (halfword), `self->unk54 = 0` (word).

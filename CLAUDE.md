@@ -158,7 +158,7 @@ which is what makes many parallel runners cheap here.
 
 ## Open toolchain blockers
 
-**There are none. All three are RESOLVED, each by a maspsx flag that sets one
+**There are none. All four are RESOLVED, each by a maspsx flag that sets one
 behaviour and nothing else, each proven inert by a byte-exact whole-image
 rebuild before it was adopted.** Do NOT screen for them, do NOT file a stall
 against them, and do NOT trust a report whose verdict predates the fix.
@@ -168,6 +168,7 @@ against them, and do NOT trust a report whose verdict predates the fix.
 | `addiu_at` (indexed global load) | round 21, 2026-09-06 | `--addiu-at` | `docs/research/addiu-at-blocker.md` |
 | `gp_rel` (small-data global) | round 42, 2026-09-15 | `--gp-symbols=config/gp-symbols.txt` | `docs/research/gp-relative-blocker.md`, "RESOLVED" |
 | `nop_mflo_mfhi` (mflo/mfhi then mult/div) | round 42, 2026-09-15 | `--no-nop-mflo-mfhi` | `docs/research/addiu-at-blocker.md`, "RESOLVED" addendum |
+| `nop_at_expansion` (indexed load, then store-to-symbol of the loaded register) | round 63, 2026-09-21 | `--nop-at-expansion` | `docs/research/load-delay-nop-blocker.md` |
 
 The flags live in `tools/patches/maspsx-addiu-at.patch` and
 `tools/patches/maspsx-lsd-flags.patch`, applied to the maspsx clone by
@@ -212,7 +213,7 @@ same-file `.sdata`/`.comm` directives — which splat-owned data never produces.
   reproducer succeeded on a five-line file and failed on the image, and the
   difference between the two was the whole diagnosis.
 
-`tools/nearmiss.py` and `tools/uncarved.py` still report all three constructs,
+`tools/nearmiss.py` and `tools/uncarved.py` still report these constructs,
 tagged `(RESOLVED-not-a-blocker)`, without counting them: older reports still
 blame them, and the tag is how you tell "this verdict predates the fix" from
 "this is really blocked". A function that hits one of these screens is
