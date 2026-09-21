@@ -24,28 +24,61 @@
  * unit is now 0x19098..0x19378 (11 functions).  The "three carry real names
  * inherited from FirecatFG" note below is now three CONFIRMED names.
  *
- * Blocker census, three-grep screen run per function at carve time:
- * 16 of 17 clean.
+ * Blocker census, three-grep screen run per function at carve time (against
+ * the original 17-function carve, before round 34's six departed): 16 of 17
+ * clean.  `GetCdUseVSyncCallback`'s `gp_rel` screen hit was the one exception
+ * (only 3 instructions, so nothing was lost either way) -- it was RESOLVED
+ * and MATCHED round 45 (see the ROUND 42 CORRECTION above); no function in
+ * this unit is blocked or stub-filed as of round 64.
  *
- * BLOCKED, stub report already filed, do NOT spend attempts on it:
- *   gp_rel: GetCdUseVSyncCallback (only 3 instructions, so nothing is lost)
- *
- * Three of the entries carry real names inherited from FirecatFG's lsddecomp
- * (`strcpy`, `strstr`, `CdStatus`) -- treat those names as HYPOTHESES like any
- * other inherited symbol, but they are a strong hint about the shape.  Three
- * more are 2-instruction leaves that splat matched itself.
+ * ROUND 64 (naming pass, runner alpha): what the unit IS, now that every
+ * function has a report.  Eleven functions split into three groups:
+ *   - `Class6D430__InstallCdReadDriver`/`Class6D430__DestroyCdReadDriver`
+ *     (ctor/dtor pair, `Class6D430*` self): chains `Class6D430`'s own
+ *     ctor/dtor (`include/code_171e0.h`) then, on the ctor side, overwrites
+ *     `self->methods` with `GetClass6D4E8Methods()`'s table -- `D_8006D4E8`,
+ *     independently confirmed elsewhere (`src/code_179d8_q.c`) as "the
+ *     CD-ROM read driver".  No caller is visible yet (referenced only from
+ *     the still-uncarved `code_179d8` remainder), so WHICH broader purpose
+ *     this reclassification serves is open; see both reports' `## Naming`.
+ *   - `OpenCdFile`/`CloseCdFile`/`GetCdFileSize`/`ReadCdFile` (the
+ *     `ObjA34_179D8H` quad, two still `INCLUDE_ASM`): resolves a CD-ROM file
+ *     by name, tracks whether it is open, reports its sector-rounded size,
+ *     and reads from it.  Not inferred from this unit alone --
+ *     `src/code_179d8_s.c`'s `func_800272D0`/`func_80027480`/
+ *     `func_80027528`/`func_800276D0` call the sync version of exactly one
+ *     of these apiece when CD-async mode is off, and independently
+ *     reimplement the identical algorithm (same field offsets) for the
+ *     async path otherwise -- see `OpenCdFile.md` for the full mapping.
+ *     `BuildCdFilePath` is `OpenCdFile`'s own path-string helper.
+ *   - `NoOp2`/`NoOp3`/`NoOp4`: the three 2-instruction (`jr $ra; nop`) leaves
+ *     splat matched at carve time; no caller or vtable slot identified for
+ *     any of them.  `GetCdUseVSyncCallback` is the twelfth matched function
+ *     (a plain getter).
+ * The three `strcpy`/`strstr`/`CdStatus` names the ROUND 34 note above
+ * discusses are Sony's, per that note -- they are no longer entries of this
+ * unit and are not renamed here (CLAUDE.md: Sony symbols are never renamed).
  *
  * The 43 functions in FRONT of this slice (still `code_179d8`) are
- * gp_rel-saturated -- 33 of 43 blocked -- and that remainder also owns this
- * segment's ONLY switch jump table (func_80027A24, which will need the Gate 2
- * rodata attach/split when it is carved).  The cut is placed here to leave
- * both debts behind: THIS slice owns no jump table and needs no rodata attach.
+ * gp_rel-saturated -- 33 of 43 blocked, RESOLVED per the ROUND 42 CORRECTION
+ * -- and that remainder also owns this segment's ONLY switch jump table
+ * (func_80027A24, which will need the Gate 2 rodata attach/split when it is
+ * carved).  The cut is placed here to leave both debts behind: THIS slice
+ * owns no jump table and needs no rodata attach.
  *
- * Class-framework status: measured, not assumed.  Zero functions in this slice
- * reference any of the 60 method tables tools/classtable.py --scan finds.  The
- * sibling slice code_179d8_e DOES contain two class-table accessors, so the
- * "code_179d8 is not class-framework code" note is neighbourhood-scoped -- run
- * the check for your own functions rather than inheriting either verdict.
+ * Class-framework status, CORRECTED round 64: measured, not assumed, and the
+ * prior claim here ("zero functions in this slice reference any of the 60
+ * method tables") was wrong by the time it was written -- `python3
+ * tools/classtable.py --scan` lists BOTH `D_8006D430` (44 slots, header 3)
+ * and `D_8006D4E8` (29 slots, header 0x13) among the 60, and
+ * `Class6D430__InstallCdReadDriver`/`Class6D430__DestroyCdReadDriver`
+ * dispatch through both via `GetClass6D430Methods()`/`GetClass6D4E8Methods()`.
+ * `ObjA34_179D8H` additionally carries its OWN per-instance `methods`
+ * pointer (dispatched by `ReadCdFile`'s `onError` slot), not yet tied to
+ * either scanned table.  The sibling slice code_179d8_e also contains two
+ * class-table accessors -- so "code_179d8 is not class-framework code" was
+ * never true of this neighbourhood; run the check for your own functions
+ * rather than inheriting any verdict here.
  */
 #include "common.h"
 /* code_171e0.h's Class6D430/Class6D430Methods already
