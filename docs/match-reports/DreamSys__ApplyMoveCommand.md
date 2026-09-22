@@ -1,11 +1,13 @@
-# func_80059E98
+# DreamSys__ApplyMoveCommand
+
+> Renamed from `func_80059E98` on 2026-09-22 (tools/rename.py). Address 0x80059e98.
 
 **Unit:** DreamSys · **Size:** 110 words · **Status:** MATCHED, 110/110.
 
 ## What it does
 
-Called by `func_80059AEC`/`func_80059B50` as
-`this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1))` -- `arg1`
+Called by `DreamSys__TickMoveFree`/`DreamSys__TickMoveForced` as
+`this->vt->DreamSys__ApplyMoveCommand(this, this->vt->DreamSys__AdvanceMoveCycle(this, 1))` -- `arg1`
 is a mood/day-type selector. When `arg1 == 0` the function does nothing at
 all (matches retail's own early `beqz` straight to the epilogue -- no `$v0`
 write on that path, consistent with the function's return value being
@@ -13,7 +15,7 @@ meaningless there and never inspected by its only two callers on that
 branch). Otherwise:
 
 ```c
-s32 func_80059E98(DreamSys *this, s32 arg1)
+s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 {
 	s32 delta;
 	PlayerSpawnPoint *pos;
@@ -92,7 +94,7 @@ All in `include/DreamSys.h`:
   falls off the end for `arg1 == 0`, matching retail's own lack of any `$v0`
   write on that path) -- GCC 2.6.3 warns `control reaches end of non-void
   function` but compiles it identically to retail. Both callers only use
-  the return value when they got it via the `func_80059BE0(this, 1)`
+  the return value when they got it via the `DreamSys__AdvanceMoveCycle(this, 1)`
   argument path, which per the vtable's own existing comments never passes
   a literal 0 for `arg1`, so the undefined-value path is never actually
   observed by real callers -- consistent with retail not bothering to set

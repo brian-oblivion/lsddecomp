@@ -1,4 +1,6 @@
-# func_8005A050
+# DreamSys__ApplyPendingTurn
+
+> Renamed from `func_8005A050` on 2026-09-22 (tools/rename.py). Address 0x8005a050.
 
 **Unit:** DreamSys · **Size:** 24 instructions · **Status:** MATCHED (24/24 words)
 
@@ -14,7 +16,7 @@ arithmetic is safe", per `DECOMPILATION_LEARNINGS.md`.
 ## The C
 
 ```c
-void func_8005A050(DreamSys *this)
+void DreamSys__ApplyPendingTurn(DreamSys *this)
 {
 	s32 idx;
 

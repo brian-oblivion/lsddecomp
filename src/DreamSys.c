@@ -20,10 +20,10 @@
    strict ROM-address ordering of the definitions below. */
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
-/* func_800598E8 (round 2026-09-08) calls this unit's own func_80059A1C,
+/* func_800598E8 (round 2026-09-08) calls this unit's own DreamSys__FlipMoveCommand,
    defined immediately after it in ROM order -- same forward-declaration
    need as the two above. */
-void func_80059A1C(DreamSys *this);
+void DreamSys__FlipMoveCommand(DreamSys *this);
 
 DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 {
@@ -473,7 +473,7 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 		this->callback_0x98 = NULL;
 		break;
 	case 1:
-		this->callback_0x98 = (void (*)(DreamSys *))vt->func_80059A58;
+		this->callback_0x98 = (void (*)(DreamSys *))vt->DreamSys__TickMove;
 		break;
 	case 2:
 		this->callback_0x98 = vt->func_8005A0B0;
@@ -536,7 +536,7 @@ void func_80059814(DreamSys *this)
    docs/match-reports/func_800598E8.md for the residue that's left -- it is a
    different, deeper mechanism (opportunistic delay-slot placement of the
    `this` register setup across multiple converging paths into the shared
-   `func_80059A1C(this)` tail call), not reachable by the rename lever nor by
+   `DreamSys__FlipMoveCommand(this)` tail call), not reachable by the rename lever nor by
    a scheduling barrier at the merge point (tried, no effect). Re-verified
    fresh round 37 (2026-09-12, runner charlie); a permuter search was run
    this round and found no improvement -- see the report's round 37
@@ -587,12 +587,12 @@ void func_800598E8(DreamSys *this)
 		return;
 	}
 call_tail:
-	func_80059A1C(this);
+	DreamSys__FlipMoveCommand(this);
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800598E8);
 
-void func_80059A1C(DreamSys *this)
+void DreamSys__FlipMoveCommand(DreamSys *this)
 {
 	this->unk_0xA8 = 0;
 	if (this->unk_0xA0 != 0) {
@@ -609,39 +609,39 @@ void DreamSys__NoOpSlot14C(void) {
 void DreamSys__NoOpSlot150(void) {
 }
 
-s32 func_80059A58(DreamSys *this)
+s32 DreamSys__TickMove(DreamSys *this)
 {
 	if (this->unk_0x6c == 0) {
-		this->vt->func_8005A050(this);
-		return this->vt->func_80059AEC(this);
+		this->vt->DreamSys__ApplyPendingTurn(this);
+		return this->vt->DreamSys__TickMoveFree(this);
 	} else if (this->unk_0x6c != 2) {
-		return this->vt->func_80059B50(this);
+		return this->vt->DreamSys__TickMoveForced(this);
 	} else {
-		return this->vt->func_80059BD4(this);
+		return this->vt->DreamSys__TickMoveHeld(this);
 	}
 }
 
-s32 func_80059AEC(DreamSys *this)
+s32 DreamSys__TickMoveFree(DreamSys *this)
 {
 	if (this->movementBlocked != 0)
 		return this->movementBlocked;
-	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
+	return this->vt->DreamSys__ApplyMoveCommand(this, this->vt->DreamSys__AdvanceMoveCycle(this, 1));
 }
 
-s32 func_80059B50(DreamSys *this)
+s32 DreamSys__TickMoveForced(DreamSys *this)
 {
 	this->unk_0xA0 = 1;
 	if (this->movementBlocked != 0)
-		return this->vt->func_80059BE0(this, 0);
-	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
+		return this->vt->DreamSys__AdvanceMoveCycle(this, 0);
+	return this->vt->DreamSys__ApplyMoveCommand(this, this->vt->DreamSys__AdvanceMoveCycle(this, 1));
 }
 
-s32 func_80059BD4(DreamSys *this)
+s32 DreamSys__TickMoveHeld(DreamSys *this)
 {
 	return this->unk_0xA0 = 1;
 }
 
-s32 func_80059BE0(DreamSys *this, s32 arg1)
+s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
 {
 	s32 doCallback = 0;
 	s32 ret = 0;
@@ -661,7 +661,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		}
 
 		if (doCallback)
-			this->vt->func_80059D1C(this);
+			this->vt->DreamSys__StartVoice(this);
 
 		p = this->unk_0x5C;
 		if (p != NULL && this->screenShakeOn != 0 && arg1 != 0) {
@@ -677,7 +677,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 	}
 
 	if (!doCallback)
-		this->vt->func_80059E3C(this);
+		this->vt->DreamSys__StopVoice(this);
 	return ret;
 }
 
@@ -691,8 +691,8 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
    the same role for the raw `D_80087EB0[idx]` read and, independently, for
    the literal `0x90` argument at the very end. Removing either variable
    (rebuilding the "obvious" simpler form) reproduces a real, measured
-   regression -- see docs/match-reports/func_80059D1C.md. */
-void func_80059D1C(DreamSys *this)
+   regression -- see docs/match-reports/DreamSys__StartVoice.md. */
+void DreamSys__StartVoice(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 	s32 idx;
@@ -726,7 +726,7 @@ void func_80059D1C(DreamSys *this)
 	}
 }
 
-void func_80059E3C(DreamSys *this)
+void DreamSys__StopVoice(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 
@@ -737,7 +737,7 @@ void func_80059E3C(DreamSys *this)
 	}
 }
 
-s32 func_80059E98(DreamSys *this, s32 arg1)
+s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 {
 	s32 delta;
 	PlayerSpawnPoint *pos;
@@ -761,7 +761,7 @@ s32 func_80059E98(DreamSys *this, s32 arg1)
 	}
 }
 
-void func_8005A050(DreamSys *this)
+void DreamSys__ApplyPendingTurn(DreamSys *this)
 {
 	s32 idx;
 

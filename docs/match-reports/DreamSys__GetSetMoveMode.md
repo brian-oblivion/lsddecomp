@@ -35,7 +35,7 @@ s32 DreamSys__GetSetMoveMode(DreamSys *this, s32 value)
 ## New fields: `unk_0xAC` / `unk_0xB0`, a "current/paired" pair
 
 Split out of the old `unknown_values_0xAC[24]` gap, alongside `unk_0xBC`
-(see `func_80059E3C.md`, a STALL touching the same gap). Together with
+(see `DreamSys__StopVoice.md`, a STALL touching the same gap). Together with
 `DreamSys__ChangeMoveMode` (paired copy-on-change) and `DreamSys__RestorePreviousMoveMode` (unconditional
 `0xAC = 0xB0` copy), the three functions read like get/set/sync accessors
 on a "target vs. current" pair, but no confirmed semantic name yet.

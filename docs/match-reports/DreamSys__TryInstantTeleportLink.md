@@ -320,7 +320,7 @@ instruction (the hoisted `li $v0,0x1` return-value constant vs. retail's
 not a commutative `addu`'s operand order or destination register at all.
 No `addu`/`add` instruction appears anywhere in either of the two
 diverging words. Same family as `func_8004ABD0`'s (`class_3ac78`) and
-`func_80059BE0`'s residue #2 (this same unit, this round) -- an
+`DreamSys__AdvanceMoveCycle`'s residue #2 (this same unit, this round) -- an
 independent, dependency-free value getting scheduled into an earlier
 delay slot than retail chose -- but a DIFFERENT class from the
 commutative-add one. Not re-attempted further this round: already

@@ -95,7 +95,7 @@ deriving from first principles.** `DreamSys__TickStaircaseCase3`'s C, sitting a 
 lines above this function's own `INCLUDE_ASM` line, answered in advance
 the exact "cache in a local or re-read the field" question that has cost
 other functions in this unit multiple attempts (see
-`docs/match-reports/func_80059BE0.md`, same round, same unit, unresolved
+`docs/match-reports/DreamSys__AdvanceMoveCycle.md`, same round, same unit, unresolved
 for a different field). This is cheaper than the permuter and cheaper than
 manual derivation, and it is very easy to miss when working strictly
 top-to-bottom through a queue instead of first scanning nearby already-

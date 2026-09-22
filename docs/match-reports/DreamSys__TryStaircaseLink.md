@@ -77,7 +77,7 @@ below).
 
 ## What it does
 
-Called through `vtable_DreamSys::DreamSys__TryStaircaseLink` (+0x1DC) by `func_80059E98`
+Called through `vtable_DreamSys::DreamSys__TryStaircaseLink` (+0x1DC) by `DreamSys__ApplyMoveCommand`
 (matched this round, see its own report) as the first of three "link test"
 tries. Signature `bool (DreamSys *this, PlayerSpawnPoint *currentPos)`,
 matching its siblings `DreamSys__TryTunnelLink`/`DreamSys__TryStageTimerLink`.
@@ -136,7 +136,7 @@ staircase:
 assumed: every `j`/fallthrough in the function lands on either an explicit
 `li v0,0` or the shared epilogue label that itself does `li v0,0`. There is
 no path that reaches the epilogue with a nonzero `$v0`. This makes the
-function's practical behavior in its only caller (`func_80059E98`'s
+function's practical behavior in its only caller (`DreamSys__ApplyMoveCommand`'s
 `!this->vt->DreamSys__TryStaircaseLink(...) && ...` chain) equivalent to always
 continuing to the next link test -- a real quirk of retail's own logic, not
 a decompilation error.
@@ -364,7 +364,7 @@ were tested through the full oracle and all three are false leads**:
   the path that reaches `staircase:` via the EARLIER `goto`, which never
   executes `new_var = this;` at all. This reads `new_var` uninitialized on
   that path: a genuine undefined-behavior form, not the legitimate
-  register-forcing idiom that closed `func_80059D1C` this same round (there,
+  register-forcing idiom that closed `DreamSys__StartVoice` this same round (there,
   the duplicate local was assigned on EVERY path before use). Tested anyway
   out of thoroughness: **regressed to 30/88**, confirming it is not a useful
   lever even ignoring the UB.

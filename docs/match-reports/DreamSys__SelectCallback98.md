@@ -21,7 +21,7 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 		this->callback_0x98 = NULL;
 		break;
 	case 1:
-		this->callback_0x98 = (void (*)(DreamSys *))vt->func_80059A58;
+		this->callback_0x98 = (void (*)(DreamSys *))vt->DreamSys__TickMove;
 		break;
 	case 2:
 		this->callback_0x98 = vt->func_8005A0B0;
@@ -50,7 +50,7 @@ unconditionally, and reused for both the entry guard (`unk_0x9C == 2`) and
 the case-2 dispatch (`arg1 == 2`) — the same constant appearing twice in one
 function, genuinely shared, unlike the residue below.
 
-`func_8005A134`, `func_80059A58` (cast — it actually returns `s32`, see
+`func_8005A134`, `DreamSys__TickMove` (cast — it actually returns `s32`, see
 CLAUDE.md's "one-line wrapper" note; `callback_0x98`'s declared type is
 `void(*)(DreamSys*)` so the assignment needs an explicit cast to silence the
 warning without touching codegen), `func_8005A0B0`, and `func_8005A1F4` all

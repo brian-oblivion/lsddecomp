@@ -1,24 +1,26 @@
-# func_80059AEC — MATCHED
+# DreamSys__TickMoveFree — MATCHED
+
+> Renamed from `func_80059AEC` on 2026-09-22 (tools/rename.py). Address 0x80059aec.
 
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. 25/25 words, full match.
 
 ## Source
 
 ```c
-s32 func_80059AEC(DreamSys *this)
+s32 DreamSys__TickMoveFree(DreamSys *this)
 {
 	if (this->unk_0x70 != 0)
 		return this->unk_0x70;
-	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
+	return this->vt->DreamSys__ApplyMoveCommand(this, this->vt->DreamSys__AdvanceMoveCycle(this, 1));
 }
 ```
 
 Vtable slot `0x158`. If `unk_0x70` is set, returns it unchanged (a genuine
 early exit returning a DIFFERENT value than the main path — this is exactly
 the shape HEAD BROADCAST #1's `goto`-lever example describes). Otherwise
-calls `func_80059BE0(this, 1)` (still `INCLUDE_ASM`, in this runner's range
+calls `DreamSys__AdvanceMoveCycle(this, 1)` (still `INCLUDE_ASM`, in this runner's range
 but not yet reached — vtable slot `0x164`) and feeds its result into
-`func_80059E98(this, ...)` (also still `INCLUDE_ASM`, outside this runner's
+`DreamSys__ApplyMoveCommand(this, ...)` (also still `INCLUDE_ASM`, outside this runner's
 assigned range), returning THAT result.
 
 ## Residue fixed — and a correction to broadcast #1's lever
@@ -53,7 +55,7 @@ FIRST, with NO `goto` and NO enclosing `if`/`else` for the main path**:
 ```c
 if (this->unk_0x70 != 0)
 	return this->unk_0x70;
-return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
+return this->vt->DreamSys__ApplyMoveCommand(this, this->vt->DreamSys__AdvanceMoveCycle(this, 1));
 ```
 
 This is precisely the plain "does not need a lever" shape CLAUDE.md's own

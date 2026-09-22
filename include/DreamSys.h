@@ -20,7 +20,7 @@
  * their shared, only correct view of `struct DreamSys` and its vtable.
  * Naming pass, round 65 (2026-09-22): named 42 of the unit's own functions
  * and 6 struct fields; the remainder of the "unk_0x6c/0x70.../0xBC" link-
- * timing state machine (func_80059A58/AEC/B50/BD4/BE0/E98 and friends) is
+ * timing state machine (DreamSys__TickMove/AEC/B50/BD4/BE0/E98 and friends) is
  * left as `func_` -- mechanics are documented at each site but no name was
  * confident enough to clear the tier-A/B bar (FINISHING-PLAN track 3). */
 
@@ -51,7 +51,7 @@ extern s32 D_80087E5C[3];
 extern s32 D_80087E68[3];
 extern s32 D_80087E74[3];
 
-/* Consumed by func_80059E98 (round 2026-09-06), both indexed by that
+/* Consumed by DreamSys__ApplyMoveCommand (round 2026-09-06), both indexed by that
    function's own `arg1` (a mood/day-type selector, range implied by the
    table sizes below): `D_80087E34[arg1] * D_80087E20[this->moveMode]` forms
    a signed delta, then `D_80087E3C[arg1]` is called with it. Index 0 is
@@ -81,7 +81,7 @@ extern D_80087E84Entry D_80087E84[8];
 extern u8 D_80087E08[];
 
 /* 12-byte-stride table, address-of only (never loaded through) by
-   func_8005A050, indexed by DreamSys::unk_0xA4 and forwarded as
+   DreamSys__ApplyPendingTurn, indexed by DreamSys::unk_0xA4 and forwarded as
    func_8001CEB4's arg2. Splat resolves this to the SAME symbol name as
    &D_80087E84[-1] (see that field's comment above), but the two call sites
    use incompatible strides (4 vs 12 bytes) -- likely two unrelated globals
@@ -193,11 +193,11 @@ typedef struct DreamSysUnk14Tail {
 typedef struct DreamSysUnk14 {
 	s32 unk_0x0;
 	s32 unknown_values_0x4[(0x18 - 0x4) / 4];
-	/* Compared against -0x1F3 (-499) by func_80059E98 (round 2026-09-06):
+	/* Compared against -0x1F3 (-499) by DreamSys__ApplyMoveCommand (round 2026-09-06):
 	   must be >= that, together with unk_0x1C's own bound below, to run a
 	   WallLink call -- only reached while DreamSys::currentStage is 0. */
 	s32 unk_0x18;
-	/* Compared against -0x7D0 (-2000) by func_80059E98 (round 2026-09-06):
+	/* Compared against -0x7D0 (-2000) by DreamSys__ApplyMoveCommand (round 2026-09-06):
 	   must be < that alongside unk_0x18 above. */
 	s32 unk_0x1C;
 	s32 unknown_values_0x20[(0x38 - 0x20) / 4];
@@ -210,7 +210,7 @@ typedef struct DreamSysUnk14 {
    two-word (x,y) points per func_8005942C (MATCHED, elsewhere in
    this unit; not independently re-confirmed this round). +0x24 (the second point's y) is
    confirmed: func_80059814 (round 2026-08-30) nudges it. +0x18 (the first
-   point's y) is also now confirmed: func_80059BE0 (round 2026-09-02) nudges
+   point's y) is also now confirmed: DreamSys__AdvanceMoveCycle (round 2026-09-02) nudges
    it by the SAME delta as +0x24, in the same statement pair. */
 typedef struct DreamSysUnk5C {
 	s8 unknown_values_0x0[0x18];
@@ -219,7 +219,7 @@ typedef struct DreamSysUnk5C {
 	s32 unk_0x24;
 } DreamSysUnk5C;
 
-/* Object pointed to by DreamSys::unk_0x58, used by func_80059E3C (slot
+/* Object pointed to by DreamSys::unk_0x58, used by DreamSys__StopVoice (slot
    +0x84) and, this round, ExecuteLink (slot +0x80): loaded, dereferenced
    for its own vtable pointer at offset 0, and called through. Everything
    else about this class -- including whether it is the SAME class as
@@ -228,19 +228,19 @@ typedef struct DreamSysUnk5C {
    FlushSoundCueSet), which is consistent with it being a pointer value just
    not typed that way there. slot0x84 takes TWO arguments, not one --
    head-adjudicated 2026-08-30-c: the guard value (DreamSys::unk_0xBC)
-   loaded into $a1 by func_80059E3C is never overwritten before the jalr, so
-   it is passed through, not just branched on. See func_80059E3C.md.
+   loaded into $a1 by DreamSys__StopVoice is never overwritten before the jalr, so
+   it is passed through, not just branched on. See DreamSys__StopVoice.md.
    slot0x80 (ExecuteLink, round 2026-09-02) takes three arguments, all
    literal constants at that call site (0x90, 0x6E, 0x6E) -- nothing here
    suggests what they mean.
 
-   func_80059D1C (round 2026-09-06) adds two more confirmed facts: slot0x80
+   DreamSys__StartVoice (round 2026-09-06) adds two more confirmed facts: slot0x80
    DOES return a value -- it stores the result into DreamSys::unk_0xBC on one
    call path -- so its return type widens from `void` to `s32` here; this is
    safe for every existing call site (ExecuteLink, DreamSys__DreamSys's own
    slot0x80 use on the DIFFERENT DreamSysCtorArgObj vtable below) because none
    of them ever read $v0 after the call, so a discarded s32 return compiles
-   identically to a void one. func_80059D1C also reaches a new slot at +0x9C,
+   identically to a void one. DreamSys__StartVoice also reaches a new slot at +0x9C,
    one argument, called three times with a byte-table value and small
    literal constants (1, 2); nothing here suggests what it does either. */
 typedef struct DreamSysUnk58Vtable {
@@ -496,7 +496,7 @@ extern DreamSysVec3 D_80087EA4;
      `this->unk_0xB8 = (this->unk_0x28->unk_0x36 & 0x7F); if (unk_0xB8 >=
      0x18) unk_0xB8 = 0;` -- i.e. `unk_0xB8` is bounded to [0, 0x18). Both
      `D_80087EB0` and `D_80087EC8` (each already-named 24+-byte byte
-     tables) are indexed by this SAME bounded value in `func_80059D1C`
+     tables) are indexed by this SAME bounded value in `DreamSys__StartVoice`
      (`D_80087EC8[unk_0xB8]`), so `D_80087EC8`'s real, ever-read extent is
      exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
      bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
@@ -566,7 +566,7 @@ typedef struct DreamSysUnk28Target {
 extern s8 D_80087E14[9];
 
 /* Byte tables indexed by DreamSys::unk_0xB8 (already bounded to [0,0x18) at
-   the write site -- see that field's own comment). func_80059D1C
+   the write site -- see that field's own comment). DreamSys__StartVoice
    (round 2026-09-06) reads both: D_80087EB0[unk_0xB8] (values 0..0x1E) feeds
    DreamSysUnk58Vtable::slot0x80's `a1` argument, left-shifted by 4;
    D_80087EC8[unk_0xB8] (values include -2..2, hence `s8` not `u8`) feeds
@@ -652,7 +652,7 @@ typedef struct DreamSys {
 	s32 unk_0x64;
 
 	bool isFlashbackSession;
-	/* Read by func_80059A58; compared against 0 / 1, else-branch otherwise.
+	/* Read by DreamSys__TickMove; compared against 0 / 1, else-branch otherwise.
 	   Meaning unidentified beyond that (round 2026-08-30). */
 	s32 unk_0x6c;
 
@@ -695,14 +695,14 @@ typedef struct DreamSys {
 	   unconditionally to arg1 (round 2026-08-30). */
 	s32 unk_0x9C;
 	/* (this->unk_0xA0 ^ 1) < 1u, i.e. (unk_0xA0 == 1), written by
-	   func_800598E8; also toggled/incremented by func_80059A1C and forced
-	   to 1 by func_80059B50 (round 2026-08-30). */
+	   func_800598E8; also toggled/incremented by DreamSys__FlipMoveCommand and forced
+	   to 1 by DreamSys__TickMoveForced (round 2026-08-30). */
 	s32 unk_0xA0;
 	/* Index into the 12-byte-stride D_80087E80 table; consumed and reset
-	   to 0 by func_8005A050 (round 2026-08-30-b). */
+	   to 0 by DreamSys__ApplyPendingTurn (round 2026-08-30-b). */
 	s32 unk_0xA4;
 	/* (unk_0xA0 == 1) as computed by func_800598E8; unconditionally cleared
-	   to 0 by func_80059A1C on every call (round 2026-08-30). */
+	   to 0 by DreamSys__FlipMoveCommand on every call (round 2026-08-30). */
 	s32 unk_0xA8;
 	/* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with previousMoveMode.
 	   DreamSys__GetSetMoveMode's bounds-checked setter (vtable +0x180) writes both
@@ -713,7 +713,7 @@ typedef struct DreamSys {
 	/* "Previous"/paired value; see moveMode (round 2026-08-30-b). */
 	s32 previousMoveMode;
 	/* Attempt/beat counter incremented (and bounded to [0,4)) by
-	   func_80059BE0 on every call while unk_0xA0 is nonzero; reset to 0 once
+	   DreamSys__AdvanceMoveCycle on every call while unk_0xA0 is nonzero; reset to 0 once
 	   unk_0xA0 goes back to 0. Compared against 3 there to pick a +-50
 	   nudge applied to unk_0x5C's y fields, and against 4 (together with
 	   moveMode) to force unk_0xA0 back to 0 (round 2026-09-02). */
@@ -721,13 +721,13 @@ typedef struct DreamSys {
 	/* Derived from `unknown_values_0x28[0x36]` masked to 0x7F, or forced to
 	   0 (if >= 0x18) or 2 (if `unknwon_int_0x44 == 15` and this is still 0)
 	   by DreamSys__NotifyLinkAttempt's `arg1 == -1` path (round 2026-09-02). Also an index:
-	   func_80059D1C (round 2026-09-06) does nothing when this is 0, else
+	   DreamSys__StartVoice (round 2026-09-06) does nothing when this is 0, else
 	   uses it to index D_80087EB0/D_80087EC8 (see those externs), compares
 	   it against 0x16 (22) to decide whether to keep or discard
 	   unk_0xBC's new value, and against 0xB (11) to gate two extra vtable
 	   calls. */
 	s32 unk_0xB8;
-	/* Gate flag: func_80059E3C runs its body (a call through
+	/* Gate flag: DreamSys__StopVoice runs its body (a call through
 	   unk_0x58->vt->slot0x84, then resets this to -1) only while this is
 	   >= 0 (round 2026-08-30-b). */
 	s32 unk_0xBC;
@@ -817,7 +817,7 @@ typedef struct DreamSys {
 	DreamSysUnk14 unk14Snapshot;
 	DreamSysUnk14Tail unk14TailSnapshot;
 	s32 unk_0x908;
-	/* Compared with an UNSIGNED `< 1` (sltiu) by func_80059E98 (round
+	/* Compared with an UNSIGNED `< 1` (sltiu) by DreamSys__ApplyMoveCommand (round
 	   2026-09-06) -- typed `u32` rather than `s32` to reproduce that,
 	   confirmed safe since its only two writers (round 2026-08-30) both
 	   set it to the literal 0. */
@@ -843,7 +843,7 @@ typedef struct DreamSys {
 	s32 unk_0x924;
 } DreamSys;
 
-/* Dispatch table indexed by func_80059E98's `arg1`; see that table's own
+/* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
    comment near D_80087E20/D_80087E34 above. Same element signature as
    DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below. */
 extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);
@@ -1019,42 +1019,42 @@ struct vtable_DreamSys{
 	void (*DreamSys__NoOpSlot14C)(DreamSys *this);
 	/* No-op stub (`{ }`); one of DreamSys__SelectCallback80's callback_0x80 choices. */
 	void (*DreamSys__NoOpSlot150)(DreamSys *this);
-	/* Dispatches on unk_0x6C to func_8005A050+func_80059AEC, func_80059BD4,
-	   or func_80059B50, and returns whichever's result (round 2026-08-30). */
-	s32 (*func_80059A58)(DreamSys *this);
-	/* Returns movementBlocked unchanged if nonzero; otherwise calls func_80059BE0
-	   and func_80059E98 in sequence and returns the latter's result
+	/* Dispatches on unk_0x6C to DreamSys__ApplyPendingTurn+DreamSys__TickMoveFree, DreamSys__TickMoveHeld,
+	   or DreamSys__TickMoveForced, and returns whichever's result (round 2026-08-30). */
+	s32 (*DreamSys__TickMove)(DreamSys *this);
+	/* Returns movementBlocked unchanged if nonzero; otherwise calls DreamSys__AdvanceMoveCycle
+	   and DreamSys__ApplyMoveCommand in sequence and returns the latter's result
 	   (round 2026-08-30). */
-	s32 (*func_80059AEC)(DreamSys *this);
-	/* Forces unk_0xA0 to 1; then either calls func_80059BE0(this, 0) and
-	   returns its result, or chains func_80059BE0(this, 1) into
-	   func_80059E98 and returns THAT result (round 2026-08-30). */
-	s32 (*func_80059B50)(DreamSys *this);
+	s32 (*DreamSys__TickMoveFree)(DreamSys *this);
+	/* Forces unk_0xA0 to 1; then either calls DreamSys__AdvanceMoveCycle(this, 0) and
+	   returns its result, or chains DreamSys__AdvanceMoveCycle(this, 1) into
+	   DreamSys__ApplyMoveCommand and returns THAT result (round 2026-08-30). */
+	s32 (*DreamSys__TickMoveForced)(DreamSys *this);
 	/* Sets unk_0xA0 to 1 and returns 1 (round 2026-08-30). */
-	s32 (*func_80059BD4)(DreamSys *this);
-	/* Referenced by func_80059AEC/func_80059B50; return value is threaded
-	   into func_80059E98. MATCHED, round 32 (a permuter-found register-
+	s32 (*DreamSys__TickMoveHeld)(DreamSys *this);
+	/* Referenced by DreamSys__TickMoveFree/DreamSys__TickMoveForced; return value is threaded
+	   into DreamSys__ApplyMoveCommand. MATCHED, round 32 (a permuter-found register-
 	   forcing lever closed the round-2026-09-02 register-identity/delay-
-	   slot-filler residue -- see docs/match-reports/func_80059BE0.md):
+	   slot-filler residue -- see docs/match-reports/DreamSys__AdvanceMoveCycle.md):
 	   bumps unk_0xB4 while unk_0xA0 is nonzero,
-	   conditionally calls func_80059D1C (slot +0x168) or func_80059E3C
+	   conditionally calls DreamSys__StartVoice (slot +0x168) or DreamSys__StopVoice
 	   (slot +0x16C), nudges unk_0x5C's y fields, and always returns the
 	   ORIGINAL unk_0xA0 value read on entry (0 if it was already 0). */
-	s32 (*func_80059BE0)(DreamSys *this, s32 arg1);
+	s32 (*DreamSys__AdvanceMoveCycle)(DreamSys *this, s32 arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x168). Called by
-	   func_80059BE0 as (this), return value discarded -- MATCHED, round 37
+	   DreamSys__AdvanceMoveCycle as (this), return value discarded -- MATCHED, round 37
 	   (the addiu_at blocker this was once filed under is resolved; see
-	   docs/match-reports/func_80059D1C.md). */
-	void (*func_80059D1C)(DreamSys *this);
+	   docs/match-reports/DreamSys__StartVoice.md). */
+	void (*DreamSys__StartVoice)(DreamSys *this);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x16C). Called by
-	   func_80059BE0 as (this) on the path where the +0x168 slot was NOT
+	   DreamSys__AdvanceMoveCycle as (this) on the path where the +0x168 slot was NOT
 	   taken (round 2026-09-02). MATCHED. */
-	void (*func_80059E3C)(DreamSys *this);
-	/* Referenced by func_80059AEC/func_80059B50; MATCHED (110/110 words). */
-	s32 (*func_80059E98)(DreamSys *this, s32 arg1);
-	/* Referenced by func_80059A58; MATCHED (24/24 words). Called with
+	void (*DreamSys__StopVoice)(DreamSys *this);
+	/* Referenced by DreamSys__TickMoveFree/DreamSys__TickMoveForced; MATCHED (110/110 words). */
+	s32 (*DreamSys__ApplyMoveCommand)(DreamSys *this, s32 arg1);
+	/* Referenced by DreamSys__TickMove; MATCHED (24/24 words). Called with
 	   (this) only, return value discarded. */
-	void (*func_8005A050)(DreamSys *this);
+	void (*DreamSys__ApplyPendingTurn)(DreamSys *this);
 	/* Referenced by DreamSys__SelectCallback98's arg1==2 case; stored into
 	   callback_0x98, never called directly by this runner's functions. */
 	void (*func_8005A0B0)(DreamSys *this);
@@ -1102,7 +1102,7 @@ struct vtable_DreamSys{
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D0) --
 	   DreamSys__TryTunnelLink is already matched (`bool (DreamSys *this,
 	   PlayerSpawnPoint *currentPos)`, see its definition in DreamSys.c).
-	   Called by func_80059E98 (round 2026-09-06) as the third of three
+	   Called by DreamSys__ApplyMoveCommand (round 2026-09-06) as the third of three
 	   "link test" tries, same argument shape as DreamSys__TryStageTimerLink/DreamSys__TryInstantTeleportLink/
 	   DreamSys__TryStaircaseLink below. */
 	bool (*DreamSys__TryTunnelLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
@@ -1113,7 +1113,7 @@ struct vtable_DreamSys{
 	   see DreamSys__TryStageTimerLink.md. */
 	bool (*DreamSys__TryStageTimerLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D8/+0x1DC).
-	   Both still INCLUDE_ASM. func_80059E98 (round 2026-09-06) calls
+	   Both still INCLUDE_ASM. DreamSys__ApplyMoveCommand (round 2026-09-06) calls
 	   DreamSys__TryStaircaseLink (+0x1DC) first, then DreamSys__TryInstantTeleportLink (+0x1D8), then
 	   DreamSys__TryTunnelLink above -- same "link test" signature as those, confirmed
 	   by this call site alone (neither function's own body has been read

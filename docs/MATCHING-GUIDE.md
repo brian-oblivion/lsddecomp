@@ -182,7 +182,7 @@ into one of these. This list is short because this project is young — add to i
 
   Three cautions, all measured:
   - **It is not strictly dominant.** Applied to a guard that already has the
-    correct idiom it makes things WORSE (`func_80059BE0`). Read which shape
+    correct idiom it makes things WORSE (`DreamSys__AdvanceMoveCycle`). Read which shape
     the disassembly ALREADY shows first.
   - **"Give the duplicate its own C variable" is NOT the fix** once block
     order is already right — twice-reproduced regressions on

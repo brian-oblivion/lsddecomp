@@ -1,11 +1,13 @@
-# func_80059A1C — MATCHED
+# DreamSys__FlipMoveCommand — MATCHED
+
+> Renamed from `func_80059A1C` on 2026-09-22 (tools/rename.py). Address 0x80059a1c.
 
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. 11/11 words, full match.
 
 ## Source
 
 ```c
-void func_80059A1C(DreamSys *this)
+void DreamSys__FlipMoveCommand(DreamSys *this)
 {
 	this->unk_0xA8 = 0;
 	if (this->unk_0xA0 != 0) {
@@ -17,7 +19,7 @@ void func_80059A1C(DreamSys *this)
 }
 ```
 
-Not a vtable slot — called directly (`jal func_80059A1C`) from `func_800598E8`,
+Not a vtable slot — called directly (`jal DreamSys__FlipMoveCommand`) from `func_800598E8`,
 matched earlier this round. Rounds `unk_0xA0` away from zero to the nearest
 even number... no: rounds it by ±1 to flip its parity (odd → +1, even → −1),
 i.e. drives it towards/through zero one step at a time while always landing

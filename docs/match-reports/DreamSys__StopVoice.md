@@ -1,4 +1,6 @@
-# func_80059E3C — MATCHED (round 2026-08-30-c)
+# DreamSys__StopVoice — MATCHED (round 2026-08-30-c)
+
+> Renamed from `func_80059E3C` on 2026-09-22 (tools/rename.py). Address 0x80059e3c.
 
 **Unit:** DreamSys · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
 
@@ -25,7 +27,7 @@ slot `+0x84` (with itself as the sole argument), then resets `unk_0xBC` to
 ## The matching C
 
 ```c
-void func_80059E3C(DreamSys *this)
+void DreamSys__StopVoice(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 

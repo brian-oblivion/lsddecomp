@@ -1,4 +1,6 @@
-# func_80059BE0 -- MATCHED, 79/79 words, round 32 (2026-09-12, runner alpha2)
+# DreamSys__AdvanceMoveCycle -- MATCHED, 79/79 words, round 32 (2026-09-12, runner alpha2)
+
+> Renamed from `func_80059BE0` on 2026-09-22 (tools/rename.py). Address 0x80059be0.
 
 **This function now matches retail byte-for-byte.** Before touching anything,
 this round re-measured fresh per the function's own standing instruction
@@ -58,7 +60,7 @@ everything else already tried on this residue class.
 ## Final C (matches retail exactly)
 
 ```c
-s32 func_80059BE0(DreamSys *this, s32 arg1)
+s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
 {
 	s32 doCallback = 0;
 	s32 ret = 0;
@@ -78,7 +80,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		}
 
 		if (doCallback)
-			this->vt->func_80059D1C(this);
+			this->vt->DreamSys__StartVoice(this);
 
 		p = this->unk_0x5C;
 		if (p != NULL && this->screenShakeOn != 0 && arg1 != 0) {
@@ -94,7 +96,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 	}
 
 	if (!doCallback)
-		this->vt->func_80059E3C(this);
+		this->vt->DreamSys__StopVoice(this);
 	return ret;
 }
 ```
@@ -123,8 +125,8 @@ number. Round 2026-09-02, runner BRAVO (original filing).
 
 ## What it does
 
-Vtable slot `+0x164`. Called by `func_80059AEC`/`func_80059B50` as
-`func_80059BE0(this, 0)` or `func_80059BE0(this, 1)`. It:
+Vtable slot `+0x164`. Called by `DreamSys__TickMoveFree`/`DreamSys__TickMoveForced` as
+`DreamSys__AdvanceMoveCycle(this, 0)` or `DreamSys__AdvanceMoveCycle(this, 1)`. It:
 
 1. Returns 0 immediately if `this->unk_0xA0 == 0` (no attempt/beat cycle in
    progress), still running the "else" tail call below first.
@@ -133,7 +135,7 @@ Vtable slot `+0x164`. Called by `func_80059AEC`/`func_80059B50` as
    - if the counter reaches 4, clears `this->unk_0xA0` and flags a callback;
    - else if `this->unk_0xAC == 4`, flags the callback when the counter is
      even.
-3. If the callback flag is set, calls `this->vt->func_80059D1C(this)` (vtable
+3. If the callback flag is set, calls `this->vt->DreamSys__StartVoice(this)` (vtable
    slot `+0x168`, itself still `INCLUDE_ASM`/blocked — see that function's
    own stall report).
 4. If `this->unk_0x5C` is non-NULL, `this->screenShakeOn` is nonzero, and
@@ -141,7 +143,7 @@ Vtable slot `+0x164`. Called by `func_80059AEC`/`func_80059B50` as
    nudges both `this->unk_0x5C->unk_0x18` and `->unk_0x24` (the y-components
    of the two `(x,y)` points documented on `DreamSysUnk5C`) by `delta`.
 5. If `this->unk_0xA0` is now 0, resets `this->unk_0xB4` to 0.
-6. If the callback flag was NOT set, calls `this->vt->func_80059E3C(this)`
+6. If the callback flag was NOT set, calls `this->vt->DreamSys__StopVoice(this)`
    (slot `+0x16C`, already matched separately in this unit) instead of the
    slot-`0x168` call.
 7. Returns the value saved in step 2 (or 0, from step 1).
@@ -156,7 +158,7 @@ function itself did not close:
   in the SAME statement pair, which is what pinned the offset down.
 - `DreamSys::unk_0xB4` (was `unknown_values_0xB4[8]`) — the attempt/beat
   counter described above, bounded to `[0,4)` while `unk_0xA0` is nonzero.
-- `vtable_DreamSys::func_80059D1C` (was `unknown_functions_0x168[1]`) — named
+- `vtable_DreamSys::DreamSys__StartVoice` (was `unknown_functions_0x168[1]`) — named
   from `tools/classtable.py DREAMSYS_METHODS` (`+0x168`); the symbol already
   existed as an `INCLUDE_ASM` entry in `src/DreamSys.c`, just not yet wired
   into the vtable struct.
@@ -169,12 +171,12 @@ function itself did not close:
   call site uses it.
 
 Confirmed the two blocker screens are clean for this function: no `gp_rel`
-hit and no `addiu $at, $at, %lo` hit anywhere in `func_80059BE0.s`.
+hit and no `addiu $at, $at, %lo` hit anywhere in `DreamSys__AdvanceMoveCycle.s`.
 
 ## Best-reached body (45/79 words, clean/drift-free build)
 
 Two whole sub-blocks of the function compile BYTE-IDENTICAL to retail: the
-`func_80059D1C`/`func_80059E3C` dispatch pair (the `if (doCallback) ... else
+`DreamSys__StartVoice`/`DreamSys__StopVoice` dispatch pair (the `if (doCallback) ... else
 ...` call shape, `0x4A44C`-`0x4A468` and the `unk_0x5C`/`screenShakeOn`/
 `delta` block (`0x4A46C`-`0x4A4C4`) match exactly, including the `delta =
 -50; if (this->unk_0xB4 >= 3) delta = 50;` idiom (an ordinary ternary
@@ -202,7 +204,7 @@ of which reproduce the same two residues:
    here the way it did for `func_80025D10`.
 2. **`count`'s hardware register.** Retail keeps the incremented
    `this->unk_0xB4 + 1` value in `$a0` (freed up again right before the
-   `func_80059D1C` call, which needs `$a0` for `this`); every rewrite tried
+   `DreamSys__StartVoice` call, which needs `$a0` for `this`); every rewrite tried
    here (a named `count` local, an inlined `this->unk_0xB4++` with no local
    at all, a hoisted-vs-nested `bit` sub-expression) instead allocates
    `$v1`. This drags along a second residue: retail computes `andi
@@ -245,7 +247,7 @@ class, not an instruction-ORDER difference a barrier is permitted to fix.
 
 ```c
 #if 0
-s32 func_80059BE0(DreamSys *this, s32 arg1)
+s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
 {
 	s32 doCallback = 0;
 	s32 ret;
@@ -269,7 +271,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		}
 
 		if (doCallback)
-			this->vt->func_80059D1C(this);
+			this->vt->DreamSys__StartVoice(this);
 
 		p = this->unk_0x5C;
 		if (p != NULL && this->screenShakeOn != 0 && arg1 != 0) {
@@ -287,7 +289,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 	}
 
 	if (!doCallback)
-		this->vt->func_80059E3C(this);
+		this->vt->DreamSys__StopVoice(this);
 	return ret;
 }
 #endif
@@ -303,7 +305,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
   notice `$v1 == 0` on the early-exit path (i.e. something that keeps `ret`'s
   two assignments provably distinct to GCC 2.6.3's very limited alias/value
   analysis). Whatever that shape is, it wasn't found this round.
-- The `func_80059D1C`/`unk_0x5C`/`delta` two-thirds of the function are
+- The `DreamSys__StartVoice`/`unk_0x5C`/`delta` two-thirds of the function are
   solid — reuse this report's C for those blocks verbatim; they are not
   where the remaining risk is.
 
@@ -319,7 +321,7 @@ form only in operand/branch order.
 
 ## Round: hand analysis (runner delta), asm reading confirmed, no corrections found
 
-Re-read `asm/nonmatchings/DreamSys/func_80059BE0.s` directly against this
+Re-read `asm/nonmatchings/DreamSys/DreamSys__AdvanceMoveCycle.s` directly against this
 report's two documented residues. Both check out exactly as described --
 no transcription errors found (unlike `func_8002B3F4` this same round,
 where the preserved C had a bare-array-vs-dereference bug): the prologue
@@ -415,7 +417,7 @@ reached (45/79, 81 real words vs retail's 79), despite the confirmed
 2-word drift.** Do not spend further attempts trying to force the literal
 shared-label CFG shape by hand; both direct translations of it regress. A
 permuter run seeded on this exact body (`tools/setup-permuter.sh
-func_80059BE0 <this body>`) is the next reasonable step, and should now
+DreamSys__AdvanceMoveCycle <this body>`) is the next reasonable step, and should now
 also close the tail-merge residue in addition to the two previously known
 ones -- it was not tried this round due to time budget, and the seed used
 for a PRIOR round's queued-but-not-yet-run permuter mention (`func_8002B3F4`,
@@ -449,7 +451,7 @@ negative for assuming the first helps the second.
 
 **A preserved "near-miss" body's own drift claim is a claim, not a fact,
 and it does not stay true just because nobody edited the function
-since.** Two independent instances this round (`func_80059BE0` above;
+since.** Two independent instances this round (`DreamSys__AdvanceMoveCycle` above;
 `func_80063144`'s divergence #2, see that report) each carried a
 "clean"/"pure reordering, same word count" claim that was wrong, in the
 SAME direction (both undercounted the real word length by exactly the
@@ -545,7 +547,7 @@ if (this->unk_0xA0 != 0) {
     ... (unchanged BIG block, no `else` clause at all) ...
 }
 if (!doCallback)
-    this->vt->func_80059E3C(this);
+    this->vt->DreamSys__StopVoice(this);
 return ret;
 ```
 
@@ -628,7 +630,7 @@ ret = this->unk_0xA0;
 ... (unchanged big block) ...
 dispatch:
 if (!doCallback)
-	this->vt->func_80059E3C(this);
+	this->vt->DreamSys__StopVoice(this);
 return ret;
 ```
 

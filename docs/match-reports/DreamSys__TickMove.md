@@ -1,29 +1,31 @@
-# func_80059A58 — MATCHED
+# DreamSys__TickMove — MATCHED
+
+> Renamed from `func_80059A58` on 2026-09-22 (tools/rename.py). Address 0x80059a58.
 
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. 37/37 words, full match.
 
 ## Source
 
 ```c
-s32 func_80059A58(DreamSys *this)
+s32 DreamSys__TickMove(DreamSys *this)
 {
 	if (this->unk_0x6c == 0) {
-		this->vt->func_8005A050(this);
-		return this->vt->func_80059AEC(this);
+		this->vt->DreamSys__ApplyPendingTurn(this);
+		return this->vt->DreamSys__TickMoveFree(this);
 	} else if (this->unk_0x6c != 2) {
-		return this->vt->func_80059B50(this);
+		return this->vt->DreamSys__TickMoveForced(this);
 	} else {
-		return this->vt->func_80059BD4(this);
+		return this->vt->DreamSys__TickMoveHeld(this);
 	}
 }
 ```
 
-Vtable slot `0x154`. A dispatcher on `unk_0x6c`: `0` calls `func_8005A050`
-(still `INCLUDE_ASM`, result discarded) then tail-returns `func_80059AEC`'s
-result; `2` tail-returns `func_80059BD4`'s result; anything else tail-returns
-`func_80059B50`'s result. Return type `s32` per CLAUDE.md's "one-line
+Vtable slot `0x154`. A dispatcher on `unk_0x6c`: `0` calls `DreamSys__ApplyPendingTurn`
+(still `INCLUDE_ASM`, result discarded) then tail-returns `DreamSys__TickMoveFree`'s
+result; `2` tail-returns `DreamSys__TickMoveHeld`'s result; anything else tail-returns
+`DreamSys__TickMoveForced`'s result. Return type `s32` per CLAUDE.md's "one-line
 wrapper" note — this is a passthrough of whatever the selected callee
-returns, and two of the three callees (`func_80059AEC`, `func_80059B50`,
+returns, and two of the three callees (`DreamSys__TickMoveFree`, `DreamSys__TickMoveForced`,
 matched later this round) are confirmed `s32`-returning, so a `void` wrapper
 would be actively wrong here, not just unproven.
 
@@ -36,7 +38,7 @@ v1,v0,ELSE_TARGET` (branch away on NOT-equal) with the `!=2` case's body
 placed at the far target and the `==2` case inline — the opposite pairing
 from a naive `if (==2) {...} else {...}` reading. Swapping to `if (unk_0x6c
 != 2) { B50 } else { BD4 }` (matching retail's actual `bne`/inline pairing)
-fixed it immediately. Same family of residue as `func_80059A1C` this round:
+fixed it immediately. Same family of residue as `DreamSys__FlipMoveCommand` this round:
 reading a comparison's DIRECTION off the disassembly and transcribing the
 "obvious" `if (==) {...} else {...}` shape doesn't reliably reproduce which
 block ends up inline vs at the branch target.

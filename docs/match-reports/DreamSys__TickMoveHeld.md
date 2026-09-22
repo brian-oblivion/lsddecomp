@@ -1,4 +1,6 @@
-# func_80059BD4 — MATCHED
+# DreamSys__TickMoveHeld — MATCHED
+
+> Renamed from `func_80059BD4` on 2026-09-22 (tools/rename.py). Address 0x80059bd4.
 
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. 3/3 words, full match on
 the first attempt.
@@ -6,7 +8,7 @@ the first attempt.
 ## Source
 
 ```c
-s32 func_80059BD4(DreamSys *this)
+s32 DreamSys__TickMoveHeld(DreamSys *this)
 {
 	return this->unk_0xA0 = 1;
 }
@@ -19,7 +21,7 @@ here the POSITIVE evidence for `s32` is that `$v0` is loaded with `1` BEFORE
 the store and is left completely untouched through to `jr $ra`, i.e. the
 retail code is deliberately keeping the just-computed value alive as the
 return register rather than merely using it as a store source. Also called
-by `func_80059A58` (matched earlier this round) as the direct source of its
+by `DreamSys__TickMove` (matched earlier this round) as the direct source of its
 own return value in the `unk_0x6c == 2` case, which independently confirms
 the `s32` return type is actually used by a caller, not just theoretically
 available.

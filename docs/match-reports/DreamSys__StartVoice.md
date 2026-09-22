@@ -1,4 +1,6 @@
-# func_80059D1C -- MATCHED (72/72, byte-exact), round 37, via a permuter-found register-forcing lever
+# DreamSys__StartVoice -- MATCHED (72/72, byte-exact), round 37, via a permuter-found register-forcing lever
+
+> Renamed from `func_80059D1C` on 2026-09-22 (tools/rename.py). Address 0x80059d1c.
 
 > **MATCHED, round 37 (2026-09-12, runner charlie).** This function is now
 > byte-exact (`./build-and-verify.sh` reports `OK: build matches retail
@@ -62,7 +64,7 @@ externs added this round) and calls through the object's vtable twice
 stored result and two more pairs of vtable calls respectively.
 
 ```c
-void func_80059D1C(DreamSys *this)
+void DreamSys__StartVoice(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 	s32 idx;
@@ -315,14 +317,14 @@ round's primary tool. Re-measured before touching anything: rebuilt the
 exact preserved body above and reproduced **55/72 words, zero address
 drift**, byte-identical to rounds 32 and 35.
 
-**Scaffold set up per `tools/setup-permuter.sh func_80059D1C <seed>`.**
+**Scaffold set up per `tools/setup-permuter.sh DreamSys__StartVoice <seed>`.**
 `--debug --stack-diffs` confirmed the base score (116) matches the residue
 already on record (a whole-function register-identity swap: 20 register-diff
 penalty points, 16 stack-diff points from the `sw`/register-choice
 differences in the prologue, no reorderings/insertions/deletions -- i.e.
 purely an allocation question, exactly as described above).
 
-**Search 1** (`permuter-work/func_80059D1C`, `-j 6 --stop-on-zero --best-only
+**Search 1** (`permuter-work/DreamSys__StartVoice`, `-j 6 --stop-on-zero --best-only
 --stack-diffs`, `timeout 900`): ran 76521 iterations before the bound expired
 (`rc=124`, confirmed on the very next command). No zero was reached, but the
 permuter's `--best-only` flag saved every local-best candidate it found, and
@@ -487,7 +489,7 @@ Final clean form (now live in `src/DreamSys.c`, with a comment explaining why
 `headingArg` and `scratch` are load-bearing rather than superfluous):
 
 ```c
-void func_80059D1C(DreamSys *this)
+void DreamSys__StartVoice(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 	s32 idx;
