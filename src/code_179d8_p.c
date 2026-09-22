@@ -80,23 +80,24 @@ extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
 
 /*
- * This function's OWN reading of D_8006DAD4: a POINTER VARIABLE (loaded
- * with `lw`, not an array base) to a 0x10-byte-stride record, indexed by
- * channel. code_179d8_m.c reads the SAME symbol as a fixed-offset object
- * pointer (its own ObjDAD4, offsets 0x194/0x196) -- a different, valid
- * reading per the project's convention: same global, two shapes, two
- * independent local views.
+ * This function's OWN reading of D_8006DAD4: a POINTER VARIABLE (loaded with
+ * `lw`, not an array base) into the PS1 SPU voice register block -- the value
+ * is 0x1F801C00, established when code_179d8_m was named as the 24-voice
+ * sound driver.  Indexed as HALFWORDS: `D_8006DAD4[woff + N]` with
+ * `s16 woff = i * 8`, i.e. 8 halfwords (0x10 bytes) per voice, which is the
+ * SPU's own per-voice register stride.  code_179d8_m.c reads the SAME symbol
+ * as a fixed-offset object pointer (its own ObjDAD4, offsets 0x194/0x196) --
+ * a different, valid reading per the project's convention.
+ *
+ * ROUND 66: the POINTEE MUST BE `volatile`.  These are hardware registers, and
+ * the qualifier is load-bearing for the MATCH, not just for correctness: cc1
+ * 2.6.3 orders volatile accesses against other volatile accesses only, so
+ * without it cc1 hoists the `D_8008EA26` volatile store/reload pair across
+ * these six stores.  Worth 54/131 -> 98/131.  Round 31's `Rec16DAD4` struct
+ * spelling (stride 0x10, fields f0..fA) is RETRACTED: it compiles the index as
+ * a plain late `sll 4` instead of retail's split `sll 19` / `sra 15`.
  */
-typedef struct {
-    u16 f0;  /* +0x0 */
-    u16 f2;  /* +0x2 */
-    u16 f4;  /* +0x4 */
-    u16 f6;  /* +0x6 */
-    u16 f8;  /* +0x8 */
-    u16 fA;  /* +0xA */
-    u8 pad[0x10 - 0xC];
-} Rec16DAD4;
-extern Rec16DAD4 *D_8006DAD4;
+extern volatile u16 *D_8006DAD4;
 
 /* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
  * (voices 0-15 / 16-31) -- D_80090C60/64 are the hardware-mirrored "just
@@ -107,28 +108,30 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-/* STALL -- see docs/match-reports/func_80031F3C.md.  Best-derived body
- * compiles to 122/131 words (9 SHORT); raw word-match 42/131 under that
- * drift; first real diff at vram 0x80031F4C (file 0x2274C) -- a missing
- * `sll a0,a0,0x13` (the early half of a split-shift index computation).
- * Preserved here for the next attempt. */
+/* STALL -- see docs/match-reports/func_80031F3C.md.  Round 66 revisit:
+ * best-derived body now compiles to EXACT LENGTH (was 9 words SHORT);
+ * raw word-match 103/131 (was 42/131); first real diff at vram 0x80032064
+ * (file 0x22864) -- `sllv a3,t2,a0` vs `sllv a2,t2,a0`, a register-identity
+ * residue on bitLo/bitHi.  Preserved here for the next attempt.  Note the
+ * four load-bearing spellings: D_8006DAD4's POINTEE is volatile (it holds
+ * 0x1F801C00, the SPU voice registers) which is what pins cc1's scheduler;
+ * `s16 woff = i * 8` (SIGNED) is what fuses into retail's sll19/sra15 split
+ * shift; the loop is a `for`, not a guard plus `for(;;)`; and the tail does
+ * three stores off the reloaded index, not one.
+ */
 #if 0
 void func_80031F3C(void)
 {
     s16 i;
+    s16 woff;
     u16 bitpos;
     u32 bitLo;
     u32 bitHi;
     u16 hw0;
     u16 hw1;
-    u16 mask0;
-    u16 mask1;
-    if (D_8008E9D0 == 0) {
-        return;
-    }
 
-    i = 0;
-    for (;;) {
+    for (i = 0; i < D_8008E9D0; i++) {
+        woff = i * 8;
         D_8008D98A[i].unk0 = 0x18;
         D_8008D988[i].unk0 = 0xFF;
         D_8008D9A3[i].unk0 = 0;
@@ -139,12 +142,12 @@ void func_80031F3C(void)
         D_8008D99A[i].unk0 = 0;
         D_8008D99C[i].unk0 = 0xFF;
 
-        D_8006DAD4[i].f6 = 0x200;
-        D_8006DAD4[i].f4 = 0x1000;
-        D_8006DAD4[i].f8 = 0x80FF;
-        D_8006DAD4[i].f0 = 0;
-        D_8006DAD4[i].f2 = 0;
-        D_8006DAD4[i].fA = 0x4000;
+        D_8006DAD4[woff + 3] = 0x200;
+        D_8006DAD4[woff + 2] = 0x1000;
+        D_8006DAD4[woff + 4] = 0x80FF;
+        D_8006DAD4[woff + 0] = 0;
+        D_8006DAD4[woff + 1] = 0;
+        D_8006DAD4[woff + 5] = 0x4000;
 
         D_8008EA26 = i;
         bitpos = D_8008EA26 & 0xFFFF;
@@ -156,26 +159,18 @@ void func_80031F3C(void)
             bitHi = 1u << (bitpos - 0x10);
         }
 
-        i++;
         D_8008D9A3[bitpos & 0xFFFF].unk0 = 0;
+        D_8008D98C[bitpos & 0xFFFF].unk0 = 0;
+        D_8008D988[bitpos & 0xFFFF].unk0 = 0;
 
         hw0 = D_80090C60;
         hw1 = D_80090C64;
-        mask0 = D_8008E228;
-        hw0 = (u16)(bitLo | hw0);
+        hw0 = bitLo | hw0;
         D_80090C60 = hw0;
-        mask0 = mask0 & (u16) ~hw0;
-        D_8008E228 = mask0;
-
-        mask1 = D_8008E22C;
-        hw1 = (u16)(bitHi | hw1);
+        D_8008E228 = D_8008E228 & ~hw0;
+        hw1 = bitHi | hw1;
         D_80090C64 = hw1;
-        mask1 = mask1 & (u16) ~hw1;
-        D_8008E22C = mask1;
-
-        if (!(i < D_8008E9D0)) {
-            break;
-        }
+        D_8008E22C = D_8008E22C & ~hw1;
     }
 }
 #endif
