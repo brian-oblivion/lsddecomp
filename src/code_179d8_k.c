@@ -240,13 +240,14 @@ extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
  * dispatch, one fewer byte consumed since this byte already stood in for
  * the first data byte.
  *
- * STALL -- see docs/match-reports/func_8003424C.md. length exact 172/172,
- * 122/172 raw word-match, first real diff at word 2: a pure register-identity
- * swap (retail's widened "channel" lives in $s4 and its per-case data byte in
- * $s3; this C's compiles the same roles into $s3/$s4 the other way around).
- * CLAUDE.md's register-identity STALL rule -- reshaping tried and did not
- * move it (see report for the full list of variants). */
-#if 0
+ */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 122/172 words, length exact. Residue: a pure
+ * register-identity swap (retail's widened "channel" lives in $s4 and its
+ * per-case data byte in $s3; this C compiles the same roles into $s3/$s4
+ * the other way around), CLAUDE.md's register-identity STALL rule --
+ * reshaping tried and did not move it (docs/match-reports/func_8003424C.md).
+ * Hand-derived. */
 void func_8003424C(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -325,8 +326,9 @@ void func_8003424C(s16 a0, s16 a1)
         }
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
+#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 62/70 words, length exact. Residue: register-identity
