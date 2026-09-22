@@ -30,11 +30,11 @@ extern s32 D_80087E74[3];
 
 /* Consumed by func_80059E98 (round 2026-09-06), both indexed by that
    function's own `arg1` (a mood/day-type selector, range implied by the
-   table sizes below): `D_80087E34[arg1] * D_80087E20[this->unk_0xAC]` forms
+   table sizes below): `D_80087E34[arg1] * D_80087E20[this->moveMode]` forms
    a signed delta, then `D_80087E3C[arg1]` is called with it. Index 0 is
    unused/null in D_80087E3C (arg1 == 0 returns before reaching any of
    these, per that function's own guard) -- consistent with D_80087E34[0]
-   being 0 too. D_80087E20 is indexed separately by DreamSys::unk_0xAC (its
+   being 0 too. D_80087E20 is indexed separately by DreamSys::moveMode (its
    own "Current" value, see that field), not by arg1. */
 extern s32 D_80087E20[5];
 extern s8 D_80087E34[8];
@@ -635,8 +635,8 @@ typedef struct DreamSys {
 
 	/* Gate flag: DreamSys__BlockMovement sets it to 1; func_8005931C reads it back;
 	   DreamSys__UpdateTickState skips its whole body while this is nonzero. */
-	s32 unk_0x70;
-	/* Cleared to 0, then set to (dreamTimer % unk_0x120 == 0) by
+	s32 movementBlocked;
+	/* Cleared to 0, then set to (dreamTimer % tickPeriod == 0) by
 	   DreamSys__UpdateTickState. */
 	s32 unk_0x74;
 	/* Cleared to 0 by func_80059598; no other observed use. */
@@ -681,19 +681,19 @@ typedef struct DreamSys {
 	/* (unk_0xA0 == 1) as computed by func_800598E8; unconditionally cleared
 	   to 0 by func_80059A1C on every call (round 2026-08-30). */
 	s32 unk_0xA8;
-	/* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with unk_0xB0.
+	/* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with previousMoveMode.
 	   DreamSys__GetSetMoveMode's bounds-checked setter (vtable +0x180) writes both
-	   this and unk_0xB0 together; DreamSys__ChangeMoveMode copies the OLD value of
-	   this into unk_0xB0 before overwriting it, when the new value
+	   this and previousMoveMode together; DreamSys__ChangeMoveMode copies the OLD value of
+	   this into previousMoveMode before overwriting it, when the new value
 	   differs (round 2026-08-30-b). */
-	s32 unk_0xAC;
-	/* "Previous"/paired value; see unk_0xAC (round 2026-08-30-b). */
-	s32 unk_0xB0;
+	s32 moveMode;
+	/* "Previous"/paired value; see moveMode (round 2026-08-30-b). */
+	s32 previousMoveMode;
 	/* Attempt/beat counter incremented (and bounded to [0,4)) by
 	   func_80059BE0 on every call while unk_0xA0 is nonzero; reset to 0 once
 	   unk_0xA0 goes back to 0. Compared against 3 there to pick a +-50
 	   nudge applied to unk_0x5C's y fields, and against 4 (together with
-	   unk_0xAC) to force unk_0xA0 back to 0 (round 2026-09-02). */
+	   moveMode) to force unk_0xA0 back to 0 (round 2026-09-02). */
 	s32 unk_0xB4;
 	/* Derived from `unknown_values_0x28[0x36]` masked to 0x7F, or forced to
 	   0 (if >= 0x18) or 2 (if `unknwon_int_0x44 == 15` and this is still 0)
@@ -720,9 +720,9 @@ typedef struct DreamSys {
 	   layout unknown beyond that entry point (round 2026-08-30). */
 	s8 unk_0xCC[0x54];
 
-	/* Divisor for DreamSys__UpdateTickState's (dreamTimer % unk_0x120) check. */
-	s32 unk_0x120;
-	/* Result of DreamSys__UpdateTickState's (dreamTimer % unk_0x120 == 0) check. */
+	/* Divisor for DreamSys__UpdateTickState's (dreamTimer % tickPeriod) check. */
+	s32 tickPeriod;
+	/* Result of DreamSys__UpdateTickState's (dreamTimer % tickPeriod == 0) check. */
 	s32 unk_0x124;
 	/* unk_0x124/0x128/0x12C/0x130 are also bounds-checked-set as a group of
 	   four by func_8005A1B0 (vtable +0x18C): each is overwritten with the
@@ -764,7 +764,7 @@ typedef struct DreamSys {
 	s32 unknown_word_0x680;
 	s8 unknown_values_0x684[500];
 
-	s32 unk_0x878;
+	s32 newGamePending;
 	s32 currentFlashbackIndex;
 	/* Set (whole word) by DreamSys__TryStageTimerLink to func_8005BF48()'s return value,
 	   right before an ExecuteLink (round 2026-09-02). */
@@ -999,7 +999,7 @@ struct vtable_DreamSys{
 	/* Dispatches on unk_0x6C to func_8005A050+func_80059AEC, func_80059BD4,
 	   or func_80059B50, and returns whichever's result (round 2026-08-30). */
 	s32 (*func_80059A58)(DreamSys *this);
-	/* Returns unk_0x70 unchanged if nonzero; otherwise calls func_80059BE0
+	/* Returns movementBlocked unchanged if nonzero; otherwise calls func_80059BE0
 	   and func_80059E98 in sequence and returns the latter's result
 	   (round 2026-08-30). */
 	s32 (*func_80059AEC)(DreamSys *this);
@@ -1064,9 +1064,9 @@ struct vtable_DreamSys{
 	   passes literal 0, compatible with either. */
 	s32 (*DreamSys__GetCurrentDayAndYear)(DreamSys *this, s32 *arg1);
 	s32 (*AdvanceDay)(DreamSys *this);
-	/* Zeroes unk_0x878 unconditionally (round 2026-08-30-c). */
+	/* Zeroes newGamePending unconditionally (round 2026-08-30-c). */
 	void (*DreamSys__ClearNewGameFlag)(DreamSys *this);
-	/* Getter for unk_0x878 (round 2026-08-30-c). */
+	/* Getter for newGamePending (round 2026-08-30-c). */
 	s32 (*DreamSys__GetNewGameFlag)(DreamSys *this);
 	/* Optionally writes a literal 0x700 through arg1 (if non-NULL), always
 	   returns &this->unknown_sdata_0x178 (round 2026-08-30-c). */

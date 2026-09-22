@@ -42,9 +42,9 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 	val = ((DreamSysCtorArgObj *)arg1)->methods->slot0x80(arg1, 0);
 	this->vt->slot10(this, val);
 	this->vt->GetSetDreamTimeLimit(this, -1);
-	this->unk_0x70 = 1;
+	this->movementBlocked = 1;
 	this->unk_0x6c = 0;
-	this->unk_0x878 = 1;
+	this->newGamePending = 1;
 	this->vt->InitNewGame(this);
 	return this->vt->func_800588EC(this);
 }
@@ -126,7 +126,7 @@ void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 {
 	if (this->unk_0x6c != 0)
 		return;
-	if (this->unk_0x70 != 0)
+	if (this->movementBlocked != 0)
 		return;
 	if (this->unk_0x908 != 0)
 		return;
@@ -291,7 +291,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->vt->DreamSys__SetTickPeriod(this, arg2);
 
 	this->nextCinematic.entry = -1;
-	this->unk_0x70 = 0;
+	this->movementBlocked = 0;
 	this->unknwon_int_0x44 = 0;
 	this->unk_0x74 = 0;
 	this->unk_0x908 = 0;
@@ -307,7 +307,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 
 void DreamSys__BlockMovement(DreamSys *this)
 {
-	this->unk_0x70 = 1;
+	this->movementBlocked = 1;
 }
 s32 func_8005931C(DreamSys *this)
 {
@@ -343,9 +343,9 @@ void func_8005938C(DreamSys *this, s32 value)
 }
 void DreamSys__UpdateTickState(DreamSys *this)
 {
-	if (this->unk_0x70 == 0) {
+	if (this->movementBlocked == 0) {
 		this->unk_0x74 = 0;
-		this->unk_0x124 = ((u32)this->dreamTimer % (u32)this->unk_0x120) == 0;
+		this->unk_0x124 = ((u32)this->dreamTimer % (u32)this->tickPeriod) == 0;
 	}
 }
 void DreamSys__RunTickCallbacks(DreamSys *this)
@@ -615,15 +615,15 @@ s32 func_80059A58(DreamSys *this)
 
 s32 func_80059AEC(DreamSys *this)
 {
-	if (this->unk_0x70 != 0)
-		return this->unk_0x70;
+	if (this->movementBlocked != 0)
+		return this->movementBlocked;
 	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
 }
 
 s32 func_80059B50(DreamSys *this)
 {
 	this->unk_0xA0 = 1;
-	if (this->unk_0x70 != 0)
+	if (this->movementBlocked != 0)
 		return this->vt->func_80059BE0(this, 0);
 	return this->vt->func_80059E98(this, this->vt->func_80059BE0(this, 1));
 }
@@ -646,7 +646,7 @@ s32 func_80059BE0(DreamSys *this, s32 arg1)
 		count = this->unk_0xB4 + 1;
 		this->unk_0xB4 = count;
 		if (count < 4) {
-			doCallback = (this->unk_0xAC == 4) && ((count & 1) == 0);
+			doCallback = (this->moveMode == 4) && ((count & 1) == 0);
 		} else {
 			this->unk_0xA0 = 0;
 			doCallback = 1;
@@ -735,7 +735,7 @@ s32 func_80059E98(DreamSys *this, s32 arg1)
 	PlayerSpawnPoint *pos;
 
 	if (arg1 != 0) {
-		delta = D_80087E34[arg1] * D_80087E20[this->unk_0xAC];
+		delta = D_80087E34[arg1] * D_80087E20[this->moveMode];
 		this->vt->func_800595A0(this);
 		pos = this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0);
 		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
@@ -786,10 +786,10 @@ s32 DreamSys__GetSetMoveMode(DreamSys *this, s32 value)
 {
 	s32 old;
 
-	old = this->unk_0xAC;
+	old = this->moveMode;
 	if (value >= 0) {
-		this->unk_0xAC = value;
-		this->unk_0xB0 = value;
+		this->moveMode = value;
+		this->previousMoveMode = value;
 	}
 	return old;
 }
@@ -798,16 +798,16 @@ void DreamSys__ChangeMoveMode(DreamSys *this, s32 value)
 {
 	s32 old;
 
-	old = this->unk_0xAC;
+	old = this->moveMode;
 	if (old != value) {
-		this->unk_0xB0 = old;
-		this->unk_0xAC = value;
+		this->previousMoveMode = old;
+		this->moveMode = value;
 	}
 }
 
 void DreamSys__RestorePreviousMoveMode(DreamSys *this)
 {
-	this->unk_0xAC = this->unk_0xB0;
+	this->moveMode = this->previousMoveMode;
 }
 
 void func_8005A1B0(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
@@ -824,7 +824,7 @@ void func_8005A1B0(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
 
 void DreamSys__SetTickPeriod(DreamSys *this, s32 value)
 {
-	this->unk_0x120 = value;
+	this->tickPeriod = value;
 }
 
 void func_8005A1F4(void *arg0, Func8005A1F4Arg *arg1)
@@ -899,12 +899,12 @@ s32 DreamSys__AdvanceDay(DreamSys *this)
 
 void DreamSys__ClearNewGameFlag(DreamSys *this)
 {
-	this->unk_0x878 = 0;
+	this->newGamePending = 0;
 }
 
 s32 DreamSys__GetNewGameFlag(DreamSys *this)
 {
-	return this->unk_0x878;
+	return this->newGamePending;
 }
 
 s32 *func_8005A350(DreamSys *this, s32 *arg1)
@@ -945,7 +945,7 @@ s32 DreamSys__EndDay(DreamSys *this, s32 arg1)
 		this->vt->AdvanceDay(this);
 	} else if (arg1 == 2) {
 		this->vt->InitNewGame(this);
-		this->unk_0x878 = 1;
+		this->newGamePending = 1;
 	}
 	return this->isFlashbackSession;
 }
@@ -1129,7 +1129,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	this->unk_0x908 = 0;
 	this->unk_0x910 = 0;
 	this->unk_0x90C = 0;
-	if (this->unk_0xAC != 4) {
+	if (this->moveMode != 4) {
 		return false;
 	}
 	this->vt->DreamSys__RestorePreviousMoveMode(this);
@@ -1166,7 +1166,7 @@ s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->unk_0x91C);
 	}
-	if (this->unk_0xAC != 4) {
+	if (this->moveMode != 4) {
 		if (this->unk_0x914 >= 0x85)
 			return 1;
 		if ((u32)(this->unk_0x914 - 0x2B) < 0xF || (u32)(this->unk_0x914 - 0x4B) < 0xF) {
@@ -1191,7 +1191,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABC8, &this->unk_0x91C);
 	}
-	if (this->unk_0xAC != 4) {
+	if (this->moveMode != 4) {
 		if (this->unk_0x914 >= 0x95)
 			return 1;
 		if ((u32)(this->unk_0x914 - 0x16) < 0xF || (u32)(this->unk_0x914 - 0x39) < 0x10 || (u32)(this->unk_0x914 - 0x6E) < 0xF) {
@@ -1219,7 +1219,7 @@ s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABD0, &this->unk_0x91C);
 	}
-	if (this->unk_0xAC != 4) {
+	if (this->moveMode != 4) {
 		if (this->unk_0x914 < 0x65) {
 			if ((u32)(this->unk_0x914 - 0x2B) < 0xF) {
 				this->unk_0xA4 = 2;
@@ -1248,7 +1248,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABD8, &this->unk_0x91C);
 	}
-	if (this->unk_0xAC != 4) {
+	if (this->moveMode != 4) {
 		if (this->unk_0x914 >= 0x71)
 			return 1;
 		if ((u32)(this->unk_0x914 - 0x1E) < 0xF || (u32)(this->unk_0x914 - 0x52) < 0xF) {
