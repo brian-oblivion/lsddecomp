@@ -94,3 +94,7 @@ before unrelated stores in the disassembly regardless of source order, but
 the stores themselves preserve it. Getting the order right fixed a stray
 register too (`$v1` vs `$a0` for the switch's own dispatch constant); no
 `__asm__("")` barrier or register trick was needed or attempted.
+
+## Naming
+
+- **Tier B.** Symmetric setter for callback_0x98's own small menu; additionally, when the mode was already 2 on entry, calls func_8005A134(this, 0) first, and its own mode-2 case wires up an InitSoundCueSet call.

@@ -140,3 +140,7 @@ read the disassembly's block order directly into `goto` labels instead.
 This is a superset of the already-documented "goto vs return" lever
 (DECOMPILATION_LEARNINGS.md) — it generalizes past a single early-exit to
 an arbitrary number of blocks that converge on one shared tail.
+
+## Naming
+
+- **Tier B.** Forwards `arg1` to the base class's generic +0x88 notify slot unconditionally, then handles two DreamSys-specific sentinel values: -1 and -2, called with exactly those literals by DreamSys__FindNearbyLink (class_3bb8c_p.c) on link-found / link-not-found, and with a small positive mode code by DreamSys__ApplyOffsetSlotAndNotify (same unit).

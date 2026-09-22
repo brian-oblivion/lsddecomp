@@ -27,3 +27,7 @@ void DreamSys__RestoreLinkSnapshot(DreamSys *this)
 ## Provenance
 
 round 2026-09-02, runner ALPHA, unit DreamSys.
+
+## Naming
+
+- **Tier A.** Restore counterpart of DreamSys__SaveLinkSnapshot: copies the two snapshots back, then clears unk_0x14->unk_0x0 to 0. Called on the "link attempt failed / mismatched" paths of DreamSys__NotifyLinkAttempt and DreamSys__WallLink.

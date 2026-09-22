@@ -430,3 +430,7 @@ one call it was meant to feed. This is the same lesson as the
 `DreamSys__InstanceEffectsOnJournal` cast-local finding, generalized past
 "cast of a `void *` parameter" to "any repeatedly-recomputed address
 expression."
+
+## Naming
+
+- **Tier B.** STALL (still INCLUDE_ASM). Wraps Test4StaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseCase0..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.

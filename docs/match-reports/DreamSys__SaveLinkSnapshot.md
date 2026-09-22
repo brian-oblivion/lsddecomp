@@ -155,3 +155,7 @@ this.
 ## Provenance
 
 round 2026-09-02, runner ALPHA, unit DreamSys.
+
+## Naming
+
+- **Tier A.** Block-copies *this->unk_0x14 (0x50 bytes) and its own unk_0x44 tail into unk14Snapshot/unk14TailSnapshot -- already documented in the header as a matched save/restore pair with DreamSys__RestoreLinkSnapshot.

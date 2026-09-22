@@ -34,3 +34,7 @@ there. The function's OWN body makes clear `arg1` is an output pointer
 ## Provenance
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
+
+## Naming
+
+- **Tier A.** Returns currentDay+1, optionally writes currentYear through an output pointer -- both already-named fields, pure getter.

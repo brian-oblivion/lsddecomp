@@ -25,3 +25,7 @@ matching the existing header entry exactly).
 ## Provenance
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
+
+## Naming
+
+- **Tier A.** One-line getter for the already-named `currentStage` field.

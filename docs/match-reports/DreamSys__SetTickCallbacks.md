@@ -31,3 +31,7 @@ independently corroborates.
 
 None beyond what's already documented — a clean first-attempt match, no
 residue.
+
+## Naming
+
+- **Tier B.** Chains DreamSys__SelectCallback98(arg1) then DreamSys__SelectCallback80(arg2) -- the enable counterpart of DreamSys__ClearTickCallbacks.

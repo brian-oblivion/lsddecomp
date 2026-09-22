@@ -24,3 +24,7 @@ void DreamSys__SetTickPeriod(DreamSys *this, s32 value)
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+- **Tier B.** One-line setter for tickPeriod, the divisor DreamSys__UpdateTickState reduces dreamTimer against.

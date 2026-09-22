@@ -30,3 +30,7 @@ void DreamSys__ChangeMoveMode(DreamSys *this, s32 value)
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+- **Tier B.** Saves the OLD moveMode into previousMoveMode, then overwrites moveMode with the new value, only when the value actually differs -- the history-preserving sibling of DreamSys__GetSetMoveMode.

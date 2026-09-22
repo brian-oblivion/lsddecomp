@@ -366,3 +366,7 @@ computation), which is a different shape entirely and the lever has nothing
 to attach to. Checking the precondition against the raw `.s` BEFORE
 attempting the lever (as this round's brief instructed) correctly predicted
 it would not apply here, saving a blind attempt.
+
+## Naming
+
+- **Tier B.** STALL (still INCLUDE_ASM). Wraps Test4InstantTeleporters and calls ExecuteLink (type 0x11) on success, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink. Renaming a stall's symbol changes no bytes.

@@ -51,3 +51,7 @@ overwritten anyway."
 ## Provenance
 
 round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
+
+## Naming
+
+- **Tier A.** Pure leaf: computes an xz-only (a-b) relative vector (y forced to 0) and applies it via BaseObjO__AddVec14. Mechanics are the whole story.

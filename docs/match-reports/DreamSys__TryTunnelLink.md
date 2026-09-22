@@ -103,3 +103,7 @@ confirmed independently via a host-side `offsetof` walk of the whole
 ## Provenance
 
 round 2026-09-02, runner ALPHA, unit DreamSys.
+
+## Naming
+
+- **Tier B.** `bool(DreamSys*, PlayerSpawnPoint*)`; wraps Test4TunnelLinks and calls ExecuteLink (type 0xD) on success. One of a 4-member family (with TryStageTimerLink/TryInstantTeleportLink/TryStaircaseLink) the header's own pre-existing comment already called "three link tests", called in sequence from func_80059E98; also called directly from DreamSys__WallLink's own static-link path.

@@ -35,3 +35,7 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+- **Tier B.** Unconditionally selects callback_0x98 mode 0 (NULL) and, if its own argument is true, also selects callback_0x80 mode 0 -- the disable counterpart of DreamSys__SetTickCallbacks.

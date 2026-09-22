@@ -130,3 +130,7 @@ pattern: `if (cond) {big} else {small-return};` is not reliably reproduced by
 plain `if`/`else` once "big" grows past whatever GCC 2.6.3's placement
 heuristic keys on — write the small side as an inverted guard-clause early
 return instead, unconditionally, as a first attempt rather than a last resort.
+
+## Naming
+
+- **Tier B.** One of the 4-entry D_80087EEC dispatch table's own functions, in table order (this is index 0), chosen by DreamSys__TryStaircaseLink via GetLastSpawnExtra. Does an initial DreamSys__ApplyRelativeOffset against D_8008ABC0, then a stage-family bounds check incrementing the unk_0x914 attempt counter. Only ever wired up after Test4StaircaseNodes succeeds -- the "staircase" context is solid; the difference between cases 0..3 is not.

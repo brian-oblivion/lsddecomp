@@ -68,3 +68,7 @@ something specific to `DreamSys__CheckTunnelHeading`'s own tables or caller.
 
 round 43, runner ALPHA, unit DreamSys (stretch pick beyond the assigned
 queue).
+
+## Naming
+
+- **Tier B.** Near-identical body to DreamSys__CheckTunnelHeading, differing only in which per-stage heading table it indexes (D_80088C84/D_80088BDC here); called from DreamSys__TryStaircaseLink.

@@ -23,3 +23,7 @@ Retyped the vtable field from `void *DreamSys__ClearNewGameFlag;` to
 ## Provenance
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
+
+## Naming
+
+- **Tier B.** Setter (to 0) for newGamePending. DreamSys__DreamSys (ctor) and DreamSys__EndDay's re-init path both set the flag to 1 immediately after InitNewGame -- two agreeing call sites for the "new game (re)initialized, not yet acknowledged" reading; not independently confirmed beyond that context.

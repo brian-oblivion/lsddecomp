@@ -100,3 +100,7 @@ for a different field). This is cheaper than the permuter and cheaper than
 manual derivation, and it is very easy to miss when working strictly
 top-to-bottom through a queue instead of first scanning nearby already-
 matched code for a template.
+
+## Naming
+
+- **Tier B.** Table index 1 of the same D_80087EEC family as DreamSys__TickStaircaseCase0, against D_8008ABC8; same evidence and same caveat.

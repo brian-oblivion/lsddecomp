@@ -43,3 +43,7 @@ gp-relative and addiu_at" to MATCHED.
 ## Provenance
 
 round 43, runner ALPHA, unit DreamSys.
+
+## Naming
+
+- **Tier A.** Pure leaf: returns the already-named `.extra` field of the last static spawn point found via the D_8008ACC4/C8 scratch indices; its return value indexes the DreamSys__TickStaircaseCase0..3 dispatch table.

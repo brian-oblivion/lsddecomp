@@ -124,3 +124,7 @@ lands exactly on the rodata jump-table's own base address (not inside the
 function body), the fix is almost certainly a missing high-end `case N: break;`
 matching `default`, not a body/order defect. Add one past the table's known
 `sltiu` bound (`bound - 1` in the post-subtraction index space) and rebuild.
+
+## Naming
+
+- **Tier B.** A `switch (mode - 2)` over ~14 distinct case values, each setting one or two of the link-state fields (movementBlocked-adjacent unk_0xA0/0xA4/0x88/0x74) or calling DreamSys__ChangeMoveMode / DreamSys__RestorePreviousMoveMode, gated by three busy flags. The individual case semantics are not established, only that this is a mode/command dispatcher.

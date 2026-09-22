@@ -82,3 +82,7 @@ else return N;` — is the more reliable first attempt for an out-of-band early
 exit in this codebase's `New_X`-adjacent retry-counter family, and that GCC's
 own tail-merge (not manual `goto` engineering) is enough to unify two such
 guard clauses into one physical block when retail does so.
+
+## Naming
+
+- **Tier B.** Table index 3 of the same D_80087EEC family, against D_8008ABD8; same evidence and caveat.

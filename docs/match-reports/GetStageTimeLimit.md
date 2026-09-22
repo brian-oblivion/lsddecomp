@@ -36,3 +36,7 @@ None beyond what CLAUDE.md already documents about `addiu_at` being resolved —
 this function is a clean confirmation that a single-instruction-scaled table
 index (`sll $a0,$a0,1` then `addiu_at` form) now matches on the first try with
 plain array indexing, no reshaping required.
+
+## Naming
+
+- **Tier A.** One-line table lookup, STAGE_TIME_LIMITS[stage]. Free function, no `this`.

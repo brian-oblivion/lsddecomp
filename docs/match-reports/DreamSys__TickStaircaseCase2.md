@@ -106,3 +106,7 @@ worktree that was never torn down) and closed with it happening again to a
 live runner. **One-commit-per-match is what makes a runner's work survive its
 session, and a runner that batches commits to the end of a batch is one API
 error away from losing all of it.** See PARALLEL-RUNS §4b/§4c.
+
+## Naming
+
+- **Tier B.** Table index 2 of the same D_80087EEC family, against D_8008ABD0; same evidence and caveat.

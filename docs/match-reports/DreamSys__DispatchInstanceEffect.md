@@ -92,3 +92,7 @@ the base-class slot (`+0xDC` -> `DreamSys__DispatchLinkCommandAndTryAttach`) and
 ## Provenance
 
 round 2026-09-02, runner ALPHA, unit DreamSys.
+
+## Naming
+
+- **Tier B.** Calls the base class's generic +0xDC notify slot unconditionally, then forwards to the already-named DreamSys__InstanceEffectsOnJournal only when the notified object's masked type tag equals 0x1F234.

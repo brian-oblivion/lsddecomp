@@ -33,3 +33,7 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+- **Tier A.** One-line getter, dreamTimer/15 -- the same tick-per-second scale DreamSys__GetSetDreamTimeLimit already established (value*15 on set, result/15 on get).

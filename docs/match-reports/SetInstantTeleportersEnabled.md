@@ -55,3 +55,7 @@ re-derivation.
 ## Provenance
 
 round 43, runner ALPHA, unit DreamSys.
+
+## Naming
+
+- **Tier A.** Sets the flag Test4InstantTeleporters gates on (returns -1 immediately when it is 0); called externally from src/code_4cd08.c via its own extern declaration.

@@ -113,3 +113,7 @@ branch-free function is mostly a test of whether the CALLING unit's
 existing field/vtable-slot names are right, and here every single one of
 them (six vtable slots, thirteen struct fields) checked out against a
 function none of them had been confirmed against before.
+
+## Naming
+
+- **Tier B.** Logs mood for the current position (LogChunkMood) then comprehensively zeroes/resets every per-link-attempt transient field this unit's link machinery reads (movementBlocked-adjacent state, the two decay accumulators, unk_0x908/90C/910, nextCinematic.entry). No confirmed external caller within this unit's own queue.

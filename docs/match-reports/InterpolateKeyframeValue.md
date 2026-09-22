@@ -115,3 +115,7 @@ round 2026-08-30-d, runner alpha2 (original stall, 17/33). Round 42
 (2026-09-15, gp_rel/nop_mflo_mfhi resolution round) rebuilt to 30/33.
 Round 43 (2026-09-15), runner ALPHA: permuter search + hand translation,
 MATCHED 33/33.
+
+## Naming
+
+- **Tier A.** Pure leaf: linear interpolation between two value/position keyframes with a divide-by-zero guard (dt forced to 1 when the two positions coincide). Mechanics are the whole story.

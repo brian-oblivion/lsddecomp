@@ -24,3 +24,7 @@ Retyped the vtable field from `void *DreamSys__GetNewGameFlag;` to
 ## Provenance
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
+
+## Naming
+
+- **Tier B.** Getter counterpart of DreamSys__ClearNewGameFlag; same evidence.

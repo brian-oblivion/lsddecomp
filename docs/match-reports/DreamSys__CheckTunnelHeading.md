@@ -148,3 +148,7 @@ otherwise correct."
 
 round 43, runner ALPHA, unit DreamSys (stretch pick beyond the assigned
 queue).
+
+## Naming
+
+- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (D_800889B8/D_80088858 here); called from DreamSys__TryTunnelLink.

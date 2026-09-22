@@ -36,3 +36,7 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+- **Tier B.** Invokes callback_0x80 and callback_0x98 if set -- the second of the two statements DreamSys__TimerTick's tick-only path runs every tick.

@@ -84,3 +84,7 @@ top of the function when the disassembly shows it loaded unconditionally
 before any branch**, even if the source only *uses* it inside conditional
 paths — this is a real, recurring shape (`struct vtable_DreamSys *vt =
 this->vt;`), not over-fitting.
+
+## Naming
+
+- **Tier B.** Sets DreamSys::callback80Mode to its own argument, then picks one of a fixed small menu of vtable functions (or NULL) for callback_0x80 based on that same argument.

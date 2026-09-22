@@ -74,3 +74,7 @@ SHA1 confirms this produces byte-identical output.
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+- **Tier B.** Calls the linkMgr companion's own slot0xF0, then vt->BaseObjO__UnlinkCompanion(this, linkMgr) (the ctor's slot10 buddy-link's own unlink counterpart), then the shared base's own +0x050 slot. Mechanics (undoes the ctor's companion link) are solid; why it is invoked is not.

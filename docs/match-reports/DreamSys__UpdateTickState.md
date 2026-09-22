@@ -36,3 +36,7 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+- **Tier B.** Runs immediately before DreamSys__RunTickCallbacks in DreamSys__TimerTick's tick-only path: when not movementBlocked, resets one flag and recomputes `dreamTimer % tickPeriod == 0` into another. Purpose of the recomputed flag beyond that is not confirmed.

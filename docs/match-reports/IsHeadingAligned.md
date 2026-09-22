@@ -90,3 +90,7 @@ readings. Worth a general note that "another report already typed this
 offset" is not by itself grounds to reuse that type when the current
 function's own load instruction disagrees (`lhu` vs `lh`) — trust the
 instruction over the precedent.
+
+## Naming
+
+- **Tier A.** Pure leaf: normalizes a heading delta to [-180,180) and tests it against a fixed window. Mechanics are the whole story; free function shared by DreamSys__CheckTunnelHeading and DreamSys__CheckStaircaseHeading.

@@ -22,3 +22,7 @@ void DreamSys__RestorePreviousMoveMode(DreamSys *this)
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+- **Tier B.** One-line: moveMode = previousMoveMode. moveMode also gates a `!= 4` family split reused across DreamSys__TickStaircaseCase0..3 and the Try*Link family, consistent with a movement-mode concept; what value 4 specifically represents is not confirmed.

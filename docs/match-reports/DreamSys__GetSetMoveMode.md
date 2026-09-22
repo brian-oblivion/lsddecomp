@@ -44,3 +44,7 @@ on a "target vs. current" pair, but no confirmed semantic name yet.
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+- **Tier B.** Get-or-set (sentinel value < 0 means "get only") that forces moveMode and previousMoveMode to the SAME new value when setting -- distinct from DreamSys__ChangeMoveMode below, which preserves history.

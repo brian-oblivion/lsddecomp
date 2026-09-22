@@ -61,3 +61,7 @@ fields, `unk_0x880` is written here for the first time.)
 ## Provenance
 
 round 2026-09-02, runner ALPHA, unit DreamSys.
+
+## Naming
+
+- **Tier B.** Wraps Test4StageTransition and calls ExecuteLink (type 0x10) on success; same family as DreamSys__TryTunnelLink.
