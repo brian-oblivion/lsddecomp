@@ -26,3 +26,16 @@ asserting anything about the field's internal structure.
 ## Proposed learning
 
 None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B31C` | `Class866E8__GetCurrentCellKey` | B | Occupant of vtable slot `+0x0D4`; returns `&self->curCellTag`. That address is the start of the 4-byte record `Class866E8__DispatchToRectCells` rewrites immediately before every cell visit: a tag halfword copied from `cellTag`, then the current column and row as bytes. So the accessor hands out "which cell is being visited right now". Tier B -- the record's contents are established, what a consumer does with the pointer is not (no decompiled function reads through it). |
+
+This supersedes the earlier reading in this report, which sized `+0x1C0` as
+one opaque 0x28-byte block because nothing then reached inside it.
+`Class866E8__DispatchToRectCells` does, and its three writes are what named
+the fields.

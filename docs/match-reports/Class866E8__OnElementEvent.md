@@ -84,3 +84,27 @@ just for forward dispatch instead of a shared tail.
 
 round 2026-09-02, runner ALPHA, unit class_3ac78. First attempt 33/46 (two
 distinct residues); second attempt closed both together, 46/46.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004AA6C` | `Class866E8__OnElementEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `Class866E8__Finalize` and `Class866E8__ResetAllElements` here (command 6), and `class_3bb8c`'s `func_8004BD14` (command 7). The body forwards to the BASE table's `+0x088` -- `Class6B5CC__NotifyIfUnk20Active`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
+
+Type correction made this round, byte-neutral and oracle-verified: the third
+parameter was typed `UnkListObj_3ac78 *` (this unit's SENDER type). All three
+callers pass an element, and the field this function reaches is `+0x014` --
+`UnkSlotEntry_3ac78`'s own, zeroed by the ctor. Retyped to
+`UnkSlotEntry_3ac78 *elem`, and `UnkSlotEntry_3ac78::unk14` from `s32` to
+`GenericObject *heldObj`, since the body dereferences it as an object with a
+vtable at `+0x000`. Callers checked: `Class866E8__Finalize`,
+`Class866E8__ResetAllElements` (both in this unit, both pass `&self->elems[i]`),
+and `class_3bb8c`'s `func_8004BD14` (passes `Elem *entry`). Whole-image SHA1
+green after the change.
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `UnkSlotEntry+0x014` | `heldObj` | B | Released here through the shared BasicClass `release` slot with the store-back shape `x = x->methods->release(x)`, and zeroed by the ctor. The name claims only that the entry holds an object it owns. |
+| `Class866E8+0x1BC` | `lastEventElem` | B | Written only here, with the element the event concerned. `class_3bb8c`'s `func_8004C3F0` reads `unk1BC->unk4` and treats it as an `ElemTarget *`, which is exactly `Elem::unk4` -- independent confirmation that the pointer is an element. |

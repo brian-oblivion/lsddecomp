@@ -308,3 +308,55 @@ report already records a 122,037-iteration permuter run that never moved
 off the base score even once — the deepest completed search in this unit's
 history, and about as strong a negative as a permuter run produces.
 Disposition unchanged: STALL at 95/117, `INCLUDE_ASM` in place.
+
+## Naming
+
+Round 67 (track 3, naming pass). Still a documented STALL; naming applies to
+the report and to the preserved body's identifiers, not to the shipped bytes.
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B100` | `Class866E8__DispatchToRectCells` | B | Walks `rects[0 .. rectCount)`; for each rectangle selects `elems[rect->elemIdx]`, skips it unless the element's target is live, then walks the rectangle's cells with a row stride of 20, and for each cell writes the current-cell record (`curCellTag`/`curCellCol`/`curCellRow`) and calls `NotifyGridCell` on the cell and on every cell chained behind it. Tier B: the traversal is certain, the purpose of the notification is not. |
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `Class866E8+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `class_3bb8c` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `func_8004B38C` block-copies in. The name records only "the tag stamped onto each visited cell". |
+| `Class866E8+0x1C0` | `curCellTag` | B | Written per cell visit; `Class866E8__GetCurrentCellKey` returns its address. |
+| `Class866E8+0x1C2` | `curCellCol` | A | Written per cell visit with the rectangle's start column plus the inner loop offset. |
+| `Class866E8+0x1C3` | `curCellRow` | A | Same, row. |
+| `Class866E8+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_3bb8c`'s `func_8004CE24` walks the identical chain off `EntryChildObj::unk38`. |
+
+**Type caveat, recorded not fixed.** This unit declares the cell type as
+`Class866E8 *`. `class_3bb8c`'s independently derived view says
+`EntryChildObj *`, and its evidence is better: the ctor here ORs `0x80000000`
+into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
+exactly (`func_8004C0AC` sets the same bit, matched `func_8004CE24` clears
+it), and `flags36`/`nextInCell` line up with `EntryChildObj::unk36`/`unk38`.
+Unifying the two views is track-4 work, so the declared type is unchanged and
+a note sits on the field in `include/class_3ac78.h`. Posted to the broadcast.
+
+### Field names in the preserved bodies above
+
+Round 67 renamed this unit's struct fields. The preserved bodies in THIS
+report are left in their original spelling -- preserved code is a record of
+what was tried, not doctrine -- but they will not compile as written against
+the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
+
+| old | current |
+| --- | --- |
+| `self->unk88` | `self->rectCount` |
+| `self->unk8C` | `self->rects` |
+| `self->unkEC` | `self->elems` |
+| `self->unk54` | `self->origin` |
+| `self->unk68` | `self->config` |
+| `self->unk70` | `self->enabled` |
+| `self->unkBC` | `self->cellTag` |
+| `self->unk1C0` / `unk1C2` / `unk1C3` | `curCellTag` / `curCellCol` / `curCellRow` |
+| `self->unk1BC` | `self->lastEventElem` |
+| `entry->unk0` / `unk2` / `unk4` / `unk8` / `unkC` / `unk10` / `unk14` | `flag` / `key` / `target` / `list` / `cellParent` / `cells` / `heldObj` |
+| `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
+| `->methods->unk04(...)` | `->methods->release(...)` |
+
+The `#if 0` copy that lives in `src/class_3ac78.c` WAS updated to the current
+names in the same round, so that one still compiles; only identifiers changed
+and the recorded score is unaffected.

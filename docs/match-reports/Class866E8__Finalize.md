@@ -337,3 +337,21 @@ genuinely different C control-flow spellings that compile to identical
 object code rules out reshaping as a category" was correct as far as it
 went (CFG-level reshaping truly was exhausted) but did not generalize to
 in-body statement ordering, which was the axis that actually worked.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004A7C0` | `Class866E8__Finalize` | A | Occupant of vtable slot `+0x00C`. `include/code_8220.h` establishes that slot as `BasicClassMethods::finalize` (the virtual teardown), distinct from `+0x004` `release` (finalize, then free self). This body matches: it tears down every `elems[]` entry and tail-calls the base table's own `+0x00C`. This CORRECTS the inherited hypothesis -- the field and this report both called it `dtor`, which is `release`'s job, not this slot's. |
+
+Slot name changed in `include/class_3ac78.h` accordingly:
+`Class866E8Methods::dtor` -> `finalize`.
+
+This function is also the second independent witness that the shared
+`+0x004` slot on every object it touches is BasicClass's `release`: it uses
+the `x = x->methods->release(x)` release-and-store-back shape on
+`entry->target`, `entry->list->unk2C`, `entry->list` itself and
+`entry->cellParent`. The local views' `unk04` slots were renamed `release`
+on that basis.

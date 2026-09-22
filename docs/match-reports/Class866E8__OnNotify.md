@@ -73,3 +73,15 @@ since pointers and `s32` are both 32-bit registers.
 ## Provenance
 
 round 2026-09-02, runner ALPHA, unit class_3ac78.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004A984` | `Class866E8__OnNotify` | A | Occupant of vtable slot `+0x038`, which `include/code_8220.h` establishes as `BasicClassMethods::slot38` / `onNotify` -- the RECEIVING half of `+0x030 notifyParents`, with `(self, sender, event)`. The body is the standard override shape: call the base table's own `+0x038` with the same three arguments, then branch on the SENDER's class tag (`sender->methods->header & 0xF`). `func_8001CD60` in `code_d294` is the same shape one class up. |
+
+Parameters renamed from the evidence: `arg1` -> `sender`, `arg2` -> `command`
+(`code_8220.h` calls the pair sender/event; this class's own numbering is
+described in `Class866E8__ForwardAcceptedCommand.md`).

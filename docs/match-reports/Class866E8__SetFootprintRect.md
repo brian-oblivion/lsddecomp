@@ -636,3 +636,47 @@ than the literal `$?`, which is sufficient here but is worth fixing
 properly (a marker written to its OWN file, not appended to the shared
 log) before relying on a captured `rc=` value for anything this round's
 reports didn't need it for.
+
+## Naming
+
+Round 67 (track 3, naming pass). Still a documented STALL; naming applies to
+the report and to the preserved body's identifiers, not to the shipped bytes.
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B030` | `Class866E8__SetFootprintRect` | B | The sibling of `Class866E8__SetFootprintFromCell`, taken on the `config->unk4 != 0` branch of `Class866E8__ApplyToSenderFootprint`. Where that one writes a cell plus a span, this one writes a whole rectangle directly into `rects.e[0]` -- element index from `slot124`, then column, row, width and height, each derived from a descriptor byte with the same off-by-one and the same `0x13` edge case on both axes -- and sets `rectCount = 1`. Tier B. |
+
+The preserved `#if 0` body keeps its own local variable names but its field
+references were updated to the current names (`self->unk88` -> `rectCount`,
+`self->unk8C` -> `rects`) in the same round. No code changed; the recorded
+22/52 figure is unaffected.
+
+Note `0x13` is 19, i.e. the last column of a 20-wide grid -- consistent with
+the stride established in `Class866E8__SetGridSpan.md`, and an independent
+sighting of that 20.
+
+### Field names in the preserved bodies above
+
+Round 67 renamed this unit's struct fields. The preserved bodies in THIS
+report are left in their original spelling -- preserved code is a record of
+what was tried, not doctrine -- but they will not compile as written against
+the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
+
+| old | current |
+| --- | --- |
+| `self->unk88` | `self->rectCount` |
+| `self->unk8C` | `self->rects` |
+| `self->unkEC` | `self->elems` |
+| `self->unk54` | `self->origin` |
+| `self->unk68` | `self->config` |
+| `self->unk70` | `self->enabled` |
+| `self->unkBC` | `self->cellTag` |
+| `self->unk1C0` / `unk1C2` / `unk1C3` | `curCellTag` / `curCellCol` / `curCellRow` |
+| `self->unk1BC` | `self->lastEventElem` |
+| `entry->unk0` / `unk2` / `unk4` / `unk8` / `unkC` / `unk10` / `unk14` | `flag` / `key` / `target` / `list` / `cellParent` / `cells` / `heldObj` |
+| `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
+| `->methods->unk04(...)` | `->methods->release(...)` |
+
+The `#if 0` copy that lives in `src/class_3ac78.c` WAS updated to the current
+names in the same round, so that one still compiles; only identifiers changed
+and the recorded score is unaffected.

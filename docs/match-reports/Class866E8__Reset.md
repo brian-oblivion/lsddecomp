@@ -69,3 +69,25 @@ void Class866E8__Reset(Class866E8 *self)
 None new -- this is exactly the round-42 `gp_rel` resolution playing out:
 the prior report's technical observation (the `%gp_rel` load) was correct
 and complete, only its blocked-verdict framing needed rebuilding.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004AA10` | `Class866E8__Reset` | B | Occupant of vtable slot `+0x040`. Body does nothing but put the object back to a known state: clears `config`, `acceptedTags` and `rectCount`, re-applies the default grid span, and writes the four `-1` sentinels at `+0x1CC..+0x1D8`. The sibling table `D_800865C8` names its own `+0x040` occupant `resetUnk3C` (`include/class_39e08.h`), so `+0x040` is a reset slot in this family. Tier B and not A because nothing establishes WHEN a reset is wanted -- its one known caller is `Class866E8__SetConfig`. |
+| `D_8008A980` | `gDefaultGridSpan` | B | Value `0x0000A000`, and this is its only reader in the whole image. It is handed straight to `setGridSpan`, which derives `span >> 11 == 20` -- the byte-verified grid row stride -- and `span >> 12 == 10`. See `Class866E8__SetGridSpan.md` for the full arithmetic. |
+
+Field names established here:
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `Class866E8+0x068` | `config` | B | Cleared here, set by `Class866E8__SetConfig`, read by `Class866E8__ApplyToSenderFootprint` as `config->unk4`; `class_3bb8c` reads the same pointee as `{s16 divisor, s16 count, s32 unk4}` from four functions -- a small parameter block, not an object. |
+| `Class866E8+0x0E8` | `acceptedTags` | A | See `Class866E8__ForwardAcceptedCommand.md`: its only reader walks it as a NUL-terminated list of vtable header words and uses it to accept or reject a sender. |
+| `Class866E8+0x088` | `rectCount` | A | Its only writers set it to 1 (`Class866E8__SetFootprintRect`) or save/restore it around a walk (`Class866E8__ApplyToSenderFootprint`), and its only readers bound a loop over `rects[]` (here, and `class_3bb8c_b`'s matched `func_8004CE24`). |
+
+`unk1CC`/`unk1D0`/`unk1D4`/`unk1D8` deliberately keep placeholder names: all
+that is known is that they are four consecutive words set to `-1` here and
+never read by any decompiled function. Writing a name for them would be a
+guess.

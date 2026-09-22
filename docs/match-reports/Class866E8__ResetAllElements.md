@@ -296,3 +296,44 @@ axis this round's runner could identify without a genuinely new idea.
 Flagged on the broadcast that this round's staffing table understated the
 prior search depth ("~928 iters" reads like a truncation of "140,928").
 Disposition unchanged: STALL at 9/74, `INCLUDE_ASM` in place.
+
+## Naming
+
+Round 67 (track 3, naming pass). This function is still a documented STALL;
+naming applies to the report and to the preserved body's field references,
+not to the shipped bytes.
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004ABD0` | `Class866E8__ResetAllElements` | B | Occupant of vtable slot `+0x0C0`, and `class_3bb8c`'s matched `func_8004B57C` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
+
+The preserved `#if 0` body in `src/class_3ac78.c` was updated to the current
+field names in the same round (`entry->unk0` -> `flag`, `entry->unk4` ->
+`target`, `entry->unk8` -> `list`, `self->unkEC` -> `self->elems`). Its score
+and residue are unchanged -- no code was altered, only identifiers.
+
+### Field names in the preserved bodies above
+
+Round 67 renamed this unit's struct fields. The preserved bodies in THIS
+report are left in their original spelling -- preserved code is a record of
+what was tried, not doctrine -- but they will not compile as written against
+the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
+
+| old | current |
+| --- | --- |
+| `self->unk88` | `self->rectCount` |
+| `self->unk8C` | `self->rects` |
+| `self->unkEC` | `self->elems` |
+| `self->unk54` | `self->origin` |
+| `self->unk68` | `self->config` |
+| `self->unk70` | `self->enabled` |
+| `self->unkBC` | `self->cellTag` |
+| `self->unk1C0` / `unk1C2` / `unk1C3` | `curCellTag` / `curCellCol` / `curCellRow` |
+| `self->unk1BC` | `self->lastEventElem` |
+| `entry->unk0` / `unk2` / `unk4` / `unk8` / `unkC` / `unk10` / `unk14` | `flag` / `key` / `target` / `list` / `cellParent` / `cells` / `heldObj` |
+| `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
+| `->methods->unk04(...)` | `->methods->release(...)` |
+
+The `#if 0` copy that lives in `src/class_3ac78.c` WAS updated to the current
+names in the same round, so that one still compiles; only identifiers changed
+and the recorded score is unaffected.

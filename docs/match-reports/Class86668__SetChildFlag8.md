@@ -53,3 +53,20 @@ MIPS's strict left-to-right register-filling convention means there's no
 "skip a register" call shape. This resolves an ambiguity that pure "no
 instruction was needed either way" reasoning can't: a caller with no argument
 in that slot at all would use `$a1`, not `$a2`, for its first literal.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004A478` | `Class86668__SetChildFlag8` | B | `gClass86668Methods`'s own last slot (`+0x070`). Reads the child object at `self->unk34`, and if non-NULL dispatches its `+0x080` slot. In `Class866E8` that slot is the inherited `Class6B5CC__GetSetUnk10Flag8` (matched, `code_d294_b`), a get-or-set of bit 8 of the object's `unk10` bitfield, taking `(self, value)` -- so the two literal `0x7F`s this call sets up are not read by that occupant. Tier B, and prefixed with the containing class rather than the callee's: the name says what this method does (push a flag down to the held child), not what the child's class is. |
+
+Deliberately NOT asserted: that `Class86668::unk34` is a `Class866E8`. The
+header claims it, but the only evidence is that slot `+0x080` exists in
+`D_800866E8` -- true of every `Class6B5CC` descendant. The name avoids
+depending on it.
+
+The two `0x7F` arguments are left in the call: they cost nothing, they are
+what retail's caller sets up, and other occupants of slot `+0x070` in this
+table family may read them.

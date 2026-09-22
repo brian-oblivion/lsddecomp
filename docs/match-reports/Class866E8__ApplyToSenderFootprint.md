@@ -141,3 +141,23 @@ suspecting anything deeper.
 round 2026-09-02 (head-requested extension), runner ALPHA, unit
 class_3ac78. First attempt 70/79 (two independent, both diagnosed and
 fixed); second attempt 79/79.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004AEA4` | `Class866E8__ApplyToSenderFootprint` | B | Occupant of vtable slot `+0x12C`, reached only from `Class866E8__ForwardAcceptedCommand`. Body: derive a query argument from the sender, call `slot110` to resolve it into a descriptor, SAVE `rectCount` and the whole `rects` block, overwrite them with a single rectangle built from that descriptor (`Class866E8__SetFootprintFromCell` or `Class866E8__SetFootprintRect`, selected by `config->unk4`), run `Class866E8__DispatchToRectCells` over it, then RESTORE both. The save/restore bracket is what makes "footprint" the right word: the rectangle list is borrowed for the duration of one sender's notification. Tier B -- the mechanism is complete, the game meaning is not. |
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `Class866E8+0x08C` | `rects` | A | Saved and restored as one 0x30-byte block here; written a rectangle at a time by `Class866E8__SetFootprintRect`; read as a bounded array of grid rectangles by `Class866E8__DispatchToRectCells` here and by `class_3bb8c_b`'s BYTE-MATCHED `func_8004CE24`. |
+
+Local types renamed this round: `HistoryEntry_3ac78` -> `GridRect_3ac78`,
+`HistoryBlock_3ac78` -> `GridRectList_3ac78`. The "History" name was a
+hypothesis from before the block's reader was understood; `func_8004CE24`
+(matched, `class_3bb8c_b`) reads the same 0xC bytes as
+`{elemIdx, startCol, startRow, width, height}` and walks a grid rectangle with
+them. The members' own names (`elemIdx`/`col`/`row`/`width`/`height`) were
+already correct and are unchanged.
