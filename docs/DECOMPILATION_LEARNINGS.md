@@ -396,6 +396,16 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   is discarded, so when N identical calls merge into GROUPS, the grouping PARTITIONS BY DECLARED
   RETURN TYPE — a 2+2 split is a TYPE mismatch no barrier touches. (a §"Confirmed on this game",
   §"Cross-jump shape THREE")
+- **Before reshaping a suspected tail-merge stall, LIST the return types of every call in the chain
+  — retail's merge set must be type-uniform.** A 30-second check, strictly cheaper than any reshape.
+  Why it is decisive: `(set (reg v0) (call ...))` and a bare `(call ...)` are not `rtx_equal_p`, and
+  the call insn is where a shared suffix must BEGIN, so a return-type mismatch forecloses the WHOLE
+  merge rather than costing one instruction — length comes out long by roughly 3 words per un-merged
+  arm. Confirmed in BOTH directions on two slots: `void`→`s32` stopped a merge and cost
+  already-matched `func_8005E160` 4 words; `s32`→`void` restored one and closed `func_80061778`'s
+  two-round stall at 198/198 with the derived body UNCHANGED. Two chains that appear to miss in
+  OPPOSITE directions are the same uniform deficit twice, not two bugs — that misreading is what
+  cost the stall its second round. (a round 68)
 - **Retyping a shared vtable slot is NOT local — prefer a LOCAL function-pointer variable.** Assign
   both differently-typed slots into one `void (*fn)(...)` and call `fn`: that forces the merge
   without the retype that silently broke a matched function in another unit. Two symmetric slots
