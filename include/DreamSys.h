@@ -162,7 +162,7 @@ typedef struct DreamSysUnk14Tail {
    DreamSys__SaveLinkSnapshot/DreamSys__RestoreLinkSnapshot (round 2026-09-02): +0x0 is a word cleared to
    0 by DreamSys__RestoreLinkSnapshot (restore) after the rest of the struct is overwritten;
    +0x38 is the pre-existing 3-word vector (Class6B5CC__LocalOffsetToWorldPos/func_8005942C,
-   still INCLUDE_ASM); +0x44 is a pointer to a DreamSysUnk14Tail, itself
+   both MATCHED); +0x44 is a pointer to a DreamSysUnk14Tail, itself
    block-copied (not just followed) by the same two functions. The whole
    0x50-byte struct (this field included, raw) is block-copied to/from
    DreamSys::unk14Snapshot -- see that field's comment. Bytes 0x4..0x38 and
@@ -184,8 +184,8 @@ typedef struct DreamSysUnk14 {
 } DreamSysUnk14;
 
 /* Struct pointed to by DreamSys::unk_0x5C. +0x14 / +0x20 are a pair of
-   two-word (x,y) points per func_8005942C (still INCLUDE_ASM elsewhere in
-   this unit; not confirmed by this round). +0x24 (the second point's y) is
+   two-word (x,y) points per func_8005942C (MATCHED, elsewhere in
+   this unit; not independently re-confirmed this round). +0x24 (the second point's y) is
    confirmed: func_80059814 (round 2026-08-30) nudges it. +0x18 (the first
    point's y) is also now confirmed: func_80059BE0 (round 2026-09-02) nudges
    it by the SAME delta as +0x24, in the same statement pair. */
@@ -801,7 +801,7 @@ typedef struct DreamSys {
 	u32 unk_0x90C;
 	/* Function pointer, called as `unk_0x910(this)` and its `s32` result
 	   used as a truth value (DreamSys__TryStaircaseLink, round 2026-09-06); set from
-	   `D_80087EEC[GetLastSpawnExtra()]` (both still INCLUDE_ASM) or NULLed --
+	   `D_80087EEC[GetLastSpawnExtra()]` (both MATCHED) or NULLed --
 	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
 	   being called through. */
 	s32 (*unk_0x910)(struct DreamSys *this);
@@ -1010,29 +1010,27 @@ struct vtable_DreamSys{
 	/* Sets unk_0xA0 to 1 and returns 1 (round 2026-08-30). */
 	s32 (*func_80059BD4)(DreamSys *this);
 	/* Referenced by func_80059AEC/func_80059B50; return value is threaded
-	   into func_80059E98. Still INCLUDE_ASM -- STALLED at 45/79 words round
-	   2026-09-02 on a register-identity/delay-slot-filler residue, not a
-	   value/structure error: bumps unk_0xB4 while unk_0xA0 is nonzero,
+	   into func_80059E98. MATCHED, round 32 (a permuter-found register-
+	   forcing lever closed the round-2026-09-02 register-identity/delay-
+	   slot-filler residue -- see docs/match-reports/func_80059BE0.md):
+	   bumps unk_0xB4 while unk_0xA0 is nonzero,
 	   conditionally calls func_80059D1C (slot +0x168) or func_80059E3C
 	   (slot +0x16C), nudges unk_0x5C's y fields, and always returns the
-	   ORIGINAL unk_0xA0 value read on entry (0 if it was already 0). See
-	   docs/match-reports/func_80059BE0.md for the best-reached body and
-	   what was tried. */
+	   ORIGINAL unk_0xA0 value read on entry (0 if it was already 0). */
 	s32 (*func_80059BE0)(DreamSys *this, s32 arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x168). Called by
-	   func_80059BE0 as (this), return value discarded -- still INCLUDE_ASM,
-	   blocked (addiu_at indexed-global load; see
-	   docs/match-reports/func_80059D1C.md). This prototype only types that
-	   call site (round 2026-09-02). */
+	   func_80059BE0 as (this), return value discarded -- MATCHED, round 37
+	   (the addiu_at blocker this was once filed under is resolved; see
+	   docs/match-reports/func_80059D1C.md). */
 	void (*func_80059D1C)(DreamSys *this);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x16C). Called by
 	   func_80059BE0 as (this) on the path where the +0x168 slot was NOT
-	   taken (round 2026-09-02). */
+	   taken (round 2026-09-02). MATCHED. */
 	void (*func_80059E3C)(DreamSys *this);
-	/* Referenced by func_80059AEC/func_80059B50; still INCLUDE_ASM. */
+	/* Referenced by func_80059AEC/func_80059B50; MATCHED (110/110 words). */
 	s32 (*func_80059E98)(DreamSys *this, s32 arg1);
-	/* Referenced by func_80059A58; still INCLUDE_ASM. Called with (this)
-	   only, return value discarded. */
+	/* Referenced by func_80059A58; MATCHED (24/24 words). Called with
+	   (this) only, return value discarded. */
 	void (*func_8005A050)(DreamSys *this);
 	/* Referenced by DreamSys__SelectCallback98's arg1==2 case; stored into
 	   callback_0x98, never called directly by this runner's functions. */
@@ -1227,25 +1225,30 @@ extern s8 SPECIAL_COLORS[];
 /* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
    Test4InstantTeleporters, each of which forwards its own three args
    straight through and appends a fixed trailing quadruple (length table,
-   trigger table, spawn table, literal 1). Still INCLUDE_ASM; return type is
-   a guess (s32, compared with `bltz` at DreamSys__StaticWallLink's call
-   site) -- CLAUDE.md's tail-call-wrapper warning applies: byte match alone
-   proves nothing about it (round 2026-08-30-c). */
+   trigger table, spawn table, literal 1). Defined later in this unit's own
+   ROM order; this is a forward declaration for the earlier call sites
+   above, not a cross-unit prototype. MATCHED (the gp-relative/addiu_at
+   blockers this was once filed under are resolved, see CLAUDE.md); return
+   type is confirmed s32 by every call site's `bltz` check, not just a guess
+   -- CLAUDE.md's tail-call-wrapper warning no longer applies once a
+   function is its own real C body, only while it is still INCLUDE_ASM
+   (round 2026-08-30-c note superseded). */
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
                            s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
 
 /* Called by DreamSys__TryStageTimerLink as (&this->linkCoordinates, this->currentStage,
    currentPos, this->dreamTimer); result compared with `bltz` exactly like
-   TestForStaticLink's call site, so s32 (round 2026-09-02). Blocked by the
-   gp-relative addressing blocker -- see docs/match-reports/Test4StageTransition.md
-   -- so it stays INCLUDE_ASM; this prototype only types the call site. */
+   TestForStaticLink's call site, so s32 (round 2026-09-02). MATCHED, defined
+   later in this unit's own ROM order -- this is a forward declaration, not a
+   cross-unit prototype (the gp-relative blocker this was once filed under is
+   resolved; see docs/match-reports/Test4StageTransition.md). */
 extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
 
 /* Called by DreamSys__TryStageTimerLink with NO arguments (the disassembly's call site has
    an empty delay slot and no a0-a3 setup); its return value is stored whole
-   into this->unk_0x880, hence s32 (round 2026-09-02). Blocked by the
-   gp-relative addressing blocker -- see docs/match-reports/func_8005BF48.md
-   -- so it stays INCLUDE_ASM; this prototype only types the call site. */
+   into this->unk_0x880, hence s32 (round 2026-09-02). MATCHED, defined later
+   in this unit's own ROM order -- forward declaration only (gp-relative
+   blocker resolved; see docs/match-reports/func_8005BF48.md). */
 extern s32 func_8005BF48(void);
 
 /* Called by DreamSys__TryTunnelLink as (this, &local) where `local` is a 0x10-byte
@@ -1261,10 +1264,10 @@ extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
 
 /* Called by DreamSys__TryTunnelLink as (&this->unk_0x888, &this->unk_0x884, &local) --
    same `local` buffer Class6B5CC__GetRotationDegrees fills above; result used as a truth
-   value (`beqz`), so s32 (round 2026-09-02). Blocked by both the
-   gp-relative and addiu_at blockers -- see
-   docs/match-reports/DreamSys__CheckTunnelHeading.md -- so it stays INCLUDE_ASM; this
-   prototype only types the call site. */
+   value (`beqz`), so s32 (round 2026-09-02). MATCHED, defined later in
+   this unit's own ROM order -- forward declaration only (the gp-relative
+   and addiu_at blockers this was once filed under are both resolved; see
+   docs/match-reports/DreamSys__CheckTunnelHeading.md). */
 extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Called by DreamSys__TryStaircaseLink (round 2026-09-06) as (&this->linkCoordinates,
@@ -1276,24 +1279,25 @@ extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *curre
 
 /* Called by DreamSys__TryStaircaseLink as (&this->unk_0x888, &this->unk_0x884, &local) --
    identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same two
-   `this` fields), so the same signature. Blocked by both the gp-relative and
-   addiu_at blockers -- see docs/match-reports/DreamSys__CheckStaircaseHeading.md -- so it
-   stays INCLUDE_ASM; this prototype only types the call site. */
+   `this` fields), so the same signature. MATCHED, defined later in this
+   unit's own ROM order -- forward declaration only (the gp-relative and
+   addiu_at blockers this was once filed under are both resolved; see
+   docs/match-reports/DreamSys__CheckStaircaseHeading.md). */
 extern s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Same (target, currentPos, stage) forwarding shape as Test4TunnelLinks
    above (see that function's own comment) -- called by DreamSys__TryInstantTeleportLink as
    (&this->linkCoordinates, currentPos, this->currentStage), result compared
-   with `bltz` (round 2026-09-02). Blocked by the gp-relative addressing
-   blocker -- see docs/match-reports/Test4InstantTeleporters.md -- so it
-   stays INCLUDE_ASM; this prototype only types the call site. */
+   with `bltz` (round 2026-09-02). MATCHED, defined later in this unit's own
+   ROM order -- forward declaration only (gp-relative blocker resolved; see
+   docs/match-reports/Test4InstantTeleporters.md). */
 extern s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 
 /* Called by DreamSys__TryInstantTeleportLink with NO arguments, same shape as func_8005BF48
    above; return value is forwarded straight into ExecuteLink's stage-type
-   argument, hence s32 (round 2026-09-02). Blocked by the gp-relative
-   addressing blocker -- see docs/match-reports/func_8005BFC4.md -- so it
-   stays INCLUDE_ASM; this prototype only types the call site. */
+   argument, hence s32 (round 2026-09-02). MATCHED, defined later in this
+   unit's own ROM order -- forward declaration only (gp-relative blocker
+   resolved; see docs/match-reports/func_8005BFC4.md). */
 extern s32 func_8005BFC4(void);
 
 /* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
