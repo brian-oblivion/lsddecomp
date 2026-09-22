@@ -649,7 +649,7 @@ typedef struct DreamSys {
 	void (*callback_0x80)(struct DreamSys *this);
 	/* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1); no other
 	   observed use (round 2026-08-30). */
-	s32 unk_0x84;
+	s32 callback80Mode;
 	/* Index into the (D_80087E50, D_80087E5C) delta/threshold table pair,
 	   consumed and reset to 0 by func_80059814 (round 2026-08-30). */
 	s32 unk_0x88;

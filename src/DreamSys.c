@@ -434,7 +434,7 @@ void DreamSys__SelectCallback80(DreamSys *this, s32 arg1)
 {
 	struct vtable_DreamSys *vt = this->vt;
 
-	this->unk_0x84 = arg1;
+	this->callback80Mode = arg1;
 	switch (arg1) {
 	case 0:
 		this->callback_0x80 = NULL;
