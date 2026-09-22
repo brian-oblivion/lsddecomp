@@ -1,4 +1,6 @@
-# func_8005937C
+# DreamSys__SetSoundObj
+
+> Renamed from `func_8005937C` on 2026-09-22 (tools/rename.py). Address 0x8005937c.
 
 **Unit:** DreamSys · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
@@ -9,7 +11,7 @@ Setter for `unk_0x58`.
 ## The C
 
 ```c
-void func_8005937C(DreamSys *this, s32 value)
+void DreamSys__SetSoundObj(DreamSys *this, s32 value)
 {
 	this->unk_0x58 = value;
 }

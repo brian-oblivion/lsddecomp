@@ -1,17 +1,19 @@
-# func_8005931C
+# DreamSys__NoOpSlot12C
 
-**Unit:** DreamSys · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
+> Renamed from `func_800595A0` on 2026-09-22 (tools/rename.py). Address 0x800595a0.
+
+**Unit:** DreamSys · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
 ## What it does
 
-Plain getter for `unk_0x74`, the field `DreamSys__UpdateTickState` clears.
+Returns 0 unconditionally, ignoring the object. A stub slot that later subclasses presumably override.
 
 ## The C
 
 ```c
-s32 func_8005931C(DreamSys *this)
+s32 DreamSys__NoOpSlot12C(DreamSys *this)
 {
-	return this->unk_0x74;
+	return 0;
 }
 ```
 
@@ -24,7 +26,7 @@ recovered the body per docs/PARALLEL-RUNS.md 4c, rescored it in the main
 checkout from a clean build, and filed this report.
 
 This is a MATCH, not a mid-attempt snapshot: applied on its own to a green
-tree it gives 3/3 words with the whole-image SHA1 verifying.
+tree it gives 2/2 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's

@@ -1,14 +1,16 @@
-# func_800597C0 — MATCHED
+# DreamSys__StepLook — MATCHED
+
+> Renamed from `func_800597C0` on 2026-09-22 (tools/rename.py). Address 0x800597c0.
 
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. 21/21 words, full match.
 
 ## Source
 
 ```c
-void func_800597C0(DreamSys *this)
+void DreamSys__StepLook(DreamSys *this)
 {
-	this->vt->func_80059814(this);
-	this->vt->func_800598E8(this);
+	this->vt->DreamSys__StepLookOffset(this);
+	this->vt->DreamSys__StepLookYaw(this);
 }
 ```
 

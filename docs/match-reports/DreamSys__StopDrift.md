@@ -1,4 +1,6 @@
-# func_8005A134
+# DreamSys__StopDrift
+
+> Renamed from `func_8005A134` on 2026-09-22 (tools/rename.py). Address 0x8005a134.
 
 **Unit:** DreamSys · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
 
@@ -12,7 +14,7 @@ round's vtable comment) as `(this, 0)` when `this->unk_0x9C == 2`.
 ## The C
 
 ```c
-void func_8005A134(DreamSys *this, s32 arg1)
+void DreamSys__StopDrift(DreamSys *this, s32 arg1)
 {
 	this->unk_0xC4 = 0;
 	this->unk_0xC8 = arg1;

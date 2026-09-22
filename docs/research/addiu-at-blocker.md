@@ -289,7 +289,7 @@ incremental path, because the flags are invisible to the dependency graph.
 
 At minimum 5 functions, confirmed blocked and stub-reported:
 
-- `DreamSys`: `func_80059814`, `func_800598E8`
+- `DreamSys`: `DreamSys__StepLookOffset`, `DreamSys__StepLookYaw`
 - `Entity`: `Entity__GetUnlockEffect`, `Entity__GetLinkStage`,
   `Entity__GetEventVideo`
 

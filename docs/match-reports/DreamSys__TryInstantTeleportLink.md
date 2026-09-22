@@ -220,7 +220,7 @@ CFG, fixed register allocation, only delay-slot scheduling in question.
 
 Re-read `asm/nonmatchings/DreamSys/DreamSys__TryInstantTeleportLink.s` directly (not just this
 report's prose) as a check against the kind of misread that turned out to
-be real in `func_8005A1F4` this same round. No hidden bug found here --
+be real in `DreamSys__SoundCueCallback` this same round. No hidden bug found here --
 every field offset, call target, and the two delay-slot sites this report
 already describes check out exactly against the raw disassembly.
 
@@ -228,7 +228,7 @@ One additional reshape, not previously on record: replacing the three
 literal `return true;` exit points with a single named `bool ret = true;`
 materialized once at function entry and returned from all three sites
 (the same "materialize the value into a named local before the branch"
-idiom that closed `func_8005A1F4` this round). Result: **identical 58/63**,
+idiom that closed `DreamSys__SoundCueCallback` this round). Result: **identical 58/63**,
 same two delay-slot sites diverging the same way. This idiom generalizes
 from "a comparison's boolean result" (where it worked) to "a constant
 return value repeated across multiple exits" (where it does not move

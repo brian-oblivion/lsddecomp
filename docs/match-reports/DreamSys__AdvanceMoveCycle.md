@@ -335,7 +335,7 @@ finding precisely. And `count` (`this->unk_0xB4 + 1`) really does live in
 `slti $v0,$a0,0x4`. No new lead found by re-reading; the report's own
 "for the next attempt" guidance stands. Seed already validated
 (`--debug` base 640: 8 register differences, 4 insertions, 2 deletions,
-0 reorderings/stack/branch). Queued behind `func_8005A1F4`, `func_8002B3F4`
+0 reorderings/stack/branch). Queued behind `DreamSys__SoundCueCallback`, `func_8002B3F4`
 and `func_80064E34` for a search slot. No source changes; `INCLUDE_ASM`
 untouched.
 
@@ -618,7 +618,7 @@ inherited figure" standing instruction.
 
 **Lever 1: a `goto`-based early return for the OUTER entry guard**, the
 exact reshape that closed the branch-order gap in this unit's
-`func_80059814`/`func_800598E8` this round (see those reports):
+`DreamSys__StepLookOffset`/`DreamSys__StepLookYaw` this round (see those reports):
 
 ```c
 doCallback = 0;

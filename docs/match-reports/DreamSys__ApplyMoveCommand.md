@@ -22,7 +22,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 
 	if (arg1 != 0) {
 		delta = D_80087E34[arg1] * D_80087E20[this->unk_0xAC];
-		this->vt->func_800595A0(this);
+		this->vt->DreamSys__NoOpSlot12C(this);
 		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
 		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
 		 && !this->vt->DreamSys__TryInstantTeleportLink(this, pos)

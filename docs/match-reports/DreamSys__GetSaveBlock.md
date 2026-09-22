@@ -1,4 +1,6 @@
-# func_8005A350
+# DreamSys__GetSaveBlock
+
+> Renamed from `func_8005A350` on 2026-09-22 (tools/rename.py). Address 0x8005a350.
 
 **Unit:** DreamSys · **Size:** 6 instructions · **Status:** MATCHED (6/6 words)
 
@@ -11,7 +13,7 @@ in the `jr` delay slot, so it executes unconditionally on both paths).
 ## The C
 
 ```c
-s32 *func_8005A350(DreamSys *this, s32 *arg1)
+s32 *DreamSys__GetSaveBlock(DreamSys *this, s32 *arg1)
 {
 	if (arg1 != NULL)
 		*arg1 = 0x700;
@@ -19,8 +21,8 @@ s32 *func_8005A350(DreamSys *this, s32 *arg1)
 }
 ```
 
-Retyped the vtable field from `void *func_8005A350;` to
-`s32 *(*func_8005A350)(DreamSys *this, s32 *arg1);`.
+Retyped the vtable field from `void *DreamSys__GetSaveBlock;` to
+`s32 *(*DreamSys__GetSaveBlock)(DreamSys *this, s32 *arg1);`.
 
 ## Provenance
 

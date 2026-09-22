@@ -1,4 +1,6 @@
-# func_8005A0B0
+# DreamSys__TickDrift
+
+> Renamed from `func_8005A0B0` on 2026-09-22 (tools/rename.py). Address 0x8005a0b0.
 
 **Unit:** DreamSys · **Size:** 33 instructions · **Status:** MATCHED (33/33 words)
 
@@ -13,7 +15,7 @@ and decrements `this->unk_0x5C->unk_0x24` by `0x258` (600); if `unk_0xC8 !=
 ## The C
 
 ```c
-void func_8005A0B0(DreamSys *this)
+void DreamSys__TickDrift(DreamSys *this)
 {
 	if (this->unk_0xC4 != 0) {
 		this->vt->BaseObjO__AddVec14(this, &D_80087EA4);

@@ -227,7 +227,7 @@ hand (three lines) before reaching for the permuter again.
 
 Re-read `asm/nonmatchings/DreamSys/CalcDreamColor.s` directly (the same
 "verify from raw asm, not from the report" discipline that found a real
-misread bug in `func_8005A1F4` this round). No hidden semantic bug found
+misread bug in `DreamSys__SoundCueCallback` this round). No hidden semantic bug found
 here -- the classification loop and the table lookup are exactly what this
 report already describes. Two concrete follow-ups, both tested against the
 real oracle (`./build-and-verify.sh` + `funcdiff.py`), not just reasoned
@@ -282,7 +282,7 @@ about the REAL oracle unless it is re-verified end to end, including
 the permuter's internal metric while being a different, WRONG size. This is
 the same caution CLAUDE.md's "four ways a score lies" already states for
 `funcdiff` itself; it applies with equal force to a permuter's own score,
-and this function is a second confirmed instance (after `func_8005A1F4`'s
+and this function is a second confirmed instance (after `DreamSys__SoundCueCallback`'s
 round-18 "50-point candidate" scare, which was structurally different
 rather than size-wrong, but the same "read it back against the disassembly
 before trusting it" discipline caught both).

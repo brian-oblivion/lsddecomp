@@ -19,7 +19,7 @@ void DreamSys__FlipMoveCommand(DreamSys *this)
 }
 ```
 
-Not a vtable slot — called directly (`jal DreamSys__FlipMoveCommand`) from `func_800598E8`,
+Not a vtable slot — called directly (`jal DreamSys__FlipMoveCommand`) from `DreamSys__StepLookYaw`,
 matched earlier this round. Rounds `unk_0xA0` away from zero to the nearest
 even number... no: rounds it by ±1 to flip its parity (odd → +1, even → −1),
 i.e. drives it towards/through zero one step at a time while always landing

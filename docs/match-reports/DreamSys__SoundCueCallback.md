@@ -1,4 +1,6 @@
-# func_8005A1F4 — MATCH (25/25 words)
+# DreamSys__SoundCueCallback — MATCH (25/25 words)
+
+> Renamed from `func_8005A1F4` on 2026-09-22 (tools/rename.py). Address 0x8005a1f4.
 
 **Unit:** DreamSys · **Size:** 25 instructions · **Status: byte-exact, whole-image SHA1 confirmed.**
 
@@ -12,7 +14,7 @@ this section first.
 
 Vtable `+0x194`, never called through the vtable within this unit --
 referenced only by RAW ADDRESS as `InitSoundCueSet`'s 5th argument (still
-INCLUDE_ASM, uncarved `code_179d8`; see `func_8005A134`'s report). If
+INCLUDE_ASM, uncarved `code_179d8`; see `DreamSys__StopDrift`'s report). If
 `arg1->mode == 1`: tests whether `arg1->value` is evenly divisible by 20.
 If it is, writes `9` and `-1` into `field_0x1C`/`field_0x20`. **If it is
 NOT, writes the SAME literal `9` (not the quotient) and `-1` into
@@ -22,7 +24,7 @@ NOT, writes the SAME literal `9` (not the quotient) and `-1` into
 
 Three prior rounds' reports (and the struct/doc prose) claimed the
 not-divisible branch stores **the quotient** (`arg1->value / 20`) into
-`field_0x30`. Reading `asm/nonmatchings/DreamSys/func_8005A1F4.s` directly,
+`field_0x30`. Reading `asm/nonmatchings/DreamSys/DreamSys__SoundCueCallback.s` directly,
 instruction by instruction, shows this is wrong:
 
 ```
@@ -71,7 +73,7 @@ boolean RESULT into a named `int` local before branching on it**, rather
 than testing the expression directly in the `if`:
 
 ```c
-void func_8005A1F4(void *arg0, Func8005A1F4Arg *arg1)
+void DreamSys__SoundCueCallback(void *arg0, Func8005A1F4Arg *arg1)
 {
 	s32 isDivisible;
 
@@ -149,7 +151,7 @@ typedef struct Func8005A1F4Arg {
 	s32 field_0x34;
 } Func8005A1F4Arg;
 
-void func_8005A1F4(void *arg0, Func8005A1F4Arg *arg1)
+void DreamSys__SoundCueCallback(void *arg0, Func8005A1F4Arg *arg1)
 {
 	if (arg1->mode == 1) {
 		if (arg1->value % 20 == 0) {
@@ -236,7 +238,7 @@ both getting `9`, not `field_0x34` alone.)
 
 **Directly tested the coordinator's type/width lever against this
 function's own disassembly, rather than reasoning about it.** Every
-load and store in `func_8005A1F4.s` is confirmed word-width:
+load and store in `DreamSys__SoundCueCallback.s` is confirmed word-width:
 
 ```
 lw  $v1, 0x0($a1)     # mode  -- lw, so s32/u32, not narrower

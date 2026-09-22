@@ -103,7 +103,7 @@ struct/parameters accordingly (`ObjCC34` -> `SoundCueSet`,
 tag value -- concretely `this->moodIndex + 1` in `Entity.c` -- `arg3` is
 always the caller's own `this` pointer, and `arg4` is a value indexed out
 of (or read directly from) a function-pointer table in every caller
-(`this->vt->func_8005A1F4` in `DreamSys.c`; `D_800874B0[sub->unk6]` in
+(`this->vt->DreamSys__SoundCueCallback` in `DreamSys.c`; `D_800874B0[sub->unk6]` in
 `class_3bb8c_n.c`, and `D_800874B0` is itself a 14-slot class table per
 `classtable.py --scan`). So `owner`/`callback` are tier A by mechanics
 (store the caller's own context and a function-pointer-shaped value,

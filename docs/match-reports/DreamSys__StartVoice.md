@@ -256,7 +256,7 @@ REORDERING (same statements, different sequence) -- a change that also alters
 which temporaries exist (removing a local, merging two statements into one)
 tests a different axis entirely and, on this function, made things worse both
 times. Two mutually-exclusive-branch functions in this same unit
-(`func_80059814`, `func_800598E8`) closed via a variable-COALESCING rename
+(`DreamSys__StepLookOffset`, `DreamSys__StepLookYaw`) closed via a variable-COALESCING rename
 this same round; this function has no comparable mutually-exclusive-branch
 structure for `this`/`heading` to coalesce across (both are live
 simultaneously, in one straight-line flow), which is likely why the same
@@ -374,7 +374,7 @@ function.
 **Reading it with `tools/asm-differ/diff.py`: all four registers now match
 retail exactly.** `this=$s2`, `obj=$s1`, `vt=$s3`, `heading=$s0` (via
 `new_var`, which the compiler allocates into the SAME register `heading`
-held, since they now have disjoint live ranges the way `func_80059814`'s
+held, since they now have disjoint live ranges the way `DreamSys__StepLookOffset`'s
 `delta`/`step` coalescing worked). The entire function matches
 instruction-for-instruction from the prologue through the epilogue, with
 **one exception**: the two-instruction group at 0x4A550-0x4A568 --

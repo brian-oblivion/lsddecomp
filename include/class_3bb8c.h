@@ -2329,7 +2329,7 @@ typedef struct Unk50Struct_3bb8c_l {
  * class -- it has its own methods pointer at +0x000 (func_8005393C
  * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (func_800531CC
  * reads it directly). Offset +0x10C happens to coincide with a DreamSys
- * vtable offset, but DreamSys's own occupant there (func_8005937C) takes
+ * vtable offset, but DreamSys's own occupant there (DreamSys__SetSoundObj) takes
  * one s32 argument while this call site passes two -- different arities,
  * so this is a different class, not DreamSys; left unnamed. */
 typedef struct Obj14Methods_3bb8c_l {

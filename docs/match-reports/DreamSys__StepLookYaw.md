@@ -1,4 +1,6 @@
-# func_800598E8 -- STALL: 1 word SHORT (76/77 instructions), whole CFG matches exactly; register-coalescing fix closed half the prior gap this round; first real diff at 0x4A1EC (`this` register setup for the tail call, hoisted into a different delay slot by retail than by any C tried here)
+# DreamSys__StepLookYaw -- STALL: 1 word SHORT (76/77 instructions), whole CFG matches exactly; register-coalescing fix closed half the prior gap this round; first real diff at 0x4A1EC (`this` register setup for the tail call, hoisted into a different delay slot by retail than by any C tried here)
+
+> Renamed from `func_800598E8` on 2026-09-22 (tools/rename.py). Address 0x800598e8.
 
 > **ROUND 49 (2026-09-16, runner bravo): re-verified fresh; one new hand
 > axis (clean negative) and a fresh bounded permuter search (no
@@ -65,15 +67,15 @@
 
 > **VERDICT CORRECTED AGAIN, round 32 (2026-09-12, runner alpha2).** The
 > figure below ("2 words SHORT, 75/77") is now STALE on the length claim.
-> This round applied `func_80059814`'s round-32 fix (reuse the SAME C
+> This round applied `DreamSys__StepLookOffset`'s round-32 fix (reuse the SAME C
 > variable, `delta`, for the decay branch's step value instead of a separate
 > `step` local) here too, since retail's disassembly shows the identical
 > pattern: `delta`'s register (`$s2`) is reused by the decay branch instead of
 > a fresh register being allocated. **It worked**: the function is now
 > **76/77 words, 1 word SHORT** (was 75/77, 2 short) — one of the two
 > previously-documented missing words (the `sw $s2` prologue save) is now
-> present and correct, confirming `func_800598E8`'s report correctly deferred
-> to `func_80059814`'s analysis and the lesson DID transfer, as promised.
+> present and correct, confirming `DreamSys__StepLookYaw`'s report correctly deferred
+> to `DreamSys__StepLookOffset`'s analysis and the lesson DID transfer, as promised.
 >
 > **What's left is a genuinely different, deeper residue** — not the
 > `delta`/`s2` promotion (that's fixed) but which DELAY SLOT the `this`
@@ -95,20 +97,20 @@
 
 ## Round 32 (2026-09-12, runner alpha2): the `delta`/`step` rename closes one of the two missing words; the other is a cross-path delay-slot-fill residue
 
-Per this function's own report instruction ("do `func_80059814` first and
+Per this function's own report instruction ("do `DreamSys__StepLookOffset` first and
 carry what you learn across -- but verify the transfer rather than assuming
 it"), applied that function's round-32 fix here: replaced the separate
 `step` local in the decay branch (`this->unk_0x94 != 0` arm) with the SAME
 `delta` variable already used in the table-indexed branch, and rewrote the
 `(cond) ? A : B` ternary as retail's actual delay-slot idiom (`delta = A; if
 (cond) delta = B;`) to match the exact instruction shape visible in
-`asm/nonmatchings/DreamSys/func_800598E8.s` (`bgez v0,L / addiu s2,-0x2d`
+`asm/nonmatchings/DreamSys/DreamSys__StepLookYaw.s` (`bgez v0,L / addiu s2,-0x2d`
 [delay, unconditional] / `ori s2,0x2d` [fallthrough-only]).
 
 **Confirmed by re-reading the raw disassembly directly (not assuming the
 sibling's fix transfers)**: retail's decay branch really does write to `$s2`
 -- the SAME register `delta` occupies in the table-indexed branch -- exactly
-the pattern `func_80059814` closed. Applying the identical rename:
+the pattern `DreamSys__StepLookOffset` closed. Applying the identical rename:
 
 ```c
 } else if (this->unk_0x94 != 0) {
@@ -132,7 +134,7 @@ exactly, closing exactly the residue the previous verdict named.
 The C still uses a shared `goto call_tail; ... call_tail: DreamSys__FlipMoveCommand(this);`
 merge point for three of the function's exit paths (the two early-outs inside
 the `idx != 0` branch, and the `apply:` block's fallthrough). Comparing the
-freshly compiled object to retail (`tools/asm-differ/diff.py func_800598E8`)
+freshly compiled object to retail (`tools/asm-differ/diff.py DreamSys__StepLookYaw`)
 localizes the whole remaining gap to exactly this merge:
 
 ```
@@ -197,7 +199,7 @@ restored).
 ### Proposed learning (round 32)
 
 The register-coalescing rename that closes a same-length register-identity
-residue (see `func_80059814.md`'s round-32 finding) can ALSO close part of a
+residue (see `DreamSys__StepLookOffset.md`'s round-32 finding) can ALSO close part of a
 DIFFERENT class of residue — a missing callee-saved-register promotion — when
 the two residues share a root cause (the same value needing the same
 register across two mutually exclusive branches). It closed exactly the
@@ -211,11 +213,11 @@ call site with different `a0`-liveness histories).
 
 ---
 
-## Round 25 (runner echo): CFG fixed by the same lever as func_80059814; one new residue found
+## Round 25 (runner echo): CFG fixed by the same lever as DreamSys__StepLookOffset; one new residue found
 > figure below ("7/77, NOT re-measured") is now STALE. This round applied
-> `func_80059814`'s sibling fix (same block-order lever, same `~sum + 1`
+> `DreamSys__StepLookOffset`'s sibling fix (same block-order lever, same `~sum + 1`
 > negation, confirmed by re-deriving the whole function from
-> `asm/nonmatchings/DreamSys/func_800598E8.s` directly rather than trusting
+> `asm/nonmatchings/DreamSys/DreamSys__StepLookYaw.s` directly rather than trusting
 > the old report's transcription) and it worked identically well: **every
 > branch and jump target in the function now matches retail exactly.** What
 > is left is a SINGLE, different residue from the sibling's -- not a
@@ -226,7 +228,7 @@ call site with different `a0`-liveness histories).
 > **PARTIAL VERDICT CORRECTION, round 24 (2026-09-08). NOT a reopening --
 > read the distinction, because guessing either way costs a round.**
 >
-> This report defers its whole blocking analysis to `func_80059814`'s report
+> This report defers its whole blocking analysis to `DreamSys__StepLookOffset`'s report
 > ("a confirmed `maspsx`/`--aspsx-version` gate, not a source-shape
 > problem"). That residue is the `addiu_at` folded-vs-unfolded form, and it
 > **was RESOLVED in round 21** (maspsx `--addiu-at`;
@@ -234,7 +236,7 @@ call site with different `a0`-liveness histories).
 > longer exists, and `tools/nearmiss.py` screens this function BLOCKER-CLEAN.
 >
 > **But that does not make it assignable-and-cheap, and here is the measured
-> reason.** `func_80059814`, the sibling this report defers to, WAS
+> reason.** `DreamSys__StepLookOffset`, the sibling this report defers to, WAS
 > re-measured this round: splicing its preserved body back in unchanged took
 > it from 8/53 to **14/53**, with both table loads now word-for-word
 > identical to retail. Retiring the blocker was worth 6 words and left it
@@ -249,18 +251,18 @@ call site with different `a0`-liveness histories).
 >
 > Whoever takes this: re-measure FIRST, put the three figures in the title
 > (length, raw word-match, first real diff off `tools/asm-differ/diff.py`),
-> and read `func_80059814`'s report for the sign-branch residue and the
+> and read `DreamSys__StepLookOffset`'s report for the sign-branch residue and the
 > `~sum + 1` negative before reshaping the shared half.
 
 ---
 
-## Round 25 (runner echo): CFG fixed by the same lever as func_80059814; one new residue found
+## Round 25 (runner echo): CFG fixed by the same lever as DreamSys__StepLookOffset; one new residue found
 
 Re-derived the whole function fresh from
-`asm/nonmatchings/DreamSys/func_800598E8.s` (not from the old report's
+`asm/nonmatchings/DreamSys/DreamSys__StepLookYaw.s` (not from the old report's
 `#if 0` snippet, per this round's instruction to re-measure and read the
 disassembly directly rather than trust a transcription). The shape is the
-sibling of `func_80059814`, one table pair over (`D_80087E68`/`D_80087E74`,
+sibling of `DreamSys__StepLookOffset`, one table pair over (`D_80087E68`/`D_80087E74`,
 indexed by `unk_0x90`/`unk_0x94`), PLUS: an unconditional `unk_0xA8 =
 (unk_0xA0 == 1)` up front, a 16-bit "pending value" write through
 `D_80087E84[0].value` before EACH vtable call, and an ALMOST-unconditional
@@ -268,7 +270,7 @@ tail call to `DreamSys__FlipMoveCommand(this)` (skipped only on the one path whe
 `idx == 0 && this->unk_0x94 == 0` -- the old report's "unconditionally
 tail-calls" was imprecise on this one point).
 
-Applying the same two fixes that closed `func_80059814`'s branch-order gap:
+Applying the same two fixes that closed `DreamSys__StepLookOffset`'s branch-order gap:
 
 ```c
 if (sum >= 0) {
@@ -296,7 +298,7 @@ coincidence specific to the other function).
 
 ### The new residue: `delta` doesn't get promoted to a callee-saved register
 
-Unlike `func_80059814`'s residue (a straight register-identity swap at
+Unlike `DreamSys__StepLookOffset`'s residue (a straight register-identity swap at
 matching length), this function is **2 words SHORT** with a **different
 root cause**: retail's prologue saves FOUR registers (`s0`, `s1`, `s2`,
 `ra`); this build's only saves three (`s0`, `s1`, `ra`) -- `s2` never gets
@@ -384,7 +386,7 @@ axis tried this round left the allocator's decision unchanged.
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. Best reached: 7/77 words in
 range, large outside-range diff. Restored to `INCLUDE_ASM`.
 
-**Shares its blocking residue with `func_80059814` (same round, same unit) —
+**Shares its blocking residue with `DreamSys__StepLookOffset` (same round, same unit) —
 see that report for the full analysis (a confirmed `maspsx`/`--aspsx-version`
 gate, not a source-shape problem). This report only covers what's specific
 to this function.**
@@ -395,7 +397,7 @@ to this function.**
 /* best-reached body, does NOT compile to retail bytes — preserved for the
    next attempt, not a working match */
 #if 0
-void func_800598E8(DreamSys *this)
+void DreamSys__StepLookYaw(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
@@ -428,7 +430,7 @@ void func_800598E8(DreamSys *this)
 #endif
 ```
 
-Vtable slot `0x148`. Same shape as `func_80059814`, one table pair over
+Vtable slot `0x148`. Same shape as `DreamSys__StepLookOffset`, one table pair over
 (`D_80087E68`/`D_80087E74`, indexed by `unk_0x90`/`unk_0x94` instead of
 `unk_0x88`/`unk_0x8C`), plus: computes `unk_0xA8 = (unk_0xA0 == 1)` up
 front unconditionally, and — instead of directly mutating a struct field
@@ -440,7 +442,7 @@ see the `D_80087E84` array's header comment in `include/DreamSys.h`).
 Unconditionally tail-calls `DreamSys__FlipMoveCommand(this)` at the end (matched
 separately this round, see `DreamSys__FlipMoveCommand.md`).
 
-## Residue: identical to `func_80059814`'s residue 1
+## Residue: identical to `DreamSys__StepLookOffset`'s residue 1
 
 `D_80087E68[idx]` and `D_80087E74[idx]` hit the exact same missing-`addiu`
 shape (confirmed word 14 of the diff: retail `687e2124` — `addiu $at,$at,
@@ -449,13 +451,13 @@ same signature as the other function). Did not re-run the isolated
 reproducers for this function specifically since the mechanism (verified
 against `maspsx`'s own source, not behavior) is per-instruction-pattern, not
 per-function — it applies identically here. Did not spend further attempts
-reshaping past confirming the same signature; see `func_80059814.md` for the
+reshaping past confirming the same signature; see `DreamSys__StepLookOffset.md` for the
 attempts that were made (on the sibling function) and why they don't help
 here either.
 
 ## Proposed learning
 
-None beyond what's in `func_80059814.md` — same root cause, filed here so
+None beyond what's in `DreamSys__StepLookOffset.md` — same root cause, filed here so
 `tools/progress.py` doesn't send the next runner in blind on this one too.
 
 ---

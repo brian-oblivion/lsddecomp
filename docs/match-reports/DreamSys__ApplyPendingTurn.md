@@ -42,14 +42,14 @@ different things
 
 An earlier round's comment on `D_80087E84` says `&D_80087E84[-1] (==
 &D_80087E80, a distinct label immediately before it)`, describing a
-4-byte-stride array (`func_800598E8`, `D_80087E84Entry` = `{s16, s16}`).
+4-byte-stride array (`DreamSys__StepLookYaw`, `D_80087E84Entry` = `{s16, s16}`).
 This function's own `lui`/`addiu %hi/%lo(D_80087E80)` uses a 12-byte stride
 (`idx*12`, from `sll,1` + `addu` + `sll,2`) -- incompatible with a 4-byte
 element. Both call sites reference the SAME linker symbol name (splat picked
 the same label because both point at the same byte address), but the
 strides don't reconcile into one struct. Most likely explanation: two
 unrelated globals that happen to sit at adjacent addresses, and the earlier
-round's `[-1]` observation was really about `func_800598E8` using a constant
+round's `[-1]` observation was really about `DreamSys__StepLookYaw` using a constant
 (not runtime-indexed) address that happens to land exactly on this second,
 unrelated symbol. Left both declarations in place with a comment
 cross-referencing this; not resolved further this round.

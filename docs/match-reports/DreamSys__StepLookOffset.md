@@ -1,4 +1,6 @@
-# func_80059814 -- MATCHED, 53/53 words, round 32 (2026-09-12, runner alpha2)
+# DreamSys__StepLookOffset -- MATCHED, 53/53 words, round 32 (2026-09-12, runner alpha2)
+
+> Renamed from `func_80059814` on 2026-09-22 (tools/rename.py). Address 0x80059814.
 
 **This function now matches retail byte-for-byte.** The round-25 residue below
 (a register-identity swap in the decay branch, retail's `step` in `$a2`,
@@ -12,7 +14,7 @@ Two things were tried, in order:
 1. **Rewrite the ternary as retail's own "unconditional default value,
    overwritten by the fallthrough" idiom** (`step = -0x258; if (x < 0) step =
    0x258;` instead of `step = (x < 0) ? 0x258 : -0x258;`), matching the exact
-   delay-slot shape visible in `asm/nonmatchings/DreamSys/func_80059814.s`
+   delay-slot shape visible in `asm/nonmatchings/DreamSys/DreamSys__StepLookOffset.s`
    (`bgez v0,L / addiu a2,zero,-0x258 [delay slot, unconditional] / ori
    a2,zero,0x258 [fallthrough-only]`). **No effect** — byte-identical 49/53,
    same register swap. This rules out ternary-vs-explicit-overwrite as the
@@ -21,7 +23,7 @@ Two things were tried, in order:
    ternary's spelling, never its control-flow shape).
 2. **Reuse the SAME C variable (`delta`) for the decay branch's step value,
    instead of a separate `step` local.** The function has no stack frame at
-   all (`nonmatching func_80059814, 0xD4` with no `addiu sp`) and is small
+   all (`nonmatching DreamSys__StepLookOffset, 0xD4` with no `addiu sp`) and is small
    enough that GCC 2.6.3's local register allocator appears to key hard-register
    preference on which pseudo-register a value's *first RTL definition*
    reuses, not on program order or declaration order (both already ruled out
@@ -55,7 +57,7 @@ into one C-level variable before accepting the stall.
 ## Final C (matches retail exactly)
 
 ```c
-void func_80059814(DreamSys *this)
+void DreamSys__StepLookOffset(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
@@ -198,7 +200,7 @@ or a duplicated single-instruction tail kept as two copies, needs an
 explicit `goto` in the C, not an if/else that lets the compiler pick which
 arm falls through).
 
-Reading `asm/nonmatchings/DreamSys/func_80059814.s` directly (not the old
+Reading `asm/nonmatchings/DreamSys/DreamSys__StepLookOffset.s` directly (not the old
 report's abbreviated snippet) shows the real shape: the "clear `unk_0x88`
 and return" tail is NOT one shared merge point -- it is **two separate
 physical copies**, each ending in its own `j .L800598E0` with the store in
@@ -352,7 +354,7 @@ declarations it needs, positioned to compile if reinstated.
    length, zero address drift. The remaining 4-word residue is a pure
    register-identity swap (retail uses $a2 for `step`, this compiles to
    $a1) confined to the decay branch -- see the "Round 25" section above. */
-void func_80059814(DreamSys *this)
+void DreamSys__StepLookOffset(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
@@ -427,7 +429,7 @@ Round 2026-08-30, runner ALPHA, unit `DreamSys`. Best reached: 8/53 words in
 range, with a large outside-range diff (the size is wrong, so that in-range
 score is not itself trustworthy — see below). Restored to `INCLUDE_ASM`.
 
-**Companion function `func_800598E8` (same unit, same round) hits the
+**Companion function `DreamSys__StepLookYaw` (same unit, same round) hits the
 identical root cause** — see its own report, which cross-references this one
 rather than repeating the analysis.
 
@@ -437,7 +439,7 @@ rather than repeating the analysis.
 /* best-reached body, does NOT compile to retail bytes — preserved for the
    next attempt, not a working match */
 #if 0
-void func_80059814(DreamSys *this)
+void DreamSys__StepLookOffset(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;

@@ -14,7 +14,7 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 	struct vtable_DreamSys *vt = this->vt;
 
 	if (this->unk_0x9C == 2)
-		vt->func_8005A134(this, 0);
+		vt->DreamSys__StopDrift(this, 0);
 	this->unk_0x9C = arg1;
 	switch (arg1) {
 	case 0:
@@ -24,10 +24,10 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 		this->callback_0x98 = (void (*)(DreamSys *))vt->DreamSys__TickMove;
 		break;
 	case 2:
-		this->callback_0x98 = vt->func_8005A0B0;
+		this->callback_0x98 = vt->DreamSys__TickDrift;
 		this->unk_0xC4 = 1;
 		this->unk_0xC8 = 1;
-		InitSoundCueSet(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->func_8005A1F4);
+		InitSoundCueSet(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->DreamSys__SoundCueCallback);
 		break;
 	}
 }
@@ -35,7 +35,7 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 
 `InitSoundCueSet` is still `INCLUDE_ASM` in the uncarved `code_179d8`; the local
 `extern` follows CLAUDE.md's "calling into a function still INCLUDE_ASM in
-another unit is fine" precedent. `this->vt->func_8005A1F4` (not the hoisted
+another unit is fine" precedent. `this->vt->DreamSys__SoundCueCallback` (not the hoisted
 `vt` local) is used deliberately for the last argument — see residue 3.
 
 ## Derivation
@@ -50,24 +50,24 @@ unconditionally, and reused for both the entry guard (`unk_0x9C == 2`) and
 the case-2 dispatch (`arg1 == 2`) — the same constant appearing twice in one
 function, genuinely shared, unlike the residue below.
 
-`func_8005A134`, `DreamSys__TickMove` (cast — it actually returns `s32`, see
+`DreamSys__StopDrift`, `DreamSys__TickMove` (cast — it actually returns `s32`, see
 CLAUDE.md's "one-line wrapper" note; `callback_0x98`'s declared type is
 `void(*)(DreamSys*)` so the assignment needs an explicit cast to silence the
-warning without touching codegen), `func_8005A0B0`, and `func_8005A1F4` all
+warning without touching codegen), `DreamSys__TickDrift`, and `DreamSys__SoundCueCallback` all
 resolved via `tools/classtable.py DREAMSYS_METHODS` against the vtable slots
 read in the disassembly (`0x17C`, `0x154`, `0x178`, `0x194`).
 
 ## Residues fixed, in order
 
 1. First attempt (48/54): case 2's body written in the "obvious" order
-   (`unk_0xC4 = 1; unk_0xC8 = 1; callback_0x98 = vt->func_8005A0B0;` — literal
+   (`unk_0xC4 = 1; unk_0xC8 = 1; callback_0x98 = vt->DreamSys__TickDrift;` — literal
    field-address order, ascending). Two symptoms: the switch's own
    dispatch constant (comparing `arg1` to 1) landed in `$v1` where retail
    has `$a0`, and the three stores in case 2's body came out in a different
    *relative* order than retail (retail's `sw v0,0x98` — the callback store —
    is scheduled AFTER the two literal-1 stores even though the LOAD feeding it
    is scheduled well before them).
-2. Fix: reorder case 2's body so `this->callback_0x98 = vt->func_8005A0B0;`
+2. Fix: reorder case 2's body so `this->callback_0x98 = vt->DreamSys__TickDrift;`
    is the FIRST statement, followed by the two `unk_0xC4`/`unk_0xC8` literal
    stores — full match. Both symptoms (the stray register AND the store
    order) cleared from this single reorder; they were the same underlying
@@ -97,4 +97,4 @@ register too (`$v1` vs `$a0` for the switch's own dispatch constant); no
 
 ## Naming
 
-- **Tier B.** Symmetric setter for callback_0x98's own small menu; additionally, when the mode was already 2 on entry, calls func_8005A134(this, 0) first, and its own mode-2 case wires up an InitSoundCueSet call.
+- **Tier B.** Symmetric setter for callback_0x98's own small menu; additionally, when the mode was already 2 on entry, calls DreamSys__StopDrift(this, 0) first, and its own mode-2 case wires up an InitSoundCueSet call.

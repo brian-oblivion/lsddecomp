@@ -20,7 +20,7 @@
    strict ROM-address ordering of the definitions below. */
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
-/* func_800598E8 (round 2026-09-08) calls this unit's own DreamSys__FlipMoveCommand,
+/* DreamSys__StepLookYaw (round 2026-09-08) calls this unit's own DreamSys__FlipMoveCommand,
    defined immediately after it in ROM order -- same forward-declaration
    need as the two above. */
 void DreamSys__FlipMoveCommand(DreamSys *this);
@@ -317,7 +317,7 @@ void DreamSys__BlockMovement(DreamSys *this)
 {
 	this->movementBlocked = 1;
 }
-s32 func_8005931C(DreamSys *this)
+s32 DreamSys__GetLinkCommandFlag(DreamSys *this)
 {
 	return this->unk_0x74;
 }
@@ -337,7 +337,7 @@ s32 DreamSys__GetDreamTimerScaled(DreamSys *this)
 {
 	return (u32)this->dreamTimer / 15;
 }
-void func_8005937C(DreamSys *this, s32 value)
+void DreamSys__SetSoundObj(DreamSys *this, s32 value)
 {
 	this->unk_0x58 = value;
 }
@@ -422,7 +422,7 @@ void func_80059598(DreamSys *this)
 {
 	this->unk_0x78 = 0;
 }
-s32 func_800595A0(DreamSys *this)
+s32 DreamSys__NoOpSlot12C(DreamSys *this)
 {
 	return 0;
 }
@@ -448,7 +448,7 @@ void DreamSys__SelectCallback80(DreamSys *this, s32 arg1)
 		this->callback_0x80 = NULL;
 		break;
 	case 1:
-		this->callback_0x80 = vt->func_800597C0;
+		this->callback_0x80 = vt->DreamSys__StepLook;
 		break;
 	case 2:
 		this->callback_0x80 = vt->DreamSys__NoOpSlot14C;
@@ -466,7 +466,7 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 	struct vtable_DreamSys *vt = this->vt;
 
 	if (this->unk_0x9C == 2)
-		vt->func_8005A134(this, 0);
+		vt->DreamSys__StopDrift(this, 0);
 	this->unk_0x9C = arg1;
 	switch (arg1) {
 	case 0:
@@ -476,21 +476,21 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 		this->callback_0x98 = (void (*)(DreamSys *))vt->DreamSys__TickMove;
 		break;
 	case 2:
-		this->callback_0x98 = vt->func_8005A0B0;
+		this->callback_0x98 = vt->DreamSys__TickDrift;
 		this->unk_0xC4 = 1;
 		this->unk_0xC8 = 1;
-		InitSoundCueSet(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->func_8005A1F4);
+		InitSoundCueSet(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->DreamSys__SoundCueCallback);
 		break;
 	}
 }
 
-void func_800597C0(DreamSys *this)
+void DreamSys__StepLook(DreamSys *this)
 {
-	this->vt->func_80059814(this);
-	this->vt->func_800598E8(this);
+	this->vt->DreamSys__StepLookOffset(this);
+	this->vt->DreamSys__StepLookYaw(this);
 }
 
-void func_80059814(DreamSys *this)
+void DreamSys__StepLookOffset(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
@@ -529,11 +529,11 @@ void func_80059814(DreamSys *this)
 
 #if 0
 /* best-reached body, round 32 (2026-09-12, runner alpha2): the delta/step
-   register-coalescing fix that closed func_80059814 (reusing the SAME `delta`
+   register-coalescing fix that closed DreamSys__StepLookOffset (reusing the SAME `delta`
    local across both mutually exclusive branches instead of a separate `step`)
    applies here too and closes ONE of the two previously-missing words: 76/77
    words, 1 word SHORT (was 75/77, 2 words short). See
-   docs/match-reports/func_800598E8.md for the residue that's left -- it is a
+   docs/match-reports/DreamSys__StepLookYaw.md for the residue that's left -- it is a
    different, deeper mechanism (opportunistic delay-slot placement of the
    `this` register setup across multiple converging paths into the shared
    `DreamSys__FlipMoveCommand(this)` tail call), not reachable by the rename lever nor by
@@ -548,7 +548,7 @@ void func_80059814(DreamSys *this)
    duplicated call site back down, so the function grows to 78 words (1 word
    LONG) instead of 76 (1 word SHORT): trades one residue for a different,
    equally-real one rather than closing it. Reverted immediately. */
-void func_800598E8(DreamSys *this)
+void DreamSys__StepLookYaw(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
@@ -590,7 +590,7 @@ call_tail:
 	DreamSys__FlipMoveCommand(this);
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_800598E8);
+INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StepLookYaw);
 
 void DreamSys__FlipMoveCommand(DreamSys *this)
 {
@@ -744,7 +744,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 
 	if (arg1 != 0) {
 		delta = D_80087E34[arg1] * D_80087E20[this->moveMode];
-		this->vt->func_800595A0(this);
+		this->vt->DreamSys__NoOpSlot12C(this);
 		pos = this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0);
 		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
 		 && !this->vt->DreamSys__TryInstantTeleportLink(this, pos)
@@ -772,7 +772,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 	}
 }
 
-void func_8005A0B0(DreamSys *this)
+void DreamSys__TickDrift(DreamSys *this)
 {
 	if (this->unk_0xC4 != 0) {
 		this->vt->BaseObjO__AddVec14(this, &D_80087EA4);
@@ -782,7 +782,7 @@ void func_8005A0B0(DreamSys *this)
 		func_8002CD08(this->unk_0x58, this->unk_0xCC);
 }
 
-void func_8005A134(DreamSys *this, s32 arg1)
+void DreamSys__StopDrift(DreamSys *this, s32 arg1)
 {
 	this->unk_0xC4 = 0;
 	this->unk_0xC8 = arg1;
@@ -835,7 +835,7 @@ void DreamSys__SetTickPeriod(DreamSys *this, s32 value)
 	this->tickPeriod = value;
 }
 
-void func_8005A1F4(void *arg0, Func8005A1F4Arg *arg1)
+void DreamSys__SoundCueCallback(void *arg0, Func8005A1F4Arg *arg1)
 {
 	s32 isDivisible;
 
@@ -915,7 +915,7 @@ s32 DreamSys__GetNewGameFlag(DreamSys *this)
 	return this->newGamePending;
 }
 
-s32 *func_8005A350(DreamSys *this, s32 *arg1)
+s32 *DreamSys__GetSaveBlock(DreamSys *this, s32 *arg1)
 {
 	if (arg1 != NULL)
 		*arg1 = 0x700;

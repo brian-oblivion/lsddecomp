@@ -41,8 +41,8 @@ extern s32 D_8008ACC0;
 extern s32 D_8008ACC4;
 extern s32 D_8008ACC8;
 
-/* Delta/threshold table pairs consumed by func_80059814 (D_80087E50 /
-   D_80087E5C, indexed by DreamSys::unk_0x88) and func_800598E8 (D_80087E68 /
+/* Delta/threshold table pairs consumed by DreamSys__StepLookOffset (D_80087E50 /
+   D_80087E5C, indexed by DreamSys::unk_0x88) and DreamSys__StepLookYaw (D_80087E68 /
    D_80087E74, indexed by DreamSys::unk_0x90). Index 0 is unused/zero in both
    pairs; indices 1 and 2 are the negative/positive delta and its matching
    threshold. Still raw `nonmatching` data (round 2026-08-30). */
@@ -66,7 +66,7 @@ extern s8 D_80087E34[8];
    same element type as DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below, which this table
    holds pointers to. */
 
-/* {value, flag} pair array; func_800598E8 always writes index 0's value and
+/* {value, flag} pair array; DreamSys__StepLookYaw always writes index 0's value and
    passes &D_80087E84[-1] (== &D_80087E80, a distinct label immediately
    before it) to func_8001CEB4. Still raw `nonmatching` data. */
 typedef struct D_80087E84Entry {
@@ -209,7 +209,7 @@ typedef struct DreamSysUnk14 {
 /* Struct pointed to by DreamSys::unk_0x5C. +0x14 / +0x20 are a pair of
    two-word (x,y) points per func_8005942C (MATCHED, elsewhere in
    this unit; not independently re-confirmed this round). +0x24 (the second point's y) is
-   confirmed: func_80059814 (round 2026-08-30) nudges it. +0x18 (the first
+   confirmed: DreamSys__StepLookOffset (round 2026-08-30) nudges it. +0x18 (the first
    point's y) is also now confirmed: DreamSys__AdvanceMoveCycle (round 2026-09-02) nudges
    it by the SAME delta as +0x24, in the same statement pair. */
 typedef struct DreamSysUnk5C {
@@ -224,7 +224,7 @@ typedef struct DreamSysUnk5C {
    for its own vtable pointer at offset 0, and called through. Everything
    else about this class -- including whether it is the SAME class as
    DreamSys::unk_0x4C below -- is unknown. Elsewhere in this unit unk_0x58
-   is set/read as a plain s32 (func_8005937C, func_8005A134's call into
+   is set/read as a plain s32 (DreamSys__SetSoundObj, DreamSys__StopDrift's call into
    FlushSoundCueSet), which is consistent with it being a pointer value just
    not typed that way there. slot0x84 takes TWO arguments, not one --
    head-adjudicated 2026-08-30-c: the guard value (DreamSys::unk_0xBC)
@@ -456,10 +456,10 @@ typedef struct DreamSysEntityObj {
 	DreamSysEntityMethods *methods;
 } DreamSysEntityObj;
 
-/* Struct pointed to by func_8005A1F4's arg1 -- forwarded (never called) as
+/* Struct pointed to by DreamSys__SoundCueCallback's arg1 -- forwarded (never called) as
    InitSoundCueSet's 5th argument via DreamSys__SelectCallback98's arg1==2 case, so its
    real caller/owner lives outside this unit. Only the offsets
-   func_8005A1F4 itself touches are named; +0x8..+0x1C and +0x24..+0x30
+   DreamSys__SoundCueCallback itself touches are named; +0x8..+0x1C and +0x24..+0x30
    are unconfirmed gaps (round 2026-08-30-d). */
 typedef struct Func8005A1F4Arg {
 	s32 mode;             /* +0x0, compared against literal 1 */
@@ -474,7 +474,7 @@ typedef struct Func8005A1F4Arg {
 
 /* Full-word (x,y,z) vector, distinct from `struct RelativePos` (s16 triplet
    -- the on-disk/network form). DreamSys__ApplyRelativeOffset builds one of these on the
-   stack as a-b with y forced to 0; func_8005A0B0 passes the static
+   stack as a-b with y forced to 0; DreamSys__TickDrift passes the static
    D_80087EA4 instance of one. Both feed vtable slot +0xBC
    (BaseObjO__AddVec14, round 2026-08-30-d). */
 typedef struct DreamSysVec3 {
@@ -581,11 +581,11 @@ extern const s8 D_80087EC8[0x18];
 extern void *func_80017B34(s32 size);
 
 /* Also declared in Entity.h for a different (Entity) struct's fields; here
-   called by func_8005A134 as (this->unk_0x58, this->unk_0xCC)
+   called by DreamSys__StopDrift as (this->unk_0x58, this->unk_0xCC)
    (round 2026-08-30-b). */
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
-/* Also declared in Entity.h. Called by func_8005A0B0 as
+/* Also declared in Entity.h. Called by DreamSys__TickDrift as
    (this->unk_0x58, this->unk_0xCC) -- same argument shape as
    FlushSoundCueSet above (round 2026-08-30-d). */
 extern void func_8002CD08(s32 arg0, void *arg1);
@@ -638,7 +638,7 @@ typedef struct DreamSys {
 	   from `class_3bb8c_p.c` (round 57 naming pass). */
 	void *pendingExtra;
 
-	/* Set by func_8005937C(this, value); no other observed use. */
+	/* Set by DreamSys__SetSoundObj(this, value); no other observed use. */
 	s32 unk_0x58;
 	/* Set by func_80059384(this, value); read as a pointer by
 	   func_8005942C (this->unk_0x5C + 0x14 and + 0x20 are passed to
@@ -656,7 +656,7 @@ typedef struct DreamSys {
 	   Meaning unidentified beyond that (round 2026-08-30). */
 	s32 unk_0x6c;
 
-	/* Gate flag: DreamSys__BlockMovement sets it to 1; func_8005931C reads it back;
+	/* Gate flag: DreamSys__BlockMovement sets it to 1; DreamSys__GetLinkCommandFlag reads it back;
 	   DreamSys__UpdateTickState skips its whole body while this is nonzero. */
 	s32 movementBlocked;
 	/* Cleared to 0, then set to (dreamTimer % tickPeriod == 0) by
@@ -674,16 +674,16 @@ typedef struct DreamSys {
 	   observed use (round 2026-08-30). */
 	s32 callback80Mode;
 	/* Index into the (D_80087E50, D_80087E5C) delta/threshold table pair,
-	   consumed and reset to 0 by func_80059814 (round 2026-08-30). */
+	   consumed and reset to 0 by DreamSys__StepLookOffset (round 2026-08-30). */
 	s32 unk_0x88;
 	/* Running accumulator nudged by unk_0x88's table entry, or decayed by
 	   600/call towards 0 when unk_0x88 is 0; also propagated into
-	   unk_0x5C->unk_0x24. Set by func_80059814 (round 2026-08-30). */
+	   unk_0x5C->unk_0x24. Set by DreamSys__StepLookOffset (round 2026-08-30). */
 	s32 unk_0x8C;
 	/* Index into the (D_80087E68, D_80087E74) delta/threshold table pair,
-	   consumed and reset to 0 by func_800598E8 (round 2026-08-30). */
+	   consumed and reset to 0 by DreamSys__StepLookYaw (round 2026-08-30). */
 	s32 unk_0x90;
-	/* Running delta accumulator paired with unk_0x90; see func_800598E8
+	/* Running delta accumulator paired with unk_0x90; see DreamSys__StepLookYaw
 	   (round 2026-08-30). */
 	s32 unk_0x94;
 	/* Set by DreamSys__SelectCallback80(this, arg1) exactly like callback_0x80, but from
@@ -691,17 +691,17 @@ typedef struct DreamSys {
 	   DreamSys__RunTickCallbacks, if non-NULL. */
 	void (*callback_0x98)(struct DreamSys *this);
 	/* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
-	   entry, this->vt->func_8005A134(this, 0) fires first; then it is set
+	   entry, this->vt->DreamSys__StopDrift(this, 0) fires first; then it is set
 	   unconditionally to arg1 (round 2026-08-30). */
 	s32 unk_0x9C;
 	/* (this->unk_0xA0 ^ 1) < 1u, i.e. (unk_0xA0 == 1), written by
-	   func_800598E8; also toggled/incremented by DreamSys__FlipMoveCommand and forced
+	   DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
 	   to 1 by DreamSys__TickMoveForced (round 2026-08-30). */
 	s32 unk_0xA0;
 	/* Index into the 12-byte-stride D_80087E80 table; consumed and reset
 	   to 0 by DreamSys__ApplyPendingTurn (round 2026-08-30-b). */
 	s32 unk_0xA4;
-	/* (unk_0xA0 == 1) as computed by func_800598E8; unconditionally cleared
+	/* (unk_0xA0 == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
 	   to 0 by DreamSys__FlipMoveCommand on every call (round 2026-08-30). */
 	s32 unk_0xA8;
 	/* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with previousMoveMode.
@@ -901,7 +901,7 @@ struct vtable_DreamSys{
 	   own epilogue, so it becomes DreamSys__DreamSys's own return value
 	   unchanged (round 2026-09-02) -- typed `DreamSys *` to match. */
 	DreamSys *(*func_800588EC)(DreamSys *this);
-	/* Called by func_800598E8 as (this, 0, &D_80087E84[-1]); return value,
+	/* Called by DreamSys__StepLookYaw as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */
 	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);
 	u32 unknown_functions_0x48[1];
@@ -938,7 +938,7 @@ struct vtable_DreamSys{
 	   0x80057384 is outside this unit/runner's range; still INCLUDE_ASM. */
 	void (*BaseObjO__SetVec14)(DreamSys *this, void *arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0BC). Called by
-	   DreamSys__ApplyRelativeOffset and func_8005A0B0 with a DreamSysVec3* second argument
+	   DreamSys__ApplyRelativeOffset and DreamSys__TickDrift with a DreamSysVec3* second argument
 	   (round 2026-08-30-d). */
 	void (*BaseObjO__AddVec14)(DreamSys *this, DreamSysVec3 *arg1);
 	/* Called by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked by its own
@@ -991,10 +991,10 @@ struct vtable_DreamSys{
 	   small local buffer (round 2026-09-02). */
 	void (*DreamSys__ResetLinkState)(DreamSys *this, s32 arg1, s32 arg2);
 	void (*DreamSys__BlockMovement)(DreamSys *this);
-	s32 (*func_8005931C)(DreamSys *this);
+	s32 (*DreamSys__GetLinkCommandFlag)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);
 	s32 (*DreamSys__GetDreamTimerScaled)(DreamSys *this);
-	void (*func_8005937C)(DreamSys *this, s32 value);
+	void (*DreamSys__SetSoundObj)(DreamSys *this, s32 value);
 	void (*func_80059384)(DreamSys *this, void *value);
 	void (*func_8005938C)(DreamSys *this, s32 value);
 	void (*DreamSys__UpdateTickState)(DreamSys *this);
@@ -1002,7 +1002,7 @@ struct vtable_DreamSys{
 	s32 (*func_8005942C)(DreamSys *this, void *out, s32 day, s32 *reference, s32 tolerance);
 	void (*func_80059590)(DreamSys *this);
 	void (*func_80059598)(DreamSys *this);
-	s32 (*func_800595A0)(DreamSys *this);
+	s32 (*DreamSys__NoOpSlot12C)(DreamSys *this);
 	void (*DreamSys__ClearTickCallbacks)(DreamSys *this, bool arg1);
 	/* Chains DreamSys__SelectCallback98(this, arg1) then DreamSys__SelectCallback80(this, arg2)
 	   (round 2026-08-30). */
@@ -1011,10 +1011,10 @@ struct vtable_DreamSys{
 	void (*DreamSys__SelectCallback80)(DreamSys *this, s32 arg1);
 	/* Called unconditionally by DreamSys__ClearTickCallbacks as this->vt->DreamSys__SelectCallback98(this, 0). */
 	void (*DreamSys__SelectCallback98)(DreamSys *this, s32 arg1);
-	/* Calls func_80059814(this) then func_800598E8(this) (round 2026-08-30). */
-	void (*func_800597C0)(DreamSys *this);
-	void (*func_80059814)(DreamSys *this);
-	void (*func_800598E8)(DreamSys *this);
+	/* Calls DreamSys__StepLookOffset(this) then DreamSys__StepLookYaw(this) (round 2026-08-30). */
+	void (*DreamSys__StepLook)(DreamSys *this);
+	void (*DreamSys__StepLookOffset)(DreamSys *this);
+	void (*DreamSys__StepLookYaw)(DreamSys *this);
 	/* No-op stub (`{ }`); one of DreamSys__SelectCallback80's callback_0x80 choices. */
 	void (*DreamSys__NoOpSlot14C)(DreamSys *this);
 	/* No-op stub (`{ }`); one of DreamSys__SelectCallback80's callback_0x80 choices. */
@@ -1057,10 +1057,10 @@ struct vtable_DreamSys{
 	void (*DreamSys__ApplyPendingTurn)(DreamSys *this);
 	/* Referenced by DreamSys__SelectCallback98's arg1==2 case; stored into
 	   callback_0x98, never called directly by this runner's functions. */
-	void (*func_8005A0B0)(DreamSys *this);
+	void (*DreamSys__TickDrift)(DreamSys *this);
 	/* Referenced by DreamSys__SelectCallback98's entry guard (this->unk_0x9C==2); called
 	   as (this, 0). */
-	void (*func_8005A134)(DreamSys *this, s32 arg1);
+	void (*DreamSys__StopDrift)(DreamSys *this, s32 arg1);
 	/* +0x180..+0x190: resolved via tools/classtable.py DREAMSYS_METHODS,
 	   all five matched this round (2026-08-30-b). DreamSys__GetSetMoveMode is also
 	   called directly (not through the vtable) by func_80059148, as
@@ -1074,7 +1074,7 @@ struct vtable_DreamSys{
 	   called there) is forwarded as InitSoundCueSet's 5th argument. arg0 is
 	   unused in the body; kept generic rather than typed DreamSys* since
 	   nothing here confirms it (round 2026-08-30-d). */
-	void (*func_8005A1F4)(void *arg0, Func8005A1F4Arg *arg1);
+	void (*DreamSys__SoundCueCallback)(void *arg0, Func8005A1F4Arg *arg1);
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as
@@ -1091,7 +1091,7 @@ struct vtable_DreamSys{
 	s32 (*DreamSys__GetNewGameFlag)(DreamSys *this);
 	/* Optionally writes a literal 0x700 through arg1 (if non-NULL), always
 	   returns &this->unknown_sdata_0x178 (round 2026-08-30-c). */
-	s32 *(*func_8005A350)(DreamSys *this, s32 *arg1);
+	s32 *(*DreamSys__GetSaveBlock)(DreamSys *this, s32 *arg1);
 	s32 (*StartDay)(DreamSys *this);
 	s32 (*EndDay)(DreamSys *this, s32 arg1);
 	CinematicCall (*GetCinematic)(DreamSys *this);
