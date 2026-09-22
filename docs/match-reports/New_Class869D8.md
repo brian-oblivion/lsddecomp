@@ -35,3 +35,12 @@ Matched on the first attempt -- this is a direct copy of the established
 New_X idiom already confirmed several times elsewhere in this codebase
 (see docs/MATCHING-GUIDE.md, "Writing a class method" / "Allocation sites
 look like..."). No residue.
+
+## Naming
+
+**New_Class869D8** -- tier A. Pure `New_X` allocator idiom (allocate fixed
+size, null-check, ctor, return); the allocator's mechanics ARE its purpose
+by the tier-A leaf rule. Matches the project's established `New_Class866E8`/
+`New_X` naming convention (class_3ac78.c, class_39e08.c) exactly, and this
+name was already in use in this function's own report prose before the
+round-68 rename made it real.

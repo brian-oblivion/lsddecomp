@@ -1,3 +1,25 @@
+/*
+ * class_3bb8c_c -- three small sibling classes, each built by its own
+ * New_X/ctor pair (allocate, chain a base ctor, install the class's own
+ * vtable): Class869D8, Class86AA0 and Class86B60. All three follow the
+ * same class-framework shape documented in docs/research/class-framework.md
+ * and already used elsewhere in this codebase (e.g. class_3ac78.c's
+ * Class866E8). Class86B60 is the largest of the three -- its own vtable
+ * (gClass86B60Methods, 78 slots) is mostly dispatched from the sibling
+ * unit class_3bb8c_d.c, which shares this file's header
+ * (include/class_3bb8c.h) and struct definitions; this unit contributes
+ * only the allocator and ctor.
+ *
+ * Two free functions round out the unit: CheckObj866E8CountFlag, called
+ * directly (not through any vtable) from the still-uncarved
+ * func_8004DE08, computes a 0/1 flag from an Obj866E8's own fields; and
+ * FormatNumberIntoBuffer, called from Class86B60's own ctor, formats a
+ * number into a shared buffer whose broader role (nearby rodata strings
+ * hint at a memory-card save label) is not established from this unit
+ * alone.
+ *
+ * All 20 definitions here are matched, 0 INCLUDE_ASM.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 

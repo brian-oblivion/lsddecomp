@@ -122,3 +122,20 @@ delete `lw a2,164(s0)` and break `func_8004DE08`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_d.c:219`. Oracle green.
+
+## Naming
+
+**CheckObj866E8CountFlag** -- tier B. Free function (not a vtable method --
+called directly by `jal` from the still-uncarved `func_8004DE08`), so named
+`VerbNoun`. Mechanics are fully evident: reaches an `Obj866E8` through a
+caller-side context struct, compares one field (`unkC`) against a large
+literal (`9999999`), and writes a computed 0/1 flag into a result block.
+The literal reads as a sentinel (a game-common "treat as unlimited/uncapped"
+threshold) but that is a purpose GUESS the rule forbids naming on, so the
+name stays mechanical: "check a count against its threshold, produce a
+flag" -- not "IsUncapped"/"IsAvailable"/etc. `Ctx678_3bb8c_c`/
+`Result678_3bb8c_c` (the two parameter types) are left as-is; they already
+name exactly what evidence supports (a caller-side context wrapper and a
+result block), and CLAUDE.md's four-ways-a-score-lies precedent (delta,
+round 13) is the standing reason not to touch a shared/ambiguous struct
+without stronger cause.

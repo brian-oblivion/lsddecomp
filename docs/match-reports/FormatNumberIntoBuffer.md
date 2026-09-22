@@ -98,3 +98,21 @@ does — doing it before turns a two-caller-saved-register need into a
 callee-saved spill (`s0`/`s1` prologue/epilogue) that does not exist in
 retail and is a strong signal of a mis-ordered access, not a matching
 struct-copy question.
+
+## Naming
+
+**FormatNumberIntoBuffer** -- tier B. Free function (called directly by
+`Class86B60__Class86B60`, not through any vtable), `VerbNoun`. Mechanics are
+fully evident: formats `arg0` via `FormatFullWidthNumber` into
+`D_8008AA24`'s buffer, then copies 6 raw bytes of that buffer into
+`D_8008AA18`'s buffer at `+0x12`. Purpose is explicitly NOT established --
+the header's own comments on `D_8008AA18`/`D_8008AA24` document both as
+"writable-buffer placeholders" whose real runtime role is outside this
+unit's own carved ground (a nearby string, "CARD\FILEICN1.TIM", and the
+disc's own product-code string sit in the same rodata block, which is
+*suggestive* of a memory-card save-icon label under construction, but
+that is exactly the kind of purpose-guess the naming rule forbids without
+a function that actually establishes it). Named for the one certain
+mechanic -- format a number, copy it into another buffer -- and nothing
+more. `D_8008AA24`/`D_8008AA18` themselves are left unrenamed for the same
+reason.

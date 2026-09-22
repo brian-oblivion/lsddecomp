@@ -110,3 +110,28 @@ call-then-call sequencing word-for-word).
 > `slot40` right after `self->methods = func_8004E2D0();`) -- write it as
 > a plain sequential assignment-then-dispatch; no getter re-fetch or
 > caching is needed for the match.
+
+## Naming
+
+**Class86B60__Class86B60** -- tier A. Canonical ctor (`Class__Class`
+convention). Same evidence class as the other two ctors in this unit:
+occupies `ctor` (+0x008) on `gClass86B60Methods`, chains a base ctor,
+installs its own vtable directly (`self->methods = ...`, the
+"base-ctor-chain sets self->methods directly" pattern already documented
+for `TaskCoreMethods::slotD8`), then dispatches through the freshly
+installed table twice more in the same function (`slotD8`, then
+`onConstruct` -- see the header-edit note below).
+
+## Header edit: Class86B60Methods::slot40 -> onConstruct
+
+Renamed following the compiler-ownership recipe (FINISHING-PLAN.md track
+3 step 3), not assumed safe: `Class86B60Methods` is otherwise SHARED with
+`src/class_3bb8c_d.c` (most of its other slots are dispatched from
+functions there). Renamed the field in the struct DEFINITION alone,
+rebuilt, and the compiler's error was confined to this unit's own call
+site (`src/class_3bb8c_c.c`, this function's own last statement) --
+nothing in `class_3bb8c_d.c` or anywhere else references this specific
+slot. Fixed the one call site, oracle green. Same name and same evidence
+shape ("runs right after self->methods is installed") as
+`Class869D8Methods::onConstruct`, which this unit's other ctor
+(`Class869D8__Class869D8`) already established.

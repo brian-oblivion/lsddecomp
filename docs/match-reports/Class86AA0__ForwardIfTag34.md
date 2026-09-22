@@ -38,3 +38,15 @@ identifies which specific class `0x34` names.
 
 Matched on the first attempt. No residue -- straightforward branch, single
 dispatch call, no register-identity surprises.
+
+## Naming
+
+**Class86AA0__ForwardIfTag34** -- tier B. Mechanics fully evident from the
+body: reads `arg1`'s own class-instance header-tag byte, and iff it equals
+the literal `0x34`, forwards to `self`'s own `slotB8` with no other
+arguments. Named for exactly that observable shape (compare a tag byte
+against a literal, conditionally forward) rather than for a guessed
+in-game meaning of "tag 0x34" or of what the forwarded call accomplishes
+-- neither is established. `GenericTagInst_3bb8c_c`/`GenericTagMethods_3bb8c_c`
+(the minimal "any class instance, tag byte only" shape this function reads
+through) are left as-is; they are already named for exactly what they are.

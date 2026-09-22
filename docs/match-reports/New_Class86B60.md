@@ -50,3 +50,13 @@ argument.
 ## Proposed learning
 
 None beyond what's already documented for this unit's `New_X` idiom.
+
+## Naming
+
+**New_Class86B60** -- tier A. Same `New_X` allocator idiom as
+`New_Class869D8`/`New_Class86AA0`, one extra forwarded argument
+(`dreamSys`). Also externally used as a `PollTaskCtor` callback
+(`include/Class6D3C8.h`); that unit's own independent local view keeps its
+own return/param naming and is untouched by this rename (function names
+are unique symbols, tree-wide by construction, so that call site now reads
+`New_Class86B60` too).

@@ -97,3 +97,10 @@ The practical instruction is sound. What it left out is that a divergence is a
 signal the real signature is unknown, and that the callee settles it cheaply —
 without which two wrong declarations sit in the tree looking like a resolved
 question.
+
+## Naming
+
+**Class86AA0__Class86AA0** -- tier A. Canonical ctor (`Class__Class`
+convention): chains a base ctor (`GetClass6B5CCMethods`), installs this
+class's own vtable, zeroes three of its own fields. Same shape and
+evidence class as `Class869D8__Class869D8`.

@@ -259,3 +259,22 @@ declaration.
 > claims the numerically-lowest saved register, others shift up by one) as
 > a fast top-level screen for the same STALL class on sight, before
 > spending attempts on source reshaping.
+
+## Naming
+
+**Class86AA0__ForwardIfArg2InRange** -- tier B. Mechanics are fully
+established (round 17's permuter pass pinned the byte-exact body):
+unconditionally forwards `(self, arg1, arg2)` to the base ctor table's own
+`slot9C`, then, only when `5 <= arg2 < 9`, forwards the same three
+arguments again to `self`'s own `slotA0`. Purpose is explicitly NOT
+established -- the function's own history section already documents an
+open arity/purpose conflict with its nominal vtable slot (`slotB8`, whose
+call site from `Class86AA0__ForwardIfTag34` passes only `self`, one
+argument short of what this function's own body reads) that round 9/10
+deliberately left unreconciled. Named for the one concrete, evidenced
+mechanic (a numeric range gate on `arg2`) rather than for either disputed
+caller's arity or for a guessed meaning of the `[5, 9)` band. `slotA0` and
+`slotB8` (the vtable field names) are left unrenamed: this function's own
+occupancy of `slotB8` is itself the open question the report documents, so
+naming the slot after this function's behavior would misstate an
+unresolved fact as settled.

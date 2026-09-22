@@ -29,3 +29,9 @@ Class86AA0 *New_Class86AA0(void)
 ## Notes
 
 Matched on the first attempt; same idiom as New_Class869D8. No residue.
+
+## Naming
+
+**New_Class86AA0** -- tier A. Same `New_X` allocator idiom as
+`New_Class869D8` (see that report), mirrored exactly for this sibling
+class.

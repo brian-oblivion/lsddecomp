@@ -43,3 +43,16 @@ the same tail) with no reordering needed.
 
 None beyond what's already documented for this unit's base-ctor-table
 pattern.
+
+## Naming
+
+**Class869D8__ForwardIfUnk10AndUnk70** -- tier B. Mechanics are fully
+evident from the body (forward to the base ctor table's `slot9C` iff both
+`unk10` and `unk70` are nonzero) but the fields' real meaning, and so the
+forward's in-game purpose, is not established -- only that both gate the
+call (see the struct comments). Named on the "NotifyIfUnkNActive"-style
+precedent already used elsewhere in this codebase for a gated-forward shape
+(e.g. `Class6B5CC__NotifyIfUnk20Active`, include/code_d294.h) rather than
+inventing a semantic verb ("Notify"/"Release"/etc.) the body does not
+support. `unk10`/`unk70` themselves are left unnamed -- no evidence beyond
+"nonzero gate" exists for either.

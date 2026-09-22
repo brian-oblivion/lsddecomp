@@ -41,3 +41,14 @@ computes the getter's return value, then reading the table directly out of
 `asm/data/*.s`. The "count header word, +0x004 BasicClass__func_17eb0"
 opening two words are a strong fingerprint that a `.word` block found this
 way really is a vtable and not incidental data.
+
+## Naming
+
+**GetClass869D8Methods** -- tier A. Pure vtable getter (`return
+&gClass869D8Methods;`), the same shape and role as the project's other
+`GetClassXMethods` getters (e.g. `GetClass86668Methods`, class_3ac78.c).
+The mechanics -- "returns a pointer to this specific class's own methods
+table" -- ARE the purpose, so tier A applies by the leaf-getter rule. The
+underlying vtable global was renamed alongside it, `D_800869D8` ->
+`gClass869D8Methods` (same `g` + getter-name-minus-"Get" pairing already
+established by `gClass86668Methods`/`GetClass86668Methods`).

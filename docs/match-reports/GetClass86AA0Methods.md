@@ -29,3 +29,9 @@ same table) are typed; see `include/class_3bb8c.h`.
 ## Proposed learning
 
 See GetClass869D8Methods.md -- same finding, second instance.
+
+## Naming
+
+**GetClass86AA0Methods** -- tier A. Same pure-getter shape and evidence as
+`GetClass869D8Methods` (see that report); `D_80086AA0` renamed alongside
+it to `gClass86AA0Methods` for the same reason.
