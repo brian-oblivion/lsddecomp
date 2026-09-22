@@ -35,12 +35,9 @@ report, the head promotes after merging.
 Each is one maspsx flag setting one behaviour, proven inert by a byte-exact rebuild. Do not
 screen for them, do not stall on them, do not trust a verdict predating the fix.
 
-| construct | round | flag | doc |
-| --- | --- | --- | --- |
-| `addiu_at` (indexed global load) | 21 | `--addiu-at` | `research/addiu-at-blocker.md` |
-| `gp_rel` (small-data global) | 42 | `--gp-symbols=config/gp-symbols.txt` | `research/gp-relative-blocker.md` |
-| `nop_mflo_mfhi` | 42 | `--no-nop-mflo-mfhi` | `addiu-at-blocker.md`, RESOLVED addendum |
-| `nop_at_expansion` (indexed load, then store-to-symbol of that reg) | 63 | `--nop-at-expansion` | `research/load-delay-nop-blocker.md` |
+Which four, which flag, which round and which research doc: the table in CLAUDE.md, "Open
+toolchain blockers", which every runner and head reads first and which owns that list. Do not
+keep a second copy here; a stale copy of it is worse than no copy.
 
 (a §"BLOCKED: no C function can reach a small-data global", §"BLOCKED: no C function can
 load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen runs FORWARD")
@@ -205,6 +202,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   because 2.6.3 collapses a free `v0 = 0` arm into the BRANCH's own delay slot and evicts a
   `slot++` that was already matching. Read the delay slot before you build the variant.
   (a round 64, charlie)
+- **A bare `__asm__("")` at a basic-block JOIN blocks GCC's eager delay-slot fill and can COST
+  instructions.** It is legal under HARD RULE 6 (it moves no value between registers) and still made
+  `func_8002CF18` worse for four rounds. The discriminator is WHERE it sits: inside a block a barrier
+  orders that block's statements, but at a join it denies the scheduler the instruction it would have
+  hoisted into the branch's delay slot, costing a nop per join. A barrier that makes the body LONGER
+  is this, not a block-order result. (a round 65)
 
 ### 3b. Switch and jump tables
 
@@ -372,6 +375,13 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   made cc1 emit retail's `move`, and six of six joint-best permuter candidates converged on it.
   Using the alias EVERYWHERE collapses back to two pointers and cc1 coalesces again, so the lever is
   partial use. (a round 60, `func_8002C278`, -> 54/76)
+- **Local COUNT is the lever on a register-identity residue in all THREE directions — delete, merge
+  and add — not only delete.** Round 65 worked one unit's three stalls at once: deleting four cached
+  tail temps made `func_8002DDBC`'s whole 25-instruction tail byte-exact and fixed two registers four
+  blocks UPSTREAM of the deletion; reusing an already-dead local in `func_8002D1B4` was worth 1700
+  asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
+  `func_8002CF18`. The delete direction needs a CALL-crossing live range, so it does not apply to
+  leaves. (a round 65)
 
 ### 3e. Frames and stack
 
@@ -727,6 +737,17 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   never-searched, ranking scaffold-rejected functions to the TOP. Rank a fresh unit by SIBLING GROUP
   and remember an unpromoted learning does not exist. (a §"\"Unscoreable\" describes a SESSION's
   state", §"Gate 1b's sixth screen is neither SOUND nor COMPLETE")
+- **A recorded LENGTH figure is only comparable within one toolchain generation.** Round 45 filed
+  `func_8002D1B4` at 332 built words; the same preserved body rebuilt in round 65 gives 334, because
+  round 63 adopted `--nop-at-expansion`. Word-match was unaffected, so the two instruments decayed
+  differently: a maspsx flag that adds or drops an expansion nop changes every LENGTH figure recorded
+  before it and no MATCH figure. A title's "N words short/long" from before a flag landed is not
+  comparable with one after; rebuild the body and re-measure before ranking on it. (a round 65)
+- **"Exact length" can be arithmetic rather than structure, and only the positional-skeleton figure
+  notices.** `func_8002CF18` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
+  65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right
+  total. Length is a SUM and cancels; the skeleton figure was 118 at that "exact length". Read the
+  skeleton figure before believing a length claim, exactly as for ins/del. (a round 65)
 
 ## 5. Withdrawn or SDK-voided — do not re-add
 

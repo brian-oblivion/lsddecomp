@@ -6,6 +6,159 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-22 — round 65: the first revisit round that paid nothing, a naming pass sent back over one word, and two "exact length" claims retracted as arithmetic
+
+**Three runners, three tracks, three merges, all green. Matched unchanged at
+1150, queued unchanged at 102** — this round moved no bytes by design: the
+matching slot was revisits (0 matches from 3 attempts, the first revisit round
+to pay nothing) and tracks 1b and 3 are byte-neutral by construction. Head on
+Opus; nothing was adjudicated that needed Fable, and the two findings that
+would are ESCALATED below rather than acted on. Gate 0 clean, all three
+worktrees byte-verified before handover.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 3 | `DreamSys` | 44 functions, 6 unit-local fields named, 74/116 -> 32/116 unnamed; **review FAILED on one tier-A name**, unit not marked |
+| bravo | opus | 1 revisit | `code_179d8_l` | 3 revisits, 0 matches, all three improved; two stale verdicts retracted |
+| charlie | sonnet | 1b | `code_8220_c` | 9 of 9 preserved bodies promoted; `check-nonmatching` 12 -> 20 bodies |
+
+### A tier-A name that asserted a physical unit nothing establishes
+
+The track-3 head review samples five names per unit against their evidence.
+`DreamSys__GetDreamTimerSeconds` was filed tier A on the evidence "dreamTimer/15,
+matches GetSetDreamTimeLimit's scale". The body is `return (u32)this->dreamTimer
+/ 15;` and nothing else. For that quotient to be SECONDS, `dreamTimer` must
+advance at 15 Hz, and measured, nothing in the tree says it does: the field is
+incremented by exactly 1 per call of `DreamSys__TimerTick`, which is a vtable
+slot (`void *TimerTick;`) with no caller anywhere in `src/` that would fix its
+rate, and `dreamTimeLimit` — the value it is compared against — is written only
+through its own setter, with no constant reaching it in matched code.
+
+**The runner's stated evidence was real and was about something else.** "Matches
+GetSetDreamTimeLimit's scale" establishes that the timer and its limit share
+units AS EACH OTHER. It says nothing about what that unit IS, which is the
+entire claim the name makes. That is the precise shape track 3's tier rules
+exist to catch, and it is worth recording because the evidence was not absent —
+it was sound evidence for a weaker proposition, which is much harder to notice
+than no evidence at all. Now `DreamSys__GetDreamTimerScaled`, tier B, with the
+retirement condition written into its report: if `TimerTick`'s dispatch rate is
+ever established at 15 Hz, `...Seconds` becomes correct and tier A.
+
+A second name was tier-inflated rather than wrong: `GetStageTimeLimit` sat at
+tier A on `STAGE_TIME_LIMITS`, an INHERITED symbol. Track 3 makes every
+inherited name a tier-B hypothesis, so a tier-A name whose only support is an
+unconfirmed inherited name inherits that uncertainty rather than escaping it.
+Corrected to B. Both fixes went through `rename.py`, image byte-identical.
+
+Consequences applied as written: the unit is NOT `mark-unit`'d, and the naming
+runner goes back to **Opus** (`plan.py set-model --role naming_runner --model
+opus`; the tool takes no `--reason`, so this paragraph is it). The unit had not
+passed on the merits either — 32 of 116 defs remain deliberately unnamed, the
+runner having declined to name a tightly-coupled link-timer state machine rather
+than risk a wrong tier-A claim, which is the rule working in the other
+direction. The other three sampled names passed cleanly, including one
+(`SetInstantTeleportersEnabled`) where the head verified the flag it writes
+really is read as the gate, at `src/DreamSys.c:1856`.
+
+Alpha also retired 14 stale "blocked by gp-relative addressing" banners in
+`include/DreamSys.h` that predated the round-42 and round-63 toolchain fixes,
+and proposed ZERO cross-unit field names — having tested each by the compiler
+rather than by grep, and found that a textual hit on `unk_0x84` in
+`class_3bb8c_t.c` was an unrelated struct's coincidentally-numbered field. That
+is round 57's lesson applied unprompted by a Sonnet runner.
+
+### Two "exact length" claims retracted as arithmetic rather than structure
+
+Bravo's three revisits produced no match — the first revisit round to pay
+nothing, against a running 11 matches in 22 attempts — but retracted two
+recorded figures that had been ranking the queue.
+
+`func_8002CF18` had carried "EXACT LENGTH MATCH 167/167" since round 37, for 28
+rounds. It was two one-word padding artifacts sitting on top of a body two words
+SHORT, summing to the right total. **Length is a sum, and a sum cancels.** The
+discriminator was already available and nobody had read it: funcdiff's
+positional-skeleton figure stood at 118 while the length claim said exact. This
+is the same failure mode round 58 measured for ins/del (an insertion and a
+deletion cancel in length) arriving one instrument over, and it is now an idiom.
+The function ended the round at ins/del 29/29 -> 16/16, skeleton 118 -> 89,
+asm-differ 3255 -> 1250, with the residue now almost purely a register rotation.
+
+`func_8002D1B4` went from 18 words LONG to EXACT LENGTH 316/316 and word-match
+33 -> 201/316, leaving only the frame SIZE (`-8` against retail's `-0x10`). Round
+45's `volatile s16 D_8008EA26` model is retracted: the global is an ordinary
+non-volatile `s16`, and retail's five apparent reloads are CSE killed by
+intervening stores. `func_8002DDBC` reached 107 words (5 short) with its whole
+25-instruction tail byte-exact.
+
+### A recorded LENGTH figure is only comparable within one toolchain generation
+
+Round 45 filed `func_8002D1B4` at 332 built words. The same preserved body,
+rebuilt unchanged in round 65, gives **334** — because round 63 adopted
+`--nop-at-expansion`. Word-match was unaffected. So a maspsx flag that adds or
+drops an expansion nop silently changes every LENGTH figure recorded before it
+and no MATCH figure, and the two instruments in a stall title decay at different
+rates. A title's "N words short/long" from before a flag landed is not
+comparable with one after it. Promoted as an idiom; see the escalation below for
+the part the head did not act on.
+
+### Track 1b: nine bodies, and the permuter-review rule actually tested
+
+Charlie promoted all nine assigned bodies in `code_8220_c`;
+`tools/check-nonmatching.sh` now compiles 20 bodies across 5 units, up from 12,
+with the image byte-identical throughout. Eight of nine already carried a live,
+current-symbol `#if 0` snapshot, so no stale-symbol repair was needed.
+
+One body (`func_8001989C`) contains a permuter-found lever, which track 1b
+allows only after a human-style review that its semantics are what the
+disassembly does. The head verified that claim rather than accepting it: round
+48's own report oracle-verified the lever as a scheduling-only reshaping AND
+separately rejected a UB-exploiting candidate from the same search as "a
+semantic non-candidate on inspection". **The rejection is the evidence the rule
+wants** — it shows the reviewer was discriminating, not just approving. ROM
+order was verified from `build/lsdde.map`; the head's first check of it was
+vacuous (the symbols file does not list auto-named functions, so the comparison
+ran over an empty list and `all([])` returned True) and was redone.
+
+### Escalated — not acted on
+
+1. **A bare `__asm__("")` at a basic-block JOIN can COST instructions** by
+   denying GCC the instruction it would have hoisted into a branch's delay slot.
+   It passed CLAUDE.md HARD RULE 6's legality test (it moves no value between
+   registers) and still made `func_8002CF18` worse for four rounds. Promoted to
+   DECOMPILATION_LEARNINGS as a source-construct caveat, which is head work. The
+   part NOT done: HARD RULE 6 currently reads that a bare barrier "is allowed"
+   with no counter-indication, and whether that sentence should carry one is a
+   RULE edit in CLAUDE.md, i.e. Fable's call between rounds.
+2. **The length-figure/toolchain-generation finding may invalidate recorded
+   figures corpus-wide.** One function was measured. If `--nop-at-expansion`
+   (and the three earlier flags) shifted lengths generally, then every stall
+   title's length figure recorded before its flag landed is suspect, and
+   `plan.py`'s `len-exact` / `len-off` job tags are derived from exactly those
+   figures — so the ranking the head assigns from may be keyed on stale
+   measurements. A sweep that rebuilds preserved bodies and re-measures is a
+   TOOL change, not a round's work.
+3. Round 64's **stalesyms backlog** (52 live stale refs in 25 reports, 5 missing
+   the mandated `#if 0` form) is still open and untouched this round.
+4. Gate 3 was run in full on the round's one search and returned a numeric
+   **disagreement** — scaffold 21/21 against a real build of 45/45 — which is
+   not one of the three rows §3.5's table enumerates (it is the mirror of
+   "dirtier than the real build"). Bravo recorded it and searched anyway with
+   its reasoning, and the search found no zero, so nothing was adopted from it.
+   Whether a scaffold CLEANER than the real build is a fourth row or a restatement
+   of the second is a doc question, not a round's.
+
+### Doc hygiene
+
+`DECOMPILATION_LEARNINGS.md` took four promotions (the three above plus local
+COUNT as a lever in all three directions — delete, merge and add — which round
+63 had recorded only as delete) and went 777 -> 801, one over budget. Distilled
+back to 798 by replacing the four-RESOLVED-blockers TABLE with a pointer to
+CLAUDE.md's, which owns that list and which every runner and head reads first.
+That is content removal, not the reflow round 64 escalated: a second copy of a
+table is exactly the redundancy the budget exists to squeeze, and a stale copy of
+it would be worse than none.
+
+
 ## 2026-09-21 — round 64: the first track closes, and a per-lever negative that stood 16 rounds turns out to be the lever
 
 **Three runners, three tracks, three merges, all green. 1148 -> 1150 matched,

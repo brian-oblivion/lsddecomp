@@ -1,7 +1,7 @@
 {
   "models": {
     "match_runner": "opus",
-    "naming_runner": "sonnet"
+    "naming_runner": "opus"
   },
   "stop_rule": {
     "attempts_per_model": 6,
@@ -190,6 +190,16 @@
           "note": "REVISIT runner on class_3bb8c_n: MATCH func_80055258 110/110 and func_80055410 87/87 (both ins0/del0, verified individually post-merge); func_8005511C 16/79 1-short -> 49/79 LENGTH EXACT, still a stall at ins3/3 plateau. Both matches closed on axes a permuter cannot search: the global's INCOMPLETE-ARRAY vs SCALAR declaration, and DELETING a local whose live range crosses a call. Round 48's attempt-6 per-lever negative on func_8005511C's winning lever was unreproducible and had stood 16 rounds. All three REVISITED lines written, all three ASSIGNABLE markers retired.",
           "round": 64,
           "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-22",
+          "matches": 0,
+          "model": "opus",
+          "note": "REVISIT runner (bravo) on code_179d8_l: func_8002DDBC, func_8002D1B4, func_8002CF18. 3 attempts, 0 matches -- the first revisit round to pay nothing, though all three improved substantially and two stale verdicts were RETRACTED. func_8002D1B4 18-words-LONG -> EXACT LENGTH 316/316, word-match 33 -> 201/316, residue now only the frame SIZE (-8 vs -0x10); round 45's 'volatile s16 D_8008EA26' model retracted (ordinary non-volatile s16 declared as an incomplete array). func_8002CF18 round 37's 'EXACT LENGTH 167/167' RETRACTED as arithmetic not structure (two one-word padding artifacts over a body two words short); ins/del 29/29 -> 16/16, skeleton 118 -> 89, asm-differ 3255 -> 1250. func_8002DDBC 108 -> 107 words (5 short), whole 25-instruction tail now byte-exact. Levers: local COUNT is the axis in all THREE directions (delete/merge/add), transferred between all three functions; G = x | G not G |= x (operand order is visible); order global updates by retail's LOAD order. Gate 3 run in full on the one search (1500s bound, no zero): check 2 = 21/21 scaffold against check 3 = 45/45 real build, a numeric DISAGREEMENT recorded rather than papered over. Not calibration: track 1 is parked and these were revisits.",
+          "round": 65,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -225,6 +235,16 @@
           "model": "sonnet",
           "note": "Promoted Obj86B60__NotifyParents (code_2cc8c_c, 23/32, length exact, zero drift, round-46 hand-derived memory-barrier body, NOT the rejected permuter output-58-1). Both oracles green; check-nonmatching now 10 bodies in 4 units. Head corrected the block comment's HARD RULE 6 paraphrase at merge.",
           "round": 62,
+          "runners": 1
+        },
+        {
+          "attempts": 9,
+          "calibration": false,
+          "date": "2026-09-22",
+          "matches": 9,
+          "model": "sonnet",
+          "note": "charlie promoted all 9 assigned preserved bodies in code_8220_c to #ifdef NON_MATCHING; check-nonmatching green at 20 bodies across 5 units, up from 12, image byte-identical throughout. 8 of 9 already carried a live current-symbol #if 0 snapshot so no stale-symbol repair was needed; func_8001A268 had none and was inserted fresh from its report. One body (func_8001989C) contains a permuter-found lever, promoted as reviewed because round 48's own report did the track-1b human-style semantic check -- oracle-verified and explicitly distinguished from a same-search UB-exploiting candidate it rejected. Head verified that discriminator rather than taking the claim, and verified ROM order from build/lsdde.map.",
+          "round": 65,
           "runners": 1
         }
       ],
@@ -347,6 +367,16 @@
           "model": "sonnet",
           "note": "Naming pass on code_179d8_h: 11 functions named (tier A x5, tier B x6, no tier C), 2 globals, 6 unit-local fields. Head review sampled five names against evidence -- all stand, no tier-A name without evidence, so the naming runner stays sonnet. Alpha also falsified two of its own unit header's claims (a 'zero functions reference any of the 60 class tables' line that was false, and a stale gp_rel BLOCKED banner for a function matched in round 45) and proposed one cross-unit field name, applied by the head by TYPE SCOPE.",
           "round": 64,
+          "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-22",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Naming pass on DreamSys (alpha, sonnet): 74/116 -> 32/116 unnamed, 44 functions named, 6 unit-local fields, 14 stale gp-relative blocker banners retired, unit header comment written. NOT mark-unit'd: head review of five sampled names found one tier-A name without evidence (DreamSys__GetDreamTimerSeconds -- the body is dreamTimer/15 and nothing establishes a 15 Hz rate; TimerTick is a vtable slot with no caller in src/ fixing it, dreamTimeLimit is written only through its own setter) and one inflated tier (GetStageTimeLimit tier A resting on the inherited symbol STAGE_TIME_LIMITS, which track 3 makes a tier-B hypothesis). Both corrected by the head in place per the round-63 precedent, image byte-identical. 32 defs remain unnamed regardless, so the unit had not passed on the merits either. No cross-unit field names proposed: the runner tested each by the compiler and found a textual grep hit in class_3bb8c_t.c was an unrelated struct's coincidentally-numbered field.",
+          "round": 65,
           "runners": 1
         }
       ],
