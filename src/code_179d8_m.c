@@ -125,19 +125,136 @@ extern u8 D_8008EA1A;
 
 extern s16 D_8008E8C0;
 
-/* STALL -- see docs/match-reports/StepVoiceEnvelope.md. Round 48 (echo):
- * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
- * frame gap: -0x10 -> -0x18, byte-exact vs retail; retail addresses
- * NOTHING via $sp beyond the prologue/epilogue immediate itself and
- * saves zero callee-saved registers on either side, textbook pure
- * padding). FOURTH confirmed negative for length closure this round --
- * built length UNCHANGED (237/231, still 6 words LONG). Frame realignment
- * reproduced the same already-diagnosed "woff computed too early, before
- * the sign-extension chain" residue this report's own "Axes tried"
- * section already explored from three placements; no new residue
- * surfaced. Best body (237/231 built words, 6 words LONG) preserved there
- * in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 237/231 words, 6 words long. Residue: a redundant
+ * sign-extension around the incU/incS accumulator add -- confirmed still
+ * the real gap after round 48's frame-padding lever realigned the frame
+ * byte-exactly without closing the length, and after a permuter search
+ * (round 37) plateaued at 2105/4155 across 80,882 iterations with no
+ * candidate reaching zero (docs/match-reports/StepVoiceEnvelope.md).
+ * Hand-derived. */
+void StepVoiceEnvelope(s16 a0)
+{
+    s16 idxCopy;
+    s16 accum;
+    u8 flagByte;
+    u16 val1;
+    u16 val2;
+    s32 product1;
+    s32 q1;
+    s32 q1b;
+    u32 q1c;
+    u32 q2;
+    s32 tmp;
+    u8 tableval;
+    s16 limit;
+    s16 woff;
+
+    /* Halfword-indexed byte-offset for the D_8008D7F2/D_8008D7F0 stores
+     * near the end of this function: idx*8 computed here, kept `s16`
+     * (matching retail's dependency -- its early `sll #3` reads the
+     * sign-extended parameter and stays a plain register value, with no
+     * separate unsigned materialization at this point), before the
+     * 0x34-stride record accesses even start. Masked to `u16` only at
+     * the point of use (indexing an `s16 *`, which then scales by 2),
+     * reaching idx*16 -- the real per-channel byte stride for these two
+     * 0x10-stride, single-field arrays. Same base idiom as
+     * InitSpuDriver's D_8006DAD4 fix, but kept `s16` (not `u16`) until
+     * point of use -- see this report's "non-loop" analysis for why the
+     * loop-context version of the idiom does not transfer directly. */
+    idxCopy = a0;
+    woff = idxCopy << 3;
+
+    if (gVoiceEnvInterval[idxCopy].unk0 != 0) {
+        s16 orig = gVoiceEnvCountdown[idxCopy].unk0;
+
+        gVoiceEnvCountdown[idxCopy].unk0 = orig - 1;
+        if (orig > 0) {
+            return;
+        }
+        gVoiceEnvCountdown[idxCopy].unk0 = gVoiceEnvInterval[idxCopy].unk0;
+    }
+
+    {
+        u16 accumU = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
+        u16 incU = ((Rec34HalfU *) gVoiceEnvStep)[idxCopy].unk0;
+        s16 incS = gVoiceEnvStep[idxCopy].unk0;
+        s16 accumS;
+
+        accumU = accumU + incU;
+        gVoiceEnvAccum[idxCopy].unk0 = accumU;
+        accumS = gVoiceEnvAccum[idxCopy].unk0;
+
+        if (incS > 0) {
+            limit = gVoiceEnvLimit[idxCopy].unk0;
+            if (accumS >= limit) {
+                accumU = limit;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
+            }
+        } else if (incS < 0) {
+            limit = gVoiceEnvLimit[idxCopy].unk0;
+            if (limit >= accumS) {
+                accumU = limit;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
+            }
+        }
+    }
+
+    accum = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
+    D_8008EA10 = (u8) accum;
+    tableval = D_8008E970->masterVolume;
+
+    product1 = accum * (tableval * 0x3FFF);
+    q1 = product1 / 16129;
+    q1b = q1 * D_8008EA16;
+    q1c = q1b * D_8008EA19;
+    q2 = q1c / 16129u;
+
+    if (D_8008EA1A < 0x40) {
+        tmp = q2 * D_8008EA1A;
+        val2 = (u32) tmp >> 6;
+        val1 = q2;
+    } else {
+        tmp = q2 * (0x7F - D_8008EA1A);
+        val1 = (u32) tmp >> 6;
+        val2 = q2;
+    }
+
+    if (D_8008EA17 < 0x40) {
+        tmp = val2 * D_8008EA17;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - D_8008EA17);
+        val1 = tmp / 64;
+    }
+
+    if (D_8008EA11 < 0x40) {
+        tmp = val2 * D_8008EA11;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - D_8008EA11);
+        val1 = tmp / 64;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (val1 < val2) {
+            val1 = val2;
+        } else {
+            val2 = val1;
+        }
+    }
+
+    ((s16 *) D_8008D7F2)[(u16) woff] = val2;
+    flagByte = D_8008D970[idxCopy];
+    ((s16 *) D_8008D7F0)[(u16) woff] = val1;
+    flagByte |= 3;
+    D_8008D970[idxCopy] = flagByte;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
+#endif
 
 /* Same 0x34-stride channel-configuration record family documented in
  * code_179d8_j.c (Rec34D994/Rec34Byte/Rec34Half); this unit keeps its
@@ -173,16 +290,121 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
 }
 
 
-/* STALL -- see docs/match-reports/StepVoiceFade.md. Round 48 (echo):
- * tested charlie's frame-padding lever (u8 dead[8], sized to the current
- * build's frame gap: -0x10 -> -0x18, byte-exact vs retail). Frame realigns
- * exactly but built length is UNCHANGED (222/228, still 6 words short) --
- * same negative-for-length-closure result as UpdateVoiceEnvelopes. The
- * already-diagnosed missing early-persisted value ($t1 = idx<<3, held live
- * across the whole function) is still the real gap; frame padding does not
- * touch it. Best body (222/228 built words, 6 words short) preserved there
- * in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 222/228 words, 6 words short. Residue: a persisted early
+ * value ($t1 = idx<<3, held live across the whole function) this C does
+ * not reproduce -- confirmed still the real gap after round 48's
+ * frame-padding lever realigned the frame byte-exactly without closing
+ * the length, and after a permuter search (round 37) plateaued at
+ * 2430/4125 with no candidate reaching zero (docs/match-reports/
+ * StepVoiceFade.md). Hand-derived. */
+void StepVoiceFade(s16 a0)
+{
+    s16 idxCopy;
+    s16 step;
+    u16 increment;
+    s16 incrementS;
+    u16 accum;
+    s16 limit;
+    u8 accumByte;
+    u8 tableval;
+    s32 product1;
+    s32 q1;
+    s32 q1b;
+    u32 q1c;
+    u32 q2;
+    u16 val1;
+    u16 val2;
+    s32 tmp;
+    u8 v0;
+
+    idxCopy = a0;
+    step = gVoiceFadeInterval[a0].unk0;
+    if (step != 0) {
+        u16 current = ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0;
+
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = current - 1;
+        if ((s16) current > 0) {
+            return;
+        }
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = gVoiceFadeInterval[a0].unk0;
+    }
+
+    increment = ((Rec34HalfU *) gVoiceFadeStep)[a0].unk0;
+    accum = ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0;
+    incrementS = gVoiceFadeStep[a0].unk0;
+    accum = accum + increment;
+    ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+
+    if (incrementS > 0) {
+        limit = gVoiceFadeLimit[a0].unk0;
+        if ((s16) accum >= limit) {
+            accum = limit;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
+        }
+    } else if (incrementS < 0) {
+        limit = gVoiceFadeLimit[a0].unk0;
+        if (limit >= (s16) accum) {
+            accum = limit;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
+        }
+    }
+
+    accumByte = *(u8 *) &gVoiceFadeAccum[a0].unk0;
+    D_8008EA11 = accumByte;
+    tableval = D_8008E970->masterVolume;
+
+    product1 = D_8008EA10 * (tableval * 0x3FFF);
+    q1 = product1 / 16129;
+    q1b = q1 * D_8008EA16;
+    q1c = q1b * D_8008EA19;
+    q2 = q1c / 16129u;
+
+    if (D_8008EA1A < 0x40) {
+        tmp = q2 * D_8008EA1A;
+        val2 = (u32) tmp >> 6;
+        val1 = q2;
+    } else {
+        tmp = q2 * (0x7F - D_8008EA1A);
+        val1 = (u32) tmp >> 6;
+        val2 = q2;
+    }
+
+    if (D_8008EA17 < 0x40) {
+        tmp = val2 * D_8008EA17;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - D_8008EA17);
+        val1 = tmp / 64;
+    }
+
+    if (accumByte < 0x40) {
+        tmp = val2 * accumByte;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - accumByte);
+        val1 = tmp / 64;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (val1 < val2) {
+            val1 = val2;
+        } else {
+            val2 = val1;
+        }
+    }
+
+    D_8008D7F2[idxCopy].unk0 = val2;
+    v0 = D_8008D970[idxCopy];
+    D_8008D7F0[idxCopy].unk0 = val1;
+    v0 |= 3;
+    D_8008D970[idxCopy] = v0;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceFade);
+#endif
 
 extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
@@ -524,9 +746,70 @@ extern u8 D_8008EA18;
 
 extern s16 func_8002E038(u16 a0, u16 a1);
 
-/* STALL -- see docs/match-reports/ApplyVoicePitchBend.md. Best body reached
- * (77/138 words, byte-exact length) preserved there in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 77/138 words, length exact. Residue: register-class
+ * renumbering plus one deferred `& 0xFFFF` mask on the second
+ * func_8002E038 argument -- a banned-to-fix register-identity case, per
+ * a permuter search that plateaued at 485/770 with no candidate reaching
+ * zero (docs/match-reports/ApplyVoicePitchBend.md). Hand-derived. */
+s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
+{
+    s16 threshold;
+    u16 someTotal;
+    u16 baseValue;
+    s32 outA2;
+    s32 outA1;
+    s32 product;
+    s32 q;
+    s32 r;
+    u8 tableByte;
+    u8 byteVal;
+
+    threshold = a4 - 0x40;
+    if (D_8008D996[a0].unk0 != a1) {
+        return 0;
+    }
+    if (D_8008D99E[a0].unk0 != a2) {
+        return 0;
+    }
+    if (D_8008D99A[a0].unk0 != a3) {
+        return 0;
+    }
+
+    someTotal = D_8008D99C[a0].unk0 + (D_8008EA13 << 4);
+    baseValue = ((Rec34U16 *) D_8008D994)[a0].unk0;
+
+    if (threshold > 0) {
+        tableByte = D_8008E978[someTotal].bendCurveDown;
+        product = threshold * tableByte;
+        q = product / 63;
+        outA2 = baseValue + q;
+        r = product % 63;
+        outA1 = r * 2;
+    } else {
+        outA2 = baseValue;
+        if (threshold < 0) {
+            tableByte = D_8008E978[someTotal].bendCurveUp;
+            product = threshold * tableByte;
+            q = product / 64;
+            outA2 = baseValue + q - 1;
+            r = product % 64;
+            outA1 = r * 2 + 0x7F;
+        } else {
+            outA1 = 0;
+        }
+    }
+
+    byteVal = *(u8 *) &D_8008D99C[a0].unk0;
+    D_8008EA26 = a0;
+    D_8008EA18 = byteVal;
+    D_8008D7F4[a0].unk0 = func_8002E038(outA2 & 0xFFFF, outA1 & 0xFFFF);
+    D_8008D970[a0] |= 4;
+    return 1;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", ApplyVoicePitchBend);
+#endif
 
 /* "Currently selected channel" scratch global -- same idiom as
  * D_8008EA26 above, write-only here (see code_179d8_j.c's own reading
@@ -549,30 +832,348 @@ s32 ApplyPitchBendToAllVoices(s16 a0, s16 a1, s16 a2, u16 a3) {
     return sum;
 }
 
-/* STALL -- see docs/match-reports/UpdateVoiceEnvelopes.md. Round 48 (echo):
- * tested charlie's func_800351D0 frame-padding lever (u8 dead[8], sized to
- * the CURRENT BUILD's frame gap: -0x30 -> -0x38, byte-exact vs retail) plus
- * an "s32 count" fix (avoid a spurious `andi 0xff` mask GCC inserted for a
- * u8 local). Result: raw word-match improved 49/241 -> 93/241, but total
- * length moved to 236/241 (5 words short, was 4) -- the frame padding
- * recovers BYTE-OFFSET alignment exactly but adds no instructions (an
- * addiu immediate costs the same one word regardless of value), so it
- * does not by itself close a missing-CONTENT gap the way it did for
- * func_800351D0 (which also gained words from tail duplication). Best
- * body (236/241 built words, 5 words short) preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", UpdateVoiceEnvelopes);
+#ifdef NON_MATCHING
+/* NON_MATCHING: 236/241 words, 5 words short. Residue: retail's
+ * unconditional `move a2,v0`/`li t0,1`/`move a3,a0` do-while-style setup
+ * before the count>0 loop, which this C's `for` does not reproduce (a
+ * literal do-while conversion was tried and regressed hard, 236/241,
+ * 93/241 raw match -> 233/241, 16/241 -- reverted), plus cosmetic
+ * s0/s1 register-color swaps in phases 2-6. Round 48's frame-padding
+ * lever and an `s32 count` fix (drop a spurious andi mask) already
+ * applied; a permuter search (round 37) plateaued at 1578/2276 with no
+ * candidate reaching zero (docs/match-reports/UpdateVoiceEnvelopes.md).
+ * Hand-derived. */
 
-/* STALL -- see docs/match-reports/StartNote.md. Round 48 (echo):
- * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
- * frame gap: 0x140 -> 0x148, byte-exact vs retail). THIRD confirmed
- * negative for length closure this round (same as UpdateVoiceEnvelopes and
- * StepVoiceFade above) -- built length UNCHANGED (402/387, still 15
- * words LONG). This function's own report already diagnoses its gap as
- * two unrelated residues (an early-materialization scheduling point, and
- * a mid-loop addressing-cost difference for D_8008EA26 and neighbors) --
- * frame padding does not touch either. Best body (402/387 built words,
- * 15 words LONG) preserved there in #if 0. */
+/* Ring buffer of "channel activity" bitmasks, one slot appended per
+ * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
+extern s32 gVoiceActivityRingIdx;
+extern s32 gVoiceActivityRing[];
+
+/* 0x34-stride record family, UNSIGNED 16-bit view -- this function
+ * writes it via `lhu`-driven re-reads (store, then re-check the SAME
+ * field unsigned) rather than the `Rec34Half` signed view. D_8008D98E
+ * already declared elsewhere in the unit as `Rec34Half`; reinterpreted
+ * here via cast, not redeclared. */
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34HalfU2;
+
+extern void SpuSetNoiseVoice(s32 a0, s32 a1);
+extern void StepVoiceEnvelope(s16 a0);
+extern void StepVoiceFade(s16 a0);
+extern Rec16D7F4 D_8008D7F6[];
+
+/* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
+ * field (declared above, `unk0` only) -- this function ALSO reads this
+ * array's `+0x2`, `+0x8` and `+0xA` sub-fields, so it needs a wider
+ * local view of the same base symbol, reached via a cast per this
+ * project's multiple-independent-local-views convention. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    s16 unk2; /* +0x2 */
+    u8 pad4[0x8 - 0x4];
+    s16 unk8; /* +0x8 */
+    s16 unkA; /* +0xA */
+    u8 padC[0x10 - 0xC];
+} Rec16D7F0Wide;
+
+/* D_8006DAD4, already declared above as `ObjDAD4 *` (one struct, fields
+ * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
+ * per-channel records here -- another independent local view of the
+ * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
+ * reading of a sibling symbol). */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    s16 unk2; /* +0x2 */
+    s16 unk4; /* +0x4 */
+    s16 unk6; /* +0x6 */
+    s16 unk8; /* +0x8 */
+    s16 unkA; /* +0xA */
+    u16 unkC; /* +0xC */
+    u8 padE[0x10 - 0xE];
+} Rec16DAD4C;
+
+void UpdateVoiceEnvelopes(void) {
+    s32 i = 0;
+    s32 ringIdx;
+    s32 *slot;
+    s32 count;
+    u8 dead[8];
+
+    if (0) {
+        dead[0] = 0;
+    }
+
+    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
+    gVoiceActivityRingIdx = ringIdx;
+    slot = &gVoiceActivityRing[ringIdx];
+    count = D_8008E9D0;
+    *slot = 0;
+
+    if (count > 0) {
+        Rec34HalfU2 *p98E = (Rec34HalfU2 *) D_8008D98E;
+        Rec16DAD4C *pDad = (Rec16DAD4C *) D_8006DAD4;
+
+        for (i = 0; i < count; i++) {
+            p98E->unk0 = pDad->unkC;
+            if (p98E->unk0 == 0) {
+                *slot |= 1 << i;
+            }
+            p98E++;
+            pDad++;
+        }
+    }
+
+    if (gDisableVoiceStarveScan == 0) {
+        s32 mask;
+        s32 j;
+
+        mask = -1;
+        for (j = 0; j < 0xF; j++) {
+            mask &= gVoiceActivityRing[j];
+        }
+
+        for (i = 0; i < D_8008E9D0; i++) {
+            s32 bit = 1 << i;
+
+            if (mask & bit) {
+                if (D_8008D9A3[i].unk0 == 2) {
+                    SpuSetNoiseVoice(0, 0xFFFFFF);
+                }
+                D_8008D9A3[i].unk0 = 0;
+            }
+        }
+    }
+
+    D_8008E228 &= ~D_80090C60;
+    D_8008E22C &= ~D_80090C64;
+
+    for (i = 0; i < 0x18; i++) {
+        if (gVoiceEnvActive[i].unk0 != 0) {
+            StepVoiceEnvelope(i);
+        }
+        if (gVoiceFadeActive[i].unk0 != 0) {
+            StepVoiceFade(i);
+        }
+    }
+
+    {
+    Rec16D7F0Wide *p7F0 = D_8008D7F0;
+
+    for (i = 0; i < 0x18; i++) {
+        if (D_8008D970[i] & 1) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
+        }
+        if (D_8008D970[i] & 4) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
+        }
+        if (D_8008D970[i] & 8) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
+        }
+        if (D_8008D970[i] & 0x10) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
+            ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
+        }
+
+        D_8008D970[i] = 0;
+        p7F0++;
+    }
+    }
+
+    {
+        ObjDAD4 *rec = D_8006DAD4;
+        u16 lowMask = D_80090C60;
+        u16 highMask = D_80090C64;
+        u16 lowActive = D_8008E228;
+        u16 highActive = D_8008E22C;
+        s16 v230 = D_8008E230;
+        s16 v234 = D_8008E234;
+
+        D_80090C60 = 0;
+        D_80090C64 = 0;
+        D_8008E228 = 0;
+        D_8008E22C = 0;
+
+        *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
+        *(u16 *) ((u8 *) rec + 0x18E) = highMask;
+        *(u16 *) ((u8 *) rec + 0x188) = lowActive;
+        *(u16 *) ((u8 *) rec + 0x18A) = highActive;
+        *(s16 *) ((u8 *) rec + 0x198) = v230;
+        *(s16 *) ((u8 *) rec + 0x19A) = v234;
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", UpdateVoiceEnvelopes);
+#endif
+
+#ifdef NON_MATCHING
+/* NON_MATCHING: 402/387 words, 15 words long. Residue: two independent
+ * pieces -- an early-materialization scheduling point (~2-3 words) and a
+ * mid-loop addressing-cost difference for D_8008EA26 and neighbors
+ * (~10-12 words); round 48's frame-padding lever realigned the frame
+ * byte-exactly without closing either. A permuter search (round 37)
+ * plateaued at 12471/15053 across 51,596 iterations with no candidate
+ * reaching zero (docs/match-reports/StartNote.md). Hand-derived; two
+ * stale-symbol fixes applied per tools/stalesyms.py (round 37): the
+ * renamed-to-SpuVmVSetUp call (was func_80032148) and D_8008EA0D, which
+ * has no linker symbol of its own and is read through the already-linked
+ * D_8008EA24 base pointer instead. */
+typedef struct {
+    u8 unk0; /* +0x0 */
+    u8 unk1; /* +0x1 */
+    u8 pad2[0x4 - 0x2];
+    u8 unk4; /* +0x4 */
+    u8 pad5[0x10 - 0x5];
+} SlotE968M;
+extern SlotE968M *D_8008E968;
+
+typedef struct {
+    u8 pad0[0x12];
+    u8 unk12; /* +0x12 */
+    u8 pad13[0xAC - 0x13];
+} Entry90902E8M;
+extern Entry90902E8M *D_800902E8[];
+
+extern u8 D_8008EA0C;
+extern u8 D_8008EA0E;
+extern u8 D_8008EA0F;
+extern u8 D_8008EA1C;
+extern u8 D_8008EA1D;
+extern u8 D_8008EA1E;
+extern u8 D_8008EA1F;
+extern u8 D_8008EA20;
+extern u16 D_8008EA24;
+
+extern Rec34Half D_8008D9A0[];
+
+extern void func_8002D6A4(void);
+extern void func_8002D8E0(s32 a0);
+extern s32 func_8002DF7C(void);
+extern void func_8002D1B4(s32 a0, u16 a1);
+extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
+
+s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
+{
+    Entry90902E8M *s6;
+    SlotE968M *slot;
+    s32 s3;
+    s32 chan;
+    u8 matchCount;
+    u8 chanScan;
+    s16 origA2;
+    s32 shifted;
+    s16 a0s16;
+    u8 byte0;
+    u8 byte1;
+    u8 idBuf[0x80];
+    u8 chanBuf[0x80];
+
+    origA2 = a2;
+    byte0 = (u8) a0;
+    shifted = a0 << 16;
+    a0s16 = (s16) (shifted >> 16);
+    byte1 = (u32) shifted >> 24;
+    s6 = &D_800902E8[byte0][byte1];
+
+    if (SpuVmVSetUp(a1, a2) != 0) {
+        return -1;
+    }
+
+    slot = &D_8008E968[a2];
+    D_8008EA22 = (s16) a0;
+    D_8008EA0E = (u8) a3;
+    D_8008EA0F = 0;
+    D_8008EA10 = (u8) a4;
+    D_8008EA11 = (u8) a5;
+    D_8008EA16 = slot->unk1;
+    D_8008EA17 = slot->unk4;
+    D_8008EA0C = slot->unk0;
+
+    if ((u32) D_8008EA13 >= D_8008E970->difficultyThreshold) {
+        return -1;
+    }
+
+    s3 = 0;
+    if (a4 != 0) {
+        matchCount = 0;
+        for (chanScan = 0; chanScan < D_8008EA0C; chanScan++) {
+            Tbl32E978 *entry = &D_8008E978[D_8008EA13 * 16 + chanScan];
+
+            if (D_8008EA0E < entry->bendCurveUp) {
+                continue;
+            }
+            if (entry->bendCurveDown < D_8008EA0E) {
+                continue;
+            }
+            idBuf[matchCount] = entry->unk16;
+            chanBuf[matchCount] = chanScan;
+            matchCount++;
+        }
+
+        if (matchCount != 0) {
+            s32 s2;
+            u8 s1;
+
+            s2 = a4 * 127;
+            for (s1 = 0; s1 < matchCount; s1++) {
+                Tbl32E978 *entry2;
+
+                D_8008EA24 = idBuf[s1];
+                D_8008EA18 = chanBuf[s1];
+
+                entry2 = &D_8008E978[D_8008EA13 * 16 + D_8008EA18];
+                D_8008EA1B = entry2->unk0;
+                D_8008EA19 = entry2->unk2;
+                D_8008EA1A = entry2->unk3;
+                D_8008EA1C = entry2->unk4;
+                D_8008EA1D = entry2->unk5;
+                D_8008EA20 = entry2->unk1;
+                D_8008EA1E = entry2->unk6;
+                D_8008EA1F = entry2->unk7;
+
+                chan = func_8002CF18(0) & 0xFF;
+                D_8008EA26 = chan;
+                if (chan < D_8008E9D0) {
+                    D_8008D9A3[chan].unk0 = 1;
+                    D_8008D98A[D_8008EA26].unk0 = 0;
+                    D_8008D996[D_8008EA26].unk0 = (s16) a0;
+                    D_8008D99E[D_8008EA26].unk0 = *((u8 *) &D_8008EA24 - 0x17);
+                    D_8008D998[D_8008EA26].unk0 = D_8008EA13;
+                    D_8008D99A[D_8008EA26].unk0 = origA2;
+
+                    if ((s16) a0 != 0x21) {
+                        s16 speed = *(s16 *) ((u8 *) s6 + 0x4E + s6->unk12 * 2);
+
+                        D_8008D990[D_8008EA26].unk0 = s2 / speed;
+                    }
+
+                    D_8008D992[D_8008EA26].unk0 = (u8) a5;
+                    D_8008D99C[D_8008EA26].unk0 = D_8008EA18;
+                    D_8008D994[D_8008EA26].unk0 = a3;
+                    D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
+                    D_8008D988[D_8008EA26].unk0 = D_8008EA24;
+
+                    func_8002D6A4();
+                    if (D_8008EA24 == 0xFF) {
+                        func_8002D8E0(*(u8 *) &D_8008EA26);
+                    } else {
+                        func_8002D1B4(matchCount, func_8002DF7C());
+                    }
+                    s3 = (s3 << 4) | D_8008EA26;
+                }
+            }
+        }
+    } else {
+        StopNote(a0s16, a1, a2, a3);
+    }
+
+    return s3;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StartNote);
+#endif
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
  * 16 channels in the first word, next 16 in the second), each paired

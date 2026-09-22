@@ -603,3 +603,16 @@ final block as StepVoiceEnvelope, confirmed near-identical between the
 two reports). "Fade" rather than a more specific name for the same reason
 as BeginVoiceFade: what value is actually being interpolated in-game is
 not established from this function's body alone.
+
+## NON_MATCHING body promoted, round 67
+
+Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+kept in `#else`. All of the preserved body's own local `Rec34HalfU`/
+`Rec16D7F0`/plain-byte-global declarations were already present in the
+unit's shared prelude (moved up for `StepVoiceEnvelope`, first in ROM
+order) and were dropped here rather than re-typedef'd. One real field-name
+update: the body's own local `ObjE970` (`unk18`) collided with the shared
+`ObjE970` the prelude already declares with the same offset under the name
+`masterVolume`; the access was changed to `D_8008E970->masterVolume`, same
+offset, no behavior change. `./build-and-verify.sh` green (zero bytes
+changed) and `tools/check-nonmatching.sh code_179d8_m` green.

@@ -818,3 +818,21 @@ here -- proposing for the head to apply once no runner is live on
 
 Posted to the broadcast this round; see also InitSpuDriver.md's own
 `## Proposed field names`.
+
+## NON_MATCHING body promoted, round 67
+
+Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+kept in `#else`. Used the CURRENT best preserved body (round 48 echo,
+236/241 words, 5 short) rather than the older superseded 237/241 one kept
+at the end of this report for reference. All of its supporting
+declarations (the `gVoiceActivityRing*` pair, `Rec34HalfU2`,
+`Rec16D7F0Wide`, `Rec16DAD4C`, `SpuSetNoiseVoice`, the `StepVoiceEnvelope`/
+`StepVoiceFade` externs, `D_8008D7F6`) are new to the unit and were kept
+local to this function's `#ifdef` block, per CLAUDE.md's rule against
+adding to a shared header; everything else it touches (`D_8008D9A3`,
+`D_8006DAD4`, `D_8008D970`, `D_80090C60`/`64`, `D_8008E228`/`22C`,
+`D_8008E230`/`234`, `D_8008D7F0`, `D_8008D7F4`, `D_8008E9D0`,
+`gDisableVoiceStarveScan`, `gVoiceEnvActive`, `gVoiceFadeActive`) was
+already declared earlier in the unit and needed no change.
+`./build-and-verify.sh` green (zero bytes changed) and
+`tools/check-nonmatching.sh code_179d8_m` green.
