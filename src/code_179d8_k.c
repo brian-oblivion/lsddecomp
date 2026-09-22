@@ -159,11 +159,11 @@ extern s32 func_80035E80(s16 channel, s16 slot);
  * characterised since it has not been matched. */
 extern void func_8003424C(s16 channel, s16 slot);
 
-/* STALL -- see docs/match-reports/func_80034138.md. length exact 69/69,
- * 66/69 raw word-match, first real diff at word 22: two pure scheduling
- * residues (a load-pair order swap and one delay-slot filler choice),
- * not a logic or CFG difference. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 66/69 words, length exact. Residue: two pure scheduling
+ * residues in the prologue (a load-pair order swap and one delay-slot
+ * filler choice), not a logic or CFG difference
+ * (docs/match-reports/func_80034138.md). Hand-derived. */
 void func_80034138(s16 a0, s16 a1, s16 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -212,8 +212,9 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
         }
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
+#endif
 
 /* Forward declarations for sibling functions defined later in THIS unit,
  * needed because func_8003424C dispatches to them by MIDI-style status
