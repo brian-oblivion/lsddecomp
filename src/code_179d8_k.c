@@ -328,14 +328,15 @@ void func_8003424C(s16 a0, s16 a1)
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
 
-/* STALL -- see docs/match-reports/func_800344FC.md. length exact 70/70,
- * 62/70 raw word-match (round 47, runner echo -- up from 61/70 via a
- * permuter-found `do { return; } while (0)` rewrite of the early return),
- * first real diff at word 1: a register-identity rename ($t0<->$a2 for
- * the a0 copy kept live across the two calls, $a3/$s1<->$t0 for the
- * masked-a3 copy), not a logic or CFG difference -- CLAUDE.md's
- * register-identity STALL rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 62/70 words, length exact. Residue: register-identity
+ * rename ($t0<->$a2 for the a0 copy kept live across the two calls,
+ * $a3/$s1<->$t0 for the masked-a3 copy), not a logic or CFG difference
+ * (docs/match-reports/func_800344FC.md). Permuter candidate, semantics
+ * reviewed round 66: the winning mutation is a bare `return;` rewritten
+ * as `do { return; } while (0);`, which executes its single iteration
+ * unconditionally and returns on it either way -- behaviorally identical
+ * to the statement it replaces, no UB, no dead branch. */
 void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -363,8 +364,9 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
         StopNote(packed, note, vol, (u8)a3);
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800344FC);
+#endif
 
 void func_80034614(s16 a0, s16 a1, u8 a2)
 {
