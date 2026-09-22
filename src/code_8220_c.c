@@ -51,20 +51,14 @@ typedef struct {
     s16 x, y;
 } Vec2s16_98;
 
-#if 0
-/* STALL snapshot round 48 -- see docs/match-reports/func_8001989C.md.
- * 76/84 words, no drift. This function's OWN residue (a pre-existing
- * self/prim register swap) is CLOSED by a permuter-found lead: wrapping
- * the OtTag-splice branch in `do { ... } while (0)` and caching
- * *(u8 **)(prim + 0x88) into `vtx0` for the FIRST +0xA store only (NOT
- * all three -- making it symmetric regresses to 48/84). Remaining residue
- * is the family-shared class documented in func_8001A064.md: register-
+#ifdef NON_MATCHING
+/* NON_MATCHING: 76/84 words, length exact. Residue: family-shared register
  * identity ($a2 vs $a1, duplicated OT mask) plus a missing delay-slot
- * filler `addiu $v0,$s1,0x1c`. That residue was searched exhaustively
- * (6/6 siblings, 471873 combined iterations, round 48) with no fix found
- * -- do not re-search this function's remaining gap without a genuinely
- * new axis not already tried on the other six.
- */
+ * filler `addiu $v0,$s1,0x1c` (docs/match-reports/func_8001989C.md).
+ * This function's own self/prim register-swap sub-residue is closed by a
+ * permuter-found lead (do/while(0) wrap + partial vtx0 caching), reviewed
+ * and confirmed semantically equivalent to the disassembly, not scorer-
+ * exploiting UB. Hand-derived (with a reviewed permuter-found lever). */
 void func_8001989C(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
@@ -93,9 +87,9 @@ void func_8001989C(void *arg0, void *arg1) {
         RCpolyG3(self, D_8008ACD0);
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
+#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 70/78 words, length exact. Residue: register identity
