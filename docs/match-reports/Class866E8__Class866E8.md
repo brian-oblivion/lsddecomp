@@ -23,7 +23,7 @@ extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
 extern GenericObject *func_8004D38C(void);
 extern s32 func_80020C5C(void);
-extern Vec3_3ac78 D_8008682C;
+extern Vec3_3ac78 gDefaultOrigin;
 
 void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 {
@@ -41,7 +41,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     if (arg1 != NULL) {
         self->unk54 = *arg1;
     } else {
-        self->unk54 = D_8008682C;
+        self->unk54 = gDefaultOrigin;
     }
 
     self->unk1B0 = 0;
@@ -150,7 +150,7 @@ here since this function only DISPATCHES to it, never inlines its body).
    instructions are three loads THEN three stores (batched) -- the same
    "whole-struct `=` compiles to a batched block move" idiom as
    `HistoryBlock_3ac78` (documented elsewhere in this header). Writing
-   `self->unk54 = *arg1;` / `self->unk54 = D_8008682C;` instead of
+   `self->unk54 = *arg1;` / `self->unk54 = gDefaultOrigin;` instead of
    field-by-field fixed a register-swap-and-shift residue immediately
    (23/163 -> 70/163 in one change).
 2. **`new_class_6d940` takes an argument, not zero.** Retail sets

@@ -2514,7 +2514,7 @@ struct Obj87034_3bb8c_l {
 
 /* Global BasicClass-family accessor shared across many classes (see
  * include/class_39e08.h's own fuller `Class86668Methods` view of the SAME
- * table, D_80086668) -- declared here as this unit's own minimal,
+ * table, gClass86668Methods) -- declared here as this unit's own minimal,
  * independent local view rather than including that header, per this
  * project's multiple-independent-local-views convention. Only the one
  * slot func_80052DE8 dispatches through is named. */

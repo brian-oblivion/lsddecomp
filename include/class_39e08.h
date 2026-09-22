@@ -57,7 +57,7 @@ typedef struct Class865C8Methods {
     void *unk20, *unk24, *unk28, *unk2C;           /* BasicClass, inherited */
     void *unk30, *unk34;                           /* BasicClass, inherited */
     /* Occupied here by func_80049958 itself; only reachable from THIS
-     * struct via GetClass86668Methods()'s own D_80086668 view of the same offset
+     * struct via GetClass86668Methods()'s own gClass86668Methods view of the same offset
      * (Class86668Methods::slot38 below), where it forwards to the inherited
      * Obj86B60__OnNotify. */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_80049958 */
@@ -70,11 +70,11 @@ typedef struct Class865C8Methods {
     void *slot54;                                  /* +0x054 func_80049CA8 */
     void (*noop58)(void);                          /* +0x058 func_8004A35C (no-op, matched) */
     void *slot5C;                                  /* +0x05C func_8004A364 */
-    /* Shared with D_80086668 (see Class86668Methods below) -- literally the
+    /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */
     void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 func_8004A3EC */
     void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset / Obj86B60__NotifyChildReset) */
-    /* Also shared with D_80086668 at the same offset. */
+    /* Also shared with gClass86668Methods at the same offset. */
     void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C func_8004A458 */
     void *unk70;                                   /* Class86668__SetChildFlag8 */
     void *unk74, *unk78;                           /* null slots */
@@ -289,7 +289,7 @@ struct Obj865C8 {
     Obj4C *unk4C;                 /* +0x04C, func_80049E20 -- result of func_80052B70 */
 };
 
-/* Base class table shared by D_800865C8 and D_80086668 (resolved with
+/* Base class table shared by D_800865C8 and gClass86668Methods (resolved with
  * tools/classtable.py 0x800865C8 --vs 0x8006E878). Only the slots this
  * unit's functions dispatch through when explicitly calling the BASE
  * implementation are typed. */
@@ -301,7 +301,7 @@ typedef struct IntermediateBaseMethods {
     /* Same accessor/slot combination code_2c054.h calls
      * `TaskUtilMethods::slot44` on -- there it forwards to
      * `self->unk38 = <base result>` (func_8003C1DC). Here the caller
-     * (func_8004A2C4, D_80086668's own +0x044 override) zeroes
+     * (func_8004A2C4, gClass86668Methods's own +0x044 override) zeroes
      * `self->unk28` immediately before the call and reads it back
      * immediately after: same "default, then base may overwrite" shape. */
     void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
@@ -325,7 +325,7 @@ extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);
  * scalar args are untyped beyond their register width. */
 extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
-/* A sibling class (D_80086668, 28 slots) that overrides several of
+/* A sibling class (gClass86668Methods, 28 slots) that overrides several of
  * D_800865C8's slots (+0x008, +0x00C, +0x040, +0x044, +0x048) while sharing
  * the rest verbatim (+0x058..+0x070, confirmed identical function
  * addresses in both tables by tools/classtable.py). Constructed by
@@ -352,7 +352,7 @@ typedef struct Class86668Methods {
     void (*dtor)(Obj865C8 *self);                          /* +0x00C func_8004A228 */
     u8 pad10[0x38 - 0x10];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
-     * offset (func_80049958, this unit): D_80086668's own +0x038 is
+     * offset (func_80049958, this unit): gClass86668Methods's own +0x038 is
      * Obj86B60__OnNotify (a base/inherited slot, out of this unit's scope).
      * Called by func_80049958 as GetClass86668Methods()->slot38(self, arg1, arg2). */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
@@ -367,14 +367,14 @@ typedef struct Class86668Methods {
     void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
     u8 pad4C[0x54 - 0x4C];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
-     * offset (func_80049CA8, this unit): D_80086668's own +0x054 is
+     * offset (func_80049CA8, this unit): gClass86668Methods's own +0x054 is
      * Obj86B60__OnTag1Notify (a base/inherited slot, out of this unit's scope).
      * Called by func_80049CA8 as GetClass86668Methods()->slot54(self, arg1,
      * arg2), return discarded. */
     void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 Obj86B60__OnTag1Notify */
 } Class86668Methods;
 
-/* A plain accessor with no parameters, returning &D_80086668. Defined in the
+/* A plain accessor with no parameters, returning &gClass86668Methods. Defined in the
  * class_3ac78 unit, not this one -- matched there as C in round 2026-09-02,
  * so it is no longer INCLUDE_ASM. Declared here only because this unit
  * dispatches through it; class_3ac78.h holds its owning view. */
@@ -394,8 +394,8 @@ extern void *func_80017B34(s32 size);
  * the result straight into `Obj865C8::subB` (`SubObjB *`). */
 extern SubObjB *New_VabStreamObj(s32 arg1);
 
-/* Rodata symbols right next to this unit's own D_80086668/D_800865C8
- * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before D_80086668
+/* Rodata symbols right next to this unit's own gClass86668Methods/D_800865C8
+ * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before gClass86668Methods
  * respectively). Only their ADDRESSES are taken, as the 2nd/3rd args to
  * SubObjAMethods::slot70 (func_80049B54); real element type/size unknown. */
 extern u8 D_80086650[];

@@ -131,7 +131,7 @@ struct UnkPtr68Obj_3ac78 {
  * self->unk54's pointee (Class866E8__Class866E8, the ctor) -- a 3-word block copied
  * via a WHOLE-STRUCT assignment (`self->unk54 = *arg1;`, retail: 3 loads
  * then 3 stores, batched) from either the ctor's own `arg1` when non-NULL,
- * or the default global `D_8008682C` otherwise. Same "whole-struct
+ * or the default global `gDefaultOrigin` otherwise. Same "whole-struct
  * assignment compiles to a batched load/store block" idiom as
  * `HistoryBlock_3ac78` above.
  */
@@ -178,7 +178,7 @@ struct Class866E8Methods {
     /* +0x0BC */ u8 pad0BC[0x0D0 - 0x0BC];
     /* +0x0D0 */ void (*slotD0)(Class866E8 *self, void *list, s32 count);        /* Class866E8__ForwardAcceptedCommand; called by Class866E8__OnCommand */
     /* +0x0D4 */ u8 pad0D4[0x0DC - 0x0D4];
-    /* +0x0DC */ void (*slotDC)(Class866E8 *self, s32 arg1);                    /* Class866E8__Reset; called with self and the loaded value of D_8008A980 (a lone .word, 0x0000A000, no other reference in the image) */
+    /* +0x0DC */ void (*slotDC)(Class866E8 *self, s32 arg1);                    /* Class866E8__Reset; called with self and the loaded value of gDefaultGridSpan (a lone .word, 0x0000A000, no other reference in the image) */
     /* +0x0E0 */ u8 pad0E0[0x0F4 - 0x0E0];
     /* +0x0F4 */ void (*slotF4)(Class866E8 *self);                              /* func_8004B5BC; called by Class866E8__UpdateIfEnabled */
     /* +0x0F8 */ u8 pad0F8[0x100 - 0x0F8];
@@ -212,7 +212,7 @@ struct Class866E8 {
     /* +0x036 */ u16 flags36;                /* bit 0x80 tested by NotifyGridCell */
     /* +0x038 */ Class866E8 *unk38;          /* Class866E8__DispatchToRectCells: singly-linked chain of OTHER Class866E8 instances sharing one grid cell, walked while non-NULL -- same "chained instances in one slot" idiom as the sibling unit's EntryChildObj::unk38 (include/class_3bb8c.h) */
     /* +0x03C */ u8 pad03C[0x054 - 0x03C];
-    /* +0x054 */ Vec3_3ac78 unk54;           /* Class866E8__Class866E8 (ctor): copied field-by-field from its own arg1 (when non-NULL) or the default global D_8008682C */
+    /* +0x054 */ Vec3_3ac78 unk54;           /* Class866E8__Class866E8 (ctor): copied field-by-field from its own arg1 (when non-NULL) or the default global gDefaultOrigin */
     /* +0x060 */ s32 unk60;                  /* Class866E8__SetCallback arg1 */
     /* +0x064 */ s32 unk64;                  /* Class866E8__SetCallback arg2 */
     /* +0x068 */ UnkPtr68Obj_3ac78 *unk68;   /* Class866E8__SetConfig arg1, stored raw; Class866E8__ApplyToSenderFootprint dereferences ->unk4 */
@@ -257,8 +257,8 @@ extern Class866E8Methods *func_8004D244(void);
 extern void *func_80017B34(s32 size);
 
 /*
- * Class86668 -- vtable D_80086668 (28 slots, header 0x230), resolved with
- * tools/classtable.py D_80086668. Its own last slot (+0x070) is
+ * Class86668 -- vtable gClass86668Methods (28 slots, header 0x230), resolved with
+ * tools/classtable.py gClass86668Methods. Its own last slot (+0x070) is
  * Class86668__SetChildFlag8, which is the only reason this class is visible from this
  * unit at all: Class86668__SetChildFlag8 dispatches through a Class866E8 instance held
  * at Class86668::unk34. Everything else about Class86668 is unknown.
@@ -274,7 +274,7 @@ struct Class86668 {
     /* +0x034 */ Class866E8 *unk34;          /* Class86668__SetChildFlag8 dispatches through this, guarded by a NULL check */
 };
 
-extern Class86668Methods D_80086668;
+extern Class86668Methods gClass86668Methods;
 
 /*
  * Opaque descriptor buffer passed as Class866E8__SetFootprintFromCell's arg1, Class866E8__ApplyToSenderFootprint's

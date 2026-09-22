@@ -1276,3 +1276,6 @@ Class866E8__GetCurrentCellKey = 0x8004B31C; // type:func
 Class866E8__SetGridSpan = 0x8004B32C; // type:func
 Class866E8__SetConfig = 0x8004B344; // type:func
 Class86668__SetChildFlag8 = 0x8004A478; // type:func
+gClass86668Methods = 0x80086668;
+gDefaultOrigin = 0x8008682C;
+gDefaultGridSpan = 0x8008A980;

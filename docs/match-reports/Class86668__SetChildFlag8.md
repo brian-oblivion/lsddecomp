@@ -22,8 +22,8 @@ jalr  $v0
  ori  $a3, $zero, 0x7F
 ```
 
-Resolved via `tools/classtable.py D_80086668` and `tools/classtable.py
-D_800866E8`: `D_80086668` (28 slots, header 0x230) is this function's own
+Resolved via `tools/classtable.py gClass86668Methods` and `tools/classtable.py
+D_800866E8`: `gClass86668Methods` (28 slots, header 0x230) is this function's own
 containing class's vtable, and this IS its last slot (+0x070) — the only
 reason this class is visible from this unit at all. `D_800866E8` (80 slots,
 header 0x114) is the vtable of the sub-object at `self->unk34`; slot +0x080
@@ -41,7 +41,7 @@ which can only be `Class86668__SetChildFlag8`'s own second parameter, forwarded 
 (no `move` needed since it's already resident in the right register).
 
 Named the two classes by vtable address per project convention (see
-`Class6D3C8.h`): `Class86668` (D_80086668) and `Class866E8` (D_800866E8).
+`Class6D3C8.h`): `Class86668` (gClass86668Methods) and `Class866E8` (D_800866E8).
 Both declared in the new `include/class_3ac78.h`.
 
 ## Proposed learning

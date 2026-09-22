@@ -12,7 +12,7 @@ void Class86668__SetChildFlag8(Class86668 *self, s32 arg1)
 
 Class86668Methods *GetClass86668Methods(void)
 {
-    return &D_80086668;
+    return &gClass86668Methods;
 }
 
 Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
@@ -44,7 +44,7 @@ extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
 extern GenericObject *func_8004D38C(void);
 extern s32 func_80020C5C(void);
 extern void func_80017CFC(void *arg1);
-extern Vec3_3ac78 D_8008682C;
+extern Vec3_3ac78 gDefaultOrigin;
 
 void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 {
@@ -62,7 +62,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     if (arg1 != NULL) {
         self->unk54 = *arg1;
     } else {
-        self->unk54 = D_8008682C;
+        self->unk54 = gDefaultOrigin;
     }
 
     self->unk1B0 = 0;
@@ -206,14 +206,14 @@ void Class866E8__OnNotify(Class866E8 *self, GenericObject *arg1, s32 arg2)
     }
 }
 
-extern s32 D_8008A980;
+extern s32 gDefaultGridSpan;
 
 void Class866E8__Reset(Class866E8 *self)
 {
     self->unk68 = NULL;
     self->unkE8 = 0;
     self->unk88 = 0;
-    self->methods->slotDC(self, D_8008A980);
+    self->methods->slotDC(self, gDefaultGridSpan);
     self->unk1CC = -1;
     self->unk1D0 = -1;
     self->unk1D4 = -1;

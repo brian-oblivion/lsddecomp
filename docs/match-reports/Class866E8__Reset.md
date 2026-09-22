@@ -7,27 +7,27 @@
 Previously filed as blocked by `gp_rel` (round 42 reopen note); that blocker
 was RESOLVED in round 42 by `maspsx --gp-symbols`, pinned in the Makefile.
 Rebuilt clean on the first attempt this round -- the earlier report's only
-finding (the `lw $a1, %gp_rel(D_8008A980)($gp)` instruction) was correct, it
+finding (the `lw $a1, %gp_rel(gDefaultGridSpan)($gp)` instruction) was correct, it
 just isn't a blocker any more.
 
 ## What it does
 
 `Class866E8`'s vtable slot `+0x040` (constructor-adjacent init, called by
 `Class866E8__SetConfig`): zeroes `unk68`/`unkE8`/`unk88`, dispatches slot `+0x0DC`
-with `self` and the loaded value of a lone global word `D_8008A980`, then
+with `self` and the loaded value of a lone global word `gDefaultGridSpan`, then
 sets four new fields (`unk1CC`/`unk1D0`/`unk1D4`/`unk1D8`) to `-1`.
 
 ## Body
 
 ```c
-extern s32 D_8008A980;
+extern s32 gDefaultGridSpan;
 
 void Class866E8__Reset(Class866E8 *self)
 {
     self->unk68 = NULL;
     self->unkE8 = 0;
     self->unk88 = 0;
-    self->methods->slotDC(self, D_8008A980);
+    self->methods->slotDC(self, gDefaultGridSpan);
     self->unk1CC = -1;
     self->unk1D0 = -1;
     self->unk1D4 = -1;
@@ -37,12 +37,12 @@ void Class866E8__Reset(Class866E8 *self)
 
 ## Derivation notes
 
-- `D_8008A980` (`asm/data/7B12C.sdata.s`) is a single `.word 0x0000A000`
+- `gDefaultGridSpan` (`asm/data/7B12C.sdata.s`) is a single `.word 0x0000A000`
   with no other reference anywhere in the image (checked with
-  `grep -rl D_8008A980 asm/`). It sits in an unnamed top-level `sdata`
+  `grep -rl gDefaultGridSpan asm/`). It sits in an unnamed top-level `sdata`
   segment, not owned by any carved unit, so it is declared `extern s32`
   directly in `src/class_3ac78.c` -- same pattern already used for
-  `D_8008682C` in this same file. `%gp_rel(D_8008A980)($gp)` loads its
+  `gDefaultOrigin` in this same file. `%gp_rel(gDefaultGridSpan)($gp)` loads its
   *value*, not its address, so the call argument is a plain `s32`, not a
   pointer.
 - `self->unk0` (the vtable pointer) is read early in retail's own
