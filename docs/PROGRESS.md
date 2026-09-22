@@ -2369,6 +2369,29 @@ length-figure re-measuring sweep (five stall functions have the construct in
 retail, a body's figure moves by one or two words, the tag only orders the
 revisit queue and the revisit rebuilds first).
 
+**Revision 11 (2026-09-22, after rounds 66 and 67).** The check-3 rule that
+a perfect scaffold score means the cause is outside the function is
+REWRITTEN in both places it lived (PARALLEL-RUNS §3.5 table, LEARNINGS §3j):
+a perfect score says the residue is what the scorer NORMALIZES AWAY (round
+67's wrong branch target) or is outside the function, and the one-second
+isolated compile already in CLAUDE.md tells which, before declining. §3.5
+also gains bravo's tiebreak: signatures that disagree with no decline row
+applying are settled by objdumping both objects. Track 1b bodies are written
+for the reader: the verified build never compiles them, so a construct whose
+only purpose was bytes stays in the report; `func_800344FC`'s
+`do { return; } while (0);` is a plain `return;` again, check-nonmatching
+green. The naming prompt tells the runner to grep `src/` for a unit's
+placeholder-named callees before calling a body unnameable (alpha's method).
+`plan.py` reads a preserved body line-anchored like stalesyms does, and
+"length matches" now tags `len-exact` (round 47's `0x25C/151` title scored
+`len-off`). `rename.py` prints a note when a rename makes a PROPOSED RENAME
+read `new -> new`; the one instance in `code_8220.h` is cleaned up. NOT
+adopted: a stale-signature detector (compiling IS the detector: check-
+nonmatching for promoted bodies, the revisit rebuild for reports); a
+stalesyms view of `.c` bodies (same reason); a rule about rename.py editing
+history (the existing boundary stands: PROGRESS and the archive are frozen,
+everything else stays resolvable).
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

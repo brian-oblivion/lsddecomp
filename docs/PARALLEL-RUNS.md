@@ -258,7 +258,11 @@ rounds 40 to 47):
 | --- | --- | --- |
 | any signature | the same signature | AGREE, search is meaningful |
 | dirtier than the real build | zero drift | MISMATCH, scaffold artifact, decline |
-| perfect zero | does not match | whole-file effect, decline, stop looking inside the function |
+| perfect zero | does not match | the residue is what the scorer NORMALIZES AWAY (a branch target, round 67) or a whole-file effect; compile the body alone through CLAUDE.md's recipe (one second) to tell which BEFORE declining |
+
+When the two signatures differ and neither decline row applies, objdump both
+objects: identical disassembly means the gap is a diff-alignment artifact and
+the verdict is AGREE (round 66, scaffold 4/4 against funcdiff 10/10).
 
 A check-3 verdict written before round 58 that says "0/0" without naming how
 the real-build signature was obtained was inferred from length; the head's

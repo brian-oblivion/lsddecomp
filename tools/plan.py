@@ -257,7 +257,8 @@ def report_state(func):
     if not p.exists():
         return "fresh", False
     t = p.read_text(errors="replace")
-    body = "#if 0" in t
+    # Line-anchored, like stalesyms.has_if0: prose that mentions "`#if 0`" is not a body (round 66).
+    body = bool(re.search(r"^[ \t]*#if\s+0\b.*?^[ \t]*#endif", t, re.S | re.M))
     if progress.REOPENED_RE.search(t):
         return "fresh", body
     return "stalled", body
@@ -265,7 +266,7 @@ def report_state(func):
 
 PERM_RUN_RE = re.compile(r"[0-9]{3,}[, ]*(iteration|iters)|rc=(124|137)|permuter-exhausted|--stop-on-zero", re.I)
 SPENT_RE = re.compile(r"levers? (are |is )?spent|exhausted|do not (re-)?attempt|not worth (another|further)|no further attempt", re.I)
-EXACT_RE = re.compile(r"length[: ]*EXACT|exact length|\b(\d+)/\1\b", re.I)
+EXACT_RE = re.compile(r"length[: ]*EXACT|exact length|length (match|matches)|\b(\d+)/\2\b", re.I)
 
 
 def stall_cost(func, title):

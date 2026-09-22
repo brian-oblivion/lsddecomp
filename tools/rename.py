@@ -216,9 +216,17 @@ def main():
     SYMBOLS.write_text("".join(lines))
 
     # 3. every other file
+    vacuous = re.compile(rf"\b{re.escape(new)}\b\s*(->|→|=>)\s*\b{re.escape(new)}\b")
     for p in touched:
         text = p.read_text(errors="replace")
-        p.write_text(pat.sub(new, text))
+        text = pat.sub(new, text)
+        p.write_text(text)
+        # A "PROPOSED RENAME: old -> new" note whose proposal this rename just
+        # applied now reads "new -> new" (round 67, code_8220.h). The rewrite
+        # is right -- references stay resolvable -- but the note is done.
+        for i, line in enumerate(text.split("\n"), 1):
+            if vacuous.search(line):
+                print(f"  note: {p.relative_to(ROOT)}:{i} now says {new} -> {new}; delete that proposal note")
 
     # 4. the report
     if report_old.exists():

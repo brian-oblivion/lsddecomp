@@ -557,9 +557,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   COST")
 - **Check 3's discriminator is AGREEMENT, not zero-ness.** A 6/6 scaffold matching a 6/6 real build
   AGREES and paid (19/52 -> 22/52); a 0/0 scaffold is NECESSARY, not SUFFICIENT; a PERFECT scaffold
-  score on a non-matching function means the cause is OUTSIDE the function. Check 3 licenses the
-  SEARCH, not its output. (a §"A perfect permuter scaffold score can be the bad news", §"Check 3's
-  AGREEMENT verdict")
+  score on a non-matching function means the residue is what the scorer NORMALIZES AWAY (a branch
+  target, round 67) or is outside it; the one-second isolated compile tells which. Check 3 licenses
+  the SEARCH, not its output.
 - **`--stack-diffs` is MANDATORY on a frame or offset residue or you get a FALSE ZERO** — the scorer
   normalizes stack-offset differences away, and a false zero is expensive because it is treated as a
   lead to translate. (a §"`--stack-diffs` is MANDATORY")

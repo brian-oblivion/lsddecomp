@@ -335,10 +335,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
  * rename ($t0<->$a2 for the a0 copy kept live across the two calls,
  * $a3/$s1<->$t0 for the masked-a3 copy), not a logic or CFG difference
  * (docs/match-reports/func_800344FC.md). Permuter candidate, semantics
- * reviewed round 66: the winning mutation is a bare `return;` rewritten
- * as `do { return; } while (0);`, which executes its single iteration
- * unconditionally and returns on it either way -- behaviorally identical
- * to the statement it replaces, no UB, no dead branch. */
+ * reviewed round 66; its winning mutation (`return;` as
+ * `do { return; } while (0);`) is in the report, not here: this body is
+ * for the reader and the verified build never compiles it. */
 void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -351,7 +350,7 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 
     speed = a3;
     if (flag == 0) {
-        do { return; } while (0);
+        return;
     }
     if ((u8)a3 != 0) {
         s16 packed = (a1 << 8) | a0;

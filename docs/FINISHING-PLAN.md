@@ -19,10 +19,11 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 10 (2026-09-22, after rounds 64 and 65: doc budgets in
-words; the dead-code strip is a preprocessor walk shared by progress.py and
-funcdiff.py; teardown sees forkserver workers; stalesyms --fix; the
-reproducer recipe restored to the form that word-splits in both shells).
+Plan revision: 11 (2026-09-22, after rounds 66 and 67: a perfect scaffold
+score means the residue is what the scorer normalizes away OR outside the
+function, and the one-second isolated compile tells which; 1b bodies are
+written for the reader; the naming prompt greps placeholder callees; plan.py
+reads `#if 0` line-anchored and "length matches" as exact).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -180,6 +181,10 @@ queued, not matched.
   review that its semantics are what the disassembly does; the report says
   which it was. A body that scored well by exploiting the scorer (UB, dead
   branches) is never promoted.
+- Written for the reader. The verified build never compiles this body, so a
+  construct whose only purpose was bytes (`do { return; } while (0);`, a
+  redundant copy, an inverted arm) buys nothing here: write the plain form and
+  leave the byte-shaped one in the report (round 66).
 - The comment names the score, the residue class and the report.
 - `./build-and-verify.sh` green (nothing changed) AND `tools/check-nonmatching.sh`
   green (the body compiles and references only linked symbols).
@@ -413,7 +418,9 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > A/B/C recorded per name in the report's `## Naming` section with the
 > evidence; conventions as §3 track 3 lists them; inherited names are
 > hypotheses to confirm or replace; Sony symbols are never renamed; a wrong
-> tier-A name is worse than `func_`. When unsure, keep `func_` and write down
+> tier-A name is worse than `func_`. Before calling a body unnameable, grep
+> `src/` for its placeholder-named callees: one matched and named elsewhere
+> often names the caller (round 66). When unsure, keep `func_` and write down
 > what you know.
 >
 > Commit per logical step: one commit per `rename.py` run or per batch of
