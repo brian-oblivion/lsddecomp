@@ -1,11 +1,49 @@
-/* This unit: the DreamSys class's constructor, its per-tick update chain
- * (DreamSys__TimerTick/DreamSys__RunTickCallbacks/DreamSys__UpdateTickState),
- * the day/mood/flashback bookkeeping (DreamSys__StartDay/EndDay,
- * DreamSys__UpdateDreamChart and the MoodGraphContributor helpers,
- * DreamSys__AddFlashback/FlashbackSaving), and the whole "try a link" family
- * (DreamSys__WallLink/DynamicLink and the "Try...Link"/"Test4..."/
- * GetStaticSpawn static-link testers). See include/DreamSys.h for what the
- * class IS as a whole, including the methods implemented in sibling units. */
+/* DreamSys -- the object that IS a dream in progress: it owns the dream
+ * clock, the player-ish body that walks around the stage, the mood record
+ * that decides the next day's dream, and the "link" (teleport) machinery
+ * that ends one stage and starts another. See include/DreamSys.h for the
+ * class as a whole; several of its methods live in sibling units
+ * (class_3bb8c_p/t/r/o) because the class spans more than one segment.
+ *
+ * Four groups of functions live here.
+ *
+ * 1. Construction and reset. New_DreamSys/DreamSys__DreamSys,
+ *    DreamSys__ResetSessionState (the constructor's last step: no tick
+ *    callbacks, sound cue set freed, staircase-walk state cleared, base
+ *    orientation applied), DreamSys__ResetLinkState, DreamSys__SpawnAtLink.
+ *
+ * 2. The per-tick chain. DreamSys__TimerTick advances dreamTimer and, at
+ *    dreamTimeLimit, either loads the next flashback or ends the dream;
+ *    below the limit it runs DreamSys__UpdateTickState and
+ *    DreamSys__RunTickCallbacks, which call the two callback slots
+ *    DreamSys__SelectCallback80/98 install. Slot 80's mode 1 is
+ *    DreamSys__StepLook (the two spring-with-decay "look" accumulators:
+ *    DreamSys__StepLookOffset moves the height curve, DreamSys__StepLookYaw
+ *    turns the object +-45 degrees a tick up to +-181 and springs back).
+ *    Slot 98's mode 1 is DreamSys__TickMove, the movement state machine
+ *    (Free/Forced/Held by moveOverride) that runs a four-tick step cycle in
+ *    DreamSys__AdvanceMoveCycle -- a sound voice at the end of each cycle
+ *    (DreamSys__StartVoice / DreamSys__StopVoice, through a VabStreamObj in
+ *    DreamSys::soundObj), a +-50 view bob, and finally
+ *    DreamSys__ApplyMoveCommand, which tries the three link tests before
+ *    letting the move happen. Slot 98's mode 2 is DreamSys__TickDrift.
+ *
+ * 3. Day, mood and flashback bookkeeping. DreamSys__StartDay/EndDay,
+ *    DreamSys__UpdateDreamChart and the MoodGraphContributor helpers,
+ *    DreamSys__AddFlashback/FlashbackSaving, DreamSys__CalcUnlockScore, and
+ *    DreamSys__GetSaveBlock, which hands out the 0x700 bytes of the object
+ *    that DreamSys__InitNewGame initializes and that start with SAVE_MAGIC.
+ *
+ * 4. Linking. DreamSys__WallLink/DynamicLink, the "Try...Link" family and
+ *    the free "Test4..."/GetStaticSpawn static-link testers underneath them;
+ *    ExecuteLink writes the link type into DreamSys::pendingLinkType.
+ *
+ * Naming pass: round 66 (Opus). Everything above is measured, not guessed --
+ * the evidence for each name is in that function's match report under
+ * `## Naming`. Four functions are deliberately still `func_`-shaped
+ * (DreamSys__func_5938c/59590/59598/5ba20 and the free func_8005BFC4): each
+ * touches exactly one field or global that nothing in any carved unit ever
+ * reads back, so there is nothing to name them after. */
 #include "common.h"
 #include "DreamSys.h"
 

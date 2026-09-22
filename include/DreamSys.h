@@ -18,11 +18,26 @@
  * family), class_3bb8c_t.c, class_3bb8c_r.c and class_3bb8c_o.c -- because
  * the class's code spans more than one disassembly segment; this header is
  * their shared, only correct view of `struct DreamSys` and its vtable.
- * Naming pass, round 65 (2026-09-22): named 42 of the unit's own functions
- * and 6 struct fields; the remainder of the "moveOverride/0x70.../0xBC" link-
- * timing state machine (DreamSys__TickMove/AEC/B50/BD4/BE0/E98 and friends) is
- * left as `func_` -- mechanics are documented at each site but no name was
- * confident enough to clear the tier-A/B bar (FINISHING-PLAN track 3). */
+ * Naming pass, round 65 (42 functions, 6 fields) and round 66 (29 more
+ * functions, 31 fields, 33 globals, and the rotation types below). Round 65's
+ * note here said the "0x6C/0x70.../0xBC" state machine had no name confident
+ * enough to clear the bar; round 66 found one, and the thing that unlocked it
+ * was NOT reading those functions harder. It was two cross-unit
+ * identifications that turn opaque call sites into evidence:
+ *   - func_8001CEB4, the inherited slot +0x044, is MATCHED in src/code_d294.c
+ *     and is the ROTATION SETTER. Every `void *` constant this unit hands it
+ *     is therefore three {numerator, denominator} degree ratios, and every one
+ *     of them decodes to a round angle. That converts "opaque generic
+ *     pointer" into "+-45 degrees of yaw" at six call sites.
+ *   - DreamSys::soundObj is a VabStreamObj* (src/code_179d8_e.c): its vtable
+ *     +0x84 and +0x9C ARE VabStreamObj__StopVoice and
+ *     VabStreamObj__SetPitchOffset, at the same offsets with the same
+ *     signatures, and the value +0x80 returns is exactly what +0x84 is later
+ *     handed. That turns the +0xB8/+0xBC pair into a voice selector and a
+ *     voice index.
+ * The general form: a placeholder-named callee in ANOTHER unit can be the
+ * only evidence your own unit's names need, and `grep` for it costs nothing.
+ * Per-name evidence and tiers are in docs/match-reports/<func>.md. */
 
 #include "common.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
