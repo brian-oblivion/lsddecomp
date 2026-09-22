@@ -17,7 +17,7 @@ void Class869D8__Class869D8(Class869D8 *self)
 {
     func_8003F24C()->ctor(self);
     self->methods = GetClass869D8Methods();
-    self->methods->slot40(self);
+    self->methods->onConstruct(self);
 }
 
 void func_8004D2F8(void) {
