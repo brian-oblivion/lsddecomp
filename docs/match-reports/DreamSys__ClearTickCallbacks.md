@@ -1,0 +1,41 @@
+# DreamSys__ClearTickCallbacks
+
+> Renamed from `func_800595A8` on 2026-09-22 (tools/rename.py). Address 0x800595a8.
+
+**Unit:** DreamSys · **Size:** 26 instructions · **Status:** MATCHED (26/26 words)
+
+## What it does
+
+Calls method slot `DreamSys__SelectCallback98` with 0, then conditionally method slot `DreamSys__SelectCallback80` with 0 when the flag argument is set. Both go through the object's method table at offset 0, per the hand-rolled class framework.
+
+## The C
+
+```c
+void DreamSys__ClearTickCallbacks(DreamSys *this, bool arg1)
+{
+	this->vt->DreamSys__SelectCallback98(this, 0);
+	if (arg1)
+		this->vt->DreamSys__SelectCallback80(this, 0);
+}
+```
+
+## Provenance
+
+Derived by runner/echo in round 2026-08-29-a. That runner was killed by an
+account-wide session limit before it committed anything at all -- it had
+written C for 14 of its 15 assigned functions and filed zero reports. The head
+recovered the body per docs/PARALLEL-RUNS.md 4c, rescored it in the main
+checkout from a clean build, and filed this report.
+
+This is a MATCH, not a mid-attempt snapshot: applied on its own to a green
+tree it gives 26/26 words with the whole-image SHA1 verifying.
+
+Scoring note: the head's first pass at rescoring these 14 bodies read numbers
+from a build that had failed to compile (the spliced file was missing echo's
+`#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
+STALE BUILD guard caught it. The numbers here are from the corrected pass --
+see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+- **Tier B.** Unconditionally selects callback_0x98 mode 0 (NULL) and, if its own argument is true, also selects callback_0x80 mode 0 -- the disable counterpart of DreamSys__SetTickCallbacks.

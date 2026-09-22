@@ -36,10 +36,10 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
             self->unk_0x28 = result;
             if (result != NULL) {
                 self->vt->BaseObjO__AddVec14(self, &sp88);
-                self->vt->func_80058B08(self, -1);
+                self->vt->DreamSys__NotifyLinkAttempt(self, -1);
                 return 1;
             }
-            self->vt->func_80058B08(self, -2);
+            self->vt->DreamSys__NotifyLinkAttempt(self, -2);
             return 0;
         }
     }
@@ -58,7 +58,7 @@ currently STALLED -- see its report; still linkable and correct as an
 already matched). Stores the search result into `self->unk_0x28`
 (`DreamSysUnk28Target *`), and on success dispatches `self->vt->slotBC`
 (`BaseObjO__AddVec14`, already named) and `self->vt->slot0x88`
-(`func_80058B08`, already named) with `-1`; on failure, only the latter
+(`DreamSys__NotifyLinkAttempt`, already named) with `-1`; on failure, only the latter
 with `-2`.
 
 ## The stack-layout gap
@@ -98,7 +98,7 @@ both are declared as opaque `u8` padding.
 (`self->unk_0x14 + 0x18`), builds and scans grid candidates
 (`DreamSys__BuildLinkQueries` + `DreamSys__ScanLinkCandidates`), stores
 the result into `self->unk_0x28`, and on success applies the found
-position (`BaseObjO__AddVec14`) and tags the outcome via `func_80058B08`
+position (`BaseObjO__AddVec14`) and tags the outcome via `DreamSys__NotifyLinkAttempt`
 (`-1` success / `-2` failure). "Find a nearby link" is squarely what the
 grid search does; the surrounding game purpose (why search for one here)
 is not established, which keeps this tier B rather than A.
@@ -122,7 +122,7 @@ scope at merge.
   B). Evidence: this function calls `unk_0x4C->methods->queryLinkAtPos`
   to look up a link at a position; `include/DreamSys.h`'s own existing
   comments show it used the same way by `DreamSys__WallLink`,
-  `func_8005A82C` and `func_80058A94` in `src/DreamSys.c` -- every access
+  `DreamSys__TryInstantTeleportLink` and `DreamSys__UnlinkLinkMgr` in `src/DreamSys.c` -- every access
   across every unit is link-related.
 
 ## Verify

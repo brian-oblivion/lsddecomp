@@ -55,7 +55,7 @@ Every raw offset this function touches turned out to already be named:
 - `+0x1F0` (vtable) → `InitMoodContibutors` -- this unit's OWN
   just-matched function, called back through the vtable with the
   `IsDaySpecial` result as its `special` argument. Counted forward from
-  `func_8005A7A0` (`+0x1D4`, confirmed via `classtable.py` in that
+  `DreamSys__TryStageTimerLink` (`+0x1D4`, confirmed via `classtable.py` in that
   function's own report) through the five slots between it and
   `InitMoodContibutors`.
 

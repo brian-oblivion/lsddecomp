@@ -35,7 +35,7 @@ verified in isolation through the pinned pipeline (a two-pointer `do/while`
 reproducer emits `sltu`, confirming this is not DreamSys-specific). Retail's
 own instruction is `slt` (signed) at this exact spot. 35/38 words, with
 drift outside the range (traced to this unit's still-unmatched
-`func_8005950C`, unrelated to this change -- see that report; not a new
+`InterpolateKeyframeValue`, unrelated to this change -- see that report; not a new
 class of the "shared-struct" drift hazard, just a residue from a DIFFERENT
 already-tracked stall bleeding into the same whole-image diff).
 
@@ -79,10 +79,10 @@ identical.
 ## Verification
 
 `./build-and-verify.sh` -> whole-image SHA1 matches retail (the run in this
-report's own history shows `build exit=2` because `func_8005950C`, a
+report's own history shows `build exit=2` because `InterpolateKeyframeValue`, a
 DIFFERENT still-STALLED function in this same unit, was 30/33 at the moment
 this was tested; `cmp -l` against retail confirms all remaining differing
-bytes fall inside `func_8005950C`'s own address range, `0x80059510`-
+bytes fall inside `InterpolateKeyframeValue`'s own address range, `0x80059510`-
 `0x8005952E`, none inside `CalcNavigationScore`).
 `tools/funcdiff.py CalcNavigationScore` -> `38/38 words match`.
 

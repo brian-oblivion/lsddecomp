@@ -6,7 +6,7 @@
 
 Already forward-declared (`bool ExecuteLink(DreamSys *system, s32 stage,
 s32 unk1, s32 unk2);`) and called from four already-matched functions
-(`DreamSys__DynamicLink`, `DreamSys__StaticWallLink`, `func_8005A700`).
+(`DreamSys__DynamicLink`, `DreamSys__StaticWallLink`, `DreamSys__TryTunnelLink`).
 This is the body: records `unk1` into `unknwon_int_0x44`, calls a
 base-class hook, bails if that hook cleared the flag, otherwise commits the
 new stage and (conditionally) resets the dream timer and fires a secondary

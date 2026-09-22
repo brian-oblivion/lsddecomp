@@ -17,7 +17,7 @@ into an all-ones mask, then masked to `0xA`), which is exactly what GCC 2.6.3
 emits for a ternary on a simple equality-to-zero test; no special shape was
 needed to reproduce it.
 
-Called by `func_8005A82C` (still `INCLUDE_ASM`, see that function's own
+Called by `DreamSys__TryInstantTeleportLink` (still `INCLUDE_ASM`, see that function's own
 report) as `saved = func_8005BFC4();` with no arguments -- consistent with
 the existing header prototype `extern s32 func_8005BFC4(void);`.
 

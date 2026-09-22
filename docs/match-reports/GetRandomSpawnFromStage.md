@@ -20,7 +20,7 @@ world-space adjustment, same `PlayerSpawnGridPos`/`SPAWN_POS_ADJUST` idiom
 as the already-matched `GenerateInitialSpawn`), increments
 `*gpDinamicLinkPenalty`, and returns the chosen stage. Called throughout
 this unit as the shared "give me somewhere to land" primitive (already
-visible at several now-matched call sites: `func_8005BE90`,
+visible at several now-matched call sites: `Test4StageTransition`,
 `Test4InstantTeleporters`'s trigger tables, `DreamSys__DynamicLink`).
 
 ## `D_80087F34` is NOT a second table -- same discovery as `D_80088758`/`D_8008875C`
@@ -55,7 +55,7 @@ division with magic-number multiplication (`lui`/`ori` loading
 `0x2AAAAAAB`, `mult`, `sra`, `mfhi`, two `subu`s) -- a completely different,
 LONGER instruction sequence than a real `div`. Retail uses a genuine
 `div`/`mfhi` pair with the standard divide-by-zero/`INT_MIN`-overflow
-`break` guards (the same idiom already confirmed for `func_8005950C` and
+`break` guards (the same idiom already confirmed for `InterpolateKeyframeValue` and
 every other runtime-divisor division in this unit), meaning the ORIGINAL
 source's divisor was NOT visible to the compiler as a literal at that
 point.

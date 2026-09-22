@@ -72,7 +72,7 @@ void DreamSys__ApplyOffsetSlotAndNotify(DreamSys *self, s16 *slot, s32 val, void
     self->vt->BaseObjO__ApplyRotatedVec14(self, &D_8008ABA4[0]);
     *slot = 0;
     if (extra != NULL) {
-        self->vt->func_80058B08(self, count);
+        self->vt->DreamSys__NotifyLinkAttempt(self, count);
     }
 }
 
@@ -191,10 +191,10 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
             self->linkTarget = result;
             if (result != NULL) {
                 self->vt->BaseObjO__AddVec14(self, &sp88);
-                self->vt->func_80058B08(self, -1);
+                self->vt->DreamSys__NotifyLinkAttempt(self, -1);
                 return 1;
             }
-            self->vt->func_80058B08(self, -2);
+            self->vt->DreamSys__NotifyLinkAttempt(self, -2);
             return 0;
         }
     }

@@ -12,13 +12,13 @@
 > }` early return in `do {...} while(0)` -- round 47's lever, untried on
 > this function, and tried here specifically to see whether it perturbs the
 > case-4 delay-slot choice the way it perturbed an unrelated struct copy in
-> `func_8005A9CC` this same round. **Byte-identical to the kept 106/110
+> `DreamSys__TryStaircaseLink` this same round. **Byte-identical to the kept 106/110
 > body -- no effect anywhere**, confirmed via `asm-differ` across the whole
 > function, not just the two named residue sites. Reverted immediately;
 > `INCLUDE_ASM` restored, whole-image SHA1 verified green.
 >
-> This is a clean negative and, combined with `func_8005A82C`'s two clean
-> negatives and `func_8005A9CC`'s one destructive positive-that-regresses
+> This is a clean negative and, combined with `DreamSys__TryInstantTeleportLink`'s two clean
+> negatives and `DreamSys__TryStaircaseLink`'s one destructive positive-that-regresses
 > (all three this round), completes a small but instructive matrix: the
 > do-while lever's effect (none / cascading-elsewhere) does not correlate
 > with residue class, function size, or which statement is wrapped -- it is
@@ -33,10 +33,10 @@
 > A `do{...}while(0)` wrap around one early-return case in a `switch` can
 > leave a COMPLETELY UNRELATED case's delay-slot-fill choice (case 4, three
 > cases away) untouched, even in the same function -- unlike
-> `func_8005A9CC` this round, where the exact same lever, applied to a
+> `DreamSys__TryStaircaseLink` this round, where the exact same lever, applied to a
 > `goto` rather than a `return`, corrupted an unrelated struct-copy dozens
 > of instructions later. The two functions share a unit and a residue class
-> but not the lever's blast radius; see `func_8005A9CC.md`'s round-49 entry
+> but not the lever's blast radius; see `DreamSys__TryStaircaseLink.md`'s round-49 entry
 > for the contrasting case.
 
 **Unit:** DreamSys · **Size:** 110 words · **Status:** STALL, 106/110 words
@@ -213,7 +213,7 @@ objdump showing 3 saved registers where retail uses 2, discussed and fixed
 separately below); a case-local `DreamSysEntityMethods *methods` temp
 (byte-identical to the current form); a bare `__asm__("")` immediately
 before the cast-and-call statement (byte-identical -- optimized away with
-zero effect, same as `func_8005A9CC`'s finding this round).
+zero effect, same as `DreamSys__TryStaircaseLink`'s finding this round).
 
 **A related but ALREADY-FIXED trap worth recording explicitly**: the very
 first draft of this function used a function-scope
@@ -394,7 +394,7 @@ function already argued this thoroughly. A permuter scaffold was set up
 preserved body; see the runner's final summary for the search's outcome
 (iteration count and `rc`), since the project's parallel-run discipline
 requires exactly one search running at a time and this function's search was
-queued behind `func_80059D1C`'s and `func_8005A9CC`'s.
+queued behind `func_80059D1C`'s and `DreamSys__TryStaircaseLink`'s.
 
 `INCLUDE_ASM` restored immediately after measuring; whole-image SHA1 verified
 green; `git diff --stat` empty against `main` for this unit's non-report
@@ -430,7 +430,7 @@ better than the base 180). **Both were examined; both are false leads, for
 two different reasons:**
 
 - **Score 120** relies on undefined behavior in the same shape
-  `func_8005A9CC.md` already found this round: it declares `new_var = entity`
+  `DreamSys__TryStaircaseLink.md` already found this round: it declares `new_var = entity`
   inside `case 7:`'s fallthrough into `case 8:`, then reads `new_var` in
   cases 9-12 -- separate switch targets reached via the jump table, NOT via
   fallthrough from 7/8, so `new_var` is uninitialized on every path that
@@ -490,7 +490,7 @@ this round's hoist-both-before-either precondition: neither residue is an
 adjacent-load/mult pair with a later consumer -- residue 1 is a single
 `addiu`-derived bounds check invisible to source spelling, residue 2 is a
 delay-slot-fill choice between an independent register move and a load,
-the same shape as `func_8005A82C`/`func_8005A9CC`'s residues this round.
+the same shape as `DreamSys__TryInstantTeleportLink`/`DreamSys__TryStaircaseLink`'s residues this round.
 The lever does not apply to either.
 
 Two new forms tried on the already-documented axes, both rebuilt and
@@ -514,8 +514,8 @@ reverted immediately after measuring.
 
 ### Proposed learning (round 39)
 
-Both of this function's residues, and both of `func_8005A82C`'s/
-`func_8005A9CC`'s this round, share a common shape worth naming explicitly:
+Both of this function's residues, and both of `DreamSys__TryInstantTeleportLink`'s/
+`DreamSys__TryStaircaseLink`'s this round, share a common shape worth naming explicitly:
 **a delay-slot-fill or register-class choice between two ALREADY-INDEPENDENT,
 already-schedulable instructions, with no data dependency chain for a
 source-level hoist to shorten.** The hoist-both-before-either lever targets

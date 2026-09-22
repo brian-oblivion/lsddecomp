@@ -10,7 +10,7 @@ adoption: `rm -rf build`, full rebuild with the flag and no C change, **0
 differing bytes** across 995 matched functions, so the "up to 65 sites that
 want a nop" the census worried about are all either INCLUDE_ASM bytes or load
 delay slots — none is a matched-C `mflo` hazard. Then `IsDaySpecial`'s
-preserved body, unchanged, **52/52 on the first build**. `func_8005950C`'s
+preserved body, unchanged, **52/52 on the first build**. `InterpolateKeyframeValue`'s
 preserved body went 17/33 → 30/33 (the nops gone; a register-allocation
 residue in the `/ 0x400` preamble remains); `func_8001CEB4`'s preserved body
 is NOT a match and its report is corrected. Eleven queued functions and one
@@ -320,7 +320,7 @@ safe; loading through a runtime-indexed global is not.
 **Nothing was changed. This section is evidence for the operator's decision, per
 CLAUDE.md rule 5.**
 
-A third function, `func_8005950C` in `DreamSys`, stalled at 17/33 on a residue
+A third function, `InterpolateKeyframeValue` in `DreamSys`, stalled at 17/33 on a residue
 that is NOT the `addiu_at` construct but IS one of the other three flags this
 document already identifies as moving together with it.
 
@@ -356,7 +356,7 @@ Counting `mflo`/`mfhi` sites across the whole image via `objdump -d` on
 
 Narrowing to the specific hazard construct — an `mflo`/`mfhi` with a
 `mult`/`div` within the next four instructions, which is exactly what
-`func_8005950C` hits:
+`InterpolateKeyframeValue` hits:
 
 | | count |
 | --- | --- |
@@ -492,7 +492,7 @@ grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
 What changes is what a runner should conclude when it hits. Add: **a `switch`
 dense enough to become a jump table is blocked, even with no array in the C.**
 Sparse switches that compile to compare-and-branch chains are fine and several
-already match (`func_8005966C` and `func_800596E8` in `DreamSys`, four cases
+already match (`DreamSys__SelectCallback80` and `DreamSys__SelectCallback98` in `DreamSys`, four cases
 each).
 
 At carve time this is also a boundary question, not only a routing one: a
@@ -793,7 +793,7 @@ match reports left behind, exactly like ordinary stalls.
 
 ## The `nop_mflo_mfhi` sibling: measured scope (round 11, head)
 
-`docs/match-reports/func_8005950C.md` flagged a connection for "whoever
+`docs/match-reports/InterpolateKeyframeValue.md` flagged a connection for "whoever
 triages this document next": its residue is a mandatory `nop` pair between an
 `mflo`/`mfhi` and the next instruction reading that result, which matches the
 NAME of the `nop_mflo_mfhi` flag that `config_for_aspsx_version` flips together
@@ -815,7 +815,7 @@ an uncarved monolithic segment.
 | queued `INCLUDE_ASM` | **2** |
 | uncarved `asm` segments | 7 |
 
-The two queued hits are `func_8005950C` — the function that proposed the
+The two queued hits are `InterpolateKeyframeValue` — the function that proposed the
 learning — and `DreamSys__GetPreviousDayMood`.
 
 **What this settles, and what it does not.** The hypothesis is NOT falsified:
@@ -870,7 +870,7 @@ an uncarved top-level `asm/*.s`.
 | uncarved `asm` segments | 7 | 7 |
 | Psy-Q library (`psyq_*`, outside the game denominator) | not counted | 11 |
 
-The four queued hits are `func_8005950C`, `DreamSys__GetPreviousDayMood`,
+The four queued hits are `InterpolateKeyframeValue`, `DreamSys__GetPreviousDayMood`,
 **`IsDaySpecial`** and **`func_8001CEB4`** — the last two new since round 11.
 All four now carry match-report files, so `progress.py` counts them as
 documented stalls rather than fresh ground.
