@@ -1,4 +1,6 @@
-# func_800591B4 — MATCHED
+# DreamSys__ResetLinkState — MATCHED
+
+> Renamed from `func_800591B4` on 2026-09-22 (tools/rename.py). Address 0x800591b4.
 
 **Unit:** DreamSys · **Size:** 87 words (94 instructions incl. delay
 slots/nops, `0x499B4`-`0x49B10`) · **Status:** MATCHED (87/87 words),
@@ -8,8 +10,8 @@ runner BRAVO. Matched on the first attempt — no residue.
 ## What it does
 
 Vtable slot `+0x0F8`. A straight-line "start dream" initializer, no
-branches at all: six vtable calls (`LogChunkMood`, `func_8005966C`,
-`func_800596E8`, `func_8005A168`, `func_8005A1B0`, `func_8005A1EC`), a large
+branches at all: six vtable calls (`LogChunkMood`, `DreamSys__SelectCallback80`,
+`DreamSys__SelectCallback98`, `func_8005A168`, `func_8005A1B0`, `func_8005A1EC`), a large
 block of per-dream state zeroed in between/after, and a closing
 `Class6B5CC__GetRotationDegrees`/`func_8001CEB4` pair over a small local buffer — the same
 `func_8001CEB4(this, 1, &local)` shape already established by
@@ -20,11 +22,11 @@ by earlier rounds; the only new things this round contributes are the
 function's own slot and a 12-byte local buffer's two known `s16` sub-fields.
 
 Both blocker screens are clean: no `gp_rel` hit and no
-`addiu $at, $at, %lo` hit anywhere in `func_800591B4.s`.
+`addiu $at, $at, %lo` hit anywhere in `DreamSys__ResetLinkState.s`.
 
 ## New vtable knowledge
 
-- `vtable_DreamSys::func_800591B4` (was inside `unknown_functions_0xec[4]`)
+- `vtable_DreamSys::DreamSys__ResetLinkState` (was inside `unknown_functions_0xec[4]`)
   — this function's own slot, `+0x0F8`, split out of that array (now
   `unknown_functions_0xec[3]`, covering `0xEC`/`0xF0`/`0xF4`).
 
@@ -37,7 +39,7 @@ strong independent corroboration for all of those.
 ## Source
 
 ```c
-void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
+void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 {
 	struct {
 		s8 unknown_values_0x0[8];
@@ -46,8 +48,8 @@ void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
 	} local;
 
 	this->vt->LogChunkMood(this, &this->linkCoordinates);
-	this->vt->func_8005966C(this, 1);
-	this->vt->func_800596E8(this, 1);
+	this->vt->DreamSys__SelectCallback80(this, 1);
+	this->vt->DreamSys__SelectCallback98(this, 1);
 	this->vt->func_8005A168(this, arg1);
 
 	this->unk_0xBC = -1;

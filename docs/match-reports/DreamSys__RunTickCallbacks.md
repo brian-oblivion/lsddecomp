@@ -1,17 +1,22 @@
-# func_80059360
+# DreamSys__RunTickCallbacks
 
-**Unit:** DreamSys · **Size:** 7 instructions · **Status:** MATCHED (7/7 words)
+> Renamed from `func_800593D8` on 2026-09-22 (tools/rename.py). Address 0x800593d8.
+
+**Unit:** DreamSys · **Size:** 21 instructions · **Status:** MATCHED (21/21 words)
 
 ## What it does
 
-Returns the dream timer converted from frames to seconds. The unsigned divide is what retail emits; a signed one produces the extra sign-correction sequence.
+Fires two optional callbacks in order, each null-checked. Both take the object as their only argument.
 
 ## The C
 
 ```c
-s32 func_80059360(DreamSys *this)
+void DreamSys__RunTickCallbacks(DreamSys *this)
 {
-	return (u32)this->dreamTimer / 15;
+	if (this->callback_0x80 != NULL)
+		this->callback_0x80(this);
+	if (this->callback_0x98 != NULL)
+		this->callback_0x98(this);
 }
 ```
 
@@ -24,7 +29,7 @@ recovered the body per docs/PARALLEL-RUNS.md 4c, rescored it in the main
 checkout from a clean build, and filed this report.
 
 This is a MATCH, not a mid-attempt snapshot: applied on its own to a green
-tree it gives 7/7 words with the whole-image SHA1 verifying.
+tree it gives 21/21 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's

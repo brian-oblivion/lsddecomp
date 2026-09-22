@@ -203,8 +203,8 @@ void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
 	return;
 
 tick_only:
-	this->vt->func_80059394(this);
-	this->vt->func_800593D8(this);
+	this->vt->DreamSys__UpdateTickState(this);
+	this->vt->DreamSys__RunTickCallbacks(this);
 }
 
 void DreamSys__DispatchChunkChange(DreamSys *this, void *arg1, s32 arg2)
@@ -264,7 +264,7 @@ void func_80059148(DreamSys *this, s32 value)
 	}
 }
 
-void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
+void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 {
 	struct {
 		s8 unknown_values_0x0[8];
@@ -273,8 +273,8 @@ void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
 	} local;
 
 	this->vt->LogChunkMood(this, &this->linkCoordinates);
-	this->vt->func_8005966C(this, 1);
-	this->vt->func_800596E8(this, 1);
+	this->vt->DreamSys__SelectCallback80(this, 1);
+	this->vt->DreamSys__SelectCallback98(this, 1);
 	this->vt->func_8005A168(this, arg1);
 
 	this->unk_0xBC = -1;
@@ -305,7 +305,7 @@ void func_800591B4(DreamSys *this, s32 arg1, s32 arg2)
 	this->vt->func_8001CEB4(this, 1, &local);
 }
 
-void func_80059310(DreamSys *this)
+void DreamSys__BlockMovement(DreamSys *this)
 {
 	this->unk_0x70 = 1;
 }
@@ -325,7 +325,7 @@ s32 DreamSys__GetSetDreamTimeLimit(DreamSys *this, s32 value)
 		result = (u32)result / 15;
 	return result;
 }
-s32 func_80059360(DreamSys *this)
+s32 DreamSys__GetDreamTimerSeconds(DreamSys *this)
 {
 	return (u32)this->dreamTimer / 15;
 }
@@ -341,14 +341,14 @@ void func_8005938C(DreamSys *this, s32 value)
 {
 	this->unk_0x64 = value;
 }
-void func_80059394(DreamSys *this)
+void DreamSys__UpdateTickState(DreamSys *this)
 {
 	if (this->unk_0x70 == 0) {
 		this->unk_0x74 = 0;
 		this->unk_0x124 = ((u32)this->dreamTimer % (u32)this->unk_0x120) == 0;
 	}
 }
-void func_800593D8(DreamSys *this)
+void DreamSys__RunTickCallbacks(DreamSys *this)
 {
 	if (this->callback_0x80 != NULL)
 		this->callback_0x80(this);
@@ -418,19 +418,19 @@ s32 func_800595A0(DreamSys *this)
 {
 	return 0;
 }
-void func_800595A8(DreamSys *this, bool arg1)
+void DreamSys__ClearTickCallbacks(DreamSys *this, bool arg1)
 {
-	this->vt->func_800596E8(this, 0);
+	this->vt->DreamSys__SelectCallback98(this, 0);
 	if (arg1)
-		this->vt->func_8005966C(this, 0);
+		this->vt->DreamSys__SelectCallback80(this, 0);
 }
-void func_80059610(DreamSys *this, s32 arg1, s32 arg2)
+void DreamSys__SetTickCallbacks(DreamSys *this, s32 arg1, s32 arg2)
 {
-	this->vt->func_800596E8(this, arg1);
-	this->vt->func_8005966C(this, arg2);
+	this->vt->DreamSys__SelectCallback98(this, arg1);
+	this->vt->DreamSys__SelectCallback80(this, arg2);
 }
 
-void func_8005966C(DreamSys *this, s32 arg1)
+void DreamSys__SelectCallback80(DreamSys *this, s32 arg1)
 {
 	struct vtable_DreamSys *vt = this->vt;
 
@@ -453,7 +453,7 @@ void func_8005966C(DreamSys *this, s32 arg1)
 
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
 
-void func_800596E8(DreamSys *this, s32 arg1)
+void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 {
 	struct vtable_DreamSys *vt = this->vt;
 
@@ -1073,7 +1073,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 		return true;
 	if (this->isFlashbackSession)
 		return true;
-	this->vt->GetSetDreamTimeLimit(this, this->vt->func_80059360(this) + saved);
+	this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerSeconds(this) + saved);
 	return true;
 }
 #endif

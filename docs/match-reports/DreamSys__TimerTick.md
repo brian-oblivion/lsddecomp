@@ -44,8 +44,8 @@ void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
 	return;
 
 tick_only:
-	this->vt->func_80059394(this);
-	this->vt->func_800593D8(this);
+	this->vt->DreamSys__UpdateTickState(this);
+	this->vt->DreamSys__RunTickCallbacks(this);
 }
 ```
 

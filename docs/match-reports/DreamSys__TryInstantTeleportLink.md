@@ -107,7 +107,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 		return true;
 	if (this->isFlashbackSession)
 		return true;
-	this->vt->GetSetDreamTimeLimit(this, this->vt->func_80059360(this) + saved);
+	this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerSeconds(this) + saved);
 	return true;
 }
 ```
@@ -136,10 +136,10 @@ encodes it, at exactly two sites.
   BaseObjO__SetVec14(this, &local)` -- same buffer as the slot above.
 - The tail two calls, `vt->slot0x108(this)` and `vt->slot0x104(this, ...)`,
   turned out to be ALREADY-NAMED existing slots read at the wrong offset in
-  a first pass: `+0x108` is `func_80059360(DreamSys *this)` (existing
+  a first pass: `+0x108` is `DreamSys__GetDreamTimerSeconds(DreamSys *this)` (existing
   signature, unchanged) and `+0x104` is `GetSetDreamTimeLimit(DreamSys
   *this, s32 time)` (existing signature, unchanged) -- confirming
-  `GetSetDreamTimeLimit(this, func_80059360(this) + saved)` as the correct
+  `GetSetDreamTimeLimit(this, DreamSys__GetDreamTimerSeconds(this) + saved)` as the correct
   reading, not two new unnamed slots.
 - `this->isFlashbackSession` (existing field, offset `0x68`) gates the
   final `GetSetDreamTimeLimit` call.
@@ -280,7 +280,7 @@ if (this->isFlashbackSession) {
 	new_var = true;
 	return new_var;
 }
-this->vt->GetSetDreamTimeLimit(this, this->vt->func_80059360(this) + saved);
+this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerSeconds(this) + saved);
 return new_var;   /* <-- new_var was never (re)assigned on THIS path */
 ```
 

@@ -1,4 +1,6 @@
-# func_800596E8 — MATCHED
+# DreamSys__SelectCallback98 — MATCHED
+
+> Renamed from `func_800596E8` on 2026-09-22 (tools/rename.py). Address 0x800596e8.
 
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. 54/54 words, full match.
 
@@ -7,7 +9,7 @@ Round 2026-08-30, runner ALPHA, unit `DreamSys`. 54/54 words, full match.
 ```c
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
 
-void func_800596E8(DreamSys *this, s32 arg1)
+void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 {
 	struct vtable_DreamSys *vt = this->vt;
 
@@ -38,7 +40,7 @@ another unit is fine" precedent. `this->vt->func_8005A1F4` (not the hoisted
 
 ## Derivation
 
-Same shape as `func_8005966C`, matched earlier this round: hoist `this->vt`
+Same shape as `DreamSys__SelectCallback80`, matched earlier this round: hoist `this->vt`
 into a local (retail loads `$s2 = this->vt` unconditionally at entry and
 reuses it), and write the `arg1` dispatch as a `switch` with cases in
 ascending textual order (`0, 1, 2`) — GCC 2.6.3 lays out each case's body in

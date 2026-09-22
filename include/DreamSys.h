@@ -434,7 +434,7 @@ typedef struct DreamSysEntityObj {
 } DreamSysEntityObj;
 
 /* Struct pointed to by func_8005A1F4's arg1 -- forwarded (never called) as
-   InitSoundCueSet's 5th argument via func_800596E8's arg1==2 case, so its
+   InitSoundCueSet's 5th argument via DreamSys__SelectCallback98's arg1==2 case, so its
    real caller/owner lives outside this unit. Only the offsets
    func_8005A1F4 itself touches are named; +0x8..+0x1C and +0x24..+0x30
    are unconfirmed gaps (round 2026-08-30-d). */
@@ -633,21 +633,21 @@ typedef struct DreamSys {
 	   Meaning unidentified beyond that (round 2026-08-30). */
 	s32 unk_0x6c;
 
-	/* Gate flag: func_80059310 sets it to 1; func_8005931C reads it back;
-	   func_80059394 skips its whole body while this is nonzero. */
+	/* Gate flag: DreamSys__BlockMovement sets it to 1; func_8005931C reads it back;
+	   DreamSys__UpdateTickState skips its whole body while this is nonzero. */
 	s32 unk_0x70;
 	/* Cleared to 0, then set to (dreamTimer % unk_0x120 == 0) by
-	   func_80059394. */
+	   DreamSys__UpdateTickState. */
 	s32 unk_0x74;
 	/* Cleared to 0 by func_80059598; no other observed use. */
 	s32 unk_0x78;
 	/* Cleared to 0 by func_80059590; no other observed use. */
 	s32 unk_0x7C;
-	/* Set by func_8005966C(this, arg1): NULL when arg1==0, otherwise one of
+	/* Set by DreamSys__SelectCallback80(this, arg1): NULL when arg1==0, otherwise one of
 	   three vtable-slot function pointers selected by arg1 (1/2/3). Called
-	   with (this) by func_800593D8, if non-NULL. */
+	   with (this) by DreamSys__RunTickCallbacks, if non-NULL. */
 	void (*callback_0x80)(struct DreamSys *this);
-	/* Set unconditionally to arg1 by func_8005966C(this, arg1); no other
+	/* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1); no other
 	   observed use (round 2026-08-30). */
 	s32 unk_0x84;
 	/* Index into the (D_80087E50, D_80087E5C) delta/threshold table pair,
@@ -663,11 +663,11 @@ typedef struct DreamSys {
 	/* Running delta accumulator paired with unk_0x90; see func_800598E8
 	   (round 2026-08-30). */
 	s32 unk_0x94;
-	/* Set by func_8005966C(this, arg1) exactly like callback_0x80, but from
+	/* Set by DreamSys__SelectCallback80(this, arg1) exactly like callback_0x80, but from
 	   a *different* trio of vtable slots. Called with (this) by
-	   func_800593D8, if non-NULL. */
+	   DreamSys__RunTickCallbacks, if non-NULL. */
 	void (*callback_0x98)(struct DreamSys *this);
-	/* "Mode" field read/written by func_800596E8(this, arg1): when ==2 on
+	/* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
 	   entry, this->vt->func_8005A134(this, 0) fires first; then it is set
 	   unconditionally to arg1 (round 2026-08-30). */
 	s32 unk_0x9C;
@@ -709,20 +709,20 @@ typedef struct DreamSys {
 	   >= 0 (round 2026-08-30-b). */
 	s32 unk_0xBC;
 	s8 unknown_values_0xC0[4];
-	/* Set to 1 by func_800596E8's arg1==2 case, alongside unk_0xC8 and
+	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside unk_0xC8 and
 	   callback_0x98 (round 2026-08-30). */
 	s32 unk_0xC4;
-	/* Set to 1 by func_800596E8's arg1==2 case, alongside unk_0xC4
+	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside unk_0xC4
 	   (round 2026-08-30). */
 	s32 unk_0xC8;
 	/* Struct initialized in-place by InitSoundCueSet (still INCLUDE_ASM, in
-	   the uncarved code_179d8) via func_800596E8's arg1==2 case; internal
+	   the uncarved code_179d8) via DreamSys__SelectCallback98's arg1==2 case; internal
 	   layout unknown beyond that entry point (round 2026-08-30). */
 	s8 unk_0xCC[0x54];
 
-	/* Divisor for func_80059394's (dreamTimer % unk_0x120) check. */
+	/* Divisor for DreamSys__UpdateTickState's (dreamTimer % unk_0x120) check. */
 	s32 unk_0x120;
-	/* Result of func_80059394's (dreamTimer % unk_0x120 == 0) check. */
+	/* Result of DreamSys__UpdateTickState's (dreamTimer % unk_0x120 == 0) check. */
 	s32 unk_0x124;
 	/* unk_0x124/0x128/0x12C/0x130 are also bounds-checked-set as a group of
 	   four by func_8005A1B0 (vtable +0x18C): each is overwritten with the
@@ -962,39 +962,39 @@ struct vtable_DreamSys{
 	u32 unknown_functions_0xf0[2];
 	/* This function's OWN slot (+0x0F8, resolved via
 	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:
-	   calls LogChunkMood/func_8005966C/func_800596E8/func_8005A168/
+	   calls LogChunkMood/DreamSys__SelectCallback80/DreamSys__SelectCallback98/func_8005A168/
 	   func_8005A1B0/func_8005A1EC in sequence, then zeroes a large block of
 	   per-dream state, ending with a Class6B5CC__GetRotationDegrees/func_8001CEB4 pair over a
 	   small local buffer (round 2026-09-02). */
-	void (*func_800591B4)(DreamSys *this, s32 arg1, s32 arg2);
-	void (*func_80059310)(DreamSys *this);
+	void (*DreamSys__ResetLinkState)(DreamSys *this, s32 arg1, s32 arg2);
+	void (*DreamSys__BlockMovement)(DreamSys *this);
 	s32 (*func_8005931C)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);
-	s32 (*func_80059360)(DreamSys *this);
+	s32 (*DreamSys__GetDreamTimerSeconds)(DreamSys *this);
 	void (*func_8005937C)(DreamSys *this, s32 value);
 	void (*func_80059384)(DreamSys *this, void *value);
 	void (*func_8005938C)(DreamSys *this, s32 value);
-	void (*func_80059394)(DreamSys *this);
-	void (*func_800593D8)(DreamSys *this);
+	void (*DreamSys__UpdateTickState)(DreamSys *this);
+	void (*DreamSys__RunTickCallbacks)(DreamSys *this);
 	s32 (*func_8005942C)(DreamSys *this, void *out, s32 day, s32 *reference, s32 tolerance);
 	void (*func_80059590)(DreamSys *this);
 	void (*func_80059598)(DreamSys *this);
 	s32 (*func_800595A0)(DreamSys *this);
-	void (*func_800595A8)(DreamSys *this, bool arg1);
-	/* Chains func_800596E8(this, arg1) then func_8005966C(this, arg2)
+	void (*DreamSys__ClearTickCallbacks)(DreamSys *this, bool arg1);
+	/* Chains DreamSys__SelectCallback98(this, arg1) then DreamSys__SelectCallback80(this, arg2)
 	   (round 2026-08-30). */
-	void (*func_80059610)(DreamSys *this, s32 arg1, s32 arg2);
-	/* Called by func_800595A8(this, TRUE) as this->vt->func_8005966C(this, 0). */
-	void (*func_8005966C)(DreamSys *this, s32 arg1);
-	/* Called unconditionally by func_800595A8 as this->vt->func_800596E8(this, 0). */
-	void (*func_800596E8)(DreamSys *this, s32 arg1);
+	void (*DreamSys__SetTickCallbacks)(DreamSys *this, s32 arg1, s32 arg2);
+	/* Called by DreamSys__ClearTickCallbacks(this, TRUE) as this->vt->DreamSys__SelectCallback80(this, 0). */
+	void (*DreamSys__SelectCallback80)(DreamSys *this, s32 arg1);
+	/* Called unconditionally by DreamSys__ClearTickCallbacks as this->vt->DreamSys__SelectCallback98(this, 0). */
+	void (*DreamSys__SelectCallback98)(DreamSys *this, s32 arg1);
 	/* Calls func_80059814(this) then func_800598E8(this) (round 2026-08-30). */
 	void (*func_800597C0)(DreamSys *this);
 	void (*func_80059814)(DreamSys *this);
 	void (*func_800598E8)(DreamSys *this);
-	/* No-op stub (`{ }`); one of func_8005966C's callback_0x80 choices. */
+	/* No-op stub (`{ }`); one of DreamSys__SelectCallback80's callback_0x80 choices. */
 	void (*DreamSys__NoOpSlot14C)(DreamSys *this);
-	/* No-op stub (`{ }`); one of func_8005966C's callback_0x80 choices. */
+	/* No-op stub (`{ }`); one of DreamSys__SelectCallback80's callback_0x80 choices. */
 	void (*DreamSys__NoOpSlot150)(DreamSys *this);
 	/* Dispatches on unk_0x6C to func_8005A050+func_80059AEC, func_80059BD4,
 	   or func_80059B50, and returns whichever's result (round 2026-08-30). */
@@ -1034,10 +1034,10 @@ struct vtable_DreamSys{
 	/* Referenced by func_80059A58; still INCLUDE_ASM. Called with (this)
 	   only, return value discarded. */
 	void (*func_8005A050)(DreamSys *this);
-	/* Referenced by func_800596E8's arg1==2 case; stored into
+	/* Referenced by DreamSys__SelectCallback98's arg1==2 case; stored into
 	   callback_0x98, never called directly by this runner's functions. */
 	void (*func_8005A0B0)(DreamSys *this);
-	/* Referenced by func_800596E8's entry guard (this->unk_0x9C==2); called
+	/* Referenced by DreamSys__SelectCallback98's entry guard (this->unk_0x9C==2); called
 	   as (this, 0). */
 	void (*func_8005A134)(DreamSys *this, s32 arg1);
 	/* +0x180..+0x190: resolved via tools/classtable.py DREAMSYS_METHODS,
@@ -1049,7 +1049,7 @@ struct vtable_DreamSys{
 	void (*func_8005A1A4)(DreamSys *this);
 	void (*func_8005A1B0)(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
 	void (*func_8005A1EC)(DreamSys *this, s32 value);
-	/* Referenced by func_800596E8's arg1==2 case: its raw address (never
+	/* Referenced by DreamSys__SelectCallback98's arg1==2 case: its raw address (never
 	   called there) is forwarded as InitSoundCueSet's 5th argument. arg0 is
 	   unused in the body; kept generic rather than typed DreamSys* since
 	   nothing here confirms it (round 2026-08-30-d). */

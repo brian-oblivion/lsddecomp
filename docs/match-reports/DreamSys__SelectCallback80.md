@@ -1,11 +1,13 @@
-# func_8005966C — MATCHED
+# DreamSys__SelectCallback80 — MATCHED
+
+> Renamed from `func_8005966C` on 2026-09-22 (tools/rename.py). Address 0x8005966c.
 
 Round 2026-08-30, runner ALPHA, unit `DreamSys`. 31/31 words, full match.
 
 ## Source
 
 ```c
-void func_8005966C(DreamSys *this, s32 arg1)
+void DreamSys__SelectCallback80(DreamSys *this, s32 arg1)
 {
 	struct vtable_DreamSys *vt = this->vt;
 

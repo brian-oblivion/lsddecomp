@@ -1,15 +1,17 @@
-# func_80059310
+# DreamSys__BlockMovement
+
+> Renamed from `func_80059310` on 2026-09-22 (tools/rename.py). Address 0x80059310.
 
 **Unit:** DreamSys · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
 ## What it does
 
-Sets the `unk_0x70` flag to 1 -- the guard that `func_80059394` tests before recomputing its tick state.
+Sets the `unk_0x70` flag to 1 -- the guard that `DreamSys__UpdateTickState` tests before recomputing its tick state.
 
 ## The C
 
 ```c
-void func_80059310(DreamSys *this)
+void DreamSys__BlockMovement(DreamSys *this)
 {
 	this->unk_0x70 = 1;
 }

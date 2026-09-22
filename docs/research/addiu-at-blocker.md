@@ -492,7 +492,7 @@ grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/<unit>/<func>.s
 What changes is what a runner should conclude when it hits. Add: **a `switch`
 dense enough to become a jump table is blocked, even with no array in the C.**
 Sparse switches that compile to compare-and-branch chains are fine and several
-already match (`func_8005966C` and `func_800596E8` in `DreamSys`, four cases
+already match (`DreamSys__SelectCallback80` and `DreamSys__SelectCallback98` in `DreamSys`, four cases
 each).
 
 At carve time this is also a boundary question, not only a routing one: a

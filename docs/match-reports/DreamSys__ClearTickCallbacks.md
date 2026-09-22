@@ -1,20 +1,21 @@
-# func_80059394
+# DreamSys__ClearTickCallbacks
 
-**Unit:** DreamSys · **Size:** 17 instructions · **Status:** MATCHED (17/17 words)
+> Renamed from `func_800595A8` on 2026-09-22 (tools/rename.py). Address 0x800595a8.
+
+**Unit:** DreamSys · **Size:** 26 instructions · **Status:** MATCHED (26/26 words)
 
 ## What it does
 
-Guarded per-tick update: when `unk_0x70` is clear it zeroes `unk_0x74` and sets `unk_0x124` to whether the dream timer divides evenly by the `unk_0x120` interval. The comparison result is stored directly as the field value rather than branched over.
+Calls method slot `DreamSys__SelectCallback98` with 0, then conditionally method slot `DreamSys__SelectCallback80` with 0 when the flag argument is set. Both go through the object's method table at offset 0, per the hand-rolled class framework.
 
 ## The C
 
 ```c
-void func_80059394(DreamSys *this)
+void DreamSys__ClearTickCallbacks(DreamSys *this, bool arg1)
 {
-	if (this->unk_0x70 == 0) {
-		this->unk_0x74 = 0;
-		this->unk_0x124 = ((u32)this->dreamTimer % (u32)this->unk_0x120) == 0;
-	}
+	this->vt->DreamSys__SelectCallback98(this, 0);
+	if (arg1)
+		this->vt->DreamSys__SelectCallback80(this, 0);
 }
 ```
 
@@ -27,7 +28,7 @@ recovered the body per docs/PARALLEL-RUNS.md 4c, rescored it in the main
 checkout from a clean build, and filed this report.
 
 This is a MATCH, not a mid-attempt snapshot: applied on its own to a green
-tree it gives 17/17 words with the whole-image SHA1 verifying.
+tree it gives 26/26 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's

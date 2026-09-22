@@ -1,19 +1,19 @@
-# func_800595A8
+# DreamSys__GetDreamTimerSeconds
 
-**Unit:** DreamSys · **Size:** 26 instructions · **Status:** MATCHED (26/26 words)
+> Renamed from `func_80059360` on 2026-09-22 (tools/rename.py). Address 0x80059360.
+
+**Unit:** DreamSys · **Size:** 7 instructions · **Status:** MATCHED (7/7 words)
 
 ## What it does
 
-Calls method slot `func_800596E8` with 0, then conditionally method slot `func_8005966C` with 0 when the flag argument is set. Both go through the object's method table at offset 0, per the hand-rolled class framework.
+Returns the dream timer converted from frames to seconds. The unsigned divide is what retail emits; a signed one produces the extra sign-correction sequence.
 
 ## The C
 
 ```c
-void func_800595A8(DreamSys *this, bool arg1)
+s32 DreamSys__GetDreamTimerSeconds(DreamSys *this)
 {
-	this->vt->func_800596E8(this, 0);
-	if (arg1)
-		this->vt->func_8005966C(this, 0);
+	return (u32)this->dreamTimer / 15;
 }
 ```
 
@@ -26,7 +26,7 @@ recovered the body per docs/PARALLEL-RUNS.md 4c, rescored it in the main
 checkout from a clean build, and filed this report.
 
 This is a MATCH, not a mid-attempt snapshot: applied on its own to a green
-tree it gives 26/26 words with the whole-image SHA1 verifying.
+tree it gives 7/7 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's

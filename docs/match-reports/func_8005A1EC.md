@@ -6,7 +6,7 @@
 
 Vtable slot `+0x190` (fifth and last of the five-function run; see
 `func_8005A168.md`). Plain setter: `this->unk_0x120 = value`. `unk_0x120`
-was already named (divisor for `func_80059394`'s `dreamTimer %
+was already named (divisor for `DreamSys__UpdateTickState`'s `dreamTimer %
 unk_0x120` check).
 
 ## The C
