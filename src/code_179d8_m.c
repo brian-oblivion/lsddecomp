@@ -1008,17 +1008,172 @@ void UpdateVoiceEnvelopes(void) {
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", UpdateVoiceEnvelopes);
 #endif
 
-/* STALL -- see docs/match-reports/StartNote.md. Round 48 (echo):
- * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
- * frame gap: 0x140 -> 0x148, byte-exact vs retail). THIRD confirmed
- * negative for length closure this round (same as UpdateVoiceEnvelopes and
- * StepVoiceFade above) -- built length UNCHANGED (402/387, still 15
- * words LONG). This function's own report already diagnoses its gap as
- * two unrelated residues (an early-materialization scheduling point, and
- * a mid-loop addressing-cost difference for D_8008EA26 and neighbors) --
- * frame padding does not touch either. Best body (402/387 built words,
- * 15 words LONG) preserved there in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 402/387 words, 15 words long. Residue: two independent
+ * pieces -- an early-materialization scheduling point (~2-3 words) and a
+ * mid-loop addressing-cost difference for D_8008EA26 and neighbors
+ * (~10-12 words); round 48's frame-padding lever realigned the frame
+ * byte-exactly without closing either. A permuter search (round 37)
+ * plateaued at 12471/15053 across 51,596 iterations with no candidate
+ * reaching zero (docs/match-reports/StartNote.md). Hand-derived; two
+ * stale-symbol fixes applied per tools/stalesyms.py (round 37): the
+ * renamed-to-SpuVmVSetUp call (was func_80032148) and D_8008EA0D, which
+ * has no linker symbol of its own and is read through the already-linked
+ * D_8008EA24 base pointer instead. */
+typedef struct {
+    u8 unk0; /* +0x0 */
+    u8 unk1; /* +0x1 */
+    u8 pad2[0x4 - 0x2];
+    u8 unk4; /* +0x4 */
+    u8 pad5[0x10 - 0x5];
+} SlotE968M;
+extern SlotE968M *D_8008E968;
+
+typedef struct {
+    u8 pad0[0x12];
+    u8 unk12; /* +0x12 */
+    u8 pad13[0xAC - 0x13];
+} Entry90902E8M;
+extern Entry90902E8M *D_800902E8[];
+
+extern u8 D_8008EA0C;
+extern u8 D_8008EA0E;
+extern u8 D_8008EA0F;
+extern u8 D_8008EA1C;
+extern u8 D_8008EA1D;
+extern u8 D_8008EA1E;
+extern u8 D_8008EA1F;
+extern u8 D_8008EA20;
+extern u16 D_8008EA24;
+
+extern Rec34Half D_8008D9A0[];
+
+extern void func_8002D6A4(void);
+extern void func_8002D8E0(s32 a0);
+extern s32 func_8002DF7C(void);
+extern void func_8002D1B4(s32 a0, u16 a1);
+extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
+
+s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
+{
+    Entry90902E8M *s6;
+    SlotE968M *slot;
+    s32 s3;
+    s32 chan;
+    u8 matchCount;
+    u8 chanScan;
+    s16 origA2;
+    s32 shifted;
+    s16 a0s16;
+    u8 byte0;
+    u8 byte1;
+    u8 idBuf[0x80];
+    u8 chanBuf[0x80];
+
+    origA2 = a2;
+    byte0 = (u8) a0;
+    shifted = a0 << 16;
+    a0s16 = (s16) (shifted >> 16);
+    byte1 = (u32) shifted >> 24;
+    s6 = &D_800902E8[byte0][byte1];
+
+    if (SpuVmVSetUp(a1, a2) != 0) {
+        return -1;
+    }
+
+    slot = &D_8008E968[a2];
+    D_8008EA22 = (s16) a0;
+    D_8008EA0E = (u8) a3;
+    D_8008EA0F = 0;
+    D_8008EA10 = (u8) a4;
+    D_8008EA11 = (u8) a5;
+    D_8008EA16 = slot->unk1;
+    D_8008EA17 = slot->unk4;
+    D_8008EA0C = slot->unk0;
+
+    if ((u32) D_8008EA13 >= D_8008E970->difficultyThreshold) {
+        return -1;
+    }
+
+    s3 = 0;
+    if (a4 != 0) {
+        matchCount = 0;
+        for (chanScan = 0; chanScan < D_8008EA0C; chanScan++) {
+            Tbl32E978 *entry = &D_8008E978[D_8008EA13 * 16 + chanScan];
+
+            if (D_8008EA0E < entry->bendCurveUp) {
+                continue;
+            }
+            if (entry->bendCurveDown < D_8008EA0E) {
+                continue;
+            }
+            idBuf[matchCount] = entry->unk16;
+            chanBuf[matchCount] = chanScan;
+            matchCount++;
+        }
+
+        if (matchCount != 0) {
+            s32 s2;
+            u8 s1;
+
+            s2 = a4 * 127;
+            for (s1 = 0; s1 < matchCount; s1++) {
+                Tbl32E978 *entry2;
+
+                D_8008EA24 = idBuf[s1];
+                D_8008EA18 = chanBuf[s1];
+
+                entry2 = &D_8008E978[D_8008EA13 * 16 + D_8008EA18];
+                D_8008EA1B = entry2->unk0;
+                D_8008EA19 = entry2->unk2;
+                D_8008EA1A = entry2->unk3;
+                D_8008EA1C = entry2->unk4;
+                D_8008EA1D = entry2->unk5;
+                D_8008EA20 = entry2->unk1;
+                D_8008EA1E = entry2->unk6;
+                D_8008EA1F = entry2->unk7;
+
+                chan = func_8002CF18(0) & 0xFF;
+                D_8008EA26 = chan;
+                if (chan < D_8008E9D0) {
+                    D_8008D9A3[chan].unk0 = 1;
+                    D_8008D98A[D_8008EA26].unk0 = 0;
+                    D_8008D996[D_8008EA26].unk0 = (s16) a0;
+                    D_8008D99E[D_8008EA26].unk0 = *((u8 *) &D_8008EA24 - 0x17);
+                    D_8008D998[D_8008EA26].unk0 = D_8008EA13;
+                    D_8008D99A[D_8008EA26].unk0 = origA2;
+
+                    if ((s16) a0 != 0x21) {
+                        s16 speed = *(s16 *) ((u8 *) s6 + 0x4E + s6->unk12 * 2);
+
+                        D_8008D990[D_8008EA26].unk0 = s2 / speed;
+                    }
+
+                    D_8008D992[D_8008EA26].unk0 = (u8) a5;
+                    D_8008D99C[D_8008EA26].unk0 = D_8008EA18;
+                    D_8008D994[D_8008EA26].unk0 = a3;
+                    D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
+                    D_8008D988[D_8008EA26].unk0 = D_8008EA24;
+
+                    func_8002D6A4();
+                    if (D_8008EA24 == 0xFF) {
+                        func_8002D8E0(*(u8 *) &D_8008EA26);
+                    } else {
+                        func_8002D1B4(matchCount, func_8002DF7C());
+                    }
+                    s3 = (s3 << 4) | D_8008EA26;
+                }
+            }
+        }
+    } else {
+        StopNote(a0s16, a1, a2, a3);
+    }
+
+    return s3;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StartNote);
+#endif
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
  * 16 channels in the first word, next 16 in the second), each paired

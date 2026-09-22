@@ -616,3 +616,28 @@ documentation, nothing compiled references them yet); the base symbols
 themselves (`D_8008E970`, `D_8008E978`) were not renamed since
 `D_8008E978` is shared with bravo's live `code_179d8_j_b.c` this round
 (see broadcast).
+
+## NON_MATCHING body promoted, round 67
+
+Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+kept in `#else`. Applied both stale-symbol fixes this report's round-37
+update already diagnosed but the preserved `#if 0` text above still shows
+literally: `func_80032148(a1, a2)` -> `SpuVmVSetUp(a1, a2)` (already
+declared earlier in the unit, called the same way by
+`ApplyPitchBendToAllVoices`), and `D_8008EA0D` (no linker symbol of its
+own) -> `*((u8 *) &D_8008EA24 - 0x17)`. Also dropped four locally-redundant
+declarations that collide with types the unit's shared prelude already
+established under different typedef names for the same symbols
+(`D_8008D98A`, `D_8008D990` already `Rec34Half`; `D_8008D992` already
+`Rec34ByteEdd4`; `D_8008D998` already `Rec34Half` where this body's own
+copy said `Rec34S16` -- same `unk0` field either way, so no access-site
+change needed) and renamed two field accesses to the names a later
+naming pass gave the same offsets: `D_8008E970->unk12` ->
+`->difficultyThreshold`, `entry->unkC`/`unkD` -> `->bendCurveUp`/
+`->bendCurveDown` (by OFFSET, not by the field's on-disk polarity --
+this function's usage doesn't depend on which direction the name
+implies). `./build-and-verify.sh` green (zero bytes changed);
+`tools/check-nonmatching.sh code_179d8_m` green; `tools/stalesyms.py`
+shows no stale references left in `src/code_179d8_m.c` (only the report's
+own preserved-block text still carries the old name, expected and
+harmless).
