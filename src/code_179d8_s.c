@@ -361,4 +361,73 @@ void func_80027800(Obj80027480 *self, char *arg1) {
     UnlockCd();
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_s", func_80027A24);
+extern s32 gCdIdle; /* "idle"/"ready" flag, 0/1 */
+extern void FreeCdRequestNode(Node8008A894 *node);
+extern void *GetCdFileEntry(s32 index);
+
+void func_80027A24(void) {
+    Node8008A894 *node;
+    Obj80027480 *self;
+    s32 code;
+
+    LockCd();
+    node = gCdRequestQueue;
+    if (node != NULL) {
+        self = node->unkC;
+        code = node->unk8;
+        if (node->unk0 == 0) {
+            self->unk28 = 1;
+            switch (code) {
+            case 2:
+                self->methods->slot44(self, GetCdFileEntry(node->unk10),
+                                      node->unk14, node->unk18);
+                break;
+            case 3:
+                self->methods->onError(self);
+                break;
+            case 4:
+                self->methods->slot4C(self, node->unk14, node->unk18);
+                break;
+            case 5:
+                self->methods->slot54(self, node->unk14, node->unk18);
+                break;
+            case 7:
+                self->methods->slot58(self, GetCdFileEntry(node->unk10));
+                break;
+            }
+            self->unk28 = 0;
+        } else if (gCdIdle != 0) {
+            if (node->unk4 != 0) {
+                self->unk24 |= 1;
+            }
+            self->unk22 -= 1;
+            self->unk24 = *(volatile s32 *)&self->unk24 | 2;
+            if (self->unk22 == 0) {
+                self->unk24 = *(volatile s32 *)&self->unk24 | 4;
+            }
+            switch (code) {
+            case 2:
+                self->unk24 |= 0x10;
+                break;
+            case 3:
+                self->unk24 |= 0x20;
+                break;
+            case 4:
+                self->unk24 |= 0x40;
+                break;
+            case 5:
+                self->unk24 |= 0x80;
+                break;
+            case 7:
+                self->unk24 |= 0x200;
+                break;
+            }
+            self->methods->slot64(self);
+            FreeCdRequestNode(node);
+            if (gCdRequestQueue == NULL) {
+                self->methods->slot70(self);
+            }
+        }
+    }
+    UnlockCd();
+}
