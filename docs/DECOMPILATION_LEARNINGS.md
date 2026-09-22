@@ -12,24 +12,6 @@ report, the head promotes after merging.
 
 ## 1. Toolchain facts (proven)
 
-- **GCC 2.6.3 Psy-Q + maspsx + binutils 2.43.1 reproduces retail byte-for-byte.** `-mips1
-  -mcpu=3000 -O2 -G0 -funsigned-char -fno-builtin -mno-abicalls`; maspsx
-  `--aspsx-version=2.34 --dont-force-G0 --expand-div` plus the flags below. PINNED: a
-  suspected problem is an escalation with a reproducer. (a §"Toolchain facts")
-- **`cpp` and `cc1` take different flags; C89 only.** `-fno-builtin` is cc1-only and `cpp`
-  exits 33 on it. A `//` comment is a parse error reported far from the comment.
-  `-no-pad-sections` is required or gas pads `.text`. splat owns `include/*.inc`; hand edits
-  die on extract. (a §"Toolchain facts")
-- **`include/psyq/INLINE.H` and the LIBGPU `set*` macros are INERT — use `include/gte.h`.**
-  Eight vendored headers are CRLF and `cpp` splices `\` only before LF, so 1134 macros
-  expand to nothing: valid C, no warnings, no instructions. Hence **a negative about a MACRO
-  counts only once you have proved it EXPANDED**. (a §"Toolchain facts")
-- **The game is plain C with a hand-rolled class framework — never `cc1plus`.** Constructors
-  go through the table, entries are 4 bytes against g++'s 8, zero 8-byte vtables against 128
-  flat tables. Resolve slots with `classtable.py`; a patchy `--vs` diff means the wrong
-  ancestor, and the longer identical high-slot run is the real parent. (a §"The class
-  framework (SETTLED")
-
 ### The four RESOLVED blockers
 
 Each is one maspsx flag setting one behaviour, proven inert by a byte-exact rebuild. Do not
@@ -101,18 +83,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   failure in a function that never touched the declaration. `sizeof` is not how this game allocates
   (`New_X` passes a literal byte count), so trailing fields are safe, `DreamSys` excepted. A rodata
   slot holding JUMP TABLES must stay attached to its unit. (a §"Confirmed on this game")
-- **A `D_XXXXXXXX` in rodata holding a STRING is a symbol to REFERENCE, never a string to retype.**
-  splat has already emitted those bytes; a C literal emits a second copy, and because
-  `section_order` puts `.rodata` first the whole image shifts and the first differing byte lands
-  thousands of bytes AHEAD of the code you edited. Grep `asm/data/*.rodata.s` for the symbol first;
-  `extern const char D_XXXXXXXX[];` is the only correct spelling — a build-system fact proven by
-  round 20's `func_8003FC70` whole-image green, the one SDK-exit precedent that survives. (a §"A
-  rodata `D_XXXXXXXX` holding a STRING is a symbol to REFERENCE")
-- **Preserve a stalled body in `#if 0 ... #endif`, never in a `/* */` block comment**, inlined in
-  the match report with every declaration it needs, positioned where it would compile: inside a
-  block comment a line starting with `*` is ambiguous between a continuation marker and a
-  dereference. Which of several preserved bodies is authoritative is stated in PROSE, so do not
-  build a screen for it. (a §"A report's MANDATED preservation form can point at the WRONG body")
 - **To learn a shape from a MATCHED sibling, diff its compiled OBJECT against your target's retail
   `.s` -- never its C against your C.** The object comparison shows what the compiler DID, which is
   the thing that has to agree. Round 62 closed `func_80031890` (73/73, ins 0/del 0) this way after
@@ -135,10 +105,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   effect: writing the `unk10` store before `unk14`, against the compiled store order, is what makes
   cc1 hoist the `lh` into the delay slot — treat order as an independent lever and try it both ways.
   (a round 60, `func_8002C278`)
-- **Not strictly dominant — diagnose per instance.** Round 25 closed three functions with FOUR
-  different placement fixes and regressed one already right. Tell: a lone unconditional `j` to a
-  nearby join whose delay slot carries real work. Build no screen. (a §"THE LEVER IS NOT STRICTLY
-  DOMINANT", §"The mechanical screen for this has NO measured precision")
 - **"A barrier had no effect" is positive evidence FOR block order**, as is a flat permuter plateau.
   But "a barrier does not transfer" has three causes — block order, intra-block scheduling, and DCE
   (barrier-proof; `func_80029C40`) — and an `mflo`/`mfhi` is a NEGATIVE indicator. Once block order
@@ -346,10 +312,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `hSpan2` split a lifetime, closing a register) with the INERT entry below: a same-valued alias on
   a continuously-live value is copy-propagated away, measured byte-identical at 55/97 on
   `func_8004CAF0`'s `self`. (round 53, bravo)
-- **Swapping an intermediate local for a direct field write is a WHOLE-FUNCTION experiment, not a
-  local one.** Removing `func_8004CFB8`'s cosmetic `val` changed cc1's block layout enough to
-  regress the function's already-solved FIRST half, 25/28 to 15/28. Build and score the whole
-  function after every such swap. (round 53, bravo)
 - **Levers measured INERT — do not re-derive.** C89 `register` (the legal form) is a no-op for
   allocation; a clobber-bearing barrier is no better than an empty one; a dummy unused SCALAR cannot
   nudge frame allocation; a same-valued alias is collapsed by copy propagation and an algebraic
@@ -550,19 +512,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ### 3i. GTE and inline asm
 
-- **A COP2/GTE instruction's C form is the Psy-Q `gte_*` macro, and `include/gte.h` holds the
-  GNU-syntax versions this pipeline can assemble.** Write `gte_stsxy3_g3(prim)`, never the `swc2`
-  lines. Each macro's `__asm__ volatile("swc2 $12, 0x8(%0)" : : "r"(ptr) : "memory")` passes HARD
-  RULE 6's test: `"r"` leaves the GPR to the allocator and `$12`-`$14` are COP2 data registers with
-  no GPR identity to pin. (a §"Toolchain facts")
-- **A whole-function `__asm__` is for instructions with NO C form, not constructs that are hard to
-  type — and look in `gte.h` FIRST.** `TransformAndCullPoly` was carried as a 58-word `__asm__`
-  because `rtpt`/`nclip`/`avsz3`/`cfc2` "have no C form"; every one is a macro and the body is
-  ordinary branching C, byte-exact first build. (a §"Round 13, second batch", §"Toolchain facts")
-- **Name the right clobbers, and bracket real branches.** A GPR clobber naming `$2`-`$5` on a COP2
-  block forces spurious evictions that present as a register-identity residue elsewhere. A block
-  containing a real branch mnemonic needs an explicit tab-delimited `".set\tnoreorder\n\t"` …
-  `".set\treorder\n\t"` bracket. (a §"Round 13 (2026-09-03)", §"Toolchain facts")
 - **A BARE `__asm__("")` CAN change register allocation, which HARD RULE 6's own test calls
   banned.** On game-neutral code, removing it swaps which register holds each of two values, while
   `__asm__("" ::: "memory")` was byte-identical, so the memory clobber is not the risky half. What
@@ -714,11 +663,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   one; a LOW count predicts nothing. The threshold was corrected TWICE (5 -> 7, then the 7+ band
   matched byte-exact at 8). (a §"Round 13: retail's callee-saved-register demand", §"Round 14
   CORRECTION")
-- **A blocker screen cannot see OWNERSHIP — measured twice.** Fourteen stalled functions (1669
-  words, ~4100 lines of derivation) lay fully inside placed Sony objects while passing every blocker
-  screen, reading as the cleanest ground in the queue while unmatchable by construction. Run
-  `python3 tools/sdkstalls.py`. (a §"14 stalled functions were Sony library code", §"A blocker
-  screen cannot see OWNERSHIP")
 - **"N words short" and "N/M words match" are DIFFERENT measurements that read identically, and a
   word count is not a count of DIVERGENCES.** A title must carry LENGTH, RAW WORD-MATCH and WHERE
   THE FIRST REAL DIFF IS: a body can be the right length and match almost nothing (144/145 compiled,
@@ -754,36 +698,32 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 Each rests on Sony's linked SDK objects (ASPSX-built, so no source shape of ours reached
 those bytes) or was retracted on measurement. **Exception: a mechanism confirmed by a
 standalone reproducer, or one where our oracle went green on a C body BEFORE the
-reclassification — those stand and are kept above.** Method and the one surviving precedent
-(`func_8003FC70`) are in a §"The SDK-exit census, re-run over this document".
+reclassification — those stand and are kept above.** Method and the surviving precedent
+(`func_8003FC70`): §"The SDK-exit census, re-run over this document" (full text of four condensed
+entries below: archive, "Distilled out on 2026-09-22").
 
 - §"A `for`-loop keeps a status value register-resident where `goto`/labels folds it away" —
-  instance verdict WITHDRAWN (round 45), both functions are `libcd/sys.o`.
-- §"A third escape from the `sltiu` boolean-materialization fold" — instance WITHDRAWN (round 47);
-  the shape survives only as an untested hypothesis.
-- §"Round 27's HEADLINE", **address-taken parameter** row — 0-for-4 on game code. The other two rows
-  (invert the guard, inline every call site) STAND.
-- §"Round 27: two source levers for a residue that looks like register identity" — the section-2
-  COROLLARY (test arm polarity on a 1-word-short function) WITHDRAWN, length-neutral; the section-3
-  headline is FALSE without its `$a0` caveat.
+  WITHDRAWN (round 45), both functions `libcd/sys.o`.
+- §"A third escape from the `sltiu` boolean-materialization fold" — WITHDRAWN (round 47); an
+  untested hypothesis only.
+- §"Round 27's HEADLINE", **address-taken parameter** row — 0-for-4 on game code; other rows STAND.
+- §"Round 27: two source levers for a residue that looks like register identity" — section-2
+  COROLLARY WITHDRAWN; section-3 headline FALSE without its `$a0` caveat.
 - §"Round 27: the DCE-eliminated always-true check gets a structural hypothesis" — VOID as a
-  game-code class; both instances are `libcd/iso9660.o`. The METHOD survives.
-- §"New residue classes opened this round" — the **retry-loop driver cluster** and the
-  **commutative-operand SLOT order in `addu`** are CLASSES WITHDRAWN (round 47); an `rs`/`rt` swap
-  in game code is a NEW finding needing its own reproducer.
-- §"Round 16" **framed wrappers** — the reading heuristic survives; the codegen claim *"GCC 2.6.3
-  here always pays for the frame"* has NO pinned-pipeline evidence.
+  game-code class, both instances `libcd/iso9660.o`; the METHOD survives.
+- §"New residue classes opened this round" — the retry-loop driver cluster and the
+  commutative-operand SLOT order in `addu` are CLASSES WITHDRAWN (round 47).
+- §"Round 16" **framed wrappers** — reading heuristic survives; codegen claim has NO
+  pinned-pipeline evidence.
 - §"Round 16" **`volatile` cast as a codegen lever** — worked example WITHDRAWN (round 44),
-  `func_8002C048` is `libc2/strcmp.o`; the principle and the MMIO carve-out stand. Its
-  **`func_800323A8`** examples are Sony's too, though both claims keep their reproducers.
-- §"Two DISTINCT permuter false-lead patterns" and §"A residue next to a just-fixed defect" — their
-  libcd instances are illustrations, not measurements.
-- §"NEW STALL CLASS: retail recomputes an address our GCC CSEs away" — original example was Sony's
-  `strcmp`; `func_8003E968` is game code and the class is CLOSED (3h).
-- **Not withdrawn, listed so they are not re-proposed as a FIFTH way a score lies:** the
-  forgotten-`padNN` struct insertion (round 13), drift misattributed to the function under the
-  cursor (round 20), the jump-table funcdiff window (round 27, FIXED), and a length-short function
-  shifting `.bss` (round 36). In every one the oracle went RED and was right.
+  `func_8002C048` is Sony's; principle and MMIO carve-out stand.
+- §"Two DISTINCT permuter false-lead patterns" and §"A residue next to a just-fixed defect" —
+  libcd instances only, illustrations not measurements.
+- §"NEW STALL CLASS: retail recomputes an address our GCC CSEs away" — original example Sony's
+  `strcmp`; `func_8003E968` is game code, CLOSED (3h).
+- **Not a fifth way a score lies** (forgotten-`padNN` pad, drift misattributed to the cursor
+  function, jump-table funcdiff window, `.bss`-shifting length-short function): CLAUDE.md covers
+  all four by name; do not re-propose.
 
 ## 6. In the archive only, deliberately not carried
 

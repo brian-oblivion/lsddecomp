@@ -31,7 +31,7 @@ Everything else is measured:
     unk fields, slotNN vtable calls, raw D_ globals, NON_MATCHING bodies;
   - the SDK call surface: functions game code calls whose address lies in a
     Psy-Q segment, split into named and still func_;
-  - doc line budgets, so the sprawl this plan replaced does not grow back.
+  - doc word budgets, so the sprawl this plan replaced does not grow back.
 """
 import argparse
 import datetime
@@ -59,22 +59,28 @@ MODELS = {
     "mechanical_runner": "sonnet",
 }
 
-# Line budgets. A doc over budget is a warning here and a job in track 5.
+# WORD budgets. A doc over budget is a warning here and a job in track 5.
+# Words, not lines, since revision 10: round 64 met the LEARNINGS line budget
+# by reflowing to a wider column with the text word-for-word identical, so a
+# line count no longer measured how much a newcomer has to read. Each figure
+# is the old line budget converted at that doc's own words-per-line on
+# 2026-09-22 (LEARNINGS at its pre-reflow ratio), so the slack each doc had is
+# unchanged and only the reflow loophole closed.
 DOC_BUDGETS = {
-    "CLAUDE.md": 800,
-    "docs/FINISHING-PLAN.md": 600,
-    "docs/PARALLEL-RUNS.md": 500,
-    "docs/DECOMPILATION_LEARNINGS.md": 800,
-    "docs/MATCHING-GUIDE.md": 700,
-    "docs/SDK-OBJECTS-GUIDE.md": 400,
-    "docs/SDK-OBJECTS-RUNS.md": 300,
+    "CLAUDE.md": 7300,
+    "docs/FINISHING-PLAN.md": 5600,
+    "docs/PARALLEL-RUNS.md": 4300,
+    "docs/DECOMPILATION_LEARNINGS.md": 9800,
+    "docs/MATCHING-GUIDE.md": 6100,
+    "docs/SDK-OBJECTS-GUIDE.md": 3500,
+    "docs/SDK-OBJECTS-RUNS.md": 3100,
 }
 
 TRACK5_ITEMS = {
     "readme": "reader-facing README.md: what the game's code is, how it is organised, how to build",
     "credits": "CREDITS.md current for every inherited name and tool",
     "asm-sites": "every live __asm__ site justified or retired (func_800195EC question, the bare barriers)",
-    "docs-budget": "every doc within its line budget; archive holds the history",
+    "docs-budget": "every doc within its word budget; archive holds the history",
     "nonmatching-clean": "tools/check-nonmatching.sh green and every stall has a NON_MATCHING body or a written reason",
 }
 
@@ -417,8 +423,8 @@ def collect(st):
     docs = {}
     for rel, budget in DOC_BUDGETS.items():
         p = ROOT / rel
-        n = sum(1 for _ in p.open(errors="replace")) if p.exists() else None
-        docs[rel] = {"lines": n, "budget": budget,
+        n = len(p.read_text(errors="replace").split()) if p.exists() else None
+        docs[rel] = {"words": n, "budget": budget,
                      "over": n is not None and n > budget}
 
     ec = subprocess.run([sys.executable, "tools/externcheck.py"], capture_output=True, text=True, cwd=ROOT).stdout
@@ -587,7 +593,7 @@ def print_status(d, n, st):
     if over:
         print("  DOC BUDGET EXCEEDED (a rule states its reason in a sentence; the story goes to PROGRESS.md):")
         for k, v in over:
-            print(f"    {k}: {v['lines']} lines, budget {v['budget']}")
+            print(f"    {k}: {v['words']} words, budget {v['budget']} (distil to docs/archive/; a reflow changes nothing here)")
         print()
     print(f"  READY JOBS (top {n}; head fills at most 5 runner slots from the top, one unit per runner):")
     for track, desc, model in jobs(d, n):

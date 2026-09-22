@@ -87,30 +87,69 @@ NOT_A_FUNCTION = re.compile(
     r"|\.NON_MATCHING|^D_[0-9A-Fa-f]{8}$|^jtbl_|^gcc2_compiled|^__gnu_compiled)")
 
 
+_PP_RE = re.compile(r"^[ \t]*#[ \t]*(if|ifdef|ifndef|elif|else|endif)\b[ \t]*(.*?)[ \t]*$")
+
+
+def _pp_cond(kw, arg):
+    """True = compiled, False = dead, None = unknown (keep both arms)."""
+    arg = re.sub(r"/\*.*?\*/", "", arg).strip()
+    if kw == "if":
+        return {"0": False, "1": True}.get(arg)
+    if arg == "NON_MATCHING":
+        return kw == "ifndef"     # `#ifdef NON_MATCHING` is dead, `#ifndef` live
+    return None
+
+
 def strip_dead_code(text):
     """Remove preserved bodies and comments before counting anything.
 
     A stalled function's best-known body is routinely kept in the unit inside
     `#if 0 ... #endif` so a later session can resume it, with the INCLUDE_ASM
-    restored right after. NEITHER form is compiled, so neither is matched --
-    and counting a preserved derivation as progress means good practice
-    inflates the headline. The same strip catches a commented-out INCLUDE_ASM,
-    which would otherwise be counted as a queued function that does not exist.
+    restored right after; a readable body kept under `#ifdef NON_MATCHING`
+    (FINISHING-PLAN.md, track 1b) is compiled only by `make nonmatching`, with
+    the live INCLUDE_ASM in its `#else`. NEITHER form is compiled by the
+    verified build, so neither is matched -- and counting a preserved
+    derivation as progress means good practice inflates the headline. The same
+    strip catches a commented-out INCLUDE_ASM, which would otherwise be counted
+    as a queued function that does not exist.
+
+    This is a small preprocessor walk rather than three regexes (round 64):
+    the regex form dropped a `#if 0` block's `#else` arm along with the dead
+    one, and could not see that the INCLUDE_ASM in the `#else` of an
+    `#if 1 ... #else` is DEAD -- funcdiff then warned "still INCLUDE_ASM" on a
+    genuine match, inverting its signal exactly when a function closes. Only
+    `#if 0`, `#if 1`, `#ifdef/#ifndef NON_MATCHING` and their `#else`/`#elif`
+    are decided; any other conditional keeps both arms. Directive lines
+    themselves are dropped.
 
     Return the stripped text SEPARATELY: the caller still needs the original,
     because the DELIBERATELY UNWORKED marker lives in a header comment and
     stripping comments in place silently zeroes the banked column.
     """
-    # A readable body kept under `#ifdef NON_MATCHING` (FINISHING-PLAN.md,
-    # track 1b) is compiled only by `make nonmatching`, never by the verified
-    # build, so it is NOT a match. Drop the #ifdef half and keep the #else
-    # half, where the live INCLUDE_ASM sits. Without this the function would
-    # count as matched AND queued at once.
-    code = re.sub(r"^#ifdef NON_MATCHING\b.*?^#else\b[^\n]*\n", "", text,
-                  flags=re.M | re.S)
-    code = re.sub(r"^#ifdef NON_MATCHING\b.*?^#endif\b[^\n]*\n", "", code,
-                  flags=re.M | re.S)
-    code = re.sub(r"^#if 0\b.*?^#endif\b[^\n]*\n", "", code, flags=re.M | re.S)
+    out = []
+    stack = []   # per open conditional: [this arm live (True/False/None), an arm already taken]
+    for line in text.split("\n"):
+        m = _PP_RE.match(line)
+        if m:
+            kw, arg = m.group(1), m.group(2)
+            if kw in ("if", "ifdef", "ifndef"):
+                c = _pp_cond(kw, arg)
+                stack.append([c, c is True])
+            elif kw in ("elif", "else") and stack:
+                prev, taken = stack[-1]
+                if prev is None:
+                    c = None
+                elif taken:
+                    c = False
+                else:
+                    c = True if kw == "else" else _pp_cond("if", arg)
+                stack[-1] = [c, taken or c is True]
+            elif kw == "endif" and stack:
+                stack.pop()
+            continue
+        if all(c is not False for c, _ in stack):
+            out.append(line)
+    code = "\n".join(out)
     return re.sub(r"/\*.*?\*/", "", code, flags=re.S)
 
 

@@ -19,10 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 9 (2026-09-21, after rounds 62 and 63: a fourth maspsx
-blocker resolved the same way as the first three; rename.py had been
-de-ranking the queue; 1b jobs per unit; the ins/del rule is a pointer, not a
-verdict).
+Plan revision: 10 (2026-09-22, after rounds 64 and 65: doc budgets in
+words; the dead-code strip is a preprocessor walk shared by progress.py and
+funcdiff.py; teardown sees forkserver workers; stalesyms --fix; the
+reproducer recipe restored to the form that word-splits in both shells).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -487,8 +487,10 @@ this repo from following:
   current rules. A rule carries its reason in one sentence and a pointer to
   the PROGRESS round or archive section that holds the story.
 - **No counts in docs.** Measure with `progress.py` and `plan.py`.
-- **Line budgets**, enforced by `plan.py` as warnings and by track 5 as a
-  checklist item. Over budget means distil, and move the history to
+- **Word budgets** (words, not lines: round 64 met a line budget by
+  reflowing to a wider column with the text unchanged), enforced by `plan.py`
+  as warnings and by track 5 as a checklist item. Over budget means distil,
+  i.e. move whole entries to
   `docs/archive/`. Promoting a round's idioms is never suppressed to protect
   a budget; the head promotes, then distils (or spawns a Sonnet to) in the
   same consolidation when the warning shows. Distillation is maintenance,

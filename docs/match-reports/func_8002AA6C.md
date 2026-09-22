@@ -44,6 +44,7 @@ hardware-register block (`D_8006D8C0` and neighbours) that delta established
 for this unit.
 
 ```c
+/* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 s32 func_8002AA6C(void)
 {
     s32 n;
@@ -68,8 +69,8 @@ s32 func_8002AA6C(void)
         do {
             if (*pRetry < 7) {
                 counter = 0;
-                func_80025AE4(D_80010AAC);
-                func_80012C20(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                puts(D_80010AAC);
+                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < D_8006D614) {
                     saved = D_8006D5FC;
@@ -77,7 +78,7 @@ s32 func_8002AA6C(void)
 
                     while (D_8006D60C & 0x10) {
                         if ((u8)counter == 0) {
-                            func_80025AE4(D_80010A40);
+                            puts(D_80010A40);
                         }
                         counter++;
                         func_80029F10(1, 0, 0, 0);
@@ -85,7 +86,7 @@ s32 func_8002AA6C(void)
 
                     while (func_80029F10(0x16, D_8006D908, 0, 0)) {
                         func_80029F10(1, 0, 0, 0);
-                        func_80025AE4(D_80010A50);
+                        puts(D_80010A50);
                     }
 
                     D_8006D5FC = saved;
@@ -127,7 +128,7 @@ s32 func_8002AA6C(void)
             p2[-1] = p2[-2];
             func_80029F10(6, 0, 0, 1);
             p2[2] = p2[-3];
-            p2[3] = func_80025900(-1) + 0x1E0;
+            p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
 
         tail:
@@ -347,6 +348,7 @@ preserved below for the next attempt.
 
 ```c
 #if 0
+/* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 s32 func_8002AA6C(void)
 {
     s32 n;
@@ -371,8 +373,8 @@ s32 func_8002AA6C(void)
         do {
             if (*pRetry < 7) {
                 counter = 0;
-                func_80025AE4(D_80010AAC);
-                func_80012C20(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                puts(D_80010AAC);
+                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < D_8006D614) {
                     saved = D_8006D5FC;
@@ -380,7 +382,7 @@ s32 func_8002AA6C(void)
 
                     while (D_8006D60C & 0x10) {
                         if ((u8)counter == 0) {
-                            func_80025AE4(D_80010A40);
+                            puts(D_80010A40);
                         }
                         counter++;
                         func_80029F10(1, 0, 0, 0);
@@ -388,7 +390,7 @@ s32 func_8002AA6C(void)
 
                     while (func_80029F10(0x16, D_8006D908, 0, 0)) {
                         func_80029F10(1, 0, 0, 0);
-                        func_80025AE4(D_80010A50);
+                        puts(D_80010A50);
                     }
 
                     D_8006D5FC = saved;
@@ -434,7 +436,7 @@ s32 func_8002AA6C(void)
             p2[-1] = p2[-2];
             func_80029F10(6, 0, 0, 1);
             p2[2] = p2[-3];
-            p2[3] = func_80025900(-1) + 0x1E0;
+            p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
 
         tail:

@@ -20,6 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import progress
 import srcpath
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -175,12 +176,11 @@ def include_asm_check(name):
     """
     inc = re.compile(r"INCLUDE_ASM\([^,]+,\s*" + re.escape(name) + r"\s*\)")
     for c in srcpath.src_files():
-        text = c.read_text()
-        # A preserved body or a commented-out line is not compiled and must
-        # not count as a live INCLUDE_ASM.
-        code = re.sub(r"^#if 0\b.*?^#endif\b[^\n]*\n", "", text,
-                      flags=re.M | re.S)
-        code = re.sub(r"/\*.*?\*/", "", code, flags=re.S)
+        # A preserved body, a commented-out line, or the `#else` arm of an
+        # `#if 1` a runner iterates under is not compiled and must not count
+        # as a live INCLUDE_ASM (round 64: the regex form warned "still
+        # INCLUDE_ASM" on a genuine match). progress.py owns the walk.
+        code = progress.strip_dead_code(c.read_text())
         if inc.search(code):
             return (f"{name} is still INCLUDE_ASM in {c.name}.\n"
                     f"         The build therefore contains RETAIL'S OWN BYTES "

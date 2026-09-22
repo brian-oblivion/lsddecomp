@@ -8797,3 +8797,103 @@ they came from.
   screen miscounts, alongside the word "permuter").
 - "count trivial `jr $ra; nop` functions separately," (a second ranking
   instruction, alongside "rank a fresh unit by SIBLING GROUP").
+
+## Distilled out on 2026-09-22 (revision 10)
+
+The budget for `docs/DECOMPILATION_LEARNINGS.md` changed from 800 lines to 9800 words
+(round 64 met the line budget by reflowing to a wider column, content unchanged), so this
+pass distills by moving whole entries here rather than by trimming clauses. Each entry below
+is verbatim from the lean file; most duplicate content already stated in `CLAUDE.md` (the
+Psy-Q GTE/clobber rules, the C89 `cpp`/`cc1` split, the class-framework facts, the rodata
+`D_XXXXXXXX` string idiom, the `#if 0` preservation form, and the SDK-ownership screen), a
+few are special cases fully covered by a surviving sibling entry, and the four from section 5
+are withdrawal pointers condensed in place, kept here in full.
+
+**1. Toolchain facts (proven)**
+
+- **GCC 2.6.3 Psy-Q + maspsx + binutils 2.43.1 reproduces retail byte-for-byte.** `-mips1
+  -mcpu=3000 -O2 -G0 -funsigned-char -fno-builtin -mno-abicalls`; maspsx
+  `--aspsx-version=2.34 --dont-force-G0 --expand-div` plus the flags below. PINNED: a
+  suspected problem is an escalation with a reproducer. (a §"Toolchain facts")
+- **`cpp` and `cc1` take different flags; C89 only.** `-fno-builtin` is cc1-only and `cpp`
+  exits 33 on it. A `//` comment is a parse error reported far from the comment.
+  `-no-pad-sections` is required or gas pads `.text`. splat owns `include/*.inc`; hand edits
+  die on extract. (a §"Toolchain facts")
+- **`include/psyq/INLINE.H` and the LIBGPU `set*` macros are INERT — use `include/gte.h`.**
+  Eight vendored headers are CRLF and `cpp` splices `\` only before LF, so 1134 macros
+  expand to nothing: valid C, no warnings, no instructions. Hence **a negative about a MACRO
+  counts only once you have proved it EXPANDED**. (a §"Toolchain facts")
+- **The game is plain C with a hand-rolled class framework — never `cc1plus`.** Constructors
+  go through the table, entries are 4 bytes against g++'s 8, zero 8-byte vtables against 128
+  flat tables. Resolve slots with `classtable.py`; a patchy `--vs` diff means the wrong
+  ancestor, and the longer identical high-slot run is the real parent. (a §"The class
+  framework (SETTLED")
+
+**2. Build hygiene**
+
+- **A `D_XXXXXXXX` in rodata holding a STRING is a symbol to REFERENCE, never a string to retype.**
+  splat has already emitted those bytes; a C literal emits a second copy, and because
+  `section_order` puts `.rodata` first the whole image shifts and the first differing byte lands
+  thousands of bytes AHEAD of the code you edited. Grep `asm/data/*.rodata.s` for the symbol first;
+  `extern const char D_XXXXXXXX[];` is the only correct spelling — a build-system fact proven by
+  round 20's `func_8003FC70` whole-image green, the one SDK-exit precedent that survives. (a §"A
+  rodata `D_XXXXXXXX` holding a STRING is a symbol to REFERENCE")
+- **Preserve a stalled body in `#if 0 ... #endif`, never in a `/* */` block comment**, inlined in
+  the match report with every declaration it needs, positioned where it would compile: inside a
+  block comment a line starting with `*` is ambiguous between a continuation marker and a
+  dereference. Which of several preserved bodies is authoritative is stated in PROSE, so do not
+  build a screen for it. (a §"A report's MANDATED preservation form can point at the WRONG body")
+
+**3a. Control flow and block order**
+
+- **Not strictly dominant — diagnose per instance.** Round 25 closed three functions with FOUR
+  different placement fixes and regressed one already right. Tell: a lone unconditional `j` to a
+  nearby join whose delay slot carries real work. Build no screen. (a §"THE LEVER IS NOT STRICTLY
+  DOMINANT", §"The mechanical screen for this has NO measured precision")
+
+**3d. Locals, naming and register identity**
+
+- **Swapping an intermediate local for a direct field write is a WHOLE-FUNCTION experiment, not a
+  local one.** Removing `func_8004CFB8`'s cosmetic `val` changed cc1's block layout enough to
+  regress the function's already-solved FIRST half, 25/28 to 15/28. Build and score the whole
+  function after every such swap. (round 53, bravo)
+
+**3i. GTE and inline asm**
+
+- **A COP2/GTE instruction's C form is the Psy-Q `gte_*` macro, and `include/gte.h` holds the
+  GNU-syntax versions this pipeline can assemble.** Write `gte_stsxy3_g3(prim)`, never the `swc2`
+  lines. Each macro's `__asm__ volatile("swc2 $12, 0x8(%0)" : : "r"(ptr) : "memory")` passes HARD
+  RULE 6's test: `"r"` leaves the GPR to the allocator and `$12`-`$14` are COP2 data registers with
+  no GPR identity to pin. (a §"Toolchain facts")
+- **A whole-function `__asm__` is for instructions with NO C form, not constructs that are hard to
+  type — and look in `gte.h` FIRST.** `TransformAndCullPoly` was carried as a 58-word `__asm__`
+  because `rtpt`/`nclip`/`avsz3`/`cfc2` "have no C form"; every one is a macro and the body is
+  ordinary branching C, byte-exact first build. (a §"Round 13, second batch", §"Toolchain facts")
+- **Name the right clobbers, and bracket real branches.** A GPR clobber naming `$2`-`$5` on a COP2
+  block forces spurious evictions that present as a register-identity residue elsewhere. A block
+  containing a real branch mnemonic needs an explicit tab-delimited `".set\tnoreorder\n\t"` …
+  `".set\treorder\n\t"` bracket. (a §"Round 13 (2026-09-03)", §"Toolchain facts")
+
+**4. Verdict classes and how far to trust them**
+
+- **A blocker screen cannot see OWNERSHIP — measured twice.** Fourteen stalled functions (1669
+  words, ~4100 lines of derivation) lay fully inside placed Sony objects while passing every blocker
+  screen, reading as the cleanest ground in the queue while unmatchable by construction. Run
+  `python3 tools/sdkstalls.py`. (a §"14 stalled functions were Sony library code", §"A blocker
+  screen cannot see OWNERSHIP")
+
+**5. Withdrawn or SDK-voided — full text of the entries condensed to one-line pointers**
+
+- §"Round 27: two source levers for a residue that looks like register identity" — the section-2
+  COROLLARY (test arm polarity on a 1-word-short function) WITHDRAWN, length-neutral; the section-3
+  headline is FALSE without its `$a0` caveat.
+- §"New residue classes opened this round" — the **retry-loop driver cluster** and the
+  **commutative-operand SLOT order in `addu`** are CLASSES WITHDRAWN (round 47); an `rs`/`rt` swap
+  in game code is a NEW finding needing its own reproducer.
+- §"Round 16" **`volatile` cast as a codegen lever** — worked example WITHDRAWN (round 44),
+  `func_8002C048` is `libc2/strcmp.o`; the principle and the MMIO carve-out stand. Its
+  **`func_800323A8`** examples are Sony's too, though both claims keep their reproducers.
+- **Not withdrawn, listed so they are not re-proposed as a FIFTH way a score lies:** the
+  forgotten-`padNN` struct insertion (round 13), drift misattributed to the function under the
+  cursor (round 20), the jump-table funcdiff window (round 27, FIXED), and a length-short function
+  shifting `.bss` (round 36). In every one the oracle went RED and was right.

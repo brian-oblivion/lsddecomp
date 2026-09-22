@@ -237,6 +237,7 @@ each, carves it into `unk78`/`unk80`/`unk88` (bases) and
 uncarved).
 
 ```c
+/* stalesyms --fix 2026-09-22: func_8003FC18 -> GsClearOt -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 void func_8003ECD0(Unk18Obj *self) {
     s32 size;
     s32 buf;
@@ -266,8 +267,8 @@ void func_8003ECD0(Unk18Obj *self) {
     *(s32 *)self->unk7C = self->unk3C;
     *(s32 *)(self->unk7C + 4) = self->unk84;
 
-    func_8003FC18(0, 0, self->unk78);
-    func_8003FC18(0, 0, self->unk7C);
+    GsClearOt(0, 0, self->unk78);
+    GsClearOt(0, 0, self->unk7C);
 
     self->unk70 = 1;
     self->unk74 = 0;

@@ -674,15 +674,13 @@ lead you have not tried and failed to reproduce in isolation** — extract the
 construct into a self-contained `.c` and run it through the pinned pipeline:
 
 ```sh
-# Run this under BASH. This project's interactive shell is zsh, which does NOT
-# word-split an unquoted $(...), so the flags would reach maspsx as ONE argv
-# entry; it dies on --aspsx-version, and because that is mid-PIPE the recipe's
-# own exit status still reads 0. Symptom: objdump prints its "file format" line
-# and no function at all. In zsh, spell the expansion ${=MASPSX_FLAGS}.
-MASPSX_FLAGS=$(sed -n 's/^MASPSX_FLAGS *:= *//p' Makefile)
+# Keep the $(sed ...) INLINE. An unquoted $(...) word-splits in bash AND zsh;
+# a $VAR holding the same flags does NOT in zsh (measured 2026-09-22), and then
+# maspsx gets one argv entry, dies mid-pipe, the exit status still reads 0 and
+# objdump prints its "file format" line and no function at all.
 tools/gcc263/cpp -Iinclude -Iinclude/psyq -undef -lang-c -nostdinc -Dmips -D__GNUC__=2 /tmp/t.c \
   | tools/gcc263/cc1 -mips1 -mcpu=3000 -quiet -G0 -O2 \
-  | .venv/bin/python3 tools/maspsx/maspsx.py $MASPSX_FLAGS \
+  | .venv/bin/python3 tools/maspsx/maspsx.py $(sed -n 's/^MASPSX_FLAGS *:= *//p' Makefile) \
   | tools/binutils/bin/mipsel-linux-gnu-as -march=r3000 -EL -no-pad-sections -G0 -o /tmp/t.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d /tmp/t.o
 ```

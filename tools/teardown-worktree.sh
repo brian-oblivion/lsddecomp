@@ -13,7 +13,7 @@
 #
 #   1. the branch has NO commits that main lacks (everything merged);
 #   2. the worktree has no uncommitted changes;
-#   3. no permuter process is cwd-ed into the worktree.
+#   3. no permuter process, or multiprocessing worker of one, is cwd-ed into the worktree.
 #
 # The fourth precondition (every touched function has a report) is checked by
 # the merge, not here. Pass --i-know for a deliberate discard of a branch you
@@ -50,7 +50,12 @@ live=0
 for d in /proc/[0-9]*; do
     cwd=$(readlink "$d/cwd" 2>/dev/null) || continue
     case "$cwd" in "$dest"*)
-        if tr '\0' ' ' < "$d/cmdline" 2>/dev/null | grep -qE 'permuter|decomp-permuter'; then
+        # Python 3.14 starts multiprocessing workers through a FORKSERVER, so
+        # the permuter's workers run as `python -c "from multiprocessing.
+        # forkserver import main; ..."` -- no "permuter" in their cmdline, and
+        # they outlive a parent killed by `timeout` (round 65: 11 of them
+        # survived a teardown this guard let through).
+        if tr '\0' ' ' < "$d/cmdline" 2>/dev/null | grep -qE 'permuter|decomp-permuter|multiprocessing'; then
             echo "REFUSING: live search process ${d#/proc/} in $cwd"; live=1
         fi;;
     esac

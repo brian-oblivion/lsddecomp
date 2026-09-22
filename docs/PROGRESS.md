@@ -2155,6 +2155,36 @@ skeleton diffs and forces ins/del to 0/0 when they are zero; the rule text in
 all three docs now says N/N at equal length is a pointer to read the diff,
 not a verdict.
 
+**Revision 10 (2026-09-22, after rounds 64 and 65).** Doc budgets are in
+WORDS: round 64 met the LEARNINGS line budget by reflowing to a wider column
+with the text word-for-word identical, so the line count had stopped
+measuring what a newcomer reads. Each budget is the old line figure at that
+doc's own words-per-line (LEARNINGS at its pre-reflow ratio), so no doc's
+slack moved and only the loophole closed; LEARNINGS came in over and was
+distilled 10402 -> 9590 words, nine entries CLAUDE.md already owns and two
+special cases of surviving entries moved to the archive, section 5 condensed
+to one-line pointers. `progress.strip_dead_code` is a small preprocessor walk
+(`#if 0/1`, `NON_MATCHING`, `#else`, nesting) instead of three regexes, and
+`funcdiff.py` uses it: the "still INCLUDE_ASM" warning no longer fires on a
+match iterated under `#if 1 ... #else`; every count is unchanged.
+`teardown-worktree.sh` also matches `multiprocessing` in a process's
+cmdline, because Python 3.14 starts permuter workers through a forkserver
+whose cmdline never says "permuter" (round 65's eleven survivors). Round 64's
+stalesyms backlog: the tool now prints the OUTSTANDING count (the 52-in-25
+headline included eleven head-annotated reports that are not work), and
+`--fix` retrofits the names outside comments in the outstanding reports'
+preserved regions; run once, 14 reports repaired, outstanding 0, the four
+without a `#if 0` block listed for their revisit. §3.3 screen 5 gains one
+sentence: a per-lever negative screens nothing. Round 65's CLAUDE.md
+reproducer edit is REVERSED: measured under both shells, an inline `$(...)`
+word-splits in bash and zsh and a `$VAR` does not in zsh, so the original
+inline form was correct and the "run under BASH" rewrite was the broken one.
+NOT adopted: a HARD RULE 6 counter-indication (the delay-slot cost of a
+barrier is a matching idiom, promoted in LEARNINGS, not a legality rule); a
+length-figure re-measuring sweep (five stall functions have the construct in
+retail, a body's figure moves by one or two words, the tag only orders the
+revisit queue and the revisit rebuilds first).
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

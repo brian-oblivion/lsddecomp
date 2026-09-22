@@ -64,13 +64,19 @@ roughly an order of magnitude: a prose mention of an old name is harmless and
 usually historically accurate. Only `#if 0 ... #endif` blocks and ```c fences
 are scanned, which is where linkage actually matters.
 
-Usage:  python3 tools/stalesyms.py [--reports DIR] [--quiet] [--all]
+Usage:  python3 tools/stalesyms.py [--reports DIR] [--quiet] [--all] [--fix]
         --all also lists the ARCHIVAL (already-matched) reports in full.
+        --fix rewrites the stale names inside the `#if 0` blocks of the
+        OUTSTANDING live reports (not the head-annotated ones, not the
+        fence-only ones) and leaves a dated note under each repaired `#if 0`.
+        The residue those bodies recorded stays UNVERIFIED until rebuilt;
+        the fix only makes them link as written (revision 10, round 65).
 Exit 1 if any stale reference is found, so it can gate a round.
 """
 import os, re, sys
 
 SYMS = "config/symbols.slps01556.lsdde.txt"
+FIX_DATE = __import__("datetime").date.today().isoformat()
 REPORTS = "docs/match-reports"
 
 def load_symbols(path):
@@ -242,11 +248,76 @@ def main():
     live_hits = {k: v for k, v in findings.items() if is_live(k)}
     arch_hits = {k: v for k, v in findings.items() if not is_live(k)}
 
+    def annotated(name):
+        try:
+            with open(os.path.join(reports, name), errors="replace") as fh:
+                return "WILL NOT LINK AS WRITTEN" in fh.read()
+        except OSError:
+            return False
+
+    def report_text(name):
+        return open(os.path.join(reports, name), errors="replace").read()
+
+    done = sorted(k for k in live_hits if annotated(k))
+    todo = sorted(k for k in live_hits if not annotated(k))
+    nofmt = sorted(k for k in live_hits if not has_if0(report_text(k)))
+
+    if "--fix" in args:
+        # Rewrite stale names in every preserved region of the outstanding
+        # reports: the `#if 0` block AND the ```c fences, because which one is
+        # the resume-from body is stated in prose (see the func_80031A44 note
+        # below) and a runner may splice either. Names inside C comments are
+        # left alone: `/* VSync (was func_80025900) */` is the provenance note
+        # the project requires, and rewriting it would erase what it records.
+        def rename_outside_comments(src, hit):
+            parts = re.split(r'(/\*.*?\*/|//[^\n]*)', src, flags=re.S)
+            for i in range(0, len(parts), 2):
+                for o, n in hit.items():
+                    parts[i] = re.sub(r'\b' + o + r'\b', n, parts[i])
+            return "".join(parts)
+
+        def repair(m, stale):
+            block = m.group(0)
+            hit = {o: n for o, n in stale.items()
+                   if re.search(r'\b' + o + r'\b', strip_comments(block))}
+            if not hit:
+                return block
+            block = rename_outside_comments(block, hit)
+            nl = block.index("\n") + 1
+            note = ("/* stalesyms --fix " + FIX_DATE + ": "
+                    + ", ".join(f"{o} -> {n}" for o, n in sorted(hit.items()))
+                    + " -- names retrofitted so this body links as written;"
+                    " the residue it recorded is unverified until rebuilt. */\n")
+            return block[:nl] + note + block[nl:]
+
+        for k in todo:
+            path = os.path.join(reports, k)
+            text = report_text(k)
+            stale = live_hits[k]
+            new = re.sub(r'^[ \t]*#if\s+0\b.*?^[ \t]*#endif',
+                         lambda m: repair(m, stale), text, flags=re.S | re.M)
+            new = re.sub(r'```+\s*c\b.*?```+', lambda m: repair(m, stale), new, flags=re.S)
+            if new != text:
+                with open(path, "w") as fh:
+                    fh.write(new)
+                print(f"fixed {k}: " + ", ".join(f"{o} -> {n}" for o, n in sorted(stale.items())))
+        print(f"--fix: {len(todo)} outstanding report(s) processed; {len(done)} head-annotated"
+              f" report(s) left alone by design.")
+        if nofmt:
+            print(f"{len(nofmt)} of them still have NO `#if 0` block (names fixed in their fences;"
+                  " rewrite into the mandated form when the body is next rebuilt):")
+            for k in nofmt:
+                print(f"    {k}")
+        return 1
+
     total = sum(len(v) for v in findings.values())
     ltotal = sum(len(v) for v in live_hits.values())
     print(f"STALE SYMBOL REFERENCES: {total} in {len(findings)} report(s).")
     print(f"  LIVE (function still INCLUDE_ASM -- the body gates a figure): "
           f"{ltotal} in {len(live_hits)}")
+    print(f"  OUTSTANDING (live and not head-annotated -- THE NUMBER TO ACT ON): "
+          f"{sum(len(live_hits[k]) for k in todo)} in {len(todo)}"
+          + (f", of which {len([k for k in todo if k in nofmt])} fence-only" if nofmt else ""))
     print(f"  ARCHIVAL (function already matched -- src/ is the truth):     "
           f"{total - ltotal} in {len(arch_hits)}")
     print()
@@ -259,8 +330,6 @@ def main():
     print("rebuilding it proves nothing. --all lists those too.")
     print()
 
-    nofmt = sorted(k for k in live_hits if not has_if0(
-        open(os.path.join(reports, k), errors="replace").read()))
     if nofmt:
         print(f"NOTE: {len(nofmt)} of the LIVE reports have NO `#if 0` block, so the")
         print("figure above was read from their ```c fences instead -- a weaker")
@@ -282,15 +351,6 @@ def main():
     # Same shape as nearmiss.py's NOT GAME CODE marker: a verdict no tool can
     # read is a verdict the next round pays for again.  The marker here is the
     # phrase the annotation already uses, so nothing had to be re-annotated.
-    def annotated(name):
-        try:
-            with open(os.path.join(reports, name), errors="replace") as fh:
-                return "WILL NOT LINK AS WRITTEN" in fh.read()
-        except OSError:
-            return False
-
-    done = sorted(k for k in live_hits if annotated(k))
-    todo = sorted(k for k in live_hits if not annotated(k))
     if done:
         print(f"OF THE {len(live_hits)} LIVE REPORTS, {len(done)} ARE ALREADY ANNOTATED")
         print('by a head with "WILL NOT LINK AS WRITTEN" and were deliberately left')

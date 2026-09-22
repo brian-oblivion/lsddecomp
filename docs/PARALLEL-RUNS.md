@@ -7,7 +7,7 @@ This is the PROCEDURE. The history that produced each rule, with the round
 numbers and the measurements, is `docs/archive/PARALLEL-RUNS-full-2026-09-16.md`
 (referenced below as "archive") and `docs/PROGRESS.md`. A rule here states its
 reason in one sentence and links the story; do not paste stories back in.
-`tools/plan.py` warns when this file grows past its line budget.
+`tools/plan.py` warns when this file grows past its word budget.
 
 WHAT to run a round on, in what order, and which model does what, is
 `docs/FINISHING-PLAN.md`. The operator pastes the head prompt from THERE. This
@@ -209,7 +209,9 @@ diff (archive §Gate 1, round 46).
 5. Attempt history. A 252/258 got there by being worked; the figure that
    ranks it first is also evidence the cheap levers are spent. Prefer the
    smallest gap with the SHALLOWEST history and mix worked and unworked
-   ground in one assignment.
+   ground in one assignment. A recorded per-lever NEGATIVE screens nothing:
+   it measured that lever alone in that body, and two byte-inert levers are
+   not jointly inert (round 64, a negative that stood 16 rounds was the lever).
 6. Permuter history, keyed on evidence of a RUN (iteration counts, `rc=`,
    `base score`), never on the word "permuter". The word appears most where
    the lever was recommended and never pulled.
@@ -381,6 +383,7 @@ worktree with an unmerged commit by chaining the command onto a push):
 ```sh
 tools/teardown-worktree.sh <name>            # refuses unless merged, clean, idle
 python3 tools/externcheck.py                 # after any round that MATCHED: externs vs new signatures
+python3 tools/stalesyms.py --fix             # after any round that RENAMED: outstanding preserved bodies link again
 git status --porcelain && ./build-and-verify.sh && git push origin main
 ```
 
