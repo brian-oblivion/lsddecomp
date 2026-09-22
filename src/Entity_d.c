@@ -494,4 +494,58 @@ void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/Entity_d", func_80061778);
+void func_80061778(Entity *this, EntityMoodHandlerArg *out) {
+    if (this->unk44 == 0) {
+        if (func_8005E02C(this, 0x800) != 0) {
+            this->unk44 = 0xB;
+            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            Class6B5CC__FaceTarget(this->target, this, 1, 1, 0);
+            this->methods->activate(this);
+            this->methods->startSoundCue(this);
+            this->target->methods->slot130(this->target, 1);
+            out->unk10 = 0;
+            out->unk1C = 0xC;
+            this->moodTimer = 0;
+        }
+    }
+    if (this->unk44 == 0) {
+        this->methods->deactivate(this);
+        this->methods->stopSoundCue(this);
+        goto tail;
+    }
+    if (out->unk4 % 100 == 0) {
+        out->unk10 = this->methods->getProximityRatio(this);
+        out->unk1C = 0xC;
+        out->unk20 = -1;
+    }
+    if (this->moodTimer < 3) {
+        this->methods->slotCC(this, 0x96, 0);
+    } else if (this->moodTimer < 7) {
+        this->methods->slotCC(this, (this->moodTimer & 1) ? -0x32 : 0x32, 0);
+    } else if (this->moodTimer == 0x64) {
+        if (rand() & 1) {
+            this->unk44 = 0xC;
+            this->methods->slot130(this);
+        }
+    } else if (this->moodTimer == 0xF0) {
+        this->target->methods->slot134(this->target, 1, 1);
+    }
+    if (this->unk44 == 0xC) {
+        if (this->moodTimer < 0x82) {
+            this->methods->slotCC(this, 0xA, 0);
+        } else if (this->moodTimer < 0xA0) {
+            this->methods->slotC4(this, -0x1E, 0);
+        } else if (this->moodTimer < 0x12D) {
+            /* nothing */
+        } else {
+            Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
+            this->methods->slotC4(this, -0x1E, 0);
+        }
+    }
+tail:
+    if (this->methods->slot144(this, this->target) < 0x200) {
+        this->methods->deactivate(this);
+        this->methods->notifyParents(this, 0xA);
+    }
+}
+
