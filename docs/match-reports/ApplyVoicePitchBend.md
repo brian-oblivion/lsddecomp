@@ -532,3 +532,16 @@ function that produces it, not only by the MIDI-shaped depth encoding here.
 Two independent kinds of evidence, so tier A stands. `func_8002E038` is
 itself a naming candidate (a note-to-SPU-pitch converter) for whoever takes
 `code_179d8_l`; it was correctly left alone this round as out of unit.
+
+## NON_MATCHING body promoted, round 67
+
+Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+kept in `#else`. Field references updated from the report's original
+`unkC`/`unkD` to the unit's current `bendCurveUp`/`bendCurveDown` names
+(mapped by OFFSET, not by the field's "Up"/"Down" label: `unkD` (+0xD, used
+for `threshold > 0`) is `bendCurveDown`, and `unkC` (+0xC, used for
+`threshold < 0`) is `bendCurveUp` -- the struct's own inline comments claim
+the opposite polarity, which looks like a naming-pass error worth a
+separate look, not something this promotion should silently paper over).
+`./build-and-verify.sh` green (zero bytes changed) and
+`tools/check-nonmatching.sh code_179d8_m` green.

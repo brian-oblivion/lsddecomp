@@ -524,9 +524,70 @@ extern u8 D_8008EA18;
 
 extern s16 func_8002E038(u16 a0, u16 a1);
 
-/* STALL -- see docs/match-reports/ApplyVoicePitchBend.md. Best body reached
- * (77/138 words, byte-exact length) preserved there in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 77/138 words, length exact. Residue: register-class
+ * renumbering plus one deferred `& 0xFFFF` mask on the second
+ * func_8002E038 argument -- a banned-to-fix register-identity case, per
+ * a permuter search that plateaued at 485/770 with no candidate reaching
+ * zero (docs/match-reports/ApplyVoicePitchBend.md). Hand-derived. */
+s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
+{
+    s16 threshold;
+    u16 someTotal;
+    u16 baseValue;
+    s32 outA2;
+    s32 outA1;
+    s32 product;
+    s32 q;
+    s32 r;
+    u8 tableByte;
+    u8 byteVal;
+
+    threshold = a4 - 0x40;
+    if (D_8008D996[a0].unk0 != a1) {
+        return 0;
+    }
+    if (D_8008D99E[a0].unk0 != a2) {
+        return 0;
+    }
+    if (D_8008D99A[a0].unk0 != a3) {
+        return 0;
+    }
+
+    someTotal = D_8008D99C[a0].unk0 + (D_8008EA13 << 4);
+    baseValue = ((Rec34U16 *) D_8008D994)[a0].unk0;
+
+    if (threshold > 0) {
+        tableByte = D_8008E978[someTotal].bendCurveDown;
+        product = threshold * tableByte;
+        q = product / 63;
+        outA2 = baseValue + q;
+        r = product % 63;
+        outA1 = r * 2;
+    } else {
+        outA2 = baseValue;
+        if (threshold < 0) {
+            tableByte = D_8008E978[someTotal].bendCurveUp;
+            product = threshold * tableByte;
+            q = product / 64;
+            outA2 = baseValue + q - 1;
+            r = product % 64;
+            outA1 = r * 2 + 0x7F;
+        } else {
+            outA1 = 0;
+        }
+    }
+
+    byteVal = *(u8 *) &D_8008D99C[a0].unk0;
+    D_8008EA26 = a0;
+    D_8008EA18 = byteVal;
+    D_8008D7F4[a0].unk0 = func_8002E038(outA2 & 0xFFFF, outA1 & 0xFFFF);
+    D_8008D970[a0] |= 4;
+    return 1;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", ApplyVoicePitchBend);
+#endif
 
 /* "Currently selected channel" scratch global -- same idiom as
  * D_8008EA26 above, write-only here (see code_179d8_j.c's own reading
