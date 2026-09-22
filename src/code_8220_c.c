@@ -216,14 +216,11 @@ typedef struct {
     s16 x, y;
 } Vec2s16_EE4;
 
-#if 0
-/* STALL snapshot round 2 -- see docs/match-reports/func_80019EE4.md.
- * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
- * residue class as func_800197C4: $a2 vs $a1 for the OT mask, plus one
- * missing `addiu $v0,$s1,0x28`. Matches the align-4-refined cross-sibling
- * formula from func_80019D84.md: last touched self field is +0x24 (a
- * u16), raw end 0x26, align_up_4(0x26) = 0x28. Not cracked.
- */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 88/96 words, length exact. Residue: register identity
+ * ($a2 vs $a1 for the OT mask) plus a missing load-delay-slot filler
+ * `addiu $v0,$s1,0x28` = align_up_4(last touched self field + width)
+ * (docs/match-reports/func_80019EE4.md). Hand-derived. */
 void func_80019EE4(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
@@ -252,9 +249,9 @@ void func_80019EE4(void *arg0, void *arg1) {
         RCpolyGT3(self, D_8008ACD0);
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019EE4);
+#endif
 
 /* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
