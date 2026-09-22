@@ -8,13 +8,13 @@
 
 Filed round 2026-08-30-a as BLOCKED on BOTH `gp_rel` (two references,
 `gLinkDstStage`/`gLinkSpawnIndex`) AND `addiu_at` (one runtime-indexed global load
-through `D_80088BA4`). Round 21 resolved `addiu_at`; round 42 resolved
+through `STAIRCASE_SPAWNS`). Round 21 resolved `addiu_at`; round 42 resolved
 `gp_rel` and `nop_mflo_mfhi`. With all three flags now in the Makefile, this
 function matched on the first rebuild.
 
 ## What it does
 
-A single array-of-array index: `D_80088BA4[gLinkDstStage]` is a `StageSpawn*`
+A single array-of-array index: `STAIRCASE_SPAWNS[gLinkDstStage]` is a `StageSpawn*`
 (one of a table of per-stage spawn-point arrays, same table
 `Test4StaircaseNodes` already uses a few lines above), indexed a second time
 by `gLinkSpawnIndex`, reading that entry's `.extra` byte (`StageSpawn`'s last
@@ -25,11 +25,11 @@ field, a signed byte at offset 5 -- matches the retail `lb` at `+0x5`).
 ```c
 s32 GetLastSpawnExtra(void)
 {
-	return D_80088BA4[gLinkDstStage][gLinkSpawnIndex].extra;
+	return STAIRCASE_SPAWNS[gLinkDstStage][gLinkSpawnIndex].extra;
 }
 ```
 
-`D_80088BA4`, `gLinkDstStage`, `gLinkSpawnIndex` were all already declared in
+`STAIRCASE_SPAWNS`, `gLinkDstStage`, `gLinkSpawnIndex` were all already declared in
 `include/DreamSys.h`. Updated the stale header comment on the
 `extern s32 GetLastSpawnExtra(void);` prototype (used to type its still-
 `INCLUDE_ASM` caller `DreamSys__TryStaircaseLink`, same unit) from "blocked by both

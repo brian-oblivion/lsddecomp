@@ -12,10 +12,10 @@ first attempt, layout was not).
 ## What it does
 
 `if (gInstantTeleportersEnabled == 0) return -1; else return GetStaticSpawn(target,
-currentPos, stage, D_80088B5C, D_80088B24, D_80088A80, 0);` -- same
+currentPos, stage, LEN_TELEPORT_TRIGGERS, TELEPORT_TRIGGERS, TELEPORT_SPAWNS, 0);` -- same
 forwarding shape as `TestForStaticLink`/`Test4TunnelLinks`/
 `Test4StaircaseNodes` a few hundred lines above/below in this unit, using a
-dedicated table triple (`D_80088B5C`/`D_80088B24`/`D_80088A80`) and trailing
+dedicated table triple (`LEN_TELEPORT_TRIGGERS`/`TELEPORT_TRIGGERS`/`TELEPORT_SPAWNS`) and trailing
 flag `0` instead of `1`.
 
 ## Attempts 1-2: right values, wrong block order (2/20, then 0/20, both with 131461 bytes of whole-image drift)
@@ -24,7 +24,7 @@ flag `0` instead of `1`.
 /* attempt 1 */
 if (gInstantTeleportersEnabled == 0)
 	return -1;
-return GetStaticSpawn(target, currentPos, stage, D_80088B5C, D_80088B24, D_80088A80, 0);
+return GetStaticSpawn(target, currentPos, stage, LEN_TELEPORT_TRIGGERS, TELEPORT_TRIGGERS, TELEPORT_SPAWNS, 0);
 
 /* attempt 2 (same compiled result as attempt 1 -- -O2 normalizes early-return
    to if/else) */
@@ -72,8 +72,8 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
 	if (gInstantTeleportersEnabled == 0) {
 		result = -1;
 	} else {
-		result = GetStaticSpawn(target, currentPos, stage, D_80088B5C,
-		                         D_80088B24, D_80088A80, 0);
+		result = GetStaticSpawn(target, currentPos, stage, LEN_TELEPORT_TRIGGERS,
+		                         TELEPORT_TRIGGERS, TELEPORT_SPAWNS, 0);
 	}
 	return result;
 }
@@ -88,9 +88,9 @@ Added the table triple as new externs (same pattern as the two existing
 triples for `Test4TunnelLinks`/`Test4StaircaseNodes`):
 
 ```c
-extern s8 D_80088B5C[];
-extern StaticLinkTrigger* D_80088B24[];
-extern StageSpawn* D_80088A80[];
+extern s8 LEN_TELEPORT_TRIGGERS[];
+extern StaticLinkTrigger* TELEPORT_TRIGGERS[];
+extern StageSpawn* TELEPORT_SPAWNS[];
 ```
 
 ## Verification

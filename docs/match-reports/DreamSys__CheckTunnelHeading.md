@@ -8,13 +8,13 @@
 
 Filed round 2026-08-30-a as BLOCKED on BOTH `gp_rel` (4 references, the
 first to `gLinkSrcStage`) AND `addiu_at` (2 runtime-indexed global loads
-through `D_800889B8`/`D_80088858`). Round 21 resolved `addiu_at`; round 42
+through `TUNNEL_ENTER_HEADINGS`/`TUNNEL_EXIT_HEADINGS`). Round 21 resolved `addiu_at`; round 42
 resolved `gp_rel`. Attempted fresh this round (a stretch pick beyond the
 assigned queue).
 
 ## What it does
 
-Looks up a "heading" byte from `D_800889B8[gLinkSrcStage][gLinkTriggerIndex]`,
+Looks up a "heading" byte from `TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex]`,
 validates it against `currentPos`'s stored heading via the already-matched
 `IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
@@ -24,13 +24,13 @@ table, `CARDINAL_ROTATIONS`) through its two optional output parameters. Called 
 
 ## New declarations needed
 
-`D_800889B8` and `D_80088858` are per-stage tables of pointers to byte
+`TUNNEL_ENTER_HEADINGS` and `TUNNEL_EXIT_HEADINGS` are per-stage tables of pointers to byte
 arrays (4-byte stride, indexed by `gLinkSrcStage`/`gLinkDstStage` respectively,
 each further indexed by `gLinkTriggerIndex`/`gLinkSpawnIndex` to read a single `u8`):
 
 ```c
-extern u8 *D_800889B8[];
-extern u8 *D_80088858[];
+extern u8 *TUNNEL_ENTER_HEADINGS[];
+extern u8 *TUNNEL_EXIT_HEADINGS[];
 ```
 
 `CARDINAL_ROTATIONS` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
@@ -67,7 +67,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	u8 heading;
 	s32 idx;
 
-	heading = D_800889B8[gLinkSrcStage][gLinkTriggerIndex];
+	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
 	if (!IsHeadingAligned((DirectionCheckArg *)arg2, heading))
 		return 0;
 
@@ -75,7 +75,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 		*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 	if (arg0 != NULL) {
-		idx = D_80088858[gLinkDstStage][gLinkSpawnIndex];
+		idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
 		*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 	}
 	return 1;
@@ -101,13 +101,13 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = D_800889B8[gLinkSrcStage][gLinkTriggerIndex];
+	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 		if (arg0 != NULL) {
-			idx = D_80088858[gLinkDstStage][gLinkSpawnIndex];
+			idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
 			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 		}
 		result = 1;
@@ -151,4 +151,4 @@ queue).
 
 ## Naming
 
-- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (D_800889B8/D_80088858 here); called from DreamSys__TryTunnelLink.
+- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (TUNNEL_ENTER_HEADINGS/TUNNEL_EXIT_HEADINGS here); called from DreamSys__TryTunnelLink.

@@ -788,7 +788,7 @@ typedef struct DreamSys {
 	CinematicCall nextCinematic;
 	PlayerSpawnPoint linkCoordinates;
 	/* 2 bytes unused */
-	s32 unknown_sdata_0x178;
+	s32 saveMagic;
 	s32 currentYear;
 	s32 currentDay;
 	s32 totalFlasbackUnlockScore;
@@ -885,7 +885,7 @@ extern s32 (*STAIRCASE_TICK_FNS[4])(DreamSys *this);
    round 43 (2026-09-15) -- both the gp-relative and addiu_at blockers it was
    filed under are resolved (see docs/research/gp-relative-blocker.md and
    docs/research/addiu-at-blocker.md), and the one-line body
-   `D_80088BA4[gLinkDstStage][gLinkSpawnIndex].extra` matched on the first rebuild
+   `STAIRCASE_SPAWNS[gLinkDstStage][gLinkSpawnIndex].extra` matched on the first rebuild
    (docs/match-reports/GetLastSpawnExtra.md). Still declared here to type
    DreamSys__TryStaircaseLink's call site, which remains INCLUDE_ASM in this unit. */
 extern s32 GetLastSpawnExtra(void);
@@ -1114,7 +1114,7 @@ struct vtable_DreamSys{
 	/* Getter for newGamePending (round 2026-08-30-c). */
 	s32 (*DreamSys__GetNewGameFlag)(DreamSys *this);
 	/* Optionally writes a literal 0x700 through arg1 (if non-NULL), always
-	   returns &this->unknown_sdata_0x178 (round 2026-08-30-c). */
+	   returns &this->saveMagic (round 2026-08-30-c). */
 	s32 *(*DreamSys__GetSaveBlock)(DreamSys *this, s32 *arg1);
 	s32 (*StartDay)(DreamSys *this);
 	s32 (*EndDay)(DreamSys *this, s32 arg1);
@@ -1349,14 +1349,14 @@ extern s32 func_8005BFC4(void);
 
 /* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
    STAGE_PERMALINK_* triple above but for tunnel links specifically. */
-extern s8 D_800889F0[];
-extern StaticLinkTrigger* D_80088980[];
-extern StageSpawn* D_80088820[];
+extern s8 LEN_TUNNEL_TRIGGERS[];
+extern StaticLinkTrigger* TUNNEL_TRIGGERS[];
+extern StageSpawn* TUNNEL_SPAWNS[];
 
 /* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
-extern s8 D_80088CBC[];
-extern StaticLinkTrigger* D_80088C4C[];
-extern StageSpawn* D_80088BA4[];
+extern s8 LEN_STAIRCASE_TRIGGERS[];
+extern StaticLinkTrigger* STAIRCASE_TRIGGERS[];
+extern StageSpawn* STAIRCASE_SPAWNS[];
 
 /* This function might be called when the player hits a wall?
 It tries to do an static link first, then a dynamic one */

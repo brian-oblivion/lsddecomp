@@ -901,14 +901,14 @@ void DreamSys__SoundCueCallback(void *arg0, SoundCueCallbackArg *arg1)
 extern void *memset(unsigned char *dst, unsigned char c, int n);
 
 /* A constant read out of .sdata and copied whole into
-   this->unknown_sdata_0x178 -- naming convention matches (the field's own
+   this->saveMagic -- naming convention matches (the field's own
    name already flags it as sdata-sourced). Not dereferenced by this
    function or any other in this unit's queue. */
 extern s32 SAVE_MAGIC;
 
 void DreamSys__InitNewGame(DreamSys *this)
 {
-	this->unknown_sdata_0x178 = SAVE_MAGIC;
+	this->saveMagic = SAVE_MAGIC;
 	this->currentYear = 0;
 	this->currentDay = 0;
 	this->totalFlasbackUnlockScore = 0;
@@ -964,7 +964,7 @@ s32 *DreamSys__GetSaveBlock(DreamSys *this, s32 *arg1)
 {
 	if (arg1 != NULL)
 		*arg1 = 0x700;
-	return &this->unknown_sdata_0x178;
+	return &this->saveMagic;
 }
 
 s32 DreamSys__StartDay(DreamSys *this)
@@ -1737,8 +1737,8 @@ s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s3
 
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
-	return GetStaticSpawn(target, currentPos, stage, D_800889F0,
-	                       D_80088980, D_80088820, 1);
+	return GetStaticSpawn(target, currentPos, stage, LEN_TUNNEL_TRIGGERS,
+	                       TUNNEL_TRIGGERS, TUNNEL_SPAWNS, 1);
 }
 
 /* Unit-local reading of the second parameter: the caller (DreamSys__CheckTunnelHeading)
@@ -1779,13 +1779,13 @@ extern DirectionTableEntry CARDINAL_ANGLES[];
    just above it. */
 extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);
 
-/* D_800889B8: a per-stage table of pointers to byte arrays (4-byte stride,
+/* TUNNEL_ENTER_HEADINGS: a per-stage table of pointers to byte arrays (4-byte stride,
    indexed by gLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
-   "heading" byte passed to IsHeadingAligned. D_80088858 is the analogous
+   "heading" byte passed to IsHeadingAligned. TUNNEL_EXIT_HEADINGS is the analogous
    table for gLinkDstStage/gLinkSpawnIndex. Neither array's own element type is
    dereferenced beyond a single `u8` here. */
-extern u8 *D_800889B8[];
-extern u8 *D_80088858[];
+extern u8 *TUNNEL_ENTER_HEADINGS[];
+extern u8 *TUNNEL_EXIT_HEADINGS[];
 
 /* The 12-byte-stride table whose first element sits 4 bytes before the
    separately-referenced `CARDINAL_ANGLES` -- splat drew the boundary there
@@ -1808,13 +1808,13 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = D_800889B8[gLinkSrcStage][gLinkTriggerIndex];
+	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 		if (arg0 != NULL) {
-			idx = D_80088858[gLinkDstStage][gLinkSpawnIndex];
+			idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
 			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 		}
 		result = 1;
@@ -1907,10 +1907,10 @@ void SetInstantTeleportersEnabled(bool value)
 }
 
 /* Table triple for Test4InstantTeleporters, same roles as the
-   D_800889F0/D_80088CBC triples above but for instant-teleporter links. */
-extern s8 D_80088B5C[];
-extern StaticLinkTrigger* D_80088B24[];
-extern StageSpawn* D_80088A80[];
+   LEN_TUNNEL_TRIGGERS/LEN_STAIRCASE_TRIGGERS triples above but for instant-teleporter links. */
+extern s8 LEN_TELEPORT_TRIGGERS[];
+extern StaticLinkTrigger* TELEPORT_TRIGGERS[];
+extern StageSpawn* TELEPORT_SPAWNS[];
 
 s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
@@ -1919,8 +1919,8 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
 	if (gInstantTeleportersEnabled == 0) {
 		result = -1;
 	} else {
-		result = GetStaticSpawn(target, currentPos, stage, D_80088B5C,
-		                         D_80088B24, D_80088A80, 0);
+		result = GetStaticSpawn(target, currentPos, stage, LEN_TELEPORT_TRIGGERS,
+		                         TELEPORT_TRIGGERS, TELEPORT_SPAWNS, 0);
 	}
 	return result;
 }
@@ -1933,16 +1933,16 @@ s32 func_8005BFC4(void)
 s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
 {
 	if (arg2 == 0)
-		return GetStaticSpawn(target, currentPos, 0, D_80088CBC,
-		                       D_80088C4C, D_80088BA4, 0);
+		return GetStaticSpawn(target, currentPos, 0, LEN_STAIRCASE_TRIGGERS,
+		                       STAIRCASE_TRIGGERS, STAIRCASE_SPAWNS, 0);
 	return -1;
 }
 
-/* Same role as D_800889B8/D_80088858 for DreamSys__CheckTunnelHeading above, but for this
+/* Same role as TUNNEL_ENTER_HEADINGS/TUNNEL_EXIT_HEADINGS for DreamSys__CheckTunnelHeading above, but for this
    function's own "link test" (indexed the same way: gLinkSrcStage/gLinkTriggerIndex
    for the heading lookup, gLinkDstStage/gLinkSpawnIndex for the second table). */
-extern u8 *D_80088C84[];
-extern u8 *D_80088BDC[];
+extern u8 *STAIRCASE_ENTER_HEADINGS[];
+extern u8 *STAIRCASE_EXIT_HEADINGS[];
 
 s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
@@ -1950,13 +1950,13 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = D_80088C84[gLinkSrcStage][gLinkTriggerIndex];
+	heading = STAIRCASE_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 		if (arg0 != NULL) {
-			idx = D_80088BDC[gLinkDstStage][gLinkSpawnIndex];
+			idx = STAIRCASE_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
 			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 		}
 		result = 1;
@@ -1968,7 +1968,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 
 s32 GetLastSpawnExtra(void)
 {
-	return D_80088BA4[gLinkDstStage][gLinkSpawnIndex].extra;
+	return STAIRCASE_SPAWNS[gLinkDstStage][gLinkSpawnIndex].extra;
 }
 
 s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
