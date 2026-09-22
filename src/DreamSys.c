@@ -333,7 +333,7 @@ s32 DreamSys__GetSetDreamTimeLimit(DreamSys *this, s32 value)
 		result = (u32)result / 15;
 	return result;
 }
-s32 DreamSys__GetDreamTimerSeconds(DreamSys *this)
+s32 DreamSys__GetDreamTimerScaled(DreamSys *this)
 {
 	return (u32)this->dreamTimer / 15;
 }
@@ -1081,7 +1081,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 		return true;
 	if (this->isFlashbackSession)
 		return true;
-	this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerSeconds(this) + saved);
+	this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerScaled(this) + saved);
 	return true;
 }
 #endif

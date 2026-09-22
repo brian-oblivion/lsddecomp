@@ -40,3 +40,20 @@ plain array indexing, no reshaping required.
 ## Naming
 
 - **Tier A.** One-line table lookup, STAGE_TIME_LIMITS[stage]. Free function, no `this`.
+
+## Head naming review, round 65: TIER corrected A -> B
+
+The round-65 naming runner recorded this name at tier A on the evidence
+"table lookup". The body is `return STAGE_TIME_LIMITS[stage];` and the whole
+name is read off that array's symbol — which is an INHERITED name
+(`config/symbols.slps01556.lsdde.txt`, `STAGE_TIME_LIMITS = 0x80087F14`,
+predating this round; the runner did not rename it).
+
+Track 3: "Every inherited name is a tier-B hypothesis. Confirm it with
+evidence or rename it; either way, record it." A tier-A name whose only
+support is an unconfirmed inherited name inherits that name's uncertainty
+rather than escaping it. The name itself is probably right — two other call
+sites in this unit assign the lookup straight into a variable already called
+`timeLimit` — but that is the same inherited reading again, not independent
+evidence. **Tier B** until a consumer is found that shows the value used as a
+time limit.

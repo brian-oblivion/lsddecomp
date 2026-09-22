@@ -993,7 +993,7 @@ struct vtable_DreamSys{
 	void (*DreamSys__BlockMovement)(DreamSys *this);
 	s32 (*func_8005931C)(DreamSys *this);
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);
-	s32 (*DreamSys__GetDreamTimerSeconds)(DreamSys *this);
+	s32 (*DreamSys__GetDreamTimerScaled)(DreamSys *this);
 	void (*func_8005937C)(DreamSys *this, s32 value);
 	void (*func_80059384)(DreamSys *this, void *value);
 	void (*func_8005938C)(DreamSys *this, s32 value);
