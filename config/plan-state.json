@@ -220,6 +220,16 @@
           "note": "REVISIT runner (bravo) on func_80027A24 in code_179d8_s: MATCHED 151/151, unit now 7 of 7. Revisit measurements recorded before any change: ins 0 / del 0, positional skeleton diffs 0, 150/151. Round 47's stated CAUSE was falsified -- it attributed the single wrong branch target to a whole-translation-unit cross-jump artifact on the strength of a permuter scaffold scoring base 0, and declined a search on that basis; a direct pinned-pipeline isolation of the same body reproduces the residue byte-for-byte, so the cause was local to the function's source all along. Lever: N identical j-exit tails with a store in the delay slot are ONE post-switch statement replicated by dbr_schedule, not N source stores.",
           "round": 67,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-22",
+          "matches": 1,
+          "model": "opus",
+          "note": "REVISIT runner (bravo) on func_80061778, Entity_d: MATCHED 198/198 on the first build after retyping EntityMethods::slotCC s32 -> void. The inherited 'tail-merge granularity' cause was wrong; it was a TYPE. Baseline rebuild recorded first as the revisit rule requires (115/198, ins 8/del 8, 78 positional skeleton diffs, built 6 words LONG). Unit Entity_d now has zero INCLUDE_ASM. No searches spent.",
+          "round": 68,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -285,6 +295,16 @@
           "model": "sonnet",
           "note": "Charlie promoted all 5 preserved bodies in code_179d8_m to #ifdef NON_MATCHING (ApplyVoicePitchBend, StepVoiceFade, StepVoiceEnvelope, UpdateVoiceEnvelopes, StartNote). All confirmed hand-derived: each report shows a round-37 permuter search that never reached zero, with its best candidates disqualified as permuter-internal restructurings rather than translatable fixes. NON_MATCHING bodies 25 -> 30; build-and-verify green (zero bytes changed) and check-nonmatching green after every promotion. matches=0 is correct for this track: a promotion is not a byte match.",
           "round": 67,
+          "runners": 1
+        },
+        {
+          "attempts": 4,
+          "calibration": true,
+          "date": "2026-09-22",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "charlie promoted all 4 preserved bodies in code_179d8_g (func_8002B3F4, func_8002B198, func_8002A75C, func_8002AA6C) to #ifdef NON_MATCHING. Per-function hand-derived vs reviewed-permuter split recorded in each report; two hybrids endorsed a named permuter find after review, and unsound/UB candidates were listed as rejected.",
+          "round": 68,
           "runners": 1
         }
       ],
@@ -438,6 +458,16 @@
           "note": "Alpha's naming pass on class_3ac78: all 23 function defs and 3 globals named, fields and vtable slots named in the unit's own header, unit header comment written, ## Naming in all 24 reports. Class866E8 identified as a grid manager on arithmetic (gDefaultGridSpan 0xA000 >>12 = 10 and >>11 = 20, the 20 corroborated four independent ways). Corrects the inherited dtor hypothesis: +0x00C is finalize, dtor is +0x004 release. Proposed three cross-unit Obj866E8 field names; head applied them by type scope.",
           "round": 67,
           "runners": 1
+        },
+        {
+          "attempts": 20,
+          "calibration": true,
+          "date": "2026-09-22",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "alpha naming pass on class_3bb8c_c: 14 of 20 defs named across three sibling classes, 3 vtable-data globals, 2 slots -> onConstruct via the compiler-ownership recipe, unit header comment, 6 new reports for empty stubs. Head review sampled six names; both tier-B names explicitly refuse the available purpose-guess. Sonnet retained.",
+          "round": 68,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -445,6 +475,7 @@
         "DreamSys": "2026-09-22",
         "Entity": "2026-09-19",
         "class_3ac78": "2026-09-22",
+        "class_3bb8c_c": "2026-09-22",
         "class_3bb8c_f": "2026-09-20",
         "class_3bb8c_o": "2026-09-18",
         "class_3bb8c_p": "2026-09-19",

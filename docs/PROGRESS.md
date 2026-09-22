@@ -6,6 +6,128 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-22 — round 68: a wrong CAUSE cost two rounds, and a green oracle hid a red one for a whole round
+
+**Three runners, three tracks, three merges, all green. Matched 1151 -> 1152,
+queued 101 -> 100.** Head on Opus; nothing needed Fable, and the one plan-level
+finding is ESCALATED below rather than acted on. Gate 0 clean, all three
+worktrees byte-verified before handover.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 3 | `class_3bb8c_c` | 14 of 20 defs named across three sibling classes, 3 vtable globals, 2 slots -> `onConstruct`, unit header comment; review PASSED, unit marked |
+| bravo | opus | 1 revisit | `Entity_d` | `func_80061778` MATCHED 198/198; unit now has zero `INCLUDE_ASM` |
+| charlie | sonnet | 1b | `code_179d8_g` | all 4 preserved bodies promoted; `check-nonmatching` 30 -> 34 bodies |
+
+Track 3 is 20/75 units passed, 713/1152 defs still `func_` (was 726). Revisit
+yield 13/28. The naming runner stays Sonnet: `class_3bb8c_c` is its first unit
+and it passed review.
+
+**Assignment note.** `plan.py`'s third-ranked job was the 1b promotion in
+`code_d294_b`; `headercontention.py` measured a call-graph collision
+(`code_d294_b` references `GetClass6B5CCMethods`, which `class_3bb8c_c`
+defines, so alpha's `rename.py` would rewrite charlie's unit). Took the next 1b
+job, `code_179d8_g`, rather than lean on the merge-order mitigation: a promoted
+`NON_MATCHING` body carrying a stale callee name only surfaces in
+`check-nonmatching.sh` after both merges, which is a bad place to find it.
+
+### The stall was a TYPE, and the report's own figures said so for two rounds
+
+`func_80061778` sat since rounds 13 and 20 as "tail-merge granularity, not a
+CFG/value error". It was `EntityMethods::slotCC` typed `s32`. Retyping the slot
+`void` matched the function at 198/198 **with the inherited body unchanged**.
+
+The mechanism: GCC 2.6.3 emits a value-returning call as
+`(set (reg v0) (call ...))` and a void call as a bare `(call ...)`.
+`find_cross_jump` compares with `rtx_equal_p`, so two calls whose callees differ
+in return type can never be tail-merged, however identical their argument and
+target registers — and since the call insn is where a shared suffix must BEGIN,
+a return-type mismatch forecloses the whole merge rather than costing one
+instruction. In each of the function's two dispatch chains, the arm that failed
+to join retail's merge was precisely the arm typed differently from its
+siblings.
+
+The figure that cracked it was one the inherited report never recorded: the
+built function was **6 words long, exactly +3 in each chain**. The report read
+the two chains as *opposite-direction* merge misses and concluded that "rules
+out a single uniform fix" — but the same deficit twice is the one reading that
+rules out. The 8/8 insertions/deletions figure was the false alignment on a
+repeating call-setup skeleton that the revisit rule warns about; the
+`build/lsdde.map` length lookup beside it is what paid.
+
+**The corollary is the sharper half.** `slotCC` was typed `s32` on CLAUDE.md's
+one-line-wrapper rule, from `func_8005FEC8` being a lone
+`return this->methods->slotCC(this, -0x5A, 0);`. That function compiles
+**byte-identically** as `void` — verified 12/12 after the retype — so its bytes
+were never evidence in either direction. The rule produced a DEFAULT, not a
+fact, and the trap is that a default reads as evidence once it is written into
+a header comment and everyone else builds on it. A sibling cross-jump that does
+produce a fact outranks it. `include/Entity.h` now records the mechanism in both
+directions on two slots, and the diagnostic is promoted to 3f: before reshaping
+a suspected tail-merge stall, LIST the return types of every call in the chain;
+retail's merge set must be type-uniform. Thirty seconds, cheaper than any
+reshape.
+
+### A green oracle hid a red one for a whole round
+
+`tools/check-nonmatching.sh` had been RED since round 67, with the whole-image
+oracle green the entire time. Charlie hit it in an unrelated unit and correctly
+declined to fix another unit's file; the head reproduced it on clean `main`
+before believing it.
+
+Round 67 (this head's predecessor) applied a type-scope field rename and
+recorded that "the compiler listed exactly two accessors and nothing else".
+That was true **of the default build**, which never compiles an
+`#ifdef NON_MATCHING` body — so six further accessors inside
+`func_8004C6A8`'s preserved body were invisible to the check that the track-3
+procedure treats as authoritative. The same commit even noted that `gridSpan`
+"has no C accessor yet -- its reader `func_8004C6A8` is still INCLUDE_ASM",
+which was the tell, read as reassurance.
+
+`DECOMPILATION_LEARNINGS.md` had the right idiom since round 54 — "the compiler
+cannot see a `#if 0` preserved body" — and its discriminator was a `^#if 0`
+grep. **Track 1b has spent rounds converting exactly that shape into
+`#ifdef NON_MATCHING`, which that grep does not match.** The entry was correct
+and its discriminator had gone stale underneath it as a direct consequence of
+another track's progress. It now names `check-nonmatching.sh` RED against a
+GREEN oracle as the tell and covers both shapes.
+
+Promoting the round's idiom pushed the doc over budget (9946 against 9800), so
+three single-instance entries were distilled to the archive in the same
+consolidation, per FINISHING-PLAN §5: promote first, then distil.
+
+### Escalated — the head did not act on this
+
+**FINISHING-PLAN §3 track 3 step 3 is wrong as written**, and round 67 followed
+it correctly and still shipped a regression. It says the compiler's error list
+after renaming a field in the struct definition "is the exact accessor set". It
+is not: it is the exact accessor set *among code the default build compiles*,
+and `#ifdef NON_MATCHING` bodies are outside that set by construction. The step
+needs `tools/check-nonmatching.sh` added as a required check after any field or
+slot rename. That is a plan change and therefore a Fable task between rounds.
+Alpha renamed two slots this round and was warned by broadcast; both oracles are
+green.
+
+### Also this round
+
+- Bravo listed 15 live stall reports mentioning cross-jumping or tail-merging as
+  candidates for the return-type lever, ranked by length-off (a foreclosed merge
+  costs ~3 words per un-merged arm; a mis-sited merge of the right size costs
+  none). It screened `func_80032148` and `func_80033AB0` for SDK ownership as a
+  caution; the head ran `sdkstalls.py` — no live stalled function overlaps a
+  placed Sony object, so both stay assignable.
+- Bravo caught itself about to propagate a stale cross-reference: round 20's
+  report cites `Entity__UpdateActivationState` as a live comparison case and it
+  matched in round 25. One grep of `src/` catches it; corrected in the report
+  and broadcast.
+- Alpha kept six empty `void(void)` vtable stubs as bare `func_`, wrote them
+  minimal reports where they previously had none, and proposed no field names —
+  both of its tier-B names explicitly identify the available purpose-guess
+  (`IsUncapped`; a memory-card save-icon label suggested by neighbouring rodata)
+  and refuse it.
+- `externcheck.py` clean at 657 externs after a round that changed a function's
+  return type; `gpsyms.py --check` current after three global renames.
+
 ## 2026-09-22 — round 67: a two-round-old CAUSE overturned by a one-second isolation, and the standing rule that produced it
 
 **Three runners, three tracks, three merges, all green. Matched 1150 -> 1151,
