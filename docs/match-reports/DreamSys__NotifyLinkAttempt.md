@@ -23,10 +23,10 @@ Vtable slot `+0x088`. Dispatches on `arg1`:
    if `this->unknwon_int_0x44 == 15` and it's still 0), then returns unless
    `this->currentStage == 9`, in which case it falls into the shared tail.
 4. Else (any other `arg1`): returns immediately.
-5. Shared tail: calls `this->vt->func_8005A7A0(this,
+5. Shared tail: calls `this->vt->DreamSys__TryStageTimerLink(this,
    this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0))` — same
    `slot0x10C(obj, 0, 0)` call shape already established by
-   `DreamSys__FlashbackSaving`, here feeding `func_8005A7A0`'s `currentPos`
+   `DreamSys__FlashbackSaving`, here feeding `DreamSys__TryStageTimerLink`'s `currentPos`
    argument instead.
 
 Both blocker screens are clean: no `gp_rel` hit and no
@@ -96,7 +96,7 @@ handle_neg2:
 		goto neg2_mismatch;
 
 shared_tail:
-	this->vt->func_8005A7A0(this, this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0));
+	this->vt->DreamSys__TryStageTimerLink(this, this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0));
 	return;
 
 neg2_mismatch:

@@ -1,4 +1,6 @@
-# func_8005AD68
+# DreamSys__TickStaircaseCase2
+
+> Renamed from `func_8005AD68` on 2026-09-22 (tools/rename.py). Address 0x8005ad68.
 
 **Unit:** DreamSys · **Size:** 54 words · **Status:** MATCHED (54/54 words,
 whole-image build verified byte-exact).
@@ -36,7 +38,7 @@ through to a shared tail: `unk_0xA0 = 1`, `unk_0x914++`, `return 0`.
 ## Final C
 
 ```c
-s32 func_8005AD68(DreamSys *this)
+s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABD0, &this->unk_0x91C);

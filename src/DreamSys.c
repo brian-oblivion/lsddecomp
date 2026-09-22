@@ -115,7 +115,7 @@ handle_neg2:
 		goto neg2_mismatch;
 
 shared_tail:
-	this->vt->func_8005A7A0(this, this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0));
+	this->vt->DreamSys__TryStageTimerLink(this, this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0));
 	return;
 
 neg2_mismatch:
@@ -738,9 +738,9 @@ s32 func_80059E98(DreamSys *this, s32 arg1)
 		delta = D_80087E34[arg1] * D_80087E20[this->unk_0xAC];
 		this->vt->func_800595A0(this);
 		pos = this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0);
-		if (!this->vt->func_8005A9CC(this, pos)
-		 && !this->vt->func_8005A82C(this, pos)
-		 && !this->vt->func_8005A700(this, pos)) {
+		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
+		 && !this->vt->DreamSys__TryInstantTeleportLink(this, pos)
+		 && !this->vt->DreamSys__TryTunnelLink(this, pos)) {
 			this->vt->func_8005B904(this);
 			D_80087E3C[arg1](this, delta, (void *)(this->unk_0x90C < 1));
 			if (this->currentStage == 0
@@ -1011,7 +1011,7 @@ fail:
 	return false;
 }
 
-bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 	s32 local[4];
@@ -1030,7 +1030,7 @@ bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
-bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 
@@ -1048,13 +1048,13 @@ bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 #if 0
 /* Best-reached body, 58/63 words, exact length (zero address drift) -- see
-   docs/match-reports/func_8005A82C.md for the residue analysis (delay-slot
+   docs/match-reports/DreamSys__TryInstantTeleportLink.md for the residue analysis (delay-slot
    fillers around the constant "return true" materialization;
    PERMUTER-EXHAUSTED, ~49300 iterations). Restored to INCLUDE_ASM below per
    project rule (no score short of byte-exact stays in src/). Re-verified
    fresh round 39 (2026-09-14, runner echo); two new reshapes tried, neither
    moved it -- see the round 39 note in the report. */
-bool func_8005A82C(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 	s32 saved;
@@ -1077,7 +1077,7 @@ bool func_8005A82C(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A82C);
+INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryInstantTeleportLink);
 
 bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 {
@@ -1101,7 +1101,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 
 #if 0
 /* Best-reached body, 57/88 words, no address drift -- see
-   docs/match-reports/func_8005A9CC.md for the residue analysis. Restored to
+   docs/match-reports/DreamSys__TryStaircaseLink.md for the residue analysis. Restored to
    INCLUDE_ASM below per project rule (no score short of byte-exact stays in
    src/). Re-verified fresh round 39 (2026-09-14, runner echo); one new
    reshape tried (hoisting `&this->linkCoordinates` into a function-top local
@@ -1111,7 +1111,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
    extra callee-saved register), confirming the same "cast/hoist to a
    function-scope local costs a register" class already documented for
    `DreamSys__InstanceEffectsOnJournal`. Reverted immediately. */
-bool func_8005A9CC(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 	s32 local[4];
@@ -1159,9 +1159,9 @@ staircase:
 	return false;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
+INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryStaircaseLink);
 
-s32 func_8005AB2C(DreamSys *this)
+s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->unk_0x91C);
@@ -1184,7 +1184,7 @@ s32 func_8005AB2C(DreamSys *this)
 	return 0;
 }
 
-s32 func_8005AC24(DreamSys *this)
+s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 {
 	s32 flag;
 
@@ -1214,7 +1214,7 @@ s32 func_8005AC24(DreamSys *this)
 	return 0;
 }
 
-s32 func_8005AD68(DreamSys *this)
+s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABD0, &this->unk_0x91C);
@@ -1241,7 +1241,7 @@ s32 func_8005AD68(DreamSys *this)
 	return 0;
 }
 
-s32 func_8005AE40(DreamSys *this)
+s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 {
 	s32 flag;
 
@@ -1282,7 +1282,7 @@ void DreamSys__ApplyRelativeOffset(DreamSys *this, struct RelativePos *a, struct
 	this->vt->BaseObjO__AddVec14(this, &diff);
 }
 
-s32 func_8005AFD0(DreamSys *this)
+s32 DreamSys__GetCurrentStage(DreamSys *this)
 {
 	return this->currentStage;
 }
@@ -1817,7 +1817,7 @@ merge:
 	return result;
 }
 
-/* Set (whole word) into `this->unk_0x880` by func_8005A7A0 just before an
+/* Set (whole word) into `this->unk_0x880` by DreamSys__TryStageTimerLink just before an
    ExecuteLink; only ever address-taken here, never dereferenced by this
    unit's queued functions. */
 extern s32 D_8008ABF0;

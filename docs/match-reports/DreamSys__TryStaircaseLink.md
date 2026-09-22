@@ -1,4 +1,6 @@
-# func_8005A9CC -- STALL: exact length (88/88 instructions, zero address drift), 57/88 raw word-match, first real diff at 0x4B1FC (retail's delay-slot `nop` after `beqz v0,.L8005AA44` vs a hoisted `addiu a0,s0,0x16c` -- `fill_eager_delay_slots` branch-target duplication, one instruction early)
+# DreamSys__TryStaircaseLink -- STALL: exact length (88/88 instructions, zero address drift), 57/88 raw word-match, first real diff at 0x4B1FC (retail's delay-slot `nop` after `beqz v0,.L8005AA44` vs a hoisted `addiu a0,s0,0x16c` -- `fill_eager_delay_slots` branch-target duplication, one instruction early)
+
+> Renamed from `func_8005A9CC` on 2026-09-22 (tools/rename.py). Address 0x8005a9cc.
 
 > **ROUND 49 (2026-09-16, runner bravo): re-verified fresh, one new axis
 > tried and REJECTED as a regression -- and it teaches something about how
@@ -43,7 +45,7 @@
 > **Why this is worth recording rather than discarding as "just another
 > negative": it demonstrates the do-while lever perturbs GLOBAL scheduling
 > state, not a local block**, on a function where a sibling function in the
-> SAME unit (`func_8005A82C`, this same round) showed the exact opposite --
+> SAME unit (`DreamSys__TryInstantTeleportLink`, this same round) showed the exact opposite --
 > two do-while wraps at two different sites, both **completely inert**,
 > zero observable effect anywhere. The two functions have superficially
 > identical residue classes (a delay-slot-fill choice at exact length) and
@@ -60,7 +62,7 @@
 > register allocation elsewhere in the function" is confirmed here in its
 > most disruptive form (corrupting an already-matched, unrelated struct-copy
 > sequence dozens of instructions downstream), while the sibling function
-> `func_8005A82C` in the identical unit, tested the same round, showed zero
+> `DreamSys__TryInstantTeleportLink` in the identical unit, tested the same round, showed zero
 > effect from the same lever at two different sites. Treat every do-while
 > trial as its own experiment requiring full-oracle verification, never as
 > a lever whose safety a sibling's result can vouch for.
@@ -75,13 +77,13 @@ below).
 
 ## What it does
 
-Called through `vtable_DreamSys::func_8005A9CC` (+0x1DC) by `func_80059E98`
+Called through `vtable_DreamSys::DreamSys__TryStaircaseLink` (+0x1DC) by `func_80059E98`
 (matched this round, see its own report) as the first of three "link test"
 tries. Signature `bool (DreamSys *this, PlayerSpawnPoint *currentPos)`,
-matching its siblings `func_8005A700`/`func_8005A7A0`.
+matching its siblings `DreamSys__TryTunnelLink`/`DreamSys__TryStageTimerLink`.
 
 ```c
-bool func_8005A9CC(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 	s32 local[4];
@@ -135,7 +137,7 @@ assumed: every `j`/fallthrough in the function lands on either an explicit
 `li v0,0` or the shared epilogue label that itself does `li v0,0`. There is
 no path that reaches the epilogue with a nonzero `$v0`. This makes the
 function's practical behavior in its only caller (`func_80059E98`'s
-`!this->vt->func_8005A9CC(...) && ...` chain) equivalent to always
+`!this->vt->DreamSys__TryStaircaseLink(...) && ...` chain) equivalent to always
 continuing to the next link test -- a real quirk of retail's own logic, not
 a decompilation error.
 
@@ -158,8 +160,8 @@ All in `include/DreamSys.h`:
   which already covers `currentPos->position`. No other reader of this
   field existed before this round.
 - **`extern s32 (*D_80087EEC[4])(DreamSys *this)`** -- a table of the four
-  already-matched `s32 (DreamSys *this)` functions `func_8005AB2C`/
-  `func_8005AC24`/`func_8005AD68`/`func_8005AE40`, confirmed by their own
+  already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseCase0`/
+  `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
   existing definitions in `src/DreamSys.c`.
 - **`extern s32 Test4StaircaseNodes(...)`** and **`extern s32
   func_8005C02C(...)`** forward/call-site prototypes added near the
@@ -400,7 +402,7 @@ the `beqz`'s delay slot) as every prior round. Checked the hoist-both
 precondition: the residue is not a load/mult pair at all -- it is which of
 two independent, already-computable instructions (`addiu $a0,$s0,0x16c` vs.
 a genuine `nop`) fills a branch's delay slot, structurally identical to
-`func_8005A82C`'s residue this same round. The lever has nothing to attach
+`DreamSys__TryInstantTeleportLink`'s residue this same round. The lever has nothing to attach
 to here either.
 
 **One new reshape tried:** hoisting `&this->linkCoordinates` into a
@@ -418,7 +420,7 @@ changes retained; `INCLUDE_ASM` restored, whole-image SHA1 verified green.
 ### Proposed learning (round 39)
 
 A THIRD independent function this round (after `DreamSys__InstanceEffectsOnJournal`
-and, in spirit, `func_8005A82C`'s attempt-5 `pLocal`) confirms: hoisting a
+and, in spirit, `DreamSys__TryInstantTeleportLink`'s attempt-5 `pLocal`) confirms: hoisting a
 pointer/address value that is naturally re-derivable at each of its use
 sites into a function-scope local, even when the value itself is
 loop-invariant and "obviously" the same everywhere, tends to cost an extra

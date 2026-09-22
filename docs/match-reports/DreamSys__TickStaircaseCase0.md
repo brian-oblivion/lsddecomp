@@ -1,16 +1,18 @@
-# func_8005AB2C
+# DreamSys__TickStaircaseCase0
+
+> Renamed from `func_8005AB2C` on 2026-09-22 (tools/rename.py). Address 0x8005ab2c.
 
 **Unit:** DreamSys · **Size:** 62 words (0xF8 bytes) · **Status:** MATCHED
 (62/62 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
 
-`(DreamSys *this) -> s32`. Sibling of the already-matched `func_8005AD68`
+`(DreamSys *this) -> s32`. Sibling of the already-matched `DreamSys__TickStaircaseCase2`
 (same shape, described in its own report) but with **two** windows per arm
 instead of one, and different thresholds/constants:
 
 ```c
-s32 func_8005AB2C(DreamSys *this)
+s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->unk_0x91C);
@@ -44,7 +46,7 @@ a shared tail: `unk_0xA0 = 1`, `unk_0x914++`, `return 0`.
 
 ## Residue and the fix (worth recording precisely)
 
-The very first attempt used `func_8005AD68`'s exact idiom verbatim, just with
+The very first attempt used `DreamSys__TickStaircaseCase2`'s exact idiom verbatim, just with
 the guard inverted from `<` to `>=` swapped into a plain `if (cond) {...}
 else return 1;`:
 
@@ -73,7 +75,7 @@ The actual defect was the **same open branch-polarity question already
 logged for `DreamSys__TimerTick` this round**: plain `if (cond) {A} else
 {B};` does not reliably reproduce retail's choice of which side is the
 fallthrough and which is a forward branch once the `if`-body's own size
-changes. `func_8005AD68`'s single-window version happened to compile
+changes. `DreamSys__TickStaircaseCase2`'s single-window version happened to compile
 correctly with plain `if`/`else`; this function's *two*-window (`||`)
 version did not, changing GCC's own placement heuristic. The fix, applied to
 BOTH arms, was the same "guard clause" rewrite already used for
@@ -92,14 +94,14 @@ This matched first try after the rewrite (62/62).
 ## New knowledge
 
 - **`D_8008ABC0` (`struct RelativePos`)**, passed as `DreamSys__ApplyRelativeOffset`'s `a`
-  argument by this function — same call shape as `func_8005AD68`'s
+  argument by this function — same call shape as `DreamSys__TickStaircaseCase2`'s
   `D_8008ABD0`, just a different constant 0x10 bytes earlier in the same
   table.
 - **Confirms and sharpens the branch-polarity lesson from
   `DreamSys__TimerTick`'s report this round**: it is not just "an `if`/`else`
   can compile with either side as fallthrough" in the abstract — the SAME
   logical shape (`if (a < limit) {...} else return N;`) compiled correctly
-  with plain `if`/`else` for `func_8005AD68`'s single-window body and
+  with plain `if`/`else` for `DreamSys__TickStaircaseCase2`'s single-window body and
   INCORRECTLY for this function's two-window (`||`) body. The `if`-body's own
   size/complexity is part of what decides GCC 2.6.3's fallthrough choice, not
   just the source's polarity. The reliable fix in both instances tried this
@@ -109,7 +111,7 @@ This matched first try after the rewrite (62/62).
 - **A whole-image size regression can manifest as an apparently-unrelated
   symbol-resolution mystery.** Two long-established data symbols
   (`D_8008ABC0`/`D_8008ABD0`, both already used correctly by the
-  already-matched `func_8005AD68`) appeared to resolve to addresses 8 bytes
+  already-matched `DreamSys__TickStaircaseCase2`) appeared to resolve to addresses 8 bytes
   higher than their names once this function was 2 words too long — not a
   linker bug, just "the three ways a score lies" #3 (address drift) wearing
   an unfamiliar costume. Running `make extract` (permitted; changes nothing

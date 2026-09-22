@@ -17,7 +17,7 @@ validates it against `currentPos`'s stored heading via the already-matched
 `func_8005BE28` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
 table, `D_80088758`) through its two optional output parameters. Called by
-`func_8005A700` (still `INCLUDE_ASM`) as `func_8005BD3C(&this->unk_0x888,
+`DreamSys__TryTunnelLink` (still `INCLUDE_ASM`) as `func_8005BD3C(&this->unk_0x888,
 &this->unk_0x884, local)`.
 
 ## New declarations needed

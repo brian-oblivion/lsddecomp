@@ -1,4 +1,6 @@
-# func_8005AFD0
+# DreamSys__GetCurrentStage
+
+> Renamed from `func_8005AFD0` on 2026-09-22 (tools/rename.py). Address 0x8005afd0.
 
 **Unit:** DreamSys · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
@@ -9,7 +11,7 @@ Vtable `+0x1E0`. Getter for `currentStage`.
 ## The C
 
 ```c
-s32 func_8005AFD0(DreamSys *this)
+s32 DreamSys__GetCurrentStage(DreamSys *this)
 {
 	return this->currentStage;
 }

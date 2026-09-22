@@ -1,11 +1,13 @@
-# func_8005A7A0
+# DreamSys__TryStageTimerLink
+
+> Renamed from `func_8005A7A0` on 2026-09-22 (tools/rename.py). Address 0x8005a7a0.
 
 **Unit:** DreamSys · **Size:** 35 words · **Status:** MATCHED (35/35 words, full build verified byte-exact)
-**Vtable slot:** `DREAMSYS_METHODS +0x1D4` (second of the four-slot run; see func_8005A700.md)
+**Vtable slot:** `DREAMSYS_METHODS +0x1D4` (second of the four-slot run; see DreamSys__TryTunnelLink.md)
 
 ## Context
 
-Sibling of `func_8005A700` (same round, immediately preceding this function
+Sibling of `DreamSys__TryTunnelLink` (same round, immediately preceding this function
 in ROM order) and `DreamSys__StaticWallLink`, but using yet another link
 test: `func_8005BE90` (in-unit, still `INCLUDE_ASM`, gp-relative-blocked),
 which takes FOUR arguments -- `linkCoordinates`, `currentStage`,
@@ -17,7 +19,7 @@ adjacent fields, before `ExecuteLink`ing with literal type `0x10`.
 ## The C
 
 ```c
-bool func_8005A7A0(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 
@@ -42,7 +44,7 @@ extern s32 func_8005BF48(void);
 ```
 
 (The `unk_0x880`/`unk_0x884`/`unk_0x888` retyping is shared with
-`func_8005A700`'s report -- both functions in this round touch the same two
+`DreamSys__TryTunnelLink`'s report -- both functions in this round touch the same two
 fields, `unk_0x880` is written here for the first time.)
 
 ## Derivation notes

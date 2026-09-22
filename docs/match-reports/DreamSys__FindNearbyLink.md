@@ -122,7 +122,7 @@ scope at merge.
   B). Evidence: this function calls `unk_0x4C->methods->queryLinkAtPos`
   to look up a link at a position; `include/DreamSys.h`'s own existing
   comments show it used the same way by `DreamSys__WallLink`,
-  `func_8005A82C` and `DreamSys__UnlinkLinkMgr` in `src/DreamSys.c` -- every access
+  `DreamSys__TryInstantTeleportLink` and `DreamSys__UnlinkLinkMgr` in `src/DreamSys.c` -- every access
   across every unit is link-related.
 
 ## Verify

@@ -1,4 +1,6 @@
-# func_8005A82C -- STALL: exact length (63/63 instructions, zero address drift), 58/63 raw word-match, first real diff at 0x4B080 (two swapped delay-slot fillers around the `ExecuteLink` result branch -- a scheduling residue, PERMUTER-EXHAUSTED)
+# DreamSys__TryInstantTeleportLink -- STALL: exact length (63/63 instructions, zero address drift), 58/63 raw word-match, first real diff at 0x4B080 (two swapped delay-slot fillers around the `ExecuteLink` result branch -- a scheduling residue, PERMUTER-EXHAUSTED)
+
+> Renamed from `func_8005A82C` on 2026-09-22 (tools/rename.py). Address 0x8005a82c.
 
 > **ROUND 49 (2026-09-16, runner bravo): re-verified fresh, one new axis
 > (`do{...}while(0)`) tried at both remaining exit sites, both clean
@@ -26,7 +28,7 @@
 > the point of this write-up.
 >
 > **This is a clean, doubly-confirmed negative for the do-while lever on
-> this residue class.** Unlike `func_8005A9CC`'s do-while experiment this
+> this residue class.** Unlike `DreamSys__TryStaircaseLink`'s do-while experiment this
 > same round (which DID perturb codegen, for the worse, on an unrelated
 > struct-copy elsewhere in that function), this function's do-while wrapping
 > produced literally no observable change anywhere -- consistent with this
@@ -75,18 +77,18 @@
 Restored to `INCLUDE_ASM`, no toolchain issue. **PERMUTER-EXHAUSTED** (round
 2026-09-02, runner BRAVO) -- see "Permuter run" below; do not re-run this
 search expecting a different outcome without new information.
-**Vtable slot:** `DREAMSYS_METHODS +0x1D8` (third of the four-slot run; see func_8005A700.md)
+**Vtable slot:** `DREAMSYS_METHODS +0x1D8` (third of the four-slot run; see DreamSys__TryTunnelLink.md)
 
 ## What it does (fully derived, control flow confirmed)
 
-Third sibling of `func_8005A700`/`func_8005A7A0` (same round): a
+Third sibling of `DreamSys__TryTunnelLink`/`DreamSys__TryStageTimerLink` (same round): a
 `Test4InstantTeleporters` link test, then on success an `ExecuteLink` with
 literal type `0x11`, then -- new in this one -- a block of vtable/class
 calls gated on the `ExecuteLink` result, itself internally gated on two
 more conditions.
 
 ```c
-bool func_8005A82C(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 	s32 saved;
@@ -124,7 +126,7 @@ encodes it, at exactly two sites.
   slot `+0xE8`: `void (*slot0xE8)(void *self, void *arg1, PlayerSpawnPoint
   *arg2)`, called as `this->unk_0x4C->methods->slot0xE8(this->unk_0x4C,
   &local, &this->linkCoordinates)`. `local` is an 0x10-byte stack buffer
-  (same frame-derived sizing logic as `func_8005A700`'s `local`) that this
+  (same frame-derived sizing logic as `DreamSys__TryTunnelLink`'s `local`) that this
   slot fills and the next call consumes.
 - `vtable_DreamSys` gained a name for `+0xB8` (previously folded into an
   anonymous `u32 unknown_functions_0xa0[7]`, right before the already-named
@@ -216,7 +218,7 @@ CFG, fixed register allocation, only delay-slot scheduling in question.
 
 ## Round: re-verified from raw asm, one more reshape tried (runner delta, round 19)
 
-Re-read `asm/nonmatchings/DreamSys/func_8005A82C.s` directly (not just this
+Re-read `asm/nonmatchings/DreamSys/DreamSys__TryInstantTeleportLink.s` directly (not just this
 report's prose) as a check against the kind of misread that turned out to
 be real in `func_8005A1F4` this same round. No hidden bug found here --
 every field offset, call target, and the two delay-slot sites this report

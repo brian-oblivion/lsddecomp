@@ -1,17 +1,19 @@
-# func_8005AE40
+# DreamSys__TickStaircaseCase3
+
+> Renamed from `func_8005AE40` on 2026-09-22 (tools/rename.py). Address 0x8005ae40.
 
 **Unit:** DreamSys · **Size:** 73 words (0x124 bytes) · **Status:** MATCHED
 (73/73 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
 
-Third sibling of `func_8005AD68`/`func_8005AB2C` (same retry-counter shape),
+Third sibling of `DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase0` (same retry-counter shape),
 with a THIRD extra piece: both arms, after their own window checks, also
 compute a boolean "close to the next trigger" flag that (if set) bumps
 `unk_0x88` to 2 — shared tail logic neither of the other two siblings had:
 
 ```c
-s32 func_8005AE40(DreamSys *this)
+s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 {
 	s32 flag;
 
@@ -47,11 +49,11 @@ s32 func_8005AE40(DreamSys *this)
 | `unk_0xAC != 4` | `< 0x71` | `0x1E..0x2C`, `0x52..0x60` | `unk_0xA4 = 1` | `(unk_0x914-0x1E) < 0x34` |
 | `unk_0xAC == 4` | `< 0x13` | `6..7`, `0xF..0x10` | `vt->func_8001CEB4(this,0,&D_80087F08)` | `unk_0x914 < 9` |
 
-Matched first attempt, with the `DreamSys__TimerTick`/`func_8005AB2C`
+Matched first attempt, with the `DreamSys__TimerTick`/`DreamSys__TickStaircaseCase0`
 guard-clause lever (invert the band test, early `return 1;`, let the
 window-check code be the unconditional tail) applied up front rather than
 discovered by iteration — both out-of-band early exits land on the SAME
-physical `return 1;` block in retail (unlike `func_8005AB2C`'s two separate
+physical `return 1;` block in retail (unlike `DreamSys__TickStaircaseCase0`'s two separate
 copies), and writing two ordinary `if (x >= limit) return 1;` guard clauses,
 one per arm, let GCC's own tail-merge find that sharing without any
 additional coaxing.
@@ -59,7 +61,7 @@ additional coaxing.
 ## New knowledge
 
 - **`D_8008ABD8`** (`struct RelativePos`), a third constant in the same table
-  as `func_8005AD68`'s `D_8008ABD0` and `func_8005AB2C`'s `D_8008ABC0`,
+  as `DreamSys__TickStaircaseCase2`'s `D_8008ABD0` and `DreamSys__TickStaircaseCase0`'s `D_8008ABC0`,
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
 - **`D_80087F08`**, another opaque forwarded-pointer constant for
   `vt->func_8001CEB4`'s `arg2`, same shape as the already-known
@@ -74,7 +76,7 @@ additional coaxing.
 ### Proposed learning
 
 None new beyond confirming, a third time this round
-(`DreamSys__TimerTick`, `func_8005AB2C`, this function), that `if (cond)
+(`DreamSys__TimerTick`, `DreamSys__TickStaircaseCase0`, this function), that `if (cond)
 return N;` as an unconditional guard clause — rather than `if (!cond) {...}
 else return N;` — is the more reliable first attempt for an out-of-band early
 exit in this codebase's `New_X`-adjacent retry-counter family, and that GCC's

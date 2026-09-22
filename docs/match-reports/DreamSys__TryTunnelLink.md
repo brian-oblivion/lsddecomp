@@ -1,4 +1,6 @@
-# func_8005A700
+# DreamSys__TryTunnelLink
+
+> Renamed from `func_8005A700` on 2026-09-22 (tools/rename.py). Address 0x8005a700.
 
 **Unit:** DreamSys · **Size:** 40 words · **Status:** MATCHED (40/40 words, full build verified byte-exact)
 **Vtable slot:** `DREAMSYS_METHODS +0x1D0` (first of a run of four previously-unnamed slots)
@@ -28,7 +30,7 @@ usual caveat that a discarded return value proves nothing about `void`.
 ## The C
 
 ```c
-bool func_8005A700(DreamSys *this, PlayerSpawnPoint *currentPos)
+bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 	s32 local[4];
@@ -60,7 +62,7 @@ function writes/reads them as whole words (previously
 `s8 unknown_values_0x880[4]` / `s8 unknown_values_0x888[4]`):
 
 ```c
-s32 unk_0x880;   /* written by func_8005A7A0 (round 2026-09-02, another
+s32 unk_0x880;   /* written by DreamSys__TryStageTimerLink (round 2026-09-02, another
                     function in this same round -- see that report) */
 s32 unk_0x888;   /* address taken here (&this->unk_0x888) and forwarded
                     to func_8005BD3C -- read-through by that (still
@@ -69,13 +71,13 @@ s32 unk_0x888;   /* address taken here (&this->unk_0x888) and forwarded
 
 Also named the first of a run of four consecutive, previously-anonymous
 vtable slots (`+0x1D0..+0x1DC`, all four resolve via `tools/classtable.py`
-to `func_8005A700`/`func_8005A7A0`/`func_8005A82C`/`func_8005A9CC`); only
+to `DreamSys__TryTunnelLink`/`DreamSys__TryStageTimerLink`/`DreamSys__TryInstantTeleportLink`/`DreamSys__TryStaircaseLink`); only
 this round's own slot (`+0x1D0`) was given a real signature, the other
 three stay as `u32` filler pending their own rounds:
 
 ```c
 u32 unknown_functions_0x1d0[1];
-bool (*func_8005A700)(DreamSys *this, PlayerSpawnPoint *currentPos);
+bool (*DreamSys__TryTunnelLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 u32 unknown_functions_0x1d8[2];
 ```
 

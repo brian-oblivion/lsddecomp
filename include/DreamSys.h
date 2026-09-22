@@ -105,7 +105,7 @@ typedef struct PlayerSpawnPoint {
 
 /* The `chunk`+`tile` half of a PlayerSpawnPoint (4 bytes), reinterpreted as
    one struct so a single whole-struct assignment reproduces retail's
-   unaligned 4-byte `lwl`/`lwr` + `swl`/`swr` copy -- func_8005A9CC (round
+   unaligned 4-byte `lwl`/`lwr` + `swl`/`swr` copy -- DreamSys__TryStaircaseLink (round
    2026-09-06) copies a `PlayerSpawnPoint *currentPos` piecewise into
    DreamSys::unk_0x918 (this type) and DreamSys::unk_0x91C (a plain
    `struct RelativePos`, the `position` half) rather than as one 10-byte
@@ -281,7 +281,7 @@ typedef struct DreamSysUnk11CResult {
 } DreamSysUnk11CResult;
 
 /* Object pointed to by DreamSys::unk_0x4C, used by DreamSys__UnlinkLinkMgr (slot
-   +0xF0) and func_8005A82C (slot +0xE8, this round): same "vtable pointer
+   +0xF0) and DreamSys__TryInstantTeleportLink (slot +0xE8, this round): same "vtable pointer
    at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
    related to DreamSysUnk58. */
 typedef struct DreamSysUnk4CMethods {
@@ -291,7 +291,7 @@ typedef struct DreamSysUnk4CMethods {
 	   (round 2026-09-02). */
 	PlayerSpawnPoint *(*slot0xD4)(void *self, void *arg1);
 	u8 pad_0xD8[0xE8 - 0xD8];
-	/* Called by func_8005A82C as (this->unk_0x4C, &local, &this->
+	/* Called by DreamSys__TryInstantTeleportLink as (this->unk_0x4C, &local, &this->
 	   linkCoordinates) -- `local` is an output buffer also consumed by
 	   vt->slot0xB8 right after (round 2026-09-02). */
 	void (*slot0xE8)(void *self, void *arg1, PlayerSpawnPoint *arg2);
@@ -308,7 +308,7 @@ typedef struct DreamSysUnk4CMethods {
 	/* Called with (this->unk_0x4C, 0, 0) by DreamSys__FlashbackSaving (see
 	   above); ALSO called with the identical (0, 0) argument pair by
 	   DreamSys__NotifyLinkAttempt's shared tail block, whose return value is forwarded
-	   straight into vtable slot +0x1D4 (func_8005A7A0)'s `currentPos`
+	   straight into vtable slot +0x1D4 (DreamSys__TryStageTimerLink)'s `currentPos`
 	   argument (round 2026-09-02) -- same signature, different caller. */
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
 	/* Called by this unit's own DreamSys__FindNearbyLink as (this->unk_0x4C, out,
@@ -489,32 +489,32 @@ extern DreamSysVec3 D_80087EA4;
 extern s32 D_80087EE8;
 
 /* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
-   by func_8005AD68 (round 2026-09-02). */
+   by DreamSys__TickStaircaseCase2 (round 2026-09-02). */
 extern struct RelativePos D_8008ABD0;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by func_8005AB2C -- same call shape as D_8008ABD0 above, just a
+   argument by DreamSys__TickStaircaseCase0 -- same call shape as D_8008ABD0 above, just a
    different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABC0;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by func_8005AC24 -- same call shape as D_8008ABC0/D_8008ABD0
+   argument by DreamSys__TickStaircaseCase1 -- same call shape as D_8008ABC0/D_8008ABD0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABC8;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by func_8005AE40 -- same call shape as D_8008ABD0/D_8008ABC0
+   argument by DreamSys__TickStaircaseCase3 -- same call shape as D_8008ABD0/D_8008ABC0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABD8;
 
 /* Address-of only (never dereferenced by this unit's queued functions),
-   forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AD68
+   forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by DreamSys__TickStaircaseCase2
    (round 2026-09-02) -- same "opaque generic pointer" shape as that slot's
    other known call site (D_80087E84[-1]). */
 extern u8 D_80087EFC[];
 
 /* Same "opaque generic pointer" shape as D_80087EFC above, forwarded as
-   vtable slot +0x044's (func_8001CEB4) arg2 by func_8005AE40
+   vtable slot +0x044's (func_8001CEB4) arg2 by DreamSys__TickStaircaseCase3
    (round 2026-09-02) -- a different constant/address, same call shape. */
 extern u8 D_80087F08[];
 
@@ -766,14 +766,14 @@ typedef struct DreamSys {
 
 	s32 unk_0x878;
 	s32 currentFlashbackIndex;
-	/* Set (whole word) by func_8005A7A0 to func_8005BF48()'s return value,
+	/* Set (whole word) by DreamSys__TryStageTimerLink to func_8005BF48()'s return value,
 	   right before an ExecuteLink (round 2026-09-02). */
 	s32 unk_0x880;
 	/* Gate flag read by func_80059148 (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
 	s32 unk_0x884;
-	/* Zeroed (whole word) by func_8005A7A0 alongside unk_0x884
+	/* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside unk_0x884
 	   (round 2026-09-02). */
 	s32 unk_0x888;
 
@@ -800,20 +800,20 @@ typedef struct DreamSys {
 	   set it to the literal 0. */
 	u32 unk_0x90C;
 	/* Function pointer, called as `unk_0x910(this)` and its `s32` result
-	   used as a truth value (func_8005A9CC, round 2026-09-06); set from
+	   used as a truth value (DreamSys__TryStaircaseLink, round 2026-09-06); set from
 	   `D_80087EEC[func_8005C118()]` (both still INCLUDE_ASM) or NULLed --
 	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
 	   being called through. */
 	s32 (*unk_0x910)(struct DreamSys *this);
-	/* A retry/attempt counter (round 2026-09-02, func_8005AD68): read as a
+	/* A retry/attempt counter (round 2026-09-02, DreamSys__TickStaircaseCase2): read as a
 	   whole word, compared against several literal bands, and incremented
 	   by 1 at that function's normal exit. */
 	s32 unk_0x914;
 	/* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
-	   PlayerSpawnPoint whole-struct-copied here by func_8005A9CC. */
+	   PlayerSpawnPoint whole-struct-copied here by DreamSys__TryStaircaseLink. */
 	PlayerSpawnGridPos unk_0x918;
 	/* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
-	   its `b` argument (round 2026-09-02, func_8005AD68) -- carved out of
+	   its `b` argument (round 2026-09-02, DreamSys__TickStaircaseCase2) -- carved out of
 	   what was raw padding in the same 0x10-byte block as unk_0x914 above. */
 	struct RelativePos unk_0x91C;
 	s8 unknown_values_0x922[2];
@@ -825,13 +825,13 @@ typedef struct DreamSys {
    DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below. */
 extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);
 
-/* 4-entry table of `s32 (DreamSys *this)` functions (func_8005AB2C,
-   func_8005AC24, func_8005AD68, func_8005AE40, all already matched with
+/* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseCase0,
+   DreamSys__TickStaircaseCase1, DreamSys__TickStaircaseCase2, DreamSys__TickStaircaseCase3, all already matched with
    exactly that signature), indexed by func_8005C118()'s return value and
-   stashed into DreamSys::unk_0x910 by func_8005A9CC (round 2026-09-06). */
+   stashed into DreamSys::unk_0x910 by DreamSys__TryStaircaseLink (round 2026-09-06). */
 extern s32 (*D_80087EEC[4])(DreamSys *this);
 
-/* Called by func_8005A9CC with NO explicit argument setup (the disassembly's
+/* Called by DreamSys__TryStaircaseLink with NO explicit argument setup (the disassembly's
    call site leaves `$a0` holding an unrelated leftover value from the
    preceding statement, same "empty delay slot, no a0-a3 setup" shape as
    func_8005BF48 above); return value used as D_80087EEC's index. MATCHED
@@ -840,7 +840,7 @@ extern s32 (*D_80087EEC[4])(DreamSys *this);
    docs/research/addiu-at-blocker.md), and the one-line body
    `D_80088BA4[D_8008ACC4][D_8008ACC8].extra` matched on the first rebuild
    (docs/match-reports/func_8005C118.md). Still declared here to type
-   func_8005A9CC's call site, which remains INCLUDE_ASM in this unit. */
+   DreamSys__TryStaircaseLink's call site, which remains INCLUDE_ASM in this unit. */
 extern s32 func_8005C118(void);
 
 struct vtable_DreamSys{
@@ -910,7 +910,7 @@ struct vtable_DreamSys{
 	void (*tryAttachNearby)(DreamSys *this, void *arg1, s32 count);
 	u32 unknown_functions_0xa4[5];
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0B8). Called by
-	   func_8005A82C right after unk_0x4C->methods->slot0xE8, as (this,
+	   DreamSys__TryInstantTeleportLink right after unk_0x4C->methods->slot0xE8, as (this,
 	   &local) using that same output buffer (round 2026-09-02). Address
 	   0x80057384 is outside this unit/runner's range; still INCLUDE_ASM. */
 	void (*BaseObjO__SetVec14)(DreamSys *this, void *arg1);
@@ -1079,28 +1079,28 @@ struct vtable_DreamSys{
 	bool (*StaticWallLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	bool (*LoadNextFlashback)(DreamSys *this, bool unknown);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D0) --
-	   func_8005A700 is already matched (`bool (DreamSys *this,
+	   DreamSys__TryTunnelLink is already matched (`bool (DreamSys *this,
 	   PlayerSpawnPoint *currentPos)`, see its definition in DreamSys.c).
 	   Called by func_80059E98 (round 2026-09-06) as the third of three
-	   "link test" tries, same argument shape as func_8005A7A0/func_8005A82C/
-	   func_8005A9CC below. */
-	bool (*func_8005A700)(DreamSys *this, PlayerSpawnPoint *currentPos);
+	   "link test" tries, same argument shape as DreamSys__TryStageTimerLink/DreamSys__TryInstantTeleportLink/
+	   DreamSys__TryStaircaseLink below. */
+	bool (*DreamSys__TryTunnelLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D4), this
 	   round. Tests this->unknwon_int_0x44, then a static-link-with-timer
 	   test (func_8005BE90) against this->linkCoordinates/currentStage/
 	   dreamTimer, then ExecuteLinks with literal type 0x10 on success --
-	   see func_8005A7A0.md. */
-	bool (*func_8005A7A0)(DreamSys *this, PlayerSpawnPoint *currentPos);
+	   see DreamSys__TryStageTimerLink.md. */
+	bool (*DreamSys__TryStageTimerLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D8/+0x1DC).
 	   Both still INCLUDE_ASM. func_80059E98 (round 2026-09-06) calls
-	   func_8005A9CC (+0x1DC) first, then func_8005A82C (+0x1D8), then
-	   func_8005A700 above -- same "link test" signature as those, confirmed
+	   DreamSys__TryStaircaseLink (+0x1DC) first, then DreamSys__TryInstantTeleportLink (+0x1D8), then
+	   DreamSys__TryTunnelLink above -- same "link test" signature as those, confirmed
 	   by this call site alone (neither function's own body has been read
 	   yet). */
-	bool (*func_8005A82C)(DreamSys *this, PlayerSpawnPoint *currentPos);
-	bool (*func_8005A9CC)(DreamSys *this, PlayerSpawnPoint *currentPos);
+	bool (*DreamSys__TryInstantTeleportLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
+	bool (*DreamSys__TryStaircaseLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Getter for currentStage (round 2026-08-30-c). */
-	s32 (*func_8005AFD0)(DreamSys *this);
+	s32 (*DreamSys__GetCurrentStage)(DreamSys *this);
 	void (*ProcessChunkChange)(DreamSys *this, void *entity, s32 effect);
 	/* Renamed from the previous placeholder `InstanceEffectsOnPlayer` --
 	   this slot's real symbol (config/symbols.slps01556.lsdde.txt) is
@@ -1234,21 +1234,21 @@ extern s8 SPECIAL_COLORS[];
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
                            s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
 
-/* Called by func_8005A7A0 as (&this->linkCoordinates, this->currentStage,
+/* Called by DreamSys__TryStageTimerLink as (&this->linkCoordinates, this->currentStage,
    currentPos, this->dreamTimer); result compared with `bltz` exactly like
    TestForStaticLink's call site, so s32 (round 2026-09-02). Blocked by the
    gp-relative addressing blocker -- see docs/match-reports/func_8005BE90.md
    -- so it stays INCLUDE_ASM; this prototype only types the call site. */
 extern s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
 
-/* Called by func_8005A7A0 with NO arguments (the disassembly's call site has
+/* Called by DreamSys__TryStageTimerLink with NO arguments (the disassembly's call site has
    an empty delay slot and no a0-a3 setup); its return value is stored whole
    into this->unk_0x880, hence s32 (round 2026-09-02). Blocked by the
    gp-relative addressing blocker -- see docs/match-reports/func_8005BF48.md
    -- so it stays INCLUDE_ASM; this prototype only types the call site. */
 extern s32 func_8005BF48(void);
 
-/* Called by func_8005A700 as (this, &local) where `local` is a 0x10-byte
+/* Called by DreamSys__TryTunnelLink as (this, &local) where `local` is a 0x10-byte
    stack buffer also forwarded to func_8005BD3C below; return value is
    discarded at this call site (round 2026-09-02). NOT in this unit at all --
    its body disassembles into asm/code_d294.s, an uncarved segment -- so this
@@ -1259,7 +1259,7 @@ extern s32 func_8005BF48(void);
    site constrains it further. */
 extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
 
-/* Called by func_8005A700 as (&this->unk_0x888, &this->unk_0x884, &local) --
+/* Called by DreamSys__TryTunnelLink as (&this->unk_0x888, &this->unk_0x884, &local) --
    same `local` buffer Class6B5CC__GetRotationDegrees fills above; result used as a truth
    value (`beqz`), so s32 (round 2026-09-02). Blocked by both the
    gp-relative and addiu_at blockers -- see
@@ -1267,14 +1267,14 @@ extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
    prototype only types the call site. */
 extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
 
-/* Called by func_8005A9CC (round 2026-09-06) as (&this->linkCoordinates,
+/* Called by DreamSys__TryStaircaseLink (round 2026-09-06) as (&this->linkCoordinates,
    currentPos, this->currentStage) -- same forwarding shape as
    Test4TunnelLinks/TestForStaticLink above. Defined later in this unit's own
    ROM order (`src/DreamSys.c`); this is a forward declaration for that
    earlier call site, not a cross-unit prototype. */
 extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
 
-/* Called by func_8005A9CC as (&this->unk_0x888, &this->unk_0x884, &local) --
+/* Called by DreamSys__TryStaircaseLink as (&this->unk_0x888, &this->unk_0x884, &local) --
    identical call shape to func_8005BD3C above (same `local` buffer, same two
    `this` fields), so the same signature. Blocked by both the gp-relative and
    addiu_at blockers -- see docs/match-reports/func_8005C02C.md -- so it
@@ -1282,14 +1282,14 @@ extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *curre
 extern s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Same (target, currentPos, stage) forwarding shape as Test4TunnelLinks
-   above (see that function's own comment) -- called by func_8005A82C as
+   above (see that function's own comment) -- called by DreamSys__TryInstantTeleportLink as
    (&this->linkCoordinates, currentPos, this->currentStage), result compared
    with `bltz` (round 2026-09-02). Blocked by the gp-relative addressing
    blocker -- see docs/match-reports/Test4InstantTeleporters.md -- so it
    stays INCLUDE_ASM; this prototype only types the call site. */
 extern s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 
-/* Called by func_8005A82C with NO arguments, same shape as func_8005BF48
+/* Called by DreamSys__TryInstantTeleportLink with NO arguments, same shape as func_8005BF48
    above; return value is forwarded straight into ExecuteLink's stage-type
    argument, hence s32 (round 2026-09-02). Blocked by the gp-relative
    addressing blocker -- see docs/match-reports/func_8005BFC4.md -- so it
