@@ -162,12 +162,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   plainly" is evidence about if/else shape, not about the scheduler. Tell: a conditional branch
   targeting the OUTER join with a real assignment in its delay slot, the bare unconditional `j` of
   the fallthrough rule absent. 77/217 -> 208/217. (a docs/match-reports/func_80063144.md, round 59)
-- **The arm-order lever has a cheap COUNTER-indication: retail's bare `j` must carry REAL
-  WORK in its delay slot.** Where retail's carries a `nop`, inverting an if/else to fix block
-  order regressed twice on two different bodies (16/79 -> 9, 49/79 -> 13, drift both times),
-  because 2.6.3 collapses a free `v0 = 0` arm into the BRANCH's own delay slot and evicts a
-  `slot++` that was already matching. Read the delay slot before you build the variant.
-  (a round 64, charlie)
 - **A bare `__asm__("")` at a basic-block JOIN blocks GCC's eager delay-slot fill and can COST
   instructions.** It is legal under HARD RULE 6 (it moves no value between registers) and still made
   `func_8002CF18` worse for four rounds. The discriminator is WHERE it sits: inside a block a barrier
@@ -197,6 +191,15 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `return`-terminated sequential-`if` compile IDENTICALLY. Never size a residue with the whole-image
   byte count when a `switch` is present — compiling it relocates rodata. (a §"Round 16", §"Round
   12")
+- **N identical two-instruction tails ending `j <exit>` with a store in the delay slot are usually
+  ONE statement AFTER the block, not N inside it.** `dbr_schedule` fills a `j L` + `nop` by COPYING
+  `L`'s first instruction and retargeting the jump past it, so a single post-`switch` statement is
+  replicated into every `break` path and reads as a hand-written copy in each case. Length does NOT
+  discriminate — the two shapes are often EQUAL length, ins 0 / del 0, skeleton diffs 0. What does:
+  written as real per-case source, 2.6.3 cross-jumps the `default:` copy onto the first identical
+  tail, moving ONLY the bounds-check branch target and the jump-table slot for the unhandled
+  in-range value — presenting as a 3-byte whole-image diff at 150/151. (a round 67,
+  `func_80027A24`)
 
 ### 3c. Struct layout, types and widths
 
@@ -206,6 +209,15 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   compiler skipped: `tools/stalesyms.py` scans match REPORTS, not `src/`. Discriminator: the build
   is green AND `awk '/^#if 0/{i=1} /^#endif/{i=0} i && /->oldName/' src/*.c` still prints (four such
   accessors left behind in round 54). (a round 54)
+- **A preserved `#if 0` body carries the declarations of the round that WROTE it, and a later
+  naming pass may have moved the same symbol into the unit's prelude under a different typedef or
+  field name.** Redeclaring it is a real `conflicting types` error, not a harmless duplicate, so
+  promoting a body to `#ifdef NON_MATCHING` means deleting its own typedef/extern and re-pointing
+  its field accesses. Reconcile by OFFSET, never by the field's semantic label — round 67 found
+  `bendCurveUp`/`bendCurveDown` whose comment polarity disagrees with how both accessors use them.
+  Read the report's own earlier stale-symbol write-up before trusting the block to compile as
+  literally written: `stalesyms.py` scans report TEXT, so it cannot see what a promoted `.c` body
+  needs. (a round 67, `code_179d8_m`)
 - **A local's DECLARED WIDTH is a codegen decision and `s16` is the expensive default.** An
   `s16`/`u16` local compared or indexed is re-sign-extended at each use — `sll 0x10`/`sra 0x10`
   PAIRS, never scheduling, never movable by a barrier. Declare the LOCAL `s32`, keep the FIELD
@@ -336,11 +348,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   a CALL**: one `s32 r` reused for three `rand()` results cost one `move $a1,$v0` per call and
   deleting it closed 25/87 -> 87/87, while deleting a SINGLE-USE local measured exactly inert
   in the same unit. (a docs/match-reports/func_80062C58.md, round 59; a round 64, charlie)
-- **An explicit alias can force the parameter copy cc1 would otherwise coalesce away, and "the dead
-  copy gets eliminated" is a per-BODY negative.** `Obj278 *p; p = self;` used for even ONE access
-  made cc1 emit retail's `move`, and six of six joint-best permuter candidates converged on it.
-  Using the alias EVERYWHERE collapses back to two pointers and cc1 coalesces again, so the lever is
-  partial use. (a round 60, `func_8002C278`, -> 54/76)
 - **Local COUNT is the lever on a register-identity residue in all THREE directions — delete, merge
   and add — not only delete.** Round 65 worked one unit's three stalls at once: deleting four cached
   tail temps made `func_8002DDBC`'s whole 25-instruction tail byte-exact and fixed two registers four
@@ -609,12 +616,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   placements of a single `sw`, one build each, body otherwise byte-identical: 80, 82, 82, 83, 83,
   83, 92, then 106/106 at "last statement in the block". Mechanical and cheap; it found the zero on
   `func_8004C1C0`. (a round 63)
-- **Retail reuses the same counter pseudo-registers across sibling loops and SWAPS their outer/inner
-  roles.** A `for (i...) { for (j...) }` nest pins `i` outer in every loop; rewriting the nest with
-  the roles swapped took `func_8003221C` 48 -> 83/83 in one build. A loop's counter reset may also
-  be its own statement BEFORE the base-pointer load (`reg = ...; i = 0; base = ...; for (; i < N;
-  i++)`), worth 2 words. Check whether a sibling loop in the SAME function already uses the correct
-  idiom -- that is where both fixes were found. (a round 63)
 - **A narrow signed field may need an `s32` LOCAL rather than a cast to get retail's `lb` + `sll
   0xb`, but ONLY under aliasing -- this does NOT reproduce in isolation.** In `func_8004C1C0`
   (fields re-read after a callee writes the struct through `u8 *`), `s32 t = o->b2; t << 11` and
@@ -747,4 +748,7 @@ immediate", §"A struct RETURNED BY VALUE reads as a call with its arguments shi
 §"`&arr[i + j]` and `arr + i + j` are one instruction apart", the
 cache-the-scalar-not-the-pointer entry, and four permuter-practice notes superseded by the
 three-check scaffold protocol in 3j (libc data points, scheduling-residue reproducer, seed
-minimally, search-tail inert forms).
+minimally, search-tail inert forms). Distilled out round 67: §"The arm-order lever has a
+cheap COUNTER-indication", §"An explicit alias can force the parameter copy cc1 would
+otherwise coalesce away", §"Retail reuses the same counter pseudo-registers across sibling
+loops and SWAPS their outer/inner roles".

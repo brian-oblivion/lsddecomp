@@ -6,6 +6,81 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-22 — round 67: a two-round-old CAUSE overturned by a one-second isolation, and the standing rule that produced it
+
+**Three runners, three tracks, three merges, all green. Matched 1150 -> 1151,
+queued 102 -> 101.** Head on Opus; nothing needed Fable, and the findings that
+do are ESCALATED below rather than acted on. Gate 0 clean, all three worktrees
+byte-verified before handover, `headercontention.py` reported no header and no
+call-graph contention among the three units.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | opus | 3 | `class_3ac78` | 23 defs + 3 globals named, fields and slots in its own header, unit header comment; review PASSED, unit marked |
+| bravo | opus | 1 revisit | `code_179d8_s` | `func_80027A24` MATCHED 151/151; unit now 7 of 7 |
+| charlie | sonnet | 1b | `code_179d8_m` | all 5 preserved bodies promoted; `check-nonmatching` 25 -> 30 bodies |
+
+Track 3 is 19/75 units passed, 726/1151 defs still `func_` (was 745). Revisit
+yield 12/27. **The naming runner moves to Sonnet**: `class_3ac78` is the second
+clean Opus unit in a row, which is what the model table asks for.
+
+### A standing rule told round 47 to stop looking, and it was wrong
+
+`func_80027A24` sat at 150/151 since round 47 with one wrong branch target,
+filed as a whole-translation-unit cross-jump artifact "not reachable by
+rewriting this function's own source". The evidence for that verdict was a
+permuter scaffold scoring base 0 on the same body, read through the rule in
+`DECOMPILATION_LEARNINGS.md` §3j and the `PARALLEL-RUNS.md` §3.5 table: a
+perfect scaffold score on a non-matching function means the cause is OUTSIDE
+the function, decline, stop looking inside.
+
+Bravo compiled that exact body ALONE through the pinned pipeline — the
+recipe already in CLAUDE.md, about a second — and it reproduces the wrong
+branch target byte-for-byte. The cause was local the whole time.
+
+The lever: retail wrote **one** `self->unk28 = 0;` AFTER the switch with a
+plain `break` in every case. The four identical `j <exit>` + `sh zero,0x28(s0)`
+tails in retail's asm are not four source stores; `dbr_schedule` fills each
+`j after_switch` delay slot by COPYING the target block's first instruction
+and retargeting the jump past it. Writing the store literally in all five
+cases gives 2.6.3 five real store blocks, and it cross-jumps the `default:`
+copy onto case 2's byte-identical tail 0x88 earlier. Net length identical —
+which is exactly why it presented as ins 0 / del 0, skeleton diffs 0, length
+exact, and a three-byte whole-image diff. Promoted as an idiom in 3b.
+
+Four round-47 restructurings of the switch all failed, and all four kept the
+per-case stores. The measurement that mattered cost a second and was never
+taken, because a rule said not to bother.
+
+### Naming: arithmetic pinned a class that guessing had not
+
+`Class866E8` is a grid manager. `gDefaultGridSpan` is `0xA000`; slot +0x0DC
+derives `span >> 11 = 20` and `span >> 12 = 10`. That **20** shows up four
+independent ways: the ctor's `0x800` cell lattice (`0xA000/0x800`), the shift,
+the row stride in `class_3bb8c_b`'s byte-matched `func_8004CE24`, and `0x13` as
+the last valid column. So the shift is a division by cell size, not an
+arbitrary bit slice, and the three cross-unit field names the head applied by
+type scope (`gridSpan`/`gridHalfCells`/`gridCells`) rest on arithmetic rather
+than on a reading of intent. The compiler listed exactly two accessors for
+them, both in `func_8004C620`, which now reads
+`idx = self->gridHalfCells * 2` passed alongside `self->gridCells` — the
+identity is visible in the source.
+
+Two inherited hypotheses fell. `+0x00C` is `finalize`, not `dtor` (`dtor` is
+`+0x004` `release`, per `code_8220.h`). And the third parameter of slots
++0x09C / +0x0D0 / +0x12C is a **command code, not a count** — the head's own
+read of `Class866E8__ForwardAcceptedCommand` confirms it independently: a
+parameter switched over `{2,3,5,6,7,8}` cannot be a count.
+
+### Doc budget
+
+The two promotions put `DECOMPILATION_LEARNINGS.md` 214 words over. Per
+FINISHING-PLAN §5 the promotion is not suppressed to protect the budget:
+promoted first, then distilled three closed single-instance entries (the
+arm-order counter-indication, the explicit-alias parameter copy, the swapped
+sibling-loop counters) verbatim into the archive under "Distilled out on
+2026-09-22 (round 67)", with pointers added to §6. Back within budget.
+
 ## 2026-09-22 — round 66: a stall's recorded CAUSE was wrong for two rounds, a naming pass unlocked by grepping for its own placeholder callees, and a measurement that killed my own finding
 
 **Three runners, three tracks, three merges, all green. Matched unchanged at

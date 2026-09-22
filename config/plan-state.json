@@ -1,7 +1,7 @@
 {
   "models": {
     "match_runner": "opus",
-    "naming_runner": "opus"
+    "naming_runner": "sonnet"
   },
   "stop_rule": {
     "attempts_per_model": 6,
@@ -210,6 +210,16 @@
           "note": "REVISIT runner bravo on code_179d8_p func_80031F3C, the unit's only function. 42/131 -> 103/131, length 9-short -> EXACT, ins/del 29/29 -> 10/10, positional skeleton diffs 82 -> 26. Still a STALL: the residue is register identity on two adjacent temporaries, which HARD RULE 6 puts out of bounds, and bravo showed the flipped commutative operand order downstream is a SYMPTOM of it because cc1 canonicalises commutative operands by register. The round turned on the recorded CAUSE being wrong: 8 of the 9 missing words were code the preserved body never had (retail does three stores off the reloaded D_8008EA26 index sharing one *0x34 multiply, the body had one; 9 = 1+4+4 exactly), not the scheduling residue two rounds had attributed them to. Names/types USED and DECISIVE -- D_8006DAD4 is known to be 0x1F801C00, the SPU voice registers, only because code_179d8_m was named as the 24-voice SPU driver, and that is what made volatile the thing to try; typing the POINTEE volatile was worth 54/131 -> 98/131 alone. Permuter scaffold provisioned, Gate 3 checks 1-3 all run, search NOT spent.",
           "round": 66,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-22",
+          "matches": 1,
+          "model": "opus",
+          "note": "REVISIT runner (bravo) on func_80027A24 in code_179d8_s: MATCHED 151/151, unit now 7 of 7. Revisit measurements recorded before any change: ins 0 / del 0, positional skeleton diffs 0, 150/151. Round 47's stated CAUSE was falsified -- it attributed the single wrong branch target to a whole-translation-unit cross-jump artifact on the strength of a permuter scaffold scoring base 0, and declined a search on that basis; a direct pinned-pipeline isolation of the same body reproduces the residue byte-for-byte, so the cause was local to the function's source all along. Lever: N identical j-exit tails with a store in the delay slot are ONE post-switch statement replicated by dbr_schedule, not N source stores.",
+          "round": 67,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -265,6 +275,16 @@
           "model": "sonnet",
           "note": "Runner charlie, code_179d8_k: 5 of 6 preserved bodies promoted to #ifdef NON_MATCHING (func_80034138 66/69 length-exact, func_800344FC 62/70 length-exact, func_8003424C 122/172 length-exact, func_80034690 195/200 5-short, func_80035B2C 211/213 2-short). check-nonmatching.sh green throughout; 20 bodies in 5 units -> 25 in 6. Whole-image oracle green, as a promotion must leave it. func_800344FC was the one permuter-derived body: its round-47 mutation is a bare 'return;' rewritten as 'do { return; } while (0);', reviewed and promoted as behaviourally identical -- no UB, no dead branch, so it clears track 1b's stated bar, but it is a codegen-shaping artifact sitting in a body whose whole purpose is READABILITY, and that tension is escalated rather than settled here. func_800351D0 correctly NOT promoted (park rule): its preserved body calls func_800357B0 with an 8-argument slice guess that round 49 FALSIFIED when it matched that callee with a real by-value signature, so the body no longer compiles and reshaping it is fresh derivation. General lesson: a body preserved before its CALLEE was matched can be stale in the call SIGNATURE, which stalesyms.py does not catch -- it tracks renamed callees, not re-typed ones, and reported OUTSTANDING 0 with this case live.",
           "round": 66,
+          "runners": 1
+        },
+        {
+          "attempts": 5,
+          "calibration": true,
+          "date": "2026-09-22",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Charlie promoted all 5 preserved bodies in code_179d8_m to #ifdef NON_MATCHING (ApplyVoicePitchBend, StepVoiceFade, StepVoiceEnvelope, UpdateVoiceEnvelopes, StartNote). All confirmed hand-derived: each report shows a round-37 permuter search that never reached zero, with its best candidates disqualified as permuter-internal restructurings rather than translatable fixes. NON_MATCHING bodies 25 -> 30; build-and-verify green (zero bytes changed) and check-nonmatching green after every promotion. matches=0 is correct for this track: a promotion is not a byte match.",
+          "round": 67,
           "runners": 1
         }
       ],
@@ -408,12 +428,23 @@
           "note": "Naming pass on DreamSys (alpha, opus), the unit round 65's review sent back. 32/116 -> 5 unnamed: 29 functions named (1 tier A, 28 tier B), 31 fields, 46 globals, 3 local types, 2 vtable slot fields spelled by ADDRESS that rename.py's whole-word pass cannot track (renamed by hand), one wrong parameter name corrected, both header comments rewritten -- include/DreamSys.h's naming note was stale in BOTH directions, listing functions under names that no longer existed and recording as unnameable the exact state machine this round named. Five placeholders remain, all tier C with what is known written down. Head review sampled five names against their evidence and all five hold, including the sole tier A (DreamSys__NoOpSlot12C: body is 'return 0;', it really is vtable slot 0x12C, and NoOpSlot14C/150/E8Defa already existed as the unit's convention) -- so this is ONE clean Opus unit, not two, and the naming runner stays opus. No cross-unit field names proposed: alpha tested each by the compiler. THE METHOD WORTH CARRYING: round 65 concluded this state machine had no confident name, and what unlocked it was not reading those bodies harder but grepping src/ for the unit's own PLACEHOLDER-NAMED CALLEES -- func_8001CEB4, a slot alpha's header called an opaque generic pointer, is already MATCHED in src/code_d294.c and is the rotation setter reading {numerator, denominator} degree ratios, which turned six call sites into exact angles and decoded four data constants. A symbol still spelled func_XXXXXXXX says nothing about whether its body has been read.",
           "round": 66,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-22",
+          "matches": 0,
+          "model": "opus",
+          "note": "Alpha's naming pass on class_3ac78: all 23 function defs and 3 globals named, fields and vtable slots named in the unit's own header, unit header comment written, ## Naming in all 24 reports. Class866E8 identified as a grid manager on arithmetic (gDefaultGridSpan 0xA000 >>12 = 10 and >>11 = 20, the 20 corroborated four independent ways). Corrects the inherited dtor hypothesis: +0x00C is finalize, dtor is +0x004 release. Proposed three cross-unit Obj866E8 field names; head applied them by type scope.",
+          "round": 67,
+          "runners": 1
         }
       ],
       "status": "open",
       "units_done": {
         "DreamSys": "2026-09-22",
         "Entity": "2026-09-19",
+        "class_3ac78": "2026-09-22",
         "class_3bb8c_f": "2026-09-20",
         "class_3bb8c_o": "2026-09-18",
         "class_3bb8c_p": "2026-09-19",

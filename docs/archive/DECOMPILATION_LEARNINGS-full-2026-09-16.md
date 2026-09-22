@@ -8897,3 +8897,30 @@ are withdrawal pointers condensed in place, kept here in full.
   forgotten-`padNN` struct insertion (round 13), drift misattributed to the function under the
   cursor (round 20), the jump-table funcdiff window (round 27, FIXED), and a length-short function
   shifting `.bss` (round 36). In every one the oracle went RED and was right.
+
+
+## Distilled out on 2026-09-22 (round 67)
+
+Moved out of the lean doc to meet its word budget after round 67 promoted two new
+idioms. All three are still correct and closed; each names its round, whose story is in
+docs/PROGRESS.md.
+
+- **The arm-order lever has a cheap COUNTER-indication: retail's bare `j` must carry REAL
+  WORK in its delay slot.** Where retail's carries a `nop`, inverting an if/else to fix block
+  order regressed twice on two different bodies (16/79 -> 9, 49/79 -> 13, drift both times),
+  because 2.6.3 collapses a free `v0 = 0` arm into the BRANCH's own delay slot and evicts a
+  `slot++` that was already matching. Read the delay slot before you build the variant.
+  (a round 64, charlie)
+
+- **An explicit alias can force the parameter copy cc1 would otherwise coalesce away, and "the dead
+  copy gets eliminated" is a per-BODY negative.** `Obj278 *p; p = self;` used for even ONE access
+  made cc1 emit retail's `move`, and six of six joint-best permuter candidates converged on it.
+  Using the alias EVERYWHERE collapses back to two pointers and cc1 coalesces again, so the lever is
+  partial use. (a round 60, `func_8002C278`, -> 54/76)
+
+- **Retail reuses the same counter pseudo-registers across sibling loops and SWAPS their outer/inner
+  roles.** A `for (i...) { for (j...) }` nest pins `i` outer in every loop; rewriting the nest with
+  the roles swapped took `func_8003221C` 48 -> 83/83 in one build. A loop's counter reset may also
+  be its own statement BEFORE the base-pointer load (`reg = ...; i = 0; base = ...; for (; i < N;
+  i++)`), worth 2 words. Check whether a sibling loop in the SAME function already uses the correct
+  idiom -- that is where both fixes were found. (a round 63)
