@@ -513,7 +513,42 @@ void func_8002B3E4(s32 arg0)
     D_8006D8A4 = arg0;
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 30/56 words, length 1 short. Residue: instruction-selection
+ * (retail computes &D_8006D8D8 unfolded inside the loop; this folds it)
+ * (docs/match-reports/func_8002B3F4.md). Hand-derived. */
+void func_8002B3F4(void)
+{
+    u8 status;
+    s32 flags;
+    s32 handler;
+    u8 *pd9;
+
+    status = (*D_8006D8C0) & 3;
+    pd9 = &D_8006D8D9;
+
+    for (;;) {
+        flags = func_80029478();
+        if (flags == 0) {
+            break;
+        }
+        if (flags & 4) {
+            handler = D_8006D600;
+            if (handler != 0) {
+                ((void (*)(s32, u8 *))handler)(*pd9, D_8008B3D4);
+            }
+        }
+        if (flags & 2) {
+            if (D_8006D5FC != 0) {
+                ((void (*)(s32, u8 *))D_8006D5FC)(D_8006D8D8[0], D_8008B3CC);
+            }
+        }
+    }
+    *D_8006D8C0 = status;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3F4);
+#endif
 
 void func_8002B4D4(s32 arg0, s32 arg1)
 {
