@@ -488,7 +488,62 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
     return pF8[-1];
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 49/91 words, length exact. Residue: register identity
+ * (the three hoisted pointers p620/p6A0/p8D8 land in different
+ * callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
+ * func_8002B198.md). Structure is hand-derived; the diagnostic call's
+ * `ok =` sink is a permuter find (round 36), reviewed as a semantically
+ * inert dead-store reuse and oracle-confirmed. */
+s32 func_8002B198(s32 arg0)
+{
+    s32 now;
+    s32 ok;
+    s32 *p620;
+    u8 *p8D8;
+    s32 *p6A0;
+
+    D_8008B3E4 = VSync(-1) + 0x1E0;
+    p620 = D_8006D620;
+    p6A0 = D_8006D6A0;
+    p8D8 = D_8006D8D8;
+    D_8008B3E8 = 0;
+    D_8008B3EC = (s32)D_80010AE0;
+
+    for (;;) {
+        now = VSync(-1);
+        ok = 1;
+        if (D_8008B3E4 < now) {
+            ok = 0;
+        } else {
+            D_8008B3E8 = D_8008B3E8 + 1;
+            if (0x1E0000 < D_8008B3E8) {
+                ok = 0;
+            }
+        }
+        if (!ok) {
+            puts(D_80010984);
+            /* retail reuses the (dead, about-to-be-overwritten) `ok` slot as
+             * the register target for this last argument's value -- a fresh
+             * local here compiles worse (45/91 vs 49/91); see this report's
+             * round-36 entry. */
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
+                   ok = p6A0[p8D8[0]]);
+            func_8002A510();
+            return -1;
+        }
+        if ((*D_8006D934 & 0x1000000) == 0) {
+            return 0;
+        }
+        if (arg0 == 0) {
+            continue;
+        }
+        return 1;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B198);
+#endif
 
 s32 func_8002B304(s32 arg0, s32 arg1)
 {
