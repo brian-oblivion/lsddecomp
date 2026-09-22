@@ -277,15 +277,15 @@ typedef struct DreamSysCtorArgObj {
    passed through directly rather than via a derived value) -- kept as a
    separate local view per this unit's "multiple independent views of one
    table" convention until proven otherwise (round 2026-09-02). */
-typedef struct DreamSysFunc58968ArgMethods {
+typedef struct DreamSysSpawnArgMethods {
 	u8 pad00[0xE4];
 	/* Called by DreamSys__SpawnAtLink as (arg1, &local, this,
 	   &this->linkCoordinates); return value discarded. */
 	void (*slot0xE4)(void *self, void *arg1, struct DreamSys *arg2, PlayerSpawnPoint *arg3);
-} DreamSysFunc58968ArgMethods;
-typedef struct DreamSysFunc58968ArgObj {
-	DreamSysFunc58968ArgMethods *methods;
-} DreamSysFunc58968ArgObj;
+} DreamSysSpawnArgMethods;
+typedef struct DreamSysSpawnArgObj {
+	DreamSysSpawnArgMethods *methods;
+} DreamSysSpawnArgObj;
 
 /* Inner struct chased by DreamSys__NotifyLinkAttempt's `arg1 == -2` path: the return of
    DreamSysUnk4CMethods::slot0x11C (a DreamSysUnk11CResult below) has a
@@ -461,7 +461,7 @@ typedef struct DreamSysEntityObj {
    real caller/owner lives outside this unit. Only the offsets
    DreamSys__SoundCueCallback itself touches are named; +0x8..+0x1C and +0x24..+0x30
    are unconfirmed gaps (round 2026-08-30-d). */
-typedef struct Func8005A1F4Arg {
+typedef struct SoundCueCallbackArg {
 	s32 mode;             /* +0x0, compared against literal 1 */
 	s32 value;              /* +0x4, divided by 20 */
 	s8 unknown_values_0x8[0x14];
@@ -470,7 +470,7 @@ typedef struct Func8005A1F4Arg {
 	s8 unknown_values_0x24[0xC];
 	s32 field_0x30;
 	s32 field_0x34;
-} Func8005A1F4Arg;
+} SoundCueCallbackArg;
 
 /* Full-word (x,y,z) vector, distinct from `struct RelativePos` (s16 triplet
    -- the on-disk/network form). DreamSys__ApplyRelativeOffset builds one of these on the
@@ -900,13 +900,13 @@ struct vtable_DreamSys{
 	   (this); its return value is never overwritten before the function's
 	   own epilogue, so it becomes DreamSys__DreamSys's own return value
 	   unchanged (round 2026-09-02) -- typed `DreamSys *` to match. */
-	DreamSys *(*func_800588EC)(DreamSys *this);
+	DreamSys *(*DreamSys__ResetSessionState)(DreamSys *this);
 	/* Called by DreamSys__StepLookYaw as (this, 0, &D_80087E84[-1]); return value,
 	   if any, unused (round 2026-08-30). */
 	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);
 	u32 unknown_functions_0x48[1];
 	/* This function's OWN slot; called this round (round 2026-09-02). */
-	void (*func_58968)(DreamSys *this, DreamSysFunc58968ArgObj *arg1);
+	void (*DreamSys__SpawnAtLink)(DreamSys *this, DreamSysSpawnArgObj *arg1);
 	u32 unknown_functions_0x50[4];
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x060). Called by
 	   DreamSys__ResetSessionState as (this, 0) (round 2026-08-30-b). Still
@@ -999,7 +999,7 @@ struct vtable_DreamSys{
 	void (*DreamSys__func_5938c)(DreamSys *this, s32 value);
 	void (*DreamSys__UpdateTickState)(DreamSys *this);
 	void (*DreamSys__RunTickCallbacks)(DreamSys *this);
-	s32 (*DreamSys__ProjectPointAtDistance)(DreamSys *this, void *out, s32 day, s32 *reference, s32 tolerance);
+	s32 (*DreamSys__ProjectPointAtDistance)(DreamSys *this, void *out, s32 dist, s32 *reference, s32 tolerance);
 	void (*DreamSys__func_59590)(DreamSys *this);
 	void (*DreamSys__func_59598)(DreamSys *this);
 	s32 (*DreamSys__NoOpSlot12C)(DreamSys *this);
@@ -1074,7 +1074,7 @@ struct vtable_DreamSys{
 	   called there) is forwarded as InitSoundCueSet's 5th argument. arg0 is
 	   unused in the body; kept generic rather than typed DreamSys* since
 	   nothing here confirms it (round 2026-08-30-d). */
-	void (*DreamSys__SoundCueCallback)(void *arg0, Func8005A1F4Arg *arg1);
+	void (*DreamSys__SoundCueCallback)(void *arg0, SoundCueCallbackArg *arg1);
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as

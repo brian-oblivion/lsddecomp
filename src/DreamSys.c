@@ -54,7 +54,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 	this->moveOverride = 0;
 	this->newGamePending = 1;
 	this->vt->InitNewGame(this);
-	return this->vt->func_800588EC(this);
+	return this->vt->DreamSys__ResetSessionState(this);
 }
 
 void DreamSys__ResetSessionState(DreamSys *this)
@@ -71,7 +71,7 @@ void DreamSys__ResetSessionState(DreamSys *this)
 	this->unk_0x924 = 0;
 }
 
-void DreamSys__SpawnAtLink(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
+void DreamSys__SpawnAtLink(DreamSys *this, DreamSysSpawnArgObj *arg1)
 {
 	s32 local[4];
 
@@ -370,10 +370,17 @@ void DreamSys__RunTickCallbacks(DreamSys *this)
  * arg4 on Class6B5CC__LocalOffsetToWorldPos is unused by its own body but IS set (to 0) by this
  * call site's own disassembly, so it is declared here to reproduce that. */
 extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4); /* arity-ok: definition is 3-parameter, but arg4 is byte-load-bearing HERE -- retail emits `move a3,zero` at 0x80059460 */
-extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
+extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 at);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
-s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
+/* `dist` was called `day` until round 66, which was a transcription of the
+   caller-less m2c signature and is wrong: it is written into the z word of
+   the global scratch vector that Class6B5CC__LocalOffsetToWorldPos converts
+   from a LOCAL OFFSET to a world position, and it is also the abscissa
+   InterpolateKeyframeValue evaluates heightCurve's two keyframes at -- whose
+   own `position` fields are what it is compared against. It is a distance
+   along the local axis, not a day index. */
+s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *reference, s32 tolerance)
 {
 	s32 local[3];
 	s32 ret;
@@ -381,11 +388,11 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 	s32 *p;
 
 	p = &D_80087EE8;
-	*p = day;
+	*p = dist;
 	Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
 	ret = InterpolateKeyframeValue((void *)((u8 *)this->heightCurve + 0x14),
-	                     (void *)((u8 *)this->heightCurve + 0x20), day);
+	                     (void *)((u8 *)this->heightCurve + 0x20), dist);
 
 	vec = this->unk_0xC != 0 ? (s32 *)((u8 *)this->unk_0x14 + 0x38) : 0;
 	local[1] = ret + vec[1];
@@ -835,7 +842,7 @@ void DreamSys__SetTickPeriod(DreamSys *this, s32 value)
 	this->tickPeriod = value;
 }
 
-void DreamSys__SoundCueCallback(void *arg0, Func8005A1F4Arg *arg1)
+void DreamSys__SoundCueCallback(void *arg0, SoundCueCallbackArg *arg1)
 {
 	s32 isDivisible;
 
