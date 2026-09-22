@@ -738,9 +738,9 @@ struct Obj866E8 {
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
     Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
-    s32 unk74;                     /* +0x074, func_8004C6A8: copied into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
-    s16 unk78;                     /* +0x078, func_8004C620 (halfword, doubled into an index) */
-    s16 unk7A;                     /* +0x07A, func_8004C620 (halfword, passed on as an arg) */
+    s32 gridSpan;                  /* +0x074, world span of the grid; gDefaultGridSpan = 0xA000. func_8004C6A8 copies it into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
+    s16 gridHalfCells;             /* +0x078, gridSpan >> 12 = 10; func_8004C620 doubles it into an index (giving gridCells) */
+    s16 gridCells;                 /* +0x07A, gridSpan >> 11 = 20, the row stride byte-matched func_8004CE24 uses; func_8004C620 passes it on as an arg */
     s16 unk7C;                     /* +0x07C, func_8004C93C: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with unk80 to decide whether the grid footprint spans one or two 20-unit cells; also written directly by func_8004C6A8 */
     s16 unk7E;                     /* +0x07E, func_8004C93C: same convention as unk7C, vertical; also written directly by func_8004C6A8 */
     s32 unk80;                     /* +0x080, func_8004C6A8 (writes arg1 or arg2 depending on its own dispatch), then read/forwarded by func_8004C93C to func_8004CAF0's p7 */

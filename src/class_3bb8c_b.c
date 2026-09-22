@@ -49,10 +49,10 @@ void func_8004C620(Obj866E8 *self) {
     if (self->unk1B8 == 0) {
         return;
     }
-    idx = self->unk78 * 2;
+    idx = self->gridHalfCells * 2;
     func_8004CE24(self, 0);
     if (self->unk68->unk4 == 0) {
-        func_8004C6A8(self, idx, self->unk7A);
+        func_8004C6A8(self, idx, self->gridCells);
     } else {
         func_8004CC74(self);
     }
