@@ -1206,7 +1206,16 @@ extern u32 D_8009024C;
  * the division's remainder). unk6E doubles as a mode flag: -1 means
  * "unk70 holds the reciprocal-regime value", any other value means
  * "unk70 holds the same value unk6E does". */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 211/213 words, length 2 SHORT. Residue: register-identity
+ * re-read of rec->unk4A (retail's second divu re-reads it fresh via a
+ * plain `lh`; this body keeps the first read's value live in a register)
+ * (docs/match-reports/func_80035B2C.md). Hand-derived -- reaches 211/213
+ * via a narrowed `volatile` qualifier on the word-sized field only
+ * (round 26 head ruling, ordinary C semantics defeating div/mod fusion,
+ * not a banned register pin); round 35's permuter search (15862+
+ * iterations) found no zero and never beat the base score, residue
+ * marked permuter-exhausted. */
 void func_80035B2C(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -1288,8 +1297,9 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
         rec->unk88 = rec->unk70;
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035B2C);
+#endif
 
 /* MATCHED -- see docs/match-reports/func_80035E80.md. The `goto combine`
  * is load-bearing: retail keeps the "single-byte" and "loop-exit" `val`
