@@ -1,4 +1,6 @@
-# func_8004D678
+# CheckObj866E8CountFlag
+
+> Renamed from `func_8004D678` on 2026-09-22 (tools/rename.py). Address 0x8004d678.
 
 **Unit:** class_3bb8c_c · **Size:** 13 words · **Status:** MATCHED (13/13)
 
@@ -14,7 +16,7 @@ result.
 ## The C
 
 ```c
-void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
+void CheckObj866E8CountFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 {
     Obj866E8 *target = ctx->target;
     s32 flag = 1;
@@ -39,7 +41,7 @@ void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 
 ## New types: Ctx678_3bb8c_c / Result678_3bb8c_c
 
-`func_8004D678`'s first argument is NOT `Obj866E8` itself -- it is a
+`CheckObj866E8CountFlag`'s first argument is NOT `Obj866E8` itself -- it is a
 larger, unrelated caller-side struct (only visible from its one caller,
 `func_8004DE08`, which reads its own fields at +0x4C/+0x58/+0xA4/+0xB0
 around the call) whose own +0x0BC field is a pointer to the `Obj866E8`
@@ -100,7 +102,7 @@ before ever reading it:
 ```
 
 Two real arguments, exactly as the definition
-(`void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)`) says.
+(`void CheckObj866E8CountFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)`) says.
 `$a2` is a local flag, not an argument.
 
 **Why the extern must keep the third parameter.** `func_8004DE08`'s call site
@@ -109,7 +111,7 @@ loads it, and retail emits that load:
 ```
 8004de70:  lw    a1,76(s0)
 8004de74:  lw    a2,164(s0)       <- the dead 3rd argument, in retail
-8004de78:  jal   8004d678 <func_8004D678>
+8004de78:  jal   8004d678 <CheckObj866E8CountFlag>
 ```
 
 `self->unkA4` is a memory load, not a value already in `$a2`, so this is
@@ -120,3 +122,20 @@ delete `lw a2,164(s0)` and break `func_8004DE08`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_d.c:219`. Oracle green.
+
+## Naming
+
+**CheckObj866E8CountFlag** -- tier B. Free function (not a vtable method --
+called directly by `jal` from the still-uncarved `func_8004DE08`), so named
+`VerbNoun`. Mechanics are fully evident: reaches an `Obj866E8` through a
+caller-side context struct, compares one field (`unkC`) against a large
+literal (`9999999`), and writes a computed 0/1 flag into a result block.
+The literal reads as a sentinel (a game-common "treat as unlimited/uncapped"
+threshold) but that is a purpose GUESS the rule forbids naming on, so the
+name stays mechanical: "check a count against its threshold, produce a
+flag" -- not "IsUncapped"/"IsAvailable"/etc. `Ctx678_3bb8c_c`/
+`Result678_3bb8c_c` (the two parameter types) are left as-is; they already
+name exactly what evidence supports (a caller-side context wrapper and a
+result block), and CLAUDE.md's four-ways-a-score-lies precedent (delta,
+round 13) is the standing reason not to touch a shared/ambiguous struct
+without stronger cause.

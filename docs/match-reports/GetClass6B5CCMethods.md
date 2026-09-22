@@ -87,7 +87,7 @@ and it is not a judgement call.
 
 **The discriminator that separates this from the other 15 findings: is the
 extra argument byte-load-bearing at the call site?** For `BMemPMgrInit`,
-`Class6B5CC__LocalOffsetToWorldPos`, `func_8004D678`, `LinkOwnerObj__*`,
+`Class6B5CC__LocalOffsetToWorldPos`, `CheckObj866E8CountFlag`, `LinkOwnerObj__*`,
 `func_80056BBC` and `func_8002CF18`, retail *emits an instruction* for the
 extra argument (`move a1,zero`, `move a3,zero`, `lw a2,164(s0)`, `li a0,0xff`),
 so the declaration has to keep its arity or the call site's bytes change. Here
@@ -100,7 +100,7 @@ it emits nothing — all three call sites already have the value in the register
 8004aa88:  jal   8001e57c <GetClass6B5CCMethods>   ; Class866E8__OnElementEvent (class_3ac78.c, 2-arg call)
 8004aa8c:  move  s2,a2                             ; ditto
 
-8004d3e8:  jal   8001e57c <GetClass6B5CCMethods>   ; func_8004D3DC (via include/class_3bb8c.h, 1-arg call)
+8004d3e8:  jal   8001e57c <GetClass6B5CCMethods>   ; Class86AA0__Class86AA0 (via include/class_3bb8c.h, 1-arg call)
 8004d3ec:  move  s0,a0                             ; ditto
 ```
 

@@ -480,7 +480,7 @@ extern s32 SetActiveDataSourceDriverMode(s32 arg1, s32 arg2, s32 arg3);
 /* "New_X"-shaped allocator (uncarved, asm/class_3bb8c.s), zero forwarded
  * arguments (its own ctor call passes only the new instance). Stored into
  * `Obj0C::unk10`. */
-extern SubObjG *func_8004D254(void);
+extern SubObjG *New_Class869D8(void);
 
 /* Same "New_X" shape, zero arguments (uncarved, asm/psyq_memset.s). Stored
  * into `Obj0C::unk8`. */

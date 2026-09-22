@@ -1,4 +1,6 @@
-# func_8004D2A4
+# Class869D8__Class869D8
+
+> Renamed from `func_8004D2A4` on 2026-09-22 (tools/rename.py). Address 0x8004d2a4.
 
 **Unit:** class_3bb8c_c · **Size:** 21 words · **Status:** MATCHED (21/21)
 
@@ -14,10 +16,10 @@ matched, an empty body).
 ## The C
 
 ```c
-void func_8004D2A4(Class869D8 *self)
+void Class869D8__Class869D8(Class869D8 *self)
 {
     func_8003F24C()->ctor(self);
-    self->methods = func_8004D37C();
+    self->methods = GetClass869D8Methods();
     self->methods->slot40(self);
 }
 ```
@@ -38,3 +40,13 @@ OWN call site's register usage.
 
 Built and verified byte-for-byte as part of a 9-function batch across this
 whole unit; `./build-and-verify.sh` reports a clean whole-image SHA1 match.
+
+## Naming
+
+**Class869D8__Class869D8** -- tier A. Canonical ctor (`Class__Class`
+convention, e.g. `Class866E8__Class866E8`): chains the base ctor, installs
+this class's own vtable via `GetClass869D8Methods()`, then dispatches the
+freshly-installed table's own post-construct hook. The identity of the
+class and the fact that this occupies its own `ctor` slot (+0x008) are both
+evident from the body and from the vtable dump (`tools/classtable.py
+0x800869D8`).

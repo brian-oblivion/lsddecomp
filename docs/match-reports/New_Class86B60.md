@@ -1,18 +1,20 @@
-# func_8004D518
+# New_Class86B60
+
+> Renamed from `func_8004D518` on 2026-09-22 (tools/rename.py). Address 0x8004d518.
 
 **Unit:** class_3bb8c_c · **Size:** 24 words · **Status:** MATCHED (24/24)
 
 ## What it does
 
 `New_Class86B60`: the allocator for a third small sibling class (alongside
-`Class869D8`/`func_8004D254` and `Class86AA0`/`func_8004D38C`). Allocates
-0xC4 bytes and, on success, calls the ctor (`func_8004D578`, occupying this
+`Class869D8`/`New_Class869D8` and `Class86AA0`/`New_Class86AA0`). Allocates
+0xC4 bytes and, on success, calls the ctor (`Class86B60__Class86B60`, occupying this
 class's own vtable slot +0x008) with the allocated object and the caller's
 own `dreamSys` argument.
 
 Also externally visible as a `PollTaskCtor` callback -- `include/Class6D3C8.h`
 (a different unit) already declares this exact symbol,
-`extern PollTask *func_8004D518(void *dreamSys);`, used by `func_80026410`
+`extern PollTask *New_Class86B60(void *dreamSys);`, used by `func_80026410`
 as `func_80026518`'s `ctor` argument. That declaration's return/param
 naming is kept as-is there (independent local view); this unit's own
 `dreamSys` parameter name/type was chosen to match it.
@@ -20,7 +22,7 @@ naming is kept as-is there (independent local view); this unit's own
 ## The C
 
 ```c
-Class86B60 *func_8004D518(void *dreamSys)
+Class86B60 *New_Class86B60(void *dreamSys)
 {
     Class86B60 *self;
 
@@ -35,16 +37,26 @@ Class86B60 *func_8004D518(void *dreamSys)
 
 ## New header content (`include/class_3bb8c.h`)
 
-All additive/new -- see `func_8004D578`'s report (the ctor, matched
+All additive/new -- see `Class86B60__Class86B60`'s report (the ctor, matched
 alongside this function in the same round) for the full new-type list;
 both functions were derived and typed together.
 
 ## Notes
 
-Matched on the first attempt, same shape as `func_8004D254`/`func_8004D38C`
+Matched on the first attempt, same shape as `New_Class869D8`/`New_Class86AA0`
 (this unit's other two `New_X` allocators) plus one extra forwarded
 argument.
 
 ## Proposed learning
 
 None beyond what's already documented for this unit's `New_X` idiom.
+
+## Naming
+
+**New_Class86B60** -- tier A. Same `New_X` allocator idiom as
+`New_Class869D8`/`New_Class86AA0`, one extra forwarded argument
+(`dreamSys`). Also externally used as a `PollTaskCtor` callback
+(`include/Class6D3C8.h`); that unit's own independent local view keeps its
+own return/param naming and is untouched by this rename (function names
+are unique symbols, tree-wide by construction, so that call site now reads
+`New_Class86B60` too).

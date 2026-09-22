@@ -1,29 +1,51 @@
+/*
+ * class_3bb8c_c -- three small sibling classes, each built by its own
+ * New_X/ctor pair (allocate, chain a base ctor, install the class's own
+ * vtable): Class869D8, Class86AA0 and Class86B60. All three follow the
+ * same class-framework shape documented in docs/research/class-framework.md
+ * and already used elsewhere in this codebase (e.g. class_3ac78.c's
+ * Class866E8). Class86B60 is the largest of the three -- its own vtable
+ * (gClass86B60Methods, 78 slots) is mostly dispatched from the sibling
+ * unit class_3bb8c_d.c, which shares this file's header
+ * (include/class_3bb8c.h) and struct definitions; this unit contributes
+ * only the allocator and ctor.
+ *
+ * Two free functions round out the unit: CheckObj866E8CountFlag, called
+ * directly (not through any vtable) from the still-uncarved
+ * func_8004DE08, computes a 0/1 flag from an Obj866E8's own fields; and
+ * FormatNumberIntoBuffer, called from Class86B60's own ctor, formats a
+ * number into a shared buffer whose broader role (nearby rodata strings
+ * hint at a memory-card save label) is not established from this unit
+ * alone.
+ *
+ * All 20 definitions here are matched, 0 INCLUDE_ASM.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 
-Class869D8 *func_8004D254(void)
+Class869D8 *New_Class869D8(void)
 {
     Class869D8 *self;
 
     self = func_80017B34(0xDC);
     if (self != NULL) {
-        func_8004D37C()->ctor(self);
+        GetClass869D8Methods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void func_8004D2A4(Class869D8 *self)
+void Class869D8__Class869D8(Class869D8 *self)
 {
     func_8003F24C()->ctor(self);
-    self->methods = func_8004D37C();
-    self->methods->slot40(self);
+    self->methods = GetClass869D8Methods();
+    self->methods->onConstruct(self);
 }
 
 void func_8004D2F8(void) {
 }
 
-void func_8004D300(Class869D8 *self)
+void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
 {
     if (self->unk10 != 0 && self->unk70 != 0) {
         func_8003F24C()->slot9C(self);
@@ -42,27 +64,27 @@ void func_8004D36C(void) {
 void func_8004D374(void) {
 }
 
-Class869D8Methods *func_8004D37C(void)
+Class869D8Methods *GetClass869D8Methods(void)
 {
-    return &D_800869D8;
+    return &gClass869D8Methods;
 }
 
-Class86AA0 *func_8004D38C(void)
+Class86AA0 *New_Class86AA0(void)
 {
     Class86AA0 *self;
 
     self = func_80017B34(0x3C);
     if (self != NULL) {
-        func_8004D508()->ctor(self);
+        GetClass86AA0Methods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void func_8004D3DC(Class86AA0 *self)
+void Class86AA0__Class86AA0(Class86AA0 *self)
 {
     GetClass6B5CCMethods(self)->ctor(self);
-    self->methods = func_8004D508();
+    self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
     self->unk36 = 0;
     self->unk38 = 0;
@@ -71,14 +93,14 @@ void func_8004D3DC(Class86AA0 *self)
 void func_8004D42C(void) {
 }
 
-void func_8004D434(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
+void Class86AA0__ForwardIfTag34(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
 {
     if (arg1->methods->tag == 0x34) {
         self->methods->slotB8(self);
     }
 }
 
-void func_8004D47C(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+void Class86AA0__ForwardIfArg2InRange(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
     GetClass6B5CCMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
@@ -92,17 +114,17 @@ void func_8004D47C(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
     self->methods->slotA0(self, arg1, arg2);
 }
 
-void *func_8004D500(void *self)
+void *Class86AA0__ReturnSelf(void *self)
 {
     return self;
 }
 
-Class86AA0Methods *func_8004D508(void)
+Class86AA0Methods *GetClass86AA0Methods(void)
 {
-    return &D_80086AA0;
+    return &gClass86AA0Methods;
 }
 
-Class86B60 *func_8004D518(void *dreamSys)
+Class86B60 *New_Class86B60(void *dreamSys)
 {
     Class86B60 *self;
 
@@ -114,7 +136,7 @@ Class86B60 *func_8004D518(void *dreamSys)
     return NULL;
 }
 
-void func_8004D578(Class86B60 *self, void *dreamSys)
+void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
 {
     DreamSysView_3bb8c_c *dream;
     Class86B60Unk48Obj *obj;
@@ -127,12 +149,12 @@ void func_8004D578(Class86B60 *self, void *dreamSys)
     self->unkAC = 0;
     dream = dreamSys;
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
-    func_8004D6AC(dream->methods->slot1A0(dream, 0));
+    FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
     self->methods->slotD8(self, &D_80086D44);
-    self->methods->slot40(self, dreamSys);
+    self->methods->onConstruct(self, dreamSys);
 }
 
-void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
+void CheckObj866E8CountFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 {
     Obj866E8 *target = ctx->target;
     s32 flag = 1;
@@ -158,12 +180,12 @@ extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
  * idiom as Vec2s16, func_8001A268), but the trailing 2 bytes can no
  * longer be proven 2-byte aligned, so there is no safe halfword move for
  * them and the compiler falls back to two individual signed-byte
- * loads/stores. See docs/match-reports/func_8004D6AC.md. */
+ * loads/stores. See docs/match-reports/FormatNumberIntoBuffer.md. */
 typedef struct {
     s8 a, b, c, d, e, f;
 } Buf6_3bb8c_c;
 
-void func_8004D6AC(s32 arg0)
+void FormatNumberIntoBuffer(s32 arg0)
 {
     FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
     *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;

@@ -72,7 +72,7 @@ struct BaseCtorTable_3ac78 {
 extern BaseCtorTable_3ac78 *func_800428E4(void);
 extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
-extern GenericObject *func_8004D38C(void);
+extern GenericObject *New_Class86AA0(void);
 extern s32 func_80020C5C(void);
 extern void func_80017CFC(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
@@ -118,7 +118,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         entry->flag = 0;
 
         entry->list = new_class_6d940(0);
-        entry->cellParent = func_8004D38C();
+        entry->cellParent = New_Class86AA0();
         entry->cellParent->methods->slot4C(entry->cellParent, self, &self->origin);
 
         entry->cells = (Class866E8 **)func_80017B34(0x668);
@@ -134,7 +134,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         end = (u8 *)cellp + 0x668;
         p = (u8 *)cellp;
         while (p < end) {
-            obj = func_8004D38C();
+            obj = New_Class86AA0();
             *(GenericObject **)p = obj;
             obj->methods->slot4C(obj, entry->cellParent, buf);
 

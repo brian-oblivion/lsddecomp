@@ -229,7 +229,7 @@ residue, verified against the actual instructions below, not assumed.
 
 ## What it does
 
-`gIntermediateBaseMethods+0x060` (and `D_80086B60`'s own verbatim-inherited `+0x060`):
+`gIntermediateBaseMethods+0x060` (and `gClass86B60Methods`'s own verbatim-inherited `+0x060`):
 records `arg1` into `self->unk20`, dispatches `self->methods->slot30`
 (inherited BasicClass slot, `BasicClass__NotifyParents`) unconditionally, then
 `self->methods->slot64` (`Obj86B60__NotifyTargetReset`, already matched) if `arg1 == 2`,

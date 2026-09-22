@@ -319,7 +319,7 @@ extern s32 atoi(char *s);
 extern u8 *D_8008AAC4;
 
 /* Struct-copy helper types for round 45's func_800507F8, all deliberately
- * all-`s8` (alignment 1) per this round's func_8004D6AC lever: retail
+ * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
  * copies these ranges as one unaligned `lwl`/`lwr` word chunk per 4 bytes,
  * with any non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores,
  * never merged into a halfword -- alignment 2 would let GCC trust a

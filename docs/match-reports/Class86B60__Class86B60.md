@@ -1,11 +1,13 @@
-# func_8004D578
+# Class86B60__Class86B60
+
+> Renamed from `func_8004D578` on 2026-09-22 (tools/rename.py). Address 0x8004d578.
 
 **Unit:** class_3bb8c_c · **Size:** 64 words · **Status:** MATCHED (64/64)
 
 ## What it does
 
 The ctor (slot +0x008) for the new `Class86B60` sibling class (allocated by
-`func_8004D518`, matched alongside this function). Chains to a base ctor
+`New_Class86B60`, matched alongside this function). Chains to a base ctor
 (`Get_vtable_TaskCore()->slot08`, 4 args), installs this class's own vtable
 directly (rather than fetching it through another getter -- the base-class
 constructor chaining pattern already documented for
@@ -13,13 +15,13 @@ constructor chaining pattern already documented for
 handed to it by the base ctor chain (`self->unk48`), stores its own
 `dreamSys` argument, zeroes one field, makes two calls through `dreamSys`'s
 own vtable (storing one result, forwarding the other's return value to the
-still gp_rel-blocked `func_8004D6AC`), then makes two more calls through
+still gp_rel-blocked `FormatNumberIntoBuffer`), then makes two more calls through
 its own freshly-installed vtable.
 
 ## The C
 
 ```c
-void func_8004D578(Class86B60 *self, void *dreamSys)
+void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
 {
     DreamSysView_3bb8c_c *dream;
     Class86B60Unk48Obj *obj;
@@ -32,7 +34,7 @@ void func_8004D578(Class86B60 *self, void *dreamSys)
     self->unkAC = 0;
     dream = dreamSys;
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
-    func_8004D6AC(dream->methods->slot1A0(dream, 0));
+    FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
     self->methods->slotD8(self, &D_80086D44);
     self->methods->slot40(self, dreamSys);
 }
@@ -42,21 +44,21 @@ void func_8004D578(Class86B60 *self, void *dreamSys)
 
 All new declarations -- this class (`Class86B60`) had no prior C-level
 presence anywhere in the project. Placed as one new block right before the
-`Ctx678_3bb8c_c`/`func_8004D678` section, since ROM order puts
-`func_8004D518`/`func_8004D578` right before `func_8004D678`.
+`Ctx678_3bb8c_c`/`CheckObj866E8CountFlag` section, since ROM order puts
+`New_Class86B60`/`Class86B60__Class86B60` right before `CheckObj866E8CountFlag`.
 
 - `Class86B60`/`Class86B60Methods`: `ctor` (+0x008, this function),
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this
-  function's own second-to-last call). Vtable is `D_80086B60`, resolved
+  function's own second-to-last call). Vtable is `gClass86B60Methods`, resolved
   via `func_8004E2D0` (still raw asm in the uncarved
   `asm/class_3bb8c_d.s`, called directly by `jal` -- same "vtable getter"
-  shape as `func_8004D37C`/`func_8004D508`).
+  shape as `GetClass869D8Methods`/`GetClass86AA0Methods`).
 - `Class86B60` struct fields: `unk48` (`Class86B60Unk48Obj *`, set up by
   the base ctor chain, read here), `unkA4` (`void *`, stores `dreamSys`
   raw), `unkAC` (`s32`, zeroed), `unkBC` (`s32`, holds `slot1B0`'s return),
   `unkC0` (`s32`, an output buffer whose ADDRESS is passed to `slot1B0` --
   sized to exactly one word because it is the last word of the 0xC4-byte
-  allocation: `0xC0 + 4 == 0xC4`, `func_8004D518`'s own alloc size, which
+  allocation: `0xC0 + 4 == 0xC4`, `New_Class86B60`'s own alloc size, which
   is why this is a confident field boundary and not a guess).
 - `Class86B60Unk48Obj`/`Class86B60Unk48ObjMethods`: opaque, only `slot9C`
   (+0x09C, this function's own call, arg `-1`) typed. Deliberately a
@@ -87,7 +89,7 @@ presence anywhere in the project. Placed as one new block right before the
   need that header.
 - `D_80086D44`, `D_800114DC`: address-of-only placeholder `s32` globals
   (same convention as this file's existing `D_80086904`).
-- `func_8004D6AC` prototype: `extern void func_8004D6AC(s32 arg0);` -- the
+- `FormatNumberIntoBuffer` prototype: `extern void FormatNumberIntoBuffer(s32 arg0);` -- the
   unit's own still-blocked (gp_rel) function; needed here only as a
   forward declaration so this function can call it. Return value unused at
   this call site, hence `void`.
@@ -97,7 +99,7 @@ presence anywhere in the project. Placed as one new block right before the
 Matched on the first attempt, no residue. Statement order in the C mirrors
 retail's instruction order exactly (including reading `self->unk48` before
 overwriting `self->methods`, and computing `dream->methods->slot1B0(...)`
-before the `func_8004D6AC` forward, matching the retail read-then-store and
+before the `FormatNumberIntoBuffer` forward, matching the retail read-then-store and
 call-then-call sequencing word-for-word).
 
 ## Proposed learning
@@ -108,3 +110,28 @@ call-then-call sequencing word-for-word).
 > `slot40` right after `self->methods = func_8004E2D0();`) -- write it as
 > a plain sequential assignment-then-dispatch; no getter re-fetch or
 > caching is needed for the match.
+
+## Naming
+
+**Class86B60__Class86B60** -- tier A. Canonical ctor (`Class__Class`
+convention). Same evidence class as the other two ctors in this unit:
+occupies `ctor` (+0x008) on `gClass86B60Methods`, chains a base ctor,
+installs its own vtable directly (`self->methods = ...`, the
+"base-ctor-chain sets self->methods directly" pattern already documented
+for `TaskCoreMethods::slotD8`), then dispatches through the freshly
+installed table twice more in the same function (`slotD8`, then
+`onConstruct` -- see the header-edit note below).
+
+## Header edit: Class86B60Methods::slot40 -> onConstruct
+
+Renamed following the compiler-ownership recipe (FINISHING-PLAN.md track
+3 step 3), not assumed safe: `Class86B60Methods` is otherwise SHARED with
+`src/class_3bb8c_d.c` (most of its other slots are dispatched from
+functions there). Renamed the field in the struct DEFINITION alone,
+rebuilt, and the compiler's error was confined to this unit's own call
+site (`src/class_3bb8c_c.c`, this function's own last statement) --
+nothing in `class_3bb8c_d.c` or anywhere else references this specific
+slot. Fixed the one call site, oracle green. Same name and same evidence
+shape ("runs right after self->methods is installed") as
+`Class869D8Methods::onConstruct`, which this unit's other ctor
+(`Class869D8__Class869D8`) already established.

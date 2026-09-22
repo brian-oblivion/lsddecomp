@@ -1,4 +1,6 @@
-# func_8004D3DC
+# Class86AA0__Class86AA0
+
+> Renamed from `func_8004D3DC` on 2026-09-22 (tools/rename.py). Address 0x8004d3dc.
 
 **Unit:** class_3bb8c_c · **Size:** 20 words · **Status:** MATCHED (20/20)
 
@@ -7,17 +9,17 @@
 The constructor (`ctor`, slot +0x008) for `Class86AA0`. Chains to a base
 ctor (fetched via `GetClass6B5CCMethods(self)`), installs this class's own vtable,
 then zeroes three of its own fields (`unk34` u16, `unk36` u16, `unk38`
-s32) directly -- unlike func_8004D2A4's sibling ctor, there is no
+s32) directly -- unlike Class869D8__Class869D8's sibling ctor, there is no
 post-construct hook call here (the retail instruction stream ends right
 after the zero-stores).
 
 ## The C
 
 ```c
-void func_8004D3DC(Class86AA0 *self)
+void Class86AA0__Class86AA0(Class86AA0 *self)
 {
     GetClass6B5CCMethods(self)->ctor(self);
-    self->methods = func_8004D508();
+    self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
     self->unk36 = 0;
     self->unk38 = 0;
@@ -95,3 +97,10 @@ The practical instruction is sound. What it left out is that a divergence is a
 signal the real signature is unknown, and that the callee settles it cheaply —
 without which two wrong declarations sit in the tree looking like a resolved
 question.
+
+## Naming
+
+**Class86AA0__Class86AA0** -- tier A. Canonical ctor (`Class__Class`
+convention): chains a base ctor (`GetClass6B5CCMethods`), installs this
+class's own vtable, zeroes three of its own fields. Same shape and
+evidence class as `Class869D8__Class869D8`.

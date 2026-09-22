@@ -7,7 +7,7 @@
 ## What it does
 
 `gIntermediateBaseMethods+0x044` (the "IntermediateBase" table's own slot44, and
-`D_80086B60`'s own `+0x044` occupant per `tools/classtable.py`): an
+`gClass86B60Methods`'s own `+0x044` occupant per `tools/classtable.py`): an
 init/registration routine. Fills three fields with "use the init-args field
 if set, else derive from a helper call" (`self->unk10`/`unk14`/`unk18`),
 stashes the init-args pointer itself into `self->unkC`, registers three
