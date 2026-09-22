@@ -98,13 +98,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   must `j` over a join must be written NOT-LAST (explicit `goto` over the block that falls through);
   a duplicated assignment retail keeps in two copies needs the OTHER copy last. Closed
   `CheckDreamAuxTriggerCondition` 100/100. (a §"An arm that must JUMP")
-- **Two independent CFG/scheduling levers, both from `func_8002C278` (round 60).** A guard's source
-  POSITION decides where its block lands, its POLARITY does not: to put `return 0` at the BOTTOM as
-  retail has it, the body goes inside `if (cond) { ... }` with the return as the LAST statement
-  (11/76 -> 24/76). Separately, statement ORDER drives load-delay scheduling with an INVERTED
-  effect: writing the `unk10` store before `unk14`, against the compiled store order, is what makes
-  cc1 hoist the `lh` into the delay slot — treat order as an independent lever and try it both ways.
-  (a round 60, `func_8002C278`)
 - **"A barrier had no effect" is positive evidence FOR block order**, as is a flat permuter plateau.
   But "a barrier does not transfer" has three causes — block order, intra-block scheduling, and DCE
   (barrier-proof; `func_80029C40`) — and an `mflo`/`mfhi` is a NEGATIVE indicator. Once block order
@@ -203,12 +196,15 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ### 3c. Struct layout, types and widths
 
-- **A type-scoped field rename is enumerated by the COMPILER, and the compiler cannot see a `#if 0`
-  preserved body.** Rename in the DEFINITION only and fix exactly the accessors the build reports (a
-  whole-tree replace of `slotA4` mislabels five other classes), then sweep the preserved bodies the
-  compiler skipped: `tools/stalesyms.py` scans match REPORTS, not `src/`. Discriminator: the build
-  is green AND `awk '/^#if 0/{i=1} /^#endif/{i=0} i && /->oldName/' src/*.c` still prints (four such
-  accessors left behind in round 54). (a round 54)
+- **A type-scoped field rename is enumerated by the COMPILER, and the compiler cannot see a body the
+  default build does not compile** — neither a `#if 0` preserved body nor an `#ifdef NON_MATCHING`
+  one. Rename in the DEFINITION only, fix exactly the accessors the build reports (a whole-tree
+  replace of `slotA4` mislabels five other classes), then sweep what the compiler skipped:
+  `tools/check-nonmatching.sh` RED against a GREEN oracle is the tell, and `tools/stalesyms.py`
+  scans match REPORTS, not `src/`. Round 54 left four accessors in `#if 0` bodies; round 67 left six
+  in a NON_MATCHING body and check-nonmatching stayed red a whole round. Track 1b converts the
+  former shape into the latter, so a `^#if 0`-only grep now misses the growing half.
+  (a rounds 54, 68)
 - **A preserved `#if 0` body carries the declarations of the round that WROTE it, and a later
   naming pass may have moved the same symbol into the unit's prelude under a different typedef or
   field name.** Redeclaring it is a real `conflicting types` error, not a harmless duplicate, so
@@ -323,11 +319,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (66/69 -> 1/69) applied whole-function. Small straight-line bodies only, per-return, never
   whole-function. (a §"`do{...}while(0)` is a REGISTER-PRESSURE lever", §"`do { } while (0)`
   wrapping is a SMALL-BODY lever")
-- **The "mention a value twice" lever needs a value with a genuine SECOND, INDEPENDENT USE POINT,
-  not merely a second textual mention.** Reconciles round 19's close (duplicating `hSpan` into
-  `hSpan2` split a lifetime, closing a register) with the INERT entry below: a same-valued alias on
-  a continuously-live value is copy-propagated away, measured byte-identical at 55/97 on
-  `func_8004CAF0`'s `self`. (round 53, bravo)
 - **Levers measured INERT — do not re-derive.** C89 `register` (the legal form) is a no-op for
   allocation; a clobber-bearing barrier is no better than an empty one; a dummy unused SCALAR cannot
   nudge frame allocation; a same-valued alias is collapsed by copy propagation and an algebraic
@@ -634,11 +625,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   reproducers, one plain and one replicating the store-then-reload shape (reload confirmed present,
   `sb` then `lb`), emit identical `lb` + `sll 0xb` for all spellings. So the trigger is the aliasing
   context, not the spelling -- do not "fix" a spelling that is already correct. (a round 63)
-- **HImode constant narrowing: retail `addiu rX,rX,-K` but your build has `li rY,<0x10000-K>` +
-  `addu`.** A constant between a u16 source and an s16 destination field reads as unsigned and no
-  longer fits an `addiu` immediate. Fix: move it INSIDE the subtracted group -- `x - (y + K)`, never
-  `(x - K) - y`; GCC reassociates it back out at full width. Greppable straight from a diff. (a
-  round 63)
 - **Inherited no-op statements must be tested in BOTH directions.** Removing `func_8004B700`'s
   `__asm__("")` kept the image green (it was a crutch for a shape that no longer exists); removing
   `func_8004BA40`'s `do {} while (0);` DRIFTED the image. Neither outcome is predictable from
@@ -761,4 +747,7 @@ three-check scaffold protocol in 3j (libc data points, scheduling-residue reprod
 minimally, search-tail inert forms). Distilled out round 67: §"The arm-order lever has a
 cheap COUNTER-indication", §"An explicit alias can force the parameter copy cc1 would
 otherwise coalesce away", §"Retail reuses the same counter pseudo-registers across sibling
-loops and SWAPS their outer/inner roles".
+loops and SWAPS their outer/inner roles". Distilled out round 68: §"Two independent
+CFG/scheduling levers, both from `func_8002C278`", §"The `mention a value twice` lever needs a
+genuine SECOND, INDEPENDENT USE POINT" (it reconciles the round-19 close with the INERT entry in
+3d), §"HImode constant narrowing".

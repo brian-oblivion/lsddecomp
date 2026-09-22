@@ -8924,3 +8924,36 @@ docs/PROGRESS.md.
   be its own statement BEFORE the base-pointer load (`reg = ...; i = 0; base = ...; for (; i < N;
   i++)`), worth 2 words. Check whether a sibling loop in the SAME function already uses the correct
   idiom -- that is where both fixes were found. (a round 63)
+
+
+## Distilled out on 2026-09-22 (round 68)
+
+Moved out of DECOMPILATION_LEARNINGS.md §3 to meet its word budget after round 68
+promoted the return-type/cross-jump diagnostic. Each is still correct; each was
+single-instance or a caveat on a lever documented there.
+
+### Two independent CFG/scheduling levers, both from `func_8002C278`
+
+- **Two independent CFG/scheduling levers, both from `func_8002C278` (round 60).** A guard's source
+  POSITION decides where its block lands, its POLARITY does not: to put `return 0` at the BOTTOM as
+  retail has it, the body goes inside `if (cond) { ... }` with the return as the LAST statement
+  (11/76 -> 24/76). Separately, statement ORDER drives load-delay scheduling with an INVERTED
+  effect: writing the `unk10` store before `unk14`, against the compiled store order, is what makes
+  cc1 hoist the `lh` into the delay slot — treat order as an independent lever and try it both ways.
+  (a round 60, `func_8002C278`)
+
+### The "mention a value twice" lever needs a genuine SECOND, INDEPENDENT USE POINT
+
+- **The "mention a value twice" lever needs a value with a genuine SECOND, INDEPENDENT USE POINT,
+  not merely a second textual mention.** Reconciles round 19's close (duplicating `hSpan` into
+  `hSpan2` split a lifetime, closing a register) with the INERT entry below: a same-valued alias on
+  a continuously-live value is copy-propagated away, measured byte-identical at 55/97 on
+  `func_8004CAF0`'s `self`. (round 53, bravo)
+
+### HImode constant narrowing: `addiu rX,rX,-K` vs `li`+`addu`
+
+- **HImode constant narrowing: retail `addiu rX,rX,-K` but your build has `li rY,<0x10000-K>` +
+  `addu`.** A constant between a u16 source and an s16 destination field reads as unsigned and no
+  longer fits an `addiu` immediate. Fix: move it INSIDE the subtracted group -- `x - (y + K)`, never
+  `(x - K) - y`; GCC reassociates it back out at full width. Greppable straight from a diff. (a
+  round 63)
