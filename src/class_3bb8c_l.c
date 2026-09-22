@@ -40,11 +40,11 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-/* This unit's local view of func_8004A4B8's table, and the prototype for
+/* This unit's local view of GetClass86668Methods's table, and the prototype for
  * that getter. Declared HERE, not in include/class_3bb8c.h: the canonical
- * `extern Class86668Methods *func_8004A4B8(void);` lives in
+ * `extern Class86668Methods *GetClass86668Methods(void);` lives in
  * include/class_39e08.h, and any unit including BOTH headers gets
- * `conflicting types for 'func_8004A4B8'` -- which is exactly how this was
+ * `conflicting types for 'GetClass86668Methods'` -- which is exactly how this was
  * found, when class_3bb8c_k was merged. class_3bb8c_l does not include
  * class_39e08.h, so a unit-local declaration is safe here.
  *
@@ -57,7 +57,7 @@ typedef struct BaseMethods87034_3bb8c_l {
     s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, func_80052DE8 */
     void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, func_80052EBC */
 } BaseMethods87034_3bb8c_l;
-extern BaseMethods87034_3bb8c_l *func_8004A4B8(void);
+extern BaseMethods87034_3bb8c_l *GetClass86668Methods(void);
 
 void func_80052DE0(void) {
 }
@@ -65,7 +65,7 @@ void func_80052DE0(void) {
 void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
     arg1->unkC->methods->slotC8(arg1->unkC, func_80052E7C, self);
     self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
-    func_8004A4B8()->slot44(self, arg1, 1);
+    GetClass86668Methods()->slot44(self, arg1, 1);
     self->methods->slot10(self, arg2);
 }
 
@@ -79,7 +79,7 @@ void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
 
 void func_80052EBC(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->unk3C);
-    func_8004A4B8()->slot48(self);
+    GetClass86668Methods()->slot48(self);
 }
 
 /* Cross-unit helpers with no established prototype elsewhere; declared

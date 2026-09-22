@@ -1,4 +1,6 @@
-# func_8004A984 — MATCH
+# Class866E8__OnNotify — MATCH
+
+> Renamed from `func_8004A984` on 2026-09-22 (tools/rename.py). Address 0x8004a984.
 
 **Unit:** class_3ac78 · **Size:** 35 instructions · **Result:** 35/35 words
 
@@ -9,19 +11,19 @@
 segment) and calls that table's OWN slot `+0x038` with `(self, arg1,
 arg2)`. Then, if `arg1`'s own vtable header's low nibble is `1` (the
 family/base-class tag pattern from `docs/research/class-framework.md`,
-already used by `func_8004AB88` in this unit), also calls
+already used by `Class866E8__OnCommand` in this unit), also calls
 `self->methods->slot100(self, arg1, arg2)`.
 
 Note this does NOT recurse into itself: the table returned by
 `GetClass6B5CCMethods` is a *different* class's vtable from `self->methods`
-(`D_800866E8`) — slot `+0x038` there happens to be `func_8004A984` (this
+(`D_800866E8`) — slot `+0x038` there happens to be `Class866E8__OnNotify` (this
 very function) only in `Class866E8Methods`, not necessarily in whatever
 `GetClass6B5CCMethods` returns.
 
 ## GetClass6B5CCMethods's inferred signature
 
 Not decompiled (lives in the still-uncarved `asm/code_d294.s`). Its second
-parameter is passed as a plain `s32` from `func_8004AA6C` (compared there
+parameter is passed as a plain `s32` from `Class866E8__OnElementEvent` (compared there
 against small integer literals 6/7 — not a pointer-shaped use), so it's
 declared here as `extern void *GetClass6B5CCMethods(Class866E8 *self, s32
 arg1);` and this function casts its own `GenericObject *arg1` to `s32` at
@@ -33,7 +35,7 @@ register values) and costs nothing.
 ```c
 extern void *GetClass6B5CCMethods(Class866E8 *self, s32 arg1);
 
-void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
+void Class866E8__OnNotify(Class866E8 *self, GenericObject *arg1, s32 arg2)
 {
     void (*fn)(Class866E8 *self, GenericObject *arg1, s32 arg2);
 
@@ -71,3 +73,15 @@ since pointers and `s32` are both 32-bit registers.
 ## Provenance
 
 round 2026-09-02, runner ALPHA, unit class_3ac78.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004A984` | `Class866E8__OnNotify` | A | Occupant of vtable slot `+0x038`, which `include/code_8220.h` establishes as `BasicClassMethods::slot38` / `onNotify` -- the RECEIVING half of `+0x030 notifyParents`, with `(self, sender, event)`. The body is the standard override shape: call the base table's own `+0x038` with the same three arguments, then branch on the SENDER's class tag (`sender->methods->header & 0xF`). `func_8001CD60` in `code_d294` is the same shape one class up. |
+
+Parameters renamed from the evidence: `arg1` -> `sender`, `arg2` -> `command`
+(`code_8220.h` calls the pair sender/event; this class's own numbering is
+described in `Class866E8__ForwardAcceptedCommand.md`).

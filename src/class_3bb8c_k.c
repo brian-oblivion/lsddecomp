@@ -486,7 +486,7 @@ Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 
 void func_80052C10(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
-    func_8004A4B8()->ctor((Obj865C8 *)self, 0, arg1);
+    GetClass86668Methods()->ctor((Obj865C8 *)self, 0, arg1);
     self->methods = func_800544D4();
     self->unk64 = 0;
     self->unk68 = 0;
@@ -503,14 +503,14 @@ void func_80052C10(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s3
 
 void func_80052CD8(Obj865C8 *self)
 {
-    func_8004A4B8()->dtor(self);
+    GetClass86668Methods()->dtor(self);
 }
 
 void func_80052D10(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
 {
     s32 tag;
 
-    func_8004A4B8()->slot38((Obj865C8 *)self, arg1, arg2);
+    GetClass86668Methods()->slot38((Obj865C8 *)self, arg1, arg2);
     tag = arg1->target->header;
     if ((tag & 0xFFF) == 0x114) {
         self->methods->slotB4(self, arg1, arg2);

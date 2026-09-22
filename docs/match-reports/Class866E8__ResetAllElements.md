@@ -1,4 +1,6 @@
-# func_8004ABD0 — STALL
+# Class866E8__ResetAllElements — STALL
+
+> Renamed from `func_8004ABD0` on 2026-09-22 (tools/rename.py). Address 0x8004abd0.
 
 **Unit:** class_3ac78 · **Size:** 74 instructions · **Best reached:** 9/74
 words, correct size, no address drift
@@ -12,8 +14,8 @@ Walks a 7-element array of 0x1C-byte "slot" records starting at
 `self->methods->slot108(self, entry)`; if the "list" object's
 (`entry->unk8`) field `+0x2C` is non-NULL, refreshes it through its own
 base-class `unk04` slot (same `GenericObject`/`unk04` pattern already
-established by `func_8004AA6C`); calls `self->methods->slot88(self, 6,
-entry, i)` (dispatches to `func_8004AA6C`, which per its own already-
+established by `Class866E8__OnElementEvent`); calls `self->methods->slot88(self, 6,
+entry, i)` (dispatches to `Class866E8__OnElementEvent`, which per its own already-
 matched signature only reads 2 of these 4 args — the extra ones are dead
 at the callee, consistent with the "argument register carries no meaning
 if unused by callee" case in DECOMPILATION_LEARNINGS); calls
@@ -22,9 +24,9 @@ zeroes `self->unk1B8`/`unk1B4` and calls `self->methods->slot140(self)`.
 
 New struct/vtable knowledge added regardless of the stall (all verified
 straight from the disassembly): `Class866E8Methods::slot88` (declared with
-a 4th `s32 arg3` parameter that the occupant, `func_8004AA6C`, doesn't
+a 4th `s32 arg3` parameter that the occupant, `Class866E8__OnElementEvent`, doesn't
 read — same "field type need not match every occupant's real signature"
-precedent as `func_8004A984`/`func_8004AA6C`'s `GetClass6B5CCMethods`), `slot108`
+precedent as `Class866E8__OnNotify`/`Class866E8__OnElementEvent`'s `GetClass6B5CCMethods`), `slot108`
 (`func_8004C0AC`, not decompiled), `slot140` (`func_8004D088`, not
 decompiled — this promotes what was previously just end-of-struct
 padding into a real slot), `Class866E8::unkEC[7]` (`UnkSlotEntry_3ac78`,
@@ -36,7 +38,7 @@ padding into a real slot), `Class866E8::unkEC[7]` (`UnkSlotEntry_3ac78`,
 
 ```c
 #if 0
-void func_8004ABD0(Class866E8 *self)
+void Class866E8__ResetAllElements(Class866E8 *self)
 {
     s32 i;
     s32 offset;
@@ -124,7 +126,7 @@ The delay-slot filler for `slot74`'s `jalr` is choosing the offset
 increment because it is the FIRST independent, side-effect-only
 instruction reachable in the block, and GCC 2.6.3's `dbr_schedule` pass
 here appears to search past several intervening independent instructions
-(not just the immediately-next one — contrast with `func_8004AFE0`'s
+(not just the immediately-next one — contrast with `Class866E8__SetFootprintFromCell`'s
 residue, which stayed local) to find and hoist it, regardless of textual
 distance from where the C source puts it. A bare `__asm__("")` scheduling
 barrier did NOT block this hoist, which contradicts the working
@@ -145,7 +147,7 @@ changes ordering only, it's allowed" test already implies it's a
 reordering tool, not an ordering GUARANTEE) and should be checked before
 reaching for it as a fix for a "value hoisted too early" residue class,
 which up to this point had only been solved by splitting COMPUTE from
-STORE (`func_8004AFE0`), not by barriers.
+STORE (`Class866E8__SetFootprintFromCell`), not by barriers.
 
 ## Provenance
 
@@ -286,7 +288,7 @@ drift** — matches the report exactly. `INCLUDE_ASM` restored immediately
 after, `git diff --stat` confirmed clean.
 
 Not re-searched or re-attempted this round: this round's assignment staffed
-`func_8004B030` as the priority (a proven-representative permuter target,
+`Class866E8__SetFootprintRect` as the priority (a proven-representative permuter target,
 per its own report), and this function's own history — 8 manual attempts
 across 3 prior rounds plus a 140,928-iteration permuter search that
 improved on its own score but never reached zero — already exhausts every
@@ -294,3 +296,44 @@ axis this round's runner could identify without a genuinely new idea.
 Flagged on the broadcast that this round's staffing table understated the
 prior search depth ("~928 iters" reads like a truncation of "140,928").
 Disposition unchanged: STALL at 9/74, `INCLUDE_ASM` in place.
+
+## Naming
+
+Round 67 (track 3, naming pass). This function is still a documented STALL;
+naming applies to the report and to the preserved body's field references,
+not to the shipped bytes.
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004ABD0` | `Class866E8__ResetAllElements` | B | Occupant of vtable slot `+0x0C0`, and `class_3bb8c`'s matched `func_8004B57C` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
+
+The preserved `#if 0` body in `src/class_3ac78.c` was updated to the current
+field names in the same round (`entry->unk0` -> `flag`, `entry->unk4` ->
+`target`, `entry->unk8` -> `list`, `self->unkEC` -> `self->elems`). Its score
+and residue are unchanged -- no code was altered, only identifiers.
+
+### Field names in the preserved bodies above
+
+Round 67 renamed this unit's struct fields. The preserved bodies in THIS
+report are left in their original spelling -- preserved code is a record of
+what was tried, not doctrine -- but they will not compile as written against
+the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
+
+| old | current |
+| --- | --- |
+| `self->unk88` | `self->rectCount` |
+| `self->unk8C` | `self->rects` |
+| `self->unkEC` | `self->elems` |
+| `self->unk54` | `self->origin` |
+| `self->unk68` | `self->config` |
+| `self->unk70` | `self->enabled` |
+| `self->unkBC` | `self->cellTag` |
+| `self->unk1C0` / `unk1C2` / `unk1C3` | `curCellTag` / `curCellCol` / `curCellRow` |
+| `self->unk1BC` | `self->lastEventElem` |
+| `entry->unk0` / `unk2` / `unk4` / `unk8` / `unkC` / `unk10` / `unk14` | `flag` / `key` / `target` / `list` / `cellParent` / `cells` / `heldObj` |
+| `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
+| `->methods->unk04(...)` | `->methods->release(...)` |
+
+The `#if 0` copy that lives in `src/class_3ac78.c` WAS updated to the current
+names in the same round, so that one still compiles; only identifiers changed
+and the recorded score is unaffected.

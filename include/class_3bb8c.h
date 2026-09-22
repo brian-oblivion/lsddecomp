@@ -357,7 +357,7 @@ typedef struct Obj866E8Methods {
      * slot11C, then fills `out`. Returns 0 on success, 1 if the slot11C
      * lookup misses. Matches class_3ac78's independent view of the same
      * slot -- `self->methods->slot110(self, &buf, gateArg)` in that unit's
-     * func_8004AEA4 uses the identical (out-pointer, in-pointer) argument
+     * Class866E8__ApplyToSenderFootprint uses the identical (out-pointer, in-pointer) argument
      * order, which is what fixed these two params as pointers rather than
      * the previous round's placeholder (s32, void*). func_8004C158 (this
      * unit) passes its own `arg1` param through as `out` and a computed
@@ -2514,17 +2514,17 @@ struct Obj87034_3bb8c_l {
 
 /* Global BasicClass-family accessor shared across many classes (see
  * include/class_39e08.h's own fuller `Class86668Methods` view of the SAME
- * table, D_80086668) -- declared here as this unit's own minimal,
+ * table, gClass86668Methods) -- declared here as this unit's own minimal,
  * independent local view rather than including that header, per this
  * project's multiple-independent-local-views convention. Only the one
  * slot func_80052DE8 dispatches through is named. */
 /* HEAD NOTE round 15: `BaseMethods87034_3bb8c_l` and its
- * `extern ... *func_8004A4B8(void);` prototype were moved into
+ * `extern ... *GetClass86668Methods(void);` prototype were moved into
  * src/class_3bb8c_l.c. THIRD instance this merge of one rule: a cross-unit
  * prototype in a unit-local type must not live in a shared header. This one
  * was the nastiest, because it did not collide with another RUNNER -- it
  * collided with the pre-existing canonical
- * `extern Class86668Methods *func_8004A4B8(void);` in include/class_39e08.h,
+ * `extern Class86668Methods *GetClass86668Methods(void);` in include/class_39e08.h,
  * and it only surfaced when class_3bb8c_k (which includes BOTH headers) was
  * merged two merges later. class_3bb8c_l includes only class_3bb8c.h, so
  * nothing showed up when delta's own work was verified.

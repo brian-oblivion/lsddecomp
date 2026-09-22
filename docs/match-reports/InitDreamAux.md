@@ -216,7 +216,7 @@ build will fail at link with `undefined reference to gMomPathSymSpy`.
 ## Naming
 
 **InitDreamAux** — tier B. Called exactly once, as the first DreamAux-specific
-call inside `func_80049684` (a constructor: `func_8004A4B8()->ctor(self,...);
+call inside `func_80049684` (a constructor: `GetClass86668Methods()->ctor(self,...);
 self->methods = func_8004A060(); InitDreamAux(); ...`), before the rest of
 that object's own fields are set up. Clears every `gDreamAuxGroupRecord`'s
 `flag` across all 14 groups and loads the initial MOM audio-stream object

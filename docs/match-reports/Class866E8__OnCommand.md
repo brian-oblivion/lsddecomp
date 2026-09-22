@@ -1,4 +1,6 @@
-# func_8004AB88
+# Class866E8__OnCommand
+
+> Renamed from `func_8004AB88` on 2026-09-22 (tools/rename.py). Address 0x8004ab88.
 
 **Unit:** class_3ac78 · **Size:** 18 words · **Status:** MATCHED (18/18 words)
 
@@ -22,7 +24,7 @@ jalr $v0                  ; self->methods->slotD0(self, other, count) -- no
                           ; other and count unchanged from entry
 ```
 
-Slot +0x0D0 is `func_8004ADD8` (also in this unit, still `INCLUDE_ASM`; 0xCC
+Slot +0x0D0 is `Class866E8__ForwardAcceptedCommand` (also in this unit, still `INCLUDE_ASM`; 0xCC
 words, out of this round's budget). Reading its body confirms slot +0x0D0's
 real signature is `(self, void *list, s32 count)` — three genuine register
 arguments (it iterates `list` while comparing against `*(void**)other's
@@ -30,7 +32,7 @@ methods`, using `count` as a loop bound test against a small constant set).
 Since the jalr here sets up no new registers at all, and the callee
 definitely needs three real arguments with no register gap, `$a1`/`$a2` at
 the call site must be this function's own second and third parameters,
-forwarded unchanged — hence `func_8004AB88(Class866E8 *self, GenericObject
+forwarded unchanged — hence `Class866E8__OnCommand(Class866E8 *self, GenericObject
 *other, s32 count)`.
 
 The type-tag check reads the **low byte of `other->methods->header`** (the
@@ -52,3 +54,15 @@ its own body or another caller) are whatever this function's own incoming
 parameters already left in those registers. Always check the callee's own
 body for its true argument count before assuming an untouched register is
 just leftover garbage.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004AB88` | `Class866E8__OnCommand` | B | Occupant of vtable slot `+0x09C`. The base occupant of that slot is `Class6B5CC__DispatchLinkCommand(self, a1, a2)`, which switches on `a2` in `{2,3,4}` -- so the slot's third parameter is a COMMAND CODE, not the `count` this report previously called it. `func_8001CD60` (code_d294) dispatches `+0x09C` as `slot9C(self, sender, event)` when the sender's class tag is 4, which fixes the second parameter as the sender. This override accepts only senders whose vtable header low byte is `0x34` and forwards `(sender, command)` to `forwardAcceptedCommand`. Tier B: the filter and the forward are certain, the meaning of tag `0x34` and of the command numbering is not. |
+
+Parameters renamed: `other` -> `sender`, `count` -> `command`. This is the
+same parameter that `Class866E8__ForwardAcceptedCommand` gates on
+`{2,3,5,6,7,8}` -- see that report.

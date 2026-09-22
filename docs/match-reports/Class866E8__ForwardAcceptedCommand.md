@@ -1,11 +1,13 @@
-# func_8004ADD8 — MATCH
+# Class866E8__ForwardAcceptedCommand — MATCH
+
+> Renamed from `func_8004ADD8` on 2026-09-22 (tools/rename.py). Address 0x8004add8.
 
 **Unit:** class_3ac78 · **Size:** 51 instructions · **Result:** 51/51 words
 
 ## What it does
 
 `Class866E8Methods` slot `+0x0D0` (`slotD0`, already documented as such by
-`func_8004AB88`'s comment before this round). Gates on `count`: only
+`Class866E8__OnCommand`'s comment before this round). Gates on `count`: only
 proceeds for `count` in `{2,3,5,6,7,8}` (`count < 2`, `count == 4`, and
 `count >= 9` all bail early). If the gate passes, walks `self->unkE8` as a
 NUL-terminated `s32` array of tag values; for every entry equal to
@@ -16,7 +18,7 @@ NUL-terminated `s32` array of tag values; for every entry equal to
 ## Final source
 
 ```c
-void func_8004ADD8(Class866E8 *self, void *list, s32 count)
+void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *list, s32 count)
 {
     s32 *p;
     u8 unused[24];
@@ -62,11 +64,11 @@ source could plausibly have been a `switch` over a small case set, which
 is a narrower, more plausible hypothesis than an arbitrary compound
 boolean.
 
-`self->unkE8` was previously typed plain `s32` (set by `func_8004ADD0`,
+`self->unkE8` was previously typed plain `s32` (set by `Class866E8__SetAcceptedTags`,
 already matched); this function reads it back as a pointer to a
 NUL-terminated tag array. Left the FIELD's declared type as `s32` and cast
 locally (`(s32 *)self->unkE8`) rather than changing the field type, since
-`func_8004ADD0`'s parameter is genuinely just a raw word from its own
+`Class866E8__SetAcceptedTags`'s parameter is genuinely just a raw word from its own
 caller's perspective and changing it wasn't needed for either function to
 match.
 
@@ -99,7 +101,7 @@ most plausibly by passing its address somewhere, which is the normal way
 a local ends up needing a real stack slot even after the compiler could
 otherwise prove it dead. The padding local closes the byte diff without
 identifying what that real local was. Anyone revisiting this function (or
-`func_8004ADD0`/`self->unkE8`'s neighbours) should treat the 24 bytes as
+`Class866E8__SetAcceptedTags`/`self->unkE8`'s neighbours) should treat the 24 bytes as
 a size constraint on the missing piece, not a solved question.
 
 ### Proposed learning
@@ -119,3 +121,24 @@ round 2026-09-02, runner ALPHA, unit class_3ac78. First attempt 39/51
 (pure frame-size gap, logic already exact); second attempt (padding local)
 closed it, 51/51. Follow-up (same day, head-requested): `switch` rewrite
 of the gate, one attempt, also 51/51 — adopted as final.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004ADD8` | `Class866E8__ForwardAcceptedCommand` | A | Occupant of vtable slot `+0x0D0`. Body is a filter-and-forward and nothing else: bail unless the command is in `{2,3,5,6,7,8}`, then walk `acceptedTags` and, on a match against the sender's own vtable header word, dispatch `applyToSenderFootprint(self, sender, command)`. Mechanics are the purpose. |
+
+**The third parameter is a COMMAND CODE, not a count** -- this report and the
+declaration both called it `count`, and that was wrong. Three independent
+witnesses: this function gates it on a small non-contiguous set (a count would
+not skip 4); the base occupant of the sibling slot `+0x09C`,
+`Class6B5CC__DispatchLinkCommand(self, a1, a2)`, switches on the same-position
+parameter over `{2,3,4}`; and `func_8001CD60` in `code_d294` dispatches these
+slots as `(self, sender, event)`. Renamed `list` -> `sender`,
+`count` -> `command`, in the definition, the slot declarations and the two
+callers. Byte-neutral, oracle green.
+
+Posted to the round broadcast, because `class_3bb8c`'s own view of these
+slots inherits the same wrong word.

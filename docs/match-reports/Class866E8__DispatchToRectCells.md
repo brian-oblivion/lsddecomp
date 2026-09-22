@@ -1,4 +1,6 @@
-# func_8004B100
+# Class866E8__DispatchToRectCells
+
+> Renamed from `func_8004B100` on 2026-09-22 (tools/rename.py). Address 0x8004b100.
 
 **Unit:** class_3ac78 · **Size:** 117 words · **Status:** STALL, instruction-
 scheduling residue · best reached 95/117.
@@ -12,7 +14,7 @@ child object's `+0x2C` field is nonzero, walks a `entry->width` x
 20 cells) starting at `(entry->col, entry->row)`. For every grid cell
 visited: records a "current pass" tag (`self->unkBC` copied to
 `self->unk1C0`) and the cell's column/row (`self->unk1C2`/`unk1C3`,
-truncated to bytes), then calls `func_8004B2D4` on the cell's own value AND
+truncated to bytes), then calls `NotifyGridCell` on the cell's own value AND
 on every object chained off it via `->unk38` (a singly-linked "several
 objects share one grid cell" list).
 
@@ -20,9 +22,9 @@ objects share one grid cell" list).
 almost everywhere, one scheduling residue in the inner loop tail)
 
 ```c
-extern void func_8004B2D4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
+extern void NotifyGridCell(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
 
-void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
+void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 {
     s32 i;
     s32 row;
@@ -42,9 +44,9 @@ void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
                     self->unk1C0 = self->unkBC;
                     self->unk1C2 = entry->col + col;
                     self->unk1C3 = entry->row + row;
-                    func_8004B2D4(*cell, arg1, arg2);
+                    NotifyGridCell(*cell, arg1, arg2);
                     for (obj = (*cell)->unk38; obj != NULL; obj = obj->unk38) {
-                        func_8004B2D4(obj, arg1, arg2);
+                        NotifyGridCell(obj, arg1, arg2);
                     }
                 }
                 cell += 20 - entry->width;
@@ -59,7 +61,7 @@ void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 This unit has no additive-only constraint (nobody else holds
 `class_3ac78.h`), so these are real corrections, not just additions.
 Every one was independently reverified after the change: `build exit=0`
-and `func_8004AEA4`/`func_8004B2D4` (the two ALREADY-MATCHED functions
+and `Class866E8__ApplyToSenderFootprint`/`NotifyGridCell` (the two ALREADY-MATCHED functions
 whose bytes depend on these types) stayed at their full-match scores
 throughout.
 
@@ -69,7 +71,7 @@ throughout.
   (`unk0`->`elemIdx` retyped `void*`->`s32`, `unk4`->`col`, `unk6`->`row`,
   `unk8`->`width`, `unkA`->`height`).** Two independent pieces of
   evidence: `func_8004C5D0` (slot124's real occupant, already retyped
-  round 8 to return an `s32` index) feeds `func_8004B030`'s write into
+  round 8 to return an `s32` index) feeds `Class866E8__SetFootprintRect`'s write into
   this field; THIS function reads that same first field back and uses it
   exactly as an index -- `&self->unkEC[elemIdx]`, reproduced by retail as
   a multiply-by-0x1C (`UnkSlotEntry_3ac78`'s own confirmed size). The
@@ -78,15 +80,15 @@ throughout.
   SIBLING unit's `GridSlot866E8` (`include/class_3bb8c.h`: index + col +
   row + width + height), independent view, not a shared C type.
   `HistoryBlock_3ac78`'s total size stays 0x30 (4 x 0xC == 3 x 0x10), so
-  `func_8004AEA4`'s whole-struct copy is unaffected -- confirmed, still
+  `Class866E8__ApplyToSenderFootprint`'s whole-struct copy is unaffected -- confirmed, still
   79/79.
 - **`UnkSlotEntry_3ac78::unk10` retyped from `GenericObject **` to
   `Class866E8 **`.** This function forwards a grid cell's raw value
-  straight into `func_8004B2D4`, which dereferences `self->flags36` (a
+  straight into `NotifyGridCell`, which dereferences `self->flags36` (a
   genuine `Class866E8` field) and (via the chain below) `->unk38` --
   both real `Class866E8` fields, not `GenericObject`'s (which has only a
   `methods` pointer). Safe: the old typing was evidence-only prose in a
-  comment, attached to `func_8004A7C0` which is still `INCLUDE_ASM` and
+  comment, attached to `Class866E8__Finalize` which is still `INCLUDE_ASM` and
   has never compiled against it.
 - **`Class866E8::unk38` added** (`Class866E8 *`, +0x038, carved out of
   what was `pad038`): a singly-linked "several instances share one grid
@@ -97,18 +99,18 @@ throughout.
   visited.
 - **`Class866E8::unk1C0`/`unk1C2`/`unk1C3` added** (`u16`/`u8`/`u8`,
   +0x1C0/+0x1C2/+0x1C3, carved out of the front of the previously fully
-  opaque `unk1C0[0x1E8-0x1C0]` byte array). `func_8004B31C`
+  opaque `unk1C0[0x1E8-0x1C0]` byte array). `Class866E8__GetCurrentCellKey`
   (`return &self->unk1C0;`) is unaffected -- it only ever takes the
   ADDRESS, which is identical regardless of the pointee's declared type.
 - **`UnkSlotChildObj_3ac78::unk2C` added** (`s16`, +0x2C): gates the
   whole per-history-entry grid walk (nonzero test).
-- **`func_8004B2D4` widened from 1 param to 3**
+- **`NotifyGridCell` widened from 1 param to 3**
   (`Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2`). This function's
   own call sites set up real, explicit `move` instructions for `$a1`/`$a2`
   before every call (unlike `GetClass6B5CCMethods`'s "leftover, already-there"
   args elsewhere in this unit -- see that symbol's own do-not-reconcile
   note), so the call needs a matching 3-param prototype to compile at
-  all. Confirmed harmless to `func_8004B2D4`'s own already-matched body:
+  all. Confirmed harmless to `NotifyGridCell`'s own already-matched body:
   neither extra param is read, and this target does not reserve stack
   space for unused trailing args, so its bytes are unaffected --
   reverified 18/18 after the widening.
@@ -300,9 +302,61 @@ correct size, no address drift** — matches the report exactly. `INCLUDE_ASM`
 restored immediately after, `git diff --stat` confirmed clean.
 
 Not re-searched or re-attempted this round: this round's assignment staffed
-`func_8004B030` as the priority. Flagged on the broadcast that this round's
+`Class866E8__SetFootprintRect` as the priority. Flagged on the broadcast that this round's
 staffing table called this function's prior search "shallow" when its own
 report already records a 122,037-iteration permuter run that never moved
 off the base score even once — the deepest completed search in this unit's
 history, and about as strong a negative as a permuter run produces.
 Disposition unchanged: STALL at 95/117, `INCLUDE_ASM` in place.
+
+## Naming
+
+Round 67 (track 3, naming pass). Still a documented STALL; naming applies to
+the report and to the preserved body's identifiers, not to the shipped bytes.
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B100` | `Class866E8__DispatchToRectCells` | B | Walks `rects[0 .. rectCount)`; for each rectangle selects `elems[rect->elemIdx]`, skips it unless the element's target is live, then walks the rectangle's cells with a row stride of 20, and for each cell writes the current-cell record (`curCellTag`/`curCellCol`/`curCellRow`) and calls `NotifyGridCell` on the cell and on every cell chained behind it. Tier B: the traversal is certain, the purpose of the notification is not. |
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `Class866E8+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `class_3bb8c` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `func_8004B38C` block-copies in. The name records only "the tag stamped onto each visited cell". |
+| `Class866E8+0x1C0` | `curCellTag` | B | Written per cell visit; `Class866E8__GetCurrentCellKey` returns its address. |
+| `Class866E8+0x1C2` | `curCellCol` | A | Written per cell visit with the rectangle's start column plus the inner loop offset. |
+| `Class866E8+0x1C3` | `curCellRow` | A | Same, row. |
+| `Class866E8+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_3bb8c`'s `func_8004CE24` walks the identical chain off `EntryChildObj::unk38`. |
+
+**Type caveat, recorded not fixed.** This unit declares the cell type as
+`Class866E8 *`. `class_3bb8c`'s independently derived view says
+`EntryChildObj *`, and its evidence is better: the ctor here ORs `0x80000000`
+into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
+exactly (`func_8004C0AC` sets the same bit, matched `func_8004CE24` clears
+it), and `flags36`/`nextInCell` line up with `EntryChildObj::unk36`/`unk38`.
+Unifying the two views is track-4 work, so the declared type is unchanged and
+a note sits on the field in `include/class_3ac78.h`. Posted to the broadcast.
+
+### Field names in the preserved bodies above
+
+Round 67 renamed this unit's struct fields. The preserved bodies in THIS
+report are left in their original spelling -- preserved code is a record of
+what was tried, not doctrine -- but they will not compile as written against
+the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
+
+| old | current |
+| --- | --- |
+| `self->unk88` | `self->rectCount` |
+| `self->unk8C` | `self->rects` |
+| `self->unkEC` | `self->elems` |
+| `self->unk54` | `self->origin` |
+| `self->unk68` | `self->config` |
+| `self->unk70` | `self->enabled` |
+| `self->unkBC` | `self->cellTag` |
+| `self->unk1C0` / `unk1C2` / `unk1C3` | `curCellTag` / `curCellCol` / `curCellRow` |
+| `self->unk1BC` | `self->lastEventElem` |
+| `entry->unk0` / `unk2` / `unk4` / `unk8` / `unkC` / `unk10` / `unk14` | `flag` / `key` / `target` / `list` / `cellParent` / `cells` / `heldObj` |
+| `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
+| `->methods->unk04(...)` | `->methods->release(...)` |
+
+The `#if 0` copy that lives in `src/class_3ac78.c` WAS updated to the current
+names in the same round, so that one still compiles; only identifiers changed
+and the recorded score is unaffected.

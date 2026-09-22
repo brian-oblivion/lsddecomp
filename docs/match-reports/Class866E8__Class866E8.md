@@ -1,7 +1,9 @@
-# func_8004A534 -- MATCH (163/163 words, ~7 real rebuild attempts)
+# Class866E8__Class866E8 -- MATCH (163/163 words, ~7 real rebuild attempts)
+
+> Renamed from `func_8004A534` on 2026-09-22 (tools/rename.py). Address 0x8004a534.
 
 Unit `class_3ac78`, 177-line body, `Class866E8Methods::ctor` (the occupant
-of the ctor slot, dispatched by `func_8004A4C8`'s `New_Class866E8`
+of the ctor slot, dispatched by `New_Class866E8`'s `New_Class866E8`
 allocator). 8 distinct callee-saved registers (`$s0`-`$s7`, fully
 saturated) -- flagged by the head as being in the band that was 0
 matched / 4 stalled across 81 pooled samples from rounds 13-14, sent
@@ -21,9 +23,9 @@ extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
 extern GenericObject *func_8004D38C(void);
 extern s32 func_80020C5C(void);
-extern Vec3_3ac78 D_8008682C;
+extern Vec3_3ac78 gDefaultOrigin;
 
-void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
+void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 {
     s32 i;
     UnkSlotEntry_3ac78 *entry;
@@ -39,7 +41,7 @@ void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     if (arg1 != NULL) {
         self->unk54 = *arg1;
     } else {
-        self->unk54 = D_8008682C;
+        self->unk54 = gDefaultOrigin;
     }
 
     self->unk1B0 = 0;
@@ -135,7 +137,7 @@ here since this function only DISPATCHES to it, never inlines its body).
   `unk32` (new fields carved out of existing opaque padding).
 - `GenericMethodsHeader::slot4C`/`slot70` and `GenericObject::unk10` --
   additive extensions of a struct already used by two OTHER already-matched
-  functions in this unit (`func_8004A984`, `func_8004AB88`). Verified safe:
+  functions in this unit (`Class866E8__OnNotify`, `Class866E8__OnCommand`). Verified safe:
   neither touches the new slots/fields, and the whole-image SHA1 stayed
   green immediately after this specific edit, before any of this function's
   own body was written.
@@ -148,7 +150,7 @@ here since this function only DISPATCHES to it, never inlines its body).
    instructions are three loads THEN three stores (batched) -- the same
    "whole-struct `=` compiles to a batched block move" idiom as
    `HistoryBlock_3ac78` (documented elsewhere in this header). Writing
-   `self->unk54 = *arg1;` / `self->unk54 = D_8008682C;` instead of
+   `self->unk54 = *arg1;` / `self->unk54 = gDefaultOrigin;` instead of
    field-by-field fixed a register-swap-and-shift residue immediately
    (23/163 -> 70/163 in one change).
 2. **`new_class_6d940` takes an argument, not zero.** Retail sets
@@ -202,3 +204,35 @@ here was giving the intermediate variable a second, real use (computing
 i.e. the lever is "does this value get used more than once between its
 definition and the point where retail shows a staged copy," not merely
 "is there a named temp in the C."
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004A534` | `Class866E8__Class866E8` | A | Occupant of vtable slot `+0x008`, which `include/code_8220.h` establishes as `BasicClassMethods::ctor`, and which `New_Class866E8` dispatches right after allocating. `Class__Class` is the constructor convention in FINISHING-PLAN.md track 3. |
+| `D_8008682C` | `gDefaultOrigin` | A | Its only use is this ctor's fallback when `arg1 == NULL`: `self->origin = gDefaultOrigin`. `asm/data/76DC8.data.s` shows the three words are all zero, so it is literally the default origin. |
+
+Field names this function established (all unit-local -- the compiler listed
+no accessor outside `src/class_3ac78.c`):
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `Class866E8+0x054` | `origin` | B | A 3-word block, copied here from `arg1` or `gDefaultOrigin`, then passed as the THIRD argument of `cellParent->methods->slot4C(cellParent, self, &self->origin)`. The same parameter position in the sibling call one loop deeper receives `buf = {x, 0, z}`, a literal world position on the 0x800 lattice -- so the slot takes a position and this field is one. |
+| `Class866E8+0x0EC` | `elems[7]` | A | Seven 0x1C-byte records, walked 0..6 here, in `Class866E8__Finalize` and in `Class866E8__ResetAllElements`; `class_3bb8c` reaches the same array from four more functions and calls it `arr[7]`. |
+| `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `Class866E8__ResetAllElements`; `class_3bb8c`'s independent view names the same halfword `Elem::flag`. |
+| `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `class_3bb8c`'s `func_8004B700` copies a caller-supplied key byte into the same field. |
+| `UnkSlotEntry+0x004` | `target` | B | `class_3bb8c` types the same pointer `ElemTarget *` from six functions. |
+| `UnkSlotEntry+0x008` | `list` | C-ish/B | Built here by `new_class_6d940(0)`; the name records only that it is the list object the entry owns. |
+| `UnkSlotEntry+0x00C` | `cellParent` | B | Initialized here with `slot4C(cellParent, self, &self->origin)` and then passed as the PARENT argument of every grid cell's own `slot4C(cell, cellParent, buf)`. Its role in this function is exactly "the node the cells hang off". |
+| `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `Class866E8__Finalize` walks the same span tearing them down; `class_3bb8c`'s byte-matched `func_8004CE24` indexes the same block as a 2D grid. |
+
+**The 21-vs-20 discrepancy, recorded not resolved.** This ctor's placement
+loop wraps X after 21 columns (`x = 0x400 + k * 0x800`, reset when
+`x > 0xA400`), and 0x668 bytes is 410 cell pointers -- neither `20 * 20` nor a
+whole number of 21-cell rows. The grid's INDEX stride is 20, byte-verified
+twice over (`class_3bb8c_b`'s matched `func_8004CE24`, and
+`gDefaultGridSpan >> 11`). This function is byte-exact, so both constants are
+certainly right; what the extra column and the 10 spare pointers are for is
+unknown. Do not "correct" the stride to 21 on this function's evidence alone.

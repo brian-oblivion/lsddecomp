@@ -5,7 +5,7 @@
 ## What it does
 
 Method-table slot +0x060, shared VERBATIM (same function address) between
-`D_800865C8` and its sibling `D_80086668` -- confirmed by
+`D_800865C8` and its sibling `gClass86668Methods` -- confirmed by
 `tools/classtable.py`, both tables list `func_8004A3EC` at +0x060. Always
 forwards to the BASE class's own +0x060 implementation first (return value
 discarded), then -- based on the ORIGINAL argument, not the base call's

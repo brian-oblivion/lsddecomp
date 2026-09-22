@@ -252,12 +252,12 @@ consistent with this report's claim that the frame size itself is
 already correct and the deficit is purely the cross-jump merge) and
 launched a bounded background search -- but two searches were briefly
 running at once (this one alongside an already-in-flight search for
-`func_8004ABD0`), which violates this round's "one bounded search at a
+`Class866E8__ResetAllElements`), which violates this round's "one bounded search at a
 time" rule. Killed this function's search immediately upon noticing;
-`func_8004ABD0`'s continued undisturbed. This function's own permuter
+`Class866E8__ResetAllElements`'s continued undisturbed. This function's own permuter
 pass is DEFERRED, not run, this round -- the scaffold is left in place
 (`permuter-work/Class6B5CC__TryAttachNearby`, gitignored) for whoever picks this up
-next, or for a future round of this same runner once `func_8004ABD0`'s
+next, or for a future round of this same runner once `Class866E8__ResetAllElements`'s
 search completes.
 
 Inlined the literal per-axis body into `src/code_d294_b.c` as `#if 0`

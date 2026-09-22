@@ -1,4 +1,6 @@
-# func_8004A4C8
+# New_Class866E8
+
+> Renamed from `func_8004A4C8` on 2026-09-22 (tools/rename.py). Address 0x8004a4c8.
 
 **Unit:** class_3ac78 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
@@ -16,7 +18,7 @@ caller-supplied arguments. Returns the new object, or NULL.
 ## The match
 
 ```c
-Class866E8 *func_8004A4C8(s32 arg1, s32 arg2)
+Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 {
     Class866E8 *self;
 
@@ -68,7 +70,7 @@ Five instances closed in one pass, all byte-exact:
 
 | function | unit | words |
 | --- | --- | --- |
-| `func_8004A4C8` | class_3ac78 | 27/27 |
+| `New_Class866E8` | class_3ac78 | 27/27 |
 | `func_8004A130` | class_39e08 | 27/27 |
 | `func_80049608` | class_39e08 | 31/31 |
 | `func_8003B854` | code_2c054 | 36/36 |
@@ -116,3 +118,15 @@ check the doc's own discriminator against a fresh instance before trusting
 it.** This one had four confirmations and ~25 attempts behind a claim that was
 simply wrong, and the cost of that was five functions left unmatched plus a
 recommendation to spend permuter time.
+
+## Naming
+
+Round 67 (track 3, naming pass).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004A4C8` | `New_Class866E8` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `func_80017B34`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
+
+The one call site is `src/class_39e08.c`'s `func_80049684`, the boot path:
+`arg1->unkC = (SubObjG *)New_Class866E8(0, 1);`. So exactly one instance of
+this class exists, created at game start.

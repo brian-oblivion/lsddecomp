@@ -359,7 +359,7 @@ iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
 1. `e = self->methods->slot118(self, arr1[i].id)` (resolve an `Elem` by
    index/key).
 2. `self->methods->slot88(self, 6, e, i)` -- the SAME already-documented
-   slot88 (dispatches to `func_8004AA6C`, outside this unit) that
+   slot88 (dispatches to `Class866E8__OnElementEvent`, outside this unit) that
    `func_8004BD14` also calls, there with a literal `7` instead of `6`. No
    header change needed for this slot, it already existed.
 3. If `arr1[i].ptr0 != 0`: conditionally call `slot108(self, e)` (new slot,
