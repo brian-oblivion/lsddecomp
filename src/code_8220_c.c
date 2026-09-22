@@ -24,22 +24,11 @@ void func_8001979C(void *dst, s32 flag)
     }
 }
 
-#if 0
-/* STALL snapshot round 2 -- see docs/match-reports/func_800197C4.md.
- * Instruction-exact (asm-differ: zero inserted, zero deleted). Residue is
- * two register-identity choices ($a2 vs $a1 for the OT high-byte mask,
- * cascading to the second reload's register) plus one load-delay-slot
- * filler: retail forms `$s1 + 0x14` (= arg0 + 0x14) and this body has
- * nothing there. VERIFIED across all 8 siblings: the filler's offset
- * always equals (highest self-relative offset touched anywhere in the
- * CALLS branch) + (the access width at that offset) -- i.e. one byte past
- * the last field of `self` the function ever reads. Tried: computing that
- * "one past" pointer as an unconditionally-live local (cross-branch) --
- * forces a 4th callee-saved register (drift, 0/54). Tried: computing it
- * only within the `if` branch with (void)-cast non-use -- eliminated by
- * -O2, matching func_8001A268's same finding for a genuinely unused local.
- * Not cracked.
- */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 46/54 words, length exact. Residue: register identity
+ * ($a2 vs $a1 for the OT high-byte mask, cascading to the second reload's
+ * register) plus a missing load-delay-slot filler `addiu $v0,$s1,0x14`
+ * (docs/match-reports/func_800197C4.md). Hand-derived. */
 void func_800197C4(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
@@ -52,9 +41,9 @@ void func_800197C4(void *arg0, void *arg1) {
         RCpolyF3(arg0, D_8008ACD0);
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800197C4);
+#endif
 
 /* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
