@@ -808,12 +808,12 @@ typedef struct Class869D8Methods Class869D8Methods;
 /*
  * Vtable D_800869D8 (asm/data/76DC8.data.s, header word 0x17). Only the
  * slots this unit's own functions reach are typed: +0x008 (ctor,
- * func_8004D2A4, called by New_Class869D8/func_8004D254) and +0x040 (a
+ * Class869D8__Class869D8, called by New_Class869D8/New_Class869D8) and +0x040 (a
  * post-construct hook, func_8004D2F8 -- already matched, empty body).
  */
 struct Class869D8Methods {
     u8 pad000[0x008];
-    void (*ctor)(Class869D8 *self);            /* +0x008, func_8004D2A4 */
+    void (*ctor)(Class869D8 *self);            /* +0x008, Class869D8__Class869D8 */
     u8 pad00C[0x040 - 0x00C];
     void (*slot40)(Class869D8 *self);          /* +0x040, func_8004D2F8 */
 };
@@ -821,17 +821,17 @@ struct Class869D8Methods {
 struct Class869D8 {
     Class869D8Methods *methods;                /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    s32 unk10;                                  /* +0x010, func_8004D300: gates the slot9C call (nonzero test) */
+    s32 unk10;                                  /* +0x010, Class869D8__ForwardIfUnk10AndUnk70: gates the slot9C call (nonzero test) */
     u8 pad14[0x070 - 0x014];
-    s32 unk70;                                  /* +0x070, func_8004D300: gates the slot9C call (nonzero test) */
+    s32 unk70;                                  /* +0x070, Class869D8__ForwardIfUnk10AndUnk70: gates the slot9C call (nonzero test) */
     u8 pad74[0x0DC - 0x074];                     /* struct ends at the New_Class869D8 alloc size, 0xDC */
 };
 
 extern Class869D8Methods D_800869D8;
-extern Class869D8Methods *func_8004D37C(void);
+extern Class869D8Methods *GetClass869D8Methods(void);
 
 /*
- * Base-class ctor-table getter, chained by func_8004D2A4. Only the ctor
+ * Base-class ctor-table getter, chained by Class869D8__Class869D8. Only the ctor
  * slot (+0x008, single `self` argument -- this call site sets up no
  * second argument register) is needed here.
  */
@@ -839,7 +839,7 @@ typedef struct BaseCtorTable_3bb8c_c {
     u8 pad0[0x008];
     void (*ctor)(void *self);
     u8 pad00C[0x09C - 0x00C];
-    void (*slot9C)(void *self);   /* +0x09C, func_8004D300's forward target (gated by
+    void (*slot9C)(void *self);   /* +0x09C, Class869D8__ForwardIfUnk10AndUnk70's forward target (gated by
                                       Class869D8::unk10/unk70 both being nonzero) */
 } BaseCtorTable_3bb8c_c;
 
@@ -920,7 +920,7 @@ extern Class86AA0Methods *func_8004D508(void);
  * getter's table with a 3-argument call (self, arg1, arg2) -- a genuine arity
  * conflict with
  * `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established from
- * func_8004D300 via the OTHER getter, func_8003F24C). Same-offset arity
+ * Class869D8__ForwardIfUnk10AndUnk70 via the OTHER getter, func_8003F24C). Same-offset arity
  * conflict means different table/different class, per this project's
  * established split policy (see e.g. TaskCoreObjMethods in
  * include/code_2c054.h). Purely a type-name change here -- func_8004D3DC's

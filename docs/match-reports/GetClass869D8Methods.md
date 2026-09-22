@@ -1,4 +1,6 @@
-# func_8004D37C
+# GetClass869D8Methods
+
+> Renamed from `func_8004D37C` on 2026-09-22 (tools/rename.py). Address 0x8004d37c.
 
 **Unit:** class_3bb8c_c · **Size:** 4 words · **Status:** MATCHED (4/4)
 
@@ -12,7 +14,7 @@ vtable this unit calls `Class869D8Methods`. Same shape as the game's other
 ## The C
 
 ```c
-Class869D8Methods *func_8004D37C(void)
+Class869D8Methods *GetClass869D8Methods(void)
 {
     return &D_800869D8;
 }
@@ -26,7 +28,7 @@ as every other one in this codebase: header word (0x17), then a
 reading the table directly (it isn't registered with `tools/classtable.py`,
 since it isn't `D_800866E8`'s own table -- this is a distinct, smaller
 class). Only the slots this unit's own functions reach are typed:
-+0x008 (`ctor`, func_8004D2A4) and +0x040 (a post-construct hook,
++0x008 (`ctor`, Class869D8__Class869D8) and +0x040 (a post-construct hook,
 func_8004D2F8, already matched as an empty body). See
 `include/class_3bb8c.h`.
 

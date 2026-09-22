@@ -1279,3 +1279,7 @@ Class86668__SetChildFlag8 = 0x8004A478; // type:func
 gClass86668Methods = 0x80086668;
 gDefaultOrigin = 0x8008682C;
 gDefaultGridSpan = 0x8008A980;
+New_Class869D8 = 0x8004D254; // type:func
+Class869D8__Class869D8 = 0x8004D2A4; // type:func
+Class869D8__ForwardIfUnk10AndUnk70 = 0x8004D300; // type:func
+GetClass869D8Methods = 0x8004D37C; // type:func

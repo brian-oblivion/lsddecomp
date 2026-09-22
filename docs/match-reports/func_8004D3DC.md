@@ -7,7 +7,7 @@
 The constructor (`ctor`, slot +0x008) for `Class86AA0`. Chains to a base
 ctor (fetched via `GetClass6B5CCMethods(self)`), installs this class's own vtable,
 then zeroes three of its own fields (`unk34` u16, `unk36` u16, `unk38`
-s32) directly -- unlike func_8004D2A4's sibling ctor, there is no
+s32) directly -- unlike Class869D8__Class869D8's sibling ctor, there is no
 post-construct hook call here (the retail instruction stream ends right
 after the zero-stores).
 

@@ -1,29 +1,29 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-Class869D8 *func_8004D254(void)
+Class869D8 *New_Class869D8(void)
 {
     Class869D8 *self;
 
     self = func_80017B34(0xDC);
     if (self != NULL) {
-        func_8004D37C()->ctor(self);
+        GetClass869D8Methods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void func_8004D2A4(Class869D8 *self)
+void Class869D8__Class869D8(Class869D8 *self)
 {
     func_8003F24C()->ctor(self);
-    self->methods = func_8004D37C();
+    self->methods = GetClass869D8Methods();
     self->methods->slot40(self);
 }
 
 void func_8004D2F8(void) {
 }
 
-void func_8004D300(Class869D8 *self)
+void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
 {
     if (self->unk10 != 0 && self->unk70 != 0) {
         func_8003F24C()->slot9C(self);
@@ -42,7 +42,7 @@ void func_8004D36C(void) {
 void func_8004D374(void) {
 }
 
-Class869D8Methods *func_8004D37C(void)
+Class869D8Methods *GetClass869D8Methods(void)
 {
     return &D_800869D8;
 }
