@@ -184,20 +184,11 @@ void func_80019C04(void *arg0, void *arg1) {
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019C04);
 
-#if 0
-/* STALL snapshot round 2 -- see docs/match-reports/func_80019D84.md.
- * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
- * residue class: $a2 vs $a1 for the OT high-byte mask, plus one missing
- * `addiu $v0,$s1,0x28`. This is the first sibling where the raw
- * "last-field-offset + access-width" formula from func_800197C4.md does
- * NOT land exactly on the filler: the highest arg0 field this function
- * touches is +0x24 (a u16 read, raw end 0x26), but the filler is 0x28.
- * 0x28 = align-up-to-4(0x26). Every other sibling's raw sum was already a
- * multiple of 4, so this is the first case that distinguishes "one byte
- * past the last field" from "start of the next 4-byte-aligned slot" --
- * the latter is what actually matches here. Worth re-checking the other
- * seven against this refined rule rather than the raw one. Not cracked.
- */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 80/88 words, length exact. Residue: register identity
+ * ($a2 vs $a1 for the OT high-byte mask) plus a missing load-delay-slot
+ * filler `addiu $v0,$s1,0x28` = align_up_4(last touched self field +
+ * width) (docs/match-reports/func_80019D84.md). Hand-derived. */
 void func_80019D84(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
@@ -219,9 +210,9 @@ void func_80019D84(void *arg0, void *arg1) {
         RCpolyFT4(arg0, D_8008AEE8);
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019D84);
+#endif
 
 /* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
