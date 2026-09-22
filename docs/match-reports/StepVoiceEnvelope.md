@@ -626,3 +626,20 @@ checking directly whether it is the missing "BeginVoiceEnvelope".
 "Envelope" rather than "Fade" is the mechanical distinction (no saved
 start/end pair, just increment-until-limit), not a claim about which one
 is ADSR-shaped in the audio sense.
+
+## NON_MATCHING body promoted, round 67
+
+Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+kept in `#else`. This function is first in ROM order in the unit, so its
+own preserved body's local `Rec34Half`/`Rec34HalfU`/plain-byte-global
+declarations duplicate the unit's shared prelude that already sits above
+it (moved up for exactly this reason); the duplicates were dropped. One
+real field-name update: the body's own local `ObjE970` (`unk18`) collided
+with the shared `ObjE970` the prelude already declares at the same offset
+under the name `masterVolume`; changed the access to
+`D_8008E970->masterVolume`, same offset, no behavior change. The body's
+own flat `extern s16 D_8008D7F0[]/D_8008D7F2[]` declarations were also
+dropped -- the shared prelude already declares both as `Rec16D7F0[]`, and
+the body already casts to `(s16 *)` before indexing, so no code change was
+needed there. `./build-and-verify.sh` green (zero bytes changed) and
+`tools/check-nonmatching.sh code_179d8_m` green.

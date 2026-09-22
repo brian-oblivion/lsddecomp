@@ -125,19 +125,136 @@ extern u8 D_8008EA1A;
 
 extern s16 D_8008E8C0;
 
-/* STALL -- see docs/match-reports/StepVoiceEnvelope.md. Round 48 (echo):
- * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
- * frame gap: -0x10 -> -0x18, byte-exact vs retail; retail addresses
- * NOTHING via $sp beyond the prologue/epilogue immediate itself and
- * saves zero callee-saved registers on either side, textbook pure
- * padding). FOURTH confirmed negative for length closure this round --
- * built length UNCHANGED (237/231, still 6 words LONG). Frame realignment
- * reproduced the same already-diagnosed "woff computed too early, before
- * the sign-extension chain" residue this report's own "Axes tried"
- * section already explored from three placements; no new residue
- * surfaced. Best body (237/231 built words, 6 words LONG) preserved there
- * in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 237/231 words, 6 words long. Residue: a redundant
+ * sign-extension around the incU/incS accumulator add -- confirmed still
+ * the real gap after round 48's frame-padding lever realigned the frame
+ * byte-exactly without closing the length, and after a permuter search
+ * (round 37) plateaued at 2105/4155 across 80,882 iterations with no
+ * candidate reaching zero (docs/match-reports/StepVoiceEnvelope.md).
+ * Hand-derived. */
+void StepVoiceEnvelope(s16 a0)
+{
+    s16 idxCopy;
+    s16 accum;
+    u8 flagByte;
+    u16 val1;
+    u16 val2;
+    s32 product1;
+    s32 q1;
+    s32 q1b;
+    u32 q1c;
+    u32 q2;
+    s32 tmp;
+    u8 tableval;
+    s16 limit;
+    s16 woff;
+
+    /* Halfword-indexed byte-offset for the D_8008D7F2/D_8008D7F0 stores
+     * near the end of this function: idx*8 computed here, kept `s16`
+     * (matching retail's dependency -- its early `sll #3` reads the
+     * sign-extended parameter and stays a plain register value, with no
+     * separate unsigned materialization at this point), before the
+     * 0x34-stride record accesses even start. Masked to `u16` only at
+     * the point of use (indexing an `s16 *`, which then scales by 2),
+     * reaching idx*16 -- the real per-channel byte stride for these two
+     * 0x10-stride, single-field arrays. Same base idiom as
+     * InitSpuDriver's D_8006DAD4 fix, but kept `s16` (not `u16`) until
+     * point of use -- see this report's "non-loop" analysis for why the
+     * loop-context version of the idiom does not transfer directly. */
+    idxCopy = a0;
+    woff = idxCopy << 3;
+
+    if (gVoiceEnvInterval[idxCopy].unk0 != 0) {
+        s16 orig = gVoiceEnvCountdown[idxCopy].unk0;
+
+        gVoiceEnvCountdown[idxCopy].unk0 = orig - 1;
+        if (orig > 0) {
+            return;
+        }
+        gVoiceEnvCountdown[idxCopy].unk0 = gVoiceEnvInterval[idxCopy].unk0;
+    }
+
+    {
+        u16 accumU = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
+        u16 incU = ((Rec34HalfU *) gVoiceEnvStep)[idxCopy].unk0;
+        s16 incS = gVoiceEnvStep[idxCopy].unk0;
+        s16 accumS;
+
+        accumU = accumU + incU;
+        gVoiceEnvAccum[idxCopy].unk0 = accumU;
+        accumS = gVoiceEnvAccum[idxCopy].unk0;
+
+        if (incS > 0) {
+            limit = gVoiceEnvLimit[idxCopy].unk0;
+            if (accumS >= limit) {
+                accumU = limit;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
+            }
+        } else if (incS < 0) {
+            limit = gVoiceEnvLimit[idxCopy].unk0;
+            if (limit >= accumS) {
+                accumU = limit;
+                gVoiceEnvAccum[idxCopy].unk0 = accumU;
+                gVoiceEnvActive[idxCopy].unk0 = 0;
+            }
+        }
+    }
+
+    accum = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
+    D_8008EA10 = (u8) accum;
+    tableval = D_8008E970->masterVolume;
+
+    product1 = accum * (tableval * 0x3FFF);
+    q1 = product1 / 16129;
+    q1b = q1 * D_8008EA16;
+    q1c = q1b * D_8008EA19;
+    q2 = q1c / 16129u;
+
+    if (D_8008EA1A < 0x40) {
+        tmp = q2 * D_8008EA1A;
+        val2 = (u32) tmp >> 6;
+        val1 = q2;
+    } else {
+        tmp = q2 * (0x7F - D_8008EA1A);
+        val1 = (u32) tmp >> 6;
+        val2 = q2;
+    }
+
+    if (D_8008EA17 < 0x40) {
+        tmp = val2 * D_8008EA17;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - D_8008EA17);
+        val1 = tmp / 64;
+    }
+
+    if (D_8008EA11 < 0x40) {
+        tmp = val2 * D_8008EA11;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - D_8008EA11);
+        val1 = tmp / 64;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (val1 < val2) {
+            val1 = val2;
+        } else {
+            val2 = val1;
+        }
+    }
+
+    ((s16 *) D_8008D7F2)[(u16) woff] = val2;
+    flagByte = D_8008D970[idxCopy];
+    ((s16 *) D_8008D7F0)[(u16) woff] = val1;
+    flagByte |= 3;
+    D_8008D970[idxCopy] = flagByte;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
+#endif
 
 /* Same 0x34-stride channel-configuration record family documented in
  * code_179d8_j.c (Rec34D994/Rec34Byte/Rec34Half); this unit keeps its
