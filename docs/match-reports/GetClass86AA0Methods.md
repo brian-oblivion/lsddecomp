@@ -6,7 +6,7 @@
 
 ## What it does
 
-Get-vtable helper for a second small sibling class: returns `&D_80086AA0`,
+Get-vtable helper for a second small sibling class: returns `&gClass86AA0Methods`,
 this unit's `Class86AA0Methods`. Same shape and role as GetClass869D8Methods.
 
 ## The C
@@ -14,13 +14,13 @@ this unit's `Class86AA0Methods`. Same shape and role as GetClass869D8Methods.
 ```c
 Class86AA0Methods *GetClass86AA0Methods(void)
 {
-    return &D_80086AA0;
+    return &gClass86AA0Methods;
 }
 ```
 
 ## New type: Class86AA0 / Class86AA0Methods
 
-`D_80086AA0` (asm/data/76DC8.data.s, header word 0x24) is D_800869D8's
+`gClass86AA0Methods` (asm/data/76DC8.data.s, header word 0x24) is gClass869D8Methods's
 sibling: same opening shape (header, then `BasicClass__func_17eb0` at
 +0x004, ctor at +0x008 -- here Class86AA0__Class86AA0). Only +0x008 (`ctor`) and
 +0x0B8 (dispatched by Class86AA0__ForwardIfTag34, this unit's own slot +0x09C in the

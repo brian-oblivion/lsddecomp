@@ -6,7 +6,7 @@
 
 ## What it does
 
-`gIntermediateBaseMethods+0x068` (and `D_80086B60`'s own verbatim-inherited `+0x068`,
+`gIntermediateBaseMethods+0x068` (and `gClass86B60Methods`'s own verbatim-inherited `+0x068`,
 `Obj86B60__NotifyParents`'s `slot68` occupant): dereferences `self->unkC->unk0` (the
 `Obj86B60InitArgs` field `Obj86B60__Init`/`Obj86B60__Deinit` only ever forward
 opaquely, and the same field `Obj86B60__NotifyTargetReset` reaches independently through

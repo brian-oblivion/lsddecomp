@@ -13,8 +13,8 @@ reads `arg1->target->header & 0xF` and dispatches to one of
 `self->methods->slot54/58/5C` (all three called with `(self, arg1, arg2)`)
 for header values 1/2/5 respectively; any other value is a no-op.
 
-`D_80086B60`'s own `+0x038` is this same function (verbatim inherit, no
-override) -- confirmed with `tools/classtable.py D_80086B60`, which is also
+`gClass86B60Methods`'s own `+0x038` is this same function (verbatim inherit, no
+override) -- confirmed with `tools/classtable.py gClass86B60Methods`, which is also
 how `slot54`/`slot58`/`slot5C`'s occupants (`Obj86B60__OnTag1Notify`,
 `func_8003C48C`, `func_8003C51C`) were identified.
 

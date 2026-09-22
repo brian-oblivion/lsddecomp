@@ -10,7 +10,7 @@
 
 Identity accessor: returns its own argument unchanged (`addu $v0, $a0,
 $zero; jr $ra`). No call site was found anywhere in the currently-carved
-units (it is one of D_80086AA0's own vtable slots, +0x0FC), so its real
+units (it is one of gClass86AA0Methods's own vtable slots, +0x0FC), so its real
 argument/return type could not be pinned down beyond "a pointer".
 
 ## The C

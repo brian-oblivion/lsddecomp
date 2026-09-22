@@ -35,7 +35,7 @@ above is the one that reaches the real 43/43 stated below.
 Textbook "call the further-base ctor first (through a getter for its
 table, not by direct name -- `Obj6EAC0__GetBaseMethods` returns `&D_8006EAC0`), THEN
 overwrite `self->methods` with this class's own table, THEN dispatch
-through it immediately" idiom (DECOMPILATION_LEARNINGS' `func_8004D578`
+through it immediately" idiom (DECOMPILATION_LEARNINGS' `Class86B60__Class86B60`
 entry). See `include/code_2cc8c.h`'s header comment above
 `struct ClassEAC0Obj` for the full class-hierarchy discovery writeup this
 function anchors.

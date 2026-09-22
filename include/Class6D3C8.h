@@ -247,7 +247,7 @@ void func_8002658C(Class6D3C8 *self);
 /* PollTask constructors, uncarved (not this unit's to write). Called
  * directly (not through any vtable) as func_80026518's `ctor` argument. */
 extern PollTask *func_80057F68(void *dreamSys);
-extern PollTask *func_8004D518(void *dreamSys);
+extern PollTask *New_Class86B60(void *dreamSys);
 
 extern s32 func_800493E4(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 extern s32 func_800491FC(s32 *out, s32 unused); /* psyq_memset.s: same "write to *out, return a

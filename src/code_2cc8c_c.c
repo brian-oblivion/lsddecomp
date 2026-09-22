@@ -2,7 +2,7 @@
  * 19 functions plus one stall), continuing directly from code_2cc8c_b.
  *
  * The first 10 functions (through Obj86B60__OnTag1Notify) are the tail of
- * `Obj86B60` (base vtable D_80086B60, override D_80087AAC -- see
+ * `Obj86B60` (base vtable gClass86B60Methods, override D_80087AAC -- see
  * code_2cc8c.h's own header comment and code_2cc8c.c's unit comment for the
  * class-framework shape and the carve provenance). They cover the class's
  * two-argument constructor pair (`Obj86B60__Init`/`Obj86B60__Deinit`, which

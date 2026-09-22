@@ -25,7 +25,7 @@
  * offset 0 (`lw $v1, 0x0($a0)` then `lw $v0, 0xNN($v1)` then `jalr`), so
  * resolve slots with tools/classtable.py rather than by counting. The
  * class is `Obj86B60` (include/code_2cc8c.h), named after its base method
- * table D_80086B60 (78 slots; a derived override table also exists at
+ * table gClass86B60Methods (78 slots; a derived override table also exists at
  * D_80087AAC, 73 slots -- see the header's own comment). The first two
  * functions are switch dispatchers over a small event/message code.
  */

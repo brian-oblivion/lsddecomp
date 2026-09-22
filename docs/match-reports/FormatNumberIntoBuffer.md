@@ -1,4 +1,6 @@
-# func_8004D6AC — MATCHED (round 45, 22/22 words)
+# FormatNumberIntoBuffer — MATCHED (round 45, 22/22 words)
+
+> Renamed from `func_8004D6AC` on 2026-09-22 (tools/rename.py). Address 0x8004d6ac.
 
 **Unit:** class_3bb8c_c · **Size:** 22 words (0x58 bytes)
 
@@ -17,7 +19,7 @@ typedef struct {
     s8 a, b, c, d, e, f;
 } Buf6_3bb8c_c;
 
-void func_8004D6AC(s32 arg0)
+void FormatNumberIntoBuffer(s32 arg0)
 {
     FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
     *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;

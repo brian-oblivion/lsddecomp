@@ -7,7 +7,7 @@ round's queue)
 
 ## What it does
 
-`gIntermediateBaseMethods+0x048` (and `D_80086B60`'s own verbatim-inherited `+0x048`, per
+`gIntermediateBaseMethods+0x048` (and `gClass86B60Methods`'s own verbatim-inherited `+0x048`, per
 `tools/classtable.py`): the teardown counterpart to `Obj86B60__Init`'s
 init/registration -- calls `slot50` (external, unobserved elsewhere),
 unconditionally removes the three children `Obj86B60__Init` added

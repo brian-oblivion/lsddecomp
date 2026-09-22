@@ -7,8 +7,8 @@
 ## What it does
 
 `Obj86B60Methods::slot120` (verified by reading the raw table bytes at
-`D_80086B60+0x120` in `disk/SLPS_015.56` directly, and cross-checked with
-`tools/classtable.py D_80086B60`). Returns the current ring-buffer slot's
+`gClass86B60Methods+0x120` in `disk/SLPS_015.56` directly, and cross-checked with
+`tools/classtable.py gClass86B60Methods`). Returns the current ring-buffer slot's
 running count: `self->unk60[self->unk58]`.
 
 ## The C
@@ -28,8 +28,8 @@ whose comment attributed it to `Obj86B60__GetActiveSlotCount` (citing `func_8003
 was wrong.** Reading the retail table bytes directly:
 
 ```
-D_80086B60+0x118 = 0x8003DE30  (func_8003DE30, NOT Obj86B60__GetActiveSlotCount)
-D_80086B60+0x120 = 0x8003DFA0  (Obj86B60__GetActiveSlotCount's real slot)
+gClass86B60Methods+0x118 = 0x8003DE30  (func_8003DE30, NOT Obj86B60__GetActiveSlotCount)
+gClass86B60Methods+0x120 = 0x8003DFA0  (Obj86B60__GetActiveSlotCount's real slot)
 ```
 
 The byte OFFSET `func_8003C944` compiled against (0x118) was and is

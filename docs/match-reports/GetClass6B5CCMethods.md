@@ -87,7 +87,7 @@ and it is not a judgement call.
 
 **The discriminator that separates this from the other 15 findings: is the
 extra argument byte-load-bearing at the call site?** For `BMemPMgrInit`,
-`Class6B5CC__LocalOffsetToWorldPos`, `func_8004D678`, `LinkOwnerObj__*`,
+`Class6B5CC__LocalOffsetToWorldPos`, `CheckObj866E8CountFlag`, `LinkOwnerObj__*`,
 `func_80056BBC` and `func_8002CF18`, retail *emits an instruction* for the
 extra argument (`move a1,zero`, `move a3,zero`, `lw a2,164(s0)`, `li a0,0xff`),
 so the declaration has to keep its arity or the call site's bytes change. Here

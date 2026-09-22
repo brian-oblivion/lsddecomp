@@ -45,7 +45,6 @@ D_8008A96C
 D_8008A970
 D_8008A978
 D_8008A97C
-gDefaultGridSpan
 D_8008A984
 D_8008A988
 D_8008A98C
@@ -195,6 +194,7 @@ gCdState
 gCdTickStep
 gCdTimeoutCounter
 gCdUseVSyncCallback
+gDefaultGridSpan
 gDreamAuxStage
 gDreamAuxWorld
 gEntityDefaultOffset

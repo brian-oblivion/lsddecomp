@@ -6,7 +6,7 @@
 
 ## What it does
 
-Get-vtable helper for a small sibling class: returns `&D_800869D8`, the
+Get-vtable helper for a small sibling class: returns `&gClass869D8Methods`, the
 vtable this unit calls `Class869D8Methods`. Same shape as the game's other
 `func_80xxxxxx()->ctor(...)` vtable getters (e.g. class_3ac78.c's
 `GetClass86668Methods`/`func_8004D244`).
@@ -16,13 +16,13 @@ vtable this unit calls `Class869D8Methods`. Same shape as the game's other
 ```c
 Class869D8Methods *GetClass869D8Methods(void)
 {
-    return &D_800869D8;
+    return &gClass869D8Methods;
 }
 ```
 
 ## New type: Class869D8 / Class869D8Methods
 
-`D_800869D8` (asm/data/76DC8.data.s) is a plain-C vtable in the same shape
+`gClass869D8Methods` (asm/data/76DC8.data.s) is a plain-C vtable in the same shape
 as every other one in this codebase: header word (0x17), then a
 `BasicClass__func_17eb0` slot at +0x004, then a ctor at +0x008. Resolved by
 reading the table directly (it isn't registered with `tools/classtable.py`,

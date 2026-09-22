@@ -44,7 +44,7 @@ void func_8004D374(void) {
 
 Class869D8Methods *GetClass869D8Methods(void)
 {
-    return &D_800869D8;
+    return &gClass869D8Methods;
 }
 
 Class86AA0 *New_Class86AA0(void)
@@ -99,10 +99,10 @@ void *Class86AA0__ReturnSelf(void *self)
 
 Class86AA0Methods *GetClass86AA0Methods(void)
 {
-    return &D_80086AA0;
+    return &gClass86AA0Methods;
 }
 
-Class86B60 *func_8004D518(void *dreamSys)
+Class86B60 *New_Class86B60(void *dreamSys)
 {
     Class86B60 *self;
 
@@ -114,7 +114,7 @@ Class86B60 *func_8004D518(void *dreamSys)
     return NULL;
 }
 
-void func_8004D578(Class86B60 *self, void *dreamSys)
+void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
 {
     DreamSysView_3bb8c_c *dream;
     Class86B60Unk48Obj *obj;
@@ -127,12 +127,12 @@ void func_8004D578(Class86B60 *self, void *dreamSys)
     self->unkAC = 0;
     dream = dreamSys;
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
-    func_8004D6AC(dream->methods->slot1A0(dream, 0));
+    FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
     self->methods->slotD8(self, &D_80086D44);
     self->methods->slot40(self, dreamSys);
 }
 
-void func_8004D678(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
+void CheckObj866E8CountFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
 {
     Obj866E8 *target = ctx->target;
     s32 flag = 1;
@@ -158,12 +158,12 @@ extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
  * idiom as Vec2s16, func_8001A268), but the trailing 2 bytes can no
  * longer be proven 2-byte aligned, so there is no safe halfword move for
  * them and the compiler falls back to two individual signed-byte
- * loads/stores. See docs/match-reports/func_8004D6AC.md. */
+ * loads/stores. See docs/match-reports/FormatNumberIntoBuffer.md. */
 typedef struct {
     s8 a, b, c, d, e, f;
 } Buf6_3bb8c_c;
 
-void func_8004D6AC(s32 arg0)
+void FormatNumberIntoBuffer(s32 arg0)
 {
     FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
     *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;

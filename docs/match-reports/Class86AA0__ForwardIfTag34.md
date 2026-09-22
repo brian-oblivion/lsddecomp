@@ -26,8 +26,8 @@ void Class86AA0__ForwardIfTag34(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
 ## New type: GenericTagInst_3bb8c_c / GenericTagMethods_3bb8c_c
 
 Every vtable in this codebase opens with a header word whose low byte
-carries what looks like a small per-class tag (e.g. `D_800869D8`'s header
-is `0x17`, `D_80086AA0`'s is `0x24`) -- this function is the first one in
+carries what looks like a small per-class tag (e.g. `gClass869D8Methods`'s header
+is `0x17`, `gClass86AA0Methods`'s is `0x24`) -- this function is the first one in
 this unit that actually reads that byte back out and compares it against a
 literal, rather than just following the header past it to a named slot.
 Modeled as a minimal generic "any class instance" shape (`methods` pointer

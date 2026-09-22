@@ -12,9 +12,9 @@ typedef struct ClassEAC0Obj ClassEAC0Obj;
 typedef struct Pair32E99C Pair32E99C;
 
 /*
- * The class whose method table is D_80086B60 (78 slots, base) with a
+ * The class whose method table is gClass86B60Methods (78 slots, base) with a
  * derived override table at D_80087AAC (73 slots) -- resolved with
- * tools/classtable.py D_80086B60 / D_80086B60 --vs D_80087AAC. No FirecatFG
+ * tools/classtable.py gClass86B60Methods / gClass86B60Methods --vs D_80087AAC. No FirecatFG
  * name survives, so the struct is named `Obj86B60` after the base table's
  * address and fields are named by offset until real names are known. Per
  * this project's established multiple-independent-local-views convention
@@ -1078,7 +1078,7 @@ struct Obj86B60Methods {
     /* +0x074..+0x084: the five message handlers func_8003C48C dispatches to
      * (round 23). Read off jtbl_80011090: message code 0x12 -> slot80,
      * 0x13 -> slot84, 0x17 -> slot7C, 0x19 -> slot78, 0x21 -> slot74; every
-     * other code in [0x12,0x21] is a no-op. In the base table D_80086B60
+     * other code in [0x12,0x21] is a no-op. In the base table gClass86B60Methods
      * these are func_8003C7F4 / func_8003C858 / func_8003C8D0 /
      * func_8003C944 / func_8003C9B0 respectively. Pad split is ADDITIVE and
      * preserves the original 0x1C total (5 * 4 + 8). */
@@ -1186,12 +1186,12 @@ struct Obj86B60Methods {
                                                        said -- verified by
                                                        reading the raw table
                                                        bytes at
-                                                       D_80086B60+0x118 in
+                                                       gClass86B60Methods+0x118 in
                                                        disk/SLPS_015.56
                                                        directly (also
                                                        cross-checked with
                                                        tools/classtable.py
-                                                       D_80086B60). The old
+                                                       gClass86B60Methods). The old
                                                        attribution came from
                                                        func_8003C944.md's
                                                        "Struct knowledge
@@ -1790,7 +1790,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * calls `Obj6EAC0__GetBaseMethods()->ctor(self, a1, a2, a3)` before overwriting
  * `self->methods` with `&D_8006E99C` and re-dispatching through it --
  * exactly the established "base ctor first, then set own vtable pointer,
- * then dispatch through it" idiom (see e.g. func_8004D578's entry in
+ * then dispatch through it" idiom (see e.g. Class86B60__Class86B60's entry in
  * DECOMPILATION_LEARNINGS). `Obj6EAC0__GetBaseMethods` (code_2cc8c_f, bravo's own
  * function) is a bare no-argument getter for a SECOND table, D_8006EAC0
  * -- itself sharing the identical fingerprint with D_8006B5CC, so the
