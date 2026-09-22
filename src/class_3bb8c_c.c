@@ -129,7 +129,7 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
     FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
     self->methods->slotD8(self, &D_80086D44);
-    self->methods->slot40(self, dreamSys);
+    self->methods->onConstruct(self, dreamSys);
 }
 
 void CheckObj866E8CountFlag(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)

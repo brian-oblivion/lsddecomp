@@ -1191,7 +1191,16 @@ struct Class86B60Methods {
      * caller. */
     void (*slot14)(Class86B60 *self, void *arg1);
     u8 pad018[0x040 - 0x018];
-    void (*slot40)(Class86B60 *self, void *dreamSys); /* +0x040, Class86B60__Class86B60's own last call */
+    /* +0x040, Class86B60__Class86B60's own last call -- same "runs right after
+     * self->methods is installed" shape as Class869D8Methods::onConstruct
+     * above. This struct (Class86B60Methods) is otherwise SHARED with
+     * src/class_3bb8c_d.c (many other slots below are dispatched from
+     * functions there), so this rename followed the compiler-ownership
+     * recipe rather than being assumed safe: renamed the definition alone,
+     * rebuilt, and the ONLY accessor the compiler found anywhere in the
+     * tree was this unit's own Class86B60__Class86B60 (src/class_3bb8c_c.c)
+     * -- round 68. */
+    void (*onConstruct)(Class86B60 *self, void *dreamSys);
     u8 pad044[0x060 - 0x044];
     /* +0x060, func_8004DE08's own two calls, both `(self, literal)` --
      * once with `0xB` right after `self->unk58 = 5`, once with `0xF`
