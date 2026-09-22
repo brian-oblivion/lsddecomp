@@ -234,7 +234,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **A mask on the PRODUCT means a HALFWORD array, not a struct array.** Early `sll 3`, mid-block
   `andi 0xffff`, LATE base load, `sll 1` is `u16 woff = (u16)i * 8;` indexing an `(s16 *)` — eager
   in a LOOP, deferred outside one; do NOT hoist the base pointer. When a residue is a MASK, ask
-  WHICH VALUE is truncated. (a §"The \"split scaled index\"")
+  WHICH VALUE is truncated. **The SIGN of the truncation decides whether the scale shift FUSES:**
+  `s16 woff = i * 8;` gives retail's split `sll 19`/`sra 15` (cc1 fuses the sign-extend's
+  `sll 16`/`sra 16` with the scale), while the `(u16)` spelling above is a mask and stays
+  `andi`+`sll 3`. Round 31 spent three attempts on the unsigned spelling alone.
+  (a §"The \"split scaled index\"", round 66 bravo)
 - **`(cond ? p : NULL)[i]` and `((T *)(cond ? p : NULL))->field` are NOT the same construct.** An
   index on a conditional is a tree `PLUS_EXPR` that `fold()` distributes into BOTH arms, combining
   the offset with the true arm's `addiu` and turning a NULL false arm into the literal `i *
@@ -492,6 +496,14 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   un-fused a div/mod pair while preserving retail's `lh` (193/213 -> 211/213). When a qualifier
   lever "works but with a side effect", check whether the side effect is intrinsic to the LEVER or
   an artifact of WHERE it was applied. (a §"NARROW a `volatile` to the exact access that needs it")
+- **`volatile` on a POINTEE is a scheduling barrier, and cc1 2.6.3 orders volatile accesses only
+  against OTHER volatile accesses.** With `D_8006DAD4` (the SPU voice registers, `0x1F801C00`)
+  typed `u16 *`, cc1 hoisted an unrelated `volatile u16` global's store/reload pair across six
+  stores through that pointer; typing it `volatile u16 *` pinned the pair back, worth 54/131 ->
+  98/131 on its own. So when a near-miss looks like "cc1 hoisted something retail left in place",
+  ask which memory operand is memory-mapped I/O BEFORE reaching for a barrier or filing a
+  scheduling stall. Discriminator: dump cc1's own output and look for a `#.set volatile` marker
+  that has migrated past non-volatile stores. (a round 66, bravo)
 - **`volatile` has TWO independent effects** — on a global's DECLARATION it controls elision and
   reordering of accesses; through a local `volatile T *` it also controls whether the ADDRESS
   COMPUTATION is folded into the memory instruction, so "I tried it" is at most one of two

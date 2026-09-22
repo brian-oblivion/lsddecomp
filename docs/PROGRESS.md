@@ -6,6 +6,115 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-22 — round 66: a stall's recorded CAUSE was wrong for two rounds, a naming pass unlocked by grepping for its own placeholder callees, and a measurement that killed my own finding
+
+**Three runners, three tracks, three merges, all green. Matched unchanged at
+1150, queued unchanged at 102** — byte-neutral by design again: the matching
+slot was a revisit and tracks 1b and 3 move no bytes. Head on Opus; nothing
+needed Fable, and the six findings that would are ESCALATED below rather than
+acted on. Gate 0 clean, all three worktrees byte-verified before handover,
+`headercontention.py` reported no header and no call-graph contention among
+the three units.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | opus | 3 | `DreamSys` | 29 of 33 remaining defs named, 31 fields, 46 globals; review PASSED, unit marked |
+| bravo | opus | 1 revisit | `code_179d8_p` | 42/131 -> 103/131, length 9-short -> EXACT, ins/del 29/29 -> 10/10; still a stall |
+| charlie | sonnet | 1b | `code_179d8_k` | 5 of 6 bodies promoted; `check-nonmatching` 20 -> 25 bodies, 5 -> 6 units |
+
+Track 3 is 18/75 units passed, 745/1150 defs still `func_` (was 772). Revisit
+yield 11/26. The naming runner STAYS on Opus: this is one clean Opus unit and
+the rule needs two in a row.
+
+### The recorded cause was wrong, and that is what the round turned on
+
+`func_80031F3C` carried a two-round verdict attributing its whole 9-word
+deficit to a scheduling residue. Bravo rebuilt the preserved body first, as
+the revisit rule requires, reproduced the recorded figures exactly — and then
+found that 8 of the 9 missing words were **code the body never had**. Retail
+does three stores off the reloaded `D_8008EA26` index sharing one `*0x34`
+multiply; the body had one. 9 = 1 + 4 + 4, nothing left over.
+
+This is the failure mode CLAUDE.md names: a wrong SCORE is corrected the next
+time anyone measures, a wrong CAUSE is what the next round acts on. Two rounds
+of attempts were aimed at scheduling because the title said scheduling.
+
+The largest single lever was `volatile` on the POINTEE (54/131 -> 98/131), and
+it was reachable only because a SIBLING unit had been named: `D_8006DAD4` is
+known to be `0x1F801C00`, the SPU voice registers, because `code_179d8_m` was
+identified as the 24-voice SPU driver. The revisit rule's original premise —
+that a unit's new names unlock old stalls — was gated off as unproven in an
+earlier revision. Here it paid directly.
+
+### Naming: the unlock was not reading harder
+
+Round 65 concluded `DreamSys`'s movement state machine had no confident name.
+What broke it open was grepping `src/` for the unit's own **placeholder-named
+callees**. `func_8001CEB4` — which the unit's own header described as an
+opaque generic pointer — is already MATCHED in `src/code_d294.c`, and is the
+rotation setter reading `{numerator, denominator}` degree ratios. That turned
+six call sites into exact angles and decoded four data constants. A symbol
+still spelled `func_XXXXXXXX` says nothing about whether its body has been
+read.
+
+The head review sampled five names against their evidence and all five held,
+including the sole tier-A (`DreamSys__NoOpSlot12C`: the body really is
+`return 0;`, it really is vtable slot `0x12C`, and `NoOpSlot14C`/`150`/`E8Defa`
+already existed as the unit's convention). Five placeholders remain, all tier C
+with what is known written down.
+
+### A finding I reported and then measured away
+
+Mid-round I told the operator that `plan.py`'s track-1b promotable figure
+looked like an over-count, on the reasoning that its detector (`plan.py:260`,
+`"#if 0" in t`) would match reports that merely DISCUSS the convention. I then
+measured it: of the 61 reports it counts, 11 preserve their body in a bare
+fenced block with no `#if 0` line, and **all 11 carry a real function
+definition**. Over-count: zero.
+
+The true finding is narrower and worse-shaped. Those 11 are counted only
+because each happens to mention `#if 0` somewhere in prose — e.g.
+`DreamSys__TryStaircaseLink`, whose sole hit is line 436, "per the preserved
+`#if 0` body". The detector is ACCIDENTALLY correct, and it fails silently on
+the one case with no prose mention: bravo's rewritten report, which dropped out
+of the queue with a perfectly good body in it (measured under control, same
+tree, only that report differing: 60 vs 61). Wrapping the body in a real
+`#if 0` restored it.
+
+Recording this because the shape recurs: the reasoning was sound, the
+conclusion was false, and only the measurement separated them. Same shape as
+Gate 1b screen 6 (permuter history keyed on the WORD rather than evidence of a
+run).
+
+### Escalated, not acted on
+
+1. **Track 1b promoted a codegen-shaping artifact into a readability body.**
+   `func_800344FC`'s preserved body carries a round-47 permuter mutation: a
+   bare `return;` written as `do { return; } while (0);`. Charlie reviewed it
+   correctly — behaviourally identical, no UB, no dead branch — so it clears
+   the written bar. But track 1b exists so the code is READABLE, and that
+   construct is noise a reader must decode. The rule does not cover
+   semantically-inert codegen artifacts. Needs a ruling.
+2. **Gate 3 check 3 needs an object-level tiebreak** (bravo). When the
+   scaffold's and funcdiff's ins/del counts differ but neither "decline" row
+   applies, compare the two objects' disassemblies directly; equal objects
+   means the gap is a diff-alignment artifact and the search is meaningful.
+   Bravo hit exactly this (scaffold 4/4 vs funcdiff 10/10, objects identical
+   at 132 lines each). This is a PARALLEL-RUNS §3.5 procedure change.
+3. **The naming-runner prompt should carry alpha's method** as a step: grep
+   `src/` for the unit's placeholder-named callees before concluding a body is
+   unnameable. FINISHING-PLAN §4.2 change.
+4. **`plan.py:260`'s preserved-body detector** is accidentally correct today
+   and fails silently on a fence-only report (above). Tool change.
+5. **`stalesyms.py` catches renamed callees but not RE-TYPED ones.** It
+   reported OUTSTANDING 0 while `func_800351D0`'s preserved body was
+   uncompilable against the by-value signature round 49 established for
+   `func_800357B0`. A preserved body can go stale in a call SIGNATURE, and
+   nothing detects it until someone tries to compile it — which is what track
+   1b does, and why the gap surfaced now.
+6. **`DECOMPILATION_LEARNINGS.md` is at 9761/9800 words** after this round's
+   two promotions. The next promotion forces distillation.
+
 ## 2026-09-22 — round 65: the first revisit round that paid nothing, a naming pass sent back over one word, and two "exact length" claims retracted as arithmetic
 
 **Three runners, three tracks, three merges, all green. Matched unchanged at
