@@ -2514,6 +2514,15 @@ stalesyms view of `.c` bodies (same reason); a rule about rename.py editing
 history (the existing boundary stands: PROGRESS and the archive are frozen,
 everything else stays resolvable).
 
+**Revision 12 (2026-09-22, after round 68).** Track 3 step 3 said the
+compiler's error list after renaming a field in its struct definition "is
+the exact accessor set". It is the exact set among code the DEFAULT build
+compiles, and `#ifdef NON_MATCHING` bodies are outside that by construction,
+which is how round 67 followed the step and still shipped a regression. The
+step and the naming prompt now require `tools/check-nonmatching.sh` after
+every field or slot rename, and the head's merge-time type-scoped rename
+rebuilds both. Nothing else changed.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

@@ -19,11 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 11 (2026-09-22, after rounds 66 and 67: a perfect scaffold
-score means the residue is what the scorer normalizes away OR outside the
-function, and the one-second isolated compile tells which; 1b bodies are
-written for the reader; the naming prompt greps placeholder callees; plan.py
-reads `#if 0` line-anchored and "length matches" as exact).
+Plan revision: 12 (2026-09-22, after round 68: the compiler's post-rename
+error list covers only what the default build compiles, so
+`check-nonmatching.sh` is required after every field or slot rename).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -266,8 +264,11 @@ propagates everywhere.
    grep: `slotNN` and `unkNN` names recur across unrelated structs, so a
    textual search over-counts (round 57: seven textual hits, one real
    accessor). Rename the field in the struct DEFINITION only and rebuild; the
-   error list is the exact accessor set.
-   - every error is in your unit: fix them, oracle, done;
+   error list is the exact accessor set AMONG CODE THE DEFAULT BUILD
+   COMPILES. `#ifdef NON_MATCHING` bodies are outside it by construction, so
+   `tools/check-nonmatching.sh` is the second half of the list and is required
+   after every field or slot rename (round 67 shipped a regression there).
+   - every error, in both, is in your unit: fix them, both oracles, done;
    - any error is in another unit: revert the definition and do NOT rename. Put the proposed name, its
      tier and its evidence under `## Proposed field names` in the report of
      the function that established it, and post it to the broadcast. The HEAD
@@ -410,9 +411,10 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > ```sh
 > ./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; \
 > grep -nE 'error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]' /tmp/<name>_b.log | head -8
+> tools/check-nonmatching.sh   # after a FIELD or SLOT rename: the accessors the default build cannot see
 > ```
 >
-> Exit 0 and no hits, or the rename is wrong; revert it.
+> Exit 0, no hits, and check-nonmatching green, or the rename is wrong; revert it.
 >
 > Naming rules: name what the code does, not what you guess it is for; tiers
 > A/B/C recorded per name in the report's `## Naming` section with the
