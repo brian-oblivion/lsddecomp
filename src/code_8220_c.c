@@ -341,7 +341,58 @@ void func_8001A224(void *arg0, void *arg1, s32 kind)
     }
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 53/70 words, length exact. Residue: retail's
+ * `addiu $sp,$sp,-0x20` frame adjustment is scheduled into the loop-skip
+ * branch's delay slot (word 17) instead of the ordinary prologue position
+ * (word 0); a pure placement difference with no data dependency, not
+ * register identity (docs/match-reports/func_8001A268.md). Hand-derived. */
+/* A 2-s16 pair (alignment 2, not 4) -- forces the unaligned lwl/lwr whole-
+ * struct copy retail uses for prim->0x60 -> prim->0x74 -> prim->0x70 even
+ * though those particular offsets are accidentally 4-aligned; the compiler
+ * only knows the DECLARED alignment of the type, not the runtime address.
+ * Same idiom as FlashbackRotation (include/DreamSys.h) and func_8004B38C. */
+typedef struct {
+    s16 x, y;
+} Vec2s16_268;
+
+void func_8001A268(void *arg0, s32 count)
+{
+    u8 *self = (u8 *)arg0;
+    s16 *xp, *yp, *end;
+
+    *(Vec2s16_268 *)(self + 0x74) = *(Vec2s16_268 *)(self + 0x60);
+    *(Vec2s16_268 *)(self + 0x70) = *(Vec2s16_268 *)(self + 0x74);
+
+    xp = (s16 *)(self + 0x64);
+    yp = (s16 *)(self + 0x66);
+    end = (s16 *)(self + 0x5C + (count << 2));
+
+    for (; xp < end; xp += 2, yp += 2) {
+        if (*xp < *(s16 *)(self + 0x70)) {
+            *(s16 *)(self + 0x70) = *xp;
+        }
+        if (*yp < *(s16 *)(self + 0x72)) {
+            *(s16 *)(self + 0x72) = *yp;
+        }
+        if (*(s16 *)(self + 0x74) < *xp) {
+            *(s16 *)(self + 0x74) = *xp;
+        }
+        if (*(s16 *)(self + 0x76) < *yp) {
+            *(s16 *)(self + 0x76) = *yp;
+        }
+    }
+
+    if (*(s16 *)(self + 0x74) - *(s16 *)(self + 0x70) >= 0x101) {
+        *(s32 *)(self + 0x78) = 1;
+    }
+    if (*(s16 *)(self + 0x76) - *(s16 *)(self + 0x72) >= 0x101) {
+        *(s32 *)(self + 0x78) = 1;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A268);
+#endif
 
 extern s32 D_8008A824;
 extern s32 D_8008A828;
