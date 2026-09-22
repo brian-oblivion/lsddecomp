@@ -1,4 +1,6 @@
-# func_8005C02C — MATCHED 59/59
+# DreamSys__CheckStaircaseHeading — MATCHED 59/59
+
+> Renamed from `func_8005C02C` on 2026-09-22 (tools/rename.py). Address 0x8005c02c.
 
 **Unit:** DreamSys · **Size:** 59 words · **Status:** MATCHED, round 43.
 
@@ -12,13 +14,13 @@ assigned queue).
 
 ## What it does
 
-Byte-for-byte the SAME shape as `func_8005BD3C` (matched earlier this
+Byte-for-byte the SAME shape as `DreamSys__CheckTunnelHeading` (matched earlier this
 round) -- literally identical instruction sequence, just against two
 DIFFERENT per-stage tables (`D_80088C84`/`D_80088BDC` instead of
 `D_800889B8`/`D_80088858`), and used by a different caller. Called by
-`DreamSys__TryStaircaseLink` (still `INCLUDE_ASM`) as `func_8005C02C(&this->unk_0x888,
+`DreamSys__TryStaircaseLink` (still `INCLUDE_ASM`) as `DreamSys__CheckStaircaseHeading(&this->unk_0x888,
 &this->unk_0x884, local)` -- the header's own comment already flagged this
-("identical call shape to func_8005BD3C above (same `local` buffer, same
+("identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same
 two `this` fields)").
 
 ## Final body (59/59 on the first attempt)
@@ -27,14 +29,14 @@ two `this` fields)").
 extern u8 *D_80088C84[];
 extern u8 *D_80088BDC[];
 
-s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2)
+s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
 	u8 heading;
 	s32 idx;
 	s32 result;
 
 	heading = D_80088C84[D_8008ACBC][D_8008ACC0];
-	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&D_80088758[heading];
 
@@ -50,17 +52,17 @@ s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2)
 }
 ```
 
-Copied `func_8005BD3C`'s FINAL (already-matched) body verbatim, substituting
+Copied `DreamSys__CheckTunnelHeading`'s FINAL (already-matched) body verbatim, substituting
 the two table names -- including the `if/else`-with-shared-`result`
-shape that closed `func_8005BD3C`'s own one-word "exit block layout" residue.
+shape that closed `DreamSys__CheckTunnelHeading`'s own one-word "exit block layout" residue.
 Matched on the very first attempt, confirming that residue was a genuine
 property of the CONTROL-FLOW SHAPE (early-return guard vs. if/else), not
-something specific to `func_8005BD3C`'s own tables or caller.
+something specific to `DreamSys__CheckTunnelHeading`'s own tables or caller.
 
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py func_8005C02C` -> `59/59 words match`.
+`tools/funcdiff.py DreamSys__CheckStaircaseHeading` -> `59/59 words match`.
 
 ## Provenance
 

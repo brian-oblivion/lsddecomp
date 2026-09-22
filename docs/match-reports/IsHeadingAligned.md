@@ -1,4 +1,6 @@
-# func_8005BE28
+# IsHeadingAligned
+
+> Renamed from `func_8005BE28` on 2026-09-22 (tools/rename.py). Address 0x8005be28.
 
 **Unit:** DreamSys · **Size:** 26 words · **Status:** MATCHED, 26/26.
 
@@ -26,7 +28,7 @@ typedef struct DirectionTableEntry {
 
 extern DirectionTableEntry D_8008875C[];
 
-s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
+s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 {
 	s16 diff;
 
@@ -48,7 +50,7 @@ entry are left as `unkN` padding.
 
 ## Provenance of the two local types
 
-Both callers of this function (`func_8005BD3C`, `func_8005C02C`, both
+Both callers of this function (`DreamSys__CheckTunnelHeading`, `DreamSys__CheckStaircaseHeading`, both
 themselves stalled on the `gp_rel` blocker per their own reports) pass down,
 two levels removed, the `s32 local[4]` buffer that `DreamSys.c:727` fills via
 `Class6B5CC__GetRotationDegrees(this, local)`. That function's own report

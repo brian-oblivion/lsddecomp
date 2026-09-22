@@ -24,7 +24,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 	if (!this->vt->StaticWallLink(this, &this->linkCoordinates) && this->unk_0x124 != 0) {
 		this->vt->DynamicLink(this);
 	}
-	this->vt->func_8005B990(this);
+	this->vt->DreamSys__RestoreLinkSnapshot(this);
 	this->vt->DreamSys__NoOpSlotE8Default(this);
 }
 ```
@@ -33,7 +33,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 
 First attempt wrote the two guards as a combined `if (arg2 == 4 &&
 this->unknwon_int_0x44 == 0) { ...link-handling... }`, followed
-unconditionally by the two tail calls (`func_8005B990`, `DreamSys__NoOpSlotE8Default`).
+unconditionally by the two tail calls (`DreamSys__RestoreLinkSnapshot`, `DreamSys__NoOpSlotE8Default`).
 That reached 75/77 with both remaining diffs being the SAME two early
 branches' TARGET address: retail sends both `arg2 != 4` and `unknwon_int_0x44
 != 0` straight to the function's own epilogue, skipping the two tail calls

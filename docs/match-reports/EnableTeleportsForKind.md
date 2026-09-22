@@ -6,7 +6,7 @@
 
 ## What it does
 
-Enables teleports (unconditionally, `func_8005BF68(1)`) for four specific
+Enables teleports (unconditionally, `SetInstantTeleportersEnabled(1)`) for four specific
 trigger-type values: `0x4E`, `0xB`, `0x38`, `0x5D`.
 
 ## Derivation
@@ -26,7 +26,7 @@ j     END
 li    v0, 0x5d
 bne   a0, v0, END
 CALL:
-jal   func_8005BF68
+jal   SetInstantTeleportersEnabled
  li   a0, 1
 END:
 ...
@@ -73,7 +73,7 @@ void EnableTeleportsForKind(s32 triggerType)
         return;
     }
 call:
-    func_8005BF68(1);
+    SetInstantTeleportersEnabled(1);
 }
 ```
 
@@ -95,7 +95,7 @@ depended on avoiding an optimization the compiler is eager to apply to more
 
 **EnableTeleportsForKind** — tier B. Called as `EnableTeleportsForKind(record->kind)`
 from `ProcessDreamAuxTriggerRecord`, right after `CheckDreamAuxTriggerCondition`
-succeeds; unconditionally enables teleports (`func_8005BF68(1)`) when `kind`
+succeeds; unconditionally enables teleports (`SetInstantTeleportersEnabled(1)`) when `kind`
 is one of `{0x4E, 0xB, 0x38, 0x5D}`, otherwise a no-op. The mechanics (which
 four `kind` values, what they do) are fully derived and documented above;
 renamed the formerly-`triggerType` parameter to `kind` to match the caller's

@@ -148,8 +148,8 @@ typedef struct {
 	s32 day;
 } FlashbackEntry;
 
-/* Opaque 0x28-byte block, block-copied wholesale by func_8005B904 (read) /
-   func_8005B990 (write) -- see DreamSysUnk14::unk_0x44 below. Declared as a
+/* Opaque 0x28-byte block, block-copied wholesale by DreamSys__SaveLinkSnapshot (read) /
+   DreamSys__RestoreLinkSnapshot (write) -- see DreamSysUnk14::unk_0x44 below. Declared as a
    word array (not a byte array) so a whole-struct assignment reproduces
    retail's 4-word-per-iteration block-move codegen, per the confirmed idiom
    in DECOMPILATION_LEARNINGS.md ("A whole-struct assignment... for a block
@@ -159,8 +159,8 @@ typedef struct DreamSysUnk14Tail {
 } DreamSysUnk14Tail;
 
 /* Struct pointed to by DreamSys::unk_0x14. Confirmed fields, all from
-   func_8005B904/func_8005B990 (round 2026-09-02): +0x0 is a word cleared to
-   0 by func_8005B990 (restore) after the rest of the struct is overwritten;
+   DreamSys__SaveLinkSnapshot/DreamSys__RestoreLinkSnapshot (round 2026-09-02): +0x0 is a word cleared to
+   0 by DreamSys__RestoreLinkSnapshot (restore) after the rest of the struct is overwritten;
    +0x38 is the pre-existing 3-word vector (Class6B5CC__LocalOffsetToWorldPos/func_8005942C,
    still INCLUDE_ASM); +0x44 is a pointer to a DreamSysUnk14Tail, itself
    block-copied (not just followed) by the same two functions. The whole
@@ -582,7 +582,7 @@ typedef struct DreamSys {
 	   3-word vector lives at +0x38 of what this points to (read by
 	   Class6B5CC__LocalOffsetToWorldPos / func_8005942C, guarded by unk_0xC above). The whole
 	   struct is saved/restored to/from unk14Snapshot below by
-	   func_8005B904/func_8005B990 (round 2026-09-02). */
+	   DreamSys__SaveLinkSnapshot/DreamSys__RestoreLinkSnapshot (round 2026-09-02). */
 	DreamSysUnk14 *unk_0x14;
 	s8 unknown_values_0x18[12];
 
@@ -787,9 +787,9 @@ typedef struct DreamSys {
 	   unclaimed.
 
 	   The first 0x78 bytes of that tail are a save/restore scratch buffer
-	   for *unk_0x14: func_8005B904 copies *unk_0x14 (0x50 bytes) then
+	   for *unk_0x14: DreamSys__SaveLinkSnapshot copies *unk_0x14 (0x50 bytes) then
 	   *unk_0x14->unk_0x44 (0x28 bytes, DreamSysUnk14Tail) into these two
-	   fields; func_8005B990 copies them back and then clears
+	   fields; DreamSys__RestoreLinkSnapshot copies them back and then clears
 	   unk_0x14->unk_0x0 to 0 (round 2026-09-02). */
 	DreamSysUnk14 unk14Snapshot;
 	DreamSysUnk14Tail unk14TailSnapshot;
@@ -801,7 +801,7 @@ typedef struct DreamSys {
 	u32 unk_0x90C;
 	/* Function pointer, called as `unk_0x910(this)` and its `s32` result
 	   used as a truth value (DreamSys__TryStaircaseLink, round 2026-09-06); set from
-	   `D_80087EEC[func_8005C118()]` (both still INCLUDE_ASM) or NULLed --
+	   `D_80087EEC[GetLastSpawnExtra()]` (both still INCLUDE_ASM) or NULLed --
 	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
 	   being called through. */
 	s32 (*unk_0x910)(struct DreamSys *this);
@@ -827,7 +827,7 @@ extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);
 
 /* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseCase0,
    DreamSys__TickStaircaseCase1, DreamSys__TickStaircaseCase2, DreamSys__TickStaircaseCase3, all already matched with
-   exactly that signature), indexed by func_8005C118()'s return value and
+   exactly that signature), indexed by GetLastSpawnExtra()'s return value and
    stashed into DreamSys::unk_0x910 by DreamSys__TryStaircaseLink (round 2026-09-06). */
 extern s32 (*D_80087EEC[4])(DreamSys *this);
 
@@ -839,9 +839,9 @@ extern s32 (*D_80087EEC[4])(DreamSys *this);
    filed under are resolved (see docs/research/gp-relative-blocker.md and
    docs/research/addiu-at-blocker.md), and the one-line body
    `D_80088BA4[D_8008ACC4][D_8008ACC8].extra` matched on the first rebuild
-   (docs/match-reports/func_8005C118.md). Still declared here to type
+   (docs/match-reports/GetLastSpawnExtra.md). Still declared here to type
    DreamSys__TryStaircaseLink's call site, which remains INCLUDE_ASM in this unit. */
-extern s32 func_8005C118(void);
+extern s32 GetLastSpawnExtra(void);
 
 struct vtable_DreamSys{
 	u32 unknown_int;
@@ -1138,14 +1138,14 @@ struct vtable_DreamSys{
 	void (*ResetFlashbackList)(DreamSys *this);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x220/+0x224).
 	   Typed and matched this round (2026-09-02): a save/restore pair for
-	   *this->unk_0x14 (see DreamSysUnk14). func_8005B904 saves *unk_0x14
+	   *this->unk_0x14 (see DreamSysUnk14). DreamSys__SaveLinkSnapshot saves *unk_0x14
 	   and *unk_0x14->unk_0x44 into this->unk14Snapshot/unk14TailSnapshot;
-	   func_8005B990 restores them and clears unk_0x14->unk_0x0 to 0. Both
+	   DreamSys__RestoreLinkSnapshot restores them and clears unk_0x14->unk_0x0 to 0. Both
 	   take only `this` -- the previous note's "driven by a length read
 	   from this->unk_0x14" undersold it: unk_0x14 is a POINTER, dereferenced
 	   for its own bytes, not read as a length. */
-	void (*func_8005B904)(DreamSys *this);
-	void (*func_8005B990)(DreamSys *this);
+	void (*DreamSys__SaveLinkSnapshot)(DreamSys *this);
+	void (*DreamSys__RestoreLinkSnapshot)(DreamSys *this);
 	/* This field is named `func_228`, not `func_8005BA20`, even though it
 	   IS func_8005BA20's slot (resolved via tools/classtable.py this
 	   round) -- src/code_1677c.c (a different unit, out of this runner's
@@ -1155,7 +1155,7 @@ struct vtable_DreamSys{
 	   updating that call site in the same commit.
 	   This slot was previously thought to sit PAST a documented struct end
 	   at 0x21c; that was also wrong -- it directly follows
-	   ResetFlashbackList/func_8005B904/func_8005B990 above, no gap.
+	   ResetFlashbackList/DreamSys__SaveLinkSnapshot/DreamSys__RestoreLinkSnapshot above, no gap.
 	   Original call-site note preserved: called once, from Class6D3C8's
 	   constructor (func_80025FDC in src/code_1677c.c), as
 	   this->vt->func_228(this, arg->unk14) right after DreamSys is
@@ -1249,7 +1249,7 @@ extern s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *
 extern s32 func_8005BF48(void);
 
 /* Called by DreamSys__TryTunnelLink as (this, &local) where `local` is a 0x10-byte
-   stack buffer also forwarded to func_8005BD3C below; return value is
+   stack buffer also forwarded to DreamSys__CheckTunnelHeading below; return value is
    discarded at this call site (round 2026-09-02). NOT in this unit at all --
    its body disassembles into asm/code_d294.s, an uncarved segment -- so this
    prototype only types this one call site, per the "calling into a function
@@ -1263,9 +1263,9 @@ extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
    same `local` buffer Class6B5CC__GetRotationDegrees fills above; result used as a truth
    value (`beqz`), so s32 (round 2026-09-02). Blocked by both the
    gp-relative and addiu_at blockers -- see
-   docs/match-reports/func_8005BD3C.md -- so it stays INCLUDE_ASM; this
+   docs/match-reports/DreamSys__CheckTunnelHeading.md -- so it stays INCLUDE_ASM; this
    prototype only types the call site. */
-extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
+extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Called by DreamSys__TryStaircaseLink (round 2026-09-06) as (&this->linkCoordinates,
    currentPos, this->currentStage) -- same forwarding shape as
@@ -1275,11 +1275,11 @@ extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
 extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
 
 /* Called by DreamSys__TryStaircaseLink as (&this->unk_0x888, &this->unk_0x884, &local) --
-   identical call shape to func_8005BD3C above (same `local` buffer, same two
+   identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same two
    `this` fields), so the same signature. Blocked by both the gp-relative and
-   addiu_at blockers -- see docs/match-reports/func_8005C02C.md -- so it
+   addiu_at blockers -- see docs/match-reports/DreamSys__CheckStaircaseHeading.md -- so it
    stays INCLUDE_ASM; this prototype only types the call site. */
-extern s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2);
+extern s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Same (target, currentPos, stage) forwarding shape as Test4TunnelLinks
    above (see that function's own comment) -- called by DreamSys__TryInstantTeleportLink as

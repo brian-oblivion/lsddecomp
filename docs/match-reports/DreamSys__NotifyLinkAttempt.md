@@ -15,7 +15,7 @@ Vtable slot `+0x088`. Dispatches on `arg1`:
    `(this, arg1)`, discarding its return value.
 2. If `arg1 == -2`: chases `this->unk_0x4C->methods->slot0x11C(this->unk_0x4C,
    (u8 *)this->unk_0x14 + 0x18)`, and if the result's `->unk_0x4->unk_0x2C`
-   is NOT `2`, calls `this->vt->func_8005B990(this)` (vtable slot `+0x224`,
+   is NOT `2`, calls `this->vt->DreamSys__RestoreLinkSnapshot(this)` (vtable slot `+0x224`,
    already matched elsewhere in this unit — the `unk_0x14` snapshot
    restorer) and returns; otherwise falls into the shared tail below.
 3. Else if `arg1 == -1`: recomputes `this->unk_0xB8` from
@@ -100,7 +100,7 @@ shared_tail:
 	return;
 
 neg2_mismatch:
-	this->vt->func_8005B990(this);
+	this->vt->DreamSys__RestoreLinkSnapshot(this);
 }
 ```
 
@@ -114,7 +114,7 @@ body matched immediately. The remaining 22-word gap was entirely
 CONTROL-FLOW LAYOUT, not value logic: retail places the `arg1 == -1` body
 as the immediate fallthrough of the two comparisons (with the `-2` body
 positioned physically LATER, reached by a forward branch), and — more
-subtly — places the `-2` path's MISMATCH handling (the `func_8005B990`
+subtly — places the `-2` path's MISMATCH handling (the `DreamSys__RestoreLinkSnapshot`
 call) physically AFTER the shared tail block, reached by its own forward
 branch from a `bne`, while the shared tail itself is what naturally falls
 out of both the `-1` success path and the `-2` match path. A plain nested

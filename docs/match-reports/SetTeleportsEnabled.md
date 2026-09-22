@@ -6,7 +6,7 @@
 
 Enables or disables teleports depending on the trigger-type value passed in:
 enabled only for trigger types `0xB` and `0x3`, disabled for everything else.
-Forwards the resulting boolean to `func_8005BF68` (defined in `DreamSys`,
+Forwards the resulting boolean to `SetInstantTeleportersEnabled` (defined in `DreamSys`,
 still `INCLUDE_ASM` at the time of this report — only its call-site signature
 mattered here).
 
@@ -24,7 +24,7 @@ bne   $a0, $v0, .L8005C6FC
 .L8005C6F8:
 ori   $v1, $zero, 0x1          ; v1 = 1
 .L8005C6FC:
-jal   func_8005BF68
+jal   SetInstantTeleportersEnabled
  addu $a0, $v1, $zero
 ...
 ```
@@ -36,20 +36,20 @@ short-circuit evaluation order of `a0 == 0xB || a0 == 3`, checked in that
 order, so the C is written the same way rather than as two separate `if`s.
 
 ```c
-extern void func_8005BF68(bool value);
+extern void SetInstantTeleportersEnabled(bool value);
 
 void SetTeleportsEnabled(s32 triggerType)
 {
-    func_8005BF68(triggerType == 0xB || triggerType == 3);
+    SetInstantTeleportersEnabled(triggerType == 0xB || triggerType == 3);
 }
 ```
 
-`func_8005BF68`'s own definition lives in `DreamSys` and was untouched by this
+`SetInstantTeleportersEnabled`'s own definition lives in `DreamSys` and was untouched by this
 change — only an `extern` prototype was added here so the call site type-checks.
 Its parameter is a plain 0/1 value coming out of the `||` here, hence `bool`;
 nothing at this call site says anything about its return type, and the return
 value is discarded, so it is declared `void` (weak evidence — revisit if
-`DreamSys`'s own work on `func_8005BF68` finds otherwise).
+`DreamSys`'s own work on `SetInstantTeleportersEnabled` finds otherwise).
 
 ## Proposed learning
 
@@ -64,8 +64,8 @@ the callee's own body is untouched either way.
 
 **SetTeleportsEnabled** — tier A, pre-existing (not renamed this round;
 reviewed as part of the track 3 pass). A pure leaf: forwards
-`triggerType == 0xB || triggerType == 3` to `func_8005BF68`. The mechanics
-ARE the name. Note: `func_8005BF68` (called here and by
+`triggerType == 0xB || triggerType == 3` to `SetInstantTeleportersEnabled`. The mechanics
+ARE the name. Note: `SetInstantTeleportersEnabled` (called here and by
 `EnableTeleportsForKind`) is defined in `DreamSys`, not in this unit --
 MATCHED there round 43 (this report's "still `INCLUDE_ASM` at the time of
 this report" note is accurate for when it was written but is now stale;

@@ -113,7 +113,7 @@ staircase:
 		return false;
 	}
 	Class6B5CC__GetRotationDegrees(this, local);
-	if (!func_8005C02C(&this->unk_0x888, &this->unk_0x884, local)) {
+	if (!DreamSys__CheckStaircaseHeading(&this->unk_0x888, &this->unk_0x884, local)) {
 		return false;
 	}
 	if (this->unk_0xA8 == 0) {
@@ -125,7 +125,7 @@ staircase:
 	this->unk_0x908 = 1;
 	this->unk_0x90C = 1;
 	this->unk_0x914 = 0;
-	this->unk_0x910 = D_80087EEC[func_8005C118()];
+	this->unk_0x910 = D_80087EEC[GetLastSpawnExtra()];
 	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
 	this->unk_0x910(this);
 	return false;
@@ -164,13 +164,13 @@ All in `include/DreamSys.h`:
   `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
   existing definitions in `src/DreamSys.c`.
 - **`extern s32 Test4StaircaseNodes(...)`** and **`extern s32
-  func_8005C02C(...)`** forward/call-site prototypes added near the
-  existing `func_8005BD3C` one (same 3-arg shape; `func_8005C02C` is
-  blocked by the same gp-relative+addiu_at pair as `func_8005BD3C`, per its
+  DreamSys__CheckStaircaseHeading(...)`** forward/call-site prototypes added near the
+  existing `DreamSys__CheckTunnelHeading` one (same 3-arg shape; `DreamSys__CheckStaircaseHeading` is
+  blocked by the same gp-relative+addiu_at pair as `DreamSys__CheckTunnelHeading`, per its
   own existing stub report). `Test4StaircaseNodes` is defined later in this
   same unit's ROM order, so its prototype here is a plain forward
   declaration, not a cross-unit one.
-- **`extern s32 func_8005C118(void)`** -- corrected from a guessed
+- **`extern s32 GetLastSpawnExtra(void)`** -- corrected from a guessed
   `(DreamSys *this)` signature: the disassembly's call site leaves `$a0`
   holding an unrelated leftover value (`currentPos->position.z`, from the
   immediately preceding `lh`) with no explicit argument setup, matching the

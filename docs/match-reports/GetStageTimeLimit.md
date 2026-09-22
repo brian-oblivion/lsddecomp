@@ -1,4 +1,6 @@
-# func_8005BB14
+# GetStageTimeLimit
+
+> Renamed from `func_8005BB14` on 2026-09-22 (tools/rename.py). Address 0x8005bb14.
 
 **Unit:** DreamSys · **Size:** 7 words · **Status:** MATCHED, 7/7.
 
@@ -9,7 +11,7 @@ declared in `include/DreamSys.h:1059`) and return the time limit for a given
 stage.
 
 ```c
-s32 func_8005BB14(s32 stage)
+s32 GetStageTimeLimit(s32 stage)
 {
 	return STAGE_TIME_LIMITS[stage];
 }

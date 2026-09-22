@@ -12,7 +12,7 @@ Same overall shape as the already-matched `DreamSys__StaticWallLink`
 `this->linkCoordinates`/`currentPos`/`this->currentStage`, `ExecuteLink` on
 success) but with two extra steps folded in between the link test and
 `ExecuteLink`: a call into an out-of-unit function that fills a small stack
-buffer, then a call into `func_8005BD3C` (in-unit, still `INCLUDE_ASM`,
+buffer, then a call into `DreamSys__CheckTunnelHeading` (in-unit, still `INCLUDE_ASM`,
 blocked) that consumes that buffer and gates the rest of the function.
 
 `Test4TunnelLinks` is already a matched, real C function in this unit
@@ -41,7 +41,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	if (result < 0)
 		return false;
 	Class6B5CC__GetRotationDegrees(this, local);
-	if (!func_8005BD3C(&this->unk_0x888, &this->unk_0x884, local))
+	if (!DreamSys__CheckTunnelHeading(&this->unk_0x888, &this->unk_0x884, local))
 		return false;
 	if (this->unk_0xA8 == 0)
 		return false;
@@ -54,7 +54,7 @@ Supporting header additions (`include/DreamSys.h`):
 
 ```c
 extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
-extern s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2);
+extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
 ```
 
 Two DreamSys fields retyped from raw byte arrays to `s32`, since this
@@ -65,7 +65,7 @@ function writes/reads them as whole words (previously
 s32 unk_0x880;   /* written by DreamSys__TryStageTimerLink (round 2026-09-02, another
                     function in this same round -- see that report) */
 s32 unk_0x888;   /* address taken here (&this->unk_0x888) and forwarded
-                    to func_8005BD3C -- read-through by that (still
+                    to DreamSys__CheckTunnelHeading -- read-through by that (still
                     INCLUDE_ASM) callee, not by this function */
 ```
 

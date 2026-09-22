@@ -1,4 +1,6 @@
-# func_8005B904 / func_8005B990
+# DreamSys__SaveLinkSnapshot / DreamSys__RestoreLinkSnapshot
+
+> Renamed from `func_8005B904` on 2026-09-22 (tools/rename.py). Address 0x8005b904.
 
 **Unit:** DreamSys · **Sizes:** 35 words / 36 words · **Status:** BOTH MATCHED (byte-exact, full build verified)
 **Vtable slots:** `DREAMSYS_METHODS +0x220` / `+0x224`
@@ -9,7 +11,7 @@ neither makes sense read in isolation.
 ## Context
 
 Both functions were previously named-only placeholders
-(`void *func_8005B904; void *func_8005B990;`) with a comment guessing they
+(`void *DreamSys__SaveLinkSnapshot; void *DreamSys__RestoreLinkSnapshot;`) with a comment guessing they
 were "driven by a length read from `this->unk_0x14`". That undersold it:
 `unk_0x14` is a POINTER (already documented, just untyped beyond `void *`),
 and these two functions are a save/restore pair for the WHOLE struct it
@@ -18,18 +20,18 @@ points to, plus a second struct reached through one of its fields.
 Both bodies are the confirmed "whole-struct assignment" block-move idiom
 (`DECOMPILATION_LEARNINGS.md`: "batches 4 words per iteration cycling four
 temp registers... 2.6.3's inlined block-move for a struct assignment").
-`func_8005B904` copies `*this->unk_0x14` (0x50 bytes) then
+`DreamSys__SaveLinkSnapshot` copies `*this->unk_0x14` (0x50 bytes) then
 `*this->unk_0x14->unk_0x44` (0x28 bytes) into a scratch area at
 `this+0x890` (inside the struct's already-documented, still partly-unclaimed
 allocator tail -- see `DreamSys::unknown_values_0x890`'s history in the
-header). `func_8005B990` copies the SAME two regions back, then clears
+header). `DreamSys__RestoreLinkSnapshot` copies the SAME two regions back, then clears
 `unk_0x14->unk_0x0` to 0.
 
 This resolves concrete new fields of the struct `unk_0x14` points to,
 previously only known to hold "a 3-word vector at +0x38" (read by
 `Class6B5CC__LocalOffsetToWorldPos`/`func_8005942C`, both still `INCLUDE_ASM`):
 
-- `+0x0`: a word, cleared to 0 by `func_8005B990`'s restore, after the rest
+- `+0x0`: a word, cleared to 0 by `DreamSys__RestoreLinkSnapshot`'s restore, after the rest
   of the struct has already been overwritten.
 - `+0x38`: the pre-existing 3-word vector (unchanged, just now embedded in
   a named struct instead of floating as a comment).
@@ -64,7 +66,7 @@ DreamSysUnk14Tail unk14TailSnapshot;
 ```
 
 ```c
-void func_8005B904(DreamSys *this)
+void DreamSys__SaveLinkSnapshot(DreamSys *this)
 {
 	DreamSysUnk14 *p = this->unk_0x14;
 
@@ -72,7 +74,7 @@ void func_8005B904(DreamSys *this)
 	this->unk14TailSnapshot = *p->unk_0x44;
 }
 
-void func_8005B990(DreamSys *this)
+void DreamSys__RestoreLinkSnapshot(DreamSys *this)
 {
 	DreamSysUnk14 *p = this->unk_0x14;
 
@@ -109,7 +111,7 @@ DreamSysUnk14 *p = this->unk_0x14;
 ```
 
 -- and dereference through `p` for every subsequent access in the same
-function. This is safe for `func_8005B990` specifically because caching
+function. This is safe for `DreamSys__RestoreLinkSnapshot` specifically because caching
 the POINTER (the address stored in `this->unk_0x14`) is not the same as
 caching the STRUCT CONTENT it points to: the restore's second statement
 (`*p->unk_0x44 = ...`) still issues a fresh memory read of `p->unk_0x44`
@@ -126,13 +128,13 @@ per-function `funcdiff.py` window).
 
 **A repeated read of an unchanging pointer field is NOT reliably CSE'd
 across separate statements in this compiler when a whole-struct assignment
-sits between the reads** -- `func_8005B904`/`func_8005B990` both reloaded
+sits between the reads** -- `DreamSys__SaveLinkSnapshot`/`DreamSys__RestoreLinkSnapshot` both reloaded
 `this->unk_0x14` a second time (extra `lw`+`nop`, full-file address drift)
 when written as two independent `this->unk_0x14`-dereferencing statements.
 Caching the pointer into an explicit local (`DreamSysUnk14 *p =
 this->unk_0x14;`) and dereferencing through `p` closed it immediately, in
-both the read direction (`func_8005B904`, no intervening writes to `*p`)
-and the write direction (`func_8005B990`, where the SECOND access
+both the read direction (`DreamSys__SaveLinkSnapshot`, no intervening writes to `*p`)
+and the write direction (`DreamSys__RestoreLinkSnapshot`, where the SECOND access
 deliberately still needs a fresh read of `p->unk_0x44` after the first
 statement overwrites `*p` -- caching the pointer, not the pointee, is what
 matters). Worth checking any other multi-step access through the same

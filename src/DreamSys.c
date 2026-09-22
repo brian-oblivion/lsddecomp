@@ -119,7 +119,7 @@ shared_tail:
 	return;
 
 neg2_mismatch:
-	this->vt->func_8005B990(this);
+	this->vt->DreamSys__RestoreLinkSnapshot(this);
 }
 
 void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
@@ -234,7 +234,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 	if (!this->vt->StaticWallLink(this, &this->linkCoordinates) && this->unk_0x124 != 0) {
 		this->vt->DynamicLink(this);
 	}
-	this->vt->func_8005B990(this);
+	this->vt->DreamSys__RestoreLinkSnapshot(this);
 	this->vt->DreamSys__NoOpSlotE8Default(this);
 }
 
@@ -741,7 +741,7 @@ s32 func_80059E98(DreamSys *this, s32 arg1)
 		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
 		 && !this->vt->DreamSys__TryInstantTeleportLink(this, pos)
 		 && !this->vt->DreamSys__TryTunnelLink(this, pos)) {
-			this->vt->func_8005B904(this);
+			this->vt->DreamSys__SaveLinkSnapshot(this);
 			D_80087E3C[arg1](this, delta, (void *)(this->unk_0x90C < 1));
 			if (this->currentStage == 0
 			 && this->unk_0x14->unk_0x1C < -0x7D0
@@ -1022,7 +1022,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	if (result < 0)
 		return false;
 	Class6B5CC__GetRotationDegrees(this, local);
-	if (!func_8005BD3C(&this->unk_0x888, &this->unk_0x884, local))
+	if (!DreamSys__CheckTunnelHeading(&this->unk_0x888, &this->unk_0x884, local))
 		return false;
 	if (this->unk_0xA8 == 0)
 		return false;
@@ -1141,7 +1141,7 @@ staircase:
 		return false;
 	}
 	Class6B5CC__GetRotationDegrees(this, local);
-	if (!func_8005C02C(&this->unk_0x888, &this->unk_0x884, local)) {
+	if (!DreamSys__CheckStaircaseHeading(&this->unk_0x888, &this->unk_0x884, local)) {
 		return false;
 	}
 	if (this->unk_0xA8 == 0) {
@@ -1153,7 +1153,7 @@ staircase:
 	this->unk_0x908 = 1;
 	this->unk_0x90C = 1;
 	this->unk_0x914 = 0;
-	this->unk_0x910 = D_80087EEC[func_8005C118()];
+	this->unk_0x910 = D_80087EEC[GetLastSpawnExtra()];
 	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
 	this->unk_0x910(this);
 	return false;
@@ -1576,7 +1576,7 @@ void DreamSys__ResetFlashbackList(DreamSys *this)
 	this->amountFlashbacksAvailable = 0;
 }
 
-void func_8005B904(DreamSys *this)
+void DreamSys__SaveLinkSnapshot(DreamSys *this)
 {
 	DreamSysUnk14 *p = this->unk_0x14;
 
@@ -1584,7 +1584,7 @@ void func_8005B904(DreamSys *this)
 	this->unk14TailSnapshot = *p->unk_0x44;
 }
 
-void func_8005B990(DreamSys *this)
+void DreamSys__RestoreLinkSnapshot(DreamSys *this)
 {
 	DreamSysUnk14 *p = this->unk_0x14;
 
@@ -1644,7 +1644,7 @@ s32 CalcNavigationScore(void)
 	return sum;
 }
 
-s32 func_8005BB14(s32 stage)
+s32 GetStageTimeLimit(s32 stage)
 {
 	return STAGE_TIME_LIMITS[stage];
 }
@@ -1688,15 +1688,15 @@ s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32
 	                       D_80088980, D_80088820, 1);
 }
 
-/* Unit-local reading of the second parameter: the caller (func_8005BD3C)
+/* Unit-local reading of the second parameter: the caller (DreamSys__CheckTunnelHeading)
    passes down a `s32 local[4]` buffer that Class6B5CC__GetRotationDegrees (code_d294_c) fills
    with a 3-entry WholeFrac_d294 table; the byte offset +4 read here lands on
    that table's `out[1].whole` (a degrees value, per Class6B5CC__GetRotationDegrees's own
    report). This function reads it unsigned (`lhu`), independent of
    WholeFrac_d294's own `s16 whole` -- a second, disjoint view of the same
    bytes, so it is kept local rather than folded into that shared struct.
-   Moved above func_8005BD3C (round 43) because that function's own arg2 is
-   cast to this type before being forwarded to func_8005BE28 below. */
+   Moved above DreamSys__CheckTunnelHeading (round 43) because that function's own arg2 is
+   cast to this type before being forwarded to IsHeadingAligned below. */
 typedef struct DirectionCheckArg {
 	s8 unk0[4];
 	u16 heading;
@@ -1716,13 +1716,13 @@ typedef struct DirectionTableEntry {
 
 extern DirectionTableEntry D_8008875C[];
 
-/* Forward declaration: defined below in ROM order, called by func_8005BD3C
+/* Forward declaration: defined below in ROM order, called by DreamSys__CheckTunnelHeading
    just above it. */
-extern s32 func_8005BE28(DirectionCheckArg *a0, u8 a1);
+extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);
 
 /* D_800889B8: a per-stage table of pointers to byte arrays (4-byte stride,
    indexed by D_8008ACBC), each further indexed by D_8008ACC0 to read the
-   "heading" byte passed to func_8005BE28. D_80088858 is the analogous
+   "heading" byte passed to IsHeadingAligned. D_80088858 is the analogous
    table for D_8008ACC4/D_8008ACC8. Neither array's own element type is
    dereferenced beyond a single `u8` here. */
 extern u8 *D_800889B8[];
@@ -1730,7 +1730,7 @@ extern u8 *D_80088858[];
 
 /* A `DirectionTableEntry`-STRIDED (12-byte) table whose first element
    happens to sit 4 bytes before the separately-referenced `D_8008875C`
-   (the angle table `func_8005BE28` indexes) -- splat drew the boundary
+   (the angle table `IsHeadingAligned` indexes) -- splat drew the boundary
    there because `D_8008875C` is independently referenced, not because the
    underlying data is two different tables. This function only ever
    ADDRESS-TAKES an element (`&D_80088758[i]`), never dereferences one, so
@@ -1739,14 +1739,14 @@ extern u8 *D_80088858[];
    local type for one call site. */
 extern DirectionTableEntry D_80088758[];
 
-s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2)
+s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
 	u8 heading;
 	s32 idx;
 	s32 result;
 
 	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
-	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&D_80088758[heading];
 
@@ -1761,7 +1761,7 @@ s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2)
 	return result;
 }
 
-s32 func_8005BE28(DirectionCheckArg *a0, u8 a1)
+s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 {
 	s16 diff;
 
@@ -1834,11 +1834,11 @@ s32 func_8005BF48(void)
 
 /* Flag set here, tested by Test4InstantTeleporters right below; local to
    this unit -- code_4cd08.c calls the setter through its own extern
-   (`extern void func_8005BF68(bool value);`), never touches the flag
+   (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */
 extern s32 D_8008ABE4;
 
-void func_8005BF68(bool value)
+void SetInstantTeleportersEnabled(bool value)
 {
 	D_8008ABE4 = value;
 }
@@ -1875,20 +1875,20 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 	return -1;
 }
 
-/* Same role as D_800889B8/D_80088858 for func_8005BD3C above, but for this
+/* Same role as D_800889B8/D_80088858 for DreamSys__CheckTunnelHeading above, but for this
    function's own "link test" (indexed the same way: D_8008ACBC/D_8008ACC0
    for the heading lookup, D_8008ACC4/D_8008ACC8 for the second table). */
 extern u8 *D_80088C84[];
 extern u8 *D_80088BDC[];
 
-s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2)
+s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
 	u8 heading;
 	s32 idx;
 	s32 result;
 
 	heading = D_80088C84[D_8008ACBC][D_8008ACC0];
-	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&D_80088758[heading];
 
@@ -1903,7 +1903,7 @@ s32 func_8005C02C(s32 *arg0, s32 *arg1, void *arg2)
 	return result;
 }
 
-s32 func_8005C118(void)
+s32 GetLastSpawnExtra(void)
 {
 	return D_80088BA4[D_8008ACC4][D_8008ACC8].extra;
 }

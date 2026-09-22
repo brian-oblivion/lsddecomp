@@ -1,4 +1,6 @@
-# func_8005C118 — MATCHED 14/14
+# GetLastSpawnExtra — MATCHED 14/14
+
+> Renamed from `func_8005C118` on 2026-09-22 (tools/rename.py). Address 0x8005c118.
 
 **Unit:** DreamSys · **Size:** 14 words · **Status:** MATCHED, round 43.
 
@@ -21,7 +23,7 @@ field, a signed byte at offset 5 -- matches the retail `lb` at `+0x5`).
 ## Final body
 
 ```c
-s32 func_8005C118(void)
+s32 GetLastSpawnExtra(void)
 {
 	return D_80088BA4[D_8008ACC4][D_8008ACC8].extra;
 }
@@ -29,14 +31,14 @@ s32 func_8005C118(void)
 
 `D_80088BA4`, `D_8008ACC4`, `D_8008ACC8` were all already declared in
 `include/DreamSys.h`. Updated the stale header comment on the
-`extern s32 func_8005C118(void);` prototype (used to type its still-
+`extern s32 GetLastSpawnExtra(void);` prototype (used to type its still-
 `INCLUDE_ASM` caller `DreamSys__TryStaircaseLink`, same unit) from "blocked by both
 gp-relative and addiu_at" to MATCHED.
 
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py func_8005C118` -> `14/14 words match`.
+`tools/funcdiff.py GetLastSpawnExtra` -> `14/14 words match`.
 
 ## Provenance
 

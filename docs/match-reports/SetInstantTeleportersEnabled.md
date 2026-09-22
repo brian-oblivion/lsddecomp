@@ -1,4 +1,6 @@
-# func_8005BF68 — MATCHED 3/3
+# SetInstantTeleportersEnabled — MATCHED 3/3
+
+> Renamed from `func_8005BF68` on 2026-09-22 (tools/rename.py). Address 0x8005bf68.
 
 **Unit:** DreamSys · **Size:** 3 words · **Status:** MATCHED, round 43.
 
@@ -15,7 +17,7 @@ missing.
 ## What it does
 
 A one-instruction setter: stores its argument into the global flag
-`D_8008ABE4`. `code_4cd08.c` calls it as `func_8005BF68(bool value)` with
+`D_8008ABE4`. `code_4cd08.c` calls it as `SetInstantTeleportersEnabled(bool value)` with
 either a computed boolean expression or the literal `1` -- consistent with a
 plain `bool` parameter here.
 
@@ -24,11 +26,11 @@ plain `bool` parameter here.
 ```c
 /* Flag set here, tested by Test4InstantTeleporters right below; local to
    this unit -- code_4cd08.c calls the setter through its own extern
-   (`extern void func_8005BF68(bool value);`), never touches the flag
+   (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */
 extern s32 D_8008ABE4;
 
-void func_8005BF68(bool value)
+void SetInstantTeleportersEnabled(bool value)
 {
 	D_8008ABE4 = value;
 }
@@ -42,7 +44,7 @@ and its underlying data is a full 32-bit word (`asm/data/7B3C0.sdata.s`,
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py func_8005BF68` -> `3/3 words match`.
+`tools/funcdiff.py SetInstantTeleportersEnabled` -> `3/3 words match`.
 
 ### Proposed learning
 

@@ -69,11 +69,11 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     SetTeleportsEnabled(a0);
 }
 
-extern void func_8005BF68(bool value);
+extern void SetInstantTeleportersEnabled(bool value);
 
 void SetTeleportsEnabled(s32 triggerType)
 {
-    func_8005BF68(triggerType == 0xB || triggerType == 3);
+    SetInstantTeleportersEnabled(triggerType == 0xB || triggerType == 3);
 }
 
 void EnableTeleportsForKind(s32 kind)
@@ -94,7 +94,7 @@ void EnableTeleportsForKind(s32 kind)
         return;
     }
 call:
-    func_8005BF68(1);
+    SetInstantTeleportersEnabled(1);
 }
 
 void TickDreamAuxSlots2(void)

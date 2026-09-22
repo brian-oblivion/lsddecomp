@@ -1,4 +1,6 @@
-# func_8005BD3C — MATCHED 59/59
+# DreamSys__CheckTunnelHeading — MATCHED 59/59
+
+> Renamed from `func_8005BD3C` on 2026-09-22 (tools/rename.py). Address 0x8005bd3c.
 
 **Unit:** DreamSys · **Size:** 59 words · **Status:** MATCHED, round 43.
 
@@ -14,10 +16,10 @@ assigned queue).
 
 Looks up a "heading" byte from `D_800889B8[D_8008ACBC][D_8008ACC0]`,
 validates it against `currentPos`'s stored heading via the already-matched
-`func_8005BE28` (a cardinal-direction proximity test), and on success
+`IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
 table, `D_80088758`) through its two optional output parameters. Called by
-`DreamSys__TryTunnelLink` (still `INCLUDE_ASM`) as `func_8005BD3C(&this->unk_0x888,
+`DreamSys__TryTunnelLink` (still `INCLUDE_ASM`) as `DreamSys__CheckTunnelHeading(&this->unk_0x888,
 &this->unk_0x884, local)`.
 
 ## New declarations needed
@@ -33,7 +35,7 @@ extern u8 *D_80088858[];
 
 `D_80088758` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
 table whose first element sits exactly 4 bytes before the SEPARATELY
-referenced `D_8008875C` (the angle table `func_8005BE28` already indexes,
+referenced `D_8008875C` (the angle table `IsHeadingAligned` already indexes,
 matched earlier this round's queue). splat drew a symbol boundary there
 because `D_8008875C` is independently referenced elsewhere, not because the
 underlying retail data is genuinely two different tables. This function
@@ -49,24 +51,24 @@ extern DirectionTableEntry D_80088758[];
 
 Also moved the `DirectionCheckArg` typedef, the `DirectionTableEntry`
 typedef, `extern DirectionTableEntry D_8008875C[];`, and a new forward
-declaration `extern s32 func_8005BE28(DirectionCheckArg *a0, u8 a1);` to
-BEFORE `func_8005BD3C` (they previously sat between it and
-`func_8005BE28`'s own definition) -- `func_8005BD3C` needs `DirectionCheckArg`
+declaration `extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);` to
+BEFORE `DreamSys__CheckTunnelHeading` (they previously sat between it and
+`IsHeadingAligned`'s own definition) -- `DreamSys__CheckTunnelHeading` needs `DirectionCheckArg`
 to cast its own `arg2` before forwarding it, and needs to call
-`func_8005BE28`, which is defined later in ROM order. This is a pure
+`IsHeadingAligned`, which is defined later in ROM order. This is a pure
 textual reordering of type declarations and one forward declaration; no
 function DEFINITION moved, so ROM address order is unaffected.
 
 ## Attempt 1: right values, wrong exit-block layout (36/59, 84364 bytes drift)
 
 ```c
-s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2)
+s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
 	u8 heading;
 	s32 idx;
 
 	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
-	if (!func_8005BE28((DirectionCheckArg *)arg2, heading))
+	if (!IsHeadingAligned((DirectionCheckArg *)arg2, heading))
 		return 0;
 
 	if (arg1 != NULL)
@@ -93,14 +95,14 @@ instruction retail has that this shape does not.
 ## Fix: single shared `result` variable, if/else instead of early return (59/59)
 
 ```c
-s32 func_8005BD3C(s32 *arg0, s32 *arg1, void *arg2)
+s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
 	u8 heading;
 	s32 idx;
 	s32 result;
 
 	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
-	if (func_8005BE28((DirectionCheckArg *)arg2, heading)) {
+	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&D_80088758[heading];
 
@@ -126,7 +128,7 @@ retail has. Byte-exact on this second attempt.
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py func_8005BD3C` -> `59/59 words match`.
+`tools/funcdiff.py DreamSys__CheckTunnelHeading` -> `59/59 words match`.
 
 ### Proposed learning
 
