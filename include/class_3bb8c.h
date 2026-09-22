@@ -851,50 +851,50 @@ typedef struct Class86AA0 Class86AA0;
 typedef struct Class86AA0Methods Class86AA0Methods;
 
 /* Forward declaration: full definition (GenericTagMethods_3bb8c_c /
- * GenericTagInst_3bb8c_c) is below, established from func_8004D434; needed
+ * GenericTagInst_3bb8c_c) is below, established from Class86AA0__ForwardIfTag34; needed
  * here already for Class86AA0Methods::slotA0's parameter type. */
 typedef struct GenericTagInst_3bb8c_c GenericTagInst_3bb8c_c;
 
 /*
  * Vtable D_80086AA0 (asm/data/76DC8.data.s, header word 0x24). Sibling of
- * Class869D8Methods above, same shape: ctor at +0x008 (func_8004D3DC,
- * called by New_Class86AA0/func_8004D38C). +0x0B8 is dispatched by this
- * class's own func_8004D434 (slot +0x09C in the same table); its exact
+ * Class869D8Methods above, same shape: ctor at +0x008 (Class86AA0__Class86AA0,
+ * called by New_Class86AA0/New_Class86AA0). +0x0B8 is dispatched by this
+ * class's own Class86AA0__ForwardIfTag34 (slot +0x09C in the same table); its exact
  * purpose is unestablished beyond "called on self with no other args".
  */
 struct Class86AA0Methods {
     u8 pad000[0x008];
-    void (*ctor)(Class86AA0 *self);            /* +0x008, func_8004D3DC */
+    void (*ctor)(Class86AA0 *self);            /* +0x008, Class86AA0__Class86AA0 */
     u8 pad00C[0x0A0 - 0x00C];
-    /* Called by func_8004D47C (self's own slot +0x0B8 occupant, see below)
+    /* Called by Class86AA0__ForwardIfArg2InRange (self's own slot +0x0B8 occupant, see below)
      * when its own arg2 is in [5, 9). arg1 is forwarded opaquely; return
      * value unused. */
     void (*slotA0)(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2); /* +0x0A0 */
     u8 pad0A4[0x0B8 - 0x0A4];
-    /* Declared here 1-argument to match func_8004D434's own call site
+    /* Declared here 1-argument to match Class86AA0__ForwardIfTag34's own call site
      * (`self->methods->slotB8(self)`, already matched) -- but this slot's
-     * REAL occupant is func_8004D47C, whose own body reads three args
+     * REAL occupant is Class86AA0__ForwardIfArg2InRange, whose own body reads three args
      * (self, arg1, arg2). Both are right about their own codegen; see
-     * func_8004D3DC's report/GetClass6B5CCMethods's declaration below for the
+     * Class86AA0__Class86AA0's report/GetClass6B5CCMethods's declaration below for the
      * identical situation on a different symbol. Not reconciled: widening
-     * this field to 3 args would force func_8004D434's call site to
+     * this field to 3 args would force Class86AA0__ForwardIfTag34's call site to
      * synthesize an arg2 it doesn't have, breaking that already-matched
-     * function. func_8004D47C's own C definition is typed independently
+     * function. Class86AA0__ForwardIfArg2InRange's own C definition is typed independently
      * of this field (the vtable's storage is still raw asm data, so
      * nothing here type-checks it either way). */
-    void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by func_8004D434 */
+    void (*slotB8)(Class86AA0 *self);          /* +0x0B8, called by Class86AA0__ForwardIfTag34 */
 };
 
 struct Class86AA0 {
     Class86AA0Methods *methods;                /* +0x000 */
     u8 pad004[0x034 - 0x004];
-    u16 unk34;                                 /* +0x034, func_8004D3DC: zeroed in the ctor */
-    u16 unk36;                                 /* +0x036, func_8004D3DC: zeroed in the ctor */
-    s32 unk38;                                 /* +0x038, func_8004D3DC: zeroed in the ctor */
+    u16 unk34;                                 /* +0x034, Class86AA0__Class86AA0: zeroed in the ctor */
+    u16 unk36;                                 /* +0x036, Class86AA0__Class86AA0: zeroed in the ctor */
+    s32 unk38;                                 /* +0x038, Class86AA0__Class86AA0: zeroed in the ctor */
 };
 
 extern Class86AA0Methods D_80086AA0;
-extern Class86AA0Methods *func_8004D508(void);
+extern Class86AA0Methods *GetClass86AA0Methods(void);
 
 /* MEASURED, round 9: GetClass6B5CCMethods TAKES NO ARGUMENTS. Its whole body is
  * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` (asm/code_d294.s) -- it reads
@@ -908,7 +908,7 @@ extern Class86AA0Methods *func_8004D508(void);
  * right about their own codegen and both are wrong about the function.
  * Do not "reconcile" them and do not reduce either to (void) -- that changes
  * the argument setup the caller emits and breaks the match. See
- * docs/match-reports/func_8004D3DC.md.
+ * docs/match-reports/Class86AA0__Class86AA0.md.
  *
  * Return type: round 10 split this OFF `BaseCtorTable_3bb8c_c` (func_8003F24C's
  * own return type) into its own `BaseCtorTableB_3bb8c_c`. (The split is round
@@ -916,14 +916,14 @@ extern Class86AA0Methods *func_8004D508(void);
  * originally credited round 9 with both, which would have made this a settled
  * precedent rather than a fresh judgement open to challenge.)
  *
- * The reason for the split: func_8004D47C (this unit) reaches +0x09C on THIS
+ * The reason for the split: Class86AA0__ForwardIfArg2InRange (this unit) reaches +0x09C on THIS
  * getter's table with a 3-argument call (self, arg1, arg2) -- a genuine arity
  * conflict with
  * `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established from
  * Class869D8__ForwardIfUnk10AndUnk70 via the OTHER getter, func_8003F24C). Same-offset arity
  * conflict means different table/different class, per this project's
  * established split policy (see e.g. TaskCoreObjMethods in
- * include/code_2c054.h). Purely a type-name change here -- func_8004D3DC's
+ * include/code_2c054.h). Purely a type-name change here -- Class86AA0__Class86AA0's
  * own already-matched call (`GetClass6B5CCMethods(self)->ctor(self)`) only touches
  * the +0x008 `ctor` slot, whose layout is identical in both names, so this
  * renaming changes no bytes.
@@ -935,22 +935,22 @@ extern Class86AA0Methods *func_8004D508(void);
  * the split would have been right even without the arity conflict that
  * prompted it.
  *
- * NOTE: func_8004D47C itself is STALLED, not matched, so the 3-argument
+ * NOTE: Class86AA0__ForwardIfArg2InRange itself is STALLED, not matched, so the 3-argument
  * `slot9C` below is read off its disassembly rather than proven by a byte
  * match. The offset and the argument count are observed; the parameter TYPES
  * are inferred. */
 typedef struct BaseCtorTableB_3bb8c_c BaseCtorTableB_3bb8c_c;
 struct BaseCtorTableB_3bb8c_c {
     u8 pad0[0x008];
-    void (*ctor)(void *self);                     /* +0x008, func_8004D3DC */
+    void (*ctor)(void *self);                     /* +0x008, Class86AA0__Class86AA0 */
     u8 pad00C[0x09C - 0x00C];
-    /* func_8004D47C's forward target (self, arg1 opaque, arg2 int),
+    /* Class86AA0__ForwardIfArg2InRange's forward target (self, arg1 opaque, arg2 int),
      * unconditional first statement of that function. */
     void (*slot9C)(void *self, void *arg1, s32 arg2); /* +0x09C */
 };
 
 /* ROUND 59 (extern review): parameter list only, return type untouched.
- * Measured first -- func_8004D3DC's `jal 8001e57c` (0x8004D3E8) carries
+ * Measured first -- Class86AA0__Class86AA0's `jal 8001e57c` (0x8004D3E8) carries
  * `move s0,a0` in the delay slot, a callee-save spill and not argument setup,
  * so the `self` this unit passes costs zero bytes. The definition
  * (src/code_d294_b.c:736) is `(void)` and the callee at 0x8001E57C reads no
@@ -962,7 +962,7 @@ extern BaseCtorTableB_3bb8c_c *GetClass6B5CCMethods();
 /*
  * Generic class-instance shape used only to read another object's own
  * vtable header-tag BYTE (the low byte of the header word at the vtable's
- * own +0x000) -- func_8004D434's own second argument is dispatched this
+ * own +0x000) -- Class86AA0__ForwardIfTag34's own second argument is dispatched this
  * way, compared against a literal 0x34.
  */
 typedef struct GenericTagMethods_3bb8c_c {
@@ -1396,7 +1396,7 @@ struct DreamSysView_3bb8c_c {
  * plus-self there from func_8003B8E4's own byte-exact call). Same real
  * global (`gTaskCoreMethods`) two units deep, two independent arities recorded
  * from two real call sites -- the identical situation already documented
- * for GetClass6B5CCMethods above and for func_8004D3DC's report. Kept local
+ * for GetClass6B5CCMethods above and for Class86AA0__Class86AA0's report. Kept local
  * rather than including code_2c054.h, since this unit does not otherwise
  * need that header and each translation unit gets its own extern
  * prototype for a symbol in this project.

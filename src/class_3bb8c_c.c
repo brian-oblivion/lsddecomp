@@ -47,22 +47,22 @@ Class869D8Methods *GetClass869D8Methods(void)
     return &D_800869D8;
 }
 
-Class86AA0 *func_8004D38C(void)
+Class86AA0 *New_Class86AA0(void)
 {
     Class86AA0 *self;
 
     self = func_80017B34(0x3C);
     if (self != NULL) {
-        func_8004D508()->ctor(self);
+        GetClass86AA0Methods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void func_8004D3DC(Class86AA0 *self)
+void Class86AA0__Class86AA0(Class86AA0 *self)
 {
     GetClass6B5CCMethods(self)->ctor(self);
-    self->methods = func_8004D508();
+    self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
     self->unk36 = 0;
     self->unk38 = 0;
@@ -71,14 +71,14 @@ void func_8004D3DC(Class86AA0 *self)
 void func_8004D42C(void) {
 }
 
-void func_8004D434(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
+void Class86AA0__ForwardIfTag34(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
 {
     if (arg1->methods->tag == 0x34) {
         self->methods->slotB8(self);
     }
 }
 
-void func_8004D47C(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
+void Class86AA0__ForwardIfArg2InRange(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
 {
     GetClass6B5CCMethods(self)->slot9C(self, arg1, arg2);
     if (arg2 >= 9) {
@@ -92,12 +92,12 @@ void func_8004D47C(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1, s32 arg2)
     self->methods->slotA0(self, arg1, arg2);
 }
 
-void *func_8004D500(void *self)
+void *Class86AA0__ReturnSelf(void *self)
 {
     return self;
 }
 
-Class86AA0Methods *func_8004D508(void)
+Class86AA0Methods *GetClass86AA0Methods(void)
 {
     return &D_80086AA0;
 }

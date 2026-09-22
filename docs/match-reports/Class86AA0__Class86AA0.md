@@ -1,4 +1,6 @@
-# func_8004D3DC
+# Class86AA0__Class86AA0
+
+> Renamed from `func_8004D3DC` on 2026-09-22 (tools/rename.py). Address 0x8004d3dc.
 
 **Unit:** class_3bb8c_c · **Size:** 20 words · **Status:** MATCHED (20/20)
 
@@ -14,10 +16,10 @@ after the zero-stores).
 ## The C
 
 ```c
-void func_8004D3DC(Class86AA0 *self)
+void Class86AA0__Class86AA0(Class86AA0 *self)
 {
     GetClass6B5CCMethods(self)->ctor(self);
-    self->methods = func_8004D508();
+    self->methods = GetClass86AA0Methods();
     self->unk34 = 0;
     self->unk36 = 0;
     self->unk38 = 0;

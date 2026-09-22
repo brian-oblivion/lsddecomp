@@ -1,4 +1,8 @@
-# func_8004D500
+# Class86AA0__ReturnSelf
+
+> Renamed from `ReturnSelf` on 2026-09-22 (tools/rename.py). Address 0x8004d500.
+
+> Renamed from `func_8004D500` on 2026-09-22 (tools/rename.py). Address 0x8004d500.
 
 **Unit:** class_3bb8c_c · **Size:** 2 words · **Status:** MATCHED (2/2)
 
@@ -12,7 +16,7 @@ argument/return type could not be pinned down beyond "a pointer".
 ## The C
 
 ```c
-void *func_8004D500(void *self)
+void *Class86AA0__ReturnSelf(void *self)
 {
     return self;
 }

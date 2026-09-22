@@ -1,4 +1,6 @@
-# func_8004D38C
+# New_Class86AA0
+
+> Renamed from `func_8004D38C` on 2026-09-22 (tools/rename.py). Address 0x8004d38c.
 
 **Unit:** class_3bb8c_c · **Size:** 20 words · **Status:** MATCHED (20/20)
 
@@ -6,18 +8,18 @@
 
 `New_Class86AA0`: the allocator for `Class86AA0`, mirroring New_Class869D8
 exactly but for the sibling class (`0x3C`-byte allocation, ctor
-`func_8004D3DC` fetched through `func_8004D508()->ctor`).
+`Class86AA0__Class86AA0` fetched through `GetClass86AA0Methods()->ctor`).
 
 ## The C
 
 ```c
-Class86AA0 *func_8004D38C(void)
+Class86AA0 *New_Class86AA0(void)
 {
     Class86AA0 *self;
 
     self = func_80017B34(0x3C);
     if (self != NULL) {
-        func_8004D508()->ctor(self);
+        GetClass86AA0Methods()->ctor(self);
         return self;
     }
     return NULL;

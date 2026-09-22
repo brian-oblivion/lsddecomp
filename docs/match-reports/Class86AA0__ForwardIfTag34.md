@@ -1,4 +1,6 @@
-# func_8004D434
+# Class86AA0__ForwardIfTag34
+
+> Renamed from `func_8004D434` on 2026-09-22 (tools/rename.py). Address 0x8004d434.
 
 **Unit:** class_3bb8c_c · **Size:** 18 words · **Status:** MATCHED (18/18)
 
@@ -13,7 +15,7 @@ arguments.
 ## The C
 
 ```c
-void func_8004D434(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
+void Class86AA0__ForwardIfTag34(Class86AA0 *self, GenericTagInst_3bb8c_c *arg1)
 {
     if (arg1->methods->tag == 0x34) {
         self->methods->slotB8(self);
