@@ -66,34 +66,42 @@ extern s8 MOVE_COMMAND_SIGNS[8];
    same element type as DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below, which this table
    holds pointers to. */
 
-/* {value, flag} pair array; DreamSys__StepLookYaw always writes index 0's value and
-   passes &TURN_ROTATION_YAW[-1] (== &TURN_ROTATIONS, a distinct label immediately
-   before it) to func_8001CEB4. Still raw `nonmatching` data. */
-typedef struct D_80087E84Entry {
-	s16 value;
-	s16 flag;
-} D_80087E84Entry;
-extern D_80087E84Entry TURN_ROTATION_YAW[8];
+/* A single {numerator, denominator} degree ratio. This is not a guess about
+   the LAYOUT any more (round 66): func_8001CEB4 -- vtable slot +0x044, the
+   inherited rotation setter, MATCHED in src/code_d294.c -- reads exactly
+   three of these from its `data` argument, one per axis, converts each with
+   RatioToFixed12 and divides by 360, then either STORES them into the
+   object's rotation vector (flag != 0) or ADDS them modulo a full turn
+   (flag == 0). Every constant this unit hands that slot is three of these,
+   and every one of them decodes to a plausible angle: see
+   ROTATION_YAW_180 / _PLUS45 / _MINUS45 and CARDINAL_ROTATIONS below. */
+typedef struct RotationRatio {
+	s16 numerator;
+	s16 denominator;
+} RotationRatio;
 
-/* Address-of only (never loaded through) by DreamSys__ResetSessionState, forwarded
-   as func_8001CEB4's arg2. Still raw `nonmatching` data; element type/count
-   unconfirmed (round 2026-08-30-b). */
-extern u8 ROTATION_YAW_180[];
+/* The x/y/z triple func_8001CEB4 actually consumes. */
+typedef struct RotationRatios {
+	RotationRatio x;
+	RotationRatio y;
+	RotationRatio z;
+} RotationRatios;
 
-/* 12-byte-stride table, address-of only (never loaded through) by
-   DreamSys__ApplyPendingTurn, indexed by DreamSys::turnCommand and forwarded as
-   func_8001CEB4's arg2. Splat resolves this to the SAME symbol name as
-   &TURN_ROTATION_YAW[-1] (see that field's comment above), but the two call sites
-   use incompatible strides (4 vs 12 bytes) -- likely two unrelated globals
-   that just happen to sit at adjacent addresses, not one shared array.
-   Element layout unconfirmed; still raw `nonmatching` data
-   (round 2026-08-30-b). */
-typedef struct D_80087E80Entry {
-	s32 unk0;
-	s32 unk4;
-	s32 unk8;
-} D_80087E80Entry;
-extern D_80087E80Entry TURN_ROTATIONS[];
+/* One 12-byte-stride RotationRatios array that splat had to split across two
+   labels, because DreamSys__StepLookYaw references its SECOND word (entry
+   0's yaw numerator, which it overwrites with its own per-tick delta) while
+   DreamSys__ApplyPendingTurn address-takes whole entries. The round-2026-08-30-b
+   note here read the 4-byte and 12-byte views as "likely two unrelated
+   globals"; they are one table, and the data says so -- entry 0 is
+   (0 deg, 45 deg, 0 deg) with the 45 being exactly the +-0x2D
+   DreamSys__StepLookYaw writes, entry 1 is (0, -6, 0) and entry 2 is
+   (0, +6, 0), which are DreamSys::turnCommand's two values 1 and 2. */
+extern RotationRatio TURN_ROTATION_YAW[]; /* == &TURN_ROTATIONS[0].y */
+extern RotationRatios TURN_ROTATIONS[];
+
+/* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as func_8001CEB4's
+   arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
+extern RotationRatios ROTATION_YAW_180;
 
 typedef struct CinematicCall{
 	s16 bank;
@@ -530,16 +538,17 @@ extern struct RelativePos STAIRCASE_OFFSET_1;
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos STAIRCASE_OFFSET_3;
 
-/* Address-of only (never dereferenced by this unit's queued functions),
-   forwarded as vtable slot +0x044's (func_8001CEB4) arg2 by DreamSys__TickStaircaseCase2
-   (round 2026-09-02) -- same "opaque generic pointer" shape as that slot's
-   other known call site (TURN_ROTATION_YAW[-1]). */
-extern u8 ROTATION_YAW_PLUS45[];
+/* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (func_8001CEB4)
+   arg2 with flag 0 (relative) by DreamSys__TickStaircaseCase0 and
+   DreamSys__TickStaircaseCase2. Typed RotationRatios round 66: its three
+   {numerator, denominator} words are {0,1} {0x2D,1} {0,1}, byte-identical in
+   form to ROTATION_YAW_180 and to every CARDINAL_ROTATIONS entry. */
+extern RotationRatios ROTATION_YAW_PLUS45;
 
-/* Same "opaque generic pointer" shape as ROTATION_YAW_PLUS45 above, forwarded as
-   vtable slot +0x044's (func_8001CEB4) arg2 by DreamSys__TickStaircaseCase3
-   (round 2026-09-02) -- a different constant/address, same call shape. */
-extern u8 ROTATION_YAW_MINUS45[];
+/* (0 deg, -45 deg, 0 deg) -- the mirror of ROTATION_YAW_PLUS45 above
+   ({0,1} {0xFFD3,1} {0,1}), used the same way by
+   DreamSys__TickStaircaseCase1 and DreamSys__TickStaircaseCase3. */
+extern RotationRatios ROTATION_YAW_MINUS45;
 
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed

@@ -60,7 +60,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 void DreamSys__ResetSessionState(DreamSys *this)
 {
 	this->vt->func_8001D344(this, 0);
-	this->vt->func_8001CEB4(this, 1, ROTATION_YAW_180);
+	this->vt->func_8001CEB4(this, 1, &ROTATION_YAW_180);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;
 	*(s32 *)this->soundCueSet = 0;
@@ -579,7 +579,7 @@ void DreamSys__StepLookYaw(DreamSys *this)
 			goto call_tail;
 		}
 	apply:
-		TURN_ROTATION_YAW[0].value = delta;
+		TURN_ROTATION_YAW[0].numerator = delta;
 		this->vt->func_8001CEB4(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw = sum;
 		this->lookYawCommand = 0;
@@ -587,7 +587,7 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		delta = -0x2D;
 		if (this->lookYaw < 0)
 			delta = 0x2D;
-		TURN_ROTATION_YAW[0].value = delta;
+		TURN_ROTATION_YAW[0].numerator = delta;
 		this->vt->func_8001CEB4(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw += delta;
 	} else {
@@ -1719,7 +1719,13 @@ typedef struct DirectionCheckArg {
 
 /* 4-entry cardinal-direction table (12-byte stride); only the first u16 of
    each entry (the angle: 0/90/180/270) is read anywhere in this unit's
-   queue. Kept local for the same reason as DirectionCheckArg above. */
+   queue. Kept local for the same reason as DirectionCheckArg above.
+   Round 66: this view is a window into CARDINAL_ROTATIONS (below), 4 bytes
+   further on -- `angle` is that entry's yaw NUMERATOR, i.e.
+   CARDINAL_ROTATIONS[i].y.numerator, and `unk2` is its denominator (always
+   1). The two views are kept separate because this one reads the angle as a
+   bare u16 for arithmetic while the other is only ever address-taken and
+   handed to func_8001CEB4 as a rotation. */
 typedef struct DirectionTableEntry {
 	u16 angle;
 	u16 unk2;
@@ -1743,16 +1749,20 @@ extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);
 extern u8 *D_800889B8[];
 extern u8 *D_80088858[];
 
-/* A `DirectionTableEntry`-STRIDED (12-byte) table whose first element
-   happens to sit 4 bytes before the separately-referenced `CARDINAL_ANGLES`
-   (the angle table `IsHeadingAligned` indexes) -- splat drew the boundary
-   there because `CARDINAL_ANGLES` is independently referenced, not because the
-   underlying data is two different tables. This function only ever
-   ADDRESS-TAKES an element (`&CARDINAL_ROTATIONS[i]`), never dereferences one, so
-   the element type only needs to fix the STRIDE; reusing
-   `DirectionTableEntry` for that is exact and avoids inventing a third
-   local type for one call site. */
-extern DirectionTableEntry CARDINAL_ROTATIONS[];
+/* The 12-byte-stride table whose first element sits 4 bytes before the
+   separately-referenced `CARDINAL_ANGLES` -- splat drew the boundary there
+   because `CARDINAL_ANGLES` is independently referenced, not because the
+   underlying data is two different tables. Round 66 types it
+   `RotationRatios` (include/DreamSys.h) rather than as a stride-only
+   placeholder: every entry is three {numerator, denominator} degree ratios
+   in exactly the form func_8001CEB4 consumes, and the four entries' yaw
+   numerators are 0, 0x5A, 0xB4, 0x10E -- 0, 90, 180 and 270 degrees. That is
+   also what the two functions below do with an element: they store its
+   ADDRESS into DreamSys::enterRotation / ::exitRotation, and the only things
+   those two fields are ever used for are func_8001CEB4(this, 1, ptr) calls
+   in DreamSys__SetMoveOverride, DreamSys__SpawnAtLink and
+   DreamSys__TryStaircaseLink. */
+extern RotationRatios CARDINAL_ROTATIONS[];
 
 s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
