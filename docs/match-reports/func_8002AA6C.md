@@ -1359,3 +1359,48 @@ candidate that reorders two adjacent assignment statements, check that
 neither statement now reads a variable that has not yet been assigned on
 that path -- this is a strictly cheaper check than a full build-and-verify
 round trip and catches this class before it costs one.
+
+## Round 68 (runner charlie): NON_MATCHING body promoted
+
+Track 1b. This report's title-region "salvaged mid-attempt snapshot,
+never measured" label describes the STARTING point (round 17-19), not the
+body being promoted here. What is promoted is round 41's 215/223-word
+body (length exact, 223/223), reached through nine subsequent rounds of
+measure-and-reshape (19, 20, 24, 25, 32, 33, 36, 39, 41) after the salvage
+-- by round 20 the length was already exact (202/223) and every round
+since re-verified the figure fresh rather than trusting a stale one. This
+is not the unmeasured snapshot; judged on the body actually in front of
+me, not on the round-17 label.
+
+**Hybrid, both halves reviewed:**
+- The overall control-flow/loop structure, the retry-counter decrement
+  idiom, the reused `func_8002A510`/link-wait blocks and the final
+  `volatile s32 *pF4` unfolded-addressing idiom are hand-derived across
+  rounds 17-39.
+- The `n`/`saved` throwaway-sink reuse inside the `{ s32 v0 = p2[0]; ... }`
+  block is a permuter find (round 41, candidate `output-235-1`). Reviewed
+  here against the report's own correctness argument and re-confirmed:
+  `n` (the retry counter) is not read again until `tail:` unconditionally
+  overwrites it, and `saved` (holding a stashed `D_8006D5FC`) is already
+  consumed earlier on this same path before being reused as `(s32)&buf` --
+  both are freshly written on every pass through this code before their
+  next read, with no loop-carried path back to a stale value. This is the
+  SAME idiom already reviewed and promoted in `func_8002B198.md`.
+- A second, lower-scoring permuter candidate from the same round
+  (`output-215-1`, which hoists a `D_80010AAC` address load out of the
+  retry loop) was reviewed and rejected as UNSOUND: `$a0` is caller-saved
+  and the loop body makes calls that clobber it, so the hoisted form reads
+  garbage on any iteration after the first where the retry counter is
+  still under 7. Correctly never adopted. A third permuter search (round
+  49) found two candidates at score 95 that both reorder `p2 = pRetry + 4;`
+  before `pRetry`'s own assignment -- reading an uninitialized local,
+  undefined behavior -- and both were rejected on inspection without ever
+  being built. Only `output-235-1` was ever incorporated.
+
+Residue at 215/223: two small isolated clusters (a loop-setup scheduling
+swap and a register-identity swap in the final block), both confirmed
+inert to every reorder/spelling axis tried across rounds 41 and 49.
+Compiles clean under `-DNON_MATCHING` (one pre-existing `func_80029F10`
+int-from-pointer warning, no errors).
+
+NON_MATCHING body promoted, round 68.
