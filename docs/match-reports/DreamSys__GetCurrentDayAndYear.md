@@ -1,4 +1,6 @@
-# func_8005A2E4
+# DreamSys__GetCurrentDayAndYear
+
+> Renamed from `func_8005A2E4` on 2026-09-22 (tools/rename.py). Address 0x8005a2e4.
 
 **Unit:** DreamSys · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
@@ -11,7 +13,7 @@ in delay slots, executing unconditionally).
 ## The C
 
 ```c
-s32 func_8005A2E4(DreamSys *this, s32 *arg1)
+s32 DreamSys__GetCurrentDayAndYear(DreamSys *this, s32 *arg1)
 {
 	if (arg1 != NULL)
 		*arg1 = this->currentYear;
@@ -21,10 +23,10 @@ s32 func_8005A2E4(DreamSys *this, s32 *arg1)
 
 ## Retype: `arg1` was `s32`, is now `s32 *`
 
-The vtable field was previously typed `s32 (*func_8005A2E4)(DreamSys *this,
+The vtable field was previously typed `s32 (*DreamSys__GetCurrentDayAndYear)(DreamSys *this,
 s32 arg1);` from an earlier round's note about the one known external call
 site (`Class6D3C8`'s slot58, `src/code_1677c.c`, calling
-`this->vt->func_8005A2E4(this, 0)`). That call passes a literal `0`, which
+`this->vt->DreamSys__GetCurrentDayAndYear(this, 0)`). That call passes a literal `0`, which
 is a valid null-pointer constant, so retyping to `s32 *` needed no change
 there. The function's OWN body makes clear `arg1` is an output pointer
 (`sw v0, 0x0($a1)`, not a value use), not a plain scalar.

@@ -25,7 +25,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 		this->vt->DynamicLink(this);
 	}
 	this->vt->func_8005B990(this);
-	this->vt->func_800590E0(this);
+	this->vt->DreamSys__NoOpSlotE8Default(this);
 }
 ```
 
@@ -33,7 +33,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 
 First attempt wrote the two guards as a combined `if (arg2 == 4 &&
 this->unknwon_int_0x44 == 0) { ...link-handling... }`, followed
-unconditionally by the two tail calls (`func_8005B990`, `func_800590E0`).
+unconditionally by the two tail calls (`func_8005B990`, `DreamSys__NoOpSlotE8Default`).
 That reached 75/77 with both remaining diffs being the SAME two early
 branches' TARGET address: retail sends both `arg2 != 4` and `unknwon_int_0x44
 != 0` straight to the function's own epilogue, skipping the two tail calls
@@ -50,8 +50,8 @@ attempt.
   retyped from the untyped placeholder to
   `void (*LinkWall)(DreamSys *this, void *arg1, s32 arg2)`.
 - **`vtable_DreamSys+0x0E8` carved out of `unknown_functions_0xe4[6]` and
-  named `func_800590E0`** — this unit's own existing no-op stub
-  (`void func_800590E0(void) { }`). Called here as `(this)`; the callee
+  named `DreamSys__NoOpSlotE8Default`** — this unit's own existing no-op stub
+  (`void DreamSys__NoOpSlotE8Default(void) { }`). Called here as `(this)`; the callee
   ignores the argument entirely (an "empty-bodied vtable occupant" that DOES
   take a parameter per its slot's calling convention, matching the already-
   documented caution that an empty body is not evidence a slot takes no

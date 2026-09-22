@@ -235,10 +235,10 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 		this->vt->DynamicLink(this);
 	}
 	this->vt->func_8005B990(this);
-	this->vt->func_800590E0(this);
+	this->vt->DreamSys__NoOpSlotE8Default(this);
 }
 
-void func_800590E0(void) {
+void DreamSys__NoOpSlotE8Default(void) {
 }
 
 s32 func_800590E8(DreamSys *this, DreamColors *out, s32 value)
@@ -356,13 +356,13 @@ void func_800593D8(DreamSys *this)
 		this->callback_0x98(this);
 }
 /* Local prototypes, own local view (Class6B5CC__LocalOffsetToWorldPos is a different unit's
- * already-matched function taking an unrelated class as arg0; func_8005950C
+ * already-matched function taking an unrelated class as arg0; InterpolateKeyframeValue
  * is this unit's own next-in-queue function, forward-declared per
  * CLAUDE.md's convention for calling into a not-yet-preceding definition).
  * arg4 on Class6B5CC__LocalOffsetToWorldPos is unused by its own body but IS set (to 0) by this
  * call site's own disassembly, so it is declared here to reproduce that. */
 extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4); /* arity-ok: definition is 3-parameter, but arg4 is byte-load-bearing HERE -- retail emits `move a3,zero` at 0x80059460 */
-extern s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
+extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
 s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
@@ -376,7 +376,7 @@ s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 toleran
 	*p = day;
 	Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
-	ret = func_8005950C((void *)((u8 *)this->unk_0x5C + 0x14),
+	ret = InterpolateKeyframeValue((void *)((u8 *)this->unk_0x5C + 0x14),
 	                     (void *)((u8 *)this->unk_0x5C + 0x20), day);
 
 	vec = this->unk_0xC != 0 ? (s32 *)((u8 *)this->unk_0x14 + 0x38) : 0;
@@ -391,7 +391,7 @@ s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 toleran
 	return 0;
 }
 
-s32 func_8005950C(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
+s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
 {
 	s32 scaledArg2;
 	s32 dt;
@@ -443,10 +443,10 @@ void func_8005966C(DreamSys *this, s32 arg1)
 		this->callback_0x80 = vt->func_800597C0;
 		break;
 	case 2:
-		this->callback_0x80 = vt->func_80059A48;
+		this->callback_0x80 = vt->DreamSys__NoOpSlot14C;
 		break;
 	case 3:
-		this->callback_0x80 = vt->func_80059A50;
+		this->callback_0x80 = vt->DreamSys__NoOpSlot150;
 		break;
 	}
 }
@@ -595,10 +595,10 @@ void func_80059A1C(DreamSys *this)
 	}
 }
 
-void func_80059A48(void) {
+void DreamSys__NoOpSlot14C(void) {
 }
 
-void func_80059A50(void) {
+void DreamSys__NoOpSlot150(void) {
 }
 
 s32 func_80059A58(DreamSys *this)
@@ -880,7 +880,7 @@ void DreamSys__GetSetScreenShake(DreamSys *this, bool *value)
 	*value = old;
 }
 
-s32 func_8005A2E4(DreamSys *this, s32 *arg1)
+s32 DreamSys__GetCurrentDayAndYear(DreamSys *this, s32 *arg1)
 {
 	if (arg1 != NULL)
 		*arg1 = this->currentYear;
@@ -897,12 +897,12 @@ s32 DreamSys__AdvanceDay(DreamSys *this)
 	return this->currentDay;
 }
 
-void func_8005A33C(DreamSys *this)
+void DreamSys__ClearNewGameFlag(DreamSys *this)
 {
 	this->unk_0x878 = 0;
 }
 
-s32 func_8005A344(DreamSys *this)
+s32 DreamSys__GetNewGameFlag(DreamSys *this)
 {
 	return this->unk_0x878;
 }
@@ -1164,7 +1164,7 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", func_8005A9CC);
 s32 func_8005AB2C(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
-		func_8005AF64(this, &D_8008ABC0, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x85)
@@ -1189,7 +1189,7 @@ s32 func_8005AC24(DreamSys *this)
 	s32 flag;
 
 	if (this->unk_0x914 == 0) {
-		func_8005AF64(this, &D_8008ABC8, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABC8, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x95)
@@ -1217,7 +1217,7 @@ s32 func_8005AC24(DreamSys *this)
 s32 func_8005AD68(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
-		func_8005AF64(this, &D_8008ABD0, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABD0, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 < 0x65) {
@@ -1246,7 +1246,7 @@ s32 func_8005AE40(DreamSys *this)
 	s32 flag;
 
 	if (this->unk_0x914 == 0) {
-		func_8005AF64(this, &D_8008ABD8, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABD8, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x71)
@@ -1271,7 +1271,7 @@ s32 func_8005AE40(DreamSys *this)
 	return 0;
 }
 
-void func_8005AF64(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
+void DreamSys__ApplyRelativeOffset(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
 {
 	DreamSysVec3 diff;
 

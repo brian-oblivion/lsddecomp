@@ -13,7 +13,7 @@ instead of one, and different thresholds/constants:
 s32 func_8005AB2C(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
-		func_8005AF64(this, &D_8008ABC0, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x85)
@@ -91,7 +91,7 @@ This matched first try after the rewrite (62/62).
 
 ## New knowledge
 
-- **`D_8008ABC0` (`struct RelativePos`)**, passed as `func_8005AF64`'s `a`
+- **`D_8008ABC0` (`struct RelativePos`)**, passed as `DreamSys__ApplyRelativeOffset`'s `a`
   argument by this function — same call shape as `func_8005AD68`'s
   `D_8008ABD0`, just a different constant 0x10 bytes earlier in the same
   table.

@@ -38,7 +38,7 @@ reading/writing offset `0x87C` in retail versus `0x878` in the build — every
 other word matched, including branch targets, register allocation, and the
 tricky `entry->timeLimit + 4` and 36-byte-stride index computation. `0x878`
 is `DreamSys::unk_0x878`, a field several already-matched functions use
-(`func_8005A33C`, `func_8005A344`, `DreamSys__func_588ec`,
+(`DreamSys__ClearNewGameFlag`, `DreamSys__GetNewGameFlag`, `DreamSys__func_588ec`,
 `DreamSys__EndDay`) — so it could not itself be at the wrong offset. The
 actual field at `0x87C` is the VERY NEXT declared field,
 `DreamSys::currentFlashbackIndex`, which is semantically the right one

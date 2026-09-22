@@ -52,7 +52,7 @@ reshaping needed.
   (a `MoodGraphPoint[365]`, 2 bytes per element) starts at `+0x190` and is
   indexed by `currentDay` -- matches the already-declared field exactly.
 - `this->unk_0x878`: already-named field (used elsewhere by
-  `func_8005A33C`/`func_8005A344` per existing header comments).
+  `DreamSys__ClearNewGameFlag`/`DreamSys__GetNewGameFlag` per existing header comments).
 
 No new fields, no new vtable slots.
 

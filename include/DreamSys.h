@@ -450,7 +450,7 @@ typedef struct Func8005A1F4Arg {
 } Func8005A1F4Arg;
 
 /* Full-word (x,y,z) vector, distinct from `struct RelativePos` (s16 triplet
-   -- the on-disk/network form). func_8005AF64 builds one of these on the
+   -- the on-disk/network form). DreamSys__ApplyRelativeOffset builds one of these on the
    stack as a-b with y forced to 0; func_8005A0B0 passes the static
    D_80087EA4 instance of one. Both feed vtable slot +0xBC
    (BaseObjO__AddVec14, round 2026-08-30-d). */
@@ -488,21 +488,21 @@ extern DreamSysVec3 D_80087EA4;
      `D_80087EE8`, which is the vector's 3rd word). */
 extern s32 D_80087EE8;
 
-/* A `struct RelativePos` constant, passed as func_8005AF64's `a` argument
+/* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
    by func_8005AD68 (round 2026-09-02). */
 extern struct RelativePos D_8008ABD0;
 
-/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+/* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
    argument by func_8005AB2C -- same call shape as D_8008ABD0 above, just a
    different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABC0;
 
-/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+/* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
    argument by func_8005AC24 -- same call shape as D_8008ABC0/D_8008ABD0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABC8;
 
-/* Another `struct RelativePos` constant, passed as func_8005AF64's `a`
+/* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
    argument by func_8005AE40 -- same call shape as D_8008ABD0/D_8008ABC0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos D_8008ABD8;
@@ -518,10 +518,10 @@ extern u8 D_80087EFC[];
    (round 2026-09-02) -- a different constant/address, same call shape. */
 extern u8 D_80087F08[];
 
-/* Argument shape for func_8005950C: two "keyframe" points, each with a
+/* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
    (unread by this function). Called by still-INCLUDE_ASM func_8005942C as
-   func_8005950C(&this->unk_0x5C->unknown_values_0x0[0x14], arg2, arg3) --
+   InterpolateKeyframeValue(&this->unk_0x5C->unknown_values_0x0[0x14], arg2, arg3) --
    the first argument is one of DreamSysUnk5C's two documented "point"
    fields (round 2026-08-30-d). */
 typedef struct DreamSysInterpPoint {
@@ -619,7 +619,7 @@ typedef struct DreamSys {
 	s32 unk_0x58;
 	/* Set by func_80059384(this, value); read as a pointer by
 	   func_8005942C (this->unk_0x5C + 0x14 and + 0x20 are passed to
-	   func_8005950C), so it points to a pair of two-word (x,y) points. */
+	   InterpolateKeyframeValue), so it points to a pair of two-word (x,y) points. */
 	DreamSysUnk5C *unk_0x5C;
 	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
 	   (round 2026-09-02) -- see DreamSysCtorArgObj. No other observed use in
@@ -812,7 +812,7 @@ typedef struct DreamSys {
 	/* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
 	   PlayerSpawnPoint whole-struct-copied here by func_8005A9CC. */
 	PlayerSpawnGridPos unk_0x918;
-	/* A `struct RelativePos`, address-taken and passed to func_8005AF64 as
+	/* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
 	   its `b` argument (round 2026-09-02, func_8005AD68) -- carved out of
 	   what was raw padding in the same 0x10-byte block as unk_0x914 above. */
 	struct RelativePos unk_0x91C;
@@ -915,7 +915,7 @@ struct vtable_DreamSys{
 	   0x80057384 is outside this unit/runner's range; still INCLUDE_ASM. */
 	void (*BaseObjO__SetVec14)(DreamSys *this, void *arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0BC). Called by
-	   func_8005AF64 and func_8005A0B0 with a DreamSysVec3* second argument
+	   DreamSys__ApplyRelativeOffset and func_8005A0B0 with a DreamSysVec3* second argument
 	   (round 2026-08-30-d). */
 	void (*BaseObjO__AddVec14)(DreamSys *this, DreamSysVec3 *arg1);
 	/* Called by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked by its own
@@ -952,10 +952,10 @@ struct vtable_DreamSys{
 	/* This function's OWN slot; a single `sh a1, 0x48(a0)` store
 	   (`this->lastOffsetValue = val`) (round 2026-09-04). */
 	void (*DreamSys__SetLastOffsetValue)(DreamSys *this, s16 val);
-	/* This unit's own no-op stub (`func_800590E0`, `{ }`). Called by
+	/* This unit's own no-op stub (`DreamSys__NoOpSlotE8Default`, `{ }`). Called by
 	   DreamSys__WallLink as (this) -- the callee ignores its argument
 	   (round 2026-09-02). */
-	void (*func_800590E0)(DreamSys *this);
+	void (*DreamSys__NoOpSlotE8Default)(DreamSys *this);
 	/* This function's OWN slot; a single `sw a1, 0x54(a0)` store
 	   (`this->pendingExtra = extra`) (round 2026-09-04). */
 	void (*DreamSys__SetPendingExtra)(DreamSys *this, void *extra);
@@ -993,9 +993,9 @@ struct vtable_DreamSys{
 	void (*func_80059814)(DreamSys *this);
 	void (*func_800598E8)(DreamSys *this);
 	/* No-op stub (`{ }`); one of func_8005966C's callback_0x80 choices. */
-	void (*func_80059A48)(DreamSys *this);
+	void (*DreamSys__NoOpSlot14C)(DreamSys *this);
 	/* No-op stub (`{ }`); one of func_8005966C's callback_0x80 choices. */
-	void (*func_80059A50)(DreamSys *this);
+	void (*DreamSys__NoOpSlot150)(DreamSys *this);
 	/* Dispatches on unk_0x6C to func_8005A050+func_80059AEC, func_80059BD4,
 	   or func_80059B50, and returns whichever's result (round 2026-08-30). */
 	s32 (*func_80059A58)(DreamSys *this);
@@ -1057,17 +1057,17 @@ struct vtable_DreamSys{
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
 	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as
-	   this->vt->func_8005A2E4(this, 0), compared against 1. Real name and
+	   this->vt->DreamSys__GetCurrentDayAndYear(this, 0), compared against 1. Real name and
 	   full semantics unknown outside that one call site. arg1 is an OUTPUT
 	   pointer (this->currentYear is written through it when non-NULL), not
 	   a plain s32 -- retyped round 2026-08-30-c; the one external call site
 	   passes literal 0, compatible with either. */
-	s32 (*func_8005A2E4)(DreamSys *this, s32 *arg1);
+	s32 (*DreamSys__GetCurrentDayAndYear)(DreamSys *this, s32 *arg1);
 	s32 (*AdvanceDay)(DreamSys *this);
 	/* Zeroes unk_0x878 unconditionally (round 2026-08-30-c). */
-	void (*func_8005A33C)(DreamSys *this);
+	void (*DreamSys__ClearNewGameFlag)(DreamSys *this);
 	/* Getter for unk_0x878 (round 2026-08-30-c). */
-	s32 (*func_8005A344)(DreamSys *this);
+	s32 (*DreamSys__GetNewGameFlag)(DreamSys *this);
 	/* Optionally writes a literal 0x700 through arg1 (if non-NULL), always
 	   returns &this->unknown_sdata_0x178 (round 2026-08-30-c). */
 	s32 *(*func_8005A350)(DreamSys *this, s32 *arg1);

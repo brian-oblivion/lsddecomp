@@ -8,7 +8,7 @@ never a `STALL`, just never documented.
 ## Which slot this overrides
 
 `include/DreamSys.h`'s `vtable_DreamSys` names the DEFAULT `+0x0E8` value
-`func_800590E0` ("this unit's own no-op stub... Called by DreamSys__WallLink
+`DreamSys__NoOpSlotE8Default` ("this unit's own no-op stub... Called by DreamSys__WallLink
 as (this)"), a DIFFERENT function belonging to a different unit. This
 function (`0x80057C74`) is a SIBLING override of that SAME conceptual
 slot, used by different subclass instance tables:
@@ -24,9 +24,9 @@ Each of those table words sits exactly `+0x20` past that same instance
 table's own `+0x0C8` slot (confirmed against the `DreamSys__ApplyOffsetSlot0`
 occurrences at the same table bases), i.e. `+0x0C8 + 0x20 = +0x0E8` --
 the same slot `DreamSys__WallLink` calls unconditionally on `this`
-(per `func_800590E0`'s own comment), just a different subclass's
+(per `DreamSys__NoOpSlotE8Default`'s own comment), just a different subclass's
 override of it. Not a vtable slot type change: `vtable_DreamSys` keeps
-one field name per slot (its DEFAULT occupant, `func_800590E0`); this is
+one field name per slot (its DEFAULT occupant, `DreamSys__NoOpSlotE8Default`); this is
 a per-INSTANCE override value, invisible to the struct definition itself.
 
 ## Body
@@ -36,7 +36,7 @@ void DreamSys__NoOpSlotE8(void) {
 }
 ```
 
-Same "callee ignores `this`" shape as `func_800590E0` and
+Same "callee ignores `this`" shape as `DreamSys__NoOpSlotE8Default` and
 `DreamSys__NoOpSlotD8` (this unit) -- present only to match the caller's
 calling convention, per the project's established "per-call-site
 signature" precedent.

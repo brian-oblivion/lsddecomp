@@ -1,4 +1,6 @@
-# func_8005AF64
+# DreamSys__ApplyRelativeOffset
+
+> Renamed from `func_8005AF64` on 2026-09-22 (tools/rename.py). Address 0x8005af64.
 
 **Unit:** DreamSys · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
 
@@ -11,7 +13,7 @@ Builds a full-word `(x,y,z)` difference vector from two `RelativePos`
 ## The C
 
 ```c
-void func_8005AF64(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
+void DreamSys__ApplyRelativeOffset(DreamSys *this, struct RelativePos *a, struct RelativePos *b)
 {
 	DreamSysVec3 diff;
 

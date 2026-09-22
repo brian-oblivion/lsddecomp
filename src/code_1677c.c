@@ -136,7 +136,7 @@ s32 func_80026410(Class6D3C8 *self) {
     if (self->arg->unk10 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
 
-        status = self->dreamSys->vt->func_8005A2E4(self->dreamSys, 0);
+        status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
                 status = func_80026518(func_80057F68, self->dreamSys, self->unk1C);
@@ -244,7 +244,7 @@ s32 func_80026698(Class6D3C8 *self) {
         break;
     }
 
-    check = self->dreamSys->vt->func_8005A2E4(self->dreamSys, &outVal);
+    check = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, &outVal);
     result = 0;
     if (outVal != 0) {
         result = (check == 1);
